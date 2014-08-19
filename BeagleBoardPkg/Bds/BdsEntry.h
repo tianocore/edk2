@@ -45,7 +45,7 @@
 
 EFI_STATUS
 LoadPeCoffSectionFromFv (
- IN  EFI_HANDLE   FvHandle,  
+ IN  EFI_HANDLE   FvHandle,
  IN  EFI_GUID     *NameGuid
  );
 

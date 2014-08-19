@@ -3,7 +3,7 @@
   a buffer.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -27,18 +27,18 @@
 
 VOID *
 UncachedInternalAllocatePages (
-  IN EFI_MEMORY_TYPE  MemoryType,  
+  IN EFI_MEMORY_TYPE  MemoryType,
   IN UINTN            Pages
   );
 
 VOID *
 UncachedInternalAllocateAlignedPages (
-  IN EFI_MEMORY_TYPE  MemoryType,  
+  IN EFI_MEMORY_TYPE  MemoryType,
   IN UINTN            Pages,
   IN UINTN            Alignment
   );
-  
-  
+
+
 
 //
 // Assume all of memory has the same cache attributes, unless we do our magic
@@ -60,16 +60,16 @@ AddPagesToList (
   )
 {
   FREE_PAGE_NODE  *NewNode;
-  
+
   NewNode = AllocatePool (sizeof (LIST_ENTRY));
   if (NewNode == NULL) {
     ASSERT (FALSE);
     return;
   }
-  
+
   NewNode->Allocation = Allocation;
   NewNode->Pages      = Pages;
-  
+
   InsertTailList (&mPageList, &NewNode->Link);
 }
 
@@ -84,12 +84,12 @@ RemovePagesFromList (
   FREE_PAGE_NODE  *OldNode;
 
   *Pages = 0;
-  
+
   for (Link = mPageList.ForwardLink; Link != &mPageList; Link = Link->ForwardLink) {
     OldNode = BASE_CR (Link, FREE_PAGE_NODE, Link);
     if (OldNode->Allocation == Allocation) {
       *Pages = OldNode->Pages;
-      
+
       RemoveEntryList (&OldNode->Link);
       FreePool (OldNode);
       return;
@@ -119,7 +119,7 @@ ConvertToPhysicalAddress (
 
 VOID *
 UncachedInternalAllocatePages (
-  IN EFI_MEMORY_TYPE  MemoryType,  
+  IN EFI_MEMORY_TYPE  MemoryType,
   IN UINTN            Pages
   )
 {
@@ -170,7 +170,7 @@ UncachedFreePages (
 
 VOID *
 UncachedInternalAllocateAlignedPages (
-  IN EFI_MEMORY_TYPE  MemoryType,  
+  IN EFI_MEMORY_TYPE  MemoryType,
   IN UINTN            Pages,
   IN UINTN            Alignment
   )
@@ -187,7 +187,7 @@ UncachedInternalAllocateAlignedPages (
   // Alignment must be a power of two or zero.
   //
   ASSERT ((Alignment & (Alignment - 1)) == 0);
- 
+
   if (Pages == 0) {
     return NULL;
   }
@@ -201,7 +201,7 @@ UncachedInternalAllocateAlignedPages (
     // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
     //
     ASSERT (RealPages > Pages);
- 
+
     Status         = gBS->AllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
     if (EFI_ERROR (Status)) {
       return NULL;
@@ -234,16 +234,16 @@ UncachedInternalAllocateAlignedPages (
     }
     AlignedMemory  = (UINTN) Memory;
   }
-  
+
   Status = gDS->GetMemorySpaceDescriptor (Memory, &Descriptor);
   if (!EFI_ERROR (Status)) {
     // We are making an assumption that all of memory has the same default attributes
     gAttributes = Descriptor.Attributes;
   }
-  
+
   Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_WC);
   ASSERT_EFI_ERROR (Status);
-  
+
   return (VOID *)(UINTN)Memory;
 }
 
@@ -256,13 +256,13 @@ UncachedFreeAlignedPages (
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Memory; 
+  EFI_PHYSICAL_ADDRESS  Memory;
 
   ASSERT (Pages != 0);
-  
+
   Memory = (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer;
   Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), gAttributes);
-  
+
   Status = gBS->FreePages (Memory, Pages);
   ASSERT_EFI_ERROR (Status);
 }
@@ -278,7 +278,7 @@ UncachedInternalAllocateAlignedPool (
   )
 {
   VOID      *AlignedAddress;
-  
+
   //
   // Alignment must be a power of two or zero.
   //
@@ -287,7 +287,7 @@ UncachedInternalAllocateAlignedPool (
   if (Alignment < EFI_PAGE_SIZE) {
     Alignment = EFI_PAGE_SIZE;
   }
-    
+
   AlignedAddress = UncachedInternalAllocateAlignedPages (PoolType, EFI_SIZE_TO_PAGES (AllocationSize), Alignment);
   if (AlignedAddress == NULL) {
     return NULL;
@@ -382,7 +382,7 @@ UncachedInternalAllocateAlignedCopyPool (
   )
 {
   VOID  *Memory;
-  
+
   ASSERT (Buffer != NULL);
   ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN) Buffer + 1));
 
@@ -433,7 +433,7 @@ UncachedFreeAlignedPool (
   )
 {
   UINTN   Pages;
-  
+
   RemovePagesFromList (Allocation, &Pages);
 
   UncachedFreePages (Allocation, Pages);
@@ -441,7 +441,7 @@ UncachedFreeAlignedPool (
 
 VOID *
 UncachedInternalAllocatePool (
-  IN EFI_MEMORY_TYPE  MemoryType,  
+  IN EFI_MEMORY_TYPE  MemoryType,
   IN UINTN            AllocationSize
   )
 {
@@ -478,9 +478,9 @@ UncachedAllocateReservedPool (
 
 VOID *
 UncachedInternalAllocateZeroPool (
-  IN EFI_MEMORY_TYPE  PoolType,  
+  IN EFI_MEMORY_TYPE  PoolType,
   IN UINTN            AllocationSize
-  ) 
+  )
 {
   VOID  *Memory;
 
@@ -520,10 +520,10 @@ UncachedAllocateReservedZeroPool (
 
 VOID *
 UncachedInternalAllocateCopyPool (
-  IN EFI_MEMORY_TYPE  PoolType,  
+  IN EFI_MEMORY_TYPE  PoolType,
   IN UINTN            AllocationSize,
   IN CONST VOID       *Buffer
-  ) 
+  )
 {
   VOID  *Memory;
 
@@ -535,7 +535,7 @@ UncachedInternalAllocateCopyPool (
      Memory = CopyMem (Memory, Buffer, AllocationSize);
   }
   return Memory;
-} 
+}
 
 VOID *
 EFIAPI

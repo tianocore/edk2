@@ -11,7 +11,7 @@ define /r GetMaxMem()
 define /r GetWord(Addr)
 {
   unsigned long data;
-  
+
   if( (Addr & 0x2) == 0 )
   {
     data = dword(Addr);
@@ -68,7 +68,7 @@ unsigned long imgstart;
 		$printf "debug type is %x",debugtype$;
 		return;
 	}
-	
+
 	debugrva = dword(imgstart + debugdirentryrva + 0x14);
 	dwarfsig = dword(imgstart + debugrva);
 	if(dwarfsig != 0x66727764)
@@ -81,7 +81,7 @@ unsigned long imgstart;
 
   baseofcode = imgstart + dword(filehdrstart + 0x28);
   baseofdata = imgstart + dword(filehdrstart + 0x2c);
- 
+
   if( (baseofcode < baseofdata) && (baseofcode != 0) )
   {
 		elfbase = baseofcode;
@@ -132,7 +132,7 @@ unsigned long imgstart;
 		$printf "debug type is %x",debugtype$;
 		return;
 	}
-	
+
 	debugrva = dword(imgstart + debugdirentryrva + 0x14);
   debugrva = debugrva - strippedsize;
 	dwarfsig = dword(imgstart + debugrva);
@@ -142,16 +142,16 @@ unsigned long imgstart;
 		$printf "found %x", dwarfsig$;
 	  return;
 	}
-	
+
 	if( dwarfsig == 0x66727764 )
 	{
 		elfpath = (char *)(imgstart + debugrva + 0xc);
-    $printf "looking for elf path at 0x%x", elfpath$; 
+    $printf "looking for elf path at 0x%x", elfpath$;
   }
-  else 
+  else
   {
     elfpath = (char *)(imgstart + debugrva + 0x10);
-    $printf "looking for elf path at 0x%x", elfpath$; 
+    $printf "looking for elf path at 0x%x", elfpath$;
   }
 
   // elf base is baseofcode (we hope that for TE images it's not baseofdata)
@@ -181,7 +181,7 @@ unsigned long secstart;
 	}
 	else if(sectiontype == 0x12) // TE
 	{
-		ProcessTE(secstart+0x4);	
+		ProcessTE(secstart+0x4);
  	}
 }
 .
@@ -247,7 +247,7 @@ define /r LoadPeiSec()
   $fopen 50, 'C:\loadfiles.inc'$;
 
   fvlen = dword(fvbase + 0x20);
-  
+
   // first ffs file is after fv header, use headerlength field
   //ffsoffset = (dword(fvbase + 0x30) & 0xffff0000) >> 16;
   ffsoffset = (dword(fvbase + 0x30) & 0xffff0000) / 0x10000;
@@ -257,21 +257,21 @@ define /r LoadPeiSec()
   while(ffsoffset < (fvbase+fvlen))
 	{
 		// process ffs file and increment by ffs file size field
- 		ProcessFfsFile(ffsoffset);    
+ 		ProcessFfsFile(ffsoffset);
  		ffsfilesize = (dword(ffsoffset + 0x14) & 0x00ffffff);
  		if(ffsfilesize == 0)
  		{
  		  break;
  		}
 		ffsoffset = ffsoffset + ffsfilesize;
-		
+
 
 		// align to next 8 byte boundary
     if( (ffsoffset & 0x7) != 0 )
 		{
 			ffsoffset = ffsoffset + (0x8 - (ffsoffset & 0x7));
 		}
-	  
+
   } // end fv ffs loop
 
 	$vclose 50$;
@@ -283,21 +283,21 @@ define /r FindSystemTable(TopOfRam)
 unsigned long TopOfRam;
 {
   unsigned long offset;
-  
+
   $printf "FindSystemTable"$;
   $printf "top of mem is %x",TopOfRam$;
-  
+
   offset = TopOfRam;
-  
+
   // align to highest 4MB boundary
   offset = offset & 0xFFC00000;
-  
+
   // start at top and look on 4MB boundaries for system table ptr structure
   while(offset > 0)
   {
     //$printf "checking %x",offset$;
     //$printf "value is %x",dword(offset)$;
-    
+
     // low signature match
     if(dword(offset) == 0x20494249)
     {
@@ -314,13 +314,13 @@ unsigned long TopOfRam;
           }
         }
       }
-    
+
     }
-   
+
     if(offset < 0x400000) break;
-    offset = offset - 0x400000; 
+    offset = offset - 0x400000;
   }
-  
+
   return 0;
 }
 .
@@ -344,15 +344,15 @@ unsigned long SystemTable;
   unsigned long   dbgptr;
   unsigned long   dbginfo;
   unsigned long   loadedimg;
-  
+
   $printf "FindDebugInfo"$;
-  
+
   dbgentries = 0;
   CfgTableEntries = dword(SystemTable + 0x40);
   ConfigTable = dword(SystemTable + 0x44);
-  
+
   $printf "config table is at %x (%d entries)", ConfigTable, CfgTableEntries$;
-  
+
   // now search for debug info entry with guid 49152E77-1ADA-4764-B7A2-7AFEFED95E8B
   //	0x49152E77	0x47641ADA	0xFE7AA2B7	0x8B5ED9FE
   for(i=0; i<CfgTableEntries; i++)
@@ -374,15 +374,15 @@ unsigned long SystemTable;
       }
     }
   }
-  
+
   if(dbgentries == 0)
   {
     $printf "no debug entries found"$;
     return;
   }
-  
+
   $printf "debug table at %x (%d entries)", dbgptr, dbgentries$;
-  
+
   for(i=0; i<dbgentries; i++)
   {
     dbginfo = dword(dbgptr + (i*4));
@@ -402,11 +402,11 @@ define /r LoadDxe()
 {
   unsigned long     maxmem;
   unsigned long     systbl;
-  
+
   $printf "LoadDxe"$;
-  
+
   $fopen 50, 'C:\loadfiles.inc'$;
-  
+
   maxmem = GetMaxMem();
   systbl = FindSystemTable(maxmem);
   if(systbl != 0)
@@ -414,7 +414,7 @@ define /r LoadDxe()
     $printf "found system table at %x",systbl$;
     FindDebugInfo(systbl);
   }
-  
+
   $vclose 50$;
 }
 .
@@ -432,19 +432,19 @@ define /r LoadRuntimeDxe()
   unsigned long   RuntimeDebugInfo;
   unsigned long   DebugInfoOffset;
   unsigned long   imgbase;
-  
+
   $printf "LoadRuntimeDxe"$;
-  
+
   $fopen 50, 'C:\loadfiles.inc'$;
-  
+
   RuntimeDebugInfo = 0x80000010;
-  
+
   if(RuntimeDebugInfo != 0)
   {
     numentries = dword(RuntimeDebugInfo);
-    
+
     $printf "runtime debug info is at %x (%d entries)", RuntimeDebugInfo, numentries$;
-    
+
     DebugInfoOffset = RuntimeDebugInfo + 0x4;
     for(i=0; i<numentries; i++)
     {
@@ -457,7 +457,7 @@ define /r LoadRuntimeDxe()
       DebugInfoOffset = DebugInfoOffset + 0x4;
     }
   }
-  
+
   $vclose 50$;
 }
 .

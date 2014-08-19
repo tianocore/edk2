@@ -83,7 +83,7 @@ FfsFindSectionData (
 
 /**
   Find a file in the volume by name
-  
+
   @param FileName       A pointer to the name of the file to
                         find within the firmware volume.
 
@@ -117,15 +117,15 @@ FfsFindByName (
                       information.
 
   @retval EFI_SUCCESS             File information returned.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
-  
+
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 FfsGetFileInfo (
   IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
   OUT EFI_FV_FILE_INFO            *FileInfo
@@ -141,10 +141,10 @@ FfsGetFileInfo (
                         information.
 
   @retval EFI_SUCCESS             File information returned.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
 
 **/
@@ -180,7 +180,7 @@ FfsProcessFvFile (
 	@param FileType  	    File handle of a Fv type file.
   @param Volumehandle   On succes Volume Handle of the match
   @param FileHandle     On success File Handle of the match
-  
+
   @retval EFI_NOT_FOUND  				FV image can't be found.
   @retval EFI_SUCCESS						Successfully found FileType
 
@@ -212,10 +212,10 @@ FfsProcessFvFile (
 
 
 /**
-  This service enables PEIMs to ascertain the present value of the boot mode.  
+  This service enables PEIMs to ascertain the present value of the boot mode.
 
 
-  @retval BootMode           
+  @retval BootMode
 
 **/
 EFI_BOOT_MODE
@@ -226,7 +226,7 @@ GetBootMode (
 
 
 /**
-  This service enables PEIMs to update the boot mode variable.    
+  This service enables PEIMs to update the boot mode variable.
 
   @param  BootMode              The value of the boot mode to set.
 
@@ -251,7 +251,7 @@ SetBootMode (
 VOID *
 EFIAPI
 GetHobList (
-  VOID         
+  VOID
   );
 
 
@@ -259,7 +259,7 @@ GetHobList (
   Updates the pointer to the HOB list.
 
   @param  HobList       Hob list pointer to store
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -313,7 +313,7 @@ CreateHob (
 /**
   Returns the next instance of a HOB type from the starting HOB.
 
-  This function searches the first instance of a HOB type from the starting HOB pointer. 
+  This function searches the first instance of a HOB type from the starting HOB pointer.
   If there does not exist such HOB type from the starting HOB pointer, it will return NULL.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
@@ -336,8 +336,8 @@ GetNextHob (
 /**
   Returns the first instance of a HOB type among the whole HOB list.
 
-  This function searches the first instance of a HOB type among the whole HOB list. 
-  If there does not exist such HOB type in the HOB list, it will return NULL. 
+  This function searches the first instance of a HOB type among the whole HOB list.
+  If there does not exist such HOB type in the HOB list, it will return NULL.
 
   @param  Type          The HOB type to return.
 
@@ -351,10 +351,10 @@ GetFirstHob (
   );
 
 /**
-  This function searches the first instance of a HOB from the starting HOB pointer. 
-  Such HOB should satisfy two conditions: 
-  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
-  If there does not exist such HOB from the starting HOB pointer, it will return NULL. 
+  This function searches the first instance of a HOB from the starting HOB pointer.
+  Such HOB should satisfy two conditions:
+  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
+  If there does not exist such HOB from the starting HOB pointer, it will return NULL.
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
   to extract the data section and its size info respectively.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
@@ -377,7 +377,7 @@ GetNextGuidHob (
   );
 
 /**
-  This function searches the first instance of a HOB among the whole HOB list. 
+  This function searches the first instance of a HOB among the whole HOB list.
   Such HOB should satisfy two conditions:
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
   If there does not exist such HOB from the starting HOB pointer, it will return NULL.
@@ -447,8 +447,8 @@ BuildResourceDescriptorHob (
 /**
   Builds a GUID HOB with a certain data length.
 
-  This function builds a customized HOB tagged with a GUID for identification 
-  and returns the start address of GUID HOB data so that caller can fill the customized data. 
+  This function builds a customized HOB tagged with a GUID for identification
+  and returns the start address of GUID HOB data so that caller can fill the customized data.
   The HOB Header and Name field is already stripped.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
@@ -517,7 +517,7 @@ BuildFvHob (
   );
 
 /**
-  Builds a Firmware Volume HOB and a resrouce descriptor hob 
+  Builds a Firmware Volume HOB and a resrouce descriptor hob
 
   This function builds a Firmware Volume HOB.
   It can only be invoked during PEI phase;
@@ -530,11 +530,11 @@ BuildFvHob (
 **/
 VOID
 EFIAPI
-BuildFvHobs (  
+BuildFvHobs (
   IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
   IN UINT64                       NumberOfBytes,
   IN EFI_RESOURCE_ATTRIBUTE_TYPE  *ResourceAttribute  OPTIONAL
-  ); 
+  );
 
 
 /**
@@ -549,7 +549,7 @@ BuildFvHobs (
   @param  Length        The size of the Firmware Volume in bytes.
   @param  FvName       The name of the Firmware Volume.
   @param  FileName      The name of the file.
-  
+
 **/
 VOID
 EFIAPI
@@ -702,12 +702,12 @@ BuildPeCoffLoaderHob (
   @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
-VOID * 
+VOID *
 EFIAPI
 AllocatePages (
   IN UINTN            Pages
   );
-  
+
 /**
   Allocates a buffer of type EfiBootServicesData.
 
@@ -725,8 +725,8 @@ EFIAPI
 AllocatePool (
   IN UINTN  AllocationSize
   );
-  
-  
+
+
 /**
   Allocates one or more 4KB pages of type EfiBootServicesData at a specified alignment.
 

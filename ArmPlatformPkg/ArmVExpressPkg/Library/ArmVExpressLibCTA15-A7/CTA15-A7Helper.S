@@ -16,7 +16,7 @@
 
 #include <ArmPlatform.h>
 
-.text 
+.text
 .align 2
 
 GCC_ASM_EXPORT(ArmPlatformPeiBootAction)

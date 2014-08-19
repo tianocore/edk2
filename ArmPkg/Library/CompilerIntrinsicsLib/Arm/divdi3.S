@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
@@ -15,7 +15,7 @@
   .text
   .align 2
   GCC_ASM_EXPORT(__divdi3)
-  
+
 ASM_PFX(__divdi3):
   @ args = 0, pretend = 0, frame = 0
   @ frame_needed = 1, uses_anonymous_args = 0

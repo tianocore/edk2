@@ -49,7 +49,7 @@ EblSetStationIp (
   IN EFI_IP_ADDRESS *NewStationIp,  OPTIONAL
   IN EFI_IP_ADDRESS *NewSubnetMask  OPTIONAL
   );
-  
+
 EFI_STATUS
 EFIAPI
 EblMtftp (
@@ -63,6 +63,6 @@ EblMtftp (
   IN EFI_PXE_BASE_CODE_MTFTP_INFO              *Info      OPTIONAL,
   IN BOOLEAN                                   DontUseBuffer
   );
-  
+
 #endif
 

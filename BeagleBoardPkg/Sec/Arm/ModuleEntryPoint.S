@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
@@ -27,7 +27,7 @@ ASM_PFX(_ModuleEntryPoint):
   mrc     p15, 0, r0, c1, c0, 1   // read Auxiliary Control Register
   bic     r0, r0, #0x00000002     // disable L2 cache
   mcr     p15, 0, r0, c1, c0, 1   // store Auxiliary Control Register
-  
+
   //Enable Strict alignment checking & Instruction cache
   mrc     p15, 0, r0, c1, c0, 0
   bic     r0, r0, #0x00002300     /* clear bits 13, 9:8 (--V- --RS) */
@@ -42,8 +42,8 @@ ASM_PFX(_ModuleEntryPoint):
   mcr     p15, 0, r0, c1, c0, 2
   mov     r0, #0x40000000       // Set EN bit in FPEXC
   mcr     p10,#0x7,r0,c8,c0,#0  // msr     FPEXC,r0 in ARM assembly
-   
- 
+
+
   // Set CPU vectors to start of DRAM
   LoadConstantToReg (FixedPcdGet32(PcdCpuVectorBaseAddress) ,r0) // Get vector base
   mcr     p15, 0, r0, c12, c0, 0
@@ -57,14 +57,14 @@ FillVectors:
   adds    r2, r2, #4
   cmp     r2, #32
   bne     FillVectors
-   
+
   /* before we call C code, lets setup the stack pointer in internal RAM */
 stack_pointer_setup:
 
   //
-  // Set stack based on PCD values. Need to do it this way to make C code work 
-  // when it runs from FLASH. 
-  //  
+  // Set stack based on PCD values. Need to do it this way to make C code work
+  // when it runs from FLASH.
+  //
   LoadConstantToReg (FixedPcdGet32(PcdPrePiStackBase) ,r2)    /* stack base arg2  */
   LoadConstantToReg (FixedPcdGet32(PcdPrePiStackSize) ,r3)    /* stack size arg3  */
   add     r4, r2, r3
@@ -82,4 +82,4 @@ stack_pointer_setup:
 ShouldNeverGetHere:
   /* _CEntryPoint should never return */
   b       ShouldNeverGetHere
-  
+

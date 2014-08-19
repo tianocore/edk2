@@ -20,7 +20,7 @@
   FILE_GUID                      = 9195D970-C6F7-484E-8013-5B03C89C3B81
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EblAddExternalCommandLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = EblAddExternalCommandLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 
 #
@@ -40,9 +40,8 @@
   UefiBootServicesTableLib
   UefiLib
   EblAddExternalCommandLib
-  
+
 [Protocols]
   gEfiEblAddCommandProtocolGuid
-  
+
 [Guids]
- 

@@ -1,5 +1,5 @@
 #/** @file
-# 
+#
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #
@@ -41,7 +41,7 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask
-  
-  
+
+
 [Depex]
-  gEfiCpuArchProtocolGuid AND gVirtualUncachedPagesProtocolGuid
+  gEfiCpuArchProtocolGuid AND gVirtualUncachedPagesProtocolGuid

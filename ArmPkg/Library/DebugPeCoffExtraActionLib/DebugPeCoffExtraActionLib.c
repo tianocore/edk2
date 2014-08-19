@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  If the build is done on cygwin the paths are cygpaths. 
+  If the build is done on cygwin the paths are cygpaths.
   /cygdrive/c/tmp.txt vs c:\tmp.txt so we need to convert
   them to work with RVD commands
 
@@ -42,12 +42,12 @@ DeCygwinPathIfNeeded (
   CHAR8   *Ptr;
   UINTN   Index;
   UINTN   Index2;
-  
+
   Ptr = AsciiStrStr (Name, "/cygdrive/");
   if (Ptr == NULL) {
     return Name;
   }
-  
+
   for (Index = 9, Index2 = 0; (Index < (Size + 9)) && (Ptr[Index] != '\0'); Index++, Index2++) {
     Temp[Index2] = Ptr[Index];
     if (Temp[Index2] == '/') {
@@ -79,7 +79,7 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-#if !defined(MDEPKG_NDEBUG) 
+#if !defined(MDEPKG_NDEBUG)
   CHAR8 Temp[512];
 #endif
 
@@ -108,9 +108,9 @@ PeCoffLoaderRelocateImageExtraAction (
 /**
   Performs additional actions just before a PE/COFF image is unloaded.  Any resources
   that were allocated by PeCoffLoaderRelocateImageExtraAction() must be freed.
-  
+
   If ImageContext is NULL, then ASSERT().
-  
+
   @param  ImageContext  Pointer to the image context structure that describes the
                         PE/COFF image that is being unloaded.
 
@@ -124,7 +124,7 @@ PeCoffLoaderUnloadImageExtraAction (
 #if !defined(MDEPKG_NDEBUG)
   CHAR8 Temp[512];
 #endif
-  
+
   if (ImageContext->PdbPointer) {
 #ifdef __CC_ARM
     // Print out the command for the RVD debugger to load symbols for this image

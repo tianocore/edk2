@@ -11,14 +11,14 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.;
 #
 #**/
-#        
+#
 
 .text
 .p2align 2
 
 GCC_ASM_EXPORT(__switch32)
 
-ASM_PFX(__switch32):    
+ASM_PFX(__switch32):
     ldr     ip, [lr, #-1]
     cmp     r0, ip
     add     r0, lr, r0, lsl #2

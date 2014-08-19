@@ -1,16 +1,16 @@
 /** @file
   Deal with devices that just exist in memory space.
-  
+
   To follow the EFI driver model you need a root handle to start with. An
-  EFI driver will have a driver binding protocol (Supported, Start, Stop) 
-  that is used to layer on top of a handle via a gBS->ConnectController. 
+  EFI driver will have a driver binding protocol (Supported, Start, Stop)
+  that is used to layer on top of a handle via a gBS->ConnectController.
   The first handle has to just be in the system to make that work. For
-  PCI it is a PCI Root Bridge IO protocol that provides the root. 
-  
-  On an embedded system with MMIO device we need a handle to just 
-  show up. That handle will have this protocol and a device path 
-  protocol on it. 
-  
+  PCI it is a PCI Root Bridge IO protocol that provides the root.
+
+  On an embedded system with MMIO device we need a handle to just
+  show up. That handle will have this protocol and a device path
+  protocol on it.
+
   For an ethernet device the device path must contain a MAC address device path
   node.
 

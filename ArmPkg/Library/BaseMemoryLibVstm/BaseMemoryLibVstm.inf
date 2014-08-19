@@ -1,8 +1,8 @@
 ## @file
 #  Instance of Base Memory Library with some ARM vldm/vstm assembly.
 #
-#  This is a copy of the MdePkg BaseMemoryLib with the CopyMem and 
-#  SetMem worker functions replaced with assembler that uses 
+#  This is a copy of the MdePkg BaseMemoryLib with the CopyMem and
+#  SetMem worker functions replaced with assembler that uses
 #  vldm/vstm (part of NEON SIMD, optional in ARMv7-A).
 #
 #  Note: You need to enable NEON in SEC to use this library
@@ -32,7 +32,7 @@
   FILE_GUID                      = 09EE1E8D-7A2E-4573-8117-68A18569C1F5
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseMemoryLib 
+  LIBRARY_CLASS                  = BaseMemoryLib
 
 
 #
@@ -52,7 +52,7 @@
   SetMemWrapper.c
   CopyMemWrapper.c
   MemLibGeneric.c
-  MemLibGuid.c  
+  MemLibGuid.c
   MemLibInternals.h
   Arm/CopyMem.asm
   Arm/CopyMem.S

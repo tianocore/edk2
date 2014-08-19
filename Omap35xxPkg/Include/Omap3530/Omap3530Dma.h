@@ -56,9 +56,9 @@
 #define DMA4_CSDP_BURST_EN32      (0x2 << 14)
 #define DMA4_CSDP_BURST_EN64      (0x3 << 14)
 
-#define DMA4_CSDP_WRITE_MODE_NONE_POSTED      (0x0 << 16)  
+#define DMA4_CSDP_WRITE_MODE_NONE_POSTED      (0x0 << 16)
 #define DMA4_CSDP_WRITE_MODE_POSTED           (0x1 << 16)
-#define DMA4_CSDP_WRITE_MODE_LAST_NON_POSTED  (0x2 << 16)  
+#define DMA4_CSDP_WRITE_MODE_LAST_NON_POSTED  (0x2 << 16)
 
 #define DMA4_CSDP_DST_ENDIAN_LOCK_LOCK    BIT18
 #define DMA4_CSDP_DST_ENDIAN_LOCK_ADAPT   0
@@ -72,7 +72,7 @@
 #define DMA4_CSDP_SRC_ENDIAN_BIG          BIT21
 #define DMA4_CSDP_SRC_ENDIAN_LITTLE       0
 
-// Channel Control 
+// Channel Control
 #define DMA4_CCR_SYNCHRO_CONTROL_MASK     0x1f
 
 #define DMA4_CCR_FS_ELEMENT     (0    | 0)
@@ -104,7 +104,7 @@
 
 #define DMA4_CCR_CONST_FILL_ENABLE        BIT16
 #define DMA4_CCR_TRANSPARENT_COPY_ENABLE  BIT17
-  
+
 #define DMA4_CCR_SEL_SRC_DEST_SYNC_SOURCE BIT24
 
 #define DMA4_CSR_DROP                     BIT1
@@ -126,5 +126,5 @@
 #define DMA4_CICR_ENABLE_ALL              0x1FBE
 
 
-#endif 
+#endif
 

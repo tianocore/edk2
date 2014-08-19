@@ -81,7 +81,7 @@ ASM_PFX(ResetEntry):
   stmfd     SP!,{LR}                  @ Store the link register for the current mode
   sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              @ Store the register state
-  
+
   mov       R0,#0                     @ ExceptionType
   ldr       R1,ASM_PFX(CommonExceptionEntry)
   bx        R1

@@ -34,17 +34,17 @@ LzmaDecompressLibConstructor (
   )
 {
   EXTRACT_SECTION_HOB   *Hob;
-  
+
   Hob = GetFirstGuidHob (&gLzmaCustomDecompressGuid);
   if (Hob == NULL) {
     return EFI_NOT_FOUND;
   }
-  
-  // Locate Guided Hob   
+
+  // Locate Guided Hob
 
   return ExtractGuidedSectionRegisterHandlers (
           &gLzmaCustomDecompressGuid,
           Hob->Data.SectionGetInfo,
           Hob->Data.SectionExtraction
-          );      
+          );
 }

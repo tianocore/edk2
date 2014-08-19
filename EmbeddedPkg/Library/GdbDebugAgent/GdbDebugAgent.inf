@@ -51,10 +51,10 @@
   ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
-  BaseLib  
-  DebugLib  
-  BaseMemoryLib  
-  PcdLib  
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PcdLib
   GdbSerialLib
   CacheMaintenanceLib
   DebugAgentTimerLib

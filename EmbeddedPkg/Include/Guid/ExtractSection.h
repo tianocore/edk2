@@ -28,7 +28,7 @@ typedef struct {
 } EXTRACT_SECTION_DATA;
 
 typedef struct {
-  EFI_HOB_GUID_TYPE     Hob;     
+  EFI_HOB_GUID_TYPE     Hob;
   EXTRACT_SECTION_DATA  Data;
 } EXTRACT_SECTION_HOB;
 

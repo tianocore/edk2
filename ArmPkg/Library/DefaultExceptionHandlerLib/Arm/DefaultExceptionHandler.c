@@ -3,7 +3,7 @@
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -42,9 +42,9 @@ GetImageName (
   );
 
 /**
-  Convert the Current Program Status Register (CPSR) to a string. The string is 
-  a defacto standard in the ARM world. 
-  
+  Convert the Current Program Status Register (CPSR) to a string. The string is
+  a defacto standard in the ARM world.
+
   It is possible to add extra bits by adding them to CpsrChar array.
 
   @param  Cpsr         ARM CPSR register value
@@ -73,7 +73,7 @@ CpsrString (
     { 5,  't' },
     { 0,  '?' }
   };
-  
+
   Str = ReturnStr;
 
   for (Index = 0; CpsrChar[Index].BIT != 0; Index++, Str++) {
@@ -83,10 +83,10 @@ CpsrString (
       *Str &= ~0x20;
     }
   }
-  
+
   *Str++ = '_';
   *Str = '\0';
-  
+
   switch (Cpsr & 0x1f) {
   case 0x10:
     ModeStr = "usr";
@@ -112,15 +112,15 @@ CpsrString (
   case 0x1f:
     ModeStr = "sys";
     break;
-  
+
   default:
     ModeStr = "???";
     break;
   }
-  
+
   AsciiStrCat (Str, ModeStr);
   return;
-}  
+}
 
 CHAR8 *
 FaultStatusToString (
@@ -164,7 +164,7 @@ STATIC CHAR8 *gExceptionTypeString[] = {
 
 /**
   This is the default action to take on an unexpected exception
-  
+
   Since this is exception context don't do anything crazy like try to allcoate memory.
 
   @param  ExceptionType    Type of the exception
@@ -198,31 +198,31 @@ DefaultExceptionHandler (
     CHAR8   Buffer[80];
     UINT8   *DisAsm;
     UINT32  ItBlock;
-    
+
     CpsrString (SystemContext.SystemContextArm->CPSR, CpsrStr);
     DEBUG ((EFI_D_ERROR, "%a\n", CpsrStr));
-  
+
     Pdb = GetImageName (SystemContext.SystemContextArm->PC, &ImageBase, &PeCoffSizeOfHeader);
     Offset = SystemContext.SystemContextArm->PC - ImageBase;
     if (Pdb != NULL) {
       DEBUG ((EFI_D_ERROR, "%a\n", Pdb));
 
       //
-      // A PE/COFF image loads its headers into memory so the headers are 
+      // A PE/COFF image loads its headers into memory so the headers are
       // included in the linked addresses. ELF and Mach-O images do not
       // include the headers so the first byte of the image is usually
       // text (code). If you look at link maps from ELF or Mach-O images
       // you need to subtract out the size of the PE/COFF header to get
-      // get the offset that matches the link map. 
+      // get the offset that matches the link map.
       //
       DEBUG ((EFI_D_ERROR, "loaded at 0x%08x (PE/COFF offset) 0x%x (ELF or Mach-O offset) 0x%x", ImageBase, Offset, Offset - PeCoffSizeOfHeader));
-      
+
       // If we come from an image it is safe to show the instruction. We know it should not fault
       DisAsm = (UINT8 *)(UINTN)SystemContext.SystemContextArm->PC;
       ItBlock = 0;
       DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, TRUE, &ItBlock, Buffer, sizeof (Buffer));
       DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
-      
+
       switch (ExceptionType) {
       case EXCEPT_ARM_UNDEFINED_INSTRUCTION:
       case EXCEPT_ARM_SOFTWARE_INTERRUPT:
@@ -231,7 +231,7 @@ DefaultExceptionHandler (
         // advance PC past the faulting instruction
         PcAdjust = (UINTN)DisAsm - SystemContext.SystemContextArm->PC;
         break;
-      
+
       default:
         break;
       }
@@ -258,11 +258,11 @@ DefaultExceptionHandler (
 
   DEBUG ((EFI_D_ERROR, "\n"));
   ASSERT (FALSE);
-  
+
   // Clear the error registers that we have already displayed incase some one wants to keep going
   SystemContext.SystemContextArm->DFSR = 0;
   SystemContext.SystemContextArm->IFSR = 0;
 
-  // If some one is stepping past the exception handler adjust the PC to point to the next instruction 
+  // If some one is stepping past the exception handler adjust the PC to point to the next instruction
   SystemContext.SystemContextArm->PC += PcAdjust;
 }

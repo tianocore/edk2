@@ -1,6 +1,6 @@
 /** @file
   Protocol is used to help implement DebugSupport.RegisterPeriodicCallback() functionality.
-  This enables the DXE timer driver to support the periodic callback function so the 
+  This enables the DXE timer driver to support the periodic callback function so the
   DebugSupport driver does not need to contain platform specific information about how a timer
   works.
 
@@ -39,4 +39,4 @@ struct _EFI_DEBUG_SUPPORT_PERIODIC_CALLBACK_PROTOCOL {
 
 extern EFI_GUID gEfiDebugSupportPeriodicCallbackProtocolGuid;
 
-#endif 
+#endif

@@ -20,7 +20,7 @@
   FILE_GUID                      = d8c640db-73ba-48f5-a7ed-8e93c6012491
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EfiFileLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = EfiFileLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 
 #
@@ -44,12 +44,12 @@
   DevicePathLib
   PrintLib
   BaseMemoryLib
-  UefiLib   
+  UefiLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
   DebugLib
   EblNetworkLib
-  
+
 [Protocols]
   gEfiBlockIoProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMED
   gEfiDiskIoProtocolGuid                     # PROTOCOL SOMETIMES_CONSUMED
@@ -57,7 +57,7 @@
   gEfiFirmwareVolume2ProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadFileProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
   gEfiFirmwareVolumeBlockProtocolGuid        # PROTOCOL SOMETIMES_CONSUMED
-    
+
 [Guids]
   gEfiFileInfoGuid
   gEfiFileSystemInfoGuid

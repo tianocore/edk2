@@ -2,7 +2,7 @@
   Add custom commands for BeagleBoard development.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -39,11 +39,11 @@
   Simple arm disassembler via a library
 
   Argv[0] - symboltable
-  Argv[1] - Optional quoted format string 
+  Argv[1] - Optional quoted format string
   Argv[2] - Optional flag
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -64,7 +64,7 @@ EblSymbolTable (
   UINT32                            PeCoffSizeOfHeaders;
   UINT32                            ImageBase;
   BOOLEAN                           Elf;
-  
+
   // Need to add lots of error checking on the passed in string
   // Default string is for RealView debugger or gdb depending on toolchain used.
   if (Argc > 1) {
@@ -74,17 +74,17 @@ EblSymbolTable (
     // Assume gdb
     Format = "add-symbol-file %a 0x%x";
 #else
-    // Default to RVCT 
+    // Default to RVCT
     Format = "load /a /ni /np %a &0x%x";
 #endif
   }
   Elf = (Argc > 2) ? FALSE : TRUE;
-  
+
   Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&DebugImageTableHeader);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   DebugTable = DebugImageTableHeader->EfiDebugImageInfoTable;
   if (DebugTable == NULL) {
     return EFI_SUCCESS;
@@ -100,13 +100,13 @@ EblSymbolTable (
           if (Elf) {
             // ELF and Mach-O images don't include the header so the linked address does not include header
             ImageBase += PeCoffSizeOfHeaders;
-          } 
+          }
           AsciiPrint (Format, Pdb, ImageBase);
           AsciiPrint ("\n");
         } else {
         }
       }
-    }  
+    }
   }
 
   return EFI_SUCCESS;
@@ -121,7 +121,7 @@ EblSymbolTable (
   ARgv[2] - Number of instructions to disassembly (optional)
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -138,22 +138,22 @@ EblDisassembler (
   UINT32  Count;
   CHAR8   Buffer[80];
   UINT32  ItBlock;
-  
+
   if (Argc < 2) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Address = AsciiStrHexToUintn (Argv[1]);
   Count   = (Argc > 2) ? (UINT32)AsciiStrHexToUintn (Argv[2]) : 20;
 
-  Ptr = (UINT8 *)(UINTN)Address;  
+  Ptr = (UINT8 *)(UINTN)Address;
   ItBlock = 0;
   do {
     CurrentAddress = Ptr;
     DisassembleInstruction (&Ptr, TRUE, TRUE, &ItBlock, Buffer, sizeof (Buffer));
     AsciiPrint ("0x%08x: %a\n", CurrentAddress, Buffer);
   } while (Count-- > 0);
- 
+
 
   return EFI_SUCCESS;
 }
@@ -203,7 +203,7 @@ CHAR8 *mTokenList[] = {
   ARgv[2] - Number of instructions to disassembly (optional)
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -256,7 +256,7 @@ EblPerformance (
           AsciiPrint ("%6a %6ld ms\n", Token, Milliseconds);
           break;
         }
-      }   
+      }
     }
   } while (Key != 0);
 

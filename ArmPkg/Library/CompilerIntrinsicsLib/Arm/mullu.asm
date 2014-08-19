@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -15,7 +15,7 @@
 
   EXPORT  __ARM_ll_mullu
   EXPORT  __aeabi_lmul
-       
+
   AREA  Math, CODE, READONLY
 
 ;
@@ -45,5 +45,5 @@ __aeabi_lmul
   mla     r1, r2, r1, ip
   mla     r1, r3, lr, r1
   ldmia   sp!, {pc}
-  
+
   END

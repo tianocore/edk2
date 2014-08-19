@@ -58,7 +58,7 @@
 #define TT_DESCRIPTOR_SECTION_WRITE_BACK          (TT_DESCRIPTOR_SECTION_ACCESS_PERMISSION_READ_WRITE | \
                                                    TT_DESCRIPTOR_SECTION_DOMAIN(0)                    | \
                                                    TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK      | \
-                                                   TT_DESCRIPTOR_TYPE_SECTION)                                                   
+                                                   TT_DESCRIPTOR_TYPE_SECTION)
 #define TT_DESCRIPTOR_SECTION_WRITE_THROUGH       (TT_DESCRIPTOR_SECTION_ACCESS_PERMISSION_READ_WRITE | \
                                                    TT_DESCRIPTOR_SECTION_DOMAIN(0)                    | \
                                                    TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH   | \

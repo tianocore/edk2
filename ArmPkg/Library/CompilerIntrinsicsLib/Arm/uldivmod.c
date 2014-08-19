@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ UINT32 __udivsi3(UINT32 n, UINT32 d);
 UINT32 __umodsi3(UINT32 a, UINT32 b);
 
 
-UINT64 
+UINT64
 __aeabi_uidivmod(unsigned numerator, unsigned denominator)
 {
   UINT64  Return;
@@ -32,7 +32,7 @@ __aeabi_uidivmod(unsigned numerator, unsigned denominator)
 }
 
 unsigned
-__aeabi_uidiv (unsigned n, unsigned d) 
+__aeabi_uidiv (unsigned n, unsigned d)
 {
   return __udivsi3 (n, d);
 }

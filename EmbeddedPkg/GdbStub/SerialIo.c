@@ -1,13 +1,13 @@
 /** @file
-  Serial IO Abstraction for GDB stub. This allows an EFI consoles that shows up on the system 
+  Serial IO Abstraction for GDB stub. This allows an EFI consoles that shows up on the system
   running GDB. One consle for error information and another console for user input/output.
-  
-  Basic packet format is $packet-data#checksum. So every comand has 4 bytes of overhead: $, 
-  #, 0, 0. The 0 and 0 are the ascii characters for the checksum. 
-  
+
+  Basic packet format is $packet-data#checksum. So every comand has 4 bytes of overhead: $,
+  #, 0, 0. The 0 and 0 are the ascii characters for the checksum.
+
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,7 @@
 
 //
 // Set TRUE if F Reply package signals a ctrl-c. We can not process the Ctrl-c
-// here we need to wait for the periodic callback to do this. 
+// here we need to wait for the periodic callback to do this.
 //
 BOOLEAN gCtrlCBreakFlag = FALSE;
 
@@ -34,9 +34,9 @@ BOOLEAN gCtrlCBreakFlag = FALSE;
 BOOLEAN gProcessingFPacket = FALSE;
 
 /**
-  Process a control-C break message. 
-  
-  Currently a place holder, remove the ASSERT when it gets implemented. 
+  Process a control-C break message.
+
+  Currently a place holder, remove the ASSERT when it gets implemented.
 
   @param  ErrNo   Error infomration from the F reply packet or other source
 
@@ -62,55 +62,55 @@ GdbCtrlCBreakMessage (
   @param  Packet  Packet to parse like an F reply packet
   @param  ErrNo   Buffer to hold Count bytes that were read
 
-  @retval -1      Error, not a valid F reply packet 
-  @retval other   Return the return code from the F reply packet 
+  @retval -1      Error, not a valid F reply packet
+  @retval other   Return the return code from the F reply packet
 
 **/
 INTN
 GdbParseFReplyPacket (
   IN  CHAR8   *Packet,
-  OUT UINTN   *ErrNo   
+  OUT UINTN   *ErrNo
   )
 {
   INTN   RetCode;
-   
+
   if (Packet[0] != 'F') {
     // A valid responce would be an F packet
     return -1;
   }
-  
+
   RetCode = AsciiStrHexToUintn (&Packet[1]);
-  
-  // Find 1st comma 
-  for (;*Packet != '\0' && *Packet != ',';  Packet++);  
+
+  // Find 1st comma
+  for (;*Packet != '\0' && *Packet != ',';  Packet++);
   if (*Packet == '\0') {
     *ErrNo = 0;
     return RetCode;
   }
-  
+
   *ErrNo = AsciiStrHexToUintn (++Packet);
 
-  // Find 2nd comma 
-  for (;*Packet != '\0' && *Packet != ',';  Packet++);  
+  // Find 2nd comma
+  for (;*Packet != '\0' && *Packet != ',';  Packet++);
   if (*Packet == '\0') {
     return RetCode;
   }
-  
+
   if (*(++Packet) == 'C') {
-    GdbCtrlCBreakMessage (*ErrNo);  
+    GdbCtrlCBreakMessage (*ErrNo);
   }
-  
+
   return RetCode;
 }
 
 
 /**
-  Read data from a FileDescriptor. On success number of bytes read is returned. Zero indicates 
+  Read data from a FileDescriptor. On success number of bytes read is returned. Zero indicates
   the end of a file. On error -1 is returned. If count is zero, GdbRead returns zero.
 
   @param  FileDescriptor   Device to talk to.
   @param  Buffer           Buffer to hold Count bytes that were read
-  @param  Count            Number of bytes to transfer. 
+  @param  Count            Number of bytes to transfer.
 
   @retval -1               Error
   @retval {other}          Number of bytes read.
@@ -128,19 +128,19 @@ GdbRead (
   INTN    RetCode;
   UINTN   ErrNo;
   BOOLEAN ReceiveDone = FALSE;
-   
+
   // Send:
   // "Fread,XX,YYYYYYYY,XX
   //
   // XX - FileDescriptor in ASCII
-  // YYYYYYYY - Buffer address in ASCII 
+  // YYYYYYYY - Buffer address in ASCII
   // XX - Count in ASCII
   // SS - check sum
   //
   Size = AsciiSPrint (Packet, sizeof (Packet), "Fread,%x,%x,%x", FileDescriptor, Buffer, Count);
   // Packet array is too small if you got this ASSERT
   ASSERT (Size < sizeof (Packet));
-  
+
   gProcessingFPacket = TRUE;
   SendPacket (Packet);
   Print ((CHAR16 *)L"Packet sent..\n");
@@ -175,25 +175,25 @@ GdbRead (
 
   RetCode = GdbParseFReplyPacket (Packet, &ErrNo);
   Print ((CHAR16 *)L"RetCode: %x..ErrNo: %x..\n", RetCode, ErrNo);
-  
+
   if (ErrNo > 0) {
     //Send error to the host if there is any.
     SendError ((UINT8)ErrNo);
   }
-  
+
   gProcessingFPacket = FALSE;
 
   return RetCode;
-}  
-  
+}
+
 
 /**
-  Write data to a FileDescriptor. On success number of bytes written is returned. Zero indicates 
-  nothing was written. On error -1 is returned. 
+  Write data to a FileDescriptor. On success number of bytes written is returned. Zero indicates
+  nothing was written. On error -1 is returned.
 
   @param  FileDescriptor   Device to talk to.
   @param  Buffer           Buffer to hold Count bytes that are to be written
-  @param  Count            Number of bytes to transfer. 
+  @param  Count            Number of bytes to transfer.
 
   @retval -1               Error
   @retval {other}          Number of bytes written.
@@ -216,14 +216,14 @@ GdbWrite (
   // #Fwrite,XX,YYYYYYYY,XX$SS
   //
   // XX - FileDescriptor in ASCII
-  // YYYYYYYY - Buffer address in ASCII 
+  // YYYYYYYY - Buffer address in ASCII
   // XX - Count in ASCII
   // SS - check sum
   //
   Size = AsciiSPrint (Packet, sizeof (Packet), "Fwrite,%x,%x,%x", FileDescriptor, Buffer, Count);
   // Packet array is too small if you got this ASSERT
   ASSERT (Size < sizeof (Packet));
-  
+
   SendPacket (Packet);
   Print ((CHAR16 *)L"Packet sent..\n");
 
@@ -235,7 +235,7 @@ GdbWrite (
     // Process GDB commands
     switch (Packet[0]) {
       //Read memory command.
-      //m addr,length. 
+      //m addr,length.
       case    'm':
         ReadFromMemory (Packet);
         break;
@@ -243,13 +243,13 @@ GdbWrite (
       //Fretcode, errno, Ctrl-C flag
       //retcode - Count read
       case    'F':
-        //Once target receives F reply packet that means the previous 
+        //Once target receives F reply packet that means the previous
         //transactions are finished.
         ReceiveDone = TRUE;
         break;
-      
+
       //Send empty buffer
-      default    :  
+      default    :
         SendNotSupported();
         break;
     }
@@ -262,7 +262,7 @@ GdbWrite (
   if (ErrNo > 0) {
     SendError((UINT8)ErrNo);
   }
- 
+
   return RetCode;
 }
 
@@ -271,7 +271,7 @@ GdbWrite (
   Reset the serial device.
 
   @param  This              Protocol instance pointer.
-                            
+
   @retval EFI_SUCCESS       The device was reset.
   @retval EFI_DEVICE_ERROR  The serial device could not be reset.
 
@@ -287,7 +287,7 @@ GdbSerialReset (
 
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
+  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
   data buts, and stop bits on a serial device.
 
   @param  This             Protocol instance pointer.
@@ -355,7 +355,7 @@ GdbSerialSetControl (
 
   @param  This              Protocol instance pointer.
   @param  Control           A pointer to return the current Control signals from the serial device.
-                            
+
   @retval EFI_SUCCESS       The control bits were read from the serial device.
   @retval EFI_DEVICE_ERROR  The serial device is not functioning correctly.
 
@@ -396,16 +396,16 @@ GdbSerialWrite (
   UINTN            Return;
 
   SerialDev = GDB_SERIAL_DEV_FROM_THIS (This);
-  
+
   Return = GdbWrite (SerialDev->OutFileDescriptor, Buffer, *BufferSize);
   if (Return == (UINTN)-1) {
     return EFI_DEVICE_ERROR;
   }
-  
+
   if (Return != *BufferSize) {
     *BufferSize = Return;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -435,27 +435,27 @@ GdbSerialRead (
   UINTN            Return;
 
   SerialDev = GDB_SERIAL_DEV_FROM_THIS (This);
-  
+
   Return = GdbRead (SerialDev->InFileDescriptor, Buffer, *BufferSize);
   if (Return == (UINTN)-1) {
     return EFI_DEVICE_ERROR;
   }
-  
+
   if (Return != *BufferSize) {
     *BufferSize = Return;
   }
-  
+
   return EFI_SUCCESS;
 }
 
 
-// 
+//
 // Template used to initailize the GDB Serial IO protocols
 //
 GDB_SERIAL_DEV gdbSerialDevTemplate = {
   GDB_SERIAL_DEV_SIGNATURE,
   NULL,
-  
+
   { // SerialIo
     SERIAL_IO_INTERFACE_REVISION,
     GdbSerialReset,
@@ -504,7 +504,7 @@ GDB_SERIAL_DEV gdbSerialDevTemplate = {
 
 /**
   Make two serial consoles: 1) StdIn and StdOut via GDB. 2) StdErr via GDB.
-  
+
   These console show up on the remote system running GDB
 
 **/
@@ -520,21 +520,21 @@ GdbInitializeSerialConsole (
   // Use the template to make a copy of the Serial Console private data structure.
   StdOutSerialDev = AllocateCopyPool (sizeof (GDB_SERIAL_DEV),  &gdbSerialDevTemplate);
   ASSERT (StdOutSerialDev != NULL);
-  
+
   // Fixup pointer after the copy
   StdOutSerialDev->SerialIo.Mode = &StdOutSerialDev->SerialMode;
-  
+
   StdErrSerialDev = AllocateCopyPool (sizeof (GDB_SERIAL_DEV),  &gdbSerialDevTemplate);
   ASSERT (StdErrSerialDev != NULL);
 
   // Fixup pointer and modify stuff that is different for StdError
-  StdErrSerialDev->SerialIo.Mode = &StdErrSerialDev->SerialMode;  
+  StdErrSerialDev->SerialIo.Mode = &StdErrSerialDev->SerialMode;
   StdErrSerialDev->DevicePath.Index = 1;
   StdErrSerialDev->OutFileDescriptor = GDB_STDERR;
-  
+
   // Make a new handle with Serial IO protocol and its device path on it.
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &StdOutSerialDev->Handle, 
+                  &StdOutSerialDev->Handle,
                   &gEfiSerialIoProtocolGuid,   &StdOutSerialDev->SerialIo,
                   &gEfiDevicePathProtocolGuid, &StdOutSerialDev->DevicePath,
                   NULL
@@ -543,7 +543,7 @@ GdbInitializeSerialConsole (
 
   // Make a new handle with Serial IO protocol and its device path on it.
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &StdErrSerialDev->Handle, 
+                  &StdErrSerialDev->Handle,
                   &gEfiSerialIoProtocolGuid,   &StdErrSerialDev->SerialIo,
                   &gEfiDevicePathProtocolGuid, &StdErrSerialDev->DevicePath,
                   NULL

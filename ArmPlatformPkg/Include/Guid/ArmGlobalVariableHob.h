@@ -24,8 +24,8 @@
 extern EFI_GUID gArmGlobalVariableGuid;
 
 ///
-/// Describes all memory ranges used during the HOB producer 
-/// phase that exist outside the HOB list. This HOB type 
+/// Describes all memory ranges used during the HOB producer
+/// phase that exist outside the HOB list. This HOB type
 /// describes how memory is used, not the physical attributes of memory.
 ///
 typedef struct {
@@ -42,9 +42,9 @@ typedef struct {
   ///
   EFI_PHYSICAL_ADDRESS        GlobalVariableBase;
 
-  /// 
+  ///
   /// The length in bytes of memory allocated by this HOB.
-  /// 
+  ///
   UINT32                      GlobalVariableSize;
 } ARM_HOB_GLOBAL_VARIABLE;
 

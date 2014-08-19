@@ -1,5 +1,5 @@
 #/** @file
-#  PE/COFF Loader Library implementation that wraps a protocol passed up from 
+#  PE/COFF Loader Library implementation that wraps a protocol passed up from
 #  SEC/PEI via a HOB. This is done to save space.
 #
 #  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
@@ -20,7 +20,7 @@
   FILE_GUID                      = 671C6FD7-99FB-4EE3-B640-4B1D463BC3B5
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PeCoffLib 
+  LIBRARY_CLASS                  = PeCoffLib
   CONSTRUCTOR                    = DxeHobPeCoffLibConstructor
 
 

@@ -1,11 +1,11 @@
 /** @file
   Abstraction for hardware based interrupt routine
-  
+
   On non IA-32 systems it is common to have a single hardware interrupt vector
   and a 2nd layer of software that routes the interrupt handlers based on the
-  interrupt source. This protocol enables this routing. The driver implementing 
-  this protocol is responsible for clearing the pending interrupt in the 
-  interrupt routing hardware. The HARDWARE_INTERRUPT_HANDLER is responsible 
+  interrupt source. This protocol enables this routing. The driver implementing
+  this protocol is responsible for clearing the pending interrupt in the
+  interrupt routing hardware. The HARDWARE_INTERRUPT_HANDLER is responsible
   for clearing interrupt sources from individual devices.
 
 
@@ -48,7 +48,7 @@ typedef UINTN HARDWARE_INTERRUPT_SOURCE;
   @param Source         Source of the interrupt. Hardware routing off a specific platform defines
                         what source means.
   @param SystemContext  Pointer to system register context. Mostly used by debuggers and will
-                        update the system context after the return from the interrupt if 
+                        update the system context after the return from the interrupt if
                         modified. Don't change these values unless you know what you are doing
 
 **/
@@ -56,7 +56,7 @@ typedef
 VOID
 (EFIAPI *HARDWARE_INTERRUPT_HANDLER) (
   IN  HARDWARE_INTERRUPT_SOURCE   Source,
-  IN  EFI_SYSTEM_CONTEXT          SystemContext     
+  IN  EFI_SYSTEM_CONTEXT          SystemContext
   );
 
 
@@ -133,11 +133,11 @@ EFI_STATUS
 (EFIAPI *HARDWARE_INTERRUPT_INTERRUPT_STATE) (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source,
-  IN BOOLEAN                            *InterruptState  
+  IN BOOLEAN                            *InterruptState
   );
 
 /**
-  Signal to the hardware that the End Of Intrrupt state 
+  Signal to the hardware that the End Of Intrrupt state
   has been reached.
 
   @param This     Instance pointer for this protocol

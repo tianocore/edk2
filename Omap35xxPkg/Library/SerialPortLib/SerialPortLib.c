@@ -3,7 +3,7 @@
 
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -59,7 +59,7 @@ SerialPortWrite (
   UINT32  LSR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_LSR_REG;
   UINT32  THR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_THR_REG;
   UINTN   Count;
-    
+
   for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
     while ((MmioRead8(LSR) & UART_LSR_TX_FIFO_E_MASK) == UART_LSR_TX_FIFO_E_NOT_EMPTY);
     MmioWrite8(THR, *Buffer);
@@ -89,7 +89,7 @@ SerialPortRead (
   UINT32  LSR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_LSR_REG;
   UINT32  RBR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_RBR_REG;
   UINTN   Count;
-    
+
   for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
     while ((MmioRead8(LSR) & UART_LSR_RX_FIFO_E_MASK) == UART_LSR_RX_FIFO_E_EMPTY);
     *Buffer = MmioRead8(RBR);

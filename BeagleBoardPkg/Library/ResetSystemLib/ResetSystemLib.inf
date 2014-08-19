@@ -34,7 +34,7 @@
 [Pcd.common]
   gArmTokenSpaceGuid.PcdCpuResetAddress
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress
-  
+
 [LibraryClasses]
   DebugLib
   ArmLib

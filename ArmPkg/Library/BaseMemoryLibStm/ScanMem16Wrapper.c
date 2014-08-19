@@ -33,7 +33,7 @@
   address to the highest address for a 16-bit value that matches Value.  If a match is found,
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.
-  
+
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
   If Length is not aligned on a 16-bit boundary, then ASSERT().

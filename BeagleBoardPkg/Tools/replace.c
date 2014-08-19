@@ -1,9 +1,9 @@
 //
-// Quick hack to work around not having sed, or any other reasonable 
+// Quick hack to work around not having sed, or any other reasonable
 // way to edit a file from a script on Windows......
 //
 // Copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-//  
+//
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -40,7 +40,7 @@ Usage (char *Name)
 // argv[1] - Old File
 // argv[2] - New File
 // argv[3+n] - Match String
-// argv[4+n] - Replace string 
+// argv[4+n] - Replace string
 int
 main (int argc, char **argv)
 {
@@ -106,9 +106,9 @@ main (int argc, char **argv)
   // into a buffer that is as big as the maximum search key size.
   // Then we can search the keys for a match. If no match
   // copy the old file character to the new file. If it is a match
-  // then copy the replacement string into the output file. 
-  // This code assumes the file system is smart and caches the 
-  // file in a buffer. So all the reads don't really hit the disk. 
+  // then copy the replacement string into the output file.
+  // This code assumes the file system is smart and caches the
+  // file in a buffer. So all the reads don't really hit the disk.
   InFilePos = 0;
   while (InFilePos < (InFileSize - MinLenKey)) {
     fseek (In, InFilePos, SEEK_SET);
@@ -126,7 +126,7 @@ main (int argc, char **argv)
     if (!Found) {
       fputc (Key[0], Out);
     }
- 
+
     InFilePos++;
   }
 
@@ -136,7 +136,7 @@ main (int argc, char **argv)
   while ((c = fgetc (In)) != EOF) {
     fputc (c, Out);
   }
- 
+
   fclose (In);
   fclose (Out);
   free (Key);

@@ -34,39 +34,39 @@
 
 [Sources.ARM]
   Arm/Processor.c
-  
+
 [Sources.IA32]
   Ia32/Processor.c
-  
+
 [Sources.X64]
   X64/Processor.c
-  
-  
+
+
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  
+
 [LibraryClasses]
-  BaseLib  
-  DebugLib  
-  UefiLib  
-  UefiDriverEntryPoint  
-  UefiBootServicesTableLib  
-  UefiRuntimeServicesTableLib  
-  BaseMemoryLib  
-  MemoryAllocationLib  
-  DevicePathLib  
-  PcdLib  
+  BaseLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+  PcdLib
   GdbSerialLib
   PrintLib
   CacheMaintenanceLib
 
 
-[Protocols]  
-  gEfiDebugSupportProtocolGuid                   
-  gEfiDebugPortProtocolGuid                     
-  gEfiSerialIoProtocolGuid                     
-  
+[Protocols]
+  gEfiDebugSupportProtocolGuid
+  gEfiDebugPortProtocolGuid
+  gEfiSerialIoProtocolGuid
+
 [Guids]
   gEfiDebugImageInfoTableGuid
 

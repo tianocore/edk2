@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +47,7 @@ ArmDataCachePresent (
   )
 {
   UINT32 CLIDR = ReadCLIDR ();
-  
+
   if ((CLIDR & 0x2) == 0x2) {
     // Instruction cache exists
     return TRUE;
@@ -56,10 +56,10 @@ ArmDataCachePresent (
     // Unified cache
     return TRUE;
   }
-  
+
   return FALSE;
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheSize (
@@ -70,15 +70,15 @@ ArmDataCacheSize (
   UINT32 Associativity;
   UINT32 LineSize;
   UINT32 CCSIDR = ReadCCSIDR (0);
-  
+
   LineSize      = (1 << ((CCSIDR & 0x7) + 2));
   Associativity = ((CCSIDR >> 3) & 0x3ff) + 1;
   NumSets       = ((CCSIDR >> 13) & 0x7fff) + 1;
 
   // LineSize is in words (4 byte chunks)
-  return  NumSets * Associativity * LineSize * 4;      
+  return  NumSets * Associativity * LineSize * 4;
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheAssociativity (
@@ -89,14 +89,14 @@ ArmDataCacheAssociativity (
 
   return ((CCSIDR >> 3) & 0x3ff) + 1;
 }
-  
+
 UINTN
 ArmDataCacheSets (
   VOID
   )
 {
   UINT32 CCSIDR = ReadCCSIDR (0);
-  
+
   return ((CCSIDR >> 13) & 0x7fff) + 1;
 }
 
@@ -111,7 +111,7 @@ ArmDataCacheLineLength (
   // * 4 converts to bytes
   return (1 << (CCSIDR + 2)) * 4;
 }
-  
+
 BOOLEAN
 EFIAPI
 ArmInstructionCachePresent (
@@ -119,7 +119,7 @@ ArmInstructionCachePresent (
   )
 {
   UINT32 CLIDR = ReadCLIDR ();
-  
+
   if ((CLIDR & 1) == 1) {
     // Instruction cache exists
     return TRUE;
@@ -128,10 +128,10 @@ ArmInstructionCachePresent (
     // Unified cache
     return TRUE;
   }
-  
+
   return FALSE;
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheSize (
@@ -142,15 +142,15 @@ ArmInstructionCacheSize (
   UINT32 Associativity;
   UINT32 LineSize;
   UINT32 CCSIDR = ReadCCSIDR (1);
-  
+
   LineSize      = (1 << ((CCSIDR & 0x7) + 2));
   Associativity = ((CCSIDR >> 3) & 0x3ff) + 1;
   NumSets       = ((CCSIDR >> 13) & 0x7fff) + 1;
 
   // LineSize is in words (4 byte chunks)
-  return  NumSets * Associativity * LineSize * 4;      
+  return  NumSets * Associativity * LineSize * 4;
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheAssociativity (
@@ -162,7 +162,7 @@ ArmInstructionCacheAssociativity (
   return ((CCSIDR >> 3) & 0x3ff) + 1;
 //  return 4;
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheSets (
@@ -170,7 +170,7 @@ ArmInstructionCacheSets (
   )
 {
   UINT32 CCSIDR = ReadCCSIDR (1);
-  
+
   return ((CCSIDR >> 13) & 0x7fff) + 1;
 }
 
@@ -198,11 +198,11 @@ ArmV7DataCacheOperation (
 
   SavedInterruptState = ArmGetInterruptState ();
   ArmDisableInterrupts ();
-  
+
   ArmV7AllDataCachesOperation (DataCacheOperation);
-  
+
   ArmDrainWriteBuffer ();
-  
+
   if (SavedInterruptState) {
     ArmEnableInterrupts ();
   }
@@ -218,11 +218,11 @@ ArmV7PoUDataCacheOperation (
 
   SavedInterruptState = ArmGetInterruptState ();
   ArmDisableInterrupts ();
-  
+
   ArmV7PerformPoUDataCacheOperation (DataCacheOperation);
-  
+
   ArmDrainWriteBuffer ();
-  
+
   if (SavedInterruptState) {
     ArmEnableInterrupts ();
   }

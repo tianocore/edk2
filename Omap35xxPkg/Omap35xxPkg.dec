@@ -35,14 +35,14 @@
   ##  @libraryclass  Abstract location of basic OMAP components
   ##
   OmapLib|Include/Library/OmapLib.h
-  
+
   ##  @libraryclass  Abstract OMAP and ARM DMA, modeled after PCI IO protocol
   ##
   OmapDmaLib|Include/Library/OmapDmaLib.h
 
 
 [Guids.common]
-  gOmap35xxTokenSpaceGuid    =  { 0x24b09abe, 0x4e47, 0x481c, { 0xa9, 0xad, 0xce, 0xf1, 0x2c, 0x39, 0x23, 0x27} } 
+  gOmap35xxTokenSpaceGuid    =  { 0x24b09abe, 0x4e47, 0x481c, { 0xa9, 0xad, 0xce, 0xf1, 0x2c, 0x39, 0x23, 0x27} }
 
 [PcdsFeatureFlag.common]
 
@@ -55,4 +55,4 @@
   gOmap35xxTokenSpaceGuid.PcdOmap35xxDebugAgentTimer|5|UINT32|0x00000207
   gOmap35xxTokenSpaceGuid.PcdDebugAgentTimerFreqNanoSeconds|77|UINT32|0x00000208
   gOmap35xxTokenSpaceGuid.PcdMmchsTimerFreq100NanoSeconds|1000000|UINT32|0x00000209
-  
+

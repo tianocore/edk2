@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -61,10 +61,10 @@ MicroSecondDelay (
   )
 {
   UINT64  NanoSeconds;
-  
+
   NanoSeconds = MultU64x32(MicroSeconds, 1000);
 
-  while (NanoSeconds > (UINTN)-1) { 
+  while (NanoSeconds > (UINTN)-1) {
     NanoSecondDelay((UINTN)-1);
     NanoSeconds -= (UINTN)-1;
   }
@@ -87,12 +87,12 @@ NanoSecondDelay (
   UINT32  TimerCountRegister;
 
   Delay = (NanoSeconds / PcdGet32(PcdEmbeddedPerformanceCounterPeriodInNanoseconds)) + 1;
-  
+
   TimerCountRegister = TimerBase(PcdGet32(PcdOmap35xxFreeTimer)) + GPTIMER_TCRR;
 
   StartTime = MmioRead32 (TimerCountRegister);
 
-  do 
+  do
   {
     CurrentTime = MmioRead32 (TimerCountRegister);
     ElapsedTime = CurrentTime - StartTime;
@@ -108,7 +108,7 @@ EFIAPI
 GetPerformanceCounter (
   VOID
   )
-{ 
+{
   return (UINT64)MmioRead32 (TimerBase(PcdGet32(PcdOmap35xxFreeTimer)) + GPTIMER_TCRR);
 }
 
@@ -123,11 +123,11 @@ GetPerformanceCounterProperties (
     // Timer starts with the reload value
     *StartValue = (UINT64)MmioRead32 (TimerBase(PcdGet32(PcdOmap35xxFreeTimer)) + GPTIMER_TLDR);
   }
-  
+
   if (EndValue != NULL) {
     // Timer counts up to 0xFFFFFFFF
     *EndValue = 0xFFFFFFFF;
   }
-  
+
   return PcdGet64(PcdEmbeddedPerformanceCounterFrequencyInHz);
 }

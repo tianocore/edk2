@@ -2,7 +2,7 @@
   Default exception handler
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -90,7 +90,7 @@ MRegList (
   UINTN     Index, Start, End;
   CHAR8     *Str;
   BOOLEAN   First;
- 
+
   Str = mMregListStr;
   *Str = '\0';
   AsciiStrCat  (Str, "{");
@@ -100,13 +100,13 @@ MRegList (
       for (Index++; ((OpCode & (1 << Index)) != 0) && Index <= 15; Index++) {
         End = Index;
       }
-      
+
       if (!First) {
         AsciiStrCat  (Str, ",");
       } else {
         First = FALSE;
       }
-      
+
       if (Start == End) {
         AsciiStrCat  (Str, gReg[Start]);
         AsciiStrCat  (Str, ", ");
@@ -121,7 +121,7 @@ MRegList (
     AsciiStrCat  (Str, "ERROR");
   }
   AsciiStrCat  (Str, "}");
-  
+
   // BugBug: Make caller pass in buffer it is cleaner
   return mMregListStr;
 }
@@ -145,17 +145,17 @@ RotateRight (
 
 
 /**
-  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to 
-  point to next instructin. 
-  
-  We cheat and only decode instructions that access 
+  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to
+  point to next instructin.
+
+  We cheat and only decode instructions that access
   memory. If the instruction is not found we dump the instruction in hex.
-   
-  @param  OpCodePtr   Pointer to pointer of ARM instruction to disassemble.  
+
+  @param  OpCodePtr   Pointer to pointer of ARM instruction to disassemble.
   @param  Buf         Buffer to sprintf disassembly into.
-  @param  Size        Size of Buf in bytes. 
+  @param  Size        Size of Buf in bytes.
   @param  Extended    TRUE dump hex for instruction too.
-  
+
 **/
 VOID
 DisassembleArmInstruction (
@@ -177,7 +177,7 @@ DisassembleArmInstruction (
   P = (OpCode & BIT24) == BIT24;
   U = (OpCode & BIT23) == BIT23;
   B = (OpCode & BIT22) == BIT22;  // Also called S
-  W = (OpCode & BIT21) == BIT21;  
+  W = (OpCode & BIT21) == BIT21;
   L = (OpCode & BIT20) == BIT20;
   S = (OpCode & BIT6) == BIT6;
   H = (OpCode & BIT5) == BIT5;
@@ -195,27 +195,27 @@ DisassembleArmInstruction (
   // LDREX, STREX
   if ((OpCode  & 0x0fe000f0) == 0x01800090) {
     if (L) {
-      // A4.1.27  LDREX{<cond>} <Rd>, [<Rn>] 
-      AsciiSPrint (Buf, Size, "LDREX%a %a, [%a]", COND (OpCode), gReg[Rd], gReg[Rn]);   
+      // A4.1.27  LDREX{<cond>} <Rd>, [<Rn>]
+      AsciiSPrint (Buf, Size, "LDREX%a %a, [%a]", COND (OpCode), gReg[Rd], gReg[Rn]);
     } else {
      // A4.1.103  STREX{<cond>} <Rd>, <Rm>, [<Rn>]
-      AsciiSPrint (Buf, Size, "STREX%a %a, %a, [%a]", COND (OpCode), gReg[Rd], gReg[Rn], gReg[Rn]);   
-    } 
+      AsciiSPrint (Buf, Size, "STREX%a %a, %a, [%a]", COND (OpCode), gReg[Rd], gReg[Rn], gReg[Rn]);
+    }
     return;
   }
-  
+
   // LDM/STM
   if ((OpCode  & 0x0e000000) == 0x08000000) {
     if (L) {
       // A4.1.20 LDM{<cond>}<addressing_mode> <Rn>{!}, <registers>
       // A4.1.21 LDM{<cond>}<addressing_mode> <Rn>, <registers_without_pc>^
       // A4.1.22 LDM{<cond>}<addressing_mode> <Rn>{!}, <registers_and_pc>^
-      AsciiSPrint (Buf, Size, "LDM%a%a, %a%a, %a", COND (OpCode), LDM_EXT (Rn ,(OpCode >> 23) & 3), gReg[Rn], WRITE (W), MRegList (OpCode), USER (B));   
+      AsciiSPrint (Buf, Size, "LDM%a%a, %a%a, %a", COND (OpCode), LDM_EXT (Rn ,(OpCode >> 23) & 3), gReg[Rn], WRITE (W), MRegList (OpCode), USER (B));
     } else {
       // A4.1.97 STM{<cond>}<addressing_mode> <Rn>{!}, <registers>
       // A4.1.98 STM{<cond>}<addressing_mode> <Rn>, <registers>^
-      AsciiSPrint (Buf, Size, "STM%a%a, %a%a, %a", COND (OpCode), LDM_EXT (Rn ,(OpCode >> 23) & 3), gReg[Rn], WRITE (W), MRegList (OpCode), USER (B));   
-    }   
+      AsciiSPrint (Buf, Size, "STM%a%a, %a%a, %a", COND (OpCode), LDM_EXT (Rn ,(OpCode >> 23) & 3), gReg[Rn], WRITE (W), MRegList (OpCode), USER (B));
+    }
     return;
   }
 
@@ -225,7 +225,7 @@ DisassembleArmInstruction (
     if ((OpCode & 0xfd70f000 ) == 0xf550f000) {
       Index = AsciiSPrint (Buf, Size, "PLD");
     } else {
-      Index = AsciiSPrint (Buf, Size, "%a%a%a%a %a, ", L ? "LDR" : "STR", COND (OpCode), BYTE (B), (!(P) && W) ? "T":"", gReg[Rd]); 
+      Index = AsciiSPrint (Buf, Size, "%a%a%a%a %a, ", L ? "LDR" : "STR", COND (OpCode), BYTE (B), (!(P) && W) ? "T":"", gReg[Rd]);
     }
     if (P) {
       if (!I) {
@@ -256,7 +256,7 @@ DisassembleArmInstruction (
         } else {
           Type = "ROR";
         }
-          
+
         AsciiSPrint (&Buf[Index], Size - Index, "[%a, #%a%a, %a, #%d]%a", gReg[Rn], SIGN (U), gReg[Rm], Type, shift_imm, WRITE (W));
       }
     } else {  // !P
@@ -287,13 +287,13 @@ DisassembleArmInstruction (
         } else {
           Type = "ROR";
         }
-          
+
         AsciiSPrint (&Buf[Index], Size - Index, "[%a], #%a%a, %a, #%d", gReg[Rn], SIGN (U), gReg[Rm], Type, shift_imm);
       }
     }
-    return;  
+    return;
   }
-  
+
   if ((OpCode  & 0x0e000000) == 0x00000000) {
     // LDR/STR address mode 3
     // LDR|STR{<cond>}H|SH|SB|D <Rd>, <addressing_mode>
@@ -314,8 +314,8 @@ DisassembleArmInstruction (
         Root = "STR%aD %a ";
       }
     }
-  
-    Index = AsciiSPrint (Buf, Size, Root, COND (OpCode), gReg[Rd]); 
+
+    Index = AsciiSPrint (Buf, Size, Root, COND (OpCode), gReg[Rd]);
 
     S = (OpCode & BIT6) == BIT6;
     H = (OpCode & BIT5) == BIT5;
@@ -350,7 +350,7 @@ DisassembleArmInstruction (
     AsciiSPrint (Buf, Size, "SWP%a%a %a, %a, [%a]", COND (OpCode), BYTE (B), gReg[Rd], gReg[Rm], gReg[Rn]);
     return;
   }
-  
+
   if ((OpCode  & 0xfe5f0f00) == 0xf84d0500) {
     // A4.1.90 SRS SRS<addressing_mode> #<mode>{!}
     AsciiSPrint (Buf, Size, "SRS%a #0x%x%a", gLdmStack[(OpCode >> 23) & 3], OpCode & 0x1f, WRITE (W));
@@ -362,13 +362,13 @@ DisassembleArmInstruction (
     AsciiSPrint (Buf, Size, "RFE%a %a", gLdmStack[(OpCode >> 23) & 3], gReg[Rn], WRITE (W));
     return;
   }
-  
+
   if ((OpCode  & 0xfff000f0) == 0xe1200070) {
     // A4.1.7 BKPT <immed_16>
     AsciiSPrint (Buf, Size, "BKPT %x", ((OpCode >> 8) | (OpCode & 0xf)) & 0xffff);
     return;
-  }  
-  
+  }
+
   if ((OpCode  & 0xfff10020) == 0xf1000000) {
     // A4.1.16 CPS<effect> <iflags> {, #<mode>}
     if (((OpCode >> 6) & 0x7) == 0) {
@@ -381,19 +381,19 @@ DisassembleArmInstruction (
       }
     }
     return;
-  }  
-    
+  }
+
   if ((OpCode  & 0x0f000000) == 0x0f000000) {
     // A4.1.107 SWI{<cond>} <immed_24>
     AsciiSPrint (Buf, Size, "SWI%a %x", COND (OpCode), OpCode & 0x00ffffff);
     return;
-  }  
+  }
 
   if ((OpCode  & 0x0fb00000) == 0x01000000) {
     // A4.1.38 MRS{<cond>} <Rd>, CPSR  MRS{<cond>} <Rd>, SPSR
     AsciiSPrint (Buf, Size, "MRS%a %a, %a", COND (OpCode), gReg[Rd], B ? "SPSR" : "CPSR");
     return;
-  }  
+  }
 
 
   if ((OpCode  & 0x0db00000) == 0x03200000) {
@@ -406,14 +406,14 @@ DisassembleArmInstruction (
       AsciiSPrint (Buf, Size, "MRS%a %a_%a, %a", COND (OpCode), B ? "SPSR" : "CPSR", gReg[Rd]);
     }
     return;
-  }  
+  }
 
   if ((OpCode  & 0xff000010) == 0xfe000000) {
     // A4.1.13 CDP{<cond>} <coproc>, <opcode_1>, <CRd>, <CRn>, <CRm>, <opcode_2>
     AsciiSPrint (Buf, Size, "CDP%a 0x%x, 0x%x, CR%d, CR%d, CR%d, 0x%x", COND (OpCode), (OpCode >> 8) & 0xf, (OpCode >> 20) & 0xf, Rn, Rd, Rm, (OpCode >> 5) &0x7);
     return;
   }
-  
+
   if ((OpCode  & 0x0e000000) == 0x0c000000) {
     // A4.1.19 LDC and A4.1.96 SDC
     if ((OpCode & 0xf0000000) == 0xf0000000) {
@@ -421,36 +421,36 @@ DisassembleArmInstruction (
     } else {
       Index = AsciiSPrint (Buf, Size, "%a%a 0x%x, CR%d, ",  L ? "LDC":"SDC", COND (OpCode), (OpCode >> 8) & 0xf, Rd);
     }
-    
+
     if (!P) {
-      if (!W) { 
+      if (!W) {
         // A5.5.5.5 [<Rn>], <option>
-      AsciiSPrint (&Buf[Index], Size - Index, "[%a], {0x%x}", gReg[Rn], OpCode & 0xff); 
+      AsciiSPrint (&Buf[Index], Size - Index, "[%a], {0x%x}", gReg[Rn], OpCode & 0xff);
       } else {
         // A.5.5.4  [<Rn>], #+/-<offset_8>*4
-      AsciiSPrint (&Buf[Index], Size - Index, "[%a], #%a0x%x*4", gReg[Rn], SIGN (U), OpCode & 0xff); 
+      AsciiSPrint (&Buf[Index], Size - Index, "[%a], #%a0x%x*4", gReg[Rn], SIGN (U), OpCode & 0xff);
       }
     } else {
       // A5.5.5.2 [<Rn>, #+/-<offset_8>*4 ]!
-      AsciiSPrint (&Buf[Index], Size - Index, "[%a, #%a0x%x*4]%a", gReg[Rn], SIGN (U), OpCode & 0xff, WRITE (W)); 
+      AsciiSPrint (&Buf[Index], Size - Index, "[%a, #%a0x%x*4]%a", gReg[Rn], SIGN (U), OpCode & 0xff, WRITE (W));
     }
-    
+
   }
-  
+
   if ((OpCode  & 0x0f000010) == 0x0e000010) {
-    // A4.1.32 MRC2, MCR2 
+    // A4.1.32 MRC2, MCR2
     AsciiSPrint (Buf, Size, "%a%a 0x%x, 0x%x, %a, CR%d, CR%d, 0x%x", L ? "MRC":"MCR", COND (OpCode), (OpCode >> 8) & 0xf, (OpCode >> 20) & 0xf, gReg[Rd], Rn, Rm, (OpCode >> 5) &0x7);
-    return;    
+    return;
   }
 
   if ((OpCode  & 0x0ff00000) == 0x0c400000) {
-    // A4.1.33 MRRC2, MCRR2 
+    // A4.1.33 MRRC2, MCRR2
     AsciiSPrint (Buf, Size, "%a%a 0x%x, 0x%x, %a, %a, CR%d", L ? "MRRC":"MCRR", COND (OpCode), (OpCode >> 4) & 0xf, (OpCode >> 20) & 0xf, gReg[Rd], gReg[Rn], Rm);
-    return;    
+    return;
   }
 
   AsciiSPrint (Buf, Size, "Faulting OpCode 0x%08x", OpCode);
-  
+
   *OpCodePtr += 1;
   return;
 }

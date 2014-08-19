@@ -1,5 +1,5 @@
 /** @file
-  
+
   Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -52,6 +52,5 @@
   gEmbeddedExternalDeviceProtocolGuid
 
 [Depex]
-  gEfiMetronomeArchProtocolGuid AND 
+  gEfiMetronomeArchProtocolGuid AND
   gEmbeddedExternalDeviceProtocolGuid
-  

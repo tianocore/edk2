@@ -22,7 +22,7 @@
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
-  
+
   AREA    ArmRealViewEbHelper, CODE, READONLY
 
 //UINTN

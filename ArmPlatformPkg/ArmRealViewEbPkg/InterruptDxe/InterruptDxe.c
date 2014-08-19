@@ -1,14 +1,14 @@
 /*++
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
-Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>                                                         
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
+Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -47,7 +47,7 @@ Abstract:
 #define EB_GIC5_DIST_BASE       0x10071000
 
 // number of interrupts sources supported by each GIC on the EB
-#define EB_NUM_GIC_INTERRUPTS   96  
+#define EB_NUM_GIC_INTERRUPTS   96
 
 // number of 32-bit registers needed to represent those interrupts as a bit
 // (used for enable set, enable clear, pending set, pending clear, and active regs)
@@ -136,8 +136,8 @@ RegisterInterruptSource (
   if (Source > EB_NUM_GIC_INTERRUPTS) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
-  } 
-  
+  }
+
   if ((Handler == NULL) && (gRegisteredInterruptHandlers[Source] == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -170,19 +170,19 @@ EnableInterruptSource (
 {
   UINT32    RegOffset;
   UINTN     RegShift;
-  
+
   if (Source > EB_NUM_GIC_INTERRUPTS) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   // calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
 
   // write set-enable register
   MmioWrite32 (EB_GIC1_DIST_BASE+GIC_ICDISER+(4*RegOffset), 1 << RegShift);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -206,19 +206,19 @@ DisableInterruptSource (
 {
   UINT32    RegOffset;
   UINTN     RegShift;
-  
+
   if (Source > EB_NUM_GIC_INTERRUPTS) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   // calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
 
   // write set-enable register
   MmioWrite32 (EB_GIC1_DIST_BASE+GIC_ICDICER+(4*RegOffset), 1 << RegShift);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -245,27 +245,27 @@ GetInterruptSourceState (
 {
   UINT32    RegOffset;
   UINTN     RegShift;
-  
+
   if (Source > EB_NUM_GIC_INTERRUPTS) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   // calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
-    
+
   if ((MmioRead32 (EB_GIC1_DIST_BASE+GIC_ICDISER+(4*RegOffset)) & (1<<RegShift)) == 0) {
     *InterruptState = FALSE;
   } else {
     *InterruptState = TRUE;
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
-  Signal to the hardware that the End Of Intrrupt state 
+  Signal to the hardware that the End Of Intrrupt state
   has been reached.
 
   @param This     Instance pointer for this protocol
@@ -317,7 +317,7 @@ IrqInterruptHandler (
   if (GicInterrupt >= EB_NUM_GIC_INTERRUPTS) {
     MmioWrite32 (EB_GIC1_CPU_INTF_BASE+GIC_ICCEIOR, GicInterrupt);
   }
-  
+
   InterruptHandler = gRegisteredInterruptHandlers[GicInterrupt];
   if (InterruptHandler != NULL) {
     // Call the registered interrupt handler.
@@ -349,7 +349,7 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol = {
 
 /**
   Shutdown our hardware
-  
+
   DXE Core will disable interrupts and turn off the timer and disable interrupts
   after all the event handlers have run.
 
@@ -364,7 +364,7 @@ ExitBootServicesEvent (
   )
 {
   UINTN    i;
-  
+
   for (i = 0; i < EB_NUM_GIC_INTERRUPTS; i++) {
     DisableInterruptSource (&gHardwareInterruptProtocol, i);
   }
@@ -382,7 +382,7 @@ CpuProtocolInstalledNotification (
 {
   EFI_STATUS              Status;
   EFI_CPU_ARCH_PROTOCOL   *Cpu;
-  
+
   //
   // Get the cpu protocol that this driver requires.
   //
@@ -424,19 +424,19 @@ InterruptDxeInitialize (
   UINT32      RegOffset;
   UINTN       RegShift;
 
-  
+
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
   for (i = 0; i < EB_NUM_GIC_INTERRUPTS; i++) {
     DisableInterruptSource (&gHardwareInterruptProtocol, i);
-    
-    // Set Priority 
+
+    // Set Priority
     RegOffset = i / 4;
     RegShift = (i % 4) * 8;
     MmioAndThenOr32 (
-      EB_GIC1_DIST_BASE+GIC_ICDIPR+(4*RegOffset), 
-      ~(0xff << RegShift), 
+      EB_GIC1_DIST_BASE+GIC_ICDIPR+(4*RegOffset),
+      ~(0xff << RegShift),
       GIC_DEFAULT_PRIORITY << RegShift
       );
   }
@@ -451,25 +451,25 @@ InterruptDxeInitialize (
 
   // set priority mask reg to 0xff to allow all priorities through
   MmioWrite32 (EB_GIC1_CPU_INTF_BASE + GIC_ICCPMR, 0xff);
-  
+
   // enable gic cpu interface
   MmioWrite32 (EB_GIC1_CPU_INTF_BASE + GIC_ICCICR, 0x1);
 
   // enable gic distributor
   MmioWrite32 (EB_GIC1_DIST_BASE + GIC_ICCICR, 0x1);
 
-  
+
   ZeroMem (&gRegisteredInterruptHandlers, sizeof (gRegisteredInterruptHandlers));
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gHardwareInterruptHandle,
                   &gHardwareInterruptProtocolGuid,   &gHardwareInterruptProtocol,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   // Set up to be notified when the Cpu protocol is installed.
-  Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL, TPL_CALLBACK, CpuProtocolInstalledNotification, NULL, &CpuProtocolNotificationEvent);    
+  Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL, TPL_CALLBACK, CpuProtocolInstalledNotification, NULL, &CpuProtocolNotificationEvent);
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->RegisterProtocolNotify (&gEfiCpuArchProtocolGuid, CpuProtocolNotificationEvent, (VOID *)&CpuProtocolNotificationToken);

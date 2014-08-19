@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 // Copyright (c) 2011-2013, ARM Limited. All rights reserved.
@@ -80,21 +80,21 @@ ArmDisableInterrupts
   cpsid   if
   isb
   bx      LR
-  
-// UINT32 
+
+// UINT32
 // ReadCCSIDR (
 //   IN UINT32 CSSELR
-//   )  
+//   )
 ReadCCSIDR
   mcr p15,2,r0,c0,c0,0   ; Write Cache Size Selection Register (CSSELR)
   isb
   mrc p15,1,r0,c0,c0,0 ; Read current CP15 Cache Size ID Register (CCSIDR)
   bx  lr
-  
-// UINT32 
+
+// UINT32
 // ReadCLIDR (
 //   IN UINT32 CSSELR
-//   )  
+//   )
 ReadCLIDR
   mrc p15,1,r0,c0,c0,1 ; Read CP15 Cache Level ID Register
   bx  lr

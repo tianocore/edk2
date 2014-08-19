@@ -40,7 +40,7 @@
 
 [Protocols.common]
   gEfiDebugPortProtocolGuid
-  
+
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdGdbBaudRate|115200
   gEmbeddedTokenSpaceGuid.PcdGdbDataBits|8

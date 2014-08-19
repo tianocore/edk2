@@ -20,7 +20,7 @@
   FILE_GUID                      = 855274FA-3575-4C20-9709-C031DC5589FA
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = CompilerIntrinsicsLib 
+  LIBRARY_CLASS                  = CompilerIntrinsicsLib
 
 [Sources.AARCH64]
   AArch64/memcpy.S
@@ -41,7 +41,7 @@
   Arm/div.asm          | RVCT
   Arm/uldiv.asm        | RVCT
   Arm/ldivmod.asm      | RVCT
-  
+
 
 #
 # Move .c to .s to work around LLVM issues
@@ -60,14 +60,14 @@
 
   Arm/memcpy.S     | GCC
   Arm/memset.S     | GCC
-  
+
 #  Arm/modsi3.c     | GCC
 #  Arm/moddi3.c     | GCC
-#  Arm/muldi3.c     | GCC  
+#  Arm/muldi3.c     | GCC
   Arm/modsi3.S     | GCC
   Arm/moddi3.S     | GCC
   Arm/muldi3.S     | GCC
-  Arm/mullu.S      | GCC  
+  Arm/mullu.S      | GCC
 
 #  Arm/udivsi3.c    | GCC
 #  Arm/umodsi3.c    | GCC

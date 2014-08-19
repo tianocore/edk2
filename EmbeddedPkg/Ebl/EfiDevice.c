@@ -157,23 +157,23 @@ EblPrintLoadFileInfo (
 
   if (File->DevicePath != NULL) {
     // Try to print out the MAC address
-    for (DevicePathNode = File->DevicePath; 
-        !IsDevicePathEnd (DevicePathNode); 
+    for (DevicePathNode = File->DevicePath;
+        !IsDevicePathEnd (DevicePathNode);
         DevicePathNode = NextDevicePathNode (DevicePathNode)) {
-      
+
       if ((DevicePathType (DevicePathNode) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (DevicePathNode) == MSG_MAC_ADDR_DP)) {
         MacAddr = (MAC_ADDR_DEVICE_PATH *)DevicePathNode;
-        
+
         HwAddressSize = sizeof (EFI_MAC_ADDRESS);
         if (MacAddr->IfType == 0x01 || MacAddr->IfType == 0x00) {
           HwAddressSize = 6;
         }
-  
+
         AsciiPrint ("MAC ");
         for (Index = 0; Index < HwAddressSize; Index++) {
           AsciiPrint ("%02x", MacAddr->MacAddress.Addr[Index] & 0xff);
         }
-      }      
+      }
     }
   }
 
@@ -185,7 +185,7 @@ EblPrintLoadFileInfo (
 
 
 /**
-  Dump information about devices in the system. 
+  Dump information about devices in the system.
 
   fv:       PI Firmware Volume
   fs:       EFI Simple File System
@@ -195,7 +195,7 @@ EblPrintLoadFileInfo (
   Argv[0] - "device"
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -249,7 +249,7 @@ EblDeviceCmd (
       }
     }
   }
-  
+
   Max = EfiGetDeviceCounts (EfiOpenLoadFile);
   if (Max != 0) {
     AsciiPrint ("LoadFile Devices: (usually network)\n");
@@ -266,7 +266,7 @@ EblDeviceCmd (
 
 
 /**
-  Start an EFI image (PE32+ with EFI defined entry point). 
+  Start an EFI image (PE32+ with EFI defined entry point).
 
   Argv[0] - "start"
   Argv[1] - device name and path
@@ -278,7 +278,7 @@ EblDeviceCmd (
   start LoadFile0:                    ; load an FV via a PXE boot
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -308,7 +308,7 @@ EblStartCmd (
 
   File = EfiOpen (Argv[1], EFI_FILE_MODE_READ, 0);
   if (File == NULL) {
-    return EFI_INVALID_PARAMETER; 
+    return EFI_INVALID_PARAMETER;
   }
 
   DevicePath = File->DevicePath;
@@ -328,7 +328,7 @@ EblStartCmd (
 
     FreePool (Buffer);
   }
-  
+
   EfiClose (File);
 
   if (!EFI_ERROR (Status)) {
@@ -337,7 +337,7 @@ EblStartCmd (
       // We don't pass Argv[0] to the EFI Application (it's name) just the args
       Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&ImageInfo);
       ASSERT_EFI_ERROR (Status);
-      
+
       ImageInfo->LoadOptionsSize = (UINT32)AsciiStrSize (Argv[2]);
       ImageInfo->LoadOptions     = AllocatePool (ImageInfo->LoadOptionsSize);
       AsciiStrCpy (ImageInfo->LoadOptions, Argv[2]);
@@ -354,7 +354,7 @@ EblStartCmd (
 /**
   Load a Firmware Volume (FV) into memory from a device. This causes drivers in
   the FV to be dispatched if the dependencies of the drivers are met.
-  
+
   Argv[0] - "loadfv"
   Argv[1] - device name and path
 
@@ -363,7 +363,7 @@ EblStartCmd (
   loadfv LoadFile0:      ; load an FV via a PXE boot
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -388,7 +388,7 @@ EblLoadFvCmd (
 
   File = EfiOpen (Argv[1], EFI_FILE_MODE_READ, 0);
   if (File == NULL) {
-    return EFI_INVALID_PARAMETER; 
+    return EFI_INVALID_PARAMETER;
   }
 
   if (File->Type == EfiOpenMemoryBuffer) {
@@ -401,25 +401,25 @@ EblLoadFvCmd (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-      
+
     Status = gDS->ProcessFirmwareVolume (FvStart, FvSize, &FvHandle);
     if (EFI_ERROR (Status)) {
       FreePool (FvStart);
-    } 
+    }
   }
   return Status;
 }
 
 
 /**
-  Perform an EFI connect to connect devices that follow the EFI driver model. 
+  Perform an EFI connect to connect devices that follow the EFI driver model.
   If it is a PI system also call the dispatcher in case a new FV was made
   available by one of the connect EFI drivers (this is not a common case).
-  
+
   Argv[0] - "connect"
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -451,11 +451,11 @@ EblConnectCmd (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-      
+
       for (Index = 0; Index < HandleCount; Index++) {
         gBS->DisconnectController (HandleBuffer[Index], NULL, NULL);
       }
-      
+
       //
       // Given we disconnect our console we should go and do a connect now
       //
@@ -537,11 +537,11 @@ CHAR8 *gMemMapType[] = {
 
 /**
   Dump out the EFI memory map
-  
+
   Argv[0] - "memmap"
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -569,7 +569,7 @@ EblMemMapCmd (
   ZeroMem (PageCount, sizeof (PageCount));
 
   AsciiPrint ("EFI Memory Map\n");
-  
+
   // First call is to figure out how big the buffer needs to be
   MemMapSize = 0;
   MemMap     = NULL;
@@ -593,7 +593,7 @@ EblMemMapCmd (
           MemMap = NEXT_MEMORY_DESCRIPTOR (MemMap, DescriptorSize);
         }
       }
-        
+
       for (Index = 0, TotalMemory = 0; Index < EfiMaxMemoryType; Index++) {
         if (PageCount[Index] != 0) {
           AsciiPrint ("\n  %a %,7ld Pages (%,14ld)", gMemMapType[Index], PageCount[Index], LShiftU64 (PageCount[Index], 12));
@@ -630,27 +630,27 @@ EblMemMapCmd (
 /**
   Load a file into memory and optionally jump to it. A load address can be
   specified or automatically allocated. A quoted command line can optionally
-  be passed into the image. 
+  be passed into the image.
 
   Argv[0] - "go"
   Argv[1] - Device Name:path for the file to load
   Argv[2] - Address to load to or '*' if the load address will be allocated
   Argv[3] - Optional Entry point to the image. Image will be called if present
-  Argv[4] - "" string that will be passed as Argc & Argv to EntryPoint. Needs 
+  Argv[4] - "" string that will be passed as Argc & Argv to EntryPoint. Needs
             to include the command name
 
-  go fv1:\EblCmdX  0x10000  0x10010 "EblCmdX Arg2 Arg3 Arg4"; - load EblCmdX 
-    from FV1 to location 0x10000 and call the entry point at 0x10010 passing 
+  go fv1:\EblCmdX  0x10000  0x10010 "EblCmdX Arg2 Arg3 Arg4"; - load EblCmdX
+    from FV1 to location 0x10000 and call the entry point at 0x10010 passing
     in "EblCmdX Arg2 Arg3 Arg4" as the arguments.
 
-  go fv0:\EblCmdX  *  0x10 "EblCmdX Arg2 Arg3 Arg4"; - load EblCmdX from FS0 
+  go fv0:\EblCmdX  *  0x10 "EblCmdX Arg2 Arg3 Arg4"; - load EblCmdX from FS0
     to location allocated by this command and call the entry point at offset 0x10
     passing in "EblCmdX Arg2 Arg3 Arg4" as the arguments.
 
   go fv1:\EblCmdX  0x10000; Load EblCmdX to address 0x10000 and return
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -669,7 +669,7 @@ EblGoCmd (
   EBL_COMMMAND                  EntryPoint;
   UINTN                         EntryPointArgc;
   CHAR8                         *EntryPointArgv[MAX_ARGS];
-  
+
 
   if (Argc <= 2) {
     // device name and laod address are required
@@ -686,7 +686,7 @@ EblGoCmd (
   if (Argv[2][0] == '*') {
     // * Means allocate the buffer
     Status = EfiReadAllocatePool (File, &Address, &Size);
-    
+
     // EntryPoint is relative to the start of the image
     EntryPoint = (EBL_COMMMAND)((UINTN)EntryPoint + (UINTN)Address);
 
@@ -709,7 +709,7 @@ EblGoCmd (
         EntryPointArgc = 1;
         EntryPointArgv[0] = File->FileName;
       }
-      
+
       Status = EntryPoint (EntryPointArgc, EntryPointArgv);
     }
   }
@@ -741,7 +741,7 @@ EblFileCopyCmd (
   if (Argc < 3) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   DestFileName = Argv[2];
   FileNameLen = AsciiStrLen (DestFileName);
 
@@ -788,7 +788,7 @@ EblFileCopyCmd (
     AsciiPrint("Source file open error.\n");
     return EFI_NOT_FOUND;
   }
-  
+
   Destination = EfiOpen(DestFileName, EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0);
   if (Destination == NULL) {
     AsciiPrint("Destination file open error.\n");
@@ -799,12 +799,12 @@ EblFileCopyCmd (
   if (Buffer == NULL) {
     goto Exit;
   }
-  
+
   Size = EfiTell(Source, NULL);
 
   for (Offset = 0; Offset + FILE_COPY_CHUNK <= Size; Offset += Chunk) {
     Chunk = FILE_COPY_CHUNK;
-    
+
     Status = EfiRead(Source, Buffer, &Chunk);
     if (EFI_ERROR(Status)) {
       AsciiPrint("Read file error %r\n", Status);
@@ -815,13 +815,13 @@ EblFileCopyCmd (
     if (EFI_ERROR(Status)) {
       AsciiPrint("Write file error %r\n", Status);
       goto Exit;
-    }    
+    }
   }
-  
+
   // Any left over?
   if (Offset < Size) {
     Chunk = Size - Offset;
-    
+
     Status = EfiRead(Source, Buffer, &Chunk);
     if (EFI_ERROR(Status)) {
       AsciiPrint("Read file error %r\n", Status);
@@ -832,7 +832,7 @@ EblFileCopyCmd (
     if (EFI_ERROR(Status)) {
       AsciiPrint("Write file error %r\n", Status);
       goto Exit;
-    }    
+    }
   }
 
 
@@ -854,11 +854,11 @@ Exit:
       FreePool (DestFileName);
     }
   }
-  
+
   if (Buffer != NULL) {
     FreePool(Buffer);
   }
-  
+
   return Status;
 }
 
@@ -877,17 +877,17 @@ EblFileDiffCmd (
   UINTN         Size2;
   UINTN         Offset;
   UINTN         Chunk   = FILE_COPY_CHUNK;
-  
+
   if (Argc != 3) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   File1 = EfiOpen(Argv[1], EFI_FILE_MODE_READ, 0);
   if (File1 == NULL) {
     AsciiPrint("File 1 open error.\n");
     return EFI_NOT_FOUND;
   }
-  
+
   File2 = EfiOpen(Argv[2], EFI_FILE_MODE_READ, 0);
   if (File2 == NULL) {
     AsciiPrint("File 2 open error.\n");
@@ -906,15 +906,15 @@ EblFileDiffCmd (
   if (Buffer1 == NULL) {
     goto Exit;
   }
-  
+
   Buffer2 = AllocatePool(FILE_COPY_CHUNK);
   if (Buffer2 == NULL) {
     goto Exit;
-  }  
+  }
 
   for (Offset = 0; Offset + FILE_COPY_CHUNK <= Size1; Offset += Chunk) {
     Chunk = FILE_COPY_CHUNK;
-    
+
     Status = EfiRead(File1, Buffer1, &Chunk);
     if (EFI_ERROR(Status)) {
       AsciiPrint("File 1 read error\n");
@@ -926,17 +926,17 @@ EblFileDiffCmd (
       AsciiPrint("File 2 read error\n");
       goto Exit;
     }
-    
+
     if (CompareMem(Buffer1, Buffer2, Chunk) != 0) {
       AsciiPrint("Files differ.\n");
       goto Exit;
     };
   }
-  
+
   // Any left over?
   if (Offset < Size1) {
     Chunk = Size1 - Offset;
-    
+
     Status = EfiRead(File1, Buffer1, &Chunk);
     if (EFI_ERROR(Status)) {
       AsciiPrint("File 1 read error\n");
@@ -947,9 +947,9 @@ EblFileDiffCmd (
     if (EFI_ERROR(Status)) {
       AsciiPrint("File 2 read error\n");
       goto Exit;
-    }    
+    }
   }
-  
+
   if (CompareMem(Buffer1, Buffer2, Chunk) != 0) {
     AsciiPrint("Files differ.\n");
   } else {
@@ -963,22 +963,22 @@ Exit:
       AsciiPrint("File 1 close error %r\n", Status);
     }
   }
-  
+
   if (File2 != NULL) {
     Status = EfiClose(File2);
     if (EFI_ERROR(Status)) {
       AsciiPrint("File 2 close error %r\n", Status);
     }
   }
-  
+
   if (Buffer1 != NULL) {
     FreePool(Buffer1);
   }
-  
+
   if (Buffer2 != NULL) {
     FreePool(Buffer2);
   }
-  
+
   return Status;
 }
 
@@ -998,25 +998,25 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdDeviceTemplate[] =
   },
   {
     "go",
-    " dev:path loadaddress entrypoint args; load to given address and jump in", 
+    " dev:path loadaddress entrypoint args; load to given address and jump in",
     NULL,
     EblGoCmd
   },
   {
     "loadfv",
-    " devname; Load PI FV from device", 
+    " devname; Load PI FV from device",
     NULL,
     EblLoadFvCmd
   },
   {
     "start",
-    " path; EFI Boot Device:filepath. fs1:\\EFI\\BOOT.EFI", 
+    " path; EFI Boot Device:filepath. fs1:\\EFI\\BOOT.EFI",
     NULL,
     EblStartCmd
   },
   {
     "memmap",
-    "; dump EFI memory map", 
+    "; dump EFI memory map",
     NULL,
     EblMemMapCmd
   },

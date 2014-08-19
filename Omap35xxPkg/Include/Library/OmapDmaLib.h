@@ -1,7 +1,7 @@
 /** @file
 
-  Abstractions for simple OMAP DMA. 
-  OMAP_DMA4 structure elements are described in the OMAP35xx TRM. 
+  Abstractions for simple OMAP DMA.
+  OMAP_DMA4 structure elements are described in the OMAP35xx TRM.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 
@@ -46,16 +46,16 @@ typedef struct {
 } OMAP_DMA4;
 
 
-/**                                                                 
+/**
   Configure OMAP DMA Channel
-            
+
   @param  Channel               DMA Channel to configure
-  @param  Dma4                  Pointer to structure used to initialize DMA registers for the Channel                                                
-                                  
+  @param  Dma4                  Pointer to structure used to initialize DMA registers for the Channel
+
   @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
   @retval EFI_INVALID_PARAMETER Channel is not valid
   @retval EFI_DEVICE_ERROR      The system hardware could not map the requested information.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -64,17 +64,17 @@ EnableDmaChannel (
   IN  OMAP_DMA4   *Dma4
   );
 
-/**                                                                 
+/**
   Turn of DMA channel configured by EnableDma().
-            
+
   @param  Channel               DMA Channel to configure
   @param  SuccesMask            Bits in DMA4_CSR register indicate EFI_SUCCESS
   @param  ErrorMask             Bits in DMA4_CSR register indicate EFI_DEVICE_ERROR
-                                  
+
   @retval EFI_SUCCESS           DMA hardware disabled
   @retval EFI_INVALID_PARAMETER Channel is not valid
   @retval EFI_DEVICE_ERROR      The system hardware could not map the requested information.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -86,5 +86,5 @@ DisableDmaChannel (
 
 
 
-#endif 
+#endif
 

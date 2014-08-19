@@ -148,43 +148,43 @@ EFIAPI
 ArmDataCachePresent (
   VOID
   );
-  
+
 UINTN
 EFIAPI
 ArmDataCacheSize (
   VOID
   );
-  
+
 UINTN
 EFIAPI
 ArmDataCacheAssociativity (
   VOID
   );
-  
+
 UINTN
 EFIAPI
 ArmDataCacheLineLength (
   VOID
   );
-  
+
 BOOLEAN
 EFIAPI
 ArmInstructionCachePresent (
   VOID
   );
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheSize (
   VOID
   );
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheAssociativity (
   VOID
   );
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheLineLength (
@@ -311,7 +311,7 @@ EFIAPI
 ArmDisableInstructionCache (
   VOID
   );
-  
+
 VOID
 EFIAPI
 ArmEnableMmu (
@@ -395,7 +395,7 @@ EFIAPI
 ArmDisableFiq (
   VOID
   );
-  
+
 BOOLEAN
 EFIAPI
 ArmGetFiqState (
@@ -407,14 +407,14 @@ EFIAPI
 ArmInvalidateTlb (
   VOID
   );
-  
+
 VOID
 EFIAPI
 ArmUpdateTranslationTableEntry (
   IN  VOID     *TranslationTableEntry,
   IN  VOID     *Mva
   );
-  
+
 VOID
 EFIAPI
 ArmSetDomainAccessControl (
@@ -440,13 +440,13 @@ ArmConfigureMmu (
   OUT VOID                         **TranslationTableBase OPTIONAL,
   OUT UINTN                         *TranslationTableSize  OPTIONAL
   );
-  
+
 BOOLEAN
 EFIAPI
 ArmMmuEnabled (
   VOID
   );
-  
+
 VOID
 EFIAPI
 ArmEnableBranchPrediction (
@@ -482,13 +482,13 @@ EFIAPI
 ArmDataMemoryBarrier (
   VOID
   );
-  
+
 VOID
 EFIAPI
 ArmDataSyncronizationBarrier (
   VOID
   );
-  
+
 VOID
 EFIAPI
 ArmInstructionSynchronizationBarrier (

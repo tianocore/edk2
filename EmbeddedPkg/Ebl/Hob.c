@@ -87,7 +87,7 @@
 **/
 
 #include "Ebl.h"
-// BugBug: Autogen does not allow this to be included currently 
+// BugBug: Autogen does not allow this to be included currently
 //#include <EdkModulePkg/Include/EdkDxe.h>
 
 GLOBAL_REMOVE_IF_UNREFERENCED char *mHobResourceType[] = {
@@ -109,7 +109,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED char *mHobResourceType[] = {
   Argv[0] - "hob"
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -129,9 +129,9 @@ EblHobCmd (
   CurrentRow = 0;
   for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_HANDOFF) {
-      AsciiPrint ("PHIT HOB Ver %x Boot Mode %02x Top %lx  Bottom %lx\n", 
-        Hob.HandoffInformationTable->Version, 
-        Hob.HandoffInformationTable->BootMode, 
+      AsciiPrint ("PHIT HOB Ver %x Boot Mode %02x Top %lx  Bottom %lx\n",
+        Hob.HandoffInformationTable->Version,
+        Hob.HandoffInformationTable->BootMode,
         Hob.HandoffInformationTable->EfiMemoryTop,
         Hob.HandoffInformationTable->EfiMemoryBottom
         );
@@ -140,7 +140,7 @@ EblHobCmd (
         return EFI_SUCCESS;
       }
 
-      AsciiPrint ("    Free Top %lx Free Bottom %lx  End Of HOB %lx\n", 
+      AsciiPrint ("    Free Top %lx Free Bottom %lx  End Of HOB %lx\n",
         Hob.HandoffInformationTable->EfiFreeMemoryTop,
         Hob.HandoffInformationTable->EfiFreeMemoryBottom,
         Hob.HandoffInformationTable->EfiEndOfHobList
@@ -149,9 +149,9 @@ EblHobCmd (
     } else if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
       // mod(%) on array index is just to prevent buffer overrun
       AsciiPrint ("Mem Alloc HOB %a %g %08lx:%lx\n",
-        (Hob.MemoryAllocation->AllocDescriptor.MemoryType < EfiMaxMemoryType) ? gMemMapType[Hob.MemoryAllocation->AllocDescriptor.MemoryType] : "ILLEGAL TYPE", 
-        &Hob.MemoryAllocation->AllocDescriptor.Name, 
-        Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress, 
+        (Hob.MemoryAllocation->AllocDescriptor.MemoryType < EfiMaxMemoryType) ? gMemMapType[Hob.MemoryAllocation->AllocDescriptor.MemoryType] : "ILLEGAL TYPE",
+        &Hob.MemoryAllocation->AllocDescriptor.Name,
+        Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
         Hob.MemoryAllocation->AllocDescriptor.MemoryLength
         );
       if (CompareGuid (&gEfiHobMemoryAllocModuleGuid, &Hob.MemoryAllocation->AllocDescriptor.Name)) {
@@ -163,9 +163,9 @@ EblHobCmd (
     } else if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       AsciiPrint ("Resource HOB %a %g %08lx:%lx\n    Attributes: %08x\n",
         (Hob.ResourceDescriptor->ResourceType < EFI_RESOURCE_MAX_MEMORY_TYPE) ? mHobResourceType[Hob.ResourceDescriptor->ResourceType] : mHobResourceType[EFI_RESOURCE_MAX_MEMORY_TYPE],
-        &Hob.ResourceDescriptor->Owner, 
-        Hob.ResourceDescriptor->PhysicalStart, 
-        Hob.ResourceDescriptor->ResourceLength, 
+        &Hob.ResourceDescriptor->Owner,
+        Hob.ResourceDescriptor->PhysicalStart,
+        Hob.ResourceDescriptor->ResourceLength,
         Hob.ResourceDescriptor->ResourceAttribute
         );
         if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
@@ -179,16 +179,16 @@ EblHobCmd (
           if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
             return EFI_SUCCESS;
           }
-          AsciiPrint ("    %a 0x%08x\n", 
-            (EfiMemoryTypeInformation->Type < EfiMaxMemoryType) ? gMemMapType[EfiMemoryTypeInformation->Type] : "END       ", 
+          AsciiPrint ("    %a 0x%08x\n",
+            (EfiMemoryTypeInformation->Type < EfiMaxMemoryType) ? gMemMapType[EfiMemoryTypeInformation->Type] : "END       ",
             EfiMemoryTypeInformation->NumberOfPages
             );
        }
       }
     } else if (Hob.Header->HobType == EFI_HOB_TYPE_FV) {
-      AsciiPrint ("FV HOB %08lx:%08lx\n", Hob.FirmwareVolume->BaseAddress, Hob.FirmwareVolume->Length);  
+      AsciiPrint ("FV HOB %08lx:%08lx\n", Hob.FirmwareVolume->BaseAddress, Hob.FirmwareVolume->Length);
     } else if (Hob.Header->HobType == EFI_HOB_TYPE_CPU) {
-      AsciiPrint ("CPU HOB: Mem %x IO %x\n", Hob.Cpu->SizeOfMemorySpace, Hob.Cpu->SizeOfIoSpace);  
+      AsciiPrint ("CPU HOB: Mem %x IO %x\n", Hob.Cpu->SizeOfMemorySpace, Hob.Cpu->SizeOfIoSpace);
     } else if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_POOL) {
       AsciiPrint ("Mem Pool HOB:\n");
 /* Not in PI
@@ -199,7 +199,7 @@ EblHobCmd (
 
     if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
       break;
-    }    
+    }
   }
 
   return EFI_SUCCESS;

@@ -220,7 +220,7 @@ SemihostWriteString (
 {
   Semihost_SYS_WRITE0(String);
 }
-  
+
 UINT32
 SemihostSystem (
   IN CHAR8 *CommandLine

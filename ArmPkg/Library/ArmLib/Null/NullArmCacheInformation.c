@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -41,16 +41,16 @@ ArmDataCachePresent (
 {
   return FALSE;
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheSize (
   VOID
   )
 {
-  return 0;      
+  return 0;
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheAssociativity (
@@ -59,7 +59,7 @@ ArmDataCacheAssociativity (
 {
   return 0;
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheLineLength (
@@ -68,7 +68,7 @@ ArmDataCacheLineLength (
 {
   return 0;
 }
-  
+
 BOOLEAN
 EFIAPI
 ArmInstructionCachePresent (
@@ -77,16 +77,16 @@ ArmInstructionCachePresent (
 {
   return FALSE;
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheSize (
   VOID
   )
 {
-  return 0;      
+  return 0;
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheAssociativity (
@@ -95,7 +95,7 @@ ArmInstructionCacheAssociativity (
 {
   return 0;
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheLineLength (

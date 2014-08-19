@@ -1,13 +1,13 @@
 //
 //  Copyright (c) 2011, ARM Limited. All rights reserved.
-//  
-//  This program and the accompanying materials                          
-//  are licensed and made available under the terms and conditions of the BSD License         
-//  which accompanies this distribution.  The full text of the license may be found at        
-//  http://opensource.org/licenses/bsd-license.php                                            
 //
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+//  This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 //
 
@@ -17,15 +17,15 @@
 
   IMPORT  PeiCommonExceptionEntry
   EXPORT  PeiVectorTable
-  
+
   PRESERVE8
   AREA    PrePeiCoreException, CODE, READONLY, CODEALIGN, ALIGN=5
 
 //============================================================
 //Default Exception Handlers
 //============================================================
-  
-  
+
+
 PeiVectorTable
   b _DefaultResetHandler
   b _DefaultUndefined
@@ -75,7 +75,7 @@ _DefaultReserved
    cps       #0x13                     ; Switch to SVC for common stack
    mov  r0, #5
    blx   PeiCommonExceptionEntry
-   
+
 _DefaultIrq
    sub  r1, LR, #4
    cps       #0x13                     ; Switch to SVC for common stack

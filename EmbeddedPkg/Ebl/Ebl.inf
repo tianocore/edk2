@@ -44,43 +44,43 @@
   Ebl.h
   Network.c
   Variable.c
-  
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  
+
 [LibraryClasses]
-  DebugLib  
-  UefiLib  
-  UefiApplicationEntryPoint  
-  UefiBootServicesTableLib  
-  UefiRuntimeServicesTableLib  
-  BaseMemoryLib  
-  MemoryAllocationLib  
-  DevicePathLib  
-  IoLib  
-  PrintLib  
-  PcdLib  
-  EfiFileLib  
+  DebugLib
+  UefiLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+  IoLib
+  PrintLib
+  PcdLib
+  EfiFileLib
   HobLib
-  BaseLib  
+  BaseLib
   EblCmdLib
   EblNetworkLib
 
 [LibraryClasses.ARM]
   SemihostLib
- 
-[Protocols.common] 
-  gEfiFirmwareVolume2ProtocolGuid  
-  gEfiFirmwareVolumeBlockProtocolGuid 
-  gEfiBlockIoProtocolGuid  
+
+[Protocols.common]
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiFirmwareVolumeBlockProtocolGuid
+  gEfiBlockIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
-  gEfiLoadFileProtocolGuid  
-  gEfiLoadedImageProtocolGuid  
-  gEfiPxeBaseCodeProtocolGuid  
+  gEfiLoadFileProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEfiPxeBaseCodeProtocolGuid
   gEfiEblAddCommandProtocolGuid
   gEfiDiskIoProtocolGuid
   gEfiPciIoProtocolGuid

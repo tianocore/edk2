@@ -21,7 +21,7 @@
 #include <Guid/FileSystemVolumeLabelInfo.h>
 
 #include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h> 
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SemihostLib.h>
@@ -129,7 +129,7 @@ VolumeOpen (
   )
 {
   SEMIHOST_FCB *RootFcb = NULL;
-  
+
   if (Root == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -138,7 +138,7 @@ VolumeOpen (
   if (RootFcb == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   RootFcb->IsRoot = TRUE;
   RootFcb->Info.Attribute = EFI_FILE_READ_ONLY | EFI_FILE_DIRECTORY;
 
@@ -212,7 +212,7 @@ FileOpen (
     if (EFI_ERROR(Status)) {
       return Status;
     }
-    
+
     IsRoot = FALSE;
   }
 
@@ -267,7 +267,7 @@ FileClose (
       FreeFCB (Fcb);
     }
   }
-  
+
   return Status;
 }
 
@@ -357,7 +357,7 @@ FileWrite (
     *BufferSize -= WriteSize;
     Fcb->Position += *BufferSize;
   }
-  
+
   return Status;
 }
 
@@ -368,7 +368,7 @@ FileGetPosition (
   )
 {
   SEMIHOST_FCB *Fcb = NULL;
-    
+
   if (Position == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -447,11 +447,11 @@ GetFileInfo (
     Info->FileName[0]  = L'\0';
   } else {
     for (Index = 0; Index < NameSize; Index++) {
-      Info->FileName[Index] = Fcb->FileName[Index];            
+      Info->FileName[Index] = Fcb->FileName[Index];
     }
   }
 
-  *BufferSize = ResultSize;    
+  *BufferSize = ResultSize;
 
   return EFI_SUCCESS;
 }
@@ -467,11 +467,11 @@ GetFilesystemInfo (
   EFI_FILE_SYSTEM_INFO    *Info = NULL;
   EFI_STATUS              Status;
   UINTN                   ResultSize = SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (mSemihostFsLabel);
-    
+
   if (*BufferSize >= ResultSize) {
     ZeroMem (Buffer, ResultSize);
     Status = EFI_SUCCESS;
-        
+
     Info = Buffer;
 
     Info->Size       = ResultSize;
@@ -485,7 +485,7 @@ GetFilesystemInfo (
     Status = EFI_BUFFER_TOO_SMALL;
   }
 
-  *BufferSize = ResultSize;    
+  *BufferSize = ResultSize;
   return Status;
 }
 
@@ -500,9 +500,9 @@ FileGetInfo (
   SEMIHOST_FCB *Fcb;
   EFI_STATUS   Status;
   UINTN        ResultSize;
-  
+
   Fcb = SEMIHOST_FCB_FROM_THIS(File);
-  
+
   if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid) != 0) {
     Status = GetFilesystemInfo (Fcb, BufferSize, Buffer);
   } else if (CompareGuid (InformationType, &gEfiFileInfoGuid) != 0) {
@@ -596,8 +596,8 @@ SemihostFsEntryPoint (
     }
 
     Status = gBS->InstallMultipleProtocolInterfaces (
-                    &gInstallHandle, 
-                    &gEfiSimpleFileSystemProtocolGuid, &gSemihostFs, 
+                    &gInstallHandle,
+                    &gEfiSimpleFileSystemProtocolGuid, &gSemihostFs,
                     &gEfiDevicePathProtocolGuid,       &gDevicePath,
                     NULL
                     );
@@ -606,6 +606,6 @@ SemihostFsEntryPoint (
       FreePool (mSemihostFsLabel);
     }
   }
- 
+
   return Status;
 }

@@ -66,7 +66,7 @@
 #define RSP_TYPE_48BITS   (0x2UL << 16)
 #define CCCE_ENABLE       BIT19
 #define CICE_ENABLE       BIT20
-#define DP_ENABLE         BIT21 
+#define DP_ENABLE         BIT21
 #define INDX(CMD_INDX)    ((CMD_INDX & 0x3F) << 24)
 
 #define MMCHS_RSP10       (MMCHS1BASE + 0x110)

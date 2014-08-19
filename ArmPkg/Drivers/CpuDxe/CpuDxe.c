@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011, ARM Limited. All rights reserved.
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,14 +21,14 @@ BOOLEAN mInterruptState   = FALSE;
 
 
 /**
-  This function flushes the range of addresses from Start to Start+Length 
-  from the processor's data cache. If Start is not aligned to a cache line 
-  boundary, then the bytes before Start to the preceding cache line boundary 
-  are also flushed. If Start+Length is not aligned to a cache line boundary, 
-  then the bytes past Start+Length to the end of the next cache line boundary 
-  are also flushed. The FlushType of EfiCpuFlushTypeWriteBackInvalidate must be 
-  supported. If the data cache is fully coherent with all DMA operations, then 
-  this function can just return EFI_SUCCESS. If the processor does not support 
+  This function flushes the range of addresses from Start to Start+Length
+  from the processor's data cache. If Start is not aligned to a cache line
+  boundary, then the bytes before Start to the preceding cache line boundary
+  are also flushed. If Start+Length is not aligned to a cache line boundary,
+  then the bytes past Start+Length to the end of the next cache line boundary
+  are also flushed. The FlushType of EfiCpuFlushTypeWriteBackInvalidate must be
+  supported. If the data cache is fully coherent with all DMA operations, then
+  this function can just return EFI_SUCCESS. If the processor does not support
   flushing a range of the data cache, then the entire data cache can be flushed.
 
   @param  This             The EFI_CPU_ARCH_PROTOCOL instance.
@@ -70,13 +70,13 @@ CpuFlushCpuDataCache (
     default:
       return EFI_INVALID_PARAMETER;
   }
-  
+
   return EFI_SUCCESS;
 }
 
 
 /**
-  This function enables interrupt processing by the processor. 
+  This function enables interrupt processing by the processor.
 
   @param  This             The EFI_CPU_ARCH_PROTOCOL instance.
 
@@ -120,8 +120,8 @@ CpuDisableInterrupt (
 
 
 /**
-  This function retrieves the processor's current interrupt state a returns it in 
-  State. If interrupts are currently enabled, then TRUE is returned. If interrupts 
+  This function retrieves the processor's current interrupt state a returns it in
+  State. If interrupts are currently enabled, then TRUE is returned. If interrupts
   are currently disabled, then FALSE is returned.
 
   @param  This             The EFI_CPU_ARCH_PROTOCOL instance.
@@ -150,9 +150,9 @@ CpuGetInterruptState (
 
 /**
   This function generates an INIT on the processor. If this function succeeds, then the
-  processor will be reset, and control will not be returned to the caller. If InitType is 
-  not supported by this processor, or the processor cannot programmatically generate an 
-  INIT without help from external hardware, then EFI_UNSUPPORTED is returned. If an error 
+  processor will be reset, and control will not be returned to the caller. If InitType is
+  not supported by this processor, or the processor cannot programmatically generate an
+  INIT without help from external hardware, then EFI_UNSUPPORTED is returned. If an error
   occurs attempting to generate an INIT, then EFI_DEVICE_ERROR is returned.
 
   @param  This             The EFI_CPU_ARCH_PROTOCOL instance.
@@ -199,7 +199,7 @@ CpuGetTimerValue (
 
 /**
   Callback function for idle events.
- 
+
   @param  Event                 Event whose notification function is being invoked.
   @param  Context               The pointer to the notification function's context,
                                 which is implementation-dependent.
@@ -241,22 +241,22 @@ CpuDxeInitialize (
   EFI_STATUS  Status;
   EFI_EVENT    IdleLoopEvent;
 
-  InitializeExceptions (&mCpu);  
-  
+  InitializeExceptions (&mCpu);
+
   Status = gBS->InstallMultipleProtocolInterfaces (
-                &mCpuHandle, 
-                &gEfiCpuArchProtocolGuid,           &mCpu, 
+                &mCpuHandle,
+                &gEfiCpuArchProtocolGuid,           &mCpu,
                 &gVirtualUncachedPagesProtocolGuid, &gVirtualUncachedPages,
                 NULL
                 );
-  
+
   //
   // Make sure GCD and MMU settings match. This API calls gDS->SetMemorySpaceAttributes ()
   // and that calls EFI_CPU_ARCH_PROTOCOL.SetMemoryAttributes, so this code needs to go
   // after the protocol is installed
   //
   SyncCacheConfig (&mCpu);
-  
+
   // If the platform is a MPCore system then install the Configuration Table describing the
   // secondary core states
   if (ArmIsMpCore()) {

@@ -45,7 +45,7 @@
 
 [Ppis]
   gArmMpCoreInfoPpiGuid
-  
+
 [Guids]
   gArmMpCoreInfoGuid
 
@@ -55,4 +55,4 @@
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid
-  
+

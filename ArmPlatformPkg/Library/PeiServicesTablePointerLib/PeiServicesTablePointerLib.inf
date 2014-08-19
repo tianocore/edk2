@@ -38,7 +38,7 @@
 
 [LibraryClasses]
   ArmPlatformGlobalVariableLib
-  
+
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset
 

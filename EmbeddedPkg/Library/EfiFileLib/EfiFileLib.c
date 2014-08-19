@@ -34,19 +34,19 @@ Fv2:         - EFI Firmware VOlume device 2
 **/
 
 #include <PiDxe.h>
-#include <Protocol/BlockIo.h>             
-#include <Protocol/DiskIo.h>             
-#include <Protocol/SimpleFileSystem.h>      
-#include <Protocol/FirmwareVolume2.h>        
+#include <Protocol/BlockIo.h>
+#include <Protocol/DiskIo.h>
+#include <Protocol/SimpleFileSystem.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/LoadFile.h>
-#include <Protocol/FirmwareVolumeBlock.h>  
+#include <Protocol/FirmwareVolumeBlock.h>
 #include <Guid/FileInfo.h>
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/UefiLib.h>   
+#include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugLib.h>
@@ -210,7 +210,7 @@ EblUpdateDeviceLists (
 /**
 PathName is in the form <device name>:<path> for example fs1:\ or ROOT:\.
 Return TRUE if the <devce name> prefix of PathName matches a file system
-Volume Name. MatchIndex is the array  index in mFsInfo[] of the match, 
+Volume Name. MatchIndex is the array  index in mFsInfo[] of the match,
 and it can be used with mFs[] to find the handle that needs to be opened
 
 @param  PathName      PathName to check
@@ -291,7 +291,7 @@ EfiGetDeviceCounts (
 
 EFI_STATUS
 ConvertIpStringToEfiIp (
-  IN  CHAR8           *PathName, 
+  IN  CHAR8           *PathName,
   OUT EFI_IP_ADDRESS  *ServerIp
   )
 {
@@ -326,7 +326,7 @@ ConvertIpStringToEfiIp (
 
 
 /**
-Internal work function to extract a device number from a string skipping 
+Internal work function to extract a device number from a string skipping
 text. Easy way to extract numbers from strings like blk7:.
 
 @param  Str   String to extract device number form
@@ -344,7 +344,7 @@ EblConvertDevStringToNumber (
   UINTN   Index;
 
 
-  // Find the first digit 
+  // Find the first digit
   Max = AsciiStrLen (Str);
   for  (Index = 0; !((*Str >= '0') && (*Str <= '9')) && (Index < Max); Index++) {
     Str++;
@@ -563,11 +563,11 @@ EblFvFileDevicePath (
     do {
       File->FvType = EFI_FV_FILETYPE_ALL;
       GetNextFileStatus = File->Fv->GetNextFile (
-        File->Fv, 
+        File->Fv,
         &Key,
-        &File->FvType,  
-        &File->FvNameGuid, 
-        &File->FvAttributes, 
+        &File->FvType,
+        &File->FvNameGuid,
+        &File->FvAttributes,
         &File->Size
         );
       if (!EFI_ERROR (GetNextFileStatus)) {
@@ -634,17 +634,17 @@ EblFvFileDevicePath (
 
 
 /**
-Open a device named by PathName. The PathName includes a device name and 
+Open a device named by PathName. The PathName includes a device name and
 path separated by a :. See file header for more details on the PathName
 syntax. There is no checking to prevent a file from being opened more than
-one type. 
+one type.
 
 SectionType is only used to open an FV. Each file in an FV contains multiple
 sections and only the SectionType section is opened.
 
 For any file that is opened with EfiOpen() must be closed with EfiClose().
 
-@param  PathName    Path to parse to open 
+@param  PathName    Path to parse to open
 @param  OpenMode    Same as EFI_FILE.Open()
 @param  SectionType Section in FV to open.
 
@@ -711,7 +711,7 @@ EfiOpen (
       }
 
       if ((PathName[0] == '/') || (PathName[0] == '\\')) {
-        // PathName starts in / so this means we go to the root of the device in the CWD. 
+        // PathName starts in / so this means we go to the root of the device in the CWD.
         CwdPlusPathName[0] = '\0';
         for (FileStart = 0; gCwd[FileStart] != '\0'; FileStart++) {
           CwdPlusPathName[FileStart] = gCwd[FileStart];
@@ -740,7 +740,7 @@ EfiOpen (
       return File;
     }
 
-    DevNumber = EblConvertDevStringToNumber ((CHAR8 *)PathName); 
+    DevNumber = EblConvertDevStringToNumber ((CHAR8 *)PathName);
   }
 
   File->DeviceName = AllocatePool (StrLen);
@@ -750,11 +750,11 @@ EfiOpen (
   if (File->FileName[0] == '\0') {
     // if it is just a file name use / as root
     File->FileName = "\\";
-  } 
+  }
 
   //
   // Use best match algorithm on the dev names so we only need to look at the
-  // first few charters to match the full device name. Short name forms are 
+  // first few charters to match the full device name. Short name forms are
   // legal from the caller.
   //
   Status = EFI_SUCCESS;
@@ -767,7 +767,7 @@ EfiOpen (
       File->EfiHandle = mFs[DevNumber];
       Status = EblFileDevicePath (File, &PathName[FileStart], OpenMode);
 
-    } else if (PathName[1] == 'v' || PathName[1] == 'V') { 
+    } else if (PathName[1] == 'v' || PathName[1] == 'V') {
       if (DevNumber >= mFvCount) {
         goto ErrorExit;
       }
@@ -784,7 +784,7 @@ EfiOpen (
       for (Index = FileStart; PathName[Index] != '\0'; Index++) {
         if (PathName[Index] == ':') {
           // Support fv0:\DxeCore:0x10
-          // This means open the PE32 Section of the file 
+          // This means open the PE32 Section of the file
           ModifiedSectionType = (EFI_SECTION_TYPE)AsciiStrHexToUintn (&PathName[Index + 1]);
           PathName[Index] = '\0';
         }
@@ -960,7 +960,7 @@ EfiCopyFile (
     if (EFI_ERROR(Status)) {
       AsciiPrint("Write file error %r\n", Status);
       goto Exit;
-    }    
+    }
   }
 
   // Any left over?
@@ -977,7 +977,7 @@ EfiCopyFile (
     if (EFI_ERROR(Status)) {
       AsciiPrint("Write file error\n");
       goto Exit;
-    }    
+    }
   }
 
 Exit:
@@ -1026,16 +1026,16 @@ EfiDeviceOpenByType (
     DevStr = "loadfile%d:";
     break;
   case EfiOpenFirmwareVolume:
-    DevStr = "fv%d:";    
+    DevStr = "fv%d:";
     break;
   case EfiOpenFileSystem:
-    DevStr = "fs%d:";    
+    DevStr = "fs%d:";
     break;
   case EfiOpenBlockIo:
-    DevStr = "blk%d:";    
+    DevStr = "blk%d:";
     break;
   case EfiOpenMemoryBuffer:
-    DevStr = "a%d:";    
+    DevStr = "a%d:";
     break;
   default:
     return NULL;
@@ -1074,14 +1074,14 @@ EfiClose (
 
     TftpBufferSize = File->Size;
     Status = EblMtftp (
-      EFI_PXE_BASE_CODE_TFTP_WRITE_FILE, 
-      File->Buffer, 
-      TRUE, 
-      &TftpBufferSize, 
-      NULL, 
-      &File->ServerIp, 
-      (UINT8 *)File->FileName, 
-      NULL, 
+      EFI_PXE_BASE_CODE_TFTP_WRITE_FILE,
+      File->Buffer,
+      TRUE,
+      &TftpBufferSize,
+      NULL,
+      &File->ServerIp,
+      (UINT8 *)File->FileName,
+      NULL,
       FALSE
       );
     if (EFI_ERROR(Status)) {
@@ -1090,7 +1090,7 @@ EfiClose (
     }
   }
 
-  if ((File->Type == EfiOpenLoadFile) || 
+  if ((File->Type == EfiOpenLoadFile) ||
     ((File->Type == EfiOpenTftp) && (File->IsBufferValid == TRUE)) ||
     ((File->Type == EfiOpenFirmwareVolume) && (File->IsBufferValid == TRUE))) {
     EblFreePool(File->Buffer);
@@ -1112,9 +1112,9 @@ EfiClose (
 
 
 /**
-Return the size of the file represented by Stream. Also return the current 
+Return the size of the file represented by Stream. Also return the current
 Seek position. Opening a file will enable a valid file size to be returned.
-LoadFile is an exception as a load file size is set to zero. 
+LoadFile is an exception as a load file size is set to zero.
 
 @param  Stream    Open File Handle
 
@@ -1176,7 +1176,7 @@ EfiTell (
 
 /**
 Seek to the Offset location in the file. LoadFile and FV device types do
-not support EfiSeek(). It is not possible to grow the file size using 
+not support EfiSeek(). It is not possible to grow the file size using
 EfiSeek().
 
 SeekType defines how use Offset to calculate the new file position:
@@ -1185,7 +1185,7 @@ EfiSeekCurrent: Position is Offset bytes from the current position
 EfiSeekEnd    : Only supported if Offset is zero to seek to end of file.
 
 @param  Stream    Open File Handle
-@param  Offset    Offset to seek too. 
+@param  Offset    Offset to seek too.
 @param  SeekType  Type of seek to perform
 
 
@@ -1278,14 +1278,14 @@ CacheTftpFile (
   TftpBufferSize = File->Size;
 
   Status = EblMtftp (
-    EFI_PXE_BASE_CODE_TFTP_READ_FILE, 
-    File->Buffer, 
-    FALSE, 
-    &TftpBufferSize, 
-    NULL, 
-    &File->ServerIp, 
-    (UINT8 *)File->FileName, 
-    NULL, 
+    EFI_PXE_BASE_CODE_TFTP_READ_FILE,
+    File->Buffer,
+    FALSE,
+    &TftpBufferSize,
+    NULL,
+    &File->ServerIp,
+    (UINT8 *)File->FileName,
+    NULL,
     FALSE);
   if (EFI_ERROR(Status)) {
     AsciiPrint("TFTP error during APPLE_NSP_TFTP_READ_FILE: %r\n", Status);
@@ -1301,10 +1301,10 @@ CacheTftpFile (
 
 /**
 Read BufferSize bytes from the current location in the file. For load file,
-FV, and TFTP case you must read the entire file. 
+FV, and TFTP case you must read the entire file.
 
 @param  Stream      Open File Handle
-@param  Buffer      Caller allocated buffer. 
+@param  Buffer      Caller allocated buffer.
 @param  BufferSize  Size of buffer in bytes.
 
 
@@ -1345,7 +1345,7 @@ EfiRead (
 
   case EfiOpenFirmwareVolume:
     if (CompareGuid (&File->FvNameGuid, &gZeroGuid)) {
-      // This is the entire FV device, so treat like a memory buffer 
+      // This is the entire FV device, so treat like a memory buffer
       CopyMem (Buffer, (VOID *)(UINTN)(File->FvStart + File->CurrentPosition), *BufferSize);
       File->CurrentPosition += *BufferSize;
       Status = EFI_SUCCESS;
@@ -1429,13 +1429,13 @@ EfiRead (
 
 /**
 Read the entire file into a buffer. This routine allocates the buffer and
-returns it to the user full of the read data. 
+returns it to the user full of the read data.
 
 This is very useful for load file where it's hard to know how big the buffer
 must be.
 
 @param  Stream      Open File Handle
-@param  Buffer      Pointer to buffer to return. 
+@param  Buffer      Pointer to buffer to return.
 @param  BufferSize  Pointer to Size of buffer return..
 
 
@@ -1471,10 +1471,10 @@ EfiReadAllocatePool (
 
 
 /**
-Write data back to the file. For TFTP case you must write the entire file. 
+Write data back to the file. For TFTP case you must write the entire file.
 
 @param  Stream      Open File Handle
-@param  Buffer      Pointer to buffer to return. 
+@param  Buffer      Pointer to buffer to return.
 @param  BufferSize  Pointer to Size of buffer return..
 
 
@@ -1494,7 +1494,7 @@ EfiWrite (
 {
   EFI_STATUS              Status;
   EFI_FV_WRITE_FILE_DATA  FileData;
-  EFI_DISK_IO_PROTOCOL    *DiskIo;  
+  EFI_DISK_IO_PROTOCOL    *DiskIo;
 
   if (!FileHandleValid (File)) {
     return EFI_INVALID_PARAMETER;
@@ -1592,7 +1592,7 @@ EfiWrite (
 
 
 /**
-Given Cwd expand Path to remove .. and replace them with real 
+Given Cwd expand Path to remove .. and replace them with real
 directory names.
 
 @param  Cwd     Current Working Directory
@@ -1636,9 +1636,9 @@ ExpandPath (
     if (Work == NULL) {
       // Remaining part of Path contains no more ..
       break;
-    } 
+    }
 
-    // append path prior to .. 
+    // append path prior to ..
     AsciiStrnCat (NewPath, Start, Work - Start);
     StrLen = AsciiStrLen (NewPath);
     for (i = StrLen; i >= 0; i--) {
@@ -1659,7 +1659,7 @@ ExpandPath (
     }
 
     Start = Work + 3;
-  } 
+  }
 
   // Handle the path that remains after the ..
   AsciiStrnCat (NewPath, Start, End - Start);
@@ -1682,7 +1682,7 @@ the path does not contain a device name, The CWD is prepended to the path.
 EFI_STATUS
 EfiSetCwd (
   IN  CHAR8   *Cwd
-  ) 
+  )
 {
   EFI_OPEN_FILE *File;
   UINTN         Len;
@@ -1700,7 +1700,7 @@ EfiSetCwd (
   Path = Cwd;
   if (AsciiStrStr (Cwd, "..") != NULL) {
     if (gCwd == NULL) {
-      // no parent 
+      // no parent
       return EFI_SUCCESS;
     }
 
@@ -1754,10 +1754,10 @@ EfiSetCwd (
 Set the Current Working Directory (CWD). If a call is made to EfiOpen () and
 the path does not contain a device name, The CWD is prepended to the path.
 The CWD buffer is only valid until a new call is made to EfiSetCwd(). After
-a call to EfiSetCwd() it is not legal to use the pointer returned by 
+a call to EfiSetCwd() it is not legal to use the pointer returned by
 this function.
 
-@param  Cwd     Current Working Directory 
+@param  Cwd     Current Working Directory
 
 
 @return ""      No CWD set

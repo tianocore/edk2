@@ -18,13 +18,13 @@
 #define __EBL_H__
 
 #include <PiDxe.h>
-#include <Protocol/BlockIo.h>             
-#include <Protocol/SimpleFileSystem.h>      
-#include <Protocol/FirmwareVolume2.h>        
-#include <Protocol/LoadFile.h>              
-#include <Protocol/FirmwareVolumeBlock.h> 
-#include <Protocol/PxeBaseCode.h> 
-#include <Protocol/LoadedImage.h> 
+#include <Protocol/BlockIo.h>
+#include <Protocol/SimpleFileSystem.h>
+#include <Protocol/FirmwareVolume2.h>
+#include <Protocol/LoadFile.h>
+#include <Protocol/FirmwareVolumeBlock.h>
+#include <Protocol/PxeBaseCode.h>
+#include <Protocol/LoadedImage.h>
 #include <Protocol/EblAddCommand.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/DevicePath.h>
@@ -38,7 +38,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/UefiLib.h>   
+#include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugLib.h>
@@ -190,7 +190,7 @@ OutputData (
   IN UINTN                         Width,
   IN UINTN                        Offset
   );
-  
+
 UINTN
 WidthFromCommandName (
   IN CHAR8                        *Argv,

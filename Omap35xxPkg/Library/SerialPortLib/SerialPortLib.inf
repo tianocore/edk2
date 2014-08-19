@@ -38,7 +38,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   Omap35xxPkg/Omap35xxPkg.dec
-  
+
 [FixedPcd]
   gOmap35xxTokenSpaceGuid.PcdOmap35xxConsoleUart
 

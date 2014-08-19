@@ -1,17 +1,17 @@
 #/** @file
-#  
+#
 #  Component description file for NorFlashDxe module
-#  
+#
 #  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
-#  
+#
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 #**/
 
 [Defines]
@@ -54,7 +54,7 @@
   gEfiDevicePathProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid
   gEfiDiskIoProtocolGuid
-  
+
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
@@ -62,11 +62,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
-  
+
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked
 
 [Depex]
   #
   # NorFlashDxe must be loaded before VariableRuntimeDxe in case empty flash needs populating with default values
-  # 
-  BEFORE gVariableRuntimeDxeFileGuid 
+  #
+  BEFORE gVariableRuntimeDxeFileGuid

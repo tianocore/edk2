@@ -1,9 +1,9 @@
 #/** @file
 # Component description file for Apple Pre PI Library
 #
-# LIbrary helps you build a platform that skips PEI and loads DXE Core 
+# LIbrary helps you build a platform that skips PEI and loads DXE Core
 # directly. Helps building HOBs, reading data from the FV, and doing
-# decompression. 
+# decompression.
 #
 #  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
 #
@@ -23,7 +23,7 @@
   FILE_GUID                      = 1F3A3278-82EB-4C0D-86F1-5BCDA5846CB2
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PrePiLib 
+  LIBRARY_CLASS                  = PrePiLib
 
 
 #
@@ -65,7 +65,7 @@
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid
   gPeCoffLoaderProtocolGuid
-  
+
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize

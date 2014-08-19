@@ -1,14 +1,14 @@
 /*++
 RealView EB FVB DXE Driver
 
-Copyright (c) 2010, Apple Inc. All rights reserved.<BR>                                                         
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
+Copyright (c) 2010, Apple Inc. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 --*/
@@ -56,7 +56,7 @@ FvbGetAttributes (
 /**
   The SetAttributes() function sets configurable firmware volume
   attributes and returns the new settings of the firmware volume.
-  
+
 
   @param This         Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
@@ -67,7 +67,7 @@ FvbGetAttributes (
                       settings of the firmware volume. Type
                       EFI_FVB_ATTRIBUTES_2 is defined in
                       EFI_FIRMWARE_VOLUME_HEADER.
-  
+
   @retval EFI_SUCCESS           The firmware volume attributes were returned.
 
   @retval EFI_INVALID_PARAMETER The attributes requested are in
@@ -93,14 +93,14 @@ FvbSetAttributes (
   only for memory-mapped firmware volumes.
 
   @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
-  
+
   @param Address  Pointer to a caller-allocated
                   EFI_PHYSICAL_ADDRESS that, on successful
                   return from GetPhysicalAddress(), contains the
                   base address of the firmware volume.
-  
+
   @retval EFI_SUCCESS       The firmware volume base address was returned.
-  
+
   @retval EFI_NOT_SUPPORTED The firmware volume is not memory mapped.
 
 **/
@@ -135,9 +135,9 @@ FvbGetPhysicalAddress (
                         blocks in this range have a size of
                         BlockSize.
 
-  
+
   @retval EFI_SUCCESS             The firmware volume base address was returned.
-  
+
   @retval EFI_INVALID_PARAMETER   The requested LBA is out of range.
 
 **/
@@ -172,7 +172,7 @@ FvbGetBlockSize (
   aware that a read may be partially completed.
 
   @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
-  
+
   @param Lba      The starting logical block index
                   from which to read.
 
@@ -188,15 +188,15 @@ FvbGetBlockSize (
 
   @retval EFI_SUCCESS         The firmware volume was read successfully,
                               and contents are in Buffer.
-  
+
   @retval EFI_BAD_BUFFER_SIZE Read attempted across an LBA
                               boundary. On output, NumBytes
                               contains the total number of bytes
                               returned in Buffer.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               ReadDisabled state.
-  
+
   @retval EFI_DEVICE_ERROR    The block device is not
                               functioning correctly and could
                               not be read.
@@ -228,7 +228,7 @@ FvbRead (
   unpredictability arises because, for a sticky-write firmware
   volume, a write may negate a bit in the EFI_FVB_ERASE_POLARITY
   state but cannot flip it back again.  Before calling the
-  Write() function,  it is recommended for the caller to first call 
+  Write() function,  it is recommended for the caller to first call
   the EraseBlocks() function to erase the specified block to
   write. A block erase cycle will transition bits from the
   (NOT)EFI_FVB_ERASE_POLARITY state back to the
@@ -247,29 +247,29 @@ FvbRead (
   returns.
 
   @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
-  
+
   @param Lba      The starting logical block index to write to.
-  
+
   @param Offset   Offset into the block at which to begin writing.
-  
+
   @param NumBytes The pointer to a UINTN. At entry, *NumBytes
                   contains the total size of the buffer. At
                   exit, *NumBytes contains the total number of
                   bytes actually written.
-  
+
   @param Buffer   The pointer to a caller-allocated buffer that
                   contains the source for the write.
-  
+
   @retval EFI_SUCCESS         The firmware volume was written successfully.
-  
+
   @retval EFI_BAD_BUFFER_SIZE The write was attempted across an
                               LBA boundary. On output, NumBytes
                               contains the total number of bytes
                               actually written.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               WriteDisabled state.
-  
+
   @retval EFI_DEVICE_ERROR    The block device is malfunctioning
                               and could not be written.
 
@@ -325,7 +325,7 @@ FvbWrite (
 
   @retval EFI_SUCCESS The erase request successfully
                       completed.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               WriteDisabled state.
   @retval EFI_DEVICE_ERROR  The block device is not functioning
@@ -334,7 +334,7 @@ FvbWrite (
                             partially erased.
   @retval EFI_INVALID_PARAMETER One or more of the LBAs listed
                                 in the variable argument list do
-                                not exist in the firmware volume.  
+                                not exist in the firmware volume.
 
 **/
 EFI_STATUS
@@ -373,7 +373,7 @@ EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL gFvbProtocol = {
   FvbEraseBlocks,
   ///
   /// The handle of the parent firmware volume.
-  ///  
+  ///
   NULL
 };
 
@@ -400,18 +400,18 @@ FvbDxeInitialize (
 {
   EFI_STATUS  Status;
 
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gFvbHandle,
                   &gEfiFirmwareVolumeBlockProtocolGuid,   &gFvbProtocol,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   // SetVertAddressEvent ()
-  
+
   // GCD Map NAND as RT
-  
+
   return Status;
 }
 

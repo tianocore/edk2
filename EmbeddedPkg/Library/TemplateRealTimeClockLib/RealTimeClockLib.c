@@ -1,10 +1,10 @@
 /** @file
   Implement EFI RealTimeClock runtime services via RTC Lib.
-  
+
   Currently this driver does not support runtime virtual calling.
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -164,7 +164,7 @@ LibRtcVirtualNotifyEvent (
 {
   //
   // Only needed if you are going to support the OS calling RTC functions in virtual mode.
-  // You will need to call EfiConvertPointer (). To convert any stored physical addresses 
+  // You will need to call EfiConvertPointer (). To convert any stored physical addresses
   // to virtual address. After the OS transistions to calling in virtual mode, all future
   // runtime calls will be made in virtual mode.
   //

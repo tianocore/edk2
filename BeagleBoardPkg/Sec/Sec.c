@@ -2,7 +2,7 @@
   C Entry point for the SEC. First C code after the reset vector.
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -93,9 +93,9 @@ UartInit (
   MmioWrite32 (UartBaseAddress + UART_MCR_REG, UART_MCR_RTS_FORCE_ACTIVE | UART_MCR_DTR_FORCE_ACTIVE);
 
   // Clear & enable fifos
-  MmioWrite32 (UartBaseAddress + UART_FCR_REG, UART_FCR_TX_FIFO_CLEAR | UART_FCR_RX_FIFO_CLEAR | UART_FCR_FIFO_ENABLE);  
+  MmioWrite32 (UartBaseAddress + UART_FCR_REG, UART_FCR_TX_FIFO_CLEAR | UART_FCR_RX_FIFO_CLEAR | UART_FCR_FIFO_ENABLE);
 
-  // Restore MODE_SELECT 
+  // Restore MODE_SELECT
   MmioWrite32 (UartBaseAddress + UART_MDR1_REG, UART_MDR1_MODE_SELECT_UART_16X);
 }
 
@@ -153,7 +153,7 @@ CEntryPoint (
 
   // Start talking
   UartInit ();
- 
+
   InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL, NULL);
   SaveAndSetDebugTimerInterrupt (TRUE);
 
@@ -179,7 +179,7 @@ CEntryPoint (
 
   // Load the DXE Core and transfer control to it
   LoadDxeCoreFromFv (NULL, 0);
-  
+
   // DXE Core should always load and never return
   ASSERT (FALSE);
 }

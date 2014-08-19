@@ -1,8 +1,8 @@
 /** @file
-  Handle OMAP35xx interrupt controller 
+  Handle OMAP35xx interrupt controller
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ HARDWARE_INTERRUPT_HANDLER  gRegisteredInterruptHandlers[INT_NROF_VECTORS];
 
 /**
   Shutdown our hardware
-  
+
   DXE Core will disable interrupts and turn off the timer and disable interrupts
   after all the event handlers have run.
 
@@ -83,16 +83,16 @@ RegisterInterruptSource (
   if (Source > MAX_VECTOR) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
-  } 
-  
+  }
+
   if ((MmioRead32 (INTCPS_ILR(Source)) & INTCPS_ILR_FIQ) == INTCPS_ILR_FIQ) {
     // This vector has been programmed as FIQ so we can't use it for IRQ
-    // EFI does not use FIQ, but the debugger can use it to check for 
+    // EFI does not use FIQ, but the debugger can use it to check for
     // ctrl-c. So this ASSERT means you have a conflict with the debug agent
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   if ((Handler == NULL) && (gRegisteredInterruptHandlers[Source] == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -125,17 +125,17 @@ EnableInterruptSource (
 {
   UINTN Bank;
   UINTN Bit;
-  
+
   if (Source > MAX_VECTOR) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   Bank = Source / 32;
   Bit  = 1UL << (Source % 32);
-  
+
   MmioWrite32 (INTCPS_MIR_CLEAR(Bank), Bit);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -159,17 +159,17 @@ DisableInterruptSource (
 {
   UINTN Bank;
   UINTN Bit;
-  
+
   if (Source > MAX_VECTOR) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
+
   Bank = Source / 32;
   Bit  = 1UL << (Source % 32);
-  
+
   MmioWrite32 (INTCPS_MIR_SET(Bank), Bit);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -196,11 +196,11 @@ GetInterruptSourceState (
 {
   UINTN Bank;
   UINTN Bit;
-  
+
   if (InterruptState == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if (Source > MAX_VECTOR) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
@@ -208,18 +208,18 @@ GetInterruptSourceState (
 
   Bank = Source / 32;
   Bit  = 1UL << (Source % 32);
-    
+
   if ((MmioRead32(INTCPS_MIR(Bank)) & Bit) == Bit) {
     *InterruptState = FALSE;
   } else {
     *InterruptState = TRUE;
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
-  Signal to the hardware that the End Of Intrrupt state 
+  Signal to the hardware that the End Of Intrrupt state
   has been reached.
 
   @param This     Instance pointer for this protocol
@@ -262,19 +262,19 @@ IrqInterruptHandler (
 {
   UINT32                     Vector;
   HARDWARE_INTERRUPT_HANDLER InterruptHandler;
-  
+
   Vector = MmioRead32 (INTCPS_SIR_IRQ) & INTCPS_SIR_IRQ_MASK;
 
   // Needed to prevent infinite nesting when Time Driver lowers TPL
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
   ArmDataSyncronizationBarrier ();
-  
+
   InterruptHandler = gRegisteredInterruptHandlers[Vector];
   if (InterruptHandler != NULL) {
     // Call the registered interrupt handler.
     InterruptHandler (Vector, SystemContext);
   }
-  
+
   // Needed to clear after running the handler
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
   ArmDataSyncronizationBarrier ();
@@ -324,12 +324,12 @@ InterruptDxeInitialize (
   MmioWrite32 (INTCPS_MIR(1), 0xFFFFFFFF);
   MmioWrite32 (INTCPS_MIR(2), 0xFFFFFFFF);
   MmioOr32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
- 
+
   Status = gBS->InstallMultipleProtocolInterfaces(&gHardwareInterruptHandle,
                                                   &gHardwareInterruptProtocolGuid,   &gHardwareInterruptProtocol,
                                                   NULL);
   ASSERT_EFI_ERROR(Status);
-  
+
   //
   // Get the CPU protocol that this driver requires.
   //

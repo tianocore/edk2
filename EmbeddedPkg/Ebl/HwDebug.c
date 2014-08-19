@@ -14,7 +14,7 @@
 
   Module Name:  HwDebug.c
 
-  Commands useful for debugging hardware. 
+  Commands useful for debugging hardware.
 
 **/
 
@@ -33,7 +33,7 @@
   md   0x123445678    ; Dump 0x20 1 byte quantities starting at 0x123445678
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -63,7 +63,7 @@ EblMdCmd (
   OutputData (Address, Length, Width, (UINTN)Address);
 
   Address += Length;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -82,7 +82,7 @@ EblMdCmd (
   mf 0x123445678          ; Start at 0x123445678 and write 00 (4 byte) to the next 1 byte
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -119,7 +119,7 @@ EblMfillCmd (
       MmioWrite8 (Address, (UINT8)Data);
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -162,7 +162,7 @@ CHAR8 *gPciSerialClassCodes[] = {
   Argv[3] - func
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -195,13 +195,13 @@ EblPciCmd (
   CHAR8                         *Str;
   UINTN                         ThisBus;
 
-  
+
   BusArg  = (Argc > 1) ? AsciiStrDecimalToUintn (Argv[1]) : 0;
   DevArg  = (Argc > 2) ? AsciiStrDecimalToUintn (Argv[2]) : 0;
   FuncArg = (Argc > 3) ? AsciiStrDecimalToUintn (Argv[3]) : 0;
 
   Header = &PciHeader;
-  
+
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiPciIoProtocolGuid, NULL, &HandleCount, &HandleBuffer);
   if (EFI_ERROR (Status)) {
     AsciiPrint ("No PCI devices found in the system\n");
@@ -224,7 +224,7 @@ EblPciCmd (
           Status = Pci->Pci.Read (Pci, EfiPciIoWidthUint32, 0, sizeof (PciHeader)/sizeof (UINT32), &PciHeader);
           if (!EFI_ERROR (Status)) {
             Hdr = &PciHeader.Bridge.Hdr;
-            
+
             if (Hdr->ClassCode[2] < sizeof (gPciDevClass)/sizeof (VOID *)) {
               Str = gPciDevClass[Hdr->ClassCode[2]];
               if (Hdr->ClassCode[2] == PCI_CLASS_SERIAL) {
@@ -239,7 +239,7 @@ EblPciCmd (
             AsciiPrint ("  0x%04x   0x%04x    %a 0x%02x", Hdr->VendorId, Hdr->DeviceId, Str, Hdr->ClassCode[1]);
           }
           if (Seg != 0) {
-            // Only print Segment if it is non zero. If you only have one PCI segment it is 
+            // Only print Segment if it is non zero. If you only have one PCI segment it is
             // redundent to print it out
             AsciiPrint (" Seg:%d", Seg);
           }
@@ -254,20 +254,20 @@ EblPciCmd (
       if (!EFI_ERROR (Status)) {
         Pci->GetLocation (Pci, &Seg, &Bus, &Dev, &Func);
         if ((Bus == BusArg) && (Dev == DevArg) && (Func == FuncArg)) {
-          // Only print Segment if it is non zero. If you only have one PCI segment it is 
+          // Only print Segment if it is non zero. If you only have one PCI segment it is
           // redundant to print it out
           if (Seg != 0) {
             AsciiPrint ("Seg:%d ", Seg);
           }
           AsciiPrint ("Bus:%d Dev:%d Func:%d ", Bus, Dev, Func);
-          
+
           Status = Pci->Pci.Read (Pci, EfiPciIoWidthUint32, 0, sizeof (PciHeader)/sizeof (UINT32), Header);
           if (!EFI_ERROR (Status)) {
             Hdr = &PciHeader.Bridge.Hdr;
             if (IS_PCI_BRIDGE (&PciHeader.Bridge)) {
               Bridge = &PciHeader.Bridge.Bridge;
               AsciiPrint (
-                "PCI Bridge. Bus Primary %d Secondary %d Subordinate %d\n", 
+                "PCI Bridge. Bus Primary %d Secondary %d Subordinate %d\n",
                 Bridge->PrimaryBus, Bridge->SecondaryBus, Bridge->SubordinateBus
                 );
               AsciiPrint ("  Bar 0: 0x%08x  Bar 1: 0x%08x\n", Bridge->Bar[0], Bridge->Bar[1]);
@@ -283,14 +283,14 @@ EblPciCmd (
               }
             }
           }
-          
+
           AsciiPrint ("\n");
           break;
         }
       }
     }
   }
-  
+
   FreePool (HandleBuffer);
   return EFI_SUCCESS;
 }

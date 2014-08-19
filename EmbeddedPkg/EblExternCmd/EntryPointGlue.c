@@ -1,5 +1,5 @@
 /** @file
-  Glue code that contains the EFI entry point and converts it to an EBL 
+  Glue code that contains the EFI entry point and converts it to an EBL
   ASCII Argc, Argv sytle entry point
 
 
@@ -88,7 +88,7 @@ ParseArguments (
       } else if (*Char != ' ') {
         Argv[Arg++] = Char;
         LookingForArg = FALSE;
-      } 
+      }
     } else {
       // Looking for the terminator of an Argv[] entry
       if ((InQuote && (*Char == '"')) || (!InQuote && (*Char == ' '))) {
@@ -112,12 +112,12 @@ ParseArguments (
 
   return;
 }
- 
+
 
 
 
 /**
-  Embedded Boot Loader (EBL) - A simple EFI command line application for embedded 
+  Embedded Boot Loader (EBL) - A simple EFI command line application for embedded
   devices. PcdEmbeddedAutomaticBootCommand is a complied in command line that
   gets executed automatically. The ; separator allows multiple commands
   for each command line.
@@ -133,7 +133,7 @@ EFIAPI
 EdkExternCmdEntry (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
-  ) 
+  )
 {
   EFI_STATUS                  Status;
   EFI_LOADED_IMAGE_PROTOCOL   *ImageInfo;
@@ -144,10 +144,10 @@ EdkExternCmdEntry (
   if (EFI_ERROR (Status)) {
     Argc = 0;
   } else {
-    // Looks like valid commands were passed in. 
+    // Looks like valid commands were passed in.
     ParseArguments (ImageInfo->LoadOptions, ImageInfo->LoadOptionsSize, &Argc, Argv);
   }
-      
+
   return EblMain (Argc, Argv);
 }
 

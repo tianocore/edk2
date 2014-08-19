@@ -1,4 +1,4 @@
-;------------------------------------------------------------------------------ 
+;------------------------------------------------------------------------------
 ;
 ; Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 ; Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -11,11 +11,11 @@
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
 ;------------------------------------------------------------------------------
-  
+
     EXPORT SecSwitchStack
-            
+
     AREA   Switch_Stack, CODE, READONLY
-  
+
 ;/**
 ;  This allows the caller to switch the stack and return
 ;
@@ -30,7 +30,7 @@
 ;  VOID  *StackDelta
 ;  );
 ;
-SecSwitchStack   
+SecSwitchStack
     MOV   R1, SP
     ADD   R1, R0, R1
     MOV   SP, R1

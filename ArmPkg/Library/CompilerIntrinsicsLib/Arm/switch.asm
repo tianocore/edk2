@@ -1,4 +1,4 @@
-///------------------------------------------------------------------------------ 
+///------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -17,7 +17,7 @@
     EXPORT  __ARM_switch8
 
     AREA  ArmSwitch, CODE, READONLY
-  
+
 __ARM_switch8
   LDRB    r12,[lr,#-1]
   CMP      r3,r12
@@ -25,5 +25,5 @@ __ARM_switch8
   LDRBCS  r3,[lr,r12]
   ADD      r12,lr,r3,LSL #1
   BX      r12
-  
+
     END

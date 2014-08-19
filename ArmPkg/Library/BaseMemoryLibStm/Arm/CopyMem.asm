@@ -1,4 +1,4 @@
-;------------------------------------------------------------------------------ 
+;------------------------------------------------------------------------------
 ;
 ; CopyMem() worker for ARM
 ;
@@ -20,7 +20,7 @@
 /**
   Copy Length bytes from Source to Destination. Overlap is OK.
 
-  This implementation 
+  This implementation
 
   @param  Destination Target of copy
   @param  Source      Place to copy from
@@ -48,7 +48,7 @@ InternalMemCopyMem
   mov  r10, r0
   mov  r12, r2
   mov  r14, r1
-  
+
 memcopy_check_overlapped
   cmp  r11, r1
   // If (dest < source)
@@ -61,10 +61,10 @@ memcopy_check_overlapped
   cmp  r12, r3
   bcc  memcopy_check_optim_default
 
-  // If (length == 0)  
+  // If (length == 0)
   cmp  r12, #0
   beq  memcopy_end
-  
+
   b     memcopy_check_optim_overlap
 
 memcopy_check_optim_default
@@ -79,7 +79,7 @@ memcopy_check_optim_default
   movls  r0, #0
   andhi  r0, r3, #1
   b     memcopy_default
-    
+
 memcopy_check_optim_overlap
   // r10 = dest_end, r14 = source_end
   add  r10, r11, r12
@@ -94,12 +94,12 @@ memcopy_check_optim_overlap
   tst  r14, #0xF
   movne  r0, #0
   b  memcopy_overlapped
-  
+
 memcopy_overlapped_non_optim
   // We read 1 byte from the end of the source buffer
   sub  r3, r14, #1
   sub  r12, r12, #1
-  ldrb  r3, [r3, #0]  
+  ldrb  r3, [r3, #0]
   sub  r2, r10, #1
   cmp  r12, #0
   // We write 1 byte at the end of the dest buffer
@@ -114,60 +114,60 @@ memcopy_overlapped
   // Are we in the optimized case ?
   cmp  r0, #0
   beq  memcopy_overlapped_non_optim
-  
+
   // Optimized Overlapped - Read 32 bytes
   sub  r14, r14, #32
   sub  r12, r12, #32
   cmp  r12, #31
   ldmia  r14, {r2-r9}
-  
+
   // If length is less than 32 then disable optim
   movls  r0, #0
-  
+
   cmp  r12, #0
-  
-  // Optimized Overlapped - Write 32 bytes  
+
+  // Optimized Overlapped - Write 32 bytes
   sub  r10, r10, #32
   stmia  r10, {r2-r9}
-  
+
   // while (length != 0)
   bne  memcopy_overlapped
   b   memcopy_end
-  
+
 memcopy_default_non_optim
   // Byte copy
-  ldrb  r3, [r14], #1  
+  ldrb  r3, [r14], #1
   sub  r12, r12, #1
   strb  r3, [r10], #1
-  
+
 memcopy_default
   cmp  r12, #0
   beq  memcopy_end
-  
+
 // r10 = dest, r14 = source
 memcopy_default_loop
   cmp  r0, #0
   beq  memcopy_default_non_optim
-  
+
   // Optimized memcopy - Read 32 Bytes
   sub  r12, r12, #32
   cmp  r12, #31
   ldmia  r14!, {r2-r9}
-  
+
   // If length is less than 32 then disable optim
   movls  r0, #0
-  
+
   cmp  r12, #0
-  
+
   // Optimized memcopy - Write 32 Bytes
   stmia  r10!, {r2-r9}
 
   // while (length != 0)
   bne  memcopy_default_loop
-  
+
 memcopy_end
   mov  r0, r11
   ldmfd  sp!, {r4-r11, pc}
-  
+
   END
-  
+

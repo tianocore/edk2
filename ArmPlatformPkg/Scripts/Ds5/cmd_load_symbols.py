@@ -1,13 +1,13 @@
 #
 #  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
 from arm_ds.debugger_v1 import Debugger
@@ -38,7 +38,7 @@ if (opts is None) or (not opts):
 else:
     region_reg = re.compile("\((.*),(.*)\)")
     base_reg = re.compile("(.*)")
-    
+
     for o,a in opts:
         region_type = None
         regex = None
@@ -63,7 +63,7 @@ else:
             regex = region_reg
         else:
             assert False, "Unhandled option (%s)" % o
-            
+
         if region_type:
             m = regex.match(a)
             if m:
@@ -76,7 +76,7 @@ else:
                     raise Exception('cmd_load_symbols', "Expect a base address")
                 else:
                     raise Exception('cmd_load_symbols', "Expect a region format as (base,size)")
-    
+
 # Debugger object for accessing the debugger
 debugger = Debugger()
 
@@ -89,7 +89,7 @@ ec = debugger.getExecutionContext(0)
 
 try:
     armplatform_debugger = edk2_debugger.ArmPlatformDebugger(ec, report_file, regions, verbose)
-    
+
     if load_all:
         armplatform_debugger.load_all_symbols()
     else:

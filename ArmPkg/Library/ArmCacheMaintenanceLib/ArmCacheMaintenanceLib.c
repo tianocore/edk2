@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -27,7 +27,7 @@ CacheRangeOperation (
   UINTN ArmCacheLineLength         = ArmDataCacheLineLength();
   UINTN ArmCacheLineAlignmentMask  = ArmCacheLineLength - 1;
   UINTN ArmCacheOperationThreshold = PcdGet32(PcdArmCacheOperationThreshold);
-  
+
   if ((CacheOperation != NULL) && (Length >= ArmCacheOperationThreshold)) {
     ArmDrainWriteBuffer ();
     CacheOperation ();

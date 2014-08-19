@@ -1,22 +1,22 @@
 #/** @file
-#  
+#
 #    Component description file for Timer DXE module
-#  
+#
 #  Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 #**/
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ArmTimerDxe
-  FILE_GUID                      = 49ea041e-6752-42ca-b0b1-7344fe2546b7 
+  FILE_GUID                      = 49ea041e-6752-42ca-b0b1-7344fe2546b7
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
@@ -40,20 +40,19 @@
   BaseMemoryLib
   DebugLib
   UefiDriverEntryPoint
-  IoLib  
+  IoLib
 
 [Guids]
 
 [Protocols]
-  gEfiTimerArchProtocolGuid  
+  gEfiTimerArchProtocolGuid
   gHardwareInterruptProtocolGuid
 
 [Pcd.common]
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum  
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz  
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz
 
 [Depex]
   gHardwareInterruptProtocolGuid
-  

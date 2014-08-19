@@ -20,7 +20,7 @@
   FILE_GUID                      = 3513C4E2-06D6-4921-9C2B-E938777BA79E
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EfiCmdLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = EfiCmdLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 
 #
@@ -37,8 +37,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
-  
+
 [Protocols]
-  
+
 [Guids]
- 

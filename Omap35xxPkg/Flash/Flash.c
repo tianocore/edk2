@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -227,7 +227,7 @@ NandConfigureEcc (
   MmioWrite32 (GPMC_ECC_SIZE_CONFIG, (ECCSIZE0_512BYTES | ECCSIZE1_512BYTES));
 }
 
-VOID 
+VOID
 NandEnableEcc (
   VOID
   )
@@ -268,7 +268,7 @@ NandCalculateEcc (
     EccResult = MmioRead32 (EccResultRegister);
 
     //Calculate ECC code from 32-bit ECC result value.
-    //NOTE: Following calculation is not part of TRM. We got this information 
+    //NOTE: Following calculation is not part of TRM. We got this information
     //from Beagleboard mailing list.
     gEccCode[Index * 3] = EccResult & 0xFF;
     gEccCode[(Index * 3) + 1] = (EccResult >> 16) & 0xFF;
@@ -380,7 +380,7 @@ NandWritePage (
     MmioWrite16(GPMC_NAND_DATA_0, *MainAreaWordBuffer++);
 
     //After each write access, device has to wait to accept data.
-    //Currently we may not be programming proper timing parameters to 
+    //Currently we may not be programming proper timing parameters to
     //the GPMC_CONFIGi_0 registers and we would need to figure that out.
     //Without following delay, page programming fails.
     gBS->Stall(1);
@@ -544,7 +544,7 @@ NandFlashReset (
 
   //Send RESET command to device.
   NandSendCommand(RESET_CMD);
-  
+
   //Wait for 1ms before we check status register.
   gBS->Stall(1000);
 
@@ -562,7 +562,7 @@ NandFlashReset (
       ResetBusyTimeout--;
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -585,12 +585,12 @@ NandFlashReadBlocks (
     Status = EFI_INVALID_PARAMETER;
     goto exit;
   }
-  
+
   if (Lba > LAST_BLOCK) {
     Status = EFI_INVALID_PARAMETER;
     goto exit;
   }
-  
+
   if ((BufferSize % gNandFlashInfo->BlockSize) != 0) {
     Status = EFI_BAD_BUFFER_SIZE;
     goto exit;
@@ -640,12 +640,12 @@ NandFlashWriteBlocks (
     Status = EFI_INVALID_PARAMETER;
     goto exit;
   }
-  
+
   if (Lba > LAST_BLOCK) {
     Status = EFI_INVALID_PARAMETER;
     goto exit;
   }
-  
+
   if ((BufferSize % gNandFlashInfo->BlockSize) != 0) {
     Status = EFI_BAD_BUFFER_SIZE;
     goto exit;
@@ -668,7 +668,7 @@ NandFlashWriteBlocks (
       goto exit;
     }
   }
-  
+
   // Program data
   Status = NandWriteBlock((UINTN)Lba, EndBlockIndex, Buffer, SpareBuffer);
   if (EFI_ERROR(Status)) {
@@ -708,7 +708,7 @@ EFI_BLOCK_IO_MEDIA gNandFlashMedia = {
   0                                         // LastBlock
 };
 
-EFI_BLOCK_IO_PROTOCOL BlockIo = 
+EFI_BLOCK_IO_PROTOCOL BlockIo =
 {
   EFI_BLOCK_IO_INTERFACE_REVISION,  // Revision
   &gNandFlashMedia,                  // *Media
@@ -725,7 +725,7 @@ NandFlashInitialize (
   )
 {
   EFI_STATUS  Status;
-  
+
   gNandFlashInfo = (NAND_FLASH_INFO *)AllocateZeroPool (sizeof(NAND_FLASH_INFO));
 
   //Initialize GPMC module.
@@ -764,9 +764,9 @@ NandFlashInitialize (
 
   //Publish BlockIO.
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle, 
+                  &ImageHandle,
                   &gEfiBlockIoProtocolGuid, &BlockIo,
-                  &gEfiDevicePathProtocolGuid, &gDevicePath, 
+                  &gEfiDevicePathProtocolGuid, &gDevicePath,
                   NULL
                   );
   return Status;

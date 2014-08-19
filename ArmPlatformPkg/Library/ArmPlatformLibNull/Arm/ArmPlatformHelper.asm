@@ -23,7 +23,7 @@
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
-  
+
   PRESERVE8
   AREA    ArmPlatformNullHelper, CODE, READONLY
 

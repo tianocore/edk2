@@ -1,4 +1,4 @@
-# This is Ebl FDF file 
+# This is Ebl FDF file
 #
 # Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
 #
@@ -51,21 +51,21 @@ READ_LOCK_STATUS   = TRUE
 #
 ################################################################################
 INF  EmbeddedPkg/Ebl/Ebl.inf
-   
+
 ################################################################################
-#  
+#
 # Rules are use with the [FV] section's module INF type to define
 # how an FFS file is created for a given INF file. The following Rule are the default
 # rules for the different module type. User can add the customized rules to define the
 # content of the FFS file.
-#  
+#
 ################################################################################
-   
-   
+
+
 ############################################################################
-# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   # 
+# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   #
 ############################################################################
-#  
+#
 #[Rule.Common.DXE_DRIVER]
 #  FILE DRIVER = $(NAMED_GUID) {
 #    DXE_DEPEX    DXE_DEPEX               Optional $(INF_OUTPUT)/$(MODULE_NAME).depex
@@ -88,14 +88,14 @@ INF  EmbeddedPkg/Ebl/Ebl.inf
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
     PE32     PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI       STRING ="$(MODULE_NAME)" Optional         
+    UI       STRING ="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
    PEI_DEPEX PEI_DEPEX Optional       $(MODULE_NAME).depex
    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
-   UI       STRING="$(MODULE_NAME)" Optional         
+   UI       STRING="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM.TIANOCOMPRESSED]

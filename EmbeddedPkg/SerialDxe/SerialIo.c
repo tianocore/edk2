@@ -1,9 +1,9 @@
 /** @file
-  Serial IO Abstraction for GDB stub. This allows an EFI consoles that shows up on the system 
+  Serial IO Abstraction for GDB stub. This allows an EFI consoles that shows up on the system
   running GDB. One console for error information and another console for user input/output.
 
   Basic packet format is $packet-data#checksum. So every command has 4 bytes of overhead: $,
-  #, 0, 0. The 0 and 0 are the ascii characters for the checksum. 
+  #, 0, 0. The 0 and 0 are the ascii characters for the checksum.
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
@@ -56,7 +56,7 @@ EFI_HANDLE  gHandle = NULL;
   Reset the serial device.
 
   @param  This              Protocol instance pointer.
-                            
+
   @retval EFI_SUCCESS       The device was reset.
   @retval EFI_DEVICE_ERROR  The serial device could not be reset.
 
@@ -247,7 +247,7 @@ SerialSetControl (
 
   @param  This              Protocol instance pointer.
   @param  Control           A pointer to return the current Control signals from the serial device.
-                            
+
   @retval EFI_SUCCESS       The control bits were read from the serial device.
   @retval EFI_DEVICE_ERROR  The serial device is not functioning correctly.
 
@@ -285,7 +285,7 @@ SerialWrite (
   )
 {
   UINTN Count;
-  
+
   Count = SerialPortWrite (Buffer, *BufferSize);
 
   if (Count != *BufferSize) {
@@ -332,7 +332,7 @@ SerialRead (
   return EFI_SUCCESS;
 }
 
-// 
+//
 // Template used to initialize the GDB Serial IO protocols
 //
 EFI_SERIAL_IO_MODE gSerialIoMode = {
@@ -379,13 +379,13 @@ SerialDxeInitialize (
 
   // Make a new handle with Serial IO protocol and its device path on it.
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &gHandle, 
+                  &gHandle,
                   &gEfiSerialIoProtocolGuid,   &gSerialIoTemplate,
-                  &gEfiDevicePathProtocolGuid, &mDevicePath, 
+                  &gEfiDevicePathProtocolGuid, &mDevicePath,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   return Status;
 }
 

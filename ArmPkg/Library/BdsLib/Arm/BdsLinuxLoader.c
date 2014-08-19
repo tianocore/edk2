@@ -1,14 +1,14 @@
 /** @file
 *
 *  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -175,7 +175,7 @@ BdsBootLinuxAtag (
       Print (L"ERROR: Did not find initrd image.\n");
       goto EXIT_FREE_LINUX;
     }
-    
+
     // Check if the initrd is a uInitrd
     if (*(UINT32*)((UINTN)InitrdImageBase) == LINUX_UIMAGE_SIGNATURE) {
       // Skip the 64-byte image header
@@ -190,7 +190,7 @@ BdsBootLinuxAtag (
   //
   // Setup the Linux Kernel Parameters
   //
- 
+
   // By setting address=0 we leave the memory allocation to the function
   Status = PrepareAtagList (CommandLineArguments, InitrdImage, InitrdImageSize, &AtagBase, &AtagSize);
   if (EFI_ERROR(Status)) {

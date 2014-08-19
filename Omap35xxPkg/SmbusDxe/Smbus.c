@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -76,8 +76,8 @@ ConfigureI2c (
   //Program prescaler to obtain 12-MHz clock
   MmioWrite16(I2C_PSC, 0x0000);
 
-  //Program SCLL and SCLH 
-  //NOTE: Following values are the register dump after U-Boot code executed. 
+  //Program SCLL and SCLH
+  //NOTE: Following values are the register dump after U-Boot code executed.
   //We need to figure out how its calculated based on the I2C functional clock and I2C_PSC.
   MmioWrite16(I2C_SCLL, 0x0035);
   MmioWrite16(I2C_SCLH, 0x0035);
@@ -124,7 +124,7 @@ I2CReadOneByte (
 STATIC
 EFI_STATUS
 I2CWriteOneByte (
-  UINT8 Data    
+  UINT8 Data
   )
 {
   EFI_STATUS Status;
@@ -319,7 +319,7 @@ InitializeSmbus (
   // Install the SMBUS interface
   Status = gBS->InstallMultipleProtocolInterfaces(&Handle, &gEfiSmbusHcProtocolGuid, &SmbusProtocol, NULL);
   ASSERT_EFI_ERROR(Status);
-  
+
   return Status;
 }
 

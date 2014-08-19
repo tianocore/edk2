@@ -142,14 +142,14 @@ DssSetMode (
   )
 {
   // Make sure the interface clock is running
-  MmioWrite32 (CM_ICLKEN_DSS, EN_DSS);  
+  MmioWrite32 (CM_ICLKEN_DSS, EN_DSS);
 
   // Stop the functional clocks
   MmioAnd32 (CM_FCLKEN_DSS, ~(EN_DSS1 | EN_DSS2 | EN_TV));
 
   // Program the DSS clock divisor
   MmioWrite32 (CM_CLKSEL_DSS, 0x1000 | (LcdModes[ModeNumber].DssDivisor));
-  
+
   // Start the functional clocks
   MmioOr32 (CM_FCLKEN_DSS, (EN_DSS1 | EN_DSS2 | EN_TV));
 
@@ -159,10 +159,10 @@ DssSetMode (
   // Reset the subsystem
   MmioWrite32(DSS_SYSCONFIG, DSS_SOFTRESET);
   while (!(MmioRead32 (DSS_SYSSTATUS) & DSS_RESETDONE));
-  
+
   // Configure LCD parameters
   MmioWrite32 (DISPC_SIZE_LCD,
-               ((LcdModes[ModeNumber].HorizontalResolution - 1) 
+               ((LcdModes[ModeNumber].HorizontalResolution - 1)
                | ((LcdModes[ModeNumber].VerticalResolution - 1) << 16))
               );
   MmioWrite32 (DISPC_TIMING_H,
@@ -187,7 +187,7 @@ DssSetMode (
   MmioWrite32 (DISPC_GFX_PRELD, 0x2D8);
   MmioWrite32 (DISPC_GFX_BA0, VramBaseAddress);
   MmioWrite32 (DISPC_GFX_SIZE,
-               ((LcdModes[ModeNumber].HorizontalResolution - 1) 
+               ((LcdModes[ModeNumber].HorizontalResolution - 1)
                | ((LcdModes[ModeNumber].VerticalResolution - 1) << 16))
               );
 
@@ -213,7 +213,7 @@ HwInitializeDisplay (
 
   // Enable power lines used by TFP410
   Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   OldTpl = gBS->RaiseTPL(TPL_NOTIFY);
   Data = VAUX_DEV_GRP_P1;
@@ -222,7 +222,7 @@ HwInitializeDisplay (
 
   Data = VAUX_DEDICATED_18V;
   Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VPLL2_DEDICATED), 1, &Data);
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   // Power up TFP410 (set GPIO2 on TPS - for BeagleBoard-xM)
   Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID2, GPIODATADIR1), 1, &Data);
@@ -239,7 +239,7 @@ HwInitializeDisplay (
 
   // Power up TFP410 (set GPIO 170 - for older BeagleBoards)
   MmioAnd32 (GPIO6_BASE + GPIO_OE, ~BIT10);
-  MmioOr32  (GPIO6_BASE + GPIO_SETDATAOUT, BIT10);  
+  MmioOr32  (GPIO6_BASE + GPIO_SETDATAOUT, BIT10);
 
   return EFI_SUCCESS;
 }
@@ -249,7 +249,7 @@ InitializeDisplay (
   IN LCD_INSTANCE* Instance
   )
 {
-  EFI_STATUS           Status; 
+  EFI_STATUS           Status;
   UINTN                VramSize;
   EFI_PHYSICAL_ADDRESS VramBaseAddress;
 

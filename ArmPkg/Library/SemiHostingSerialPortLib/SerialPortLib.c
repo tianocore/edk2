@@ -2,7 +2,7 @@
   Serial I/O Port library functions with no library constructor/destructor
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -68,7 +68,7 @@ SerialPortWrite (
   while (SourceIndex < NumberOfBytes)
   {
       CurrentCharacter = Buffer[SourceIndex++];
-      
+
       switch (CurrentCharacter)
       {
       case '\r':
@@ -91,7 +91,7 @@ SerialPortWrite (
           DestinationIndex = 0;
       }
   }
-  
+
   if (DestinationIndex > 0)
   {
       PrintBuffer[DestinationIndex] = '\0';

@@ -46,7 +46,7 @@ typedef struct {
 
 /**
   Add a single command table entry.
-  
+
   @param EntryArray     Pointer EBL_COMMAND_TABLE of the command that is being added
 
 **/
@@ -73,7 +73,7 @@ VOID
   );
 
 
-typedef 
+typedef
 VOID
 (EFIAPI *EBL_GET_CHAR_CALL_BACK) (
   IN  UINTN   ElapsedTime
@@ -86,13 +86,13 @@ VOID
 
   @param  Key           EFI Key information returned
   @param  TimeoutInSec  Number of seconds to wait to timeout
-  @param  CallBack      Callback called every second during the timeout wait 
+  @param  CallBack      Callback called every second during the timeout wait
 
   @return EFI_SUCCESS  Key was returned
   @return EFI_TIMEOUT  If the TimoutInSec expired
 
 **/
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *EBL_GET_CHAR_KEY) (
   IN OUT EFI_INPUT_KEY            *Key,
@@ -108,7 +108,7 @@ EFI_STATUS
   If the use hits Q to quit return TRUE else for any other key return FALSE.
   PrefixNewline is used to figure out if a newline is needed before the prompt
   string. This depends on the last print done before calling this function.
-  CurrentRow is updated by one on a call or set back to zero if a prompt is 
+  CurrentRow is updated by one on a call or set back to zero if a prompt is
   needed.
 
   @param  CurrentRow  Used to figure out if its the end of the page and updated

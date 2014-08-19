@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -32,7 +32,7 @@ GetNextMonotonicCount (
   if (Count == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   *Count = gCurrentMonotonicCount++;
   return EFI_SUCCESS;
 }
@@ -46,9 +46,9 @@ GetNextHighMonotonicCount (
   if (HighCount == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   gCurrentMonotonicCount += 0x0000000100000000ULL;
-  
+
   *HighCount = (UINT32)RShiftU64 (gCurrentMonotonicCount, 32) & 0xFFFFFFFF;
 
   return EFI_SUCCESS;

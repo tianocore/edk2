@@ -40,22 +40,22 @@ GLOBAL_REMOVE_IF_UNREFERENCED   CHAR8 *gFvFileType[] = {
 
 /**
   Perform a dir on a device. The device must support Simple File System Protocol
-  or the FV protocol. 
+  or the FV protocol.
 
   Argv[0] - "dir"
-  Argv[1] - Device Name:path. Path is optional 
+  Argv[1] - Device Name:path. Path is optional
   Argv[2] - Optional filename to match on. A leading * means match substring
   Argv[3] - Optional FV file type
 
   dir fs1:\efi      ; perform a dir on fs1: device in the efi directory
-  dir fs1:\efi *.efi; perform a dir on fs1: device in the efi directory but 
+  dir fs1:\efi *.efi; perform a dir on fs1: device in the efi directory but
                       only print out files that contain the string *.efi
-  dir fv1:\         ; perform a dir on fv1: device in the efi directory 
+  dir fv1:\         ; perform a dir on fv1: device in the efi directory
                     NOTE: fv devices do not contain subdirs
   dir fv1:\ * PEIM  ; will match all files of type PEIM
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -71,7 +71,7 @@ EblDirCmd (
   EFI_OPEN_FILE                 *File;
   EFI_FILE_INFO                 *DirInfo;
   UINTN                         ReadSize;
-  UINTN                         CurrentRow;  
+  UINTN                         CurrentRow;
   CHAR16                        *MatchSubString;
   EFI_STATUS                    GetNextFileStatus;
   UINTN                         Key;
@@ -151,11 +151,11 @@ EblDirCmd (
     do {
       Type = SearchType;
       GetNextFileStatus = Fv->GetNextFile (
-                                Fv, 
+                                Fv,
                                 &Key,
-                                &Type,  
-                                &NameGuid, 
-                                &Attributes, 
+                                &Type,
+                                &NameGuid,
+                                &Attributes,
                                 &Size
                                 );
       if (!EFI_ERROR (GetNextFileStatus)) {
@@ -165,7 +165,7 @@ EblDirCmd (
         Size = 0;
         Status = Fv->ReadFile (
                       Fv,
-                      &NameGuid, 
+                      &NameGuid,
                       Section,
                       &Size,
                       &Type,
@@ -173,10 +173,10 @@ EblDirCmd (
                       &AuthenticationStatus
                       );
         if (!((Status == EFI_BUFFER_TOO_SMALL) || !EFI_ERROR (Status))) {
-          // EFI_SUCCESS or EFI_BUFFER_TOO_SMALL mean size is valid 
+          // EFI_SUCCESS or EFI_BUFFER_TOO_SMALL mean size is valid
           Size = 0;
         }
-        
+
         TypeStr = (Type <= EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) ? gFvFileType[Type] : "UNKNOWN";
 
         // read the UI seciton to do a name match.
@@ -208,12 +208,12 @@ EblDirCmd (
         }
       }
     } while (!EFI_ERROR (GetNextFileStatus));
-       
+
     if (SearchType == EFI_FV_FILETYPE_ALL) {
       AsciiPrint ("%,20d bytes in files %,d bytes free\n", TotalSize, File->FvSize - File->FvHeaderSize - TotalSize);
     }
-    
-    
+
+
   } else if ((File->Type == EfiOpenFileSystem) || (File->Type == EfiOpenBlockIo)) {
     // Simple File System DIR
 
@@ -233,7 +233,7 @@ EblDirCmd (
       if (UnicodeFileName[0] == '*') {
         MatchSubString = &UnicodeFileName[1];
       }
-    } 
+    }
 
     File->FsFileHandle->SetPosition (File->FsFileHandle, 0);
     for (CurrentRow = 0;;) {
@@ -247,7 +247,7 @@ EblDirCmd (
         if (DirInfo == NULL) {
           goto Done;
         }
-        
+
         // Read the data
         Status = File->FsFileHandle->Read (File->FsFileHandle, &ReadSize, DirInfo);
         if ((EFI_ERROR (Status)) || (ReadSize == 0)) {
@@ -256,7 +256,7 @@ EblDirCmd (
       } else {
         break;
       }
-      
+
       if (MatchSubString != NULL) {
         if (StrStr (&DirInfo->FileName[0], MatchSubString) == NULL) {
           // does not match *name argument, so skip
@@ -278,7 +278,7 @@ EblDirCmd (
       if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
         break;
       }
-      
+
       FreePool (DirInfo);
     }
 
@@ -297,10 +297,10 @@ Done:
   Change the Current Working Directory
 
   Argv[0] - "cd"
-  Argv[1] - Device Name:path. Path is optional 
+  Argv[1] - Device Name:path. Path is optional
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -314,8 +314,8 @@ EblCdCmd (
 {
   if (Argc <= 1) {
     return EFI_SUCCESS;
-  } 
-  
+  }
+
   return EfiSetCwd (Argv[1]);
 }
 
@@ -345,7 +345,7 @@ VOID
 EblInitializeDirCmd (
   VOID
   )
-{  
+{
   if (FeaturePcdGet (PcdEmbeddedDirCmd)) {
     EblAddCommands (mCmdDirTemplate, sizeof (mCmdDirTemplate)/sizeof (EBL_COMMAND_TABLE));
   }

@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
@@ -41,11 +41,11 @@ GCC_ASM_EXPORT(ArmInstructionSynchronizationBarrier)
 #------------------------------------------------------------------------------
 
 ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
-  mcr     p15, 0, r0, c7, c6, 1   @ invalidate single data cache line                                           
+  mcr     p15, 0, r0, c7, c6, 1   @ invalidate single data cache line
   bx      lr
 
 ASM_PFX(ArmCleanDataCacheEntryByMVA):
-  mcr     p15, 0, r0, c7, c10, 1  @ clean single data cache line     
+  mcr     p15, 0, r0, c7, c10, 1  @ clean single data cache line
   bx      lr
 
 ASM_PFX(ArmCleanInvalidateDataCacheEntryByMVA):
@@ -58,17 +58,17 @@ ASM_PFX(ArmEnableInstructionCache):
   orr    r0,r0,r1             @Set I bit
   mcr    p15,0,r0,c1,c0,0     @Write control register configuration data
   bx     LR
-  
+
 ASM_PFX(ArmDisableInstructionCache):
   ldr    r1,=IC_ON
   mrc    p15,0,r0,c1,c0,0     @Read control register configuration data
   bic    r0,r0,r1             @Clear I bit.
   mcr    p15,0,r0,c1,c0,0     @Write control register configuration data
   bx     LR
-  
+
 ASM_PFX(ArmInvalidateInstructionCache):
   mov     r0,#0
-  mcr     p15,0,r0,c7,c5,0     @Invalidate entire Instruction cache. 
+  mcr     p15,0,r0,c7,c5,0     @Invalidate entire Instruction cache.
                          @Also flushes the branch target cache.
   mov     r0,#0
   mcr     p15,0,r0,c7,c10,4    @Data write buffer
@@ -99,7 +99,7 @@ ASM_PFX(ArmEnableDataCache):
   orr     R0,R0,R1              @Set C bit
   mcr     p15,0,r0,c1,c0,0      @Write control register configuration data
   bx      LR
-  
+
 ASM_PFX(ArmDisableDataCache):
   ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
@@ -113,7 +113,7 @@ ASM_PFX(ArmCleanDataCache):
   mov     R0,#0
   mcr     p15,0,R0,c7,c10,4  @Drain write buffer
   bx      LR
-    
+
 ASM_PFX(ArmInvalidateDataCache):
   mov     R0,#0
   mcr     p15,0,R0,c7,c6,0        @Invalidate entire data cache
@@ -138,12 +138,12 @@ ASM_PFX(ArmDataMemoryBarrier):
   mov R0, #0
   mcr P15, #0, R0, C7, C10, #5    @ check if this is OK?
   bx      LR
-  
+
 ASM_PFX(ArmDataSyncronizationBarrier):
   mov R0, #0
   mcr P15, #0, R0, C7, C10, #4   @ check if this is OK?
   bx      LR
-  
+
 ASM_PFX(ArmInstructionSynchronizationBarrier):
   mov R0, #0
   mcr P15, #0, R0, C7, C5, #4     @ check if this is OK?

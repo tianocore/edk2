@@ -28,13 +28,13 @@
   ../Common/Arm/ArmLibSupport.S    | GCC
   ../Common/Arm/ArmLibSupport.asm  | RVCT
   ../Common/ArmLib.c
-  
+
   ArmV7Support.S    | GCC
   ArmV7Support.asm  | RVCT
-  
+
   ArmV7Lib.c
   ArmV7Mmu.c
-  
+
   ArmV7ArchTimer.c
   ArmV7ArchTimerSupport.S    | GCC
   ArmV7ArchTimerSupport.asm  | RVCT
@@ -45,7 +45,7 @@
 
 [LibraryClasses]
   PrePiLib
-  
+
 [Protocols]
   gEfiCpuArchProtocolGuid
 

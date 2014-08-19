@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -32,7 +32,7 @@ EblGetCurrentIpAddress (
 {
   EFI_STATUS                  Status;
   EFI_PXE_BASE_CODE_PROTOCOL  *Pxe;
-  
+
   Status = gBS->LocateProtocol (&gEfiPxeBaseCodeProtocolGuid, NULL, (VOID **)&Pxe);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -76,13 +76,13 @@ EblLoadFileBootTypeString (
 {
   EFI_STATUS    Status;
   VOID          *NullPtr;
-  
+
   Status = gBS->HandleProtocol (Handle, &gEfiPxeBaseCodeProtocolGuid, &NullPtr);
   if (!EFI_ERROR (Status)) {
     return "EFI PXE Network Boot";
   }
-  
-  return ""; 
+
+  return "";
 }
 
 EFI_STATUS
@@ -93,7 +93,7 @@ EblPerformDHCP (
 {
   EFI_STATUS                  Status;
   EFI_PXE_BASE_CODE_PROTOCOL  *Pxe;
-  
+
   Status = gBS->LocateProtocol (&gEfiPxeBaseCodeProtocolGuid, NULL, (VOID **)&Pxe);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -118,7 +118,7 @@ EblSetStationIp (
 {
   EFI_STATUS                  Status;
   EFI_PXE_BASE_CODE_PROTOCOL  *Pxe;
-  
+
   Status = gBS->LocateProtocol (&gEfiPxeBaseCodeProtocolGuid, NULL, (VOID **)&Pxe);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -128,12 +128,12 @@ EblSetStationIp (
   if (EFI_ERROR(Status) && (Status != EFI_ALREADY_STARTED)) {
     return Status;
   }
-     
+
   Status = Pxe->SetStationIp (Pxe, NewStationIp, NewSubnetMask);
   return Status;
 }
 
-  
+
 EFI_STATUS
 EFIAPI
 EblMtftp (
@@ -150,12 +150,12 @@ EblMtftp (
 {
   EFI_STATUS                  Status;
   EFI_PXE_BASE_CODE_PROTOCOL  *Pxe;
-  
+
   Status = gBS->LocateProtocol (&gEfiPxeBaseCodeProtocolGuid, NULL, (VOID **)&Pxe);
   if (EFI_ERROR(Status)) {
     return Status;
   }
-  
+
   Status = Pxe->Mtftp (
                   Pxe,
                   Operation,
@@ -170,4 +170,4 @@ EblMtftp (
                   );
   return Status;
 }
-  
+

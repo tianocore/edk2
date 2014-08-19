@@ -48,7 +48,7 @@ Arguments:
   Offset      - starting register number
   Length      - number of bytes to read
   Buffer      - destination buffer
-  
+
 Returns:
 
   EFI_SUCCESS - registers read successfully
@@ -76,7 +76,7 @@ Arguments:
   Offset      - starting register number
   Length      - number of bytes to write
   Buffer      - source buffer
-  
+
 Returns:
 
   EFI_SUCCESS - registers written successfully

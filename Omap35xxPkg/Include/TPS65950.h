@@ -30,7 +30,7 @@
 #define VMMC1_DEV_GRP         0x82
 #define DEV_GRP_P1            BIT5
 
-#define VMMC1_DEDICATED_REG   0x85 
+#define VMMC1_DEDICATED_REG   0x85
 #define VSEL_1_85V            0x0
 #define VSEL_2_85V            0x1
 #define VSEL_3_00V            0x2

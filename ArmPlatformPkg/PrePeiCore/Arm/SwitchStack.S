@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #------------------------------------------------------------------------------
-  
+
 .text
 .align 3
 
 GCC_ASM_EXPORT(SecSwitchStack)
 
 
-  
+
 #/**
 #  This allows the caller to switch the stack and return
 #
@@ -33,11 +33,11 @@ GCC_ASM_EXPORT(SecSwitchStack)
 #  VOID  *StackDelta
 #  )#
 #
-ASM_PFX(SecSwitchStack):   
+ASM_PFX(SecSwitchStack):
     mov   R1, R13
     add   R1, R0, R1
     mov   R13, R1
     bx    LR
-    
-    
-    
+
+
+

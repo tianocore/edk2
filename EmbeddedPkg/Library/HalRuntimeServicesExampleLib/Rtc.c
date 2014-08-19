@@ -14,7 +14,7 @@
 
 
 **/
- 
+
 
 
 typedef struct {
@@ -255,8 +255,8 @@ RtcTimeFieldsValid (
 Routine Description:
 
   Arguments:
- 
-  Returns: 
+
+  Returns:
 --*/
 // TODO:    Time - add argument and description to function comment
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment

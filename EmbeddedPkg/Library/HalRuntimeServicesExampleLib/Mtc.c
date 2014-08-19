@@ -63,7 +63,7 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS       The event has been handled properly 
+  EFI_SUCCESS       The event has been handled properly
   EFI_NOT_FOUND     An error occurred updating the variable.
 
 --*/
@@ -106,7 +106,7 @@ LibMtcGetNextHighMonotonicCount (
 
   *HighCount  = (UINT32) RShiftU64 (mEfiMtc, 32) + 1;
   mEfiMtc     = LShiftU64 (*HighCount, 32);
-  
+
   if (!EfiAtRuntime ()) {
     gBS->RestoreTPL (OldTpl);
   }

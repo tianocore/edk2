@@ -1,13 +1,13 @@
 //
 //  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-//  
-//  This program and the accompanying materials                          
-//  are licensed and made available under the terms and conditions of the BSD License         
-//  which accompanies this distribution.  The full text of the license may be found at        
-//  http://opensource.org/licenses/bsd-license.php                                            
 //
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+//  This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 //
 
@@ -17,17 +17,17 @@
 #include <AutoGen.h>
 
   INCLUDE AsmMacroIoLib.inc
-  
+
   IMPORT  CEntryPoint
   IMPORT  ArmPlatformGetCorePosition
   IMPORT  ArmPlatformIsPrimaryCore
   IMPORT  ArmReadMpidr
   IMPORT  ArmPlatformPeiBootAction
   EXPORT  _ModuleEntryPoint
-  
+
   PRESERVE8
   AREA    PrePeiCoreEntryPoint, CODE, READONLY
-  
+
 StartupAddr        DCD      CEntryPoint
 
 _ModuleEntryPoint
@@ -38,7 +38,7 @@ _ModuleEntryPoint
   bl    ArmReadMpidr
   // Keep a copy of the MpId register value
   mov   r5, r0
-  
+
   // Is it the Primary Core ?
   bl	ArmPlatformIsPrimaryCore
 
@@ -76,7 +76,7 @@ _PrepareArguments
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   r3, StartupAddr
-  
+
   // Jump to PrePeiCore C code
   //    r0 = mp_id
   //    r1 = pei_core_address

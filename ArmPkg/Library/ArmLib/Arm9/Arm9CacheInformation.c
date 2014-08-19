@@ -56,7 +56,7 @@ ArmDataCachePresent (
     default:                return FALSE;
   }
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheSize (
@@ -65,16 +65,16 @@ ArmDataCacheSize (
 {
   switch (DATA_CACHE_SIZE (ArmCacheInfo ()))
   {
-    case CACHE_SIZE_4_KB:   return   4 * 1024;      
+    case CACHE_SIZE_4_KB:   return   4 * 1024;
     case CACHE_SIZE_8_KB:   return   8 * 1024;
-    case CACHE_SIZE_16_KB:  return  16 * 1024;      
+    case CACHE_SIZE_16_KB:  return  16 * 1024;
     case CACHE_SIZE_32_KB:  return  32 * 1024;
     case CACHE_SIZE_64_KB:  return  64 * 1024;
     case CACHE_SIZE_128_KB: return 128 * 1024;
     default:                return   0;
   }
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheAssociativity (
@@ -88,7 +88,7 @@ ArmDataCacheAssociativity (
     default:                          return 0;
   }
 }
-  
+
 UINTN
 EFIAPI
 ArmDataCacheLineLength (
@@ -101,7 +101,7 @@ ArmDataCacheLineLength (
     default:                         return  0;
   }
 }
-  
+
 BOOLEAN
 EFIAPI
 ArmInstructionCachePresent (
@@ -115,7 +115,7 @@ ArmInstructionCachePresent (
     default:                return FALSE;
   }
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheSize (
@@ -124,16 +124,16 @@ ArmInstructionCacheSize (
 {
   switch (INSTRUCTION_CACHE_SIZE (ArmCacheInfo ()))
   {
-    case CACHE_SIZE_4_KB:   return   4 * 1024;      
+    case CACHE_SIZE_4_KB:   return   4 * 1024;
     case CACHE_SIZE_8_KB:   return   8 * 1024;
-    case CACHE_SIZE_16_KB:  return  16 * 1024;      
+    case CACHE_SIZE_16_KB:  return  16 * 1024;
     case CACHE_SIZE_32_KB:  return  32 * 1024;
     case CACHE_SIZE_64_KB:  return  64 * 1024;
     case CACHE_SIZE_128_KB: return 128 * 1024;
     default:                return   0;
   }
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheAssociativity (
@@ -148,7 +148,7 @@ ArmInstructionCacheAssociativity (
     default:                          return 0;
   }
 }
-  
+
 UINTN
 EFIAPI
 ArmInstructionCacheLineLength (

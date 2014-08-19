@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -36,7 +36,7 @@ typedef struct {
 #define EFI_PCI_IO_PRIVATE_DATA_SIGNATURE     SIGNATURE_32('p', 'c', 'i', 'o')
 #define EFI_PCI_IO_PRIVATE_DATA_FROM_THIS(a)  CR(a, EFI_PCI_IO_PRIVATE_DATA, PciIoProtocol, EFI_PCI_IO_PRIVATE_DATA_SIGNATURE)
 
-EFI_PCI_IO_DEVICE_PATH PciIoDevicePathTemplate = 
+EFI_PCI_IO_DEVICE_PATH PciIoDevicePathTemplate =
 {
   {
     { ACPI_DEVICE_PATH, ACPI_DP, { sizeof (ACPI_HID_DEVICE_PATH), 0 } },
@@ -82,7 +82,7 @@ ConfigureUSBHost (
 
   // Get the Power IC protocol
   Status = gBS->LocateProtocol (&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   // Power the USB PHY
   Data = VAUX_DEV_GRP_P1;
@@ -91,7 +91,7 @@ ConfigureUSBHost (
 
   Data = VAUX_DEDICATED_18V;
   Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VAUX2_DEDICATED), 1, &Data);
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   // Enable power to the USB hub
   Status = gTPS65950->Read (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
@@ -150,7 +150,7 @@ PciIoMemRead (
 {
   EFI_PCI_IO_PRIVATE_DATA *Private = EFI_PCI_IO_PRIVATE_DATA_FROM_THIS(This);
 
-  return PciRootBridgeIoMemRead (&Private->RootBridge.Io, 
+  return PciRootBridgeIoMemRead (&Private->RootBridge.Io,
                                 (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
                                 Private->ConfigSpace->Device.Bar[BarIndex] + Offset,
                                 Count,
@@ -170,7 +170,7 @@ PciIoMemWrite (
 {
   EFI_PCI_IO_PRIVATE_DATA *Private = EFI_PCI_IO_PRIVATE_DATA_FROM_THIS(This);
 
-  return PciRootBridgeIoMemWrite (&Private->RootBridge.Io, 
+  return PciRootBridgeIoMemWrite (&Private->RootBridge.Io,
                                  (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
                                  Private->ConfigSpace->Device.Bar[BarIndex] + Offset,
                                  Count,
@@ -217,11 +217,11 @@ PciIoPciRead (
 {
   EFI_PCI_IO_PRIVATE_DATA *Private = EFI_PCI_IO_PRIVATE_DATA_FROM_THIS(This);
 
-  return PciRootBridgeIoMemRW ((EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH)Width, 
-                               Count, 
-                               TRUE, 
-                               (PTR)(UINTN)Buffer, 
-                               TRUE, 
+  return PciRootBridgeIoMemRW ((EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH)Width,
+                               Count,
+                               TRUE,
+                               (PTR)(UINTN)Buffer,
+                               TRUE,
                                (PTR)(UINTN)(((UINT8 *)Private->ConfigSpace) + Offset)
                               );
 }
@@ -237,11 +237,11 @@ PciIoPciWrite (
 {
   EFI_PCI_IO_PRIVATE_DATA *Private = EFI_PCI_IO_PRIVATE_DATA_FROM_THIS(This);
 
-  return PciRootBridgeIoMemRW ((EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, 
-                               Count, 
-                               TRUE, 
-                               (PTR)(UINTN)(((UINT8 *)Private->ConfigSpace) + Offset), 
-                               TRUE, 
+  return PciRootBridgeIoMemRW ((EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
+                               Count,
+                               TRUE,
+                               (PTR)(UINTN)(((UINT8 *)Private->ConfigSpace) + Offset),
+                               TRUE,
                                (PTR)(UINTN)Buffer
                                );
 }
@@ -385,7 +385,7 @@ PciIoAttributes (
   case EfiPciIoAttributeOperationDisable:
     // Since we are not a real PCI device no enable/set or disable operations exist.
     return EFI_SUCCESS;
-    
+
   default:
   ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
@@ -418,7 +418,7 @@ PciIoSetBarAttributes (
   return EFI_UNSUPPORTED;
 }
 
-EFI_PCI_IO_PROTOCOL PciIoTemplate = 
+EFI_PCI_IO_PROTOCOL PciIoTemplate =
 {
   PciIoPollMem,
   PciIoPollIo,
@@ -463,7 +463,7 @@ PciEmulationEntryPoint (
     Status = EFI_OUT_OF_RESOURCES;
     return Status;
   }
-  
+
   Private->Signature              = EFI_PCI_IO_PRIVATE_DATA_SIGNATURE;  // Fill in signature
   Private->RootBridge.Signature   = PCI_ROOT_BRIDGE_SIGNATURE;          // Fake Root Bridge structure needs a signature too
   Private->RootBridge.MemoryStart = USB_EHCI_HCCAPBASE;                 // Get the USB capability register base
@@ -504,7 +504,7 @@ PciEmulationEntryPoint (
   // Unique device path.
   CopyMem(&Private->DevicePath, &PciIoDevicePathTemplate, sizeof(PciIoDevicePathTemplate));
   Private->DevicePath.AcpiDevicePath.UID = 0;
-  
+
   // Copy protocol structure
   CopyMem(&Private->PciIoProtocol, &PciIoTemplate, sizeof(PciIoTemplate));
 

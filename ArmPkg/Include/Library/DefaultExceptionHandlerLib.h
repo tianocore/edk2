@@ -27,5 +27,5 @@ DefaultExceptionHandler (
   IN     EFI_EXCEPTION_TYPE           ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT           SystemContext
   );
-  
-#endif 
+
+#endif

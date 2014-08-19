@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ GetSavedData (
 
   GuidHob = GetFirstGuidHob(&SavedDataGuid);
   GuidHob++;
-  
+
   return (PRE_PI_EXTRACT_GUIDED_SECTION_DATA *)GuidHob;
 }
 
@@ -78,21 +78,21 @@ ExtractGuidedSectionRegisterHandlers (
     SavedData->ExtractGetInfoHandlerTable [Index] = GetInfoHandler;
     return RETURN_SUCCESS;
   }
-  
+
   //
   // Check the global table is enough to contain new Handler.
   //
   if (SavedData->NumberOfExtractHandler >= PcdGet32 (PcdMaximumGuidedExtractHandler)) {
     return RETURN_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Register new Handler and guid value.
   //
   CopyGuid (&SavedData->ExtractHandlerGuidTable [SavedData->NumberOfExtractHandler], SectionGuid);
   SavedData->ExtractDecodeHandlerTable [SavedData->NumberOfExtractHandler] = DecodeHandler;
   SavedData->ExtractGetInfoHandlerTable [SavedData->NumberOfExtractHandler++] = GetInfoHandler;
-  
+
   return RETURN_SUCCESS;
 }
 
@@ -105,9 +105,9 @@ ExtractGuidedSectionGetGuidList (
   PRE_PI_EXTRACT_GUIDED_SECTION_DATA  *SavedData;
 
   ASSERT(ExtractHandlerGuidTable != NULL);
-  
+
   SavedData = GetSavedData();
-  
+
   *ExtractHandlerGuidTable = SavedData->ExtractHandlerGuidTable;
   return SavedData->NumberOfExtractHandler;
 }
@@ -118,20 +118,20 @@ ExtractGuidedSectionGetInfo (
   IN  CONST VOID    *InputSection,
   OUT       UINT32  *OutputBufferSize,
   OUT       UINT32  *ScratchBufferSize,
-  OUT       UINT16  *SectionAttribute   
+  OUT       UINT16  *SectionAttribute
   )
 {
   PRE_PI_EXTRACT_GUIDED_SECTION_DATA  *SavedData;
   UINT32                              Index;
-  
+
   if (InputSection == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
-  
+
   ASSERT (OutputBufferSize != NULL);
   ASSERT (ScratchBufferSize != NULL);
   ASSERT (SectionAttribute != NULL);
- 
+
   SavedData = GetSavedData();
 
   //
@@ -144,7 +144,7 @@ ExtractGuidedSectionGetInfo (
   }
 
   //
-  // Not found, the input guided section is not supported. 
+  // Not found, the input guided section is not supported.
   //
   if (Index == SavedData->NumberOfExtractHandler) {
     return RETURN_INVALID_PARAMETER;
@@ -167,16 +167,16 @@ ExtractGuidedSectionDecode (
   IN  CONST VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
   OUT       VOID    *ScratchBuffer,        OPTIONAL
-  OUT       UINT32  *AuthenticationStatus  
+  OUT       UINT32  *AuthenticationStatus
   )
 {
   PRE_PI_EXTRACT_GUIDED_SECTION_DATA  *SavedData;
   UINT32                              Index;
-  
+
   if (InputSection == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
-  
+
   ASSERT (OutputBuffer != NULL);
   ASSERT (AuthenticationStatus != NULL);
 
@@ -192,7 +192,7 @@ ExtractGuidedSectionDecode (
   }
 
   //
-  // Not found, the input guided section is not supported. 
+  // Not found, the input guided section is not supported.
   //
   if (Index == SavedData->NumberOfExtractHandler) {
     return RETURN_INVALID_PARAMETER;
@@ -225,7 +225,7 @@ ExtractGuidedSectionLibConstructor (
   if (SavedData.ExtractHandlerGuidTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
-  
+
   SavedData.ExtractDecodeHandlerTable  = (EXTRACT_GUIDED_SECTION_DECODE_HANDLER *)AllocatePool(PcdGet32(PcdMaximumGuidedExtractHandler) * sizeof(EXTRACT_GUIDED_SECTION_DECODE_HANDLER));
   if (SavedData.ExtractDecodeHandlerTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -235,13 +235,13 @@ ExtractGuidedSectionLibConstructor (
   if (SavedData.ExtractGetInfoHandlerTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
-  
+
   //
   // the initialized number is Zero.
   //
   SavedData.NumberOfExtractHandler = 0;
-  
+
   BuildGuidDataHob(&HobGuid, &SavedData, sizeof(SavedData));
-  
+
   return RETURN_SUCCESS;
 }

@@ -1,6 +1,6 @@
 /** @file
-  Library functions that perform file IO. Memory buffer, file system, and 
-  fimrware volume operations are supproted. 
+  Library functions that perform file IO. Memory buffer, file system, and
+  fimrware volume operations are supproted.
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -18,7 +18,7 @@
   current mounted device concept of current working directory concept implement
   by this library.
 
-  Device names are case insensative and only check the leading characters for 
+  Device names are case insensative and only check the leading characters for
   unique matches. Thus the following are all the same:
     LoadFile0:
     l0:
@@ -32,7 +32,7 @@
   fs3:         - EFI Simple File System device 3
   Fv2:         - EFI Firmware VOlume device 2
   1.2.3.4:name - TFTP IP and file name
-  
+
 **/
 
 #ifndef __EFI_FILE_LIB_H__
@@ -50,7 +50,7 @@
 
 #define MAX_PATHNAME    0x200
 
-/// Type of the file that has been opened 
+/// Type of the file that has been opened
 typedef enum {
   EfiOpenLoadFile,
   EfiOpenMemoryBuffer,
@@ -64,11 +64,11 @@ typedef enum {
 
 /// Public information about the open file
 typedef struct {
-  UINTN                         Version;          // Common information        
+  UINTN                         Version;          // Common information
   EFI_OPEN_FILE_TYPE            Type;
   EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
   EFI_STATUS                    LastError;
-  EFI_HANDLE                    EfiHandle;        
+  EFI_HANDLE                    EfiHandle;
   CHAR8                         *DeviceName;
   CHAR8                         *FileName;
 
@@ -76,18 +76,18 @@ typedef struct {
   UINT64                        MaxPosition;
 
   UINTN                         BaseOffset;       // Base offset for hexdump command
- 
+
   UINTN                         Size;             // Valid for all types other than l#:
   UINT8                         *Buffer;          // Information valid for A#:
 
-  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;              // Information valid for Fv#: 
-  EFI_GUID                      FvNameGuid;       
-  EFI_SECTION_TYPE              FvSectionType;    
-  EFI_FV_FILETYPE               FvType;           
-  EFI_FV_FILE_ATTRIBUTES        FvAttributes;     
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;              // Information valid for Fv#:
+  EFI_GUID                      FvNameGuid;
+  EFI_SECTION_TYPE              FvSectionType;
+  EFI_FV_FILETYPE               FvType;
+  EFI_FV_FILE_ATTRIBUTES        FvAttributes;
 
-  EFI_PHYSICAL_ADDRESS          FvStart;          
-  UINTN                         FvSize;      
+  EFI_PHYSICAL_ADDRESS          FvStart;
+  UINTN                         FvSize;
   UINTN                         FvHeaderSize;
 
   EFI_FILE                      *FsFileHandle;    // Information valid for Fs#:
@@ -99,11 +99,11 @@ typedef struct {
   UINTN                         DiskOffset;       // Information valid for B#:
 
   EFI_LOAD_FILE_PROTOCOL        *LoadFile;        // Information valid for l#:
-  
+
   EFI_IP_ADDRESS                ServerIp;         // Information valid for t:
   BOOLEAN                       IsDirty;
   BOOLEAN                       IsBufferValid;
-                           
+
 } EFI_OPEN_FILE;
 
 
@@ -117,17 +117,17 @@ typedef enum {
 
 
 /**
-  Open a device named by PathName. The PathName includes a device name and 
+  Open a device named by PathName. The PathName includes a device name and
   path separated by a :. See file header for more details on the PathName
   syntax. There is no checking to prevent a file from being opened more than
-  one type. 
+  one type.
 
   SectionType is only used to open an FV. Each file in an FV contains multiple
   sections and only the SectionType section is opened.
 
   For any file that is opened with EfiOpen() must be closed with EfiClose().
 
-  @param  PathName    Path to parse to open 
+  @param  PathName    Path to parse to open
   @param  OpenMode    Same as EFI_FILE.Open()
   @param  SectionType Section in FV to open.
 
@@ -182,9 +182,9 @@ EfiClose (
 
 
 /**
-  Return the size of the file represented by Stream. Also return the current 
+  Return the size of the file represented by Stream. Also return the current
   Seek position. Opening a file will enable a valid file size to be returned.
-  LoadFile is an exception as a load file size is set to zero. 
+  LoadFile is an exception as a load file size is set to zero.
 
   @param  Stream    Open File Handle
 
@@ -200,16 +200,16 @@ EfiTell (
 
 /**
   Seek to the Offset location in the file. LoadFile and FV device types do
-  not support EfiSeek(). It is not possible to grow the file size using 
+  not support EfiSeek(). It is not possible to grow the file size using
   EfiSeek().
-  
+
   SeekType defines how use Offset to calculate the new file position:
   EfiSeekStart  : Position = Offset
   EfiSeekCurrent: Position is Offset bytes from the current position
   EfiSeekEnd    : Only supported if Offset is zero to seek to end of file.
 
   @param  Stream    Open File Handle
-  @param  Offset    Offset to seek too. 
+  @param  Offset    Offset to seek too.
   @param  SeekType  Type of seek to perform
 
 
@@ -229,10 +229,10 @@ EfiSeek (
 
 /**
   Read BufferSize bytes from the current location in the file. For load file
-  and FV case you must read the entire file. 
+  and FV case you must read the entire file.
 
   @param  Stream      Open File Handle
-  @param  Buffer      Caller allocated buffer. 
+  @param  Buffer      Caller allocated buffer.
   @param  BufferSize  Size of buffer in bytes.
 
 
@@ -253,13 +253,13 @@ EfiRead (
 
 /**
   Read the entire file into a buffer. This routine allocates the buffer and
-  returns it to the user full of the read data. 
+  returns it to the user full of the read data.
 
   This is very useful for load file where it's hard to know how big the buffer
   must be.
 
   @param  Stream      Open File Handle
-  @param  Buffer      Pointer to buffer to return. 
+  @param  Buffer      Pointer to buffer to return.
   @param  BufferSize  Pointer to Size of buffer return..
 
 
@@ -279,10 +279,10 @@ EfiReadAllocatePool (
 
 
 /**
-  Write data back to the file. 
+  Write data back to the file.
 
   @param  Stream      Open File Handle
-  @param  Buffer      Pointer to buffer to return. 
+  @param  Buffer      Pointer to buffer to return.
   @param  BufferSize  Pointer to Size of buffer return..
 
 
@@ -313,12 +313,12 @@ UINTN
 EfiGetDeviceCounts (
   IN  EFI_OPEN_FILE_TYPE     Type
   );
-  
+
 
 /**
   Set the Current Working Directory (CWD). If a call is made to EfiOpen () and
   the path does not contain a device name, The CWD is prepended to the path.
-  
+
   @param  Cwd     Current Working Directory to set
 
 
@@ -329,22 +329,22 @@ EfiGetDeviceCounts (
 EFI_STATUS
 EfiSetCwd (
   IN  CHAR8   *Cwd
-  );  
+  );
 
 /**
   Set the Current Working Directory (CWD). If a call is made to EfiOpen () and
   the path does not contain a device name, The CWD is prepended to the path.
-  
-  @param  Cwd     Current Working Directory 
+
+  @param  Cwd     Current Working Directory
 
 
   @return NULL    No CWD set
   @return 'other' malloc'ed buffer contains CWD.
-  
+
 **/
 CHAR8 *
 EfiGetCwd (
   VOID
-  );  
+  );
 
 #endif

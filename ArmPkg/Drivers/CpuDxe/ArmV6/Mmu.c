@@ -24,7 +24,7 @@ typedef UINT32    ARM_FIRST_LEVEL_DESCRIPTOR;
 // Second Level Descriptors
 typedef UINT32    ARM_PAGE_TABLE_ENTRY;
 
-EFI_STATUS 
+EFI_STATUS
 SectionToGcdAttributes (
   IN  UINT32  SectionAttributes,
   OUT UINT64  *GcdAttributes
@@ -418,12 +418,12 @@ UpdatePageEntries (
 
   // Calculate number of 4KB page table entries to change
   NumPageEntries = Length / TT_DESCRIPTOR_PAGE_SIZE;
-  
+
   // Iterate for the number of 4KB pages to change
   Offset = 0;
   for(p = 0; p < NumPageEntries; p++) {
     // Calculate index into first level translation table for page table value
-    
+
     FirstLevelIdx = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(BaseAddress + Offset) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
     ASSERT (FirstLevelIdx < TRANSLATION_TABLE_SECTION_COUNT);
 
@@ -435,9 +435,9 @@ UpdatePageEntries (
       Status = ConvertSectionToPages (FirstLevelIdx << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
       if (EFI_ERROR(Status)) {
         // Exit for loop
-        break; 
-      } 
-      
+        break;
+      }
+
       // Re-read descriptor
       Descriptor = FirstLevelTable[FirstLevelIdx];
     }
@@ -462,7 +462,7 @@ UpdatePageEntries (
       // Make this virtual address point at a physical page
       PageTableEntry &= ~VirtualMask;
     }
-   
+
     if (CurrentPageTableEntry  != PageTableEntry) {
       Mva = (VOID *)(UINTN)((((UINTN)FirstLevelIdx) << TT_DESCRIPTOR_SECTION_BASE_SHIFT) + (PageTableIndex << TT_DESCRIPTOR_PAGE_BASE_SHIFT));
       if ((CurrentPageTableEntry & TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) == TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) {
@@ -471,14 +471,14 @@ UpdatePageEntries (
         WriteBackInvalidateDataCacheRange (Mva, TT_DESCRIPTOR_PAGE_SIZE);
       }
 
-      // Only need to update if we are changing the entry  
-      PageTable[PageTableIndex] = PageTableEntry; 
+      // Only need to update if we are changing the entry
+      PageTable[PageTableIndex] = PageTableEntry;
       ArmUpdateTranslationTableEntry ((VOID *)&PageTable[PageTableIndex], Mva);
     }
 
     Status = EFI_SUCCESS;
     Offset += TT_DESCRIPTOR_PAGE_SIZE;
-    
+
   } // End first level translation table loop
 
   return Status;
@@ -508,7 +508,7 @@ UpdateSectionEntries (
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
 
-  // Make sure we handle a section range that is unmapped 
+  // Make sure we handle a section range that is unmapped
   EntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK;
   EntryValue = TT_DESCRIPTOR_SECTION_TYPE_SECTION;
 
@@ -567,7 +567,7 @@ UpdateSectionEntries (
 
   // calculate number of 1MB first level entries this applies to
   NumSections = Length / TT_DESCRIPTOR_SECTION_SIZE;
-  
+
   // iterate through each descriptor
   for(i=0; i<NumSections; i++) {
     CurrentDescriptor = FirstLevelTable[FirstLevelIdx + i];
@@ -578,7 +578,7 @@ UpdateSectionEntries (
       Status = UpdatePageEntries ((FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT, TT_DESCRIPTOR_SECTION_SIZE, Attributes, VirtualMask);
     } else {
       // still a section entry
-      
+
       // mask off appropriate fields
       Descriptor = CurrentDescriptor & ~EntryMask;
 
@@ -596,7 +596,7 @@ UpdateSectionEntries (
           WriteBackInvalidateDataCacheRange (Mva, SIZE_1MB);
         }
 
-        // Only need to update if we are changing the descriptor  
+        // Only need to update if we are changing the descriptor
         FirstLevelTable[FirstLevelIdx + i] = Descriptor;
         ArmUpdateTranslationTableEntry ((VOID *)&FirstLevelTable[FirstLevelIdx + i], Mva);
       }
@@ -608,7 +608,7 @@ UpdateSectionEntries (
   return Status;
 }
 
-EFI_STATUS 
+EFI_STATUS
 ConvertSectionToPages (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress
   )
@@ -673,7 +673,7 @@ SetMemoryAttributes (
   )
 {
   EFI_STATUS    Status;
-  
+
   if(((BaseAddress & 0xFFFFF) == 0) && ((Length & 0xFFFFF) == 0)) {
     // Is the base and length a multiple of 1 MB?
     DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU section 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));

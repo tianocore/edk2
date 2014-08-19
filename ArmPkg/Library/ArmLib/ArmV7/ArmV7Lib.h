@@ -27,6 +27,6 @@ VOID
 ArmV7AllDataCachesOperation (
   IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
   );
-  
+
 #endif // __ARM_V7_LIB_H__
 

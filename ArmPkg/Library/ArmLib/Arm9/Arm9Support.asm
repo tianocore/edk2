@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -41,12 +41,12 @@ IC_ON       EQU     ( 0x1:SHL:12 )
 
 
 ArmInvalidateDataCacheEntryByMVA
-  MCR     p15, 0, r0, c7, c6, 1   ; invalidate single data cache line                                           
+  MCR     p15, 0, r0, c7, c6, 1   ; invalidate single data cache line
   BX      lr
 
 
 ArmCleanDataCacheEntryByMVA
-  MCR     p15, 0, r0, c7, c10, 1  ; clean single data cache line     
+  MCR     p15, 0, r0, c7, c10, 1  ; clean single data cache line
   BX      lr
 
 
@@ -60,7 +60,7 @@ ArmEnableInstructionCache
   ORR     R0,R0,R1             ;Set I bit
   MCR     p15,0,r0,c1,c0,0     ;Write control register configuration data
   BX      LR
-  
+
 ArmDisableInstructionCache
   LDR     R1,=IC_ON
   MRC     p15,0,R0,c1,c0,0     ;Read control register configuration data
@@ -100,7 +100,7 @@ ArmEnableDataCache
   ORR     R0,R0,R1              ;Set C bit
   MCR     p15,0,r0,c1,c0,0      ;Write control register configuration data
   BX      LR
-    
+
 ArmDisableDataCache
   LDR     R1,=DC_ON
   MRC     p15,0,R0,c1,c0,0      ;Read control register configuration data
@@ -121,7 +121,7 @@ ArmInvalidateDataCache
   MOV     R0,#0
   MCR     p15,0,R0,c7,c10,4     ;Drain write buffer
   BX      LR
-  
+
 ArmCleanInvalidateDataCache
   MRC     p15,0,r15,c7,c14,3
   BNE     ArmCleanInvalidateDataCache
@@ -139,12 +139,12 @@ ASM_PFX(ArmDataMemoryBarrier):
   mov R0, #0
   mcr P15, #0, R0, C7, C10, #5  ; Check to see if this is correct
   bx      LR
-  
+
 ASM_PFX(ArmDataSyncronizationBarrier):
   mov R0, #0
   mcr P15, #0, R0, C7, C10, #4 ; Check to see if this is correct
   bx      LR
-  
+
 ASM_PFX(ArmInstructionSynchronizationBarrier):
   MOV R0, #0
   MCR P15, #0, R0, C7, C5, #4 ; Check to see if this is correct

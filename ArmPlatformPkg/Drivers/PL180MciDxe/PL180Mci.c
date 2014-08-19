@@ -2,14 +2,14 @@
   This file implement the MMC Host Protocol for the ARM PrimeCell PL180.
 
   Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-  
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -157,7 +157,7 @@ MciSendCommand (
   if ((Status & MCI_STATUS_CMD_ERROR)) {
     // Clear Status register error flags
     MmioWrite32 (MCI_CLEAR_STATUS_REG, MCI_STATUS_CMD_ERROR);
-      
+
     if ((Status & MCI_STATUS_CMD_START_BIT_ERROR)) {
       DEBUG ((EFI_D_ERROR, "MciSendCommand(CmdIndex:%d) Start bit Error! Response:0x%X Status:0x%x\n", (Cmd & 0x3F), MmioRead32 (MCI_RESPONSE0_REG), Status));
       RetVal = EFI_NO_RESPONSE;
@@ -224,7 +224,7 @@ MciReadBlockData (
   // Read data from the RX FIFO
   Loop   = 0;
   Finish = MMCI0_BLOCKLEN / 4;
-  
+
   // Raise the TPL at the highest level to disable Interrupts.
   Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
@@ -527,7 +527,7 @@ PL180MciDxeInitialize (
 
   //Publish Component Name, BlockIO protocol interfaces
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Handle, 
+                  &Handle,
                   &gEfiMmcHostProtocolGuid,         &gMciHost,
                   NULL
                   );

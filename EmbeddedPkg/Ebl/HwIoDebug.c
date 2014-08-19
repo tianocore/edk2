@@ -31,7 +31,7 @@
   ior   0x3f8  ;Do a  8-bit IO Read from 0x3f8
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -81,7 +81,7 @@ EblIoReadCmd (
   iow   0x3f8 af  ;Do an 8-bit IO write of af to 0x3f8
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -104,7 +104,7 @@ EblIoWriteCmd (
   Port = AsciiStrHexToUintn (Argv[1]);
   Data = AsciiStrHexToUintn (Argv[2]);
   Width = WidthFromCommandName (Argv[0], 1);
- 
+
   if (Width == 1) {
     IoWrite8 (Port, (UINT8)Data);
   } else if (Width == 2) {

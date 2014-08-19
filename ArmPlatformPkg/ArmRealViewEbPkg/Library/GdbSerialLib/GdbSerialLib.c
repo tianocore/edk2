@@ -2,7 +2,7 @@
   Basic serial IO abstaction for GDB
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,10 +31,10 @@ GdbSerialLibConstructor (
 RETURN_STATUS
 EFIAPI
 GdbSerialInit (
-  IN UINT64     BaudRate, 
-  IN UINT8      Parity, 
-  IN UINT8      DataBits, 
-  IN UINT8      StopBits 
+  IN UINT64     BaudRate,
+  IN UINT8      Parity,
+  IN UINT8      DataBits,
+  IN UINT8      StopBits
   )
 {
   if ((Parity != 0) || (DataBits != 8) || (StopBits != 1)) {
@@ -45,9 +45,9 @@ GdbSerialInit (
     // Could add support for different Baud rates....
     return RETURN_UNSUPPORTED;
   }
-      
+
   UINT32  Base = PcdGet32 (PcdGdbUartBase);
-  
+
   // initialize baud rate generator to 115200 based on EB clock REFCLK24MHZ
   MmioWrite32 (Base + UARTIBRD, UART_115200_IDIV);
   MmioWrite32 (Base + UARTFBRD, UART_115200_FDIV);
@@ -68,7 +68,7 @@ BOOLEAN
 EFIAPI
 GdbIsCharAvailable (
   VOID
-  )  
+  )
 {
   UINT32 FR = PcdGet32 (PcdGdbUartBase) + UARTFR;
 
@@ -87,7 +87,7 @@ GdbGetChar (
 {
   UINT32  FR = PcdGet32 (PcdGdbUartBase) + UARTFR;
   UINT32  DR = PcdGet32 (PcdGdbUartBase) + UARTDR;
-    
+
   while ((MmioRead32 (FR) & UART_RX_EMPTY_FLAG_MASK) == 0);
   return MmioRead8 (DR);
 }

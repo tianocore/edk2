@@ -1,14 +1,14 @@
 /** @file
 *
 *  Copyright (c) 2011, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -61,14 +61,14 @@ VOID PL301AxiInit(UINTN FAxiBase) {
     // Configure the Access Control Register (MI 0)
     FAxiWriteReg(PL301_QOS_ACCESSCONTROL_MI_0, V2P_CA9_FAXI_MI0_ACCESSCNTRL_VAL);
 
-    // MP0 
+    // MP0
     // Set priority for Read
     FAxiWriteReg(PL301_AR_ARB_MI_0, 0x00000100);
     FAxiWriteReg(PL301_AR_ARB_MI_0, 0x01000200);
     FAxiWriteReg(PL301_AR_ARB_MI_0, 0x02000200);
     FAxiWriteReg(PL301_AR_ARB_MI_0, 0x03000200);
     FAxiWriteReg(PL301_AR_ARB_MI_0, 0x04000200);
-  
+
     // Set priority for Write
     FAxiWriteReg(PL301_AW_ARB_MI_0, 0x00000100);
     FAxiWriteReg(PL301_AW_ARB_MI_0, 0x01000200);
@@ -98,7 +98,7 @@ VOID PL301AxiInit(UINTN FAxiBase) {
     FAxiWriteReg(PL301_AR_ARB_MI_2, 0x02000100);
     FAxiWriteReg(PL301_AR_ARB_MI_2, 0x03000100);
     FAxiWriteReg(PL301_AR_ARB_MI_2, 0x04000100);
-  
+
     // Set priority for Write
     FAxiWriteReg(PL301_AW_ARB_MI_2, 0x00000100);
     FAxiWriteReg(PL301_AW_ARB_MI_2, 0x01000200);

@@ -334,7 +334,7 @@ BltBufferToVideo (
             );
       }
     }
-   
+
   return Status;
 }
 
@@ -416,7 +416,7 @@ LcdGraphicsBlt (
   if (!mDisplayInitialized) {
     InitializeDisplay (Instance);
   }
-  
+
   switch (BltOperation) {
 	  case EfiBltVideoFill:
 	    Status = BltVideoFill (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);

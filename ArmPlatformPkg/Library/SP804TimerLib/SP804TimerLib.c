@@ -203,7 +203,7 @@ EFIAPI
 GetPerformanceCounter (
   VOID
   )
-{ 
+{
   // Free running 64-bit/32-bit counter is needed here.
   // Don't think we need this to boot, just to do performance profile
   UINT64 Value;
@@ -246,11 +246,11 @@ GetPerformanceCounterProperties (
     // Timer starts with the reload value
     *StartValue = 0xFFFFFFFF;
   }
-  
+
   if (EndValue != NULL) {
     // Timer counts down to 0x0
     *EndValue = (UINT64)0ULL;
   }
-  
+
   return PcdGet64 (PcdEmbeddedPerformanceCounterFrequencyInHz);
 }

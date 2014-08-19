@@ -40,12 +40,12 @@
 #define HCS               BIT30 //Host capacity support/1 = Supporting high capacity
 #define CCS               BIT30 //Card capacity status/1 = High capacity card
 typedef struct {
-  UINT32  Reserved0:   7; // 0 
+  UINT32  Reserved0:   7; // 0
   UINT32  V170_V195:   1; // 1.70V - 1.95V
   UINT32  V200_V260:   7; // 2.00V - 2.60V
   UINT32  V270_V360:   9; // 2.70V - 3.60V
   UINT32  RESERVED_1:  5; // Reserved
-  UINT32  AccessMode:  2; // 00b (byte mode), 10b (sector mode) 
+  UINT32  AccessMode:  2; // 00b (byte mode), 10b (sector mode)
   UINT32  Busy:        1; // This bit is set to LOW if the card has not finished the power up routine
 }OCR;
 
@@ -71,14 +71,14 @@ typedef struct {
   UINT8   PERM_WRITE_PROTECT: 1; // Permanent write protection [13:13]
   UINT8   COPY:               1; // Copy flag (OTP) [14:14]
   UINT8   FILE_FORMAT_GRP:    1; // File format group [15:15]
-  
+
   UINT16  RESERVED_2:         5; // Reserved [20:16]
   UINT16  WRITE_BL_PARTIAL:   1; // Partial blocks for write allowed [21:21]
   UINT16  WRITE_BL_LEN:       4; // Max. write data block length [25:22]
   UINT16  R2W_FACTOR:         3; // Write speed factor [28:26]
   UINT16  RESERVED_3:         2; // Reserved [30:29]
   UINT16  WP_GRP_ENABLE:      1; // Write protect group enable [31:31]
-  
+
   UINT32  WP_GRP_SIZE:        7; // Write protect group size [38:32]
   UINT32  SECTOR_SIZE:        7; // Erase sector size [45:39]
   UINT32  ERASE_BLK_EN:       1; // Erase single block enable [46:46]
@@ -88,7 +88,7 @@ typedef struct {
   UINT32  VDD_R_CURR_MAX:     3; // Max. read current @ VDD max [58:56]
   UINT32  VDD_R_CURR_MIN:     3; // Max. read current @ VDD min [61:59]
   UINT32  C_SIZELow2:         2; // Device size [63:62]
-  
+
   UINT32  C_SIZEHigh10:       10;// Device size [73:64]
   UINT32  RESERVED_4:         2; // Reserved [75:74]
   UINT32  DSR_IMP:            1; // DSR implemented [76:76]
@@ -101,7 +101,7 @@ typedef struct {
   UINT8   TRAN_SPEED          ;  // Max. bus clock frequency [103:96]
   UINT8   NSAC                ;  // Data read access-time 2 in CLK cycles (NSAC*100) [111:104]
   UINT8   TAAC                ;  // Data read access-time 1 [119:112]
-  
+
   UINT8   RESERVED_5:         6; // Reserved [125:120]
   UINT8   CSD_STRUCTURE:      2; // CSD structure [127:126]
 }CSD;

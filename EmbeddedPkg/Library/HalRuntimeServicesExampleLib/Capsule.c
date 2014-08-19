@@ -2,7 +2,7 @@
   Generic Capsule services
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,7 +19,7 @@
 //
 //Max size capsule services support are platform policy,to populate capsules we just need
 //memory to maintain them across reset,it is not a problem. And to special capsules ,for
-//example,update flash,it is mostly decided by the platform. Here is a sample size for 
+//example,update flash,it is mostly decided by the platform. Here is a sample size for
 //different type capsules.
 //
 #define MAX_SIZE_POPULATE              (0)
@@ -34,8 +34,8 @@ SupportUpdateCapsuleRest (
   )
 {
   //
-  //If the platform has a way to guarantee the memory integrity across a system reset, return 
-  //TRUE, else FALSE. 
+  //If the platform has a way to guarantee the memory integrity across a system reset, return
+  //TRUE, else FALSE.
   //
   return FALSE;
 }
@@ -54,7 +54,7 @@ SupportCapsuleSize (
   //
   *MaxSizePopulate    = MAX_SIZE_POPULATE;
   *MaxSizeNonPopulate = MAX_SIZE_NON_POPULATE;
-  return; 
+  return;
 }
 
 
@@ -77,7 +77,7 @@ Arguments:
   CapsuleHeaderArray             A array of pointers to capsule headers passed in
   CapsuleCount                   The number of capsule
   ScatterGatherList              Physical address of datablock list points to capsule
-  
+
 Returns:
 
   EFI STATUS
@@ -85,8 +85,8 @@ Returns:
                                  not set, the capsule has been successfully processed by the firmware.
                                  If it set, the ScattlerGatherList is successfully to be set.
   EFI_INVALID_PARAMETER          CapsuleCount is less than 1,CapsuleGuid is not supported.
-  EFI_DEVICE_ERROR               Failed to SetVariable or AllocatePool or ProcessFirmwareVolume. 
-  
+  EFI_DEVICE_ERROR               Failed to SetVariable or AllocatePool or ProcessFirmwareVolume.
+
 --*/
 {
   UINTN                     CapsuleSize;
@@ -110,17 +110,17 @@ Returns:
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
-      return EFI_INVALID_PARAMETER;      
+      return EFI_INVALID_PARAMETER;
     }
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiCapsuleGuid)) {
       if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
-      }  
-    }   
+      }
+    }
   }
 
   //
-  //Assume that capsules have the same flags on reseting or not. 
+  //Assume that capsules have the same flags on reseting or not.
   //
   CapsuleHeader = CapsuleHeaderArray[0];
 
@@ -131,28 +131,28 @@ Returns:
     if (!SupportUpdateCapsuleRest()) {
       return EFI_UNSUPPORTED;
     }
-    
+
     if (ScatterGatherList == 0) {
       return EFI_INVALID_PARAMETER;
     } else {
       Status = EfiSetVariable (
-                 EFI_CAPSULE_VARIABLE_NAME,  
-                 &gEfiCapsuleVendorGuid,     
-                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,  
-                 sizeof (UINTN), 
-                 (VOID *) &ScatterGatherList 
+                 EFI_CAPSULE_VARIABLE_NAME,
+                 &gEfiCapsuleVendorGuid,
+                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                 sizeof (UINTN),
+                 (VOID *) &ScatterGatherList
                  );
-      if (Status != EFI_SUCCESS) { 
+      if (Status != EFI_SUCCESS) {
         return EFI_DEVICE_ERROR;
       }
     }
     return EFI_SUCCESS;
   }
-  
+
   //
   //The rest occurs in the condition of non-reset mode
   //
-  if (EfiAtRuntime ()) { 
+  if (EfiAtRuntime ()) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -169,7 +169,7 @@ Returns:
     gBS->CopyMem (BufferPtr, (UINT8*)CapsuleHeader+ CapsuleHeader->HeaderSize, CapsuleSize);
 
     //
-    //Call DXE service ProcessFirmwareVolume to process immediatelly 
+    //Call DXE service ProcessFirmwareVolume to process immediatelly
     //
     Status = gDS->ProcessFirmwareVolume (BufferPtr, CapsuleSize, &FvHandle);
     if (Status != EFI_SUCCESS) {
@@ -184,7 +184,7 @@ Returns:
 Done:
   if (BufferPtr != NULL) {
     gBS->FreePool (BufferPtr);
-  }     
+  }
   return EFI_DEVICE_ERROR;
 }
 
@@ -231,10 +231,10 @@ Returns:
 
   if ((MaxiumCapsuleSize == NULL) ||(ResetType == NULL)) {
     return EFI_INVALID_PARAMETER;
-  }  
+  }
 
   CapsuleHeader = NULL;
-  
+
   //
   //Compare GUIDs with EFI_CAPSULE_GUID, if capsule header contains CAPSULE_FLAGS_PERSIST_ACROSS_RESET
   //and CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flags,whatever the GUID is ,the service supports.
@@ -242,20 +242,20 @@ Returns:
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
-      return EFI_INVALID_PARAMETER;      
+      return EFI_INVALID_PARAMETER;
     }
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiCapsuleGuid)) {
       if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
         return EFI_UNSUPPORTED;
       }
-    }  
+    }
   }
 
   SupportCapsuleSize(&MaxSizePopulate,&MaxSizeNonPopulate);
   //
-  //Assume that capsules have the same flags on reseting or not. 
+  //Assume that capsules have the same flags on reseting or not.
   //
-  CapsuleHeader = CapsuleHeaderArray[0];  
+  CapsuleHeader = CapsuleHeaderArray[0];
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     //
     //Check if the platform supports update capsule across a system reset
@@ -264,11 +264,11 @@ Returns:
       return EFI_UNSUPPORTED;
     }
     *ResetType = EfiResetWarm;
-    *MaxiumCapsuleSize = MaxSizePopulate;    
+    *MaxiumCapsuleSize = MaxSizePopulate;
   } else {
     *ResetType = EfiResetCold;
     *MaxiumCapsuleSize = MaxSizeNonPopulate;
-  }  
+  }
   return EFI_SUCCESS;
 }
 

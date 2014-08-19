@@ -69,7 +69,7 @@
 
 #define CM_CLKSEL_PLL_MULT(x)           (((x) & 0x07FF) << 8)
 #define CM_CLKSEL_PLL_DIV(x)            ((((x) - 1) & 0x7F) << 0)
-  
+
 #define CM_CLKSEL_DIV_120M(x)           (((x) & 0x1F) << 0)
 
 #define CM_FCLKEN_USBHOST_EN_USBHOST2_MASK    BIT1

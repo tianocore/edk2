@@ -1,8 +1,8 @@
 ## @file
 #  Instance of Base Memory Library with some ARM ldm/stm assembly.
 #
-#  This is a copy of the MdePkg BaseMemoryLib with the CopyMem and 
-#  SetMem worker functions replaced with assembler that uses 
+#  This is a copy of the MdePkg BaseMemoryLib with the CopyMem and
+#  SetMem worker functions replaced with assembler that uses
 #  ldm/stm.
 #
 #  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
@@ -25,7 +25,7 @@
   FILE_GUID                      = 4D466AF3-2380-448D-A337-E4033F29F3F7
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseMemoryLib 
+  LIBRARY_CLASS                  = BaseMemoryLib
 
 
 #
@@ -46,7 +46,7 @@
   SetMemWrapper.c
   CopyMemWrapper.c
   MemLibGeneric.c
-  MemLibGuid.c  
+  MemLibGuid.c
   MemLibInternals.h
 
 [Sources.ARM]

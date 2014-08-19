@@ -6,7 +6,7 @@
   program with the debugger.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,14 +31,14 @@ DebugAgentTimerIntialize (
   )
 {
 }
-  
-  
+
+
 /**
   Set the period for the debug agent timer. Zero means disable the timer.
 
   @param[in] TimerPeriodMilliseconds    Frequency of the debug agent timer.
 
-**/  
+**/
 VOID
 EFIAPI
 DebugAgentTimerSetPeriod (
@@ -46,13 +46,13 @@ DebugAgentTimerSetPeriod (
   )
 {
 }
-  
+
 
 /**
-  Perform End Of Interrupt for the debug agent timer. This is called in the 
-  interrupt handler after the interrupt has been processed. 
+  Perform End Of Interrupt for the debug agent timer. This is called in the
+  interrupt handler after the interrupt has been processed.
 
-**/  
+**/
 VOID
 EFIAPI
 DebugAgentTimerEndOfInterrupt (
@@ -60,5 +60,4 @@ DebugAgentTimerEndOfInterrupt (
   )
 {
 }
-  
-  
+

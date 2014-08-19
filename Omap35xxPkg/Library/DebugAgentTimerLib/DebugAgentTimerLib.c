@@ -2,7 +2,7 @@
   Debug Agent timer lib for OMAP 35xx.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -44,7 +44,7 @@ EnableInterruptSource (
 
   Bank = gVector / 32;
   Bit  = 1UL << (gVector % 32);
-  
+
   MmioWrite32 (INTCPS_MIR_CLEAR(Bank), Bit);
 }
 
@@ -55,9 +55,9 @@ DisableInterruptSource (
 {
   UINTN Bank;
   UINTN Bit;
-  
+
   Bank = gVector / 32;
-  Bit  = 1UL << (gVector % 32);  
+  Bit  = 1UL << (gVector % 32);
 
   MmioWrite32 (INTCPS_MIR_SET(Bank), Bit);
 }
@@ -96,17 +96,17 @@ DebugAgentTimerIntialize (
     CpuDeadLoop ();
   }
   // Set source clock for GPT2 - GPT9 to SYS_CLK
-  MmioOr32 (CM_CLKSEL_PER, 1 << (TimerNumber - 2)); 
+  MmioOr32 (CM_CLKSEL_PER, 1 << (TimerNumber - 2));
 
 }
-  
-  
+
+
 /**
   Set the period for the debug agent timer. Zero means disable the timer.
 
   @param[in] TimerPeriodMilliseconds    Frequency of the debug agent timer.
 
-**/  
+**/
 VOID
 EFIAPI
 DebugAgentTimerSetPeriod (
@@ -115,13 +115,13 @@ DebugAgentTimerSetPeriod (
 {
   UINT64      TimerCount;
   INT32       LoadValue;
-  
+
   if (TimerPeriodMilliseconds == 0) {
     // Turn off GPTIMER3
     MmioWrite32 (gTCLR, TCLR_ST_OFF);
-    
+
     DisableInterruptSource ();
-  } else {  
+  } else {
     // Calculate required timer count
     TimerCount = DivU64x32(TimerPeriodMilliseconds * 1000000, PcdGet32(PcdDebugAgentTimerFreqNanoSeconds));
 
@@ -139,13 +139,13 @@ DebugAgentTimerSetPeriod (
     EnableInterruptSource ();
   }
 }
-  
+
 
 /**
-  Perform End Of Interrupt for the debug agent timer. This is called in the 
-  interrupt handler after the interrupt has been processed. 
+  Perform End Of Interrupt for the debug agent timer. This is called in the
+  interrupt handler after the interrupt has been processed.
 
-**/  
+**/
 VOID
 EFIAPI
 DebugAgentTimerEndOfInterrupt (
@@ -153,7 +153,7 @@ DebugAgentTimerEndOfInterrupt (
   )
 {
    // Clear all timer interrupts
-  MmioWrite32 (gTISR, TISR_CLEAR_ALL);  
+  MmioWrite32 (gTISR, TISR_CLEAR_ALL);
 
   // Poll interrupt status bits to ensure clearing
   while ((MmioRead32 (gTISR) & TISR_ALL_INTERRUPT_MASK) != TISR_NO_INTERRUPTS_PENDING);
@@ -163,4 +163,3 @@ DebugAgentTimerEndOfInterrupt (
 
 }
 
-  

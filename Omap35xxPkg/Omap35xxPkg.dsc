@@ -35,23 +35,23 @@
 
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  
+
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
 
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  
+
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptioHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
-  
+
   RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   OmapLib|Omap35xxPkg/Library/OmapLib/OmapLib.inf
   OmapDmaLib|Omap35xxPkg/Library/OmapDmaLib/OmapDmaLib.inf
-  
+
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
@@ -69,7 +69,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-    
+
  # UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
   UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
 
@@ -82,7 +82,7 @@
 
 [LibraryClasses.ARM]
   #
-  # Note: This NULL library feature is not yet in the edk2/BaseTools, but it is checked in to 
+  # Note: This NULL library feature is not yet in the edk2/BaseTools, but it is checked in to
   # the BaseTools project. So you need to build with the BaseTools project util this feature gets synced.
   #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
@@ -98,7 +98,7 @@
 
   RVCT:*_*_ARM_ARCHCC_FLAGS     == --cpu 7-A
   RVCT:*_*_ARM_ARCHASM_FLAGS    == --cpu 7-A
- 
+
 
 ################################################################################
 #
@@ -106,7 +106,7 @@
 #
 ################################################################################
 
-  
+
 [PcdsFixedAtBuild.common]
 
 # DEBUG_ASSERT_ENABLED       0x01
@@ -136,7 +136,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000004
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
-  
+
   gEmbeddedTokenSpaceGuid.PcdPrePiTempMemorySize|0
   gEmbeddedTokenSpaceGuid.PcdPrePiBfvBaseAddress|0
   gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize|0
@@ -147,20 +147,20 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0x20000  # 128K stack
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80000000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
-  
+
   gOmap35xxTokenSpaceGuid.PcdOmap35xxGpmcOffset|0x6E000000
   gOmap35xxTokenSpaceGuid.PcdOmap35xxMMCHS1Base|0x4809C000
 
-  # Console  
+  # Console
   gOmap35xxTokenSpaceGuid.PcdOmap35xxConsoleUart|3
-  
+
   # Timers
   gOmap35xxTokenSpaceGuid.PcdOmap35xxArchTimer|3
   gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer|4
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|77
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|13000000
-  
+
   #
   # ARM Pcds
   #
@@ -172,17 +172,17 @@
 #
 ################################################################################
 [Components.common]
-  Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf  
+  Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf
   Omap35xxPkg/Library/OmapLib/OmapLib.inf
   Omap35xxPkg/Library/OmapDmaLib/OmapDmaLib.inf
-  
+
   Omap35xxPkg/Flash/Flash.inf
   Omap35xxPkg/MMCHSDxe/MMCHS.inf
   Omap35xxPkg/SmbusDxe/Smbus.inf
   Omap35xxPkg/Gpio/Gpio.inf
   Omap35xxPkg/InterruptDxe/InterruptDxe.inf
-  Omap35xxPkg/TimerDxe/TimerDxe.inf 
+  Omap35xxPkg/TimerDxe/TimerDxe.inf
   Omap35xxPkg/TPS65950Dxe/TPS65950.inf
-  
-  
+
+
 

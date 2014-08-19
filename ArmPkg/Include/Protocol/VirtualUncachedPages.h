@@ -37,7 +37,7 @@ EFI_STATUS
   IN  EFI_PHYSICAL_ADDRESS              VirtualMask,
   OUT UINT64                            *Attributes     OPTIONAL
   );
-  
+
 typedef
 EFI_STATUS
 (EFIAPI *FREE_CONVERTED_PAGES) (
@@ -57,4 +57,4 @@ struct _VIRTUAL_UNCACHED_PAGES_PROTOCOL {
 
 extern EFI_GUID gVirtualUncachedPagesProtocolGuid;
 
-#endif  
+#endif

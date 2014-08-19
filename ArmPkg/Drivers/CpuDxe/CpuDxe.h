@@ -48,9 +48,9 @@
 
 
 /**
-  This function registers and enables the handler specified by InterruptHandler for a processor 
-  interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the 
-  handler for the processor interrupt or exception type specified by InterruptType is uninstalled. 
+  This function registers and enables the handler specified by InterruptHandler for a processor
+  interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the
+  handler for the processor interrupt or exception type specified by InterruptType is uninstalled.
   The installed handler is called once for each processor interrupt or exception.
 
   @param  InterruptType    A pointer to the processor's current interrupt state. Set to TRUE if interrupts
@@ -75,9 +75,9 @@ RegisterInterruptHandler (
 
 
 /**
-  This function registers and enables the handler specified by InterruptHandler for a processor 
-  interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the 
-  handler for the processor interrupt or exception type specified by InterruptType is uninstalled. 
+  This function registers and enables the handler specified by InterruptHandler for a processor
+  interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the
+  handler for the processor interrupt or exception type specified by InterruptType is uninstalled.
   The installed handler is called once for each processor interrupt or exception.
 
   @param  InterruptType    A pointer to the processor's current interrupt state. Set to TRUE if interrupts
@@ -120,7 +120,7 @@ SyncCacheConfig (
   IN  EFI_CPU_ARCH_PROTOCOL *CpuProtocol
   );
 
-EFI_STATUS 
+EFI_STATUS
 ConvertSectionToPages (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress
   );

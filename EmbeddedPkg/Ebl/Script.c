@@ -21,13 +21,13 @@
 
 /**
   Execute the passed in file like a series of commands. The ; can be used on
-  a single line to indicate multiple commands per line. The Ascii text file 
-  can contain any number of lines. The following line termination forms are 
+  a single line to indicate multiple commands per line. The Ascii text file
+  can contain any number of lines. The following line termination forms are
   supported:
     LF   : Unix, Mac OS X*, BeOS
     CR+LF: MS-DOS*, Microsoft Windows*
     CR   : Commodore, Apple II, and really Mac OS
-    LF+CR: for simplicity and completeness 
+    LF+CR: for simplicity and completeness
 
   Argv[0] - "script"
   Argv[1] - Device Name:path for the file to load
@@ -35,7 +35,7 @@
   script fv1:\script.txt
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -54,8 +54,8 @@ EblScriptCmd (
   CHAR8                         *Ptr;
   CHAR8                         *ScanPtr;
   UINTN                         CmdLineSize;
-  
-  
+
+
 
   if (Argc < 2) {
     // file name required
@@ -85,15 +85,15 @@ EblScriptCmd (
           CmdLineSize++;
           break;
         }
-        
+
       }
 
       Status = ProcessCmdLine (Ptr, CmdLineSize);
     }
-  
+
     FreePool (Address);
   }
- 
+
   EfiClose (File);
   return Status;
 }
@@ -103,7 +103,7 @@ EblScriptCmd (
 GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mScriptTemplate[] = {
   {
     "script",
-    " device:path; load an ascii file and execute it like commands", 
+    " device:path; load an ascii file and execute it like commands",
     NULL,
     EblScriptCmd
   }

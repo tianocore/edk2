@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # SemMem() worker for ARM
 #
@@ -34,7 +34,7 @@ InternalMemSetMem (
   IN      UINT8                     Value
   )
 **/
-  
+
 .text
 .align 2
 GCC_ASM_EXPORT(InternalMemSetMem)
@@ -77,4 +77,3 @@ L43:
   cmp      r1, #0
   bne      L34
   ldmfd    sp!, {pc}
-  

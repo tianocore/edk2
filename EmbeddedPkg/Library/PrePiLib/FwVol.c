@@ -1,10 +1,10 @@
 /** @file
   Implementation of the 6 PEI Ffs (FV) APIs in library form.
-  
+
   This code only knows about a FV if it has a EFI_HOB_TYPE_FV entry in the HOB list
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,11 +25,11 @@
 
 /**
   Returns the highest bit set of the State field
-  
+
   @param ErasePolarity   Erase Polarity  as defined by EFI_FVB2_ERASE_POLARITY
                          in the Attributes field.
   @param FfsHeader       Pointer to FFS File Header
-                      
+
 
   @retval the highest bit in the State field
 
@@ -56,15 +56,15 @@ GetFileState(
   }
 
   return HighestBit;
-} 
+}
 
 
 /**
   Calculates the checksum of the header of a file.
   The header is a zero byte checksum, so zero means header is good
-  
+
   @param FfsHeader       Pointer to FFS File Header
-                      
+
   @retval Checksum of the header
 
 **/
@@ -77,7 +77,7 @@ CalculateHeaderChecksum (
   UINT8   *Ptr;
   UINTN   Index;
   UINT8   Sum;
-  
+
   Sum = 0;
   Ptr = (UINT8 *)FileHeader;
 
@@ -91,9 +91,9 @@ CalculateHeaderChecksum (
   for (; Index < sizeof(EFI_FFS_FILE_HEADER); Index++) {
     Sum = (UINT8)(Sum + Ptr[Index]);
   }
-  
+
   //
-  // State field (since this indicates the different state of file). 
+  // State field (since this indicates the different state of file).
   //
   Sum = (UINT8)(Sum - FileHeader->State);
   //
@@ -107,10 +107,10 @@ CalculateHeaderChecksum (
 
 /**
   Given a FileHandle return the VolumeHandle
-  
+
   @param FileHandle   File handle to look up
   @param VolumeHandle Match for FileHandle
-                      
+
   @retval TRUE  VolumeHandle is valid
 
 **/
@@ -129,7 +129,7 @@ FileHandleToVolume (
   if (Hob.Raw == NULL) {
     return FALSE;
   }
-  
+
   do {
     Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, Hob.Raw);
     if (Hob.Raw != NULL) {
@@ -143,7 +143,7 @@ FileHandleToVolume (
       Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GET_NEXT_HOB (Hob));
     }
   } while (Hob.Raw != NULL);
-    
+
   return FALSE;
 }
 
@@ -153,10 +153,10 @@ FileHandleToVolume (
   Given the input file pointer, search for the next matching file in the
   FFS volume as defined by SearchType. The search starts from FileHeader inside
   the Firmware Volume defined by FwVolHeader.
-  
+
   @param FileHandle   File handle to look up
   @param VolumeHandle Match for FileHandle
-                      
+
 
 **/
 EFI_STATUS
@@ -208,13 +208,13 @@ FindFileEx (
     FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
     FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)*FileHeader + FileOccupiedSize);
   }
-  
+
   FileOffset = (UINT32) ((UINT8 *)FfsFileHeader - (UINT8 *)FwVolHeader);
   ASSERT (FileOffset <= 0xFFFFFFFF);
 
   while (FileOffset < (FvLength - sizeof (EFI_FFS_FILE_HEADER))) {
     //
-    // Get FileState which is the highest bit of the State 
+    // Get FileState which is the highest bit of the State
     //
     FileState = GetFileState (ErasePolarity, FfsFileHeader);
 
@@ -224,7 +224,7 @@ FindFileEx (
       FileOffset += sizeof(EFI_FFS_FILE_HEADER);
       FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + sizeof(EFI_FFS_FILE_HEADER));
       break;
-        
+
     case EFI_FILE_DATA_VALID:
     case EFI_FILE_MARKED_FOR_UPDATE:
       if (CalculateHeaderChecksum (FfsFileHeader) != 0) {
@@ -241,16 +241,16 @@ FindFileEx (
           *FileHeader = FfsFileHeader;
           return EFI_SUCCESS;
         }
-      } else if (((SearchType == FfsFileHeader->Type) || (SearchType == EFI_FV_FILETYPE_ALL)) && 
-                 (FfsFileHeader->Type != EFI_FV_FILETYPE_FFS_PAD)) { 
+      } else if (((SearchType == FfsFileHeader->Type) || (SearchType == EFI_FV_FILETYPE_ALL)) &&
+                 (FfsFileHeader->Type != EFI_FV_FILETYPE_FFS_PAD)) {
         *FileHeader = FfsFileHeader;
         return EFI_SUCCESS;
       }
 
-      FileOffset += FileOccupiedSize; 
+      FileOffset += FileOccupiedSize;
       FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
       break;
-    
+
     case EFI_FILE_DELETED:
       FileLength = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
       FileOccupiedSize = GET_OCCUPIED_SIZE(FileLength, 8);
@@ -261,24 +261,24 @@ FindFileEx (
     default:
       *FileHeader = NULL;
       return EFI_NOT_FOUND;
-    } 
+    }
   }
 
-  
+
   *FileHeader = NULL;
-  return EFI_NOT_FOUND;  
+  return EFI_NOT_FOUND;
 }
 
 
 /**
   Go through the file to search SectionType section,
-  when meeting an encapsuled section. 
-  
+  when meeting an encapsuled section.
+
   @param  SectionType  - Filter to find only section of this type.
   @param  Section      - From where to search.
   @param  SectionSize  - The file size to search.
   @param  OutputBuffer - Pointer to the section to search.
-                      
+
   @retval EFI_SUCCESS
 **/
 EFI_STATUS
@@ -310,11 +310,11 @@ FfsProcessSection (
 
       return EFI_SUCCESS;
     } else if ((Section->Type == EFI_SECTION_COMPRESSION) || (Section->Type == EFI_SECTION_GUID_DEFINED)) {
-    
+
       if (Section->Type == EFI_SECTION_COMPRESSION) {
         CompressionSection  = (EFI_COMPRESSION_SECTION *) Section;
         SectionLength       = *(UINT32 *)Section->Size & 0x00FFFFFF;
-        
+
         if (CompressionSection->CompressionType != EFI_STANDARD_COMPRESSION) {
           return EFI_UNSUPPORTED;
         }
@@ -333,7 +333,7 @@ FfsProcessSection (
                    &SectionAttribute
                    );
       }
-      
+
       if (EFI_ERROR (Status)) {
         //
         // GetInfo failed
@@ -349,7 +349,7 @@ FfsProcessSection (
         return EFI_OUT_OF_RESOURCES;
       }
       //
-      // Allocate destination buffer, extra one page for adjustment 
+      // Allocate destination buffer, extra one page for adjustment
       //
       DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
       if (DstBuffer == NULL) {
@@ -377,7 +377,7 @@ FfsProcessSection (
                     &AuthenticationStatus
                     );
       }
-      
+
       if (EFI_ERROR (Status)) {
         //
         // Decompress failed
@@ -386,16 +386,16 @@ FfsProcessSection (
         return EFI_NOT_FOUND;
       } else {
         return FfsProcessSection (
-                SectionType, 
-                DstBuffer, 
-                DstBufferSize, 
-                OutputBuffer 
+                SectionType,
+                DstBuffer,
+                DstBufferSize,
+                OutputBuffer
                 );
-       }        
+       }
     }
 
     //
-    // Size is 24 bits wide so mask upper 8 bits. 
+    // Size is 24 bits wide so mask upper 8 bits.
     // SectionLength is adjusted it is 4 byte aligned.
     // Go to the next section
     //
@@ -405,7 +405,7 @@ FfsProcessSection (
     ParsedLength += SectionLength;
     Section = (EFI_COMMON_SECTION_HEADER *)((UINT8 *)Section + SectionLength);
   }
-  
+
   return EFI_NOT_FOUND;
 }
 
@@ -438,7 +438,7 @@ FfsFindSectionData (
   FfsFileHeader = (EFI_FFS_FILE_HEADER *)(FileHandle);
 
   //
-  // Size is 24 bits wide so mask upper 8 bits. 
+  // Size is 24 bits wide so mask upper 8 bits.
   // Does not include FfsFileHeader header size
   // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
   //
@@ -447,9 +447,9 @@ FfsFindSectionData (
   FileSize -= sizeof (EFI_FFS_FILE_HEADER);
 
   return FfsProcessSection (
-          SectionType, 
-          Section, 
-          FileSize, 
+          SectionType,
+          Section,
+          FileSize,
           SectionData
           );
 }
@@ -503,13 +503,13 @@ FfsFindNextVolume (
   )
 {
   EFI_PEI_HOB_POINTERS        Hob;
-  
+
 
   Hob.Raw = GetHobList ();
   if (Hob.Raw == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   do {
     Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, Hob.Raw);
     if (Hob.Raw != NULL) {
@@ -521,7 +521,7 @@ FfsFindNextVolume (
       Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GET_NEXT_HOB (Hob));
     }
   } while (Hob.Raw != NULL);
-    
+
   return EFI_NOT_FOUND;
 
 }
@@ -529,7 +529,7 @@ FfsFindNextVolume (
 
 /**
   Find a file in the volume by name
-  
+
   @param FileName       A pointer to the name of the file to
                         find within the firmware volume.
 
@@ -546,7 +546,7 @@ FfsFindNextVolume (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 FfsFindFileByName (
   IN  CONST EFI_GUID        *FileName,
   IN  EFI_PEI_FV_HANDLE     VolumeHandle,
@@ -576,15 +576,15 @@ FfsFindFileByName (
                       information.
 
   @retval EFI_SUCCESS             File information returned.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
-  
+
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 FfsGetFileInfo (
   IN EFI_PEI_FILE_HANDLE  FileHandle,
   OUT EFI_FV_FILE_INFO    *FileInfo
@@ -614,14 +614,14 @@ FfsGetFileInfo (
   }
 
   //
-  // Get FileState which is the highest bit of the State 
+  // Get FileState which is the highest bit of the State
   //
   FileState = GetFileState (ErasePolarity, (EFI_FFS_FILE_HEADER*)FileHandle);
 
   switch (FileState) {
     case EFI_FILE_DATA_VALID:
     case EFI_FILE_MARKED_FOR_UPDATE:
-      break;  
+      break;
     default:
       return EFI_INVALID_PARAMETER;
     }
@@ -645,15 +645,15 @@ FfsGetFileInfo (
                         information.
 
   @retval EFI_SUCCESS             File information returned.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 FfsGetVolumeInfo (
   IN EFI_PEI_FV_HANDLE  VolumeHandle,
   OUT EFI_FV_INFO       *VolumeInfo
@@ -665,10 +665,10 @@ FfsGetVolumeInfo (
   if (VolumeInfo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
-  // VolumeHandle may not align at 8 byte, 
-  // but FvLength is UINT64 type, which requires FvHeader align at least 8 byte. 
+  // VolumeHandle may not align at 8 byte,
+  // but FvLength is UINT64 type, which requires FvHeader align at least 8 byte.
   // So, Copy FvHeader into the local FvHeader structure.
   //
   CopyMem (&FwVolHeader, VolumeHandle, sizeof (EFI_FIRMWARE_VOLUME_HEADER));
@@ -698,7 +698,7 @@ FfsGetVolumeInfo (
 	@param FileType  	    File handle of a Fv type file.
   @param Volumehandle   On succes Volume Handle of the match
   @param FileHandle     On success File Handle of the match
-  
+
   @retval EFI_NOT_FOUND  				FV image can't be found.
   @retval EFI_SUCCESS						Successfully found FileType
 
@@ -734,7 +734,7 @@ FfsAnyFvFindFirstFile (
       break;
     }
   }
-  
+
   return Status;
 }
 
@@ -788,14 +788,14 @@ FfsProcessFvFile (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Collect FvImage Info.
   //
   ZeroMem (&FvImageInfo, sizeof (FvImageInfo));
   Status = FfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
   ASSERT_EFI_ERROR (Status);
-  
+
   //
   // FvAlignment must be more than 8 bytes required by FvHeader structure.
   //
@@ -803,7 +803,7 @@ FfsProcessFvFile (
   if (FvAlignment < 8) {
     FvAlignment = 8;
   }
-  
+
   //
   // Check FvImage
   //
@@ -824,7 +824,7 @@ FfsProcessFvFile (
   // Inform HOB consumer phase, i.e. DXE core, the existance of this FV
   //
   BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart, FvImageInfo.FvSize);
-  
+
   //
   // Makes the encapsulated volume show up in DXE phase to skip processing of
   // encapsulated file again.

@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -18,7 +18,7 @@
   GCC_ASM_EXPORT(__aeabi_ldivmod)
 
 //
-// A pair of (unsigned) long longs is returned in {{r0, r1}, {r2, r3}}, 
+// A pair of (unsigned) long longs is returned in {{r0, r1}, {r2, r3}},
 //  the quotient in {r0, r1}, and the remainder in {r2, r3}.
 //
 //__value_in_regs lldiv_t
@@ -42,7 +42,7 @@ L_Test1:
     rsbs     r2,r2,#0
     rsc      r3,r3,#0
 L_Test2:
-    bl       ASM_PFX(__aeabi_uldivmod)  
+    bl       ASM_PFX(__aeabi_uldivmod)
     tst      r4,#0x40000000
     beq      L_Test3
     rsbs     r0,r0,#0
@@ -54,6 +54,6 @@ L_Test3:
     rsc      r3,r3,#0
 L_Exit:
     pop      {r4,pc}
- 
+
 
 

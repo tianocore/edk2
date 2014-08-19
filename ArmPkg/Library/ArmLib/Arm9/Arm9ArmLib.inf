@@ -28,7 +28,7 @@
 
   Arm9Support.S    | GCC
   Arm9Support.asm  | RVCT
-  
+
   Arm9Lib.c
   Arm9CacheInformation.c
 
@@ -38,7 +38,7 @@
 
 [LibraryClasses]
   MemoryAllocationLib
-  
+
 [Protocols]
   gEfiCpuArchProtocolGuid
 

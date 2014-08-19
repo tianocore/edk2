@@ -1,11 +1,11 @@
 /** @file
   Template library implementation to support ResetSystem Runtime call.
-  
+
   Fill in the templates with what ever makes you system reset.
 
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -66,7 +66,7 @@ LibResetSystem (
   ASSERT (FALSE);
   return EFI_DEVICE_ERROR;
 }
-  
+
 
 
 /**
@@ -74,7 +74,7 @@ LibResetSystem (
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/

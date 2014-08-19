@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,13 +43,13 @@ LoadPeCoffImage (
   VOID                           *Buffer;
 
   ZeroMem (&ImageContext, sizeof (ImageContext));
-    
+
   ImageContext.Handle    = PeCoffImage;
   ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
 
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   ASSERT_EFI_ERROR (Status);
-  
+
 
   //
   // Allocate Memory for the image
@@ -88,7 +88,7 @@ LoadPeCoffImage (
 
 
 
-typedef 
+typedef
 VOID
 (EFIAPI *DXE_CORE_ENTRY_POINT) (
   IN  VOID *HobStart
@@ -116,7 +116,7 @@ LoadDxeCoreFromFfsFile (
     return Status;
   }
 
-  
+
   Status = LoadPeCoffImage (PeCoffImage, &ImageAddress, &ImageSize, &EntryPoint);
 // For NT32 Debug  Status = SecWinNtPeiLoadFile (PeCoffImage, &ImageAddress, &ImageSize, &EntryPoint);
   ASSERT_EFI_ERROR (Status);
@@ -128,22 +128,22 @@ LoadDxeCoreFromFfsFile (
   ASSERT_EFI_ERROR (Status);
 
   BuildModuleHob (&FvFileInfo.FileName, (EFI_PHYSICAL_ADDRESS)(UINTN)ImageAddress, EFI_SIZE_TO_PAGES ((UINT32) ImageSize) * EFI_PAGE_SIZE, EntryPoint);
-  
+
   DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading DxeCore at 0x%10p EntryPoint=0x%10p\n", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)EntryPoint));
 
   Hob = GetHobList ();
   if (StackSize == 0) {
     // User the current stack
-  
+
     ((DXE_CORE_ENTRY_POINT)(UINTN)EntryPoint) (Hob);
   } else {
-    
+
     //
     // Allocate 128KB for the Stack
     //
     BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (StackSize));
     ASSERT (BaseOfStack != NULL);
-  
+
     //
     // Compute the top of the stack we were allocated. Pre-allocate a UINTN
     // for safety.
@@ -153,7 +153,7 @@ LoadDxeCoreFromFfsFile (
 
     //
     // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
-    //    
+    //
     UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, StackSize);
 
     SwitchStack (
@@ -164,11 +164,11 @@ LoadDxeCoreFromFfsFile (
       );
 
   }
-  
+
   // Should never get here as DXE Core does not return
   DEBUG ((EFI_D_ERROR, "DxeCore returned\n"));
   ASSERT (FALSE);
-  
+
   return EFI_DEVICE_ERROR;
 }
 
@@ -199,9 +199,9 @@ LoadDxeCoreFromFv (
 
   if (!EFI_ERROR (Status)) {
     return LoadDxeCoreFromFfsFile (FileHandle, StackSize);
-  } 
-  
-  return Status;  
+  }
+
+  return Status;
 }
 
 
@@ -219,7 +219,7 @@ DecompressFirstFv (
   if (!EFI_ERROR (Status)) {
     Status = FfsProcessFvFile (FileHandle);
   }
-  
+
   return Status;
 }
 

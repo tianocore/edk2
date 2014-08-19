@@ -68,7 +68,7 @@ Arguments:
   This  - pointer to protocol
   Gpio  - which pin to read
   Value - state of the pin
-  
+
 Returns:
 
   EFI_SUCCESS - GPIO state returned in Value
@@ -94,7 +94,7 @@ Arguments:
   This  - pointer to protocol
   Gpio  - which pin to modify
   Mode  - mode to set
-  
+
 Returns:
 
   EFI_SUCCESS - GPIO set as requested
@@ -120,7 +120,7 @@ Arguments:
   This  - pointer to protocol
   Gpio  - which pin
   Mode  - pointer to output mode value
-  
+
 Returns:
 
   EFI_SUCCESS - mode value retrieved
@@ -146,7 +146,7 @@ Arguments:
   This  - pointer to protocol
   Gpio  - which pin
   Direction - pull-up, pull-down, or none
-  
+
 Returns:
 
   EFI_SUCCESS - pin was set
@@ -164,4 +164,4 @@ struct _EMBEDDED_GPIO {
 
 extern EFI_GUID gEmbeddedGpioProtocolGuid;
 
-#endif	
+#endif

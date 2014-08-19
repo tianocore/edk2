@@ -31,13 +31,13 @@ UINTN gScreenRows;
 // Global to turn on/off breaking commands with prompts before they scroll the screen
 BOOLEAN gPageBreak = TRUE;
 
-VOID 
+VOID
 RingBufferIncrement (
   IN  INTN  *Value
   )
 {
   *Value = *Value + 1;
-  
+
   if (*Value >= MAX_CMD_HISTORY) {
     *Value = 0;
   }
@@ -49,14 +49,14 @@ RingBufferDecrement (
   )
 {
   *Value = *Value - 1;
-  
+
   if (*Value < 0) {
     *Value = MAX_CMD_HISTORY - 1;
   }
 }
 
 /**
-  Save this command in the circular history buffer. Older commands are 
+  Save this command in the circular history buffer. Older commands are
   overwritten with newer commands.
 
   @param  Cmd   Command line to archive the history of.
@@ -71,7 +71,7 @@ SetCmdHistory (
 {
   // Don't bother adding empty commands to the list
   if (AsciiStrLen(Cmd) != 0) {
-  
+
     // First entry
     if (mCmdHistoryStart == -1) {
       mCmdHistoryStart   = 0;
@@ -79,19 +79,19 @@ SetCmdHistory (
     } else {
       // Record the new command at the next index
       RingBufferIncrement(&mCmdHistoryStart);
-  
+
       // If the next index runs into the end index, shuffle end back by one
       if (mCmdHistoryStart == mCmdHistoryEnd) {
         RingBufferIncrement(&mCmdHistoryEnd);
       }
     }
-  
+
     // Copy the new command line into the ring buffer
     AsciiStrnCpy(&mCmdHistory[mCmdHistoryStart][0], Cmd, MAX_CMD_LINE);
   }
-  
+
   // Reset the command history for the next up arrow press
-  mCmdHistoryCurrent = mCmdHistoryStart;  
+  mCmdHistoryCurrent = mCmdHistoryStart;
 }
 
 
@@ -110,41 +110,41 @@ GetCmdHistory (
   )
 {
   CHAR8 *HistoricalCommand = NULL;
-  
+
   // No history yet?
   if (mCmdHistoryCurrent == -1) {
     HistoricalCommand = mCmdBlank;
     goto Exit;
   }
-  
+
   if (Direction == SCAN_UP) {
     HistoricalCommand = &mCmdHistory[mCmdHistoryCurrent][0];
-    
+
     // if we just echoed the last command, hang out there, don't wrap around
     if (mCmdHistoryCurrent == mCmdHistoryEnd) {
       goto Exit;
     }
-    
+
     // otherwise, back up by one
     RingBufferDecrement(&mCmdHistoryCurrent);
-    
+
   } else if (Direction == SCAN_DOWN) {
-    
+
     // if we last echoed the start command, put a blank prompt out
     if (mCmdHistoryCurrent == mCmdHistoryStart) {
       HistoricalCommand = mCmdBlank;
       goto Exit;
     }
-    
+
     // otherwise increment the current pointer and return that command
     RingBufferIncrement(&mCmdHistoryCurrent);
     RingBufferIncrement(&mCmdHistoryCurrent);
-    
+
     HistoricalCommand = &mCmdHistory[mCmdHistoryCurrent][0];
     RingBufferDecrement(&mCmdHistoryCurrent);
   }
 
-Exit:  
+Exit:
   return HistoricalCommand;
 }
 
@@ -202,7 +202,7 @@ ParseArguments (
       } else if (*Char != ' ') {
         Argv[Arg++] = Char;
         LookingForArg = FALSE;
-      } 
+      }
     } else {
       // Looking for the terminator of an Argv[] entry
       if (!InQuote && (*Char == ' ')) {
@@ -214,7 +214,7 @@ ParseArguments (
         *Char = '\0';
         InQuote = FALSE;
       }
-    }    
+    }
   }
 
   *Argc = Arg;
@@ -236,7 +236,7 @@ ParseArguments (
 
   @param  Key           EFI Key information returned
   @param  TimeoutInSec  Number of seconds to wait to timeout
-  @param  CallBack      Callback called every second during the timeout wait 
+  @param  CallBack      Callback called every second during the timeout wait
 
   @return EFI_SUCCESS  Key was returned
   @return EFI_TIMEOUT  If the TimoutInSec expired
@@ -275,15 +275,15 @@ EblGetCharKey (
         if (WaitCount == 2) {
           gBS->CloseEvent (WaitList[1]);
         }
-        return EFI_SUCCESS; 
+        return EFI_SUCCESS;
       }
       break;
 
     case 1:
-      // Periodic 1 sec timer signaled 
+      // Periodic 1 sec timer signaled
       TimeoutInSec--;
       if (CallBack != NULL) {
-        // Call the users callback function if registered 
+        // Call the users callback function if registered
         CallBack (TimeoutInSec);
       }
       if (TimeoutInSec == 0) {
@@ -294,7 +294,7 @@ EblGetCharKey (
     default:
       ASSERT (FALSE);
     }
-  } 
+  }
 }
 
 
@@ -305,7 +305,7 @@ EblGetCharKey (
   If the use hits Q to quit return TRUE else for any other key return FALSE.
   PrefixNewline is used to figure out if a newline is needed before the prompt
   string. This depends on the last print done before calling this function.
-  CurrentRow is updated by one on a call or set back to zero if a prompt is 
+  CurrentRow is updated by one on a call or set back to zero if a prompt is
   needed.
 
   @param  CurrentRow  Used to figure out if its the end of the page and updated
@@ -349,7 +349,7 @@ EblAnyKeyToContinueQtoQuit (
 
 
 /**
-  Set the text color of the EFI Console. If a zero is passed in reset to 
+  Set the text color of the EFI Console. If a zero is passed in reset to
   default text/background color.
 
   @param  Attribute   For text and background color
@@ -372,12 +372,12 @@ EblSetTextColor (
 /**
   Collect the keyboard input for a cmd line. Carriage Return, New Line, or ESC
   terminates the command line. You can edit the command line via left arrow,
-  delete and backspace and they all back up and erase the command line. 
+  delete and backspace and they all back up and erase the command line.
   No edit of command line is possible without deletion at this time!
-  The up arrow and down arrow fill Cmd with information from the history 
+  The up arrow and down arrow fill Cmd with information from the history
   buffer.
 
-  @param  Cmd         Command line to return 
+  @param  Cmd         Command line to return
   @param  CmdMaxSize  Maximum size of Cmd
 
   @return The Status of EblGetCharKey()
@@ -462,9 +462,9 @@ EblPrintStartupBanner (
 
 /**
   Send null requests to all removable media block IO devices so the a media add/remove/change
-  can be detected in real before we execute a command. 
+  can be detected in real before we execute a command.
 
-  This is mainly due to the fact that the FAT driver does not do this today so you can get stale 
+  This is mainly due to the fact that the FAT driver does not do this today so you can get stale
   dir commands after an SD Card has been removed.
 **/
 VOID
@@ -521,7 +521,7 @@ EblPrompt (
   commands returns an error.
 
   @param  CmdLine          Command Line to process.
-  @param  MaxCmdLineSize   MaxSize of the Command line 
+  @param  MaxCmdLineSize   MaxSize of the Command line
 
   @return EFI status of the Command
 
@@ -559,17 +559,17 @@ ProcessCmdLine (
         }
       } else {
         AsciiPrint ("The command '%a' is not supported.\n", Argv[0]);
-      } 
-    } 
+      }
+    }
   }
 
   return Status;
 }
- 
+
 
 
 /**
-  Embedded Boot Loader (EBL) - A simple EFI command line application for embedded 
+  Embedded Boot Loader (EBL) - A simple EFI command line application for embedded
   devices. PcdEmbeddedAutomaticBootCommand is a complied in command line that
   gets executed automatically. The ; separator allows multiple commands
   for each command line.
@@ -585,7 +585,7 @@ EFIAPI
 EdkBootLoaderEntry (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
-  ) 
+  )
 {
   EFI_STATUS  Status;
   CHAR8       CmdLine[MAX_CMD_LINE];
@@ -605,7 +605,7 @@ EdkBootLoaderEntry (
   EblInitializeExternalCmd ();
   EblInitializeNetworkCmd();
   EblInitializeVariableCmds ();
-  
+
   if (gST->ConOut == NULL) {
     DEBUG((EFI_D_ERROR,"Error: No Console Output\n"));
     return EFI_NOT_READY;
@@ -628,29 +628,29 @@ EdkBootLoaderEntry (
   gST->ConOut->QueryMode (gST->ConOut, gST->ConOut->Mode->Mode, &gScreenColumns, &gScreenRows);
 
   EblPrintStartupBanner ();
- 
+
   // Parse command line and handle commands separated by ;
   // The loop prints the prompt gets user input and saves history
-  
+
   // Look for a variable with a default command line, otherwise use the Pcd
   ZeroMem(&VendorGuid, sizeof(EFI_GUID));
 
   Status = gRT->GetVariable(CommandLineVariableName, &VendorGuid, NULL, &CommandLineVariableSize, CommandLineVariable);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     CommandLineVariable = AllocatePool(CommandLineVariableSize);
-    
+
     Status = gRT->GetVariable(CommandLineVariableName, &VendorGuid, NULL, &CommandLineVariableSize, CommandLineVariable);
     if (!EFI_ERROR(Status)) {
       UnicodeStrToAsciiStr(CommandLineVariable, CmdLine);
     }
-    
+
     FreePool(CommandLineVariable);
   }
-  
+
   if (EFI_ERROR(Status)) {
     AsciiStrCpy (CmdLine, (CHAR8 *)PcdGetPtr (PcdEmbeddedAutomaticBootCommand));
   }
-  
+
   for (;;) {
     Status = ProcessCmdLine (CmdLine, MAX_CMD_LINE);
     if (Status == EFI_ABORTED) {

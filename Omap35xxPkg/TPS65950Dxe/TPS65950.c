@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,7 @@ Read (
   )
 {
   EFI_STATUS               Status;
-  EFI_SMBUS_DEVICE_ADDRESS SlaveAddress; 
+  EFI_SMBUS_DEVICE_ADDRESS SlaveAddress;
   UINT8                    DeviceRegister;
   UINTN                    DeviceRegisterLength = 1;
 
@@ -62,7 +62,7 @@ Write (
   )
 {
   EFI_STATUS               Status;
-  EFI_SMBUS_DEVICE_ADDRESS SlaveAddress; 
+  EFI_SMBUS_DEVICE_ADDRESS SlaveAddress;
   UINT8                    DeviceRegister;
   UINTN                    DeviceBufferLength = Length + 1;
   UINT8                    *DeviceBuffer;
@@ -107,10 +107,10 @@ TPS65950Initialize (
   )
 {
   EFI_STATUS  Status;
-  
+
   Status = gBS->LocateProtocol(&gEfiSmbusHcProtocolGuid, NULL, (VOID **)&Smbus);
   ASSERT_EFI_ERROR(Status);
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces(&ImageHandle, &gEmbeddedExternalDeviceProtocolGuid, &ExternalDevice, NULL);
   return Status;
 }

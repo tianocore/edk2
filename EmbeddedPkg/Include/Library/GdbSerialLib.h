@@ -19,7 +19,7 @@
 
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
+  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
   data buts, and stop bits on a serial device. This call is optional as the serial
   port will be set up with defaults base on PCD values.
 
@@ -40,11 +40,11 @@
 RETURN_STATUS
 EFIAPI
 GdbSerialInit (
-  IN UINT64     BaudRate, 
-  IN UINT8      Parity, 
-  IN UINT8      DataBits, 
-  IN UINT8      StopBits 
-  ); 
+  IN UINT64     BaudRate,
+  IN UINT8      Parity,
+  IN UINT8      DataBits,
+  IN UINT8      StopBits
+  );
 
 
 /**
@@ -53,7 +53,7 @@ GdbSerialInit (
 
   @return TRUE  - Character availible
   @return FALSE - Character not availible
-  
+
 **/
 BOOLEAN
 EFIAPI
@@ -65,7 +65,7 @@ GdbIsCharAvailable (
   Get a character from GDB. This function must be able to run in interrupt context.
 
   @return A character from GDB
-  
+
 **/
 CHAR8
 EFIAPI

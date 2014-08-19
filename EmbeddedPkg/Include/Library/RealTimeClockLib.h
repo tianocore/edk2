@@ -1,6 +1,6 @@
 /** @file
   Implement EFI RealTimeClock runtime services via Lib.
-  
+
   Currently this driver does not support runtime virtual calling.
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>

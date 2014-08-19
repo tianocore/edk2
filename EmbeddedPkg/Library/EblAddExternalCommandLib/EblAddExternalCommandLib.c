@@ -36,7 +36,7 @@ EBL_ADD_COMMAND_PROTOCOL      *gEblExternalCommand = NULL;
 
   @param  Key           EFI Key information returned
   @param  TimeoutInSec  Number of seconds to wait to timeout
-  @param  CallBack      Callback called every second during the timeout wait 
+  @param  CallBack      Callback called every second during the timeout wait
 
   @return EFI_SUCCESS  Key was returned
   @return EFI_TIMEOUT  If the TimoutInSec expired
@@ -64,7 +64,7 @@ EblGetCharKey (
   If the use hits Q to quit return TRUE else for any other key return FALSE.
   PrefixNewline is used to figure out if a newline is needed before the prompt
   string. This depends on the last print done before calling this function.
-  CurrentRow is updated by one on a call or set back to zero if a prompt is 
+  CurrentRow is updated by one on a call or set back to zero if a prompt is
   needed.
 
   @param  CurrentRow  Used to figure out if its the end of the page and updated
@@ -118,12 +118,12 @@ EblAddCommandNotificationEvent (
 
 /**
   The user Entry Point for the driver. The user code starts with this function
-  as the real entry point for the image goes into a library that calls this 
+  as the real entry point for the image goes into a library that calls this
   function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -141,7 +141,7 @@ EblAddExternalCommands (
 
   mAddExternalCmdLibTemplate     = EntryArray;
   mAddExternalCmdLibTemplateSize = ArrayCount;
-  
+
   EfiCreateProtocolNotifyEvent (
     &gEfiEblAddCommandProtocolGuid,
     TPL_CALLBACK,
@@ -149,7 +149,7 @@ EblAddExternalCommands (
     NULL,
     &mEblCommandRegistration
     );
-  
+
   return EFI_SUCCESS;
 }
 

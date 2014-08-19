@@ -3,7 +3,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2012, ARM Ltd. All rights reserved.
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -82,7 +82,7 @@ SerialPortRead (
   Poll the serial device to see if there is any data waiting.
 
   If there is data waiting to be read from the serial port, then return
-  TRUE.  If there is no data waiting to be read from the serial port, then 
+  TRUE.  If there is no data waiting to be read from the serial port, then
   return FALSE.
 
   @retval TRUE             Data is waiting to be read.

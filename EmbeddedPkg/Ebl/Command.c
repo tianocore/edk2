@@ -32,7 +32,7 @@ EBL_COMMAND_TABLE *mCmdTable[EBL_MAX_COMMAND_COUNT];
 
   @param  chr   one Ascii character
 
-  @return The uppercase value of Ascii character 
+  @return The uppercase value of Ascii character
 
 **/
 STATIC
@@ -55,11 +55,11 @@ AsciiToUpper (
   FirstString is identical to SecondString, then 0 is returned. Otherwise, the
   value returned is the first mismatched Unicode character in SecondString
   subtracted from the first mismatched Unicode character in FirstString.
-  
-  @param  FirstString   Pointer to a Null-terminated ASCII string.  
+
+  @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
   @param  Length        Max length to compare.
-  
+
   @retval 0   FirstString is identical to SecondString using case insensitive
               comparisons.
   @retval !=0 FirstString is not identical to SecondString using case
@@ -85,15 +85,15 @@ AsciiStrniCmp (
     SecondString++;
     Length--;
   }
-  
+
   return AsciiToUpper (*FirstString) - AsciiToUpper (*SecondString);
 }
 
 
 
 /**
-  Add a command to the mCmdTable. If there is no free space in the command 
-  table ASSERT. The mCmdTable is maintained in alphabetical order and the 
+  Add a command to the mCmdTable. If there is no free space in the command
+  table ASSERT. The mCmdTable is maintained in alphabetical order and the
   new entry is inserted into its sorted position.
 
   @param  Entry   Command Entry to add to the CmdTable
@@ -124,7 +124,7 @@ EblAddCommand (
       if (AsciiStriCmp (mCmdTable[Count - 1]->Name, Entry->Name) <= 0) {
         break;
       }
-      
+
       mCmdTable[Count] = mCmdTable[Count - 1];
     }
     mCmdTable[Count] = (EBL_COMMAND_TABLE *)Entry;
@@ -135,7 +135,7 @@ EblAddCommand (
 
 
 /**
-  Add an set of commands to the command table. Most commonly used on static 
+  Add an set of commands to the command table. Most commonly used on static
   array of commands.
 
   @param  EntryArray   Pointer to array of command entries
@@ -167,7 +167,7 @@ EBL_ADD_COMMAND_PROTOCOL gEblAddCommand = {
 
 
 /**
-  Return the best matching command for the passed in command name. The match 
+  Return the best matching command for the passed in command name. The match
   does not have to be exact, it just needs to be unique. This enables commands
   to be shortened to the smallest set of starting characters that is unique.
 
@@ -193,9 +193,9 @@ EblGetCommand (
   if (Str != NULL) {
     // If the command includes a trailing . command extension skip it for the match.
     // Example: hexdump.4
-    Length = (UINTN)(Str - CommandName); 
+    Length = (UINTN)(Str - CommandName);
   }
-  
+
   for (Index = 0, BestMatchCount = 0, Match = NULL; Index < mCmdTableNextFreeIndex; Index++) {
     if (AsciiStriCmp (mCmdTable[Index]->Name,  CommandName) == 0) {
       // match a command exactly
@@ -226,30 +226,30 @@ CountNewLines (
   )
 {
   UINTN Count;
-  
+
   if (Str == NULL) {
     return 0;
   }
-  
+
   for (Count = 0; *Str != '\0'; Str++) {
     if (Str[Count] == '\n') {
       Count++;
     }
   }
-  
+
   return Count;
 }
 
 
 /**
-  List out help information on all the commands or print extended information 
+  List out help information on all the commands or print extended information
   about a specific passed in command.
 
   Argv[0] - "help"
   Argv[1] - Command to display help about
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -281,7 +281,7 @@ EblHelpCmd (
       }
     }
   } else if (Argv[1] != NULL) {
-    // Print specific help 
+    // Print specific help
     for (Index = 0, CurrentRow = 0; Index < mCmdTableNextFreeIndex; Index++) {
       if (AsciiStriCmp (Argv[1], mCmdTable[Index]->Name) == 0) {
         Ptr = (mCmdTable[Index]->Help == NULL) ? mCmdTable[Index]->HelpSummary : mCmdTable[Index]->Help;
@@ -306,7 +306,7 @@ EblHelpCmd (
   Argv[0] - "exit"
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_ABORTED
@@ -326,14 +326,14 @@ EblExitCmd (
   UINT32                  DescriptorVersion;
   UINTN                   Pages;
 
-  if (Argc > 1) { 
+  if (Argc > 1) {
     if (AsciiStriCmp (Argv[1], "efi") != 0) {
       return EFI_ABORTED;
     }
   } else if (Argc == 1) {
     return EFI_ABORTED;
   }
-  
+
   MemoryMap = NULL;
   MemoryMapSize = 0;
   do {
@@ -348,7 +348,7 @@ EblExitCmd (
 
       Pages = EFI_SIZE_TO_PAGES (MemoryMapSize) + 1;
       MemoryMap = AllocatePages (Pages);
-    
+
       //
       // Get System MemoryMap
       //
@@ -375,9 +375,9 @@ EblExitCmd (
   // At this point it is very dangerous to do things EFI as most of EFI is now gone.
   // This command is useful if you are working with a debugger as it will shutdown
   // DMA and other things that could break a soft resets.
-  //  
+  //
   CpuDeadLoop ();
-  
+
   // Should never get here, but makes the compiler happy
   return EFI_ABORTED;
 }
@@ -385,8 +385,8 @@ EblExitCmd (
 
 /**
   Update the screen by decrementing the timeout value.
-  This AsciiPrint has to match the AsciiPrint in 
-  EblPauseCmd. 
+  This AsciiPrint has to match the AsciiPrint in
+  EblPauseCmd.
 
   @param  ElaspedTime   Current timeout value remaining
 
@@ -410,7 +410,7 @@ EblPauseCallback (
   Argv[1] - timeout value is decimal seconds
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS  Timeout expired with no input
@@ -445,7 +445,7 @@ EblPauseCmd (
   Argv[0] - "break"
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -471,7 +471,7 @@ EblBreakPointCmd (
   Argv[1] - warm or shutdown reset type
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -496,7 +496,7 @@ EblResetCmd (
     case 's':
       ResetType = EfiResetShutdown;
     }
-  } 
+  }
 
   gRT->ResetSystem (ResetType, EFI_SUCCESS, 0, NULL);
   return EFI_SUCCESS;
@@ -511,7 +511,7 @@ EblResetCmd (
   Argv[1] - on or off
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -524,7 +524,7 @@ EblPageCmd (
   )
 {
   if (Argc <= 1) {
-    // toggle setting   
+    // toggle setting
     gPageBreak = (gPageBreak) ? FALSE : TRUE;
   } else {
     // use argv to set the value
@@ -581,7 +581,7 @@ GetBytes (
   }
   if (Bytes >= 2) {
     Result = (Result << 8) + *Address++;
-  }  
+  }
   if (Bytes >= 3) {
     Result = (Result << 8) + *Address++;
   }
@@ -611,7 +611,7 @@ OutputData (
     AsciiPrint ("%08x: ", Offset);
     for (Line = 0; (Line < 0x10) && (Address < EndAddress);) {
       Bytes = EndAddress - Address;
-            
+
       switch (Width) {
         case 4:
           if (Bytes >= 4) {
@@ -667,7 +667,7 @@ OutputData (
       Blanks[Spaces] = '\0';
 
       AsciiPrint(Blanks);
-      
+
       Blanks[Spaces] = ' ';
     }
 
@@ -682,15 +682,15 @@ OutputData (
   if (Length % Width != 0) {
     AsciiPrint ("%08x\n", Offset);
   }
-  
+
   return EFI_SUCCESS;
 }
 
 
 /**
   See if command contains .# where # is a number. Return # as the Width
-  or 1 as the default Width for commands. 
-  
+  or 1 as the default Width for commands.
+
   Example hexdump.4 returns a width of 4.
 
   @param  Argv   Argv[0] is the command name
@@ -706,7 +706,7 @@ WidthFromCommandName (
 {
   CHAR8         *Str;
   UINTN         Width;
-  
+
   //Hexdump.2 HexDump.4 mean use a different width
   Str = AsciiStrStr (Argv, ".");
   if (Str != NULL) {
@@ -728,13 +728,13 @@ WidthFromCommandName (
   Toggle page break global. This turns on and off prompting to Quit or hit any
   key to continue when a command is about to scroll the screen with its output
 
-  Argv[0] - "hexdump"[.#]  # is optional 1,2, or 4 for width  
-  Argv[1] - Device or File to dump. 
+  Argv[0] - "hexdump"[.#]  # is optional 1,2, or 4 for width
+  Argv[1] - Device or File to dump.
   Argv[2] - Optional offset to start dumping
   Argv[3] - Optional number of bytes to dump
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -757,7 +757,7 @@ EblHexdumpCmd (
   if ((Argc < 2) || (Argc > 4)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Width = WidthFromCommandName (Argv[0], 1);
   if ((Width != 1) && (Width != 2) && (Width != 4)) {
     return EFI_INVALID_PARAMETER;
@@ -778,13 +778,13 @@ EblHexdumpCmd (
       // Make sure size includes the part of the file we have skipped
       Size += Offset;
     }
-  } 
+  }
 
   Status = EfiSeek (File, Offset, EfiSeekStart);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
-  
+
   for (; Offset + HEXDUMP_CHUNK <= Size; Offset += Chunk) {
     Chunk = HEXDUMP_CHUNK;
     Status = EfiRead (File, Location, &Chunk);
@@ -801,7 +801,7 @@ EblHexdumpCmd (
       goto Exit;
     }
   }
-  
+
   // Any left over?
   if (Offset < Size) {
     Chunk = Size - Offset;
@@ -894,7 +894,7 @@ EblInitializeCmdTable (
 {
 
   EblAddCommands (mCmdTemplate, sizeof (mCmdTemplate)/sizeof (EBL_COMMAND_TABLE));
-  
+
   gBS->InstallProtocolInterface (
         &gExternalCmdHandle,
         &gEfiEblAddCommandProtocolGuid,

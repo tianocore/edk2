@@ -42,7 +42,7 @@ EblAddExternalCommands (
 
   @param  TimeoutInSec  Number of seconds to wait to timeout
 
-  @param  CallBack      Callback called every second during the timeout wait 
+  @param  CallBack      Callback called every second during the timeout wait
 
 
 
@@ -86,7 +86,7 @@ EblGetCharKey (
 
   string. This depends on the last print done before calling this function.
 
-  CurrentRow is updated by one on a call or set back to zero if a prompt is 
+  CurrentRow is updated by one on a call or set back to zero if a prompt is
 
   needed.
 

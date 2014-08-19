@@ -2,7 +2,7 @@
   Basic serial IO abstaction for GDB
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,10 +28,10 @@ UINTN                   gTimeOut = 0;
 
 /**
   The constructor function initializes the UART.
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
@@ -43,20 +43,20 @@ GdbSerialLibDebugPortConstructor (
   )
 {
   EFI_STATUS    Status;
-  
+
   Status = gBS->LocateProtocol (&gEfiDebugPortProtocolGuid, NULL, (VOID **)&gDebugPort);
   if (!EFI_ERROR (Status)) {
     gTimeOut = PcdGet32 (PcdGdbMaxPacketRetryCount);
     gDebugPort->Reset (gDebugPort);
   }
-  
+
   return Status;
 }
 
 
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
+  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
   data buts, and stop bits on a serial device. This call is optional as the serial
   port will be set up with defaults base on PCD values.
 
@@ -77,14 +77,14 @@ GdbSerialLibDebugPortConstructor (
 RETURN_STATUS
 EFIAPI
 GdbSerialInit (
-  IN UINT64     BaudRate, 
-  IN UINT8      Parity, 
-  IN UINT8      DataBits, 
-  IN UINT8      StopBits 
+  IN UINT64     BaudRate,
+  IN UINT8      Parity,
+  IN UINT8      DataBits,
+  IN UINT8      StopBits
   )
 {
   EFI_STATUS  Status;
-  
+
   Status = gDebugPort->Reset (gDebugPort);
   return Status;
 }
@@ -96,18 +96,18 @@ GdbSerialInit (
 
   @return TRUE  - Character availible
   @return FALSE - Character not availible
-  
+
 **/
 BOOLEAN
 EFIAPI
 GdbIsCharAvailable (
   VOID
-  )  
+  )
 {
   EFI_STATUS  Status;
-  
+
   Status = gDebugPort->Poll (gDebugPort);
-  
+
   return (Status == EFI_SUCCESS ? TRUE : FALSE);
 }
 
@@ -116,7 +116,7 @@ GdbIsCharAvailable (
   Get a character from GDB. This function must be able to run in interrupt context.
 
   @return A character from GDB
-  
+
 **/
 CHAR8
 EFIAPI
@@ -127,12 +127,12 @@ GdbGetChar (
   EFI_STATUS  Status;
   CHAR8       Char;
   UINTN       BufferSize;
-  
+
   do {
     BufferSize = sizeof (Char);
     Status = gDebugPort->Read (gDebugPort, gTimeOut, &BufferSize, &Char);
   } while (EFI_ERROR (Status) || BufferSize != sizeof (Char));
-    
+
   return Char;
 }
 
@@ -153,12 +153,12 @@ GdbPutChar (
 {
   EFI_STATUS  Status;
   UINTN       BufferSize;
-  
+
   do {
     BufferSize = sizeof (Char);
     Status = gDebugPort->Write (gDebugPort, gTimeOut, &BufferSize, &Char);
   } while (EFI_ERROR (Status) || BufferSize != sizeof (Char));
-    
+
   return;
 }
 

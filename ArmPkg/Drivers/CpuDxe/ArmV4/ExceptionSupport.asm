@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -20,7 +20,7 @@
 
   PRESERVE8
   AREA  DxeExceptionHandlers, CODE, READONLY
-  
+
 ExceptionHandlersStart
 
 Reset
@@ -107,35 +107,35 @@ ExceptionHandlersEnd
 AsmCommonExceptionEntry
   mrc       p15, 0, r1, c6, c0, 2   ; Read IFAR
   stmfd     SP!,{R1}                ; Store the IFAR
-  
+
   mrc       p15, 0, r1, c5, c0, 1   ; Read IFSR
   stmfd     SP!,{R1}                ; Store the IFSR
-  
+
   mrc       p15, 0, r1, c6, c0, 0   ; Read DFAR
   stmfd     SP!,{R1}                ; Store the DFAR
-  
+
   mrc       p15, 0, r1, c5, c0, 0   ; Read DFSR
   stmfd     SP!,{R1}                ; Store the DFSR
-  
+
   mrs       R1,SPSR                 ; Read SPSR (which is the pre-exception CPSR)
   stmfd     SP!,{R1}                ; Store the SPSR
-  
+
   stmfd     SP!,{LR}                ; Store the link register (which is the pre-exception PC)
   stmfd     SP,{SP,LR}^             ; Store user/system mode stack pointer and link register
   nop                               ; Required by ARM architecture
   SUB       SP,SP,#0x08             ; Adjust stack pointer
   stmfd     SP!,{R2-R12}            ; Store general purpose registers
-  
+
   ldr       R3,[SP,#0x50]           ; Read saved R1 from the stack (it was saved by the exception entry routine)
   ldr       R2,[SP,#0x4C]           ; Read saved R0 from the stack (it was saved by the exception entry routine)
   stmfd     SP!,{R2-R3}             ; Store general purpose registers R0 and R1
-  
+
   mov       R1,SP                   ; Prepare System Context pointer as an argument for the exception handler
-  
+
   sub       SP,SP,#4                ; Adjust SP to preserve 8-byte alignment
   blx       CommonCExceptionHandler ; Call exception handler
   add       SP,SP,#4                ; Adjust SP back to where we were
-  
+
   ldr       R2,[SP,#0x40]           ; Load CPSR from context, in case it has changed
   MSR       SPSR_cxsf,R2            ; Store it back to the SPSR to be restored when exiting this handler
 
@@ -146,7 +146,7 @@ AsmCommonExceptionEntry
   ldmfd     SP!,{LR}                ; Restore the link register (which is the pre-exception PC)
   add       SP,SP,#0x1C             ; Clear out the remaining stack space
   movs      PC,LR                   ; Return from exception
-  
+
   END
 
 

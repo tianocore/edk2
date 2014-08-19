@@ -1,13 +1,13 @@
 #
 #  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
 import os
@@ -29,11 +29,11 @@ def dump_fv(ec, fv_base, fv_size):
     fv = firmware_volume.FirmwareVolume(ec,
                                         int(build.PCDs['gArmTokenSpaceGuid']['PcdFvBaseAddress'][0],16),
                                         int(build.PCDs['gArmTokenSpaceGuid']['PcdFvSize'][0],16))
-    
+
     ffs = fv.get_next_ffs()
-    while ffs != None:    
+    while ffs != None:
         print "# %s" % ffs
-    
+
         section = ffs.get_next_section()
         while section != None:
             print "\t%s" % section
@@ -42,21 +42,21 @@ def dump_fv(ec, fv_base, fv_size):
             except Exception:
                 pass
             section = ffs.get_next_section(section)
-            
+
         ffs = fv.get_next_ffs(ffs)
 
 def dump_system_table(ec, mem_base, mem_size):
     st = system_table.SystemTable(ec, mem_base, mem_size)
-    
+
     debug_info_table_base = st.get_configuration_table(system_table.DebugInfoTable.CONST_DEBUG_INFO_TABLE_GUID)
-    
+
     debug_info_table = system_table.DebugInfoTable(ec, debug_info_table_base)
     debug_info_table.dump()
 
 def load_symbol_from_file(ec, filename, address, verbose = False):
     if verbose:
         print "Add symbols of %s at 0x%x" % (filename, address)
-        
+
     try:
         ec.getImageService().addSymbols(filename, address)
     except:
@@ -81,28 +81,28 @@ class ArmPlatform:
         self.sysmembase = sysmembase
         self.sysmemsize = sysmemsize
         self.fvs = fvs
-        
+
 class ArmPlatformDebugger:
     system_table = None
     firmware_volumes = {}
-    
+
     REGION_TYPE_SYSMEM = 1
     REGION_TYPE_ROM    = 2
     REGION_TYPE_FV     = 3
-    
+
     def __init__(self, ec, report_log, regions, verbose = False):
         self.ec = ec
         self.verbose = verbose
         fvs = []
         sysmem_base = None
         sysmem_size = None
-        
+
         if report_log and os.path.isfile(report_log):
             try:
                 self.build = build_report.BuildReport(report_log)
             except IOError:
                 raise IOError(2, 'Report \'%s\' is not valid' % report_log)
-            
+
             # Generate list of supported Firmware Volumes
             if self.build.PCDs['gArmTokenSpaceGuid'].has_key('PcdFvSize') and int(self.build.PCDs['gArmTokenSpaceGuid']['PcdFvSize'][0],16) != 0:
                 fvs.append((int(self.build.PCDs['gArmTokenSpaceGuid']['PcdFvBaseAddress'][0],16),int(self.build.PCDs['gArmTokenSpaceGuid']['PcdFvSize'][0],16)))
@@ -110,7 +110,7 @@ class ArmPlatformDebugger:
                 fvs.append((int(self.build.PCDs['gArmTokenSpaceGuid']['PcdSecureFvBaseAddress'][0],16),int(self.build.PCDs['gArmTokenSpaceGuid']['PcdSecureFvSize'][0],16)))
             if self.build.PCDs['gArmTokenSpaceGuid'].has_key('PcdHypFvSize') and int(self.build.PCDs['gArmTokenSpaceGuid']['PcdHypFvSize'][0],16) != 0:
                 fvs.append((int(self.build.PCDs['gArmTokenSpaceGuid']['PcdHypFvBaseAddress'][0],16),int(self.build.PCDs['gArmTokenSpaceGuid']['PcdHypFvSize'][0],16)))
-            
+
             sysmem_base = int(self.build.PCDs['gArmTokenSpaceGuid']['PcdSystemMemoryBase'][0],16)
             sysmem_size = int(self.build.PCDs['gArmTokenSpaceGuid']['PcdSystemMemorySize'][0],16)
         else:
@@ -127,9 +127,9 @@ class ArmPlatformDebugger:
                             fvs.append((base,0))
                 else:
                     print "Region type '%d' Not Supported" % region[0]
-                    
+
         self.platform = ArmPlatform(sysmem_base, sysmem_size, fvs)
-        
+
     def in_sysmem(self, addr):
         return (self.platform.sysmembase is not None) and (self.platform.sysmembase <= addr) and (addr < self.platform.sysmembase + self.platform.sysmemsize)
 
@@ -146,21 +146,21 @@ class ArmPlatformDebugger:
         pc = int(self.ec.getRegisterService().getValue('PC')) & 0xFFFFFFFF
         if self.in_fv(pc):
             debug_infos = []
-            
+
             (fv_base, fv_size) = self.get_fv_at(pc)
-            
+
             if self.firmware_volumes.has_key(fv_base) == False:
                 self.firmware_volumes[fv_base] = firmware_volume.FirmwareVolume(self.ec, fv_base, fv_size)
-                
+
             stack_frame = self.ec.getTopLevelStackFrame()
             info = self.firmware_volumes[fv_base].load_symbols_at(int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF, self.verbose)
             debug_infos.append(info)
             while stack_frame.next() is not None:
                 stack_frame = stack_frame.next()
-                
+
                 # Stack frame attached to 'PC'
                 pc = int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF
-                
+
                 # Check if the symbols for this stack frame have already been loaded
                 found = False
                 for debug_info in debug_infos:
@@ -169,28 +169,28 @@ class ArmPlatformDebugger:
                 if found == False:
                     info = self.firmware_volumes[fv_base].load_symbols_at(pc)
                     debug_infos.append(info)
-                    
+
             #self.firmware_volumes[fv_base].load_symbols_at(pc)
         elif self.in_sysmem(pc):
             debug_infos = []
-            
+
             if self.system_table is None:
                 # Find the System Table
                 self.system_table = system_table.SystemTable(self.ec, self.platform.sysmembase, self.platform.sysmemsize)
-                
+
                 # Find the Debug Info Table
                 debug_info_table_base = self.system_table.get_configuration_table(system_table.DebugInfoTable.CONST_DEBUG_INFO_TABLE_GUID)
                 self.debug_info_table = system_table.DebugInfoTable(self.ec, debug_info_table_base)
-                
+
             stack_frame = self.ec.getTopLevelStackFrame()
             info = self.debug_info_table.load_symbols_at(int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF, self.verbose)
             debug_infos.append(info)
             while stack_frame.next() is not None:
                 stack_frame = stack_frame.next()
-                
+
                 # Stack frame attached to 'PC'
                 pc = int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF
-                
+
                 # Check if the symbols for this stack frame have already been loaded
                 found = False
                 for debug_info in debug_infos:
@@ -202,16 +202,16 @@ class ArmPlatformDebugger:
                         debug_infos.append(info)
                     except:
                         pass
-                
+
             #self.debug_info_table.load_symbols_at(pc)
         else:
             raise Exception('ArmPlatformDebugger', "Not supported region")
-        
+
     def load_all_symbols(self):
         # Load all the XIP symbols attached to the Firmware Volume
         for (fv_base, fv_size) in self.platform.fvs:
             if self.firmware_volumes.has_key(fv_base) == False:
-                self.firmware_volumes[fv_base] = firmware_volume.FirmwareVolume(self.ec, fv_base, fv_size)    
+                self.firmware_volumes[fv_base] = firmware_volume.FirmwareVolume(self.ec, fv_base, fv_size)
             self.firmware_volumes[fv_base].load_all_symbols(self.verbose)
 
         try:
@@ -219,12 +219,12 @@ class ArmPlatformDebugger:
             if self.system_table is None:
                 # Find the System Table
                 self.system_table = system_table.SystemTable(self.ec, self.platform.sysmembase, self.platform.sysmemsize)
-        
-                
+
+
                 # Find the Debug Info Table
                 debug_info_table_base = self.system_table.get_configuration_table(system_table.DebugInfoTable.CONST_DEBUG_INFO_TABLE_GUID)
                 self.debug_info_table = system_table.DebugInfoTable(self.ec, debug_info_table_base)
-            
+
             self.debug_info_table.load_all_symbols(self.verbose)
         except:
             # Debugger exception could be excepted if DRAM has not been initialized or if we have not started to run from DRAM yet

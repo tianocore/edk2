@@ -429,7 +429,7 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   DevicePath = DuplicateDevicePath (OldDevicePath);
 
   EndingDevicePath = (FILEPATH_DEVICE_PATH*)GetLastDevicePathNode (DevicePath);
- 
+
   Print(L"File path of the %s: ", FileName);
   StrnCpy (BootFilePath, EndingDevicePath->PathName, BOOT_DEVICE_FILEPATH_MAX);
   Status = EditHIInputStr (BootFilePath, BOOT_DEVICE_FILEPATH_MAX);

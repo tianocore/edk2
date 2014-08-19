@@ -1,14 +1,14 @@
 #/** @file
-#  
+#
 #  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 #**/
 
 
@@ -18,7 +18,7 @@
   FILE_GUID                      = 6085e1ca-0d2d-4ba4-9872-c59b36ffd6ad
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EblCmdLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = EblCmdLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 
 #
@@ -53,12 +53,12 @@
   TimerLib
   BdsLib
   FdtLib
-  
+
 [Protocols]
   gEfiDebugSupportProtocolGuid
   gEfiLoadedImageProtocolGuid
   gEfiDevicePathToTextProtocolGuid
-  
+
 [Guids]
   gEfiDebugImageInfoTableGuid
 

@@ -1,13 +1,13 @@
 #
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
 
@@ -33,7 +33,7 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
-  
+
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPlatformSecLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbSecLibRTSM/ArmRealViewEbSecLib.inf
@@ -62,14 +62,14 @@
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
-  
+
   # Install Debugger Exception Handlers.
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|TRUE
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM RealView Emulation Board"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmRealViewEb-A8"
-  
+
   #
   # NV Storage PCDs. Use base of 0x43F00000 for NOR0
   #
@@ -87,41 +87,41 @@
   # Stack for CPU Cores in Non Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x48000000
 
-  # System Memory (256MB) 
+  # System Memory (256MB)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x70000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x10000000
-  
+
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
-    
+
   #
   # ARM Pcds
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-  
+
   #
   # ARM PrimeCells
   #
-  
+
   ## SP804 Timer
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|1000000
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000        # expressed in 100ns units, 100,000 x 100 ns = 10,000,000 ns = 10 ms
   gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|36
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0x10011000 
+  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0x10011000
   gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0x10011020
   gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0x10012020
-  
+
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x10017000
-  
+
   ## PL111 Lcd
   gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x10020000
-  
+
   #
   # ARM PL011 - Serial Terminal
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x10009000
-  
+
   #
   # ARM General Interrupt Controller
   #
@@ -135,7 +135,7 @@
 #
 ################################################################################
 [Components.common]
-  
+
   #
   # SEC
   #
@@ -144,7 +144,7 @@
       # Use the implementation which set the Secure bits
       ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   }
-  
+
   #
   # PEI Phase modules
   #
@@ -189,15 +189,15 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf  
+  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf  
-  
+  EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
+
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
@@ -213,21 +213,21 @@
 
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
-  
+
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
 
   #
   # Semi-hosting filesystem
   #
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-  
+
   #
   # FAT filesystem + GPT/MBR partitioning
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-  
+
   #
   # Bds
   #

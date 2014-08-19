@@ -43,7 +43,7 @@ typedef struct {
   UINTN    CommandLength;
 } SEMIHOST_SYSTEM_BLOCK;
 
-#if defined(__CC_ARM) 
+#if defined(__CC_ARM)
 
 #if defined(__thumb__)
 #define SWI 0xAB

@@ -19,7 +19,7 @@
   FILE_GUID                      = 1F3A3278-82EB-4C0D-86F1-5BCDA5846CB2
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HobLib 
+  LIBRARY_CLASS                  = HobLib
 
 
 #
@@ -40,7 +40,7 @@
   BaseMemoryLib
   DebugLib
   PrePiHobListPointerLib
-  
+
 [Guids]
   gEfiHobMemoryAllocModuleGuid
   gEfiHobMemoryAllocStackGuid

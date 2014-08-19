@@ -28,7 +28,7 @@ ParseIp (
   Address->v4.Addr[2] = (UINT8)AsciiStrDecimalToUintn (String);
   String = AsciiStrStr(String, ".") + 1;
   Address->v4.Addr[3] = (UINT8)AsciiStrDecimalToUintn (String);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -41,28 +41,28 @@ EblIpCmd (
   EFI_STATUS        Status = EFI_INVALID_PARAMETER;
   EFI_MAC_ADDRESS   Mac;
   EFI_IP_ADDRESS    Ip;
-  
-  if (Argc == 1) {  
+
+  if (Argc == 1) {
     // Get current IP/MAC
-  
+
     // Get current MAC address
     Status = EblGetCurrentMacAddress (&Mac);
     if (EFI_ERROR (Status)) {
       goto Exit;
     }
-    
+
     AsciiPrint ("MAC Address:  %02x:%02x:%02x:%02x:%02x:%02x\n", Mac.Addr[0],  Mac.Addr[1],  Mac.Addr[2],  Mac.Addr[3],  Mac.Addr[4],  Mac.Addr[5]);
-    
+
     // Get current IP address
     Status = EblGetCurrentIpAddress (&Ip);
     if (EFI_ERROR(Status)) {
       AsciiPrint("IP Address is not configured.\n");
       Status = EFI_SUCCESS;
       goto Exit;
-    }    
+    }
 
   	AsciiPrint("IP Address:   %d.%d.%d.%d\n", Ip.v4.Addr[0], Ip.v4.Addr[1],Ip.v4.Addr[2], Ip.v4.Addr[3]);
-    
+
   } else if ((Argv[1][0] == 'r') && (Argc == 2)) {
     // Get new address via dhcp
     Status = EblPerformDHCP (TRUE);
@@ -72,10 +72,10 @@ EblIpCmd (
     if (EFI_ERROR (Status)) {
       goto Exit;
     }
-    
+
     Status = EblSetStationIp (&Ip, NULL);
   }
-  
+
 Exit:
   return Status;
 }

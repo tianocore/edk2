@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -60,7 +60,7 @@ InitCache (
   MemoryTable[1].VirtualBase  = SOC_REGISTERS_L3_PHYSICAL_BASE;
   MemoryTable[1].Length       = SOC_REGISTERS_L3_PHYSICAL_LENGTH;
   MemoryTable[1].Attributes   = SOC_REGISTERS_L3_ATTRIBUTES;
-  
+
   // SOC Registers. L4 interconnects
   MemoryTable[2].PhysicalBase = SOC_REGISTERS_L4_PHYSICAL_BASE;
   MemoryTable[2].VirtualBase  = SOC_REGISTERS_L4_PHYSICAL_BASE;
@@ -72,8 +72,8 @@ InitCache (
   MemoryTable[3].VirtualBase  = 0;
   MemoryTable[3].Length       = 0;
   MemoryTable[3].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)0;
-  
+
   ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
-  
+
   BuildMemoryAllocationHob((EFI_PHYSICAL_ADDRESS)(UINTN)TranslationTableBase, TranslationTableSize, EfiBootServicesData);
 }

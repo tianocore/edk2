@@ -19,18 +19,18 @@
 #include <Chipset/ArmV7.h>
 
   INCLUDE AsmMacroIoLib.inc
-  
+
   IMPORT  CEntryPoint
   IMPORT  ArmPlatformIsPrimaryCore
   IMPORT  ArmReadMpidr
   IMPORT  ArmPlatformPeiBootAction
   IMPORT  ArmPlatformStackSet
-  
+
   EXPORT  _ModuleEntryPoint
 
   PRESERVE8
   AREA    PrePiCoreEntryPoint, CODE, READONLY
-  
+
 StartupAddr        DCD      CEntryPoint
 
 _ModuleEntryPoint

@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -17,7 +17,7 @@
     EXPORT  __aeabi_uidivmod
     EXPORT  __aeabi_idiv
     EXPORT  __aeabi_idivmod
-           
+
     AREA  Math, CODE, READONLY
 
 ;
@@ -150,6 +150,6 @@ label1
     ; What to do about division by zero?  For now, just return.
 __aeabi_idiv0
     BX      r14
- 
+
     END
 

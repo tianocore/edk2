@@ -15,13 +15,13 @@
 #ifndef __OMAPLIB_H__
 #define __OMAPLIB_H__
 
-UINT32 
+UINT32
 EFIAPI
 GpioBase (
   IN  UINTN Port
   );
 
-UINT32 
+UINT32
 EFIAPI
 TimerBase (
   IN  UINTN Timer

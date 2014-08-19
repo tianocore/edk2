@@ -728,7 +728,7 @@ NorFlashFvbInitialize (
     Status = ValidateFvHeader (Instance);
   }
 
-  // Install the Default FVB header if required  
+  // Install the Default FVB header if required
   if (EFI_ERROR(Status)) {
     // There is no valid header, so time to install one.
     DEBUG((EFI_D_ERROR,"NorFlashFvbInitialize: ERROR - The FVB Header is not valid. Installing a correct one for this volume.\n"));

@@ -1,18 +1,18 @@
 #/** @file
-#  
+#
 #    Component description file for DxeIpl module
-#  
+#
 #   The responsibility of this module is to load the DXE Core from a Firmware Volume. This implementation i used to load a 32-bit DXE Core.
-#  
+#
 #  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 #**/
 
 [Defines]
@@ -48,7 +48,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  
+
 
 [LibraryClasses]
   BaseLib
@@ -58,7 +58,7 @@
   PeCoffLib
   CacheMaintenanceLib
   PrePiLib
-  
+
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize

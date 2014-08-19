@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 // Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
@@ -14,7 +14,7 @@
 //------------------------------------------------------------------------------
 
 #include <AsmMacroIoLib.h>
-    
+
     INCLUDE AsmMacroIoLib.inc
 
 #ifdef ARM_CPU_ARMv6
@@ -110,7 +110,7 @@ ArmWriteAuxCr
 
 ArmReadAuxCr
   mrc     p15, 0, r0, c1, c0, 1
-  bx      lr  
+  bx      lr
 
 ArmSetTTBR0
   mcr     p15,0,r0,c2,c0,0
@@ -170,7 +170,7 @@ ArmReadMVBar
 ArmWriteMVBar
   mcr     p15, 0, r0, c12, c0, 1
   bx      lr
-  
+
 ArmCallWFE
   wfe
   bx      lr

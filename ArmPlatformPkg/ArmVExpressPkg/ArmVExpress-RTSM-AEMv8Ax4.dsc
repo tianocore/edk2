@@ -116,7 +116,7 @@
 
   ## Trustzone enable (to make the transition from EL3 to EL2 in ArmPlatformPkg/Sec)
   gArmTokenSpaceGuid.PcdTrustzoneSupport|TRUE
- 
+
   #
   # ARM PrimeCell
   #
@@ -138,7 +138,7 @@
   ## PL180 MMC/SD card controller
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x1C010048
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x1C050000
- 
+
   #
   # ARM General Interrupt Controller
   #
@@ -180,7 +180,7 @@
       # Use the implementation which set the Secure bits
       ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   }
- 
+
   #
   # PEI Phase modules
   #
@@ -249,18 +249,18 @@
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
   ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
- 
+
   #
   # Semi-hosting filesystem
   #
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
- 
+
   #
   # Multimedia Card Interface
   #
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
- 
+
   #
   # Platform Driver
   #

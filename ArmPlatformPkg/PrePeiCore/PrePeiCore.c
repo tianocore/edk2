@@ -141,7 +141,7 @@ PrePeiCoreTemporaryRamSupport (
   // Migrate the temporary memory heap to permanent memory heap.
   //
   CopyMem (NewHeap, OldHeap, CopySize >> 1);
-  
+
   SecSwitchStack ((UINTN)NewStack - (UINTN)OldStack);
 
   return EFI_SUCCESS;

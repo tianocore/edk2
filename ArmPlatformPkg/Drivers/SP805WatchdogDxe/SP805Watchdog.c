@@ -352,7 +352,7 @@ SP805Initialize (
 
   // Prohibit any rogue access to SP805 registers
   SP805Lock();
-  
+
   //
   // Make sure the Watchdog Timer Architectural Protocol has not been installed in the system yet.
   // This will avoid conflicts with the universal watchdog

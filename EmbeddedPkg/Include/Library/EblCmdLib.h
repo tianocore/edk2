@@ -34,7 +34,7 @@ EblAddCommands (
 
 
 //
-// LIbrary constructor called directly from Ebl Code. 
+// LIbrary constructor called directly from Ebl Code.
 // This module calls EblAddCommand () or EblAddCommands () to register new commands
 //
 VOID

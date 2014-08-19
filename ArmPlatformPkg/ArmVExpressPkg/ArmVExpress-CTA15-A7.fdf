@@ -1,13 +1,13 @@
 #
 #  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
 ################################################################################
@@ -65,10 +65,10 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF MdeModulePkg/Core/Dxe/DxeMain.inf 
+  INF MdeModulePkg/Core/Dxe/DxeMain.inf
 
   #
-  # PI DXE Drivers producing Architectural Protocols (EFI Services) 
+  # PI DXE Drivers producing Architectural Protocols (EFI Services)
   #
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -82,7 +82,7 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-  
+
   #
   # Multiple Console IO support
   #
@@ -109,14 +109,14 @@ READ_LOCK_STATUS   = TRUE
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
-  
+
   #
   # Filesystems
   #
 !ifndef $(ARM_BIGLITTLE_TC2)
   INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 !endif
-  
+
   #
   # FAT filesystem + GPT/MBR partitioning
   #
@@ -142,7 +142,7 @@ READ_LOCK_STATUS   = TRUE
 
   # ACPI Support
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  
+
   #
   # Networking stack
   #
@@ -159,10 +159,10 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
   INF EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
-  
+
   #
   # UEFI application
-  #  
+  #
   INF ShellBinPkg/UefiShell/UefiShell.inf
 
   #
@@ -192,7 +192,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
   INF ArmPlatformPkg/PrePi/PeiMPCore.inf
-  
+
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
       SECTION FV_IMAGE = FVMAIN
@@ -211,7 +211,7 @@ READ_LOCK_STATUS   = TRUE
 
 
 ############################################################################
-# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   # 
+# Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   #
 ############################################################################
 #
 #[Rule.Common.DXE_DRIVER]
@@ -236,14 +236,14 @@ READ_LOCK_STATUS   = TRUE
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
     TE     TE                           $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI     STRING ="$(MODULE_NAME)" Optional         
+    UI     STRING ="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
      TE       TE                        $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI       STRING="$(MODULE_NAME)" Optional         
+     UI       STRING="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM.TIANOCOMPRESSED]
@@ -284,7 +284,7 @@ READ_LOCK_STATUS   = TRUE
 
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
-    UI     STRING ="$(MODULE_NAME)" Optional         
+    UI     STRING ="$(MODULE_NAME)" Optional
     PE32   PE32                         $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 

@@ -2,7 +2,7 @@
   Report status code lib on top of either SerialLib and/or EFI Serial Protocol.
   Based on PcdStatusCodeUseEfiSerial & PcdStatusCodeUseHardSerial settings
 
-  There is just a single runtime memory buffer that contans all the data. 
+  There is just a single runtime memory buffer that contans all the data.
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -77,12 +77,12 @@ LibReportStatusCode (
     // Print DEBUG() information into output buffer.
     //
     CharCount = AsciiVSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  Format, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  Format,
                   Marker
                   );
-  } else if (Data != NULL && 
+  } else if (Data != NULL &&
              CompareGuid (&Data->Type, &gEfiStatusCodeSpecificDataGuid) &&
              (CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE) {
     //
@@ -98,19 +98,19 @@ LibReportStatusCode (
     // Print ERROR information into output buffer.
     //
     CharCount = AsciiSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  "ERROR: C%x:V%x I%x", 
-                  CodeType, 
-                  Value, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  "ERROR: C%x:V%x I%x",
+                  CodeType,
+                  Value,
                   Instance
                   );
 
     //
-    // Make sure we don't try to print values that weren't 
+    // Make sure we don't try to print values that weren't
     // intended to be printed, especially NULL GUID pointers.
     //
-    
+
     if (CallerId != NULL) {
       CharCount += AsciiSPrint (
                      &Buffer[CharCount - 1],
@@ -136,19 +136,19 @@ LibReportStatusCode (
                    );
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) {
     CharCount = AsciiSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  "PROGRESS CODE: V%x I%x\n\r", 
-                  Value, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  "PROGRESS CODE: V%x I%x\n\r",
+                  Value,
                   Instance
                   );
   } else {
     CharCount = AsciiSPrint (
-                  Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
-                  "Undefined: C%x:V%x I%x\n\r", 
-                  CodeType, 
-                  Value, 
+                  Buffer,
+                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  "Undefined: C%x:V%x I%x\n\r",
+                  CodeType,
+                  Value,
                   Instance
                   );
   }
@@ -165,7 +165,7 @@ LibReportStatusCode (
       gBS->LocateProtocol (&gEfiSerialIoProtocolGuid, NULL, (VOID **) &mSerialIoProtocol);
     }
 
-    if (mSerialIoProtocol == NULL) {    
+    if (mSerialIoProtocol == NULL) {
       mSerialIoProtocol->Write (
         mSerialIoProtocol,
         &CharCount,

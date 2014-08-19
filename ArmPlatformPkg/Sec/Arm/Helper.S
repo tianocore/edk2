@@ -1,18 +1,18 @@
 #========================================================================================
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #=======================================================================================
 
 #start of the code section
-.text 
+.text
 .align 3
 
 GCC_ASM_EXPORT(return_from_exception)
@@ -36,7 +36,7 @@ ASM_PFX(enter_monitor_mode):
     mov     sp, r3                      @ Set the stack of the Monitor Mode
 
     mov     lr, r0                      @ Use the pass entrypoint as lr
-    
+
     msr     spsr_cxsf, r4               @ Use saved mode for the MOVS jump to the kernel
 
     mov     r4, r0                      @ Swap EntryPoint and MpId registers
@@ -80,5 +80,5 @@ ASM_PFX(set_non_secure_mode):
     isb
     pop     { r1 }
     bx      lr                @ return (hopefully thumb-safe!)
-    
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

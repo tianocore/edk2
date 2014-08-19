@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -193,7 +193,7 @@ CreateHobList (
   SetHobList (Hob);
 
   BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
-  
+
   Attributes =(
     EFI_RESOURCE_ATTRIBUTE_PRESENT |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -209,25 +209,25 @@ CreateHobList (
   BuildStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)StackBase, ((UINTN)MemoryBegin + MemoryLength) - (UINTN)StackBase);
 
   if (FeaturePcdGet (PcdPrePiProduceMemoryTypeInformationHob)) {
-    // Optional feature that helps prevent EFI memory map fragmentation. 
+    // Optional feature that helps prevent EFI memory map fragmentation.
     BuildMemoryTypeInformationHob ();
   }
-}  
-  
+}
+
 
 VOID
 EFIAPI
-BuildFvHobs (  
+BuildFvHobs (
   IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
   IN UINT64                       NumberOfBytes,
   IN EFI_RESOURCE_ATTRIBUTE_TYPE  *ResourceAttribute
-  ) 
+  )
 {
 
   EFI_RESOURCE_ATTRIBUTE_TYPE Resource;
-  
+
   BuildFvHob (PhysicalStart, NumberOfBytes);
-  
+
   if (ResourceAttribute == NULL) {
     Resource = (EFI_RESOURCE_ATTRIBUTE_PRESENT    |
                 EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -236,14 +236,14 @@ BuildFvHobs (
   } else {
     Resource = *ResourceAttribute;
   }
-  
+
   BuildResourceDescriptorHob (EFI_RESOURCE_FIRMWARE_DEVICE, Resource, PhysicalStart, NumberOfBytes);
 }
 
 /**
   Returns the next instance of a HOB type from the starting HOB.
 
-  This function searches the first instance of a HOB type from the starting HOB pointer. 
+  This function searches the first instance of a HOB type from the starting HOB pointer.
   If there does not exist such HOB type from the starting HOB pointer, it will return NULL.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
@@ -266,7 +266,7 @@ GetNextHob (
   EFI_PEI_HOB_POINTERS  Hob;
 
   ASSERT (HobStart != NULL);
-   
+
   Hob.Raw = (UINT8 *) HobStart;
   //
   // Parse the HOB list until end of list or matching type is found.
@@ -279,14 +279,14 @@ GetNextHob (
   }
   return NULL;
 }
-  
-  
+
+
 
 /**
   Returns the first instance of a HOB type among the whole HOB list.
 
-  This function searches the first instance of a HOB type among the whole HOB list. 
-  If there does not exist such HOB type in the HOB list, it will return NULL. 
+  This function searches the first instance of a HOB type among the whole HOB list.
+  If there does not exist such HOB type in the HOB list, it will return NULL.
 
   @param  Type          The HOB type to return.
 
@@ -307,10 +307,10 @@ GetFirstHob (
 
 
 /**
-  This function searches the first instance of a HOB from the starting HOB pointer. 
-  Such HOB should satisfy two conditions: 
-  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
-  If there does not exist such HOB from the starting HOB pointer, it will return NULL. 
+  This function searches the first instance of a HOB from the starting HOB pointer.
+  Such HOB should satisfy two conditions:
+  its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
+  If there does not exist such HOB from the starting HOB pointer, it will return NULL.
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
   to extract the data section and its size info respectively.
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
@@ -345,7 +345,7 @@ GetNextGuidHob (
 
 
 /**
-  This function searches the first instance of a HOB among the whole HOB list. 
+  This function searches the first instance of a HOB among the whole HOB list.
   Such HOB should satisfy two conditions:
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
   If there does not exist such HOB from the starting HOB pointer, it will return NULL.
@@ -374,7 +374,7 @@ GetFirstGuidHob (
 /**
   Get the Boot Mode from the HOB list.
 
-  This function returns the system boot mode information from the 
+  This function returns the system boot mode information from the
   PHIT HOB in HOB list.
 
   @param  VOID
@@ -398,7 +398,7 @@ GetBootMode (
 /**
   Get the Boot Mode from the HOB list.
 
-  This function returns the system boot mode information from the 
+  This function returns the system boot mode information from the
   PHIT HOB in HOB list.
 
   @param  VOID
@@ -459,7 +459,7 @@ BuildModuleHob (
   // Zero the reserved space to match HOB spec
   //
   ZeroMem (Hob->MemoryAllocationHeader.Reserved, sizeof (Hob->MemoryAllocationHeader.Reserved));
-  
+
   CopyGuid (&Hob->ModuleName, ModuleName);
   Hob->EntryPoint = EntryPoint;
 }
@@ -467,8 +467,8 @@ BuildModuleHob (
 /**
   Builds a GUID HOB with a certain data length.
 
-  This function builds a customized HOB tagged with a GUID for identification 
-  and returns the start address of GUID HOB data so that caller can fill the customized data. 
+  This function builds a customized HOB tagged with a GUID for identification
+  and returns the start address of GUID HOB data so that caller can fill the customized data.
   The HOB Header and Name field is already stripped.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
@@ -580,7 +580,7 @@ BuildFvHob (
   @param  Length        The size of the Firmware Volume in bytes.
   @param  FvName       The name of the Firmware Volume.
   @param  FileName      The name of the file.
-  
+
 **/
 VOID
 EFIAPI
@@ -655,7 +655,7 @@ BuildCpuHob (
   //
   // Zero the reserved space to match HOB spec
   //
-  ZeroMem (Hob->Reserved, sizeof (Hob->Reserved)); 
+  ZeroMem (Hob->Reserved, sizeof (Hob->Reserved));
 }
 
 
@@ -762,9 +762,9 @@ BuildMemoryAllocationHob (
 
   ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
           ((Length & (EFI_PAGE_SIZE - 1)) == 0));
-  
+
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));
-  
+
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;
@@ -786,7 +786,7 @@ BuildExtractSectionHob (
   )
 {
   EXTRACT_SECTION_DATA Data;
-  
+
   Data.SectionGetInfo    = SectionGetInfo;
   Data.SectionExtraction = SectionExtraction;
   BuildGuidDataHob (Guid, &Data, sizeof (Data));
@@ -809,10 +809,10 @@ BuildPeCoffLoaderHob (
   VOID
   )
 {
-  VOID  *Ptr;      
-  
+  VOID  *Ptr;
+
   Ptr = &gPeCoffProtocol;
-  BuildGuidDataHob (&gPeCoffLoaderProtocolGuid, &Ptr, sizeof (VOID *));  
+  BuildGuidDataHob (&gPeCoffLoaderProtocolGuid, &Ptr, sizeof (VOID *));
 }
 
 // May want to put this into a library so you only need the PCD setings if you are using the feature?

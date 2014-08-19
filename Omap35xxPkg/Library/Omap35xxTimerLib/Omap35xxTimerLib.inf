@@ -23,7 +23,7 @@
   FILE_GUID                      = fe1d7183-9abb-42ce-9a3b-36d7c6a8959f
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = TimerLib 
+  LIBRARY_CLASS                  = TimerLib
 
 [Sources.common]
   TimerLib.c

@@ -121,7 +121,7 @@ UncachedAllocateReservedPages (
   If Buffer was not allocated with a page allocation function in the Memory Allocation Library,
   then ASSERT().
   If Pages is zero, then ASSERT().
- 
+
   @param  Buffer                Pointer to the buffer of pages to free.
   @param  Pages                 The number of 4 KB pages to free.
 
@@ -212,7 +212,7 @@ UncachedAllocateAlignedReservedPages (
   If Buffer was not allocated with an aligned page allocation function in the Memory Allocation
   Library, then ASSERT().
   If Pages is zero, then ASSERT().
-  
+
   @param  Buffer                Pointer to the buffer of pages to free.
   @param  Pages                 The number of 4 KB pages to free.
 
@@ -343,7 +343,7 @@ UncachedAllocateReservedZeroPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT().
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
@@ -366,7 +366,7 @@ UncachedAllocateCopyPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT().
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
@@ -389,7 +389,7 @@ UncachedAllocateRuntimeCopyPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT().
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
@@ -639,7 +639,7 @@ UncachedAllocateAlignedReservedCopyPool (
   );
 
 /**
-  Frees a buffer that was previously allocated with one of the aligned pool allocation functions 
+  Frees a buffer that was previously allocated with one of the aligned pool allocation functions
   in the Memory Allocation Library.
 
   Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the

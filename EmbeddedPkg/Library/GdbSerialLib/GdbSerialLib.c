@@ -2,7 +2,7 @@
   Basic serial IO abstaction for GDB
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,10 +54,10 @@ UINTN gPort;
 
 /**
   The constructor function initializes the UART.
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
@@ -72,9 +72,9 @@ GdbSerialLibConstructor (
   UINT8     DataBits;
   UINT8     Parity;
   UINT8     StopBits;
-  
+
   gPort = (UINTN)PcdGet32 (PcdGdbUartPort);
-  
+
   BaudRate = PcdGet64 (PcdGdbBaudRate);
   Parity   = PcdGet8 (PcdGdbParity);
   DataBits = PcdGet8 (PcdGdbDataBits);
@@ -86,7 +86,7 @@ GdbSerialLibConstructor (
 
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
+  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
   data buts, and stop bits on a serial device. This call is optional as the serial
   port will be set up with defaults base on PCD values.
 
@@ -107,10 +107,10 @@ GdbSerialLibConstructor (
 RETURN_STATUS
 EFIAPI
 GdbSerialInit (
-  IN UINT64     BaudRate, 
-  IN UINT8      Parity, 
-  IN UINT8      DataBits, 
-  IN UINT8      StopBits 
+  IN UINT64     BaudRate,
+  IN UINT8      Parity,
+  IN UINT8      DataBits,
+  IN UINT8      StopBits
   )
 {
   UINTN           Divisor;
@@ -121,7 +121,7 @@ GdbSerialInit (
   //
   // We assume the UART has been turned on to decode gPort address range
   //
-  
+
   //
   // Map 5..8 to 0..3
   //
@@ -130,8 +130,8 @@ GdbSerialInit (
   //
   // Calculate divisor for baud generator
   //
-  Divisor = 115200/(UINTN)BaudRate; 
-  
+  Divisor = 115200/(UINTN)BaudRate;
+
   //
   // Set communications format
   //
@@ -167,18 +167,18 @@ GdbSerialInit (
 
   @return TRUE  - Character availible
   @return FALSE - Character not availible
-  
+
 **/
 BOOLEAN
 EFIAPI
 GdbIsCharAvailable (
   VOID
-  )  
+  )
 {
   UINT8   Data;
-  
+
   Data = IoRead8 (gPort + LSR_OFFSET);
-  
+
   return ((Data & LSR_RXDA) == LSR_RXDA);
 }
 
@@ -187,7 +187,7 @@ GdbIsCharAvailable (
   Get a character from GDB. This function must be able to run in interrupt context.
 
   @return A character from GDB
-  
+
 **/
 CHAR8
 EFIAPI
@@ -204,7 +204,7 @@ GdbGetChar (
   } while ((Data & LSR_RXDA) == 0);
 
   Char = IoRead8 (gPort);
-  
+
   // Make this an EFI_D_INFO after we get everything debugged.
   DEBUG ((EFI_D_ERROR, "<%c<", Char));
   return Char;
@@ -226,15 +226,15 @@ GdbPutChar (
   )
 {
   UINT8   Data;
-  
+
   // Make this an EFI_D_INFO after we get everything debugged.
   DEBUG ((EFI_D_ERROR, ">%c>", Char));
- 
+
   // Wait for the serial port to be ready
   do {
     Data = IoRead8 (gPort + LSR_OFFSET);
   } while ((Data & LSR_TXRDY) == 0);
-    
+
   IoWrite8 (gPort, Char);
 }
 

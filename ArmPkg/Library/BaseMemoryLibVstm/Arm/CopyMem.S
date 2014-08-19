@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # CopyMem() worker for ARM
 #
@@ -20,7 +20,7 @@
 /**
   Copy Length bytes from Source to Destination. Overlap is OK.
 
-  This implementation 
+  This implementation
 
   @param  Destination Target of copy
   @param  Source      Place to copy from
@@ -81,7 +81,7 @@ L16:
   bne  L29
   sub  r3, lr, #1
   sub  ip, ip, #1
-  ldrb  r3, [r3, #0]  
+  ldrb  r3, [r3, #0]
   sub  r2, r9, #1
   cmp  ip, #0
   sub  r9, r9, #1
@@ -90,7 +90,7 @@ L16:
   bne  L16
   b   L7
 L11:
-  ldrb  r3, [lr], #1  
+  ldrb  r3, [lr], #1
   sub  ip, ip, #1
   strb  r3, [r9], #1
 L26:
@@ -111,4 +111,4 @@ L7:
   mov  r0, r4
   ldmfd  sp!, {r4, r9, pc}
 
-  
+

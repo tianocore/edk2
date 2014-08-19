@@ -1,8 +1,8 @@
 /** @file
-  Simple Console that sits on a SerialLib. 
+  Simple Console that sits on a SerialLib.
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,7 +13,7 @@
 
 **/
 
-/* 
+/*
   Symbols used in table below
 ===========================
   ESC = 0x1B
@@ -295,17 +295,17 @@ ReadKeyStroke (
   )
 {
   CHAR8             Char;
-  
+
   if (!SerialPortPoll ()) {
     return EFI_NOT_READY;
   }
-  
+
   SerialPortRead ((UINT8 *)&Char, 1);
-  
+
   //
   // Check for ESC sequence. This code is not techincally correct VT100 code.
   // An illegal ESC sequence represents an ESC and the characters that follow.
-  // This code will eat one or two chars after an escape. This is done to 
+  // This code will eat one or two chars after an escape. This is done to
   // prevent some complex FIFOing of the data. It is good enough to get
   // the arrow and delete keys working
   //
@@ -332,7 +332,7 @@ ReadKeyStroke (
         Key->ScanCode = SCAN_HOME;
         break;
       case 'K':
-      case 'F': // PC ANSI 
+      case 'F': // PC ANSI
         Key->ScanCode = SCAN_END;
         break;
       case '@':
@@ -340,7 +340,7 @@ ReadKeyStroke (
         Key->ScanCode = SCAN_INSERT;
         break;
       case 'P':
-      case 'X': // PC ANSI 
+      case 'X': // PC ANSI
         Key->ScanCode = SCAN_DELETE;
         break;
       case 'U':
@@ -419,12 +419,12 @@ ReadKeyStroke (
       }
     }
   } else if (Char < ' ') {
-    if ((Char == CHAR_BACKSPACE) || 
-        (Char == CHAR_TAB)       || 
-        (Char == CHAR_LINEFEED)  || 
+    if ((Char == CHAR_BACKSPACE) ||
+        (Char == CHAR_TAB)       ||
+        (Char == CHAR_LINEFEED)  ||
         (Char == CHAR_CARRIAGE_RETURN)) {
       // Only let through EFI required control characters
-      Key->UnicodeChar = (CHAR16)Char;  
+      Key->UnicodeChar = (CHAR16)Char;
     }
   } else if (Char == 0x7f) {
     Key->ScanCode = SCAN_DELETE;
@@ -523,13 +523,13 @@ OutputString (
   EFI_SIMPLE_TEXT_OUTPUT_MODE *Mode;
   UINTN                       MaxColumn;
   UINTN                       MaxRow;
-  
+
   Size = StrLen(String) + 1;
   OutputString = AllocatePool(Size);
 
   //If there is any non-ascii characters in String buffer then replace it with '?'
   //Eventually, UnicodeStrToAsciiStr API should be fixed.
-  SafeUnicodeStrToAsciiStr(String, OutputString);  
+  SafeUnicodeStrToAsciiStr(String, OutputString);
   SerialPortWrite ((UINT8 *)OutputString, Size - 1);
 
   //
@@ -693,7 +693,7 @@ SetCursorPosition (
                   This,
                   Mode->Mode,
                   &MaxColumn,
-                  &MaxRow 
+                  &MaxRow
                   );
   if (EFI_ERROR(Status)) {
     return EFI_UNSUPPORTED;
@@ -742,7 +742,7 @@ SimpleTextInOutEntryPoint (
                   &mSimpleTextIn.WaitForKey
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces(
                   &mInstallHandle,
                   &gEfiSimpleTextInProtocolGuid,   &mSimpleTextIn,
@@ -754,6 +754,6 @@ SimpleTextInOutEntryPoint (
     gST->ConOut = &mSimpleTextOut;
     gST->ConIn = &mSimpleTextIn;
   }
-  
+
   return Status;
 }

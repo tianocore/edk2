@@ -2,15 +2,15 @@
   MMC/SD Card driver for OMAP 35xx (SDIO not supported)
 
   This driver always produces a BlockIo protocol but it starts off with no Media
-  present. A TimerCallBack detects when media is inserted or removed and after 
-  a media change event a call to BlockIo ReadBlocks/WriteBlocks will cause the 
+  present. A TimerCallBack detects when media is inserted or removed and after
+  a media change event a call to BlockIo ReadBlocks/WriteBlocks will cause the
   media to be detected (or removed) and the BlockIo Media structure will get
   updated. No MMC/SD Card harward registers are updated until the first BlockIo
-  ReadBlocks/WriteBlocks after media has been insterted (booting with a card 
-  plugged in counts as an insertion event). 
+  ReadBlocks/WriteBlocks after media has been insterted (booting with a card
+  plugged in counts as an insertion event).
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +47,7 @@ MMCHS_DEVICE_PATH gMmcHsDevicePath = {
     HW_VENDOR_DP,
     (UINT8)(sizeof(VENDOR_DEVICE_PATH)),
     (UINT8)((sizeof(VENDOR_DEVICE_PATH)) >> 8),
-    0xb615f1f5, 0x5088, 0x43cd, 0x80, 0x9c, 0xa1, 0x6e, 0x52, 0x48, 0x7d, 0x00 
+    0xb615f1f5, 0x5088, 0x43cd, 0x80, 0x9c, 0xa1, 0x6e, 0x52, 0x48, 0x7d, 0x00
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -68,8 +68,8 @@ BOOLEAN                    gMediaChange = FALSE;
 
 VOID
 ParseCardCIDData (
-  UINT32 Response0, 
-  UINT32 Response1, 
+  UINT32 Response0,
+  UINT32 Response1,
   UINT32 Response2,
   UINT32 Response3
   )
@@ -96,7 +96,7 @@ UpdateMMCHSClkFrequency (
   MmioAnd32 (MMCHS_SYSCTL, ~CEN);
 
   //Set new clock frequency.
-  MmioAndThenOr32 (MMCHS_SYSCTL, ~CLKD_MASK, NewCLKD << 6); 
+  MmioAndThenOr32 (MMCHS_SYSCTL, ~CLKD_MASK, NewCLKD << 6);
 
   //Poll till Internal Clock Stable
   while ((MmioRead32 (MMCHS_SYSCTL) & ICS_MASK) != ICS);
@@ -359,7 +359,7 @@ InitializeMMCHS (
   Data = VSEL_3_00V;
   Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEDICATED_REG), 1, &Data);
   ASSERT_EFI_ERROR(Status);
-  
+
   //After ramping up voltage, set VDDS stable bit to indicate that voltage level is stable.
   MmioOr32 (CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
 
@@ -424,13 +424,13 @@ PerformCardIdenfication (
 
   DEBUG ((EFI_D_INFO, "CMD0 response: %x\n", MmioRead32 (MMCHS_RSP10)));
 
-  //Send CMD5 command. 
+  //Send CMD5 command.
   Status = SendCmd (CMD5, CMD5_INT_EN, CmdArgument);
   if (Status == EFI_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "CMD5 Success. SDIO card. Follow SDIO card specification.\n"));
     DEBUG ((EFI_D_INFO, "CMD5 response: %x\n", MmioRead32 (MMCHS_RSP10)));
     //NOTE: Returning unsupported error for now. Need to implement SDIO specification.
-    return EFI_UNSUPPORTED; 
+    return EFI_UNSUPPORTED;
   } else {
     DEBUG ((EFI_D_INFO, "CMD5 fails. Not an SDIO card.\n"));
   }
@@ -462,7 +462,7 @@ PerformCardIdenfication (
 
   //Poll till card is busy
   while (RetryCount < MAX_RETRY_COUNT) {
-    //Send CMD55 command. 
+    //Send CMD55 command.
     CmdArgument = 0;
     Status = SendCmd (CMD55, CMD55_INT_EN, CmdArgument);
     if (Status == EFI_SUCCESS) {
@@ -616,7 +616,7 @@ PerformCardConfiguration (
   if ((gCardInfo.CardType != UNKNOWN_CARD) && (gCardInfo.CardType != MMC_CARD)) {
     // We could read SCR register, but SD Card Phys spec stats any SD Card shall
     // set SCR.SD_BUS_WIDTHS to support 4-bit mode, so why bother?
- 
+
     // Send ACMD6 (application specific commands must be prefixed with CMD55)
     Status = SendCmd (CMD55, CMD55_INT_EN, CmdArgument);
     if (!EFI_ERROR (Status)) {
@@ -759,11 +759,11 @@ CpuDeadLoop ();
   }
 
   ZeroMem (&DmaOperation, sizeof (DMA_MAP_OPERATION));
-  
+
 
   Dma4.DataType = 2;                      // DMA4_CSDPi[1:0]   32-bit elements from MMCHS_DATA
 
-  Dma4.SourceEndiansim = 0;               // DMA4_CSDPi[21]    
+  Dma4.SourceEndiansim = 0;               // DMA4_CSDPi[21]
 
   Dma4.DestinationEndianism = 0;          // DMA4_CSDPi[19]
 
@@ -771,11 +771,11 @@ CpuDeadLoop ();
 
   Dma4.DestinationPacked = 0;             // DMA4_CSDPi[13]
 
-  Dma4.NumberOfElementPerFrame = This->Media->BlockSize/4; // DMA4_CENi  (TRM 4K is optimum value)  
+  Dma4.NumberOfElementPerFrame = This->Media->BlockSize/4; // DMA4_CENi  (TRM 4K is optimum value)
 
-  Dma4.NumberOfFramePerTransferBlock = BlockCount;         // DMA4_CFNi    
+  Dma4.NumberOfFramePerTransferBlock = BlockCount;         // DMA4_CFNi
 
-  Dma4.ReadPriority = 0;                  // DMA4_CCRi[6]      Low priority read  
+  Dma4.ReadPriority = 0;                  // DMA4_CCRi[6]      Low priority read
 
   Dma4.WritePriority = 0;                 // DMA4_CCRi[23]     Prefetech disabled
 
@@ -792,7 +792,7 @@ CpuDeadLoop ();
 
     Dma4.WriteMode = 1;                     // DMA4_CSDPi[17:16] Write posted
 
-    
+
 
     Dma4.SourceStartAddress = MMCHS_DATA;                   // DMA4_CSSAi
 
@@ -812,11 +812,11 @@ CpuDeadLoop ();
 
     Dma4.WritePortAccessMode = 1;           // DMA4_CCRi[15:14]  Post increment memory address
 
-    Dma4.ReadRequestNumber = 0x1e;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_RX (61)  
+    Dma4.ReadRequestNumber = 0x1e;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_RX (61)
 
     Dma4.WriteRequestNumber = 1;            // DMA4_CCRi[20:19]  Syncro upper 0x3e == 62 (one based)
 
-  } else if (OperationType == WRITE) { 
+  } else if (OperationType == WRITE) {
     Cmd = CMD25; //Multiple block write
     CmdInterruptEnable = CMD25_INT_EN;
     DmaOperation = MapOperationBusMasterRead;
@@ -827,7 +827,7 @@ CpuDeadLoop ();
 
     Dma4.WriteMode = 1;                     // DMA4_CSDPi[17:16] Write posted ???
 
-    
+
 
     Dma4.SourceStartAddress = (UINT32)BufferAddress;        // DMA4_CSSAi
 
@@ -847,7 +847,7 @@ CpuDeadLoop ();
 
     Dma4.WritePortAccessMode = 0;           // DMA4_CCRi[15:14]  Always write MMCHS_DATA
 
-    Dma4.ReadRequestNumber = 0x1d;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_TX (60)  
+    Dma4.ReadRequestNumber = 0x1d;          // DMA4_CCRi[4:0]    Syncro with MMCA_DMA_TX (60)
 
     Dma4.WriteRequestNumber = 1;            // DMA4_CCRi[20:19]  Syncro upper 0x3d == 61 (one based)
 
@@ -857,7 +857,7 @@ CpuDeadLoop ();
 
 
   EnableDmaChannel (2, &Dma4);
-  
+
 
   //Set command argument based on the card access mode (Byte mode or Block mode)
   if (gCardInfo.OCRData.AccessMode & BIT1) {
@@ -899,7 +899,7 @@ CpuDeadLoop ();
       }
     }
     RetryCount++;
-  } 
+  }
 
   DisableDmaChannel (2, DMA4_CSR_BLOCK, DMA4_CSR_ERR);
   Status = DmaUnmap (BufferMap);
@@ -933,7 +933,7 @@ TransferBlock (
   if (OperationType == READ) {
     Cmd = CMD17; //Single block read
     CmdInterruptEnable = CMD18_INT_EN;
-  } else if (OperationType == WRITE) { 
+  } else if (OperationType == WRITE) {
     Cmd = CMD24; //Single block write
     CmdInterruptEnable = CMD24_INT_EN;
   }
@@ -991,7 +991,7 @@ TransferBlock (
       }
     }
     RetryCount++;
-  } 
+  }
 
   if (RetryCount == MAX_RETRY_COUNT) {
     DEBUG ((EFI_D_ERROR, "TransferBlockData timed out.\n"));
@@ -1083,13 +1083,13 @@ DetectCard (
     DEBUG ((EFI_D_ERROR, "No MMC/SD card detected.\n"));
     return Status;
   }
-  
+
   //Get CSD (Card specific data) for the detected card.
   Status = GetCardSpecificData();
   if (EFI_ERROR(Status)) {
     return Status;
   }
-  
+
   //Configure the card in data transfer mode.
   Status = PerformCardConfiguration();
   if (EFI_ERROR(Status)) {
@@ -1100,8 +1100,8 @@ DetectCard (
   gMMCHSMedia.LastBlock    = (gCardInfo.NumBlocks - 1);
   gMMCHSMedia.BlockSize    = gCardInfo.BlockSize;
   gMMCHSMedia.ReadOnly     = (MmioRead32 (GPIO1_BASE + GPIO_DATAIN) & BIT23) == BIT23;
-  gMMCHSMedia.MediaPresent = TRUE; 
-  gMMCHSMedia.MediaId++; 
+  gMMCHSMedia.MediaPresent = TRUE;
+  gMMCHSMedia.MediaId++;
 
   DEBUG ((EFI_D_INFO, "SD Card Media Change on Handle 0x%08x\n", gImageHandle));
 
@@ -1113,8 +1113,8 @@ DetectCard (
 EFI_STATUS
 SdReadWrite (
   IN EFI_BLOCK_IO_PROTOCOL    *This,
-  IN  UINTN                   Lba, 
-  OUT VOID                    *Buffer, 
+  IN  UINTN                   Lba,
+  OUT VOID                    *Buffer,
   IN  UINTN                   BufferSize,
   IN  OPERATION_TYPE          OperationType
   )
@@ -1129,7 +1129,7 @@ SdReadWrite (
   BOOLEAN    Update;
 
 
-  
+
   Update               = FALSE;
 
   if (gMediaChange) {
@@ -1140,7 +1140,7 @@ SdReadWrite (
       gMMCHSMedia.MediaPresent = FALSE;
       gMMCHSMedia.LastBlock    = 0;
       gMMCHSMedia.BlockSize    = 512;  // Should be zero but there is a bug in DiskIo
-      gMMCHSMedia.ReadOnly     = FALSE; 
+      gMMCHSMedia.ReadOnly     = FALSE;
     }
     gMediaChange             = FALSE;
   } else if (!gMMCHSMedia.MediaPresent) {
@@ -1172,7 +1172,7 @@ SdReadWrite (
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
-  
+
   if ((BufferSize % This->Media->BlockSize) != 0) {
     Status = EFI_BAD_BUFFER_SIZE;
     goto Done;
@@ -1258,7 +1258,7 @@ MMCHSReset (
   IN BOOLEAN                        ExtendedVerification
   )
 {
-  return EFI_SUCCESS; 
+  return EFI_SUCCESS;
 }
 
 
@@ -1292,7 +1292,7 @@ MMCHSReset (
 
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
 
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
 
                                 or the buffer is not on proper alignment.
 
@@ -1351,7 +1351,7 @@ MMCHSReadBlocks (
 
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
 
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
 
                                 or the buffer is not on proper alignment.
 
@@ -1422,7 +1422,7 @@ EFI_BLOCK_IO_PROTOCOL gBlockIo = {
 
   Timer callback to convert card present hardware into a boolean that indicates
 
-  a media change event has happened. If you just check the GPIO you could see 
+  a media change event has happened. If you just check the GPIO you could see
 
   card 1 and then check again after card 1 was removed and card 2 was inserted
 
@@ -1457,7 +1457,7 @@ TimerCallback (
     }
   } else {
     if (Present && !gMediaChange) {
-      gMediaChange = TRUE;    
+      gMediaChange = TRUE;
     }
   }
 }
@@ -1479,14 +1479,14 @@ MMCHSInitialize (
 
   Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, TimerCallback, NULL, &gTimerEvent);
   ASSERT_EFI_ERROR (Status);
- 
-  Status = gBS->SetTimer (gTimerEvent, TimerPeriodic, FixedPcdGet32 (PcdMmchsTimerFreq100NanoSeconds)); 
+
+  Status = gBS->SetTimer (gTimerEvent, TimerPeriodic, FixedPcdGet32 (PcdMmchsTimerFreq100NanoSeconds));
   ASSERT_EFI_ERROR (Status);
 
   //Publish BlockIO.
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle, 
-                  &gEfiBlockIoProtocolGuid,    &gBlockIo, 
+                  &ImageHandle,
+                  &gEfiBlockIoProtocolGuid,    &gBlockIo,
                   &gEfiDevicePathProtocolGuid, &gMmcHsDevicePath,
                   NULL
                   );

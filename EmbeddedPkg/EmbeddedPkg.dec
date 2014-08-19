@@ -75,7 +75,7 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE|BOOLEAN|0x00000006
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|FALSE|BOOLEAN|0x00000041
   gEmbeddedTokenSpaceGuid.PcdEmbeddedProbeRemovable|TRUE|BOOLEAN|0x00000052
-  
+
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
@@ -90,14 +90,14 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|131072|UINT32|0x00000040
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
-  
+
   gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x0|UINT32|0x0000004e
   gEmbeddedTokenSpaceGuid.PcdMemorySize|0x0|UINT32|0x0000004f
 
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0x0|UINT32|0x00000043
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainOffset|0x0|UINT32|0x00000044
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0x0|UINT32|0x00000045
-  
+
 # Used to help reduce fragmentation in the EFI memory map
 # EFI Pages (4K) are the units used
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0|UINT32|0x00000012
@@ -116,7 +116,7 @@
   gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress|0x38e00000|UINT32|0x0000001f
 
   gEmbeddedTokenSpaceGuid.PcdMetronomeTickPeriod|100|UINT32|0x00000020
-  
+
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress|0xffff0000|UINT32|0x00000030
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize|0x0000000|UINT32|0x00000031
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|0x0000000|UINT64|0x00000032

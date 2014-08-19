@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -87,20 +87,20 @@ PciRootBridgeIoPciRW (
   return EFI_SUCCESS;
 }
 
-/**                                                                 
+/**
   Enables a PCI driver to access PCI controller registers in the PCI root bridge memory space.
-          
+
   @param  This                  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Width                 Signifies the width of the memory operations.
-  @param  Address               The base address of the memory operations.                                  
+  @param  Address               The base address of the memory operations.
   @param  Count                 The number of memory operations to perform.
   @param  Buffer                For read operations, the destination buffer to store the results. For write
-                                operations, the source buffer to write data from.                          
-  
-  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.  
+                                operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -120,7 +120,7 @@ PciRootBridgeIoMemRead (
   if ( Buffer == NULL ) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Private = INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS (This);
 
   if (!PciRootBridgeMemAddressValid (Private, Address)) {
@@ -153,30 +153,30 @@ PciRootBridgeIoMemRead (
   case EfiPciWidthFillUint32:
   case EfiPciWidthFillUint64:
     return PciRootBridgeIoMemRW (Width, Count, FALSE, In, TRUE, Out);
-  
+
   default:
     break;
   }
-  
+
   return EFI_INVALID_PARAMETER;
 }
 
 
 
-/**                                                                 
+/**
   Enables a PCI driver to access PCI controller registers in the PCI root bridge memory space.
-          
+
   @param  This                  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Width                 Signifies the width of the memory operations.
-  @param  Address               The base address of the memory operations.                                  
+  @param  Address               The base address of the memory operations.
   @param  Count                 The number of memory operations to perform.
   @param  Buffer                For read operations, the destination buffer to store the results. For write
-                                operations, the source buffer to write data from.                          
-  
-  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.  
+                                operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -196,7 +196,7 @@ PciRootBridgeIoMemWrite (
   if ( Buffer == NULL ) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Private = INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS (This);
 
   if (!PciRootBridgeMemAddressValid (Private, Address)) {
@@ -217,7 +217,7 @@ PciRootBridgeIoMemWrite (
   case EfiPciWidthUint32:
   case EfiPciWidthUint64:
     return PciRootBridgeIoMemRW (Width, Count, TRUE, In, TRUE, Out);
-  
+
   case EfiPciWidthFifoUint8:
   case EfiPciWidthFifoUint16:
   case EfiPciWidthFifoUint32:
@@ -229,7 +229,7 @@ PciRootBridgeIoMemWrite (
   case EfiPciWidthFillUint32:
   case EfiPciWidthFillUint64:
     return PciRootBridgeIoMemRW (Width, Count, TRUE, In, FALSE, Out);
-  
+
   default:
     break;
   }
@@ -237,20 +237,20 @@ PciRootBridgeIoMemWrite (
   return EFI_INVALID_PARAMETER;
 }
 
-/**                                                                 
+/**
   Enables a PCI driver to access PCI controller registers in the PCI root bridge memory space.
-          
+
   @param  This                  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Width                 Signifies the width of the memory operations.
-  @param  Address               The base address of the memory operations.                                  
+  @param  Address               The base address of the memory operations.
   @param  Count                 The number of memory operations to perform.
   @param  Buffer                For read operations, the destination buffer to store the results. For write
-                                operations, the source buffer to write data from.                          
-  
-  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.  
+                                operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -271,20 +271,20 @@ PciRootBridgeIoPciRead (
 
 
 
-/**                                                                 
+/**
   Enables a PCI driver to access PCI controller registers in the PCI root bridge memory space.
-          
+
   @param  This                  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Width                 Signifies the width of the memory operations.
-  @param  Address               The base address of the memory operations.                                  
+  @param  Address               The base address of the memory operations.
   @param  Count                 The number of memory operations to perform.
   @param  Buffer                For read operations, the destination buffer to store the results. For write
-                                operations, the source buffer to write data from.                          
-  
-  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.  
+                                operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -299,7 +299,7 @@ PciRootBridgeIoPciWrite (
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   return PciRootBridgeIoPciRW (This, TRUE, Width, Address, Count, Buffer);
 }
 

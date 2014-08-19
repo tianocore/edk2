@@ -1,13 +1,13 @@
 //
 //  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-//  
-//  This program and the accompanying materials                          
-//  are licensed and made available under the terms and conditions of the BSD License         
-//  which accompanies this distribution.  The full text of the license may be found at        
-//  http://opensource.org/licenses/bsd-license.php                                            
 //
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+//  This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 //
 
@@ -17,13 +17,13 @@
 #include <AutoGen.h>
 
   INCLUDE AsmMacroIoLib.inc
-  
+
   EXPORT  PL35xSmcInitialize
   EXPORT  PL35xSmcSetRefresh
 
   PRESERVE8
   AREA    ModuleInitializeSMC, CODE, READONLY
-  
+
 // IN r1 Smc Base Address
 // IN r2 Smc Configuration Start Address
 // IN r3 Smc Configuration End Address

@@ -36,7 +36,7 @@ LibResetSystem (
   IN UINTN            DataSize,
   IN CHAR16           *ResetData OPTIONAL
   );
-  
+
 
 
 /**
@@ -44,7 +44,7 @@ LibResetSystem (
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/

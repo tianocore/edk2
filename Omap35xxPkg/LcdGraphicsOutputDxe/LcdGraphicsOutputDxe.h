@@ -144,7 +144,7 @@ LcdGraphicsBlt (
 #define LCDENABLE       BIT0
 #define ACTIVEMATRIX    BIT3
 #define GOLCD           BIT5
-#define DATALINES24     (BIT8 | BIT9)   
+#define DATALINES24     (BIT8 | BIT9)
 #define LCDENABLESIGNAL BIT28
 
 #define GFXENABLE       BIT0

@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -18,11 +18,11 @@
   .align 2
   GCC_ASM_EXPORT(__aeabi_uldivmod)
 
-//        
+//
 //UINT64
 //EFIAPI
 //__aeabi_uldivmod (
-//  IN  UINT64   Dividend  
+//  IN  UINT64   Dividend
 //  IN  UINT64   Divisor
 //  )
 //
@@ -77,7 +77,7 @@ ASM_PFX(__aeabi_uldivmod_label2):
   mov     ip, r3
   mov     lr, r2
   b       ASM_PFX(_ll_udiv_ginormous)
-  
+
 ASM_PFX(_ll_udiv_small):
   cmp     r4, ip, lsl #1
   mov     r3, #0  // 0x0
@@ -157,7 +157,7 @@ ASM_PFX(_ll_udiv_small_label5):
   add     r1, r1, r3, lsl r6
   mov     r3, #0  // 0x0
   ldmia   sp!, {r4, r5, r6, pc}
-  
+
 ASM_PFX(_ll_udiv_big):
   subs    r0, r5, lr
   mov     r3, #0  // 0x0
@@ -245,7 +245,7 @@ ASM_PFX(_ll_udiv_big_label4):
   orr     r2, r2, r4, ror r6
   adc     r1, r1, #0      // 0x0
   ldmia   sp!, {r4, r5, r6, pc}
-  
+
 ASM_PFX(_ll_udiv_ginormous):
   subs    r2, r5, lr
   mov     r1, #0  // 0x0
@@ -254,13 +254,13 @@ ASM_PFX(_ll_udiv_ginormous):
   movcc   r2, r5
   movcc   r3, r4
   ldmia   sp!, {r4, r5, r6, pc}
-  
+
 ASM_PFX(_ll_div0):
   ldmia   sp!, {r4, r5, r6, lr}
   mov     r0, #0  // 0x0
   mov     r1, #0  // 0x0
   b       ASM_PFX(__aeabi_ldiv0)
-  
+
 ASM_PFX(__aeabi_ldiv0):
   bx      r14
 

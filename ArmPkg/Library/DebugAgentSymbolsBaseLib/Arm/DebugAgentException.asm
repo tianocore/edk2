@@ -44,7 +44,7 @@ This is the stack constructed by the exception handler (low address to high addr
   IFAR  0x50
 
   LR    0x54    # SVC Link register (we need to restore it)
-  
+
   LR    0x58    # pushed by srsfd
   CPSR  0x5c
 
@@ -77,7 +77,7 @@ ResetEntry
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
-  
+
   mov       R0,#0                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1

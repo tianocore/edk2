@@ -2,13 +2,13 @@
  The data structures in this code come from:
  OMAP35x Applications Processor Technical Reference Manual chapter 25
  OMAP34xx Multimedia Device Technical Reference Manual chapter 26.4.8.
- 
- You should use the OMAP35x manual when possible. Some things, like SectionKey, 
+
+ You should use the OMAP35x manual when possible. Some things, like SectionKey,
  are not defined in the OMAP35x manual and you have to use the OMAP34xx manual
- to find the data. 
+ to find the data.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -44,22 +44,22 @@ typedef struct {
   unsigned char  Version;
   unsigned short Reserved;
   unsigned int   Flags;
-  unsigned int   PRM_CLKSRC_CTRL; 
-  unsigned int   PRM_CLKSEL; 
+  unsigned int   PRM_CLKSRC_CTRL;
+  unsigned int   PRM_CLKSEL;
   unsigned int   CM_CLKSEL1_EMU;
   unsigned int   CM_CLKSEL_CORE;
   unsigned int   CM_CLKSEL_WKUP;
   unsigned int   CM_CLKEN_PLL_DPLL3;
-  unsigned int   CM_AUTOIDLE_PLL_DPLL3; 
-  unsigned int   CM_CLKSEL1_PLL; 
+  unsigned int   CM_AUTOIDLE_PLL_DPLL3;
+  unsigned int   CM_CLKSEL1_PLL;
   unsigned int   CM_CLKEN_PLL_DPLL4;
   unsigned int   CM_AUTOIDLE_PLL_DPLL4;
   unsigned int   CM_CLKSEL2_PLL;
-  unsigned int   CM_CLKSEL3_PLL; 
-  unsigned int   CM_CLKEN_PLL_MPU; 
-  unsigned int   CM_AUTOIDLE_PLL_MPU; 
-  unsigned int   CM_CLKSEL1_PLL_MPU; 
-  unsigned int   CM_CLKSEL2_PLL_MPU; 
+  unsigned int   CM_CLKSEL3_PLL;
+  unsigned int   CM_CLKEN_PLL_MPU;
+  unsigned int   CM_AUTOIDLE_PLL_MPU;
+  unsigned int   CM_CLKSEL1_PLL_MPU;
+  unsigned int   CM_CLKSEL2_PLL_MPU;
   unsigned int   CM_CLKSTCTRL_MPU;
 } CHSETTINGS_DATA;
 
@@ -131,7 +131,7 @@ PopulateCHSETTINGSData (
   )
 {
   unsigned int Value;
-  
+
   CHSETTINGSData->SectionKey            = 0xC0C0C0C1;
   CHSETTINGSData->Valid                 = 0x1;
   CHSETTINGSData->Version               = 0x1;
@@ -191,10 +191,10 @@ PopulateCHRAMData (
   )
 {
   unsigned int Value;
-  
+
   CHRAMData->SectionKey         = 0xC0C0C0C2;
   CHRAMData->Valid              = 0x1;
-  
+
   fscanf(DataFile, "SDRC_SYSCONFIG_LSB=0x%04x\n", &Value);
   CHRAMData->SDRC_SYSCONFIG_LSB = Value;
   fscanf(DataFile, "SDRC_CS_CFG_LSB=0x%04x\n", &Value);
@@ -247,8 +247,8 @@ PopulateCHRAMData (
   CHRAMData->Flags              = 0x0003;
 }
 
-static 
-void 
+static
+void
 PrepareConfigurationHeader (
   void
   )
@@ -258,14 +258,14 @@ PrepareConfigurationHeader (
   CHRAM_DATA      CHRAMData;
   unsigned int    ConfigurationHdrOffset = 0;
   FILE            *DataFile;
-  
+
   // Open data file
   DataFile = fopen(gDataFile, "rb");
   if (DataFile == NULL) {
     fprintf(stderr, "Can't open data file %s.\n", gDataFile);
     exit(1);
   }
-  
+
   //Initialize configuration header.
   memset(gConfigurationHeader, 0x00, sizeof(gConfigurationHeader));
 
@@ -295,19 +295,19 @@ PrepareConfigurationHeader (
   memset(&CHRAMData, 0x00, sizeof(CHRAM_DATA));
   PopulateCHRAMData(DataFile, &CHRAMData);
   memcpy(gConfigurationHeader + Toc.Start, &CHRAMData, Toc.Size);
-  
+
   //Adjust ConfigurationHdrOffset to point to next TOC
   ConfigurationHdrOffset += sizeof(TOC_DATA);
 
   //Closing TOC item
   memset(gConfigurationHeader + ConfigurationHdrOffset, 0xFF, CLOSING_TOC_ITEM_SIZE);
   ConfigurationHdrOffset += CLOSING_TOC_ITEM_SIZE;
-  
+
   // Close data file
   fclose(DataFile);
 }
 
-static 
+static
 void
 ConstructImage (
   void
@@ -324,19 +324,19 @@ ConstructImage (
   if (InputFile == NULL) {
     fprintf(stderr, "Can't open input file.\n");
     exit(0);
-  } 
+  }
 
   // Get the size of the input image.
   fstat(fileno(InputFile), &FileStat);
   InputImageFileSize = FileStat.st_size;
-  
+
   OutputFile = fopen(gOutputImageFile, "wb");
   if (OutputFile == NULL) {
     fprintf(stderr, "Can't open output file %s.\n", gOutputImageFile);
     exit(0);
   }
 
-  // Write Configuration header 
+  // Write Configuration header
   fwrite(gConfigurationHeader, 1, sizeof(gConfigurationHeader), OutputFile);
 
   // Write image header (Input image size, execution address)
@@ -354,16 +354,16 @@ ConstructImage (
 }
 
 
-int 
+int
 main (
-  int    argc, 
+  int    argc,
   char** argv
   )
 {
   char          Ch;
   unsigned char *ptr;
   int           i;
-  int           TwoArg;  
+  int           TwoArg;
 
   if (argc == 1) {
     PrintUsage ();
@@ -378,7 +378,7 @@ main (
         case 'E': /* Image execution address */
           gImageExecutionAddress = strtoul (TwoArg ? argv[i+1] : &argv[i][2], (char **)&ptr, 16);
           break;
-        
+
         case 'I': /* Input image file */
           gInputImageFile = TwoArg ? argv[i+1] : &argv[i][2];
           break;
@@ -386,7 +386,7 @@ main (
         case 'O': /* Output image file */
           gOutputImageFile = TwoArg ? argv[i+1] : &argv[i][2];
           break;
-        
+
         case 'D': /* Data file */
           gDataFile = TwoArg ? argv[i+1] : &argv[i][2];
           break;
@@ -397,7 +397,7 @@ main (
     }
   }
 
- 
+
   //Prepare configuration header
   PrepareConfigurationHeader ();
 

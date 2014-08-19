@@ -20,7 +20,7 @@
   FILE_GUID                      = ea62bdc3-1063-425f-8851-98cb47f213a8
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EblCmdLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = EblCmdLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 
 #
@@ -44,10 +44,10 @@
   ArmDisassemblerLib
   PerformanceLib
   TimerLib
-  
+
 [Protocols]
  gEfiDebugSupportProtocolGuid
  gEfiLoadedImageProtocolGuid
-  
+
 [Guids]
  gEfiDebugImageInfoTableGuid

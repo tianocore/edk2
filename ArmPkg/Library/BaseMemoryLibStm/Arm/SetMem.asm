@@ -1,4 +1,4 @@
-;------------------------------------------------------------------------------ 
+;------------------------------------------------------------------------------
 ;
 ; SetMem() worker for ARM
 ;
@@ -33,9 +33,9 @@ InternalMemSetMem (
   IN      UINT8                     Value
   )
 **/
-  
+
   EXPORT InternalMemSetMem
-  
+
   AREA AsmMemStuff, CODE, READONLY
 
 InternalMemSetMem
@@ -55,14 +55,14 @@ L32
 L31
   and   r4, r2, #0xff
   orr   r4, r4, r4, LSL #8
-  orr   r4, r4, r4, LSL #16  
+  orr   r4, r4, r4, LSL #16
   mov   r5, r4
   mov   r6, r4
-  mov   r7, r4 
-  mov   r8, r4 
-  mov   r9, r4 
-  mov   r10, r4 
-  mov   r11, r4 
+  mov   r7, r4
+  mov   r8, r4
+  mov   r9, r4
+  mov   r10, r4
+  mov   r11, r4
   b      L32
 L34
   cmp      lr, #0
@@ -77,5 +77,5 @@ L43
   cmp      r1, #0
   bne      L34
   ldmfd    sp!, {r4-r11, pc}
-  
+
   END

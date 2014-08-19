@@ -31,13 +31,13 @@
 
 [BuildOptions]
   XCODE:*_*_ARM_PLATFORM_FLAGS  == -arch armv7
-  XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
-  
+  XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
+
   GCC:*_*_ARM_PLATFORM_FLAGS    == -march=armv7-a -mfpu=neon
-  GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
+  GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
 
   RVCT:*_*_ARM_PLATFORM_FLAGS  == --cpu Cortex-A8
-  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG 
+  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -74,7 +74,7 @@
 
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
-  
+
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
 [LibraryClasses.ARM]

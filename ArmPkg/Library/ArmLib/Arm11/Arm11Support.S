@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011, ARM Limited. All rights reserved.
@@ -73,12 +73,12 @@ ASM_PFX(ArmInvalidateInstructionAndDataTlb):
   bx lr
 
 ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
-  mcr     p15, 0, r0, c7, c6, 1   @invalidate single data cache line                                           
+  mcr     p15, 0, r0, c7, c6, 1   @invalidate single data cache line
   bx      lr
 
 
 ASM_PFX(ArmCleanDataCacheEntryByMVA):
-  mcr     p15, 0, r0, c7, c10, 1  @clean single data cache line     
+  mcr     p15, 0, r0, c7, c10, 1  @clean single data cache line
   bx      lr
 
 
@@ -135,7 +135,7 @@ ASM_PFX(ArmEnableDataCache):
   orr     R0,R0,R1              @Set C bit
   mcr     p15,0,r0,c1,c0,0      @Write control register configuration data
   bx      LR
-    
+
 ASM_PFX(ArmDisableDataCache):
   LoadConstantToReg(DC_ON, R1)  @ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
@@ -149,7 +149,7 @@ ASM_PFX(ArmEnableInstructionCache):
   orr     R0,R0,R1             @Set I bit
   mcr     p15,0,r0,c1,c0,0     @Write control register configuration data
   bx      LR
-  
+
 ASM_PFX(ArmDisableInstructionCache):
   ldr     R1,=IC_ON
   mrc     p15,0,R0,c1,c0,0     @Read control register configuration data
@@ -171,17 +171,17 @@ ASM_PFX(ArmDisableBranchPrediction):
 
 ASM_PFX(ArmDataMemoryBarrier):
   mov R0, #0
-  mcr P15, #0, R0, C7, C10, #5 
+  mcr P15, #0, R0, C7, C10, #5
   bx      LR
-  
+
 ASM_PFX(ArmDataSyncronizationBarrier):
   mov R0, #0
-  mcr P15, #0, R0, C7, C10, #4 
+  mcr P15, #0, R0, C7, C10, #4
   bx      LR
-  
+
 ASM_PFX(ArmInstructionSynchronizationBarrier):
   mov R0, #0
-  mcr P15, #0, R0, C7, C5, #4 
+  mcr P15, #0, R0, C7, C5, #4
   bx      LR
 
 ASM_PFX(ArmSetLowVectors):
@@ -206,7 +206,7 @@ ASM_PFX(ArmIsMpCore):
   cmp     r0, r1
   movne   r0, #0
   pop     { r1 }
-  bx      lr     
+  bx      lr
 
 ASM_PFX(ArmCallWFI):
   wfi

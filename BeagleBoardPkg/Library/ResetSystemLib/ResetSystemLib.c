@@ -1,8 +1,8 @@
 /** @file
   Do a generic Cold Reset for OMAP3550 and BeagleBoard specific Warm reset
-  
+
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,7 +54,7 @@ ShutdownEfi (
 
       Pages = EFI_SIZE_TO_PAGES (MemoryMapSize) + 1;
       MemoryMap = AllocatePages (Pages);
-    
+
       //
       // Get System MemoryMap
       //
@@ -141,7 +141,7 @@ LibResetSystem (
   ASSERT (FALSE);
   return EFI_DEVICE_ERROR;
 }
-  
+
 
 
 /**
@@ -149,7 +149,7 @@ LibResetSystem (
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/

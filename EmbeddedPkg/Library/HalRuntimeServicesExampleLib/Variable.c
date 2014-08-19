@@ -1,11 +1,11 @@
 /** @file
   Variable services implemented from system memory
 
-  There is just a single runtime memory buffer that contans all the data. 
+  There is just a single runtime memory buffer that contans all the data.
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -50,7 +50,7 @@ AddEntry (
   EFI_TPL                 CurrentTpl;
 
 
-  SizeOfString = StrSize (VariableName); 
+  SizeOfString = StrSize (VariableName);
   Size = SizeOfString + sizeof (VARIABLE_ARRAY_ENTRY) + DataSize;
   if ((VARIABLE_ARRAY_ENTRY *)(((UINT8 *)mVariableArrayNextFree) + Size) > mVariableArrayEnd) {
     // ran out of space
@@ -70,7 +70,7 @@ AddEntry (
   mVariableArrayNextFree = (VARIABLE_ARRAY_ENTRY *)(((UINT8 *)mVariableArrayNextFree) + SizeOfString);
   CopyMem (mVariableArrayNextFree, Data, DataSize);
   mVariableArrayNextFree = (VARIABLE_ARRAY_ENTRY *)(((UINT8 *)mVariableArrayNextFree) + DataSize);
-  
+
   if (!EfiAtRuntime ()) {
     // Exit Critical section
     gBS->RestoreTPL (CurrentTpl);
@@ -78,7 +78,7 @@ AddEntry (
 
   return Entry;
 }
-  
+
 VOID
 DeleteEntry (
   IN  VARIABLE_ARRAY_ENTRY *Entry
@@ -199,22 +199,22 @@ LibGetNextVariableName (
     if (Entry == NULL) {
       return EFI_NOT_FOUND;
     }
-    
+
     // If we are at runtime skip variables that do not have the Runitme attribute set.
     Done = (EfiAtRuntime () && ((Entry->Attribute & EFI_VARIABLE_RUNTIME_ACCESS) == 0)) ? FALSE : TRUE;
-  } 
+  }
 
   StringSize = StrSize ((CHAR16 *)(Entry + 1));
   Entry = (VARIABLE_ARRAY_ENTRY *)(((UINT8 *)Entry) + (StringSize + sizeof (VARIABLE_ARRAY_ENTRY) + Entry->DataSize));
   if (Entry >= mVariableArrayEnd) {
     return EFI_NOT_FOUND;
   }
-  
+
   if (*VariableNameSize < StringSize) {
     *VariableNameSize = StringSize;
     return EFI_BUFFER_TOO_SMALL;
   }
-  
+
   *VariableNameSize = StringSize;
   CopyMem (VariableName, (CHAR16 *)(Entry + 1), StringSize);
   CopyMem (VendorGuid, &Entry->VendorGuid, sizeof (EFI_GUID));
@@ -298,9 +298,9 @@ LibVariableInitialize (VOID)
   ASSERT (mVariableArray != NULL);
 
   mVariableArrayEnd = (VARIABLE_ARRAY_ENTRY *)(((UINT8 *)mVariableArray) + Size);
-  
+
   mMaximumVariableStorageSize   = Size - sizeof (VARIABLE_ARRAY_ENTRY);
   mRemainingVariableStorageSize = mMaximumVariableStorageSize;
   mMaximumVariableSize          = mMaximumVariableStorageSize;
 }
- 
+

@@ -25,11 +25,11 @@
   ../Common/Arm/ArmLibSupport.S    | GCC
   ../Common/Arm/ArmLibSupport.asm  | RVCT
   ../Common/ArmLib.c
-  
+
   Arm11Support.S    | GCC
   Arm11Support.asm  | RVCT
 
-  Arm11Lib.c  
+  Arm11Lib.c
   Arm11LibMem.c
   ../Arm9/Arm9CacheInformation.c
 
@@ -39,7 +39,7 @@
 
 [LibraryClasses]
   PrePiLib
-  
+
 [Protocols]
   gEfiCpuArchProtocolGuid
 

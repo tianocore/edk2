@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ArmVeResetSystemLib
-  FILE_GUID                      = 36885202-0854-4373-bfd2-95d229b44d44 
+  FILE_GUID                      = 36885202-0854-4373-bfd2-95d229b44d44
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = EfiResetSystemLib

@@ -34,7 +34,7 @@
 extern CONST CHAR8 mHexToStr[];
 
 // maximum size of input and output buffers
-// This value came from the show remote command of the gdb we tested against 
+// This value came from the show remote command of the gdb we tested against
 #define MAX_BUF_SIZE 2000
 
 // maximum size of address buffer
@@ -57,11 +57,11 @@ extern CONST CHAR8 mHexToStr[];
 // GDB Signal definitions - generic names for interrupts
 //
 #define GDB_SIGINT      2  // Interrupt process via ctrl-c
-#define GDB_SIGILL      4  // Illegal instruction       
+#define GDB_SIGILL      4  // Illegal instruction
 #define GDB_SIGTRAP     5  // Trace Trap (Breakpoint and SingleStep)
 #define GDB_SIGEMT      7  // Emulator Trap
 #define GDB_SIGFPE      8  // Floating point exception
-#define GDB_SIGSEGV     11 // Setgment violation, page fault 
+#define GDB_SIGSEGV     11 // Setgment violation, page fault
 
 
 //
@@ -69,9 +69,9 @@ extern CONST CHAR8 mHexToStr[];
 // Includes all general GDB Unix like error values
 //
 #define GDB_EBADMEMADDRBUFSIZE   11  // the buffer that stores memory Address to be read from/written to is not the right size
-#define GDB_EBADMEMLENGBUFSIZE   12  // the buffer that stores Length is not the right size 
+#define GDB_EBADMEMLENGBUFSIZE   12  // the buffer that stores Length is not the right size
 #define GDB_EBADMEMLENGTH        13  // Length, the given number of bytes to read or write, is not the right size
-#define GDB_EBADMEMDATA          14  // one of the bytes or nibbles of the memory is leess than 0 
+#define GDB_EBADMEMDATA          14  // one of the bytes or nibbles of the memory is leess than 0
 #define GDB_EBADMEMDATASIZE      15  // the memory data, 'XX..', is too short or too long
 #define GDB_EBADBUFSIZE          21  // the buffer created is not the correct size
 #define GDB_EINVALIDARG          31  // argument is invalid
@@ -91,7 +91,7 @@ extern CONST CHAR8 mHexToStr[];
 //
 //Define Register size for different architectures
 //
-#if defined (MDE_CPU_IA32) 
+#if defined (MDE_CPU_IA32)
 #define REG_SIZE  32
 #elif defined (MDE_CPU_X64)
 #define REG_SIZE  64
@@ -119,7 +119,7 @@ typedef union {
     UINT32  B1:1;           // Breakpoint condition detected
     UINT32  B2:1;           // Breakpoint condition detected
     UINT32  B3:1;           // Breakpoint condition detected
-    UINT32  Reserved_1:9;   // Reserved 
+    UINT32  Reserved_1:9;   // Reserved
     UINT32  BD:1;           // Debug register access detected
     UINT32  BS:1;           // Single step
     UINT32  BT:1;           // Task switch
@@ -186,8 +186,8 @@ extern BOOLEAN gProcessingFPacket;
 
 /**
  Return the number of entries in the gExceptionType[]
- 
- @retval    UINTN, the number of entries in the gExceptionType[] array.    
+
+ @retval    UINTN, the number of entries in the gExceptionType[] array.
  **/
 UINTN
 MaxEfiException (
@@ -196,9 +196,9 @@ MaxEfiException (
 
 
 /**
- Check to see if the ISA is supported. 
+ Check to see if the ISA is supported.
  ISA = Instruction Set Architecture
- 
+
  @retval    TRUE if Isa is supported,
  FALSE otherwise.
  **/
@@ -210,7 +210,7 @@ CheckIsa (
 
 /**
  Send the T signal with the given exception type (in gdb order) and possibly with n:r pairs related to the watchpoints
- 
+
  @param  SystemContext        Register content at time of the exception
  @param  GdbExceptionType     GDB exception type
  **/
@@ -224,29 +224,29 @@ GdbSendTSignal (
 
 /**
  Translates the EFI mapping to GDB mapping
- 
+
  @param     EFIExceptionType        EFI Exception that is being processed
  @retval    UINTN that corresponds to EFIExceptionType's GDB exception type number
  **/
 UINT8
-ConvertEFItoGDBtype ( 
+ConvertEFItoGDBtype (
   IN  EFI_EXCEPTION_TYPE EFIExceptionType
   );
 
 
 /**
- Empties the given buffer 
+ Empties the given buffer
  @param *Buf pointer to the first element in buffer to be emptied
  **/
 VOID
-EmptyBuffer ( 
+EmptyBuffer (
   IN CHAR8  *Buf
   );
 
 
 /**
  Converts an 8-bit Hex Char into a INTN.
- 
+
  @param     Char  - the hex character to be converted into UINTN
  @retval    a INTN, from 0 to 15, that corressponds to Char
  -1 if Char is not a hex character
@@ -261,7 +261,7 @@ HexCharToInt (
  Send an error with the given error number after converting to hex.
  The error number is put into the buffer in hex. '255' is the biggest errno we can send.
  ex: 162 will be sent as A2.
- 
+
  @param   errno    the error number that will be sent
  **/
 VOID
@@ -288,8 +288,8 @@ SendNotSupported (
   VOID
   );
 
-/** ‘p n’ 
- Reads the n-th register's value into an output buffer and sends it as a packet 
+/** ‘p n’
+ Reads the n-th register's value into an output buffer and sends it as a packet
  @param     SystemContext       Register content at time of the exception
  @param     InBuffer            This is the input buffer received from gdb server
  **/
@@ -300,12 +300,12 @@ ReadNthRegister (
   );
 
 
-/** ‘g’ 
- Reads the general registers into an output buffer  and sends it as a packet 
+/** ‘g’
+ Reads the general registers into an output buffer  and sends it as a packet
  @param     SystemContext           Register content at time of the exception
  **/
 VOID
-ReadGeneralRegisters (  
+ReadGeneralRegisters (
   IN    EFI_SYSTEM_CONTEXT  SystemContext
   );
 
@@ -336,10 +336,10 @@ WriteGeneralRegisters (
 
 
 /** ‘m addr,length ’
- Find the Length of the area to read and the start addres. Finally, pass them to 
- another function, TransferFromMemToOutBufAndSend, that will read from that memory space and 
+ Find the Length of the area to read and the start addres. Finally, pass them to
+ another function, TransferFromMemToOutBufAndSend, that will read from that memory space and
  send it as a packet.
- 
+
  @param  *PacketData  Pointer to Payload data for the packet
  **/
 VOID
@@ -349,10 +349,10 @@ ReadFromMemory (
 
 
 /** ‘M addr,length :XX...’
- Find the Length of the area in bytes to write and the start addres. Finally, pass them to 
+ Find the Length of the area in bytes to write and the start addres. Finally, pass them to
  another function, TransferFromInBufToMem, that will write to that memory space the info in
  the input buffer.
- 
+
  @param   PacketData     Pointer to Payload data for the packet
  **/
 VOID
@@ -361,11 +361,11 @@ WriteToMemory (
   );
 
 
-/** ‘c [addr ]’ 
- Continue. addr is Address to resume. If addr is omitted, resume at current 
+/** ‘c [addr ]’
+ Continue. addr is Address to resume. If addr is omitted, resume at current
  Address.
- 
- @param SystemContext Register content at time of the exception  
+
+ @param SystemContext Register content at time of the exception
  @param *PacketData   Pointer to PacketData
  **/
 
@@ -377,9 +377,9 @@ ContinueAtAddress (
 
 
 /** ‘s [addr ]’
- Single step. addr is the Address at which to resume. If addr is omitted, resume 
+ Single step. addr is the Address at which to resume. If addr is omitted, resume
  at same Address.
- 
+
  @param SystemContext   Register content at time of the exception
  @param PacketData      Pointer to Payload data for the packet
  **/
@@ -389,27 +389,27 @@ SingleStep (
   IN  CHAR8               *PacketData
   );
 
-/** 
+/**
  Insert Single Step in the SystemContext
- 
+
  @param SystemContext   Register content at time of the exception
  **/
 VOID
 AddSingleStep (
   IN  EFI_SYSTEM_CONTEXT  SystemContext
   );
-  
-/** 
+
+/**
  Remove Single Step in the SystemContext
- 
+
  @param SystemContext   Register content at time of the exception
  **/
 VOID
 RemoveSingleStep (
   IN  EFI_SYSTEM_CONTEXT  SystemContext
   );
-  
-  
+
+
 /**
   ‘Z1, [addr], [length]’
   ‘Z2, [addr], [length]’
@@ -453,36 +453,36 @@ RemoveBreakPoint(
 /**
  Exception Hanldler for GDB. It will be called for all exceptions
  registered via the gExceptionType[] array.
- 
+
  @param ExceptionType   Exception that is being processed
- @param SystemContext   Register content at time of the exception  
- 
+ @param SystemContext   Register content at time of the exception
+
  **/
 VOID
 EFIAPI
-GdbExceptionHandler ( 
-  IN     EFI_EXCEPTION_TYPE  ExceptionType, 
-  IN OUT EFI_SYSTEM_CONTEXT  SystemContext 
+GdbExceptionHandler (
+  IN     EFI_EXCEPTION_TYPE  ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
 
 
 /**
- Periodic callback for GDB. This function is used to catch a ctrl-c or other 
+ Periodic callback for GDB. This function is used to catch a ctrl-c or other
  break in type command from GDB.
- 
+
  @param SystemContext           Register content at time of the call
- 
+
  **/
 VOID
 EFIAPI
-GdbPeriodicCallBack ( 
-  IN OUT EFI_SYSTEM_CONTEXT  SystemContext 
+GdbPeriodicCallBack (
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
 
 
 /**
   Make two serail consoles: 1) StdIn and StdOut via GDB. 2) StdErr via GDB.
-  
+
   These console show up on the remote system running GDB
 
 **/
@@ -495,15 +495,15 @@ GdbInitializeSerialConsole (
 
 /**
   Send a GDB Remote Serial Protocol Packet
-  
-  $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$', 
+
+  $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
   the packet teminating character '#' and the two digit checksum.
-  
-  If an ack '+' is not sent resend the packet, but timeout eventually so we don't end up 
+
+  If an ack '+' is not sent resend the packet, but timeout eventually so we don't end up
   in an infinit loop. This is so if you unplug the debugger code just keeps running
 
-  @param PacketData   Payload data for the packet  
-  
+  @param PacketData   Payload data for the packet
+
   @retval             Number of bytes of packet data sent.
 
 **/
@@ -511,21 +511,21 @@ UINTN
 SendPacket (
   IN  CHAR8 *PacketData
   );
-  
+
 
 /**
  Receive a GDB Remote Serial Protocol Packet
- 
- $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$', 
+
+ $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
  the packet teminating character '#' and the two digit checksum.
- 
+
  If host re-starts sending a packet without ending the previous packet, only the last valid packet is proccessed.
  (In other words, if received packet is '$12345$12345$123456#checksum', only '$123456#checksum' will be processed.)
- 
+
  If an ack '+' is not sent resend the packet
- 
- @param PacketData   Payload data for the packet  
- 
+
+ @param PacketData   Payload data for the packet
+
  @retval             Number of bytes of packet data received.
 
  **/
@@ -534,15 +534,15 @@ ReceivePacket (
  OUT  CHAR8 *PacketData,
  IN   UINTN PacketDataSize
  );
-  
+
 
 /**
-  Read data from a FileDescriptor. On success number of bytes read is returned. Zero indicates 
+  Read data from a FileDescriptor. On success number of bytes read is returned. Zero indicates
   the end of a file. On error -1 is returned. If count is zero, GdbRead returns zero.
 
   @param  FileDescriptor   Device to talk to.
   @param  Buffer           Buffer to hold Count bytes that were read
-  @param  Count            Number of bytes to transfer. 
+  @param  Count            Number of bytes to transfer.
 
   @retval -1               Error
   @retval {other}          Number of bytes read.
@@ -554,15 +554,15 @@ GdbRead (
   OUT VOID    *Buffer,
   IN  UINTN   Count
   );
-  
+
 
 /**
-  Write data to a FileDescriptor. On success number of bytes written is returned. Zero indicates 
-  nothing was written. On error -1 is returned. 
+  Write data to a FileDescriptor. On success number of bytes written is returned. Zero indicates
+  nothing was written. On error -1 is returned.
 
   @param  FileDescriptor   Device to talk to.
   @param  Buffer           Buffer to hold Count bytes that are to be written
-  @param  Count            Number of bytes to transfer. 
+  @param  Count            Number of bytes to transfer.
 
   @retval -1               Error
   @retval {other}          Number of bytes written.
@@ -575,13 +575,13 @@ GdbWrite (
   IN  UINTN         Count
   );
 
-UINTN *  
+UINTN *
 FindPointerToRegister (
   IN  EFI_SYSTEM_CONTEXT    SystemContext,
-  IN  UINTN                 RegNumber  
+  IN  UINTN                 RegNumber
   );
 
-CHAR8 * 
+CHAR8 *
 BasicReadRegister (
   IN  EFI_SYSTEM_CONTEXT      SystemContext,
   IN  UINTN                   RegNumber,
@@ -608,7 +608,7 @@ BasicWriteRegister (
   IN  CHAR8                 *InBufPtr
   );
 
-VOID  
+VOID
 PrintReg (
   EFI_SYSTEM_CONTEXT SystemContext
   );
@@ -624,7 +624,7 @@ ParseBreakpointPacket (
 UINTN
 GetBreakpointDataAddress (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINTN               BreakpointNumber 
+  IN  UINTN               BreakpointNumber
   );
 
 UINTN
@@ -635,7 +635,7 @@ GetBreakpointDetected (
 BREAK_TYPE
 GetBreakpointType (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINTN               BreakpointNumber  
+  IN  UINTN               BreakpointNumber
   );
 
 UINTN
@@ -680,7 +680,7 @@ InitializeProcessor (
 
 /**
  Send the T signal with the given exception type (in gdb order) and possibly with n:r pairs related to the watchpoints
- 
+
  @param  SystemContext        Register content at time of the exception
  @param  GdbExceptionType     GDB exception type
  **/
@@ -694,17 +694,17 @@ ProcessorSendTSignal (
 
 /**
  Check to see if this exception is related to ctrl-c handling.
- 
+
  @param ExceptionType     Exception that is being processed
- @param SystemContext     Register content at time of the exception  
+ @param SystemContext     Register content at time of the exception
 
  @return  TRUE  This was a ctrl-c check that did not find a ctrl-c
  @return  FALSE This was not a ctrl-c check or some one hit ctrl-c
  **/
 BOOLEAN
-ProcessorControlC ( 
-  IN  EFI_EXCEPTION_TYPE        ExceptionType, 
-  IN OUT EFI_SYSTEM_CONTEXT     SystemContext 
+ProcessorControlC (
+  IN  EFI_EXCEPTION_TYPE        ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT     SystemContext
   );
 
 

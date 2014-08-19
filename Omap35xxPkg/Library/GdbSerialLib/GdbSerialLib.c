@@ -2,7 +2,7 @@
   Basic serial IO abstaction for GDB
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -33,10 +33,10 @@ GdbSerialLibConstructor (
 RETURN_STATUS
 EFIAPI
 GdbSerialInit (
-  IN UINT64     BaudRate, 
-  IN UINT8      Parity, 
-  IN UINT8      DataBits, 
-  IN UINT8      StopBits 
+  IN UINT64     BaudRate,
+  IN UINT8      Parity,
+  IN UINT8      DataBits,
+  IN UINT8      StopBits
   )
 {
   return RETURN_SUCCESS;
@@ -46,7 +46,7 @@ BOOLEAN
 EFIAPI
 GdbIsCharAvailable (
   VOID
-  )  
+  )
 {
   UINT32 LSR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_LSR_REG;
 
@@ -66,7 +66,7 @@ GdbGetChar (
   UINT32  LSR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_LSR_REG;
   UINT32  RBR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_RBR_REG;
   CHAR8   Char;
-    
+
   while ((MmioRead8(LSR) & UART_LSR_RX_FIFO_E_MASK) == UART_LSR_RX_FIFO_E_EMPTY);
   Char = MmioRead8(RBR);
 
@@ -81,7 +81,7 @@ GdbPutChar (
 {
   UINT32  LSR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_LSR_REG;
   UINT32  THR = UartBase(PcdGet32(PcdOmap35xxConsoleUart)) + UART_THR_REG;
-    
+
   while ((MmioRead8(LSR) & UART_LSR_TX_FIFO_E_MASK) == UART_LSR_TX_FIFO_E_NOT_EMPTY);
   MmioWrite8(THR, Char);
 }

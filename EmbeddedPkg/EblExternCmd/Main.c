@@ -1,10 +1,10 @@
 /** @file
-  Example of an external EBL command. It's loaded via EBL start command. 
+  Example of an external EBL command. It's loaded via EBL start command.
   Argc and Argv are passed in via "" of the EBL command line.
 
   Start fs0:\EdkExternCmd.efi "Argv[0] Argv[1] 2"
 
-  will launch this command with 
+  will launch this command with
     Argv[0] = "Argv[0]"
     Argv[1] = "Argv[2]"
     Argv[2] = "3"
@@ -29,7 +29,7 @@
   Entry point with Argc, Argv. Put your code here.
 
   @param  Argc   Number of command arguments in Argv
-  @param  Argv   Array of strings that represent the parsed command line. 
+  @param  Argv   Array of strings that represent the parsed command line.
                  Argv[0] is the command name
 
   @return EFI_SUCCESS
@@ -47,7 +47,7 @@ EblMain (
   for (Index = 0; Index < Argc; Index++) {
     AsciiPrint ("Argv[%d] = %a\n", Index, Argv[Index]);
   }
-  
+
   return EFI_SUCCESS;
 }
 

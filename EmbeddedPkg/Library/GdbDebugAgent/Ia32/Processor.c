@@ -2,7 +2,7 @@
   Processor specific parts of the GDB stub
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@
 // {EFI mapping, GDB mapping}
 //
 EFI_EXCEPTION_TYPE_ENTRY gExceptionType[] = {
-  { EXCEPT_IA32_DIVIDE_ERROR,     GDB_SIGFPE  }, 
+  { EXCEPT_IA32_DIVIDE_ERROR,     GDB_SIGFPE  },
   { EXCEPT_IA32_DEBUG,            GDB_SIGTRAP },
   { EXCEPT_IA32_NMI,              GDB_SIGEMT  },
   { EXCEPT_IA32_BREAKPOINT,       GDB_SIGTRAP },
@@ -62,7 +62,7 @@ UINTN gRegisterOffsets[] = {
 
 
 //Debug only..
-VOID 
+VOID
 PrintReg (
   IN EFI_SYSTEM_CONTEXT SystemContext
   )
@@ -80,7 +80,7 @@ PrintReg (
 }
 
 //Debug only..
-VOID 
+VOID
 PrintDRreg (
   IN EFI_SYSTEM_CONTEXT SystemContext
   )
@@ -96,8 +96,8 @@ PrintDRreg (
 
 /**
  Return the number of entries in the gExceptionType[]
- 
- @retval  UINTN, the number of entries in the gExceptionType[] array.    
+
+ @retval  UINTN, the number of entries in the gExceptionType[] array.
  **/
 UINTN
 MaxEfiException (
@@ -109,9 +109,9 @@ MaxEfiException (
 
 
 /**
-  Check to see if the ISA is supported. 
+  Check to see if the ISA is supported.
   ISA = Instruction Set Architecture
- 
+
   @retval TRUE if Isa is supported,
       FALSE otherwise.
 **/
@@ -128,14 +128,14 @@ CheckIsa (
  This takes in the register number and the System Context, and returns a pointer to the RegNumber-th register in gdb ordering
  It is, by default, set to find the register pointer of the IA32 member
 
- @param   SystemContext     Register content at time of the exception 
+ @param   SystemContext     Register content at time of the exception
  @param   RegNumber       The register to which we want to find a pointer
  @retval  the pointer to the RegNumber-th pointer
  **/
 UINTN *
 FindPointerToRegister(
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINTN               RegNumber  
+  IN  UINTN               RegNumber
   )
 {
   UINT8 *TempPtr;
@@ -160,7 +160,7 @@ BasicReadRegister (
   )
 {
   UINTN RegSize;
-  
+
   RegSize = 0;
   while (RegSize < REG_SIZE) {
     *OutBufPtr++ = mHexToStr[((*FindPointerToRegister(SystemContext, RegNumber) >> (RegSize+4)) & 0xf)];
@@ -171,8 +171,8 @@ BasicReadRegister (
 }
 
 
-/** ‘p n’ 
- Reads the n-th register's value into an output buffer and sends it as a packet 
+/** ‘p n’
+ Reads the n-th register's value into an output buffer and sends it as a packet
 
  @param   SystemContext   Register content at time of the exception
  @param   InBuffer      Pointer to the input buffer received from gdb server
@@ -187,7 +187,7 @@ ReadNthRegister (
   UINTN RegNumber;
   CHAR8 OutBuffer[9]; // 1 reg=8 hex chars, and the end '\0' (escape seq)
   CHAR8 *OutBufPtr;   // pointer to the output buffer
-  
+
   RegNumber = AsciiStrHexToUintn (&InBuffer[1]);
 
   if ((RegNumber < 0) || (RegNumber >= sizeof (gRegisterOffsets)/sizeof (UINTN))) {
@@ -203,14 +203,14 @@ ReadNthRegister (
 }
 
 
-/** ‘g’ 
- Reads the general registers into an output buffer  and sends it as a packet 
+/** ‘g’
+ Reads the general registers into an output buffer  and sends it as a packet
 
  @param   SystemContext     Register content at time of the exception
  **/
 VOID
 EFIAPI
-ReadGeneralRegisters (  
+ReadGeneralRegisters (
   IN  EFI_SYSTEM_CONTEXT      SystemContext
   )
 {
@@ -219,7 +219,7 @@ ReadGeneralRegisters (
   CHAR8 *OutBufPtr;   // pointer to the output buffer
 
   OutBufPtr = OutBuffer;
-  for(i = 0 ; i < sizeof (gRegisterOffsets)/sizeof (UINTN) ; i++) {  // there are only 16 registers to read   
+  for(i = 0 ; i < sizeof (gRegisterOffsets)/sizeof (UINTN) ; i++) {  // there are only 16 registers to read
     OutBufPtr = BasicReadRegister(SystemContext, i, OutBufPtr);
   }
 
@@ -246,26 +246,26 @@ BasicWriteRegister (
   UINTN RegSize;
   UINTN TempValue; // the value transferred from a hex char
   UINT32 NewValue; // the new value of the RegNumber-th Register
-  
+
   NewValue = 0;
   RegSize = 0;
   while (RegSize < REG_SIZE) {
     TempValue = HexCharToInt(*InBufPtr++);
-    
+
    if (TempValue < 0) {
-      SendError (GDB_EBADMEMDATA); 
+      SendError (GDB_EBADMEMDATA);
       return NULL;
     }
 
     NewValue += (TempValue << (RegSize+4));
     TempValue = HexCharToInt(*InBufPtr++);
-    
+
     if (TempValue < 0) {
-      SendError (GDB_EBADMEMDATA); 
+      SendError (GDB_EBADMEMDATA);
       return NULL;
     }
-    
-    NewValue += (TempValue << RegSize); 
+
+    NewValue += (TempValue << RegSize);
     RegSize = RegSize + 8;
   }
   *(FindPointerToRegister(SystemContext, RegNumber)) = NewValue;
@@ -290,19 +290,19 @@ WriteNthRegister (
   CHAR8 RegNumBuffer[MAX_REG_NUM_BUF_SIZE];  // put the 'n..' part of the message into this array
   CHAR8 *RegNumBufPtr;
   CHAR8 *InBufPtr; // pointer to the input buffer
-  
+
   // find the register number to write
   InBufPtr = &InBuffer[1];
   RegNumBufPtr = RegNumBuffer;
   while (*InBufPtr != '=') {
     *RegNumBufPtr++ = *InBufPtr++;
-  } 
+  }
   *RegNumBufPtr = '\0';
-  RegNumber = AsciiStrHexToUintn (RegNumBuffer); 
+  RegNumber = AsciiStrHexToUintn (RegNumBuffer);
 
   // check if this is a valid Register Number
   if ((RegNumber < 0) || (RegNumber >= sizeof (gRegisterOffsets)/sizeof (UINTN))) {
-	SendError (GDB_EINVALIDREGNUM); 
+	SendError (GDB_EINVALIDREGNUM);
     return;
   }
   InBufPtr++;  // skips the '=' character
@@ -327,16 +327,16 @@ WriteGeneralRegisters (
   UINTN  i;
   CHAR8 *InBufPtr; /// pointer to the input buffer
 
-  // check to see if the buffer is the right size which is 
-  // 1 (for 'G') + 16 (for 16 registers) * 8 ( for 8 hex chars each) = 129 
+  // check to see if the buffer is the right size which is
+  // 1 (for 'G') + 16 (for 16 registers) * 8 ( for 8 hex chars each) = 129
   if (AsciiStrLen(InBuffer) != 129) { // 16 regs, 8 hex chars each, and the end '\0' (escape seq)
-	//Bad message. Message is not the right length 
-    SendError (GDB_EBADBUFSIZE); 
+	//Bad message. Message is not the right length
+    SendError (GDB_EBADBUFSIZE);
     return;
   }
 
   InBufPtr = &InBuffer[1];
-  
+
   // Read the new values for the registers from the input buffer to an array, NewValueArray.
   // The values in the array are in the gdb ordering
   for(i=0; i < sizeof (gRegisterOffsets)/sizeof (UINTN); i++) {  // there are only 16 registers to write
@@ -346,11 +346,11 @@ WriteGeneralRegisters (
   SendSuccess();
 }
 
-/** ‘c [addr ]’ 
- Continue. addr is Address to resume. If addr is omitted, resume at current 
+/** ‘c [addr ]’
+ Continue. addr is Address to resume. If addr is omitted, resume at current
  Address.
- 
- @param   SystemContext     Register content at time of the exception  
+
+ @param   SystemContext     Register content at time of the exception
  **/
 VOID
 EFIAPI
@@ -361,15 +361,15 @@ ContinueAtAddress (
 {
   if (PacketData[1] != '\0') {
     SystemContext.SystemContextIa32->Eip = AsciiStrHexToUintn (&PacketData[1]);
-  } 
+  }
 }
 
 
 /** ‘s [addr ]’
- Single step. addr is the Address at which to resume. If addr is omitted, resume 
+ Single step. addr is the Address at which to resume. If addr is omitted, resume
  at same Address.
- 
- @param   SystemContext     Register content at time of the exception  
+
+ @param   SystemContext     Register content at time of the exception
  **/
 VOID
 EFIAPI
@@ -421,9 +421,9 @@ GetBreakpointDataAddress (
 
   @param  SystemContext  Register content at time of the exception
 
-  @retval {1-4}          Currently detected breakpoint value   
+  @retval {1-4}          Currently detected breakpoint value
   @retval 0              No breakpoint detected.
- 
+
 **/
 UINTN
 GetBreakpointDetected (
@@ -444,7 +444,7 @@ GetBreakpointDetected (
   } else if (Dr6.Bits.B3 == 1) {
     BreakpointNumber = 4;
   } else {
-    BreakpointNumber = 0;  //No breakpoint detected 
+    BreakpointNumber = 0;  //No breakpoint detected
   }
 
   return BreakpointNumber;
@@ -454,13 +454,13 @@ GetBreakpointDetected (
 /**
   Returns Breakpoint type (InstructionExecution, DataWrite, DataRead or DataReadWrite)
   based on the Breakpoint number
-  
+
   @param  SystemContext        Register content at time of the exception
   @param  BreakpointNumber     Breakpoint number
-  
+
   @retval BREAK_TYPE           Breakpoint type value read from register DR7 RWn field
                                For unknown value, it returns NotSupported.
-  
+
 **/
 BREAK_TYPE
 GetBreakpointType (
@@ -474,22 +474,22 @@ GetBreakpointType (
   Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
 
   if (BreakpointNumber == 1) {
-    Type = (BREAK_TYPE) Dr7.Bits.RW0;  
+    Type = (BREAK_TYPE) Dr7.Bits.RW0;
   } else if (BreakpointNumber == 2) {
-    Type = (BREAK_TYPE) Dr7.Bits.RW1;  
+    Type = (BREAK_TYPE) Dr7.Bits.RW1;
   } else if (BreakpointNumber == 3) {
-    Type = (BREAK_TYPE) Dr7.Bits.RW2;  
+    Type = (BREAK_TYPE) Dr7.Bits.RW2;
   } else if (BreakpointNumber == 4) {
-    Type = (BREAK_TYPE) Dr7.Bits.RW3;  
+    Type = (BREAK_TYPE) Dr7.Bits.RW3;
   }
 
   return Type;
 }
 
 
-/** 
+/**
   Parses Length and returns the length which DR7 LENn field accepts.
-  For example: If we receive 1-Byte length then we should return 0. 
+  For example: If we receive 1-Byte length then we should return 0.
                Zero gets written to DR7 LENn field.
 
   @param  Length  Breakpoint length in Bytes (1 byte, 2 byte, 4 byte)
@@ -502,7 +502,7 @@ ConvertLengthData (
   IN     UINTN   Length
   )
 {
-  if (Length == 1) {         //1-Byte length 
+  if (Length == 1) {         //1-Byte length
     return 0;
   } else if (Length == 2) {  //2-Byte length
     return 1;
@@ -515,8 +515,8 @@ ConvertLengthData (
 
 
 /**
-  Finds the next free debug register. If all the registers are occupied then 
-  EFI_OUT_OF_RESOURCES is returned.  
+  Finds the next free debug register. If all the registers are occupied then
+  EFI_OUT_OF_RESOURCES is returned.
 
   @param  SystemContext   Register content at time of the exception
   @param  Register        Register value (0 - 3 for the first free debug register)
@@ -553,11 +553,11 @@ FindNextFreeDebugRegister (
 /**
   Enables the debug register. Writes Address value to appropriate DR0-3 register.
   Sets LENn, Gn, RWn bits in DR7 register.
- 
+
   @param  SystemContext   Register content at time of the exception
-  @param  Register        Register value (0 - 3) 
+  @param  Register        Register value (0 - 3)
   @param  Address         Breakpoint address value
-  @param  Type            Breakpoint type (Instruction, Data write, Data read 
+  @param  Type            Breakpoint type (Instruction, Data write, Data read
                           or write etc.)
 
   @retval EFI_STATUS      Appropriate status value.
@@ -577,15 +577,15 @@ EnableDebugRegister (
   //Convert length data
   Length = ConvertLengthData (Length);
 
-  //For Instruction execution, length should be 0 
+  //For Instruction execution, length should be 0
   //(Ref. Intel reference manual 18.2.4)
   if ((Type == 0) && (Length != 0)) {
     return EFI_INVALID_PARAMETER;
   }
- 
+
   //Hardware doesn't support ReadWatch (z3 packet) type. GDB can handle
   //software breakpoint. We should send empty packet in both these cases.
-  if ((Type == (BREAK_TYPE)DataRead) || 
+  if ((Type == (BREAK_TYPE)DataRead) ||
       (Type == (BREAK_TYPE)SoftwareBreakpoint)) {
     return EFI_UNSUPPORTED;
   }
@@ -617,7 +617,7 @@ EnableDebugRegister (
     return EFI_INVALID_PARAMETER;
   }
 
-  //Update Dr7 with appropriate Gn, RWn and LENn bits 
+  //Update Dr7 with appropriate Gn, RWn and LENn bits
   SystemContext.SystemContextIa32->Dr7 = Dr7.UintN;
 
   return EFI_SUCCESS;
@@ -633,7 +633,7 @@ EnableDebugRegister (
   @param  SystemContext  Register content at time of the exception
   @param  Address        Breakpoint address value
   @param  Length         Breakpoint length value
-  @param  Type           Breakpoint type (Instruction, Data write, 
+  @param  Type           Breakpoint type (Instruction, Data write,
                          Data read or write etc.)
   @param  Register       Register value to be returned
 
@@ -653,7 +653,7 @@ FindMatchingDebugRegister (
 
   //Hardware doesn't support ReadWatch (z3 packet) type. GDB can handle
   //software breakpoint. We should send empty packet in both these cases.
-  if ((Type == (BREAK_TYPE)DataRead) || 
+  if ((Type == (BREAK_TYPE)DataRead) ||
       (Type == (BREAK_TYPE)SoftwareBreakpoint)) {
     return EFI_UNSUPPORTED;
   }
@@ -663,24 +663,24 @@ FindMatchingDebugRegister (
 
   Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
 
-  if ((Dr7.Bits.G0 == 1) && 
+  if ((Dr7.Bits.G0 == 1) &&
       (Dr7.Bits.LEN0 == Length) &&
-      (Dr7.Bits.RW0 == Type) && 
+      (Dr7.Bits.RW0 == Type) &&
       (Address == SystemContext.SystemContextIa32->Dr0)) {
     *Register = 0;
-  } else if ((Dr7.Bits.G1 == 1) && 
+  } else if ((Dr7.Bits.G1 == 1) &&
              (Dr7.Bits.LEN1 == Length) &&
-             (Dr7.Bits.RW1 == Type) && 
+             (Dr7.Bits.RW1 == Type) &&
              (Address == SystemContext.SystemContextIa32->Dr1)) {
     *Register = 1;
-  } else if ((Dr7.Bits.G2 == 1) && 
+  } else if ((Dr7.Bits.G2 == 1) &&
              (Dr7.Bits.LEN2 == Length) &&
-             (Dr7.Bits.RW2 == Type) && 
+             (Dr7.Bits.RW2 == Type) &&
              (Address == SystemContext.SystemContextIa32->Dr2)) {
     *Register = 2;
-  } else if ((Dr7.Bits.G3 == 1) && 
+  } else if ((Dr7.Bits.G3 == 1) &&
              (Dr7.Bits.LEN3 == Length) &&
-             (Dr7.Bits.RW3 == Type) && 
+             (Dr7.Bits.RW3 == Type) &&
              (Address == SystemContext.SystemContextIa32->Dr3)) {
     *Register = 3;
   } else {
@@ -704,12 +704,12 @@ FindMatchingDebugRegister (
 EFI_STATUS
 DisableDebugRegister (
  IN  EFI_SYSTEM_CONTEXT  SystemContext,
- IN  UINTN               Register  
+ IN  UINTN               Register
  )
 {
   IA32_DR7  Dr7;
   UINTN Address = 0;
- 
+
   //Read DR7 register so appropriate Gn, RWn and LENn bits can be turned off.
   Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
 
@@ -863,15 +863,15 @@ RemoveBreakPoint (
   }
 
   switch (Type) {
-  
+
     case    0:   //Software breakpoint
       BreakType = SoftwareBreakpoint;
       break;
-      
+
     case    1:   //Hardware breakpoint
       BreakType = InstructionExecution;
       break;
-      
+
     case    2:   //Write watchpoint
       BreakType = DataWrite;
       break;

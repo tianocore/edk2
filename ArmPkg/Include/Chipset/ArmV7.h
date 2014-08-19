@@ -94,7 +94,7 @@ ArmEnableSWPInstruction (
   VOID
   );
 
-UINTN 
+UINTN
 EFIAPI
 ArmReadCbar (
   VOID

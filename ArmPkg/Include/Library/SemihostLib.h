@@ -22,7 +22,7 @@
  *  about the semihosting interface.
  *
  */
- 
+
 #define SEMIHOST_FILE_MODE_READ     (0 << 2)
 #define SEMIHOST_FILE_MODE_WRITE    (1 << 2)
 #define SEMIHOST_FILE_MODE_APPEND   (2 << 2)
@@ -92,10 +92,10 @@ VOID
 SemihostWriteString (
   IN CHAR8 *String
   );
-  
+
 UINT32
 SemihostSystem (
   IN CHAR8 *CommandLine
   );
-  
+
 #endif // __SEMIHOSTING_H__

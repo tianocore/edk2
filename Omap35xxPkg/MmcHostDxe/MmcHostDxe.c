@@ -236,7 +236,7 @@ UpdateMMCHSClkFrequency (
   MmioAnd32 (MMCHS_SYSCTL, ~CEN);
 
   // Set new clock frequency.
-  MmioAndThenOr32 (MMCHS_SYSCTL, ~CLKD_MASK, NewCLKD << 6); 
+  MmioAndThenOr32 (MMCHS_SYSCTL, ~CLKD_MASK, NewCLKD << 6);
 
   // Poll till Internal Clock Stable
   while ((MmioRead32 (MMCHS_SYSCTL) & ICS_MASK) != ICS);
@@ -264,7 +264,7 @@ InitializeMMCHS (
   Data = VSEL_3_00V;
   Status = gTPS65950->Write (gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID4, VMMC1_DEDICATED_REG), 1, &Data);
   ASSERT_EFI_ERROR(Status);
-  
+
   // After ramping up voltage, set VDDS stable bit to indicate that voltage level is stable.
   MmioOr32 (CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
 
@@ -303,10 +303,10 @@ MMCIsReadOnly (
   )
 {
   /* Note:
-   * On our BeagleBoard the SD card WP pin is always read as TRUE. 
+   * On our BeagleBoard the SD card WP pin is always read as TRUE.
    * Probably something wrong with GPIO configuration.
    * BeagleBoard-xM uses microSD cards so there is no write protect at all.
-   * Hence commenting out SD card WP pin read status.  
+   * Hence commenting out SD card WP pin read status.
    */
   //return (MmioRead32 (GPIO1_BASE + GPIO_DATAIN) & BIT23) == BIT23;
   return 0;
@@ -667,7 +667,7 @@ MMCInitialize (
   ASSERT_EFI_ERROR(Status);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Handle, 
+                  &Handle,
                   &gEfiMmcHostProtocolGuid,         &gMMCHost,
                   NULL
                   );

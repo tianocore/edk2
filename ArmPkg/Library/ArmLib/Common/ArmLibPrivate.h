@@ -67,11 +67,11 @@ CPSRRead (
   VOID
   );
 
-UINT32 
+UINT32
 ReadCCSIDR (
   IN UINT32 CSSELR
-  );  
-  
+  );
+
 UINT32
 ReadCLIDR (
   VOID

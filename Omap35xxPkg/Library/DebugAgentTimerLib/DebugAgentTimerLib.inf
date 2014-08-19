@@ -33,7 +33,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   Omap35xxPkg/Omap35xxPkg.dec
   ArmPkg/ArmPkg.dec
-  
+
 
 [LibraryClasses]
   BaseLib
@@ -44,4 +44,3 @@
 [Pcd]
   gOmap35xxTokenSpaceGuid.PcdOmap35xxDebugAgentTimer
   gOmap35xxTokenSpaceGuid.PcdDebugAgentTimerFreqNanoSeconds
-  

@@ -40,16 +40,16 @@ UINT64 mTimerPeriod = 0;
 EFI_HARDWARE_INTERRUPT_PROTOCOL *gInterrupt = NULL;
 
 /**
-  This function registers the handler NotifyFunction so it is called every time 
-  the timer interrupt fires.  It also passes the amount of time since the last 
-  handler call to the NotifyFunction.  If NotifyFunction is NULL, then the 
-  handler is unregistered.  If the handler is registered, then EFI_SUCCESS is 
-  returned.  If the CPU does not support registering a timer interrupt handler, 
-  then EFI_UNSUPPORTED is returned.  If an attempt is made to register a handler 
-  when a handler is already registered, then EFI_ALREADY_STARTED is returned.  
-  If an attempt is made to unregister a handler when a handler is not registered, 
-  then EFI_INVALID_PARAMETER is returned.  If an error occurs attempting to 
-  register the NotifyFunction with the timer interrupt, then EFI_DEVICE_ERROR 
+  This function registers the handler NotifyFunction so it is called every time
+  the timer interrupt fires.  It also passes the amount of time since the last
+  handler call to the NotifyFunction.  If NotifyFunction is NULL, then the
+  handler is unregistered.  If the handler is registered, then EFI_SUCCESS is
+  returned.  If the CPU does not support registering a timer interrupt handler,
+  then EFI_UNSUPPORTED is returned.  If an attempt is made to register a handler
+  when a handler is already registered, then EFI_ALREADY_STARTED is returned.
+  If an attempt is made to unregister a handler when a handler is not registered,
+  then EFI_INVALID_PARAMETER is returned.  If an error occurs attempting to
+  register the NotifyFunction with the timer interrupt, then EFI_DEVICE_ERROR
   is returned.
 
   @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
@@ -102,17 +102,17 @@ ExitBootServicesEvent (
 
 /**
 
-  This function adjusts the period of timer interrupts to the value specified 
-  by TimerPeriod.  If the timer period is updated, then the selected timer 
-  period is stored in EFI_TIMER.TimerPeriod, and EFI_SUCCESS is returned.  If 
-  the timer hardware is not programmable, then EFI_UNSUPPORTED is returned.  
-  If an error occurs while attempting to update the timer period, then the 
-  timer hardware will be put back in its state prior to this call, and 
-  EFI_DEVICE_ERROR is returned.  If TimerPeriod is 0, then the timer interrupt 
-  is disabled.  This is not the same as disabling the CPU's interrupts.  
-  Instead, it must either turn off the timer hardware, or it must adjust the 
-  interrupt controller so that a CPU interrupt is not generated when the timer 
-  interrupt fires. 
+  This function adjusts the period of timer interrupts to the value specified
+  by TimerPeriod.  If the timer period is updated, then the selected timer
+  period is stored in EFI_TIMER.TimerPeriod, and EFI_SUCCESS is returned.  If
+  the timer hardware is not programmable, then EFI_UNSUPPORTED is returned.
+  If an error occurs while attempting to update the timer period, then the
+  timer hardware will be put back in its state prior to this call, and
+  EFI_DEVICE_ERROR is returned.  If TimerPeriod is 0, then the timer interrupt
+  is disabled.  This is not the same as disabling the CPU's interrupts.
+  Instead, it must either turn off the timer hardware, or it must adjust the
+  interrupt controller so that a CPU interrupt is not generated when the timer
+  interrupt fires.
 
   @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
   @param  TimerPeriod      The rate to program the timer interrupt in 100 nS units. If
@@ -136,7 +136,7 @@ TimerDriverSetTimerPeriod (
   )
 {
   UINT64      TimerTicks;
-  
+
   // Always disable the timer
   ArmArchTimerDisableTimer ();
 
@@ -158,9 +158,9 @@ TimerDriverSetTimerPeriod (
 }
 
 /**
-  This function retrieves the period of timer interrupts in 100 ns units, 
-  returns that value in TimerPeriod, and returns EFI_SUCCESS.  If TimerPeriod 
-  is NULL, then EFI_INVALID_PARAMETER is returned.  If a TimerPeriod of 0 is 
+  This function retrieves the period of timer interrupts in 100 ns units,
+  returns that value in TimerPeriod, and returns EFI_SUCCESS.  If TimerPeriod
+  is NULL, then EFI_INVALID_PARAMETER is returned.  If a TimerPeriod of 0 is
   returned, then the timer is currently disabled.
 
   @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
@@ -188,12 +188,12 @@ TimerDriverGetTimerPeriod (
 }
 
 /**
-  This function generates a soft timer interrupt. If the platform does not support soft 
-  timer interrupts, then EFI_UNSUPPORTED is returned. Otherwise, EFI_SUCCESS is returned. 
-  If a handler has been registered through the EFI_TIMER_ARCH_PROTOCOL.RegisterHandler() 
-  service, then a soft timer interrupt will be generated. If the timer interrupt is 
-  enabled when this service is called, then the registered handler will be invoked. The 
-  registered handler should not be able to distinguish a hardware-generated timer 
+  This function generates a soft timer interrupt. If the platform does not support soft
+  timer interrupts, then EFI_UNSUPPORTED is returned. Otherwise, EFI_SUCCESS is returned.
+  If a handler has been registered through the EFI_TIMER_ARCH_PROTOCOL.RegisterHandler()
+  service, then a soft timer interrupt will be generated. If the timer interrupt is
+  enabled when this service is called, then the registered handler will be invoked. The
+  registered handler should not be able to distinguish a hardware-generated timer
   interrupt from a software-generated timer interrupt.
 
   @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.

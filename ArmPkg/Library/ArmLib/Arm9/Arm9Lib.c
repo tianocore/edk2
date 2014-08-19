@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2013, ARM Limited. All rights reserved.
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,7 +30,7 @@ FillTranslationTable (
   UINTN   Index;
   UINT32  Attributes;
   UINT32  PhysicalBase = MemoryRegion->PhysicalBase;
-  
+
   switch (MemoryRegion->Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
       Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK;
@@ -49,13 +49,13 @@ FillTranslationTable (
       Attributes = TT_DESCRIPTOR_SECTION_UNCACHED_UNBUFFERED;
       break;
   }
-  
+
   Entry    = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS(TranslationTable, MemoryRegion->VirtualBase);
   Sections = MemoryRegion->Length / TT_DESCRIPTOR_SECTION_SIZE;
-  
+
   // The current code does not support memory region size that is not aligned on TT_DESCRIPTOR_SECTION_SIZE boundary
   ASSERT (MemoryRegion->Length % TT_DESCRIPTOR_SECTION_SIZE == 0);
-  
+
   for (Index = 0; Index < Sections; Index++)
   {
     *Entry++     =  TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
@@ -83,7 +83,7 @@ ArmConfigureMmu (
   if (TranslationTableBase != NULL) {
     *TranslationTableBase = TranslationTable;
   }
-  
+
   if (TranslationTableBase != NULL) {
     *TranslationTableSize = TRANSLATION_TABLE_SIZE;
   }
@@ -108,7 +108,7 @@ ArmConfigureMmu (
   }
 
   ArmSetTTBR0(TranslationTable);
-    
+
   ArmSetDomainAccessControl(DOMAIN_ACCESS_CONTROL_NONE(15) |
                             DOMAIN_ACCESS_CONTROL_NONE(14) |
                             DOMAIN_ACCESS_CONTROL_NONE(13) |
@@ -125,7 +125,7 @@ ArmConfigureMmu (
                             DOMAIN_ACCESS_CONTROL_NONE( 2) |
                             DOMAIN_ACCESS_CONTROL_NONE( 1) |
                             DOMAIN_ACCESS_CONTROL_MANAGER(0));
-    
+
   ArmEnableInstructionCache();
   ArmEnableDataCache();
   ArmEnableMmu();

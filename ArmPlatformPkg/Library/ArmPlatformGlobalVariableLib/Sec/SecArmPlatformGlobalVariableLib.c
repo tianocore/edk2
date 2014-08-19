@@ -32,7 +32,7 @@ ArmPlatformGetGlobalVariable (
   ASSERT (VariableOffset < PcdGet32 (PcdSecGlobalVariableSize));
 
   GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize);
-  
+
   if (VariableSize == 4) {
     *(UINT32*)Variable = ReadUnaligned32 ((CONST UINT32*)(GlobalVariableBase + VariableOffset));
   } else if (VariableSize == 8) {

@@ -1,9 +1,9 @@
 /** @file
   Abstractions for simple OMAP DMA channel.
-  
+
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,16 +22,16 @@
 #include <Omap3530/Omap3530.h>
 
 
-/**                                                                 
+/**
   Configure OMAP DMA Channel
-            
+
   @param  Channel               DMA Channel to configure
-  @param  Dma4                  Pointer to structure used to initialize DMA registers for the Channel                                                
-                                  
+  @param  Dma4                  Pointer to structure used to initialize DMA registers for the Channel
+
   @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
   @retval EFI_INVALID_PARAMETER Channel is not valid
   @retval EFI_DEVICE_ERROR      The system hardware could not map the requested information.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -50,13 +50,13 @@ EnableDmaChannel (
   /* 1) Configure the transfer parameters in the logical DMA registers */
   /*-------------------------------------------------------------------*/
 
-  /* a) Set the data type CSDP[1:0], the Read/Write Port access type 
-        CSDP[8:7]/[15:14], the Source/dest endianism CSDP[21]/CSDP[19], 
+  /* a) Set the data type CSDP[1:0], the Read/Write Port access type
+        CSDP[8:7]/[15:14], the Source/dest endianism CSDP[21]/CSDP[19],
         write mode CSDP[17:16], source/dest packed or nonpacked CSDP[6]/CSDP[13] */
-  
+
   // Read CSDP
   RegVal = MmioRead32 (DMA4_CSDP (Channel));
-  
+
   // Build reg
   RegVal = ((RegVal & ~ 0x3) | DMA4->DataType );
   RegVal = ((RegVal & ~(0x3 <<  7)) | (DMA4->ReadPortAccessType << 7));
@@ -68,23 +68,23 @@ EnableDmaChannel (
   RegVal = ((RegVal & ~(0x1 << 13)) | (DMA4->DestinationPacked << 13));
   // Write CSDP
   MmioWrite32 (DMA4_CSDP (Channel), RegVal);
-  
+
   /* b) Set the number of element per frame CEN[23:0]*/
   MmioWrite32 (DMA4_CEN (Channel), DMA4->NumberOfElementPerFrame);
- 
+
   /* c) Set the number of frame per block CFN[15:0]*/
   MmioWrite32 (DMA4_CFN (Channel), DMA4->NumberOfFramePerTransferBlock);
-  
+
   /* d) Set the Source/dest start address index CSSA[31:0]/CDSA[31:0]*/
   MmioWrite32 (DMA4_CSSA (Channel), DMA4->SourceStartAddress);
   MmioWrite32 (DMA4_CDSA (Channel), DMA4->DestinationStartAddress);
-  
+
   /* e) Set the Read Port addressing mode CCR[13:12], the Write Port addressing mode CCR[15:14],
         read/write priority CCR[6]/CCR[26]
-        I changed LCH CCR[20:19]=00 and CCR[4:0]=00000 to 
+        I changed LCH CCR[20:19]=00 and CCR[4:0]=00000 to
         LCH CCR[20:19]= DMA4->WriteRequestNumber and CCR[4:0]=DMA4->ReadRequestNumber
   */
-  
+
   // Read CCR
   RegVal = MmioRead32 (DMA4_CCR (Channel));
 
@@ -95,13 +95,13 @@ EnableDmaChannel (
   RegVal  = ((RegVal & ~(0x3 << 14)) | (DMA4->WritePortAccessMode << 14));
   RegVal  = ((RegVal & ~(0x1 <<  6)) | (DMA4->ReadPriority << 6));
   RegVal  = ((RegVal & ~(0x1 << 26)) | (DMA4->WritePriority << 26));
-  
+
   // Write CCR
   MmioWrite32 (DMA4_CCR (Channel), RegVal);
-  
+
   /* f)- Set the source element index CSEI[15:0]*/
   MmioWrite32 (DMA4_CSEI (Channel), DMA4->SourceElementIndex);
-  
+
   /* - Set the source frame index CSFI[15:0]*/
   MmioWrite32 (DMA4_CSFI (Channel), DMA4->SourceFrameIndex);
 
@@ -111,7 +111,7 @@ EnableDmaChannel (
 
   /* - Set the destination frame index CDFI[31:0]*/
   MmioWrite32 (DMA4_CDFI (Channel), DMA4->DestinationFrameIndex);
- 
+
   MmioWrite32 (DMA4_CDFI (Channel), DMA4->DestinationFrameIndex);
 
   // Enable all the status bits since we are polling
@@ -126,17 +126,17 @@ EnableDmaChannel (
   return EFI_SUCCESS;
 }
 
-/**                                                                 
+/**
   Turn of DMA channel configured by EnableDma().
-            
+
   @param  Channel               DMA Channel to configure
   @param  SuccesMask            Bits in DMA4_CSR register indicate EFI_SUCCESS
   @param  ErrorMask             Bits in DMA4_CSR register indicate EFI_DEVICE_ERROR
-                                  
+
   @retval EFI_SUCCESS           DMA hardware disabled
   @retval EFI_INVALID_PARAMETER Channel is not valid
   @retval EFI_DEVICE_ERROR      The system hardware could not map the requested information.
-                                   
+
 **/
 EFI_STATUS
 EFIAPI
@@ -168,7 +168,7 @@ DisableDmaChannel (
   MmioWrite32 (DMA4_CICR (Channel), 0);
   MmioWrite32 (DMA4_CSR (Channel),  DMA4_CSR_RESET);
 
-  MmioAnd32 (DMA4_CCR(0), ~(DMA4_CCR_ENABLE | DMA4_CCR_RD_ACTIVE | DMA4_CCR_WR_ACTIVE)); 
+  MmioAnd32 (DMA4_CCR(0), ~(DMA4_CCR_ENABLE | DMA4_CCR_RD_ACTIVE | DMA4_CCR_WR_ACTIVE));
   return Status;
 }
 

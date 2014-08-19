@@ -1,21 +1,21 @@
 #/** @file
 #
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #**/
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = ArmPlatformPkg
-  PACKAGE_GUID                   = 3308e0a0-1d94-11e0-915c-0002a5d5c51b 
+  PACKAGE_GUID                   = 3308e0a0-1d94-11e0-915c-0002a5d5c51b
   PACKAGE_VERSION                = 0.1
 
 ################################################################################
@@ -47,7 +47,7 @@
 [PcdsFeatureFlag.common]
   # Set this PCD to TRUE to map NORFlash at 0x0. FALSE means the DRAM is mapped at 0x0.
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping|FALSE|BOOLEAN|0x00000012
-  
+
   gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE|BOOLEAN|0x00000001
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|FALSE|BOOLEAN|0x00000002
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
@@ -61,7 +61,7 @@
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1|UINT32|0x00000039
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038
-    
+
   # Stack for CPU Cores in Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000005
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize|0x10000|UINT32|0x00000036
@@ -71,7 +71,7 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0|UINT32|0x00000009
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x10000|UINT32|0x00000037
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x1000|UINT32|0x0000000A
-    
+
   # Size of the region used by UEFI in permanent memory (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x08000000|UINT32|0x00000015
 
@@ -79,7 +79,7 @@
   #  = sizeof(UINTN) /* PcdPeiServicePtr or HobListPtr */
   gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize|0x4|UINT32|0x00000016
   # PeiServicePtr and HobListPtr shares the same location in the PEI Global Variable list
-  # PeiServicePtr is only valid with PEI Core and HobListPtr only when the PEI Core is skipped. 
+  # PeiServicePtr is only valid with PEI Core and HobListPtr only when the PEI Core is skipped.
   gArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset|0x0|UINT32|0x00000017
   gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset|0x0|UINT32|0x00000018
 
@@ -115,11 +115,11 @@
 
   ## PL061 GPIO
   gArmPlatformTokenSpaceGuid.PcdPL061GpioBase|0x0|UINT32|0x00000025
-  
+
   ## PL111 Lcd & HdLcd
   gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x0|UINT32|0x00000026
   gArmPlatformTokenSpaceGuid.PcdArmHdLcdBase|0x0|UINT32|0x00000027
-  
+
   ## PL180 MCI
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000028
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x00000029
@@ -132,17 +132,17 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L""|VOID*|0x0000000D
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L""|VOID*|0x0000000E
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L""|VOID*|0x000000F
-  # PcdDefaultBootType define the type of the binary pointed by PcdDefaultBootDevicePath: 
+  # PcdDefaultBootType define the type of the binary pointed by PcdDefaultBootDevicePath:
   #  - 0 = an EFI application
   #  - 1 = a Linux kernel with ATAG support
   #  - 2 = a Linux kernel with FDT support
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0|UINT32|0x00000010
   gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L""|VOID*|0x00000011
-  
+
   ## Timeout value for displaying progressing bar in before boot OS.
   #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000001A
-  
+
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
 

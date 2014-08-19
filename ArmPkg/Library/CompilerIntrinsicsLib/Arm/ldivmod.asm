@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -15,7 +15,7 @@
 
     EXPORT  __aeabi_ldivmod
     EXTERN  __aeabi_uldivmod
-           
+
     AREA    Math, CODE, READONLY
 
 ;
@@ -52,7 +52,7 @@ L_Test3
     RSC      r3,r3,#0
 L_Exit
     POP      {r4,pc}
- 
+
     END
 
 

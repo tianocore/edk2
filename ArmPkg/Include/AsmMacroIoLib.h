@@ -159,7 +159,7 @@ _InitializePrimaryStackEnd:
   ldr  r1, =Address ;              \
   ldr  r0, =Data    ;              \
   str  r0, [r1]
-    
+
 #define MmioOr32(Address, OrData) \
   ldr  r1, =Address ;             \
   ldr  r2, =OrData  ;             \
@@ -181,7 +181,7 @@ _InitializePrimaryStackEnd:
   and  r0, r0, r2   ;                             \
   ldr  r2, =OrData  ;                             \
   orr  r0, r0, r2   ;                             \
-  str  r0, [r1]         
+  str  r0, [r1]
 
 #define MmioWriteFromReg32(Address, Reg) \
   ldr  r1, =Address ;                    \
@@ -235,7 +235,7 @@ _InitializePrimaryStackEnd:
 #else
 
 //
-// Use ARM assembly macros, form armasam 
+// Use ARM assembly macros, form armasam
 //
 //  Less magic in the macros if ldr reg, =expr works
 //
@@ -251,7 +251,7 @@ _InitializePrimaryStackEnd:
 
 // returns Data in R0 and Address in R1, and OrData in r2
 #define MmioOr32(Address, OrData) MmioOr32Macro Address, OrData
-  
+
 
 // returns _Data in R0 and _Address in R1, and _OrData in r2
 
