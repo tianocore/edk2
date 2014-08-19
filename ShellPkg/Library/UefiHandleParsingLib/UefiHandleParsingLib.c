@@ -16,7 +16,7 @@
 #include "UefiHandleParsingLib.h"
 #include "IndustryStandard/Acpi10.h"
 
-EFI_HANDLE        mHandleParsingHiiHandle;
+EFI_HANDLE        mHandleParsingHiiHandle = NULL;
 HANDLE_INDEX_LIST mHandleList = {{{NULL,NULL},0,0},0};
 GUID_INFO_BLOCK   *GuidList;
 UINTN             GuidListCount;
@@ -102,12 +102,23 @@ HandleParsingLibConstructor (
   GuidListCount = 0;
   GuidList      = NULL;
 
-  mHandleParsingHiiHandle = HiiAddPackages (&gHandleParsingHiiGuid, gImageHandle, UefiHandleParsingLibStrings, NULL);
-  if (mHandleParsingHiiHandle == NULL) {
-    return (EFI_DEVICE_ERROR);
-  }
-
+  //
+  // Do nothing with mHandleParsingHiiHandle.  Initialize HII as needed.
+  //
   return (EFI_SUCCESS);
+}
+
+/** 
+  Initialization function for HII packages.
+ 
+**/
+VOID
+HandleParsingHiiInit (VOID)
+{
+  if (mHandleParsingHiiHandle == NULL) {
+    mHandleParsingHiiHandle = HiiAddPackages (&gHandleParsingHiiGuid, gImageHandle, UefiHandleParsingLibStrings, NULL);
+    ASSERT (mHandleParsingHiiHandle != NULL);
+  }
 }
 
 /**
@@ -165,6 +176,8 @@ LoadedImageProtocolDumpInformation(
   if (!Verbose) {
     return (CatSPrint(NULL, L"LoadedImage"));
   }
+
+  HandleParsingHiiInit();
 
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_LI_DUMP_MAIN), NULL);
   RetVal = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
@@ -241,6 +254,8 @@ GraphicsOutputProtocolDumpInformation(
   if (!Verbose) {
     return (CatSPrint(NULL, L"GraphicsOutput"));
   }
+
+  HandleParsingHiiInit();
 
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_GOP_DUMP_MAIN), NULL);
   RetVal = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
@@ -321,6 +336,8 @@ PciRootBridgeIoDumpInformation(
   if (!Verbose) {
     return (CatSPrint(NULL, L"PciRootBridgeIo"));
   }
+
+  HandleParsingHiiInit();
 
   Status = gBS->HandleProtocol(
     TheHandle,
@@ -444,6 +461,8 @@ TxtOutProtocolDumpInformation(
   if (!Verbose) {
     return (NULL);
   }
+
+  HandleParsingHiiInit();
 
   RetVal  = NULL;
   Size    = 0;
@@ -883,6 +902,8 @@ AddNewGuidNameMapping(
   CONST GUID_INFO_BLOCK *Temp;
   EFI_STRING_ID         NameID;
 
+  HandleParsingHiiInit();
+
   if (Guid == NULL || TheName == NULL){
     return (EFI_INVALID_PARAMETER);
   }
@@ -918,6 +939,8 @@ GetStringNameFromGuid(
   )
 {
   CONST GUID_INFO_BLOCK *Id;
+
+  HandleParsingHiiInit();
 
   Id = InternalShellGetNodeFromGuid(Guid);
   return (HiiGetString(mHandleParsingHiiHandle, Id==NULL?STRING_TOKEN(STR_UNKNOWN_DEVICE):Id->StringId, Lang));
@@ -985,6 +1008,8 @@ GetGuidFromStringName(
   CONST GUID_INFO_BLOCK  *ListWalker;
   CHAR16                     *String;
   UINTN                  LoopCount;
+
+  HandleParsingHiiInit();
 
   ASSERT(Guid != NULL);
   if (Guid == NULL) {
