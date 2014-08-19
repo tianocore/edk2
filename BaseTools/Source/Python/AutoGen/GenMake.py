@@ -1200,7 +1200,7 @@ cleanlib:
 #
 class TopLevelMakefile(BuildFile):
     ## template used to generate toplevel makefile
-    _TEMPLATE_ = TemplateString('''${BEGIN}\tGenFds -f "${fdf_file}" -o "${platform_build_directory}" -t ${toolchain_tag} -b ${build_target} -p "${active_platform}" -a ${build_architecture_list} ${extra_options}${END}${BEGIN} -r ${fd} ${END}${BEGIN} -i ${fv} ${END}${BEGIN} -C ${cap} ${END}${BEGIN} -D ${macro} ${END}''')
+    _TEMPLATE_ = TemplateString('''${BEGIN}\tGenFds -f ${fdf_file} -o ${platform_build_directory} -t ${toolchain_tag} -b ${build_target} -p ${active_platform} -a ${build_architecture_list} ${extra_options}${END}${BEGIN} -r ${fd} ${END}${BEGIN} -i ${fv} ${END}${BEGIN} -C ${cap} ${END}${BEGIN} -D ${macro} ${END}''')
 
     ## Constructor of TopLevelMakefile
     #

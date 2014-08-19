@@ -245,7 +245,14 @@ def LaunchCommand(Command, WorkingDir):
     # if working directory doesn't exist, Popen() will raise an exception
     if not os.path.isdir(WorkingDir):
         EdkLogger.error("build", FILE_NOT_FOUND, ExtraData=WorkingDir)
-
+    
+    # Command is used as the first Argument in following Popen().
+    # It could be a string or sequence. We find that if command is a string in following Popen(),
+    # ubuntu may fail with an error message that the command is not found.
+    # So here we may need convert command from string to list instance.
+    if not isinstance(Command, list):
+        Command = Command.split()
+    
     Proc = None
     EndOfProcedure = None
     try:
@@ -1402,12 +1409,6 @@ class Build():
                 for Arch in Wa.ArchList:
                     GlobalData.gGlobalDefines['ARCH'] = Arch
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
-                    for Module in Pa.Platform.Modules:
-                        # Get ModuleAutoGen object to generate C code file and makefile
-                        Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
-                        if Ma == None:
-                            continue
-                        self.BuildModules.append(Ma)
                     self._BuildPa(self.Target, Pa)
 
                 # Create MAP file when Load Fix Address is enabled.
@@ -1491,7 +1492,6 @@ class Build():
                     Ma = ModuleAutoGen(Wa, self.ModuleFile, BuildTarget, ToolChain, Arch, self.PlatformFile)
                     if Ma == None: continue
                     MaList.append(Ma)
-                    self.BuildModules.append(Ma)
                     if not Ma.IsBinaryModule:
                         self._Build(self.Target, Ma, BuildModule=True)
 
