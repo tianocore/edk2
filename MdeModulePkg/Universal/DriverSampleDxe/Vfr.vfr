@@ -182,7 +182,6 @@ formset
                  // CHECKBOX_DEFAULT_MFG indicate EFI_IFR_CHECKBOX_DEFAULT_MFG.
                  //
                  flags    = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG,
-                 key      = 0,
                  default  = 1,
         endcheckbox;
       endif;
@@ -587,7 +586,6 @@ formset
               prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
               help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
               flags    = CHECKBOX_DEFAULT,
-              key      = 0,
       endcheckbox;
 
       text
