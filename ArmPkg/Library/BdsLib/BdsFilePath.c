@@ -311,27 +311,40 @@ BdsConnectAndUpdateDevicePath (
   EFI_DEVICE_PATH*            Remaining;
   EFI_DEVICE_PATH*            NewDevicePath;
   EFI_STATUS                  Status;
+  EFI_HANDLE                  PreviousHandle;
 
   if ((DevicePath == NULL) || (*DevicePath == NULL) || (Handle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  PreviousHandle = NULL;
   do {
     Remaining = *DevicePath;
+
     // The LocateDevicePath() function locates all devices on DevicePath that support Protocol and returns
     // the handle to the device that is closest to DevicePath. On output, the device path pointer is modified
     // to point to the remaining part of the device path
     Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &Remaining, Handle);
-    if (!EFI_ERROR (Status)) {
-      // Recursive = FALSE: We do not want to start all the device tree
-      Status = gBS->ConnectController (*Handle, NULL, Remaining, FALSE);
-    }
 
-    /*// We need to check if RemainingDevicePath does not point on the last node. Otherwise, calling
-    // NextDevicePathNode () will return an undetermined Device Path Node
-    if (!IsDevicePathEnd (RemainingDevicePath)) {
-      RemainingDevicePath = NextDevicePathNode (RemainingDevicePath);
-    }*/
+    if (!EFI_ERROR (Status)) {
+      if (*Handle == PreviousHandle) {
+        //
+        // If no forward progress is made try invoking the Dispatcher.
+        // A new FV may have been added to the system and new drivers
+        // may now be found.
+        // Status == EFI_SUCCESS means a driver was dispatched
+        // Status == EFI_NOT_FOUND means no new drivers were dispatched
+        //
+        Status = gDS->Dispatch ();
+      }
+
+      if (!EFI_ERROR (Status)) {
+        PreviousHandle = *Handle;
+
+        // Recursive = FALSE: We do not want to start the whole device tree
+        Status = gBS->ConnectController (*Handle, NULL, Remaining, FALSE);
+      }
+    }
   } while (!EFI_ERROR (Status) && !IsDevicePathEnd (Remaining));
 
   if (!EFI_ERROR (Status)) {

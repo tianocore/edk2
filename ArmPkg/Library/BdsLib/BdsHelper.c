@@ -14,7 +14,6 @@
 
 #include "BdsInternal.h"
 
-#include <Library/DxeServicesTableLib.h>
 #include <Library/HobLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PrintLib.h>
