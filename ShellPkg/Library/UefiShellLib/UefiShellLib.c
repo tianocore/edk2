@@ -1903,7 +1903,7 @@ InternalIsFlag (
   //
   // If we accept numbers then dont return TRUE. (they will be values)
   //
-  if (((Name[0] == L'-' || Name[0] == L'+') && ShellIsHexaDecimalDigitCharacter(Name[1])) && AlwaysAllowNumbers) {
+  if (((Name[0] == L'-' || Name[0] == L'+') && InternalShellIsHexOrDecimalNumber(Name+1, FALSE, FALSE)) && AlwaysAllowNumbers) {
     return (FALSE);
   }
 
