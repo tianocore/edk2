@@ -19,11 +19,12 @@
 #include  <stdlib.h>
 #include  <string.h>
 
-/** Do not define memcpy for IPF+GCC builds.
+/** Do not define memcpy for IPF+GCC or ARM+GCC builds.
     For IPF, using a GCC compiler, the memcpy function is converted to
     CopyMem by objcpy during build.
+    For ARM, the memcpy function is provided by the CompilerIntrinsics library.
 **/
-#if  !(defined(MDE_CPU_IPF) && defined(__GNUC__))
+#if !((defined(MDE_CPU_IPF) || defined(MDE_CPU_ARM)) && defined(__GNUC__))
 /** The memcpy function copies n characters from the object pointed to by s2
     into the object pointed to by s1.
 
