@@ -11,6 +11,7 @@
   The implementation is also useful as a fast priority queue.
 
   Copyright (C) 2014, Red Hat, Inc.
+  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License that accompanies this
@@ -75,12 +76,17 @@ OrderedCollectionUserStruct (
   return Node->UserStruct;
 }
 
+/**
+  A slow function that asserts that the tree is a valid red-black tree, and
+  that it orders user structures correctly.
 
-//
-// Forward declaration of internal, unit test helper function. See
-// specification and function definition later.
-//
-STATIC
+  Read-only operation.
+
+  This function uses the stack for recursion and is not recommended for
+  "production use".
+
+  @param[in] Tree  The tree to validate.
+**/
 VOID
 RedBlackTreeValidate (
   IN CONST RED_BLACK_TREE *Tree
@@ -417,14 +423,15 @@ OrderedCollectionPrev (
                           the root of the tree), then the function stores the
                           new root node of the tree in NewRoot.
 **/
-STATIC
 VOID
 RedBlackTreeRotateRight (
   IN OUT RED_BLACK_TREE_NODE *Pivot,
   OUT    RED_BLACK_TREE_NODE **NewRoot
   )
 {
-  RED_BLACK_TREE_NODE *Parent, *LeftChild, *LeftRightChild;
+  RED_BLACK_TREE_NODE *Parent;
+  RED_BLACK_TREE_NODE *LeftChild;
+  RED_BLACK_TREE_NODE *LeftRightChild;
 
   Parent         = Pivot->Parent;
   LeftChild      = Pivot->Left;
@@ -481,14 +488,15 @@ RedBlackTreeRotateRight (
                           the root of the tree), then the function stores the
                           new root node of the tree in NewRoot.
 **/
-STATIC
 VOID
 RedBlackTreeRotateLeft (
   IN OUT RED_BLACK_TREE_NODE *Pivot,
   OUT    RED_BLACK_TREE_NODE **NewRoot
   )
 {
-  RED_BLACK_TREE_NODE *Parent, *RightChild, *RightLeftChild;
+  RED_BLACK_TREE_NODE *Parent;
+  RED_BLACK_TREE_NODE *RightChild;
+  RED_BLACK_TREE_NODE *RightLeftChild;
 
   Parent         = Pivot->Parent;
   RightChild     = Pivot->Right;
@@ -582,7 +590,8 @@ OrderedCollectionInsert (
   IN     VOID                *UserStruct
   )
 {
-  RED_BLACK_TREE_NODE *Tmp, *Parent;
+  RED_BLACK_TREE_NODE *Tmp;
+  RED_BLACK_TREE_NODE *Parent;
   INTN                Result;
   RETURN_STATUS       Status;
   RED_BLACK_TREE_NODE *NewRoot;
@@ -671,7 +680,8 @@ OrderedCollectionInsert (
 
   NewRoot = Tree->Root;
   while (Tmp != NewRoot && Parent->Color == RedBlackTreeRed) {
-    RED_BLACK_TREE_NODE *GrandParent, *Uncle;
+    RED_BLACK_TREE_NODE *GrandParent;
+    RED_BLACK_TREE_NODE *Uncle;
 
     //
     // Tmp is not the root node. Tmp is red. Tmp's parent is red. (Breaking
@@ -831,8 +841,6 @@ Done:
 
   @return  If Node is NULL or colored black.
 **/
-
-STATIC
 BOOLEAN
 NodeIsNullOrBlack (
   IN CONST RED_BLACK_TREE_NODE *Node
@@ -916,8 +924,11 @@ OrderedCollectionDelete (
   )
 {
   RED_BLACK_TREE_NODE  *NewRoot;
-  RED_BLACK_TREE_NODE  *OrigLeftChild, *OrigRightChild, *OrigParent;
-  RED_BLACK_TREE_NODE  *Child, *Parent;
+  RED_BLACK_TREE_NODE  *OrigLeftChild;
+  RED_BLACK_TREE_NODE  *OrigRightChild;
+  RED_BLACK_TREE_NODE  *OrigParent;
+  RED_BLACK_TREE_NODE  *Child;
+  RED_BLACK_TREE_NODE  *Parent;
   RED_BLACK_TREE_COLOR ColorOfUnlinked;
 
   NewRoot        = Tree->Root;
@@ -1024,7 +1035,7 @@ OrderedCollectionDelete (
       //                                 C <--- ToRelink
       //
       Parent->Left = Child;
-      if (Child) {
+      if (Child != NULL) {
         Child->Parent = Parent;
       }
 
@@ -1124,7 +1135,9 @@ OrderedCollectionDelete (
     // Rotations in the loop preserve property #4.
     //
     while (Child != NewRoot && NodeIsNullOrBlack (Child)) {
-      RED_BLACK_TREE_NODE *Sibling, *LeftNephew, *RightNephew;
+      RED_BLACK_TREE_NODE *Sibling;
+      RED_BLACK_TREE_NODE *LeftNephew;
+      RED_BLACK_TREE_NODE *RightNephew;
 
       if (Child == Parent->Left) {
         Sibling = Parent->Right;
@@ -1337,13 +1350,13 @@ OrderedCollectionDelete (
 
   @retval  The black-height of Node's parent.
 **/
-STATIC
 UINT32
 RedBlackTreeRecursiveCheck (
   IN CONST RED_BLACK_TREE_NODE *Node
   )
 {
-  UINT32 LeftHeight, RightHeight;
+  UINT32 LeftHeight;
+  UINT32 RightHeight;
 
   //
   // property #2
@@ -1387,15 +1400,16 @@ RedBlackTreeRecursiveCheck (
 
   @param[in] Tree  The tree to validate.
 **/
-STATIC
 VOID
 RedBlackTreeValidate (
   IN CONST RED_BLACK_TREE *Tree
   )
 {
   UINT32                    BlackHeight;
-  UINT32                    ForwardCount, BackwardCount;
-  CONST RED_BLACK_TREE_NODE *Last, *Node;
+  UINT32                    ForwardCount;
+  UINT32                    BackwardCount;
+  CONST RED_BLACK_TREE_NODE *Last;
+  CONST RED_BLACK_TREE_NODE *Node;
 
   DEBUG ((DEBUG_VERBOSE, "%a: Tree=%p\n", __FUNCTION__, Tree));
 
