@@ -313,17 +313,25 @@ PeiCore (
     // Initialize PEI Core Private Data Buffer
     //
     PrivateData.PpiData.PpiListPtrs  = AllocateZeroPool (sizeof (PEI_PPI_LIST_POINTERS) * PcdGet32 (PcdPeiCoreMaxPpiSupported));
+    ASSERT (PrivateData.PpiData.PpiListPtrs != NULL);
     PrivateData.Fv                   = AllocateZeroPool (sizeof (PEI_CORE_FV_HANDLE) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    ASSERT (PrivateData.Fv != NULL);
     PrivateData.Fv[0].PeimState      = AllocateZeroPool (sizeof (UINT8) * PcdGet32 (PcdPeiCoreMaxPeimPerFv) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    ASSERT (PrivateData.Fv[0].PeimState != NULL);
     PrivateData.Fv[0].FvFileHandles  = AllocateZeroPool (sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    ASSERT (PrivateData.Fv[0].FvFileHandles != NULL);
     for (Index = 1; Index < PcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
       PrivateData.Fv[Index].PeimState     = PrivateData.Fv[Index - 1].PeimState + PcdGet32 (PcdPeiCoreMaxPeimPerFv);
       PrivateData.Fv[Index].FvFileHandles = PrivateData.Fv[Index - 1].FvFileHandles + PcdGet32 (PcdPeiCoreMaxPeimPerFv);
     }
     PrivateData.UnknownFvInfo        = AllocateZeroPool (sizeof (PEI_CORE_UNKNOW_FORMAT_FV_INFO) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    ASSERT (PrivateData.UnknownFvInfo != NULL);
     PrivateData.CurrentFvFileHandles = AllocateZeroPool (sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv));
+    ASSERT (PrivateData.CurrentFvFileHandles != NULL);
     PrivateData.FileGuid             = AllocatePool (sizeof (EFI_GUID) * PcdGet32 (PcdPeiCoreMaxPeimPerFv));
+    ASSERT (PrivateData.FileGuid != NULL);
     PrivateData.FileHandles          = AllocatePool (sizeof (EFI_PEI_FILE_HANDLE) * (PcdGet32 (PcdPeiCoreMaxPeimPerFv) + 1));
+    ASSERT (PrivateData.FileHandles != NULL);
   }
   InitializePpiServices      (&PrivateData,    OldCoreData);
   
