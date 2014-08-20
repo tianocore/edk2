@@ -1553,6 +1553,10 @@
   #  The required memory space is decided by the value of PcdMaximumGuidedExtractHandler.
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|0x1000000|UINT64|0x30001015
 
+  ## Canary value for the stack overflow protection. This PCD can be used by a firmware vendor
+  # or for debugging purposes to change the recommended value.
+  gEfiMdePkgTokenSpaceGuid.PcdBaseStackCanary|0x0AFF|UINT64|0x0000002A
+
 [PcdsFixedAtBuild.IPF]
   ## The base address of IO port space for IA64 arch
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
