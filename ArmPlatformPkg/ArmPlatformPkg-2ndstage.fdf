@@ -199,14 +199,14 @@ READ_LOCK_STATUS   = TRUE
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
     TE     TE                           $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI     STRING ="$(MODULE_NAME)" Optional         
+    UI     STRING ="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
      TE       TE                        $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI       STRING="$(MODULE_NAME)" Optional         
+     UI       STRING="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM.TIANOCOMPRESSED]

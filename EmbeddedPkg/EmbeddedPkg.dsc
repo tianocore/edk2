@@ -95,7 +95,7 @@
 
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
-  
+
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
 
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
