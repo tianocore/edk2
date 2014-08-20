@@ -44,6 +44,7 @@
   Tpm2DeviceLib
   HashLib
   PerformanceLib
+  MemoryAllocationLib
 
 [Guids]
   gTcgEventEntryHobGuid

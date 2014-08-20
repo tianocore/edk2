@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Protocol/TrEEProtocol.h>
 #include <Library/PerformanceLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #define PERF_ID_TREE_PEI  0x3080
 
@@ -63,10 +64,10 @@ EFI_PEI_PPI_DESCRIPTOR  mTpmInitializedPpiList = {
   NULL
 };
 
-EFI_PLATFORM_FIRMWARE_BLOB mMeasuredBaseFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredBaseFvInfo;
 UINT32 mMeasuredBaseFvIndex = 0;
 
-EFI_PLATFORM_FIRMWARE_BLOB mMeasuredChildFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredChildFvInfo;
 UINT32 mMeasuredChildFvIndex = 0;
 
 /**
@@ -592,6 +593,11 @@ PeimEntryMP (
                );
   // Do not check status, because it is optional
 
+  mMeasuredBaseFvInfo  = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+  ASSERT (mMeasuredBaseFvInfo != NULL);
+  mMeasuredChildFvInfo = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+  ASSERT (mMeasuredChildFvInfo != NULL);
+  
   if (PcdGet8 (PcdTpm2ScrtmPolicy) == 1) {
     Status = MeasureCRTMVersion ();
     ASSERT_EFI_ERROR (Status);

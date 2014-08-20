@@ -37,6 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/BaseLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include "TpmComm.h"
 
@@ -48,10 +49,10 @@ EFI_PEI_PPI_DESCRIPTOR  mTpmInitializedPpiList = {
   NULL
 };
 
-EFI_PLATFORM_FIRMWARE_BLOB mMeasuredBaseFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredBaseFvInfo;
 UINT32 mMeasuredBaseFvIndex = 0;
 
-EFI_PLATFORM_FIRMWARE_BLOB mMeasuredChildFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredChildFvInfo;
 UINT32 mMeasuredChildFvIndex = 0;
 
 EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI *mMeasurementExcludedFvPpi;
@@ -369,8 +370,8 @@ MeasureFvImage (
   //
   // Add new FV into the measured FV list.
   //
-  ASSERT (mMeasuredBaseFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
-  if (mMeasuredBaseFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+  ASSERT (mMeasuredBaseFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported));
+  if (mMeasuredBaseFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported)) {
     mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobBase   = FvBase;
     mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobLength = FvLength;
     mMeasuredBaseFvIndex++;
@@ -484,8 +485,8 @@ FirmwareVolmeInfoPpiNotifyCallback (
   //
   if (Fv->ParentFvName != NULL || Fv->ParentFileName != NULL ) {
     
-    ASSERT (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
-    if (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+    ASSERT (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported));
+    if (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported)) {
       //
       // Check whether FV is in the measured child FV list.
       //
@@ -666,6 +667,11 @@ PeimEntryMP (
                (VOID**)&mMeasurementExcludedFvPpi
                );
   // Do not check status, because it is optional
+
+  mMeasuredBaseFvInfo  = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+  ASSERT (mMeasuredBaseFvInfo != NULL);
+  mMeasuredChildFvInfo = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+  ASSERT (mMeasuredChildFvInfo != NULL);
 
   TpmHandle = (TIS_TPM_HANDLE)(UINTN)TPM_BASE_ADDRESS;
   Status = TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR)TpmHandle);
