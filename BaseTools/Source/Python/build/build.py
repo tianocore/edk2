@@ -251,8 +251,9 @@ def LaunchCommand(Command, WorkingDir):
     # ubuntu may fail with an error message that the command is not found.
     # So here we may need convert command from string to list instance.
     if not isinstance(Command, list):
-        Command = Command.split()
-    
+        if platform.system() != 'Windows':
+            Command = Command.split()
+
     Proc = None
     EndOfProcedure = None
     try:
@@ -928,7 +929,6 @@ class Build():
         if BuildModule:
             BuildCommand = BuildCommand + [Target]
             LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
-            self.CreateAsBuiltInf()
             return True
 
         # build library
@@ -946,7 +946,6 @@ class Build():
             for Mod in AutoGenObject.ModuleBuildDirectoryList:
                 NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Mod, makefile)), 'pbuild']
                 LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
-            self.CreateAsBuiltInf()
             return True
 
         # cleanlib
@@ -1056,7 +1055,6 @@ class Build():
         BuildCommand = BuildCommand + [Target]
         if BuildModule:
             LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
-            self.CreateAsBuiltInf()
             return True
 
         # build library

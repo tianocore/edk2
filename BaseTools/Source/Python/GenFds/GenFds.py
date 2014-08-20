@@ -157,7 +157,7 @@ def main():
 
         if Options.Macros:
             for Pair in Options.Macros:
-                Pair.strip('"')
+                Pair = Pair.strip('"')
                 List = Pair.split('=')
                 if len(List) == 2:
                     if List[0].strip() == "EFI_SOURCE":
