@@ -38,8 +38,10 @@ ASM_PFX(ArmIsMpCore):
   mrc     p15,0,R0,c0,c0,5
   // Get Multiprocessing extension (bit31) & U bit (bit30)
   and     R0, R0, #0xC0000000
-  // if bit30 == 0 then the processor is part of a multiprocessor system)
-  and     R0, R0, #0x80000000
+  // if (bit31 == 1) && (bit30 == 0) then the processor is part of a multiprocessor system
+  cmp     R0, #0x80000000
+  moveq   R0, #1
+  movne   R0, #0
   bx      LR
 
 ASM_PFX(ArmEnableAsynchronousAbort):
