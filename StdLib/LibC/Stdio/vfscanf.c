@@ -1,7 +1,7 @@
 /** @file
     Implementation of scanf internals for <stdio.h>.
 
-    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
@@ -124,7 +124,8 @@ int __scanfdebug = 0;
 static int
 __collate_range_cmp(int c1, int c2)
 {
-  static char s1[2], s2[2];
+  static char s1[2] = { {0}, {0} };
+  static char s2[2] = { {0}, {0} };
 
   s1[0] = (char)c1;
   s2[0] = (char)c2;
@@ -156,23 +157,23 @@ __svfscanf(FILE *fp, char const *fmt0, va_list ap)
 int
 __svfscanf_unlocked(FILE *fp, const char *fmt0, va_list ap)
 {
-  const u_char *fmt = (const u_char *)fmt0;
-  int c;      /* character from format, or conversion */
-  size_t width;   /* field width, or 0 */
-  char *p;    /* points into all kinds of strings */
-  size_t n;   /* handy size_t */
-  int flags;    /* flags as defined above */
-  char *p0;   /* saves original value of p when necessary */
-  int nassigned;    /* number of fields assigned */
-  int nconversions; /* number of conversions */
-  int nread;    /* number of characters consumed from fp */
-  int base;   /* base argument to conversion function */
-  char ccltab[256]; /* character class table for %[...] */
-  char buf[BUF];    /* buffer for numeric and mb conversions */
-  wchar_t *wcp;   /* handy wide character pointer */
-  size_t nconv;   /* length of multibyte sequence converted */
-  static const mbstate_t initial = { 0 };
-  mbstate_t mbs;
+          const u_char     *fmt     = (const u_char *)fmt0;
+                int         c;              /* character from format, or conversion */
+                size_t      width;          /* field width, or 0 */
+                char       *p;              /* points into all kinds of strings */
+                size_t      n;              /* handy size_t */
+                int         flags;          /* flags as defined above */
+                char       *p0;             /* saves original value of p when necessary */
+                int         nassigned;      /* number of fields assigned */
+                int         nconversions;   /* number of conversions */
+                int         nread;          /* number of characters consumed from fp */
+                int         base;           /* base argument to conversion function */
+                char        ccltab[256];    /* character class table for %[...] */
+                char        buf[BUF];       /* buffer for numeric and mb conversions */
+                wchar_t    *wcp;            /* handy wide character pointer */
+                size_t      nconv;          /* length of multibyte sequence converted */
+  static const  mbstate_t   initial = { 0 };
+                mbstate_t   mbs;
 
   /* `basefix' is used to avoid `if' tests in the integer scanner */
   static const short basefix[17] =
@@ -843,12 +844,8 @@ literal:
         goto match_failure;
       if ((flags & SUPPRESS) == 0) {
         if (flags & LONGDBL) {
-          long double **mp = (long double **)ap;
           long double res = strtold(buf, &p);
-
-          *(*mp) = res;
-          ap += sizeof(long double *);
-/*???*/   //*va_arg(ap, long double *) = res;
+          *va_arg(ap, long double *) = res;
         } else if (flags & LONG) {
           double res = strtod(buf, &p);
           *va_arg(ap, double *) = res;
