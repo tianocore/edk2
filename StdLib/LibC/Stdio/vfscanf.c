@@ -124,8 +124,8 @@ int __scanfdebug = 0;
 static int
 __collate_range_cmp(int c1, int c2)
 {
-  static char s1[2] = { {0}, {0} };
-  static char s2[2] = { {0}, {0} };
+  static char s1[2] = { 0 };
+  static char s2[2] = { 0 };
 
   s1[0] = (char)c1;
   s2[0] = (char)c2;
