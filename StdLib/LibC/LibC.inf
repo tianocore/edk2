@@ -1,7 +1,7 @@
 ## @file
 #  Standard C library: Miscelaneous implementations.
 #
-#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -50,6 +50,7 @@
   # Compiler helper (C RunTime) functions
   CRT/Ia32/llmul.c          | MSFT    # __allmul
   CRT/Ia32/llshl.c          | MSFT    # __allshl
+  CRT/Ia32/llshr.c          | MSFT    # __allshr
   CRT/Ia32/ulldiv.c         | MSFT    # __aulldiv
   CRT/Ia32/ullrem.c         | MSFT    # __aullrem
   CRT/Ia32/ullshr.c         | MSFT    # __aullshr
@@ -60,6 +61,7 @@
 
   CRT/Ia32/llmul.c          | INTEL
   CRT/Ia32/llshl.c          | INTEL
+  CRT/Ia32/llshr.c          | INTEL
   CRT/Ia32/ulldiv.c         | INTEL
   CRT/Ia32/ullrem.c         | INTEL
   CRT/Ia32/ullshr.c         | INTEL
