@@ -65,9 +65,9 @@ IsNvNeed (
   @param  VarName            The name of the EFI console variable.
   @param  ConsoleGuid        Specified Console protocol GUID.
   @param  ConsoleHandle      On IN,  console handle in System Table to be checked. 
-                             On OUT, new console hanlde in system table.
+                             On OUT, new console handle in system table.
   @param  ProtocolInterface  On IN,  console protocol on console handle in System Table to be checked. 
-                             On OUT, new console protocol on new console hanlde in system table.
+                             On OUT, new console protocol on new console handle in system table.
 
   @retval TRUE               System Table has been updated.
   @retval FALSE              System Table hasn't been updated.

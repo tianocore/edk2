@@ -1185,7 +1185,7 @@ DebugPortPollBuffer (
 
   If Function is NULL, and Context is not NULL, the Debug Communication Library could
     a) Return the same handle as passed in (as Context parameter).
-    b) Ignore the input Context parameter and create new hanlde to be returned.
+    b) Ignore the input Context parameter and create new handle to be returned.
 
   If parameter Function is NULL and Context is NULL, Debug Communication Library could
   created a new handle if needed and return it, otherwise it will return NULL.

@@ -1,7 +1,7 @@
 /** @file
   Debug Communication Library definitions.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -56,7 +56,7 @@ VOID
      instance, it could return the same handle as passed in (as Context parameter).
   b) If the instance does not understand, or does not want to continue use the
      private data of the previous instance, it could ignore the input Context parameter
-     and create the new hanlde to be returned.
+     and create the new handle to be returned.
 
   If Function() is NULL and Context is NULL, Debug Communication Library could create a
   new handle and return it. NULL is also a valid handle to be returned.
