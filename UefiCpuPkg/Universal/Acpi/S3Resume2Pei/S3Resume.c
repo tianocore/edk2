@@ -367,6 +367,7 @@ WriteToOsS3PerformanceData (
         AsciiSPrint (PerfData->Token, PERF_TOKEN_LENGTH, "0x%11p", Handle);
       } else {
         AsciiStrnCpy (PerfData->Token, Token, PERF_TOKEN_LENGTH);
+        PerfData->Token[PERF_TOKEN_LENGTH] = '\0';
       }
       if (StartTicker == 1) {
         StartTicker = StartValue;
