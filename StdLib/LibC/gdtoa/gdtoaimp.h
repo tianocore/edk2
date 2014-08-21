@@ -3,11 +3,7 @@
   floating-point formats to and from decimal notation.  It uses
   double-precision arithmetic internally, so there are still
   various #ifdefs that adapt the calculations to the native
-  double-precision arithmetic (any of IEEE, VAX D_floating,
-  or IBM mainframe arithmetic).
-
-  Please send bug reports to David M. Gay (dmg at acm dot org,
-  with " at " changed at "@" and " dot " changed to ".").
+  IEEE double-precision arithmetic.
 
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
@@ -17,6 +13,8 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+  *****************************************************************
 
   The author of this software is David M. Gay.
 
@@ -42,7 +40,12 @@
   ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
   THIS SOFTWARE.
 
-$NetBSD: gdtoaimp.h,v 1.5.4.1 2007/05/07 19:49:06 pavel Exp
+  Please send bug reports to David M. Gay (dmg at acm dot org,
+  with " at " changed at "@" and " dot " changed to ".").
+
+  *****************************************************************
+
+  NetBSD: gdtoaimp.h,v 1.5.4.1 2007/05/07 19:49:06 pavel Exp
 **/
 
 /* On a machine with IEEE extended-precision registers, it is
@@ -94,8 +97,6 @@ $NetBSD: gdtoaimp.h,v 1.5.4.1 2007/05/07 19:49:06 pavel Exp
  * #define Long int on machines with 32-bit ints and 64-bit longs.
  * #define Sudden_Underflow for IEEE-format machines without gradual
  *  underflow (i.e., that flush to zero on underflow).
- * #define IBM for IBM mainframe-style floating-point arithmetic.
- * #define VAX for VAX-style floating-point arithmetic (D_floating).
  * #define No_leftright to omit left-right logic in fast floating-point
  *  computation of dtoa.
  * #define Check_FLT_ROUNDS if FLT_ROUNDS can assume the values 2 or 3.
@@ -114,7 +115,6 @@ $NetBSD: gdtoaimp.h,v 1.5.4.1 2007/05/07 19:49:06 pavel Exp
  *  something other than "long long", #define Llong to be the name,
  *  and if "unsigned Llong" does not work as an unsigned version of
  *  Llong, #define #ULLong to be the corresponding unsigned type.
- * #define KR_headers for old-style C function headers.
  * #define Bad_float_h if your system lacks a float.h or if it does not
  *  define some or all of DBL_DIG, DBL_MAX_10_EXP, DBL_MAX_EXP,
  *  FLT_RADIX, FLT_ROUNDS, and DBL_MAX.
@@ -203,11 +203,7 @@ $NetBSD: gdtoaimp.h,v 1.5.4.1 2007/05/07 19:49:06 pavel Exp
 #include "stdlib.h"
 #include "string.h"
 
-#ifdef KR_headers
-#define Char char
-#else
 #define Char void
-#endif
 
 #ifdef MALLOC
 extern Char *MALLOC ANSI((size_t));
@@ -235,23 +231,6 @@ extern Char *MALLOC ANSI((size_t));
 #define DBL_MAX 1.7976931348623157e+308
 #endif
 
-#ifdef IBM
-#define DBL_DIG 16
-#define DBL_MAX_10_EXP 75
-#define DBL_MAX_EXP 63
-#define FLT_RADIX 16
-#define DBL_MAX 7.2370055773322621e+75
-#endif
-
-#ifdef VAX
-#define DBL_DIG 16
-#define DBL_MAX_10_EXP 38
-#define DBL_MAX_EXP 127
-#define FLT_RADIX 2
-#define DBL_MAX 1.7014118346046923e+38
-#define n_bigtens 2
-#endif
-
 #ifndef LONG_MAX
 #define LONG_MAX 2147483647
 #endif
@@ -265,22 +244,14 @@ extern Char *MALLOC ANSI((size_t));
 #define n_bigtens 5
 #endif
 
-#ifdef IBM
-#define n_bigtens 3
-#endif
-
-#ifdef VAX
-#define n_bigtens 2
-#endif
-
 #include "math.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if defined(IEEE_LITTLE_ENDIAN) + defined(IEEE_BIG_ENDIAN) + defined(VAX) + defined(IBM) != 1
-Exactly one of IEEE_LITTLE_ENDIAN, IEEE_BIG_ENDIAN, VAX, or IBM should be defined.
+#if defined(IEEE_LITTLE_ENDIAN) + defined(IEEE_BIG_ENDIAN) != 1
+Exactly one of IEEE_LITTLE_ENDIAN or IEEE_BIG_ENDIAN should be defined.
 #endif
 
 /*  This union assumes that:
@@ -316,7 +287,7 @@ typedef union { double d; UINT32 L[2]; } U;
  * An alternative that might be better on some machines is
  * #define Storeinc(a,b,c) (*a++ = b << 16 | c & 0xffff)
  */
-#if defined(IEEE_LITTLE_ENDIAN) + defined(VAX)
+#if defined(IEEE_LITTLE_ENDIAN)
 #define Storeinc(a,b,c) \
  (((unsigned short *)(void *)a)[1] = (unsigned short)b, \
   ((unsigned short *)(void *)a)[0] = (unsigned short)c, \
@@ -433,11 +404,7 @@ typedef union { double d; UINT32 L[2]; } U;
 #ifdef RND_PRODQUOT
 #define rounded_product(a,b) a = rnd_prod(a, b)
 #define rounded_quotient(a,b) a = rnd_quot(a, b)
-#ifdef KR_headers
-extern double rnd_prod(), rnd_quot();
-#else
 extern double rnd_prod(double, double), rnd_quot(double, double);
-#endif
 #else
 #define rounded_product(a,b) a *= b
 #define rounded_quotient(a,b) a /= b
@@ -503,7 +470,7 @@ extern mutex_t __gdtoa_locks[2];
   } while (/* CONSTCOND */ 0)
 #endif
 
-#define Kmax 15
+#define Kmax (sizeof(size_t) << 3)
 
  struct
 Bigint {

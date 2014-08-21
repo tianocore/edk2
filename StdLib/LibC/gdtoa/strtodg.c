@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -35,7 +35,6 @@
   ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
   THIS SOFTWARE.
 
-
   Please send bug reports to David M. Gay (dmg at acm dot org,
   with " at " changed at "@" and " dot " changed to ".").
 
@@ -66,11 +65,7 @@ fivesbits[] = {  0,  3,  5,  7, 10, 12, 14, 17, 19, 21,
     };
 
  Bigint *
-#ifdef KR_headers
-increment(b) Bigint *b;
-#else
 increment(Bigint *b)
-#endif
 {
   ULong *x, *xe;
   Bigint *b1;
@@ -113,11 +108,7 @@ increment(Bigint *b)
   }
 
  int
-#ifdef KR_headers
-decrement(b) Bigint *b;
-#else
 decrement(Bigint *b)
-#endif
 {
   ULong *x, *xe;
 #ifdef Pack_16
@@ -146,11 +137,7 @@ decrement(Bigint *b)
   }
 
  static int
-#ifdef KR_headers
-all_on(b, n) CONST Bigint *b; int n;
-#else
 all_on(CONST Bigint *b, int n)
-#endif
 {
   CONST ULong *x, *xe;
 
@@ -165,11 +152,7 @@ all_on(CONST Bigint *b, int n)
   }
 
  Bigint *
-#ifdef KR_headers
-set_ones(b, n) Bigint *b; int n;
-#else
 set_ones(Bigint *b, int n)
-#endif
 {
   int k;
   ULong *x, *xe;
@@ -195,13 +178,9 @@ set_ones(Bigint *b, int n)
   }
 
  static int
-rvOK
-#ifdef KR_headers
- (d, fpi, expt, bits, exact, rd, irv)
- double d; CONST FPI *fpi; Long *expt; ULong *bits; int exact, rd, *irv;
-#else
- (double d, CONST FPI *fpi, Long *expt, ULong *bits, int exact, int rd, int *irv)
-#endif
+rvOK (
+  double d, CONST FPI *fpi, Long *expt, ULong *bits, int exact, int rd, int *irv
+)
 {
   Bigint *b;
   ULong carry, inex, lostbits;
@@ -314,41 +293,22 @@ rvOK
   return rv;
   }
 
-#ifndef VAX
  static int
-#ifdef KR_headers
-mantbits(d) double d;
-#else
 mantbits(double d)
-#endif
 {
   ULong L;
-#ifdef VAX
-  L = word1(d) << 16 | word1(d) >> 16;
-  if (L)
-#else
   if ( (L = word1(d)) !=0)
-#endif
     return P - lo0bits(&L);
-#ifdef VAX
-  L = word0(d) << 16 | word0(d) >> 16 | Exp_msk11;
-#else
   L = word0(d) | Exp_msk1;
-#endif
   return P - 32 - lo0bits(&L);
   }
-#endif /* !VAX */
 
  int
-strtodg
-#ifdef KR_headers
-  (s00, se, fpi, expt, bits)
-  CONST char *s00; char **se; CONST FPI *fpi; Long *expt; ULong *bits;
-#else
-  (CONST char *s00, char **se, CONST FPI *fpi, Long *expt, ULong *bits)
-#endif
+strtodg (
+  CONST char *s00, char **se, CONST FPI *fpi, Long *expt, ULong *bits
+)
 {
-  int abe, abits, asub;
+  int abe = 0, abits = 0, asub;
   int bb0, bb2, bb5, bbe, bd2, bd5, bbbits, bs2, c, decpt, denorm;
   int dsign, e, e1, e2, emin, esign, finished, i, inex, irv;
   int j, k, nbits, nd, nd0, nf, nz, nz0, rd, rvbits, rve, rve1, sign;
@@ -563,16 +523,12 @@ strtodg
       }
     else if (e > 0) {
       if (e <= Ten_pmax) {
-#ifdef VAX
-        goto vax_ovfl_check;
-#else
         i = fivesbits[e] + mantbits(dval(rv)) <= P;
         /* rv = */ rounded_product(dval(rv), tens[e]);
         if (rvOK(dval(rv), fpi, expt, bits, i, rd, &irv))
           goto ret;
         e1 -= e;
         goto rv_notOK;
-#endif
         }
       i = DBL_DIG - nd;
       if (e <= Ten_pmax + i) {
@@ -582,22 +538,7 @@ strtodg
         e2 = e - i;
         e1 -= i;
         dval(rv) *= tens[i];
-#ifdef VAX
-        /* VAX exponent range is so narrow we must
-         * worry about overflow here...
-         */
- vax_ovfl_check:
-        dval(adj) = dval(rv);
-        word0(adj) -= P*Exp_msk1;
-        /* adj = */ rounded_product(dval(adj), tens[e2]);
-        if ((word0(adj) & Exp_mask)
-         > Exp_msk1*(DBL_MAX_EXP+Bias-1-P))
-          goto rv_notOK;
-        word0(adj) += P*Exp_msk1;
-        dval(rv) = dval(adj);
-#else
         /* rv = */ rounded_product(dval(rv), tens[e2]);
-#endif
         if (rvOK(dval(rv), fpi, expt, bits, 0, rd, &irv))
           goto ret;
         e1 -= e2;
@@ -661,14 +602,6 @@ strtodg
           dval(rv) *= tinytens[j];
       }
     }
-#ifdef IBM
-  /* e2 is a correction to the (base 2) exponent of the return
-   * value, reflecting adjustments above to avoid overflow in the
-   * native arithmetic.  For native IBM (base 16) arithmetic, we
-   * must multiply e2 by 4 to change from base 16 to 2.
-   */
-  e2 <<= 2;
-#endif
   rvb = d2b(dval(rv), &rve, &rvbits); /* rv = rvb * 2^rve */
   if (rvb == NULL)
     return STRTOG_NoMemory;
@@ -924,7 +857,7 @@ strtodg
         inex = STRTOG_Inexlo;
         }
       if (dval(adj) < 2147483647.) {
-        L = (INT32)adj0;
+        L = (Long)adj0;
         adj0 -= L;
         switch(rd) {
           case 0:
@@ -937,7 +870,7 @@ strtodg
           break;
           case 2:
           if (!asub && adj0 > 0.) {
- inc_L:
+inc_L:
             L++;
             inex = STRTOG_Inexact - inex;
             }
