@@ -1962,6 +1962,7 @@ class PlatformAutoGen(AutoGen):
     BuildRule           = property(_GetBuildRule)
     ModuleAutoGenList   = property(_GetModuleAutoGenList)
     LibraryAutoGenList  = property(_GetLibraryAutoGenList)
+    GenFdsCommand       = property(_GenFdsCommand)
 
 ## ModuleAutoGen class
 #

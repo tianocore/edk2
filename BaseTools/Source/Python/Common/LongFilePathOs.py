@@ -48,8 +48,8 @@ def chmod(path, mode):
 def stat(path):
     return os.stat(LongFilePath(path))
 
-def utime(path):
-    return os.utime(LongFilePath(path), None)
+def utime(path, times):
+    return os.utime(LongFilePath(path), times)
 
 def listdir(path):
     List = []
