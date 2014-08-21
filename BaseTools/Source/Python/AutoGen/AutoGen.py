@@ -2491,6 +2491,9 @@ class ModuleAutoGen(AutoGen):
             self._BuildTargets = {}
             self._FileTypes = {}
 
+        SubDirectory = os.path.join(self.OutputDir, File.SubDir)
+        if not os.path.exists(SubDirectory):
+            CreateDirectory(SubDirectory)
         LastTarget = None
         RuleChain = []
         SourceList = [File]
@@ -2604,7 +2607,7 @@ class ModuleAutoGen(AutoGen):
             AutoGenH = TemplateString()
             StringH = TemplateString()
             GenC.CreateCode(self, AutoGenC, AutoGenH, StringH, UniStringAutoGenC, UniStringBinBuffer)
-            if str(AutoGenC) != "" and TAB_C_CODE_FILE in self.FileTypes:
+            if str(AutoGenC) != "":
                 AutoFile = PathClass(gAutoGenCodeFileName, self.DebugDir)
                 self._AutoGenFileList[AutoFile] = str(AutoGenC)
                 self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
