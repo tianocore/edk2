@@ -2607,7 +2607,11 @@ class ModuleAutoGen(AutoGen):
             AutoGenH = TemplateString()
             StringH = TemplateString()
             GenC.CreateCode(self, AutoGenC, AutoGenH, StringH, UniStringAutoGenC, UniStringBinBuffer)
-            if str(AutoGenC) != "":
+            #
+            # AutoGen.c is generated if there are library classes in inf, or there are object files
+            #
+            if str(AutoGenC) != "" and (len(self.Module.LibraryClasses) > 0
+                                        or TAB_OBJECT_FILE in self.FileTypes):
                 AutoFile = PathClass(gAutoGenCodeFileName, self.DebugDir)
                 self._AutoGenFileList[AutoFile] = str(AutoGenC)
                 self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
