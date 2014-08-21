@@ -2458,6 +2458,24 @@ RunCommand(
   TrimSpaces(&CleanOriginal);
 
   //
+  // NULL out comments (leveraged from RunScriptFileHandle() ).
+  // The # character on a line is used to denote that all characters on the same line
+  // and to the right of the # are to be ignored by the shell.
+  // Afterward, again remove spaces, in case any were between the last command-parameter and '#'.
+  //
+  for (TempWalker = CleanOriginal; TempWalker != NULL && *TempWalker != CHAR_NULL; TempWalker++) {
+    if (*TempWalker == L'^') {
+      if (*(TempWalker + 1) == L'#') {
+        CopyMem (TempWalker, TempWalker + 1, StrSize (TempWalker) - sizeof (TempWalker[0]));
+      }
+    } else if (*TempWalker == L'#') {
+      *TempWalker = CHAR_NULL;
+    }
+  }
+
+  TrimSpaces(&CleanOriginal);
+
+  //
   // Handle case that passed in command line is just 1 or more " " characters.
   //
   if (StrLen (CleanOriginal) == 0) {
