@@ -23,7 +23,7 @@
 #include <Library/PcdLib.h>
 
 /// "canary" value that is inserted by the compiler into the stack frame.
-VOID *__stack_chk_guard = (VOID*)FixedPcdGet64 (PcdBaseStackCanary);
+VOID *__stack_chk_guard = (VOID*)0x0AFF;
 
 // If ASLR was enabled we could use
 //void (*__stack_chk_guard)(void) = __stack_chk_fail;

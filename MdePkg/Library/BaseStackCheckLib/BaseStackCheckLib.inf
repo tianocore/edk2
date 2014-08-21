@@ -38,5 +38,4 @@
   DebugLib
 
 [FixedPcd]
-  gEfiMdePkgTokenSpaceGuid.PcdBaseStackCanary
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
