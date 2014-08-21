@@ -85,7 +85,11 @@ GetNextParameter(
       StrCpy(*TempParameter, L"");
       *Walker = NextDelim + 1;
     } else if (NextDelim != NULL) {
-      StrnCpy(*TempParameter, (*Walker)+1, NextDelim - ((*Walker)+1));
+
+      //
+      // Copy ensuring that both quotes are left in place.
+      //
+      StrnCpy(*TempParameter, (*Walker), NextDelim - *Walker + 1);
       *Walker = NextDelim + 1;
     } else {
       //
