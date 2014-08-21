@@ -1,6 +1,7 @@
 /** @file
   Main file for Parse shell level 2 function.
 
+  (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -56,13 +57,22 @@ PerformParsing(
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, FileName);
     ShellStatus = SHELL_NOT_FOUND;
+  } else if (!EFI_ERROR (FileHandleIsDirectory (FileHandle))) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_FILE), gShellLevel2HiiHandle, FileName);
+    ShellStatus = SHELL_NOT_FOUND;
   } else {
     for (LoopVariable = 0 ; LoopVariable < ShellCommandInstance && !ShellFileHandleEof(FileHandle);) {
       TempLine = ShellFileHandleReturnLine(FileHandle, &Ascii);
       if (TempLine == NULL) {
         break;
       }
-      if (StrStr(TempLine, L"ShellCommand, \"") == TempLine) {
+
+      //
+      // Search for "ShellCommand," in the file to start the SFO table
+      // for a given ShellCommand.  The UEFI Shell spec does not specify
+      // a space after the comma.
+      //
+      if (StrStr (TempLine, L"ShellCommand,") == TempLine) {
         LoopVariable++;
       }
       SHELL_FREE_NON_NULL(TempLine);
@@ -71,45 +81,43 @@ PerformParsing(
       LoopVariable = 0;
       while(1) {
         TempLine = ShellFileHandleReturnLine(FileHandle, &Ascii);
-        if ( TempLine == NULL
-          || *TempLine == CHAR_NULL
-          || StrStr(TempLine, L"ShellCommand, \"") == TempLine
-         ){
+        if (TempLine == NULL
+            || *TempLine == CHAR_NULL
+            || StrStr (TempLine, L"ShellCommand,") == TempLine) {
           SHELL_FREE_NON_NULL(TempLine);
           break;
         }
-        if (StrStr(TempLine, TableName) == TempLine) {
+        if (StrStr (TempLine, TableName) == TempLine) {
           LoopVariable++;
-        }
-        if ( LoopVariable == TableNameInstance
-          || (TableNameInstance == (UINTN)-1 && StrStr(TempLine, TableName) == TempLine)
-         ){
-          for (ColumnLoop = 1, ColumnPointer = TempLine; ColumnLoop < ColumnIndex && ColumnPointer != NULL && *ColumnPointer != CHAR_NULL; ColumnLoop++) {
-            ColumnPointer = StrStr(ColumnPointer, L",");
-            if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL){
-              ColumnPointer++;
+          if (LoopVariable == TableNameInstance
+              || (TableNameInstance == (UINTN)-1)) {
+            for (ColumnLoop = 1, ColumnPointer = TempLine; ColumnLoop < ColumnIndex && ColumnPointer != NULL && *ColumnPointer != CHAR_NULL; ColumnLoop++) {
+              ColumnPointer = StrStr (ColumnPointer, L",");
+              if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL){
+                ColumnPointer++;
+              }
             }
-          }
-          if (ColumnLoop == ColumnIndex) {
-            if (ColumnPointer == NULL) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"Column Index");
-              ShellStatus = SHELL_INVALID_PARAMETER;
-            } else {
-              TempSpot = StrStr(ColumnPointer, L",");
-              if (TempSpot != NULL) {
-                *TempSpot = CHAR_NULL;
-              }
-              while (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L' '){
-                ColumnPointer++;
-              }
-              if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L'\"'){
-                ColumnPointer++;
-              }
-              if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[StrLen(ColumnPointer)-1] == L'\"'){
-                ColumnPointer[StrLen(ColumnPointer)-1] = CHAR_NULL;
-              }
+            if (ColumnLoop == ColumnIndex) {
+              if (ColumnPointer == NULL) {
+                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"Column Index");
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                TempSpot = StrStr (ColumnPointer, L",");
+                if (TempSpot != NULL) {
+                  *TempSpot = CHAR_NULL;
+                }
+                while (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L' '){
+                  ColumnPointer++;
+                }
+                if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L'\"'){
+                  ColumnPointer++;
+                }
+                if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[StrLen (ColumnPointer) - 1] == L'\"'){
+                  ColumnPointer[StrLen (ColumnPointer) - 1] = CHAR_NULL;
+                }
 
-              ShellPrintEx(-1, -1, L"%s\r\n", ColumnPointer);
+                ShellPrintEx (-1, -1, L"%s\r\n", ColumnPointer);
+              }
             }
           }
         }
