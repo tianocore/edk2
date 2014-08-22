@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -194,12 +194,11 @@ ShellCommandRunCd (
           //
           // change directory with a drive letter
           //
-          Drive = AllocateZeroPool(StrSize(Param1Copy));
+          Drive = AllocateCopyPool(StrSize(Param1Copy), Param1Copy);
           if (Drive == NULL) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
             ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
-            Drive = StrCpy(Drive, Param1Copy);
             Path = StrStr(Drive, L":");
             ASSERT(Path != NULL);
             if (EFI_ERROR(ShellIsDirectory(Param1Copy))) {
