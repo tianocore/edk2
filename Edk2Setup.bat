@@ -319,7 +319,13 @@
 @if not exist "%EDK_TOOLS_PATH%" (
     @mkdir %EDK_TOOLS_PATH%
 )
-
+@if not defined NASM_PREFIX (
+    @echo.
+    @echo WARNING : NASM_PREFIX environment variable is not set
+    @if exist "C:\nasm\nasm.exe" @set "NASM_PREFIX=C:\nasm\"
+    @if exist "C:\nasm\nasm.exe" @echo   Found nasm.exe, setting the environment variable to C:\nasm\
+    @if not exist "C:\nasm\nasm.exe" echo   Attempting to build modules that require NASM will fail.
+)
 @REM Set up the path to include the EDK_TOOLS_PATH\Bin\Win32 directory; this test determines
 @REM whether the path is in the workspace or a fully qualified path that may be outside of
 @REM the workspace
@@ -368,17 +374,17 @@
 
 @REM Set up Visual Studio if required to build the Nt32Pkg/Nt32Pkg.dsc emulator
 @if "%NT32PKG%"=="TRUE" (
-    @if not defined VSINSTALLDIR @set "PATH=%ORIGINAL_PATH%"
+    @if not defined VSINSTALLDIR @set PATH=%ORIGINAL_PATH%
     @if not defined NT32_X64 @call "%WORKSPACE%\BaseTools\get_vsvars.bat"
-    @if defined NT32_X64 call "%WORKSPACE%\BaseTools\Scripts\SetVisualStudio.bat
+    @if defined NT32_X64 call "%WORKSPACE%\BaseTools\Scripts\SetVisualStudio.bat"
     @set NT32_X64=
 )
 @if "%NT32PKG%"=="TRUE" (
-    @if not defined VS_PATH set "VS_PATH=%PATH%"
+    @if not defined VS_PATH set VS_PATH=%PATH%
 )
 @if defined VS_PATH @set "PATH=%VS_PATH%"
 @if not defined VS_PATH @set "PATH=%ORIGINAL_PATH%"
-@set "PATH=%EDK_TOOLS_PATH%\Bin\Win32;%PATH%"
+@set "PATH=%EDK_TOOLS_PATH%\Bin\Win32";%PATH%
 
 @if "%REBUILD_TOOLS%"=="TRUE" @goto Rebuild
 @if "%SVN_PULL%"== "TRUE" (
@@ -422,8 +428,8 @@
 @call python --version > nul 2>&1
 @if errorlevel 1 @set "PATH=%PYTHONHOME%\python.exe;%PATH%"
 @if not defined PYTHON_FREEZER_PATH (
-    @if not exist %PYTHONHOME%\Scripts\cxfreeze.bat @goto NoCxFreeze
-    @set PYTHON_FREEZER_PATH=%PYTHONHOME%\Scripts
+    @if not exist "%PYTHONHOME%\Scripts\cxfreeze.bat" @goto NoCxFreeze
+    @set "PYTHON_FREEZER_PATH=%PYTHONHOME%\Scripts"
 )
 @call "%WORKSPACE%\BaseTools\Scripts\SetVisualStudio.bat"
 @if errorlevel 1 @goto ExitFailure
