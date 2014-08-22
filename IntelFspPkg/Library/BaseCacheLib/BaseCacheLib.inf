@@ -29,4 +29,5 @@
 
 [LibraryClasses]
   BaseMemoryLib
+  CacheAsRamLib
 
