@@ -65,8 +65,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy
-
-[FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES
 
 [Depex]
