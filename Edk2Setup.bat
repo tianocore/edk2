@@ -47,8 +47,8 @@
 @REM #
 @echo off
 @set SCRIPT_NAME=%0
-@set SCRIPT_VERSION=0.9.0.
-@set SVN_REVISION=$Revision: 8 $
+@set SCRIPT_VERSION=0.9.2.
+@set SVN_REVISION=$Revision$
 @set RESET_ENVIRONMENT=FALSE
 @set NT32PKG=FALSE
 @set NT32_64=FALSE
