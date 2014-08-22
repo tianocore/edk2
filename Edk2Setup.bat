@@ -374,17 +374,17 @@
 
 @REM Set up Visual Studio if required to build the Nt32Pkg/Nt32Pkg.dsc emulator
 @if "%NT32PKG%"=="TRUE" (
-    @if not defined VSINSTALLDIR @set PATH=%ORIGINAL_PATH%
+    @if not defined VSINSTALLDIR @set "PATH=%ORIGINAL_PATH%"
     @if not defined NT32_X64 @call "%WORKSPACE%\BaseTools\get_vsvars.bat"
     @if defined NT32_X64 call "%WORKSPACE%\BaseTools\Scripts\SetVisualStudio.bat"
     @set NT32_X64=
 )
 @if "%NT32PKG%"=="TRUE" (
-    @if not defined VS_PATH set VS_PATH=%PATH%
+    @if not defined VS_PATH set "VS_PATH=%PATH%"
 )
 @if defined VS_PATH @set "PATH=%VS_PATH%"
 @if not defined VS_PATH @set "PATH=%ORIGINAL_PATH%"
-@set "PATH=%EDK_TOOLS_PATH%\Bin\Win32";%PATH%
+@set "PATH=%EDK_TOOLS_PATH%\Bin\Win32;%PATH%"
 
 @if "%REBUILD_TOOLS%"=="TRUE" @goto Rebuild
 @if "%SVN_PULL%"== "TRUE" (
