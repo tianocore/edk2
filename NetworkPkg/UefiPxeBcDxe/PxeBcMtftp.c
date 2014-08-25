@@ -69,6 +69,7 @@ PxeBcMtftp6CheckPacket (
       (CHAR8 *) Packet->Error.ErrorMessage,
       PXE_MTFTP_ERROR_STRING_LENGTH
       );
+    Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
   }
 
   if (Callback != NULL) {
@@ -182,6 +183,7 @@ PxeBcMtftp6GetFileSize (
         (CHAR8 *) Packet->Error.ErrorMessage,
         PXE_MTFTP_ERROR_STRING_LENGTH
         );
+      Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
     }
     goto ON_ERROR;
   }
@@ -511,6 +513,7 @@ PxeBcMtftp4CheckPacket (
       (CHAR8 *) Packet->Error.ErrorMessage,
       PXE_MTFTP_ERROR_STRING_LENGTH
       );
+    Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
   }
 
   if (Callback != NULL) {
@@ -624,6 +627,7 @@ PxeBcMtftp4GetFileSize (
         (CHAR8 *) Packet->Error.ErrorMessage,
         PXE_MTFTP_ERROR_STRING_LENGTH
         );
+      Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
     }
     goto ON_ERROR;
   }

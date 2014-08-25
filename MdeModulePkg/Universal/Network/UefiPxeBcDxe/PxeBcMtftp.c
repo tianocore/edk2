@@ -60,7 +60,8 @@ PxeBcCheckPacket (
   if (Packet->OpCode == EFI_MTFTP4_OPCODE_ERROR) {
     Private->Mode.TftpErrorReceived = TRUE;
     Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
-    AsciiStrnCpy (Private->Mode.TftpError.ErrorString, (CHAR8 *) Packet->Error.ErrorMessage, 127);
+    AsciiStrnCpy (Private->Mode.TftpError.ErrorString, (CHAR8 *) Packet->Error.ErrorMessage, PXE_MTFTP_ERROR_STRING_LENGTH);
+    Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
   }
 
   if (Callback != NULL) {
@@ -162,8 +163,9 @@ PxeBcTftpGetFileSize (
       AsciiStrnCpy (
         Private->Mode.TftpError.ErrorString, 
         (CHAR8 *) Packet->Error.ErrorMessage, 
-        127
+        PXE_MTFTP_ERROR_STRING_LENGTH
         );
+      Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
     }
     goto ON_ERROR;
   }
