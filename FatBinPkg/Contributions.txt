@@ -19,6 +19,20 @@ To make a contribution to a TianoCore project, follow these steps.
    that the project documents on its web page.  If the process is
    not documented, then submit the code on development email list
    for the project.
+5. It is preferred that contributions are submitted using the same
+   copyright license as the base project. When that is not possible,
+   then contributions using the following licenses can be accepted:
+   * BSD (2-clause): http://opensource.org/licenses/BSD-2-Clause
+   * BSD (3-clause): http://opensource.org/licenses/BSD-3-Clause
+   * MIT: http://opensource.org/licenses/MIT
+   * Python-2.0: http://opensource.org/licenses/Python-2.0
+   * Zlib: http://opensource.org/licenses/Zlib
+
+   Contributions of code put into the public domain can also be
+   accepted.
+
+   Contributions using other licenses might be accepted, but further
+   review will be required.
 
 =======================================
 = Change Description / Commit Message =
