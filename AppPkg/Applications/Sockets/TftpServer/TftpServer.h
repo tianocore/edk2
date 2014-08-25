@@ -39,7 +39,7 @@
 #include <sys/EfiSysCall.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
-#include <sys/Stat.h>
+#include <sys/stat.h>
 
 //------------------------------------------------------------------------------
 //  Macros
