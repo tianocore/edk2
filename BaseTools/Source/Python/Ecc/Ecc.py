@@ -180,6 +180,7 @@ class Ecc(object):
         EccGlobalData.gIdentifierTableList = GetTableList((MODEL_FILE_C, MODEL_FILE_H), 'Identifier', EccGlobalData.gDb)
         EccGlobalData.gCFileList = GetFileList(MODEL_FILE_C, EccGlobalData.gDb)
         EccGlobalData.gHFileList = GetFileList(MODEL_FILE_H, EccGlobalData.gDb)
+        EccGlobalData.gUFileList = GetFileList(MODEL_FILE_UNI, EccGlobalData.gDb)
 
     ## BuildMetaDataFileDatabase
     #
@@ -246,6 +247,13 @@ class Ecc(object):
                         Op.write("%s\r" % Filename)
                         Fdf(Filename, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
                         continue
+                    if len(File) > 4 and File[-4:].upper() == ".UNI":
+                        Filename = os.path.normpath(os.path.join(Root, File))
+                        EdkLogger.quiet("Parsing %s" % Filename)
+                        Op.write("%s\r" % Filename)
+                        EccGlobalData.gDb.TblFile.InsertFile(Filename, MODEL_FILE_UNI)
+                        continue
+
         Op.close()
 
         # Commit to database

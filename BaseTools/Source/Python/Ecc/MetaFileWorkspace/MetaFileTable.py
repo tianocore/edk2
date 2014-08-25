@@ -51,6 +51,7 @@ class ModuleTable(MetaFileTable):
         Value1 TEXT NOT NULL,
         Value2 TEXT,
         Value3 TEXT,
+        Usage  TEXT,
         Scope1 TEXT,
         Scope2 TEXT,
         BelongsToItem REAL NOT NULL,
@@ -84,14 +85,15 @@ class ModuleTable(MetaFileTable):
     # @param Enabled:        If this item enabled
     #
     def Insert(self, Model, Value1, Value2, Value3, Scope1='COMMON', Scope2='COMMON',
-               BelongsToItem=-1, BelongsToFile = -1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=0):
-        (Value1, Value2, Value3, Scope1, Scope2) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2))
+               BelongsToItem=-1, BelongsToFile = -1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=0, Usage=''):
+        (Value1, Value2, Value3, Usage, Scope1, Scope2) = ConvertToSqlString((Value1, Value2, Value3, Usage, Scope1, Scope2))
         return Table.Insert(
                         self, 
                         Model, 
                         Value1, 
                         Value2, 
                         Value3, 
+                        Usage,                         
                         Scope1, 
                         Scope2,
                         BelongsToItem,
@@ -113,7 +115,7 @@ class ModuleTable(MetaFileTable):
     #
     def Query(self, Model, Arch=None, Platform=None):
         ConditionString = "Model=%s AND Enabled>=0" % Model
-        ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
+        ValueString = "Value1,Value2,Value3,Usage,Scope1,Scope2,ID,StartLine"
 
         if Arch != None and Arch != 'COMMON':
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch

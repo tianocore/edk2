@@ -184,18 +184,25 @@ def ParseHeaderCommentSection(CommentList, FileName = None):
                     continue
                 License += Comment + EndOfLine
     
-    if not Copyright:
+    if not Copyright.strip():
         SqlStatement = """ select ID from File where FullPath like '%s'""" % FileName
         ResultSet = EccGlobalData.gDb.TblFile.Exec(SqlStatement)
         for Result in ResultSet:
             Msg = 'Header comment section must have copyright information'
             EccGlobalData.gDb.TblReport.Insert(ERROR_DOXYGEN_CHECK_FILE_HEADER, Msg, "File", Result[0])
 
-    if not License:
+    if not License.strip():
         SqlStatement = """ select ID from File where FullPath like '%s'""" % FileName
         ResultSet = EccGlobalData.gDb.TblFile.Exec(SqlStatement)
         for Result in ResultSet:
             Msg = 'Header comment section must have license information'
+            EccGlobalData.gDb.TblReport.Insert(ERROR_DOXYGEN_CHECK_FILE_HEADER, Msg, "File", Result[0])
+                       
+    if not Abstract.strip() or Abstract.find('Component description file') > -1:
+        SqlStatement = """ select ID from File where FullPath like '%s'""" % FileName
+        ResultSet = EccGlobalData.gDb.TblFile.Exec(SqlStatement)
+        for Result in ResultSet:
+            Msg = 'Header comment section must have Abstract information.'
             EccGlobalData.gDb.TblReport.Insert(ERROR_DOXYGEN_CHECK_FILE_HEADER, Msg, "File", Result[0])
                      
     return Abstract.strip(), Description.strip(), Copyright.strip(), License.strip()

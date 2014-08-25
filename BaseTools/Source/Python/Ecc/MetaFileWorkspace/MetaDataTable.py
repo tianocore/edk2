@@ -98,7 +98,7 @@ class Table(object):
         SqlCommand = """drop table IF EXISTS %s""" % self.Table
         try:
             self.Cur.execute(SqlCommand)
-        except sqlite3.Error, e:
+        except Exception, e:
             print "An error occurred when Drop a table:", e.args[0]
 
     ## Get count

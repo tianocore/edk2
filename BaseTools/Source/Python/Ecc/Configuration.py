@@ -80,6 +80,8 @@ class Configuration(object):
         self.GeneralCheckFileExistence = 1
         # Check whether file has non ACSII char
         self.GeneralCheckNonAcsii = 1
+        # Check whether UNI file is valid
+        self.GeneralCheckUni = 1
 
         ## Space Checking
         self.SpaceCheckAll = 1
@@ -235,6 +237,15 @@ class Configuration(object):
         self.MetaDataFileCheckPcdType = 1
         # Check whether there are FILE_GUID duplication among different INF files
         self.MetaDataFileCheckModuleFileGuidDuplication = 1
+
+        # Check Guid Format in INF files
+        self.MetaDataFileCheckModuleFileGuidFormat = 1
+        # Check Protocol Format in INF files
+        self.MetaDataFileCheckModuleFileProtocolFormat = 1
+        # Check Ppi Format in INF files
+        self.MetaDataFileCheckModuleFilePpiFormat = 1
+        # Check Pcd Format in INF files
+        self.MetaDataFileCheckModuleFilePcdFormat = 1
 
         #
         # The check points in this section are reserved

@@ -23,4 +23,5 @@ gDb = None
 gIdentifierTableList = []
 gCFileList = []
 gHFileList = []
+gUFileList = []
 gException = None
