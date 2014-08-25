@@ -803,12 +803,12 @@ PCI_CLASS_ENTRY PCISubClass_0d[] = {
   },
   {
     0x20,
-    L"Ethernet (802.11a – 5 GHz)",
+    L"Ethernet (802.11a - 5 GHz)",
     PCIBlankEntry
   },
   {
     0x21,
-    L"Ethernet (802.11b – 2.4 GHz)",
+    L"Ethernet (802.11b - 2.4 GHz)",
     PCIBlankEntry
   },
   {
