@@ -56,8 +56,10 @@ Returns:
 
 --*/
 {
-  printf ("%s v%d.%d %s - Utility to break a file into two pieces at the specified offset.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 1999-2010 Intel Corporation. All rights reserved.\n");
+  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  printf ("Copyright (c) 1999-2014 Intel Corporation. All rights reserved.\n");
+  printf ("\n  The BootSectImage tool prints information or patch destination file by source\n");
+  printf ("  file for BIOS Parameter Block (BPB) or Master Boot Record (MBR).\n");
 }
 
 void
@@ -889,6 +891,9 @@ main (
       ProcessMbr = TRUE;
     } else if (strcmp (*argv, "-v") == 0 || strcmp (*argv, "--verbose") == 0) {
       Verbose    = TRUE;
+    } else if (strcmp (*argv, "--version") == 0) {
+      Version();
+      return 0;
     } else if ((stricmp (*argv, "-d") == 0) || (stricmp (*argv, "--debug") == 0)) {
       argc--; argv++;
       if (argc < 1) {

@@ -57,8 +57,10 @@ Returns:
 
 --*/
 {
-  printf ("%s v%d.%d %s -Utility to break a file into two pieces at the request offset.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
   printf ("Copyright (c) 1999-2014 Intel Corporation. All rights reserved.\n");
+  printf ("\n  SplitFile creates two Binary files either in the same directory as the current working\n");
+  printf ("  directory or in the specified directory.\n");
 }
 
 void

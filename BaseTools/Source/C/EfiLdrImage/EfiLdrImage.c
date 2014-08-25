@@ -83,8 +83,9 @@ Returns:
 
 --*/
 {
-  printf ("%s v%d.%d %s -Utility to break a file into two pieces at the request offset.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
   printf ("Copyright (c) 1999-2014 Intel Corporation. All rights reserved.\n");
+  printf ("\n  The EfiLdrImage tool is used to combine PE files into EFILDR image with Efi loader header.\n");
 }
 
 VOID
