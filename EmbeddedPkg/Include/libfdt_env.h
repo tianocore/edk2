@@ -94,4 +94,19 @@ InstallFdtFromSemihosting (
   IN  CONST CHAR16*   FileName
   );
 
+/**
+  Load and Install FDT from Firmware Volume
+
+  @param Filename   Guid of the FDT blob to load from firmware volume
+
+  @return EFI_SUCCESS           Fdt Blob was successfully installed into the configuration table
+                                from firmware volume
+  @return EFI_NOT_FOUND         Failed to locate the file in firmware volume
+  @return EFI_OUT_OF_RESOURCES  Failed to allocate memory to contain the blob
+**/
+EFI_STATUS
+InstallFdtFromFv (
+  IN  CONST EFI_GUID *FileName
+  );
+
 #endif /* _LIBFDT_ENV_H */

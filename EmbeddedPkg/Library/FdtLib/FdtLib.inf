@@ -44,6 +44,7 @@
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
 
 [Guids]
   gEfiFileInfoGuid

@@ -12,12 +12,13 @@
 *
 **/
 
-#include <Uefi.h>
+#include <PiDxe.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/DevicePath.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/SimpleFileSystem.h>
 
 #include <Guid/Fdt.h>
@@ -174,5 +175,105 @@ InstallFdtFromSemihosting (
 CLOSE_FILES:
   File->Close (File);
   Fs->Close (Fs);
+  return Status;
+}
+
+/**
+  Load and Install FDT from Firmware Volume
+
+  @param Filename   Guid of the FDT blob to load from firmware volume
+
+  @return EFI_SUCCESS           Fdt Blob was successfully installed into the configuration table
+                                from firmware volume
+  @return EFI_NOT_FOUND         Fail to locate the file in firmware volume
+  @return EFI_OUT_OF_RESOURCES  Fail to allocate memory to contain the blob
+**/
+EFI_STATUS
+InstallFdtFromFv (
+  IN  CONST EFI_GUID *FileName
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_HANDLE                    *HandleBuffer;
+  UINTN                         NumberOfHandles;
+  UINT32                        FvStatus;
+  UINTN                         Index;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *FvInstance;
+  INTN                          SectionInstance;
+  UINTN                         FdtSize;
+  VOID*                         FdtBlob;
+  EFI_PHYSICAL_ADDRESS          FdtBase;
+
+  FvStatus        = 0;
+  SectionInstance = 0;
+
+  // Locate all the Firmware Volume protocols.
+  Status = gBS->LocateHandleBuffer (
+                   ByProtocol,
+                   &gEfiFirmwareVolume2ProtocolGuid,
+                   NULL,
+                   &NumberOfHandles,
+                   &HandleBuffer
+                   );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Looking for FV that contains the FDT blob
+  for (Index = 0; Index < NumberOfHandles; Index++) {
+    //
+    // Get the protocol on this handle
+    // This should not fail because of LocateHandleBuffer
+    //
+    Status = gBS->HandleProtocol (
+                     HandleBuffer[Index],
+                     &gEfiFirmwareVolume2ProtocolGuid,
+                     (VOID**) &FvInstance
+                     );
+    if (EFI_ERROR (Status)) {
+      goto FREE_HANDLE_BUFFER;
+    }
+
+    while (Status == EFI_SUCCESS) {
+      // FdtBlob must be allocated by ReadSection
+      FdtBlob = NULL;
+
+      // See if it contains the FDT file
+      Status = FvInstance->ReadSection (
+                        FvInstance,
+                        FileName,
+                        EFI_SECTION_RAW,
+                        SectionInstance,
+                        &FdtBlob,
+                        &FdtSize,
+                        &FvStatus
+                        );
+      if (!EFI_ERROR (Status)) {
+        // When the FDT blob is attached to the Configuration Table it is recommended to load it as Runtime Service Data
+        // to prevent the kernel to overwrite its data
+        Status = gBS->AllocatePages (AllocateAnyPages, EfiRuntimeServicesData, EFI_SIZE_TO_PAGES (FdtSize), &FdtBase);
+        if (EFI_ERROR (Status)) {
+          goto FREE_HANDLE_BUFFER;
+        }
+
+        // Copy the FDT to the Runtime memory
+        gBS->CopyMem ((VOID*)(UINTN)FdtBase, FdtBlob, FdtSize);
+        // Free the buffer allocated by FvInstance->ReadSection()
+        gBS->FreePool (FdtBlob);
+
+        // Install the FDT as part of the UEFI Configuration Table
+        Status = InstallFdtIntoConfigurationTable ((VOID*)(UINTN)FdtBase, FdtSize);
+        if (EFI_ERROR (Status)) {
+          gBS->FreePages (FdtBase, EFI_SIZE_TO_PAGES (FdtSize));
+        }
+        break;
+      }
+    }
+  }
+
+FREE_HANDLE_BUFFER:
+  // Free any allocated buffers
+  gBS->FreePool (HandleBuffer);
+
   return Status;
 }
