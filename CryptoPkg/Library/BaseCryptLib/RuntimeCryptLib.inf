@@ -34,7 +34,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM
+#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM AARCH64
 #
 
 [Sources]
@@ -88,6 +88,9 @@
   Rand/CryptRandItc.c
 
 [Sources.ARM]
+  Rand/CryptRand.c
+
+[Sources.AARCH64]
   Rand/CryptRand.c
 
 [Packages]

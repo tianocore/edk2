@@ -23,7 +23,7 @@
   PLATFORM_VERSION               = 0.93
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/CryptoPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM
+  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -51,11 +51,12 @@
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
 
-[LibraryClasses.ARM]
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
   # This library provides the instrinsic functions generate by a given compiler.
-  # [LibraryClasses.ARM] and NULL mean link this library into all ARM images.
+  # [LibraryClasses.ARM, LibraryClasses.AARCH64] and NULL mean link this library
+  # into all ARM and AARCH64 images.
   #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
