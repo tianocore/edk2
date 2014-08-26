@@ -2008,7 +2008,7 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Defs
 
     ## Retrieve binary files
-    def _GetBinaryFiles(self):
+    def _GetBinaries(self):
         if self._Binaries == None:
             self._Binaries = []
             RecordList = self._RawData[MODEL_EFI_BINARY_FILE, self._Arch, self._Platform]
@@ -2035,6 +2035,20 @@ class InfBuildData(ModuleBuildClassObject):
                 self._Binaries.append(File)
         return self._Binaries
 
+    ## Retrieve binary files with error check.
+    def _GetBinaryFiles(self):
+        Binaries = self._GetBinaries()
+        if GlobalData.gIgnoreSource and Binaries == []:
+            ErrorInfo = "The INF file does not contain any Binaries to use in creating the image\n"
+            EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, ExtraData=ErrorInfo, File=self.MetaFile)
+
+        return Binaries
+    ## Check whether it exists the binaries with current ARCH in AsBuild INF
+    def _IsSupportedArch(self):
+        if self._GetBinaries() and not self._GetSourceFiles():
+            return True
+        else:
+            return False
     ## Retrieve source files
     def _GetSourceFiles(self):
         if self._Sources == None:
@@ -2537,6 +2551,7 @@ class InfBuildData(ModuleBuildClassObject):
     Depex                   = property(_GetDepex)
     DepexExpression         = property(_GetDepexExpression)
     IsBinaryModule = property(_IsBinaryModule)
+    IsSupportedArch = property(_IsSupportedArch)
 
 ## Database
 #

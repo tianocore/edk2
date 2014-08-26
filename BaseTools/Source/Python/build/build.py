@@ -744,6 +744,7 @@ class Build():
         self.Platform       = None
         self.LoadFixAddress = 0
         self.UniFlag        = BuildOptions.Flag
+        self.BuildModules = []
 
         # print dot character during doing some time-consuming work
         self.Progress = Utils.Progressor()
@@ -929,6 +930,7 @@ class Build():
         if BuildModule:
             BuildCommand = BuildCommand + [Target]
             LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
+            self.CreateAsBuiltInf()
             return True
 
         # build library
@@ -946,6 +948,7 @@ class Build():
             for Mod in AutoGenObject.ModuleBuildDirectoryList:
                 NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Mod, makefile)), 'pbuild']
                 LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
+            self.CreateAsBuiltInf()
             return True
 
         # cleanlib
@@ -1055,6 +1058,7 @@ class Build():
         BuildCommand = BuildCommand + [Target]
         if BuildModule:
             LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
+            self.CreateAsBuiltInf()
             return True
 
         # build library
@@ -1407,6 +1411,12 @@ class Build():
                 for Arch in Wa.ArchList:
                     GlobalData.gGlobalDefines['ARCH'] = Arch
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
+                    for Module in Pa.Platform.Modules:
+                        # Get ModuleAutoGen object to generate C code file and makefile
+                        Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
+                        if Ma == None:
+                            continue
+                        self.BuildModules.append(Ma)
                     self._BuildPa(self.Target, Pa)
 
                 # Create MAP file when Load Fix Address is enabled.
@@ -1490,6 +1500,7 @@ class Build():
                     Ma = ModuleAutoGen(Wa, self.ModuleFile, BuildTarget, ToolChain, Arch, self.PlatformFile)
                     if Ma == None: continue
                     MaList.append(Ma)
+                    self.BuildModules.append(Ma)
                     if not Ma.IsBinaryModule:
                         self._Build(self.Target, Ma, BuildModule=True)
 
@@ -1580,10 +1591,20 @@ class Build():
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
                     if Pa == None:
                         continue
-                    pModules = []
-                    for Module in Pa.Platform.Modules:
+                    ModuleList = []
+                    for Inf in Pa.Platform.Modules:
+                        ModuleList.append(Inf)
+                    # Add the INF only list in FDF
+                    if GlobalData.gFdfParser != None:
+                        for InfName in GlobalData.gFdfParser.Profile.InfList:
+                            Inf = PathClass(NormPath(InfName), self.WorkspaceDir, Arch)
+                            if Inf in Pa.Platform.Modules:
+                                continue
+                            ModuleList.append(Inf)
+                    for Module in ModuleList:
                         # Get ModuleAutoGen object to generate C code file and makefile
                         Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
+                        
                         if Ma == None:
                             continue
                         # Not to auto-gen for targets 'clean', 'cleanlib', 'cleanall', 'run', 'fds'
@@ -1596,15 +1617,15 @@ class Build():
 
                             if not self.SkipAutoGen or self.Target == 'genmake':
                                 Ma.CreateMakeFile(True)
-                                Ma.CreateAsBuiltInf()
                             if self.Target == "genmake":
                                 continue
-                        pModules.append(Ma)
+                        self.BuildModules.append(Ma)
                     self.Progress.Stop("done!")
 
-                    for Ma in pModules:
+                    for Ma in self.BuildModules:
                         # Generate build task for the module
-                        Bt = BuildTask.New(ModuleMakeUnit(Ma, self.Target))
+                        if not Ma.IsBinaryModule:
+                            Bt = BuildTask.New(ModuleMakeUnit(Ma, self.Target))
                         # Break build if any build thread has error
                         if BuildTask.HasError():
                             # we need a full version of makefile for platform
@@ -1635,6 +1656,7 @@ class Build():
                 #
                 ExitFlag.set()
                 BuildTask.WaitForComplete()
+                self.CreateAsBuiltInf()
 
                 #
                 # Check for build error, and raise exception if one
@@ -1765,6 +1787,10 @@ class Build():
             self.SpawnMode = False
             self._BuildModule()
 
+    def CreateAsBuiltInf(self):
+        for Module in self.BuildModules:
+            Module.CreateAsBuiltInf()
+        self.BuildModules = []
     ## Do some clean-up works when error occurred
     def Relinquish(self):
         OldLogLevel = EdkLogger.GetLevel()

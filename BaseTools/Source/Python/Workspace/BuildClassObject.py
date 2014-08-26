@@ -57,6 +57,8 @@ class PcdClassObject(object):
         self.Phase = "DXE"
         self.Pending = False
         self.IsOverrided = IsOverrided
+        self.IsFromBinaryInf = False
+        self.IsFromDsc = False
         
     ## Convert the class to a string
     #

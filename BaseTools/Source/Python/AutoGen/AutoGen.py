@@ -269,6 +269,7 @@ class WorkspaceAutoGen(AutoGen):
             GlobalData.gAutoGenPhase = True    
             Fdf = FdfParser(self.FdfFile.Path)
             Fdf.ParseFile()
+            GlobalData.gFdfParser = Fdf
             GlobalData.gAutoGenPhase = False
             PcdSet = Fdf.Profile.PcdDict
             ModuleList = Fdf.Profile.InfList
@@ -298,7 +299,14 @@ class WorkspaceAutoGen(AutoGen):
             DecPcds = {}
             DecPcdsKey = set()
             PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
-            Pkgs = PGen.PackageList
+            PkgSet = set()
+            for Inf in ModuleList:
+                ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
+                if ModuleFile in Platform.Modules:
+                    continue
+                ModuleData = self.BuildDatabase[ModuleFile, Arch, Target, Toolchain]
+                PkgSet.update(ModuleData.Packages)
+            Pkgs = list(PkgSet) + list(PGen.PackageList)
             for Pkg in Pkgs:
                 for Pcd in Pkg.Pcds:
                     DecPcds[Pcd[0], Pcd[1]] = Pkg.Pcds[Pcd]
@@ -760,6 +768,8 @@ class PlatformAutoGen(AutoGen):
         self.FdTargetList = self.Workspace.FdTargetList
         self.FvTargetList = self.Workspace.FvTargetList
         self.AllPcdList = []
+        # get the original module/package/platform objects
+        self.BuildDatabase = Workspace.BuildDatabase
 
         # flag indicating if the makefile/C-code file has been created or not
         self.IsMakeFileCreated  = False
@@ -794,12 +804,22 @@ class PlatformAutoGen(AutoGen):
         self._ModuleAutoGenList  = None
         self._LibraryAutoGenList = None
         self._BuildCommand = None
-
+        self._AsBuildInfList = []
+        self._AsBuildModuleList = []
+        if GlobalData.gFdfParser != None:
+            self._AsBuildInfList = GlobalData.gFdfParser.Profile.InfList
+            for Inf in self._AsBuildInfList:
+                InfClass = PathClass(NormPath(Inf), GlobalData.gWorkspace, self.Arch)
+                M = self.BuildDatabase[InfClass, self.Arch, self.BuildTarget, self.ToolChain]
+                if not M.IsSupportedArch:
+                    continue
+                self._AsBuildModuleList.append(InfClass)
         # get library/modules for build
         self.LibraryBuildDirectoryList = []
         self.ModuleBuildDirectoryList = []
         # get the original module/package/platform objects
-        self.BuildDatabase = Workspace.BuildDatabase
+        self.LibraryBuildDirectoryList = []
+        self.ModuleBuildDirectoryList = []
         return True
 
     def __repr__(self):
@@ -886,8 +906,12 @@ class PlatformAutoGen(AutoGen):
     def CollectPlatformDynamicPcds(self):
         # for gathering error information
         NoDatumTypePcdList = set()
-
+        PcdNotInDb = []
         self._GuidValue = {}
+        FdfModuleList = []
+        for InfName in self._AsBuildInfList:
+            InfName = os.path.join(self.WorkspaceDir, InfName)
+            FdfModuleList.append(os.path.normpath(InfName))
         for F in self.Platform.Modules.keys():
             M = ModuleAutoGen(self.Workspace, F, self.BuildTarget, self.ToolChain, self.Arch, self.MetaFile)
             #GuidValue.update(M.Guids)
@@ -899,7 +923,42 @@ class PlatformAutoGen(AutoGen):
                 if PcdFromModule.DatumType == "VOID*" and PcdFromModule.MaxDatumSize in [None, '']:
                     NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, F))
 
+                if M.IsBinaryModule == True:
+                    PcdFromModule.IsFromBinaryInf = True
+                if (PcdFromModule.TokenCName, PcdFromModule.TokenSpaceGuidCName) in self.Platform.Pcds.keys():
+                    PcdFromModule.IsFromDsc = True
+                else:
+                    PcdFromModule.IsFromDsc = False
                 if PcdFromModule.Type in GenC.gDynamicPcd or PcdFromModule.Type in GenC.gDynamicExPcd:
+                    if F.Path not in FdfModuleList:
+                        # If one of the Source built modules listed in the DSC is not listed 
+                        # in FDF modules, and the INF lists a PCD can only use the PcdsDynamic 
+                        # access method (it is only listed in the DEC file that declares the 
+                        # PCD as PcdsDynamic), then build tool will report warning message
+                        # notify the PI that they are attempting to build a module that must 
+                        # be included in a flash image in order to be functional. These Dynamic 
+                        # PCD will not be added into the Database unless it is used by other 
+                        # modules that are included in the FDF file.
+                        if PcdFromModule.Type in GenC.gDynamicPcd and \
+                            PcdFromModule.IsFromBinaryInf == False:
+                            # Print warning message to let the developer make a determine.
+                            if PcdFromModule not in PcdNotInDb:
+                                EdkLogger.warn("build",
+                                               "A PCD listed in the DSC (%s.%s, %s) is used by a module not in the FDF. If the PCD is not used by any module listed in the FDF this PCD will be ignored. " \
+                                               % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, self.Platform.MetaFile.Path),
+                                               File=self.MetaFile, \
+                                               ExtraData=None)
+                                PcdNotInDb.append(PcdFromModule)
+                            continue
+                        # If one of the Source built modules listed in the DSC is not listed in 
+                        # FDF modules, and the INF lists a PCD can only use the PcdsDynamicEx 
+                        # access method (it is only listed in the DEC file that declares the 
+                        # PCD as PcdsDynamicEx), then DO NOT break the build; DO NOT add the 
+                        # PCD to the Platform's PCD Database.
+                        if PcdFromModule.Type in GenC.gDynamicExPcd:
+                            if PcdFromModule not in PcdNotInDb:
+                                PcdNotInDb.append(PcdFromModule)
+                            continue
                     #
                     # If a dynamic PCD used by a PEM module/PEI module & DXE module,
                     # it should be stored in Pcd PEI database, If a dynamic only
@@ -916,6 +975,68 @@ class PlatformAutoGen(AutoGen):
                         self._DynaPcdList_[Index] = PcdFromModule
                 elif PcdFromModule not in self._NonDynaPcdList_:
                     self._NonDynaPcdList_.append(PcdFromModule)
+                elif PcdFromModule in self._NonDynaPcdList_ and PcdFromModule.IsFromBinaryInf == True:
+                    Index = self._NonDynaPcdList_.index(PcdFromModule)
+                    if self._NonDynaPcdList_[Index].IsFromBinaryInf == False:
+                        #The PCD from Binary INF will override the same one from source INF
+                        self._NonDynaPcdList_.remove (self._NonDynaPcdList_[Index])
+                        PcdFromModule.Pending = False
+                        self._NonDynaPcdList_.append (PcdFromModule)
+        # Parse the DynamicEx PCD from the AsBuild INF module list of FDF.
+        DscModuleList = []
+        for ModuleInf in self.Platform.Modules.keys():
+            DscModuleList.append (os.path.normpath(ModuleInf.Path))
+        # add the PCD from modules that listed in FDF but not in DSC to Database 
+        for InfName in FdfModuleList:
+            if InfName not in DscModuleList:
+                InfClass = PathClass(InfName)
+                M = self.BuildDatabase[InfClass, self.Arch, self.BuildTarget, self.ToolChain]
+                # If a module INF in FDF but not in current arch's DSC module list, it must be module (either binary or source) 
+                # for different Arch. PCDs in source module for different Arch is already added before, so skip the source module here. 
+                # For binary module, if in current arch, we need to list the PCDs into database.   
+                if not M.IsSupportedArch:
+                    continue
+                # Override the module PCD setting by platform setting
+                ModulePcdList = self.ApplyPcdSetting(M, M.Pcds)
+                for PcdFromModule in ModulePcdList:
+                    PcdFromModule.IsFromBinaryInf = True
+                    PcdFromModule.IsFromDsc = False
+                    # Only allow the DynamicEx and Patchable PCD in AsBuild INF
+                    if PcdFromModule.Type not in GenC.gDynamicExPcd and PcdFromModule.Type not in TAB_PCDS_PATCHABLE_IN_MODULE:
+                        EdkLogger.error("build", AUTOGEN_ERROR, "PCD setting error",
+                                        File=self.MetaFile,
+                                        ExtraData="\n\tExisted %s PCD %s in:\n\t\t%s\n"
+                                        % (PcdFromModule.Type, PcdFromModule.TokenCName, InfName))
+                    # make sure that the "VOID*" kind of datum has MaxDatumSize set
+                    if PcdFromModule.DatumType == "VOID*" and PcdFromModule.MaxDatumSize in [None, '']:
+                        NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, InfName))
+                    if M.ModuleType in ["PEIM", "PEI_CORE"]:
+                        PcdFromModule.Phase = "PEI"
+                    if PcdFromModule not in self._DynaPcdList_ and PcdFromModule.Type in GenC.gDynamicExPcd:
+                        self._DynaPcdList_.append(PcdFromModule)
+                    elif PcdFromModule not in self._NonDynaPcdList_ and PcdFromModule.Type in TAB_PCDS_PATCHABLE_IN_MODULE:
+                        self._NonDynaPcdList_.append(PcdFromModule)
+                    if PcdFromModule in self._DynaPcdList_ and PcdFromModule.Phase == 'PEI' and PcdFromModule.Type in GenC.gDynamicExPcd:
+                        Index = self._DynaPcdList_.index(PcdFromModule)
+                        self._DynaPcdList_[Index].Phase = PcdFromModule.Phase
+                        self._DynaPcdList_[Index].Type = PcdFromModule.Type
+        for PcdFromModule in self._NonDynaPcdList_:
+            # If a PCD is not listed in the DSC file, but binary INF files used by 
+            # this platform all (that use this PCD) list the PCD in a [PatchPcds] 
+            # section, AND all source INF files used by this platform the build 
+            # that use the PCD list the PCD in either a [Pcds] or [PatchPcds] 
+            # section, then the tools must NOT add the PCD to the Platform's PCD
+            # Database; the build must assign the access method for this PCD as 
+            # PcdsPatchableInModule.
+            if PcdFromModule not in self._DynaPcdList_:
+                continue
+            Index = self._DynaPcdList_.index(PcdFromModule)
+            if PcdFromModule.IsFromDsc == False and \
+                PcdFromModule.Type in TAB_PCDS_PATCHABLE_IN_MODULE and \
+                PcdFromModule.IsFromBinaryInf == True and \
+                self._DynaPcdList_[Index].IsFromBinaryInf == False:
+                Index = self._DynaPcdList_.index(PcdFromModule)
+                self._DynaPcdList_.remove (self._DynaPcdList_[Index])
 
         # print out error information and break the build, if error found
         if len(NoDatumTypePcdList) > 0:
@@ -926,8 +1047,19 @@ class PlatformAutoGen(AutoGen):
                                       % NoDatumTypePcdListString)
         self._NonDynamicPcdList = self._NonDynaPcdList_
         self._DynamicPcdList = self._DynaPcdList_
-        self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
-        
+        # If PCD is listed in a PcdsDynamicHii, PcdsDynamicExHii, PcdsDynamicHii or PcdsDynamicExHii
+        # section, and the PCD is not used by any module that is listed in the DSC file, the build 
+        # provide a warning message.
+        for PcdKey in self.Platform.Pcds.keys():
+            Pcd = self.Platform.Pcds[PcdKey]
+            if Pcd not in self._DynamicPcdList + PcdNotInDb and \
+                Pcd.Type in [TAB_PCDS_DYNAMIC, TAB_PCDS_DYNAMIC_DEFAULT, TAB_PCDS_DYNAMIC_HII, TAB_PCDS_DYNAMIC_EX, TAB_PCDS_DYNAMIC_EX_DEFAULT, TAB_PCDS_DYNAMIC_EX_HII]:
+                # Print warning message to let the developer make a determine.
+                EdkLogger.warn("build",
+                               "A %s PCD listed in the DSC (%s.%s, %s) is not used by any module." \
+                               % (Pcd.Type, Pcd.TokenSpaceGuidCName, Pcd.TokenCName, self.Platform.MetaFile.Path),
+                               File=self.MetaFile, \
+                               ExtraData=None)
         #
         # Sort dynamic PCD list to:
         # 1) If PCD's datum type is VOID* and value is unicode string which starts with L, the PCD item should 
@@ -1099,7 +1231,7 @@ class PlatformAutoGen(AutoGen):
         self._DynamicPcdList.extend(UnicodePcdArray)
         self._DynamicPcdList.extend(HiiPcdArray)
         self._DynamicPcdList.extend(OtherPcdArray)
-            
+        self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
         
     ## Return the platform build data object
     def _GetPlatform(self):
@@ -1320,7 +1452,14 @@ class PlatformAutoGen(AutoGen):
                 self._PackageList.update(La.DependentPackageList)
             for Ma in self.ModuleAutoGenList:
                 self._PackageList.update(Ma.DependentPackageList)
-            self._PackageList = list(self._PackageList)
+            #Collect package set information from INF of FDF
+            PkgSet = set()
+            for ModuleFile in self._AsBuildModuleList:
+                if ModuleFile in self.Platform.Modules:
+                    continue
+                ModuleData = self.BuildDatabase[ModuleFile, self.Arch, self.BuildTarget, self.ToolChain]
+                PkgSet.update(ModuleData.Packages)
+            self._PackageList = list(self._PackageList) + list (PkgSet)
         return self._PackageList
 
     def _GetNonDynamicPcdDict(self):
@@ -1428,7 +1567,8 @@ class PlatformAutoGen(AutoGen):
     #  by the platform or current configuration
     #
     def ValidModule(self, Module):
-        return Module in self.Platform.Modules or Module in self.Platform.LibraryInstances
+        return Module in self.Platform.Modules or Module in self.Platform.LibraryInstances \
+            or Module in self._AsBuildModuleList
 
     ## Resolve the library classes in a module to library instances
     #
@@ -3020,6 +3160,8 @@ class ModuleAutoGen(AutoGen):
     #                                       dependent libraries will be created
     #
     def CreateMakeFile(self, CreateLibraryMakeFile=True):
+        if self.IsBinaryModule:
+            return
         if self.IsMakeFileCreated:
             return
 
@@ -3040,6 +3182,11 @@ class ModuleAutoGen(AutoGen):
 
         self.IsMakeFileCreated = True
 
+    def CopyBinaryFiles(self):
+        for File in self.Module.Binaries:
+            SrcPath = File.Path
+            DstPath = os.path.join(self.OutputDir , os.path.basename(SrcPath))
+            CopyLongFilePath(SrcPath, DstPath)
     ## Create autogen code for the module and its dependent libraries
     #
     #   @param      CreateLibraryCodeFile   Flag indicating if or not the code of
@@ -3052,6 +3199,9 @@ class ModuleAutoGen(AutoGen):
         # Need to generate PcdDatabase even PcdDriver is binarymodule
         if self.IsBinaryModule and self.PcdIsDriver != '':
             CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
+            return
+        if self.IsBinaryModule:
+            self.CopyBinaryFiles()
             return
 
         if not self.IsLibrary and CreateLibraryCodeFile:
