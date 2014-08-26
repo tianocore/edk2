@@ -252,6 +252,53 @@ GetFileInfo (
 
 STATIC
 EFI_STATUS
+GetBootMonFsFileInfo (
+  IN BOOTMON_FS_INSTANCE *Instance,
+  IN BOOTMON_FS_FILE     *File,
+  IN OUT UINTN           *BufferSize,
+  OUT VOID               *Buffer
+  )
+{
+  EFI_STATUS             Status;
+  BOOTMON_FS_FILE_INFO   *Info;
+  UINTN                  ResultSize;
+  UINTN                  Index;
+
+  if (File == Instance->RootFile) {
+    Status = EFI_UNSUPPORTED;
+  } else {
+    ResultSize = SIZE_OF_BOOTMON_FS_FILE_INFO;
+
+    if (*BufferSize < ResultSize) {
+      *BufferSize = ResultSize;
+      Status = EFI_BUFFER_TOO_SMALL;
+    } else {
+      Info = Buffer;
+
+      // Zero out the structure
+      ZeroMem (Info, ResultSize);
+
+      // Fill in the structure
+      Info->Size = ResultSize;
+
+      Info->EntryPoint  = File->HwDescription.EntryPoint;
+      Info->RegionCount = File->HwDescription.RegionCount;
+      for (Index = 0; Index < File->HwDescription.RegionCount; Index++) {
+        Info->Region[Index].LoadAddress = File->HwDescription.Region[Index].LoadAddress;
+        Info->Region[Index].Size        = File->HwDescription.Region[Index].Size;
+        Info->Region[Index].Offset      = File->HwDescription.Region[Index].Offset;
+        Info->Region[Index].Checksum    = File->HwDescription.Region[Index].Checksum;
+      }
+      *BufferSize = ResultSize;
+      Status = EFI_SUCCESS;
+    }
+  }
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
 SetFileName (
   IN  BOOTMON_FS_FILE *File,
   IN  CHAR16          *FileNameUnicode
@@ -452,6 +499,8 @@ BootMonFsGetInfo (
       Status = GetFilesystemInfo (Instance, BufferSize, Buffer);
     } else if (CompareGuid (InformationType, &gEfiFileInfoGuid) != 0) {
       Status = GetFileInfo (Instance, File, BufferSize, Buffer);
+    } else if (CompareGuid (InformationType, &gArmBootMonFsFileInfoGuid) != 0) {
+      Status = GetBootMonFsFileInfo (Instance, File, BufferSize, Buffer);
     } else {
       Status = EFI_UNSUPPORTED;
     }

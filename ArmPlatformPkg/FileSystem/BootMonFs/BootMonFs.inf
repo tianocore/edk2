@@ -43,6 +43,7 @@
   UefiLib
 
 [Guids]
+  gArmBootMonFsFileInfoGuid
   gEfiFileSystemInfoGuid
   gEfiFileInfoGuid
   gEfiFileSystemVolumeLabelInfoIdGuid

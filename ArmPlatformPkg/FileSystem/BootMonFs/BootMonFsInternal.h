@@ -26,6 +26,7 @@
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/SimpleFileSystem.h>
 
+#include <Guid/BootMonFsFileInfo.h>
 #include <Guid/FileInfo.h>
 #include <Guid/FileSystemInfo.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
