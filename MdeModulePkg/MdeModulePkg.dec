@@ -951,3 +951,6 @@
   #  default value is set to Zero. And the PCD is assumed ONLY to be accessed in DxeS3BootScriptLib Library.
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr|0x0|UINT64|0x00030001
 
+  ## This dynamic PCD hold an address to point to the memory of page table. The page table establishes a 1:1 
+  #  Virtual to Physical mapping according to the processor physical address bits.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIdentifyMappingPageTablePtr|0x0|UINT64|0x00030002

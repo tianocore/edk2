@@ -5,7 +5,7 @@
 #  It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
 #  the capsule runtime services are ready.
 #  
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,9 @@
   gEfiCapsuleArchProtocolGuid                   ## PRODUCED
 
 [Protocols.X64]
-  gEfiDxeSmmReadyToLockProtocolGuid             # ALWAYS_CONSUMED
+  ## UNDEFINED ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset
@@ -86,7 +88,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule || gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset  ## Populate Image requires reset support.
 
 [Pcd.X64]
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIdentifyMappingPageTablePtr
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsulePeiLongModeStackSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiVariableWriteArchProtocolGuid             ## Depends on variable write functionality to produce capsule data variable
