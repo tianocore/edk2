@@ -736,6 +736,8 @@ class Build():
         self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType)
         self.TargetTxt      = TargetTxtClassObject()
         self.ToolDef        = ToolDefClassObject()
+        #Set global flag for build mode
+        GlobalData.gIgnoreSource = BuildOptions.IgnoreSources
         if BuildOptions.DisableCache:
             self.Db         = WorkspaceDatabase(":memory:")
         else:
@@ -1903,6 +1905,7 @@ def MyOptionParser():
              "This option can also be specified by setting *_*_*_BUILD_FLAGS in [BuildOptions] section of platform DSC. If they are both specified, this value "\
              "will override the setting in [BuildOptions] section of platform DSC.")
     Parser.add_option("-N", "--no-cache", action="store_true", dest="DisableCache", default=False, help="Disable build cache mechanism")
+    Parser.add_option("--ignore-sources", action="store_true", dest="IgnoreSources", default=False, help="Focus to a binary build and ignore all source files")
 
     (Opt, Args)=Parser.parse_args()
     return (Opt, Args)

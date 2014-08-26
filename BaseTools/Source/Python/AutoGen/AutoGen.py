@@ -3160,8 +3160,10 @@ class ModuleAutoGen(AutoGen):
     #                                       dependent libraries will be created
     #
     def CreateMakeFile(self, CreateLibraryMakeFile=True):
+        # Ignore generating makefile when it is a binary module
         if self.IsBinaryModule:
             return
+
         if self.IsMakeFileCreated:
             return
 

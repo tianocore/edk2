@@ -2051,6 +2051,11 @@ class InfBuildData(ModuleBuildClassObject):
             return False
     ## Retrieve source files
     def _GetSourceFiles(self):
+        #Ignore all source files in a binary build mode
+        if GlobalData.gIgnoreSource:
+            self._Sources = []
+            return self._Sources
+
         if self._Sources == None:
             self._Sources = []
             RecordList = self._RawData[MODEL_EFI_SOURCE_FILE, self._Arch, self._Platform]
