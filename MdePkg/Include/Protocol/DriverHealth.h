@@ -21,6 +21,7 @@
   configuration changes to take affect. 
 
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>  
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -62,7 +63,16 @@ typedef enum {
 typedef struct {
   EFI_HII_HANDLE  HiiHandle;
   EFI_STRING_ID   StringId;
-  UINT64          Reserved;
+  
+  ///
+  /// 64-bit numeric value of the warning/error specified by this message. 
+  ///   A value of 0x0000000000000000 is used to indicate that MessageCode is not specified. 
+  ///   The values  0x0000000000000001 to 0x0fffffffffffffff are reserved for allocation by the UEFI Specification.
+  ///   The values  0x1000000000000000 to 0x1fffffffffffffff are reserved for IHV-developed drivers. 
+  ///   The values 0x8000000000000000 to 0x8fffffffffffffff is reserved for platform/OEM drivers.
+  ///   All other values are reserved and should not be used.
+  ///
+  UINT64          MessageCode;
 } EFI_DRIVER_HEALTH_HII_MESSAGE;
 
 /**
