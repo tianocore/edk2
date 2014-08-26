@@ -667,6 +667,7 @@
    #  144: a value of type <type> cannot be used to initialize an entity of type <type>
    #  513: a value of type <type> cannot be assigned to an entity of type <type>
    #  188: enumerated type mixed with another type (i.e. passing an integer as an enum without a cast)
-   RVCT:*_*_ARM_CC_FLAGS                  = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DTHIRTY_TWO_BIT --diag_suppress=1295,550,1293,111,68,177,223,144,513,188
+   # 1296: Extended constant initialiser used
+   RVCT:*_*_ARM_CC_FLAGS                  = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DTHIRTY_TWO_BIT --diag_suppress=1296,1295,550,1293,111,68,177,223,144,513,188
    XCODE:*_*_IA32_CC_FLAGS                = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DTHIRTY_TWO_BIT
    XCODE:*_*_X64_CC_FLAGS                 = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DSIXTY_FOUR_BIT
