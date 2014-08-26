@@ -691,6 +691,7 @@ BootMenuReorderBootOptions (
     }
 
     SelectedEntry = &BootOptionEntry->Link;
+    SecondEntry = NULL;
     // Note down the previous entry in the list to be able to cancel changes
     PrevEntry = GetPreviousNode (BootOptionsList, SelectedEntry);
 
@@ -739,7 +740,9 @@ BootMenuReorderBootOptions (
       } while ((!Move) && (!Save) && (!Cancel));
 
       if (Move) {
-        SwapListEntries (SelectedEntry, SecondEntry);
+        if ((SelectedEntry != NULL) && (SecondEntry != NULL)) {
+          SwapListEntries (SelectedEntry, SecondEntry);
+        }
       } else {
         if (Save) {
           Status = GetGlobalEnvironmentVariable (
