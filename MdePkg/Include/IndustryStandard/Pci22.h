@@ -6,7 +6,10 @@
     PCI-to-PCI Bridge Architecture Specification, Revision 1.2
     PC Card Standard, 8.0
 
+  
+
   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -653,6 +656,42 @@ typedef struct {
   UINT8                   BridgeExtention;
   UINT8                   Data;
 } EFI_PCI_CAPABILITY_PMI;
+
+///
+/// PMC - Power Management Capabilities
+/// Section 3.2.3, PCI Power Management Interface Specifiction, Revision 1.2
+///
+typedef union {
+  struct {
+    UINT16 Version : 3;
+    UINT16 PmeClock : 1;
+    UINT16 : 1;
+    UINT16 DeviceSpecificInitialization : 1;
+    UINT16 AuxCurrent : 3;
+    UINT16 D1Support : 1;
+    UINT16 D2Support : 1;
+    UINT16 PmeSupport : 5;
+  } Bits;
+  UINT16 Data;
+} EFI_PCI_PMC;
+
+#define EFI_PCI_PMC_D3_COLD_MASK    (BIT15)
+
+///
+/// PMCSR - Power Management Control/Status
+/// Section 3.2.4, PCI Power Management Interface Specifiction, Revision 1.2
+///
+typedef union {
+  struct {
+    UINT16 PowerState : 2;
+    UINT16 : 6;
+    UINT16 PmeEnable : 1;
+    UINT16 DataSelect : 4;
+    UINT16 DataScale : 2;
+    UINT16 PmeStatus : 1;
+  } Bits;
+  UINT16 Data;
+} EFI_PCI_PMCSR;
 
 ///
 /// A.G.P Capability
