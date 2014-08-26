@@ -182,10 +182,10 @@ formset
                  // CHECKBOX_DEFAULT_MFG indicate EFI_IFR_CHECKBOX_DEFAULT_MFG.
                  //
                  flags    = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG,
-                 default  = 1,
+                 default  = TRUE,
         endcheckbox;
       endif;
-	endif;
+    endif;
 
     //
     // Ordered list:
@@ -206,11 +206,12 @@ formset
                 varid       = MyIfrNVData.BootOrder,
                 prompt      = STRING_TOKEN(STR_BOOT_OPTIONS),
                 help        = STRING_TOKEN(STR_NULL_STRING),
-                option text = STRING_TOKEN(STR_BOOT_OPTION2), value = 2, flags = RESET_REQUIRED;
-                option text = STRING_TOKEN(STR_BOOT_OPTION1), value = 1, flags = RESET_REQUIRED;
-                option text = STRING_TOKEN(STR_BOOT_OPTION3), value = 3, flags = RESET_REQUIRED;
+                flags       = RESET_REQUIRED,
+                option text = STRING_TOKEN(STR_BOOT_OPTION2), value = 2, flags = 0;
+                option text = STRING_TOKEN(STR_BOOT_OPTION1), value = 1, flags = 0;
+                option text = STRING_TOKEN(STR_BOOT_OPTION3), value = 3, flags = 0;
               suppressif ideqval MyIfrNVData.BootOrderLarge == 0;
-                option text = STRING_TOKEN(STR_BOOT_OPTION4), value = 4, flags = RESET_REQUIRED;
+                option text = STRING_TOKEN(STR_BOOT_OPTION4), value = 4, flags = 0;
               endif
       endlist;
 
@@ -226,9 +227,10 @@ formset
         varid       = MyIfrNVData.OrderedList,
         prompt      = STRING_TOKEN(STR_TEST_OPCODE),
         help        = STRING_TOKEN(STR_TEXT_HELP),
-        option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 3, flags = RESET_REQUIRED;
-        option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 2, flags = RESET_REQUIRED;
-        option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 1, flags = RESET_REQUIRED;
+        flags       = RESET_REQUIRED,
+        option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 3, flags = 0;
+        option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 2, flags = 0;
+        option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 1, flags = 0;
       endlist;
     endif;
 
@@ -252,8 +254,9 @@ formset
     oneof varid  = MyIfrNVData.TestLateCheck,
       prompt      = STRING_TOKEN(STR_TEST_OPCODE),
       help        = STRING_TOKEN(STR_ONE_OF_HELP),
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = RESET_REQUIRED;
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT | RESET_REQUIRED;
+      flags       = RESET_REQUIRED,
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = 0;
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT;
       warningif prompt = STRING_TOKEN(STR_WARNING_POPUP), timeout = 5,
         ideqval MyIfrNVData.TestLateCheck == 0
       endif
@@ -263,8 +266,9 @@ formset
     oneof varid  = MyIfrNVData.TestLateCheck2,
       prompt      = STRING_TOKEN(STR_TEST_OPCODE2),
       help        = STRING_TOKEN(STR_ONE_OF_HELP),
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = DEFAULT | RESET_REQUIRED;
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = RESET_REQUIRED;
+      flags       = RESET_REQUIRED,
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = DEFAULT;
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = 0;
 
       inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
         ideqid MyIfrNVData.TestLateCheck == MyIfrNVData.TestLateCheck2
@@ -275,10 +279,10 @@ formset
     oneof varid  = MyIfrNVData.QuestionAboutTreeHugging,
       prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT),
       help        = STRING_TOKEN(STR_ONE_OF_HELP),
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = RESET_REQUIRED;
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT | RESET_REQUIRED;
-      option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 0x03, flags = RESET_REQUIRED;
-
+      flags       = RESET_REQUIRED,
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = 0;
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT;
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 3, flags = 0;
     endoneof;
 
     //
