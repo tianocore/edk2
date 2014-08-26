@@ -39,7 +39,7 @@ BootOptionStart (
     LoaderType = ReadUnaligned32 ((CONST UINT32*)&OptionalData->Header.LoaderType);
 
     if (LoaderType == BDS_LOADER_EFI_APPLICATION) {
-      if ((BootOption->Attributes & LOAD_OPTION_CATEGORY_BOOT) == 0) {
+      if ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_APP) {
         // Need to connect every drivers to ensure no dependencies are missing for the application
         BdsConnectAllDrivers ();
       }
@@ -91,7 +91,7 @@ BootOptionStart (
     }
   } else {
     // Connect all the drivers if the EFI Application is not a EFI OS Loader
-    if ((BootOption->Attributes & LOAD_OPTION_CATEGORY_BOOT) == 0) {
+    if ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_APP) {
       BdsConnectAllDrivers ();
     }
 
