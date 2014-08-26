@@ -2,6 +2,7 @@
 Entry and initialization module for the browser.
 
 Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2125,16 +2126,7 @@ UiDisplayMenu (
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
-  //
-  //  Left                                              right
-  //   |<-.->|<-.........->|<- .........->|<-...........->|
-  //     Skip    Prompt         Option         Help 
-  //
-  Width             = (CHAR16) ((gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn) / 3);
-  gOptionBlockWidth = Width + 1; 
-  gHelpBlockWidth   = (CHAR16) (Width - LEFT_SKIPPED_COLUMNS);
-  gPromptBlockWidth = (CHAR16) (gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - 2 * Width - 1);
-
+  Width     = (UINT16)gOptionBlockWidth - 1;
   TopRow    = gStatementDimensions.TopRow    + SCROLL_ARROW_HEIGHT;
   BottomRow = gStatementDimensions.BottomRow - SCROLL_ARROW_HEIGHT - 1;
 
@@ -3417,12 +3409,25 @@ FormDisplay (
     return EFI_SUCCESS;
   }
 
-  ConvertStatementToMenu();
-
   Status = DisplayPageFrame (FormData, &gStatementDimensions);
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Global Widths should be initialized before any MenuOption creation
+  // or the GetWidth() used in UiAddMenuOption() will return incorrect value.
+  //
+  //
+  //  Left                                              right
+  //   |<-.->|<-.........->|<- .........->|<-...........->|
+  //     Skip    Prompt         Option         Help 
+  //
+  gOptionBlockWidth = (CHAR16) ((gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn) / 3) + 1;
+  gHelpBlockWidth   = (CHAR16) (gOptionBlockWidth - 1 - LEFT_SKIPPED_COLUMNS);
+  gPromptBlockWidth = (CHAR16) (gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - 2 * (gOptionBlockWidth - 1) - 1);
+
+  ConvertStatementToMenu();
 
   //
   // Check whether layout is changed.
