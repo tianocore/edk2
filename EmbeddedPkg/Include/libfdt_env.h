@@ -15,6 +15,7 @@
 #ifndef _LIBFDT_ENV_H
 #define _LIBFDT_ENV_H
 
+#include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 
@@ -77,5 +78,20 @@ static inline char *strchr(const char *s, int c) {
   pattern[1] = 0;
   return AsciiStrStr (s, pattern);
 }
+
+/**
+  Load and Install FDT from Semihosting
+
+  @param Filename   Name of the file to load from semihosting
+
+  @return EFI_SUCCESS           Fdt Blob was successfully installed into the configuration table
+                                from semihosting
+  @return EFI_NOT_FOUND         Fail to locate the file in semihosting
+  @return EFI_OUT_OF_RESOURCES  Fail to allocate memory to contain the blob
+**/
+EFI_STATUS
+InstallFdtFromSemihosting (
+  IN  CONST CHAR16*   FileName
+  );
 
 #endif /* _LIBFDT_ENV_H */
