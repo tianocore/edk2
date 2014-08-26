@@ -218,7 +218,7 @@ CheckIsa (
 VOID
 GdbSendTSignal (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINT8	              GdbExceptionType
+  IN  UINT8               GdbExceptionType
   );
 
 

@@ -186,7 +186,7 @@ DefaultExceptionHandler (
   UINT32    PcAdjust = 0;
 
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n%a Exception PC at 0x%08x  CPSR 0x%08x ",
-	  gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR);
+         gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR);
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
   DEBUG_CODE_BEGIN ();

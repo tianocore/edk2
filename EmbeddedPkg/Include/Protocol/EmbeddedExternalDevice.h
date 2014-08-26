@@ -91,4 +91,4 @@ struct _EMBEDDED_EXTERNAL_DEVICE {
 
 extern EFI_GUID gEmbeddedExternalDeviceProtocolGuid;
 
-#endif	// __EMBEDDED_EXTERNAL_DEVICE_H__
+#endif  // __EMBEDDED_EXTERNAL_DEVICE_H__

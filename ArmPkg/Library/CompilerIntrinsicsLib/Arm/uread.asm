@@ -44,7 +44,7 @@ __aeabi_uread4
 ;  );
 ;
 __aeabi_uread8
-    mov	    r3, r0
+    mov     r3, r0
 
     ldrb    r1, [r3]
     ldrb    r2, [r3, #1]

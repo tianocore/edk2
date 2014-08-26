@@ -302,7 +302,7 @@ WriteNthRegister (
 
   // check if this is a valid Register Number
   if ((RegNumber < 0) || (RegNumber >= sizeof (gRegisterOffsets)/sizeof (UINTN))) {
-	SendError (GDB_EINVALIDREGNUM);
+    SendError (GDB_EINVALIDREGNUM);
     return;
   }
   InBufPtr++;  // skips the '=' character
@@ -330,7 +330,7 @@ WriteGeneralRegisters (
   // check to see if the buffer is the right size which is
   // 1 (for 'G') + 16 (for 16 registers) * 8 ( for 8 hex chars each) = 129
   if (AsciiStrLen(InBuffer) != 129) { // 16 regs, 8 hex chars each, and the end '\0' (escape seq)
-	//Bad message. Message is not the right length
+    //Bad message. Message is not the right length
     SendError (GDB_EBADBUFSIZE);
     return;
   }

@@ -397,49 +397,49 @@ EFI_STATUS
 EFIAPI
 LcdGraphicsBlt (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-	IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
-	IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION   BltOperation,
-	IN UINTN                               SourceX,
-	IN UINTN                               SourceY,
-	IN UINTN                               DestinationX,
-	IN UINTN                               DestinationY,
-	IN UINTN                               Width,
-	IN UINTN                               Height,
-	IN UINTN                               Delta           OPTIONAL   // Number of BYTES in a row of the BltBuffer
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION   BltOperation,
+  IN UINTN                               SourceX,
+  IN UINTN                               SourceY,
+  IN UINTN                               DestinationX,
+  IN UINTN                               DestinationY,
+  IN UINTN                               Width,
+  IN UINTN                               Height,
+  IN UINTN                               Delta           OPTIONAL   // Number of BYTES in a row of the BltBuffer
   )
 {
   EFI_STATUS    Status;
-	LCD_INSTANCE  *Instance;
+  LCD_INSTANCE  *Instance;
 
-	Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
+  Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
 
   if (!mDisplayInitialized) {
     InitializeDisplay (Instance);
   }
 
   switch (BltOperation) {
-	  case EfiBltVideoFill:
-	    Status = BltVideoFill (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
-		  break;
+  case EfiBltVideoFill:
+    Status = BltVideoFill (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+    break;
 
-	  case EfiBltVideoToBltBuffer:
-	    Status = BltVideoToBltBuffer (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
-      break;
+  case EfiBltVideoToBltBuffer:
+    Status = BltVideoToBltBuffer (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+    break;
 
-    case EfiBltBufferToVideo:
-      Status = BltBufferToVideo (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
-		  break;
+  case EfiBltBufferToVideo:
+    Status = BltBufferToVideo (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+    break;
 
-	  case EfiBltVideoToVideo:
-	    Status = BltVideoToVideo (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
-		  break;
+  case EfiBltVideoToVideo:
+    Status = BltVideoToVideo (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+    break;
 
-	  case EfiGraphicsOutputBltOperationMax:
-	  default:
-		  DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: Invalid Operation\n"));
-		  Status = EFI_INVALID_PARAMETER;
-		  break;
-	}
+  case EfiGraphicsOutputBltOperationMax:
+  default:
+    DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: Invalid Operation\n"));
+    Status = EFI_INVALID_PARAMETER;
+    break;
+}
 
   return Status;
 }

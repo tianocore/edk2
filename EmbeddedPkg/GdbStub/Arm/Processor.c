@@ -398,7 +398,7 @@ LIST_ENTRY  BreakpointList;
 /**
  Insert Single Step in the SystemContext
 
- @param	SystemContext	Register content at time of the exception
+ @param SystemContext  Register content at time of the exception
  **/
 VOID
 AddSingleStep (
@@ -429,7 +429,7 @@ AddSingleStep (
 /**
  Remove Single Step in the SystemContext
 
- @param	SystemContext	Register content at time of the exception
+ @param SystemContext  Register content at time of the exception
  **/
 VOID
 RemoveSingleStep (

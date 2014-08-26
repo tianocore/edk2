@@ -141,7 +141,7 @@ ValidateFvHeader (
   EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
   VARIABLE_STORE_HEADER       *VariableStoreHeader;
   UINTN                       VariableStoreLength;
-  UINTN						  FvLength;
+  UINTN                       FvLength;
 
   FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Instance->RegionBaseAddress;
 

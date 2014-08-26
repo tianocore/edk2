@@ -40,7 +40,7 @@ _ModuleEntryPoint
   mov   r5, r0
 
   // Is it the Primary Core ?
-  bl	ArmPlatformIsPrimaryCore
+  bl    ArmPlatformIsPrimaryCore
 
   // Get the top of the primary stacks (and the base of the secondary stacks)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoresStackBase), r1)

@@ -778,21 +778,21 @@ EFI_STATUS
 EFIAPI
 LcdGraphicsBlt (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-	IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
-	IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION   BltOperation,
-	IN UINTN                               SourceX,
-	IN UINTN                               SourceY,
-	IN UINTN                               DestinationX,
-	IN UINTN                               DestinationY,
-	IN UINTN                               Width,
-	IN UINTN                               Height,
-	IN UINTN                               Delta           OPTIONAL   // Number of BYTES in a row of the BltBuffer
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION   BltOperation,
+  IN UINTN                               SourceX,
+  IN UINTN                               SourceY,
+  IN UINTN                               DestinationX,
+  IN UINTN                               DestinationY,
+  IN UINTN                               Width,
+  IN UINTN                               Height,
+  IN UINTN                               Delta           OPTIONAL   // Number of BYTES in a row of the BltBuffer
   )
 {
-	EFI_STATUS         Status;
-	UINT32             HorizontalResolution;
+  EFI_STATUS         Status;
+  UINT32             HorizontalResolution;
   UINT32             VerticalResolution;
-	LCD_INSTANCE*      Instance;
+  LCD_INSTANCE*      Instance;
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
 
@@ -811,24 +811,24 @@ LcdGraphicsBlt (
       BltOperation,DestinationX,DestinationY,Width,Height,HorizontalResolution,VerticalResolution));
 
   // Check we have reasonable parameters
-	if (Width == 0 || Height == 0) {
+  if (Width == 0 || Height == 0) {
     DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: ERROR - Invalid dimension: Zero size area.\n" ));
-		Status = EFI_INVALID_PARAMETER;
-		goto EXIT;
-	}
+    Status = EFI_INVALID_PARAMETER;
+    goto EXIT;
+  }
 
-	if ((BltOperation == EfiBltVideoFill) || (BltOperation == EfiBltBufferToVideo) || (BltOperation == EfiBltVideoToBltBuffer)) {
-	  ASSERT( BltBuffer != NULL);
-	}
+  if ((BltOperation == EfiBltVideoFill) || (BltOperation == EfiBltBufferToVideo) || (BltOperation == EfiBltVideoToBltBuffer)) {
+    ASSERT( BltBuffer != NULL);
+  }
 
-	/*if ((DestinationX >= HorizontalResolution) || (DestinationY >= VerticalResolution)) {
-	  DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: ERROR - Invalid destination.\n" ));
-	  Status = EFI_INVALID_PARAMETER;
-	  goto EXIT;
-	}*/
+  /*if ((DestinationX >= HorizontalResolution) || (DestinationY >= VerticalResolution)) {
+    DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: ERROR - Invalid destination.\n" ));
+    Status = EFI_INVALID_PARAMETER;
+    goto EXIT;
+  }*/
 
-	// If we are reading data out of the video buffer, check that the source area is within the display limits
-	if ((BltOperation == EfiBltVideoToBltBuffer) || (BltOperation == EfiBltVideoToVideo)) {
+  // If we are reading data out of the video buffer, check that the source area is within the display limits
+  if ((BltOperation == EfiBltVideoToBltBuffer) || (BltOperation == EfiBltVideoToVideo)) {
     if ((SourceY + Height > VerticalResolution) || (SourceX + Width > HorizontalResolution)) {
       DEBUG((DEBUG_INFO, "LcdGraphicsBlt: ERROR - Invalid source resolution.\n" ));
       DEBUG((DEBUG_INFO, "                      - SourceY=%d + Height=%d > VerticalResolution=%d.\n", SourceY, Height, VerticalResolution ));
@@ -836,10 +836,10 @@ LcdGraphicsBlt (
       Status = EFI_INVALID_PARAMETER;
       goto EXIT;
     }
-	}
+  }
 
-	// If we are writing data into the video buffer, that the destination area is within the display limits
-	if ((BltOperation == EfiBltVideoFill) || (BltOperation == EfiBltBufferToVideo) || (BltOperation == EfiBltVideoToVideo)) {
+  // If we are writing data into the video buffer, that the destination area is within the display limits
+  if ((BltOperation == EfiBltVideoFill) || (BltOperation == EfiBltBufferToVideo) || (BltOperation == EfiBltVideoToVideo)) {
     if ((DestinationY + Height > VerticalResolution) || (DestinationX + Width > HorizontalResolution)) {
       DEBUG((DEBUG_INFO, "LcdGraphicsBlt: ERROR - Invalid destination resolution.\n" ));
       DEBUG((DEBUG_INFO, "                      - DestinationY=%d + Height=%d > VerticalResolution=%d.\n", DestinationY, Height, VerticalResolution ));
@@ -847,36 +847,36 @@ LcdGraphicsBlt (
       Status = EFI_INVALID_PARAMETER;
       goto EXIT;
     }
-	}
+  }
 
   //
   // Perform the Block Transfer Operation
   //
 
-	switch (BltOperation) {
-	case EfiBltVideoFill:
-	  Status = BltVideoFill (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
-		break;
+  switch (BltOperation) {
+  case EfiBltVideoFill:
+    Status = BltVideoFill (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+    break;
 
-	case EfiBltVideoToBltBuffer:
-	  Status = BltVideoToBltBuffer (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+  case EfiBltVideoToBltBuffer:
+    Status = BltVideoToBltBuffer (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
     break;
 
   case EfiBltBufferToVideo:
     Status = BltBufferToVideo (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
-		break;
+    break;
 
-	case EfiBltVideoToVideo:
-	  Status = BltVideoToVideo (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
-		break;
+  case EfiBltVideoToVideo:
+    Status = BltVideoToVideo (This, BltBuffer, SourceX, SourceY, DestinationX, DestinationY, Width, Height, Delta);
+    break;
 
-	case EfiGraphicsOutputBltOperationMax:
-	default:
-		DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: Invalid Operation\n"));
-		Status = EFI_INVALID_PARAMETER;
-		break;
-	}
+  case EfiGraphicsOutputBltOperationMax:
+  default:
+    DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: Invalid Operation\n"));
+    Status = EFI_INVALID_PARAMETER;
+    break;
+  }
 
 EXIT:
-	return Status;
+  return Status;
 }

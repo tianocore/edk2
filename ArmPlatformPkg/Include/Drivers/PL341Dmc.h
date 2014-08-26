@@ -17,36 +17,36 @@
 
 
 typedef struct  {
-    UINTN	HasQos;        // has QoS registers
-    UINTN	MaxChip;       // number of memory chips accessible
-    BOOLEAN  IsUserCfg;
+    UINTN   HasQos;        // has QoS registers
+    UINTN   MaxChip;       // number of memory chips accessible
+    BOOLEAN IsUserCfg;
     UINT32  User0Cfg;
     UINT32  User2Cfg;
-    UINT32	RefreshPeriod;
-    UINT32	CasLatency;
-    UINT32	WriteLatency;
-    UINT32	t_mrd;
-    UINT32	t_ras;
-    UINT32	t_rc;
-    UINT32	t_rcd;
-    UINT32	t_rfc;
-    UINT32	t_rp;
-    UINT32	t_rrd;
-    UINT32	t_wr;
-    UINT32	t_wtr;
-    UINT32	t_xp;
-    UINT32	t_xsr;
-    UINT32	t_esr;
-    UINT32	MemoryCfg;
-    UINT32	MemoryCfg2;
-    UINT32	MemoryCfg3;
-    UINT32	ChipCfg0;
-    UINT32	ChipCfg1;
-    UINT32	ChipCfg2;
-    UINT32	ChipCfg3;
-    UINT32	t_faw;
-    UINT32	t_data_en;
-    UINT32	t_wdata_en;
+    UINT32  RefreshPeriod;
+    UINT32  CasLatency;
+    UINT32  WriteLatency;
+    UINT32  t_mrd;
+    UINT32  t_ras;
+    UINT32  t_rc;
+    UINT32  t_rcd;
+    UINT32  t_rfc;
+    UINT32  t_rp;
+    UINT32  t_rrd;
+    UINT32  t_wr;
+    UINT32  t_wtr;
+    UINT32  t_xp;
+    UINT32  t_xsr;
+    UINT32  t_esr;
+    UINT32  MemoryCfg;
+    UINT32  MemoryCfg2;
+    UINT32  MemoryCfg3;
+    UINT32  ChipCfg0;
+    UINT32  ChipCfg1;
+    UINT32  ChipCfg2;
+    UINT32  ChipCfg3;
+    UINT32  t_faw;
+    UINT32  t_data_en;
+    UINT32  t_wdata_en;
     UINT32  ModeReg;
     UINT32  ExtModeReg;
 } PL341_DMC_CONFIG;
@@ -107,7 +107,7 @@ typedef struct  {
 #define DMC_MEMORY_CFG2_REG         0x4C
 #define DMC_MEMORY_CFG3_REG         0x50
 #define DMC_T_FAW_REG               0x54
-#define DMC_T_RDATA_EN              0x5C	/* DFI read data enable register */
+#define DMC_T_RDATA_EN              0x5C        /* DFI read data enable register */
 #define DMC_T_WRLAT_DIFF            0x60        /* DFI write data enable register */
 
 // Returns the state of the memory controller:
@@ -182,66 +182,66 @@ typedef struct  {
 //
 // PHY Register Settings
 //
-#define PHY_PTM_DFI_CLK_RANGE					0xE00		// DDR2 PHY PTM register offset
-#define PHY_PTM_IOTERM							0xE04
-#define PHY_PTM_PLL_EN          				0xe0c
-#define PHY_PTM_PLL_RANGE       				0xe18
-#define PHY_PTM_FEEBACK_DIV     				0xe1c
-#define PHY_PTM_RCLK_DIV        				0xe20
-#define PHY_PTM_LOCK_STATUS     				0xe28
-#define PHY_PTM_INIT_DONE	     				0xe34
-#define PHY_PTM_ADDCOM_IOSTR_OFF				0xec8
-#define PHY_PTM_SQU_TRAINING    				0xee8
-#define PHY_PTM_SQU_STAT        				0xeec
+#define PHY_PTM_DFI_CLK_RANGE       0xE00  // DDR2 PHY PTM register offset
+#define PHY_PTM_IOTERM              0xE04
+#define PHY_PTM_PLL_EN              0xe0c
+#define PHY_PTM_PLL_RANGE           0xe18
+#define PHY_PTM_FEEBACK_DIV         0xe1c
+#define PHY_PTM_RCLK_DIV            0xe20
+#define PHY_PTM_LOCK_STATUS         0xe28
+#define PHY_PTM_INIT_DONE           0xe34
+#define PHY_PTM_ADDCOM_IOSTR_OFF    0xec8
+#define PHY_PTM_SQU_TRAINING        0xee8
+#define PHY_PTM_SQU_STAT            0xeec
 
 // ==============================================================================
 // PIPD 40G DDR2/DDR3 PHY Register definitions
 //
 // Offsets from APB Base Address
 // ==============================================================================
-#define PHY_BYTE0_OFFSET					0x000
-#define PHY_BYTE1_OFFSET					0x200
-#define PHY_BYTE2_OFFSET					0x400
-#define PHY_BYTE3_OFFSET					0x600
+#define PHY_BYTE0_OFFSET            0x000
+#define PHY_BYTE1_OFFSET            0x200
+#define PHY_BYTE2_OFFSET            0x400
+#define PHY_BYTE3_OFFSET            0x600
 
-#define PHY_BYTE0_COARSE_SQADJ_INIT			0x064	;// Coarse squelch adjust
-#define PHY_BYTE1_COARSE_SQADJ_INIT			0x264	;// Coarse squelch adjust
-#define PHY_BYTE2_COARSE_SQADJ_INIT			0x464	;// Coarse squelch adjust
-#define PHY_BYTE3_COARSE_SQADJ_INIT			0x664	;// Coarse squelch adjust
+#define PHY_BYTE0_COARSE_SQADJ_INIT 0x064  ;// Coarse squelch adjust
+#define PHY_BYTE1_COARSE_SQADJ_INIT 0x264  ;// Coarse squelch adjust
+#define PHY_BYTE2_COARSE_SQADJ_INIT 0x464  ;// Coarse squelch adjust
+#define PHY_BYTE3_COARSE_SQADJ_INIT 0x664  ;// Coarse squelch adjust
 
-#define PHY_BYTE0_IOSTR_OFFSET				0x004
-#define PHY_BYTE1_IOSTR_OFFSET				0x204
-#define PHY_BYTE2_IOSTR_OFFSET				0x404
-#define PHY_BYTE3_IOSTR_OFFSET				0x604
+#define PHY_BYTE0_IOSTR_OFFSET      0x004
+#define PHY_BYTE1_IOSTR_OFFSET      0x204
+#define PHY_BYTE2_IOSTR_OFFSET      0x404
+#define PHY_BYTE3_IOSTR_OFFSET      0x604
 
 
 ;//--------------------------------------------------------------------------
 
 // DFI Clock ranges:
 
-#define PHY_PTM_DFI_CLK_RANGE_200MHz   		0x0
-#define PHY_PTM_DFI_CLK_RANGE_201_267MHz	0x1
-#define PHY_PTM_DFI_CLK_RANGE_268_333MHz	0x2
-#define PHY_PTM_DFI_CLK_RANGE_334_400MHz	0x3
-#define PHY_PTM_DFI_CLK_RANGE_401_533MHz	0x4
-#define PHY_PTM_DFI_CLK_RANGE_534_667MHz	0x5
-#define PHY_PTM_DFI_CLK_RANGE_668_800MHz	0x6
+#define PHY_PTM_DFI_CLK_RANGE_200MHz            0x0
+#define PHY_PTM_DFI_CLK_RANGE_201_267MHz        0x1
+#define PHY_PTM_DFI_CLK_RANGE_268_333MHz        0x2
+#define PHY_PTM_DFI_CLK_RANGE_334_400MHz        0x3
+#define PHY_PTM_DFI_CLK_RANGE_401_533MHz        0x4
+#define PHY_PTM_DFI_CLK_RANGE_534_667MHz        0x5
+#define PHY_PTM_DFI_CLK_RANGE_668_800MHz        0x6
 
 
 
-#define  PHY_PTM_DFI_CLK_RANGE_VAL			PHY_PTM_DFI_CLK_RANGE_334_400MHz
+#define  PHY_PTM_DFI_CLK_RANGE_VAL              PHY_PTM_DFI_CLK_RANGE_334_400MHz
 
 //--------------------------------------------------------------------------
 
 
 // PLL Range
 
-#define PHY_PTM_PLL_RANGE_200_400MHz		0x0	// b0 = frequency >= 200 MHz and < 400 MHz
-#define PHY_PTM_PLL_RANGE_400_800MHz		0x1	// b1 = frequency >= 400 MHz.
-#define PHY_PTM_FEEBACK_DIV_200_400MHz		0x0	// b0 = frequency >= 200 MHz and < 400 MHz
-#define PHY_PTM_FEEBACK_DIV_400_800MHz		0x1	// b1 = frequency >= 400 MHz.
-#define PHY_PTM_REFCLK_DIV_200_400MHz		0x0
-#define PHY_PTM_REFCLK_DIV_400_800MHz		0x1
+#define PHY_PTM_PLL_RANGE_200_400MHz            0x0     // b0 = frequency >= 200 MHz and < 400 MHz
+#define PHY_PTM_PLL_RANGE_400_800MHz            0x1     // b1 = frequency >= 400 MHz.
+#define PHY_PTM_FEEBACK_DIV_200_400MHz          0x0     // b0 = frequency >= 200 MHz and < 400 MHz
+#define PHY_PTM_FEEBACK_DIV_400_800MHz          0x1     // b1 = frequency >= 400 MHz.
+#define PHY_PTM_REFCLK_DIV_200_400MHz           0x0
+#define PHY_PTM_REFCLK_DIV_400_800MHz           0x1
 
 #define TC_UIOLHNC_MASK                         0x000003C0
 #define TC_UIOLHNC_SHIFT                        0x6
@@ -252,18 +252,18 @@ typedef struct  {
 #define TC_UIOHSTOP_SHIFT                       0x0
 #define TC_UIOLHXC_VALUE                        0x4
 
-#define PHY_PTM_SQU_TRAINING_ENABLE				0x1
-#define PHY_PTM_SQU_TRAINING_DISABLE				0x0
+#define PHY_PTM_SQU_TRAINING_ENABLE             0x1
+#define PHY_PTM_SQU_TRAINING_DISABLE            0x0
 
 
 //--------------------------------------
 // JEDEC DDR2 Device Register definitions and settings
 //--------------------------------------
-#define DDR_MODESET_SHFT						14
-#define DDR_MODESET_MR							0x0		;// Mode register
-#define DDR_MODESET_EMR							0x1		;// Extended Mode register
-#define DDR_MODESET_EMR2						0x2
-#define DDR_MODESET_EMR3						0x3
+#define DDR_MODESET_SHFT                        14
+#define DDR_MODESET_MR                          0x0  ;// Mode register
+#define DDR_MODESET_EMR                         0x1  ;// Extended Mode register
+#define DDR_MODESET_EMR2                        0x2
+#define DDR_MODESET_EMR3                        0x3
 
 //
 // Extended Mode Register settings
@@ -290,21 +290,21 @@ typedef struct  {
 
 #define DDR_EMR_ODS_VAL                         DDR_EMR_ODS_FULL
 
-#define DDR_SDRAM_START_ADDR					0x10000000
+#define DDR_SDRAM_START_ADDR                    0x10000000
 
 
 // ----------------------------------------
 // PHY IOTERM values
 // ----------------------------------------
-#define PHY_PTM_IOTERM_OFF					0x0
-#define PHY_PTM_IOTERM_150R					0x1
-#define PHY_PTM_IOTERM_75R					0x2
-#define PHY_PTM_IOTERM_50R					0x3
+#define PHY_PTM_IOTERM_OFF                      0x0
+#define PHY_PTM_IOTERM_150R                     0x1
+#define PHY_PTM_IOTERM_75R                      0x2
+#define PHY_PTM_IOTERM_50R                      0x3
 
-#define PHY_BYTE_IOSTR_60OHM				0x0
-#define PHY_BYTE_IOSTR_40OHM				0x1
-#define PHY_BYTE_IOSTR_30OHM				0x2
-#define PHY_BYTE_IOSTR_30AOHM				0x3
+#define PHY_BYTE_IOSTR_60OHM                    0x0
+#define PHY_BYTE_IOSTR_40OHM                    0x1
+#define PHY_BYTE_IOSTR_30OHM                    0x2
+#define PHY_BYTE_IOSTR_30AOHM                   0x3
 
 #define DDR2_MR_BURST_LENGTH_4     (2)
 #define DDR2_MR_BURST_LENGTH_8     (3)

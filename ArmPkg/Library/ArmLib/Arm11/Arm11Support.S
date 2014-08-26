@@ -51,7 +51,7 @@ GCC_ASM_EXPORT(ArmDisableInterrupts)
 GCC_ASM_EXPORT (ArmEnableVFP)
 
 Arm11PartNumberMask:  .word       0xFFF0
-Arm11PartNumber:      .word	      0xB020
+Arm11PartNumber:      .word       0xB020
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)

@@ -72,10 +72,10 @@ ASM_PFX(copy_cpsr_into_spsr):
 # Set the Non Secure Mode
 ASM_PFX(set_non_secure_mode):
     push    { r1 }
-    and	    r0, r0, #0x1f     @ Keep only the mode bits
+    and     r0, r0, #0x1f     @ Keep only the mode bits
     mrs     r1, spsr          @ Read the spsr
     bic     r1, r1, #0x1f     @ Clear all mode bits
-    orr	    r1, r1, r0
+    orr     r1, r1, r0
     msr     spsr_cxsf, r1     @ write back spsr (may have caused a mode switch)
     isb
     pop     { r1 }

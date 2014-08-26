@@ -644,9 +644,9 @@ OutputData (
           TextLine[Line++] = ConvertToTextLine(*Address++);
           break;
 
-			  default:
-				  AsciiPrint ("Width must be 1, 2, or 4!\n");
-				  return EFI_INVALID_PARAMETER;
+        default:
+          AsciiPrint ("Width must be 1, 2, or 4!\n");
+          return EFI_INVALID_PARAMETER;
       }
     }
 

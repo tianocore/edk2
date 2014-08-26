@@ -695,12 +695,12 @@ FfsGetVolumeInfo (
 /**
   Search through every FV until you find a file of type FileType
 
-	@param FileType  	    File handle of a Fv type file.
-  @param Volumehandle   On succes Volume Handle of the match
-  @param FileHandle     On success File Handle of the match
+  @param FileType        File handle of a Fv type file.
+  @param Volumehandle    On succes Volume Handle of the match
+  @param FileHandle      On success File Handle of the match
 
-  @retval EFI_NOT_FOUND  				FV image can't be found.
-  @retval EFI_SUCCESS						Successfully found FileType
+  @retval EFI_NOT_FOUND  FV image can't be found.
+  @retval EFI_SUCCESS    Successfully found FileType
 
 **/
 EFI_STATUS
@@ -743,11 +743,11 @@ FfsAnyFvFindFirstFile (
 /**
   Get Fv image from the FV type file, then add FV & FV2 Hob.
 
-	@param FileHandle  	        File handle of a Fv type file.
+  @param FileHandle  File handle of a Fv type file.
 
 
-  @retval EFI_NOT_FOUND  				FV image can't be found.
-  @retval EFI_SUCCESS						Successfully to process it.
+  @retval EFI_NOT_FOUND  FV image can't be found.
+  @retval EFI_SUCCESS    Successfully to process it.
 
 **/
 EFI_STATUS

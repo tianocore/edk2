@@ -51,7 +51,7 @@ _IdentifyCpu:
   mov   r9, r0
 
   // Is it the Primary Core ?
-  bl	ASM_PFX(ArmPlatformIsPrimaryCore)
+  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
   cmp   r0, #1
   // Only the primary core initialize the memory (SMC)
   beq   _InitMem

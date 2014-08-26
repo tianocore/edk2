@@ -200,9 +200,9 @@ ArmFastbootPlatformInit (
   // Read the GPT partition entry array into memory so we can get the partition names
   Status = ReadPartitionEntries (FlashBlockIo, &PartitionEntries);
   if (EFI_ERROR (Status)) {
-	DEBUG ((EFI_D_ERROR, "Warning: Failed to read partitions from Android NVM device (status: %r)\n", Status));
-	// Failing to locate partitions should not prevent to do other Android FastBoot actions
-	return EFI_SUCCESS;
+    DEBUG ((EFI_D_ERROR, "Warning: Failed to read partitions from Android NVM device (status: %r)\n", Status));
+    // Failing to locate partitions should not prevent to do other Android FastBoot actions
+    return EFI_SUCCESS;
   }
 
   // Get every Block IO protocol instance installed in the system

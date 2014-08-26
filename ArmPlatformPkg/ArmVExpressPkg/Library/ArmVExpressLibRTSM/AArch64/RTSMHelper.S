@@ -61,10 +61,10 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
   ldrh  w1, [x1]
   cmp   w0, w1
   b.ne  1f
-  mov	x0, #1
+  mov   x0, #1
   ret
 1:
-  mov	x0, #0
+  mov   x0, #0
   ret
 
 //UINTN

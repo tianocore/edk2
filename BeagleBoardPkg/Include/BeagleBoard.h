@@ -94,7 +94,7 @@
 #define SP810_CTRL_BASE                       (ARM_EB_BOARD_PERIPH_BASE + 0x01000)
 
 // SYSTRCL Register
-#define ARM_EB_SYSCTRL											  0x10001000
+#define ARM_EB_SYSCTRL                        0x10001000
 
 // Uart0
 #define PL011_CONSOLE_UART_BASE               (ARM_EB_BOARD_PERIPH_BASE + 0x09000)

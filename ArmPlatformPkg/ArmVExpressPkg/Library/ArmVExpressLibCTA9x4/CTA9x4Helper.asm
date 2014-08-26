@@ -35,7 +35,7 @@
 ArmPlatformGetPrimaryCoreMpId FUNCTION
   LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
   ldr     r0, [r0]
-  bx 	  lr
+  bx      lr
   ENDFUNC
 
 //UINTN

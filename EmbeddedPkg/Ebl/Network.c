@@ -61,7 +61,7 @@ EblIpCmd (
       goto Exit;
     }
 
-  	AsciiPrint("IP Address:   %d.%d.%d.%d\n", Ip.v4.Addr[0], Ip.v4.Addr[1],Ip.v4.Addr[2], Ip.v4.Addr[3]);
+    AsciiPrint("IP Address:   %d.%d.%d.%d\n", Ip.v4.Addr[0], Ip.v4.Addr[1],Ip.v4.Addr[2], Ip.v4.Addr[3]);
 
   } else if ((Argv[1][0] == 'r') && (Argc == 2)) {
     // Get new address via dhcp

@@ -53,7 +53,7 @@ _IdentifyCpu
   mov   r9, r0
 
   // Is it the Primary Core ?
-  bl	ArmPlatformIsPrimaryCore
+  bl    ArmPlatformIsPrimaryCore
   cmp   r0, #1
   // Only the primary core initialize the memory (SMC)
   beq   _InitMem

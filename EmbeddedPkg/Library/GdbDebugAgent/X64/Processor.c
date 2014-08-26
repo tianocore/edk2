@@ -285,7 +285,7 @@ WriteNthRegister (
 
   // check if this is a valid Register Number
   if ((RegNumber < 0) || (RegNumber >= MaxRegisterCount())) {
-	SendError (GDB_EINVALIDREGNUM);
+    SendError (GDB_EINVALIDREGNUM);
     return;
   }
   InBufPtr++;  // skips the '=' character

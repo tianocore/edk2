@@ -71,13 +71,13 @@ _SetupStackPosition
   //
 
   // Calculate how much space there is between the top of the Firmware and the Top of the System Memory
-  subs	r0, r1, r3	// r0 = SystemMemoryTop - FdTop
-  bmi	_SetupStack	// Jump if negative (FdTop > SystemMemoryTop). Case when the PrePi is in XIP memory outside of the DRAM
-  cmp	r0, r4
-  bge	_SetupStack
+  subs  r0, r1, r3      // r0 = SystemMemoryTop - FdTop
+  bmi   _SetupStack     // Jump if negative (FdTop > SystemMemoryTop). Case when the PrePi is in XIP memory outside of the DRAM
+  cmp   r0, r4
+  bge   _SetupStack
 
   // Case the top of stacks is the FdBaseAddress
-  mov	r1, r2
+  mov   r1, r2
 
 _SetupStack
   // r1 contains the top of the stack (and the UEFI Memory)
@@ -111,18 +111,18 @@ _GetStackBase
 
   // Stack for the secondary core = Number of Cores - 1
   LoadConstantToReg (FixedPcdGet32(PcdCoreCount), r0)
-  sub	r0, r0, #1
+  sub   r0, r0, #1
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r1)
   mul   r1, r1, r0
   sub   r10, r10, r1
 
   // r10 = The base of the MpCore Stacks (primary stack & secondary stacks)
-  mov	r0, r10
-  mov	r1, r8
+  mov   r0, r10
+  mov   r1, r8
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r3)
-  bl	ArmPlatformStackSet
+  bl    ArmPlatformStackSet
 
   // Is it the Primary Core ?
   mov   r0, r8

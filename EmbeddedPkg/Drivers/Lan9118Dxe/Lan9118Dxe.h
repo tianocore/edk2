@@ -89,12 +89,12 @@ typedef struct {
  *
  *  Parameters:
  *
- *	@param pobj:	A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+ *  @param pobj:  A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
  *
  *  Description:
  *
- *  	This function starts a network interface. If the network interface successfully starts, then
- *  	EFI_SUCCESS will be returned.
+ *  This function starts a network interface. If the network interface successfully starts, then
+ *  EFI_SUCCESS will be returned.
  */
 EFI_STATUS
 EFIAPI

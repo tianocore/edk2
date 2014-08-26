@@ -76,7 +76,7 @@
 #define SP810_CTRL_BASE                       (ARM_EB_BOARD_PERIPH_BASE + 0x01000)
 
 // SYSTRCL Register
-#define ARM_EB_SYSCTRL											  0x10001000
+#define ARM_EB_SYSCTRL                        0x10001000
 
 // Dynamic Memory Controller Base
 #define ARM_EB_DMC_BASE                       0x10018000

@@ -55,23 +55,23 @@ INPUT(./boot3f.o)
 
 SECTIONS
 {
-	. = PHYS_OFFSET;
+  . = PHYS_OFFSET;
 #ifdef BOOT1
-	.text : { boot1.o }
+  .text : { boot1.o }
 #endif
 
 #ifdef BOOT2
-	.text : { boot2.o }
+  .text : { boot2.o }
 #endif
 
 #ifdef BOOT3
-	.text : { boot3.o }
+  .text : { boot3.o }
 #endif
 
 #ifdef BOOT3F
-	.text : { boot3f.o }
+  .text : { boot3f.o }
 #endif
 
-	.data : { *(.data) }
-	.bss : { *(.bss) }
+  .data : { *(.data) }
+  .bss : { *(.bss) }
 }

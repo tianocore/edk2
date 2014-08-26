@@ -31,22 +31,22 @@ typedef struct {
 } ARM_CORE_INFO;
 
 typedef struct{
-	UINT64   Signature;
-	UINT32   Length;
-	UINT32   Revision;
-	UINT64   OemId;
-	UINT64   OemTableId;
-	UINTN    OemRevision;
-	UINTN    CreatorId;
-	UINTN    CreatorRevision;
-	EFI_GUID Identifier;
-	UINTN    DataLen;
+        UINT64   Signature;
+        UINT32   Length;
+        UINT32   Revision;
+        UINT64   OemId;
+        UINT64   OemTableId;
+        UINTN    OemRevision;
+        UINTN    CreatorId;
+        UINTN    CreatorRevision;
+        EFI_GUID Identifier;
+        UINTN    DataLen;
 } ARM_PROCESSOR_TABLE_HEADER;
 
 typedef struct {
-	ARM_PROCESSOR_TABLE_HEADER   Header;
-	UINTN                        NumberOfEntries;
-	ARM_CORE_INFO                *ArmCpus;
+        ARM_PROCESSOR_TABLE_HEADER   Header;
+        UINTN                        NumberOfEntries;
+        ARM_CORE_INFO                *ArmCpus;
 } ARM_PROCESSOR_TABLE;
 
 

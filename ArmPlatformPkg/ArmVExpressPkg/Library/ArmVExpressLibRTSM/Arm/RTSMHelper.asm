@@ -107,7 +107,7 @@ ArmPlatformIsPrimaryCore FUNCTION
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
-  bx 	lr
+  bx    lr
   ENDFUNC
 
 //UINTN

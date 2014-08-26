@@ -393,7 +393,7 @@ StartDefaultBootOnTimeout (
       }
       // Discard key in the buffer
       do {
-      	Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+        Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
       } while(!EFI_ERROR(Status));
       gBS->CloseEvent (WaitList[0]);
       Print(L"\n\r");
@@ -408,8 +408,8 @@ StartDefaultBootOnTimeout (
         UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BootOrder[Index]);
         Status = BdsStartBootOption (BootVariableName);
         if(!EFI_ERROR(Status)){
-        	// Boot option returned successfully, hence don't need to start next boot option
-        	break;
+          // Boot option returned successfully, hence don't need to start next boot option
+          break;
         }
         // In case of success, we should not return from this call.
       }

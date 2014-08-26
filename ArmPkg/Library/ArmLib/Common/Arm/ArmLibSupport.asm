@@ -181,7 +181,7 @@ ArmCallSEV
 
 ArmReadSctlr
   mrc     p15, 0, r0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
-  bx	  lr
+  bx      lr
 
 
 ArmReadCpuActlr

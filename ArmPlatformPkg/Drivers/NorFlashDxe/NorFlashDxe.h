@@ -149,7 +149,7 @@ struct _NOR_FLASH_INSTANCE {
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL FvbProtocol;
   VOID*                               ShadowBuffer;
 
-  NOR_FLASH_DEVICE_PATH	              DevicePath;
+  NOR_FLASH_DEVICE_PATH               DevicePath;
 };
 
 EFI_STATUS
