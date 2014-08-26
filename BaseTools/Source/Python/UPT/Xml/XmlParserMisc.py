@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse a xml file of .PKG file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -74,7 +74,6 @@ def IsRequiredItemListNull(ItemDict, XmlTreeLevel):
             ErrorMsg = ERR_XML_PARSER_REQUIRED_ITEM_MISSING % (Key, Msg)
             Logger.Error('\nUPT', PARSER_ERROR, ErrorMsg, RaiseError=True)
 
-            
 ## Get help text 
 #
 # @param HelpText
@@ -87,3 +86,16 @@ def GetHelpTextList(HelpText):
         HelpTextObj.SetString(HelT.HelpText)
         HelpTextList.append(HelpTextObj)
     return HelpTextList
+    
+## Get Prompt text 
+#
+# @param Prompt
+#
+def GetPromptList(Prompt):
+    PromptList = []
+    for SubPrompt in Prompt:
+        PromptObj = TextObject()
+        PromptObj.SetLang(SubPrompt.Lang)
+        PromptObj.SetString(SubPrompt.Prompt)
+        PromptList.append(PromptObj)
+    return PromptList

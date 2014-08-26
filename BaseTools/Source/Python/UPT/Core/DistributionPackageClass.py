@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define a class object to describe a distribution package
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -195,6 +195,7 @@ class DistributionPackageClass(object):
     #
     def GetDistributionFileList(self):
         MetaDataFileList = []
+        SkipModulesUniList = []
         
         for Guid, Version, Path in self.PackageSurfaceArea:
             Package = self.PackageSurfaceArea[Guid, Version, Path]
@@ -206,7 +207,15 @@ class DistributionPackageClass(object):
                 SearchPath = os.path.normpath(os.path.join(os.path.dirname(FullPath), IncludePath))
                 AddPath = os.path.normpath(os.path.join(PackagePath, IncludePath))
                 self.FileList += GetNonMetaDataFiles(SearchPath, ['CVS', '.svn'], False, AddPath)
-        
+            #
+            # Add the miscellaneous files on DEC file
+            #
+            for MiscFileObj in Package.GetMiscFileList():
+                for FileObj in MiscFileObj.GetFileList():
+                    MiscFileFullPath = os.path.normpath(os.path.join(os.path.dirname(FullPath), FileObj.GetURI()))
+                    if MiscFileFullPath not in self.FileList:
+                        self.FileList.append(MiscFileFullPath)
+            
             Module = None
             ModuleDict = Package.GetModuleDict()
             for Guid, Version, Name, Path in ModuleDict:
@@ -215,15 +224,43 @@ class DistributionPackageClass(object):
                 FullPath = Module.GetFullPath()
                 PkgRelPath = os.path.normpath(os.path.join(PackagePath, ModulePath))
                 MetaDataFileList.append(Path)
-                self.FileList += GetNonMetaDataFiles(os.path.dirname(FullPath), ['CVS', '.svn'], False, PkgRelPath)
-     
+                SkipList = ['CVS', '.svn']
+                NonMetaDataFileList = []
+                if Module.UniFileClassObject:
+                    for UniFile in Module.UniFileClassObject.IncFileList:
+                        OriPath = os.path.normpath(os.path.dirname(FullPath))
+                        UniFilePath = os.path.normpath(os.path.join(PkgRelPath, UniFile.Path[len(OriPath) + 1:]))
+                        if UniFilePath not in SkipModulesUniList:
+                            SkipModulesUniList.append(UniFilePath)
+                    for IncludeFile in Module.UniFileClassObject.IncludePathList:
+                        if IncludeFile not in SkipModulesUniList:
+                            SkipModulesUniList.append(IncludeFile)
+                NonMetaDataFileList = GetNonMetaDataFiles(os.path.dirname(FullPath), SkipList, False, PkgRelPath)
+                for NonMetaDataFile in NonMetaDataFileList:
+                    if NonMetaDataFile not in self.FileList:
+                        self.FileList.append(NonMetaDataFile)
         for Guid, Version, Name, Path in self.ModuleSurfaceArea:
             Module = self.ModuleSurfaceArea[Guid, Version, Name, Path]
             ModulePath = Module.GetModulePath()
             FullPath = Module.GetFullPath()
             MetaDataFileList.append(Path)
-            self.FileList += GetNonMetaDataFiles(os.path.dirname(FullPath), ['CVS', '.svn'], False, ModulePath)
-        
+            SkipList = ['CVS', '.svn']
+            NonMetaDataFileList = []
+            if Module.UniFileClassObject:
+                for UniFile in Module.UniFileClassObject.IncFileList:
+                    OriPath = os.path.normpath(os.path.dirname(FullPath))
+                    UniFilePath = os.path.normpath(os.path.join(ModulePath, UniFile.Path[len(OriPath) + 1:]))
+                    if UniFilePath not in SkipModulesUniList:
+                        SkipModulesUniList.append(UniFilePath)
+            NonMetaDataFileList = GetNonMetaDataFiles(os.path.dirname(FullPath), SkipList, False, ModulePath)
+            for NonMetaDataFile in NonMetaDataFileList:
+                if NonMetaDataFile not in self.FileList:
+                    self.FileList.append(NonMetaDataFile)
+            
+        for SkipModuleUni in SkipModulesUniList:
+            if SkipModuleUni in self.FileList:
+                self.FileList.remove(SkipModuleUni)
+
         return  self.FileList, MetaDataFileList
 
         

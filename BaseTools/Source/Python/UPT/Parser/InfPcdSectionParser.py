@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for [Pcds] sections in INF file 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -160,13 +160,13 @@ class InfPcdSectionParser(InfParserSectionRoot):
                                      ExtraData=LineContent)
                 #                    
                 elif KeysList[0][0].upper() == DT.TAB_INF_PCD_EX.upper():
-                    if len(TokenList) != 2:
+                    if len(TokenList) != 1:
                         Logger.Error('InfParser', 
                                      FORMAT_INVALID, 
                                      ST.ERR_ASBUILD_PCDEX_FORMAT_INVALID,
                                      File=FileName,
                                      Line=LineNo,
-                                     ExtraData=LineContent)                                         
+                                     ExtraData=LineContent)
                 ValueList[0:len(TokenList)] = TokenList
                 if len(ValueList) >= 1:                
                     PcdList.append((ValueList, CommentsList, (LineContent, LineNo, FileName)))                  

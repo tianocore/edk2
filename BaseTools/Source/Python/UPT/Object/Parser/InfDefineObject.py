@@ -2,7 +2,7 @@
 # This file is used to define class objects of [Defines] section for INF file. 
 # It will consumed by InfParser
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -27,6 +27,7 @@ from Library.String import GetSplitValueList
 from Library.Misc import CheckGuidRegFormat
 from Library.Misc import Sdict
 from Library.Misc import ConvPathFromAbsToRel
+from Library.Misc import ValidateUNIFilePath
 from Library.ExpressionValidate import IsValidFeatureFlagExp 
 from Library.ParserValidate import IsValidWord
 from Library.ParserValidate import IsValidInfMoudleType  
@@ -185,6 +186,7 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         self.BaseName                   = None
         self.FileGuid                   = None
         self.ModuleType                 = None
+        self.ModuleUniFileName          = None
         self.InfVersion                 = None
         self.EdkReleaseVersion          = None
         self.UefiSpecificationVersion   = None
@@ -216,8 +218,7 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         if self.BaseName != None:    
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_ITEM_MORE_THAN_ONE_FOUND%(DT.TAB_INF_DEFINES_BASE_NAME),
                        LineInfo=self.CurrentLine)
-            return False   
-                
+            return False     
         if not (BaseName == '' or BaseName == None):
             if IsValidWord(BaseName) and not BaseName.startswith("_"):
                 self.BaseName = InfDefMember()
@@ -300,6 +301,23 @@ class InfDefSection(InfDefSectionOptionRomInfo):
     #                       
     def GetModuleType(self):
         return self.ModuleType
+    
+    ## SetModuleUniFileName
+    #
+    # @param ModuleUniFileName: ModuleUniFileName
+    #     
+    def SetModuleUniFileName(self, ModuleUniFileName, Comments):
+        if Comments:
+            pass
+        if self.ModuleUniFileName != None:
+            ErrorInInf(ST.ERR_INF_PARSER_DEFINE_ITEM_MORE_THAN_ONE_FOUND%(DT.TAB_INF_DEFINES_MODULE_UNI_FILE),
+                       LineInfo=self.CurrentLine)
+        self.ModuleUniFileName = ModuleUniFileName
+
+    ## GetModuleType
+    #                       
+    def GetModuleUniFileName(self):
+        return self.ModuleUniFileName
     
     ## SetInfVersion
     #
@@ -520,10 +538,8 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         # It can be a list
         #
         ValueList = []
-        
         TokenList = GetSplitValueList(EntryPoint, DT.TAB_VALUE_SPLIT)
         ValueList[0:len(TokenList)] = TokenList        
-        
         InfDefineEntryPointItemObj = InfDefineEntryPointItem()
         if not IsValidCVariableName(ValueList[0]):
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%\
@@ -542,13 +558,11 @@ class InfDefSection(InfDefSectionOptionRomInfo):
             if not FeatureFlagRtv[0]:
                 ErrorInInf(ST.ERR_INF_PARSER_FEATURE_FLAG_EXP_SYNTAX_INVLID%\
                            (FeatureFlagRtv[1]),
-                           LineInfo=self.CurrentLine)
-                              
+                           LineInfo=self.CurrentLine)       
             InfDefineEntryPointItemObj.SetFeatureFlagExp(ValueList[1])     
         if len(ValueList) > 2:
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(EntryPoint),
                        LineInfo=self.CurrentLine)
-            
         InfDefineEntryPointItemObj.Comments = Comments             
         self.EntryPoint.append(InfDefineEntryPointItemObj)       
         
@@ -563,10 +577,8 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         # It can be a list
         #
         ValueList = []
-        
         TokenList = GetSplitValueList(UnloadImages, DT.TAB_VALUE_SPLIT)
         ValueList[0:len(TokenList)] = TokenList        
-        
         InfDefineUnloadImageItemObj = InfDefineUnloadImageItem()
         if not IsValidCVariableName(ValueList[0]):
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(ValueList[0]),
@@ -588,7 +600,6 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         if len(ValueList) > 2:
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(UnloadImages),
                        LineInfo=self.CurrentLine)
-            
         InfDefineUnloadImageItemObj.Comments = Comments
         self.UnloadImages.append(InfDefineUnloadImageItemObj)
         
@@ -603,10 +614,8 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         # It can be a list
         #
         ValueList = []
-        
         TokenList = GetSplitValueList(Constructor, DT.TAB_VALUE_SPLIT)
         ValueList[0:len(TokenList)] = TokenList        
-        
         InfDefineConstructorItemObj = InfDefineConstructorItem()
         if not IsValidCVariableName(ValueList[0]):
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(ValueList[0]),
@@ -638,7 +647,6 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         if len(ValueList) > 3:
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(Constructor),
                        LineInfo=self.CurrentLine)
-            
         InfDefineConstructorItemObj.Comments = Comments    
         self.Constructor.append(InfDefineConstructorItemObj)     
            
@@ -653,10 +661,8 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         # It can be a list and only 1 set to TRUE
         #        
         ValueList = []
-        
         TokenList = GetSplitValueList(Destructor, DT.TAB_VALUE_SPLIT)
         ValueList[0:len(TokenList)] = TokenList        
-        
         InfDefineDestructorItemObj = InfDefineDestructorItem()
         if not IsValidCVariableName(ValueList[0]):
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(ValueList[0]),
@@ -714,8 +720,6 @@ class InfDefSection(InfDefSectionOptionRomInfo):
             return False
     def GetShadow(self):
         return self.Shadow
-
-
 
     #
     # <Family>               ::=  {"MSFT"} {"GCC"}
@@ -788,8 +792,7 @@ class InfDefSection(InfDefSectionOptionRomInfo):
         else:                  
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(Name),
                        LineInfo=self.CurrentLine)
-            return False
-                  
+            return False    
         return True
 
     def GetSpecification(self):
@@ -860,6 +863,7 @@ gFUNCTION_MAPPING_FOR_DEFINE_SECTION = {
     #
     # Optional Fields
     #        
+    DT.TAB_INF_DEFINES_MODULE_UNI_FILE             : InfDefSection.SetModuleUniFileName,
     DT.TAB_INF_DEFINES_EDK_RELEASE_VERSION         : InfDefSection.SetEdkReleaseVersion,
     DT.TAB_INF_DEFINES_UEFI_SPECIFICATION_VERSION  : InfDefSection.SetUefiSpecificationVersion,
     DT.TAB_INF_DEFINES_PI_SPECIFICATION_VERSION    : InfDefSection.SetPiSpecificationVersion,
@@ -891,7 +895,6 @@ class InfDefMember():
         self.Name  = Name
         self.Value = Value
         self.CurrentLine = CurrentLine()
-        
     def GetName(self):
         return self.Name
     def SetName(self, Name):
@@ -914,8 +917,7 @@ class InfDefObject(InfSectionCommonDef):
         #
         HasFoundInfVersionFalg = False
         LineInfo = ['', -1, '']
-        ArchListString = ' '.join(Arch)
-     
+        ArchListString = ' '.join(Arch)  
         #
         # Parse Define items.
         #
@@ -923,6 +925,15 @@ class InfDefObject(InfSectionCommonDef):
             ProcessFunc = None
             Name = InfDefMemberObj.GetName()
             Value = InfDefMemberObj.GetValue()
+            if Name == DT.TAB_INF_DEFINES_MODULE_UNI_FILE:
+                ValidateUNIFilePath(Value)
+                Value = os.path.join(os.path.dirname(InfDefMemberObj.CurrentLine.FileName), Value)
+                if not os.path.isfile(Value) or not os.path.exists(Value):
+                    LineInfo[0] = InfDefMemberObj.CurrentLine.GetFileName()
+                    LineInfo[1] = InfDefMemberObj.CurrentLine.GetLineNo()
+                    LineInfo[2] = InfDefMemberObj.CurrentLine.GetLineString()
+                    ErrorInInf(ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID%(Name),
+                                   LineInfo=LineInfo)
             InfLineCommentObj = InfLineCommentObject()
             InfLineCommentObj.SetHeaderComments(InfDefMemberObj.Comments.GetHeaderComments())
             InfLineCommentObj.SetTailComments(InfDefMemberObj.Comments.GetTailComments())
@@ -932,7 +943,6 @@ class InfDefObject(InfSectionCommonDef):
                            RaiseError=True)
             if Name == DT.TAB_INF_DEFINES_INF_VERSION:
                 HasFoundInfVersionFalg = True  
-            
             if not (Name == '' or Name == None):
                 #
                 # Process "SPEC" Keyword definition.
@@ -953,8 +963,7 @@ class InfDefObject(InfSectionCommonDef):
                     #
                     if Name not in gFUNCTION_MAPPING_FOR_DEFINE_SECTION.keys():
                         ErrorInInf(ST.ERR_INF_PARSER_DEFINE_SECTION_KEYWORD_INVALID%(Name),
-                                   LineInfo=LineInfo)   
-                                                 
+                                   LineInfo=LineInfo)                           
                     else:
                         ProcessFunc = gFUNCTION_MAPPING_FOR_DEFINE_SECTION[Name]
                     if (ProcessFunc != None):
@@ -980,7 +989,6 @@ class InfDefObject(InfSectionCommonDef):
                     if (ProcessFunc != None):
                         ProcessFunc(DefineList, Value, InfLineCommentObj)
                     self.Defines[ArchListString] = DefineList
-        
         #
         # After set, check whether INF_VERSION defined.
         #

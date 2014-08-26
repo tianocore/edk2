@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse a PCD file of .PKG file
 #
-# Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -31,6 +31,8 @@ from Library.Xml.XmlRoutines import XmlAttribute
 from Library.Xml.XmlRoutines import XmlNode
 from Library.Xml.XmlRoutines import XmlList
 from Library.Xml.XmlRoutines import CreateXmlElement
+from Library.UniClassObject import ConvertSpecialUnicodes
+from Library.UniClassObject import GetLanguageCode1766
 from Object.POM.CommonObject import FileObject
 from Object.POM.CommonObject import MiscFileObject
 from Object.POM.CommonObject import UserExtensionObject
@@ -40,7 +42,6 @@ from Object.POM.CommonObject import FileNameObject
 from Object.POM.ModuleObject import ModuleObject
 from Xml.XmlParserMisc import IsRequiredItemListNull
 from Xml.XmlParserMisc import GetHelpTextList
-
 import Library.DataType as DataType
 
 ##
@@ -54,14 +55,11 @@ class ClonedFromXml(object):
     def FromXml(self, Item, Key):
         self.GUID = XmlElement(Item, '%s/GUID' % Key)
         self.Version = XmlAttribute(XmlNode(Item, '%s/GUID' % Key), 'Version')
-
         if self.GUID == '' and self.Version == '':
             return None
-
         ClonedFrom = ClonedRecordObject()
         ClonedFrom.SetPackageGuid(self.GUID)
         ClonedFrom.SetPackageVersion(self.Version)
-
         return ClonedFrom
 
     def ToXml(self, ClonedFrom, Key):
@@ -72,7 +70,6 @@ class ClonedFromXml(object):
         AttributeList = []
         NodeList = [Element1]
         Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
-
         return Root
 
     def __str__(self):
@@ -99,7 +96,6 @@ class CommonDefinesXml(object):
         [Mod for Mod in GetSplitValueList(XmlAttribute(Item, 'SupModList'), DataType.TAB_SPACE_SPLIT) if Mod]
         self.FeatureFlag = ConvertNOTEQToNE(XmlAttribute(Item, 'FeatureFlag'))
 
-
     def ToXml(self):
         pass
 
@@ -107,7 +103,27 @@ class CommonDefinesXml(object):
         return "Usage = %s SupArchList = %s SupModList = %s FeatureFlag = %s" \
                 % (self.Usage, self.SupArchList, self.SupModList, self.FeatureFlag)
 
+##
+# PromptXml
+#
+class PromptXml(object):
+    def __init__(self):
+        self.Prompt = ''
+        self.Lang = ''
 
+    def FromXml(self, Item, Key):
+        if Key:
+            pass
+        self.Prompt = XmlElement2(Item, 'Prompt')
+        self.Lang = XmlAttribute(Item, 'Lang')
+
+    def ToXml(self, Prompt, Key='Prompt'):
+        if self.Prompt:
+            pass
+        return CreateXmlElement('%s' % Key, Prompt.GetString(), [], [['Lang', Prompt.GetLang()]])
+    def __str__(self):
+        return "Prompt = %s Lang = %s" % (self.Prompt, self.Lang)
+        
 ##
 # HelpTextXml
 #
@@ -138,10 +154,10 @@ class HeaderXml(object):
         self.BaseName = ''
         self.GUID = ''
         self.Version = ''
-        self.Copyright = ''
-        self.License = ''
-        self.Abstract = ''
-        self.Description = ''
+        self.CopyrightList = []
+        self.LicenseList = []
+        self.AbstractList = []
+        self.DescriptionList = []
 
     def FromXml(self, Item, Key, IsRequiredCheck=False, IsStandAlongModule=False):
         if not Item and IsRequiredCheck:
@@ -156,21 +172,28 @@ class HeaderXml(object):
         self.BaseName = XmlAttribute(XmlNode(Item, '%s/Name' % Key), 'BaseName')
         self.GUID = XmlElement(Item, '%s/GUID' % Key)
         self.Version = XmlAttribute(XmlNode(Item, '%s/GUID' % Key), 'Version')
-        self.Copyright = XmlElement(Item, '%s/Copyright' % Key)
-        self.License = XmlElement(Item, '%s/License' % Key)
-        self.Abstract = XmlElement(Item, '%s/Abstract' % Key)
-        self.Description = XmlElement(Item, '%s/Description' % Key)
 
+        for SubItem in XmlList(Item, '%s/Abstract' % Key):
+            HeaderAbstractLang = XmlAttribute(SubItem, 'Lang')
+            self.AbstractList.append((HeaderAbstractLang, XmlElement(SubItem, '%s/Abstract' % Key)))
+        for SubItem in XmlList(Item, '%s/Description' % Key):
+            HeaderDescriptionLang = XmlAttribute(SubItem, 'Lang')
+            self.DescriptionList.append((HeaderDescriptionLang, XmlElement(SubItem, '%s/Description' % Key)))
+        for SubItem in XmlList(Item, '%s/Copyright' % Key):
+            HeaderCopyrightLang = XmlAttribute(SubItem, 'Lang')
+            self.CopyrightList.append((HeaderCopyrightLang, XmlElement(SubItem, '%s/Copyright' % Key)))
+        for SubItem in XmlList(Item, '%s/License' % Key):
+            HeaderLicenseLang = XmlAttribute(SubItem, 'Lang')
+            self.LicenseList.append((HeaderLicenseLang, XmlElement(SubItem, '%s/License' % Key)))    
         ModuleHeader = ModuleObject()
         ModuleHeader.SetName(self.Name)
         ModuleHeader.SetBaseName(self.BaseName)
         ModuleHeader.SetGuid(self.GUID)
         ModuleHeader.SetVersion(self.Version)
-        ModuleHeader.SetCopyright(self.Copyright)
-        ModuleHeader.SetLicense(self.License)
-        ModuleHeader.SetAbstract(self.Abstract)
-        ModuleHeader.SetDescription(self.Description)
-
+        ModuleHeader.SetCopyright(self.CopyrightList)
+        ModuleHeader.SetLicense(self.LicenseList)
+        ModuleHeader.SetAbstract(self.AbstractList)
+        ModuleHeader.SetDescription(self.DescriptionList)
         return ModuleHeader
 
     def ToXml(self, Header, Key):
@@ -178,23 +201,51 @@ class HeaderXml(object):
             pass
         Element1 = CreateXmlElement('Name', Header.GetName(), [], [['BaseName', Header.GetBaseName()]])
         Element2 = CreateXmlElement('GUID', Header.GetGuid(), [], [['Version', Header.GetVersion()]])
-        AttributeList = []
         NodeList = [Element1,
                     Element2,
-                    ['Copyright', Header.GetCopyright()],
-                    ['License', Header.GetLicense()],
-                    ['Abstract', Header.GetAbstract()],
-                    ['Description', Header.GetDescription()],
                     ]
-        Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
 
+        UNIInfAbstractList = []
+        UNIInfDescriptionList = []
+        # Get Abstract and Description from Uni File
+        # if the Uni File exists
+        if Header.UniFileClassObject is not None:
+            UniStrDict = Header.UniFileClassObject.OrderedStringList
+            for Lang in UniStrDict:
+                for StringDefClassObject in UniStrDict[Lang]:
+                    if not StringDefClassObject.StringValue:
+                        continue
+                    if StringDefClassObject.StringName == DataType.TAB_INF_ABSTRACT:
+                        UNIInfAbstractList.append((GetLanguageCode1766(Lang),
+                                                   ConvertSpecialUnicodes(StringDefClassObject.StringValue)))
+
+                    if StringDefClassObject.StringName == DataType.TAB_INF_DESCRIPTION:
+                        UNIInfDescriptionList.append((GetLanguageCode1766(Lang),
+                                                      ConvertSpecialUnicodes(StringDefClassObject.StringValue)))
+
+        # Get Abstract and Description from INF File Header
+        for (Lang, Value) in Header.GetCopyright():
+            if Value:
+                NodeList.append(CreateXmlElement('Copyright', Value, [], []))
+        for (Lang, Value) in Header.GetLicense():
+            if Value:
+                NodeList.append(CreateXmlElement('License', Value, [], []))
+        for (Lang, Value) in Header.GetAbstract() + UNIInfAbstractList:
+            if Value:
+                NodeList.append(CreateXmlElement('Abstract', Value, [], [['Lang', Lang]]))
+        for (Lang, Value) in Header.GetDescription() + UNIInfDescriptionList:
+            if Value:
+                NodeList.append(CreateXmlElement('Description', Value, [], [['Lang', Lang]]))
+
+        AttributeList = []
+        Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
         return Root
 
     def __str__(self):
         return "Name = %s BaseName = %s GUID = %s Version = %s Copyright = %s \
         License = %s Abstract = %s Description = %s" % \
-        (self.Name, self.BaseName, self.GUID, self.Version, self.Copyright, \
-         self.License, self.Abstract, self.Description)
+        (self.Name, self.BaseName, self.GUID, self.Version, self.CopyrightList, \
+         self.LicenseList, self.AbstractList, self.DescriptionList)
 ##
 # DistributionPackageHeaderXml
 #
@@ -218,13 +269,11 @@ class DistributionPackageHeaderXml(object):
         self.Signature = XmlElement(Item, '%s/Signature' % Key)
         self.XmlSpecification = XmlElement(Item, '%s/XmlSpecification' % Key)
         self.Header.FromXml(Item, Key)
-
         DistributionPackageHeader = DistributionPackageHeaderObject()
         if self.ReadOnly.upper() == 'TRUE':
             DistributionPackageHeader.ReadOnly = True
         elif self.ReadOnly.upper() == 'FALSE':
             DistributionPackageHeader.ReadOnly = False
-
         if self.RePackage.upper() == 'TRUE':
             DistributionPackageHeader.RePackage = True
         elif self.RePackage.upper() == 'FALSE':
@@ -233,16 +282,14 @@ class DistributionPackageHeaderXml(object):
         DistributionPackageHeader.Date = self.Date
         DistributionPackageHeader.Signature = self.Signature
         DistributionPackageHeader.XmlSpecification = self.XmlSpecification
-
         DistributionPackageHeader.SetName(self.Header.Name)
         DistributionPackageHeader.SetBaseName(self.Header.BaseName)
         DistributionPackageHeader.SetGuid(self.Header.GUID)
         DistributionPackageHeader.SetVersion(self.Header.Version)
-        DistributionPackageHeader.SetCopyright(self.Header.Copyright)
-        DistributionPackageHeader.SetLicense(self.Header.License)
-        DistributionPackageHeader.SetAbstract(self.Header.Abstract)
-        DistributionPackageHeader.SetDescription(self.Header.Description)
-
+        DistributionPackageHeader.SetCopyright(self.Header.CopyrightList)
+        DistributionPackageHeader.SetLicense(self.Header.LicenseList)
+        DistributionPackageHeader.SetAbstract(self.Header.AbstractList)
+        DistributionPackageHeader.SetDescription(self.Header.DescriptionList)
         return DistributionPackageHeader
 
     def ToXml(self, DistributionPackageHeader, Key):
@@ -261,22 +308,35 @@ class DistributionPackageHeaderXml(object):
             AttributeList.append(['ReadOnly', str(DistributionPackageHeader.ReadOnly).lower()])
         if DistributionPackageHeader.RePackage != '':
             AttributeList.append(['RePackage', str(DistributionPackageHeader.RePackage).lower()])
-
+        if DistributionPackageHeader.GetAbstract():
+            DPAbstract = DistributionPackageHeader.GetAbstract()[0][1]
+        else:
+            DPAbstract = ''
+        if DistributionPackageHeader.GetDescription():
+            DPDescription = DistributionPackageHeader.GetDescription()[0][1]
+        else:
+            DPDescription = ''
+        if DistributionPackageHeader.GetCopyright():
+            DPCopyright = DistributionPackageHeader.GetCopyright()[0][1]
+        else:
+            DPCopyright = ''
+        if DistributionPackageHeader.GetLicense():
+            DPLicense = DistributionPackageHeader.GetLicense()[0][1]
+        else:
+            DPLicense = ''
         NodeList = [Element1,
                     Element2,
                     ['Vendor', DistributionPackageHeader.Vendor],
                     ['Date', DistributionPackageHeader.Date],
-                    ['Copyright', DistributionPackageHeader.GetCopyright()],
-                    ['License', DistributionPackageHeader.GetLicense()],
-                    ['Abstract', DistributionPackageHeader.GetAbstract()],
-                    ['Description', \
-                     DistributionPackageHeader.GetDescription()],
+                    ['Copyright', DPCopyright],
+                    ['License', DPLicense],
+                    ['Abstract', DPAbstract],
+                    ['Description', DPDescription],
                     ['Signature', DistributionPackageHeader.Signature],
                     ['XmlSpecification', \
                      DistributionPackageHeader.XmlSpecification],
                     ]
         Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
-
         return Root
 
     def __str__(self):
@@ -299,36 +359,63 @@ class PackageHeaderXml(object):
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
         self.PackagePath = XmlElement(Item, '%s/PackagePath' % Key)
         self.Header.FromXml(Item, Key)
-
         PackageObject2.SetName(self.Header.Name)
         PackageObject2.SetBaseName(self.Header.BaseName)
         PackageObject2.SetGuid(self.Header.GUID)
         PackageObject2.SetVersion(self.Header.Version)
-        PackageObject2.SetCopyright(self.Header.Copyright)
-        PackageObject2.SetLicense(self.Header.License)
-        PackageObject2.SetAbstract(self.Header.Abstract)
-        PackageObject2.SetDescription(self.Header.Description)
+        PackageObject2.SetCopyright(self.Header.CopyrightList)
+        PackageObject2.SetLicense(self.Header.LicenseList)
+        PackageObject2.SetAbstract(self.Header.AbstractList)
+        PackageObject2.SetDescription(self.Header.DescriptionList)
         PackageObject2.SetPackagePath(self.PackagePath)
 
     def ToXml(self, PackageObject2, Key):
         if self.PackagePath:
             pass
-        Element1 = \
-        CreateXmlElement('Name', PackageObject2.GetName(), [], \
+        Element1 = CreateXmlElement('Name', PackageObject2.GetName(), [], \
                          [['BaseName', PackageObject2.GetBaseName()]])
         Element2 = CreateXmlElement('GUID', PackageObject2.GetGuid(), [], \
                                     [['Version', PackageObject2.GetVersion()]])
-        AttributeList = []
         NodeList = [Element1,
-                    Element2,
-                    ['Copyright', PackageObject2.GetCopyright()],
-                    ['License', PackageObject2.GetLicense()],
-                    ['Abstract', PackageObject2.GetAbstract()],
-                    ['Description', PackageObject2.GetDescription()],
-                    ['PackagePath', PackageObject2.GetPackagePath()],
+                    Element2
                     ]
-        Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
+        
+        UNIPackageAbrstractList = []
+        UNIPackageDescriptionList = []
+        # Get Abstract and Description from Uni File
+        # if the Uni File exists
+        if PackageObject2.UniFileClassObject is not None:
+            UniStrDict = PackageObject2.UniFileClassObject.OrderedStringList
+            for Lang in UniStrDict:
+                for StringDefClassObject in UniStrDict[Lang]:
+                    if not StringDefClassObject.StringValue:
+                        continue
+                    if StringDefClassObject.StringName == DataType.TAB_DEC_PACKAGE_ABSTRACT:
+                        UNIPackageAbrstractList.append((GetLanguageCode1766(Lang), 
+                                                        ConvertSpecialUnicodes(StringDefClassObject.StringValue)))
 
+                    if StringDefClassObject.StringName == DataType.TAB_DEC_PACKAGE_DESCRIPTION:
+                        UNIPackageDescriptionList.append((GetLanguageCode1766(Lang), 
+                                                          ConvertSpecialUnicodes(StringDefClassObject.StringValue)))
+
+        # Get Abstract and Description from DEC File Header
+        for (Lang, Value) in PackageObject2.GetCopyright():
+            if Value:
+                NodeList.append(CreateXmlElement(DataType.TAB_HEADER_COPYRIGHT, Value, [], []))
+        for (Lang, Value) in PackageObject2.GetLicense():
+            if Value:
+                NodeList.append(CreateXmlElement(DataType.TAB_HEADER_LICENSE, Value, [], []))
+        for (Lang, Value) in PackageObject2.GetAbstract() + UNIPackageAbrstractList:
+            if Value:
+                NodeList.append(CreateXmlElement(DataType.TAB_HEADER_ABSTRACT, Value, [], [['Lang', Lang]]))
+        for (Lang, Value) in PackageObject2.GetDescription() + UNIPackageDescriptionList:
+            if Value:
+                NodeList.append(CreateXmlElement(DataType.TAB_HEADER_DESCRIPTION, Value, [], [['Lang', Lang]]))
+        
+
+        NodeList.append(['PackagePath', PackageObject2.GetPackagePath()])
+        AttributeList = []
+        Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
         return Root
 
     def __str__(self):
@@ -351,7 +438,6 @@ class MiscellaneousFileXml(object):
         self.Header.FromXml(Item, Key)
         NewItem = XmlNode(Item, '%s/Header' % Key)
         self.Header.FromXml(NewItem, 'Header')
-
         for SubItem in XmlList(Item, '%s/Filename' % Key):
             Filename = XmlElement(SubItem, '%s/Filename' % Key)
             Executable = XmlAttribute(XmlNode(SubItem, '%s/Filename' % Key), 'Executable')
@@ -362,12 +448,11 @@ class MiscellaneousFileXml(object):
             else:
                 Executable = ''
             self.Files.append([Filename, Executable])
-
         MiscFile = MiscFileObject()
-        MiscFile.SetCopyright(self.Header.Copyright)
-        MiscFile.SetLicense(self.Header.License)
-        MiscFile.SetAbstract(self.Header.Abstract)
-        MiscFile.SetDescription(self.Header.Description)
+        MiscFile.SetCopyright(self.Header.CopyrightList)
+        MiscFile.SetLicense(self.Header.LicenseList)
+        MiscFile.SetAbstract(self.Header.AbstractList)
+        MiscFile.SetDescription(self.Header.DescriptionList)
         MiscFileList = []
         for File in self.Files:
             FileObj = FileObject()
@@ -375,7 +460,6 @@ class MiscellaneousFileXml(object):
             FileObj.SetExecutable(File[1])
             MiscFileList.append(FileObj)
         MiscFile.SetFileList(MiscFileList)
-
         return MiscFile
     ##
     # This API is used for DistP's tool section
@@ -383,10 +467,8 @@ class MiscellaneousFileXml(object):
     def FromXml2(self, Item, Key):
         if Item is None:
             return None
-
         NewItem = XmlNode(Item, '%s/Header' % Key)
         self.Header.FromXml(NewItem, 'Header')
-
         for SubItem in XmlList(Item, '%s/Filename' % Key):
             Filename = XmlElement(SubItem, '%s/Filename' % Key)
             Executable = \
@@ -399,13 +481,12 @@ class MiscellaneousFileXml(object):
             else:
                 Executable = ''
             self.Files.append([Filename, Executable, OsType])
-
         MiscFile = MiscFileObject()
         MiscFile.SetName(self.Header.Name)
-        MiscFile.SetCopyright(self.Header.Copyright)
-        MiscFile.SetLicense(self.Header.License)
-        MiscFile.SetAbstract(self.Header.Abstract)
-        MiscFile.SetDescription(self.Header.Description)
+        MiscFile.SetCopyright(self.Header.CopyrightList)
+        MiscFile.SetLicense(self.Header.LicenseList)
+        MiscFile.SetAbstract(self.Header.AbstractList)
+        MiscFile.SetDescription(self.Header.DescriptionList)
         MiscFileList = []
         for File in self.Files:
             FileObj = FileObject()
@@ -414,7 +495,6 @@ class MiscellaneousFileXml(object):
             FileObj.SetOS(File[2])
             MiscFileList.append(FileObj)
         MiscFile.SetFileList(MiscFileList)
-
         return MiscFile
 
     ##
@@ -424,19 +504,33 @@ class MiscellaneousFileXml(object):
         if self.Header:
             pass
         if MiscFile:
-            NodeList = [['Copyright', MiscFile.GetCopyright()],
-                        ['License', MiscFile.GetLicense()],
-                        ['Abstract', MiscFile.GetAbstract()],
-                        ['Description', MiscFile.GetDescription()],
+            if MiscFile.GetAbstract():
+                DPAbstract = MiscFile.GetAbstract()[0][1]
+            else:
+                DPAbstract = ''
+            if MiscFile.GetDescription():
+                DPDescription = MiscFile.GetDescription()[0][1]
+            else:
+                DPDescription = ''
+            if MiscFile.GetCopyright():
+                DPCopyright = MiscFile.GetCopyright()[0][1]
+            else:
+                DPCopyright = ''
+            if MiscFile.GetLicense():
+                DPLicense = MiscFile.GetLicense()[0][1]
+            else:
+                DPLicense = ''
+            NodeList = [['Copyright', DPCopyright],
+                        ['License', DPLicense],
+                        ['Abstract', DPAbstract],
+                        ['Description', DPDescription],
                        ]
-
             for File in MiscFile.GetFileList():
                 NodeList.append\
                 (CreateXmlElement\
                  ('Filename', File.GetURI(), [], \
                   [['Executable', str(File.GetExecutable()).lower()]]))
             Root = CreateXmlElement('%s' % Key, '', NodeList, [])
-
             return Root
     ##
     # This API is used for DistP's tool section
@@ -445,15 +539,30 @@ class MiscellaneousFileXml(object):
         if self.Header:
             pass
         if MiscFile:
+            if MiscFile.GetAbstract():
+                DPAbstract = MiscFile.GetAbstract()[0][1]
+            else:
+                DPAbstract = ''
+            if MiscFile.GetDescription():
+                DPDescription = MiscFile.GetDescription()[0][1]
+            else:
+                DPDescription = ''
+            if MiscFile.GetCopyright():
+                DPCopyright = MiscFile.GetCopyright()[0][1]
+            else:
+                DPCopyright = ''
+            if MiscFile.GetLicense():
+                DPLicense = MiscFile.GetLicense()[0][1]
+            else:
+                DPLicense = ''
             NodeList = [['Name', MiscFile.GetName()],
-                        ['Copyright', MiscFile.GetCopyright()],
-                        ['License', MiscFile.GetLicense()],
-                        ['Abstract', MiscFile.GetAbstract()],
-                        ['Description', MiscFile.GetDescription()],
+                        ['Copyright', DPCopyright],
+                        ['License', DPLicense],
+                        ['Abstract', DPAbstract],
+                        ['Description', DPDescription],
                        ]
             HeaderNode = CreateXmlElement('Header', '', NodeList, [])
             NodeList = [HeaderNode]
-
             for File in MiscFile.GetFileList():
                 NodeList.append\
                 (CreateXmlElement\
@@ -461,7 +570,6 @@ class MiscellaneousFileXml(object):
                   [['Executable', str(File.GetExecutable()).lower()], \
                    ['OS', File.GetOS()]]))
             Root = CreateXmlElement('%s' % Key, '', NodeList, [])
-
             return Root
 
     def __str__(self):
@@ -476,6 +584,11 @@ class UserExtensionsXml(object):
     def __init__(self):
         self.UserId = ''
         self.Identifier = ''
+        self.BinaryAbstractList = []
+        self.BinaryDescriptionList = []
+        self.BinaryCopyrightList = []
+        self.BinaryLicenseList = []
+        self.LangDefsList = []
         self.DefineDict = {}
         self.BuildOptionDict = {}
         self.IncludesDict = {}
@@ -489,51 +602,64 @@ class UserExtensionsXml(object):
     def FromXml2(self, Item, Key):
         self.UserId = XmlAttribute(XmlNode(Item, '%s' % Key), 'UserId')
         self.Identifier = XmlAttribute(XmlNode(Item, '%s' % Key), 'Identifier')
-
         UserExtension = UserExtensionObject()
         UserExtension.SetUserID(self.UserId)
         UserExtension.SetIdentifier(self.Identifier)
-
         return UserExtension
 
     def FromXml(self, Item, Key):
         self.UserId = XmlAttribute(XmlNode(Item, '%s' % Key), 'UserId')
         self.Identifier = XmlAttribute(XmlNode(Item, '%s' % Key), 'Identifier')
+        if self.UserId == DataType.TAB_BINARY_HEADER_USERID \
+        and self.Identifier == DataType.TAB_BINARY_HEADER_IDENTIFIER:
+            for SubItem in XmlList(Item, '%s/BinaryAbstract' % Key):
+                BinaryAbstractLang = XmlAttribute(SubItem, 'Lang')
+                self.BinaryAbstractList.append((BinaryAbstractLang, XmlElement(SubItem, '%s/BinaryAbstract' % Key)))
+            for SubItem in XmlList(Item, '%s/BinaryDescription' % Key):
+                BinaryDescriptionLang = XmlAttribute(SubItem, 'Lang')
+                self.BinaryDescriptionList.append((BinaryDescriptionLang, 
+                                                       XmlElement(SubItem, '%s/BinaryDescription' % Key)))
+            for SubItem in XmlList(Item, '%s/BinaryCopyright' % Key):
+                BinaryCopyrightLang = XmlAttribute(SubItem, 'Lang')
+                self.BinaryCopyrightList.append((BinaryCopyrightLang, 
+                                                     XmlElement(SubItem, '%s/BinaryCopyright' % Key)))
+            for SubItem in XmlList(Item, '%s/BinaryLicense' % Key):
+                BinaryLicenseLang = XmlAttribute(SubItem, 'Lang')
+                self.BinaryLicenseList.append((BinaryLicenseLang, 
+                                                   XmlElement(SubItem, '%s/BinaryLicense' % Key)))   
 
         DefineItem = XmlNode(Item, '%s/Define' % Key)
         for SubItem in XmlList(DefineItem, 'Define/Statement'):
             Statement = XmlElement(SubItem, '%s/Statement' % Key)
             self.DefineDict[Statement] = ""
-
         BuildOptionItem = XmlNode(Item, '%s/BuildOption' % Key)
         for SubItem in XmlList(BuildOptionItem, 'BuildOption/Statement'):
             Statement = XmlElement(SubItem, '%s/Statement' % Key)
             Arch = XmlAttribute(XmlNode(SubItem, '%s/Statement' % Key), 'SupArchList')
             self.BuildOptionDict[Arch] = Statement
-
         IncludesItem = XmlNode(Item, '%s/Includes' % Key)
         for SubItem in XmlList(IncludesItem, 'Includes/Statement'):
             Statement = XmlElement(SubItem, '%s/Statement' % Key)
             Arch = XmlAttribute(XmlNode(SubItem, '%s/Statement' % Key), 'SupArchList')
             self.IncludesDict[Statement] = Arch
-
         SourcesItem = XmlNode(Item, '%s/Sources' % Key)
         Tmp = UserExtensionSourceXml()
         SourceDict = Tmp.FromXml(SourcesItem, 'Sources')
         self.SourcesDict = SourceDict
-
         BinariesItem = XmlNode(Item, '%s/Binaries' % Key)
         Tmp = UserExtensionBinaryXml()
         BinariesDict = Tmp.FromXml(BinariesItem, 'Binaries')
         self.BinariesDict = BinariesDict
-
         self.Statement = XmlElement(Item, 'UserExtensions')
         SupArch = XmlAttribute(XmlNode(Item, '%s' % Key), 'SupArchList')
         self.SupArchList = [Arch for Arch in GetSplitValueList(SupArch, DataType.TAB_SPACE_SPLIT) if Arch]
-
         UserExtension = UserExtensionObject()
         UserExtension.SetUserID(self.UserId)
         UserExtension.SetIdentifier(self.Identifier)
+        UserExtension.SetBinaryAbstract(self.BinaryAbstractList)
+        UserExtension.SetBinaryDescription(self.BinaryDescriptionList)
+        UserExtension.SetBinaryCopyright(self.BinaryCopyrightList)
+        UserExtension.SetBinaryLicense(self.BinaryLicenseList)
         UserExtension.SetStatement(self.Statement)
         UserExtension.SetSupArchList(self.SupArchList)
         UserExtension.SetDefinesDict(self.DefineDict)
@@ -541,22 +667,37 @@ class UserExtensionsXml(object):
         UserExtension.SetIncludesDict(self.IncludesDict)
         UserExtension.SetSourcesDict(self.SourcesDict)
         UserExtension.SetBinariesDict(self.BinariesDict)
-
         return UserExtension
 
     def ToXml(self, UserExtension, Key):
         if self.UserId:
             pass
-
         AttributeList = [['UserId', str(UserExtension.GetUserID())],
                          ['Identifier', str(UserExtension.GetIdentifier())],
                          ['SupArchList', \
                           GetStringOfList(UserExtension.GetSupArchList())],
                         ]
-
         Root = CreateXmlElement('%s' % Key, UserExtension.GetStatement(), [], \
-                                AttributeList)
-
+                                    AttributeList)
+        if UserExtension.GetIdentifier() == DataType.TAB_BINARY_HEADER_IDENTIFIER and \
+        UserExtension.GetUserID() == DataType.TAB_BINARY_HEADER_USERID:
+            for (Lang, Value) in UserExtension.GetBinaryAbstract():
+                if Value:
+                    ChildElement = CreateXmlElement('BinaryAbstract', Value, [], [['Lang', Lang]])
+                    Root.appendChild(ChildElement)
+            for (Lang, Value) in UserExtension.GetBinaryDescription():
+                if Value:
+                    ChildElement = CreateXmlElement('BinaryDescription', Value, [], [['Lang', Lang]])
+                    Root.appendChild(ChildElement)
+            for (Lang, Value) in UserExtension.GetBinaryCopyright():
+                if Value:
+                    ChildElement = CreateXmlElement('BinaryCopyright', Value, [], [])
+                    Root.appendChild(ChildElement)
+            for (Lang, Value) in UserExtension.GetBinaryLicense():
+                if Value:
+                    ChildElement = CreateXmlElement('BinaryLicense', Value, [], [])
+                    Root.appendChild(ChildElement)
+                    
         NodeList = []
         DefineDict = UserExtension.GetDefinesDict()
         if DefineDict:
@@ -565,7 +706,6 @@ class UserExtensionsXml(object):
                                 ('Statement', Item, [], []))
             DefineElement = CreateXmlElement('Define', '', NodeList, [])
             Root.appendChild(DefineElement)
-
         NodeList = []
         BuildOptionDict = UserExtension.GetBuildOptionDict()
         if BuildOptionDict:
@@ -576,7 +716,6 @@ class UserExtensionsXml(object):
             BuildOptionElement = \
             CreateXmlElement('BuildOption', '', NodeList, [])
             Root.appendChild(BuildOptionElement)
-
         NodeList = []
         IncludesDict = UserExtension.GetIncludesDict()
         if IncludesDict:
@@ -586,19 +725,16 @@ class UserExtensionsXml(object):
                                  [['SupArchList', IncludesDict[Item]]]))
             IncludesElement = CreateXmlElement('Includes', '', NodeList, [])
             Root.appendChild(IncludesElement)
-
         NodeList = []
         SourcesDict = UserExtension.GetSourcesDict()
         if SourcesDict:
             Tmp = UserExtensionSourceXml()
             Root.appendChild(Tmp.ToXml(SourcesDict, 'Sources'))
-
         NodeList = []
         BinariesDict = UserExtension.GetBinariesDict()
         if BinariesDict:
             Tmp = UserExtensionBinaryXml()
             Root.appendChild(Tmp.ToXml(BinariesDict, 'Binaries'))
-
         return Root
 
     def __str__(self):
@@ -620,7 +756,6 @@ class UserExtensionSourceXml(object):
         if self.UserExtensionSource:
             pass
         Dict = {}
-
         #SourcesItem = XmlNode(Item, '%s/Sources' % Key)
         for SubItem in XmlList(Item, 'Sources/SourceFile'):
             FileName = XmlElement(SubItem, 'SourceFile/FileName')
@@ -628,7 +763,6 @@ class UserExtensionSourceXml(object):
             FeatureFlag = XmlElement(SubItem, 'SourceFile/FeatureFlag')
             SupArchStr = XmlElement(SubItem, 'SourceFile/SupArchList')
             DictKey = (FileName, Family, FeatureFlag, SupArchStr)
-
             ValueList = []
             for ValueNodeItem in XmlList(SubItem, \
                                          'SourceFile/SourceFileOtherAttr'):
@@ -643,9 +777,7 @@ class UserExtensionSourceXml(object):
                     ToolCode = ''
                     Comment = ''
                 ValueList.append((TagName, ToolCode, Comment))
-
             Dict[DictKey] = ValueList
-
         return Dict
 
     def ToXml(self, Dict, Key):
@@ -690,16 +822,13 @@ class UserExtensionBinaryXml(object):
             pass
         if self.UserExtensionBinary:
             pass
-
         Dict = {}
-
         for SubItem in XmlList(Item, 'Binaries/Binary'):
             FileName = XmlElement(SubItem, 'Binary/FileName')
             FileType = XmlElement(SubItem, 'Binary/FileType')
             FFE = XmlElement(SubItem, 'Binary/FeatureFlag')
             SupArch = XmlElement(SubItem, 'Binary/SupArchList')
             DictKey = (FileName, FileType, ConvertNOTEQToNE(FFE), SupArch)
-
             ValueList = []
             for ValueNodeItem in XmlList(SubItem, \
                                          'Binary/BinaryFileOtherAttr'):
@@ -719,9 +848,7 @@ class UserExtensionBinaryXml(object):
                     Comment = ''
 
                 ValueList.append((Target, Family, TagName, Comment))
-
             Dict[DictKey] = ValueList
-
         return Dict
 
     def ToXml(self, Dict, Key):
@@ -777,7 +904,6 @@ class LibraryClassXml(object):
             HelpTextObj = HelpTextXml()
             HelpTextObj.FromXml(HelpTextItem, '%s/HelpText' % Key)
             self.HelpText.append(HelpTextObj)
-
         LibraryClass = LibraryClassObject()
         LibraryClass.SetLibraryClass(self.Keyword)
         LibraryClass.SetIncludeHeader(self.HeaderFile)
@@ -787,7 +913,6 @@ class LibraryClassXml(object):
         LibraryClass.SetSupModuleList(self.CommonDefines.SupModList)
         LibraryClass.SetFeatureFlag(ConvertNOTEQToNE(self.CommonDefines.FeatureFlag))
         LibraryClass.SetHelpTextList(GetHelpTextList(self.HelpText))
-
         return LibraryClass
 
     def ToXml(self, LibraryClass, Key):
@@ -802,17 +927,13 @@ class LibraryClassXml(object):
         for Item in LibraryClass.GetHelpTextList():
             Tmp = HelpTextXml()
             NodeList.append(Tmp.ToXml(Item))
-
         Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
-
         return Root
 
     def ToXml2(self, LibraryClass, Key):
         if self.HeaderFile:
             pass
-
         FeatureFlag = ConvertNEToNOTEQ(LibraryClass.GetFeatureFlag())
-
         AttributeList = \
         [['Usage', LibraryClass.GetUsage()], \
          ['SupArchList', GetStringOfList(LibraryClass.GetSupArchList())], \
@@ -823,9 +944,7 @@ class LibraryClassXml(object):
         for Item in LibraryClass.GetHelpTextList():
             Tmp = HelpTextXml()
             NodeList.append(Tmp.ToXml(Item))
-
         Root = CreateXmlElement('%s' % Key, '', NodeList, AttributeList)
-
         return Root
 
     def __str__(self):
@@ -847,18 +966,18 @@ class FilenameXml(object):
 
     def FromXml(self, Item, Key):
         self.FileType = XmlAttribute(Item, 'FileType')
+        Guid = XmlAttribute(Item, 'GUID')
         self.Filename = XmlElement(Item, 'Filename')
         self.CommonDefines.FromXml(Item, Key)
-
         FeatureFlag = ConvertNOTEQToNE(self.CommonDefines.FeatureFlag)
-
         Filename = FileNameObject()
         #
         # Convert File Type
         #
         if self.FileType == 'UEFI_IMAGE':
             self.FileType = 'PE32'
-
+        
+        Filename.SetGuidValue(Guid)
         Filename.SetFileType(self.FileType)
         Filename.SetFilename(self.Filename)
         Filename.SetSupArchList(self.CommonDefines.SupArchList)
@@ -873,6 +992,7 @@ class FilenameXml(object):
                           GetStringOfList(Filename.GetSupArchList())],
                          ['FileType', Filename.GetFileType()],
                          ['FeatureFlag', ConvertNEToNOTEQ(Filename.GetFeatureFlag())],
+                         ['GUID', Filename.GetGuidValue()]
                         ]
         Root = CreateXmlElement('%s' % Key, Filename.GetFilename(), [], AttributeList)
 

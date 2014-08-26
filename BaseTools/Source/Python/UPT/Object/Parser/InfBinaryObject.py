@@ -2,7 +2,7 @@
 # This file is used to define class objects of INF file [Binaries] section. 
 # It will consumed by InfParser. 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -99,6 +99,7 @@ class InfBianryCommonItem(InfBianryItem, CurrentLine):
         self.CommonType = ''
         self.TagName = ''
         self.Family = ''
+        self.GuidValue = ''
         InfBianryItem.__init__(self)
         CurrentLine.__init__(self)
 
@@ -116,6 +117,11 @@ class InfBianryCommonItem(InfBianryItem, CurrentLine):
         self.Family = Family
     def GetFamily(self):
         return self.Family
+    
+    def SetGuidValue(self, GuidValue):
+        self.GuidValue = GuidValue
+    def GetGuidValue(self):
+        return self.GuidValue
 
 ##
 #
@@ -150,7 +156,7 @@ class InfBinariesObject(InfSectionCommonDef):
             if len(VerContent) < 2:
                 Logger.Error("InfParser",
                              ToolError.FORMAT_INVALID,
-                             ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID % (VerContent[0]),
+                             ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID % (VerContent[0], 2),
                              File=VerCurrentLine.GetFileName(),
                              Line=VerCurrentLine.GetLineNo(),
                              ExtraData=VerCurrentLine.GetLineString())
@@ -291,18 +297,29 @@ class InfBinariesObject(InfSectionCommonDef):
             CurrentLineOfItem = Item[2]
             GlobalData.gINF_CURRENT_LINE = CurrentLineOfItem
             InfBianryCommonItemObj = None
-            if len(ItemContent) < 2:
+            if ItemContent[0] == 'SUBTYPE_GUID':
+                if len(ItemContent) < 3:
+                    Logger.Error("InfParser",
+                                 ToolError.FORMAT_INVALID,
+                                 ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID % (ItemContent[0], 3),
+                                 File=CurrentLineOfItem.GetFileName(),
+                                 Line=CurrentLineOfItem.GetLineNo(),
+                                 ExtraData=CurrentLineOfItem.GetLineString())
+                    return False
+            else:
+                if len(ItemContent) < 2:
+                    Logger.Error("InfParser",
+                                 ToolError.FORMAT_INVALID,
+                                 ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID % (ItemContent[0], 2),
+                                 File=CurrentLineOfItem.GetFileName(),
+                                 Line=CurrentLineOfItem.GetLineNo(),
+                                 ExtraData=CurrentLineOfItem.GetLineString())
+                    return False
+                
+            if len(ItemContent) > 7:
                 Logger.Error("InfParser",
                              ToolError.FORMAT_INVALID,
-                             ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID % (ItemContent[0]),
-                             File=CurrentLineOfItem.GetFileName(),
-                             Line=CurrentLineOfItem.GetLineNo(),
-                             ExtraData=CurrentLineOfItem.GetLineString())
-                return False
-            if len(ItemContent) > 6:
-                Logger.Error("InfParser",
-                             ToolError.FORMAT_INVALID,
-                             ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID_MAX % (ItemContent[0], 6),
+                             ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID_MAX % (ItemContent[0], 7),
                              File=CurrentLineOfItem.GetFileName(),
                              Line=CurrentLineOfItem.GetLineNo(),
                              ExtraData=CurrentLineOfItem.GetLineString())
@@ -318,7 +335,7 @@ class InfBinariesObject(InfSectionCommonDef):
                 BinaryFileType = ItemContent[0].strip()
                 if BinaryFileType == 'RAW' or BinaryFileType == 'ACPI' or BinaryFileType == 'ASL':
                     BinaryFileType = 'BIN'
-
+                    
                 if BinaryFileType not in DT.BINARY_FILE_TYPE_LIST:
                     Logger.Error("InfParser",
                                  ToolError.FORMAT_INVALID,
@@ -342,44 +359,64 @@ class InfBinariesObject(InfSectionCommonDef):
 
                 InfBianryCommonItemObj.SetType(BinaryFileType)
                 InfBianryCommonItemObj.SetCommonType(ItemContent[0])
+                FileName = ''
+                if BinaryFileType == 'FREEFORM':
+                    InfBianryCommonItemObj.SetGuidValue(ItemContent[1])
+                    if len(ItemContent) >= 3:
+                        FileName = ItemContent[2]
+                    else:
+                        Logger.Error("InfParser",
+                                 ToolError.FORMAT_INVALID,
+                                 ST.ERR_INF_PARSER_BINARY_ITEM_FILENAME_NOT_EXIST,
+                                 File=CurrentLineOfItem.GetFileName(),
+                                 Line=CurrentLineOfItem.GetLineNo(),
+                                 ExtraData=CurrentLineOfItem.GetLineString())
+                else:
+                    FileName = ItemContent[1]
                 #
                 # Verify File exist or not
                 #
                 FullFileName = os.path.normpath(os.path.realpath(os.path.join(GlobalData.gINF_MODULE_DIR,
-                                                                              ItemContent[1])))
-                if not (ValidFile(FullFileName) or ValidFile(ItemContent[1])):
+                                                                              FileName)))
+                if not (ValidFile(FullFileName) or ValidFile(FileName)):
                     Logger.Error("InfParser",
                                  ToolError.FORMAT_INVALID,
-                                 ST.ERR_INF_PARSER_BINARY_ITEM_FILE_NOT_EXIST % (ItemContent[1]),
+                                 ST.ERR_INF_PARSER_BINARY_ITEM_FILE_NOT_EXIST % (FileName),
                                  File=CurrentLineOfItem.GetFileName(),
                                  Line=CurrentLineOfItem.GetLineNo(),
                                  ExtraData=CurrentLineOfItem.GetLineString())
                 #
                 # Validate file exist/format.
                 #
-                if IsValidPath(ItemContent[1], GlobalData.gINF_MODULE_DIR):
+                if IsValidPath(FileName, GlobalData.gINF_MODULE_DIR):
                     IsValidFileFlag = True
                 else:
                     Logger.Error("InfParser",
                                 ToolError.FORMAT_INVALID,
-                                ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID % (ItemContent[1]),
+                                ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID % (FileName),
                                 File=CurrentLineOfItem.GetFileName(),
                                 Line=CurrentLineOfItem.GetLineNo(),
                                 ExtraData=CurrentLineOfItem.GetLineString())
                     return False
                 if IsValidFileFlag:
                     ItemContent[0] = ConvPathFromAbsToRel(ItemContent[0], GlobalData.gINF_MODULE_DIR)
-                    InfBianryCommonItemObj.SetFileName(ItemContent[1])
+                    InfBianryCommonItemObj.SetFileName(FileName)
             if len(ItemContent) >= 3:
                 #
                 # Add Target information
                 #
-                InfBianryCommonItemObj.SetTarget(ItemContent[2])
+                if BinaryFileType != 'FREEFORM':
+                    InfBianryCommonItemObj.SetTarget(ItemContent[2])
+                    
             if len(ItemContent) >= 4:
                 #
                 # Add Family information
                 #
-                InfBianryCommonItemObj.SetFamily(ItemContent[3])
+                if BinaryFileType != 'FREEFORM':
+                    InfBianryCommonItemObj.SetFamily(ItemContent[3])
+                else:
+                    InfBianryCommonItemObj.SetTarget(ItemContent[3])
+                    
             if len(ItemContent) >= 5:
                 #
                 # TagName entries are build system specific. If there 
@@ -388,28 +425,62 @@ class InfBinariesObject(InfSectionCommonDef):
                 # system specific content cannot be distributed using 
                 # the UDP
                 #
-                if ItemContent[4].strip() != '':
-                    Logger.Error("InfParser",
-                                 ToolError.FORMAT_INVALID,
-                                 ST.ERR_INF_PARSER_TAGNAME_NOT_PERMITTED % (ItemContent[4]),
-                                 File=CurrentLineOfItem.GetFileName(),
-                                 Line=CurrentLineOfItem.GetLineNo(),
-                                 ExtraData=CurrentLineOfItem.GetLineString())
-            if len(ItemContent) == 6:
+                if BinaryFileType != 'FREEFORM':
+                    if ItemContent[4].strip() != '':
+                        Logger.Error("InfParser",
+                                     ToolError.FORMAT_INVALID,
+                                     ST.ERR_INF_PARSER_TAGNAME_NOT_PERMITTED % (ItemContent[4]),
+                                     File=CurrentLineOfItem.GetFileName(),
+                                     Line=CurrentLineOfItem.GetLineNo(),
+                                     ExtraData=CurrentLineOfItem.GetLineString())
+                else:
+                    InfBianryCommonItemObj.SetFamily(ItemContent[4])
+                    
+            if len(ItemContent) >= 6:
                 #
                 # Add FeatureFlagExp
                 #
-                if ItemContent[5].strip() == '':
+                if BinaryFileType != 'FREEFORM':
+                    if ItemContent[5].strip() == '':
+                        Logger.Error("InfParser",
+                                     ToolError.FORMAT_INVALID,
+                                     ST.ERR_INF_PARSER_FEATURE_FLAG_EXP_MISSING,
+                                     File=CurrentLineOfItem.GetFileName(),
+                                     Line=CurrentLineOfItem.GetLineNo(),
+                                     ExtraData=CurrentLineOfItem.GetLineString())
+                    #
+                    # Validate Feature Flag Express   
+                    #
+                    FeatureFlagRtv = IsValidFeatureFlagExp(ItemContent[5].strip())
+                    if not FeatureFlagRtv[0]:
+                        Logger.Error("InfParser",
+                                     ToolError.FORMAT_INVALID,
+                                     ST.ERR_INF_PARSER_FEATURE_FLAG_EXP_SYNTAX_INVLID % (FeatureFlagRtv[1]),
+                                     File=CurrentLineOfItem.GetFileName(),
+                                     Line=CurrentLineOfItem.GetLineNo(),
+                                     ExtraData=CurrentLineOfItem.GetLineString())
+                    InfBianryCommonItemObj.SetFeatureFlagExp(ItemContent[5])
+                else:
+                    if ItemContent[5].strip() != '':
+                        Logger.Error("InfParser",
+                                     ToolError.FORMAT_INVALID,
+                                     ST.ERR_INF_PARSER_TAGNAME_NOT_PERMITTED % (ItemContent[5]),
+                                     File=CurrentLineOfItem.GetFileName(),
+                                     Line=CurrentLineOfItem.GetLineNo(),
+                                     ExtraData=CurrentLineOfItem.GetLineString())
+                        
+            if len(ItemContent) == 7:
+                if ItemContent[6].strip() == '':
                     Logger.Error("InfParser",
-                                 ToolError.FORMAT_INVALID,
-                                 ST.ERR_INF_PARSER_FEATURE_FLAG_EXP_MISSING,
-                                 File=CurrentLineOfItem.GetFileName(),
-                                 Line=CurrentLineOfItem.GetLineNo(),
-                                 ExtraData=CurrentLineOfItem.GetLineString())
+                                     ToolError.FORMAT_INVALID,
+                                     ST.ERR_INF_PARSER_FEATURE_FLAG_EXP_MISSING,
+                                     File=CurrentLineOfItem.GetFileName(),
+                                     Line=CurrentLineOfItem.GetLineNo(),
+                                     ExtraData=CurrentLineOfItem.GetLineString())
                 #
                 # Validate Feature Flag Express   
                 #
-                FeatureFlagRtv = IsValidFeatureFlagExp(ItemContent[5].strip())
+                FeatureFlagRtv = IsValidFeatureFlagExp(ItemContent[6].strip())
                 if not FeatureFlagRtv[0]:
                     Logger.Error("InfParser",
                                  ToolError.FORMAT_INVALID,
@@ -417,7 +488,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                  File=CurrentLineOfItem.GetFileName(),
                                  Line=CurrentLineOfItem.GetLineNo(),
                                  ExtraData=CurrentLineOfItem.GetLineString())
-                InfBianryCommonItemObj.SetFeatureFlagExp(ItemContent[5])
+                InfBianryCommonItemObj.SetFeatureFlagExp(ItemContent[6])
 
             InfBianryCommonItemObj.SetSupArchList(__SupArchList)
 
@@ -489,7 +560,7 @@ class InfBinariesObject(InfSectionCommonDef):
                     if len(UiContent) < 2:
                         Logger.Error("InfParser",
                                      ToolError.FORMAT_INVALID,
-                                     ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID % (UiContent[0]),
+                                     ST.ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID % (UiContent[0], 2),
                                      File=UiCurrentLine.GetFileName(),
                                      Line=UiCurrentLine.GetLineNo(),
                                      ExtraData=UiCurrentLine.GetLineString())

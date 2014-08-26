@@ -1,7 +1,7 @@
 ## @file
 # Install distribution package.
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -28,7 +28,6 @@ from sys import stdin
 from sys import platform
 
 from Core.DependencyRules import DependencyRules
-from Library.Misc import CheckEnvVariable
 from Library import GlobalData
 from Logger import StringTable as ST
 import Logger.Log as Logger
@@ -133,89 +132,27 @@ def Main(Options = None):
             Logger.Error("RmPkg", 
                          OPTION_MISSING, 
                          ExtraData=ST.ERR_SPECIFY_PACKAGE)
-        CheckEnvVariable()
         WorkspaceDir = GlobalData.gWORKSPACE
         #
         # Prepare check dependency
         #
         Dep = DependencyRules(DataBase)
         
-        if Options.DistributionFile:
-            (Guid, Version, NewDpFileName) = \
-            DataBase.GetDpByName(os.path.split(Options.DistributionFile)[1])
-            if not Guid:
-                Logger.Error("RmPkg", UNKNOWN_ERROR, ST.ERR_PACKAGE_NOT_INSTALLED % Options.DistributionFile)
-        else:
-            Guid = Options.PackageGuid
-            Version = Options.PackageVersion
         #
-        # Check Dp existing
+        # Get the Dp information
         #
-        if not Dep.CheckDpExists(Guid, Version):
-            Logger.Error("RmPkg", UNKNOWN_ERROR, ST.ERR_DISTRIBUTION_NOT_INSTALLED)
-        #
-        # Check for Distribution files existence in /conf/upt, if not exist, 
-        # Warn user and go on.
-        #
-        StoredDistFile = os.path.normpath(os.path.join(WorkspaceDir, GlobalData.gUPT_DIR, NewDpFileName))
-        if not os.path.isfile(StoredDistFile):
-            Logger.Warn("RmPkg", ST.WRN_DIST_NOT_FOUND%StoredDistFile)
-            StoredDistFile = None
-            
+        StoredDistFile, Guid, Version = GetInstalledDpInfo(Options.DistributionFile, Dep, DataBase, WorkspaceDir)
+
         # 
         # Check Dp depex
         #
         CheckDpDepex(Dep, Guid, Version, WorkspaceDir)
 
+        # 
+        # remove distribution
         #
-        # Get Current File List
-        #
-        NewFileList = GetCurrentFileList(DataBase, Guid, Version, WorkspaceDir)
+        RemoveDist(Guid, Version, StoredDistFile, DataBase, WorkspaceDir, Options.Yes)
 
-        #
-        # Remove all files
-        #
-        MissingFileList = []
-        for (Path, Md5Sum) in DataBase.GetDpFileList(Guid, Version):
-            if os.path.isfile(Path):
-                if Path in NewFileList:
-                    NewFileList.remove(Path)
-                if not Options.Yes:
-                    #
-                    # check whether modified by users
-                    #
-                    Md5Sigature = md5.new(open(str(Path), 'rb').read())
-                    if Md5Sum != Md5Sigature.hexdigest():
-                        Logger.Info(ST.MSG_CONFIRM_REMOVE2 % Path)
-                        Input = stdin.readline()
-                        Input = Input.replace('\r', '').replace('\n', '')
-                        if Input.upper() != 'Y':
-                            continue
-                RemovePath(Path)
-            else:
-                MissingFileList.append(Path)
-        
-        for Path in NewFileList:
-            if os.path.isfile(Path):
-                if (not Options.Yes) and (not os.path.split(Path)[1].startswith('.')):
-                    Logger.Info(ST.MSG_CONFIRM_REMOVE3 % Path)
-                    Input = stdin.readline()
-                    Input = Input.replace('\r', '').replace('\n', '')
-                    if Input.upper() != 'Y':
-                        continue
-                RemovePath(Path)
-
-        #
-        # Remove distribution files in /Conf/.upt
-        #
-        if StoredDistFile is not None:
-            os.remove(StoredDistFile)
-
-        #
-        # update database
-        #
-        Logger.Quiet(ST.MSG_UPDATE_PACKAGE_DATABASE)
-        DataBase.RemoveDpObj(Guid, Version)
         Logger.Quiet(ST.MSG_FINISH)
         
         ReturnCode = 0
@@ -242,5 +179,98 @@ def Main(Options = None):
                      format_exc())
         ReturnCode = CODE_ERROR
     return ReturnCode
-        
 
+## GetInstalledDpInfo method
+#
+# Get the installed distribution information
+#
+# @param  DistributionFile: the name of the distribution
+# @param  Dep: the instance of DependencyRules
+# @param  DataBase: the internal database
+# @param  WorkspaceDir: work space directory
+# @retval StoredDistFile: the distribution file that backed up
+# @retval Guid: the Guid of the distribution
+# @retval Version: the Version of distribution
+#
+def GetInstalledDpInfo(DistributionFile, Dep, DataBase, WorkspaceDir):
+    (Guid, Version, NewDpFileName) = DataBase.GetDpByName(os.path.split(DistributionFile)[1])
+    if not Guid:
+        Logger.Error("RmPkg", UNKNOWN_ERROR, ST.ERR_PACKAGE_NOT_INSTALLED % DistributionFile)
+
+    #
+    # Check Dp existing
+    #
+    if not Dep.CheckDpExists(Guid, Version):
+        Logger.Error("RmPkg", UNKNOWN_ERROR, ST.ERR_DISTRIBUTION_NOT_INSTALLED)
+    #
+    # Check for Distribution files existence in /conf/upt, if not exist, 
+    # Warn user and go on.
+    #
+    StoredDistFile = os.path.normpath(os.path.join(WorkspaceDir, GlobalData.gUPT_DIR, NewDpFileName))
+    if not os.path.isfile(StoredDistFile):
+        Logger.Warn("RmPkg", ST.WRN_DIST_NOT_FOUND%StoredDistFile)
+        StoredDistFile = None
+
+    return StoredDistFile, Guid, Version
+
+## RemoveDist method
+#
+# remove a distribution
+#
+# @param  Guid: the Guid of the distribution
+# @param  Version: the Version of distribution
+# @param  StoredDistFile: the distribution file that backed up
+# @param  DataBase: the internal database
+# @param  WorkspaceDir: work space directory
+# @param  ForceRemove: whether user want to remove file even it is modified
+#
+def RemoveDist(Guid, Version, StoredDistFile, DataBase, WorkspaceDir, ForceRemove):
+    #
+    # Get Current File List
+    #
+    NewFileList = GetCurrentFileList(DataBase, Guid, Version, WorkspaceDir)
+
+    #
+    # Remove all files
+    #
+    MissingFileList = []
+    for (Path, Md5Sum) in DataBase.GetDpFileList(Guid, Version):
+        if os.path.isfile(Path):
+            if Path in NewFileList:
+                NewFileList.remove(Path)
+            if not ForceRemove:
+                #
+                # check whether modified by users
+                #
+                Md5Sigature = md5.new(open(str(Path), 'rb').read())
+                if Md5Sum != Md5Sigature.hexdigest():
+                    Logger.Info(ST.MSG_CONFIRM_REMOVE2 % Path)
+                    Input = stdin.readline()
+                    Input = Input.replace('\r', '').replace('\n', '')
+                    if Input.upper() != 'Y':
+                        continue
+            RemovePath(Path)
+        else:
+            MissingFileList.append(Path)
+    
+    for Path in NewFileList:
+        if os.path.isfile(Path):
+            if (not ForceRemove) and (not os.path.split(Path)[1].startswith('.')):
+                Logger.Info(ST.MSG_CONFIRM_REMOVE3 % Path)
+                Input = stdin.readline()
+                Input = Input.replace('\r', '').replace('\n', '')
+                if Input.upper() != 'Y':
+                    continue
+            RemovePath(Path)
+
+    #
+    # Remove distribution files in /Conf/.upt
+    #
+    if StoredDistFile is not None:
+        os.remove(StoredDistFile)
+
+    #
+    # update database
+    #
+    Logger.Quiet(ST.MSG_UPDATE_PACKAGE_DATABASE)
+    DataBase.RemoveDpObj(Guid, Version)

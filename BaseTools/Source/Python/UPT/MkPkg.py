@@ -1,7 +1,7 @@
 ## @file
 # Install distribution package.
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -45,7 +45,6 @@ import Logger.Log as Logger
 from Xml.XmlParser import DistributionPackageXml
 from Xml.IniToXml import IniToXml
 
-from Library.Misc import CheckEnvVariable
 from Library import GlobalData
 from Library.ParserValidate import IsValidPath
 
@@ -78,7 +77,6 @@ def Main(Options = None):
     try:
         DataBase = GlobalData.gDB        
         ContentFileClosed = True
-        CheckEnvVariable()
         WorkspaceDir = GlobalData.gWORKSPACE
 
         #

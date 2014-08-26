@@ -2,7 +2,7 @@
 # This file is used to define class objects of INF file [LibraryClasses] section. 
 # It will consumed by InfParser. 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -236,6 +236,7 @@ class InfLibraryClassObject():
                 #
                 LibItemObj.SetFileGuid(LibItem[0])
                 LibItemObj.SetVersion(LibItem[1])
+                LibItemObj.SetSupArchList(__SupArchList)
 
             if self.LibraryClasses.has_key((LibItemObj)):
                 LibraryList = self.LibraryClasses[LibItemObj]

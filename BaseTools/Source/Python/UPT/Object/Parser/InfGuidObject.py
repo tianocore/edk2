@@ -2,7 +2,7 @@
 # This file is used to define class objects of INF file [Guids] section. 
 # It will consumed by InfParser. 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -156,7 +156,6 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
             #   
             if CommentItemUsage == CommentItemGuidType == PreUsage == PreGuidType == DT.ITEM_UNDEFINED:
                 CommentItemHelpText = PreHelpText + DT.END_OF_LINE + CommentItemHelpText
-                
                 PreHelpText = CommentItemHelpText
                 
             if BlockFlag == 4:     
@@ -164,6 +163,8 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                 CommentItemIns.SetUsageItem(CommentItemUsage)
                 CommentItemIns.SetGuidTypeItem(CommentItemGuidType)
                 CommentItemIns.SetVariableNameItem(CommentItemVarString)
+                if CommentItemHelpText == '' or CommentItemHelpText.endswith(DT.END_OF_LINE):
+                    CommentItemHelpText = CommentItemHelpText.strip(DT.END_OF_LINE)
                 CommentItemIns.SetHelpStringItem(CommentItemHelpText)
                 CommentInsList.append(CommentItemIns)
                 
@@ -180,7 +181,7 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                 CommentItemIns.SetUsageItem(DT.ITEM_UNDEFINED)
                 CommentItemIns.SetGuidTypeItem(DT.ITEM_UNDEFINED)
                 if PreHelpText == '' or PreHelpText.endswith(DT.END_OF_LINE):
-                    PreHelpText += DT.END_OF_LINE
+                    PreHelpText = PreHelpText.strip(DT.END_OF_LINE)
                 CommentItemIns.SetHelpStringItem(PreHelpText)
                 CommentInsList.append(CommentItemIns)
                 #
@@ -190,6 +191,8 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                 CommentItemIns.SetUsageItem(CommentItemUsage)
                 CommentItemIns.SetGuidTypeItem(CommentItemGuidType)
                 CommentItemIns.SetVariableNameItem(CommentItemVarString)
+                if CommentItemHelpText == '' or CommentItemHelpText.endswith(DT.END_OF_LINE):
+                    CommentItemHelpText = CommentItemHelpText.strip(DT.END_OF_LINE)
                 CommentItemIns.SetHelpStringItem(CommentItemHelpText)
                 CommentInsList.append(CommentItemIns)
                 

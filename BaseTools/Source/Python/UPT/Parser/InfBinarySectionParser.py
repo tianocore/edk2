@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for [Binaries] sections in INF file 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -178,9 +178,15 @@ class InfBinarySectionParser(InfParserSectionRoot):
                                           CurrentLineObj))
             else:
                 if len(ValueList) == 2:
-                    TokenList = GetSplitValueList(ValueList[1], 
-                                                  DT.TAB_VALUE_SPLIT, 
-                                                  4)
+                    if ValueList[0].strip() == 'SUBTYPE_GUID':
+                        TokenList = GetSplitValueList(ValueList[1], 
+                                                      DT.TAB_VALUE_SPLIT, 
+                                                      5)
+                    else:
+                        TokenList = GetSplitValueList(ValueList[1], 
+                              DT.TAB_VALUE_SPLIT, 
+                              4)
+                        
                     NewValueList = []
                     NewValueList.append(ValueList[0])
                     for Item in TokenList:
@@ -188,6 +194,15 @@ class InfBinarySectionParser(InfParserSectionRoot):
                     ComBinaryList.append((NewValueList, 
                                           LineComment, 
                                           CurrentLineObj))
+                elif len(ValueList) == 1:
+                    NewValueList = []
+                    NewValueList.append(ValueList[0])
+                    ComBinaryList.append((NewValueList, 
+                                          LineComment, 
+                                          CurrentLineObj))
+                    
+                    
+                
             
             ValueList = []
             LineComment = None

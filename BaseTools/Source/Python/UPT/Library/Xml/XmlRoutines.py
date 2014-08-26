@@ -2,7 +2,7 @@
 # This is an XML API that uses a syntax similar to XPath, but it is written in
 # standard python so that no extra python packages are required to use it.
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -22,6 +22,7 @@ XmlRoutines
 #
 import xml.dom.minidom
 import re
+import codecs
 from Logger.ToolError import PARSER_ERROR
 import Logger.Log as Logger
 
@@ -219,7 +220,7 @@ def XmlNodeName(Dom):
 #
 def XmlParseFile(FileName):
     try:
-        XmlFile = open(FileName)
+        XmlFile = codecs.open(FileName, 'rb')
         Dom = xml.dom.minidom.parse(XmlFile)
         XmlFile.close()
         return Dom

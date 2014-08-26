@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for sections in INF file 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -239,6 +239,7 @@ class InfSectionParser(InfDefinSectionParser,
         self.InfSmmDepexSection = InfDepexObject()
         self.InfBinariesSection = InfBinariesObject()
         self.InfHeader = InfHeaderObject()
+        self.InfBinaryHeader = InfHeaderObject()
         self.InfSpecialCommentSection = InfSpecialCommentObject()
 
         #
@@ -253,8 +254,16 @@ class InfSectionParser(InfDefinSectionParser,
     #
     # File Header content parser
     #    
-    def InfHeaderParser(self, Content, InfHeaderObject2, FileName):
-        (Abstract, Description, Copyright, License) = ParseHeaderCommentSection(Content, FileName)
+    def InfHeaderParser(self, Content, InfHeaderObject2, FileName, IsBinaryHeader = False):
+        if IsBinaryHeader:
+            (Abstract, Description, Copyright, License) = ParseHeaderCommentSection(Content, FileName, True)
+            if not Abstract or not Description or not Copyright or not License:
+                Logger.Error('Parser',
+                             FORMAT_INVALID,
+                             ST.ERR_INVALID_BINARYHEADER_FORMAT,
+                             File=FileName)
+        else:
+            (Abstract, Description, Copyright, License) = ParseHeaderCommentSection(Content, FileName)
         #
         # Not process file name now, for later usage.
         #

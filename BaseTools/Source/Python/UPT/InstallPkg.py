@@ -1,7 +1,7 @@
 ## @file
 # Install distribution package.
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -17,12 +17,14 @@ Install a distribution package
 ##
 # Import Modules
 #
+from Core.FileHook import __FileHookOpen__
 import os.path
 from os import chmod
 from os import SEEK_SET
 from os import SEEK_END
 import stat
 import md5
+import copy
 from sys import stdin
 from sys import platform
 from shutil import rmtree
@@ -42,7 +44,6 @@ from Logger.ToolError import FORMAT_INVALID
 from Logger.ToolError import FILE_TYPE_MISMATCH
 import Logger.Log as Logger
 
-from Library.Misc import CheckEnvVariable
 from Library.Misc import Sdict
 from Library.Misc import ConvertPath
 from Library.ParserValidate import IsValidInstallPath
@@ -82,7 +83,6 @@ def InstallNewPackage(WorkspaceDir, Path, CustomPath = False):
         Logger.Error("InstallPkg", UNKNOWN_ERROR, ST.ERR_USER_INTERRUPT)
     Input = Input.replace('\r', '').replace('\n', '')
     return InstallNewPackage(WorkspaceDir, Input, False)
-
 
 ## InstallNewModule
 #
@@ -133,10 +133,9 @@ def InstallNewFile(WorkspaceDir, File):
 #
 # UnZipDp
 #
-def UnZipDp(WorkspaceDir, Options, DataBase):
+def UnZipDp(WorkspaceDir, DpPkgFileName):
     ContentZipFile = None
     Logger.Quiet(ST.MSG_UZIP_PARSE_XML)
-    DpPkgFileName = Options.PackageFile
     DistFile = PackageFile(DpPkgFileName)
     
     DpDescFileName, ContentFileName = GetDPFile(DistFile.GetZipFile())
@@ -156,26 +155,7 @@ def UnZipDp(WorkspaceDir, Options, DataBase):
         DistPkg.Header.RePackage = False
     if DistPkg.Header.ReadOnly == '':
         DistPkg.Header.ReadOnly = False
-    
-    #
-    # prepare check dependency
-    #
-    Dep = DependencyRules(DataBase)
-    #
-    # Check distribution package installed or not
-    #
-    if Dep.CheckDpExists(DistPkg.Header.GetGuid(),
-        DistPkg.Header.GetVersion()):
-        Logger.Error("InstallPkg", UPT_ALREADY_INSTALLED_ERROR,
-            ST.WRN_DIST_PKG_INSTALLED)
-    #
-    # Check distribution dependency (all module dependency should be
-    # satisfied)
-    #
-    if not Dep.CheckDpDepexSatisfied(DistPkg):
-        Logger.Error("InstallPkg", UNKNOWN_ERROR,
-            ST.ERR_PACKAGE_NOT_MATCH_DEPENDENCY,
-            ExtraData=DistPkg.Header.Name)
+
     #
     # unzip contents.zip file
     #
@@ -185,7 +165,7 @@ def UnZipDp(WorkspaceDir, Options, DataBase):
         Logger.Error("InstallPkg", FILE_NOT_FOUND,
             ST.ERR_FILE_BROKEN % ContentFileName)
 
-    FilePointer = open(ContentFile, "rb")
+    FilePointer = __FileHookOpen__(ContentFile, "rb")
     #
     # Assume no archive comment.
     #
@@ -204,13 +184,13 @@ def UnZipDp(WorkspaceDir, Options, DataBase):
     # verify MD5 signature when existed
     #
     if DistPkg.Header.Signature != '':
-        Md5Sigature = md5.new(open(ContentFile, 'rb').read())
+        Md5Sigature = md5.new(__FileHookOpen__(ContentFile, 'rb').read())
         if DistPkg.Header.Signature != Md5Sigature.hexdigest():
             ContentZipFile.Close()
             Logger.Error("InstallPkg", FILE_CHECKSUM_FAILURE,
                 ExtraData=ContentFile)
 
-    return DistPkg, Dep, ContentZipFile, DpPkgFileName
+    return DistPkg, ContentZipFile, DpPkgFileName, DistFile
 
 ## GetPackageList
 #
@@ -224,7 +204,11 @@ def GetPackageList(DistPkg, Dep, WorkspaceDir, Options, ContentZipFile, ModuleLi
         Logger.Info(ST.MSG_INSTALL_PACKAGE % Package.GetName())
         if Dep.CheckPackageExists(Guid, Version):
             Logger.Info(ST.WRN_PACKAGE_EXISTED %(Guid, Version))
-        NewPackagePath = InstallNewPackage(WorkspaceDir, PackagePath, Options.CustomPath)
+        if Options.UseGuidedPkgPath:
+            GuidedPkgPath = "%s_%s_%s" % (Package.GetName(), Guid, Version)
+            NewPackagePath = InstallNewPackage(WorkspaceDir, GuidedPkgPath, Options.CustomPath)
+        else:
+            NewPackagePath = InstallNewPackage(WorkspaceDir, PackagePath, Options.CustomPath)
         InstallPackageContent(PackagePath, NewPackagePath, Package, ContentZipFile, Dep, WorkspaceDir, ModuleList, 
                               DistPkg.Header.ReadOnly)
         PackageList.append(Package)
@@ -238,8 +222,8 @@ def GetPackageList(DistPkg, Dep, WorkspaceDir, Options, ContentZipFile, ModuleLi
     # dependency (Hard to get the location of the newly installed package)
     #
     for Package in PackageList:
-        FilePath = PackageToDec(Package)
-        Md5Sigature = md5.new(open(str(FilePath), 'rb').read())
+        FilePath = PackageToDec(Package, DistPkg.Header)
+        Md5Sigature = md5.new(__FileHookOpen__(str(FilePath), 'rb').read())
         Md5Sum = Md5Sigature.hexdigest()
         if (FilePath, Md5Sum) not in Package.FileList:
             Package.FileList.append((FilePath, Md5Sum))
@@ -258,7 +242,7 @@ def GetModuleList(DistPkg, Dep, WorkspaceDir, ContentZipFile, ModuleList):
     # install them directly. If not, we will try to create a new directory 
     # for it.
     #
-    ModulePathList = []   
+    ModulePathList = []
     
     #
     # Check module exist and install
@@ -297,8 +281,9 @@ def GetModuleList(DistPkg, Dep, WorkspaceDir, ContentZipFile, ModuleList):
     # generate all inf for modules
     #
     for (Module, Package) in ModuleList:
-        FilePath = ModuleToInf(Module)
-        Md5Sigature = md5.new(open(str(FilePath), 'rb').read())
+        CheckCNameInModuleRedefined(Module, DistPkg)
+        FilePath = ModuleToInf(Module, Package, DistPkg.Header)
+        Md5Sigature = md5.new(__FileHookOpen__(str(FilePath), 'rb').read())
         Md5Sum = Md5Sigature.hexdigest()
         if Package:
             if (FilePath, Md5Sum) not in Package.FileList:
@@ -306,8 +291,166 @@ def GetModuleList(DistPkg, Dep, WorkspaceDir, ContentZipFile, ModuleList):
         else:
             if (FilePath, Md5Sum) not in Module.FileList:
                 Module.FileList.append((FilePath, Md5Sum))
+        #
+        # append the module unicode files to Package FileList
+        #
+        for (FilePath, Md5Sum) in Module.FileList:
+            if str(FilePath).endswith('.uni') and Package and (FilePath, Md5Sum) not in Package.FileList:
+                Package.FileList.append((FilePath, Md5Sum))
     
     return NewDict
+
+##
+# Get all protocol/ppi/guid CNames and pcd name from all dependent DEC file
+#
+def GetDepProtocolPpiGuidPcdNames(DePackageObjList):
+    #
+    # [[Dec1Protocol1, Dec1Protocol2...], [Dec2Protocols...],...]
+    #
+    DependentProtocolCNames = []
+    DependentPpiCNames = []
+    DependentGuidCNames = []
+    DependentPcdNames = []
+    
+    for PackageObj in DePackageObjList:
+        #
+        # Get protocol CName list from all dependent DEC file
+        #
+        ProtocolCNames = []
+        for Protocol in PackageObj.GetProtocolList():
+            if Protocol.GetCName() not in ProtocolCNames:
+                ProtocolCNames.append(Protocol.GetCName())
+  
+        DependentProtocolCNames.append(ProtocolCNames)
+            
+        #
+        # Get Ppi CName list from all dependent DEC file
+        #            
+        PpiCNames = []
+        for Ppi in PackageObj.GetPpiList():
+            if Ppi.GetCName() not in PpiCNames:
+                PpiCNames.append(Ppi.GetCName())
+
+        DependentPpiCNames.append(PpiCNames)
+            
+        #
+        # Get Guid CName list from all dependent DEC file
+        #      
+        GuidCNames = []
+        for Guid in PackageObj.GetGuidList():
+            if Guid.GetCName() not in GuidCNames:
+                GuidCNames.append(Guid.GetCName())
+        
+        DependentGuidCNames.append(GuidCNames)
+        
+        #
+        # Get PcdName list from all dependent DEC file
+        #
+        PcdNames = []
+        for Pcd in PackageObj.GetPcdList():
+            PcdName = '.'.join([Pcd.GetTokenSpaceGuidCName(), Pcd.GetCName()])
+            if PcdName not in PcdNames:
+                PcdNames.append(PcdName)
+        
+        DependentPcdNames.append(PcdNames)
+                
+            
+    return DependentProtocolCNames, DependentPpiCNames, DependentGuidCNames, DependentPcdNames
+
+##
+# Check if protocol CName is redefined
+#
+def CheckProtoclCNameRedefined(Module, DependentProtocolCNames):
+    for ProtocolInModule in Module.GetProtocolList():
+        IsCNameDefined = False
+        for PackageProtocolCNames in DependentProtocolCNames:
+            if ProtocolInModule.GetCName() in PackageProtocolCNames:
+                if IsCNameDefined:
+                    Logger.Error("\nUPT", FORMAT_INVALID, 
+                                 File = Module.GetFullPath(), 
+                                 ExtraData = \
+                                 ST.ERR_INF_PARSER_ITEM_DUPLICATE_IN_DEC % ProtocolInModule.GetCName())
+                else:
+                    IsCNameDefined = True
+
+##
+# Check if Ppi CName is redefined
+#
+def CheckPpiCNameRedefined(Module, DependentPpiCNames):
+    for PpiInModule in Module.GetPpiList():
+        IsCNameDefined = False
+        for PackagePpiCNames in DependentPpiCNames:
+            if PpiInModule.GetCName() in PackagePpiCNames:
+                if IsCNameDefined:
+                    Logger.Error("\nUPT", FORMAT_INVALID, 
+                                 File = Module.GetFullPath(), 
+                                 ExtraData = ST.ERR_INF_PARSER_ITEM_DUPLICATE_IN_DEC % PpiInModule.GetCName())
+                else:
+                    IsCNameDefined = True    
+
+##
+# Check if Guid CName is redefined
+#
+def CheckGuidCNameRedefined(Module, DependentGuidCNames):
+    for GuidInModule in Module.GetGuidList():
+        IsCNameDefined = False
+        for PackageGuidCNames in DependentGuidCNames:
+            if GuidInModule.GetCName() in PackageGuidCNames:
+                if IsCNameDefined:
+                    Logger.Error("\nUPT", FORMAT_INVALID, 
+                                 File = Module.GetFullPath(), 
+                                 ExtraData = \
+                                 ST.ERR_INF_PARSER_ITEM_DUPLICATE_IN_DEC % GuidInModule.GetCName())
+                else:
+                    IsCNameDefined = True
+
+##
+# Check if PcdName is redefined
+#
+def CheckPcdNameRedefined(Module, DependentPcdNames):
+    PcdObjs = []
+    if not Module.GetBinaryFileList():
+        PcdObjs += Module.GetPcdList()
+    else:
+        Binary = Module.GetBinaryFileList()[0]
+        for AsBuild in Binary.GetAsBuiltList():
+            PcdObjs += AsBuild.GetPatchPcdList() + AsBuild.GetPcdExList()
+
+    for PcdObj in PcdObjs:
+        PcdName = '.'.join([PcdObj.GetTokenSpaceGuidCName(), PcdObj.GetCName()])
+        IsPcdNameDefined = False
+        for PcdNames in DependentPcdNames:
+            if PcdName in PcdNames:
+                if IsPcdNameDefined:
+                    Logger.Error("\nUPT", FORMAT_INVALID, 
+                                 File = Module.GetFullPath(), 
+                                 ExtraData = ST.ERR_INF_PARSER_ITEM_DUPLICATE_IN_DEC % PcdName)
+                else:
+                    IsPcdNameDefined = True
+
+##
+# Check if any Protocol/Ppi/Guid and Pcd name is redefined in its dependent DEC files
+#
+def CheckCNameInModuleRedefined(Module, DistPkg):
+    DePackageObjList = []
+    #
+    # Get all dependent package objects
+    # 
+    for Obj in Module.GetPackageDependencyList():
+        Guid = Obj.GetGuid()
+        Version = Obj.GetVersion()
+        for Key in DistPkg.PackageSurfaceArea:
+            if Key[0] == Guid and Key[1] == Version:
+                if DistPkg.PackageSurfaceArea[Key] not in DePackageObjList:
+                    DePackageObjList.append(DistPkg.PackageSurfaceArea[Key])
+    
+    DependentProtocolCNames, DependentPpiCNames, DependentGuidCNames, DependentPcdNames = \
+    GetDepProtocolPpiGuidPcdNames(DePackageObjList)
+
+    CheckProtoclCNameRedefined(Module, DependentProtocolCNames)
+    CheckPpiCNameRedefined(Module, DependentPpiCNames)
+    CheckGuidCNameRedefined(Module, DependentGuidCNames)
+    CheckPcdNameRedefined(Module, DependentPcdNames)
 
 ## GenToolMisc
 #
@@ -369,8 +512,7 @@ def Main(Options = None):
     ContentZipFile, DistFile = None, None
 
     try:
-        DataBase = GlobalData.gDB        
-        CheckEnvVariable()
+        DataBase = GlobalData.gDB
         WorkspaceDir = GlobalData.gWORKSPACE
         if not Options.PackageFile:
             Logger.Error("InstallPkg", OPTION_MISSING, ExtraData=ST.ERR_SPECIFY_PACKAGE)
@@ -378,63 +520,30 @@ def Main(Options = None):
         #
         # unzip dist.pkg file
         #
-        DistPkg, Dep, ContentZipFile, DpPkgFileName = UnZipDp(WorkspaceDir, Options, DataBase)
+        DistPkg, ContentZipFile, DpPkgFileName, DistFile = UnZipDp(WorkspaceDir, Options.PackageFile)
 
         #
-        # PackageList, ModuleList record the information for the meta-data
-        # files that need to be generated later
+        # check dependency
         #
-        PackageList = []
-        ModuleList = []
-        DistPkg.PackageSurfaceArea = GetPackageList(DistPkg, Dep, WorkspaceDir, Options, 
-                                                    ContentZipFile, ModuleList, PackageList)
-
-        DistPkg.ModuleSurfaceArea = GetModuleList(DistPkg, Dep, WorkspaceDir, ContentZipFile, ModuleList)       
-        
-        
-        GenToolMisc(DistPkg, WorkspaceDir, ContentZipFile)
-        
-        #
-        # copy "Distribution File" to directory $(WORKSPACE)/conf/upt
-        #
-        DistFileName = os.path.split(DpPkgFileName)[1]
-        DestDir = os.path.normpath(os.path.join(WorkspaceDir, GlobalData.gUPT_DIR))
-        CreateDirectory(DestDir)
-        DestFile = os.path.normpath(os.path.join(DestDir, DistFileName))
-        if os.path.exists(DestFile):
-            FileName, Ext = os.path.splitext(DistFileName)
-            NewFileName = FileName + '_' + DistPkg.Header.GetGuid() + '_' + DistPkg.Header.GetVersion() + Ext
-            DestFile = os.path.normpath(os.path.join(DestDir, NewFileName))
-            if os.path.exists(DestFile):
-                #
-                # ask for user input the new file name
-                #
-                Logger.Info( ST.MSG_NEW_FILE_NAME_FOR_DIST)
-                Input = stdin.readline()
-                Input = Input.replace('\r', '').replace('\n', '')
-                DestFile = os.path.normpath(os.path.join(DestDir, Input))
-        copyfile(DpPkgFileName, DestFile)
-        NewDpPkgFileName = DestFile[DestFile.find(DestDir) + len(DestDir) + 1:]
+        Dep = DependencyRules(DataBase)
+        CheckInstallDpx(Dep, DistPkg)
 
         #
-        # update database
+        # Install distribution
         #
-        Logger.Quiet(ST.MSG_UPDATE_PACKAGE_DATABASE)
-        DataBase.AddDPObject(DistPkg, NewDpPkgFileName, DistFileName, 
-                       DistPkg.Header.RePackage)
-        
+        InstallDp(DistPkg, DpPkgFileName, ContentZipFile, Options, Dep, WorkspaceDir, DataBase)
         ReturnCode = 0
         
     except FatalError, XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
-            Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),
-                platform) + format_exc())
+            Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
+            
     except KeyboardInterrupt:
         ReturnCode = ABORT_ERROR
         if Logger.GetLevel() <= Logger.DEBUG_9:
-            Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),
-                platform) + format_exc())
+            Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
+            
     except:
         ReturnCode = CODE_ERROR
         Logger.Error(
@@ -446,7 +555,6 @@ def Main(Options = None):
                     )
         Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),
             platform) + format_exc())
-
     finally:
         Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_STARTED)
         if DistFile:
@@ -457,11 +565,65 @@ def Main(Options = None):
             rmtree(GlobalData.gUNPACK_DIR)
             GlobalData.gUNPACK_DIR = None
         Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)
-
     if ReturnCode == 0:
         Logger.Quiet(ST.MSG_FINISH)
-    
     return ReturnCode
+
+# BackupDist method
+#  
+# This method will backup the Distribution file into the $(WORKSPACE)/conf/upt, and rename it 
+# if there is already a same-named distribution existed.
+#
+# @param DpPkgFileName: The distribution path
+# @param Guid:          The distribution Guid
+# @param Version:       The distribution Version
+# @param WorkspaceDir:  The workspace directory
+# @retval NewDpPkgFileName: The exact backup file name
+#
+def BackupDist(DpPkgFileName, Guid, Version, WorkspaceDir):
+    DistFileName = os.path.split(DpPkgFileName)[1]
+    DestDir = os.path.normpath(os.path.join(WorkspaceDir, GlobalData.gUPT_DIR))
+    CreateDirectory(DestDir)
+    DestFile = os.path.normpath(os.path.join(DestDir, DistFileName))
+    if os.path.exists(DestFile):
+        FileName, Ext = os.path.splitext(DistFileName)
+        NewFileName = FileName + '_' + Guid + '_' + Version + Ext
+        DestFile = os.path.normpath(os.path.join(DestDir, NewFileName))
+        if os.path.exists(DestFile):
+            #
+            # ask for user input the new file name
+            #
+            Logger.Info( ST.MSG_NEW_FILE_NAME_FOR_DIST)
+            Input = stdin.readline()
+            Input = Input.replace('\r', '').replace('\n', '')
+            DestFile = os.path.normpath(os.path.join(DestDir, Input))
+    copyfile(DpPkgFileName, DestFile)
+    NewDpPkgFileName = DestFile[DestFile.find(DestDir) + len(DestDir) + 1:]
+    return NewDpPkgFileName
+
+## CheckInstallDpx method
+#
+#  check whether distribution could be installed
+#
+#   @param  Dep: the DependencyRules instance that used to check dependency
+#   @param  DistPkg: the distribution object
+#
+def CheckInstallDpx(Dep, DistPkg):
+    #
+    # Check distribution package installed or not
+    #
+    if Dep.CheckDpExists(DistPkg.Header.GetGuid(),
+        DistPkg.Header.GetVersion()):
+        Logger.Error("InstallPkg", UPT_ALREADY_INSTALLED_ERROR,
+            ST.WRN_DIST_PKG_INSTALLED)
+    #
+    # Check distribution dependency (all module dependency should be
+    # satisfied)
+    #
+    if not Dep.CheckInstallDpDepexSatisfied(DistPkg):
+        Logger.Error("InstallPkg", UNKNOWN_ERROR,
+            ST.ERR_PACKAGE_NOT_MATCH_DEPENDENCY,
+            ExtraData=DistPkg.Header.Name)
 
 ## InstallModuleContent method
 #
@@ -501,7 +663,7 @@ def InstallModuleContent(FromPath, NewPath, ModulePath, Module, ContentZipFile,
             
             if not IsValidInstallPath(File):
                 Logger.Error("UPT", FORMAT_INVALID, ST.ERR_FILE_NAME_INVALIDE%File)
-                      
+
             FromFile = os.path.join(FromPath, ModulePath, File)
             Executable = Item.GetExecutable()            
             ToFile = os.path.normpath(os.path.join(NewModuleFullPath, ConvertPath(File)))
@@ -575,7 +737,7 @@ def InstallModuleContentZipFile(ContentZipFile, FromPath, ModulePath, WorkspaceD
                 FromFile = FileName
                 ToFile = os.path.normpath(os.path.join(WorkspaceDir, 
                         ConvertPath(FileName.replace(FromPath, NewPath, 1))))
-                CheckList = Module.FileList
+                CheckList = copy.copy(Module.FileList)
                 if Package:
                     CheckList += Package.FileList
                 for Item in CheckList:
@@ -619,23 +781,28 @@ def FileUnderPath(FileName, CheckPath):
 # @return:  True or False  
 #
 def InstallFile(ContentZipFile, FromFile, ToFile, ReadOnly, Executable=False):
-    if not ContentZipFile or not ContentZipFile.UnpackFile(FromFile, ToFile):
-        Logger.Error("UPT", FILE_NOT_FOUND, ST.ERR_INSTALL_FILE_FROM_EMPTY_CONTENT%FromFile)
-
-    if ReadOnly:
-        if not Executable:
-            chmod(ToFile, stat.S_IREAD)
-        else:
-            chmod(ToFile, stat.S_IREAD|stat.S_IEXEC)
-    elif Executable:
-        chmod(ToFile, stat.S_IREAD|stat.S_IWRITE|stat.S_IEXEC)
+    if os.path.exists(os.path.normpath(ToFile)):
+        pass
     else:
-        chmod(ToFile, stat.S_IREAD|stat.S_IWRITE)
+        if not ContentZipFile or not ContentZipFile.UnpackFile(FromFile, ToFile):
+            Logger.Error("UPT", FILE_NOT_FOUND, ST.ERR_INSTALL_FILE_FROM_EMPTY_CONTENT % FromFile)
+
+        if ReadOnly:
+            if not Executable:
+                chmod(ToFile, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+            else:
+                chmod(ToFile, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+        elif Executable:
+            chmod(ToFile, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IWUSR | stat.S_IWGRP |
+                  stat.S_IWOTH | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+        else:
+            chmod(ToFile, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
                 
-    Md5Sigature = md5.new(open(str(ToFile), 'rb').read())
+    Md5Sigature = md5.new(__FileHookOpen__(str(ToFile), 'rb').read())
     Md5Sum = Md5Sigature.hexdigest()
+
     return Md5Sum
-        
+
 ## InstallPackageContent method
 #
 #   @param  FromPath: FromPath
@@ -701,10 +868,10 @@ def InstallPackageContent(FromPath, ToPath, Package, ContentZipFile, Dep,
             CreateDirectory(ToFile)
             continue
         if ReadOnly:
-            chmod(ToFile, stat.S_IREAD)
+            chmod(ToFile, stat.S_IRUSR|stat.S_IRGRP|stat.S_IROTH)
         else:
-            chmod(ToFile, stat.S_IREAD|stat.S_IWRITE)            
-        Md5Sigature = md5.new(open(str(ToFile), 'rb').read())
+            chmod(ToFile, stat.S_IRUSR|stat.S_IRGRP|stat.S_IROTH|stat.S_IWUSR|stat.S_IWGRP|stat.S_IWOTH)            
+        Md5Sigature = md5.new(__FileHookOpen__(str(ToFile), 'rb').read())
         Md5Sum = Md5Sigature.hexdigest()
         if (ToFile, Md5Sum) not in Package.FileList:
             Package.FileList.append((ToFile, Md5Sum))
@@ -767,4 +934,35 @@ def GetDPFile(ZipFile):
         Logger.Error("PackagingTool", FILE_UNKNOWN_ERROR,
             ExtraData=ST.ERR_DIST_FILE_TOOFEW)
     return DescFile, ContentFile
+
+## InstallDp method
+#
+#   Install the distribution to current workspace
+#
+def InstallDp(DistPkg, DpPkgFileName, ContentZipFile, Options, Dep, WorkspaceDir, DataBase):
+    #
+    # PackageList, ModuleList record the information for the meta-data
+    # files that need to be generated later
+    #
+    PackageList = []
+    ModuleList = []
+    DistPkg.PackageSurfaceArea = GetPackageList(DistPkg, Dep, WorkspaceDir, Options, 
+                                                ContentZipFile, ModuleList, PackageList)
+
+    DistPkg.ModuleSurfaceArea = GetModuleList(DistPkg, Dep, WorkspaceDir, ContentZipFile, ModuleList)
+    
+    GenToolMisc(DistPkg, WorkspaceDir, ContentZipFile)
+    
+    #
+    # copy "Distribution File" to directory $(WORKSPACE)/conf/upt
+    #
+    DistFileName = os.path.split(DpPkgFileName)[1]
+    NewDpPkgFileName = BackupDist(DpPkgFileName, DistPkg.Header.GetGuid(), DistPkg.Header.GetVersion(), WorkspaceDir)
+
+    #
+    # update database
+    #
+    Logger.Quiet(ST.MSG_UPDATE_PACKAGE_DATABASE)
+    DataBase.AddDPObject(DistPkg, NewDpPkgFileName, DistFileName, 
+                   DistPkg.Header.RePackage)
 

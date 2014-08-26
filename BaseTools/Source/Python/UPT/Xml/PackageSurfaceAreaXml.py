@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse a Package file of .PKG file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -254,6 +254,16 @@ class PackageSurfaceAreaXml(object):
             Tmp = PcdEntryXml()
             PcdEntry = Tmp.FromXml2(SubItem, 'PcdEntry')
             Package.SetPcdList(Package.GetPcdList() + [PcdEntry])
+            
+            #
+            # Get PcdErrorCommentDict from PcdError in PcdEntry Node
+            #
+            for PcdErrorObj in PcdEntry.GetPcdErrorsList():
+                PcdErrorMessageList = PcdErrorObj.GetErrorMessageList()
+                if PcdErrorMessageList:
+                    Package.PcdErrorCommentDict[(PcdEntry.GetTokenSpaceGuidCName(), PcdErrorObj.GetErrorNumber())] = \
+                    PcdErrorMessageList
+                    
 
         if XmlList(Item, '/PackageSurfaceArea/PcdDeclarations') and not \
            XmlList(Item, '/PackageSurfaceArea/PcdDeclarations/PcdEntry'):

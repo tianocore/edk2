@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define strings used in the UPT tool
 #
-# Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -42,9 +42,9 @@ MSG_USAGE_STRING = _("\n"
 MSG_VERSION_NUMBER = _("1.0")
 MSG_VERSION = _("Intel(r) UEFI Packaging Tool (Intel(r) UEFIPT) - Revision " + \
                 MSG_VERSION_NUMBER)
-MSG_COPYRIGHT = _("Copyright (c) 2011 - 2013 Intel Corporation All Rights Reserved.")
+MSG_COPYRIGHT = _("Copyright (c) 2011 Intel Corporation All Rights Reserved.")
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
-MSG_USAGE = _("%s [options]\n%s" % ("upt.exe", MSG_VERSION_COPYRIGHT))
+MSG_USAGE = _("%s [options]\n%s" % ("UPT", MSG_VERSION_COPYRIGHT))
 MSG_DESCRIPTION = _("The Intel(r) UEFIUPT is used to create, " + \
                     "install or remove a UEFI Distribution Package.")
 
@@ -64,21 +64,23 @@ ERR_INF_PARSER_BUILD_OPTION_FORMAT_INVALID = \
     _("Build Option format incorrect.")
 ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID = _(
      "The format of binary %s item is incorrect. "
-     "It should contain at least 2 elements.")
+     "It should contain at least %d elements.")
 ERR_INF_PARSER_BINARY_ITEM_FORMAT_INVALID_MAX = _(
      "The format of binary %s item is invalid, "
-     "it should contain not more than %d elements.")    
+     "it should contain not more than %d elements.")
 ERR_INF_PARSER_BINARY_ITEM_INVALID_FILETYPE = _(
      "The Binary FileType is incorrect. It should in %s")
 ERR_INF_PARSER_BINARY_ITEM_FILE_NOT_EXIST = _(
      "The Binary File: %s not exist.")
+ERR_INF_PARSER_BINARY_ITEM_FILENAME_NOT_EXIST = _(
+     "The Binary File Name item not exist")
 ERR_INF_PARSER_BINARY_VER_TYPE = _(
      "Only this type is allowed: \"%s\".")
 ERR_INF_PARSER_MULTI_DEFINE_SECTION = \
     _("Multiple define sections found. "
       "It must be corrected before continuing.")
 ERR_INF_PARSER_DEFINE_ITEM_MORE_THAN_ONE_FOUND = \
-    _("More then 1 %s is defined in DEFINES section. "
+    _("More than 1 %s is defined in DEFINES section. "
       "It must be corrected before continuing.")
 ERR_INF_PARSER_DEFINE_NAME_INVALID = \
     _("Incorrect name format for : %s")
@@ -88,8 +90,8 @@ ERR_INF_PARSER_DEFINE_MODULETYPE_INVALID = _("Incorrect MODULE_TYPE: %s")
 ERR_INF_PARSER_DEFINE_FROMAT_INVALID = _("Incorrect format: %s")
 ERR_INF_PARSER_FILE_NOT_EXIST = _("This file does not exist: %s")
 ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID = \
-    _("The file does not exist or has an incorrect file name or not in "
-      "sub-directories of the directory containing the INF file: %s. "
+    _("The file does not exist or not in sub-directories "
+      "or has an incorrect file name of the directory containing the INF or DEC file: %s. "
       "It must be corrected before continuing")
 ERR_INF_PARSER_DEFINE_SHADOW_INVALID = \
    _("The SHADOW keyword is only valid for"
@@ -98,6 +100,8 @@ ERR_INF_PARSER_DEFINE_SECTION_HEADER_INVALID = \
     _("The format of the section header is incorrect")
 ERR_INF_PARSER_DEPEX_SECTION_INVALID = \
     _("A module can't have a Depex section when its module type is %s")
+ERR_INF_PARSER_DEPEX_SECTION_INVALID_FOR_BASE_LIBRARY_CLASS = \
+    _("A base type library class can't have a Depex section with module type not defined.")
 ERR_INF_PARSER_DEPEX_SECTION_INVALID_FOR_LIBRARY_CLASS = \
     _("A library class can't have a Depex section when its supported module type list is not defined.")
 ERR_INF_PARSER_DEPEX_SECTION_INVALID_FOR_DRIVER = \
@@ -212,6 +216,8 @@ ERR_INF_NO_PKG_DEPENDENCY_INFO = _("There are no packages defined that use the A
 #
 # Item duplicate
 #
+ERR_INF_PARSER_ITEM_DUPLICATE_IN_DEC = \
+_('"%s" is redefined in its dependent DEC files')
 ERR_INF_PARSER_ITEM_DUPLICATE = _("%s define duplicated! " 
                                   "It must be corrected before continuing.")
 ERR_INF_PARSER_ITEM_DUPLICATE_COMMON = _("%s define duplicated! Item listed" 
@@ -246,7 +252,7 @@ ERR_BO_CONTATIN_ASBUILD_AND_COMMON = _("A binary INF file should contain either 
 
 ERR_ASBUILD_PCD_SECTION_TYPE = _("The AsBuilt INF file contains a PCD section type that is not permitted: %s.")
 ERR_ASBUILD_PATCHPCD_FORMAT_INVALID = _("The AsBuilt PatchPcd entry must contain 3 elements: PcdName|Value|Offset")
-ERR_ASBUILD_PCDEX_FORMAT_INVALID = _("The AsBuilt PcdEx entry must contain 2 elements: PcdName|Value")
+ERR_ASBUILD_PCDEX_FORMAT_INVALID = _("The AsBuilt PcdEx entry must contain one element: PcdName")
 ERR_ASBUILD_PCD_VALUE_INVALID = \
     _("The AsBuilt PCD value %s is incorrect or not align with it's datum type %s. "
       "It must be corrected before continuing.")
@@ -349,7 +355,13 @@ MSG_NEW_FILE_NAME      = _(
 MSG_RELATIVE_PATH_ONLY = _("Please specify a relative path, full path is not allowed: %s")
 MSG_NEW_PKG_PATH  = _(
     "Select package location.  To quit with no input, press [Enter].")
-
+MSG_CHECK_DP_FOR_REPLACE = _("Verifying the dependency rule for replacement of distributions:\n %s replaces %s")
+MSG_CHECK_DP_FOR_INSTALL = _("Verifying the dependency rule for installation of distribution:\n %s")
+MSG_REPLACE_ALREADY_INSTALLED_DP = _("Distribution with the same GUID/Version is already installed, "
+                                     "replace would result in two instances, which is not allowed")
+MSG_RECOVER_START = _('An error was detected, recovery started ...')
+MSG_RECOVER_DONE = _('Recovery completed.')
+MSG_RECOVER_FAIL = _('Recovery failed.')
 #
 # Error related strings.
 #
@@ -378,6 +390,8 @@ ERR_PACKAGE_NOT_MATCH_DEPENDENCY = _(
     "This distribution package does not meet the dependency requirements")
 ERR_UNKNOWN_FATAL_INSTALL_ERR    = \
 _("Unknown unrecoverable error when installing: %s")
+ERR_UNKNOWN_FATAL_REPLACE_ERR    = \
+_("Unknown unrecoverable error during replacement of distributions: %s replaces %s")
 ERR_OPTION_NOT_FOUND             = _("Options not found")
 ERR_INVALID_PACKAGE_NAME         = _("Incorrect package name: %s. ")
 ERR_INVALID_PACKAGE_PATH         = \
@@ -393,6 +407,7 @@ ERR_PACKAGE_NOT_INSTALLED        = _(
 ERR_DISTRIBUTION_NOT_INSTALLED   = _(
     "The distribution package is not installed.")
 ERR_UNKNOWN_FATAL_REMOVING_ERR   = _("Unknown error when removing package")
+ERR_UNKNOWN_FATAL_INVENTORYWS_ERR   = _("Unknown error when inventorying WORKSPACE")
 ERR_NOT_CONFIGURE_WORKSPACE_ENV  = _(
     "The WORKSPACE environment variable must be configured.")
 ERR_NO_TEMPLATE_FILE             = _("This package information data file is not found: %s")
@@ -400,6 +415,10 @@ ERR_DEBUG_LEVEL                  = _(
     "Not supported debug level. Use default level instead.")
 ERR_REQUIRE_T_OPTION             = _(
     "Option -t is required during distribution creation.")
+ERR_REQUIRE_O_OPTION             = _(
+    "Option -o is required during distribution replacement.")
+ERR_REQUIRE_U_OPTION             = _(
+    "Option -u is required during distribution replacement.")
 ERR_REQUIRE_I_C_R_OPTION         = _(
     "Options -i, -c and -r are mutually exclusive.")
 ERR_I_C_EXCLUSIVE                = \
@@ -408,6 +427,11 @@ ERR_I_R_EXCLUSIVE                = \
 _("Option -i and -r are mutually exclusive.")
 ERR_C_R_EXCLUSIVE                = \
 _("Option -c and -r are mutually exclusive.")
+ERR_U_ICR_EXCLUSIVE                = \
+_("Option -u and -c/-i/-r are mutually exclusive.")
+
+ERR_L_OA_EXCLUSIVE                = \
+_("Option -l and -c/-i/-r/-u are mutually exclusive.")
 
 ERR_FAILED_LOAD                  = _("Failed to load %s\n\t%s")
 ERR_PLACEHOLDER_DIFFERENT_REPEAT = _(
@@ -551,32 +575,66 @@ ERR_INSTALL_FILE_DEC_FILE_ERROR = _("Could not obtain the TokenSpaceGuidCName an
 ERR_NOT_SUPPORTED_SA_MODULE = _("Stand-alone module distribution does not allow EDK 1 INF")
 ERR_INSTALL_DIST_NOT_FOUND               = \
 _("Distribution file to be installed is not found in current working directory or workspace: %s")
+ERR_REPLACE_DIST_NOT_FOUND               = \
+_("Distribution file for replace function was not found in the current working directory or workspace: %s")
+ERR_DIST_FILENAME_ONLY_FOR_REPLACE_ORIG               = \
+_("Only a distribution file name without a path is allowed for "
+  "the distribution to be replaced during replace. Current given: '%s'.")
+ERR_UNIPARSE_DBLQUOTE_UNMATCHED = \
+_("Only Language entry can contain a couple of matched quote in one line")
+ERR_UNIPARSE_NO_SECTION_EXIST = _("No PakcageDef or ModuleDef section exists in the UNI file.")
+ERR_UNIPARSE_STRNAME_FORMAT_ERROR = _("The String Token Name %s must start with \"STR_\"")
+ERR_UNIPARSE_SEP_LANGENTRY_LINE = _("Each <LangEntry> should be in a separate line :%s.")
+ERR_UNIPARSE_MULTI_ENTRY_EXIST = \
+_("There are same entries : %s in the UNI file, every kind of entry should be only one.")
+ERR_UNIPARSE_ENTRY_ORDER_WRONG = \
+_("The string entry order in UNI file should be <AbstractStrings>, <DescriptionStrings>, \
+<BinaryAbstractStrings>, <BinaryDescriptionStrings>.")
+ERR_UNIPARSE_STRTOKEN_FORMAT_ERROR = _("The String Token Type %s must be one of the '_PROMPT', '_HELP' and '_ERR_'.") 
+ERR_UNIPARSE_LINEFEED_UNDER_EXIST = _("Line feed should not exist under this line: %s.")
+ERR_UNIPARSE_LINEFEED_UP_EXIST = _("Line feed should not exist up this line: %s.")
+ERR_UNI_MISS_LANGENTRY = _("Language entry missed in this Entry, %s.")
 ERR_BINARY_HEADER_ORDER           = _("Binary header must follow the file header.")
 ERR_NO_SOURCE_HEADER              = _("File header statement \"## @file\" must exist at the first place.")
+ERR_UNI_FILE_SUFFIX_WRONG = _("The UNI file must have an extension of '.uni', '.UNI' or '.Uni'")
+ERR_UNI_FILE_NAME_INVALID = _("The use of '..', '../' and './' in the UNI file is prohibited.")
+ERR_UNI_SUBGUID_VALUE_DEFINE_DEC_NOT_FOUND = _("There are no DEC file to define the GUID value for \
+this GUID CName: '%s'.")
 
 #
 # Expression error message
 #
 ERR_EXPR_RIGHT_PAREN            = \
-_('Expected ")" in feature flag expression [%s]. Found: [%s].')
+_('Missing ")" in expression "%s".')
 ERR_EXPR_FACTOR                 = \
-_('Expected HEX, integer, macro, quoted string or PcdName in '
-  'feature flag expression [%s]. Found: [%s].')
+_('"%s" is expected to be HEX, integer, macro, quoted string or PcdName in '
+  'expression "%s".')
 ERR_EXPR_STRING_ITEM            = \
-_('Expected quoted string, macro name or PcdName in feature flag '
-  'expression [%s]. Found: [%s].')
+_('"%s" is expected to be HEX, integer, macro, quoted string or PcdName in '
+  'expression [%s].')
 ERR_EXPR_EQUALITY               = \
-_('Expected ==, EQ, != or NE  in feature flag expression [%s]. Found: [%s].')
+_('"%s" is expected to be ==, EQ, != or NE  in expression "%s".')
 ERR_EXPR_BOOLEAN                = \
-_('The rest of string [%s] in feature flag ' 
-  'expression [%s] cannot be evaluated.')
+_('The string "%s" in expression "%s" can not be recognized as a part of the logical expression.')
 ERR_EXPR_EMPTY                  = _('Boolean value cannot be empty.')
+ERR_EXPRESS_EMPTY               = _('Expression can not be empty.')
 ERR_EXPR_LOGICAL                = \
-_('The following cannot be evaluated as a logical expression: [%s].')
-ERR_EXPR_OR                     = _('The expression must be encapsulated in open "(" and close ")" '
+_('The following is not a valid logical expression: "%s".')
+ERR_EXPR_OR                     = _('The expression: "%s" must be encapsulated in open "(" and close ")" '
                                     'parenthesis when using | or ||.')
+ERR_EXPR_RANGE                  = \
+_('The following is not a valid range expression: "%s".')
+ERR_EXPR_RANGE_FACTOR           = \
+_('"%s" is expected to be HEX, integer in valid range expression "%s".')
+ERR_EXPR_RANGE_DOUBLE_PAREN_NESTED = \
+_('Double parentheses nested is not allowed in valid range expression: "%s".')
+ERR_EXPR_RANGE_EMPTY            = _('Valid range can not be empty.')
+ERR_EXPR_LIST_EMPTY             = _('Valid list can not be empty.')
+ERR_PAREN_NOT_USED              = _('Parenthesis must be used on both sides of "OR", "AND" in valid range : %s.')
+ERR_EXPR_LIST                   = \
+_('The following is not a valid list expression: "%s".')
 
-#
+
 # DEC parser error message
 #
 ERR_DECPARSE_STATEMENT_EMPTY        = \
@@ -632,6 +690,8 @@ ERR_DECPARSE_PCD_VOID               = \
 _("Incorrect  value [%s] of type [%s].  Value  must be printable and in the "
   "form of{...} for array, or ""..."" for string, or L""..."""
   "for unicode string.")
+ERR_DECPARSE_PCD_VALUE_EMPTY        = \
+_("Pcd value can not be empty.") 
 ERR_DECPARSE_PCD_BOOL               = \
 _("Invalid value [%s] of type [%s]; must be expression, TRUE, FALSE, 0 or 1.")
 ERR_DECPARSE_PCD_INT                = _("Incorrect value [%s] of type [%s]."\
@@ -657,6 +717,7 @@ _("No GUID value specified, must be <CName> = <GuidValueInCFormat>.")
 ERR_DECPARSE_CGUID_GUIDFORMAT       = \
 _("Incorrect GUID value format, must be <GuidValueInCFormat:" 
   "{8,4,4,{2,2,2,2,2,2,2,2}}>.")
+ERR_DECPARSE_CGUID_NOT_FOUND = _("Unable to find the GUID value of this GUID CName : '%s'.")
 ERR_DECPARSE_FILEOPEN               = _("Unable to open: [%s].")
 ERR_DECPARSE_SECTION_EMPTY          = _("Empty sections are not allowed.")
 ERR_DECPARSE_SECTION_UE             = _("Incorrect UserExtentions format. "
@@ -697,7 +758,13 @@ ERR_DECPARSE_REDEFINE               = _(
 ERR_DECPARSE_MACRO_RESOLVE          = _("Macro %s in %s cannot be resolved.")
 ERR_DECPARSE_UE_DUPLICATE           = \
     _("Duplicated UserExtensions header found.")
-
+ERR_DECPARSE_PCDERRORMSG_MISS_VALUE_SPLIT = \
+    _("Missing '|' between Pcd's error code and Pcd's error message.")
+ERR_DECPARSE_PCD_MISS_ERRORMSG = \
+    _("Missing Pcd's error message.")
+ERR_DECPARSE_PCD_UNMATCHED_ERRORCODE = \
+    _("There is no error message matched with this Pcd error code : %s in both DEC and UNI file.")
+ERR_DECPARSE_PCD_NODEFINED = _("The PCD : %s used in the Expression is undefined.")
 #
 # Used to print the current line content which cause error raise.
 # Be attached to the end of every error message above.
@@ -718,8 +785,11 @@ WRN_DIST_PKG_INSTALLED    = _("This distribution package has been installed")
 WRN_DIST_NOT_FOUND         = _(
     "Distribution is not found at location %s")
 WRN_MULTI_PCD_RANGES      = _(
-    "A PCD can only have one each of @ValidRange, @ValidList, "
-    "and @Expression comment")
+    "A PCD can only have one type of @ValidRange, @ValidList, and @Expression comment")
+WRN_MULTI_PCD_VALIDVALUE  = _(
+    "A PCD can only have one of @ValidList comment")
+WRN_MULTI_PCD_PROMPT      = _(
+    "A PCD can only have one of @Prompt comment")
 WRN_MISSING_USAGE                = _("Missing usage")
 WRN_INVALID_GUID_TYPE            = _("This is and incorrect Guid type: %s")
 WRN_MISSING_GUID_TYPE            = _("Missing Guid Type")
@@ -742,6 +812,8 @@ WARN_SPECIAL_SECTION_LOCATION_WRONG = _("Warning. A special section should be "
                                         "at the end of a file or at the end of a section.")
 WARN_INSTALLED_PACKAGE_NOT_FOUND = \
     _("File not found. The DEC file for a package cannot be found in GUID/Version/Install path: %s %s %s")
+WARN_CUSTOMPATH_OVERRIDE_USEGUIDEDPATH = \
+    _("option selection of --custom-path will override the option --use-guided-paths")
 
 #
 # Help related strings.
@@ -766,11 +838,19 @@ HLP_SPECIFY_DEC_NAME_CREATE      = _(
     "Specify dec file names to create package")
 HLP_SPECIFY_INF_NAME_CREATE      = _(
     "Specify inf file names to create package")
+HLP_LIST_DIST_INSTALLED      = _(
+    "List the UEFI Distribution Packages that have been installed")
 HLP_NO_SUPPORT_GUI               = _(
     "Starting the tool in graphical mode is not supported in this version")
 HLP_DISABLE_PROMPT               = _(
-    "Disable all user prompts")
+    "Disable user prompts for removing modified files. Valid only when -r is present")
 HLP_CUSTOM_PATH_PROMPT           = _(
     "Enable user prompting for alternate installation directories")
 HLP_SKIP_LOCK_CHECK              = _(
     "Skip the check for multiple instances")
+HLP_SPECIFY_PACKAGE_NAME_REPLACE  = _(
+    "Specify the UEFI Distribution Package file name to replace the existing file name")
+HLP_SPECIFY_PACKAGE_NAME_TO_BE_REPLACED = _(
+    "Specify the UEFI Distribution Package file name to be replaced")
+HLP_USE_GUIDED_PATHS = _(
+    "Install packages to the following directory path by default: <PackageName>_<PACKAGE_GUID>_<PACKAGE_VERSION>")

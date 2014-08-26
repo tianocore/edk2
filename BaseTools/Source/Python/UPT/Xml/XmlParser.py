@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse a xml file of .PKG file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -38,7 +38,6 @@ from Logger.StringTable import ERR_XML_INVALID_EXTERN_SUPARCHLIST
 from Logger.StringTable import ERR_XML_INVALID_EXTERN_SUPMODLIST
 from Logger.StringTable import ERR_XML_INVALID_EXTERN_SUPMODLIST_NOT_LIB
 from Logger.StringTable import ERR_FILE_NAME_INVALIDE
-from Logger.StringTable import ERR_XML_INVALID_BINARY_FILE_TYPE
 from Logger.ToolError import PARSER_ERROR
 from Logger.ToolError import FORMAT_INVALID
 
@@ -78,12 +77,25 @@ class DistributionPackageXml(object):
                 DpHeader = self.DistP.Header
                 XmlTreeLevel = ['DistributionPackage', 'DistributionHeader']
                 CheckDict = Sdict()
+                if DpHeader.GetAbstract():
+                    DPAbstract = DpHeader.GetAbstract()[0][1]
+                else:
+                    DPAbstract = ''
+                if DpHeader.GetCopyright():
+                    DPCopyright = DpHeader.GetCopyright()[0][1]
+                else:
+                    DPCopyright = ''
+                if DpHeader.GetLicense():
+                    DPLicense = DpHeader.GetLicense()[0][1]
+                else:
+                    DPLicense = ''
+                
                 CheckDict['Name'] = DpHeader.GetName()
                 CheckDict['GUID'] = DpHeader.GetGuid()
                 CheckDict['Version'] = DpHeader.GetVersion()
-                CheckDict['Copyright'] = DpHeader.GetCopyright()
-                CheckDict['License'] = DpHeader.GetLicense()
-                CheckDict['Abstract'] = DpHeader.GetAbstract()
+                CheckDict['Copyright'] = DPCopyright
+                CheckDict['License'] = DPLicense
+                CheckDict['Abstract'] = DPAbstract
                 CheckDict['Vendor'] = DpHeader.GetVendor()
                 CheckDict['Date'] = DpHeader.GetDate()
                 CheckDict['XmlSpecification'] = DpHeader.GetXmlSpecification()
@@ -610,11 +622,6 @@ def ValidateMS2(Module, TopXmlTreeLevel):
         if Item and len(Item.FileNamList) > 0 and Item.FileNamList[0].FileType == 'FREEFORM':
             Item.FileNamList[0].FileType = 'SUBTYPE_GUID'
             Module.GetBinaryFileList()[ItemCount] = Item
-        if Item and len(Item.FileNamList) > 0 and Item.FileNamList[0].FileType == 'DISPOSABLE':
-            Logger.Error('\nUPT',
-                 PARSER_ERROR,
-                 ERR_XML_INVALID_BINARY_FILE_TYPE % ('DISPOSABLE'),
-                 RaiseError=True)           
 
 ## ValidateMS3
 #
@@ -697,8 +704,7 @@ def ValidateMS3(Module, TopXmlTreeLevel):
             for PcdExItem in AsBuilt.PcdExValueList:
                 CheckDict = {'TokenSpaceGuidValue':PcdExItem.TokenSpaceGuidValue,
                              'Token':PcdExItem.Token,
-                             'DatumType':PcdExItem.DatumType,
-                             'Value':PcdExItem.DefaultValue}
+                             'DatumType':PcdExItem.DatumType}
                 XmlTreeLevel = TopXmlTreeLevel + ['BinaryFiles', 'BinaryFile', 'AsBuilt', 'PcdExValue']
                 IsRequiredItemListNull(CheckDict, XmlTreeLevel)
                 #

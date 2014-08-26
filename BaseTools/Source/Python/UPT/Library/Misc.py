@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -41,11 +41,15 @@ from Library import GlobalData
 from Library.DataType import SUP_MODULE_LIST
 from Library.DataType import END_OF_LINE
 from Library.DataType import TAB_SPLIT
-from Library.DataType import LANGUAGE_EN_US
+from Library.DataType import TAB_LANGUAGE_EN_US
+from Library.DataType import TAB_LANGUAGE_EN
+from Library.DataType import TAB_LANGUAGE_EN_X
+from Library.DataType import TAB_UNI_FILE_SUFFIXS
 from Library.String import GetSplitValueList
 from Library.ParserValidate import IsValidHexVersion
 from Library.ParserValidate import IsValidPath
 from Object.POM.CommonObject import TextObject
+from Core.FileHook import __FileHookOpen__
 
 ## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C 
 # structure style
@@ -160,14 +164,14 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
 
     if os.path.exists(File):
         try:
-            if Content == open(File, "rb").read():
+            if Content == __FileHookOpen__(File, "rb").read():
                 return False
         except BaseException:
             Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
 
     CreateDirectory(os.path.dirname(File))
     try:
-        FileFd = open(File, "wb")
+        FileFd = __FileHookOpen__(File, "wb")
         FileFd.write(Content)
         FileFd.close()
     except BaseException:
@@ -188,6 +192,8 @@ def GetFiles(Root, SkipList=None, FullPath=True):
             for Item in SkipList:
                 if Item in Dirs:
                     Dirs.remove(Item)
+                if Item in Files:
+                    Files.remove(Item)
         for Dir in Dirs:
             if Dir.startswith('.'):
                 Dirs.remove(Dir)
@@ -566,39 +572,46 @@ class PathClass(object):
 
     Key = property(_GetFileKey)
 
-## Check environment variables
+## Get current workspace
 #
-#  Check environment variables that must be set for build. Currently they are
+#  get WORKSPACE from environment variable if present,if not use current working directory as WORKSPACE
 #
-#   WORKSPACE           The directory all packages/platforms start from
-#   EDK_TOOLS_PATH      The directory contains all tools needed by the build
-#   PATH                $(EDK_TOOLS_PATH)/Bin/<sys> must be set in PATH
-#
-#   If any of above environment variable is not set or has error, the build
-#   will be broken.
-#
-def CheckEnvVariable():
+def GetWorkspace():
     #
     # check WORKSPACE
     #
-    if "WORKSPACE" not in environ:
-        Logger.Error("UPT",
-                     ToolError.UPT_ENVIRON_MISSING_ERROR,
-                     ST.ERR_NOT_FOUND_ENVIRONMENT,
-                     ExtraData="WORKSPACE")
+    if "WORKSPACE" in environ:
+        WorkspaceDir = os.path.normpath(environ["WORKSPACE"])
+        if not os.path.exists(WorkspaceDir):
+            Logger.Error("UPT",
+                         ToolError.UPT_ENVIRON_MISSING_ERROR,
+                         ST.ERR_WORKSPACE_NOTEXIST,
+                         ExtraData="%s" % WorkspaceDir)
+    else:
+        WorkspaceDir = os.getcwd()
 
-    WorkspaceDir = os.path.normpath(environ["WORKSPACE"])
-    if not os.path.exists(WorkspaceDir):
-        Logger.Error("UPT",
-                     ToolError.UPT_ENVIRON_MISSING_ERROR,
-                     ST.ERR_WORKSPACE_NOTEXIST,
-                     ExtraData="%s" % WorkspaceDir)
-    elif ' ' in WorkspaceDir:
-        Logger.Error("UPT",
-                     ToolError.FORMAT_NOT_SUPPORTED,
-                     ST.ERR_SPACE_NOTALLOWED,
-                     ExtraData=WorkspaceDir)
+    if WorkspaceDir[-1] == ':':
+        WorkspaceDir += os.sep
+    return WorkspaceDir
 
+## Get relative path
+#
+#  use full path and workspace to get relative path
+#  the destination of this function is mainly to resolve the root path issue(like c: or c:\)  
+#
+#  @param Fullpath: a string of fullpath
+#  @param Workspace: a string of workspace
+#
+def GetRelativePath(Fullpath, Workspace):
+    
+    RelativePath = ''
+    if Workspace.endswith(os.sep):
+        RelativePath = Fullpath[Fullpath.upper().find(Workspace.upper())+len(Workspace):]
+    else:
+        RelativePath = Fullpath[Fullpath.upper().find(Workspace.upper())+len(Workspace)+1:]
+        
+    return RelativePath
+    
 ## Check whether all module types are in list
 #
 # check whether all module types (SUP_MODULE_LIST) are in list
@@ -644,7 +657,7 @@ class MergeCommentDict(dict):
 #
 def GenDummyHelpTextObj():
     HelpTxt = TextObject()
-    HelpTxt.SetLang(LANGUAGE_EN_US)
+    HelpTxt.SetLang(TAB_LANGUAGE_EN_US)
     HelpTxt.SetString(' ')
     return HelpTxt
 
@@ -972,3 +985,136 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
             VerString = GetSplitValueList(VerString, '=', 1)[1]
 
         return FileGuidString, VerString
+
+## GetLocalValue
+#
+# Generate the local value for INF and DEC file. If Lang attribute not present, then use this value.
+# If present, and there is no element without the Lang attribute, and one of the elements has the rfc1766 code is 
+# "en-x-tianocore", or "en-US" if "en-x-tianocore" was not found, or "en" if "en-US" was not found, or startswith 'en' 
+# if 'en' was not found, then use this value.
+# If multiple entries of a tag exist which have the same language code, use the last entry.
+#
+# @param ValueList  A list need to be processed.
+# @param UseFirstValue: True to use the first value, False to use the last value 
+#
+# @return LocalValue
+def GetLocalValue(ValueList, UseFirstValue=False):
+    Value1 = ''
+    Value2 = ''
+    Value3 = ''
+    Value4 = ''
+    Value5 = ''
+    for (Key, Value) in ValueList:
+        if Key == TAB_LANGUAGE_EN_X:
+            if UseFirstValue:
+                if not Value1:
+                    Value1 = Value
+            else:
+                Value1 = Value
+        if Key == TAB_LANGUAGE_EN_US:
+            if UseFirstValue:
+                if not Value2:
+                    Value2 = Value
+            else:
+                Value2 = Value
+        if Key == TAB_LANGUAGE_EN:
+            if UseFirstValue:
+                if not Value3:
+                    Value3 = Value
+            else:
+                Value3 = Value
+        if Key.startswith(TAB_LANGUAGE_EN):
+            if UseFirstValue:
+                if not Value4:
+                    Value4 = Value
+            else:
+                Value4 = Value
+        if Key == '':
+            if UseFirstValue:
+                if not Value5:
+                    Value5 = Value
+            else:
+                Value5 = Value
+            
+    if Value1:
+        return Value1
+    if Value2:
+        return Value2
+    if Value3:
+        return Value3
+    if Value4:
+        return Value4
+    if Value5:
+        return Value5
+    
+    return ''
+
+
+## GetCharIndexOutStr
+#
+# Get comment character index outside a string
+#
+# @param Line:              The string to be checked
+# @param CommentCharacter:  Comment char, used to ignore comment content
+#
+# @retval Index
+#
+def GetCharIndexOutStr(CommentCharacter, Line):
+    #
+    # remove whitespace
+    #
+    Line = Line.strip()
+
+    #
+    # Check whether comment character is in a string
+    #
+    InString = False
+    for Index in range(0, len(Line)):
+        if Line[Index] == '"':
+            InString = not InString
+        elif Line[Index] == CommentCharacter and InString :
+            pass
+        elif Line[Index] == CommentCharacter and (Index +1) < len(Line) and Line[Index+1] == CommentCharacter \
+            and not InString :
+            return Index
+    return -1
+
+## ValidateUNIFilePath
+#
+# Check the UNI file path
+#
+# @param FilePath: The UNI file path 
+#
+def ValidateUNIFilePath(Path):
+    Suffix = Path[Path.rfind(TAB_SPLIT):]
+    
+    #
+    # Check if the suffix is one of the '.uni', '.UNI', '.Uni' 
+    #
+    if Suffix not in TAB_UNI_FILE_SUFFIXS:
+        Logger.Error("Unicode File Parser", 
+                        ToolError.FORMAT_INVALID, 
+                        Message=ST.ERR_UNI_FILE_SUFFIX_WRONG, 
+                        ExtraData=Path)    
+    
+    #
+    # Check if '..' in the file name(without suffixe)
+    #
+    if (TAB_SPLIT + TAB_SPLIT) in Path:
+        Logger.Error("Unicode File Parser", 
+                        ToolError.FORMAT_INVALID, 
+                        Message=ST.ERR_UNI_FILE_NAME_INVALID, 
+                        ExtraData=Path)    
+    
+    #
+    # Check if the file name is valid according to the DEC and INF specification
+    #
+    Pattern = '[a-zA-Z0-9_][a-zA-Z0-9_\-\.]*'
+    FileName = Path.replace(Suffix, '')
+    InvalidCh = re.sub(Pattern, '', FileName)
+    if InvalidCh:
+        Logger.Error("Unicode File Parser", 
+                        ToolError.FORMAT_INVALID, 
+                        Message=ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID, 
+                        ExtraData=Path)    
+

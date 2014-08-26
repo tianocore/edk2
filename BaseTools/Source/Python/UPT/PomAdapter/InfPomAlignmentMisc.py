@@ -1,7 +1,7 @@
 ## @file InfPomAlignmentMisc.py
 # This file contained the routines for InfPomAlignment
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -24,6 +24,10 @@ from Library import DataType as DT
 from Library.Misc import ConvertArchList
 from Object.POM.ModuleObject import BinaryFileObject
 from Object.POM import CommonObject
+from Library.String import FORMAT_INVALID
+from Library.Misc import CheckGuidRegFormat
+from Logger import StringTable as ST
+
 
 ## GenModuleHeaderUserExt
 #
@@ -167,7 +171,8 @@ def _GenInfDefineStateMent(HeaderComment, Name, Value, TailComment):
 ## GenBinaryData
 #
 #
-def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObjectList, SupArchList, BinaryModule):
+def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObjectList, \
+                  SupArchList, BinaryModule, DecObjList=None):
     if BinaryModule:
         pass
     OriSupArchList = SupArchList
@@ -179,6 +184,7 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
         else:
             TagName = ''
             Family = ''
+        
         FFE = ItemObj.GetFeatureFlagExp()
 
         #
@@ -200,6 +206,41 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
         FileNameObj.SetFileType(ItemObj.GetType())
         FileNameObj.SetFilename(ItemObj.GetFileName())
         FileNameObj.SetFeatureFlag(FFE)
+        #
+        # Get GUID value of the GUID CName in the DEC file
+        #
+        if ItemObj.GetType() == DT.SUBTYPE_GUID_BINARY_FILE_TYPE:                
+            if not CheckGuidRegFormat(ItemObj.GetGuidValue()):
+                if not DecObjList:
+                    if DT.TAB_HORIZON_LINE_SPLIT in ItemObj.GetGuidValue() or \
+                        DT.TAB_COMMA_SPLIT in ItemObj.GetGuidValue():
+                        Logger.Error("\nMkPkg",
+                                 FORMAT_INVALID,
+                                 ST.ERR_DECPARSE_DEFINE_PKGGUID,
+                                 ExtraData=ItemObj.GetGuidValue(),
+                                 RaiseError=True)
+                    else:
+                        Logger.Error("\nMkPkg",
+                                     FORMAT_INVALID,
+                                     ST.ERR_UNI_SUBGUID_VALUE_DEFINE_DEC_NOT_FOUND % \
+                                     (ItemObj.GetGuidValue()),
+                                     RaiseError=True)
+                else:
+                    for DecObj in DecObjList:
+                        for GuidObj in DecObj.GetGuidList():
+                            if GuidObj.GetCName() == ItemObj.GetGuidValue():
+                                FileNameObj.SetGuidValue(GuidObj.GetGuid())
+                                break
+
+                    if not FileNameObj.GetGuidValue():                        
+                        Logger.Error("\nMkPkg",
+                                         FORMAT_INVALID,
+                                         ST.ERR_DECPARSE_CGUID_NOT_FOUND % \
+                                         (ItemObj.GetGuidValue()),
+                                         RaiseError=True)  
+            else:
+                FileNameObj.SetGuidValue(ItemObj.GetGuidValue().strip())
+
         FileNameObj.SetSupArchList(SupArchList)
         FileNameList = [FileNameObj]
 

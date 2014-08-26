@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for [Libraries] sections in INF file 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -44,21 +44,21 @@ class InfLibrarySectionParser(InfParserSectionRoot):
             # Macro defined in this section 
             #
             SectionMacros = {}
-            ValueList     = []
-            LibraryList   = []
-            LibStillCommentFalg  = False
-            LibHeaderComments    = []
-            LibLineComment       = None              
+            ValueList = []
+            LibraryList = []
+            LibStillCommentFalg = False
+            LibHeaderComments = []
+            LibLineComment = None
             #
             # Parse section content
             #
             for Line in SectionString:
                 LibLineContent = Line[0]
-                LibLineNo      = Line[1]
-                
+                LibLineNo = Line[1]
+
                 if LibLineContent.strip() == '':
                     continue
-                
+
                 #
                 # Found Header Comments 
                 #
@@ -82,14 +82,14 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                         continue
                 else:
                     LibStillCommentFalg = False
-                              
+
                 if len(LibHeaderComments) >= 1:
                     LibLineComment = InfLineCommentObject()
                     LineCommentContent = ''
                     for Item in LibHeaderComments:
                         LineCommentContent += Item[0] + DT.END_OF_LINE
                     LibLineComment.SetHeaderComments(LineCommentContent)
-                
+
                 #
                 # Find Tail comment.
                 #
@@ -98,8 +98,8 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                     LibLineContent = LibLineContent[:LibLineContent.find(DT.TAB_COMMENT_SPLIT)]
                     if LibLineComment == None:
                         LibLineComment = InfLineCommentObject()
-                    LibLineComment.SetTailComments(LibTailComments)            
-                
+                    LibLineComment.SetTailComments(LibTailComments)
+
                 #
                 # Find Macro
                 #
@@ -110,28 +110,28 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                 if Name != None:
                     SectionMacros[Name] = Value
                     LibLineComment = None
-                    LibHeaderComments = []                
+                    LibHeaderComments = []
                     continue
-                
+
                 TokenList = GetSplitValueList(LibLineContent, DT.TAB_VALUE_SPLIT, 1)
                 ValueList[0:len(TokenList)] = TokenList
-    
+
                 #
                 # Replace with Local section Macro and [Defines] section Macro.
                 #            
-                ValueList = [InfExpandMacro(Value, (FileName, LibLineContent, LibLineNo), 
+                ValueList = [InfExpandMacro(Value, (FileName, LibLineContent, LibLineNo),
                                             self.FileLocalMacros, SectionMacros, True)
                                             for Value in ValueList]
-    
-                LibraryList.append((ValueList, LibLineComment, 
+
+                LibraryList.append((ValueList, LibLineComment,
                                     (LibLineContent, LibLineNo, FileName)))
                 ValueList = []
                 LibLineComment = None
                 LibTailComments = ''
                 LibHeaderComments = []
-                
+
                 continue
-    
+
             #
             # Current section archs
             #    
@@ -139,36 +139,36 @@ class InfLibrarySectionParser(InfParserSectionRoot):
             for Item in self.LastSectionHeaderContent:
                 if (Item[1], Item[2]) not in KeyList:
                     KeyList.append((Item[1], Item[2]))
-                                   
-            if not InfSectionObject.SetLibraryClasses(LibraryList, KeyList = KeyList):
-                Logger.Error('InfParser', 
+
+            if not InfSectionObject.SetLibraryClasses(LibraryList, KeyList=KeyList):
+                Logger.Error('InfParser',
                              FORMAT_INVALID,
                              ST.ERR_INF_PARSER_MODULE_SECTION_TYPE_ERROR % ("[Library]"),
-                             File=FileName, 
+                             File=FileName,
                              Line=Item[3])
         #
         # For Binary INF
         #
         else:
             self.InfAsBuiltLibraryParser(SectionString, InfSectionObject, FileName)
-                
+
     def InfAsBuiltLibraryParser(self, SectionString, InfSectionObject, FileName):
         LibraryList = []
         LibInsFlag = False
         for Line in SectionString:
             LineContent = Line[0]
-            LineNo      = Line[1]
-            
+            LineNo = Line[1]
+
             if LineContent.strip() == '':
                 LibInsFlag = False
                 continue
-            
+
             if not LineContent.strip().startswith("#"):
-                Logger.Error('InfParser', 
+                Logger.Error('InfParser',
                             FORMAT_INVALID,
-                            ST.ERR_LIB_CONTATIN_ASBUILD_AND_COMMON, 
-                            File=FileName, 
-                            Line=LineNo, 
+                            ST.ERR_LIB_CONTATIN_ASBUILD_AND_COMMON,
+                            File=FileName,
+                            Line=LineNo,
                             ExtraData=LineContent)
 
             if IsLibInstanceInfo(LineContent):
@@ -185,13 +185,6 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                 if LibGuid != '':
                     if (LibGuid, LibVer) not in LibraryList:
                         LibraryList.append((LibGuid, LibVer))
-                else:
-                    Logger.Error('InfParser',
-                            FORMAT_INVALID,
-                            ST.ERR_LIB_INSTANCE_MISS_GUID,
-                            File=FileName,
-                            Line=LineNo,
-                            ExtraData=LineContent)
 
         #
         # Current section archs
@@ -201,10 +194,10 @@ class InfLibrarySectionParser(InfParserSectionRoot):
         for Item in self.LastSectionHeaderContent:
             if (Item[1], Item[2]) not in KeyList:
                 KeyList.append((Item[1], Item[2]))
-                
-        if not InfSectionObject.SetLibraryClasses(LibraryList, KeyList = KeyList):
-            Logger.Error('InfParser', 
+
+        if not InfSectionObject.SetLibraryClasses(LibraryList, KeyList=KeyList):
+            Logger.Error('InfParser',
                          FORMAT_INVALID,
                          ST.ERR_INF_PARSER_MODULE_SECTION_TYPE_ERROR % ("[Library]"),
-                         File=FileName, 
-                         Line=Item[3])           
+                         File=FileName,
+                         Line=Item[3])

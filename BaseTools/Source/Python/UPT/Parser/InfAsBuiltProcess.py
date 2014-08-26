@@ -1,7 +1,7 @@
 ## @file
 # This file is used to provide method for process AsBuilt INF file. It will consumed by InfParser
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -19,7 +19,6 @@ InfAsBuiltProcess
 import os
 import re
 from Library import GlobalData
-
 import Logger.Log as Logger
 from Logger import StringTable as ST
 from Logger import ToolError
@@ -74,7 +73,7 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo, CurrentInfFileName):
         if VersionMatchedObj:
             Guid = GuidMatchedObj.group().strip()
             Version = VersionMatchedObj.group().strip()
-            return GetGuidVerFormLibInstance(Guid, Version, WorkSpace, CurrentInfFileName)
+            return Guid, Version
 
     #
     # To deal with library instance specified by file name
@@ -106,47 +105,47 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo, CurrentInfFileName):
 # @param WorkSpace. The WorkSpace directory used to combined with INF file path.
 #
 # @return GUID, Version
-def GetPackageListInfo(FileNameString, WorkSpace, LineNo): 
+def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
     PackageInfoList = []
     DefineSectionMacros = {}
     PackageSectionMacros = {}
-    
+
     FileLinesList = GetFileLineContent(FileNameString, WorkSpace, LineNo, '')
-    
+
     RePackageHeader = re.compile('^\s*\[Packages.*\].*$')
     ReDefineHeader = re.compile('^\s*\[Defines].*$')
-    
+
     PackageHederFlag = False
     DefineHeaderFlag = False
     LineNo = -1
     for Line in FileLinesList:
         LineNo += 1
         Line = Line.strip()
-        
+
         if Line.startswith('['):
             PackageHederFlag = False
-            DefineHeaderFlag = False            
-        
+            DefineHeaderFlag = False
+
         if Line.startswith("#"):
             continue
-        
+
         if not Line:
-            continue        
-        
+            continue
+
         #
         # Found [Packages] section 
         #
         if RePackageHeader.match(Line):
             PackageHederFlag = True
             continue
-        
+
         #
         # Found [Define] section
         #
         if ReDefineHeader.match(Line):
             DefineHeaderFlag = True
             continue
-        
+
         if DefineHeaderFlag:
             #
             # Find Macro
@@ -154,12 +153,12 @@ def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
             Name, Value = MacroParser((Line, LineNo),
                                       FileNameString,
                                       DT.MODEL_META_DATA_HEADER,
-                                      DefineSectionMacros) 
-                       
+                                      DefineSectionMacros)
+
             if Name != None:
-                DefineSectionMacros[Name] = Value               
+                DefineSectionMacros[Name] = Value
                 continue
-            
+
         if PackageHederFlag:
 
             #
@@ -170,22 +169,22 @@ def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
                                       DT.MODEL_META_DATA_PACKAGE,
                                       DefineSectionMacros)
             if Name != None:
-                PackageSectionMacros[Name] = Value               
+                PackageSectionMacros[Name] = Value
                 continue
-            
+
             #
             # Replace with Local section Macro and [Defines] section Macro.
             #            
             Line = InfExpandMacro(Line, (FileNameString, Line, LineNo), DefineSectionMacros, PackageSectionMacros, True)
-            
+
             Line = GetSplitValueList(Line, "#", 1)[0]
             Line = GetSplitValueList(Line, "|", 1)[0]
             PackageInfoList.append(Line)
-     
-    return PackageInfoList    
-    
+
+    return PackageInfoList
+
 def GetFileLineContent(FileName, WorkSpace, LineNo, OriginalString):
-    
+
     if not LineNo:
         LineNo = -1
 
@@ -194,26 +193,16 @@ def GetFileLineContent(FileName, WorkSpace, LineNo, OriginalString):
     #
     FullFileName = os.path.normpath(os.path.realpath(os.path.join(WorkSpace, FileName)))
     if not (ValidFile(FullFileName)):
-        Logger.Error("InfParser", 
-                     ToolError.FORMAT_INVALID,
-                     ST.ERR_FILELIST_EXIST%(FileName),
-                     File=GlobalData.gINF_MODULE_NAME,
-                     Line=LineNo, 
-                     ExtraData=OriginalString)
-    
+        return []
+
     #
     # Validate file exist/format.
     #
     if not IsValidPath(FileName, WorkSpace):
-        Logger.Error("InfParser", 
-                     ToolError.FORMAT_INVALID,
-                     ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID%(FileName),
-                     File=GlobalData.gINF_MODULE_NAME, 
-                     Line=LineNo, 
-                     ExtraData=OriginalString)
-    
+        return []
+
     FileLinesList = []
-    
+
     try:
         FullFileName = FullFileName.replace('\\', '/')
         Inputfile = open(FullFileName, "rb", 0)
@@ -228,9 +217,9 @@ def GetFileLineContent(FileName, WorkSpace, LineNo, OriginalString):
                      ToolError.FILE_READ_FAILURE,
                      ST.ERR_FILE_OPEN_FAILURE,
                      File=FullFileName)
-    
+
     FileLinesList = ProcessLineExtender(FileLinesList)
-    
+
     return FileLinesList
 
 ##

@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common items of class object
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -14,7 +14,7 @@
 '''
 Common Object
 '''
-from Library.DataType import LANGUAGE_EN_US
+from Library.DataType import TAB_LANGUAGE_EN_US
 
 ## HelpTextObject
 #
@@ -44,6 +44,20 @@ class HelpTextListObject(object):
     def GetHelpTextList(self):
         return self.HelpTextList
 
+## PromptListObject
+#
+# @param object:       Inherited from object class
+#
+class PromptListObject(object):
+    def __init__(self):
+        self.PromptList = []
+    
+    def SetPromptList(self, PromptList):
+        self.PromptList = PromptList
+    
+    def GetPromptList(self):
+        return self.PromptList
+    
 ## CommonPropertiesObject
 #
 # This class defined common attribution used in Module/Platform/Package files
@@ -60,6 +74,7 @@ class CommonPropertiesObject(HelpTextObject, HelpTextListObject):
         self.Usage = []
         self.FeatureFlag = ''
         self.SupArchList = []
+        self.GuidValue = ''
         HelpTextObject.__init__(self)
         HelpTextListObject.__init__(self)
         
@@ -80,6 +95,12 @@ class CommonPropertiesObject(HelpTextObject, HelpTextListObject):
 
     def GetSupArchList(self):
         return self.SupArchList
+    
+    def SetGuidValue(self, GuidValue):
+        self.GuidValue = GuidValue
+        
+    def GetGuidValue(self):
+        return self.GuidValue
 
 ## CommonHeaderObject
 #
@@ -89,35 +110,96 @@ class CommonPropertiesObject(HelpTextObject, HelpTextListObject):
 #
 class CommonHeaderObject(object):
     def __init__(self):
-        self.Abstract = ''
-        self.Description = ''
-        self.Copyright = ''
-        self.License = ''
+        self.AbstractList = []
+        self.DescriptionList = []
+        self.CopyrightList = []
+        self.LicenseList = []
 
     def SetAbstract(self, Abstract):
-        self.Abstract = Abstract
+        if isinstance(Abstract, list):
+            self.AbstractList = Abstract
+        else:
+            self.AbstractList.append(Abstract)
 
     def GetAbstract(self):
-        return self.Abstract
+        return self.AbstractList
 
     def SetDescription(self, Description):
-        self.Description = Description
+        if isinstance(Description, list):
+            self.DescriptionList = Description
+        else:
+            self.DescriptionList.append(Description)
 
     def GetDescription(self):
-        return self.Description
+        return self.DescriptionList
 
     def SetCopyright(self, Copyright):
-        self.Copyright = Copyright
+        if isinstance(Copyright, list):
+            self.CopyrightList = Copyright
+        else:
+            self.CopyrightList.append(Copyright)
 
     def GetCopyright(self):
-        return self.Copyright
+        return self.CopyrightList
 
     def SetLicense(self, License):
-        self.License = License
+        if isinstance(License, list):
+            self.LicenseList = License
+        else:
+            self.LicenseList.append(License)
 
     def GetLicense(self):
-        return self.License
+        return self.LicenseList
 
+## BinaryHeaderObject
+#
+# This class defined Binary header items used in Module/Platform/Package files
+#
+# @param object:          Inherited from object class
+#
+class BinaryHeaderObject(object):
+    def __init__(self):
+        self.BinaryHeaderAbstractList = []
+        self.BinaryHeaderDescriptionList = []
+        self.BinaryHeaderCopyrightList = []
+        self.BinaryHeaderLicenseList = []
+
+    def SetBinaryHeaderAbstract(self, Abstract):
+        if isinstance(Abstract, list) and Abstract:
+            self.BinaryHeaderAbstractList = Abstract
+        elif isinstance(Abstract, tuple) and Abstract[1]:
+            self.BinaryHeaderAbstractList.append(Abstract)
+
+    def GetBinaryHeaderAbstract(self):
+        return self.BinaryHeaderAbstractList
+
+    def SetBinaryHeaderDescription(self, Description):
+        if isinstance(Description, list) and Description:
+            self.BinaryHeaderDescriptionList = Description
+        elif isinstance(Description, tuple) and Description[1]:
+            self.BinaryHeaderDescriptionList.append(Description)
+
+    def GetBinaryHeaderDescription(self):
+        return self.BinaryHeaderDescriptionList
+
+    def SetBinaryHeaderCopyright(self, Copyright):
+        if isinstance(Copyright, list) and Copyright:
+            self.BinaryHeaderCopyrightList = Copyright
+        elif isinstance(Copyright, tuple) and Copyright[1]:
+            self.BinaryHeaderCopyrightList.append(Copyright)
+
+    def GetBinaryHeaderCopyright(self):
+        return self.BinaryHeaderCopyrightList
+
+    def SetBinaryHeaderLicense(self, License):
+        if isinstance(License, list) and License:
+            self.BinaryHeaderLicenseList = License
+        elif isinstance(License, tuple) and License[1]:
+            self.BinaryHeaderLicenseList.append(License)
+
+    def GetBinaryHeaderLicense(self):
+        return self.BinaryHeaderLicenseList
+    
 ## ClonedRecordObject
 #
 # This class defined ClonedRecord items used in Module/Platform/Package files
@@ -177,7 +259,7 @@ class ClonedRecordObject(object):
 #
 class TextObject(object):
     def __init__(self):
-        self.Lang = LANGUAGE_EN_US
+        self.Lang = TAB_LANGUAGE_EN_US
         self.String = ''
 
     def SetLang(self, Lang):
@@ -224,10 +306,10 @@ class FileNameObject(CommonPropertiesObject):
 #
 class FileObject(object):
     def __init__(self):
-        self.Executable = ''
+        self.Executable = '' 
         self.Uri = ''
         self.OsType = ''
-
+        
     def SetExecutable(self, Executable):
         self.Executable = Executable
 
@@ -478,6 +560,11 @@ class UserExtensionObject(object):
     def __init__(self):
         self.UserID = ''
         self.Identifier = ''
+        self.BinaryAbstractList = []
+        self.BinaryDescriptionList = []
+        self.BinaryCopyrightList = []
+        self.BinaryLicenseList = []
+        self.UniLangDefsList = []
         #
         # { Statement : Arch , ... }    
         #
@@ -518,6 +605,60 @@ class UserExtensionObject(object):
         
     def GetIdentifier(self):
         return self.Identifier
+    
+    def SetUniLangDefsList(self, UniLangDefsList):
+        self.UniLangDefsList = UniLangDefsList
+        
+    def GetUniLangDefsList(self):
+        return self.UniLangDefsList
+    
+    def SetBinaryAbstract(self, BinaryAbstractList):
+        self.BinaryAbstractList = BinaryAbstractList
+    
+    def GetBinaryAbstract(self, Lang=None):
+        if Lang:
+            for (Key, Value) in self.BinaryAbstractList:
+                if Key == Lang:
+                    return Value
+            return None
+        else:
+            return self.BinaryAbstractList
+    
+    def SetBinaryDescription(self, BinaryDescriptionList):
+        self.BinaryDescriptionList = BinaryDescriptionList
+    
+    def GetBinaryDescription(self, Lang=None):
+        if Lang:
+            for (Key, Value) in self.BinaryDescriptionList:
+                if Key == Lang:
+                    return Value
+            return None
+        else:
+            return self.BinaryDescriptionList
+    
+    def SetBinaryCopyright(self, BinaryCopyrightList):
+        self.BinaryCopyrightList = BinaryCopyrightList
+    
+    def GetBinaryCopyright(self, Lang=None):
+        if Lang:
+            for (Key, Value) in self.BinaryCopyrightList:
+                if Key == Lang:
+                    return Value
+            return None
+        else:
+            return self.BinaryCopyrightList
+    
+    def SetBinaryLicense(self, BinaryLicenseList):
+        self.BinaryLicenseList = BinaryLicenseList
+    
+    def GetBinaryLicense(self, Lang=None):
+        if Lang:
+            for (Key, Value) in self.BinaryLicenseList:
+                if Key == Lang:
+                    return Value
+            return None
+        else:
+            return self.BinaryLicenseList
     
     def SetDefinesDict(self, DefinesDict):
         self.DefinesDict = DefinesDict
@@ -600,6 +741,10 @@ class PcdErrorObject(object):
         self.Expression = ''
         self.ErrorNumber = ''
         self.ErrorMessageList = []
+        self.TokenSpaceGuidCName = ''
+        self.CName = ''
+        self.FileLine = ''
+        self.LineNum = 0
 
     def SetValidValue(self, ValidValue):
         self.ValidValue = ValidValue
@@ -637,7 +782,31 @@ class PcdErrorObject(object):
     def GetErrorMessageList(self):
         return self.ErrorMessageList
     
-
+    def SetTokenSpaceGuidCName(self, TokenSpaceGuidCName):
+        self.TokenSpaceGuidCName = TokenSpaceGuidCName
+        
+    def GetTokenSpaceGuidCName(self):
+        return self.TokenSpaceGuidCName
+    
+    def SetCName(self, CName):
+        self.CName = CName
+        
+    def GetCName(self):
+        return self.CName
+    
+    def SetFileLine(self, FileLine):
+        self.FileLine = FileLine
+        
+    def GetFileLine(self):
+        return self.FileLine
+    
+    def SetLineNum(self, LineNum):
+        self.LineNum = LineNum
+        
+    def GetLineNum(self):
+        return self.LineNum
+    
+    
 ## IncludeObject
 #
 # This class defined Include item used in Module/Platform/Package files
@@ -692,7 +861,7 @@ class IncludeObject(CommonPropertiesObject):
 # @param SkuInfoList:          Input value for SkuInfoList, default is {}
 # @param SupModuleList:        Input value for SupModuleList, default is []
 #
-class PcdObject(CommonPropertiesObject, HelpTextListObject):
+class PcdObject(CommonPropertiesObject, HelpTextListObject, PromptListObject):
     def __init__(self):
         self.PcdCName = ''
         self.CName = ''
@@ -709,6 +878,7 @@ class PcdObject(CommonPropertiesObject, HelpTextListObject):
         self.SupModuleList = []        
         CommonPropertiesObject.__init__(self)
         HelpTextListObject.__init__(self)
+        PromptListObject.__init__(self)
     
     def SetPcdCName(self, PcdCName):
         self.PcdCName = PcdCName

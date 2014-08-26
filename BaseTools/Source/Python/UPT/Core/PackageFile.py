@@ -2,7 +2,7 @@
 #
 # PackageFile class represents the zip file of a distribution package.
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -36,7 +36,7 @@ import Logger.Log as Logger
 from Logger import StringTable as ST
 from Library.Misc import CreateDirectory
 from Library.Misc import RemoveDirectory
-
+from Core.FileHook import __FileHookOpen__
 
 
 class PackageFile:
@@ -96,7 +96,7 @@ class PackageFile:
     ## Extract the file
     # 
     # @param Which:  the source path 
-    # @param To:  the destination path 
+    # @param ToDest:  the destination path 
     #
     def Extract(self, Which, ToDest):
         Which = os.path.normpath(Which)
@@ -116,7 +116,8 @@ class PackageFile:
                 Logger.Warn("PackagingTool", \
                             ST.WRN_FILE_NOT_OVERWRITTEN % ToDest)
                 return
-            ToFile = open(ToDest, "wb")
+            else:
+                ToFile = __FileHookOpen__(ToDest, 'wb')
         except BaseException, Xstr:
             Logger.Error("PackagingTool", FILE_OPEN_FAILURE, 
                             ExtraData="%s (%s)" % (ToDest, str(Xstr)))
@@ -234,6 +235,8 @@ class PackageFile:
     #
     def PackData(self, Data, ArcName):
         try:
+            if os.path.splitext(ArcName)[1].lower() == '.pkg':
+                Data = Data.encode('utf_8')
             self._ZipFile.writestr(ArcName, Data)
         except BaseException, Xstr:
             Logger.Error("PackagingTool", FILE_COMPRESS_FAILURE,

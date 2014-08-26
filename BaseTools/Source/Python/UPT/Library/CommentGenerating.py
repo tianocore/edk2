@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define comment generating interface
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -24,8 +24,18 @@ from Library.DataType import TAB_SPACE_SPLIT
 from Library.DataType import TAB_INF_GUIDTYPE_VAR
 from Library.DataType import USAGE_ITEM_NOTIFY
 from Library.DataType import ITEM_UNDEFINED
-from Library.DataType import LANGUAGE_EN_US
-
+from Library.DataType import TAB_HEADER_COMMENT
+from Library.DataType import TAB_BINARY_HEADER_COMMENT
+from Library.DataType import TAB_COMMENT_SPLIT
+from Library.DataType import TAB_SPECIAL_COMMENT
+from Library.DataType import END_OF_LINE
+from Library.DataType import TAB_COMMENT_EDK1_SPLIT
+from Library.DataType import TAB_COMMENT_EDK1_START
+from Library.DataType import TAB_COMMENT_EDK1_END
+from Library.DataType import TAB_STAR
+from Library.DataType import TAB_PCD_PROMPT
+from Library.UniClassObject import ConvertSpecialUnicodes
+from Library.Misc import GetLocalValue
 ## GenTailCommentLines
 #
 # @param TailCommentLines:  the tail comment lines that need to be generated
@@ -33,11 +43,11 @@ from Library.DataType import LANGUAGE_EN_US
 #                            line tail comment
 # 
 def GenTailCommentLines (TailCommentLines, LeadingSpaceNum = 0):
-    EndOfLine = "\n"
-    TailCommentLines = TailCommentLines.rstrip(EndOfLine)
-    CommentStr = "  ## " + (EndOfLine + LeadingSpaceNum * TAB_SPACE_SPLIT + \
-                            "  ## ").join(GetSplitValueList(TailCommentLines, \
-                                                            EndOfLine))
+    TailCommentLines = TailCommentLines.rstrip(END_OF_LINE)
+    CommentStr = TAB_SPACE_SPLIT*2 + TAB_SPECIAL_COMMENT + TAB_SPACE_SPLIT + \
+    (END_OF_LINE + LeadingSpaceNum * TAB_SPACE_SPLIT + TAB_SPACE_SPLIT*2 + TAB_SPECIAL_COMMENT + \
+     TAB_SPACE_SPLIT).join(GetSplitValueList(TailCommentLines, END_OF_LINE))
+     
     return CommentStr
 
 ## GenGenericComment
@@ -47,10 +57,9 @@ def GenTailCommentLines (TailCommentLines, LeadingSpaceNum = 0):
 def GenGenericComment (CommentLines):
     if not CommentLines:
         return ''
-    EndOfLine = "\n"
-    CommentLines = CommentLines.rstrip(EndOfLine)
-    CommentStr = '## ' + (EndOfLine + '# ').join\
-    (GetSplitValueList(CommentLines, EndOfLine)) + EndOfLine
+    CommentLines = CommentLines.rstrip(END_OF_LINE)
+    CommentStr = TAB_SPECIAL_COMMENT + TAB_SPACE_SPLIT + (END_OF_LINE + TAB_COMMENT_SPLIT + TAB_SPACE_SPLIT).join\
+    (GetSplitValueList(CommentLines, END_OF_LINE)) + END_OF_LINE
     return CommentStr
 
 ## GenGenericCommentF
@@ -61,23 +70,40 @@ def GenGenericComment (CommentLines):
 # @param CommentLines:   Generic comment Text, maybe Multiple Lines
 # @return CommentStr:    Generated comment line 
 # 
-def GenGenericCommentF (CommentLines, NumOfPound=1):
+def GenGenericCommentF (CommentLines, NumOfPound=1, IsPrompt=False, IsInfLibraryClass=False):
     if not CommentLines:
         return ''
-    EndOfLine = "\n"
     #
     # if comment end with '\n', then remove it to prevent one extra line
     # generate later on
     #
-    if CommentLines.endswith(EndOfLine):
+    if CommentLines.endswith(END_OF_LINE):
         CommentLines = CommentLines[:-1]
-    CommentLineList = GetSplitValueList(CommentLines, EndOfLine)
     CommentStr = ''
-    for Line in CommentLineList:
-        if Line == '':
-            CommentStr += '#' * NumOfPound + '\n'
-        else:
-            CommentStr += '#' * NumOfPound + ' ' + Line + '\n'
+    if IsPrompt:
+        CommentStr += TAB_COMMENT_SPLIT * NumOfPound + TAB_SPACE_SPLIT + TAB_PCD_PROMPT + TAB_SPACE_SPLIT + \
+        CommentLines.replace(END_OF_LINE, '') + END_OF_LINE
+    else:
+        CommentLineList = GetSplitValueList(CommentLines, END_OF_LINE)
+        FindLibraryClass = False
+        for Line in CommentLineList:
+            # If this comment is for @libraryclass and it has multiple lines
+            # make sure the second lines align to the first line after @libraryclass as below
+            #
+            # ## @libraryclass XYZ FIRST_LINE
+            # ##               ABC SECOND_LINE
+            #
+            if IsInfLibraryClass and Line.find(u'@libraryclass ') > -1:
+                FindLibraryClass = True
+            if Line == '':
+                CommentStr += TAB_COMMENT_SPLIT * NumOfPound + END_OF_LINE
+            else:
+                if FindLibraryClass and Line.find(u'@libraryclass ') > -1:
+                    CommentStr += TAB_COMMENT_SPLIT * NumOfPound + TAB_SPACE_SPLIT + Line + END_OF_LINE
+                elif FindLibraryClass:
+                    CommentStr += TAB_COMMENT_SPLIT * NumOfPound + TAB_SPACE_SPLIT * 16 + Line + END_OF_LINE
+                else:
+                    CommentStr += TAB_COMMENT_SPLIT * NumOfPound + TAB_SPACE_SPLIT + Line + END_OF_LINE
      
     return CommentStr
 
@@ -91,40 +117,57 @@ def GenGenericCommentF (CommentLines, NumOfPound=1):
 # @param Copyright     possible multiple copyright lines
 # @param License       possible multiple license lines
 #
-def GenHeaderCommentSection(Abstract, Description, Copyright, License):
-    EndOfLine = '\n'
+def GenHeaderCommentSection(Abstract, Description, Copyright, License, IsBinaryHeader=False, \
+                            CommChar=TAB_COMMENT_SPLIT):
     Content = ''
-    
-    Content += '## @file' + EndOfLine
-    if Abstract:
-        Abstract = Abstract.rstrip(EndOfLine)
-        Content += '# ' + Abstract + EndOfLine
-        Content += '#' + EndOfLine
+
+    #
+    # Convert special character to (c), (r) and (tm).
+    #
+    if isinstance(Abstract, unicode):
+        Abstract = ConvertSpecialUnicodes(Abstract)
+    if isinstance(Description, unicode):
+        Description = ConvertSpecialUnicodes(Description)
+    if IsBinaryHeader:
+        Content += CommChar * 2 + TAB_SPACE_SPLIT + TAB_BINARY_HEADER_COMMENT + END_OF_LINE
+    elif CommChar == TAB_COMMENT_EDK1_SPLIT:
+        Content += CommChar + TAB_SPACE_SPLIT + TAB_COMMENT_EDK1_START + TAB_STAR + TAB_SPACE_SPLIT +\
+         TAB_HEADER_COMMENT + END_OF_LINE
     else:
-        Content += '#' + EndOfLine
+        Content += CommChar * 2 + TAB_SPACE_SPLIT + TAB_HEADER_COMMENT + END_OF_LINE
+    if Abstract:
+        Abstract = Abstract.rstrip(END_OF_LINE)
+        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
+                                                                                                (Abstract, END_OF_LINE))
+        Content += END_OF_LINE + CommChar + END_OF_LINE
+    else:
+        Content += CommChar + END_OF_LINE
 
     if Description:
-        Description = Description.rstrip(EndOfLine)
-        Content += '# ' + (EndOfLine + '# ').join(GetSplitValueList\
-                                                  (Description, '\n'))
-        Content += EndOfLine + '#' + EndOfLine        
+        Description = Description.rstrip(END_OF_LINE)
+        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
+                                                  (Description, END_OF_LINE))
+        Content += END_OF_LINE + CommChar + END_OF_LINE        
   
     #
     # There is no '#\n' line to separate multiple copyright lines in code base 
     #
     if Copyright:
-        Copyright = Copyright.rstrip(EndOfLine)
-        Content += '# ' + (EndOfLine + '# ').join\
-        (GetSplitValueList(Copyright, '\n'))
-        Content += EndOfLine + '#' + EndOfLine
+        Copyright = Copyright.rstrip(END_OF_LINE)
+        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join\
+        (GetSplitValueList(Copyright, END_OF_LINE))
+        Content += END_OF_LINE + CommChar + END_OF_LINE
 
     if License:
-        License = License.rstrip(EndOfLine)
-        Content += '# ' + (EndOfLine + '# ').join(GetSplitValueList\
-                                                  (License, '\n'))
-        Content += EndOfLine + '#' + EndOfLine
-
-    Content += '##' + EndOfLine
+        License = License.rstrip(END_OF_LINE)
+        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
+                                                  (License, END_OF_LINE))
+        Content += END_OF_LINE + CommChar + END_OF_LINE
+    
+    if CommChar == TAB_COMMENT_EDK1_SPLIT:
+        Content += CommChar + TAB_SPACE_SPLIT + TAB_STAR + TAB_COMMENT_EDK1_END + END_OF_LINE
+    else:
+        Content += CommChar * 2 + END_OF_LINE
     
     return Content
 
@@ -197,21 +240,7 @@ def GenDecTailComment (SupModuleList):
 #  @return HelpStr: the help text string found, '' means no help text found
 #
 def _GetHelpStr(HelpTextObjList):
-    HelpStr = ''
-
+    ValueList = []        
     for HelpObj in HelpTextObjList:
-        if HelpObj and HelpObj.GetLang() == LANGUAGE_EN_US:
-            HelpStr = HelpObj.GetString()
-            return HelpStr
-    
-    for HelpObj in HelpTextObjList:
-        if HelpObj and HelpObj.GetLang().startswith('en'):
-            HelpStr = HelpObj.GetString()
-            return HelpStr
-
-    for HelpObj in HelpTextObjList:
-        if HelpObj and not HelpObj.GetLang():
-            HelpStr = HelpObj.GetString()
-            return HelpStr
-    
-    return HelpStr
+        ValueList.append((HelpObj.GetLang(), HelpObj.GetString()))
+    return GetLocalValue(ValueList, True)

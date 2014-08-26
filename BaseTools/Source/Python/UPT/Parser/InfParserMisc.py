@@ -1,7 +1,7 @@
 ## @file
 # This file contained the miscellaneous functions for INF parser 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -82,6 +82,10 @@ def InfExpandMacro(Content, LineInfo, GlobalMacros=None, SectionMacros=None, Fla
     LineContent = LineInfo[1]
     LineNo = LineInfo[2]
     
+    # Don't expand macros in comments
+    if LineContent.strip().startswith("#"):
+        return Content
+
     NewLineInfo = (FileName, LineNo, LineContent)
     
     #

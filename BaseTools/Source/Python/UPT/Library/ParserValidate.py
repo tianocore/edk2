@@ -1,6 +1,7 @@
 ## @file ParserValidate.py
+# Functions for parser validation
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -566,7 +567,7 @@ def IsValidPcdValue(PcdValue):
     for Char in PcdValue:
         if Char == '\n' or Char == '\t' or Char == '\f':
             return False
-        
+    
     #
     # <Boolean>
     #
@@ -582,14 +583,13 @@ def IsValidPcdValue(PcdValue):
     if IsValidHex(PcdValue):
         return True
     
-    ReIsValidIntegerSingle = re.compile(r"^\s*[0-9]\s*$", re.DOTALL)   
+    ReIsValidIntegerSingle = re.compile(r"^\s*[0-9]\s*$", re.DOTALL)
     if ReIsValidIntegerSingle.match(PcdValue) != None:
         return True
     
     ReIsValidIntegerMulti = re.compile(r"^\s*[1-9][0-9]+\s*$", re.DOTALL)   
     if ReIsValidIntegerMulti.match(PcdValue) != None:
         return True
-    
     
     #
     # <StringVal>              ::=  {<StringType>} {<Array>} {"$(" <MACRO> ")"}

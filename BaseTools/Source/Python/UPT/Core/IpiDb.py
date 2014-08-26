@@ -1,7 +1,7 @@
 ## @file
 # This file is for installed package information database operations
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -27,6 +27,7 @@ import Logger.Log as Logger
 from Logger import StringTable as ST
 from Logger.ToolError import UPT_ALREADY_RUNNING_ERROR
 from Logger.ToolError import UPT_DB_UPDATE_ERROR
+import platform as pf
 
 ## IpiDb
 #
@@ -39,7 +40,7 @@ from Logger.ToolError import UPT_DB_UPDATE_ERROR
 #
 #
 class IpiDatabase(object):
-    def __init__(self, DbPath):
+    def __init__(self, DbPath, Workspace):
         Dir = os.path.dirname(DbPath)
         if not os.path.isdir(Dir):
             os.mkdir(Dir)
@@ -54,6 +55,7 @@ class IpiDatabase(object):
         self.ModDepexTable = 'ModDepexInfo'
         self.DpFileListTable = 'DpFileListInfo'
         self.DummyTable = 'Dummy'
+        self.Workspace = os.path.normpath(Workspace)
 
     ## Initialize build database
     #
@@ -156,6 +158,12 @@ class IpiDatabase(object):
         
         Logger.Verbose(ST.MSG_INIT_IPI_FINISH)
 
+    def RollBack(self):
+        self.Conn.rollback()
+
+    def Commit(self):
+        self.Conn.commit()
+
     ## Add a distribution install information from DpObj
     #
     # @param DpObj:
@@ -222,7 +230,6 @@ class IpiDatabase(object):
             self._AddDp(DpObj.Header.GetGuid(), DpObj.Header.GetVersion(), \
                         NewDpPkgFileName, DpPkgFileName, RePackage)
     
-            self.Conn.commit()
         except sqlite3.IntegrityError, DetailMsg:
             Logger.Error("UPT",
                          UPT_DB_UPDATE_ERROR,
@@ -266,7 +273,13 @@ class IpiDatabase(object):
     # @param Path: A Md5Sum
     #
     def _AddDpFilePathList(self, DpGuid, DpVersion, Path, Md5Sum):
-        
+        Path = os.path.normpath(Path)
+        if pf.system() == 'Windows':
+            if Path.startswith(self.Workspace):
+                Path = Path[len(self.Workspace):]
+        else:
+            if Path.startswith(self.Workspace + os.sep):
+                Path = Path[len(self.Workspace)+1:]
         SqlCommand = """insert into %s values('%s', '%s', '%s', '%s')""" % \
         (self.DpFileListTable, Path, DpGuid, DpVersion, Md5Sum)
 
@@ -320,6 +333,11 @@ class IpiDatabase(object):
         
         if PkgVersion == None or len(PkgVersion.strip()) == 0:
             PkgVersion = 'N/A'
+            
+        if os.name == 'posix':
+            Path = Path.replace('\\', os.sep)
+        else:
+            Path = Path.replace('/', os.sep)
         
         #
         # Add module from package information to DB.
@@ -378,6 +396,11 @@ class IpiDatabase(object):
         
         if DepexVersion == None or len(DepexVersion.strip()) == 0:
             DepexVersion = 'N/A'
+            
+        if os.name == 'posix':
+            Path = Path.replace('\\', os.sep)
+        else:
+            Path = Path.replace('/', os.sep)
         
         #
         # Add module depex information to DB.
@@ -478,7 +501,7 @@ class IpiDatabase(object):
         (self.DpTable, DpGuid, DpVersion)
         self.Cur.execute(SqlCommand)
         
-        self.Conn.commit()
+        #self.Conn.commit()
         
     ## Get a list of distribution install information.
     #
@@ -554,7 +577,7 @@ class IpiDatabase(object):
         for Result in self.Cur:
             Path = Result[0]
             Md5Sum = Result[3]
-            PathList.append((Path, Md5Sum))
+            PathList.append((os.path.join(self.Workspace, Path), Md5Sum))
         
         return PathList
 
@@ -824,7 +847,7 @@ class IpiDatabase(object):
         self.Cur.execute(SqlCommand)
         for ModuleInfo in self.Cur:
             FilePath = ModuleInfo[0]
-            ModList.append(FilePath)
+            ModList.append(os.path.join(self.Workspace, FilePath))
             
         return ModList        
 
@@ -844,7 +867,7 @@ class IpiDatabase(object):
         ModuleVersion = '%s' and InstallPath ='%s'
                             """ % (self.ModDepexTable, Guid, Version, Path)
         self.Cur.execute(SqlCommand)
-        self.Conn.commit()
+
         
         DepexList = []
         for DepInfo in self.Cur:
@@ -853,7 +876,25 @@ class IpiDatabase(object):
             DepexList.append((DepexGuid, DepexVersion))
         
         return DepexList
-    
+ 
+    ## Inventory the distribution installed to current workspace
+    #
+    # Inventory the distribution installed to current workspace
+    #   
+    def InventoryDistInstalled(self):
+        SqlCommand = """select * from %s """ % (self.DpTable)
+        self.Cur.execute(SqlCommand)
+        
+        DpInfoList = []
+        for Result in self.Cur:
+            DpGuid = Result[0]
+            DpVersion = Result[1]
+            DpAliasName = Result[3]
+            DpFileName = Result[4]            
+            DpInfoList.append((DpGuid, DpVersion, DpFileName, DpAliasName))
+        
+        return DpInfoList     
+
     ## Close entire database
     #
     # Close the connection and cursor
