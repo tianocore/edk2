@@ -182,7 +182,7 @@ NorFlashReadStatusRegister (
   return MmioRead32 (Instance->DeviceBaseAddress);
 }
 
-
+STATIC
 BOOLEAN
 NorFlashBlockIsLocked (
   IN NOR_FLASH_INSTANCE     *Instance,
@@ -190,9 +190,6 @@ NorFlashBlockIsLocked (
   )
 {
   UINT32                LockStatus;
-  BOOLEAN               BlockIsLocked;
-
-  BlockIsLocked = TRUE;
 
   // Send command for reading device id
   SEND_NOR_COMMAND (BlockAddress, 2, P30_CMD_READ_DEVICE_ID);
@@ -207,23 +204,16 @@ NorFlashBlockIsLocked (
     DEBUG((EFI_D_ERROR, "NorFlashBlockIsLocked: WARNING: Block LOCKED DOWN\n"));
   }
 
-  if ((LockStatus & 0x1) == 0) {
-    // This means the block is unlocked
-    DEBUG((DEBUG_BLKIO, "UnlockSingleBlock: Block 0x%08x unlocked\n", BlockAddress));
-    BlockIsLocked = FALSE;
-  }
-
-  return BlockIsLocked;
+  return ((LockStatus & 0x1) != 0);
 }
 
-
+STATIC
 EFI_STATUS
 NorFlashUnlockSingleBlock (
   IN NOR_FLASH_INSTANCE     *Instance,
   IN UINTN                  BlockAddress
   )
 {
-  EFI_STATUS            Status = EFI_SUCCESS;
   UINT32                LockStatus;
 
   // Raise the Task Priority Level to TPL_NOTIFY to serialise all its operations
@@ -262,19 +252,21 @@ NorFlashUnlockSingleBlock (
   // Put device back into Read Array mode
   SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_READ_ARRAY);
 
-  DEBUG((DEBUG_BLKIO, "UnlockSingleBlock: BlockAddress=0x%08x, Exit Status = \"%r\".\n", BlockAddress, Status));
+  DEBUG((DEBUG_BLKIO, "UnlockSingleBlock: BlockAddress=0x%08x\n", BlockAddress));
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
-
+STATIC
 EFI_STATUS
 NorFlashUnlockSingleBlockIfNecessary (
   IN NOR_FLASH_INSTANCE     *Instance,
   IN UINTN                  BlockAddress
   )
 {
-  EFI_STATUS Status = EFI_SUCCESS;
+  EFI_STATUS Status;
+
+  Status = EFI_SUCCESS;
 
   if (NorFlashBlockIsLocked (Instance, BlockAddress) == TRUE) {
     Status = NorFlashUnlockSingleBlock (Instance, BlockAddress);
@@ -287,6 +279,7 @@ NorFlashUnlockSingleBlockIfNecessary (
 /**
  * The following function presumes that the block has already been unlocked.
  **/
+STATIC
 EFI_STATUS
 NorFlashEraseSingleBlock (
   IN NOR_FLASH_INSTANCE     *Instance,
@@ -340,7 +333,7 @@ NorFlashEraseSingleBlock (
 }
 
 /**
- * The following function presumes that the block has already been unlocked.
+ * This function unlock and erase an entire NOR Flash block.
  **/
 EFI_STATUS
 NorFlashUnlockAndEraseSingleBlock (
@@ -366,9 +359,10 @@ NorFlashUnlockAndEraseSingleBlock (
   do {
     // Unlock the block if we have to
     Status = NorFlashUnlockSingleBlockIfNecessary (Instance, BlockAddress);
-    if (!EFI_ERROR(Status)) {
-      Status = NorFlashEraseSingleBlock (Instance, BlockAddress);
+    if (EFI_ERROR (Status)) {
+      break;
     }
+    Status = NorFlashEraseSingleBlock (Instance, BlockAddress);
     Index++;
   } while ((Index < NOR_FLASH_ERASE_RETRY) && (Status == EFI_WRITE_PROTECTED));
 
