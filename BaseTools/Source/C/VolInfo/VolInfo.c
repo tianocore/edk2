@@ -51,7 +51,7 @@ Abstract:
 EFI_GUID  gEfiCrc32GuidedSectionExtractionProtocolGuid = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
 
 #define UTILITY_MAJOR_VERSION      0
-#define UTILITY_MINOR_VERSION      82
+#define UTILITY_MINOR_VERSION      83
 
 #define UTILITY_NAME         "VolInfo"
 
@@ -172,7 +172,7 @@ Returns:
   //
   // Print utility header
   //
-  printf ("%s Tiano Firmware Volume FFS image info.  Version %d.%d %s, %s\n",
+  printf ("%s Version %d.%d %s, %s\n",
     UTILITY_NAME,
     UTILITY_MAJOR_VERSION,
     UTILITY_MINOR_VERSION,
@@ -1839,6 +1839,7 @@ Returns:
   // Copyright declaration
   // 
   fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "  Display Tiano Firmware Volume FFS image information\n\n");
 
   //
   // Details Option

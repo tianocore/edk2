@@ -69,7 +69,7 @@ UINT32 gPageTableOffsetInFile = EFI_PAGE_BASE_OFFSET_IN_LDR;
 // Utility version information
 //
 #define UTILITY_MAJOR_VERSION 0
-#define UTILITY_MINOR_VERSION 1
+#define UTILITY_MINOR_VERSION 2
 
 void
 Version (
@@ -91,7 +91,7 @@ Returns:
 
 --*/
 {
-  printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 VOID
@@ -100,7 +100,7 @@ Usage (
   )
 {
   printf ("Usage: GenPage.exe [options] EfiLoaderImageName \n\n\
-Copyright (c) 2008 - 2013, Intel Corporation.  All rights reserved.\n\n\
+Copyright (c) 2008 - 2014, Intel Corporation.  All rights reserved.\n\n\
   Utility to generate the EfiLoader image containing a page table.\n\n\
 optional arguments:\n\
   -h, --help            Show this help message and exit\n\

@@ -29,7 +29,7 @@ Abstract:
 
 #define UTILITY_NAME            "GenCrc32"
 #define UTILITY_MAJOR_VERSION   0
-#define UTILITY_MINOR_VERSION   1
+#define UTILITY_MINOR_VERSION   2
 
 #define CRC32_NULL              0
 #define CRC32_ENCODE            1
@@ -55,7 +55,7 @@ Returns:
 
 --*/
 {
-  fprintf (stdout, "%s Version %d.%d Build %s \n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  fprintf (stdout, "%s Version %d.%d %s \n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 VOID
@@ -86,7 +86,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option

@@ -39,7 +39,7 @@ Abstract:
 // Utility version information
 //
 #define UTILITY_MAJOR_VERSION 0
-#define UTILITY_MINOR_VERSION 1
+#define UTILITY_MINOR_VERSION 2
 
 #define MAX_DRIVE                             26
 #define PARTITION_TABLE_OFFSET                0x1BE
@@ -542,7 +542,7 @@ Returns:
 
 --*/
 {
-  printf ("%s Version %d.%d Build%s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 VOID
@@ -551,7 +551,7 @@ PrintUsage (
   )
 {
   printf ("Usage: GenBootSector [options] --cfg-file CFG_FILE\n\n\
-Copyright (c) 2009 - 2013, Intel Corporation.  All rights reserved.\n\n\
+Copyright (c) 2009 - 2014, Intel Corporation.  All rights reserved.\n\n\
   Utility to retrieve and update the boot sector or MBR.\n\n\
 optional arguments:\n\
   -h, --help            Show this help message and exit\n\
