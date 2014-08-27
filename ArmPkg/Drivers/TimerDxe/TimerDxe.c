@@ -293,7 +293,7 @@ TimerInterruptHandler (
     }
 
     // Reload the Timer
-    TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod));
+    TimerDriverSetTimerPeriod (&gTimer, mTimerPeriod);
   }
 
   // Enable timer interrupts
