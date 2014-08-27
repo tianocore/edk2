@@ -141,12 +141,13 @@ TimerDriverSetTimerPeriod (
   ArmArchTimerDisableTimer ();
 
   if (TimerPeriod != 0) {
-    // Convert TimerPeriod to micro sec units
-    TimerTicks = DivU64x32 (TimerPeriod, 10);
+    // TimerTicks = TimerPeriod in 1ms unit x Frequency.10^-3
+    //            = TimerPeriod.10^-4 x Frequency.10^-3
+    //            = (TimerPeriod x Frequency) x 10^-7
+    TimerTicks = MultU64x32 (TimerPeriod, FixedPcdGet32 (PcdArmArchTimerFreqInHz));
+    TimerTicks = DivU64x32 (TimerTicks, 10000000U);
 
-    TimerTicks = MultU64x32 (TimerTicks, (PcdGet32(PcdArmArchTimerFreqInHz)/1000000));
-
-    ArmArchTimerSetTimerVal((UINTN)TimerTicks);
+    ArmArchTimerSetTimerVal ((UINTN)TimerTicks);
 
     // Enable the timer
     ArmArchTimerEnableTimer ();
