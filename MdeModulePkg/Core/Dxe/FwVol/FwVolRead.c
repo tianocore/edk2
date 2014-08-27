@@ -280,6 +280,7 @@ FvReadFile (
   UINT8                             *SrcPtr;
   EFI_FFS_FILE_HEADER               *FfsHeader;
   UINTN                             InputBufferSize;
+  UINTN                             WholeFileSize;
 
   if (NameGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -290,7 +291,7 @@ FvReadFile (
 
   //
   // Keep looking until we find the matching NameGuid.
-  // The Key is really an FfsFileEntry
+  // The Key is really a FfsFileEntry
   //
   FvDevice->LastKey = 0;
   do {
@@ -312,6 +313,26 @@ FvReadFile (
   // Get a pointer to the header
   //
   FfsHeader = FvDevice->LastKey->FfsHeader;
+  if (FvDevice->IsMemoryMapped) {
+    //
+    // Memory mapped FV has not been cached, so here is to cache by file.
+    //
+    if (!FvDevice->LastKey->FileCached) {
+      //
+      // Cache FFS file to memory buffer.
+      //
+      WholeFileSize = IS_FFS_FILE2 (FfsHeader) ? FFS_FILE2_SIZE (FfsHeader): FFS_FILE_SIZE (FfsHeader);
+      FfsHeader = AllocateCopyPool (WholeFileSize, FfsHeader);
+      if (FfsHeader == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      //
+      // Let FfsHeader in FfsFileEntry point to the cached file buffer.
+      //
+      FvDevice->LastKey->FfsHeader = FfsHeader;
+      FvDevice->LastKey->FileCached = TRUE;
+    }
+  }
 
   //
   // Remember callers buffer size
@@ -427,13 +448,12 @@ FvReadFileSection (
   FvDevice = FV_DEVICE_FROM_THIS (This);
 
   //
-  // Read the whole file into buffer
+  // Read the file
   //
-  FileBuffer = NULL;
   Status = FvReadFile (
             This,
             NameGuid,
-            (VOID **)&FileBuffer,
+            NULL,
             &FileSize,
             &FileType,
             &FileAttributes,
@@ -447,8 +467,11 @@ FvReadFileSection (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  ASSERT (FileBuffer != NULL);
-
+  if (IS_FFS_FILE2 (FfsEntry->FfsHeader)) {
+    FileBuffer = ((UINT8 *) FfsEntry->FfsHeader) + sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    FileBuffer = ((UINT8 *) FfsEntry->FfsHeader) + sizeof (EFI_FFS_FILE_HEADER);
+  }
   //
   // Check to see that the file actually HAS sections before we go any further.
   //
@@ -497,8 +520,6 @@ FvReadFileSection (
   //
 
 Done:
-  CoreFreePool (FileBuffer);
-
   return Status;
 }
 

@@ -3,7 +3,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -46,8 +46,9 @@ FV_DEVICE mFvDevice = {
   NULL,
   { NULL, NULL },
   0,
+  0,
   FALSE,
-  0
+  FALSE
 };
 
 
@@ -254,7 +255,14 @@ FreeFvDeviceResource (
       //
       // Close stream and free resources from SEP
       //
-      CloseSectionStream (FfsFileEntry->StreamHandle);
+      CloseSectionStream (FfsFileEntry->StreamHandle, FALSE);
+    }
+
+    if (FfsFileEntry->FileCached) {
+      //
+      // Free the cached file buffer.
+      //
+      CoreFreePool (FfsFileEntry->FfsHeader);
     }
 
     CoreFreePool (FfsFileEntry);
@@ -262,11 +270,12 @@ FreeFvDeviceResource (
     FfsFileEntry = (FFS_FILE_LIST_ENTRY *) NextEntry;
   }
 
-
-  //
-  // Free the cache
-  //
-  CoreFreePool (FvDevice->CachedFv);
+  if (!FvDevice->IsMemoryMapped) {
+    //
+    // Free the cached FV buffer.
+    //
+    CoreFreePool (FvDevice->CachedFv);
+  }
 
   //
   // Free Volume Header
@@ -310,7 +319,7 @@ FvCheck (
   EFI_FFS_FILE_STATE                    FileState;
   UINT8                                 *TopFvAddress;
   UINTN                                 TestLength;
-
+  EFI_PHYSICAL_ADDRESS                  PhysicalAddress;
 
   Fvb = FvDevice->Fvb;
   FwVolHeader = FvDevice->FwVolHeader;
@@ -325,10 +334,25 @@ FvCheck (
   // the header to check to make sure the volume is valid
   //
   Size = (UINTN)(FwVolHeader->FvLength - FwVolHeader->HeaderLength);
-  FvDevice->CachedFv = AllocatePool (Size);
+  if ((FvbAttributes & EFI_FVB2_MEMORY_MAPPED) != 0) {
+    FvDevice->IsMemoryMapped = TRUE;
 
-  if (FvDevice->CachedFv == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = Fvb->GetPhysicalAddress (Fvb, &PhysicalAddress);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Don't cache memory mapped FV really.
+    //
+    FvDevice->CachedFv = (UINT8 *) (UINTN) (PhysicalAddress + FwVolHeader->HeaderLength);
+  } else {
+    FvDevice->IsMemoryMapped = FALSE;
+    FvDevice->CachedFv = AllocatePool (Size);
+
+    if (FvDevice->CachedFv == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   //
@@ -336,69 +360,71 @@ FvCheck (
   //
   FvDevice->EndOfCachedFv = FvDevice->CachedFv + Size;
 
-  //
-  // Copy FV minus header into memory using the block map we have all ready
-  // read into memory.
-  //
-  BlockMap = FwVolHeader->BlockMap;
-  CacheLocation = FvDevice->CachedFv;
-  LbaIndex = 0;
-  LbaOffset = 0;
-  HeaderSize = FwVolHeader->HeaderLength;
-  while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
-    Index = 0;
-    Size  = BlockMap->Length;
-    if (HeaderSize > 0) {
-      //
-      // Skip header size
-      //
-      for (; Index < BlockMap->NumBlocks && HeaderSize >= BlockMap->Length; Index ++) {
-        HeaderSize -= BlockMap->Length;
-        LbaIndex ++;
-      }
-
-      //
-      // Check whether FvHeader is crossing the multi block range.
-      //
-      if (Index >= BlockMap->NumBlocks) {
-        BlockMap++;
-        continue;
-      } else if (HeaderSize > 0) {
-        LbaOffset = HeaderSize;
-        Size = BlockMap->Length - HeaderSize;
-        HeaderSize = 0;
-      }
-    }
-    
+  if (!FvDevice->IsMemoryMapped) {
     //
-    // read the FV data  
+    // Copy FV minus header into memory using the block map we have all ready
+    // read into memory.
     //
-    for (; Index < BlockMap->NumBlocks; Index ++) {
-      Status = Fvb->Read (Fvb,
-                      LbaIndex,
-                      LbaOffset,
-                      &Size,
-                      CacheLocation
-                      );
-
-      //
-      // Not check EFI_BAD_BUFFER_SIZE, for Size = BlockMap->Length
-      //
-      if (EFI_ERROR (Status)) {
-        goto Done;
-      }
-
-      LbaIndex++;
-      CacheLocation += Size;
-
-      //
-      // After we skip Fv Header always read from start of block
-      //
-      LbaOffset = 0;
+    BlockMap = FwVolHeader->BlockMap;
+    CacheLocation = FvDevice->CachedFv;
+    LbaIndex = 0;
+    LbaOffset = 0;
+    HeaderSize = FwVolHeader->HeaderLength;
+    while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
+      Index = 0;
       Size  = BlockMap->Length;
-    }
+      if (HeaderSize > 0) {
+        //
+        // Skip header size
+        //
+        for (; Index < BlockMap->NumBlocks && HeaderSize >= BlockMap->Length; Index ++) {
+          HeaderSize -= BlockMap->Length;
+          LbaIndex ++;
+        }
 
-    BlockMap++;
+        //
+        // Check whether FvHeader is crossing the multi block range.
+        //
+        if (Index >= BlockMap->NumBlocks) {
+          BlockMap++;
+          continue;
+        } else if (HeaderSize > 0) {
+          LbaOffset = HeaderSize;
+          Size = BlockMap->Length - HeaderSize;
+          HeaderSize = 0;
+        }
+      }
+    
+      //
+      // read the FV data  
+      //
+      for (; Index < BlockMap->NumBlocks; Index ++) {
+        Status = Fvb->Read (Fvb,
+                        LbaIndex,
+                        LbaOffset,
+                        &Size,
+                        CacheLocation
+                        );
+
+        //
+        // Not check EFI_BAD_BUFFER_SIZE, for Size = BlockMap->Length
+        //
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
+
+        LbaIndex++;
+        CacheLocation += Size;
+
+        //
+        // After we skip Fv Header always read from start of block
+        //
+        LbaOffset = 0;
+        Size  = BlockMap->Length;
+      }
+
+      BlockMap++;
+    }
   }
 
   //

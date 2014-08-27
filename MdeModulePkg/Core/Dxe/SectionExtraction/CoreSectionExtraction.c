@@ -440,7 +440,7 @@ OpenSectionStream (
   return OpenSectionStreamEx (
            SectionStreamLength,
            SectionStream,
-           TRUE,
+           FALSE,
            0,
            SectionStreamHandle
            );
@@ -1344,7 +1344,7 @@ FreeChildNode (
     // If it's an encapsulating section, we close the resulting section stream.
     // CloseSectionStream will free all memory associated with the stream.
     //
-    CloseSectionStream (ChildNode->EncapsulatedStreamHandle);
+    CloseSectionStream (ChildNode->EncapsulatedStreamHandle, TRUE);
   }
 
   if (ChildNode->Event != NULL) {
@@ -1362,6 +1362,8 @@ FreeChildNode (
   SEP member function.  Deletes an existing section stream
 
   @param  StreamHandleToClose    Indicates the stream to close
+  @param  FreeStreamBuffer       TRUE - Need to free stream buffer;
+                                 FALSE - No need to free stream buffer.
 
   @retval EFI_SUCCESS            The section stream is closed sucessfully.
   @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
@@ -1372,7 +1374,8 @@ FreeChildNode (
 EFI_STATUS
 EFIAPI
 CloseSectionStream (
-  IN  UINTN                                     StreamHandleToClose
+  IN  UINTN                                     StreamHandleToClose,
+  IN  BOOLEAN                                   FreeStreamBuffer
   )
 {
   CORE_SECTION_STREAM_NODE                      *StreamNode;
@@ -1397,7 +1400,9 @@ CloseSectionStream (
       ChildNode = CHILD_SECTION_NODE_FROM_LINK (Link);
       FreeChildNode (ChildNode);
     }
-    CoreFreePool (StreamNode->StreamBuffer);
+    if (FreeStreamBuffer) {
+      CoreFreePool (StreamNode->StreamBuffer);
+    }
     CoreFreePool (StreamNode);
     Status = EFI_SUCCESS;
   } else {
