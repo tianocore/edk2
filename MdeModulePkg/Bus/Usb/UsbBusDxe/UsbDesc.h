@@ -2,7 +2,7 @@
 
     Manage Usb Descriptor List
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _USB_DESCRIPTOR_H_
 #define _USB_DESCRIPTOR_H_
 
-#define USB_MAX_INTERFACE_SETTING  8
+#define USB_MAX_INTERFACE_SETTING  256
 
 //
 // The RequestType in EFI_USB_DEVICE_REQUEST is composed of
