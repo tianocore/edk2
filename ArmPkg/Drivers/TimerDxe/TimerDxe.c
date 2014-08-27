@@ -35,6 +35,10 @@ EFI_EVENT             EfiExitBootServicesEvent = (EFI_EVENT)NULL;
 
 // The current period of the timer interrupt
 UINT64 mTimerPeriod = 0;
+// The latest Timer Tick calculated for mTimerPeriod
+UINT64 mTimerTicks = 0;
+// Number of elapsed period since the last Timer interrupt
+UINT64 mElapsedPeriod = 1;
 
 // Cached copy of the Hardware Interrupt protocol instance
 EFI_HARDWARE_INTERRUPT_PROTOCOL *gInterrupt = NULL;
@@ -135,26 +139,44 @@ TimerDriverSetTimerPeriod (
   IN UINT64                   TimerPeriod
   )
 {
+  UINT64      CounterValue;
   UINT64      TimerTicks;
+  EFI_TPL     OriginalTPL;
 
   // Always disable the timer
   ArmArchTimerDisableTimer ();
 
   if (TimerPeriod != 0) {
-    // TimerTicks = TimerPeriod in 1ms unit x Frequency.10^-3
-    //            = TimerPeriod.10^-4 x Frequency.10^-3
-    //            = (TimerPeriod x Frequency) x 10^-7
+    // mTimerTicks = TimerPeriod in 1ms unit x Frequency.10^-3
+    //             = TimerPeriod.10^-4 x Frequency.10^-3
+    //             = (TimerPeriod x Frequency) x 10^-7
     TimerTicks = MultU64x32 (TimerPeriod, FixedPcdGet32 (PcdArmArchTimerFreqInHz));
     TimerTicks = DivU64x32 (TimerTicks, 10000000U);
 
-    ArmArchTimerSetTimerVal ((UINTN)TimerTicks);
+    // Raise TPL to update the mTimerTicks and mTimerPeriod to ensure these values
+    // are coherent in the interrupt handler
+    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+
+    mTimerTicks    = TimerTicks;
+    mTimerPeriod   = TimerPeriod;
+    mElapsedPeriod = 1;
+
+    gBS->RestoreTPL (OriginalTPL);
+
+    // Get value of the current physical timer
+    CounterValue = ArmReadCntPct ();
+    // Set the interrupt in Current Time + mTimerTick
+    ArmWriteCntpCval (CounterValue + mTimerTicks);
 
     // Enable the timer
     ArmArchTimerEnableTimer ();
+  } else {
+    // Save the new timer period
+    mTimerPeriod   = TimerPeriod;
+    // Reset the elapsed period
+    mElapsedPeriod = 1;
   }
 
-  // Save the new timer period
-  mTimerPeriod = TimerPeriod;
   return EFI_SUCCESS;
 }
 
@@ -274,6 +296,8 @@ TimerInterruptHandler (
   )
 {
   EFI_TPL      OriginalTPL;
+  UINT64       CurrentValue;
+  UINT64       CompareValue;
 
   //
   // DXE core uses this callback for the EFI timer tick. The DXE core uses locks
@@ -289,11 +313,29 @@ TimerInterruptHandler (
     gInterrupt->EndOfInterrupt (gInterrupt, Source);
 
     if (mTimerNotifyFunction) {
-      mTimerNotifyFunction (mTimerPeriod);
+      mTimerNotifyFunction (mTimerPeriod * mElapsedPeriod);
     }
 
+    //
     // Reload the Timer
-    TimerDriverSetTimerPeriod (&gTimer, mTimerPeriod);
+    //
+
+    // Get current counter value
+    CurrentValue = ArmReadCntPct ();
+    // Get the counter value to compare with
+    CompareValue = ArmReadCntpCval ();
+
+    // This loop is needed in case we missed interrupts (eg: case when the interrupt handling
+    // has taken longer than mTickPeriod).
+    // Note: Physical Counter is counting up
+    mElapsedPeriod = 0;
+    do {
+      CompareValue += mTimerTicks;
+      mElapsedPeriod++;
+    } while (CompareValue < CurrentValue);
+
+    // Set next compare value
+    ArmWriteCntpCval (CompareValue);
   }
 
   // Enable timer interrupts
