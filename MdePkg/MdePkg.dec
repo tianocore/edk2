@@ -1,7 +1,6 @@
 ## @file  MdePkg.dec
+# This Package provides all definitions, library classes and libraries instances.
 #
-# This Package provides all definitions(including functions, MACROs, structures and library classes)
-# and libraries instances, which are defined in MDE Specification.
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
 # EFI1.10/UEFI2.4/PI1.3 and some Industry Standards.
 #
@@ -22,6 +21,7 @@
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = MdePkg
+  PACKAGE_UNI_FILE               = MdePkg.uni
   PACKAGE_GUID                   = 1E73767F-8F52-4603-AEB4-F29B510B6766
   PACKAGE_VERSION                = 1.04
 
@@ -1365,236 +1365,419 @@
   ## Include/Protocol/AdapterInformation.h
   gEfiAdapterInformationProtocolGuid	 = { 0xE5DD1403, 0xD622, 0xC24E, {0x84, 0x88, 0xC7, 0x1B, 0x17, 0xF5, 0xE8, 0x02 }}
 
+#
+# [Error.gEfiMdePkgTokenSpaceGuid]
+#   0x80000001 | Invalid value provided.
+#   0x80000002 | Reserved bits must be set to zero.
+#   0x80000003 | Incorrect progress code provided.
+#
+
 [PcdsFeatureFlag]
-  ## If TRUE, the component name protocol will not be installed.
+  ## Indicates if the component name protocol will be installed.<BR><BR>
+  #   TRUE  - Does not install component name protocol.<BR>
+  #   FALSE - Install component name protocol.<BR>
+  # @Prompt Disable Component Name Protocol.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
 
-  ## If TRUE, the driver diagnostics protocol will not be installed.
+  ## Indicates if the diagnostics name protocol will be installed.<BR><BR>
+  #   TRUE  - Does not install diagnostics name protocol.<BR>
+  #   FALSE - Install diagnostics name protocol.<BR>
+  # @Prompt Disable Diagnostics Name protocol.
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE|BOOLEAN|0x0000000e
 
-  ## If TRUE, the component name2 protocol will not be installed.
+  ## Indicates if the component name2 protocol will be installed.<BR><BR>
+  #   TRUE  - Does not install component name2 protocol.<BR>
+  #   FALSE - Install component name2 protocol.<BR>
+  # @Prompt Disable Component Name2 Protocol.
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE|BOOLEAN|0x00000010
 
-  ## If TRUE, the driver diagnostics2 protocol will not be installed.
+  ## Indicates if the diagnostics2 name protocol will be installed.<BR><BR>
+  #   TRUE  - Does not install diagnostics2 name protocol.<BR>
+  #   FALSE - Install diagnostics2 name protocol.<BR>
+  # @Prompt Disable Diagnostics2 Name Protocol.
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE|BOOLEAN|0x00000011
 
-  ## Indicates whether EFI 1.1 ISO 639-2 language supports are obsolete.
-  #  If TRUE, Variable driver will be also not to auto update between PlatformLang and Lang variables.
+  ## Indicates if EFI 1.1 ISO 639-2 language supports are obsolete<BR><BR>
+  #   TRUE  - Deprecate global variable LangCodes.<BR>
+  #   FALSE - Does not deprecate global variable LangCodes.<BR>
+  # @Prompt Deprecate Global Variable LangCodes.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE|BOOLEAN|0x00000012
 
-  ## If TRUE, UGA Draw Protocol is still consumed.
+  ## Indicates if UGA Draw Protocol is still consumed.<BR><BR>
+  #   TRUE  - Consume UGA Draw protocol.<BR>
+  #   FALSE - Does not consume UGA Draw protocol.<BR>
+  # @Prompt Consume UGA Draw Protocol.
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE|BOOLEAN|0x00000027
 
-  ## If TRUE, a check will be made to see if a specified node is a member of  linked list
-  #  in the following BaseLib fucntions: GetNextNode(), IsNull(), IsNodeAtEnd(),
-  #  SwapListEntries()
+  ## Indicates if a check will be made to see if a specified node is a member of linked list
+  #  in the following BaseLib functions: GetNextNode(), IsNull(), IsNodeAtEnd(), SwapListEntries().<BR><BR>
+  #   TRUE  - Verify a specified node is a member of linked list.<BR>
+  #   FALSE - Does not verify a specified node is a member of linked list.<BR>
+  # @Prompt Verify Node In List.
   gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList|FALSE|BOOLEAN|0x00000028
 
   ## If TRUE, OrderedCollectionLib is instructed to validate the
   #  ORDERED_COLLECTION structure at the end of such operations (typically
   #  structure modifications) that justify validation of the structure for unit
   #  testing purposes.
+  # @Prompt Validate ORDERED_COLLECTION structure
   gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|FALSE|BOOLEAN|0x0000002a
 
 [PcdsFixedAtBuild]
-  ## Indicates the maximum length of unicode string
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
-
-  ## Indicates the maximum length of ascii string
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000|UINT32|0x00000002
-
-  ## Indicates the maximum node number of linked list
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000|UINT32|0x00000003
-
-  ## Indicates the maximum node number of device path
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount|0|UINT32|0x00000029
-
-  ## Indicates the timeout tick of holding spin lock
-  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000|UINT32|0x00000004
-
-  ## The mask is used to control DebugLib behavior
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0|UINT8|0x00000005
-
-  ## The mask is used to control ReportStatusCodeLib behavior
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0|UINT8|0x00000007
-
-  ## This value is used to fill a segment of memory
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF|UINT8|0x00000008
-
-  ## The mask is used to control PerformanceLib behavior
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0|UINT8|0x00000009
-
-  ## The mask is used to control PostCodeLib behavior
-  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
-
-  ## This value is used to set the FSB clock
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
-
-  ## The maxium allowable size of formatted unicode string
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320|UINT32|0x101
-
-  ## Status code value for indicating a watchdog timer is expired
+  ## Status code value for indicating a watchdog timer has expired.
   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
+  # @Prompt Progress Code for WatchDog Timer Expired.
+  # @ValidList  0x80000003 | 0x00011003
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003|UINT32|0x00000013
 
   ## Status code value for indicating the invocation of SetVirtualAddressMap()
   # EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
+  # @Prompt Progress Code for Invocation of SetVirtualAddressMap.
+  # @ValidList  0x80000003 | 0x03111004
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap|0x03111004|UINT32|0x00000014
 
   ## Status code value for indicating the start of memory test
   # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
+  # @Prompt Progress Code for Memory Test Start.
+  # @ValidList  0x80000003 | 0x00051006
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted|0x00051006|UINT32|0x00000015
 
   ## Status code value for indicating memory error in memory test
   # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
+  # @Prompt Progress Code for Memory Error.
+  # @ValidList  0x80000003 | 0x00051003
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError|0x00051003|UINT32|0x00000016
 
-  ## Status code value for indicating the failure of console operation
+  ## Status code value for console operation failure.
   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
+  # @Prompt Progress Code for Console Error.
+  # @ValidList  0x80000003 | 0x01040006
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError|0x01040006|UINT32|0x00000017
 
-  ## Status code value for indicating the failure of console reset operation
+  ## Status code value for console reset operation failure.
   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
+  # @Prompt Progress Code for Console Reset.
+  # @ValidList  0x80000003 | 0x01040001
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset|0x01040001|UINT32|0x00000018
 
-  ## Status code value for indicating the failure of console input operation
+  ## Status code value for console input operation failure.
   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
+  # @Prompt Progress Code for Console Input Error.
+  # @ValidList  0x80000003 | 0x01040007
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError|0x01040007|UINT32|0x00000019
 
-  ## Status code value for indicating the failure of console output operation
+  ## Status code value for console output operation failure.
   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
+  # @Prompt Progress Code for Console Output Error.
+  # @ValidList  0x80000003 | 0x01040008
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError|0x01040008|UINT32|0x0000001a
 
-  ## Status code value for indicating the failure of mouse operation
+  ## Status code value for mouse operation failure.
   # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INTERFACE_ERROR
+  # @Prompt Progress Code for Module Device Failure.
+  # @ValidList  0x80000003 | 0x01020005
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError|0x01020005|UINT32|0x30001000
 
-  ## Status code value for indicating the enable of mouse device
+  ## Status code value for indicating mouse device has been enabled.
   # EFI_PERIPHERAL_MOUSE | EFI_P_PC_ENABLE
+  # @Prompt Progress Code for Enable Mouse Device.
+  # @ValidList  0x80000003 | 0x01020004
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable|0x01020004|UINT32|0x30001001
 
-  ## Status code value for indicating the disable of mouse device
+  ## Status code value for indicating mouse device has been disabled.
   # EFI_PERIPHERAL_MOUSE | EFI_P_PC_DISABLE
+  # @Prompt Progress Code for Disable Mouse Device.
+  # @ValidList  0x80000003 | 0x01020002
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable|0x01020002|UINT32|0x30001002
 
-  ## Status code value for indicating the enable of keyboard device
+  ## Status code value for enabling keyboard device.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE
+  # @Prompt Progress Code for Enable Keyboard Device.
+  # @ValidList  0x80000003 | 0x01010004
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable|0x01010004|UINT32|0x30001003
 
-  ## Status code value for indicating the disable of keyboard device
+  ## Status code value for disabling keyboard device.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_DISABLE
+  # @Prompt Progress Code for Disable Keyboard Device.
+  # @ValidList  0x80000003 | 0x01010002
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable|0x01010002|UINT32|0x30001004
 
-  ## Status code value for indicating whether keboard device is present
+  ## Status code value for indicating presence of keyboard.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT
+  # @Prompt Progress Code for Detect Keyboard Device.
+  # @ValidList  0x80000003 | 0x01010003
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect|0x01010003|UINT32|0x30001005
 
-  ## Status code value for indicating the reset operation of keyboard device
+  ## Status code value for keyboard operation reset operation.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET
+  # @Prompt Progress Code for Keyboard Device Reset.
+  # @ValidList  0x80000003 | 0x01010001
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardReset|0x01010001|UINT32|0x30001006
 
-  ## Status code value for indicating the clear buffer operation of keyboard device
+  ## Status code value for keyboard clear buffer operation.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER
+  # @Prompt Progress Code for Keyboard Device Clear Buffer.
+  # @ValidList  0x80000003 | 0x01011000
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardClearBuffer|0x01011000|UINT32|0x30001007
 
-  ## Status code value for indicating the self test of keyboard device
+  ## Status code value for keyboard device self-test.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST
+  # @Prompt Progress Code for Keyboard Device SelfTest.
+  # @ValidList  0x80000003 | 0x01011001
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardSelfTest|0x01011001|UINT32|0x30001008
 
-  ## Status code value for indicating the operation of keyboard device is failed
+  ## Status code value for indicating keyboard device failure.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR
+  # @Prompt Progress Code for Keyboard Device Failure.
+  # @ValidList  0x80000003 | 0x01010005
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInterfaceError|0x01010005|UINT32|0x30001009
 
-  ## Status code value for indicating the failure of keyboard input handler
+  ## Status code value for indicating keyboard input handler failure.
   # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INPUT_ERROR
+  # @Prompt Progress Code for Keyboard Input Failure.
+  # @ValidList  0x80000003 | 0x01010007
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError|0x01010007|UINT32|0x3000100a
 
-  ## Status code value for indicating the failure of mouse input handler
+  ## Status code value for mouse input handler failure.
   # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INPUT_ERROR
+  # @Prompt Progress Code for Mouse Input Failure.
+  # @ValidList  0x80000003 | 0x01020007
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError|0x01020007|UINT32|0x3000100b
 
-  ## Status code value for indicating the reset operation of mouse device
+  ## Status code value for mouse device reset operation.
   # EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET
+  # @Prompt Progress Code for Mouse Device Reset.
+  # @ValidList  0x80000003 | 0x01020001
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x3000100c
 
-  ## Status code value for indicating the handoff from Pei phase to Dxe phase
+  ## Status code value for indicating the handoff from PEI phase to DXE phase.
   # EFI_SOFTWARE_PEI_CORE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
+  # @Prompt Progress Code for Handoff from Pei phase to Dxe phase.
+  # @ValidList  0x80000003 | 0x3021001
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3021001|UINT32|0x3000100d
 
   ## Status code value for indicating one PEIM is dispatched.
   #  EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_BEGIN
+  # @Prompt Progress Code for Dispatching One PEIM.
+  # @ValidList  0x80000003 | 0x3020002
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch|0x3020002|UINT32|0x3000100e
 
-  ## Status code value for indicating entering PeiCore
+  ## Status code value for PeiCore entry.
   #  EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT
+  # @Prompt Progress Code for PeiCore Entry.
+  # @ValidList  0x80000003 | 0x3020000
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry|0x3020000|UINT32|0x3000100f
 
-  ## Status code value for indicating entering DxeCore
+  ## Status code value for DxeCore entry.
   # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT
+  # @Prompt Progress Code for DxeCore Entry.
+  # @ValidList  0x80000003 | 0x3041000
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreEntry|0x3041000|UINT32|0x30001010
 
-  ## Status code value for indicating the handoff from DxeCore to Bds
+  ## Status code value for handoff from DxeCore to BDS.
   # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT
+  # @Prompt Progress Code for Handoff from DxeCore to BDS.
+  # @ValidList  0x80000003 | 0x3041001
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreHandoffToBds|0x3041001|UINT32|0x30001011
 
-  ## Status code value for indicating the exit of boot service
+  ## Status code value for indicating boot service exit.
   # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES
+  # @Prompt Progress Code for Exit of Boot Service.
+  # @ValidList  0x80000003 | 0x3101019
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit|0x3101019|UINT32|0x30001012
 
-  ## Status code value for indicating the begin of Dxe driver
+  ## Status code value for indicating the beginning of DXE driver.
   # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN
+  # @Prompt Progress Code for Begin of DXE Driver.
+  # @ValidList  0x80000003 | 0x3040002
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverBegin|0x3040002|UINT32|0x30001013
 
-  ## Status code value for indicating the end of Dxe driver
+  ## Status code value for indicating the end of DXE drive.
   # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END
+  # @Prompt Progress Code for End of DXE Driver.
+  # @ValidList  0x80000003 | 0x3040003
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014
+
+[PcdsFixedAtBuild,PcdsPatchableInModule]
+  ## Indicates the maximum length of unicode string used in the following
+  #  BaseLib functions: StrLen(), StrSize(), StrCmp(), StrnCmp(), StrCpy(), StrnCpy()<BR><BR>
+  #  0  - No length check for unicode string.<BR>
+  #  >0 - Maximum length of unicode string.<BR>
+  # @Prompt Maximum Length of Unicode String.
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
+
+  ## Indicates the maximum length of ascii string used in the following
+  #  BaseLib functions: AsciiStrLen(), AsciiStrSize(), AsciiStrCmp(), AsciiStrnCmp(),
+  #  AsciiStrCpy(), AsciiStrnCpy(). <BR><BR>
+  #  0  - No length check for ascii string.<BR>
+  #  >0 - Maximum length of ascii string.<BR>
+  # @Prompt Maximum Length of Ascii String.
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000|UINT32|0x00000002
+
+  ## Indicates the maximum node number of linked list.<BR><BR>
+  #  0  - No node number check for linked list.<BR>
+  #  >0 - Maximum node number of linked list.<BR>
+  # @Prompt Maximum Length of Linked List.
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000|UINT32|0x00000003
+
+  ## Indicates the maximum node number of device path.<BR><BR>
+  #  0  - No node number check for device path.<BR>
+  #  >0 - Maximum node number of device path.<BR>
+  # @Prompt Maximum node number of device path.
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount|0|UINT32|0x00000029
+
+  ## Indicates the timeout tick of holding spin lock.<BR><BR>
+  #  0  - No timeout.<BR>
+  #  >0 - Timeout tick of holding spin lock.<BR>
+  # @Prompt Spin Lock Timeout (us).
+  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000|UINT32|0x00000004
+
+  ## The mask is used to control DebugLib behavior.<BR><BR>
+  #  BIT0 - Enable Debug Assert.<BR>
+  #  BIT1 - Enable Debug Print.<BR>
+  #  BIT2 - Enable Debug Code.<BR>
+  #  BIT3 - Enable Clear Memory.<BR>
+  #  BIT4 - Enable BreakPoint as ASSERT.<BR>
+  #  BIT5 - Enable DeadLoop as ASSERT.<BR>
+  # @Prompt Debug Property.
+  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask & 0xC0) == 0
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0|UINT8|0x00000005
+
+  ## This flag is used to control the print out Debug message.<BR><BR>
+  #  BIT0  - Initialization message.<BR>
+  #  BIT1  - Warning message.<BR>
+  #  BIT2  - Load Event message.<BR>
+  #  BIT3  - File System message.<BR>
+  #  BIT4  - Allocate or Free Pool message.<BR>
+  #  BIT5  - Allocate or Free Page message.<BR>
+  #  BIT6  - Information message.<BR>
+  #  BIT7  - Dispatcher message.<BR>
+  #  BIT8  - Variable message.<BR>
+  #  BIT10 - Boot Manager message.<BR>
+  #  BIT12 - BlockIo Driver message.<BR>
+  #  BIT14 - Network Driver message.<BR>
+  #  BIT16 - UNDI Driver message.<BR>
+  #  BIT17 - LoadFile message.<BR>
+  #  BIT19 - Event message.<BR>
+  #  BIT20 - Global Coherency Database changes message.<BR>
+  #  BIT21 - Memory range cachability changes message.<BR>
+  #  BIT22 - Detailed debug message.<BR>
+  #  BIT28 - Error message.<BR>
+  # @Prompt Debug Message Print Level.
+  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel & 0x7F84AA00) == 0
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
+
+  ## The mask is used to control ReportStatusCodeLib behavior.<BR><BR>
+  #  BIT0 - Enable Progress Code.<BR>
+  #  BIT1 - Enable Error Code.<BR>
+  #  BIT2 - Enable Debug Code.<BR>
+  # @Prompt Report Status Code Property.
+  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask & 0xF8) == 0
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0|UINT8|0x00000007
+
+  ## This value is used to fill a segment of memory when PcdDebugPropertyMask Clear Memory is enabled.
+  # @Prompt Value to Clear Memory.
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF|UINT8|0x00000008
+
+  ## The mask is used to control PerformanceLib behavior.<BR><BR>
+  #  BIT0 - Enable Performance Measurement.<BR>
+  # @Prompt Performance Measurement Property.
+  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask & 0xFE) == 0
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0|UINT8|0x00000009
+
+  ## The mask is used to control PostCodeLib behavior.<BR><BR>
+  #  BIT0 - Enable Post Code.<BR>
+  #  BIT1 - Enable Post Code with Description.<BR>
+  # @Prompt Post Code Property.
+  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask & 0xFC) == 0
+  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
+
+  ## This value is used to configure X86 Processor FSB clock.
+  # @Prompt FSB Clock.
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
+
+  ## The maximum printable number of characters. UefLib functions: AsciiPrint(), AsciiErrorPrint(),
+  #  PrintXY(), AsciiPrintXY(), Print(), ErrorPrint() base on this PCD value to print characters.
+  # @Prompt Maximum Printable Number of Characters.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320|UINT32|0x101
+
+  ## Indicates the allowable maximum number in extract handler table.
+  # @Prompt Maximum Number of GuidedExtractHandler.
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
+
+  ## Indicates the default timeouts for USB transfers in milliseconds.
+  # @Prompt USB Transfer Timeout (ms).
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
 
   ## This value is used to set the available memory address to store Guided Extract Handlers.
   #  The required memory space is decided by the value of PcdMaximumGuidedExtractHandler.
+  # @Prompt Memory Address of GuidedExtractHandler Table.
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|0x1000000|UINT64|0x30001015
 
-[PcdsFixedAtBuild.IPF]
-  ## The base address of IO port space for IA64 arch
+[PcdsFixedAtBuild.IPF, PcdsPatchableInModule.IPF]
+  ## The base address of IO port space for IA64 arch.
+  # @Prompt IA64 IO Port Space Base Address.
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
 
-[PcdsFixedAtBuild,PcdsPatchableInModule]
-  ## This flag is used to control the printout of DebugLib
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
-
-  ## Indicates the allowable maximum number in extract handler table
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
-
-  ## Indicates the default timeouts for USB transfers in milliseconds
-  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
-
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
-  ## This value is used to set the base address of pci express hierarchy
+  ## This value is used to set the base address of PCI express hierarchy.
+  # @Prompt PCI Express Base Address.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
 
-  ## Default current ISO 639-2 language: English & French
+  ## Default current ISO 639-2 language: English & French.
+  # @Prompt Default Value of LangCodes Variable.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfraengfra"|VOID*|0x0000001c
 
-  ## Default current ISO 639-2 language: English
+  ## Default current ISO 639-2 language: English.
+  # @Prompt Default Value of Lang Variable.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
 
-  ## Default platform supported RFC 4646 languages: (American) English & French
+  ## Default platform supported RFC 4646 languages: (American) English & French.
+  # @Prompt Default Value of PlatformLangCodes Variable.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fr;en-US;fr-FR"|VOID*|0x0000001e
 
-  ## Defualt current RFC 4646 language: (American) English
+  ## Default current RFC 4646 language: (American) English.
+  # @Prompt Default Value of PlatformLang Variable.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
 
-  ## Indicates the default baud rate of UART
+  ## Indicates the default baud rate of UART.
+  # @Prompt Default UART Baud Rate.
+  # @ValidList  0x80000001 | 115200, 57600, 38400, 19200, 9600, 7200, 4800, 3600, 2400, 2000, 1800, 1200, 600, 300, 150, 134, 110, 75, 50
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
 
-  ## Indicates the number of efficient data bit in UART transaction
+  ## Indicates the number of efficient data bit in UART transaction.
+  # @Prompt Default UART Data Bit.
+  # @ValidRange 0x80000001 | 5 - 8
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
 
-  ## Indicates the setting of data parity in UART transaction
+  ## Indicates the setting of data parity in UART transaction.<BR><BR>
+  # 0 - Default Parity.<BR>
+  # 1 - No Parity.<BR>
+  # 2 - Even Parity.<BR>
+  # 3 - Odd Parity.<BR>
+  # 4 - Mark Parity.<BR>
+  # 5 - Space Parity.<BR>
+  # @Prompt Default UART Parity.
+  # @ValidRange 0x80000001 | 0 - 5
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
 
-  ## Indicates the setting of stop bit in UART transaction
+  ## Indicates the setting of stop bit in UART transaction.<BR><BR>
+  # 0 - Default Stop Bits.<BR>
+  # 1 - One Stop Bit.<BR>
+  # 2 - One Five Stop Bits.<BR>
+  # 3 - Two Stop Bits.<BR>
+  # @Prompt Default UART Stop Bits.
+  # @ValidRange 0x80000001 | 0 - 3
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
 
-  ## Indicates the usable type of terminal
-  #  0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
+  ## Indicates the usable type of terminal.<BR><BR>
+  #  0 - PCANSI<BR>
+  #  1 - VT100<BR>
+  #  2 - VT100+<BR>
+  #  3 - UTF8<BR>
+  # @Prompt Default Terminal Type.
+  # @ValidRange 0x80000001 | 0 - 3
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  MdePkgExtra.uni
