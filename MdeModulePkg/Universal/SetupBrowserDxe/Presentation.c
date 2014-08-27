@@ -1985,17 +1985,6 @@ ProcessCallBackFunction (
                              TypeValue,
                              &ActionRequest
                              );
-    //
-    // IFR is updated, force to reparse the IFR binary
-    //
-    if (mHiiPackageListUpdated) {
-      if (BackUpBuffer != NULL) {
-        FreePool (BackUpBuffer);
-      }
-
-      return EFI_SUCCESS;
-    }
-
     if (!EFI_ERROR (Status)) {
       //
       // Need to sync the value between Statement->HiiValue->Value and Statement->BufferValue
@@ -2412,15 +2401,6 @@ SetupBrowser (
           ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && 
           (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
         Status = ProcessCallBackFunction(Selection, Selection->FormSet, Selection->Form, Statement, EFI_BROWSER_ACTION_CHANGING, FALSE);
-        //
-        // IFR is updated during callback of EFI_BROWSER_ACTION_CHANGING, force to reparse the IFR binary
-        //
-        if (mHiiPackageListUpdated) {
-          Selection->Action = UI_ACTION_REFRESH_FORMSET;
-          mHiiPackageListUpdated = FALSE;
-          break;
-        }
-
         if (Statement->Operand == EFI_IFR_REF_OP) {
           //
           // Process dynamic update ref opcode.
@@ -2448,14 +2428,6 @@ SetupBrowser (
 
         if (!EFI_ERROR (Status) && Statement->Operand != EFI_IFR_REF_OP) {
           ProcessCallBackFunction(Selection, Selection->FormSet, Selection->Form, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
-          //
-          // IFR is updated during callback of EFI_BROWSER_ACTION_CHANGED, force to reparse the IFR binary
-          //
-          if (mHiiPackageListUpdated) {
-            Selection->Action = UI_ACTION_REFRESH_FORMSET;
-            mHiiPackageListUpdated = FALSE;
-            break;
-          }
         }
       } else {
         //

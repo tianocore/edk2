@@ -2449,7 +2449,10 @@ ValidateFormSet (
   ASSERT (FormSet != NULL);
 
   Find = ValidateHiiHandle(FormSet->HiiHandle);
-  if (!Find) {
+  //
+  // Should not remove the formset which is being used.
+  //
+  if (!Find && (FormSet != gCurrentSelection->FormSet)) {
     CleanBrowserStorage(FormSet);
     RemoveEntryList (&FormSet->Link);
     DestroyFormSet (FormSet);
