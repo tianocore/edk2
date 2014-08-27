@@ -1,9 +1,9 @@
 ## @file
-# Component description file for Cpu Io SMM Io Library.
+# SMM Instance of I/O Library using SMM CPU I/O 2 Protocol.
 #
-# I/O Library implementation that uses the CPU I/O Protocol for I/O
+# I/O Library SMM implementation that uses SMM CPU I/O 2 Protocol for I/O
 #  and MMIO operations.
-# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmIoLibSmmCpuIo2
+  MODULE_UNI_FILE                = SmmIoLibSmmCpuIo2.uni
   FILE_GUID                      = DEEEA15E-4A77-4513-BA75-71D26FEF78A1
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
@@ -43,8 +44,6 @@
   DebugLib
   SmmServicesTableLib
 
-[Protocols]
-  gEfiSmmCpuIo2ProtocolGuid                         ## CONSUMES
-
 [Depex.common.DXE_SMM_DRIVER]
   gEfiSmmCpuIo2ProtocolGuid
+

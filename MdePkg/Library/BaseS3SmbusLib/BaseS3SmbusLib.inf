@@ -1,11 +1,10 @@
 ## @file
-# Component description file for S3SmbusLib.
+# Instance of S3 Smbus Library based on SmBus and S3 BootScript Library.
 #
-# Smbus Library Services that do SMBus transactions and also enable the
-# operatation to be replayed during an S3 resume. This library class maps
-# directly on top of the SmbusLib class.
+# S3 Smbus Library Services that do SMBus transactions and also enable the
+# operatation to be replayed during an S3 resume. 
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseS3SmbusLib
+  MODULE_UNI_FILE                = BaseS3SmbusLib.uni
   FILE_GUID                      = 01190654-FED0-40d3-BA7F-2925539E5830
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

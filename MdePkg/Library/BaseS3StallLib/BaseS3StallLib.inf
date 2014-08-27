@@ -1,11 +1,10 @@
 ## @file
-# Component description file for S3StallLib.
+# Instance of S3 Stall Library based on Timer and S3 BootScript Library.
 #
 # Stall Services that do stall and also enable the Stall operatation
-# to be replayed during an S3 resume. This library class maps directly on top
-# of the Timer class.
+# to be replayed during an S3 resume. 
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseS3StallLib
+  MODULE_UNI_FILE                = BaseS3StallLib.uni
   FILE_GUID                      = 498C6AC3-CC29-4821-BE6F-7C6F4ECF2C14
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

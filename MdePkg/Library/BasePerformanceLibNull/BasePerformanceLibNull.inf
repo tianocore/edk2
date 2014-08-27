@@ -1,10 +1,7 @@
 ## @file
-#  Instance of Performance Library based on Base Library.
+#  Instance of Performance Library with empty functions.
 #
-#  Performance Library that layers on top of the Base Library to measure start
-#  and end times using CPU specific timer services if they are available.
-#
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BasePerformanceLibNull
+  MODULE_UNI_FILE                = BasePerformanceLibNull.uni
   FILE_GUID                      = FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -43,5 +41,5 @@
 
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask  ## CONSUMES
 

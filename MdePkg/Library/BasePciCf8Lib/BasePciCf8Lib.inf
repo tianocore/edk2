@@ -4,7 +4,7 @@
 #  PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
 #  Layers on top of an I/O Library instance.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BasePciCf8Lib
+  MODULE_UNI_FILE                = BasePciCf8Lib.uni
   FILE_GUID                      = 472ab06d-9810-4c00-bb7f-dad1828fc1ab
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

@@ -1,8 +1,8 @@
 ## @file
 #  Instance of Debug Library based on Serial Port Library.
-#  It uses Print Library to produce formatted output strings.
+#  It uses Print Library to produce formatted output strings to seiral port device.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseDebugLibSerialPort
+  MODULE_UNI_FILE                = BaseDebugLibSerialPort.uni
   FILE_GUID                      = BB83F95F-EDBC-4884-A520-CD42AF388FAE
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -42,6 +43,6 @@
   DebugPrintErrorLevelLib
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue  ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask      ## CONSUMES
 

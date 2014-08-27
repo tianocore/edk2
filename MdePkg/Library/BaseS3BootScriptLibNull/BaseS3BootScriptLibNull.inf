@@ -5,7 +5,7 @@
 # resume.  All the library interfaces simply return EFI_SUCCESS without
 # performing any operation.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseS3BootScriptLibNull
+  MODULE_UNI_FILE                = BaseS3BootScriptLibNull.uni
   FILE_GUID                      = 9A6DC1AC-94C0-43b1-8714-4C70FD58A815
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

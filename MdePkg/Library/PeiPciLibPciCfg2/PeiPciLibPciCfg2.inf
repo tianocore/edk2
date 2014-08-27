@@ -7,7 +7,7 @@
 #  the first PPI found, so this library instance should only be used platforms
 #  with a single PCI segment.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,6 +22,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiPciLibPciCfg2
+  MODULE_UNI_FILE                = PeiPciLibPciCfg2.uni
   FILE_GUID                      = FA3AD693-D58A-4619-960B-8EE85C914870
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -52,3 +53,4 @@
 
 [Depex.common.PEIM]
   gEfiPciCfg2PpiGuid
+

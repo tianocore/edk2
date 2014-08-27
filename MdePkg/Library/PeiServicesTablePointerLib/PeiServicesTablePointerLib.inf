@@ -5,7 +5,7 @@
 #  PEI Services Table from a global variable. Not available to modules that execute from
 #  read-only memory.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiServicesTablePointerLib
+  MODULE_UNI_FILE                = PeiServicesTablePointerLib.uni
   FILE_GUID                      = 1c747f6b-0a58-49ae-8ea3-0327a4fa10e3
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0

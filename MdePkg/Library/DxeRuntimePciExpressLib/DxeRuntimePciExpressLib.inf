@@ -7,7 +7,7 @@
 #  PCI devices that are registered for for runtime access is maintained so the 
 #  proper virtual address is used to perform the PCI Express Configuration cycle.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,6 +22,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeRuntimePciExpressLib
+  MODULE_UNI_FILE                = DxeRuntimePciExpressLib.uni
   FILE_GUID                      = 54DCBCE5-92AD-41f5-AAAF-1170F16DA6A8
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -53,4 +54,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress  ## CONSUMES
 
 [Guids]
-  gEfiEventVirtualAddressChangeGuid         ## PRODUCES ## Event
+  gEfiEventVirtualAddressChangeGuid         ## CONSUMES ## Event
+

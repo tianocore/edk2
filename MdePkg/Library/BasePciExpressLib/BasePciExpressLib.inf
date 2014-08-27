@@ -4,7 +4,7 @@
 #  PCI Express Library that uses the 256 MB PCI Express MMIO window to perform
 #  PCI Configuration cycles. Layers on top of an I/O Library instance.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BasePciExpressLib
+  MODULE_UNI_FILE                = BasePciExpressLib.uni
   FILE_GUID                      = 287e50f4-a188-4699-b907-3e4080ca5688
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -41,5 +42,5 @@
   IoLib
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress  ## CONSUMES
 

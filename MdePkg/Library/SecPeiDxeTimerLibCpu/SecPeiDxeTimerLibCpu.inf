@@ -13,7 +13,7 @@
 # Note that for IA-32 and x64, this library only supports xAPIC mode. If x2APIC
 # support is desired, the SecPeiDxeTimerLibUefiCpu library can be used.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,6 +28,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SecPeiDxeTimerLibCpu
+  MODULE_UNI_FILE                = SecPeiDxeTimerLibCpu.uni
   FILE_GUID                      = b5a05743-9b71-489b-a0ed-a0eb3950d23b
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

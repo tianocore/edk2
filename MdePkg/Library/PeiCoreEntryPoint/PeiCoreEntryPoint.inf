@@ -1,7 +1,7 @@
 ## @file
 # Module entry point library for PEI core.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiCoreEntryPoint
+  MODULE_UNI_FILE                = PeiCoreEntryPoint.uni
   FILE_GUID                      = b3b0654a-969d-4096-86cb-27e262a02083
   MODULE_TYPE                    = PEI_CORE
   VERSION_STRING                 = 1.0
@@ -35,3 +36,4 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+

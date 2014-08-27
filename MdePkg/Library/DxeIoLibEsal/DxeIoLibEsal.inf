@@ -1,11 +1,10 @@
 ## @file
-# Component description file for a CPU I/O Library that layers on top of 
-# Itanium ESAL services.
+# I/O Library instance that layers on top of Itanium ESAL services.
 #
 # I/O Library implementation that uses Itanium ESAL services for I/O
 #  and MMIO operations.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available
 # under the terms and conditions of the BSD License which accompanies this 
 # distribution. The full text of the license may be found at
@@ -14,11 +13,12 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeIoLibEsal
+  MODULE_UNI_FILE                = DxeIoLibEsal.uni
   FILE_GUID                      = 0D8E6E4E-B029-475f-9122-60A3FEDBA8C0
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -46,3 +46,4 @@
 
 [Depex]
   gEfiExtendedSalBaseIoServicesProtocolGuid
+

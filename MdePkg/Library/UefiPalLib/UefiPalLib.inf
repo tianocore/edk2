@@ -4,7 +4,7 @@
 # This instance of PAL library retrieves the PAL Entry Point from the SAL System Table
 # register in the EFI System Confguration Table.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiPalLib
+  MODULE_UNI_FILE                = UefiPalLib.uni
   FILE_GUID                      = B7F30170-9E5F-482a-B553-A145A5787003
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -44,4 +45,5 @@
   DebugLib
 
 [Guids]
-  gEfiSalSystemTableGuid        ## CONSUMES ## GUID
+  gEfiSalSystemTableGuid        ## CONSUMES ## SystemTable
+

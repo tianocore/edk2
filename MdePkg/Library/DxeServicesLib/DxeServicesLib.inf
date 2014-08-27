@@ -1,9 +1,11 @@
 ## @file
+# DXE Services Library instance provides functions that simplify the development of DXE Drivers.
+#
 # DXE Services Library provides access data from sections of FFS files based on FV protocol.
 # It also provides access file based on file path from a firmware volume, 
 # from a file system interface, or from the load file interface.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeServicesLib
+  MODULE_UNI_FILE                = DxeServicesLib.uni
   FILE_GUID                      = EE680C58-FFC0-4a5d-858F-66FF9C84BC9F
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -42,11 +45,12 @@
   UefiBootServicesTableLib
 
 [Guids]
-  gEfiFileInfoGuid                              ## CONSUMES
+  gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## UNDEFINED
 
 [Protocols]
-  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
-  gEfiLoadedImageProtocolGuid                   ## CONSUMES
-  gEfiLoadFileProtocolGuid                      ## CONSUMES
-  gEfiLoadFile2ProtocolGuid                     ## CONSUMES 
-  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES 
+  gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiLoadFile2ProtocolGuid                     ## SOMETIMES_CONSUMES 
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES 
+

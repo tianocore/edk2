@@ -5,7 +5,7 @@
 #  If the DevicePathFromText/DevicePathToText protocol doesn't exist, the library
 #  uses its internal conversion logic.
 #
-# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiDevicePathLibOptionalDevicePathProtocol
+  MODULE_UNI_FILE                = UefiDevicePathLibOptionalDevicePathProtocol.uni
   FILE_GUID                      = 3E1C696D-FCF0-45a7-85A7-E86C2A1C1080
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -52,22 +53,29 @@
   PrintLib
 
 [Guids]
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiVTUTF8Guid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiVT100Guid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiVT100PlusGuid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiPcAnsiGuid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiUartDevicePathGuid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiSasDevicePathGuid
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiDevicePathUtilitiesProtocolGuid           ## CONSUMES
-  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
-  gEfiDevicePathFromTextProtocolGuid            ## CONSUMES
-  gEfiDebugPortProtocolGuid                     ## SOMETIMES_CONSUMES ## GUID
+  gEfiDevicePathToTextProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiDevicePathFromTextProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiDebugPortProtocolGuid                     ## UNDEFINED
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount ## SOMETIMES_CONSUMES
 
 [Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SAL_DRIVER, Depex.common.DXE_SMM_DRIVER]
   gEfiDevicePathUtilitiesProtocolGuid
+  

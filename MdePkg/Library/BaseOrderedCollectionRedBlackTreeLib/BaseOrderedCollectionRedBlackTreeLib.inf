@@ -26,6 +26,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseOrderedCollectionRedBlackTreeLib
+  MODULE_UNI_FILE                = BaseOrderedCollectionRedBlackTreeLib.uni
   FILE_GUID                      = 699F73C3-0058-484C-A9E5-61189276A985
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -46,4 +47,4 @@
   MemoryAllocationLib
 
 [FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection
+  gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection ## CONSUMES

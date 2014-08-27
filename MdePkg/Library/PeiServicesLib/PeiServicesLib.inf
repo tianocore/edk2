@@ -1,7 +1,7 @@
 ## @file
 # PEI Services Library implementation.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiServicesLib
+  MODULE_UNI_FILE                = PeiServicesLib.uni
   FILE_GUID                      = a804239b-4155-446f-acc8-f0825d74908c
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -39,11 +40,9 @@
   DebugLib
 
 [Guids]
-  gEfiFirmwareFileSystem2Guid        ## PRODUCES ## FV
+  gEfiFirmwareFileSystem2Guid        ## SOMETIMES_PRODUCES ## GUID # FV File System Guid.
 
 [Ppis]
-  gEfiPeiFirmwareVolumeInfoPpiGuid   ## PRODUCES
-  gEfiPeiFirmwareVolumeInfo2PpiGuid  ## PRODUCES
-
-
+  gEfiPeiFirmwareVolumeInfoPpiGuid   ## SOMETIMES_PRODUCES
+  gEfiPeiFirmwareVolumeInfo2PpiGuid  ## SOMETIMES_PRODUCES
 

@@ -4,7 +4,7 @@
 #  Base Memory Library that uses MMX registers for high performance.
 #  Optimized for use in DXE.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseMemoryLibMmx
+  MODULE_UNI_FILE                = BaseMemoryLibMmx.uni
   FILE_GUID                      = d458a654-f64c-49db-b8d1-3821306bf1f6
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

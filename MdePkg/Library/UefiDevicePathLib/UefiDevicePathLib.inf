@@ -3,7 +3,7 @@
 #
 # Device Path Library that layers on top of the Memory Allocation Library.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiDevicePathLib
+  MODULE_UNI_FILE                = UefiDevicePathLib.uni
   FILE_GUID                      = 91c1677a-e57f-4191-8b8e-eb7711a716e0
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -48,16 +49,23 @@
   PrintLib
 
 [Guids]
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiVTUTF8Guid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiVT100Guid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiVT100PlusGuid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiPcAnsiGuid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiUartDevicePathGuid
+  ## SOMETIMES_CONSUMES  ## GUID
   gEfiSasDevicePathGuid
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    ## CONSUMES
-  gEfiDebugPortProtocolGuid                     ## SOMETIMES_CONSUMES ## GUID
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiDebugPortProtocolGuid                     ## UNDEFINED
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount    ## SOMETIMES_CONSUMES
+

@@ -4,7 +4,7 @@
 # Memory Allocation Library that uses PEI Services to allocate memory.
 #  Free operations are ignored.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiMemoryAllocationLib
+  MODULE_UNI_FILE                = PeiMemoryAllocationLib.uni
   FILE_GUID                      = b694e0dc-cd4e-4b30-885b-9c164ed3e74a
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0

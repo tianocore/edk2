@@ -4,7 +4,7 @@
 #  Base Memory Library that is optimized for use in PEI phase.  
 #  Uses REP, MMX, XMM registers as required for best performance.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseMemoryLibOptPei
+  MODULE_UNI_FILE                = BaseMemoryLibOptPei.uni
   FILE_GUID                      = D6F43B1B-0F21-462b-B8B7-A033C3EB4261
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

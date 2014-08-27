@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiServicesTablePointerLibIdt
+  MODULE_UNI_FILE                = PeiServicesTablePointerLibIdt.uni
   FILE_GUID                      = DED3F743-CE2C-4ba6-92A2-FFCE2A6D72D9
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0

@@ -3,7 +3,7 @@
 #
 #  Debug Lib that sends messages to the the Standard Error Device in the EFI System Table.
 #
-#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiDebugLibStdErr
+  MODULE_UNI_FILE                = UefiDebugLibStdErr.uni
   FILE_GUID                      = b57a1df6-ffdb-4247-a3df-3a562176751a
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -45,6 +46,6 @@
   DebugPrintErrorLevelLib
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue   ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue   ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask       ## CONSUMES
 

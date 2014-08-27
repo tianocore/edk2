@@ -1,6 +1,8 @@
 ## @file
 #  Stack Check Library
 #
+#  Stack Check Library
+#
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -16,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseStackCheckLib
+  MODULE_UNI_FILE                = BaseStackCheckLib.uni
   FILE_GUID                      = 5f6579f7-b648-4fdb-9f19-4c17e27e8eff
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -38,4 +41,4 @@
   DebugLib
 
 [FixedPcd]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask  ## CONSUMES

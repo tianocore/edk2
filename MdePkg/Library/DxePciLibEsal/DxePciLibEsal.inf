@@ -1,7 +1,7 @@
 ## @file
 #  PCI Library that uses ESAL services to perform PCI Configuration cycles.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxePciLibEsal
+  MODULE_UNI_FILE                = DxePciLibEsal.uni
   FILE_GUID                      = E3441740-3B41-4c90-9C9D-964056C7417D
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -36,3 +37,4 @@
   ExtendedSalLib
   DebugLib
   BaseLib
+

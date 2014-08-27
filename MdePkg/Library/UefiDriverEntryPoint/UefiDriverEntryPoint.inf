@@ -1,7 +1,7 @@
 ## @file
-# Module entry point library for UEFI driver.
+# Module entry point library for UEFI driver, DXE driver and SMM driver.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiDriverEntryPoint
+  MODULE_UNI_FILE                = UefiDriverEntryPoint.uni
   FILE_GUID                      = 331deb15-454b-48d8-9b74-70d01f3f3556
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -43,7 +44,7 @@
 
 
 [Protocols]
-  gEfiLoadedImageProtocolGuid                   ## CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES
 
 
 #

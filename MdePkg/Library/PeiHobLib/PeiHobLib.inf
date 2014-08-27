@@ -3,7 +3,7 @@
 #
 # HOB Library implementation that uses PEI Services to retrieve the HOB List.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiHobLib
+  MODULE_UNI_FILE                = PeiHobLib.uni
   FILE_GUID                      = 9643128f-ac24-4b3e-b6be-d8849a306153
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -42,18 +43,14 @@
   DebugLib
 
 [Guids]
-  gEfiHobMemoryAllocStackGuid                   ## PRODUCES ## HOB
-  gEfiHobMemoryAllocBspStoreGuid                ## PRODUCES ## HOB
-  gEfiHobMemoryAllocModuleGuid                  ## PRODUCES ## HOB
+  gEfiHobMemoryAllocStackGuid                   ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation StackHob
+  gEfiHobMemoryAllocBspStoreGuid                ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation BspStoreHob
+  gEfiHobMemoryAllocModuleGuid                  ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation ModuleHob
 
 #
 # [Hob]
-#   RESOURCE_DESCRIPTOR   ## PRODUCES
-#   MEMORY_ALLOCATION     ## PRODUCES
-#   GUID_EXTENSION        ## CONSUMES
-#   GUID_EXTENSION        ## PRODUCES
-#   CPU                   ## PRODUCES
-#   FV2                   ## PRODUCES
-#   FV                    ## PRODUCES
+#   MEMORY_ALLOCATION     ## SOMETIMES_PRODUCES
+#   RESOURCE_DESCRIPTOR   ## SOMETIMES_PRODUCES
+#   FIRMWARE_VOLUME       ## SOMETIMES_PRODUCES
 #   
 
