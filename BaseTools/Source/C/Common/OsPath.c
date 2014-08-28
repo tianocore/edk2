@@ -1,4 +1,5 @@
 /** @file
+Functions useful to operate file directories by parsing file path.
 
 Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
@@ -8,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  StringFuncs.c
-
-Abstract:
-
-  Functions useful to operate file directories by parsing file path.
 
 **/
 

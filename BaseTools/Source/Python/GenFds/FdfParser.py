@@ -218,6 +218,7 @@ class FdfParser:
         self.CurrentFvName = None
         self.__Token = ""
         self.__SkippedChars = ""
+        GlobalData.gFdfParser = self
 
         # Used to section info
         self.__CurSection = []
@@ -2356,6 +2357,9 @@ class FdfParser:
         ffsInf.CurrentLineNum = self.CurrentLineNumber
         ffsInf.CurrentLineContent = self.__CurrentLine()
 
+        #Replace $(SAPCE) with real space
+        ffsInf.InfFileName = ffsInf.InfFileName.replace('$(SPACE)', ' ')
+
         if ffsInf.InfFileName.replace('$(WORKSPACE)', '').find('$') == -1:
             #do case sensitive check for file path
             ErrorCode, ErrorInfo = PathClass(NormPath(ffsInf.InfFileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
@@ -2391,6 +2395,12 @@ class FdfParser:
     #   @param  FfsInfObj   for whom option is got
     #
     def __GetInfOptions(self, FfsInfObj):
+        if self.__IsKeyword("FILE_GUID"):
+            if not self.__IsToken("="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+            if not self.__GetNextGuid():
+                raise Warning("expected GUID value", self.FileName, self.CurrentLineNumber)
+            FfsInfObj.OverrideGuid = self.__Token
 
         if self.__IsKeyword( "RuleOverride"):
             if not self.__IsToken( "="):
@@ -2426,8 +2436,8 @@ class FdfParser:
 
                 
         if self.__GetNextToken():
-            p = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
-            if p.match(self.__Token):
+            p = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\))')
+            if p.match(self.__Token) and p.match(self.__Token).span()[1] == len(self.__Token):
                 FfsInfObj.KeyStringList.append(self.__Token)
                 if not self.__IsToken(","):
                     return
@@ -2576,7 +2586,7 @@ class FdfParser:
         else:
             FfsFileObj.CurrentLineNum = self.CurrentLineNumber
             FfsFileObj.CurrentLineContent = self.__CurrentLine()
-            FfsFileObj.FileName = self.__Token
+            FfsFileObj.FileName = self.__Token.replace('$(SPACE)', ' ')
             self.__VerifyFile(FfsFileObj.FileName)
 
         if not self.__IsToken( "}"):

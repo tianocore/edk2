@@ -45,6 +45,7 @@ class GenFdsGlobalVariable:
     LibDir = ''
     WorkSpace = None
     WorkSpaceDir = ''
+    ConfDir = ''
     EdkSourceDir = ''
     OutputDirFromDscDict = {}
     TargetName = ''
@@ -88,7 +89,7 @@ class GenFdsGlobalVariable:
     def __LoadBuildRule():
         if GenFdsGlobalVariable.__BuildRuleDatabase:
             return GenFdsGlobalVariable.__BuildRuleDatabase
-        BuildConfigurationFile = os.path.normpath(os.path.join(GenFdsGlobalVariable.WorkSpaceDir, "Conf/target.txt"))
+        BuildConfigurationFile = os.path.normpath(os.path.join(GenFdsGlobalVariable.ConfDir, "target.txt"))
         TargetTxt = TargetTxtClassObject()
         if os.path.isfile(BuildConfigurationFile) == True:
             TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
@@ -201,11 +202,13 @@ class GenFdsGlobalVariable:
 
         TargetList = set()
         FileList = []
-        for File in Inf.Sources:
-            if File.TagName in ("", "*", GenFdsGlobalVariable.ToolChainTag) and \
-                File.ToolChainFamily in ("", "*", GenFdsGlobalVariable.ToolChainFamily):
-                FileList.append((File, DataType.TAB_UNKNOWN_FILE))
-        
+
+        if not Inf.IsBinaryModule:
+            for File in Inf.Sources:
+                if File.TagName in ("", "*", GenFdsGlobalVariable.ToolChainTag) and \
+                    File.ToolChainFamily in ("", "*", GenFdsGlobalVariable.ToolChainFamily):
+                    FileList.append((File, DataType.TAB_UNKNOWN_FILE))
+
         for File in Inf.Binaries:
             if File.Target in ['COMMON', '*', GenFdsGlobalVariable.TargetName]:
                 FileList.append((File, File.Type))
@@ -645,7 +648,8 @@ class GenFdsGlobalVariable:
                 '$(EDK_SOURCE)'  : GenFdsGlobalVariable.EdkSourceDir,
 #                '$(OUTPUT_DIRECTORY)': GenFdsGlobalVariable.OutputDirFromDsc,
                 '$(TARGET)' : GenFdsGlobalVariable.TargetName,
-                '$(TOOL_CHAIN_TAG)' : GenFdsGlobalVariable.ToolChainTag
+                '$(TOOL_CHAIN_TAG)' : GenFdsGlobalVariable.ToolChainTag,
+                '$(SPACE)' : ' '
                }
         OutputDir = GenFdsGlobalVariable.OutputDirFromDscDict[GenFdsGlobalVariable.ArchList[0]]
         if Arch != 'COMMON' and Arch in GenFdsGlobalVariable.ArchList:

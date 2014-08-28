@@ -31,6 +31,7 @@ from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 from MetaFileTable import MetaFileStorage
+from MetaFileCommentParser import CheckInfComment
 
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
@@ -595,6 +596,8 @@ class InfParser(MetaFileParser):
                 continue
             if Comment:
                 Comments.append((Comment, Index + 1))
+            if GlobalData.gOptions and GlobalData.gOptions.CheckUsage:
+                CheckInfComment(self._SectionType, Comments, str(self.MetaFile), Index + 1, self._ValueList)
             #
             # Model, Value1, Value2, Value3, Arch, Platform, BelongsToItem=-1,
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
@@ -823,6 +826,10 @@ class DscParser(MetaFileParser):
         "FIX_LOAD_TOP_MEMORY_ADDRESS"
     ]
 
+    SubSectionDefineKeywords = [
+        "FILE_GUID"
+    ]
+
     SymbolPattern = ValueExpression.SymbolPattern
 
     ## Constructor of DscParser
@@ -1041,13 +1048,15 @@ class DscParser(MetaFileParser):
         if not self._ValueList[2]:
             EdkLogger.error('Parser', FORMAT_INVALID, "No value specified",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
-        if not self._ValueList[1] in self.DefineKeywords:
+        if (not self._ValueList[1] in self.DefineKeywords and
+            (self._InSubsection and self._ValueList[1] not in self.SubSectionDefineKeywords)):
             EdkLogger.error('Parser', FORMAT_INVALID,
                             "Unknown keyword found: %s. "
                             "If this is a macro you must "
                             "add it as a DEFINE in the DSC" % self._ValueList[1],
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
-        self._Defines[self._ValueList[1]] = self._ValueList[2]
+        if not self._InSubsection:
+            self._Defines[self._ValueList[1]] = self._ValueList[2]
         self._ItemType = self.DataType[TAB_DSC_DEFINES.upper()]
 
     @ParseMacro
@@ -1226,6 +1235,7 @@ class DscParser(MetaFileParser):
         self.__RetrievePcdValue()
         self._Content = self._RawTable.GetAll()
         self._ContentIndex = 0
+        self._InSubsection = False
         while self._ContentIndex < len(self._Content) :
             Id, self._ItemType, V1, V2, V3, S1, S2, Owner, self._From, \
                 LineStart, ColStart, LineEnd, ColEnd, Enabled = self._Content[self._ContentIndex]
@@ -1254,6 +1264,10 @@ class DscParser(MetaFileParser):
             self._LineIndex = LineStart - 1
             self._ValueList = [V1, V2, V3]
 
+            if Owner > 0 and Owner in self._IdMapping:
+                self._InSubsection = True
+            else:
+                self._InSubsection = False
             try:
                 Processer[self._ItemType]()
             except EvaluationException, Excpt:
@@ -1356,6 +1370,13 @@ class DscParser(MetaFileParser):
 
         Type, Name, Value = self._ValueList
         Value = ReplaceMacro(Value, self._Macros, False)
+        #
+        # If it is <Defines>, return
+        #
+        if self._InSubsection:
+            self._ValueList = [Type, Name, Value]
+            return
+
         if self._ItemType == MODEL_META_DATA_DEFINE:
             if self._SectionType == MODEL_META_DATA_HEADER:
                 self._FileLocalMacros[Name] = Value

@@ -1,4 +1,5 @@
 /** @file
+EFI Firmware Volume routines which work on a Fv image in buffers.
 
 Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -8,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  FirmwareVolumeBufferLib.h
-  
-Abstract:
-
-  EFI Firmware Volume routines which work on a Fv image in buffers.
 
 **/
 

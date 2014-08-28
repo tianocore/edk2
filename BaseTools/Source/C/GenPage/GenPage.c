@@ -1,18 +1,4 @@
 /** @file
-
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-  GenPage.c
-  
-Abstract:
   Pre-Create a 4G page table (2M pages).
   It's used in DUET x64 build needed to enter LongMode.
  
@@ -28,6 +14,16 @@ Abstract:
                         (
                           Directory-Ptr Directory {512}
                         ) {4}
+
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
 **/
 
 #include <stdio.h>

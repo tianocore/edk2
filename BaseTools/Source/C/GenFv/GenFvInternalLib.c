@@ -1,4 +1,5 @@
 /** @file
+This file contains the internal functions required to generate a Firmware Volume.
 
 Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
@@ -9,14 +10,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenFvInternalLib.c
-
-Abstract:
-
-  This file contains the internal functions required to generate a Firmware Volume.
 
 **/
 

@@ -18,7 +18,7 @@
 from Ffs import Ffs
 import Section
 import subprocess
-import os
+import Common.LongFilePathOs as os
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import CompressSectionClassObject
 

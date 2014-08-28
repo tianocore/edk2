@@ -1,5 +1,11 @@
 /** @file
-
+Creates and EFILDR image.
+This tool combines several PE Image files together using following format denoted as EBNF:
+FILE := EFILDR_HEADER
+        EFILDR_IMAGE +
+        <PeImageFileContent> +
+The order of EFILDR_IMAGE is same as the order of placing PeImageFileContent.
+  
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -8,21 +14,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  efildrimage.c
-
-Abstract:
-
-  Creates and EFILDR image.
-  This tool combines several PE Image files together using following format denoted as EBNF:
-  FILE := EFILDR_HEADER
-          EFILDR_IMAGE +
-          <PeImageFileContent> +
-  The order of EFILDR_IMAGE is same as the order of placing PeImageFileContent.
-
-Revision History
 
 **/
 

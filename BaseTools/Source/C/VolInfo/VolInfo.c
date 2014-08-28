@@ -1,4 +1,5 @@
 /** @file
+The tool dumps the contents of a firmware volume
 
 Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -8,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  VolInfo.c
-
-Abstract:
-
-  The tool dumps the contents of a firmware volume
 
 **/
 
@@ -1716,7 +1709,7 @@ Returns:
   CHAR8             Line[MAX_LINE_LEN];
   GUID_TO_BASENAME  *GPtr;
 
-  if ((Fptr = fopen (FileName, "r")) == NULL) {
+  if ((Fptr = fopen (LongFilePath (FileName), "r")) == NULL) {
     printf ("ERROR: Failed to open input cross-reference file '%s'\n", FileName);
     return EFI_DEVICE_ERROR;
   }

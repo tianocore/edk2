@@ -92,6 +92,8 @@ class FileStatement (FileStatementClassObject) :
 
         elif self.FileName != None:
             self.FileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)
+            #Replace $(SAPCE) with real space
+            self.FileName = self.FileName.replace('$(SPACE)', ' ')
             SectionFiles = [GenFdsGlobalVariable.MacroExtend(self.FileName, Dict)]
 
         else:

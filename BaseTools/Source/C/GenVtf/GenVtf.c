@@ -1,4 +1,6 @@
-/**
+/** @file
+This file contains functions required to generate a boot strap file (BSF) also 
+known as the Volume Top File (VTF)
 
 Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
@@ -8,16 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  GenVtf.c
-
-Abstract:
-
-  This file contains functions required to generate a boot strap file (BSF)
-  also known as the Volume Top File (VTF)
 
 **/
 

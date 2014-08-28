@@ -1,5 +1,9 @@
 /** @file
-
+Reading/writing MBR/DBR.
+  NOTE:
+    If we write MBR to disk, we just update the MBR code and the partition table wouldn't be over written.
+    If we process DBR, we will patch MBR to set first partition active if no active partition exists.
+    
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -8,16 +12,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GnuGenBootSector.c
-  
-Abstract:
-  Reading/writing MBR/DBR.
-  NOTE:
-    If we write MBR to disk, we just update the MBR code and the partition table wouldn't be over written.
-    If we process DBR, we will patch MBR to set first partition active if no active partition exists.
 
 **/
 

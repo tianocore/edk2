@@ -1,4 +1,5 @@
 /** @file
+Calculate Crc32 value and Verify Crc32 value for input data.
 
 Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
@@ -8,13 +9,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenCrc32.c
-
-Abstract:
-  Calculate Crc32 value and Verify Crc32 value for input data.
 
 **/
 

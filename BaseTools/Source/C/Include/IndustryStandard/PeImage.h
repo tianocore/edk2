@@ -4,18 +4,16 @@
 
   @bug Fix text - doc as defined in MSFT EFI specification.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at:
+  distribution.  The full text of the license may be found at
     http://opensource.org/licenses/bsd-license.php
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  File Name:  PeImage.h
 
 **/
 

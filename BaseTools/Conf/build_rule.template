@@ -299,7 +299,7 @@
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-
+        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
     <Command.GCC>
         $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
         $(OBJCOPY) --strip-unneeded -R .eh_frame ${src}

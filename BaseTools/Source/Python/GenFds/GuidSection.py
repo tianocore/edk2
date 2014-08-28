@@ -198,7 +198,7 @@ class GuidSection(GuidSectionClassObject) :
                 HeaderLength = str(self.ExtraHeaderSize)
 
             if self.ProcessRequired == "NONE" and HeaderLength == None:
-                if TempFileSize > InputFileSize and TempFileSize % 4 == 0:
+                if TempFileSize > InputFileSize:
                     FileHandleIn.seek(0)
                     BufferIn  = FileHandleIn.read()
                     FileHandleOut.seek(0)
@@ -247,15 +247,15 @@ class GuidSection(GuidSectionClassObject) :
         if self.KeyStringList == None or self.KeyStringList == []:
             Target = GenFdsGlobalVariable.TargetName
             ToolChain = GenFdsGlobalVariable.ToolChainTag
-            ToolDb = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.WorkSpaceDir).ToolsDefTxtDatabase
+            ToolDb = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDatabase
             if ToolChain not in ToolDb['TOOL_CHAIN_TAG']:
                 EdkLogger.error("GenFds", GENFDS_ERROR, "Can not find external tool because tool tag %s is not defined in tools_def.txt!" % ToolChain)
             self.KeyStringList = [Target+'_'+ToolChain+'_'+self.CurrentArchList[0]]
             for Arch in self.CurrentArchList:
-                if Target+'_'+ToolChain+'_'+Arch not in self.KeyStringList:
-                    self.KeyStringList.append(Target+'_'+ToolChain+'_'+Arch)
-                    
-        ToolDefinition = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.WorkSpaceDir).ToolsDefTxtDictionary
+                if Target + '_' + ToolChain + '_' + Arch not in self.KeyStringList:
+                    self.KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
+
+        ToolDefinition = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDictionary
         ToolPathTmp = None
         for ToolDef in ToolDefinition.items():
             if self.NameGuid == ToolDef[1]:

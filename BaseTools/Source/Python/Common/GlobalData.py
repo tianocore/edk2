@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common static strings used by INF/DEC/DSC files
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -69,3 +69,11 @@ gIgnoreSource = False
 # FDF parser
 #
 gFdfParser = None
+
+#
+# If a module is built more than once with different PCDs or library classes
+# a temporary INF file with same content is created, the temporary file is removed
+# when build exits.
+#
+gTempInfs = []
+

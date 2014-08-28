@@ -1,7 +1,7 @@
 ## @file
 # process rule section generation
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -211,10 +211,10 @@ class EfiSection (EfiSectionClassObject):
             """If File List is empty"""
             if FileList == [] :
                 if self.Optional == True:
-                     GenFdsGlobalVariable.VerboseLogger( "Optional Section don't exist!")
-                     return [], None
+                    GenFdsGlobalVariable.VerboseLogger("Optional Section don't exist!")
+                    return [], None
                 else:
-                     EdkLogger.error("GenFds", GENFDS_ERROR, "Output file for %s section could not be found for %s" % (SectionType, InfFileName))
+                    EdkLogger.error("GenFds", GENFDS_ERROR, "Output file for %s section could not be found for %s" % (SectionType, InfFileName))
 
             else:
                 """Convert the File to Section file one by one """

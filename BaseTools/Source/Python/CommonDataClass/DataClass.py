@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define class for data structure used in ECC
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -29,6 +29,7 @@ MODEL_FILE_DSC = 1013
 MODEL_FILE_FDF = 1014
 MODEL_FILE_INC = 1015
 MODEL_FILE_CIF = 1016
+MODEL_FILE_UNI = 1017
 MODEL_FILE_OTHERS = 1099
 
 MODEL_IDENTIFIER_FILE_HEADER = 2001

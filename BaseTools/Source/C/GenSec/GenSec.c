@@ -1,4 +1,5 @@
 /** @file
+Creates output file that is a properly formed section per the PI spec.
 
 Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
@@ -8,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenSection.c
-
-Abstract:
-
-  Creates output file that is a properly formed section per the PI spec.
 
 **/
 

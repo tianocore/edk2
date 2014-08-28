@@ -1,4 +1,8 @@
 /** @file
+  This contains all code necessary to build the GenFvImage.exe utility.       
+  This utility relies heavily on the GenFvImage Lib.  Definitions for both
+  can be found in the Tiano Firmware Volume Generation Utility 
+  Specification, review draft.
 
 Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
@@ -8,17 +12,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenFv.c
-
-Abstract:
-
-  This contains all code necessary to build the GenFvImage.exe utility.       
-  This utility relies heavily on the GenFvImage Lib.  Definitions for both
-  can be found in the Tiano Firmware Volume Generation Utility 
-  Specification, review draft.
 
 **/
 

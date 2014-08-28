@@ -29,7 +29,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 gMacroRefPattern = re.compile('(DEF\([^\(\)]+\))')
 gEnvRefPattern = re.compile('(ENV\([^\(\)]+\))')
 gMacroDefPattern = re.compile("DEFINE\s+([^\s]+)")
-gDefaultToolsDefFile = "Conf/tools_def.txt"
+gDefaultToolsDefFile = "tools_def.txt"
 
 ## ToolDefClassObject
 #
@@ -196,18 +196,23 @@ class ToolDefClassObject(object):
 
 ## ToolDefDict
 #
-# Load tools_def.txt in input workspace dir
+# Load tools_def.txt in input Conf dir
 #
-# @param WorkSpace:  Workspace dir
+# @param ConfDir:  Conf dir
 #
 # @retval ToolDef An instance of ToolDefClassObject() with loaded tools_def.txt
 #
-def ToolDefDict(WorkSpace):
-    Target = TargetTxtDict(WorkSpace)
+def ToolDefDict(ConfDir):
+    Target = TargetTxtDict(ConfDir)
     ToolDef = ToolDefClassObject()
     if DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF in Target.TargetTxtDictionary:
-        gDefaultToolsDefFile = Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
-    ToolDef.LoadToolDefFile(os.path.normpath(os.path.join(WorkSpace, gDefaultToolsDefFile)))
+        ToolsDefFile = Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
+        if ToolsDefFile:
+            ToolDef.LoadToolDefFile(os.path.normpath(ToolsDefFile))
+        else:
+            ToolDef.LoadToolDefFile(os.path.normpath(os.path.join(ConfDir, gDefaultToolsDefFile)))
+    else:
+        ToolDef.LoadToolDefFile(os.path.normpath(os.path.join(ConfDir, gDefaultToolsDefFile)))
     return ToolDef
 
 ##

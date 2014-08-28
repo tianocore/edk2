@@ -1,4 +1,5 @@
-/**
+/** @file
+This file contains functions required to generate a Firmware File System file.
 
 Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenFfs.c
-
-Abstract:
-
-  This file contains functions required to generate a Firmware File System
-  file.
 
 **/
 
@@ -899,7 +891,7 @@ Returns:
   // Open output file to write ffs data.
   //
   remove(OutputFileName);
-  FfsFile = fopen (OutputFileName, "wb");
+  FfsFile = fopen (LongFilePath (OutputFileName), "wb");
   if (FfsFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", OutputFileName);
     goto Finish;

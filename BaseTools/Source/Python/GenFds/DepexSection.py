@@ -24,6 +24,7 @@ from CommonDataClass.FdfClass import DepexSectionClassObject
 from AutoGen.GenDepex import DependencyExpression
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.Misc import PathClass
 
 ## generate data section
 #
@@ -38,10 +39,22 @@ class DepexSection (DepexSectionClassObject):
 
     def __FindGuidValue(self, CName):
         for Arch in GenFdsGlobalVariable.ArchList:
-            for PkgDb in GenFdsGlobalVariable.WorkSpace.GetPackageList(GenFdsGlobalVariable.ActivePlatform, 
-                                                                       Arch, 
-                                                                       GenFdsGlobalVariable.TargetName, 
-                                                                       GenFdsGlobalVariable.ToolChainTag):
+            PkgList = GenFdsGlobalVariable.WorkSpace.GetPackageList(GenFdsGlobalVariable.ActivePlatform,
+                                                                    Arch,
+                                                                    GenFdsGlobalVariable.TargetName,
+                                                                    GenFdsGlobalVariable.ToolChainTag)
+            for Inf in GenFdsGlobalVariable.FdfParser.Profile.InfList:
+                ModuleFile = PathClass(Inf, GenFdsGlobalVariable.WorkSpaceDir)
+                ModuleData = GenFdsGlobalVariable.WorkSpace.BuildObject[
+                                                            ModuleFile,
+                                                            Arch,
+                                                            GenFdsGlobalVariable.TargetName,
+                                                            GenFdsGlobalVariable.ToolChainTag
+                                                            ]
+                for Pkg in ModuleData.Packages:
+                    if Pkg not in PkgList:
+                        PkgList.append(Pkg)
+            for PkgDb in PkgList:
                 if CName in PkgDb.Ppis:
                     return PkgDb.Ppis[CName]
                 if CName in PkgDb.Protocols:

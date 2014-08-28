@@ -320,7 +320,7 @@ MSG_NEW_FILE_NAME_FOR_DIST      = _(
 MSG_UPDATE_PACKAGE_DATABASE    = _("Update Distribution Package Database ...")
 MSG_PYTHON_ON                  = _("(Python %s on %s) ")
 MSG_SEARCH_FOR_HELP            = _(
-    "\n(Please send email to edk2-buildtools-devel@lists.sourceforge.net for\n"
+    "\n(Please send email to edk2-devel@lists.sourceforge.net for\n"
     " help, attach the following call stack trace.)\n")
 MSG_REMOVE_TEMP_FILE_STARTED   = _("Removing temp files started ... ")
 MSG_REMOVE_TEMP_FILE_DONE   = _("Removing temp files ... Done.")

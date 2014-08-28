@@ -1,3 +1,6 @@
+## @file
+# This file is used to collect all defined strings in multiple uni files
+#
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -6,10 +9,6 @@
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-#
-#This file is used to collect all defined strings in multiple uni files
-#
 
 ##
 # Import Modules

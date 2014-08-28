@@ -23,6 +23,7 @@ import time
 import re
 import cPickle
 import array
+import shutil
 from UserDict import IterableUserDict
 from UserList import UserList
 
@@ -42,6 +43,90 @@ gFileTimeStampCache = {}    # {file path : file time stamp}
 
 ## Dictionary used to store dependencies of files
 gDependencyDatabase = {}    # arch : {file path : [dependent files list]}
+
+## Routine to process duplicated INF
+#
+#  This function is called by following two cases:
+#  Case 1 in DSC:
+#    [components.arch]
+#    Pkg/module/module.inf
+#    Pkg/module/module.inf {
+#      <Defines>
+#        FILE_GUID = 0D1B936F-68F3-4589-AFCC-FB8B7AEBC836
+#    }
+#  Case 2 in FDF:
+#    INF Pkg/module/module.inf
+#    INF FILE_GUID = 0D1B936F-68F3-4589-AFCC-FB8B7AEBC836 Pkg/module/module.inf
+#
+#  This function copies Pkg/module/module.inf to
+#  Conf/.cache/0D1B936F-68F3-4589-AFCC-FB8B7AEBC836module.inf
+#
+#  @param Path     Original PathClass object
+#  @param BaseName New file base name
+#
+#  @retval         return the new PathClass object
+#
+def ProcessDuplicatedInf(Path, BaseName, Workspace):
+    Filename = os.path.split(Path.File)[1]
+    if '.' in Filename:
+        Filename = BaseName + Path.BaseName + Filename[Filename.rfind('.'):]
+    else:
+        Filename = BaseName + Path.BaseName
+
+    #
+    # If -N is specified on command line, cache is disabled
+    # The directory has to be created
+    #
+    DbDir = os.path.split(GlobalData.gDatabasePath)[0]
+    if not os.path.exists(DbDir):
+        os.makedirs(DbDir)
+    #
+    # A temporary INF is copied to database path which must have write permission
+    # The temporary will be removed at the end of build
+    # In case of name conflict, the file name is 
+    # FILE_GUIDBaseName (0D1B936F-68F3-4589-AFCC-FB8B7AEBC836module.inf)
+    #
+    TempFullPath = os.path.join(DbDir,
+                                Filename)
+    RtPath = PathClass(Path.File, Workspace)
+    #
+    # Modify the full path to temporary path, keep other unchanged
+    #
+    # To build same module more than once, the module path with FILE_GUID overridden has
+    # the file name FILE_GUIDmodule.inf, but the relative path (self.MetaFile.File) is the real path
+    # in DSC which is used as relative path by C files and other files in INF. 
+    # A trick was used: all module paths are PathClass instances, after the initialization
+    # of PathClass, the PathClass.Path is overridden by the temporary INF path.
+    #
+    # The reason for creating a temporary INF is:
+    # Platform.Modules which is the base to create ModuleAutoGen objects is a dictionary,
+    # the key is the full path of INF, the value is an object to save overridden library instances, PCDs.
+    # A different key for the same module is needed to create different output directory,
+    # retrieve overridden PCDs, library instances.
+    #
+    # The BaseName is the FILE_GUID which is also the output directory name.
+    #
+    #
+    RtPath.Path = TempFullPath
+    RtPath.BaseName = BaseName
+    #
+    # If file exists, compare contents
+    #
+    if os.path.exists(TempFullPath):
+        with open(str(Path), 'rb') as f1: Src = f1.read()
+        with open(TempFullPath, 'rb') as f2: Dst = f2.read()
+        if Src == Dst:
+            return RtPath
+    GlobalData.gTempInfs.append(TempFullPath)
+    shutil.copy2(str(Path), TempFullPath)
+    return RtPath
+
+## Remove temporary created INFs whose paths were saved in gTempInfs
+#
+def ClearDuplicatedInf():
+    for File in GlobalData.gTempInfs:
+        if os.path.exists(File):
+            os.remove(File)
 
 ## callback routine for processing variable option
 #
@@ -1455,6 +1540,45 @@ def CommonPath(PathList):
         if P1[Index] != P2[Index]:
             return os.path.sep.join(P1[:Index])
     return os.path.sep.join(P1)
+
+#
+# Convert string to C format array
+#
+def ConvertStringToByteArray(Value):
+    Value = Value.strip()
+    if not Value:
+        return None
+    if Value[0] == '{':
+        if not Value.endswith('}'):
+            return None
+        Value = Value.replace(' ', '').replace('{', '').replace('}', '')
+        ValFields = Value.split(',')
+        try:
+            for Index in range(len(ValFields)):
+                ValFields[Index] = str(int(ValFields[Index], 0))
+        except ValueError:
+            return None
+        Value = '{' + ','.join(ValFields) + '}'
+        return Value
+
+    Unicode = False
+    if Value.startswith('L"'):
+        if not Value.endswith('"'):
+            return None
+        Value = Value[1:]
+        Unicode = True
+    elif not Value.startswith('"') or not Value.endswith('"'):
+        return None
+
+    Value = eval(Value)         # translate escape character
+    NewValue = '{'
+    for Index in range(0,len(Value)):
+        if Unicode:
+            NewValue = NewValue + str(ord(Value[Index]) % 0x10000) + ','
+        else:
+            NewValue = NewValue + str(ord(Value[Index]) % 0x100) + ','
+    Value = NewValue + '0}'
+    return Value
 
 class PathClass(object):
     def __init__(self, File='', Root='', AlterRoot='', Type='', IsBinary=False,

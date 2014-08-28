@@ -57,9 +57,8 @@ __copyright__ = "Copyright (c) 2007 - 2014, Intel Corporation  All rights reserv
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
 
 ## build configuration file
-gBuildConfiguration = "Conf/target.txt"
-gBuildCacheDir = "Conf/.cache"
-gToolsDefinition = "Conf/tools_def.txt"
+gBuildConfiguration = "target.txt"
+gToolsDefinition = "tools_def.txt"
 
 TemporaryTablePattern = re.compile(r'^_\d+_\d+_[a-fA-F0-9]+$')
 TmpTableDict = {}
@@ -630,7 +629,8 @@ class BuildTask:
     #
     def AddDependency(self, Dependency):
         for Dep in Dependency:
-            self.DependencyList.append(BuildTask.New(Dep))    # BuildTask list
+            if not Dep.BuildObject.IsBinaryModule:
+                self.DependencyList.append(BuildTask.New(Dep))    # BuildTask list
 
     ## The thread wrapper of LaunchCommand function
     #
@@ -732,18 +732,34 @@ class Build():
         self.SkipAutoGen    = BuildOptions.SkipAutoGen
         self.Reparse        = BuildOptions.Reparse
         self.SkuId          = BuildOptions.SkuId
+        self.ConfDirectory = BuildOptions.ConfDirectory
         self.SpawnMode      = True
         self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType)
         self.TargetTxt      = TargetTxtClassObject()
         self.ToolDef        = ToolDefClassObject()
         #Set global flag for build mode
         GlobalData.gIgnoreSource = BuildOptions.IgnoreSources
+
+        if self.ConfDirectory:
+            # Get alternate Conf location, if it is absolute, then just use the absolute directory name
+            ConfDirectoryPath = os.path.normpath(self.ConfDirectory)
+
+            if not os.path.isabs(ConfDirectoryPath):
+                # Since alternate directory name is not absolute, the alternate directory is located within the WORKSPACE
+                # This also handles someone specifying the Conf directory in the workspace. Using --conf=Conf
+                ConfDirectoryPath = os.path.join(self.WorkspaceDir, ConfDirectoryPath)
+        else:
+            # Get standard WORKSPACE/Conf use the absolute path to the WORKSPACE/Conf
+            ConfDirectoryPath = os.path.join(self.WorkspaceDir, 'Conf')
+        GlobalData.gConfDirectory = ConfDirectoryPath
+        GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
+
         if BuildOptions.DisableCache:
             self.Db         = WorkspaceDatabase(":memory:")
         else:
-            self.Db         = WorkspaceDatabase(None, self.Reparse)
-        self.BuildDatabase  = self.Db.BuildObject
-        self.Platform       = None
+            self.Db = WorkspaceDatabase(GlobalData.gDatabasePath, self.Reparse)
+        self.BuildDatabase = self.Db.BuildObject
+        self.Platform = None
         self.LoadFixAddress = 0
         self.UniFlag        = BuildOptions.Flag
         self.BuildModules = []
@@ -772,14 +788,14 @@ class Build():
         #
         # Check target.txt and tools_def.txt and Init them
         #
-        BuildConfigurationFile = os.path.normpath(os.path.join(self.WorkspaceDir, gBuildConfiguration))
+        BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, gBuildConfiguration))
         if os.path.isfile(BuildConfigurationFile) == True:
             StatusCode = self.TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
 
             ToolDefinitionFile = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
             if ToolDefinitionFile == '':
                 ToolDefinitionFile = gToolsDefinition
-            ToolDefinitionFile = os.path.normpath(os.path.join(self.WorkspaceDir, ToolDefinitionFile))
+                ToolDefinitionFile = os.path.normpath(os.path.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
             if os.path.isfile(ToolDefinitionFile) == True:
                 StatusCode = self.ToolDef.LoadToolDefFile(ToolDefinitionFile)
             else:
@@ -1079,7 +1095,7 @@ class Build():
                 # First should close DB.
                 #
                 self.Db.Close()
-                RemoveDirectory(gBuildCacheDir, True)
+                RemoveDirectory(os.path.dirname(GlobalData.gDatabasePath), True)
             except WindowsError, X:
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
@@ -1804,19 +1820,19 @@ class Build():
         EdkLogger.SetLevel(OldLogLevel)
 
     def DumpBuildData(self):
-        CacheDirectory = os.path.join(self.WorkspaceDir, gBuildCacheDir)
+        CacheDirectory = os.path.dirname(GlobalData.gDatabasePath)
         Utils.CreateDirectory(CacheDirectory)
         Utils.DataDump(Utils.gFileTimeStampCache, os.path.join(CacheDirectory, "gFileTimeStampCache"))
         Utils.DataDump(Utils.gDependencyDatabase, os.path.join(CacheDirectory, "gDependencyDatabase"))
 
     def RestoreBuildData(self):
-        FilePath = os.path.join(self.WorkspaceDir, gBuildCacheDir, "gFileTimeStampCache")
+        FilePath = os.path.join(os.path.dirname(GlobalData.gDatabasePath), "gFileTimeStampCache")
         if Utils.gFileTimeStampCache == {} and os.path.isfile(FilePath):
             Utils.gFileTimeStampCache = Utils.DataRestore(FilePath)
             if Utils.gFileTimeStampCache == None:
                 Utils.gFileTimeStampCache = {}
 
-        FilePath = os.path.join(self.WorkspaceDir, gBuildCacheDir, "gDependencyDatabase")
+        FilePath = os.path.join(os.path.dirname(GlobalData.gDatabasePath), "gDependencyDatabase")
         if Utils.gDependencyDatabase == {} and os.path.isfile(FilePath):
             Utils.gDependencyDatabase = Utils.DataRestore(FilePath)
             if Utils.gDependencyDatabase == None:
@@ -1905,6 +1921,8 @@ def MyOptionParser():
              "This option can also be specified by setting *_*_*_BUILD_FLAGS in [BuildOptions] section of platform DSC. If they are both specified, this value "\
              "will override the setting in [BuildOptions] section of platform DSC.")
     Parser.add_option("-N", "--no-cache", action="store_true", dest="DisableCache", default=False, help="Disable build cache mechanism")
+    Parser.add_option("--conf", action="store", type="string", dest="ConfDirectory", help="Specify the customized Conf directory.")
+    Parser.add_option("--check-usage", action="store_true", dest="CheckUsage", default=False, help="Check usage content of entries listed in INF file.")
     Parser.add_option("--ignore-sources", action="store_true", dest="IgnoreSources", default=False, help="Focus to a binary build and ignore all source files")
 
     (Opt, Args)=Parser.parse_args()
@@ -2064,13 +2082,14 @@ def Main():
                     "\nbuild",
                     CODE_ERROR,
                     "Unknown fatal error when processing [%s]" % MetaFile,
-                    ExtraData="\n(Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!)\n",
+                    ExtraData="\n(Please send email to edk2-devel@lists.sourceforge.net for help, attaching following call stack trace!)\n",
                     RaiseError=False
                     )
         EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
         ReturnCode = CODE_ERROR
     finally:
         Utils.Progressor.Abort()
+        Utils.ClearDuplicatedInf()
 
     if ReturnCode == 0:
         Conclusion = "Done"

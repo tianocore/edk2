@@ -35,8 +35,11 @@ from MetaFileParser import *
 from BuildClassObject import *
 from WorkspaceCommon import GetDeclaredPcd
 from Common.Misc import AnalyzeDscPcd
+from Common.Misc import ProcessDuplicatedInf
 import re
 from Common.Parsing import IsValidWord
+
+import Common.GlobalData as GlobalData
 
 ## Platform build information from DSC file
 #
@@ -103,6 +106,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._Target = Target
         self._Toolchain = Toolchain
         self._Clear()
+        self._HandleOverridePath()
 
     ## XXX[key] = value
     def __setitem__(self, key, value):
@@ -146,6 +150,27 @@ class DscBuildData(PlatformBuildClassObject):
         self._ISOLanguages      = None
         self._VpdToolGuid       = None
         self.__Macros            = None
+
+
+    ## handle Override Path of Module
+    def _HandleOverridePath(self):
+        RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
+        Macros = self._Macros
+        Macros["EDK_SOURCE"] = GlobalData.gEcpSource
+        for Record in RecordList:
+            ModuleId = Record[5]
+            LineNo = Record[6]
+            ModuleFile = PathClass(NormPath(Record[0]), GlobalData.gWorkspace, Arch=self._Arch)
+            RecordList = self._RawData[MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH, self._Arch, None, ModuleId]
+            if RecordList != []:
+                SourceOverridePath = os.path.join(GlobalData.gWorkspace, NormPath(RecordList[0][0]))
+
+                # Check if the source override path exists
+                if not os.path.isdir(SourceOverridePath):
+                    EdkLogger.error('build', FILE_NOT_FOUND, Message='Source override path does not exist:', File=self.MetaFile, ExtraData=SourceOverridePath, Line=LineNo)
+
+                #Add to GlobalData Variables
+                GlobalData.gOverrideDir[ModuleFile.Key] = SourceOverridePath
 
     ## Get current effective macros
     def _GetMacros(self):
@@ -478,6 +503,7 @@ class DscBuildData(PlatformBuildClassObject):
         Macros = self._Macros
         Macros["EDK_SOURCE"] = GlobalData.gEcpSource
         for Record in RecordList:
+            DuplicatedFile = False
             ModuleFile = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
             ModuleId = Record[5]
             LineNo = Record[6]
@@ -490,22 +516,10 @@ class DscBuildData(PlatformBuildClassObject):
             # Check duplication
             # If arch is COMMON, no duplicate module is checked since all modules in all component sections are selected
             if self._Arch != 'COMMON' and ModuleFile in self._Modules:
-                EdkLogger.error('build', FILE_DUPLICATED, File=self.MetaFile, ExtraData=str(ModuleFile), Line=LineNo)
+                DuplicatedFile = True
 
             Module = ModuleBuildClassObject()
             Module.MetaFile = ModuleFile
-
-            # get module override path
-            RecordList = self._RawData[MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH, self._Arch, None, ModuleId]
-            if RecordList != []:
-                Module.SourceOverridePath = os.path.join(GlobalData.gWorkspace, NormPath(RecordList[0][0], Macros))
-
-                # Check if the source override path exists
-                if not os.path.isdir(Module.SourceOverridePath):
-                    EdkLogger.error('build', FILE_NOT_FOUND, Message = 'Source override path does not exist:', File=self.MetaFile, ExtraData=Module.SourceOverridePath, Line=LineNo)
-                
-                #Add to GlobalData Variables
-                GlobalData.gOverrideDir[ModuleFile.Key] = Module.SourceOverridePath
 
             # get module private library instance
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, None, ModuleId]
@@ -562,6 +576,16 @@ class DscBuildData(PlatformBuildClassObject):
                 else:
                     OptionString = Module.BuildOptions[ToolChainFamily, ToolChain]
                     Module.BuildOptions[ToolChainFamily, ToolChain] = OptionString + " " + Option
+
+            RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, None, ModuleId]
+            if DuplicatedFile and not RecordList:
+                EdkLogger.error('build', FILE_DUPLICATED, File=self.MetaFile, ExtraData=str(ModuleFile), Line=LineNo)
+            if RecordList:
+                if len(RecordList) != 1:
+                    EdkLogger.error('build', OPTION_UNKNOWN, 'Only FILE_GUID can be listed in <Defines> section.',
+                                    File=self.MetaFile, ExtraData=str(ModuleFile), Line=LineNo)
+                ModuleFile = ProcessDuplicatedInf(ModuleFile, RecordList[0][2], GlobalData.gWorkspace)
+                ModuleFile.Arch = self._Arch
 
             self._Modules[ModuleFile] = Module
         return self._Modules
@@ -641,9 +665,26 @@ class DscBuildData(PlatformBuildClassObject):
     def _ValidatePcd(self, PcdCName, TokenSpaceGuid, Setting, PcdType, LineNo):
         if self._DecPcds == None:
             self._DecPcds = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain)
+            FdfInfList = []
+            if GlobalData.gFdfParser:
+                FdfInfList = GlobalData.gFdfParser.Profile.InfList
+
+            PkgSet = set()
+            for Inf in FdfInfList:
+                ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch=self._Arch)
+                if ModuleFile in self._Modules:
+                    continue
+                ModuleData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
+                PkgSet.update(ModuleData.Packages)
+            DecPcds = {}
+            for Pkg in PkgSet:
+                for Pcd in Pkg.Pcds:
+                    DecPcds[Pcd[0], Pcd[1]] = Pkg.Pcds[Pcd]
+            self._DecPcds.update(DecPcds)
+
         if (PcdCName, TokenSpaceGuid) not in self._DecPcds:
             EdkLogger.error('build', PARSER_ERROR,
-                            "Pcd (%s.%s) defined in DSC is not declared in DEC files." % (TokenSpaceGuid, PcdCName),
+                            "Pcd (%s.%s) defined in DSC is not declared in DEC files. Arch: ['%s']" % (TokenSpaceGuid, PcdCName, self._Arch),
                             File=self.MetaFile, Line=LineNo)
         ValueList, IsValid, Index = AnalyzeDscPcd(Setting, PcdType, self._DecPcds[PcdCName, TokenSpaceGuid].DatumType)
         if not IsValid and PcdType not in [MODEL_PCD_FEATURE_FLAG, MODEL_PCD_FIXED_AT_BUILD]:
@@ -1676,6 +1717,9 @@ class InfBuildData(ModuleBuildClassObject):
             # items defined _PROPERTY_ don't need additional processing
             if Name in self:
                 self[Name] = Value
+                if self._Defs == None:
+                    self._Defs = sdict()
+                self._Defs[Name] = Value
             # some special items in [Defines] section need special treatment
             elif Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION', 'EDK_RELEASE_VERSION', 'PI_SPECIFICATION_VERSION'):
                 if Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION'):
@@ -2309,6 +2353,13 @@ class InfBuildData(ModuleBuildClassObject):
                     EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No [Depex] section or no valid expression in [Depex] section for [%s] module" \
                                     % self.ModuleType, File=self.MetaFile)
 
+            if len(RecordList) != 0 and self.ModuleType == 'USER_DEFINED':
+                for Record in RecordList:
+                    if Record[4] not in ['PEIM', 'DXE_DRIVER', 'DXE_SMM_DRIVER']:
+                        EdkLogger.error('build', FORMAT_INVALID,
+                                        "'%s' module must specify the type of [Depex] section" % self.ModuleType,
+                                        File=self.MetaFile)
+
             Depex = sdict()
             for Record in RecordList:
                 DepexStr = ReplaceMacro(Record[0], self._Macros, False)
@@ -2570,8 +2621,6 @@ class InfBuildData(ModuleBuildClassObject):
 #
 class WorkspaceDatabase(object):
 
-    # default database file path
-    _DB_PATH_ = "Conf/.cache/build.db"
 
     #
     # internal class used for call corresponding file parser and caching the result
@@ -2682,7 +2731,7 @@ class WorkspaceDatabase(object):
     def __init__(self, DbPath, RenewDb=False):
         self._DbClosedFlag = False
         if not DbPath:
-            DbPath = os.path.normpath(os.path.join(GlobalData.gWorkspace, self._DB_PATH_))
+            DbPath = os.path.normpath(os.path.join(GlobalData.gWorkspace, 'Conf', GlobalData.gDatabasePath))
 
         # don't create necessary path for db in memory
         if DbPath != ':memory:':
