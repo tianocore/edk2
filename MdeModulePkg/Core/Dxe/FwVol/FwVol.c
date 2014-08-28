@@ -320,6 +320,12 @@ FvCheck (
   UINT8                                 *TopFvAddress;
   UINTN                                 TestLength;
   EFI_PHYSICAL_ADDRESS                  PhysicalAddress;
+  BOOLEAN                               FileCached;
+  UINTN                                 WholeFileSize;
+  EFI_FFS_FILE_HEADER                   *CacheFfsHeader;
+
+  FileCached = FALSE;
+  CacheFfsHeader = NULL;
 
   Fvb = FvDevice->Fvb;
   FwVolHeader = FvDevice->FwVolHeader;
@@ -460,6 +466,11 @@ FvCheck (
   TopFvAddress = FvDevice->EndOfCachedFv;
   while ((UINT8 *) FfsHeader < TopFvAddress) {
 
+    if (FileCached) {
+      CoreFreePool (CacheFfsHeader);
+      FileCached = FALSE;
+    }
+
     TestLength = TopFvAddress - ((UINT8 *) FfsHeader);
     if (TestLength > sizeof (EFI_FFS_FILE_HEADER)) {
       TestLength = sizeof (EFI_FFS_FILE_HEADER);
@@ -493,7 +504,25 @@ FvCheck (
       }
     }
 
-    if (!IsValidFfsFile (FvDevice->ErasePolarity, FfsHeader)) {
+    CacheFfsHeader = FfsHeader;
+    if ((CacheFfsHeader->Attributes & FFS_ATTRIB_CHECKSUM) == FFS_ATTRIB_CHECKSUM) {
+      if (FvDevice->IsMemoryMapped) {
+        //
+        // Memory mapped FV has not been cached.
+        // Here is to cache FFS file to memory buffer for following checksum calculating.
+        // And then, the cached file buffer can be also used for FvReadFile.
+        //
+        WholeFileSize = IS_FFS_FILE2 (CacheFfsHeader) ? FFS_FILE2_SIZE (CacheFfsHeader): FFS_FILE_SIZE (CacheFfsHeader);
+        CacheFfsHeader = AllocateCopyPool (WholeFileSize, CacheFfsHeader);
+        if (CacheFfsHeader == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
+        }
+        FileCached = TRUE;
+      }
+    }
+
+    if (!IsValidFfsFile (FvDevice->ErasePolarity, CacheFfsHeader)) {
       //
       // File system is corrupted
       //
@@ -501,11 +530,11 @@ FvCheck (
       goto Done;
     }
 
-    if (IS_FFS_FILE2 (FfsHeader)) {
-      ASSERT (FFS_FILE2_SIZE (FfsHeader) > 0x00FFFFFF);
+    if (IS_FFS_FILE2 (CacheFfsHeader)) {
+      ASSERT (FFS_FILE2_SIZE (CacheFfsHeader) > 0x00FFFFFF);
       if (!FvDevice->IsFfs3Fv) {
-        DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsHeader->Name));
-        FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (FfsHeader));
+        DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &CacheFfsHeader->Name));
+        FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
         //
         // Adjust pointer to the next 8-byte aligned boundry.
         //
@@ -514,7 +543,7 @@ FvCheck (
       }
     }
 
-    FileState = GetFileState (FvDevice->ErasePolarity, FfsHeader);
+    FileState = GetFileState (FvDevice->ErasePolarity, CacheFfsHeader);
 
     //
     // check for non-deleted file
@@ -529,14 +558,16 @@ FvCheck (
         goto Done;
       }
 
-      FfsFileEntry->FfsHeader = FfsHeader;
+      FfsFileEntry->FfsHeader = CacheFfsHeader;
+      FfsFileEntry->FileCached = FileCached;
+      FileCached = FALSE;
       InsertTailList (&FvDevice->FfsFileListHeader, &FfsFileEntry->Link);
     }
 
-    if (IS_FFS_FILE2 (FfsHeader)) {
-      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (FfsHeader));
+    if (IS_FFS_FILE2 (CacheFfsHeader)) {
+      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
     } else {
-      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE_SIZE (FfsHeader));
+      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE_SIZE (CacheFfsHeader));
     }
 
     //
@@ -548,6 +579,10 @@ FvCheck (
 
 Done:
   if (EFI_ERROR (Status)) {
+    if (FileCached) {
+      CoreFreePool (CacheFfsHeader);
+      FileCached = FALSE;
+    }
     FreeFvDeviceResource (FvDevice);
   }
 
