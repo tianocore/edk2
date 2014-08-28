@@ -1,8 +1,8 @@
 ## @file
 #  Package for cryptography modules.
 #
-#  This Package provides cryptographic-related libraries for UEFI
-#  security modules.
+#  This Package provides cryptographic-related libraries for UEFI security modules.
+#  It also provides a test application to test libraries.
 #
 #  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
@@ -18,6 +18,7 @@
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = CryptoPkg
+  PACKAGE_UNI_FILE               = CryptoPkg.uni
   PACKAGE_GUID                   = 36470E80-36F2-4ba0-8CC8-937C7D9FF888
   PACKAGE_VERSION                = 0.93
 
@@ -32,3 +33,7 @@
 [Protocols]
   ## Include/Protocol/RuntimeCrypt.h
   gEfiRuntimeCryptProtocolGuid = { 0xe1475e0c, 0x1746, 0x4802, {0x86, 0x2e, 0x1, 0x1c, 0x2c, 0x2d, 0x9d, 0x86 }}
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CryptoPkgExtra.uni
+  
