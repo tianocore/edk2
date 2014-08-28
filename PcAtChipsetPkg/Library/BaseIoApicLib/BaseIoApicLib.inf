@@ -1,7 +1,7 @@
 ## @file
-#   Library instance for I/O APIC library class
+#  Library instance for I/O APIC library class
 #
-#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseIoApicLib
+  MODULE_UNI_FILE                = BaseIoApicLib.uni
   FILE_GUID                      = 58ED6E5A-E36A-462a-9ED6-6E62C9A26DF8
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -35,4 +36,5 @@
   IoApicLib.c
 
 [Pcd]
-  gPcAtChipsetPkgTokenSpaceGuid.PcdIoApicBaseAddress
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIoApicBaseAddress    ## CONSUMES
+

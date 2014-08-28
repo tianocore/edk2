@@ -1,6 +1,9 @@
 ## @file
-# 
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# This driver implements Reset Architectural Protocol.
+#
+# It should depend on the ResetSystemLib instance that is implemented based on KBC.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -18,6 +21,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = KbcReset
+  MODULE_UNI_FILE                = KbcReset.uni
   FILE_GUID                      = 6F0198AA-1F1D-426D-AE3E-39AB633FCC28
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -37,7 +41,10 @@
   ResetEntry.c
 
 [Protocols]
-  gEfiResetArchProtocolGuid
+  gEfiResetArchProtocolGuid ## PRODUCES
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  KbcResetExtra.uni

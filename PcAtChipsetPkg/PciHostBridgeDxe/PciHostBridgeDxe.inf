@@ -1,21 +1,21 @@
 ## @file
+#  The basic interfaces implementation to a single segment PCI Host Bridge driver.
 #
-#    Component description file a sinngle segment PCI Host Bridge driver.
-#
-#  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PciHostBridge
+  MODULE_UNI_FILE                = PciHostBridge.uni
   FILE_GUID                      = 2383608E-C6D0-4e3e-858D-45DFAC3543D5
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -53,11 +53,13 @@
   X64/IoFifo.S
 
 [Protocols]
-  gEfiPciHostBridgeResourceAllocationProtocolGuid
-  gEfiPciRootBridgeIoProtocolGuid
-  gEfiMetronomeArchProtocolGuid
-  gEfiDevicePathProtocolGuid
+  gEfiPciHostBridgeResourceAllocationProtocolGuid       ## PRODUCES
+  gEfiPciRootBridgeIoProtocolGuid                       ## PRODUCES
+  gEfiMetronomeArchProtocolGuid                         ## CONSUMES
+  gEfiDevicePathProtocolGuid                            ## PRODUCES
 
 [depex]
   gEfiMetronomeArchProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  PciHostBridgeExtra.uni

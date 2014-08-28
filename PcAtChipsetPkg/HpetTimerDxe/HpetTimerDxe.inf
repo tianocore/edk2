@@ -1,6 +1,7 @@
 ## @file
-# 
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Timer Architectural Protocol module using High Precesion Event Timer (HPET).
+#
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -14,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HpetTimerDxe
+  MODULE_UNI_FILE                = HpetTimerDxe.uni
   FILE_GUID                      = 6CE6B0DE-781C-4f6c-B42D-98346C614BEC
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -49,12 +51,14 @@
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
 [FeaturePcd]
-  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetMsiEnable
-  
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetMsiEnable    ## CONSUMES
+
 [Pcd]
-  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress
-  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetLocalApicVector
-  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetLocalApicVector      ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod   ## CONSUMES
 
 [Depex]
   gEfiCpuArchProtocolGuid
+[UserExtensions.TianoCore."ExtraFiles"]
+  HpetTimerDxeExtra.uni

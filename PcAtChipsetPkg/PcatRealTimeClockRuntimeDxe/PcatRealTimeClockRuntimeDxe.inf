@@ -5,7 +5,7 @@
 #  This driver provides GetTime, SetTime, GetWakeupTime, SetWakeupTime services to Runtime Service Table.
 #  It will install a tagging protocol with gEfiRealTimeClockArchProtocolGuid.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PcRtc
+  MODULE_UNI_FILE                = PcRtc.uni
   FILE_GUID                      = 378D7B65-8DA9-4773-B6E4-A47826A833E1
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -60,4 +61,6 @@
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
   
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout  ## CONSUMES
+[UserExtensions.TianoCore."ExtraFiles"]
+  PcRtcExtra.uni
