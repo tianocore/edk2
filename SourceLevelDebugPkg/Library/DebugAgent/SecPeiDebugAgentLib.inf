@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for SEC Core and PEI modules.
 #
-#  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SecPeiDebugAgentLib
+  MODULE_UNI_FILE                = SecPeiDebugAgentLib.uni
   FILE_GUID                      = 508B7D59-CD4E-4a6b-A45B-6D3B2D90111E
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 0.7
@@ -76,14 +77,16 @@
   PeCoffExtraActionLib
 
 [Ppis]
-  gEfiPeiMemoryDiscoveredPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid                ## NOTIFY
   gEfiVectorHandoffInfoPpiGuid                  ## PRODUCES
 
 [Guids]
-  gEfiDebugAgentGuid                            ## PRODUCES ## HOB
+  ## PRODUCES ## HOB
+  ## CONSUMES ## HOB
+  gEfiDebugAgentGuid
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize    ## SOMETIMES_CONSUMES
 

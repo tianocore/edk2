@@ -1,7 +1,7 @@
 ## @file
 #  PeCoffExtraAction Library to support source level debug.
 #
-#  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeCoffExtraActionLib
+  MODULE_UNI_FILE                = PeCoffExtraActionLib.uni
   FILE_GUID                      = 8F01CBD5-E069-44d7-90C9-35F0318603AD
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 0.7
@@ -52,5 +53,5 @@
   PcdLib
 
 [Pcd]
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod
-  
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod    ## CONSUMES
+
