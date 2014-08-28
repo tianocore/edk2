@@ -1,8 +1,9 @@
 ## @file
-#  This library defines some routines that are generic for IA32 family CPU
-#  to be UEFI specification compliant.
+#  This library defines some routines that are generic for IA32 family CPU.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  The library routines are UEFI specification compliant.
+#
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseUefiCpuLib
+  MODULE_UNI_FILE                = BaseUefiCpuLib.uni
   FILE_GUID                      = 34C24FD7-7A90-45c2-89FD-946473D9CE98
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

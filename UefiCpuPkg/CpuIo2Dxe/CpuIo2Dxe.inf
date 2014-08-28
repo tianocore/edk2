@@ -1,9 +1,7 @@
 ## @file
-#  Produces the CPU I/O 2 Protocol.
+#  Produces the CPU I/O 2 Protocol by using the services of the I/O Library.
 #
-#  This DXE driver produces of the CPU I/O 2 Protocol, as introduced by PI 1.2.
-#
-# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = CpuIo2Dxe
+  MODULE_UNI_FILE                = CpuIo2Dxe.uni
   FILE_GUID                      = A19B1FE7-C1BC-49F8-875F-54A5D542443F
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0  
@@ -47,3 +46,6 @@
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuIo2DxeExtra.uni

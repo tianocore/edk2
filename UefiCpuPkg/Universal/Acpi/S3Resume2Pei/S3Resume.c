@@ -1,5 +1,5 @@
 /** @file
-  This module produces the EFI_PEI_S3_RESUME_PPI.
+  This module produces the EFI_PEI_S3_RESUME2_PPI.
   This module works with StandAloneBootScriptExecutor to S3 resume to OS.
   This module will excute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.

@@ -1,10 +1,11 @@
 ## @file
-# S3 Resume Module:
+# S3 Resume Module installs EFI_PEI_S3_RESUME2_PPI.
+#
 # This module works with StandAloneBootScriptExecutor to S3 resume to OS.
 # This module will excute the boot script saved during last boot and after that,
 # control is passed to OS waking up handler.
 #
-# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = S3Resume2Pei
+  MODULE_UNI_FILE                = S3Resume2Pei.uni
   FILE_GUID                      = 89E549B0-7CFE-449d-9BA3-10D8B2312D71
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -66,25 +68,30 @@
   PrintLib
 
 [Guids]
-  gEfiBootScriptExecutorVariableGuid            # SOMETIMES_CONSUMED
-  gEfiBootScriptExecutorContextGuid             # SOMETIMES_CONSUMED
-  gPerformanceProtocolGuid                      # ALWAYS_CONSUMED L"PerfDataMemAddr"
-  gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED  Hob: GUID_EXTENSION
-  gEfiAcpiS3ContextGuid                         # ALWAYS_CONSUMED
+  gEfiBootScriptExecutorVariableGuid            ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
+  gEfiBootScriptExecutorContextGuid             ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
+  gPerformanceProtocolGuid                      ## SOMETIMES_CONSUMES ## Variable:L"PerfDataMemAddr"
+  ## SOMETIMES_CONSUMES ## HOB
+  ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
+  gEfiAcpiVariableGuid
+  gEfiAcpiS3ContextGuid                         ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid                # PPI ALWAYS_CONSUMED
-  gEfiPeiS3Resume2PpiGuid                        # PPI ALWAYS_PRODUCED
-  gPeiSmmAccessPpiGuid                           # PPI ALWAYS_CONSUMED
-  gPeiPostScriptTablePpiGuid                     # PPI ALWAYS_PRODUCED
-  gEfiEndOfPeiSignalPpiGuid                      # PPI ALWAYS_PRODUCED
+  gEfiPeiReadOnlyVariable2PpiGuid               ## CONSUMES
+  gEfiPeiS3Resume2PpiGuid                       ## PRODUCES
+  gPeiSmmAccessPpiGuid                          ## SOMETIMES_CONSUMES
+  gPeiPostScriptTablePpiGuid                    ## SOMETIMES_PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                     ## SOMETIMES_PRODUCES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport  ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable  ## SOMETIMES_CONSUMES
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  S3Resume2PeiExtra.uni

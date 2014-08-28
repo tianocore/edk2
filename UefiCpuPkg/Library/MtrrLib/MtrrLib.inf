@@ -1,5 +1,5 @@
 ## @file
-#  MTRR library provides API for MTRR operation
+#  MTRR library provides APIs for MTRR operation.
 #
 #  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = MtrrLib
+  MODULE_UNI_FILE                = MtrrLib.uni
   FILE_GUID                      = 6826b408-f4f3-47ee-917f-af7047f9d937
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

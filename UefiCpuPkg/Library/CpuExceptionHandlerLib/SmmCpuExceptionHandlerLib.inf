@@ -1,9 +1,7 @@
 ## @file
-#  Component description file for SMM CPU Exception Handler Library instance.
+#  CPU Exception Handler library instance for SMM modules.
 #
-#  This library instance supports SMM module only.
-#
-#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmCpuExceptionHandlerLib
+  MODULE_UNI_FILE                = SmmCpuExceptionHandlerLib.uni
   FILE_GUID                      = 8D2C439B-3981-42ff-9CE5-1B50ECA502D6
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
@@ -59,6 +58,4 @@
   LocalApicLib
   PeCoffGetEntryPointLib
   DebugLib
- 
-[Ppis]
-  gEfiVectorHandoffInfoPpiGuid
+

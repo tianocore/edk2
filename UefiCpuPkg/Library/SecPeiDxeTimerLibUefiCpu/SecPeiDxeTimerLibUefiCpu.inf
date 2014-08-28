@@ -13,7 +13,7 @@
 # This library differs with the SecPeiDxeTimerLibCpu library in the MdePkg in
 # that it uses the local APIC library so that it supports x2APIC mode.
 #
-# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,6 +28,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SecPeiDxeTimerLibUefiCpu
+  MODULE_UNI_FILE                = SecPeiDxeTimerLibUefiCpu.uni
   FILE_GUID                      = 4FFF2014-2086-4ee6-9B58-886D1967861C
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -62,5 +63,5 @@
 
 
 [Pcd.IA32, Pcd.X64]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock  ## SOMETIME_CONSUMES
 

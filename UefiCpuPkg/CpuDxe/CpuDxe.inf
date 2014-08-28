@@ -1,8 +1,7 @@
 ## @file
+#  Simple CPU driver installs CPU Architecture Protocol.
 #
-#    Component description file for simple CPU driver
-#
-#  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = CpuDxe
+  MODULE_UNI_FILE                = CpuDxe.uni
   FILE_GUID                      = 1A1E4886-9517-440e-9FDE-3BE44CEE2136
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -58,12 +58,14 @@
   X64/CpuAsm.S   | GCC
 
 [Protocols]
-  gEfiCpuArchProtocolGuid
+  gEfiCpuArchProtocolGuid                       ## PRODUCES
 
 [Guids]
-  gIdleLoopEventGuid                            ## CONSUMES ## GUID
-  gEfiVectorHandoffTableGuid                    ## CONSUMES ## Configuration Table
+  gIdleLoopEventGuid                            ## CONSUMES           ## Event
+  gEfiVectorHandoffTableGuid                    ## SOMETIMES_CONSUMES ## SystemTable
 
 [Depex]
   TRUE
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuDxeExtra.uni

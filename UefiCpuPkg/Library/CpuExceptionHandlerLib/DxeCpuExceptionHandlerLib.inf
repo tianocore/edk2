@@ -1,9 +1,7 @@
 ## @file
-#  Component description file for DXE CPU Exception Handler Library instance.
+#  CPU Exception Handler library instance for DXE modules.
 #
-#  This library instance supports DXE module only.
-#
-#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeCpuExceptionHandlerLib
+  MODULE_UNI_FILE                = DxeCpuExceptionHandlerLib.uni
   FILE_GUID                      = B6E9835A-EDCF-4748-98A8-27D3C722E02D
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
