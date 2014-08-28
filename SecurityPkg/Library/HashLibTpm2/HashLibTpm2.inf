@@ -1,7 +1,10 @@
 ## @file
-#  Ihis library uses TPM2 device to calculation hash.
+#  Provides hash service using TPM2 device
 #
-# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  This library uses TPM2 device to calculate hash. Platform can use PcdTpm2HashMask to 
+#  mask some hash calculation.
+#
+# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -14,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HashLibTpm2
+  MODULE_UNI_FILE                = HashLibTpm2.uni
   FILE_GUID                      = 1317F0D5-7842-475c-B1CA-6EDC20DCBE7D
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -42,4 +46,4 @@
   PcdLib
 
 [Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask         ## CONSUMES

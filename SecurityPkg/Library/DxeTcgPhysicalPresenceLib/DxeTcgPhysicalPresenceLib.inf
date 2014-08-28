@@ -1,12 +1,15 @@
 ## @file
-# TCG physical presence library instance. This library will lock
-# TPM after executing TPM request.
+#  Executes pending TPM 1.2 requests from OS or BIOS and Locks TPM
+#
+#  This library will check and execute TPM 1.2 request from OS or BIOS. The request may
+#  ask for user confirmation before execution. This Library will also lock TPM physical 
+#  presence at last.
 #
 #  Caution: This module requires additional review when modified.
 #  This driver will have external input - variable.
 #  This external input must be validated carefully to avoid security issue.
 #
-# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -18,7 +21,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeTcgPhysicalPresenceLib   
+  BASE_NAME                      = DxeTcgPhysicalPresenceLib
+  MODULE_UNI_FILE                = DxeTcgPhysicalPresenceLib.uni
   FILE_GUID                      = EBC43A46-34AC-4F07-A7F5-A5394619361C
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -52,8 +56,13 @@
   HiiLib
 
 [Protocols]
-  gEfiTcgProtocolGuid
-  gEdkiiVariableLockProtocolGuid
+  gEfiTcgProtocolGuid                   ## CONSUMES
+  gEdkiiVariableLockProtocolGuid        ## CONSUMES
 
 [Guids]
+  ## CONSUMES           ## HII
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresenceFlags"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
   gEfiPhysicalPresenceGuid

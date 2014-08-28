@@ -1,9 +1,9 @@
 ## @file
-#  The library instance provides security service of image authentication 
-#  status check in UEFI2.3.1.
+#  Provides security service of image authentication status check
+#
 #  Authentication Status Library module supports UEFI2.3.1
 #
-# Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -15,7 +15,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeImageAuthenticationStatusLib   
+  BASE_NAME                      = DxeImageAuthenticationStatusLib
+  MODULE_UNI_FILE                = DxeImageAuthenticationStatusLib.uni
   FILE_GUID                      = EB92D1DE-7C36-4680-BB88-A67E96049F72
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

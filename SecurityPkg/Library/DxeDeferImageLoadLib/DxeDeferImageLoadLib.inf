@@ -1,7 +1,11 @@
 ## @file
-#  The library instance provides security service of deferring image load.
+#  Provides security service of deferred image load
 #
-# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+#  The platform may need to defer the execution of an image because of security 
+#  considerations. These deferred images will be recorded and then reported by 
+#  installing an instance of the EFI_DEFERRED_IMAGE_LOAD_PROTOCOL.
+#
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -13,7 +17,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeDeferImageLoadLib   
+  BASE_NAME                      = DxeDeferImageLoadLib
+  MODULE_UNI_FILE                = DxeDeferImageLoadLib.uni
   FILE_GUID                      = 5E2FAE1F-41DA-4fbd-BC81-603CE5CD8497
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -48,14 +53,16 @@
   PcdLib 
 
 [Protocols]
-  gEfiFirmwareVolume2ProtocolGuid
-  gEfiBlockIoProtocolGuid
-  gEfiSimpleFileSystemProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid                        ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                                ## SOMETIMES_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiDeferredImageLoadProtocolGuid                      ## SOMETIMES_PRODUCES
+  ## SOMETIMES_CONSUMES
+  ## NOTIFY
   gEfiUserManagerProtocolGuid
-  gEfiDeferredImageLoadProtocolGuid
-  
+   
 [Guids]
-  gEfiGlobalVariableGuid
+  gEfiGlobalVariableGuid                                  ## SOMETIMES_CONSUMES  ## Variable:L"BootOrder"
   
 [Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdDeferImageLoadPolicy
+  gEfiSecurityPkgTokenSpaceGuid.PcdDeferImageLoadPolicy   ## SOMETIMES_CONSUMES

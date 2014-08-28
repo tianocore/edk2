@@ -1,5 +1,7 @@
 ## @file
-#  This module will initialize TPM2 device and measure FVs in PEI phase.
+#  Initializes TPM 2.0 device and measure FVs in PEI phase
+#
+#  This module will initialize TPM device, measure reported FVs and BIOS version.
 #
 # Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
@@ -14,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = TrEEPei
+  MODULE_UNI_FILE                = TrEEPei.uni
   FILE_GUID                      = CA5A1928-6523-409d-A9FE-5DCC87387222
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -23,6 +26,9 @@
 # The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+# [BootMode]
+#   S3_RESUME                 ## SOMETIMES_CONSUMES
 #
 
 [Sources]
@@ -47,27 +53,30 @@
   MemoryAllocationLib
 
 [Guids]
-  gTcgEventEntryHobGuid
-  gMeasuredFvHobGuid
-  gEfiTpmDeviceInstanceNoneGuid
-  gEfiTpmDeviceInstanceTpm12Guid
+  gTcgEventEntryHobGuid                                                ## PRODUCES               ## HOB
+  gMeasuredFvHobGuid                                                   ## PRODUCES               ## HOB
+  gEfiTpmDeviceInstanceNoneGuid                                        ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
+  gEfiTpmDeviceInstanceTpm12Guid                                       ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
 
 [Ppis]
-  gEfiPeiFirmwareVolumeInfoPpiGuid
-  gEfiPeiFirmwareVolumeInfo2PpiGuid
-  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid
-  gPeiTpmInitializedPpiGuid
-  gEfiEndOfPeiSignalPpiGuid
+  gEfiPeiFirmwareVolumeInfoPpiGuid                                     ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEfiPeiFirmwareVolumeInfo2PpiGuid                                    ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid                  ## SOMETIMES_CONSUMES
+  gPeiTpmInitializedPpiGuid                                            ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                                            ## SOMETIMES_CONSUMES     ## NOTIFY
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString             ## CONSUMES
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString              ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                     ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy                  ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy                     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported              ## CONSUMES
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND
   gEfiPeiReadOnlyVariable2PpiGuid AND
   gEfiTpmDeviceSelectedGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TrEEPeiExtra.uni

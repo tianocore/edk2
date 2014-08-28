@@ -1,7 +1,9 @@
 ## @file
-#  This library is used by other modules to send TPM2 command.
+#  Provides some TPM 2.0 commands
 #
-# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  This library is used by other modules to send TPM 2.0 command.
+#
+# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -14,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Tpm2CommandLib
+  MODULE_UNI_FILE                = Tpm2CommandLib.uni
   FILE_GUID                      = 2F572F32-8BE5-4868-BD1D-7438AD97DC27
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

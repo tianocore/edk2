@@ -1,11 +1,14 @@
 ## @file
-# TrEE physical presence library instance. This library will execute TPM2 request.
+#  Executes TPM 2.0 requests from OS or BIOS
+#
+#  This library will check and execute TPM 2.0 request from OS or BIOS. The request may
+#  ask for user confirmation before execution.
 #
 #  Caution: This module requires additional review when modified.
 #  This driver will have external input - variable.
 #  This external input must be validated carefully to avoid security issue.
 #
-# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -17,7 +20,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeTrEEPhysicalPresenceLib   
+  BASE_NAME                      = DxeTrEEPhysicalPresenceLib
+  MODULE_UNI_FILE                = DxeTrEEPhysicalPresenceLib.uni
   FILE_GUID                      = 601ECB06-7874-489e-A280-805780F6C861
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -52,8 +56,13 @@
   Tpm2CommandLib
 
 [Protocols]
-  gEfiTrEEProtocolGuid
-  gEdkiiVariableLockProtocolGuid
+  gEfiTrEEProtocolGuid                 ## CONSUMES
+  gEdkiiVariableLockProtocolGuid       ## CONSUMES
 
 [Guids]
+  ## CONSUMES           ## HII
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresenceFlags"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
   gEfiTrEEPhysicalPresenceGuid

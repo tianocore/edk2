@@ -1,7 +1,10 @@
 ## @file
-#  TpmCommLib instance implements basis TPM Interface Specification (TIS) and TPM command functions.
+#  Provides some common functions for the TCG feature
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  This instance provides basic TPM Interface Specification (TIS) functions 
+#  and TPM hashall function.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -14,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = TpmCommLib
+  MODULE_UNI_FILE                = TpmCommLib.uni
   FILE_GUID                      = 7d9fe32e-a6a9-4cdf-abff-10cc7f22e1c9
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0

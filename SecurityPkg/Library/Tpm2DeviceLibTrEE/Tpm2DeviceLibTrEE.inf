@@ -1,7 +1,10 @@
 ## @file
-#  Ihis library is TPM2 TREE protocol lib.
+#  Provides function interfaces to communicate with TPM 2.0 device
 #
-# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  This library helps to use TPM 2.0 device in library function API
+#  based on TrEE protocol.
+#
+# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -14,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Tpm2DeviceLibTrEE
+  MODULE_UNI_FILE                = Tpm2DeviceLibTrEE.uni
   FILE_GUID                      = BBCB6F85-303C-4eb9-8182-AF98D4B3020C
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

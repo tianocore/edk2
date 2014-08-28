@@ -1,7 +1,9 @@
 ## @file
+#  Provides hash service by registered hash handler
+#
 #  Ihis library is BaseCrypto router. It will redirect hash request to each individual
-#  hash handler registerd, such as SHA1, SHA256.
-#  Platform can use PcdTpm2HashMask to mask some hash engines.
+#  hash handler registered, such as SHA1, SHA256. Platform can use PcdTpm2HashMask to 
+#  mask some hash engines.
 #
 # Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
@@ -16,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HashLibBaseCryptoRouterPei
+  MODULE_UNI_FILE                = HashLibBaseCryptoRouterPei.uni
   FILE_GUID                      = DDCBCFBA-8EEB-488a-96D6-097831A6E50B
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -46,5 +49,5 @@
   HobLib
 
 [Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask        ## CONSUMES
 

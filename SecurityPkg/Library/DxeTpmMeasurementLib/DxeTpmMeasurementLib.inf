@@ -1,7 +1,10 @@
 ## @file
-#  This library is used by other modules to measure data to TPM 1.2 or TPM 2.0.
+#  Provides TPM measurement functions for TPM1.2 and TPM 2.0
+# 
+#  This library provides TpmMeasureAndLogData() to to measure and log data, and 
+#  extend the measurement result into a specific PCR.
 #
-# Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -18,6 +21,7 @@
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = TpmMeasurementLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  MODULE_UNI_FILE                = DxeTpmMeasurementLib.uni
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -40,5 +44,5 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiTcgProtocolGuid
-  gEfiTrEEProtocolGuid
+  gEfiTcgProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiTrEEProtocolGuid          ## SOMETIMES_CONSUMES

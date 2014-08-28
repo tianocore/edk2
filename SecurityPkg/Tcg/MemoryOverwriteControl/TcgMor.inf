@@ -1,7 +1,9 @@
 ## @file
-#  Component description file for Memory Overwrite Control driver.
+#  Initilizes MemoryOverwriteRequestControl variable
 #
-# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+#  This module will clear MOR_CLEAR_MEMORY_BIT bit if it is set.
+#
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -14,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = TcgMor
+  MODULE_UNI_FILE                = TcgMor.uni
   FILE_GUID                      = AD416CE3-A483-45b1-94C2-4B4E4D575562
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -42,10 +45,13 @@
   UefiLib
 
 [Guids]
-  gEfiMemoryOverwriteControlDataGuid            # GUID ALWAYS_CONSUMED
+  ## SOMETIMES_CONSUMES      ## Variable:L"MemoryOverwriteRequestControl"
+  ## PRODUCES                ## Variable:L"MemoryOverwriteRequestControl"
+  gEfiMemoryOverwriteControlDataGuid
 
 [Depex]
   gEfiVariableArchProtocolGuid AND
-  gEfiVariableWriteArchProtocolGuid AND
-  ( gEfiTcgProtocolGuid OR gEfiTrEEProtocolGuid )
+  gEfiVariableWriteArchProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  TcgMorExtra.uni

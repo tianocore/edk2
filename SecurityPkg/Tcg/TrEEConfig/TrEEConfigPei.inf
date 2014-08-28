@@ -1,5 +1,7 @@
 ## @file
-#  Component name for TrEE configuration module.
+#  Set TPM device type
+#
+#  This module initializes TPM device type based on variable and detection.
 #  NOTE: This module is only for reference only, each platform should have its own setup page.
 #
 # Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
@@ -15,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = TrEEConfigPei
+  MODULE_UNI_FILE                = TrEEConfigPei.uni
   FILE_GUID                      = A5C1EF72-9379-4370-B4C7-0F5126CAC38E
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -22,6 +25,9 @@
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+# [BootMode]
+#   S3_RESUME                 ## SOMETIMES_CONSUMES
 #
 
 [Sources]
@@ -48,19 +54,23 @@
   Tpm12DeviceLib
 
 [Guids]
-  gEfiTrEEPhysicalPresenceGuid
+  ## SOMETIMES_CONSUMES ## Variable:L"TREE_CONFIGURATION"
+  ## SOMETIMES_CONSUMES ## Variable:L"TREE_DEVICE_DETECTION"
   gTrEEConfigFormSetGuid
-  gEfiTpmDeviceSelectedGuid
+  gEfiTpmDeviceSelectedGuid           ## PRODUCES             ## GUID    # Used as a PPI GUID
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid
+  gEfiPeiReadOnlyVariable2PpiGuid     ## CONSUMES
 
 [Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy         ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection                ## CONSUMES 
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress                  ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND
   gEfiPeiReadOnlyVariable2PpiGuid
+  
+[UserExtensions.TianoCore."ExtraFiles"]
+  TrEEConfigPeiExtra.uni
