@@ -1,17 +1,17 @@
 ## @file
-#  Cryptographic Library Instance for DXE_RUNTIME_DRIVER
+#  Cryptographic Library Instance for DXE_RUNTIME_DRIVER.
 #
 #  Caution: This module requires additional review when modified.
 #  This library will have external input - signature.
-#  This external input must be validated carefully to avoid security issue like
-#  buffer overflow, integer overflow.
+#  This external input must be validated carefully to avoid security issues such as 
+#  buffer overflow or integer overflow.
 #
 #  Note: MD4 Digest functions, HMAC-MD5 functions, HMAC-SHA1 functions, AES/
 #  TDES/ARC4 functions, RSA external functions, PKCS#7 SignedData sign functions,
-#  Diffie-Hellman functions, authenticode signature verification functions are
+#  Diffie-Hellman functions, and authenticode signature verification functions are
 #  not supported in this instance.
 #
-#  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = RuntimeCryptLib
+  MODULE_UNI_FILE                = RuntimeCryptLib.uni
   FILE_GUID                      = 78189cc0-727d-46a4-84ea-f7dd860de64a
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0

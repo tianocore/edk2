@@ -1,5 +1,5 @@
 ## @file
-# OpenSSL Library implementation.
+#  This module provides openSSL Library implementation.
 # 
 #  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = OpensslLib
+  MODULE_UNI_FILE                = OpensslLib.uni
   FILE_GUID                      = C873A7D0-9824-409f-9B42-2C158B992E69
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
