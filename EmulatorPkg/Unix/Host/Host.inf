@@ -145,4 +145,4 @@
    XCODE:*_*_X64_DLINK_PATH == gcc
    XCODE:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -L/usr/X11R6/lib -lXext -lX11 -framework Carbon
    XCODE:*_*_X64_ASM_FLAGS == -g
-
+   XCODE:*_*_X64_CC_FLAGS = -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack
