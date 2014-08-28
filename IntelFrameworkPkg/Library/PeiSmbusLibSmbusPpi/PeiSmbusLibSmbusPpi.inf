@@ -1,8 +1,7 @@
 ## @file
-# Component description file for Pei Smbus Library.
-#
 # SMBUS library that layers on top of the SMBUS PPI.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiSmbusLibSmbusPpi
+  MODULE_UNI_FILE                = PeiSmbusLibSmbusPpi.uni
   FILE_GUID                      = 51C4C059-67F0-4e3c-9A55-FF42A8291C8C
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -47,7 +47,7 @@
   PeiServicesTablePointerLib
 
 [Ppis]
-  gEfiPeiSmbusPpiGuid                           # PPI ALWAYS_CONSUMED
+  gEfiPeiSmbusPpiGuid                           ## CONSUMES
 
 [Depex]
   gEfiPeiSmbusPpiGuid

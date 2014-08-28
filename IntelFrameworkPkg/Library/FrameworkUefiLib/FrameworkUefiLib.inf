@@ -1,13 +1,11 @@
 ## @file
-#  Component description file for the entry point to a EFIDXE Drivers
-#
 #  Library to abstract Framework extensions that conflict with UEFI 2.0 Specification.
-#  Help Port Framework/Tinao code that has conflicts with UEFI 2.0 by hiding the oldconflicts 
-#  with library functions and supporting implementations of the old (EDK/EFI 1.10) and new 
-#  (EDK II/UEFI 2.0) way. This module is a DXE driver as it contains DXE enum extensions for 
-#  EFI event services.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This library is helpful to port Framework/Tinao code that has conflicts with UEFI 2.0. 
+#  It hides the old conflicts with library functions and supporting implementations of
+#  the old (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way.
+#
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FrameworkUefiLib
+  MODULE_UNI_FILE                = FrameworkUefiLib.uni
   FILE_GUID                      = B2F0D71A-A39F-4094-854B-0C6BA6910CCE
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -54,30 +53,30 @@
   DevicePathLib
   
 [Guids]
-  gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
-  gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
+  gEfiEventReadyToBootGuid                      ## SOMETIMES_CONSUMES  ## Event
+  gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event
 
 [Protocols]
-  gEfiDriverBindingProtocolGuid                 # ALWAYS_CONSUMED
-  gEfiSimpleTextOutProtocolGuid                 # ALWAYS_CONSUMED
-  gEfiGraphicsOutputProtocolGuid                # ALWAYS_CONSUMED
-  gEfiHiiFontProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiComponentNameProtocolGuid                 # SOMETIMES_CONSUMED
-  gEfiComponentName2ProtocolGuid                # SOMETIMES_CONSUMED
-  gEfiDriverConfigurationProtocolGuid           # SOMETIMES_CONSUMED
-  gEfiDriverConfiguration2ProtocolGuid          # SOMETIMES_CONSUMED
-  gEfiDriverDiagnosticsProtocolGuid             # SOMETIMES_CONSUMED
-  gEfiDriverDiagnostics2ProtocolGuid            # SOMETIMES_CONSUMED
-  gEfiUgaDrawProtocolGuid                       # SOMETIMES_CONSUMED
+  gEfiDriverBindingProtocolGuid                 ## SOMETIMES_PRODUCES
+  gEfiSimpleTextOutProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiHiiFontProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiComponentNameProtocolGuid                 ## SOMETIMES_PRODUCES
+  gEfiComponentName2ProtocolGuid                ## SOMETIMES_PRODUCES
+  gEfiDriverConfigurationProtocolGuid           ## SOMETIMES_PRODUCES
+  gEfiDriverConfiguration2ProtocolGuid          ## SOMETIMES_PRODUCES
+  gEfiDriverDiagnosticsProtocolGuid             ## SOMETIMES_PRODUCES
+  gEfiDriverDiagnostics2ProtocolGuid            ## SOMETIMES_PRODUCES
+  gEfiUgaDrawProtocolGuid                       ## SOMETIMES_CONSUMES
 
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable   ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport           ## CONSUMES
 
