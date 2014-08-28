@@ -1722,7 +1722,7 @@ Returns:
 
 --*/
 {
-  if ((BaseAddress >= 0) && (FwVolSize > 0x40) && ((BaseAddress + FwVolSize) % 8 == 0)) {
+  if ((FwVolSize > 0x40) && ((BaseAddress + FwVolSize) % 8 == 0)) {
     return EFI_SUCCESS;
   }
 
