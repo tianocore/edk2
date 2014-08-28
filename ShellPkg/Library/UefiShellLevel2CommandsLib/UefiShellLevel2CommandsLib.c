@@ -21,7 +21,7 @@
 
   * functions are non-interactive only
 
-
+  Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -107,7 +107,7 @@ ShellLevel2CommandsLibConstructor (
   ShellCommandRegisterAlias(L"mkdir", L"md");
   ShellCommandRegisterAlias(L"cd ..", L"cd..");
   ShellCommandRegisterAlias(L"cd \\", L"cd\\");
-  ShellCommandRegisterAlias(L"ren", L"mv");
+  ShellCommandRegisterAlias(L"mv", L"ren");
   //
   // These are installed in level 2 or 3...
   //
