@@ -21,6 +21,7 @@
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = SourceLevelDebugPkg
+  PACKAGE_UNI_FILE               = SourceLevelDebugPkg.uni
   PACKAGE_GUID                   = DBF00C27-D8D7-443d-918B-4E85CDA1373B
   PACKAGE_VERSION                = 0.86
 
@@ -44,35 +45,51 @@
   gEfiDebugAgentGuid       = {0x865a5a9b, 0xb85d, 0x474c, { 0x84, 0x55, 0x65, 0xd1, 0xbe, 0x84, 0x4b, 0xe2 }}
   gEfiSourceLevelDebugPkgTokenSpaceGuid = {0x865a5aab, 0xb85d, 0x474c, { 0x84, 0x55, 0x65, 0xd1, 0xbe, 0x84, 0x4b, 0xe2 }}
 
+#
+# [Error.gEfiSourceLevelDebugPkgTokenSpaceGuid]
+#   0x80000001 | Invalid value provided.
+#
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## The memory BAR of usb debug port, it may be different with the memory bar of ehci host controller.
-  ## Note that the memory BAR address is only used before Pci bus resource allocation.
+  #  Note that the memory BAR address is only used before Pci bus resource allocation.
+  # @Prompt Configure usb debug port memory BAR.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbDebugPortMemorySpaceBase|0xd0000000|UINT32|0x00000001
 
   ## The memory BAR of ehci host controller, in which usb debug feature is enabled.
-  ## Note that the memory BAR address is only used before Pci bus resource allocation.
+  #  Note that the memory BAR address is only used before Pci bus resource allocation.
+  # @Prompt Configure ehci host controller memory BAR.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciMemorySpaceBase|0xd0000000|UINT32|0x00000002
 
   ## The pci address of ehci host controller, in which usb debug feature is enabled.
-  ## The format of pci address is :            
-  ##     -----------------------------------------------------------------------
-  ##     | Bits 28..31 | Bits 20..27 | Bits 15..19 | Bits 12..14 | Bits 00..11 |
-  ##     -----------------------------------------------------------------------
-  ##     |      0      |     Bus     |   Device    |   Function  |      0      |
-  ##     -----------------------------------------------------------------------
-  ##
-  ## For the value below, it means the pci address at bus 0x0, device 0x1D, function 0x7.
+  #  The format of pci address is :<BR>
+  #      -----------------------------------------------------------------------<BR>
+  #      | Bits 28..31 | Bits 20..27 | Bits 15..19 | Bits 12..14 | Bits 00..11 |<BR>
+  #      -----------------------------------------------------------------------<BR>
+  #      |      0      |     Bus     |   Device    |   Function  |      0      |<BR>
+  #      -----------------------------------------------------------------------<BR>
+  #  For the value 0x000EF000, it means the pci address at bus 0x0, device 0x1D, function 0x7.
+  # @Prompt Configure ehci host controller pci address.
+  # @Expression  0x80000001 | (gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress & 0xF0000FFF) == 0
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress|0x000EF000|UINT32|0x00000003
 
   ## The mask of exception numbers whose handlers would be ignored and cannot be replaced or 
-  ## hooked by Debug Agent Library.
+  #  hooked by Debug Agent Library. Masking INT1/INT3 is invalid.
+  # @Prompt Configure exception numbers not to be hooked by Debug Agent.
+  # @Expression  0x80000001 | (gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger & 0xA) == 0
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger|0x00000000|UINT32|0x00000004
 
-  ## The method to issue break point to Debug Agent Library when Loading/UnLoading image.  
-  ## 1: Use I/O Port 84 to issue hardware break point
-  ## 2: Use INT3 to issue software break point
+  ## The method to issue break point to Debug Agent Library when Loading/UnLoading image.<BR><BR>
+  #  1: Use I/O Port 84 to issue hardware break point<BR>
+  #  2: Use INT3 to issue software break point<BR>
+  # @Prompt Configure Loading/UnLoading image break method.
+  # @ValidRange  0x80000001 | 1 - 2
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x1|UINT8|0x00000005
 
-  ## The data buffer size used by debug port in debug communication library.
+  ## The data buffer size used by debug port in debug communication library instances.
+  #  Its value is not suggested to be changed in platform DSC file.
+  # @Prompt Assign debug port buffer size.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|0x0|UINT16|0x00000006
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  SourceLevelDebugPkgExtra.uni
