@@ -1,7 +1,7 @@
 ## @file
 #  Module that produces the Framework CPU I/O Protocol using the services of the I/O Library
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -14,6 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = CpuIoDxe
+  MODULE_UNI_FILE                = CpuIoDxe.uni
   FILE_GUID                      = BAE7599F-3C6B-43b7-BDF0-9CE07AA91AA6
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -45,3 +46,6 @@
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuIoDxeExtra.uni

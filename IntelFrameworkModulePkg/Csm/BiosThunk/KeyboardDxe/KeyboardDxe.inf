@@ -1,10 +1,10 @@
 ## @file
-# Component description file for BiosKeyboard module.
+# Ps2 Keyboard driver.
 #
-# Ps2 Keyboard driver by using Legacy Bios protocol service and IsaIo protocol service.
-# This dirver uses legacy INT16 to get the key stroke status.
+# Ps2 Keyboard driver by using Legacy Bios protocol service and IsaIo protocol 
+# service. This dirver uses legacy INT16 to get the key stroke status.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = KeyboardDxe
+  MODULE_UNI_FILE                = KeyboardDxe.uni
   FILE_GUID                      = 5479662B-6AE4-49e8-A6BD-6DE4B625811F
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -60,15 +61,17 @@
   PcdLib
 
 [Protocols]
-  gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
-  gEfiLegacyBiosProtocolGuid                    # PROTOCOL TO_START
-  gEfiPs2PolicyProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiIsaIoProtocolGuid                         ## TO_START
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiLegacyBiosProtocolGuid                    ## CONSUMES
+  gEfiPs2PolicyProtocolGuid                     ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification|FALSE  ## CONSUMES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection                  ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  KeyboardDxeExtra.uni

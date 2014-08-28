@@ -1,8 +1,10 @@
 ## @file
-#  FwVolDxe driver produces Firmware Volume2 protocol with full services
+#  FwVolDxe Driver.
+#
+#  This driver produces Firmware Volume2 protocol with full services
 #  (read/write, get/set) based on Firmware Volume Block protocol.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FwVolDxe
+  MODULE_UNI_FILE                = FwVolDxe.uni
   FILE_GUID                      = 233C2592-1CEC-494a-A097-15DC96379777
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -55,9 +58,9 @@
 
 
 [Guids]
-  gEfiFirmwareVolumeTopFileGuid                ## CONSUMES
-  gEfiFirmwareFileSystem2Guid                  ## CONSUMES
-  gEfiFirmwareFileSystem3Guid                  ## CONSUMES
+  gEfiFirmwareVolumeTopFileGuid                ## CONSUMES ## File # VTF file
+  gEfiFirmwareFileSystem2Guid                  ## CONSUMES ## GUID # File System Guid
+  gEfiFirmwareFileSystem3Guid                  ## CONSUMES ## GUID # File System Guid
 
 [Protocols]
   gEfiSectionExtractionProtocolGuid            ## CONSUMES
@@ -67,3 +70,5 @@
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiSectionExtractionProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  FwVolDxeExtra.uni

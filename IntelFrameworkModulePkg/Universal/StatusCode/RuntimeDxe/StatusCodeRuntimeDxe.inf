@@ -1,8 +1,7 @@
 ## @file
-#  Status Code Runtime Dxe driver that supports multiple devices and produces
-#  Status Code Runtime Protocol.
+#  Status Code Runtime Dxe driver produces Status Code Runtime Protocol.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = StatusCodeRuntimeDxe
+  MODULE_UNI_FILE                = StatusCodeRuntimeDxe.uni
   FILE_GUID                      = FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -62,25 +62,27 @@
 
 
 [Guids]
-  gEfiDataHubStatusCodeRecordGuid               ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
-  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
-  gMemoryStatusCodeRecordGuid                   ## CONSUMES ## HOB
+  gEfiDataHubStatusCodeRecordGuid               ## SOMETIMES_PRODUCES ## UNDEFINED # DataRecord Guid
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_PRODUCES ## UNDEFINED # Record data type
+  gMemoryStatusCodeRecordGuid                   ## SOMETIMES_CONSUMES ## HOB
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
-  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
+  gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES ## UNDEFINED
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## PRODUCES
-  gEfiDataHubProtocolGuid                       ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
+  gEfiDataHubProtocolGuid                       ## SOMETIMES_CONSUMES # Needed if Data Hub is supported for status code
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn              ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM     ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial             ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## SOMETIMES_CONSUMES
 
 [Depex]
   TRUE
+[UserExtensions.TianoCore."ExtraFiles"]
+  StatusCodeRuntimeDxeExtra.uni

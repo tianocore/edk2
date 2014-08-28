@@ -3,7 +3,7 @@
 #
 # This driver installs Legacy Bios Protocol to support CSM module work in EFI system.
 #
-# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LegacyBiosDxe
+  MODULE_UNI_FILE                = LegacyBiosDxe.uni
   FILE_GUID                      = F122A15C-C10B-4d54-8F48-60F4F06DD1AD
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -102,48 +103,48 @@
 
 
 [Guids]
-  gEfiDiskInfoIdeInterfaceGuid                  # ALWAYS_CONSUMED
-  gEfiSmbiosTableGuid                           # ALWAYS_CONSUMED
-  gEfiLegacyBiosGuid                            # ALWAYS_PRODUCED
+  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_CONSUMES ##GUID #Used in LegacyBiosBuildIdeData() to assure device is a disk
+  gEfiSmbiosTableGuid                           ## SOMETIMES_CONSUMES ##SystemTable
+  gEfiLegacyBiosGuid                            ## SOMETIMES_CONSUMES ##GUID #Used in LegacyBiosInstallVgaRom() to locate handle buffer
 
 [Guids.IA32]
-  gEfiSmbiosTableGuid                           # ALWAYS_CONSUMED
-  gEfiAcpi20TableGuid                           # ALWAYS_CONSUMED
-  gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED
+  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ##SystemTable
+  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ##SystemTable
 
 [Guids.X64]
-  gEfiSmbiosTableGuid                           # ALWAYS_CONSUMED
-  gEfiAcpi20TableGuid                           # ALWAYS_CONSUMED
-  gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED
+  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ##SystemTable
+  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ##SystemTable
 
 
 [Protocols]
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiTimerArchProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiIsaIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiDiskInfoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiLegacy8259ProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiLegacyBiosPlatformProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
-  gEfiLegacyInterruptProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
+  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiPciRootBridgeIoProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiTimerArchProtocolGuid                     ## CONSUMES
+  gEfiIsaIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiGenericMemTestProtocolGuid                ## CONSUMES
+  gEfiDiskInfoProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiSimpleTextInProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiLegacy8259ProtocolGuid                    ## CONSUMES
+  gEfiLegacyBiosPlatformProtocolGuid            ## CONSUMES
+  gEfiLegacyInterruptProtocolGuid               ## CONSUMES
+  gEfiLegacyRegion2ProtocolGuid                 ## CONSUMES
+  gEfiLegacyBiosProtocolGuid                    ## PRODUCES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEndOpromShadowAddress
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLowPmmMemorySize
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion  ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize       ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEndOpromShadowAddress        ## SOMETIMES_CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLowPmmMemorySize             ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize            ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase      ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize      ## CONSUMES
 
 [Depex]
   gEfiLegacyRegion2ProtocolGuid AND gEfiLegacyInterruptProtocolGuid AND gEfiLegacyBiosPlatformProtocolGuid AND gEfiLegacy8259ProtocolGuid AND gEfiGenericMemTestProtocolGuid AND gEfiCpuArchProtocolGuid AND gEfiTimerArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  LegacyBiosDxeExtra.uni

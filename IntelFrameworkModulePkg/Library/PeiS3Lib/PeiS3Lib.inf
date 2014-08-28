@@ -1,11 +1,11 @@
 ## @file
+#  This library provides API to invoke the S3 resume vector in the ACPI Table in S3 resume mode.
 #
-#  This library provides API to invoke the S3 resume vector in the APCI Table in S3 resume mode. 
 #  This library instance is no longer used and module using this library
 #  class should update to directly locate EFI_PEI_S3_RESUME_PPI defined
 #  in PI 1.2 specification. 
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiS3Lib
+  MODULE_UNI_FILE                = PeiS3Lib.uni
   FILE_GUID                      = EFB7D3A8-DEB9-4bed-B6D6-3B09BEEB835A
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -44,6 +45,5 @@
   DebugLib
 
 [Ppis]
-  gEfiPeiS3ResumePpiGuid                # ALWAYS_CONSUMES
-
+  gEfiPeiS3ResumePpiGuid                ## CONSUMES
 

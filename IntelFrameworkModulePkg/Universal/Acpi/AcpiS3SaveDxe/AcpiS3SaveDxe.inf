@@ -1,7 +1,6 @@
 ## @file
-# Component description file for AcpiS3Save module.
+# AcpiS3Save module installs ACPI S3 Save protocol to prepare S3 boot data.
 #
-# This is an implementation of the ACPI S3 Save protocol.
 # Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AcpiS3SaveDxe
+  MODULE_UNI_FILE                = AcpiS3SaveDxe.uni
   FILE_GUID                      = 2BDED685-F733-455f-A840-43A22B791FB3
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -53,28 +53,30 @@
   DxeServicesLib
 
 [Guids]
-  gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED
-  gEfiAcpiS3ContextGuid                         # ALWAYS_CONSUMED
-  gEfiAcpiVariableCompatiblityGuid              # SOMETIME_CONSUMED L"AcpiGlobalVariable"
-  gEfiAcpi20TableGuid                           # ALWAYS_CONSUMED  System Table
-  gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED  System Table
+  gEfiAcpiVariableGuid                          ## PRODUCES  ## UNDEFINED # LockBox Save Data.
+  gEfiAcpiS3ContextGuid                         ## PRODUCES  ## UNDEFINED # LockBox Save Data.
+  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
+  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
+  ## SOMETIMES_CONSUMES ## Variable:L"AcpiGlobalVariable"
+  ## SOMETIMES_PRODUCES ## Variable:L"AcpiGlobalVariable"
+  gEfiAcpiVariableCompatiblityGuid
 
 [Protocols]
-  gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
-  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
-  gFrameworkEfiMpServiceProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
-  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiAcpiS3SaveProtocolGuid                    ## PRODUCES
+  gFrameworkEfiMpServiceProtocolGuid            ## SOMETIMES_CONSUMES
+  ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid
 
 [FeaturePcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport          ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode                 ## CONSUMES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize    ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize    ## SOMETIMES_CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize       ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                         ## CONSUMES
   ## SOMETIMES_CONSUMES
   ## SOMETIMES_PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdIdentifyMappingPageTablePtr
@@ -85,4 +87,6 @@
   # AcpiS3SaveDxe module is executed. 
   #
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid AND gEfiMpServiceProtocolGuid
-  
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  AcpiS3SaveDxeExtra.uni

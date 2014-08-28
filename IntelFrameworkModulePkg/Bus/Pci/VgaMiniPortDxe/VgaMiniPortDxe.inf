@@ -1,7 +1,7 @@
 ## @file
 # VGA Mini Port Driver that manages VGA device and produces VGA Mini Port Protocol.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VgaMiniPort
+  MODULE_UNI_FILE                = VgaMiniPort.uni
   FILE_GUID                      = 15C5E761-58D8-461a-9173-CAB020916264
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -52,4 +53,5 @@
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiVgaMiniPortProtocolGuid                   ## BY_START
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  VgaMiniPortExtra.uni

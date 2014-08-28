@@ -1,6 +1,6 @@
 ## @file
+#  BDSDxe module is core driver for BDS phase.
 #
-#  BDSDxe module is core driver for BDS phase. 
 #  When DxeCore dispatching all DXE driver, this module will produce architecture protocol 
 #  gEfiBdsArchProtocolGuid. After DxeCore finish dispatching, DxeCore will invoke Entry
 #  interface of protocol gEfiBdsArchProtocolGuid, then BDS phase is entered.
@@ -28,6 +28,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BdsDxe
+  MODULE_UNI_FILE                = BdsDxe.uni
   FILE_GUID                      = FC5C7020-1A48-4198-9BE2-EAD5ABC8CF2F
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0 
@@ -113,93 +114,114 @@
   UefiHiiServicesLib
   
 [Guids]
-                                                ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"PlatformLang" (Platform supported languange in Rfc4646 format)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"Lang" (Platform supported languange in Iso639 format)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"KeyXX" (Hotkey option variable)
-                                                ## PRODUCES           ## Variable:L"HwErrRecSupport" (The level of platform supported hardware Error Record Persistence)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOptionSupport" (The feature supported in boot option menu, value could be: EFI_BOOT_OPTION_SUPPORT_KEY, EFI_BOOT_OPTION_SUPPORT_APP
-                                                ## SOMETIMES_PRODUCES (not PcdUefiVariableDefaultLangDeprecate)## Variable:L"LangCodes" (Value of PcdUefiVariableDefaultLangCodes)
-                                                ## PRODUCES           ## Variable:L"PlatformLangCodes" (Value of PcdUefiVariableDefaultPlatformLangCodes)
-                                                ## PRODUCES           ## Variable:L"Timeout" (The time out value in second of showing progress bar)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOrder" (The boot option array)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"DriverOrder" (The driver order list)
-                                                ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
-                                                ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
-                                                ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
-  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
-  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
-  gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
-  gEfiHiiPlatformSetupFormsetGuid               ## CONSUMES ## GUID (Indicate the formset class guid to be displayed)
-  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
-  gEfiHiiDriverHealthFormsetGuid                ## CONSUMES ## GUID (Indicate the Driver Health formset class guid to be displayed)
-  gEfiLegacyDevOrderVariableGuid                ## SOMETIMES_PRODUCES ## Variable:L"LegacyDevOrder"
-  gFrontPageFormSetGuid                         ## PRODUCES           ## FrontPage HII Package
-  gBootMaintFormSetGuid                         ## SOMETIMES_PRODUCES ## BootMaint HII Package
-  gFileExploreFormSetGuid                       ## SOMETIMES_PRODUCES ## FileExplore HII Package
-  gBootManagerFormSetGuid                       ## SOMETIMES_PRODUCES ## BootManager HII Package
-  gDeviceManagerFormSetGuid                     ## SOMETIMES_PRODUCES ## DeviceManager HII Package
-  gDriverHealthFormSetGuid                      ## SOMETIMES_PRODUCES ## DriverHealth HII Package
-  gConnectConInEventGuid                        ## CONSUMES ## GUID (Connect ConIn Event)
-  gEfiFmpCapsuleGuid                            ## CONSUMES ## GUID (FMP Capsule)
-  gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES ## Variable:L"BootXXXX"          # Boot option variable
+  ## SOMETIMES_PRODUCES ## Variable:L"DriverXXXX"        # Driver load option.
+  ## SOMETIMES_PRODUCES ## Variable:L"PlatformLang"      # Platform supported languange in Rfc4646 format
+  ## SOMETIMES_PRODUCES ## Variable:L"Lang"              # Platform supported languange in Iso639 format
+  ## SOMETIMES_PRODUCES ## Variable:L"LangCodes"         # Value of PcdUefiVariableDefaultLangCodes
+  ## PRODUCES           ## Variable:L"PlatformLangCodes" # Value of PcdUefiVariableDefaultPlatformLangCodes
+  ## SOMETIMES_PRODUCES ## Variable:L"KeyXXXX"  # Hotkey option variable
+  ## PRODUCES           ## Variable:L"HwErrRecSupport"   # The level of platform supported hardware Error Record Persistence
+  ## PRODUCES           ## Variable:L"Timeout"     # The time out value in second of showing progress bar
+  ## SOMETIMES_PRODUCES ## Variable:L"BootOptionSupport" # The feature supported in boot option menu, value could be: EFI_BOOT_OPTION_SUPPORT_KEY, EFI_BOOT_OPTION_SUPPORT_APP
+  ## SOMETIMES_PRODUCES ## Variable:L"BootOrder"   # The boot option array
+  ## SOMETIMES_PRODUCES ## Variable:L"DriverOrder" # The driver order list
+  ## SOMETIMES_CONSUMES ## Variable:L"ConIn"  # The device path of console in device
+  ## SOMETIMES_PRODUCES ## Variable:L"ConIn"  # The device path of console in device
+  ## SOMETIMES_CONSUMES ## Variable:L"ConOut" # The device path of console out device
+  ## SOMETIMES_PRODUCES ## Variable:L"ConOut" # The device path of console out device
+  ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" # The device path of error out device
+  ## SOMETIMES_PRODUCES ## Variable:L"ErrOut" # The device path of error out device
+  ## SOMETIMES_CONSUMES ## Variable:L"ConInDev"  # The device path of console in device
+  ## SOMETIMES_CONSUMES ## Variable:L"ConOutDev" # The device path of console out device
+  ## SOMETIMES_CONSUMES ## Variable:L"ErrOutDev" # The device path of error out device
+  ## SOMETIMES_PRODUCES ## Variable:L"BootNext"  # The number of next boot option
+  gEfiGlobalVariableGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## SOMETIMES_CONSUMES ## UNDEFINED # Indicate the information type is volume
+  gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## UNDEFINED # Indicate the information type is file
+  gEfiHiiPlatformSetupFormsetGuid               ## SOMETIMES_CONSUMES ## UNDEFINED # Indicate the formset class guid to be displayed
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED # Extended IFR Guid Opcode
+  gEfiHiiDriverHealthFormsetGuid                ## SOMETIMES_CONSUMES ## UNDEFINED # Indicate the Driver Health formset class guid to be displayed
+  ## SOMETIMES_PRODUCES ## Variable:L"LegacyDevOrder"
+  ## SOMETIMES_CONSUMES ## Variable:L"LegacyDevOrder"
+  gEfiLegacyDevOrderVariableGuid
+  gFrontPageFormSetGuid                         ## SOMETIMES_CONSUMES ## HII # FrontPage HII Package
+  gBootMaintFormSetGuid                         ## SOMETIMES_CONSUMES ## HII # BootMaint HII Package
+  gFileExploreFormSetGuid                       ## SOMETIMES_CONSUMES ## HII # FileExplore HII Package
+  gBootManagerFormSetGuid                       ## SOMETIMES_CONSUMES ## HII # BootManager HII Package
+  gDeviceManagerFormSetGuid                     ## SOMETIMES_CONSUMES ## HII # DeviceManager HII Package
+  gDriverHealthFormSetGuid                      ## SOMETIMES_CONSUMES ## HII # DriverHealth HII Package
+  ## SOMETIMES_PRODUCES ## Event
+  ## SOMETIMES_CONSUMES ## Event
+  gConnectConInEventGuid
+  gEfiFmpCapsuleGuid                            ## SOMETIMES_CONSUMES ## GUID # FMP Capsule
+  gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
-  gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
-  gEfiBdsArchProtocolGuid                       ## PROTOCOL PRODUCES
-  gEfiSmbiosProtocolGuid                        ## PROTOCOL CONSUMES
-  gEfiGenericMemTestProtocolGuid                ## PROTOCOL CONSUMES
-  gEfiLegacyBiosProtocolGuid                    ## PROTOCOL CONSUMES
-  gEfiUgaDrawProtocolGuid |gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## PROTOCOL SOMETIMES_CONSUMES
-  gEfiBlockIoProtocolGuid                       ## PROTOCOL CONSUMES
-  gEfiGraphicsOutputProtocolGuid                ## PROTOCOL SOMETIMES_CONSUMES
-  gEfiSimpleTextInputExProtocolGuid             ## PROTOCOL CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               ## PROTOCOL CONSUMES
-  gEfiFormBrowser2ProtocolGuid                  ## PROTOCOL CONSUMES
-  gEfiSerialIoProtocolGuid                      ## PROTOCOL CONSUMES
-  gEfiDevicePathProtocolGuid                    ## PROTOCOL CONSUMES
-  gEfiDriverHealthProtocolGuid                  ## PROTOCOL SOMETIMES_CONSUMES
-  gEfiPciIoProtocolGuid                         ## PROTOCOL CONSUMES
-  gEfiBootLogoProtocolGuid                      ## PROTOCOL SOMETIMES_CONSUMES
-  gEdkiiVariableLockProtocolGuid                ## PROTOCOL CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiBdsArchProtocolGuid                       ## PRODUCES
+  gEfiSmbiosProtocolGuid                        ## CONSUMES
+  gEfiGenericMemTestProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiLegacyBiosProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid |gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  ## CONSUMES
+  ## NOTIFY
+  gEfiSimpleTextInputExProtocolGuid             
+  gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_PRODUCES
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiSerialIoProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiDriverHealthProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport                   ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable ## CONSUMES
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes          ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang               ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang       ## SOMETIMES_CONSUMES
+  ## CONSUMES
+  ## PRODUCES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow     ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn  ## PRODUCES
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  ## CONSUMES
+  ## PRODUCES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor   ## CONSUMES   
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution  ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution    ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand       ## SOMETIMES_CONSUMES
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
-  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable                      ## CONSUMES
 
 [Depex]
   TRUE
 
 #
 # [BootMode] 
-#   BOOT_ON_FLASH_UPDATE    ## SOMETIMES_CONSUMES (Update Capsule Image)
+#   FLASH_UPDATE    ## SOMETIMES_CONSUMES # Update Capsule Image
 #
-#  
-# [Hob]
-#   HOB                     ## SOMETIMES_CONSUMES  ## GUID EXTENSION Capsule Data Hob
-#
-# 
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BdsDxeExtra.uni

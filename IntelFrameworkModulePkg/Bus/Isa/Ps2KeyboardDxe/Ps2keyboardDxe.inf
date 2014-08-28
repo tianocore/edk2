@@ -1,10 +1,10 @@
 ## @file
-# Ps2 Keyboard UEFI Driver which produce gEfiSimpleTextInProtocolGuid and gEfiSimpleTextInputExProtocolGuid
-# protocol. 
-# The keyboard type implemented follows IBM compatible PS2 protocol, with Scan Codes Set 1.
+# Ps2 Keyboard Driver.
 #
-# This dirver directly uses IsaIo protocol service to support KeyBoard work.
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Ps2 Keyboard Driver for UEFI. The keyboard type implemented follows IBM
+# compatible PS2 protocol using Scan Code Set 1.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Ps2KeyboardDxe
+  MODULE_UNI_FILE                = Ps2KeyboardDxe.uni
   FILE_GUID                      = 3DC82376-637B-40a6-A8FC-A565417F2C38
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -59,25 +60,26 @@
   PcdLib
   
 [Protocols]
-  gEfiPs2PolicyProtocolGuid                     # PROTOCOL TO_START
-  gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiPs2PolicyProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiIsaIoProtocolGuid                         ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification   ## CONSUMES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection             ## SOMETIMES_CONSUMES
 
+#
 # [Event]
-#   ##
-#   # Event will be signaled for WaitForKey event.
-#   #
-#   EVT_NOTIFY_WAIT                             ## PRODUCES
 #
 #   ##
-#   # Event will be used to poll mouse state.
+#   # Timer event used to read key strokes at a regular interval.
 #   #
-#   EVT_NOTIFY_SIGNAL                           ## PRODUCES
+#   EVENT_TYPE_PERIODIC_TIMER   ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Ps2KeyboardDxeExtra.uni

@@ -1,10 +1,11 @@
 ## @file
 # ISA Floppy PEIM to support recovery boot via floppy disk.
 #
-# This module detects Floppy devices. If found, it will install BlockIo PPI.
-#  This module is only dispatched in Recovery Boot mode.
+# This module detects and supports ISA Floppy drives. If a drive is discovered
+# the PEIM will install the BlockIo PPI. This module is only dispatched if it
+# is in the Recovery Boot mode.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -25,6 +26,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaFloppyPei
+  MODULE_UNI_FILE                = IsaFloppyPei.uni
   FILE_GUID                      = 7F6E0A24-DBFD-43df-9755-0292D7D3DD48
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -43,8 +45,9 @@
   Fdc.h
 
 [Packages]
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   IoLib
@@ -58,11 +61,13 @@
   PcdLib
 
 [Ppis]
-  gEfiPeiVirtualBlockIoPpiGuid    # PPI ALWAYS_PRODUCED
+  gEfiPeiVirtualBlockIoPpiGuid    ## PRODUCES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFdcBaseAddress
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFdcBaseAddress   ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  IsaFloppyPeiExtra.uni

@@ -1,7 +1,7 @@
 ## @file
 #  Status code PEIM which produces Status Code PPI.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = StatusCodePei
+  MODULE_UNI_FILE                = StatusCodePei.uni
   FILE_GUID                      = 1EC0F53A-FDE0-4576-8F25-7A1A410F58EB
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -55,20 +56,23 @@
 
 [Guids]
   gMemoryStatusCodeRecordGuid                   ## SOMETIMES_CONSUMES ## HOB
-  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
+  gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES ## UNDEFINED # String Data Type
 
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## PRODUCES
 
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
 
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory  ## SOMETIMES_CONSUMES
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  StatusCodePeiExtra.uni

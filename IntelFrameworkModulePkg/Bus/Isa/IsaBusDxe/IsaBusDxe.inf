@@ -1,12 +1,12 @@
 ## @file
-# Component description file for IsaBus module.
+# Generates ISA I/O Protocols based on the ISA ACPI Protocol instances.
 #
-# Discovers all the ISA Controllers and their resources by using the ISA ACPI 
-# Protocol, produces an instance of the ISA I/O Protocol for every ISA 
+# Discovers all the ISA Controllers and their resources by using the ISA ACPI
+# Protocol, produces an instance of the ISA I/O Protocol for every ISA
 # Controller found. This driver is designed to manage a PCI-to-ISA bridge Device
-# such as LPC bridge.
+# such as an LPC bridge.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaBusDxe
+  MODULE_UNI_FILE                = IsaBusDxe.uni
   FILE_GUID                      = 240612B5-A063-11d4-9A3A-0090273FC14D
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -58,13 +59,15 @@
   DebugLib
 
 [Protocols]
-  gEfiIsaIoProtocolGuid                         # PROTOCOL BY_START
-  gEfiIsaAcpiProtocolGuid                       # PROTOCOL TO_START
-  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL TO_START
+  gEfiIsaIoProtocolGuid                         ## BY_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+  gEfiIsaAcpiProtocolGuid                       ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiGenericMemTestProtocolGuid                ## TO_START
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures  ## CONSUMES
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  IsaBusDxeExtra.uni

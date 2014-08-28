@@ -1,16 +1,11 @@
 ## @file
-# Component description file for IsaFloppy module.
+# Provides ISA Floppy Disk support.
 #
-# ISA Floppy Disk UEFI Driver conforming to the UEFI driver model
+# Provides ISA Floppy Disk UEFI Driver conforming to the UEFI driver model. The
+# driver provides support for two drives per controller, DMA channel 2, diskette
+# change line and write protect.  Currently only 1.44MB drives are supported.
 #
-#  1. Support two types diskette drive  
-#     1.44M drive and 2.88M drive (and now only support 1.44M)
-#  2. Support two diskette drives per floppy disk controller
-#  3. Use DMA channel 2 to transfer data
-#  4. Do not use interrupt
-#  5. Support diskette change line signal and write protect
-#
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaFloppyDxe
+  MODULE_UNI_FILE                = IsaFloppyDxe.uni
   FILE_GUID                      = 0abd8284-6da3-4616-971a-83a5148067ba
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -62,10 +58,21 @@
   PcdLib
 
 [Protocols]
-  gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiIsaIoProtocolGuid                               ## TO_START
+  gEfiBlockIoProtocolGuid                             ## BY_START
+  gEfiDevicePathProtocolGuid                          ## TO_START
 
 [FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable        # CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable       # CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable   ## CONSUMES
+
+#
+# [Event]
+#   ##
+#   # Floppy motor control timer event.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER   ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IsaFloppyDxeExtra.uni

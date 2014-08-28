@@ -2,7 +2,7 @@
 #  Debug Library based on report status code library
 #
 #  Debug Library for PEIMs and DXE drivers that sends debug messages to ReportStatusCode
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiDxeDebugLibReportStatusCode
+  MODULE_UNI_FILE                = PeiDxeDebugLibReportStatusCode.uni
   FILE_GUID                      = bda39d3a-451b-4350-8266-81ab10fa0523
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -46,10 +47,9 @@
   DebugPrintErrorLevelLib
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue  ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask      ## CONSUMES
 
 [Guids]
-  gEfiStatusCodeDataTypeDebugGuid    ## CONSUMES
-  
-  
+  gEfiStatusCodeDataTypeDebugGuid    ## SOMETIMES_CONSUMES ## GUID
+

@@ -1,9 +1,11 @@
 ## @file
-# Component description file for IsaIoDxe module.
-#
 # Produces an instance of the ISA I/O Protocol for every SIO controller.
 #
-# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# Produces an instance of the ISA I/O Protocol for every SIO controller. The ISA
+# I/O protocols are installed based off of the information provided by each
+# instance of the SIO Protocol found.
+#
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaIoDxe
+  MODULE_UNI_FILE                = IsaIoDxe.uni
   FILE_GUID                      = 61AD3083-DCAD-4850-A50C-73B23B3B14F9
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -55,13 +58,14 @@
   DebugLib
 
 [Protocols]
-  gEfiIsaIoProtocolGuid                         # PROTOCOL BY_START
-  gEfiSioProtocolGuid                           # PROTOCOL TO_START
-  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL TO_START
+  gEfiIsaIoProtocolGuid                         ## BY_START
+  gEfiSioProtocolGuid                           ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiGenericMemTestProtocolGuid                ## TO_START
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures  ## CONSUMES
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  IsaIoDxeExtra.uni

@@ -2,10 +2,10 @@
 #  LzmaCustomDecompressLib produces LZMA custom decompression algorithm.
 #
 #  It is based on the LZMA SDK 4.65.
-#  LZMA SDK 4.65 was placed in the public domain on 2009-02-03.  
+#  LZMA SDK 4.65 was placed in the public domain on 2009-02-03.
 #  It was released on the http://www.7-zip.org/sdk.html website.
 #
-#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LzmaDecompressLib
+  MODULE_UNI_FILE                = LzmaDecompressLib.uni
   FILE_GUID                      = 35194660-7421-44ad-9636-e44885f092d1
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -51,7 +52,7 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [Guids]
-  gLzmaCustomDecompressGuid  ## PRODUCED  ## GUID specifies LZMA custom decompress algorithm.
+  gLzmaCustomDecompressGuid  ## PRODUCES  ## UNDEFINED # specifies LZMA custom decompress algorithm.
 
 [LibraryClasses]
   BaseLib

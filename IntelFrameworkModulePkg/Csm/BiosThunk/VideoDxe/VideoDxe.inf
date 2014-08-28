@@ -4,7 +4,7 @@
 # This driver by using Legacy Bios protocol service to support csm Video
 # and produce Graphics Output Protocol.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BiosVideoDxe
+  MODULE_UNI_FILE                = BiosVideoDxe.uni
   FILE_GUID                      = 0B04B2ED-861C-42cd-A22F-C3AAFACCB896
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -61,22 +62,26 @@
 
 
 [Guids]
-  gEfiLegacyBiosGuid                            # ALWAYS_PRODUCED
-  gEfiEventExitBootServicesGuid
+  gEfiLegacyBiosGuid                            ## PRODUCES  ##GUID # Install Legacy BIOS GUID to mark this driver as a BIOS Thunk Driver
+  gEfiEventExitBootServicesGuid                 ## CONSUMES  ##Event
 
 [Protocols]
-  gEfiVgaMiniPortProtocolGuid                   # PROTOCOL BY_START
-  gEfiEdidDiscoveredProtocolGuid                # PROTOCOL BY_START
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
-  gEfiEdidActiveProtocolGuid                    # PROTOCOL BY_START
-  gEfiLegacyBiosProtocolGuid                    # PROTOCOL TO_START
-  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiEdidOverrideProtocolGuid                  # PROTOCOL TO_START
+  gEfiVgaMiniPortProtocolGuid                   ## BY_START
+  gEfiEdidDiscoveredProtocolGuid                ## BY_START
+  gEfiGraphicsOutputProtocolGuid                ## BY_START
+  gEfiEdidActiveProtocolGuid                    ## BY_START
+  gEfiLegacyBiosProtocolGuid                    ## CONSUMES
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+  gEfiEdidOverrideProtocolGuid                  ## SOMETIMES_CONSUMES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution  
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable  ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable        ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable        ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution                 ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution                   ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BiosVideoDxeExtra.uni

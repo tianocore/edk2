@@ -1,9 +1,7 @@
 ## @file
+#  NULL implementation for PlatformBdsLib library class interfaces.
 #  
-#  Provide NULL implementation for PlatformBdsLib library class interfaces which
-#  should be implemented by OEM.
-#  
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformBdsLib
+  MODULE_UNI_FILE                = PlatformBdsLib.uni
   FILE_GUID                      = 143B5044-7C1B-4904-9778-EA16F1F3D554
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

@@ -1,6 +1,9 @@
 ## @file
 # Serial driver for standard UARTS on an ISA bus.
 #
+# Produces the Serial I/O protocol for standard UARTS using ISA I/O. This driver
+# supports the 8250, 16450, 16550 and 16550A UART types.
+#
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -16,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaSerialDxe
+  MODULE_UNI_FILE                = IsaSerialDxe.uni
   FILE_GUID                      = 93B80003-9FB3-11d4-9A3A-0090273FC14D
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -53,19 +57,22 @@
   DebugLib
 
 [Guids]
-  gEfiUartDevicePathGuid
+  gEfiUartDevicePathGuid                        ## SOMETIMES_CONSUMES   ## GUID
 
 [Protocols]
   gEfiIsaIoProtocolGuid                         ## TO_START
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSerialIoProtocolGuid                      ## BY_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE
-  
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE   ## CONSUMES
 
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1       ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IsaSerialDxeExtra.uni

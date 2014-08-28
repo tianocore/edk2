@@ -21,7 +21,7 @@
 #  drivers to be aware of all reporting formats.
 #  For more information, please ref http://www.intel.com/technology/framework/
 #  
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -36,6 +36,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DataHubDxe
+  MODULE_UNI_FILE                = DataHubDxe.uni
   FILE_GUID                      = 53BCC14F-C24F-434C-B294-8ED2D4CC1860
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -69,9 +70,11 @@
 
 
 [Protocols]
-  gEfiDataHubProtocolGuid                       # PROTOCOL PRODUCED
+  gEfiDataHubProtocolGuid                       ## PRODUCES
 
 
 [Depex]
   TRUE
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  DataHubDxeExtra.uni

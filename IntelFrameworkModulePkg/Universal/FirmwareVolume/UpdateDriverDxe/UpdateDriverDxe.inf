@@ -1,9 +1,11 @@
 ## @file
+# Update Driver for Capulse update.
+#
 # This driver is intended to be put in a capsule (FV). If all goes well, 
 # then it should be dispatched from the capsule FV, then find the image 
 # in the same FV and program it in a target Firmware Volume device.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UpdateDriverDxe
+  MODULE_UNI_FILE                = UpdateDriverDxe.uni
   FILE_GUID                      = 0E84FC69-29CC-4C6D-92AC-6D476921850F
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -57,8 +60,8 @@
   DevicePathLib
 
 [Guids]
-  gEfiConfigFileNameGuid                        ## CONSUMES FileName to store ConfigFile
-  gEfiUpdateDataFileGuid                        ## CONSUMES FileName to store Capsule Data.
+  gEfiConfigFileNameGuid                        ## CONSUMES ## File # FileName to store ConfigFile
+  gEfiUpdateDataFileGuid                        ## CONSUMES ## File # FileName to store Capsule Data.
 
 [Protocols]
   gEfiFaultTolerantWriteProtocolGuid            ## CONSUMES
@@ -69,3 +72,5 @@
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiFaultTolerantWriteProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  UpdateDriverDxeExtra.uni

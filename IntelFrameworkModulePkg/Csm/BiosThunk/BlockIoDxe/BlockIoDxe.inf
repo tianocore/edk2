@@ -1,7 +1,10 @@
 ## @file
-#  Component description file for BIOS Block IO module.
+# BIOS Block IO module.
 #
-# Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+# This is the UEFI driver to thunk legacy BIOS int13 interface into UEFI block IO interface.
+# Once connected it installs EfiBlockIoProtocol on top of legacy BIOS int13.
+#
+# Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -17,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BlockIoDxe
+  MODULE_UNI_FILE                = BlockIoDxe.uni
   FILE_GUID                      = 4495E47E-42A9-4007-8c17-B6664F909D04
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -41,18 +45,21 @@
 
 
 [Protocols]
-  gEfiBlockIoProtocolGuid
-  gEfiDevicePathProtocolGuid
-  gEfiPciIoProtocolGuid
-  gEfiLegacyBiosProtocolGuid
+  gEfiBlockIoProtocolGuid    ## BY_START
+  gEfiDevicePathProtocolGuid ## BY_START
+  gEfiDevicePathProtocolGuid ## TO_START
+  gEfiPciIoProtocolGuid      ## TO_START
+  gEfiLegacyBiosProtocolGuid ## TO_START
 
 
 [Guids]
-  gEfiLegacyBiosGuid
-  gBlockIoVendorGuid
+  gEfiLegacyBiosGuid ## PRODUCES            ## UNDEFINED
+  gBlockIoVendorGuid ## SOMETIMES_CONSUMES  ## UNDEFINED
 
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  BlockIoDxeExtra.uni

@@ -1,8 +1,7 @@
 ## @file
-#  Status Code Handler Driver which produces datahub handler and hook it
-#  onto the DXE status code router.
+#  Status Code Handler Driver which produces datahub handler.
 #
-#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DatahubStatusCodeHandlerDxe
+  MODULE_UNI_FILE                = DatahubStatusCodeHandlerDxe.uni
   FILE_GUID                      = 863D214F-0920-437B-8CAD-88EA83A24E97
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0  
@@ -53,19 +53,20 @@
   
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
-  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
-  gEfiDataHubStatusCodeRecordGuid               ## CONSUMES
-  gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
+  gEfiDataHubStatusCodeRecordGuid               ## PRODUCES ## UNDEFINED # DataRecord Guid
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_PRODUCES ## UNDEFINED # Record data type
   
 [Protocols]
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
   gEfiDataHubProtocolGuid                       ## CONSUMES
-  gEfiStatusCodeRuntimeProtocolGuid             ## CONSUMES
+  gEfiStatusCodeRuntimeProtocolGuid             ## UNDEFINED
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub ## CONSUMES
 
 [Depex]
   gEfiRscHandlerProtocolGuid AND
   gEfiDataHubProtocolGuid
-  
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DatahubStatusCodeHandlerDxeExtra.uni

@@ -1,7 +1,7 @@
 ## @file
-#  This driver takes DEBUG () info from Data Hub and writes it to StdErr if it exists.
+#  This driver takes DEBUG info from Data Hub and writes it to StdErr if it exists.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DataHubStdErrDxe
+  MODULE_UNI_FILE                = DataHubStdErrDxe.uni
   FILE_GUID                      = CA515306-00CE-4032-874E-11B755FF6866
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -42,13 +43,15 @@
   DebugLib
 
 [Guids]
-  gEfiStatusCodeDataTypeDebugGuid               # SOMETIMES_CONSUMED
-  gEfiDataHubStatusCodeRecordGuid               # SOMETIMES_CONSUMED
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES ## UNDEFINED  # DataRecord Date Type
+  gEfiDataHubStatusCodeRecordGuid               ## SOMETIMES_CONSUMES ## UNDEFINED  # DataRecordGuid
 
 
 [Protocols]
-  gEfiDataHubProtocolGuid                       # PROTOCOL CONSUMED
+  gEfiDataHubProtocolGuid                       ## CONSUMES
 
 [Depex]
   gEfiDataHubProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  DataHubStdErrDxeExtra.uni

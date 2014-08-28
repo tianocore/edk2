@@ -1,8 +1,10 @@
 ## @file
-# Ps2 Mouse Simulate TouchPad Driver
+# PS2 Mouse driver providing absolute (touch pad) pointer support.
 #
-# This dirver directly uses IsaIo protocol service to support a faked Ps2 TouchPad work.
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# This driver simulates a touch pad absolute pointing device using a standard
+# PS2 mouse as the input hardware.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Ps2MouseAbsolutePointerDxe
+  MODULE_UNI_FILE                = Ps2MouseAbsolutePointerDxe.uni
   FILE_GUID                      = 2899C94A-1FB6-4b1a-B96B-8364975303E0
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -59,15 +62,16 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification   ## CONSUMES
 
-# [Event]
-#   ##
-#   # Event for EFI_SIMPLE_POINTER_PROTOCOL.WaitForInput.
-#   #
-#   EVENT_TYPE_NOTIFY_WAIT                             ## PRODUCES
 #
-#   # Periodic timer event to poll the fake Ps2 mouse device and get its packet data.
+# [Event]
+#
+#   ##
+#   # Timer event used to check the mouse state at a regular interval.
 #   #
-#   EVENT_TYPE_PERIODIC_TIMER                          ## PRODUCES
+#   EVENT_TYPE_PERIODIC_TIMER   ## CONSUMES
+#
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  Ps2MouseAbsolutePointerDxeExtra.uni

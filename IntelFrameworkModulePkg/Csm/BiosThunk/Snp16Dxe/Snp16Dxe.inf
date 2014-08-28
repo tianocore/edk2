@@ -1,7 +1,9 @@
 ## @file
+# SNP driver On Legacy NIC ROM.
+#
 # Thunk wrapper UEFI driver to produce EFI SNP protocol based on legacy 16 NIC ROM.
 #
-# Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -16,6 +18,7 @@
 
 [Defines]
   BASE_NAME                            = BiosSnp16
+  MODULE_UNI_FILE                      = BiosSnp16.uni
   FILE_GUID                            = D0CAA91E-2DE4-4b0d-B3DC-09C67E854E34
   MODULE_TYPE                          = UEFI_DRIVER
   INF_VERSION                          = 0x00010005
@@ -52,16 +55,19 @@
   MemoryAllocationLib
 
 [Guids]
-  gEfiEventExitBootServicesGuid
+  gEfiEventExitBootServicesGuid         ##CONSUMES  ##Event
 
 [Protocols]
-  gEfiNetworkInterfaceIdentifierProtocolGuid
-  gEfiDevicePathProtocolGuid
-  gEfiSimpleNetworkProtocolGuid
-  gEfiPciIoProtocolGuid
-  gEfiLegacyBiosProtocolGuid
+  gEfiNetworkInterfaceIdentifierProtocolGuid  ##BY_START
+  gEfiDevicePathProtocolGuid                  ##BY_START
+  gEfiDevicePathProtocolGuid                  ##TO_START
+  gEfiSimpleNetworkProtocolGuid               ##BY_START
+  gEfiPciIoProtocolGuid                       ##TO_START
+  gEfiLegacyBiosProtocolGuid                  ##CONSUMES
 
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  BiosSnp16Extra.uni

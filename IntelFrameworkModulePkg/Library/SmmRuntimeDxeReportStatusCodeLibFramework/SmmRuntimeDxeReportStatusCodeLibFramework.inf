@@ -1,11 +1,11 @@
 ## @file
-#  Report status code library instance which supports logging message in SMM, as well as DXE & runtime phase.
+#  Framework Report status code library instance which supports logging message in SMM, as well as DXE & runtime phase.
 #
 #  This library instance supports status code report in SMM, as well as DXE & runtime phase.
 #  In SMM, it logs message via SMM Status Code Protocol.
 #  Otherwise, it logs message to ReportStatusCode() in framework runtime services table or runtime report status code protocol.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmRuntimeDxeReportStatusCodeLibFramework
+  MODULE_UNI_FILE                = SmmRuntimeDxeReportStatusCodeLibFramework.uni
   FILE_GUID                      = D65D9F72-7BCE-4f73-A673-47AF446A1A31
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -56,17 +57,17 @@
   MemoryAllocationLib
 
 [Guids]
-  gEfiStatusCodeSpecificDataGuid                ## CONSUMES
-  gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
+  gEfiStatusCodeSpecificDataGuid                ## SOMETIMES_CONSUMES ## UNDEFINED
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES ## UNDEFINED
   gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
 
 
 [Protocols]
-  gEfiStatusCodeRuntimeProtocolGuid             ## CONSUMES
-  gEfiSmmBaseProtocolGuid                       ## CONSUMES
-  gEfiSmmStatusCodeProtocolGuid                 ## CONSUMES
+  gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiSmmBaseProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiSmmStatusCodeProtocolGuid                 ## SOMETIMES_CONSUMES
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask ## CONSUMES
 

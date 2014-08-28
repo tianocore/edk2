@@ -2,7 +2,7 @@
 #  This library instance produces UefiDecompressLib and Tiano Custom decompression algorithm.
 #  Tiano custom decompression algorithm shares most of code with Uefi Decompress algorithm.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseUefiTianoDecompressLib
+  MODULE_UNI_FILE                = BaseUefiTianoDecompressLib.uni
   FILE_GUID                      = d774c4d9-c121-4da3-a5e2-0f317e3c630c
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -43,4 +44,5 @@
   ExtractGuidedSectionLib
 
 [Guids]
-  gTianoCustomDecompressGuid      ## PRODUCED  ## GUID specifies tiano custom decompress algorithm.
+  gTianoCustomDecompressGuid      ## PRODUCES  ## UNDEFINED # specifies tiano custom decompress algorithm.
+

@@ -1,9 +1,9 @@
 ## @file
-# Component description file for IdeBus module.
+# IDE bus driver.
 #
-# IDE bus driver. This driver will enumerate IDE device and export the blockIo
-#  protocol for every device.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# This driver will enumerate IDE device and export the blockIo protocol for every device.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IdeBusDxe
+  MODULE_UNI_FILE                = IdeBusDxe.uni
   FILE_GUID                      = 69FD8E47-A161-4550-B01A-5594CEB2B2B2
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -70,15 +71,18 @@
 
 
 [Guids]
-  gEfiDiskInfoIdeInterfaceGuid                  # CONSUMES  ## GUID
-  gEfiEventExitBootServicesGuid                 # CONSUMES  ## Event
+  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED # DiskInfo Interface Guid
+  gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
 
 
 [Protocols]
-  gEfiDiskInfoProtocolGuid                      # BY_START
-  gEfiBlockIoProtocolGuid                       # BY_START
-  gEfiIdeControllerInitProtocolGuid             # TO_START
-  gEfiPciIoProtocolGuid                         # TO_START
-  gEfiDevicePathProtocolGuid                    # TO_START
+  gEfiDiskInfoProtocolGuid                      ## BY_START
+  gEfiBlockIoProtocolGuid                       ## BY_START
+  gEfiIdeControllerInitProtocolGuid             ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  IdeBusDxeExtra.uni
