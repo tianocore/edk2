@@ -15,6 +15,7 @@
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = IntelFrameworkPkg
+  PACKAGE_UNI_FILE               = IntelFrameworkPkg.uni
   PACKAGE_GUID                   = 2759ded5-bb57-4b06-af4f-c398fa552719
   PACKAGE_VERSION                = 0.93
 
@@ -180,3 +181,6 @@
   ## Include/Protocol/SmmCpuSaveState.h
   gEfiSmmCpuSaveStateProtocolGuid = { 0x21f302ad, 0x6e94, 0x471b, {0x84, 0xbc, 0xb1, 0x48, 0x0, 0x40, 0x3a, 0x1d}}
 
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IntelFrameworkPkgExtra.uni
