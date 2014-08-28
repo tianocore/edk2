@@ -1,7 +1,9 @@
 ## @file
-#  Component files for VLAN configuration shell application.
+#  Shell application VLAN configuration.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  It is shell application which is used to get and set VLAN configuration.
+#
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +22,7 @@
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = VlanConfigMain
+  MODULE_UNI_FILE                = VConfig.uni
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
@@ -44,4 +47,7 @@
   HiiLib
 
 [Protocols]
-  gEfiVlanConfigProtocolGuid
+  gEfiVlanConfigProtocolGuid     ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VConfigExtra.uni

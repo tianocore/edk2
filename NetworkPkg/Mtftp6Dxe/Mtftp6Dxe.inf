@@ -1,7 +1,10 @@
 ## @file
-#  Component description file for Mtftp6 module.
+#  Client-side Mtftp6 service.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI MTFTPv6 Protocol which provides basic services for
+#  client-side unicast and/or multicast TFTP.
+#
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +24,8 @@
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = Mtftp6DriverEntryPoint
   UNLOAD_IMAGE                   = NetLibDefaultUnload
+  MODULE_UNI_FILE                = Mtftp6Dxe.uni
+
 #
 # The following information is for reference only and not required by the build tools.
 #
@@ -62,8 +67,10 @@
 
 
 [Protocols]
-  gEfiUdp6ServiceBindingProtocolGuid
-  gEfiUdp6ProtocolGuid
-  gEfiMtftp6ServiceBindingProtocolGuid
-  gEfiMtftp6ProtocolGuid
+  gEfiUdp6ServiceBindingProtocolGuid                ## TO_START
+  gEfiUdp6ProtocolGuid                              ## TO_START
+  gEfiMtftp6ServiceBindingProtocolGuid              ## BY_START
+  gEfiMtftp6ProtocolGuid                            ## BY_START
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  Mtftp6DxeExtra.uni
