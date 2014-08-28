@@ -7,7 +7,7 @@
 #  It allows code running in the boot services environment to perform lexical
 #  comparison functions on Unicode strings for English languages.
 #  
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EnglishDxe
+  MODULE_UNI_FILE                = EnglishDxe.uni
   FILE_GUID                      = CD3BAFB6-50FB-4fe8-8E4E-AB74D2C1A600
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -48,10 +49,12 @@
   PcdLib
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support    ## CONSUMES
 
 [Protocols]
-  gEfiUnicodeCollationProtocolGuid  | gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport  ## PRODUCES
-  gEfiUnicodeCollation2ProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support ## PRODUCES
+  gEfiUnicodeCollationProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport      ## SOMETIMES_PRODUCES
+  gEfiUnicodeCollation2ProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support    ## PRODUCES
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  EnglishDxeExtra.uni

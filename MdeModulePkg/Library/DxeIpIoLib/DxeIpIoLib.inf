@@ -1,17 +1,14 @@
 ## @file
-#  Instance of DxeIpIoLib.
+#  This library instance provides IP services upon EFI IPv4/IPv6 Protocols.
 #
-#  This module provides IP services by consuming EFI IP4 Service Binding Protocol and
-#  EFI IP4 Protocol.
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
@@ -19,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeIpIoLib
+  MODULE_UNI_FILE                = DxeIpIoLib.uni
   FILE_GUID                      = A302F877-8625-425c-B1EC-7487B62C4FDA
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -48,8 +46,8 @@
   DpcLib
 
 [Protocols]
-  gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-  gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiIp6ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-  gEfiIp6ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiIp4ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiIp6ProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiIp6ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
 

@@ -1,8 +1,7 @@
 ## @file
-#  Status Code Handler Driver which produces general handlers and hook them
-#  onto the DXE status code router.
+#  Status Code Handler Driver which produces general handlers and hook them onto the DXE status code router.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = StatusCodeHandlerRuntimeDxe
+  MODULE_UNI_FILE                = StatusCodeHandlerRuntimeDxe.uni
   FILE_GUID                      = 6C2004EF-4E0E-4BE4-B14C-340EB4AA5891
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -49,25 +49,27 @@
   PrintLib
   ReportStatusCodeLib
   DebugLib
-  SynchronizationLib
   BaseMemoryLib
   
 [Guids]
-  gMemoryStatusCodeRecordGuid                   ## CONSUMES ## HOB
+  gMemoryStatusCodeRecordGuid                   ## SOMETIMES_CONSUMES   ## HOB
+  gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES   ## UNDEFINED
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
   gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
-  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
 
 [Protocols]
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory   ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiRscHandlerProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  StatusCodeHandlerRuntimeDxeExtra.uni

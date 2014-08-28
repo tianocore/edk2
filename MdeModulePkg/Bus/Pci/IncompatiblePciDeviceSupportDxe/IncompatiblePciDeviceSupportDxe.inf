@@ -4,7 +4,7 @@
 #  Installs EFI PCI Incompatible Device Support protocol and includes one incompatile 
 #  pci devices list template.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IncompatiblePciDeviceSupport
+  MODULE_UNI_FILE                = IncompatiblePciDeviceSupport.uni
   FILE_GUID                      = AD70855E-0CC5-4abf-8979-BE762A949EA3
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -43,7 +44,10 @@
   DebugLib
 
 [Protocols]
-  gEfiIncompatiblePciDeviceSupportProtocolGuid    ## PRODUCEDS
+  gEfiIncompatiblePciDeviceSupportProtocolGuid    ## PRODUCES
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IncompatiblePciDeviceSupportExtra.uni

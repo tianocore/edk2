@@ -1,7 +1,7 @@
 ## @file
-# Null instance of Debug Agent Library with empty functions.
+#  Null instance of Debug Agent Library with empty functions.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -10,11 +10,12 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DebugAgentLibNull
+  MODULE_UNI_FILE                = DebugAgentLibNull.uni
   FILE_GUID                      = 4904B42F-9FC0-4c2e-BB3F-A2AB35123530
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

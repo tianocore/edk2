@@ -1,9 +1,10 @@
 ## @file
-#  This driver installs Single Segment Pci Configuration 2 PPI 
-#  to provide read, write and modify access to Pci configuration space in PEI phase. 
+#  Pcat SingleSegmentPciCfg2Pei Pei Module.
+#
+#  It installs SingleSegmentPciConfiguration2 PPI to provide read, write and modify access to Pci configuration space in PEI phase.
 #  To follow PI specification, these services also support access to the unaligned Pci address.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PcatSingleSegmentPciCfg2Pei
+  MODULE_UNI_FILE                = PcatSingleSegmentPciCfg2Pei.uni
   FILE_GUID                      = 4F1F379F-2A62-48bb-AC34-D3F135C6E2B7
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -44,7 +46,10 @@
   PeiServicesLib
 
 [Ppis]
-  gEfiPciCfg2PpiGuid                   ## PRODUCED
+  gEfiPciCfg2PpiGuid                   ## PRODUCES
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PcatSingleSegmentPciCfg2PeiExtra.uni

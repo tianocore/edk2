@@ -19,7 +19,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = SectionExtractionDxeEntry
-  MODULE_UNI_FILE                = SectionExtractionDxeModStrs.uni
+  MODULE_UNI_FILE                = SectionExtractionDxe.uni
 
 #
 # The following information is for reference only and not required by the build tools.

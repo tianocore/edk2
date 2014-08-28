@@ -279,7 +279,7 @@
 #            - Variable GUID for HII type PCD
 #            - Token space GUID for dynamicex type PCD 
 #    
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -294,6 +294,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PcdDxe
+  MODULE_UNI_FILE                = PcdDxe.uni
   FILE_GUID                      = 80CF7257-87AB-47f9-A3FE-D50B76D89541
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 4.0
@@ -330,7 +331,7 @@
 
 [Guids]
   gPcdDataBaseHobGuid                           ## SOMETIMES_CONSUMES  ## HOB
-  gPcdDataBaseSignatureGuid                     ## CONSUMES  ## UNDEFINED  # PCD database signature GUID.
+  gPcdDataBaseSignatureGuid                     ## CONSUMES  ## GUID  # PCD database signature GUID.
 
 [Protocols]
   gPcdProtocolGuid                              ## PRODUCES
@@ -344,3 +345,5 @@
 [Depex]
   TRUE
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  PcdDxeExtra.uni

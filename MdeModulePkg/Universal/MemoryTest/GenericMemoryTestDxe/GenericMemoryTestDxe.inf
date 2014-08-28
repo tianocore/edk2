@@ -1,10 +1,7 @@
 ## @file
-# Component description file for Generic memory test.
+# This driver first constructs the non-tested memory range, then performs the R/W/V memory test.
 #
-# This driver first constructs the non-tested memory range,
-# then performs the R/W/V memory test.
-#
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = GenericMemoryTestDxe
+  MODULE_UNI_FILE                = GenericMemoryTestDxe.uni
   FILE_GUID                      = 9C1080EE-D02E-487f-9432-F3BF086EC180
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -51,9 +49,11 @@
   DebugLib
 
 [Protocols]
-  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiGenericMemTestProtocolGuid                ## PRODUCES
 
 [Depex]
   gEfiCpuArchProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  GenericMemoryTestDxeExtra.uni

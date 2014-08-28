@@ -1,10 +1,10 @@
 ## @file
-# This driver produces Debug Port protocol to be used by debug agent to communicate with
-# the remote debug host.
+# This driver produces Debug Port protocol to be used by debug agent to communicate with the remote debug host.
 #
 # This driver binds exclusively to a standard UART serial port on the controller handle,
-#  and initializes serial Io interface, publishs Debug Port and Device Path Protocol.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# and initializes serial Io interface, publishs Debug Port and Device Path Protocol.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DebugPortDxe
+  MODULE_UNI_FILE                = DebugPortDxe.uni
   FILE_GUID                      = 73E9457A-CEA1-4917-9A9C-9F1F0F0FD322
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -58,11 +59,13 @@
   DebugLib
 
 [Guids]
-  gEfiDebugPortVariableGuid                     ## SOMETIMES_CONSUMES ## Variable:L"DEBUGPORT"
-  gEfiDebugPortDevicePathGuid                   ## SOMETIMES_CONSUMES ## GUID
+  gEfiDebugPortVariableGuid                     ## SOMETIMES_CONSUMES   ## Variable:L"DEBUGPORT"
+  gEfiDebugPortDevicePathGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED # Device path
 
 [Protocols]
   gEfiSerialIoProtocolGuid                      ## TO_START
   gEfiDevicePathProtocolGuid                    ## BY_START
   gEfiDebugPortProtocolGuid                     ## BY_START
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  DebugPortDxeExtra.uni

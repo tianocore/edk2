@@ -1,7 +1,8 @@
 ## @file
-# Component description file for Variable module.
+# This module installs variable arch protocol and variable write arch protocol.
 #
-# This module installs three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName.
+# It provides four EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName and QueryVariableInfo.
+#
 # Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -17,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VariableRuntimeDxe
+  MODULE_UNI_FILE                = VariableRuntimeDxe.uni
   FILE_GUID                      = CBD2E4D5-7068-4FF5-B462-9822B4AD8D60
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -55,29 +57,41 @@
   HobLib
 
 [Protocols]
-  gEfiFirmwareVolumeBlockProtocolGuid           ## SOMETIMES_CONSUMES
-  gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
-  gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
-  gEfiFaultTolerantWriteProtocolGuid            ## SOMETIMES_CONSUMES
-  gEdkiiVariableLockProtocolGuid                ## ALWAYS_PRODUCES
+  gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMES
+  ## CONSUMES
+  ## NOTIFY
+  gEfiFaultTolerantWriteProtocolGuid
+  gEfiVariableWriteArchProtocolGuid             ## PRODUCES
+  gEfiVariableArchProtocolGuid                  ## PRODUCES
+  gEdkiiVariableLockProtocolGuid                ## PRODUCES
 
 [Guids]
-  gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
-  gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
-  gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
-  gEfiSystemNvDataFvGuid                        ## CONSUMES
-  gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
-  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
-  gEdkiiFaultTolerantWriteGuid                  ## CONSUMES
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiVariableGuid
+  ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRecSupport"
+  gEfiGlobalVariableGuid
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
+  gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
+  gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRec####"
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES             ## Event
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEdkiiFaultTolerantWriteGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                ## CONSUMES
   
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## CONSUMES # statistic the information of variable.
@@ -86,11 +100,5 @@
 [Depex]
   TRUE
 
-# [Event]
-#   ##
-#   # Event will be signaled for VIRTUAL_ADDRESS_CHANGE event.
-#   #
-#   EVENT_TYPE_NOTIFY_SIGNAL                    ## PRODUCES
-#
-#
-    
+[UserExtensions.TianoCore."ExtraFiles"]
+  VariableRuntimeDxeExtra.uni

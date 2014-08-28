@@ -1,9 +1,7 @@
 ## @file
+#  Implement ReadOnly Variable Services required by PEIM and install PEI ReadOnly Varaiable2 PPI.
 #
-#  Implement ReadOnly Variable Services required by PEIM and install
-#  PEI ReadOnly Varaiable2 PPI. These services operates the non-volatile storage space.
-#
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -17,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiVariable
+  MODULE_UNI_FILE                = PeiVariable.uni
   FILE_GUID                      = 34C8C28F-B61C-45a2-8F2E-89E46BECC63B
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -46,24 +45,30 @@
   PeiServicesLib
 
 [Guids]
+  ## CONSUMES             ## GUID # Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
   gEfiVariableGuid
+  ## SOMETIMES_PRODUCES   ## HOB
+  ## SOMETIMES_CONSUMES   ## HOB
   gEfiVariableIndexTableGuid
-  gEfiSystemNvDataFvGuid
+  gEfiSystemNvDataFvGuid            ## SOMETIMES_CONSUMES   ## GUID
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## CONSUMES             ## GUID # Dependence
   gEdkiiFaultTolerantWriteGuid
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid                ## PRODUCES
+  gEfiPeiReadOnlyVariable2PpiGuid   ## PRODUCES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase      ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize      ## CONSUMES
 
 [Depex]
   gEdkiiFaultTolerantWriteGuid
 
-#
-#  [BootMode]
-#    RECOVERY          ## CONSUMES
-#
+# [BootMode]
+# RECOVERY_FULL             ## SOMETIMES_CONSUMES
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  PeiVariableExtra.uni

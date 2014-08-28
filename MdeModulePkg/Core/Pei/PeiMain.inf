@@ -1,5 +1,7 @@
 ## @file
-# PeiMain module is core module in PEI phase. It takes responsibilities of:
+# PeiMain module is core module in PEI phase.
+#
+# It takes responsibilities of:
 # 1) Initialize memory, PPI, image services etc, to establish PEIM runtime environment.
 # 2) Dispatch PEIM from discovered FV.
 # 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
@@ -19,6 +21,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiCore
+  MODULE_UNI_FILE                = PeiCore.uni
   FILE_GUID                      = 52C05B14-0B98-496c-BC3B-04B50211D680
   MODULE_TYPE                    = PEI_CORE
   VERSION_STRING                 = 1.0
@@ -70,32 +73,60 @@
   PcdLib
 
 [Guids]
-  gPeiAprioriFileNameGuid       ## CONSUMES ## GUID
-  gEfiFirmwareFileSystem2Guid   ## CONSUMES ## FV
-  gEfiFirmwareFileSystem3Guid   ## CONSUMES ## FV
+  gPeiAprioriFileNameGuid       ## SOMETIMES_CONSUMES   ## File
+  ## PRODUCES   ## UNDEFINED # Install ppi
+  ## CONSUMES   ## UNDEFINED # Locate ppi
+  gEfiFirmwareFileSystem2Guid
+  ## PRODUCES   ## UNDEFINED # Install ppi
+  ## CONSUMES   ## UNDEFINED # Locate ppi
+  ## CONSUMES   ## GUID      # Used to compare with FV's file system guid and get the FV's file system format
+  gEfiFirmwareFileSystem3Guid
   
 [Ppis]
-  gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES (PeiReportStatusService is not ready if this PPI doesn't exist)
-  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES (PeiResetService is not ready if this PPI doesn't exist)
+  gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES # PeiReportStatusService is not ready if this PPI doesn't exist
+  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES # PeiResetService is not ready if this PPI doesn't exist 
   gEfiDxeIplPpiGuid                             ## CONSUMES
   gEfiPeiMemoryDiscoveredPpiGuid                ## PRODUCES
-  gEfiPeiDecompressPpiGuid                      ## CONSUMES
-  gEfiPeiFirmwareVolumeInfoPpiGuid              ## NOTIFY   ## SOMETIMES_PRODUCES (Produce FvInfoPpi if the encapsulated FvImage is found)
-  gEfiPeiFirmwareVolumeInfo2PpiGuid             ## NOTIFY   ## SOMETIMES_PRODUCES (Produce FvInfo2Ppi if the encapsulated FvImage is found)
-  gEfiPeiLoadFilePpiGuid                        ## PRODUCES ## SOMETIMES_CONSUMES (The default load PeImage logic will be used when this PPI doesn't exist)
+  gEfiPeiDecompressPpiGuid                      ## SOMETIMES_CONSUMES
+  ## NOTIFY
+  ## SOMETIMES_PRODUCES # Produce FvInfoPpi if the encapsulated FvImage is found
+  gEfiPeiFirmwareVolumeInfoPpiGuid
+  ## NOTIFY
+  ## SOMETIMES_PRODUCES # Produce FvInfoPpi2 if the encapsulated FvImage is found
+  gEfiPeiFirmwareVolumeInfo2PpiGuid
+  ## PRODUCES
+  ## CONSUMES
+  gEfiPeiLoadFilePpiGuid
   gEfiPeiSecurity2PpiGuid                       ## NOTIFY
   gEfiTemporaryRamSupportPpiGuid                ## SOMETIMES_CONSUMES
   gEfiTemporaryRamDonePpiGuid                   ## SOMETIMES_CONSUMES
 
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv               ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported            ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize                   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport            ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressPeiCodePageNumber          ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber     ## SOMETIMES_CONSUMES 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber      ## SOMETIMES_CONSUMES 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable             ## CONSUMES  
-  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot                       ## SOMETIMES_CONSUMES 
+[Pcd]  
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported                   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv                     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressPeiCodePageNumber         ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber    ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot                      ## CONSUMES 
+
+# [BootMode]
+# S3_RESUME             ## SOMETIMES_CONSUMES
+
+# [Hob]
+# PHIT                  ## PRODUCES
+# RESOURCE_DESCRIPTOR   ## SOMETIMES_PRODUCES
+# RESOURCE_DESCRIPTOR   ## SOMETIMES_CONSUMES
+# MEMORY_ALLOCATION     ## SOMETIMES_CONSUMES
+# FIRMWARE_VOLUME       ## SOMETIMES_PRODUCES
+# FIRMWARE_VOLUME       ## SOMETIMES_CONSUMES
+# MEMORY_ALLOCATION     ## SOMETIMES_PRODUCES
+# MEMORY_ALLOCATION     ## PRODUCES # MEMORY_ALLOCATION_STACK
+# UNDEFINED             ## PRODUCES # MEMORY_POOL
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PeiCoreExtra.uni

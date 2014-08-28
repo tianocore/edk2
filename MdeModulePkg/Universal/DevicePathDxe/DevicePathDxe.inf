@@ -6,7 +6,7 @@
 #  PcdDevicePathSupportDevicePathToText & PcdDevicePathSupportDevicePathFromText
 #  respectively.
 #
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DevicePathDxe
+  MODULE_UNI_FILE                = DevicePathDxe.uni
   FILE_GUID                      = 9B680FCE-AD6B-4F3A-B60B-F59899003443
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -44,13 +45,16 @@
   UefiDriverEntryPoint
   
 [Protocols]
-  gEfiDevicePathToTextProtocolGuid   | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText ## PRODUCES
-  gEfiDevicePathFromTextProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## PRODUCES
+  gEfiDevicePathToTextProtocolGuid   | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText ## SOMETIMES_PRODUCES
+  gEfiDevicePathFromTextProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_PRODUCES
   gEfiDevicePathUtilitiesProtocolGuid ## PRODUCES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText   ## CONSUMES
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DevicePathDxeExtra.uni

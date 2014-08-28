@@ -1,7 +1,7 @@
 ## @file
-#   This module provide an SMM CIS compliant implementation of SMM IPL.
+#  This module provide an SMM CIS compliant implementation of SMM IPL.
 #
-# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PiSmmIpl
+  MODULE_UNI_FILE                = PiSmmIpl.uni
   FILE_GUID                      = 2FA2A6DA-11D5-4dc3-999A-749648B03C56
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -51,26 +52,37 @@
   PcdLib
   
 [Protocols]
-  gEfiSmmBase2ProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
-  gEfiSmmCommunicationProtocolGuid              # PROTOCOL ALWAYS_PRODUCED
-  gEfiSmmAccess2ProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiSmmConfigurationProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiSmmControl2ProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiCpuArchProtocolGuid                       # PROTOCOL SIMETIMES_CONSUMED
+  gEfiSmmBase2ProtocolGuid                      ## PRODUCES
+  gEfiSmmCommunicationProtocolGuid              ## PRODUCES
+  gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
+  ## NOTIFY
+  ## CONSUMES
+  gEfiSmmConfigurationProtocolGuid
+  gEfiSmmControl2ProtocolGuid                   ## CONSUMES
+  ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  ## UNDEFINED # Used to do smm communcation
+  gEfiDxeSmmReadyToLockProtocolGuid
+  gEfiCpuArchProtocolGuid                       ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiEventDxeDispatchGuid                      # ALWAYS_CONSUMED
-  gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
-  gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
-  gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED
-  gEfiEndOfDxeEventGroupGuid                    # ALWAYS_CONSUMED
-  gLoadFixedAddressConfigurationTableGuid       # SIMETIMES_CONSUMED
+  ## CONSUMES           ## Event
+  ## PRODUCES           ## UNDEFINED # Used to do smm communcation
+  gEfiEventDxeDispatchGuid
+  gEfiEventReadyToBootGuid                      ## CONSUMES             ## Event
+  ## SOMETIMES_CONSUMES ## Event
+  ## SOMETIMES_PRODUCES ## UNDEFINED # Used to do smm communcation
+  gEfiEventLegacyBootGuid
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES             ## Event
+  gLoadFixedAddressConfigurationTableGuid       ## SOMETIMES_CONSUMES   ## SystemTable
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber    # SIMETIMES_CONSUMED 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable       # ALWAYS_CONSUMED
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable        ## CONSUMES
 
- 
 [Depex]
   gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PiSmmIplExtra.uni

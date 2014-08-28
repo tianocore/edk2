@@ -5,7 +5,7 @@
 #  in UEFI spec 2.2. It installs Block IO and Disk Info protocol for each ATA device
 #  it enumerates and identifies successfully.
 #
-#  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AtaBusDxe
+  MODULE_UNI_FILE                = AtaBusDxe.uni
   FILE_GUID                      = 19DF145A-B1D4-453f-8507-38816676D7F6
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -59,16 +60,19 @@
   ReportStatusCodeLib
 
 [Guids]
-  gEfiDiskInfoIdeInterfaceGuid                  # CONSUMES  ## GUID
-  gEfiDiskInfoAhciInterfaceGuid                 # CONSUMES  ## GUID
-  gEfiMemoryOverwriteControlDataGuid            # CONSUMES  ## GUID
+  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED
+  gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_PRODUCES ## UNDEFINED
+  gEfiMemoryOverwriteControlDataGuid            ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"
 
 [Protocols]
-  gEfiDiskInfoProtocolGuid                      # BY_START
-  gEfiBlockIoProtocolGuid                       # BY_START
-  gEfiBlockIo2ProtocolGuid                      # BY_START
-  gEfiAtaPassThruProtocolGuid                   # TO_START
-  gEfiDevicePathProtocolGuid                    # TO_START
-  gEfiStorageSecurityCommandProtocolGuid        # BY_START
+  gEfiDiskInfoProtocolGuid                      ## BY_START
+  gEfiBlockIoProtocolGuid                       ## BY_START
+  gEfiBlockIo2ProtocolGuid                      ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+  gEfiAtaPassThruProtocolGuid                   ## TO_START
+  gEfiStorageSecurityCommandProtocolGuid        ## BY_START
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  AtaBusDxeExtra.uni

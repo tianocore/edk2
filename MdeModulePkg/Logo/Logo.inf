@@ -1,8 +1,7 @@
 ## @file
-#  This module provides the default logo bitmap picture shown on setup screen,
-#  which is corresponding to gEfiDefaultBmpLogoGuid.
+#  The default logo bitmap picture shown on setup screen, which is corresponding to gEfiDefaultBmpLogoGuid.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Logo
+  MODULE_UNI_FILE                = Logo.uni
   FILE_GUID                      = 7BB28B99-61BB-11D5-9A5D-0090273FC14D
   MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
@@ -24,9 +24,11 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
 
 [Binaries]
   BIN|Logo.bmp|*
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  LogoExtra.uni

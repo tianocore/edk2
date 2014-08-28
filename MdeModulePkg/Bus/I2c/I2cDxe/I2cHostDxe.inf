@@ -1,7 +1,7 @@
 ## @file
 #  This driver produce I2C Host Protocol on I2C controller handle.
 #
-#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = I2cHostDxe
+  MODULE_UNI_FILE                = I2cHostDxe.uni
   FILE_GUID                      = CDEC3671-816E-43DC-A002-DCD645229338
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -45,9 +46,10 @@
   MdePkg/MdePkg.dec
 
 [Protocols]
-  gEfiI2cIoProtocolGuid                             ## BY_START
   gEfiI2cHostProtocolGuid                           ## BY_START
   gEfiI2cMasterProtocolGuid                         ## TO_START
-  gEfiI2cEnumerateProtocolGuid                      ## TO_START
   gEfiI2cBusConfigurationManagementProtocolGuid     ## TO_START
-  gEfiI2cHostProtocolGuid                           ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  I2cHostDxeExtra.uni
+

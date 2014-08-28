@@ -1,11 +1,10 @@
-## @file
-#  
+## @file 
 #  Null Recovery library instance for PEIM module
 #  This library instance is no longer used and module using this library
 #  class should update to directly locate EFI_PEI_RECOVERY_MODULE_PPI defined
 #  in PI 1.2 specification. 
 #  
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiRecoveryLibNull
+  MODULE_UNI_FILE                = PeiRecoveryLibNull.uni
   FILE_GUID                      = 41789FB9-02AC-4484-BD40-A3147D7EDA25
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -37,4 +37,3 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-  

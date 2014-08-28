@@ -1,20 +1,24 @@
 ## @file
-#    Component description file for SNP module.
+#  This module produces EFI SNP Protocol.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials are licensed 
-# and made available under the terms and conditions of the BSD License which 
-# accompanies this distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php 
+#  This module produces Simple Network Protocol upon EFI Network Interface 
+#  Identifier Protocol, to provide a packet level interface to a network adapter.
 #
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials are licensed 
+#  and made available under the terms and conditions of the BSD License which 
+#  accompanies this distribution. The full text of the license may be found at 
+#  http://opensource.org/licenses/bsd-license.php 
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SnpDxe
+  MODULE_UNI_FILE                = SnpDxe.uni
   FILE_GUID                      = A2f436EA-A127-4EF8-957C-8048606FF670
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -67,11 +71,13 @@
   NetLib
 
 [Guids]
-  gEfiEventExitBootServicesGuid                 ## CONSUMES
-
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
 
 [Protocols]
-  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiNetworkInterfaceIdentifierProtocolGuid_31 # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleNetworkProtocolGuid                 ## BY_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31 ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SnpDxeExtra.uni

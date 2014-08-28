@@ -1,7 +1,7 @@
 ## @file
 #   This driver installs Generic Memory Test Protocol which does not perform real memory test.
 #  
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = NullMemoryTestDxe
+  MODULE_UNI_FILE                = NullMemoryTestDxe.uni
   FILE_GUID                      = 96B5C032-DF4C-4b6e-8232-438DCF448D0E
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -46,3 +47,6 @@
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  NullMemoryTestDxeExtra.uni

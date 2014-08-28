@@ -1,9 +1,10 @@
 ## @file
-# Component description file for UhcPeim PEIM to produce gPeiUsbHostControllerPpiGuid based on gPeiUsbControllerPpiGuid
-# which is used to enable recovery function from USB Drivers.
+# The UhcPeim driver is responsible for managing the behavior of UHCI controller at PEI phase.
 #
-# Usb Host Controller PEIM to support recovery from USB device.
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# It produces gPeiUsbHostControllerPpiGuid based on gPeiUsbControllerPpiGuid which is used
+# to enable recovery function from USB Drivers.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -19,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UhciPei
+  MODULE_UNI_FILE                = UhciPei.uni
   FILE_GUID                      = C463CEAC-FC57-4f36-88B7-356C750C3BCA
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -51,11 +53,12 @@
 
 
 [Ppis]
-  gPeiUsbHostControllerPpiGuid                  # PPI ALWAYS_PRODUCED
-  gPeiUsbControllerPpiGuid                      # PPI ALWAYS_CONSUMED
+  gPeiUsbHostControllerPpiGuid                  ## PRODUCES
+  gPeiUsbControllerPpiGuid                      ## CONSUMES
 
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  UhciPeiExtra.uni

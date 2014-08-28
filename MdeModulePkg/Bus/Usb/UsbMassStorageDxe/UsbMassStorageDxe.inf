@@ -1,6 +1,5 @@
 ## @file
-# USB Mass Storage Driver that manages USB mass storage devices and
-# produces Block I/O Protocol.
+# USB Mass Storage Driver that manages USB mass storage devices and produces Block I/O Protocol.
 #
 # The USB mass storage class is specified in two layers: the bottom layer
 # is the transportation protocol. The top layer is the command set.
@@ -14,7 +13,7 @@
 # 3. USB Mass Storage Class Bulk-Only Transport, Revision 1.0.
 # 4. UEFI Specification, v2.1
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -30,6 +29,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UsbMassStorageDxe
+  MODULE_UNI_FILE                = UsbMassStorageDxe.uni
   FILE_GUID                      = 9FB4B4A7-42C0-4bcd-8540-9BCC6711F83E
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -78,3 +78,10 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiBlockIoProtocolGuid                       ## BY_START
   gEfiDiskInfoProtocolGuid                      ## BY_START
+
+# [Event]
+# EVENT_TYPE_RELATIVE_TIMER        ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UsbMassStorageDxeExtra.uni

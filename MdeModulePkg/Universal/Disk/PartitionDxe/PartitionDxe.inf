@@ -1,6 +1,5 @@
 ## @file
-#  Modules that produces the logic Block I/O protocol for every partition
-#  it discovers via the physical Block I/O.
+#  Modules that produces the logic Block I/O protocol for every partition via the physical Block I/O.
 #
 #  This module produces the logical Block I/O device that represents
 #  the bytes from Start to End of the Parent Block I/O device.
@@ -12,7 +11,7 @@
 #  This external input must be validated carefully to avoid security issue like
 #  buffer overflow, integer overflow.
 #
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +25,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PartitionDxe
+  MODULE_UNI_FILE                = PartitionDxe.uni
   FILE_GUID                      = 1FA1F39E-FEFF-4aae-BD7B-38A070A3B609
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -67,16 +67,23 @@
 
 [Guids]
   gEfiPartTypeUnusedGuid                        ## SOMETIMES_CONSUMES ## GUID
-  gEfiPartTypeSystemPartGuid                    ## SOMETIMES_CONSUMES ## Protocol
+  ## SOMETIMES_CONSUMES ## GUID
+  ## SOMETIMES_CONSUMES ## GUID # Install protocol
+  gEfiPartTypeSystemPartGuid
 
 
 [Protocols]
-  gEfiBlockIoProtocolGuid                       ## BY_START
-  gEfiDevicePathProtocolGuid                    ## BY_START
-  gEfiDiskIoProtocolGuid                        ## BY_START
-  gEfiDiskIo2ProtocolGuid                       ## BY_START
-  gEfiBlockIoProtocolGuid                       ## TO_START
-  gEfiBlockIo2ProtocolGuid                      ## TO_START
-  gEfiDevicePathProtocolGuid                    ## TO_START
+  ## BY_START
+  ## TO_START
+  gEfiBlockIoProtocolGuid
+  ## BY_START
+  ## TO_START
+  gEfiBlockIo2ProtocolGuid
+  ## BY_START
+  ## TO_START
+  gEfiDevicePathProtocolGuid
   gEfiDiskIoProtocolGuid                        ## TO_START
   gEfiDiskIo2ProtocolGuid                       ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PartitionDxeExtra.uni

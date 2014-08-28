@@ -1,7 +1,7 @@
 ## @file
 #  Null Reset System Library instance that only generates ASSERT() conditions.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseResetSystemLibNull
+  MODULE_UNI_FILE                = BaseResetSystemLibNull.uni
   FILE_GUID                      = 667A8B1C-9C97-4b2a-AE7E-568772FE45F3
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

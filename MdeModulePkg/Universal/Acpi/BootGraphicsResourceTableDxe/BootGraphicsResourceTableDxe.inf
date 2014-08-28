@@ -1,7 +1,7 @@
 ## @file
 #  This module install ACPI Boot Graphics Resource Table (BGRT).
 #
-#  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BootGraphicsResourceTableDxe
+  MODULE_UNI_FILE                = BootGraphicsResourceTableDxe.uni
   FILE_GUID                      = B8E62775-BB0A-43f0-A843-5BE8B14F8CCD
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -44,15 +45,18 @@
   PcdLib
 
 [Protocols]
-  gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES
-  gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiBootLogoProtocolGuid                      ## PRODUCES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
 
 [Guids]
-  gEfiEventReadyToBootGuid                      ## CONSUMES
+  gEfiEventReadyToBootGuid                      ## CONSUMES ## Event
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BootGraphicsResourceTableDxeExtra.uni

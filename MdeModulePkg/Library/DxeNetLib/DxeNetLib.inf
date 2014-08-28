@@ -1,14 +1,14 @@
 ## @file
-#  Instance of DxeNetLib.
+#  This library instance provides the basic network services.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
 #
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeNetLib
+  MODULE_UNI_FILE                = DxeNetLib.uni
   FILE_GUID                      = db6dcef3-9f4e-4340-9351-fc35aa8a5888
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -50,14 +51,17 @@
   PrintLib
 
 [Guids]
-  gEfiNicIp4ConfigVariableGuid
-  gEfiSmbiosTableGuid
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr EFI_NIC_IP4_CONFIG_VARIABLE
+  ## UNDEFINED # Device Path Node 
+  gEfiNicIp4ConfigVariableGuid                  
+  gEfiSmbiosTableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
 
 [Protocols]
-  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
-  gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleNetworkProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiManagedNetworkProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiManagedNetworkServiceBindingProtocolGuid  ## SOMETIMES_CONSUMES
+  gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_CONSUMES
+

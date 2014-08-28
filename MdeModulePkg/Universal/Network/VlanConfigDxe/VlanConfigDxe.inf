@@ -1,7 +1,10 @@
 ## @file
-#  Component description file for VLAN configuration module.
+#  This module provides one way to configurate VALN setting.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI HII Configuration Access Protocol to provide one way to
+#  configurate VALN setting
+#
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -15,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VlanConfigDxe
+  MODULE_UNI_FILE                = VlanConfigDxe.uni
   FILE_GUID                      = E4F61863-FE2C-4b56-A8F4-08519BC439DF
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -51,10 +55,18 @@
   HiiLib
 
 [Guids]
-  gEfiIfrTianoGuid
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mVlanStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr mVlanStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiGetBrowserData     mVlanStorageName
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiSetBrowserData     mVlanStorageName
+  ## SOMETIMES_CONSUMES ## HII
   gVlanConfigFormSetGuid
 
 [Protocols]
-  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiHiiConfigAccessProtocolGuid               ## BY_START
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
-  gEfiVlanConfigProtocolGuid                    ## CONSUMES
+  gEfiVlanConfigProtocolGuid                    ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VlanConfigDxeExtra.uni

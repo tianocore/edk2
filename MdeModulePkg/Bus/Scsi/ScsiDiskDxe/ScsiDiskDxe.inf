@@ -1,9 +1,8 @@
 ## @file
-#    
-#  Scsi Disk driver. This driver detects the Scsi disk media and installs Block I/O Protocol
-#  on the device handle that holds the SCSI I/O Portocol.
+#  The Scsi Disk driver is used to retrieve the media info in the attached SCSI disk.
+#  It detects the SCSI disk media and installs Block I/O Protocol on the device handle.
 #  
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ScsiDisk
+  MODULE_UNI_FILE                = ScsiDisk.uni
   FILE_GUID                      = 0A66E322-3740-4cce-AD62-BD172CECCA35
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -60,6 +60,13 @@
   gEfiExtScsiPassThruProtocolGuid               ## TO_START
 
 [Guids]
-  gEfiDiskInfoScsiInterfaceGuid                 ## SOMETIME_PRODUCES (The device is physical SCSI disk)
-  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIME_PRODUCES (The device is ATAPI device in IDE mode)
-  gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIME_PRODUCES (The device is ATAPI device in AHCI mode)
+  gEfiDiskInfoScsiInterfaceGuid                 ## SOMETIMES_PRODUCES ## UNDEFINED
+  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED
+  gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_PRODUCES ## UNDEFINED
+
+# [Event]
+# EVENT_TYPE_RELATIVE_TIMER       ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ScsiDiskExtra.uni

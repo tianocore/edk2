@@ -1,12 +1,15 @@
 ## @file
-# Component description file for ARP module
+#  This module produces EFI ARP Protocol and EFI ARP Service Binding Protocol.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI ARP Protocol upon EFI MNP Protocol, to provide a generic
+#  implementation of the Address Resolution Protocol that is described in RFCs 826
+#  and 1122.
 #
-#   This program and the accompanying materials
-#   are licensed and made available under the terms and conditions of the BSD License
-#   which accompanies this distribution.  The full text of the license may be found at
-#   http://opensource.org/licenses/bsd-license.php
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
 #
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -17,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ArpDxe
+  MODULE_UNI_FILE                = ArpDxe.uni
   FILE_GUID                      = 529D3F93-E8E9-4e73-B1E1-BDF6A9D50113
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -55,7 +59,10 @@
   DpcLib
 
 [Protocols]
-  gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
-  gEfiArpServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiArpProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+  gEfiArpServiceBindingProtocolGuid             ## BY_START
+  gEfiManagedNetworkServiceBindingProtocolGuid  ## TO_START
+  gEfiArpProtocolGuid                           ## BY_START
+  gEfiManagedNetworkProtocolGuid                ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ArpDxeExtra.uni

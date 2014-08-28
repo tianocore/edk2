@@ -1,8 +1,7 @@
 ## @file
-#  Status Code Handler Driver which produces general handlers and hook them
-#  onto the SMM status code router.
+#  Status Code Handler Driver which produces general handlers and hook them onto the SMM status code router.
 #
-#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = StatusCodeHandlerSmm
+  MODULE_UNI_FILE                = StatusCodeHandlerSmm.uni
   FILE_GUID                      = 79CD78D8-6EDC-4978-BD02-3299C387AB17
   MODULE_TYPE                    = DXE_SMM_DRIVER
   PI_SPECIFICATION_VERSION       = 0x0001000A
@@ -47,23 +47,24 @@
   PrintLib
   ReportStatusCodeLib
   DebugLib
-  SynchronizationLib
   MemoryAllocationLib
   BaseMemoryLib
   
 [Guids]
-  gMemoryStatusCodeRecordGuid                   ## CONSUMES ## HOB
-  gEfiStatusCodeDataTypeStringGuid              ## CONSUMES
+  gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES   ## UNDEFINED
 
 [Protocols]
   gEfiSmmRscHandlerProtocolGuid                 ## CONSUMES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory   ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiSmmRscHandlerProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  StatusCodeHandlerSmmExtra.uni

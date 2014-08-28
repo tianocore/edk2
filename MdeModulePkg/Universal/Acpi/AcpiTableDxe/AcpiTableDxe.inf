@@ -1,7 +1,7 @@
 ## @file
 #  ACPI Table Protocol Driver
 #
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials are
 #  licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AcpiTableDxe
+  MODULE_UNI_FILE                = AcpiTableDxe.uni
   FILE_GUID                      = 9622E42C-8E38-4a08-9E8F-54F784652F6B
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -54,24 +55,28 @@
   PcdLib
 
 [Guids]
-  gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED
-  gEfiAcpiTableGuid
+  gEfiAcpi10TableGuid                           ## PRODUCES ## SystemTable
+  gEfiAcpiTableGuid                             ## PRODUCES ## SystemTable
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol  ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
 
 [Protocols]
-  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
-  gEfiAcpiSdtProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
-  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiAcpiTableProtocolGuid                     ## PRODUCES
+  gEfiAcpiSdtProtocolGuid                       ## PRODUCES
+  ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid
 
 [Depex]
   TRUE
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  AcpiTableDxeExtra.uni

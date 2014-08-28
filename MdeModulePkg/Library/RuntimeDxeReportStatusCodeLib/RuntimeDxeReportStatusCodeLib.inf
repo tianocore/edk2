@@ -1,7 +1,7 @@
 ## @file
 #  Report status code library instance which supports logging message in DXE & runtime phase.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = RuntimeDxeReportStatusCodeLib
+  MODULE_UNI_FILE                = RuntimeDxeReportStatusCodeLib.uni
   FILE_GUID                      = 07D25BBB-F832-41bb-BBA0-612E9F033067
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -45,8 +46,8 @@
   UefiRuntimeLib
 
 [Guids]
-  gEfiStatusCodeSpecificDataGuid                ## CONSUMES
-  gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
+  gEfiStatusCodeSpecificDataGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES   ## UNDEFINED
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
   gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
 
@@ -54,5 +55,5 @@
   gEfiStatusCodeRuntimeProtocolGuid             ## CONSUMES
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask  ## CONSUMES
 

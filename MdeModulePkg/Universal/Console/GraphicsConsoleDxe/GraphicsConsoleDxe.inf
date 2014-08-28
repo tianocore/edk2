@@ -1,10 +1,10 @@
 ## @file
-# 
-#  Component description file for GraphicsConsole module
+#  Console support on graphic devices.
 #
-#  This is the main routine for initializing the Graphics Console support routines.
+#  This driver will install Simple Text Output protocol by consuming Graphices Output
+#  protocol or UGA Draw protocol on graphic devices.
 #  
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -18,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = GraphicsConsoleDxe
+  MODULE_UNI_FILE                = GraphicsConsoleDxe.uni
   FILE_GUID                      = CCCB0C28-4B24-11d5-9A5A-0090273FC14D
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -54,17 +55,21 @@
   PcdLib
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSimpleTextOutProtocolGuid                 ## BY_START
   gEfiGraphicsOutputProtocolGuid                ## TO_START
   gEfiUgaDrawProtocolGuid                       ## TO_START
   gEfiHiiFontProtocolGuid                       ## TO_START
-  gEfiHiiDatabaseProtocolGuid                   ## TO_START   
+  ## TO_START
+  ## NOTIFY
+  gEfiHiiDatabaseProtocolGuid
 
 [FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution   ## SOMETIMES_CONSUMES
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  GraphicsConsoleDxeExtra.uni

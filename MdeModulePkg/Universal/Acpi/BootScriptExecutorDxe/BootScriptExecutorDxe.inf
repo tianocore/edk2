@@ -4,7 +4,7 @@
 # This is a standalone Boot Script Executor. Standalone means it does not
 # depends on any PEI or DXE service.
 #
-# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BootScriptExecutorDxe
+  MODULE_UNI_FILE                = BootScriptExecutorDxe.uni
   FILE_GUID                      = FA20568B-548B-4b2b-81EF-1BA08D4A3CEC
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -50,19 +51,14 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  TimerLib
   PcdLib
   BaseMemoryLib
-  SmbusLib
   UefiDriverEntryPoint
   BaseLib
-  PciLib
-  IoLib
   S3BootScriptLib
   PeCoffLib
   DxeServicesLib
   UefiBootServicesTableLib
-  UefiRuntimeServicesTableLib
   CacheMaintenanceLib
   UefiLib
   DebugAgentLib
@@ -70,20 +66,22 @@
   CpuExceptionHandlerLib
 
 [Guids]
-  gEfiBootScriptExecutorVariableGuid
-  gEfiBootScriptExecutorContextGuid
-  gPerformanceProtocolGuid
-  gEfiEventExitBootServicesGuid
+  gEfiBootScriptExecutorVariableGuid    ## PRODUCES ## UNDEFINED # SaveLockBox
+  gEfiBootScriptExecutorContextGuid     ## PRODUCES ## UNDEFINED # SaveLockBox
 
 [Protocols]
+  ## NOTIFY
+  ## CONSUMES
   gEfiDxeSmmReadyToLockProtocolGuid
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode  ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable          ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiLockBoxProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  BootScriptExecutorDxeExtra.uni

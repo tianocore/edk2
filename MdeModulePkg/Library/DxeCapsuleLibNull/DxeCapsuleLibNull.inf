@@ -2,7 +2,7 @@
 #  NULL Dxe Capsule library instance.
 #  It can make core modules pass package level build.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeCapsuleLibNull
+  MODULE_UNI_FILE                = DxeCapsuleLibNull.uni
   FILE_GUID                      = 4004de5a-09a5-4f0c-94d7-82322e096aa7
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -35,4 +36,3 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-  

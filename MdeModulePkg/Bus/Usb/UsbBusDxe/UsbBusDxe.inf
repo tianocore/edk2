@@ -1,10 +1,7 @@
 ## @file
-#  
-#  Component Description File For UsbBus Dxe Module.
+#  The Usb Bus Dxe driver is used to enumerate and manage all attached usb devices.
 #
-#  Usb Bus Dxe driver is used to enumerate and manage all attached usb devices.
-#  
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UsbBusDxe
+  MODULE_UNI_FILE                = UsbBusDxe.uni
   FILE_GUID                      = 240612B7-A063-11d4-9A3A-0090273FC14D
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -66,14 +64,16 @@
 
 [Protocols]
   gEfiUsbIoProtocolGuid                         ## BY_START
-  gEfiDevicePathProtocolGuid                    ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid                    
   gEfiUsb2HcProtocolGuid                        ## TO_START
   gEfiUsbHcProtocolGuid                         ## TO_START
 
 # [Event]
-#   ##
-#   # Periodic timer event for monitoring attach/detach event in port and enumerate attached usb devices.
-#   #
-#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
 #
+# EVENT_TYPE_PERIODIC_TIMER       ## CONSUMES
 #
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UsbBusDxeExtra.uni

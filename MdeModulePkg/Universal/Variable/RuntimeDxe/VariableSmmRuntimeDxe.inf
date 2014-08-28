@@ -1,10 +1,11 @@
 ## @file
-#  Component description file for Variable SmmRuntimeDxe module.
+#  This module is the Runtime DXE part correspond to SMM variable module.
 #
-#  This module is the Runtime DXE part correspond to SMM variable module. It 
-#  installs variable arch protocol and variable write arch protocol and works 
-#  with SMM variable module together. 
-# Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+#  It installs variable arch protocol and variable write arch protocol to provide
+#  four EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName and QueryVariableInfo
+#  and works with SMM variable module together.
+#
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VariableSmmRuntimeDxe
+  MODULE_UNI_FILE                = VariableSmmRuntimeDxe.uni
   FILE_GUID                      = 9F7DCADE-11EA-448a-A46F-76E003657DD1
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -50,20 +52,28 @@
   PcdLib  
 
 [Protocols]
-  gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
-  gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES  
-  gEfiSmmCommunicationProtocolGuid
+  gEfiVariableWriteArchProtocolGuid             ## PRODUCES
+  gEfiVariableArchProtocolGuid                  ## PRODUCES
+  gEfiSmmCommunicationProtocolGuid              ## CONSUMES
+  ## CONSUMES
+  ## NOTIFY
+  ## UNDEFINED # Used to do smm communication
   gEfiSmmVariableProtocolGuid
-  gEdkiiVariableLockProtocolGuid                ## ALWAYS_PRODUCES
+  gEdkiiVariableLockProtocolGuid                ## PRODUCES
 
 [Guids]
-  gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
+  gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
+  ## CONSUMES ## GUID # Locate protocol
+  ## CONSUMES ## GUID # Protocol notify
   gSmmVariableWriteGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize    ## CONSUMES
   
 [Depex]
   gEfiSmmCommunicationProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VariableSmmRuntimeDxeExtra.uni

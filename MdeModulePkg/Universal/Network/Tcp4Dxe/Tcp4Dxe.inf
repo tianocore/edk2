@@ -1,9 +1,10 @@
 ## @file
-# Component name for module Tcp4
+#  This module produces EFI TCPv4 Protocol and EFI TCPv4 Service Binding Protocol.
 #
-# FIX ME!
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI TCPv4(Transmission Control Protocol version 4) Protocol
+#  upon EFI IPv4 Protocol, to provide basic TCPv4 I/O services.
 #
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -18,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Tcp4Dxe
+  MODULE_UNI_FILE                = Tcp4Dxe.uni
   FILE_GUID                      = 6d6963ab-906d-4a65-a7ca-bd40e5d6af4d
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -73,8 +75,10 @@
   DpcLib
 
 [Protocols]
-  gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
-  gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiTcp4ProtocolGuid                          # PROTOCOL SOMETIMES_PRODUCED
-  
+  gEfiTcp4ServiceBindingProtocolGuid            ## BY_START
+  gEfiIp4ServiceBindingProtocolGuid             ## TO_START
+  gEfiTcp4ProtocolGuid                          ## BY_START
+  gEfiIp4ProtocolGuid                           ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Tcp4DxeExtra.uni

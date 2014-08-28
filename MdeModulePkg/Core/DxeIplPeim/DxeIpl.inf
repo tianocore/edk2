@@ -5,7 +5,7 @@
 #  PPI to discover and dispatch the DXE Foundation and components that are
 #  needed to run the DXE Foundation.
 #
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeIpl
+  MODULE_UNI_FILE                = DxeIpl.uni
   FILE_GUID                      = 86D70125-BAA3-4296-A62F-602BEBBB9081
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -77,50 +78,50 @@
 
 [Ppis]
   gEfiDxeIplPpiGuid                 ## PRODUCES
-  gEfiEndOfPeiSignalPpiGuid         ## SOMETIMES_PRODUCES(Not produced on S3 boot path)
-  gEfiPeiDecompressPpiGuid          ## SOMETIMES_PRODUCES
+  gEfiPeiDecompressPpiGuid          ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid         ## SOMETIMES_PRODUCES # Not produced on S3 boot path
   gEfiPeiReadOnlyVariable2PpiGuid   ## SOMETIMES_CONSUMES
-  gEfiPeiLoadFilePpiGuid            ## CONSUMES
-  gEfiPeiS3Resume2PpiGuid           ## SOMETIMES_CONSUMES(Consumed on S3 boot path)
-  gEfiPeiRecoveryModulePpiGuid      ## SOMETIMES_CONSUMES(Consumed on recovery boot path)
-  gEfiVectorHandoffInfoPpiGuid      ## SOMETIMES_CONSUMES
+  gEfiPeiLoadFilePpiGuid            ## SOMETIMES_CONSUMES
+  gEfiPeiS3Resume2PpiGuid           ## SOMETIMES_CONSUMES # Consumed on S3 boot path
+  gEfiPeiRecoveryModulePpiGuid      ## SOMETIMES_CONSUMES # Consumed on recovery boot path
+  ## SOMETIMES_CONSUMES
+  ## UNDEFINED # HOB
+  gEfiVectorHandoffInfoPpiGuid
 
 [Guids]
-  gEfiMemoryTypeInformationGuid     ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
-  gEfiMemoryTypeInformationGuid     ## SOMETIMES_PRODUCES ## HOB
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
+  ## SOMETIMES_PRODUCES ## HOB
+  gEfiMemoryTypeInformationGuid
 
 [FeaturePcd.IA32]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
 
 [FeaturePcd.X64]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress ## CONSUMES
 
 [Pcd.IA32,Pcd.X64]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
 
 #
 # [BootMode]
-#   S3_RESUME                       ## SOMETIMES_CONSUMES
-#   RECOVERY                        ## SOMETIMES_CONSUMES
+#  S3_RESUME                        ## SOMETIMES_CONSUMES
+#  RECOVERY_FULL                    ## SOMETIMES_CONSUMES
 #
 #
 # [Hob]
-#   ##
-#   # New Stack HoB
-#   MEMORY_ALLOCATION               ## PRODUCES
-#   ##
-#   # Old Stack HOB
-#   MEMORY_ALLOCATION               ## CONSUMES
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # MEMORY_ALLOCATION_MODULE for DxeCore
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # New Stack HoB   
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # Old Stack HOB
 #
 # [Hob.IPF]
-#   ##
-#   # BSP Stack HOB for IPF
-#   MEMORY_ALLOCATION               ## PRODUCES
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # MEMORY_ALLOCATION_BSP_STORE
 #
-#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DxeIplExtra.uni

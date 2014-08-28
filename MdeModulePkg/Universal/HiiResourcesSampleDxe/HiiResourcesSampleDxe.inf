@@ -1,8 +1,10 @@
 ## @file
-# This is an example of how a driver retrieve HII data using HII Package List
-# Protocol, and how to publish the HII data.
+#  This is a sample HII resource driver.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This driver show how a HII driver retrieve HII data using HII Package List protocol
+#  and publish the HII data.
+#
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HiiResourcesSample
+  MODULE_UNI_FILE                = HiiResourcesSample.uni
   FILE_GUID                      = D49D2EB0-44D5-4621-9FD6-1A92C9109B99
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -51,3 +54,7 @@
 
 [Protocols]
   gEfiHiiPackageListProtocolGuid    ## CONSUMES
+  gEfiDevicePathProtocolGuid        ## PRODUCES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HiiResourcesSampleExtra.uni

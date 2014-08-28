@@ -1,8 +1,7 @@
 ## @file
-# Component description file for UsbBotPei module.
+# The Usb mass storage device Peim driver is used to support recovery from USB device.
 #
-# Usb mass storage device Peim driver to support recovery from USB device.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -18,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UsbBotPei
+  MODULE_UNI_FILE                = UsbBotPei.uni
   FILE_GUID                      = 8401A046-6F70-4505-8471-7015B40355E3
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -53,13 +53,16 @@
   PcdLib
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue  ## CONSUMES
 
 [Ppis]
-  gEfiPeiVirtualBlockIoPpiGuid                  # PPI ALWAYS_PRODUCED
-  gPeiUsbIoPpiGuid                              # PPI ALWAYS_CONSUMED
-
+  gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
+  ## CONSUMES
+  ## NOTIFY
+  gPeiUsbIoPpiGuid
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbIoPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  UsbBotPeiExtra.uni

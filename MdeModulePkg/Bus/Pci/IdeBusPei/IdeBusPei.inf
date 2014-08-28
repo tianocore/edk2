@@ -1,10 +1,10 @@
 ## @file
 # PEIM to produce gEfiPeiVirtualBlockIoPpiGuid PPI for ATA controllers in the platform.
-# This PPI canl be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
+# This PPI can be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
 # for Atapi CD ROM device.
 #
 # This module discovers CDROM devices in Legacy and native mode and installs block IO ppis for them.
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IdeBusPei
+  MODULE_UNI_FILE                = IdeBusPei.uni
   FILE_GUID                      = B7A5041A-78BA-49e3-B73B-54C757811FB6
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -54,14 +55,14 @@
   PcdLib
 
 [Ppis]
-  gPeiAtaControllerPpiGuid                      # PPI ALWAYS_CONSUMED
-  gEfiPeiVirtualBlockIoPpiGuid                  # PPI ALWAYS_PRODUCED
+  gPeiAtaControllerPpiGuid                      ## CONSUMES
+  gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
   
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSataSpinUpDelayInSecForRecoveryPath
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSataSpinUpDelayInSecForRecoveryPath   ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid AND gPeiAtaControllerPpiGuid
 
-
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  IdeBusPeiExtra.uni

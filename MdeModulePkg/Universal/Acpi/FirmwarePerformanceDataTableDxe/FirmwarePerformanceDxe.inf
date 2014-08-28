@@ -5,7 +5,7 @@
 #  for Firmware Basic Boot Performance Record and other boot performance records, 
 #  and install FPDT to ACPI table.
 #
-#  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FirmwarePerformanceDxe
+  MODULE_UNI_FILE                = FirmwarePerformanceDxe.uni
   FILE_GUID                      = 00160F8D-2B35-4df2-BBE0-B272A8D631F0
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -52,37 +53,39 @@
   UefiLib
 
 [Protocols]
-  gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
   gEfiSmmCommunicationProtocolGuid              ## SOMETIMES_CONSUMES
-  gEfiVariableArchProtocolGuid                  ## SOMETIMES_CONSUMES
-  gEfiLockBoxProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiVariableArchProtocolGuid                  ## CONSUMES
+  gEfiLockBoxProtocolGuid                       ## CONSUMES
 
 [Guids]
-  gEfiEventExitBootServicesGuid                 ## CONSUMES
-  gEfiEventReadyToBootGuid                      ## CONSUMES
-  gEfiEventLegacyBootGuid                       ## CONSUMES
-  gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES
-  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES
-  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES
-  gEfiFirmwarePerformanceGuid                   ## PRODUCES  ## Variable:L"FirmwarePerformance"
-  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_CONSUMES ## Hob
-  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_CONSUMES ## SmiHandler
-  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_CONSUMES ## StatusCode Data
-  gFirmwarePerformanceS3PointerGuid             ## SOMETIMES_PRODUCES # SaveLockBox
+  gEfiEventExitBootServicesGuid                 ## CONSUMES             ## Event
+  gEfiEventReadyToBootGuid                      ## CONSUMES             ## Event
+  gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES   ## Event
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_CONSUMES   ## Variable:L"FirmwarePerformance"
+  ## PRODUCES             ## Variable:L"FirmwarePerformance"
+  ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
+  ## SOMETIMES_CONSUMES ## UNDEFINED # StatusCode Data
+  gEfiFirmwarePerformanceGuid
+  gFirmwarePerformanceS3PointerGuid             ## PRODUCES ## UNDEFINED # SaveLockBox
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
-  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
-  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support   ## CONSUMES
 
 [Depex]
   gEfiRscHandlerProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FirmwarePerformanceDxeExtra.uni

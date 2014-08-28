@@ -1,7 +1,11 @@
 ## @file
-#  Component description file for Mnp module.
+#  This module produces EFI MNP Protocol, EFI MNP Servie Binding Protocol and EFI VLAN Protocol.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI Managed Network Protocol upon EFI Simple Network Protocol,
+#  to provide raw asynchronous network I/O services. It also produces EFI VLAN Protocol
+#  to provide manageability interface for VLAN configuration. 
+#
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -15,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = MnpDxe
+  MODULE_UNI_FILE                = MnpDxe.uni
   FILE_GUID                      = 025BBFC7-E6A9-4b8b-82AD-6815A1AEAF4A
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -58,7 +63,12 @@
   DpcLib
 
 [Protocols]
-  gEfiManagedNetworkServiceBindingProtocolGuid  ## PRODUCES
-  gEfiSimpleNetworkProtocolGuid                 ## CONSUMES
-  gEfiManagedNetworkProtocolGuid                ## PRODUCES
-  gEfiVlanConfigProtocolGuid                    ## SOMETIMES_PRODUCES
+  gEfiManagedNetworkServiceBindingProtocolGuid  ## BY_START
+  gEfiSimpleNetworkProtocolGuid                 ## TO_START
+  gEfiManagedNetworkProtocolGuid                ## BY_START
+  ## BY_START
+  ## UNDEFINED # variable
+  gEfiVlanConfigProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  MnpDxeExtra.uni

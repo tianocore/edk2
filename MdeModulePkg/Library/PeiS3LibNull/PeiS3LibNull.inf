@@ -1,11 +1,10 @@
 ## @file
-#  
 #  Null S3 library instance for PEIM module.
 #  This library instance is no longer used and module using this library
 #  class should update to directly locate EFI_PEI_S3_RESUME_PPI defined
 #  in PI 1.2 specification. 
 #  
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiS3LibNull
+  MODULE_UNI_FILE                = PeiS3LibNull.uni
   FILE_GUID                      = 018E1925-D6A2-4a2a-8958-817610A15ADF
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0

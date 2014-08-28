@@ -1,8 +1,10 @@
 ## @file
+# Platform console driver manages console devices.
+#
 # Console Platfrom DXE Driver that specifies whether device can be used as console
 # input/output device or error output device and update global variables accordingly.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ConPlatformDxe
+  MODULE_UNI_FILE                = ConPlatformDxe.uni
   FILE_GUID                      = 51ccf399-4fdf-4e55-a45b-e123f84d456a
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -55,37 +58,41 @@
   DebugLib
 
 [Guids]
-  ##
+  #
   # This is the VendorGuid of all architecturally defined variables in UEFI spec.
   #
-  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConIn"
-  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConOut"
-  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ErrOut"
-  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConInDev"
-  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConOutDev"
-  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ErrOutDev"
-  ##
+  ## SOMETIMES_CONSUMES ## Variable:L"ConIn"
+  ## SOMETIMES_CONSUMES ## Variable:L"ConOut"
+  ## SOMETIMES_CONSUMES ## Variable:L"ErrOut"
+  ## SOMETIMES_PRODUCES ## Variable:L"ConInDev"
+  ## SOMETIMES_PRODUCES ## Variable:L"ConOutDev"
+  ## SOMETIMES_PRODUCES ## Variable:L"ErrOutDev"
+  gEfiGlobalVariableGuid
+  #
   # This GUID is used to specify the device is the standard error device.
   # If the device is a standard error device, this GUID as the protocol GUID will be installed
   # onto this device handle.
   #
-  gEfiStandardErrorDeviceGuid                   ## PROTOCOL
-  ##
+  gEfiStandardErrorDeviceGuid                   ## SOMETIMES_PRODUCES ## UNDEFINED # protocol GUID installed on device handle
+  #
   # This GUID is used to specify the device is the console output device.
   # If the device is a console output device, this GUID as the protocol GUID will be installed
   # onto this device handle.
   #
-  gEfiConsoleOutDeviceGuid                      ## PROTOCOL
-  ##
+  gEfiConsoleOutDeviceGuid                      ## SOMETIMES_PRODUCES ## UNDEFINED # protocol GUID installed on device handle
+  #
   # This GUID is used to specify the device is the console input device.
   # If the device is a console input device, this GUID as the protocol GUID will be installed
   # onto this device handle.
   #
-  gEfiConsoleInDeviceGuid                       ## PROTOCOL
+  gEfiConsoleInDeviceGuid                       ## SOMETIMES_PRODUCES ## UNDEFINED # protocol GUID installed on device handle
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSimpleTextInProtocolGuid                  ## TO_START
   gEfiSimpleTextOutProtocolGuid                 ## TO_START
-  gEfiPciIoProtocolGuid                         ## TO_START
-  gEfiGraphicsOutputProtocolGuid                ## TO_START
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ConPlatformDxeExtra.uni

@@ -1,8 +1,7 @@
 ## @file
-# Component description file for UsbPeim module.
+# The Usb Bus Peim driver is used to support recovery from usb device.
 #
-# Usb Bus Peim driver to support recovery from usb device.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -18,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UsbBusPei
+  MODULE_UNI_FILE                = UsbBusPei.uni
   FILE_GUID                      = 8401A045-6F70-4505-8471-7015B40355E3
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -53,14 +53,15 @@
   PcdLib
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue  ## CONSUMES
   
 [Ppis]
-  gPeiUsbIoPpiGuid                              # PPI ALWAYS_PRODUCED
-  gPeiUsbHostControllerPpiGuid                  # PPI ALWAYS_CONSUMED
-  gPeiUsb2HostControllerPpiGuid                 # PPI ALWAYS_CONSUMED
-
+  gPeiUsbIoPpiGuid                              ## PRODUCES
+  gPeiUsbHostControllerPpiGuid                  ## SOMETIMES_CONSUMES
+  gPeiUsb2HostControllerPpiGuid                 ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid AND gPeiUsb2HostControllerPpiGuid OR gPeiUsbHostControllerPpiGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  UsbBusPeiExtra.uni

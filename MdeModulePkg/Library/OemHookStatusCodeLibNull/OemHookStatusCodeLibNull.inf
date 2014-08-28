@@ -1,7 +1,7 @@
 ## @file
 #  Null instance of OEM Hook Status Code Library with empty functions.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = OemHookStatusCodeLibNull
+  MODULE_UNI_FILE                = OemHookStatusCodeLibNull.uni
   FILE_GUID                      = 54D2878F-25CD-4a2b-8420-EBD18E609C76
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

@@ -1,11 +1,9 @@
 ## @file
-#  Sample UEFI Application Reference Module.
-#  This is a shell application that will display statistical information about variable
-#  usage.
+#  This is a shell application that will display statistical information about variable usage.
 #  Note that if Variable Dxe driver doesn't enable the feature by setting PcdVariableCollectStatistics
 #  as TRUE, The application will not display variable statistical information.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -18,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VariableInfo
+  MODULE_UNI_FILE                = VariableInfo.uni
   FILE_GUID                      = 202A2922-8C27-4943-9855-26180BF9F113
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
@@ -44,4 +43,7 @@
   UefiLib
 
 [Guids]
-  gEfiVariableGuid        ## CONSUMES ## Configuration Table Guid
+  gEfiVariableGuid          ## CONSUMES ## SystemTable
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VariableInfoExtra.uni

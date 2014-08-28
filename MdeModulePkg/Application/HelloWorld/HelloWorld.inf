@@ -1,12 +1,12 @@
 ## @file
-#  Sample UEFI Application Reference EDKII Module
+#  Sample UEFI Application Reference EDKII Module.
 #
-#  This is a sample shell application that will print "UEFI Hello World!" to the 
+#  This is a sample shell application that will print "UEFI Hello World!" to the
 #  UEFI Console based on PCD setting.
 #
 #  It demos how to use EDKII PCD mechanism to make code more flexible.
 #
-#  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HelloWorld
+  MODULE_UNI_FILE                = HelloWorld.uni
   FILE_GUID                      = 6987936E-ED34-44db-AE97-1FA5E4ED2116
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
@@ -45,8 +46,11 @@
   PcdLib
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable   ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString || gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable  ## Valid when gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes  || gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable  ## Valid when gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString || gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable    ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes  || gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable    ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HelloWorldExtra.uni

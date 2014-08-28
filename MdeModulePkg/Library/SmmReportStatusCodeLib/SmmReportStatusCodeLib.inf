@@ -1,8 +1,9 @@
 ## @file
-#  SMM report status code library
+#  SMM report status code library.
 #
-#  Retrieve status code and report status code in SMM phase
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Retrieve status code and report status code in SMM phase.
+#
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmReportStatusCodeLib
+  MODULE_UNI_FILE                = SmmReportStatusCodeLib.uni
   FILE_GUID                      = 67089D19-B3D6-4d9e-A0EB-FEDC1F83A1EE
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
@@ -44,11 +46,11 @@
   MemoryAllocationLib
 
 [Guids]
-  gEfiStatusCodeSpecificDataGuid                ## CONSUMES
-  gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
+  gEfiStatusCodeSpecificDataGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES   ## UNDEFINED
 
 [Protocols]
   gEfiSmmStatusCodeProtocolGuid                 ## CONSUMES
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask  ## CONSUMES

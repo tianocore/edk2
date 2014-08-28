@@ -1,7 +1,7 @@
 ## @file
-#  Component description file for LockBox library.
+#  NULL LockBox library instance.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions
@@ -17,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LockBoxNullLib
+  MODULE_UNI_FILE                = LockBoxNullLib.uni
   FILE_GUID                      = 0BA38EBD-E190-4df7-8EC4-0A6E2B43772D
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -35,7 +36,4 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
-[LibraryClasses]
-  BaseLib
 

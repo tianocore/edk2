@@ -33,6 +33,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatDriOverrideDxe
+  MODULE_UNI_FILE                = PlatDriOverrideDxe.uni
   FILE_GUID                      = 35034CE2-A6E5-4fb4-BABE-A0156E9B2549
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -72,32 +73,43 @@
   PrintLib 
    
 [Guids]
-  ##  This GUID C Name is not required for build since it is from UefiLib and not directly used by this module source.
-  ##  gEfiGlobalVariableGuid                      ## SOMETIMES_CONSUMED ## Variable:L"PlatformLang" this variable specifies the platform supported language string (RFC 4646 format)
-  ##  gEfiGlobalVariableGuid                      ## SOMETIMES_CONSUMED ## Variable:L"Lang" this variable specifies the platform supported language string (ISO 639-2 format)
-  ##
-  # There could be more than one variables, from PlatDriOver, PlatDriOver1, PlatDriOver2,...
   #
-  # gEfiCallerIdGuid                            ## Private  ## Variable:L"PlatDriOver"
-  gEfiIfrTianoGuid                              ## CONSUMES ## Guid
-  gPlatformOverridesManagerGuid                 ## PRODUCES ## Guid
+  # This GUID C Name is not required for build since it is from UefiLib and not directly used by this module source.
+  #  gEfiGlobalVariableGuid                     ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang" # this variable specifies the platform supported language string (RFC 4646 format)
+  #  gEfiGlobalVariableGuid                     ## SOMETIMES_CONSUMES   ## Variable:L"Lang" # this variable specifies the platform supported language string (ISO 639-2 format)
+  #
+  # There could be more than one variables, from PlatDriOver, PlatDriOver1, PlatDriOver2,...
+  #  gEfiCallerIdGuid                           ## Private  ## Variable:L"PlatDriOver"
+  #
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES   ## UNDEFINED
+  ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch Data
+  ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData Data
+  ## SOMETIMES_CONSUMES ## GUID # HiiSetBrowserData Data
+  ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr Data
+  ## CONSUMES           ## HII
+  gPlatformOverridesManagerGuid
 
 [Protocols]
-  gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMED (Get Driver Name if ComponentName2Protocol exists)
-  gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMED (Get Driver Name if ComponentNameProtocol exists and ComponentName2Protocol doesn't exist)
-  gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMED (Get Driver Name from EFI UI section if ComponentName2Protocol and ComponentNameProtocol don't exist)
-  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMED (Find the PCI device if PciIo protocol is installed)
-  gEfiBusSpecificDriverOverrideProtocolGuid     ## SOMETIMES_CONSUMED (Check whether the PCI device contains one or more efi drivers in its option rom by this protocol) 
+  gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMES # Get Driver Name if ComponentName2Protocol exists
+  gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMES # Get Driver Name if ComponentNameProtocol exists and ComponentName2Protocol doesn't exist
+  gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMES # Get Driver Name from EFI UI section if ComponentName2Protocol and ComponentNameProtocol don't exist
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES # Find the PCI device if PciIo protocol is installed
+  gEfiBusSpecificDriverOverrideProtocolGuid     ## SOMETIMES_CONSUMES # Check whether the PCI device contains one or more efi drivers in its option rom by this protocol
 
-  gEfiDriverBindingProtocolGuid                 ## SOMETIMES_CONSUMED
-  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMED
-  gEfiLoadedImageDevicePathProtocolGuid         ## SOMETIMES_CONSUMED (Show the drivers in the second page that support DriverBindingProtocol, LoadedImageProtocol and LoadedImageDevicePathProtocol)
-  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMED (Show the controller device in the first page that support DevicePathProtocol)
+  gEfiDriverBindingProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid         ## SOMETIMES_CONSUMES # Show the drivers in the second page that support DriverBindingProtocol, LoadedImageProtocol and LoadedImageDevicePathProtocol
 
-  gEfiFormBrowser2ProtocolGuid                  ## CONSUMED
-  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMED
-  gEfiHiiConfigAccessProtocolGuid               ## PRODUCED
-  gEfiPlatformDriverOverrideProtocolGuid        ## PRODUCED
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiPlatformDriverOverrideProtocolGuid        ## PRODUCES
+  ## PRODUCES
+  ## SOMETIMES_CONSUMES # Show the controller device in the first page that support DevicePathProtocol
+  gEfiDevicePathProtocolGuid
 
 [Depex]
   gEfiFormBrowser2ProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PlatDriOverrideDxeExtra.uni

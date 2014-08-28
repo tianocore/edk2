@@ -5,7 +5,7 @@
 #  code via PEI Status Code Service. If the service is not available, it then tries calling
 #  OEM Hook Status Code Library.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiReportStatusCodeLib
+  MODULE_UNI_FILE                = PeiReportStatusCodeLib.uni
   FILE_GUID                      = 8c690838-7a22-45c4-aa58-a33e3e515cd4
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -49,10 +50,10 @@
 
 
 [Guids]
-  gEfiStatusCodeSpecificDataGuid                ## CONSUMES
-  gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
+  gEfiStatusCodeSpecificDataGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES   ## UNDEFINED
 
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask  ## CONSUMES
 

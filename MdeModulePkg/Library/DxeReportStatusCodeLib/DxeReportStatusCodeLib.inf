@@ -1,8 +1,9 @@
 ## @file
-#  DXE report status code library
+#  DXE report status code library.
 #
-#  Retrieve status code and report status code in DXE phase
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Retrieve status code and report status code in DXE phase.
+#
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeReportStatusCodeLib
+  MODULE_UNI_FILE                = DxeReportStatusCodeLib.uni
   FILE_GUID                      = EBF144C8-70F5-4e09-ADE2-F41F5C59AFDA
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -44,12 +46,12 @@
   DevicePathLib
 
 [Guids]
-  gEfiStatusCodeSpecificDataGuid                ## CONSUMES
-  gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
+  gEfiStatusCodeSpecificDataGuid                ## SOMETIMES_CONSUMES ## UNDEFINED
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES ## UNDEFINED
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## CONSUMES
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask  ## CONSUMES
 

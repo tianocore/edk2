@@ -1,8 +1,5 @@
 ## @file
-#  
-#  Component Description File For EhciDxe Module.
-# 
-#  EhciDxe driver is responsible for managing the behavior of EHCI controller. 
+#  The EhciDxe driver is responsible for managing the behavior of EHCI controller.
 #  It implements the interfaces of monitoring the status of all ports and transferring 
 #  Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
 #
@@ -11,7 +8,7 @@
 #  This way avoids the control transfer on a shared port between EHCI and companion host
 #  controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
 #
-#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -27,6 +24,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EhciDxe
+  MODULE_UNI_FILE                = EhciDxe.uni
   FILE_GUID                      = BDFE430E-8F2A-4db0-9991-6F856594777E
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -64,7 +62,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport  ## SOMETIME_CONSUMES (enable/disable usb legacy support.)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport  ## CONSUMES
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -78,15 +76,15 @@
   ReportStatusCodeLib
 
 [Guids]
-  gEfiEventExitBootServicesGuid                 ## PRODUCES ## Event
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
 
 [Protocols]
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiUsb2HcProtocolGuid                        ## BY_START
 
 # [Event]
-#   ##
-#   # Periodic timer event for checking the result of interrupt transfer execution.
-#   #
-#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+# EVENT_TYPE_PERIODIC_TIMER       ## CONSUMES
 #
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EhciDxeExtra.uni

@@ -1,7 +1,7 @@
 ## @file
 # DXE S3 boot script Library.
 #
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeS3BootScriptLib
+  MODULE_UNI_FILE                = DxeS3BootScriptLib.uni
   FILE_GUID                      = 57F9967B-26CD-4262-837A-55B8AA158254
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -53,13 +54,18 @@
   PciLib
   IoLib 
   LockBoxLib
-  
+
 [Protocols]
-  gEfiSmmBase2ProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiDxeSmmReadyToLockProtocolGuid              # ALWAYS_CONSUMED
-  gEfiSmmReadyToLockProtocolGuid                 # ALWAYS_CONSUMED
-  
+  gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid             ## NOTIFY
+  gEfiSmmReadyToLockProtocolGuid                ## NOTIFY
+
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr                   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr                ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptRuntimeTableReservePageNumber         ## CONSUMES
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptRuntimeTableReservePageNumber   ## CONSUMES
+

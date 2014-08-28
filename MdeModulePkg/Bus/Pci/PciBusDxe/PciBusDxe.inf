@@ -1,11 +1,8 @@
 ## @file
-#  Component description file for PciBus module.
+#  The PCI bus driver will probe all PCI devices and allocate MMIO and IO space for these devices.
+#  Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable hot plug supporting.
 #
-#  PCI bus driver. This module will probe all PCI devices and allocate MMIO and IO
-#  space for these devices. Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable
-#  hot plug supporting.
-#
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PciBusDxe
+  MODULE_UNI_FILE                = PciBusDxe.uni
   FILE_GUID                      = 93B80004-9FB3-11d4-9A3A-0090273FC14D
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -83,37 +81,32 @@
   PeCoffLib
 
 [Protocols]
-  gEfiPciHotPlugRequestProtocolGuid               ## BY_START
+  gEfiPciHotPlugRequestProtocolGuid               ## SOMETIMES_PRODUCES
   gEfiPciIoProtocolGuid                           ## BY_START
   gEfiDevicePathProtocolGuid                      ## BY_START
   gEfiBusSpecificDriverOverrideProtocolGuid       ## BY_START
-  gEfiLoadedImageProtocolGuid                     ## CONSUMED
-  gEfiDecompressProtocolGuid                      ## CONSUMED
-  gEfiPciHotPlugInitProtocolGuid                  ## CONSUMED
-  gEfiPciHostBridgeResourceAllocationProtocolGuid ## CONSUMED
-  gEfiPciPlatformProtocolGuid                     ## CONSUMED
-  gEfiPciOverrideProtocolGuid                     ## CONSUMED 
-  gEfiPciEnumerationCompleteProtocolGuid          ## CONSUMED 
-  gEfiPciRootBridgeIoProtocolGuid                 ## CONSUMED
-  gEfiIncompatiblePciDeviceSupportProtocolGuid    ## CONSUMED
-  gEfiLoadFile2ProtocolGuid                       ## CONSUMED
+  gEfiLoadedImageProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiDecompressProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiPciHotPlugInitProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiPciHostBridgeResourceAllocationProtocolGuid ## TO_START
+  gEfiPciPlatformProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiPciOverrideProtocolGuid                     ## SOMETIMES_CONSUMES 
+  gEfiPciEnumerationCompleteProtocolGuid          ## PRODUCES 
+  gEfiPciRootBridgeIoProtocolGuid                 ## TO_START
+  gEfiIncompatiblePciDeviceSupportProtocolGuid    ## SOMETIMES_CONSUMES
+  gEfiLoadFile2ProtocolGuid                       ## SOMETIMES_PRODUCES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable        ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
 
-# [Event]
-#   ##
-#   # Notify event set by CreateEventForHpc () for PCI Hot Plug controller.
-#   #
-#   EVT_NOTIFY_SIGNAL                   ## PRODUCES
-#
-#
+[UserExtensions.TianoCore."ExtraFiles"]
+  PciBusDxeExtra.uni

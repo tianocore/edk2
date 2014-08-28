@@ -1,7 +1,7 @@
 ## @file
-#  Component description file for LockBox library.
+#  PEI LockBox library instance.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions
@@ -17,6 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmLockBoxPeiLib
+  MODULE_UNI_FILE                = SmmLockBoxPeiLib.uni
   FILE_GUID                      = 5F5E6140-E7BA-4bd6-B85F-236B5BCD8E1E
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -45,12 +46,14 @@
   DebugLib
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode  ## CONSUMES
 
 [Guids]
-  gEfiSmmLockBoxCommunicationGuid       ## CONSUMED
-  gEfiAcpiVariableGuid               ## CONSUMED
+  ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
+  ## SOMETIMES_CONSUMES ## UNDEFINED # SmmSystemTable
+  gEfiSmmLockBoxCommunicationGuid
+  gEfiAcpiVariableGuid                  ## SOMETIMES_CONSUMES ## HOB
 
 [Ppis]
-  gEfiPeiSmmCommunicationPpiGuid     ## CONSUMED
-  gPeiSmmAccessPpiGuid               ## CONSUMED
+  gEfiPeiSmmCommunicationPpiGuid        ## CONSUMES
+  gPeiSmmAccessPpiGuid                  ## SOMETIMES_CONSUMES

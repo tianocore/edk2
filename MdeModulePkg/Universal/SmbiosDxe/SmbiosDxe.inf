@@ -1,7 +1,6 @@
 ## @file
-# Component description file for Smbios module.
+# This driver initializes and installs the SMBIOS protocol, constructs SMBIOS table into system configuration table.
 #
-# This driver initializes and installs the SMBIOS protocol.
 # Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmbiosDxe
+  MODULE_UNI_FILE                = SmbiosDxe.uni
   FILE_GUID                      = F9D88642-0737-49bc-81B5-6889CD57D9EA
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -48,14 +48,16 @@
   PcdLib
 
 [Protocols]
-  gEfiSmbiosProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
+  gEfiSmbiosProtocolGuid                            ## PRODUCES
   
 [Guids]
-  gEfiEventReadyToBootGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiSmbiosTableGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmbiosTableGuid                               ## PRODUCES ## SystemTable
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion   ## CONSUMES
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SmbiosDxeExtra.uni

@@ -1,8 +1,12 @@
 ## @file
-# Component name for module Ip4Config
+#  This module produces EFI IPv4 Configuration Protocol.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI IPv4 Configuration Protocol upon EFI MNP Protocol,
+#  to performs platform- and policy-dependent configuration for the EFI IPv4
+#  Protocol driver. It installs EFI HII Configuration Access Protocol to provide
+#  one way to configurate the IPv4 network setting.
 #
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -17,6 +21,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Ip4ConfigDxe
+  MODULE_UNI_FILE                = Ip4ConfigDxe.uni
   FILE_GUID                      = 26841BDE-920A-4e7a-9FBE-637F477143A6
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -56,15 +61,31 @@
   HiiLib
   PrintLib
   DpcLib
+  DevicePathLib
 
 [Protocols]
-  gEfiDhcp4ServiceBindingProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
-  gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
-  gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
-  gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiDhcp4ProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ConfigProtocolGuid                     ## BY_START
+  gEfiManagedNetworkServiceBindingProtocolGuid  ## TO_START
+  gEfiManagedNetworkProtocolGuid                ## TO_START
+  gEfiDhcp4ServiceBindingProtocolGuid           ## TO_START
+  gEfiDhcp4ProtocolGuid                         ## TO_START
+  gEfiHiiConfigAccessProtocolGuid               ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
 
 [Guids]
-  gEfiNicIp4ConfigVariableGuid                  ## CONSUMES ## Guid
-  gNicIp4ConfigNvDataGuid                       ## PRODUCES ## Guid
+  ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## Variable
+  ## SOMETIMES_CONSUMES ## Variable
+  ## SOMETIMES_PRODUCES ## GUID # Device Path Node
+  gEfiNicIp4ConfigVariableGuid
+  ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData     EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_CONSUMES ## HII
+  gNicIp4ConfigNvDataGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Ip4ConfigDxeExtra.uni

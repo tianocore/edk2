@@ -1,12 +1,9 @@
 ## @file
-#  
-#  Component Description File For UhciDxe Module.
-#
-#  UhciDxe driver is responsible for managing the behavior of UHCI controller. 
+#  The UhciDxe driver is responsible for managing the behavior of UHCI controller. 
 #  It implements the interfaces of monitoring the status of all ports and transferring
 #  Control, Bulk, Interrupt and Isochronous requests to Usb1.x device
 #
-#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UhciDxe
+  MODULE_UNI_FILE                = UhciDxe.uni
   FILE_GUID                      = 2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -60,7 +58,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport  ## SOMETIME_CONSUMES (enable/disable usb legacy support.)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport  ## CONSUMES
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -74,15 +72,15 @@
   ReportStatusCodeLib
 
 [Guids]
-  gEfiEventExitBootServicesGuid                 ## PRODUCES ## Event
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
 
 [Protocols]
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiUsb2HcProtocolGuid                        ## BY_START
 
 # [Event]
-#   ##
-#   # Periodic timer event for checking the result of interrupt transfer execution.
-#   #
-#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+# EVENT_TYPE_PERIODIC_TIMER       ## CONSUMES
 #
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UhciDxeExtra.uni

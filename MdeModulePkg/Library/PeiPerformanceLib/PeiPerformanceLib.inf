@@ -1,12 +1,11 @@
-## @file
-#  
+## @file 
 #  Performance library instance used in PEI phase.
 #  
 #  This library provides the performance measurement interfaces in PEI phase, it creates
 #  and consumes GUIDed HOB for performance logging. The GUIDed HOB is passed to DXE phase
 #  so that it can be taken over by DxeCorePerformanceLib.  
 #  
-#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiPerformanceLib
+  MODULE_UNI_FILE                = PeiPerformanceLib.uni
   FILE_GUID                      = F72DE735-B24F-4ef6-897F-70A85D01A047
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -50,9 +50,13 @@
 
 
 [Guids]
-  gPerformanceProtocolGuid     ## PRODUCES ## HOB
-  gPerformanceExProtocolGuid   ## PRODUCES ## HOB
+  ## PRODUCES ## HOB
+  ## CONSUMES ## HOB
+  gPerformanceProtocolGuid
+  ## PRODUCES ## HOB
+  ## CONSUMES ## HOB
+  gPerformanceExProtocolGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES

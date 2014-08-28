@@ -1,8 +1,7 @@
 ## @file
-#  This driver enumerates I2C devices on I2C bus and produce I2C
-#  IO Protocol on I2C devices.
+#  This driver enumerates I2C devices on I2C bus and produce I2C IO Protocol on I2C devices.
 #
-#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = I2cBusDxe
+  MODULE_UNI_FILE                = I2cBusDxe.uni
   FILE_GUID                      = 0C34B372-2622-4A13-A46E-BFD0DEB48BFF
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -47,8 +47,12 @@
 
 [Protocols]
   gEfiI2cIoProtocolGuid                             ## BY_START
-  gEfiI2cHostProtocolGuid                           ## BY_START
-  gEfiI2cMasterProtocolGuid                         ## TO_START
+  ## BY_START
+  ## TO_START
+  gEfiDevicePathProtocolGuid
   gEfiI2cEnumerateProtocolGuid                      ## TO_START
-  gEfiI2cBusConfigurationManagementProtocolGuid     ## TO_START
   gEfiI2cHostProtocolGuid                           ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  I2cBusDxeExtra.uni
+

@@ -2,13 +2,13 @@
 #  Performance library instance used by SMM Core.
 #  
 #  This library provides the performance measurement interfaces and initializes performance
-#  logging for the SMM phase. 
+#  logging for the SMM phase.
 #  It initializes SMM phase performance logging by publishing the SMM Performance and PerformanceEx Protocol,
 #  which is consumed by SmmPerformanceLib to logging performance data in SMM phase.
 #  This library is mainly used by SMM Core to start performance logging to ensure that
 #  SMM Performance and PerformanceEx Protocol are installed at the very beginning of SMM phase.
 #  
-#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmCorePerformanceLib
+  MODULE_UNI_FILE                = SmmCorePerformanceLib.uni
   FILE_GUID                      = 36290D10-0F47-42c1-BBCE-E191C7928DCF
   MODULE_TYPE                    = SMM_CORE
   VERSION_STRING                 = 1.0
@@ -61,8 +62,12 @@
   gEfiSmmAccess2ProtocolGuid                ## CONSUMES
 
 [Guids]
-  gSmmPerformanceProtocolGuid               ## PRODUCES
-  gSmmPerformanceExProtocolGuid             ## PRODUCES
+  ## PRODUCES ## UNDEFINED # Install protocol
+  ## CONSUMES ## UNDEFINED # SmiHandlerRegister
+  gSmmPerformanceProtocolGuid
+  ## PRODUCES ## UNDEFINED # Install protocol
+  ## CONSUMES ## UNDEFINED # SmiHandlerRegister
+  gSmmPerformanceExProtocolGuid
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES

@@ -9,7 +9,7 @@
 # 1. Universal Serial Bus HID Firmware Specification, ver 1.11
 # 2. UEFI Specification, v2.1
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +25,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UsbMouseAbsolutePointerDxe
+  MODULE_UNI_FILE                = UsbMouseAbsolutePointerDxe.uni
   FILE_GUID                      = 4EA43463-747C-46eb-97FB-B0E5C5F05306
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -64,14 +65,8 @@
   gEfiAbsolutePointerProtocolGuid               ## BY_START
 
 # [Event]
-#   ##
-#   # Periodic timer event for delayed recovery, which deals with device error.
-#   #
-#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
-#   ##
-#   # Event for EFI_ABSOLUTE_POINTER_PROTOCOL.WaitForInput
-#   #
-#   EVENT_TYPE_NOTIFY_WAIT                      ## PRODUCES
-#
+# EVENT_TYPE_RELATIVE_TIMER        ## CONSUMES
 #
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  UsbMouseAbsolutePointerDxeExtra.uni

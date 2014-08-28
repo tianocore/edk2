@@ -1,6 +1,4 @@
 ## @file
-#  Component description file for SMM Variable module.
-#
 #  This module installs SMM variable protocol into SMM protocol database,
 #  which can be used by SMM driver, and installs SMM variable protocol 
 #  into BS protocol database, which can be used to notify the SMM Runtime
@@ -28,6 +26,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VariableSmm
+  MODULE_UNI_FILE                = VariableSmm.uni
   FILE_GUID                      = 23A089B3-EED5-4ac5-B2AB-43E3298C2343
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
@@ -65,34 +64,48 @@
   PcdLib
 
 [Protocols]
-  gEfiSmmFirmwareVolumeBlockProtocolGuid        ## SOMETIMES_CONSUMES
-  gEfiSmmVariableProtocolGuid                   ## ALWAYS_PRODUCES
-  gEfiSmmFaultTolerantWriteProtocolGuid         ## SOMETIMES_CONSUMES
-  gEfiSmmAccess2ProtocolGuid                    ## ALWAYS_CONSUMES
-  gEfiSmmEndOfDxeProtocolGuid                   ## ALWAYS_CONSUMES
+  gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
+  ## CONSUMES
+  ## NOTIFY
+  gEfiSmmFaultTolerantWriteProtocolGuid
+  ## PRODUCES
+  ## UNDEFINED # SmiHandlerRegister
+  gEfiSmmVariableProtocolGuid
+  gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
+  gEfiSmmEndOfDxeProtocolGuid                   ## CONSUMES
 
 [Guids]
-  gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
-  gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
-  gSmmVariableWriteGuid                         ## PRODUCES ## SMM Variable Write Guid 
-  gEfiSystemNvDataFvGuid                        ## CONSUMES
-  gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
-  gEdkiiFaultTolerantWriteGuid                  ## CONSUMES
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiVariableGuid
+  ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRecSupport"
+  gEfiGlobalVariableGuid
+  gSmmVariableWriteGuid                         ## PRODUCES             ## UNDEFINED # Install protocol
+  gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
+  gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRec####"
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEdkiiFaultTolerantWriteGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                ## CONSUMES
   
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## CONSUMES # statistic the information of variable.
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics   ## CONSUMES # statistic the information of variable.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate  ## CONSUMES
 
 [Depex]
   TRUE
 
-    
+[UserExtensions.TianoCore."ExtraFiles"]
+  VariableSmmExtra.uni

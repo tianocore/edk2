@@ -4,7 +4,7 @@
 #  This driver installs AtaPassThru and ExtScsiPassThru protocol in each ide/sata controller
 #  to access to all attached Ata/Atapi devices.
 #
-#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AtaAtapiPassThruDxe
+  MODULE_UNI_FILE                = AtaAtapiPassThruDxe.uni
   FILE_GUID                      = 5E523CB4-D397-4986-87BD-A6DD8B22F455
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -61,11 +62,17 @@
   PcdLib
 
 [Protocols]
-  gEfiAtaPassThruProtocolGuid                   # BY_START
-  gEfiExtScsiPassThruProtocolGuid               # BY_START
-  gEfiIdeControllerInitProtocolGuid             # TO_START
-  gEfiDevicePathProtocolGuid                    # TO_START
-  gEfiPciIoProtocolGuid                         # TO_START
+  gEfiAtaPassThruProtocolGuid                   ## BY_START
+  gEfiExtScsiPassThruProtocolGuid               ## BY_START
+  gEfiIdeControllerInitProtocolGuid             ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable   ## SOMETIMES_CONSUMES
+
+# [Event]
+# EVENT_TYPE_PERIODIC_TIMER ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  AtaAtapiPassThruDxeExtra.uni

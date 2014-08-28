@@ -1,6 +1,8 @@
 ## @file
-# Component description file for XhcPeim PEIM to produce gPeiUsb2HostControllerPpiGuid
-# based on gPeiUsbControllerPpiGuid which is used to enable recovery function from USB Drivers.
+# The XhcPeim driver is responsible for managing the behavior of XHCI controller at PEI phase.
+#
+# It produces gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
+# which is used to enable recovery function from USB Drivers.
 #
 # Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
 #
@@ -18,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = XhciPei
+  MODULE_UNI_FILE                = XhciPei.uni
   FILE_GUID                      = 65E5746E-9C14-467d-B5B3-932A66D59F79
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -57,3 +60,5 @@
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  XhciPeiExtra.uni

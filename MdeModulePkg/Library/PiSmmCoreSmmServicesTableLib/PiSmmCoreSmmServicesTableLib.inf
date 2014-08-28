@@ -1,7 +1,7 @@
 ## @file
 # SMM Core SMM Services Table Library.
 #
-# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PiSmmCoreSmmServicesTableLib
+  MODULE_UNI_FILE                = PiSmmCoreSmmServicesTableLib.uni
   FILE_GUID                      = C427146A-2EF2-4af9-A85A-E09EA65EE47D
   MODULE_TYPE                    = SMM_CORE
   VERSION_STRING                 = 1.0
@@ -33,5 +34,3 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-[LibraryClasses]
-  DebugLib

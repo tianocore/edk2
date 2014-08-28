@@ -1,8 +1,10 @@
 ## @file
-# Component name for module Mtftp4
+#  This module produces EFI MTFTPv4 Protocol and EFI MTFTPv4 Service Binding Protocol.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI MTFTPv4 Protocol upon EFI UDPv4 Protocol, to provide
+#  basic services for client-side unicast and/or multicase TFTP operations.
 #
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -17,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Mtftp4Dxe
+  MODULE_UNI_FILE                = Mtftp4Dxe.uni
   FILE_GUID                      = DC3641B8-2FA8-4ed3-BC1F-F9962A03454B
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -63,8 +66,10 @@
 
 
 [Protocols]
-  gEfiMtftp4ServiceBindingProtocolGuid          # PROTOCOL ALWAYS_CONSUMED
-  gEfiMtftp4ProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
-  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
-  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  gEfiMtftp4ServiceBindingProtocolGuid          ## BY_START
+  gEfiUdp4ServiceBindingProtocolGuid            ## TO_START
+  gEfiMtftp4ProtocolGuid                        ## BY_START
+  gEfiUdp4ProtocolGuid                          ## TO_START
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  Mtftp4DxeExtra.uni

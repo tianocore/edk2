@@ -1,10 +1,10 @@
 ## @file
-#  Component Description File For NVM Express Host Controller Module.
+#  NVM Express Host Controller Module.
 #
 #  NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
 #  NVM Express specification.
 #
-#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = NvmExpressDxe
+  MODULE_UNI_FILE                = NvmExpressDxe.uni
   FILE_GUID                      = 5BE3BDF4-53CF-46a3-A6A9-73C34A6E5EE3
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -62,7 +63,16 @@
 
 [Protocols]
   gEfiPciIoProtocolGuid                       ## TO_START
-  gEfiDevicePathProtocolGuid                  ## TO_START
+  ## BY_START
+  ## TO_START
+  gEfiDevicePathProtocolGuid
   gEfiBlockIoProtocolGuid                     ## BY_START
   gEfiDiskInfoProtocolGuid                    ## BY_START
-  gEfiDriverSupportedEfiVersionProtocolGuid   ## BY_START
+  gEfiDriverSupportedEfiVersionProtocolGuid   ## PRODUCES
+
+# [Event]
+# EVENT_TYPE_RELATIVE_TIMER ## SOMETIMES_CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  NvmExpressDxeExtra.uni

@@ -1,4 +1,6 @@
 ## @file
+# Fault Tolerant Write Dxe Driver.
+#
 # This driver installs Fault Tolerant Write (FTW) protocol, 
 # which provides fault tolerant write capability for block devices.
 # Its implementation depends on the full functionality FVB protocol that support read, write/erase flash access.
@@ -17,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FaultTolerantWriteDxe
+  MODULE_UNI_FILE                = FaultTolerantWriteDxe.uni
   FILE_GUID                      = FE5CEA76-4F72-49e8-986F-2CD899DFFE5D
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -50,23 +53,30 @@
   ReportStatusCodeLib
 
 [Guids]
-  gEdkiiWorkingBlockSignatureGuid               ## CONSUMES ## FV Signature of Working Space Header
+  #
+  # Signature in EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER
+  #
+  ## CONSUMES           ## GUID
+  ## PRODUCES           ## GUID
+  gEdkiiWorkingBlockSignatureGuid
 
 [Protocols]
-  gEfiSwapAddressRangeProtocolGuid     | gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable          ## CONSUMES
-  gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMES
+  gEfiSwapAddressRangeProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable ## SOMETIMES_CONSUMES
+  ## NOTIFY
+  ## CONSUMES
+  gEfiFirmwareVolumeBlockProtocolGuid
   gEfiFaultTolerantWriteProtocolGuid            ## PRODUCES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable    ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase    ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize      ## CONSUMES
 
 #
 # gBS->CalculateCrc32() is consumed in EntryPoint.
@@ -77,3 +87,5 @@
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiRuntimeArchProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  FaultTolerantWriteDxeExtra.uni

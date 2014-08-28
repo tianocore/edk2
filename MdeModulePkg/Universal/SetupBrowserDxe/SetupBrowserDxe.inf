@@ -1,7 +1,9 @@
 ## @file
-# The DXE driver produces FORM BROWSER protocols defined in UEFI HII 2.1 specificatin.
+# The DXE driver produces FORM BROWSER2 protocol defined in UEFI specification.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# It also produces FormBrowserEx(2) protocol to let user register the different Hot key service. 
+#
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SetupBrowser
+  MODULE_UNI_FILE                = SetupBrowser.uni
   FILE_GUID                      = EBf342FE-B1D3-4EF8-957C-8048606FF671
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 2.0
@@ -55,21 +58,23 @@
   UefiLib
 
 [Guids]
-  gEfiIfrFrameworkGuid                          ## CONSUMES  ## GUID
-  gEfiHiiPlatformSetupFormsetGuid
-  gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES ## GUID
+  gEfiIfrFrameworkGuid                          ## SOMETIMES_CONSUMES  ## GUID
+  gEfiHiiPlatformSetupFormsetGuid               ## SOMETIMES_CONSUMES  ## GUID
+  gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES  ## GUID
 
 [Protocols]
-  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiFormBrowser2ProtocolGuid                  ## PRODUCES
   gEdkiiFormBrowserEx2ProtocolGuid              ## PRODUCES
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
   gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
-  gEfiUnicodeCollation2ProtocolGuid             ## CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiUserManagerProtocolGuid                   ## SOMETIMES_CONSUMES
   gEfiDevicePathFromTextProtocolGuid            ## SOMETIMES_CONSUMES
-  gEdkiiFormDisplayEngineProtocolGuid           ## PRODUCE
-  gEfiFormBrowserExProtocolGuid                 ## PRODUCE
+  ## CONSUMES
+  ## NOTIFY
+  gEdkiiFormDisplayEngineProtocolGuid
+  gEfiFormBrowserExProtocolGuid                 ## PRODUCES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES
@@ -77,4 +82,5 @@
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  SetupBrowserExtra.uni

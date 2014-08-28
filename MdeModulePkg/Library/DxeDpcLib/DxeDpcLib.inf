@@ -1,22 +1,21 @@
 ## @file
-#  Instance of DxeDpcLib.
-#  
-#  This module provides DPC service by consuming EFI DPC Protocol.
+#  This library instance provides DPC service by consuming EFI DPC Protocol.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
 #
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeDpcLib
+  MODULE_UNI_FILE                = DxeDpcLib.uni
   FILE_GUID                      = 38897D86-FF36-4472-AE64-1DB9AE715C81
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -41,7 +40,7 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiDpcProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiDpcProtocolGuid                  ## CONSUMES
 
 [Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SAL_DRIVER, Depex.common.DXE_SMM_DRIVER]
   gEfiDpcProtocolGuid

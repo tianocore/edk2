@@ -1,11 +1,10 @@
 ## @file
-#
 # Memory Allocation Library instance dedicated to DXE Core.
 # The implementation borrows the DxeCore Memory Allocation services as the primitive
 # for memory allocation instead of using UEFI boot servces in an indirect way.
 # It is assumed that this library instance must be linked with DxeCore in this package. 
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeCoreMemoryAllocationLib
+  MODULE_UNI_FILE                = DxeCoreMemoryAllocationLib.uni
   FILE_GUID                      = 632F3FAC-1CA4-4725-BAA2-BDECCF9A111C
   MODULE_TYPE                    = DXE_CORE
   VERSION_STRING                 = 1.0

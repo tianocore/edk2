@@ -1,11 +1,13 @@
 ## @file
+#  Dxe Crc32 Guided Section Extract library.
+#
 #  This library doesn't produce any library class. The constructor function uses 
 #  ExtractGuidedSectionLib service to register CRC32 guided section handler
 #  that parses CRC32 encapsulation section and extracts raw data.
 #
 #  It uses UEFI boot service CalculateCrc32 to authenticate 32 bit CRC value.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +21,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeCrc32GuidedSectionExtractLib
+  MODULE_UNI_FILE                = DxeCrc32GuidedSectionExtractLib.uni
   FILE_GUID                      = 387A2490-81FC-4E7C-8E0A-3E58C30FCD0B
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -46,8 +49,7 @@
   BaseMemoryLib
 
 [Guids]
-  gEfiCrc32GuidedSectionExtractionGuid             ## CONSUMES ## GUID
+  gEfiCrc32GuidedSectionExtractionGuid             ## PRODUCES ## UNDEFINED
 
 [Protocols]
-  gEfiSecurityPolicyProtocolGuid                   ## SOMETIMES_CONSUMED (Set platform override AUTH status if exist)
-  
+  gEfiSecurityPolicyProtocolGuid                   ## SOMETIMES_CONSUMES # Set platform override AUTH status if exist

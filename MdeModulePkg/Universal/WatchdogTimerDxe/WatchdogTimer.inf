@@ -1,7 +1,7 @@
 ## @file
-# Generic watchdog timer driver produceing Watchdog Timer Architectural Protocol using UEFI APIs.
+# Generic watchdog timer driver producing Watchdog Timer Architectural Protocol using UEFI APIs.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = WatchdogTimer
+  MODULE_UNI_FILE                = WatchdogTimer.uni
   FILE_GUID                      = F099D67F-71AE-4c36-B2A3-DCEB0EB2B7D8
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -44,13 +45,12 @@
 [Protocols]
   gEfiWatchdogTimerArchProtocolGuid             ## PRODUCES
 
-[depex]
+[Depex]
   gEfiTimerArchProtocolGuid
-  
+
 # [Event]
-#   ##
-#   # Relative timer event set by EFI_WATCHDOG_TIMER_ARCH_PROTOCOL.SetTimerPeriod()
-#   #
-#   EVENT_TYPE_RELATIVE_TIMER                   ## PRODUCES
+# EVENT_TYPE_RELATIVE_TIMER ## CONSUMES
 #
-#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  WatchdogTimerExtra.uni

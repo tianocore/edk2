@@ -1,20 +1,26 @@
 ## @file
-#  Component description file for IScsi module.
+#  This module produces EFI iSCSI Initiator Name Protocol.
 #
-# Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
+#  This module produces EFI iSCSI Initiator Name Protocol upon EFI TCPv4 Protocol
+#  and EFI DHCPv4 Protocol, to provide the capability to do the transport for SCSI
+#  data over TCP/IP. It installs EFI HII Configuration Access Protocol to provide
+#  one way to configurate the iSCSI setting.
 #
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IScsi4Dxe
+  MODULE_UNI_FILE                = IScsi4Dxe.uni
   FILE_GUID                      = 4579B72D-7EC4-4dd4-8486-083C86B182A7
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -81,23 +87,39 @@
   NetLib
 
 [Protocols]
+  ## PRODUCES
+  ## UNDEFINED # Variable
   gEfiIScsiInitiatorNameProtocolGuid
-  gEfiTcp4ProtocolGuid
-  gEfiExtScsiPassThruProtocolGuid
+  gEfiExtScsiPassThruProtocolGuid               ## BY_START
+  gEfiTcp4ProtocolGuid                          ## TO_START
+  gEfiTcp4ServiceBindingProtocolGuid            ## TO_START
+  gEfiDhcp4ProtocolGuid                         ## TO_START
+  gEfiDhcp4ServiceBindingProtocolGuid           ## TO_START
+  ## TO_START
+  ## PRODUCES
   gEfiDevicePathProtocolGuid
-  gEfiTcp4ServiceBindingProtocolGuid
-  gEfiHiiDatabaseProtocolGuid
-  gEfiHiiConfigAccessProtocolGuid
-  gEfiPciIoProtocolGuid
-  gEfiAcpiTableProtocolGuid
-  gEfiDhcp4ProtocolGuid
-  gEfiDhcp4ServiceBindingProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiEventExitBootServicesGuid
-  gEfiIfrTianoGuid                              ## CONSUMES ## GUID
-  gEfiAcpiTableGuid                             ## CONSUMES ## GUID
-  gEfiAcpi10TableGuid                           ## CONSUMES ## GUID
-  gEfiAcpi20TableGuid                           ## CONSUMES ## GUID
-  gIp4IScsiConfigGuid                           ## PRODUCES ## GUID
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED
+  gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
+  ## SOMETIMES_PRODUCES ## Variable:L"iSCSIDeviceList"
+  ## SOMETIMES_CONSUMES ## Variable:L"iSCSIDeviceList"
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mVendorStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr mVendorStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiGetBrowserData     mVendorStorageName
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiSetBrowserData     mVendorStorageName
+  ## SOMETIMES_CONSUMES ## HII
+  gIp4IScsiConfigGuid
+  ## SOMETIMES_PRODUCES ## Variable
+  ## SOMETIMES_CONSUMES ## Variable
   gIScsiCHAPAuthInfoGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IScsi4DxeExtra.uni

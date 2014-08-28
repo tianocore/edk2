@@ -3,10 +3,10 @@
 #  
 #  This library instance provides infrastructure for SMM drivers to log performance
 #  data. It consumes SMM PerformanceEx or Performance Protocol published by SmmCorePerformanceLib
-#  to log performance data. If both SMM PerformanceEx and Performance Protocol are not available, it does not log any
-#  performance information.
+#  to log performance data. If both SMM PerformanceEx and Performance Protocol are not available,
+#  it does not log any performance information.
 #  
-#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmPerformanceLib
+  MODULE_UNI_FILE                = SmmPerformanceLib.uni
   FILE_GUID                      = 1EDD13E6-D0CD-4432-A692-FF65C9B4F039
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
@@ -49,8 +50,8 @@
   BaseMemoryLib
 
 [Guids]
-  gSmmPerformanceProtocolGuid           ## SOMETIMES_CONSUMES
-  gSmmPerformanceExProtocolGuid         ## SOMETIMES_CONSUMES
+  gSmmPerformanceProtocolGuid           ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
+  gSmmPerformanceExProtocolGuid         ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES

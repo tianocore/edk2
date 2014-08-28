@@ -1,4 +1,6 @@
 ## @file
+#  Pei Crc32 Guided Section Extract library.
+#
 #  This library doesn't produce any library class. The constructor function uses 
 #  ExtractGuidedSectionLib service to register CRC32 guided section handler
 #  that parses CRC32 encapsulation section and extracts raw data.

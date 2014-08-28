@@ -1,8 +1,10 @@
 ## @file
 # Emulation Variable for EFI_RUNTIME_SERVICES.
 #
-# This module provides three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# This module installs variable arch protocol and variable write arch protocol to provide
+# four EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName and QueryVariableInfo.
+#
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +19,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EmuVariableRuntimeDxe
+  MODULE_UNI_FILE                = EmuVariableRuntimeDxe.uni
   FILE_GUID                      = 02B01AD5-7E59-43e8-A6D8-238180613A5A
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
@@ -56,25 +59,30 @@
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
 
 [Guids]
-  gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
-  gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
+  ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
+  gEfiGlobalVariableGuid
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiVariableGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                ## CONSUMES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics   ## CONSUMES # statistic the information of variable.
 
 [Depex]
   TRUE
 
-# [Event]
-#   ##
-#   # Event will be signaled for VIRTUAL_ADDRESS_CHANGE event.
-#   #
-#   EVENT_TYPE_NOTIFY_SIGNAL                    ## PRODUCES
-#
-#
+[UserExtensions.TianoCore."ExtraFiles"]
+  EmuVariableRuntimeDxeExtra.uni

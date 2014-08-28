@@ -1,8 +1,11 @@
 ## @file
-# Component name for module Dhcp4
+#  This module produces EFI DHCPv4 Protocol and EFI DHCPv4 Service Binding Protocol.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This module produces EFI DHCPv4 Protocol upon EFI UDPv4 Protocol, to provide the
+#  capability to collect configuration information for the EFI IPv4 Protocol drivers
+#  and to provide DHCPv4 server and PXE boot server discovery services.
 #
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -17,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Dhcp4Dxe
+  MODULE_UNI_FILE                = Dhcp4Dxe.uni
   FILE_GUID                      = 94734718-0BBC-47fb-96A5-EE7A5AE6A2AD
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -59,8 +63,10 @@
 
 
 [Protocols]
-  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
-  gEfiDhcp4ServiceBindingProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
-  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
-  gEfiDhcp4ProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiDhcp4ServiceBindingProtocolGuid           ## BY_START
+  gEfiUdp4ServiceBindingProtocolGuid            ## TO_START
+  gEfiDhcp4ProtocolGuid                         ## BY_START
+  gEfiUdp4ProtocolGuid                          ## TO_START
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  Dhcp4DxeExtra.uni

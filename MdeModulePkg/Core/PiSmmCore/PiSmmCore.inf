@@ -1,7 +1,7 @@
 ## @file
 # This module provide an SMM CIS compliant implementation of SMM Core.
 #
-# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PiSmmCore
+  MODULE_UNI_FILE                = PiSmmCore.uni
   FILE_GUID                      = E94F54CD-81EB-47ed-AEC3-856F5DC157A9
   MODULE_TYPE                    = SMM_CORE
   VERSION_STRING                 = 1.0
@@ -59,22 +60,25 @@
   TimerLib
 
 [Protocols]
-  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiSmmReadyToLockProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
-  gEfiSmmCpuIo2ProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiSmmEndOfDxeProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
-  gEfiSecurityArchProtocolGuid                  # PROTOCOL SOMETIMES_CONSUMED
-  gEfiSecurity2ArchProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMED
+  gEfiDxeSmmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
+  gEfiSmmReadyToLockProtocolGuid                ## PRODUCES
+  gEfiSmmCpuIo2ProtocolGuid                     ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gEfiSmmEndOfDxeProtocolGuid                   ## PRODUCES
+  gEfiSecurityArchProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiSecurity2ArchProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## PRODUCES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber    # SOMETIMES_CONSUMED 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable       # ALWAYS_CONSUMED
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable        ## CONSUMES
   
 [Guids]
-  gAprioriGuid                                  # ALWAYS_CONSUMED
-  gEfiEventDxeDispatchGuid                      # ALWAYS_CONSUMED
-  gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
-  gEfiEndOfDxeEventGroupGuid                    # ALWAYS_CONSUMED
+  gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
+  gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEventLegacyBootGuid                       ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PiSmmCoreExtra.uni
