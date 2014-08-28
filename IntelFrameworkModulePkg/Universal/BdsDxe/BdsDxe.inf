@@ -156,6 +156,7 @@
   gConnectConInEventGuid
   gEfiFmpCapsuleGuid                            ## SOMETIMES_CONSUMES ## GUID # FMP Capsule
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
+  gEfiUartDevicePathGuid                        ## SOMETIMES_CONSUMES ## GUID (Identify the device path for UARD device)
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
