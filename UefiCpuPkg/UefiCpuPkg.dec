@@ -1,5 +1,4 @@
 ## @file  UefiCpuPkg.dec
-#
 # This Package provides UEFI compatible CPU modules and libraries.
 #
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
@@ -17,6 +16,7 @@
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = UefiCpuPkg
+  PACKAGE_UNI_FILE               = UefiCpuPkg.uni
   PACKAGE_GUID                   = 2171df9b-0d39-45aa-ac37-2de190010d23
   PACKAGE_VERSION                = 0.3
 
@@ -41,8 +41,19 @@
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
 
+#
+# [Error.gUefiCpuPkgTokenSpaceGuid]
+#   0x80000001 | Invalid value provided.
+#
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## This value is the CPU Local Apic base address, which aligns the address on a 4-KByte boundary.
+  # @Prompt Configure base address of CPU Local Apic
+  # @Expression  0x80000001 | (gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress & 0xfff) == 0
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress|0xfee00000|UINT32|0x00000001
-  ## Specifies delay value in microseconds after sending out an INIT IPI
+  ## Specifies delay value in microseconds after sending out an INIT IPI.
+  # @Prompt Configure delay value after send an INIT IPI
   gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds|10000|UINT32|0x30000002
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  UefiCpuPkgExtra.uni
