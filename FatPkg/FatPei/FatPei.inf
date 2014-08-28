@@ -1,7 +1,7 @@
 ## @file
 #    Lite Fat driver only used in Pei Phase.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials are licensed and made available
 #  under the terms and conditions of the BSD License which accompanies this
@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FatPei
+  MODULE_UNI_FILE                = FatPei.uni
   FILE_GUID                      = 5B60CCFD-1011-4BCF-B7D1-BB99CA96A603
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -54,9 +55,9 @@
 
 
 [Guids]
-  gRecoveryOnFatUsbDiskGuid                   # ALWAYS_CONSUMED
-  gRecoveryOnFatIdeDiskGuid                   # ALWAYS_CONSUMED
-  gRecoveryOnFatFloppyDiskGuid                # ALWAYS_CONSUMED
+  gRecoveryOnFatUsbDiskGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gRecoveryOnFatIdeDiskGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gRecoveryOnFatFloppyDiskGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
 
 
 [Ppis]
@@ -71,4 +72,5 @@
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
 
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  FatPeiExtra.uni

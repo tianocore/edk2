@@ -4,7 +4,7 @@
 #  This UEFI driver detects the FAT file system in the disk.
 #  It also produces the Simple File System protocol for the consumer to
 #  perform file and directory operations on the disk.
-#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials are licensed and made available
 #  under the terms and conditions of the BSD License which accompanies this
@@ -20,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Fat
+  MODULE_UNI_FILE                = Fat.uni
   FILE_GUID                      = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -74,18 +75,20 @@
   PcdLib
 
 [Guids]
-  gEfiFileInfoGuid
-  gEfiFileSystemInfoGuid
-  gEfiFileSystemVolumeLabelInfoIdGuid
+  gEfiFileInfoGuid                      ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiFileSystemInfoGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiFileSystemVolumeLabelInfoIdGuid   ## SOMETIMES_CONSUMES   ## UNDEFINED
 
 [Protocols]
-  gEfiDiskIoProtocolGuid
-  gEfiDiskIo2ProtocolGuid
-  gEfiBlockIoProtocolGuid
-  gEfiSimpleFileSystemProtocolGuid
-  gEfiUnicodeCollationProtocolGuid
-  gEfiUnicodeCollation2ProtocolGuid
+  gEfiDiskIoProtocolGuid                ## TO_START
+  gEfiDiskIo2ProtocolGuid               ## TO_START
+  gEfiBlockIoProtocolGuid               ## TO_START
+  gEfiSimpleFileSystemProtocolGuid      ## BY_START
+  gEfiUnicodeCollationProtocolGuid      ## TO_START
+  gEfiUnicodeCollation2ProtocolGuid     ## TO_START
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang           ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang   ## SOMETIMES_CONSUMES
+[UserExtensions.TianoCore."ExtraFiles"]
+  FatExtra.uni
