@@ -1315,8 +1315,8 @@ typedef struct {
 ///
 typedef struct {
   UINT8   Type;
-  UINT8   Length;
-  UINT16  Reserved;
+  UINT16  Length;
+  UINT8   Reserved;
   UINT64  RefreshFramePhysicalAddress;
   UINT64  WatchdogControlFramePhysicalAddress;
   UINT32  WatchdogTimerGSIV;
