@@ -210,8 +210,8 @@ InternalAllocateAlignedPages (
   EFI_PHYSICAL_ADDRESS   Memory;
   EFI_PHYSICAL_ADDRESS   AlignedMemory;
   EFI_PEI_HOB_POINTERS   Hob;
-  BOOLEAN                SkipBeforeMemHob = FALSE;
-  BOOLEAN                SkipAfterMemHob = FALSE;
+  BOOLEAN                SkipBeforeMemHob;
+  BOOLEAN                SkipAfterMemHob;
   EFI_PHYSICAL_ADDRESS   HobBaseAddress;
   UINT64                 HobLength;
   EFI_MEMORY_TYPE        HobMemoryType;
@@ -267,6 +267,8 @@ InternalAllocateAlignedPages (
   // The before or after mem HOBs need to be skipped under special cases where the aligned portion
   // touches either the top or bottom of the original allocated space.
   //
+  SkipBeforeMemHob = FALSE;
+  SkipAfterMemHob  = FALSE;
   if (Memory == AlignedMemory) {
     SkipBeforeMemHob = TRUE;
   }
