@@ -124,7 +124,7 @@ private:
   SPendingAssign      *PendingAssignList;
 
 public:
-  CFormPkg (IN UINT32 BufferSize);
+  CFormPkg (IN UINT32 BufferSize = 4096);
   ~CFormPkg ();
 
   CHAR8             * IfrBinBufferGet (IN UINT32);
