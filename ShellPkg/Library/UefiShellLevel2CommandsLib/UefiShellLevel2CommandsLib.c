@@ -108,6 +108,8 @@ ShellLevel2CommandsLibConstructor (
   ShellCommandRegisterAlias(L"cd ..", L"cd..");
   ShellCommandRegisterAlias(L"cd \\", L"cd\\");
   ShellCommandRegisterAlias(L"mv", L"ren");
+  ShellCommandRegisterAlias(L"mv", L"move");
+  ShellCommandRegisterAlias(L"map", L"mount");
   //
   // These are installed in level 2 or 3...
   //
