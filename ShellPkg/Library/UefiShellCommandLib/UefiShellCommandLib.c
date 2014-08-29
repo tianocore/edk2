@@ -526,13 +526,8 @@ ShellCommandRegisterCommandName (
   //
   Node = AllocateZeroPool(sizeof(SHELL_COMMAND_INTERNAL_LIST_ENTRY));
   ASSERT(Node != NULL);
-  Node->CommandString = AllocateZeroPool(StrSize(CommandString));
+  Node->CommandString = AllocateCopyPool(StrSize(CommandString), CommandString);
   ASSERT(Node->CommandString != NULL);
-
-  //
-  // populate the new struct
-  //
-  StrCpy(Node->CommandString, CommandString);
 
   Node->GetManFileName  = GetManFileName;
   Node->CommandHandler  = CommandHandler;
@@ -792,16 +787,10 @@ ShellCommandRegisterAlias (
   //
   Node = AllocateZeroPool(sizeof(ALIAS_LIST));
   ASSERT(Node != NULL);
-  Node->CommandString = AllocateZeroPool(StrSize(Command));
-  Node->Alias = AllocateZeroPool(StrSize(Alias));
+  Node->CommandString = AllocateCopyPool(StrSize(Command), Command);
+  Node->Alias = AllocateCopyPool(StrSize(Alias), Alias);
   ASSERT(Node->CommandString != NULL);
   ASSERT(Node->Alias != NULL);
-
-  //
-  // populate the new struct
-  //
-  StrCpy(Node->CommandString, Command);
-  StrCpy(Node->Alias        , Alias );
 
   InsertHeadList (&mAliasList.Link, &Node->Link);
 
@@ -1176,12 +1165,11 @@ ShellCommandAddMapItemAndUpdatePath(
     Status = EFI_OUT_OF_RESOURCES;
   } else {
     MapListNode->Flags = Flags;
-    MapListNode->MapName = AllocateZeroPool(StrSize(Name));
+    MapListNode->MapName = AllocateZeroPool(StrSize(Name), Name);
     MapListNode->DevicePath = DuplicateDevicePath(DevicePath);
     if ((MapListNode->MapName == NULL) || (MapListNode->DevicePath == NULL)){
       Status = EFI_OUT_OF_RESOURCES;
     } else {
-      StrCpy(MapListNode->MapName, Name);
       InsertTailList(&gShellMapList.Link, &MapListNode->Link);
     }
   }
