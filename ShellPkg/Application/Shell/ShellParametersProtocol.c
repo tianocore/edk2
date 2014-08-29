@@ -609,7 +609,6 @@ RemoveFileTag(
 
   @return  Status code from ShellInfoObject.NewEfiShellProtocol->WriteFile.
 **/
-STATIC
 EFI_STATUS
 WriteFileTag (
   IN SHELL_FILE_HANDLE FileHandle

@@ -3187,7 +3187,7 @@ InternalEfiShellGetListAlias(
   
   @return        The null-terminated string converted into all lowercase.  
 **/
-STATIC CHAR16 *
+CHAR16 *
 ToLower (
   CHAR16 *Str
   )

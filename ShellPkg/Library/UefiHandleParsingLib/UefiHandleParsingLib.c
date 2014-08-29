@@ -847,7 +847,6 @@ Function to add a new GUID/Name mapping.
 @retval EFI_OUT_OF_RESOURCES  A memory allocation failed
 @retval EFI_INVALID_PARAMETER Guid NameId was invalid
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 InsertNewGuidNameMapping(

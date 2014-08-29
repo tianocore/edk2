@@ -27,7 +27,6 @@
   @retval EFI_SUCCESS             The help was displayed
   @retval FI_NOT_FOUND            The command name could not be found
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 PrintDynamicCommandHelp(
