@@ -393,6 +393,7 @@ PosixFileOpen (
   // BUGBUG: assume an open of root
   // if current location, return current data
   //
+  TrailingDash = FALSE;
   if ((StrCmp (FileName, L"\\") == 0) ||
       (StrCmp (FileName, L".") == 0 && PrivateFile->IsRootDirectory)) {
 OpenRoot:
@@ -401,7 +402,6 @@ OpenRoot:
     goto Done;
   }
 
-  TrailingDash = FALSE;
   if (FileName[StrLen (FileName) - 1] == L'\\') {
     TrailingDash = TRUE;
     FileName[StrLen (FileName) - 1]  = 0;
