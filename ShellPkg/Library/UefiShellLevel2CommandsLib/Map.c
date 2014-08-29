@@ -228,13 +228,12 @@ MappingListHasType(
   // specific has priority
   //
   if (Specific != NULL) {
-    NewSpecific = AllocateZeroPool(StrSize(Specific) + sizeof(CHAR16));
+    NewSpecific = AllocateCopyPool(StrSize(Specific) + sizeof(CHAR16), Specific);
     if (NewSpecific == NULL){
       return FALSE;
     }
-    StrCpy(NewSpecific, Specific);
     if (NewSpecific[StrLen(NewSpecific)-1] != L':') {
-      StrCat(NewSpecific, L":");
+      StrnCat(NewSpecific, L":", 2);
     }
 
     if (SearchList(MapList, NewSpecific, NULL, TRUE, FALSE, L";")) {
@@ -877,13 +876,12 @@ AddMappingFromMapping(
   EFI_STATUS                      Status;
   CHAR16                          *NewSName;
   
-  NewSName = AllocateZeroPool(StrSize(SName) + sizeof(CHAR16));
+  NewSName = AllocateCopyPool(StrSize(SName) + sizeof(CHAR16), SName);
   if (NewSName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
   }
-  StrCpy(NewSName, SName);
   if (NewSName[StrLen(NewSName)-1] != L':') {
-    StrCat(NewSName, L":");
+    StrnCat(NewSName, L":", 2);
   }
 
   if (!IsNumberLetterOnly(NewSName, StrLen(NewSName)-1)) {
@@ -930,13 +928,12 @@ AddMappingFromHandle(
   EFI_STATUS                Status;
   CHAR16                    *NewSName;
   
-  NewSName = AllocateZeroPool(StrSize(SName) + sizeof(CHAR16));
+  NewSName = AllocateCopyPool(StrSize(SName) + sizeof(CHAR16), SName);
   if (NewSName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
   }
-  StrCpy(NewSName, SName);
   if (NewSName[StrLen(NewSName)-1] != L':') {
-    StrCat(NewSName, L":");
+    StrnCat(NewSName, L":", 2);
   }
 
   if (!IsNumberLetterOnly(NewSName, StrLen(NewSName)-1)) {

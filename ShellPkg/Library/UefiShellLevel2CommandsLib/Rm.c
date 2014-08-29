@@ -77,6 +77,7 @@ CascadeDelete(
   EFI_STATUS            Status;
   SHELL_PROMPT_RESPONSE *Resp;
   CHAR16                *TempName;
+  UINTN                 NewSize;
 
   Resp                  = NULL;
   ShellStatus           = SHELL_SUCCESS;
@@ -125,13 +126,14 @@ CascadeDelete(
           //
           // Update the node filename to have full path with file system identifier
           //
-          TempName = AllocateZeroPool(StrSize(Node->FullName) + StrSize(Node2->FullName));
+          NewSize = StrSize(Node->FullName) + StrSize(Node2->FullName);
+          TempName = AllocateZeroPool(NewSize);
           if (TempName == NULL) {
             ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
-            StrCpy(TempName, Node->FullName);
+            StrnCpy(TempName, Node->FullName, NewSize/sizeof(CHAR16) -1);
             TempName[StrStr(TempName, L":")+1-TempName] = CHAR_NULL;
-            StrCat(TempName, Node2->FullName);
+            StrnCat(TempName, Node2->FullName, NewSize/sizeof(CHAR16) -1 - StrLen(TempName));
             FreePool((VOID*)Node2->FullName);
             Node2->FullName = TempName;
 
