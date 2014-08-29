@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2013-2014, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -777,6 +777,9 @@ ShellCommandRegisterAlias (
   )
 {
   ALIAS_LIST *Node;
+  ALIAS_LIST *CommandAlias;
+  ALIAS_LIST *PrevCommandAlias; 
+  INTN       LexicalMatchValue;
 
   //
   // Asserts for NULL
@@ -800,10 +803,37 @@ ShellCommandRegisterAlias (
   StrCpy(Node->CommandString, Command);
   StrCpy(Node->Alias        , Alias );
 
+  InsertHeadList (&mAliasList.Link, &Node->Link);
+
   //
-  // add the new struct to the list
+  // Move a new pre-defined registered alias to its sorted ordered location in the list
   //
-  InsertTailList (&mAliasList.Link, &Node->Link);
+  for ( CommandAlias = (ALIAS_LIST *)GetFirstNode (&mAliasList.Link),
+         PrevCommandAlias = (ALIAS_LIST *)GetFirstNode (&mAliasList.Link)
+       ; !IsNull (&mAliasList.Link, &CommandAlias->Link)
+       ; CommandAlias = (ALIAS_LIST *) GetNextNode (&mAliasList.Link, &CommandAlias->Link) ) {
+    //
+    // Get Lexical comparison value between PrevCommandAlias and CommandAlias List Entry
+    //
+    LexicalMatchValue = gUnicodeCollation->StriColl (
+                                             gUnicodeCollation,
+                                             PrevCommandAlias->Alias,
+                                             CommandAlias->Alias
+                                             );
+
+    //
+    // Swap PrevCommandAlias and CommandAlias list entry if PrevCommandAlias list entry
+    // is alphabetically greater than CommandAlias list entry
+    // 
+    if (LexicalMatchValue > 0) {
+      CommandAlias = (ALIAS_LIST *) SwapListEntries (&PrevCommandAlias->Link, &CommandAlias->Link);
+    } else if (LexicalMatchValue < 0) {
+      //
+      // PrevCommandAlias entry is lexically lower than CommandAlias entry
+      //
+      break;
+    }
+  }
 
   return (RETURN_SUCCESS);
 }
