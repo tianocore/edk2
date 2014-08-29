@@ -28,23 +28,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 #include <Library/BaseLib.h>
-#include <Library/LockBoxLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/HobLib.h>
 
 /**
-  Allocate EfiACPIMemoryNVS below 4G memory address.
+  Allocate EfiReservedMemoryType below 4G memory address.
 
-  This function allocates EfiACPIMemoryNVS below 4G memory address.
+  This function allocates EfiReservedMemoryType below 4G memory address.
 
-  @param  Size         Size of memory to allocate.
+  @param  Size      Size of memory to allocate.
   
-  @return Allocated address for output.
+  @return Allocated Address for output.
 
 **/
 VOID*
-AllocateAcpiNvsMemoryBelow4G (
+AllocateReservedMemoryBelow4G (
   IN   UINTN   Size
   )
 {
@@ -58,7 +57,7 @@ AllocateAcpiNvsMemoryBelow4G (
 
   Status  = gBS->AllocatePages (
                    AllocateMaxAddress,
-                   EfiACPIMemoryNVS,
+                   EfiReservedMemoryType,
                    Pages,
                    &Address
                    );
@@ -97,8 +96,8 @@ VariableLockCapsuleLongModeBufferVariable (
 }
 
 /**
-  1. Allocate NVS memory for capsule PEIM to establish a 1:1 Virtual to Physical mapping.
-  2. Allocate NVS memroy as a stack for capsule PEIM to transfer from 32-bit mdoe to 64-bit mode.
+  1. Allocate Reserved memory for capsule PEIM to establish a 1:1 Virtual to Physical mapping.
+  2. Allocate Reserved memroy as a stack for capsule PEIM to transfer from 32-bit mdoe to 64-bit mode.
 
 **/
 VOID
@@ -177,7 +176,7 @@ PrepareContextForCapsulePei (
       TotalPagesNum = NumberOfPml4EntriesNeeded + 1;
     }
     
-    LongModeBuffer.PageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAcpiNvsMemoryBelow4G (EFI_PAGES_TO_SIZE (TotalPagesNum));
+    LongModeBuffer.PageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedMemoryBelow4G (EFI_PAGES_TO_SIZE (TotalPagesNum));
     ASSERT (LongModeBuffer.PageTableAddress != 0);
     PcdSet64 (PcdIdentifyMappingPageTablePtr, LongModeBuffer.PageTableAddress); 
   }
@@ -186,7 +185,7 @@ PrepareContextForCapsulePei (
   // Allocate stack
   //
   LongModeBuffer.StackSize        = PcdGet32 (PcdCapsulePeiLongModeStackSize);
-  LongModeBuffer.StackBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAcpiNvsMemoryBelow4G (PcdGet32 (PcdCapsulePeiLongModeStackSize));
+  LongModeBuffer.StackBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedMemoryBelow4G (PcdGet32 (PcdCapsulePeiLongModeStackSize));
   ASSERT (LongModeBuffer.StackBaseAddress != 0);  
   
   Status = gRT->SetVariable (

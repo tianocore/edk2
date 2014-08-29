@@ -56,7 +56,6 @@
   BaseMemoryLib
 
 [LibraryClasses.X64]
-  LockBoxLib
   UefiLib
   BaseMemoryLib
   HobLib  
@@ -66,10 +65,6 @@
   ## SOMETIMES_PRODUCES   ## Variable:L"CapsuleLongModeBuffer" # The long mode buffer used by IA32 Capsule PEIM to call X64 CapsuleCoalesce code to handle >4GB capsule blocks
   gEfiCapsuleVendorGuid
   gEfiFmpCapsuleGuid                            ## SOMETIMES_CONSUMES   ## GUID # FMP capsule GUID
-
-[Guids.X64]
-  gEfiAcpiVariableGuid                          ## SOMETIMES_CONSUMES   ## GUID # RestoreLockBox
-  gEfiAcpiS3ContextGuid                         ## SOMETIMES_CONSUMES   ## GUID # RestoreLockBox
 
 [Protocols]
   gEfiCapsuleArchProtocolGuid                   ## PRODUCES
