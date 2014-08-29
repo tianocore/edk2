@@ -173,6 +173,7 @@ QemuVideoControllerDriverStart (
   EFI_TPL                           OldTpl;
   EFI_STATUS                        Status;
   QEMU_VIDEO_PRIVATE_DATA           *Private;
+  BOOLEAN                           IsQxl;
   EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
   ACPI_ADR_DEVICE_PATH              AcpiDeviceNode;
   PCI_TYPE00                        Pci;
@@ -233,6 +234,12 @@ QemuVideoControllerDriverStart (
     goto ClosePciIo;
   }
   Private->Variant = Card->Variant;
+
+  //
+  // IsQxl is based on the detected Card->Variant, which at a later point might
+  // not match Private->Variant.
+  //
+  IsQxl = (BOOLEAN)(Card->Variant == QEMU_VIDEO_BOCHS);
 
   //
   // Save original PCI attributes
@@ -354,7 +361,7 @@ QemuVideoControllerDriverStart (
     break;
   case QEMU_VIDEO_BOCHS_MMIO:
   case QEMU_VIDEO_BOCHS:
-    Status = QemuVideoBochsModeSetup (Private);
+    Status = QemuVideoBochsModeSetup (Private, IsQxl);
     break;
   default:
     ASSERT (FALSE);

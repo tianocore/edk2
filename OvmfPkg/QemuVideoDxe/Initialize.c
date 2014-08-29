@@ -253,7 +253,8 @@ QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
 
 EFI_STATUS
 QemuVideoBochsModeSetup (
-  QEMU_VIDEO_PRIVATE_DATA  *Private
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  BOOLEAN                  IsQxl
   )
 {
   UINT32                                 AvailableFbSize;
@@ -262,10 +263,48 @@ QemuVideoBochsModeSetup (
   QEMU_VIDEO_BOCHS_MODES                 *VideoMode;
 
   //
-  // fetch available framebuffer size
+  // Fetch the available framebuffer size.
   //
-  AvailableFbSize  = BochsRead (Private, VBE_DISPI_INDEX_VIDEO_MEMORY_64K);
-  AvailableFbSize *= SIZE_64KB;
+  // VBE_DISPI_INDEX_VIDEO_MEMORY_64K is expected to return the size of the
+  // drawable framebuffer. Up to and including qemu-2.1 however it used to
+  // return the size of PCI BAR 0 (ie. the full video RAM size).
+  //
+  // On stdvga the two concepts coincide with each other; the full memory size
+  // is usable for drawing.
+  //
+  // On QXL however, only a leading segment, "surface 0", can be used for
+  // drawing; the rest of the video memory is used for the QXL guest-host
+  // protocol. VBE_DISPI_INDEX_VIDEO_MEMORY_64K should report the size of
+  // "surface 0", but since it doesn't (up to and including qemu-2.1), we
+  // retrieve the size of the drawable portion from a field in the QXL ROM BAR,
+  // where it is also available.
+  //
+  if (IsQxl) {
+    UINT32 Signature;
+    UINT32 DrawStart;
+
+    Signature = 0;
+    DrawStart = 0xFFFFFFFF;
+    AvailableFbSize = 0;
+    if (EFI_ERROR (
+          Private->PciIo->Mem.Read (Private->PciIo, EfiPciIoWidthUint32,
+                                PCI_BAR_IDX2, 0, 1, &Signature)) ||
+        Signature != SIGNATURE_32 ('Q', 'X', 'R', 'O') ||
+        EFI_ERROR (
+          Private->PciIo->Mem.Read (Private->PciIo, EfiPciIoWidthUint32,
+                                PCI_BAR_IDX2, 36, 1, &DrawStart)) ||
+        DrawStart != 0 ||
+        EFI_ERROR (
+          Private->PciIo->Mem.Read (Private->PciIo, EfiPciIoWidthUint32,
+                                PCI_BAR_IDX2, 40, 1, &AvailableFbSize))) {
+      DEBUG ((EFI_D_ERROR, "%a: can't read size of drawable buffer from QXL "
+        "ROM\n", __FUNCTION__));
+      return EFI_NOT_FOUND;
+    }
+  } else {
+    AvailableFbSize  = BochsRead (Private, VBE_DISPI_INDEX_VIDEO_MEMORY_64K);
+    AvailableFbSize *= SIZE_64KB;
+  }
   DEBUG ((EFI_D_VERBOSE, "%a: AvailableFbSize=0x%x\n", __FUNCTION__,
     AvailableFbSize));
 

@@ -499,7 +499,8 @@ QemuVideoCirrusModeSetup (
 
 EFI_STATUS
 QemuVideoBochsModeSetup (
-  QEMU_VIDEO_PRIVATE_DATA  *Private
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  BOOLEAN                  IsQxl
   );
 
 VOID
