@@ -2,7 +2,7 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -3214,25 +3214,20 @@ QueryTable (
   for (Index = 0; Index < Number; Index++) {
     High  = (UINT8) (Table[Index].Key >> 8);
     Low   = (UINT8) (Table[Index].Key & 0x00FF);
+
     //
     // Check if Key is in the range
+    // or if Key == Value in the table
     //
-    if (High > Low && Key >= Low && Key <= High) {
+    if ((High > Low && Key >= Low && Key <= High) 
+      || (Table[Index].Key == Key)) {
       StrnCpy (Info, Table[Index].Info, InfoLen-1);
-      StrnCat (Info, L"\n", InfoLen - StrLen(Info));
-      return Key;
-    }
-    //
-    // Check if Key == Value in the table
-    //
-    if (Table[Index].Key == Key) {
-      StrnCpy (Info, Table[Index].Info, InfoLen-1);
-      StrnCat (Info, L"\n", InfoLen - StrLen(Info));
+      StrnCat (Info, L"\n", InfoLen - 1 - StrLen(Info));
       return Key;
     }
   }
 
-  StrnCpy (Info, L"Undefined Value\n", InfoLen);
+  StrnCpy (Info, L"Undefined Value\n", InfoLen - 1);
   return QUERY_TABLE_UNFOUND;
 }
 
