@@ -1,7 +1,7 @@
 /** @file
   Main file for Drivers shell Driver1 function.
 
-  (C) Copyright 2012-2014, Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2012-2014, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -304,6 +304,11 @@ ShellCommandRunDrivers (
         }
         if (Temp2 != NULL) {
           FreePool(Temp2);
+        }
+        
+        if (ShellGetExecutionBreakFlag ()) {
+          ShellStatus = SHELL_ABORTED;
+          break;
         }
       }
     }
