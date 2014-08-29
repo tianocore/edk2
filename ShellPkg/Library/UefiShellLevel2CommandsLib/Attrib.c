@@ -1,6 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
+  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -152,6 +153,11 @@ ShellCommandRunAttrib (
                 FileNode->Info->Attribute&EFI_FILE_READ_ONLY? L'R':L' ',
                 FileNode->FileName
                );
+               
+              if (ShellGetExecutionBreakFlag()) {
+                  ShellStatus = SHELL_ABORTED;
+                  break;
+              }
             }
             Status = ShellCloseFileMetaArg(&ListOfFiles);
             ListOfFiles = NULL;
