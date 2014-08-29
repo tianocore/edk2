@@ -133,7 +133,7 @@
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
         "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
-    <Command.ARMGCC, Command.ARMLINUXGCC>
+    <Command.ARMGCC, Command.ARMLINUXGCC, command.XCODE>
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
 
 
@@ -411,7 +411,7 @@
       
 [Masm16-Code-File]
     <InputFile>
-        ?.asm16, ?.Asm16, ?.ASM16
+        ?.asm16, ?.Asm16, ?.ASM16, ?.s16, ?.S16
 
     <ExtraDependency>
         $(MAKE_FILE)
