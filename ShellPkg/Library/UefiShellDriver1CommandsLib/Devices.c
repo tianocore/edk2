@@ -1,7 +1,7 @@
 /** @file
   Main file for devices shell Driver1 function.
 
-  (C) Copyright 2012-2014, Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2012-2014, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -250,6 +250,11 @@ ShellCommandRunDevices (
         if (Name != NULL) {
           FreePool(Name);
         }
+        if (ShellGetExecutionBreakFlag ()) {
+          ShellStatus = SHELL_ABORTED;
+          break;
+        }
+        
       }
 
       if (HandleList != NULL) {
