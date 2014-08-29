@@ -1161,6 +1161,8 @@ GdbScriptAddImage (
           SymbolsAddr
           );
         fclose (GdbTempFile);
+        // This is for the lldb breakpoint only
+        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders), 1);
       } else {
         ASSERT (FALSE);
       }
@@ -1178,8 +1180,10 @@ GdbScriptAddImage (
         //
         // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
         // Hey what can you say scripting in gdb is not that great....
+        // Also used for the lldb breakpoint script. The lldb breakpoint script does
+        // not use the file, it uses the arguments.
         //
-        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer), (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders), 1);
+        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders), 1);
       } else {
         ASSERT (FALSE);
       }
@@ -1235,6 +1239,7 @@ GdbScriptRemoveImage (
         ImageContext->PdbPointer
         );
       fclose (GdbTempFile);
+      SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, 0, 0);
     } else {
       ASSERT (FALSE);
     }
@@ -1248,7 +1253,7 @@ GdbScriptRemoveImage (
       // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
       // Hey what can you say scripting in gdb is not that great....
       //
-      SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer), 0, 0);
+      SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, 0, 0);
     } else {
       ASSERT (FALSE);
     }  
