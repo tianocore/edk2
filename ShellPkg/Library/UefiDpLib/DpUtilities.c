@@ -1,7 +1,7 @@
 /** @file
   Utility functions used by the Dp application.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -144,7 +144,7 @@ GetShortPdbFileName (
   ZeroMem (UnicodeBuffer, DXE_PERFORMANCE_STRING_LENGTH * sizeof (CHAR16));
 
   if (PdbFileName == NULL) {
-    StrCpy (UnicodeBuffer, L" ");
+    StrnCpy (UnicodeBuffer, L" ", 1);
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
@@ -334,7 +334,7 @@ GetNameFromHandle (
   //
   StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_ERROR_NAME), NULL);
   ASSERT (StringPtr != NULL);
-  StrCpy (mGaugeString, StringPtr);
+  StrnCpy (mGaugeString, StringPtr, DP_GAUGE_STRING_LENGTH);
   FreePool (StringPtr);
 }
 
