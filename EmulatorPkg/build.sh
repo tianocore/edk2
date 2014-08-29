@@ -63,8 +63,17 @@ case `uname` in
         echo UnixPkg requires Snow Leopard or later OS
         exit 1
       else
-        HOST_TOOLS=XCODE32
-        TARGET_TOOLS=XCLANG
+        CLANG_VER=$(clang -ccc-host-triple x86_64-pc-win32-macho 2>&1 >/dev/null) || true
+        if [[ "$CLANG_VER" == *-ccc-host-triple* ]]
+        then
+        # only older versions of Xcode support -ccc-host-tripe, for newer versions
+        # it is -target
+          HOST_TOOLS=XCODE32
+          TARGET_TOOLS=XCODE5
+        else
+          HOST_TOOLS=XCODE32
+          TARGET_TOOLS=XCLANG
+        fi
       fi
       BUILD_NEW_SHELL="-D BUILD_NEW_SHELL"
       BUILD_FAT="-D BUILD_FAT"
@@ -190,7 +199,8 @@ do
 done
 
 PLATFORMFILE=$WORKSPACE/EmulatorPkg/EmulatorPkg.dsc
-BUILD_ROOT_ARCH=$BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR
+BUILD_DIR=$BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"
+BUILD_ROOT_ARCH=$BUILD_DIR/$PROCESSOR
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
 then
@@ -215,7 +225,16 @@ if [[ "$RUN_EMULATOR" == "yes" ]]; then
       # This .gdbinit script sets a breakpoint that loads symbols for the PE/COFFEE
       # images that get loaded in Host
       #
-      cp $WORKSPACE/EmulatorPkg/Unix/.gdbinit $BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR
+      if [[ "$CLANG_VER" == *-ccc-host-triple* ]]
+      then
+      # only older versions of Xcode support -ccc-host-tripe, for newer versions
+      # it is -target
+        cp $WORKSPACE/EmulatorPkg/Unix/lldbefi.py $BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR
+        cd $BUILD_ROOT_ARCH; /usr/bin/lldb --source $WORKSPACE/EmulatorPkg/Unix/lldbinit Host
+        exit $? 
+      else
+        cp $WORKSPACE/EmulatorPkg/Unix/.gdbinit $BUILD_OUTPUT_DIR/DEBUG_"$TARGET_TOOLS"/$PROCESSOR
+      fi
       ;;
   esac
 
