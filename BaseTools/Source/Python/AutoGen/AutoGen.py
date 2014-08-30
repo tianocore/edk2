@@ -283,15 +283,7 @@ class WorkspaceAutoGen(AutoGen):
                             ExtraData="Build target [%s] is not supported by the platform. [Valid target: %s]"
                                       % (self.BuildTarget, " ".join(self.Platform.BuildTargets)))
 
-        # Validate SKU ID
-        if not self.SkuId:
-            self.SkuId = 'DEFAULT'
-
-        if self.SkuId not in self.Platform.SkuIds:
-            EdkLogger.error("build", PARAMETER_INVALID,
-                            ExtraData="SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
-                                      % (self.SkuId, " ".join(self.Platform.SkuIds.keys())))
-
+        
         # parse FDF file to get PCDs in it, if any
         if not self.FdfFile:
             self.FdfFile = self.Platform.FlashDefinition
@@ -996,11 +988,6 @@ class PlatformAutoGen(AutoGen):
                             PcdFromModule.IsFromBinaryInf == False:
                             # Print warning message to let the developer make a determine.
                             if PcdFromModule not in PcdNotInDb:
-                            #    EdkLogger.warn("build",
-                            #                   "A PCD listed in the DSC (%s.%s, %s) is used by a module not in the FDF. If the PCD is not used by any module listed in the FDF this PCD will be ignored. " \
-                            #                   % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, self.Platform.MetaFile.Path),
-                            #                   File=self.MetaFile, \
-                            #                   ExtraData=None)
                                 PcdNotInDb.append(PcdFromModule)
                             continue
                         # If one of the Source built modules listed in the DSC is not listed in 
@@ -1105,19 +1092,6 @@ class PlatformAutoGen(AutoGen):
                                       % NoDatumTypePcdListString)
         self._NonDynamicPcdList = self._NonDynaPcdList_
         self._DynamicPcdList = self._DynaPcdList_
-        # If PCD is listed in a PcdsDynamicHii, PcdsDynamicExHii, PcdsDynamicHii or PcdsDynamicExHii
-        # section, and the PCD is not used by any module that is listed in the DSC file, the build 
-        # provide a warning message.
-        #for PcdKey in self.Platform.Pcds.keys():
-        #    Pcd = self.Platform.Pcds[PcdKey]
-        #    if Pcd not in self._DynamicPcdList + PcdNotInDb and \
-        #        Pcd.Type in [TAB_PCDS_DYNAMIC, TAB_PCDS_DYNAMIC_DEFAULT, TAB_PCDS_DYNAMIC_HII, TAB_PCDS_DYNAMIC_EX, TAB_PCDS_DYNAMIC_EX_DEFAULT, TAB_PCDS_DYNAMIC_EX_HII]:
-        #        # Print warning message to let the developer make a determine.
-                #EdkLogger.warn("build",
-                #               "A %s PCD listed in the DSC (%s.%s, %s) is not used by any module." \
-                #               % (Pcd.Type, Pcd.TokenSpaceGuidCName, Pcd.TokenCName, self.Platform.MetaFile.Path),
-                #               File=self.MetaFile, \
-                #               ExtraData=None)
         #
         # Sort dynamic PCD list to:
         # 1) If PCD's datum type is VOID* and value is unicode string which starts with L, the PCD item should 
