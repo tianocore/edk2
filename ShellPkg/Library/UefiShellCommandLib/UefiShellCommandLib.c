@@ -1165,7 +1165,7 @@ ShellCommandAddMapItemAndUpdatePath(
     Status = EFI_OUT_OF_RESOURCES;
   } else {
     MapListNode->Flags = Flags;
-    MapListNode->MapName = AllocateZeroPool(StrSize(Name), Name);
+    MapListNode->MapName = AllocateCopyPool(StrSize(Name), Name);
     MapListNode->DevicePath = DuplicateDevicePath(DevicePath);
     if ((MapListNode->MapName == NULL) || (MapListNode->DevicePath == NULL)){
       Status = EFI_OUT_OF_RESOURCES;
