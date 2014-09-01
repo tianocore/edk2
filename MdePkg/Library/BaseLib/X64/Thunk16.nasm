@@ -145,7 +145,7 @@ _EntryPoint:
 _16Gdtr:
         DW      GDT_SIZE - 1
 _16GdtrBase:
-        DQ      _NullSeg
+        DQ      0
 _16Idtr:
         DW      (1 << 10) - 1
         DD      0

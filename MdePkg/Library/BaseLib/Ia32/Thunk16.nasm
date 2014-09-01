@@ -139,7 +139,7 @@ _16Idtr:
 _16Gdtr:
         DW      GdtEnd - _NullSegDesc - 1
 _16GdtrBase:
-        DD      _NullSegDesc
+        DD      0
 
 ;------------------------------------------------------------------------------
 ; _ToUserCode() takes control in real mode before passing control to user code.
