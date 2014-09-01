@@ -111,10 +111,6 @@
   gArmPlatformTokenSpaceGuid.PL011UartInteger|0|UINT32|0x00000020
   gArmPlatformTokenSpaceGuid.PL011UartFractional|0|UINT32|0x0000002D
 
-  ## PL031 RealTimeClock
-  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0|UINT32|0x00000024
-  gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy|300000000|UINT32|0x00000022
-
   ## PL061 GPIO
   gArmPlatformTokenSpaceGuid.PcdPL061GpioBase|0x0|UINT32|0x00000025
 
@@ -147,6 +143,11 @@
 
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
+
+[PcdsFixedAtBuild.common,PcdsDynamic.common]
+  ## PL031 RealTimeClock
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0|UINT32|0x00000024
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy|300000000|UINT32|0x00000022
 
 [PcdsFixedAtBuild.ARM]
   # Stack for CPU Cores in Secure Monitor Mode
