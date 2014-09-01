@@ -80,28 +80,25 @@ _BackFromUserCode:
     ; in IA32_REGS structure. This facilitates wrapper function to extract them
     ; into that structure.
     ;
-    ; Some instructions for manipulation of segment registers have to be written
-    ; in opcode since 64-bit MASM prevents accesses to those registers.
-    ;
-    DB      16h                         ; push ss
-    DB      0eh                         ; push cs
-    DB      66h
-    call    .Base                       ; push eip
+BITS    16
+    push    ss
+    push    cs
+o32 call    dword .Base                 ; push eip
 .Base:
-    DB      66h
-    push    0                           ; reserved high order 32 bits of EFlags
-    pushfw                              ; pushfd actually
+    push    dword 0                     ; reserved high order 32 bits of EFlags
+    pushfd
     cli                                 ; disable interrupts
     push    gs
     push    fs
-    DB      6                           ; push es
-    DB      1eh                         ; push ds
-    DB      66h, 60h                    ; pushad
+    push    es
+    push    ds
+    pushad
     DB      66h, 0bah                   ; mov edx, imm32
-.ThunkAttr:     dd   0
+.ThunkAttr: dd   0
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15
     jz      .1
-    mov     eax, 15cd2401h              ; mov ax, 2401h & int 15h
+    mov     ax, 2401h
+    int     15h
     cli                                 ; disable interrupts
     jnc     .2
 .1:
@@ -111,43 +108,34 @@ _BackFromUserCode:
     or      al, 2
     out     92h, al                     ; deactivate A20M#
 .2:
-    xor     ax, ax                      ; xor eax, eax
-    mov     eax, ss                     ; mov ax, ss
-    lea     bp, [esp + IA32_REGS.size]
-    ;
-    ; rsi in the following 2 instructions is indeed bp in 16-bit code
-    ;
-    mov     [rsi - IA32_REGS.size + IA32_REGS._ESP], bp
-    DB      66h
-    mov     ebx, [rsi - IA32_REGS.size + IA32_REGS._EIP]
-    shl     ax, 4                       ; shl eax, 4
-    add     bp, ax                      ; add ebp, eax
-    mov     ax, cs
-    shl     ax, 4
-    lea     ax, [eax + ebx + (.64BitCode - .Base)]
-    DB      66h, 2eh, 89h, 87h          ; mov cs:[bx + (.64Eip - .Base)], eax
-    DW      .64Eip - .Base
+    xor     eax, eax
+    mov     ax, ss
+    lea     ebp, [esp + IA32_REGS.size]
+    mov     [bp - IA32_REGS.size + IA32_REGS._ESP], ebp
+    mov     ebx, [bp - IA32_REGS.size + IA32_REGS._EIP]
+    shl     eax, 4                      ; shl eax, 4
+    add     ebp, eax                    ; add ebp, eax
+    mov     eax, cs
+    shl     eax, 4
+    lea     eax, [eax + ebx + (.64BitCode - .Base)]
+    mov     [cs:bx + (.64Eip - .Base)], eax
     DB      66h, 0b8h                   ; mov eax, imm32
 .SavedCr4:  DD      0
-    mov     cr4, rax
-    ;
-    ; rdi in the instruction below is indeed bx in 16-bit code
-    ;
-    DB      66h, 2eh                    ; 2eh is "cs:" segment override
-    lgdt    [rdi + (SavedGdt - .Base)]
-    DB      66h
+    mov     cr4, eax
+o32 lgdt [cs:bx + (SavedGdt - .Base)]
     mov     ecx, 0c0000080h
     rdmsr
     or      ah, 1
     wrmsr
     DB      66h, 0b8h                   ; mov eax, imm32
 .SavedCr0:  DD      0
-    mov     cr0, rax
+    mov     cr0, eax
     DB      66h, 0eah                   ; jmp far cs:.64Bit
 .64Eip:     DD      0
 .SavedCs:   DW      0
 .64BitCode:
-    db      090h 
+BITS    64
+    nop
     db      048h, 0bch                 ; mov rsp, imm64
 .SavedSp:   DQ   0                     ; restore stack
     nop
@@ -169,40 +157,40 @@ _16Idtr:
 ; It will be shadowed to somewhere in memory below 1MB.
 ;------------------------------------------------------------------------------
 _ToUserCode:
-    mov     ss, edx                     ; set new segment selectors
-    mov     ds, edx
-    mov     es, edx
-    mov     fs, edx
-    mov     gs, edx
-    DB      66h
+BITS    16
+    mov     ss, dx                      ; set new segment selectors
+    mov     ds, dx
+    mov     es, dx
+    mov     fs, dx
+    mov     gs, dx
     mov     ecx, 0c0000080h
-    mov     cr0, rax                    ; real mode starts at next instruction
+    mov     cr0, eax                    ; real mode starts at next instruction
     rdmsr
     and     ah, ~1
     wrmsr
-    mov     cr4, rbp
-    mov     ss, esi                     ; set up 16-bit stack segment
-    mov     sp, bx                      ; set up 16-bit stack pointer
-    DB      66h                         ; make the following call 32-bit
-    call    .Base                       ; push eip
+    mov     cr4, ebp
+    mov     ss, si                      ; set up 16-bit stack segment
+    mov     esp, ebx                    ; set up 16-bit stack pointer
+    call    dword .Base                 ; push eip
 .Base:
-    pop     bp                          ; ebp <- address of .Base
-    push    qword [esp + IA32_REGS.size + 2]
-    lea     eax, [rsi + (.RealMode - .Base)]    ; rsi is "bp" in 16-bit code
-    push    rax
+    pop     ebp                         ; ebp <- address of .Base
+    push    word [dword esp + IA32_REGS.size + 2]
+    lea     ax, [bp + (.RealMode - .Base)]
+    push    ax
     retf                                ; execution begins at next instruction
 .RealMode:
-    DB      66h, 2eh                    ; CS and operand size override
-    lidt    [rsi + (_16Idtr - .Base)]
-    DB      66h, 61h                    ; popad
-    DB      1fh                         ; pop ds
-    DB      07h                         ; pop es
+
+o32 lidt    [cs:bp + (_16Idtr - .Base)]
+
+    popad
+    pop     ds
+    pop     es
     pop     fs
     pop     gs
-    popfw                               ; popfd
-    lea     sp, [esp + 4]               ; skip high order 32 bits of EFlags
-    DB      66h                         ; make the following retf 32-bit
-    retf                                ; transfer control to user code
+    popfd
+    lea     esp, [esp + 4]        ; skip high order 32 bits of EFlags
+
+o32 retf                                ; transfer control to user code
 
 ALIGN   8
 
@@ -245,6 +233,7 @@ GDT_SIZE equ $ - _NullSeg
 ;------------------------------------------------------------------------------
 global ASM_PFX(InternalAsmThunk16)
 ASM_PFX(InternalAsmThunk16):
+BITS    64
     push    rbp
     push    rbx
     push    rsi
@@ -300,7 +289,7 @@ ASM_PFX(InternalAsmThunk16):
     mov     [rcx], ebp                  ; save CR4 in _BackFromUserCode.SavedCr4
     and     ebp, ~30h                ; clear PAE, PSE bits
     mov     esi, r8d                    ; esi <- 16-bit stack segment
-    DB      6ah, DATA32                 ; push DATA32
+    push    DATA32
     pop     rdx                         ; rdx <- 32-bit data segment selector
     lgdt    [rcx + (_16Gdtr - _BackFromUserCode.SavedCr4)]
     mov     ss, edx

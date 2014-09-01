@@ -82,23 +82,24 @@ _BackFromUserCode:
     ; in IA32_REGS structure. This facilitates wrapper function to extract them
     ; into that structure.
     ;
+BITS    16
     push    ss
     push    cs
-    DB      66h
-    call    .Base                       ; push eip
+o32 call    dword .Base                 ; push eip
 .Base:
-    pushfw                              ; pushfd actually
+    pushfd
     cli                                 ; disable interrupts
     push    gs
     push    fs
     push    es
     push    ds
-    pushaw                              ; pushad actually
+    pushad
     DB      66h, 0bah                   ; mov edx, imm32
 .ThunkAttr: dd   0
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15
     jz      .1
-    mov     eax, 15cd2401h              ; mov ax, 2401h & int 15h
+    mov     ax, 2401h
+    int     15h
     cli                                 ; disable interrupts
     jnc     .2
 .1:
@@ -108,24 +109,17 @@ _BackFromUserCode:
     or      al, 2
     out     92h, al                     ; deactivate A20M#
 .2:
-    xor     ax, ax                      ; xor eax, eax
-    mov     eax, ss                     ; mov ax, ss
-    DB      67h
-    lea     bp, [esp + IA32_REGS.size]
-    ;
-    ; esi's in the following 2 instructions are indeed bp in 16-bit code. Fact
-    ; is "esi" in 32-bit addressing mode has the same encoding of "bp" in 16-
-    ; bit addressing mode.
-    ;
-    mov     [esi - IA32_REGS.size + IA32_REGS._ESP], bp
-    mov     ebx, [esi - IA32_REGS.size + IA32_REGS._EIP]
-    shl     ax, 4                       ; shl eax, 4
-    add     bp, ax                      ; add ebp, eax
+    xor     eax, eax
+    mov     ax, ss
+    lea     ebp, [esp + IA32_REGS.size]
+    mov     [bp - IA32_REGS.size + IA32_REGS._ESP], ebp
+    mov     bx, [bp - IA32_REGS.size + IA32_REGS._EIP]
+    shl     eax, 4                      ; shl eax, 4
+    add     ebp, eax                    ; add ebp, eax
     DB      66h, 0b8h                   ; mov eax, imm32
 .SavedCr4:  DD      0
     mov     cr4, eax
-    DB      66h
-    lgdt    [cs:edi + (SavedGdt - .Base)]
+o32 lgdt [cs:bx + (SavedGdt - .Base)]
     DB      66h, 0b8h                   ; mov eax, imm32
 .SavedCr0:  DD      0
     mov     cr0, eax
@@ -134,8 +128,7 @@ _BackFromUserCode:
     mov     ss, eax
     DB      66h, 0bch                   ; mov esp, imm32
 .SavedEsp   DD      0
-    DB      66h
-    retf                                ; return to protected mode
+o32 retf                                ; return to protected mode
 
 _EntryPoint:
         DD      _ToUserCode - ASM_PFX(m16Start)
@@ -153,45 +146,34 @@ _16GdtrBase:
 ; It will be shadowed to somewhere in memory below 1MB.
 ;------------------------------------------------------------------------------
 _ToUserCode:
-    mov     edx, ss
-    mov     ss, ecx                     ; set new segment selectors
-    mov     ds, ecx
-    mov     es, ecx
-    mov     fs, ecx
-    mov     gs, ecx
+BITS    16
+    mov     dx, ss
+    mov     ss, cx                      ; set new segment selectors
+    mov     ds, cx
+    mov     es, cx
+    mov     fs, cx
+    mov     gs, cx
     mov     cr0, eax                    ; real mode starts at next instruction
                                         ;  which (per SDM) *must* be a far JMP.
     DB      0eah
 .RealAddr: DW 0, 0
 
     mov     cr4, ebp
-    mov     ss, esi                     ; set up 16-bit stack segment
-    xchg    sp, bx                      ; set up 16-bit stack pointer
+    mov     ss, si                      ; set up 16-bit stack segment
+    xchg    esp, ebx                    ; set up 16-bit stack pointer
+    mov     bp, [esp + IA32_REGS.size]
+    mov     [cs:bp + (_BackFromUserCode.SavedSs - _BackFromUserCode)], dx
+    mov     [cs:bp + (_BackFromUserCode.SavedEsp - _BackFromUserCode)], ebx
+    lidt    [cs:bp + (_16Idtr - _BackFromUserCode)]
 
-;   mov     bp, [esp + sizeof(IA32_REGS)
-    DB      67h
-    mov     ebp, [esp + IA32_REGS.size] ; BackFromUserCode address from stack
-
-;   mov     cs:[bp + (_BackFromUserCode.SavedSs - _BackFromUserCode)], dx
-    mov     [cs:esi + (_BackFromUserCode.SavedSs - _BackFromUserCode)], edx
-
-;   mov     cs:[bp + (_BackFromUserCode.SavedEsp - _BackFromUserCode)], ebx
-    DB      2eh, 66h, 89h, 9eh
-    DW      _BackFromUserCode.SavedEsp - _BackFromUserCode
-
-;   lidt    cs:[bp + (_16Idtr - _BackFromUserCode)]
-    DB      2eh, 66h, 0fh, 01h, 9eh
-    DW      _16Idtr - _BackFromUserCode
-
-    popaw                               ; popad actually
+    popad
     pop     ds
     pop     es
     pop     fs
     pop     gs
-    popfw                                ; popfd
+    popfd
 
-    DB      66h                         ; Use 32-bit addressing for "retf" below
-    retf                                ; transfer control to user code
+o32 retf                                ; transfer control to user code
 
 ALIGN   16
 _NullSegDesc    DQ      0
@@ -221,6 +203,7 @@ GdtEnd:
 ;------------------------------------------------------------------------------
 global ASM_PFX(InternalAsmThunk16)
 ASM_PFX(InternalAsmThunk16):
+BITS    32
     push    ebp
     push    ebx
     push    esi
