@@ -72,6 +72,3 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
 
   gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
-
-  gArmTokenSpaceGuid.PcdGicDistributorBase
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
