@@ -57,7 +57,7 @@ SECTION .data
 ; These are global constant to convey information to C code.
 ;
 ASM_PFX(m16Size)         DW      InternalAsmThunk16 - ASM_PFX(m16Start)
-ASM_PFX(mThunk16Attr)    DW      _ThunkAttr - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttr - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt)          DW      _NullSeg - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase)     DW      _16GdtrBase - ASM_PFX(m16Start)
 ASM_PFX(mTransition)     DW      _EntryPoint - ASM_PFX(m16Start)
@@ -86,8 +86,8 @@ _BackFromUserCode:
     DB      16h                         ; push ss
     DB      0eh                         ; push cs
     DB      66h
-    call    @Base                       ; push eip
-@Base:
+    call    .Base                       ; push eip
+.Base:
     DB      66h
     push    0                           ; reserved high order 32 bits of EFlags
     pushfw                              ; pushfd actually
@@ -98,19 +98,19 @@ _BackFromUserCode:
     DB      1eh                         ; push ds
     DB      66h, 60h                    ; pushad
     DB      66h, 0bah                   ; mov edx, imm32
-_ThunkAttr:     dd   0
+.ThunkAttr:     dd   0
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15
-    jz      @1
+    jz      .1
     mov     eax, 15cd2401h              ; mov ax, 2401h & int 15h
     cli                                 ; disable interrupts
-    jnc     @2
-@1:
+    jnc     .2
+.1:
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL
-    jz      @2
+    jz      .2
     in      al, 92h
     or      al, 2
     out     92h, al                     ; deactivate A20M#
-@2:
+.2:
     xor     ax, ax                      ; xor eax, eax
     mov     eax, ss                     ; mov ax, ss
     lea     bp, [esp + IA32_REGS.size]
@@ -124,32 +124,32 @@ _ThunkAttr:     dd   0
     add     bp, ax                      ; add ebp, eax
     mov     ax, cs
     shl     ax, 4
-    lea     ax, [eax + ebx + (@64BitCode - @Base)]
-    DB      66h, 2eh, 89h, 87h          ; mov cs:[bx + (@64Eip - @Base)], eax
-    DW      @64Eip - @Base
+    lea     ax, [eax + ebx + (.64BitCode - .Base)]
+    DB      66h, 2eh, 89h, 87h          ; mov cs:[bx + (.64Eip - .Base)], eax
+    DW      .64Eip - .Base
     DB      66h, 0b8h                   ; mov eax, imm32
-SavedCr4:   DD      0
+.SavedCr4:  DD      0
     mov     cr4, rax
     ;
     ; rdi in the instruction below is indeed bx in 16-bit code
     ;
     DB      66h, 2eh                    ; 2eh is "cs:" segment override
-    lgdt    [rdi + (SavedGdt - @Base)]
+    lgdt    [rdi + (SavedGdt - .Base)]
     DB      66h
     mov     ecx, 0c0000080h
     rdmsr
     or      ah, 1
     wrmsr
     DB      66h, 0b8h                   ; mov eax, imm32
-SavedCr0:   DD      0
+.SavedCr0:  DD      0
     mov     cr0, rax
-    DB      66h, 0eah                   ; jmp far cs:@64Bit
-@64Eip:     DD      0
-SavedCs:    DW      0
-@64BitCode:
+    DB      66h, 0eah                   ; jmp far cs:.64Bit
+.64Eip:     DD      0
+.SavedCs:   DW      0
+.64BitCode:
     db      090h 
     db      048h, 0bch                 ; mov rsp, imm64
-SavedSp:    DQ   0                     ; restore stack
+.SavedSp:   DQ   0                     ; restore stack
     nop
     ret
 
@@ -184,16 +184,16 @@ _ToUserCode:
     mov     ss, esi                     ; set up 16-bit stack segment
     mov     sp, bx                      ; set up 16-bit stack pointer
     DB      66h                         ; make the following call 32-bit
-    call    @ToUserCodeBase                       ; push eip
-@ToUserCodeBase:
-    pop     bp                          ; ebp <- address of @ToUserCodeBase
+    call    .Base                       ; push eip
+.Base:
+    pop     bp                          ; ebp <- address of .Base
     push    qword [esp + IA32_REGS.size + 2]
-    lea     eax, [rsi + (@RealMode - @ToUserCodeBase)]    ; rsi is "bp" in 16-bit code
+    lea     eax, [rsi + (.RealMode - .Base)]    ; rsi is "bp" in 16-bit code
     push    rax
     retf                                ; execution begins at next instruction
-@RealMode:
+.RealMode:
     DB      66h, 2eh                    ; CS and operand size override
-    lidt    [rsi + (_16Idtr - @ToUserCodeBase)]
+    lidt    [rsi + (_16Idtr - .Base)]
     DB      66h, 61h                    ; popad
     DB      1fh                         ; pop ds
     DB      07h                         ; pop es
@@ -269,7 +269,7 @@ ASM_PFX(InternalAsmThunk16):
     add     edi, eax                    ; edi <- linear address of 16-bit stack
     pop     rcx
     rep     movsd                       ; copy RegSet
-    lea     ecx, [rdx + (SavedCr4 - ASM_PFX(m16Start))]
+    lea     ecx, [rdx + (_BackFromUserCode.SavedCr4 - ASM_PFX(m16Start))]
     mov     eax, edx                    ; eax <- transition code address
     and     edx, 0fh
     shl     eax, 12                     ; segment address in high order 16 bits
@@ -278,11 +278,11 @@ ASM_PFX(InternalAsmThunk16):
   
     sgdt    [rsp + 60h]       ; save GDT stack in argument space
     movzx   r10, word [rsp + 60h]   ; r10 <- GDT limit 
-    lea     r11, [rcx + (InternalAsmThunk16 - SavedCr4) + 0xf]
+    lea     r11, [rcx + (InternalAsmThunk16 - _BackFromUserCode.SavedCr4) + 0xf]
     and     r11, ~0xf            ; r11 <- 16-byte aligned shadowed GDT table in real mode buffer
     
-    mov     [rcx + (SavedGdt - SavedCr4)], r10w      ; save the limit of shadowed GDT table
-    mov     [rcx + (SavedGdt - SavedCr4) + 2], r11  ; save the base address of shadowed GDT table
+    mov     [rcx + (SavedGdt - _BackFromUserCode.SavedCr4)], r10w      ; save the limit of shadowed GDT table
+    mov     [rcx + (SavedGdt - _BackFromUserCode.SavedCr4) + 2], r11  ; save the base address of shadowed GDT table
     
     mov     rsi, [rsp + 62h]  ; rsi <- the original GDT base address
     xchg    rcx, r10                    ; save rcx to r10 and initialize rcx to be the limit of GDT table
@@ -294,25 +294,25 @@ ASM_PFX(InternalAsmThunk16):
     
     sidt    [rsp + 50h]       ; save IDT stack in argument space
     mov     rax, cr0
-    mov     [rcx + (SavedCr0 - SavedCr4)], eax
+    mov     [rcx + (_BackFromUserCode.SavedCr0 - _BackFromUserCode.SavedCr4)], eax
     and     eax, 7ffffffeh              ; clear PE, PG bits
     mov     rbp, cr4
-    mov     [rcx], ebp                  ; save CR4 in SavedCr4
+    mov     [rcx], ebp                  ; save CR4 in _BackFromUserCode.SavedCr4
     and     ebp, ~30h                ; clear PAE, PSE bits
     mov     esi, r8d                    ; esi <- 16-bit stack segment
     DB      6ah, DATA32                 ; push DATA32
     pop     rdx                         ; rdx <- 32-bit data segment selector
-    lgdt    [rcx + (_16Gdtr - SavedCr4)]
+    lgdt    [rcx + (_16Gdtr - _BackFromUserCode.SavedCr4)]
     mov     ss, edx
     pushfq
     lea     edx, [rdx + DATA16 - DATA32]
-    lea     r8, [REL @RetFromRealMode]
+    lea     r8, [REL .RetFromRealMode]
     push    r8
     mov     r8d, cs
-    mov     [rcx + (SavedCs - SavedCr4)], r8w
-    mov     [rcx + (SavedSp - SavedCr4)], rsp
-    jmp     dword far [rcx + (_EntryPoint - SavedCr4)]
-@RetFromRealMode:
+    mov     [rcx + (_BackFromUserCode.SavedCs - _BackFromUserCode.SavedCr4)], r8w
+    mov     [rcx + (_BackFromUserCode.SavedSp - _BackFromUserCode.SavedCr4)], rsp
+    jmp     dword far [rcx + (_EntryPoint - _BackFromUserCode.SavedCr4)]
+.RetFromRealMode:
     popfq
     lgdt    [rsp + 60h]       ; restore protected mode GDTR
     lidt    [rsp + 50h]       ; restore protected mode IDTR

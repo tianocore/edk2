@@ -59,7 +59,7 @@ SECTION .data
 ; These are global constant to convey information to C code.
 ;
 ASM_PFX(m16Size)         DW      InternalAsmThunk16 - ASM_PFX(m16Start)
-ASM_PFX(mThunk16Attr)    DW      _ThunkAttr - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttr - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt)          DW      _NullSegDesc - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase)     DW      _16GdtrBase - ASM_PFX(m16Start)
 ASM_PFX(mTransition)     DW      _EntryPoint - ASM_PFX(m16Start)
@@ -85,8 +85,8 @@ _BackFromUserCode:
     push    ss
     push    cs
     DB      66h
-    call    @Base                       ; push eip
-@Base:
+    call    .Base                       ; push eip
+.Base:
     pushfw                              ; pushfd actually
     cli                                 ; disable interrupts
     push    gs
@@ -95,19 +95,19 @@ _BackFromUserCode:
     push    ds
     pushaw                              ; pushad actually
     DB      66h, 0bah                   ; mov edx, imm32
-_ThunkAttr:     dd   0
+.ThunkAttr: dd   0
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15
-    jz      @1
+    jz      .1
     mov     eax, 15cd2401h              ; mov ax, 2401h & int 15h
     cli                                 ; disable interrupts
-    jnc     @2
-@1:
+    jnc     .2
+.1:
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL
-    jz      @2
+    jz      .2
     in      al, 92h
     or      al, 2
     out     92h, al                     ; deactivate A20M#
-@2:
+.2:
     xor     ax, ax                      ; xor eax, eax
     mov     eax, ss                     ; mov ax, ss
     DB      67h
@@ -122,18 +122,18 @@ _ThunkAttr:     dd   0
     shl     ax, 4                       ; shl eax, 4
     add     bp, ax                      ; add ebp, eax
     DB      66h, 0b8h                   ; mov eax, imm32
-SavedCr4:   DD      0
+.SavedCr4:  DD      0
     mov     cr4, eax
     DB      66h
-    lgdt    [cs:edi + (SavedGdt - @Base)]
+    lgdt    [cs:edi + (SavedGdt - .Base)]
     DB      66h, 0b8h                   ; mov eax, imm32
-SavedCr0:   DD      0
+.SavedCr0:  DD      0
     mov     cr0, eax
     DB      0b8h                        ; mov ax, imm16
-SavedSs     DW      0
+.SavedSs    DW      0
     mov     ss, eax
     DB      66h, 0bch                   ; mov esp, imm32
-SavedEsp    DD      0
+.SavedEsp   DD      0
     DB      66h
     retf                                ; return to protected mode
 
@@ -162,7 +162,7 @@ _ToUserCode:
     mov     cr0, eax                    ; real mode starts at next instruction
                                         ;  which (per SDM) *must* be a far JMP.
     DB      0eah
-_RealAddr: DW 0, 0
+.RealAddr: DW 0, 0
 
     mov     cr4, ebp
     mov     ss, esi                     ; set up 16-bit stack segment
@@ -172,12 +172,12 @@ _RealAddr: DW 0, 0
     DB      67h
     mov     ebp, [esp + IA32_REGS.size] ; BackFromUserCode address from stack
 
-;   mov     cs:[bp + (SavedSs - _BackFromUserCode)], dx
-    mov     [cs:esi + (SavedSs - _BackFromUserCode)], edx
+;   mov     cs:[bp + (_BackFromUserCode.SavedSs - _BackFromUserCode)], dx
+    mov     [cs:esi + (_BackFromUserCode.SavedSs - _BackFromUserCode)], edx
 
-;   mov     cs:[bp + (SavedEsp - _BackFromUserCode)], ebx
+;   mov     cs:[bp + (_BackFromUserCode.SavedEsp - _BackFromUserCode)], ebx
     DB      2eh, 66h, 89h, 9eh
-    DW      SavedEsp - _BackFromUserCode
+    DW      _BackFromUserCode.SavedEsp - _BackFromUserCode
 
 ;   lidt    cs:[bp + (_16Idtr - _BackFromUserCode)]
     DB      2eh, 66h, 0fh, 01h, 9eh
@@ -241,28 +241,28 @@ ASM_PFX(InternalAsmThunk16):
     rep     movsd                       ; copy RegSet
     mov     eax, [esp + 40]             ; eax <- address of transition code
     mov     esi, edx                    ; esi <- 16-bit stack segment
-    lea     edx, [eax + (SavedCr0 - ASM_PFX(m16Start))]
+    lea     edx, [eax + (_BackFromUserCode.SavedCr0 - ASM_PFX(m16Start))]
     mov     ecx, eax
     and     ecx, 0fh
     shl     eax, 12
     lea     ecx, [ecx + (_BackFromUserCode - ASM_PFX(m16Start))]
     mov     ax, cx
     stosd                               ; [edi] <- return address of user code
-    add     eax, _RealAddr + 4 - _BackFromUserCode
-    mov     [edx + (_RealAddr - SavedCr0)], eax
-    sgdt    [edx + (SavedGdt - SavedCr0)]
+    add     eax, _ToUserCode.RealAddr + 4 - _BackFromUserCode
+    mov     [edx + (_ToUserCode.RealAddr - _BackFromUserCode.SavedCr0)], eax
+    sgdt    [edx + (SavedGdt - _BackFromUserCode.SavedCr0)]
     sidt    [esp + 36]        ; save IDT stack in argument space
     mov     eax, cr0
-    mov     [edx], eax                  ; save CR0 in SavedCr0
+    mov     [edx], eax                  ; save CR0 in _BackFromUserCode.SavedCr0
     and     eax, 7ffffffeh              ; clear PE, PG bits
     mov     ebp, cr4
-    mov     [edx + (SavedCr4 - SavedCr0)], ebp
+    mov     [edx + (_BackFromUserCode.SavedCr4 - _BackFromUserCode.SavedCr0)], ebp
     and     ebp, ~30h                ; clear PAE, PSE bits
     push    10h
     pop     ecx                         ; ecx <- selector for data segments
-    lgdt    [edx + (_16Gdtr - SavedCr0)]
+    lgdt    [edx + (_16Gdtr - _BackFromUserCode.SavedCr0)]
     pushfd                              ; Save df/if indeed
-    call    dword far [edx + (_EntryPoint - SavedCr0)]
+    call    dword far [edx + (_EntryPoint - _BackFromUserCode.SavedCr0)]
     popfd
     lidt    [esp + 36]        ; restore protected mode IDTR
     lea     eax, [ebp - IA32_REGS.size] ; eax <- the address of IA32_REGS
