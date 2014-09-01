@@ -252,7 +252,7 @@
   Ia32/DisableCache.asm | INTEL
 
   Ia32/GccInline.c | GCC
-  Ia32/Thunk16.S | GCC 
+  Ia32/Thunk16.nasm | GCC 
   Ia32/EnableDisableInterrupts.S | GCC 
   Ia32/EnablePaging64.S | GCC 
   Ia32/DisablePaging32.S | GCC 
