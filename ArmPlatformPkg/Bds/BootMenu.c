@@ -555,7 +555,8 @@ BootMenuUpdateBootOption (
 
     Print(L"Arguments to pass to the binary: ");
     if (CmdLineSize > 0) {
-      AsciiStrnCpy(CmdLine, (CONST CHAR8*)(LinuxArguments + 1), CmdLineSize);
+      AsciiStrnCpy (CmdLine, (CONST CHAR8*)(LinuxArguments + 1), sizeof (CmdLine));
+      CmdLine[sizeof (CmdLine) - 1] = '\0';
     } else {
       CmdLine[0] = '\0';
     }
@@ -581,10 +582,29 @@ BootMenuUpdateBootOption (
     if (BootOption->OptionalDataSize > 0) {
       IsPrintable = IsPrintableString (BootOption->OptionalData, &IsUnicode);
       if (IsPrintable) {
+          //
+          // The size in bytes of the string, final zero included, should
+          // be equal to or at least lower than "BootOption->OptionalDataSize"
+          // and the "IsPrintableString()" has already tested that the length
+          // in number of characters is smaller than BOOT_DEVICE_OPTION_MAX,
+          // final '\0' included. We can thus copy the string for editing
+          // using "CopyMem()". Furthermore, note that in the case of an Unicode
+          // string "StrnCpy()" and "StrCpy()" can not be used to copy the
+          // string because the data pointed to by "BootOption->OptionalData"
+          // is not necessarily 2-byte aligned.
+          //
         if (IsUnicode) {
-          StrnCpy (UnicodeCmdLine, BootOption->OptionalData, BootOption->OptionalDataSize / 2);
+          CopyMem (
+            UnicodeCmdLine, BootOption->OptionalData,
+            MIN (sizeof (UnicodeCmdLine),
+                 BootOption->OptionalDataSize)
+            );
         } else {
-          AsciiStrnCpy (CmdLine, BootOption->OptionalData, BootOption->OptionalDataSize);
+          CopyMem (
+            CmdLine, BootOption->OptionalData,
+            MIN (sizeof (CmdLine),
+                 BootOption->OptionalDataSize)
+            );
         }
       }
     } else {
