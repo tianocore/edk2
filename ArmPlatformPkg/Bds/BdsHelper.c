@@ -404,7 +404,9 @@ IsUnicodeString (
  * Some limitations:
  *   - it only supports unicode string that use ASCII character (< 0x100)
  *   - single character ASCII strings are interpreted as Unicode string
- *   - string cannot be longer than 2 x BOOT_DEVICE_OPTION_MAX (600 bytes)
+ *   - string cannot be longer than BOOT_DEVICE_OPTION_MAX characters and
+ *     thus (BOOT_DEVICE_OPTION_MAX*2) bytes for an Unicode string and
+ *     BOOT_DEVICE_OPTION_MAX bytes for an ASCII string.
  *
  * @param String    Buffer that might contain a Unicode or Ascii string
  * @param IsUnicode If not NULL this boolean value returns if the string is an
@@ -446,7 +448,7 @@ IsPrintableString (
   }
 
   IsPrintable = FALSE;
-  for (Index = 0; Index < BOOT_DEVICE_OPTION_MAX * 2; Index++) {
+  for (Index = 0; Index < BOOT_DEVICE_OPTION_MAX; Index++) {
     if (UnicodeDetected) {
       Character = ((CHAR16*)String)[Index];
     } else {
