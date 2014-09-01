@@ -670,7 +670,7 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #
 # Other Supported Tools
 # =====================
-#   NASM                 2.0.3   http://www.nasm.us/
+#   NASM 2.0.7 or later                 http://www.nasm.us/
 #
 ####################################################################################
 ####################################################################################
