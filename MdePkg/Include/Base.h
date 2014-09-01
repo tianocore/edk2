@@ -79,21 +79,20 @@ VERIFY_SIZE_OF (CHAR16, 2);
 #endif
 
 //
-// For symbol name in GNU assembly code, an extra "_" is necessary
+// For symbol name in assembly code, an extra "_" is sometimes necessary
 //
-#if defined(__GNUC__)
-  ///
-  /// Private worker functions for ASM_PFX()
-  ///
-  #define _CONCATENATE(a, b)  __CONCATENATE(a, b)
-  #define __CONCATENATE(a, b) a ## b
 
-  ///
-  /// The __USER_LABEL_PREFIX__ macro predefined by GNUC represents the prefix
-  /// on symbols in assembly language.
-  ///
-  #define ASM_PFX(name) _CONCATENATE (__USER_LABEL_PREFIX__, name)
-#endif
+///
+/// Private worker functions for ASM_PFX()
+///
+#define _CONCATENATE(a, b)  __CONCATENATE(a, b)
+#define __CONCATENATE(a, b) a ## b
+
+///
+/// The __USER_LABEL_PREFIX__ macro predefined by GNUC represents the prefix
+/// on symbols in assembly language.
+///
+#define ASM_PFX(name) _CONCATENATE (__USER_LABEL_PREFIX__, name)
 
 #if __APPLE__
   //
