@@ -25,9 +25,11 @@ PreparePlatformHardware (
 {
   //Note: Interrupts will be disabled by the GIC driver when ExitBootServices() will be called.
 
-  // Clean, invalidate, disable data cache
-  ArmDisableDataCache();
-  ArmCleanInvalidateDataCache();
+  // Clean before Disable else the Stack gets corrupted with old data.
+  ArmCleanDataCache ();
+  ArmDisableDataCache ();
+  // Invalidate all the entries that might have snuck in.
+  ArmInvalidateDataCache ();
 
   // Invalidate and disable the Instruction cache
   ArmDisableInstructionCache ();
