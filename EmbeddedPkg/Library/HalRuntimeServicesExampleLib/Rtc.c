@@ -3,6 +3,7 @@
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2014, ARM Ltd. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -246,33 +247,33 @@ ConvertEfiTimeToRtcTime (
   }
 }
 
+/**
+  Check the validity of all the fields of a data structure of type EFI_TIME
+
+  @param[in]  Time  Pointer to a data structure of type EFI_TIME that defines a date and time
+
+  @retval  EFI_SUCCESS            All date and time fields are valid
+  @retval  EFI_INVALID_PARAMETER  At least one date or time field is not valid
+**/
 EFI_STATUS
 RtcTimeFieldsValid (
   IN EFI_TIME *Time
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-  Returns:
---*/
-// TODO:    Time - add argument and description to function comment
-// TODO:    EFI_INVALID_PARAMETER - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
-  if (Time->Year < 1998 ||
-      Time->Year > 2099 ||
-      Time->Month < 1 ||
-      Time->Month > 12 ||
-      (!DayValid (Time)) ||
-      Time->Hour > 23 ||
-      Time->Minute > 59 ||
-      Time->Second > 59 ||
-      Time->Nanosecond > 999999999 ||
-      (!(Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE || (Time->TimeZone >= -1440 && Time->TimeZone <= 1440))) ||
-      (Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT)))
+  if ((Time->Year       < 1998     )                      ||
+      (Time->Year       > 2099     )                      ||
+      (Time->Month      < 1        )                      ||
+      (Time->Month      > 12       )                      ||
+      (!DayValid (Time))                                  ||
+      (Time->Hour       > 23       )                      ||
+      (Time->Minute     > 59       )                      ||
+      (Time->Second     > 59       )                      ||
+      (Time->Nanosecond > 999999999)                      ||
+      ((Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
+       ((Time->TimeZone < -1440) ||
+        (Time->TimeZone > 1440 )   )                  )  ||
+      (Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT |
+                           EFI_TIME_IN_DAYLIGHT      )))
       ) {
     return EFI_INVALID_PARAMETER;
   }
