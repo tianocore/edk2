@@ -52,7 +52,5 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
 
-  gArmTokenSpaceGuid.PcdArmPrimaryCore
-
 [Depex]
   gEfiCpuArchProtocolGuid
