@@ -59,7 +59,7 @@ SECTION .data
 ; These are global constant to convey information to C code.
 ;
 ASM_PFX(m16Size)         DW      InternalAsmThunk16 - ASM_PFX(m16Start)
-ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttr - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttrEnd - 4 - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt)          DW      _NullSegDesc - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase)     DW      _16GdtrBase - ASM_PFX(m16Start)
 ASM_PFX(mTransition)     DW      _EntryPoint - ASM_PFX(m16Start)
@@ -94,8 +94,8 @@ o32 call    dword .Base                 ; push eip
     push    es
     push    ds
     pushad
-    DB      66h, 0bah                   ; mov edx, imm32
-.ThunkAttr: dd   0
+    mov     edx, strict dword 0
+.ThunkAttrEnd:
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15
     jz      .1
     mov     ax, 2401h
@@ -116,18 +116,18 @@ o32 call    dword .Base                 ; push eip
     mov     bx, [bp - IA32_REGS.size + IA32_REGS._EIP]
     shl     eax, 4                      ; shl eax, 4
     add     ebp, eax                    ; add ebp, eax
-    DB      66h, 0b8h                   ; mov eax, imm32
-.SavedCr4:  DD      0
+    mov     eax, strict dword 0
+.SavedCr4End:
     mov     cr4, eax
 o32 lgdt [cs:bx + (SavedGdt - .Base)]
-    DB      66h, 0b8h                   ; mov eax, imm32
-.SavedCr0:  DD      0
+    mov     eax, strict dword 0
+.SavedCr0End:
     mov     cr0, eax
-    DB      0b8h                        ; mov ax, imm16
-.SavedSs    DW      0
+    mov     ax, strict word 0
+.SavedSsEnd:
     mov     ss, eax
-    DB      66h, 0bch                   ; mov esp, imm32
-.SavedEsp   DD      0
+    mov     esp, strict dword 0
+.SavedEspEnd:
 o32 retf                                ; return to protected mode
 
 _EntryPoint:
@@ -155,15 +155,14 @@ BITS    16
     mov     gs, cx
     mov     cr0, eax                    ; real mode starts at next instruction
                                         ;  which (per SDM) *must* be a far JMP.
-    DB      0eah
-.RealAddr: DW 0, 0
-
+    jmp     0:strict word 0
+.RealAddrEnd:
     mov     cr4, ebp
     mov     ss, si                      ; set up 16-bit stack segment
     xchg    esp, ebx                    ; set up 16-bit stack pointer
     mov     bp, [esp + IA32_REGS.size]
-    mov     [cs:bp + (_BackFromUserCode.SavedSs - _BackFromUserCode)], dx
-    mov     [cs:bp + (_BackFromUserCode.SavedEsp - _BackFromUserCode)], ebx
+    mov     [cs:bp + (_BackFromUserCode.SavedSsEnd - 2 - _BackFromUserCode)], dx
+    mov     [cs:bp + (_BackFromUserCode.SavedEspEnd - 4 - _BackFromUserCode)], ebx
     lidt    [cs:bp + (_16Idtr - _BackFromUserCode)]
 
     popad
@@ -224,28 +223,28 @@ BITS    32
     rep     movsd                       ; copy RegSet
     mov     eax, [esp + 40]             ; eax <- address of transition code
     mov     esi, edx                    ; esi <- 16-bit stack segment
-    lea     edx, [eax + (_BackFromUserCode.SavedCr0 - ASM_PFX(m16Start))]
+    lea     edx, [eax + (_BackFromUserCode.SavedCr0End - ASM_PFX(m16Start))]
     mov     ecx, eax
     and     ecx, 0fh
     shl     eax, 12
     lea     ecx, [ecx + (_BackFromUserCode - ASM_PFX(m16Start))]
     mov     ax, cx
     stosd                               ; [edi] <- return address of user code
-    add     eax, _ToUserCode.RealAddr + 4 - _BackFromUserCode
-    mov     [edx + (_ToUserCode.RealAddr - _BackFromUserCode.SavedCr0)], eax
-    sgdt    [edx + (SavedGdt - _BackFromUserCode.SavedCr0)]
+    add     eax, _ToUserCode.RealAddrEnd - _BackFromUserCode
+    mov     [edx + (_ToUserCode.RealAddrEnd - 4 - _BackFromUserCode.SavedCr0End)], eax
+    sgdt    [edx + (SavedGdt - _BackFromUserCode.SavedCr0End)]
     sidt    [esp + 36]        ; save IDT stack in argument space
     mov     eax, cr0
-    mov     [edx], eax                  ; save CR0 in _BackFromUserCode.SavedCr0
+    mov     [edx - 4], eax                  ; save CR0 in _BackFromUserCode.SavedCr0End - 4
     and     eax, 7ffffffeh              ; clear PE, PG bits
     mov     ebp, cr4
-    mov     [edx + (_BackFromUserCode.SavedCr4 - _BackFromUserCode.SavedCr0)], ebp
+    mov     [edx + (_BackFromUserCode.SavedCr4End - 4 - _BackFromUserCode.SavedCr0End)], ebp
     and     ebp, ~30h                ; clear PAE, PSE bits
     push    10h
     pop     ecx                         ; ecx <- selector for data segments
-    lgdt    [edx + (_16Gdtr - _BackFromUserCode.SavedCr0)]
+    lgdt    [edx + (_16Gdtr - _BackFromUserCode.SavedCr0End)]
     pushfd                              ; Save df/if indeed
-    call    dword far [edx + (_EntryPoint - _BackFromUserCode.SavedCr0)]
+    call    dword far [edx + (_EntryPoint - _BackFromUserCode.SavedCr0End)]
     popfd
     lidt    [esp + 36]        ; restore protected mode IDTR
     lea     eax, [ebp - IA32_REGS.size] ; eax <- the address of IA32_REGS

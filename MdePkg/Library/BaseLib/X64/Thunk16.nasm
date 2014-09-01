@@ -57,7 +57,7 @@ SECTION .data
 ; These are global constant to convey information to C code.
 ;
 ASM_PFX(m16Size)         DW      InternalAsmThunk16 - ASM_PFX(m16Start)
-ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttr - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttrEnd - 4 - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt)          DW      _NullSeg - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase)     DW      _16GdtrBase - ASM_PFX(m16Start)
 ASM_PFX(mTransition)     DW      _EntryPoint - ASM_PFX(m16Start)
@@ -93,8 +93,8 @@ o32 call    dword .Base                 ; push eip
     push    es
     push    ds
     pushad
-    DB      66h, 0bah                   ; mov edx, imm32
-.ThunkAttr: dd   0
+    mov     edx, strict dword 0
+.ThunkAttrEnd:
     test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15
     jz      .1
     mov     ax, 2401h
@@ -117,27 +117,25 @@ o32 call    dword .Base                 ; push eip
     add     ebp, eax                    ; add ebp, eax
     mov     eax, cs
     shl     eax, 4
-    lea     eax, [eax + ebx + (.64BitCode - .Base)]
-    mov     [cs:bx + (.64Eip - .Base)], eax
-    DB      66h, 0b8h                   ; mov eax, imm32
-.SavedCr4:  DD      0
+    lea     eax, [eax + ebx + (.X64JmpEnd - .Base)]
+    mov     [cs:bx + (.X64JmpEnd - 6 - .Base)], eax
+    mov     eax, strict dword 0
+.SavedCr4End:
     mov     cr4, eax
 o32 lgdt [cs:bx + (SavedGdt - .Base)]
     mov     ecx, 0c0000080h
     rdmsr
     or      ah, 1
     wrmsr
-    DB      66h, 0b8h                   ; mov eax, imm32
-.SavedCr0:  DD      0
+    mov     eax, strict dword 0
+.SavedCr0End:
     mov     cr0, eax
-    DB      66h, 0eah                   ; jmp far cs:.64Bit
-.64Eip:     DD      0
-.SavedCs:   DW      0
-.64BitCode:
+    jmp     0:strict dword 0
+.X64JmpEnd:
 BITS    64
     nop
-    db      048h, 0bch                 ; mov rsp, imm64
-.SavedSp:   DQ   0                     ; restore stack
+    mov rsp, strict qword 0
+.SavedSpEnd:
     nop
     ret
 
@@ -258,7 +256,7 @@ BITS    64
     add     edi, eax                    ; edi <- linear address of 16-bit stack
     pop     rcx
     rep     movsd                       ; copy RegSet
-    lea     ecx, [rdx + (_BackFromUserCode.SavedCr4 - ASM_PFX(m16Start))]
+    lea     ecx, [rdx + (_BackFromUserCode.SavedCr4End - ASM_PFX(m16Start))]
     mov     eax, edx                    ; eax <- transition code address
     and     edx, 0fh
     shl     eax, 12                     ; segment address in high order 16 bits
@@ -267,11 +265,11 @@ BITS    64
   
     sgdt    [rsp + 60h]       ; save GDT stack in argument space
     movzx   r10, word [rsp + 60h]   ; r10 <- GDT limit 
-    lea     r11, [rcx + (InternalAsmThunk16 - _BackFromUserCode.SavedCr4) + 0xf]
+    lea     r11, [rcx + (InternalAsmThunk16 - _BackFromUserCode.SavedCr4End) + 0xf]
     and     r11, ~0xf            ; r11 <- 16-byte aligned shadowed GDT table in real mode buffer
     
-    mov     [rcx + (SavedGdt - _BackFromUserCode.SavedCr4)], r10w      ; save the limit of shadowed GDT table
-    mov     [rcx + (SavedGdt - _BackFromUserCode.SavedCr4) + 2], r11  ; save the base address of shadowed GDT table
+    mov     [rcx + (SavedGdt - _BackFromUserCode.SavedCr4End)], r10w      ; save the limit of shadowed GDT table
+    mov     [rcx + (SavedGdt - _BackFromUserCode.SavedCr4End) + 2], r11  ; save the base address of shadowed GDT table
     
     mov     rsi, [rsp + 62h]  ; rsi <- the original GDT base address
     xchg    rcx, r10                    ; save rcx to r10 and initialize rcx to be the limit of GDT table
@@ -283,24 +281,24 @@ BITS    64
     
     sidt    [rsp + 50h]       ; save IDT stack in argument space
     mov     rax, cr0
-    mov     [rcx + (_BackFromUserCode.SavedCr0 - _BackFromUserCode.SavedCr4)], eax
+    mov     [rcx + (_BackFromUserCode.SavedCr0End - 4 - _BackFromUserCode.SavedCr4End)], eax
     and     eax, 7ffffffeh              ; clear PE, PG bits
     mov     rbp, cr4
-    mov     [rcx], ebp                  ; save CR4 in _BackFromUserCode.SavedCr4
+    mov     [rcx - 4], ebp              ; save CR4 in _BackFromUserCode.SavedCr4End - 4
     and     ebp, ~30h                ; clear PAE, PSE bits
     mov     esi, r8d                    ; esi <- 16-bit stack segment
     push    DATA32
     pop     rdx                         ; rdx <- 32-bit data segment selector
-    lgdt    [rcx + (_16Gdtr - _BackFromUserCode.SavedCr4)]
+    lgdt    [rcx + (_16Gdtr - _BackFromUserCode.SavedCr4End)]
     mov     ss, edx
     pushfq
     lea     edx, [rdx + DATA16 - DATA32]
     lea     r8, [REL .RetFromRealMode]
     push    r8
     mov     r8d, cs
-    mov     [rcx + (_BackFromUserCode.SavedCs - _BackFromUserCode.SavedCr4)], r8w
-    mov     [rcx + (_BackFromUserCode.SavedSp - _BackFromUserCode.SavedCr4)], rsp
-    jmp     dword far [rcx + (_EntryPoint - _BackFromUserCode.SavedCr4)]
+    mov     [rcx + (_BackFromUserCode.X64JmpEnd - 2 - _BackFromUserCode.SavedCr4End)], r8w
+    mov     [rcx + (_BackFromUserCode.SavedSpEnd - 8 - _BackFromUserCode.SavedCr4End)], rsp
+    jmp     dword far [rcx + (_EntryPoint - _BackFromUserCode.SavedCr4End)]
 .RetFromRealMode:
     popfq
     lgdt    [rsp + 60h]       ; restore protected mode GDTR
