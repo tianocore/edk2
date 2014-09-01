@@ -671,8 +671,6 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 # Other Supported Tools
 # =====================
 #   NASM                 2.0.3   http://www.nasm.us/
-#                        Note: Converts NASM source to .bin. Object linking to
-#                              EDK II driver modules is not currently supported.
 #
 ####################################################################################
 ####################################################################################
