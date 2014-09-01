@@ -155,6 +155,7 @@
   Ia32/CpuId.c | MSFT 
   Ia32/CpuBreakpoint.c | MSFT 
   Ia32/ARShiftU64.c | MSFT 
+  Ia32/Thunk16.nasm | MSFT
   Ia32/Thunk16.asm | MSFT
   Ia32/EnablePaging64.asm | MSFT
   Ia32/EnableCache.c | MSFT
@@ -249,6 +250,7 @@
   Ia32/CpuId.asm | INTEL 
   Ia32/CpuBreakpoint.asm | INTEL 
   Ia32/ARShiftU64.asm | INTEL 
+  Ia32/Thunk16.nasm | INTEL
   Ia32/Thunk16.asm | INTEL
   Ia32/EnablePaging64.asm | INTEL
   Ia32/EnableCache.asm | INTEL
@@ -307,6 +309,7 @@
   X86DisablePaging32.c
 
 [Sources.X64]
+  X64/Thunk16.nasm
   X64/Thunk16.asm
   X64/CpuIdEx.asm
   X64/CpuId.asm
@@ -481,7 +484,6 @@
   X86DisablePaging64.c
   X86DisablePaging32.c
   X64/GccInline.c | GCC
-  X64/Thunk16.nasm | GCC 
   X64/Thunk16.S | XCODE 
   X64/SwitchStack.S | GCC 
   X64/SetJump.S | GCC 
