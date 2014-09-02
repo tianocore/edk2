@@ -618,7 +618,7 @@ IfconfigGetAllNicInfoByHii (
       goto ON_ERROR;
     }
     if (ConfigHdr != NULL) {
-      StrnCpy (ConfigResp, ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100);
+      StrnCpy (ConfigResp, ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100 - 1);
     }
  
     //
@@ -791,7 +791,7 @@ IfconfigSetNicAddrByHii (
     goto ON_EXIT;
   }
   if (ConfigHdr != NULL) {
-    StrnCpy (ConfigResp, ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100);
+    StrnCpy (ConfigResp, ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100 - 1);
   }
 
   NicConfig = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
