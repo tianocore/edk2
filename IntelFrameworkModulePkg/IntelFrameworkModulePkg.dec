@@ -21,7 +21,7 @@
   PACKAGE_NAME                   = IntelFrameworkModulePkg
   PACKAGE_UNI_FILE               = IntelFrameworkModulePkg.uni
   PACKAGE_GUID                   = 88894582-7553-4822-B484-624E24B6DECF
-  PACKAGE_VERSION                = 0.93
+  PACKAGE_VERSION                = 0.94
 
 [Includes]
   Include                        # Root include for the package
