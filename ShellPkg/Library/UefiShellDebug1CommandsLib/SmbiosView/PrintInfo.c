@@ -2,6 +2,7 @@
   Module for clarifying the content of the smbios structure element information.
 
   Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1532,6 +1533,10 @@ DisplayProcessorFamily (
     Print (L"AMD Opteron 4200 Series Processor\n");
     break;
 
+  case 0x3F:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_FX_SERIES), gShellDebug1HiiHandle);
+    break;
+
   case 0x40:
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MIPS_FAMILY), gShellDebug1HiiHandle);
     break;
@@ -1565,11 +1570,35 @@ DisplayProcessorFamily (
     break;
 
   case 0x48:
-    Print (L"AMD S-Series Processor\n");
+    Print (L"AMD A-Series Processor\n");
     break;
 
   case 0x49:
     Print (L"AMD G-Series Processor\n");
+    break;
+
+  case 0x4A:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_Z_SERIES), gShellDebug1HiiHandle);
+    break;
+
+  case 0x4B:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_R_SERIES), gShellDebug1HiiHandle);
+    break;
+
+  case 0x4C:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_OPTERON_4300_SERIES), gShellDebug1HiiHandle);
+    break;
+
+  case 0x4D:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_OPTERON_6300_SERIES), gShellDebug1HiiHandle);
+    break;
+
+  case 0x4E:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_OPTERON_3300_SERIES), gShellDebug1HiiHandle);
+    break;
+
+  case 0x4F:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_OPTERON_FIREPRO_SERIES), gShellDebug1HiiHandle);
     break;
 
   case 0x50:
@@ -1909,7 +1938,7 @@ DisplayProcessorFamily (
     break;
 
   case 0xCC:
-    Print (L"zArchitectur\n");
+    Print (L"zArchitecture\n");
     break;
 
   case 0xCD:
@@ -1971,6 +2000,15 @@ DisplayProcessorFamily (
   case 0xE0:
     Print (L"Multi-Core Intel Xeon processor 3400 Series\n");
     break;
+
+  case 0xE4:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_OPTERON_3000_SERIES), gShellDebug1HiiHandle);
+    break;
+
+  case 0xE5:
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_SEMPRON_II), gShellDebug1HiiHandle);
+    break;
+
 
   case 0xE6:
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_AMD_EMBEDDED_OPTERON_QUAD_CORE), gShellDebug1HiiHandle);

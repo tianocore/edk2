@@ -469,7 +469,7 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   },
   {
     0x24,
-    L"Socket BGA1155"
+    L"Socket LGA1155"
   },
   {
     0x25,
@@ -494,6 +494,14 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x2A,
     L"Socket FM2"
+  },
+  {
+    0x2B,
+    L"Socket LGA2011-3"
+  },
+  {
+    0x2C,
+    L"Socket LGA1356-3"
   }
 };
 
