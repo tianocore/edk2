@@ -20,7 +20,7 @@
   PACKAGE_NAME                   = CryptoPkg
   PACKAGE_UNI_FILE               = CryptoPkg.uni
   PACKAGE_GUID                   = 36470E80-36F2-4ba0-8CC8-937C7D9FF888
-  PACKAGE_VERSION                = 0.93
+  PACKAGE_VERSION                = 0.94
 
 [Includes]
   Include
