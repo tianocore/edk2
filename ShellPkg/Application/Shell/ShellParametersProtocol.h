@@ -190,13 +190,15 @@ ParseCommandLineToArgs(
   @param[in, out] Walker        pointer to string of command line.  Adjusted to
                                 reminaing command line on return
   @param[in, out] TempParameter pointer to string of command line item extracted.
+  @param[in]      Length        Length of (*TempParameter) in bytes
 
 **/
 VOID
 EFIAPI
 GetNextParameter(
-  CHAR16 **Walker,
-  CHAR16 **TempParameter
+  IN OUT CHAR16   **Walker,
+  IN OUT CHAR16   **TempParameter,
+  IN CONST UINTN  Length
   );
 
 #endif //_SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_

@@ -530,18 +530,17 @@ EfiShellGetDevicePathFromFilePath(
     if (Cwd == NULL) {
       return (NULL);
     }
-    Size = StrSize(Cwd);
-    Size += StrSize(Path);
+    Size = StrSize(Cwd) + StrSize(Path) - sizeof(CHAR16);
     NewPath = AllocateZeroPool(Size);
     if (NewPath == NULL) {
       return (NULL);
     }
-    StrCpy(NewPath, Cwd);
+    StrnCpy(NewPath, Cwd, Size/sizeof(CHAR16)-1);
     if (*Path == L'\\') {
       Path++;
       while (PathRemoveLastItem(NewPath)) ;
     }
-    StrCat(NewPath, Path);
+    StrnCat(NewPath, Path, Size/sizeof(CHAR16) - 1 - StrLen(NewPath));
     DevicePathForReturn = EfiShellGetDevicePathFromFilePath(NewPath);
     FreePool(NewPath);
     return (DevicePathForReturn);
@@ -1846,10 +1845,9 @@ InternalDuplicateShellFileInfo(
   if (NewNode == NULL) {
     return (NULL);
   }
-  NewNode->FullName = AllocateZeroPool(StrSize(Node->FullName));
-
-  NewNode->FileName = AllocateZeroPool(StrSize(Node->FileName));
-  NewNode->Info     = AllocateZeroPool((UINTN)Node->Info->Size);
+  NewNode->FullName = AllocateCopyPool(StrSize(Node->FullName), Node->FullName);
+  NewNode->FileName = AllocateCopyPool(StrSize(Node->FileName), Node->FileName);
+  NewNode->Info     = AllocateCopyPool((UINTN)Node->Info->Size, Node->Info);
   if ( NewNode->FullName == NULL
     || NewNode->FileName == NULL
     || NewNode->Info == NULL
@@ -1865,9 +1863,6 @@ InternalDuplicateShellFileInfo(
   if (!Save) {
     Node->Handle = NULL;
   }
-  StrCpy((CHAR16*)NewNode->FullName, Node->FullName);
-  StrCpy((CHAR16*)NewNode->FileName, Node->FileName);
-  CopyMem(NewNode->Info, Node->Info, (UINTN)Node->Info->Size);
 
   return((EFI_SHELL_FILE_INFO*)NewNode);
 }
@@ -2055,7 +2050,7 @@ EfiShellFindFilesInDir(
   }
   SHELL_FREE_NON_NULL(BasePath);
   return(Status);
-}
+  }
 
 /**
   Get the GUID value from a human readable name.
@@ -2313,8 +2308,8 @@ ShellSearchHandle(
             if (NewFullName == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
             } else {
-              StrCpy(NewFullName, MapName);
-              StrCat(NewFullName, ShellInfoNode->FullName+1);
+              StrnCpy(NewFullName, MapName, Size/sizeof(CHAR16)-1);
+              StrnCat(NewFullName, ShellInfoNode->FullName+1, (Size/sizeof(CHAR16))-StrLen(NewFullName)-1);
               FreePool((VOID*)ShellInfoNode->FullName);
               ShellInfoNode->FullName = NewFullName;
             }
@@ -2437,11 +2432,10 @@ EfiShellFindFiles(
   RootDevicePath = NULL;
   RootFileHandle = NULL;
   MapName        = NULL;
-  PatternCopy = AllocateZeroPool(StrSize(FilePattern));
+  PatternCopy = AllocateCopyPool(StrSize(FilePattern), FilePattern);
   if (PatternCopy == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
-  StrCpy(PatternCopy, FilePattern);
 
   PatternCopy = PathCleanUpDirectories(PatternCopy);
 
@@ -2645,7 +2639,7 @@ EfiShellGetEnvEx(
       ; Node = (ENV_VAR_LIST*)GetNextNode(&List, &Node->Link)
      ){
       ASSERT(Node->Key != NULL);
-      StrCpy(CurrentWriteLocation, Node->Key);
+      StrnCpy(CurrentWriteLocation, Node->Key,  (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)) - 1);
       CurrentWriteLocation += StrLen(CurrentWriteLocation) + 1;
     }
 
@@ -2669,7 +2663,6 @@ EfiShellGetEnvEx(
       // Allocate the space and recall the get function
       //
       Buffer = AllocateZeroPool(Size);
-      ASSERT(Buffer != NULL);
       Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
     }
     //

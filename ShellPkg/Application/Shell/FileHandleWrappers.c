@@ -509,21 +509,20 @@ FileInterfaceStdInRead(
         if (StrStr(CurrentString + TabPos, L":") == NULL) {
           Cwd = ShellInfoObject.NewEfiShellProtocol->GetCurDir(NULL);
           if (Cwd != NULL) {
-            StrCpy(TabStr, Cwd);
+            StrnCpy(TabStr, Cwd, (*BufferSize)/sizeof(CHAR16) - 1);
             if (TabStr[StrLen(TabStr)-1] == L'\\' && *(CurrentString + TabPos) == L'\\' ) {
               TabStr[StrLen(TabStr)-1] = CHAR_NULL;
             }
             StrnCat(TabStr, CurrentString + TabPos, (StringLen - TabPos) * sizeof (CHAR16));
           } else {
-            StrCpy(TabStr, L"");
+            *TabStr = CHAR_NULL;
             StrnCat(TabStr, CurrentString + TabPos, (StringLen - TabPos) * sizeof (CHAR16));
           }
         } else {
-          StrCpy(TabStr, CurrentString + TabPos);
+          StrnCpy(TabStr, CurrentString + TabPos, (*BufferSize)/sizeof(CHAR16) - 1);
         }
-        StrCat(TabStr, L"*");
+        StrnCat(TabStr, L"*", (*BufferSize)/sizeof(CHAR16) - 1 - StrLen(TabStr));
         FoundFileList = NULL;
-//        TabStr = PathCleanUpDirectories(TabStr);
         Status  = ShellInfoObject.NewEfiShellProtocol->FindFiles(TabStr, &FoundFileList);
         for ( TempStr = CurrentString
             ; *TempStr == L' '
@@ -1168,7 +1167,7 @@ CreateFileInterfaceEnv(
   EnvFileInterface->Delete      = FileInterfaceEnvDelete;
   EnvFileInterface->Read        = FileInterfaceEnvRead;
 
-  StrCpy(EnvFileInterface->Name, EnvName);
+  StrnCpy(EnvFileInterface->Name, EnvName, StrLen(EnvName));
 
   //
   // Assign the different members for Volatile and Non-Volatile variables

@@ -152,7 +152,7 @@ GetEnvironmentVariableList(
   if (VariableName == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
-  StrCpy(VariableName, L"");
+  *VariableName = CHAR_NULL;
 
   while (!EFI_ERROR(Status)) {
     NameSize = (UINTN)MaxVarSize;
@@ -178,13 +178,12 @@ GetEnvironmentVariableList(
           }
         }
         if (!EFI_ERROR(Status) && VarList != NULL) {
-          VarList->Key = AllocateZeroPool(StrSize(VariableName));
+          VarList->Key = AllocateCopyPool(StrSize(VariableName), VariableName);
           if (VarList->Key == NULL) {
             SHELL_FREE_NON_NULL(VarList->Val);
             SHELL_FREE_NON_NULL(VarList);
             Status = EFI_OUT_OF_RESOURCES;
           } else {
-            StrCpy(VarList->Key, VariableName);
             InsertTailList(ListHead, &VarList->Link);
           }
         }
@@ -286,7 +285,6 @@ SetEnvironmentVariables(
   UINTN         CurrentCount;
   ENV_VAR_LIST  *VarList;
   ENV_VAR_LIST  *Node;
-  UINTN         NewSize;
 
   VarList = NULL;
 
@@ -307,20 +305,44 @@ SetEnvironmentVariables(
     }
     ASSERT(StrStr(CurrentString, L"=") != NULL);
     Node = AllocateZeroPool(sizeof(ENV_VAR_LIST));
-    ASSERT(Node != NULL);
+    if (Node == NULL) {
+      SetEnvironmentVariableList(&VarList->Link);
+      return (EFI_OUT_OF_RESOURCES);
+    }
+
     Node->Key = AllocateZeroPool((StrStr(CurrentString, L"=") - CurrentString + 1) * sizeof(CHAR16));
-    ASSERT(Node->Key != NULL);
+    if (Node->Key == NULL) {
+      SHELL_FREE_NON_NULL(Node);
+      SetEnvironmentVariableList(&VarList->Link);
+      return (EFI_OUT_OF_RESOURCES);
+    }
+
+    //
+    // Copy the string into the Key, leaving the last character allocated as NULL to terminate
+    //
     StrnCpy(Node->Key, CurrentString, StrStr(CurrentString, L"=") - CurrentString);
-    NewSize = StrSize(CurrentString);
-    NewSize -= StrLen(Node->Key) - 1;
-    Node->Val = AllocateZeroPool(NewSize);
-    ASSERT(Node->Val != NULL);
-    StrCpy(Node->Val, CurrentString + StrLen(Node->Key) + 1);
+
+    //
+    // ValueSize = TotalSize - already removed size - size for '=' + size for terminator (the last 2 items cancel each other)
+    //
+    Node->Val = AllocateCopyPool(StrSize(CurrentString) - StrSize(Node->Key), CurrentString + StrLen(Node->Key) + 1);
+    if (Node->Val == NULL) {
+      SHELL_FREE_NON_NULL(Node->Key);
+      SHELL_FREE_NON_NULL(Node);
+      SetEnvironmentVariableList(&VarList->Link);
+      return (EFI_OUT_OF_RESOURCES);
+    }
+
     Node->Atts = EFI_VARIABLE_BOOTSERVICE_ACCESS;
 
     if (VarList == NULL) {
       VarList = AllocateZeroPool(sizeof(ENV_VAR_LIST));
-      ASSERT(VarList != NULL);
+      if (VarList == NULL) {
+        SHELL_FREE_NON_NULL(Node->Key);
+        SHELL_FREE_NON_NULL(Node->Val);
+        SHELL_FREE_NON_NULL(Node);
+        return (EFI_OUT_OF_RESOURCES);
+      }
       InitializeListHead(&VarList->Link);
     }
     InsertTailList(&VarList->Link, &Node->Link);

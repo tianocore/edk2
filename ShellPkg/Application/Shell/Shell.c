@@ -937,7 +937,7 @@ ProcessCommandLine(
         continue;
       }
 
-      ShellInfoObject.ShellInitSettings.FileName = AllocateZeroPool(StrSize(CurrentArg));
+      ShellInfoObject.ShellInitSettings.FileName = AllocateCopyPool(StrSize(CurrentArg), CurrentArg);
       if (ShellInfoObject.ShellInitSettings.FileName == NULL) {
         return (EFI_OUT_OF_RESOURCES);
       }
@@ -945,8 +945,6 @@ ProcessCommandLine(
       // We found `file-name`.
       //
       ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoStartup = 1;
-
-      StrCpy (ShellInfoObject.ShellInitSettings.FileName, CurrentArg);
       LoopVar++;
 
       // Add `file-name-options`
@@ -1027,10 +1025,10 @@ DoStartupScript(
     if (FileStringPath == NULL) {
       return (EFI_OUT_OF_RESOURCES);
     }
-    StrCpy(FileStringPath, ShellInfoObject.ShellInitSettings.FileName);
+    StrnCpy(FileStringPath, ShellInfoObject.ShellInitSettings.FileName, NewSize/sizeof(CHAR16) -1);
     if (ShellInfoObject.ShellInitSettings.FileOptions != NULL) {
-      StrCat(FileStringPath, L" ");
-      StrCat(FileStringPath, ShellInfoObject.ShellInitSettings.FileOptions);
+      StrnCat(FileStringPath, L" ", NewSize/sizeof(CHAR16) - StrLen(FileStringPath) -1);
+      StrnCat(FileStringPath, ShellInfoObject.ShellInitSettings.FileOptions, NewSize/sizeof(CHAR16) - StrLen(FileStringPath) -1);
     }
     Status = RunCommand(FileStringPath, ExitStatus);
     FreePool(FileStringPath);
@@ -1247,9 +1245,8 @@ AddLineToCommandHistory(
 
   Node = AllocateZeroPool(sizeof(BUFFER_LIST));
   ASSERT(Node != NULL);
-  Node->Buffer = AllocateZeroPool(StrSize(Buffer));
+  Node->Buffer = AllocateCopyPool(StrSize(Buffer), Buffer);
   ASSERT(Node->Buffer != NULL);
-  StrCpy(Node->Buffer, Buffer);
 
   InsertTailList(&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Node->Link);
 }
@@ -1280,11 +1277,10 @@ ShellConvertAlias(
     return (EFI_SUCCESS);
   }
   FreePool(*CommandString);
-  *CommandString = AllocateZeroPool(StrSize(NewString));
+  *CommandString = AllocateCopyPool(StrSize(NewString), NewString);
   if (*CommandString == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
-  StrCpy(*CommandString, NewString);
   return (EFI_SUCCESS);
 }
 
@@ -1477,7 +1473,7 @@ ShellConvertVariables (
   //
   // now do the replacements...
   //
-  NewCommandLine1 = AllocateZeroPool(NewSize);
+  NewCommandLine1 = AllocateCopyPool(NewSize, OriginalCommandLine);
   NewCommandLine2 = AllocateZeroPool(NewSize);
   ItemTemp        = AllocateZeroPool(ItemSize+(2*sizeof(CHAR16)));
   if (NewCommandLine1 == NULL || NewCommandLine2 == NULL || ItemTemp == NULL) {
@@ -1486,16 +1482,15 @@ ShellConvertVariables (
     SHELL_FREE_NON_NULL(ItemTemp);
     return (NULL);
   }
-  StrCpy(NewCommandLine1, OriginalCommandLine);
   for (MasterEnvList = EfiShellGetEnv(NULL)
-    ;  MasterEnvList != NULL && *MasterEnvList != CHAR_NULL //&& *(MasterEnvList+1) != CHAR_NULL
+    ;  MasterEnvList != NULL && *MasterEnvList != CHAR_NULL
     ;  MasterEnvList += StrLen(MasterEnvList) + 1
    ){
-    StrCpy(ItemTemp, L"%");
-    StrCat(ItemTemp, MasterEnvList);
-    StrCat(ItemTemp, L"%");
+    *ItemTemp = L'%';
+    StrnCat(ItemTemp, MasterEnvList, ((ItemSize+(2*sizeof(CHAR16)))/sizeof(CHAR16))-1 - StrLen(ItemTemp));
+    StrnCat(ItemTemp, L"%", ((ItemSize+(2*sizeof(CHAR16)))/sizeof(CHAR16))-1 - StrLen(ItemTemp));
     ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, ItemTemp, EfiShellGetEnv(MasterEnvList), TRUE, FALSE);
-    StrCpy(NewCommandLine1, NewCommandLine2);
+    StrnCpy(NewCommandLine1, NewCommandLine2, NewSize/sizeof(CHAR16)-1);
   }
   if (CurrentScriptFile != NULL) {
     for (AliasListNode = (ALIAS_LIST*)GetFirstNode(&CurrentScriptFile->SubstList)
@@ -1503,7 +1498,7 @@ ShellConvertVariables (
       ;  AliasListNode = (ALIAS_LIST*)GetNextNode(&CurrentScriptFile->SubstList, &AliasListNode->Link)
    ){
     ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, AliasListNode->Alias, AliasListNode->CommandString, TRUE, FALSE);
-    StrCpy(NewCommandLine1, NewCommandLine2);
+    StrnCpy(NewCommandLine1, NewCommandLine2, NewSize/sizeof(CHAR16)-1);
     }
 
     //
@@ -1516,7 +1511,7 @@ ShellConvertVariables (
   // Now cleanup any straggler intentionally ignored "%" characters
   //
   ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, L"^%", L"%", TRUE, FALSE);
-  StrCpy(NewCommandLine1, NewCommandLine2);
+  StrnCpy(NewCommandLine1, NewCommandLine2, NewSize/sizeof(CHAR16)-1);
   
   FreePool(NewCommandLine2);
   FreePool(ItemTemp);
@@ -1850,7 +1845,7 @@ IsValidSplit(
       return (EFI_OUT_OF_RESOURCES);
     }
     TempWalker = (CHAR16*)Temp;
-    GetNextParameter(&TempWalker, &FirstParameter);
+    GetNextParameter(&TempWalker, &FirstParameter, StrSize(CmdLine));
 
     if (GetOperationType(FirstParameter) == Unknown_Invalid) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
@@ -2018,7 +2013,7 @@ DoHelpUpdate(
   Walker = *CmdLine;
   while(Walker != NULL && *Walker != CHAR_NULL) {
     LastWalker = Walker;
-    GetNextParameter(&Walker, &CurrentParameter);
+    GetNextParameter(&Walker, &CurrentParameter, StrSize(*CmdLine));
     if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
       LastWalker[0] = L' ';
       LastWalker[1] = L' ';
@@ -2027,8 +2022,12 @@ DoHelpUpdate(
         Status = EFI_OUT_OF_RESOURCES;
         break;
       }
-      StrCpy(NewCommandLine, L"help ");
-      StrCat(NewCommandLine, *CmdLine);
+
+      //
+      // We know the space is sufficient since we just calculated it.
+      //
+      StrnCpy(NewCommandLine, L"help ", 5);
+      StrnCat(NewCommandLine, *CmdLine, StrLen(*CmdLine));
       SHELL_FREE_NON_NULL(*CmdLine);
       *CmdLine = NewCommandLine;
       break;
@@ -2507,7 +2506,7 @@ RunCommand(
     return (EFI_OUT_OF_RESOURCES);
   }
   TempWalker = CleanOriginal;
-  GetNextParameter(&TempWalker, &FirstParameter);
+  GetNextParameter(&TempWalker, &FirstParameter, StrSize(CleanOriginal));
 
   //
   // Depending on the first parameter we change the behavior
@@ -2703,7 +2702,7 @@ RunScriptFileHandle (
       ; // conditional increment in the body of the loop
   ){
     ASSERT(CommandLine2 != NULL);
-    StrCpy(CommandLine2, NewScriptFile->CurrentCommand->Cl);
+    StrnCpy(CommandLine2, NewScriptFile->CurrentCommand->Cl, PcdGet16(PcdShellPrintBufferSize)/sizeof(CHAR16)-1);
 
     //
     // NULL out comments
@@ -2722,7 +2721,7 @@ RunScriptFileHandle (
       //
       // Due to variability in starting the find and replace action we need to have both buffers the same.
       //
-      StrCpy(CommandLine, CommandLine2);
+      StrnCpy(CommandLine, CommandLine2, PcdGet16(PcdShellPrintBufferSize)/sizeof(CHAR16)-1);
 
       //
       // Remove the %0 to %9 from the command line (if we have some arguments)
@@ -2774,7 +2773,7 @@ RunScriptFileHandle (
       Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%8", L"\"\"", FALSE, FALSE);
       Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%9", L"\"\"", FALSE, FALSE);
 
-      StrCpy(CommandLine2, CommandLine);
+      StrnCpy(CommandLine2, CommandLine, PcdGet16(PcdShellPrintBufferSize)/sizeof(CHAR16)-1);
 
       LastCommand = NewScriptFile->CurrentCommand;
 

@@ -35,8 +35,9 @@
 VOID
 EFIAPI
 GetNextParameter(
-  CHAR16 **Walker,
-  CHAR16 **TempParameter
+  IN OUT CHAR16   **Walker,
+  IN OUT CHAR16   **TempParameter,
+  IN CONST UINTN  Length
   )
 {
   CHAR16 *NextDelim;
@@ -82,7 +83,7 @@ GetNextParameter(
       //
       // found ""
       //
-      StrCpy(*TempParameter, L"");
+      *(*TempParameter) = CHAR_NULL;
       *Walker = NextDelim + 1;
     } else if (NextDelim != NULL) {
 
@@ -95,7 +96,7 @@ GetNextParameter(
       //
       // last one... someone forgot the training quote!
       //
-      StrCpy(*TempParameter, *Walker);
+      StrnCpy(*TempParameter, *Walker, Length/sizeof(CHAR16) - 1);
       *Walker = NULL;
     }
     for (TempLoc = *TempParameter ; TempLoc != NULL && *TempLoc != CHAR_NULL ; TempLoc++) {
@@ -117,7 +118,7 @@ GetNextParameter(
       //
       // last one.
       //
-      StrCpy(*TempParameter, *Walker);
+      StrnCpy(*TempParameter, *Walker, Length/sizeof(CHAR16) - 1);
       *Walker = NULL;
     }
     for (NextDelim = *TempParameter ; NextDelim != NULL && *NextDelim != CHAR_NULL ; NextDelim++) {
@@ -181,17 +182,10 @@ ParseCommandLineToArgs(
   for ( Count = 0
       , Walker = (CHAR16*)CommandLine
       ; Walker != NULL && *Walker != CHAR_NULL
-      ; GetNextParameter(&Walker, &TempParameter)
+      ; GetNextParameter(&Walker, &TempParameter, Size)
       , Count++
      );
 
-/*  Count = 0;
-  Walker = (CHAR16*)CommandLine;
-  while(Walker != NULL) {
-    GetNextParameter(&Walker, &TempParameter);
-    Count++;
-  }
-*/
   //
   // lets allocate the pointer array
   //
@@ -205,10 +199,12 @@ ParseCommandLineToArgs(
   Walker = (CHAR16*)CommandLine;
   while(Walker != NULL && *Walker != CHAR_NULL) {
     SetMem16(TempParameter, Size, CHAR_NULL);
-    GetNextParameter(&Walker, &TempParameter);
-    NewParam = AllocateZeroPool(StrSize(TempParameter));
-    ASSERT(NewParam != NULL);
-    StrCpy(NewParam, TempParameter);
+    GetNextParameter(&Walker, &TempParameter, Size);
+    NewParam = AllocateCopyPool(StrSize(TempParameter), TempParameter);
+    if (NewParam == NULL){
+      SHELL_FREE_NON_NULL(TempParameter);
+      return (EFI_OUT_OF_RESOURCES);
+    }
     ((CHAR16**)(*Argv))[(*Argc)] = NewParam;
     (*Argc)++;
   }
@@ -976,7 +972,7 @@ UpdateStdInStdOutStdErr(
   //
   // re-populate the string to support any filenames that were in quotes.
   //
-  StrCpy(CommandLineCopy, NewCommandLine);
+  StrnCpy(CommandLineCopy, NewCommandLine, StrLen(NewCommandLine));
 
   if (FirstLocation != CommandLineCopy + StrLen(CommandLineCopy)
     && ((UINTN)(FirstLocation - CommandLineCopy) < StrLen(NewCommandLine))
