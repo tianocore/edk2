@@ -23,7 +23,7 @@
   PACKAGE_NAME                   = MdePkg
   PACKAGE_UNI_FILE               = MdePkg.uni
   PACKAGE_GUID                   = 1E73767F-8F52-4603-AEB4-F29B510B6766
-  PACKAGE_VERSION                = 1.04
+  PACKAGE_VERSION                = 1.05
 
 
 [Includes]
