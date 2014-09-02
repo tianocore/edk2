@@ -21,7 +21,7 @@
   PACKAGE_NAME                   = SecurityPkg
   PACKAGE_UNI_FILE               = SecurityPkg.uni
   PACKAGE_GUID                   = 24369CAC-6AA6-4fb8-88DB-90BF061668AD
-  PACKAGE_VERSION                = 0.93
+  PACKAGE_VERSION                = 0.94
 
 [Includes]
   Include
