@@ -165,7 +165,9 @@ CascadeDelete(
     //
     // now delete the current node...
     //
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE), gShellLevel2HiiHandle, Node->FullName);
+    if (!Quiet) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE), gShellLevel2HiiHandle, Node->FullName);
+    }
     Status = gEfiShellProtocol->DeleteFile(Node->Handle);
     Node->Handle = NULL;
   }
