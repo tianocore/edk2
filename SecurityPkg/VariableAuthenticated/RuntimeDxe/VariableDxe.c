@@ -369,7 +369,7 @@ FtwNotificationEvent (
   //
   // Mark the variable storage region of the FLASH as RUNTIME.
   //
-  VariableStoreBase   = mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
+  VariableStoreBase   = NvStorageVariableBase + (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(NvStorageVariableBase))->HeaderLength);
   VariableStoreLength = ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase)->Size;
   BaseAddress = VariableStoreBase & (~EFI_PAGE_MASK);
   Length      = VariableStoreLength + (VariableStoreBase - BaseAddress);
@@ -377,7 +377,7 @@ FtwNotificationEvent (
 
   Status      = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "Variable driver failed to add EFI_MEMORY_RUNTIME attribute to Flash.\n"));
+    DEBUG ((DEBUG_WARN, "Variable driver failed to get flash memory attribute.\n"));
   } else {
     Status = gDS->SetMemorySpaceAttributes (
                     BaseAddress,
