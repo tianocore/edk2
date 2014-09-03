@@ -1,6 +1,6 @@
 ## @file  MdeModulePkg.dec
 # This package provides the modules that conform to UEFI/PI Industry standards.
-# It also provides the defintions(including PPIs/PROTOCOLs/GUIDs and library classes)
+# It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
@@ -466,7 +466,7 @@
   #  DUET platform requires the token to be TRUE.<BR><BR>
   #   TRUE  - Turn off usb legacy support.<BR>
   #   FALSE - Does not turn off usb legacy support.<BR>
-  # @Prompt Turn off usb legacy support.
+  # @Prompt Turn off USB legacy support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
   
   ## Indicates if HiiImageProtocol will be installed.
@@ -659,7 +659,7 @@
   # @Prompt Max PEI PCD callback number per PCD entry.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08|UINT32|0x0001000f
 
-  ## VPD type PCD allow developer point an absoluted physical address PcdVpdBaseAddress
+  ## VPD type PCD  allows a developer to point to an absolute physical address PcdVpdBaseAddress
   #  to store PCD value.
   # @Prompt VPD base address.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
@@ -710,8 +710,8 @@
   # @Prompt FFS name of capsule coalesce image.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleCoalesceFile|{ 0xA6, 0xE4, 0xFD, 0xF7, 0x4C, 0x29, 0x3c, 0x49, 0xB5, 0x0F, 0x97, 0x34, 0x55, 0x3B, 0xB7, 0x57 }|VOID*|0x30000017
 
-  ## Maximun number of performance log entries during PEI phase.
-  # @Prompt Maximun number of PEI performance log entries.
+  ## Maximum number of performance log entries during PEI phase.
+  # @Prompt Maximum number of PEI performance log entries.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
 
   ## RTC Update Timeout Value(microsecond).
@@ -813,7 +813,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
 
   ## UART clock frequency is for the baud rate configuration.
-  # @Prompt Serial Port Clock Rate
+  # @Prompt Serial Port Clock Rate.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|1843200|UINT32|0x00010066
   
   ## PCI Serial Device Info. It is an array of Device, Function, and Power Management
@@ -829,7 +829,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo|{0xFF}|VOID*|0x00010067
 
   ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
-  # @Prompt Pci Port Extended Transmit FIFO Size in Bytes
+  # @Prompt Serial Port Extended Transmit FIFO Size in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|64|UINT32|0x00010068
   
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
@@ -1078,8 +1078,8 @@
   # @Prompt SRIOV system page size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
 
-  ## Smbios version.
-  # @Prompt Smbios version.
+  ## SMBIOS version.
+  # @Prompt SMBIOS version.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0207|UINT16|0x00010055
 
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for
