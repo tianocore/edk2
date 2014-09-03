@@ -251,7 +251,7 @@ FspHobProcess (
     DEBUG((DEBUG_INFO, "S3 memory %Xh - %Xh bytes\n", S3PeiMemBase, S3PeiMemSize));
 
     //
-    // Make sure Stack and PeiMemory are not overlap - JYAO1
+    // Make sure Stack and PeiMemory are not overlap
     //
 
     Status = PeiServicesInstallPeiMemory (
@@ -280,7 +280,7 @@ FspHobProcess (
 
       if (Status == EFI_SUCCESS) {
         //
-        // Make sure Stack and CapsuleBuffer are not overlap - JYAO1
+        // Make sure Stack and CapsuleBuffer are not overlap
         //
         CapsuleBuffer = (VOID *)(UINTN)BASE_1MB;
         CapsuleBufferLength = (UINTN)(LowMemorySize - PeiMemSize);
@@ -313,7 +313,7 @@ FspHobProcess (
       );
 
     //
-    // Make sure Stack and CapsuleBuffer are not overlap - JYAO1
+    // Make sure Stack and CapsuleBuffer are not overlap
     //
 
     //

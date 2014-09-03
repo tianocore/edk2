@@ -15,8 +15,8 @@
 #include <PiPei.h>
 
 /**
-  This function provides dummy function so that SecCore can pass pass build
-  Validation in Ia32FamilyCpuPkg. All real platform library instances needs
+  This function provides dummy function so that SecCore can pass build
+  validation in IntelFspPkg. All real platform library instances needs
   to implement the real entry point in assembly.
 **/
 VOID
