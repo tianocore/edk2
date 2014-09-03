@@ -1,5 +1,5 @@
 ## @file
-#  ACPI Timer Library
+#  Base ACPI Timer Library
 #
 #  Provides basic timer support using the ACPI timer hardware.  The performance
 #  counter features are provided by the processors time stamp counter. 
@@ -17,13 +17,13 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = AcpiTimerLib
+  BASE_NAME                      = BaseAcpiTimerLib
   FILE_GUID                      = 564DE85F-049E-4481-BF7A-CA04D2788CF9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = TimerLib|SEC PEI_CORE PEIM
   CONSTRUCTOR                    = AcpiTimerLibConstructor
-  MODULE_UNI_FILE                = AcpiTimerLibModStrs.uni
+  MODULE_UNI_FILE                = BaseAcpiTimerLib.uni
 
 [Sources]
   AcpiTimerLib.c
