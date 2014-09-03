@@ -129,45 +129,45 @@ def GenHeaderCommentSection(Abstract, Description, Copyright, License, IsBinaryH
     if isinstance(Description, unicode):
         Description = ConvertSpecialUnicodes(Description)
     if IsBinaryHeader:
-        Content += CommChar * 2 + TAB_SPACE_SPLIT + TAB_BINARY_HEADER_COMMENT + END_OF_LINE
+        Content += CommChar * 2 + TAB_SPACE_SPLIT + TAB_BINARY_HEADER_COMMENT + '\r\n'
     elif CommChar == TAB_COMMENT_EDK1_SPLIT:
         Content += CommChar + TAB_SPACE_SPLIT + TAB_COMMENT_EDK1_START + TAB_STAR + TAB_SPACE_SPLIT +\
-         TAB_HEADER_COMMENT + END_OF_LINE
+         TAB_HEADER_COMMENT + '\r\n'
     else:
-        Content += CommChar * 2 + TAB_SPACE_SPLIT + TAB_HEADER_COMMENT + END_OF_LINE
+        Content += CommChar * 2 + TAB_SPACE_SPLIT + TAB_HEADER_COMMENT + '\r\n'
     if Abstract:
-        Abstract = Abstract.rstrip(END_OF_LINE)
-        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
-                                                                                                (Abstract, END_OF_LINE))
-        Content += END_OF_LINE + CommChar + END_OF_LINE
+        Abstract = Abstract.rstrip('\r\n')
+        Content += CommChar + TAB_SPACE_SPLIT + ('\r\n' + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
+                                                                                                (Abstract, '\n'))
+        Content += '\r\n' + CommChar + '\r\n'
     else:
-        Content += CommChar + END_OF_LINE
+        Content += CommChar + '\r\n'
 
     if Description:
-        Description = Description.rstrip(END_OF_LINE)
-        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
-                                                  (Description, END_OF_LINE))
-        Content += END_OF_LINE + CommChar + END_OF_LINE        
+        Description = Description.rstrip('\r\n')
+        Content += CommChar + TAB_SPACE_SPLIT + ('\r\n' + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
+                                                  (Description, '\n'))
+        Content += '\r\n' + CommChar + '\r\n'
   
     #
     # There is no '#\n' line to separate multiple copyright lines in code base 
     #
     if Copyright:
-        Copyright = Copyright.rstrip(END_OF_LINE)
-        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join\
-        (GetSplitValueList(Copyright, END_OF_LINE))
-        Content += END_OF_LINE + CommChar + END_OF_LINE
+        Copyright = Copyright.rstrip('\r\n')
+        Content += CommChar + TAB_SPACE_SPLIT + ('\r\n' + CommChar + TAB_SPACE_SPLIT).join\
+        (GetSplitValueList(Copyright, '\n'))
+        Content += '\r\n' + CommChar + '\r\n'
 
     if License:
-        License = License.rstrip(END_OF_LINE)
-        Content += CommChar + TAB_SPACE_SPLIT + (END_OF_LINE + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
-                                                  (License, END_OF_LINE))
-        Content += END_OF_LINE + CommChar + END_OF_LINE
+        License = License.rstrip('\r\n')
+        Content += CommChar + TAB_SPACE_SPLIT + ('\r\n' + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
+                                                  (License, '\n'))
+        Content += '\r\n' + CommChar + '\r\n'
     
     if CommChar == TAB_COMMENT_EDK1_SPLIT:
-        Content += CommChar + TAB_SPACE_SPLIT + TAB_STAR + TAB_COMMENT_EDK1_END + END_OF_LINE
+        Content += CommChar + TAB_SPACE_SPLIT + TAB_STAR + TAB_COMMENT_EDK1_END + '\r\n'
     else:
-        Content += CommChar * 2 + END_OF_LINE
+        Content += CommChar * 2 + '\r\n'
     
     return Content
 

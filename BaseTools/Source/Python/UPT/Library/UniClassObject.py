@@ -245,9 +245,9 @@ def FormatUniEntry(StrTokenName, TokenValueList, ContainerFile):
         for SubValue in ValueList:
             if SubValue.strip():
                 SubValueContent += \
-                ' ' * (PreFormatLength + len('#language en-US    ')) + '\"%s\\n\"' % SubValue.strip() + os.linesep
-        SubValueContent = SubValueContent[(PreFormatLength + len('#language en-US    ')):SubValueContent.rfind('\\n')] \
-        + '\"' + os.linesep
+                ' ' * (PreFormatLength + len('#language en-US ')) + '\"%s\\n\"' % SubValue.strip() + '\r\n'
+        SubValueContent = SubValueContent[(PreFormatLength + len('#language en-US ')):SubValueContent.rfind('\\n')] \
+        + '\"' + '\r\n'
         SubContent += ' '*PreFormatLength + '#language %-5s ' % Lang + SubValueContent
     if SubContent:
         SubContent = StrTokenName + ' '*(PreFormatLength - len(StrTokenName)) + SubContent[PreFormatLength:]
@@ -289,7 +289,7 @@ class StringDefClassObject(object):
     def UpdateValue(self, Value = None):
         if Value != None:
             if self.StringValue:
-                self.StringValue = self.StringValue  + os.linesep + Value
+                self.StringValue = self.StringValue + '\r\n' + Value
             else:
                 self.StringValue = Value
             self.StringValueByteList = UniToHexList(self.StringValue)
@@ -452,7 +452,7 @@ class UniFileClassObject(object):
             if not Line.startswith(DT.TAB_COMMENT_EDK1_SPLIT) and HeaderStart and not HeaderEnd:
                 HeaderEnd = True
             if Line.startswith(DT.TAB_COMMENT_EDK1_SPLIT) and HeaderStart and not HeaderEnd and FirstGenHeader:
-                self.UniFileHeader += Line + os.linesep
+                self.UniFileHeader += Line + '\r\n'
                 continue
         
         #
@@ -498,11 +498,11 @@ class UniFileClassObject(object):
                 if FileIn[LineCount].strip().startswith('#language'):
                     Line = Line + FileIn[LineCount]
                     FileIn[LineCount-1] = Line
-                    FileIn[LineCount] = os.linesep
+                    FileIn[LineCount] = '\r\n'
                     LineCount -= 1
                     for Index in xrange (LineCount + 1, len (FileIn) - 1):
                         if (Index == len(FileIn) -1):
-                            FileIn[Index] = os.linesep
+                            FileIn[Index] = '\r\n'
                         else:
                             FileIn[Index] = FileIn[Index + 1]
                     continue
@@ -858,12 +858,12 @@ class UniFileClassObject(object):
                                 Value = Value + Lines[IndexJ].strip()[1:-1]
                             CombineToken = False
                         else:
-                            Value = Value + Lines[IndexJ].strip()[1:-1] + os.linesep
+                            Value = Value + Lines[IndexJ].strip()[1:-1] + '\r\n'
                     else:
                         IndexI = IndexJ
                         break
-                if Value.endswith(os.linesep):
-                    Value = Value[: Value.rfind(os.linesep)]
+                if Value.endswith('\r\n'):
+                    Value = Value[: Value.rfind('\r\n')]
                 Language = GetLanguageCode(Language, self.IsCompatibleMode, self.File)
                 self.AddStringToList(Name, Language, Value)
                 continue

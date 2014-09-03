@@ -582,20 +582,17 @@ def GenPackageUNIEncodeFile(PackageObject, UniFileHeader = '', Encoding=TAB_ENCO
     ContainerFile = os.path.normpath(os.path.join(os.path.dirname(PackageObject.GetFullPath()), 
                                                   (PackageObject.GetBaseName() + '.uni')))
     
-    Content = UniFileHeader + os.linesep
-    Content += os.linesep
+    Content = UniFileHeader + '\r\n'
+    Content += '\r\n'
     
-    Content += FormatUniEntry('#string ' + TAB_DEC_PACKAGE_ABSTRACT, PackageObject.GetAbstract(), ContainerFile) \
-    + os.linesep
+    Content += FormatUniEntry('#string ' + TAB_DEC_PACKAGE_ABSTRACT, PackageObject.GetAbstract(), ContainerFile) + '\r\n'
         
     Content += FormatUniEntry('#string ' + TAB_DEC_PACKAGE_DESCRIPTION, PackageObject.GetDescription(), ContainerFile) \
-    + os.linesep
+    + '\r\n'
     
-    Content += FormatUniEntry('#string ' + TAB_DEC_BINARY_ABSTRACT, BinaryAbstract, ContainerFile) \
-    + os.linesep
+    Content += FormatUniEntry('#string ' + TAB_DEC_BINARY_ABSTRACT, BinaryAbstract, ContainerFile) + '\r\n'
     
-    Content += FormatUniEntry('#string ' + TAB_DEC_BINARY_DESCRIPTION, BinaryDescription, ContainerFile) \
-    + os.linesep
+    Content += FormatUniEntry('#string ' + TAB_DEC_BINARY_DESCRIPTION, BinaryDescription, ContainerFile) + '\r\n'
     
     PromptGenList = []
     HelpTextGenList = []    
@@ -612,7 +609,7 @@ def GenPackageUNIEncodeFile(PackageObject, UniFileHeader = '', Encoding=TAB_ENCO
             if (PcdPromptStrName, Lang) not in PromptGenList:
                 TokenValueList.append((Lang, PromptStr))
                 PromptGenList.append((PcdPromptStrName, Lang))
-        PromptString = FormatUniEntry(PcdPromptStrName, TokenValueList, ContainerFile) + os.linesep
+        PromptString = FormatUniEntry(PcdPromptStrName, TokenValueList, ContainerFile) + '\r\n'
         if PromptString not in Content:
             Content += PromptString
             
@@ -628,7 +625,7 @@ def GenPackageUNIEncodeFile(PackageObject, UniFileHeader = '', Encoding=TAB_ENCO
             if (PcdHelpStrName, Lang) not in HelpTextGenList:
                 TokenValueList.append((Lang, HelpStr))
                 HelpTextGenList.append((PcdHelpStrName, Lang))
-        HelpTextString = FormatUniEntry(PcdHelpStrName, TokenValueList, ContainerFile) + os.linesep
+        HelpTextString = FormatUniEntry(PcdHelpStrName, TokenValueList, ContainerFile) + '\r\n'
         if HelpTextString not in Content:
             Content += HelpTextString
             
@@ -639,7 +636,7 @@ def GenPackageUNIEncodeFile(PackageObject, UniFileHeader = '', Encoding=TAB_ENCO
                 PcdErrStrName = '#string ' + TAB_STR_TOKENCNAME + TAB_UNDERLINE_SPLIT + Pcd.GetTokenSpaceGuidCName() \
                     + TAB_UNDERLINE_SPLIT + TAB_STR_TOKENERR \
                     + TAB_UNDERLINE_SPLIT + ErrorNo[2:]
-                PcdErrString = FormatUniEntry(PcdErrStrName, PcdError.GetErrorMessageList(), ContainerFile) + os.linesep
+                PcdErrString = FormatUniEntry(PcdErrStrName, PcdError.GetErrorMessageList(), ContainerFile) + '\r\n'
                 if PcdErrString not in Content:
                     Content += PcdErrString
                     
