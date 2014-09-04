@@ -3429,7 +3429,8 @@ class ModuleAutoGen(AutoGen):
             CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
             return
         if self.IsBinaryModule:
-            self.CopyBinaryFiles()
+            if self.IsLibrary:
+                self.CopyBinaryFiles()
             return
 
         if not self.IsLibrary and CreateLibraryCodeFile:
