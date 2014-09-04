@@ -85,7 +85,11 @@ _BackFromUserCode:
 BITS    16
     push    ss
     push    cs
-o32 call    dword .Base                 ; push eip
+    ;
+    ; Note: We can't use o32 on the next instruction because of a bug
+    ; in NASM 2.09.04 through 2.10rc1.
+    ;
+    call    dword .Base                 ; push eip
 .Base:
     pushfd
     cli                                 ; disable interrupts
