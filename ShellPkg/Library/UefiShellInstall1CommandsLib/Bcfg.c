@@ -665,22 +665,33 @@ BcfgMoveInstall1(
   IN CONST UINT16                 *CurrentOrder,
   IN CONST UINTN                  OrderCount,
   IN CONST UINT16                 OldLocation,
-  IN CONST UINT16                 NewLocation
+  IN       UINT16                 NewLocation
   )
 {
   UINT16            *NewOrder;
   EFI_STATUS        Status;
   UINT16            Temp;
 
-  NewOrder = AllocateZeroPool(OrderCount*sizeof(CurrentOrder[0]));
-  ASSERT(NewOrder != NULL);
+  NewOrder = AllocateCopyPool(OrderCount*sizeof(CurrentOrder[0]), CurrentOrder);
+  if (NewOrder == NULL) {
+    return (SHELL_OUT_OF_RESOURCES);
+  }
+
+  //
+  // correct the new location
+  //
+  if (NewLocation >= OrderCount) {
+    if (OrderCount > 0) {
+      NewLocation = (UINT16)OrderCount - 1;
+    } else {
+      NewLocation = 0;
+    }
+  }
 
   Temp = CurrentOrder[OldLocation];
-  CopyMem(NewOrder, CurrentOrder, OrderCount*sizeof(CurrentOrder[0]));
   CopyMem(NewOrder+OldLocation, NewOrder+OldLocation+1, (OrderCount - OldLocation - 1)*sizeof(CurrentOrder[0]));
   CopyMem(NewOrder+NewLocation+1, NewOrder+NewLocation, (OrderCount - NewLocation - 1)*sizeof(CurrentOrder[0]));
   NewOrder[NewLocation] = Temp;
-
 
   Status = gRT->SetVariable(
     Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder",
@@ -1142,6 +1153,7 @@ ShellCommandRunBcfgInstall (
   BGFG_OPERATION        CurrentOperation;
   UINTN                 Length;
   UINT64                Intermediate;
+  UINT16                Count;
 
   Length              = 0;
   ProblemParam        = NULL;
@@ -1228,6 +1240,8 @@ ShellCommandRunBcfgInstall (
       }
     }
 
+    Count = (UINT16) (Length / sizeof(CurrentOperation.Order[0]));
+
     //
     // large block to read the type of operation and verify parameter types for the info.
     //
@@ -1312,8 +1326,8 @@ ShellCommandRunBcfgInstall (
           } else {
             Status = ShellConvertStringToUint64(CurrentParam, &Intermediate, TRUE, FALSE);
             CurrentOperation.Number1     = (UINT16)Intermediate;
-            if (CurrentOperation.Number1 > (Length / sizeof(CurrentOperation.Order[0]))){
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellInstall1HiiHandle, Length / sizeof(CurrentOperation.Order[0]));
+            if (CurrentOperation.Number1 > Count){
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellInstall1HiiHandle, Count);
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
           }
@@ -1330,24 +1344,24 @@ ShellCommandRunBcfgInstall (
           } else {
             Status = ShellConvertStringToUint64(CurrentParam, &Intermediate, TRUE, FALSE);
             CurrentOperation.Number1     = (UINT16)Intermediate;
-            if (CurrentOperation.Number1 > (Length / sizeof(CurrentOperation.Order[0]))){
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellInstall1HiiHandle, Length / sizeof(CurrentOperation.Order[0]));
-              ShellStatus = SHELL_INVALID_PARAMETER;
-            }
-            CurrentParam = ShellCommandLineGetRawValue(Package, ++ParamNumber);
-            if (CurrentParam == NULL || !ShellIsHexOrDecimalNumber(CurrentParam, TRUE, FALSE)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellInstall1HiiHandle, CurrentParam);
+            if (CurrentOperation.Number1 > Count){
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellInstall1HiiHandle, Count);
               ShellStatus = SHELL_INVALID_PARAMETER;
             } else {
-              Status = ShellConvertStringToUint64(CurrentParam, &Intermediate, TRUE, FALSE);
-              CurrentOperation.Number2     = (UINT16)Intermediate;
-            }
-            if (CurrentOperation.Number2 == CurrentOperation.Number1
-              ||CurrentOperation.Number1 > (Length / sizeof(CurrentOperation.Order[0]))
-              ||CurrentOperation.Number2 > (Length / sizeof(CurrentOperation.Order[0]))
-             ){
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellInstall1HiiHandle, Length / sizeof(CurrentOperation.Order[0]));
-              ShellStatus = SHELL_INVALID_PARAMETER;
+              CurrentParam = ShellCommandLineGetRawValue(Package, ++ParamNumber);
+              if (CurrentParam == NULL || !ShellIsHexOrDecimalNumber(CurrentParam, TRUE, FALSE)) {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellInstall1HiiHandle, CurrentParam);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                Status = ShellConvertStringToUint64(CurrentParam, &Intermediate, TRUE, FALSE);
+                CurrentOperation.Number2     = (UINT16)Intermediate;
+              }
+              if (CurrentOperation.Number2 == CurrentOperation.Number1
+                ||CurrentOperation.Number2 >= Count
+               ){
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellInstall1HiiHandle, Count);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              }
             }
           }
         } else {
@@ -1364,7 +1378,7 @@ ShellCommandRunBcfgInstall (
         case   BcfgTypeDump:
           ShellStatus = BcfgDisplayDumpInstall1(
             CurrentOperation.Target == BcfgTargetBootOrder?L"Boot":L"Driver",
-            Length / sizeof(CurrentOperation.Order[0]),
+            Count,
             CurrentOperation.Order,
             ShellCommandLineGetFlag(Package, L"-v"));
           break;
@@ -1372,7 +1386,7 @@ ShellCommandRunBcfgInstall (
           ShellStatus = BcfgMoveInstall1(
             CurrentOperation.Target,
             CurrentOperation.Order,
-            Length / sizeof(CurrentOperation.Order[0]),
+            Count,
             CurrentOperation.Number1,
             CurrentOperation.Number2);
           break;
@@ -1380,7 +1394,7 @@ ShellCommandRunBcfgInstall (
           ShellStatus = BcfgRemoveInstall1(
             CurrentOperation.Target,
             CurrentOperation.Order,
-            Length / sizeof(CurrentOperation.Order[0]),
+            Count,
             CurrentOperation.Number1);
           break;
         case   BcfgTypeAdd:
@@ -1391,7 +1405,7 @@ ShellCommandRunBcfgInstall (
             CurrentOperation.FileName,
             CurrentOperation.Description==NULL?L"":CurrentOperation.Description,
             CurrentOperation.Order,
-            Length / sizeof(CurrentOperation.Order[0]),
+            Count,
             CurrentOperation.Target,
             (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddh),
             (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddp),
@@ -1401,7 +1415,7 @@ ShellCommandRunBcfgInstall (
           ShellStatus = BcfgAddOptInstall1(
             CurrentOperation.OptData,
             CurrentOperation.Order,
-            Length / sizeof(CurrentOperation.Order[0]),
+            Count,
             CurrentOperation.Target);
           break;
         default:
