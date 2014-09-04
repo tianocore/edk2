@@ -56,7 +56,7 @@ SECTION .data
 ;
 ; These are global constant to convey information to C code.
 ;
-ASM_PFX(m16Size)         DW      InternalAsmThunk16 - ASM_PFX(m16Start)
+ASM_PFX(m16Size)         DW      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
 ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttrEnd - 4 - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt)          DW      _NullSeg - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase)     DW      _16GdtrBase - ASM_PFX(m16Start)
@@ -269,7 +269,7 @@ BITS    64
   
     sgdt    [rsp + 60h]       ; save GDT stack in argument space
     movzx   r10, word [rsp + 60h]   ; r10 <- GDT limit 
-    lea     r11, [rcx + (InternalAsmThunk16 - _BackFromUserCode.SavedCr4End) + 0xf]
+    lea     r11, [rcx + (ASM_PFX(InternalAsmThunk16) - _BackFromUserCode.SavedCr4End) + 0xf]
     and     r11, ~0xf            ; r11 <- 16-byte aligned shadowed GDT table in real mode buffer
     
     mov     [rcx + (SavedGdt - _BackFromUserCode.SavedCr4End)], r10w      ; save the limit of shadowed GDT table

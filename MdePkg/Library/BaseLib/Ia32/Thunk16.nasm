@@ -58,7 +58,7 @@ SECTION .data
 ;
 ; These are global constant to convey information to C code.
 ;
-ASM_PFX(m16Size)         DW      InternalAsmThunk16 - ASM_PFX(m16Start)
+ASM_PFX(m16Size)         DW      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
 ASM_PFX(mThunk16Attr)    DW      _BackFromUserCode.ThunkAttrEnd - 4 - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt)          DW      _NullSegDesc - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase)     DW      _16GdtrBase - ASM_PFX(m16Start)
