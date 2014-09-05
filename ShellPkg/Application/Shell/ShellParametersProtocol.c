@@ -30,7 +30,7 @@
   @param[in, out] Walker        pointer to string of command line.  Adjusted to
                                 reminaing command line on return
   @param[in, out] TempParameter pointer to string of command line item extracted.
-
+  @param[in]      Length        buffer size of TempParameter.
 **/
 VOID
 EFIAPI

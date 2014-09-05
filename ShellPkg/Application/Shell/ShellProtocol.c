@@ -2050,7 +2050,7 @@ EfiShellFindFilesInDir(
   }
   SHELL_FREE_NON_NULL(BasePath);
   return(Status);
-  }
+}
 
 /**
   Get the GUID value from a human readable name.
