@@ -367,6 +367,7 @@ BootOptionDelete (
   UINTN         BootOrderSize;
   UINT16*       BootOrder;
   UINTN         BootOrderCount;
+  CHAR16        BootVariableName[9];
   EFI_STATUS    Status;
 
   // Remove the entry from the BootOrder environment variable
@@ -399,7 +400,17 @@ BootOptionDelete (
         );
   }
 
+  // Delete Boot#### environment variable
+  UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BootOption->LoadOptionIndex);
+  Status = gRT->SetVariable (
+      BootVariableName,
+      &gEfiGlobalVariableGuid,
+      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+      0,
+      NULL
+      );
+
   FreePool (BootOrder);
 
-  return EFI_SUCCESS;
+  return Status;
 }
