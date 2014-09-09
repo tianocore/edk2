@@ -120,7 +120,7 @@ _Exit(int status)
   longjmp(gMD->MainExit, 0x55);     // Get out of here.  longjmp can't return 0. Use 0x55 for a non-zero value.
 
 #ifdef __GNUC__
-  __builtin__Exit(status);         /* Keep GCC happy - never reached */
+  _Exit(status);        /* Keep GCC happy - never reached */
 #endif
 }
 
