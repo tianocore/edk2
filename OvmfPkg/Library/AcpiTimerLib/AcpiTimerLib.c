@@ -43,20 +43,75 @@
     )
 
 //
-// PIIX4 Power Management PCI Configuration Registers
+// PCI Location of Q35 Power Management PCI Configuration Registers
 //
-#define PMBA                PIIX4_PCI_POWER_MANAGEMENT_REGISTER (0x40)
+#define Q35_POWER_MANAGEMENT_BUS       0x00
+#define Q35_POWER_MANAGEMENT_DEVICE    0x1f
+#define Q35_POWER_MANAGEMENT_FUNCTION  0x00
+
+//
+// Macro to access Q35 Power Management PCI Configuration Registers
+//
+#define Q35_PCI_POWER_MANAGEMENT_REGISTER(Register) \
+  PCI_LIB_ADDRESS (                                 \
+    Q35_POWER_MANAGEMENT_BUS,                       \
+    Q35_POWER_MANAGEMENT_DEVICE,                    \
+    Q35_POWER_MANAGEMENT_FUNCTION,                  \
+    Register                                        \
+    )
+
+//
+// PCI Location of Host Bridge PCI Configuration Registers
+//
+#define HOST_BRIDGE_BUS       0x00
+#define HOST_BRIDGE_DEVICE    0x00
+#define HOST_BRIDGE_FUNCTION  0x00
+
+//
+// Macro to access Host Bridge Configuration Registers
+//
+#define HOST_BRIDGE_REGISTER(Register) \
+  PCI_LIB_ADDRESS (                    \
+    HOST_BRIDGE_BUS,                   \
+    HOST_BRIDGE_DEVICE,                \
+    HOST_BRIDGE_FUNCTION,              \
+    Register                           \
+    )
+
+//
+// Host Bridge Device ID (DID) Register
+//
+#define HOST_BRIDGE_DID  HOST_BRIDGE_REGISTER (0x02)
+
+//
+// Host Bridge DID Register values
+//
+#define PCI_DEVICE_ID_INTEL_82441    0x1237  // DID value for PIIX4
+#define PCI_DEVICE_ID_INTEL_Q35_MCH  0x29C0  // DID value for Q35
+
+//
+// Access Power Management PCI Config Regs based on Host Bridge type
+//
+#define PCI_POWER_MANAGEMENT_REGISTER(Register)                   \
+  ((PciRead16 (HOST_BRIDGE_DID) == PCI_DEVICE_ID_INTEL_Q35_MCH) ? \
+    Q35_PCI_POWER_MANAGEMENT_REGISTER (Register) :                \
+    PIIX4_PCI_POWER_MANAGEMENT_REGISTER (Register))
+
+//
+// Power Management PCI Configuration Registers
+//
+#define PMBA                PCI_POWER_MANAGEMENT_REGISTER (0x40)
 #define   PMBA_RTE          BIT0
-#define PMREGMISC           PIIX4_PCI_POWER_MANAGEMENT_REGISTER (0x80)
+#define PMREGMISC           PCI_POWER_MANAGEMENT_REGISTER (0x80)
 #define   PMIOSE            BIT0
 
 //
-// The ACPI Time in the PIIX4 is a 24-bit counter
+// The ACPI Time is a 24-bit counter
 //
 #define ACPI_TIMER_COUNT_SIZE  BIT24
 
 //
-// Offset in the PIIX4 Power Management Base Address to the ACPI Timer 
+// Offset in the Power Management Base Address to the ACPI Timer
 //
 #define ACPI_TIMER_OFFSET      0x8
 
@@ -76,12 +131,12 @@ AcpiTimerLibConstructor (
   )
 {
   //
-  // Check to see if the PIIX4 Power Management Base Address is already enabled
+  // Check to see if the Power Management Base Address is already enabled
   //
   if ((PciRead8 (PMREGMISC) & PMIOSE) == 0) {
     //
-    // If the PIIX4 Power Management Base Address is not programmed, 
-    // then program the PIIX4 Power Management Base Address from a PCD.
+    // If the Power Management Base Address is not programmed,
+    // then program the Power Management Base Address from a PCD.
     //
     PciAndThenOr32 (PMBA, (UINT32)(~0x0000FFC0), PcdGet16 (PcdAcpiPmBaseAddress));
 
