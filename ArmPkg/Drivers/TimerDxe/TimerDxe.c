@@ -24,7 +24,7 @@
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
-#include <Library/ArmArchTimerLib.h>
+#include <Library/ArmArchTimer.h>
 
 #include <Protocol/Timer.h>
 #include <Protocol/HardwareInterrupt.h>

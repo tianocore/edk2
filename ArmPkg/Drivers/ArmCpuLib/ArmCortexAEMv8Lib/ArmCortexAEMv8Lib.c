@@ -14,7 +14,7 @@
 
 #include <Base.h>
 #include <Library/ArmCpuLib.h>
-#include <Library/ArmArchTimerLib.h>
+#include <Library/ArmArchTimer.h>
 #include <Library/PcdLib.h>
 
 #include <Chipset/ArmAemV8.h>

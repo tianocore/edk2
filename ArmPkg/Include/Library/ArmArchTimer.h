@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef __ARM_ARCH_TIMER_LIB_H__
-#define __ARM_ARCH_TIMER_LIB_H__
+#ifndef __ARM_ARCH_TIMER_H__
+#define __ARM_ARCH_TIMER_H__
 
 #define ARM_ARCH_TIMER_ENABLE           (1 << 0)
 #define ARM_ARCH_TIMER_IMASK            (1 << 1)
@@ -112,4 +112,4 @@ ArmArchTimerSetCompareVal (
   IN   UINT64   Val
   );
 
-#endif // __ARM_ARCH_TIMER_LIB_H__
+#endif // __ARM_ARCH_TIMER_H__

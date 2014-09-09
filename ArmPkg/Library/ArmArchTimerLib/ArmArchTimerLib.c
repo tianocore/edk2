@@ -20,7 +20,7 @@
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/ArmArchTimerLib.h>
+#include <Library/ArmArchTimer.h>
 
 #define TICKS_PER_MICRO_SEC     (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
 
