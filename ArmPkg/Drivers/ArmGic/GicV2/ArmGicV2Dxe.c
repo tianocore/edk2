@@ -29,6 +29,9 @@ Abstract:
 
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol;
 
+UINT32 mGicInterruptInterfaceBase;
+UINT32 mGicDistributorBase;
+
 /**
   Enable interrupt source Source.
 
@@ -51,7 +54,7 @@ GicV2EnableInterruptSource (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicEnableInterrupt (FixedPcdGet32 (PcdGicDistributorBase), Source);
+  ArmGicEnableInterrupt (mGicDistributorBase, Source);
 
   return EFI_SUCCESS;
 }
@@ -78,7 +81,7 @@ GicV2DisableInterruptSource (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicDisableInterrupt (FixedPcdGet32 (PcdGicDistributorBase), Source);
+  ArmGicDisableInterrupt (mGicDistributorBase, Source);
 
   return EFI_SUCCESS;
 }
@@ -107,7 +110,7 @@ GicV2GetInterruptSourceState (
     return EFI_UNSUPPORTED;
   }
 
-  *InterruptState = ArmGicIsInterruptEnabled (FixedPcdGet32 (PcdGicDistributorBase), Source);
+  *InterruptState = ArmGicIsInterruptEnabled (mGicDistributorBase, Source);
 
   return EFI_SUCCESS;
 }
@@ -135,7 +138,7 @@ GicV2EndOfInterrupt (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicV2EndOfInterrupt (FixedPcdGet32 (PcdGicInterruptInterfaceBase), Source);
+  ArmGicV2EndOfInterrupt (mGicInterruptInterfaceBase, Source);
   return EFI_SUCCESS;
 }
 
@@ -160,7 +163,7 @@ GicV2IrqInterruptHandler (
   UINT32                      GicInterrupt;
   HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
 
-  GicInterrupt = ArmGicV2AcknowledgeInterrupt (FixedPcdGet32 (PcdGicInterruptInterfaceBase));
+  GicInterrupt = ArmGicV2AcknowledgeInterrupt (mGicInterruptInterfaceBase);
 
   // Special Interrupts (ID1020-ID1023) have an Interrupt ID greater than the number of interrupt (ie: Spurious interrupt).
   if ((GicInterrupt & ARM_GIC_ICCIAR_ACKINTID) >= mGicNumInterrupts) {
@@ -216,7 +219,7 @@ GicV2ExitBootServicesEvent (
 
   // Acknowledge all pending interrupts
   do {
-    GicInterrupt = ArmGicV2AcknowledgeInterrupt (FixedPcdGet32 (PcdGicInterruptInterfaceBase));
+    GicInterrupt = ArmGicV2AcknowledgeInterrupt (mGicInterruptInterfaceBase);
 
     if ((GicInterrupt & ARM_GIC_ICCIAR_ACKINTID) < mGicNumInterrupts) {
       GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
@@ -224,10 +227,10 @@ GicV2ExitBootServicesEvent (
   } while (!ARM_GIC_IS_SPECIAL_INTERRUPTS (GicInterrupt));
 
   // Disable Gic Interface
-  ArmGicV2DisableInterruptInterface (FixedPcdGet32 (PcdGicInterruptInterfaceBase));
+  ArmGicV2DisableInterruptInterface (mGicInterruptInterfaceBase);
 
   // Disable Gic Distributor
-  ArmGicDisableDistributor (FixedPcdGet32 (PcdGicDistributorBase));
+  ArmGicDisableDistributor (mGicDistributorBase);
 }
 
 /**
@@ -256,7 +259,9 @@ GicV2DxeInitialize (
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicNumInterrupts = ArmGicGetMaxNumInterrupts (FixedPcdGet32 (PcdGicDistributorBase));
+  mGicInterruptInterfaceBase = PcdGet32 (PcdGicInterruptInterfaceBase);
+  mGicDistributorBase = PcdGet32 (PcdGicDistributorBase);
+  mGicNumInterrupts = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     GicV2DisableInterruptSource (&gHardwareInterruptV2Protocol, Index);
@@ -265,7 +270,7 @@ GicV2DxeInitialize (
     RegOffset = Index / 4;
     RegShift = (Index % 4) * 8;
     MmioAndThenOr32 (
-      FixedPcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPR + (4 * RegOffset),
+      mGicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
       ~(0xff << RegShift),
       ARM_GIC_DEFAULT_PRIORITY << RegShift
       );
@@ -282,28 +287,28 @@ GicV2DxeInitialize (
   //
   // Read the first Interrupt Processor Targets Register (that corresponds to the 4
   // first SGIs)
-  CpuTarget = MmioRead32 (FixedPcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPTR);
+  CpuTarget = MmioRead32 (mGicDistributorBase + ARM_GIC_ICDIPTR);
 
   // The CPU target is a bit field mapping each CPU to a GIC CPU Interface. This value
   // is 0 when we run on a uniprocessor platform.
   if (CpuTarget != 0) {
     // The 8 first Interrupt Processor Targets Registers are read-only
     for (Index = 8; Index < (mGicNumInterrupts / 4); Index++) {
-      MmioWrite32 (FixedPcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPTR + (Index * 4), CpuTarget);
+      MmioWrite32 (mGicDistributorBase + ARM_GIC_ICDIPTR + (Index * 4), CpuTarget);
     }
   }
 
   // Set binary point reg to 0x7 (no preemption)
-  MmioWrite32 (FixedPcdGet32 (PcdGicInterruptInterfaceBase) + ARM_GIC_ICCBPR, 0x7);
+  MmioWrite32 (mGicInterruptInterfaceBase + ARM_GIC_ICCBPR, 0x7);
 
   // Set priority mask reg to 0xff to allow all priorities through
-  MmioWrite32 (FixedPcdGet32 (PcdGicInterruptInterfaceBase) + ARM_GIC_ICCPMR, 0xff);
+  MmioWrite32 (mGicInterruptInterfaceBase + ARM_GIC_ICCPMR, 0xff);
 
   // Enable gic cpu interface
-  ArmGicEnableInterruptInterface (FixedPcdGet32 (PcdGicInterruptInterfaceBase));
+  ArmGicEnableInterruptInterface (mGicInterruptInterfaceBase);
 
   // Enable gic distributor
-  ArmGicEnableDistributor (FixedPcdGet32 (PcdGicDistributorBase));
+  ArmGicEnableDistributor (mGicDistributorBase);
 
   Status = InstallAndRegisterInterruptService (
           &gHardwareInterruptV2Protocol, GicV2IrqInterruptHandler, GicV2ExitBootServicesEvent);

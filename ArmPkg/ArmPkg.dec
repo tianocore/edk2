@@ -82,13 +82,6 @@
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
 
   #
-  # ARM Generic Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
-  gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
-
-  #
   # ARM Secure Firmware PCDs
   #
   gArmTokenSpaceGuid.PcdSecureFdBaseAddress|0|UINT32|0x00000015
@@ -216,6 +209,10 @@
   gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x00200000|UINT32|0x00000026
 
 
+#
+# These PCDs are also defined as 'PcdsDynamic' to be redefined when using UEFI in a
+# context of virtual machine.
+#
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
   #
   # ARM Architectural Timer
@@ -227,3 +224,10 @@
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26|UINT32|0x00000040
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
+
+  #
+  # ARM Generic Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
+  gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025

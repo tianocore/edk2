@@ -43,12 +43,13 @@
   MemoryAllocationLib
   UefiDriverEntryPoint
   IoLib
+  PcdLib
 
 [Protocols]
   gHardwareInterruptProtocolGuid
   gEfiCpuArchProtocolGuid
 
-[FixedPcd.common]
+[Pcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
 

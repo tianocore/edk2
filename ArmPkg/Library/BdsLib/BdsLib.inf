@@ -48,6 +48,7 @@
   DebugLib
   DevicePathLib
   HobLib
+  PcdLib
   PerformanceLib
   SerialPortLib
   FdtLib
@@ -91,7 +92,7 @@
 [FixedPcd.ARM]
   gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset
 
-[FixedPcd.AARCH64]
+[Pcd.AARCH64]
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicSgiIntId
 
