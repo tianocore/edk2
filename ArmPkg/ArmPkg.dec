@@ -137,16 +137,6 @@
   # Maximum file size for TFTP servers that do not support 'tsize' extension
   gArmTokenSpaceGuid.PcdMaxTftpFileSize|0x01000000|UINT32|0x00000000
 
-  #
-  # ARM Architectural Timer
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
-
-  # ARM Architectural Timer Interrupt(GIC PPI) numbers
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
-  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26|UINT32|0x00000040
-  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
 
 [PcdsFixedAtBuild.ARM]
   #
@@ -224,3 +214,16 @@
   gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x20000000|UINT32|0x00000023
   # The FDT blob must be loaded at a 2MB aligned address.
   gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x00200000|UINT32|0x00000026
+
+
+[PcdsFixedAtBuild.common, PcdsDynamic.common]
+  #
+  # ARM Architectural Timer
+  #
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
+
+  # ARM Architectural Timer Interrupt(GIC PPI) numbers
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26|UINT32|0x00000040
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
