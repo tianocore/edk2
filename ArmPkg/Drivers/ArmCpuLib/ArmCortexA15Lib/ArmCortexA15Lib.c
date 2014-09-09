@@ -15,9 +15,8 @@
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmCpuLib.h>
-#include <Library/ArmArchTimer.h>
+#include <Library/ArmGenericTimerCounterLib.h>
 #include <Library/DebugLib.h>
-#include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
 #include <Chipset/ArmCortexA15.h>
@@ -39,7 +38,7 @@ ArmCpuSetup (
 
   // Note: System Counter frequency can only be set in Secure privileged mode,
   // if security extensions are implemented.
-  ArmArchTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
+  ArmGenericTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
 
   if (ArmIsMpCore()) {
     // Turn on SMP coherency

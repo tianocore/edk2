@@ -41,6 +41,7 @@
   DebugLib
   UefiDriverEntryPoint
   IoLib
+  ArmGenericTimerCounterLib
 
 [Guids]
 

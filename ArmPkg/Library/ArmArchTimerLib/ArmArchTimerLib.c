@@ -20,7 +20,7 @@
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/ArmArchTimer.h>
+#include <Library/ArmGenericTimerCounterLib.h>
 
 #define TICKS_PER_MICRO_SEC     (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
 
@@ -47,13 +47,13 @@ TimerConstructor (
     // Only set the frequency for ARMv7. We expect the secure firmware to have already do it
     // If the security extensions are not implemented set Timer Frequency
     if ((ArmReadIdPfr1 () & ARM_PFR1_SEC) == 0x0) {
-      ArmArchTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
+      ArmGenericTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
     }
 #endif
 
     // Architectural Timer Frequency must be set in the Secure privileged(if secure extensions are supported) mode.
     // If the reset value (0) is returned just ASSERT.
-    TimerFreq = ArmArchTimerGetTimerFreq ();
+    TimerFreq = ArmGenericTimerGetTimerFreq ();
     ASSERT (TimerFreq != 0);
 
   } else {
@@ -88,13 +88,13 @@ MicroSecondDelay (
   TimerTicks64 = (MicroSeconds * PcdGet32 (PcdArmArchTimerFreqInHz)) / 1000000U;
 
   // Read System Counter value
-  SystemCounterVal = ArmArchTimerGetSystemCount ();
+  SystemCounterVal = ArmGenericTimerGetSystemCount ();
 
   TimerTicks64 += SystemCounterVal;
 
   // Wait until delay count is expired.
   while (SystemCounterVal < TimerTicks64) {
-    SystemCounterVal = ArmArchTimerGetSystemCount ();
+    SystemCounterVal = ArmGenericTimerGetSystemCount ();
   }
 
   return MicroSeconds;
@@ -149,7 +149,7 @@ GetPerformanceCounter (
   )
 {
   // Just return the value of system count
-  return ArmArchTimerGetSystemCount ();
+  return ArmGenericTimerGetSystemCount ();
 }
 
 /**
@@ -192,5 +192,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0xFFFFFFFFFFFFFFFFUL;
   }
 
-  return (UINT64)ArmArchTimerGetTimerFreq ();
+  return (UINT64)ArmGenericTimerGetTimerFreq ();
 }

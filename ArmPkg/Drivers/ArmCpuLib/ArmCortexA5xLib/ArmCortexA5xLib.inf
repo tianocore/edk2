@@ -25,7 +25,7 @@
 
 [LibraryClasses]
   ArmLib
-  IoLib
+  ArmGenericTimerCounterLib
   PcdLib
 
 [Sources.common]

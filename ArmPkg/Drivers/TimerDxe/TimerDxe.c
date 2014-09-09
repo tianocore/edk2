@@ -24,6 +24,7 @@
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
+#include <Library/ArmGenericTimerCounterLib.h>
 #include <Library/ArmArchTimer.h>
 
 #include <Protocol/Timer.h>
@@ -101,7 +102,7 @@ ExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-  ArmArchTimerDisableTimer ();
+  ArmGenericTimerDisableTimer ();
 }
 
 /**
@@ -144,7 +145,7 @@ TimerDriverSetTimerPeriod (
   EFI_TPL     OriginalTPL;
 
   // Always disable the timer
-  ArmArchTimerDisableTimer ();
+  ArmGenericTimerDisableTimer ();
 
   if (TimerPeriod != 0) {
     // mTimerTicks = TimerPeriod in 1ms unit x Frequency.10^-3
@@ -163,13 +164,13 @@ TimerDriverSetTimerPeriod (
 
     gBS->RestoreTPL (OriginalTPL);
 
-    // Get value of the current physical timer
-    CounterValue = ArmReadCntPct ();
+    // Get value of the current timer
+    CounterValue = ArmGenericTimerGetSystemCount ();
     // Set the interrupt in Current Time + mTimerTick
-    ArmWriteCntpCval (CounterValue + mTimerTicks);
+    ArmGenericTimerSetCompareVal (CounterValue + mTimerTicks);
 
     // Enable the timer
-    ArmArchTimerEnableTimer ();
+    ArmGenericTimerEnableTimer ();
   } else {
     // Save the new timer period
     mTimerPeriod   = TimerPeriod;
@@ -307,7 +308,7 @@ TimerInterruptHandler (
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   // Check if the timer interrupt is active
-  if ((ArmArchTimerGetTimerCtrlReg () ) & ARM_ARCH_TIMER_ISTATUS) {
+  if ((ArmGenericTimerGetTimerCtrlReg () ) & ARM_ARCH_TIMER_ISTATUS) {
 
     // Signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
     gInterrupt->EndOfInterrupt (gInterrupt, Source);
@@ -321,9 +322,9 @@ TimerInterruptHandler (
     //
 
     // Get current counter value
-    CurrentValue = ArmReadCntPct ();
+    CurrentValue = ArmGenericTimerGetSystemCount ();
     // Get the counter value to compare with
-    CompareValue = ArmReadCntpCval ();
+    CompareValue = ArmGenericTimerGetCompareVal ();
 
     // This loop is needed in case we missed interrupts (eg: case when the interrupt handling
     // has taken longer than mTickPeriod).
@@ -335,7 +336,7 @@ TimerInterruptHandler (
     } while (CompareValue < CurrentValue);
 
     // Set next compare value
-    ArmWriteCntpCval (CompareValue);
+    ArmGenericTimerSetCompareVal (CompareValue);
   }
 
   // Enable timer interrupts
@@ -379,10 +380,10 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Disable the timer
-  TimerCtrlReg = ArmArchTimerGetTimerCtrlReg ();
+  TimerCtrlReg = ArmGenericTimerGetTimerCtrlReg ();
   TimerCtrlReg |= ARM_ARCH_TIMER_IMASK;
   TimerCtrlReg &= ~ARM_ARCH_TIMER_ENABLE;
-  ArmArchTimerSetTimerCtrlReg (TimerCtrlReg);
+  ArmGenericTimerSetTimerCtrlReg (TimerCtrlReg);
   Status = TimerDriverSetTimerPeriod (&gTimer, 0);
   ASSERT_EFI_ERROR (Status);
 
@@ -416,7 +417,7 @@ TimerInitialize (
 
   // Everything is ready, unmask and enable timer interrupts
   TimerCtrlReg = ARM_ARCH_TIMER_ENABLE;
-  ArmArchTimerSetTimerCtrlReg (TimerCtrlReg);
+  ArmGenericTimerSetTimerCtrlReg (TimerCtrlReg);
 
   // Register for an ExitBootServicesEvent
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);
