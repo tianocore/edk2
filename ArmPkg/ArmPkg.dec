@@ -105,12 +105,6 @@
   gArmTokenSpaceGuid.PcdHypFvBaseAddress|0|UINT32|0x0000003C
   gArmTokenSpaceGuid.PcdHypFvSize|0|UINT32|0x0000003D
 
-  # System Memory (DRAM): These PCDs define the region of in-built system memory
-  # Some platforms can get DRAM extensions, these additional regions will be declared
-  # to UEFI by ArmPlatformLib
-  gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
-
   # Use ClusterId + CoreId to identify the PrimaryCore
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
   # The Primary Core is ClusterId[0] & CoreId[0]
@@ -214,6 +208,12 @@
 # context of virtual machine.
 #
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
+  # System Memory (DRAM): These PCDs define the region of in-built system memory
+  # Some platforms can get DRAM extensions, these additional regions will be declared
+  # to UEFI by ArmPlatformLib
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
+
   #
   # ARM Architectural Timer
   #

@@ -103,14 +103,6 @@ InitializeMemory (
 
   DEBUG ((EFI_D_ERROR, "Memory Init PEIM Loaded\n"));
 
-  // Ensure PcdSystemMemorySize has been set
-  ASSERT (FixedPcdGet64 (PcdSystemMemorySize) != 0);
-
-  SystemMemoryBase = (UINTN)FixedPcdGet64 (PcdSystemMemoryBase);
-  SystemMemoryTop = SystemMemoryBase + (UINTN)FixedPcdGet64 (PcdSystemMemorySize);
-  FdBase = (UINTN)PcdGet32 (PcdFdBaseAddress);
-  FdTop = FdBase + (UINTN)PcdGet32 (PcdFdSize);
-
   //
   // Initialize the System Memory (DRAM)
   //
@@ -118,6 +110,14 @@ InitializeMemory (
     // In case the DRAM has not been initialized by the secure firmware
     ArmPlatformInitializeSystemMemory ();
   }
+
+  // Ensure PcdSystemMemorySize has been set
+  ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
+
+  SystemMemoryBase = (UINTN)PcdGet64 (PcdSystemMemoryBase);
+  SystemMemoryTop = SystemMemoryBase + (UINTN)PcdGet64 (PcdSystemMemorySize);
+  FdBase = (UINTN)PcdGet32 (PcdFdBaseAddress);
+  FdTop = FdBase + (UINTN)PcdGet32 (PcdFdSize);
 
   //
   // Declare the UEFI memory to PEI
