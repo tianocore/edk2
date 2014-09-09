@@ -14,6 +14,7 @@
 
 #include <PiDxe.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLoadLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 

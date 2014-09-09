@@ -262,6 +262,9 @@
 
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
 
+  # FDT Support
+  EmbeddedPkg/Library/FdtLoadLib/FdtLoadLib.inf
+
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
