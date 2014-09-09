@@ -32,7 +32,7 @@ AGENT_HANDLER_SIGNATURE  MACRO
   db   41h, 47h, 54h, 48h       ; SIGNATURE_32('A','G','T','H')
 ENDM
 
-ExceptionStubHeaderSize        dw      Exception1Handle - Exception0Handle ;
+ExceptionStubHeaderSize        dd      Exception1Handle - Exception0Handle ;
 CommonEntryAddr                dq      CommonEntry ;
 
 .code

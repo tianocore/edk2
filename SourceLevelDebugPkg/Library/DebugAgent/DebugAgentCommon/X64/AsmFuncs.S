@@ -34,7 +34,7 @@ ASM_GLOBAL ASM_PFX(CommonEntry)
 
 .data
 
-ASM_PFX(ExceptionStubHeaderSize):  .word     ASM_PFX(Exception1Handle) - ASM_PFX(Exception0Handle)
+ASM_PFX(ExceptionStubHeaderSize):  .long     ASM_PFX(Exception1Handle) - ASM_PFX(Exception0Handle)
 
 
 .text
@@ -271,13 +271,13 @@ NoExtrPush:
   movzwq   32(%rbp), %rax
 #  movq     %cs, %rax
   pushq    %rax
-  movq     %ds, %rax
+  movw     %ds, %rax
   pushq    %rax
-  movq     %es, %rax
+  movw     %es, %rax
   pushq    %rax
-  movq     %fs, %rax
+  movw     %fs, %rax
   pushq    %rax
-  movq     %gs, %rax
+  movw     %gs, %rax
   pushq    %rax
 
 ## UINT64  Rip;

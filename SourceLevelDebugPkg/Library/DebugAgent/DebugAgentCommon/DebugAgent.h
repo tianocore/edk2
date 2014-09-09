@@ -67,7 +67,7 @@
 
 extern UINTN  Exception0Handle;
 extern UINTN  TimerInterruptHandle;
-extern UINT16 ExceptionStubHeaderSize;
+extern UINT32 ExceptionStubHeaderSize;
 extern BOOLEAN mSkipBreakpoint;
 extern EFI_VECTOR_HANDOFF_INFO mVectorHandoffInfoDebugAgent[];
 extern UINTN                   mVectorHandoffInfoCount;

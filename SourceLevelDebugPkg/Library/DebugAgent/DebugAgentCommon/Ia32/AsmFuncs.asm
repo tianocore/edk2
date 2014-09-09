@@ -38,7 +38,7 @@ ENDM
 
 .data
 
-ExceptionStubHeaderSize   DW    Exception1Handle - Exception0Handle
+ExceptionStubHeaderSize   DD    Exception1Handle - Exception0Handle
 CommonEntryAddr           DD    CommonEntry
 
 .code

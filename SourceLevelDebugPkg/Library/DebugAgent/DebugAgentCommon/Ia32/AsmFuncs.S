@@ -33,7 +33,7 @@ ASM_GLOBAL ASM_PFX(CommonEntry)
 
 .data
 
-ASM_PFX(ExceptionStubHeaderSize):  .word     ASM_PFX(Exception1Handle) - ASM_PFX(Exception0Handle)
+ASM_PFX(ExceptionStubHeaderSize):  .long     ASM_PFX(Exception1Handle) - ASM_PFX(Exception0Handle)
 
 .text
 
