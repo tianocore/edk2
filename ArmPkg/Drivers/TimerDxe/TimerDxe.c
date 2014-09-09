@@ -390,6 +390,12 @@ TimerInitialize (
   // Note: Because it is not possible to determine the security state of the
   // CPU dynamically, we just install interrupt handler for both sec and non-sec
   // timer PPI
+  Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerVirtIntrNum), TimerInterruptHandler);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerHypIntrNum), TimerInterruptHandler);
+  ASSERT_EFI_ERROR (Status);
+
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerSecIntrNum), TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
