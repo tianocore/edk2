@@ -934,7 +934,7 @@ DisassembleThumbInstruction (
 
       case CMN_THUMB2:
         // CMN <Rn>, #<const>}
-        Target = (OpCode32 & 0xff) | ((OpCode >> 4) && 0x700) | ((OpCode & BIT26) == BIT26 ? BIT11 : 0);
+        Target = (OpCode32 & 0xff) | ((OpCode >> 4) & 0x700) | ((OpCode & BIT26) == BIT26 ? BIT11 : 0);
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a, #0x%x", gReg[Rn], Target);
         return;
 
