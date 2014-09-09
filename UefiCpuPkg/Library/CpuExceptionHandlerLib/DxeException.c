@@ -119,7 +119,7 @@ InitializeCpuInterruptHandlers (
       (VOID *) TemplateMap.ExceptionStart,
       TemplateMap.ExceptionStubHeaderSize
       );
-    AsmVectorNumFixup ((VOID *) InterruptEntry, (UINT8) Index);
+    AsmVectorNumFixup ((VOID *) InterruptEntry,  (UINT8) Index, (VOID *) TemplateMap.ExceptionStart);
     InterruptEntry += TemplateMap.ExceptionStubHeaderSize;
   }
 

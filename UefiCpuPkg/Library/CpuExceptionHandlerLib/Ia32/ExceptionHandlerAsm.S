@@ -632,7 +632,7 @@ ASM_PFX(AsmGetTemplateAddressMap):
         popl        %ebp
         ret
 #-------------------------------------------------------------------------------------
-#  AsmVectorNumFixup (*VectorBase, VectorNum);
+#  AsmVectorNumFixup (*NewVectorAddr, VectorNum, *OldVectorAddr);
 #-------------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(AsmVectorNumFixup)
 ASM_PFX(AsmVectorNumFixup):

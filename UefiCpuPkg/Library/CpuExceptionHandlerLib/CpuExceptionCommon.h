@@ -204,17 +204,19 @@ ArchRestoreExceptionContext (
   );
 
 /**
-  Fix up the vector number in the vector code.
+  Fix up the vector number and function address in the vector code.
  
-  @param[in] VectorBase   Base address of the vector handler.
-  @param[in] VectorNum    Index of vector.
+  @param[in] NewVectorAddr   New vector handler address.
+  @param[in] VectorNum       Index of vector.
+  @param[in] OldVectorAddr   Old vector handler address.
 
 **/
 VOID
 EFIAPI
 AsmVectorNumFixup (
-  IN VOID    *VectorBase,
-  IN UINT8   VectorNum
+  IN VOID    *NewVectorAddr,
+  IN UINT8   VectorNum,
+  IN VOID    *OldVectorAddr
   );
 
 /**

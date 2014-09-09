@@ -166,7 +166,11 @@ UpdateIdtTable (
         (VOID *) TemplateMap->HookAfterStubHeaderStart,
         TemplateMap->ExceptionStubHeaderSize
         );
-      AsmVectorNumFixup ((VOID *) mReservedVectors[Index].HookAfterStubHeaderCode, (UINT8) Index);
+      AsmVectorNumFixup (
+        (VOID *) mReservedVectors[Index].HookAfterStubHeaderCode,
+        (UINT8) Index,
+        (VOID *) TemplateMap->HookAfterStubHeaderStart
+        );
       //
       // Go on the following code
       //
