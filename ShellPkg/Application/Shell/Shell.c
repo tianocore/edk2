@@ -1486,7 +1486,7 @@ ShellConvertVariables (
     ;  MasterEnvList != NULL && *MasterEnvList != CHAR_NULL
     ;  MasterEnvList += StrLen(MasterEnvList) + 1
    ){
-    *ItemTemp = L'%';
+    StrnCpy(ItemTemp, L"%", ((ItemSize+(2*sizeof(CHAR16)))/sizeof(CHAR16))-1);
     StrnCat(ItemTemp, MasterEnvList, ((ItemSize+(2*sizeof(CHAR16)))/sizeof(CHAR16))-1 - StrLen(ItemTemp));
     StrnCat(ItemTemp, L"%", ((ItemSize+(2*sizeof(CHAR16)))/sizeof(CHAR16))-1 - StrLen(ItemTemp));
     ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, ItemTemp, EfiShellGetEnv(MasterEnvList), TRUE, FALSE);
