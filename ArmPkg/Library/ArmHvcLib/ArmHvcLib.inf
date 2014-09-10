@@ -1,0 +1,32 @@
+#/** @file
+#
+#  Copyright (c) 2012-2013, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmHvcLib
+  FILE_GUID                      = E594959A-D150-44D3-963B-BA90329D3D9A
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmHvcLib
+
+[Sources.ARM]
+  Arm/ArmHvc.asm    | RVCT
+  Arm/ArmHvc.S      | GCC
+
+[Sources.AARCH64]
+  AArch64/ArmHvc.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec

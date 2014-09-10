@@ -36,7 +36,8 @@
   GCC:*_*_ARM_PLATFORM_FLAGS    == -march=armv7-a -mfpu=neon
   GCC:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
 
-  RVCT:*_*_ARM_PLATFORM_FLAGS  == --cpu Cortex-A8
+  # We use A15 to get the Secure and Virtualization extensions
+  RVCT:*_*_ARM_PLATFORM_FLAGS  == --cpu Cortex-A15
   RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
 [LibraryClasses.common]
@@ -130,6 +131,7 @@
 
   ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
+  ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
