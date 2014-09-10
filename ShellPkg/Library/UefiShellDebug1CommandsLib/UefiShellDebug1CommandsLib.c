@@ -13,6 +13,7 @@
 **/
 
 #include "UefiShellDebug1CommandsLib.h"
+#include <Library/BcfgCommandLib.h>
 
 STATIC CONST CHAR16 mFileName[] = L"Debug1Commands";
 EFI_HANDLE gShellDebug1HiiHandle = NULL;
@@ -84,17 +85,9 @@ UefiShellDebug1CommandsLibConstructor (
   ShellCommandRegisterCommandName(L"edit",          ShellCommandRunEdit               , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_EDIT)         );
   ShellCommandRegisterCommandName(L"hexedit",       ShellCommandRunHexEdit            , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_HEXEDIT)      );
 
-  //
-  // check install profile bit of the profiles mask is set
-  //
-  if ((PcdGet8(PcdShellProfileMask) & BIT2) == 0) {
-    ShellCommandRegisterCommandName(L"bcfg",        ShellCommandRunBcfg               , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_BCFG)         );
-  }
-
-
-
-
   ShellCommandRegisterAlias(L"dmem", L"mem");
+
+  BcfgLibraryRegisterBcfgCommand(ImageHandle, SystemTable, L"Debug1");
 
   return (EFI_SUCCESS);
 }
@@ -115,6 +108,8 @@ UefiShellDebug1CommandsLibDestructor (
   if (gShellDebug1HiiHandle != NULL) {
     HiiRemovePackages(gShellDebug1HiiHandle);
   }
+
+  BcfgLibraryUnregisterBcfgCommand(ImageHandle, SystemTable);
   return (EFI_SUCCESS);
 }
 

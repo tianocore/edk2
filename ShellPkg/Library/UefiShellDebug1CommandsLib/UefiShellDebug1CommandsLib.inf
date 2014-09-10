@@ -36,7 +36,6 @@
   Mm.c
   SetVar.c
   SerMode.c
-  Bcfg.c
   Pci.c
   Pci.h
   DmpStore.c
@@ -115,6 +114,7 @@
   UefiBootServicesTableLib
   SortLib
   PrintLib
+  BcfgCommandLib
 
 [Pcd]
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask              # ALWAYS_CONSUMED

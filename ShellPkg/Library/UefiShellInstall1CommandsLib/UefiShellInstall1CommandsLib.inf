@@ -24,9 +24,6 @@
 
 [Sources.common]
   UefiShellInstall1CommandsLib.c
-  UefiShellInstall1CommandsLib.h
-  UefiShellInstall1CommandsLib.uni
-  Bcfg.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -45,6 +42,7 @@
   UefiBootServicesTableLib
   SortLib
   PrintLib
+  BcfgCommandLib
 
 [Pcd]
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask # ALWAYS_CONSUMED

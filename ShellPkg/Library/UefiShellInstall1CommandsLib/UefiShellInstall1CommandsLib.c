@@ -12,24 +12,7 @@
 
 **/
 
-#include "UefiShellInstall1CommandsLib.h"
-
-STATIC CONST CHAR16 mFileName[] = L"ShellCommands";
-EFI_HANDLE gShellInstall1HiiHandle = NULL;
-
-/**
-  Function to get the filename with help context if HII will not be used.
-
-  @return   The filename with help text in it.
-**/
-CONST CHAR16*
-EFIAPI
-ShellCommandGetManFileNameInstall1 (
-  VOID
-  )
-{
-  return (mFileName);
-}
+#include <Library/BcfgCommandLib.h>
 
 /**
   Constructor for the Shell Level 1 Commands library.
@@ -56,17 +39,7 @@ ShellInstall1CommandsLibConstructor (
     return (EFI_SUCCESS);
   }
 
-  gShellInstall1HiiHandle = HiiAddPackages (&gShellInstall1HiiGuid, gImageHandle, UefiShellInstall1CommandsLibStrings, NULL);
-  if (gShellInstall1HiiHandle == NULL) {
-    return (EFI_DEVICE_ERROR);
-  }
-
-  //
-  // install our shell command handlers that are always installed
-  //
-  ShellCommandRegisterCommandName(L"bcfg", ShellCommandRunBcfgInstall , ShellCommandGetManFileNameInstall1, 0, L"Install", FALSE, gShellInstall1HiiHandle, STRING_TOKEN(STR_GET_HELP_BCFG));
-
-  return (EFI_SUCCESS);
+  return (BcfgLibraryRegisterBcfgCommand(ImageHandle, SystemTable, L"Install1"));
 }
 
 /**
@@ -82,8 +55,5 @@ ShellInstall1CommandsLibDestructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  if (gShellInstall1HiiHandle != NULL) {
-    HiiRemovePackages(gShellInstall1HiiHandle);
-  }
-  return (EFI_SUCCESS);
+  return (BcfgLibraryUnregisterBcfgCommand(ImageHandle, SystemTable));
 }
