@@ -55,7 +55,6 @@
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz
 
 [Depex]
   gHardwareInterruptProtocolGuid
