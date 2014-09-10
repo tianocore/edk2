@@ -231,3 +231,11 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
   gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
+
+  #
+  # ARM PSCI function invocations can be done either through hypervisor
+  # calls (HVC) or secure monitor calls (SMC).
+  # PcdArmPsciMethod == 1 : use HVC
+  # PcdArmPsciMethod == 2 : use SMC
+  #
+  gArmTokenSpaceGuid.PcdArmPsciMethod|0|UINT32|0x00000042
