@@ -65,7 +65,7 @@ typedef struct {
 typedef struct {
   USB_INTERFACE_SETTING*        Settings[USB_MAX_INTERFACE_SETTING];
   UINTN                         NumOfSetting;
-  UINT8                         ActiveIndex;  // Index of active setting
+  UINTN                         ActiveIndex;  // Index of active setting
 } USB_INTERFACE_DESC;
 
 typedef struct {

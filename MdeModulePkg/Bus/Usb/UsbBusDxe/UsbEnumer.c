@@ -318,7 +318,7 @@ UsbSelectSetting (
   )
 {
   USB_INTERFACE_SETTING   *Setting;
-  UINT8                   Index;
+  UINTN                   Index;
 
   //
   // Locate the active alternate setting
