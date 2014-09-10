@@ -1140,6 +1140,7 @@ CreateFileInterfaceEnv(
   )
 {
   EFI_FILE_PROTOCOL_ENVIRONMENT  *EnvFileInterface;
+  UINTN                          EnvNameSize;
 
   if (EnvName == NULL) {
     return (NULL);
@@ -1148,7 +1149,8 @@ CreateFileInterfaceEnv(
   //
   // Get some memory
   //
-  EnvFileInterface = AllocateZeroPool(sizeof(EFI_FILE_PROTOCOL_ENVIRONMENT)+StrSize(EnvName));
+  EnvNameSize = StrSize(EnvName);
+  EnvFileInterface = AllocateZeroPool(sizeof(EFI_FILE_PROTOCOL_ENVIRONMENT)+EnvNameSize);
   if (EnvFileInterface == NULL){
     return (NULL);
   }
@@ -1166,8 +1168,8 @@ CreateFileInterfaceEnv(
   EnvFileInterface->Flush       = FileInterfaceNopGeneric;
   EnvFileInterface->Delete      = FileInterfaceEnvDelete;
   EnvFileInterface->Read        = FileInterfaceEnvRead;
-
-  StrnCpy(EnvFileInterface->Name, EnvName, StrLen(EnvName));
+  
+  CopyMem(EnvFileInterface->Name, EnvName, EnvNameSize);
 
   //
   // Assign the different members for Volatile and Non-Volatile variables
