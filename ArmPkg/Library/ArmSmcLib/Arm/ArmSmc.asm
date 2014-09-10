@@ -18,7 +18,7 @@
 ArmCallSmc
     push    {r4-r8}
     // r0 will be popped just after the SMC call
-    pop     {r0}
+    push     {r0}
 
     // Load the SMC arguments values into the appropriate registers
     ldr     r7, [r0, #28]
