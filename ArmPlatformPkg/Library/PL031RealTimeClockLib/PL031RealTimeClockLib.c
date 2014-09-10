@@ -1,8 +1,6 @@
 /** @file
   Implement EFI RealTimeClock runtime services via RTC Lib.
 
-  Currently this driver does not support runtime virtual calling.
-
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
@@ -40,11 +38,12 @@
 
 #include <ArmPlatform.h>
 
-STATIC CONST CHAR16  mTimeZoneVariableName[] = L"PL031RtcTimeZone";
-STATIC CONST CHAR16  mDaylightVariableName[] = L"PL031RtcDaylight";
-STATIC BOOLEAN       mPL031Initialized = FALSE;
-STATIC EFI_EVENT     mRtcVirtualAddrChangeEvent;
-STATIC UINTN         mPL031RtcBase;
+STATIC CONST CHAR16           mTimeZoneVariableName[] = L"PL031RtcTimeZone";
+STATIC CONST CHAR16           mDaylightVariableName[] = L"PL031RtcDaylight";
+STATIC BOOLEAN                mPL031Initialized = FALSE;
+STATIC EFI_EVENT              mRtcVirtualAddrChangeEvent;
+STATIC UINTN                  mPL031RtcBase;
+STATIC EFI_RUNTIME_SERVICES   *mRT;
 
 EFI_STATUS
 IdentifyPL031 (
@@ -294,7 +293,7 @@ LibGetTime (
 
   // Get the current time zone information from non-volatile storage
   Size = sizeof (TimeZone);
-  Status = gRT->GetVariable (
+  Status = mRT->GetVariable (
                   (CHAR16 *)mTimeZoneVariableName,
                   &gEfiCallerIdGuid,
                   NULL,
@@ -312,7 +311,7 @@ LibGetTime (
     // The time zone variable does not exist in non-volatile storage, so create it.
     Time->TimeZone = EFI_UNSPECIFIED_TIMEZONE;
     // Store it
-    Status = gRT->SetVariable (
+    Status = mRT->SetVariable (
                     (CHAR16 *)mTimeZoneVariableName,
                     &gEfiCallerIdGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
@@ -346,7 +345,7 @@ LibGetTime (
 
   // Get the current daylight information from non-volatile storage
   Size = sizeof (Daylight);
-  Status = gRT->GetVariable (
+  Status = mRT->GetVariable (
                   (CHAR16 *)mDaylightVariableName,
                   &gEfiCallerIdGuid,
                   NULL,
@@ -364,7 +363,7 @@ LibGetTime (
     // The daylight variable does not exist in non-volatile storage, so create it.
     Time->Daylight = 0;
     // Store it
-    Status = gRT->SetVariable (
+    Status = mRT->SetVariable (
                     (CHAR16 *)mDaylightVariableName,
                     &gEfiCallerIdGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
@@ -498,7 +497,7 @@ LibSetTime (
   // Do this after having set the RTC.
 
   // Save the current time zone information into non-volatile storage
-  Status = gRT->SetVariable (
+  Status = mRT->SetVariable (
                   (CHAR16 *)mTimeZoneVariableName,
                   &gEfiCallerIdGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
@@ -516,7 +515,7 @@ LibSetTime (
   }
 
   // Save the current daylight information into non-volatile storage
-  Status = gRT->SetVariable (
+  Status = mRT->SetVariable (
                   (CHAR16 *)mDaylightVariableName,
                   &gEfiCallerIdGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
@@ -609,6 +608,7 @@ LibRtcVirtualNotifyEvent (
   // runtime calls will be made in virtual mode.
   //
   EfiConvertPointer (0x0, (VOID**)&mPL031RtcBase);
+  EfiConvertPointer (0x0, (VOID**)&mRT);
   return;
 }
 
@@ -655,6 +655,8 @@ LibRtcInitialize (
   gRT->SetTime       = LibSetTime;
   gRT->GetWakeupTime = LibGetWakeupTime;
   gRT->SetWakeupTime = LibSetWakeupTime;
+
+  mRT = gRT;
 
   // Install the protocol
   Handle = NULL;
