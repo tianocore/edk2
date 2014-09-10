@@ -54,6 +54,10 @@
   { \
     0xf3d301bb, 0xf4a5, 0x45a8, { 0xb0, 0xb7, 0xfa, 0x99, 0x9c, 0x62, 0x37, 0xae } \
   }
+#define SHELL_BCFG_HII_GUID \
+  { \
+    0x5f5f605d, 0x1583, 0x4a2d, {0xa6, 0xb2, 0xeb, 0x12, 0xda, 0xb4, 0xa2, 0xb6 } \
+  }
 
 extern EFI_GUID gHandleParsingHiiGuid;
 extern EFI_GUID gShellDebug1HiiGuid;
@@ -63,5 +67,6 @@ extern EFI_GUID gShellLevel1HiiGuid;
 extern EFI_GUID gShellLevel2HiiGuid;
 extern EFI_GUID gShellLevel3HiiGuid;
 extern EFI_GUID gShellNetwork1HiiGuid;
+extern EFI_GUID gShellBcfgHiiGuid;
 
 #endif
