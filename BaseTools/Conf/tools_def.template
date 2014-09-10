@@ -6478,6 +6478,7 @@ RELEASE_XCODE5_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$
   DEBUG_XCODE5_IA32_ASM_FLAGS  = -arch i386 -g
   NOOPT_XCODE5_IA32_ASM_FLAGS  = -arch i386 -g
 RELEASE_XCODE5_IA32_ASM_FLAGS  = -arch i386 
+      *_XCODE5_IA32_NASM_FLAGS = -f macho32
 
 
   DEBUG_XCODE5_IA32_CC_FLAGS   = -arch i386 -c -g -Os       -Wall -Werror -include AutoGen.h -funsigned-char -fno-stack-protector -fno-builtin -fshort-wchar -fasm-blocks -mdynamic-no-pic -mno-implicit-float -mms-bitfields -msoft-float -Wno-unused-parameter -Wno-missing-braces -Wno-missing-field-initializers -Wno-tautological-compare -Wno-sign-compare -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang $(PLATFORM_FLAGS)
@@ -6497,6 +6498,7 @@ RELEASE_XCODE5_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _
   DEBUG_XCODE5_X64_ASM_FLAGS  = -arch x86_64 -g
   NOOPT_XCODE5_X64_ASM_FLAGS  = -arch x86_64 -g
 RELEASE_XCODE5_X64_ASM_FLAGS  = -arch x86_64 
+      *_XCODE5_X64_NASM_FLAGS = -f macho64
 *_XCODE5_*_PP_FLAGS         = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h 
 *_XCODE5_*_VFRPP_FLAGS      = -x c -E -P -DVFRCOMPILE -include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h 
 
