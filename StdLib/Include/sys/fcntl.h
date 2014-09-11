@@ -2,7 +2,7 @@
     This file includes the definitions for open and fcntl described by POSIX
     for <fcntl.h>; it also includes related kernel definitions.
 
-    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made
     available under the terms and conditions of the BSD License which
     accompanies this distribution.  The full text of the license may be found
@@ -70,7 +70,7 @@
 #define O_APPEND    0x00000008  ///< set append mode
 #define O_CREAT     0x00000200  ///< create if nonexistent
 #define O_TRUNC     0x00000400  ///< truncate to zero length
-#define O_EXCL      0x00000800  ///< error if already exists
+#define O_EXCL      0x00000800  ///< Grant EXCLusive access, or error if already exists and O_CREAT
 
 #define O_DIRECTORY 0x00001000  ///< error if path is not a directory
 #define O_NOCTTY    0x00002000  ///< Don't make this the controlling TTY

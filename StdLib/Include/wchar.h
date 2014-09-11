@@ -150,7 +150,7 @@
               - WEOF might not be negative.
               - mbstate_t objects are not intended to be inspected by programs.
 
-    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -1089,7 +1089,7 @@ by the value of base, and a final wide string of one or more unrecognized wide
 characters, including the terminating null wide character of the input wide string. Then,
 they attempt to convert the subject sequence to an integer, and return the result.
 
-    @param[in]  Nptr    Pointer to the string to convert to a floating-point value.
+    @param[in]  Nptr    Pointer to the string to convert.
     @param[in]  EndPtr  Optional pointer to an object in which to store a pointer
                         to the final wide string.
     @param[in]  Base    Base, 0 to 36, of the value represented by the string

@@ -15,7 +15,7 @@
   One element of the FIFO is always reserved as the "terminator" element.  Thus,
   the capacity of a FIFO is actually NumElements-1.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -102,10 +102,10 @@ FIFO_FreeSpace (
   WDex = Self->WriteIndex;
 
   if(RDex <= WDex) {
-    Count = Self->NumElements - ((WDex - RDex) - 1);
+    Count = (Self->NumElements - (WDex - RDex)) - 1;
   }
   else {
-    Count = (RDex - WDex);
+    Count = (RDex - WDex)-1;
   }
   if(As == AsBytes) {
     Count *= Self->ElementSize;
@@ -221,32 +221,31 @@ FIFO_Enqueue (
   assert(Self != NULL);
   assert(pElement != NULL);
 
-  if(FIFO_IsFull(Self)) {
-    Count = 0;
+  if(FIFO_IsFull(Self)) {                                                 // FIFO is full so can't add to it
+    Count = 0;                                                              // Zero characters added
   }
-  else {
-    Count = MIN(Count, Self->FreeSpace(Self, AsElements));
-    SizeOfElement = Self->ElementSize;
-    Windex = Self->WriteIndex;
+  else {                                                                  // Otherwise, FIFO is not full...
+    Count = MIN(Count, Self->FreeSpace(Self, AsElements));                  // Smaller of requested or available space
+    SizeOfElement = Self->ElementSize;                                      // Size of Elements, in bytes
+    Windex = Self->WriteIndex;                                              // Index of first writable slot in FIFO
 
-    ElemPtr = (uintptr_t)pElement;
+    ElemPtr = (uintptr_t)pElement;                                          // Addr. of element to add, as an integer
+    QPtr    = (uintptr_t)Self->Queue + (SizeOfElement * Windex);            // Addr. in FIFO to write, as an integer
 
-    QPtr   = (uintptr_t)Self->Queue + (SizeOfElement * Windex);
-    for(i = 0; i < Count; ++i) {
-      (void)CopyMem((void *)QPtr, (const void *)ElemPtr, SizeOfElement);
-      Windex = (UINT32)ModuloIncrement(Windex, Self->NumElements);
-      if(Windex == 0) {   // If the index wrapped
-        QPtr = (uintptr_t)Self->Queue;
+    for(i = 0; i < Count; ++i) {                                            // For Count elements...
+      (void)CopyMem((void *)QPtr, (const void *)ElemPtr, SizeOfElement);      // Copy an element into the FIFO
+      Windex = (UINT32)ModuloIncrement(Windex, Self->NumElements);            // Increment the Write index, wrap if necessary
+      if(Windex == 0) {                                                       // If the index wrapped
+        QPtr = (uintptr_t)Self->Queue;                                          // Go to the beginning
       }
       else {
-        QPtr += SizeOfElement;
+        QPtr += SizeOfElement;                                                // Otherwise, point to next in FIFO
       }
-      ElemPtr += SizeOfElement;
+      ElemPtr += SizeOfElement;                                               // And also point to next Element to add
     }
-    (void)ZeroMem((void*)QPtr, SizeOfElement);
-    Self->WriteIndex = Windex;
+    Self->WriteIndex = Windex;                                              // Finally, save the new Write Index
   }
-  return Count;
+  return Count;                                                           // Number of elements added to FIFO
 }
 
 /** Read or copy elements from the FIFO.
@@ -277,7 +276,6 @@ FIFO_Dequeue (
   BOOLEAN   Consume
   )
 {
-  UINTN         ElemPtr;
   UINTN         QPtr;
   UINT32        RDex;
   UINT32        SizeOfElement;
@@ -285,37 +283,39 @@ FIFO_Dequeue (
 
   assert(Self != NULL);
   assert(pElement != NULL);
-  assert(Count != 0);
 
   if(FIFO_IsEmpty(Self)) {
     Count = 0;
   }
   else {
-    RDex          = Self->ReadIndex;
-    SizeOfElement = Self->ElementSize;
-    ElemPtr       = (UINTN)pElement;
-    Count         = MIN(Count, Self->Count(Self, AsElements));
+    RDex          = Self->ReadIndex;                                  // Get this FIFO's Read Index
+    SizeOfElement = Self->ElementSize;                                // Get size of this FIFO's elements
+    Count         = MIN(Count, Self->Count(Self, AsElements));        // Lesser of requested or actual
 
-    QPtr = (UINTN)Self->Queue + (RDex * Self->ElementSize);
-    for(i = 0; i < Count; ++i) {
-      (void)CopyMem((void *)ElemPtr, (const void *)QPtr, Self->ElementSize);
-      RDex = (UINT32)ModuloIncrement(RDex, Self->NumElements);
-      if(RDex == 0) {   // If the index wrapped
-        QPtr = (UINTN)Self->Queue;
+    QPtr = (UINTN)Self->Queue + (RDex * Self->ElementSize);           // Point to Read location in FIFO
+    for(i = 0; i < Count; ++i) {                                      // Iterate Count times...
+      (void)CopyMem(pElement, (const void *)QPtr, Self->ElementSize);   // Copy element from FIFO to caller's buffer
+      RDex = (UINT32)ModuloIncrement(RDex, Self->NumElements);          // Increment Read Index
+      if(RDex == 0) {                                                   // If the index wrapped
+        QPtr = (UINTN)Self->Queue;                                        // Point back to beginning of data
       }
-      else {
-        QPtr += Self->ElementSize;
+      else {                                                            // Otherwise
+        QPtr += Self->ElementSize;                                        // Point to the next element in FIFO
       }
-      ElemPtr += Self->ElementSize;
-    }
-    if(Consume) {
-      Self->ReadIndex = RDex;
+      pElement = (char*)pElement + Self->ElementSize;                   // Point to next element in caller's buffer
+    }                                                                 // Iterate: for loop
+    if(Consume) {                                                     // If caller requests data consumption
+      Self->ReadIndex = RDex;                                           // Set FIFO's Read Index to new Index
     }
   }
-  return Count;
+  return Count;                                                     // Return number of elements actually read
 }
 
 /** Read elements from the FIFO.
+
+    Read the specified number of elements from the FIFO, removing each element read.
+    The number of elements actually read from the FIFO is returned.  This number can differ
+    from the Count requested if more elements are requested than are in the FIFO.
 
     @param[in]    Self        Pointer to the FIFO instance.
     @param[out]   pElement    Pointer to where to store the element read from the FIFO.
@@ -338,7 +338,7 @@ FIFO_Read (
 
 /** Make a copy of the FIFO's data.
     The contents of the FIFO is copied out and linearized without affecting the
-    FIFO contents.
+    FIFO contents.  This function is idempotent.
 
     @param[in]    Self        Pointer to the FIFO instance.
     @param[out]   pElement    Pointer to where to store the elements copied from the FIFO.
@@ -435,7 +435,7 @@ FIFO_Flush (
 
   assert(Self != NULL);
 
-  NumInQ = FIFO_FreeSpace(Self, AsElements);
+  NumInQ = FIFO_NumInQueue(Self, AsElements);
   if(NumToFlush >= NumInQ) {
     Self->ReadIndex   = 0;
     Self->WriteIndex  = 0;
@@ -464,7 +464,7 @@ FIFO_Truncate (
 
   assert(Self != NULL);
 
-  Remainder = Self->Count(Self, AsElements);
+  Remainder = FIFO_NumInQueue(Self, AsElements);
   if(Remainder > 0) {
     Self->WriteIndex = (UINT32)ModuloDecrement(Self->WriteIndex, Self->NumElements);
     --Remainder;

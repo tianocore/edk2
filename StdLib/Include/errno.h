@@ -26,7 +26,7 @@
   All macro definitions in this list must begin with the letter 'E'
   and be followed by a digit or an uppercase letter.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -46,6 +46,7 @@ extern  RETURN_STATUS   EFIerrno;
 // Define error number in terms of the ENUM in <sys/errno.h>
 
 #define ERESTART          -1                      /* restart syscall */
+#define ESUCCESS          __ESUCCESS              /* No Problems */
 
 #define EMINERRORVAL      __EMINERRORVAL          /*  1   The lowest valid error value */
 

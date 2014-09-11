@@ -1,6 +1,6 @@
 /** @file
 
-    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made
     available under  the terms and conditions of the BSD License that
     accompanies this distribution. The full text of the license may be found at
@@ -119,21 +119,24 @@ struct stat {
 
 #define S_EFISHIFT    20            // LS bit of the UEFI attributes
 
-#define S_IFMT   _S_IFMT
-#define S_IFBLK  _S_IFBLK
-#define S_IFREG  _S_IFREG
-#define S_IFIFO  _S_IFIFO
-#define S_IFCHR  _S_IFCHR
-#define S_IFDIR  _S_IFDIR
-#define S_IFSOCK _S_IFSOCK
-
-#define S_ISDIR(m)  ((m & _S_IFMT) == _S_IFDIR)   ///< directory
-#define S_ISCHR(m)  ((m & _S_IFMT) == _S_IFCHR)   ///< char special
-#define S_ISREG(m)  ((m & _S_IFMT) == _S_IFREG)   ///< regular file
-#define S_ISBLK(m)  ((m & _S_IFMT) == _S_IFBLK)   ///< block special
-#define S_ISSOCK(m) ((m & _S_IFMT) == _S_IFSOCK)  ///< socket
+#define S_IFMT      _S_IFMT
+#define S_IFIFO     _S_IFIFO
+#define S_IFCHR     _S_IFCHR
+#define S_IFDIR     _S_IFDIR
+#define S_IFBLK     _S_IFBLK
+#define S_IFREG     _S_IFREG
+#define S_IFSOCK    _S_IFSOCK
+#define S_ITTY      _S_ITTY
+#define S_IWTTY     _S_IWTTY
+#define S_ICONSOLE  _S_ICONSOLE
 
 #define S_ISFIFO(m) ((m & _S_IFMT) == _S_IFIFO)   ///< fifo
+#define S_ISCHR(m)  ((m & _S_IFMT) == _S_IFCHR)   ///< char special
+#define S_ISDIR(m)  ((m & _S_IFMT) == _S_IFDIR)   ///< directory
+#define S_ISBLK(m)  ((m & _S_IFMT) == _S_IFBLK)   ///< block special
+#define S_ISREG(m)  ((m & _S_IFMT) == _S_IFREG)   ///< regular file
+#define S_ISSOCK(m) ((m & _S_IFMT) == _S_IFSOCK)  ///< socket
+
 
 /*  The following three macros have been changed to reflect
     access permissions that better reflect the UEFI FAT file system.
@@ -191,8 +194,18 @@ __BEGIN_DECLS
   **/
   int     lstat (const char *, struct stat *);
 
-  /**
-  **/
+/** Obtains information about the file pointed to by path.
+
+    Opens the file pointed to by path, calls _EFI_FileInfo with the file's handle,
+    then closes the file.
+
+    @param[in]    path      Path to the file to obtain information about.
+    @param[out]   statbuf   Buffer in which the file status is put.
+
+    @retval    0  Successful Completion.
+    @retval   -1  An error has occurred and errno has been set to
+                  identify the error.
+**/
   int     stat  (const char *, struct stat *);
 
   /**

@@ -22,7 +22,7 @@
     This file and its contents are inspired by the <sys/cdefs.h> files in Berkeley
     Unix.  They have been re-implemented to be specific to the EFI environment.
 
-    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -360,8 +360,8 @@ typedef  UINTN   EFI_ULONG_T;
 #if defined(__GNUC__)
   #if __GNUC_PREREQ__(4,4)
     /* GCC 4.4 or later */
-    typedef   INT64   LONGN;
-    typedef  UINT64   ULONGN;
+    typedef   INTN    LONGN;
+    typedef  UINTN    ULONGN;
   #else
     /* minGW gcc variant */
     typedef   INT32   LONGN;

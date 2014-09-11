@@ -7,7 +7,7 @@
   directives.  These default values are specified as an enum in order to ease
   the maintenance of the values.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -22,6 +22,7 @@
 
 /* Define the error numbers, sequentially, beginning at 1. */
 enum {
+  __ESUCCESS      = 0,              /*  0   For those rare times one needs to say all is OK */
   __EMINERRORVAL  = 1,              /* The lowest valid error value */
   __EPERM         = __EMINERRORVAL, /*  1   Operation not permitted */
   __ENOENT,                         /*  2   No such file or directory */
