@@ -2,6 +2,7 @@
 # process FFS generation from INF statement
 #
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -362,7 +363,31 @@ class FfsInfStatement(FfsInfStatementClassObject):
         #
 
         self.__InfParse__(Dict)
+        SrcFile = os.path.join( GenFdsGlobalVariable.WorkSpaceDir , self.InfFileName);
+        DestFile = os.path.join( self.OutputPath, self.ModuleGuid + '.ffs')
         
+        SrcFileDir = "."
+        SrcPath = os.path.dirname(SrcFile)
+        SrcFileName = os.path.basename(SrcFile)
+        SrcFileBase, SrcFileExt = os.path.splitext(SrcFileName)   
+        DestPath = os.path.dirname(DestFile)
+        DestFileName = os.path.basename(DestFile)
+        DestFileBase, DestFileExt = os.path.splitext(DestFileName)   
+        self.MacroDict = {
+            # source file
+            "${src}"      :   SrcFile,
+            "${s_path}"   :   SrcPath,
+            "${s_dir}"    :   SrcFileDir,
+            "${s_name}"   :   SrcFileName,
+            "${s_base}"   :   SrcFileBase,
+            "${s_ext}"    :   SrcFileExt,
+            # destination file
+            "${dst}"      :   DestFile,
+            "${d_path}"   :   DestPath,
+            "${d_name}"   :   DestFileName,
+            "${d_base}"   :   DestFileBase,
+            "${d_ext}"    :   DestFileExt
+        }
         #
         # Allow binary type module not specify override rule in FDF file.
         # 
@@ -420,6 +445,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             '$(NAMED_GUID)'  : self.ModuleGuid
         }
         String = GenFdsGlobalVariable.MacroExtend(String, MacroDict)
+        String = GenFdsGlobalVariable.MacroExtend(String, self.MacroDict)        
         return String
 
     ## __GetRule__() method
