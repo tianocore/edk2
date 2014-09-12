@@ -578,7 +578,7 @@ DoReturn:
     pushl   -8(%esp)      # save EIP in new location
     pushl   -8(%esp)      # save EFLAGS in new location
     popfl                 # restore EFLAGS
-    retf                  # far return
+    lret                  # far return
 
 DoIret:
     iretl
