@@ -386,7 +386,6 @@ Dhcp6CalculateLeaseTime (
   IN DHCP6_IA_CB              *IaCb
   )
 {
-  EFI_DHCP6_IA_ADDRESS        *IaAddr;
   UINT32                      MinLt;
   UINT32                      MaxLt;
   UINTN                       Index;
@@ -401,9 +400,8 @@ Dhcp6CalculateLeaseTime (
   // valid life time.
   //
   for (Index = 0; Index < IaCb->Ia->IaAddressCount; Index++) {
-    IaAddr = IaCb->Ia->IaAddress + Index * sizeof (EFI_DHCP6_IA_ADDRESS);
-    MinLt  = MIN (MinLt, IaAddr->ValidLifetime);
-    MaxLt  = MAX (MinLt, IaAddr->ValidLifetime);
+    MinLt  = MIN (MinLt, IaCb->Ia->IaAddress[Index].ValidLifetime);
+    MaxLt  = MAX (MinLt, IaCb->Ia->IaAddress[Index].ValidLifetime);
   }
 
   //
