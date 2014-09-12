@@ -50,34 +50,164 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\TargetTxtClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\ToolDefClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\VpdInfoFile.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\__init__.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\BuildVersion.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\BuildClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaDataTable.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaFileParser.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaFileTable.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\WorkspaceDatabase.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Workspace\__init__.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\AutoGen.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\BuildEngine.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\GenC.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\GenDepex.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\GenMake.py \
               $(BASE_TOOLS_PATH)\Source\Python\Autogen\StrGather.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\UniClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\__init__.py
+              $(BASE_TOOLS_PATH)\Source\Python\Autogen\UniClassObject.py
 
-UPT_BUILDVERSION_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\UPT\BuildVersion.py
+CMD_BUILD=$(BASE_TOOLS_PATH)\Source\Python\build\BuildReport.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\c.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\CLexer.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\CodeFragment.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\CodeFragmentCollector.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\CParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\Database.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\EfiCompressor.pyd \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\Eot.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\EotGlobalData.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\EotToolError.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\FileProfile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\FvImage.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\InfParserLite.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\LzmaCompressor.pyd \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\Parser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\ParserWarning.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Eot\Report.py
+
+CMD_GENFDS=$(BASE_TOOLS_PATH)\Source\Python\GenFds\AprioriSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Attribute.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Capsule.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\CapsuleData.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\ComponentStatement.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\CompressSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\DataSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\DepexSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\EfiSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Fd.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\FdfParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Ffs.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\FfsFileStatement.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\FfsInfStatement.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Fv.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\FvImageSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFds.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFdsGlobalVariable.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\GuidSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\OptionRom.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\OptRomFileStatement.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\OptRomInfStatement.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Region.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Rule.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\RuleComplexFile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\RuleSimpleFile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Section.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\UiSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\VerSection.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenFds\Vtf.py
+
+CMD_BPDG=$(BASE_TOOLS_PATH)\Source\Python\BPDG\GenVpd.py \
+    $(BASE_TOOLS_PATH)\Source\Python\BPDG\StringTable.py
+
+CMD_UPT=$(BASE_TOOLS_PATH)\Source\Python\UPT\Core\DependencyRules.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Core\DistributionPackageClass.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Core\FileHook.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Core\IpiDb.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Core\PackageFile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Dll\sqlite3.dll \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\GenMetaFile\GenDecFile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\GenMetaFile\GenInfFile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\GenMetaFile\GenMetaFileMisc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\GenMetaFile\GenXmlFile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\InstallPkg.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\InventoryWs.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\CommentGenerating.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\CommentParsing.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\DataType.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\ExpressionValidate.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\GlobalData.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\Misc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\ParserValidate.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\Parsing.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\String.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\UniClassObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\Xml\XmlRoutines.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Logger\Log.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Logger\StringTable.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Logger\ToolError.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\MkPkg.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\DecObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfBinaryObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfBuildOptionObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfCommonObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfDefineCommonObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfDefineObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfDepexObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfGuidObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfHeaderObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfLibraryClassesObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfMisc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfPackagesObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfPcdObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfPpiObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfProtocolObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfSoucesObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\Parser\InfUserExtensionObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\POM\CommonObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\POM\ModuleObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Object\POM\PackageObject.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\DecParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\DecParserMisc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfAsBuiltProcess.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfBinarySectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfBuildOptionSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfDefineSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfDepexSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfGuidPpiProtocolSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfLibrarySectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfPackageSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfParserMisc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfPcdSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Parser\InfSourceSectionParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\PomAdapter\DecPomAlignment.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\PomAdapter\InfPomAlignment.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\PomAdapter\InfPomAlignmentMisc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\ReplacePkg.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\RmPkg.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\UnitTest\CommentGeneratingUnitTest.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\UnitTest\CommentParsingUnitTest.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\UnitTest\DecParserTest.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\UnitTest\DecParserUnitTest.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\UnitTest\InfBinarySectionTest.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\CommonXml.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\GuidProtocolPpiXml.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\IniToXml.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\ModuleSurfaceAreaXml.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\PackageSurfaceAreaXml.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\PcdXml.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParserMisc.py
+
               
 all: SetPythonPath $(APPLICATIONS)
 
 SetPythonPath:
   set PYTHONPATH=$(BASE_TOOLS_PATH)\Source\Python
 
-$(BIN_DIR)\build.exe: $(BASE_TOOLS_PATH)\Source\Python\build\build.py $(COMMON_PYTHON)
+$(BIN_DIR)\build.exe: $(BASE_TOOLS_PATH)\Source\Python\build\build.py $(COMMON_PYTHON) $(CMD_BUILD)
   @pushd . & @cd build & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) build.py & @popd
 
-$(BIN_DIR)\GenFds.exe: $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFds.py $(COMMON_PYTHON)
+$(BIN_DIR)\GenFds.exe: $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFds.py $(COMMON_PYTHON) $(CMD_GENFDS)
   @pushd . & @cd GenFds & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenFds.py & @popd
 
 $(BIN_DIR)\Trim.exe: $(BASE_TOOLS_PATH)\Source\Python\Trim\Trim.py $(COMMON_PYTHON)
@@ -95,10 +225,10 @@ $(BIN_DIR)\GenPatchPcdTable.exe: $(BASE_TOOLS_PATH)\Source\Python\GenPatchPcdTab
 $(BIN_DIR)\PatchPcdValue.exe: $(BASE_TOOLS_PATH)\Source\Python\PatchPcdValue\PatchPcdValue.py $(COMMON_PYTHON)
   @pushd . & @cd PatchPcdValue & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) PatchPcdValue.py & @popd
 
-$(BIN_DIR)\BPDG.exe: $(BASE_TOOLS_PATH)\Source\Python\BPDG\BPDG.py $(COMMON_PYTHON)
+$(BIN_DIR)\BPDG.exe: $(BASE_TOOLS_PATH)\Source\Python\BPDG\BPDG.py $(COMMON_PYTHON) $(CMD_BPDG)
   @pushd . & @cd BPDG & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) BPDG.py & @popd
 
-$(BIN_DIR)\UPT.exe: $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py $(UPT_BUILDVERSION_PYTHON)
+$(BIN_DIR)\UPT.exe: $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py $(CMD_UPT)
   @pushd . & @cd UPT & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) UPT.py & @popd
 
 $(BIN_DIR)\Rsa2048Sha256Sign.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256Sign.py
