@@ -1,6 +1,7 @@
 /** @file
   Main file for BCFG command.
 
+  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1353,7 +1354,7 @@ ShellCommandRunBcfg (
           } else {
             Status = ShellConvertStringToUint64(CurrentParam, &Intermediate, TRUE, FALSE);
             CurrentOperation.Number1     = (UINT16)Intermediate;
-            if (CurrentOperation.Number1 > Count){
+            if (CurrentOperation.Number1 >= Count){
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, Count);
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
@@ -1371,7 +1372,7 @@ ShellCommandRunBcfg (
           } else {
             Status = ShellConvertStringToUint64(CurrentParam, &Intermediate, TRUE, FALSE);
             CurrentOperation.Number1     = (UINT16)Intermediate;
-            if (CurrentOperation.Number1 > Count){
+            if (CurrentOperation.Number1 >= Count){
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, Count);
               ShellStatus = SHELL_INVALID_PARAMETER;
             } else {
