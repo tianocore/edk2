@@ -378,12 +378,7 @@ DoReturn:
     pushq   0x18(%rax)        # save EFLAGS in new location
     movq    (%rax), %rax      # restore rax
     popfq                     # restore EFLAGS
-    .byte   0x48              # prefix to composite "retq" with next "retf"
-#ifdef __APPLE__
-    .byte   0xCB
-#else
-    retf                      # far return
-#endif
+    lretq                     # far return
 DoIret:
     iretq
 
