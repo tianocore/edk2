@@ -768,6 +768,7 @@ def BuildExDataBase(Dict):
     DbUnInitValueUint8 = DbItemList(1, RawDataList = UnInitValueUint8)
     UnInitValueBoolean = Dict['UNINIT_GUID_DECL_BOOLEAN']
     DbUnInitValueBoolean = DbItemList(1, RawDataList = UnInitValueBoolean)
+    PcdTokenNumberMap = Dict['PCD_ORDER_TOKEN_NUMBER_MAP']
  
     DbNameTotle = ["InitValueUint64", "VardefValueUint64", "InitValueUint32", "VardefValueUint32", "VpdHeadValue", "ExMapTable", 
                "LocalTokenNumberTable", "GuidTable", "StringHeadValue",  "PcdNameOffsetTable","VariableTable","SkuTable", "StringTableLen", "PcdTokenTable", "PcdCNameTable", 
@@ -838,7 +839,7 @@ def BuildExDataBase(Dict):
         
         SkuIndexTabalOffset = SkuIdTableOffset + Dict['SKUID_VALUE'][0] + 1
         if (TokenTypeValue & (0x2 << 28)):
-            SkuTable[SkuHeaderIndex] = (DbOffset|int(TokenTypeValue & ~(0x2<<28)), SkuIndexTabalOffset + SkuIndexIndexTable[SkuHeaderIndex])
+            SkuTable[SkuHeaderIndex] = (DbOffset|int(TokenTypeValue & ~(0x2<<28)), SkuIndexTabalOffset + SkuIndexIndexTable[PcdTokenNumberMap[LocalTokenNumberTableIndex]])
             LocalTokenNumberTable[LocalTokenNumberTableIndex] = (SkuTableOffset + SkuHeaderIndex * 8) | int(TokenTypeValue)
             SkuHeaderIndex += 1
         
@@ -1100,6 +1101,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     Dict['PCD_TOKENSPACE_MAP'] = []
     Dict['PCD_NAME_OFFSET'] = []
     
+    Dict['PCD_ORDER_TOKEN_NUMBER_MAP'] = {}
     PCD_STRING_INDEX_MAP = {}
     
     StringTableIndex = 0
@@ -1112,7 +1114,8 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     NumberOfSkuEnabledPcd = 0
     GuidList = []
     i = 0
-    for Pcd in Platform.DynamicPcdList:
+    ReorderedDynPcdList = GetOrderedDynamicPcdList(Platform.DynamicPcdList, Platform.PcdTokenNumber)
+    for Pcd in ReorderedDynPcdList:
         VoidStarTypeCurrSize = []
         i += 1
         CName = Pcd.TokenCName
@@ -1184,8 +1187,8 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 # Store all variable names of one HII PCD under different SKU to stringTable
                 # and calculate the VariableHeadStringIndex
                 if SkuIdIndex - 2 == 0:
-                    for SkuName in Pcd.SkuInfoList:
-                        SkuInfo = Pcd.SkuInfoList[SkuName]
+                    for SkuName2 in Pcd.SkuInfoList:
+                        SkuInfo = Pcd.SkuInfoList[SkuName2]
                         if SkuInfo.SkuId == None or SkuInfo.SkuId == '':
                             continue
                         VariableNameStructure = StringToArray(SkuInfo.VariableName)
@@ -1405,7 +1408,8 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     Dict['PCD_CNAME']        = ['' for x in range(NumberOfLocalTokens)]
     Dict['PCD_TOKENSPACE_MAP'] = ['' for x in range(NumberOfLocalTokens)]  
     Dict['PCD_CNAME_LENGTH'] = [0 for x in range(NumberOfLocalTokens)]
-    for Pcd in Platform.DynamicPcdList:
+    SkuEnablePcdIndex = 0
+    for Pcd in ReorderedDynPcdList:
         CName = Pcd.TokenCName
         TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
         if Pcd.Phase != Phase:
@@ -1416,6 +1420,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         if Phase == 'DXE':
             GeneratedTokenNumber -= NumberOfPeiLocalTokens
 
+        if len(Pcd.SkuInfoList) > 1:
+            Dict['PCD_ORDER_TOKEN_NUMBER_MAP'][GeneratedTokenNumber] = SkuEnablePcdIndex
+            SkuEnablePcdIndex += 1
         EdkLogger.debug(EdkLogger.DEBUG_1, "PCD = %s.%s" % (CName, TokenSpaceGuidCName))
         EdkLogger.debug(EdkLogger.DEBUG_1, "phase = %s" % Phase)
         EdkLogger.debug(EdkLogger.DEBUG_1, "GeneratedTokenNumber = %s" % str(GeneratedTokenNumber))
@@ -1595,4 +1602,11 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     
     Buffer = BuildExDataBase(Dict)
     return AutoGenH, AutoGenC, Buffer
+
+def GetOrderedDynamicPcdList(DynamicPcdList, PcdTokenNumberList):
+    ReorderedDyPcdList = [None for i in range(len(DynamicPcdList))]
+    for Pcd in DynamicPcdList:
+        if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in PcdTokenNumberList:
+            ReorderedDyPcdList[PcdTokenNumberList[Pcd.TokenCName, Pcd.TokenSpaceGuidCName]-1] = Pcd
+    return ReorderedDyPcdList
 
