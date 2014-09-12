@@ -68,6 +68,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.InfFileName = None
         self.OverrideGuid = None
         self.PatchedBinFile = ''
+        self.MacroDict = {}
 
     ## GetFinalTargetSuffixMap() method
     #
