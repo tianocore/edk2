@@ -14,14 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Snp.h"
 
-//
-//  Module global variables needed to support undi 3.0 interface
-//
-EFI_PCI_IO_PROTOCOL         *mPciIo;
-V2P                         *mV2p = NULL; // undi3.0 map_list head
-// End Global variables
-//
-
 /**
   One notified function to stop UNDI device when gBS->ExitBootServices() called.
 
@@ -277,12 +269,11 @@ SimpleNetworkDriverStart (
   SNP_DRIVER                                *Snp;
   VOID                                      *Address;
   EFI_HANDLE                                Handle;
-  PXE_PCI_CONFIG_INFO                       ConfigInfo;
-  PCI_TYPE00                                *ConfigHeader;
-  UINT32                                    *TempBar;
   UINT8                                     BarIndex;
   PXE_STATFLAGS                             InitStatFlags;
-
+  EFI_PCI_IO_PROTOCOL                       *PciIo;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR         *BarDesc;
+  
   DEBUG ((EFI_D_NET, "\nSnpNotifyNetworkInterfaceIdentifier()  "));
 
   Status = gBS->OpenProtocol (
@@ -311,7 +302,7 @@ SimpleNetworkDriverStart (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &mPciIo,
+                  (VOID **) &PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -367,14 +358,14 @@ SimpleNetworkDriverStart (
   // OK, we like this UNDI, and we know snp is not already there on this handle
   // Allocate and initialize a new simple network protocol structure.
   //
-  Status = mPciIo->AllocateBuffer (
-                        mPciIo,
-                        AllocateAnyPages,
-                        EfiBootServicesData,
-                        SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
-                        &Address,
-                        0
-                        );
+  Status = PciIo->AllocateBuffer (
+                    PciIo,
+                    AllocateAnyPages,
+                    EfiBootServicesData,
+                    SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
+                    &Address,
+                    0
+                    );
 
   if (Status != EFI_SUCCESS) {
     DEBUG ((EFI_D_NET, "\nCould not allocate SNP_DRIVER structure.\n"));
@@ -385,7 +376,7 @@ SimpleNetworkDriverStart (
 
   ZeroMem (Snp, sizeof (SNP_DRIVER));
 
-  Snp->PciIo      = mPciIo;
+  Snp->PciIo      = PciIo;
   Snp->Signature  = SNP_DRIVER_SIGNATURE;
 
   EfiInitializeLock (&Snp->Lock, TPL_NOTIFY);
@@ -446,14 +437,14 @@ SimpleNetworkDriverStart (
   // -it is OK to allocate one global set of CPB, DB pair for each UNDI
   // interface as EFI does not multi-task and so SNP will not be re-entered!
   //
-  Status = mPciIo->AllocateBuffer (
-                        mPciIo,
-                        AllocateAnyPages,
-                        EfiBootServicesData,
-                        SNP_MEM_PAGES (4096),
-                        &Address,
-                        0
-                        );
+  Status = PciIo->AllocateBuffer (
+                    PciIo,
+                    AllocateAnyPages,
+                    EfiBootServicesData,
+                    SNP_MEM_PAGES (4096),
+                    &Address,
+                    0
+                    );
 
   if (Status != EFI_SUCCESS) {
     DEBUG ((EFI_D_NET, "\nCould not allocate CPB and DB structures.\n"));
@@ -464,19 +455,35 @@ SimpleNetworkDriverStart (
   Snp->Db   = (VOID *) ((UINTN) Address + 2048);
 
   //
-  // PxeStart call is going to give the callback functions to UNDI, these callback
-  // functions use the BarIndex values from the snp structure, so these must be initialized
-  // with default values before doing a PxeStart. The correct values can be obtained after
-  // getting the config information from UNDI
+  // Find the correct memory and io bar.
   //
-  Snp->MemoryBarIndex = 0;
-  Snp->IoBarIndex     = 1;
+  Snp->MemoryBarIndex = PCI_MAX_BAR;
+  Snp->IoBarIndex     = PCI_MAX_BAR;
+  for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
+    Status = PciIo->GetBarAttributes (
+                      PciIo,
+                      BarIndex,
+                      NULL,
+                      (VOID**) &BarDesc
+                      );
+    if (Status == EFI_UNSUPPORTED) {
+      continue;
+    } else if (EFI_ERROR (Status)) {
+      goto Error_DeleteSNP;
+    }
 
-  //
-  // we need the undi init information many times in this snp code, just get it
-  // once here and store it in the snp driver structure. to get Init Info
-  // from UNDI we have to start undi first.
-  //
+    if (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
+      Snp->MemoryBarIndex = BarIndex;
+    } else if (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_IO) {
+      Snp->IoBarIndex = BarIndex;
+    }
+
+    FreePool (BarDesc);
+  }
+  if ((Snp->MemoryBarIndex == PCI_MAX_BAR) || (Snp->IoBarIndex == PCI_MAX_BAR)) {
+    goto Error_DeleteSNP;
+  }
+
   Status = PxeStart (Snp);
 
   if (Status != EFI_SUCCESS) {
@@ -511,57 +518,6 @@ SimpleNetworkDriverStart (
     DEBUG ((EFI_D_NET, "\nSnp->undi.init_info()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
     PxeStop (Snp);
     goto Error_DeleteSNP;
-  }
-
-  Snp->Cdb.OpCode     = PXE_OPCODE_GET_CONFIG_INFO;
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
-
-  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr    = PXE_DBADDR_NOT_USED;
-
-  Snp->Cdb.DBsize     = (UINT16) sizeof (ConfigInfo);
-  Snp->Cdb.DBaddr     = (UINT64)(UINTN) &ConfigInfo;
-
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
-
-  DEBUG ((EFI_D_NET, "\nSnp->undi.get_config_info()  "));
-
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
-
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
-    DEBUG ((EFI_D_NET, "\nSnp->undi.config_info()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
-    PxeStop (Snp);
-    goto Error_DeleteSNP;
-  }
-  //
-  // Find the correct BAR to do IO.
-  //
-  //
-  // Enumerate through the PCI BARs for the device to determine which one is
-  // the IO BAR.  Save the index of the BAR into the adapter info structure.
-  // for  regular 32bit BARs, 0 is memory mapped, 1 is io mapped
-  //
-  ConfigHeader  = (PCI_TYPE00 *) ConfigInfo.Config.Byte;
-  TempBar       = (UINT32 *) ConfigHeader->Device.Bar;
-  for (BarIndex = 0; BarIndex <= 5; BarIndex++) {
-    if ((*TempBar & PCI_BAR_MEM_MASK) == PCI_BAR_MEM_64BIT) {
-      //
-      // This is a 64-bit memory bar, skip this and the
-      // next bar as well.
-      //
-      TempBar++;
-    }
-
-    if ((*TempBar & PCI_BAR_IO_MASK) == PCI_BAR_IO_MODE) {
-      Snp->IoBarIndex = BarIndex;
-      break;
-    }
-
-    TempBar++;
   }
 
   //
@@ -703,19 +659,19 @@ SimpleNetworkDriverStart (
     return Status;
   }
 
-  mPciIo->FreeBuffer (
-            mPciIo,
-            SNP_MEM_PAGES (4096),
-            Snp->Cpb
-            );
+  PciIo->FreeBuffer (
+           PciIo,
+           SNP_MEM_PAGES (4096),
+           Snp->Cpb
+           );
 
 Error_DeleteSNP:
 
-  mPciIo->FreeBuffer (
-                mPciIo,
-                SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
-                Snp
-                );
+  PciIo->FreeBuffer (
+           PciIo,
+           SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
+           Snp
+           );
 NiiError:
   gBS->CloseProtocol (
         Controller,
@@ -771,6 +727,7 @@ SimpleNetworkDriverStop (
   EFI_STATUS                  Status;
   EFI_SIMPLE_NETWORK_PROTOCOL *SnpProtocol;
   SNP_DRIVER                  *Snp;
+  EFI_PCI_IO_PROTOCOL         *PciIo;
 
   //
   // Get our context back.
@@ -822,17 +779,18 @@ SimpleNetworkDriverStop (
   PxeShutdown (Snp);
   PxeStop (Snp);
 
-  mPciIo->FreeBuffer (
-                mPciIo,
-                SNP_MEM_PAGES (4096),
-                Snp->Cpb
-                );
+  PciIo = Snp->PciIo;
+  PciIo->FreeBuffer (
+           PciIo,
+           SNP_MEM_PAGES (4096),
+           Snp->Cpb
+           );
 
-  mPciIo->FreeBuffer (
-                mPciIo,
-                SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
-                Snp
-                );
+  PciIo->FreeBuffer (
+           PciIo,
+           SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
+           Snp
+           );
 
   return Status;
 }
@@ -848,159 +806,6 @@ EFI_DRIVER_BINDING_PROTOCOL gSimpleNetworkDriverBinding = {
   NULL,
   NULL
 };
-
-
-/**
-  This routine maps the given CPU address to a Device address. It creates a
-  an entry in the map list with the virtual and physical addresses and the
-  un map cookie.
-
-  @param  V2p                  pointer to return a map list node pointer.
-  @param  Type                 the direction in which the data flows from the given
-                               virtual address device->cpu or cpu->device or both
-                               ways.
-  @param  VirtualAddress       virtual address (or CPU address) to be mapped.
-  @param  BufferSize           size of the buffer to be mapped.
-
-  @retval EFI_SUCEESS           routine has completed the mapping.
-  @retval EFI_INVALID_PARAMETER invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES  out of resource.
-  @retval other                 error as indicated.
-
-**/
-EFI_STATUS
-AddV2P (
-  IN OUT V2P                    **V2p,
-  EFI_PCI_IO_PROTOCOL_OPERATION Type,
-  VOID                          *VirtualAddress,
-  UINTN                         BufferSize
-  )
-{
-  EFI_STATUS  Status;
-
-  if ((V2p == NULL) || (VirtualAddress == NULL) || (BufferSize == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *V2p = AllocatePool (sizeof (V2P));
-  if (*V2p == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  Status = mPciIo->Map (
-                     mPciIo,
-                     Type,
-                     VirtualAddress,
-                     &BufferSize,
-                     &(*V2p)->PhysicalAddress,
-                     &(*V2p)->Unmap
-                     );
-  if (Status != EFI_SUCCESS) {
-    FreePool (*V2p);
-    return Status;
-  }
-  (*V2p)->VirtualAddress = VirtualAddress;
-  (*V2p)->BufferSize     = BufferSize;
-  (*V2p)->Next           = mV2p;
-  mV2p                   = *V2p;
-
-  return EFI_SUCCESS;
-}
-
-
-/**
-  This routine searches the linked list of mapped address nodes (for undi3.0
-  interface) to find the node that corresponds to the given virtual address and
-  returns a pointer to that node.
-
-  @param  V2p                  pointer to return a map list node pointer.
-  @param  VirtualAddr          virtual address (or CPU address) to be searched in
-                               the map list
-
-  @retval EFI_SUCEESS          A match was found.
-  @retval Other                A match cannot be found.
-
-**/
-EFI_STATUS
-FindV2p (
-  V2P          **V2p,
-  VOID         *VirtualAddr
-  )
-{
-  V2P    *Ptr;
-
-  if (V2p == NULL || VirtualAddr == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  for (Ptr = mV2p; Ptr != NULL; Ptr = Ptr->Next) {
-    if (Ptr->VirtualAddress == VirtualAddr) {
-      *V2p = Ptr;
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-
-/**
-  Unmap the given virtual address and free the memory allocated for the map list
-  node corresponding to that address.
-
-  @param  VirtualAddress       virtual address (or CPU address) to be unmapped.
-
-  @retval EFI_SUCEESS          Successfully unmapped.
-  @retval Other                Other errors as indicated.
-
-**/
-EFI_STATUS
-DelV2p (
-  VOID *VirtualAddress
-  )
-{
-  V2P           *Current;
-  V2P           *Next;
-  EFI_STATUS    Status;
-
-  if (VirtualAddress == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (mV2p == NULL) {
-    return EFI_NOT_FOUND;
-  }
-  //
-  // Is our node at the head of the list??
-  //
-  if ((Current = mV2p)->VirtualAddress == VirtualAddress) {
-    mV2p    = mV2p->Next;
-
-    Status  = mPciIo->Unmap (mPciIo, Current->Unmap);
-
-    FreePool (Current);
-
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Unmap failed with status = %r\n", Status));
-    }
-    return Status;
-  }
-
-  for (; Current->Next != NULL; Current = Next) {
-    if ((Next = Current->Next)->VirtualAddress == VirtualAddress) {
-      Current->Next = Next->Next;
-      Status  = mPciIo->Unmap (mPciIo, Next->Unmap);
-      FreePool (Next);
-
-      if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Unmap failed with status = %r\n", Status));
-      }
-      return Status;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
 
 /**
   The SNP driver entry point.

@@ -1,7 +1,7 @@
 /** @file
     Declaration of strctures and functions for SnpDxe driver.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 
 #include <IndustryStandard/Pci.h>
+#include <IndustryStandard/Acpi.h>
 
 #define FOUR_GIGABYTES  (UINT64) 0x100000000ULL
 
@@ -140,62 +141,6 @@ extern EFI_DRIVER_BINDING_PROTOCOL    gSimpleNetworkDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL    gSimpleNetworkComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL   gSimpleNetworkComponentName2;
 
-//
-//  Virtual to physical mapping for all UNDI 3.0s.
-//
-typedef struct _V2P V2P;
-
-struct _V2P {
-  V2P                   *Next;
-  VOID                  *VirtualAddress;
-  UINTN                 BufferSize;
-  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
-  VOID                  *Unmap;
-};
-
-/**
-  This routine maps the given CPU address to a Device address. It creates a
-  an entry in the map list with the virtual and physical addresses and the
-  un map cookie.
-
-  @param  V2p                  pointer to return a map list node pointer.
-  @param  Type                 the direction in which the data flows from the given
-                               virtual address device->cpu or cpu->device or both
-                               ways.
-  @param  VirtualAddress       virtual address (or CPU address) to be mapped.
-  @param  BufferSize           size of the buffer to be mapped.
-
-  @retval EFI_SUCEESS          routine has completed the mapping.
-  @retval other                error as indicated.
-
-**/
-EFI_STATUS
-AddV2p (
-  V2P                           **V2p,
-  EFI_PCI_IO_PROTOCOL_OPERATION Type,
-  VOID                          *VirtualAddress,
-  UINTN                         BufferSize
-  );
-
-/**
-  This routine searches the linked list of mapped address nodes (for undi3.0
-  interface) to find the node that corresponds to the given virtual address and
-  returns a pointer to that node.
-
-  @param  V2p                  pointer to return a map list node pointer.
-  @param  VirtualAddress                virtual address (or CPU address) to be searched in
-                               the map list
-
-  @retval EFI_SUCEESS          if a match found!
-  @retval Other                match not found
-
-**/
-EFI_STATUS
-FindV2p (
-  V2P          **V2p,
-  VOID         *VirtualAddress
-  );
-
 /**
   this routine calls undi to start the interface and changes the snp state.
 
@@ -270,100 +215,6 @@ PxeShutdown (
 EFI_STATUS
 PxeGetStnAddr (
   SNP_DRIVER *Snp
-  );
-
-/**
-  This routine unmaps the given virtual address and frees the memory allocated
-  for the map list node corresponding to that address.
-
-  @param  VirtualAddress       virtual address (or CPU address) to be unmapped
-
-  @retval EFI_SUCEESS          if successfully unmapped
-  @retval Other                as indicated by the error
-
-**/
-EFI_STATUS
-DelV2p (
-  VOID *VirtualAddress
-  );
-
-/**
-  This is a callback routine supplied to UNDI at undi_start time.
-  UNDI call this routine when it wants to have exclusive access to a critical
-  section of the code/data.
-
-  @param Enable   non-zero indicates acquire
-                  zero indicates release
-
-**/
-VOID
-EFIAPI
-SnpUndi32CallbackBlock30 (
-  IN UINT32 Enable
-  );
-
-/**
-  This is a callback routine supplied to UNDI at undi_start time.
-  UNDI call this routine with the number of micro seconds when it wants to
-  pause.
-
-  @param MicroSeconds  number of micro seconds to pause, ususlly multiple of 10.
-
-**/
-VOID
-EFIAPI
-SnpUndi32CallbackDelay30 (
-  IN UINT64 MicroSeconds
-  );
-
-/**
-  This is a callback routine supplied to UNDI at undi_start time.
-  This is the IO routine for UNDI. This is not currently being used by UNDI3.0
-  because Undi3.0 uses io/mem offsets relative to the beginning of the device
-  io/mem address and so it needs to use the PCI_IO_FUNCTION that abstracts the
-  start of the device's io/mem addresses. Since SNP cannot retrive the context
-  of the undi3.0 interface it cannot use the PCI_IO_FUNCTION that specific for
-  that NIC and uses one global IO functions structure, this does not work.
-  This however works fine for EFI1.0 Undis because they use absolute addresses
-  for io/mem access.
-
-  @param ReadOrWrite  indicates read or write, IO or Memory
-  @param NumBytes     number of bytes to read or write
-  @param Address      IO or memory address to read from or write to
-  @param BufferAddr   memory location to read into or that contains the bytes to
-                      write
-
-**/
-VOID
-EFIAPI
-SnpUndi32CallbackMemio30 (
-  IN UINT8      ReadOrWrite,
-  IN UINT8      NumBytes,
-  IN UINT64     Address,
-  IN OUT UINT64 BufferAddr
-  );
-
-/**
-  This is a callback routine supplied to UNDI at undi_start time.
-  UNDI call this routine with a virtual or CPU address that SNP provided to
-  convert it to a physical or device address. Since EFI uses the identical
-  mapping, this routine returns the physical address same as the virtual address
-  for most of the addresses. an address above 4GB cannot generally be used as a
-  device address, it needs to be mapped to a lower physical address. This
-  routine does not call the map routine itself, but it assumes that the mapping
-  was done at the time of providing the address to UNDI. This routine just
-  looks up the address in a map table (which is the v2p structure chain).
-
-  @param  CpuAddr        virtual address of a buffer.
-  @param  DeviceAddrPtr  pointer to the physical address.
-                         The DeviceAddrPtr will contain 0 in case of any error.
-
-**/
-VOID
-EFIAPI
-SnpUndi32CallbackV2p30 (
-  IN UINT64     CpuAddr,
-  IN OUT UINT64 DeviceAddrPtr
   );
 
 /**
