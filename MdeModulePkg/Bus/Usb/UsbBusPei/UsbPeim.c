@@ -720,6 +720,7 @@ PeiConfigureUsbDevice (
     DEBUG ((EFI_D_ERROR, "PeiUsbSetDeviceAddress Failed: %r\n", Status));
     return Status;
   }
+  MicroSecondDelay (USB_SET_DEVICE_ADDRESS_STALL);
 
   PeiUsbDevice->DeviceAddress = *DeviceAddress;
 
@@ -750,6 +751,7 @@ PeiConfigureUsbDevice (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  MicroSecondDelay (USB_GET_CONFIG_DESCRIPTOR_STALL);
 
   Status = PeiUsbSetConfiguration (
             PeiServices,
@@ -809,6 +811,7 @@ PeiUsbGetAllConfiguration (
     DEBUG ((EFI_D_ERROR, "PeiUsbGet Config Descriptor First Failed\n"));
     return Status;
   }
+  MicroSecondDelay (USB_GET_CONFIG_DESCRIPTOR_STALL);
 
   ConfigDesc        = (EFI_USB_CONFIG_DESCRIPTOR *) PeiUsbDevice->ConfigurationData;
   ConfigDescLength  = ConfigDesc->TotalLength;

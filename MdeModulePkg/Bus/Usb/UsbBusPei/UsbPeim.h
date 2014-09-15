@@ -99,6 +99,17 @@ typedef struct {
 //
 #define USB_SET_PORT_POWER_STALL        (2 * USB_BUS_1_MILLISECOND)
 
+//
+// Wait for set device address, refers to specification
+// [USB20-9.2.6.3, it says 2ms]
+//
+#define USB_SET_DEVICE_ADDRESS_STALL    (2 * USB_BUS_1_MILLISECOND)
+
+//
+// Wait for get configuration descriptor, set by experience
+//
+#define USB_GET_CONFIG_DESCRIPTOR_STALL (1 * USB_BUS_1_MILLISECOND)
+
 /**
   Submits control transfer to a target USB device.
   
