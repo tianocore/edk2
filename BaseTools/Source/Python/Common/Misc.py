@@ -526,6 +526,7 @@ def RealPath(File, Dir='', OverrideDir=''):
     return NewFile
 
 def RealPath2(File, Dir='', OverrideDir=''):
+    NewFile = None
     if OverrideDir:
         NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
         if NewFile:
@@ -535,8 +536,10 @@ def RealPath2(File, Dir='', OverrideDir=''):
                 return NewFile[len(OverrideDir)+1:], NewFile[0:len(OverrideDir)]
     if GlobalData.gAllFiles:
         NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
-    else:
+    if not NewFile:
         NewFile = os.path.normpath(os.path.join(Dir, File))
+        if not os.path.exists(NewFile):
+            return None, None
     if NewFile:
         if Dir:
             if Dir[-1] == os.path.sep:

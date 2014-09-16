@@ -105,8 +105,6 @@ def main():
                 FdfFilename = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
             if not os.path.exists(FdfFilename):
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=FdfFilename)
-            if os.path.normcase (FdfFilename).find(Workspace) != 0:
-                EdkLogger.error("GenFds", FILE_NOT_FOUND, "FdfFile doesn't exist in Workspace!")
 
             GenFdsGlobalVariable.FdfFile = FdfFilename
             GenFdsGlobalVariable.FdfFileTimeStamp = os.path.getmtime(FdfFilename)
@@ -136,10 +134,8 @@ def main():
             if not os.path.exists(ActivePlatform)  :
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist!")
 
-            if os.path.normcase (ActivePlatform).find(Workspace) != 0:
-                EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist in Workspace!")
-
-            ActivePlatform = ActivePlatform[len(Workspace):]
+            if os.path.normcase (ActivePlatform).find(Workspace) == 0:
+                ActivePlatform = ActivePlatform[len(Workspace):]
             if len(ActivePlatform) > 0 :
                 if ActivePlatform[0] == '\\' or ActivePlatform[0] == '/':
                     ActivePlatform = ActivePlatform[1:]
