@@ -29,7 +29,6 @@
 
 [Sources]
   PlatformPeim.c
-  PlatformPeiLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,6 +42,7 @@
   DebugLib
   HobLib
   ArmPlatformLib
+  PlatformPeiLib
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
