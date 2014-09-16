@@ -505,7 +505,7 @@ PhySoftReset (
       gBS->Stall (LAN9118_STALL);
     }
   // PHY Basic Control Register reset
-  } else if (Flags & PHY_RESET_PMT) {
+  } else if (Flags & PHY_RESET_BCR) {
     IndirectPHYWrite32 (PHY_INDEX_BASIC_CTRL, PHYCR_RESET);
 
     // Wait for completion
