@@ -370,13 +370,9 @@ BOpt_FindFileSystem (
       if (FileContext->Info == NULL) {
         VolumeLabel = L"NO FILE SYSTEM INFO";
       } else {
-        if (FileContext->Info->VolumeLabel == NULL) {
-          VolumeLabel = L"NULL VOLUME LABEL";
-        } else {
-          VolumeLabel = FileContext->Info->VolumeLabel;
-          if (*VolumeLabel == 0x0000) {
-            VolumeLabel = L"NO VOLUME LABEL";
-          }
+        VolumeLabel = FileContext->Info->VolumeLabel;
+        if (*VolumeLabel == 0x0000) {
+          VolumeLabel = L"NO VOLUME LABEL";
         }
       }
 
