@@ -525,7 +525,7 @@ NorFlashWriteBuffer (
 
   // Write the data to the NOR Flash, advancing each address by 4 bytes
   for(Count=0; Count < BufferSizeInWords; Count++, Data++, Buffer++) {
-    *Data = *Buffer;
+    MmioWrite32 ((UINTN)Data, *Buffer);
   }
 
   // Issue the Buffered Program Confirm command, to start the programming operation
