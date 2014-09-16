@@ -49,7 +49,7 @@ import Common.EdkLogger
 import Common.GlobalData as GlobalData
 
 # Version and Copyright
-VersionNumber = "0.51" + ' ' + gBUILD_VERSION
+VersionNumber = "0.60" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + VersionNumber
 __copyright__ = "Copyright (c) 2007 - 2014, Intel Corporation  All rights reserved."
 
