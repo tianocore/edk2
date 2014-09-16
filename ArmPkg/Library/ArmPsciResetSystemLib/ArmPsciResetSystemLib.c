@@ -25,6 +25,18 @@
 
 #include <IndustryStandard/ArmStdSmc.h>
 
+STATIC UINT32 mArmPsciMethod;
+
+RETURN_STATUS
+EFIAPI
+ArmPsciResetSystemLibConstructor (
+  VOID
+  )
+{
+  mArmPsciMethod = PcdGet32 (PcdArmPsciMethod);
+  return RETURN_SUCCESS;
+}
+
 /**
   Resets the entire platform.
 
@@ -69,7 +81,7 @@ LibResetSystem (
     return EFI_UNSUPPORTED;
   }
 
-  switch (PcdGet32 (PcdArmPsciMethod)) {
+  switch (mArmPsciMethod) {
   case 1:
     ArmCallHvc (&ArmHvcArgs);
     break;
