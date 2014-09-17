@@ -1,0 +1,2049 @@
+======================================================================
+
+                       CHANGES_SUMMARY.TXT
+
+        A QUICK overview of changes from 1.33 in reverse order
+
+  A summary of additions rather than bug fixes and minor code changes.
+
+          Numbers refer to items in CHANGES_FROM_133*.TXT
+             which may contain additional information.
+
+                          DISCLAIMER
+
+ The software and these notes are provided "as is".  They may include
+ typographical or technical errors and their authors disclaims all
+ liability of any kind or nature for damages due to error, fault,
+ defect, or deficiency regardless of cause.  All warranties of any
+ kind, either express or implied, including, but not limited to, the
+ implied  warranties of merchantability and fitness for a particular
+ purpose are disclaimed.
+
+======================================================================
+
+#258. You can specify a user-defined base class for your parser
+
+    The base class must constructor must have a signature similar to
+    that of ANTLRParser.
+
+#253. Generation of block preamble (-preamble and -preamble_first)
+
+    The antlr option -preamble causes antlr to insert the code
+    BLOCK_PREAMBLE at the start of each rule and block.
+
+    The antlr option -preamble_first is similar, but inserts the
+    code BLOCK_PREAMBLE_FIRST(PreambleFirst_123) where the symbol
+    PreambleFirst_123 is equivalent to the first set defined by
+    the #FirstSetSymbol described in Item #248.
+
+#248. Generate symbol for first set of an alternative
+
+        rr : #FirstSetSymbol(rr_FirstSet)  ( Foo | Bar ) ;
+
+#216. Defer token fetch for C++ mode
+
+    When the ANTLRParser class is built with the pre-processor option 
+    ZZDEFER_FETCH defined, the fetch of new tokens by consume() is deferred
+    until LA(i) or LT(i) is called. 
+
+#215. Use reset() to reset DLGLexerBase
+#188. Added pccts/h/DLG_stream_input.h
+#180. Added ANTLRParser::getEofToken()
+#173. -glms for Microsoft style filenames with -gl
+#170. Suppression for predicates with lookahead depth >1
+
+      Consider the following grammar with -ck 2 and the predicate in rule
+      "a" with depth 2:
+
+            r1  : (ab)* "@"
+                ;
+
+            ab  : a
+                | b
+                ;
+
+            a   : (A B)? => <<p(LATEXT(2))>>? A B C
+                ;
+
+            b   : A B C
+                ;
+
+      Normally, the predicate would be hoisted into rule r1 in order to
+      determine whether to call rule "ab".  However it should *not* be
+      hoisted because, even if p is false, there is a valid alternative
+      in rule b.  With "-mrhoistk on" the predicate will be suppressed.
+
+      If "-info p" command line option is present the following information
+      will appear in the generated code:
+
+                while ( (LA(1)==A)
+        #if 0
+
+        Part (or all) of predicate with depth > 1 suppressed by alternative
+            without predicate
+
+        pred  <<  p(LATEXT(2))>>?
+                  depth=k=2  ("=>" guard)  rule a  line 8  t1.g
+          tree context:
+            (root = A
+               B
+            )
+
+        The token sequence which is suppressed: ( A B )
+        The sequence of references which generate that sequence of tokens:
+
+           1 to ab          r1/1       line 1     t1.g
+           2 ab             ab/1       line 4     t1.g
+           3 to b           ab/2       line 5     t1.g
+           4 b              b/1        line 11    t1.g
+           5 #token A       b/1        line 11    t1.g
+           6 #token B       b/1        line 11    t1.g
+
+        #endif
+
+      A slightly more complicated example:
+
+            r1  : (ab)* "@"
+                ;
+
+            ab  : a
+                | b
+                ;
+
+            a   : (A B)? => <<p(LATEXT(2))>>? (A  B | D E)
+                ;
+
+            b   : <<q(LATEXT(2))>>? D E
+                ;
+
+
+      In this case, the sequence (D E) in rule "a" which lies behind
+      the guard is used to suppress the predicate with context (D E)
+      in rule b.
+
+                while ( (LA(1)==A || LA(1)==D)
+            #if 0
+
+            Part (or all) of predicate with depth > 1 suppressed by alternative
+                without predicate
+
+            pred  <<  q(LATEXT(2))>>?
+                              depth=k=2  rule b  line 11  t2.g
+              tree context:
+                (root = D
+                   E
+                )
+
+            The token sequence which is suppressed: ( D E )
+            The sequence of references which generate that sequence of tokens:
+
+               1 to ab          r1/1       line 1     t2.g
+               2 ab             ab/1       line 4     t2.g
+               3 to a           ab/1       line 4     t2.g
+               4 a              a/1        line 8     t2.g
+               5 #token D       a/1        line 8     t2.g
+               6 #token E       a/1        line 8     t2.g
+
+            #endif
+            &&
+            #if 0
+
+            pred  <<  p(LATEXT(2))>>?
+                              depth=k=2  ("=>" guard)  rule a  line 8  t2.g
+              tree context:
+                (root = A
+                   B
+                )
+
+            #endif
+
+            (! ( LA(1)==A && LA(2)==B ) || p(LATEXT(2)) )  {
+                ab();
+                ...
+
+#165. (Changed in MR13) option -newAST
+
+      To create ASTs from an ANTLRTokenPtr antlr usually calls
+      "new AST(ANTLRTokenPtr)".  This option generates a call
+      to "newAST(ANTLRTokenPtr)" instead.  This allows a user
+      to define a parser member function to create an AST object.
+
+#161. (Changed in MR13) Switch -gxt inhibits generation of tokens.h
+
+#158. (Changed in MR13) #header causes problem for pre-processors
+
+      A user who runs the C pre-processor on antlr source suggested
+      that another syntax be allowed.  With MR13 such directives
+      such as #header, #pragma, etc. may be written as "\#header",
+      "\#pragma", etc.  For escaping pre-processor directives inside
+      a #header use something like the following:
+
+            \#header
+            <<
+                \#include <stdio.h>
+            >>
+
+#155. (Changed in MR13) Context behind predicates can suppress
+
+      With -mrhoist enabled the context behind a guarded predicate can
+      be used to suppress other predicates.  Consider the following grammar:
+
+        r0 : (r1)+;
+
+        r1  : rp
+            | rq
+            ;
+        rp  : <<p LATEXT(1)>>? B ;
+        rq : (A)? => <<q LATEXT(1)>>? (A|B);
+
+      In earlier versions both predicates "p" and "q" would be hoisted into
+      rule r0. With MR12c predicate p is suppressed because the context which
+      follows predicate q includes "B" which can "cover" predicate "p".  In
+      other words, in trying to decide in r0 whether to call r1, it doesn't
+      really matter whether p is false or true because, either way, there is
+      a valid choice within r1.
+
+#154. (Changed in MR13) Making hoist suppression explicit using <<nohoist>>
+
+      A common error, even among experienced pccts users, is to code
+      an init-action to inhibit hoisting rather than a leading action.
+      An init-action does not inhibit hoisting.
+
+      This was coded:
+
+        rule1 : <<;>> rule2
+
+      This is what was meant:
+
+        rule1 : <<;>> <<;>> rule2
+
+      With MR13, the user can code:
+
+        rule1 : <<;>> <<nohoist>> rule2
+
+      The following will give an error message:
+
+        rule1 : <<nohoist>> rule2
+
+      If the <<nohoist>> appears as an init-action rather than a leading
+      action an error message is issued.  The meaning of an init-action
+      containing "nohoist" is unclear: does it apply to just one
+      alternative or to all alternatives ?
+
+#151a. Addition of ANTLRParser::getLexer(), ANTLRTokenStream::getLexer()
+
+      You must manually cast the ANTLRTokenStream to your program's
+      lexer class. Because the name of the lexer's class is not fixed.
+      Thus it is impossible to incorporate it into the DLGLexerBase
+      class.
+
+#151b.(Changed in MR12) ParserBlackBox member getLexer()
+
+#150. (Changed in MR12) syntaxErrCount and lexErrCount now public
+
+#149. (Changed in MR12) antlr option -info o (letter o for orphan)
+
+      If there is more than one rule which is not referenced by any
+      other rule then all such rules are listed.  This is useful for
+      alerting one to rules which are not used, but which can still
+      contribute to ambiguity.
+
+#148. (Changed in MR11) #token names appearing in zztokens,token_tbl
+
+      One can write:
+
+            #token Plus ("+")             "\+"
+            #token RP   ("(")             "\("
+            #token COM  ("comment begin") "/\*"
+
+      The string in parenthesis will be used in syntax error messages.
+
+#146. (Changed in MR11) Option -treport for locating "difficult" alts
+
+      It can be difficult to determine which alternatives are causing
+      pccts to work hard to resolve an ambiguity.  In some cases the
+      ambiguity is successfully resolved after much CPU time so there
+      is no message at all.
+
+      A rough measure of the amount of work being peformed which is
+      independent of the CPU speed and system load is the number of
+      tnodes created.  Using "-info t" gives information about the
+      total number of tnodes created and the peak number of tnodes.
+
+        Tree Nodes:  peak 1300k  created 1416k  lost 0
+
+      It also puts in the generated C or C++ file the number of tnodes
+      created for a rule (at the end of the rule).  However this
+      information is not sufficient to locate the alternatives within
+      a rule which are causing the creation of tnodes.
+
+      Using:
+
+             antlr -treport 100000 ....
+
+      causes antlr to list on stdout any alternatives which require the
+      creation of more than 100,000 tnodes, along with the lookahead sets
+      for those alternatives.
+
+      The following is a trivial case from the ansi.g grammar which shows
+      the format of the report.  This report might be of more interest
+      in cases where 1,000,000 tuples were created to resolve the ambiguity.
+
+      -------------------------------------------------------------------------
+        There were 0 tuples whose ambiguity could not be resolved
+             by full lookahead
+        There were 157 tnodes created to resolve ambiguity between:
+
+          Choice 1: statement/2  line 475  file ansi.g
+          Choice 2: statement/3  line 476  file ansi.g
+
+            Intersection of lookahead[1] sets:
+
+               IDENTIFIER
+
+            Intersection of lookahead[2] sets:
+
+               LPARENTHESIS     COLON            AMPERSAND        MINUS
+               STAR             PLUSPLUS         MINUSMINUS       ONESCOMPLEMENT
+               NOT              SIZEOF           OCTALINT         DECIMALINT
+               HEXADECIMALINT   FLOATONE         FLOATTWO         IDENTIFIER
+               STRING           CHARACTER
+      -------------------------------------------------------------------------
+
+#143. (Changed in MR11) Optional ";" at end of #token statement
+
+      Fixes problem of:
+
+            #token X "x"
+
+            <<
+                parser action
+            >>
+
+      Being confused with:
+
+            #token X "x" <<lexical action>>
+
+#142. (Changed in MR11) class BufFileInput subclass of DLGInputStream
+
+      Alexey Demakov (demakov@kazbek.ispras.ru) has supplied class
+      BufFileInput derived from DLGInputStream which provides a
+      function lookahead(char *string) to test characters in the
+      input stream more than one character ahead.
+      The class is located in pccts/h/BufFileInput.* of the kit.
+
+#140. #pred to define predicates
+
+      +---------------------------------------------------+
+      | Note: Assume "-prc on" for this entire discussion |
+      +---------------------------------------------------+
+
+      A problem with predicates is that each one is regarded as
+      unique and capable of disambiguating cases where two
+      alternatives have identical lookahead.  For example:
+
+        rule : <<pred(LATEXT(1))>>? A
+             | <<pred(LATEXT(1))>>? A
+             ;
+
+      will not cause any error messages or warnings to be issued
+      by earlier versions of pccts.  To compare the text of the
+      predicates is an incomplete solution.
+
+      In 1.33MR11 I am introducing the #pred statement in order to
+      solve some problems with predicates.  The #pred statement allows
+      one to give a symbolic name to a "predicate literal" or a
+      "predicate expression" in order to refer to it in other predicate
+      expressions or in the rules of the grammar.
+
+      The predicate literal associated with a predicate symbol is C
+      or C++ code which can be used to test the condition.  A
+      predicate expression defines a predicate symbol in terms of other
+      predicate symbols using "!", "&&", and "||".  A predicate symbol
+      can be defined in terms of a predicate literal, a predicate
+      expression, or *both*.
+
+      When a predicate symbol is defined with both a predicate literal
+      and a predicate expression, the predicate literal is used to generate
+      code, but the predicate expression is used to check for two
+      alternatives with identical predicates in both alternatives.
+
+      Here are some examples of #pred statements:
+
+        #pred  IsLabel       <<isLabel(LATEXT(1))>>?
+        #pred  IsLocalVar    <<isLocalVar(LATEXT(1))>>?
+        #pred  IsGlobalVar   <<isGlobalVar(LATEXT(1)>>?
+        #pred  IsVar         <<isVar(LATEXT(1))>>?       IsLocalVar || IsGlobalVar
+        #pred  IsScoped      <<isScoped(LATEXT(1))>>?    IsLabel || IsLocalVar
+
+      I hope that the use of EBNF notation to describe the syntax of the
+      #pred statement will not cause problems for my readers (joke).
+
+        predStatement : "#pred"
+                            CapitalizedName
+                              (
+                                  "<<predicate_literal>>?"
+                                | "<<predicate_literal>>?"  predOrExpr
+                                | predOrExpr
+                              )
+                      ;
+
+        predOrExpr    : predAndExpr ( "||" predAndExpr ) * ;
+
+        predAndExpr   : predPrimary ( "&&" predPrimary ) * ;
+
+        predPrimary   : CapitalizedName
+                      | "!" predPrimary
+                      | "(" predOrExpr ")"
+                      ;
+
+      What is the purpose of this nonsense ?
+
+      To understand how predicate symbols help, you need to realize that
+      predicate symbols are used in two different ways with two different
+      goals.
+
+        a. Allow simplification of predicates which have been combined
+           during predicate hoisting.
+
+        b. Allow recognition of identical predicates which can't disambiguate
+           alternatives with common lookahead.
+
+      First we will discuss goal (a).  Consider the following rule:
+
+            rule0: rule1
+                 | ID
+                 | ...
+                 ;
+
+            rule1: rule2
+                 | rule3
+                 ;
+
+            rule2: <<isX(LATEXT(1))>>? ID ;
+            rule3: <<!isX(LATEXT(1)>>? ID ;
+
+      When the predicates in rule2 and rule3 are combined by hoisting
+      to create a prediction expression for rule1 the result is:
+
+            if ( LA(1)==ID
+                && ( isX(LATEXT(1) || !isX(LATEXT(1) ) ) { rule1(); ...
+
+      This is inefficient, but more importantly, can lead to false
+      assumptions that the predicate expression distinguishes the rule1
+      alternative with some other alternative with lookahead ID.  In
+      MR11 one can write:
+
+            #pred IsX     <<isX(LATEXT(1))>>?
+
+            ...
+
+            rule2: <<IsX>>? ID  ;
+            rule3: <<!IsX>>? ID ;
+
+      During hoisting MR11 recognizes this as a special case and
+      eliminates the predicates.  The result is a prediction
+      expression like the following:
+
+            if ( LA(1)==ID ) { rule1(); ...
+
+      Please note that the following cases which appear to be equivalent
+      *cannot* be simplified by MR11 during hoisting because the hoisting
+      logic only checks for a "!" in the predicate action, not in the
+      predicate expression for a predicate symbol.
+
+        *Not* equivalent and is not simplified during hoisting:
+
+            #pred IsX      <<isX(LATEXT(1))>>?
+            #pred NotX     <<!isX(LATEXT(1))>>?
+            ...
+            rule2: <<IsX>>? ID  ;
+            rule3: <<NotX>>? ID ;
+
+        *Not* equivalent and is not simplified during hoisting:
+
+            #pred IsX      <<isX(LATEXT(1))>>?
+            #pred NotX     !IsX
+            ...
+            rule2: <<IsX>>? ID  ;
+            rule3: <<NotX>>? ID ;
+
+      Now we will discuss goal (b).
+
+      When antlr discovers that there is a lookahead ambiguity between
+      two alternatives it attempts to resolve the ambiguity by searching
+      for predicates in both alternatives.  In the past any predicate
+      would do, even if the same one appeared in both alternatives:
+
+            rule: <<p(LATEXT(1))>>? X
+                | <<p(LATEXT(1))>>? X
+                ;
+
+      The #pred statement is a start towards solving this problem.
+      During ambiguity resolution (*not* predicate hoisting) the
+      predicates for the two alternatives are expanded and compared.
+      Consider the following example:
+
+            #pred Upper     <<isUpper(LATEXT(1))>>?
+            #pred Lower     <<isLower(LATEXT(1))>>?
+            #pred Alpha     <<isAlpha(LATEXT(1))>>?  Upper || Lower
+
+            rule0: rule1
+                 | <<Alpha>>? ID
+                 ;
+
+            rule1:
+                 | rule2
+                 | rule3
+                 ...
+                 ;
+
+            rule2: <<Upper>>? ID;
+            rule3: <<Lower>>? ID;
+
+      The definition of #pred Alpha expresses:
+
+            a. to test the predicate use the C code "isAlpha(LATEXT(1))"
+
+            b. to analyze the predicate use the information that
+               Alpha is equivalent to the union of Upper and Lower,
+
+      During ambiguity resolution the definition of Alpha is expanded
+      into "Upper || Lower" and compared with the predicate in the other
+      alternative, which is also "Upper || Lower".  Because they are
+      identical MR11 will report a problem.
+
+    -------------------------------------------------------------------------
+      t10.g, line 5: warning: the predicates used to disambiguate rule rule0
+             (file t10.g alt 1 line 5 and alt 2 line 6)
+             are identical when compared without context and may have no
+             resolving power for some lookahead sequences.
+    -------------------------------------------------------------------------
+
+      If you use the "-info p" option the output file will contain:
+
+    +----------------------------------------------------------------------+
+    |#if 0                                                                 |
+    |                                                                      |
+    |The following predicates are identical when compared without          |
+    |  lookahead context information.  For some ambiguous lookahead        |
+    |  sequences they may not have any power to resolve the ambiguity.     |
+    |                                                                      |
+    |Choice 1: rule0/1  alt 1  line 5  file t10.g                          |
+    |                                                                      |
+    |  The original predicate for choice 1 with available context          |
+    |    information:                                                      |
+    |                                                                      |
+    |    OR expr                                                           |
+    |                                                                      |
+    |      pred  <<  Upper>>?                                              |
+    |                        depth=k=1  rule rule2  line 14  t10.g         |
+    |        set context:                                                  |
+    |           ID                                                         |
+    |                                                                      |
+    |      pred  <<  Lower>>?                                              |
+    |                        depth=k=1  rule rule3  line 15  t10.g         |
+    |        set context:                                                  |
+    |           ID                                                         |
+    |                                                                      |
+    |  The predicate for choice 1 after expansion (but without context     |
+    |    information):                                                     |
+    |                                                                      |
+    |    OR expr                                                           |
+    |                                                                      |
+    |      pred  <<  isUpper(LATEXT(1))>>?                                 |
+    |                        depth=k=1  rule   line 1  t10.g               |
+    |                                                                      |
+    |      pred  <<  isLower(LATEXT(1))>>?                                 |
+    |                        depth=k=1  rule   line 2  t10.g               |
+    |                                                                      |
+    |                                                                      |
+    |Choice 2: rule0/2  alt 2  line 6  file t10.g                          |
+    |                                                                      |
+    |  The original predicate for choice 2 with available context          |
+    |    information:                                                      |
+    |                                                                      |
+    |  pred  <<  Alpha>>?                                                  |
+    |                    depth=k=1  rule rule0  line 6  t10.g              |
+    |    set context:                                                      |
+    |       ID                                                             |
+    |                                                                      |
+    |  The predicate for choice 2 after expansion (but without context     |
+    |    information):                                                     |
+    |                                                                      |
+    |  OR expr                                                             |
+    |                                                                      |
+    |    pred  <<  isUpper(LATEXT(1))>>?                                   |
+    |                      depth=k=1  rule   line 1  t10.g                 |
+    |                                                                      |
+    |    pred  <<  isLower(LATEXT(1))>>?                                   |
+    |                      depth=k=1  rule   line 2  t10.g                 |
+    |                                                                      |
+    |                                                                      |
+    |#endif                                                                |
+    +----------------------------------------------------------------------+
+
+      The comparison of the predicates for the two alternatives takes
+      place without context information, which means that in some cases
+      the predicates will be considered identical even though they operate
+      on disjoint lookahead sets.  Consider:
+
+            #pred Alpha
+
+            rule1: <<Alpha>>? ID
+                 | <<Alpha>>? Label
+                 ;
+
+      Because the comparison of predicates takes place without context
+      these will be considered identical.  The reason for comparing
+      without context is that otherwise it would be necessary to re-evaluate
+      the entire predicate expression for each possible lookahead sequence.
+      This would require more code to be written and more CPU time during
+      grammar analysis, and it is not yet clear whether anyone will even make
+      use of the new #pred facility.
+
+      A temporary workaround might be to use different #pred statements
+      for predicates you know have different context.  This would avoid
+      extraneous warnings.
+
+      The above example might be termed a "false positive".  Comparison
+      without context will also lead to "false negatives".  Consider the
+      following example:
+
+            #pred Alpha
+            #pred Beta
+
+            rule1: <<Alpha>>? A
+                 | rule2
+                 ;
+
+            rule2: <<Alpha>>? A
+                 | <<Beta>>?  B
+                 ;
+
+      The predicate used for alt 2 of rule1 is (Alpha || Beta).  This
+      appears to be different than the predicate Alpha used for alt1.
+      However, the context of Beta is B.  Thus when the lookahead is A
+      Beta will have no resolving power and Alpha will be used for both
+      alternatives.  Using the same predicate for both alternatives isn't
+      very helpful, but this will not be detected with 1.33MR11.
+
+      To properly handle this the predicate expression would have to be
+      evaluated for each distinct lookahead context.
+
+      To determine whether two predicate expressions are identical is
+      difficult.  The routine may fail to identify identical predicates.
+
+      The #pred feature also compares predicates to see if a choice between
+      alternatives which is resolved by a predicate which makes the second
+      choice unreachable.  Consider the following example:
+
+            #pred A         <<A(LATEXT(1)>>?
+            #pred B         <<B(LATEXT(1)>>?
+            #pred A_or_B    A || B
+
+            r   : s
+                | t
+                ;
+            s   : <<A_or_B>>? ID
+                ;
+            t   : <<A>>? ID
+                ;
+
+        ----------------------------------------------------------------------------
+        t11.g, line 5: warning: the predicate used to disambiguate the
+               first choice of  rule r
+             (file t11.g alt 1 line 5 and alt 2 line 6)
+             appears to "cover" the second predicate when compared without context.
+             The second predicate may have no resolving power for some lookahead
+               sequences.
+        ----------------------------------------------------------------------------
+
+#132. (Changed in 1.33MR11) Recognition of identical predicates in alts
+
+      Prior to 1.33MR11, there would be no ambiguity warning when the
+      very same predicate was used to disambiguate both alternatives:
+
+        test: ref B
+            | ref C
+            ;
+
+        ref : <<pred(LATEXT(1)>>? A
+
+      In 1.33MR11 this will cause the warning:
+
+        warning: the predicates used to disambiguate rule test
+            (file v98.g alt 1 line 1 and alt 2 line 2)
+             are identical and have no resolving power
+
+        -----------------  Note  -----------------
+
+          This is different than the following case
+
+                test: <<pred(LATEXT(1))>>? A B
+                    | <<pred(LATEXT(1)>>?  A C
+                    ;
+
+          In this case there are two distinct predicates
+          which have exactly the same text.  In the first
+          example there are two references to the same
+          predicate.  The problem represented by this
+          grammar will be addressed later.
+
+
+#127. (Changed in 1.33MR11)
+
+                    Count Syntax Errors     Count DLG Errors
+                    -------------------     ----------------
+
+       C++ mode     ANTLRParser::           DLGLexerBase::
+                      syntaxErrCount          lexErrCount
+       C mode       zzSyntaxErrCount        zzLexErrCount
+
+       The C mode variables are global and initialized to 0.
+       They are *not* reset to 0 automatically when antlr is
+       restarted.
+
+       The C++ mode variables are public.  They are initialized
+       to 0 by the constructors.  They are *not* reset to 0 by the
+       ANTLRParser::init() method.
+
+       Suggested by Reinier van den Born (reinier@vnet.ibm.com).
+
+#126. (Changed in 1.33MR11) Addition of #first <<...>>
+
+       The #first <<...>> inserts the specified text in the output
+       files before any other #include statements required by pccts.
+       The only things before the #first text are comments and
+       a #define ANTLR_VERSION.
+
+       Requested by  and Esa Pulkkinen (esap@cs.tut.fi) and Alexin
+       Zoltan (alexin@inf.u-szeged.hu).
+
+#124. A Note on the New "&&" Style Guarded Predicates
+
+        I've been asked several times, "What is the difference between
+        the old "=>" style guard predicates and the new style "&&" guard
+        predicates, and how do you choose one over the other" ?
+
+        The main difference is that the "=>" does not apply the
+        predicate if the context guard doesn't match, whereas
+        the && form always does.  What is the significance ?
+
+        If you have a predicate which is not on the "leading edge"
+        it is cannot be hoisted.  Suppose you need a predicate that
+        looks at LA(2).  You must introduce it manually.  The
+        classic example is:
+
+            castExpr :
+                     LP typeName RP
+                     | ....
+                     ;
+
+            typeName : <<isTypeName(LATEXT(1))>>?  ID
+                     | STRUCT ID
+                     ;
+
+        The problem  is that isTypeName() isn't on the leading edge
+        of typeName, so it won't be hoisted into castExpr to help
+        make a decision on which production to choose.
+
+        The *first* attempt to fix it is this:
+
+            castExpr :
+                     <<isTypeName(LATEXT(2))>>?
+                                        LP typeName RP
+                     | ....
+                     ;
+
+        Unfortunately, this won't work because it ignores
+        the problem of STRUCT.  The solution is to apply
+        isTypeName() in castExpr if LA(2) is an ID and
+        don't apply it when LA(2) is STRUCT:
+
+            castExpr :
+                     (LP ID)? => <<isTypeName(LATEXT(2))>>?
+                                        LP typeName RP
+                     | ....
+                     ;
+
+        In conclusion, the "=>" style guarded predicate is
+        useful when:
+
+            a. the tokens required for the predicate
+               are not on the leading edge
+            b. there are alternatives in the expression
+               selected by the predicate for which the
+               predicate is inappropriate
+
+        If (b) were false, then one could use a simple
+        predicate (assuming "-prc on"):
+
+            castExpr :
+                     <<isTypeName(LATEXT(2))>>?
+                                        LP typeName RP
+                     | ....
+                     ;
+
+            typeName : <<isTypeName(LATEXT(1))>>?  ID
+                     ;
+
+        So, when do you use the "&&" style guarded predicate ?
+
+        The new-style "&&" predicate should always be used with
+        predicate context.  The context guard is in ADDITION to
+        the automatically computed context.  Thus it useful for
+        predicates which depend on the token type for reasons
+        other than context.
+
+        The following example is contributed by Reinier van den Born
+        (reinier@vnet.ibm.com).
+
+ +-------------------------------------------------------------------------+
+ | This grammar has two ways to call functions:                            |
+ |                                                                         |
+ |  - a "standard" call syntax with parens and comma separated args        |
+ |  - a shell command like syntax (no parens and spacing separated args)   |
+ |                                                                         |
+ | The former also allows a variable to hold the name of the function,     |
+ | the latter can also be used to call external commands.                  |
+ |                                                                         |
+ | The grammar (simplified) looks like this:                               |
+ |                                                                         |
+ |   fun_call   :     ID "(" { expr ("," expr)* } ")"                      |
+ |                                  /* ID is function name */              |
+ |              | "@" ID "(" { expr ("," expr)* } ")"                      |
+ |                                  /* ID is var containing fun name */    |
+ |              ;                                                          |
+ |                                                                         |
+ |   command    : ID expr*          /* ID is function name */              |
+ |              | path expr*        /* path is external command name */    |
+ |              ;                                                          |
+ |                                                                         |
+ |   path       : ID                /* left out slashes and such */        |
+ |              | "@" ID            /* ID is environment var */            |
+ |              ;                                                          |
+ |                                                                         |
+ |   expr       : ....                                                     |
+ |              | "(" expr ")";                                            |
+ |                                                                         |
+ |   call       : fun_call                                                 |
+ |              | command                                                  |
+ |              ;                                                          |
+ |                                                                         |
+ | Obviously the call is wildly ambiguous. This is more or less how this   |
+ | is to be resolved:                                                      |
+ |                                                                         |
+ |    A call begins with an ID or an @ followed by an ID.                  |
+ |                                                                         |
+ |    If it is an ID and if it is an ext. command name  -> command         |
+ |                       if followed by a paren         -> fun_call        |
+ |                       otherwise                      -> command         |
+ |                                                                         |
+ |    If it is an @  and if the ID is a var name        -> fun_call        |
+ |                       otherwise                      -> command         |
+ |                                                                         |
+ | One can implement these rules quite neatly using && predicates:         |
+ |                                                                         |
+ |   call       : ("@" ID)? && <<isVarName(LT(2))>>? fun_call              |
+ |              | (ID)?     && <<isExtCmdName>>?     command               |
+ |              | (ID "(")?                          fun_call              |
+ |              |                                    command               |
+ |              ;                                                          |
+ |                                                                         |
+ | This can be done better, so it is not an ideal example, but it          |
+ | conveys the principle.                                                  |
+ +-------------------------------------------------------------------------+
+
+#122. (Changed in 1.33MR11)  Member functions to reset DLG in C++ mode
+
+         void DLGFileReset(FILE *f) { input = f; found_eof = 0; }
+         void DLGStringReset(DLGChar *s) { input = s; p = &input[0]; }
+
+        Supplied by R.A. Nelson (cowboy@VNET.IBM.COM)
+
+#119. (Changed in 1.33MR11) Ambiguity aid for grammars
+
+      The user can ask for additional information on ambiguities reported
+      by antlr to stdout.  At the moment, only one ambiguity report can
+      be created in an antlr run.
+
+      This feature is enabled using the "-aa" (Ambiguity Aid)  option.
+
+      The following options control the reporting of ambiguities:
+
+          -aa ruleName       Selects reporting by name of rule
+          -aa lineNumber     Selects reporting by line number
+                               (file name not compared)
+
+          -aam               Selects "multiple" reporting for a token
+                             in the intersection set of the
+                             alternatives.
+
+                             For instance, the token ID may appear dozens
+                             of times in various paths as the program
+                             explores the rules which are reachable from
+                             the point of an ambiguity. With option -aam
+                             every possible path the search program
+                             encounters is reported.
+
+                             Without -aam only the first encounter is
+                             reported.  This may result in incomplete
+                             information, but the information may be
+                             sufficient and much shorter.
+
+          -aad depth         Selects the depth of the search.
+                             The default value is 1.
+
+                             The number of paths to be searched, and the
+                             size of the report can grow geometrically
+                             with the -ck value if a full search for all
+                             contributions to the source of the ambiguity
+                             is explored.
+
+                             The depth represents the number of tokens
+                             in the lookahead set which are matched against
+                             the set of ambiguous tokens.  A depth of 1
+                             means that the search stops when a lookahead
+                             sequence of just one token is matched.
+
+                             A k=1 ck=6 grammar might generate 5,000 items
+                             in a report if a full depth 6 search is made
+                             with the Ambiguity Aid.  The source of the
+                             problem may be in the first token and obscured
+                             by the volume of data - I hesitate to call
+                             it information.
+
+                             When the user selects a depth > 1, the search
+                             is first performed at depth=1 for both
+                             alternatives, then depth=2 for both alternatives,
+                             etc.
+
+      Sample output for rule grammar in antlr.g itself:
+
+  +---------------------------------------------------------------------+
+  | Ambiguity Aid                                                       |
+  |                                                                     |
+  |   Choice 1: grammar/70                 line 632  file a.g           |
+  |   Choice 2: grammar/82                 line 644  file a.g           |
+  |                                                                     |
+  |   Intersection of lookahead[1] sets:                                |
+  |                                                                     |
+  |      "\}"             "class"          "#errclass"      "#tokclass" |
+  |                                                                     |
+  |    Choice:1  Depth:1  Group:1  ("#errclass")                        |
+  |  1 in (...)* block                grammar/70       line 632   a.g   |
+  |  2 to error                       grammar/73       line 635   a.g   |
+  |  3 error                          error/1          line 894   a.g   |
+  |  4 #token "#errclass"             error/2          line 895   a.g   |
+  |                                                                     |
+  |    Choice:1  Depth:1  Group:2  ("#tokclass")                        |
+  |  2 to tclass                      grammar/74       line 636   a.g   |
+  |  3 tclass                         tclass/1         line 937   a.g   |
+  |  4 #token "#tokclass"             tclass/2         line 938   a.g   |
+  |                                                                     |
+  |    Choice:1  Depth:1  Group:3  ("class")                            |
+  |  2 to class_def                   grammar/75       line 637   a.g   |
+  |  3 class_def                      class_def/1      line 669   a.g   |
+  |  4 #token "class"                 class_def/3      line 671   a.g   |
+  |                                                                     |
+  |    Choice:1  Depth:1  Group:4  ("\}")                               |
+  |  2 #token "\}"                    grammar/76       line 638   a.g   |
+  |                                                                     |
+  |    Choice:2  Depth:1  Group:5  ("#errclass")                        |
+  |  1 in (...)* block                grammar/83       line 645   a.g   |
+  |  2 to error                       grammar/93       line 655   a.g   |
+  |  3 error                          error/1          line 894   a.g   |
+  |  4 #token "#errclass"             error/2          line 895   a.g   |
+  |                                                                     |
+  |    Choice:2  Depth:1  Group:6  ("#tokclass")                        |
+  |  2 to tclass                      grammar/94       line 656   a.g   |
+  |  3 tclass                         tclass/1         line 937   a.g   |
+  |  4 #token "#tokclass"             tclass/2         line 938   a.g   |
+  |                                                                     |
+  |    Choice:2  Depth:1  Group:7  ("class")                            |
+  |  2 to class_def                   grammar/95       line 657   a.g   |
+  |  3 class_def                      class_def/1      line 669   a.g   |
+  |  4 #token "class"                 class_def/3      line 671   a.g   |
+  |                                                                     |
+  |    Choice:2  Depth:1  Group:8  ("\}")                               |
+  |  2 #token "\}"                    grammar/96       line 658   a.g   |
+  +---------------------------------------------------------------------+
+
+      For a linear lookahead set ambiguity (where k=1 or for k>1 but
+      when all lookahead sets [i] with i<k all have degree one) the
+      reports appear in the following order:
+
+        for (depth=1 ; depth <= "-aad depth" ; depth++) {
+          for (alternative=1; alternative <=2 ; alternative++) {
+            while (matches-are-found) {
+              group++;
+              print-report
+            };
+          };
+       };
+
+      For reporting a k-tuple ambiguity, the reports appear in the
+      following order:
+
+        for (depth=1 ; depth <= "-aad depth" ; depth++) {
+          while (matches-are-found) {
+            for (alternative=1; alternative <=2 ; alternative++) {
+              group++;
+              print-report
+            };
+          };
+       };
+
+      This is because matches are generated in different ways for
+      linear lookahead and k-tuples.
+
+#117. (Changed in 1.33MR10) new EXPERIMENTAL predicate hoisting code
+
+      The hoisting of predicates into rules to create prediction
+      expressions is a problem in antlr.  Consider the following
+      example (k=1 with -prc on):
+
+        start   : (a)* "@" ;
+        a       : b | c ;
+        b       : <<isUpper(LATEXT(1))>>? A ;
+        c       : A ;
+
+      Prior to 1.33MR10 the code generated for "start" would resemble:
+
+        while {
+            if (LA(1)==A &&
+                    (!LA(1)==A || isUpper())) {
+              a();
+            }
+        };
+
+      This code is wrong because it makes rule "c" unreachable from
+      "start".  The essence of the problem is that antlr fails to
+      recognize that there can be a valid alternative within "a" even
+      when the predicate <<isUpper(LATEXT(1))>>? is false.
+
+      In 1.33MR10 with -mrhoist the hoisting of the predicate into
+      "start" is suppressed because it recognizes that "c" can
+      cover all the cases where the predicate is false:
+
+        while {
+            if (LA(1)==A) {
+              a();
+            }
+        };
+
+      With the antlr "-info p" switch the user will receive information
+      about the predicate suppression in the generated file:
+
+      --------------------------------------------------------------
+        #if 0
+
+        Hoisting of predicate suppressed by alternative without predicate.
+        The alt without the predicate includes all cases where
+            the predicate is false.
+
+           WITH predicate: line 7  v1.g
+           WITHOUT predicate: line 7  v1.g
+
+        The context set for the predicate:
+
+             A
+
+        The lookahead set for the alt WITHOUT the semantic predicate:
+
+             A
+
+        The predicate:
+
+          pred <<  isUpper(LATEXT(1))>>?
+                          depth=k=1  rule b  line 9  v1.g
+            set context:
+               A
+            tree context: null
+
+        Chain of referenced rules:
+
+            #0  in rule start (line 5 v1.g) to rule a
+            #1  in rule a (line 7 v1.g)
+
+        #endif
+      --------------------------------------------------------------
+
+      A predicate can be suppressed by a combination of alternatives
+      which, taken together, cover a predicate:
+
+        start   : (a)* "@" ;
+
+        a       : b | ca | cb | cc ;
+
+        b       : <<isUpper(LATEXT(1))>>? ( A | B | C ) ;
+
+        ca      : A ;
+        cb      : B ;
+        cc      : C ;
+
+      Consider a more complex example in which "c" covers only part of
+      a predicate:
+
+        start   : (a)* "@" ;
+
+        a       : b
+                | c
+                ;
+
+        b       : <<isUpper(LATEXT(1))>>?
+                    ( A
+                    | X
+                    );
+
+        c       : A
+                ;
+
+      Prior to 1.33MR10 the code generated for "start" would resemble:
+
+        while {
+            if ( (LA(1)==A || LA(1)==X) &&
+                    (! (LA(1)==A || LA(1)==X) || isUpper()) {
+              a();
+            }
+        };
+
+      With 1.33MR10 and -mrhoist the predicate context is restricted to
+      the non-covered lookahead.  The code resembles:
+
+        while {
+            if ( (LA(1)==A || LA(1)==X) &&
+                  (! (LA(1)==X) || isUpper()) {
+              a();
+            }
+        };
+
+      With the antlr "-info p" switch the user will receive information
+      about the predicate restriction in the generated file:
+
+      --------------------------------------------------------------
+        #if 0
+
+        Restricting the context of a predicate because of overlap
+          in the lookahead set between the alternative with the
+          semantic predicate and one without
+        Without this restriction the alternative without the predicate
+          could not be reached when input matched the context of the
+          predicate and the predicate was false.
+
+           WITH predicate: line 11  v4.g
+           WITHOUT predicate: line 12  v4.g
+
+        The original context set for the predicate:
+
+             A                X
+
+        The lookahead set for the alt WITHOUT the semantic predicate:
+
+             A
+
+        The intersection of the two sets
+
+             A
+
+        The original predicate:
+
+          pred <<  isUpper(LATEXT(1))>>?
+                          depth=k=1  rule b  line 15  v4.g
+            set context:
+               A                X
+            tree context: null
+
+        The new (modified) form of the predicate:
+
+          pred <<  isUpper(LATEXT(1))>>?
+                          depth=k=1  rule b  line 15  v4.g
+            set context:
+               X
+            tree context: null
+
+        #endif
+      --------------------------------------------------------------
+
+      The bad news about -mrhoist:
+
+        (a) -mrhoist does not analyze predicates with lookahead
+            depth > 1.
+
+        (b) -mrhoist does not look past a guarded predicate to
+            find context which might cover other predicates.
+
+      For these cases you might want to use syntactic predicates.
+      When a semantic predicate fails during guess mode the guess
+      fails and the next alternative is tried.
+
+      Limitation (a) is illustrated by the following example:
+
+        start    : (stmt)* EOF ;
+
+        stmt     : cast
+                 | expr
+                 ;
+        cast     : <<isTypename(LATEXT(2))>>? LP ID RP ;
+
+        expr     : LP ID RP ;
+
+      This is not much different from the first example, except that
+      it requires two tokens of lookahead context to determine what
+      to do.  This predicate is NOT suppressed because the current version
+      is unable to handle predicates with depth > 1.
+
+      A predicate can be combined with other predicates during hoisting.
+      In those cases the depth=1 predicates are still handled.  Thus,
+      in the following example the isUpper() predicate will be suppressed
+      by line #4 when hoisted from "bizarre" into "start", but will still
+      be present in "bizarre" in order to predict "stmt".
+
+        start    : (bizarre)* EOF ;     // #1
+                                        // #2
+        bizarre  : stmt                 // #3
+                 | A                    // #4
+                 ;
+
+        stmt     : cast
+                 | expr
+                 ;
+
+        cast     : <<isTypename(LATEXT(2))>>? LP ID RP ;
+
+        expr     : LP ID RP ;
+                 | <<isUpper(LATEXT(1))>>? A
+
+      Limitation (b) is illustrated by the following example of a
+      context guarded predicate:
+
+        rule : (A)? <<p>>?          // #1
+                     (A             // #2
+                     |B             // #3
+                     )              // #4
+             | <<q>> B              // #5
+             ;
+
+      Recall that this means that when the lookahead is NOT A then
+      the predicate "p" is ignored and it attempts to match "A|B".
+      Ideally, the "B" at line #3 should suppress predicate "q".
+      However, the current version does not attempt to look past
+      the guard predicate to find context which might suppress other
+      predicates.
+
+      In some cases -mrhoist will lead to the reporting of ambiguities
+      which were not visible before:
+
+        start   : (a)* "@";
+        a       : bc | d;
+        bc      : b  | c ;
+
+        b       : <<isUpper(LATEXT(1))>>? A;
+        c       : A ;
+
+        d       : A ;
+
+      In this case there is a true ambiguity in "a" between "bc" and "d"
+      which can both match "A".  Without -mrhoist the predicate in "b"
+      is hoisted into "a" and there is no ambiguity reported.  However,
+      with -mrhoist, the predicate in "b" is suppressed by "c" (as it
+      should be) making the ambiguity in "a" apparent.
+
+      The motivations for these changes were hoisting problems reported
+      by Reinier van den Born (reinier@vnet.ibm.com) and several others.
+
+#113. (Changed in 1.33MR10) new context guarded pred: (g)? && <<p>>? expr
+
+      The existing context guarded predicate:
+
+            rule : (guard)? => <<p>>? expr
+                 | next_alternative
+                 ;
+
+      generates code which resembles:
+
+            if (lookahead(expr) && (!guard || pred)) {
+              expr()
+            } else ....
+
+      This is not suitable for some applications because it allows
+      expr() to be invoked when the predicate is false.  This is
+      intentional because it is meant to mimic automatically computed
+      predicate context.
+
+      The new context guarded predicate uses the guard information
+      differently because it has a different goal.  Consider:
+
+            rule : (guard)? && <<p>>? expr
+                 | next_alternative
+                 ;
+
+      The new style of context guarded predicate is equivalent to:
+
+            rule : <<guard==true && pred>>? expr
+                 | next_alternative
+                 ;
+
+      It generates code which resembles:
+
+            if (lookahead(expr) && guard && pred) {
+                expr();
+            } else ...
+
+      Both forms of guarded predicates severely restrict the form of
+      the context guard: it can contain no rule references, no
+      (...)*, no (...)+, and no {...}.  It may contain token and
+      token class references, and alternation ("|").
+
+      Addition for 1.33MR11: in the token expression all tokens must
+      be at the same height of the token tree:
+
+            (A ( B | C))? && ...            is ok (all height 2)
+            (A ( B |  ))? && ...            is not ok (some 1, some 2)
+            (A B C D | E F G H)? && ...     is ok (all height 4)
+            (A B C D | E )? && ...          is not ok (some 4, some 1)
+
+      This restriction is required in order to properly compute the lookahead
+      set for expressions like:
+
+            rule1 : (A B C)? && <<pred>>? rule2 ;
+            rule2 : (A|X) (B|Y) (C|Z);
+
+      This addition was suggested by Rienier van den Born (reinier@vnet.ibm.com)
+
+#109. (Changed in 1.33MR10) improved trace information
+
+      The quality of the trace information provided by the "-gd"
+      switch has been improved significantly.  Here is an example
+      of the output from a test program.  It shows the rule name,
+      the first token of lookahead, the call depth, and the guess
+      status:
+
+        exit rule gusxx {"?"} depth 2
+        enter rule gusxx {"?"} depth 2
+        enter rule gus1 {"o"} depth 3 guessing
+        guess done - returning to rule gus1 {"o"} at depth 3
+                    (guess mode continues - an enclosing guess is still active)
+        guess done - returning to rule gus1 {"Z"} at depth 3
+                    (guess mode continues - an enclosing guess is still active)
+        exit rule gus1 {"Z"} depth 3 guessing
+        guess done - returning to rule gusxx {"o"} at depth 2 (guess mode ends)
+        enter rule gus1 {"o"} depth 3
+        guess done - returning to rule gus1 {"o"} at depth 3 (guess mode ends)
+        guess done - returning to rule gus1 {"Z"} at depth 3 (guess mode ends)
+        exit rule gus1 {"Z"} depth 3
+        line 1: syntax error at "Z" missing SC
+            ...
+
+      Rule trace reporting is controlled by the value of the integer
+      [zz]traceOptionValue:  when it is positive tracing is enabled,
+      otherwise it is disabled.  Tracing during guess mode is controlled
+      by the value of the integer [zz]traceGuessOptionValue.  When
+      it is positive AND [zz]traceOptionValue is positive rule trace
+      is reported in guess mode.
+
+      The values of [zz]traceOptionValue and [zz]traceGuessOptionValue
+      can be adjusted by subroutine calls listed below.
+
+      Depending on the presence or absence of the antlr -gd switch
+      the variable [zz]traceOptionValueDefault is set to 0 or 1.  When
+      the parser is initialized or [zz]traceReset() is called the
+      value of [zz]traceOptionValueDefault is copied to [zz]traceOptionValue.
+      The value of [zz]traceGuessOptionValue is always initialzed to 1,
+      but, as noted earlier, nothing will be reported unless
+      [zz]traceOptionValue is also positive.
+
+      When the parser state is saved/restored the value of the trace
+      variables are also saved/restored.  If a restore causes a change in
+      reporting behavior from on to off or vice versa this will be reported.
+
+      When the -gd option is selected, the macro "#define zzTRACE_RULES"
+      is added to appropriate output files.
+
+        C++ mode
+        --------
+        int     traceOption(int delta)
+        int     traceGuessOption(int delta)
+        void    traceReset()
+        int     traceOptionValueDefault
+
+        C mode
+        --------
+        int     zzTraceOption(int delta)
+        int     zzTraceGuessOption(int delta)
+        void    zzTraceReset()
+        int     zzTraceOptionValueDefault
+
+      The argument "delta" is added to the traceOptionValue.  To
+      turn on trace when inside a particular rule one:
+
+        rule : <<traceOption(+1);>>
+               (
+                rest-of-rule
+               )
+               <<traceOption(-1);>>
+       ;  /* fail clause */ <<traceOption(-1);>>
+
+      One can use the same idea to turn *off* tracing within a
+      rule by using a delta of (-1).
+
+      An improvement in the rule trace was suggested by Sramji
+      Ramanathan (ps@kumaran.com).
+
+#108. A Note on Deallocation of Variables Allocated in Guess Mode
+
+                            NOTE
+        ------------------------------------------------------
+        This mechanism only works for heap allocated variables
+        ------------------------------------------------------
+
+      The rewrite of the trace provides the machinery necessary
+      to properly free variables or undo actions following a
+      failed guess.
+
+      The macro zzUSER_GUESS_HOOK(guessSeq,zzrv) is expanded
+      as part of the zzGUESS macro.  When a guess is opened
+      the value of zzrv is 0.  When a longjmp() is executed to
+      undo the guess, the value of zzrv will be 1.
+
+      The macro zzUSER_GUESS_DONE_HOOK(guessSeq) is expanded
+      as part of the zzGUESS_DONE macro.  This is executed
+      whether the guess succeeds or fails as part of closing
+      the guess.
+
+      The guessSeq is a sequence number which is assigned to each
+      guess and is incremented by 1 for each guess which becomes
+      active.  It is needed by the user to associate the start of
+      a guess with the failure and/or completion (closing) of a
+      guess.
+
+      Guesses are nested.  They must be closed in the reverse
+      of the order that they are opened.
+
+      In order to free memory used by a variable during a guess
+      a user must write a routine which can be called to
+      register the variable along with the current guess sequence
+      number provided by the zzUSER_GUESS_HOOK macro. If the guess
+      fails, all variables tagged with the corresponding guess
+      sequence number should be released.  This is ugly, but
+      it would require a major rewrite of antlr 1.33 to use
+      some mechanism other than setjmp()/longjmp().
+
+      The order of calls for a *successful* guess would be:
+
+        zzUSER_GUESS_HOOK(guessSeq,0);
+        zzUSER_GUESS_DONE_HOOK(guessSeq);
+
+      The order of calls for a *failed* guess would be:
+
+        zzUSER_GUESS_HOOK(guessSeq,0);
+        zzUSER_GUESS_HOOK(guessSeq,1);
+        zzUSER_GUESS_DONE_HOOK(guessSeq);
+
+      The default definitions of these macros are empty strings.
+
+      Here is an example in C++ mode.  The zzUSER_GUESS_HOOK and
+      zzUSER_GUESS_DONE_HOOK macros and myGuessHook() routine
+      can be used without change in both C and C++ versions.
+
+      ----------------------------------------------------------------------
+        <<
+
+        #include "AToken.h"
+
+        typedef ANTLRCommonToken ANTLRToken;
+
+        #include "DLGLexer.h"
+
+        int main() {
+
+          {
+            DLGFileInput     in(stdin);
+            DLGLexer         lexer(&in,2000);
+            ANTLRTokenBuffer pipe(&lexer,1);
+            ANTLRCommonToken aToken;
+            P                parser(&pipe);
+
+            lexer.setToken(&aToken);
+            parser.init();
+            parser.start();
+          };
+
+          fclose(stdin);
+          fclose(stdout);
+          return 0;
+        }
+
+        >>
+
+        <<
+        char *s=NULL;
+
+        #undef zzUSER_GUESS_HOOK
+        #define zzUSER_GUESS_HOOK(guessSeq,zzrv) myGuessHook(guessSeq,zzrv);
+        #undef zzUSER_GUESS_DONE_HOOK
+        #define zzUSER_GUESS_DONE_HOOK(guessSeq)   myGuessHook(guessSeq,2);
+
+        void myGuessHook(int guessSeq,int zzrv) {
+          if (zzrv == 0) {
+            fprintf(stderr,"User hook: starting guess #%d\n",guessSeq);
+          } else if (zzrv == 1) {
+            free (s);
+            s=NULL;
+            fprintf(stderr,"User hook: failed guess #%d\n",guessSeq);
+          } else if (zzrv == 2) {
+            free (s);
+            s=NULL;
+            fprintf(stderr,"User hook: ending guess #%d\n",guessSeq);
+          };
+        }
+
+        >>
+
+        #token A    "a"
+        #token      "[\t \ \n]"     <<skip();>>
+
+        class P {
+
+        start : (top)+
+              ;
+
+        top   : (which) ?   <<fprintf(stderr,"%s is a which\n",s); free(s); s=NULL; >>
+              | other       <<fprintf(stderr,"%s is an other\n",s); free(s); s=NULL; >>
+              ; <<if (s != NULL) free(s); s=NULL; >>
+
+        which : which2
+              ;
+
+        which2 : which3
+              ;
+        which3
+              : (label)?         <<fprintf(stderr,"%s is a label\n",s);>>
+              | (global)?        <<fprintf(stderr,"%s is a global\n",s);>>
+              | (exclamation)?   <<fprintf(stderr,"%s is an exclamation\n",s);>>
+              ;
+
+        label :       <<s=strdup(LT(1)->getText());>> A ":" ;
+
+        global :      <<s=strdup(LT(1)->getText());>> A "::" ;
+
+        exclamation : <<s=strdup(LT(1)->getText());>> A "!" ;
+
+        other :       <<s=strdup(LT(1)->getText());>> "other" ;
+
+        }
+      ----------------------------------------------------------------------
+
+      This is a silly example, but illustrates the idea.  For the input
+      "a ::" with tracing enabled the output begins:
+
+      ----------------------------------------------------------------------
+        enter rule "start" depth 1
+        enter rule "top" depth 2
+        User hook: starting guess #1
+        enter rule "which" depth 3 guessing
+        enter rule "which2" depth 4 guessing
+        enter rule "which3" depth 5 guessing
+        User hook: starting guess #2
+        enter rule "label" depth 6 guessing
+        guess failed
+        User hook: failed guess #2
+        guess done - returning to rule "which3" at depth 5 (guess mode continues
+                                                 - an enclosing guess is still active)
+        User hook: ending guess #2
+        User hook: starting guess #3
+        enter rule "global" depth 6 guessing
+        exit rule "global" depth 6 guessing
+        guess done - returning to rule "which3" at depth 5 (guess mode continues
+                                                 - an enclosing guess is still active)
+        User hook: ending guess #3
+        enter rule "global" depth 6 guessing
+        exit rule "global" depth 6 guessing
+        exit rule "which3" depth 5 guessing
+        exit rule "which2" depth 4 guessing
+        exit rule "which" depth 3 guessing
+        guess done - returning to rule "top" at depth 2 (guess mode ends)
+        User hook: ending guess #1
+        enter rule "which" depth 3
+        .....
+      ----------------------------------------------------------------------
+
+      Remember:
+
+        (a) Only init-actions are executed during guess mode.
+        (b) A rule can be invoked multiple times during guess mode.
+        (c) If the guess succeeds the rule will be called once more
+              without guess mode so that normal actions will be executed.
+            This means that the init-action might need to distinguish
+              between guess mode and non-guess mode using the variable
+              [zz]guessing.
+
+#101. (Changed in 1.33MR10) antlr -info command line switch
+
+        -info
+
+            p   - extra predicate information in generated file
+
+            t   - information about tnode use:
+                    at the end of each rule in generated file
+                    summary on stderr at end of program
+
+            m   - monitor progress
+                    prints name of each rule as it is started
+                    flushes output at start of each rule
+
+            f   - first/follow set information to stdout
+
+            0   - no operation (added in 1.33MR11)
+
+      The options may be combined and may appear in any order.
+      For example:
+
+        antlr -info ptm -CC -gt -mrhoist on mygrammar.g
+
+#100a. (Changed in 1.33MR10) Predicate tree simplification
+
+      When the same predicates can be referenced in more than one
+      alternative of a block large predicate trees can be formed.
+
+      The difference that these optimizations make is so dramatic
+      that I have decided to use it even when -mrhoist is not selected.
+
+      Consider the following grammar:
+
+        start : ( all )* ;
+
+        all   : a
+              | d
+              | e
+              | f
+              ;
+
+        a     : c A B
+              | c A C
+              ;
+
+        c     : <<AAA(LATEXT(2))>>?
+              ;
+
+        d     : <<BBB(LATEXT(2))>>? B C
+              ;
+
+        e     : <<CCC(LATEXT(2))>>? B C
+              ;
+
+        f     : e X Y
+              ;
+
+      In rule "a" there is a reference to rule "c" in both alternatives.
+      The length of the predicate AAA is k=2 and it can be followed in
+      alternative 1 only by (A B) while in alternative 2 it can be
+      followed only by (A C).  Thus they do not have identical context.
+
+      In rule "all" the alternatives which refer to rules "e" and "f" allow
+      elimination of the duplicate reference to predicate CCC.
+
+      The table below summarized the kind of simplification performed by
+      1.33MR10.  In the table, X and Y stand for single predicates
+      (not trees).
+
+        (OR X (OR Y (OR Z)))  => (OR X Y Z)
+        (AND X (AND Y (AND Z)))  => (AND X Y Z)
+
+        (OR X  (... (OR  X Y) ... ))     => (OR X (... Y ... ))
+        (AND X (... (AND X Y) ... ))     => (AND X (... Y ... ))
+        (OR X  (... (AND X Y) ... ))     => (OR X (...  ... ))
+        (AND X (... (OR  X Y) ... ))     => (AND X (...  ... ))
+
+        (AND X)               => X
+        (OR X)                => X
+
+      In a test with a complex grammar for a real application, a predicate
+      tree with six OR nodes and 12 leaves was reduced to "(OR X Y Z)".
+
+      In 1.33MR10 there is a greater effort to release memory used
+      by predicates once they are no longer in use.
+
+#100b. (Changed in 1.33MR10) Suppression of extra predicate tests
+
+      The following optimizations require that -mrhoist be selected.
+
+      It is relatively easy to optimize the code generated for predicate
+      gates when they are of the form:
+
+            (AND X Y Z ...)
+        or  (OR  X Y Z ...)
+
+      where X, Y, Z, and "..." represent individual predicates (leaves) not
+      predicate trees.
+
+      If the predicate is an AND the contexts of the X, Y, Z, etc. are
+      ANDed together to create a single Tree context for the group and
+      context tests for the individual predicates are suppressed:
+
+            --------------------------------------------------
+            Note: This was incorrect.  The contexts should be
+            ORed together.  This has been fixed.  A more 
+            complete description is available in item #152.
+            ---------------------------------------------------
+
+      Optimization 1:  (AND X Y Z ...)
+
+        Suppose the context for Xtest is LA(1)==LP and the context for
+        Ytest is LA(1)==LP && LA(2)==ID.
+
+            Without the optimization the code would resemble:
+
+                if (lookaheadContext &&
+                    !(LA(1)==LP && LA(1)==LP && LA(2)==ID) ||
+                        ( (! LA(1)==LP || Xtest) &&
+                          (! (LA(1)==LP || LA(2)==ID) || Xtest)
+                        )) {...
+
+            With the -mrhoist optimization the code would resemble:
+
+                if (lookaheadContext &&
+                    ! (LA(1)==LP && LA(2)==ID) || (Xtest && Ytest) {...
+
+      Optimization 2: (OR X Y Z ...) with identical contexts
+
+        Suppose the context for Xtest is LA(1)==ID and for Ytest
+        the context is also LA(1)==ID.
+
+            Without the optimization the code would resemble:
+
+                if (lookaheadContext &&
+                    ! (LA(1)==ID || LA(1)==ID) ||
+                        (LA(1)==ID && Xtest) ||
+                        (LA(1)==ID && Ytest) {...
+
+            With the -mrhoist optimization the code would resemble:
+
+                if (lookaheadContext &&
+                    (! LA(1)==ID) || (Xtest || Ytest) {...
+
+      Optimization 3: (OR X Y Z ...) with distinct contexts
+
+        Suppose the context for Xtest is LA(1)==ID and for Ytest
+        the context is LA(1)==LP.
+
+            Without the optimization the code would resemble:
+
+                if (lookaheadContext &&
+                    ! (LA(1)==ID || LA(1)==LP) ||
+                        (LA(1)==ID && Xtest) ||
+                        (LA(1)==LP && Ytest) {...
+
+            With the -mrhoist optimization the code would resemble:
+
+                if (lookaheadContext &&
+                        (zzpf=0,
+                            (LA(1)==ID && (zzpf=1) && Xtest) ||
+                            (LA(1)==LP && (zzpf=1) && Ytest) ||
+                            !zzpf) {
+
+            These may appear to be of similar complexity at first,
+            but the non-optimized version contains two tests of each
+            context while the optimized version contains only one
+            such test, as well as eliminating some of the inverted
+            logic (" !(...) || ").
+
+      Optimization 4: Computation of predicate gate trees
+
+        When generating code for the gates of predicate expressions
+        antlr 1.33 vanilla uses a recursive procedure to generate
+        "&&" and "||" expressions for testing the lookahead. As each
+        layer of the predicate tree is exposed a new set of "&&" and
+        "||" expressions on the lookahead are generated.  In many
+        cases the lookahead being tested has already been tested.
+
+        With -mrhoist a lookahead tree is computed for the entire
+        lookahead expression.  This means that predicates with identical
+        context or context which is a subset of another predicate's
+        context disappear.
+
+        This is especially important for predicates formed by rules
+        like the following:
+
+            uppperCaseVowel : <<isUpperCase(LATEXT(1))>>?  vowel;
+            vowel:          : <<isVowel(LATEXT(1))>>? LETTERS;
+
+        These predicates are combined using AND since both must be
+        satisfied for rule upperCaseVowel.  They have identical
+        context which makes this optimization very effective.
+
+      The affect of Items #100a and #100b together can be dramatic.  In
+      a very large (but real world) grammar one particular predicate
+      expression was reduced from an (unreadable) 50 predicate leaves,
+      195 LA(1) terms, and 5500 characters to an (easily comprehensible)
+      3 predicate leaves (all different) and a *single* LA(1) term.
+
+#98.  (Changed in 1.33MR10) Option "-info p"
+
+      When the user selects option "-info p" the program will generate
+      detailed information about predicates.  If the user selects
+      "-mrhoist on" additional detail will be provided explaining
+      the promotion and suppression of predicates.  The output is part
+      of the generated file and sandwiched between #if 0/#endif statements.
+
+      Consider the following k=1 grammar:
+
+        start : ( all ) * ;
+
+        all   : ( a
+                | b
+                )
+                ;
+
+        a     : c B
+              ;
+
+        c     : <<LATEXT(1)>>?
+              | B
+              ;
+
+        b     : <<LATEXT(1)>>? X
+              ;
+
+      Below is an excerpt of the output for rule "start" for the three
+      predicate options (off, on, and maintenance release style hoisting).
+
+      For those who do not wish to use the "-mrhoist on" option for code
+      generation the option can be used in a "diagnostic" mode to provide
+      valuable information:
+
+            a. where one should insert null actions to inhibit hoisting
+            b. a chain of rule references which shows where predicates are
+               being hoisted
+
+      ======================================================================
+      Example of "-info p" with "-mrhoist on"
+      ======================================================================
+        #if 0
+
+        Hoisting of predicate suppressed by alternative without predicate.
+        The alt without the predicate includes all cases where the
+           predicate is false.
+
+           WITH predicate: line 11  v36.g
+           WITHOUT predicate: line 12  v36.g
+
+        The context set for the predicate:
+
+             B
+
+        The lookahead set for alt WITHOUT the semantic predicate:
+
+             B
+
+        The predicate:
+
+          pred <<  LATEXT(1)>>?  depth=k=1  rule c  line 11  v36.g
+
+            set context:
+               B
+            tree context: null
+
+        Chain of referenced rules:
+
+            #0  in rule start (line 1 v36.g) to rule all
+            #1  in rule all (line 3 v36.g) to rule a
+            #2  in rule a (line 8 v36.g) to rule c
+            #3  in rule c (line 11 v36.g)
+
+        #endif
+        &&
+        #if 0
+
+        pred <<  LATEXT(1)>>?  depth=k=1  rule b  line 15  v36.g
+
+          set context:
+             X
+          tree context: null
+
+        #endif
+      ======================================================================
+      Example of "-info p"  with the default -prc setting ( "-prc off")
+      ======================================================================
+        #if 0
+
+        OR
+          pred <<  LATEXT(1)>>?  depth=k=1  rule c  line 11  v36.g
+
+            set context:
+              nil
+            tree context: null
+
+          pred <<  LATEXT(1)>>?  depth=k=1  rule b  line 15  v36.g
+
+            set context:
+              nil
+            tree context: null
+
+        #endif
+      ======================================================================
+      Example of "-info p" with "-prc on" and "-mrhoist off"
+      ======================================================================
+        #if 0
+
+        OR
+          pred <<  LATEXT(1)>>?  depth=k=1  rule c  line 11  v36.g
+
+            set context:
+               B
+            tree context: null
+
+          pred <<  LATEXT(1)>>?  depth=k=1  rule b  line 15  v36.g
+
+            set context:
+               X
+            tree context: null
+
+        #endif
+      ======================================================================
+
+#60.  (Changed in 1.33MR7) Major changes to exception handling
+
+        There were significant problems in the handling of exceptions
+        in 1.33 vanilla.  The general problem is that it can only
+        process one level of exception handler.  For example, a named
+        exception handler, an exception handler for an alternative, or
+        an exception for a subrule  always went to the rule's exception
+        handler if there was no "catch" which matched the exception.
+
+        In 1.33MR7 the exception handlers properly "nest".  If an
+        exception handler does not have a matching "catch" then the
+        nextmost outer exception handler is checked for an appropriate
+        "catch" clause, and so on until an exception handler with an
+        appropriate "catch" is found.
+
+        There are still undesirable features in the way exception
+        handlers are implemented, but I do not have time to fix them
+        at the moment:
+
+            The exception handlers for alternatives are outside the
+            block containing the alternative.  This makes it impossible
+            to access variables declared in a block or to resume the
+            parse by "falling through".  The parse can still be easily
+            resumed in other ways, but not in the most natural fashion.
+
+            This results in an inconsistentcy between named exception
+            handlers and exception handlers for alternatives.  When
+            an exception handler for an alternative "falls through"
+            it goes to the nextmost outer handler - not the "normal
+            action".
+
+        A major difference between 1.33MR7 and 1.33 vanilla is
+        the default action after an exception is caught:
+
+            1.33 Vanilla
+            ------------
+            In 1.33 vanilla the signal value is set to zero ("NoSignal")
+            and the code drops through to the code following the exception.
+            For named exception handlers this is the "normal action".
+            For alternative exception handlers this is the rule's handler.
+
+            1.33MR7
+            -------
+            In 1.33MR7 the signal value is NOT automatically set to zero.
+
+            There are two cases:
+
+                For named exception handlers: if the signal value has been
+                set to zero the code drops through to the "normal action".
+
+                For all other cases the code branches to the nextmost outer
+                exception handler until it reaches the handler for the rule.
+
+        The following macros have been defined for convenience:
+
+            C/C++ Mode Name
+            --------------------
+            (zz)suppressSignal
+                  set signal & return signal arg to 0 ("NoSignal")
+            (zz)setSignal(intValue)
+                  set signal & return signal arg to some value
+            (zz)exportSignal
+                  copy the signal value to the return signal arg
+
+        I'm not sure why PCCTS make a distinction between the local
+        signal value and the return signal argument, but I'm loathe
+        to change the code. The burden of copying the local signal
+        value to the return signal argument can be given to the
+        default signal handler, I suppose.
+
+#53.  (Explanation for 1.33MR6) What happens after an exception is caught ?
+
+        The Book is silent about what happens after an exception
+        is caught.
+
+        The following code fragment prints "Error Action" followed
+        by "Normal Action".
+
+        test : Word ex:Number <<printf("Normal Action\n");>>
+                exception[ex]
+                   catch NoViableAlt:
+                        <<printf("Error Action\n");>>
+        ;
+
+        The reason for "Normal Action" is that the normal flow of the
+        program after a user-written exception handler is to "drop through".
+        In the case of an exception handler for a rule this results in
+        the exection of a "return" statement.  In the case of an
+        exception handler attached to an alternative, rule, or token
+        this is the code that would have executed had there been no
+        exception.
+
+        The user can achieve the desired result by using a "return"
+        statement.
+
+        test : Word ex:Number <<printf("Normal Action\n");>>
+                exception[ex]
+                   catch NoViableAlt:
+                        <<printf("Error Action\n"); return;>>
+        ;
+
+        The most powerful mechanism for recovery from parse errors
+        in pccts is syntactic predicates because they provide
+        backtracking.  Exceptions allow "return", "break",
+        "consumeUntil(...)", "goto _handler", "goto _fail", and
+        changing the _signal value.
+
+#41.  (Added in 1.33MR6) antlr -stdout
+
+        Using "antlr -stdout ..." forces the text that would
+        normally go to the grammar.c or grammar.cpp file to
+        stdout.
+
+#40.  (Added in 1.33MR6) antlr -tab to change tab stops
+
+        Using "antlr -tab number ..." changes the tab stops
+        for the grammar.c or grammar.cpp file.  The number
+        must be between 0 and 8.  Using 0 gives tab characters,
+        values between 1 and 8 give the appropriate number of
+        space characters.
+
+#34.  (Added to 1.33MR1) Add public DLGLexerBase::set_line(int newValue)
+
+        Previously there was no public function for changing the line
+        number maintained by the lexer.
+
+#28.   (Added to 1.33MR1) More control over DLG header
+
+        Version 1.33MR1 adds the following directives to PCCTS
+        for C++ mode:
+
+          #lexprefix  <<source code>>
+
+                Adds source code to the DLGLexer.h file
+                after the #include "DLexerBase.h" but
+                before the start of the class definition.
+
+          #lexmember  <<source code>>
+
+                Adds source code to the DLGLexer.h file
+                as part of the DLGLexer class body.  It
+                appears immediately after the start of
+                the class and a "public: statement.
+

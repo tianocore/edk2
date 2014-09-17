@@ -1,0 +1,44 @@
+/* OUTPUT_FORMAT(efi-bsdrv-x86_64) */
+SECTIONS
+{
+  /* . = 0 + SIZEOF_HEADERS; */
+  . = 0x280;
+  .text ALIGN(0x20) :
+  {
+    *(.text .stub .text.* .gnu.linkonce.t.*)
+    . = ALIGN(0x20);
+  } =0x90909090
+  .data ALIGN(0x20) :
+  {
+    *(
+      .rodata .rodata.* .gnu.linkonce.r.*
+      .data .data.* .gnu.linkonce.d.*
+      .bss .bss.*
+      *COM*
+    )
+    . = ALIGN(0x20);
+  }
+  .eh_frame ALIGN(0x20) :
+  {
+    KEEP (*(.eh_frame))
+  }
+  .got ALIGN(0x20) :
+  {
+    *(.got .got.*)
+    . = ALIGN(0x20);
+  }
+  .rela ALIGN(0x20) :
+  {
+    *(.rela .rela.*)
+  }
+  /DISCARD/ : {
+    *(.note.GNU-stack) *(.gnu_debuglink)
+    *(.interp)
+    *(.dynsym)
+    *(.dynstr)
+    *(.dynamic)
+    *(.hash)
+    *(.comment)
+  }
+}
+
