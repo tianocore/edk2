@@ -2392,6 +2392,7 @@ SetupAndRunCommandOrFile(
   // Now run the command, script, or application
   //
   if (!EFI_ERROR(Status)) {
+    TrimSpaces(&CmdLine);
     Status = RunCommandOrFile(
               Type,
               CmdLine,
