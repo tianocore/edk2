@@ -1494,12 +1494,18 @@ ShellOpenFileMetaArg (
 {
   EFI_STATUS                    Status;
   LIST_ENTRY                    mOldStyleFileList;
+  CHAR16                        *CleanFilePathStr;
 
   //
   // ASSERT that Arg and ListHead are not NULL
   //
   ASSERT(Arg      != NULL);
   ASSERT(ListHead != NULL);
+
+  Status = InternalShellStripQuotes (Arg, &CleanFilePathStr);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Check for UEFI Shell 2.0 protocols
@@ -1508,11 +1514,12 @@ ShellOpenFileMetaArg (
     if (*ListHead == NULL) {
       *ListHead = (EFI_SHELL_FILE_INFO*)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
       if (*ListHead == NULL) {
+        FreePool(CleanFilePathStr);
         return (EFI_OUT_OF_RESOURCES);
       }
       InitializeListHead(&((*ListHead)->Link));
     }
-    Status = gEfiShellProtocol->OpenFileList(Arg,
+    Status = gEfiShellProtocol->OpenFileList(CleanFilePathStr,
                                            OpenMode,
                                            ListHead);
     if (EFI_ERROR(Status)) {
@@ -1522,9 +1529,11 @@ ShellOpenFileMetaArg (
     }
     if (*ListHead != NULL && IsListEmpty(&(*ListHead)->Link)) {
       FreePool(*ListHead);
+      FreePool(CleanFilePathStr);
       *ListHead = NULL;
       return (EFI_NOT_FOUND);
     }
+    FreePool(CleanFilePathStr);
     return (Status);
   }
 
@@ -1540,15 +1549,17 @@ ShellOpenFileMetaArg (
     //
     // Get the EFI Shell list of files
     //
-    Status = mEfiShellEnvironment2->FileMetaArg(Arg, &mOldStyleFileList);
+    Status = mEfiShellEnvironment2->FileMetaArg(CleanFilePathStr, &mOldStyleFileList);
     if (EFI_ERROR(Status)) {
       *ListHead = NULL;
+      FreePool(CleanFilePathStr);
       return (Status);
     }
 
     if (*ListHead == NULL) {
       *ListHead = (EFI_SHELL_FILE_INFO    *)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
       if (*ListHead == NULL) {
+        FreePool(CleanFilePathStr);
         return (EFI_OUT_OF_RESOURCES);
       }
       InitializeListHead(&((*ListHead)->Link));
@@ -1569,9 +1580,11 @@ ShellOpenFileMetaArg (
       *ListHead = NULL;
       Status = EFI_NOT_FOUND;
     }
+    FreePool(CleanFilePathStr);
     return (Status);
   }
 
+  FreePool(CleanFilePathStr);
   return (EFI_UNSUPPORTED);
 }
 /**
@@ -4240,3 +4253,41 @@ ShellDeleteFileByName(
   return(Status);
   
 }
+
+/**
+  Cleans off all the quotes in the string.
+
+  @param[in]     OriginalString   pointer to the string to be cleaned.
+  @param[out]   CleanString      The new string with all quotes removed. 
+                                                  Memory allocated in the function and free 
+                                                  by caller.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+InternalShellStripQuotes (
+  IN  CONST CHAR16     *OriginalString,
+  OUT CHAR16           **CleanString
+  )
+{
+  CHAR16            *Walker;
+  
+  if (OriginalString == NULL || CleanString == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *CleanString = AllocateCopyPool (StrSize (OriginalString), OriginalString);
+  if (*CleanString == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Walker = *CleanString; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
+    if (*Walker == L'\"') {
+      CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+

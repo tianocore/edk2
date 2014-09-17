@@ -295,11 +295,13 @@ ValidateAndCopyFiles(
   CHAR16                    *HiiResultOk;
   CONST EFI_SHELL_FILE_INFO *Node;
   SHELL_STATUS              ShellStatus;
+  EFI_STATUS                Status;
   CHAR16                    *DestPath;
   VOID                      *Response;
   UINTN                     PathSize;
   CONST CHAR16              *Cwd;
   UINTN                     NewSize;
+  CHAR16                    *CleanFilePathStr;
 
   if (Resp == NULL) {
     Response = NULL;
@@ -315,14 +317,25 @@ ValidateAndCopyFiles(
   ASSERT(FileList != NULL);
   ASSERT(DestDir  != NULL);
 
+  
+  Status = ShellLevel2StripQuotes (DestDir, &CleanFilePathStr);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      return SHELL_OUT_OF_RESOURCES;
+    } else {
+      return SHELL_INVALID_PARAMETER;
+    }
+  }  
+
   //
   // If we are trying to copy multiple files... make sure we got a directory for the target...
   //
-  if (EFI_ERROR(ShellIsDirectory(DestDir)) && FileList->Link.ForwardLink != FileList->Link.BackLink) {
+  if (EFI_ERROR(ShellIsDirectory(CleanFilePathStr)) && FileList->Link.ForwardLink != FileList->Link.BackLink) {
     //
     // Error for destination not a directory
     //
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, DestDir);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, CleanFilePathStr);
+    FreePool (CleanFilePathStr);
     return (SHELL_INVALID_PARAMETER);
   }
   for (Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&FileList->Link)
@@ -336,7 +349,7 @@ ValidateAndCopyFiles(
       continue;
     }
 
-    NewSize =  StrSize(DestDir);
+    NewSize =  StrSize(CleanFilePathStr);
     NewSize += StrSize(Node->FullName);
     NewSize += (Cwd == NULL)? 0 : StrSize(Cwd);
     if (NewSize > PathSize) {
@@ -348,17 +361,19 @@ ValidateAndCopyFiles(
     //
     if (!RecursiveMode && !EFI_ERROR(ShellIsDirectory(Node->FullName))) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DIR_REQ), gShellLevel2HiiHandle);
+      FreePool (CleanFilePathStr);
       return (SHELL_INVALID_PARAMETER);
     }
 
     //
     // make sure got dest as dir if needed
     //
-    if (!EFI_ERROR(ShellIsDirectory(Node->FullName)) && EFI_ERROR(ShellIsDirectory(DestDir))) {
+    if (!EFI_ERROR(ShellIsDirectory(Node->FullName)) && EFI_ERROR(ShellIsDirectory(CleanFilePathStr))) {
       //
       // Error for destination not a directory
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, DestDir);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, CleanFilePathStr);
+      FreePool (CleanFilePathStr);
       return (SHELL_INVALID_PARAMETER);
     }
   }
@@ -371,6 +386,7 @@ ValidateAndCopyFiles(
     SHELL_FREE_NON_NULL(DestPath);
     SHELL_FREE_NON_NULL(HiiOutput);
     SHELL_FREE_NON_NULL(HiiResultOk);
+    FreePool (CleanFilePathStr);
     return (SHELL_OUT_OF_RESOURCES);
   }
 
@@ -395,26 +411,27 @@ ValidateAndCopyFiles(
     }
 
     if (FileList->Link.ForwardLink == FileList->Link.BackLink // 1 item
-      && EFI_ERROR(ShellIsDirectory(DestDir))                 // not an existing directory
+      && EFI_ERROR(ShellIsDirectory(CleanFilePathStr))                 // not an existing directory
       ) {
-      if (StrStr(DestDir, L":") == NULL) {
+      if (StrStr(CleanFilePathStr, L":") == NULL) {
         //
         // simple copy of a single file
         //
         if (Cwd != NULL) {
           StrnCpy(DestPath, Cwd, PathSize/sizeof(CHAR16)-1);
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, DestDir);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, CleanFilePathStr);
+          FreePool (CleanFilePathStr);
           return (SHELL_INVALID_PARAMETER);
         }
-        if (DestPath[StrLen(DestPath)-1] != L'\\' && DestDir[0] != L'\\') {
+        if (DestPath[StrLen(DestPath)-1] != L'\\' && CleanFilePathStr[0] != L'\\') {
           StrnCat(DestPath, L"\\", PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
-        } else if (DestPath[StrLen(DestPath)-1] == L'\\' && DestDir[0] == L'\\') {
+        } else if (DestPath[StrLen(DestPath)-1] == L'\\' && CleanFilePathStr[0] == L'\\') {
           ((CHAR16*)DestPath)[StrLen(DestPath)-1] = CHAR_NULL;
         }
-        StrnCat(DestPath, DestDir, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
+        StrnCat(DestPath, CleanFilePathStr, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
       } else {
-        StrnCpy(DestPath, DestDir, PathSize/sizeof(CHAR16) -1);
+        StrnCpy(DestPath, CleanFilePathStr, PathSize/sizeof(CHAR16) -1);
       }
     } else {
       //
@@ -424,50 +441,52 @@ ValidateAndCopyFiles(
       //
       // Check for leading slash
       //
-      if (DestDir[0] == L'\\') {
+      if (CleanFilePathStr[0] == L'\\') {
          //
          // Copy to the root of CWD
          //
         if (Cwd != NULL) {
           StrnCpy(DestPath, Cwd, PathSize/sizeof(CHAR16) -1);
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, DestDir);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, CleanFilePathStr);
+          FreePool(CleanFilePathStr);
           return (SHELL_INVALID_PARAMETER);
         }
         while (PathRemoveLastItem(DestPath));
-        StrnCat(DestPath, DestDir+1, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
+        StrnCat(DestPath, CleanFilePathStr+1, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
         StrnCat(DestPath, Node->FileName, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
-      } else if (StrStr(DestDir, L":") == NULL) {
+      } else if (StrStr(CleanFilePathStr, L":") == NULL) {
         if (Cwd != NULL) {
           StrnCpy(DestPath, Cwd, PathSize/sizeof(CHAR16) -1);
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, DestDir);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, CleanFilePathStr);
+          FreePool(CleanFilePathStr);
           return (SHELL_INVALID_PARAMETER);
         }
-        if (DestPath[StrLen(DestPath)-1] != L'\\' && DestDir[0] != L'\\') {
+        if (DestPath[StrLen(DestPath)-1] != L'\\' && CleanFilePathStr[0] != L'\\') {
           StrnCat(DestPath, L"\\", PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
-        } else if (DestPath[StrLen(DestPath)-1] == L'\\' && DestDir[0] == L'\\') {
+        } else if (DestPath[StrLen(DestPath)-1] == L'\\' && CleanFilePathStr[0] == L'\\') {
           ((CHAR16*)DestPath)[StrLen(DestPath)-1] = CHAR_NULL;
         }
-        StrnCat(DestPath, DestDir, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
-        if (DestDir[StrLen(DestDir)-1] != L'\\' && Node->FileName[0] != L'\\') {
+        StrnCat(DestPath, CleanFilePathStr, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
+        if (CleanFilePathStr[StrLen(CleanFilePathStr)-1] != L'\\' && Node->FileName[0] != L'\\') {
           StrnCat(DestPath, L"\\", PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
-        } else if (DestDir[StrLen(DestDir)-1] == L'\\' && Node->FileName[0] == L'\\') {
+        } else if (CleanFilePathStr[StrLen(CleanFilePathStr)-1] == L'\\' && Node->FileName[0] == L'\\') {
           ((CHAR16*)DestPath)[StrLen(DestPath)-1] = CHAR_NULL;
         }
         StrnCat(DestPath, Node->FileName, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
 
       } else {
-        StrnCpy(DestPath, DestDir, PathSize/sizeof(CHAR16) -1);
-        if (DestDir[StrLen(DestDir)-1] != L'\\' && Node->FileName[0] != L'\\') {
+        StrnCpy(DestPath, CleanFilePathStr, PathSize/sizeof(CHAR16) -1);
+        if (CleanFilePathStr[StrLen(CleanFilePathStr)-1] != L'\\' && Node->FileName[0] != L'\\') {
           StrnCat(DestPath, L"\\", PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
-        } else if (DestDir[StrLen(DestDir)-1] == L'\\' && Node->FileName[0] == L'\\') {
-          ((CHAR16*)DestDir)[StrLen(DestDir)-1] = CHAR_NULL;
+        } else if (CleanFilePathStr[StrLen(CleanFilePathStr)-1] == L'\\' && Node->FileName[0] == L'\\') {
+          ((CHAR16*)CleanFilePathStr)[StrLen(CleanFilePathStr)-1] = CHAR_NULL;
         }
         StrnCat(DestPath, Node->FileName, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
       }
     }
-
+    FreePool (CleanFilePathStr);
     //
     // Make sure the path exists
     //

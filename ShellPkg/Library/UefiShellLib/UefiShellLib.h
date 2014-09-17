@@ -72,5 +72,23 @@ InternalShellIsHexOrDecimalNumber (
   IN CONST BOOLEAN  StopAtSpace
   );
 
+/**
+  Cleans off all the quotes in the string.
+
+  @param[in]     OriginalString   pointer to the string to be cleaned.
+  @param[out]   CleanString      The new string with all quotes removed. 
+                                                  Memory allocated in the function and free 
+                                                  by caller.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+InternalShellStripQuotes (
+  IN  CONST CHAR16     *OriginalString,
+  OUT CHAR16           **CleanString
+  );
+
+
 #endif
 

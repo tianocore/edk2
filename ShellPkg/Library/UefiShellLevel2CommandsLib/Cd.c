@@ -38,6 +38,7 @@ ShellCommandRunCd (
   SHELL_FILE_HANDLE Handle;
   CONST CHAR16      *Param1;
   CHAR16            *Param1Copy;
+  CHAR16*           Walker;
 
   ProblemParam = NULL;
   ShellStatus = SHELL_SUCCESS;
@@ -96,6 +97,12 @@ ShellCommandRunCd (
       }
     } else {
       Param1Copy = CatSPrint(NULL, L"%s", Param1, NULL);
+      for (Walker = Param1Copy; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
+        if (*Walker == L'\"') {
+          CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+        }
+      }
+      
       if (Param1Copy != NULL) {
         Param1Copy = PathCleanUpDirectories(Param1Copy);
       }

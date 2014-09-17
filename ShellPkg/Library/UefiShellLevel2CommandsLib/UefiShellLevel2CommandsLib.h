@@ -301,6 +301,23 @@ StrniCmp(
   );
 
 /**
+  Cleans off all the quotes in the string.
+
+  @param[in]     OriginalString   pointer to the string to be cleaned.
+  @param[out]   CleanString      The new string with all quotes removed. 
+                                                  Memory allocated in the function and free 
+                                                  by caller.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+ShellLevel2StripQuotes (
+  IN  CONST CHAR16     *OriginalString,
+  OUT CHAR16           **CleanString
+  );
+
+/**
   Function for 'Vol' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
