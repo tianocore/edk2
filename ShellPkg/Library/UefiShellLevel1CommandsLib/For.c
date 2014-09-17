@@ -294,6 +294,7 @@ ShellCommandRunFor (
   SCRIPT_FILE         *CurrentScriptFile;
   CHAR16              *ArgSet;
   CHAR16              *ArgSetWalker;
+  CHAR16              *Parameter;
   UINTN               ArgSize;
   UINTN               LoopVar;
   SHELL_FOR_INFO      *Info;
@@ -309,6 +310,7 @@ ShellCommandRunFor (
   ShellStatus         = SHELL_SUCCESS;
   ArgSetWalker        = NULL;
   TempString          = NULL;
+  Parameter           = NULL;
   FirstPass           = FALSE;
 
   //
@@ -391,9 +393,15 @@ ShellCommandRunFor (
             ShellCloseFileMetaArg(&FileList);
           }
         } else {
-          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" \"", 0);
-          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, gEfiShellParametersProtocol->Argv[LoopVar], 0);
-          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
+          Parameter = gEfiShellParametersProtocol->Argv[LoopVar];
+          if (Parameter[0] == L'\"' && Parameter[StrLen(Parameter)-1] == L'\"') {
+            ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" ", 0);
+            ArgSet = StrnCatGrow(&ArgSet, &ArgSize, Parameter, 0);
+          } else {
+            ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" \"", 0);
+            ArgSet = StrnCatGrow(&ArgSet, &ArgSize, Parameter, 0);
+            ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
+          }
         }
       }
       if (ArgSet == NULL) {
@@ -692,12 +700,6 @@ ShellCommandRunFor (
           InternalUpdateAliasOnList(Info->ReplacementName, TempString, &CurrentScriptFile->SubstList);
           Info->CurrentValue += StrLen(TempString);
 
-          if (Info->CurrentValue[0] == L'\"') {
-            Info->CurrentValue++;
-          }
-          while (Info->CurrentValue[0] == L' ') {
-            Info->CurrentValue++;
-          }
           if (Info->CurrentValue[0] == L'\"') {
             Info->CurrentValue++;
           }
