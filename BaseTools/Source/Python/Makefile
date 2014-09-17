@@ -38,11 +38,15 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspace.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspaceBuild.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkLogger.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\Expression.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\FdfClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\FdfParserLite.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\GlobalData.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Identification.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\InfClassObject.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOs.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOsPath.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathSupport.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\MigrationUtilities.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Misc.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Parsing.py \
@@ -51,20 +55,46 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\ToolDefClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\VpdInfoFile.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\BuildVersion.py \
+              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\CommonClass.py \
+              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\DataClass.py \
+              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\Exceptions.py \
+              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\FdfClass.py \
+              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\ModuleClass.py \
+              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\PackageClass.py \
+              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\PlatformClass.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\Table.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableDataModel.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableDec.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableDsc.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableEotReport.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableFdf.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableFile.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableFunction.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableIdentifier.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableInf.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TablePcd.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableQuery.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Table\TableReport.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\BuildClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaDataTable.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaFileCommentParser.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaFileParser.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaFileTable.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Workspace\WorkspaceCommon.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\WorkspaceDatabase.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\AutoGen.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\BuildEngine.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\GenC.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\GenDepex.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\GenMake.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\StrGather.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Autogen\UniClassObject.py
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\AutoGen.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\BuildEngine.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenC.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenDepex.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenMake.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenPcdDb.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\InfSectionParser.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\StrGather.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\UniClassObject.py
 
 CMD_BUILD=$(BASE_TOOLS_PATH)\Source\Python\build\BuildReport.py \
+    $(BASE_TOOLS_PATH)\Source\Python\GenPatchPcdTable\GenPatchPcdTable.py \
+    $(BASE_TOOLS_PATH)\Source\Python\PatchPcdValue\PatchPcdValue.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\c.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\CLexer.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\CodeFragment.py \
@@ -204,7 +234,7 @@ all: SetPythonPath $(APPLICATIONS)
 SetPythonPath:
   set PYTHONPATH=$(BASE_TOOLS_PATH)\Source\Python
 
-$(BIN_DIR)\build.exe: $(BASE_TOOLS_PATH)\Source\Python\build\build.py $(COMMON_PYTHON) $(CMD_BUILD)
+$(BIN_DIR)\build.exe: $(BASE_TOOLS_PATH)\Source\Python\build\build.py $(COMMON_PYTHON) $(CMD_BUILD) $(CMD_GENFDS)
   @pushd . & @cd build & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) build.py & @popd
 
 $(BIN_DIR)\GenFds.exe: $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFds.py $(COMMON_PYTHON) $(CMD_GENFDS)
