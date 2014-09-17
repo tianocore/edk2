@@ -1503,7 +1503,7 @@ BcfgLibraryRegisterBcfgCommand (
   IN CONST CHAR16      *Name
   )
 {
-  if (gShellBcfgHiiHandle) {
+  if (gShellBcfgHiiHandle != NULL) {
     return (EFI_SUCCESS);
   }
 
