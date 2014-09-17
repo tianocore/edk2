@@ -536,7 +536,7 @@ p_option(u_long option) {
     case RES_DNSRCH:    return "dnsrch";
     case RES_INSECURE1: return "insecure1";
     case RES_INSECURE2: return "insecure2";
-    default:        sprintf(nbuf, "?0x%lx?", (u_long)option);
+    default:        sprintf(nbuf, "?0x%lx?", (unsigned long)option);
                 return (nbuf);
     }
 }

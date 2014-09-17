@@ -228,7 +228,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
     /* Serial number. */
     t = ns_get32(rdata);  rdata += NS_INT32SZ;
     T(addstr("\t\t\t\t\t", 5, &buf, &buflen));
-    len = SPRINTF((tmp, "%lu", t));
+    len = SPRINTF((tmp, "%lu", (unsigned long)t));
     T(addstr(tmp, len, &buf, &buflen));
     T(spaced = addtab(len, 16, spaced, &buf, &buflen));
     T(addstr("; serial\n", 9, &buf, &buflen));
@@ -517,7 +517,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
     labels = *rdata++;
     t = ns_get32(rdata);  rdata += NS_INT32SZ;
     len = SPRINTF((tmp, " %s %d %lu ",
-                   p_type((int)type), (int)algorithm, t));
+                   p_type((int)type), (int)algorithm, (unsigned long)t));
     T(addstr(tmp, len, &buf, &buflen));
     if (labels != (u_int)dn_count_labels(name))
       goto formerr;
