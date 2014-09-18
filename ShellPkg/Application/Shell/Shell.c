@@ -2139,11 +2139,24 @@ RunInternalCommand(
   CHAR16                    **Argv;
   SHELL_STATUS              CommandReturnedStatus;
   BOOLEAN                   LastError;
+  CHAR16                    *Walker;
+  CHAR16                    *NewCmdLine;  
+
+  NewCmdLine = AllocateCopyPool (StrSize (CmdLine), CmdLine);
+  if (NewCmdLine == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Walker = NewCmdLine; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
+    if (*Walker == L'^' && *(Walker+1) == L'#') {
+      CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+    }
+  }
 
   //
   // get the argc and argv updated for internal commands
   //
-  Status = UpdateArgcArgv(ParamProtocol, CmdLine, &Argv, &Argc);
+  Status = UpdateArgcArgv(ParamProtocol, NewCmdLine, &Argv, &Argc);
   if (!EFI_ERROR(Status)) {
     //
     // Run the internal command.
@@ -2204,6 +2217,7 @@ RunInternalCommand(
     Status = EFI_SUCCESS;
   }
 
+  FreePool (NewCmdLine);
   return (Status);
 }
 
@@ -2466,7 +2480,7 @@ RunCommand(
   for (TempWalker = CleanOriginal; TempWalker != NULL && *TempWalker != CHAR_NULL; TempWalker++) {
     if (*TempWalker == L'^') {
       if (*(TempWalker + 1) == L'#') {
-        CopyMem (TempWalker, TempWalker + 1, StrSize (TempWalker) - sizeof (TempWalker[0]));
+        TempWalker++;
       }
     } else if (*TempWalker == L'#') {
       *TempWalker = CHAR_NULL;
@@ -2710,8 +2724,10 @@ RunScriptFileHandle (
     //
     for (CommandLine3 = CommandLine2 ; CommandLine3 != NULL && *CommandLine3 != CHAR_NULL ; CommandLine3++) {
       if (*CommandLine3 == L'^') {
-        if (*(CommandLine3+1) == L'#' || *(CommandLine3+1) == L':') {
+        if ( *(CommandLine3+1) == L':') {
           CopyMem(CommandLine3, CommandLine3+1, StrSize(CommandLine3) - sizeof(CommandLine3[0]));
+        } else if (*(CommandLine3+1) == L'#') {
+          CommandLine3++;
         }
       } else if (*CommandLine3 == L'#') {
         *CommandLine3 = CHAR_NULL;

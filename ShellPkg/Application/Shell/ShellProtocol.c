@@ -1433,6 +1433,8 @@ InternalShellExecuteDevicePath(
   UINTN                         *ExitDataSizePtr;
   CHAR16                        *ImagePath;
   UINTN                         Index;
+  CHAR16                        *Walker;
+  CHAR16                        *NewCmdLine;
 
   // ExitDataSize is not OPTIONAL for gBS->BootServices, provide somewhere for
   // it to be dumped if the caller doesn't want it.
@@ -1449,6 +1451,17 @@ InternalShellExecuteDevicePath(
   InitializeListHead(&OrigEnvs);
 
   NewHandle = NULL;
+  
+  NewCmdLine = AllocateCopyPool (StrSize (CommandLine), CommandLine);
+  if (NewCmdLine == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Walker = NewCmdLine; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
+    if (*Walker == L'^' && *(Walker+1) == L'#') {
+      CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+    }
+  }
 
   //
   // Load the image with:
@@ -1478,9 +1491,9 @@ InternalShellExecuteDevicePath(
 
   if (!EFI_ERROR(Status)) {
     ASSERT(LoadedImage->LoadOptionsSize == 0);
-    if (CommandLine != NULL) {
-      LoadedImage->LoadOptionsSize  = (UINT32)StrSize(CommandLine);
-      LoadedImage->LoadOptions      = (VOID*)CommandLine;
+    if (NewCmdLine != NULL) {
+      LoadedImage->LoadOptionsSize  = (UINT32)StrSize(NewCmdLine);
+      LoadedImage->LoadOptions      = (VOID*)NewCmdLine;
     }
 
     //
@@ -1499,7 +1512,7 @@ InternalShellExecuteDevicePath(
     ShellParamsProtocol.StdIn   = ShellInfoObject.NewShellParametersProtocol->StdIn;
     ShellParamsProtocol.StdOut  = ShellInfoObject.NewShellParametersProtocol->StdOut;
     ShellParamsProtocol.StdErr  = ShellInfoObject.NewShellParametersProtocol->StdErr;
-    Status = UpdateArgcArgv(&ShellParamsProtocol, CommandLine, NULL, NULL);
+    Status = UpdateArgcArgv(&ShellParamsProtocol, NewCmdLine, NULL, NULL);
     ASSERT_EFI_ERROR(Status);
     //
     // Replace Argv[0] with the full path of the binary we're executing:
@@ -1577,6 +1590,8 @@ FreeAlloc:
     CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
     ASSERT_EFI_ERROR (CleanupStatus);
   }
+
+  FreePool (NewCmdLine);
 
   return(Status);
 }
