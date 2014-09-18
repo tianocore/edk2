@@ -1,8 +1,6 @@
 #/** @file
 #
-#  Component description file for SysConfigArmRealViewEbLib module
-#
-#  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,19 +14,15 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SysConfigArmRealViewEbLib
-  FILE_GUID                      = 46eddfa0-8de0-11e0-944b-0002a5d5c51b
+  BASE_NAME                      = ArmPlatformSysConfigLibNull
+  FILE_GUID                      = b2a191a9-9bac-4c83-a2f3-d5f6e71efd03
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmPlatformSysConfigLib
 
 [Sources.common]
-  SysConfigArmRealViewEb.c
+  ArmPlatformSysConfigLibNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
-  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-
-[LibraryClasses]
-  BaseLib
