@@ -1,0 +1,62 @@
+## @file
+#  Device tree enumeration DXE driver for ARM Virtual Machines
+#
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials are
+#  licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtFdtDxe
+  FILE_GUID                      = 837DCA9E-E874-4D82-B29A-23FE0E23D1E2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeVirtFdtDxe
+
+[Sources]
+  VirtFdtDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  UefiDriverEntryPoint
+  DxeServicesLib
+  FdtLib
+  VirtioMmioDeviceLib
+
+[Guids]
+  gFdtTableGuid
+
+[Pcd]
+  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
+  gArmTokenSpaceGuid.PcdArmPsciMethod
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+
+[Depex]
+  TRUE
