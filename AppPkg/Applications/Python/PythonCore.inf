@@ -41,7 +41,7 @@
   LibWchar
   LibGen
   LibNetUtil
-  DevShell
+  DevMedia
   #
   # Comment out the following two library classes if socket support is
   # NOT being built in to Python.

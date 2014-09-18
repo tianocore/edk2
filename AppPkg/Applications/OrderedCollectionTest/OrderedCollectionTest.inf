@@ -38,5 +38,5 @@
 [LibraryClasses]
   LibC
   LibStdio
-  DevShell
+  DevMedia
   OrderedCollectionLib

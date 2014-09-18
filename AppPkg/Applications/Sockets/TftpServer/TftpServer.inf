@@ -52,7 +52,7 @@
   BaseMemoryLib
   BsdSocketLib
   DebugLib
-  DevShell
+  DevMedia
   EfiSocketLib
   LibC
   ShellLib

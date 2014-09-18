@@ -65,7 +65,8 @@
 # Applications should not directly access any functions defined in these libraries.
   LibGdtoa|StdLib/LibC/gdtoa/gdtoa.inf
   DevConsole|StdLib/LibC/Uefi/Devices/daConsole.inf
-  DevShell|StdLib/LibC/Uefi/Devices/daShell.inf
+  DevShell|StdLib/LibC/Uefi/Devices/daShell.inf       # DEPRECATED!  Please use DevMedia for new code.
+  DevMedia|StdLib/LibC/Uefi/Devices/daShell.inf
   DevUtility|StdLib/LibC/Uefi/Devices/daUtility.inf
 
 [LibraryClasses.ARM]

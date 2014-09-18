@@ -40,7 +40,7 @@
 [LibraryClasses]
   BaseMemoryLib
   BsdSocketLib
-  DevShell
+  DevMedia
   EfiSocketLib
   LibC
   LibMath

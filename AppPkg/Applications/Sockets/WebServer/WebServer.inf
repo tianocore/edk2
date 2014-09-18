@@ -75,7 +75,7 @@
   BaseMemoryLib
   BsdSocketLib
   DebugLib
-  DevShell
+  DevMedia
   DxeServicesTableLib
   EfiSocketLib
   LibC

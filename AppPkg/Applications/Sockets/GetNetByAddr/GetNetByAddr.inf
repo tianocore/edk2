@@ -41,7 +41,7 @@
   BaseMemoryLib
   BsdSocketLib
   DebugLib
-  DevShell
+  DevMedia
   EfiSocketLib
   LibC
   LibMath
