@@ -160,6 +160,7 @@ struct _PXEBC_PRIVATE_DATA {
   BOOLEAN                                   IsProxyRecved;
   BOOLEAN                                   IsDoDiscover;
 
+  EFI_IP_ADDRESS                            TmpStationIp;
   EFI_IP_ADDRESS                            StationIp;
   EFI_IP_ADDRESS                            SubnetMask;
   EFI_IP_ADDRESS                            GatewayIp;

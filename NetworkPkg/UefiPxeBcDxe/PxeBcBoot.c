@@ -633,6 +633,14 @@ PxeBcDhcp6BootInfo (
   }
 
   //
+  // Set the station address to IP layer.
+  //
+  Status = PxeBcSetIp6Address (Private);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
   // Parse the value of boot file size.
   //
   if (Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_PARAM] != NULL) {

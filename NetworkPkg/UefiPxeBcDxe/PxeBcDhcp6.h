@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv6 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 #define PXEBC_DHCP6_OPTION_MAX_SIZE       312
 #define PXEBC_DHCP6_PACKET_MAX_SIZE       1472
 #define PXEBC_IP6_POLICY_MAX              0xff
+#define PXEBC_IP6_ROUTE_TABLE_TIMEOUT     10
 
 #define PXEBC_DHCP6_S_PORT                547
 #define PXEBC_DHCP6_C_PORT                546
@@ -254,6 +255,33 @@ PxeBcDhcp6Discover (
   IN  EFI_IP_ADDRESS                *DestIp
   );
 
+/**
+  Set the IP6 policy to Automatic.
+
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         Switch the IP policy succesfully.
+  @retval     Others              Unexpect error happened.
+
+**/
+EFI_STATUS
+PxeBcSetIp6Policy (
+  IN PXEBC_PRIVATE_DATA            *Private
+  );
+
+/**
+  This function will register the station IP address and flush IP instance to start using the new IP address.
+  
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         The new IP address has been configured successfully.
+  @retval     Others              Failed to configure the address.
+
+**/
+EFI_STATUS
+PxeBcSetIp6Address (
+  IN  PXEBC_PRIVATE_DATA              *Private
+  );
 
 /**
   Start the DHCPv6 S.A.R.R. process to acquire the IPv6 address and other PXE boot information.

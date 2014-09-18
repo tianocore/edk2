@@ -512,7 +512,7 @@ PxeBcParseDhcp4Packet (
   }
 
   //
-  // The offer with "yiaddr" is a proxy offer.
+  // The offer with zero "yiaddr" is a proxy offer.
   //
   if (Offer->Dhcp4.Header.YourAddr.Addr[0] == 0) {
     IsProxyOffer = TRUE;

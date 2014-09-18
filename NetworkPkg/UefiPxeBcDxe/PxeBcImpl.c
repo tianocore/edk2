@@ -124,6 +124,14 @@ EfiPxeBcStart (
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
+
+    //
+    // Set Ip6 policy to Automatic to start the IP6 router discovery.
+    //
+    Status = PxeBcSetIp6Policy (Private);
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   } else {
     AsciiPrint ("\n>>Start PXE over IPv4");
     //

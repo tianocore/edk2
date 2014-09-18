@@ -488,7 +488,7 @@ PxeBcParseDhcp6Packet (
   }
 
   //
-  // The offer with assigned client address is a proxy offer.
+  // The offer with assigned client address is NOT a proxy offer.
   // An ia_na option, embeded with valid ia_addr option and a status_code of success.
   //
   Option = Options[PXEBC_DHCP6_IDX_IA_NA];
@@ -1235,9 +1235,128 @@ PxeBcUnregisterIp6Address (
   }
 }
 
+/**
+  Check whether IP driver could route the message which will be sent to ServerIp address.
+  
+  This function will check the IP6 route table every 1 seconds until specified timeout is expired, if a valid
+  route is found in IP6 route table, the address will be filed in GatewayAddr and return.
+
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+  @param[in]  TimeOutInSecond     Timeout value in seconds.
+  @param[out] GatewayAddr         Pointer to store the gateway IP address.
+
+  @retval     EFI_SUCCESS         Found a valid gateway address successfully.
+  @retval     EFI_TIMEOUT         The operation is time out.
+  @retval     Other               Unexpect error happened.
+  
+**/
+EFI_STATUS
+PxeBcCheckRouteTable (
+  IN  PXEBC_PRIVATE_DATA            *Private,
+  IN  UINTN                         TimeOutInSecond,
+  OUT EFI_IPv6_ADDRESS              *GatewayAddr
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_IP6_PROTOCOL                 *Ip6;
+  EFI_IP6_MODE_DATA                Ip6ModeData;
+  UINTN                            Index;
+  EFI_EVENT                        TimeOutEvt;
+  UINTN                            RetryCount;
+  BOOLEAN                          GatewayIsFound;
+
+  ASSERT (GatewayAddr != NULL);
+  ASSERT (Private != NULL);
+
+  Ip6            = Private->Ip6;
+  GatewayIsFound = FALSE;
+  RetryCount     = 0;
+  TimeOutEvt     = NULL;
+  ZeroMem (GatewayAddr, sizeof (EFI_IPv6_ADDRESS));
+
+  while (TRUE) {
+    Status = Ip6->GetModeData (Ip6, &Ip6ModeData, NULL, NULL);
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+
+    //
+    // Find out the gateway address which can route the message whcih send to ServerIp.
+    //
+    for (Index = 0; Index < Ip6ModeData.RouteCount; Index++) {
+      if (NetIp6IsNetEqual (&Private->ServerIp.v6, &Ip6ModeData.RouteTable[Index].Destination, Ip6ModeData.RouteTable[Index].PrefixLength)) {
+        IP6_COPY_ADDRESS (GatewayAddr, &Ip6ModeData.RouteTable[Index].Gateway);
+        GatewayIsFound = TRUE;
+        break;
+      }
+    }
+
+    if (Ip6ModeData.AddressList != NULL) {
+      FreePool (Ip6ModeData.AddressList);
+    }
+    if (Ip6ModeData.GroupTable != NULL) {
+      FreePool (Ip6ModeData.GroupTable);
+    }
+    if (Ip6ModeData.RouteTable != NULL) {
+      FreePool (Ip6ModeData.RouteTable);
+    }
+    if (Ip6ModeData.NeighborCache != NULL) {
+      FreePool (Ip6ModeData.NeighborCache);
+    }
+    if (Ip6ModeData.PrefixTable != NULL) {
+      FreePool (Ip6ModeData.PrefixTable);
+    }
+    if (Ip6ModeData.IcmpTypeList != NULL) {
+      FreePool (Ip6ModeData.IcmpTypeList);
+    }
+    
+    if (GatewayIsFound || RetryCount == TimeOutInSecond) {
+      break;
+    }
+    
+    RetryCount++;
+    
+    //
+    // Delay 1 second then recheck it again.
+    //
+    if (TimeOutEvt == NULL) {
+      Status = gBS->CreateEvent (
+                      EVT_TIMER,
+                      TPL_CALLBACK,
+                      NULL,
+                      NULL,
+                      &TimeOutEvt
+                      );
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+    }
+
+    Status = gBS->SetTimer (TimeOutEvt, TimerRelative, TICKS_PER_SECOND);
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+    while (EFI_ERROR (gBS->CheckEvent (TimeOutEvt))) {
+      Ip6->Poll (Ip6);
+    }
+  }
+  
+ON_EXIT:
+  if (TimeOutEvt != NULL) {
+    gBS->CloseEvent (TimeOutEvt);
+  }
+  
+  if (GatewayIsFound) {
+    Status = EFI_SUCCESS;
+  } else if (RetryCount == TimeOutInSecond) {
+    Status = EFI_TIMEOUT;
+  }
+
+  return Status; 
+}
 
 /**
-  Register the ready address by Ip6Config protocol.
+  Register the ready station address and gateway by Ip6Config protocol.
 
   @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
   @param[in]  Address             The pointer to the ready address.
@@ -1256,6 +1375,7 @@ PxeBcRegisterIp6Address (
   EFI_IP6_CONFIG_PROTOCOL          *Ip6Cfg;
   EFI_IP6_CONFIG_POLICY            Policy;
   EFI_IP6_CONFIG_MANUAL_ADDRESS    CfgAddr;
+  EFI_IPv6_ADDRESS                 GatewayAddr;
   UINTN                            DataSize;
   EFI_EVENT                        TimeOutEvt;
   EFI_EVENT                        MappedEvt;
@@ -1273,19 +1393,19 @@ PxeBcRegisterIp6Address (
   ZeroMem (&CfgAddr, sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS));
   CopyMem (&CfgAddr.Address, Address, sizeof (EFI_IPv6_ADDRESS));
 
-  //
-  // Get and store the current policy of IP6 driver.
-  //
-  Status = Ip6Cfg->GetData (
-                     Ip6Cfg,
-                     Ip6ConfigDataTypePolicy,
-                     &DataSize,
-                     &Private->Ip6Policy
-                     );
+  Status = Ip6->Configure (Ip6, &Private->Ip6CfgData);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
 
+  //
+  // Retrieve the gateway address from IP6 route table.
+  //
+  Status = PxeBcCheckRouteTable (Private, PXEBC_IP6_ROUTE_TABLE_TIMEOUT, &GatewayAddr);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+  
   //
   // There is no channel between IP6 and PXE driver about address setting,
   // so it has to set the new address by Ip6ConfigProtocol manually.
@@ -1381,6 +1501,21 @@ PxeBcRegisterIp6Address (
     }
   }
 
+  //
+  // Set the default gateway address back if needed.
+  //
+  if (!NetIp6IsUnspecifiedAddr (&GatewayAddr)) {
+    Status = Ip6Cfg->SetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeGateway,
+                       sizeof (EFI_IPv6_ADDRESS),
+                       &GatewayAddr
+                       );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
+
 ON_EXIT:
   if (MappedEvt != NULL) {
     Ip6Cfg->UnregisterDataNotify (
@@ -1396,6 +1531,100 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  Set the IP6 policy to Automatic.
+
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         Switch the IP policy succesfully.
+  @retval     Others              Unexpect error happened.
+
+**/
+EFI_STATUS
+PxeBcSetIp6Policy (
+  IN PXEBC_PRIVATE_DATA            *Private
+  )
+{
+  EFI_IP6_CONFIG_POLICY            Policy;
+  EFI_STATUS                       Status;
+  EFI_IP6_CONFIG_PROTOCOL          *Ip6Cfg;
+  UINTN                            DataSize;
+
+  Ip6Cfg      = Private->Ip6Cfg;
+  DataSize    = sizeof (EFI_IP6_CONFIG_POLICY);
+
+  //
+  // Get and store the current policy of IP6 driver.
+  //
+  Status = Ip6Cfg->GetData (
+                     Ip6Cfg,
+                     Ip6ConfigDataTypePolicy,
+                     &DataSize,
+                     &Private->Ip6Policy
+                     );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (Private->Ip6Policy == Ip6ConfigPolicyManual) {
+    Policy = Ip6ConfigPolicyAutomatic;
+    Status = Ip6Cfg->SetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypePolicy,
+                       sizeof(EFI_IP6_CONFIG_POLICY),
+                       &Policy
+                       );
+    if (EFI_ERROR (Status)) {
+      //
+      // There is no need to recover later.
+      //
+      Private->Ip6Policy = PXEBC_IP6_POLICY_MAX;
+    }
+  }
+
+  return Status;
+}
+
+/**
+  This function will register the station IP address and flush IP instance to start using the new IP address.
+  
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         The new IP address has been configured successfully.
+  @retval     Others              Failed to configure the address.
+
+**/
+EFI_STATUS
+PxeBcSetIp6Address (
+  IN  PXEBC_PRIVATE_DATA              *Private
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_DHCP6_PROTOCOL          *Dhcp6;
+    
+  Dhcp6 = Private->Dhcp6;
+
+  CopyMem (&Private->StationIp.v6, &Private->TmpStationIp.v6, sizeof (EFI_IPv6_ADDRESS));
+  CopyMem (&Private->PxeBc.Mode->StationIp.v6, &Private->StationIp.v6, sizeof (EFI_IPv6_ADDRESS));
+
+  Status = PxeBcRegisterIp6Address (Private, &Private->StationIp.v6);
+  if (EFI_ERROR (Status)) {
+    Dhcp6->Stop (Dhcp6);
+    return Status;
+  }
+
+  Status = PxeBcFlushStationIp (Private, &Private->StationIp, NULL);
+  if (EFI_ERROR (Status)) {
+    PxeBcUnregisterIp6Address (Private);
+    Dhcp6->Stop (Dhcp6);
+    return Status;
+  }
+
+  AsciiPrint ("\n  Station IP address is ");
+  PxeBcShowIp6Addr (&Private->StationIp.v6);
+
+  return EFI_SUCCESS;
+}
 
 /**
   EFI_DHCP6_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol driver
@@ -1843,36 +2072,23 @@ PxeBcDhcp6Sarr (
   }
 
   ASSERT (Mode.Ia->State == Dhcp6Bound);
-  CopyMem (&Private->StationIp.v6, &Mode.Ia->IaAddress[0].IpAddress, sizeof (EFI_IPv6_ADDRESS));
-  CopyMem (&PxeMode->StationIp.v6, &Private->StationIp.v6, sizeof (EFI_IPv6_ADDRESS));
-
-  Status = PxeBcRegisterIp6Address (Private, &Private->StationIp.v6);
-  if (EFI_ERROR (Status)) {
-    Dhcp6->Stop (Dhcp6);
-    return Status;
-  }
-
-  Status = PxeBcFlushStationIp (Private, &Private->StationIp, NULL);
-  if (EFI_ERROR (Status)) {
-    PxeBcUnregisterIp6Address (Private);
-    Dhcp6->Stop (Dhcp6);
-    return Status;
-  }
+  //
+  // DHCP6 doesn't have an option to specify the router address on the subnet, the only way to get the
+  // router address in IP6 is the router discovery mechanism (the RS and RA, which only be handled when
+  // the IP policy is Automatic). So we just hold the station IP address here and leave the IP policy as
+  // Automatic, until we get the server IP address. This could let IP6 driver finish the router discovery 
+  // to find a valid router address.
+  //
+  CopyMem (&Private->TmpStationIp.v6, &Mode.Ia->IaAddress[0].IpAddress, sizeof (EFI_IPv6_ADDRESS));
 
   //
   // Check the selected offer whether BINL retry is needed.
   //
   Status = PxeBcHandleDhcp6Offer (Private);
   if (EFI_ERROR (Status)) {
-    PxeBcUnregisterIp6Address (Private);
     Dhcp6->Stop (Dhcp6);
     return Status;
   }
-
-  AsciiPrint ("\n  Station IP address is ");
-
-  PxeBcShowIp6Addr (&Private->StationIp.v6);
-
+  
   return EFI_SUCCESS;
 }
-
