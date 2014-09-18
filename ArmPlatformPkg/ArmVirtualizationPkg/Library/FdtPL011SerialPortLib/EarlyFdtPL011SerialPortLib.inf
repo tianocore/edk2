@@ -1,0 +1,45 @@
+#/** @file
+#
+#  Component description file for EarlyFdtPL011SerialPortLib module
+#
+#  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EarlyFdtPL011SerialPortLib
+  FILE_GUID                      = 0983616A-49BC-4732-B531-4AF98D2056F0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib|SEC PEI_CORE PEIM
+
+[Sources.common]
+  EarlyFdtPL011SerialPortLib.c
+
+[LibraryClasses]
+  PL011UartLib
+  PcdLib
+  FdtLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+
+[FixedPcd]
+  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
