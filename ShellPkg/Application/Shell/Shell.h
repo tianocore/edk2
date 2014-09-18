@@ -231,17 +231,14 @@ ProcessCommandLine(
 
   @param[in] ImagePath          The path to the image for shell.  The first place to look for the startup script.
   @param[in] FilePath           The path to the file for shell.  The second place to look for the startup script.
-  @param[out] ExitStatus        The exit code of the script. Ignored if NULL.
-                                Invalid when this function returns an error.
 
   @retval EFI_SUCCESS           The variable is initialized.
 **/
 EFI_STATUS
 EFIAPI
 DoStartupScript(
-  IN  EFI_DEVICE_PATH_PROTOCOL *ImagePath,
-  IN  EFI_DEVICE_PATH_PROTOCOL *FilePath,
-  OUT SHELL_STATUS             *ExitStatus
+  IN EFI_DEVICE_PATH_PROTOCOL *ImagePath,
+  IN EFI_DEVICE_PATH_PROTOCOL *FilePath
   );
 
 /**
@@ -286,8 +283,7 @@ AddLineToCommandHistory(
 
   This will determine if the command line represents an internal shell command or dispatch an external application.
 
-  @param[in]  CmdLine     the command line to parse
-  @param[out] ExitStatus  The exit status of the command. Ignored if NULL.
+  @param[in] CmdLine  the command line to parse
 
   @retval EFI_SUCCESS     the command was completed
   @retval EFI_ABORTED     the command's operation was aborted
@@ -295,8 +291,7 @@ AddLineToCommandHistory(
 EFI_STATUS
 EFIAPI
 RunCommand(
-  IN  CONST CHAR16         *CmdLine,
-  OUT       SHELL_STATUS   *ExitStatus
+  IN CONST CHAR16   *CmdLine
   );
 
 /**
@@ -320,17 +315,13 @@ IsValidCommandName(
   @param[in] Handle             The handle to the already opened file.
   @param[in] Name               The name of the script file.
 
-  @param[out] ExitStatus      The exit code of the script. Ignored if NULL.
-                              Invalid when this function returns an error.
-
   @retval EFI_SUCCESS           the script completed sucessfully
 **/
 EFI_STATUS
 EFIAPI
 RunScriptFileHandle (
-  IN  SHELL_FILE_HANDLE  Handle,
-  IN  CONST CHAR16       *Name,
-  OUT SHELL_STATUS       *ExitStatus
+  IN SHELL_FILE_HANDLE  Handle,
+  IN CONST CHAR16       *Name
   );
 
 /**
@@ -341,20 +332,17 @@ RunScriptFileHandle (
   @param[in] CmdLine            the command line to run.
   @param[in] ParamProtocol      the shell parameters protocol pointer
 
-  @param[out] ExitStatus      The exit code of the script. Ignored if NULL.
-                              Invalid when this function returns an error.
-
   @retval EFI_SUCCESS           the script completed sucessfully
 **/
 EFI_STATUS
 EFIAPI
 RunScriptFile (
-  IN  CONST CHAR16                   *ScriptPath,
-  IN  SHELL_FILE_HANDLE              Handle OPTIONAL,
-  IN  CONST CHAR16                   *CmdLine,
-  IN  EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol,
-  OUT SHELL_STATUS                   *ExitStatus
+  IN CONST CHAR16                   *ScriptPath,
+  IN SHELL_FILE_HANDLE              Handle OPTIONAL,
+  IN CONST CHAR16                   *CmdLine,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
   );
+
 
 #endif //_SHELL_INTERNAL_HEADER_
 
