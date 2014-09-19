@@ -487,7 +487,7 @@ ValidateAndCopyFiles(
         StrnCat(DestPath, Node->FileName, PathSize/sizeof(CHAR16) - StrLen(DestPath) -1);
       }
     }
-    FreePool (CleanFilePathStr);
+    
     //
     // Make sure the path exists
     //
@@ -540,6 +540,7 @@ ValidateAndCopyFiles(
   SHELL_FREE_NON_NULL(DestPath);
   SHELL_FREE_NON_NULL(HiiOutput);
   SHELL_FREE_NON_NULL(HiiResultOk);
+  SHELL_FREE_NON_NULL(CleanFilePathStr);
   if (Resp == NULL) {
     SHELL_FREE_NON_NULL(Response);
   }
