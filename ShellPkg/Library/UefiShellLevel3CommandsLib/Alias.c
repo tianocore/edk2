@@ -1,7 +1,7 @@
 /** @file
   Main file for Alias shell level 3 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -90,9 +90,11 @@ ShellCommandRunAlias (
   SHELL_STATUS        ShellStatus;
   CONST CHAR16        *Param1;
   CONST CHAR16        *Param2;
+  CHAR16              *CleanParam2;
 
   ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
+  CleanParam2         = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -118,6 +120,19 @@ ShellCommandRunAlias (
   } else {
     Param1 = ShellCommandLineGetRawValue(Package, 1);
     Param2 = ShellCommandLineGetRawValue(Package, 2);
+
+    if (Param2 != NULL) {
+      CleanParam2 = AllocateCopyPool (StrSize(Param2), Param2);
+      if (CleanParam2 == NULL) {
+        return SHELL_OUT_OF_RESOURCES;
+      }
+
+      if (CleanParam2[0] == L'\"' && CleanParam2[StrLen(CleanParam2)-1] == L'\"') {
+        CleanParam2[StrLen(CleanParam2)-1] = L'\0';
+        CopyMem (CleanParam2, CleanParam2 + 1, StrSize(CleanParam2) - sizeof(CleanParam2[0]));
+      }
+    }
+
     //
     // check for "-?"
     //
@@ -138,7 +153,7 @@ ShellCommandRunAlias (
       //
       // must be adding an alias
       //
-      Status = gEfiShellProtocol->SetAlias(Param2, Param1, FALSE, ShellCommandLineGetFlag(Package, L"-v"));
+      Status = gEfiShellProtocol->SetAlias(CleanParam2, Param1, FALSE, ShellCommandLineGetFlag(Package, L"-v"));
       if (EFI_ERROR(Status)) {
         if (Status == EFI_ACCESS_DENIED) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle);
@@ -161,5 +176,6 @@ ShellCommandRunAlias (
     ShellCommandLineFreeVarList (Package);
   }
 
+  SHELL_FREE_NON_NULL (CleanParam2);
   return (ShellStatus);
 }
