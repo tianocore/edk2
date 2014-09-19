@@ -212,7 +212,7 @@ class DistributionPackageClass(object):
             #
             for MiscFileObj in Package.GetMiscFileList():
                 for FileObj in MiscFileObj.GetFileList():
-                    MiscFileFullPath = os.path.normpath(os.path.join(os.path.dirname(FullPath), FileObj.GetURI()))
+                    MiscFileFullPath = os.path.normpath(os.path.join(PackagePath, FileObj.GetURI()))
                     if MiscFileFullPath not in self.FileList:
                         self.FileList.append(MiscFileFullPath)
             

@@ -983,7 +983,7 @@ def GenSection(SectionName, SectionDict, SplitArch=True, NeedBlankLine=False):
                 NewStatement = ""
                 for Line in LineList:
                     # ignore blank comment
-                    if not Line.replace("#", '').strip() and SectionName != 'Defines':
+                    if not Line.replace("#", '').strip() and SectionName not in ('Defines', 'Hob', 'Event', 'BootMode'):
                         continue
                     # add two space before non-comments line except the comments in Defines section
                     if Line.strip().startswith('#') and SectionName == 'Defines':

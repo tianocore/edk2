@@ -705,7 +705,7 @@ def GenGuidSections(GuidObjList):
             else:
                 Comment = ''
             if Usage != DT.ITEM_UNDEFINED and GuidType == DT.ITEM_UNDEFINED:
-                Comment = '## ' + Usage + ' ## GUID ' + Comment
+                Comment = '## ' + Usage + Comment
             elif GuidType == 'Variable':
                 Comment = '## ' + Usage + ' ## ' + GuidType + ':' + VariableName + Comment
             else:
@@ -1027,10 +1027,10 @@ def GenSpecialSections(ObjectList, SectionName):
         Content = '# ' + ('\n' + '# ').join(GetSplitValueList(SectionContent, '\n'))
         Content = Content.lstrip()
     #
-    # add two empty line after the generated section content to differentiate it between other possible sections
+    # add a return to differentiate it between other possible sections
     # 
     if Content:
-        Content += '\n#\n#\n'
+        Content += '\n'
     return Content
 ## GenBuildOptions
 #
