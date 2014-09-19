@@ -309,10 +309,11 @@ ValidateAndCopyFiles(
     Response = *Resp;
   }
 
-  DestPath    = NULL;
-  ShellStatus = SHELL_SUCCESS;
-  PathSize    = 0;
-  Cwd         = ShellGetCurrentDir(NULL);
+  DestPath         = NULL;
+  ShellStatus      = SHELL_SUCCESS;
+  PathSize         = 0;
+  Cwd              = ShellGetCurrentDir(NULL);
+  CleanFilePathStr = NULL;
 
   ASSERT(FileList != NULL);
   ASSERT(DestDir  != NULL);

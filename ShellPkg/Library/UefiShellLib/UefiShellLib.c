@@ -1502,6 +1502,8 @@ ShellOpenFileMetaArg (
   ASSERT(Arg      != NULL);
   ASSERT(ListHead != NULL);
 
+  CleanFilePathStr = NULL;
+
   Status = InternalShellStripQuotes (Arg, &CleanFilePathStr);
   if (EFI_ERROR (Status)) {
     return Status;

@@ -275,9 +275,10 @@ ValidateAndMoveFiles(
   ASSERT(FileList != NULL);
   ASSERT(DestDir  != NULL);
 
-  DestPath = NULL;
-  Cwd      = ShellGetCurrentDir(NULL);
-  Response = *Resp;
+  DestPath         = NULL;
+  Cwd              = ShellGetCurrentDir(NULL);
+  Response         = *Resp;
+  CleanFilePathStr = NULL;
 
   Status = ShellLevel2StripQuotes (DestDir, &CleanFilePathStr);
   if (EFI_ERROR (Status)) {
