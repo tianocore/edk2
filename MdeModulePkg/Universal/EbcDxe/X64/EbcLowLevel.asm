@@ -4,6 +4,7 @@
 ;    for option ROMs.
 ;  
 ;  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+;  Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
 ;  This program and the accompanying materials
 ;  are licensed and made available under the terms and conditions of the BSD License
 ;  which accompanies this distribution.  The full text of the license may be found at
@@ -50,7 +51,34 @@ EbcLLCALLEXNative        PROC    PUBLIC
 
       ; Set stack pointer to new value
       sub    r8,  rdx
+
+      ;
+      ; Fix X64 native function call prolog. Prepare space for at least 4 arguments,
+      ; even if the native function's arguments are less than 4.
+      ;
+      ; From MSDN x64 Software Conventions, Overview of x64 Calling Conventions:
+      ;   "The caller is responsible for allocating space for parameters to the
+      ;   callee, and must always allocate sufficient space for the 4 register
+      ;   parameters, even if the callee doesn't have that many parameters.
+      ;   This aids in the simplicity of supporting C unprototyped functions,
+      ;   and vararg C/C++ functions."
+      ;
+      cmp    r8, 20h
+      jae    skip_expansion
+      mov    r8, 20h
+skip_expansion:
+      
       sub    rsp, r8
+
+      ;
+      ; Fix X64 native function call 16-byte alignment.
+      ;
+      ; From MSDN x64 Software Conventions, Stack Usage:
+      ;   "The stack will always be maintained 16-byte aligned, except within 
+      ;   the prolog (for example, after the return address is pushed)."
+      ;
+      and    rsp, NOT 0fh
+
       mov    rcx, rsp
       sub    rsp, 20h
       call   CopyMem

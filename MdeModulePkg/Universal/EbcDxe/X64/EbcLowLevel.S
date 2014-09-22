@@ -3,7 +3,7 @@
 #    This code provides low level routines that support the Virtual Machine
 #   for option ROMs.
 #  
-#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -46,7 +46,34 @@ ASM_PFX(EbcLLCALLEXNative):
 
       # Set stack pointer to new value
       sub    %rdx, %r8  
+      
+      #
+      # Fix X64 native function call prolog. Prepare space for at least 4 arguments,
+      # even if the native function's arguments are less than 4.
+      #
+      # From MSDN x64 Software Conventions, Overview of x64 Calling Conventions:
+      #   "The caller is responsible for allocating space for parameters to the
+      #   callee, and must always allocate sufficient space for the 4 register
+      #   parameters, even if the callee doesn't have that many parameters.
+      #   This aids in the simplicity of supporting C unprototyped functions,
+      #   and vararg C/C++ functions."
+      #
+      cmp    $0x20, %r8
+      jae    skip_expansion
+      mov    $0x20, %r8
+skip_expansion:
+      
       sub    %r8,  %rsp 
+      
+      #
+      # Fix X64 native function call 16-byte alignment.
+      #
+      # From MSDN x64 Software Conventions, Stack Usage:
+      #   "The stack will always be maintained 16-byte aligned, except within 
+      #   the prolog (for example, after the return address is pushed)."
+      #
+      and    $0xFFFFFFFFFFFFFFF0, %rsp
+      
       mov    %rsp, %rcx
       sub    $0x20, %rsp 
       call   ASM_PFX(CopyMem)
