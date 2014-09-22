@@ -51,6 +51,7 @@
   MemoryAllocationLib
   BaseLib
   DxeServicesTableLib
+  OrderedCollectionLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
