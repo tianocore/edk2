@@ -432,9 +432,9 @@ IsKeyOptionVariable (
   *OptionNumber = 0;
   for (Index = 3; Index < 7; Index++) {
     if ((Name[Index] >= L'0') && (Name[Index] <= L'9')) {
-      *OptionNumber = *OptionNumber * 10 + Name[Index] - L'0';
+      *OptionNumber = *OptionNumber * 16 + Name[Index] - L'0';
     } else if ((Name[Index] >= L'A') && (Name[Index] <= L'F')) {
-      *OptionNumber = *OptionNumber * 10 + Name[Index] - L'A';
+      *OptionNumber = *OptionNumber * 16 + Name[Index] - L'A' + 10;
     } else {
       return FALSE;
     }
