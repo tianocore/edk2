@@ -20,14 +20,10 @@
 #include <Library/QemuFwCfgLib.h>
 
 //
-// The types and the documentation reflects the SeaBIOS interface. In OVMF we
-// use a minimal subset of it.
+// The types and the documentation reflects the SeaBIOS interface.
 //
 #define QEMU_LOADER_FNAME_SIZE QEMU_FW_CFG_FNAME_SIZE
 
-//
-// We only look at the Allocate command, and only to get FwCfg filenames.
-//
 typedef enum {
   QemuLoaderCmdAllocate = 1,
   QemuLoaderCmdAddPointer,
