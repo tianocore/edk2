@@ -110,7 +110,7 @@ def ModuleToInf(ModuleObject, PackageObject=None, DistHeader=None):
     Content += GenHeaderCommentSection(ModuleAbstract,
                                        ModuleDescription,
                                        ModuleCopyright,
-                                       ModuleLicense)
+                                       ModuleLicense).replace('\r\n', '\n')
 
     #
     # Generate Binary Header 
@@ -261,13 +261,18 @@ def GenDefines(ModuleObject):
     #
     # generate [Defines] section
     #
+    LeftOffset = 31
     Content = ''
     NewSectionDict = {}
+
     for UserExtension in ModuleObject.GetUserExtensionList():
         DefinesDict = UserExtension.GetDefinesDict()
         if not DefinesDict:
             continue
         for Statement in DefinesDict:
+            if Statement.split(DT.TAB_EQUAL_SPLIT) > 1:
+                Statement = (u'%s ' % Statement.split(DT.TAB_EQUAL_SPLIT, 1)[0]).ljust(LeftOffset) \
+                             + u'= %s' % Statement.split(DT.TAB_EQUAL_SPLIT, 1)[1].lstrip()
             SortedArch = DT.TAB_ARCH_COMMON
             if Statement.strip().startswith(DT.TAB_INF_DEFINES_CUSTOM_MAKEFILE):
                 pos = Statement.find(DT.TAB_VALUE_SPLIT)
@@ -280,11 +285,7 @@ def GenDefines(ModuleObject):
             else:
                 NewSectionDict[SortedArch] = [Statement]
     SpecialStatementList = []
-    #
-    # Add INF_VERSION statement firstly
-    #
-    
-    LeftOffset = 31
+
     # TAB_INF_DEFINES_INF_VERSION
     Statement = (u'%s ' % DT.TAB_INF_DEFINES_INF_VERSION).ljust(LeftOffset) + u'= %s' % '0x00010017'
     SpecialStatementList.append(Statement)

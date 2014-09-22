@@ -344,7 +344,7 @@ def PackageToDec(Package, DistHeader = None):
     Content += GenHeaderCommentSection(PackageAbstract, \
                                        PackageDescription, \
                                        PackageCopyright, \
-                                       PackageLicense)
+                                       PackageLicense).replace('\r\n', '\n')
 
     #
     # Generate Binary header 
