@@ -686,7 +686,7 @@ class Check(object):
                             % (MODEL_EFI_LIBRARY_CLASS, MODEL_EFI_LIBRARY_CLASS)
             RecordSet = EccGlobalData.gDb.TblDsc.Exec(SqlCommand)
             for Record in RecordSet:
-                if Record[3] and Record[4] and Record[3] != Record[4]:
+                if Record[3] and Record[4] and Record[3] != Record[4] and Record[1] != 'NULL':
                     SqlCommand = """select FullPath from File where ID = %s""" % (Record[2])
                     FilePathList = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
                     for FilePath in FilePathList:
