@@ -768,8 +768,9 @@ BcfgAddOpt(
   CHAR16          *FileName;
   CHAR16          *Temp2;
   CHAR16          *Data;
-  UINT16          KeyIndex;
+  UINT32          KeyIndex;
   CHAR16          VariableName[12];
+  UINT8           *VariableData;
 
   SHELL_FILE_HANDLE FileHandle;
 
@@ -779,8 +780,10 @@ BcfgAddOpt(
   FileName        = NULL;
   Data            = NULL;
   KeyOptionBuffer = NULL;
+  VariableData    = NULL;
 
   ZeroMem(&NewKeyOption, sizeof(EFI_KEY_OPTION));
+  ZeroMem(VariableName, sizeof(VariableName));
 
   while(Walker[0] == L' ') {
     Walker++;
@@ -941,28 +944,31 @@ BcfgAddOpt(
       }
 
       if (ShellStatus == SHELL_SUCCESS) {
-        for (Temp2 = NULL, KeyIndex = 0 ; KeyIndex < 0xFFFF ; KeyIndex++) {
+        for (Temp2 = NULL, KeyIndex = 0 ; KeyIndex <= 0xFFFF ; KeyIndex++) {
           UnicodeSPrint(VariableName, sizeof(VariableName), L"Key%04x", KeyIndex);
-          Status = gRT->GetVariable(
-              VariableName,
-              (EFI_GUID*)&gEfiGlobalVariableGuid,
-              NULL,
-              (UINTN*)&Intermediate,
-              NULL);
+          Status = GetEfiGlobalVariable2 (VariableName, &VariableData, NULL);
           if (Status == EFI_NOT_FOUND) {
             break;
           }
+          if (!EFI_ERROR(Status)) {
+            SHELL_FREE_NON_NULL(VariableData);
+          }
         }
-        Status = gRT->SetVariable(
-          VariableName,
-          (EFI_GUID*)&gEfiGlobalVariableGuid,
-          EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
-          sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * NewKeyOption.KeyData.Options.InputKeyCount),
-          KeyOptionBuffer);
-        if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellBcfgHiiHandle, VariableName, Status);
+        if (KeyIndex <= 0xFFFF) {
+          Status = gRT->SetVariable(
+            VariableName,
+            (EFI_GUID*)&gEfiGlobalVariableGuid,
+            EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
+            sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * NewKeyOption.KeyData.Options.InputKeyCount),
+            KeyOptionBuffer);
+          if (EFI_ERROR(Status)) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellBcfgHiiHandle, VariableName, Status);
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          }   
+        } else {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_VAR_NO_NUM), gShellBcfgHiiHandle);
           ShellStatus = SHELL_INVALID_PARAMETER;
-        }   
+        }
         ASSERT(FileName == NULL && Data == NULL);
       }
     }
