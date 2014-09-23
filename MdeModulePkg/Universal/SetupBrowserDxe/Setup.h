@@ -171,6 +171,7 @@ typedef struct {
   BROWSER_STORAGE  *BrowserStorage;
 
   CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
+  CHAR16           *ConfigAltResp; // Alt config response string for this ConfigRequest.
   UINTN            ElementCount;   // Number of <RequestElement> in the <ConfigRequest>
   UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
 } FORMSET_STORAGE;
@@ -379,6 +380,7 @@ typedef struct {
   LIST_ENTRY            SaveFailLink;
 
   CHAR16                *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
+  CHAR16                *ConfigAltResp; // Alt config response string for this ConfigRequest.
   UINTN                 ElementCount;   // Number of <RequestElement> in the <ConfigRequest>  
   UINTN                 SpareStrLen;
 

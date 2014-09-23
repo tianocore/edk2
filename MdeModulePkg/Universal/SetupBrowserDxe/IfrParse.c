@@ -586,7 +586,7 @@ InitializeRequestElement (
     StrLen = UnicodeSPrint (
                RequestElement,
                30 * sizeof (CHAR16),
-               L"&OFFSET=%x&WIDTH=%x",
+               L"&OFFSET=%04x&WIDTH=%04x",
                Question->VarStoreInfo.VarOffset,
                Question->StorageWidth
                );
