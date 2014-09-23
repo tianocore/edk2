@@ -25,6 +25,10 @@ ARCH = IA32
 
 MAKE        = nmake -nologo
 
+# DOS del command doesn't support ":\\" in the file path, such as j:\\BaseTools. Convert ":\\" to ":\"
+BASE_TOOLS_PATH = $(BASE_TOOLS_PATH::\\=:\)
+EDK_TOOLS_PATH  = $(EDK_TOOLS_PATH::\\=:\)
+
 SOURCE_PATH = $(BASE_TOOLS_PATH)\Source\C
 BIN_PATH    = $(BASE_TOOLS_PATH)\Bin
 LIB_PATH    = $(BASE_TOOLS_PATH)\Lib

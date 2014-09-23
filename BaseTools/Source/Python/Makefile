@@ -25,6 +25,10 @@ FREEZE=$(PYTHON_FREEZER_PATH)\FreezePython.exe
 
 MODULES=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_8,encodings.utf_16_le,encodings.latin_1,encodings.ascii
 
+# DOS del command doesn't support ":\\" in the file path, such as j:\\BaseTools. Convert ":\\" to ":\"
+BASE_TOOLS_PATH = $(BASE_TOOLS_PATH::\\=:\)
+EDK_TOOLS_PATH  = $(EDK_TOOLS_PATH::\\=:\)
+
 BIN_DIR=$(EDK_TOOLS_PATH)\Bin\Win32
 
 APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe $(BIN_DIR)\Rsa2048Sha256Sign.exe $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe
