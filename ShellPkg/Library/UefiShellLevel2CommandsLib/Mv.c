@@ -289,6 +289,8 @@ ValidateAndMoveFiles(
     }
   }  
 
+  ASSERT (CleanFilePathStr != NULL);
+
   //
   // Get and validate the destination location
   //

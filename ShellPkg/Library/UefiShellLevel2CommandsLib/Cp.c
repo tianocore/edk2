@@ -326,7 +326,9 @@ ValidateAndCopyFiles(
     } else {
       return SHELL_INVALID_PARAMETER;
     }
-  }  
+  }
+  
+  ASSERT (CleanFilePathStr != NULL);
 
   //
   // If we are trying to copy multiple files... make sure we got a directory for the target...
