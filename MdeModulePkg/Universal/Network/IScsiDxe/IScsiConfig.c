@@ -872,6 +872,23 @@ IScsiFormCallback (
             Status = EFI_INVALID_PARAMETER;
             break;
           }
+
+          //
+          // Validate iSCSI target name configuration again:
+          // The format of iSCSI target name is already verified when user input the name;
+          // here we only check the case user does not input the name.
+          //
+          if (Private->Current->SessionConfigData.TargetName[0] == '\0') {
+            CreatePopUp (
+              EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+              &Key,
+              L"iSCSI target name is NULL!",
+              NULL
+              );
+            Status = EFI_INVALID_PARAMETER;
+            break;
+          }
+
         }
 
         if (IfrNvData->CHAPType != ISCSI_CHAP_NONE) {
