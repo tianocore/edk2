@@ -770,7 +770,7 @@ BcfgAddOpt(
   CHAR16          *Data;
   UINT32          KeyIndex;
   CHAR16          VariableName[12];
-  UINT8           *VariableData;
+  VOID            *VariableData;
 
   SHELL_FILE_HANDLE FileHandle;
 
