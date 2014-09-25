@@ -3811,7 +3811,7 @@ NOOPT_DDK3790xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF
 *_*_*_OBJCOPY_FLAGS             = objcopy not needed for
 *_*_*_SYMRENAME_PATH            = echo
 *_*_*_SYMRENAME_FLAGS           = Symbol renaming not needed for
-DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)\$(MODULE_NAME).debug
+DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
 RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
 
 DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -c -include AutoGen.h
