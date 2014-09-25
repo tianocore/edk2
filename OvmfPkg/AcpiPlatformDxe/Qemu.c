@@ -1,7 +1,7 @@
 /** @file
   OVMF ACPI QEMU support
 
-  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 
   Copyright (C) 2012-2014, Red Hat, Inc.
 
@@ -943,7 +943,7 @@ Process2ndPassCmdAddPointer (
   Blob2Remaining += Blob2->Size;
   ASSERT (PointerValue < Blob2Remaining);
 
-  Blob2Remaining -= PointerValue;
+  Blob2Remaining -= (UINTN) PointerValue;
   DEBUG ((EFI_D_VERBOSE, "%a: checking for ACPI header in \"%a\" at 0x%Lx "
     "(remaining: 0x%Lx): ", __FUNCTION__, AddPointer->PointeeFile,
     PointerValue, (UINT64)Blob2Remaining));
