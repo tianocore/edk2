@@ -56,7 +56,7 @@ GetSystemMemorySizeBelow4gb (
   Cmos0x34 = (UINT8) CmosRead8 (0x34);
   Cmos0x35 = (UINT8) CmosRead8 (0x35);
 
-  return (((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
+  return (UINT32) (((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
 }
 
 

@@ -11,7 +11,7 @@
     synchronous requests and EFI_BLOCK_IO_PROTOCOL for now.
 
   Copyright (C) 2012, Red Hat, Inc.
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -770,8 +770,8 @@ VirtioBlkInit (
   Dev->BlockIoMedia.RemovableMedia   = FALSE;
   Dev->BlockIoMedia.MediaPresent     = TRUE;
   Dev->BlockIoMedia.LogicalPartition = FALSE;
-  Dev->BlockIoMedia.ReadOnly         = !!(Features & VIRTIO_BLK_F_RO);
-  Dev->BlockIoMedia.WriteCaching     = !!(Features & VIRTIO_BLK_F_FLUSH);
+  Dev->BlockIoMedia.ReadOnly         = (BOOLEAN) ((Features & VIRTIO_BLK_F_RO) != 0);
+  Dev->BlockIoMedia.WriteCaching     = (BOOLEAN) ((Features & VIRTIO_BLK_F_FLUSH) != 0);
   Dev->BlockIoMedia.BlockSize        = BlockSize;
   Dev->BlockIoMedia.IoAlign          = 0;
   Dev->BlockIoMedia.LastBlock        = DivU64x32 (NumSectors,

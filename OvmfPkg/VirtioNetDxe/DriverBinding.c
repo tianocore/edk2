@@ -3,7 +3,7 @@
   Driver Binding code and its private helpers for the virtio-net driver.
 
   Copyright (C) 2013, Red Hat, Inc.
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -129,7 +129,7 @@ VirtioNetGetFeatures (
     if (EFI_ERROR (Status)) {
       goto YieldDevice;
     }
-    *MediaPresent = !!(LinkStatus & VIRTIO_NET_S_LINK_UP);
+    *MediaPresent = (BOOLEAN) ((LinkStatus & VIRTIO_NET_S_LINK_UP) != 0);
   }
 
 YieldDevice:

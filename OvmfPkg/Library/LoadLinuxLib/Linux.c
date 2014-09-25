@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -384,8 +384,8 @@ SetupLinuxMemmap (
 #ifdef MDE_CPU_IA32
   Efi->efi_loader_signature = SIGNATURE_32 ('E', 'L', '3', '2');
 #else
-  Efi->efi_systab_hi = ((UINT64)(UINTN) gST) >> 32;
-  Efi->efi_memmap_hi = ((UINT64)(UINTN) MemoryMapPtr) >> 32;
+  Efi->efi_systab_hi = (UINT32) (((UINT64)(UINTN) gST) >> 32);
+  Efi->efi_memmap_hi = (UINT32) (((UINT64)(UINTN) MemoryMapPtr) >> 32);
   Efi->efi_loader_signature = SIGNATURE_32 ('E', 'L', '6', '4');
 #endif
 
