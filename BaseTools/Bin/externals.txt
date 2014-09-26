@@ -1,1 +1,0 @@
-Win32  https://svn.code.sf.net/p/edk2-toolbinaries/code/trunk/Win32
