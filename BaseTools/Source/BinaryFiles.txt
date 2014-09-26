@@ -1,0 +1,74 @@
+## @file
+# This file lists all of the tool files that must be present in the Bin trees.
+#
+# This file is used by the EDK II Build Server that automatically builds the
+# BaseTools Win32 binaries.
+# When new tools are create, the tool executable must be listed in the [Bin.Win32]
+# section.
+# If a tool requires additional files, the developer must list those files in the
+# [ExtraFiles.Win32] section.
+# The [CxFreeze.Win32] section is maintained by the owner of the Build Server who
+# must ensure that files that are required by the cx_freeze frozen binaries are 
+# present in the Bin\Win32 directory.
+#
+# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at:
+#   http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Bin.Win32]
+build.exe
+BPDG.exe
+BootSectImage.exe
+Common.PyUtility.pyd
+EfiCompressor.pyd
+EfiLdrImage.exe
+EfiRom.exe
+Eot.EfiCompressor.pyd
+Eot.LzmaCompressor.pyd
+GenBootSector.exe
+GenCrc32.exe
+GenDepex.exe
+GenFds.exe
+GenFfs.exe
+GenFv.exe
+GenFw.exe
+GenPage.exe
+GenPatchPcdTable.exe
+GenSec.exe
+GenVtf.exe
+ImportTool.bat
+LzmaCompress.exe
+LzmaF86Compress.bat
+PatchPcdValue.exe
+Rsa2048Sha256GenerateKeys.exe
+Rsa2048Sha256Sign.exe
+Split.exe
+TargetTool.exe
+TianoCompress.exe
+Trim.exe
+UPT.exe
+VfrCompile.exe
+VolInfo.exe
+
+[ExtraFiles.Win32]
+TestSigningPrivateKey.pem
+
+[CxFreeze.Win32]
+_ctypes.pyd
+_hashlib.pyd
+_socket.pyd
+_sqlite3.pyd
+_ssl.pyd
+pyexpat.pyd
+python27.dll
+select.pyd
+sqlite3.dll
+msvcr71.dll

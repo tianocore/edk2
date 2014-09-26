@@ -1,0 +1,84 @@
+Intel(R) Platform Innovation Framework for EFI
+BuildTools Project, BaseTools Sub-Project
+Root Package 1.00
+2007-08-31
+
+Intel is a trademark or registered trademark of Intel Corporation or its
+subsidiaries in the United States and other countries.
+* Other names and brands may be claimed as the property of others.
+Copyright (c) 2007, Intel Corporation. All rights reserved.
+
+-------------------------------------------------------------------------------
+Quick Start
+-----------
+
+Windows:
+  a) Set the PYTHON_FREEZER_PATH to the cx_Freeze installation directory
+  b) Go to the <buildtools_project>/BaseTools and run "toolsetup" script
+
+Unix-like:
+  a) make -C <buildtools_project>/BaseTools
+  b) Look over https://edk2.tianocore.org/step-by-step-instructions.html
+     for a helpful step-by-step guide for building 'Hello World' on
+     various operating systems with edk2.
+
+Supported build targets (toolsetup)
+-----------------------------------
+
+build(or none)  - Incremental Build of all C based tools. This is the default target
+rebuild         - Clean all generated files and directories during build, and rebuild all tools
+
+-------------------------------------------------------------------------------
+Tools in Python
+---------------
+* Convert Python source to exe file
+
+  The tools written in Python can be converted into executable program which can 
+  be executed without installing a Python interpreter.  (Generally it is easier
+  to run the scripts from their source on operating systems other than Windows.)
+
+  For Windows and Linux, the conversion tool package is called cx_Freeze, its
+  home page is:
+
+		http://sourceforge.net/projects/cx-freeze/
+
+	If you have installed cx_Freeze at c:\cx_Freeze-3.0.3. Use following command
+  lines to convert MyBuild.py to MyBuild.exe (note this is an example, there is
+  no MyBuild Python project in the BaseTools\Python tree.
+
+    set PYTHONPATH=<BaseToolsDirPath>\Source\Python
+  	c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_16_le,encodings.utf_8 --install-dir=.\mybuild MyBuild.py
+
+	The generated .exe (and .dll) files are put in "mybuild" subdirectory.
+
+  The following is a real example with the BuildTools/trunk/BaseTools project 
+  installed in: C:\Work\BaseTools
+
+  
+  C:\Work\BaseTools\Source\Python> set PYTHONPATH=C:\Work\BaseTools\Source\Python
+  C:\Work\BaseTools\Source\Python> c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_16_le,encodings.utf_8 --install-dir=C:\Work\BaseTools\Bin\Win32 build\build.py
+
+---------------
+* Execute tools written in Python without conversion
+
+Unix-like systems:
+
+The edk2/edksetup.sh script will setup everything which is needed to
+run the scripts from their source.
+
+Windows:
+
+  The tools written in Python can be executed directly from its source directory
+as long as the Python interpreter (Python 2.5) has been installed. Before the execution,
+please make sure the environment variable PYTHONPATH is set to 
+
+        <buildtools_project>/BaseTools/Source/Python
+
+  There're five tools written in Python. The entrance file of each tool is listed
+below.
+
+      build               <buildtools_project>/BaseTools/Source/Python/build/build.py
+      GenFds              <buildtools_project>/BaseTools/Source/Python/GenFds/GenFds.py
+      Trim                <buildtools_project>/BaseTools/Source/Python/Trim/Trim.py
+      MigrationMsa2Inf    <buildtools_project>/BaseTools/Source/Python/MigrationMsa2Inf/MigrationMsa2Inf.py
+      UPT                 <buildtools_project>/BaseTools/Source/Python/UPT/UPT.py

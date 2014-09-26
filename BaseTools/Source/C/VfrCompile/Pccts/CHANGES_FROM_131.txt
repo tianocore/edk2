@@ -1,0 +1,522 @@
+CHANGES FROM 1.31
+
+This file contains the migration of PCCTS from 1.31 in the order that
+changes were made.  1.32b7 is the last beta before full 1.32.
+Terence Parr, Parr Research Corporation 1995.
+
+
+======================================================================
+1.32b1
+Added Russell Quong to banner, changed banner for output slightly
+Fixed it so that you have before / after actions for C++ in class def
+Fixed bug in optimizer that made it sometimes forget to set internal
+        token pointers.  Only showed up when a {...} was in the "wrong spot".
+
+======================================================================
+1.32b2
+Added fixes by Dave Seidel for PC compilers in 32 bit mode (config.h
+and set.h).
+
+======================================================================
+1.32b3
+Fixed hideous bug in code generator for wildcard and for ~token op.
+
+from Dave Seidel
+
+   Added pcnames.bat
+   1. in antlr/main.c: change strcasecmp() to stricmp()
+
+   2. in dlg/output.c: use DLEXER_C instead on "DLexer.C"
+
+   3. in h/PBlackBox.h: use <iostream.h> instead of <stream.h>
+
+======================================================================
+1.32b4
+When the -ft option was used, any path prefix screwed up
+the gate on the .h files
+
+Fixed yet another bug due to the optimizer.
+
+The exception handling thing was a bit wacko:
+
+a : ( A B )? A B
+  | A C
+  ;
+  exception ...
+
+caused an exception if "A C" was the input.  In other words,
+it found that A C didn't match the (A B)? pred and caused
+an exception rather than trying the next alt.  All I did
+was to change the zzmatch_wsig() macros.
+
+Fixed some problems in gen.c relating to the name of token
+class bit sets in the output.
+
+Added the tremendously cool generalized predicate.  For the
+moment, I'll give this bried description.
+
+a : <<predicate>>? blah
+  | foo
+  ;
+
+This implies that (assuming blah and foo are syntactically
+ambiguous) "predicate" indicates the semantic validity of
+applying "blah".  If "predicate" is false, "foo" is attempted.
+
+Previously, you had to say:
+
+a : <<LA(1)==ID ? predicate : 1>>? ID
+  | ID
+  ;
+
+Now, you can simply use "predicate" without the ?: operator
+if you turn on ANTLR command line option: "-prc on".  This
+tells ANTLR to compute that all by itself.  It computes n
+tokens of lookahead where LT(n) or LATEXT(n) is the farthest
+ahead you look.
+
+If you give a predicate using "-prc on" that is followed
+by a construct that can recognize more than one n-sequence,
+you will get a warning from ANTLR.  For example,
+
+a : <<isTypeName(LT(1)->getText())>>? (ID|INT)
+  ;
+
+This is wrong because the predicate will be applied to INTs
+as well as ID's.  You should use this syntax to make
+the predicate more specific:
+
+a : (ID)? => <<isTypeName(LT(1)->getText())>>? (ID|INT)
+  ;
+
+which says "don't apply the predicate unless ID is the
+current lookahead context".
+
+You cannot currently have anything in the "(context)? =>"
+except sequences such as:
+
+( LPAREN ID | LPAREN SCOPE )? => <<pred>>?
+
+I haven't tested this THAT much, but it does work for the
+C++ grammar.
+
+======================================================================
+1.32b5
+
+Added getLine() to the ANTLRTokenBase and DLGBasedToken classes
+left line() for backward compatibility.
+----
+Removed SORCERER_TRANSFORM from the ast.h stuff.
+-------
+Fixed bug in code gen of ANTLR such that nested syn preds work more
+efficiently now.  The ANTLRTokenBuffer was getting very large
+with nested predicates.
+------
+Memory leak is now gone from ANTLRTokenBuf; all tokens are deleted.
+For backward compatibility reasons, you have to say parser->deleteTokens()
+or mytokenbuffer->deleteTokens() but later it will be the default mode.
+Say this after the parser is constructed. E.g.,
+
+    ParserBlackBox<DLGLexer, MyParser, ANTLRToken> p(stdin);
+    p.parser()->deleteTokens();
+    p.parser()->start_symbol();
+
+
+==============================
+1.32b6
+
+Changed so that deleteTokens() will do a delete ((ANTLRTokenBase *))
+on the ptr.  This gets the virtual destructor.
+
+Fixed some weird things in the C++ header files (a few return types).
+
+Made the AST routines correspond to the book and SORCERER stuff.
+
+New token stuff:  See testcpp/14/test.g
+
+ANTLR accepts a #pragma gc_tokens which says
+[1]     Generate label = copy(LT(1)) instead of label=LT(1) for
+        all labeled token references.
+[2]     User now has to define ANTLRTokenPtr (as a class or a typedef
+        to just a pointer) as well as the ANTLRToken class itself.
+		See the example.
+
+To delete tokens in token buffer, use deleteTokens() message on parser.
+
+        All tokens that fall off the ANTLRTokenBuffer get deleted
+        which is what currently happens when deleteTokens() message
+        has been sent to token buffer.
+
+We always generate ANTLRTokenPtr instead of 'ANTLRToken *' now.
+Then if no pragma set, ANTLR generates a
+
+        class ANTLRToken;
+        typedef ANTLRToken *ANTLRTokenPtr;
+
+in each file.
+
+Made a warning for x:rule_ref <<$x>>; still no warning for $i's, however.
+class BB {
+
+a : x:b y:A <<$x
+$y>>
+  ;
+
+b : B;
+
+}
+generates
+Antlr parser generator   Version 1.32b6   1989-1995
+test.g, line 3: error: There are no token ptrs for rule references: '$x'
+
+===================
+1.32b7:
+
+[With respect to token object garbage collection (GC), 1.32b7
+ backtracks from 1.32b6, but results in better and less intrusive GC.
+ This is the last beta version before full 1.32.]
+
+BIGGEST CHANGES:
+
+o	The "#pragma gc_tokens" is no longer used.
+
+o	.C files are now .cpp files (hence, makefiles will have to
+	be changed; or you can rerun genmk).  This is a good move,
+	but causes some backward incompatibility problems.  You can
+	avoid this by changing CPP_FILE_SUFFIX to ".C" in pccts/h/config.h.
+
+o	The token object class hierarchy has been flattened to include
+	only three classes: ANTLRAbstractToken, ANTLRCommonToken, and
+	ANTLRCommonNoRefCountToken.  The common token now does garbage
+	collection via ref counting.
+
+o	"Smart" pointers are now used for garbage collection.  That is,
+	ANTLRTokenPtr is used instead of "ANTLRToken *".
+
+o	The antlr.1 man page has been cleaned up slightly.
+
+o	The SUN C++ compiler now complains less about C++ support code.
+
+o	Grammars which subclass ANTLRCommonToken must wrap all token
+	pointer references in mytoken(token_ptr).  This is the only
+	serious backward incompatibility.  See below.
+
+
+MINOR CHANGES:
+
+--------------------------------------------------------
+1	deleteTokens()
+
+The deleteTokens() message to the parser or token buffer has been changed
+to one of:
+
+    void noGarbageCollectTokens()   { inputTokens->noGarbageCollectTokens(); }
+    void garbageCollectTokens()     { inputTokens->garbageCollectTokens(); }
+
+The token buffer deletes all non-referenced tokens by default now.
+
+--------------------------------------------------------
+2	makeToken()
+
+The makeToken() message returns a new type.  The function should look
+like:
+
+    virtual ANTLRAbstractToken *makeToken(ANTLRTokenType tt,
+                                          ANTLRChar *txt,
+                                          int line)
+    {
+        ANTLRAbstractToken *t = new ANTLRCommonToken(tt,txt);
+        t->setLine(line);
+        return t;
+    }
+
+--------------------------------------------------------
+3	TokenType
+
+Changed TokenType-> ANTLRTokenType  (often forces changes in AST defs due
+to #[] constructor called to AST(tokentype, string)).
+
+--------------------------------------------------------
+4	AST()
+
+You must define AST(ANTLRTokenPtr t) now in your AST class definition.
+You might also have to include ATokPtr.h above the definition; e.g.,
+if AST is defined in a separate file, such as AST.h, it's a good idea
+to include ATOKPTR_H (ATokPtr.h).  For example,
+
+	#include ATOKPTR_H
+	class AST : public ASTBase {
+	protected:
+	    ANTLRTokenPtr token;
+	public:
+	    AST(ANTLRTokenPtr t) { token = t; }
+	    void preorder_action() {
+	        char *s = token->getText();
+	        printf(" %s", s);
+	    }
+	};
+
+Note the use of smart pointers rather than "ANTLRToken *".
+
+--------------------------------------------------------
+5	SUN C++
+
+From robertb oakhill.sps.mot.com Bob Bailey. Changed ANTLR C++ output
+to avoid an error in Sun C++ 3.0.1.  Made "public" return value
+structs created to hold multiple return values public.
+
+--------------------------------------------------------
+6	genmk
+
+Fixed genmk so that target List.* is not included anymore.  It's
+called SList.* anyway.
+
+--------------------------------------------------------
+7	\r vs \n
+
+Scott Vorthmann <vorth cmu.edu> fixed antlr.g in ANTLR so that \r
+is allowed as the return character as well as \n.
+
+--------------------------------------------------------
+8	Exceptions
+
+Bug in exceptions attached to labeled token/tokclass references.  Didn't gen
+code for exceptions.  This didn't work:
+
+a : "help" x:ID
+  ;
+        exception[x]
+        catch MismatchedToken : <<printf("eh?\n");>>
+
+Now ANTLR generates (which is kinda big, but necessary):
+
+        if ( !_match_wsig(ID) ) {
+                if ( guessing ) goto fail;
+                _signal=MismatchedToken;
+                switch ( _signal ) {
+                case MismatchedToken :
+                        printf("eh?\n");
+                        _signal = NoSignal;
+                        break;
+                default :
+                        goto _handler;
+                }
+        }
+
+which implies that you can recover and continue parsing after a missing/bad
+token reference.
+
+--------------------------------------------------------
+9	genmk
+
+genmk now correctly uses config file for CPP_FILE_SUFFIX stuff.
+
+--------------------------------------------------------
+10	general cleanup / PURIFY
+
+Anthony Green <green vizbiz.com> suggested a bunch of good general
+clean up things for the code; he also suggested a few things to
+help out the "PURIFY" memory allocation checker.
+
+--------------------------------------------------------
+11	$-variable references.
+
+Manuel ORNATO indicated that a $-variable outside of a rule caused
+ANTLR to crash.  I fixed this.
+
+12	Tom Moog suggestion
+
+Fail action of semantic predicate needs "{}" envelope.  FIXED.
+
+13	references to LT(1).
+
+I have enclosed all assignments such as:
+
+             _t22 = (ANTLRTokenPtr)LT(1);
+
+in "if ( !guessing )" so that during backtracking the reference count
+for token objects is not increased.
+
+
+TOKEN OBJECT GARBAGE COLLECTION
+
+1	INTRODUCTION
+
+The class ANTLRCommonToken is now garbaged collected through a "smart"
+pointer called ANTLRTokenPtr using reference counting.  Any token
+object not referenced by your grammar actions is destroyed by the
+ANTLRTokenBuffer when it must make room for more token objects.
+Referenced tokens are then destroyed in your parser when local
+ANTLRTokenPtr objects are deleted.  For example,
+
+a : label:ID ;
+
+would be converted to something like:
+
+void yourclass::a(void)
+{
+	zzRULE;
+	ANTLRTokenPtr label=NULL;	// used to be ANTLRToken *label;
+        zzmatch(ID);
+        label = (ANTLRTokenPtr)LT(1);
+	consume();
+	...
+}
+
+When the "label" object is destroyed (it's just a pointer to your
+input token object LT(1)), it decrements the reference count on the
+object created for the ID.  If the count goes to zero, the object
+pointed by label is deleted.
+
+To correctly manage the garbage collection, you should use
+ANTLRTokenPtr instead of "ANTLRToken *".  Most ANTLR support code
+(visible to the user) has been modified to use the smart pointers.
+
+***************************************************************
+Remember that any local objects that you create are not deleted when a
+lonjmp() is executed.  Unfortunately, the syntactic predicates (...)?
+use setjmp()/longjmp().  There are some situations when a few tokens
+will "leak".
+***************************************************************
+
+2	DETAILS
+
+o	The default is to perform token object garbage collection.
+	You may use parser->noGarbageCollectTokens() to turn off
+	garbage collection.
+
+
+o	The type ANTLRTokenPtr is always defined now (automatically).
+	If you do not wish to use smart pointers, you will have to
+	redefined ANTLRTokenPtr by subclassing, changing the header
+	file or changing ANTLR's code generation (easy enough to
+	do in gen.c).
+
+o	If you don't use ParserBlackBox, the new initialization sequence is:
+
+	    ANTLRTokenPtr aToken = new ANTLRToken;
+	    scan.setToken(mytoken(aToken));
+
+	where mytoken(aToken) gets an ANTLRToken * from the smart pointer.
+
+o	Define C++ preprocessor symbol DBG_REFCOUNTTOKEN to see a bunch of
+	debugging stuff for reference counting if you suspect something.
+
+
+3	WHY DO I HAVE TO TYPECAST ALL MY TOKEN POINTERS NOW??????
+
+If you subclass ANTLRCommonToken and then attempt to refer to one of
+your token members via a token pointer in your grammar actions, the
+C++ compiler will complain that your token object does not have that
+member.  For example, if you used to do this
+
+<<
+class ANTLRToken : public ANTLRCommonToken {
+        int muck;
+	...
+};
+>>
+
+class Foo {
+a : t:ID << t->muck = ...; >> ;
+}
+
+Now, you must do change the t->muck reference to:
+
+a : t:ID << mytoken(t)->muck = ...; >> ;
+
+in order to downcast 't' to be an "ANTLRToken *" not the
+"ANTLRAbstractToken *" resulting from ANTLRTokenPtr::operator->().
+The macro is defined as:
+
+/*
+ * Since you cannot redefine operator->() to return one of the user's
+ * token object types, we must down cast.  This is a drag.  Here's
+ * a macro that helps.  template: "mytoken(a-smart-ptr)->myfield".
+ */
+#define mytoken(tp) ((ANTLRToken *)(tp.operator->()))
+
+You have to use macro mytoken(grammar-label) now because smart
+pointers are not specific to a parser's token objects.  In other
+words, the ANTLRTokenPtr class has a pointer to a generic
+ANTLRAbstractToken not your ANTLRToken; the ANTLR support code must
+use smart pointers too, but be able to work with any kind of
+ANTLRToken.  Sorry about this, but it's C++'s fault not mine.  Some
+nebulous future version of the C++ compilers should obviate the need
+to downcast smart pointers with runtime type checking (and by allowing
+different return type of overridden functions).
+
+A way to have backward compatible code is to shut off the token object
+garbage collection; i.e., use parser->noGarbageCollectTokens() and
+change the definition of ANTLRTokenPtr (that's why you get source code
+<wink>).
+
+
+PARSER EXCEPTION HANDLING
+
+I've noticed some weird stuff with the exception handling.  I intend
+to give this top priority for the "book release" of ANTLR.
+
+==========
+1.32 Full Release
+
+o	Changed Token class hierarchy to be (Thanks to Tom Moog):
+
+        ANTLRAbstractToken
+          ANTLRRefCountToken
+             ANTLRCommonToken
+          ANTLRNoRefCountCommonToken
+
+o	Added virtual panic() to ANTLRAbstractToken.  Made ANTLRParser::panic()
+	virtual also.
+
+o	Cleaned up the dup() stuff in AST hierarchy to use shallowCopy() to
+	make node copies.  John Farr at Medtronic suggested this.  I.e.,
+	if you want to use dup() with either ANTLR or SORCERER or -transform
+	mode with SORCERER, you must defined shallowCopy() as:
+
+	virtual PCCTS_AST *shallowCopy()
+	{
+	    return new AST;
+	    p->setDown(NULL);
+	    p->setRight(NULL);
+	    return p;
+	}
+
+	or
+
+	virtual PCCTS_AST *shallowCopy()
+	{
+	    return new AST(*this);
+	}
+	
+	if you have defined a copy constructor such as
+
+	AST(const AST &t)	// shallow copy constructor
+	{
+		token = t.token;
+		iconst = t.iconst;
+		setDown(NULL);
+		setRight(NULL);
+	}
+
+o	Added a warning with -CC and -gk are used together.  This is broken,
+	hence a warning is appropriate.
+
+o	Added warning when #-stuff is used w/o -gt option.
+
+o	Updated MPW installation.
+
+o	"Miller, Philip W." <MILLERPW f1groups.fsd.jhuapl.edu> suggested
+	that genmk be use RENAME_OBJ_FLAG RENAME_EXE_FLAG instead of
+	hardcoding "-o" in genmk.c.
+
+o	made all exit() calls use EXIT_SUCCESS or EXIT_FAILURE.
+
+===========================================================================
+1.33
+
+EXIT_FAILURE and EXIT_SUCCESS were not always defined.  I had to modify
+a bunch of files to use PCCTS_EXIT_XXX, which forces a new version.  Sorry
+about that.
+

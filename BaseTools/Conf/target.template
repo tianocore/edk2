@@ -1,0 +1,72 @@
+#
+#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#  ALL Paths are Relative to WORKSPACE
+
+#  Separate multiple LIST entries with a SINGLE SPACE character, do not use comma characters.
+#  Un-set an option by either commenting out the line, or not setting a value.
+
+#
+#  PROPERTY              Type       Use         Description
+#  ----------------      --------   --------    -----------------------------------------------------------
+#  ACTIVE_PLATFORM       Filename   Recommended Specify the WORKSPACE relative Path and Filename
+#                                               of the platform description file that will be used for the
+#                                               build. This line is required if and only if the current
+#                                               working directory does not contain one or more description
+#                                               files.
+ACTIVE_PLATFORM       = Nt32Pkg/Nt32Pkg.dsc
+
+#  TARGET                List       Optional    Zero or more of the following: DEBUG, RELEASE, NOOPT
+#                                               UserDefined; separated by a space character.
+#                                               If the line is missing or no value is specified, all
+#                                               valid targets specified in the platform description file 
+#                                               will attempt to be built. The following line will build 
+#                                               DEBUG platform target.
+TARGET                = DEBUG
+
+#  TARGET_ARCH           List       Optional    What kind of architecture is the binary being target for.
+#                                               One, or more, of the following, IA32, IPF, X64, EBC, ARM
+#                                               or AArch64.
+#                                               Multiple values can be specified on a single line, using
+#                                               space charaters to separate the values.  These are used
+#                                               during the parsing of a platform description file, 
+#                                               restricting the build output target(s.)
+#                                               The Build Target ARCH is determined by (precedence high to low):
+#                                                 Command-line: -a ARCH option
+#                                                 target.txt: TARGET_ARCH values
+#                                                 DSC file: [Defines] SUPPORTED_ARCHITECTURES tag
+#                                               If not specified, then all valid architectures specified
+#                                               in the platform file, for which tools are available, will be
+#                                               built.
+TARGET_ARCH           = IA32
+
+#  TOOL_DEFINITION_FILE  Filename  Optional   Specify the name of the filename to use for specifying
+#                                             the tools to use for the build.  If not specified,
+#                                             WORKSPACE/Conf/tools_def.txt will be used for the build.
+TOOL_CHAIN_CONF       = Conf/tools_def.txt
+
+#  TAGNAME               List      Optional   Specify the name(s) of the tools_def.txt TagName to use.
+#                                             If not specified, all applicable TagName tools will be
+#                                             used for the build.  The list uses space character separation.
+TOOL_CHAIN_TAG        = MYTOOLS
+
+# MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Recommend to set this
+#                                                 value to one more than the number of your compurter
+#                                                 cores or CPUs. Less than 2 means disable multithread build.
+MAX_CONCURRENT_THREAD_NUMBER = 1
+
+
+# BUILD_RULE_CONF  Filename Optional  Specify the file name to use for the build rules that are followed
+#                                     when generating Makefiles. If not specified, the file: 
+#                                     WORKSPACE/Conf/build_rule.txt will be used
+BUILD_RULE_CONF = Conf/build_rule.txt
+
