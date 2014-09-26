@@ -51,7 +51,8 @@
 
 [Depex]
   gEfiVariableArchProtocolGuid AND
-  gEfiVariableWriteArchProtocolGuid
+  gEfiVariableWriteArchProtocolGuid AND
+  ( gEfiTcgProtocolGuid OR gEfiTrEEProtocolGuid )
 
 [UserExtensions.TianoCore."ExtraFiles"]
   TcgMorExtra.uni
