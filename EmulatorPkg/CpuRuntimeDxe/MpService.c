@@ -1015,10 +1015,6 @@ CpuCheckAllAPsStatus (
     gThread->MutexUnlock (ProcessorData->StateLock);
 
     switch (ProcessorState) {
-    case CPU_STATE_READY:
-      SetApProcedure (ProcessorData, gMPSystem.Procedure, gMPSystem.ProcedureArgument);
-      break;
-
     case CPU_STATE_FINISHED:
       if (gMPSystem.SingleThread) {
         Status = GetNextBlockedNumber (&NextNumber);
