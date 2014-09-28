@@ -1001,12 +1001,12 @@ CpuCheckAllAPsStatus (
     // context. Meaning deadlock. Which is a bad thing.
     // So, try lock it. If we can get it, cool, do our thing.
     // otherwise, just dump out & try again on the next iteration.
-    Status = gThread->MutexTryLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    Status = gThread->MutexTryLock (ProcessorData->StateLock);
     if (EFI_ERROR(Status)) {
       return;
     }
-    ProcessorState = gMPSystem.ProcessorData[ProcessorNumber].State;
-    gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    ProcessorState = ProcessorData->State;
+    gThread->MutexUnlock (ProcessorData->StateLock);
 
     switch (ProcessorState) {
     case CPU_STATE_READY:
@@ -1027,9 +1027,9 @@ CpuCheckAllAPsStatus (
         }
       }
 
-      gThread->MutexLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
-      gMPSystem.ProcessorData[ProcessorNumber].State = CPU_STATE_IDLE;
-      gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+      gThread->MutexLock (ProcessorData->StateLock);
+      ProcessorData->State = CPU_STATE_IDLE;
+      gThread->MutexUnlock (ProcessorData->StateLock);
       gMPSystem.FinishCount++;
       break;
 
@@ -1056,12 +1056,12 @@ CpuCheckAllAPsStatus (
         }
 
         // Mark the
-        Status = gThread->MutexTryLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+        Status = gThread->MutexTryLock (ProcessorData->StateLock);
         if (EFI_ERROR(Status)) {
           return;
         }
-        ProcessorState = gMPSystem.ProcessorData[ProcessorNumber].State;
-        gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+        ProcessorState = ProcessorData->State;
+        gThread->MutexUnlock (ProcessorData->StateLock);
 
         if (ProcessorState != CPU_STATE_IDLE) {
           // If we are retrying make sure we don't double count
