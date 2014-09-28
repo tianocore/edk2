@@ -984,10 +984,9 @@ CpuCheckAllAPsStatus (
     gMPSystem.Timeout -= gPollInterval;
   }
 
-  ProcessorData = (PROCESSOR_DATA_BLOCK *) Context;
-
   for (ProcessorNumber = 0; ProcessorNumber < gMPSystem.NumberOfProcessors; ProcessorNumber++) {
-    if ((ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
+    ProcessorData = &gMPSystem.ProcessorData[ProcessorNumber];
+    if ((ProcessorData->Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
      // Skip BSP
       continue;
     }
@@ -1045,7 +1044,8 @@ CpuCheckAllAPsStatus (
     //
     if (gMPSystem.FailedList != NULL) {
       for (ProcessorNumber = 0; ProcessorNumber < gMPSystem.NumberOfProcessors; ProcessorNumber++) {
-        if ((ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
+        ProcessorData = &gMPSystem.ProcessorData[ProcessorNumber];
+        if ((ProcessorData->Info.StatusFlag & PROCESSOR_AS_BSP_BIT) == PROCESSOR_AS_BSP_BIT) {
          // Skip BSP
           continue;
         }
