@@ -465,7 +465,13 @@ CpuMpServicesStartupAllAps (
         continue;
       }
 
-      SetApProcedure (ProcessorData, Procedure, ProcedureArgument);
+      gThread->MutexLock (ProcessorData->StateLock);
+      ProcessorState = ProcessorData->State;
+      gThread->MutexUnlock (ProcessorData->StateLock);
+
+      if (ProcessorState == CPU_STATE_READY) {
+        SetApProcedure (ProcessorData, Procedure, ProcedureArgument);
+      }
     }
 
     //
