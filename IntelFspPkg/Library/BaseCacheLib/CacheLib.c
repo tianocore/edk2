@@ -381,7 +381,7 @@ ProgramFixedMtrr (
     *Len -= mFixedMtrrTable[MsrNum].Length;
     *Base += mFixedMtrrTable[MsrNum].Length;
   }
-  TempQword = AsmReadMsr64 (mFixedMtrrTable[MsrNum].Msr) & (~ClearMask | OrMask);
+  TempQword = (AsmReadMsr64 (mFixedMtrrTable[MsrNum].Msr) & (~ClearMask)) | OrMask;
   AsmWriteMsr64 (mFixedMtrrTable[MsrNum].Msr, TempQword);
 
   return EFI_SUCCESS;
