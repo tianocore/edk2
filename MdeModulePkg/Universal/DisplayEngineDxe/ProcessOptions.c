@@ -955,7 +955,6 @@ ProcessOptions (
   UINTN                           Index2;
   UINT8                           *ValueArray;
   UINT8                           ValueType;
-  EFI_STRING_ID                   StringId;
   EFI_IFR_ORDERED_LIST            *OrderList;
   BOOLEAN                         ValueInvalid;
 
@@ -964,7 +963,6 @@ ProcessOptions (
   StringPtr     = NULL;
   Character[1]  = L'\0';
   *OptionString = NULL;
-  StringId      = 0;
   ValueInvalid  = FALSE;
 
   ZeroMem (FormattedNumber, 21 * sizeof (CHAR16));

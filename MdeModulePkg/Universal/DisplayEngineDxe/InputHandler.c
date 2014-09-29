@@ -439,7 +439,6 @@ GetNumericInput (
   IN  UI_MENU_OPTION              *MenuOption
   )
 {
-  EFI_STATUS              Status;
   UINTN                   Column;
   UINTN                   Row;
   CHAR16                  InputText[MAX_NUMERIC_INPUT_WIDTH];
@@ -685,7 +684,7 @@ GetNumericInput (
       goto TheKey2;
     }
 
-    Status = WaitForKeyStroke (&Key);
+    WaitForKeyStroke (&Key);
 
 TheKey2:
     switch (Key.UnicodeChar) {
@@ -1118,7 +1117,6 @@ GetSelectionInputPopUp (
   IN  UI_MENU_OPTION              *MenuOption
   )
 {
-  EFI_STATUS              Status;
   EFI_INPUT_KEY           Key;
   UINTN                   Index;
   CHAR16                  *StringPtr;
@@ -1351,7 +1349,7 @@ GetSelectionInputPopUp (
       goto TheKey;
     }
 
-    Status = WaitForKeyStroke (&Key);
+    WaitForKeyStroke (&Key);
 
 TheKey:
     switch (Key.UnicodeChar) {
@@ -1505,7 +1503,6 @@ TheKey:
         } else {
           gUserInput->InputValue.Buffer = ReturnValue;
           gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
-          Status = EFI_SUCCESS;
         }
       } else {
         ASSERT (CurrentOption != NULL);
@@ -1514,7 +1511,6 @@ TheKey:
           return EFI_DEVICE_ERROR;
         } else {
           SetValuesByType (&gUserInput->InputValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type);
-          Status = EFI_SUCCESS;
         }
       }
 

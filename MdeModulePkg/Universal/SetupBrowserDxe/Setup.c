@@ -836,13 +836,11 @@ FormDisplayCallback (
   IN VOID         *Context
   )
 {
-  EFI_STATUS                  Status;
-
   if (mFormDisplay != NULL) {
     return;
   }
 
-  Status = gBS->LocateProtocol (
+  gBS->LocateProtocol (
                   &gEdkiiFormDisplayEngineProtocolGuid,
                   NULL,
                   (VOID **) &mFormDisplay
@@ -3217,7 +3215,6 @@ SubmitForSystem (
   EFI_STATUS              Status;
   LIST_ENTRY              *Link;
   LIST_ENTRY              *StorageLink;
-  BROWSER_STORAGE         *Storage;
   FORMSET_STORAGE         *FormSetStorage;
   FORM_BROWSER_FORM       *Form;
   FORM_BROWSER_FORMSET    *LocalFormSet;
@@ -3283,7 +3280,6 @@ SubmitForSystem (
         StorageLink = GetFirstNode (&LocalFormSet->StorageListHead);
         while (!IsNull (&LocalFormSet->StorageListHead, StorageLink)) {
           FormSetStorage = FORMSET_STORAGE_FROM_LINK (StorageLink);
-          Storage        = FormSetStorage->BrowserStorage;
           StorageLink = GetNextNode (&LocalFormSet->StorageListHead, StorageLink);
 
           SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
@@ -3292,7 +3288,6 @@ SubmitForSystem (
         StorageLink = GetFirstNode (&LocalFormSet->SaveFailStorageListHead);
         while (!IsNull (&LocalFormSet->SaveFailStorageListHead, StorageLink)) {
           FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (StorageLink);
-          Storage        = FormSetStorage->BrowserStorage;
           StorageLink = GetNextNode (&LocalFormSet->SaveFailStorageListHead, StorageLink);
 
           SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
@@ -4823,13 +4818,11 @@ ConfigRequestAdjust (
   CHAR16       *RequestElement;
   CHAR16       *NextRequestElement;
   CHAR16       *NextElementBakup;
-  UINTN        SpareBufLen;
   CHAR16       *SearchKey;
   CHAR16       *ValueKey;
   BOOLEAN      RetVal;
   CHAR16       *ConfigRequest;
 
-  SpareBufLen    = 0;
   RetVal         = FALSE;
   NextElementBakup = NULL;
   ValueKey         = NULL;

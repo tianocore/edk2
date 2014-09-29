@@ -2049,10 +2049,8 @@ UiDisplayMenu (
   UINTN                           TopRow;
   UINTN                           BottomRow;
   UINTN                           Index;
-  UINT16                          Width;
   CHAR16                          *StringPtr;
   CHAR16                          *OptionString;
-  CHAR16                          *OutputString;
   CHAR16                          *HelpString;
   CHAR16                          *HelpHeaderString;
   CHAR16                          *HelpBottomString;
@@ -2069,10 +2067,8 @@ UiDisplayMenu (
   UI_MENU_OPTION                  *MenuOption;
   UI_MENU_OPTION                  *NextMenuOption;
   UI_MENU_OPTION                  *SavedMenuOption;
-  UI_MENU_OPTION                  *PreviousMenuOption;
   UI_CONTROL_FLAG                 ControlFlag;
   UI_SCREEN_OPERATION             ScreenOperation;
-  UINT16                          DefaultId;
   FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
   BROWSER_HOT_KEY                 *HotKey;
   UINTN                           HelpPageIndex;
@@ -2087,7 +2083,6 @@ UiDisplayMenu (
   UINT16                          BottomLineWidth;
   EFI_STRING_ID                   HelpInfo;
   UI_EVENT_TYPE                   EventType;
-  FORM_DISPLAY_ENGINE_STATEMENT   *InitialHighlight;
   BOOLEAN                         SkipHighLight;
 
   EventType           = UIEventNone;
@@ -2098,7 +2093,6 @@ UiDisplayMenu (
   OptionString        = NULL;
   ScreenOperation     = UiNoOperation;
   NewLine             = TRUE;
-  DefaultId           = 0;
   HelpPageCount       = 0;
   HelpLine            = 0;
   RowCount            = 0;
@@ -2109,24 +2103,20 @@ UiDisplayMenu (
   EachLineWidth       = 0;
   HeaderLineWidth     = 0;
   BottomLineWidth     = 0;
-  OutputString        = NULL;
   UpArrow             = FALSE;
   DownArrow           = FALSE;
   SkipValue           = 0;
   SkipHighLight       = FALSE;
 
   NextMenuOption      = NULL;
-  PreviousMenuOption  = NULL;
   SavedMenuOption     = NULL;
   HotKey              = NULL;
   Repaint             = TRUE;
   MenuOption          = NULL;
   gModalSkipColumn    = (CHAR16) (gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn) / 6;
-  InitialHighlight    = gFormData->HighLightedStatement;
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
-  Width     = (UINT16)gOptionBlockWidth - 1;
   TopRow    = gStatementDimensions.TopRow    + SCROLL_ARROW_HEIGHT;
   BottomRow = gStatementDimensions.BottomRow - SCROLL_ARROW_HEIGHT - 1;
 

@@ -135,7 +135,6 @@ RefreshKeyHelp (
 {
   UINTN                  SecCol;
   UINTN                  ThdCol;
-  UINTN                  LeftColumnOfHelp;
   UINTN                  RightColumnOfHelp;
   UINTN                  TopRowOfHelp;
   UINTN                  BottomRowOfHelp;
@@ -166,7 +165,6 @@ RefreshKeyHelp (
   ThdCol            = gScreenDimensions.LeftColumn + (gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn) / 3 * 2;
 
   StartColumnOfHelp = gScreenDimensions.LeftColumn + 2;
-  LeftColumnOfHelp  = gScreenDimensions.LeftColumn + 1;
   RightColumnOfHelp = gScreenDimensions.RightColumn - 1;
   TopRowOfHelp      = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
   BottomRowOfHelp   = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 2;
