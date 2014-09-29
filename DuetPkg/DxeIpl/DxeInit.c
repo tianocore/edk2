@@ -218,7 +218,7 @@ Returns:
     "HobStart = %p\n"
     "Memory Top = %lx, Bottom = %lx\n"
     "Free Memory Top = %lx, Bottom = %lx\n"
-    "NvStorageFvb = %p, Length = %x\n"
+    "NvStorageFvb = %lx, Length = %lx\n"
     "BfvResource = %lx, Length = %lx\n"
     "NvStorageFvResource = %lx, Length = %lx\n"
     "NvStorage = %lx, Length = %lx\n"
@@ -236,7 +236,7 @@ Returns:
     gHob,
     gHob->Phit.EfiMemoryTop, gHob->Phit.EfiMemoryBottom,
     gHob->Phit.EfiFreeMemoryTop, gHob->Phit.EfiFreeMemoryBottom,
-    gHob->NvStorageFvb.FvbInfo.Entries[0].Base, (UINTN) gHob->NvFtwFvb.FvbInfo.Entries[0].Length,
+    gHob->NvStorageFvb.FvbInfo.Entries[0].Base, gHob->NvFtwFvb.FvbInfo.Entries[0].Length,
     gHob->BfvResource.PhysicalStart, gHob->BfvResource.ResourceLength,
     gHob->NvStorageFvResource.PhysicalStart, gHob->NvStorageFvResource.ResourceLength,
     gHob->NvStorage.FvbInfo.Entries[0].Base, gHob->NvStorage.FvbInfo.Entries[0].Length,
