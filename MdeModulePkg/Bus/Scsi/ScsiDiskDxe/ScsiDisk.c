@@ -1572,7 +1572,6 @@ CheckTargetStatus (
 
   case EFI_EXT_SCSI_STATUS_TARGET_RESERVATION_CONFLICT:
     return EFI_DEVICE_ERROR;
-    break;
 
   default:
     return EFI_SUCCESS;
