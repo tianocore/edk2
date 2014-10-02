@@ -230,7 +230,7 @@ INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
-  INF  OvmfPkg/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !else
   INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif

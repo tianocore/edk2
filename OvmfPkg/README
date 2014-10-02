@@ -66,6 +66,8 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
   - Option 1: QEMU 1.6 or newer; Use QEMU -pflash parameter
     * QEMU/OVMF will use emulated flash, and fully support UEFI variables
     * Run qemu with: -pflash path/to/OVMF.fd
+    * Note that this option is required for running SecureBoot-enabled builds
+      (-D SECURE_BOOT_ENABLE).
   - Option 2: Use QEMU -bios parameter
     * Note that UEFI variables will be partially emulated, and non-volatile
       variables may lose their contents after a reboot

@@ -562,7 +562,7 @@
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   }
-  OvmfPkg/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !endif
 
   OvmfPkg/PlatformDxe/Platform.inf
