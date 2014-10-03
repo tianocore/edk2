@@ -73,39 +73,39 @@
   PathLib
 
 [Guids]
-  gShellVariableGuid                                      # ALWAYS_CONSUMED
-  gShellMapGuid                                           # ALWAYS_CONSUMED
-  gShellAliasGuid                                         # ALWAYS_CONSUMED
+  gShellVariableGuid                                      # ALWAYS_CONSUMES
+  gShellMapGuid                                           # ALWAYS_CONSUMES
+  gShellAliasGuid                                         # ALWAYS_CONSUMES
 
 [Protocols]
-  gEfiShellProtocolGuid                                   # ALWAYS_PRODUCED
-                                                          # SOMETIMES_CONSUMED
-  gEfiShellParametersProtocolGuid                         # ALWAYS_PRODUCED
-                                                          # SOMETIMES_CONSUMED
+  gEfiShellProtocolGuid                                   # ALWAYS_PRODUCES
+                                                          # SOMETIMES_CONSUMES
+  gEfiShellParametersProtocolGuid                         # ALWAYS_PRODUCES
+                                                          # SOMETIMES_CONSUMES
 
-#  gEfiShellEnvironment2Guid                               # SOMETIMES_PRODUCED
-#  gEfiShellInterfaceGuid                                  # SOMETIMES_PRODUCED
+#  gEfiShellEnvironment2Guid                               # SOMETIMES_PRODUCES
+#  gEfiShellInterfaceGuid                                  # SOMETIMES_PRODUCES
 
-  gEfiSimpleTextInputExProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiSimpleTextInProtocolGuid                            # ALWAYS_CONSUMED
-  gEfiSimpleTextOutProtocolGuid                           # ALWAYS_CONSUMED
-  gEfiSimpleFileSystemProtocolGuid                        # ALWAYS_CONSUMED
-  gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMED
-  gEfiComponentName2ProtocolGuid                          # ALWAYS_CONSUMED
-  gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                              # ALWAYS_CONSUMED
+  gEfiSimpleTextInputExProtocolGuid                       # ALWAYS_CONSUMES
+  gEfiSimpleTextInProtocolGuid                            # ALWAYS_CONSUMES
+  gEfiSimpleTextOutProtocolGuid                           # ALWAYS_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                        # ALWAYS_CONSUMES
+  gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMES
+  gEfiComponentName2ProtocolGuid                          # ALWAYS_CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMES
+  gEfiDevicePathProtocolGuid                              # ALWAYS_CONSUMES
 
 [Pcd]
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols  # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform   # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii  # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault     # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize    # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault    # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount       # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier             # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols  # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform   # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii  # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault     # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize    # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault    # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount       # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         # ALWAYS_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier             # ALWAYS_CONSUMES
 
