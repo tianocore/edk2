@@ -1,6 +1,7 @@
 /** @file
   Main entry point of editor
   
+  (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -241,7 +242,7 @@ ShellCommandRunHexEdit (
       //
       HMainEditorCleanup ();
 
-      if (!EFI_ERROR (Status)) {
+      if (EFI_ERROR (Status)) {
         if (ShellStatus == SHELL_SUCCESS) {
           ShellStatus = SHELL_UNSUPPORTED;
         }
