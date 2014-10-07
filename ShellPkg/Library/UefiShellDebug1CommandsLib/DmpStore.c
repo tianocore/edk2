@@ -335,7 +335,7 @@ AppendSingleVariableToFile (
   FreePool (Buffer);
 
   if (!EFI_ERROR (Status) && 
-      (BufferSize != sizeof (NameSize) + sizeof (DataSize) + sizeof (*Guid) + sizeof (Attributes) + NameSize + DataSize)
+      (BufferSize != sizeof (NameSize) + sizeof (DataSize) + sizeof (*Guid) + sizeof (Attributes) + NameSize + DataSize + sizeof (UINT32))
     ) {
     Status = EFI_DEVICE_ERROR;
   }
