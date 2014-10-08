@@ -507,7 +507,7 @@ ValidateAndMoveFiles(
     SHELL_FREE_NON_NULL(FullDestPath);
     FullDestPath = NULL;
     if (ShellIsDirectory(DestPath)==EFI_SUCCESS) {
-      CreateFullDestPath(&DestPath, &FullDestPath, Node->FileName);
+      CreateFullDestPath((CONST CHAR16 **)&DestPath, &FullDestPath, Node->FileName);
     }
 
     //
