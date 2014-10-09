@@ -459,7 +459,7 @@ ValidateAndMoveFiles(
   //
   // Get and validate the destination location
   //
-  ShellStatus = GetDestinationLocation(CleanFilePathStr, &DestPath, Cwd, FileList->Link.ForwardLink == FileList->Link.BackLink, &Attr);
+  ShellStatus = GetDestinationLocation(CleanFilePathStr, &DestPath, Cwd, (BOOLEAN)(FileList->Link.ForwardLink == FileList->Link.BackLink), &Attr);
   FreePool (CleanFilePathStr);
 
   if (ShellStatus != SHELL_SUCCESS) {
