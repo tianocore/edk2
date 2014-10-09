@@ -658,6 +658,14 @@ NotifyFwVolBlock (
     }
     ASSERT (FwVolHeader != NULL);
 
+    //
+    // Validate FV Header signature, if not as expected, continue.
+    //
+    if (FwVolHeader->Signature != EFI_FVH_SIGNATURE) {
+      CoreFreePool (FwVolHeader);
+      continue;
+    }
+
     if (!VerifyFvHeaderChecksum (FwVolHeader)) {
       CoreFreePool (FwVolHeader);
       continue;
