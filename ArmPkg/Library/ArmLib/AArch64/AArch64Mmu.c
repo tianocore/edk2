@@ -251,6 +251,7 @@ GetBlockEntryListFromAddress (
   UINTN   RootTableEntryCount;
   UINT64 *TranslationTable;
   UINT64 *BlockEntry;
+  UINT64 *SubTableBlockEntry;
   UINT64  BlockEntryAddress;
   UINTN   BaseAddressAlignment;
   UINTN   PageLevel;
@@ -382,17 +383,18 @@ GetBlockEntryListFromAddress (
         }
         TranslationTable = (UINT64*)((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
 
+        // Populate the newly created lower level table
+        SubTableBlockEntry = TranslationTable;
+        for (Index = 0; Index < TT_ENTRY_COUNT; Index++) {
+          *SubTableBlockEntry = Attributes | (BlockEntryAddress + (Index << TT_ADDRESS_OFFSET_AT_LEVEL(IndexLevel + 1)));
+          SubTableBlockEntry++;
+        }
+
         // Fill the BlockEntry with the new TranslationTable
         *BlockEntry = ((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE) | TableAttributes | TT_TYPE_TABLE_ENTRY;
         // Update the last block entry with the newly created translation table
         *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
 
-        // Populate the newly created lower level table
-        BlockEntry = TranslationTable;
-        for (Index = 0; Index < TT_ENTRY_COUNT; Index++) {
-          *BlockEntry = Attributes | (BlockEntryAddress + (Index << TT_ADDRESS_OFFSET_AT_LEVEL(IndexLevel + 1)));
-          BlockEntry++;
-        }
         // Block Entry points at the beginning of the Translation Table
         BlockEntry = TranslationTable;
       }
