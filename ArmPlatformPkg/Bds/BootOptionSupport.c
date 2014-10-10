@@ -18,6 +18,7 @@
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/DevicePathToText.h>
+#include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/PxeBaseCode.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/SimpleNetwork.h>
@@ -530,17 +531,19 @@ BdsLoadOptionMemMapList (
   IN OUT LIST_ENTRY* BdsLoadOptionList
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             HandleCount;
-  EFI_HANDLE                        *HandleBuffer;
-  UINTN                             DevicePathHandleCount;
-  EFI_HANDLE                        *DevicePathHandleBuffer;
-  BOOLEAN                           IsParent;
-  UINTN                             Index;
-  UINTN                             Index2;
-  BDS_SUPPORTED_DEVICE              *SupportedDevice;
-  EFI_DEVICE_PATH_PROTOCOL*         DevicePathProtocol;
-  EFI_DEVICE_PATH*                  DevicePath;
+  EFI_STATUS                          Status;
+  UINTN                               HandleCount;
+  EFI_HANDLE                         *HandleBuffer;
+  UINTN                               DevicePathHandleCount;
+  EFI_HANDLE                         *DevicePathHandleBuffer;
+  BOOLEAN                             IsParent;
+  UINTN                               Index;
+  UINTN                               Index2;
+  BDS_SUPPORTED_DEVICE               *SupportedDevice;
+  EFI_DEVICE_PATH_PROTOCOL*           DevicePathProtocol;
+  EFI_DEVICE_PATH*                    DevicePath;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL    *FileProtocol;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvbProtocol;
 
   // List all the BlockIo Protocols
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &HandleCount, &HandleBuffer);
@@ -549,7 +552,35 @@ BdsLoadOptionMemMapList (
   }
 
   for (Index = 0; Index < HandleCount; Index++) {
-    // We only select the handle WITH a Device Path AND not part of Media (to avoid duplication with HardDisk, CDROM, etc)
+    // We only select handles WITH a Device Path AND not part of Media (to
+    // avoid duplication with HardDisk, CDROM, etc). Skip handles used by
+    // Simple Filesystem or used for Variable Storage.
+
+
+    Status = gBS->HandleProtocol (HandleBuffer[Index],
+                                  &gEfiSimpleFileSystemProtocolGuid,
+                                  (VOID *)&FileProtocol);
+    if (!EFI_ERROR(Status)) {
+      // SimpleFilesystem supported on this handle, skip
+      continue;
+    }
+
+    Status = gBS->HandleProtocol (HandleBuffer[Index],
+                                  &gEfiFirmwareVolumeBlockProtocolGuid,
+                                  (VOID *)&FvbProtocol);
+    if (!EFI_ERROR(Status)) {
+      // Firmware Volme Block / Variable storage supported on this handle, skip
+      continue;
+    }
+
+    Status = gBS->HandleProtocol (HandleBuffer[Index],
+                                  &gEfiFirmwareVolumeBlock2ProtocolGuid,
+                                  (VOID *)&FvbProtocol);
+    if (!EFI_ERROR(Status)) {
+      // Firmware Volme Block / Variable storage supported on this handle, skip
+      continue;
+    }
+
     Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **)&DevicePathProtocol);
     if (!EFI_ERROR(Status)) {
       // BlockIo is not part of Media Device Path

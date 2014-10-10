@@ -61,6 +61,8 @@
   gEfiPxeBaseCodeProtocolGuid
   gEfiSimpleNetworkProtocolGuid
   gEfiDevicePathToTextProtocolGuid
+  gEfiFirmwareVolumeBlockProtocolGuid
+  gEfiFirmwareVolumeBlock2ProtocolGuid
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor
