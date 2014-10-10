@@ -2,7 +2,7 @@
 
    Internal functions to operate Working Block Space.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -128,7 +128,6 @@ InitWorkSpaceHeader (
 /**
   Read work space data from work block or spare block.
 
-  @param FtwDevice      The private data of FTW driver.
   @param FvBlock        FVB Protocol interface to access the block.
   @param BlockSize      The size of the block.
   @param Lba            Lba of the block.
