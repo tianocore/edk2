@@ -46,6 +46,7 @@
 
 [Pcd]
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress
+  gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
@@ -53,7 +54,6 @@
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
-  gArmTokenSpaceGuid.PcdArmPsciMethod
 
 [Protocols]
   gEfiDevicePathProtocolGuid

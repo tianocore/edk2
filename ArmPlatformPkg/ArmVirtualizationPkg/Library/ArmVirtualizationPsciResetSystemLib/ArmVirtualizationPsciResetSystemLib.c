@@ -2,11 +2,11 @@
   Support ResetSystem Runtime call using PSCI calls
 
   Note: A similar library is implemented in
-  ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationPsciResetSystemLib
-  So similar issues might exist in this implementation too.
+  ArmPkg/Library/ArmPsciResetSystemLib. Similar issues might
+  exist in this implementation too.
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -25,8 +25,21 @@
 #include <Library/DebugLib.h>
 #include <Library/EfiResetSystemLib.h>
 #include <Library/ArmSmcLib.h>
+#include <Library/ArmHvcLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
+
+STATIC UINT32 mArmPsciMethod;
+
+RETURN_STATUS
+EFIAPI
+ArmPsciResetSystemLibConstructor (
+  VOID
+  )
+{
+  mArmPsciMethod = PcdGet32 (PcdArmPsciMethod);
+  return RETURN_SUCCESS;
+}
 
 /**
   Resets the entire platform.
@@ -49,8 +62,10 @@ LibResetSystem (
   )
 {
   ARM_SMC_ARGS ArmSmcArgs;
+  ARM_HVC_ARGS ArmHvcArgs;
 
   switch (ResetType) {
+
   case EfiResetPlatformSpecific:
     // Map the platform specific reset as reboot
   case EfiResetWarm:
@@ -58,17 +73,31 @@ LibResetSystem (
   case EfiResetCold:
     // Send a PSCI 0.2 SYSTEM_RESET command
     ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
+    ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
     break;
   case EfiResetShutdown:
     // Send a PSCI 0.2 SYSTEM_OFF command
     ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
+    ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
     break;
   default:
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
-  ArmCallSmc (&ArmSmcArgs);
+  switch (mArmPsciMethod) {
+  case 1:
+    ArmCallHvc (&ArmHvcArgs);
+    break;
+
+  case 2:
+    ArmCallSmc (&ArmSmcArgs);
+    break;
+
+  default:
+    DEBUG ((EFI_D_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+    return EFI_UNSUPPORTED;
+  }
 
   // We should never be here
   DEBUG ((EFI_D_ERROR, "%a: PSCI Reset failed\n", __FUNCTION__));
