@@ -3,7 +3,7 @@
   These are the common Fault Tolerant Write (FTW) functions that are shared 
   by DXE FTW driver and SMM FTW driver.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -81,7 +81,6 @@ FtwAllocate (
   )
 {
   EFI_STATUS                      Status;
-  UINTN                           Length;
   UINTN                           Offset;
   EFI_FTW_DEVICE                  *FtwDevice;
   EFI_FAULT_TOLERANT_WRITE_HEADER *FtwHeader;
@@ -134,14 +133,14 @@ FtwAllocate (
   FtwHeader->PrivateDataSize  = PrivateDataSize;
   FtwHeader->HeaderAllocated  = FTW_VALID_STATE;
 
-  Length                      = sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER);
-  Status = FtwDevice->FtwFvBlock->Write (
-                                    FtwDevice->FtwFvBlock,
-                                    FtwDevice->FtwWorkSpaceLba,
-                                    FtwDevice->FtwWorkSpaceBase + Offset,
-                                    &Length,
-                                    (UINT8 *) FtwHeader
-                                    );
+  Status = WriteWorkSpaceData (
+             FtwDevice->FtwFvBlock,
+             FtwDevice->WorkBlockSize,
+             FtwDevice->FtwWorkSpaceLba,
+             FtwDevice->FtwWorkSpaceBase + Offset,
+             sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER),
+             (UINT8 *) FtwHeader
+             );
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
@@ -150,6 +149,7 @@ FtwAllocate (
   //
   Status = FtwUpdateFvState (
             FtwDevice->FtwFvBlock,
+            FtwDevice->WorkBlockSize,
             FtwDevice->FtwWorkSpaceLba,
             FtwDevice->FtwWorkSpaceBase + Offset,
             WRITES_ALLOCATED
@@ -170,13 +170,14 @@ FtwAllocate (
 
 
 /**
-  Write a record with fault tolerant mannaer.
+  Write a record with fault tolerant manner.
   Since the content has already backuped in spare block, the write is
   guaranteed to be completed with fault tolerant manner.
 
   @param This            The pointer to this protocol instance. 
   @param Fvb             The FVB protocol that provides services for
                          reading, writing, and erasing the target block.
+  @param BlockSize       The size of the block.
 
   @retval  EFI_SUCCESS          The function completed successfully
   @retval  EFI_ABORTED          The function could not complete successfully
@@ -185,7 +186,8 @@ FtwAllocate (
 EFI_STATUS
 FtwWriteRecord (
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL     *This,
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb,
+  IN UINTN                                 BlockSize
   )
 {
   EFI_STATUS                      Status;
@@ -193,11 +195,9 @@ FtwWriteRecord (
   EFI_FAULT_TOLERANT_WRITE_HEADER *Header;
   EFI_FAULT_TOLERANT_WRITE_RECORD *Record;
   UINTN                           Offset;
-  EFI_LBA                         WorkSpaceLbaOffset;
+  UINTN                           NumberOfWriteBlocks;
 
   FtwDevice = FTW_CONTEXT_FROM_THIS (This);
-
-  WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
 
   //
   // Spare Complete but Destination not complete,
@@ -218,8 +218,9 @@ FtwWriteRecord (
     Offset = (UINT8 *) Record - FtwDevice->FtwWorkSpace;
     Status = FtwUpdateFvState (
               FtwDevice->FtwBackupFvb,
-              FtwDevice->FtwSpareLba + WorkSpaceLbaOffset,
-              FtwDevice->FtwWorkSpaceBase + Offset,
+              FtwDevice->SpareBlockSize,
+              FtwDevice->FtwSpareLba + FtwDevice->FtwWorkSpaceLbaInSpare,
+              FtwDevice->FtwWorkSpaceBaseInSpare + Offset,
               SPARE_COMPLETED
               );
     if (EFI_ERROR (Status)) {
@@ -227,7 +228,7 @@ FtwWriteRecord (
     }
 
     Status = FlushSpareBlockToWorkingBlock (FtwDevice);
-  } else if (IsBootBlock (FtwDevice, Fvb, Record->Lba)) {
+  } else if (IsBootBlock (FtwDevice, Fvb)) {
     //
     // Update boot block
     //
@@ -236,7 +237,8 @@ FtwWriteRecord (
     //
     // Update blocks other than working block or boot block
     //
-    Status = FlushSpareBlockToTargetBlock (FtwDevice, Fvb, Record->Lba);
+    NumberOfWriteBlocks = FTW_BLOCKS ((UINTN) (Record->Offset + Record->Length), BlockSize);
+    Status = FlushSpareBlockToTargetBlock (FtwDevice, Fvb, Record->Lba, BlockSize, NumberOfWriteBlocks);
   }
 
   if (EFI_ERROR (Status)) {
@@ -248,6 +250,7 @@ FtwWriteRecord (
   Offset = (UINT8 *) Record - FtwDevice->FtwWorkSpace;
   Status = FtwUpdateFvState (
             FtwDevice->FtwFvBlock,
+            FtwDevice->WorkBlockSize,
             FtwDevice->FtwWorkSpaceLba,
             FtwDevice->FtwWorkSpaceBase + Offset,
             DEST_COMPLETED
@@ -266,6 +269,7 @@ FtwWriteRecord (
     Offset = (UINT8 *) Header - FtwDevice->FtwWorkSpace;
     Status = FtwUpdateFvState (
               FtwDevice->FtwFvBlock,
+              FtwDevice->WorkBlockSize,
               FtwDevice->FtwWorkSpaceLba,
               FtwDevice->FtwWorkSpaceBase + Offset,
               WRITES_COMPLETED
@@ -330,6 +334,10 @@ FtwWrite (
   UINTN                               Index;
   UINT8                               *Ptr;
   EFI_PHYSICAL_ADDRESS                FvbPhysicalAddress;
+  UINTN                               BlockSize;
+  UINTN                               NumberOfBlocks;
+  UINTN                               NumberOfWriteBlocks;
+  UINTN                               WriteLength;
 
   FtwDevice = FTW_CONTEXT_FROM_THIS (This);
 
@@ -383,12 +391,7 @@ FtwWrite (
   if ((Record->SpareComplete == FTW_VALID_STATE) && (Record->DestinationComplete != FTW_VALID_STATE)) {
     return EFI_NOT_READY;
   }
-  //
-  // Check if the input data can fit within the target block
-  //
-  if ((Offset + Length) > FtwDevice->SpareAreaLength) {
-    return EFI_BAD_BUFFER_SIZE;
-  }
+
   //
   // Get the FVB protocol by handle
   //
@@ -399,15 +402,39 @@ FtwWrite (
 
   Status = Fvb->GetPhysicalAddress (Fvb, &FvbPhysicalAddress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "FtwLite: Get FVB physical address - %r\n", Status));
+    DEBUG ((EFI_D_ERROR, "Ftw: Write(), Get FVB physical address - %r\n", Status));
     return EFI_ABORTED;
+  }
+
+  //
+  // Now, one FVB has one type of BlockSize.
+  //
+  Status = Fvb->GetBlockSize (Fvb, 0, &BlockSize, &NumberOfBlocks);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Ftw: Write(), Get block size - %r\n", Status));
+    return EFI_ABORTED;
+  }
+
+  NumberOfWriteBlocks = FTW_BLOCKS (Offset + Length, BlockSize);
+  DEBUG ((EFI_D_INFO, "Ftw: Write(), BlockSize - 0x%x, NumberOfWriteBlock - 0x%x\n", BlockSize, NumberOfWriteBlocks));
+  WriteLength = NumberOfWriteBlocks * BlockSize;
+
+  //
+  // Check if the input data can fit within the spare block.
+  //
+  if (WriteLength > FtwDevice->SpareAreaLength) {
+    return EFI_BAD_BUFFER_SIZE;
   }
 
   //
   // Set BootBlockUpdate FLAG if it's updating boot block.
   //
-  if (IsBootBlock (FtwDevice, Fvb, Lba)) {
+  if (IsBootBlock (FtwDevice, Fvb)) {
     Record->BootBlockUpdate = FTW_VALID_STATE;
+    //
+    // Boot Block and Spare Block should have same block size and block numbers.
+    //
+    ASSERT ((BlockSize == FtwDevice->SpareBlockSize) && (NumberOfWriteBlocks == FtwDevice->NumberOfSpareBlock));
   }
   //
   // Write the record to the work space.
@@ -415,7 +442,7 @@ FtwWrite (
   Record->Lba     = Lba;
   Record->Offset  = Offset;
   Record->Length  = Length;
-  Record->RelativeOffset = (INT64) (FvbPhysicalAddress + (UINTN) Lba * FtwDevice->BlockSize) - (INT64) FtwDevice->SpareAreaAddress;
+  Record->RelativeOffset = (INT64) (FvbPhysicalAddress + (UINTN) Lba * BlockSize) - (INT64) FtwDevice->SpareAreaAddress;
   if (PrivateData != NULL) {
     CopyMem ((Record + 1), PrivateData, (UINTN) Header->PrivateDataSize);
   }
@@ -423,13 +450,14 @@ FtwWrite (
   MyOffset  = (UINT8 *) Record - FtwDevice->FtwWorkSpace;
   MyLength  = FTW_RECORD_SIZE (Header->PrivateDataSize);
 
-  Status = FtwDevice->FtwFvBlock->Write (
-                                    FtwDevice->FtwFvBlock,
-                                    FtwDevice->FtwWorkSpaceLba,
-                                    FtwDevice->FtwWorkSpaceBase + MyOffset,
-                                    &MyLength,
-                                    (UINT8 *) Record
-                                    );
+  Status = WriteWorkSpaceData (
+             FtwDevice->FtwFvBlock,
+             FtwDevice->WorkBlockSize,
+             FtwDevice->FtwWorkSpaceLba,
+             FtwDevice->FtwWorkSpaceBase + MyOffset,
+             MyLength,
+             (UINT8 *) Record
+             );
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
@@ -439,7 +467,7 @@ FtwWrite (
   //
   // Allocate a memory buffer
   //
-  MyBufferSize  = FtwDevice->SpareAreaLength;
+  MyBufferSize  = WriteLength;
   MyBuffer      = AllocatePool (MyBufferSize);
   if (MyBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -448,8 +476,8 @@ FtwWrite (
   // Read all original data from target block to memory buffer
   //
   Ptr = MyBuffer;
-  for (Index = 0; Index < FtwDevice->NumberOfSpareBlock; Index += 1) {
-    MyLength  = FtwDevice->BlockSize;
+  for (Index = 0; Index < NumberOfWriteBlocks; Index += 1) {
+    MyLength  = BlockSize;
     Status    = Fvb->Read (Fvb, Lba + Index, 0, &MyLength, Ptr);
     if (EFI_ERROR (Status)) {
       FreePool (MyBuffer);
@@ -477,7 +505,7 @@ FtwWrite (
 
   Ptr = SpareBuffer;
   for (Index = 0; Index < FtwDevice->NumberOfSpareBlock; Index += 1) {
-    MyLength = FtwDevice->BlockSize;
+    MyLength = FtwDevice->SpareBlockSize;
     Status = FtwDevice->FtwBackupFvb->Read (
                                         FtwDevice->FtwBackupFvb,
                                         FtwDevice->FtwSpareLba + Index,
@@ -495,11 +523,16 @@ FtwWrite (
   }
   //
   // Write the memory buffer to spare block
+  // Do not assume Spare Block and Target Block have same block size
   //
   Status  = FtwEraseSpareBlock (FtwDevice);
   Ptr     = MyBuffer;
-  for (Index = 0; Index < FtwDevice->NumberOfSpareBlock; Index += 1) {
-    MyLength = FtwDevice->BlockSize;
+  for (Index = 0; MyBufferSize > 0; Index += 1) {
+    if (MyBufferSize > FtwDevice->SpareBlockSize) {
+      MyLength = FtwDevice->SpareBlockSize;
+    } else {
+      MyLength = MyBufferSize;
+    }
     Status = FtwDevice->FtwBackupFvb->Write (
                                         FtwDevice->FtwBackupFvb,
                                         FtwDevice->FtwSpareLba + Index,
@@ -514,6 +547,7 @@ FtwWrite (
     }
 
     Ptr += MyLength;
+    MyBufferSize -= MyLength;
   }
   //
   // Free MyBuffer
@@ -526,6 +560,7 @@ FtwWrite (
   MyOffset = (UINT8 *) Record - FtwDevice->FtwWorkSpace;
   Status = FtwUpdateFvState (
             FtwDevice->FtwFvBlock,
+            FtwDevice->WorkBlockSize,
             FtwDevice->FtwWorkSpaceLba,
             FtwDevice->FtwWorkSpaceBase + MyOffset,
             SPARE_COMPLETED
@@ -541,7 +576,7 @@ FtwWrite (
   //  Since the content has already backuped in spare block, the write is
   //  guaranteed to be completed with fault tolerant manner.
   //
-  Status = FtwWriteRecord (This, Fvb);
+  Status = FtwWriteRecord (This, Fvb, BlockSize);
   if (EFI_ERROR (Status)) {
     FreePool (SpareBuffer);
     return EFI_ABORTED;
@@ -552,7 +587,7 @@ FtwWrite (
   Status  = FtwEraseSpareBlock (FtwDevice);
   Ptr     = SpareBuffer;
   for (Index = 0; Index < FtwDevice->NumberOfSpareBlock; Index += 1) {
-    MyLength = FtwDevice->BlockSize;
+    MyLength = FtwDevice->SpareBlockSize;
     Status = FtwDevice->FtwBackupFvb->Write (
                                         FtwDevice->FtwBackupFvb,
                                         FtwDevice->FtwSpareLba + Index,
@@ -609,6 +644,8 @@ FtwRestart (
   EFI_FAULT_TOLERANT_WRITE_HEADER     *Header;
   EFI_FAULT_TOLERANT_WRITE_RECORD     *Record;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  UINTN                               BlockSize;
+  UINTN                               NumberOfBlocks;
 
   FtwDevice = FTW_CONTEXT_FROM_THIS (This);
 
@@ -627,6 +664,15 @@ FtwRestart (
   Status = FtwGetFvbByHandle (FvBlockHandle, &Fvb);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
+  }
+
+  //
+  // Now, one FVB has one type of BlockSize
+  //
+  Status = Fvb->GetBlockSize (Fvb, 0, &BlockSize, &NumberOfBlocks);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Ftw: Restart(), Get block size - %r\n", Status));
+    return EFI_ABORTED;
   }
 
   //
@@ -651,7 +697,7 @@ FtwRestart (
   //  Since the content has already backuped in spare block, the write is
   //  guaranteed to be completed with fault tolerant manner.
   //
-  Status = FtwWriteRecord (This, Fvb);
+  Status = FtwWriteRecord (This, Fvb, BlockSize);
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
@@ -706,6 +752,7 @@ FtwAbort (
   Offset = (UINT8 *) FtwDevice->FtwLastWriteHeader - FtwDevice->FtwWorkSpace;
   Status = FtwUpdateFvState (
             FtwDevice->FtwFvBlock,
+            FtwDevice->WorkBlockSize,
             FtwDevice->FtwWorkSpaceLba,
             FtwDevice->FtwWorkSpaceBase + Offset,
             WRITES_COMPLETED

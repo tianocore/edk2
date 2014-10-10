@@ -877,10 +877,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x0|UINT32|0x30000014
 
   ## Base address of the FTW working block range in flash device.
+  # If PcdFlashNvStorageFtwWorkingSize is larger than one block size, this value should be block size aligned.
   # @Prompt Base address of flash FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
 
   ## Size of the FTW working block range.
+  # If the value is less than one block size, the work space range should not span blocks.
+  # If the value is larger than one block size, it should be block size aligned.
   # @Prompt Size of flash FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
 
@@ -893,6 +896,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0x0|UINT64|0x80000013
 
   ## 64-bit Base address of the FTW working block range in flash device.
+  # If PcdFlashNvStorageFtwWorkingSize is larger than one block size, this value should be block size aligned.
   # @Prompt 64-bit Base address of flash FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0x0|UINT64|0x80000010
 

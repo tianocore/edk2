@@ -1,9 +1,9 @@
 /** @file
 
   The internal header file includes the common header files, defines
-  internal structure and functions used by FtwLite module.
+  internal structure and functions used by Ftw module.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -50,6 +50,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SPARE_COMPLETED   0x2
 #define DEST_COMPLETED    0x4
 
+#define FTW_BLOCKS(Length, BlockSize) ((UINTN) ((Length) / (BlockSize) + (((Length) & ((BlockSize) - 1)) ? 1 : 0)))
 
 #define FTW_DEVICE_SIGNATURE  SIGNATURE_32 ('F', 'T', 'W', 'D')
 
@@ -63,9 +64,11 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS                    WorkSpaceAddress;   // Base address of working space range in flash.
   EFI_PHYSICAL_ADDRESS                    SpareAreaAddress;   // Base address of spare range in flash.
   UINTN                                   WorkSpaceLength;    // Size of working space range in flash.
+  UINTN                                   NumberOfWorkSpaceBlock; // Number of the blocks in work block for work space.
+  UINTN                                   WorkBlockSize;      // Block size in bytes of the work blocks in flash
   UINTN                                   SpareAreaLength;    // Size of spare range in flash.
   UINTN                                   NumberOfSpareBlock; // Number of the blocks in spare block.
-  UINTN                                   BlockSize;          // Block size in bytes of the blocks in flash
+  UINTN                                   SpareBlockSize;     // Block size in bytes of the spare blocks in flash
   EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *FtwWorkSpaceHeader;// Pointer to Working Space Header in memory buffer
   EFI_FAULT_TOLERANT_WRITE_HEADER         *FtwLastWriteHeader;// Pointer to last record header in memory buffer
   EFI_FAULT_TOLERANT_WRITE_RECORD         *FtwLastWriteRecord;// Pointer to last record in memory buffer
@@ -73,9 +76,12 @@ typedef struct {
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *FtwBackupFvb;      // FVB of spare block
   EFI_LBA                                 FtwSpareLba;        // Start LBA of spare block
   EFI_LBA                                 FtwWorkBlockLba;    // Start LBA of working block that contains working space in its last block.
+  UINTN                                   NumberOfWorkBlock;  // Number of the blocks in work block.
   EFI_LBA                                 FtwWorkSpaceLba;    // Start LBA of working space
   UINTN                                   FtwWorkSpaceBase;   // Offset into the FtwWorkSpaceLba block.
   UINTN                                   FtwWorkSpaceSize;   // Size of working space range that stores write record.
+  EFI_LBA                                 FtwWorkSpaceLbaInSpare; // Start LBA of working space in spare block.
+  UINTN                                   FtwWorkSpaceBaseInSpare;// Offset into the FtwWorkSpaceLbaInSpare block.
   UINT8                                   *FtwWorkSpace;      // Point to Work Space in memory buffer 
   //
   // Following a buffer of FtwWorkSpace[FTW_WORK_SPACE_SIZE],
@@ -335,7 +341,6 @@ IsWorkingBlock (
 
   @param FtwDevice       The private data of FTW driver
   @param FvBlock         Fvb protocol instance
-  @param Lba             The block specified
 
   @return A BOOLEAN value indicating in boot block or not.
 
@@ -343,19 +348,20 @@ IsWorkingBlock (
 BOOLEAN
 IsBootBlock (
   EFI_FTW_DEVICE                      *FtwDevice,
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
-  EFI_LBA                             Lba
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock
   );
 
 /**
   Copy the content of spare block to a target block. Size is FTW_BLOCK_SIZE.
-  Spare block is accessed by FTW backup FVB protocol interface. LBA is 1.
-  Target block is accessed by FvbBlock protocol interface. LBA is Lba.
+  Spare block is accessed by FTW backup FVB protocol interface.
+  Target block is accessed by FvBlock protocol interface.
 
 
   @param FtwDevice       The private data of FTW driver
   @param FvBlock         FVB Protocol interface to access target block
   @param Lba             Lba of the target block
+  @param BlockSize       The size of the block
+  @param NumberOfBlocks  The number of consecutive blocks starting with Lba
 
   @retval  EFI_SUCCESS               Spare block content is copied to target block
   @retval  EFI_INVALID_PARAMETER     Input parameter error
@@ -367,7 +373,9 @@ EFI_STATUS
 FlushSpareBlockToTargetBlock (
   EFI_FTW_DEVICE                      *FtwDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
-  EFI_LBA                             Lba
+  EFI_LBA                             Lba,
+  UINTN                               BlockSize,
+  UINTN                               NumberOfBlocks
   );
 
 /**
@@ -395,8 +403,8 @@ FlushSpareBlockToWorkingBlock (
 
 /**
   Copy the content of spare block to a boot block. Size is FTW_BLOCK_SIZE.
-  Spare block is accessed by FTW working FVB protocol interface. LBA is 1.
-  Target block is accessed by FvbBlock protocol interface. LBA is Lba.
+  Spare block is accessed by FTW working FVB protocol interface.
+  Target block is accessed by FvBlock protocol interface.
 
   FTW will do extra work on boot block update.
   FTW should depend on a protocol of EFI_ADDRESS_RANGE_SWAP_PROTOCOL,
@@ -405,7 +413,7 @@ FlushSpareBlockToWorkingBlock (
   1. GetRangeLocation(), if the Range is inside the boot block, FTW know
   that boot block will be update. It shall add a FLAG in the working block.
   2. When spare block is ready,
-  3. SetSwapState(EFI_SWAPPED)
+  3. SetSwapState(SWAPPED)
   4. erasing boot block,
   5. programming boot block until the boot block is ok.
   6. SetSwapState(UNSWAPPED)
@@ -431,6 +439,7 @@ FlushSpareBlockToBootBlock (
 
 
   @param FvBlock         FVB Protocol interface to access SrcBlock and DestBlock
+  @param BlockSize       The size of the block
   @param Lba             Lba of a block
   @param Offset          Offset on the Lba
   @param NewBit          New value that will override the old value if it can be change
@@ -445,6 +454,7 @@ FlushSpareBlockToBootBlock (
 EFI_STATUS
 FtwUpdateFvState (
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
+  IN UINTN                               BlockSize,
   IN EFI_LBA                             Lba,
   IN UINTN                               Offset,
   IN UINT8                               NewBit
@@ -614,7 +624,7 @@ FtwReclaimWorkSpace (
 
 /**
 
-  Get firmware block by address.
+  Get firmware volume block by address.
 
 
   @param Address         Address specified the block
@@ -707,5 +717,53 @@ VOID
 InitializeLocalWorkSpaceHeader (
   VOID
   );
- 
+
+/**
+  Read work space data from work block or spare block.
+
+  @param FvBlock        FVB Protocol interface to access the block.
+  @param BlockSize      The size of the block.
+  @param Lba            Lba of the block.
+  @param Offset         The offset within the block.
+  @param Length         The number of bytes to read from the block.
+  @param Buffer         The data is read.
+
+  @retval EFI_SUCCESS   The function completed successfully.
+  @retval EFI_ABORTED   The function could not complete successfully.
+
+**/
+EFI_STATUS
+ReadWorkSpaceData (
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvBlock,
+  IN UINTN                              BlockSize,
+  IN EFI_LBA                            Lba,
+  IN UINTN                              Offset,
+  IN UINTN                              Length,
+  OUT UINT8                             *Buffer
+  );
+
+/**
+  Write data to work block.
+
+  @param FvBlock        FVB Protocol interface to access the block.
+  @param BlockSize      The size of the block.
+  @param Lba            Lba of the block.
+  @param Offset         The offset within the block to place the data.
+  @param Length         The number of bytes to write to the block.
+  @param Buffer         The data to write.
+
+  @retval EFI_SUCCESS   The function completed successfully.
+  @retval EFI_ABORTED   The function could not complete successfully.
+
+**/
+EFI_STATUS
+WriteWorkSpaceData (
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvBlock,
+  IN UINTN                              BlockSize,
+  IN EFI_LBA                            Lba,
+  IN UINTN                              Offset,
+  IN UINTN                              Length,
+  IN UINT8                              *Buffer
+  );
+
 #endif
