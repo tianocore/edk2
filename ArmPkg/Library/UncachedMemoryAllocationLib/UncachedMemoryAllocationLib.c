@@ -3,6 +3,7 @@
   a buffer.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2014, AMR Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -46,59 +47,227 @@ UncachedInternalAllocateAlignedPages (
 UINT64  gAttributes;
 
 typedef struct {
-  VOID        *Allocation;
-  UINTN       Pages;
-  LIST_ENTRY  Link;
+  EFI_PHYSICAL_ADDRESS  Base;
+  VOID                  *Allocation;
+  UINTN                 Pages;
+  EFI_MEMORY_TYPE       MemoryType;
+  BOOLEAN               Allocated;
+  LIST_ENTRY            Link;
 } FREE_PAGE_NODE;
 
-LIST_ENTRY  mPageList = INITIALIZE_LIST_HEAD_VARIABLE (mPageList);
+STATIC LIST_ENTRY  mPageList = INITIALIZE_LIST_HEAD_VARIABLE (mPageList);
+// Track the size of the non-allocated buffer in the linked-list
+STATIC UINTN   mFreedBufferSize = 0;
 
-VOID
-AddPagesToList (
-  IN VOID   *Allocation,
-  UINTN     Pages
+/**
+ * This function firstly checks if the requested allocation can fit into one
+ * of the previously allocated buffer.
+ * If the requested allocation does not fit in the existing pool then
+ * the function makes a new allocation.
+ *
+ * @param MemoryType    Type of memory requested for the new allocation
+ * @param Pages         Number of requested page
+ * @param Alignment     Required alignment
+ * @param Allocation    Address of the newly allocated buffer
+ *
+ * @return EFI_SUCCESS  If the function manage to allocate a buffer
+ * @return !EFI_SUCCESS If the function did not manage to allocate a buffer
+ */
+STATIC
+EFI_STATUS
+AllocatePagesFromList (
+  IN EFI_MEMORY_TYPE  MemoryType,
+  IN UINTN            Pages,
+  IN UINTN            Alignment,
+  OUT VOID            **Allocation
   )
 {
+  EFI_STATUS       Status;
+  LIST_ENTRY      *Link;
+  FREE_PAGE_NODE  *Node;
   FREE_PAGE_NODE  *NewNode;
+  UINTN            AlignmentMask;
+  EFI_PHYSICAL_ADDRESS Memory;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
 
-  NewNode = AllocatePool (sizeof (LIST_ENTRY));
-  if (NewNode == NULL) {
-    ASSERT (FALSE);
-    return;
+  // Alignment must be a power of two or zero.
+  ASSERT ((Alignment & (Alignment - 1)) == 0);
+
+  //
+  // Look in our list for the smallest page that could satisfy the new allocation
+  //
+  NewNode = NULL;
+  for (Link = mPageList.ForwardLink; Link != &mPageList; Link = Link->ForwardLink) {
+    Node = BASE_CR (Link, FREE_PAGE_NODE, Link);
+    if ((Node->Allocated == FALSE) && (Node->MemoryType == MemoryType)) {
+      // We have a node that fits our requirements
+      if (((UINTN)Node->Base & (Alignment - 1)) == 0) {
+        // We found a page that matches the page size
+        if (Node->Pages == Pages) {
+          Node->Allocated  = TRUE;
+          Node->Allocation = (VOID*)(UINTN)Node->Base;
+          *Allocation      = Node->Allocation;
+
+          // Update the size of the freed buffer
+          mFreedBufferSize  -= Pages * EFI_PAGE_SIZE;
+          return EFI_SUCCESS;
+        } else if (Node->Pages > Pages) {
+          if (NewNode == NULL) {
+            // It is the first node that could contain our new allocation
+            NewNode = Node;
+          } else if (NewNode->Pages > Node->Pages) {
+            // This node offers a smaller number of page.
+            NewNode = Node;
+          }
+        }
+      }
+    }
+  }
+  // Check if we have found a node that could contain our new allocation
+  if (NewNode != NULL) {
+    NewNode->Allocated = TRUE;
+    Node->Allocation   = (VOID*)(UINTN)Node->Base;
+    *Allocation        = Node->Allocation;
+    return EFI_SUCCESS;
   }
 
-  NewNode->Allocation = Allocation;
+  //
+  // Otherwise, we need to allocate a new buffer
+  //
+
+  // We do not want to over-allocate in case the alignment requirement does not
+  // require extra pages
+  if (Alignment > EFI_PAGE_SIZE) {
+    AlignmentMask  = Alignment - 1;
+    Pages          += EFI_SIZE_TO_PAGES (Alignment);
+  } else {
+    AlignmentMask  = 0;
+  }
+
+  Status = gBS->AllocatePages (AllocateAnyPages, MemoryType, Pages, &Memory);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gDS->GetMemorySpaceDescriptor (Memory, &Descriptor);
+  if (!EFI_ERROR (Status)) {
+    // We are making an assumption that all of memory has the same default attributes
+    gAttributes = Descriptor.Attributes;
+  } else {
+    gBS->FreePages (Memory, Pages);
+    return Status;
+  }
+
+  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_WC);
+  if (EFI_ERROR (Status)) {
+    gBS->FreePages (Memory, Pages);
+    return Status;
+  }
+
+  NewNode = AllocatePool (sizeof (FREE_PAGE_NODE));
+  if (NewNode == NULL) {
+    ASSERT (FALSE);
+    gBS->FreePages (Memory, Pages);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  NewNode->Base       = Memory;
+  NewNode->Allocation = (VOID*)(((UINTN)Memory + AlignmentMask) & ~AlignmentMask);
   NewNode->Pages      = Pages;
+  NewNode->Allocated  = TRUE;
+  NewNode->MemoryType = MemoryType;
 
   InsertTailList (&mPageList, &NewNode->Link);
+
+  *Allocation = NewNode->Allocation;
+  return EFI_SUCCESS;
 }
 
+/**
+ * Free the memory allocation
+ *
+ * This function will actually try to find the allocation in the linked list.
+ * And it will then mark the entry as freed.
+ *
+ * @param  Allocation  Base address of the buffer to free
+ *
+ * @return EFI_SUCCESS            The allocation has been freed
+ * @return EFI_NOT_FOUND          The allocation was not found in the pool.
+ * @return EFI_INVALID_PARAMETER  If Allocation is NULL
+ *
+ */
+STATIC
+EFI_STATUS
+FreePagesFromList (
+  IN  VOID  *Allocation
+  )
+{
+  LIST_ENTRY      *Link;
+  FREE_PAGE_NODE  *Node;
 
-VOID
-RemovePagesFromList (
-  OUT VOID  *Allocation,
-  OUT UINTN *Pages
+  if (Allocation == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Link = mPageList.ForwardLink; Link != &mPageList; Link = Link->ForwardLink) {
+    Node = BASE_CR (Link, FREE_PAGE_NODE, Link);
+    if ((UINTN)Node->Allocation == (UINTN)Allocation) {
+      Node->Allocated = FALSE;
+
+      // Update the size of the freed buffer
+      mFreedBufferSize  += Node->Pages * EFI_PAGE_SIZE;
+
+      // If the size of the non-allocated reaches the threshold we raise a warning.
+      // It might be an expected behaviour in some cases.
+      // We might device to free some of these buffers later on.
+      if (mFreedBufferSize > PcdGet64 (PcdArmFreeUncachedMemorySizeThreshold)) {
+        DEBUG ((EFI_D_WARN, "Warning: The list of non-allocated buffer has reach the threshold.\n"));
+      }
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+ * This function is automatically invoked when the driver exits
+ * It frees all the non-allocated memory buffer.
+ * This function is not responsible to free allocated buffer (eg: case of memory leak,
+ * runtime allocation).
+ */
+EFI_STATUS
+EFIAPI
+UncachedMemoryAllocationLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   LIST_ENTRY      *Link;
   FREE_PAGE_NODE  *OldNode;
 
-  *Pages = 0;
-
-  for (Link = mPageList.ForwardLink; Link != &mPageList; Link = Link->ForwardLink) {
-    OldNode = BASE_CR (Link, FREE_PAGE_NODE, Link);
-    if (OldNode->Allocation == Allocation) {
-      *Pages = OldNode->Pages;
-
-      RemoveEntryList (&OldNode->Link);
-      FreePool (OldNode);
-      return;
-    }
+  // Test if the list is empty
+  Link = mPageList.ForwardLink;
+  if (Link == &mPageList) {
+    return EFI_SUCCESS;
   }
 
-  return;
-}
+  // Free all the pages and nodes
+  do {
+    OldNode = BASE_CR (Link, FREE_PAGE_NODE, Link);
+    // Point to the next entry
+    Link = Link->ForwardLink;
 
+    // We only free the non-allocated buffer
+    if (OldNode->Allocated == FALSE) {
+      gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)OldNode->Base, OldNode->Pages);
+      RemoveEntryList (&OldNode->Link);
+      FreePool (OldNode);
+    }
+  } while (Link != &mPageList);
+
+  return EFI_SUCCESS;
+}
 
 /**
   Converts a cached or uncached address to a physical address suitable for use in SoC registers.
@@ -175,76 +344,21 @@ UncachedInternalAllocateAlignedPages (
   IN UINTN            Alignment
   )
 {
-  EFI_STATUS                        Status;
-  EFI_PHYSICAL_ADDRESS              Memory;
-  EFI_PHYSICAL_ADDRESS              AlignedMemory;
-  UINTN                             AlignmentMask;
-  UINTN                             UnalignedPages;
-  UINTN                             RealPages;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR   Descriptor;
-
-  //
-  // Alignment must be a power of two or zero.
-  //
-  ASSERT ((Alignment & (Alignment - 1)) == 0);
+  EFI_STATUS Status;
+  VOID   *Allocation;
 
   if (Pages == 0) {
     return NULL;
   }
-  if (Alignment > EFI_PAGE_SIZE) {
-    //
-    // Caculate the total number of pages since alignment is larger than page size.
-    //
-    AlignmentMask  = Alignment - 1;
-    RealPages      = Pages + EFI_SIZE_TO_PAGES (Alignment);
-    //
-    // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
-    //
-    ASSERT (RealPages > Pages);
 
-    Status         = gBS->AllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
-    if (EFI_ERROR (Status)) {
-      return NULL;
-    }
-    AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
-    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN) Memory);
-    if (UnalignedPages > 0) {
-      //
-      // Free first unaligned page(s).
-      //
-      Status = gBS->FreePages (Memory, UnalignedPages);
-      ASSERT_EFI_ERROR (Status);
-    }
-    Memory         = (EFI_PHYSICAL_ADDRESS) (AlignedMemory + EFI_PAGES_TO_SIZE (Pages));
-    UnalignedPages = RealPages - Pages - UnalignedPages;
-    if (UnalignedPages > 0) {
-      //
-      // Free last unaligned page(s).
-      //
-      Status = gBS->FreePages (Memory, UnalignedPages);
-      ASSERT_EFI_ERROR (Status);
-    }
+  Allocation = NULL;
+  Status = AllocatePagesFromList (MemoryType, Pages, Alignment, &Allocation);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return NULL;
   } else {
-    //
-    // Do not over-allocate pages in this case.
-    //
-    Status = gBS->AllocatePages (AllocateAnyPages, MemoryType, Pages, &Memory);
-    if (EFI_ERROR (Status)) {
-      return NULL;
-    }
-    AlignedMemory  = (UINTN) Memory;
+    return Allocation;
   }
-
-  Status = gDS->GetMemorySpaceDescriptor (Memory, &Descriptor);
-  if (!EFI_ERROR (Status)) {
-    // We are making an assumption that all of memory has the same default attributes
-    gAttributes = Descriptor.Attributes;
-  }
-
-  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_WC);
-  ASSERT_EFI_ERROR (Status);
-
-  return (VOID *)(UINTN)Memory;
 }
 
 
@@ -255,19 +369,8 @@ UncachedFreeAlignedPages (
   IN UINTN  Pages
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Memory;
-
-  ASSERT (Pages != 0);
-
-  Memory = (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer;
-  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), gAttributes);
-
-  Status = gBS->FreePages (Memory, Pages);
-  ASSERT_EFI_ERROR (Status);
+  FreePagesFromList (Buffer);
 }
-
-
 
 
 VOID *
@@ -292,8 +395,6 @@ UncachedInternalAllocateAlignedPool (
   if (AlignedAddress == NULL) {
     return NULL;
   }
-
-  AddPagesToList ((VOID *)(UINTN)AlignedAddress, EFI_SIZE_TO_PAGES (AllocationSize));
 
   return (VOID *) AlignedAddress;
 }
@@ -432,11 +533,7 @@ UncachedFreeAlignedPool (
   IN VOID   *Allocation
   )
 {
-  UINTN   Pages;
-
-  RemovePagesFromList (Allocation, &Pages);
-
-  UncachedFreePages (Allocation, Pages);
+  UncachedFreePages (Allocation, 0);
 }
 
 VOID *

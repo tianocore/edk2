@@ -23,6 +23,8 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = UncachedMemoryAllocationLib
 
+  DESTRUCTOR                     = UncachedMemoryAllocationLibDestructor
+
 [Sources.common]
   UncachedMemoryAllocationLib.c
 
@@ -34,5 +36,8 @@
   BaseLib
   ArmLib
   MemoryAllocationLib
+  PcdLib
   DxeServicesTableLib
 
+[Pcd]
+  gArmTokenSpaceGuid.PcdArmFreeUncachedMemorySizeThreshold
