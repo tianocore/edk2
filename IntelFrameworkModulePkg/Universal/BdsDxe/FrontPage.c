@@ -741,66 +741,66 @@ UpdateFrontPageStrings (
                   NULL,
                   (VOID **) &Smbios
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (!EFI_ERROR (Status)) {
+    SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
+    do {
+      Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
+      if (EFI_ERROR(Status)) {
+        break;
+      }
 
-  SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
-  do {
-    Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
-    if (EFI_ERROR(Status)) {
-      break;
-    }
+      if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
+        Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
+        StrIndex = Type0Record->BiosVersion;
+        GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length), StrIndex, &NewString);
+        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
+        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        FreePool (NewString);
+        Find[0] = TRUE;
+      }
 
-    if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
-      Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
-      StrIndex = Type0Record->BiosVersion;
-      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length), StrIndex, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[0] = TRUE;
-    }  
+      if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
+        Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
+        StrIndex = Type1Record->ProductName;
+        GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length), StrIndex, &NewString);
+        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
+        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        FreePool (NewString);
+        Find[1] = TRUE;
+      }
 
-    if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
-      Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
-      StrIndex = Type1Record->ProductName;
-      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length), StrIndex, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[1] = TRUE;
-    }
-      
-    if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
-      Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
-      StrIndex = Type4Record->ProcessorVersion;
-      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type4Record + Type4Record->Hdr.Length), StrIndex, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[2] = TRUE;
-    }    
+      if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
+        Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
+        StrIndex = Type4Record->ProcessorVersion;
+        GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type4Record + Type4Record->Hdr.Length), StrIndex, &NewString);
+        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
+        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        FreePool (NewString);
+        Find[2] = TRUE;
+      }
 
-    if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
-      Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
-      ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[3] = TRUE;
-    } 
+      if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
+        Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
+        ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
+        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
+        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        FreePool (NewString);
+        Find[3] = TRUE;
+      }
 
-    if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
-      Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
-      ConvertMemorySizeToString (
-        (UINT32)(RShiftU64((Type19Record->EndingAddress - Type19Record->StartingAddress + 1), 10)),
-        &NewString
-        );
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[4] = TRUE;  
-    }
-  } while ( !(Find[0] && Find[1] && Find[2] && Find[3] && Find[4]));
+      if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
+        Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
+        ConvertMemorySizeToString (
+          (UINT32)(RShiftU64((Type19Record->EndingAddress - Type19Record->StartingAddress + 1), 10)),
+          &NewString
+          );
+        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE);
+        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        FreePool (NewString);
+        Find[4] = TRUE;
+      }
+    } while ( !(Find[0] && Find[1] && Find[2] && Find[3] && Find[4]));
+  }
   return ;
 }
 
