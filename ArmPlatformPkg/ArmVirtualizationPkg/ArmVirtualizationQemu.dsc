@@ -48,6 +48,13 @@
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
+!ifdef INTEL_BDS
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  PlatformBdsLib|ArmPlatformPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+!endif
+
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
@@ -138,6 +145,10 @@
 
   # initial location of the device tree blob passed by QEMU -- base of DRAM
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x40000000
+
+!ifdef INTEL_BDS
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+!endif
 
 [PcdsDynamicDefault.common]
   # System Memory Size -- 1 MB initially, actual size will be fetched from DT
@@ -245,7 +256,13 @@
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+!ifdef INTEL_BDS
+  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+!else
   ArmPlatformPkg/Bds/Bds.inf
+!endif
 
   #
   # SCSI Bus and Disk Driver

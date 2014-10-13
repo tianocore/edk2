@@ -161,7 +161,13 @@ READ_LOCK_STATUS   = TRUE
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+!ifdef INTEL_BDS
+  INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+!else
   INF ArmPlatformPkg/Bds/Bds.inf
+!endif
 
   #
   # Networking stack
