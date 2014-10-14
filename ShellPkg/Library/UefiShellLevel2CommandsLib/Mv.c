@@ -25,7 +25,6 @@
   @retval TRUE            The move is across file system.
   @retval FALSE           The move is within a file system.
 **/
-STATIC
 BOOLEAN
 EFIAPI
 IsBetweenFileSystem(
@@ -69,17 +68,16 @@ IsBetweenFileSystem(
 
   if the move is invalid this function will report the error to StdOut.
 
-  @param FullName [in]    The name of the file to move.
-  @param Cwd      [in]    The current working directory
-  @param DestPath [in]    The target location to move to
-  @param Attribute[in]    The Attribute of the file
-  @param DestAttr [in]    The Attribute of the destination
-  @param FileStatus[in]   The Status of the file when opened
+  @param SourcePath [in]    The name of the file to move.
+  @param Cwd        [in]    The current working directory
+  @param DestPath   [in]    The target location to move to
+  @param Attribute  [in]    The Attribute of the file
+  @param DestAttr   [in]    The Attribute of the destination
+  @param FileStatus [in]    The Status of the file when opened
 
   @retval TRUE        The move is valid
   @retval FALSE       The move is not
 **/
-STATIC
 BOOLEAN
 EFIAPI
 IsValidMove(
@@ -152,13 +150,14 @@ IsValidMove(
   @param[in] DestParameter               The original path to the destination.
   @param[in, out] DestPathPointer  A pointer to the callee allocated final path.
   @param[in] Cwd                   A pointer to the current working directory.
+  @param[in] SingleSource          TRUE to have only one source file.
+  @param[in, out] DestAttr         A pointer to the destination information attribute.
 
   @retval SHELL_INVALID_PARAMETER  The DestParameter could not be resolved to a location.
   @retval SHELL_INVALID_PARAMETER  The DestParameter could be resolved to more than 1 location.
   @retval SHELL_INVALID_PARAMETER  Cwd is required and is NULL.
   @retval SHELL_SUCCESS            The operation was sucessful.
 **/
-STATIC
 SHELL_STATUS
 EFIAPI
 GetDestinationLocation(
@@ -275,6 +274,15 @@ GetDestinationLocation(
   return (SHELL_SUCCESS);
 }
 
+/**
+  Function to do a move across file systems.
+
+  @param[in] Node               A pointer to the file to be removed.
+  @param[in] DestPath           A pointer to the destination file path.
+  @param[out] Resp              A pointer to response from question.  Pass back on looped calling
+
+  @retval SHELL_SUCCESS     The source file was moved to the destination.
+**/
 EFI_STATUS
 EFIAPI
 MoveBetweenFileSystems(
@@ -304,6 +312,17 @@ MoveBetweenFileSystems(
   return (Status);
 }
 
+/**
+  Function to take the destination path and target file name to generate the full destination path.
+
+  @param[in] DestPath           A pointer to the destination file path string.
+  @param[out] FullDestPath      A pointer to the full destination path string.
+  @param[in] FileName           Name string of  the targe file.
+
+  @retval SHELL_SUCCESS             the files were all moved.
+  @retval SHELL_INVALID_PARAMETER   a parameter was invalid
+  @retval SHELL_OUT_OF_RESOURCES    a memory allocation failed
+**/
 EFI_STATUS
 EFIAPI
 CreateFullDestPath(
@@ -333,6 +352,16 @@ CreateFullDestPath(
   return (EFI_SUCCESS);
 }
 
+/**
+  Function to do a move within a file system.
+
+  @param[in] Node               A pointer to the file to be removed.
+  @param[in] DestPath           A pointer to the destination file path.
+  @param[out] Resp              A pointer to response from question.  Pass back on looped calling.
+
+  @retval SHELL_SUCCESS           The source file was moved to the destination.
+  @retval SHELL_OUT_OF_RESOURCES  A memory allocation failed.
+**/
 EFI_STATUS
 EFIAPI
 MoveWithinFileSystems(
@@ -414,7 +443,6 @@ MoveWithinFileSystems(
   @retval SHELL_WRITE_PROTECTED     the destination was write protected
   @retval SHELL_OUT_OF_RESOURCES    a memory allocation failed
 **/
-STATIC
 SHELL_STATUS
 EFIAPI
 ValidateAndMoveFiles(
@@ -513,17 +541,17 @@ ValidateAndMoveFiles(
     //
     // Validate that the move is valid
     //
-    if (!IsValidMove(Node->FullName, Cwd, FullDestPath?FullDestPath:DestPath, Node->Info->Attribute, Attr, Node->Status)) {
+    if (!IsValidMove(Node->FullName, Cwd, FullDestPath!=NULL? FullDestPath:DestPath, Node->Info->Attribute, Attr, Node->Status)) {
       ShellStatus = SHELL_INVALID_PARAMETER;
       continue;
     }
 
-    ShellPrintEx(-1, -1, HiiOutput, Node->FullName, FullDestPath?FullDestPath:DestPath);
+    ShellPrintEx(-1, -1, HiiOutput, Node->FullName, FullDestPath!=NULL? FullDestPath:DestPath);
 
     //
     // See if destination exists
     //
-    if (!EFI_ERROR(ShellFileExists(FullDestPath?FullDestPath:DestPath))) {
+    if (!EFI_ERROR(ShellFileExists(FullDestPath!=NULL? FullDestPath:DestPath))) {
       if (Response == NULL) {
         ShellPromptForResponseHii(ShellPromptResponseTypeYesNoAllCancel, STRING_TOKEN (STR_GEN_DEST_EXIST_OVR), gShellLevel2HiiHandle, &Response);
       }
@@ -549,14 +577,14 @@ ValidateAndMoveFiles(
           FreePool(Response);
           return SHELL_ABORTED;
       }
-      Status = ShellDeleteFileByName(FullDestPath?FullDestPath:DestPath);
+      Status = ShellDeleteFileByName(FullDestPath!=NULL? FullDestPath:DestPath);
     }
 
     if (IsBetweenFileSystem(Node->FullName, Cwd, DestPath)) {
       while (FullDestPath == NULL && DestPath != NULL && DestPath[0] != CHAR_NULL && DestPath[StrLen(DestPath) - 1] == L'\\') {
         DestPath[StrLen(DestPath) - 1] = CHAR_NULL;
       }
-      Status = MoveBetweenFileSystems(Node, FullDestPath?FullDestPath:DestPath, &Response);
+      Status = MoveBetweenFileSystems(Node, FullDestPath!=NULL? FullDestPath:DestPath, &Response);
     } else {
       Status = MoveWithinFileSystems(Node, DestPath, &Response);
     }
