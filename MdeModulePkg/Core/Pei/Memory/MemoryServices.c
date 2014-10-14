@@ -178,16 +178,20 @@ PeiAllocatePages (
   // Check to see if on 4k boundary, If not aligned, make the allocation aligned.
   //
   *(FreeMemoryTop) -= *(FreeMemoryTop) & 0xFFF;
-  
+
   //
-  // Verify that there is sufficient memory to satisfy the allocation
+  // Verify that there is sufficient memory to satisfy the allocation.
+  // For page allocation, the overhead sizeof (EFI_HOB_MEMORY_ALLOCATION) needs to be considered.
   //
-  RemainingPages = (UINTN)(*FreeMemoryTop - *FreeMemoryBottom) >> EFI_PAGE_SHIFT;
+  if ((UINTN) (*FreeMemoryTop - *FreeMemoryBottom) < (UINTN) ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION), 8)) {
+    DEBUG ((EFI_D_ERROR, "AllocatePages failed: No space to build memory allocation hob.\n"));
+    return  EFI_OUT_OF_RESOURCES;
+  }
+  RemainingPages = (UINTN)(*FreeMemoryTop - *FreeMemoryBottom - ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION), 8)) >> EFI_PAGE_SHIFT;
   //
-  // For page allocation, the overhead sizeof (EFI_HOB_MEMORY_ALLOCATION) needs one extra page.
-  // So the number of remaining pages needs to be greater than that of the request pages.
+  // The number of remaining pages needs to be greater than or equal to that of the request pages.
   //
-  if (RemainingPages <= Pages) {
+  if (RemainingPages < Pages) {
     DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64) Pages));
     DEBUG ((EFI_D_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64) RemainingPages));
     return  EFI_OUT_OF_RESOURCES;
