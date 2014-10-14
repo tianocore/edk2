@@ -256,6 +256,9 @@
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
+!ifdef $(FIRMWARE_VER)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
+!endif
 
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"VExpress"
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
