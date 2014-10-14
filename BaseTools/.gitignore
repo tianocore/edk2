@@ -1,0 +1,14 @@
+*.d
+*.o
+*.pyc
+Source/C/VfrCompile/EfiVfrParser.cpp
+Source/C/VfrCompile/EfiVfrParser.h
+Source/C/VfrCompile/Pccts/antlr/antlr
+Source/C/VfrCompile/Pccts/dlg/dlg
+Source/C/VfrCompile/VfrLexer.cpp
+Source/C/VfrCompile/VfrLexer.h
+Source/C/VfrCompile/VfrParser.dlg
+Source/C/VfrCompile/VfrSyntax.cpp
+Source/C/VfrCompile/VfrTokens.h
+Source/C/bin/
+Source/C/libs/
