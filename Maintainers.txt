@@ -1,0 +1,176 @@
+EDK II Maintainers
+==================
+
+This file provides information about the primary maintainers for
+EDK II.
+
+In general, you should not privately email the maintainer. You should
+email the edk2-devel list, but you can also Cc the maintainer.
+
+Descriptions of section entries:
+
+  L: Mailing list that is relevant to this area (default is edk2-devel)
+     Patches and questions should be sent to the email list.
+  M: Cc address for patches and questions (ie, the package maintainer)
+  W: Web-page with status/info
+  T: SCM tree type and location.  Type is one of: git, svn.
+  S: Status, one of the following:
+     Supported:  Someone is actually paid to look after this.
+     Maintained: Someone actually looks after it.
+     Odd Fixes:  It has a maintainer but they don't have time to do
+                 much other than throw the odd patch in. See below.
+     Orphan:     No current maintainer [but maybe you could take the
+                 role as you write your new code].
+     Obsolete:   Old code. Something tagged obsolete generally means
+                 it has been replaced by a better system and you
+                 should be using that.
+
+EDK II
+------
+W: http://tianocore.github.io/edk2/
+L: https://lists.sourceforge.net/lists/listinfo/edk2-devel
+T: git - https://github.com/tianocore/edk2.git
+T: git - https://bitbucket.org/tianocore/edk2.git
+T: git - http://git.code.sf.net/p/tianocore/edk2
+T: svn - https://svn.code.sf.net/p/edk2/code/trunk/edk2
+
+Responsible Disclosure, Reporting Security Issues
+-------------------------------------------------
+W: https://github.com/tianocore/tianocore.github.io/wiki/Security
+
+EDK II Releases:
+----------------
+UDK2014
+W: http://tianocore.github.io/udk2014/
+S: Supported
+
+EDK II Packages:
+----------------
+AppPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/AppPkg
+M: Daryl Mcdaniel <daryl.mcdaniel@intel.com>
+
+ArmPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
+M: Olivier Martin <olivier.martin@arm.com>
+
+ArmPlatformPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
+M: Olivier Martin <olivier.martin@arm.com>
+
+BaseTools
+W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
+M: Yingke D Liu <yingke.d.liu@intel.com>
+
+BeagleBoardPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/BeagleBoardPkg
+M: Olivier Martin <olivier.martin@arm.com>
+
+CryptoPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
+M: Ye Ting <ting.ye@intel.com>
+
+DuetPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/DuetPkg
+M: Ruiyu Ni <ruiyu.ni@intel.com>
+
+EdkCompatibilityPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/EdkCompatibilityPkg
+M: Liming Gao <liming.gao@intel.com>
+
+EdkShellPkg, EdkShellBinPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/EdkShellPkg
+M: Ruiyu Ni <ruiyu.ni@intel.com>
+T: svn - https://svn.code.sf.net/p/efi-shell/code/trunk/Shell/
+S: Obsolete (Use ShellPkg & ShellBinPkg instead)
+
+EmbeddedPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
+M: Olivier Martin <olivier.martin@arm.com>
+
+EmulatorPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
+M: Jordan Justen <jordan.l.justen@intel.com>
+M: Andrew Fish <afish@apple.com>
+S: Maintained
+
+FatPkg, FatBinPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
+M: Ruiyu Ni <ruiyu.ni@intel.com>
+T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
+T: git - https://github.com/tianocore/edk2-FatPkg.git
+
+IntelFrameworkModulePkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkModulePkg
+M: Jeff Fan <jeff.fan@intel.com>
+
+IntelFrameworkPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkPkg
+M: Michael D Kinney <michael.d.kinney@intel.com>
+
+IntelFspPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFspPkg
+
+IntelFspWrapperPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFspWrapperPkg
+
+MdeModulePkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
+M: Feng Tian <feng.tian@intel.com>
+
+MdePkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
+M: Michael D Kinney <michael.d.kinney@intel.com>
+
+NetworkPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
+M: Qian Ouyang <qian.ouyang@intel.com>
+
+Nt32Pkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/Nt32Pkg
+M: Ruiyu Ni <ruiyu.ni@intel.com>
+
+Omap35xxPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/Omap35xxPkg
+M: Olivier Martin <olivier.martin@arm.com>
+
+OptionRomPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/OptionRomPkg
+M: Ruiyu Ni <ruiyu.ni@intel.com>
+
+OvmfPkg
+W: http://tianocore.github.io/ovmf/
+M: Jordan Justen <jordan.l.justen@intel.com>
+M: Laszlo Ersek <lersek@redhat.com>
+S: Maintained
+
+PcAtChipsetPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
+M: Ruiyu Ni <ruiyu.ni@intel.com>
+
+PerformancePkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/PerformancePkg
+M: Daryl Mcdaniel <daryl.mcdaniel@intel.com>
+
+SecurityPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
+M: Guo Dong <guo.dong@intel.com>
+
+ShellPkg, ShellBinPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
+M: Jaben Carsey <jaben.carsey@intel.com>
+
+SourceLevelDebugPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
+
+StdLib, StdLibPrivateInternalFiles
+W: https://github.com/tianocore/tianocore.github.io/wiki/StdLib
+M: Daryl Mcdaniel <daryl.mcdaniel@intel.com>
+
+UefiCpuPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
+M: Jeff Fan <jeff.fan@intel.com>
+
+UnixPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/UnixPkg
+S: Obsolete (Use EmulatorPkg instead)
