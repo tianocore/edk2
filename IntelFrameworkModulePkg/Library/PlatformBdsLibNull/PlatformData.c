@@ -19,27 +19,3 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// Predefined platform default time out value
 ///
 UINT16                      gPlatformBootTimeOutDefault = 10;
-
-//
-// Platform specific keyboard device path
-//
-
-///
-/// Predefined platform default console device path
-///
-BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
-  {
-    NULL,
-    0
-  }
-};
-
-///
-/// Predefined platform specific driver option
-///
-EFI_DEVICE_PATH_PROTOCOL    *gPlatformDriverOption[] = { NULL };
-
-///
-/// Predefined platform connect sequence
-///
-EFI_DEVICE_PATH_PROTOCOL    *gPlatformConnectSequence[] = { NULL };

@@ -153,21 +153,6 @@ PlatformBdsBootFail (
 }
 
 /**
-  This function is remained for IBV/OEM to do some platform action,
-  if there no console device can be connected.
-
-  @return EFI_SUCCESS      Direct return success now.
-
-**/
-EFI_STATUS
-PlatformBdsNoConsoleAction (
-  VOID
-  )
-{
-  return EFI_SUCCESS;
-}
-
-/**
   This function locks platform flash that is not allowed to be updated during normal boot path.
   The flash layout is platform specific.
 **/
