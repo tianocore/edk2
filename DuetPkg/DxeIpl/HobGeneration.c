@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -25,6 +25,7 @@ Revision History:
 
 #define EFI_CPUID_EXTENDED_FUNCTION  0x80000000
 #define CPUID_EXTENDED_ADD_SIZE      0x80000008
+#define EBDA_VALUE_ADDRESS           0x40E
 
 HOB_TEMPLATE  gHobTemplate = {
   { // Phit
@@ -602,12 +603,21 @@ Return:
 --*/
 {
   UINTN                Index;
+  UINT64               EbdaAddress;
 
   //
   // Prepare Low Memory
   // 0x18 pages is 72 KB.
   //
-  gHob->MemoryFreeUnder1MB.ResourceLength = EFI_MEMORY_BELOW_1MB_END - EFI_MEMORY_BELOW_1MB_START;
+  EbdaAddress = ((UINT64)(*(UINT16 *)(UINTN)(EBDA_VALUE_ADDRESS))) << 4;
+  if (EbdaAddress < 0x9A000 || EbdaAddress > EFI_MEMORY_BELOW_1MB_END) {
+    //
+    // EBDA should not go below 0x9A000 in any implementation,
+    // so add check here to make sure EBDA_VALUE_ADDRESS has a valid value.
+    //
+    EbdaAddress = EFI_MEMORY_BELOW_1MB_END;
+  }
+  gHob->MemoryFreeUnder1MB.ResourceLength = EbdaAddress - EFI_MEMORY_BELOW_1MB_START;
   gHob->MemoryFreeUnder1MB.PhysicalStart  = EFI_MEMORY_BELOW_1MB_START;
 
   //
