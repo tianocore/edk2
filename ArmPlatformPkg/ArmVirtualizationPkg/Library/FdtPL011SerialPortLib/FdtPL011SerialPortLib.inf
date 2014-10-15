@@ -20,7 +20,7 @@
   FILE_GUID                      = CB768406-7DE6-49B6-BC2C-F324E110DE5A
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SerialPortLib|DXE_CORE DXE_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = SerialPortLib|DXE_CORE DXE_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
   CONSTRUCTOR                    = FdtPL011SerialPortLibInitialize
 
 [Sources.common]
