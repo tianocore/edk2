@@ -9,7 +9,7 @@
     Aligned  - A read of N contiguous sectors.
     OverRun  - The last byte is not on a sector boundary.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -366,7 +366,15 @@ DiskIoDestroySubtask (
   )
 {
   LIST_ENTRY               *Link;
+
+  if (Subtask->Task != NULL) {
+    EfiAcquireLock (&Subtask->Task->SubtasksLock);
+  }
   Link = RemoveEntryList (&Subtask->Link);
+  if (Subtask->Task != NULL) {
+    EfiReleaseLock (&Subtask->Task->SubtasksLock);
+  }
+
   if (!Subtask->Blocking) {
     if (Subtask->WorkingBuffer != NULL) {
       FreeAlignedPages (
@@ -430,18 +438,10 @@ DiskIo2OnReadWriteComplete (
       gBS->SignalEvent (Task->Token->Event);
 
       //
-      // Mark token to NULL
+      // Mark token to NULL indicating the Task is a dead task.
       //
       Task->Token = NULL;
     }
-  }
-
-  if (IsListEmpty (&Task->Subtasks)) {
-    EfiAcquireLock (&Instance->TaskQueueLock);
-    RemoveEntryList (&Task->Link);
-    EfiReleaseLock (&Instance->TaskQueueLock);
-
-    FreePool (Task);
   }
 }
 
@@ -753,6 +753,42 @@ DiskIo2Cancel (
 }
 
 /**
+  Remove the completed tasks from Instance->TaskQueue. Completed tasks are those who don't have any subtasks.
+
+  @param Instance    Pointer to the DISK_IO_PRIVATE_DATA.
+
+  @retval TRUE       The Instance->TaskQueue is empty after the completed tasks are removed.
+  @retval FALSE      The Instance->TaskQueue is not empty after the completed tasks are removed.
+**/
+BOOLEAN
+DiskIo2RemoveCompletedTask (
+  IN DISK_IO_PRIVATE_DATA     *Instance
+  )
+{
+  BOOLEAN                     QueueEmpty;
+  LIST_ENTRY                  *Link;
+  DISK_IO2_TASK               *Task;
+
+  QueueEmpty = TRUE;
+
+  EfiAcquireLock (&Instance->TaskQueueLock);
+  for (Link = GetFirstNode (&Instance->TaskQueue); !IsNull (&Instance->TaskQueue, Link); ) {
+    Task = CR (Link, DISK_IO2_TASK, Link, DISK_IO2_TASK_SIGNATURE);
+    if (IsListEmpty (&Task->Subtasks)) {
+      Link = RemoveEntryList (&Task->Link);
+      ASSERT (Task->Token == NULL);
+      FreePool (Task);
+    } else {
+      Link = GetNextNode (&Instance->TaskQueue, Link);
+      QueueEmpty = FALSE;
+    }
+  }
+  EfiReleaseLock (&Instance->TaskQueueLock);
+
+  return QueueEmpty;
+}
+
+/**
   Common routine to access the disk.
 
   @param Instance    Pointer to the DISK_IO_PRIVATE_DATA.
@@ -781,12 +817,13 @@ DiskIo2ReadWriteDisk (
   EFI_BLOCK_IO2_PROTOCOL *BlockIo2;
   EFI_BLOCK_IO_MEDIA     *Media;
   LIST_ENTRY             *Link;
+  LIST_ENTRY             *NextLink;
   LIST_ENTRY             Subtasks;
   DISK_IO_SUBTASK        *Subtask;
   DISK_IO2_TASK          *Task;
-  BOOLEAN                TaskQueueEmpty;
   EFI_TPL                OldTpl;
   BOOLEAN                Blocking;
+  BOOLEAN                SubtaskBlocking;
   LIST_ENTRY             *SubtasksPtr;
 
   Task      = NULL;
@@ -803,24 +840,21 @@ DiskIo2ReadWriteDisk (
   if (Write && Media->ReadOnly) {
     return EFI_WRITE_PROTECTED;
   }
-  
+
   if (Blocking) {
     //
     // Wait till pending async task is completed.
     //
-    do {
-      EfiAcquireLock (&Instance->TaskQueueLock);
-      TaskQueueEmpty = IsListEmpty (&Instance->TaskQueue);
-      EfiReleaseLock (&Instance->TaskQueueLock);
-    } while (!TaskQueueEmpty);
+    while (!DiskIo2RemoveCompletedTask (Instance));
 
     SubtasksPtr = &Subtasks;
   } else {
+    DiskIo2RemoveCompletedTask (Instance);
     Task = AllocatePool (sizeof (DISK_IO2_TASK));
     if (Task == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    
+
     EfiAcquireLock (&Instance->TaskQueueLock);
     InsertTailList (&Instance->TaskQueue, &Task->Link);
     EfiReleaseLock (&Instance->TaskQueueLock);
@@ -828,6 +862,7 @@ DiskIo2ReadWriteDisk (
     Task->Signature = DISK_IO2_TASK_SIGNATURE;
     Task->Instance  = Instance;
     Task->Token     = Token;
+    EfiInitializeLock (&Task->SubtasksLock, TPL_NOTIFY);
 
     SubtasksPtr = &Task->Subtasks;
   }
@@ -842,12 +877,15 @@ DiskIo2ReadWriteDisk (
   ASSERT (!IsListEmpty (SubtasksPtr));
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  for (Link = GetFirstNode (SubtasksPtr); !IsNull (SubtasksPtr, Link); Link = GetNextNode (SubtasksPtr, Link)) {
-    Subtask = CR (Link, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
+  for ( Link = GetFirstNode (SubtasksPtr), NextLink = GetNextNode (SubtasksPtr, Link)
+      ; !IsNull (SubtasksPtr, Link)
+      ; Link = NextLink, NextLink = GetNextNode (SubtasksPtr, NextLink)
+      ) {
+    Subtask         = CR (Link, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
+    Subtask->Task   = Task;
+    SubtaskBlocking = Subtask->Blocking;
 
-    if (!Subtask->Blocking) {
-      Subtask->Task = Task;
-    }
+    ASSERT ((Subtask->Length % Media->BlockSize == 0) || (Subtask->Length < Media->BlockSize));
 
     if (Subtask->Write) {
       //
@@ -860,12 +898,12 @@ DiskIo2ReadWriteDisk (
         CopyMem (Subtask->WorkingBuffer + Subtask->Offset, Subtask->Buffer, Subtask->Length);
       }
 
-      if (Subtask->Blocking) {
+      if (SubtaskBlocking) {
         Status = BlockIo->WriteBlocks (
                             BlockIo,
                             MediaId,
                             Subtask->Lba,
-                            Subtask->Length < Media->BlockSize ? Media->BlockSize : Subtask->Length,
+                            (Subtask->Length % Media->BlockSize == 0) ? Subtask->Length : Media->BlockSize,
                             (Subtask->WorkingBuffer != NULL) ? Subtask->WorkingBuffer : Subtask->Buffer
                             );
       } else {
@@ -874,7 +912,7 @@ DiskIo2ReadWriteDisk (
                              MediaId,
                              Subtask->Lba,
                              &Subtask->BlockIo2Token,
-                             Subtask->Length < Media->BlockSize ? Media->BlockSize : Subtask->Length,
+                             (Subtask->Length % Media->BlockSize == 0) ? Subtask->Length : Media->BlockSize,
                              (Subtask->WorkingBuffer != NULL) ? Subtask->WorkingBuffer : Subtask->Buffer
                              );
       }
@@ -883,12 +921,12 @@ DiskIo2ReadWriteDisk (
       //
       // Read
       //
-      if (Subtask->Blocking) {
+      if (SubtaskBlocking) {
         Status = BlockIo->ReadBlocks (
                             BlockIo,
                             MediaId,
                             Subtask->Lba,
-                            Subtask->Length < Media->BlockSize ? Media->BlockSize : Subtask->Length,
+                            (Subtask->Length % Media->BlockSize == 0) ? Subtask->Length : Media->BlockSize,
                             (Subtask->WorkingBuffer != NULL) ? Subtask->WorkingBuffer : Subtask->Buffer
                             );
         if (!EFI_ERROR (Status) && (Subtask->WorkingBuffer != NULL)) {
@@ -900,12 +938,20 @@ DiskIo2ReadWriteDisk (
                              MediaId,
                              Subtask->Lba,
                              &Subtask->BlockIo2Token,
-                             Subtask->Length < Media->BlockSize ? Media->BlockSize : Subtask->Length,
+                             (Subtask->Length % Media->BlockSize == 0) ? Subtask->Length : Media->BlockSize,
                              (Subtask->WorkingBuffer != NULL) ? Subtask->WorkingBuffer : Subtask->Buffer
                              );
       }
     }
-    
+
+    if (SubtaskBlocking || EFI_ERROR (Status)) {
+      //
+      // Make sure the subtask list only contains non-blocking subtasks.
+      // Remove failed non-blocking subtasks as well because the callback won't be called.
+      //
+      DiskIoDestroySubtask (Instance, Subtask);
+    }
+
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -918,28 +964,15 @@ DiskIo2ReadWriteDisk (
   // We shouldn't remove all the tasks because the non-blocking requests have been submitted and cannot be canceled.
   //
   if (EFI_ERROR (Status)) {
-    while (!IsNull (SubtasksPtr, Link)) {
-      Subtask = CR (Link, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
-      Link = DiskIoDestroySubtask (Instance, Subtask);
+    while (!IsNull (SubtasksPtr, NextLink)) {
+      Subtask = CR (NextLink, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
+      NextLink = DiskIoDestroySubtask (Instance, Subtask);
     }
   }
 
   //
-  // Remove all the blocking subtasks because the non-blocking callback only removes the non-blocking subtask.
-  //
-  for (Link = GetFirstNode (SubtasksPtr); !IsNull (SubtasksPtr, Link); ) {
-    Subtask = CR (Link, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
-    if (Subtask->Blocking) {
-      Link = DiskIoDestroySubtask (Instance, Subtask);
-    } else {
-      Link = GetNextNode (SubtasksPtr, Link);
-    }
-  }
-
-  //
-  // It's possible that the callback runs before raising TPL to NOTIFY,
-  // so the subtasks list only contains blocking subtask.
-  // Remove the Task after the blocking subtasks are removed in above.
+  // It's possible that the non-blocking subtasks finish before raising TPL to NOTIFY,
+  // so the subtasks list might be empty at this point.
   //
   if (!Blocking && IsListEmpty (SubtasksPtr)) {
     EfiAcquireLock (&Instance->TaskQueueLock);
@@ -1063,6 +1096,8 @@ DiskIo2OnFlushComplete (
   ASSERT (Task->Signature == DISK_IO2_FLUSH_TASK_SIGNATURE);
   Task->Token->TransactionStatus = Task->BlockIo2Token.TransactionStatus;
   gBS->SignalEvent (Task->Token->Event);
+
+  FreePool (Task);
 }
 
 /**

@@ -51,6 +51,7 @@ typedef struct {
 typedef struct {
   UINT32                          Signature;
   LIST_ENTRY                      Link;     /// < link to other task
+  EFI_LOCK                        SubtasksLock;
   LIST_ENTRY                      Subtasks; /// < header of subtasks
   EFI_DISK_IO2_TOKEN              *Token;
   DISK_IO_PRIVATE_DATA            *Instance;
