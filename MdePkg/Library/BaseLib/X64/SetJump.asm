@@ -21,7 +21,7 @@
 
     .code
 
-EXTERNDEF   InternalAssertJumpBuffer:PROC
+EXTERN   InternalAssertJumpBuffer:PROC
 
 ;------------------------------------------------------------------------------
 ; UINTN
