@@ -19,8 +19,8 @@ EXTERN PageFaultHandler:PROC
 
     .code
     
-EXTERNDEF   AsmFixAddress16:DWORD
-EXTERNDEF   AsmJmpAddr32:DWORD
+PUBLIC   AsmFixAddress16
+PUBLIC   AsmJmpAddr32
     
 AsmTransferControl  PROC
     ; rcx S3WakingVector    :DWORD
