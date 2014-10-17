@@ -47,7 +47,7 @@ InternalMathDivRemU64x64    PROC
     jmp     InternalMathDivRemU64x32
 InternalMathDivRemU64x64    ENDP
 
-_@DivRemU64x64  PROC    USES    ebx esi edi
+_@DivRemU64x64  PROC PRIVATE    USES    ebx esi edi
     mov     edx, dword ptr [esp + 20]
     mov     eax, dword ptr [esp + 16]   ; edx:eax <- dividend
     mov     edi, edx
