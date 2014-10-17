@@ -308,74 +308,6 @@
 
 [Sources.X64]
   X64/Thunk16.asm
-  X64/CpuPause.asm
-  X64/EnableDisableInterrupts.asm
-  X64/DisableInterrupts.asm
-  X64/EnableInterrupts.asm
-  X64/FlushCacheLine.asm
-  X64/Invd.asm
-  X64/Wbinvd.asm
-  X64/DisablePaging64.asm
-  X64/Mwait.asm
-  X64/Monitor.asm
-  X64/ReadPmc.asm
-  X64/ReadTsc.asm
-  X64/WriteMm7.asm
-  X64/WriteMm6.asm
-  X64/WriteMm5.asm
-  X64/WriteMm4.asm
-  X64/WriteMm3.asm
-  X64/WriteMm2.asm
-  X64/WriteMm1.asm
-  X64/WriteMm0.asm
-  X64/ReadMm7.asm
-  X64/ReadMm6.asm
-  X64/ReadMm5.asm
-  X64/ReadMm4.asm
-  X64/ReadMm3.asm
-  X64/ReadMm2.asm
-  X64/ReadMm1.asm
-  X64/ReadMm0.asm
-  X64/FxRestore.asm
-  X64/FxSave.asm
-  X64/WriteLdtr.asm
-  X64/ReadLdtr.asm
-  X64/WriteIdtr.asm
-  X64/ReadIdtr.asm
-  X64/WriteGdtr.asm
-  X64/ReadGdtr.asm
-  X64/ReadTr.asm
-  X64/ReadSs.asm
-  X64/ReadGs.asm
-  X64/ReadFs.asm
-  X64/ReadEs.asm
-  X64/ReadDs.asm
-  X64/ReadCs.asm
-  X64/WriteDr7.asm
-  X64/WriteDr6.asm
-  X64/WriteDr5.asm
-  X64/WriteDr4.asm
-  X64/WriteDr3.asm
-  X64/WriteDr2.asm
-  X64/WriteDr1.asm
-  X64/WriteDr0.asm
-  X64/ReadDr7.asm
-  X64/ReadDr6.asm
-  X64/ReadDr5.asm
-  X64/ReadDr4.asm
-  X64/ReadDr3.asm
-  X64/ReadDr2.asm
-  X64/ReadDr1.asm
-  X64/ReadDr0.asm
-  X64/WriteCr4.asm
-  X64/WriteCr3.asm
-  X64/WriteCr2.asm
-  X64/WriteCr0.asm
-  X64/ReadCr4.asm
-  X64/ReadCr3.asm
-  X64/ReadCr2.asm
-  X64/ReadCr0.asm
-  X64/ReadEflags.asm
   X64/CpuIdEx.asm
   X64/CpuId.asm
   X64/LongJump.asm
@@ -388,11 +320,147 @@
   X64/WriteMsr64.c | MSFT 
   X64/ReadMsr64.c | MSFT 
   X64/RdRand.asm | MSFT
+  X64/CpuPause.asm | MSFT
+  X64/EnableDisableInterrupts.asm | MSFT
+  X64/DisableInterrupts.asm | MSFT
+  X64/EnableInterrupts.asm | MSFT
+  X64/FlushCacheLine.asm | MSFT
+  X64/Invd.asm | MSFT
+  X64/Wbinvd.asm | MSFT
+  X64/DisablePaging64.asm | MSFT
+  X64/Mwait.asm | MSFT
+  X64/Monitor.asm | MSFT
+  X64/ReadPmc.asm | MSFT
+  X64/ReadTsc.asm | MSFT
+  X64/WriteMm7.asm | MSFT
+  X64/WriteMm6.asm | MSFT
+  X64/WriteMm5.asm | MSFT
+  X64/WriteMm4.asm | MSFT
+  X64/WriteMm3.asm | MSFT
+  X64/WriteMm2.asm | MSFT
+  X64/WriteMm1.asm | MSFT
+  X64/WriteMm0.asm | MSFT
+  X64/ReadMm7.asm | MSFT
+  X64/ReadMm6.asm | MSFT
+  X64/ReadMm5.asm | MSFT
+  X64/ReadMm4.asm | MSFT
+  X64/ReadMm3.asm | MSFT
+  X64/ReadMm2.asm | MSFT
+  X64/ReadMm1.asm | MSFT
+  X64/ReadMm0.asm | MSFT
+  X64/FxRestore.asm | MSFT
+  X64/FxSave.asm | MSFT
+  X64/WriteLdtr.asm | MSFT
+  X64/ReadLdtr.asm | MSFT
+  X64/WriteIdtr.asm | MSFT
+  X64/ReadIdtr.asm | MSFT
+  X64/WriteGdtr.asm | MSFT
+  X64/ReadGdtr.asm | MSFT
+  X64/ReadTr.asm | MSFT
+  X64/ReadSs.asm | MSFT
+  X64/ReadGs.asm | MSFT
+  X64/ReadFs.asm | MSFT
+  X64/ReadEs.asm | MSFT
+  X64/ReadDs.asm | MSFT
+  X64/ReadCs.asm | MSFT
+  X64/WriteDr7.asm | MSFT
+  X64/WriteDr6.asm | MSFT
+  X64/WriteDr5.asm | MSFT
+  X64/WriteDr4.asm | MSFT
+  X64/WriteDr3.asm | MSFT
+  X64/WriteDr2.asm | MSFT
+  X64/WriteDr1.asm | MSFT
+  X64/WriteDr0.asm | MSFT
+  X64/ReadDr7.asm | MSFT
+  X64/ReadDr6.asm | MSFT
+  X64/ReadDr5.asm | MSFT
+  X64/ReadDr4.asm | MSFT
+  X64/ReadDr3.asm | MSFT
+  X64/ReadDr2.asm | MSFT
+  X64/ReadDr1.asm | MSFT
+  X64/ReadDr0.asm | MSFT
+  X64/WriteCr4.asm | MSFT
+  X64/WriteCr3.asm | MSFT
+  X64/WriteCr2.asm | MSFT
+  X64/WriteCr0.asm | MSFT
+  X64/ReadCr4.asm | MSFT
+  X64/ReadCr3.asm | MSFT
+  X64/ReadCr2.asm | MSFT
+  X64/ReadCr0.asm | MSFT
+  X64/ReadEflags.asm | MSFT
 
   X64/CpuBreakpoint.asm | INTEL 
   X64/WriteMsr64.asm | INTEL 
   X64/ReadMsr64.asm | INTEL 
   X64/RdRand.asm | INTEL
+  X64/CpuPause.asm | INTEL
+  X64/EnableDisableInterrupts.asm | INTEL
+  X64/DisableInterrupts.asm | INTEL
+  X64/EnableInterrupts.asm | INTEL
+  X64/FlushCacheLine.asm | INTEL
+  X64/Invd.asm | INTEL
+  X64/Wbinvd.asm | INTEL
+  X64/DisablePaging64.asm | INTEL
+  X64/Mwait.asm | INTEL
+  X64/Monitor.asm | INTEL
+  X64/ReadPmc.asm | INTEL
+  X64/ReadTsc.asm | INTEL
+  X64/WriteMm7.asm | INTEL
+  X64/WriteMm6.asm | INTEL
+  X64/WriteMm5.asm | INTEL
+  X64/WriteMm4.asm | INTEL
+  X64/WriteMm3.asm | INTEL
+  X64/WriteMm2.asm | INTEL
+  X64/WriteMm1.asm | INTEL
+  X64/WriteMm0.asm | INTEL
+  X64/ReadMm7.asm | INTEL
+  X64/ReadMm6.asm | INTEL
+  X64/ReadMm5.asm | INTEL
+  X64/ReadMm4.asm | INTEL
+  X64/ReadMm3.asm | INTEL
+  X64/ReadMm2.asm | INTEL
+  X64/ReadMm1.asm | INTEL
+  X64/ReadMm0.asm | INTEL
+  X64/FxRestore.asm | INTEL
+  X64/FxSave.asm | INTEL
+  X64/WriteLdtr.asm | INTEL
+  X64/ReadLdtr.asm | INTEL
+  X64/WriteIdtr.asm | INTEL
+  X64/ReadIdtr.asm | INTEL
+  X64/WriteGdtr.asm | INTEL
+  X64/ReadGdtr.asm | INTEL
+  X64/ReadTr.asm | INTEL
+  X64/ReadSs.asm | INTEL
+  X64/ReadGs.asm | INTEL
+  X64/ReadFs.asm | INTEL
+  X64/ReadEs.asm | INTEL
+  X64/ReadDs.asm | INTEL
+  X64/ReadCs.asm | INTEL
+  X64/WriteDr7.asm | INTEL
+  X64/WriteDr6.asm | INTEL
+  X64/WriteDr5.asm | INTEL
+  X64/WriteDr4.asm | INTEL
+  X64/WriteDr3.asm | INTEL
+  X64/WriteDr2.asm | INTEL
+  X64/WriteDr1.asm | INTEL
+  X64/WriteDr0.asm | INTEL
+  X64/ReadDr7.asm | INTEL
+  X64/ReadDr6.asm | INTEL
+  X64/ReadDr5.asm | INTEL
+  X64/ReadDr4.asm | INTEL
+  X64/ReadDr3.asm | INTEL
+  X64/ReadDr2.asm | INTEL
+  X64/ReadDr1.asm | INTEL
+  X64/ReadDr0.asm | INTEL
+  X64/WriteCr4.asm | INTEL
+  X64/WriteCr3.asm | INTEL
+  X64/WriteCr2.asm | INTEL
+  X64/WriteCr0.asm | INTEL
+  X64/ReadCr4.asm | INTEL
+  X64/ReadCr3.asm | INTEL
+  X64/ReadCr2.asm | INTEL
+  X64/ReadCr0.asm | INTEL
+  X64/ReadEflags.asm | INTEL
 
   X64/Non-existing.c
   Math64.c
