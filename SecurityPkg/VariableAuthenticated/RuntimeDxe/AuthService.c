@@ -1410,9 +1410,11 @@ ProcessVariable (
 
   if (!IsFirstTime) {
     //
-    // Check input PubKey.
+    // 2 cases need to check here
+    //   1. Internal PubKey variable. PubKeyIndex is always 0 
+    //   2. Other counter-based AuthVariable. Check input PubKey.
     //
-    if (CompareMem (PubKey, mPubKeyStore + (KeyIndex - 1) * EFI_CERT_TYPE_RSA2048_SIZE, EFI_CERT_TYPE_RSA2048_SIZE) != 0) {
+    if (KeyIndex == 0 || CompareMem (PubKey, mPubKeyStore + (KeyIndex - 1) * EFI_CERT_TYPE_RSA2048_SIZE, EFI_CERT_TYPE_RSA2048_SIZE) != 0) {
       return EFI_SECURITY_VIOLATION;
     }
     //
