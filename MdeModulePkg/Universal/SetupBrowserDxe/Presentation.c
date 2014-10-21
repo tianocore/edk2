@@ -2426,7 +2426,12 @@ SetupBrowser (
         //
         IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
 
-        if (!EFI_ERROR (Status) && Statement->Operand != EFI_IFR_REF_OP) {
+        if (!EFI_ERROR (Status) && 
+            (Statement->Operand != EFI_IFR_REF_OP) && 
+            ((Statement->Storage == NULL) || (Statement->Storage != NULL && Statement->ValueChanged))) {
+          //
+          // Only question value has been changed, browser will trig CHANGED callback.
+          //
           ProcessCallBackFunction(Selection, Selection->FormSet, Selection->Form, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
       } else {
