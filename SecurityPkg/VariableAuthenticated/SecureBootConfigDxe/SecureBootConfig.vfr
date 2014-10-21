@@ -495,14 +495,12 @@ formset
      text
        help   = STRING_TOKEN(STR_SAVE_AND_EXIT),
        text   = STRING_TOKEN(STR_SAVE_AND_EXIT),
-       text   = STRING_TOKEN(STR_NULL),
        flags  = INTERACTIVE,
        key    = KEY_VALUE_SAVE_AND_EXIT_PK;
 
      text
        help   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
        text   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
-       text   = STRING_TOKEN(STR_NULL),
        flags  = INTERACTIVE,
        key    = KEY_VALUE_NO_SAVE_AND_EXIT_PK;
 

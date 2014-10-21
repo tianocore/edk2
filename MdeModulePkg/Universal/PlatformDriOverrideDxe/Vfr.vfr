@@ -42,7 +42,6 @@ formset
     text
       help   = STRING_TOKEN(STR_FIRST_REFRESH_HELP),
       text   = STRING_TOKEN(STR_FIRST_REFRESH),
-      text   = STRING_TOKEN(STR_NULL_STRING),
       flags  = INTERACTIVE,
       key    = KEY_VALUE_DEVICE_REFRESH;
 
@@ -102,7 +101,6 @@ formset
     text
       help   = STRING_TOKEN (STR_NULL_STRING),
       text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
-        text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
       flags  = INTERACTIVE | RESET_REQUIRED,
       key    = KEY_VALUE_ORDER_SAVE_AND_EXIT;
   endform;
