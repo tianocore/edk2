@@ -8,6 +8,10 @@
 #  This driver will have external input - variable data.
 #  This external input must be validated carefully to avoid security issues such as 
 #  buffer overflow or integer overflow.
+#    The whole SMM authentication variable design relies on the integrity of flash part and SMM.
+#  which is assumed to be protected by platform.  All variable code and metadata in flash/SMM Memory
+#  may not be modified without authorization. If platform fails to protect these resources, 
+#  the authentication service provided in this driver will be broken, and the behavior is undefined.
 #
 # Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials

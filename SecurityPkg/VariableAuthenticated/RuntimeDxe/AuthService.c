@@ -7,6 +7,10 @@
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
   Variable attribute should also be checked to avoid authentication bypass.
+     The whole SMM authentication variable design relies on the integrity of flash part and SMM.
+  which is assumed to be protected by platform.  All variable code and metadata in flash/SMM Memory
+  may not be modified without authorization. If platform fails to protect these resources, 
+  the authentication service provided in this driver will be broken, and the behavior is undefined.
 
   ProcessVarWithPk(), ProcessVarWithKek() and ProcessVariable() are the function to do
   variable authentication.
@@ -251,6 +255,10 @@ AutenticatedVariableServiceInitialize (
     DataSize  = DataSizeOfVariable (Variable.CurrPtr);
     Data      = GetVariableDataPtr (Variable.CurrPtr);
     ASSERT ((DataSize != 0) && (Data != NULL));
+    //
+    // "AuthVarKeyDatabase" is an internal variable. Its DataSize is always ensured not to exceed mPubKeyStore buffer size(See definition before) 
+    //  Therefore, there is no memory overflow in underlying CopyMem.
+    //
     CopyMem (mPubKeyStore, (UINT8 *) Data, DataSize);
     mPubKeyNumber = (UINT32) (DataSize / EFI_CERT_TYPE_RSA2048_SIZE);
   }
@@ -564,6 +572,10 @@ AddPubKeyInStore (
       DataSize  = DataSizeOfVariable (Variable.CurrPtr);
       Data      = GetVariableDataPtr (Variable.CurrPtr);
       ASSERT ((DataSize != 0) && (Data != NULL));
+      //
+      // "AuthVarKeyDatabase" is an internal used variable. Its DataSize is always ensured not to exceed mPubKeyStore buffer size(See definition before) 
+      //  Therefore, there is no memory overflow in underlying CopyMem.
+      //
       CopyMem (mPubKeyStore, (UINT8 *) Data, DataSize);
       mPubKeyNumber = (UINT32) (DataSize / EFI_CERT_TYPE_RSA2048_SIZE);
 
