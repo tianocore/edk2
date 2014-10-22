@@ -2,13 +2,13 @@
   The firmware file related definitions in PI.
 
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.              
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   PI Version 1.2.
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #pragma pack(1)
 ///
 /// Used to verify the integrity of the file.
-/// 
+///
 typedef union {
   struct {
     ///
@@ -60,7 +60,7 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 
 ///
 /// File Types Definitions
-/// 
+///
 #define EFI_FV_FILETYPE_ALL                   0x00
 #define EFI_FV_FILETYPE_RAW                   0x01
 #define EFI_FV_FILETYPE_FREEFORM              0x02
@@ -82,17 +82,17 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 #define EFI_FV_FILETYPE_FFS_MIN               0xf0
 #define EFI_FV_FILETYPE_FFS_MAX               0xff
 #define EFI_FV_FILETYPE_FFS_PAD               0xf0
-/// 
+///
 /// FFS File Attributes.
-/// 
+///
 #define FFS_ATTRIB_LARGE_FILE         0x01
 #define FFS_ATTRIB_FIXED              0x04
 #define FFS_ATTRIB_DATA_ALIGNMENT     0x38
 #define FFS_ATTRIB_CHECKSUM           0x40
 
-/// 
+///
 /// FFS File State Bits.
-/// 
+///
 #define EFI_FILE_HEADER_CONSTRUCTION  0x01
 #define EFI_FILE_HEADER_VALID         0x02
 #define EFI_FILE_DATA_VALID           0x04
@@ -102,9 +102,9 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 
 
 ///
-/// Each file begins with the header that describe the 
+/// Each file begins with the header that describe the
 /// contents and state of the files.
-/// 
+///
 typedef struct {
   ///
   /// This GUID is the file name. It is used to uniquely identify the file.
@@ -139,22 +139,22 @@ typedef struct {
   /// volume, except if the file type is EFI_FV_FILETYPE_FFS_PAD.
   ///
   EFI_GUID                  Name;
-  
+
   ///
   /// Used to verify the integrity of the file.
-  ///  
+  ///
   EFI_FFS_INTEGRITY_CHECK   IntegrityCheck;
-  
+
   ///
   /// Identifies the type of file.
-  ///  
+  ///
   EFI_FV_FILETYPE           Type;
-  
+
   ///
   /// Declares various file attribute bits.
-  ///  
+  ///
   EFI_FFS_FILE_ATTRIBUTES   Attributes;
-  
+
   ///
   /// The length of the file in bytes, including the FFS header.
   /// The length of the file data is either (Size - sizeof(EFI_FFS_FILE_HEADER)). This calculation means a
@@ -163,12 +163,12 @@ typedef struct {
   /// located at the next 8-byte aligned firmware volume offset following the last byte of the file F.
   ///
   UINT8                     Size[3];
-  
+
   ///
   /// Used to track the state of the file throughout the life of the file from creation to deletion.
   ///
   EFI_FFS_FILE_STATE        State;
-  
+
   ///
   /// If FFS_ATTRIB_LARGE_FILE is set in Attributes, then ExtendedSize exists and Size must be set to zero.
   /// If FFS_ATTRIB_LARGE_FILE is not set then EFI_FFS_FILE_HEADER is used.
@@ -220,10 +220,10 @@ typedef UINT8 EFI_SECTION_TYPE;
 
 ///
 /// Common section header.
-/// 
+///
 typedef struct {
   ///
-  /// A 24-bit unsigned integer that contains the total size of the section in bytes, 
+  /// A 24-bit unsigned integer that contains the total size of the section in bytes,
   /// including the EFI_COMMON_SECTION_HEADER.
   ///
   UINT8             Size[3];
@@ -235,36 +235,36 @@ typedef struct {
 
 typedef struct {
   ///
-  /// A 24-bit unsigned integer that contains the total size of the section in bytes, 
+  /// A 24-bit unsigned integer that contains the total size of the section in bytes,
   /// including the EFI_COMMON_SECTION_HEADER.
   ///
   UINT8             Size[3];
-  
+
   EFI_SECTION_TYPE  Type;
-  
+
   ///
   /// If Size is 0xFFFFFF, then ExtendedSize contains the size of the section. If
-  /// Size is not equal to 0xFFFFFF, then this field does not exist.  
+  /// Size is not equal to 0xFFFFFF, then this field does not exist.
   ///
   UINT32            ExtendedSize;
 } EFI_COMMON_SECTION_HEADER2;
 
 ///
-/// Leaf section type that contains an 
+/// Leaf section type that contains an
 /// IA-32 16-bit executable image.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER  EFI_COMPATIBILITY16_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2 EFI_COMPATIBILITY16_SECTION2;
 
 ///
 /// CompressionType of EFI_COMPRESSION_SECTION.
-/// 
+///
 #define EFI_NOT_COMPRESSED        0x00
 #define EFI_STANDARD_COMPRESSION  0x01
 ///
-/// An encapsulation section type in which the 
+/// An encapsulation section type in which the
 /// section data is compressed.
-/// 
+///
 typedef struct {
   ///
   /// Usual common section header. CommonHeader.Type = EFI_SECTION_COMPRESSION.
@@ -309,19 +309,19 @@ typedef EFI_COMMON_SECTION_HEADER2  EFI_DISPOSABLE_SECTION2;
 
 ///
 /// The leaf section which could be used to determine the dispatch order of DXEs.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER   EFI_DXE_DEPEX_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2  EFI_DXE_DEPEX_SECTION2;
 
 ///
 /// The leaf section which contains a PI FV.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER   EFI_FIRMWARE_VOLUME_IMAGE_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2  EFI_FIRMWARE_VOLUME_IMAGE_SECTION2;
 
 ///
 /// The leaf section which contains a single GUID.
-/// 
+///
 typedef struct {
   ///
   /// Common section header. CommonHeader.Type = EFI_SECTION_FREEFORM_SUBTYPE_GUID.
@@ -340,18 +340,18 @@ typedef struct {
   EFI_COMMON_SECTION_HEADER2    CommonHeader;
   ///
   /// This GUID is defined by the creator of the file. It is a vendor-defined file type.
-  ///  
+  ///
   EFI_GUID                      SubTypeGuid;
 } EFI_FREEFORM_SUBTYPE_GUID_SECTION2;
 
 ///
 /// Attributes of EFI_GUID_DEFINED_SECTION.
-/// 
+///
 #define EFI_GUIDED_SECTION_PROCESSING_REQUIRED  0x01
 #define EFI_GUIDED_SECTION_AUTH_STATUS_VALID    0x02
 ///
 /// The leaf section which is encapsulation defined by specific GUID.
-/// 
+///
 typedef struct {
   ///
   /// The common section header. CommonHeader.Type = EFI_SECTION_GUID_DEFINED.
@@ -378,27 +378,27 @@ typedef struct {
   EFI_COMMON_SECTION_HEADER2    CommonHeader;
   ///
   /// The GUID that defines the format of the data that follows. It is a vendor-defined section type.
-  ///  
+  ///
   EFI_GUID                      SectionDefinitionGuid;
   ///
   /// Contains the offset in bytes from the beginning of the common header to the first byte of the data.
-  ///  
+  ///
   UINT16                        DataOffset;
   ///
   /// The bit field that declares some specific characteristics of the section contents.
-  ///  
+  ///
   UINT16                        Attributes;
 } EFI_GUID_DEFINED_SECTION2;
 
 ///
 /// The leaf section which contains PE32+ image.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER   EFI_PE32_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2  EFI_PE32_SECTION2;
 
 ///
 /// The leaf section used to determine the dispatch order of PEIMs.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER   EFI_PEI_DEPEX_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2  EFI_PEI_DEPEX_SECTION2;
 
@@ -416,37 +416,37 @@ typedef EFI_COMMON_SECTION_HEADER2  EFI_PIC_SECTION2;
 
 ///
 /// The leaf section which constains the position-independent-code image.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER   EFI_TE_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2  EFI_TE_SECTION2;
 
 ///
 /// The leaf section which contains an array of zero or more bytes.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER   EFI_RAW_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2  EFI_RAW_SECTION2;
 
-/// 
+///
 /// The SMM dependency expression section is a leaf section that contains a dependency expression that
 /// is used to determine the dispatch order for SMM drivers. Before the SMRAM invocation of the
 /// SMM driver's entry point, this dependency expression must evaluate to TRUE. See the Platform
 /// Initialization Specification, Volume 2, for details regarding the format of the dependency expression.
 /// The dependency expression may refer to protocols installed in either the UEFI or the SMM protocol
 /// database. EFI_SMM_DEPEX_SECTION2 must be used if the section is 16MB or larger.
-/// 
+///
 typedef EFI_COMMON_SECTION_HEADER EFI_SMM_DEPEX_SECTION;
 typedef EFI_COMMON_SECTION_HEADER2 EFI_SMM_DEPEX_SECTION2;
 
 ///
-/// The leaf section which contains a unicode string that 
+/// The leaf section which contains a unicode string that
 /// is human readable file name.
-/// 
+///
 typedef struct {
   EFI_COMMON_SECTION_HEADER   CommonHeader;
 
   ///
   /// Array of unicode string.
-  /// 
+  ///
   CHAR16                      FileNameString[1];
 } EFI_USER_INTERFACE_SECTION;
 
@@ -457,15 +457,15 @@ typedef struct {
 
 ///
 /// The leaf section which contains a numeric build number and
-/// an optional unicode string that represents the file revision. 
-/// 
+/// an optional unicode string that represents the file revision.
+///
 typedef struct {
   EFI_COMMON_SECTION_HEADER   CommonHeader;
   UINT16                      BuildNumber;
 
   ///
   /// Array of unicode string.
-  /// 
+  ///
   CHAR16                      VersionString[1];
 } EFI_VERSION_SECTION;
 

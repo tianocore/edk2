@@ -2,13 +2,13 @@
   HOB related definitions in PI.
 
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                                                          
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   PI Version 1.0
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 //
 // HobType of EFI_HOB_GENERIC_HEADER.
-// 
+//
 #define EFI_HOB_TYPE_HANDOFF              0x0001
 #define EFI_HOB_TYPE_MEMORY_ALLOCATION    0x0002
 #define EFI_HOB_TYPE_RESOURCE_DESCRIPTOR  0x0003
@@ -35,9 +35,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_HOB_TYPE_END_OF_HOB_LIST      0xFFFF
 
 ///
-/// Describes the format and size of the data inside the HOB. 
+/// Describes the format and size of the data inside the HOB.
 /// All HOBs must contain this generic HOB header.
-/// 
+///
 typedef struct {
   ///
   /// Identifies the HOB data structure type.
@@ -56,13 +56,13 @@ typedef struct {
 
 ///
 /// Value of version  in EFI_HOB_HANDOFF_INFO_TABLE.
-/// 
+///
 #define EFI_HOB_HANDOFF_TABLE_VERSION 0x0009
 
 ///
-/// Contains general state information used by the HOB producer phase. 
+/// Contains general state information used by the HOB producer phase.
 /// This HOB must be the first one in the HOB list.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_HANDOFF.
@@ -70,7 +70,7 @@ typedef struct {
   EFI_HOB_GENERIC_HEADER  Header;
   ///
   /// The version number pertaining to the PHIT HOB definition.
-  /// This value is four bytes in length to provide an 8-byte aligned entry 
+  /// This value is four bytes in length to provide an 8-byte aligned entry
   /// when it is combined with the 4-byte BootMode.
   ///
   UINT32                  Version;
@@ -88,7 +88,7 @@ typedef struct {
   ///
   EFI_PHYSICAL_ADDRESS    EfiMemoryBottom;
   ///
-  /// The highest address location of free memory that is currently available 
+  /// The highest address location of free memory that is currently available
   /// for use by the HOB producer phase.
   ///
   EFI_PHYSICAL_ADDRESS    EfiFreeMemoryTop;
@@ -102,19 +102,19 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS    EfiEndOfHobList;
 } EFI_HOB_HANDOFF_INFO_TABLE;
 
-/// 
+///
 /// EFI_HOB_MEMORY_ALLOCATION_HEADER describes the
 /// various attributes of the logical memory allocation. The type field will be used for
 /// subsequent inclusion in the UEFI memory map.
-/// 
+///
 typedef struct {
   ///
   /// A GUID that defines the memory allocation region's type and purpose, as well as
   /// other fields within the memory allocation HOB. This GUID is used to define the
   /// additional data within the HOB that may be present for the memory allocation HOB.
   /// Type EFI_GUID is defined in InstallProtocolInterface() in the UEFI 2.0
-  /// specification. 
-  /// 
+  /// specification.
+  ///
   EFI_GUID              Name;
 
   ///
@@ -124,16 +124,16 @@ typedef struct {
   ///
   EFI_PHYSICAL_ADDRESS  MemoryBaseAddress;
 
-  /// 
+  ///
   /// The length in bytes of memory allocated by this HOB.
-  /// 
+  ///
   UINT64                MemoryLength;
 
   ///
   /// Defines the type of memory allocated by this HOB. The memory type definition
   /// follows the EFI_MEMORY_TYPE definition. Type EFI_MEMORY_TYPE is defined
   /// in AllocatePages() in the UEFI 2.0 specification.
-  /// 
+  ///
   EFI_MEMORY_TYPE       MemoryType;
 
   ///
@@ -143,8 +143,8 @@ typedef struct {
 } EFI_HOB_MEMORY_ALLOCATION_HEADER;
 
 ///
-/// Describes all memory ranges used during the HOB producer 
-/// phase that exist outside the HOB list. This HOB type 
+/// Describes all memory ranges used during the HOB producer
+/// phase that exist outside the HOB list. This HOB type
 /// describes how memory is used, not the physical attributes of memory.
 ///
 typedef struct {
@@ -165,10 +165,10 @@ typedef struct {
 
 
 ///
-/// Describes the memory stack that is produced by the HOB producer 
+/// Describes the memory stack that is produced by the HOB producer
 /// phase and upon which all post-memory-installed executable
 /// content in the HOB producer phase is executing.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_MEMORY_ALLOCATION.
@@ -182,11 +182,11 @@ typedef struct {
 } EFI_HOB_MEMORY_ALLOCATION_STACK;
 
 ///
-/// Defines the location of the boot-strap 
+/// Defines the location of the boot-strap
 /// processor (BSP) BSPStore ("Backing Store Pointer Store").
-/// This HOB is valid for the Itanium processor family only 
+/// This HOB is valid for the Itanium processor family only
 /// register overflow store.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_MEMORY_ALLOCATION.
@@ -213,12 +213,12 @@ typedef struct {
   ///
   EFI_HOB_MEMORY_ALLOCATION_HEADER  MemoryAllocationHeader;
   ///
-  /// The GUID specifying the values of the firmware file system name 
+  /// The GUID specifying the values of the firmware file system name
   /// that contains the HOB consumer phase component.
   ///
   EFI_GUID                          ModuleName;
   ///
-  /// The address of the memory-mapped firmware volume 
+  /// The address of the memory-mapped firmware volume
   /// that contains the HOB consumer phase firmware file.
   ///
   EFI_PHYSICAL_ADDRESS              EntryPoint;
@@ -226,12 +226,12 @@ typedef struct {
 
 ///
 /// The resource type.
-/// 
+///
 typedef UINT32 EFI_RESOURCE_TYPE;
 
 //
 // Value of ResourceType in EFI_HOB_RESOURCE_DESCRIPTOR.
-// 
+//
 #define EFI_RESOURCE_SYSTEM_MEMORY          0x00000000
 #define EFI_RESOURCE_MEMORY_MAPPED_IO       0x00000001
 #define EFI_RESOURCE_IO                     0x00000002
@@ -243,7 +243,7 @@ typedef UINT32 EFI_RESOURCE_TYPE;
 
 ///
 /// A type of recount attribute type.
-/// 
+///
 typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 
 //
@@ -277,10 +277,10 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 #define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE    0x00400000
 
 ///
-/// Describes the resource properties of all fixed, 
+/// Describes the resource properties of all fixed,
 /// nonrelocatable resource ranges found on the processor
 /// host bus during the HOB producer phase.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR.
@@ -300,7 +300,7 @@ typedef struct {
   ///
   EFI_RESOURCE_ATTRIBUTE_TYPE ResourceAttribute;
   ///
-  /// The physical start address of the resource region. 
+  /// The physical start address of the resource region.
   ///
   EFI_PHYSICAL_ADDRESS        PhysicalStart;
   ///
@@ -310,9 +310,9 @@ typedef struct {
 } EFI_HOB_RESOURCE_DESCRIPTOR;
 
 ///
-/// Allows writers of executable content in the HOB producer phase to 
+/// Allows writers of executable content in the HOB producer phase to
 /// maintain and manage HOBs with specific GUID.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_GUID_EXTENSION.
@@ -329,7 +329,7 @@ typedef struct {
 
 ///
 /// Details the location of firmware volumes that contain firmware files.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_FV.
@@ -346,9 +346,9 @@ typedef struct {
 } EFI_HOB_FIRMWARE_VOLUME;
 
 ///
-/// Details the location of a firmware volume that was extracted 
+/// Details the location of a firmware volume that was extracted
 /// from a file within another firmware volume.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_FV2.
@@ -398,7 +398,7 @@ typedef struct {
 
 ///
 /// Describes pool memory allocations.
-/// 
+///
 typedef struct {
   ///
   /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_MEMORY_POOL.
@@ -418,7 +418,7 @@ typedef struct {
   /// The HOB generic header where Header.HobType = EFI_HOB_TYPE_UEFI_CAPSULE.
   ///
   EFI_HOB_GENERIC_HEADER Header;
-  
+
   ///
   /// The physical memory-mapped base address of an UEFI capsule. This value is set to
   /// point to the base of the contiguous memory of the UEFI capsule.
@@ -449,4 +449,4 @@ typedef union {
 } EFI_PEI_HOB_POINTERS;
 
 
-#endif 
+#endif

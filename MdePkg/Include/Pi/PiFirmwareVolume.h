@@ -2,13 +2,13 @@
   The firmware volume related definitions in PI.
 
   Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   PI Version 1.3
@@ -25,19 +25,19 @@ typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
 
 //
 // Value of EFI_FV_FILE_ATTRIBUTES.
-// 
+//
 #define EFI_FV_FILE_ATTRIB_ALIGNMENT      0x0000001F
 #define EFI_FV_FILE_ATTRIB_FIXED          0x00000100
 #define EFI_FV_FILE_ATTRIB_MEMORY_MAPPED  0x00000200
 
 ///
 /// type of EFI FVB attribute
-/// 
+///
 typedef UINT32  EFI_FVB_ATTRIBUTES_2;
 
-// 
+//
 // Attributes bit definitions
-// 
+//
 #define EFI_FVB2_READ_DISABLED_CAP  0x00000001
 #define EFI_FVB2_READ_ENABLED_CAP   0x00000002
 #define EFI_FVB2_READ_STATUS        0x00000004
@@ -104,7 +104,7 @@ typedef struct {
 ///
 typedef struct {
   ///
-  /// The first 16 bytes are reserved to allow for the reset vector of 
+  /// The first 16 bytes are reserved to allow for the reset vector of
   /// processors whose reset vector is at address 0.
   ///
   UINT8                     ZeroVector[16];
@@ -162,7 +162,7 @@ typedef struct {
 
 ///
 /// Extension header pointed by ExtHeaderOffset of volume header.
-/// 
+///
 typedef struct {
   ///
   /// Firmware volume name.
@@ -176,7 +176,7 @@ typedef struct {
 
 ///
 /// Entry struture for describing FV extension header
-/// 
+///
 typedef struct {
   ///
   /// Size of this header extension.
@@ -191,7 +191,7 @@ typedef struct {
 #define EFI_FV_EXT_TYPE_OEM_TYPE  0x01
 ///
 /// This extension header provides a mapping between a GUID and an OEM file type.
-/// 
+///
 typedef struct {
   ///
   /// Standard extension entry, with the type EFI_FV_EXT_TYPE_OEM_TYPE.
@@ -204,7 +204,7 @@ typedef struct {
   UINT32    TypeMask;
   ///
   /// An array of GUIDs, each GUID representing an OEM file type.
-  /// 
+  ///
   /// EFI_GUID  Types[1];
   ///
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY_OEM_TYPE;

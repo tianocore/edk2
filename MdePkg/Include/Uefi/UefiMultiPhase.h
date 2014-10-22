@@ -2,13 +2,13 @@
   This includes some definitions introduced in UEFI that will be used in both PEI and DXE phases.
 
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -18,14 +18,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/WinCertificate.h>
 ///
 /// Enumeration of memory types introduced in UEFI.
-/// 
+///
 typedef enum {
   ///
   /// Not used.
   ///
   EfiReservedMemoryType,
   ///
-  /// The code portions of a loaded application. 
+  /// The code portions of a loaded application.
   /// (Note that UEFI OS loaders are UEFI applications.)
   ///
   EfiLoaderCode,
@@ -87,7 +87,7 @@ typedef enum {
 
 ///
 /// Data structure that precedes all of the standard EFI table types.
-/// 
+///
 typedef struct {
   ///
   /// A 64-bit signature that identifies the type of table that follows.
@@ -119,14 +119,14 @@ typedef struct {
 
 ///
 /// Attributes of variable.
-/// 
+///
 #define EFI_VARIABLE_NON_VOLATILE                            0x00000001
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS                      0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS                          0x00000004
 ///
-/// This attribute is identified by the mnemonic 'HR' 
+/// This attribute is identified by the mnemonic 'HR'
 /// elsewhere in this specification.
-/// 
+///
 #define EFI_VARIABLE_HARDWARE_ERROR_RECORD                   0x00000008
 ///
 /// Attributes of Authenticated Variable
@@ -136,7 +136,7 @@ typedef struct {
 #define EFI_VARIABLE_APPEND_WRITE                            0x00000040
 
 
-///   
+///
 /// AuthInfo is a WIN_CERTIFICATE using the wCertificateType
 /// WIN_CERTIFICATE_UEFI_GUID and the CertType
 /// EFI_CERT_TYPE_RSA2048_SHA256_GUID. If the attribute specifies
@@ -150,41 +150,41 @@ typedef struct {
 /// WIN_CERTIFICATE shall be used to describe the signature of the
 /// Variable data *Data. In addition, the signature will also
 /// include the MonotonicCount value to guard against replay attacks.
-///  
+///
 typedef struct {
   ///
-  /// Included in the signature of        
+  /// Included in the signature of
   /// AuthInfo.Used to ensure freshness/no
-  /// replay. Incremented during each     
-  /// "Write" access.   
-  ///                  
+  /// replay. Incremented during each
+  /// "Write" access.
+  ///
   UINT64                      MonotonicCount;
   ///
-  /// Provides the authorization for the variable 
-  /// access. It is a signature across the        
-  /// variable data and the  Monotonic Count      
-  /// value. Caller uses Private key that is      
-  /// associated with a public key that has been  
-  /// provisioned via the key exchange.           
+  /// Provides the authorization for the variable
+  /// access. It is a signature across the
+  /// variable data and the  Monotonic Count
+  /// value. Caller uses Private key that is
+  /// associated with a public key that has been
+  /// provisioned via the key exchange.
   ///
   WIN_CERTIFICATE_UEFI_GUID   AuthInfo;
 } EFI_VARIABLE_AUTHENTICATION;
 
 ///
-/// When the attribute EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS is 
+/// When the attribute EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS is
 /// set, then the Data buffer shall begin with an instance of a complete (and serialized)
-/// EFI_VARIABLE_AUTHENTICATION_2 descriptor. The descriptor shall be followed by the new 
-/// variable value and DataSize shall reflect the combined size of the descriptor and the new 
-/// variable value. The authentication descriptor is not part of the variable data and is not 
+/// EFI_VARIABLE_AUTHENTICATION_2 descriptor. The descriptor shall be followed by the new
+/// variable value and DataSize shall reflect the combined size of the descriptor and the new
+/// variable value. The authentication descriptor is not part of the variable data and is not
 /// returned by subsequent calls to GetVariable().
 ///
 typedef struct {
   ///
-  /// For the TimeStamp value, components Pad1, Nanosecond, TimeZone, Daylight and 
+  /// For the TimeStamp value, components Pad1, Nanosecond, TimeZone, Daylight and
   /// Pad2 shall be set to 0. This means that the time shall always be expressed in GMT.
   ///
   EFI_TIME                    TimeStamp;
-  /// 
+  ///
   /// Only a CertType of  EFI_CERT_TYPE_PKCS7_GUID is accepted.
   ///
   WIN_CERTIFICATE_UEFI_GUID   AuthInfo;
