@@ -68,7 +68,7 @@ M: Olivier Martin <olivier.martin@arm.com>
 
 CryptoPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
-M: Ye Ting <ting.ye@intel.com>
+M: Qin Long <qin.long@intel.com>
 
 DuetPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/DuetPkg
@@ -110,9 +110,11 @@ M: Michael D Kinney <michael.d.kinney@intel.com>
 
 IntelFspPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFspPkg
+M: Jiewen Yao <jiewen.yao@intel.com>
 
 IntelFspWrapperPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFspWrapperPkg
+M: Jiewen Yao <jiewen.yao@intel.com>
 
 MdeModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
@@ -124,7 +126,7 @@ M: Michael D Kinney <michael.d.kinney@intel.com>
 
 NetworkPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
-M: Qian Ouyang <qian.ouyang@intel.com>
+M: Siyuan Fu <siyuan.fu@intel.com>
 
 Nt32Pkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Nt32Pkg
@@ -162,6 +164,7 @@ M: Jaben Carsey <jaben.carsey@intel.com>
 
 SourceLevelDebugPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
+M: Jeff Fan <jeff.fan@intel.com>
 
 StdLib, StdLibPrivateInternalFiles
 W: https://github.com/tianocore/tianocore.github.io/wiki/StdLib
