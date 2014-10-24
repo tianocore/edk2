@@ -1,8 +1,8 @@
 /** @file
-  TCG Service Protocol as defined in TCG_EFI_Protocol_1_20_Final
+  TCG Service Protocol as defined in TCG_EFI_Protocol_1_22_Final
   See http://trustedcomputinggroup.org for the latest specification
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -41,12 +41,6 @@ typedef struct _TCG_EFI_BOOT_SERVICE_CAPABILITY {
 } TCG_EFI_BOOT_SERVICE_CAPABILITY;
 
 typedef UINT32   TCG_ALGORITHM_ID;
-
-///
-/// Note:
-///   Status codes returned for functions of EFI_TCG_PROTOCOL do not exactly match
-///   those defined in the TCG EFI Protocol 1.20 Final Specification.
-///
 
 /**
   This service provides EFI protocol capability information, state information 
