@@ -50,6 +50,7 @@
   Ia32/PlDebugSupport.c
   X64/PlDebugSupport.h
   X64/PlDebugSupportX64.c
+  X64/AsmFuncs.nasm
   X64/AsmFuncs.S
   X64/AsmFuncs.asm
 
