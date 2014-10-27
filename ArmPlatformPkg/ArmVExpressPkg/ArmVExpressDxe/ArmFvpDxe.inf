@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = ArmFvpDxe
-  FILE_GUID                      = fe61bb5f-1b67-4c24-b346-73db42e873e5
+  FILE_GUID                      = 405b2307-6839-4d52-aeb9-bece64252800
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = ArmFvpInitialise
