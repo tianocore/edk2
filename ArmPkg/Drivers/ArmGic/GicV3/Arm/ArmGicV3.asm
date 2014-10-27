@@ -13,8 +13,8 @@
 
 // For the moment we assume this will run in SVC mode on ARMv7
 
-    EXPORT  ArmGicGetControlSystemRegisterEnable
-    EXPORT  ArmGicSetControlSystemRegisterEnable
+    EXPORT  ArmGicV3GetControlSystemRegisterEnable
+    EXPORT  ArmGicV3SetControlSystemRegisterEnable
     EXPORT  ArmGicV3EnableInterruptInterface
     EXPORT  ArmGicV3DisableInterruptInterface
     EXPORT  ArmGicV3EndOfInterrupt
@@ -29,7 +29,7 @@
 //ArmGicGetControlSystemRegisterEnable (
 //  VOID
 //  );
-ArmGicGetControlSystemRegisterEnable
+ArmGicV3GetControlSystemRegisterEnable
         mrc     p15, 0, r0, c12, c12, 5 // ICC_SRE
         bx      lr
 
@@ -38,7 +38,7 @@ ArmGicGetControlSystemRegisterEnable
 //ArmGicSetControlSystemRegisterEnable (
 //  IN UINT32         ControlSystemRegisterEnable
 //  );
-ArmGicSetControlSystemRegisterEnable
+ArmGicV3SetControlSystemRegisterEnable
         mcr     p15, 0, r0, c12, c12, 5 // ICC_SRE
         isb
         bx      lr

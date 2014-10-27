@@ -80,6 +80,9 @@ typedef enum {
 #define ARM_GIC_ICCIIDR_GET_REVISION(IccIidr)     (((IccIidr) >> 12) & 0xF)
 #define ARM_GIC_ICCIIDR_GET_IMPLEMENTER(IccIidr)  ((IccIidr) & 0xFFF)
 
+// Bit Mask for
+#define ARM_GIC_ICCIAR_ACKINTID                 0x3FF
+
 ARM_GIC_ARCH_REVISION
 EFIAPI
 ArmGicGetSupportedArchRevision (

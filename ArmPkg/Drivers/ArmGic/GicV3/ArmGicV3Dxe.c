@@ -1,36 +1,25 @@
-/*++
-
-Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
-Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
-
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  GicV2/ArmGicV2Dxe.c
-
-Abstract:
-
-  Driver implementing the GicV2 interrupt controller protocol
-
---*/
+/** @file
+*
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*
+**/
 
 #include "ArmGicDxe.h"
-#include "GicV2/ArmGicV2Lib.h"
+#include "GicV3/ArmGicV3Lib.h"
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
-extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol;
+extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV3Protocol;
 
-STATIC UINT32 mGicInterruptInterfaceBase;
-STATIC UINT32 mGicDistributorBase;
+STATIC UINTN mGicDistributorBase;
 
 /**
   Enable interrupt source Source.
@@ -39,12 +28,12 @@ STATIC UINT32 mGicDistributorBase;
   @param Source   Hardware source of the interrupt
 
   @retval EFI_SUCCESS       Source interrupt enabled.
-  @retval EFI_UNSUPPORTED   Source interrupt is not supported
+  @retval EFI_DEVICE_ERROR  Hardware could not be programmed.
 
 **/
 EFI_STATUS
 EFIAPI
-GicV2EnableInterruptSource (
+GicV3EnableInterruptSource (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
@@ -66,12 +55,12 @@ GicV2EnableInterruptSource (
   @param Source   Hardware source of the interrupt
 
   @retval EFI_SUCCESS       Source interrupt disabled.
-  @retval EFI_UNSUPPORTED   Source interrupt is not supported
+  @retval EFI_DEVICE_ERROR  Hardware could not be programmed.
 
 **/
 EFI_STATUS
 EFIAPI
-GicV2DisableInterruptSource (
+GicV3DisableInterruptSource (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
@@ -94,12 +83,12 @@ GicV2DisableInterruptSource (
   @param InterruptState  TRUE: source enabled, FALSE: source disabled.
 
   @retval EFI_SUCCESS       InterruptState is valid
-  @retval EFI_UNSUPPORTED   Source interrupt is not supported
+  @retval EFI_DEVICE_ERROR  InterruptState is not valid
 
 **/
 EFI_STATUS
 EFIAPI
-GicV2GetInterruptSourceState (
+GicV3GetInterruptSourceState (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source,
   IN BOOLEAN                            *InterruptState
@@ -123,12 +112,12 @@ GicV2GetInterruptSourceState (
   @param Source   Hardware source of the interrupt
 
   @retval EFI_SUCCESS       Source interrupt EOI'ed.
-  @retval EFI_UNSUPPORTED   Source interrupt is not supported
+  @retval EFI_DEVICE_ERROR  Hardware could not be programmed.
 
 **/
 EFI_STATUS
 EFIAPI
-GicV2EndOfInterrupt (
+GicV3EndOfInterrupt (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
@@ -138,7 +127,7 @@ GicV2EndOfInterrupt (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicV2EndOfInterrupt (mGicInterruptInterfaceBase, Source);
+  ArmGicV3EndOfInterrupt (Source);
   return EFI_SUCCESS;
 }
 
@@ -155,7 +144,7 @@ GicV2EndOfInterrupt (
 **/
 VOID
 EFIAPI
-GicV2IrqInterruptHandler (
+GicV3IrqInterruptHandler (
   IN EFI_EXCEPTION_TYPE           InterruptType,
   IN EFI_SYSTEM_CONTEXT           SystemContext
   )
@@ -163,9 +152,10 @@ GicV2IrqInterruptHandler (
   UINT32                      GicInterrupt;
   HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
 
-  GicInterrupt = ArmGicV2AcknowledgeInterrupt (mGicInterruptInterfaceBase);
+  GicInterrupt = ArmGicV3AcknowledgeInterrupt ();
 
-  // Special Interrupts (ID1020-ID1023) have an Interrupt ID greater than the number of interrupt (ie: Spurious interrupt).
+  // Special Interrupts (ID1020-ID1023) have an Interrupt ID greater than the
+  // number of interrupt (ie: Spurious interrupt).
   if ((GicInterrupt & ARM_GIC_ICCIAR_ACKINTID) >= mGicNumInterrupts) {
     // The special interrupt do not need to be acknowledge
     return;
@@ -179,18 +169,18 @@ GicV2IrqInterruptHandler (
     DEBUG ((EFI_D_ERROR, "Spurious GIC interrupt: 0x%x\n", GicInterrupt));
   }
 
-  GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
+  GicV3EndOfInterrupt (&gHardwareInterruptV3Protocol, GicInterrupt);
 }
 
 //
 // The protocol instance produced by this driver
 //
-EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol = {
+EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV3Protocol = {
   RegisterInterruptSource,
-  GicV2EnableInterruptSource,
-  GicV2DisableInterruptSource,
-  GicV2GetInterruptSourceState,
-  GicV2EndOfInterrupt
+  GicV3EnableInterruptSource,
+  GicV3DisableInterruptSource,
+  GicV3GetInterruptSourceState,
+  GicV3EndOfInterrupt
 };
 
 /**
@@ -204,30 +194,24 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol = {
 **/
 VOID
 EFIAPI
-GicV2ExitBootServicesEvent (
+GicV3ExitBootServicesEvent (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
 {
   UINTN    Index;
-  UINT32   GicInterrupt;
-
-  // Disable all the interrupts
-  for (Index = 0; Index < mGicNumInterrupts; Index++) {
-    GicV2DisableInterruptSource (&gHardwareInterruptV2Protocol, Index);
-  }
 
   // Acknowledge all pending interrupts
-  do {
-    GicInterrupt = ArmGicV2AcknowledgeInterrupt (mGicInterruptInterfaceBase);
+  for (Index = 0; Index < mGicNumInterrupts; Index++) {
+    GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
+  }
 
-    if ((GicInterrupt & ARM_GIC_ICCIAR_ACKINTID) < mGicNumInterrupts) {
-      GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
-    }
-  } while (!ARM_GIC_IS_SPECIAL_INTERRUPTS (GicInterrupt));
+  for (Index = 0; Index < mGicNumInterrupts; Index++) {
+    GicV3EndOfInterrupt (&gHardwareInterruptV3Protocol, Index);
+  }
 
   // Disable Gic Interface
-  ArmGicV2DisableInterruptInterface (mGicInterruptInterfaceBase);
+  ArmGicV3DisableInterruptInterface ();
 
   // Disable Gic Distributor
   ArmGicDisableDistributor (mGicDistributorBase);
@@ -245,7 +229,7 @@ GicV2ExitBootServicesEvent (
 
 **/
 EFI_STATUS
-GicV2DxeInitialize (
+GicV3DxeInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
@@ -259,12 +243,11 @@ GicV2DxeInitialize (
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicInterruptInterfaceBase = PcdGet32 (PcdGicInterruptInterfaceBase);
   mGicDistributorBase = PcdGet32 (PcdGicDistributorBase);
   mGicNumInterrupts = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
-    GicV2DisableInterruptSource (&gHardwareInterruptV2Protocol, Index);
+    GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
 
     // Set Priority
     RegOffset = Index / 4;
@@ -298,20 +281,28 @@ GicV2DxeInitialize (
     }
   }
 
+  // Make sure System Register access is enabled (SRE). This depends on the
+  // lower levels giving us permission, otherwise we will cause an exception
+  // here.
+  // Note: We do not need to set ICC_SRE_EL2.Enable because the OS is started at the
+  // same exception level.
+  // It is the OS responsibility to set this bit.
+  ArmGicV3SetControlSystemRegisterEnable (ArmGicV3GetControlSystemRegisterEnable () | ICC_SRE_EL2_SRE);
+
   // Set binary point reg to 0x7 (no preemption)
-  MmioWrite32 (mGicInterruptInterfaceBase + ARM_GIC_ICCBPR, 0x7);
+  ArmGicV3SetBinaryPointer (0x7);
 
   // Set priority mask reg to 0xff to allow all priorities through
-  MmioWrite32 (mGicInterruptInterfaceBase + ARM_GIC_ICCPMR, 0xff);
+  ArmGicV3SetPriorityMask (0xff);
 
   // Enable gic cpu interface
-  ArmGicEnableInterruptInterface (mGicInterruptInterfaceBase);
+  ArmGicV3EnableInterruptInterface ();
 
   // Enable gic distributor
   ArmGicEnableDistributor (mGicDistributorBase);
 
   Status = InstallAndRegisterInterruptService (
-          &gHardwareInterruptV2Protocol, GicV2IrqInterruptHandler, GicV2ExitBootServicesEvent);
+          &gHardwareInterruptV3Protocol, GicV3IrqInterruptHandler, GicV3ExitBootServicesEvent);
 
   return Status;
 }

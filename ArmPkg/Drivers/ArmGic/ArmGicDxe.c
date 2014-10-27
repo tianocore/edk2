@@ -49,6 +49,8 @@ InterruptDxeInitialize (
 
   if (Revision == ARM_GIC_ARCH_REVISION_2) {
     Status = GicV2DxeInitialize (ImageHandle, SystemTable);
+  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
+    Status = GicV3DxeInitialize (ImageHandle, SystemTable);
   } else {
     Status = EFI_UNSUPPORTED;
   }

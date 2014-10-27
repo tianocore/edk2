@@ -55,4 +55,13 @@ GicV2DxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   );
 
+//
+// GicV3 API
+//
+EFI_STATUS
+GicV3DxeInitialize (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  );
+
 #endif

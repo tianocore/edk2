@@ -15,6 +15,20 @@
 #ifndef _ARM_GIC_V3_H_
 #define _ARM_GIC_V3_H_
 
+#define ICC_SRE_EL2_SRE         (1 << 0)
+
+UINT32
+EFIAPI
+ArmGicV3GetControlSystemRegisterEnable (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmGicV3SetControlSystemRegisterEnable (
+  IN UINT32         ControlSystemRegisterEnable
+  );
+
 VOID
 EFIAPI
 ArmGicV3EnableInterruptInterface (

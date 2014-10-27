@@ -25,8 +25,8 @@
 .text
 .align 2
 
-GCC_ASM_EXPORT(ArmGicGetControlSystemRegisterEnable)
-GCC_ASM_EXPORT(ArmGicSetControlSystemRegisterEnable)
+GCC_ASM_EXPORT(ArmGicV3GetControlSystemRegisterEnable)
+GCC_ASM_EXPORT(ArmGicV3SetControlSystemRegisterEnable)
 GCC_ASM_EXPORT(ArmGicV3EnableInterruptInterface)
 GCC_ASM_EXPORT(ArmGicV3DisableInterruptInterface)
 GCC_ASM_EXPORT(ArmGicV3EndOfInterrupt)
@@ -36,10 +36,10 @@ GCC_ASM_EXPORT(ArmGicV3SetBinaryPointer)
 
 //UINT32
 //EFIAPI
-//ArmGicGetControlSystemRegisterEnable (
+//ArmGicV3GetControlSystemRegisterEnable (
 //  VOID
 //  );
-ASM_PFX(ArmGicGetControlSystemRegisterEnable):
+ASM_PFX(ArmGicV3GetControlSystemRegisterEnable):
         EL1_OR_EL2_OR_EL3(x1)
 1:  mrs x0, ICC_SRE_EL1
         b       4f
@@ -50,10 +50,10 @@ ASM_PFX(ArmGicGetControlSystemRegisterEnable):
 
 //VOID
 //EFIAPI
-//ArmGicSetControlSystemRegisterEnable (
+//ArmGicV3SetControlSystemRegisterEnable (
 //  IN UINT32         ControlSystemRegisterEnable
 //  );
-ASM_PFX(ArmGicSetControlSystemRegisterEnable):
+ASM_PFX(ArmGicV3SetControlSystemRegisterEnable):
         EL1_OR_EL2_OR_EL3(x1)
 1:  msr ICC_SRE_EL1, x0
         b       4f

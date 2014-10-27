@@ -27,6 +27,7 @@
   ArmGicCommonDxe.c
 
   GicV2/ArmGicV2Dxe.c
+  GicV3/ArmGicV3Dxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
