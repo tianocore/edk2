@@ -172,6 +172,46 @@ SemihostFileLength (
   }
 }
 
+/**
+  Get a temporary name for a file from the host running the debug agent.
+
+  @param[out]  Buffer      Pointer to the buffer where the temporary name has to
+                           be stored
+  @param[in]   Identifier  File name identifier (integer in the range 0 to 255)
+  @param[in]   Length      Length of the buffer to store the temporary name
+
+  @retval  RETURN_SUCCESS            Temporary name returned
+  @retval  RETURN_INVALID_PARAMETER  Invalid buffer address
+  @retval  RETURN_ABORTED            Temporary name not returned
+
+**/
+RETURN_STATUS
+SemihostFileTmpName(
+  OUT  VOID   *Buffer,
+  IN   UINT8  Identifier,
+  IN   UINTN  Length
+  )
+{
+  SEMIHOST_FILE_TMPNAME_BLOCK  TmpNameBlock;
+  INT32                        Result;
+
+  if (Buffer == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  TmpNameBlock.Buffer     = Buffer;
+  TmpNameBlock.Identifier = Identifier;
+  TmpNameBlock.Length     = Length;
+
+  Result = Semihost_SYS_TMPNAME (&TmpNameBlock);
+
+  if (Result != 0) {
+    return  RETURN_ABORTED;
+  } else {
+    return  RETURN_SUCCESS;
+  }
+}
+
 RETURN_STATUS
 SemihostFileRemove (
   IN CHAR8 *FileName
@@ -194,6 +234,44 @@ SemihostFileRemove (
     return RETURN_SUCCESS;
   } else {
     return RETURN_ABORTED;
+  }
+}
+
+/**
+  Rename a specified file.
+
+  @param[in]  FileName     Name of the file to rename.
+  @param[in]  NewFileName  The new name of the file.
+
+  @retval  RETURN_SUCCESS            File Renamed
+  @retval  RETURN_INVALID_PARAMETER  Either the current or the new name is not specified
+  @retval  RETURN_ABORTED            Rename failed
+
+**/
+RETURN_STATUS
+SemihostFileRename(
+  IN  CHAR8  *FileName,
+  IN  CHAR8  *NewFileName
+  )
+{
+  SEMIHOST_FILE_RENAME_BLOCK  RenameBlock;
+  INT32                       Result;
+
+  if ((FileName == NULL) || (NewFileName == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  RenameBlock.FileName          = FileName;
+  RenameBlock.FileNameLength    = AsciiStrLen (FileName);
+  RenameBlock.NewFileName       = NewFileName;
+  RenameBlock.NewFileNameLength = AsciiStrLen (NewFileName);
+
+  Result = Semihost_SYS_RENAME (&RenameBlock);
+
+  if (Result != 0) {
+    return  RETURN_ABORTED;
+  } else {
+    return  RETURN_SUCCESS;
   }
 }
 
