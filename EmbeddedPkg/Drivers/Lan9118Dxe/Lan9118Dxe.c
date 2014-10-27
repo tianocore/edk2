@@ -918,7 +918,7 @@ SnpGetStatus (
     TxStatus = MmioRead32 (LAN9118_TX_STATUS);
     PacketTag = TxStatus >> 16;
     TxStatus = TxStatus & 0xFFFF;
-    if ((TxStatus & TXSTATUS_ES) && TxStatus != (TXSTATUS_ES | TXSTATUS_NO_CA)) {
+    if ((TxStatus & TXSTATUS_ES) && (TxStatus != (TXSTATUS_ES | TXSTATUS_NO_CA))) {
       DEBUG ((EFI_D_ERROR, "LAN9118: There was an error transmitting. TxStatus=0x%08x:", TxStatus));
       if (TxStatus & TXSTATUS_NO_CA) {
         DEBUG ((EFI_D_ERROR, "- No carrier\n"));
@@ -939,7 +939,7 @@ SnpGetStatus (
         DEBUG ((EFI_D_ERROR, "- Lost carrier during Tx\n"));
       }
       return EFI_DEVICE_ERROR;
-    } else {
+    } else if (TxBuff != NULL) {
       LanDriver->Stats.TxTotalFrames += 1;
       *TxBuff = LanDriver->TxRing[PacketTag % LAN9118_TX_RING_NUM_ENTRIES];
     }
