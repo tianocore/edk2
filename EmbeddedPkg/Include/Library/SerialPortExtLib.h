@@ -1,6 +1,16 @@
 /** @file
 
-  Copyright (c) 2012, ARM Ltd. All rights reserved.
+  Serial I/O port control interface extension.
+
+  This library provides an extension to the library providing common
+  serial I/O port functions that is defined in MdePkg. The aim is to
+  provide more control over the functionalities of a serial port. The
+  extension covers all the needs of the UEFI Serial I/O Protocol.
+  Though, its use is not restricted to the UEFI Serial I/O Protocol.
+  It could for example be used in the PEI phase of the boot sequence
+  as well.
+
+  Copyright (c) 2012 - 2014, ARM Ltd. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
