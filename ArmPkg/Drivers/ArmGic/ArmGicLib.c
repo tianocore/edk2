@@ -19,6 +19,15 @@
 
 #include "GicV2/ArmGicV2Lib.h"
 
+ARM_GIC_ARCH_REVISION
+EFIAPI
+ArmGicGetSupportedArchRevision (
+  VOID
+  )
+{
+  return ARM_GIC_ARCH_REVISION_2;
+}
+
 UINTN
 EFIAPI
 ArmGicGetInterfaceIdentification (
@@ -71,15 +80,22 @@ ArmGicAcknowledgeInterrupt (
   )
 {
   UINTN Value;
+  ARM_GIC_ARCH_REVISION Revision;
 
-  Value = ArmGicV2AcknowledgeInterrupt (GicInterruptInterfaceBase);
-
-  // InterruptId is required for the caller to know if a valid or spurious
-  // interrupt has been read
-  ASSERT (InterruptId != NULL);
-
-  if (InterruptId != NULL) {
-    *InterruptId = Value & ARM_GIC_ICCIAR_ACKINTID;
+  Revision = ArmGicGetSupportedArchRevision ();
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    Value = ArmGicV2AcknowledgeInterrupt (GicInterruptInterfaceBase);
+    // InterruptId is required for the caller to know if a valid or spurious
+    // interrupt has been read
+    ASSERT (InterruptId != NULL);
+    if (InterruptId != NULL) {
+      *InterruptId = Value & ARM_GIC_ICCIAR_ACKINTID;
+    }
+  } else {
+    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+    // Report Spurious interrupt which is what the above controllers would
+    // return if no interrupt was available
+    Value = 1023;
   }
 
   return Value;
@@ -92,7 +108,14 @@ ArmGicEndOfInterrupt (
   IN UINTN                  Source
   )
 {
-  ArmGicV2EndOfInterrupt (GicInterruptInterfaceBase, Source);
+  ARM_GIC_ARCH_REVISION Revision;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    ArmGicV2EndOfInterrupt (GicInterruptInterfaceBase, Source);
+  } else {
+    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+  }
 }
 
 VOID
@@ -164,7 +187,14 @@ ArmGicEnableInterruptInterface (
   IN  INTN          GicInterruptInterfaceBase
   )
 {
-  return ArmGicV2EnableInterruptInterface (GicInterruptInterfaceBase);
+  ARM_GIC_ARCH_REVISION Revision;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    ArmGicV2EnableInterruptInterface (GicInterruptInterfaceBase);
+  } else {
+    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+  }
 }
 
 VOID
@@ -173,5 +203,12 @@ ArmGicDisableInterruptInterface (
   IN  INTN          GicInterruptInterfaceBase
   )
 {
-  return ArmGicV2DisableInterruptInterface (GicInterruptInterfaceBase);
+  ARM_GIC_ARCH_REVISION Revision;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    ArmGicV2DisableInterruptInterface (GicInterruptInterfaceBase);
+  } else {
+    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+  }
 }

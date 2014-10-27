@@ -27,6 +27,7 @@
   GicV2/ArmGicV2NonSecLib.c
 
 [LibraryClasses]
+  DebugLib
   IoLib
 
 [Packages]

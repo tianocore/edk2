@@ -33,6 +33,7 @@ Abstract:
   @retval EFI_SUCCESS           Protocol registered
   @retval EFI_OUT_OF_RESOURCES  Cannot allocate protocol data structure
   @retval EFI_DEVICE_ERROR      Hardware problems
+  @retval EFI_UNSUPPORTED       GIC version not supported
 
 **/
 EFI_STATUS
@@ -41,9 +42,16 @@ InterruptDxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS            Status;
+  ARM_GIC_ARCH_REVISION Revision;
 
-  Status = GicV2DxeInitialize (ImageHandle, SystemTable);
+  Revision = ArmGicGetSupportedArchRevision ();
+
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    Status = GicV2DxeInitialize (ImageHandle, SystemTable);
+  } else {
+    Status = EFI_UNSUPPORTED;
+  }
 
   return Status;
 }
