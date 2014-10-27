@@ -57,7 +57,7 @@ EFI_FILE gSemihostFsFile = {
 };
 
 //
-// Device path for SemiHosting. It contains our autogened Caller ID GUID.
+// Device path for semi-hosting. It contains our autogened Caller ID GUID.
 //
 typedef struct {
   VENDOR_DEVICE_PATH        Guid;
@@ -149,99 +149,150 @@ VolumeOpen (
   return EFI_SUCCESS;
 }
 
+/**
+  Open a file on the host system by means of the semihosting interface.
+
+  @param[in]   This        A pointer to the EFI_FILE_PROTOCOL instance that is
+                           the file handle to source location.
+  @param[out]  NewHandle   A pointer to the location to return the opened
+                           handle for the new file.
+  @param[in]   FileName    The Null-terminated string of the name of the file
+                           to be opened.
+  @param[in]   OpenMode    The mode to open the file : Read or Read/Write or
+                           Read/Write/Create
+  @param[in]   Attributes  Only valid for EFI_FILE_MODE_CREATE, in which case these
+                           are the attribute bits for the newly created file. The
+                           mnemonics of the attribute bits are : EFI_FILE_READ_ONLY,
+                           EFI_FILE_HIDDEN, EFI_FILE_SYSTEM, EFI_FILE_RESERVED,
+                           EFI_FILE_DIRECTORY and EFI_FILE_ARCHIVE.
+
+  @retval  EFI_SUCCESS            The file was open.
+  @retval  EFI_NOT_FOUND          The specified file could not be found.
+  @retval  EFI_DEVICE_ERROR       The last issued semi-hosting operation failed.
+  @retval  EFI_WRITE_PROTECTED    Attempt to create a directory. This is not possible
+                                  with the semi-hosting interface.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough resources were available to open the file.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
+**/
 EFI_STATUS
 FileOpen (
-  IN  EFI_FILE    *File,
-  OUT EFI_FILE    **NewHandle,
-  IN  CHAR16      *FileName,
-  IN  UINT64      OpenMode,
-  IN  UINT64      Attributes
+  IN  EFI_FILE  *This,
+  OUT EFI_FILE  **NewHandle,
+  IN  CHAR16    *FileName,
+  IN  UINT64    OpenMode,
+  IN  UINT64    Attributes
   )
 {
-  SEMIHOST_FCB  *FileFcb = NULL;
-  EFI_STATUS    Status   = EFI_SUCCESS;
-  UINTN         SemihostHandle;
-  CHAR8         *AsciiFileName;
-  UINT32        SemihostMode;
-  BOOLEAN       IsRoot;
-  UINTN         Length;
+  SEMIHOST_FCB   *FileFcb;
+  RETURN_STATUS  Return;
+  EFI_STATUS     Status;
+  UINTN          SemihostHandle;
+  CHAR8          *AsciiFileName;
+  UINT32         SemihostMode;
+  UINTN          Length;
 
   if ((FileName == NULL) || (NewHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  // Semihosting does not support directories
-  if (Attributes & EFI_FILE_DIRECTORY) {
-    return EFI_UNSUPPORTED;
+  if ( (OpenMode != EFI_FILE_MODE_READ) &&
+       (OpenMode != (EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE)) &&
+       (OpenMode != (EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE)) ) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  // Semihost interface requires ASCII filenames
-  AsciiFileName = AllocatePool ((StrLen (FileName) + 1) * sizeof (CHAR8));
+  if ((OpenMode & EFI_FILE_MODE_CREATE) &&
+      (Attributes & EFI_FILE_DIRECTORY)    ) {
+    return EFI_WRITE_PROTECTED;
+  }
+
+  AsciiFileName = AllocatePool (StrLen (FileName) + 1);
   if (AsciiFileName == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   UnicodeStrToAsciiStr (FileName, AsciiFileName);
 
+  // Opening '/', '\', '.', or the NULL pathname is trying to open the root directory
   if ((AsciiStrCmp (AsciiFileName, "\\") == 0) ||
       (AsciiStrCmp (AsciiFileName, "/")  == 0) ||
       (AsciiStrCmp (AsciiFileName, "")   == 0) ||
-      (AsciiStrCmp (AsciiFileName, ".")  == 0)) {
-    // Opening '/', '\', '.', or the NULL pathname is trying to open the root directory
-    IsRoot = TRUE;
-
-    // Root directory node doesn't have a name.
+      (AsciiStrCmp (AsciiFileName, ".")  == 0)    ) {
     FreePool (AsciiFileName);
-    AsciiFileName = NULL;
+    return (VolumeOpen (&gSemihostFs, NewHandle));
+  }
+
+  //
+  // No control is done here concerning the file path. It is passed
+  // as it is to the host operating system through the semi-hosting
+  // interface. We first try to open the file in the read or update
+  // mode even if the file creation has been asked for. That way, if
+  // the file already exists, it is not truncated to zero length. In
+  // write mode (bit SEMIHOST_FILE_MODE_WRITE up), if the file already
+  // exists, it is reset to an empty file.
+  //
+  if (OpenMode == EFI_FILE_MODE_READ) {
+    SemihostMode = SEMIHOST_FILE_MODE_READ | SEMIHOST_FILE_MODE_BINARY;
   } else {
-    // Translate EFI_FILE_MODE into Semihosting mode
-    if (OpenMode & EFI_FILE_MODE_WRITE) {
-      SemihostMode = SEMIHOST_FILE_MODE_WRITE | SEMIHOST_FILE_MODE_BINARY;
-    } else if (OpenMode & EFI_FILE_MODE_READ) {
-      SemihostMode = SEMIHOST_FILE_MODE_READ  | SEMIHOST_FILE_MODE_BINARY;
-    } else {
-      return EFI_UNSUPPORTED;
-    }
+    SemihostMode = SEMIHOST_FILE_MODE_READ | SEMIHOST_FILE_MODE_BINARY | SEMIHOST_FILE_MODE_UPDATE;
+  }
+  Return = SemihostFileOpen (AsciiFileName, SemihostMode, &SemihostHandle);
 
-    // Add the creation flag if necessary
+  if (RETURN_ERROR (Return)) {
     if (OpenMode & EFI_FILE_MODE_CREATE) {
-      SemihostMode |= SEMIHOST_FILE_MODE_UPDATE;
+      //
+      // In the create if does not exist case, if the opening in update
+      // mode failed, create it and open it in update mode. The update
+      // mode allows for both read and write from and to the file.
+      //
+      Return = SemihostFileOpen (
+                 AsciiFileName,
+                 SEMIHOST_FILE_MODE_WRITE | SEMIHOST_FILE_MODE_BINARY | SEMIHOST_FILE_MODE_UPDATE,
+                 &SemihostHandle
+                 );
+      if (RETURN_ERROR (Return)) {
+        Status = EFI_DEVICE_ERROR;
+        goto Error;
+      }
+    } else {
+      Status = EFI_NOT_FOUND;
+      goto Error;
     }
-
-    // Call the semihosting interface to open the file.
-    Status = SemihostFileOpen (AsciiFileName, SemihostMode, &SemihostHandle);
-    if (EFI_ERROR(Status)) {
-      return Status;
-    }
-
-    IsRoot = FALSE;
   }
 
   // Allocate a control block and fill it
   FileFcb = AllocateFCB ();
   if (FileFcb == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
   }
 
   FileFcb->FileName       = AsciiFileName;
   FileFcb->SemihostHandle = SemihostHandle;
   FileFcb->Position       = 0;
-  FileFcb->IsRoot         = IsRoot;
+  FileFcb->IsRoot         = 0;
   FileFcb->OpenMode       = OpenMode;
 
-  if (!IsRoot) {
-    Status = SemihostFileLength (SemihostHandle, &Length);
-    if (EFI_ERROR(Status)) {
-      return Status;
-    }
-
-    FileFcb->Info.FileSize     = Length;
-    FileFcb->Info.PhysicalSize = Length;
-    FileFcb->Info.Attribute    = Attributes;
+  Return = SemihostFileLength (SemihostHandle, &Length);
+  if (RETURN_ERROR (Return)) {
+    Status = EFI_DEVICE_ERROR;
+    FreeFCB (FileFcb);
+    goto Error;
   }
+
+  FileFcb->Info.FileSize     = Length;
+  FileFcb->Info.PhysicalSize = Length;
+  FileFcb->Info.Attribute    = (OpenMode & EFI_FILE_MODE_CREATE) ? Attributes : 0;
 
   InsertTailList (&gFileList, &FileFcb->Link);
 
   *NewHandle = &FileFcb->File;
+
+  return EFI_SUCCESS;
+
+Error:
+
+  FreePool (AsciiFileName);
 
   return Status;
 }
