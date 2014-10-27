@@ -979,29 +979,24 @@ SnpGetStatus (
 
   // Read interrupt status if IrqStat is not NULL
   if (IrqStat != NULL) {
+    *IrqStat = 0;
 
     // Check for receive interrupt
     if (MmioRead32 (LAN9118_INT_STS) & INSTS_RSFL) { // Data moved from rx FIFO
       *IrqStat |= EFI_SIMPLE_NETWORK_RECEIVE_INTERRUPT;
       MmioWrite32 (LAN9118_INT_STS,INSTS_RSFL);
-    } else {
-      *IrqStat &= ~EFI_SIMPLE_NETWORK_RECEIVE_INTERRUPT;
     }
 
     // Check for transmit interrupt
     if (MmioRead32 (LAN9118_INT_STS) & INSTS_TSFL) {
       *IrqStat |= EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
       MmioWrite32 (LAN9118_INT_STS,INSTS_TSFL);
-    } else {
-      *IrqStat &= ~EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
     }
 
     // Check for software interrupt
     if (MmioRead32 (LAN9118_INT_STS) & INSTS_SW_INT) {
       *IrqStat |= EFI_SIMPLE_NETWORK_SOFTWARE_INTERRUPT;
       MmioWrite32 (LAN9118_INT_STS,INSTS_SW_INT);
-    } else {
-      *IrqStat &= ~EFI_SIMPLE_NETWORK_SOFTWARE_INTERRUPT;
     }
   }
 
