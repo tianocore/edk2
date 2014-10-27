@@ -44,7 +44,6 @@
     EXPORT  ArmEnableVFP
     EXPORT  ArmCallWFI
     EXPORT  ArmReadCbar
-    EXPORT  ArmInvalidateInstructionAndDataTlb
     EXPORT  ArmReadMpidr
     EXPORT  ArmReadTpidrurw
     EXPORT  ArmWriteTpidrurw
@@ -361,11 +360,6 @@ ArmCallWFI
 ArmReadCbar
   mrc     p15, 4, r0, c15, c0, 0  //Read Configuration Base Address Register
   bx      lr
-
-ArmInvalidateInstructionAndDataTlb
-  mcr     p15, 0, r0, c8, c7, 0      ; Invalidate Inst TLB and Data TLB
-  dsb
-  bx lr
 
 ArmReadMpidr
   mrc     p15, 0, r0, c0, c0, 5     ; read MPIDR

@@ -18,7 +18,6 @@
 .text
 .align 2
 GCC_ASM_EXPORT(ArmDisableCachesAndMmu)
-GCC_ASM_EXPORT(ArmInvalidateInstructionAndDataTlb)
 GCC_ASM_EXPORT(ArmCleanInvalidateDataCache)
 GCC_ASM_EXPORT(ArmCleanDataCache)
 GCC_ASM_EXPORT(ArmInvalidateDataCache)
@@ -67,10 +66,6 @@ ASM_PFX(ArmDisableCachesAndMmu):
   bic   r0, r0, #CTRL_I_BIT             @ Disable I Cache
   mcr   p15, 0, r0, c1, c0, 0           @ Write control register
   bx      LR
-
-ASM_PFX(ArmInvalidateInstructionAndDataTlb):
-  mcr     p15, 0, r0, c8, c7, 0      @ Invalidate Inst TLB and Data TLB
-  bx lr
 
 ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
   mcr     p15, 0, r0, c7, c6, 1   @invalidate single data cache line

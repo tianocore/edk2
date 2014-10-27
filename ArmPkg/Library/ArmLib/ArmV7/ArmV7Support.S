@@ -47,7 +47,6 @@ GCC_ASM_EXPORT (ArmWriteVBar)
 GCC_ASM_EXPORT (ArmEnableVFP)
 GCC_ASM_EXPORT (ArmCallWFI)
 GCC_ASM_EXPORT (ArmReadCbar)
-GCC_ASM_EXPORT (ArmInvalidateInstructionAndDataTlb)
 GCC_ASM_EXPORT (ArmReadMpidr)
 GCC_ASM_EXPORT (ArmReadTpidrurw)
 GCC_ASM_EXPORT (ArmWriteTpidrurw)
@@ -367,11 +366,6 @@ ASM_PFX(ArmCallWFI):
 ASM_PFX(ArmReadCbar):
   mrc     p15, 4, r0, c15, c0, 0  @ Read Configuration Base Address Register
   bx      lr
-
-ASM_PFX(ArmInvalidateInstructionAndDataTlb):
-  mcr     p15, 0, r0, c8, c7, 0      @ Invalidate Inst TLB and Data TLB
-  dsb
-  bx lr
 
 ASM_PFX(ArmReadMpidr):
   mrc     p15, 0, r0, c0, c0, 5       @ read MPIDR

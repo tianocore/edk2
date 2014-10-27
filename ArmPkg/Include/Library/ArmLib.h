@@ -338,12 +338,6 @@ ArmDisableCachesAndMmu (
 
 VOID
 EFIAPI
-ArmInvalidateInstructionAndDataTlb (
-  VOID
-  );
-
-VOID
-EFIAPI
 ArmEnableInterrupts (
   VOID
   );
@@ -402,6 +396,9 @@ ArmGetFiqState (
   VOID
   );
 
+/**
+ * Invalidate Data and Instruction TLBs
+ */
 VOID
 EFIAPI
 ArmInvalidateTlb (

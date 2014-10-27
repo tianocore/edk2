@@ -48,7 +48,6 @@ GCC_ASM_EXPORT (ArmWriteVBar)
 GCC_ASM_EXPORT (ArmReadVBar)
 GCC_ASM_EXPORT (ArmEnableVFP)
 GCC_ASM_EXPORT (ArmCallWFI)
-GCC_ASM_EXPORT (ArmInvalidateInstructionAndDataTlb)
 GCC_ASM_EXPORT (ArmReadMpidr)
 GCC_ASM_EXPORT (ArmReadTpidrurw)
 GCC_ASM_EXPORT (ArmWriteTpidrurw)
@@ -448,18 +447,6 @@ ASM_PFX(ArmEnableVFP):
 ASM_PFX(ArmCallWFI):
   wfi
   ret
-
-
-ASM_PFX(ArmInvalidateInstructionAndDataTlb):
-   EL1_OR_EL2_OR_EL3(x0)
-1: tlbi  vmalle1
-   b     4f
-2: tlbi  alle2
-   b     4f
-3: tlbi  alle3
-4: dsb   sy
-   isb
-   ret
 
 
 ASM_PFX(ArmReadMpidr):
