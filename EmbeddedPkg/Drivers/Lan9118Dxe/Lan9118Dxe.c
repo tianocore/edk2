@@ -489,6 +489,9 @@ SnpShutdown (
     return Status;
   }
 
+  // Back to the started and thus not initialized state
+  Snp->Mode->State = EfiSimpleNetworkStarted;
+
   return EFI_SUCCESS;
 }
 
