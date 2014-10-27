@@ -204,7 +204,7 @@ FileOpen (
 
     // Add the creation flag if necessary
     if (OpenMode & EFI_FILE_MODE_CREATE) {
-      SemihostMode |= SEMIHOST_FILE_MODE_CREATE;
+      SemihostMode |= SEMIHOST_FILE_MODE_UPDATE;
     }
 
     // Call the semihosting interface to open the file.

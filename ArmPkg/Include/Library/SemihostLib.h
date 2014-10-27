@@ -26,7 +26,7 @@
 #define SEMIHOST_FILE_MODE_READ     (0 << 2)
 #define SEMIHOST_FILE_MODE_WRITE    (1 << 2)
 #define SEMIHOST_FILE_MODE_APPEND   (2 << 2)
-#define SEMIHOST_FILE_MODE_CREATE   (1 << 1)
+#define SEMIHOST_FILE_MODE_UPDATE   (1 << 1)
 #define SEMIHOST_FILE_MODE_BINARY   (1 << 0)
 #define SEMIHOST_FILE_MODE_ASCII    (0 << 0)
 

@@ -49,7 +49,7 @@ WriteStringToFile (
   I'm currently having issues with this code crashing the debugger. Seems like it should work.
 
   UINT32        SemihostHandle;
-  UINT32        SemihostMode = SEMIHOST_FILE_MODE_WRITE | SEMIHOST_FILE_MODE_BINARY | SEMIHOST_FILE_MODE_CREATE;
+  UINT32        SemihostMode = SEMIHOST_FILE_MODE_WRITE | SEMIHOST_FILE_MODE_BINARY | SEMIHOST_FILE_MODE_UPDATE;
 
   SemihostFileOpen ("c:\rvi_symbols.inc", SemihostMode, &SemihostHandle);
   SemihostFileWrite (SemihostHandle, &Length, Buffer);
