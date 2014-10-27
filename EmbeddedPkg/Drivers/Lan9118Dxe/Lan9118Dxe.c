@@ -99,16 +99,25 @@ Lan9118DxeEntry (
   SnpMode->NvRamSize = 0;           // No NVRAM with this device
   SnpMode->NvRamAccessSize = 0; // No NVRAM with this device
 
-  // Update network mode information
-  SnpMode->ReceiveFilterMask = EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_UNICAST |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;/* |
-                                 EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;*/
-  // Current allowed settings
-  SnpMode->ReceiveFilterSetting = EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST |
-                                    EFI_SIMPLE_NETWORK_RECEIVE_UNICAST |
-                                    EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
+  //
+  // Claim that all receive filter settings are supported, though the MULTICAST mode
+  // is not completely supported. The LAN9118 Ethernet controller is only able to
+  // do a "hash filtering" and not a perfect filtering on multicast addresses. The
+  // controller does not filter the multicast addresses directly but a hash value
+  // of them. The hash value of a multicast address is derived from its CRC and
+  // ranges from 0 to 63 included.
+  // We claim that the perfect MULTICAST filtering mode is supported because
+  // we do not want the user to switch directly to the PROMISCOUS_MULTICAST mode
+  // and thus not being able to take advantage of the hash filtering.
+  //
+  SnpMode->ReceiveFilterMask = EFI_SIMPLE_NETWORK_RECEIVE_UNICAST              |
+                               EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST            |
+                               EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST            |
+                               EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS          |
+                               EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
+
+  // We do not intend to receive anything for the time being.
+  SnpMode->ReceiveFilterSetting = 0;
 
   // LAN9118 has 64bit hash table, can filter 64 MCast MAC Addresses
   SnpMode->MaxMCastFilterCount = MAX_MCAST_FILTER_CNT;
@@ -344,12 +353,7 @@ SnpInitialize (
     return Status;
   }
 
-  // Enable the receiver and transmitter
-  Status = StartRx (0, Snp);
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
+  // Enable the transmitter
   Status = StartTx (START_TX_MAC | START_TX_CFG, Snp);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -553,7 +557,9 @@ SnpReceiveFilters (
   UINT32                   Crc;
   UINT8                    HashValue;
   UINT32                   MacCSRValue;
+  UINT32                   ReceiveFilterSetting;
   EFI_MAC_ADDRESS          *Mac;
+  EFI_MAC_ADDRESS          ZeroMac;
 
   // Check Snp Instance
   if (Snp == NULL) {
@@ -632,69 +638,73 @@ SnpReceiveFilters (
   }
 
   //
+  // Before to change anything, stop and reset the reception of
+  // packets.
+  //
+  StopRx (STOP_RX_CLEAR, Snp);
+
+  //
   // Write the mask of the selected hash values for the multicast filtering.
   // The two masks are set to zero if the multicast filtering is not enabled.
   //
   IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHL, MultHashTableLow);
   IndirectMACWrite32 (INDIRECT_MAC_INDEX_HASHH, MultHashTableHigh);
 
+  ReceiveFilterSetting = (Mode->ReceiveFilterSetting | Enable) & (~Disable);
+
+  //
   // Read MAC controller
-  MacCSRValue = IndirectMACRead32 (INDIRECT_MAC_INDEX_CR);
+  //
+  MacCSRValue  = IndirectMACRead32 (INDIRECT_MAC_INDEX_CR);
+  MacCSRValue &= ~(MACCR_HPFILT | MACCR_BCAST | MACCR_PRMS | MACCR_MCPAS);
 
-  // Set the options for the MAC_CSR
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) {
-    StartRx (0, Snp);
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) {
+    Lan9118SetMacAddress (&Mode->CurrentAddress, Snp);
     DEBUG ((DEBUG_NET, "Allowing Unicast Frame Reception\n"));
+  } else {
+    //
+    // The Unicast packets do not have to be listen to, set the MAC
+    // address of the LAN9118 to be the "not configured" all zeroes
+    // ethernet MAC address.
+    //
+    ZeroMem (&ZeroMac, NET_ETHER_ADDR_LEN);
+    Lan9118SetMacAddress (&ZeroMac, Snp);
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) {
-    StopRx (0, Snp);
-    DEBUG ((DEBUG_NET, "Disabling Unicast Frame Reception\n"));
-  }
-
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) {
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) {
     MacCSRValue |= MACCR_HPFILT;
     DEBUG ((DEBUG_NET, "Allowing Multicast Frame Reception\n"));
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) {
-    MacCSRValue &= ~MACCR_HPFILT;
-    DEBUG ((DEBUG_NET, "Disabling Multicast Frame Reception\n"));
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) {
+    MacCSRValue |= MACCR_MCPAS;
+    DEBUG ((DEBUG_NET, "Enabling Promiscuous Multicast Mode\n"));
   }
 
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) {
-    MacCSRValue &= ~(MACCR_BCAST);
+  if ((ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) == 0) {
+    MacCSRValue |= MACCR_BCAST;
+  } else {
     DEBUG ((DEBUG_NET, "Allowing Broadcast Frame Reception\n"));
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) {
-    MacCSRValue |= MACCR_BCAST;
-    DEBUG ((DEBUG_NET, "Disabling Broadcast Frame Reception\n"));
-  }
-
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) {
+  if (ReceiveFilterSetting & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) {
     MacCSRValue |= MACCR_PRMS;
     DEBUG ((DEBUG_NET, "Enabling Promiscuous Mode\n"));
   }
 
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) {
-    MacCSRValue &= ~MACCR_PRMS;
-    DEBUG ((DEBUG_NET, "Disabling Promiscuous Mode\n"));
-  }
-
-  if (Enable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) {
-    MacCSRValue |= (MACCR_HPFILT | MACCR_PRMS);
-    DEBUG ((DEBUG_NET, "Enabling Promiscuous Multicast Mode\n"));
-  }
-
-  if (Disable & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) {
-    MacCSRValue &= ~(MACCR_HPFILT | MACCR_PRMS);
-    DEBUG ((DEBUG_NET, "Disabling Promiscuous Multicast Mode\n"));
-  }
-
+  //
   // Write the options to the MAC_CSR
+  //
   IndirectMACWrite32 (INDIRECT_MAC_INDEX_CR, MacCSRValue);
   gBS->Stall (LAN9118_STALL);
+
+  //
+  // If we have to retrieve something, start packet reception.
+  //
+  Mode->ReceiveFilterSetting = ReceiveFilterSetting;
+  if (ReceiveFilterSetting != 0) {
+    StartRx (0, Snp);
+  }
 
   return EFI_SUCCESS;
 }
@@ -769,8 +779,20 @@ SnpStationAddress (
     }
   }
 
-  // Write address
-  Lan9118SetMacAddress (New, Snp);
+  CopyMem (&Snp->Mode->CurrentAddress, New, NET_ETHER_ADDR_LEN);
+
+  //
+  // If packet reception is currently activated, stop and reset it,
+  // set the new ethernet address and restart the packet reception.
+  // Otherwise, nothing to do, the MAC address will be updated in
+  // SnpReceiveFilters() when the UNICAST packet reception will be
+  // activated.
+  //
+  if (Snp->Mode->ReceiveFilterSetting  != 0) {
+    StopRx (STOP_RX_CLEAR, Snp);
+    Lan9118SetMacAddress (New, Snp);
+    StartRx (0, Snp);
+  }
 
   return EFI_SUCCESS;
 }

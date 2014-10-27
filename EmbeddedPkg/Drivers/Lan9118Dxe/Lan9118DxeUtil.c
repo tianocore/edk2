@@ -320,8 +320,6 @@ Lan9118SetMacAddress (
                       (UINT32)(Mac->Addr[4] & 0xFF) |
                       ((Mac->Addr[5] & 0xFF) << 8)
                     );
-
-  CopyMem (&Snp->Mode->CurrentAddress, &Mac, NET_ETHER_ADDR_LEN);
 }
 
 VOID
@@ -398,6 +396,7 @@ Lan9118Initialize (
       DEBUG ((EFI_D_WARN, "Warning: using driver-default MAC address\n"));
       DefaultMacAddress = FixedPcdGet64 (PcdLan9118DefaultMacAddress);
       Lan9118SetMacAddress((EFI_MAC_ADDRESS *) &DefaultMacAddress, Snp);
+      CopyMem (&Snp->Mode->CurrentAddress, &DefaultMacAddress, NET_ETHER_ADDR_LEN);
     }
   } else {
     // Store the MAC address that was loaded from EEPROM
