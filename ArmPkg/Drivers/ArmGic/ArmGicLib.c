@@ -18,6 +18,7 @@
 #include <Library/IoLib.h>
 
 #include "GicV2/ArmGicV2Lib.h"
+#include "GicV3/ArmGicV3Lib.h"
 
 UINTN
 EFIAPI
@@ -82,6 +83,8 @@ ArmGicAcknowledgeInterrupt (
     if (InterruptId != NULL) {
       *InterruptId = Value & ARM_GIC_ICCIAR_ACKINTID;
     }
+  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
+    Value = ArmGicV3AcknowledgeInterrupt ();
   } else {
     ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
     // Report Spurious interrupt which is what the above controllers would
@@ -104,6 +107,8 @@ ArmGicEndOfInterrupt (
   Revision = ArmGicGetSupportedArchRevision ();
   if (Revision == ARM_GIC_ARCH_REVISION_2) {
     ArmGicV2EndOfInterrupt (GicInterruptInterfaceBase, Source);
+  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
+    ArmGicV3EndOfInterrupt (Source);
   } else {
     ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
   }
@@ -183,6 +188,8 @@ ArmGicEnableInterruptInterface (
   Revision = ArmGicGetSupportedArchRevision ();
   if (Revision == ARM_GIC_ARCH_REVISION_2) {
     ArmGicV2EnableInterruptInterface (GicInterruptInterfaceBase);
+  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
+    ArmGicV3EnableInterruptInterface ();
   } else {
     ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
   }
@@ -199,6 +206,8 @@ ArmGicDisableInterruptInterface (
   Revision = ArmGicGetSupportedArchRevision ();
   if (Revision == ARM_GIC_ARCH_REVISION_2) {
     ArmGicV2DisableInterruptInterface (GicInterruptInterfaceBase);
+  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
+    ArmGicV3DisableInterruptInterface ();
   } else {
     ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
   }
