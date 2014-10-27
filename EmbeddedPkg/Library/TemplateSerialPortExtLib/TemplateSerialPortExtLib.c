@@ -36,7 +36,7 @@ SerialPortSetControl (
 /**
   Get the serial device control bits.
 
-  @param  Control                 Control signals read from the serial device.
+  @param  Control  Control signals read from the serial device.
 
   @retval EFI_SUCCESS             The control bits were read from the serial device.
   @retval EFI_DEVICE_ERROR        The serial device is not functioning correctly.
@@ -45,7 +45,7 @@ SerialPortSetControl (
 RETURN_STATUS
 EFIAPI
 SerialPortGetControl (
-  OUT UINT32                  *Control
+  OUT UINT32  *Control
   )
 {
   if (SerialPortPoll ()) {
@@ -54,7 +54,7 @@ SerialPortGetControl (
   } else {
     *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY | EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
   }
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
 /**

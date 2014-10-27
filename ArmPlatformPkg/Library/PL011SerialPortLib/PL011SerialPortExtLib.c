@@ -100,20 +100,38 @@ SerialPortSetControl (
 }
 
 /**
-  Get the serial device control bits.
 
-  @param  Control                 Control signals read from the serial device.
+  Retrieve the status of the control bits on a serial device.
 
-  @retval EFI_SUCCESS             The control bits were read from the serial device.
-  @retval EFI_DEVICE_ERROR        The serial device is not functioning correctly.
+  @param[out]  Control  Status of the control bits on a serial device :
+
+                        . EFI_SERIAL_DATA_CLEAR_TO_SEND, EFI_SERIAL_DATA_SET_READY,
+                          EFI_SERIAL_RING_INDICATE, EFI_SERIAL_CARRIER_DETECT,
+                          EFI_SERIAL_REQUEST_TO_SEND, EFI_SERIAL_DATA_TERMINAL_READY
+                          are all related to the DTE (Data Terminal Equipment) and
+                          DCE (Data Communication Equipment) modes of operation of
+                          the serial device.
+                        . EFI_SERIAL_INPUT_BUFFER_EMPTY : equal to one if the receive
+                          buffer is empty, 0 otherwise.
+                        . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the transmit
+                          buffer is empty, 0 otherwise.
+                        . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if the
+                          hardware loopback is enabled (the ouput feeds the receive
+                          buffer), 0 otherwise.
+                        . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one if a
+                          loopback is accomplished by software, 0 otherwise.
+                        . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : equal to one if the
+                          hardware flow control based on CTS (Clear To Send) and RTS
+                          (Ready To Send) control signals is enabled, 0 otherwise.
+
+  @retval RETURN_SUCCESS  The control bits were read from the serial device.
 
 **/
 RETURN_STATUS
 EFIAPI
 SerialPortGetControl (
-  OUT UINT32                  *Control
+  OUT UINT32  *Control
   )
 {
   return PL011UartGetControl ((UINTN)PcdGet64 (PcdSerialRegisterBase), Control);
 }
-
