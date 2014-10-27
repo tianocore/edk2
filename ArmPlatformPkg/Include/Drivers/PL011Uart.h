@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -100,21 +100,37 @@ PL011UartInitializePort (
   );
 
 /**
-  Set the serial device control bits.
 
-  @param  UartBase                The base address of the PL011 UART.
-  @param  Control                 Control bits which are to be set on the serial device.
+  Assert or deassert the control signals on a serial port.
+  The following control signals are set according their bit settings :
+  . Request to Send
+  . Data Terminal Ready
 
-  @retval EFI_SUCCESS             The new control bits were set on the serial device.
-  @retval EFI_UNSUPPORTED         The serial device does not support this operation.
-  @retval EFI_DEVICE_ERROR        The serial device is not functioning correctly.
+  @param[in]  UartBase  UART registers base address
+  @param[in]  Control   The following bits are taken into account :
+                        . EFI_SERIAL_REQUEST_TO_SEND : assert/deassert the
+                          "Request To Send" control signal if this bit is
+                          equal to one/zero.
+                        . EFI_SERIAL_DATA_TERMINAL_READY : assert/deassert
+                          the "Data Terminal Ready" control signal if this
+                          bit is equal to one/zero.
+                        . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : enable/disable
+                          the hardware loopback if this bit is equal to
+                          one/zero.
+                        . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : not supported.
+                        . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : enable/
+                          disable the hardware flow control based on CTS (Clear
+                          To Send) and RTS (Ready To Send) control signals.
+
+  @retval  RETURN_SUCCESS      The new control bits were set on the serial device.
+  @retval  RETURN_UNSUPPORTED  The serial device does not support this operation.
 
 **/
 RETURN_STATUS
 EFIAPI
 PL011UartSetControl (
-    IN UINTN                    UartBase,
-    IN UINT32                   Control
+  IN UINTN   UartBase,
+  IN UINT32  Control
   );
 
 /**
