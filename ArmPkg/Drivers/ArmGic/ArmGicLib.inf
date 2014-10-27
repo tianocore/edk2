@@ -26,7 +26,14 @@
   GicV2/ArmGicV2Lib.c
   GicV2/ArmGicV2NonSecLib.c
 
+[Sources.ARM]
+  Arm/ArmGicArchLib.c
+
+[Sources.AARCH64]
+  AArch64/ArmGicArchLib.c
+
 [LibraryClasses]
+  ArmLib
   DebugLib
   IoLib
 

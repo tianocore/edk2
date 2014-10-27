@@ -19,7 +19,8 @@
 // GIC definitions
 //
 typedef enum {
-  ARM_GIC_ARCH_REVISION_2
+  ARM_GIC_ARCH_REVISION_2,
+  ARM_GIC_ARCH_REVISION_3
 } ARM_GIC_ARCH_REVISION;
 
 //

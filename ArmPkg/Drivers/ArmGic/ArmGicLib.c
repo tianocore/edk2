@@ -19,15 +19,6 @@
 
 #include "GicV2/ArmGicV2Lib.h"
 
-ARM_GIC_ARCH_REVISION
-EFIAPI
-ArmGicGetSupportedArchRevision (
-  VOID
-  )
-{
-  return ARM_GIC_ARCH_REVISION_2;
-}
-
 UINTN
 EFIAPI
 ArmGicGetInterfaceIdentification (

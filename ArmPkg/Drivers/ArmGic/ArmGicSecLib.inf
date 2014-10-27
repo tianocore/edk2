@@ -26,6 +26,12 @@
   GicV2/ArmGicV2Lib.c
   GicV2/ArmGicV2SecLib.c
 
+[Sources.ARM]
+  Arm/ArmGicArchLib.c
+
+[Sources.AARCH64]
+  AArch64/ArmGicArchLib.c
+
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
@@ -34,7 +40,5 @@
 
 [LibraryClasses]
   ArmLib
-  ArmPlatformLib
   DebugLib
   IoLib
-  PcdLib
