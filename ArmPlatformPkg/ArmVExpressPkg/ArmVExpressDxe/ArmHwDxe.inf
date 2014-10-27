@@ -28,4 +28,5 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
+  ArmShellCmdRunAxfLib
   UefiDriverEntryPoint

@@ -13,6 +13,8 @@
 **/
 
 #include <Library/UefiLib.h>
+#include <Library/DebugLib.h>
+#include <Library/ArmShellCmdLib.h>
 
 EFI_STATUS
 EFIAPI
@@ -21,5 +23,13 @@ ArmHwInitialise (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  return EFI_SUCCESS;
+  EFI_STATUS  Status;
+
+  // Install dynamic Shell command to run baremetal binaries.
+  Status = ShellDynCmdRunAxfInstall (ImageHandle);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "ArmHwDxe: Failed to install ShellDynCmdRunAxf\n"));
+  }
+
+  return Status;
 }

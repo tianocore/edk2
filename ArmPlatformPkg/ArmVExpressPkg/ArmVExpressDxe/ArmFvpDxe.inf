@@ -29,6 +29,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  ArmShellCmdRunAxfLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   VirtioMmioDeviceLib

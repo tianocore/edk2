@@ -16,6 +16,7 @@
 #include <Library/VirtioMmioDeviceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/ArmShellCmdLib.h>
 
 #define ARM_FVP_BASE_VIRTIO_BLOCK_BASE    0x1c130000
 
@@ -69,6 +70,12 @@ ArmFvpInitialise (
   Status = VirtioMmioInstallDevice (ARM_FVP_BASE_VIRTIO_BLOCK_BASE, ImageHandle);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "ArmFvpDxe: Failed to install Virtio block device\n"));
+  }
+
+  // Install dynamic Shell command to run baremetal binaries.
+  Status = ShellDynCmdRunAxfInstall (ImageHandle);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "ArmFvpDxe: Failed to install ShellDynCmdRunAxf\n"));
   }
 
   return Status;
