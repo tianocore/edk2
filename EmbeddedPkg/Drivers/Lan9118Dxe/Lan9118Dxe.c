@@ -749,7 +749,7 @@ SnpStatistics (
   }
 
   // Fill in the statistics
-  CopyMem(&Statistics, &LanDriver->Stats, sizeof(EFI_NETWORK_STATISTICS));
+  CopyMem (Statistics, &LanDriver->Stats, sizeof(EFI_NETWORK_STATISTICS));
 
   return EFI_SUCCESS;
 }
