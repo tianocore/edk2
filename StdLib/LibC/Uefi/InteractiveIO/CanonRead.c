@@ -3,7 +3,7 @@
 
   The functions assume that isatty() is TRUE at the time they are called.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -87,6 +87,10 @@ IIO_CanonRead (
   //  Input and process characters until BufferSize is exhausted.
   do {
     InChar = IIO_GetInChar(filp, FirstRead);
+    if (InChar == WEOF) {
+      NumRead = 0;
+      break;
+    }
     FirstRead = FALSE;
     Activate  = TRUE;
     if(InChar == CHAR_CARRIAGE_RETURN) {
@@ -128,6 +132,8 @@ IIO_CanonRead (
     }
     else if(CCEQ(Termio->c_cc[VEOF], InChar)) {
       InChar = WEOF;
+      NumRead = 0;
+      EchoIsOK = FALSE;   // Buffer, but don't echo this character
     }
     else if(CCEQ(Termio->c_cc[VEOL], InChar)) {
       EchoIsOK = FALSE;   // Buffer, but don't echo this character

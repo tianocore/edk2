@@ -1,7 +1,7 @@
 /** @file
   Declarations and macros for the console abstraction.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -32,8 +32,8 @@ typedef struct {
   UINTN                       Reserved_1;   // Ensure that next member starts on an 8-byte boundary
   UINT64                      NumRead;      ///< Number of characters Read.
   UINT64                      NumWritten;   ///< Number of characters Written.
-  EFI_INPUT_KEY               UnGetKey;     ///< One-key pushback, for poll().
   __mbstate_t                 CharState;    ///< Character state for the byte stream passing through this device
+  CHAR16                      UnGetKey;     ///< One-key pushback, for poll().
 } ConInstance;
 
 __BEGIN_DECLS

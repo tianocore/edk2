@@ -2,7 +2,7 @@
     Macros and declarations for terminal oriented ioctls and
     I/O discipline.
 
-    Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -421,6 +421,8 @@ typedef enum {
 } TtyFunKey;
 
 // Non-UEFI character definitions
-#define CHAR_EOT    0x0004        /* End of Text (EOT) character */
+#define CHAR_EOT    0x0004        /* End of Text (EOT) character -- Unix End-of-File character */
+#define CHAR_SUB    0x001a        /* MSDOS End-of-File character */
+#define CHAR_ESC    0x001b        /* Escape (ESC) character */
 
 #endif /* !_SYS_TERMIOS_H_ */

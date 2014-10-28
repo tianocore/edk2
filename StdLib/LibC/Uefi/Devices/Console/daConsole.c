@@ -10,7 +10,7 @@
   The devices status as a wide device is indicatd by _S_IWTTY being set in
   f_iflags.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -24,6 +24,7 @@
 #include  <Library/BaseLib.h>
 #include  <Library/MemoryAllocationLib.h>
 #include  <Library/UefiBootServicesTableLib.h>
+#include  <Library/DebugLib.h>
 #include  <Protocol/SimpleTextIn.h>
 #include  <Protocol/SimpleTextOut.h>
 
@@ -35,6 +36,7 @@
 #include  <stdarg.h>
 #include  <sys/fcntl.h>
 #include  <unistd.h>
+#include  <sys/termios.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
 #include  <Device/IIO.h>
@@ -238,7 +240,6 @@ da_ConWrite(
 
   // Depending on status, update BufferSize and return
   if(!RETURN_ERROR(Status)) {
-    //BufferSize = NumChar;
     NumChar = BufferSize;
     Stream->NumWritten += NumChar;
   }
@@ -248,11 +249,83 @@ da_ConWrite(
 
 /** Read a wide character from the console input device.
 
+    Returns NUL or a translated input character.
+
+    @param[in]      filp          Pointer to file descriptor for this file.
+    @param[out]     Buffer        Buffer in which to place the read character.
+
+    @retval    EFI_DEVICE_ERROR   A hardware error has occurred.
+    @retval    EFI_NOT_READY      No data is available.  Try again later.
+    @retval    EFI_SUCCESS        One wide character has been placed in Character
+                                    - 0x0000  NUL, ignore this
+                                    - Otherwise, should be a good wide character in Character
+**/
+static
+EFI_STATUS
+da_ConRawRead (
+  IN OUT  struct __filedes   *filp,
+     OUT  wchar_t            *Character
+)
+{
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL   *Proto;
+  ConInstance                      *Stream;
+  cIIO                             *Self;
+  EFI_STATUS                        Status;
+  EFI_INPUT_KEY                     Key = {0,0};
+  wchar_t                           RetChar;
+
+  Self    = (cIIO *)filp->devdata;
+  Stream  = BASE_CR(filp->f_ops, ConInstance, Abstraction);
+  Proto   = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
+
+  if(Stream->UnGetKey == CHAR_NULL) {
+    Status = Proto->ReadKeyStroke(Proto, &Key);
+  }
+  else {
+    Status  = EFI_SUCCESS;
+    // Use the data in the Un-get buffer
+    // Guaranteed that ScanCode and UnicodeChar are not both NUL
+    Key.ScanCode        = SCAN_NULL;
+    Key.UnicodeChar     = Stream->UnGetKey;
+    Stream->UnGetKey    = CHAR_NULL;
+  }
+  if(Status == EFI_SUCCESS) {
+    // Translate the Escape Scan Code to an ESC character
+    if (Key.ScanCode != 0) {
+      if (Key.ScanCode == SCAN_ESC) {
+        RetChar = CHAR_ESC;
+      }
+      else if((Self->Termio.c_iflag & IGNSPEC) != 0) {
+        // If we are ignoring special characters, return a NUL
+        RetChar = 0;
+      }
+      else {
+        // Must be a control, function, or other non-printable key.
+        // Map it into the Platform portion of the Unicode private use area
+        RetChar = TtyFunKeyMax - Key.ScanCode;
+      }
+    }
+    else {
+      RetChar = Key.UnicodeChar;
+    }
+    *Character = RetChar;
+  }
+  else {
+    *Character = 0;
+  }
+  return Status;
+}
+
+/** Read a wide character from the console input device.
+
   NOTE: The UEFI Console is a wide device, _S_IWTTY, so characters returned
         by da_ConRead are WIDE characters.  It is the responsibility of the
         higher-level function(s) to perform any necessary conversions.
 
-    @param[in,out]  BufferSize  Number of characters in Buffer.
+    A NUL character, 0x0000, is never returned.  In the event that such a character
+    is encountered, the read is either retried or -1 is returned with errno set
+    to EAGAIN.
+
     @param[in]      filp          Pointer to file descriptor for this file.
     @param[in]      offset        Ignored.
     @param[in]      BufferSize    Buffer size, in bytes.
@@ -274,79 +347,63 @@ da_ConRead(
 {
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL   *Proto;
   ConInstance                      *Stream;
-  cIIO                              *Self;
-  EFI_INPUT_KEY                     Key = {0,0};
-  EFI_STATUS                        Status = RETURN_SUCCESS;
+  //cIIO                              *Self;
+  EFI_STATUS                        Status;
   UINTN                             Edex;
   ssize_t                           NumRead;
-  int                               Flags;
-  wchar_t                           RetChar;   // Default to No Data
+  BOOLEAN                           BlockingMode;
+  wchar_t                           RetChar;
 
   NumRead = -1;
   if(BufferSize < sizeof(wchar_t)) {
     errno = EINVAL;     // Buffer is too small to hold one character
   }
   else {
-    Self = (cIIO *)filp->devdata;
-  Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
-  Proto = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
-    Flags = filp->Oflags;
-    if((Stream->UnGetKey.UnicodeChar == CHAR_NULL) && (Stream->UnGetKey.ScanCode == SCAN_NULL)) {
-      // No data pending in the Un-get buffer.  Get a char from the hardware.
-      if((Flags & O_NONBLOCK) == 0) {
+    Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
+    Proto = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
+    BlockingMode = ((filp->Oflags & O_NONBLOCK) == 0);
+
+    do {
+      Status = EFI_SUCCESS;
+      if(BlockingMode) {
         // Read a byte in Blocking mode
-      Status = gBS->WaitForEvent( 1, &Proto->WaitForKey, &Edex);
-        EFIerrno = Status;
-        if(Status != EFI_SUCCESS) {
-          errno = EINVAL;
+        Status = gBS->WaitForEvent( 1, &Proto->WaitForKey, &Edex);
       }
-        else {
-      Status = Proto->ReadKeyStroke(Proto, &Key);
-          if(Status == EFI_SUCCESS) {
-            NumRead = 1;   // Indicate that Key holds the data
-          }
-          else {
-            errno = EIO;
-          }
-        }
-      }
-      else {
-        // Read a byte in Non-Blocking mode
-      Status = Proto->ReadKeyStroke(Proto, &Key);
-        EFIerrno = Status;
-        if(Status == EFI_SUCCESS) {
-          // Got a keystroke.
-          NumRead = 1;   // Indicate that Key holds the data
-        }
-        else if(Status == EFI_NOT_READY) {
-          // Keystroke data is not available
-          errno = EAGAIN;
-        }
-        else {
-          // Hardware error
-          errno = EIO;
-        }
-      }
-    }
-    else {
-      // Use the data in the Un-get buffer
-      Key.ScanCode          = Stream->UnGetKey.ScanCode;
-      Key.UnicodeChar       = Stream->UnGetKey.UnicodeChar;
-      Stream->UnGetKey.ScanCode     = SCAN_NULL;
-      Stream->UnGetKey.UnicodeChar  = CHAR_NULL;
+
+      /*  WaitForEvent should not be able to fail since
+            NumberOfEvents is set to constant 1 so is never 0
+            Event is set by the Simple Text Input protocol so should never be EVT_NOTIFY_SIGNAL
+            Current TPL should be TPL_APPLICATION.
+          ASSERT so that we catch any problems during development.
+      */
+      ASSERT(Status == EFI_SUCCESS);
+
+      Status = da_ConRawRead (filp, &RetChar);
+    } while ( BlockingMode &&
+             (RetChar == 0) &&
+             (Status != EFI_DEVICE_ERROR));
+
+    EFIerrno = Status;
+    if(Status == EFI_SUCCESS) {
+      // Got a keystroke.
       NumRead = 1;   // Indicate that Key holds the data
     }
-    // If we have data, prepare it for return.
-    if(NumRead == 1) {
-      RetChar = Key.UnicodeChar;
-      if((RetChar == 0) && ((Self->Termio.c_iflag & IGNSPEC) == 0)) {
-        // Must be a control, function, or other non-printable key.
-        // Map it into the Platform portion of the Unicode private use area
-        RetChar = (Key.ScanCode == 0) ? 0 : 0xF900U - Key.ScanCode;
-      }
-      *((wchar_t *)Buffer) = RetChar;
-      }
+    else if(Status == EFI_NOT_READY) {
+      // Keystroke data is not available
+      errno = EAGAIN;
     }
+    else {
+      // Hardware error
+      errno = EIO;
+    }
+    if (RetChar == 0) {
+      NumRead = -1;
+      errno = EAGAIN;
+    }
+    else {
+      *((wchar_t *)Buffer) = RetChar;
+    }
+  }
   return NumRead;
 }
 
@@ -542,24 +599,23 @@ da_ConPoll(
     return POLLNVAL;    // Looks like a bad filp pointer
   }
   if(Stream->InstanceNum == 0) {
-    // Only input is supported for this device
+    // STDIN: Only input is supported for this device
     Proto = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
-    if((Stream->UnGetKey.UnicodeChar == CHAR_NULL) && (Stream->UnGetKey.ScanCode == SCAN_NULL)) {
-      Status = Proto->ReadKeyStroke(Proto, &Stream->UnGetKey);
-      if(Status == RETURN_SUCCESS) {
-        RdyMask = POLLIN;
-        if(Stream->UnGetKey.UnicodeChar != CHAR_NULL) {
-          RdyMask |= POLLRDNORM;
-        }
+    Status = da_ConRawRead (filp, &Stream->UnGetKey);
+    if(Status == RETURN_SUCCESS) {
+      RdyMask = POLLIN;
+      if ((Stream->UnGetKey <  TtyFunKeyMin)   ||
+          (Stream->UnGetKey >= TtyFunKeyMax))
+      {
+        RdyMask |= POLLRDNORM;
       }
-      else {
-        Stream->UnGetKey.ScanCode     = SCAN_NULL;
-        Stream->UnGetKey.UnicodeChar  = CHAR_NULL;
-      }
+    }
+    else {
+      Stream->UnGetKey  = CHAR_NULL;
     }
   }
   else if(Stream->InstanceNum < NUM_SPECIAL) {  // Not 0, is it 1 or 2?
-    // Only output is supported for this device
+    // (STDOUT || STDERR): Only output is supported for this device
     RdyMask = POLLOUT;
   }
   else {
@@ -638,8 +694,7 @@ __Cons_construct(
 
     Stream->NumRead     = 0;
     Stream->NumWritten  = 0;
-    Stream->UnGetKey.ScanCode     = SCAN_NULL;
-    Stream->UnGetKey.UnicodeChar  = CHAR_NULL;
+    Stream->UnGetKey    = CHAR_NULL;
 
     if(Stream->Dev == NULL) {
       continue;                 // No device for this stream.
