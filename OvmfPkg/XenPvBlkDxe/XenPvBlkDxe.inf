@@ -33,6 +33,8 @@
   XenPvBlkDxe.c
   ComponentName.c
   ComponentName.h
+  BlockFront.c
+  BlockFront.h
 
 
 [LibraryClasses]

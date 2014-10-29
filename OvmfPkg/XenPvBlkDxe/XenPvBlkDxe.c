@@ -20,6 +20,8 @@
 
 #include "XenPvBlkDxe.h"
 
+#include "BlockFront.h"
+
 
 ///
 /// Driver Binding Protocol instance
@@ -258,6 +260,7 @@ XenPvBlkDxeDriverBindingStart (
 {
   EFI_STATUS Status;
   XENBUS_PROTOCOL *XenBusIo;
+  XEN_BLOCK_FRONT_DEVICE *Dev;
 
   Status = gBS->OpenProtocol (
                 ControllerHandle,
@@ -271,7 +274,17 @@ XenPvBlkDxeDriverBindingStart (
     return Status;
   }
 
+  Status = XenPvBlockFrontInitialization (XenBusIo, XenBusIo->Node, &Dev);
+  if (EFI_ERROR (Status)) {
+    goto CloseProtocol;
+  }
+
   return EFI_SUCCESS;
+
+CloseProtocol:
+  gBS->CloseProtocol (ControllerHandle, &gXenBusProtocolGuid,
+                      This->DriverBindingHandle, ControllerHandle);
+  return Status;
 }
 
 /**
