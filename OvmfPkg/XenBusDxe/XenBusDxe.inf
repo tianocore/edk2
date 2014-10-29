@@ -40,6 +40,8 @@
   InterlockedCompareExchange16.h
   GrantTable.c
   GrantTable.h
+  EventChannel.c
+  EventChannel.h
 
 [Sources.IA32]
   Ia32/hypercall.S
