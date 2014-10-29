@@ -1,7 +1,7 @@
 /** @file
   Common defines and definitions for a FwVolDxe driver.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -484,6 +484,8 @@ IsValidFFSFile (
   @retval EFI_SUCCESS           Successfully read volume header to the allocated
                                 buffer.
   @retval EFI_ACCESS_DENIED     Read status of FV is not enabled.
+  @retval EFI_INVALID_PARAMETER The FV Header signature is not as expected or
+                                the file system could not be understood.
 **/
 EFI_STATUS
 GetFwVolHeader (

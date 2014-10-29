@@ -405,25 +405,4 @@ IsValidFfsFile (
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   );
 
-
-/**
-  given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
-  copy the volume header into it.
-
-  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to
-                                read the volume header
-  @param  FwVolHeader           Pointer to pointer to allocated buffer in which
-                                the volume header is returned.
-
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
-  @retval EFI_SUCCESS           Successfully read volume header to the allocated
-                                buffer.
-
-**/
-EFI_STATUS
-GetFwVolHeader (
-  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
-  OUT    EFI_FIRMWARE_VOLUME_HEADER             **FwVolHeader
-  );
-
 #endif

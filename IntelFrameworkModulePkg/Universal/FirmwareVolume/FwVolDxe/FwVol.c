@@ -4,7 +4,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -34,6 +34,8 @@
   @retval EFI_SUCCESS           Successfully read volume header to the allocated
                                 buffer.
   @retval EFI_ACCESS_DENIED     Read status of FV is not enabled.
+  @retval EFI_INVALID_PARAMETER The FV Header signature is not as expected or
+                                the file system could not be understood.
 **/
 EFI_STATUS
 GetFwVolHeader (
@@ -88,6 +90,22 @@ GetFwVolHeader (
                     &FvhLength,
                     (UINT8 *) &TempFvh
                     );
+  }
+
+  //
+  // Validate FV Header signature, if not as expected, continue.
+  //
+  if (TempFvh.Signature != EFI_FVH_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check to see that the file system is indeed formatted in a way we can
+  // understand it...
+  //
+  if ((!CompareGuid (&TempFvh.FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) &&
+      (!CompareGuid (&TempFvh.FileSystemGuid, &gEfiFirmwareFileSystem3Guid))) {
+    return EFI_INVALID_PARAMETER;
   }
 
   *FwVolHeader = AllocatePool (TempFvh.HeaderLength);
@@ -669,15 +687,6 @@ FwVolDriverInit (
       continue;
     }
     ASSERT (FwVolHeader != NULL);
-    //
-    // Check to see that the file system is indeed formatted in a way we can
-    // understand it...
-    //
-    if ((!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) &&
-        (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid))) {
-      FreePool (FwVolHeader);
-      continue;
-    }
     FreePool (FwVolHeader);
 
     Reinstall = FALSE;

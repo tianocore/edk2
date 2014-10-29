@@ -173,6 +173,8 @@ ReadFvbData (
   @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
   @retval EFI_SUCCESS           Successfully read volume header to the allocated
                                 buffer.
+  @retval EFI_INVALID_PARAMETER The FV Header signature is not as expected or
+                                the file system could not be understood.
 
 **/
 EFI_STATUS
@@ -197,6 +199,22 @@ GetFwVolHeader (
   Status = ReadFvbData (Fvb, &StartLba, &Offset, FvhLength, (UINT8 *)&TempFvh);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  //
+  // Validate FV Header signature, if not as expected, continue.
+  //
+  if (TempFvh.Signature != EFI_FVH_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check to see that the file system is indeed formatted in a way we can
+  // understand it...
+  //
+  if ((!CompareGuid (&TempFvh.FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) &&
+      (!CompareGuid (&TempFvh.FileSystemGuid, &gEfiFirmwareFileSystem3Guid))) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -658,26 +676,8 @@ NotifyFwVolBlock (
     }
     ASSERT (FwVolHeader != NULL);
 
-    //
-    // Validate FV Header signature, if not as expected, continue.
-    //
-    if (FwVolHeader->Signature != EFI_FVH_SIGNATURE) {
-      CoreFreePool (FwVolHeader);
-      continue;
-    }
-
     if (!VerifyFvHeaderChecksum (FwVolHeader)) {
       CoreFreePool (FwVolHeader);
-      continue;
-    }
-
-
-    //
-    // Check to see that the file system is indeed formatted in a way we can
-    // understand it...
-    //
-    if ((!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) &&
-        (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid))) {
       continue;
     }
 

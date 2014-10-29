@@ -2595,6 +2595,8 @@ ReadFvbData (
   @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
   @retval EFI_SUCCESS           Successfully read volume header to the allocated
                                 buffer.
+  @retval EFI_INVALID_PARAMETER The FV Header signature is not as expected or
+                                the file system could not be understood.
 
 **/
 EFI_STATUS
