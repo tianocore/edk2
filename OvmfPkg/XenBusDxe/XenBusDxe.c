@@ -29,6 +29,8 @@
 
 #include "XenBusDxe.h"
 
+#include "XenHypercall.h"
+
 
 ///
 /// Driver Binding Protocol instance
@@ -264,6 +266,8 @@ NotifyExitBoot (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
+  @retval EFI_UNSUPPORTED          Something is missing on the system that
+                                   prevent to start the edvice.
   @retval Others                   The driver failded to start the device.
 
 **/
@@ -294,6 +298,20 @@ XenBusDxeDriverBindingStart (
   }
   mMyDevice = Dev;
   EfiReleaseLock (&mMyDeviceLock);
+
+  Status = XenHyperpageInit (Dev);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XenBus: Unable to retrieve the hyperpage.\n"));
+    Status = EFI_UNSUPPORTED;
+    goto ErrorAllocated;
+  }
+
+  Status = XenGetSharedInfoPage (Dev);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XenBus: Unable to get the shared info page.\n"));
+    Status = EFI_UNSUPPORTED;
+    goto ErrorAllocated;
+  }
 
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
                              NotifyExitBoot,

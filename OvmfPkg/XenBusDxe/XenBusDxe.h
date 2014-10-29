@@ -70,6 +70,8 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gXenBusDxeComponentName;
 //
 // Other stuff
 //
+#include <IndustryStandard/Xen/xen.h>
+
 #define PCI_VENDOR_ID_XEN                0x5853
 #define PCI_DEVICE_ID_XEN_PLATFORM       0x0001
 
@@ -83,6 +85,9 @@ struct _XENBUS_DEVICE {
   EFI_DRIVER_BINDING_PROTOCOL   *This;
   EFI_HANDLE                    ControllerHandle;
   EFI_EVENT                     ExitBootEvent;
+
+  VOID                          *Hyperpage;
+  shared_info_t                 *SharedInfo;
 };
 
 #endif
