@@ -31,6 +31,7 @@
 
 #include "XenHypercall.h"
 #include "GrantTable.h"
+#include "XenStore.h"
 
 
 ///
@@ -346,6 +347,9 @@ XenBusDxeDriverBindingStart (
 
   XenGrantTableInit (Dev, MmioAddr);
 
+  Status = XenStoreInit (Dev);
+  ASSERT_EFI_ERROR (Status);
+
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
                              NotifyExitBoot,
                              (VOID*) Dev,
@@ -399,6 +403,7 @@ XenBusDxeDriverBindingStop (
   XENBUS_DEVICE *Dev = mMyDevice;
 
   gBS->CloseEvent (Dev->ExitBootEvent);
+  XenStoreDeinit (Dev);
   XenGrantTableDeinit (Dev);
 
   gBS->CloseProtocol (ControllerHandle, &gEfiPciIoProtocolGuid,
