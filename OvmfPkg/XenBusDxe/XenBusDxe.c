@@ -30,6 +30,7 @@
 #include "XenBusDxe.h"
 
 #include "XenHypercall.h"
+#include "GrantTable.h"
 
 
 ///
@@ -282,6 +283,8 @@ XenBusDxeDriverBindingStart (
   EFI_STATUS Status;
   XENBUS_DEVICE *Dev;
   EFI_PCI_IO_PROTOCOL *PciIo;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *BarDesc;
+  UINT64 MmioAddr;
 
   Status = gBS->OpenProtocol (
                      ControllerHandle,
@@ -313,6 +316,20 @@ XenBusDxeDriverBindingStart (
   mMyDevice = Dev;
   EfiReleaseLock (&mMyDeviceLock);
 
+  //
+  // The BAR1 of this PCI device is used for shared memory and is supposed to
+  // look like MMIO. The address space of the BAR1 will be used to map the
+  // Grant Table.
+  //
+  Status = PciIo->GetBarAttributes (PciIo, PCI_BAR_IDX1, NULL, (VOID**) &BarDesc);
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM);
+
+  /* Get a Memory address for mapping the Grant Table. */
+  DEBUG ((EFI_D_INFO, "XenBus: BAR at %LX\n", BarDesc->AddrRangeMin));
+  MmioAddr = BarDesc->AddrRangeMin;
+  FreePool (BarDesc);
+
   Status = XenHyperpageInit (Dev);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "XenBus: Unable to retrieve the hyperpage.\n"));
@@ -326,6 +343,8 @@ XenBusDxeDriverBindingStart (
     Status = EFI_UNSUPPORTED;
     goto ErrorAllocated;
   }
+
+  XenGrantTableInit (Dev, MmioAddr);
 
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
                              NotifyExitBoot,
@@ -380,6 +399,7 @@ XenBusDxeDriverBindingStop (
   XENBUS_DEVICE *Dev = mMyDevice;
 
   gBS->CloseEvent (Dev->ExitBootEvent);
+  XenGrantTableDeinit (Dev);
 
   gBS->CloseProtocol (ControllerHandle, &gEfiPciIoProtocolGuid,
          This->DriverBindingHandle, ControllerHandle);

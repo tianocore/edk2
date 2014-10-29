@@ -38,6 +38,8 @@
   XenHypercall.h
   InterlockedCompareExchange16.c
   InterlockedCompareExchange16.h
+  GrantTable.c
+  GrantTable.h
 
 [Sources.IA32]
   Ia32/hypercall.S
