@@ -43,6 +43,9 @@ EFI_DRIVER_BINDING_PROTOCOL gXenBusDxeDriverBinding = {
 };
 
 
+STATIC EFI_LOCK       mMyDeviceLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_CALLBACK);
+STATIC XENBUS_DEVICE *mMyDevice = NULL;
+
 /**
   Unloads an image.
 
@@ -216,6 +219,19 @@ XenBusDxeDriverBindingSupported (
   return Status;
 }
 
+VOID
+EFIAPI
+NotifyExitBoot (
+  IN EFI_EVENT Event,
+  IN VOID *Context
+  )
+{
+  XENBUS_DEVICE *Dev = Context;
+
+  gBS->DisconnectController(Dev->ControllerHandle,
+                            Dev->This->DriverBindingHandle, NULL);
+}
+
 /**
   Starts a bus controller.
 
@@ -259,7 +275,37 @@ XenBusDxeDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS Status;
+  XENBUS_DEVICE *Dev;
+
+  Dev = AllocateZeroPool (sizeof (*Dev));
+  Dev->Signature = XENBUS_DEVICE_SIGNATURE;
+  Dev->This = This;
+  Dev->ControllerHandle = ControllerHandle;
+
+  EfiAcquireLock (&mMyDeviceLock);
+  if (mMyDevice != NULL) {
+    EfiReleaseLock (&mMyDeviceLock);
+    //
+    // There is already a XenBus running, only one can be used at a time.
+    //
+    Status = EFI_ALREADY_STARTED;
+    goto ErrorAllocated;
+  }
+  mMyDevice = Dev;
+  EfiReleaseLock (&mMyDeviceLock);
+
+  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
+                             NotifyExitBoot,
+                             (VOID*) Dev,
+                             &Dev->ExitBootEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+
+ErrorAllocated:
+  FreePool (Dev);
+  return Status;
 }
 
 /**
@@ -297,5 +343,11 @@ XenBusDxeDriverBindingStop (
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  XENBUS_DEVICE *Dev = mMyDevice;
+
+  gBS->CloseEvent (Dev->ExitBootEvent);
+
+  mMyDevice = NULL;
+  FreePool (Dev);
+  return EFI_SUCCESS;
 }

@@ -74,4 +74,15 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gXenBusDxeComponentName;
 #define PCI_DEVICE_ID_XEN_PLATFORM       0x0001
 
 
+typedef struct _XENBUS_DEVICE XENBUS_DEVICE;
+
+// Have the state of the driver.
+#define XENBUS_DEVICE_SIGNATURE SIGNATURE_32 ('X','B','s','t')
+struct _XENBUS_DEVICE {
+  UINT32                        Signature;
+  EFI_DRIVER_BINDING_PROTOCOL   *This;
+  EFI_HANDLE                    ControllerHandle;
+  EFI_EVENT                     ExitBootEvent;
+};
+
 #endif
