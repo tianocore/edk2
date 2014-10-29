@@ -62,6 +62,7 @@
   gEfiPciIoProtocolGuid
   gEfiComponentName2ProtocolGuid
   gEfiComponentNameProtocolGuid
+  gXenBusProtocolGuid
 
 
 [Guids]

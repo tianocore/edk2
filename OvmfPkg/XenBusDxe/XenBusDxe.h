@@ -19,6 +19,11 @@
 #include <Uefi.h>
 
 //
+// Xen interface version used
+//
+#define  __XEN_INTERFACE_VERSION__ 0x00040400
+
+//
 // Libraries
 //
 #include <Library/UefiBootServicesTableLib.h>
@@ -45,6 +50,7 @@
 //
 // Produced Protocols
 //
+#include <Protocol/XenBus.h>
 
 
 //
