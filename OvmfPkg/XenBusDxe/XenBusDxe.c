@@ -281,11 +281,25 @@ XenBusDxeDriverBindingStart (
 {
   EFI_STATUS Status;
   XENBUS_DEVICE *Dev;
+  EFI_PCI_IO_PROTOCOL *PciIo;
+
+  Status = gBS->OpenProtocol (
+                     ControllerHandle,
+                     &gEfiPciIoProtocolGuid,
+                     (VOID **) &PciIo,
+                     This->DriverBindingHandle,
+                     ControllerHandle,
+                     EFI_OPEN_PROTOCOL_BY_DRIVER
+                     );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   Dev = AllocateZeroPool (sizeof (*Dev));
   Dev->Signature = XENBUS_DEVICE_SIGNATURE;
   Dev->This = This;
   Dev->ControllerHandle = ControllerHandle;
+  Dev->PciIo = PciIo;
 
   EfiAcquireLock (&mMyDeviceLock);
   if (mMyDevice != NULL) {
@@ -323,6 +337,8 @@ XenBusDxeDriverBindingStart (
 
 ErrorAllocated:
   FreePool (Dev);
+  gBS->CloseProtocol (ControllerHandle, &gEfiPciIoProtocolGuid,
+                      This->DriverBindingHandle, ControllerHandle);
   return Status;
 }
 
@@ -364,6 +380,9 @@ XenBusDxeDriverBindingStop (
   XENBUS_DEVICE *Dev = mMyDevice;
 
   gBS->CloseEvent (Dev->ExitBootEvent);
+
+  gBS->CloseProtocol (ControllerHandle, &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle, ControllerHandle);
 
   mMyDevice = NULL;
   FreePool (Dev);

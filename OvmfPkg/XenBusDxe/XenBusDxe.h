@@ -84,6 +84,7 @@ struct _XENBUS_DEVICE {
   UINT32                        Signature;
   EFI_DRIVER_BINDING_PROTOCOL   *This;
   EFI_HANDLE                    ControllerHandle;
+  EFI_PCI_IO_PROTOCOL           *PciIo;
   EFI_EVENT                     ExitBootEvent;
 
   VOID                          *Hyperpage;
