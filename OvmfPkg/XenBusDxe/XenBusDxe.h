@@ -116,4 +116,9 @@ TestAndClearBit (
   IN volatile VOID *Address
   );
 
+CHAR8*
+AsciiStrDup (
+  IN CONST CHAR8* Str
+  );
+
 #endif
