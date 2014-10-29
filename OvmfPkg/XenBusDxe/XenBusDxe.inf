@@ -44,6 +44,9 @@
   EventChannel.h
   XenStore.c
   XenStore.h
+  XenBus.c
+  XenBus.h
+  Helpers.c
 
 [Sources.IA32]
   Ia32/hypercall.S

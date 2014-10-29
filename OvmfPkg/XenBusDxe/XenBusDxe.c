@@ -32,6 +32,7 @@
 #include "XenHypercall.h"
 #include "GrantTable.h"
 #include "XenStore.h"
+#include "XenBus.h"
 
 
 ///
@@ -286,6 +287,7 @@ XenBusDxeDriverBindingStart (
   EFI_PCI_IO_PROTOCOL *PciIo;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *BarDesc;
   UINT64 MmioAddr;
+  EFI_DEVICE_PATH_PROTOCOL *DevicePath;
 
   Status = gBS->OpenProtocol (
                      ControllerHandle,
@@ -299,11 +301,26 @@ XenBusDxeDriverBindingStart (
     return Status;
   }
 
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &DevicePath,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+
+  if (EFI_ERROR (Status)) {
+    goto ErrorOpenningProtocol;
+  }
+
   Dev = AllocateZeroPool (sizeof (*Dev));
   Dev->Signature = XENBUS_DEVICE_SIGNATURE;
   Dev->This = This;
   Dev->ControllerHandle = ControllerHandle;
   Dev->PciIo = PciIo;
+  Dev->DevicePath = DevicePath;
+  InitializeListHead (&Dev->ChildList);
 
   EfiAcquireLock (&mMyDeviceLock);
   if (mMyDevice != NULL) {
@@ -350,6 +367,8 @@ XenBusDxeDriverBindingStart (
   Status = XenStoreInit (Dev);
   ASSERT_EFI_ERROR (Status);
 
+  XenBusEnumerateBus (Dev);
+
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
                              NotifyExitBoot,
                              (VOID*) Dev,
@@ -360,6 +379,9 @@ XenBusDxeDriverBindingStart (
 
 ErrorAllocated:
   FreePool (Dev);
+  gBS->CloseProtocol (ControllerHandle, &gEfiDevicePathProtocolGuid,
+                      This->DriverBindingHandle, ControllerHandle);
+ErrorOpenningProtocol:
   gBS->CloseProtocol (ControllerHandle, &gEfiPciIoProtocolGuid,
                       This->DriverBindingHandle, ControllerHandle);
   return Status;
@@ -400,12 +422,56 @@ XenBusDxeDriverBindingStop (
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
+  UINTN Index;
+  XENBUS_PROTOCOL *XenBusIo;
+  XENBUS_PRIVATE_DATA *ChildData;
+  EFI_STATUS Status;
   XENBUS_DEVICE *Dev = mMyDevice;
+
+  for (Index = 0; Index < NumberOfChildren; Index++) {
+    Status = gBS->OpenProtocol (
+               ChildHandleBuffer[Index],
+               &gXenBusProtocolGuid,
+               (VOID **) &XenBusIo,
+               This->DriverBindingHandle,
+               ControllerHandle,
+               EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "XenBusDxe: get children protocol failed: %r\n", Status));
+      continue;
+    }
+    ChildData = XENBUS_PRIVATE_DATA_FROM_THIS (XenBusIo);
+    Status = gBS->DisconnectController (ChildData->Handle, NULL, NULL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "XenBusDxe: error disconnecting child: %r\n",
+              Status));
+      continue;
+    }
+
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+               ChildData->Handle,
+               &gEfiDevicePathProtocolGuid, ChildData->DevicePath,
+               &gXenBusProtocolGuid, &ChildData->XenBusIo,
+               NULL);
+    ASSERT_EFI_ERROR (Status);
+
+    FreePool ((VOID*)ChildData->XenBusIo.Type);
+    FreePool ((VOID*)ChildData->XenBusIo.Node);
+    FreePool ((VOID*)ChildData->XenBusIo.Backend);
+    FreePool (ChildData->DevicePath);
+    RemoveEntryList (&ChildData->Link);
+    FreePool (ChildData);
+  }
+  if (NumberOfChildren > 0) {
+    return EFI_SUCCESS;
+  }
 
   gBS->CloseEvent (Dev->ExitBootEvent);
   XenStoreDeinit (Dev);
   XenGrantTableDeinit (Dev);
 
+  gBS->CloseProtocol (ControllerHandle, &gEfiDevicePathProtocolGuid,
+         This->DriverBindingHandle, ControllerHandle);
   gBS->CloseProtocol (ControllerHandle, &gEfiPciIoProtocolGuid,
          This->DriverBindingHandle, ControllerHandle);
 

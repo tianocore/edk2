@@ -199,6 +199,24 @@ XENSTORE_STATUS
   );
 
 /**
+  Set a new state for the frontend of the PV driver.
+
+  @param This         A pointer to XENBUS_PROTOCOL instance.
+  @param Transaction  The transaction to end/commit.
+  @param State        The new state to apply.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of failure.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_SET_STATE)(
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN XenBusState            State
+  );
+
+/**
   Grant access to the page Frame to the domain DomainId.
 
   @param This       A pointer to XENBUS_PROTOCOL instance.
@@ -322,6 +340,7 @@ struct _XENBUS_PROTOCOL {
   XENBUS_XS_REMOVE              XsRemove;
   XENBUS_XS_TRANSACTION_START   XsTransactionStart;
   XENBUS_XS_TRANSACTION_END     XsTransactionEnd;
+  XENBUS_SET_STATE              SetState;
 
   XENBUS_GRANT_ACCESS           GrantAccess;
   XENBUS_GRANT_END_ACCESS       GrantEndAccess;

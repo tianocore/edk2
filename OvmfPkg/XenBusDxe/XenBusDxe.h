@@ -82,6 +82,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gXenBusDxeComponentName;
 #define PCI_DEVICE_ID_XEN_PLATFORM       0x0001
 
 
+typedef struct _XENBUS_DEVICE_PATH XENBUS_DEVICE_PATH;
 typedef struct _XENBUS_DEVICE XENBUS_DEVICE;
 
 // Have the state of the driver.
@@ -92,10 +93,28 @@ struct _XENBUS_DEVICE {
   EFI_HANDLE                    ControllerHandle;
   EFI_PCI_IO_PROTOCOL           *PciIo;
   EFI_EVENT                     ExitBootEvent;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  LIST_ENTRY                    ChildList;
 
   VOID                          *Hyperpage;
   shared_info_t                 *SharedInfo;
 };
+
+// There is one of this struct allocated for every child.
+#define XENBUS_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('X', 'B', 'p', 'd')
+typedef struct {
+    UINTN Signature;
+    LIST_ENTRY Link;
+    EFI_HANDLE Handle;
+    XENBUS_PROTOCOL XenBusIo;
+    XENBUS_DEVICE *Dev;
+    XENBUS_DEVICE_PATH *DevicePath;
+} XENBUS_PRIVATE_DATA;
+
+#define XENBUS_PRIVATE_DATA_FROM_THIS(a) \
+  CR (a, XENBUS_PRIVATE_DATA, XenBusIo, XENBUS_PRIVATE_DATA_SIGNATURE)
+#define XENBUS_PRIVATE_DATA_FROM_LINK(a) \
+  CR (a, XENBUS_PRIVATE_DATA, Link, XENBUS_PRIVATE_DATA_SIGNATURE)
 
 /*
  * Helpers
