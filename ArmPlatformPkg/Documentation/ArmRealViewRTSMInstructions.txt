@@ -16,15 +16,12 @@ svn co https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2 edk2 --username 
 cd edk2
 svn co https://edk2-fatdriver2.svn.sourceforge.net/svnroot/edk2-fatdriver2/trunk/FatPkg FatPkg --username guest
 
-3. Apply BaseTools patches (BaseTools-Pending-Patches.patch combines all the currently pending BaseTools patches)
-patch -p1 < ArmPlatformPkg/Documentation/patches/BaseTools-Pending-Patches.patch
-
-4. Set up the environment. And build the EDK2’s tools
+3. Set up the environment. And build the EDK2’s tools
 export EDK_TOOLS_PATH=`pwd`/BaseTools
 . edksetup.sh `pwd`/BaseTools/
 make -C $EDK_TOOLS_PATH
 
-5. Build the ARM RealView EB UEFI Firmware
+4. Build the ARM RealView EB UEFI Firmware
 build -a ARM -p ArmPlatformPkg/ArmRealViewEBPkg/ArmRealViewEb-RTSM-A8.dsc -t RVCTLINUX
 
 

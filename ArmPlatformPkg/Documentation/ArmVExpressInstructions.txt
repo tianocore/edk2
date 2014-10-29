@@ -38,21 +38,18 @@ svn co https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2 edk2 --username 
 cd edk2
 svn co https://edk2-fatdriver2.svn.sourceforge.net/svnroot/edk2-fatdriver2/trunk/FatPkg FatPkg --username guest
 
-3. Apply BaseTools patches (BaseTools-Pending-Patches.patch combines all the currently pending BaseTools patches)
-patch -p1 < ArmPlatformPkg/Documentation/patches/BaseTools-Pending-Patches.patch
-
-4. Set up the environment. And build the EDK2’s tools
+3. Set up the environment. And build the EDK2’s tools
 export EDK_TOOLS_PATH=`pwd`/BaseTools
-. edksetup.sh `pwd`/BaseTools/
+. edksetup.sh
 make -C $EDK_TOOLS_PATH
 
-5. Ensure the ARMGCC toolchain is in your PATH environment variable or defined by the ARMGCC_TOOLS_PATH environment variable. Example:
+4. Ensure the ARMGCC toolchain is in your PATH environment variable or defined by the ARMGCC_TOOLS_PATH environment variable. Example:
 export ARMGCC_TOOLS_PATH=/opt/toolchains/arm-2010.09-arm-none-eabi-i686-pc-linux-gnu/bin/
 
-6. Build the ARM Versatile Express UEFI Firmware
+5. Build the ARM Versatile Express UEFI Firmware
 build -a ARM -p ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-CTA9x4.dsc -t ARMGCC
 
-7. Edit the ARM Versatile Express configuration file config.txt to declare the location of the UEFI firmware in NOR Flash
+6. Edit the ARM Versatile Express configuration file config.txt to declare the location of the UEFI firmware in NOR Flash
 TOTALIMAGES: 5                   ;Number of Images (Max : 32)
 NOR0UPDATE: AUTO                 ;Image Update:NONE/AUTO/FORCE
 NOR0ADDRESS: BOOT                ;Image Flash Address
@@ -77,20 +74,20 @@ NOR4ADDRESS: 40000000            ;Image Flash Address
 NOR4NAME: BOOTSCRIPT             ;Image Name
 NOR4FILE: \SOFTWARE\bootscr.txt  ;Image File Name
 
-8. To select second NOR Flash as a booting device, replace in the ARM Versatile Express file \SITE1\HBI0191B\board.txt:
+7. To select second NOR Flash as a booting device, replace in the ARM Versatile Express file \SITE1\HBI0191B\board.txt:
 SCC: 0x004 0x00001F09
 By:
 SCC: 0x004 0x10001F09
 
-9. Copy Build/ArmVExpress-CTA9x4/DEBUG_ARMGCC/FV/SEC_ARMVEXPRESS_EFI.fd to the ARM Versatile Express mass storage (available when the board is connected through USB to your host machine) under the folder SOTWARE and name sec_uefi.bin. Example for cygwin:
+8. Copy Build/ArmVExpress-CTA9x4/DEBUG_ARMGCC/FV/SEC_ARMVEXPRESS_EFI.fd to the ARM Versatile Express mass storage (available when the board is connected through USB to your host machine) under the folder SOTWARE and name sec_uefi.bin. Example for cygwin:
 cp Build/ArmVExpress-CTA9x4/DEBUG_ARMGCC/FV/SEC_ARMVEXPRESS_EFI.fd /cygdrive/e/SOFTWARE/sec_uefi.bin
 
-10. Start the ARM Versatile Express board. You should read “Waiting for firmware at 0x80000000 ...” on the serial port. 
+9. Start the ARM Versatile Express board. You should read “Waiting for firmware at 0x80000000 ...” on the serial port. 
 
-11. Copy ARMVEXPRESS_EFI.fd at 0x80000000 with RealView Debugger
+10. Copy ARMVEXPRESS_EFI.fd at 0x80000000 with RealView Debugger
 readfile,raw,nowarn "[EDK2_PATH]\Build\ArmVExpress-CTA9x4\DEBUG_ARMGCC\FV\ARMVEXPRESS_EFI.fd"=0x80000000
 
-12. Resume the execution from RealView Debugger
+11. Resume the execution from RealView Debugger
 
 For all subsequent times
 ************************
