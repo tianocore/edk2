@@ -69,6 +69,136 @@ typedef enum {
 ///
 
 /**
+  Get the contents of the node Node of the PV device. Returns the contents in
+  *Result which should be freed after use.
+
+  @param This           A pointer to XENBUS_PROTOCOL instance.
+  @param Transaction    The XenStore transaction covering this request.
+  @param Node           The basename of the file to read.
+  @param Result         The returned contents from this file.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of failure.
+
+  @note The results buffer is malloced and should be free'd by the
+        caller.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_XS_READ)(
+  IN  XENBUS_PROTOCOL       *This,
+  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST CHAR8           *Node,
+  OUT VOID                  **Result
+  );
+
+/**
+  Get the contents of the node Node of the PV device's backend. Returns the
+  contents in *Result which should be freed after use.
+
+  @param This           A pointer to XENBUS_PROTOCOL instance.
+  @param Transaction    The XenStore transaction covering this request.
+  @param Node           The basename of the file to read.
+  @param Result         The returned contents from this file.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of failure.
+
+  @note The results buffer is malloced and should be free'd by the
+        caller.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_XS_BACKEND_READ)(
+  IN  XENBUS_PROTOCOL       *This,
+  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST CHAR8           *Node,
+  OUT VOID                  **Result
+  );
+
+/**
+  Print formatted write to a XenStore node.
+
+  @param This             A pointer to XENBUS_PROTOCOL instance.
+  @param Transaction      The XenStore transaction covering this request.
+  @param Directory        The dirname of the path to read.
+  @param Node             The basename of the path to read.
+  @param Format           AsciiSPrint format string followed by a variable number
+                          of arguments.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of write failure.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_XS_PRINTF) (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST CHAR8            *Directory,
+  IN CONST CHAR8            *Node,
+  IN CONST CHAR8            *Format,
+  ...
+  );
+
+/**
+  Remove a node or directory (directories must be empty) of the PV driver's
+  subdirectory.
+
+  @param This           A pointer to XENBUS_PROTOCOL instance.
+  @param Transaction    The XenStore transaction covering this request.
+  @param Node           The basename of the node to remove.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of failure.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_XS_REMOVE) (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST CHAR8            *Node
+  );
+
+/**
+  Start a transaction.
+
+  Changes by others will not be seen during the lifetime of this
+  transaction, and changes will not be visible to others until it
+  is committed (XsTransactionEnd).
+
+  @param This         A pointer to XENBUS_PROTOCOL instance.
+  @param Transaction  The returned transaction.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of failure.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_XS_TRANSACTION_START)(
+  IN  XENBUS_PROTOCOL       *This,
+  OUT XENSTORE_TRANSACTION  *Transaction
+  );
+
+/**
+  End a transaction.
+
+  @param This         A pointer to XENBUS_PROTOCOL instance.
+  @param Transaction  The transaction to end/commit.
+  @param Abort        If TRUE, the transaction is discarded
+                      instead of committed.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of failure.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_XS_TRANSACTION_END) (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN BOOLEAN                Abort
+  );
+
+/**
   Grant access to the page Frame to the domain DomainId.
 
   @param This       A pointer to XENBUS_PROTOCOL instance.
@@ -101,6 +231,83 @@ EFI_STATUS
   IN grant_ref_t      Ref
   );
 
+/**
+  Register a XenStore watch.
+
+  XenStore watches allow a client to wait for changes to an object in the
+  XenStore.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param Node       The basename of the path to watch.
+  @param Token      A token.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of write failure.  EEXIST errors from the
+           XenStore are supressed, allowing multiple, physically different,
+           xenbus_watch objects, to watch the same path in the XenStore.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_REGISTER_WATCH) (
+  IN  XENBUS_PROTOCOL *This,
+  IN  CONST CHAR8     *Node,
+  OUT VOID            **Token
+  );
+
+/**
+  Register a XenStore watch on a backend's node.
+
+  XenStore watches allow a client to wait for changes to an object in the
+  XenStore.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param Node       The basename of the path to watch.
+  @param Token      A token.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of write failure.  EEXIST errors from the
+           XenStore are supressed, allowing multiple, physically different,
+           xenbus_watch objects, to watch the same path in the XenStore.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_REGISTER_WATCH_BACKEND) (
+  IN  XENBUS_PROTOCOL *This,
+  IN  CONST CHAR8     *Node,
+  OUT VOID            **Token
+  );
+
+/**
+  Unregister a XenStore watch.
+
+  @param This   A pointer to the XENBUS_PROTOCOL.
+  @param Token  An token previously returned by a successful
+                call to RegisterWatch ().
+**/
+typedef
+VOID
+(EFIAPI *XENBUS_UNREGISTER_WATCH) (
+  IN XENBUS_PROTOCOL  *This,
+  IN VOID             *Token
+  );
+
+/**
+  Block until the node watch by Token change.
+
+  @param This   A pointer to the XENBUS_PROTOCOL.
+  @param Token  An token previously returned by a successful
+                call to RegisterWatch or RegisterWatchBackend.
+
+  @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
+           indicating the type of failure.
+**/
+typedef
+XENSTORE_STATUS
+(EFIAPI *XENBUS_WAIT_FOR_WATCH) (
+  IN XENBUS_PROTOCOL  *This,
+  IN VOID             *Token
+  );
+
 
 ///
 /// Protocol structure
@@ -109,11 +316,27 @@ EFI_STATUS
 /// should not be used outside of the EDK II tree.
 ///
 struct _XENBUS_PROTOCOL {
+  XENBUS_XS_READ                XsRead;
+  XENBUS_XS_BACKEND_READ        XsBackendRead;
+  XENBUS_XS_PRINTF              XsPrintf;
+  XENBUS_XS_REMOVE              XsRemove;
+  XENBUS_XS_TRANSACTION_START   XsTransactionStart;
+  XENBUS_XS_TRANSACTION_END     XsTransactionEnd;
+
   XENBUS_GRANT_ACCESS           GrantAccess;
   XENBUS_GRANT_END_ACCESS       GrantEndAccess;
+
+  XENBUS_REGISTER_WATCH         RegisterWatch;
+  XENBUS_REGISTER_WATCH_BACKEND RegisterWatchBackend;
+  XENBUS_UNREGISTER_WATCH       UnregisterWatch;
+  XENBUS_WAIT_FOR_WATCH         WaitForWatch;
   //
   // Protocol data fields
   //
+  CONST CHAR8                   *Type;
+  UINT16                        DeviceId;
+  CONST CHAR8                   *Node;
+  CONST CHAR8                   *Backend;
 };
 
 extern EFI_GUID gXenBusProtocolGuid;

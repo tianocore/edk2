@@ -941,6 +941,46 @@ XenStoreUnwatch (
   return XenStoreTalkv (XST_NIL, XS_UNWATCH, WriteRequest, 2, NULL, NULL);
 }
 
+STATIC
+XENSTORE_STATUS
+XenStoreWaitWatch (
+  VOID *Token
+  )
+{
+  XENSTORE_MESSAGE *Message;
+  LIST_ENTRY *Entry = NULL;
+  LIST_ENTRY *Last = NULL;
+  XENSTORE_STATUS Status;
+
+  while (TRUE) {
+    EfiAcquireLock (&xs.WatchEventsLock);
+    if (IsListEmpty (&xs.WatchEvents) ||
+        Last == GetFirstNode (&xs.WatchEvents)) {
+      EfiReleaseLock (&xs.WatchEventsLock);
+      Status = XenStoreProcessMessage ();
+      if (Status != XENSTORE_STATUS_SUCCESS && Status != XENSTORE_STATUS_EAGAIN) {
+        return Status;
+      }
+      continue;
+    }
+
+    for (Entry = GetFirstNode (&xs.WatchEvents);
+         Entry != Last && !IsNull (&xs.WatchEvents, Entry);
+         Entry = GetNextNode (&xs.WatchEvents, Entry)) {
+      Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
+      if (Message->u.Watch.Handle == Token) {
+        RemoveEntryList (Entry);
+        EfiReleaseLock (&xs.WatchEventsLock);
+        FreePool(Message->u.Watch.Vector);
+        FreePool(Message);
+        return XENSTORE_STATUS_SUCCESS;
+      }
+    }
+    Last = GetFirstNode (&xs.WatchEvents);
+    EfiReleaseLock (&xs.WatchEventsLock);
+  }
+}
+
 VOID
 EFIAPI
 NotifyEventChannelCheckForEvent (
@@ -1383,4 +1423,128 @@ XenStoreUnregisterWatch (
 
   FreePool (Watch->Node);
   FreePool (Watch);
+}
+
+
+//
+// XENBUS protocol
+//
+
+XENSTORE_STATUS
+EFIAPI
+XenBusWaitForWatch (
+  IN XENBUS_PROTOCOL *This,
+  IN VOID *Token
+  )
+{
+  return XenStoreWaitWatch (Token);
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreRead (
+  IN  XENBUS_PROTOCOL       *This,
+  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST CHAR8           *Node,
+  OUT VOID                  **Value
+  )
+{
+  return XenStoreRead (Transaction, This->Node, Node, NULL, Value);
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreBackendRead (
+  IN  XENBUS_PROTOCOL       *This,
+  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST CHAR8           *Node,
+  OUT VOID                  **Value
+  )
+{
+  return XenStoreRead (Transaction, This->Backend, Node, NULL, Value);
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreRemove (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN const char             *Node
+  )
+{
+  return XenStoreRemove (Transaction, This->Node, Node);
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreTransactionStart (
+  IN  XENBUS_PROTOCOL       *This,
+  OUT XENSTORE_TRANSACTION  *Transaction
+  )
+{
+  return XenStoreTransactionStart (Transaction);
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreTransactionEnd (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN BOOLEAN                Abort
+  )
+{
+  return XenStoreTransactionEnd (Transaction, Abort);
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreSPrint (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST CHAR8            *DirectoryPath,
+  IN CONST CHAR8            *Node,
+  IN CONST CHAR8            *FormatString,
+  ...
+  )
+{
+  VA_LIST Marker;
+  XENSTORE_STATUS Status;
+
+  VA_START (Marker, FormatString);
+  Status = XenStoreVSPrint (Transaction, DirectoryPath, Node, FormatString, Marker);
+  VA_END (Marker);
+
+  return Status;
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusRegisterWatch (
+  IN  XENBUS_PROTOCOL *This,
+  IN  CONST CHAR8     *Node,
+  OUT VOID            **Token
+  )
+{
+  return XenStoreRegisterWatch (This->Node, Node, (XENSTORE_WATCH **) Token);
+}
+
+XENSTORE_STATUS
+EFIAPI
+XenBusRegisterWatchBackend (
+  IN  XENBUS_PROTOCOL *This,
+  IN  CONST CHAR8     *Node,
+  OUT VOID            **Token
+  )
+{
+  return XenStoreRegisterWatch (This->Backend, Node, (XENSTORE_WATCH **) Token);
+}
+
+VOID
+EFIAPI
+XenBusUnregisterWatch (
+  IN XENBUS_PROTOCOL  *This,
+  IN VOID             *Token
+  )
+{
+  XenStoreUnregisterWatch ((XENSTORE_WATCH *) Token);
 }

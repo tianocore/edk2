@@ -289,4 +289,91 @@ XenStoreDeinit (
   IN XENBUS_DEVICE *Dev
   );
 
+
+//
+// XENBUS protocol
+//
+
+XENSTORE_STATUS
+EFIAPI
+XenBusWaitForWatch (
+  IN XENBUS_PROTOCOL *This,
+  IN VOID *Token
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreRead (
+  IN  XENBUS_PROTOCOL       *This,
+  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST CHAR8           *Node,
+  OUT VOID                  **Value
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreBackendRead (
+  IN  XENBUS_PROTOCOL       *This,
+  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST CHAR8           *Node,
+  OUT VOID                  **Value
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreRemove (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST CHAR8            *Node
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreTransactionStart (
+  IN  XENBUS_PROTOCOL       *This,
+  OUT XENSTORE_TRANSACTION  *Transaction
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreTransactionEnd (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN BOOLEAN                Abort
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusXenStoreSPrint (
+  IN XENBUS_PROTOCOL        *This,
+  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST CHAR8            *DirectoryPath,
+  IN CONST CHAR8            *Node,
+  IN CONST CHAR8            *FormatString,
+  ...
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusRegisterWatch (
+  IN  XENBUS_PROTOCOL *This,
+  IN  CONST CHAR8     *Node,
+  OUT VOID            **Token
+  );
+
+XENSTORE_STATUS
+EFIAPI
+XenBusRegisterWatchBackend (
+  IN  XENBUS_PROTOCOL *This,
+  IN  CONST CHAR8     *Node,
+  OUT VOID            **Token
+  );
+
+VOID
+EFIAPI
+XenBusUnregisterWatch (
+  IN XENBUS_PROTOCOL  *This,
+  IN VOID             *Token
+  );
+
 #endif /* _XEN_XENSTORE_XENSTOREVAR_H */
