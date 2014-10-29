@@ -77,6 +77,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gXenPvBlkDxeComponentName;
 //
 #include "DriverBinding.h"
 #include "ComponentName.h"
+#include "BlockIo.h"
 
 
 #endif

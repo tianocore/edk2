@@ -35,6 +35,8 @@
   ComponentName.h
   BlockFront.c
   BlockFront.h
+  BlockIo.c
+  BlockIo.h
 
 
 [LibraryClasses]

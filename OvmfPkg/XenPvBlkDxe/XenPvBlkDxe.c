@@ -261,6 +261,7 @@ XenPvBlkDxeDriverBindingStart (
   EFI_STATUS Status;
   XENBUS_PROTOCOL *XenBusIo;
   XEN_BLOCK_FRONT_DEVICE *Dev;
+  EFI_BLOCK_IO_MEDIA *Media;
 
   Status = gBS->OpenProtocol (
                 ControllerHandle,
@@ -279,8 +280,45 @@ XenPvBlkDxeDriverBindingStart (
     goto CloseProtocol;
   }
 
+  CopyMem (&Dev->BlockIo, &gXenPvBlkDxeBlockIo, sizeof (EFI_BLOCK_IO_PROTOCOL));
+  Media = AllocateCopyPool (sizeof (EFI_BLOCK_IO_MEDIA),
+                            &gXenPvBlkDxeBlockIoMedia);
+  if (Dev->MediaInfo.VDiskInfo & VDISK_REMOVABLE) {
+    Media->RemovableMedia = TRUE;
+  }
+  Media->MediaPresent = TRUE;
+  Media->ReadOnly = !Dev->MediaInfo.ReadWrite;
+  if (Dev->MediaInfo.CdRom) {
+    //
+    // If it's a cdrom, the blocksize value need to be 2048 for OVMF to
+    // recognize it as a cdrom:
+    //    MdeModulePkg/Universal/Disk/PartitionDxe/ElTorito.c
+    //
+    Media->BlockSize = 2048;
+    Media->LastBlock = DivU64x32 (Dev->MediaInfo.Sectors,
+                                  Media->BlockSize / Dev->MediaInfo.SectorSize) - 1;
+  } else {
+    Media->BlockSize = Dev->MediaInfo.SectorSize;
+    Media->LastBlock = Dev->MediaInfo.Sectors - 1;
+  }
+  ASSERT (Media->BlockSize % 512 == 0);
+  Dev->BlockIo.Media = Media;
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                    &ControllerHandle,
+                    &gEfiBlockIoProtocolGuid, &Dev->BlockIo,
+                    NULL
+                    );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XenPvBlk: install protocol fail: %r\n", Status));
+    goto UninitBlockFront;
+  }
+
   return EFI_SUCCESS;
 
+UninitBlockFront:
+  FreePool (Media);
+  XenPvBlockFrontShutdown (Dev);
 CloseProtocol:
   gBS->CloseProtocol (ControllerHandle, &gXenBusProtocolGuid,
                       This->DriverBindingHandle, ControllerHandle);
@@ -322,6 +360,33 @@ XenPvBlkDxeDriverBindingStop (
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
+  EFI_BLOCK_IO_PROTOCOL *BlockIo;
+  XEN_BLOCK_FRONT_DEVICE *Dev;
+  EFI_BLOCK_IO_MEDIA *Media;
+  EFI_STATUS Status;
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle, &gEfiBlockIoProtocolGuid,
+                  (VOID **)&BlockIo,
+                  This->DriverBindingHandle, ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gBS->UninstallProtocolInterface (ControllerHandle,
+                  &gEfiBlockIoProtocolGuid, BlockIo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Media = BlockIo->Media;
+  Dev = XEN_BLOCK_FRONT_FROM_BLOCK_IO (BlockIo);
+  XenPvBlockFrontShutdown (Dev);
+
+  FreePool (Media);
+
   gBS->CloseProtocol (ControllerHandle, &gXenBusProtocolGuid,
          This->DriverBindingHandle, ControllerHandle);
 
