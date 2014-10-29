@@ -63,6 +63,7 @@ typedef enum {
 
 
 #include <IndustryStandard/Xen/grant_table.h>
+#include <IndustryStandard/Xen/event_channel.h>
 
 ///
 /// Function prototypes
@@ -250,6 +251,54 @@ EFI_STATUS
   );
 
 /**
+  Allocate a port that can be bind from domain DomainId.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param DomainId   The domain ID that can bind the newly allocated port.
+  @param Port       A pointer to a evtchn_port_t that will contain the newly
+                    allocated port.
+
+  @retval UINT32    The return value from the hypercall, 0 if success.
+**/
+typedef
+UINT32
+(EFIAPI *XENBUS_EVENT_CHANNEL_ALLOCATE) (
+  IN  XENBUS_PROTOCOL *This,
+  IN  domid_t         DomainId,
+  OUT evtchn_port_t   *Port
+  );
+
+/**
+  Send an event to the remote end of the channel whose local endpoint is Port.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param Port       Local port to the the event from.
+
+  @retval UINT32    The return value from the hypercall, 0 if success.
+**/
+typedef
+UINT32
+(EFIAPI *XENBUS_EVENT_CHANNEL_NOTIFY) (
+  IN XENBUS_PROTOCOL  *This,
+  IN evtchn_port_t    Port
+  );
+
+/**
+  Close a local event channel Port.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param Port       The event channel to close.
+
+  @retval UINT32    The return value from the hypercall, 0 if success.
+**/
+typedef
+UINT32
+(EFIAPI *XENBUS_EVENT_CHANNEL_CLOSE) (
+  IN XENBUS_PROTOCOL  *This,
+  IN evtchn_port_t    Port
+  );
+
+/**
   Register a XenStore watch.
 
   XenStore watches allow a client to wait for changes to an object in the
@@ -344,6 +393,10 @@ struct _XENBUS_PROTOCOL {
 
   XENBUS_GRANT_ACCESS           GrantAccess;
   XENBUS_GRANT_END_ACCESS       GrantEndAccess;
+
+  XENBUS_EVENT_CHANNEL_ALLOCATE EventChannelAllocate;
+  XENBUS_EVENT_CHANNEL_NOTIFY   EventChannelNotify;
+  XENBUS_EVENT_CHANNEL_CLOSE    EventChannelClose;
 
   XENBUS_REGISTER_WATCH         RegisterWatch;
   XENBUS_REGISTER_WATCH_BACKEND RegisterWatchBackend;

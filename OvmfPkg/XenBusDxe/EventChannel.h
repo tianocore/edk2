@@ -33,4 +33,56 @@ XenEventChannelNotify (
   IN evtchn_port_t Port
   );
 
+/*
+ * XenBus protocol
+ */
+
+/**
+  Allocate a port that can be bind from domain DomainId.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param DomainId   The domain ID that can bind the newly allocated port.
+  @param Port       A pointer to a evtchn_port_t that will contain the newly
+                    allocated port.
+
+  @retval UINT32    The return value from the hypercall, 0 if success.
+**/
+UINT32
+EFIAPI
+XenBusEventChannelAllocate (
+  IN  XENBUS_PROTOCOL *This,
+  IN  domid_t         DomainId,
+  OUT evtchn_port_t   *Port
+  );
+
+/**
+  Send an event to the remote end of the channel whose local endpoint is Port.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param Port       Local port to the the event from.
+
+  @retval UINT32    The return value from the hypercall, 0 if success.
+**/
+UINT32
+EFIAPI
+XenBusEventChannelNotify (
+  IN XENBUS_PROTOCOL *This,
+  IN evtchn_port_t   Port
+  );
+
+/**
+  Close a local event channel Port.
+
+  @param This       A pointer to the XENBUS_PROTOCOL.
+  @param Port       The event channel to close.
+
+  @retval UINT32    The return value from the hypercall, 0 if success.
+**/
+UINT32
+EFIAPI
+XenBusEventChannelClose (
+  IN XENBUS_PROTOCOL *This,
+  IN evtchn_port_t   Port
+  );
+
 #endif

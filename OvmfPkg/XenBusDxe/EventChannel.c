@@ -31,3 +31,58 @@ XenEventChannelNotify (
   ReturnCode = XenHypercallEventChannelOp (Dev, EVTCHNOP_send, &Send);
   return ReturnCode;
 }
+
+UINT32
+EFIAPI
+XenBusEventChannelAllocate (
+  IN  XENBUS_PROTOCOL *This,
+  IN  domid_t         DomainId,
+  OUT evtchn_port_t   *Port
+  )
+{
+  XENBUS_PRIVATE_DATA *Private;
+  evtchn_alloc_unbound_t Parameter;
+  UINT32 ReturnCode;
+
+  Private = XENBUS_PRIVATE_DATA_FROM_THIS (This);
+
+  Parameter.dom = DOMID_SELF;
+  Parameter.remote_dom = DomainId;
+  ReturnCode = XenHypercallEventChannelOp (Private->Dev,
+                                   EVTCHNOP_alloc_unbound,
+                                   &Parameter);
+  if (ReturnCode != 0) {
+    DEBUG ((EFI_D_ERROR, "ERROR: alloc_unbound failed with rc=%d", ReturnCode));
+    return ReturnCode;
+  }
+  *Port = Parameter.port;
+  return ReturnCode;
+}
+
+UINT32
+EFIAPI
+XenBusEventChannelNotify (
+  IN XENBUS_PROTOCOL *This,
+  IN evtchn_port_t   Port
+  )
+{
+  XENBUS_PRIVATE_DATA *Private;
+
+  Private = XENBUS_PRIVATE_DATA_FROM_THIS(This);
+  return XenEventChannelNotify (Private->Dev, Port);
+}
+
+UINT32
+EFIAPI
+XenBusEventChannelClose (
+  IN XENBUS_PROTOCOL *This,
+  IN evtchn_port_t   Port
+  )
+{
+  XENBUS_PRIVATE_DATA *Private;
+  evtchn_close_t Close;
+
+  Private = XENBUS_PRIVATE_DATA_FROM_THIS (This);
+  Close.port = Port;
+  return XenHypercallEventChannelOp (Private->Dev, EVTCHNOP_close, &Close);
+}
