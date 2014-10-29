@@ -1,0 +1,59 @@
+## @file
+#  This driver produces a XenBus protocol for every Xen PV devices found.
+#
+#  Copyright (C) 2014, Citrix Ltd.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = XenBusDxe
+  FILE_GUID                 = 565ec8ba-a484-11e3-802b-b8ac6f7d65e6
+  MODULE_TYPE               = UEFI_DRIVER
+
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = XenBusDxeDriverEntryPoint
+  UNLOAD_IMAGE              = XenBusDxeUnload
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  XenBusDxe.h
+  XenBusDxe.c
+  DriverBinding.h
+  ComponentName.c
+  ComponentName.h
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  HobLib
+
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiPciIoProtocolGuid
+  gEfiComponentName2ProtocolGuid
+  gEfiComponentNameProtocolGuid
+
+
+[Guids]
+  gEfiXenInfoGuid
+
