@@ -97,4 +97,23 @@ struct _XENBUS_DEVICE {
   shared_info_t                 *SharedInfo;
 };
 
+/*
+ * Helpers
+ */
+
+/**
+  Atomically test and clear a bit.
+
+  @param Bit      Bit index to test in *Address
+  @param Address  The Address to the buffer that contain the bit to test.
+
+  @return Value of the Bit before it was cleared.
+**/
+INT32
+EFIAPI
+TestAndClearBit (
+  IN INT32 Bit,
+  IN volatile VOID *Address
+  );
+
 #endif

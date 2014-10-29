@@ -48,12 +48,16 @@
   Ia32/hypercall.asm
   Ia32/InterlockedCompareExchange16.S
   Ia32/InterlockedCompareExchange16.asm
+  Ia32/TestAndClearBit.S
+  Ia32/TestAndClearBit.asm
 
 [Sources.X64]
   X64/hypercall.S
   X64/hypercall.asm
   X64/InterlockedCompareExchange16.S
   X64/InterlockedCompareExchange16.asm
+  X64/TestAndClearBit.S
+  X64/TestAndClearBit.asm
 
 [LibraryClasses]
   UefiDriverEntryPoint
