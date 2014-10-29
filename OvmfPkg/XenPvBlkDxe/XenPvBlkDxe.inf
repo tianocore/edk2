@@ -1,0 +1,59 @@
+## @file
+#  This driver produces a Block I/O protocol for a Xen PV block device.
+#
+#  Copyright (C) 2014, Citrix Ltd.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = XenPvBlkDxe
+  FILE_GUID                 = 8c2487ea-9af3-11e3-b966-b8ac6f7d65e6
+  MODULE_TYPE               = UEFI_DRIVER
+
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = XenPvBlkDxeDriverEntryPoint
+  UNLOAD_IMAGE              = XenPvBlkDxeUnload
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  XenPvBlkDxe.h
+  XenPvBlkDxe.c
+  ComponentName.c
+  ComponentName.h
+
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiComponentName2ProtocolGuid
+  gEfiComponentNameProtocolGuid
+  gXenBusProtocolGuid
+  gEfiDevicePathProtocolGuid                    ## TO_START
+
+
+[Guids]
+
