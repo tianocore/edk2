@@ -1,18 +1,18 @@
 /** @file
   Implement the TCP4 driver support for the socket layer.
 
-  Copyright (c) 2011, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
   \section ConnectionManagement Connection Management
-  
+
   The ::EslTcp4Listen routine initially places the SOCK_STREAM or
   SOCK_SEQPACKET socket into a listen state.   When a remote machine
   makes a connection to the socket, the TCPv4 network layer calls
@@ -487,7 +487,7 @@ EslTcp4ConnectStart (
   EFI_STATUS Status;
 
   DBG_ENTER ( );
-  
+
   //
   //  Determine if any more local adapters are available
   //
@@ -776,7 +776,7 @@ EslTcp4Listen (
       //
       pPort = pNextPort;
     }
-    
+
     //
     //  Determine if any ports are in the listen state
     //
@@ -840,7 +840,6 @@ EslTcp4ListenComplete (
   EFI_HANDLE ChildHandle;
   struct sockaddr_in LocalAddress;
   EFI_TCP4_CONFIG_DATA * pConfigData;
-  ESL_LAYER * pLayer;
   ESL_PORT * pNewPort;
   ESL_SOCKET * pNewSocket;
   ESL_SOCKET * pSocket;
@@ -869,7 +868,6 @@ EslTcp4ListenComplete (
     //  Allocate a socket for this connection
     //
     ChildHandle = NULL;
-    pLayer = &mEslLayer;
     Status = EslSocketAllocate ( &ChildHandle,
                                  DEBUG_CONNECTION,
                                  &pNewSocket );
@@ -1041,7 +1039,7 @@ EslTcp4ListenComplete (
     //  Process:
     //    Call close
     //    Release the resources
-    
+
   }
 
   DBG_EXIT ( );
@@ -1151,7 +1149,7 @@ EslTcp4LocalAddressSet (
     //  Determine if the default address is used
     //
     pAccessPoint->UseDefaultAddress = (BOOLEAN)( 0 == pIpAddress->sin_addr.s_addr );
-    
+
     //
     //  Set the subnet mask
     //
@@ -1345,7 +1343,7 @@ EslTcp4PortAllocate (
 
   This routine is called by ::EslSocketPortClose.
   See the \ref PortCloseStateMachine section.
-  
+
   @param [in] pPort       Address of an ::ESL_PORT structure.
 
   @retval EFI_SUCCESS     The port is closed
@@ -1360,7 +1358,7 @@ EslTcp4PortClose (
   UINTN DebugFlags;
   ESL_TCP4_CONTEXT * pTcp4;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
 
   //
@@ -1504,13 +1502,13 @@ EslTcp4PortCloseOp (
   @param [in] pPort           Address of an ::ESL_PORT structure.
 
   @param [in] pPacket         Address of an ::ESL_PACKET structure.
-  
+
   @param [in] pbConsumePacket Address of a BOOLEAN indicating if the packet is to be consumed
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -1888,13 +1886,13 @@ EslTcp4RxStart (
   during the current transmission attempt.
 
   @param [in] pSocket         Address of an ::ESL_SOCKET structure
-  
+
   @param [in] Flags           Message control flags
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [in] pAddress        Network address of the remote system address
@@ -1924,7 +1922,6 @@ EslTcp4TxBuffer (
   ESL_PACKET ** ppQueueHead;
   ESL_PACKET ** ppQueueTail;
   ESL_PACKET * pPreviousPacket;
-  ESL_TCP4_CONTEXT * pTcp4;
   size_t * pTxBytes;
   EFI_TCP4_TRANSMIT_DATA * pTxData;
   EFI_STATUS Status;
@@ -1951,7 +1948,6 @@ EslTcp4TxBuffer (
       //
       //  Determine the queue head
       //
-      pTcp4 = &pPort->Context.Tcp4;
       bUrgent = (BOOLEAN)( 0 != ( Flags & MSG_OOB ));
       bUrgentQueue = bUrgent
                     && ( !pSocket->bOobInLine )
@@ -2142,7 +2138,7 @@ EslTcp4TxComplete (
   ESL_PORT * pPort;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
 
   //

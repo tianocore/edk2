@@ -1,3 +1,13 @@
+/** @file
+  Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 /*
  * Copyright (c) 1985, 1993
  *    The Regents of the University of California.  All rights reserved.
@@ -168,7 +178,7 @@ res_hnok(
     const char *dn
     )
 {
-    int ppch = '\0', pch = PERIOD, ch = *dn++;
+    int pch = PERIOD, ch = *dn++;
 
     while (ch != '\0') {
         int nch = *dn++;
@@ -185,7 +195,8 @@ res_hnok(
             if (!middlechar(ch))
                 return (0);
         }
-        ppch = pch, pch = ch, ch = nch;
+        pch = ch;
+        ch = nch;
     }
     return (1);
 }

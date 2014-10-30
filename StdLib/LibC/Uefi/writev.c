@@ -1,7 +1,6 @@
-/*
- * Copyright (c) 1999, 2000
- * Intel Corporation.
- * All rights reserved.
+/** @file
+ *
+ * Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -100,9 +99,11 @@ writev(
     int iovcnt
     )
 {
-  const struct iovec  *pVecTmp;
-  char      *pBuf, *pBufTmp;
-  size_t      TotalBytes, i, ret;
+  const struct iovec   *pVecTmp;
+  char                 *pBuf;
+  size_t                TotalBytes;
+  size_t                i;
+  size_t                ret;
 
   //
   //  See how much memory we'll need
@@ -126,7 +127,7 @@ writev(
   //  Copy vectors to the buffer
   //
 
-  for (pBufTmp = pBuf; iovcnt; iovcnt--) {
+  for (; iovcnt; iovcnt--) {
     bcopy(iov->iov_base, pBuf, iov->iov_len);
     pBuf += iov->iov_len;
     iov++;

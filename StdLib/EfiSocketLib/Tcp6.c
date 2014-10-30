@@ -1,18 +1,18 @@
 /** @file
   Implement the TCP6 driver support for the socket layer.
 
-  Copyright (c) 2011, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
   \section ConnectionManagement Connection Management
-  
+
   The ::EslTcp6Listen routine initially places the SOCK_STREAM or
   SOCK_SEQPACKET socket into a listen state.   When a remote machine
   makes a connection to the socket, the TCPv6 network layer calls
@@ -398,55 +398,55 @@ EslTcp6ConnectPoll (
       case EFI_DEVICE_ERROR:
         pSocket->errno = EIO;
         break;
-      
+
       case EFI_ABORTED:
         pSocket->errno = ECONNABORTED;
         break;
-      
+
       case EFI_ACCESS_DENIED:
         pSocket->errno = EACCES;
         break;
-      
+
       case EFI_CONNECTION_RESET:
         pSocket->errno = ECONNRESET;
         break;
-      
+
       case EFI_INVALID_PARAMETER:
         pSocket->errno = EADDRNOTAVAIL;
         break;
-      
+
       case EFI_HOST_UNREACHABLE:
       case EFI_NO_RESPONSE:
         pSocket->errno = EHOSTUNREACH;
         break;
-      
+
       case EFI_NO_MAPPING:
         pSocket->errno = EAFNOSUPPORT;
         break;
-      
+
       case EFI_NO_MEDIA:
       case EFI_NETWORK_UNREACHABLE:
         pSocket->errno = ENETDOWN;
         break;
-      
+
       case EFI_OUT_OF_RESOURCES:
         pSocket->errno = ENOBUFS;
         break;
-      
+
       case EFI_PORT_UNREACHABLE:
       case EFI_PROTOCOL_UNREACHABLE:
       case EFI_CONNECTION_REFUSED:
         pSocket->errno = ECONNREFUSED;
         break;
-      
+
       case EFI_SUCCESS:
         pSocket->errno = 0;
         break;
-      
+
       case EFI_TIMEOUT:
         pSocket->errno = ETIMEDOUT;
         break;
-      
+
       case EFI_UNSUPPORTED:
         pSocket->errno = EOPNOTSUPP;
         break;
@@ -505,7 +505,7 @@ EslTcp6ConnectStart (
   EFI_STATUS Status;
 
   DBG_ENTER ( );
-  
+
   //
   //  Determine if any more local adapters are available
   //
@@ -601,7 +601,7 @@ EslTcp6ConnectStart (
       //  Status to errno translation gets done in EslTcp4ConnectPoll
       //
       pTcp6->ConnectToken.CompletionToken.Status = Status;
-      
+
       //
       //  Continue with the next port
       //
@@ -807,7 +807,7 @@ EslTcp6Listen (
       //
       pPort = pNextPort;
     }
-    
+
     //
     //  Determine if any ports are in the listen state
     //
@@ -871,7 +871,6 @@ EslTcp6ListenComplete (
   EFI_HANDLE ChildHandle;
   struct sockaddr_in6 LocalAddress;
   EFI_TCP6_CONFIG_DATA * pConfigData;
-  ESL_LAYER * pLayer;
   ESL_PORT * pNewPort;
   ESL_SOCKET * pNewSocket;
   ESL_SOCKET * pSocket;
@@ -900,7 +899,6 @@ EslTcp6ListenComplete (
     //  Allocate a socket for this connection
     //
     ChildHandle = NULL;
-    pLayer = &mEslLayer;
     Status = EslSocketAllocate ( &ChildHandle,
                                  DEBUG_CONNECTION,
                                  &pNewSocket );
@@ -1098,7 +1096,7 @@ EslTcp6ListenComplete (
     //  Process:
     //    Call close
     //    Release the resources
-    
+
   }
 
   DBG_EXIT ( );
@@ -1397,7 +1395,7 @@ EslTcp6PortAllocate (
 
   This routine is called by ::EslSocketPortClose.
   See the \ref PortCloseStateMachine section.
-  
+
   @param [in] pPort       Address of an ::ESL_PORT structure.
 
   @retval EFI_SUCCESS     The port is closed
@@ -1412,7 +1410,7 @@ EslTcp6PortClose (
   UINTN DebugFlags;
   ESL_TCP6_CONTEXT * pTcp6;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
 
   //
@@ -1556,13 +1554,13 @@ EslTcp6PortCloseOp (
   @param [in] pPort           Address of an ::ESL_PORT structure.
 
   @param [in] pPacket         Address of an ::ESL_PACKET structure.
-  
+
   @param [in] pbConsumePacket Address of a BOOLEAN indicating if the packet is to be consumed
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -1957,13 +1955,13 @@ EslTcp6RxStart (
   during the current transmission attempt.
 
   @param [in] pSocket         Address of an ::ESL_SOCKET structure
-  
+
   @param [in] Flags           Message control flags
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [in] pAddress        Network address of the remote system address
@@ -1993,7 +1991,6 @@ EslTcp6TxBuffer (
   ESL_PACKET ** ppQueueHead;
   ESL_PACKET ** ppQueueTail;
   ESL_PACKET * pPreviousPacket;
-  ESL_TCP6_CONTEXT * pTcp6;
   size_t * pTxBytes;
   EFI_TCP6_TRANSMIT_DATA * pTxData;
   EFI_STATUS Status;
@@ -2020,7 +2017,6 @@ EslTcp6TxBuffer (
       //
       //  Determine the queue head
       //
-      pTcp6 = &pPort->Context.Tcp6;
       bUrgent = (BOOLEAN)( 0 != ( Flags & MSG_OOB ));
       bUrgentQueue = bUrgent
                     && ( !pSocket->bOobInLine )
@@ -2211,7 +2207,7 @@ EslTcp6TxComplete (
   ESL_PORT * pPort;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
 
   //

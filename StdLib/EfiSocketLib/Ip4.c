@@ -1,11 +1,11 @@
 /** @file
   Implement the IP4 driver support for the socket layer.
 
-  Copyright (c) 2011, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -430,13 +430,13 @@ EslIp4PortAllocate (
   @param [in] pPort           Address of an ::ESL_PORT structure.
 
   @param [in] pPacket         Address of an ::ESL_PACKET structure.
-  
+
   @param [in] pbConsumePacket Address of a BOOLEAN indicating if the packet is to be consumed
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -653,17 +653,15 @@ EslIp4RxComplete (
   )
 {
   size_t LengthInBytes;
-  ESL_PORT * pPort;
   ESL_PACKET * pPacket;
   EFI_IP4_RECEIVE_DATA * pRxData;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
-  
+
   //
   //  Get the operation status.
   //
-  pPort = pIo->pPort;
   Status = pIo->Token.Ip4Rx.Status;
 
   //
@@ -672,7 +670,7 @@ EslIp4RxComplete (
   pRxData = pIo->Token.Ip4Rx.Packet.RxData;
   LengthInBytes = pRxData->HeaderLength + pRxData->DataLength;
 
-  //
+  //{{
   //      +--------------------+   +----------------------+
   //      | ESL_IO_MGMT        |   |      Data Buffer     |
   //      |                    |   |     (Driver owned)   |
@@ -692,7 +690,7 @@ EslIp4RxComplete (
   //
   //
   //  Save the data in the packet
-  //
+  //}}
   pPacket = pIo->pPacket;
   pPacket->Op.Ip4Rx.pRxData = pRxData;
 
@@ -717,7 +715,7 @@ EslIp4RxComplete (
   that the socket is configured.
 
   @param [in] pSocket         Address of an ::ESL_SOCKET structure
-  
+
   @retval EFI_SUCCESS - The port is connected
   @retval EFI_NOT_STARTED - The port is not connected
 
@@ -904,7 +902,7 @@ EslIp4RxComplete (
   //  Determine the socket configuration status
   //
   Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
-  
+
   //
   //  Return the port connected state.
   //
@@ -1188,9 +1186,9 @@ EslIp4TxComplete (
   ESL_PACKET * pPacket;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
-  
+
   //
   //  Locate the active transmit packet
   //

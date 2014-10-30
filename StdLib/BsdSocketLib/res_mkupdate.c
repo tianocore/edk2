@@ -1,3 +1,13 @@
+/** @file
+  Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 /*
  * Copyright (c) 1996 by Internet Software Consortium.
  *
@@ -100,7 +110,7 @@ int
 res_mkupdate(ns_updrec *rrecp_in, u_char *buf, int buflen) {
     ns_updrec *rrecp_start = rrecp_in;
     HEADER *hp;
-    u_char *cp, *sp1, *sp2, *startp, *endp;
+    u_char *cp, *sp2, *startp, *endp;
     int n, i, soanum, multiline;
     ns_updrec *rrecp;
     struct in_addr ina;
@@ -125,7 +135,6 @@ res_mkupdate(ns_updrec *rrecp_in, u_char *buf, int buflen) {
     hp->id = htons(++_res.id);
     hp->opcode = ns_o_update;
     hp->rcode = NOERROR;
-    sp1 = buf + 2*INT16SZ;  /* save pointer to zocount */
     cp = buf + HFIXEDSZ;
     buflen -= HFIXEDSZ;
     dpp = dnptrs;

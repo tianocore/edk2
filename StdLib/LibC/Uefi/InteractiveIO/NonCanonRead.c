@@ -37,7 +37,6 @@ IIO_NonCanonRead (
   cIIO           *This;
   cFIFO          *InBuf;
   struct termios *Termio;
-  EFI_STATUS      Status;
   ssize_t         NumRead;
   cc_t            tioMin;
   cc_t            tioTime;
@@ -74,7 +73,7 @@ IIO_NonCanonRead (
       if(InBuf->IsEmpty(InBuf)) {
         NumRead = filp->f_ops->fo_read(filp, &filp->f_offset, sizeof(wchar_t), &InChar);
         if(NumRead > 0) {
-          Status = InBuf->Write(InBuf, &InChar, 1);  // Buffer the character
+          (void) InBuf->Write(InBuf, &InChar, 1);  // Buffer the character
         }
       }
   //    break;

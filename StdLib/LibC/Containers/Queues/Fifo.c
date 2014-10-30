@@ -292,17 +292,17 @@ FIFO_Dequeue (
     SizeOfElement = Self->ElementSize;                                // Get size of this FIFO's elements
     Count         = MIN(Count, Self->Count(Self, AsElements));        // Lesser of requested or actual
 
-    QPtr = (UINTN)Self->Queue + (RDex * Self->ElementSize);           // Point to Read location in FIFO
+    QPtr = (UINTN)Self->Queue + (RDex * SizeOfElement);           // Point to Read location in FIFO
     for(i = 0; i < Count; ++i) {                                      // Iterate Count times...
-      (void)CopyMem(pElement, (const void *)QPtr, Self->ElementSize);   // Copy element from FIFO to caller's buffer
+      (void)CopyMem(pElement, (const void *)QPtr, SizeOfElement);   // Copy element from FIFO to caller's buffer
       RDex = (UINT32)ModuloIncrement(RDex, Self->NumElements);          // Increment Read Index
       if(RDex == 0) {                                                   // If the index wrapped
         QPtr = (UINTN)Self->Queue;                                        // Point back to beginning of data
       }
       else {                                                            // Otherwise
-        QPtr += Self->ElementSize;                                        // Point to the next element in FIFO
+        QPtr += SizeOfElement;                                        // Point to the next element in FIFO
       }
-      pElement = (char*)pElement + Self->ElementSize;                   // Point to next element in caller's buffer
+      pElement = (char*)pElement + SizeOfElement;                   // Point to next element in caller's buffer
     }                                                                 // Iterate: for loop
     if(Consume) {                                                     // If caller requests data consumption
       Self->ReadIndex = RDex;                                           // Set FIFO's Read Index to new Index

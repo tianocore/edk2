@@ -8,7 +8,7 @@
   It is the responsibility of the caller, or higher level function, to perform
   any necessary translation between wide and narrow characters.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -63,7 +63,6 @@ IIO_WriteOne(struct __filedes *filp, cFIFO *OBuf, wchar_t InCh)
   UINT32              CurRow;       // Current cursor row on the screen
   UINT32              PrevColumn;   // Previous column.  Used to detect wrapping.
   UINT32              AdjColumn;    // Current cursor column on the screen
-  UINT32              AdjRow;       // Current cursor row on the screen
 
   RetVal    = -1;
   wcb       = wc;
@@ -79,7 +78,6 @@ IIO_WriteOne(struct __filedes *filp, cFIFO *OBuf, wchar_t InCh)
     CurRow    = This->CurrentXY.Row;
 
     numW      = 1;          // The majority of characters buffer one character
-    AdjRow    = 0;          // Most characters just cause horizontal movement
     AdjColumn = 0;
     if(OFlag & OPOST) {
       /* Perform output processing */
@@ -127,7 +125,6 @@ IIO_WriteOne(struct __filedes *filp, cFIFO *OBuf, wchar_t InCh)
             numW  = 2;
             CurColumn = 0;
           }
-          AdjRow = 1;
           break;                      //}}
 
         case CHAR_BACKSPACE:          //{{

@@ -75,7 +75,7 @@ IIO_GetInChar (
 {
   cIIO             *This;
   cFIFO            *InBuf;
-  EFI_STATUS        Status;
+  size_t            Status;
   ssize_t           NumRead;
   wint_t            RetVal;
   wchar_t           InChar;
@@ -92,8 +92,10 @@ IIO_GetInChar (
   }
   if(BufCnt > 0) {
     Status = InBuf->Read(InBuf, &InChar, 1);
-    --BufCnt;
-    NumRead = 1;
+    if (Status > 0) {
+      --BufCnt;
+      NumRead = 1;
+    }
   }
   else {
     NumRead = filp->f_ops->fo_read(filp, &filp->f_offset, sizeof(wchar_t), &InChar);
