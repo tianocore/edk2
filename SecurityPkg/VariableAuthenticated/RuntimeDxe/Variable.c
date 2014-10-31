@@ -218,18 +218,24 @@ UpdateVariableInfo (
 
   This code checks if variable header is valid or not.
 
-  @param Variable        Pointer to the Variable Header.
+  @param Variable           Pointer to the Variable Header.
+  @param VariableStoreEnd   Pointer to the Variable Store End.
 
-  @retval TRUE           Variable header is valid.
-  @retval FALSE          Variable header is not valid.
+  @retval TRUE              Variable header is valid.
+  @retval FALSE             Variable header is not valid.
 
 **/
 BOOLEAN
 IsValidVariableHeader (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER       *Variable,
+  IN  VARIABLE_HEADER       *VariableStoreEnd
   )
 {
-  if (Variable == NULL || Variable->StartId != VARIABLE_DATA) {
+  if ((Variable == NULL) || (Variable >= VariableStoreEnd) || (Variable->StartId != VARIABLE_DATA)) {
+    //
+    // Variable is NULL or has reached the end of variable store,
+    // or the StartId is not correct.
+    //
     return FALSE;
   }
 
@@ -529,10 +535,6 @@ GetNextVariablePtr (
 {
   UINTN Value;
 
-  if (!IsValidVariableHeader (Variable)) {
-    return NULL;
-  }
-
   Value =  (UINTN) GetVariableDataPtr (Variable);
   Value += DataSizeOfVariable (Variable);
   Value += GET_PAD_SIZE (DataSizeOfVariable (Variable));
@@ -605,14 +607,16 @@ IsValidPubKeyIndex (
   )
 {
   VARIABLE_HEADER          *Variable;
+  VARIABLE_HEADER          *VariableStoreEnd;
 
   if (PubKeyIndex > mPubKeyNumber) {
     return FALSE;
   }
-  
+
   Variable = GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
-  
-  while (IsValidVariableHeader (Variable)) {
+  VariableStoreEnd = GetEndPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
+
+  while (IsValidVariableHeader (Variable, VariableStoreEnd)) {
     if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) && 
         Variable->PubKeyIndex == PubKeyIndex) {
       return TRUE;
@@ -799,7 +803,7 @@ Reclaim (
     Variable          = GetStartPointer (VariableStoreHeader);
     MaximumBufferSize = sizeof (VARIABLE_STORE_HEADER);
 
-    while (IsValidVariableHeader (Variable)) {
+    while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
       NextVariable = GetNextVariablePtr (Variable);
       if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) &&
           Variable != UpdatingVariable &&
@@ -866,7 +870,7 @@ Reclaim (
     // Refresh the PubKeyIndex for all valid variables (ADDED and IN_DELETED_TRANSITION).
     //
     Variable = GetStartPointer (VariableStoreHeader);
-    while (IsValidVariableHeader (Variable)) {
+    while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
       NextVariable = GetNextVariablePtr (Variable);
       if (Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
         if ((StrCmp (GetVariableNamePtr (Variable), AUTHVAR_KEYDB_NAME) == 0) && 
@@ -912,7 +916,7 @@ Reclaim (
     // Reinstall all ADDED variables as long as they are not identical to Updating Variable.
     //
     Variable = GetStartPointer (VariableStoreHeader);
-    while (IsValidVariableHeader (Variable)) {
+    while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
       NextVariable = GetNextVariablePtr (Variable);
       if (Variable != UpdatingVariable && Variable->State == VAR_ADDED) {
         VariableSize = (UINTN) NextVariable - (UINTN) Variable;
@@ -931,7 +935,7 @@ Reclaim (
     // Reinstall all in delete transition variables.
     //
     Variable = GetStartPointer (VariableStoreHeader);
-    while (IsValidVariableHeader (Variable)) {
+    while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
       NextVariable = GetNextVariablePtr (Variable);
       if (Variable != UpdatingVariable && Variable != UpdatingInDeletedTransition && Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
 
@@ -943,7 +947,7 @@ Reclaim (
 
         FoundAdded = FALSE;
         AddedVariable = GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
-        while (IsValidVariableHeader (AddedVariable)) {
+        while (IsValidVariableHeader (AddedVariable, GetEndPointer ((VARIABLE_STORE_HEADER *) ValidBuffer))) {
           NextAddedVariable = GetNextVariablePtr (AddedVariable);
           NameSize = NameSizeOfVariable (AddedVariable);
           if (CompareGuid (&AddedVariable->VendorGuid, &Variable->VendorGuid) &&
@@ -1036,7 +1040,7 @@ Reclaim (
       mVariableModuleGlobal->CommonVariableTotalSize = CommonVariableTotalSize;
     } else {
       NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase);
-      while (IsValidVariableHeader (NextVariable)) {
+      while (IsValidVariableHeader (NextVariable, GetEndPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase))) {
         VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
         if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
           mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
@@ -1102,7 +1106,7 @@ FindVariableEx (
   InDeletedVariable  = NULL;
 
   for ( PtrTrack->CurrPtr = PtrTrack->StartPtr
-      ; (PtrTrack->CurrPtr < PtrTrack->EndPtr) && IsValidVariableHeader (PtrTrack->CurrPtr)
+      ; IsValidVariableHeader (PtrTrack->CurrPtr, PtrTrack->EndPtr)
       ; PtrTrack->CurrPtr = GetNextVariablePtr (PtrTrack->CurrPtr)
       ) {
     if (PtrTrack->CurrPtr->State == VAR_ADDED ||
@@ -2867,10 +2871,7 @@ VariableServiceGetNextVariableName (
     //
     // Switch from Volatile to HOB, to Non-Volatile.
     //
-    while ((Variable.CurrPtr >= Variable.EndPtr) ||
-           (Variable.CurrPtr == NULL)            ||
-           !IsValidVariableHeader (Variable.CurrPtr)
-          ) {
+    while (!IsValidVariableHeader (Variable.CurrPtr, Variable.EndPtr)) {
       //
       // Find current storage index
       //
@@ -3119,8 +3120,7 @@ VariableServiceSetVariable (
     // Parse non-volatile variable data and get last variable offset.
     //
     NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) Point);
-    while ((NextVariable < GetEndPointer ((VARIABLE_STORE_HEADER *) (UINTN) Point))
-        && IsValidVariableHeader (NextVariable)) {
+    while (IsValidVariableHeader (NextVariable, GetEndPointer ((VARIABLE_STORE_HEADER *) (UINTN) Point))) {
       NextVariable = GetNextVariablePtr (NextVariable);
     }
     mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) Point;
@@ -3294,7 +3294,7 @@ VariableServiceQueryVariableInfoInternal (
   //
   // Now walk through the related variable store.
   //
-  while ((Variable < GetEndPointer (VariableStoreHeader)) && IsValidVariableHeader (Variable)) {
+  while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
     NextVariable = GetNextVariablePtr (Variable);
     VariableSize = (UINT64) (UINTN) NextVariable - (UINT64) (UINTN) Variable;
 
@@ -3594,7 +3594,7 @@ InitNonVolatileVariableStore (
   // Parse non-volatile variable data and get last variable offset.
   //
   NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase);
-  while (IsValidVariableHeader (NextVariable)) {
+  while (IsValidVariableHeader (NextVariable, GetEndPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase))) {
     VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
     if ((NextVariable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
       mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
@@ -3640,7 +3640,7 @@ FlushHobVariableToFlash (
     //
     mVariableModuleGlobal->VariableGlobal.HobVariableBase = 0;
     for ( Variable = GetStartPointer (VariableStoreHeader)
-        ; (Variable < GetEndPointer (VariableStoreHeader) && IsValidVariableHeader (Variable))
+        ; IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))
         ; Variable = GetNextVariablePtr (Variable)
         ) {
       if (Variable->State != VAR_ADDED) {
