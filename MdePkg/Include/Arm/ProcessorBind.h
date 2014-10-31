@@ -110,7 +110,9 @@ typedef INT32   INTN;
 //
 #define EFIAPI    
 
-#if defined(__GNUC__)
+// When compiling with Clang, we still use GNU as for the assembler, so we still
+// need to define the GCC_ASM* macros.
+#if defined(__GNUC__) || defined(__clang__)
   ///
   /// For GNU assembly code, .global or .globl can declare global symbols.
   /// Define this macro to unify the usage.
