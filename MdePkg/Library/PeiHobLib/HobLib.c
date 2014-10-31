@@ -327,10 +327,11 @@ BuildResourceDescriptorWithOwnerHob (
   )
 {
   EFI_HOB_RESOURCE_DESCRIPTOR  *Hob;
-  EFI_STATUS                    Status;
 
-  Status = PeiServicesCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR), (void **)&Hob);
-  ASSERT_EFI_ERROR (Status);
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, (UINT16) sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->ResourceType      = ResourceType;
   Hob->ResourceAttribute = ResourceAttribute;
