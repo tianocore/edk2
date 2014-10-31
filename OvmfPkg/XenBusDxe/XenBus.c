@@ -348,28 +348,33 @@ Out:
 }
 
 STATIC XENBUS_PRIVATE_DATA gXenBusPrivateData = {
-  .Signature = XENBUS_PRIVATE_DATA_SIGNATURE,
+  XENBUS_PRIVATE_DATA_SIGNATURE,    // Signature
+  { NULL, NULL },                   // Link
+  NULL,                             // Handle
+  {                                 // XenBusIo
+    XenBusXenStoreRead,             // XenBusIo.XsRead
+    XenBusXenStoreBackendRead,      // XenBusIo.XsBackendRead
+    XenBusXenStoreSPrint,           // XenBusIo.XsPrintf
+    XenBusXenStoreRemove,           // XenBusIo.XsRemove
+    XenBusXenStoreTransactionStart, // XenBusIo.XsTransactionStart
+    XenBusXenStoreTransactionEnd,   // XenBusIo.XsTransactionEnd
+    XenBusSetState,                 // XenBusIo.SetState
+    XenBusGrantAccess,              // XenBusIo.GrantAccess
+    XenBusGrantEndAccess,           // XenBusIo.GrantEndAccess
+    XenBusEventChannelAllocate,     // XenBusIo.EventChannelAllocate
+    XenBusEventChannelNotify,       // XenBusIo.EventChannelNotify
+    XenBusEventChannelClose,        // XenBusIo.EventChannelClose
+    XenBusRegisterWatch,            // XenBusIo.RegisterWatch
+    XenBusRegisterWatchBackend,     // XenBusIo.RegisterWatchBackend
+    XenBusUnregisterWatch,          // XenBusIo.UnregisterWatch
+    XenBusWaitForWatch,             // XenBusIo.WaitForWatch
 
-  .XenBusIo.XsRead = XenBusXenStoreRead,
-  .XenBusIo.XsBackendRead = XenBusXenStoreBackendRead,
-  .XenBusIo.XsPrintf = XenBusXenStoreSPrint,
-  .XenBusIo.XsRemove = XenBusXenStoreRemove,
-  .XenBusIo.XsTransactionStart = XenBusXenStoreTransactionStart,
-  .XenBusIo.XsTransactionEnd = XenBusXenStoreTransactionEnd,
-  .XenBusIo.SetState = XenBusSetState,
-  .XenBusIo.GrantAccess = XenBusGrantAccess,
-  .XenBusIo.GrantEndAccess = XenBusGrantEndAccess,
-  .XenBusIo.EventChannelAllocate = XenBusEventChannelAllocate,
-  .XenBusIo.EventChannelNotify = XenBusEventChannelNotify,
-  .XenBusIo.EventChannelClose = XenBusEventChannelClose,
-  .XenBusIo.RegisterWatch = XenBusRegisterWatch,
-  .XenBusIo.RegisterWatchBackend = XenBusRegisterWatchBackend,
-  .XenBusIo.UnregisterWatch = XenBusUnregisterWatch,
-  .XenBusIo.WaitForWatch = XenBusWaitForWatch,
+    NULL,                           // XenBusIo.Type
+    0,                              // XenBusIo.DeviceId
+    NULL,                           // XenBusIo.Node
+    NULL,                           // XenBusIo.Backend
+  },
 
-  .XenBusIo.Type = NULL,
-  .XenBusIo.Node = NULL,
-  .XenBusIo.Backend = NULL,
-
-  .Dev = NULL
+  NULL,                             // Dev
+  NULL                              // DevicePath
 };
