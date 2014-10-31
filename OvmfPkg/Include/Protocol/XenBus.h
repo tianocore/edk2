@@ -39,7 +39,7 @@ typedef struct
   UINT32 Id;
 } XENSTORE_TRANSACTION;
 
-#define XST_NIL ((XENSTORE_TRANSACTION) { 0 })
+#define XST_NIL ((XENSTORE_TRANSACTION *) NULL)
 
 typedef enum {
   XENSTORE_STATUS_SUCCESS = 0,
@@ -88,7 +88,7 @@ typedef
 XENSTORE_STATUS
 (EFIAPI *XENBUS_XS_READ)(
   IN  XENBUS_PROTOCOL       *This,
-  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  CONST CHAR8           *Node,
   OUT VOID                  **Result
   );
@@ -112,7 +112,7 @@ typedef
 XENSTORE_STATUS
 (EFIAPI *XENBUS_XS_BACKEND_READ)(
   IN  XENBUS_PROTOCOL       *This,
-  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  CONST CHAR8           *Node,
   OUT VOID                  **Result
   );
@@ -134,7 +134,7 @@ typedef
 XENSTORE_STATUS
 (EFIAPI *XENBUS_XS_PRINTF) (
   IN XENBUS_PROTOCOL        *This,
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8            *Directory,
   IN CONST CHAR8            *Node,
   IN CONST CHAR8            *Format,
@@ -156,7 +156,7 @@ typedef
 XENSTORE_STATUS
 (EFIAPI *XENBUS_XS_REMOVE) (
   IN XENBUS_PROTOCOL        *This,
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8            *Node
   );
 
@@ -195,7 +195,7 @@ typedef
 XENSTORE_STATUS
 (EFIAPI *XENBUS_XS_TRANSACTION_END) (
   IN XENBUS_PROTOCOL        *This,
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN BOOLEAN                Abort
   );
 
@@ -213,7 +213,7 @@ typedef
 XENSTORE_STATUS
 (EFIAPI *XENBUS_SET_STATE)(
   IN XENBUS_PROTOCOL        *This,
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN XenBusState            State
   );
 

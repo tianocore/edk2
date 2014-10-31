@@ -166,7 +166,7 @@ XenPvBlockFrontInitialization (
   OUT XEN_BLOCK_FRONT_DEVICE  **DevPtr
   )
 {
-  XENSTORE_TRANSACTION xbt;
+  XENSTORE_TRANSACTION Transaction;
   CHAR8 *DeviceType;
   blkif_sring_t *SharedRing;
   XENSTORE_STATUS Status;
@@ -209,38 +209,38 @@ XenPvBlockFrontInitialization (
                          &Dev->RingRef);
 
 Again:
-  Status = XenBusIo->XsTransactionStart (XenBusIo, &xbt);
+  Status = XenBusIo->XsTransactionStart (XenBusIo, &Transaction);
   if (Status != XENSTORE_STATUS_SUCCESS) {
     DEBUG ((EFI_D_WARN, "XenPvBlk: Failed to start transaction, %d\n", Status));
     goto Error;
   }
 
-  Status = XenBusIo->XsPrintf (XenBusIo, xbt, NodeName, "ring-ref", "%d",
+  Status = XenBusIo->XsPrintf (XenBusIo, &Transaction, NodeName, "ring-ref", "%d",
                                Dev->RingRef);
   if (Status != XENSTORE_STATUS_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "XenPvBlk: Failed to write ring-ref.\n"));
     goto AbortTransaction;
   }
-  Status = XenBusIo->XsPrintf (XenBusIo, xbt, NodeName,
+  Status = XenBusIo->XsPrintf (XenBusIo, &Transaction, NodeName,
                                "event-channel", "%d", Dev->EventChannel);
   if (Status != XENSTORE_STATUS_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "XenPvBlk: Failed to write event-channel.\n"));
     goto AbortTransaction;
   }
-  Status = XenBusIo->XsPrintf (XenBusIo, xbt, NodeName,
+  Status = XenBusIo->XsPrintf (XenBusIo, &Transaction, NodeName,
                                "protocol", "%a", XEN_IO_PROTO_ABI_NATIVE);
   if (Status != XENSTORE_STATUS_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "XenPvBlk: Failed to write protocol.\n"));
     goto AbortTransaction;
   }
 
-  Status = XenBusIo->SetState (XenBusIo, xbt, XenbusStateConnected);
+  Status = XenBusIo->SetState (XenBusIo, &Transaction, XenbusStateConnected);
   if (Status != XENSTORE_STATUS_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "XenPvBlk: Failed to switch state.\n"));
     goto AbortTransaction;
   }
 
-  Status = XenBusIo->XsTransactionEnd (XenBusIo, xbt, FALSE);
+  Status = XenBusIo->XsTransactionEnd (XenBusIo, &Transaction, FALSE);
   if (Status == XENSTORE_STATUS_EAGAIN) {
     goto Again;
   }
@@ -319,7 +319,7 @@ Error2:
   XenBusIo->XsRemove (XenBusIo, XST_NIL, "protocol");
   goto Error;
 AbortTransaction:
-  XenBusIo->XsTransactionEnd (XenBusIo, xbt, TRUE);
+  XenBusIo->XsTransactionEnd (XenBusIo, &Transaction, TRUE);
 Error:
   XenPvBlockFree (Dev);
   return EFI_DEVICE_ERROR;

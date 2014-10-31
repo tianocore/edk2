@@ -790,7 +790,7 @@ XenStoreReadReply (
 STATIC
 XENSTORE_STATUS
 XenStoreTalkv (
-  IN  XENSTORE_TRANSACTION    Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  enum xsd_sockmsg_type   RequestType,
   IN  CONST WRITE_REQUEST     *WriteRequest,
   IN  UINT32                  NumRequests,
@@ -803,7 +803,11 @@ XenStoreTalkv (
   UINT32 Index;
   XENSTORE_STATUS Status;
 
-  Message.tx_id = Transaction.Id;
+  if (Transaction == XST_NIL) {
+    Message.tx_id = 0;
+  } else {
+    Message.tx_id = Transaction->Id;
+  }
   Message.req_id = 0;
   Message.type = RequestType;
   Message.len = 0;
@@ -869,7 +873,7 @@ Error:
 STATIC
 XENSTORE_STATUS
 XenStoreSingle (
-  IN  XENSTORE_TRANSACTION    Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  enum xsd_sockmsg_type   RequestType,
   IN  CONST CHAR8             *Body,
   OUT UINT32                  *LenPtr OPTIONAL,
@@ -1157,7 +1161,7 @@ XenStoreDeinit (
 
 XENSTORE_STATUS
 XenStoreListDirectory (
-  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  CONST CHAR8           *DirectoryPath,
   IN  CONST CHAR8           *Node,
   OUT UINT32                *DirectoryCountPtr,
@@ -1184,7 +1188,7 @@ XenStoreListDirectory (
 
 BOOLEAN
 XenStorePathExists (
-  IN XENSTORE_TRANSACTION  Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8           *Directory,
   IN CONST CHAR8           *Node
   )
@@ -1204,7 +1208,7 @@ XenStorePathExists (
 
 XENSTORE_STATUS
 XenStoreRead (
-  IN  XENSTORE_TRANSACTION    Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  CONST CHAR8             *DirectoryPath,
   IN  CONST CHAR8             *Node,
   OUT UINT32                  *LenPtr OPTIONAL,
@@ -1228,7 +1232,7 @@ XenStoreRead (
 
 XENSTORE_STATUS
 XenStoreWrite (
-  IN XENSTORE_TRANSACTION  Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8           *DirectoryPath,
   IN CONST CHAR8           *Node,
   IN CONST CHAR8           *Str
@@ -1253,7 +1257,7 @@ XenStoreWrite (
 
 XENSTORE_STATUS
 XenStoreRemove (
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8            *DirectoryPath,
   IN CONST CHAR8            *Node
   )
@@ -1288,7 +1292,7 @@ XenStoreTransactionStart (
 
 XENSTORE_STATUS
 XenStoreTransactionEnd (
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN BOOLEAN                Abort
   )
 {
@@ -1305,7 +1309,7 @@ XenStoreTransactionEnd (
 
 XENSTORE_STATUS
 XenStoreVSPrint (
-  IN XENSTORE_TRANSACTION  Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8           *DirectoryPath,
   IN CONST CHAR8           *Node,
   IN CONST CHAR8           *FormatString,
@@ -1328,7 +1332,7 @@ XenStoreVSPrint (
 XENSTORE_STATUS
 EFIAPI
 XenStoreSPrint (
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8            *DirectoryPath,
   IN CONST CHAR8            *Node,
   IN CONST CHAR8            *FormatString,
@@ -1444,7 +1448,7 @@ XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreRead (
   IN  XENBUS_PROTOCOL       *This,
-  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  CONST CHAR8           *Node,
   OUT VOID                  **Value
   )
@@ -1456,7 +1460,7 @@ XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreBackendRead (
   IN  XENBUS_PROTOCOL       *This,
-  IN  XENSTORE_TRANSACTION  Transaction,
+  IN  CONST XENSTORE_TRANSACTION *Transaction,
   IN  CONST CHAR8           *Node,
   OUT VOID                  **Value
   )
@@ -1468,7 +1472,7 @@ XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreRemove (
   IN XENBUS_PROTOCOL        *This,
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN const char             *Node
   )
 {
@@ -1489,7 +1493,7 @@ XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreTransactionEnd (
   IN XENBUS_PROTOCOL        *This,
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN BOOLEAN                Abort
   )
 {
@@ -1500,7 +1504,7 @@ XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreSPrint (
   IN XENBUS_PROTOCOL        *This,
-  IN XENSTORE_TRANSACTION   Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8            *DirectoryPath,
   IN CONST CHAR8            *Node,
   IN CONST CHAR8            *FormatString,

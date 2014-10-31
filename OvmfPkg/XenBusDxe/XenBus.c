@@ -314,7 +314,7 @@ XENSTORE_STATUS
 EFIAPI
 XenBusSetState (
   IN XENBUS_PROTOCOL      *This,
-  IN XENSTORE_TRANSACTION Transaction,
+  IN CONST XENSTORE_TRANSACTION *Transaction,
   IN enum xenbus_state    NewState
   )
 {
