@@ -31,8 +31,7 @@
   LinuxGdt.c
 
 [Sources.IA32]
-  Ia32/JumpToKernel.asm
-  Ia32/JumpToKernel.S
+  Ia32/JumpToKernel.nasm
 
 [Sources.X64]
   X64/JumpToKernel.asm

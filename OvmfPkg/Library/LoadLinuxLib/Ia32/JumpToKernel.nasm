@@ -12,9 +12,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-  .586p
-  .model flat,C
-  .code
+  SECTION .text
 
 ;------------------------------------------------------------------------------
 ; VOID
@@ -24,13 +22,12 @@
 ;   VOID *KernelBootParams
 ;   );
 ;------------------------------------------------------------------------------
-JumpToKernel PROC
+global ASM_PFX(JumpToKernel)
+ASM_PFX(JumpToKernel):
 
     mov     esi, [esp + 8]
-    call    DWORD PTR [esp + 4]
+    call    DWORD [esp + 4]
     ret
-
-JumpToKernel ENDP
 
 ;------------------------------------------------------------------------------
 ; VOID
@@ -42,13 +39,11 @@ JumpToKernel ENDP
 ;   VOID *KernelStart
 ;   );
 ;------------------------------------------------------------------------------
-JumpToUefiKernel PROC
+global ASM_PFX(JumpToUefiKernel)
+ASM_PFX(JumpToUefiKernel):
 
     mov     eax, [esp + 12]
-    mov     eax, [eax + 264h]
+    mov     eax, [eax + 0x264]
     add     eax, [esp + 16]
     jmp     eax
 
-JumpToUefiKernel ENDP
-
-END
