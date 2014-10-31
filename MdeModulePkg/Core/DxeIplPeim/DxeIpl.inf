@@ -40,6 +40,7 @@
   X64/VirtualMemory.h  ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   X64/VirtualMemory.c  ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   Ia32/DxeLoadFunc.c
+  Ia32/IdtVectorAsm.nasm||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   Ia32/IdtVectorAsm.asm||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   Ia32/IdtVectorAsm.S  ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
