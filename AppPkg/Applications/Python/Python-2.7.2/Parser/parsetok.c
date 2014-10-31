@@ -1,6 +1,15 @@
+/** @file
+  Parser-tokenizer link implementation.
 
-/* Parser-tokenizer link implementation */
+  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 #include "pgenheaders.h"
 #include "tokenizer.h"
 #include "node.h"
@@ -131,7 +140,9 @@ parsetok(struct tok_state *tok, grammar *g, int start, perrdetail *err_ret,
 {
     parser_state *ps;
     node *n;
-    int started = 0, handling_import = 0, handling_with = 0;
+    int started = 0;
+    //int handling_import = 0;
+    //int handling_with = 0;
 
     if ((ps = PyParser_New(g, start)) == NULL) {
         fprintf(stderr, "no mem for new parser\n");
@@ -163,7 +174,8 @@ parsetok(struct tok_state *tok, grammar *g, int start, perrdetail *err_ret,
         }
         if (type == ENDMARKER && started) {
             type = NEWLINE; /* Add an extra newline */
-            handling_with = handling_import = 0;
+            //handling_with = 0;
+            //handling_import = 0;
             started = 0;
             /* Add the right number of dedent tokens,
                except if a certain flag is given --

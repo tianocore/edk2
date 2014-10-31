@@ -1,4 +1,14 @@
-/*
+/** @file
+  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
  * All rights reserved.
  *
@@ -25,14 +35,12 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
 
-/*
  * Issues to be discussed:
  * - Thread safe-ness must be checked
  * - Return values.  There seems to be no standard for return value (RFC2133)
  *   but INRIA implementation returns EAI_xxx defined for getaddrinfo().
- */
+**/
 
 #if 0
 #include <sys/types.h>
@@ -104,8 +112,8 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
     u_long v4a;
 #ifdef ENABLE_IPV6
     u_char pfx;
-#endif
     int h_error;
+#endif
     char numserv[512];
     char numaddr[512];
 
@@ -181,7 +189,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
         hp = getipnodebyaddr(addr, gni_afd->a_addrlen, gni_afd->a_af, &h_error);
 #else
         hp = gethostbyaddr(addr, gni_afd->a_addrlen, gni_afd->a_af);
-        h_error = h_errno;
+        //h_error = h_errno;
 #endif
 
         if (hp) {

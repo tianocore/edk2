@@ -1,17 +1,15 @@
 /** @file
   Translate the network name into an IP address
 
-  Copyright (c) 2011-2012, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
-
 #include <errno.h>
 #include <netdb.h>
 #include <string.h>
@@ -26,11 +24,10 @@
 char mBuffer[65536];
 
 
-/**
-  Translate the network name into an IP address
+/** Translate the network name into an IP address
 
-  @param [in] Argc  The number of arguments
-  @param [in] Argv  The argument value array
+  @param[in]  Argc  The number of arguments
+  @param[in]  Argv  The argument value array
 
   @retval  0        The application exited normally.
   @retval  Other    An error occurred.
@@ -41,7 +38,6 @@ main (
   IN char **Argv
   )
 {
-  int AppStatus;
   UINT8 * pIpAddress;
   struct netent * pNetwork;
 
@@ -49,17 +45,12 @@ main (
             "%a starting\r\n",
             Argv[0]));
 
-  //
   //  Determine if the network name is specified
-  //
-  AppStatus = 0;
   if ( 1 == Argc ) {
     Print ( L"%a  <network name>\r\n", Argv[0]);
   }
   else {
-    //
     //  Translate the net name
-    //
     pNetwork = getnetbyname ( Argv[1]);
     if ( NULL == pNetwork ) {
       Print ( L"ERROR - network not found, errno: %d\r\n", errno );
@@ -75,9 +66,6 @@ main (
               pIpAddress[3]);
     }
   }
-
-  //
   //  All done
-  //
   return errno;
 }

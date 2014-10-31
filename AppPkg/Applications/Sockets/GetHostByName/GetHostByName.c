@@ -1,17 +1,15 @@
 /** @file
   Translate the host name into an IP address
 
-  Copyright (c) 2011-2012, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
-
 #include <errno.h>
 #include <netdb.h>
 #include <string.h>
@@ -26,11 +24,10 @@
 char mBuffer[65536];
 
 
-/**
-  Translate the host name into an IP address
+/** Translate the host name into an IP address
 
-  @param [in] Argc  The number of arguments
-  @param [in] Argv  The argument value array
+  @param[in]  Argc  The number of arguments
+  @param[in]  Argv  The argument value array
 
   @retval  0        The application exited normally.
   @retval  Other    An error occurred.
@@ -41,7 +38,6 @@ main (
   IN char **Argv
   )
 {
-  int AppStatus;
   UINTN Index;
   struct hostent * pHost;
   UINT8 * pIpAddress;
@@ -51,17 +47,12 @@ main (
             "%a starting\r\n",
             Argv[0]));
 
-  //
   //  Determine if the host name is specified
-  //
-  AppStatus = 0;
   if ( 1 == Argc ) {
     Print ( L"%a  <host name>\r\n", Argv[0]);
   }
   else {
-    //
     //  Translate the host name
-    //
     pHost = gethostbyname ( Argv[1]);
     if ( NULL == pHost ) {
       Print ( L"ERROR - host not found, h_errno: %d\r\n", h_errno );
@@ -76,9 +67,7 @@ main (
               pHost->h_addrtype,
               pHost->h_name );
 
-      //
       //  Display the other addresses
-      //
       for ( Index = 1; NULL != pHost->h_addr_list[Index]; Index++ ) {
         pIpAddress = (UINT8 *)pHost->h_addr_list[Index];
         Print ( L"%d.%d.%d.%d\r\n",
@@ -88,9 +77,7 @@ main (
                 pIpAddress[3]);
       }
 
-      //
       //  Display the list of aliases
-      //
       ppName = pHost->h_aliases;
       if (( NULL == ppName ) || ( NULL == *ppName )) {
         Print ( L"No aliases\r\n" );
@@ -115,9 +102,6 @@ main (
       }
     }
   }
-
-  //
   //  All done
-  //
   return errno;
 }

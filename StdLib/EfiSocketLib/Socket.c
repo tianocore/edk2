@@ -4006,6 +4006,7 @@ EslSocketPortCloseComplete (
   //  Determine if the receive operation is pending
   Status = EslSocketPortCloseRxDone ( pPort );
   DBG_EXIT_STATUS ( Status );
+  --Status;
 }
 
 

@@ -586,7 +586,6 @@ da_ConPoll(
   short              events
   )
 {
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL   *Proto;
   ConInstance                      *Stream;
   EFI_STATUS                        Status = RETURN_SUCCESS;
   short                             RdyMask = 0;
@@ -600,7 +599,6 @@ da_ConPoll(
   }
   if(Stream->InstanceNum == 0) {
     // STDIN: Only input is supported for this device
-    Proto = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
     Status = da_ConRawRead (filp, &Stream->UnGetKey);
     if(Status == RETURN_SUCCESS) {
       RdyMask = POLLIN;
