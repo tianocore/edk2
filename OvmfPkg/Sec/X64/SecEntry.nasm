@@ -1,4 +1,3 @@
-      TITLE   SecEntry.asm
 ;------------------------------------------------------------------------------
 ;*
 ;*   Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
@@ -18,9 +17,10 @@
 
 #include <Base.h>
 
-.code
+DEFAULT REL
+SECTION .text
 
-EXTERN SecCoreStartupWithStack:PROC
+extern ASM_PFX(SecCoreStartupWithStack)
 
 ;
 ; SecCore Entry Point
@@ -33,12 +33,13 @@ EXTERN SecCoreStartupWithStack:PROC
 ;
 ; @return     None  This routine does not return
 ;
-_ModuleEntryPoint PROC PUBLIC
+global ASM_PFX(_ModuleEntryPoint)
+ASM_PFX(_ModuleEntryPoint):
 
     ;
     ; Load temporary RAM stack based on PCDs
     ;
-    SEC_TOP_OF_STACK EQU (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + \
+    %define SEC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + \
                           FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
     mov     rsp, SEC_TOP_OF_STACK
     nop
@@ -50,9 +51,6 @@ _ModuleEntryPoint PROC PUBLIC
     ;
     mov     rcx, rbp
     mov     rdx, rsp
-    sub     rsp, 20h
-    call    SecCoreStartupWithStack
+    sub     rsp, 0x20
+    call    ASM_PFX(SecCoreStartupWithStack)
 
-_ModuleEntryPoint ENDP
-
-END
