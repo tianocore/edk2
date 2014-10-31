@@ -29,7 +29,7 @@
 
 #include "xen-compat.h"
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(MDE_CPU_IA32) || defined(MDE_CPU_X64)
 #include "arch-x86/xen.h"
 #elif defined(__arm__) || defined (__aarch64__)
 #include "arch-arm.h"

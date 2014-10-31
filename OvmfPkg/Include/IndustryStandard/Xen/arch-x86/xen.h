@@ -59,9 +59,9 @@
 #endif
 #define set_xen_guest_handle(hnd, val) set_xen_guest_handle_raw(hnd, val)
 
-#if defined(__i386__)
+#if defined(MDE_CPU_IA32)
 #include "xen-x86_32.h"
-#elif defined(__x86_64__)
+#elif defined(MDE_CPU_X64)
 #include "xen-x86_64.h"
 #endif
 
@@ -82,7 +82,7 @@ typedef UINTN xen_ulong_t;
 
 typedef UINT64 tsc_timestamp_t; /* RDTSC timestamp */
 
-#ifdef __i386__
+#ifdef MDE_CPU_IA32
 #pragma pack(4)
 #endif
 struct arch_shared_info {
@@ -93,7 +93,7 @@ struct arch_shared_info {
     UINT64 pad[32];
 };
 typedef struct arch_shared_info arch_shared_info_t;
-#ifdef __i386__
+#ifdef MDE_CPU_IA32
 #pragma pack()
 #endif
 

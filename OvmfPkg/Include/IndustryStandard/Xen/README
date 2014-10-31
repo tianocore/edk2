@@ -32,3 +32,6 @@ s/([^a-zA-Z0-9_]|^)unsigned char([^a-zA-Z0-9_]|$)/\1UINT8\2/g
 s/([^a-zA-Z0-9_]|^)char([^a-zA-Z0-9_]|$)/\1CHAR8\2/g
 s/([^a-zA-Z0-9_]|^)unsigned long([^a-zA-Z0-9_]|$)/\1UINTN\2/g
 s/([^a-zA-Z0-9_]|^)long([^a-zA-Z0-9_]|$)/\1INTN\2/g
+
+s/__i386__/MDE_CPU_IA32/g
+s/__x86_64__/MDE_CPU_X64/g
