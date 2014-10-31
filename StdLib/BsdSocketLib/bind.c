@@ -1,22 +1,19 @@
 /** @file
   Implement the bind API.
 
-  Copyright (c) 2011, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
-
 #include <SocketInternals.h>
 
 
-/**
-  Bind a name to a socket.
+/** Bind a name to a socket.
 
   The bind routine connects a name (network address) to a socket on the local machine.
 
@@ -40,7 +37,6 @@
 
   @return     The bind routine returns zero (0) if successful and -1 upon failure.
               In the case of an error, ::errno contains more information.
-
  **/
 int
 bind (
@@ -51,25 +47,19 @@ bind (
 {
   int BindStatus;
   EFI_SOCKET_PROTOCOL * pSocketProtocol;
-  EFI_STATUS Status;
 
-  //
   //  Locate the context for this socket
-  //
   pSocketProtocol = BslFdToSocketProtocol ( s, NULL, &errno );
   if ( NULL != pSocketProtocol ) {
-    //
+
     //  Bind the socket
-    //
-    Status = pSocketProtocol->pfnBind ( pSocketProtocol,
+    (void) pSocketProtocol->pfnBind ( pSocketProtocol,
                                         name,
                                         namelen,
                                         &errno );
   }
 
-  //
   //  Return the operation stauts
-  //
   BindStatus = ( 0 == errno ) ? 0 : -1;
   return BindStatus;
 }

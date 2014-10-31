@@ -1,22 +1,19 @@
 /** @file
   Implement the getsockopt API.
 
-  Copyright (c) 2011, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
-
 #include <SocketInternals.h>
 
 
-/**
-  Get the socket options
+/** Get the socket options
 
   The
   <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockopt.html#">POSIX</a>
@@ -31,7 +28,6 @@
 
   @return     This routine returns zero (0) if successful or -1 when an error occurs.
               In the case of an error, ::errno contains more details.
-
 **/
 int
 getsockopt (
@@ -44,27 +40,19 @@ getsockopt (
 {
   int OptionStatus;
   EFI_SOCKET_PROTOCOL * pSocketProtocol;
-  EFI_STATUS Status;
-  
-  //
+
   //  Locate the context for this socket
-  //
   pSocketProtocol = BslFdToSocketProtocol ( s, NULL, &errno );
   if ( NULL != pSocketProtocol ) {
-    //
     //  Get the socket option
-    //
-    Status = pSocketProtocol->pfnOptionGet ( pSocketProtocol,
+    (void) pSocketProtocol->pfnOptionGet ( pSocketProtocol,
                                              level,
                                              option_name,
                                              option_value,
                                              option_len,
                                              &errno );
   }
-  
-  //
   //  Return the operation stauts
-  //
   OptionStatus = ( 0 == errno ) ? 0 : -1;
   return OptionStatus;
 }

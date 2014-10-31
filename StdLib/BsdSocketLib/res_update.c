@@ -1,3 +1,13 @@
+/** @file
+  Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 /*
  * Copyright (c) 1996 by Internet Software Consortium.
  *
@@ -476,9 +486,9 @@ ans=%d, auth=%d, add=%d, rcode=%d\n",
             dname = zptr->z_ns[k].nsname;
             qtype = T_A;
             }
-
         } /* while */
     }
+    --ttl;  // Suppress the "Set but not used" warning/error for ttl.
 
     _res.options |= RES_DEBUG;
     for (zptr = zgrp_start; zptr; zptr = zptr->z_next) {
@@ -502,8 +512,7 @@ ans=%d, auth=%d, add=%d, rcode=%d\n",
         } else
             fprintf(stdout, "res_mkupdate: packet size = %d\n", n);
 
-        /*
-         * Override the list of NS records from res_init() with
+        /* Override the list of NS records from res_init() with
          * the authoritative nameservers for the zone being updated.
          * Sort primary to be the first in the list of nameservers.
          */
