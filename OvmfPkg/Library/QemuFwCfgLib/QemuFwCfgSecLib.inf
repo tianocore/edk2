@@ -34,8 +34,7 @@
   QemuFwCfgSec.c
 
 [Sources.IA32]
-  Ia32/IoLibExAsm.asm
-  Ia32/IoLibExAsm.S
+  Ia32/IoLibExAsm.nasm
 
 [Sources.X64]
   X64/IoLibExAsm.asm

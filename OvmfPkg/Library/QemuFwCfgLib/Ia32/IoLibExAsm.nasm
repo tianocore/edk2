@@ -11,9 +11,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .586P
-    .model  flat,C
-    .code
+    SECTION .text
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -24,7 +22,8 @@
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoReadFifo8 PROC
+global ASM_PFX(IoReadFifo8)
+ASM_PFX(IoReadFifo8):
 
     mov     dx, [esp + 4]
     mov     ecx, [esp + 8]
@@ -33,9 +32,6 @@ IoReadFifo8 PROC
 rep insb
     pop     edi
     ret
-
-IoReadFifo8 ENDP
-
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -46,7 +42,8 @@ IoReadFifo8 ENDP
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoWriteFifo8 PROC
+global ASM_PFX(IoWriteFifo8)
+ASM_PFX(IoWriteFifo8):
 
     mov     dx, [esp + 4]
     mov     ecx, [esp + 8]
@@ -55,8 +52,4 @@ IoWriteFifo8 PROC
 rep outsb
     pop     esi
     ret
-
-IoWriteFifo8 ENDP
-
-    END
 
