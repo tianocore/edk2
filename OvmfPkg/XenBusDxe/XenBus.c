@@ -45,13 +45,19 @@
 STATIC XENBUS_PRIVATE_DATA gXenBusPrivateData;
 
 STATIC XENBUS_DEVICE_PATH gXenBusDevicePathTemplate = {
-  .Vendor.Header.Type = HARDWARE_DEVICE_PATH,
-  .Vendor.Header.SubType = HW_VENDOR_DP,
-  .Vendor.Header.Length[0] = (UINT8) sizeof (XENBUS_DEVICE_PATH),
-  .Vendor.Header.Length[1] = (UINT8) (sizeof (XENBUS_DEVICE_PATH) >> 8),
-  .Vendor.Guid = XENBUS_PROTOCOL_GUID,
-  .Type = 0,
-  .DeviceId = 0
+  {                                                 // Vendor
+    {                                               // Vendor.Header
+      HARDWARE_DEVICE_PATH,                         // Vendor.Header.Type
+      HW_VENDOR_DP,                                 // Vendor.Header.SubType
+      {
+        (UINT8) (sizeof (XENBUS_DEVICE_PATH)),      // Vendor.Header.Length[0]
+        (UINT8) (sizeof (XENBUS_DEVICE_PATH) >> 8), // Vendor.Header.Length[1]
+      }
+    },
+    XENBUS_PROTOCOL_GUID,                           // Vendor.Guid
+  },
+  0,                                                // Type
+  0                                                 // DeviceId
 };
 
 
