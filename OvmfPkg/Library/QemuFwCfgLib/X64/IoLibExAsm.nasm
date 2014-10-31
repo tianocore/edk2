@@ -11,7 +11,8 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .code
+    DEFAULT REL
+    SECTION .text
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -22,16 +23,14 @@
 ;    IN VOID                   *Buffer            // r8
 ;    );
 ;------------------------------------------------------------------------------
-IoReadFifo8 PROC
+global ASM_PFX(IoReadFifo8)
+ASM_PFX(IoReadFifo8):
 
     xchg    rcx, rdx
     xchg    rdi, r8             ; rdi: buffer address; r8: save rdi
 rep insb
     mov     rdi, r8             ; restore rdi
     ret
-
-IoReadFifo8 ENDP
-
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -42,15 +41,12 @@ IoReadFifo8 ENDP
 ;    IN VOID                   *Buffer            // r8
 ;    );
 ;------------------------------------------------------------------------------
-IoWriteFifo8 PROC
+global ASM_PFX(IoWriteFifo8)
+ASM_PFX(IoWriteFifo8):
 
     xchg    rcx, rdx
     xchg    rsi, r8             ; rdi: buffer address; r8: save rdi
 rep outsb
     mov     rsi, r8             ; restore rdi
     ret
-
-IoWriteFifo8 ENDP
-
-    END
 

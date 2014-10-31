@@ -37,8 +37,7 @@
   Ia32/IoLibExAsm.nasm
 
 [Sources.X64]
-  X64/IoLibExAsm.asm
-  X64/IoLibExAsm.S
+  X64/IoLibExAsm.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
