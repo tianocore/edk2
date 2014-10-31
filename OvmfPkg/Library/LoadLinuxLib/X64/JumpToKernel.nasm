@@ -12,7 +12,8 @@
 ;
 ;------------------------------------------------------------------------------
 
-  .code
+  DEFAULT REL
+  SECTION .text
 
 ;------------------------------------------------------------------------------
 ; VOID
@@ -22,7 +23,8 @@
 ;   VOID *KernelBootParams     // rdx
 ;   );
 ;------------------------------------------------------------------------------
-JumpToKernel PROC
+global ASM_PFX(JumpToKernel)
+ASM_PFX(JumpToKernel):
 
     ; Set up for executing kernel. BP in %esi, entry point on the stack
     ; (64-bit when the 'ret' will use it as 32-bit, but we're little-endian)
@@ -30,43 +32,41 @@ JumpToKernel PROC
     push   rcx
 
     ; Jump into the compatibility mode CS
-    push    10h
-    lea     rax, @F
+    push    0x10
+    lea     rax, [.0]
     push    rax
-    DB 048h, 0cbh                      ; retfq
+    DB 0x48, 0xcb                      ; retfq
 
-@@:
+.0:
     ; Now in compatibility mode.
 
-    DB 0b8h, 018h, 000h, 000h, 000h    ; movl    $0x18, %eax
-    DB 08eh, 0d8h                      ; movl    %eax, %ds
-    DB 08eh, 0c0h                      ; movl    %eax, %es
-    DB 08eh, 0e0h                      ; movl    %eax, %fs
-    DB 08eh, 0e8h                      ; movl    %eax, %gs
-    DB 08eh, 0d0h                      ; movl    %eax, %ss
+    DB 0xb8, 0x18, 0x0, 0x0, 0x0    ; movl    $0x18, %eax
+    DB 0x8e, 0xd8                      ; movl    %eax, %ds
+    DB 0x8e, 0xc0                      ; movl    %eax, %es
+    DB 0x8e, 0xe0                      ; movl    %eax, %fs
+    DB 0x8e, 0xe8                      ; movl    %eax, %gs
+    DB 0x8e, 0xd0                      ; movl    %eax, %ss
 
     ; Disable paging
-    DB 00fh, 020h, 0c0h                ; movl    %cr0, %eax
-    DB 00fh, 0bah, 0f8h, 01fh          ; btcl    $31, %eax
-    DB 00fh, 022h, 0c0h                ; movl    %eax, %cr0
+    DB 0xf, 0x20, 0xc0                ; movl    %cr0, %eax
+    DB 0xf, 0xba, 0xf8, 0x1f          ; btcl    $31, %eax
+    DB 0xf, 0x22, 0xc0                ; movl    %eax, %cr0
 
     ; Disable long mode in EFER
-    DB 0b9h, 080h, 000h, 000h, 0c0h    ; movl    $0x0c0000080, %ecx
-    DB 00fh, 032h                      ; rdmsr
-    DB 00fh, 0bah, 0f8h, 008h          ; btcl    $8, %eax
-    DB 00fh, 030h                      ; wrmsr
+    DB 0xb9, 0x80, 0x0, 0x0, 0xc0    ; movl    $0x0c0000080, %ecx
+    DB 0xf, 0x32                      ; rdmsr
+    DB 0xf, 0xba, 0xf8, 0x8          ; btcl    $8, %eax
+    DB 0xf, 0x30                      ; wrmsr
 
     ; Disable PAE
-    DB 00fh, 020h, 0e0h                ; movl    %cr4, %eax
-    DB 00fh, 0bah, 0f8h, 005h          ; btcl    $5, %eax
-    DB 00fh, 022h, 0e0h                ; movl    %eax, %cr4
+    DB 0xf, 0x20, 0xe0                ; movl    %cr4, %eax
+    DB 0xf, 0xba, 0xf8, 0x5          ; btcl    $5, %eax
+    DB 0xf, 0x22, 0xe0                ; movl    %eax, %cr4
 
-    DB 031h, 0edh                      ; xor     %ebp, %ebp
-    DB 031h, 0ffh                      ; xor     %edi, %edi
-    DB 031h, 0dbh                      ; xor     %ebx, %ebx
-    DB 0c3h                            ; ret
-
-JumpToKernel ENDP
+    DB 0x31, 0xed                      ; xor     %ebp, %ebp
+    DB 0x31, 0xff                      ; xor     %edi, %edi
+    DB 0x31, 0xdb                      ; xor     %ebx, %ebx
+    DB 0xc3                            ; ret
 
 ;------------------------------------------------------------------------------
 ; VOID
@@ -78,18 +78,16 @@ JumpToKernel ENDP
 ;   VOID *KernelStart,             // r9
 ;   );
 ;------------------------------------------------------------------------------
-JumpToUefiKernel PROC
+global ASM_PFX(JumpToUefiKernel)
+ASM_PFX(JumpToUefiKernel):
 
     mov     rdi, rcx
     mov     rsi, rdx
     mov     rdx, r8
     xor     rax, rax
-    mov     eax, [r8 + 264h]
+    mov     eax, [r8 + 0x264]
     add     r9, rax
-    add     r9, 200h
+    add     r9, 0x200
     call    r9
     ret
 
-JumpToUefiKernel ENDP
-
-END

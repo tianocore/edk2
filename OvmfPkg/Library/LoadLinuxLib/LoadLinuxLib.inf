@@ -34,8 +34,7 @@
   Ia32/JumpToKernel.nasm
 
 [Sources.X64]
-  X64/JumpToKernel.asm
-  X64/JumpToKernel.S
+  X64/JumpToKernel.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
