@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -60,6 +60,7 @@ typedef struct  {
   @param[in] String       The string to evaluate.
   @param[in] ForceHex     TRUE - always assume hex.
   @param[in] StopAtSpace  TRUE to halt upon finding a space, FALSE to keep going.
+  @param[in] TimeNumbers  TRUE to allow numbers with ":", FALSE otherwise.
 
   @retval TRUE        It is all numeric (dec/hex) characters.
   @retval FALSE       There is a non-numeric character.
@@ -69,7 +70,8 @@ EFIAPI
 InternalShellIsHexOrDecimalNumber (
   IN CONST CHAR16   *String,
   IN CONST BOOLEAN  ForceHex,
-  IN CONST BOOLEAN  StopAtSpace
+  IN CONST BOOLEAN  StopAtSpace,
+  IN CONST BOOLEAN  TimeNumbers
   );
 
 /**

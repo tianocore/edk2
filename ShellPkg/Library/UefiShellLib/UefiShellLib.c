@@ -1903,6 +1903,7 @@ InternalIsOnCheckList (
 
   @param[in] Name               pointer to Name of parameter found
   @param[in] AlwaysAllowNumbers TRUE to allow numbers, FALSE to not.
+  @param[in] TimeNumbers        TRUE to allow numbers with ":", FALSE otherwise.
 
   @retval TRUE                  the Parameter is a flag.
   @retval FALSE                 the Parameter not a flag.
@@ -1911,7 +1912,8 @@ BOOLEAN
 EFIAPI
 InternalIsFlag (
   IN CONST CHAR16               *Name,
-  IN BOOLEAN                    AlwaysAllowNumbers
+  IN CONST BOOLEAN              AlwaysAllowNumbers,
+  IN CONST BOOLEAN              TimeNumbers
   )
 {
   //
@@ -1922,7 +1924,7 @@ InternalIsFlag (
   //
   // If we accept numbers then dont return TRUE. (they will be values)
   //
-  if (((Name[0] == L'-' || Name[0] == L'+') && InternalShellIsHexOrDecimalNumber(Name+1, FALSE, FALSE)) && AlwaysAllowNumbers) {
+  if (((Name[0] == L'-' || Name[0] == L'+') && InternalShellIsHexOrDecimalNumber(Name+1, FALSE, FALSE, TimeNumbers)) && AlwaysAllowNumbers) {
     return (FALSE);
   }
 
@@ -2056,6 +2058,7 @@ InternalCommandLineParse (
         // possibly trigger the next loop(s) to populate the value of this item
         //
         case TypeValue:
+        case TypeTimeValue:
           GetItemValue = 1;
           ValueSize = 0;
           break;
@@ -2075,7 +2078,7 @@ InternalCommandLineParse (
           ASSERT(GetItemValue == 0);
           break;
       }
-    } else if (GetItemValue != 0 && !InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers)) {
+    } else if (GetItemValue != 0 && !InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers, CurrentItemPackage->Type == TypeTimeValue)) {
       ASSERT(CurrentItemPackage != NULL);
       //
       // get the item VALUE for a previous flag
@@ -2114,7 +2117,7 @@ InternalCommandLineParse (
       if (GetItemValue == 0) {
         InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
       }
-    } else if (!InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers) ){ //|| ProblemParam == NULL) {
+    } else if (!InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers, FALSE)){
       //
       // add this one as a non-flag
       //
@@ -3134,7 +3137,7 @@ ShellStrToUintn(
 
   Hex = FALSE;
 
-  if (!InternalShellIsHexOrDecimalNumber(String, Hex, TRUE)) {
+  if (!InternalShellIsHexOrDecimalNumber(String, Hex, TRUE, FALSE)) {
     Hex = TRUE;
   }
 
@@ -3551,6 +3554,7 @@ ShellPromptForResponseHii (
   @param[in] String       The string to evaluate.
   @param[in] ForceHex     TRUE - always assume hex.
   @param[in] StopAtSpace  TRUE to halt upon finding a space, FALSE to keep going.
+  @param[in] TimeNumbers        TRUE to allow numbers with ":", FALSE otherwise.
 
   @retval TRUE        It is all numeric (dec/hex) characters.
   @retval FALSE       There is a non-numeric character.
@@ -3560,7 +3564,8 @@ EFIAPI
 InternalShellIsHexOrDecimalNumber (
   IN CONST CHAR16   *String,
   IN CONST BOOLEAN  ForceHex,
-  IN CONST BOOLEAN  StopAtSpace
+  IN CONST BOOLEAN  StopAtSpace,
+  IN CONST BOOLEAN  TimeNumbers
   )
 {
   BOOLEAN Hex;
@@ -3604,6 +3609,9 @@ InternalShellIsHexOrDecimalNumber (
   // loop through the remaining characters and use the lib function
   //
   for ( ; String != NULL && *String != CHAR_NULL && !(StopAtSpace && *String == L' ') ; String++){
+    if (TimeNumbers && (String[0] == L':')) {
+      continue;
+    }
     if (Hex) {
       if (!ShellIsHexaDecimalDigitCharacter(*String)) {
         return (FALSE);
@@ -3927,10 +3935,10 @@ ShellConvertStringToUint64(
 
   Hex = ForceHex;
 
-  if (!InternalShellIsHexOrDecimalNumber(String, Hex, StopAtSpace)) {
+  if (!InternalShellIsHexOrDecimalNumber(String, Hex, StopAtSpace, FALSE)) {
     if (!Hex) {
       Hex = TRUE;
-      if (!InternalShellIsHexOrDecimalNumber(String, Hex, StopAtSpace)) {
+      if (!InternalShellIsHexOrDecimalNumber(String, Hex, StopAtSpace, FALSE)) {
         return (EFI_INVALID_PARAMETER);
       }
     } else {
@@ -3946,7 +3954,7 @@ ShellConvertStringToUint64(
   //
   // make sure we have something left that is numeric.
   //
-  if (Walker == NULL || *Walker == CHAR_NULL || !InternalShellIsHexOrDecimalNumber(Walker, Hex, StopAtSpace)) {
+  if (Walker == NULL || *Walker == CHAR_NULL || !InternalShellIsHexOrDecimalNumber(Walker, Hex, StopAtSpace, FALSE)) {
     return (EFI_INVALID_PARAMETER);
   }
 

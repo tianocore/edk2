@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -668,6 +668,7 @@ typedef enum {
   TypeStart,        ///< A flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...).
   TypeDoubleValue,  ///< A flag that has 2 space seperated value data following it (IE "-a 1 2").
   TypeMaxValue,     ///< A flag followed by all the command line data before the next flag.
+  TypeTimeValue,    ///< A flag that has a time value following it (IE "-a -5:00").
   TypeMax,
 } SHELL_PARAM_TYPE;
 
