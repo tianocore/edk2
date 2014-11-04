@@ -165,7 +165,7 @@ GetMailboxFromConfigurationTable (
 {
   EFI_STATUS               Status;
   DEBUG_AGENT_MAILBOX      *Mailbox;
-  
+
   Status = EfiGetSystemConfigurationTable (&gEfiDebugAgentGuid, (VOID **) &Mailbox);
   if (Status == EFI_SUCCESS && Mailbox != NULL) {
     VerifyMailboxChecksum (Mailbox);
@@ -364,7 +364,7 @@ InitializeDebugAgent (
     return ;
   }
 
-  // 
+  //
   // Disable Debug Timer interrupt
   //
   SaveAndSetDebugTimerInterrupt (FALSE);
@@ -398,16 +398,16 @@ InitializeDebugAgent (
     mSaveIdtTableSize = IdtDescriptor.Limit + 1;
     mSavedIdtTable    = AllocateCopyPool (mSaveIdtTableSize, (VOID *) IdtDescriptor.Base);
     //
-    // Initialize Debug Timer hardware
+    // Initialize Debug Timer hardware and save its initial count
     //
-    InitializeDebugTimer ();
+    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer ();
     //
     // Check if Debug Agent initialized in DXE phase
     //
     Mailbox = GetMailboxFromConfigurationTable ();
     if (Mailbox == NULL) {
       //
-      // Try to get mailbox from GUIDed HOB build in PEI 
+      // Try to get mailbox from GUIDed HOB build in PEI
       //
       HobList = GetHobList ();
       Mailbox = GetMailboxFromHob (HobList);
@@ -465,7 +465,7 @@ InitializeDebugAgent (
       if (IsHostAttached ()) {
         Print (L"Debug Agent: Host is still connected, please de-attach TARGET firstly!\r\n");
         *(EFI_STATUS *)Context = EFI_ACCESS_DENIED;
-        // 
+        //
         // Enable Debug Timer interrupt again
         //
         SaveAndSetDebugTimerInterrupt (TRUE);
@@ -496,11 +496,11 @@ InitializeDebugAgent (
     mDxeCoreFlag                = TRUE;
     mMultiProcessorDebugSupport = TRUE;
     //
-    // Initialize Debug Timer hardware
+    // Initialize Debug Timer hardware and its initial count
     //
-    InitializeDebugTimer ();
+    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer ();
     //
-    // Try to get mailbox from GUIDed HOB build in PEI 
+    // Try to get mailbox from GUIDed HOB build in PEI
     //
     HobList = Context;
     Mailbox = GetMailboxFromHob (HobList);
@@ -520,7 +520,7 @@ InitializeDebugAgent (
     if (Context != NULL) {
       Ia32Idtr =  (IA32_DESCRIPTOR *) Context;
       Ia32IdtEntry = (IA32_IDT_ENTRY *)(Ia32Idtr->Base);
-      MailboxLocation = (UINT64 *) (UINTN) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow + 
+      MailboxLocation = (UINT64 *) (UINTN) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow +
                                            (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetHigh << 16));
       Mailbox = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
       VerifyMailboxChecksum (Mailbox);
@@ -548,7 +548,7 @@ InitializeDebugAgent (
 
   default:
     //
-    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this 
+    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this
     // Debug Agent library instance.
     //
     DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
