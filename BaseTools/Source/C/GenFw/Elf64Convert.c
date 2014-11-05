@@ -710,13 +710,15 @@ WriteSections64 (
             break;
 
           case R_AARCH64_CALL26:
-            if  (Rel->r_addend != 0 ) { /* TODO */
-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_CALL26 Need to fixup with addend!.");
-            }
-            break;
-
           case R_AARCH64_JUMP26:
-            if  (Rel->r_addend != 0 ) { /* TODO : AArch64 '-O2' optimisation. */
+            if  (Rel->r_addend != 0 ) {
+              // Some references to static functions sometime start at the base of .text + addend.
+              // It is safe to ignore these relocations because they patch a `BL` instructions that
+              // contains an offset from the instruction itself and there is only a single .text section.
+              // So we check if the symbol is a "section symbol"
+              if (ELF64_ST_TYPE (Sym->st_info) == STT_SECTION) {
+                break;
+              }
               Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_JUMP26 Need to fixup with addend!.");
             }
             break;
