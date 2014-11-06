@@ -59,6 +59,3 @@
   PeCoffGetEntryPointLib 
   MemoryAllocationLib
   DebugLib
-
-[Ppis]
-  gEfiVectorHandoffInfoPpiGuid
