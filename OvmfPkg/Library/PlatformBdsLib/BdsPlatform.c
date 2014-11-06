@@ -1144,14 +1144,6 @@ Returns:
   //
   TryRunningQemuKernel ();
 
-  //
-  // Give one chance to enter the setup if we
-  // have the time out
-  //
-  if (Timeout != 0) {
-    //PlatformBdsEnterFrontPage (Timeout, FALSE);
-  }
-
   DEBUG ((EFI_D_INFO, "BdsLibConnectAll\n"));
   BdsLibConnectAll ();
   BdsLibEnumerateAllBootOption (BootOptionList);
