@@ -1193,7 +1193,7 @@ Returns:
     //
     // Enter Setup if user input
     //
-    PlatformBdsEnterFrontPage (Timeout, FALSE);
+    PlatformBdsEnterFrontPage (Timeout, TRUE);
   }
 }
 
