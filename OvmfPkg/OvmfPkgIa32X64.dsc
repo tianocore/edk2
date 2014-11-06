@@ -339,6 +339,10 @@
 
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
+  # Set video resolution for text setup.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.
