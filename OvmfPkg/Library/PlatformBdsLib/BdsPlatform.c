@@ -1063,8 +1063,6 @@ Returns:
   EFI_STATUS                         Status;
   UINT16                             Timeout;
   EFI_EVENT                          UserInputDurationTime;
-  LIST_ENTRY                     *Link;
-  BDS_COMMON_OPTION                  *BootOption;
   UINTN                              Index;
   EFI_INPUT_KEY                      Key;
   EFI_TPL                            OldTpl;
@@ -1158,27 +1156,6 @@ Returns:
   //
   // To give the User a chance to enter Setup here, if user set TimeOut is 0.
   // BDS should still give user a chance to enter Setup
-  //
-  // Connect first boot option, and then check user input before exit
-  //
-  for (Link = BootOptionList->ForwardLink; Link != BootOptionList;Link = Link->ForwardLink) {
-    BootOption = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
-    if (!IS_LOAD_OPTION_TYPE (BootOption->Attribute, LOAD_OPTION_ACTIVE)) {
-      //
-      // skip the header of the link list, becuase it has no boot option
-      //
-      continue;
-    } else {
-      //
-      // Make sure the boot option device path connected, but ignore the BBS device path
-      //
-      if (DevicePathType (BootOption->DevicePath) != BBS_DEVICE_PATH) {
-        BdsLibConnectDevicePath (BootOption->DevicePath);
-      }
-      break;
-    }
-  }
-
   //
   // Check whether the user input after the duration time has expired
   //
