@@ -1196,8 +1196,6 @@ Returns:
     Timeout = 0xffff;
     PlatformBdsEnterFrontPage (Timeout, FALSE);
   }
-
-  return ;
 }
 
 VOID
