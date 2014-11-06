@@ -1062,10 +1062,6 @@ Returns:
 {
   EFI_STATUS                         Status;
   UINT16                             Timeout;
-  EFI_EVENT                          UserInputDurationTime;
-  UINTN                              Index;
-  EFI_INPUT_KEY                      Key;
-  EFI_TPL                            OldTpl;
   EFI_BOOT_MODE                      BootMode;
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
@@ -1114,19 +1110,7 @@ Returns:
     //
     PlatformBdsNoConsoleAction ();
   }
-  //
-  // Create a 300ms duration event to ensure user has enough input time to enter Setup
-  //
-  Status = gBS->CreateEvent (
-                  EVT_TIMER,
-                  0,
-                  NULL,
-                  NULL,
-                  &UserInputDurationTime
-                  );
-  ASSERT (Status == EFI_SUCCESS);
-  Status = gBS->SetTimer (UserInputDurationTime, TimerRelative, 3000000);
-  ASSERT (Status == EFI_SUCCESS);
+
   //
   // Memory test and Logo show
   //
@@ -1153,25 +1137,7 @@ Returns:
   //
   BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
 
-  //
-  // To give the User a chance to enter Setup here, if user set TimeOut is 0.
-  // BDS should still give user a chance to enter Setup
-  //
-  // Check whether the user input after the duration time has expired
-  //
-  OldTpl = EfiGetCurrentTpl();
-  gBS->RestoreTPL (TPL_APPLICATION);
-  gBS->WaitForEvent (1, &UserInputDurationTime, &Index);
-  gBS->CloseEvent (UserInputDurationTime);
-  Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-  gBS->RaiseTPL (OldTpl);
-
-  if (!EFI_ERROR (Status)) {
-    //
-    // Enter Setup if user input
-    //
-    PlatformBdsEnterFrontPage (Timeout, TRUE);
-  }
+  PlatformBdsEnterFrontPage (Timeout, TRUE);
 }
 
 VOID
