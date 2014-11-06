@@ -1193,7 +1193,6 @@ Returns:
     //
     // Enter Setup if user input
     //
-    Timeout = 0xffff;
     PlatformBdsEnterFrontPage (Timeout, FALSE);
   }
 }
