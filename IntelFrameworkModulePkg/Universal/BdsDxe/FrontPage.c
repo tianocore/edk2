@@ -891,64 +891,62 @@ ShowProgress (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Color;
 
-  if (TimeoutDefault == 0) {
-    return EFI_TIMEOUT;
-  }
+  if (TimeoutDefault != 0) {
+    DEBUG ((EFI_D_INFO, "\n\nStart showing progress bar... Press any key to stop it! ...Zzz....\n"));
 
-  DEBUG ((EFI_D_INFO, "\n\nStart showing progress bar... Press any key to stop it! ...Zzz....\n"));
-
-  SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
-  SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
-  SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
-  
-  TmpStr = GetStringById (STRING_TOKEN (STR_START_BOOT_OPTION));
-
-  if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
-    //
-    // Clear the progress status bar first
-    //
-    if (TmpStr != NULL) {
-      PlatformBdsShowProgress (Foreground, Background, TmpStr, Color, 0, 0);
-    }
-  }
-  
-
-  TimeoutRemain = TimeoutDefault;
-  while (TimeoutRemain != 0) {
-    DEBUG ((EFI_D_INFO, "Showing progress bar...Remaining %d second!\n", TimeoutRemain));
-
-    Status = WaitForSingleEvent (gST->ConIn->WaitForKey, ONE_SECOND);
-    if (Status != EFI_TIMEOUT) {
-      break;
-    }
-    TimeoutRemain--;
+    SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
+    SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
+    SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
     
+    TmpStr = GetStringById (STRING_TOKEN (STR_START_BOOT_OPTION));
+
     if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
       //
-      // Show progress
+      // Clear the progress status bar first
       //
       if (TmpStr != NULL) {
-        PlatformBdsShowProgress (
-          Foreground,
-          Background,
-          TmpStr,
-          Color,
-          ((TimeoutDefault - TimeoutRemain) * 100 / TimeoutDefault),
-          0
-          );
+        PlatformBdsShowProgress (Foreground, Background, TmpStr, Color, 0, 0);
       }
     }
-  }
-  
-  if (TmpStr != NULL) {
-    gBS->FreePool (TmpStr);
-  }
+    
 
-  //
-  // Timeout expired
-  //
-  if (TimeoutRemain == 0) {
-    return EFI_TIMEOUT;
+    TimeoutRemain = TimeoutDefault;
+    while (TimeoutRemain != 0) {
+      DEBUG ((EFI_D_INFO, "Showing progress bar...Remaining %d second!\n", TimeoutRemain));
+
+      Status = WaitForSingleEvent (gST->ConIn->WaitForKey, ONE_SECOND);
+      if (Status != EFI_TIMEOUT) {
+        break;
+      }
+      TimeoutRemain--;
+      
+      if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+        //
+        // Show progress
+        //
+        if (TmpStr != NULL) {
+          PlatformBdsShowProgress (
+            Foreground,
+            Background,
+            TmpStr,
+            Color,
+            ((TimeoutDefault - TimeoutRemain) * 100 / TimeoutDefault),
+            0
+            );
+        }
+      }
+    }
+    
+    if (TmpStr != NULL) {
+      gBS->FreePool (TmpStr);
+    }
+
+    //
+    // Timeout expired
+    //
+    if (TimeoutRemain == 0) {
+      return EFI_TIMEOUT;
+    }
   }
 
   //
