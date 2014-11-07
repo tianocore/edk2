@@ -48,6 +48,11 @@ The EADK is comprised of three packages:
                See the PythonReadMe.txt file, in the Python directory,
                for information on configuring and building Python.
 
+      Lua      A port of the Lua-5.2.3 interpreter for UEFI.  This
+               application is disabled by default.  Un-comment the line for
+               LuaLib.inf in the [LibraryClasses] section and Lua.inf in the 
+               [Components] section of AppPkg.dsc to enable building Lua.
+
       OrderedCollectionTest  A small Standard C Library application that
                demonstrates the use of the OrderedCollectionLib library class
                (provided by the BaseOrderedCollectionRedBlackTreeLib library

@@ -1,0 +1,69 @@
+Lua is designed, implemented, and maintained by a team at PUC-Rio, the
+Pontifical Catholic University of Rio de Janeiro in Brazil. Lua was born and
+raised in Tecgraf, formerly the Computer Graphics Technology Group of PUC-Rio.
+Lua is now housed at LabLua, a laboratory of the Department of Computer Science
+of PUC-Rio.
+
+The initial work to provide the UEFI implementation of Lua was done at
+Emulex Corporation.
+
+Some final packaging and build file "beautification" was done at
+Intel Corporation.
+
+Copyright notices, applying to this package and its contents, follow below.
+These notices will be updated as necessitated by ongoing maintenance and
+enhancement.
+
+--------
+Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+--------
+Copyright (c) 2014, Emulex Corporation  3333 Susan Street, Costa Mesa, CA 92626
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------
+Copyright (C) 1994-2013 Lua.org, PUC-Rio.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+------------------------------------------------------------------------------
