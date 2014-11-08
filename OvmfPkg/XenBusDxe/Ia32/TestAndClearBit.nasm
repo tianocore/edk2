@@ -1,4 +1,4 @@
-.code
+SECTION .text
 
 ; INT32
 ; EFIAPI
@@ -6,12 +6,11 @@
 ;   IN  INT32 Bit,
 ;   IN  volatile VOID* Address
 ;   );
-TestAndClearBit PROC
+global ASM_PFX(TestAndClearBit)
+ASM_PFX(TestAndClearBit):
   mov ecx, [esp + 4]
   mov edx, [esp + 8]
   lock btr [edx], ecx
   sbb eax, eax
   ret
-TestAndClearBit ENDP
 
-END
