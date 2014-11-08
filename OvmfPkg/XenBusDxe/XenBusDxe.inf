@@ -55,8 +55,7 @@
 
 [Sources.X64]
   X64/hypercall.nasm
-  X64/InterlockedCompareExchange16.S
-  X64/InterlockedCompareExchange16.asm
+  X64/InterlockedCompareExchange16.nasm
   X64/TestAndClearBit.S
   X64/TestAndClearBit.asm
 
