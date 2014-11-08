@@ -49,8 +49,7 @@
   Helpers.c
 
 [Sources.IA32]
-  Ia32/hypercall.S
-  Ia32/hypercall.asm
+  Ia32/hypercall.nasm
   Ia32/InterlockedCompareExchange16.S
   Ia32/InterlockedCompareExchange16.asm
   Ia32/TestAndClearBit.S

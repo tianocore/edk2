@@ -1,4 +1,4 @@
-.code
+SECTION .text
 
 ; INTN
 ; EFIAPI
@@ -7,7 +7,8 @@
 ;   IN OUT INTN Arg1,
 ;   IN OUT INTN Arg2
 ;   );
-XenHypercall2 PROC
+global ASM_PFX(XenHypercall2)
+ASM_PFX(XenHypercall2):
   ; Save only ebx, ecx is supposed to be a scratch register and needs to be
   ; saved by the caller
   push ebx
@@ -21,6 +22,4 @@ XenHypercall2 PROC
   call eax
   pop ebx
   ret
-XenHypercall2 ENDP
 
-END
