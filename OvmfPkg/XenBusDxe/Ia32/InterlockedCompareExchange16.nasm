@@ -21,9 +21,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .486
-    .model  flat,C
-    .code
+    SECTION .text
 
 ;------------------------------------------------------------------------------
 ; UINT32
@@ -34,12 +32,11 @@
 ;   IN      UINT16                    ExchangeValue
 ;   );
 ;------------------------------------------------------------------------------
-InternalSyncCompareExchange16   PROC
+global ASM_PFX(InternalSyncCompareExchange16)
+ASM_PFX(InternalSyncCompareExchange16):
     mov     ecx, [esp + 4]
     mov     eax, [esp + 8]
     mov     edx, [esp + 12]
     lock    cmpxchg [ecx], dx
     ret
-InternalSyncCompareExchange16   ENDP
 
-    END
