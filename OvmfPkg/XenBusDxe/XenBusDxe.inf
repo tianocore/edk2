@@ -56,8 +56,7 @@
 [Sources.X64]
   X64/hypercall.nasm
   X64/InterlockedCompareExchange16.nasm
-  X64/TestAndClearBit.S
-  X64/TestAndClearBit.asm
+  X64/TestAndClearBit.nasm
 
 [LibraryClasses]
   UefiDriverEntryPoint

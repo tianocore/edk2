@@ -1,4 +1,5 @@
-.code
+DEFAULT REL
+SECTION .text
 
 ; INT32
 ; EFIAPI
@@ -6,11 +7,10 @@
 ;   IN  INT32 Bit,                // rcx
 ;   IN  volatile VOID* Address    // rdx
 ;   );
-TestAndClearBit PROC
+global ASM_PFX(TestAndClearBit)
+ASM_PFX(TestAndClearBit):
   lock
   btr [rdx], ecx
   sbb eax, eax
   ret
-TestAndClearBit ENDP
 
-END
