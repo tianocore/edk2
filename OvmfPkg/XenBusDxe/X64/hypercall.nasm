@@ -1,4 +1,5 @@
-.code
+DEFAULT REL
+SECTION .text
 
 ; INTN
 ; EFIAPI
@@ -7,7 +8,8 @@
 ;   IN OUT INTN Arg1,
 ;   IN OUT INTN Arg2
 ;   );
-XenHypercall2 PROC
+global ASM_PFX(XenHypercall2)
+ASM_PFX(XenHypercall2):
   push rdi
   push rsi
   ; Copy HypercallAddr to rax
@@ -21,6 +23,4 @@ XenHypercall2 PROC
   pop rsi
   pop rdi
   ret
-XenHypercall2 ENDP
 
-END
