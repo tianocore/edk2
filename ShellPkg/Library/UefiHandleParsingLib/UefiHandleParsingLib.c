@@ -898,7 +898,6 @@ AddNewGuidNameMapping(
   IN CONST CHAR8    *Lang OPTIONAL
   )
 {
-  CONST GUID_INFO_BLOCK *Temp;
   EFI_STRING_ID         NameID;
 
   HandleParsingHiiInit();
@@ -907,7 +906,7 @@ AddNewGuidNameMapping(
     return (EFI_INVALID_PARAMETER);
   }
 
-  if ((Temp = InternalShellGetNodeFromGuid(Guid)) != NULL) {
+  if ((InternalShellGetNodeFromGuid(Guid)) != NULL) {
     return (EFI_ACCESS_DENIED);
   }
 
