@@ -2,7 +2,7 @@
   Transfer protocol defintions used by debug agent and host. It is only
   intended to be used by Debug related module implementation.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -52,6 +52,8 @@ typedef struct {
 //
 #define DEBUG_COMMAND_REQUEST      (0 << 7)
 #define DEBUG_COMMAND_RESPONSE     (1 << 7)
+
+#define IS_REQUEST(x)              (((x)->Command & DEBUG_COMMAND_RESPONSE) == 0)
 
 //
 // HOST initiated commands

@@ -605,19 +605,20 @@ ReadRemainingBreakPacket (
     return EFI_CRC_ERROR;
   }
   Mailbox = GetMailboxPointer();
-  if (((DebugHeader->Command & DEBUG_COMMAND_RESPONSE) == 0) &&
-       (DebugHeader->SequenceNo == (UINT8) (Mailbox->HostSequenceNo + 1))) {
-    //
-    // Only updagte HostSequenceNo for new command packet
-    //
-    UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, DebugHeader->SequenceNo);
-    return EFI_SUCCESS;
-  } else {
-    //
-    // If one old command or response packet received, skip it
-    //
-    return EFI_DEVICE_ERROR;
+  if (IS_REQUEST (DebugHeader)) {
+    if (DebugHeader->SequenceNo == (UINT8) (Mailbox->HostSequenceNo + 1)) {
+      //
+      // Only updagte HostSequenceNo for new command packet 
+      //
+      UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, DebugHeader->SequenceNo);
+      return EFI_SUCCESS;
+    }
+    if (DebugHeader->SequenceNo == Mailbox->HostSequenceNo) {
+      return EFI_SUCCESS;
+    }
   }
+
+  return EFI_DEVICE_ERROR;
 }
 
 /**
@@ -1646,7 +1647,7 @@ CommandCommunication (
 
     DebugAgentMsgPrint (DEBUG_AGENT_INFO, "TARGET: Try to get command from HOST...\n");
     Status = ReceivePacket ((UINT8 *)DebugHeader, &BreakReceived, NULL, READ_PACKET_TIMEOUT, TRUE);
-    if (Status != RETURN_SUCCESS || (DebugHeader->Command & DEBUG_COMMAND_RESPONSE) != 0) {
+    if (Status != RETURN_SUCCESS || !IS_REQUEST (DebugHeader)) {
       DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "TARGET: Get command[%x] sequenceno[%x] returned status is [%x] \n", DebugHeader->Command, DebugHeader->SequenceNo, Status);
       DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "TARGET: Get command failed or it's response packet not expected! \n");
       ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
