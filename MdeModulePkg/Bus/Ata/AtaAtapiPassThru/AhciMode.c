@@ -1440,8 +1440,19 @@ AhciReset (
 {
   UINT64                 Delay;
   UINT32                 Value;
+  UINT32                 Capability;
 
-  AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
+  //
+  // Collect AHCI controller information
+  //
+  Capability = AhciReadReg (PciIo, EFI_AHCI_CAPABILITY_OFFSET);
+  
+  //
+  // Enable AE before accessing any AHCI registers if Supports AHCI Mode Only is not set
+  //
+  if ((Capability & EFI_AHCI_CAP_SAM) == 0) {
+    AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
+  }
 
   AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_RESET);
 
@@ -2245,15 +2256,17 @@ AhciModeInitialization (
   }
 
   //
-  // Enable AE before accessing any AHCI registers
-  //
-  AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
-
-  //
   // Collect AHCI controller information
   //
-  Capability           = AhciReadReg(PciIo, EFI_AHCI_CAPABILITY_OFFSET);
-
+  Capability = AhciReadReg (PciIo, EFI_AHCI_CAPABILITY_OFFSET);
+  
+  //
+  // Enable AE before accessing any AHCI registers if Supports AHCI Mode Only is not set
+  //
+  if ((Capability & EFI_AHCI_CAP_SAM) == 0) {
+    AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
+  }
+  
   //
   // Get the number of command slots per port supported by this HBA.
   //
