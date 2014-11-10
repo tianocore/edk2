@@ -1,7 +1,7 @@
 /** @file
   Measure TrEE required variable.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -312,7 +312,7 @@ SecureBootHook (
              Data,
              DataSize
              );
-  DEBUG ((EFI_D_ERROR, "MeasureBootPolicyVariable - %r\n", Status));
+  DEBUG ((EFI_D_INFO, "MeasureBootPolicyVariable - %r\n", Status));
 
   if (!EFI_ERROR (Status)) {
     AddDataMeasured (VariableName, VendorGuid, Data, DataSize);

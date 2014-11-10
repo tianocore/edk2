@@ -509,7 +509,7 @@ DxeTpm2MeasureBootHandler (
             // Measure GPT disk.
             //
             Status = TrEEMeasureGptTable (TreeProtocol, Handle);
-            DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler - TrEEMeasureGptTable - %r\n", Status));
+            DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - TrEEMeasureGptTable - %r\n", Status));
             if (!EFI_ERROR (Status)) {
               //
               // GPT disk check done.
@@ -653,7 +653,7 @@ DxeTpm2MeasureBootHandler (
                ImageContext.ImageType, 
                DevicePathNode
                );
-    DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler - TrEEMeasurePeImage - %r\n", Status));
+    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - TrEEMeasurePeImage - %r\n", Status));
   }
 
   //
@@ -664,7 +664,7 @@ Finish:
     FreePool (OrigDevicePathNode);
   }
 
-  DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler - %r\n", Status));
+  DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - %r\n", Status));
 
   return Status;
 }
