@@ -116,7 +116,7 @@ InitializeMemory (
 
   SystemMemoryBase = (UINTN)PcdGet64 (PcdSystemMemoryBase);
   SystemMemoryTop = SystemMemoryBase + (UINTN)PcdGet64 (PcdSystemMemorySize);
-  FdBase = (UINTN)PcdGet32 (PcdFdBaseAddress);
+  FdBase = (UINTN)PcdGet64 (PcdFdBaseAddress);
   FdTop = FdBase + (UINTN)PcdGet32 (PcdFdSize);
 
   //

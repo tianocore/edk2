@@ -125,7 +125,7 @@ LibResetSystem (
   switch (ResetType) {
   case EfiResetWarm:
     //Perform warm reset of the system by jumping to the begining of the FV
-    StartOfFv = (CALL_STUB)(UINTN)PcdGet32(PcdFvBaseAddress);
+    StartOfFv = (CALL_STUB)(UINTN)PcdGet64 (PcdFvBaseAddress);
     StartOfFv ();
     break;
   case EfiResetCold:

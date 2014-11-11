@@ -181,9 +181,9 @@ ArmPlatformInitializeSystemMemory (
   //
   ASSERT (NewSize >= SIZE_128MB);
   ASSERT (
-    (((UINT64)PcdGet32 (PcdFdBaseAddress) +
+    (((UINT64)PcdGet64 (PcdFdBaseAddress) +
       (UINT64)PcdGet32 (PcdFdSize)) <= NewBase) ||
-    ((UINT64)PcdGet32 (PcdFdBaseAddress) >= (NewBase + NewSize)));
+    ((UINT64)PcdGet64 (PcdFdBaseAddress) >= (NewBase + NewSize)));
 }
 
 VOID

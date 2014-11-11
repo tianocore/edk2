@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *  Copyright (c) 2014, Linaro Limited. All rights reserved.
 *
 *  This program and the accompanying materials
@@ -41,7 +41,7 @@ PlatformPeim (
   CopyMem (NewBase, Base, FdtSize);
   PcdSet64 (PcdDeviceTreeBaseAddress, (UINT64)(UINTN)NewBase);
 
-  BuildFvHob (PcdGet32(PcdFvBaseAddress), PcdGet32(PcdFvSize));
+  BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
 
   return EFI_SUCCESS;
 }

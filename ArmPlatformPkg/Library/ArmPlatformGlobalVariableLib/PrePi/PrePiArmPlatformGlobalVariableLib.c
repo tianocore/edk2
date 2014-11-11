@@ -19,8 +19,8 @@
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 
-#define IS_XIP() (((UINT32)PcdGet32 (PcdFdBaseAddress) > (UINT32)(PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize))) || \
-                  ((PcdGet32 (PcdFdBaseAddress) + PcdGet32 (PcdFdSize)) < PcdGet64 (PcdSystemMemoryBase)))
+#define IS_XIP() (((UINT32)PcdGet64 (PcdFdBaseAddress) > (UINT32)(PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize))) || \
+                  ((PcdGet64 (PcdFdBaseAddress) + PcdGet32 (PcdFdSize)) < PcdGet64 (PcdSystemMemoryBase)))
 
 // Declared by ArmPlatformPkg/PrePi Module
 extern UINTN mGlobalVariableBase;

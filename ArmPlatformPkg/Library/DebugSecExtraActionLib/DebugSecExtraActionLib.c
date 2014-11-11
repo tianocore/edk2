@@ -35,7 +35,7 @@ NonSecureWaitForFirmware (
   UINTN InterruptId;
 
   // The secondary cores will execute the firmware once wake from WFI.
-  SecondaryStart = (VOID (*)())PcdGet32 (PcdFvBaseAddress);
+  SecondaryStart = (VOID (*)())(UINTN)PcdGet64 (PcdFvBaseAddress);
 
   ArmCallWFI ();
 
@@ -69,6 +69,7 @@ ArmPlatformSecExtraAction (
 {
   CHAR8           Buffer[100];
   UINTN           CharCount;
+  UINTN*          StartAddress;
 
   if (FeaturePcdGet (PcdStandalone) == FALSE) {
 
@@ -77,7 +78,7 @@ ArmPlatformSecExtraAction (
     //
 
     if (ArmPlatformIsPrimaryCore (MpId)) {
-      UINTN*   StartAddress = (UINTN*)PcdGet32(PcdFvBaseAddress);
+      StartAddress = (UINTN*)(UINTN)PcdGet64 (PcdFvBaseAddress);
 
       // Patch the DRAM to make an infinite loop at the start address
       *StartAddress = 0xEAFFFFFE; // opcode for while(1)
@@ -85,7 +86,7 @@ ArmPlatformSecExtraAction (
       CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Waiting for firmware at 0x%08X ...\n\r",StartAddress);
       SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
-      *JumpAddress = PcdGet32(PcdFvBaseAddress);
+      *JumpAddress = PcdGet64 (PcdFvBaseAddress);
     } else {
       // When the primary core is stopped by the hardware debugger to copy the firmware
       // into DRAM. The secondary cores are still running. As soon as the first bytes of
@@ -104,10 +105,10 @@ ArmPlatformSecExtraAction (
 
     if (ArmPlatformIsPrimaryCore (MpId)) {
       // Signal the secondary cores they can jump to PEI phase
-      ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
+      ArmGicSendSgiTo (PcdGet32 (PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
 
       // To enter into Non Secure state, we need to make a return from exception
-      *JumpAddress = PcdGet32(PcdFvBaseAddress);
+      *JumpAddress = PcdGet64 (PcdFvBaseAddress);
     } else {
       // We wait for the primary core to finish to initialize the System Memory. Otherwise the secondary
       // cores would make crash the system by setting their stacks in DRAM before the primary core has not
@@ -115,6 +116,6 @@ ArmPlatformSecExtraAction (
       *JumpAddress = (UINTN)NonSecureWaitForFirmware;
     }
   } else {
-    *JumpAddress = PcdGet32(PcdFvBaseAddress);
+    *JumpAddress = PcdGet64 (PcdFvBaseAddress);
   }
 }
