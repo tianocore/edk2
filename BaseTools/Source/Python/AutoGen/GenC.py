@@ -1550,6 +1550,17 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer):
         StringH.Append(gAutoGenHeaderString.Replace({'FileName':FileName}))
         StringH.Append(gAutoGenHPrologueString.Replace({'File':'STRDEFS', 'Guid':Info.Guid.replace('-','_')}))
         CreateUnicodeStringCode(Info, AutoGenC, StringH, UniGenCFlag, UniGenBinBuffer)
+
+        GuidMacros = []
+        for Guid in Info.Module.Guids:
+            if Guid in Info.Module.GetGuidsUsedByPcd():
+                continue
+            GuidMacros.append('#define %s %s' % (Guid, Info.Module.Guids[Guid]))
+        for Guid, Value in Info.Module.Protocols.items() + Info.Module.Ppis.items():
+            GuidMacros.append('#define %s %s' % (Guid, Value))
+        if GuidMacros:
+            StringH.Append('\n#ifdef VFRCOMPILE\n%s\n#endif\n' % '\n'.join(GuidMacros))
+
         StringH.Append("\n#endif\n")
         AutoGenH.Append('#include "%s"\n' % FileName)
 
