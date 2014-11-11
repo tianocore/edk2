@@ -18,8 +18,8 @@
 GCC_ASM_EXPORT(ArmCallHvc)
 
 ASM_PFX(ArmCallHvc):
-  // Push x0 on the stack
-  str   x0, [sp, #-8]!
+  // Push x0 on the stack - The stack must always be quad-word aligned
+  str   x0, [sp, #-16]!
 
   // Load the HVC arguments values into the appropriate registers
   ldp   x6, x7, [x0, #48]
@@ -30,9 +30,9 @@ ASM_PFX(ArmCallHvc):
   hvc   #0
 
   // Pop the ARM_HVC_ARGS structure address from the stack into x9
-  ldr   x9, [sp], #8
+  ldr   x9, [sp], #16
 
-  // Store the HVC returned values into the appropriate registers
+  // Store the HVC returned values into the ARM_HVC_ARGS structure.
   // A HVC call can return up to 4 values
   stp   x2, x3, [x9, #16]
   stp   x0, x1, [x9, #0]

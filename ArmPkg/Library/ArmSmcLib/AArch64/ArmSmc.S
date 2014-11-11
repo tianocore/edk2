@@ -17,8 +17,8 @@
 GCC_ASM_EXPORT(ArmCallSmc)
 
 ASM_PFX(ArmCallSmc):
-  // Push x0 on the stack
-  str   x0, [sp, #-8]!
+  // Push x0 on the stack - The stack must always be quad-word aligned
+  str   x0, [sp, #-16]!
 
   // Load the SMC arguments values into the appropriate registers
   ldp   x6, x7, [x0, #48]
@@ -29,9 +29,9 @@ ASM_PFX(ArmCallSmc):
   smc   #0
 
   // Pop the ARM_SMC_ARGS structure address from the stack into x9
-  ldr   x9, [sp], #8
+  ldr   x9, [sp], #16
 
-  // Store the SMC returned values into the appropriate registers
+  // Store the SMC returned values into the ARM_SMC_ARGS structure.
   // A SMC call can return up to 4 values - we do not need to store back x4-x7.
   stp   x2, x3, [x9, #16]
   stp   x0, x1, [x9, #0]
