@@ -283,7 +283,7 @@ SnpInitialize (
   }
 
   // Initiate a PHY reset
-  Status = PhySoftReset (PHY_RESET_PMT | PHY_RESET_CHECK_LINK, Snp);
+  Status = PhySoftReset (PHY_RESET_PMT, Snp);
   if (EFI_ERROR (Status)) {
     Snp->Mode->State = EfiSimpleNetworkStopped;
     DEBUG ((EFI_D_WARN, "Warning: Link not ready after TimeOut. Check ethernet cable\n"));
@@ -403,7 +403,7 @@ SnpReset (
   }
 
   // Initiate a PHY reset
-  Status = PhySoftReset (PHY_RESET_PMT | PHY_RESET_CHECK_LINK, Snp);
+  Status = PhySoftReset (PHY_RESET_PMT, Snp);
   if (EFI_ERROR (Status)) {
     Snp->Mode->State = EfiSimpleNetworkStopped;
     return EFI_NOT_STARTED;

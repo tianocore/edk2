@@ -491,7 +491,6 @@ PhySoftReset (
   )
 {
   UINT32 PmtCtrl = 0;
-  UINT32 LinkTo = 0;
 
   // PMT PHY reset takes precedence over BCR
   if (Flags & PHY_RESET_PMT) {
@@ -510,20 +509,6 @@ PhySoftReset (
     // Wait for completion
     while (IndirectPHYRead32 (PHY_INDEX_BASIC_CTRL) & PHYCR_RESET) {
       gBS->Stall (LAN9118_STALL);
-    }
-  }
-
-  // Check the link status
-  if (Flags & PHY_RESET_CHECK_LINK) {
-    LinkTo = 100000; // 2 second (could be 50% more)
-    while (EFI_ERROR (CheckLinkStatus (0, Snp)) && (LinkTo > 0)) {
-      gBS->Stall (LAN9118_STALL);
-      LinkTo--;
-    }
-
-    // Timed out
-    if (LinkTo <= 0) {
-      return EFI_TIMEOUT;
     }
   }
 

@@ -115,8 +115,7 @@ SoftReset (
 // Flags for PHY reset
 #define PHY_RESET_PMT                                   BIT0
 #define PHY_RESET_BCR                                   BIT1
-#define PHY_RESET_CHECK_LINK                            BIT2
-#define PHY_SOFT_RESET_CLEAR_INT                        BIT3
+#define PHY_SOFT_RESET_CLEAR_INT                        BIT2
 
 // Perform PHY software reset
 EFI_STATUS
