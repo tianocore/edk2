@@ -361,7 +361,7 @@ da_ConRead(
   else {
     Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
     Proto = (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Stream->Dev;
-    BlockingMode = ((filp->Oflags & O_NONBLOCK) == 0);
+    BlockingMode = (BOOLEAN)((filp->Oflags & O_NONBLOCK) == 0);
 
     do {
       Status = EFI_SUCCESS;
