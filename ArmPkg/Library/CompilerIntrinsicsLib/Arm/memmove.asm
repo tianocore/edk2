@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// Copyright (c) 2011, ARM Limited. All rights reserved.
+// Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -28,27 +28,26 @@
 ;
 __aeabi_memmove
   CMP     r2, #0
-  BXEQ    r14
+  BXEQ    lr
   CMP     r0, r1
-  BXEQ    r14
+  BXEQ    lr
   BHI     memmove_backward
-  BLS     memmove_forward
 
 memmove_forward
   LDRB    r3, [r1], #1
   STRB    r3, [r0], #1
   SUBS    r2, r2, #1
-  BXEQ    r14
-  B       memmove_forward
+  BNE     memmove_forward
+  BX      lr
 
 memmove_backward
   add     r0, r2
   add     r1, r2
 memmove_backward_loop
-  LDRB    r3, [r1], #-1
-  STRB    r3, [r0], #-1
-  SUBS    r2, r2, #-1
-  BXEQ    r14
-  B       memmove_backward_loop
+  LDRB    r3, [r1, #-1]!
+  STRB    r3, [r0, #-1]!
+  SUBS    r2, r2, #1
+  BNE     memmove_backward_loop
+  BX      lr
 
   END

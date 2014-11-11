@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+// Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -19,41 +20,31 @@
 
     AREA    Memset, CODE, READONLY
 
+; void __aeabi_memclr4(void *dest, size_t n);
+; void __aeabi_memclr(void *dest, size_t n);
+__aeabi_memclr
+__aeabi_memclr4
+  mov   r2, #0
+
 ;
 ;VOID
 ;EFIAPI
 ;__aeabi_memset (
 ; IN  VOID    *Destination,
-; IN  UINT32  Character,
-; IN  UINT32  Size
+; IN  UINT32  Size,
+; IN  UINT32  Character
 ; );
 ;
 __aeabi_memset
-
+  cmp  r1, #0
+  bxeq lr
   ; args = 0, pretend = 0, frame = 0
   ; frame_needed = 1, uses_anonymous_args = 0
-  stmfd  sp!, {r7, lr}
-  mov  ip, #0
-  add  r7, sp, #0
-  mov  lr, r0
-  b  L9
 L10
-  and  r3, r1, #255
-  add  ip, ip, #1
-  strb  r3, [lr], #1
-L9
-  cmp  ip, r2
+  strb  r2, [r0], #1
+  subs  r1, r1, #1
+  ; While size is not 0
   bne  L10
-  ldmfd  sp!, {r7, pc}
-
-__aeabi_memclr
-  mov   r2, r1
-  mov   r1, #0
-  b     __aeabi_memset
-
-__aeabi_memclr4
-  mov   r2, r1
-  mov   r1, #0
-  b     __aeabi_memset
+  bx   lr
 
   END

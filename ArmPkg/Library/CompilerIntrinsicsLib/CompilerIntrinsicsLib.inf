@@ -60,6 +60,7 @@
 
   Arm/memcpy.S     | GCC
   Arm/memset.S     | GCC
+  Arm/memmove.S    | GCC
 
 #  Arm/modsi3.c     | GCC
 #  Arm/moddi3.c     | GCC

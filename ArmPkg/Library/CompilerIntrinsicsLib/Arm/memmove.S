@@ -1,7 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -13,26 +12,37 @@
 #
 #------------------------------------------------------------------------------
 
-
   .text
   .align 2
-  GCC_ASM_EXPORT (memset)
+  GCC_ASM_EXPORT (memmove)
 
 # VOID
 # EFIAPI
-# memset (
-#  IN  VOID    *Destination,
-#  IN  UINT32  Character,
-#  IN  UINT32  Size
+# memmove (
+#  IN  VOID          *Destination,
+#  IN  CONST VOID    *Source,
+#  IN  UINT32        Size
 #  );
-ASM_PFX(memset):
-  cmp  r2, #0
-  bxeq lr
-  @ args = 0, pretend = 0, frame = 0
-  @ frame_needed = 1, uses_anonymous_args = 0
-L10:
-  strb  r1, [r0], #1
-  subs  r2, r2, #1
-  @ While size is not 0
-  bne  L10
-  bx   lr
+ASM_PFX(memmove):
+  CMP     r2, #0
+  BXEQ    lr
+  CMP     r0, r1
+  BXEQ    lr
+  BHI     memmove_backward
+
+memmove_forward:
+  LDRB    r3, [r1], #1
+  STRB    r3, [r0], #1
+  SUBS    r2, r2, #1
+  BXEQ    lr
+  B       memmove_forward
+
+memmove_backward:
+  add     r0, r2
+  add     r1, r2
+memmove_backward_loop:
+  LDRB    r3, [r1, #-1]!
+  STRB    r3, [r0, #-1]!
+  SUBS    r2, r2, #1
+  BXEQ    lr
+  B       memmove_backward_loop
