@@ -28,3 +28,8 @@ Create a directory, \Efi\StdLib\lib\Lua.    This is the default location for Lua
 
 If desired, copy the files from AppPkg\Applications\Lua\scripts, in the source tree, into
 \Efi\StdLib\lib\Lua.
+
+Bugs and Other Issues
+---------------------
+EOF characters, ^D or ^Z, are not properly recognized by the console and can't be used to
+terminate an application.  Use os.exit() to exit Lua.

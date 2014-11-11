@@ -131,7 +131,7 @@
 #  AppPkg/Applications/Python/PythonCore.inf
 
 #### Un-comment the following line to build Lua.
-  AppPkg/Applications/Lua/Lua.inf
+#  AppPkg/Applications/Lua/Lua.inf
 
 
 ##############################################################################
