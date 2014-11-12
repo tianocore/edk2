@@ -4,7 +4,7 @@
 #  Intel's Framework Boot Script Save Protocol is replaced by S3 Save State Protocol in PI.
 #  This module produces Framework Boot Script Save protocol by consuming PI S3 Save State protocol
 #  
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -62,13 +62,20 @@
   PcdLib
   DxeServicesLib
   CacheMaintenanceLib
+  BaseMemoryLib
+  DevicePathLib
+  UefiLib
 
 [Protocols]
   gEfiBootScriptSaveProtocolGuid          ## PRODUCES
   gEfiS3SaveStateProtocolGuid             ## CONSUMES
 
+[Guids]
+  gEdkiiMemoryProfileGuid
+
 [Pcd]
   gEfiEdkCompatibilityPkgTokenSpaceGuid.BootScriptThunkDataPtr
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask
 
 [Depex]
   gEfiS3SaveStateProtocolGuid

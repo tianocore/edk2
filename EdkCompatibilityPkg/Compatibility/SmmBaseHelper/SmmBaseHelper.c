@@ -34,6 +34,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/CpuLib.h>
+#include <Library/PcdLib.h>
 #include <Guid/SmmBaseThunkCommunication.h>
 #include <Protocol/SmmBaseHelperReady.h>
 #include <Protocol/SmmCpu.h>
@@ -43,6 +44,42 @@
 #include <Protocol/LoadPe32Image.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmAccess2.h>
+
+/**
+  Register SMM image to SMRAM profile.
+
+  @param[in] FilePath           File path of the image.
+  @param[in] ImageBuffer        Image base address.
+  @param[in] NumberOfPage       Number of page.
+
+  @retval TRUE                  Register success.
+  @retval FALSE                 Register fail.
+
+**/
+BOOLEAN
+RegisterSmramProfileImage (
+  IN EFI_DEVICE_PATH_PROTOCOL   *FilePath,
+  IN PHYSICAL_ADDRESS           ImageBuffer,
+  IN UINTN                      NumberOfPage
+  );
+
+/**
+  Unregister SMM image from SMRAM profile.
+
+  @param[in] FilePath           File path of the image.
+  @param[in] ImageBuffer        Image base address.
+  @param[in] NumberOfPage       Number of page.
+
+  @retval TRUE                  Unregister success.
+  @retval FALSE                 Unregister fail.
+
+**/
+BOOLEAN
+UnregisterSmramProfileImage (
+  IN EFI_DEVICE_PATH_PROTOCOL   *FilePath,
+  IN PHYSICAL_ADDRESS           ImageBuffer,
+  IN UINTN                      NumberOfPage
+  );
 
 ///
 /// Structure for tracking paired information of registered Framework SMI handler
@@ -694,11 +731,13 @@ LoadImage (
     mFrameworkSmst->NumberOfCpus          = mNumberOfProcessors;
     mFrameworkSmst->CurrentlyExecutingCpu = gSmst->CurrentlyExecutingCpu;
 
+    RegisterSmramProfileImage (FilePath, DstBuffer, PageCount);
     Status = gBS->StartImage (*ImageHandle, NULL, NULL);
     if (EFI_ERROR (Status)) {
       mLoadPe32Image->UnLoadPeImage (mLoadPe32Image, *ImageHandle);
       *ImageHandle = NULL;
       FreePages ((VOID *)(UINTN)DstBuffer, PageCount);
+      UnregisterSmramProfileImage (FilePath, DstBuffer, PageCount);
     }
   }
 
