@@ -37,6 +37,7 @@
   Dispatcher.c
   Smi.c
   InstallConfigurationTable.c
+  SmramProfileRecord.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -73,12 +74,18 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable        ## CONSUMES
-  
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask           ## CONSUMES
+
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
   gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEventLegacyBootGuid                       ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
+  ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
+  ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
+  gEdkiiMemoryProfileGuid
+  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PiSmmCoreExtra.uni

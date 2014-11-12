@@ -69,6 +69,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/IdleLoopEvent.h>
 #include <Guid/VectorHandoffTable.h>
 #include <Ppi/VectorHandoffInfo.h>
+#include <Guid/ZeroGuid.h>
+#include <Guid/MemoryProfile.h>
 
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -190,6 +192,56 @@ typedef struct {
   EFI_HANDLE            ImageHandle;
   EFI_HANDLE            DeviceHandle;
 } EFI_GCD_MAP_ENTRY;
+
+
+#define LOADED_IMAGE_PRIVATE_DATA_SIGNATURE   SIGNATURE_32('l','d','r','i')
+
+typedef struct {
+  UINTN                       Signature;
+  /// Image handle
+  EFI_HANDLE                  Handle;   
+  /// Image type
+  UINTN                       Type;           
+  /// If entrypoint has been called
+  BOOLEAN                     Started;        
+  /// The image's entry point
+  EFI_IMAGE_ENTRY_POINT       EntryPoint;     
+  /// loaded image protocol
+  EFI_LOADED_IMAGE_PROTOCOL   Info;           
+  /// Location in memory
+  EFI_PHYSICAL_ADDRESS        ImageBasePage;  
+  /// Number of pages
+  UINTN                       NumberOfPages;  
+  /// Original fixup data
+  CHAR8                       *FixupData;     
+  /// Tpl of started image
+  EFI_TPL                     Tpl;            
+  /// Status returned by started image
+  EFI_STATUS                  Status;         
+  /// Size of ExitData from started image
+  UINTN                       ExitDataSize;   
+  /// Pointer to exit data from started image
+  VOID                        *ExitData;      
+  /// Pointer to pool allocation for context save/retore
+  VOID                        *JumpBuffer;    
+  /// Pointer to buffer for context save/retore
+  BASE_LIBRARY_JUMP_BUFFER    *JumpContext;  
+  /// Machine type from PE image
+  UINT16                      Machine;        
+  /// EBC Protocol pointer
+  EFI_EBC_PROTOCOL            *Ebc;           
+  /// Runtime image list
+  EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   
+  /// Pointer to Loaded Image Device Path Protocl
+  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  
+  /// PeCoffLoader ImageContext
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; 
+  /// Status returned by LoadImage() service.
+  EFI_STATUS                  LoadImageStatus;
+} LOADED_IMAGE_PRIVATE_DATA;
+
+#define LOADED_IMAGE_PRIVATE_DATA_FROM_THIS(a) \
+          CR(a, LOADED_IMAGE_PRIVATE_DATA, Info, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE)
 
 //
 // DXE Core Global Variables
@@ -1192,7 +1244,32 @@ CoreAllocatePages (
   IN OUT EFI_PHYSICAL_ADDRESS  *Memory
   );
 
+/**
+  Allocates pages from the memory map.
 
+  @param  Type                   The type of allocation to perform
+  @param  MemoryType             The type of memory to turn the allocated pages
+                                 into
+  @param  NumberOfPages          The number of pages to allocate
+  @param  Memory                 A pointer to receive the base allocated memory
+                                 address
+
+  @return Status. On success, Memory is filled in with the base address allocated
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in
+                                 spec.
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate.
+  @retval EFI_SUCCESS            Pages successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreInternalAllocatePages (
+  IN EFI_ALLOCATE_TYPE      Type,
+  IN EFI_MEMORY_TYPE        MemoryType,
+  IN UINTN                  NumberOfPages,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Memory
+  );
 
 /**
   Frees previous allocated pages.
@@ -1212,7 +1289,23 @@ CoreFreePages (
   IN UINTN                  NumberOfPages
   );
 
+/**
+  Frees previous allocated pages.
 
+  @param  Memory                 Base address of memory being freed
+  @param  NumberOfPages          The number of pages to free
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER  Address not aligned
+  @return EFI_SUCCESS         -Pages successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreInternalFreePages (
+  IN EFI_PHYSICAL_ADDRESS   Memory,
+  IN UINTN                  NumberOfPages
+  );
 
 /**
   This function returns a copy of the current memory map. The map is an array of
@@ -1277,7 +1370,26 @@ CoreAllocatePool (
   OUT VOID            **Buffer
   );
 
+/**
+  Allocate pool of a particular type.
 
+  @param  PoolType               Type of pool to allocate
+  @param  Size                   The amount of pool to allocate
+  @param  Buffer                 The address to return a pointer to the allocated
+                                 pool
+
+  @retval EFI_INVALID_PARAMETER  PoolType not valid or Buffer is NULL
+  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
+  @retval EFI_SUCCESS            Pool successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreInternalAllocatePool (
+  IN EFI_MEMORY_TYPE  PoolType,
+  IN UINTN            Size,
+  OUT VOID            **Buffer
+  );
 
 /**
   Frees pool.
@@ -1294,7 +1406,20 @@ CoreFreePool (
   IN VOID        *Buffer
   );
 
+/**
+  Frees pool.
 
+  @param  Buffer                 The allocated pool entry to free
+
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value.
+  @retval EFI_SUCCESS            Pool successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreInternalFreePool (
+  IN VOID        *Buffer
+  );
 
 /**
   Loads an EFI image into memory and returns a handle to the image.
@@ -2617,6 +2742,78 @@ GetFwVolHeader (
 BOOLEAN
 VerifyFvHeaderChecksum (
   IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
+  );
+
+/**
+  Initialize memory profile.
+
+  @param HobStart   The start address of the HOB.
+
+**/
+VOID
+MemoryProfileInit (
+  IN VOID   *HobStart
+  );
+
+/**
+  Install memory profile protocol.
+
+**/
+VOID
+MemoryProfileInstallProtocol (
+  VOID
+  );
+
+/**
+  Register image to memory profile.
+
+  @param DriverEntry    Image info.
+  @param FileType       Image file type.
+
+  @retval TRUE          Register success.
+  @retval FALSE         Register fail.
+
+**/
+BOOLEAN
+RegisterMemoryProfileImage (
+  IN LOADED_IMAGE_PRIVATE_DATA  *DriverEntry,
+  IN EFI_FV_FILETYPE            FileType
+  );
+
+/**
+  Unregister image from memory profile.
+
+  @param DriverEntry    Image info.
+
+  @retval TRUE          Unregister success.
+  @retval FALSE         Unregister fail.
+
+**/
+BOOLEAN
+UnregisterMemoryProfileImage (
+  IN LOADED_IMAGE_PRIVATE_DATA  *DriverEntry
+  );
+
+/**
+  Update memory profile information.
+
+  @param CallerAddress  Address of caller who call Allocate or Free.
+  @param Action         This Allocate or Free action.
+  @param MemoryType     Memory type.
+  @param Size           Buffer size.
+  @param Buffer         Buffer address.
+
+  @retval TRUE          Profile udpate success.
+  @retval FALSE         Profile update fail.
+
+**/
+BOOLEAN
+CoreUpdateProfile (
+  IN EFI_PHYSICAL_ADDRESS   CallerAddress,
+  IN MEMORY_PROFILE_ACTION  Action,
+  IN EFI_MEMORY_TYPE        MemoryType, // Valid for AllocatePages/AllocatePool
+  IN UINTN                  Size,       // Valid for AllocatePages/FreePages/AllocatePool
+  IN VOID                   *Buffer
   );
 
 #endif

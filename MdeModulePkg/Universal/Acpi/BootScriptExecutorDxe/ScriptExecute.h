@@ -4,7 +4,7 @@
   This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory 
   in the entry point. The functionality is to interpret and restore the S3 boot script 
   
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -36,9 +36,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugAgentLib.h>
 #include <Library/LockBoxLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
+#include <Library/DevicePathLib.h>
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
+#include <Guid/MemoryProfile.h>
+
 #include <Protocol/DxeSmmReadyToLock.h>
 #include <IndustryStandard/Acpi.h>
 /**

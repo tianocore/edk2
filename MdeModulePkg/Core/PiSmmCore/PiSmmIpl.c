@@ -979,6 +979,13 @@ ExecuteSmmCoreFromSmram (
       //
       DEBUG ((DEBUG_INFO, "SMM IPL calling SMM Core at SMRAM address %p\n", (VOID *)(UINTN)ImageContext.EntryPoint));
 
+      gSmmCorePrivate->PiSmmCoreImageBase = ImageContext.ImageAddress;
+      gSmmCorePrivate->PiSmmCoreImageSize = ImageContext.ImageSize;
+      DEBUG ((DEBUG_INFO, "PiSmmCoreImageBase - 0x%016lx\n", gSmmCorePrivate->PiSmmCoreImageBase));
+      DEBUG ((DEBUG_INFO, "PiSmmCoreImageSize - 0x%016lx\n", gSmmCorePrivate->PiSmmCoreImageSize));
+
+      gSmmCorePrivate->PiSmmCoreEntryPoint = ImageContext.EntryPoint;
+
       //
       // Execute image
       //
@@ -1075,6 +1082,14 @@ SmmIplEntry (
   ASSERT_EFI_ERROR (Status);
 
   gSmmCorePrivate->SmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  //
+  // Save a full copy
+  //
+  gSmmCorePrivate->FullSmramRangeCount = gSmmCorePrivate->SmramRangeCount;
+  gSmmCorePrivate->FullSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  ASSERT (gSmmCorePrivate->FullSmramRanges != NULL);
+  CopyMem (gSmmCorePrivate->FullSmramRanges, gSmmCorePrivate->SmramRanges, Size);
 
   //
   // Open all SMRAM ranges

@@ -2,7 +2,7 @@
   The internal header file that declared a data structure that is shared
   between the SMM IPL and the SMM Core.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -116,6 +116,57 @@ typedef struct {
   /// a software SMI handler back to the caller of the SMM Communication Protocol.
   ///
   EFI_STATUS                      ReturnStatus;
+
+  EFI_PHYSICAL_ADDRESS            PiSmmCoreImageBase;
+  UINT64                          PiSmmCoreImageSize;
+  EFI_PHYSICAL_ADDRESS            PiSmmCoreEntryPoint;
+
+  UINTN                           FullSmramRangeCount;
+  EFI_SMRAM_DESCRIPTOR            *FullSmramRanges;
 } SMM_CORE_PRIVATE_DATA;
+
+//
+// Page management
+//
+
+typedef struct {
+  LIST_ENTRY  Link;
+  UINTN       NumberOfPages;
+} FREE_PAGE_LIST;
+
+extern LIST_ENTRY  mSmmMemoryMap;
+
+//
+// Pool management
+//
+
+//
+// MIN_POOL_SHIFT must not be less than 5
+//
+#define MIN_POOL_SHIFT  6
+#define MIN_POOL_SIZE   (1 << MIN_POOL_SHIFT)
+
+//
+// MAX_POOL_SHIFT must not be less than EFI_PAGE_SHIFT - 1
+//
+#define MAX_POOL_SHIFT  (EFI_PAGE_SHIFT - 1)
+#define MAX_POOL_SIZE   (1 << MAX_POOL_SHIFT)
+
+//
+// MAX_POOL_INDEX are calculated by maximum and minimum pool sizes
+//
+#define MAX_POOL_INDEX  (MAX_POOL_SHIFT - MIN_POOL_SHIFT + 1)
+
+typedef struct {
+  UINTN        Size;
+  BOOLEAN      Available;
+} POOL_HEADER;
+
+typedef struct {
+  POOL_HEADER  Header;
+  LIST_ENTRY   Link;
+} FREE_POOL_HEADER;
+
+extern LIST_ENTRY  mSmmPoolLists[MAX_POOL_INDEX];
 
 #endif

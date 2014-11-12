@@ -1,7 +1,7 @@
 /** @file
   SMM Core Main Entry Point
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -81,6 +81,9 @@ SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
   { SmmEndOfDxeHandler,       &gEfiEndOfDxeEventGroupGuid,        NULL, FALSE },
   { NULL,                     NULL,                               NULL, FALSE }
 };
+
+UINTN                           mFullSmramRangeCount;
+EFI_SMRAM_DESCRIPTOR            *mFullSmramRanges;
 
 /**
   Place holder function until all the SMM System Table Service are available.
@@ -225,6 +228,8 @@ SmmReadyToLockHandler (
   //
   gST = NULL;
   gBS = NULL;
+
+  SmramProfileReadyToLock ();
 
   return Status;
 }
@@ -401,6 +406,16 @@ SmmMain (
   //
   SmmInitializeMemoryServices (gSmmCorePrivate->SmramRangeCount, gSmmCorePrivate->SmramRanges);
 
+  SmramProfileInit ();
+
+  //
+  // Copy FullSmramRanges to SMRAM
+  //
+  mFullSmramRangeCount = gSmmCorePrivate->FullSmramRangeCount;
+  mFullSmramRanges = AllocatePool (mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
+  ASSERT (mFullSmramRanges != NULL);
+  CopyMem (mFullSmramRanges, gSmmCorePrivate->FullSmramRanges, mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
+
   //
   // Register all SMI Handlers required by the SMM Core
   //
@@ -412,6 +427,8 @@ SmmMain (
                );
     ASSERT_EFI_ERROR (Status);
   }
-  
+
+  RegisterSmramProfileHandler ();
+
   return EFI_SUCCESS;
 }

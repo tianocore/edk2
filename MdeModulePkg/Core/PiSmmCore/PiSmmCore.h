@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by SmmCore module.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -33,6 +33,8 @@
 #include <Guid/Apriori.h>
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
+#include <Guid/ZeroGuid.h>
+#include <Guid/MemoryProfile.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -272,6 +274,31 @@ SmmAllocatePages (
   );
 
 /**
+  Allocates pages from the memory map.
+
+  @param  Type                   The type of allocation to perform
+  @param  MemoryType             The type of memory to turn the allocated pages
+                                 into
+  @param  NumberOfPages          The number of pages to allocate
+  @param  Memory                 A pointer to receive the base allocated memory
+                                 address
+
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate.
+  @retval EFI_SUCCESS            Pages successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmInternalAllocatePages (
+  IN      EFI_ALLOCATE_TYPE         Type,
+  IN      EFI_MEMORY_TYPE           MemoryType,
+  IN      UINTN                     NumberOfPages,
+  OUT     EFI_PHYSICAL_ADDRESS      *Memory
+  );
+
+/**
   Frees previous allocated pages.
 
   @param  Memory                 Base address of memory being freed
@@ -285,6 +312,24 @@ SmmAllocatePages (
 EFI_STATUS
 EFIAPI
 SmmFreePages (
+  IN      EFI_PHYSICAL_ADDRESS      Memory,
+  IN      UINTN                     NumberOfPages
+  );
+
+/**
+  Frees previous allocated pages.
+
+  @param  Memory                 Base address of memory being freed
+  @param  NumberOfPages          The number of pages to free
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER  Address not aligned
+  @return EFI_SUCCESS            Pages successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmInternalFreePages (
   IN      EFI_PHYSICAL_ADDRESS      Memory,
   IN      UINTN                     NumberOfPages
   );
@@ -311,6 +356,27 @@ SmmAllocatePool (
   );
 
 /**
+  Allocate pool of a particular type.
+
+  @param  PoolType               Type of pool to allocate
+  @param  Size                   The amount of pool to allocate
+  @param  Buffer                 The address to return a pointer to the allocated
+                                 pool
+
+  @retval EFI_INVALID_PARAMETER  PoolType not valid
+  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
+  @retval EFI_SUCCESS            Pool successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmInternalAllocatePool (
+  IN      EFI_MEMORY_TYPE           PoolType,
+  IN      UINTN                     Size,
+  OUT     VOID                      **Buffer
+  );
+
+/**
   Frees pool.
 
   @param  Buffer                 The allocated pool entry to free
@@ -322,6 +388,21 @@ SmmAllocatePool (
 EFI_STATUS
 EFIAPI
 SmmFreePool (
+  IN      VOID                      *Buffer
+  );
+
+/**
+  Frees pool.
+
+  @param  Buffer                 The allocated pool entry to free
+
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value.
+  @retval EFI_SUCCESS            Pool successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmInternalFreePool (
   IN      VOID                      *Buffer
   );
 
@@ -740,5 +821,102 @@ BOOLEAN
 SmmIsSchedulable (
   IN  EFI_SMM_DRIVER_ENTRY   *DriverEntry
   );
+
+//
+// SmramProfile
+//
+
+/**
+  Initialize SMRAM profile.
+
+**/
+VOID
+SmramProfileInit (
+  VOID
+  );
+
+/**
+  Register SMM image to SMRAM profile.
+
+  @param DriverEntry    SMM image info.
+  @param RegisterToDxe  Register image to DXE.
+
+  @retval TRUE          Register success.
+  @retval FALSE         Register fail.
+
+**/
+BOOLEAN
+RegisterSmramProfileImage (
+  IN EFI_SMM_DRIVER_ENTRY   *DriverEntry,
+  IN BOOLEAN                RegisterToDxe
+  );
+
+/**
+  Unregister image from SMRAM profile.
+
+  @param DriverEntry        SMM image info.
+  @param UnregisterToDxe    Unregister image from DXE.
+
+  @retval TRUE              Unregister success.
+  @retval FALSE             Unregister fail.
+
+**/
+BOOLEAN
+UnregisterSmramProfileImage (
+  IN EFI_SMM_DRIVER_ENTRY   *DriverEntry,
+  IN BOOLEAN                UnregisterToDxe
+  );
+
+/**
+  Update SMRAM profile information.
+
+  @param CallerAddress  Address of caller who call Allocate or Free.
+  @param Action         This Allocate or Free action.
+  @param MemoryType     Memory type.
+  @param Size           Buffer size.
+  @param Buffer         Buffer address.
+
+  @retval TRUE          Profile udpate success.
+  @retval FALSE         Profile update fail.
+
+**/
+BOOLEAN
+SmmCoreUpdateProfile (
+  IN EFI_PHYSICAL_ADDRESS CallerAddress,
+  IN MEMORY_PROFILE_ACTION Action,
+  IN EFI_MEMORY_TYPE      MemoryType, // Valid for AllocatePages/AllocatePool
+  IN UINTN                Size,       // Valid for AllocatePages/FreePages/AllocatePool
+  IN VOID                 *Buffer
+  );
+
+/**
+  Register SMRAM profile handler.
+
+**/
+VOID
+RegisterSmramProfileHandler (
+  VOID
+  );
+
+/**
+  SMRAM profile ready to lock callback function.
+
+**/
+VOID
+SmramProfileReadyToLock (
+  VOID
+  );
+
+/**
+  Dump SMRAM infromation.
+
+**/
+VOID
+DumpSmramInfo (
+  VOID
+  );
+
+extern UINTN                    mFullSmramRangeCount;
+extern EFI_SMRAM_DESCRIPTOR     *mFullSmramRanges;
 
 #endif

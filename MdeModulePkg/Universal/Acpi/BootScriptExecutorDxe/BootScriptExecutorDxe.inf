@@ -64,10 +64,12 @@
   DebugAgentLib
   LockBoxLib
   CpuExceptionHandlerLib
+  DevicePathLib
 
 [Guids]
   gEfiBootScriptExecutorVariableGuid    ## PRODUCES ## UNDEFINED # SaveLockBox
   gEfiBootScriptExecutorContextGuid     ## PRODUCES ## UNDEFINED # SaveLockBox
+  gEdkiiMemoryProfileGuid               ## SOMETIMES_CONSUMES ## GUID # Locate protocol
 
 [Protocols]
   ## NOTIFY
@@ -78,7 +80,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode  ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable          ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask   ## CONSUMES
 
 [Depex]
   gEfiLockBoxProtocolGuid

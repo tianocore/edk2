@@ -52,6 +52,7 @@
   Mem/Page.c
   Mem/MemData.c
   Mem/Imem.h
+  Mem/MemoryProfileRecord.c
   FwVolBlock/FwVolBlock.c
   FwVolBlock/FwVolBlock.h
   FwVol/FwVolWrite.c
@@ -120,6 +121,8 @@
   gIdleLoopEventGuid
   gEventExitBootServicesFailedGuid              ## SOMETIMES_PRODUCES   ## Event
   gEfiVectorHandoffTableGuid                    ## SOMETIMES_PRODUCES   ## SystemTable
+  gEdkiiMemoryProfileGuid                       ## SOMETIMES_PRODUCES   ## GUID # Install protocol
+  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
 
 [Ppis]
   gEfiVectorHandoffInfoPpiGuid                  ## UNDEFINED # HOB
@@ -177,6 +180,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask               ## CONSUMES
 
 # [Hob]
 # RESOURCE_DESCRIPTOR   ## CONSUMES
