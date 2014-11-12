@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1015,6 +1015,27 @@ typedef UINTN RETURN_STATUS;
 **/
 #define SIGNATURE_64(A, B, C, D, E, F, G, H) \
     (SIGNATURE_32 (A, B, C, D) | ((UINT64) (SIGNATURE_32 (E, F, G, H)) << 32))
+
+#if defined(_MSC_EXTENSIONS)
+  //
+  // Intrinsic function provides the address of the instruction in the calling
+  // function that will be executed after control returns to the caller.
+  //
+  #pragma intrinsic(_ReturnAddress)
+  #define RETURN_ADDRESS(L)     ((L == 0) ? _ReturnAddress() : (VOID *) 0)
+#elif defined(__GNUC__)
+  //
+  // Built-in Function returns the return address of the current function,
+  // or of one of its callers.
+  //
+  void * __builtin_return_address (unsigned int level);
+  #define RETURN_ADDRESS(L)     __builtin_return_address (L)
+#else
+  //
+  // Compilers don't support this feature.
+  //
+  #define RETURN_ADDRESS(L)     ((VOID *) 0)
+#endif
 
 #endif
 
