@@ -3,6 +3,7 @@
 
   Copyright (c) 2007-2008 Samuel Thibault.
   Copyright (C) 2014, Citrix Ltd.
+  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -33,11 +34,6 @@
 
 #include <IndustryStandard/Xen/io/protocols.h>
 #include <IndustryStandard/Xen/io/xenbus.h>
-
-//
-// Header used for UINT32_MAX and UINT16_MAX
-//
-#include "inttypes.h"
 
 /**
   Helper to read an integer from XenStore.
@@ -191,7 +187,7 @@ XenPvBlockFrontInitialization (
   FreePool (DeviceType);
 
   Status = XenBusReadUint64 (XenBusIo, "backend-id", FALSE, &Value);
-  if (Status != XENSTORE_STATUS_SUCCESS || Value > UINT16_MAX) {
+  if (Status != XENSTORE_STATUS_SUCCESS || Value > MAX_UINT16) {
     DEBUG ((EFI_D_ERROR, "XenPvBlk: Failed to get backend-id (%d)\n",
             Status));
     goto Error;
@@ -259,7 +255,7 @@ Again:
   }
 
   Status = XenBusReadUint64 (XenBusIo, "info", TRUE, &Value);
-  if (Status != XENSTORE_STATUS_SUCCESS || Value > UINT32_MAX) {
+  if (Status != XENSTORE_STATUS_SUCCESS || Value > MAX_UINT32) {
     goto Error2;
   }
   Dev->MediaInfo.VDiskInfo = Value;
@@ -275,7 +271,7 @@ Again:
   }
 
   Status = XenBusReadUint64 (XenBusIo, "sector-size", TRUE, &Value);
-  if (Status != XENSTORE_STATUS_SUCCESS || Value > UINT32_MAX) {
+  if (Status != XENSTORE_STATUS_SUCCESS || Value > MAX_UINT32) {
     goto Error2;
   }
   if (Value % 512 != 0) {
