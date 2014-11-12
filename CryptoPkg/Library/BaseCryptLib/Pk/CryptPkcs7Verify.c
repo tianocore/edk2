@@ -10,7 +10,7 @@
   WrapPkcs7Data(), Pkcs7GetSigners(), Pkcs7Verify() will get UEFI Authenticated
   Variable and will do basic check for data structure.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -123,7 +123,7 @@ X509VerifyCb (
   @param[in]  P7Length     Length of the PKCS#7 message in bytes.
   @param[out] WrapFlag     If TRUE P7Data is a ContentInfo structure, otherwise
                            return FALSE.
-  @param[out] WrapData     If return status of this function is TRUE: 
+  @param[out] WrapData     If return status of this function is TRUE:
                            1) when WrapFlag is TRUE, pointer to P7Data.
                            2) when WrapFlag is FALSE, pointer to a new ContentInfo
                            structure. It's caller's responsibility to free this
@@ -227,7 +227,7 @@ WrapPkcs7Data (
   @param[in]  X509Stack       Pointer to a X509 stack object.
   @param[out] Cert            Pointer to a X509 certificate.
   @param[out] CertSize        Length of output X509 certificate in bytes.
-                                 
+
   @retval     TRUE            The X509 stack pop succeeded.
   @retval     FALSE           The pop operation failed.
 
@@ -359,7 +359,7 @@ Pkcs7GetSigners (
       (TrustedCert == NULL) || (CertLength == NULL) || (P7Length > INT_MAX)) {
     return FALSE;
   }
-  
+
   Status = WrapPkcs7Data (P7Data, P7Length, &Wrapped, &SignedData, &SignedDataSize);
   if (!Status) {
     return Status;
@@ -410,7 +410,7 @@ Pkcs7GetSigners (
   //
   BufferSize = sizeof (UINT8);
   OldSize    = BufferSize;
-  
+
   for (Index = 0; ; Index++) {
     Status = X509PopCertificate (Stack, &SingleCert, &SingleCertSize);
     if (!Status) {
@@ -455,7 +455,7 @@ Pkcs7GetSigners (
     *CertStack   = CertBuf;
     *StackLength = BufferSize;
     Status = TRUE;
-  } 
+  }
 
 _Exit:
   //
@@ -485,7 +485,7 @@ _Exit:
   if (OldBuf != NULL) {
     free (OldBuf);
   }
-  
+
   return Status;
 }
 
@@ -556,11 +556,11 @@ Pkcs7Verify (
   //
   // Check input parameters.
   //
-  if (P7Data == NULL || TrustedCert == NULL || InData == NULL || 
+  if (P7Data == NULL || TrustedCert == NULL || InData == NULL ||
     P7Length > INT_MAX || CertLength > INT_MAX || DataLength > INT_MAX) {
     return FALSE;
   }
-  
+
   Pkcs7     = NULL;
   DataBio   = NULL;
   Cert      = NULL;
@@ -578,10 +578,15 @@ Pkcs7Verify (
   if (EVP_add_digest (EVP_sha256 ()) == 0) {
     return FALSE;
   }
+  if (EVP_add_digest (EVP_sha384 ()) == 0) {
+    return FALSE;
+  }
+  if (EVP_add_digest (EVP_sha512 ()) == 0) {
+    return FALSE;
+  }
   if (EVP_add_digest_alias (SN_sha1WithRSAEncryption, SN_sha1WithRSA) == 0) {
     return FALSE;
   }
-
 
   Status = WrapPkcs7Data (P7Data, P7Length, &Wrapped, &SignedData, &SignedDataSize);
   if (!Status) {
@@ -589,7 +594,7 @@ Pkcs7Verify (
   }
 
   Status = FALSE;
-  
+
   //
   // Retrieve PKCS#7 Data (DER encoding)
   //

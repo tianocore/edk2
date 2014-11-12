@@ -3,7 +3,7 @@
   The 32-bit versions of C compiler generate calls to library routines
   to handle 64-bit math. These functions use non-standard calling conventions.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,7 +30,7 @@ __declspec(naked) void __cdecl _allshl (void)
     ;
     ; Handle shifting of between 0 and 31 bits
     ;
-    cmp     cl, 32              
+    cmp     cl, 32
     jae     short More32
     shld    edx, eax, cl
     shl     eax, cl
