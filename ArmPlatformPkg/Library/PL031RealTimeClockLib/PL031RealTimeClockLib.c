@@ -221,7 +221,7 @@ DayValid (
   IN  EFI_TIME  *Time
   )
 {
-  INTN  DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  STATIC CONST INTN DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
   if (Time->Day < 1 ||
       Time->Day > DayOfMonth[Time->Month - 1] ||
