@@ -60,6 +60,7 @@
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## ALWAYS_CONSUMED
   gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames  ## SOMETIMES_CONSUMED
 
 [Depex]
   gEfiUnicodeCollation2ProtocolGuid

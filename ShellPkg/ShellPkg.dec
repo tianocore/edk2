@@ -128,3 +128,7 @@
 
   ## Unicode string of the shell supplier
   gEfiShellPkgTokenSpaceGuid.PcdShellSupplier|L"EDK II"|VOID*|0x00000010
+
+  ## Do iSCSI decode for map names.
+  # This is disabled by default due to the length of generated strings
+  gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames|FALSE|BOOLEAN|0x00000012

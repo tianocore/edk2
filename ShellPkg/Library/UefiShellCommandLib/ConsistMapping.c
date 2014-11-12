@@ -651,13 +651,6 @@ DevPathSerialIScsi (
   IN DEVICE_CONSIST_MAPPING_INFO  *MappingItem
   )
 {
-///@todo make this a PCD
-//
-// As Csd of ISCSI node is quite long, we comment
-// the code below to keep the consistent mapping
-// short. Uncomment if you really need it.
-//
-/*
   ISCSI_DEVICE_PATH  *IScsi;
   UINT8              *IScsiTargetName;
   CHAR16             *TargetName;
@@ -667,24 +660,25 @@ DevPathSerialIScsi (
   ASSERT(DevicePathNode != NULL);
   ASSERT(MappingItem != NULL);
 
-  IScsi = (ISCSI_DEVICE_PATH  *) DevicePathNode;
-  AppendCSDNum (MappingItem, IScsi->NetworkProtocol);
-  AppendCSDNum (MappingItem, IScsi->LoginOption);
-  AppendCSDNum (MappingItem, IScsi->Lun);
-  AppendCSDNum (MappingItem, IScsi->TargetPortalGroupTag);
-  TargetNameLength = DevicePathNodeLength (DevicePathNode) - sizeof (ISCSI_DEVICE_PATH);
-  if (TargetNameLength > 0) {
-    TargetName = AllocateZeroPool ((TargetNameLength + 1) * sizeof (CHAR16));
-    if (TargetName != NULL) {
-      IScsiTargetName = (UINT8 *) (IScsi + 1);
-      for (Index = 0; Index < TargetNameLength; Index++) {
-        TargetName[Index] = (CHAR16) IScsiTargetName[Index];
+  if (PcdGetBool(PcdShellDecodeIScsiMapNames)) {
+    IScsi = (ISCSI_DEVICE_PATH  *) DevicePathNode;
+    AppendCSDNum (MappingItem, IScsi->NetworkProtocol);
+    AppendCSDNum (MappingItem, IScsi->LoginOption);
+    AppendCSDNum (MappingItem, IScsi->Lun);
+    AppendCSDNum (MappingItem, IScsi->TargetPortalGroupTag);
+    TargetNameLength = DevicePathNodeLength (DevicePathNode) - sizeof (ISCSI_DEVICE_PATH);
+    if (TargetNameLength > 0) {
+      TargetName = AllocateZeroPool ((TargetNameLength + 1) * sizeof (CHAR16));
+      if (TargetName != NULL) {
+        IScsiTargetName = (UINT8 *) (IScsi + 1);
+        for (Index = 0; Index < TargetNameLength; Index++) {
+          TargetName[Index] = (CHAR16) IScsiTargetName[Index];
+        }
+        AppendCSDStr (MappingItem, TargetName);
+        FreePool (TargetName);
       }
-      AppendCSDStr (MappingItem, TargetName);
-      FreePool (TargetName);
     }
   }
- */
 }
 
 /**
