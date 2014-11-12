@@ -997,11 +997,6 @@ class Build():
             try:
                 #os.rmdir(AutoGenObject.BuildDir)
                 RemoveDirectory(AutoGenObject.BuildDir, True)
-                #
-                # First should close DB.
-                #
-                self.Db.Close()
-                RemoveDirectory(os.path.dirname(GlobalData.gDatabasePath), True)
             except WindowsError, X:
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
@@ -1091,11 +1086,6 @@ class Build():
             try:
                 #os.rmdir(AutoGenObject.BuildDir)
                 RemoveDirectory(AutoGenObject.BuildDir, True)
-                #
-                # First should close DB.
-                #
-                self.Db.Close()
-                RemoveDirectory(os.path.dirname(GlobalData.gDatabasePath), True)
             except WindowsError, X:
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
@@ -1804,6 +1794,10 @@ class Build():
         else:
             self.SpawnMode = False
             self._BuildModule()
+
+        if self.Target == 'cleanall':
+            self.Db.Close()
+            RemoveDirectory(os.path.dirname(GlobalData.gDatabasePath), True)
 
     def CreateAsBuiltInf(self):
         for Module in self.BuildModules:
