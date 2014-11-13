@@ -25,6 +25,7 @@ VOID *mCommonStack = 0;
 VOID *mTopOfApCommonStack = 0;
 VOID *mApStackStart = 0;
 
+BOOLEAN mAPsAlreadyInitFinished = FALSE;
 volatile BOOLEAN mStopCheckAllAPsStatus = TRUE;
 
 EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
@@ -1112,6 +1113,7 @@ ResetProcessorToIdleState (
   IN CPU_DATA_BLOCK  *CpuData
   )
 {
+  ResetApStackless ((UINT32)CpuData->Info.ProcessorId);
 }
 
 /**
@@ -1137,6 +1139,14 @@ ProcessorToIdleState (
   CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
 
   AsmApDoneWithCommonStack ();
+
+  //
+  // Avoid forcibly reset AP caused the AP State is not updated.
+  //
+  GetMpSpinLock (CpuData);
+  CpuData->State = CpuStateIdle;
+  CpuData->Procedure = NULL;
+  ReleaseMpSpinLock (CpuData);
 
   while (TRUE) {
     GetMpSpinLock (CpuData);
@@ -1319,13 +1329,27 @@ ApEntryPointInC (
   VOID
   )
 {
-  VOID* TopOfApStack;
+  VOID*           TopOfApStack;
+  UINTN           ProcessorNumber;
 
-  FillInProcessorInformation (FALSE, mMpSystemData.NumberOfProcessors);
-  TopOfApStack  = (UINT8*)mApStackStart + gApStackSize;
-  mApStackStart = TopOfApStack;
+  if (!mAPsAlreadyInitFinished) {
+    FillInProcessorInformation (FALSE, mMpSystemData.NumberOfProcessors);
+    TopOfApStack  = (UINT8*)mApStackStart + gApStackSize;
+    mApStackStart = TopOfApStack;
 
-  mMpSystemData.NumberOfProcessors++;
+    //
+    // Store the Stack address, when reset the AP, We can found the original address.
+    //
+    mMpSystemData.CpuDatas[mMpSystemData.NumberOfProcessors].TopOfStack = TopOfApStack;
+    mMpSystemData.NumberOfProcessors++;
+    mMpSystemData.NumberOfEnabledProcessors++;
+  } else {
+    WhoAmI (&mMpServicesTemplate, &ProcessorNumber);
+    //
+    // Get the original stack address.
+    //
+    TopOfApStack = mMpSystemData.CpuDatas[ProcessorNumber].TopOfStack;
+  }
 
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)ProcessorToIdleState,
@@ -1461,6 +1485,8 @@ InitializeMpSupport (
     FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
     return;
   }
+
+  mAPsAlreadyInitFinished = TRUE;
 
   if (mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
     FreePages (mApStackStart, EFI_SIZE_TO_PAGES (

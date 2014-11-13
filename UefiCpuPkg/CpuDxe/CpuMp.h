@@ -99,6 +99,7 @@ typedef struct {
   EFI_EVENT                      WaitEvent;
   BOOLEAN                        TimeoutActive;
   EFI_EVENT                      CheckThisAPEvent;
+  VOID                           *TopOfStack;
 } CPU_DATA_BLOCK;
 
 /**
@@ -620,6 +621,20 @@ PrepareAPStartupCode (
 VOID
 FreeApStartupCode (
   VOID
+  );
+
+/**
+  Resets the Application Processor and directs it to jump to the
+  specified routine.
+
+  The processor jumps to this code in flat mode, but the processor's
+  stack is not initialized.
+
+  @param ProcessorId           the AP of ProcessorId was reset
+**/
+VOID
+ResetApStackless (
+  IN UINT32 ProcessorId
   );
 
 #endif // _CPU_MP_H_
