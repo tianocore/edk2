@@ -238,27 +238,22 @@ STARTUP_CODE mStartupCodeTemplate = {
 
 };
 
+volatile STARTUP_CODE *StartupCode = NULL;
 
 /**
-  Starts the Application Processors and directs them to jump to the
-  specified routine.
-
-  The processor jumps to this code in flat mode, but the processor's
-  stack is not initialized.
-
-  @param ApEntryPoint    Pointer to the Entry Point routine
+  Prepares Startup Code for APs.
+  This function prepares Startup Code for APs.
 
   @retval EFI_SUCCESS           The APs were started
   @retval EFI_OUT_OF_RESOURCES  Cannot allocate memory to start APs
 
 **/
 EFI_STATUS
-StartApsStackless (
-  IN STACKLESS_AP_ENTRY_POINT ApEntryPoint
+PrepareAPStartupCode (
+  VOID
   )
 {
   EFI_STATUS            Status;
-  volatile STARTUP_CODE *StartupCode;
   IA32_DESCRIPTOR       Gdtr;
   EFI_PHYSICAL_ADDRESS  StartAddress;
 
@@ -281,7 +276,7 @@ StartApsStackless (
   StartupCode->GdtLimit = Gdtr.Limit;
   StartupCode->GdtBase = (UINT32) Gdtr.Base;
 
-  StartupCode->CpuDxeEntryValue = (UINTN) ApEntryPoint;
+  StartupCode->CpuDxeEntryValue = (UINTN) AsmApEntryPoint;
 
   StartupCode->FlatJmpOffset += (UINT32) StartAddress;
 
@@ -290,14 +285,45 @@ StartApsStackless (
   StartupCode->LongJmpOffset += (UINT32) StartAddress;
 #endif
 
-  SendInitSipiSipiAllExcludingSelf ((UINT32)(UINTN)(VOID*) StartupCode);
+  return EFI_SUCCESS;
+}
 
+/**
+  Free the code buffer of startup AP.
+
+**/
+VOID
+FreeApStartupCode (
+  VOID
+  )
+{
+  if (StartupCode != NULL) {
+    gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)(VOID*) StartupCode,
+                    EFI_SIZE_TO_PAGES (sizeof (*StartupCode)));
+  }
+}
+
+
+/**
+  Starts the Application Processors and directs them to jump to the
+  specified routine.
+
+  The processor jumps to this code in flat mode, but the processor's
+  stack is not initialized.
+
+  @retval EFI_SUCCESS           The APs were started
+
+**/
+EFI_STATUS
+StartApsStackless (
+  VOID
+  )
+{
+  SendInitSipiSipiAllExcludingSelf ((UINT32)(UINTN)(VOID*) StartupCode);
   //
   // Wait 100 milliseconds for APs to arrive at the ApEntryPoint routine
   //
   MicroSecondDelay (100 * 1000);
-
-  gBS->FreePages (StartAddress, EFI_SIZE_TO_PAGES (sizeof (*StartupCode)));
 
   return EFI_SUCCESS;
 }

@@ -1454,7 +1454,10 @@ InitializeMpSupport (
 
   InitMpSystemData ();
 
+  PrepareAPStartupCode ();
+
   if (mMpSystemData.NumberOfProcessors == 1) {
+    FreeApStartupCode ();
     FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
     return;
   }

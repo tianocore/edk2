@@ -40,15 +40,12 @@ VOID
   The processor jumps to this code in flat mode, but the processor's
   stack is not initialized.
 
-  @param ApEntryPoint    Pointer to the Entry Point routine
-
   @retval EFI_SUCCESS           The APs were started
-  @retval EFI_OUT_OF_RESOURCES  Cannot allocate memory to start APs
 
 **/
 EFI_STATUS
 StartApsStackless (
-  IN STACKLESS_AP_ENTRY_POINT ApEntryPoint
+  VOID
   );
 
 /**
@@ -601,6 +598,28 @@ WhoAmI (
 VOID
 ResetProcessorToIdleState (
   IN CPU_DATA_BLOCK  *CpuData
+  );
+
+/**
+  Prepares Startup Code for APs.
+  This function prepares Startup Code for APs.
+
+  @retval EFI_SUCCESS           The APs were started
+  @retval EFI_OUT_OF_RESOURCES  Cannot allocate memory to start APs
+
+**/
+EFI_STATUS
+PrepareAPStartupCode (
+  VOID
+  );
+
+/**
+  Free the code buffer of startup AP.
+
+**/
+VOID
+FreeApStartupCode (
+  VOID
   );
 
 #endif // _CPU_MP_H_
