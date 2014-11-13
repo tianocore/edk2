@@ -125,6 +125,50 @@ FillInProcessorInformation (
   );
 
 /**
+  This service retrieves the number of logical processor in the platform
+  and the number of those logical processors that are enabled on this boot.
+  This service may only be called from the BSP.
+
+  This function is used to retrieve the following information:
+    - The number of logical processors that are present in the system.
+    - The number of enabled logical processors in the system at the instant
+      this call is made.
+
+  Because MP Service Protocol provides services to enable and disable processors
+  dynamically, the number of enabled logical processors may vary during the
+  course of a boot session.
+
+  If this service is called from an AP, then EFI_DEVICE_ERROR is returned.
+  If NumberOfProcessors or NumberOfEnabledProcessors is NULL, then
+  EFI_INVALID_PARAMETER is returned. Otherwise, the total number of processors
+  is returned in NumberOfProcessors, the number of currently enabled processor
+  is returned in NumberOfEnabledProcessors, and EFI_SUCCESS is returned.
+
+  @param[in]  This                        A pointer to the EFI_MP_SERVICES_PROTOCOL
+                                          instance.
+  @param[out] NumberOfProcessors          Pointer to the total number of logical
+                                          processors in the system, including the BSP
+                                          and disabled APs.
+  @param[out] NumberOfEnabledProcessors   Pointer to the number of enabled logical
+                                          processors that exist in system, including
+                                          the BSP.
+
+  @retval EFI_SUCCESS             The number of logical processors and enabled
+                                  logical processors was retrieved.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_INVALID_PARAMETER   NumberOfProcessors is NULL.
+  @retval EFI_INVALID_PARAMETER   NumberOfEnabledProcessors is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+GetNumberOfProcessors (
+  IN  EFI_MP_SERVICES_PROTOCOL  *This,
+  OUT UINTN                     *NumberOfProcessors,
+  OUT UINTN                     *NumberOfEnabledProcessors
+  );
+
+/**
   This return the handle number for the calling processor.  This service may be
   called from the BSP and APs.
 
