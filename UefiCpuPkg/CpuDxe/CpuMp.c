@@ -16,6 +16,19 @@
 #include "CpuMp.h"
 
 /**
+  Application Processor C code entry point.
+
+**/
+VOID
+EFIAPI
+ApEntryPointInC (
+  VOID
+  )
+{
+}
+
+
+/**
   Initialize Multi-processor support.
 
 **/
