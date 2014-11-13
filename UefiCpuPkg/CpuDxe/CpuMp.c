@@ -30,7 +30,7 @@ EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   NULL, // StartupAllAPs,
   NULL, // StartupThisAP,
   NULL, // SwitchBSP,
-  NULL, // EnableDisableAP,
+  EnableDisableAP,
   WhoAmI
 };
 
@@ -55,6 +55,101 @@ IsBSP (
   CpuData = &mMpSystemData.CpuDatas[CpuIndex];
 
   return CpuData->Info.StatusFlag & PROCESSOR_AS_BSP_BIT ? TRUE : FALSE;
+}
+
+/**
+  Get the Application Processors state.
+
+  @param   CpuData    the pointer to CPU_DATA_BLOCK of specified AP
+
+  @retval  CPU_STATE  the AP status
+
+**/
+CPU_STATE
+GetApState (
+  IN  CPU_DATA_BLOCK  *CpuData
+  )
+{
+  CPU_STATE State;
+
+  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+    CpuPause ();
+  }
+
+  State = CpuData->State;
+  ReleaseSpinLock (&CpuData->CpuDataLock);
+
+  return State;
+}
+
+/**
+  Check the Application Processors Status whether contains the Flags.
+
+  @param     CpuData  the pointer to CPU_DATA_BLOCK of specified AP
+  @param     Flags    the StatusFlag describing in EFI_PROCESSOR_INFORMATION
+
+  @retval    TRUE     the AP status includes the StatusFlag
+  @retval    FALSE    the AP status excludes the StatusFlag
+
+**/
+BOOLEAN
+TestCpuStatusFlag (
+  IN  CPU_DATA_BLOCK  *CpuData,
+  IN  UINT32          Flags
+  )
+{
+  UINT32 Ret;
+
+  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+    CpuPause ();
+  }
+
+  Ret = CpuData->Info.StatusFlag & Flags;
+  ReleaseSpinLock (&CpuData->CpuDataLock);
+
+  return !!(Ret);
+}
+
+/**
+  Bitwise-Or of the Application Processors Status with the Flags.
+
+  @param     CpuData  the pointer to CPU_DATA_BLOCK of specified AP
+  @param     Flags    the StatusFlag describing in EFI_PROCESSOR_INFORMATION
+
+**/
+VOID
+CpuStatusFlagOr (
+  IN  CPU_DATA_BLOCK  *CpuData,
+  IN  UINT32          Flags
+  )
+{
+  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+    CpuPause ();
+  }
+
+  CpuData->Info.StatusFlag |= Flags;
+  ReleaseSpinLock (&CpuData->CpuDataLock);
+}
+
+/**
+  Bitwise-AndNot of the Application Processors Status with the Flags.
+
+  @param     CpuData  the pointer to CPU_DATA_BLOCK of specified AP
+  @param     Flags    the StatusFlag describing in EFI_PROCESSOR_INFORMATION
+
+**/
+VOID
+CpuStatusFlagAndNot (
+  IN  CPU_DATA_BLOCK  *CpuData,
+  IN  UINT32          Flags
+  )
+{
+  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+    CpuPause ();
+  }
+
+  CpuData->Info.StatusFlag &= ~Flags;
+  ReleaseSpinLock (&CpuData->CpuDataLock);
 }
 
 /**
@@ -161,6 +256,95 @@ GetProcessorInfo (
   }
 
   CopyMem (ProcessorInfoBuffer, &mMpSystemData.CpuDatas[ProcessorNumber], sizeof (EFI_PROCESSOR_INFORMATION));
+  return EFI_SUCCESS;
+}
+
+/**
+  This service lets the caller enable or disable an AP from this point onward.
+  This service may only be called from the BSP.
+
+  This service allows the caller enable or disable an AP from this point onward.
+  The caller can optionally specify the health status of the AP by Health. If
+  an AP is being disabled, then the state of the disabled AP is implementation
+  dependent. If an AP is enabled, then the implementation must guarantee that a
+  complete initialization sequence is performed on the AP, so the AP is in a state
+  that is compatible with an MP operating system. This service may not be supported
+  after the UEFI Event EFI_EVENT_GROUP_READY_TO_BOOT is signaled.
+
+  If the enable or disable AP operation cannot be completed prior to the return
+  from this service, then EFI_UNSUPPORTED must be returned.
+
+  @param[in] This              A pointer to the EFI_MP_SERVICES_PROTOCOL instance.
+  @param[in] ProcessorNumber   The handle number of AP that is to become the new
+                               BSP. The range is from 0 to the total number of
+                               logical processors minus 1. The total number of
+                               logical processors can be retrieved by
+                               EFI_MP_SERVICES_PROTOCOL.GetNumberOfProcessors().
+  @param[in] EnableAP          Specifies the new state for the processor for
+                               enabled, FALSE for disabled.
+  @param[in] HealthFlag        If not NULL, a pointer to a value that specifies
+                               the new health status of the AP. This flag
+                               corresponds to StatusFlag defined in
+                               EFI_MP_SERVICES_PROTOCOL.GetProcessorInfo(). Only
+                               the PROCESSOR_HEALTH_STATUS_BIT is used. All other
+                               bits are ignored.  If it is NULL, this parameter
+                               is ignored.
+
+  @retval EFI_SUCCESS             The specified AP was enabled or disabled successfully.
+  @retval EFI_UNSUPPORTED         Enabling or disabling an AP cannot be completed
+                                  prior to this service returning.
+  @retval EFI_UNSUPPORTED         Enabling or disabling an AP is not supported.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_NOT_FOUND           Processor with the handle specified by ProcessorNumber
+                                  does not exist.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the BSP.
+
+**/
+EFI_STATUS
+EFIAPI
+EnableDisableAP (
+  IN  EFI_MP_SERVICES_PROTOCOL  *This,
+  IN  UINTN                     ProcessorNumber,
+  IN  BOOLEAN                   EnableAP,
+  IN  UINT32                    *HealthFlag OPTIONAL
+  )
+{
+  CPU_DATA_BLOCK *CpuData;
+
+  if (!IsBSP ()) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (ProcessorNumber >= mMpSystemData.NumberOfProcessors) {
+    return EFI_NOT_FOUND;
+  }
+
+  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
+  if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (GetApState (CpuData) != CpuStateIdle) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (EnableAP) {
+    if (!(TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT))) {
+      mMpSystemData.NumberOfEnabledProcessors++;
+    }
+    CpuStatusFlagOr (CpuData, PROCESSOR_ENABLED_BIT);
+  } else {
+    if (TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
+      mMpSystemData.NumberOfEnabledProcessors--;
+    }
+    CpuStatusFlagAndNot (CpuData, PROCESSOR_ENABLED_BIT);
+  }
+
+  if (HealthFlag != NULL) {
+    CpuStatusFlagAndNot (CpuData, (UINT32)~PROCESSOR_HEALTH_STATUS_BIT);
+    CpuStatusFlagOr (CpuData, (*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT));
+  }
+
   return EFI_SUCCESS;
 }
 
