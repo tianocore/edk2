@@ -112,6 +112,18 @@ typedef struct {
   CPU_DATA_BLOCK              *CpuDatas;
   UINTN                       NumberOfProcessors;
   UINTN                       NumberOfEnabledProcessors;
+
+  EFI_AP_PROCEDURE            Procedure;
+  VOID                        *ProcedureArgument;
+  UINTN                       StartCount;
+  UINTN                       FinishCount;
+  BOOLEAN                     SingleThread;
+  UINTN                       **FailedList;
+  UINTN                       FailedListIndex;
+  INTN                        Timeout;
+  EFI_EVENT                   WaitEvent;
+  BOOLEAN                     TimeoutActive;
+  EFI_EVENT                   CheckAllAPsEvent;
 } MP_SYSTEM_DATA;
 
 /**
@@ -205,6 +217,154 @@ GetProcessorInfo (
   IN  EFI_MP_SERVICES_PROTOCOL   *This,
   IN  UINTN                      ProcessorNumber,
   OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
+  );
+
+/**
+  This service executes a caller provided function on all enabled APs. APs can
+  run either simultaneously or one at a time in sequence. This service supports
+  both blocking and non-blocking requests. The non-blocking requests use EFI
+  events so the BSP can detect when the APs have finished. This service may only
+  be called from the BSP.
+
+  This function is used to dispatch all the enabled APs to the function specified
+  by Procedure.  If any enabled AP is busy, then EFI_NOT_READY is returned
+  immediately and Procedure is not started on any AP.
+
+  If SingleThread is TRUE, all the enabled APs execute the function specified by
+  Procedure one by one, in ascending order of processor handle number. Otherwise,
+  all the enabled APs execute the function specified by Procedure simultaneously.
+
+  If WaitEvent is NULL, execution is in blocking mode. The BSP waits until all
+  APs finish or TimeoutInMicroseconds expires. Otherwise, execution is in non-blocking
+  mode, and the BSP returns from this service without waiting for APs. If a
+  non-blocking mode is requested after the UEFI Event EFI_EVENT_GROUP_READY_TO_BOOT
+  is signaled, then EFI_UNSUPPORTED must be returned.
+
+  If the timeout specified by TimeoutInMicroseconds expires before all APs return
+  from Procedure, then Procedure on the failed APs is terminated. All enabled APs
+  are always available for further calls to EFI_MP_SERVICES_PROTOCOL.StartupAllAPs()
+  and EFI_MP_SERVICES_PROTOCOL.StartupThisAP(). If FailedCpuList is not NULL, its
+  content points to the list of processor handle numbers in which Procedure was
+  terminated.
+
+  Note: It is the responsibility of the consumer of the EFI_MP_SERVICES_PROTOCOL.StartupAllAPs()
+  to make sure that the nature of the code that is executed on the BSP and the
+  dispatched APs is well controlled. The MP Services Protocol does not guarantee
+  that the Procedure function is MP-safe. Hence, the tasks that can be run in
+  parallel are limited to certain independent tasks and well-controlled exclusive
+  code. EFI services and protocols may not be called by APs unless otherwise
+  specified.
+
+  In blocking execution mode, BSP waits until all APs finish or
+  TimeoutInMicroseconds expires.
+
+  In non-blocking execution mode, BSP is freed to return to the caller and then
+  proceed to the next task without having to wait for APs. The following
+  sequence needs to occur in a non-blocking execution mode:
+
+    -# The caller that intends to use this MP Services Protocol in non-blocking
+       mode creates WaitEvent by calling the EFI CreateEvent() service.  The caller
+       invokes EFI_MP_SERVICES_PROTOCOL.StartupAllAPs(). If the parameter WaitEvent
+       is not NULL, then StartupAllAPs() executes in non-blocking mode. It requests
+       the function specified by Procedure to be started on all the enabled APs,
+       and releases the BSP to continue with other tasks.
+    -# The caller can use the CheckEvent() and WaitForEvent() services to check
+       the state of the WaitEvent created in step 1.
+    -# When the APs complete their task or TimeoutInMicroSecondss expires, the MP
+       Service signals WaitEvent by calling the EFI SignalEvent() function. If
+       FailedCpuList is not NULL, its content is available when WaitEvent is
+       signaled. If all APs returned from Procedure prior to the timeout, then
+       FailedCpuList is set to NULL. If not all APs return from Procedure before
+       the timeout, then FailedCpuList is filled in with the list of the failed
+       APs. The buffer is allocated by MP Service Protocol using AllocatePool().
+       It is the caller's responsibility to free the buffer with FreePool() service.
+    -# This invocation of SignalEvent() function informs the caller that invoked
+       EFI_MP_SERVICES_PROTOCOL.StartupAllAPs() that either all the APs completed
+       the specified task or a timeout occurred. The contents of FailedCpuList
+       can be examined to determine which APs did not complete the specified task
+       prior to the timeout.
+
+  @param[in]  This                    A pointer to the EFI_MP_SERVICES_PROTOCOL
+                                      instance.
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled APs of the system. See type
+                                      EFI_AP_PROCEDURE.
+  @param[in]  SingleThread            If TRUE, then all the enabled APs execute
+                                      the function specified by Procedure one by
+                                      one, in ascending order of processor handle
+                                      number.  If FALSE, then all the enabled APs
+                                      execute the function specified by Procedure
+                                      simultaneously.
+  @param[in]  WaitEvent               The event created by the caller with CreateEvent()
+                                      service.  If it is NULL, then execute in
+                                      blocking mode. BSP waits until all APs finish
+                                      or TimeoutInMicroseconds expires.  If it's
+                                      not NULL, then execute in non-blocking mode.
+                                      BSP requests the function specified by
+                                      Procedure to be started on all the enabled
+                                      APs, and go on executing immediately. If
+                                      all return from Procedure, or TimeoutInMicroseconds
+                                      expires, this event is signaled. The BSP
+                                      can use the CheckEvent() or WaitForEvent()
+                                      services to check the state of event.  Type
+                                      EFI_EVENT is defined in CreateEvent() in
+                                      the Unified Extensible Firmware Interface
+                                      Specification.
+  @param[in]  TimeoutInMicroseconds   Indicates the time limit in microseconds for
+                                      APs to return from Procedure, either for
+                                      blocking or non-blocking mode. Zero means
+                                      infinity.  If the timeout expires before
+                                      all APs return from Procedure, then Procedure
+                                      on the failed APs is terminated. All enabled
+                                      APs are available for next function assigned
+                                      by EFI_MP_SERVICES_PROTOCOL.StartupAllAPs()
+                                      or EFI_MP_SERVICES_PROTOCOL.StartupThisAP().
+                                      If the timeout expires in blocking mode,
+                                      BSP returns EFI_TIMEOUT.  If the timeout
+                                      expires in non-blocking mode, WaitEvent
+                                      is signaled with SignalEvent().
+  @param[in]  ProcedureArgument       The parameter passed into Procedure for
+                                      all APs.
+  @param[out] FailedCpuList           If NULL, this parameter is ignored. Otherwise,
+                                      if all APs finish successfully, then its
+                                      content is set to NULL. If not all APs
+                                      finish before timeout expires, then its
+                                      content is set to address of the buffer
+                                      holding handle numbers of the failed APs.
+                                      The buffer is allocated by MP Service Protocol,
+                                      and it's the caller's responsibility to
+                                      free the buffer with FreePool() service.
+                                      In blocking mode, it is ready for consumption
+                                      when the call returns. In non-blocking mode,
+                                      it is ready when WaitEvent is signaled.  The
+                                      list of failed CPU is terminated by
+                                      END_OF_CPU_LIST.
+
+  @retval EFI_SUCCESS             In blocking mode, all APs have finished before
+                                  the timeout expired.
+  @retval EFI_SUCCESS             In non-blocking mode, function has been dispatched
+                                  to all enabled APs.
+  @retval EFI_UNSUPPORTED         A non-blocking mode request was made after the
+                                  UEFI event EFI_EVENT_GROUP_READY_TO_BOOT was
+                                  signaled.
+  @retval EFI_DEVICE_ERROR        Caller processor is AP.
+  @retval EFI_NOT_STARTED         No enabled APs exist in the system.
+  @retval EFI_NOT_READY           Any enabled APs are busy.
+  @retval EFI_TIMEOUT             In blocking mode, the timeout expired before
+                                  all enabled APs have finished.
+  @retval EFI_INVALID_PARAMETER   Procedure is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+StartupAllAPs (
+  IN  EFI_MP_SERVICES_PROTOCOL  *This,
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  BOOLEAN                   SingleThread,
+  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL,
+  OUT UINTN                     **FailedCpuList         OPTIONAL
   );
 
 /**
