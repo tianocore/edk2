@@ -54,6 +54,13 @@
   ## Specifies delay value in microseconds after sending out an INIT IPI.
   # @Prompt Configure delay value after send an INIT IPI
   gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds|10000|UINT32|0x30000002
+  ## Specifies max supported number of Logical Processors.
+  # @Prompt Configure max supported number of Logical Processorss
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|64|UINT32|0x00000002
+  ## This value specifies the Application Processor (AP) stack size, used for Mp Service, which must
+  ## aligns the address on a 4-KByte boundary.
+  # @Prompt Configure stack size for Application Processor (AP)
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize|0x8000|UINT32|0x00000003
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni

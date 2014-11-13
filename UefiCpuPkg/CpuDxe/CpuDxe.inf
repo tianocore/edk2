@@ -75,6 +75,10 @@
   gIdleLoopEventGuid                            ## CONSUMES           ## Event
   gEfiVectorHandoffTableGuid                    ## SOMETIMES_CONSUMES ## SystemTable
 
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber   ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                 ## CONSUMES
+
 [Depex]
   TRUE
 

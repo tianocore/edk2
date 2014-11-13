@@ -15,9 +15,14 @@
 #include "CpuDxe.h"
 #include "CpuMp.h"
 
+UINTN gMaxLogicalProcessorNumber;
+UINTN gApStackSize;
+
 VOID *mCommonStack = 0;
 VOID *mTopOfApCommonStack = 0;
+VOID *mApStackStart = 0;
 
+volatile UINTN mNumberOfProcessors;
 
 /**
   Application Processor C code entry point.
@@ -29,6 +34,7 @@ ApEntryPointInC (
   VOID
   )
 {
+  mNumberOfProcessors++;
 }
 
 
@@ -41,5 +47,39 @@ InitializeMpSupport (
   VOID
   )
 {
-}
+  gMaxLogicalProcessorNumber = (UINTN) PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  if (gMaxLogicalProcessorNumber < 1) {
+    DEBUG ((DEBUG_ERROR, "Setting PcdCpuMaxLogicalProcessorNumber should be more than zero.\n"));
+    return;
+  }
 
+  if (gMaxLogicalProcessorNumber == 1) {
+    return;
+  }
+
+  gApStackSize = (UINTN) PcdGet32 (PcdCpuApStackSize);
+  ASSERT ((gApStackSize & (SIZE_4KB - 1)) == 0);
+
+  mApStackStart = AllocatePages (EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
+  ASSERT (mApStackStart != NULL);
+
+  //
+  // the first buffer of stack size used for common stack, when the amount of AP
+  // more than 1, we should never free the common stack which maybe used for AP reset.
+  //
+  mCommonStack = mApStackStart;
+  mTopOfApCommonStack = (UINT8*) mApStackStart + gApStackSize;
+  mApStackStart = mTopOfApCommonStack;
+
+  mNumberOfProcessors = 1;
+
+  if (mNumberOfProcessors == 1) {
+    FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
+    return;
+  }
+
+  if (mNumberOfProcessors < gMaxLogicalProcessorNumber) {
+    FreePages (mApStackStart, EFI_SIZE_TO_PAGES ((gMaxLogicalProcessorNumber - mNumberOfProcessors) *
+                                                 gApStackSize));
+  }
+}
