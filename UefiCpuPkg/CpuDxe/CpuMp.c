@@ -632,6 +632,11 @@ StartupAllAPs (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // temporarily stop checkAllAPsStatus for avoid resource dead-lock.
+  //
+  mStopCheckAllAPsStatus = TRUE;
+
   for (Number = 0; Number < mMpSystemData.NumberOfProcessors; Number++) {
     CpuData = &mMpSystemData.CpuDatas[Number];
     if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
@@ -652,11 +657,6 @@ StartupAllAPs (
       return EFI_NOT_READY;
     }
   }
-
-  //
-  // temporarily stop checkAllAPsStatus for initialize parameters.
-  //
-  mStopCheckAllAPsStatus = TRUE;
 
   mMpSystemData.Procedure         = Procedure;
   mMpSystemData.ProcedureArgument = ProcedureArgument;
@@ -715,6 +715,11 @@ StartupAllAPs (
     //
     return EFI_SUCCESS;
   }
+
+  //
+  // Blocking temporarily stop CheckAllAPsStatus()
+  //
+  mStopCheckAllAPsStatus = TRUE;
 
   while (TRUE) {
     CheckAndUpdateAllAPsToIdleState ();
@@ -859,6 +864,11 @@ StartupThisAP (
     return EFI_NOT_FOUND;
   }
 
+  //
+  // temporarily stop checkAllAPsStatus for avoid resource dead-lock.
+  //
+  mStopCheckAllAPsStatus = TRUE;
+
   CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
   if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT) ||
       !TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
@@ -868,11 +878,6 @@ StartupThisAP (
   if (GetApState (CpuData) != CpuStateIdle) {
     return EFI_NOT_READY;
   }
-
-  //
-  // temporarily stop checkAllAPsStatus for initialize parameters.
-  //
-  mStopCheckAllAPsStatus = TRUE;
 
   SetApState (CpuData, CpuStateReady);
 
@@ -1013,6 +1018,10 @@ EnableDisableAP (
   )
 {
   CPU_DATA_BLOCK *CpuData;
+  BOOLEAN        TempStopCheckState;
+
+  CpuData = NULL;
+  TempStopCheckState = FALSE;
 
   if (!IsBSP ()) {
     return EFI_DEVICE_ERROR;
@@ -1020,6 +1029,14 @@ EnableDisableAP (
 
   if (ProcessorNumber >= mMpSystemData.NumberOfProcessors) {
     return EFI_NOT_FOUND;
+  }
+
+  //
+  // temporarily stop checkAllAPsStatus for initialize parameters.
+  //
+  if (!mStopCheckAllAPsStatus) {
+    mStopCheckAllAPsStatus = TRUE;
+    TempStopCheckState = TRUE;
   }
 
   CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
@@ -1046,6 +1063,10 @@ EnableDisableAP (
   if (HealthFlag != NULL) {
     CpuStatusFlagAndNot (CpuData, (UINT32)~PROCESSOR_HEALTH_STATUS_BIT);
     CpuStatusFlagOr (CpuData, (*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT));
+  }
+
+  if (TempStopCheckState) {
+    mStopCheckAllAPsStatus = FALSE;
   }
 
   return EFI_SUCCESS;
@@ -1303,20 +1324,6 @@ CheckAllAPsStatus (
   //
   for (Number = 0; Number < mMpSystemData.NumberOfProcessors; Number++) {
     CpuData = &mMpSystemData.CpuDatas[Number];
-    if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
-      //
-      // Skip BSP
-      //
-      continue;
-    }
-
-    if (!TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
-      //
-      // Skip Disabled processors
-      //
-      continue;
-    }
-
     if (CpuData->WaitEvent) {
       CheckThisAPStatus (NULL, (VOID *)CpuData);
     }
