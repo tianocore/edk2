@@ -15,6 +15,10 @@
 #include "CpuDxe.h"
 #include "CpuMp.h"
 
+VOID *mCommonStack = 0;
+VOID *mTopOfApCommonStack = 0;
+
+
 /**
   Application Processor C code entry point.
 

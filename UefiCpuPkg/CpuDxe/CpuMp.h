@@ -24,5 +24,32 @@ InitializeMpSupport (
   VOID
   );
 
+/**
+  The AP entry point that the Startup-IPI target code will jump to.
+
+  The processor jumps to this code in flat mode, but the processor's
+  stack is not initialized.
+
+**/
+VOID
+EFIAPI
+AsmApEntryPoint (
+  VOID
+  );
+
+/**
+  Releases the lock preventing other APs from using the shared AP
+  stack.
+
+  Once the AP has transitioned to using a new stack, it can call this
+  function to allow another AP to proceed with using the shared stack.
+
+**/
+VOID
+EFIAPI
+AsmApDoneWithCommonStack (
+  VOID
+  );
+
 #endif // _CPU_MP_H_
 
