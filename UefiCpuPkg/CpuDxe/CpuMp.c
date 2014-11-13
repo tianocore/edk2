@@ -25,6 +25,8 @@ VOID *mCommonStack = 0;
 VOID *mTopOfApCommonStack = 0;
 VOID *mApStackStart = 0;
 
+volatile BOOLEAN mStopCheckAllAPsStatus = TRUE;
+
 EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   GetNumberOfProcessors,
   GetProcessorInfo,
@@ -637,6 +639,11 @@ StartupAllAPs (
     }
   }
 
+  //
+  // temporarily stop checkAllAPsStatus for initialize parameters.
+  //
+  mStopCheckAllAPsStatus = TRUE;
+
   mMpSystemData.Procedure         = Procedure;
   mMpSystemData.ProcedureArgument = ProcedureArgument;
   mMpSystemData.WaitEvent         = WaitEvent;
@@ -686,13 +693,13 @@ StartupAllAPs (
     }
   }
 
+  mStopCheckAllAPsStatus = FALSE;
+
   if (WaitEvent != NULL) {
-    Status = gBS->SetTimer (
-                    mMpSystemData.CheckAllAPsEvent,
-                    TimerPeriodic,
-                    EFI_TIMER_PERIOD_MICROSECONDS (100)
-                    );
-    return Status;
+    //
+    // non blocking
+    //
+    return EFI_SUCCESS;
   }
 
   while (TRUE) {
@@ -819,7 +826,6 @@ StartupThisAP (
   )
 {
   CPU_DATA_BLOCK        *CpuData;
-  EFI_STATUS            Status;
 
   CpuData = NULL;
 
@@ -849,6 +855,11 @@ StartupThisAP (
     return EFI_NOT_READY;
   }
 
+  //
+  // temporarily stop checkAllAPsStatus for initialize parameters.
+  //
+  mStopCheckAllAPsStatus = TRUE;
+
   SetApState (CpuData, CpuStateReady);
 
   SetApProcedure (CpuData, Procedure, ProcedureArgument);
@@ -858,16 +869,13 @@ StartupThisAP (
   CpuData->TimeoutActive = !!(TimeoutInMicroseconds);
   CpuData->Finished = Finished;
 
+  mStopCheckAllAPsStatus = FALSE;
+
   if (WaitEvent != NULL) {
     //
     // Non Blocking
     //
-    Status = gBS->SetTimer (
-                    CpuData->CheckThisAPEvent,
-                    TimerPeriodic,
-                    EFI_TIMER_PERIOD_MICROSECONDS (100)
-                    );
-    return Status;
+    return EFI_SUCCESS;
   }
 
   //
@@ -1194,11 +1202,9 @@ CheckThisAPStatus (
   return;
 
 out:
-  gBS->SetTimer (CpuData->CheckThisAPEvent, TimerCancel, 0);
-  if (CpuData->WaitEvent) {
-    gBS->SignalEvent (CpuData->WaitEvent);
-    CpuData->WaitEvent = NULL;
-  }
+  CpuData->TimeoutActive = FALSE;
+  gBS->SignalEvent (CpuData->WaitEvent);
+  CpuData->WaitEvent = NULL;
 }
 
 /**
@@ -1218,36 +1224,62 @@ CheckAllAPsStatus (
   IN  VOID             *Context
   )
 {
+  CPU_DATA_BLOCK *CpuData;
+  UINTN          Number;
+
   if (mMpSystemData.TimeoutActive) {
     mMpSystemData.Timeout -= gPollInterval;
   }
 
-  CheckAndUpdateAllAPsToIdleState ();
-
-  //
-  // task timeout
-  //
-  if (mMpSystemData.TimeoutActive && mMpSystemData.Timeout < 0) {
-    ResetAllFailedAPs();
-    //
-    // force exit
-    //
-    mMpSystemData.FinishCount = mMpSystemData.StartCount;
-  }
-
-  if (mMpSystemData.FinishCount != mMpSystemData.StartCount) {
+  if (mStopCheckAllAPsStatus) {
     return;
   }
 
-  gBS->SetTimer (
-         mMpSystemData.CheckAllAPsEvent,
-         TimerCancel,
-         0
-         );
+  if (mMpSystemData.WaitEvent != NULL) {
+    CheckAndUpdateAllAPsToIdleState ();
+    //
+    // task timeout
+    //
+    if (mMpSystemData.TimeoutActive && mMpSystemData.Timeout < 0) {
+      ResetAllFailedAPs();
+      //
+      // force exit
+      //
+      mMpSystemData.FinishCount = mMpSystemData.StartCount;
+    }
 
-  if (mMpSystemData.WaitEvent) {
+    if (mMpSystemData.FinishCount != mMpSystemData.StartCount) {
+      return;
+    }
+
+    mMpSystemData.TimeoutActive = FALSE;
     gBS->SignalEvent (mMpSystemData.WaitEvent);
     mMpSystemData.WaitEvent = NULL;
+    mStopCheckAllAPsStatus = TRUE;
+  }
+
+  //
+  // check each AP status for StartupThisAP
+  //
+  for (Number = 0; Number < mMpSystemData.NumberOfProcessors; Number++) {
+    CpuData = &mMpSystemData.CpuDatas[Number];
+    if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
+      //
+      // Skip BSP
+      //
+      continue;
+    }
+
+    if (!TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
+      //
+      // Skip Disabled processors
+      //
+      continue;
+    }
+
+    if (CpuData->WaitEvent) {
+      CheckThisAPStatus (NULL, (VOID *)CpuData);
+    }
   }
 }
 
@@ -1324,8 +1356,6 @@ InitMpSystemData (
   VOID
   )
 {
-  UINTN          ProcessorNumber;
-  CPU_DATA_BLOCK *CpuData;
   EFI_STATUS     Status;
 
   ZeroMem (&mMpSystemData, sizeof (MP_SYSTEM_DATA));
@@ -1345,17 +1375,15 @@ InitMpSystemData (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  for (ProcessorNumber = 0; ProcessorNumber < gMaxLogicalProcessorNumber; ProcessorNumber++) {
-    CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
-    Status = gBS->CreateEvent (
-                    EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
-                    CheckThisAPStatus,
-                    (VOID *) CpuData,
-                    &CpuData->CheckThisAPEvent
-                    );
-    ASSERT_EFI_ERROR (Status);
-  }
+  //
+  // Set timer to check all APs status.
+  //
+  Status = gBS->SetTimer (
+                  mMpSystemData.CheckAllAPsEvent,
+                  TimerPeriodic,
+                  EFI_TIMER_PERIOD_MICROSECONDS (100)
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // BSP
