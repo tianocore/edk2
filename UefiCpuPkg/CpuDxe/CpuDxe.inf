@@ -46,6 +46,8 @@
   CpuDxe.c
   CpuDxe.h
   CpuGdt.c
+  CpuMp.c
+  CpuMp.h
 
 [Sources.IA32]
   Ia32/CpuAsm.asm | MSFT

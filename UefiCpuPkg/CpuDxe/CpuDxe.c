@@ -13,6 +13,7 @@
 **/
 
 #include "CpuDxe.h"
+#include "CpuMp.h"
 
 //
 // Global Variables
@@ -896,6 +897,8 @@ InitializeCpu (
                   &IdleLoopEvent
                   );
   ASSERT_EFI_ERROR (Status);
+
+  InitializeMpSupport ();
 
   return Status;
 }
