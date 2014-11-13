@@ -1231,6 +1231,7 @@ CheckAllAPsStatus (
 {
   CPU_DATA_BLOCK *CpuData;
   UINTN          Number;
+  EFI_STATUS     Status;
 
   if (mMpSystemData.TimeoutActive) {
     mMpSystemData.Timeout -= gPollInterval;
@@ -1239,6 +1240,16 @@ CheckAllAPsStatus (
   if (mStopCheckAllAPsStatus) {
     return;
   }
+
+  //
+  // avoid next timer enter.
+  //
+  Status = gBS->SetTimer (
+                  mMpSystemData.CheckAllAPsEvent,
+                  TimerCancel,
+                  0
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   if (mMpSystemData.WaitEvent != NULL) {
     CheckAndUpdateAllAPsToIdleState ();
@@ -1254,13 +1265,15 @@ CheckAllAPsStatus (
     }
 
     if (mMpSystemData.FinishCount != mMpSystemData.StartCount) {
-      return;
+      goto EXIT;
     }
 
     mMpSystemData.TimeoutActive = FALSE;
     gBS->SignalEvent (mMpSystemData.WaitEvent);
     mMpSystemData.WaitEvent = NULL;
     mStopCheckAllAPsStatus = TRUE;
+
+    goto EXIT;
   }
 
   //
@@ -1286,6 +1299,14 @@ CheckAllAPsStatus (
       CheckThisAPStatus (NULL, (VOID *)CpuData);
     }
   }
+
+EXIT:
+  Status = gBS->SetTimer (
+                  mMpSystemData.CheckAllAPsEvent,
+                  TimerPeriodic,
+                  EFI_TIMER_PERIOD_MICROSECONDS (100)
+                  );
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**
