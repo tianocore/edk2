@@ -1108,9 +1108,40 @@ ProcessorToIdleState (
   IN      VOID                      *Context2   OPTIONAL
   )
 {
-  DEBUG ((DEBUG_INFO, "Ap apicid is %d\n", GetApicId ()));
+  UINTN                 ProcessorNumber;
+  CPU_DATA_BLOCK        *CpuData;
+  EFI_AP_PROCEDURE      Procedure;
+  VOID                  *ProcedureArgument;
+
+  WhoAmI (&mMpServicesTemplate, &ProcessorNumber);
+  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
 
   AsmApDoneWithCommonStack ();
+
+  while (TRUE) {
+    while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+      CpuPause ();
+    }
+
+    ProcedureArgument = CpuData->Parameter;
+    Procedure = CpuData->Procedure;
+    ReleaseSpinLock (&CpuData->CpuDataLock);
+
+    if (Procedure != NULL) {
+      Procedure (ProcedureArgument);
+
+      while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+        CpuPause ();
+      }
+
+      CpuData->Procedure = NULL;
+      ReleaseSpinLock (&CpuData->CpuDataLock);
+
+      SetApState (CpuData, CpuStateFinished);
+    }
+
+    CpuPause ();
+  }
 
   CpuSleep ();
   CpuDeadLoop ();
