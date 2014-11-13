@@ -30,7 +30,7 @@ EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   GetProcessorInfo,
   StartupAllAPs,
   StartupThisAP,
-  NULL, // SwitchBSP,
+  SwitchBSP,
   EnableDisableAP,
   WhoAmI
 };
@@ -889,6 +889,55 @@ StartupThisAP (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  This service switches the requested AP to be the BSP from that point onward.
+  This service changes the BSP for all purposes.   This call can only be performed
+  by the current BSP.
+
+  This service switches the requested AP to be the BSP from that point onward.
+  This service changes the BSP for all purposes. The new BSP can take over the
+  execution of the old BSP and continue seamlessly from where the old one left
+  off. This service may not be supported after the UEFI Event EFI_EVENT_GROUP_READY_TO_BOOT
+  is signaled.
+
+  If the BSP cannot be switched prior to the return from this service, then
+  EFI_UNSUPPORTED must be returned.
+
+  @param[in] This              A pointer to the EFI_MP_SERVICES_PROTOCOL instance.
+  @param[in] ProcessorNumber   The handle number of AP that is to become the new
+                               BSP. The range is from 0 to the total number of
+                               logical processors minus 1. The total number of
+                               logical processors can be retrieved by
+                               EFI_MP_SERVICES_PROTOCOL.GetNumberOfProcessors().
+  @param[in] EnableOldBSP      If TRUE, then the old BSP will be listed as an
+                               enabled AP. Otherwise, it will be disabled.
+
+  @retval EFI_SUCCESS             BSP successfully switched.
+  @retval EFI_UNSUPPORTED         Switching the BSP cannot be completed prior to
+                                  this service returning.
+  @retval EFI_UNSUPPORTED         Switching the BSP is not supported.
+  @retval EFI_SUCCESS             The calling processor is an AP.
+  @retval EFI_NOT_FOUND           The processor with the handle specified by
+                                  ProcessorNumber does not exist.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the current BSP or
+                                  a disabled AP.
+  @retval EFI_NOT_READY           The specified AP is busy.
+
+**/
+EFI_STATUS
+EFIAPI
+SwitchBSP (
+  IN EFI_MP_SERVICES_PROTOCOL  *This,
+  IN  UINTN                    ProcessorNumber,
+  IN  BOOLEAN                  EnableOldBSP
+  )
+{
+   //
+   // Current always return unsupported.
+   //
+   return EFI_UNSUPPORTED;
 }
 
 /**
