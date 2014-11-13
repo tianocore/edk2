@@ -25,6 +25,28 @@ VOID *mApStackStart = 0;
 volatile UINTN mNumberOfProcessors;
 
 /**
+  Application Processors do loop routine
+  after switch to its own stack.
+
+  @param  Context1    A pointer to the context to pass into the function.
+  @param  Context2    A pointer to the context to pass into the function.
+
+**/
+VOID
+ProcessorToIdleState (
+  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context2   OPTIONAL
+  )
+{
+  DEBUG ((DEBUG_INFO, "Ap apicid is %d\n", GetApicId ()));
+
+  AsmApDoneWithCommonStack ();
+
+  CpuSleep ();
+  CpuDeadLoop ();
+}
+
+/**
   Application Processor C code entry point.
 
 **/
@@ -35,6 +57,13 @@ ApEntryPointInC (
   )
 {
   mNumberOfProcessors++;
+  mApStackStart = (UINT8*)mApStackStart + gApStackSize;
+
+  SwitchStack (
+    (SWITCH_STACK_ENTRY_POINT)(UINTN)ProcessorToIdleState,
+    NULL,
+    NULL,
+    mApStackStart);
 }
 
 
