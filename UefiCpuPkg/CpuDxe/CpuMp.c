@@ -25,7 +25,7 @@ VOID *mCommonStack = 0;
 VOID *mTopOfApCommonStack = 0;
 VOID *mApStackStart = 0;
 
-BOOLEAN mAPsAlreadyInitFinished = FALSE;
+volatile BOOLEAN mAPsAlreadyInitFinished = FALSE;
 volatile BOOLEAN mStopCheckAllAPsStatus = TRUE;
 
 EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
@@ -1135,10 +1135,14 @@ ProcessorToIdleState (
   EFI_AP_PROCEDURE      Procedure;
   VOID                  *ProcedureArgument;
 
+  AsmApDoneWithCommonStack ();
+
+  while (!mAPsAlreadyInitFinished) {
+    CpuPause ();
+  }
+
   WhoAmI (&mMpServicesTemplate, &ProcessorNumber);
   CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
-
-  AsmApDoneWithCommonStack ();
 
   //
   // Avoid forcibly reset AP caused the AP State is not updated.
@@ -1485,6 +1489,11 @@ InitializeMpSupport (
     FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
     return;
   }
+
+  mMpSystemData.CpuDatas = ReallocatePool (
+                             sizeof (CPU_DATA_BLOCK) * gMaxLogicalProcessorNumber,
+                             sizeof (CPU_DATA_BLOCK) * mMpSystemData.NumberOfProcessors,
+                             mMpSystemData.CpuDatas);
 
   mAPsAlreadyInitFinished = TRUE;
 
