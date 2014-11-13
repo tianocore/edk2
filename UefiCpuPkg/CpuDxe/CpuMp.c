@@ -38,6 +38,36 @@ EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
 };
 
 /**
+   Get Mp Service Lock.
+
+  @param   CpuData    the pointer to CPU_DATA_BLOCK of specified processor
+
+**/
+VOID
+GetMpSpinLock (
+  IN  CPU_DATA_BLOCK  *CpuData
+  )
+{
+  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+    CpuPause ();
+  }
+}
+
+/**
+   Release Mp Service Lock.
+
+  @param   CpuData    the pointer to CPU_DATA_BLOCK of specified processor
+
+**/
+VOID
+ReleaseMpSpinLock (
+  IN  CPU_DATA_BLOCK  *CpuData
+  )
+{
+  ReleaseSpinLock (&CpuData->CpuDataLock);
+}
+
+/**
   Check whether caller processor is BSP.
 
   @retval  TRUE       the caller is BSP
@@ -75,12 +105,9 @@ GetApState (
 {
   CPU_STATE State;
 
-  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-    CpuPause ();
-  }
-
+  GetMpSpinLock (CpuData);
   State = CpuData->State;
-  ReleaseSpinLock (&CpuData->CpuDataLock);
+  ReleaseMpSpinLock (CpuData);
 
   return State;
 }
@@ -98,12 +125,9 @@ SetApState (
   IN  CPU_STATE        State
   )
 {
-  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-    CpuPause ();
-  }
-
+  GetMpSpinLock (CpuData);
   CpuData->State = State;
-  ReleaseSpinLock (&CpuData->CpuDataLock);
+  ReleaseMpSpinLock (CpuData);
 }
 
 /**
@@ -122,13 +146,10 @@ SetApProcedure (
   IN   VOID                  *ProcedureArgument
   )
 {
-  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-    CpuPause ();
-  }
-
+  GetMpSpinLock (CpuData);
   CpuData->Parameter  = ProcedureArgument;
   CpuData->Procedure  = Procedure;
-  ReleaseSpinLock (&CpuData->CpuDataLock);
+  ReleaseMpSpinLock (CpuData);
 }
 
 /**
@@ -149,12 +170,9 @@ TestCpuStatusFlag (
 {
   UINT32 Ret;
 
-  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-    CpuPause ();
-  }
-
+  GetMpSpinLock (CpuData);
   Ret = CpuData->Info.StatusFlag & Flags;
-  ReleaseSpinLock (&CpuData->CpuDataLock);
+  ReleaseMpSpinLock (CpuData);
 
   return !!(Ret);
 }
@@ -172,12 +190,9 @@ CpuStatusFlagOr (
   IN  UINT32          Flags
   )
 {
-  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-    CpuPause ();
-  }
-
+  GetMpSpinLock (CpuData);
   CpuData->Info.StatusFlag |= Flags;
-  ReleaseSpinLock (&CpuData->CpuDataLock);
+  ReleaseMpSpinLock (CpuData);
 }
 
 /**
@@ -193,12 +208,9 @@ CpuStatusFlagAndNot (
   IN  UINT32          Flags
   )
 {
-  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-    CpuPause ();
-  }
-
+  GetMpSpinLock (CpuData);
   CpuData->Info.StatusFlag &= ~Flags;
-  ReleaseSpinLock (&CpuData->CpuDataLock);
+  ReleaseMpSpinLock (CpuData);
 }
 
 /**
@@ -1127,25 +1139,18 @@ ProcessorToIdleState (
   AsmApDoneWithCommonStack ();
 
   while (TRUE) {
-    while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-      CpuPause ();
-    }
-
+    GetMpSpinLock (CpuData);
     ProcedureArgument = CpuData->Parameter;
     Procedure = CpuData->Procedure;
-    ReleaseSpinLock (&CpuData->CpuDataLock);
+    ReleaseMpSpinLock (CpuData);
 
     if (Procedure != NULL) {
       Procedure (ProcedureArgument);
 
-      while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
-        CpuPause ();
-      }
-
+      GetMpSpinLock (CpuData);
       CpuData->Procedure = NULL;
-      ReleaseSpinLock (&CpuData->CpuDataLock);
-
-      SetApState (CpuData, CpuStateFinished);
+      CpuData->State = CpuStateFinished;
+      ReleaseMpSpinLock (CpuData);
     }
 
     CpuPause ();
