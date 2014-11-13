@@ -26,7 +26,7 @@ VOID *mApStackStart = 0;
 
 EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   GetNumberOfProcessors,
-  NULL, // GetProcessorInfo,
+  GetProcessorInfo,
   NULL, // StartupAllAPs,
   NULL, // StartupThisAP,
   NULL, // SwitchBSP,
@@ -111,6 +111,56 @@ GetNumberOfProcessors (
 
   *NumberOfProcessors        = mMpSystemData.NumberOfProcessors;
   *NumberOfEnabledProcessors = mMpSystemData.NumberOfEnabledProcessors;
+  return EFI_SUCCESS;
+}
+
+/**
+  Gets detailed MP-related information on the requested processor at the
+  instant this call is made. This service may only be called from the BSP.
+
+  This service retrieves detailed MP-related information about any processor
+  on the platform. Note the following:
+    - The processor information may change during the course of a boot session.
+    - The information presented here is entirely MP related.
+
+  Information regarding the number of caches and their sizes, frequency of operation,
+  slot numbers is all considered platform-related information and is not provided
+  by this service.
+
+  @param[in]  This                  A pointer to the EFI_MP_SERVICES_PROTOCOL
+                                    instance.
+  @param[in]  ProcessorNumber       The handle number of processor.
+  @param[out] ProcessorInfoBuffer   A pointer to the buffer where information for
+                                    the requested processor is deposited.
+
+  @retval EFI_SUCCESS             Processor information was returned.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_INVALID_PARAMETER   ProcessorInfoBuffer is NULL.
+  @retval EFI_NOT_FOUND           The processor with the handle specified by
+                                  ProcessorNumber does not exist in the platform.
+
+**/
+EFI_STATUS
+EFIAPI
+GetProcessorInfo (
+  IN  EFI_MP_SERVICES_PROTOCOL   *This,
+  IN  UINTN                      ProcessorNumber,
+  OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
+  )
+{
+  if (ProcessorInfoBuffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsBSP ()) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (ProcessorNumber >= mMpSystemData.NumberOfProcessors) {
+    return EFI_NOT_FOUND;
+  }
+
+  CopyMem (ProcessorInfoBuffer, &mMpSystemData.CpuDatas[ProcessorNumber], sizeof (EFI_PROCESSOR_INFORMATION));
   return EFI_SUCCESS;
 }
 
