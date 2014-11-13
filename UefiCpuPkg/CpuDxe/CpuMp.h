@@ -16,6 +16,7 @@
 #define _CPU_MP_H_
 
 #include <Protocol/MpService.h>
+#include <Library/SynchronizationLib.h>
 
 /**
   Initialize Multi-processor support.
@@ -75,6 +76,52 @@ VOID
 EFIAPI
 AsmApDoneWithCommonStack (
   VOID
+  );
+
+typedef enum {
+  CpuStateIdle,
+  CpuStateBlocked,
+  CpuStateReady,
+  CpuStateBuzy,
+  CpuStateFinished
+} CPU_STATE;
+
+/**
+  Define Individual Processor Data block.
+
+**/
+typedef struct {
+  EFI_PROCESSOR_INFORMATION      Info;
+  SPIN_LOCK                      CpuDataLock;
+  volatile CPU_STATE             State;
+
+  EFI_AP_PROCEDURE               Procedure;
+  VOID                           *Parameter;
+} CPU_DATA_BLOCK;
+
+/**
+  Define MP data block which consumes individual processor block.
+
+**/
+typedef struct {
+  CPU_DATA_BLOCK              *CpuDatas;
+  UINTN                       NumberOfProcessors;
+  UINTN                       NumberOfEnabledProcessors;
+} MP_SYSTEM_DATA;
+
+/**
+  This function is called by all processors (both BSP and AP) once and collects MP related data.
+
+  @param Bsp             TRUE if the CPU is BSP
+  @param ProcessorNumber The specific processor number
+
+  @retval EFI_SUCCESS    Data for the processor collected and filled in
+
+**/
+EFI_STATUS
+FillInProcessorInformation (
+  IN     BOOLEAN              Bsp,
+  IN     UINTN                ProcessorNumber
   );
 
 #endif // _CPU_MP_H_

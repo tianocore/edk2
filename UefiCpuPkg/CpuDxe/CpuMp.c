@@ -18,11 +18,11 @@
 UINTN gMaxLogicalProcessorNumber;
 UINTN gApStackSize;
 
+MP_SYSTEM_DATA mMpSystemData;
+
 VOID *mCommonStack = 0;
 VOID *mTopOfApCommonStack = 0;
 VOID *mApStackStart = 0;
-
-volatile UINTN mNumberOfProcessors;
 
 EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   NULL, // GetNumberOfProcessors,
@@ -66,16 +66,84 @@ ApEntryPointInC (
   VOID
   )
 {
-  mNumberOfProcessors++;
-  mApStackStart = (UINT8*)mApStackStart + gApStackSize;
+  VOID* TopOfApStack;
+
+  FillInProcessorInformation (FALSE, mMpSystemData.NumberOfProcessors);
+  TopOfApStack  = (UINT8*)mApStackStart + gApStackSize;
+  mApStackStart = TopOfApStack;
+
+  mMpSystemData.NumberOfProcessors++;
 
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)ProcessorToIdleState,
     NULL,
     NULL,
-    mApStackStart);
+    TopOfApStack);
 }
 
+/**
+  This function is called by all processors (both BSP and AP) once and collects MP related data.
+
+  @param Bsp             TRUE if the CPU is BSP
+  @param ProcessorNumber The specific processor number
+
+  @retval EFI_SUCCESS    Data for the processor collected and filled in
+
+**/
+EFI_STATUS
+FillInProcessorInformation (
+  IN     BOOLEAN              Bsp,
+  IN     UINTN                ProcessorNumber
+  )
+{
+  CPU_DATA_BLOCK  *CpuData;
+  UINT32          ProcessorId;
+
+  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
+  ProcessorId  = GetApicId ();
+  CpuData->Info.ProcessorId  = ProcessorId;
+  CpuData->Info.StatusFlag   = PROCESSOR_ENABLED_BIT | PROCESSOR_HEALTH_STATUS_BIT;
+  if (Bsp) {
+    CpuData->Info.StatusFlag |= PROCESSOR_AS_BSP_BIT;
+  }
+  CpuData->Info.Location.Package = ProcessorId;
+  CpuData->Info.Location.Core    = 0;
+  CpuData->Info.Location.Thread  = 0;
+  CpuData->State = Bsp ? CpuStateBuzy : CpuStateIdle;
+
+  CpuData->Procedure        = NULL;
+  CpuData->Parameter        = NULL;
+  InitializeSpinLock (&CpuData->CpuDataLock);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Prepare the System Data.
+
+  @retval EFI_SUCCESS     the System Data finished initilization.
+
+**/
+EFI_STATUS
+InitMpSystemData (
+  VOID
+  )
+{
+  ZeroMem (&mMpSystemData, sizeof (MP_SYSTEM_DATA));
+
+  mMpSystemData.NumberOfProcessors = 1;
+  mMpSystemData.NumberOfEnabledProcessors = 1;
+
+  mMpSystemData.CpuDatas = AllocateZeroPool (sizeof (CPU_DATA_BLOCK) * gMaxLogicalProcessorNumber);
+  ASSERT(mMpSystemData.CpuDatas != NULL);
+
+  //
+  // BSP
+  //
+  FillInProcessorInformation (TRUE, 0);
+
+  return EFI_SUCCESS;
+}
 
 /**
   Initialize Multi-processor support.
@@ -110,15 +178,16 @@ InitializeMpSupport (
   mTopOfApCommonStack = (UINT8*) mApStackStart + gApStackSize;
   mApStackStart = mTopOfApCommonStack;
 
-  mNumberOfProcessors = 1;
+  InitMpSystemData ();
 
-  if (mNumberOfProcessors == 1) {
+  if (mMpSystemData.NumberOfProcessors == 1) {
     FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
     return;
   }
 
-  if (mNumberOfProcessors < gMaxLogicalProcessorNumber) {
-    FreePages (mApStackStart, EFI_SIZE_TO_PAGES ((gMaxLogicalProcessorNumber - mNumberOfProcessors) *
-                                                 gApStackSize));
+  if (mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
+    FreePages (mApStackStart, EFI_SIZE_TO_PAGES (
+                                (gMaxLogicalProcessorNumber - mMpSystemData.NumberOfProcessors) *
+                                gApStackSize));
   }
 }

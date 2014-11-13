@@ -42,6 +42,7 @@
   UefiLib
   CpuExceptionHandlerLib
   TimerLib
+  SynchronizationLib
 
 [Sources]
   ApStartup.c
