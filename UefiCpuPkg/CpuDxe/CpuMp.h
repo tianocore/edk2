@@ -15,6 +15,8 @@
 #ifndef _CPU_MP_H_
 #define _CPU_MP_H_
 
+#include <Protocol/MpService.h>
+
 /**
   Initialize Multi-processor support.
 

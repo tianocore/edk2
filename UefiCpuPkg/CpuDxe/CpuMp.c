@@ -24,6 +24,16 @@ VOID *mApStackStart = 0;
 
 volatile UINTN mNumberOfProcessors;
 
+EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
+  NULL, // GetNumberOfProcessors,
+  NULL, // GetProcessorInfo,
+  NULL, // StartupAllAPs,
+  NULL, // StartupThisAP,
+  NULL, // SwitchBSP,
+  NULL, // EnableDisableAP,
+  NULL  // WhoAmI
+};
+
 /**
   Application Processors do loop routine
   after switch to its own stack.
