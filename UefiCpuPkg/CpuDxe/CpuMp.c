@@ -20,6 +20,7 @@ UINTN gApStackSize;
 UINTN gPollInterval = 100; // 100 microseconds
 
 MP_SYSTEM_DATA mMpSystemData;
+EFI_HANDLE     mMpServiceHandle = NULL;
 
 VOID *mCommonStack = 0;
 VOID *mTopOfApCommonStack = 0;
@@ -1472,6 +1473,8 @@ InitializeMpSupport (
   VOID
   )
 {
+  EFI_STATUS Status;
+
   gMaxLogicalProcessorNumber = (UINTN) PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
   if (gMaxLogicalProcessorNumber < 1) {
     DEBUG ((DEBUG_ERROR, "Setting PcdCpuMaxLogicalProcessorNumber should be more than zero.\n"));
@@ -1515,6 +1518,13 @@ InitializeMpSupport (
                              mMpSystemData.CpuDatas);
 
   mAPsAlreadyInitFinished = TRUE;
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mMpServiceHandle,
+                  &gEfiMpServiceProtocolGuid,  &mMpServicesTemplate,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   if (mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
     FreePages (mApStackStart, EFI_SIZE_TO_PAGES (
