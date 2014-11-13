@@ -24,6 +24,30 @@ InitializeMpSupport (
   VOID
   );
 
+typedef
+VOID
+(EFIAPI *STACKLESS_AP_ENTRY_POINT)(
+  VOID
+  );
+
+/**
+  Starts the Application Processors and directs them to jump to the
+  specified routine.
+
+  The processor jumps to this code in flat mode, but the processor's
+  stack is not initialized.
+
+  @param ApEntryPoint    Pointer to the Entry Point routine
+
+  @retval EFI_SUCCESS           The APs were started
+  @retval EFI_OUT_OF_RESOURCES  Cannot allocate memory to start APs
+
+**/
+EFI_STATUS
+StartApsStackless (
+  IN STACKLESS_AP_ENTRY_POINT ApEntryPoint
+  );
+
 /**
   The AP entry point that the Startup-IPI target code will jump to.
 

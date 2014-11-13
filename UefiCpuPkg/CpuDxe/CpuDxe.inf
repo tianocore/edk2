@@ -41,11 +41,14 @@
   UefiCpuLib
   UefiLib
   CpuExceptionHandlerLib
+  TimerLib
 
 [Sources]
+  ApStartup.c
   CpuDxe.c
   CpuDxe.h
   CpuGdt.c
+  CpuGdt.h
   CpuMp.c
   CpuMp.h
 
