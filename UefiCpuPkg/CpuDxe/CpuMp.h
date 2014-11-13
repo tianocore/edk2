@@ -124,5 +124,36 @@ FillInProcessorInformation (
   IN     UINTN                ProcessorNumber
   );
 
+/**
+  This return the handle number for the calling processor.  This service may be
+  called from the BSP and APs.
+
+  This service returns the processor handle number for the calling processor.
+  The returned value is in the range from 0 to the total number of logical
+  processors minus 1. The total number of logical processors can be retrieved
+  with EFI_MP_SERVICES_PROTOCOL.GetNumberOfProcessors(). This service may be
+  called from the BSP and APs. If ProcessorNumber is NULL, then EFI_INVALID_PARAMETER
+  is returned. Otherwise, the current processors handle number is returned in
+  ProcessorNumber, and EFI_SUCCESS is returned.
+
+  @param[in]  This             A pointer to the EFI_MP_SERVICES_PROTOCOL instance.
+  @param[out] ProcessorNumber  The handle number of AP that is to become the new
+                               BSP. The range is from 0 to the total number of
+                               logical processors minus 1. The total number of
+                               logical processors can be retrieved by
+                               EFI_MP_SERVICES_PROTOCOL.GetNumberOfProcessors().
+
+  @retval EFI_SUCCESS             The current processor handle number was returned
+                                  in ProcessorNumber.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+WhoAmI (
+  IN EFI_MP_SERVICES_PROTOCOL  *This,
+  OUT UINTN                    *ProcessorNumber
+  );
+
 #endif // _CPU_MP_H_
 
