@@ -17,6 +17,7 @@
 
 UINTN gMaxLogicalProcessorNumber;
 UINTN gApStackSize;
+UINTN gPollInterval = 100; // 100 microseconds
 
 MP_SYSTEM_DATA mMpSystemData;
 
@@ -28,7 +29,7 @@ EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   GetNumberOfProcessors,
   GetProcessorInfo,
   NULL, // StartupAllAPs,
-  NULL, // StartupThisAP,
+  StartupThisAP,
   NULL, // SwitchBSP,
   EnableDisableAP,
   WhoAmI
@@ -80,6 +81,52 @@ GetApState (
   ReleaseSpinLock (&CpuData->CpuDataLock);
 
   return State;
+}
+
+/**
+  Set the Application Processors state.
+
+  @param   CpuData    The pointer to CPU_DATA_BLOCK of specified AP
+  @param   State      The AP status
+
+**/
+VOID
+SetApState (
+  IN  CPU_DATA_BLOCK   *CpuData,
+  IN  CPU_STATE        State
+  )
+{
+  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+    CpuPause ();
+  }
+
+  CpuData->State = State;
+  ReleaseSpinLock (&CpuData->CpuDataLock);
+}
+
+/**
+  Set the Application Processor prepare to run a function specified
+  by Params.
+
+  @param CpuData           the pointer to CPU_DATA_BLOCK of specified AP
+  @param Procedure         A pointer to the function to be run on enabled APs of the system
+  @param ProcedureArgument Pointer to the optional parameter of the assigned function
+
+**/
+VOID
+SetApProcedure (
+  IN   CPU_DATA_BLOCK        *CpuData,
+  IN   EFI_AP_PROCEDURE      Procedure,
+  IN   VOID                  *ProcedureArgument
+  )
+{
+  while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
+    CpuPause ();
+  }
+
+  CpuData->Parameter  = ProcedureArgument;
+  CpuData->Procedure  = Procedure;
+  ReleaseSpinLock (&CpuData->CpuDataLock);
 }
 
 /**
@@ -150,6 +197,45 @@ CpuStatusFlagAndNot (
 
   CpuData->Info.StatusFlag &= ~Flags;
   ReleaseSpinLock (&CpuData->CpuDataLock);
+}
+
+/**
+  Searches for the next blocking AP.
+
+  Search for the next AP that is put in blocking state by single-threaded StartupAllAPs().
+
+  @param  NextNumber           Pointer to the processor number of the next blocking AP.
+
+  @retval EFI_SUCCESS          The next blocking AP has been found.
+  @retval EFI_NOT_FOUND        No blocking AP exists.
+
+**/
+EFI_STATUS
+GetNextBlockedNumber (
+  OUT UINTN  *NextNumber
+  )
+{
+  UINTN                 Number;
+  CPU_STATE             CpuState;
+  CPU_DATA_BLOCK        *CpuData;
+
+  for (Number = 0; Number < mMpSystemData.NumberOfProcessors; Number++) {
+    CpuData = &mMpSystemData.CpuDatas[Number];
+    if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
+      //
+      // Skip BSP
+      //
+      continue;
+    }
+
+    CpuState = GetApState (CpuData);
+    if (CpuState == CpuStateBlocked) {
+      *NextNumber = Number;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -256,6 +342,177 @@ GetProcessorInfo (
   }
 
   CopyMem (ProcessorInfoBuffer, &mMpSystemData.CpuDatas[ProcessorNumber], sizeof (EFI_PROCESSOR_INFORMATION));
+  return EFI_SUCCESS;
+}
+
+/**
+  This service lets the caller get one enabled AP to execute a caller-provided
+  function. The caller can request the BSP to either wait for the completion
+  of the AP or just proceed with the next task by using the EFI event mechanism.
+  See EFI_MP_SERVICES_PROTOCOL.StartupAllAPs() for more details on non-blocking
+  execution support.  This service may only be called from the BSP.
+
+  This function is used to dispatch one enabled AP to the function specified by
+  Procedure passing in the argument specified by ProcedureArgument.  If WaitEvent
+  is NULL, execution is in blocking mode. The BSP waits until the AP finishes or
+  TimeoutInMicroSecondss expires. Otherwise, execution is in non-blocking mode.
+  BSP proceeds to the next task without waiting for the AP. If a non-blocking mode
+  is requested after the UEFI Event EFI_EVENT_GROUP_READY_TO_BOOT is signaled,
+  then EFI_UNSUPPORTED must be returned.
+
+  If the timeout specified by TimeoutInMicroseconds expires before the AP returns
+  from Procedure, then execution of Procedure by the AP is terminated. The AP is
+  available for subsequent calls to EFI_MP_SERVICES_PROTOCOL.StartupAllAPs() and
+  EFI_MP_SERVICES_PROTOCOL.StartupThisAP().
+
+  @param[in]  This                    A pointer to the EFI_MP_SERVICES_PROTOCOL
+                                      instance.
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled APs of the system. See type
+                                      EFI_AP_PROCEDURE.
+  @param[in]  ProcessorNumber         The handle number of the AP. The range is
+                                      from 0 to the total number of logical
+                                      processors minus 1. The total number of
+                                      logical processors can be retrieved by
+                                      EFI_MP_SERVICES_PROTOCOL.GetNumberOfProcessors().
+  @param[in]  WaitEvent               The event created by the caller with CreateEvent()
+                                      service.  If it is NULL, then execute in
+                                      blocking mode. BSP waits until all APs finish
+                                      or TimeoutInMicroseconds expires.  If it's
+                                      not NULL, then execute in non-blocking mode.
+                                      BSP requests the function specified by
+                                      Procedure to be started on all the enabled
+                                      APs, and go on executing immediately. If
+                                      all return from Procedure or TimeoutInMicroseconds
+                                      expires, this event is signaled. The BSP
+                                      can use the CheckEvent() or WaitForEvent()
+                                      services to check the state of event.  Type
+                                      EFI_EVENT is defined in CreateEvent() in
+                                      the Unified Extensible Firmware Interface
+                                      Specification.
+  @param[in]  TimeoutInMicroseconds   Indicates the time limit in microseconds for
+                                      APs to return from Procedure, either for
+                                      blocking or non-blocking mode. Zero means
+                                      infinity.  If the timeout expires before
+                                      all APs return from Procedure, then Procedure
+                                      on the failed APs is terminated. All enabled
+                                      APs are available for next function assigned
+                                      by EFI_MP_SERVICES_PROTOCOL.StartupAllAPs()
+                                      or EFI_MP_SERVICES_PROTOCOL.StartupThisAP().
+                                      If the timeout expires in blocking mode,
+                                      BSP returns EFI_TIMEOUT.  If the timeout
+                                      expires in non-blocking mode, WaitEvent
+                                      is signaled with SignalEvent().
+  @param[in]  ProcedureArgument       The parameter passed into Procedure for
+                                      all APs.
+  @param[out] Finished                If NULL, this parameter is ignored.  In
+                                      blocking mode, this parameter is ignored.
+                                      In non-blocking mode, if AP returns from
+                                      Procedure before the timeout expires, its
+                                      content is set to TRUE. Otherwise, the
+                                      value is set to FALSE. The caller can
+                                      determine if the AP returned from Procedure
+                                      by evaluating this value.
+
+  @retval EFI_SUCCESS             In blocking mode, specified AP finished before
+                                  the timeout expires.
+  @retval EFI_SUCCESS             In non-blocking mode, the function has been
+                                  dispatched to specified AP.
+  @retval EFI_UNSUPPORTED         A non-blocking mode request was made after the
+                                  UEFI event EFI_EVENT_GROUP_READY_TO_BOOT was
+                                  signaled.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_TIMEOUT             In blocking mode, the timeout expired before
+                                  the specified AP has finished.
+  @retval EFI_NOT_READY           The specified AP is busy.
+  @retval EFI_NOT_FOUND           The processor with the handle specified by
+                                  ProcessorNumber does not exist.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the BSP or disabled AP.
+  @retval EFI_INVALID_PARAMETER   Procedure is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+StartupThisAP (
+  IN  EFI_MP_SERVICES_PROTOCOL  *This,
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  UINTN                     ProcessorNumber,
+  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL,
+  OUT BOOLEAN                   *Finished               OPTIONAL
+  )
+{
+  CPU_DATA_BLOCK        *CpuData;
+  EFI_STATUS            Status;
+
+  CpuData = NULL;
+
+  if (Finished != NULL) {
+    *Finished = FALSE;
+  }
+
+  if (!IsBSP ()) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (Procedure == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ProcessorNumber >= mMpSystemData.NumberOfProcessors) {
+    return EFI_NOT_FOUND;
+  }
+
+  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
+  if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT) ||
+      !TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (GetApState (CpuData) != CpuStateIdle) {
+    return EFI_NOT_READY;
+  }
+
+  SetApState (CpuData, CpuStateReady);
+
+  SetApProcedure (CpuData, Procedure, ProcedureArgument);
+
+  CpuData->Timeout = TimeoutInMicroseconds;
+  CpuData->WaitEvent = WaitEvent;
+  CpuData->TimeoutActive = !!(TimeoutInMicroseconds);
+  CpuData->Finished = Finished;
+
+  if (WaitEvent != NULL) {
+    //
+    // Non Blocking
+    //
+    Status = gBS->SetTimer (
+                    CpuData->CheckThisAPEvent,
+                    TimerPeriodic,
+                    EFI_TIMER_PERIOD_MICROSECONDS (100)
+                    );
+    return Status;
+  }
+
+  //
+  // Blocking
+  //
+  while (TRUE) {
+    if (GetApState (CpuData) == CpuStateFinished) {
+      SetApState (CpuData, CpuStateIdle);
+      break;
+    }
+
+    if (CpuData->TimeoutActive && CpuData->Timeout < 0) {
+      ResetProcessorToIdleState (CpuData);
+      return EFI_TIMEOUT;
+    }
+
+    gBS->Stall (gPollInterval);
+    CpuData->Timeout -= gPollInterval;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -398,6 +655,22 @@ WhoAmI (
 }
 
 /**
+  Terminate AP's task and set it to idle state.
+
+  This function terminates AP's task due to timeout by sending INIT-SIPI,
+  and sends it to idle state.
+
+  @param CpuData           the pointer to CPU_DATA_BLOCK of specified AP
+
+**/
+VOID
+ResetProcessorToIdleState (
+  IN CPU_DATA_BLOCK  *CpuData
+  )
+{
+}
+
+/**
   Application Processors do loop routine
   after switch to its own stack.
 
@@ -417,6 +690,60 @@ ProcessorToIdleState (
 
   CpuSleep ();
   CpuDeadLoop ();
+}
+
+/**
+  Checks AP' status periodically.
+
+  This function is triggerred by timer perodically to check the
+  state of AP forStartupThisAP() executed in non-blocking mode.
+
+  @param  Event    Event triggered.
+  @param  Context  Parameter passed with the event.
+
+**/
+VOID
+EFIAPI
+CheckThisAPStatus (
+  IN  EFI_EVENT        Event,
+  IN  VOID             *Context
+  )
+{
+  CPU_DATA_BLOCK  *CpuData;
+  CPU_STATE       CpuState;
+
+  CpuData = (CPU_DATA_BLOCK *) Context;
+  if (CpuData->TimeoutActive) {
+    CpuData->Timeout -= gPollInterval;
+  }
+
+  CpuState = GetApState (CpuData);
+
+  if (CpuState == CpuStateFinished) {
+    if (CpuData->Finished) {
+      *CpuData->Finished = TRUE;
+    }
+    SetApState (CpuData, CpuStateIdle);
+    goto out;
+  }
+
+  if (CpuData->TimeoutActive && CpuData->Timeout < 0) {
+    if (CpuState != CpuStateIdle &&
+        CpuData->Finished) {
+      *CpuData->Finished = FALSE;
+    }
+    ResetProcessorToIdleState (CpuData);
+    goto out;
+  }
+
+  return;
+
+out:
+  gBS->SetTimer (CpuData->CheckThisAPEvent, TimerCancel, 0);
+  if (CpuData->WaitEvent) {
+    gBS->SignalEvent (CpuData->WaitEvent);
+    CpuData->WaitEvent = NULL;
+  }
 }
 
 /**
@@ -492,6 +819,10 @@ InitMpSystemData (
   VOID
   )
 {
+  UINTN          ProcessorNumber;
+  CPU_DATA_BLOCK *CpuData;
+  EFI_STATUS     Status;
+
   ZeroMem (&mMpSystemData, sizeof (MP_SYSTEM_DATA));
 
   mMpSystemData.NumberOfProcessors = 1;
@@ -499,6 +830,18 @@ InitMpSystemData (
 
   mMpSystemData.CpuDatas = AllocateZeroPool (sizeof (CPU_DATA_BLOCK) * gMaxLogicalProcessorNumber);
   ASSERT(mMpSystemData.CpuDatas != NULL);
+
+  for (ProcessorNumber = 0; ProcessorNumber < gMaxLogicalProcessorNumber; ProcessorNumber++) {
+    CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
+    Status = gBS->CreateEvent (
+                    EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    CheckThisAPStatus,
+                    (VOID *) CpuData,
+                    &CpuData->CheckThisAPEvent
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // BSP
