@@ -33,7 +33,7 @@
 
 [Sources.AARCH64]
   AArch64/ArmGicArchLib.c
-  GicV3/AArch64/ArmGicV3.S | GCC
+  GicV3/AArch64/ArmGicV3.S
 
 [LibraryClasses]
   ArmLib
