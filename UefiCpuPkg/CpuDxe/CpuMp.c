@@ -52,6 +52,7 @@ GetMpSpinLock (
   while (!AcquireSpinLockOrFail (&CpuData->CpuDataLock)) {
     CpuPause ();
   }
+  CpuData->LockSelf = GetApicId ();
 }
 
 /**
@@ -1145,6 +1146,13 @@ ProcessorToIdleState (
   CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
 
   //
+  // Avoid forcibly reset AP caused the AP got lock not release.
+  //
+  if (CpuData->LockSelf == (INTN) GetApicId ()) {
+    ReleaseSpinLock (&CpuData->CpuDataLock);
+  }
+
+  //
   // Avoid forcibly reset AP caused the AP State is not updated.
   //
   GetMpSpinLock (CpuData);
@@ -1395,6 +1403,7 @@ FillInProcessorInformation (
   CpuData->Procedure        = NULL;
   CpuData->Parameter        = NULL;
   InitializeSpinLock (&CpuData->CpuDataLock);
+  CpuData->LockSelf         = -1;
 
   return EFI_SUCCESS;
 }
