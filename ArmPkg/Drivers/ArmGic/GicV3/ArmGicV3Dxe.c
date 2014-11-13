@@ -281,14 +281,6 @@ GicV3DxeInitialize (
     }
   }
 
-  // Make sure System Register access is enabled (SRE). This depends on the
-  // lower levels giving us permission, otherwise we will cause an exception
-  // here.
-  // Note: We do not need to set ICC_SRE_EL2.Enable because the OS is started at the
-  // same exception level.
-  // It is the OS responsibility to set this bit.
-  ArmGicV3SetControlSystemRegisterEnable (ArmGicV3GetControlSystemRegisterEnable () | ICC_SRE_EL2_SRE);
-
   // Set binary point reg to 0x7 (no preemption)
   ArmGicV3SetBinaryPointer (0x7);
 

@@ -15,6 +15,8 @@
 #include <Library/ArmLib.h>
 #include <Library/ArmGicLib.h>
 
+#include "GicV3/ArmGicV3Lib.h"
+
 ARM_GIC_ARCH_REVISION
 EFIAPI
 ArmGicGetSupportedArchRevision (
@@ -28,7 +30,17 @@ ArmGicGetSupportedArchRevision (
   // driver requires SRE. If only Memory mapped access is available we try to
   // drive the GIC as a v2.
   if (ArmReadIdPfr1 () & ARM_PFR1_GIC) {
-    return ARM_GIC_ARCH_REVISION_3;
+    // Make sure System Register access is enabled (SRE). This depends on the
+    // higher privilege level giving us permission, otherwise we will either
+    // cause an exception here, or the write doesn't stick in which case we need
+    // to fall back to the GICv2 MMIO interface.
+    // Note: We do not need to set ICC_SRE_EL2.Enable because the OS is started
+    // at the same exception level.
+    // It is the OS responsibility to set this bit.
+    ArmGicV3SetControlSystemRegisterEnable (ArmGicV3GetControlSystemRegisterEnable () | ICC_SRE_EL2_SRE);
+    if (ArmGicV3GetControlSystemRegisterEnable () & ICC_SRE_EL2_SRE) {
+      return ARM_GIC_ARCH_REVISION_3;
+    }
   }
 
   return ARM_GIC_ARCH_REVISION_2;
