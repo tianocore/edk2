@@ -253,7 +253,7 @@ PopulateRequest (
   //
   Request->Lun[0] = 1;
   Request->Lun[1] = (UINT8) Target;
-  Request->Lun[2] = (UINT8) ((Lun >> 8) | 0x40);
+  Request->Lun[2] = (UINT8) (((UINT32)Lun >> 8) | 0x40);
   Request->Lun[3] = (UINT8) Lun;
 
   //
