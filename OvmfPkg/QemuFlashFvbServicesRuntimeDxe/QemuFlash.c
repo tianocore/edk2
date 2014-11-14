@@ -54,7 +54,7 @@ QemuFlashPtr (
   IN        UINTN                               Offset
   )
 {
-  return mFlashBase + (Lba * mFdBlockSize) + Offset;
+  return mFlashBase + ((UINTN)Lba * mFdBlockSize) + Offset;
 }
 
 
