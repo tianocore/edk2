@@ -15,12 +15,14 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PciLib.h>
+#include <Library/PcdLib.h>
 #include <OvmfPlatforms.h>
 
 //
 // Power Management PCI Configuration Register fields
 //
 #define PMBA_RTE  BIT0
+#define PMIOSE    BIT0
 
 //
 // Offset in the Power Management Base Address to the ACPI Timer
@@ -33,14 +35,8 @@
 STATIC UINT32 mAcpiTimerIoAddr;
 
 /**
-  The constructor function caches the ACPI tick counter address
-
-  At the time this constructor runs (DXE_CORE or later), ACPI IO space
-  has already been enabled by either PlatformPei or by the "Base"
-  instance of this library.
-  In order to avoid querying the underlying platform type during each
-  tick counter read operation, we cache the counter address during
-  initialization of this instance of the Timer Library.
+  The constructor function caches the ACPI tick counter address, and,
+  if necessary, enables ACPI IO space.
 
   @retval EFI_SUCCESS   The constructor always returns RETURN_SUCCESS.
 
@@ -53,6 +49,7 @@ AcpiTimerLibConstructor (
 {
   UINT16 HostBridgeDevId;
   UINTN Pmba;
+  UINTN PmRegMisc;
 
   //
   // Query Host Bridge DID to determine platform type
@@ -60,10 +57,12 @@ AcpiTimerLibConstructor (
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   switch (HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
-      Pmba = POWER_MGMT_REGISTER_PIIX4 (0x40);
+      Pmba      = POWER_MGMT_REGISTER_PIIX4 (0x40);
+      PmRegMisc = POWER_MGMT_REGISTER_PIIX4 (0x80);
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
-      Pmba = POWER_MGMT_REGISTER_Q35 (0x40);
+      Pmba      = POWER_MGMT_REGISTER_Q35 (0x40);
+      PmRegMisc = POWER_MGMT_REGISTER_Q35 (0x80);
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
@@ -73,6 +72,22 @@ AcpiTimerLibConstructor (
   }
 
   mAcpiTimerIoAddr = (PciRead32 (Pmba) & ~PMBA_RTE) + ACPI_TIMER_OFFSET;
+
+  //
+  // Check to see if the Power Management Base Address is already enabled
+  //
+  if ((PciRead8 (PmRegMisc) & PMIOSE) == 0) {
+    //
+    // If the Power Management Base Address is not programmed,
+    // then program the Power Management Base Address from a PCD.
+    //
+    PciAndThenOr32 (Pmba, (UINT32) ~0xFFC0, PcdGet16 (PcdAcpiPmBaseAddress));
+
+    //
+    // Enable PMBA I/O port decodes in PMREGMISC
+    //
+    PciOr8 (PmRegMisc, PMIOSE);
+  }
 
   return RETURN_SUCCESS;
 }
