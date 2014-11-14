@@ -35,6 +35,7 @@
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/Pci22.h>
+#include <OvmfPlatforms.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -228,6 +229,11 @@ MiscInitialization (
   VOID
   )
 {
+  UINT16 HostBridgeDevId;
+  UINTN  PmCmd;
+  UINTN  Pmba;
+  UINTN  PmRegMisc;
+
   //
   // Disable A20 Mask
   //
@@ -239,33 +245,48 @@ MiscInitialization (
   BuildCpuHob (36, 16);
 
   //
+  // Query Host Bridge DID to determine platform type
+  //
+  HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+  switch (HostBridgeDevId) {
+    case INTEL_82441_DEVICE_ID:
+      PmCmd     = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
+      Pmba      = POWER_MGMT_REGISTER_PIIX4 (0x40);
+      PmRegMisc = POWER_MGMT_REGISTER_PIIX4 (0x80);
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      PmCmd     = POWER_MGMT_REGISTER_Q35 (PCI_COMMAND_OFFSET);
+      Pmba      = POWER_MGMT_REGISTER_Q35 (0x40);
+      PmRegMisc = POWER_MGMT_REGISTER_Q35 (0x80);
+      break;
+    default:
+      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__, HostBridgeDevId));
+      ASSERT (FALSE);
+      return;
+  }
+
+  //
   // If PMREGMISC/PMIOSE is set, assume the ACPI PMBA has been configured (for
   // example by Xen) and skip the setup here. This matches the logic in
   // AcpiTimerLibConstructor ().
   //
-  if ((PciRead8 (PCI_LIB_ADDRESS (0, 1, 3, 0x80)) & 0x01) == 0) {
+  if ((PciRead8 (PmRegMisc) & 0x01) == 0) {
     //
     // The PEI phase should be exited with fully accessibe PIIX4 IO space:
     // 1. set PMBA
     //
-    PciAndThenOr32 (
-      PCI_LIB_ADDRESS (0, 1, 3, 0x40),
-      (UINT32) ~0xFFC0,
-      PcdGet16 (PcdAcpiPmBaseAddress)
-      );
+    PciAndThenOr32 (Pmba, (UINT32) ~0xFFC0, PcdGet16 (PcdAcpiPmBaseAddress));
 
     //
     // 2. set PCICMD/IOSE
     //
-    PciOr8 (
-      PCI_LIB_ADDRESS (0, 1, 3, PCI_COMMAND_OFFSET),
-      EFI_PCI_COMMAND_IO_SPACE
-      );
+    PciOr8 (PmCmd, EFI_PCI_COMMAND_IO_SPACE);
 
     //
     // 3. set PMREGMISC/PMIOSE
     //
-    PciOr8 (PCI_LIB_ADDRESS (0, 1, 3, 0x80), 0x01);
+    PciOr8 (PmRegMisc, 0x01);
   }
 }
 
