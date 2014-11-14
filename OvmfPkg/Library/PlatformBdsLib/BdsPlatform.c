@@ -717,63 +717,92 @@ Returns:
 
 
 VOID
-PciInitialization (
+PciAcpiInitialization (
   )
 {
-  //
-  // Bus 0, Device 0, Function 0 - Host to PCI Bridge
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 0, 0, 0x3c), 0x00);
+  UINT16 HostBridgeDevId;
+  UINTN  Pmba;
 
   //
-  // Bus 0, Device 1, Function 0 - PCI to ISA Bridge
+  // Query Host Bridge DID to determine platform type
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x3c), 0x00);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x60), 0x0b); // LNKA routing target
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x61), 0x0b); // LNKB routing target
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x62), 0x0a); // LNKC routing target
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x63), 0x0a); // LNKD routing target
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  switch (HostBridgeDevId) {
+    case INTEL_82441_DEVICE_ID:
+      Pmba = POWER_MGMT_REGISTER_PIIX4 (0x40);
+      //
+      // 00:01.0 ISA Bridge (PIIX4) LNK routing targets
+      //
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x60), 0x0b); // A
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x61), 0x0b); // B
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x62), 0x0a); // C
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x63), 0x0a); // D
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      Pmba = POWER_MGMT_REGISTER_Q35 (0x40);
+      //
+      // 00:1f.0 LPC Bridge (Q35) LNK routing targets
+      //
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x60), 0x0a); // A
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x61), 0x0a); // B
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x62), 0x0b); // C
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x63), 0x0b); // D
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x68), 0x0a); // E
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x69), 0x0a); // F
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6a), 0x0b); // G
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6b), 0x0b); // H
+      break;
+    default:
+      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__, HostBridgeDevId));
+      ASSERT (FALSE);
+      return;
+  }
 
-  //
-  // Bus 0, Device 1, Function 1 - IDE Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 1, 0x3c), 0x00);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 1, 0x0d), 0x40);
-
-  //
-  // Bus 0, Device 1, Function 3 - Power Managment Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 3, 0x3c), 0x09);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 3, 0x3d), 0x01); // INTA
-
-  //
-  // Bus 0, Device 2, Function 0 - Video Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 2, 0, 0x3c), 0x00);
-
-  //
-  // Bus 0, Device 3, Function 0 - Network Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 3, 0, 0x3c), 0x0a);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 3, 0, 0x3d), 0x01); // INTA (-> LNKC)
-
-  //
-  // Bus 0, Device 5, Function 0 - RAM Memory
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 5, 0, 0x3c), 0x0b);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 5, 0, 0x3d), 0x01); // INTA (-> LNKA)
-}
-
-
-VOID
-AcpiInitialization (
-  VOID
-  )
-{
   //
   // Set ACPI SCI_EN bit in PMCNTRL
   //
-  IoOr16 ((PciRead32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40)) & ~BIT0) + 4, BIT0);
+  IoOr16 ((PciRead32 (Pmba) & ~BIT0) + 4, BIT0);
+
+  //
+  // Initialize PCI_INTERRUPT_LINE for commonly encountered devices and slots
+  //
+  // FIXME: This should instead be accomplished programmatically by
+  //        ennumerating all PCI devices present in the system and
+  //        computing PCI_INTERRUPT_LINE from PCI_INTERRUPT_PIN, the
+  //        slot/position of the device, and the available host IRQs
+  //        (for an example, see SeaBIOS pci_bios_init_devices() in
+  //        src/fw/pciinit.c)
+  //
+  switch (HostBridgeDevId) {
+    case INTEL_82441_DEVICE_ID:
+      PciWrite8 (PCI_LIB_ADDRESS (0,    1, 2, 0x3c), 0x0b); // usb (northbr.)
+      PciWrite8 (PCI_LIB_ADDRESS (0,    1, 3, 0x3c), 0x0a); // acpi (northbr.)
+      PciWrite8 (PCI_LIB_ADDRESS (0,    3, 0, 0x3c), 0x0b);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    4, 0, 0x3c), 0x0b);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    5, 0, 0x3c), 0x0a);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    6, 0, 0x3c), 0x0a);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    7, 0, 0x3c), 0x0b);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    8, 0, 0x3c), 0x0b);
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      PciWrite8 (PCI_LIB_ADDRESS (0,    2, 0, 0x3c), 0x0b);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    3, 0, 0x3c), 0x0b);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    4, 0, 0x3c), 0x0a);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    5, 0, 0x3c), 0x0a);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    6, 0, 0x3c), 0x0b);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    7, 0, 0x3c), 0x0b);
+      PciWrite8 (PCI_LIB_ADDRESS (0,    8, 0, 0x3c), 0x0a);
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 0, 0x3c), 0x0a); // uhci1
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 1, 0x3c), 0x0a); // uhci2
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 2, 0x3c), 0x0b); // uhci3
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 7, 0x3c), 0x0b); // ehci1
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 2, 0x3c), 0x0a); // ahci (northbr.)
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 3, 0x3c), 0x0a); // smbus (northbr.)
+      break;
+    default:
+      ASSERT (FALSE); // should never be reached
+  }
 }
 
 
@@ -938,8 +967,7 @@ Returns:
   //
   BdsLibConnectAll ();
 
-  PciInitialization ();
-  AcpiInitialization ();
+  PciAcpiInitialization ();
 
   //
   // Clear the logo after all devices are connected.

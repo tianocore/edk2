@@ -59,6 +59,8 @@ Abstract:
 #include <Guid/HobList.h>
 #include <Guid/GlobalVariable.h>
 
+#include <OvmfPlatforms.h>
+
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformDriverOption[];
