@@ -245,7 +245,7 @@ MiscInitialization (
   BuildCpuHob (36, 16);
 
   //
-  // Query Host Bridge DID to determine platform type
+  // Query Host Bridge DID to determine platform type and save to PCD
   //
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   switch (HostBridgeDevId) {
@@ -265,6 +265,7 @@ MiscInitialization (
       ASSERT (FALSE);
       return;
   }
+  PcdSet16 (PcdOvmfHostBridgePciDevId, HostBridgeDevId);
 
   //
   // If PMREGMISC/PMIOSE is set, assume the ACPI PMBA has been configured (for
