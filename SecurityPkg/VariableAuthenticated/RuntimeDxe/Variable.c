@@ -592,14 +592,14 @@ GetEndPointer (
 
   Check the PubKeyIndex is a valid key or not.
 
-  This function will iterate the NV storage to see if this PubKeyIndex is still referenced 
+  This function will iterate the NV storage to see if this PubKeyIndex is still referenced
   by any valid count-based auth variabe.
-  
+
   @param[in]  PubKeyIndex     Index of the public key in public key store.
 
   @retval     TRUE            The PubKeyIndex is still in use.
   @retval     FALSE           The PubKeyIndex is not referenced by any count-based auth variabe.
-  
+
 **/
 BOOLEAN
 IsValidPubKeyIndex (
@@ -617,20 +617,20 @@ IsValidPubKeyIndex (
   VariableStoreEnd = GetEndPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
 
   while (IsValidVariableHeader (Variable, VariableStoreEnd)) {
-    if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) && 
+    if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) &&
         Variable->PubKeyIndex == PubKeyIndex) {
       return TRUE;
     }
     Variable = GetNextVariablePtr (Variable);
   }
-  
+
   return FALSE;
 }
 
 /**
 
   Get the number of valid public key in PubKeyStore.
-  
+
   @param[in]  PubKeyNumber     Number of the public key in public key store.
 
   @return     Number of valid public key in PubKeyStore.
@@ -645,13 +645,13 @@ GetValidPubKeyNumber (
   UINT32       Counter;
 
   Counter = 0;
-  
+
   for (PubKeyIndex = 1; PubKeyIndex <= PubKeyNumber; PubKeyIndex++) {
     if (IsValidPubKeyIndex (PubKeyIndex)) {
       Counter++;
     }
   }
-  
+
   return Counter;
 }
 
@@ -659,7 +659,7 @@ GetValidPubKeyNumber (
 
   Filter the useless key in public key store.
 
-  This function will find out all valid public keys in public key database, save them in new allocated 
+  This function will find out all valid public keys in public key database, save them in new allocated
   buffer NewPubKeyStore, and give the new PubKeyIndex. The caller is responsible for freeing buffer
   NewPubKeyIndex and NewPubKeyStore with FreePool().
 
@@ -668,10 +668,10 @@ GetValidPubKeyNumber (
   @param[out]  NewPubKeyIndex       Point to an array of new PubKeyIndex corresponds to NewPubKeyStore.
   @param[out]  NewPubKeyStore       Saved all valid public keys in PubKeyStore.
   @param[out]  NewPubKeySize        Buffer size of the NewPubKeyStore.
-  
+
   @retval  EFI_SUCCESS              Trim operation is complete successfully.
   @retval  EFI_OUT_OF_RESOURCES     No enough memory resources, or no useless key in PubKeyStore.
-  
+
 **/
 EFI_STATUS
 PubKeyStoreFilter (
@@ -685,7 +685,7 @@ PubKeyStoreFilter (
   UINT32        PubKeyIndex;
   UINT32        CopiedKey;
   UINT32        NewPubKeyNumber;
-  
+
   NewPubKeyNumber = GetValidPubKeyNumber (PubKeyNumber);
   if (NewPubKeyNumber == PubKeyNumber) {
     return EFI_OUT_OF_RESOURCES;
@@ -739,7 +739,7 @@ PubKeyStoreFilter (
   @param[in]      NewVariable             Pointer to new variable.
   @param[in]      NewVariableSize         New variable size.
   @param[in]      ReclaimPubKeyStore      Reclaim for public key database or not.
-  
+
   @return EFI_SUCCESS                  Reclaim operation has finished successfully.
   @return EFI_OUT_OF_RESOURCES         No enough memory resources or variable space.
   @return EFI_DEVICE_ERROR             The public key database doesn't exist.
@@ -873,7 +873,7 @@ Reclaim (
     while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
       NextVariable = GetNextVariablePtr (Variable);
       if (Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-        if ((StrCmp (GetVariableNamePtr (Variable), AUTHVAR_KEYDB_NAME) == 0) && 
+        if ((StrCmp (GetVariableNamePtr (Variable), AUTHVAR_KEYDB_NAME) == 0) &&
             (CompareGuid (&Variable->VendorGuid, &gEfiAuthenticatedVariableGuid))) {
           //
           // Skip the public key database, it will be reinstalled later.
@@ -882,7 +882,7 @@ Reclaim (
           Variable = NextVariable;
           continue;
         }
-        
+
         VariableSize = (UINTN) NextVariable - (UINTN) Variable;
         CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
         ((VARIABLE_HEADER*) CurrPtr)->PubKeyIndex = NewPubKeyIndex[Variable->PubKeyIndex];
@@ -909,7 +909,7 @@ Reclaim (
     Variable->DataSize = NewPubKeySize;
     StrCpy (GetVariableNamePtr (Variable), GetVariableNamePtr (PubKeyHeader));
     CopyMem (GetVariableDataPtr (Variable), NewPubKeyStore, NewPubKeySize);
-    CurrPtr = (UINT8*) GetNextVariablePtr (Variable); 
+    CurrPtr = (UINT8*) GetNextVariablePtr (Variable);
     CommonVariableTotalSize += (UINTN) CurrPtr - (UINTN) Variable;
   } else {
     //
@@ -1524,7 +1524,7 @@ VariableGetBestLanguage (
 
   @param[in] Attributes         Variable attributes for Variable entries.
   @param ...                    The variable argument list with type VARIABLE_ENTRY_CONSISTENCY *.
-                                A NULL terminates the list. The VariableSize of 
+                                A NULL terminates the list. The VariableSize of
                                 VARIABLE_ENTRY_CONSISTENCY is the variable data size as input.
                                 It will be changed to variable total size as output.
 
@@ -1803,7 +1803,7 @@ AutoUpdateLangVariable (
         VariableEntry[0].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
         VariableEntry[0].Guid = &gEfiGlobalVariableGuid;
         VariableEntry[0].Name = EFI_LANG_VARIABLE_NAME;
-        
+
         VariableEntry[1].VariableSize = AsciiStrSize (BestPlatformLang);
         VariableEntry[1].Guid = &gEfiGlobalVariableGuid;
         VariableEntry[1].Name = EFI_PLATFORM_LANG_VARIABLE_NAME;
@@ -2009,7 +2009,7 @@ UpdateVariable (
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
-      
+
       //
       // Only variable that have RT attributes can be updated/deleted in Runtime.
       //
@@ -2103,20 +2103,21 @@ UpdateVariable (
         CopyMem (BufferForMerge, (UINT8 *) ((UINTN) Variable->CurrPtr + DataOffset), Variable->CurrPtr->DataSize);
 
         //
-        // Set Max Common Variable Data Size as default MaxDataSize 
+        // Set Max Common Variable Data Size as default MaxDataSize
         //
         MaxDataSize = PcdGet32 (PcdMaxVariableSize) - DataOffset;
 
         if ((CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) &&
-            ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))) ||
-            (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0))) {
+            ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0) ||
+             (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE2) == 0))) ||
+             (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0))) {
           //
           // For variables with formatted as EFI_SIGNATURE_LIST, the driver shall not perform an append of
           // EFI_SIGNATURE_DATA values that are already part of the existing variable value.
           //
           Status = AppendSignatureList (
                      BufferForMerge,
-                     Variable->CurrPtr->DataSize, 
+                     Variable->CurrPtr->DataSize,
                      MaxDataSize - Variable->CurrPtr->DataSize,
                      Data,
                      DataSize,
@@ -2530,8 +2531,8 @@ Done:
 /**
   Check if a Unicode character is a hexadecimal character.
 
-  This function checks if a Unicode character is a 
-  hexadecimal character.  The valid hexadecimal character is 
+  This function checks if a Unicode character is a
+  hexadecimal character.  The valid hexadecimal character is
   L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
 
 
@@ -2701,7 +2702,7 @@ VariableLockRequestToLock (
 
   @retval TRUE      This variable is read-only variable.
   @retval FALSE     This variable is NOT read-only variable.
-  
+
 **/
 BOOLEAN
 IsReadOnlyVariable (
@@ -2722,7 +2723,7 @@ IsReadOnlyVariable (
       return TRUE;
     }
   }
-  
+
   return FALSE;
 }
 
@@ -3077,8 +3078,8 @@ VariableServiceSetVariable (
 
   if ((UINTN)(~0) - PayloadSize < StrSize(VariableName)){
     //
-    // Prevent whole variable size overflow 
-    // 
+    // Prevent whole variable size overflow
+    //
     return EFI_INVALID_PARAMETER;
   }
 
@@ -3184,8 +3185,9 @@ VariableServiceSetVariable (
     Status = ProcessVarWithPk (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes, TRUE);
   } else if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0)) {
     Status = ProcessVarWithPk (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes, FALSE);
-  } else if (CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) && 
-          ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))) {
+  } else if (CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) &&
+          ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))
+           || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE2)) == 0) {
     Status = ProcessVarWithPk (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes, FALSE);
     if (EFI_ERROR (Status)) {
       Status = ProcessVarWithKek (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes);
@@ -3937,4 +3939,3 @@ GetFvbInfoByAddress (
 
   return Status;
 }
-

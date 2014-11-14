@@ -64,11 +64,11 @@ UINT8 mHashOidValue[] = {
   };
 
 HASH_TABLE mHash[] = {
-  { L"SHA1",   20, &mHashOidValue[0],  5, Sha1GetContextSize,  Sha1Init,   Sha1Update,    Sha1Final  },
-  { L"SHA224", 28, &mHashOidValue[5],  9, NULL,                NULL,       NULL,          NULL       },
-  { L"SHA256", 32, &mHashOidValue[14], 9, Sha256GetContextSize,Sha256Init, Sha256Update,  Sha256Final},
-  { L"SHA384", 48, &mHashOidValue[23], 9, NULL,                NULL,       NULL,          NULL       },
-  { L"SHA512", 64, &mHashOidValue[32], 9, NULL,                NULL,       NULL,          NULL       }
+  { L"SHA1",   20, &mHashOidValue[0],  5, Sha1GetContextSize,   Sha1Init,   Sha1Update,   Sha1Final  },
+  { L"SHA224", 28, &mHashOidValue[5],  9, NULL,                 NULL,       NULL,         NULL       },
+  { L"SHA256", 32, &mHashOidValue[14], 9, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Final},
+  { L"SHA384", 48, &mHashOidValue[23], 9, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Final},
+  { L"SHA512", 64, &mHashOidValue[32], 9, Sha512GetContextSize, Sha512Init, Sha512Update, Sha512Final}
 };
 
 /**
@@ -99,11 +99,11 @@ SecureBootHook (
 
   @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
   @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
-  @param  ReadSize        On input, the size in bytes of the requested read operation.  
+  @param  ReadSize        On input, the size in bytes of the requested read operation.
                           On output, the number of bytes actually read.
   @param  Buffer          Output buffer that contains the data read from the PE/COFF image.
-  
-  @retval EFI_SUCCESS     The specified portion of the PE/COFF image was read and the size 
+
+  @retval EFI_SUCCESS     The specified portion of the PE/COFF image was read and the size
 **/
 EFI_STATUS
 EFIAPI
@@ -117,7 +117,7 @@ DxeImageVerificationLibImageRead (
   UINTN               EndPosition;
 
   if (FileHandle == NULL || ReadSize == NULL || Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;    
+    return EFI_INVALID_PARAMETER;
   }
 
   if (MAX_ADDRESS - FileOffset < *ReadSize) {
@@ -306,7 +306,7 @@ HashPeImage (
   SectionHeader = NULL;
   Status        = FALSE;
 
-  if ((HashAlg != HASHALG_SHA1) && (HashAlg != HASHALG_SHA256)) {
+  if ((HashAlg >= HASHALG_MAX)) {
     return FALSE;
   }
 
@@ -315,13 +315,28 @@ HashPeImage (
   //
   ZeroMem (mImageDigest, MAX_DIGEST_SIZE);
 
-  if (HashAlg == HASHALG_SHA1) {
-    mImageDigestSize  = SHA1_DIGEST_SIZE;
-    mCertType         = gEfiCertSha1Guid;
-  } else if (HashAlg == HASHALG_SHA256) {
-    mImageDigestSize  = SHA256_DIGEST_SIZE;
-    mCertType         = gEfiCertSha256Guid;
-  } else {
+  switch (HashAlg) {
+  case HASHALG_SHA1:
+    mImageDigestSize = SHA1_DIGEST_SIZE;
+    mCertType        = gEfiCertSha1Guid;
+    break;
+
+  case HASHALG_SHA256:
+    mImageDigestSize = SHA256_DIGEST_SIZE;
+    mCertType        = gEfiCertSha256Guid;
+    break;
+
+  case HASHALG_SHA384:
+    mImageDigestSize = SHA384_DIGEST_SIZE;
+    mCertType        = gEfiCertSha384Guid;
+    break;
+
+  case HASHALG_SHA512:
+    mImageDigestSize = SHA512_DIGEST_SIZE;
+    mCertType        = gEfiCertSha512Guid;
+    break;
+
+  default:
     return FALSE;
   }
 
@@ -347,8 +362,8 @@ HashPeImage (
   //
   if (mNtHeader.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && mNtHeader.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
-    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value 
-    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the 
+    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
+    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the
     //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
     //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
     //
@@ -359,7 +374,7 @@ HashPeImage (
     //
     Magic =  mNtHeader.Pe32->OptionalHeader.Magic;
   }
-  
+
   //
   // 3.  Calculate the distance from the base of the image header to the image checksum address.
   // 4.  Hash the image header from its base to beginning of the image checksum.
@@ -466,7 +481,7 @@ HashPeImage (
       if (!Status) {
         goto Done;
       }
-    }    
+    }
   }
 
   //
@@ -604,7 +619,7 @@ Done:
 
   @param[in]  AuthData            Pointer to the Authenticode Signature retrieved from signed image.
   @param[in]  AuthDataSize        Size of the Authenticode Signature in bytes.
-  
+
   @retval EFI_UNSUPPORTED             Hash algorithm is not supported.
   @retval EFI_SUCCESS                 Hash successfully.
 
@@ -804,6 +819,124 @@ AddImageExeInfo (
 }
 
 /**
+  Check whether the hash of an given X.509 certificate is in forbidden database (DBX).
+
+  @param[in]  Certificate       Pointer to X.509 Certificate that is searched for.
+  @param[in]  CertSize          Size of X.509 Certificate.
+  @param[in]  SignatureList     Pointer to the Signature List in forbidden database.
+  @param[in]  SignatureListSize Size of Signature List.
+  @param[out] RevocationTime    Return the time that the certificate was revoked.
+
+  @return TRUE   The certificate hash is found in the forbidden database.
+  @return FALSE  The certificate hash is not found in the forbidden database.
+
+**/
+BOOLEAN
+IsCertHashFoundInDatabase (
+  IN  UINT8               *Certificate,
+  IN  UINTN               CertSize,
+  IN  EFI_SIGNATURE_LIST  *SignatureList,
+  IN  UINTN               SignatureListSize,
+  OUT EFI_TIME            *RevocationTime
+  )
+{
+  BOOLEAN             IsFound;
+  EFI_STATUS          Status;
+  EFI_SIGNATURE_LIST  *DbxList;
+  UINTN               DbxSize;
+  EFI_SIGNATURE_DATA  *CertHash;
+  UINTN               CertHashCount;
+  UINTN               Index;
+  UINT32              HashAlg;
+  VOID                *HashCtx;
+  UINT8               CertDigest[MAX_DIGEST_SIZE];
+  UINT8               *DbxCertHash;
+  UINTN               SiglistHeaderSize;
+
+  IsFound  = FALSE;
+  DbxList  = SignatureList;
+  DbxSize  = SignatureListSize;
+  HashCtx  = NULL;
+  HashAlg  = HASHALG_MAX;
+
+  ASSERT (RevocationTime != NULL);
+
+  while ((DbxSize > 0) && (SignatureListSize >= DbxList->SignatureListSize)) {
+    //
+    // Determine Hash Algorithm of Certificate in the forbidden database.
+    //
+    if (CompareGuid (&DbxList->SignatureType, &gEfiCertX509Sha256Guid)) {
+      HashAlg = HASHALG_SHA256;
+    } else if (CompareGuid (&DbxList->SignatureType, &gEfiCertX509Sha384Guid)) {
+      HashAlg = HASHALG_SHA384;
+    } else if (CompareGuid (&DbxList->SignatureType, &gEfiCertX509Sha512Guid)) {
+      HashAlg = HASHALG_SHA512;
+    } else {
+      DbxSize -= DbxList->SignatureListSize;
+      DbxList  = (EFI_SIGNATURE_LIST *) ((UINT8 *) DbxList + DbxList->SignatureListSize);
+      continue;
+    }
+
+    //
+    // Calculate the hash value of current db certificate for comparision.
+    //
+    if (mHash[HashAlg].GetContextSize == NULL) {
+      goto Done;
+    }
+    ZeroMem (CertDigest, MAX_DIGEST_SIZE);
+    HashCtx = AllocatePool (mHash[HashAlg].GetContextSize ());
+    if (HashCtx == NULL) {
+      goto Done;
+    }
+    Status = mHash[HashAlg].HashInit (HashCtx);
+    if (!Status) {
+      goto Done;
+    }
+    Status = mHash[HashAlg].HashUpdate (HashCtx, Certificate, CertSize);
+    if (!Status) {
+      goto Done;
+    }
+    Status = mHash[HashAlg].HashFinal (HashCtx, CertDigest);
+    if (!Status) {
+      goto Done;
+    }
+
+    SiglistHeaderSize = sizeof (EFI_SIGNATURE_LIST) + DbxList->SignatureHeaderSize;
+    CertHash          = (EFI_SIGNATURE_DATA *) ((UINT8 *) DbxList + SiglistHeaderSize);
+    CertHashCount     = (DbxList->SignatureListSize - SiglistHeaderSize) / DbxList->SignatureSize;
+    for (Index = 0; Index < CertHashCount; Index++) {
+      //
+      // Iterate each Signature Data Node within this CertList for verify.
+      //
+      DbxCertHash = CertHash->SignatureData;
+      if (CompareMem (DbxCertHash, CertDigest, mHash[HashAlg].DigestLength) == 0) {
+        //
+        // Hash of Certificate is found in forbidden database.
+        //
+        IsFound = TRUE;
+
+        //
+        // Return the revocation time.
+        //
+        CopyMem (RevocationTime, (EFI_TIME *)(DbxCertHash + mHash[HashAlg].DigestLength), sizeof (EFI_TIME));
+        goto Done;
+      }
+      CertHash = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertHash + DbxList->SignatureSize);
+    }
+
+    DbxSize -= DbxList->SignatureListSize;
+    DbxList  = (EFI_SIGNATURE_LIST *) ((UINT8 *) DbxList + DbxList->SignatureListSize);
+  }
+
+Done:
+  if (HashCtx != NULL) {
+    FreePool (HashCtx);
+  }
+
+  return IsFound;
+}
+
+/**
   Check whether signature is in specified database.
 
   @param[in]  VariableName        Name of database variable that is searched in.
@@ -831,6 +964,7 @@ IsSignatureFoundInDatabase (
   UINTN               Index;
   UINTN               CertCount;
   BOOLEAN             IsFound;
+
   //
   // Read signature database variable.
   //
@@ -890,24 +1024,296 @@ Done:
 }
 
 /**
-  Verify PKCS#7 SignedData using certificate found in Variable which formatted
-  as EFI_SIGNATURE_LIST. The Variable may be PK, KEK, DB or DBX.
+  Check whether the timestamp is valid by comparing the signing time and the revocation time.
 
-  @param[in]  AuthData      Pointer to the Authenticode Signature retrieved from signed image.
-  @param[in]  AuthDataSize  Size of the Authenticode Signature in bytes.
-  @param[in]  VariableName  Name of Variable to search for Certificate.
-  @param[in]  VendorGuid    Variable vendor GUID.
+  @param SigningTime         A pointer to the signing time.
+  @param RevocationTime      A pointer to the revocation time.
 
-  @retval TRUE         Image pass verification.
-  @retval FALSE        Image fail verification.
+  @retval  TRUE              The SigningTime is not later than the RevocationTime.
+  @retval  FALSE             The SigningTime is later than the RevocationTime.
 
 **/
 BOOLEAN
-IsPkcsSignedDataVerifiedBySignatureList (
+IsValidSignatureByTimestamp (
+  IN EFI_TIME               *SigningTime,
+  IN EFI_TIME               *RevocationTime
+  )
+{
+  if (SigningTime->Year != RevocationTime->Year) {
+    return (BOOLEAN) (SigningTime->Year < RevocationTime->Year);
+  } else if (SigningTime->Month != RevocationTime->Month) {
+    return (BOOLEAN) (SigningTime->Month < RevocationTime->Month);
+  } else if (SigningTime->Day != RevocationTime->Day) {
+    return (BOOLEAN) (SigningTime->Day < RevocationTime->Day);
+  } else if (SigningTime->Hour != RevocationTime->Hour) {
+    return (BOOLEAN) (SigningTime->Hour < RevocationTime->Hour);
+  } else if (SigningTime->Minute != RevocationTime->Minute) {
+    return (BOOLEAN) (SigningTime->Minute < RevocationTime->Minute);
+  }
+
+  return (BOOLEAN) (SigningTime->Second <= RevocationTime->Second);
+}
+
+/**
+  Check if the given time value is zero.
+
+  @param[in]  Time      Pointer of a time value.
+
+  @retval     TRUE      The Time is Zero.
+  @retval     FALSE     The Time is not Zero.
+
+**/
+BOOLEAN
+IsTimeZero (
+  IN EFI_TIME               *Time
+  )
+{
+  if ((Time->Year == 0) && (Time->Month == 0) &&  (Time->Day == 0) &&
+      (Time->Hour == 0) && (Time->Minute == 0) && (Time->Second == 0)) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  Check whether the timestamp signature is valid and the signing time is also earlier than 
+  the revocation time.
+
+  @param[in]  AuthData        Pointer to the Authenticode signature retrieved from signed image.
+  @param[in]  AuthDataSize    Size of the Authenticode signature in bytes.
+  @param[in]  RevocationTime  The time that the certificate was revoked.
+
+  @retval TRUE      Timestamp signature is valid and signing time is no later than the 
+                    revocation time.
+  @retval FALSE     Timestamp signature is not valid or the signing time is later than the
+                    revocation time.
+
+**/
+BOOLEAN
+PassTimestampCheck (
+  IN UINT8                  *AuthData,
+  IN UINTN                  AuthDataSize,
+  IN EFI_TIME               *RevocationTime
+  )
+{
+  EFI_STATUS                Status;
+  BOOLEAN                   VerifyStatus;
+  EFI_SIGNATURE_LIST        *CertList;
+  EFI_SIGNATURE_DATA        *Cert;
+  UINT8                     *DbtData;
+  UINTN                     DbtDataSize;
+  UINT8                     *RootCert;
+  UINTN                     RootCertSize;
+  UINTN                     Index;
+  UINTN                     CertCount;
+  EFI_TIME                  SigningTime;
+
+  //
+  // Variable Initialization
+  //
+  VerifyStatus      = FALSE;
+  DbtData           = NULL;
+  CertList          = NULL;
+  Cert              = NULL;
+  RootCert          = NULL;
+  RootCertSize      = 0;
+
+  //
+  // If RevocationTime is zero, the certificate shall be considered to always be revoked.
+  //
+  if (IsTimeZero (RevocationTime)) {
+    return FALSE;
+  }
+
+  //
+  // RevocationTime is non-zero, the certificate should be considered to be revoked from that time and onwards.
+  // Using the dbt to get the trusted TSA certificates.
+  //
+  DbtDataSize = 0;
+  Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    DbtData = (UINT8 *) AllocateZeroPool (DbtDataSize);
+    if (DbtData == NULL) {
+      goto Done;
+    }
+    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, (VOID *) DbtData);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+  }
+
+  CertList = (EFI_SIGNATURE_LIST *) DbtData;
+  while ((DbtDataSize > 0) && (DbtDataSize >= CertList->SignatureListSize)) {
+    if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
+      Cert      = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
+      CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
+      for (Index = 0; Index < CertCount; Index++) {
+        //
+        // Iterate each Signature Data Node within this CertList for verify.
+        //
+        RootCert     = Cert->SignatureData;
+        RootCertSize = CertList->SignatureSize - sizeof (EFI_GUID);
+        //
+        // Get the signing time if the timestamp signature is valid.
+        //
+        if (ImageTimestampVerify (AuthData, AuthDataSize, RootCert, RootCertSize, &SigningTime)) {
+          //
+          // The signer signature is valid only when the signing time is earlier than revocation time.
+          //
+          if (IsValidSignatureByTimestamp (&SigningTime, RevocationTime)) {
+            VerifyStatus = TRUE;
+            goto Done;
+          }
+        }
+        Cert = (EFI_SIGNATURE_DATA *) ((UINT8 *) Cert + CertList->SignatureSize);
+      }
+    }
+    DbtDataSize -= CertList->SignatureListSize;
+    CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
+  }
+
+Done:
+  if (DbtData != NULL) {
+    FreePool (DbtData);
+  }
+
+  return VerifyStatus;
+}
+
+/**
+  Check whether the image signature is forbidden by the forbidden database (dbx).
+  The image is forbidden to load if any certificates for signing are revoked before signing time.
+
+  @param[in]  AuthData      Pointer to the Authenticode signature retrieved from the signed image.
+  @param[in]  AuthDataSize  Size of the Authenticode signature in bytes.
+
+  @retval TRUE              Image is forbidden by dbx.
+  @retval FALSE             Image is not forbidden by dbx.
+
+**/
+BOOLEAN
+IsForbiddenByDbx (
+  IN UINT8                  *AuthData,
+  IN UINTN                  AuthDataSize
+  )
+{
+  EFI_STATUS                Status;
+  BOOLEAN                   IsForbidden;
+  UINT8                     *Data;
+  UINTN                     DataSize;
+  UINTN                     Index;
+  UINT8                     *CertBuffer;
+  UINTN                     BufferLength;
+  UINT8                     *TrustedCert;
+  UINTN                     TrustedCertLength;
+  UINT8                     CertNumber;
+  UINT8                     *CertPtr;
+  UINT8                     *Cert;
+  UINTN                     CertSize;
+  EFI_TIME                  RevocationTime;
+
+  //
+  // Variable Initialization
+  //
+  IsForbidden       = FALSE;
+  Data              = NULL;
+  Cert              = NULL;
+  CertBuffer        = NULL;
+  BufferLength      = 0;
+  TrustedCert       = NULL;
+  TrustedCertLength = 0;
+
+  //
+  // The image will not be forbidden if dbx can't be got.
+  //
+  DataSize = 0;
+  Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Data = (UINT8 *) AllocateZeroPool (DataSize);
+    if (Data == NULL) {
+      return IsForbidden;
+    }
+
+    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *) Data);
+  }
+  if (EFI_ERROR (Status)) {
+    return IsForbidden;
+  }
+
+  //
+  // Retrieve the certificate stack from AuthData
+  // The output CertStack format will be:
+  //       UINT8  CertNumber;
+  //       UINT32 Cert1Length;
+  //       UINT8  Cert1[];
+  //       UINT32 Cert2Length;
+  //       UINT8  Cert2[];
+  //       ...
+  //       UINT32 CertnLength;
+  //       UINT8  Certn[];
+  //
+  Pkcs7GetSigners (AuthData, AuthDataSize, &CertBuffer, &BufferLength, &TrustedCert, &TrustedCertLength);
+  if (BufferLength == 0) {
+    IsForbidden = TRUE;
+    goto Done;
+  }
+
+  //
+  // Check if any certificates in AuthData is in the forbidden database.
+  //
+  CertNumber = (UINT8) (*CertBuffer);
+  CertPtr    = CertBuffer + 1;
+  for (Index = 0; Index < CertNumber; Index++) {
+    CertSize = (UINTN) ReadUnaligned32 ((UINT32 *)CertPtr);
+    Cert     = (UINT8 *)CertPtr + sizeof (UINT32);
+    if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, Cert, &gEfiCertX509Guid, CertSize)) {
+      //
+      // Raw certificate in dbx means the image signed by the certificate is forbidden.
+      //
+      IsForbidden = TRUE;
+      goto Done;
+    }
+
+    if (IsCertHashFoundInDatabase (Cert, CertSize, (EFI_SIGNATURE_LIST *)Data, DataSize, &RevocationTime)) {
+      //
+      // Check the timestamp signature and signing time to determine if the image can be trusted.
+      //
+      IsForbidden = TRUE;
+      if (PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime)) {
+        IsForbidden = FALSE;
+      }
+      goto Done;
+    }
+
+    CertPtr = CertPtr + sizeof (UINT32) + CertSize;
+  }
+
+Done:
+  if (Data != NULL) {
+    FreePool (Data);
+  }
+
+  Pkcs7FreeSigners (CertBuffer);
+  Pkcs7FreeSigners (TrustedCert);
+
+  return IsForbidden;
+}
+
+/**
+  Check whether the image signature can be verified by the trusted certificates in DB database.
+
+  @param[in]  AuthData      Pointer to the Authenticode signature retrieved from signed image.
+  @param[in]  AuthDataSize  Size of the Authenticode signature in bytes.
+
+  @retval TRUE         Image passed verification using certificate in db.
+  @retval FALSE        Image didn't pass verification using certificate in db.
+
+**/
+BOOLEAN
+IsAllowedByDb (
   IN UINT8              *AuthData,
-  IN UINTN              AuthDataSize,
-  IN CHAR16             *VariableName,
-  IN EFI_GUID           *VendorGuid
+  IN UINTN              AuthDataSize
   )
 {
   EFI_STATUS                Status;
@@ -929,14 +1335,14 @@ IsPkcsSignedDataVerifiedBySignatureList (
   VerifyStatus = FALSE;
 
   DataSize = 0;
-  Status   = gRT->GetVariable (VariableName, VendorGuid, NULL, &DataSize, NULL);
+  Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Data = (UINT8 *) AllocateZeroPool (DataSize);
     if (Data == NULL) {
       return VerifyStatus;
     }
 
-    Status = gRT->GetVariable (VariableName, VendorGuid, NULL, &DataSize, (VOID *) Data);
+    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *) Data);
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -947,14 +1353,15 @@ IsPkcsSignedDataVerifiedBySignatureList (
     CertList = (EFI_SIGNATURE_LIST *) Data;
     while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
       if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
-        Cert          = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
-        CertCount     = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
+        Cert       = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
+        CertCount  = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
+
         for (Index = 0; Index < CertCount; Index++) {
           //
           // Iterate each Signature Data Node within this CertList for verify.
           //
-          RootCert      = Cert->SignatureData;
-          RootCertSize  = CertList->SignatureSize - sizeof (EFI_GUID);
+          RootCert     = Cert->SignatureData;
+          RootCertSize = CertList->SignatureSize - sizeof (EFI_GUID);
 
           //
           // Call AuthenticodeVerify library to Verify Authenticode struct.
@@ -968,12 +1375,14 @@ IsPkcsSignedDataVerifiedBySignatureList (
                            mImageDigestSize
                            );
           if (VerifyStatus) {
-            SecureBootHook (VariableName, VendorGuid, CertList->SignatureSize, Cert);
+            SecureBootHook (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, Cert);
             goto Done;
           }
+
           Cert = (EFI_SIGNATURE_DATA *) ((UINT8 *) Cert + CertList->SignatureSize);
         }
       }
+
       DataSize -= CertList->SignatureListSize;
       CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
     }
@@ -1108,7 +1517,7 @@ DxeImageVerificationHandler (
   }
 
   //
-  // The policy QUERY_USER_ON_SECURITY_VIOLATION and ALLOW_EXECUTE_ON_SECURITY_VIOLATION 
+  // The policy QUERY_USER_ON_SECURITY_VIOLATION and ALLOW_EXECUTE_ON_SECURITY_VIOLATION
   // violates the UEFI spec and has been removed.
   //
   ASSERT (Policy != QUERY_USER_ON_SECURITY_VIOLATION && Policy != ALLOW_EXECUTE_ON_SECURITY_VIOLATION);
@@ -1183,8 +1592,8 @@ DxeImageVerificationHandler (
 
   if (mNtHeader.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && mNtHeader.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
-    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value 
-    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the 
+    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
+    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the
     //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
     //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
     //
@@ -1195,7 +1604,7 @@ DxeImageVerificationHandler (
     //
     Magic = mNtHeader.Pe32->OptionalHeader.Magic;
   }
-  
+
   if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
     // Use PE32 offset.
@@ -1203,7 +1612,7 @@ DxeImageVerificationHandler (
     NumberOfRvaAndSizes = mNtHeader.Pe32->OptionalHeader.NumberOfRvaAndSizes;
     if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
       SecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
-    }        
+    }
   } else {
     //
     // Use PE32+ offset.
@@ -1219,7 +1628,7 @@ DxeImageVerificationHandler (
   //
   if (SecDataDir == NULL || SecDataDir->Size == 0) {
     //
-    // This image is not signed. The SHA256 hash value of the image must match a record in the security database "db", 
+    // This image is not signed. The SHA256 hash value of the image must match a record in the security database "db",
     // and not be reflected in the security data base "dbx".
     //
     if (!HashPeImage (HASHALG_SHA256)) {
@@ -1247,7 +1656,7 @@ DxeImageVerificationHandler (
   }
 
   //
-  // Verify the signature of the image, multiple signatures are allowed as per PE/COFF Section 4.7 
+  // Verify the signature of the image, multiple signatures are allowed as per PE/COFF Section 4.7
   // "Attribute Certificate Table".
   // The first certificate starts at offset (SecDataDir->VirtualAddress) from the start of the file.
   //
@@ -1259,13 +1668,13 @@ DxeImageVerificationHandler (
         (SecDataDir->VirtualAddress + SecDataDir->Size - OffSet) < WinCertificate->dwLength) {
       break;
     }
-    
+
     //
     // Verify the image's Authenticode signature, only DER-encoded PKCS#7 signed data is supported.
     //
     if (WinCertificate->wCertificateType == WIN_CERT_TYPE_PKCS_SIGNED_DATA) {
       //
-      // The certificate is formatted as WIN_CERTIFICATE_EFI_PKCS which is described in the 
+      // The certificate is formatted as WIN_CERTIFICATE_EFI_PKCS which is described in the
       // Authenticode specification.
       //
       PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) WinCertificate;
@@ -1298,11 +1707,11 @@ DxeImageVerificationHandler (
     if (EFI_ERROR (Status)) {
       continue;
     }
-    
+
     //
     // Check the digital signature against the revoked certificate in forbidden database (dbx).
     //
-    if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid)) {
+    if (IsForbiddenByDbx (AuthData, AuthDataSize)) {
       Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED;
       VerifyStatus = EFI_ACCESS_DENIED;
       break;
@@ -1312,7 +1721,7 @@ DxeImageVerificationHandler (
     // Check the digital signature against the valid certificate in allowed database (db).
     //
     if (EFI_ERROR (VerifyStatus)) {
-      if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid)) {
+      if (IsAllowedByDb (AuthData, AuthDataSize)) {
         VerifyStatus = EFI_SUCCESS;
       }
     }
@@ -1337,7 +1746,7 @@ DxeImageVerificationHandler (
     //
     VerifyStatus = EFI_ACCESS_DENIED;
   }
-  
+
   if (!EFI_ERROR (VerifyStatus)) {
     return EFI_SUCCESS;
   } else {
@@ -1407,7 +1816,7 @@ OnReadyToBoot (
     return ;
   }
 
-  ImageExeInfoTable->NumberOfImages = 0;  
+  ImageExeInfoTable->NumberOfImages = 0;
   gBS->InstallConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID *) ImageExeInfoTable);
 
 }
@@ -1434,10 +1843,10 @@ DxeImageVerificationLibConstructor (
   //
   EfiCreateEventReadyToBootEx (
     TPL_CALLBACK,
-    OnReadyToBoot, 
-    NULL, 
+    OnReadyToBoot,
+    NULL,
     &Event
-    ); 
+    );
 
   return RegisterSecurity2Handler (
           DxeImageVerificationHandler,

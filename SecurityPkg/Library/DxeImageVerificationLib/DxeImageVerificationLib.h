@@ -2,13 +2,13 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by ImageVerificationLib.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -76,9 +76,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HASHALG_MAX                            0x00000005
 
 //
-// Set max digest size as SHA256 Output (32 bytes) by far
+// Set max digest size as SHA512 Output (64 bytes) by far
 //
-#define MAX_DIGEST_SIZE    SHA256_DIGEST_SIZE      
+#define MAX_DIGEST_SIZE    SHA512_DIGEST_SIZE
 //
 //
 // PKCS7 Certificate definition

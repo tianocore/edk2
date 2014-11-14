@@ -2,12 +2,12 @@
   Header file for NV data structure definition.
 
 Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -41,6 +41,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FORM_FILE_EXPLORER_ID_KEK             0x11
 #define FORM_FILE_EXPLORER_ID_DB              0x12
 #define FORM_FILE_EXPLORER_ID_DBX             0x13
+#define FORMID_SECURE_BOOT_DBT_OPTION_FORM    0x14
+#define SECUREBOOT_ENROLL_SIGNATURE_TO_DBT    0x15
+#define SECUREBOOT_DELETE_SIGNATURE_FROM_DBT  0x16
+#define FORM_FILE_EXPLORER_ID_DBT             0x17
 
 #define SECURE_BOOT_MODE_CUSTOM               0x01
 #define SECURE_BOOT_MODE_STANDARD             0x00
@@ -56,6 +60,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_VALUE_SAVE_AND_EXIT_DBX           0x100a
 #define KEY_VALUE_NO_SAVE_AND_EXIT_DBX        0x100b
 #define KEY_HIDE_SECURE_BOOT                  0x100c
+#define KEY_VALUE_SAVE_AND_EXIT_DBT           0x100d
+#define KEY_VALUE_NO_SAVE_AND_EXIT_DBT        0x100e
 
 #define KEY_SECURE_BOOT_OPTION                0x1100
 #define KEY_SECURE_BOOT_PK_OPTION             0x1101
@@ -69,10 +75,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_SECURE_BOOT_KEK_GUID              0x110a
 #define KEY_SECURE_BOOT_SIGNATURE_GUID_DB     0x110b
 #define KEY_SECURE_BOOT_SIGNATURE_GUID_DBX    0x110c
+#define KEY_SECURE_BOOT_DBT_OPTION            0x110d
+#define KEY_SECURE_BOOT_SIGNATURE_GUID_DBT    0x110e
 
 #define LABEL_KEK_DELETE                      0x1200
 #define LABEL_DB_DELETE                       0x1201
 #define LABEL_DBX_DELETE                      0x1202
+#define LABEL_DBT_DELETE                      0x1203
 #define LABEL_END                             0xffff
 
 #define SECURE_BOOT_MAX_ATTEMPTS_NUM          255
@@ -93,7 +102,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Question ID 0x4000 ~ 0x4FFF is for DBX
 //
-#define OPTION_DEL_DBX_QUESTION_ID            0x4000 
+#define OPTION_DEL_DBX_QUESTION_ID            0x4000
+
+//
+// Question ID 0x5000 ~ 0x5FFF is for DBT
+//
+#define OPTION_DEL_DBT_QUESTION_ID            0x5000
 
 #define FILE_OPTION_GOTO_OFFSET               0xC000
 #define FILE_OPTION_OFFSET                    0x8000
@@ -102,18 +116,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SECURE_BOOT_GUID_SIZE                 36
 #define SECURE_BOOT_GUID_STORAGE_SIZE         37
 
-
 //
 // Nv Data structure referenced by IFR
 //
 typedef struct {
-  BOOLEAN AttemptSecureBoot;  //Attempt to enable/disable Secure Boot.
-  BOOLEAN HideSecureBoot;  //Hiden Attempt Secure Boot
+  BOOLEAN AttemptSecureBoot;   // Attempt to enable/disable Secure Boot
+  BOOLEAN HideSecureBoot;      // Hiden Attempt Secure Boot
   CHAR16  SignatureGuid[SECURE_BOOT_GUID_STORAGE_SIZE];
-  BOOLEAN PhysicalPresent; //If a Physical Present User;
-  UINT8   SecureBootMode;  //Secure Boot Mode: Standard Or Custom
-  BOOLEAN DeletePk; 
-  BOOLEAN HasPk;           //If Pk is existed it is true;
+  BOOLEAN PhysicalPresent;     // If a Physical Present User
+  UINT8   SecureBootMode;      // Secure Boot Mode: Standard Or Custom
+  BOOLEAN DeletePk;
+  BOOLEAN HasPk;               // If Pk is existed it is true
+  BOOLEAN AlwaysRevocation;    // If the certificate is always revoked. Revocation time is hidden
+  UINT8   CertificateFormat;   // The type of the certificate
+  EFI_HII_DATE RevocationDate; // The revocation date of the certificate
+  EFI_HII_TIME RevocationTime; // The revocation time of the certificate
 } SECUREBOOT_CONFIGURATION;
 
 #endif
