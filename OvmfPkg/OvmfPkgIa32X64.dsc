@@ -201,7 +201,6 @@
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
 !ifdef $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
@@ -209,6 +208,7 @@
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
@@ -219,13 +219,14 @@
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
-  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
 !endif
 
 [LibraryClasses.common.UEFI_DRIVER]
+  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
@@ -235,13 +236,12 @@
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
+  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -262,6 +262,8 @@
 !endif
 
 [LibraryClasses.common.UEFI_APPLICATION]
+  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
@@ -269,6 +271,14 @@
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
+
+[LibraryClasses.common.DXE_SMM_DRIVER]
+  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+
+[LibraryClasses.common.SMM_CORE]
+  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
 
 ################################################################################
 #
