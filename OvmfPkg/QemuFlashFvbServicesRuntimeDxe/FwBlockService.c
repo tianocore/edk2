@@ -895,7 +895,7 @@ STATIC
 EFI_STATUS
 MarkMemoryRangeForRuntimeAccess (
   EFI_PHYSICAL_ADDRESS                BaseAddress,
-  UINT64                              Length
+  UINTN                               Length
   )
 {
   EFI_STATUS                          Status;
@@ -919,7 +919,7 @@ MarkMemoryRangeForRuntimeAccess (
   Status = gBS->AllocatePages (
                   AllocateAddress,
                   EfiRuntimeServicesData,
-                  (UINTN) EFI_SIZE_TO_PAGES (Length),
+                  EFI_SIZE_TO_PAGES (Length),
                   &BaseAddress
                   );
   ASSERT_EFI_ERROR (Status);
@@ -1026,7 +1026,7 @@ Returns:
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *OldFwbInterface;
   UINT32                              MaxLbaSize;
   EFI_PHYSICAL_ADDRESS                BaseAddress;
-  UINT64                              Length;
+  UINTN                               Length;
   UINTN                               NumOfBlocks;
   EFI_EVENT                           VirtualAddressChangeEvent;
 
