@@ -43,7 +43,7 @@ XenHyperpageInit (
 UINT64
 XenHypercallHvmGetParam (
   IN XENBUS_DEVICE *Dev,
-  IN INTN          Index
+  IN UINT32        Index
   )
 {
   xen_hvm_param_t     Parameter;
