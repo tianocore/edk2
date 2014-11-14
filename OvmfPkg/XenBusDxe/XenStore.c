@@ -69,7 +69,7 @@
 
 typedef struct {
   CONST VOID  *Data;
-  UINTN       Len;
+  UINT32      Len;
 } WRITE_REQUEST;
 
 /* Register callback to watch subtree (node) in the XenStore. */
@@ -456,7 +456,7 @@ STATIC
 XENSTORE_STATUS
 XenStoreWriteStore (
   IN CONST VOID *DataPtr,
-  IN UINTN      Len
+  IN UINT32     Len
   )
 {
   XENSTORE_RING_IDX Cons, Prod;
@@ -535,7 +535,7 @@ STATIC
 XENSTORE_STATUS
 XenStoreReadStore (
   OUT VOID *DataPtr,
-  IN  UINTN Len
+  IN  UINT32 Len
   )
 {
   XENSTORE_RING_IDX Cons, Prod;
@@ -883,7 +883,7 @@ XenStoreSingle (
   WRITE_REQUEST WriteRequest;
 
   WriteRequest.Data = (VOID *) Body;
-  WriteRequest.Len = AsciiStrSize (Body);
+  WriteRequest.Len = (UINT32)AsciiStrSize (Body);
 
   return XenStoreTalkv (Transaction, RequestType, &WriteRequest, 1,
                         LenPtr, Result);
@@ -912,9 +912,9 @@ XenStoreWatch (
   WRITE_REQUEST WriteRequest[2];
 
   WriteRequest[0].Data = (VOID *) Path;
-  WriteRequest[0].Len = AsciiStrSize (Path);
+  WriteRequest[0].Len = (UINT32)AsciiStrSize (Path);
   WriteRequest[1].Data = (VOID *) Token;
-  WriteRequest[1].Len = AsciiStrSize (Token);
+  WriteRequest[1].Len = (UINT32)AsciiStrSize (Token);
 
   return XenStoreTalkv (XST_NIL, XS_WATCH, WriteRequest, 2, NULL, NULL);
 }
@@ -938,9 +938,9 @@ XenStoreUnwatch (
   WRITE_REQUEST WriteRequest[2];
 
   WriteRequest[0].Data = (VOID *) Path;
-  WriteRequest[0].Len = AsciiStrSize (Path);
+  WriteRequest[0].Len = (UINT32)AsciiStrSize (Path);
   WriteRequest[1].Data = (VOID *) Token;
-  WriteRequest[1].Len = AsciiStrSize (Token);
+  WriteRequest[1].Len = (UINT32)AsciiStrSize (Token);
 
   return XenStoreTalkv (XST_NIL, XS_UNWATCH, WriteRequest, 2, NULL, NULL);
 }
@@ -1245,9 +1245,9 @@ XenStoreWrite (
   Path = XenStoreJoin (DirectoryPath, Node);
 
   WriteRequest[0].Data = (VOID *) Path;
-  WriteRequest[0].Len = AsciiStrSize (Path);
+  WriteRequest[0].Len = (UINT32)AsciiStrSize (Path);
   WriteRequest[1].Data = (VOID *) Str;
-  WriteRequest[1].Len = AsciiStrLen (Str);
+  WriteRequest[1].Len = (UINT32)AsciiStrLen (Str);
 
   Status = XenStoreTalkv (Transaction, XS_WRITE, WriteRequest, 2, NULL, NULL);
   FreePool (Path);
