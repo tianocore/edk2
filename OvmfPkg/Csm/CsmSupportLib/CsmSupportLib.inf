@@ -38,6 +38,9 @@
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiDiskInfoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED

@@ -21,6 +21,11 @@
 STATIC EFI_HANDLE mLegacyInterruptHandle = NULL;
 
 //
+// Legacy Interrupt Device number (0x01 on piix4, 0x1f on q35/mch)
+//
+STATIC UINT8      mLegacyInterruptDevice;
+
+//
 // The Legacy Interrupt Protocol instance produced by this driver
 //
 STATIC EFI_LEGACY_INTERRUPT_PROTOCOL mLegacyInterrupt = {
@@ -77,7 +82,7 @@ GetLocation (
   )
 {
   *Bus      = LEGACY_INT_BUS;
-  *Device   = LEGACY_INT_DEV;
+  *Device   = mLegacyInterruptDevice;
   *Function = LEGACY_INT_FUNC;
 
   return EFI_SUCCESS;
@@ -98,7 +103,7 @@ GetAddress (
 {
   return PCI_LIB_ADDRESS(
           LEGACY_INT_BUS,
-          LEGACY_INT_DEV,
+          mLegacyInterruptDevice,
           LEGACY_INT_FUNC,
           PirqReg[PirqNumber]
           );
@@ -173,12 +178,31 @@ LegacyInterruptInstall (
   VOID
   )
 {
+  UINT16      HostBridgeDevId;
   EFI_STATUS  Status;
 
   //
   // Make sure the Legacy Interrupt Protocol is not already installed in the system
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED(NULL, &gEfiLegacyInterruptProtocolGuid);
+
+  //
+  // Query Host Bridge DID to determine platform type, then set device number
+  //
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  switch (HostBridgeDevId) {
+    case INTEL_82441_DEVICE_ID:
+      mLegacyInterruptDevice = LEGACY_INT_DEV_PIIX4;
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      mLegacyInterruptDevice = LEGACY_INT_DEV_Q35;
+      break;
+    default:
+      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__, HostBridgeDevId));
+      ASSERT (FALSE);
+      return EFI_UNSUPPORTED;
+  }
 
   //
   // Make a new handle and install the protocol

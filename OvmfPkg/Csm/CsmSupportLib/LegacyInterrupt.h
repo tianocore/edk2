@@ -20,12 +20,16 @@
 
 #include <Protocol/LegacyInterrupt.h>
 
+#include <Library/PcdLib.h>
 #include <Library/PciLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <OvmfPlatforms.h>
+
 
 #define LEGACY_INT_BUS  0
-#define LEGACY_INT_DEV  1
+#define LEGACY_INT_DEV_PIIX4  0x01
+#define LEGACY_INT_DEV_Q35    0x1f
 #define LEGACY_INT_FUNC 0
 
 #define PIRQN           0x00  // PIRQ Null
