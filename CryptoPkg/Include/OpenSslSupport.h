@@ -72,7 +72,7 @@ typedef VOID  *FILE;
    portably, hence it is provided by a Standard C header file.
    For pre-Standard C compilers, here is a version that usually works
    (but watch out!): */
-#define offsetof(type, member) ( (int) & ((type*)0) -> member )
+#define offsetof(type, member) OFFSET_OF (type, member)
 
 //
 // Basic types from EFI Application Toolkit required to buiild Open SSL
