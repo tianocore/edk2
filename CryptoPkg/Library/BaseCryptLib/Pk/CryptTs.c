@@ -535,7 +535,8 @@ TimestampTokenVerify (
   // Construct TS_TST_INFO structure from the signed contents.
   //
   TstTemp = TstData;
-  TstInfo = d2i_TS_TST_INFO (NULL, &TstTemp, (int)TstSize);
+  TstInfo = d2i_TS_TST_INFO (NULL, (const unsigned char **) &TstTemp,
+              (int)TstSize);
   if (TstInfo == NULL) {
     goto _Exit;
   }
