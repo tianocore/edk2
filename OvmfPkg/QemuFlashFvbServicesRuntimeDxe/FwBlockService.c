@@ -979,7 +979,7 @@ InitializeVariableFvHeader (
     // Erase all the blocks
     //
     for (Offset = Start; Offset < Start + Length; Offset += BlockSize) {
-      Status = QemuFlashEraseBlock ((EFI_LBA) Offset / BlockSize);
+      Status = QemuFlashEraseBlock (Offset / BlockSize);
       ASSERT_EFI_ERROR (Status);
     }
 
@@ -988,7 +988,7 @@ InitializeVariableFvHeader (
     //
     WriteLength = GoodFwVolHeader->HeaderLength;
     Status = QemuFlashWrite (
-               (EFI_LBA) Start / BlockSize,
+               Start / BlockSize,
                0,
                &WriteLength,
                (UINT8 *) GoodFwVolHeader);
