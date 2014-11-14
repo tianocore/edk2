@@ -271,7 +271,7 @@ SmmEndOfDxeHandler (
              EFI_NATIVE_INTERFACE,
              NULL
              );
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
