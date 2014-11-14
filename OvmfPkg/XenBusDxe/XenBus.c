@@ -182,7 +182,7 @@ XenBusAddDevice (
     Private->XenBusIo.Type = AsciiStrDup (Type);
     Private->XenBusIo.Node = AsciiStrDup (DevicePath);
     Private->XenBusIo.Backend = BackendPath;
-    Private->XenBusIo.DeviceId = AsciiStrDecimalToUintn (Id);
+    Private->XenBusIo.DeviceId = (UINT16)AsciiStrDecimalToUintn (Id);
     Private->Dev = Dev;
 
     TempXenBusPath = AllocateCopyPool (sizeof (XENBUS_DEVICE_PATH),
@@ -274,7 +274,7 @@ XenBusEnumerateDeviceType (
     XenBusAddDevice (Dev, Type, Directory[Index]);
   }
 
-  FreePool (Directory);
+  FreePool ((VOID*)Directory);
 }
 
 
@@ -310,7 +310,7 @@ XenBusEnumerateBus (
     XenBusEnumerateDeviceType (Dev, Types[Index]);
   }
 
-  FreePool (Types);
+  FreePool ((VOID*)Types);
 
   return XENSTORE_STATUS_SUCCESS;
 }

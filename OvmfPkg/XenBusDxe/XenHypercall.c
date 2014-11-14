@@ -53,7 +53,7 @@ XenHypercallHvmGetParam (
 
   Parameter.domid = DOMID_SELF;
   Parameter.index = Index;
-  Error = XenHypercall2 (Dev->Hyperpage + __HYPERVISOR_hvm_op * 32,
+  Error = XenHypercall2 ((UINT8*)Dev->Hyperpage + __HYPERVISOR_hvm_op * 32,
                          HVMOP_get_param, (INTN) &Parameter);
   if (Error != 0) {
     DEBUG ((EFI_D_ERROR,
@@ -72,7 +72,7 @@ XenHypercallMemoryOp (
   )
 {
   ASSERT (Dev->Hyperpage != NULL);
-  return XenHypercall2 (Dev->Hyperpage + __HYPERVISOR_memory_op * 32,
+  return XenHypercall2 ((UINT8*)Dev->Hyperpage + __HYPERVISOR_memory_op * 32,
                         Operation, (INTN) Arguments);
 }
 
@@ -84,7 +84,7 @@ XenHypercallEventChannelOp (
   )
 {
   ASSERT (Dev->Hyperpage != NULL);
-  return XenHypercall2 (Dev->Hyperpage + __HYPERVISOR_event_channel_op * 32,
+  return XenHypercall2 ((UINT8*)Dev->Hyperpage + __HYPERVISOR_event_channel_op * 32,
                         Operation, (INTN) Arguments);
 }
 
