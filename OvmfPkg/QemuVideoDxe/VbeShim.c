@@ -153,13 +153,13 @@ InstallVbeShim (
   CopyMem (VbeInfo->Signature, "VESA", 4);
   VbeInfo->VesaVersion = 0x0300;
 
-  VbeInfo->OemNameAddress = (UINT32)(SegmentC << 12 | (UINT16)(UINTN)Ptr);
+  VbeInfo->OemNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
   CopyMem (Ptr, "QEMU", 5);
   Ptr += 5;
 
   VbeInfo->Capabilities = BIT0; // DAC can be switched into 8-bit mode
 
-  VbeInfo->ModeListAddress = (UINT32)(SegmentC << 12 | (UINT16)(UINTN)Ptr);
+  VbeInfo->ModeListAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
   *(UINT16*)Ptr = 0x00f1; // mode number
   Ptr += 2;
   *(UINT16*)Ptr = 0xFFFF; // mode list terminator
@@ -168,17 +168,17 @@ InstallVbeShim (
   VbeInfo->VideoMem64K = (UINT16)((1024 * 768 * 4 + 65535) / 65536);
   VbeInfo->OemSoftwareVersion = 0x0000;
 
-  VbeInfo->VendorNameAddress = (UINT32)(SegmentC << 12 | (UINT16)(UINTN)Ptr);
+  VbeInfo->VendorNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
   CopyMem (Ptr, "OVMF", 5);
   Ptr += 5;
 
-  VbeInfo->ProductNameAddress = (UINT32)(SegmentC << 12 | (UINT16)(UINTN)Ptr);
+  VbeInfo->ProductNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
   Printed = AsciiSPrint ((CHAR8 *)Ptr,
               sizeof VbeInfoFull->Buffer - (Ptr - VbeInfoFull->Buffer), "%s",
               CardName);
   Ptr += Printed + 1;
 
-  VbeInfo->ProductRevAddress = (UINT32)(SegmentC << 12 | (UINT16)(UINTN)Ptr);
+  VbeInfo->ProductRevAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
   CopyMem (Ptr, mProductRevision, sizeof mProductRevision);
   Ptr += sizeof mProductRevision;
 
@@ -268,7 +268,7 @@ InstallVbeShim (
   //
   // Second, point the Int10h vector at the shim.
   //
-  Int0x10->Segment = (UINT16) (SegmentC >> 4);
+  Int0x10->Segment = (UINT16) ((UINT32)SegmentC >> 4);
   Int0x10->Offset  = (UINT16) ((UINTN) (VbeModeInfo + 1) - SegmentC);
 
   DEBUG ((EFI_D_INFO, "%a: VBE shim installed\n", __FUNCTION__));
