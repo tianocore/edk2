@@ -136,7 +136,7 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
   }
 
   IoData.Dev = XEN_BLOCK_FRONT_FROM_BLOCK_IO (This);
-  Sector = Lba * (Media->BlockSize / 512);
+  Sector = (UINTN)MultU64x32 (Lba, Media->BlockSize / 512);
 
   while (BufferSize > 0) {
     if (((UINTN)Buffer & EFI_PAGE_MASK) == 0) {
