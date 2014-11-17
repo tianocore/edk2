@@ -557,6 +557,7 @@ GetUefiMemoryProfileData (
   Size = Size + sizeof (MEMORY_PROFILE_ALLOC_INFO);
   Data = AllocateZeroPool ((UINTN) Size);
   if (Data == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     Print (L"UefiMemoryProfile: AllocateZeroPool (0x%x) - %r\n", Size, Status);
     return Status;
   }
@@ -597,7 +598,7 @@ GetSmramProfileData (
 {
   EFI_STATUS                                    Status;
   UINTN                                         CommSize;
-  UINT8                                         CommBuffer[sizeof (EFI_GUID) + sizeof (UINTN) + sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA)];
+  UINT8                                         *CommBuffer;
   EFI_SMM_COMMUNICATE_HEADER                    *CommHeader;
   SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO      *CommGetProfileInfo;
   SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA      *CommGetProfileData;
@@ -608,6 +609,14 @@ GetSmramProfileData (
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &SmmCommunication);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "SmramProfile: Locate SmmCommunication protocol - %r\n", Status));
+    return Status;
+  }
+
+  CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA);
+  CommBuffer = AllocateZeroPool (CommSize);
+  if (CommBuffer == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    Print (L"SmramProfile: AllocateZeroPool (0x%x) for comm buffer - %r\n", CommSize, Status);
     return Status;
   }
 
@@ -627,6 +636,7 @@ GetSmramProfileData (
   CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
   Status = SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
   if (EFI_ERROR (Status)) {
+    FreePool (CommBuffer);
     DEBUG ((EFI_D_ERROR, "SmramProfile: SmmCommunication - %r\n", Status));
     return Status;
   }
@@ -643,15 +653,17 @@ GetSmramProfileData (
   //
   ProfileBuffer = (PHYSICAL_ADDRESS) (UINTN) AllocateZeroPool ((UINTN) ProfileSize);
   if (ProfileBuffer == 0) {
-    Print (L"UefiMemoryProfile: AllocateZeroPool (0x%x) - %r\n", (UINTN) ProfileSize, Status);
-    return EFI_SUCCESS;
+    FreePool (CommBuffer);
+    Status = EFI_OUT_OF_RESOURCES;
+    Print (L"SmramProfile: AllocateZeroPool (0x%x) for profile buffer - %r\n", (UINTN) ProfileSize, Status);
+    return Status;
   }
 
   CommHeader = (EFI_SMM_COMMUNICATE_HEADER *) &CommBuffer[0];
   CopyMem (&CommHeader->HeaderGuid, &gEdkiiMemoryProfileGuid, sizeof(gEdkiiMemoryProfileGuid));
   CommHeader->MessageLength = sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA);
 
-  CommGetProfileData = (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA *)&CommBuffer[OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)];
+  CommGetProfileData = (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA *) &CommBuffer[OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)];
   CommGetProfileData->Header.Command      = SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA;
   CommGetProfileData->Header.DataLength   = sizeof (*CommGetProfileData);
   CommGetProfileData->Header.ReturnStatus = (UINT64)-1;
@@ -663,6 +675,8 @@ GetSmramProfileData (
   ASSERT_EFI_ERROR (Status);
 
   if (CommGetProfileData->Header.ReturnStatus != 0) {
+    FreePool ((VOID *) (UINTN) CommGetProfileData->ProfileBuffer);
+    FreePool (CommBuffer);
     Print (L"GetProfileData - 0x%x\n", CommGetProfileData->Header.ReturnStatus);
     return EFI_SUCCESS;
   }
@@ -674,6 +688,7 @@ GetSmramProfileData (
   Print (L"======= SmramProfile end =======\n\n\n");
 
   FreePool ((VOID *) (UINTN) CommGetProfileData->ProfileBuffer);
+  FreePool (CommBuffer);
 
   return EFI_SUCCESS;
 }

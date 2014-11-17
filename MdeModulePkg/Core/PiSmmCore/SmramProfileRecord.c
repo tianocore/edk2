@@ -824,6 +824,8 @@ SmmCoreUpdateProfileAllocate (
   MEMORY_PROFILE_ALLOC_INFO_DATA    *AllocInfoData;
   EFI_MEMORY_TYPE                   ProfileMemoryIndex;
 
+  AllocInfoData = NULL;
+
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
     return FALSE;
