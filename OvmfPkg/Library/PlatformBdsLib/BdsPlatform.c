@@ -25,7 +25,20 @@ EFI_EVENT     mEfiDevPathEvent;
 VOID          *mEmuVariableEventReg;
 EFI_EVENT     mEmuVariableEvent;
 BOOLEAN       mDetectVgaOnly;
+UINT16        mHostBridgeDevId;
 
+//
+// Table of host IRQs matching PCI IRQs A-D
+// (for configuring PCI Interrupt Line register)
+//
+CONST UINT8 PciHostIrqs[] = {
+  0x0a, 0x0a, 0x0b, 0x0b
+};
+
+//
+// Array Size macro
+//
+#define ARRAY_SIZE(array) (sizeof (array) / sizeof (array[0]))
 
 //
 // Type definitions
@@ -716,18 +729,136 @@ Returns:
 }
 
 
+/**
+  Configure PCI Interrupt Line register for applicable devices
+  Ported from SeaBIOS, src/fw/pciinit.c, *_pci_slot_get_irq()
+
+  @param[in]  Handle - Handle of PCI device instance
+  @param[in]  PciIo - PCI IO protocol instance
+  @param[in]  PciHdr - PCI Header register block
+
+  @retval EFI_SUCCESS - PCI Interrupt Line register configured successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+SetPciIntLine (
+  IN EFI_HANDLE           Handle,
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN PCI_TYPE00           *PciHdr
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *DevPathNode;
+  UINTN                     RootSlot;
+  UINTN                     Idx;
+  UINT8                     IrqLine;
+  EFI_STATUS                Status;
+
+  Status = EFI_SUCCESS;
+
+  if (PciHdr->Device.InterruptPin != 0) {
+
+    DevPathNode = DevicePathFromHandle (Handle);
+    ASSERT (DevPathNode != NULL);
+
+    //
+    // Compute index into PciHostIrqs[] table by walking
+    // the device path and adding up all device numbers
+    //
+    Status = EFI_NOT_FOUND;
+    RootSlot = 0;
+    Idx = PciHdr->Device.InterruptPin - 1;
+    while (!IsDevicePathEnd (DevPathNode)) {
+      if (DevicePathType (DevPathNode) == HARDWARE_DEVICE_PATH &&
+          DevicePathSubType (DevPathNode) == HW_PCI_DP) {
+
+        Idx += ((PCI_DEVICE_PATH *)DevPathNode)->Device;
+
+        //
+        // Unlike SeaBIOS, which starts climbing from the leaf device
+        // up toward the root, we traverse the device path starting at
+        // the root moving toward the leaf node.
+        // The slot number of the top-level parent bridge is needed for
+        // Q35 cases with more than 24 slots on the root bus.
+        //
+        if (Status != EFI_SUCCESS) {
+          Status = EFI_SUCCESS;
+          RootSlot = ((PCI_DEVICE_PATH *)DevPathNode)->Device;
+        }
+      }
+
+      DevPathNode = NextDevicePathNode (DevPathNode);
+    }
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if (RootSlot == 0) {
+      DEBUG((
+        EFI_D_ERROR,
+        "%a: PCI host bridge (00:00.0) should have no interrupts!\n",
+        __FUNCTION__
+        ));
+      ASSERT (FALSE);
+    }
+
+    //
+    // Final PciHostIrqs[] index calculation depends on the platform
+    // and should match SeaBIOS src/fw/pciinit.c *_pci_slot_get_irq()
+    //
+    switch (mHostBridgeDevId) {
+      case INTEL_82441_DEVICE_ID:
+        Idx -= 1;
+        break;
+      case INTEL_Q35_MCH_DEVICE_ID:
+        //
+        // SeaBIOS contains the following comment:
+        // "Slots 0-24 rotate slot:pin mapping similar to piix above, but
+        //  with a different starting index - see q35-acpi-dsdt.dsl.
+        //
+        //  Slots 25-31 all use LNKA mapping (or LNKE, but A:D = E:H)"
+        //
+        if (RootSlot > 24) {
+          //
+          // in this case, subtract back out RootSlot from Idx
+          // (SeaBIOS never adds it to begin with, but that would make our
+          //  device path traversal loop above too awkward)
+          //
+          Idx -= RootSlot;
+        }
+        break;
+      default:
+        ASSERT (FALSE); // should never get here
+    }
+    Idx %= ARRAY_SIZE (PciHostIrqs);
+    IrqLine = PciHostIrqs[Idx];
+
+    //
+    // Set PCI Interrupt Line register for this device to PciHostIrqs[Idx]
+    //
+    Status = PciIo->Pci.Write (
+               PciIo,
+               EfiPciIoWidthUint8,
+               PCI_INT_LINE_OFFSET,
+               1,
+               &IrqLine
+               );
+  }
+
+  return Status;
+}
+
+
 VOID
 PciAcpiInitialization (
   )
 {
-  UINT16 HostBridgeDevId;
   UINTN  Pmba;
 
   //
   // Query Host Bridge DID to determine platform type
   //
-  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
-  switch (HostBridgeDevId) {
+  mHostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  switch (mHostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
       Pmba = POWER_MGMT_REGISTER_PIIX4 (0x40);
       //
@@ -754,55 +885,20 @@ PciAcpiInitialization (
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__, HostBridgeDevId));
+        __FUNCTION__, mHostBridgeDevId));
       ASSERT (FALSE);
       return;
   }
 
   //
+  // Initialize PCI_INTERRUPT_LINE for applicable present PCI devices
+  //
+  VisitAllPciInstances (SetPciIntLine);
+
+  //
   // Set ACPI SCI_EN bit in PMCNTRL
   //
   IoOr16 ((PciRead32 (Pmba) & ~BIT0) + 4, BIT0);
-
-  //
-  // Initialize PCI_INTERRUPT_LINE for commonly encountered devices and slots
-  //
-  // FIXME: This should instead be accomplished programmatically by
-  //        ennumerating all PCI devices present in the system and
-  //        computing PCI_INTERRUPT_LINE from PCI_INTERRUPT_PIN, the
-  //        slot/position of the device, and the available host IRQs
-  //        (for an example, see SeaBIOS pci_bios_init_devices() in
-  //        src/fw/pciinit.c)
-  //
-  switch (HostBridgeDevId) {
-    case INTEL_82441_DEVICE_ID:
-      PciWrite8 (PCI_LIB_ADDRESS (0,    1, 2, 0x3c), 0x0b); // usb (northbr.)
-      PciWrite8 (PCI_LIB_ADDRESS (0,    1, 3, 0x3c), 0x0a); // acpi (northbr.)
-      PciWrite8 (PCI_LIB_ADDRESS (0,    3, 0, 0x3c), 0x0b);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    4, 0, 0x3c), 0x0b);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    5, 0, 0x3c), 0x0a);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    6, 0, 0x3c), 0x0a);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    7, 0, 0x3c), 0x0b);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    8, 0, 0x3c), 0x0b);
-      break;
-    case INTEL_Q35_MCH_DEVICE_ID:
-      PciWrite8 (PCI_LIB_ADDRESS (0,    2, 0, 0x3c), 0x0b);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    3, 0, 0x3c), 0x0b);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    4, 0, 0x3c), 0x0a);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    5, 0, 0x3c), 0x0a);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    6, 0, 0x3c), 0x0b);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    7, 0, 0x3c), 0x0b);
-      PciWrite8 (PCI_LIB_ADDRESS (0,    8, 0, 0x3c), 0x0a);
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 0, 0x3c), 0x0a); // uhci1
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 1, 0x3c), 0x0a); // uhci2
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 2, 0x3c), 0x0b); // uhci3
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1d, 7, 0x3c), 0x0b); // ehci1
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 2, 0x3c), 0x0a); // ahci (northbr.)
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 3, 0x3c), 0x0a); // smbus (northbr.)
-      break;
-    default:
-      ASSERT (FALSE); // should never be reached
-  }
 }
 
 
