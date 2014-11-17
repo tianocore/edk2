@@ -20,7 +20,8 @@ UINTN gApStackSize;
 UINTN gPollInterval = 100; // 100 microseconds
 
 MP_SYSTEM_DATA mMpSystemData;
-EFI_HANDLE     mMpServiceHandle = NULL;
+EFI_HANDLE     mMpServiceHandle       = NULL;
+EFI_EVENT      mExitBootServicesEvent = (EFI_EVENT)NULL;
 
 VOID *mCommonStack = 0;
 VOID *mTopOfApCommonStack = 0;
@@ -1465,6 +1466,28 @@ InitMpSystemData (
 }
 
 /**
+  Callback function for ExitBootServices.
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+ExitBootServicesCallback (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  //
+  // Avoid APs access invalid buff datas which allocated by BootServices,
+  // so we send INIT IPI to APs to let them wait for SIPI state.
+  //
+  SendInitIpiAllExcludingSelf ();
+}
+
+/**
   Initialize Multi-processor support.
 
 **/
@@ -1531,4 +1554,13 @@ InitializeMpSupport (
                                 (gMaxLogicalProcessorNumber - mMpSystemData.NumberOfProcessors) *
                                 gApStackSize));
   }
+
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
+                  ExitBootServicesCallback,
+                  NULL,
+                  &mExitBootServicesEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 }
