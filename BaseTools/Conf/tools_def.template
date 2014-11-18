@@ -179,11 +179,11 @@ DEFINE GCC46_X64_PREFIX        = /usr/bin/
 DEFINE GCC47_IA32_PREFIX       = /usr/bin/
 DEFINE GCC47_X64_PREFIX        = /usr/bin/
 
-DEFINE GCC48_IA32_PREFIX       = /usr/bin/
-DEFINE GCC48_X64_PREFIX        = /usr/bin/
+DEFINE GCC48_IA32_PREFIX       = ENV(GCC48_BIN)
+DEFINE GCC48_X64_PREFIX        = ENV(GCC48_BIN)
 
-DEFINE GCC49_IA32_PREFIX       = /usr/bin/
-DEFINE GCC49_X64_PREFIX        = /usr/bin/
+DEFINE GCC49_IA32_PREFIX       = ENV(GCC49_BIN)
+DEFINE GCC49_X64_PREFIX        = ENV(GCC49_BIN)
 
 DEFINE UNIX_IASL_BIN           = ENV(IASL_PREFIX)iasl
 DEFINE WIN_ASL_BIN_DIR         = C:\ASL
@@ -333,14 +333,14 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
-#   GCC48       -Linux-  Requires:
-#                             GCC 4.8
+#   GCC48       -Linux,Windows-  Requires:
+#                             GCC 4.8 targeting x86_64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
-#   GCC49       -Linux-  Requires:
-#                             GCC 4.9
+#   GCC49       -Linux,Windows-  Requires:
+#                             GCC 4.9 targeting x86_64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
@@ -4367,7 +4367,8 @@ RELEASE_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -Wno-unused-but-s
 ####################################################################################
 *_GCC48_*_*_FAMILY               = GCC
 
-*_GCC48_*_MAKE_PATH                    = make
+*_GCC48_*_MAKE_PATH                    = DEF(GCC48_IA32_PREFIX)make
+*_GCC48_*_*_DLL                        = ENV(GCC48_DLL)
 *_GCC48_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 
 *_GCC48_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
@@ -4489,7 +4490,8 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 ####################################################################################
 *_GCC49_*_*_FAMILY               = GCC
 
-*_GCC49_*_MAKE_PATH                    = make
+*_GCC49_*_MAKE_PATH                    = DEF(GCC49_IA32_PREFIX)make
+*_GCC49_*_*_DLL                        = ENV(GCC49_DLL)
 *_GCC49_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 
 *_GCC49_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)

@@ -131,11 +131,33 @@
     <Command.GCC, Command.RVCT>
         # For RVCTCYGWIN CC_FLAGS must be first to work around pathing issues
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
-        "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
     <Command.ARMGCC, Command.ARMLINUXGCC, command.XCODE>
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
 
+[C-Code-File.COMMON.IPF]
+    <InputFile>
+        ?.c
+        ?.C
+        ?.cc
+        ?.CC
+        ?.cpp
+        ?.Cpp
+        ?.CPP
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        "$(CC)" /Fo${dst} $(CC_FLAGS) $(INC) ${src}
+
+    <Command.GCC, Command.RVCT>
+        # For RVCTCYGWIN CC_FLAGS must be first to work around pathing issues
+        "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
+        "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
 [C-Header-File]
     <InputFile>
