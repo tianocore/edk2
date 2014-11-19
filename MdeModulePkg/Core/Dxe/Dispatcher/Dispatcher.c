@@ -736,6 +736,8 @@ FvIsBeingProcesssed (
   LIST_ENTRY                            *Link;
   KNOWN_HANDLE                          *KnownHandle;
 
+  FwVolHeader = NULL;
+
   //
   // Get the FirmwareVolumeBlock protocol on that handle
   //
