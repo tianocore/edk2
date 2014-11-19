@@ -773,8 +773,9 @@
   # @Expression 0x80000002 | (gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl & 0xD8) == 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl|0x07|UINT8|0x00020005
 
-  ## TFTP BlockSize. Initial value 0 means using default block size which is (MTU-IP_HEADER-UDP_HEADER-TFTP_HEADER)
-  #  to handle all link layers. If the value is non zero, the PCD value will be used as block size.
+  ## This setting can override the default TFTP block size. A value of 0 computes
+  # the default from MTU information. A non-zero value will be used as block size
+  # in bytes.
   # @Prompt TFTP block size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize|0x0|UINT64|0x30001026
 
