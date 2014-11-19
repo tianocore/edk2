@@ -16,8 +16,6 @@
 #ifndef __XENBUS_DXE_HYPERCALL_H__
 #define __XENBUS_DXE_HYPERCALL_H__
 
-typedef struct _XENBUS_DEVICE XENBUS_DEVICE;
-
 /**
   This function will put the two arguments in the right place (registers) and
   call HypercallAddr, which correspond to an entry in the hypercall pages.
