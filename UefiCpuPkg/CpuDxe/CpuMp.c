@@ -178,7 +178,7 @@ TestCpuStatusFlag (
   Ret = CpuData->Info.StatusFlag & Flags;
   ReleaseMpSpinLock (CpuData);
 
-  return !!(Ret);
+  return (Ret != 0);
 }
 
 /**
@@ -664,7 +664,7 @@ StartupAllAPs (
   mMpSystemData.ProcedureArgument = ProcedureArgument;
   mMpSystemData.WaitEvent         = WaitEvent;
   mMpSystemData.Timeout           = TimeoutInMicroseconds;
-  mMpSystemData.TimeoutActive     = !!(TimeoutInMicroseconds);
+  mMpSystemData.TimeoutActive     = (TimeoutInMicroseconds != 0);
   mMpSystemData.FinishCount       = 0;
   mMpSystemData.StartCount        = 0;
   mMpSystemData.SingleThread      = SingleThread;
@@ -887,7 +887,7 @@ StartupThisAP (
 
   CpuData->Timeout = TimeoutInMicroseconds;
   CpuData->WaitEvent = WaitEvent;
-  CpuData->TimeoutActive = !!(TimeoutInMicroseconds);
+  CpuData->TimeoutActive = (TimeoutInMicroseconds != 0);
   CpuData->Finished = Finished;
 
   mStopCheckAllAPsStatus = FALSE;
