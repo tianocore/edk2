@@ -123,6 +123,7 @@ EFI_DXE_SERVICES mDxeServices = {
   (EFI_SCHEDULE)                     CoreSchedule,                        // Schedule
   (EFI_TRUST)                        CoreTrust,                           // Trust
   (EFI_PROCESS_FIRMWARE_VOLUME)      CoreProcessFirmwareVolume,           // ProcessFirmwareVolume
+  (EFI_SET_MEMORY_SPACE_CAPABILITIES)CoreSetMemorySpaceCapabilities,      // SetMemorySpaceCapabilities
 };
 
 EFI_SYSTEM_TABLE mEfiSystemTableTemplate = {

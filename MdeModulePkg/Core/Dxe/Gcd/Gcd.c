@@ -3,7 +3,7 @@
   The GCD services are used to manage the memory and I/O regions that
   are accessible to the CPU that is executing the DXE core.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -798,7 +798,7 @@ CoreConvertSpace (
       }
       break;
     //
-    // Set attribute operations
+    // Set attributes operation
     //
     case GCD_SET_ATTRIBUTES_MEMORY_OPERATION:
       if ((Attributes & EFI_MEMORY_RUNTIME) != 0) {
@@ -808,6 +808,23 @@ CoreConvertSpace (
         }
       }
       if ((Entry->Capabilities & Attributes) != Attributes) {
+        Status = EFI_UNSUPPORTED;
+        goto Done;
+      }
+      break;
+    //
+    // Set capabilities operation
+    //
+    case GCD_SET_CAPABILITIES_MEMORY_OPERATION:
+      if ((BaseAddress & EFI_PAGE_MASK) != 0 || (Length & EFI_PAGE_MASK) != 0) {
+        Status = EFI_INVALID_PARAMETER;
+
+        goto Done;
+      }
+      //
+      // Current attributes must still be supported with new capabilities
+      //
+      if ((Capabilities & Entry->Attributes) != Entry->Attributes) {
         Status = EFI_UNSUPPORTED;
         goto Done;
       }
@@ -891,10 +908,16 @@ CoreConvertSpace (
       Entry->GcdIoType = EfiGcdIoTypeNonExistent;
       break;
     //
-    // Set attribute operations
+    // Set attributes operation
     //
     case GCD_SET_ATTRIBUTES_MEMORY_OPERATION:
       Entry->Attributes = Attributes;
+      break;
+    //
+    // Set capabilities operation
+    //
+    case GCD_SET_CAPABILITIES_MEMORY_OPERATION:
+      Entry->Capabilities = Capabilities;
       break;
     }
     Link = Link->ForwardLink;
@@ -1555,6 +1578,45 @@ CoreSetMemorySpaceAttributes (
   DEBUG ((DEBUG_GCD, "  Attributes  = %016lx\n", Attributes));
 
   return CoreConvertSpace (GCD_SET_ATTRIBUTES_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, Attributes);
+}
+
+
+/**
+  Modifies the capabilities for a memory region in the global coherency domain of the
+  processor.
+
+  @param  BaseAddress      The physical address that is the start address of a memory region.
+  @param  Length           The size in bytes of the memory region.
+  @param  Capabilities     The bit mask of capabilities that the memory region supports.
+
+  @retval EFI_SUCCESS           The capabilities were set for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+  @retval EFI_UNSUPPORTED       The capabilities specified by Capabilities do not include the
+                                memory region attributes currently in use.
+  @retval EFI_ACCESS_DENIED     The capabilities for the memory resource range specified by
+                                BaseAddress and Length cannot be modified.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the capabilities
+                                of the memory resource range.
+**/
+EFI_STATUS
+EFIAPI
+CoreSetMemorySpaceCapabilities (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length,
+  IN UINT64                Capabilities
+  )
+{
+  EFI_STATUS    Status;
+
+  DEBUG ((DEBUG_GCD, "GCD:CoreSetMemorySpaceCapabilities(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
+  DEBUG ((DEBUG_GCD, "  Capabilities  = %016lx\n", Capabilities));
+
+  Status = CoreConvertSpace (GCD_SET_CAPABILITIES_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, Capabilities, 0);
+  if (!EFI_ERROR(Status)) {
+    CoreUpdateMemoryAttributes(BaseAddress, RShiftU64(Length, EFI_PAGE_SHIFT), Capabilities);
+  }
+
+  return Status;
 }
 
 
