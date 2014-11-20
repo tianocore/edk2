@@ -2078,7 +2078,7 @@ InternalCommandLineParse (
           ASSERT(GetItemValue == 0);
           break;
       }
-    } else if (GetItemValue != 0 && !InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers, (CONST BOOLEAN)(CurrentItemPackage->Type == TypeTimeValue))) {
+    } else if (GetItemValue != 0 && CurrentItemPackage != NULL && !InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers, (CONST BOOLEAN)(CurrentItemPackage->Type == TypeTimeValue))) {
       ASSERT(CurrentItemPackage != NULL);
       //
       // get the item VALUE for a previous flag
