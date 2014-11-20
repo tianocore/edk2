@@ -92,7 +92,7 @@ PerformParsing(
           if (LoopVariable == TableNameInstance
               || (TableNameInstance == (UINTN)-1)) {
             for (ColumnLoop = 1, ColumnPointer = TempLine; ColumnLoop < ColumnIndex && ColumnPointer != NULL && *ColumnPointer != CHAR_NULL; ColumnLoop++) {
-              ColumnPointer = StrStr (ColumnPointer, L",");
+              ColumnPointer = StrStr (ColumnPointer, L",\"");
               if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL){
                 ColumnPointer++;
               }
@@ -102,7 +102,7 @@ PerformParsing(
                 ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"Column Index");
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
-                TempSpot = StrStr (ColumnPointer, L",");
+                TempSpot = StrStr (ColumnPointer, L",\"");
                 if (TempSpot != NULL) {
                   *TempSpot = CHAR_NULL;
                 }
