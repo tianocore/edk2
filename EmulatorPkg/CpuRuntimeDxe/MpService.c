@@ -111,8 +111,31 @@ GetNextBlockedNumber (
   return EFI_NOT_FOUND;
 }
 
+/**
+ * Calculated and stalled the interval time by BSP to check whether
+ * the APs have finished.
+ *
+ * @param[in]  Timeout    The time limit in microseconds for
+ *                        APs to return from Procedure.
+ *
+ * @retval     StallTime  Time of execution stall.
+**/
+UINTN
+CalculateAndStallInterval (
+  IN UINTN                  Timeout
+  )
+{
+  UINTN                 StallTime;
 
+  if (Timeout < gPollInterval && Timeout != 0) {
+    StallTime = Timeout;
+  } else {
+    StallTime = gPollInterval;
+  }
+  gBS->Stall (StallTime);
 
+  return StallTime;
+}
 
 /**
   This service retrieves the number of logical processor in the platform
@@ -378,7 +401,7 @@ CpuMpServicesStartupAllAps (
   UINTN                 NextNumber;
   PROCESSOR_STATE       APInitialState;
   PROCESSOR_STATE       ProcessorState;
-  INTN                  Timeout;
+  UINTN                 Timeout;
 
 
   if (!IsBSP ()) {
@@ -540,13 +563,12 @@ CpuMpServicesStartupAllAps (
       goto Done;
     }
 
-    if ((TimeoutInMicroseconds != 0) && (Timeout < 0)) {
+    if ((TimeoutInMicroseconds != 0) && (Timeout == 0)) {
       Status = EFI_TIMEOUT;
       goto Done;
     }
 
-    gBS->Stall (gPollInterval);
-    Timeout -= gPollInterval;
+    Timeout -= CalculateAndStallInterval (Timeout);
   }
 
 Done:
@@ -659,7 +681,7 @@ CpuMpServicesStartupThisAP (
   OUT BOOLEAN                   *Finished               OPTIONAL
   )
 {
-  INTN            Timeout;
+  UINTN            Timeout;
 
   if (!IsBSP ()) {
     return EFI_DEVICE_ERROR;
@@ -717,12 +739,11 @@ CpuMpServicesStartupThisAP (
 
     gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
-    if ((TimeoutInMicroseconds != 0) && (Timeout < 0)) {
+    if ((TimeoutInMicroseconds != 0) && (Timeout == 0)) {
       return EFI_TIMEOUT;
     }
 
-    gBS->Stall (gPollInterval);
-    Timeout -= gPollInterval;
+    Timeout -= CalculateAndStallInterval (Timeout);
   }
 
   return EFI_SUCCESS;
@@ -987,7 +1008,7 @@ CpuCheckAllAPsStatus (
   BOOLEAN               Found;
 
   if (gMPSystem.TimeoutActive) {
-    gMPSystem.Timeout -= gPollInterval;
+    gMPSystem.Timeout -= CalculateAndStallInterval (gMPSystem.Timeout);
   }
 
   for (ProcessorNumber = 0; ProcessorNumber < gMPSystem.NumberOfProcessors; ProcessorNumber++) {
@@ -1040,7 +1061,7 @@ CpuCheckAllAPsStatus (
     }
   }
 
-  if (gMPSystem.TimeoutActive && gMPSystem.Timeout < 0) {
+  if (gMPSystem.TimeoutActive && gMPSystem.Timeout == 0) {
     //
     // Timeout
     //
