@@ -172,6 +172,7 @@ typedef struct {
 
   CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
   CHAR16           *ConfigAltResp; // Alt config response string for this ConfigRequest.
+  BOOLEAN          HasCallAltCfg;  // Flag to show whether browser has call ExtractConfig to get Altcfg string.
   UINTN            ElementCount;   // Number of <RequestElement> in the <ConfigRequest>
   UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
 } FORMSET_STORAGE;
@@ -917,6 +918,7 @@ InitializeFormSet (
   @param  RetrieveValueFirst     Whether call the retrieve call back to
                                  get the initial value before get default
                                  value.
+  @param  SkipGetAltCfg          Whether skip the get altcfg string process.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_UNSUPPORTED        Unsupport SettingScope.
@@ -930,7 +932,8 @@ ExtractDefault (
   IN BROWSER_SETTING_SCOPE            SettingScope,
   IN BROWSER_GET_DEFAULT_VALUE        GetDefaultValueScope,
   IN BROWSER_STORAGE                  *Storage,
-  IN BOOLEAN                          RetrieveValueFirst
+  IN BOOLEAN                          RetrieveValueFirst,
+  IN BOOLEAN                          SkipGetAltCfg
   );
 
 /**

@@ -928,7 +928,7 @@ ProcessAction (
   }
 
   if ((Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
-    ExtractDefault (gCurrentSelection->FormSet, gCurrentSelection->Form, DefaultId, gBrowserSettingScope, GetDefaultForAll, NULL, FALSE);
+    ExtractDefault (gCurrentSelection->FormSet, gCurrentSelection->Form, DefaultId, gBrowserSettingScope, GetDefaultForAll, NULL, FALSE, FALSE);
     UpdateStatementStatus (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
   }
 
@@ -1542,7 +1542,7 @@ ProcessUserInput (
       //
       // Reset Question to default value specified by DefaultId
       //
-      Status = ExtractDefault (gCurrentSelection->FormSet, NULL, Statement->DefaultId, FormSetLevel, GetDefaultForAll, NULL, FALSE);
+      Status = ExtractDefault (gCurrentSelection->FormSet, NULL, Statement->DefaultId, FormSetLevel, GetDefaultForAll, NULL, FALSE, FALSE);
       UpdateStatementStatus (gCurrentSelection->FormSet, NULL, FormSetLevel);
       break;
 
