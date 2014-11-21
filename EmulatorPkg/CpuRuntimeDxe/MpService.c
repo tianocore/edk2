@@ -713,6 +713,10 @@ CpuMpServicesStartupThisAP (
     return EFI_INVALID_PARAMETER;
   }
 
+  if ((gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   gThread->MutexLock(gMPSystem.ProcessorData[ProcessorNumber].StateLock);
   if (gMPSystem.ProcessorData[ProcessorNumber].State != CPU_STATE_IDLE) {
     gThread->MutexUnlock(gMPSystem.ProcessorData[ProcessorNumber].StateLock);
