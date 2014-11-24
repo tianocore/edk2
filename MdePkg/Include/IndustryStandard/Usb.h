@@ -1,7 +1,7 @@
 /** @file
   Support for USB 2.0 standard.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,32 @@
 
 #ifndef __USB_H__
 #define __USB_H__
+
+//
+// Subset of Class and Subclass definitions from USB Specs
+//
+
+//
+// Usb mass storage class code
+//
+#define USB_MASS_STORE_CLASS    0x08
+
+//
+// Usb mass storage subclass code, specify the command set used.
+//
+#define USB_MASS_STORE_RBC      0x01 ///< Reduced Block Commands
+#define USB_MASS_STORE_8020I    0x02 ///< SFF-8020i, typically a CD/DVD device
+#define USB_MASS_STORE_QIC      0x03 ///< Typically a tape device
+#define USB_MASS_STORE_UFI      0x04 ///< Typically a floppy disk driver device
+#define USB_MASS_STORE_8070I    0x05 ///< SFF-8070i, typically a floppy disk driver device.
+#define USB_MASS_STORE_SCSI     0x06 ///< SCSI transparent command set
+
+//
+// Usb mass storage protocol code, specify the transport protocol
+//
+#define USB_MASS_STORE_CBI0     0x00 ///< CBI protocol with command completion interrupt
+#define USB_MASS_STORE_CBI1     0x01 ///< CBI protocol without command completion interrupt
+#define USB_MASS_STORE_BOT      0x50 ///< Bulk-Only Transport
 
 //
 // Standard device request and request type
