@@ -132,3 +132,8 @@
   ## Do iSCSI decode for map names.
   # This is disabled by default due to the length of generated strings
   gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames|FALSE|BOOLEAN|0x00000012
+
+  ## Controls Extended decode for Vendor device path nodes for map names.
+  # Up to this many bytes of vendor specific data will be used. Default is 0
+  # (disabled).
+  gEfiShellPkgTokenSpaceGuid.PcdShellVendorExtendedDecode|0|UINT32|0x00000013

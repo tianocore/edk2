@@ -14,6 +14,7 @@
 #include "UefiShellCommandLib.h"
 #include <Library/DevicePathLib.h>
 #include <Library/SortLib.h>
+#include <Library/UefiLib.h>
 
 typedef enum {
   MTDTypeUnknown,
@@ -575,6 +576,9 @@ DevPathSerialVendor (
 {
   VENDOR_DEVICE_PATH  *Vendor;
   SAS_DEVICE_PATH     *Sas;
+  UINTN               TargetNameLength;
+  UINTN               Index;
+  CHAR16              *Buffer;
 
   if (DevicePathNode == NULL || MappingItem == NULL) {
     return;
@@ -589,6 +593,32 @@ DevPathSerialVendor (
     AppendCSDNum (MappingItem, Sas->Lun);
     AppendCSDNum (MappingItem, Sas->DeviceTopology);
     AppendCSDNum (MappingItem, Sas->RelativeTargetPort);
+  } else {
+    TargetNameLength = MIN(DevicePathNodeLength (DevicePathNode) - sizeof (VENDOR_DEVICE_PATH), PcdGet32(PcdShellVendorExtendedDecode));
+    if (TargetNameLength != 0) {
+      //
+      // String is 2 chars per data byte, plus NULL terminator
+      //
+      Buffer = AllocateZeroPool (((TargetNameLength * 2) + 1) * sizeof(CHAR16));
+      ASSERT(Buffer != NULL);
+      if (Buffer == NULL) {
+        return;
+      }
+
+      //
+      // Build the string data
+      //
+      for (Index = 0; Index < TargetNameLength; Index++) {
+        Buffer = CatSPrint (Buffer, L"%02x", *((UINT8*)Vendor + sizeof (VENDOR_DEVICE_PATH) + Index));
+      }
+
+      //
+      // Append the new data block
+      //
+      AppendCSDStr (MappingItem, Buffer);
+
+      FreePool(Buffer);
+    }
   }
 }
 
