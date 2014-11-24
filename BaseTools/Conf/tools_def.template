@@ -165,19 +165,17 @@ DEFINE CYGWIN_BINIA32          = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe
 DEFINE CYGWIN_BINX64           = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
 DEFINE CYGWIN_BINIPF           = c:/cygwin/opt/tiano/gcc/ipf/bin/ia64-pc-elf-
 
-DEFINE GCC44_IA32_PREFIX       = /usr/bin/
-#DEFINE GCC44_IA32_PREFIX       = ENV(HOME)/programs/gcc/4.4/ia32/
-DEFINE GCC44_X64_PREFIX        = /usr/bin/
-#DEFINE GCC44_X64_PREFIX       = ENV(HOME)/programs/gcc/4.4/x64/
+DEFINE GCC44_IA32_PREFIX       = ENV(GCC44_BIN)
+DEFINE GCC44_X64_PREFIX        = ENV(GCC44_BIN)
 
-DEFINE GCC45_IA32_PREFIX       = /usr/bin/
-DEFINE GCC45_X64_PREFIX        = /usr/bin/
+DEFINE GCC45_IA32_PREFIX       = ENV(GCC45_BIN)
+DEFINE GCC45_X64_PREFIX        = ENV(GCC45_BIN)
 
-DEFINE GCC46_IA32_PREFIX       = /usr/bin/
-DEFINE GCC46_X64_PREFIX        = /usr/bin/
+DEFINE GCC46_IA32_PREFIX       = ENV(GCC46_BIN)
+DEFINE GCC46_X64_PREFIX        = ENV(GCC46_BIN)
 
-DEFINE GCC47_IA32_PREFIX       = /usr/bin/
-DEFINE GCC47_X64_PREFIX        = /usr/bin/
+DEFINE GCC47_IA32_PREFIX       = ENV(GCC47_BIN)
+DEFINE GCC47_X64_PREFIX        = ENV(GCC47_BIN)
 
 DEFINE GCC48_IA32_PREFIX       = ENV(GCC48_BIN)
 DEFINE GCC48_X64_PREFIX        = ENV(GCC48_BIN)
@@ -309,38 +307,38 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
-#   GCC44       -Linux-  Requires:
-#                             GCC 4.4 (Native)
+#   GCC44       -Linux,Windows-  Requires:
+#                             GCC 4.4 targeting x86_64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
-#   GCC45       -Linux-  Requires:
-#                             GCC 4.5 (Native)
+#   GCC45       -Linux,Windows-  Requires:
+#                             GCC 4.5 targeting x86_64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
-#   GCC46       -Linux-  Requires:
-#                             GCC 4.6 (Native)
+#   GCC46       -Linux,Windows-  Requires:
+#                             GCC 4.6 targeting x86_64-linux-gnu or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
-#   GCC47       -Linux-  Requires:
-#                             GCC 4.7 (Native)
+#   GCC47       -Linux,Windows-  Requires:
+#                             GCC 4.7 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
 #   GCC48       -Linux,Windows-  Requires:
-#                             GCC 4.8 targeting x86_64-linux-gnu
+#                             GCC 4.8 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
 #   GCC49       -Linux,Windows-  Requires:
-#                             GCC 4.9 targeting x86_64-linux-gnu
+#                             GCC 4.9 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
@@ -4014,7 +4012,8 @@ DEFINE GCC49_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
 ####################################################################################
 *_GCC44_*_*_FAMILY               = GCC
 
-*_GCC44_*_MAKE_PATH                    = make
+*_GCC44_*_MAKE_PATH                    = DEF(GCC44_IA32_PREFIX)make
+*_GCC44_*_*_DLL                        = ENV(GCC44_DLL)
 *_GCC44_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 
 *_GCC44_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
@@ -4081,7 +4080,8 @@ DEFINE GCC49_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
 ####################################################################################
 *_GCC45_*_*_FAMILY               = GCC
 
-*_GCC45_*_MAKE_PATH                    = make
+*_GCC45_*_MAKE_PATH                    = DEF(GCC45_IA32_PREFIX)make
+*_GCC45_*_*_DLL                        = ENV(GCC45_DLL)
 *_GCC45_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 
 *_GCC45_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
@@ -4148,7 +4148,8 @@ DEFINE GCC49_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
 ####################################################################################
 *_GCC46_*_*_FAMILY               = GCC
 
-*_GCC46_*_MAKE_PATH                    = make
+*_GCC46_*_MAKE_PATH                    = DEF(GCC46_IA32_PREFIX)make
+*_GCC46_*_*_DLL                        = ENV(GCC46_DLL)
 *_GCC46_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 
 *_GCC46_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
@@ -4245,7 +4246,8 @@ RELEASE_GCC46_ARM_CC_FLAGS       = DEF(GCC46_ARM_CC_FLAGS) -Wno-unused-but-set-v
 ####################################################################################
 *_GCC47_*_*_FAMILY               = GCC
 
-*_GCC47_*_MAKE_PATH                    = make
+*_GCC47_*_MAKE_PATH                    = DEF(GCC47_IA32_PREFIX)make
+*_GCC47_*_*_DLL                        = ENV(GCC47_DLL)
 *_GCC47_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 
 *_GCC47_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
