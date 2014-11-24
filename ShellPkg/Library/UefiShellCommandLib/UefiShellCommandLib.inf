@@ -53,6 +53,7 @@
   gEfiShellProtocolGuid                                   # ALWAYS_CONSUMED
   gEfiShellParametersProtocolGuid                         # ALWAYS_CONSUMED
   gEfiShellDynamicCommandProtocolGuid                     # SOMETIMES_CONSUMED
+  gEfiUsbIoProtocolGuid                                   ## SOMETIMES_CONSUMED
 
 [Guids]
   gEfiSasDevicePathGuid                                   # ALWAYS_CONSUMED
@@ -60,6 +61,7 @@
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## ALWAYS_CONSUMED
   gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdUsbExtendedDecode         ## SOMETIMES_CONSUMED
   gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames  ## SOMETIMES_CONSUMED
   gEfiShellPkgTokenSpaceGuid.PcdShellVendorExtendedDecode ## SOMETIMES_CONSUMED
 

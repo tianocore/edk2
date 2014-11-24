@@ -129,6 +129,9 @@
   ## Unicode string of the shell supplier
   gEfiShellPkgTokenSpaceGuid.PcdShellSupplier|L"EDK II"|VOID*|0x00000010
 
+  ## Do extended decode of USB for determining media type
+  gEfiShellPkgTokenSpaceGuid.PcdUsbExtendedDecode|TRUE|BOOLEAN|0x00000011
+
   ## Do iSCSI decode for map names.
   # This is disabled by default due to the length of generated strings
   gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames|FALSE|BOOLEAN|0x00000012
