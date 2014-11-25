@@ -1,6 +1,12 @@
 /*++
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Caution: This file is used for Duet platform only, do not use them in real platform.
+All variable code, variable metadata, and variable data used by Duet platform are on 
+disk. They can be changed by user. BIOS is not able to protoect those.
+Duet trusts all meta data from disk. If variable code, variable metadata and variable
+data is modified in inproper way, the behavior is undefined.
+
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
