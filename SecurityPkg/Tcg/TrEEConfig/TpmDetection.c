@@ -46,7 +46,7 @@ IsDtpmPresent (
     DEBUG ((EFI_D_ERROR, "DetectTpmDevice: Dtpm not present\n"));
     return FALSE;
   } else {
-    DEBUG ((EFI_D_ERROR, "DetectTpmDevice: Dtpm present\n"));
+    DEBUG ((EFI_D_INFO, "DetectTpmDevice: Dtpm present\n"));
     return TRUE;
   }
 }
@@ -76,7 +76,7 @@ DetectTpmDevice (
   // In S3, we rely on normal boot Detection, because we save to ReadOnly Variable in normal boot.
   //
   if (BootMode == BOOT_ON_S3_RESUME) {
-    DEBUG ((EFI_D_ERROR, "DetectTpmDevice: S3 mode\n"));
+    DEBUG ((EFI_D_INFO, "DetectTpmDevice: S3 mode\n"));
 
     Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariable2PpiGuid, 0, NULL, (VOID **) &VariablePpi);
     ASSERT_EFI_ERROR (Status);
@@ -99,7 +99,7 @@ DetectTpmDevice (
     }
   }
 
-  DEBUG ((EFI_D_ERROR, "DetectTpmDevice:\n"));
+  DEBUG ((EFI_D_INFO, "DetectTpmDevice:\n"));
   if (!IsDtpmPresent ()) {
     // dTPM not available
     return TPM_DEVICE_NULL;

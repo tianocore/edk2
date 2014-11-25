@@ -91,15 +91,15 @@ TpmCommandClear (
     CopyMem (LocalAuthSession.hmac.buffer, PlatformAuth->buffer, PlatformAuth->size);
   }
 
-  DEBUG ((EFI_D_ERROR, "Tpm2ClearControl ... \n"));
+  DEBUG ((EFI_D_INFO, "Tpm2ClearControl ... \n"));
   Status = Tpm2ClearControl (TPM_RH_PLATFORM, AuthSession, NO);
-  DEBUG ((EFI_D_ERROR, "Tpm2ClearControl - %r\n", Status));
+  DEBUG ((EFI_D_INFO, "Tpm2ClearControl - %r\n", Status));
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  DEBUG ((EFI_D_ERROR, "Tpm2Clear ... \n"));
+  DEBUG ((EFI_D_INFO, "Tpm2Clear ... \n"));
   Status = Tpm2Clear (TPM_RH_PLATFORM, AuthSession);
-  DEBUG ((EFI_D_ERROR, "Tpm2Clear - %r\n", Status));
+  DEBUG ((EFI_D_INFO, "Tpm2Clear - %r\n", Status));
 
 Done:
   ZeroMem (&LocalAuthSession.hmac, sizeof(LocalAuthSession.hmac));

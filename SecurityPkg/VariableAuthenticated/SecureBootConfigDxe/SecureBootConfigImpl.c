@@ -1920,7 +1920,7 @@ DeleteKeyExchangeKey (
   ZeroMem (OldData, KekDataSize);
   while ((KekDataSize > 0) && (KekDataSize >= CertList->SignatureListSize)) {
     CertCount  = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
-    DEBUG ((DEBUG_ERROR, "       CertCount = %x\n", CertCount));
+    DEBUG ((DEBUG_INFO, "       CertCount = %x\n", CertCount));
     if (CertCount != 0) {
       CopyMem (OldData + Offset, CertList, CertList->SignatureListSize);
       Offset += CertList->SignatureListSize;
@@ -2118,7 +2118,7 @@ DeleteSignature (
   ZeroMem (OldData, ItemDataSize);
   while ((ItemDataSize > 0) && (ItemDataSize >= CertList->SignatureListSize)) {
     CertCount  = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
-    DEBUG ((DEBUG_ERROR, "       CertCount = %x\n", CertCount));
+    DEBUG ((DEBUG_INFO, "       CertCount = %x\n", CertCount));
     if (CertCount != 0) {
       CopyMem (OldData + Offset, (UINT8*)(CertList), CertList->SignatureListSize);
       Offset += CertList->SignatureListSize;

@@ -1,7 +1,7 @@
 /** @file
   Implement defer image load services for user identification in UEFI2.2.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -853,7 +853,7 @@ DxeDeferImageLoadHandler (
     return EFI_SUCCESS;
   }
  
-  DEBUG ((EFI_D_ERROR, "[Security] No user identified, the image is deferred to load!\n"));
+  DEBUG ((EFI_D_INFO, "[Security] No user identified, the image is deferred to load!\n"));
   PutDefferedImageInfo (File, FileBuffer, FileSize);
 
   //

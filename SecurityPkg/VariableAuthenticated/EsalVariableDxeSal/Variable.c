@@ -1,7 +1,7 @@
 /** @file
   The implementation of Extended SAL variable services.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -3244,7 +3244,7 @@ VariableCommonInitialize (
                );
   } else {
     Status = EFI_VOLUME_CORRUPTED;
-    DEBUG((EFI_D_INFO, "Variable Store header is corrupted\n"));
+    DEBUG((EFI_D_ERROR, "Variable Store header is corrupted\n"));
   }
 
 Done:
