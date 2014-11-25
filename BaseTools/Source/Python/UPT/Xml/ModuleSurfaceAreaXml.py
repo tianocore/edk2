@@ -160,7 +160,7 @@ class BinaryFileXml(object):
 
         GuiVerElemList = []
         for LibGuidVer in LibGuidVerList:
-            if IsMatchArch(LibGuidVer.GetSupArchList(), SupportArch):
+            if LibGuidVer.GetLibGuid() and IsMatchArch(LibGuidVer.GetSupArchList(), SupportArch):
                 GuiVerElem = \
                 CreateXmlElement('GUID', LibGuidVer.GetLibGuid(), [], [['Version', LibGuidVer.GetLibVersion()]])
                 GuiVerElemList.append(GuiVerElem)
