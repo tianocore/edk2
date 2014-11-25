@@ -4,7 +4,7 @@
   This file implements protocol interfaces: Driver Binding protocol,
   Block IO protocol and DiskInfo protocol.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1072,6 +1072,10 @@ BlockIoReadWrite (
   }
 
   if (BufferSize == 0) {
+    if ((Token != NULL) && (Token->Event != NULL)) {
+      Token->TransactionStatus = EFI_SUCCESS;
+      gBS->SignalEvent (Token->Event);
+    }
     return EFI_SUCCESS;
   }
 
