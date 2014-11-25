@@ -1738,7 +1738,7 @@ CoreGetMemorySpaceDescriptor (
                                 resource range specified by BaseAddress and Length.
   @retval EFI_UNSUPPORTED       The bit mask of attributes is not support for the memory resource
                                 range specified by BaseAddress and Length.
-  @retval EFI_ACCESS_DEFINED    The attributes for the memory resource range specified by
+  @retval EFI_ACCESS_DENIED     The attributes for the memory resource range specified by
                                 BaseAddress and Length cannot be modified.
   @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
                                 the memory resource range.
@@ -1752,6 +1752,32 @@ CoreSetMemorySpaceAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
   IN UINT64                Attributes
+  );
+
+
+/**
+  Modifies the capabilities for a memory region in the global coherency domain of the
+  processor.
+
+  @param  BaseAddress      The physical address that is the start address of a memory region.
+  @param  Length           The size in bytes of the memory region.
+  @param  Capabilities     The bit mask of capabilities that the memory region supports.
+
+  @retval EFI_SUCCESS           The capabilities were set for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+  @retval EFI_UNSUPPORTED       The capabilities specified by Capabilities do not include the
+                                memory region attributes currently in use.
+  @retval EFI_ACCESS_DENIED     The capabilities for the memory resource range specified by
+                                BaseAddress and Length cannot be modified.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the capabilities
+                                of the memory resource range.
+**/
+EFI_STATUS
+EFIAPI
+CoreSetMemorySpaceCapabilities (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length,
+  IN UINT64                Capabilities
   );
 
 
@@ -2615,6 +2641,28 @@ GetFwVolHeader (
 BOOLEAN
 VerifyFvHeaderChecksum (
   IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
+  );
+
+/**
+  Internal function.  Converts a memory range to use new attributes.
+
+  @param  Start                  The first address of the range Must be page
+                                 aligned
+  @param  NumberOfPages          The number of pages to convert
+  @param  NewAttributes          The new attributes value for the range.
+
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
+                                 range  or convertion not allowed.
+  @retval EFI_SUCCESS            Successfully converts the memory range to the
+                                 specified attributes.
+
+**/
+VOID
+CoreUpdateMemoryAttributes (
+  IN EFI_PHYSICAL_ADDRESS  Start,
+  IN UINT64                NumberOfPages,
+  IN UINT64                NewAttributes
   );
 
 #endif
