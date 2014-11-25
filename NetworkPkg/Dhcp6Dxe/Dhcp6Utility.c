@@ -143,9 +143,9 @@ Dhcp6GenerateClientId (
     //
     // Set the Duid-type, hardware-type, time and copy the hardware address.
     //
-    WriteUnaligned16 ((UINT16 *) ((UINT8 *)&Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid)), HTONS (Dhcp6DuidTypeLlt));
-    WriteUnaligned16 ((UINT16 *) ((UINT8 *)&Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 2), HTONS (NET_IFTYPE_ETHERNET));
-    WriteUnaligned32 ((UINT32 *) ((UINT8 *)&Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 4), HTONL (Stamp));
+    WriteUnaligned16 ((UINT16 *) ((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid)), HTONS (Dhcp6DuidTypeLlt));
+    WriteUnaligned16 ((UINT16 *) ((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 2), HTONS (NET_IFTYPE_ETHERNET));
+    WriteUnaligned32 ((UINT32 *) ((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 4), HTONL (Stamp));
 
     CopyMem (Duid->Duid + 8, &Mode->CurrentAddress, Mode->HwAddressSize);
   }
