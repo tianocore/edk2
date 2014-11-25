@@ -884,6 +884,8 @@ PeiGetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  VariableHeader = NULL;
+
   //
   // Find existing variable
   //
@@ -969,6 +971,8 @@ PeiGetNextVariableName (
   if (VariableName == NULL || VariableGuid == NULL || VariableNameSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  VariableHeader = NULL;
 
   Status = FindVariable (VariableName, VariableGuid, &Variable, &StoreInfo);
   if (Variable.CurrPtr == NULL || Status != EFI_SUCCESS) {
