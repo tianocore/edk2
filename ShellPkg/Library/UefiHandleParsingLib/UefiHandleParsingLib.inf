@@ -1,6 +1,6 @@
 ##  @file
 #  Provides interface to advanced shell functionality for parsing both handle and protocol database.
-#  Copyright (c) 2013 - 2014, Hewlett-Packard Development Company, L.P.
+#  Copyright (c) 2013 - 2014, Hewlett-Packard Development Company, L.P.<BR>
 #  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
@@ -36,6 +36,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ShellPkg/ShellPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -172,6 +173,9 @@
   gEfiIdeControllerInitProtocolGuid                       ##UNDEFINED
   gEfiDiskIo2ProtocolGuid                                 ##UNDEFINED
   gEfiAdapterInformationProtocolGuid                      ##UNDEFINED
+  gEfiIsaIoProtocolGuid                                   ##UNDEFINED
+  gEfiIsaAcpiProtocolGuid                                 ##UNDEFINED
+  gEfiShellDynamicCommandProtocolGuid                     ##UNDEFINED
 
 [Guids]
   gEfiFileInfoGuid                                        ##CONSUMES
@@ -188,6 +192,9 @@
   gEfiPartTypeSystemPartGuid                              ##UNDEFINED
   gEfiPartTypeLegacyMbrGuid                               ##UNDEFINED
   gHandleParsingHiiGuid                                   ##UNDEFINED
+  gEfiAdapterInfoMediaStateGuid                           ##SOMETIMES CONSUMES
+  gEfiAdapterInfoNetworkBootGuid                          ##SOMETIMES CONSUMES
+  gEfiAdapterInfoSanMacAddressGuid                        ##SOMETIMES CONSUMES
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      ##CONSUMES
