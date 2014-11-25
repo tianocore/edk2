@@ -1,7 +1,7 @@
 ## @file
 # This is NT32 FDF file with UEFI HII features enabled
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -270,7 +270,11 @@ INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
 # for binary shell, binary fat and logo module.
 #
 ################################################################################
-INF EdkShellBinPkg/FullShell/FullShell.inf
+!ifndef $(USE_OLD_SHELL)
+INF  ShellBinPkg/UefiShell/UefiShell.inf
+!else
+INF  EdkShellBinPkg/FullShell/FullShell.inf
+!endif
 
 INF FatBinPkg/EnhancedFatDxe/Fat.inf
 

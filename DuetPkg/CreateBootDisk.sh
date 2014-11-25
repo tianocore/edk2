@@ -2,7 +2,7 @@
 
 ## @file
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -89,11 +89,11 @@ then
 				mkdir -p $EFI_BOOT_MEDIA/efi/boot
 				if [ "$5" = IA32 ]
 				then
-					cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
+					cp $WORKSPACE/ShellBinPkg/UefiShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/boot$5.efi
 				else
 					if [ "$5" = X64 ]
 					then
-						cp $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootx64.efi 
+						cp $WORKSPACE/ShellBinPkg/UefiShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/boot$5.efi
 					else
 						echo Wrong Arch!
 					fi
@@ -115,10 +115,10 @@ then
 				mmd -i $EFI_BOOT_MEDIA ::/efi ::/efi/boot
 				if [ "$5" = IA32 ]
 				then
-					mcopy -i $EFI_BOOT_MEDIA $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi ::/efi/boot/bootia32.efi
+					mcopy -i $EFI_BOOT_MEDIA $WORKSPACE/ShellBinPkg/UefiShell/Ia32/Shell.efi ::/efi/boot/boot$5.efi
 				elif [ "$5" = X64 ]
 				then
-					mcopy -i $EFI_BOOT_MEDIA $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi ::/efi/boot/bootx64.efi
+					mcopy -i $EFI_BOOT_MEDIA $WORKSPACE/ShellBinPkg/UefiShell/X64/Shell.efi ::/efi/boot/boot$5.efi
 				else
 					echo Wrong Arch!
 				fi
@@ -146,11 +146,11 @@ then
 					mkdir $EFI_BOOT_MEDIA/efi/boot
 					if [ "$5" = IA32 ]
 					then
-						cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
+						cp $WORKSPACE/ShellBinPkg/UefiShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/boot$5.efi
 					else
 						if [ "$5" = X64 ]
 						then
-							cp $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootx64.efi 
+							cp $WORKSPACE/ShellBinPkg/UefiShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/boot$5.efi
 						else
 							echo Wrong Arch!
 						fi
@@ -178,11 +178,11 @@ then
 					mkdir $EFI_BOOT_MEDIA/efi/boot
 					if [ "$5" = IA32 ]
 					then
-						cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
+						cp $WORKSPACE/ShellBinPkg/UefiShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/boot$5.efi
 					else
 						if [ "$5" = X64 ]
 						then
-							cp $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootx64.efi 
+							cp $WORKSPACE/ShellBinPkg/UefiShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/boot$5.efi
 						else
 							echo Wrong Arch!
 						fi
