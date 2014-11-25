@@ -1109,9 +1109,7 @@ MeasureHandoffTables (
              (VOID **) &SmbiosTable
              );
 
-  if (!EFI_ERROR (Status)) {
-    ASSERT (SmbiosTable != NULL);
-
+  if (!EFI_ERROR (Status) && SmbiosTable != NULL) {
     TcgEvent.PCRIndex  = 1;
     TcgEvent.EventType = EV_EFI_HANDOFF_TABLES;
     TcgEvent.EventSize = sizeof (HandoffTables);
@@ -1225,8 +1223,6 @@ MeasureVariable (
   UINTN                             VarNameLength;
   EFI_VARIABLE_DATA_TREE            *VarLog;
 
-  ASSERT ((VarSize == 0 && VarData == NULL) || (VarSize != 0 && VarData != NULL));
-
   DEBUG ((EFI_D_ERROR, "TrEEDxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)PCRIndex, (UINTN)EventType));
   DEBUG ((EFI_D_ERROR, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
 
@@ -1318,10 +1314,12 @@ ReadAndMeasureVariable (
       *VarSize = 0;
     }
   } else {
+    //
+    // if status error, VarData is freed and set NULL by GetVariable2
+    //
     if (EFI_ERROR (Status)) {
-      return Status;
+      return EFI_NOT_FOUND;
     }
-    ASSERT (*VarData != NULL);
   }
 
   Status = MeasureVariable (
@@ -1428,9 +1426,11 @@ MeasureAllBootVariables (
   if (Status == EFI_NOT_FOUND) {
     return EFI_SUCCESS;
   }
-  ASSERT (BootOrder != NULL);
 
   if (EFI_ERROR (Status)) {
+    //
+    // BootOrder can't be NULL if status is not EFI_NOT_FOUND
+    //
     FreePool (BootOrder);
     return Status;
   }
@@ -1721,7 +1721,10 @@ InstallAcpiTable (
                             &TableKey
                             );
   }
-  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG((EFI_D_ERROR, "Tcg Acpi Table installation failure"));
+  }
 }
 
 /**
@@ -1748,7 +1751,9 @@ OnExitBootServices (
   Status = TcgMeasureAction (
              EFI_EXIT_BOOT_SERVICES_INVOCATION
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_INVOCATION));
+  }
 
   //
   // Measure success of ExitBootServices
@@ -1756,7 +1761,9 @@ OnExitBootServices (
   Status = TcgMeasureAction (
              EFI_EXIT_BOOT_SERVICES_SUCCEEDED
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
+  }
 }
 
 /**
@@ -1783,7 +1790,9 @@ OnExitBootServicesFailed (
   Status = TcgMeasureAction (
              EFI_EXIT_BOOT_SERVICES_FAILED
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_FAILED));
+  }
 
 }
 

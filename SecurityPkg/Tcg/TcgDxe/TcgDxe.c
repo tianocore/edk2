@@ -505,7 +505,10 @@ TcgDxeHashLogExtendEventI (
                (UINTN) HashDataLen,
                &NewEventHdr->Digest
                );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "TpmCommHashAll Failed. %x\n", Status));
+      return Status;
+    }
   }
 
   Status = TpmCommExtend (
@@ -745,9 +748,7 @@ MeasureHandoffTables (
              (VOID **) &SmbiosTable
              );
 
-  if (!EFI_ERROR (Status)) {
-    ASSERT (SmbiosTable != NULL);
-
+  if (!EFI_ERROR (Status) && SmbiosTable != NULL) {
     TcgEvent.PCRIndex  = 1;
     TcgEvent.EventType = EV_EFI_HANDOFF_TABLES;
     TcgEvent.EventSize = sizeof (HandoffTables);
@@ -1023,9 +1024,11 @@ MeasureAllBootVariables (
   if (Status == EFI_NOT_FOUND) {
     return EFI_SUCCESS;
   }
-  ASSERT (BootOrder != NULL);
 
   if (EFI_ERROR (Status)) {
+    //
+    // BootOrder can't be NULL if status is not EFI_NOT_FOUND
+    //
     FreePool (BootOrder);
     return Status;
   }
@@ -1091,14 +1094,18 @@ OnReadyToBoot (
     Status = TcgMeasureAction (
                EFI_CALLING_EFI_APPLICATION
                );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+    }
 
     //
     // 2. Draw a line between pre-boot env and entering post-boot env.
     //
     for (PcrIndex = 0; PcrIndex < 8; PcrIndex++) {
       Status = MeasureSeparatorEvent (PcrIndex);
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Seperator Event not Measured. Error!\n"));
+      }
     }
 
     //
@@ -1119,7 +1126,9 @@ OnReadyToBoot (
     Status = TcgMeasureAction (
                EFI_RETURNING_FROM_EFI_APPLICATOIN
                );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATOIN));
+    }
   }
 
   DEBUG ((EFI_D_INFO, "TPM TcgDxe Measure Data when ReadyToBoot\n"));
@@ -1198,7 +1207,10 @@ InstallAcpiTable (
                             &TableKey
                             );
   }
-  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG((EFI_D_ERROR, "Tcg Acpi Table installation failure"));
+  }
 }
 
 /**
@@ -1225,7 +1237,9 @@ OnExitBootServices (
   Status = TcgMeasureAction (
              EFI_EXIT_BOOT_SERVICES_INVOCATION
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_INVOCATION));
+  }
 
   //
   // Measure success of ExitBootServices
@@ -1233,7 +1247,9 @@ OnExitBootServices (
   Status = TcgMeasureAction (
              EFI_EXIT_BOOT_SERVICES_SUCCEEDED
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)){
+    DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
+  }
 }
 
 /**
@@ -1260,8 +1276,9 @@ OnExitBootServicesFailed (
   Status = TcgMeasureAction (
              EFI_EXIT_BOOT_SERVICES_FAILED
              );
-  ASSERT_EFI_ERROR (Status);
-
+  if (EFI_ERROR (Status)){
+    DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_FAILED));
+  }
 }
 
 /**
