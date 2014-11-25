@@ -13,6 +13,11 @@
 # This library instance uses the PCD_PROTOCOL to handle dynamic PCD request and use
 # EFI_PCD_PROTOCOL to handle dynamicEx type PCD.
 #
+# Note: A driver of type DXE_RUNTIME_DRIVER and DXE_SMM_DRIVER can only use this DxePcdLib 
+#  in their initialization without any issues to access Dynamic and DynamicEx PCD. They can't 
+#  access Dynamic and DynamicEx PCD in the implementation of runtime services and SMI handlers.
+#  Because EFI_PCD_PROTOCOL is DXE protocol that is not aviable in OS runtime phase.  
+#
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
