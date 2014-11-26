@@ -891,7 +891,7 @@ EFI_STATUS
 (EFIAPI *EFI_QUERY_CAPSULE_CAPABILITIES) (
   IN  EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
   IN  UINTN                CapsuleCount,
-  OUT UINT64               *MaxiumCapsuleSize,
+  OUT UINT64               *MaximumCapsuleSize,
   OUT EFI_RESET_TYPE       *ResetType
 );
 
