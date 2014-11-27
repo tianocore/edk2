@@ -2,6 +2,7 @@
   This file implements I2C Host Protocol which provides callers with the ability to 
   do I/O transactions to all of the devices on the I2C bus.
 
+  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -672,6 +673,10 @@ I2cHostI2cBusConfigurationAvailable (
                         I2cHostContext->I2cEvent,
                         &I2cHostContext->Status
                         );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG((DEBUG_ERROR, "I2cHostI2cBusConfigurationAvailable: Error starting I2C operation, %r\n", Status));
+  }
 }
 
 /**

@@ -11,6 +11,7 @@
         always on the first sector of a media. The first sector also contains
         the legacy boot strap code.
 
+Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -74,6 +75,9 @@ PartitionValidMbr (
       // return FALSE since no block devices on a system are implemented
       // with INT 13h
       //
+    
+      DEBUG((EFI_D_INFO, "PartitionValidMbr: Bad MBR partition size EndingLBA(%1x) > LastLBA(%1x)\n", EndingLBA, LastLba));
+
       return FALSE;
     }
 

@@ -257,7 +257,7 @@ SMM_IPL_EVENT_NOTIFICATION  mSmmIplEvents[] = {
   //
   { TRUE,  FALSE, &gEfiSmmConfigurationProtocolGuid,  SmmIplSmmConfigurationEventNotify, &gEfiSmmConfigurationProtocolGuid,  TPL_NOTIFY,   NULL },
   //
-  // Declare protocl notification on DxeSmmReadyToLock protocols.  When this notification is etablished, 
+  // Declare protocol notification on DxeSmmReadyToLock protocols.  When this notification is established, 
   // the associated event is immediately signalled, so the notification function will be executed and the 
   // DXE SMM Ready To Lock Protocol will be found if it is already in the handle database.
   //
@@ -659,7 +659,7 @@ SmmIplSmmConfigurationEventNotify (
 
 /**
   Event notification that is fired every time a DxeSmmReadyToLock protocol is added
-  or if gEfiEventReadyToBootGuid is signalled.
+  or if gEfiEventReadyToBootGuid is signaled.
 
   @param  Event                 The Event that is being processed, not used.
   @param  Context               Event Context, not used.
@@ -694,7 +694,7 @@ SmmIplReadyToLockEventNotify (
   } else {
     //
     // If SMM is not locked yet and we got here from gEfiEventReadyToBootGuid being 
-    // signalled, then gEfiDxeSmmReadyToLockProtocolGuid was not installed as expected.
+    // signaled, then gEfiDxeSmmReadyToLockProtocolGuid was not installed as expected.
     // Print a warning on debug builds.
     //
     DEBUG ((DEBUG_WARN, "SMM IPL!  DXE SMM Ready To Lock Protocol not installed before Ready To Boot signal\n"));
