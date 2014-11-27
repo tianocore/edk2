@@ -1525,7 +1525,7 @@ IsSavedHighlightStatement (
   if ((gFormData->HiiHandle == gHighligthMenuInfo.HiiHandle) &&
       (gFormData->FormId == gHighligthMenuInfo.FormId)) {
     if (gHighligthMenuInfo.HLTQuestionId != 0) {
-      return (gHighligthMenuInfo.HLTQuestionId == GetQuestionIdInfo (HighLightedStatement->OpCode));
+      return (BOOLEAN) (gHighligthMenuInfo.HLTQuestionId == GetQuestionIdInfo (HighLightedStatement->OpCode));
     } else {
       if (CompareMem (gHighligthMenuInfo.HLTOpCode, HighLightedStatement->OpCode, gHighligthMenuInfo.HLTOpCode->Length) == 0) {
         if (gHighligthMenuInfo.HLTIndex == 0 || gHighligthMenuInfo.HLTIndex == GetIndexInfoForOpcode(HighLightedStatement->OpCode)) {
@@ -1556,12 +1556,12 @@ IsHighLightMenuOption (
 {
   if (gHighligthMenuInfo.HLTQuestionId != 0) {
     if (GetQuestionIdInfo(MenuOption->ThisTag->OpCode) == gHighligthMenuInfo.HLTQuestionId) {
-      return (MenuOption->Sequence == gHighligthMenuInfo.HLTSequence);
+      return (BOOLEAN) (MenuOption->Sequence == gHighligthMenuInfo.HLTSequence);
     }
   } else {
     if(CompareMem (gHighligthMenuInfo.HLTOpCode, MenuOption->ThisTag->OpCode, gHighligthMenuInfo.HLTOpCode->Length) == 0) {
       if (gHighligthMenuInfo.HLTIndex == 0 || gHighligthMenuInfo.HLTIndex == GetIndexInfoForOpcode(MenuOption->ThisTag->OpCode)) {
-        return (MenuOption->Sequence == gHighligthMenuInfo.HLTSequence);
+        return (BOOLEAN) (MenuOption->Sequence == gHighligthMenuInfo.HLTSequence);
       } else {
         return FALSE;
       }
@@ -1648,7 +1648,7 @@ IsTopOfScreeMenuOption (
   )
 {
   if (gHighligthMenuInfo.TOSQuestionId != 0) {
-    return (GetQuestionIdInfo(MenuOption->ThisTag->OpCode) == gHighligthMenuInfo.TOSQuestionId);
+    return (BOOLEAN) (GetQuestionIdInfo(MenuOption->ThisTag->OpCode) == gHighligthMenuInfo.TOSQuestionId);
   } 
 
   if(CompareMem (gHighligthMenuInfo.TOSOpCode, MenuOption->ThisTag->OpCode, gHighligthMenuInfo.TOSOpCode->Length) == 0) {
