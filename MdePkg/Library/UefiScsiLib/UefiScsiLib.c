@@ -903,9 +903,6 @@ ScsiRead10Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
@@ -926,11 +923,7 @@ ScsiRead10Command (
   //
   // Fill Cdb for Read (10) Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_READ10;
-  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
   WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
 
@@ -1001,9 +994,6 @@ ScsiWrite10Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
@@ -1024,11 +1014,7 @@ ScsiWrite10Command (
   //
   // Fill Cdb for Write (10) Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_WRITE10;
-  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
   WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
 
@@ -1099,9 +1085,6 @@ ScsiRead16Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIXTEEN];
 
@@ -1122,11 +1105,7 @@ ScsiRead16Command (
   //
   // Fill Cdb for Read (16) Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_READ16;
-  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
   WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
 
@@ -1197,9 +1176,6 @@ ScsiWrite16Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIXTEEN];
 
@@ -1220,11 +1196,7 @@ ScsiWrite16Command (
   //
   // Fill Cdb for Write (16) Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_WRITE16;
-  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
   WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
 
