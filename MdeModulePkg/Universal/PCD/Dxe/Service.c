@@ -1,6 +1,7 @@
 /** @file
     Help functions used by PCD DXE driver.
 
+Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1508,7 +1509,7 @@ GetExPcdTokenNumber (
 
       MatchGuidIdx = MatchGuid - GuidTable;
 
-      for (Index = 0; Index < mPeiExMapppingTableSize; Index++) {
+      for (Index = 0; Index < mPcdDatabase.PeiDb->ExTokenCount; Index++) {
         if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
             (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
             return ExMap[Index].TokenNumber;
@@ -1529,7 +1530,7 @@ GetExPcdTokenNumber (
 
   MatchGuidIdx = MatchGuid - GuidTable;
 
-  for (Index = 0; Index < mDxeExMapppingTableSize; Index++) {
+  for (Index = 0; Index < mPcdDatabase.DxeDb->ExTokenCount; Index++) {
     if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
          (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
         return ExMap[Index].TokenNumber;
