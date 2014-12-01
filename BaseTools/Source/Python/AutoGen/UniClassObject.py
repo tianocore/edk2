@@ -1,6 +1,9 @@
 ## @file
 # This file is used to collect all defined strings in multiple uni files
 #
+#
+# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
+#
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -36,10 +39,7 @@ CR = u'\u000D'
 LF = u'\u000A'
 NULL = u'\u0000'
 TAB = u'\t'
-BACK_SPLASH = u'\\'
-DOBULE_QUOTED_SPLASH = u'\\"'
-SIGLE_QUOTED_SPLASH = u"\\'"
-TAB_BACK_SLASH = u"\\/"
+BACK_SLASH_PLACEHOLDER = u'\u0006'
 
 gIncludePattern = re.compile("^#include +[\"<]+([^\"< >]+)[>\"]+$", re.MULTILINE | re.UNICODE)
 
@@ -283,6 +283,20 @@ class UniFileClassObject(object):
         FileName = Item[Item.find(u'#include ') + len(u'#include ') :Item.find(u' ', len(u'#include '))][1:-1]
         self.LoadUniFile(FileName)
 
+    def StripComments(self, Line):
+        Comment = u'//'
+        CommentPos = Line.find(Comment)
+        while CommentPos >= 0:
+        # if there are non matched quotes before the comment header
+        # then we are in the middle of a string
+        # but we need to ignore the escaped quotes and backslashes.
+            if ((Line.count(u'"', 0, CommentPos) - Line.count(u'\\"', 0, CommentPos)) & 1) == 1:
+                CommentPos = Line.find (Comment, CommentPos + 1)
+            else:
+                return Line[:CommentPos]
+        return Line
+                
+
     #
     # Pre-process before parse .uni file
     #
@@ -291,7 +305,7 @@ class UniFileClassObject(object):
             EdkLogger.error("Unicode File Parser", FILE_NOT_FOUND, ExtraData=File.Path)
 
         try:
-            FileIn = codecs.open(LongFilePath(File.Path), mode='rb', encoding='utf-16').readlines()
+            FileIn = codecs.open(LongFilePath(File.Path), mode='rb', encoding='utf-16')
         except UnicodeError, X:
             EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File.Path);
         except:
@@ -301,42 +315,23 @@ class UniFileClassObject(object):
         #
         # Use unique identifier
         #
-        FindFlag = -1
-        LineCount = 0
         for Line in FileIn:
-            Line = FileIn[LineCount]
-            LineCount += 1
             Line = Line.strip()
+            Line = Line.replace(u'\\\\', BACK_SLASH_PLACEHOLDER)
+            Line = self.StripComments(Line)
+
             #
-            # Ignore comment line and empty line
+            # Ignore empty line
             #
-            if Line == u'' or Line.startswith(u'//'):
-                continue
+            if len(Line) == 0: 
+                continue 
             
-            #
-            # Process comment embeded in string define lines
-            #
-            FindFlag = Line.find(u'//')
-            if FindFlag != -1:
-                Line = Line.replace(Line[FindFlag:], u' ')
-                if FileIn[LineCount].strip().startswith('#language'):
-                    Line = Line + FileIn[LineCount]
-                    FileIn[LineCount-1] = Line
-                    FileIn[LineCount] = os.linesep
-                    LineCount -= 1
-                    for Index in xrange (LineCount + 1, len (FileIn) - 1):
-                        if (Index == len(FileIn) -1):
-                            FileIn[Index] = os.linesep
-                        else:
-                            FileIn[Index] = FileIn[Index + 1]
-                    continue
-                              
+                             
             Line = Line.replace(u'/langdef', u'#langdef')
             Line = Line.replace(u'/string', u'#string')
             Line = Line.replace(u'/language', u'#language')
             Line = Line.replace(u'/include', u'#include')
 
-            Line = Line.replace(u'\\\\', u'\u0006')
             Line = Line.replace(UNICODE_WIDE_CHAR, WIDE_CHAR)
             Line = Line.replace(UNICODE_NARROW_CHAR, NARROW_CHAR)
             Line = Line.replace(UNICODE_NON_BREAKING_CHAR, NON_BREAKING_CHAR)
@@ -344,13 +339,10 @@ class UniFileClassObject(object):
             Line = Line.replace(u'\\r\\n', CR + LF)
             Line = Line.replace(u'\\n', CR + LF)
             Line = Line.replace(u'\\r', CR)
-            Line = Line.replace(u'\\t', u'\t')
-            Line = Line.replace(u'''\"''', u'''"''')
-            Line = Line.replace(u'\t', u' ')
-            Line = Line.replace(u'\u0006', u'\\')
-            Line = Line.replace(DOBULE_QUOTED_SPLASH, u'"')
-            Line = Line.replace(SIGLE_QUOTED_SPLASH, u"'")
-            Line = Line.replace(TAB_BACK_SLASH, u"/")
+            Line = Line.replace(u'\\t', u' ')
+            Line = Line.replace(u'\\"', u'"') 
+            Line = Line.replace(u"\\'", u"'") 
+            Line = Line.replace(BACK_SLASH_PLACEHOLDER, u'\\')
 
 #           if Line.find(u'\\x'):
 #               hex = Line[Line.find(u'\\x') + 2 : Line.find(u'\\x') + 6]
