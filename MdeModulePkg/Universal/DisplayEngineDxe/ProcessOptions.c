@@ -1036,7 +1036,7 @@ ProcessOptions (
           // Exit current DisplayForm with new value.
           //
           gUserInput->SelectedStatement = Question;
-          
+          gMisMatch = TRUE;
           ValueArray = AllocateZeroPool (Question->CurrentValue.BufferLen);
           ASSERT (ValueArray != NULL);
           gUserInput->InputValue.Buffer    = ValueArray;
@@ -1121,7 +1121,7 @@ ProcessOptions (
           // Exit current DisplayForm with new value.
           //
           gUserInput->SelectedStatement = Question;
-          
+          gMisMatch = TRUE;
           ValueArray = AllocateCopyPool (Question->CurrentValue.BufferLen, Question->CurrentValue.Buffer);
           ASSERT (ValueArray != NULL);
           gUserInput->InputValue.Buffer    = ValueArray;
@@ -1198,7 +1198,7 @@ ProcessOptions (
             break;
           }
           gUserInput->SelectedStatement = Question;
-
+          gMisMatch = TRUE;
           FreePool (*OptionString);
           *OptionString = NULL;
           return EFI_NOT_FOUND;

@@ -63,6 +63,7 @@ extern CHAR16            gPromptBlockWidth;
 extern CHAR16            gOptionBlockWidth;
 extern CHAR16            gHelpBlockWidth;
 extern CHAR16            *mUnknownString;
+extern BOOLEAN           gMisMatch;
 
 //
 // Screen definitions
@@ -196,9 +197,31 @@ typedef struct {
 
 typedef struct {
   EFI_HII_HANDLE     HiiHandle;
-  EFI_QUESTION_ID    QuestionId;
-  EFI_IFR_OP_HEADER  *OpCode;
-  UINT16             DisplayRow;
+  UINT16             FormId;
+  
+  //
+  // Info for the highlight question.
+  // HLT means highlight
+  //
+  // If one statement has questionid, save questionid info to find the question.
+  // If one statement not has questionid info, save the opcode info to find the 
+  // statement. If more than one statement has same opcode in one form(just like
+  // empty subtitle info may has more than one info one form), also use Index 
+  // info to find the statement.
+  //
+  EFI_QUESTION_ID    HLTQuestionId;
+  EFI_IFR_OP_HEADER  *HLTOpCode;
+  UINTN              HLTIndex;
+  UINTN              HLTSequence;
+  
+  //
+  // Info for the top of screen question.
+  // TOS means Top Of Screen
+  //
+  EFI_QUESTION_ID    TOSQuestionId;
+  EFI_IFR_OP_HEADER  *TOSOpCode;
+  UINTN              TOSIndex;
+
   UINT16             SkipValue;
 } DISPLAY_HIGHLIGHT_MENU_INFO;
 

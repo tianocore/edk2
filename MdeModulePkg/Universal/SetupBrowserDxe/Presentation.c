@@ -1445,21 +1445,20 @@ ProcessQuestionConfig (
   Process the user input data.
 
   @param UserInput               The user input data.
-  @param ChangeHighlight         Whether need to change the highlight statement.  
 
   @retval EFI_SUCESSS            This function always return successfully for now.
 
 **/
 EFI_STATUS
 ProcessUserInput (
-  IN USER_INPUT               *UserInput,
-  IN BOOLEAN                  ChangeHighlight
+  IN USER_INPUT               *UserInput
   )
 {
   EFI_STATUS                    Status;
   FORM_BROWSER_STATEMENT        *Statement;
 
-  Status = EFI_SUCCESS;
+  Status    = EFI_SUCCESS;
+  Statement = NULL;
 
   //
   // When Exit from FormDisplay function, one of the below two cases must be true.
@@ -1470,62 +1469,35 @@ ProcessUserInput (
   // Remove the last highligh question id, this id will update when show next form.
   //
   gCurrentSelection->QuestionId = 0;
+  if (UserInput->SelectedStatement != NULL){
+    Statement = GetBrowserStatement(UserInput->SelectedStatement);
+    ASSERT (Statement != NULL);
+
+    //
+    // This question is the current user select one,record it and later
+    // show it as the highlight question.
+    //
+    gCurrentSelection->CurrentMenu->QuestionId = Statement->QuestionId;
+    //
+    // For statement like text, actio, it not has question id.
+    // So use FakeQuestionId to save the question.
+    //
+    if (gCurrentSelection->CurrentMenu->QuestionId == 0) {
+      mCurFakeQestId = Statement->FakeQuestionId;
+    } else {
+      mCurFakeQestId = 0;
+    }
+  }
 
   //
   // First process the Action field in USER_INPUT.
   //
   if (UserInput->Action != 0) {
     Status = ProcessAction (UserInput->Action, UserInput->DefaultId);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Clear the highlight info.
-    //
     gCurrentSelection->Statement = NULL;
-
-    if (UserInput->SelectedStatement != NULL) {
-      Statement = GetBrowserStatement(UserInput->SelectedStatement);
-      ASSERT (Statement != NULL);
-      //
-      // Save the current highlight menu in the menu history data.
-      // which will be used when later browse back to this form.
-      //
-      gCurrentSelection->CurrentMenu->QuestionId = Statement->QuestionId;
-      //
-      // For statement like text, actio, it not has question id.
-      // So use FakeQuestionId to save the question.
-      //
-      if (gCurrentSelection->CurrentMenu->QuestionId == 0) {
-        mCurFakeQestId = Statement->FakeQuestionId;
-      } else {
-        mCurFakeQestId = 0;
-      }
-    }
   } else {
-    Statement = GetBrowserStatement(UserInput->SelectedStatement);
     ASSERT (Statement != NULL);
-
     gCurrentSelection->Statement = Statement;
-
-    if (ChangeHighlight) {
-      //
-      // This question is the current user select one,record it and later
-      // show it as the highlight question.
-      //
-      gCurrentSelection->CurrentMenu->QuestionId = Statement->QuestionId;
-      //
-      // For statement like text, actio, it not has question id.
-      // So use FakeQuestionId to save the question.
-      //
-      if (gCurrentSelection->CurrentMenu->QuestionId == 0) {
-        mCurFakeQestId = Statement->FakeQuestionId;
-      } else {
-        mCurFakeQestId = 0;
-      }
-    }
-
     switch (Statement->Operand) {
     case EFI_IFR_REF_OP:
       Status = ProcessGotoOpCode(Statement, gCurrentSelection);
@@ -1612,7 +1584,6 @@ DisplayForm (
   EFI_STATUS               Status;
   USER_INPUT               UserInput;
   FORM_ENTRY_INFO          *CurrentMenu;
-  BOOLEAN                  ChangeHighlight;
 
   ZeroMem (&UserInput, sizeof (USER_INPUT));
 
@@ -1636,9 +1607,6 @@ DisplayForm (
 
   gCurrentSelection->CurrentMenu = CurrentMenu;
 
-  //
-  // Find currrent highlight statement.
-  //
   if (gCurrentSelection->QuestionId == 0) {
     //
     // Highlight not specified, fetch it from cached menu
@@ -1646,9 +1614,6 @@ DisplayForm (
     gCurrentSelection->QuestionId = CurrentMenu->QuestionId;
   }
 
-  //
-  // Evaluate all the Expressions in this Form
-  //
   Status = EvaluateFormExpressions (gCurrentSelection->FormSet, gCurrentSelection->Form);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1656,34 +1621,15 @@ DisplayForm (
 
   UpdateDisplayFormData ();
 
-  //
-  // Three possible status maybe return.
-  //
-  // EFI_INVALID_PARAMETER: The input dimension info is not valid.
-  // EFI_NOT_FOUND:         The input value for oneof/orderedlist opcode is not valid
-  //                        and an valid value has return.
-  // EFI_SUCCESS:           Success shows form and get user input in UserInput paramenter.
-  //
   ASSERT (gDisplayFormData.BrowserStatus == BROWSER_SUCCESS);
   Status = mFormDisplay->FormDisplay (&gDisplayFormData, &UserInput);
-  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
+  if (EFI_ERROR (Status)) {
     FreeDisplayFormData();
     return Status;
   }
 
-  //
-  // If status is EFI_SUCCESS, means user has change the highlight menu and new user input return.
-  //                           in this case, browser need to change the highlight menu.
-  // If status is EFI_NOT_FOUND, means the input DisplayFormData has error for oneof/orderedlist 
-  //                          opcode and new valid value has return, browser core need to adjust
-  //                          value for this opcode and shows this form again.
-  //
-  ChangeHighlight = (Status == EFI_SUCCESS ? TRUE :FALSE);
-
-  Status = ProcessUserInput (&UserInput, ChangeHighlight);
-
+  Status = ProcessUserInput (&UserInput);
   FreeDisplayFormData();
-
   return Status;
 }
 
