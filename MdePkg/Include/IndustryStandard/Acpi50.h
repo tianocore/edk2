@@ -1,6 +1,7 @@
 /** @file   
   ACPI 5.0 definitions from the ACPI Specification Revision 5.0a November 13, 2013.
 
+  Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -1857,7 +1858,8 @@ typedef struct {
   UINT8                                    CommandComplete:1;
   UINT8                                    SciDoorbell:1;
   UINT8                                    Error:1;
-  UINT8                                    Reserved:5;
+  UINT8                                    PlatformNotification:1;
+  UINT8                                    Reserved:4;
   UINT8                                    Reserved1;
 } EFI_ACPI_5_0_PCCT_GENERIC_SHARED_MEMORY_REGION_STATUS;
 
