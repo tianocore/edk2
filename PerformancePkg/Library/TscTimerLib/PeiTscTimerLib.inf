@@ -1,6 +1,10 @@
 ## @file
 #  Pei Timer Library which uses the Time Stamp Counter in the processor.
 #
+#  Note: This library is a sample implementation that depends on chipset ACPI timer. 
+#    It may not work on new generation chipset. PcAtChipsetPkg AcpiTimerLib is 
+#    the generic timer library that can replace this one. 
+#
 #  A version of the Timer Library using the processor's TSC.
 #  The time stamp counter in newer processors may support an enhancement, referred to as invariant TSC.
 #  The invariant TSC runs at a constant rate in all ACPI P-, C-. and T-states.
@@ -8,7 +12,7 @@
 #  TSC reads are much more efficient and do not incur the overhead associated with a ring transition or
 #  access to a platform resource.
 #
-#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
