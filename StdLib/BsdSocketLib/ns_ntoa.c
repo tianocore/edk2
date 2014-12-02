@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1986, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -12,8 +12,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
+ *  This product includes software developed by the University of
+ *  California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -32,72 +32,72 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)ns_ntoa.c	8.1 (Berkeley) 6/4/93";
+static char sccsid[] = "@(#)ns_ntoa.c 8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/param.h>
 #include <netns/ns.h>
 #include <stdio.h>
 
-static char *spectHex();
+static char *spectHex(char *p0);
 
 char *
 ns_ntoa(
-	struct ns_addr addr
-	)
+  struct ns_addr addr
+  )
 {
-	static char obuf[40];
-	union { union ns_net net_e; u_long long_e; } net;
-	u_short port = htons(addr.x_port);
-	register char *cp;
-	char *cp2;
-	register u_char *up = addr.x_host.c_host;
-	u_char *uplim = up + 6;
+  static char obuf[40];
+  union { union ns_net net_e; u_long long_e; } net;
+  u_short port = htons(addr.x_port);
+  register char *cp;
+  char *cp2;
+  register u_char *up = addr.x_host.c_host;
+  u_char *uplim = up + 6;
 
-	net.net_e = addr.x_net;
-	sprintf(obuf, "%x", (UINT32)ntohl(net.long_e));
-	cp = spectHex(obuf);
-	cp2 = cp + 1;
-	while (*up==0 && up < uplim) up++;
-	if (up == uplim) {
-		if (port) {
-			sprintf(cp, ".0");
-			cp += 2;
-		}
-	} else {
-		sprintf(cp, ".%x", *up++);
-		while (up < uplim) {
-			while (*cp) cp++;
-			sprintf(cp, "%02x", *up++);
-		}
-		cp = spectHex(cp2);
-	}
-	if (port) {
-		sprintf(cp, ".%x", port);
-		spectHex(cp + 1);
-	}
-	return (obuf);
+  net.net_e = addr.x_net;
+  sprintf(obuf, "%x", (UINT32)ntohl(net.long_e));
+  cp = spectHex(obuf);
+  cp2 = cp + 1;
+  while (*up==0 && up < uplim) up++;
+  if (up == uplim) {
+    if (port) {
+      sprintf(cp, ".0");
+      cp += 2;
+    }
+  } else {
+    sprintf(cp, ".%x", *up++);
+    while (up < uplim) {
+      while (*cp) cp++;
+      sprintf(cp, "%02x", *up++);
+    }
+    cp = spectHex(cp2);
+  }
+  if (port) {
+    sprintf(cp, ".%x", port);
+    spectHex(cp + 1);
+  }
+  return (obuf);
 }
 
 static char *
 spectHex(
-	char *p0
-	)
+  char *p0
+  )
 {
-	int ok = 0;
-	int nonzero = 0;
-	register char *p = p0;
-	for (; *p; p++) switch (*p) {
+  int ok = 0;
+  int nonzero = 0;
+  register char *p = p0;
+  for (; *p; p++) switch (*p) {
 
-	case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-		*p += ('A' - 'a');
-		/* fall into . . . */
-	case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-		ok = 1;
-	case '1': case '2': case '3': case '4': case '5':
-	case '6': case '7': case '8': case '9':
-		nonzero = 1;
-	}
-	if (nonzero && !ok) { *p++ = 'H'; *p = 0; }
-	return (p);
+  case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+    *p += ('A' - 'a');
+    /* fall into . . . */
+  case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+    ok = 1;
+  case '1': case '2': case '3': case '4': case '5':
+  case '6': case '7': case '8': case '9':
+    nonzero = 1;
+  }
+  if (nonzero && !ok) { *p++ = 'H'; *p = 0; }
+  return (p);
 }
