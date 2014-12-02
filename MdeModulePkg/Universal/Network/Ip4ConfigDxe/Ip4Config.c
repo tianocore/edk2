@@ -1,6 +1,7 @@
 /** @file
   This code implements the IP4Config and NicIp4Config protocols.
 
+Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -656,7 +657,7 @@ Ip4ConfigCleanDhcp4 (
     This->Dhcp4Handle = NULL;
   }
 
-  if (This->Dhcp4Event == NULL) {
+  if (This->Dhcp4Event != NULL) {
     gBS->CloseEvent (This->Dhcp4Event);
     This->Dhcp4Event = NULL;
   }
