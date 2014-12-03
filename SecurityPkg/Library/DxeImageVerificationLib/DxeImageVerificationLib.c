@@ -860,6 +860,7 @@ IsCertHashFoundInDatabase (
   HashAlg  = HASHALG_MAX;
 
   ASSERT (RevocationTime != NULL);
+  ASSERT (DbxList != NULL);
 
   while ((DbxSize > 0) && (SignatureListSize >= DbxList->SignatureListSize)) {
     //
@@ -1132,15 +1133,16 @@ PassTimestampCheck (
   //
   DbtDataSize = 0;
   Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, NULL);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    DbtData = (UINT8 *) AllocateZeroPool (DbtDataSize);
-    if (DbtData == NULL) {
-      goto Done;
-    }
-    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, (VOID *) DbtData);
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    goto Done;
+  }
+  DbtData = (UINT8 *) AllocateZeroPool (DbtDataSize);
+  if (DbtData == NULL) {
+    goto Done;
+  }
+  Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, NULL, &DbtDataSize, (VOID *) DbtData);
+  if (EFI_ERROR (Status)) {
+    goto Done;
   }
 
   CertList = (EFI_SIGNATURE_LIST *) DbtData;
@@ -1229,14 +1231,15 @@ IsForbiddenByDbx (
   //
   DataSize = 0;
   Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    Data = (UINT8 *) AllocateZeroPool (DataSize);
-    if (Data == NULL) {
-      return IsForbidden;
-    }
-
-    Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *) Data);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return IsForbidden;
   }
+  Data = (UINT8 *) AllocateZeroPool (DataSize);
+  if (Data == NULL) {
+    return IsForbidden;
+  }
+
+  Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *) Data);
   if (EFI_ERROR (Status)) {
     return IsForbidden;
   }
@@ -1254,7 +1257,7 @@ IsForbiddenByDbx (
   //       UINT8  Certn[];
   //
   Pkcs7GetSigners (AuthData, AuthDataSize, &CertBuffer, &BufferLength, &TrustedCert, &TrustedCertLength);
-  if (BufferLength == 0) {
+  if ((BufferLength == 0) || (CertBuffer == NULL)) {
     IsForbidden = TRUE;
     goto Done;
   }
