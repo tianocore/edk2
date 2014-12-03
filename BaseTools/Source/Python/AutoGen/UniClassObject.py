@@ -340,6 +340,7 @@ class UniFileClassObject(object):
             Line = Line.replace(u'\\n', CR + LF)
             Line = Line.replace(u'\\r', CR)
             Line = Line.replace(u'\\t', u' ')
+            Line = Line.replace(u'\t', u' ')
             Line = Line.replace(u'\\"', u'"') 
             Line = Line.replace(u"\\'", u"'") 
             Line = Line.replace(BACK_SLASH_PLACEHOLDER, u'\\')
