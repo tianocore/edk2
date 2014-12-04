@@ -1,6 +1,7 @@
 /** @file
   Functions implementation related with DHCPv6 for UefiPxeBc Driver.
 
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -664,7 +665,6 @@ PxeBcRequestBootService (
 {
   EFI_PXE_BASE_CODE_UDP_PORT          SrcPort;
   EFI_PXE_BASE_CODE_UDP_PORT          DestPort;
-  EFI_PXE_BASE_CODE_MODE              *Mode;
   EFI_PXE_BASE_CODE_PROTOCOL          *PxeBc;
   EFI_PXE_BASE_CODE_DHCPV6_PACKET     *Discover;
   UINTN                               DiscoverLen;
@@ -682,7 +682,6 @@ PxeBcRequestBootService (
   UINT8                               *Option;
 
   PxeBc       = &Private->PxeBc;
-  Mode        = PxeBc->Mode;
   Request     = Private->Dhcp6Request;
   ProxyOffer = &Private->OfferBuffer[Index].Dhcp6.Packet.Offer;
   SrcPort     = PXEBC_BS_DISCOVER_PORT;

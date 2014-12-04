@@ -1,6 +1,7 @@
 /** @file
   The implementation of a dispatch routine for processing TCP requests.
 
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -98,12 +99,12 @@ Tcp4GetMode (
 
     AccessPoint->UseDefaultAddress   = Tcb->UseDefaultAddr;
 
-    CopyMem (&AccessPoint->StationAddress, &Tcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+    IP4_COPY_ADDRESS (&AccessPoint->StationAddress, &Tcb->LocalEnd.Ip);
 
-    AccessPoint->SubnetMask          = Tcb->SubnetMask;
+    IP4_COPY_ADDRESS (&AccessPoint->SubnetMask, &Tcb->SubnetMask);
     AccessPoint->StationPort         = NTOHS (Tcb->LocalEnd.Port);
 
-    CopyMem (&AccessPoint->RemoteAddress, &Tcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+    IP4_COPY_ADDRESS (&AccessPoint->RemoteAddress, &Tcb->RemoteEnd.Ip);
 
     AccessPoint->RemotePort          = NTOHS (Tcb->RemoteEnd.Port);
     AccessPoint->ActiveFlag          = (BOOLEAN) (Tcb->State != TCP_LISTEN);
@@ -239,7 +240,7 @@ TcpBind (
   UINT16          *RandomPort;
 
   if (IpVersion == IP_VERSION_4) {
-    CopyMem (&Local, &TcpAp->Tcp4Ap.StationAddress, sizeof (EFI_IPv4_ADDRESS));
+    IP4_COPY_ADDRESS (&Local, &TcpAp->Tcp4Ap.StationAddress);
     Port       = &TcpAp->Tcp4Ap.StationPort;
     RandomPort = &mTcp4RandomPort;
   } else {
@@ -495,12 +496,14 @@ TcpConfigurePcb (
     IpCfgData.Ip4CfgData.TypeOfService      = CfgData->Tcp4CfgData.TypeOfService;
     IpCfgData.Ip4CfgData.TimeToLive         = CfgData->Tcp4CfgData.TimeToLive;
     IpCfgData.Ip4CfgData.UseDefaultAddress  = CfgData->Tcp4CfgData.AccessPoint.UseDefaultAddress;
-    IpCfgData.Ip4CfgData.SubnetMask         = CfgData->Tcp4CfgData.AccessPoint.SubnetMask;
+    IP4_COPY_ADDRESS (
+      &IpCfgData.Ip4CfgData.SubnetMask,
+      &CfgData->Tcp4CfgData.AccessPoint.SubnetMask
+      );
     IpCfgData.Ip4CfgData.ReceiveTimeout     = (UINT32) (-1);
-    CopyMem (
+    IP4_COPY_ADDRESS (
       &IpCfgData.Ip4CfgData.StationAddress,
-      &CfgData->Tcp4CfgData.AccessPoint.StationAddress,
-      sizeof (EFI_IPv4_ADDRESS)
+      &CfgData->Tcp4CfgData.AccessPoint.StationAddress
       );
 
   } else {
@@ -533,8 +536,14 @@ TcpConfigurePcb (
     //
     // Get the default address information if the instance is configured to use default address.
     //
-    CfgData->Tcp4CfgData.AccessPoint.StationAddress = IpCfgData.Ip4CfgData.StationAddress;
-    CfgData->Tcp4CfgData.AccessPoint.SubnetMask     = IpCfgData.Ip4CfgData.SubnetMask;
+    IP4_COPY_ADDRESS (
+      &CfgData->Tcp4CfgData.AccessPoint.StationAddress,
+      &IpCfgData.Ip4CfgData.StationAddress
+      );
+    IP4_COPY_ADDRESS (
+      &CfgData->Tcp4CfgData.AccessPoint.SubnetMask,
+      &IpCfgData.Ip4CfgData.SubnetMask
+      );
 
     TcpAp = (TCP_ACCESS_POINT *) &CfgData->Tcp4CfgData.AccessPoint;
   } else {
@@ -601,7 +610,7 @@ TcpConfigurePcb (
 
     CopyMem (&Tcb->LocalEnd.Ip, &CfgData->Tcp4CfgData.AccessPoint.StationAddress, sizeof (IP4_ADDR));
     Tcb->LocalEnd.Port  = HTONS (CfgData->Tcp4CfgData.AccessPoint.StationPort);
-    Tcb->SubnetMask     = CfgData->Tcp4CfgData.AccessPoint.SubnetMask;
+    IP4_COPY_ADDRESS (&Tcb->SubnetMask, &CfgData->Tcp4CfgData.AccessPoint.SubnetMask);
 
     CopyMem (&Tcb->RemoteEnd.Ip, &CfgData->Tcp4CfgData.AccessPoint.RemoteAddress, sizeof (IP4_ADDR));
     Tcb->RemoteEnd.Port = HTONS (CfgData->Tcp4CfgData.AccessPoint.RemotePort);

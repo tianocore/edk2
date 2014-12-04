@@ -1,6 +1,7 @@
 /** @file
   Misc support routines for TCP driver.
 
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -428,7 +429,6 @@ TcpInsertTcb (
   LIST_ENTRY       *Entry;
   LIST_ENTRY       *Head;
   TCP_CB           *Node;
-  TCP_PROTO_DATA  *TcpProto;
 
   ASSERT (
     (Tcb != NULL) &&
@@ -466,7 +466,6 @@ TcpInsertTcb (
 
   InsertHeadList (Head, &Tcb->List);
 
-  TcpProto = (TCP_PROTO_DATA *) Tcb->Sk->ProtoReserved;
 
   return 0;
 }

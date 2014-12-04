@@ -1,6 +1,7 @@
 /** @file
   Dhcp6 internal functions implementation.
 
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -544,7 +545,6 @@ Dhcp6UpdateIaInfo (
   )
 {
   EFI_STATUS                  Status;
-  EFI_DHCP6_STATE             State;
   UINT8                       *Option;
   UINT8                       *IaInnerOpt;
   UINT16                      IaInnerLen;
@@ -565,7 +565,6 @@ Dhcp6UpdateIaInfo (
   //
   // See details in the section-18.1.8 of rfc-3315.
   //
-  State  = Dhcp6Init;
   Option = Dhcp6SeekIaOption (
              Packet->Dhcp6.Option,
              Packet->Length - sizeof (EFI_DHCP6_HEADER),
@@ -2428,14 +2427,12 @@ Dhcp6HandleAdvertiseMsg (
 {
   EFI_STATUS                  Status;
   UINT8                       *Option;
-  UINT16                      StsCode;
   BOOLEAN                     Timeout;
 
   ASSERT(Instance->Config);
   ASSERT(Instance->IaCb.Ia);
 
   Timeout = FALSE;
-  StsCode = Dhcp6StsSuccess;
 
   //
   // If the client does receives a valid reply message that includes a rapid
