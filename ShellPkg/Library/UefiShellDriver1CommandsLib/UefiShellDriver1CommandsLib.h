@@ -207,5 +207,20 @@ ShellCommandRunUnload (
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
+/**
+  Do a connect from an EFI variable via it's key name.
+
+  @param[in] Key      The name of the EFI Variable.
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+ShellConnectFromDevPaths (
+  IN CONST CHAR16 *Key
+  );
+
+
+
 #endif
 

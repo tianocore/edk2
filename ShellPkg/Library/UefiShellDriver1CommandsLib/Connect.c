@@ -93,6 +93,8 @@ ShellConnectPciRootBridge (
   for (RootBridgeIndex = 0; RootBridgeIndex < RootBridgeHandleCount; RootBridgeIndex++) {    
     gBS->ConnectController (RootBridgeHandleBuffer[RootBridgeIndex], NULL, NULL, FALSE);    
   }  
+
+  FreePool (RootBridgeHandleBuffer);
   
   return EFI_SUCCESS;
 }
@@ -192,7 +194,7 @@ ConnectControllers (
 **/
 EFI_STATUS
 EFIAPI
-ConnectFromDevPaths (
+ShellConnectFromDevPaths (
   IN CONST CHAR16 *Key
   )
 {
@@ -462,31 +464,31 @@ ShellCommandRunConnect (
       // do the conin and conout from EFI variables
       // if the first fails dont 'loose' the error
       //
-      Status = ConnectFromDevPaths(L"ConInDev");
+      Status = ShellConnectFromDevPaths(L"ConInDev");
       if (EFI_ERROR(Status)) {
-        ConnectFromDevPaths(L"ConOutDev");
+        ShellConnectFromDevPaths(L"ConOutDev");
       } else {
-        Status = ConnectFromDevPaths(L"ConOutDev");
+        Status = ShellConnectFromDevPaths(L"ConOutDev");
       }
       if (EFI_ERROR(Status)) {
-        ConnectFromDevPaths(L"ErrOutDev");
+        ShellConnectFromDevPaths(L"ErrOutDev");
       } else {
-        Status = ConnectFromDevPaths(L"ErrOutDev");
+        Status = ShellConnectFromDevPaths(L"ErrOutDev");
       }
       if (EFI_ERROR(Status)) {
-        ConnectFromDevPaths(L"ErrOut");
+        ShellConnectFromDevPaths(L"ErrOut");
       } else {
-        Status = ConnectFromDevPaths(L"ErrOut");
+        Status = ShellConnectFromDevPaths(L"ErrOut");
       }
       if (EFI_ERROR(Status)) {
-        ConnectFromDevPaths(L"ConIn");
+        ShellConnectFromDevPaths(L"ConIn");
       } else {
-        Status = ConnectFromDevPaths(L"ConIn");
+        Status = ShellConnectFromDevPaths(L"ConIn");
       }
       if (EFI_ERROR(Status)) {
-        ConnectFromDevPaths(L"ConOut");
+        ShellConnectFromDevPaths(L"ConOut");
       } else {
-        Status = ConnectFromDevPaths(L"ConOut");
+        Status = ShellConnectFromDevPaths(L"ConOut");
       }
       if (EFI_ERROR(Status)) {
         ShellStatus = SHELL_DEVICE_ERROR;
