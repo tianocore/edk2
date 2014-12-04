@@ -1,5 +1,6 @@
 /** @file
 
+(C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -227,8 +228,8 @@ Udp4Configure (
       // Save the configuration data.
       //
       CopyMem (&Instance->ConfigData, UdpConfigData, sizeof (Instance->ConfigData));
-      Instance->ConfigData.StationAddress = Ip4ConfigData.StationAddress;
-      Instance->ConfigData.SubnetMask     = Ip4ConfigData.SubnetMask;
+      IP4_COPY_ADDRESS (&Instance->ConfigData.StationAddress, &Ip4ConfigData.StationAddress);
+      IP4_COPY_ADDRESS (&Instance->ConfigData.SubnetMask, &Ip4ConfigData.SubnetMask);
 
       //
       // Try to allocate the required port resource.
@@ -588,7 +589,7 @@ Udp4Transmit (
   Udp4Header->Checksum     = 0;
 
   UdpSessionData = TxData->UdpSessionData;
-  Override.Ip4OverrideData.SourceAddress = ConfigData->StationAddress;
+  IP4_COPY_ADDRESS (&Override.Ip4OverrideData.SourceAddress, &ConfigData->StationAddress);
 
   if (UdpSessionData != NULL) {
     //
@@ -596,7 +597,7 @@ Udp4Transmit (
     // UdpSessionData.
     //
     if (!EFI_IP4_EQUAL (&UdpSessionData->SourceAddress, &mZeroIp4Addr)) {
-      CopyMem (&Override.Ip4OverrideData.SourceAddress, &UdpSessionData->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
+      IP4_COPY_ADDRESS (&Override.Ip4OverrideData.SourceAddress, &UdpSessionData->SourceAddress);
     }
 
     if (UdpSessionData->SourcePort != 0) {
@@ -643,7 +644,7 @@ Udp4Transmit (
   // Fill the IpIo Override data.
   //
   if (TxData->GatewayAddress != NULL) {
-    CopyMem (&Override.Ip4OverrideData.GatewayAddress, TxData->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    IP4_COPY_ADDRESS (&Override.Ip4OverrideData.GatewayAddress, TxData->GatewayAddress);
   } else {
     ZeroMem (&Override.Ip4OverrideData.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
   }

@@ -1,6 +1,7 @@
 /** @file
   Interface routine for Mtftp4.
   
+(C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -305,13 +306,13 @@ Mtftp4ConfigUnicastPort (
   UdpConfig.ReceiveTimeout     = 0;
   UdpConfig.TransmitTimeout    = 0;
   UdpConfig.UseDefaultAddress  = Config->UseDefaultSetting;
-  UdpConfig.StationAddress     = Config->StationIp;
-  UdpConfig.SubnetMask         = Config->SubnetMask;
+  IP4_COPY_ADDRESS (&UdpConfig.StationAddress, &Config->StationIp);
+  IP4_COPY_ADDRESS (&UdpConfig.SubnetMask, &Config->SubnetMask);
   UdpConfig.StationPort        = 0;
   UdpConfig.RemotePort         = 0;
 
   Ip = HTONL (Instance->ServerIp);
-  CopyMem (&UdpConfig.RemoteAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  IP4_COPY_ADDRESS (&UdpConfig.RemoteAddress, &Ip);
 
   Status = UdpIo->Protocol.Udp4->Configure (UdpIo->Protocol.Udp4, &UdpConfig);
 

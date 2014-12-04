@@ -1,6 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
+(C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -847,7 +848,7 @@ EfiKeyFiFoRemoveOneKey (
     return FALSE;
   }
 
-  *Output                         = TerminalDevice->EfiKeyFiFo->Data[Head];
+  CopyMem (Output, &TerminalDevice->EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
 
   TerminalDevice->EfiKeyFiFo->Head = (UINT8) ((Head + 1) % (FIFO_MAX_NUMBER + 1));
 

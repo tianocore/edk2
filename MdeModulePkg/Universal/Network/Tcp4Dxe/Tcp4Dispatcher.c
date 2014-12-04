@@ -1,6 +1,7 @@
 /** @file
   Tcp request dispatcher implementation.
 
+(C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -101,11 +102,11 @@ Tcp4GetMode (
 
     AccessPoint->UseDefaultAddress  = Tcb->UseDefaultAddr;
 
-    CopyMem (&AccessPoint->StationAddress, &Tcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
-    AccessPoint->SubnetMask         = Tcb->SubnetMask;
+    IP4_COPY_ADDRESS (&AccessPoint->StationAddress, &Tcb->LocalEnd.Ip);
+    IP4_COPY_ADDRESS (&AccessPoint->SubnetMask, &Tcb->SubnetMask);
     AccessPoint->StationPort        = NTOHS (Tcb->LocalEnd.Port);
 
-    CopyMem (&AccessPoint->RemoteAddress, &Tcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+    IP4_COPY_ADDRESS (&AccessPoint->RemoteAddress, &Tcb->RemoteEnd.Ip);
     AccessPoint->RemotePort         = NTOHS (Tcb->RemoteEnd.Port);
     AccessPoint->ActiveFlag         = (BOOLEAN) (Tcb->State != TCP_LISTEN);
 
@@ -458,7 +459,7 @@ Tcp4ConfigurePcb (
 
   CopyMem (&Tcb->LocalEnd.Ip, &CfgData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
   Tcb->LocalEnd.Port  = HTONS (CfgData->AccessPoint.StationPort);
-  Tcb->SubnetMask     = CfgData->AccessPoint.SubnetMask;
+  IP4_COPY_ADDRESS (&Tcb->SubnetMask, &CfgData->AccessPoint.SubnetMask);
 
   if (CfgData->AccessPoint.ActiveFlag) {
     CopyMem (&Tcb->RemoteEnd.Ip, &CfgData->AccessPoint.RemoteAddress, sizeof (IP4_ADDR));

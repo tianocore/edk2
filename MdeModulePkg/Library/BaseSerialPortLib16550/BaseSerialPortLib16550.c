@@ -1,6 +1,7 @@
 /** @file
   16550 UART Serial Port library functions
 
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -184,7 +185,6 @@ GetSerialRegisterBase (
   )
 {
   UINTN                 PciLibAddress;
-  UINTN                 PrimaryBusNumber;
   UINTN                 BusNumber;
   UINTN                 SubordinateBusNumber;
   UINT32                ParentIoBase;
@@ -233,7 +233,6 @@ GetSerialRegisterBase (
     //
     // Retrieve and verify the bus numbers in the PCI to PCI Bridge
     //
-    PrimaryBusNumber     = PciRead8 (PciLibAddress + PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET);
     BusNumber            = PciRead8 (PciLibAddress + PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET);
     SubordinateBusNumber = PciRead8 (PciLibAddress + PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET);
     if (BusNumber == 0 || BusNumber > SubordinateBusNumber) {

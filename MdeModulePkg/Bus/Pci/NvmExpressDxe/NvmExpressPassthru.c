@@ -2,6 +2,7 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -852,7 +853,6 @@ NvmExpressBuildDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL                    **DevicePath
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA   *Private;
   NVME_NAMESPACE_DEVICE_PATH     *Node;
 
   //
@@ -861,8 +861,6 @@ NvmExpressBuildDevicePath (
   if ((This == NULL) || (DevicePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
 
   if (NamespaceId == 0) {
     return EFI_NOT_FOUND;

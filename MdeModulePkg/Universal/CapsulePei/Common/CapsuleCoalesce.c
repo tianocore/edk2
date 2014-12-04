@@ -9,6 +9,7 @@
   CapsuleDataCoalesce() will do basic validation before coalesce capsule data
   into memory.
 
+(C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -960,7 +961,6 @@ CapsuleDataCoalesce (
   UINT8                          *DestPtr;
   UINTN                          DestLength;
   UINT8                          *RelocPtr;
-  UINT64                         *AddDataPtr;
   UINTN                          CapsuleTimes; 
   UINT64                         SizeLeft; 
   UINT64                         CapsuleImageSize; 
@@ -986,7 +986,6 @@ CapsuleDataCoalesce (
   CapsuleTimes     = 0;
   CapsuleImageSize = 0;
   PrivateDataPtr   = NULL;
-  AddDataPtr       = NULL;
   CapsuleHeader    = NULL;
   CapsuleBeginFlag = TRUE;
   CapsuleSize      = 0;

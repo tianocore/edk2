@@ -1,6 +1,7 @@
 /** @file
   IpIo Library.
 
+(C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -703,7 +704,7 @@ IpIoCreateSndEntry (
 
     Ip4TxData = &TxData->Ip4TxData;
 
-    CopyMem (&Ip4TxData->DestinationAddress, Dest, sizeof (EFI_IPv4_ADDRESS));
+    IP4_COPY_ADDRESS (&Ip4TxData->DestinationAddress, Dest);
 
     Ip4TxData->OverrideData    = &OverrideData->Ip4OverrideData;
     Ip4TxData->OptionsLength   = 0;
@@ -1765,8 +1766,8 @@ IpIoConfigIp (
                   NULL
                   );
 
-        ((EFI_IP4_CONFIG_DATA*) IpConfigData)->StationAddress = Ip4ModeData.ConfigData.StationAddress;
-        ((EFI_IP4_CONFIG_DATA*) IpConfigData)->SubnetMask     = Ip4ModeData.ConfigData.SubnetMask;
+        IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA*) IpConfigData)->StationAddress, &Ip4ModeData.ConfigData.StationAddress);
+        IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA*) IpConfigData)->SubnetMask, &Ip4ModeData.ConfigData.SubnetMask);
     }
 
       CopyMem (
