@@ -117,10 +117,10 @@ CallFspNotifyPhase (
   IN NOTIFY_PHASE_PARAMS *NotifyPhaseParams
   )
 {
-  FSP_NOTFY_PHASE     NotifyPhaseApi;
+  FSP_NOTIFY_PHASE    NotifyPhaseApi;
   FSP_STATUS          FspStatus;
 
-  NotifyPhaseApi = (FSP_NOTFY_PHASE)(UINTN)(FspHeader->ImageBase + FspHeader->NotifyPhaseEntryOffset);
+  NotifyPhaseApi = (FSP_NOTIFY_PHASE)(UINTN)(FspHeader->ImageBase + FspHeader->NotifyPhaseEntryOffset);
   FspStatus = Execute32BitCode ((UINTN)NotifyPhaseApi, (UINTN)NotifyPhaseParams);
 
   return FspStatus;
