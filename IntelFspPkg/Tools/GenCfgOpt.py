@@ -615,7 +615,7 @@ EndList
                 BinFd = open(BinFile, "rb")
                 IdStr    = BinFd.read(0x08)
                 ImageId  = struct.unpack('Q', IdStr)
-                ImageRev = struct.unpack('L', BinFd.read(0x04))
+                ImageRev = struct.unpack('I', BinFd.read(0x04))
                 BinFd.close()
 
                 HeaderFd.write("#define VPD_IMAGE_ID    0x%016X        /* '%s' */\n" % (ImageId[0], IdStr))
