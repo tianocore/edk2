@@ -214,16 +214,21 @@ advance_fixed_size:
 
 check_address:
    ; Is valid Microcode start point ?
-   cmp   dword ptr [esi], 0ffffffffh
+   cmp   dword ptr [esi].ucode_hdr.version, 0ffffffffh
    jz    done
 
+   ; Is automatic size detection ?
+   mov   eax, [esp].LOAD_UCODE_PARAMS.ucode_code_size
+   cmp   eax, 0ffffffffh
+   jz    @f
+
    ; Address >= microcode region address + microcode region size?
-   mov   eax, [esp].LOAD_UCODE_PARAMS.ucode_code_addr
-   add   eax, [esp].LOAD_UCODE_PARAMS.ucode_code_size
+   add   eax, [esp].LOAD_UCODE_PARAMS.ucode_code_addr
    cmp   esi, eax
    jae   done        ;Jif address is outside of ucode region
    jmp   check_main_header
 
+@@:
 load_check:
    ; Get the revision of the current microcode update loaded
    mov   ecx, MSR_IA32_BIOS_SIGN_ID
