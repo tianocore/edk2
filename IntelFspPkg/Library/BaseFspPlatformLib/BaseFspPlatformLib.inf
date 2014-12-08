@@ -36,6 +36,9 @@
   gIntelFspPkgTokenSpaceGuid.PcdTemporaryRamSize
   gIntelFspPkgTokenSpaceGuid.PcdFspTemporaryRamSize
 
+[Guids]
+  gFspBootLoaderTemporaryMemoryGuid
+
 [FixedPcd]
   gIntelFspPkgTokenSpaceGuid.PcdFspMaxPatchEntry
   gIntelFspPkgTokenSpaceGuid.PcdFspMaxPerfEntry
