@@ -38,7 +38,7 @@ EFI_PEI_PPI_DESCRIPTOR      mPeiReadyToBootPpi = {
 };
 
 
-UINT32  mFspNotfifySequence[] = {
+UINT32  mFspNotifySequence[] = {
   EnumInitPhaseAfterPciEnumeration,
   EnumInitPhaseReadyToBoot
 };
@@ -46,23 +46,23 @@ UINT32  mFspNotfifySequence[] = {
 /**
   Install FSP notification.
 
-  @param[in] NotificatonCode  FSP notification code
+  @param[in] NotificationCode  FSP notification code
 
   @retval EFI_SUCCESS            Notify FSP successfully
-  @retval EFI_INVALID_PARAMETER  NotificatonCode is invalid
+  @retval EFI_INVALID_PARAMETER  NotificationCode is invalid
 
 **/
 EFI_STATUS
 EFIAPI
 FspNotificationHandler (
-  IN  UINT32     NotificatonCode
+  IN  UINT32     NotificationCode
   )
 {
   EFI_STATUS                Status;
 
   Status   = EFI_SUCCESS;
 
-  switch (NotificatonCode) {
+  switch (NotificationCode) {
   case EnumInitPhaseAfterPciEnumeration:
     //
     // Do POST PCI initialization if needed
@@ -134,20 +134,20 @@ FspWaitForNotify (
   )
 {
   EFI_STATUS                 Status;
-  UINT32                     NotificatonValue;
-  UINT32                     NotificatonCount;
+  UINT32                     NotificationValue;
+  UINT32                     NotificationCount;
   UINT8                      Count;
 
-  NotificatonCount = 0;
-  while (NotificatonCount < sizeof(mFspNotfifySequence) / sizeof(UINT32)) {
+  NotificationCount = 0;
+  while (NotificationCount < sizeof(mFspNotifySequence) / sizeof(UINT32)) {
 
-    Count = (UINT8)((NotificatonCount << 1) & 0x07);
+    Count = (UINT8)((NotificationCount << 1) & 0x07);
     SetFspMeasurePoint (FSP_PERF_ID_API_NOTIFY_POSTPCI_ENTRY + Count);
 
-    NotificatonValue = ((NOTIFY_PHASE_PARAMS *)(UINTN)GetFspApiParameter ())->Phase;
-    DEBUG ((DEBUG_INFO, "FSP Got Notification. Notification Value : 0x%08X\n", NotificatonValue));
+    NotificationValue = ((NOTIFY_PHASE_PARAMS *)(UINTN)GetFspApiParameter ())->Phase;
+    DEBUG ((DEBUG_INFO, "FSP Got Notification. Notification Value : 0x%08X\n", NotificationValue));
 
-    if (mFspNotfifySequence[NotificatonCount] != NotificatonValue) {
+    if (mFspNotifySequence[NotificationCount] != NotificationValue) {
       //
       // Notify code does not follow the predefined order
       //
@@ -156,12 +156,12 @@ FspWaitForNotify (
       //
       // Process Notification and Give control back to the boot loader framework caller
       //
-      Status = FspNotificationHandler (NotificatonValue);
+      Status = FspNotificationHandler (NotificationValue);
       SetFspApiReturnStatus(Status);
       if (!EFI_ERROR(Status)) {
-        NotificatonCount++;
+        NotificationCount++;
         SetFspApiReturnStatus(EFI_SUCCESS);
-        if (NotificatonValue == EnumInitPhaseReadyToBoot) {
+        if (NotificationValue == EnumInitPhaseReadyToBoot) {
           break;
         }
       }
