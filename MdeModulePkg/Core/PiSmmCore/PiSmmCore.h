@@ -50,6 +50,7 @@
 #include <Library/SmmCorePlatformHookLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/TimerLib.h>
+#include <Library/HobLib.h>
 
 #include "PiSmmCorePrivateData.h"
 

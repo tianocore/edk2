@@ -59,6 +59,7 @@
   SmmCorePlatformHookLib
   PerformanceLib
   TimerLib
+  HobLib
 
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
