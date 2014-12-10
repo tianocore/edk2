@@ -172,6 +172,7 @@
   gEfiIdeControllerInitProtocolGuid                       ##UNDEFINED
   gEfiDiskIo2ProtocolGuid                                 ##UNDEFINED
   gEfiAdapterInformationProtocolGuid                      ##UNDEFINED
+  gEfiShellDynamicCommandProtocolGuid                     ##UNDEFINED
 
 [Guids]
   gEfiFileInfoGuid                                        ##CONSUMES
