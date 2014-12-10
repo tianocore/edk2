@@ -1245,7 +1245,7 @@ MeasureVariable (
      VarName,
      VarNameLength * sizeof (*VarName)
      );
-  if (VarSize != 0) {
+  if (VarSize != 0 && VarData != NULL) {
     CopyMem (
        (CHAR16 *)VarLog->UnicodeName + VarNameLength,
        VarData,
@@ -1423,7 +1423,7 @@ MeasureAllBootVariables (
              &BootCount,
              (VOID **) &BootOrder
              );
-  if (Status == EFI_NOT_FOUND) {
+  if (Status == EFI_NOT_FOUND || BootOrder == NULL) {
     return EFI_SUCCESS;
   }
 
