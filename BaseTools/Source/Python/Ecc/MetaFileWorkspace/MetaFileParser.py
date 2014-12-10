@@ -461,13 +461,14 @@ class InfParser(MetaFileParser):
                                      MODEL_PCD_DYNAMIC_EX,
                                      MODEL_PCD_DYNAMIC]:
                 Line = Content[Index].strip()
-                if Line.startswith(TAB_COMMENT_SPLIT):
+                if Line.startswith(TAB_SPECIAL_COMMENT):
+                    Usage += ' ' + Line[Line.find(TAB_SPECIAL_COMMENT):]
+                    continue
+                elif Line.startswith(TAB_COMMENT_SPLIT):
                     continue
                 elif Line.find(TAB_COMMENT_SPLIT) > 0:
-                    Usage = Line[Line.find(TAB_COMMENT_SPLIT):]
+                    Usage += ' ' + Line[Line.find(TAB_COMMENT_SPLIT):]
                     Line = Line[:Line.find(TAB_COMMENT_SPLIT)]
-                else:
-                    Usage = ''
             else:
             # skip empty, commented, block commented lines
                 Line = CleanString(Content[Index], AllowCppStyleComment=True)
@@ -545,6 +546,7 @@ class InfParser(MetaFileParser):
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
             #
             self._ValueList[0] = self._ValueList[0].replace('/', '\\')
+            Usage = Usage.strip()
             for Arch, Platform in self._Scope:
                 self._Store(self._SectionType,
                             self._ValueList[0],
@@ -561,6 +563,7 @@ class InfParser(MetaFileParser):
                             0,
                             Usage
                             )
+            Usage = ''
         if IsFindBlockComment:
             EdkLogger.error("Parser", FORMAT_INVALID, "Open block comments (starting with /*) are expected to end with */", 
                             File=self.MetaFile)
@@ -731,6 +734,7 @@ class DscParser(MetaFileParser):
         TAB_ELSE_IF.upper()                         :   MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSEIF,
         TAB_ELSE.upper()                            :   MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSE,
         TAB_END_IF.upper()                          :   MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF,
+        TAB_ERROR.upper()                           :   MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR,
     }
 
     # Valid names in define section
@@ -1117,6 +1121,7 @@ class DscParser(MetaFileParser):
             MODEL_META_DATA_BUILD_OPTION                    :   self.__ProcessBuildOption,
             MODEL_UNKNOWN                                   :   self._Skip,
             MODEL_META_DATA_USER_EXTENSION                  :   self._Skip,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR     :   self._Skip,
         }
         
         self._RawTable = self._Table
@@ -1152,9 +1157,10 @@ class DscParser(MetaFileParser):
                 # Only catch expression evaluation error here. We need to report
                 # the precise number of line on which the error occurred
                 #
-                EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
-                                File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
-                                Line=self._LineIndex+1)
+                pass
+#                 EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
+#                                 File=self._FileWithError, ExtraData=' '.join(self._ValueList),
+#                                 Line=self._LineIndex+1)
             except MacroException, Excpt:
                 EdkLogger.error('Parser', FORMAT_INVALID, str(Excpt),
                                 File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
@@ -1809,7 +1815,10 @@ class Fdf(FdfObject):
         # Load Fdf file if filename is not None
         #
         if Filename != None:
-            self.LoadFdfFile(Filename)
+            try:
+                self.LoadFdfFile(Filename)
+            except Exception:
+                pass
 
     #
     # Insert a FDF file record into database

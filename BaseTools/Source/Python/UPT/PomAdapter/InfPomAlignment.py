@@ -940,7 +940,7 @@ class InfPomAlignment(ModuleObject):
                     HelpTextObj.SetString(CommentItem.GetHelpStringItem())
                     Pcd.SetHelpTextList(Pcd.GetHelpTextList() + [HelpTextObj])
                 AsBuildPatchPcdList.append(Pcd)
-            else:
+            elif PcdItem[0].upper() == DT.TAB_INF_PCD_EX.upper():
                 PcdItemObj = PcdItem[1]
                 Pcd = CommonObject.PcdObject()
                 Pcd.SetTokenSpaceGuidValue(PcdItemObj.GetTokenSpaceGuidValue())

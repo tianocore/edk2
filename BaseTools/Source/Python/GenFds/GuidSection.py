@@ -159,6 +159,13 @@ class GuidSection(GuidSectionClassObject) :
                        SecNum     + \
                        '.tmp'
             TempFile = os.path.normpath(TempFile)
+            #
+            # Remove temp file if its time stamp is older than dummy file
+            # Just in case the external tool fails at this time but succeeded before
+            # Error should be reported if the external tool does not generate a new output based on new input
+            #
+            if os.path.exists(TempFile) and os.path.exists(DummyFile) and os.path.getmtime(TempFile) < os.path.getmtime(DummyFile):
+                os.remove(TempFile)
 
             FirstCall = False
             CmdOption = '-e'
@@ -183,6 +190,12 @@ class GuidSection(GuidSectionClassObject) :
                 FirstCall = False
                 ReturnValue[0] = 0
                 GenFdsGlobalVariable.GuidTool(TempFile, [DummyFile], ExternalTool, CmdOption)
+            #
+            # There is external tool which does not follow standard rule which return nonzero if tool fails
+            # The output file has to be checked
+            #
+            if not os.path.exists(TempFile):
+                EdkLogger.error("GenFds", COMMAND_FAILURE, 'Fail to call %s, no output file was generated' % ExternalTool)
 
             FileHandleIn = open(DummyFile,'rb')
             FileHandleIn.seek(0,2)
@@ -257,6 +270,7 @@ class GuidSection(GuidSectionClassObject) :
 
         ToolDefinition = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDictionary
         ToolPathTmp = None
+        ToolOption = None
         for ToolDef in ToolDefinition.items():
             if self.NameGuid == ToolDef[1]:
                 KeyList = ToolDef[0].split('_')

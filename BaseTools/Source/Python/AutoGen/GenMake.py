@@ -679,7 +679,8 @@ cleanlib:
                     NewFile = self.PlaceMacro(str(F), self.Macros)
                     # In order to use file list macro as dependency
                     if T.GenListFile:
-                        self.ListFileMacros[T.ListFileMacro].append(str(F))
+                        # gnu tools need forward slash path separater, even on Windows
+                        self.ListFileMacros[T.ListFileMacro].append(str(F).replace ('\\', '/'))
                         self.FileListMacros[T.FileListMacro].append(NewFile)
                     elif T.GenFileListMacro:
                         self.FileListMacros[T.FileListMacro].append(NewFile)

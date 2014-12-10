@@ -2935,7 +2935,8 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetGuidList(self):
         if self._GuidList == None:
-            self._GuidList = self.Module.Guids
+            self._GuidList = sdict()
+            self._GuidList.update(self.Module.Guids)
             for Library in self.DependentLibraryList:
                 self._GuidList.update(Library.Guids)
                 self.UpdateComments(self._GuidComments, Library.GuidComments)
@@ -2955,7 +2956,8 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetProtocolList(self):
         if self._ProtocolList == None:
-            self._ProtocolList = self.Module.Protocols
+            self._ProtocolList = sdict()
+            self._ProtocolList.update(self.Module.Protocols)
             for Library in self.DependentLibraryList:
                 self._ProtocolList.update(Library.Protocols)
                 self.UpdateComments(self._ProtocolComments, Library.ProtocolComments)
@@ -2968,7 +2970,8 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetPpiList(self):
         if self._PpiList == None:
-            self._PpiList = self.Module.Ppis
+            self._PpiList = sdict()
+            self._PpiList.update(self.Module.Ppis)
             for Library in self.DependentLibraryList:
                 self._PpiList.update(Library.Ppis)
                 self.UpdateComments(self._PpiComments, Library.PpiComments)

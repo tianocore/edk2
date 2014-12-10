@@ -216,20 +216,11 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
         #
         for Line in SectionString:
             LineContent = Line[0]
-            LineNo = Line[1]
 
             if LineContent.strip() == '':
                 continue
-            #
-            # Replace with [Defines] section Macro
-            #
-            LineContent = InfExpandMacro(LineContent,
-                                         (FileName, LineContent, LineNo),
-                                         self.FileLocalMacros,
-                                         None)
 
             UserExtensionContent += LineContent + DT.END_OF_LINE
-
             continue
 
         #
