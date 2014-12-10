@@ -769,7 +769,7 @@ AddImageExeInfo (
   }
 
   DevicePathSize            = GetDevicePathSize (DevicePath);
-  NewImageExeInfoEntrySize  = sizeof (EFI_IMAGE_EXECUTION_INFO) + NameStringLen + DevicePathSize + SignatureSize;
+  NewImageExeInfoEntrySize  = sizeof (EFI_IMAGE_EXECUTION_INFO) - sizeof (EFI_SIGNATURE_LIST) + NameStringLen + DevicePathSize + SignatureSize;
   NewImageExeInfoTable      = (EFI_IMAGE_EXECUTION_INFO_TABLE *) AllocateRuntimePool (ImageExeInfoTableSize + NewImageExeInfoEntrySize);
   if (NewImageExeInfoTable == NULL) {
     return ;
@@ -1475,6 +1475,7 @@ DxeImageVerificationHandler (
   UINTN                                AuthDataSize;
   EFI_IMAGE_DATA_DIRECTORY             *SecDataDir;
   UINT32                               OffSet;
+  CHAR16                               *NameStr;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1778,7 +1779,12 @@ Done:
     //
     // Policy decides to defer or reject the image; add its information in image executable information table.
     //
-    AddImageExeInfo (Action, NULL, File, SignatureList, SignatureListSize);
+    NameStr = ConvertDevicePathToText (File, FALSE, TRUE);
+    AddImageExeInfo (Action, NameStr, File, SignatureList, SignatureListSize);
+    if (NameStr != NULL) {
+      DEBUG((EFI_D_INFO, "The image doesn't pass verification: %s\n", NameStr));
+      FreePool(NameStr);
+    }
     Status = EFI_SECURITY_VIOLATION;
   }
 
