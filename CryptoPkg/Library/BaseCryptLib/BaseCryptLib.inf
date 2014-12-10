@@ -93,5 +93,5 @@
 [BuildOptions]
   # suppress the following warnings so we do not break the build with warnings-as-errors:
   #   C4305: truncation from type1 to type2 (Introduced by RFC3161 Timestamp ASN.1 declarations)
-  MSFT:*_*_X64_CC_FLAGS = /wd4305
+  MSFT:*_*_*_CC_FLAGS = /wd4305
   GCC:*_GCC44_IA32_CC_FLAGS = "-D__cdecl=__attribute__((cdecl))" "-D__declspec(t)=__attribute__((t))"
