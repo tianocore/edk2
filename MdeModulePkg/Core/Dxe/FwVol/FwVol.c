@@ -672,7 +672,7 @@ NotifyFwVolBlock (
     //
     Status = GetFwVolHeader (Fvb, &FwVolHeader);
     if (EFI_ERROR (Status)) {
-      return;
+      continue;
     }
     ASSERT (FwVolHeader != NULL);
 
