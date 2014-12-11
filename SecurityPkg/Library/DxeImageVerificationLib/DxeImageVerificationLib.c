@@ -841,7 +841,7 @@ IsCertHashFoundInDatabase (
   )
 {
   BOOLEAN             IsFound;
-  EFI_STATUS          Status;
+  BOOLEAN             Status;
   EFI_SIGNATURE_LIST  *DbxList;
   UINTN               DbxSize;
   EFI_SIGNATURE_DATA  *CertHash;
