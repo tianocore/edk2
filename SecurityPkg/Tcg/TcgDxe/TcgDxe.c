@@ -1021,7 +1021,7 @@ MeasureAllBootVariables (
              &BootCount,
              (VOID **) &BootOrder
              );
-  if (Status == EFI_NOT_FOUND) {
+  if (Status == EFI_NOT_FOUND || BootOrder == NULL) {
     return EFI_SUCCESS;
   }
 
