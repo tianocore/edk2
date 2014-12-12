@@ -23,6 +23,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct {
   TPM2_COMMAND_HEADER       Header;
+  TPMI_RH_HIERARCHY         AuthHandle;
+  UINT32                    AuthSessionSize;
+  TPMS_AUTH_COMMAND         AuthSession;
+  TPM2B_DIGEST              AuthPolicy;
+  TPMI_ALG_HASH             HashAlg;
+} TPM2_SET_PRIMARY_POLICY_COMMAND;
+
+typedef struct {
+  TPM2_RESPONSE_HEADER       Header;
+  UINT32                     AuthSessionSize;
+  TPMS_AUTH_RESPONSE         AuthSession;
+} TPM2_SET_PRIMARY_POLICY_RESPONSE;
+
+typedef struct {
+  TPM2_COMMAND_HEADER       Header;
   TPMI_RH_CLEAR             AuthHandle;
   UINT32                    AuthorizationSize;
   TPMS_AUTH_COMMAND         AuthSession;
@@ -104,6 +119,87 @@ typedef struct {
 } TPM2_HIERARCHY_CONTROL_RESPONSE;
 
 #pragma pack()
+
+/**
+  This command allows setting of the authorization policy for the platform hierarchy (platformPolicy), the
+  storage hierarchy (ownerPolicy), and and the endorsement hierarchy (endorsementPolicy).
+
+  @param[in]  AuthHandle            TPM_RH_ENDORSEMENT, TPM_RH_OWNER or TPM_RH_PLATFORM+{PP} parameters to be validated
+  @param[in]  AuthSession           Auth Session context
+  @param[in]  AuthPolicy            An authorization policy hash
+  @param[in]  HashAlg               The hash algorithm to use for the policy
+
+  @retval EFI_SUCCESS      Operation completed successfully.
+  @retval EFI_DEVICE_ERROR Unexpected device behavior.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2SetPrimaryPolicy (
+  IN  TPMI_RH_HIERARCHY_AUTH    AuthHandle,
+  IN  TPMS_AUTH_COMMAND         *AuthSession,
+  IN  TPM2B_DIGEST              *AuthPolicy,
+  IN  TPMI_ALG_HASH             HashAlg
+  )
+{
+  EFI_STATUS                                 Status;
+  TPM2_SET_PRIMARY_POLICY_COMMAND            SendBuffer;
+  TPM2_SET_PRIMARY_POLICY_RESPONSE           RecvBuffer;
+  UINT32                                     SendBufferSize;
+  UINT32                                     RecvBufferSize;
+  UINT8                                      *Buffer;
+  UINT32                                     SessionInfoSize;
+
+  //
+  // Construct command
+  //
+  SendBuffer.Header.tag = SwapBytes16(TPM_ST_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_SetPrimaryPolicy);
+
+  SendBuffer.AuthHandle = SwapBytes32 (AuthHandle);
+
+  //
+  // Add in Auth session
+  //
+  Buffer = (UINT8 *)&SendBuffer.AuthSession;
+
+  // sessionInfoSize
+  SessionInfoSize = CopyAuthSessionCommand (AuthSession, Buffer);
+  Buffer += SessionInfoSize;
+  SendBuffer.AuthSessionSize = SwapBytes32(SessionInfoSize);
+
+  //
+  // Real data
+  //
+  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(AuthPolicy->size));
+  Buffer += sizeof(UINT16);
+  CopyMem (Buffer, AuthPolicy->buffer, AuthPolicy->size);
+  Buffer += AuthPolicy->size;
+  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(HashAlg));
+  Buffer += sizeof(UINT16);
+
+  SendBufferSize = (UINT32)((UINTN)Buffer - (UINTN)&SendBuffer);
+  SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
+
+  //
+  // send Tpm command
+  //
+  RecvBufferSize = sizeof (RecvBuffer);
+  Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
+    DEBUG ((EFI_D_ERROR, "Tpm2SetPrimaryPolicy - RecvBufferSize Error - %x\n", RecvBufferSize));
+    return EFI_DEVICE_ERROR;
+  }
+  if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "Tpm2SetPrimaryPolicy - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   This command removes all TPM context associated with a specific Owner.

@@ -35,6 +35,9 @@
   Tpm2Hierarchy.c
   Tpm2NVStorage.c
   Tpm2Startup.c
+  Tpm2Session.c
+  Tpm2Context.c
+  Tpm2EnhancedAuthorization.c
   Tpm2Test.c
   Tpm2DictionaryAttack.c
   Tpm2Miscellaneous.c
