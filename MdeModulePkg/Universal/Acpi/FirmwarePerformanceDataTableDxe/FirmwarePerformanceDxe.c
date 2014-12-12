@@ -744,7 +744,7 @@ FpdtExitBootServicesEventNotify (
   IN VOID             *Context
   )
 {
-  if (mDxeCoreReportStatusCodeEnable == FALSE) {
+  if (!mDxeCoreReportStatusCodeEnable) {
     //
     // When DxeCore Report Status Code is disabled, 
     // Unregister boot time report status code listener at ExitBootService Event.
