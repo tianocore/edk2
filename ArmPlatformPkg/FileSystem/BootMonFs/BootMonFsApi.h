@@ -91,6 +91,28 @@ BootMonFsCloseFile (
   IN EFI_FILE_PROTOCOL  *This
   );
 
+/**
+  Open a file on the boot monitor file system.
+
+  @param[in]   This        The EFI_FILE_PROTOCOL parent handle.
+  @param[out]  NewHandle   A pointer to the location to return the opened
+                           handle for the new file.
+  @param[in]   FileName    The Null-terminated string of the name of the file
+                           to be opened.
+  @param[in]   OpenMode    The mode to open the file : Read or Read/Write or
+                           Read/Write/Create
+  @param[in]   Attributes  Attributes of the file in case of a file creation
+
+  @retval  EFI_SUCCESS            The file was open.
+  @retval  EFI_NOT_FOUND          The specified file could not be found or the specified
+                                  directory in which to create a file could not be found.
+  @retval  EFI_DEVICE_ERROR       The device reported an error.
+  @retval  EFI_WRITE_PROTECTED    Attempt to create a directory. This is not possible
+                                  with the BootMon file system.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough resources were available to open the file.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsOpenFile (
@@ -101,7 +123,23 @@ BootMonFsOpenFile (
   IN UINT64             Attributes
   );
 
+/**
+  Read data from an open file.
 
+  @param[in]      This        A pointer to the EFI_FILE_PROTOCOL instance that
+                              is the file handle to read data from.
+  @param[in out]  BufferSize  On input, the size of the Buffer. On output, the
+                              amount of data returned in Buffer. In both cases,
+                              the size is measured in bytes.
+  @param[out]     Buffer      The buffer into which the data is read.
+
+  @retval  EFI_SUCCESS            The data was read.
+  @retval  EFI_DEVICE_ERROR       On entry, the current file position is
+                                  beyond the end of the file, or the device
+                                  reported an error while performing the read
+                                  operation.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsReadFile (

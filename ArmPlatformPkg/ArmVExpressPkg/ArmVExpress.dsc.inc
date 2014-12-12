@@ -23,6 +23,7 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
+  BasePathLib|MdeModulePkg/Library/BasePathLib/BasePathLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf

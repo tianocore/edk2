@@ -12,6 +12,7 @@
 *
 **/
 
+#include <Library/PathLib.h>
 #include "BootMonFsInternal.h"
 
 // Clear a file's image description on storage media:
@@ -445,59 +446,78 @@ CreateNewFile (
 }
 
 /**
-  Opens a file on the Nor Flash FS volume
+  Open a file on the boot monitor file system.
 
-  Calls BootMonFsGetFileFromAsciiFilename to search the list of tracked files.
+  The boot monitor file system does not allow for sub-directories. There is only
+  one directory, the root one. On any attempt to create a directory, the function
+  returns in error with the EFI_WRITE_PROTECTED error code.
 
-  @param  This  The EFI_FILE_PROTOCOL parent handle.
-  @param  NewHandle Double-pointer to the newly created protocol.
-  @param  FileName The name of the image/metadata on flash
-  @param  OpenMode Read,write,append etc
-  @param  Attributes ?
+  @param[in]   This        A pointer to the EFI_FILE_PROTOCOL instance that is
+                           the file handle to source location.
+  @param[out]  NewHandle   A pointer to the location to return the opened
+                           handle for the new file.
+  @param[in]   FileName    The Null-terminated string of the name of the file
+                           to be opened.
+  @param[in]   OpenMode    The mode to open the file : Read or Read/Write or
+                           Read/Write/Create
+  @param[in]   Attributes  Attributes of the file in case of a file creation
 
-  @return EFI_STATUS
-  OUT_OF_RESOURCES
-    Run out of space to keep track of the allocated structures
-  DEVICE_ERROR
-    Unable to locate the volume associated with the parent file handle
-  NOT_FOUND
-    Filename wasn't found on flash
-  SUCCESS
+  @retval  EFI_SUCCESS            The file was open.
+  @retval  EFI_NOT_FOUND          The specified file could not be found or the specified
+                                  directory in which to create a file could not be found.
+  @retval  EFI_DEVICE_ERROR       The device reported an error.
+  @retval  EFI_WRITE_PROTECTED    Attempt to create a directory. This is not possible
+                                  with the Boot Monitor file system.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough resources were available to open the file.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
 
 **/
 EFIAPI
 EFI_STATUS
 BootMonFsOpenFile (
-  IN EFI_FILE_PROTOCOL  *This,
-  OUT EFI_FILE_PROTOCOL **NewHandle,
-  IN CHAR16             *FileName,
-  IN UINT64             OpenMode,
-  IN UINT64             Attributes
+  IN EFI_FILE_PROTOCOL   *This,
+  OUT EFI_FILE_PROTOCOL  **NewHandle,
+  IN CHAR16              *FileName,
+  IN UINT64              OpenMode,
+  IN UINT64              Attributes
   )
 {
-  BOOTMON_FS_FILE     *Directory;
-  BOOTMON_FS_FILE     *File;
-  BOOTMON_FS_INSTANCE *Instance;
-  CHAR8*               AsciiFileName;
   EFI_STATUS           Status;
+  BOOTMON_FS_FILE      *Directory;
+  BOOTMON_FS_FILE      *File;
+  BOOTMON_FS_INSTANCE  *Instance;
+  CHAR8                *Buf;
+  CHAR16               *Path;
+  CHAR16               *Separator;
+  CHAR8                *AsciiFileName;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if ((FileName == NULL) || (NewHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  //
   // The only valid modes are read, read/write, and read/write/create
-  if (!(OpenMode & EFI_FILE_MODE_READ) || ((OpenMode & EFI_FILE_MODE_CREATE)  && !(OpenMode & EFI_FILE_MODE_WRITE))) {
+  //
+  if ( (OpenMode != EFI_FILE_MODE_READ) &&
+       (OpenMode != (EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE)) &&
+       (OpenMode != (EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE)) ) {
     return EFI_INVALID_PARAMETER;
   }
 
   Directory = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
   if (Directory == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_INVALID_PARAMETER;
   }
 
   Instance = Directory->Instance;
 
-  // If the instance has not been initialized it yet then do it ...
+  //
+  // If the instance has not been initialized yet then do it ...
+  //
   if (!Instance->Initialized) {
     Status = BootMonFsInitialize (Instance);
     if (EFI_ERROR (Status)) {
@@ -505,58 +525,137 @@ BootMonFsOpenFile (
     }
   }
 
-  // BootMonFs interface requires ASCII filenames
-  AsciiFileName = AllocatePool ((StrLen (FileName) + 1) * sizeof (CHAR8));
-  if (AsciiFileName == NULL) {
+  //
+  // Copy the file path to be able to work on it. We do not want to
+  // modify the input file name string "FileName".
+  //
+  Buf = AllocateCopyPool (StrSize (FileName), FileName);
+  if (Buf == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr (FileName, AsciiFileName);
+  Path = (CHAR16*)Buf;
+  AsciiFileName = NULL;
 
-  if ((AsciiStrCmp (AsciiFileName, "\\") == 0) ||
-      (AsciiStrCmp (AsciiFileName, "/")  == 0) ||
-      (AsciiStrCmp (AsciiFileName, "")   == 0) ||
-      (AsciiStrCmp (AsciiFileName, ".")  == 0))
-  {
+  //
+  // Handle single periods, double periods and convert forward slashes '/'
+  // to backward '\' ones. Does not handle a '.' at the beginning of the
+  // path for the time being.
+  //
+  if (PathCleanUpDirectories (Path) == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Error;
+  }
+
+  //
+  // Detect if the first component of the path refers to a directory.
+  // This is done to return the correct error code when trying to
+  // access or create a directory other than the root directory.
+  //
+
+  //
+  // Search for the '\\' sequence and if found return in error
+  // with the EFI_INVALID_PARAMETER error code. ere in the path.
+  //
+  if (StrStr (Path, L"\\\\") != NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Error;
+  }
+  //
+  // Get rid of the leading '\' if any.
+  //
+  Path += (Path[0] == L'\\');
+
+  //
+  // Look for a '\' in the file path. If one is found then
+  // the first component of the path refers to a directory
+  // that is not the root directory.
+  //
+  Separator = StrStr (Path, L"\\");
+  if (Separator != NULL) {
     //
-    // Opening '/', '\', '.', or the NULL pathname is trying to open the root directory
+    // In the case '<dir name>\' and a creation, return
+    // EFI_WRITE_PROTECTED if this is for a directory
+    // creation, EFI_INVALID_PARAMETER otherwise.
+    //
+    if ((*(Separator + 1) == '\0') && ((OpenMode & EFI_FILE_MODE_CREATE) != 0)) {
+      if (Attributes & EFI_FILE_DIRECTORY) {
+        Status = EFI_WRITE_PROTECTED;
+      } else {
+        Status = EFI_INVALID_PARAMETER;
+      }
+    } else {
+      //
+      // Attempt to open a file or a directory that is not in the
+      // root directory or to open without creation a directory
+      // located in the root directory, returns EFI_NOT_FOUND.
+      //
+      Status = EFI_NOT_FOUND;
+    }
+    goto Error;
+  }
+
+  //
+  // BootMonFs interface requires ASCII filenames
+  //
+  AsciiFileName = AllocatePool (StrLen (Path) + 1);
+  if (AsciiFileName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+  UnicodeStrToAsciiStr (Path, AsciiFileName);
+  if (AsciiStrSize (AsciiFileName) > MAX_NAME_LENGTH) {
+   AsciiFileName[MAX_NAME_LENGTH - 1] = '\0';
+  }
+
+  if ((AsciiFileName[0] == '\0') ||
+      (AsciiFileName[0] == '.' )    ) {
+    //
+    // Opening the root directory
     //
 
     *NewHandle = &Instance->RootFile->File;
     Instance->RootFile->Position = 0;
     Status = EFI_SUCCESS;
   } else {
+
+    if ((OpenMode & EFI_FILE_MODE_CREATE) &&
+        (Attributes & EFI_FILE_DIRECTORY)    ) {
+      Status = EFI_WRITE_PROTECTED;
+      goto Error;
+    }
+
     //
-    // Open or Create a regular file
+    // Open or create a file in the root directory.
     //
 
-    // Check if the file already exists
     Status = BootMonGetFileFromAsciiFileName (Instance, AsciiFileName, &File);
     if (Status == EFI_NOT_FOUND) {
-      // The file doesn't exist.
-      if (OpenMode & EFI_FILE_MODE_CREATE) {
-        // If the file does not exist but is required then create it.
-        if (Attributes & EFI_FILE_DIRECTORY) {
-          // BootMonFS doesn't support subdirectories
-          Status = EFI_UNSUPPORTED;
-        } else {
-          // Create a new file
-          Status = CreateNewFile (Instance, AsciiFileName, &File);
-          if (!EFI_ERROR (Status)) {
-            File->OpenMode = OpenMode;
-            *NewHandle = &File->File;
-            File->Position = 0;
-          }
-        }
+      if ((OpenMode & EFI_FILE_MODE_CREATE) == 0) {
+        goto Error;
       }
-    } else if (Status == EFI_SUCCESS) {
-      // The file exists
+
+      Status = CreateNewFile (Instance, AsciiFileName, &File);
+      if (!EFI_ERROR (Status)) {
+        File->OpenMode = OpenMode;
+        *NewHandle = &File->File;
+        File->Position = 0;
+      }
+    } else {
+      //
+      // The file already exists.
+      //
       File->OpenMode = OpenMode;
       *NewHandle = &File->File;
       File->Position = 0;
     }
   }
 
-  FreePool (AsciiFileName);
+Error:
+
+  FreePool (Buf);
+  if (AsciiFileName != NULL) {
+    FreePool (AsciiFileName);
+  }
 
   return Status;
 }

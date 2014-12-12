@@ -33,9 +33,11 @@
 [Packages]
   ArmPlatformPkg/ArmPlatformPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseLib
+  BasePathLib
   DevicePathLib
   MemoryAllocationLib
   PrintLib

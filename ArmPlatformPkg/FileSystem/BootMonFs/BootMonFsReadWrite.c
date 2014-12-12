@@ -20,6 +20,23 @@
 
 #include "BootMonFsInternal.h"
 
+/**
+  Read data from an open file.
+
+  @param[in]      This        A pointer to the EFI_FILE_PROTOCOL instance that
+                              is the file handle to read data from.
+  @param[in out]  BufferSize  On input, the size of the Buffer. On output, the
+                              amount of data returned in Buffer. In both cases,
+                              the size is measured in bytes.
+  @param[out]     Buffer      The buffer into which the data is read.
+
+  @retval  EFI_SUCCESS            The data was read.
+  @retval  EFI_DEVICE_ERROR       On entry, the current file position is
+                                  beyond the end of the file, or the device
+                                  reported an error while performing the read
+                                  operation.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsReadFile (
@@ -51,9 +68,14 @@ BootMonFsReadFile (
   FileStart = (Media->LowestAlignedLba + File->HwDescription.BlockStart) * Media->BlockSize;
 
   if (File->Position >= File->HwDescription.Region[0].Size) {
-    // The entire file has been read
+    // The entire file has been read or the position has been
+    // set past the end of the file.
     *BufferSize = 0;
-    return EFI_DEVICE_ERROR;
+    if (File->Position > File->HwDescription.Region[0].Size) {
+      return EFI_DEVICE_ERROR;
+    } else {
+      return EFI_SUCCESS;
+    }
   }
 
   // This driver assumes that the entire file is in region 0.
