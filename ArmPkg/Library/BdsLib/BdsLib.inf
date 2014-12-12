@@ -37,6 +37,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
@@ -53,6 +54,7 @@
   SerialPortLib
   FdtLib
   TimerLib
+  NetLib
 
 [LibraryClasses.AARCH64]
   ArmGicLib
@@ -74,6 +76,10 @@
   gEfiUsbIoProtocolGuid
   gEfiLoadedImageProtocolGuid
   gEfiSimpleNetworkProtocolGuid
+  gEfiDhcp4ServiceBindingProtocolGuid
+  gEfiDhcp4ProtocolGuid
+  gEfiMtftp4ServiceBindingProtocolGuid
+  gEfiMtftp4ProtocolGuid
 
 [FeaturePcd]
   gArmTokenSpaceGuid.PcdArmLinuxSpinTable

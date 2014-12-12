@@ -63,6 +63,8 @@
   gEfiDevicePathToTextProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid
   gEfiFirmwareVolumeBlock2ProtocolGuid
+  gEfiDhcp4ServiceBindingProtocolGuid
+  gEfiMtftp4ServiceBindingProtocolGuid
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor

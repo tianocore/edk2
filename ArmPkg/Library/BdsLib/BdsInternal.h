@@ -71,6 +71,11 @@ typedef struct _BDS_SYSTEM_MEMORY_RESOURCE {
   UINT64                      ResourceLength;
 } BDS_SYSTEM_MEMORY_RESOURCE;
 
+typedef struct {
+  UINT64  FileSize;
+  UINT64  DownloadedNbOfBytes;
+  UINT64  LastReportedNbOfBytes;
+} BDS_TFTP_CONTEXT;
 
 // BdsHelper.c
 EFI_STATUS

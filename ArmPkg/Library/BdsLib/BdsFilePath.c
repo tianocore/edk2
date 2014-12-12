@@ -14,12 +14,40 @@
 
 #include "BdsInternal.h"
 
+#include <Library/NetLib.h>
+
+#include <Protocol/Bds.h>
 #include <Protocol/UsbIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleNetwork.h>
+#include <Protocol/Dhcp4.h>
+#include <Protocol/Mtftp4.h>
 
 #define IS_DEVICE_PATH_NODE(node,type,subtype) (((node)->Type == (type)) && ((node)->SubType == (subtype)))
+
+/*
+   Constant strings and define related to the message indicating the amount of
+   progress in the dowloading of a TFTP file.
+*/
+
+// Frame for the progression slider
+STATIC CONST CHAR16 mTftpProgressFrame[] = L"[                                        ]";
+
+// Number of steps in the progression slider
+#define TFTP_PROGRESS_SLIDER_STEPS  ((sizeof (mTftpProgressFrame) / sizeof (CHAR16)) - 3)
+
+// Size in number of characters plus one (final zero) of the message to
+// indicate the progress of a tftp download. The format is "[(progress slider:
+// 40 characters)] (nb of KBytes downloaded so far: 7 characters) Kb". There
+// are thus the number of characters in mTftpProgressFrame[] plus 11 characters
+// (2 // spaces, "Kb" and seven characters for the number of KBytes).
+#define TFTP_PROGRESS_MESSAGE_SIZE  ((sizeof (mTftpProgressFrame) / sizeof (CHAR16)) + 12)
+
+// String to delete the tftp progress message to be able to update it :
+// (TFTP_PROGRESS_MESSAGE_SIZE-1) '\b'
+STATIC CONST CHAR16 mTftpProgressDelete[] = L"\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+
 
 // Extract the FilePath from the Device Path
 CHAR16*
@@ -723,14 +751,14 @@ BdsPxeLoadImage (
 
 BOOLEAN
 BdsTftpSupport (
-  IN EFI_DEVICE_PATH*           DevicePath,
-  IN EFI_HANDLE                 Handle,
-  IN EFI_DEVICE_PATH*           RemainingDevicePath
+  IN EFI_DEVICE_PATH  *DevicePath,
+  IN EFI_HANDLE       Handle,
+  IN EFI_DEVICE_PATH  *RemainingDevicePath
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS       Status;
   EFI_DEVICE_PATH  *NextDevicePath;
-  EFI_PXE_BASE_CODE_PROTOCOL  *PxeBcProtocol;
+  VOID             *Interface;
 
   // Validate the Remaining Device Path
   if (IsDevicePathEnd (RemainingDevicePath)) {
@@ -748,151 +776,412 @@ BdsTftpSupport (
     return FALSE;
   }
 
-  Status = gBS->HandleProtocol (Handle, &gEfiPxeBaseCodeProtocolGuid, (VOID **)&PxeBcProtocol);
+  Status = gBS->HandleProtocol (
+                  Handle, &gEfiDevicePathProtocolGuid,
+                  &Interface
+                  );
   if (EFI_ERROR (Status)) {
     return FALSE;
-  } else {
-    return TRUE;
   }
+
+  //
+  // Check that the controller (identified by its handle "Handle") supports the
+  // MTFTPv4 Service Binding Protocol. If it does, it means that it supports the
+  // EFI MTFTPv4 Protocol needed to download the image through TFTP.
+  //
+  Status = gBS->HandleProtocol (
+                  Handle, &gEfiMtftp4ServiceBindingProtocolGuid,
+                  &Interface
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
+/**
+  Worker function that get the size in numbers of bytes of a file from a TFTP
+  server before to download the file.
+
+  @param[in]   Mtftp4    MTFTP4 protocol interface
+  @param[in]   FilePath  Path of the file, Ascii encoded
+  @param[out]  FileSize  Address where to store the file size in number of
+                         bytes.
+
+  @retval  EFI_SUCCESS   The size of the file was returned.
+  @retval  !EFI_SUCCESS  The size of the file was not returned.
+
+**/
+STATIC
+EFI_STATUS
+Mtftp4GetFileSize (
+  IN  EFI_MTFTP4_PROTOCOL  *Mtftp4,
+  IN  CHAR8                *FilePath,
+  OUT UINT64               *FileSize
+  )
+{
+  EFI_STATUS         Status;
+  EFI_MTFTP4_OPTION  ReqOpt[1];
+  EFI_MTFTP4_PACKET  *Packet;
+  UINT32             PktLen;
+  EFI_MTFTP4_OPTION  *TableOfOptions;
+  EFI_MTFTP4_OPTION  *Option;
+  UINT32             OptCnt;
+  UINT8              OptBuf[128];
+
+  ReqOpt[0].OptionStr = (UINT8*)"tsize";
+  OptBuf[0] = '0';
+  OptBuf[1] = 0;
+  ReqOpt[0].ValueStr = OptBuf;
+
+  Status = Mtftp4->GetInfo (
+             Mtftp4,
+             NULL,
+             (UINT8*)FilePath,
+             NULL,
+             1,
+             ReqOpt,
+             &PktLen,
+             &Packet
+             );
+
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  Status = Mtftp4->ParseOptions (
+                     Mtftp4,
+                     PktLen,
+                     Packet,
+                     (UINT32 *) &OptCnt,
+                     &TableOfOptions
+                     );
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  Option = TableOfOptions;
+  while (OptCnt != 0) {
+    if (AsciiStrnCmp ((CHAR8 *)Option->OptionStr, "tsize", 5) == 0) {
+      *FileSize = AsciiStrDecimalToUint64 ((CHAR8 *)Option->ValueStr);
+      break;
+    }
+    OptCnt--;
+    Option++;
+  }
+  FreePool (TableOfOptions);
+
+  if (OptCnt == 0) {
+    Status = EFI_UNSUPPORTED;
+  }
+
+Error :
+
+  return Status;
+}
+
+/**
+  Update the progress of a file download
+  This procedure is called each time a new TFTP packet is received.
+
+  @param[in]  This       MTFTP4 protocol interface
+  @param[in]  Token      Parameters for the download of the file
+  @param[in]  PacketLen  Length of the packet
+  @param[in]  Packet     Address of the packet
+
+  @retval  EFI_SUCCESS  All packets are accepted.
+
+**/
+STATIC
+EFI_STATUS
+Mtftp4CheckPacket (
+  IN EFI_MTFTP4_PROTOCOL  *This,
+  IN EFI_MTFTP4_TOKEN     *Token,
+  IN UINT16               PacketLen,
+  IN EFI_MTFTP4_PACKET    *Packet
+  )
+{
+  BDS_TFTP_CONTEXT  *Context;
+  CHAR16            Progress[TFTP_PROGRESS_MESSAGE_SIZE];
+  UINT64            NbOfKb;
+  UINTN             Index;
+  UINTN             LastStep;
+  UINTN             Step;
+  UINT64            LastNbOf50Kb;
+  UINT64            NbOf50Kb;
+
+  if ((NTOHS (Packet->OpCode)) == EFI_MTFTP4_OPCODE_DATA) {
+    Context = (BDS_TFTP_CONTEXT*)Token->Context;
+
+    if (Context->DownloadedNbOfBytes == 0) {
+      if (Context->FileSize > 0) {
+        Print (L"%s       0 Kb", mTftpProgressFrame);
+      } else {
+        Print (L"    0 Kb");
+      }
+    }
+
+    //
+    // The data is the packet are prepended with two UINT16 :
+    // . OpCode = EFI_MTFTP4_OPCODE_DATA
+    // . Block  = the number of this block of data
+    //
+    Context->DownloadedNbOfBytes += PacketLen - sizeof (Packet->OpCode) - sizeof (Packet->Data.Block);
+    NbOfKb = Context->DownloadedNbOfBytes / 1024;
+
+    Progress[0] = L'\0';
+    if (Context->FileSize > 0) {
+      LastStep  = (Context->LastReportedNbOfBytes * TFTP_PROGRESS_SLIDER_STEPS) / Context->FileSize;
+      Step      = (Context->DownloadedNbOfBytes   * TFTP_PROGRESS_SLIDER_STEPS) / Context->FileSize;
+      if (Step > LastStep) {
+        Print (mTftpProgressDelete);
+        StrCpy (Progress, mTftpProgressFrame);
+        for (Index = 1; Index < Step; Index++) {
+          Progress[Index] = L'=';
+        }
+        Progress[Step] = L'>';
+
+        UnicodeSPrint (
+          Progress + (sizeof (mTftpProgressFrame) / sizeof (CHAR16)) - 1,
+          sizeof (Progress) - sizeof (mTftpProgressFrame),
+          L" %7d Kb",
+          NbOfKb
+          );
+        Context->LastReportedNbOfBytes = Context->DownloadedNbOfBytes;
+      }
+    } else {
+      //
+      // Case when we do not know the size of the final file.
+      // We print the updated size every 50KB of downloaded data
+      //
+      LastNbOf50Kb = Context->LastReportedNbOfBytes / (50*1024);
+      NbOf50Kb     = Context->DownloadedNbOfBytes   / (50*1024);
+      if (NbOf50Kb > LastNbOf50Kb) {
+        Print (L"\b\b\b\b\b\b\b\b\b\b");
+        UnicodeSPrint (Progress, sizeof (Progress), L"%7d Kb", NbOfKb);
+        Context->LastReportedNbOfBytes = Context->DownloadedNbOfBytes;
+      }
+    }
+    if (Progress[0] != L'\0') {
+      Print (L"%s", Progress);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Download an image from a TFTP server
+
+  @param[in]   DevicePath           Device path of the TFTP boot option
+  @param[in]   ControllerHandle     Handle of the network controller
+  @param[in]   RemainingDevicePath  Device path of the TFTP boot option but
+                                    the first node that identifies the network controller
+  @param[in]   Type                 Type to allocate memory pages
+  @param[out]  Image                Address of the bufer where the image is stored in
+                                    case of success
+  @param[out]  ImageSize            Size in number of bytes of the i;age in case of
+                                    success
+
+  @retval  EFI_SUCCESS   The image was returned.
+  @retval  !EFI_SUCCESS  Something went wrong.
+
+**/
 EFI_STATUS
 BdsTftpLoadImage (
   IN     EFI_DEVICE_PATH*       DevicePath,
-  IN     EFI_HANDLE             Handle,
+  IN     EFI_HANDLE             ControllerHandle,
   IN     EFI_DEVICE_PATH*       RemainingDevicePath,
   IN     EFI_ALLOCATE_TYPE      Type,
   IN OUT EFI_PHYSICAL_ADDRESS   *Image,
   OUT    UINTN                  *ImageSize
   )
 {
-  EFI_STATUS                  Status;
-  EFI_PXE_BASE_CODE_PROTOCOL  *Pxe;
-  UINT64                      TftpBufferSize;
-  UINT64                      TftpTransferSize;
-  EFI_IP_ADDRESS              ServerIp;
-  IPv4_DEVICE_PATH*           IPv4DevicePathNode;
-  FILEPATH_DEVICE_PATH*       FilePathDevicePath;
-  EFI_IP_ADDRESS              LocalIp;
-  CHAR8*                      AsciiPathName;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
+  EFI_STATUS              Status;
+  EFI_HANDLE              Dhcp4ChildHandle;
+  EFI_DHCP4_PROTOCOL      *Dhcp4;
+  BOOLEAN                 Dhcp4ToStop;
+  EFI_HANDLE              Mtftp4ChildHandle;
+  EFI_MTFTP4_PROTOCOL     *Mtftp4;
+  EFI_DHCP4_CONFIG_DATA   Dhcp4CfgData;
+  EFI_DHCP4_MODE_DATA     Dhcp4Mode;
+  EFI_MTFTP4_CONFIG_DATA  Mtftp4CfgData;
+  IPv4_DEVICE_PATH        *IPv4DevicePathNode;
+  FILEPATH_DEVICE_PATH    *FilePathDevicePathNode;
+  CHAR8                   *AsciiFilePath;
+  EFI_MTFTP4_TOKEN        Mtftp4Token;
+  UINT64                  FileSize;
+  UINT64                  TftpBufferSize;
+  BDS_TFTP_CONTEXT        *TftpContext;
 
   ASSERT(IS_DEVICE_PATH_NODE (RemainingDevicePath, MESSAGING_DEVICE_PATH, MSG_IPv4_DP));
-
   IPv4DevicePathNode = (IPv4_DEVICE_PATH*)RemainingDevicePath;
-  FilePathDevicePath = (FILEPATH_DEVICE_PATH*)(IPv4DevicePathNode + 1);
 
-  Status = gBS->LocateProtocol (&gEfiPxeBaseCodeProtocolGuid, NULL, (VOID **)&Pxe);
+  Dhcp4ChildHandle  = NULL;
+  Dhcp4             = NULL;
+  Dhcp4ToStop       = FALSE;
+  Mtftp4ChildHandle = NULL;
+  Mtftp4            = NULL;
+  AsciiFilePath     = NULL;
+  TftpContext       = NULL;
+
+  if (!IPv4DevicePathNode->StaticIpAddress) {
+    //
+    // Using the DHCP4 Service Binding Protocol, create a child handle of the DHCP4 service and
+    // install the DHCP4 protocol on it. Then, open the DHCP protocol.
+    //
+    Status = NetLibCreateServiceChild (
+               ControllerHandle,
+               gImageHandle,
+               &gEfiDhcp4ServiceBindingProtocolGuid,
+               &Dhcp4ChildHandle
+               );
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->OpenProtocol (
+                      Dhcp4ChildHandle,
+                      &gEfiDhcp4ProtocolGuid,
+                      (VOID **) &Dhcp4,
+                      gImageHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_BY_DRIVER
+                      );
+    }
+    if (EFI_ERROR (Status)) {
+      Print (L"Unable to open DHCP4 protocol\n");
+      goto Error;
+    }
+  }
+
+  //
+  // Using the MTFTP4 Service Binding Protocol, create a child handle of the MTFTP4 service and
+  // install the MTFTP4 protocol on it. Then, open the MTFTP4 protocol.
+  //
+  Status = NetLibCreateServiceChild (
+             ControllerHandle,
+             gImageHandle,
+             &gEfiMtftp4ServiceBindingProtocolGuid,
+             &Mtftp4ChildHandle
+             );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->OpenProtocol (
+                    Mtftp4ChildHandle,
+                    &gEfiMtftp4ProtocolGuid,
+                    (VOID **) &Mtftp4,
+                    gImageHandle,
+                    ControllerHandle,
+                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    );
+  }
   if (EFI_ERROR (Status)) {
-    return Status;
+    Print (L"Unable to open MTFTP4 protocol\n");
+    goto Error;
   }
 
-  Status = Pxe->Start (Pxe, FALSE);
-  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-    return Status;
-  }
+  if (!IPv4DevicePathNode->StaticIpAddress) {
+    //
+    // Configure the DHCP4, all default settings. It is acceptable for the configuration to
+    // fail if the return code is equal to EFI_ACCESS_DENIED which means that the configuration
+    // has been done by another instance of the DHCP4 protocol or that the DHCP configuration
+    // process has been started but is not completed yet.
+    //
+    ZeroMem (&Dhcp4CfgData, sizeof (EFI_DHCP4_CONFIG_DATA));
+    Status = Dhcp4->Configure (Dhcp4, &Dhcp4CfgData);
+    if (EFI_ERROR (Status)) {
+      if (Status != EFI_ACCESS_DENIED) {
+        Print (L"Error while configuring the DHCP4 protocol\n");
+        goto Error;
+      }
+    }
 
-  do {
-    if (!IPv4DevicePathNode->StaticIpAddress) {
-      Status = Pxe->Dhcp (Pxe, TRUE);
+    //
+    // Start the DHCP configuration. This may have already been done thus do not leave in error
+    // if the return code is EFI_ALREADY_STARTED.
+    //
+    Status = Dhcp4->Start (Dhcp4, NULL);
+    if (EFI_ERROR (Status)) {
+      if (Status != EFI_ALREADY_STARTED) {
+        Print (L"DHCP configuration failed\n");
+        goto Error;
+      }
     } else {
-      CopyMem (&LocalIp.v4, &IPv4DevicePathNode->LocalIpAddress, sizeof (EFI_IPv4_ADDRESS));
-      Status = Pxe->SetStationIp (Pxe, &LocalIp, NULL);
+      Dhcp4ToStop = TRUE;
     }
 
-    // If an IP Address has already been set and a different static IP address is requested then restart
-    // the Network service.
-    if (Status == EFI_ALREADY_STARTED) {
-      Status = gBS->LocateProtocol (&gEfiSimpleNetworkProtocolGuid, NULL, (VOID **)&Snp);
-      if (!EFI_ERROR (Status) && IPv4DevicePathNode->StaticIpAddress &&
-          (CompareMem (&Snp->Mode->CurrentAddress, &IPv4DevicePathNode->LocalIpAddress, sizeof(EFI_MAC_ADDRESS)) != 0))
-      {
-        Pxe->Stop (Pxe);
-        Status = Pxe->Start (Pxe, FALSE);
-        if (EFI_ERROR(Status)) {
-          break;
-        }
-        // After restarting the PXE protocol, we want to try again with our new IP Address
-        Status = EFI_ALREADY_STARTED;
-      }
+    Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4Mode);
+    if (EFI_ERROR (Status)) {
+      goto Error;
     }
-  } while (Status == EFI_ALREADY_STARTED);
 
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  CopyMem (&ServerIp.v4, &IPv4DevicePathNode->RemoteIpAddress, sizeof (EFI_IPv4_ADDRESS));
-
-  // Convert the Unicode PathName to Ascii
-  AsciiPathName = AllocatePool ((StrLen (FilePathDevicePath->PathName) + 1) * sizeof (CHAR8));
-  if (AsciiPathName == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  UnicodeStrToAsciiStr (FilePathDevicePath->PathName, AsciiPathName);
-
-  // Try to get the size (required the TFTP server to have "tsize" extension)
-  Status = Pxe->Mtftp (
-                  Pxe,
-                  EFI_PXE_BASE_CODE_TFTP_GET_FILE_SIZE,
-                  NULL,
-                  FALSE,
-                  &TftpBufferSize,
-                  NULL,
-                  &ServerIp,
-                  (UINT8*)AsciiPathName,
-                  NULL,
-                  FALSE
-                  );
-  // Pxe.Mtftp replies EFI_PROTOCOL_ERROR if tsize is not supported by the TFTP server
-  if (EFI_ERROR (Status) && (Status != EFI_PROTOCOL_ERROR)) {
-    if (Status == EFI_TFTP_ERROR) {
-      DEBUG((EFI_D_ERROR, "TFTP Error: Fail to get the size of the file\n"));
+    if (Dhcp4Mode.State != Dhcp4Bound) {
+      Status = EFI_TIMEOUT;
+      Print (L"DHCP configuration failed\n");
+      goto Error;
     }
-    goto EXIT;
   }
 
   //
-  // Two cases:
-  //   1) the file size is unknown (tsize extension not supported)
-  //   2) tsize returned the file size
+  // Configure the TFTP4 protocol
   //
-  if (Status == EFI_PROTOCOL_ERROR) {
-    for (TftpBufferSize = SIZE_8MB; TftpBufferSize <= FixedPcdGet32 (PcdMaxTftpFileSize); TftpBufferSize += SIZE_8MB) {
-      // Allocate a buffer to hold the whole file.
-      Status = gBS->AllocatePages (
-                      Type,
-                      EfiBootServicesCode,
-                      EFI_SIZE_TO_PAGES (TftpBufferSize),
-                      Image
-                      );
-      if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Failed to allocate space for image: %r\n", Status));
-        goto EXIT;
-      }
 
-      TftpTransferSize = TftpBufferSize;
-      Status = Pxe->Mtftp (
-                      Pxe,
-                      EFI_PXE_BASE_CODE_TFTP_READ_FILE,
-                      (VOID *)(UINTN)*Image,
-                      FALSE,
-                      &TftpTransferSize,
-                      NULL,
-                      &ServerIp,
-                      (UINT8*)AsciiPathName,
-                      NULL,
-                      FALSE
-                      );
-      if (EFI_ERROR (Status)) {
-        gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
-      } else {
-        *ImageSize = (UINTN)TftpBufferSize;
-        break;
-      }
-    }
+  ZeroMem (&Mtftp4CfgData, sizeof (EFI_MTFTP4_CONFIG_DATA));
+  Mtftp4CfgData.UseDefaultSetting = FALSE;
+  Mtftp4CfgData.TimeoutValue      = 4;
+  Mtftp4CfgData.TryCount          = 6;
+
+  if (IPv4DevicePathNode->StaticIpAddress) {
+    CopyMem (&Mtftp4CfgData.StationIp , &IPv4DevicePathNode->LocalIpAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Mtftp4CfgData.SubnetMask, &IPv4DevicePathNode->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Mtftp4CfgData.GatewayIp , &IPv4DevicePathNode->GatewayIpAddress, sizeof (EFI_IPv4_ADDRESS));
   } else {
+    CopyMem (&Mtftp4CfgData.StationIp , &Dhcp4Mode.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Mtftp4CfgData.SubnetMask, &Dhcp4Mode.SubnetMask   , sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Mtftp4CfgData.GatewayIp , &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
+  }
+
+  CopyMem (&Mtftp4CfgData.ServerIp  , &IPv4DevicePathNode->RemoteIpAddress, sizeof (EFI_IPv4_ADDRESS));
+
+  Status = Mtftp4->Configure (Mtftp4, &Mtftp4CfgData);
+  if (EFI_ERROR (Status)) {
+    Print (L"Error while configuring the MTFTP4 protocol\n");
+    goto Error;
+  }
+
+  //
+  // Convert the Unicode path of the file to Ascii
+  //
+
+  FilePathDevicePathNode = (FILEPATH_DEVICE_PATH*)(IPv4DevicePathNode + 1);
+  AsciiFilePath = AllocatePool ((StrLen (FilePathDevicePathNode->PathName) + 1) * sizeof (CHAR8));
+  if (AsciiFilePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+  UnicodeStrToAsciiStr (FilePathDevicePathNode->PathName, AsciiFilePath);
+
+  //
+  // Try to get the size of the file in bytes from the server. If it fails,
+  // start with a 8MB buffer to download the file.
+  //
+  FileSize = 0;
+  if (Mtftp4GetFileSize (Mtftp4, AsciiFilePath, &FileSize) == EFI_SUCCESS) {
+    TftpBufferSize = FileSize;
+  } else {
+    TftpBufferSize = SIZE_8MB;
+  }
+
+  TftpContext = AllocatePool (sizeof (BDS_TFTP_CONTEXT));
+  if (TftpContext == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+  TftpContext->FileSize = FileSize;
+
+  for (; TftpBufferSize <= FixedPcdGet32 (PcdMaxTftpFileSize);
+         TftpBufferSize = (TftpBufferSize + SIZE_8MB) & (~(SIZE_8MB-1))) {
+    //
     // Allocate a buffer to hold the whole file.
+    //
     Status = gBS->AllocatePages (
                     Type,
                     EfiBootServicesCode,
@@ -900,31 +1189,85 @@ BdsTftpLoadImage (
                     Image
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Failed to allocate space for kernel image: %r\n", Status));
-      goto EXIT;
+      Print (L"Failed to allocate space for image\n");
+      goto Error;
     }
 
-    Status = Pxe->Mtftp (
-                    Pxe,
-                    EFI_PXE_BASE_CODE_TFTP_READ_FILE,
-                    (VOID *)(UINTN)*Image,
-                    FALSE,
-                    &TftpBufferSize,
-                    NULL,
-                    &ServerIp,
-                    (UINT8*)AsciiPathName,
-                    NULL,
-                    FALSE
-                    );
+    TftpContext->DownloadedNbOfBytes   = 0;
+    TftpContext->LastReportedNbOfBytes = 0;
+
+    ZeroMem (&Mtftp4Token, sizeof (EFI_MTFTP4_TOKEN));
+    Mtftp4Token.Filename    = (UINT8*)AsciiFilePath;
+    Mtftp4Token.BufferSize  = TftpBufferSize;
+    Mtftp4Token.Buffer      = (VOID *)(UINTN)*Image;
+    Mtftp4Token.CheckPacket = Mtftp4CheckPacket;
+    Mtftp4Token.Context     = (VOID*)TftpContext;
+
+    Print (L"Downloading the file <%s> from the TFTP server\n", FilePathDevicePathNode->PathName);
+    Status = Mtftp4->ReadFile (Mtftp4, &Mtftp4Token);
+    Print (L"\n");
     if (EFI_ERROR (Status)) {
-      gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
-    } else {
-      *ImageSize = (UINTN)TftpBufferSize;
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        Print (L"Downloading failed, file larger than expected.\n");
+        gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
+        continue;
+      } else {
+        goto Error;
+      }
     }
+
+    *ImageSize = Mtftp4Token.BufferSize;
+    break;
   }
 
-EXIT:
-  FreePool (AsciiPathName);
+Error:
+  if (Dhcp4ChildHandle != NULL) {
+    if (Dhcp4 != NULL) {
+      if (Dhcp4ToStop) {
+        Dhcp4->Stop (Dhcp4);
+      }
+      gBS->CloseProtocol (
+             Dhcp4ChildHandle,
+             &gEfiDhcp4ProtocolGuid,
+             gImageHandle,
+             ControllerHandle
+            );
+    }
+    NetLibDestroyServiceChild (
+      ControllerHandle,
+      gImageHandle,
+      &gEfiDhcp4ServiceBindingProtocolGuid,
+      Dhcp4ChildHandle
+      );
+  }
+
+  if (Mtftp4ChildHandle != NULL) {
+    if (Mtftp4 != NULL) {
+      if (AsciiFilePath != NULL) {
+        FreePool (AsciiFilePath);
+      }
+      if (TftpContext != NULL) {
+        FreePool (TftpContext);
+      }
+      gBS->CloseProtocol (
+             Mtftp4ChildHandle,
+             &gEfiMtftp4ProtocolGuid,
+             gImageHandle,
+             ControllerHandle
+            );
+    }
+    NetLibDestroyServiceChild (
+      ControllerHandle,
+      gImageHandle,
+      &gEfiMtftp4ServiceBindingProtocolGuid,
+      Mtftp4ChildHandle
+      );
+  }
+
+  if (EFI_ERROR (Status)) {
+    Print (L"Failed to download the file - Error=%r\n", Status);
+  }
+
   return Status;
 }
 
