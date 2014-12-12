@@ -149,7 +149,7 @@ _SetPrimaryStackEnd:
 _InitializePrimaryStackLoop:          ;             \
   cmp     Tmp1, sp                    ;             \
   bls     _InitializePrimaryStackEnd  ;             \
-  str     GlobalSize, [Tmp1], #-4     ;             \
+  str     GlobalSize, [Tmp1, #-4]!    ;             \
   b       _InitializePrimaryStackLoop ;             \
 _InitializePrimaryStackEnd:
 
@@ -228,7 +228,7 @@ _SetPrimaryStackEnd:
 _InitializePrimaryStackLoop:          ;             \
   cmp     Tmp1, sp                    ;             \
   bls     _InitializePrimaryStackEnd  ;             \
-  str     GlobalSize, [Tmp1], #-4     ;             \
+  str     GlobalSize, [Tmp1, #-4]!    ;             \
   b       _InitializePrimaryStackLoop ;             \
 _InitializePrimaryStackEnd:
 
