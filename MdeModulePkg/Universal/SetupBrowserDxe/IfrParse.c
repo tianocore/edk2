@@ -452,6 +452,42 @@ IntializeBrowserStorage (
 }
 
 /**
+  Check whether exist device path info in the ConfigHdr string.
+
+  @param  String                 UEFI configuration string
+
+  @retval TRUE                   Device Path exist.
+  @retval FALSE                  Not exist device path info.
+
+**/
+BOOLEAN
+IsDevicePathExist (
+  IN  EFI_STRING                   String
+  )
+{
+  UINTN                    Length;
+  EFI_STRING               PathHdr;
+
+  for (; (*String != 0 && StrnCmp (String, L"PATH=", StrLen (L"PATH=")) != 0); String++);
+  if (*String == 0) {
+    return FALSE;
+  }
+
+  String += StrLen (L"PATH=");
+  if (*String == 0) {
+    return FALSE;
+  }
+  PathHdr = String;
+
+  for (Length = 0; *String != 0 && *String != L'&'; String++, Length++);
+  if (((Length + 1) / 2) < sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
   Allocate a FORMSET_STORAGE data structure and insert to FormSet Storage List.
 
   @param  FormSet                    Pointer of the current FormSet
@@ -528,6 +564,17 @@ CreateStorage (
     InitializeConfigHdr (FormSet, BrowserStorage);
 
     BrowserStorage->Initialized = FALSE;
+  } else {
+    if ((StorageType == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) && 
+        (FormSet->DriverHandle != NULL) && 
+        (!IsDevicePathExist (BrowserStorage->ConfigHdr))) {
+      //
+      // If this storage not has device path info but new formset has,
+      // update the device path info.
+      //
+      FreePool (BrowserStorage->ConfigHdr);
+      InitializeConfigHdr (FormSet, BrowserStorage);
+    }
   }
 
   Storage->BrowserStorage = BrowserStorage;
