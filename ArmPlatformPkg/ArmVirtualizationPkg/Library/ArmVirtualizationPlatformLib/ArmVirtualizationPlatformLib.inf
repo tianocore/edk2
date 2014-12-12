@@ -41,7 +41,7 @@
   VirtMem.c
 
 [Sources.AARCH64]
-  AARCH64/VirtHelper.S      | GCC
+  AARCH64/VirtHelper.S
 
 [Sources.ARM]
   ARM/VirtHelper.S          | GCC

@@ -38,7 +38,7 @@
   ArmJunoMem.c
 
 [Sources.AARCH64]
-  AArch64/ArmJunoHelper.S | GCC
+  AArch64/ArmJunoHelper.S
 
 [Sources.ARM]
   Arm/ArmJunoHelper.S     | GCC
