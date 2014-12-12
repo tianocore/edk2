@@ -1405,7 +1405,7 @@ CoreFreePages (
 
   Status = CoreInternalFreePages (Memory, NumberOfPages);
   if (!EFI_ERROR (Status)) {
-    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePages, 0, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) Memory);
+    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePages, (EFI_MEMORY_TYPE) 0, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) Memory);
   }
   return Status;
 }
