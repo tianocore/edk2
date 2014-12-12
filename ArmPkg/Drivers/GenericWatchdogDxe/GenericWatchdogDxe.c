@@ -27,7 +27,7 @@
 #include <Protocol/WatchdogTimer.h>
 #include <Protocol/HardwareInterrupt.h>
 
-#include <Drivers/GenericWatchdog.h>
+#include "GenericWatchdog.h"
 
 // The number of 100ns periods (the unit of time passed to these functions)
 // in a second

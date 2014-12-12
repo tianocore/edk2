@@ -201,7 +201,7 @@
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  ArmPlatformPkg/ArmJunoPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
+  ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
 
   #
   # Semi-hosting filesystem

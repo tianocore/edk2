@@ -27,7 +27,6 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  ArmPlatformPkg/ArmJunoPkg/ArmJuno.dec
 
 [LibraryClasses]
   ArmGenericTimerCounterLib
@@ -41,10 +40,10 @@
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
 
-[FixedPcd]
-  gArmJunoTokenSpaceGuid.PcdGenericWatchdogControlBase
-  gArmJunoTokenSpaceGuid.PcdGenericWatchdogRefreshBase
-  gArmJunoTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum
+[Pcd.common]
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum
 
 [Protocols]
   gEfiWatchdogTimerArchProtocolGuid

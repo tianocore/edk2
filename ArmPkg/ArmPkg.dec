@@ -229,6 +229,14 @@
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
 
   #
+  # ARM Generic Watchdog
+  #
+
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0x2A440000|UINT32|0x00000007
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0x2A450000|UINT32|0x00000008
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|93|UINT32|0x00000009
+
+  #
   # ARM Generic Interrupt Controller
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C

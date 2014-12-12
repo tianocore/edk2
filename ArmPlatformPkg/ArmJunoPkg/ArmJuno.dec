@@ -32,9 +32,5 @@
   gArmJunoTokenSpaceGuid    =  { 0xa1147a20, 0x3144, 0x4f8d, { 0x82, 0x95, 0xb4, 0x83, 0x11, 0xc8, 0xe4, 0xa4 } }
 
 [PcdsFixedAtBuild.common]
-  gArmJunoTokenSpaceGuid.PcdGenericWatchdogControlBase|0x2A440000|UINT32|0x00000001
-  gArmJunoTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0x2A450000|UINT32|0x00000002
-  gArmJunoTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|93|UINT32|0x00000003
-
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbOhciBaseAddress|0x7FFB0000|UINT32|0x00000004
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbEhciBaseAddress|0x7FFC0000|UINT32|0x00000005

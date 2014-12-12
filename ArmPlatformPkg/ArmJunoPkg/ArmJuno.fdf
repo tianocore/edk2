@@ -115,7 +115,7 @@ READ_LOCK_STATUS   = TRUE
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  INF ArmPlatformPkg/ArmJunoPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
+  INF ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
 
   # NOR Flash driver
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
