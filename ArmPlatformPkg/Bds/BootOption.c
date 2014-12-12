@@ -221,6 +221,8 @@ BootOptionSetFields (
     WriteUnaligned32 ((UINT32 *)EfiLoadOptionPtr, ARM_BDS_OPTIONAL_DATA_SIGNATURE);
     WriteUnaligned32 ((UINT32 *)(EfiLoadOptionPtr + 4), BootType);
 
+    // OptionalData should have been initialized by the caller of this function
+    ASSERT (OptionalData != NULL);
     BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)OptionalData;
     SrcLinuxArguments = &(BootArguments->LinuxArguments);
     DestLinuxArguments = &((ARM_BDS_LOADER_OPTIONAL_DATA*)EfiLoadOptionPtr)->Arguments.LinuxArguments;
@@ -237,7 +239,9 @@ BootOptionSetFields (
       CopyMem (InitrdPathListPtr, (VOID*)((UINTN)(SrcLinuxArguments + 1) + SrcLinuxArguments->CmdLineSize), SrcLinuxArguments->InitrdSize);
     }
   } else {
-    CopyMem (BootOption->OptionalData, OptionalData, OptionalDataSize);
+    if (OptionalData != NULL) {
+      CopyMem (BootOption->OptionalData, OptionalData, OptionalDataSize);
+    }
   }
   BootOption->OptionalDataSize = OptionalDataSize;
 
