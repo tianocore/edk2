@@ -341,6 +341,9 @@ BootMenuAddBootOption (
       if (InitrdPathNodes != NULL) {
         // Append the Device Path to the selected device path
         InitrdPath = AppendDevicePath (SupportedBootDevice->DevicePathProtocol, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNodes);
+        // Free the InitrdPathNodes created by Support->CreateDevicePathNode()
+        FreePool (InitrdPathNodes);
+
         if (InitrdPath == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           goto EXIT;
@@ -540,6 +543,8 @@ BootMenuUpdateBootOption (
           // Append the Device Path to the selected device path
           InitrdPath = AppendDevicePath (TempInitrdPath, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNodes);
           FreePool (TempInitrdPath);
+          // Free the InitrdPathNodes created by Support->CreateDevicePathNode()
+          FreePool (InitrdPathNodes);
           if (InitrdPath == NULL) {
             Status = EFI_OUT_OF_RESOURCES;
             goto EXIT;
@@ -846,6 +851,8 @@ UpdateFdtPath (
   if (FdtDevicePathNodes != NULL) {
     // Append the Device Path node to the select device path
     FdtDevicePath = AppendDevicePath (SupportedBootDevice->DevicePathProtocol, FdtDevicePathNodes);
+    // Free the FdtDevicePathNodes created by Support->CreateDevicePathNode()
+    FreePool (FdtDevicePathNodes);
     FdtDevicePathSize = GetDevicePathSize (FdtDevicePath);
     Status = gRT->SetVariable (
                     (CHAR16*)L"Fdt",
