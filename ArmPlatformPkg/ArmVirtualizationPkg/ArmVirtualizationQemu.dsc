@@ -67,7 +67,7 @@
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
   GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
-  GCC:*_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
+  *_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
 
 
 ################################################################################
