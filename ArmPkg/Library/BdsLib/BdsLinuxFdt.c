@@ -554,6 +554,9 @@ PrepareFdt (
   // If we succeeded to generate the new Device Tree then free the old Device Tree
   gBS->FreePages (*FdtBlobBase, EFI_SIZE_TO_PAGES (*FdtBlobSize));
 
+  // Update the real size of the Device Tree
+  fdt_pack ((VOID*)(UINTN)(NewFdtBlobBase));
+
   *FdtBlobBase = NewFdtBlobBase;
   *FdtBlobSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(NewFdtBlobBase));
   return EFI_SUCCESS;
