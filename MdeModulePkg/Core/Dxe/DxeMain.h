@@ -2850,12 +2850,6 @@ CoreUpdateProfile (
   @param  NumberOfPages          The number of pages to convert
   @param  NewAttributes          The new attributes value for the range.
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter
-  @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
-                                 range  or convertion not allowed.
-  @retval EFI_SUCCESS            Successfully converts the memory range to the
-                                 specified attributes.
-
 **/
 VOID
 CoreUpdateMemoryAttributes (
