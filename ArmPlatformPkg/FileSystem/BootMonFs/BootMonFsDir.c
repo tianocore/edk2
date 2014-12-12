@@ -28,6 +28,8 @@ OpenBootMonFsOpenVolume (
     return EFI_DEVICE_ERROR;
   }
 
+  Instance->RootFile->Info->Attribute = EFI_FILE_READ_ONLY | EFI_FILE_DIRECTORY;
+
   *Root = &Instance->RootFile->File;
 
   return EFI_SUCCESS;
@@ -114,6 +116,8 @@ BootMonFsOpenDirectory (
 
   return EFI_UNSUPPORTED;
 }
+
+STATIC
 EFI_STATUS
 GetFileSystemVolumeLabelInfo (
   IN BOOTMON_FS_INSTANCE *Instance,
@@ -178,6 +182,7 @@ ComputeFreeSpace (
   return MediaSize - (FileSizeSum + (Media->BlockSize + NumFiles));
 }
 
+STATIC
 EFI_STATUS
 GetFilesystemInfo (
   IN BOOTMON_FS_INSTANCE *Instance,
@@ -199,26 +204,19 @@ GetFilesystemInfo (
   return Status;
 }
 
+STATIC
 EFI_STATUS
 GetFileInfo (
-  IN BOOTMON_FS_INSTANCE *Instance,
-  IN BOOTMON_FS_FILE     *File,
-  IN OUT UINTN           *BufferSize,
-  OUT VOID               *Buffer
+  IN BOOTMON_FS_INSTANCE  *Instance,
+  IN BOOTMON_FS_FILE      *File,
+  IN OUT UINTN            *BufferSize,
+  OUT VOID                *Buffer
   )
 {
-  EFI_FILE_INFO   *Info;
-  UINTN           ResultSize;
-  UINTN           NameSize;
-  UINTN           Index;
+  EFI_FILE_INFO  *Info;
+  UINTN          ResultSize;
 
-  if (File == Instance->RootFile) {
-    NameSize = 0;
-    ResultSize = SIZE_OF_EFI_FILE_INFO + sizeof (CHAR16);
-  } else {
-    NameSize   = AsciiStrLen (File->HwDescription.Footer.Filename) + 1;
-    ResultSize = SIZE_OF_EFI_FILE_INFO + (NameSize * sizeof (CHAR16));
-  }
+  ResultSize = SIZE_OF_EFI_FILE_INFO + StrSize (File->Info->FileName);
 
   if (*BufferSize < ResultSize) {
     *BufferSize = ResultSize;
@@ -227,23 +225,9 @@ GetFileInfo (
 
   Info = Buffer;
 
-  // Zero out the structure
-  ZeroMem (Info, ResultSize);
-
-  // Fill in the structure
+  CopyMem (Info, File->Info, ResultSize);
+  // Size of the information
   Info->Size = ResultSize;
-
-  if (File == Instance->RootFile) {
-    Info->Attribute    = EFI_FILE_READ_ONLY | EFI_FILE_DIRECTORY;
-    Info->FileName[0]  = L'\0';
-  } else {
-    Info->FileSize     = BootMonFsGetImageLength (File);
-    Info->PhysicalSize = BootMonFsGetPhysicalSize (File);
-
-    for (Index = 0; Index < NameSize; Index++) {
-      Info->FileName[Index] = File->HwDescription.Footer.Filename[Index];
-    }
-  }
 
   *BufferSize = ResultSize;
 
@@ -297,171 +281,253 @@ GetBootMonFsFileInfo (
   return Status;
 }
 
+/**
+  Set the name of a file.
+
+  This is a helper function for SetFileInfo().
+
+  @param[in]  Instance  A pointer to the description of the volume
+                        the file belongs to.
+  @param[in]  File      A pointer to the description of the file.
+  @param[in]  FileName  A pointer to the new name of the file.
+
+  @retval  EFI_SUCCESS        The name was set.
+  @retval  EFI_ACCESS_DENIED  An attempt is made to change the name of a file
+                              to a file that is already present.
+
+**/
 STATIC
 EFI_STATUS
 SetFileName (
-  IN  BOOTMON_FS_FILE *File,
-  IN  CHAR16          *FileNameUnicode
+  IN  BOOTMON_FS_INSTANCE  *Instance,
+  IN  BOOTMON_FS_FILE      *File,
+  IN  CONST CHAR16         *FileName
   )
 {
-  CHAR8                 *FileNameAscii;
-  UINT16                 SavedChar;
-  UINTN                  FileNameSize;
-  BOOTMON_FS_FILE       *SameFile;
-  EFI_STATUS             Status;
+  CHAR16           TruncFileName[MAX_NAME_LENGTH];
+  CHAR8            AsciiFileName[MAX_NAME_LENGTH];
+  BOOTMON_FS_FILE  *SameFile;
 
-  // EFI Shell inserts '\' in front of the filename that must be stripped
-  if (FileNameUnicode[0] == L'\\') {
-    FileNameUnicode++;
-  }
-  //
-  // Convert Unicode into Ascii
-  //
-  SavedChar = L'\0';
-  FileNameSize = StrLen (FileNameUnicode) + 1;
-  FileNameAscii = AllocatePool (FileNameSize * sizeof (CHAR8));
-  if (FileNameAscii == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  // If Unicode string is too long then truncate it.
-  if (FileNameSize > MAX_NAME_LENGTH) {
-    SavedChar = FileNameUnicode[MAX_NAME_LENGTH - 1];
-    FileNameUnicode[MAX_NAME_LENGTH - 1] = L'\0';
-  }
-  UnicodeStrToAsciiStr (FileNameUnicode, FileNameAscii);
-  // If the unicode string was truncated then restore its original content.
-  if (SavedChar != L'\0') {
-    FileNameUnicode[MAX_NAME_LENGTH - 1] = SavedChar;
+  // If the file path start with a \ strip it. The EFI Shell may
+  // insert a \ in front of the file name.
+  if (FileName[0] == L'\\') {
+    FileName++;
   }
 
-  // If we're changing the file name
-  if (AsciiStrCmp (FileNameAscii, File->HwDescription.Footer.Filename) == 0) {
-    // No change to filename.
-    Status = EFI_SUCCESS;
-  } else if (!(File->OpenMode & EFI_FILE_MODE_WRITE)) {
-    // You can only change the filename if you open the file for write.
-    Status = EFI_ACCESS_DENIED;
-  } else if (BootMonGetFileFromAsciiFileName (
-                File->Instance,
-                File->HwDescription.Footer.Filename,
-                &SameFile) != EFI_NOT_FOUND) {
+  StrnCpy (TruncFileName, FileName, MAX_NAME_LENGTH - 1);
+  TruncFileName[MAX_NAME_LENGTH - 1] = 0;
+  UnicodeStrToAsciiStr (TruncFileName, AsciiFileName);
+
+  if (BootMonGetFileFromAsciiFileName (
+        File->Instance,
+        AsciiFileName,
+        &SameFile
+        ) != EFI_NOT_FOUND) {
     // A file with that name already exists.
-    Status = EFI_ACCESS_DENIED;
+    return EFI_ACCESS_DENIED;
   } else {
     // OK, change the filename.
-    AsciiStrCpy (FileNameAscii, File->HwDescription.Footer.Filename);
-    Status = EFI_SUCCESS;
+    AsciiStrToUnicodeStr (AsciiFileName, File->Info->FileName);
+    return EFI_SUCCESS;
   }
-
-  FreePool (FileNameAscii);
-  return Status;
 }
 
-// Set the file's size (NB "size", not "physical size"). If the change amounts
-// to an increase, simply do a write followed by a flush.
-// (This is a helper function for SetFileInfo.)
+/**
+  Set the size of a file.
+
+  This is a helper function for SetFileInfo().
+
+  @param[in]  Instance  A pointer to the description of the volume
+                        the file belongs to.
+  @param[in]  File      A pointer to the description of the file.
+  @param[in]  NewSize   The requested new size for the file.
+
+  @retval  EFI_SUCCESS           The size was set.
+  @retval  EFI_OUT_OF_RESOURCES  An allocation needed to process the request failed.
+
+**/
 STATIC
 EFI_STATUS
 SetFileSize (
-  IN BOOTMON_FS_INSTANCE *Instance,
-  IN BOOTMON_FS_FILE     *BootMonFsFile,
-  IN UINTN                NewSize
+  IN BOOTMON_FS_INSTANCE  *Instance,
+  IN BOOTMON_FS_FILE      *BootMonFsFile,
+  IN UINTN                 NewSize
   )
 {
-  UINT64             StoredPosition;
-  EFI_STATUS         Status;
-  EFI_FILE_PROTOCOL *File;
-  CHAR8              Buffer;
-  UINTN              BufferSize;
-  UINT32             OldSize;
+  EFI_STATUS              Status;
+  UINT32                  OldSize;
+  LIST_ENTRY              *RegionToFlushLink;
+  LIST_ENTRY              *NextRegionToFlushLink;
+  BOOTMON_FS_FILE_REGION  *Region;
+  EFI_FILE_PROTOCOL       *File;
+  CHAR8                   *Buffer;
+  UINTN                   BufferSize;
+  UINT64                  StoredPosition;
 
-  OldSize = BootMonFsFile->HwDescription.Region[0].Size;
+  OldSize = BootMonFsFile->Info->FileSize;
 
-  if (OldSize == NewSize) {
-    return EFI_SUCCESS;
-  }
+  //
+  // In case of file truncation, force the regions waiting for writing to
+  // not overflow the new size of the file.
+  //
+  if (NewSize < OldSize) {
+    for (RegionToFlushLink = GetFirstNode (&BootMonFsFile->RegionToFlushLink);
+         !IsNull (&BootMonFsFile->RegionToFlushLink, RegionToFlushLink);
+         )
+    {
+      NextRegionToFlushLink = GetNextNode (&BootMonFsFile->RegionToFlushLink, RegionToFlushLink);
+      Region = (BOOTMON_FS_FILE_REGION*)RegionToFlushLink;
+      if (Region->Offset > NewSize) {
+        RemoveEntryList (RegionToFlushLink);
+        FreePool (Region->Buffer);
+        FreePool (Region);
+      } else {
+        Region->Size = MIN (Region->Size, NewSize - Region->Offset);
+      }
+      RegionToFlushLink = NextRegionToFlushLink;
+    }
 
-  Buffer = 0;
-  BufferSize = sizeof (Buffer);
-
-  File = &BootMonFsFile->File;
-
-  if (!(BootMonFsFile->OpenMode & EFI_FILE_MODE_WRITE)) {
-    return EFI_ACCESS_DENIED;
-  }
-
-  if (NewSize <= OldSize) {
-    OldSize = NewSize;
-  } else {
+  } else if (NewSize > OldSize) {
     // Increasing a file's size is potentially complicated as it may require
     // moving the image description on media. The simplest way to do it is to
     // seek past the end of the file (which is valid in UEFI) and perform a
     // Write.
+    File = &BootMonFsFile->File;
 
     // Save position
     Status = File->GetPosition (File, &StoredPosition);
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
-    Status = File->SetPosition (File, NewSize - 1);
+    // Set position at the end of the file
+    Status = File->SetPosition (File, OldSize);
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    Status = File->Write (File, &BufferSize, &Buffer);
+
+    BufferSize = NewSize - OldSize;
+    Buffer = AllocateZeroPool (BufferSize);
+    if (Buffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Status = File->Write (File, &BufferSize, Buffer);
+    FreePool (Buffer);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
     // Restore saved position
-    Status = File->SetPosition (File, NewSize - 1);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    Status = File->Flush (File);
+    Status = File->SetPosition (File, StoredPosition);
     if (EFI_ERROR (Status)) {
       return Status;
     }
   }
+
+  BootMonFsFile->Info->FileSize = NewSize;
+
   return EFI_SUCCESS;
 }
 
+/**
+  Set information about a file.
+
+  @param[in]  Instance  A pointer to the description of the volume
+                        the file belongs to.
+  @param[in]  File      A pointer to the description of the file.
+  @param[in]  Info      A pointer to the file information to write.
+
+  @retval  EFI_SUCCESS           The information was set.
+  @retval  EFI_ACCESS_DENIED     An attempt is being made to change the
+                                 EFI_FILE_DIRECTORY Attribute.
+  @retval  EFI_ACCESS_DENIED     The file was opened in read-only mode and an
+                                 attempt is being made to modify a field other
+                                 than Attribute.
+  @retval  EFI_ACCESS_DENIED     An attempt is made to change the name of a file
+                                 to a file that is already present.
+  @retval  EFI_WRITE_PROTECTED   An attempt is being made to modify a read-only
+                                 attribute.
+  @retval  EFI_OUT_OF_RESOURCES  An allocation needed to process the request
+                                 failed.
+
+**/
+STATIC
 EFI_STATUS
 SetFileInfo (
-  IN BOOTMON_FS_INSTANCE *Instance,
-  IN BOOTMON_FS_FILE     *File,
-  IN UINTN                BufferSize,
-  IN EFI_FILE_INFO       *Info
+  IN BOOTMON_FS_INSTANCE  *Instance,
+  IN BOOTMON_FS_FILE      *File,
+  IN EFI_FILE_INFO        *Info
   )
 {
-  EFI_STATUS             Status;
+  EFI_STATUS  Status;
+  BOOLEAN     FileSizeIsDifferent;
+  BOOLEAN     FileNameIsDifferent;
+  BOOLEAN     TimeIsDifferent;
 
-  Status = EFI_SUCCESS;
+  //
+  // A directory can not be changed to a file and a file can
+  // not be changed to a directory.
+  //
+  if ((Info->Attribute & EFI_FILE_DIRECTORY)      !=
+      (File->Info->Attribute & EFI_FILE_DIRECTORY)  ) {
+    return EFI_ACCESS_DENIED;
+  }
 
-  // Note that a call to this function on a file opened read-only is only
-  // invalid if it actually changes fields, so  we don't immediately fail if the
-  // OpenMode is wrong.
-  // Also note that the only fields supported are filename and size, others are
-  // ignored.
+  FileSizeIsDifferent = (Info->FileSize != File->Info->FileSize);
+  FileNameIsDifferent = (StrnCmp (
+                           Info->FileName,
+                           File->Info->FileName,
+                           MAX_NAME_LENGTH - 1
+                           ) != 0);
+  //
+  // Check if the CreateTime, LastAccess or ModificationTime
+  // have been changed. The file system does not support file
+  // timestamps thus the three times in "File->Info" are
+  // always equal to zero. The following comparison actually
+  // checks if all three times are still equal to 0 or not.
+  //
+  TimeIsDifferent = CompareMem (
+                      &Info->CreateTime,
+                      &File->Info->CreateTime,
+                      3 * sizeof (EFI_TIME)
+                      ) != 0;
 
-  if (File != Instance->RootFile) {
-    if (!(File->OpenMode & EFI_FILE_MODE_WRITE)) {
+  //
+  // For a file opened in read-only mode, only the Attribute field can be
+  // modified. The root directory open mode is forced to read-only at opening
+  // thus the following test protects the root directory to be somehow modified.
+  //
+  if (File->OpenMode == EFI_FILE_MODE_READ) {
+    if (FileSizeIsDifferent || FileNameIsDifferent || TimeIsDifferent) {
       return EFI_ACCESS_DENIED;
     }
+  }
 
-    Status = SetFileName (File, Info->FileName);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  if (TimeIsDifferent) {
+    return EFI_WRITE_PROTECTED;
+  }
 
-    // Update file size
+  if (FileSizeIsDifferent) {
     Status = SetFileSize (Instance, File, Info->FileSize);
     if (EFI_ERROR (Status)) {
       return Status;
     }
   }
-  return Status;
+
+  //
+  // Note down in RAM the Attribute field but we can not
+  // ask to store it in flash for the time being.
+  //
+  File->Info->Attribute = Info->Attribute;
+
+  if (FileNameIsDifferent) {
+    Status = SetFileName (Instance, File, Info->FileName);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 EFIAPI
@@ -477,11 +543,17 @@ BootMonFsGetInfo (
   BOOTMON_FS_FILE     *File;
   BOOTMON_FS_INSTANCE *Instance;
 
-  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
-  if (File == NULL) {
-    return EFI_DEVICE_ERROR;
+  if ((This == NULL)                         ||
+      (InformationType == NULL)              ||
+      (BufferSize == NULL)                   ||
+      ((Buffer == NULL) && (*BufferSize > 0))  ) {
+    return EFI_INVALID_PARAMETER;
   }
 
+  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   Instance = File->Instance;
 
   // If the instance has not been initialized yet then do it ...
@@ -509,6 +581,37 @@ BootMonFsGetInfo (
   return Status;
 }
 
+/**
+  Set information about a file or a volume.
+
+  @param[in]  This             A pointer to the EFI_FILE_PROTOCOL instance that
+                               is the file handle the information is for.
+  @param[in]  InformationType  The type identifier for the information being set :
+                               EFI_FILE_INFO_ID or EFI_FILE_SYSTEM_INFO_ID or
+                               EFI_FILE_SYSTEM_VOLUME_LABEL_ID
+  @param[in]  BufferSize       The size, in bytes, of Buffer.
+  @param[in]  Buffer           A pointer to the data buffer to write. The type of the
+                               data inside the buffer is indicated by InformationType.
+
+  @retval  EFI_SUCCESS            The information was set.
+  @retval  EFI_UNSUPPORTED        The InformationType is not known.
+  @retval  EFI_DEVICE_ERROR       The last issued semi-hosting operation failed.
+  @retval  EFI_ACCESS_DENIED      An attempt is made to change the name of a file
+                                  to a file that is already present.
+  @retval  EFI_ACCESS_DENIED      An attempt is being made to change the
+                                  EFI_FILE_DIRECTORY Attribute.
+  @retval  EFI_ACCESS_DENIED      InformationType is EFI_FILE_INFO_ID and
+                                  the file was opened in read-only mode and an
+                                  attempt is being made to modify a field other
+                                  than Attribute.
+  @retval  EFI_WRITE_PROTECTED    An attempt is being made to modify a read-only
+                                  attribute.
+  @retval  EFI_BAD_BUFFER_SIZE    The size of the buffer is lower than that indicated by
+                                  the data inside the buffer.
+  @retval  EFI_OUT_OF_RESOURCES   A allocation needed to process the request failed.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsSetInfo (
@@ -518,28 +621,56 @@ BootMonFsSetInfo (
   IN VOID               *Buffer
   )
 {
-  EFI_STATUS           Status;
-  BOOTMON_FS_FILE     *File;
-  BOOTMON_FS_INSTANCE *Instance;
+  BOOTMON_FS_FILE       *File;
+  EFI_FILE_INFO         *Info;
+  EFI_FILE_SYSTEM_INFO  *SystemInfo;
+
+  if ((This == NULL)            ||
+      (InformationType == NULL) ||
+      (Buffer == NULL)             ) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
-  if (File == NULL) {
-    return EFI_DEVICE_ERROR;
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  Instance = File->Instance;
-
-  if (CompareGuid (InformationType, &gEfiFileInfoGuid) != 0) {
-    Status = SetFileInfo (Instance, File, BufferSize, (EFI_FILE_INFO *) Buffer);
-  } else {
-    // The only writable field in the other two information types
-    // (i.e. EFI_FILE_SYSTEM_INFO and EFI_FILE_SYSTEM_VOLUME_LABEL) is the
-    // filesystem volume label. This can be retrieved with GetInfo, but it is
-    // hard-coded into this driver, not stored on media.
-    Status = EFI_UNSUPPORTED;
+  if (CompareGuid (InformationType, &gEfiFileInfoGuid)) {
+    Info = Buffer;
+    if (Info->Size < (SIZE_OF_EFI_FILE_INFO + StrSize (Info->FileName))) {
+      return EFI_INVALID_PARAMETER;
+    }
+    if (BufferSize < Info->Size) {
+      return EFI_BAD_BUFFER_SIZE;
+    }
+    return (SetFileInfo (File->Instance, File, Info));
   }
 
-  return Status;
+  //
+  // The only writable field in the other two information types
+  // (i.e. EFI_FILE_SYSTEM_INFO and EFI_FILE_SYSTEM_VOLUME_LABEL) is the
+  // filesystem volume label. This can be retrieved with GetInfo, but it is
+  // hard-coded into this driver, not stored on media.
+  //
+
+  if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid)) {
+    SystemInfo = Buffer;
+    if (SystemInfo->Size <
+        (SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (SystemInfo->VolumeLabel))) {
+      return EFI_INVALID_PARAMETER;
+    }
+    if (BufferSize < SystemInfo->Size) {
+      return EFI_BAD_BUFFER_SIZE;
+    }
+    return EFI_WRITE_PROTECTED;
+  }
+
+  if (CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
+    return EFI_WRITE_PROTECTED;
+  }
+
+  return EFI_UNSUPPORTED;
 }
 
 EFIAPI

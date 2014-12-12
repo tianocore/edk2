@@ -54,6 +54,30 @@ EFI_FILE_PROTOCOL mBootMonFsFileTemplate = {
   BootMonFsFlushFile
 };
 
+/**
+  Search for a file given its name coded in Ascii.
+
+  When searching through the files of the volume, if a file is currently not
+  open, its name was written on the media and is kept in RAM in the
+  "HwDescription.Footer.Filename[]" field of the file's description.
+
+  If a file is currently open, its name might not have been written on the
+  media yet, and as the "HwDescription" is a mirror in RAM of what is on the
+  media the "HwDescription.Footer.Filename[]" might be outdated. In that case,
+  the up to date name of the file is stored in the "Info" field of the file's
+  description.
+
+  @param[in]   Instance       Pointer to the description of the volume in which
+                              the file has to be search for.
+  @param[in]   AsciiFileName  Name of the file.
+
+  @param[out]  File           Pointer to the description of the file if the
+                              file was found.
+
+  @retval  EFI_SUCCESS    The file was found.
+  @retval  EFI_NOT_FOUND  The file was not found.
+
+**/
 EFI_STATUS
 BootMonGetFileFromAsciiFileName (
   IN  BOOTMON_FS_INSTANCE   *Instance,
@@ -61,22 +85,26 @@ BootMonGetFileFromAsciiFileName (
   OUT BOOTMON_FS_FILE       **File
   )
 {
-  LIST_ENTRY        *Entry;
-  BOOTMON_FS_FILE   *FileEntry;
-
-  // Remove the leading '\\'
-  if (*AsciiFileName == '\\') {
-    AsciiFileName++;
-  }
+  LIST_ENTRY       *Entry;
+  BOOTMON_FS_FILE  *FileEntry;
+  CHAR8            OpenFileAsciiFileName[MAX_NAME_LENGTH];
+  CHAR8            *AsciiFileNameToCompare;
 
   // Go through all the files in the list and return the file handle
   for (Entry = GetFirstNode (&Instance->RootFile->Link);
-         !IsNull (&Instance->RootFile->Link, Entry);
-         Entry = GetNextNode (&Instance->RootFile->Link, Entry)
-         )
+       !IsNull (&Instance->RootFile->Link, Entry);
+       Entry = GetNextNode (&Instance->RootFile->Link, Entry)
+       )
   {
     FileEntry = BOOTMON_FS_FILE_FROM_LINK_THIS (Entry);
-    if (AsciiStrCmp (FileEntry->HwDescription.Footer.Filename, AsciiFileName) == 0) {
+    if (FileEntry->Info != NULL) {
+      UnicodeStrToAsciiStr (FileEntry->Info->FileName, OpenFileAsciiFileName);
+      AsciiFileNameToCompare = OpenFileAsciiFileName;
+    } else {
+      AsciiFileNameToCompare = FileEntry->HwDescription.Footer.Filename;
+    }
+
+    if (AsciiStrCmp (AsciiFileNameToCompare, AsciiFileName) == 0) {
       *File = FileEntry;
       return EFI_SUCCESS;
     }
@@ -291,6 +319,7 @@ BootMonFsDriverStart (
   BOOTMON_FS_INSTANCE *Instance;
   EFI_STATUS           Status;
   UINTN                VolumeNameSize;
+  EFI_FILE_INFO       *Info;
 
   Instance = AllocateZeroPool (sizeof (BOOTMON_FS_INSTANCE));
   if (Instance == NULL) {
@@ -307,8 +336,7 @@ BootMonFsDriverStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (Instance);
-    return Status;
+    goto Error;
   }
 
   Status = gBS->OpenProtocol (
@@ -320,8 +348,7 @@ BootMonFsDriverStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (Instance);
-    return Status;
+    goto Error;
   }
 
   //
@@ -350,9 +377,15 @@ BootMonFsDriverStart (
   // Initialize the root file
   Status = BootMonFsCreateFile (Instance, &Instance->RootFile);
   if (EFI_ERROR (Status)) {
-    FreePool (Instance);
-    return Status;
+    goto Error;
   }
+
+  Info = AllocateZeroPool (sizeof (EFI_FILE_INFO));
+  if (Info == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+  Instance->RootFile->Info = Info;
 
   // Initialize the DevicePath of the Instance
   Status = gBS->OpenProtocol (
@@ -364,8 +397,7 @@ BootMonFsDriverStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (Instance);
-    return Status;
+    goto Error;
   }
 
   //
@@ -376,8 +408,23 @@ BootMonFsDriverStart (
                       &gEfiSimpleFileSystemProtocolGuid, &Instance->Fs,
                       NULL
                       );
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
 
   InsertTailList (&mInstances, &Instance->Link);
+
+  return EFI_SUCCESS;
+
+Error:
+
+    if (Instance->RootFile != NULL) {
+      if (Instance->RootFile->Info != NULL) {
+        FreePool (Instance->RootFile->Info);
+      }
+      FreePool (Instance->RootFile);
+    }
+    FreePool (Instance);
 
   return Status;
 }
@@ -433,6 +480,10 @@ BootMonFsDriverStop (
       &ControllerHandle,
       &gEfiSimpleFileSystemProtocolGuid, &Instance->Fs,
       NULL);
+
+  FreePool (Instance->RootFile->Info);
+  FreePool (Instance->RootFile);
+  FreePool (Instance);
 
   return Status;
 }

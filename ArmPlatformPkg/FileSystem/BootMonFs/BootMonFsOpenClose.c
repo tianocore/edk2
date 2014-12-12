@@ -39,6 +39,10 @@ InvalidateImageDescription (
 
   Buffer = AllocateZeroPool (sizeof (HW_IMAGE_DESCRIPTION));
 
+  if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   Status = DiskIo->WriteDisk (DiskIo,
                     MediaId,
                     File->HwDescAddress,
@@ -51,83 +55,75 @@ InvalidateImageDescription (
   return Status;
 }
 
-// Flush file data that will extend the file's length. Update and, if necessary,
-// move the image description.
-// We need to pass the file's starting position on media (FileStart), because
-// if the file hasn't been flushed before its Description->BlockStart won't
-// have been initialised.
-// FileStart must be aligned to the media's block size.
-// Note that this function uses DiskIo to flush, so call BlockIo->FlushBlocks()
-// after calling it.
+/**
+  Write the description of a file to storage media.
+
+  This function uses DiskIo to write to the media, so call BlockIo->FlushBlocks()
+  after calling it to ensure the data are written on the media.
+
+  @param[in]  File       Description of the file whose description on the
+                         storage media has to be updated.
+  @param[in]  FileName   Name of the file. Its length is assumed to be
+                         lower than MAX_NAME_LENGTH.
+  @param[in]  DataSize   Number of data bytes of the file.
+  @param[in]  FileStart  File's starting position on media. FileStart must
+                         be aligned to the media's block size.
+
+  @retval  EFI_WRITE_PROTECTED  The device cannot be written to.
+  @retval  EFI_DEVICE_ERROR     The device reported an error while performing
+                                the write operation.
+
+**/
 STATIC
 EFI_STATUS
-FlushAppendRegion (
-  IN BOOTMON_FS_FILE         *File,
-  IN BOOTMON_FS_FILE_REGION  *Region,
-  IN UINT64                   NewFileSize,
-  IN UINT64                   FileStart
+WriteFileDescription (
+  IN  BOOTMON_FS_FILE  *File,
+  IN  CHAR8            *FileName,
+  IN  UINT32            DataSize,
+  IN  UINT64            FileStart
   )
 {
-  EFI_STATUS               Status;
-  EFI_DISK_IO_PROTOCOL    *DiskIo;
-  UINTN                    BlockSize;
-  HW_IMAGE_DESCRIPTION    *Description;
+  EFI_STATUS            Status;
+  EFI_DISK_IO_PROTOCOL  *DiskIo;
+  UINTN                 BlockSize;
+  UINT32                FileSize;
+  HW_IMAGE_DESCRIPTION  *Description;
 
-  DiskIo = File->Instance->DiskIo;
-
+  DiskIo    = File->Instance->DiskIo;
   BlockSize = File->Instance->BlockIo->Media->BlockSize;
-
   ASSERT (FileStart % BlockSize == 0);
 
-  // Only invalidate the Image Description of files that have already been
-  // written in Flash
-  if (File->HwDescAddress != 0) {
-    Status = InvalidateImageDescription (File);
-    ASSERT_EFI_ERROR (Status);
-  }
+  //
+  // Construct the file description
+  //
 
-  //
-  // Update File Description
-  //
+  FileSize = DataSize + sizeof (HW_IMAGE_DESCRIPTION);
   Description = &File->HwDescription;
   Description->Attributes = 1;
   Description->BlockStart = FileStart / BlockSize;
-  Description->BlockEnd = Description->BlockStart + (NewFileSize / BlockSize);
+  Description->BlockEnd   = Description->BlockStart + (FileSize / BlockSize);
+  AsciiStrCpy (Description->Footer.Filename, FileName);
+
+#ifdef MDE_CPU_ARM
+  Description->Footer.Offset  = HW_IMAGE_FOOTER_OFFSET;
+  Description->Footer.Version = HW_IMAGE_FOOTER_VERSION;
+#else
+  Description->Footer.Offset  = HW_IMAGE_FOOTER_OFFSET2;
+  Description->Footer.Version = HW_IMAGE_FOOTER_VERSION2;
+#endif
   Description->Footer.FooterSignature1 = HW_IMAGE_FOOTER_SIGNATURE_1;
   Description->Footer.FooterSignature2 = HW_IMAGE_FOOTER_SIGNATURE_2;
-#ifdef MDE_CPU_ARM
-  Description->Footer.Version = HW_IMAGE_FOOTER_VERSION;
-  Description->Footer.Offset = HW_IMAGE_FOOTER_OFFSET;
-#else
-  Description->Footer.Version = HW_IMAGE_FOOTER_VERSION2;
-  Description->Footer.Offset = HW_IMAGE_FOOTER_OFFSET2;
-#endif
   Description->RegionCount = 1;
   Description->Region[0].Checksum = 0;
   Description->Region[0].Offset = Description->BlockStart * BlockSize;
-  Description->Region[0].Size = NewFileSize - sizeof (HW_IMAGE_DESCRIPTION);
+  Description->Region[0].Size = DataSize;
 
   Status = BootMonFsComputeFooterChecksum (Description);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  // Write the new file data
-  Status = DiskIo->WriteDisk (
-                    DiskIo,
-                    File->Instance->Media->MediaId,
-                    FileStart + Region->Offset,
-                    Region->Size,
-                    Region->Buffer
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  // Round the file size up to the nearest block size
-  if ((NewFileSize % BlockSize) > 0) {
-    NewFileSize += BlockSize - (NewFileSize % BlockSize);
-  }
-
-  File->HwDescAddress = (FileStart + NewFileSize) - sizeof (HW_IMAGE_DESCRIPTION);
+  File->HwDescAddress = ((Description->BlockEnd + 1) * BlockSize) - sizeof (HW_IMAGE_DESCRIPTION);
 
   // Update the file description on the media
   Status = DiskIo->WriteDisk (
@@ -140,14 +136,6 @@ FlushAppendRegion (
   ASSERT_EFI_ERROR (Status);
 
   return Status;
-}
-
-BOOLEAN
-BootMonFsFileNeedFlush (
-  IN BOOTMON_FS_FILE         *File
-  )
-{
-  return !IsListEmpty (&File->RegionToFlushLink);
 }
 
 // Find a space on media for a file that has not yet been flushed to disk.
@@ -167,6 +155,7 @@ STATIC
 EFI_STATUS
 BootMonFsFindSpaceForNewFile (
   IN  BOOTMON_FS_FILE     *File,
+  IN  UINT64              FileSize,
   OUT UINT64              *FileStart
   )
 {
@@ -174,25 +163,15 @@ BootMonFsFindSpaceForNewFile (
   BOOTMON_FS_FILE         *RootFile;
   BOOTMON_FS_FILE         *FileEntry;
   UINTN                    BlockSize;
-  UINT64                   FileSize;
   EFI_BLOCK_IO_MEDIA      *Media;
 
   Media = File->Instance->BlockIo->Media;
   BlockSize = Media->BlockSize;
   RootFile = File->Instance->RootFile;
 
-  if (IsListEmpty (&RootFile->Link)) {
-    return EFI_SUCCESS;
-  }
-
   // This function must only be called for file which has not been flushed into
   // Flash yet
   ASSERT (File->HwDescription.RegionCount == 0);
-
-  // Find out how big the file will be
-  FileSize = BootMonFsGetImageLength (File);
-  // Add the file header to the file
-  FileSize += sizeof (HW_IMAGE_DESCRIPTION);
 
   *FileStart = 0;
   // Go through all the files in the list
@@ -253,6 +232,20 @@ FreeFileRegions (
   }
 }
 
+/**
+  Flush all modified data associated with a file to a device.
+
+  @param[in]  This  A pointer to the EFI_FILE_PROTOCOL instance that is the
+                    file handle to flush.
+
+  @retval  EFI_SUCCESS            The data was flushed.
+  @retval  EFI_ACCESS_DENIED      The file was opened read-only.
+  @retval  EFI_DEVICE_ERROR       The device reported an error.
+  @retval  EFI_VOLUME_FULL        The volume is full.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough resources were available to flush the data.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsFlushFile (
@@ -261,52 +254,62 @@ BootMonFsFlushFile (
 {
   EFI_STATUS               Status;
   BOOTMON_FS_INSTANCE     *Instance;
+  EFI_FILE_INFO           *Info;
+  EFI_BLOCK_IO_PROTOCOL   *BlockIo;
+  EFI_BLOCK_IO_MEDIA      *Media;
+  EFI_DISK_IO_PROTOCOL    *DiskIo;
+  UINTN                    BlockSize;
+  CHAR8                    AsciiFileName[MAX_NAME_LENGTH];
   LIST_ENTRY              *RegionToFlushLink;
   BOOTMON_FS_FILE         *File;
   BOOTMON_FS_FILE         *NextFile;
   BOOTMON_FS_FILE_REGION  *Region;
   LIST_ENTRY              *FileLink;
   UINTN                    CurrentPhysicalSize;
-  UINTN                    BlockSize;
   UINT64                   FileStart;
   UINT64                   FileEnd;
   UINT64                   RegionStart;
   UINT64                   RegionEnd;
+  UINT64                   NewDataSize;
   UINT64                   NewFileSize;
   UINT64                   EndOfAppendSpace;
   BOOLEAN                  HasSpace;
-  EFI_DISK_IO_PROTOCOL    *DiskIo;
-  EFI_BLOCK_IO_PROTOCOL   *BlockIo;
 
-  Status      = EFI_SUCCESS;
-  FileStart   = 0;
-
-  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
-  if (File == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  // Check if the file needs to be flushed
-  if (!BootMonFsFileNeedFlush (File)) {
-    return Status;
+  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  Instance = File->Instance;
-  BlockIo = Instance->BlockIo;
-  DiskIo = Instance->DiskIo;
-  BlockSize = BlockIo->Media->BlockSize;
+  if (File->OpenMode == EFI_FILE_MODE_READ) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  Instance  = File->Instance;
+  Info      = File->Info;
+  BlockIo   = Instance->BlockIo;
+  Media     = BlockIo->Media;
+  DiskIo    = Instance->DiskIo;
+  BlockSize = Media->BlockSize;
+
+  UnicodeStrToAsciiStr (Info->FileName, AsciiFileName);
 
   // If the file doesn't exist then find a space for it
   if (File->HwDescription.RegionCount == 0) {
-    Status = BootMonFsFindSpaceForNewFile (File, &FileStart);
-    // FileStart has changed so we need to recompute RegionEnd
+    Status = BootMonFsFindSpaceForNewFile (
+               File,
+               Info->FileSize + sizeof (HW_IMAGE_DESCRIPTION),
+               &FileStart
+               );
     if (EFI_ERROR (Status)) {
       return Status;
     }
   } else {
     FileStart = File->HwDescription.BlockStart * BlockSize;
   }
-
   // FileEnd is the current NOR address of the end of the file's data
   FileEnd = FileStart + File->HwDescription.Region[0].Size;
 
@@ -316,17 +319,20 @@ BootMonFsFlushFile (
        )
   {
     Region = (BOOTMON_FS_FILE_REGION*)RegionToFlushLink;
+    if (Region->Size == 0) {
+      continue;
+    }
 
     // RegionStart and RegionEnd are the the intended NOR address of the
     // start and end of the region
-    RegionStart = FileStart + Region->Offset;
-    RegionEnd = RegionStart + Region->Size;
+    RegionStart = FileStart   + Region->Offset;
+    RegionEnd   = RegionStart + Region->Size;
 
     if (RegionEnd < FileEnd) {
       // Handle regions representing edits to existing portions of the file
       // Write the region data straight into the file
       Status = DiskIo->WriteDisk (DiskIo,
-                        BlockIo->Media->MediaId,
+                        Media->MediaId,
                         RegionStart,
                         Region->Size,
                         Region->Buffer
@@ -345,7 +351,8 @@ BootMonFsFlushFile (
 
       // Check if there is space to append the new region
       HasSpace = FALSE;
-      NewFileSize = (RegionEnd - FileStart) + sizeof (HW_IMAGE_DESCRIPTION);
+      NewDataSize = RegionEnd - FileStart;
+      NewFileSize = NewDataSize + sizeof (HW_IMAGE_DESCRIPTION);
       CurrentPhysicalSize = BootMonFsGetPhysicalSize (File);
       if (NewFileSize <= CurrentPhysicalSize) {
         HasSpace = TRUE;
@@ -360,7 +367,7 @@ BootMonFsFlushFile (
           EndOfAppendSpace = NextFile->HwDescription.BlockStart * BlockSize;
         } else {
           // We are flushing the last file.
-          EndOfAppendSpace = (BlockIo->Media->LastBlock + 1) * BlockSize;
+          EndOfAppendSpace = (Media->LastBlock + 1) * BlockSize;
         }
         if (EndOfAppendSpace - FileStart >= NewFileSize) {
           HasSpace = TRUE;
@@ -368,10 +375,31 @@ BootMonFsFlushFile (
       }
 
       if (HasSpace == TRUE) {
-        Status = FlushAppendRegion (File, Region, NewFileSize, FileStart);
+        // Invalidate the current image description of the file if any.
+        if (File->HwDescAddress != 0) {
+          Status = InvalidateImageDescription (File);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        }
+
+        // Write the new file data
+        Status = DiskIo->WriteDisk (
+                    DiskIo,
+                    Media->MediaId,
+                    RegionStart,
+                    Region->Size,
+                    Region->Buffer
+                    );
         if (EFI_ERROR (Status)) {
           return Status;
         }
+
+        Status = WriteFileDescription (File, AsciiFileName, NewDataSize, FileStart);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+
       } else {
         // There isn't a space for the file.
         // Options here are to move the file or fragment it. However as files
@@ -385,20 +413,32 @@ BootMonFsFlushFile (
   }
 
   FreeFileRegions (File);
+  Info->PhysicalSize = BootMonFsGetPhysicalSize (File);
+
+  if ((AsciiStrCmp (AsciiFileName, File->HwDescription.Footer.Filename) != 0) ||
+      (Info->FileSize != File->HwDescription.Region[0].Size)               ) {
+    Status = WriteFileDescription (File, AsciiFileName, Info->FileSize, FileStart);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
 
   // Flush DiskIo Buffers (see UEFI Spec 12.7 - DiskIo buffers are flushed by
   // calling FlushBlocks on the same device's BlockIo).
   BlockIo->FlushBlocks (BlockIo);
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
-  Closes a file on the Nor Flash FS volume.
+  Close a specified file handle.
 
-  @param  This  The EFI_FILE_PROTOCOL to close.
+  @param[in]  This  A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                    handle to close.
 
-  @return Always returns EFI_SUCCESS.
+  @retval  EFI_SUCCESS            The file was closed.
+  @retval  EFI_INVALID_PARAMETER  The parameter "This" is NULL or is not an open
+                                  file handle.
 
 **/
 EFIAPI
@@ -407,42 +447,25 @@ BootMonFsCloseFile (
   IN EFI_FILE_PROTOCOL  *This
   )
 {
-  // Flush the file if needed
-  This->Flush (This);
+  BOOTMON_FS_FILE  *File;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // In the case of a file and not the root directory
+  if (This != &File->Instance->RootFile->File) {
+    This->Flush (This);
+    FreePool (File->Info);
+    File->Info = NULL;
+  }
+
   return EFI_SUCCESS;
-}
-
-// Create a new instance of BOOTMON_FS_FILE.
-// Uses BootMonFsCreateFile to
-STATIC
-EFI_STATUS
-CreateNewFile (
-  IN  BOOTMON_FS_INSTANCE  *Instance,
-  IN  CHAR8*                AsciiFileName,
-  OUT BOOTMON_FS_FILE     **NewHandle
-  )
-{
-  EFI_STATUS       Status;
-  BOOTMON_FS_FILE *File;
-
-  Status = BootMonFsCreateFile (Instance, &File);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  // Remove the leading '\\'
-  if (*AsciiFileName == '\\') {
-    AsciiFileName++;
-  }
-
-  // Set the file name
-  CopyMem (File->HwDescription.Footer.Filename, AsciiFileName, MAX_NAME_LENGTH);
-
-  // Add the file to list of files of the File System
-  InsertHeadList (&Instance->RootFile->Link, &File->Link);
-
-  *NewHandle = File;
-  return Status;
 }
 
 /**
@@ -490,8 +513,14 @@ BootMonFsOpenFile (
   CHAR16               *Path;
   CHAR16               *Separator;
   CHAR8                *AsciiFileName;
+  EFI_FILE_INFO        *Info;
 
   if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Directory = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (Directory->Info == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -505,11 +534,6 @@ BootMonFsOpenFile (
   if ( (OpenMode != EFI_FILE_MODE_READ) &&
        (OpenMode != (EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE)) &&
        (OpenMode != (EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE)) ) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Directory = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
-  if (Directory == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -535,6 +559,7 @@ BootMonFsOpenFile (
   }
   Path = (CHAR16*)Buf;
   AsciiFileName = NULL;
+  Info = NULL;
 
   //
   // Handle single periods, double periods and convert forward slashes '/'
@@ -625,6 +650,18 @@ BootMonFsOpenFile (
     }
 
     //
+    // Allocate a buffer to store the characteristics of the file while the
+    // file is open. We allocate the maximum size to not have to reallocate
+    // if the file name is changed.
+    //
+    Info = AllocateZeroPool (
+             SIZE_OF_EFI_FILE_INFO + (sizeof (CHAR16) * MAX_NAME_LENGTH));
+    if (Info == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Error;
+    }
+
+    //
     // Open or create a file in the root directory.
     //
 
@@ -634,20 +671,32 @@ BootMonFsOpenFile (
         goto Error;
       }
 
-      Status = CreateNewFile (Instance, AsciiFileName, &File);
-      if (!EFI_ERROR (Status)) {
-        File->OpenMode = OpenMode;
-        *NewHandle = &File->File;
-        File->Position = 0;
+      Status = BootMonFsCreateFile (Instance, &File);
+      if (EFI_ERROR (Status)) {
+        goto Error;
       }
+      InsertHeadList (&Instance->RootFile->Link, &File->Link);
+      Info->Attribute = Attributes;
     } else {
       //
-      // The file already exists.
+      // File already open, not supported yet.
       //
-      File->OpenMode = OpenMode;
-      *NewHandle = &File->File;
-      File->Position = 0;
+      if (File->Info != NULL) {
+        Status = EFI_UNSUPPORTED;
+        goto Error;
+      }
     }
+
+    Info->FileSize     = BootMonFsGetImageLength (File);
+    Info->PhysicalSize = BootMonFsGetPhysicalSize (File);
+    AsciiStrToUnicodeStr (AsciiFileName, Info->FileName);
+
+    File->Info = Info;
+    Info = NULL;
+    File->Position = 0;
+    File->OpenMode = OpenMode;
+
+    *NewHandle = &File->File;
   }
 
 Error:
@@ -655,6 +704,9 @@ Error:
   FreePool (Buf);
   if (AsciiFileName != NULL) {
     FreePool (AsciiFileName);
+  }
+  if (Info != NULL) {
+    FreePool (Info);
   }
 
   return Status;
@@ -671,6 +723,19 @@ BootMonFsDeleteFail (
   // You can't delete the root directory
   return EFI_WARN_DELETE_FAILURE;
 }
+
+/**
+  Close and delete a file from the boot monitor file system.
+
+  @param[in]  This  A pointer to the EFI_FILE_PROTOCOL instance that is the file
+                    handle to delete.
+
+  @retval  EFI_SUCCESS              The file was closed and deleted.
+  @retval  EFI_INVALID_PARAMETER    The parameter "This" is NULL or is not an open
+                                    file handle.
+  @retval  EFI_WARN_DELETE_FAILURE  The handle was closed, but the file was not deleted.
+
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsDelete (
@@ -681,23 +746,26 @@ BootMonFsDelete (
   BOOTMON_FS_FILE         *File;
   LIST_ENTRY              *RegionToFlushLink;
   BOOTMON_FS_FILE_REGION  *Region;
-  EFI_BLOCK_IO_PROTOCOL   *BlockIo;
-  UINT8                   *EmptyBuffer;
 
-  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
-  if (File == NULL) {
-    return EFI_DEVICE_ERROR;
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  Status = EFI_SUCCESS;
+  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  if (BootMonFsFileNeedFlush (File)) {
+  if (!IsListEmpty (&File->RegionToFlushLink)) {
     // Free the entries from the Buffer List
     RegionToFlushLink = GetFirstNode (&File->RegionToFlushLink);
     do {
       Region = (BOOTMON_FS_FILE_REGION*)RegionToFlushLink;
 
-      // Get Next entry
+      //
+      // Get next element of the list before deleting the region description
+      // that contain the LIST_ENTRY structure.
+      //
       RegionToFlushLink = RemoveEntryList (RegionToFlushLink);
 
       // Free the buffers
@@ -708,25 +776,18 @@ BootMonFsDelete (
 
   // If (RegionCount is greater than 0) then the file already exists
   if (File->HwDescription.RegionCount > 0) {
-    BlockIo = File->Instance->BlockIo;
-
-    // Create an empty buffer
-    EmptyBuffer = AllocateZeroPool (BlockIo->Media->BlockSize);
-    if (EmptyBuffer == NULL) {
-      FreePool (File);
-      return EFI_OUT_OF_RESOURCES;
-    }
-
     // Invalidate the last Block
     Status = InvalidateImageDescription (File);
     ASSERT_EFI_ERROR (Status);
-
-    FreePool (EmptyBuffer);
+    if (EFI_ERROR (Status)) {
+      return  EFI_WARN_DELETE_FAILURE;
+    }
   }
 
   // Remove the entry from the list
   RemoveEntryList (&File->Link);
+  FreePool (File->Info);
   FreePool (File);
-  return Status;
-}
 
+  return EFI_SUCCESS;
+}

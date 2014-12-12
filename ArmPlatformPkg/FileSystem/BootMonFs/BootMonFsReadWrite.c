@@ -36,6 +36,7 @@
                                   reported an error while performing the read
                                   operation.
   @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
 **/
 EFIAPI
 EFI_STATUS
@@ -53,25 +54,30 @@ BootMonFsReadFile (
   EFI_STATUS            Status;
   UINTN                 RemainingFileSize;
 
+  if ((This == NULL)       ||
+      (BufferSize == NULL) ||
+      (Buffer == NULL)        ) {
+    return EFI_INVALID_PARAMETER;
+  }
+  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   // Ensure the file has been written in Flash before reading it.
   // This keeps the code simple and avoids having to manage a non-flushed file.
   BootMonFsFlushFile (This);
 
-  File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
-  if (File == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Instance = File->Instance;
-  DiskIo = Instance->DiskIo;
-  Media = Instance->Media;
+  Instance  = File->Instance;
+  DiskIo    = Instance->DiskIo;
+  Media     = Instance->Media;
   FileStart = (Media->LowestAlignedLba + File->HwDescription.BlockStart) * Media->BlockSize;
 
-  if (File->Position >= File->HwDescription.Region[0].Size) {
+  if (File->Position >= File->Info->FileSize) {
     // The entire file has been read or the position has been
     // set past the end of the file.
     *BufferSize = 0;
-    if (File->Position > File->HwDescription.Region[0].Size) {
+    if (File->Position > File->Info->FileSize) {
       return EFI_DEVICE_ERROR;
     } else {
       return EFI_SUCCESS;
@@ -79,7 +85,7 @@ BootMonFsReadFile (
   }
 
   // This driver assumes that the entire file is in region 0.
-  RemainingFileSize = File->HwDescription.Region[0].Size - File->Position;
+  RemainingFileSize = File->Info->FileSize - File->Position;
 
   // If read would go past end of file, truncate the read
   if (*BufferSize > RemainingFileSize) {
@@ -102,7 +108,26 @@ BootMonFsReadFile (
   return Status;
 }
 
-// Inserts an entry into the write chain
+/**
+  Write data to an open file.
+
+  The data is not written to the flash yet. It will be written when the file
+  will be either read, closed or flushed.
+
+  @param[in]      This        A pointer to the EFI_FILE_PROTOCOL instance that
+                              is the file handle to write data to.
+  @param[in out]  BufferSize  On input, the size of the Buffer. On output, the
+                              size of the data actually written. In both cases,
+                              the size is measured in bytes.
+  @param[in]      Buffer      The buffer of data to write.
+
+  @retval  EFI_SUCCESS            The data was written.
+  @retval  EFI_ACCESS_DENIED      The file was opened read only.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate the buffer to store the
+                                  data to write.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsWriteFile (
@@ -114,38 +139,57 @@ BootMonFsWriteFile (
   BOOTMON_FS_FILE         *File;
   BOOTMON_FS_FILE_REGION  *Region;
 
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
-  if (File == NULL) {
+  if (File->Info == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!(File->OpenMode & EFI_FILE_MODE_WRITE)) {
+  if (File->OpenMode == EFI_FILE_MODE_READ) {
     return EFI_ACCESS_DENIED;
   }
 
   // Allocate and initialize the memory region
   Region = (BOOTMON_FS_FILE_REGION*)AllocateZeroPool (sizeof (BOOTMON_FS_FILE_REGION));
   if (Region == NULL) {
+    *BufferSize = 0;
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Region->Buffer  = AllocateCopyPool (*BufferSize, Buffer);
+  Region->Buffer = AllocateCopyPool (*BufferSize, Buffer);
   if (Region->Buffer == NULL) {
+    *BufferSize = 0;
     FreePool (Region);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Region->Size    = *BufferSize;
-
+  Region->Size   = *BufferSize;
   Region->Offset = File->Position;
 
   InsertTailList (&File->RegionToFlushLink, &Region->Link);
 
   File->Position += *BufferSize;
 
+  if (File->Position > File->Info->FileSize) {
+    File->Info->FileSize = File->Position;
+  }
+
   return EFI_SUCCESS;
 }
 
+/**
+  Set a file's current position.
+
+  @param[in]  This      A pointer to the EFI_FILE_PROTOCOL instance that is
+                        the file handle to set the requested position on.
+  @param[in]  Position  The byte position from the start of the file to set.
+
+  @retval  EFI_SUCCESS            The position was set.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsSetPosition (
@@ -153,33 +197,63 @@ BootMonFsSetPosition (
   IN UINT64             Position
   )
 {
-  BOOTMON_FS_FILE         *File;
+  BOOTMON_FS_FILE  *File;
 
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
+  //
   // UEFI Spec section 12.5:
   // "Seeking to position 0xFFFFFFFFFFFFFFFF causes the current position to
-  //  be set to the end of the file."
+  // be set to the end of the file."
+  //
   if (Position == 0xFFFFFFFFFFFFFFFF) {
-    File->Position = BootMonFsGetImageLength (File);
-  } else {
-    // NB: Seeking past the end of the file is valid.
-    File->Position = Position;
+    Position = File->Info->FileSize;
   }
+
+  File->Position = Position;
 
   return EFI_SUCCESS;
 }
 
+/**
+  Return a file's current position.
+
+  @param[in]   This      A pointer to the EFI_FILE_PROTOCOL instance that is
+                         the file handle to get the current position on.
+  @param[out]  Position  The address to return the file's current position value.
+
+  @retval  EFI_SUCCESS            The position was returned.
+  @retval  EFI_INVALID_PARAMETER  At least one of the parameters is invalid.
+
+**/
 EFIAPI
 EFI_STATUS
 BootMonFsGetPosition (
   IN  EFI_FILE_PROTOCOL *This,
   OUT UINT64            *Position
-  ) {
+  )
+{
   BOOTMON_FS_FILE         *File;
 
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   File = BOOTMON_FS_FILE_FROM_FILE_THIS (This);
+  if (File->Info == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Position == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   *Position = File->Position;
+
   return EFI_SUCCESS;
 }

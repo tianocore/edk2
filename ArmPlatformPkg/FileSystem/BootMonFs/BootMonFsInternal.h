@@ -54,8 +54,14 @@ typedef struct {
 
   EFI_FILE_PROTOCOL     File;
 
+  //
+  // The following fields are relevant only if the file is open.
+  //
+
+  EFI_FILE_INFO         *Info;
   UINT64                Position;
-  // If the file needs to be flushed then this list contain the memory buffer that creates this file
+  // If the file needs to be flushed then this list contain the memory
+  // buffer that creates this file
   LIST_ENTRY            RegionToFlushLink;
   UINT64                OpenMode;
 } BOOTMON_FS_FILE;
