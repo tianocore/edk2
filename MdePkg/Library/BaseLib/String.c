@@ -14,8 +14,11 @@
 
 #include "BaseLibInternals.h"
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Copies one Null-terminated Unicode string to another Null-terminated Unicode
   string and returns the new Unicode string.
 
@@ -68,6 +71,8 @@ StrCpy (
 }
 
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Copies up to a specified length from one Null-terminated Unicode string  to 
   another Null-terminated Unicode string and returns the new Unicode string.
 
@@ -137,6 +142,7 @@ StrnCpy (
   ZeroMem (Destination, Length * sizeof (*Destination));
   return ReturnValue;
 }
+#endif
 
 /**
   Returns the length of a Null-terminated Unicode string.
@@ -319,7 +325,11 @@ StrnCmp (
   return *FirstString - *SecondString;
 }
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Concatenates one Null-terminated Unicode string to another Null-terminated
   Unicode string, and returns the concatenated Unicode string.
 
@@ -369,6 +379,8 @@ StrCat (
 }
 
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Concatenates up to a specified length one Null-terminated Unicode to the end 
   of another Null-terminated Unicode string, and returns the concatenated 
   Unicode string.
@@ -427,6 +439,7 @@ StrnCat (
   ASSERT (StrSize (Destination) != 0);
   return Destination;
 }
+#endif
 
 /**
   Returns the first occurrence of a Null-terminated Unicode sub-string
@@ -1065,8 +1078,11 @@ UnicodeStrToAsciiStr (
   return ReturnValue;
 }
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Copies one Null-terminated ASCII string to another Null-terminated ASCII
   string and returns the new ASCII string.
 
@@ -1116,6 +1132,8 @@ AsciiStrCpy (
 }
 
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Copies up to a specified length one Null-terminated ASCII string to another 
   Null-terminated ASCII string and returns the new ASCII string.
 
@@ -1181,6 +1199,7 @@ AsciiStrnCpy (
   ZeroMem (Destination, Length * sizeof (*Destination));
   return ReturnValue;
 }
+#endif
 
 /**
   Returns the length of a Null-terminated ASCII string.
@@ -1462,7 +1481,11 @@ AsciiStrnCmp (
   return *FirstString - *SecondString;
 }
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Concatenates one Null-terminated ASCII string to another Null-terminated
   ASCII string, and returns the concatenated ASCII string.
 
@@ -1507,6 +1530,8 @@ AsciiStrCat (
 }
 
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Concatenates up to a specified length one Null-terminated ASCII string to 
   the end of another Null-terminated ASCII string, and returns the 
   concatenated ASCII string.
@@ -1563,6 +1588,7 @@ AsciiStrnCat (
   ASSERT (AsciiStrSize (Destination) != 0);
   return Destination;
 }
+#endif
 
 /**
   Returns the first occurrence of a Null-terminated ASCII sub-string
