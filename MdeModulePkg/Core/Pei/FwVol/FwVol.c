@@ -530,12 +530,6 @@ FirmwareVolmeInfoPpiNotifyCallback (
   Status       = EFI_SUCCESS;
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
-  if (PrivateData->FvCount >= PcdGet32 (PcdPeiCoreMaxFvSupported)) {
-    DEBUG ((EFI_D_ERROR, "The number of Fv Images (%d) exceed the max supported FVs (%d) in Pei", PrivateData->FvCount + 1, PcdGet32 (PcdPeiCoreMaxFvSupported)));
-    DEBUG ((EFI_D_ERROR, "PcdPeiCoreMaxFvSupported value need be reconfigurated in DSC"));
-    ASSERT (FALSE);
-  }
-
   if (CompareGuid (NotifyDescriptor->Guid, &gEfiPeiFirmwareVolumeInfo2PpiGuid)) {
     //
     // It is FvInfo2PPI.
@@ -582,6 +576,12 @@ FirmwareVolmeInfoPpiNotifyCallback (
         DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvInfo2Ppi.FvInfo));
         return EFI_SUCCESS;
       }
+    }
+
+    if (PrivateData->FvCount >= PcdGet32 (PcdPeiCoreMaxFvSupported)) {
+      DEBUG ((EFI_D_ERROR, "The number of Fv Images (%d) exceed the max supported FVs (%d) in Pei", PrivateData->FvCount + 1, PcdGet32 (PcdPeiCoreMaxFvSupported)));
+      DEBUG ((EFI_D_ERROR, "PcdPeiCoreMaxFvSupported value need be reconfigurated in DSC"));
+      ASSERT (FALSE);
     }
 
     //
