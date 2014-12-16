@@ -349,14 +349,19 @@ PciRootBridgeIoDumpInformation(
   }
 
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_PH), NULL);
-  ASSERT (Temp != NULL);
+  if (Temp == NULL) {
+    return NULL;
+  }
   Temp2 = CatSPrint(L"\r\n", Temp, PciRootBridgeIo->ParentHandle);
   FreePool(Temp);
   RetVal = Temp2;
   Temp2 = NULL;
  
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_SEG), NULL);
-  ASSERT (Temp != NULL);
+  if (Temp == NULL) {
+    SHELL_FREE_NON_NULL(RetVal);
+    return NULL;
+  }
   Temp2 = CatSPrint(RetVal, Temp, PciRootBridgeIo->SegmentNumber);
   FreePool(Temp);
   FreePool(RetVal);
@@ -368,7 +373,10 @@ PciRootBridgeIoDumpInformation(
   Status = PciRootBridgeIo->GetAttributes (PciRootBridgeIo, &Supports, &Attributes);
   if (!EFI_ERROR(Status)) {
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_ATT), NULL);
-    ASSERT (Temp != NULL);    
+    if (Temp == NULL) {
+      SHELL_FREE_NON_NULL(RetVal);
+      return NULL;
+    }    
     Temp2 = CatSPrint(RetVal, Temp, Attributes);
     FreePool(Temp);
     FreePool(RetVal);
@@ -376,7 +384,10 @@ PciRootBridgeIoDumpInformation(
     Temp2 = NULL;
     
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_SUPPORTS), NULL);
-    ASSERT (Temp != NULL);
+    if (Temp == NULL) {
+      SHELL_FREE_NON_NULL(RetVal);
+      return NULL;
+    }
     Temp2 = CatSPrint(RetVal, Temp, Supports);
     FreePool(Temp);
     FreePool(RetVal);
@@ -388,7 +399,10 @@ PciRootBridgeIoDumpInformation(
   Status = PciRootBridgeIo->Configuration (PciRootBridgeIo, (VOID **) &Configuration);
   if (!EFI_ERROR(Status) && Configuration != NULL) {
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_TITLE), NULL);
-    ASSERT (Temp != NULL);
+    if (Temp == NULL) {
+      SHELL_FREE_NON_NULL(RetVal);
+      return NULL;
+    }
     Temp2 = CatSPrint(RetVal, Temp, Supports);
     FreePool(Temp);
     FreePool(RetVal);
@@ -611,6 +625,9 @@ AdapterInformationDumpInformation (
     return (CatSPrint(NULL, L"AdapterInfo"));
   }
 
+  InfoTypesBuffer   = NULL;
+  InformationBlock  = NULL;
+  
   //
   // Allocate print buffer to store data
   //
@@ -643,18 +660,31 @@ AdapterInformationDumpInformation (
                                    );
   if (EFI_ERROR (Status)) {
     TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_GET_SUPP_TYPES_FAILED), NULL);
-    RetVal = CatSPrint (RetVal, TempStr, Status);
+    if (TempStr != NULL) {
+      RetVal = CatSPrint (RetVal, TempStr, Status);
+    } else {
+      goto ERROR_EXIT;
+    }  
   } else {
     TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_SUPP_TYPE_HEADER), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
     RetVal = CatSPrint (RetVal, TempStr);
     SHELL_FREE_NON_NULL (TempStr);
 
     for (GuidIndex = 0; GuidIndex < InfoTypesBufferCount; GuidIndex++) {
       TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_GUID_NUMBER), NULL);
+      if (TempStr == NULL) {
+        goto ERROR_EXIT;
+      }
       RetVal = CatSPrint (RetVal, TempStr, (GuidIndex + 1), InfoTypesBuffer[GuidIndex]);
       SHELL_FREE_NON_NULL (TempStr);
 
       TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_GUID_STRING), NULL);
+      if (TempStr == NULL) {
+        goto ERROR_EXIT;
+      }
 
       if (CompareGuid (&InfoTypesBuffer[GuidIndex], &gEfiAdapterInfoMediaStateGuid)) {
         RetVal = CatSPrint (RetVal, TempStr, L"gEfiAdapterInfoMediaStateGuid");
@@ -694,10 +724,16 @@ AdapterInformationDumpInformation (
 
       if (EFI_ERROR (Status)) {
         TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_GETINFO_FAILED), NULL);
+        if (TempStr == NULL) {
+          goto ERROR_EXIT;
+        }
         RetVal = CatSPrint (RetVal, TempStr, Status);
       } else {
         if (CompareGuid (&InfoTypesBuffer[GuidIndex], &gEfiAdapterInfoMediaStateGuid)) {
           TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_MEDIA_STATE), NULL);
+          if (TempStr == NULL) {
+            goto ERROR_EXIT;
+          }
           RetVal = CatSPrint (
                      RetVal,
                      TempStr,
@@ -706,6 +742,9 @@ AdapterInformationDumpInformation (
                      );
         } else if (CompareGuid (&InfoTypesBuffer[GuidIndex], &gEfiAdapterInfoNetworkBootGuid)) {
           TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_NETWORK_BOOT_INFO), NULL);
+          if (TempStr == NULL) {
+            goto ERROR_EXIT;
+          }
           RetVal = CatSPrint (
                      RetVal,
                      TempStr,
@@ -720,6 +759,9 @@ AdapterInformationDumpInformation (
                      );
         } else if (CompareGuid (&InfoTypesBuffer[GuidIndex], &gEfiAdapterInfoSanMacAddressGuid) == TRUE) { 
           TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_SAN_MAC_ADDRESS_INFO), NULL);
+          if (TempStr == NULL) {
+            goto ERROR_EXIT;
+          }
           RetVal = CatSPrint (
                      RetVal,
                      TempStr,
@@ -732,6 +774,9 @@ AdapterInformationDumpInformation (
                      );   
         } else {
           TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_UNKNOWN_INFO_TYPE), NULL);
+          if (TempStr == NULL) {
+            goto ERROR_EXIT;
+          }
           RetVal = CatSPrint (RetVal, TempStr, &InfoTypesBuffer[GuidIndex]);
         }
       }
@@ -740,7 +785,14 @@ AdapterInformationDumpInformation (
     }
   }
 
+  SHELL_FREE_NON_NULL (InfoTypesBuffer);
   return RetVal;
+
+ERROR_EXIT:
+  SHELL_FREE_NON_NULL (RetVal);
+  SHELL_FREE_NON_NULL (InfoTypesBuffer);
+  SHELL_FREE_NON_NULL (InformationBlock);
+  return NULL;
 }
 //
 // Put the information on the NT32 protocol GUIDs here so we are not dependant on the Nt32Pkg
