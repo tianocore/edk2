@@ -135,8 +135,6 @@
 #include <Protocol/DiskIo2.h>
 #include <Protocol/AdapterInformation.h>
 #include <Protocol/EfiShellDynamicCommand.h>
-#include <Protocol/IsaIo.h>
-#include <Protocol/IsaAcpi.h>
 
 #include <Library/HandleParsingLib.h>
 #include <Library/UefiBootServicesTableLib.h>

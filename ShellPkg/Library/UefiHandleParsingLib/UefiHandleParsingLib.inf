@@ -36,7 +36,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ShellPkg/ShellPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -173,8 +172,6 @@
   gEfiIdeControllerInitProtocolGuid                       ##UNDEFINED
   gEfiDiskIo2ProtocolGuid                                 ##UNDEFINED
   gEfiAdapterInformationProtocolGuid                      ##UNDEFINED
-  gEfiIsaIoProtocolGuid                                   ##UNDEFINED
-  gEfiIsaAcpiProtocolGuid                                 ##UNDEFINED
   gEfiShellDynamicCommandProtocolGuid                     ##UNDEFINED
 
 [Guids]
