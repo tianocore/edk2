@@ -466,7 +466,6 @@ IsDevicePathExist (
   )
 {
   UINTN                    Length;
-  EFI_STRING               PathHdr;
 
   for (; (*String != 0 && StrnCmp (String, L"PATH=", StrLen (L"PATH=")) != 0); String++);
   if (*String == 0) {
@@ -477,7 +476,6 @@ IsDevicePathExist (
   if (*String == 0) {
     return FALSE;
   }
-  PathHdr = String;
 
   for (Length = 0; *String != 0 && *String != L'&'; String++, Length++);
   if (((Length + 1) / 2) < sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
