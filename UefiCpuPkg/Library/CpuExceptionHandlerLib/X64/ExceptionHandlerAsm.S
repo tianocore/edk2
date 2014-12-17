@@ -188,13 +188,13 @@ CommonInterruptEntry_al_0000:
     pushq   %rax                      # for ss
     movzwq  32(%rbp), %rax
     pushq   %rax                      # for cs
-    movl    %ds, %eax
+    mov     %ds, %rax
     pushq   %rax
-    movl    %es, %eax
+    mov     %es, %rax
     pushq   %rax
-    movl    %fs, %eax
+    mov     %fs, %rax
     pushq   %rax
-    movl    %gs, %eax
+    mov     %gs, %rax
     pushq   %rax
 
     movq    %rcx, 8(%rbp)                # save vector number
@@ -327,9 +327,9 @@ CommonInterruptEntry_al_0000:
     # mov   %rax, %fs ; not for fs
     # (X64 will not use fs and gs, so we do not restore it)
     popq    %rax
-    movl    %eax, %es
+    mov     %rax, %es
     popq    %rax
-    movl    %eax, %ds
+    mov     %rax, %ds
     popq    32(%rbp)  # for cs
     popq    56(%rbp)  # for ss
 
