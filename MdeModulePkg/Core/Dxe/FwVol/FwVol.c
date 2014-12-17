@@ -482,7 +482,7 @@ FvCheck (
     FfsHeader = (EFI_FFS_FILE_HEADER *) (FvDevice->CachedFv);
   }
   TopFvAddress = FvDevice->EndOfCachedFv;
-  while ((UINT8 *) FfsHeader < TopFvAddress) {
+  while (((UINTN) FfsHeader >= (UINTN) FvDevice->CachedFv) && ((UINTN) FfsHeader <= (UINTN) ((UINTN) TopFvAddress - sizeof (EFI_FFS_FILE_HEADER)))) {
 
     if (FileCached) {
       CoreFreePool (CacheFfsHeader);
