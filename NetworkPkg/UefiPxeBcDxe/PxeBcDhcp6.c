@@ -1280,7 +1280,7 @@ PxeBcCheckRouteTable (
     }
 
     //
-    // Find out the gateway address which can route the message whcih send to ServerIp.
+    // Find out the gateway address which can route the message which send to ServerIp.
     //
     for (Index = 0; Index < Ip6ModeData.RouteCount; Index++) {
       if (NetIp6IsNetEqual (&Private->ServerIp.v6, &Ip6ModeData.RouteTable[Index].Destination, Ip6ModeData.RouteTable[Index].PrefixLength)) {
@@ -1381,6 +1381,7 @@ PxeBcRegisterIp6Address (
   EFI_STATUS                       Status;
   UINT64                           DadTriggerTime;
   EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS    DadXmits;
+  BOOLEAN                          NoGateway;
 
   Status     = EFI_SUCCESS;
   TimeOutEvt = NULL;
@@ -1388,6 +1389,7 @@ PxeBcRegisterIp6Address (
   DataSize   = sizeof (EFI_IP6_CONFIG_POLICY);
   Ip6Cfg     = Private->Ip6Cfg;
   Ip6        = Private->Ip6;
+  NoGateway  = FALSE;
 
   ZeroMem (&CfgAddr, sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS));
   CopyMem (&CfgAddr.Address, Address, sizeof (EFI_IPv6_ADDRESS));
@@ -1402,7 +1404,7 @@ PxeBcRegisterIp6Address (
   //
   Status = PxeBcCheckRouteTable (Private, PXEBC_IP6_ROUTE_TABLE_TIMEOUT, &GatewayAddr);
   if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
+    NoGateway = TRUE;
   }
   
   //
@@ -1503,7 +1505,7 @@ PxeBcRegisterIp6Address (
   //
   // Set the default gateway address back if needed.
   //
-  if (!NetIp6IsUnspecifiedAddr (&GatewayAddr)) {
+  if (!NoGateway && !NetIp6IsUnspecifiedAddr (&GatewayAddr)) {
     Status = Ip6Cfg->SetData (
                        Ip6Cfg,
                        Ip6ConfigDataTypeGateway,
