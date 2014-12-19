@@ -2,7 +2,7 @@
 
   This library class defines a set of interfaces to customize Display module
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -165,6 +165,9 @@ RefreshKeyHelp (
   SecCol            = gScreenDimensions.LeftColumn + (gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn) / 3;
   ThdCol            = gScreenDimensions.LeftColumn + (gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn) / 3 * 2;
 
+  //
+  // + 2 means leave 1 space before the first hotkey info.
+  //
   StartColumnOfHelp = gScreenDimensions.LeftColumn + 2;
   LeftColumnOfHelp  = gScreenDimensions.LeftColumn + 1;
   RightColumnOfHelp = gScreenDimensions.RightColumn - 1;
@@ -178,6 +181,12 @@ RefreshKeyHelp (
   ColumnStr2        = gLibEmptyString;
   ColumnStr3        = gLibEmptyString;
 
+  //
+  // Clean the space at gScreenDimensions.LeftColumn + 1.
+  //
+  PrintStringAtWithWidth (StartColumnOfHelp - 1, BottomRowOfHelp, gLibEmptyString, 1);
+  PrintStringAtWithWidth (StartColumnOfHelp - 1, TopRowOfHelp, gLibEmptyString, 1);
+
   if (Statement == NULL) {
     //
     // Print Key for Form without showable statement.
@@ -186,7 +195,10 @@ RefreshKeyHelp (
     PrintStringAtWithWidth (StartColumnOfHelp, BottomRowOfHelp, gLibEmptyString, ColumnWidth1);
     PrintStringAtWithWidth (SecCol, BottomRowOfHelp, gLibEmptyString, ColumnWidth2);
     PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, gLibEmptyString, ColumnWidth1);
-    PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, gEscapeString, ColumnWidth3);
+    if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
+      ColumnStr3 = gEscapeString;
+    }
+    PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, ColumnStr3, ColumnWidth3);
 
     return;
   }
