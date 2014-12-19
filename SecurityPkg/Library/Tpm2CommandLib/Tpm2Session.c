@@ -99,7 +99,7 @@ Tpm2StartAuthSession (
   Buffer += Salt->size;
 
   *(TPM_SE *)Buffer = SessionType;
-  Buffer += sizeof(UINT8);
+  Buffer++;
 
   WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->algorithm));
   Buffer += sizeof(UINT16);
