@@ -1042,7 +1042,7 @@ BdsCreateDevOrder (
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
                   &gEfiLegacyDevOrderVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   TotalSize,
                   DevOrder
                   );
@@ -1363,7 +1363,7 @@ BdsUpdateLegacyDevOrder (
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
                   &gEfiLegacyDevOrderVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   TotalSize,
                   NewDevOrder
                   );
