@@ -987,13 +987,13 @@ vfrStatementVarStoreEfi :
                                                          _PCATCH(gCVfrVarDataTypeDB.GetDataTypeSize(TypeName, &Size), LineNum);
                                                        } else {
                                                         _PCATCH(mCVfrDataStorage.DeclareBufferVarStore (
-                                                                                  TN->getText(),
+                                                                                  StoreName,
                                                                                   &Guid,
                                                                                   &gCVfrVarDataTypeDB,
                                                                                   TypeName,
                                                                                   VarStoreId
                                                                                   ), LineNum);                                                      
-                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId(TN->getText(), &VarStoreId, &Guid), VN);
+                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId(StoreName, &VarStoreId, &Guid), VN);
                                                          _PCATCH(gCVfrVarDataTypeDB.GetDataTypeSize(TypeName, &Size), N->getLine());
                                                        }
                                                        VSEObj.SetGuid (&Guid);                                                       
