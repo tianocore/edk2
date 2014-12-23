@@ -1,6 +1,7 @@
 ## @file
 # build a platform or a module
 #
+#  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -938,7 +939,7 @@ class Build():
 
         # run
         if Target == 'run':
-            RunDir = os.path.normpath(os.path.join(AutoGenObject.BuildDir, 'IA32'))
+            RunDir = os.path.normpath(os.path.join(AutoGenObject.BuildDir, GlobalData.gGlobalDefines['ARCH']))
             Command = '.\SecMain'
             os.chdir(RunDir)
             LaunchCommand(Command, RunDir)
@@ -1061,7 +1062,7 @@ class Build():
 
         # run
         if Target == 'run':
-            RunDir = os.path.normpath(os.path.join(AutoGenObject.BuildDir, 'IA32'))
+            RunDir = os.path.normpath(os.path.join(AutoGenObject.BuildDir, GlobalData.gGlobalDefines['ARCH']))
             Command = '.\SecMain'
             os.chdir(RunDir)
             LaunchCommand(Command, RunDir)
