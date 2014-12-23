@@ -1,0 +1,74 @@
+## @file
+#  Support for Simple File System over Firmware Volume.
+#
+#  This driver uses the EFI_FIRMWARE_VOLUME2_PROTOCOL to expose files in firmware
+#  volumes via the the EFI_SIMPLE_FILESYSTEM_PROTOCOL and EFI_FILE_PROTOCOL.
+#
+#  It will expose a single directory, containing one file for each file in the firmware
+#  volume. If a file has a UI section, its contents will be used as a filename.
+#  Otherwise, a string representation of the GUID will be used.
+#  Files of an executable type (That is PEIM, DRIVER, COMBINED_PEIM_DRIVER and APPLICATION)
+#  will have ".efi" added to their filename.
+#
+#  Its primary intended use is to be able to start EFI applications embedded in FVs
+#  from the UEFI shell. It is entirely read-only.
+#
+#  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FvSimpleFileSystem
+  MODULE_UNI_FILE                = FvSimpleFileSystem.uni
+  FILE_GUID                      = 907125c0-a5f1-11e3-a3fe-a3198b49350c
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FvSimpleFileSystemEntryPoint
+
+[Sources]
+
+  ComponentName.c
+  FvSimpleFileSystem.c
+  FvSimpleFileSystemEntryPoint.c
+  FvSimpleFileSystemInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DevicePathLib
+  MemoryAllocationLib
+  PrintLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang              ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang                      ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiFileInfoGuid                                                         ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiFileSystemInfoGuid                                                   ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiFileSystemVolumeLabelInfoIdGuid                                      ## SOMETIMES_CONSUMES   ## UNDEFINED
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                                               ## TO_START
+  gEfiFirmwareVolume2ProtocolGuid                                          ## TO_START
+  gEfiUnicodeCollationProtocolGuid                                         ## TO_START
+  gEfiUnicodeCollation2ProtocolGuid                                        ## TO_START
+  gEfiSimpleFileSystemProtocolGuid                                         ## BY_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FvSimpleFileSystemExtra.uni
