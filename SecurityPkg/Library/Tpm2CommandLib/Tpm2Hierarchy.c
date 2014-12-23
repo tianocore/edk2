@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct {
   TPM2_COMMAND_HEADER       Header;
-  TPMI_RH_HIERARCHY         AuthHandle;
+  TPMI_RH_HIERARCHY_AUTH    AuthHandle;
   UINT32                    AuthSessionSize;
   TPMS_AUTH_COMMAND         AuthSession;
   TPM2B_DIGEST              AuthPolicy;
