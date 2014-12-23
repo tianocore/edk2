@@ -2,7 +2,7 @@
   Library instance that implement UEFI Device Path Library class based on protocol
   gEfiDevicePathUtilitiesProtocolGuid.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -195,12 +195,8 @@ DevicePathNodeLength (
   IN CONST VOID  *Node
   )
 {
-  UINTN Length;
-
   ASSERT (Node != NULL);
-  Length = ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
-  ASSERT (Length >= sizeof (EFI_DEVICE_PATH_PROTOCOL));
-  return Length;
+  return ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
 }
 
 /**
@@ -567,8 +563,7 @@ GetNextDevicePathInstance (
   If there is not enough memory to allocate space for the new device path, then 
   NULL is returned.  
   The memory is allocated from EFI boot services memory. It is the responsibility 
-  of the caller to
-  free the memory allocated.
+  of the caller to free the memory allocated.
 
   @param  NodeType                   The device node type for the new device node.
   @param  NodeSubType                The device node sub-type for the new device node.
