@@ -2,7 +2,7 @@
   X.509 Certificate Handler Wrapper Implementation which does not provide
   real capabilities.
 
-Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -173,6 +173,32 @@ X509VerifyCert (
   IN  UINTN        CertSize,
   IN  CONST UINT8  *CACert,
   IN  UINTN        CACertSize
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
+  Retrieve the TBSCertificate from one given X.509 certificate.
+
+  Return FALSE to indicate this interface is not supported.
+
+  @param[in]      Cert         Pointer to the given DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     TBSCert      DER-Encoded To-Be-Signed certificate.
+  @param[out]     TBSCertSize  Size of the TBS certificate in bytes.
+
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetTBSCert (
+  IN  CONST UINT8  *Cert,
+  IN  UINTN        CertSize,
+  OUT UINT8        **TBSCert,
+  OUT UINTN        *TBSCertSize
   )
 {
   ASSERT (FALSE);

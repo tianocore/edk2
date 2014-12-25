@@ -1907,6 +1907,32 @@ X509StackFree (
   );
 
 /**
+  Retrieve the TBSCertificate from one given X.509 certificate.
+
+  @param[in]      Cert         Pointer to the given DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     TBSCert      DER-Encoded To-Be-Signed certificate.
+  @param[out]     TBSCertSize  Size of the TBS certificate in bytes.
+
+  If Cert is NULL, then return FALSE.
+  If TBSCert is NULL, then return FALSE.
+  If TBSCertSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @retval  TRUE   The TBSCertificate was retrieved successfully.
+  @retval  FALSE  Invalid X.509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetTBSCert (
+  IN  CONST UINT8  *Cert,
+  IN  UINTN        CertSize,
+  OUT UINT8        **TBSCert,
+  OUT UINTN        *TBSCertSize
+  );
+
+/**
   Get the signer's certificates from PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
@@ -2067,6 +2093,7 @@ AuthenticodeVerify (
   signature.
 
   If AuthData is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
 
   @param[in]  AuthData     Pointer to the Authenticode Signature retrieved from signed
                            PE/COFF image to be verified.

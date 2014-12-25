@@ -852,6 +852,8 @@ IsCertHashFoundInDatabase (
   UINT8               CertDigest[MAX_DIGEST_SIZE];
   UINT8               *DbxCertHash;
   UINTN               SiglistHeaderSize;
+  UINT8               *TBSCert;
+  UINTN               TBSCertSize;
 
   IsFound  = FALSE;
   DbxList  = SignatureList;
@@ -859,8 +861,16 @@ IsCertHashFoundInDatabase (
   HashCtx  = NULL;
   HashAlg  = HASHALG_MAX;
 
-  ASSERT (RevocationTime != NULL);
-  ASSERT (DbxList != NULL);
+  if ((RevocationTime == NULL) || (DbxList == NULL)) {
+    return FALSE;
+  }
+
+  //
+  // Retrieve the TBSCertificate from the X.509 Certificate.
+  //
+  if (!X509GetTBSCert (Certificate, CertSize, &TBSCert, &TBSCertSize)) {
+    return FALSE;
+  }
 
   while ((DbxSize > 0) && (SignatureListSize >= DbxList->SignatureListSize)) {
     //
@@ -879,7 +889,7 @@ IsCertHashFoundInDatabase (
     }
 
     //
-    // Calculate the hash value of current db certificate for comparision.
+    // Calculate the hash value of current TBSCertificate for comparision.
     //
     if (mHash[HashAlg].GetContextSize == NULL) {
       goto Done;
@@ -893,7 +903,7 @@ IsCertHashFoundInDatabase (
     if (!Status) {
       goto Done;
     }
-    Status = mHash[HashAlg].HashUpdate (HashCtx, Certificate, CertSize);
+    Status = mHash[HashAlg].HashUpdate (HashCtx, TBSCert, TBSCertSize);
     if (!Status) {
       goto Done;
     }

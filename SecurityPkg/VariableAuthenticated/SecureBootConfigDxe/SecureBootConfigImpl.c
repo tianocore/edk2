@@ -1073,11 +1073,20 @@ CalculateCertHash (
   BOOLEAN                   Status;
   VOID                      *HashCtx;
   UINTN                     CtxSize;
+  UINT8                     *TBSCert;
+  UINTN                     TBSCertSize;
 
   HashCtx = NULL;
   Status  = FALSE;
 
   if (HashAlg >= HASHALG_MAX) {
+    return FALSE;
+  }
+
+  //
+  // Retrieve the TBSCertificate for Hash Calculation.
+  //
+  if (!X509GetTBSCert (CertData, CertSize, &TBSCert, &TBSCertSize)) {
     return FALSE;
   }
 
@@ -1099,7 +1108,7 @@ CalculateCertHash (
   //
   // 3. Calculate the hash.
   //
-  Status  = mHash[HashAlg].HashUpdate (HashCtx, CertData, CertSize);
+  Status  = mHash[HashAlg].HashUpdate (HashCtx, TBSCert, TBSCertSize);
   if (!Status) {
     goto Done;
   }
