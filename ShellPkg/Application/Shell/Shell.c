@@ -101,6 +101,48 @@ TrimSpaces(
 }
 
 /**
+  Parse for the next instance of one string within another string. Can optionally make sure that 
+  the string was not escaped (^ character) per the shell specification.
+
+  @param[in] SourceString             The string to search within
+  @param[in] FindString               The string to look for
+  @param[in] CheckForEscapeCharacter  TRUE to skip escaped instances of FinfString, otherwise will return even escaped instances
+**/
+CHAR16*
+EFIAPI
+FindNextInstance(
+  IN CONST CHAR16   *SourceString,
+  IN CONST CHAR16   *FindString,
+  IN CONST BOOLEAN  CheckForEscapeCharacter
+  )
+{
+  CHAR16 *Temp;
+  if (SourceString == NULL) {
+    return (NULL);
+  }
+  Temp = StrStr(SourceString, FindString);
+
+  //
+  // If nothing found, or we dont care about escape characters
+  //
+  if (Temp == NULL || !CheckForEscapeCharacter) {
+    return (Temp);
+  }
+
+  //
+  // If we found an escaped character, try again on the remainder of the string
+  //
+  if ((Temp > (SourceString)) && *(Temp-1) == L'^') {
+    return FindNextInstance(Temp+1, FindString, CheckForEscapeCharacter);
+  }
+
+  //
+  // we found the right character
+  //
+  return (Temp);
+}
+
+/**
   Find a command line contains a split operation
 
   @param[in] CmdLine      The command line to parse.
@@ -142,7 +184,39 @@ ContainsSplit(
   )
 {
   CONST CHAR16 *TempSpot;
-  TempSpot = FindSplit(CmdLine);
+  CONST CHAR16 *FirstQuote;
+  CONST CHAR16 *SecondQuote;
+
+  FirstQuote    = FindNextInstance (CmdLine, L"\"", TRUE);
+  SecondQuote   = NULL;
+  TempSpot      = FindSplit(CmdLine);
+
+  if (FirstQuote == NULL    || 
+      TempSpot == NULL      || 
+      TempSpot == CHAR_NULL || 
+      FirstQuote > TempSpot
+      ) {
+    return (BOOLEAN) ((TempSpot != NULL) && (*TempSpot != CHAR_NULL));
+  }
+
+  while ((TempSpot != NULL) && (*TempSpot != CHAR_NULL)) {
+    if (FirstQuote == NULL || FirstQuote > TempSpot) {
+      break;
+    }    
+    SecondQuote = FindNextInstance (FirstQuote + 1, L"\"", TRUE);
+    if (SecondQuote == NULL) {
+      break;
+    }
+    if (SecondQuote < TempSpot) {
+      FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
+      continue;
+    } else {
+      FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
+      TempSpot = FindSplit(TempSpot + 1);
+      continue;
+    } 
+  }
+  
   return (BOOLEAN) ((TempSpot != NULL) && (*TempSpot != CHAR_NULL));
 }
 
@@ -1230,48 +1304,6 @@ ShellConvertAlias(
     return (EFI_OUT_OF_RESOURCES);
   }
   return (EFI_SUCCESS);
-}
-
-/**
-  Parse for the next instance of one string within another string. Can optionally make sure that 
-  the string was not escaped (^ character) per the shell specification.
-
-  @param[in] SourceString             The string to search within
-  @param[in] FindString               The string to look for
-  @param[in] CheckForEscapeCharacter  TRUE to skip escaped instances of FinfString, otherwise will return even escaped instances
-**/
-CHAR16*
-EFIAPI
-FindNextInstance(
-  IN CONST CHAR16   *SourceString,
-  IN CONST CHAR16   *FindString,
-  IN CONST BOOLEAN  CheckForEscapeCharacter
-  )
-{
-  CHAR16 *Temp;
-  if (SourceString == NULL) {
-    return (NULL);
-  }
-  Temp = StrStr(SourceString, FindString);
-
-  //
-  // If nothing found, or we dont care about escape characters
-  //
-  if (Temp == NULL || !CheckForEscapeCharacter) {
-    return (Temp);
-  }
-
-  //
-  // If we found an escaped character, try again on the remainder of the string
-  //
-  if ((Temp > (SourceString)) && *(Temp-1) == L'^') {
-    return FindNextInstance(Temp+1, FindString, CheckForEscapeCharacter);
-  }
-
-  //
-  // we found the right character
-  //
-  return (Temp);
 }
 
 /**
