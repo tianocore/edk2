@@ -143,6 +143,53 @@ FindNextInstance(
 }
 
 /**
+  Check whether the string between a pair of % is a valid envifronment variable name.
+
+  @param[in] BeginPercent       pointer to the first percent.
+  @param[in] EndPercent          pointer to the last percent.
+
+  @retval TRUE                          is a valid environment variable name.
+  @retval FALSE                         is NOT a valid environment variable name.
+**/
+BOOLEAN
+IsValidEnvironmentVariableName(
+  IN CONST CHAR16     *BeginPercent,
+  IN CONST CHAR16     *EndPercent
+  )
+{
+  CONST CHAR16    *Walker;
+  
+  Walker = NULL;
+
+  ASSERT (BeginPercent != NULL);
+  ASSERT (EndPercent != NULL);
+  ASSERT (BeginPercent < EndPercent);
+  
+  if ((BeginPercent + 1) == EndPercent) {
+    return FALSE;
+  }
+
+  for (Walker = BeginPercent + 1; Walker < EndPercent; Walker++) {
+    if (
+        (*Walker >= L'0' && *Walker <= L'9') ||
+        (*Walker >= L'A' && *Walker <= L'Z') ||
+        (*Walker >= L'a' && *Walker <= L'z') ||
+        (*Walker == L'_')
+      ) {
+      if (Walker == BeginPercent + 1 && (*Walker >= L'0' && *Walker <= L'9')) {
+        return FALSE;
+      } else {
+        continue;
+      }
+    } else {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
   Find a command line contains a split operation
 
   @param[in] CmdLine      The command line to parse.
@@ -1355,14 +1402,17 @@ StripUnreplacedEnvironmentVariables(
     }
     ASSERT(FirstPercent < FirstQuote);
     if (SecondPercent < FirstQuote) {
-      FirstPercent[0] = L'\"';
-      SecondPercent[0] = L'\"';
-
-      //
-      // We need to remove from FirstPercent to SecondPercent
-      //
-      CopyMem(FirstPercent + 1, SecondPercent, StrSize(SecondPercent));
-      CurrentLocator = FirstPercent + 2;
+      if (IsValidEnvironmentVariableName(FirstPercent, SecondPercent)) {
+        //
+        // We need to remove from FirstPercent to SecondPercent
+        //
+        CopyMem(FirstPercent, SecondPercent + 1, StrSize(SecondPercent + 1));
+        //
+        // dont need to update the locator.  both % characters are gone.
+        //
+      } else {
+        CurrentLocator = SecondPercent + 1;
+      }
       continue;
     }
     ASSERT(FirstQuote < SecondPercent);
