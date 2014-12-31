@@ -3370,10 +3370,10 @@ GetFvbInfoByAddress (
   UINTN                                   Index;
   EFI_PHYSICAL_ADDRESS                    FvbBaseAddress;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *Fvb;
-  EFI_FIRMWARE_VOLUME_HEADER              *FwVolHeader;
   EFI_FVB_ATTRIBUTES_2                    Attributes;
- 
-  Fvb = NULL;
+  UINTN                                   BlockSize;
+  UINTN                                   NumberOfBlocks;
+
   HandleBuffer = NULL;
 
   //
@@ -3400,9 +3400,9 @@ GetFvbInfoByAddress (
     //
     Status = Fvb->GetAttributes (Fvb, &Attributes);
     if (EFI_ERROR (Status) || ((Attributes & EFI_FVB2_WRITE_STATUS) == 0)) {
-      continue;     
+      continue;
     }
-    
+
     //
     // Compare the address and select the right one.
     //
@@ -3411,8 +3411,15 @@ GetFvbInfoByAddress (
       continue;
     }
 
-    FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
-    if ((Address >= FvbBaseAddress) && (Address < (FvbBaseAddress + FwVolHeader->FvLength))) {
+    //
+    // Assume one FVB has one type of BlockSize.
+    //
+    Status = Fvb->GetBlockSize (Fvb, 0, &BlockSize, &NumberOfBlocks);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if ((Address >= FvbBaseAddress) && (Address < (FvbBaseAddress + BlockSize * NumberOfBlocks))) {
       if (FvbHandle != NULL) {
         *FvbHandle  = HandleBuffer[Index];
       }
