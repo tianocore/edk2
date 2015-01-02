@@ -173,6 +173,9 @@
 
   gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0
 
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform

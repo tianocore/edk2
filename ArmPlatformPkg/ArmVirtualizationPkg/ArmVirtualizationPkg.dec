@@ -53,3 +53,6 @@
   # PcdArmPsciMethod == 2 : use SMC
   #
   gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0|UINT32|0x00000003
+
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0|UINT64|0x00000004
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0|UINT64|0x00000005

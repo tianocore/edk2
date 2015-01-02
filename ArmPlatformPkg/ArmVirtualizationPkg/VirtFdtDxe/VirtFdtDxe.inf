@@ -47,6 +47,8 @@
 [Pcd]
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress
   gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress
+  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
