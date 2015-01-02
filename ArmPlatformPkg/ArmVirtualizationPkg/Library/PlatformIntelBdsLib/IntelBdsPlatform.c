@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "IntelBdsPlatform.h"
 
+#include <Library/QemuBootOrderLib.h>
+
 ///
 /// Predefined platform default time out value
 ///
@@ -305,6 +307,14 @@ PlatformBdsPolicyBehavior (
 
   BdsLibConnectAll ();
   BdsLibEnumerateAllBootOption (BootOptionList);
+
+  SetBootOrderFromQemu (BootOptionList);
+  //
+  // The BootOrder variable may have changed, reload the in-memory list with
+  // it.
+  //
+  BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
+
   PlatformBdsEnterFrontPage (gPlatformBootTimeOutDefault, TRUE);
 }
 

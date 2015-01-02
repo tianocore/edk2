@@ -40,6 +40,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -51,6 +52,7 @@
   UefiBootServicesTableLib
   PcdLib
   GenericBdsLib
+  QemuBootOrderLib
 
 [Guids]
   gArmGlobalVariableGuid

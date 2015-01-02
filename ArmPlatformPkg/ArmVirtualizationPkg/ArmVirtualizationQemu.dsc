@@ -54,6 +54,7 @@
   GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   PlatformBdsLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+  QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
 !endif
 
 [LibraryClasses.common.UEFI_DRIVER]
@@ -78,6 +79,9 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|FALSE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|TRUE
+
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|FALSE
