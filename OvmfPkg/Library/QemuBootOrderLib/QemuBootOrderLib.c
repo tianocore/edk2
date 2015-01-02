@@ -128,7 +128,7 @@ SubstringEq (
 /**
 
   Parse a comma-separated list of hexadecimal integers into the elements of an
-  UINT32 array.
+  UINT64 array.
 
   Whitespace, "0x" prefixes, leading or trailing commas, sequences of commas,
   or an empty string are not allowed; they are rejected.
@@ -168,12 +168,12 @@ STATIC
 RETURN_STATUS
 ParseUnitAddressHexList (
   IN      SUBSTRING  UnitAddress,
-  OUT     UINT32     *Result,
+  OUT     UINT64     *Result,
   IN OUT  UINTN      *NumResults
   )
 {
   UINTN         Entry;    // number of entry currently being parsed
-  UINT32        EntryVal; // value being constructed for current entry
+  UINT64        EntryVal; // value being constructed for current entry
   CHAR8         PrevChr;  // UnitAddress character previously checked
   UINTN         Pos;      // current position within UnitAddress
   RETURN_STATUS Status;
@@ -193,10 +193,10 @@ ParseUnitAddressHexList (
           -1;
 
     if (Val >= 0) {
-      if (EntryVal > 0xFFFFFFF) {
+      if (EntryVal > 0xFFFFFFFFFFFFFFFull) {
         return RETURN_INVALID_PARAMETER;
       }
-      EntryVal = (EntryVal << 4) | Val;
+      EntryVal = LShiftU64 (EntryVal, 4) | Val;
     } else if (Chr == ',') {
       if (PrevChr == ',') {
         return RETURN_INVALID_PARAMETER;
@@ -578,7 +578,7 @@ TranslatePciOfwNodes (
   IN OUT  UINTN          *TranslatedSize
   )
 {
-  UINT32 PciDevFun[2];
+  UINT64 PciDevFun[2];
   UINTN  NumEntries;
   UINTN  Written;
 
@@ -622,8 +622,8 @@ TranslatePciOfwNodes (
     //                                                ^
     //                                                fixed LUN
     //
-    UINT32 Secondary;
-    UINT32 Slave;
+    UINT64 Secondary;
+    UINT64 Slave;
 
     NumEntries = 1;
     if (ParseUnitAddressHexList (
@@ -645,7 +645,7 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/Ata(%a,%a,0x0)",
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Ata(%a,%a,0x0)",
       PciDevFun[0],
       PciDevFun[1],
       Secondary ? "Secondary" : "Primary",
@@ -672,7 +672,7 @@ TranslatePciOfwNodes (
     //                                    ^
     //                                    ACPI UID
     //
-    UINT32 AcpiUid;
+    UINT64 AcpiUid;
 
     NumEntries = 1;
     if (ParseUnitAddressHexList (
@@ -688,7 +688,7 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/Floppy(0x%x)",
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Floppy(0x%Lx)",
       PciDevFun[0],
       PciDevFun[1],
       AcpiUid
@@ -715,7 +715,7 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/HD(",
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/HD(",
       PciDevFun[0],
       PciDevFun[1]
       );
@@ -742,7 +742,7 @@ TranslatePciOfwNodes (
     //   PciRoot(0x0)/Pci(0x7,0x3)/Scsi(0x2,0x3)
     //                                -- if PCI function is present and nonzero
     //
-    UINT32 TargetLun[2];
+    UINT64 TargetLun[2];
 
     TargetLun[1] = 0;
     NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
@@ -758,7 +758,7 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)/Scsi(0x%x,0x%x)",
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Scsi(0x%Lx,0x%Lx)",
       PciDevFun[0],
       PciDevFun[1],
       TargetLun[0],
@@ -781,7 +781,7 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%x,0x%x)",
+      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)",
       PciDevFun[0],
       PciDevFun[1]
       );
