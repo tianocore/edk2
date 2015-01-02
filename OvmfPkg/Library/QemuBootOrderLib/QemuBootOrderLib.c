@@ -23,7 +23,9 @@
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/QemuBootOrderLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/VirtioMmioTransport.h>
 
 
 /**
@@ -36,6 +38,7 @@
   Numbers of nodes in OpenFirmware device paths that are required and examined.
 **/
 #define REQUIRED_PCI_OFW_NODES  2
+#define REQUIRED_MMIO_OFW_NODES 1
 #define EXAMINED_OFW_NODES      4
 
 
@@ -801,6 +804,182 @@ TranslatePciOfwNodes (
 }
 
 
+//
+// A type providing easy raw access to the base address of a virtio-mmio
+// transport.
+//
+typedef union {
+  UINT64 Uint64;
+  UINT8  Raw[8];
+} VIRTIO_MMIO_BASE_ADDRESS;
+
+
+/**
+
+  Translate an MMIO-like array of OpenFirmware device nodes to a UEFI device
+  path fragment.
+
+  @param[in]     OfwNode         Array of OpenFirmware device nodes to
+                                 translate, constituting the beginning of an
+                                 OpenFirmware device path.
+
+  @param[in]     NumNodes        Number of elements in OfwNode.
+
+  @param[out]    Translated      Destination array receiving the UEFI path
+                                 fragment, allocated by the caller. If the
+                                 return value differs from RETURN_SUCCESS, its
+                                 contents is indeterminate.
+
+  @param[in out] TranslatedSize  On input, the number of CHAR16's in
+                                 Translated. On RETURN_SUCCESS this parameter
+                                 is assigned the number of non-NUL CHAR16's
+                                 written to Translated. In case of other return
+                                 values, TranslatedSize is indeterminate.
+
+
+  @retval RETURN_SUCCESS           Translation successful.
+
+  @retval RETURN_BUFFER_TOO_SMALL  The translation does not fit into the number
+                                   of bytes provided.
+
+  @retval RETURN_UNSUPPORTED       The array of OpenFirmware device nodes can't
+                                   be translated in the current implementation.
+
+**/
+STATIC
+RETURN_STATUS
+TranslateMmioOfwNodes (
+  IN      CONST OFW_NODE *OfwNode,
+  IN      UINTN          NumNodes,
+  OUT     CHAR16         *Translated,
+  IN OUT  UINTN          *TranslatedSize
+  )
+{
+  VIRTIO_MMIO_BASE_ADDRESS VirtioMmioBase;
+  CHAR16                   VenHwString[60 + 1];
+  UINTN                    NumEntries;
+  UINTN                    Written;
+
+  //
+  // Get the base address of the virtio-mmio transport.
+  //
+  if (NumNodes < REQUIRED_MMIO_OFW_NODES ||
+      !SubstringEq (OfwNode[0].DriverName, "virtio-mmio")
+      ) {
+    return RETURN_UNSUPPORTED;
+  }
+  NumEntries = 1;
+  if (ParseUnitAddressHexList (
+        OfwNode[0].UnitAddress,
+        &VirtioMmioBase.Uint64,
+        &NumEntries
+        ) != RETURN_SUCCESS
+      ) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  UnicodeSPrintAsciiFormat (VenHwString, sizeof VenHwString,
+    "VenHw(%g,%02X%02X%02X%02X%02X%02X%02X%02X)", &gVirtioMmioTransportGuid,
+    VirtioMmioBase.Raw[0], VirtioMmioBase.Raw[1], VirtioMmioBase.Raw[2],
+    VirtioMmioBase.Raw[3], VirtioMmioBase.Raw[4], VirtioMmioBase.Raw[5],
+    VirtioMmioBase.Raw[6], VirtioMmioBase.Raw[7]);
+
+  if (NumNodes >= 2 &&
+      SubstringEq (OfwNode[1].DriverName, "disk")) {
+    //
+    // OpenFirmware device path (virtio-blk disk):
+    //
+    //   /virtio-mmio@000000000a003c00/disk@0,0
+    //                ^                     ^ ^
+    //                |                     fixed
+    //                base address of virtio-mmio register block
+    //
+    // UEFI device path prefix:
+    //
+    //   <VenHwString>/HD(
+    //
+    Written = UnicodeSPrintAsciiFormat (
+                Translated,
+                *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+                "%s/HD(",
+                VenHwString
+                );
+  } else if (NumNodes >= 3 &&
+             SubstringEq (OfwNode[1].DriverName, "channel") &&
+             SubstringEq (OfwNode[2].DriverName, "disk")) {
+    //
+    // OpenFirmware device path (virtio-scsi disk):
+    //
+    //   /virtio-mmio@000000000a003a00/channel@0/disk@2,3
+    //                ^                        ^      ^ ^
+    //                |                        |      | LUN
+    //                |                        |      target
+    //                |                        channel (unused, fixed 0)
+    //                base address of virtio-mmio register block
+    //
+    // UEFI device path prefix:
+    //
+    //   <VenHwString>/Scsi(0x2,0x3)
+    //
+    UINT64 TargetLun[2];
+
+    TargetLun[1] = 0;
+    NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
+    if (ParseUnitAddressHexList (
+          OfwNode[2].UnitAddress,
+          TargetLun,
+          &NumEntries
+          ) != RETURN_SUCCESS
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+                Translated,
+                *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+                "%s/Scsi(0x%Lx,0x%Lx)",
+                VenHwString,
+                TargetLun[0],
+                TargetLun[1]
+                );
+  } else if (NumNodes >= 2 &&
+             SubstringEq (OfwNode[1].DriverName, "ethernet-phy")) {
+    //
+    // OpenFirmware device path (virtio-net NIC):
+    //
+    //   /virtio-mmio@000000000a003e00/ethernet-phy@0
+    //                ^                             ^
+    //                |                             fixed
+    //                base address of virtio-mmio register block
+    //
+    // UEFI device path prefix (dependent on presence of nonzero PCI function):
+    //
+    //   <VenHwString>/MAC(
+    //
+    Written = UnicodeSPrintAsciiFormat (
+                Translated,
+                *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+                "%s/MAC(",
+                VenHwString
+                );
+  } else {
+    return RETURN_UNSUPPORTED;
+  }
+
+  //
+  // There's no way to differentiate between "completely used up without
+  // truncation" and "truncated", so treat the former as the latter, and return
+  // success only for "some room left unused".
+  //
+  if (Written + 1 < *TranslatedSize) {
+    *TranslatedSize = Written;
+    return RETURN_SUCCESS;
+  }
+
+  return RETURN_BUFFER_TOO_SMALL;
+}
+
+
 /**
 
   Translate an array of OpenFirmware device nodes to a UEFI device path
@@ -848,6 +1027,11 @@ TranslateOfwNodes (
 
   if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
     Status = TranslatePciOfwNodes (OfwNode, NumNodes, Translated,
+               TranslatedSize);
+  }
+  if (Status == RETURN_UNSUPPORTED &&
+      FeaturePcdGet (PcdQemuBootOrderMmioTranslation)) {
+    Status = TranslateMmioOfwNodes (OfwNode, NumNodes, Translated,
                TranslatedSize);
   }
   return Status;
@@ -1069,7 +1253,7 @@ Exit:
 
   This function should accommodate any further policy changes in "boot option
   survival". Currently we're adding back everything that starts with neither
-  PciRoot() nor HD().
+  PciRoot() nor HD() nor a virtio-mmio VenHw() node.
 
   @param[in,out] BootOrder     The structure holding the boot order to
                                complete. The caller is responsible for
@@ -1140,6 +1324,18 @@ BootOrderComplete (
             // fragments
             //
             Keep = !FeaturePcdGet (PcdQemuBootOrderPciTranslation);
+          }
+        } else if (DevicePathType(FirstNode) == HARDWARE_DEVICE_PATH &&
+                   DevicePathSubType(FirstNode) == HW_VENDOR_DP) {
+          VENDOR_DEVICE_PATH *VenHw;
+
+          VenHw = (VENDOR_DEVICE_PATH *)FirstNode;
+          if (CompareGuid (&VenHw->Guid, &gVirtioMmioTransportGuid)) {
+            //
+            // drop virtio-mmio if we enabled the user to select boot options
+            // referencing such device paths
+            //
+            Keep = !FeaturePcdGet (PcdQemuBootOrderMmioTranslation);
           }
         }
 

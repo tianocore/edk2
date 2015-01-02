@@ -48,9 +48,12 @@
   BaseLib
   PrintLib
   DevicePathLib
+  BaseMemoryLib
 
 [Guids]
   gEfiGlobalVariableGuid
+  gVirtioMmioTransportGuid
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation
