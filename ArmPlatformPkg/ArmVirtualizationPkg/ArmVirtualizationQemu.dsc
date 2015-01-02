@@ -42,6 +42,7 @@
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+  QemuFwCfgLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
 
   ArmPlatformLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationPlatformLib/ArmVirtualizationPlatformLib.inf
   ArmPlatformSysConfigLib|ArmPlatformPkg/Library/ArmPlatformSysConfigLibNull/ArmPlatformSysConfigLibNull.inf
