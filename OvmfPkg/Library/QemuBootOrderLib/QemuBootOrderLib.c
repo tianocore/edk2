@@ -1,7 +1,7 @@
 /** @file
   Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file.
 
-  Copyright (C) 2012 - 2013, Red Hat, Inc.
+  Copyright (C) 2012 - 2014, Red Hat, Inc.
   Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -22,6 +22,7 @@
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/QemuBootOrderLib.h>
 #include <Guid/GlobalVariable.h>
 
 

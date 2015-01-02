@@ -2,7 +2,7 @@
   Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file --
   include file.
 
-  Copyright (C) 2012, Red Hat, Inc.
+  Copyright (C) 2012-2014, Red Hat, Inc.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -13,6 +13,8 @@
   WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
+#ifndef __QEMU_BOOT_ORDER_LIB_H__
+#define __QEMU_BOOT_ORDER_LIB_H__
 
 #include <Uefi/UefiBaseType.h>
 #include <Base.h>
@@ -51,3 +53,5 @@ RETURN_STATUS
 SetBootOrderFromQemu (
   IN  CONST LIST_ENTRY *BootOptionList
   );
+
+#endif

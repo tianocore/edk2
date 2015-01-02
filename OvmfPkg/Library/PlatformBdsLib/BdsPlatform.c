@@ -13,7 +13,7 @@
 **/
 
 #include "BdsPlatform.h"
-#include "QemuBootOrder.h"
+#include <Library/QemuBootOrderLib.h>
 
 
 //
