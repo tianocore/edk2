@@ -51,3 +51,6 @@
 
 [Guids]
   gEfiGlobalVariableGuid
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation

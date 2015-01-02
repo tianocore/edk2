@@ -35,8 +35,8 @@
 /**
   Numbers of nodes in OpenFirmware device paths that are required and examined.
 **/
-#define REQUIRED_OFW_NODES 2
-#define EXAMINED_OFW_NODES 4
+#define REQUIRED_PCI_OFW_NODES  2
+#define EXAMINED_OFW_NODES      4
 
 
 /**
@@ -539,7 +539,7 @@ ParseOfwNode (
 
 /**
 
-  Translate an array of OpenFirmware device nodes to a UEFI device path
+  Translate a PCI-like array of OpenFirmware device nodes to a UEFI device path
   fragment.
 
   @param[in]     OfwNode         Array of OpenFirmware device nodes to
@@ -571,7 +571,7 @@ ParseOfwNode (
 **/
 STATIC
 RETURN_STATUS
-TranslateOfwNodes (
+TranslatePciOfwNodes (
   IN      CONST OFW_NODE *OfwNode,
   IN      UINTN          NumNodes,
   OUT     CHAR16         *Translated,
@@ -585,7 +585,7 @@ TranslateOfwNodes (
   //
   // Get PCI device and optional PCI function. Assume a single PCI root.
   //
-  if (NumNodes < REQUIRED_OFW_NODES ||
+  if (NumNodes < REQUIRED_PCI_OFW_NODES ||
       !SubstringEq (OfwNode[0].DriverName, "pci")
       ) {
     return RETURN_UNSUPPORTED;
@@ -800,6 +800,58 @@ TranslateOfwNodes (
   return RETURN_BUFFER_TOO_SMALL;
 }
 
+
+/**
+
+  Translate an array of OpenFirmware device nodes to a UEFI device path
+  fragment.
+
+  @param[in]     OfwNode         Array of OpenFirmware device nodes to
+                                 translate, constituting the beginning of an
+                                 OpenFirmware device path.
+
+  @param[in]     NumNodes        Number of elements in OfwNode.
+
+  @param[out]    Translated      Destination array receiving the UEFI path
+                                 fragment, allocated by the caller. If the
+                                 return value differs from RETURN_SUCCESS, its
+                                 contents is indeterminate.
+
+  @param[in out] TranslatedSize  On input, the number of CHAR16's in
+                                 Translated. On RETURN_SUCCESS this parameter
+                                 is assigned the number of non-NUL CHAR16's
+                                 written to Translated. In case of other return
+                                 values, TranslatedSize is indeterminate.
+
+
+  @retval RETURN_SUCCESS           Translation successful.
+
+  @retval RETURN_BUFFER_TOO_SMALL  The translation does not fit into the number
+                                   of bytes provided.
+
+  @retval RETURN_UNSUPPORTED       The array of OpenFirmware device nodes can't
+                                   be translated in the current implementation.
+
+**/
+STATIC
+RETURN_STATUS
+TranslateOfwNodes (
+  IN      CONST OFW_NODE *OfwNode,
+  IN      UINTN          NumNodes,
+  OUT     CHAR16         *Translated,
+  IN OUT  UINTN          *TranslatedSize
+  )
+{
+  RETURN_STATUS Status;
+
+  Status = RETURN_UNSUPPORTED;
+
+  if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
+    Status = TranslatePciOfwNodes (OfwNode, NumNodes, Translated,
+               TranslatedSize);
+  }
+  return Status;
+}
 
 /**
 
@@ -1083,9 +1135,11 @@ BootOrderComplete (
           if ((Acpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST &&
               EISA_ID_TO_NUM (Acpi->HID) == 0x0a03) {
             //
-            // drop PciRoot()
+            // drop PciRoot() if we enabled the user to select PCI-like boot
+            // options, by providing translation for such OFW device path
+            // fragments
             //
-            Keep = FALSE;
+            Keep = !FeaturePcdGet (PcdQemuBootOrderPciTranslation);
           }
         }
 
