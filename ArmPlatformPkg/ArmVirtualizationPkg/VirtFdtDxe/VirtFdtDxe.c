@@ -27,6 +27,7 @@
 #include <libfdt.h>
 
 #include <Guid/Fdt.h>
+#include <Guid/VirtioMmioTransport.h>
 
 #pragma pack (1)
 typedef struct {
@@ -209,7 +210,8 @@ InitializeVirtFdtDxe (
         break;
       }
 
-      CopyMem (&DevicePath->Vendor.Guid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
+      CopyMem (&DevicePath->Vendor.Guid, &gVirtioMmioTransportGuid,
+        sizeof (EFI_GUID));
       DevicePath->PhysBase = RegBase;
       SetDevicePathNodeLength (&DevicePath->Vendor,
                                sizeof (*DevicePath) - sizeof (DevicePath->End));

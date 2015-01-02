@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VirtFdtDxe
-  FILE_GUID                      = 837DCA9E-E874-4D82-B29A-23FE0E23D1E2
+  FILE_GUID                      = 9AD7DCB4-E6EC-472E-96BF-81C219A3F77E
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
@@ -43,6 +43,7 @@
 
 [Guids]
   gFdtTableGuid
+  gVirtioMmioTransportGuid
 
 [Pcd]
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress
