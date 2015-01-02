@@ -32,4 +32,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/GlobalVariable.h>
 
+VOID
+PlatformBdsEnterFrontPage (
+  IN UINT16                 TimeoutDefault,
+  IN BOOLEAN                ConnectAllHappened
+  );
+
 #endif // _INTEL_BDS_PLATFORM_H

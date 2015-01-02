@@ -177,6 +177,8 @@
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
 
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform

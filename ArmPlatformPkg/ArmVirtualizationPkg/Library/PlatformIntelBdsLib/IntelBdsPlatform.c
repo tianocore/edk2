@@ -302,6 +302,10 @@ PlatformBdsPolicyBehavior (
 
   Status = PlatformBdsConnectConsole ();
   ASSERT_EFI_ERROR (Status);
+
+  BdsLibConnectAll ();
+  BdsLibEnumerateAllBootOption (BootOptionList);
+  PlatformBdsEnterFrontPage (gPlatformBootTimeOutDefault, TRUE);
 }
 
 /**
