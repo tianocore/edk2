@@ -305,6 +305,11 @@ PlatformBdsPolicyBehavior (
   Status = PlatformBdsConnectConsole ();
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Process QEMU's -kernel command line option
+  //
+  TryRunningQemuKernel ();
+
   BdsLibConnectAll ();
   BdsLibEnumerateAllBootOption (BootOptionList);
 

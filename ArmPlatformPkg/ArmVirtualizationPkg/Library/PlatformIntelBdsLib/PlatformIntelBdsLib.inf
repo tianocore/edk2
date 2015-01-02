@@ -33,6 +33,7 @@
 [Sources]
   IntelBdsPlatform.c
   IntelBdsPlatform.h
+  QemuKernel.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -53,9 +54,15 @@
   PcdLib
   GenericBdsLib
   QemuBootOrderLib
+  QemuFwCfgLib
+  PrintLib
+  UefiRuntimeServicesTableLib
 
 [Guids]
   gArmGlobalVariableGuid
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
@@ -65,3 +72,6 @@
 [Protocols]
   gEfiDevicePathFromTextProtocolGuid
   gEfiDevicePathToTextProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
