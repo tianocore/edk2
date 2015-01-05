@@ -14,7 +14,7 @@
   VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(), 
   SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmFaultTolerantWrite.h>
 #include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmEndOfDxe.h>
+#include <Protocol/SmmVarCheck.h>
 
 #include <Library/SmmServicesTableLib.h>
 
@@ -118,6 +119,10 @@ EFI_SMM_VARIABLE_PROTOCOL      gSmmVariable = {
   SmmVariableSetVariable,
   VariableServiceQueryVariableInfo
 };
+
+EDKII_SMM_VAR_CHECK_PROTOCOL mSmmVarCheck = { VarCheckRegisterSetVariableCheckHandler,
+                                              VarCheckVariablePropertySet,
+                                              VarCheckVariablePropertyGet };
 
 /**
   Return TRUE if ExitBootServices () has been called.
@@ -520,6 +525,7 @@ SmmVariableHandler (
   SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO     *QueryVariableInfo;
   VARIABLE_INFO_ENTRY                              *VariableInfo;
   SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE           *VariableToLock;
+  SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY *CommVariableProperty;
   UINTN                                            InfoSize;
   UINTN                                            NameBufferSize;
   UINTN                                            CommBufferPayloadSize;
@@ -754,6 +760,61 @@ SmmVariableHandler (
                    );
       }
       break;
+    case SMM_VARIABLE_FUNCTION_VAR_CHECK_VARIABLE_PROPERTY_SET:
+      if (mEndOfDxe) {
+        Status = EFI_ACCESS_DENIED;
+      } else {
+        CommVariableProperty = (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY *) SmmVariableFunctionHeader->Data;
+        Status = VarCheckVariablePropertySet (
+                   CommVariableProperty->Name,
+                   &CommVariableProperty->Guid,
+                   &CommVariableProperty->VariableProperty
+                   );
+      }
+      break;
+    case SMM_VARIABLE_FUNCTION_VAR_CHECK_VARIABLE_PROPERTY_GET:
+      if (CommBufferPayloadSize < OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name)) {
+        DEBUG ((EFI_D_ERROR, "VarCheckVariablePropertyGet: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+      //
+      // Copy the input communicate buffer payload to pre-allocated SMM variable buffer payload.
+      //
+      CopyMem (mVariableBufferPayload, SmmVariableFunctionHeader->Data, CommBufferPayloadSize);
+      CommVariableProperty = (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY *) mVariableBufferPayload;
+      if ((UINTN) (~0) - CommVariableProperty->NameSize < OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name)) {
+        //
+        // Prevent InfoSize overflow happen
+        //
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      InfoSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) + CommVariableProperty->NameSize;
+
+      //
+      // SMRAM range check already covered before
+      //
+      if (InfoSize > CommBufferPayloadSize) {
+        DEBUG ((EFI_D_ERROR, "VarCheckVariablePropertyGet: Data size exceed communication buffer size limit!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      if (CommVariableProperty->NameSize < sizeof (CHAR16) || CommVariableProperty->Name[CommVariableProperty->NameSize/sizeof (CHAR16) - 1] != L'\0') {
+        //
+        // Make sure VariableName is A Null-terminated string.
+        //
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      Status = VarCheckVariablePropertyGet (
+                 CommVariableProperty->Name,
+                 &CommVariableProperty->Guid,
+                 &CommVariableProperty->VariableProperty
+                 );
+      CopyMem (SmmVariableFunctionHeader->Data, mVariableBufferPayload, CommBufferPayloadSize);
+      break;
 
     default:
       Status = EFI_UNSUPPORTED;
@@ -911,6 +972,14 @@ VariableServiceInitialize (
                     );
   ASSERT_EFI_ERROR (Status);
 
+  Status = gSmst->SmmInstallProtocolInterface (
+                    &VariableHandle,
+                    &gEdkiiSmmVarCheckProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mSmmVarCheck
+                    );
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Get SMRAM information
   //
@@ -934,7 +1003,7 @@ VariableServiceInitialize (
   mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
 
   mVariableBufferPayloadSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) +
-                               OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) - sizeof (VARIABLE_HEADER);
+                               OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - sizeof (VARIABLE_HEADER);
 
   Status = gSmst->SmmAllocatePool (
                     EfiRuntimeServicesData,

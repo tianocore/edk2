@@ -9,7 +9,7 @@
 #  This external input must be validated carefully to avoid security issues such as 
 #  buffer overflow or integer overflow.
 #
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -44,6 +44,7 @@
   AuthService.c
   AuthService.h
   Measurement.c
+  VarCheck.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -67,6 +68,7 @@
   PlatformSecureLib
   HobLib
   TpmMeasurementLib
+  DevicePathLib
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMES
@@ -76,6 +78,7 @@
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
   gEfiVariableArchProtocolGuid                  ## PRODUCES
   gEdkiiVariableLockProtocolGuid                ## PRODUCES
+  gEdkiiVarCheckProtocolGuid                    ## PRODUCES
 
 
 [Guids]
