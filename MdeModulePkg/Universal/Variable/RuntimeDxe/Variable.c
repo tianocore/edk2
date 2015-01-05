@@ -14,7 +14,7 @@
   VariableServiceGetVariable() and VariableServiceSetVariable() are external API
   to receive datasize and data buffer. The size should be checked carefully.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -55,51 +55,6 @@ BOOLEAN                mEndOfDxe              = FALSE;
 ///
 BOOLEAN                mEnableLocking         = TRUE;
 
-//
-// To prevent name collisions with possible future globally defined variables,
-// other internal firmware data variables that are not defined here must be
-// saved with a unique VendorGuid other than EFI_GLOBAL_VARIABLE or
-// any other GUID defined by the UEFI Specification. Implementations must
-// only permit the creation of variables with a UEFI Specification-defined
-// VendorGuid when these variables are documented in the UEFI Specification.
-//
-GLOBAL_VARIABLE_ENTRY mGlobalVariableList[] = {
-  {EFI_LANG_CODES_VARIABLE_NAME,             VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_LANG_VARIABLE_NAME,                   VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_TIME_OUT_VARIABLE_NAME,               VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_PLATFORM_LANG_CODES_VARIABLE_NAME,    VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_PLATFORM_LANG_VARIABLE_NAME,          VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_CON_IN_VARIABLE_NAME,                 VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_CON_OUT_VARIABLE_NAME,                VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_ERR_OUT_VARIABLE_NAME,                VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_CON_IN_DEV_VARIABLE_NAME,             VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_CON_OUT_DEV_VARIABLE_NAME,            VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_ERR_OUT_DEV_VARIABLE_NAME,            VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_BOOT_ORDER_VARIABLE_NAME,             VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_BOOT_NEXT_VARIABLE_NAME,              VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_BOOT_CURRENT_VARIABLE_NAME,           VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_BOOT_OPTION_SUPPORT_VARIABLE_NAME,    VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_DRIVER_ORDER_VARIABLE_NAME,           VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_HW_ERR_REC_SUPPORT_VARIABLE_NAME,     VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_SETUP_MODE_NAME,                      VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_KEY_EXCHANGE_KEY_NAME,                VARIABLE_ATTRIBUTE_NV_BS_RT_AT},
-  {EFI_PLATFORM_KEY_NAME,                    VARIABLE_ATTRIBUTE_NV_BS_RT_AT},
-  {EFI_SIGNATURE_SUPPORT_NAME,               VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_SECURE_BOOT_MODE_NAME,                VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_KEK_DEFAULT_VARIABLE_NAME,            VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_PK_DEFAULT_VARIABLE_NAME,             VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_DB_DEFAULT_VARIABLE_NAME,             VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_DBX_DEFAULT_VARIABLE_NAME,            VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_DBT_DEFAULT_VARIABLE_NAME,            VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME, VARIABLE_ATTRIBUTE_BS_RT},
-  {EFI_OS_INDICATIONS_VARIABLE_NAME,         VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {EFI_VENDOR_KEYS_VARIABLE_NAME,            VARIABLE_ATTRIBUTE_BS_RT},
-};
-GLOBAL_VARIABLE_ENTRY mGlobalVariableList2[] = {
-  {L"Boot####",                              VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {L"Driver####",                            VARIABLE_ATTRIBUTE_NV_BS_RT},
-  {L"Key####",                               VARIABLE_ATTRIBUTE_NV_BS_RT},
-};
 
 /**
   Routine used to track statistical information about variable usage. 
@@ -2175,63 +2130,6 @@ IsHwErrRecVariable (
 }
 
 /**
-  This code checks if variable guid is global variable guid first.
-  If yes, further check if variable name is in mGlobalVariableList or mGlobalVariableList2 and attributes matched.
-
-  @param[in] VariableName       Pointer to variable name.
-  @param[in] VendorGuid         Variable Vendor Guid.
-  @param[in] Attributes         Attributes of the variable.
-
-  @retval EFI_SUCCESS           Variable is not global variable, or Variable is global variable, variable name is in the lists and attributes matched.
-  @retval EFI_INVALID_PARAMETER Variable is global variable, but variable name is not in the lists or attributes unmatched.
-
-**/
-EFI_STATUS
-EFIAPI
-CheckEfiGlobalVariable (
-  IN CHAR16             *VariableName,
-  IN EFI_GUID           *VendorGuid,
-  IN UINT32             Attributes
-  )
-{
-  UINTN     Index;
-  UINTN     NameLength;
-
-  if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid)){
-    //
-    // Try list 1, exactly match.
-    //
-    for (Index = 0; Index < sizeof (mGlobalVariableList)/sizeof (mGlobalVariableList[0]); Index++) {
-      if ((StrCmp (mGlobalVariableList[Index].Name, VariableName) == 0) &&
-          (Attributes == 0 || Attributes == mGlobalVariableList[Index].Attributes)) {
-        return EFI_SUCCESS;
-      }
-    }
-
-    //
-    // Try list 2.
-    //
-    NameLength = StrLen (VariableName) - 4;
-    for (Index = 0; Index < sizeof (mGlobalVariableList2)/sizeof (mGlobalVariableList2[0]); Index++) {
-      if ((StrLen (VariableName) == StrLen (mGlobalVariableList2[Index].Name)) &&
-          (StrnCmp (mGlobalVariableList2[Index].Name, VariableName, NameLength) == 0) &&
-          IsHexaDecimalDigitCharacter (VariableName[NameLength]) &&
-          IsHexaDecimalDigitCharacter (VariableName[NameLength + 1]) &&
-          IsHexaDecimalDigitCharacter (VariableName[NameLength + 2]) &&
-          IsHexaDecimalDigitCharacter (VariableName[NameLength + 3]) &&
-          (Attributes == 0 || Attributes == mGlobalVariableList2[Index].Attributes)) {
-        return EFI_SUCCESS;
-      }
-    }
-
-    DEBUG ((EFI_D_INFO, "[Variable]: set global variable with invalid variable name or attributes - %g:%s:%x\n", VendorGuid, VariableName, Attributes));
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Mark a variable that will become read-only after leaving the DXE phase of execution.
 
   @param[in] This          The VARIABLE_LOCK_PROTOCOL instance.
@@ -2255,6 +2153,7 @@ VariableLockRequestToLock (
   )
 {
   VARIABLE_ENTRY                  *Entry;
+  CHAR16                          *Name;
 
   if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2273,8 +2172,8 @@ VariableLockRequestToLock (
 
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
-  Entry->Name = (CHAR16 *) (Entry + 1);
-  StrnCpy   (Entry->Name, VariableName, StrLen (VariableName));
+  Name = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
+  StrnCpy   (Name, VariableName, StrLen (VariableName));
   CopyGuid (&Entry->Guid, VendorGuid);
   InsertTailList (&mLockedVariableList, &Entry->Link);
 
@@ -2567,6 +2466,7 @@ VariableServiceSetVariable (
   EFI_PHYSICAL_ADDRESS                Point;
   LIST_ENTRY                          *Link;
   VARIABLE_ENTRY                      *Entry;
+  CHAR16                              *Name;
 
   //
   // Check input parameters.
@@ -2619,12 +2519,7 @@ VariableServiceSetVariable (
     //
     if (StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
-    }  
-  }
-
-  Status = CheckEfiGlobalVariable (VariableName, VendorGuid, Attributes);
-  if (EFI_ERROR (Status)) {
-    return Status;
+    }
   }
 
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
@@ -2653,12 +2548,18 @@ VariableServiceSetVariable (
         ; Link = GetNextNode (&mLockedVariableList, Link)
         ) {
       Entry = BASE_CR (Link, VARIABLE_ENTRY, Link);
-      if (CompareGuid (&Entry->Guid, VendorGuid) && (StrCmp (Entry->Name, VariableName) == 0)) {
+      Name = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
+      if (CompareGuid (&Entry->Guid, VendorGuid) && (StrCmp (Name, VariableName) == 0)) {
         Status = EFI_WRITE_PROTECTED;
         DEBUG ((EFI_D_INFO, "[Variable]: Changing readonly variable after leaving DXE phase - %g:%s\n", VendorGuid, VariableName));
         goto Done;
       }
     }
+  }
+
+  Status = InternalVarCheckSetVariableCheck (VariableName, VendorGuid, Attributes, DataSize, Data);
+  if (EFI_ERROR (Status)) {
+    goto Done;
   }
 
   //
@@ -2678,6 +2579,7 @@ VariableServiceSetVariable (
       // 2. The only attribute differing is EFI_VARIABLE_APPEND_WRITE
       //
       Status = EFI_INVALID_PARAMETER;
+      DEBUG ((EFI_D_INFO, "[Variable]: Rewritten a preexisting variable with different attributes - %g:%s\n", VendorGuid, VariableName));
       goto Done;
     }
   }

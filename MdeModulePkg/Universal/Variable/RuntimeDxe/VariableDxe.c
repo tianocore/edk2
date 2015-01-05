@@ -4,7 +4,7 @@
   and volatile storage space and install variable architecture protocol.
   
 Copyright (C) 2013, Red Hat, Inc.
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,8 +23,14 @@ EFI_HANDLE                     mHandle                    = NULL;
 EFI_EVENT                      mVirtualAddressChangeEvent = NULL;
 EFI_EVENT                      mFtwRegistration           = NULL;
 extern LIST_ENTRY              mLockedVariableList;
+extern LIST_ENTRY              mVarCheckVariableList;
+extern UINT32                  mNumberOfHandler;
+extern VAR_CHECK_SET_VARIABLE_CHECK_HANDLER *mHandlerTable;
 extern BOOLEAN                 mEndOfDxe;
 EDKII_VARIABLE_LOCK_PROTOCOL   mVariableLock              = { VariableLockRequestToLock };
+EDKII_VAR_CHECK_PROTOCOL       mVarCheck                  = { VarCheckRegisterSetVariableCheckHandler,
+                                                              VarCheckVariablePropertySet,
+                                                              VarCheckVariablePropertyGet };
 
 /**
   Return TRUE if ExitBootServices () has been called.
@@ -222,9 +228,8 @@ VariableClassAddressChangeEvent (
   IN VOID                                 *Context
   )
 {
-  LIST_ENTRY     *Link;
-  VARIABLE_ENTRY *Entry;
   EFI_STATUS     Status;
+  UINTN          Index;
 
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
@@ -242,22 +247,15 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.HobVariableBase);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
   EfiConvertPointer (0x0, (VOID **) &mNvVariableCache);  
-
-  //
-  // in the list of locked variables, convert the name pointers first
-  //
-  for ( Link = GetFirstNode (&mLockedVariableList)
-      ; !IsNull (&mLockedVariableList, Link)
-      ; Link = GetNextNode (&mLockedVariableList, Link)
-      ) {
-    Entry = BASE_CR (Link, VARIABLE_ENTRY, Link);
-    Status = EfiConvertPointer (0x0, (VOID **) &Entry->Name);
-    ASSERT_EFI_ERROR (Status);
+  EfiConvertPointer (0x0, (VOID **) &mHandlerTable);
+  for (Index = 0; Index < mNumberOfHandler; Index++) {
+    EfiConvertPointer (0x0, (VOID **) &mHandlerTable[Index]);
   }
-  //
-  // second, convert the list itself using UefiRuntimeLib
-  //
+
   Status = EfiConvertList (0x0, &mLockedVariableList);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = EfiConvertList (0x0, &mVarCheckVariableList);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -438,6 +436,14 @@ VariableServiceInitialize (
                   &mHandle,
                   &gEdkiiVariableLockProtocolGuid,
                   &mVariableLock,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mHandle,
+                  &gEdkiiVarCheckProtocolGuid,
+                  &mVarCheck,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
