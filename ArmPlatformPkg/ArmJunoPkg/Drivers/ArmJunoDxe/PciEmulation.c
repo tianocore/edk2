@@ -547,8 +547,8 @@ PciInstallDevice (
   //
   // Configure PCI config space: OHCI + EHCI
   //
-  Private->ConfigSpace->Hdr.VendorId = 0x3530; //TODO: Define one
-  Private->ConfigSpace->Hdr.DeviceId = 0x3530; //TODO: Define one
+  Private->ConfigSpace->Hdr.VendorId = 0xFFFF; // Invalid vendor Id as it is not an actual device.
+  Private->ConfigSpace->Hdr.DeviceId = 0x0000; // Not relevant as the vendor id is not valid.
   Private->ConfigSpace->Hdr.ClassCode[0] = ClassCode1;
   Private->ConfigSpace->Hdr.ClassCode[1] = ClassCode2;
   Private->ConfigSpace->Hdr.ClassCode[2] = ClassCode3;

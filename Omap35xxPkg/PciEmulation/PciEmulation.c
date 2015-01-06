@@ -604,8 +604,8 @@ PciEmulationEntryPoint (
   }
 
   // Configure PCI config space
-  Private->ConfigSpace->Hdr.VendorId = 0x3530;
-  Private->ConfigSpace->Hdr.DeviceId = 0x3530;
+  Private->ConfigSpace->Hdr.VendorId = 0xFFFF; // Invalid vendor Id as it is not an actual device.
+  Private->ConfigSpace->Hdr.DeviceId = 0x0000; // Not relevant as the vendor id is not valid.
   Private->ConfigSpace->Hdr.ClassCode[0] = 0x20;
   Private->ConfigSpace->Hdr.ClassCode[1] = 0x03;
   Private->ConfigSpace->Hdr.ClassCode[2] = 0x0C;
