@@ -174,14 +174,14 @@ JunoFdtStart (
   Status = BootMonFs->OpenVolume (BootMonFs, &Fs);
   if (EFI_ERROR (Status)) {
     PrintMessage ("Warning: Fail to open file system that should contain FDT file.\n");
-    goto UNLOAD_PROTOCOL;
+    goto CLOSE_PROTOCOL;
   }
 
   File = NULL;
   Status = Fs->Open (Fs, &File, mFdtFileName, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR (Status)) {
     PrintMessage ("Warning: Fail to load FDT file '%s'.\n", mFdtFileName);
-    goto UNLOAD_PROTOCOL;
+    goto CLOSE_PROTOCOL;
   }
 
   Size = 0;
@@ -189,7 +189,7 @@ JunoFdtStart (
   FileInfo = AllocatePool (Size);
   Status = File->GetInfo (File, &gEfiFileInfoGuid, &Size, FileInfo);
   if (EFI_ERROR (Status)) {
-    goto UNLOAD_PROTOCOL;
+    goto CLOSE_PROTOCOL;
   }
 
   // Get the file size
@@ -219,13 +219,13 @@ JunoFdtStart (
     }
   }
 
-UNLOAD_PROTOCOL:
+CLOSE_PROTOCOL:
   // We do not need the FileSystem protocol
   gBS->CloseProtocol (
-      ControllerHandle,
-      &gEfiSimpleFileSystemProtocolGuid,
-      DriverBinding->ImageHandle,
-      ControllerHandle);
+         ControllerHandle,
+         &gEfiSimpleFileSystemProtocolGuid,
+         gImageHandle,
+         ControllerHandle);
 
   return Status;
 }
