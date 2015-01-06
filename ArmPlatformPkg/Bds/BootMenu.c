@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011 - 2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -863,7 +863,7 @@ UpdateFdtPath (
                     );
     ASSERT_EFI_ERROR(Status);
   } else {
-    gRT->SetVariable (
+    Status = gRT->SetVariable (
            (CHAR16*)L"Fdt",
            &gArmGlobalVariableGuid,
            EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
