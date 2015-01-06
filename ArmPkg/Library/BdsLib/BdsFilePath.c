@@ -467,27 +467,34 @@ BdsFileSystemSupport (
 
 EFI_STATUS
 BdsFileSystemLoadImage (
-  IN     EFI_DEVICE_PATH *DevicePath,
-  IN     EFI_HANDLE Handle,
-  IN     EFI_DEVICE_PATH *RemainingDevicePath,
+  IN     EFI_DEVICE_PATH       *DevicePath,
+  IN     EFI_HANDLE            Handle,
+  IN     EFI_DEVICE_PATH       *RemainingDevicePath,
   IN     EFI_ALLOCATE_TYPE     Type,
-  IN OUT EFI_PHYSICAL_ADDRESS* Image,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Image,
   OUT    UINTN                 *ImageSize
   )
 {
-  FILEPATH_DEVICE_PATH*             FilePathDevicePath;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL     *FsProtocol;
-  EFI_FILE_PROTOCOL                   *Fs;
-  EFI_STATUS Status;
-  EFI_FILE_INFO       *FileInfo;
-  EFI_FILE_PROTOCOL   *File;
-  UINTN               Size;
+  EFI_STATUS                       Status;
+  FILEPATH_DEVICE_PATH             *FilePathDevicePath;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *FsProtocol;
+  EFI_FILE_PROTOCOL                *Fs;
+  EFI_FILE_INFO                    *FileInfo;
+  EFI_FILE_PROTOCOL                *File;
+  UINTN                            Size;
 
   ASSERT (IS_DEVICE_PATH_NODE (RemainingDevicePath, MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP));
 
   FilePathDevicePath = (FILEPATH_DEVICE_PATH*)RemainingDevicePath;
 
-  Status = gBS->HandleProtocol (Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&FsProtocol);
+  Status = gBS->OpenProtocol (
+                  Handle,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  (VOID**)&FsProtocol,
+                  gImageHandle,
+                  Handle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -495,13 +502,12 @@ BdsFileSystemLoadImage (
   // Try to Open the volume and get root directory
   Status = FsProtocol->OpenVolume (FsProtocol, &Fs);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto CLOSE_PROTOCOL;
   }
 
-  File = NULL;
   Status = Fs->Open (Fs, &File, FilePathDevicePath->PathName, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto CLOSE_PROTOCOL;
   }
 
   Size = 0;
@@ -509,7 +515,7 @@ BdsFileSystemLoadImage (
   FileInfo = AllocatePool (Size);
   Status = File->GetInfo (File, &gEfiFileInfoGuid, &Size, FileInfo);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto CLOSE_FILE;
   }
 
   // Get the file size
@@ -527,6 +533,16 @@ BdsFileSystemLoadImage (
   if (!EFI_ERROR (Status)) {
     Status = File->Read (File, &Size, (VOID*)(UINTN)(*Image));
   }
+
+CLOSE_FILE:
+  File->Close (File);
+
+CLOSE_PROTOCOL:
+  gBS->CloseProtocol (
+         Handle,
+         &gEfiSimpleFileSystemProtocolGuid,
+         gImageHandle,
+         Handle);
 
   return Status;
 }
