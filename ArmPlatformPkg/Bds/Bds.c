@@ -427,7 +427,6 @@ StartDefaultBootOnTimeout (
                                 which is implementation-dependent.
 
 **/
-STATIC
 VOID
 EFIAPI
 EmptyCallbackFunction (

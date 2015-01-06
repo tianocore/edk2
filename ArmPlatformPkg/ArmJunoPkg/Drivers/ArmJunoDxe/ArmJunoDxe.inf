@@ -53,6 +53,7 @@
   gEfiEndOfDxeEventGroupGuid
   gEfiFileInfoGuid
   gFdtTableGuid
+  gArmPlatformUpdateFdtEventGuid
 
 [Protocols]
   gEfiBlockIoProtocolGuid

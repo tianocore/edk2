@@ -15,6 +15,7 @@
 #include "BdsInternal.h"
 
 #include <Guid/ArmGlobalVariableHob.h>
+#include <Guid/ArmPlatformEvents.h>
 
 extern BDS_LOAD_OPTION_SUPPORT *BdsLoadOptionSupportList;
 
@@ -834,6 +835,7 @@ UpdateFdtPath (
   BDS_SUPPORTED_DEVICE      *SupportedBootDevice;
   EFI_DEVICE_PATH_PROTOCOL  *FdtDevicePathNodes;
   EFI_DEVICE_PATH_PROTOCOL  *FdtDevicePath;
+  EFI_EVENT                 UpdateFdtEvent;
 
   Status = SelectBootDevice (&SupportedBootDevice);
   if (EFI_ERROR(Status)) {
@@ -871,6 +873,23 @@ UpdateFdtPath (
            NULL
            );
     ASSERT_EFI_ERROR(Status);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Signal FDT has been updated
+    //
+    Status = gBS->CreateEventEx (
+        EVT_NOTIFY_SIGNAL,
+        TPL_NOTIFY,
+        EmptyCallbackFunction,
+        NULL,
+        &gArmPlatformUpdateFdtEventGuid,
+        &UpdateFdtEvent
+        );
+    if (!EFI_ERROR (Status)) {
+      gBS->SignalEvent (UpdateFdtEvent);
+    }
   }
 
 EXIT:

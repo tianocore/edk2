@@ -289,4 +289,19 @@ IsPrintableString (
   OUT BOOLEAN *IsUnicode
   );
 
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+EmptyCallbackFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  );
+
 #endif /* _BDSINTERNAL_H_ */

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2014-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -28,6 +28,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Guid/ArmGlobalVariableHob.h>
+#include <Guid/ArmPlatformEvents.h>
 #include <Guid/EventGroup.h>
 #include <Guid/Fdt.h>
 #include <Guid/FileInfo.h>
@@ -293,7 +294,7 @@ EFI_DRIVER_BINDING_PROTOCOL mJunoFdtBinding = {
 STATIC
 VOID
 EFIAPI
-OnEndOfDxe (
+LoadFdtOnEvent (
   EFI_EVENT                               Event,
   VOID                                    *Context
   )
@@ -304,6 +305,7 @@ OnEndOfDxe (
   UINTN            VariableSize;
   CHAR16*          FdtDevicePathStr;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
+  EFI_EVENT        ArmPlatformUpdateFdtEvent;
 
   //
   // Read the 'FDT' UEFI Variable to know where we should we read the blob from.
@@ -384,15 +386,29 @@ OnEndOfDxe (
     }
   }
 
-  // Install the Binding protocol to verify when the FileSystem that contains the FDT has been installed
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &gImageHandle,
-                  &gEfiDriverBindingProtocolGuid, &mJunoFdtBinding,
-                  NULL
-                  );
-  if (EFI_ERROR (Status)) {
+  // Context is not NULL when this function is called for a gEfiEndOfDxeEventGroupGuid event
+  if (Context) {
+    // Install the Binding protocol to verify when the FileSystem that contains the FDT has been installed
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &gImageHandle,
+                    &gEfiDriverBindingProtocolGuid, &mJunoFdtBinding,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return;
+    }
+
+    // Register the event triggered when the 'Fdt' variable is updated.
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    LoadFdtOnEvent,
+                    NULL,
+                    &gArmPlatformUpdateFdtEventGuid,
+                    &ArmPlatformUpdateFdtEvent
+                    );
     ASSERT_EFI_ERROR (Status);
-    return;
   }
 
   //
@@ -400,6 +416,8 @@ OnEndOfDxe (
   //
   BdsConnectDevicePath (mFdtFileSystemDevicePath, &Handle, NULL);
 }
+
+STATIC CONST BOOLEAN mIsEndOfDxeEvent = TRUE;
 
 EFI_STATUS
 JunoFdtInstall (
@@ -415,8 +433,8 @@ JunoFdtInstall (
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
-                  OnEndOfDxe,
-                  NULL,
+                  LoadFdtOnEvent,
+                  &mIsEndOfDxeEvent,
                   &gEfiEndOfDxeEventGroupGuid,
                   &EndOfDxeEvent
                   );

@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -41,6 +41,9 @@
   gArmGlobalVariableGuid      = { 0xc3253c90, 0xa24f, 0x4599, { 0xa6, 0x64, 0x1f, 0x88, 0x13, 0x77, 0x8f, 0xc9} }
 
   gArmBootMonFsFileInfoGuid   = { 0x41e26b9c, 0xada6, 0x45b3, { 0x80, 0x8e, 0x23, 0x57, 0xa3, 0x5b, 0x60, 0xd6 } }
+
+  ## Include/Guid/ArmPlatformEvents.h
+  gArmPlatformUpdateFdtEventGuid = { 0xaffe115b, 0x8589, 0x456d, { 0xba, 0xb5, 0x8f, 0x2e, 0xda, 0x53, 0xae, 0xb7 } }
 
 [Ppis]
   ## Include/Ppi/ArmGlobalVariable.h
