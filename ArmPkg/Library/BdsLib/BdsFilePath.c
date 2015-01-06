@@ -24,7 +24,19 @@
 #include <Protocol/Dhcp4.h>
 #include <Protocol/Mtftp4.h>
 
+
 #define IS_DEVICE_PATH_NODE(node,type,subtype) (((node)->Type == (type)) && ((node)->SubType == (subtype)))
+
+/* Type and defines to set up the DHCP4 options */
+
+typedef struct {
+  EFI_DHCP4_PACKET_OPTION Head;
+  UINT8                   Route;
+} DHCP4_OPTION;
+
+#define DHCP_TAG_PARA_LIST  55
+#define DHCP_TAG_NETMASK     1
+#define DHCP_TAG_ROUTER      3
 
 /*
    Constant strings and define related to the message indicating the amount of
@@ -998,22 +1010,24 @@ BdsTftpLoadImage (
   OUT    UINTN                  *ImageSize
   )
 {
-  EFI_STATUS              Status;
-  EFI_HANDLE              Dhcp4ChildHandle;
-  EFI_DHCP4_PROTOCOL      *Dhcp4;
-  BOOLEAN                 Dhcp4ToStop;
-  EFI_HANDLE              Mtftp4ChildHandle;
-  EFI_MTFTP4_PROTOCOL     *Mtftp4;
-  EFI_DHCP4_CONFIG_DATA   Dhcp4CfgData;
-  EFI_DHCP4_MODE_DATA     Dhcp4Mode;
-  EFI_MTFTP4_CONFIG_DATA  Mtftp4CfgData;
-  IPv4_DEVICE_PATH        *IPv4DevicePathNode;
-  FILEPATH_DEVICE_PATH    *FilePathDevicePathNode;
-  CHAR8                   *AsciiFilePath;
-  EFI_MTFTP4_TOKEN        Mtftp4Token;
-  UINT64                  FileSize;
-  UINT64                  TftpBufferSize;
-  BDS_TFTP_CONTEXT        *TftpContext;
+  EFI_STATUS               Status;
+  EFI_HANDLE               Dhcp4ChildHandle;
+  EFI_DHCP4_PROTOCOL       *Dhcp4;
+  BOOLEAN                  Dhcp4ToStop;
+  EFI_HANDLE               Mtftp4ChildHandle;
+  EFI_MTFTP4_PROTOCOL      *Mtftp4;
+  DHCP4_OPTION             ParaList;
+  EFI_DHCP4_PACKET_OPTION  *OptionList[2];
+  EFI_DHCP4_CONFIG_DATA    Dhcp4CfgData;
+  EFI_DHCP4_MODE_DATA      Dhcp4Mode;
+  EFI_MTFTP4_CONFIG_DATA   Mtftp4CfgData;
+  IPv4_DEVICE_PATH         *IPv4DevicePathNode;
+  FILEPATH_DEVICE_PATH     *FilePathDevicePathNode;
+  CHAR8                    *AsciiFilePath;
+  EFI_MTFTP4_TOKEN         Mtftp4Token;
+  UINT64                   FileSize;
+  UINT64                   TftpBufferSize;
+  BDS_TFTP_CONTEXT         *TftpContext;
 
   ASSERT(IS_DEVICE_PATH_NODE (RemainingDevicePath, MESSAGING_DEVICE_PATH, MSG_IPv4_DP));
   IPv4DevicePathNode = (IPv4_DEVICE_PATH*)RemainingDevicePath;
@@ -1086,6 +1100,14 @@ BdsTftpLoadImage (
     // process has been started but is not completed yet.
     //
     ZeroMem (&Dhcp4CfgData, sizeof (EFI_DHCP4_CONFIG_DATA));
+    ParaList.Head.OpCode     = DHCP_TAG_PARA_LIST;
+    ParaList.Head.Length     = 2;
+    ParaList.Head.Data[0]    = DHCP_TAG_NETMASK;
+    ParaList.Route           = DHCP_TAG_ROUTER;
+    OptionList[0]            = &ParaList.Head;
+    Dhcp4CfgData.OptionCount = 1;
+    Dhcp4CfgData.OptionList  = OptionList;
+
     Status = Dhcp4->Configure (Dhcp4, &Dhcp4CfgData);
     if (EFI_ERROR (Status)) {
       if (Status != EFI_ACCESS_DENIED) {
@@ -1207,9 +1229,9 @@ BdsTftpLoadImage (
     Status = Mtftp4->ReadFile (Mtftp4, &Mtftp4Token);
     Print (L"\n");
     if (EFI_ERROR (Status)) {
+      gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
       if (Status == EFI_BUFFER_TOO_SMALL) {
         Print (L"Downloading failed, file larger than expected.\n");
-        gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
         continue;
       } else {
         goto Error;
