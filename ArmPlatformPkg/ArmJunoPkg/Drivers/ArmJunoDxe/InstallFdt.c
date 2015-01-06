@@ -189,7 +189,7 @@ JunoFdtStart (
   FileInfo = AllocatePool (Size);
   Status = File->GetInfo (File, &gEfiFileInfoGuid, &Size, FileInfo);
   if (EFI_ERROR (Status)) {
-    goto CLOSE_PROTOCOL;
+    goto CLOSE_FILE;
   }
 
   // Get the file size
@@ -218,6 +218,9 @@ JunoFdtStart (
       }
     }
   }
+
+CLOSE_FILE:
+  File->Close (File);
 
 CLOSE_PROTOCOL:
   // We do not need the FileSystem protocol
