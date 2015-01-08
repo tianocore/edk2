@@ -917,10 +917,11 @@ vfrStatementVarStoreEfi :
      CHAR8           *TypeName;
      UINT32          LineNum;
      CHAR8           *StoreName = NULL;
+     BOOLEAN         CustomizedName = FALSE;
   >>
   E:Efivarstore                                     << VSEObj.SetLineNo(E->getLine()); >>
   (
-      TN:StringIdentifier ","                       << TypeName = TN->getText(); LineNum = TN->getLine(); >>
+      TN:StringIdentifier ","                       << TypeName = TN->getText(); LineNum = TN->getLine(); CustomizedName = TRUE; >>
     | U8:"UINT8" ","                                << TypeName = U8->getText(); LineNum = U8->getLine(); >>
     | U16:"UINT16" ","                              << TypeName = U16->getText(); LineNum = U16->getLine(); >>
     | C16:"CHAR16" ","                              << TypeName = (CHAR8 *) "UINT16"; LineNum = C16->getLine(); >>
@@ -952,6 +953,10 @@ vfrStatementVarStoreEfi :
                                                        StoreName = gCVfrStringDB.GetVarStoreNameFormStringId(_STOSID(VN->getText(), VN->getLine()));
                                                        if (StoreName == NULL) {
                                                          _PCATCH (VFR_RETURN_UNSUPPORTED, VN->getLine(), "Can't get varstore name for this StringId!");
+                                                       }
+                                                       if (!CustomizedName) {
+                                                         _PCATCH (VFR_RETURN_UNSUPPORTED, E->getLine(), "Old style efivarstore must have String Identifier!");
+                                                         return;
                                                        }
                                                        Size = _STOU32(N->getText(), N->getLine());
                                                        switch (Size) {
