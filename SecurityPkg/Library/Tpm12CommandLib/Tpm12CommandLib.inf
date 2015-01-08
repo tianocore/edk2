@@ -31,6 +31,7 @@
 [Sources]
   Tpm12Startup.c
   Tpm12Ownership.c
+  Tpm12NvStorage.c
 
 [Packages]
   MdePkg/MdePkg.dec
