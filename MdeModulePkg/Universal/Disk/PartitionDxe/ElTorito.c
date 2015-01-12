@@ -45,8 +45,8 @@ PartitionInstallElToritoChildHandles (
   )
 {
   EFI_STATUS              Status;
-  UINT32                  VolDescriptorLba;
-  UINT32                  Lba;
+  UINT64                  VolDescriptorOffset;
+  UINT32                  Lba2KB;
   EFI_BLOCK_IO_MEDIA      *Media;
   CDROM_VOLUME_DESCRIPTOR *VolDescriptor;
   ELTORITO_CATALOG        *Catalog;
@@ -67,13 +67,17 @@ PartitionInstallElToritoChildHandles (
   VolSpaceSize  = 0;
 
   //
-  // CD_ROM has the fixed block size as 2048 bytes
+  // CD_ROM has the fixed block size as 2048 bytes (SIZE_2KB)
   //
-  if (Media->BlockSize != 2048) {
+
+  // If the ISO image has been copied onto a different storage media
+  // then the block size might be different (eg: USB).
+  // Ensure 2048 (SIZE_2KB) is a multiple of block size
+  if (((SIZE_2KB % Media->BlockSize) != 0) || (Media->BlockSize > SIZE_2KB)) {
     return EFI_NOT_FOUND;
   }
 
-  VolDescriptor = AllocatePool ((UINTN) Media->BlockSize);
+  VolDescriptor = AllocatePool ((UINTN)SIZE_2KB);
 
   if (VolDescriptor == NULL) {
     return EFI_NOT_FOUND;
@@ -82,31 +86,17 @@ PartitionInstallElToritoChildHandles (
   Catalog = (ELTORITO_CATALOG *) VolDescriptor;
 
   //
-  // the ISO-9660 volume descriptor starts at 32k on the media
-  // and CD_ROM has the fixed block size as 2048 bytes, so...
-  //
-  //
-  // ((16*2048) / Media->BlockSize) - 1;
-  //
-  VolDescriptorLba = 15;
-  //
   // Loop: handle one volume descriptor per time
+  //       The ISO-9660 volume descriptor starts at 32k on the media
   //
-  while (TRUE) {
-
-    VolDescriptorLba += 1;
-    if (VolDescriptorLba > Media->LastBlock) {
-      //
-      // We are pointing past the end of the device so exit
-      //
-      break;
-    }
-
+  for (VolDescriptorOffset = SIZE_32KB;
+       VolDescriptorOffset <= MultU64x32 (Media->LastBlock, Media->BlockSize);
+       VolDescriptorOffset += SIZE_2KB) {
     Status = DiskIo->ReadDisk (
                        DiskIo,
                        Media->MediaId,
-                       MultU64x32 (VolDescriptorLba, Media->BlockSize),
-                       Media->BlockSize,
+                       VolDescriptorOffset,
+                       SIZE_2KB,
                        VolDescriptor
                        );
     if (EFI_ERROR (Status)) {
@@ -139,17 +129,19 @@ PartitionInstallElToritoChildHandles (
     }
     //
     // Read in the boot El Torito boot catalog
+    // The LBA unit used by El Torito boot catalog is 2KB unit
     //
-    Lba = UNPACK_INT32 (VolDescriptor->BootRecordVolume.EltCatalog);
-    if (Lba > Media->LastBlock) {
+    Lba2KB = UNPACK_INT32 (VolDescriptor->BootRecordVolume.EltCatalog);
+    // Ensure the LBA (in 2KB unit) fits into our media
+    if (Lba2KB * (SIZE_2KB / Media->BlockSize) > Media->LastBlock) {
       continue;
     }
 
     Status = DiskIo->ReadDisk (
                        DiskIo,
                        Media->MediaId,
-                       MultU64x32 (Lba, Media->BlockSize),
-                       Media->BlockSize,
+                       MultU64x32 (Lba2KB, SIZE_2KB),
+                       SIZE_2KB,
                        Catalog
                        );
     if (EFI_ERROR (Status)) {
@@ -191,7 +183,7 @@ PartitionInstallElToritoChildHandles (
       }
 
       SubBlockSize  = 512;
-      SectorCount   = Catalog->Boot.SectorCount;
+      SectorCount   = Catalog->Boot.SectorCount * (SIZE_2KB / Media->BlockSize);
 
       switch (Catalog->Boot.MediaType) {
 
@@ -236,7 +228,7 @@ PartitionInstallElToritoChildHandles (
 
       CdDev.BootEntry = (UINT32) BootEntry;
       BootEntry++;
-      CdDev.PartitionStart = Catalog->Boot.Lba;
+      CdDev.PartitionStart = Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize);
       if (SectorCount < 2) {
         //
         // When the SectorCount < 2, set the Partition as the whole CD.
@@ -265,8 +257,8 @@ PartitionInstallElToritoChildHandles (
                 BlockIo2,
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &CdDev,
-                Catalog->Boot.Lba,
-                Catalog->Boot.Lba + CdDev.PartitionSize - 1,
+                Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize),
+                (Catalog->Boot.Lba + CdDev.PartitionSize - 1) * (SIZE_2KB / Media->BlockSize),
                 SubBlockSize,
                 FALSE
                 );
