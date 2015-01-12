@@ -1,0 +1,59 @@
+## @file
+#  Component description file for SMM SwDispatch2 Protocol on SMM SwDispatch Protocol Thunk driver.
+#
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmSwDispatch2OnSmmSwDispatchThunk
+  FILE_GUID                      = 1410C6AC-9F4B-495b-9C23-8A5AEB0165E9
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = SmmSwDispatch2ThunkMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmSwDispatch2OnSmmSwDispatchThunk.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  SmmServicesTableLib
+  BaseLib
+  IoLib
+  DebugLib
+
+[Protocols]
+  gEfiSmmControlProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmSwDispatchProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmCpuProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmSwDispatch2ProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
+
+[Depex]
+  gEfiSmmSwDispatchProtocolGuid AND
+  gEfiSmmControlProtocolGuid AND
+  gEfiSmmCpuProtocolGuid
+

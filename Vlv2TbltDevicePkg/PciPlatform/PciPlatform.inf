@@ -1,0 +1,70 @@
+#/*++
+#
+# Copyright (c)  2003  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+
+#
+#  Module Name:
+#
+#    PciPlatform.inf
+#
+#  Abstract:
+#
+#    Component description file for PciPlatform module.
+#
+--*/
+
+[defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = PciPlatform
+  FILE_GUID            = E2441B64-7EF4-41fe-B3A3-8CAA7F8D3017
+  MODULE_TYPE          = DXE_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = PciPlatformDriverEntry
+
+[sources.common]
+  BoardPciPlatform.c
+  PciPlatform.c
+  PciPlatform.h
+
+[Guids]
+  gEfiNormalSetupGuid
+  gEfiPlatformBootModeGuid
+
+[Protocols]
+  gEfiPciPlatformProtocolGuid
+  gEfiCpuIoProtocolGuid
+  gEfiFirmwareVolumeProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiPciIoProtocolGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  HobLib
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DxeServicesTableLib
+
+[BuildOptions]
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND
+  gEfiVariableWriteArchProtocolGuid

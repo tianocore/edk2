@@ -1,0 +1,55 @@
+#/*++
+#
+#  Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                     
+#
+#  Module Name:
+#
+#   PpmPolicy.inf
+#
+#  Abstract:
+#
+#    Implement platform power management policy
+#
+#--*/
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PpmPolicy
+  FILE_GUID                      = 2EE72E7C-FB9E-4318-B888-33A315C7A91D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PpmPolicyEntry
+
+[Sources]
+  PpmPolicy.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  IA32FamilyCpuPkg/IA32FamilyCpuPkg.dec #CpuConfigLib.h
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+  PchPlatformLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
+  gPpmPlatformPolicyProtocolGuid
+
+[Guids]
+  gEfiSetupVariableGuid
+
+[Depex]
+  gEfiMpServiceProtocolGuid

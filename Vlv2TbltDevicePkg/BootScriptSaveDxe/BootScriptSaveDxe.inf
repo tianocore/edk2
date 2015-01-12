@@ -1,0 +1,65 @@
+#
+#
+## @file
+# Component description file for ScriptSave Lite module.
+#
+# This is an implementation of the Boot Script Save protocol.
+# Copyright (c) 2006  - 2014, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootScriptSaveDxe
+  FILE_GUID                      = 42BB673D-09F3-4e2e-9FEE-D081131DED5B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeScriptSave
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  ScriptSave.c
+  InternalBootScriptSave.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  PcdLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  S3BootScriptLib
+
+[Protocols]
+  gEfiBootScriptSaveProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+
+
+[Depex]
+  TRUE
+

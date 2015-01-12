@@ -1,0 +1,35 @@
+#/** @file
+#
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformCmosLib
+  FILE_GUID                      = ECA883EF-0CBE-40b6-84BC-FA4A709782F7
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformCmosLib
+
+[Sources]
+  PlatformCmosLib.c
+
+[LibraryClasses]
+  IoLib
+
+[Packages]
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec

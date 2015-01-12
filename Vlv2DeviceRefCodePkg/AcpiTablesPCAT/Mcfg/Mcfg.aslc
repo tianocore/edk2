@@ -1,0 +1,92 @@
+/*++
+
+  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+
+
+Module Name:
+
+  Mcfg.c
+
+Abstract:
+
+  This file contains a structure definition for the ACPI Memory mapped
+  configuration space base address Description Table (MCFG).  Any changes
+  to the MCFG table require updating the respective structure count in
+  Mcfg.h and then adding the structure to the MCFG defined in this file.
+  The table layout is defined in Mcfg.h and the table contents are defined
+  in McfgTable.h and Mcfg.h.
+
+--*/
+
+//
+// Statements that include other files
+//
+#include <Mcfg.h>
+
+//
+// MCFG Table definition
+//
+EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE MCFG = {
+  EFI_ACPI_3_0_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_SIGNATURE,
+  sizeof (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE),
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_REVISION,
+  //
+  // Checksum will be updated at runtime
+  //
+  0x00,
+  //
+  // It is expected that these values will be programmed at runtime
+  //
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+
+  0,
+  EFI_ACPI_OEM_MCFG_REVISION,
+  0,
+  0,
+  //
+  // Beginning of MCFG specific fields
+  //
+  EFI_ACPI_RESERVED_QWORD,
+  //
+  // Sample Memory Mapped Configuration Space Base Address Structure
+  //
+  // 0x0,                                                              // Base Address
+  // 0x0,                                                              // PCI Segment Group Number
+  // 0x0,                                                              // Start Bus Number
+  // 0x0,                                                              // End Bus Number
+  // EFI_ACPI_RESERVED_DWORD,                                          // Reserved
+  //
+  // Memory Mapped Configuration Space Base Address Structure
+  //
+  0x0,                      // Base Address, will be updated by AcpiPlatform
+  0x0,                      // PCI Segment Group Number
+  0x0,                      // Start Bus Number
+  PLATFORM_MAX_BUS_NUM,     // End Bus Number
+  EFI_ACPI_RESERVED_DWORD,  // Reserved
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from
+  // removing the data structure from the executable
+  //
+  return (VOID*)&MCFG;
+}
