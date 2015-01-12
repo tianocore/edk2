@@ -4,7 +4,7 @@
   cleared after it is processed in the next boot cycle. The TPM response 
   is saved to variable.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -63,6 +63,9 @@ typedef struct {
 // It should be protected from malicious software (e.g. Set it as read-only variable). 
 //
 #define PHYSICAL_PRESENCE_FLAGS_VARIABLE  L"PhysicalPresenceFlags"
+typedef struct {
+  UINT8   PPFlags;
+} EFI_PHYSICAL_PRESENCE_FLAGS;
 
 //
 // The definition bit of the TPM Management Flags

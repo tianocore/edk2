@@ -8,7 +8,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -53,7 +53,7 @@ PhysicalPresenceCallback (
   EFI_STATUS                     Status;
   UINTN                          DataSize;
   EFI_PHYSICAL_PRESENCE          PpData;
-  UINT8                          Flags;
+  EFI_PHYSICAL_PRESENCE_FLAGS    Flags;
   BOOLEAN                        RequestConfirmed;
 
   //
@@ -67,23 +67,31 @@ PhysicalPresenceCallback (
                            &DataSize,
                            &PpData
                            );
-  if (EFI_ERROR (Status)) {
-    mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
-    DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
-    return EFI_SUCCESS;
-  }
 
   DEBUG ((EFI_D_INFO, "[TPM] PP callback, Parameter = %x\n", mTcgNvs->PhysicalPresence.Parameter));
   if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_RETURN_REQUEST_RESPONSE_TO_OS) {
+    if (EFI_ERROR (Status)) {
+      mTcgNvs->PhysicalPresence.ReturnCode  = PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE;
+      mTcgNvs->PhysicalPresence.LastRequest = 0;
+      mTcgNvs->PhysicalPresence.Response    = 0;
+      DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
+      return EFI_SUCCESS;
+    }
+    mTcgNvs->PhysicalPresence.ReturnCode  = PP_RETURN_TPM_OPERATION_RESPONSE_SUCCESS;
     mTcgNvs->PhysicalPresence.LastRequest = PpData.LastPPRequest;
     mTcgNvs->PhysicalPresence.Response    = PpData.PPResponse;
   } else if ((mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS) 
           || (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2)) {
+    if (EFI_ERROR (Status)) {
+      mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+      DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
+      return EFI_SUCCESS;
+    }
     if (mTcgNvs->PhysicalPresence.Request == PHYSICAL_PRESENCE_SET_OPERATOR_AUTH) {
       //
       // This command requires UI to prompt user for Auth data.
       //
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_NOT_IMPLEMENTED;
+      mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
       return EFI_SUCCESS;
     }
 
@@ -100,15 +108,35 @@ PhysicalPresenceCallback (
     }
 
     if (EFI_ERROR (Status)) { 
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
+      mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
       return EFI_SUCCESS;
     }
-    mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_SUCCESS;
+    mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS;
+
+    if (mTcgNvs->PhysicalPresence.Request >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+      DataSize = sizeof (EFI_PHYSICAL_PRESENCE_FLAGS);
+      Status = mSmmVariable->SmmGetVariable (
+                               PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+                               &gEfiPhysicalPresenceGuid,
+                               NULL,
+                               &DataSize,
+                               &Flags
+                               );
+      if (EFI_ERROR (Status)) {
+        Flags.PPFlags = TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION;
+      }
+      mTcgNvs->PhysicalPresence.ReturnCode = TcgPpVendorLibSubmitRequestToPreOSFunction (mTcgNvs->PhysicalPresence.Request, Flags.PPFlags);
+    }
   } else if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST) {
+    if (EFI_ERROR (Status)) {
+      mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
+      DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
+      return EFI_SUCCESS;
+    }
     //
     // Get the Physical Presence flags
     //
-    DataSize = sizeof (UINT8);
+    DataSize = sizeof (EFI_PHYSICAL_PRESENCE_FLAGS);
     Status = mSmmVariable->SmmGetVariable (
                              PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                              &gEfiPhysicalPresenceGuid,
@@ -117,7 +145,7 @@ PhysicalPresenceCallback (
                              &Flags
                              );
     if (EFI_ERROR (Status)) {
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
+      mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
       DEBUG ((EFI_D_ERROR, "[TPM] Get PP flags failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
@@ -135,27 +163,27 @@ PhysicalPresenceCallback (
       case PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE:
       case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE:
       case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE:
-        if ((Flags & FLAG_NO_PPI_PROVISION) != 0) {
+        if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION) != 0) {
           RequestConfirmed = TRUE;
         }
         break;
 
       case PHYSICAL_PRESENCE_CLEAR:
       case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR:
-        if ((Flags & FLAG_NO_PPI_CLEAR) != 0) {
+        if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0) {
           RequestConfirmed = TRUE;
         }
         break;
 
       case PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE:
-        if ((Flags & FLAG_NO_PPI_MAINTENANCE) != 0) {
+        if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_MAINTENANCE) != 0) {
           RequestConfirmed = TRUE;
         }
         break;
 
       case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
       case PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE:
-        if ((Flags & FLAG_NO_PPI_CLEAR) != 0 && (Flags & FLAG_NO_PPI_PROVISION) != 0) {
+        if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0 && (Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION) != 0) {
           RequestConfirmed = TRUE;
         }
         break;  
@@ -171,15 +199,20 @@ PhysicalPresenceCallback (
         //
         // This command requires UI to prompt user for Auth data
         //
-        mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_NOT_IMPLEMENTED; 
+        mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED; 
         return EFI_SUCCESS;
+      default:
+        break;
     }
 
     if (RequestConfirmed) {
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_ALLOWED_AND_PPUSER_NOT_REQUIRED;
+      mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED;
     } else {
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_ALLOWED_AND_PPUSER_REQUIRED;
+      mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_REQUIRED;
     }    
+    if (mTcgNvs->PhysicalPresence.Request >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+      mTcgNvs->PhysicalPresence.ReturnCode = TcgPpVendorLibGetUserConfirmationStatusFunction (mTcgNvs->PhysicalPresence.Request, Flags.PPFlags);
+    }
   } 
 
   return EFI_SUCCESS;

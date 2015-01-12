@@ -1,7 +1,7 @@
 /** @file
   The header file for TCG SMM driver.
   
-Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -36,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DxeServicesLib.h>
 #include <Library/TpmMeasurementLib.h>
 #include <Library/PcdLib.h>
+#include <Library/TcgPpVendorLib.h>
 
 #pragma pack(1)
 typedef struct {
@@ -83,23 +84,10 @@ typedef struct {
 #define ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST     8
 
 //
-// The return code for Get User Confirmation Status for Operation
+// The return code for Return TPM Operation Response to OS Environment
 //
-#define PP_REQUEST_NOT_IMPLEMENTED                                 0
-#define PP_REQUEST_BIOS_ONLY                                       1
-#define PP_REQUEST_BLOCKED                                         2
-#define PP_REQUEST_ALLOWED_AND_PPUSER_REQUIRED                     3
-#define PP_REQUEST_ALLOWED_AND_PPUSER_NOT_REQUIRED                 4
-
-//
-// The return code for Sumbit TPM Request to Pre-OS Environment
-// and Sumbit TPM Request to Pre-OS Environment 2
-//
-#define PP_SUBMIT_REQUEST_SUCCESS                                  0
-#define PP_SUBMIT_REQUEST_NOT_IMPLEMENTED                          1
-#define PP_SUBMIT_REQUEST_GENERAL_FAILURE                          2
-#define PP_SUBMIT_REQUEST_BLOCKED_BY_BIOS_SETTINGS                 3
-
+#define PP_RETURN_TPM_OPERATION_RESPONSE_SUCCESS                   0
+#define PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE                   1
 
 //
 // The definition for TCG MOR
