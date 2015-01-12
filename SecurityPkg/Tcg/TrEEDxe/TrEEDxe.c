@@ -1,7 +1,7 @@
 /** @file
   This module implements TrEE Protocol.
   
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -48,6 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/HashLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #define PERF_ID_TREE_DXE  0x3120
 
@@ -64,16 +65,13 @@ typedef struct {
 typedef struct {
   EFI_GUID               *EventGuid;
   TREE_EVENT_LOG_FORMAT  LogFormat;
-  UINT32                 BootHashAlg;
-  UINT16                 DigestAlgID;
-  TPMI_ALG_HASH          TpmHashAlgo;
 } TREE_EVENT_INFO_STRUCT;
 
 TREE_EVENT_INFO_STRUCT mTreeEventInfo[] = {
-  {&gTcgEventEntryHobGuid,             TREE_EVENT_LOG_FORMAT_TCG_1_2,      TREE_BOOT_HASH_ALG_SHA1,     0,                       TPM_ALG_SHA1},
+  {&gTcgEventEntryHobGuid,             TREE_EVENT_LOG_FORMAT_TCG_1_2},
 };
 
-#define TCG_EVENT_LOG_AREA_COUNT_MAX   5
+#define TCG_EVENT_LOG_AREA_COUNT_MAX   2
 
 typedef struct {
   TREE_EVENT_LOG_FORMAT             EventLogFormat;
@@ -629,72 +627,6 @@ TcgDxeLogEvent (
 }
 
 /**
-  This function return hash algorithm from event log format.
-
-  @param[in]     EventLogFormat    Event log format.
-
-  @return hash algorithm.
-**/
-TPMI_ALG_HASH
-TrEEGetHashAlgoFromLogFormat (
-  IN      TREE_EVENT_LOG_FORMAT     EventLogFormat
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < sizeof(mTreeEventInfo)/sizeof(mTreeEventInfo[0]); Index++) {
-    if (mTreeEventInfo[Index].LogFormat == EventLogFormat) {
-      return mTreeEventInfo[Index].TpmHashAlgo;
-    }
-  }
-  return TPM_ALG_SHA1;
-}
-
-/**
-  This function return hash algorithm ID from event log format.
-
-  @param[in]     EventLogFormat    Event log format.
-
-  @return hash algorithm ID.
-**/
-UINT16
-TrEEGetAlgIDFromLogFormat (
-  IN      TREE_EVENT_LOG_FORMAT     EventLogFormat
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < sizeof(mTreeEventInfo)/sizeof(mTreeEventInfo[0]); Index++) {
-    if (mTreeEventInfo[Index].LogFormat == EventLogFormat) {
-      return mTreeEventInfo[Index].DigestAlgID;
-    }
-  }
-  return 0;
-}
-
-/**
-  This function return boot hash algorithm from event log format.
-
-  @param[in]     EventLogFormat    Event log format.
-
-  @return boot hash algorithm.
-**/
-UINT32
-TrEEGetBootHashAlgFromLogFormat (
-  IN      TREE_EVENT_LOG_FORMAT     EventLogFormat
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < sizeof(mTreeEventInfo)/sizeof(mTreeEventInfo[0]); Index++) {
-    if (mTreeEventInfo[Index].LogFormat == EventLogFormat) {
-      return mTreeEventInfo[Index].BootHashAlg;
-    }
-  }
-  return TREE_BOOT_HASH_ALG_SHA1;
-}
-
-/**
   This function get digest from digest list.
 
   @param HashAlg    digest algorithm
@@ -811,6 +743,10 @@ TcgDxeHashLogExtendEvent (
 {
   EFI_STATUS                        Status;
   TPML_DIGEST_VALUES                DigestList;
+  
+  if (!mTcgDxeData.BsCap.TrEEPresentFlag) {
+    return EFI_DEVICE_ERROR;
+  }
 
   Status = HashAndExtend (
              NewEventHdr->PCRIndex,
@@ -822,6 +758,15 @@ TcgDxeHashLogExtendEvent (
     if ((Flags & TREE_EXTEND_ONLY) == 0) {
       Status = TcgDxeLogHashEvent (&DigestList, NewEventHdr, NewEventData);
     }
+  }
+
+  if (Status == EFI_DEVICE_ERROR) {
+    DEBUG ((EFI_D_ERROR, "TcgDxeHashLogExtendEvent - %r. Disable TPM.\n", Status));
+    mTcgDxeData.BsCap.TrEEPresentFlag = FALSE;
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (PcdGet32 (PcdStatusCodeSubClassTpmDevice) | EFI_P_EC_INTERFACE_ERROR)
+      );
   }
 
   return Status;
@@ -892,6 +837,14 @@ TreeHashLogExtendEvent (
       if ((Flags & TREE_EXTEND_ONLY) == 0) {
         Status = TcgDxeLogHashEvent (&DigestList, &NewEventHdr, Event->Event);
       }
+    }
+    if (Status == EFI_DEVICE_ERROR) {
+      DEBUG ((EFI_D_ERROR, "MeasurePeImageAndExtend - %r. Disable TPM.\n", Status));
+      mTcgDxeData.BsCap.TrEEPresentFlag = FALSE;
+      REPORT_STATUS_CODE (
+        EFI_ERROR_CODE | EFI_ERROR_MINOR,
+        (PcdGet32 (PcdStatusCodeSubClassTpmDevice) | EFI_P_EC_INTERFACE_ERROR)
+        );
     }
   } else {
     Status = TcgDxeHashLogExtendEvent (
@@ -1614,6 +1567,9 @@ OnReadyToBoot (
     Status = TcgMeasureAction (
                EFI_CALLING_EFI_APPLICATION
                );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+    }
 
     //
     // 2. Draw a line between pre-boot env and entering post-boot env.
@@ -1621,6 +1577,9 @@ OnReadyToBoot (
     //
     for (PcrIndex = 0; PcrIndex < 7; PcrIndex++) {
       Status = MeasureSeparatorEvent (PcrIndex);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Seperator Event not Measured. Error!\n"));
+      }
     }
 
     //
@@ -1641,6 +1600,9 @@ OnReadyToBoot (
     Status = TcgMeasureAction (
                EFI_RETURNING_FROM_EFI_APPLICATOIN
                );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "%s not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATOIN));
+    }
   }
 
   DEBUG ((EFI_D_INFO, "TPM2 TrEEDxe Measure Data when ReadyToBoot\n"));
@@ -1857,6 +1819,10 @@ DriverEntry (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TPM not detected!\n"));
     return Status;
+  }
+  
+  if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
+    mTcgDxeData.BsCap.TrEEPresentFlag = FALSE;
   }
 
   //

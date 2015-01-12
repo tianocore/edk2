@@ -2,7 +2,7 @@
 #  Produces TCG protocol and measures boot environment
 #  This module will produce TCG protocol and measure boot environment.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -51,6 +51,7 @@
   PrintLib
   UefiLib
   PcdLib
+  ReportStatusCodeLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## SystemTable           # Smbios Table
@@ -59,6 +60,7 @@
   
   gEfiGlobalVariableGuid                             ## SOMETIMES_CONSUMES  ## Variable:L"BootXXXX"
   gTcgEventEntryHobGuid                              ## SOMETIMES_CONSUMES  ## HOB
+  gTpmErrorHobGuid                                   ## SOMETIMES_CONSUMES  ## HOB
   gEfiEventExitBootServicesGuid                      ## CONSUMES            ## Event
   gEventExitBootServicesFailedGuid                   ## SOMETIMES_CONSUMES  ## Event
   gEfiTpmDeviceInstanceTpm12Guid                     ## PRODUCES            ## GUID       # TPM device identifier
@@ -76,6 +78,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId         ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision   ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice   ## SOMETIMES_CONSUMES
 
 [Depex]
   TRUE

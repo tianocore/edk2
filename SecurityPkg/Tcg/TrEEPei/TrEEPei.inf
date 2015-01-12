@@ -3,7 +3,7 @@
 #
 #  This module will initialize TPM device, measure reported FVs and BIOS version.
 #
-# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -51,9 +51,11 @@
   HashLib
   PerformanceLib
   MemoryAllocationLib
+  ReportStatusCodeLib
 
 [Guids]
   gTcgEventEntryHobGuid                                                ## PRODUCES               ## HOB
+  gTpmErrorHobGuid                                                     ## SOMETIMES_PRODUCES     ## HOB
   gMeasuredFvHobGuid                                                   ## PRODUCES               ## HOB
   gEfiTpmDeviceInstanceNoneGuid                                        ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
   gEfiTpmDeviceInstanceTpm12Guid                                       ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
@@ -72,6 +74,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy                  ## SOMETIMES_CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy                     ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported              ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice         ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND
