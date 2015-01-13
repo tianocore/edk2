@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,6 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
-  BasePathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
@@ -119,8 +118,8 @@
   # It uses the Shell libraries.
   ArmShellCmdRunAxfLib|ArmPlatformPkg/Library/ArmShellCmdRunAxf/ArmShellCmdRunAxf.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
-  FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
-  SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
 [LibraryClasses.common.SEC]
   ArmPlatformSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf

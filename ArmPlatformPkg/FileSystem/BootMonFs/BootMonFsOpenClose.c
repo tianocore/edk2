@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2012-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,6 @@
 *
 **/
 
-#include <Library/PathLib.h>
 #include "BootMonFsInternal.h"
 
 // Clear a file's image description on storage media:

@@ -1,7 +1,7 @@
 #/** @file
 #  Support for ARM Boot Monitor File System
 #
-#  Copyright (c) 2012-2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2012-2015, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -34,11 +34,9 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
   BaseLib
-  BasePathLib
   DevicePathLib
   MemoryAllocationLib
   PrintLib
