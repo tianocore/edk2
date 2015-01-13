@@ -50,7 +50,6 @@
   UefiBootServicesTableLib
   SortLib
   PrintLib
-  PathLib
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel # ALWAYS_CONSUMED

@@ -2,7 +2,7 @@
   Main file for If and else shell level 1 function.
 
   Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@
 
 #include "UefiShellLevel1CommandsLib.h"
 #include <Library/PrintLib.h>
-#include <Library/PathLib.h>
 
 typedef enum {
   EndTagOr,

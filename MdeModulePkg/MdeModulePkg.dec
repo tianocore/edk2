@@ -102,6 +102,9 @@
   #
   CustomizedDisplayLib|Include/Library/CustomizedDisplayLib.h
 
+  ## @libraryclass   Provides sorting functions
+  SortLib|Include/Library/SortLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

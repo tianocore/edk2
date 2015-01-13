@@ -226,6 +226,9 @@
   ##  @libraryclass  Defines library APIs used by modules to get/set print error level.
   DebugPrintErrorLevelLib|Include/Library/DebugPrintErrorLevelLib.h
 
+  ##  @libraryclass  provides EFI_FILE_HANDLE services
+  FileHandleLib|Include/Library/FileHandleLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
@@ -1705,6 +1708,11 @@
   #  PrintXY(), AsciiPrintXY(), Print(), ErrorPrint() base on this PCD value to print characters.
   # @Prompt Maximum Printable Number of Characters.
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320|UINT32|0x101
+
+  ## This is the print buffer length for FileHandleLib.
+  #  FileHandlePrintLine() sizes buffers based on this PCD value for printing.
+  # @Prompt Number of Printable Characters.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiFileHandleLibPrintBufferSize|1536|UINT16|0x201
 
   ## Indicates the allowable maximum number in extract handler table.
   # @Prompt Maximum Number of GuidedExtractHandler.

@@ -1084,7 +1084,7 @@ FileHandlePrintLine(
   //
   // Get a buffer to print into
   //
-  Buffer = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
+  Buffer = AllocateZeroPool (PcdGet16 (PcdUefiFileHandleLibPrintBufferSize));
   if (Buffer == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
@@ -1093,7 +1093,7 @@ FileHandlePrintLine(
   // Print into our buffer
   //
   VA_START (Marker, Format);
-  UnicodeVSPrint (Buffer, PcdGet16 (PcdShellPrintBufferSize), Format, Marker);
+  UnicodeVSPrint (Buffer, PcdGet16 (PcdUefiFileHandleLibPrintBufferSize), Format, Marker);
   VA_END (Marker);
 
   //

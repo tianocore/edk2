@@ -1,7 +1,7 @@
 ##  @file
-# Provides interface to shell functionality for shell commands and applications.
+#   Library used for sorting routines.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,36 +15,32 @@
 
 [Defines]
   INF_VERSION                    = 0x00010006
-  BASE_NAME                      = BaseFileHandleLib
-  FILE_GUID                      = 9495D344-9D8A-41f3-8D17-E2FD238C4E71
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = UefiSortLib
+  FILE_GUID                      = 4264A823-45A3-42db-B92C-AA078555CBD3
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = FileHandleLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = SortLib|UEFI_APPLICATION UEFI_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER DXE_DRIVER
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources.common]
-  UefiFileHandleLib.c
+  UefiSortLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
-  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
   BaseLib
   BaseMemoryLib
   DebugLib
-  PrintLib
-  PcdLib
+  UefiBootServicesTableLib
+  DevicePathLib
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid             # ALWAYS_USED
+  gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                              # ALWAYS_CONSUMED
 
-[Guids]
-  gEfiFileInfoGuid                              # ALWAYS_CONSUMED
-
-[Pcd.common]
-  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize # ALWAYS_CONSUMED

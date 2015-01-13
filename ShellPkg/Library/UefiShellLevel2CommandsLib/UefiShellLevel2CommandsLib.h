@@ -47,7 +47,6 @@
 #include <Library/HiiLib.h>
 #include <Library/SortLib.h>
 #include <Library/FileHandleLib.h>
-#include <Library/PathLib.h>
 
 extern CONST  CHAR16                            mFileName[];
 extern        EFI_HANDLE                        gShellLevel2HiiHandle;

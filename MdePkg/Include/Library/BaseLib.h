@@ -1,8 +1,8 @@
 /** @file
   Provides string functions, linked list functions, math functions, synchronization
-  functions, and CPU architecture-specific functions.
+  functions, file path functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -484,7 +484,7 @@ AsciiStrnCatS (
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Copies one Null-terminated Unicode string to another Null-terminated Unicode
   string and returns the new Unicode string.
@@ -517,7 +517,7 @@ StrCpy (
 
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Copies up to a specified length from one Null-terminated Unicode string to 
   another Null-terminated Unicode string and returns the new Unicode string.
@@ -686,7 +686,7 @@ StrnCmp (
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Concatenates one Null-terminated Unicode string to another Null-terminated
   Unicode string, and returns the concatenated Unicode string.
@@ -728,7 +728,7 @@ StrCat (
 
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Concatenates up to a specified length one Null-terminated Unicode to the end 
   of another Null-terminated Unicode string, and returns the concatenated 
@@ -1016,7 +1016,7 @@ UnicodeStrToAsciiStr (
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Copies one Null-terminated ASCII string to another Null-terminated ASCII
   string and returns the new ASCII string.
@@ -1047,7 +1047,7 @@ AsciiStrCpy (
 
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Copies up to a specified length one Null-terminated ASCII string to another 
   Null-terminated ASCII string and returns the new ASCII string.
@@ -1245,7 +1245,7 @@ AsciiStrnCmp (
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Concatenates one Null-terminated ASCII string to another Null-terminated
   ASCII string, and returns the concatenated ASCII string.
@@ -1282,7 +1282,7 @@ AsciiStrCat (
 
 
 /**
-  [ATTENTION] This function will be deprecated for security reason.
+  [ATTENTION] This function is deprecated for security reason.
 
   Concatenates up to a specified length one Null-terminated ASCII string to 
   the end of another Null-terminated ASCII string, and returns the 
@@ -1591,6 +1591,43 @@ BcdToDecimal8 (
   IN      UINT8                     Value
   );
 
+//
+//  File Path Manipulation Functions
+//
+
+/**
+  Removes the last directory or file entry in a path by changing the last
+  L'\' to a CHAR_NULL.
+
+  @param[in, out] Path    The pointer to the path to modify.
+
+  @retval FALSE     Nothing was found to remove.
+  @retval TRUE      A directory or file was removed.
+**/
+BOOLEAN
+EFIAPI
+PathRemoveLastItem(
+  IN OUT CHAR16 *Path
+  );
+
+/**
+  Function to clean up paths.
+    - Single periods in the path are removed.
+    - Double periods in the path are removed along with a single parent directory.
+    - Forward slashes L'/' are converted to backward slashes L'\'.
+
+  This will be done inline and the existing buffer may be larger than required
+  upon completion.
+
+  @param[in] Path       The pointer to the string containing the path.
+
+  @return       Returns Path, otherwise returns NULL to indicate that an error has occured.
+**/
+CHAR16*
+EFIAPI
+PathCleanUpDirectories(
+  IN CHAR16 *Path
+);
 
 //
 // Linked List Functions and Macros

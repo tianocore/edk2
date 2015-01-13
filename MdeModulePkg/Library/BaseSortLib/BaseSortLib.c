@@ -1,7 +1,7 @@
 /** @file
   Library used for sorting routines.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,23 +11,13 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
 #include <Uefi.h>
-#include <ShellBase.h>
 
-#include <Protocol/UnicodeCollation.h>
-#include <Protocol/DevicePath.h>
-
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SortLib.h>
-#include <Library/DevicePathLib.h>
-
-STATIC EFI_UNICODE_COLLATION_PROTOCOL   *mUnicodeCollation = NULL;
-
 
 /**
   Worker function for QuickSorting.  This function is identical to PerformQuickSort,
@@ -135,7 +125,6 @@ QuickSortWorker (
       CompareFunction,
       Buffer);
   }
-
   return;
 }
 /**
@@ -185,14 +174,12 @@ PerformQuickSort (
 }
 
 /**
-  Function to compare 2 device paths for use in QuickSort.
+  Not supported in Base version.
 
-  @param[in] Buffer1            pointer to Device Path poiner to compare
-  @param[in] Buffer2            pointer to second DevicePath pointer to compare
+  @param[in] Buffer1  Ignored.
+  @param[in] Buffer2  Ignored.
 
-  @retval 0                     Buffer1 equal to Buffer2
-  @return < 0                   Buffer1 is less than Buffer2
-  @return > 0                   Buffer1 is greater than Buffer2
+  ASSERT and return 0.
 **/
 INTN
 EFIAPI
@@ -201,62 +188,8 @@ DevicePathCompare (
   IN  CONST VOID             *Buffer2
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath1;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath2;
-  CHAR16                    *TextPath1;
-  CHAR16                    *TextPath2;
-  EFI_STATUS                Status;
-  INTN                      RetVal;
-
-  DevicePath1 = *(EFI_DEVICE_PATH_PROTOCOL**)Buffer1;
-  DevicePath2 = *(EFI_DEVICE_PATH_PROTOCOL**)Buffer2;
-
-  if (DevicePath1 == NULL) {
-    if (DevicePath2 == NULL) {
-      return 0;
-    }
-
-    return -1;
-  }
-
-  if (DevicePath2 == NULL) {
-    return 1;
-  }
-
-  if (mUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(
-      &gEfiUnicodeCollation2ProtocolGuid,
-      NULL,
-      (VOID**)&mUnicodeCollation);
-
-    ASSERT_EFI_ERROR(Status);
-  }
-
-  TextPath1 = ConvertDevicePathToText(
-    DevicePath1,
-    FALSE,
-    FALSE);
-
-  TextPath2 = ConvertDevicePathToText(
-    DevicePath2,
-    FALSE,
-    FALSE);
-
-  if (TextPath1 == NULL) {
-    RetVal = -1;
-  } else if (TextPath2 == NULL) {
-    RetVal = 1;
-  } else {
-    RetVal = mUnicodeCollation->StriColl(
-      mUnicodeCollation,
-      TextPath1,
-      TextPath2);
-  }
-
-  SHELL_FREE_NON_NULL(TextPath1);
-  SHELL_FREE_NON_NULL(TextPath2);
-
-  return (RetVal);
+  ASSERT(FALSE);
+  return 0;
 }
 
 /**
@@ -276,20 +209,8 @@ StringNoCaseCompare (
   IN  CONST VOID             *Buffer2
   )
 {
-  EFI_STATUS                Status;
-  if (mUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(
-      &gEfiUnicodeCollation2ProtocolGuid,
-      NULL,
-      (VOID**)&mUnicodeCollation);
-
-    ASSERT_EFI_ERROR(Status);
-  }
-
-  return (mUnicodeCollation->StriColl(
-    mUnicodeCollation,
-    *(CHAR16**)Buffer1,
-    *(CHAR16**)Buffer2));
+  ASSERT(FALSE);
+  return 0;
 }
 
 
@@ -310,7 +231,8 @@ StringCompare (
   IN  CONST VOID                *Buffer2
   )
 {
-  return (StrCmp(
-    *(CHAR16**)Buffer1,
-    *(CHAR16**)Buffer2));
+  ASSERT(FALSE);
+  return 0;
 }
+
+

@@ -63,6 +63,7 @@
   LinkedList.c
   SafeString.c
   String.c
+  FilePaths.c
   BaseLibInternals.h
 
 [Sources.Ia32]

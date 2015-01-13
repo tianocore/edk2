@@ -46,7 +46,6 @@
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/HandleParsingLib.h>
-#include <Library/PathLib.h>
 #include <Library/FileHandleLib.h>
 
 #include "ShellParametersProtocol.h"

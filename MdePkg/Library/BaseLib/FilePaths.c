@@ -1,5 +1,5 @@
 /** @file
-  Provides interface to path manipulation functions.
+  Defines file-path manipulation functions.
 
   Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -10,18 +10,16 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
-
-#include <Base.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/PathLib.h>
-#include <Library/BaseLib.h>
-#include <Protocol/SimpleTextIn.h> 
+#include  <Uefi/UefiBaseType.h>
+#include  <Library/BaseMemoryLib.h>
+#include  <Library/BaseLib.h>
+#include  <Protocol/SimpleTextIn.h>
 
 /**
   Removes the last directory or file entry in a path by changing the last
   L'\' to a CHAR_NULL.
 
-  @param[in, out] Path    The pointer to the path to modify.
+  @param[in,out] Path     A pointer to the path to modify.
 
   @retval FALSE     Nothing was found to remove.
   @retval TRUE      A directory or file was removed.
@@ -53,19 +51,18 @@ PathRemoveLastItem(
 }
 
 /**
-  Function to clean up paths.  
-  
+  Function to clean up paths.
+
   - Single periods in the path are removed.
   - Double periods in the path are removed along with a single parent directory.
   - Forward slashes L'/' are converted to backward slashes L'\'.
 
-  This will be done inline and the existing buffer may be larger than required 
+  This will be done inline and the existing buffer may be larger than required
   upon completion.
 
   @param[in] Path       The pointer to the string containing the path.
 
-  @retval NULL          An error occured.
-  @return Path in all other instances.
+  @return       Returns Path, otherwise returns NULL to indicate that an error has occured.
 **/
 CHAR16*
 EFIAPI
@@ -75,10 +72,10 @@ PathCleanUpDirectories(
 {
   CHAR16  *TempString;
   UINTN   TempSize;
+
   if (Path==NULL) {
     return(NULL);
   }
-
   //
   // Fix up the '/' vs '\'
   //
@@ -87,7 +84,6 @@ PathCleanUpDirectories(
       *TempString = L'\\';
     }
   }
-
   //
   // Fix up the ..
   //
@@ -102,7 +98,6 @@ PathCleanUpDirectories(
     *TempString = CHAR_NULL;
     PathRemoveLastItem(Path);
   }
-
   //
   // Fix up the .
   //

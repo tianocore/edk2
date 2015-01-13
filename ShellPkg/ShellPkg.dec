@@ -18,8 +18,8 @@
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = ShellPkg
-  PACKAGE_GUID                   = 9FB7587C-93F7-40a7-9C04-FD7BA94EE646
-  PACKAGE_VERSION                = 0.50
+  PACKAGE_GUID                   = C1014BB7-4092-43D4-984F-0738EB424DBF
+  PACKAGE_VERSION                = 1.0
 
 [Includes]
   Include
@@ -31,20 +31,11 @@
   ##  @libraryclass  Provides shell internal support Only available for shell internal commands
   ShellCommandLib|Include/Library/ShellCommandLib.h
 
-  ##  @libraryclass  provides EFI_FILE_HANDLE services used by Shell and ShellLib
-  FileHandleLib|Include/Library/FileHandleLib.h
-
   ## @libraryclass   Allows for a shell application to have a C style entry point
   ShellCEntryLib|Include/Library/ShellCEntryLib.h
 
-  ## @libraryclass   Provides sorting functions
-  SortLib|Include/Library/SortLib.h
-
   ## @libraryclass   Provides advanced parsing functions
   HandleParsingLib|Include/Library/HandleParsingLib.h
-
-  ## @libraryclass   Provides path manipulation functions
-  PathLib|Include/Library/PathLib.h
 
   ## @libraryclass   provides BCFG command
   BcfgCommandLib|Include/Library/BcfgCommandLib.h
@@ -91,7 +82,7 @@
   #  This should be FALSE for compiling the shell application itself only.
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|TRUE|BOOLEAN|0x00000005
 
-  ## This is the max buffer for ShellLib, FileHandleLib, and internal Shell printings.
+  ## This is the max buffer for ShellLib and internal Shell printings.
   gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize|16000|UINT16|0x0000000C
 
   ## This flag is used to control the commands available in the shell
