@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@
 #include "UefiShellLib.h"
 #include <ShellBase.h>
 #include <Library/SortLib.h>
+#include <Library/PathLib.h>
 
 #define FIND_XXXXX_FILE_BUFFER_SIZE (SIZE_OF_EFI_FILE_INFO + MAX_FILE_NAME_LEN)
 
@@ -671,6 +672,7 @@ ShellOpenFileByName(
   EFI_DEVICE_PATH_PROTOCOL      *FilePath;
   EFI_STATUS                    Status;
   EFI_FILE_INFO                 *FileInfo;
+  CHAR16                        *FileNameCopy;
 
   //
   // ASSERT if FileName is NULL
@@ -682,11 +684,32 @@ ShellOpenFileByName(
   }
 
   if (gEfiShellProtocol != NULL) {
-    if ((OpenMode & EFI_FILE_MODE_CREATE) == EFI_FILE_MODE_CREATE && (Attributes & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY) {
-      return ShellCreateDirectory(FileName, FileHandle);
+    if ((OpenMode & EFI_FILE_MODE_CREATE) == EFI_FILE_MODE_CREATE) {
+
+      //
+      // Create only a directory
+      //
+      if ((Attributes & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY) {
+        return ShellCreateDirectory(FileName, FileHandle);
+      }
+
+      //
+      // Create the directory to create the file in
+      //
+      FileNameCopy = AllocateCopyPool (StrSize (FileName), FileName);
+      if (FileName == NULL) {
+        return (EFI_OUT_OF_RESOURCES);
+      }
+      PathCleanUpDirectories (FileNameCopy);
+      if (PathRemoveLastItem (FileNameCopy)) {
+        ShellCreateDirectory (FileNameCopy, FileHandle);
+        ShellCloseFile (FileHandle);
+      }
+      SHELL_FREE_NON_NULL (FileNameCopy);
     }
+
     //
-    // Use UEFI Shell 2.0 method
+    // Use UEFI Shell 2.0 method to create the file
     //
     Status = gEfiShellProtocol->OpenFileByName(FileName,
                                                FileHandle,
