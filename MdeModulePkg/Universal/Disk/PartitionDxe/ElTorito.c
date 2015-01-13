@@ -1,7 +1,7 @@
 /** @file
   Decode an El Torito formatted CD-ROM
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -258,7 +258,7 @@ PartitionInstallElToritoChildHandles (
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &CdDev,
                 Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize),
-                (Catalog->Boot.Lba + CdDev.PartitionSize - 1) * (SIZE_2KB / Media->BlockSize),
+                MultU64x32 (Catalog->Boot.Lba + CdDev.PartitionSize - 1, SIZE_2KB / Media->BlockSize),
                 SubBlockSize,
                 FALSE
                 );
