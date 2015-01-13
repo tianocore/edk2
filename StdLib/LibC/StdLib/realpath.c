@@ -13,7 +13,6 @@
 #include <LibConfig.h>
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PathLib.h>
 #include <errno.h>
 
 /** The realpath() function shall derive, from the pathname pointed to by
