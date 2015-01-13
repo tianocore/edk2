@@ -265,7 +265,7 @@ TcgDxeStatusCheck (
   }
 
   if (EventLogLastEntry != NULL) {
-    if (TcgData->BsCap.TPMDeactivatedFlag || (!ProtocolCapability.TPMPresentFlag)) {
+    if (TcgData->BsCap.TPMDeactivatedFlag || (!TcgData->BsCap.TPMPresentFlag)) {
       *EventLogLastEntry = (EFI_PHYSICAL_ADDRESS)(UINTN)0;
     } else {
       *EventLogLastEntry = (EFI_PHYSICAL_ADDRESS)(UINTN)TcgData->LastEvent;
@@ -412,7 +412,7 @@ TcgDxeLogEvent (
 
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
   
-  if (TcgData->BsCap.TPMDeactivatedFlag || (!ProtocolCapability.TPMPresentFlag)) {
+  if (TcgData->BsCap.TPMDeactivatedFlag || (!TcgData->BsCap.TPMPresentFlag)) {
     return EFI_DEVICE_ERROR;
   }
   return TcgDxeLogEventI (
@@ -581,7 +581,7 @@ TcgDxeHashLogExtendEvent (
 
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
   
-  if (TcgData->BsCap.TPMDeactivatedFlag || (!ProtocolCapability.TPMPresentFlag)) {
+  if (TcgData->BsCap.TPMDeactivatedFlag || (!TcgData->BsCap.TPMPresentFlag)) {
     return EFI_DEVICE_ERROR;
   }
     
@@ -589,7 +589,7 @@ TcgDxeHashLogExtendEvent (
     return EFI_UNSUPPORTED;
   }
   
-  if (HashData == NULL && HashDataLen > 0) {
+  if (HashData == 0 && HashDataLen > 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1383,7 +1383,7 @@ DriverEntry (
                   EFI_NATIVE_INTERFACE,
                   &mTcgDxeData.TcgProtocol
                   );
-  if (!EFI_ERROR (Status) && (!mTcgDxeData.BsCap.TPMDeactivatedFlag) && ProtocolCapability.TPMPresentFlag) {
+  if (!EFI_ERROR (Status) && (!mTcgDxeData.BsCap.TPMDeactivatedFlag) && mTcgDxeData.BsCap.TPMPresentFlag) {
     //
     // Setup the log area and copy event log from hob list to it
     //
