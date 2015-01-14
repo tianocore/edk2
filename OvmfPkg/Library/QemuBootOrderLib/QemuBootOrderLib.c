@@ -1571,3 +1571,53 @@ ErrorFreeFwCfg:
 
   return Status;
 }
+
+
+/**
+  Calculate the number of seconds we should be showing the FrontPage progress
+  bar for.
+
+  @return  The TimeoutDefault argument for PlatformBdsEnterFrontPage().
+**/
+UINT16
+GetFrontPageTimeoutFromQemu (
+  VOID
+  )
+{
+  FIRMWARE_CONFIG_ITEM BootMenuWaitItem;
+  UINTN                BootMenuWaitSize;
+
+  QemuFwCfgSelectItem (QemuFwCfgItemBootMenu);
+  if (QemuFwCfgRead16 () == 0) {
+    //
+    // The user specified "-boot menu=off", or didn't specify "-boot
+    // menu=(on|off)" at all. Return the platform default.
+    //
+    return PcdGet16 (PcdPlatformBootTimeOut);
+  }
+
+  if (RETURN_ERROR (QemuFwCfgFindFile ("etc/boot-menu-wait", &BootMenuWaitItem,
+                      &BootMenuWaitSize)) ||
+      BootMenuWaitSize != sizeof (UINT16)) {
+    //
+    // "-boot menu=on" was specified without "splash-time=N". In this case,
+    // return three seconds if the platform default would cause us to skip the
+    // front page, and return the platform default otherwise.
+    //
+    UINT16 Timeout;
+
+    Timeout = PcdGet16 (PcdPlatformBootTimeOut);
+    if (Timeout == 0) {
+      Timeout = 3;
+    }
+    return Timeout;
+  }
+
+  //
+  // "-boot menu=on,splash-time=N" was specified, where N is in units of
+  // milliseconds. The Intel BDS Front Page progress bar only supports whole
+  // seconds, round N up.
+  //
+  QemuFwCfgSelectItem (BootMenuWaitItem);
+  return (UINT16)((QemuFwCfgRead16 () + 999) / 1000);
+}

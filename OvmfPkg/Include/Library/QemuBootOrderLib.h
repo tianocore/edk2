@@ -54,4 +54,16 @@ SetBootOrderFromQemu (
   IN  CONST LIST_ENTRY *BootOptionList
   );
 
+
+/**
+  Calculate the number of seconds we should be showing the FrontPage progress
+  bar for.
+
+  @return  The TimeoutDefault argument for PlatformBdsEnterFrontPage().
+**/
+UINT16
+GetFrontPageTimeoutFromQemu (
+  VOID
+  );
+
 #endif

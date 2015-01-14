@@ -57,3 +57,6 @@
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation
+
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
