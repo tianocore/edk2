@@ -1185,7 +1185,6 @@ Returns:
 --*/
 {
   EFI_STATUS                         Status;
-  UINT16                             Timeout;
   EFI_BOOT_MODE                      BootMode;
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
@@ -1202,11 +1201,6 @@ Returns:
     //
     PlatformBdsRestoreNvVarsFromHardDisk ();
   }
-
-  //
-  // Init the time out value
-  //
-  Timeout = PcdGet16 (PcdPlatformBootTimeOut);
 
   //
   // Load the driver option as the driver option list
@@ -1261,7 +1255,7 @@ Returns:
   //
   BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
 
-  PlatformBdsEnterFrontPage (Timeout, TRUE);
+  PlatformBdsEnterFrontPage (GetFrontPageTimeoutFromQemu(), TRUE);
 }
 
 VOID
