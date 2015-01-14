@@ -22,7 +22,6 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformBdsLib|DXE_DRIVER
-  CONSTRUCTOR                    = PlatformIntelBdsConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -67,7 +66,6 @@
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
 
 [Protocols]
   gEfiDevicePathFromTextProtocolGuid

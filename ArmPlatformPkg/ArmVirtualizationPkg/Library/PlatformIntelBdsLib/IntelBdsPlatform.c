@@ -17,22 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/QemuBootOrderLib.h>
 
-///
-/// Predefined platform default time out value
-///
-UINT16                      gPlatformBootTimeOutDefault;
-
-EFI_STATUS
-EFIAPI
-PlatformIntelBdsConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  gPlatformBootTimeOutDefault = (UINT16)PcdGet16 (PcdPlatformBootTimeOut);
-  return EFI_SUCCESS;
-}
-
 //
 // BDS Platform Functions
 //
@@ -320,7 +304,7 @@ PlatformBdsPolicyBehavior (
   //
   BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
 
-  PlatformBdsEnterFrontPage (gPlatformBootTimeOutDefault, TRUE);
+  PlatformBdsEnterFrontPage (GetFrontPageTimeoutFromQemu(), TRUE);
 }
 
 /**
