@@ -48,7 +48,6 @@
   UefiLib
   HiiLib
   SortLib
-  PathLib
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # ALWAYS_CONSUMED
