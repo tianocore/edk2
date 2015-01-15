@@ -177,3 +177,11 @@ M: Jeff Fan <jeff.fan@intel.com>
 UnixPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/UnixPkg
 S: Obsolete (Use EmulatorPkg instead)
+
+Vlv2DeviceRefCodePkg
+M: David Wei <david.wei@intel.com>
+M: Tim He <tim.he@intel.com>
+
+Vlv2TbltDevicePkg
+M: David Wei <david.wei@intel.com>
+M: Tim He <tim.he@intel.com>
