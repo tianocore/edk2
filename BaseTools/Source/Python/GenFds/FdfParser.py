@@ -715,6 +715,8 @@ class FdfParser:
                     self.__SetMacroValue(Macro, Value)
                     self.__WipeOffArea.append(((DefineLine, DefineOffset), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
             elif self.__Token == 'SET':
+                if not self.__GetIfListCurrentItemStat(IfList):
+                    continue
                 SetLine = self.CurrentLineNumber - 1
                 SetOffset = self.CurrentOffsetWithinLine - len('SET')
                 PcdPair = self.__GetNextPcdName()
