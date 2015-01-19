@@ -4,7 +4,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
 # EFI1.10/UEFI2.4/PI1.3 and some Industry Standards.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -625,6 +625,9 @@
 
   ## Include/Guid/VectorHandoffTable.h
   gEfiVectorHandoffTableGuid        = { 0x996ec11c, 0x5397, 0x4e73, { 0xb5, 0x8f, 0x82, 0x7e, 0x52, 0x90, 0x6d, 0xef }}
+
+  ## Include/IndustryStandard/Hsti.h
+  gAdapterInfoPlatformSecurityGuid  = {0x6be272c7, 0x1320, 0x4ccd, { 0x90, 0x17, 0xd4, 0x61, 0x2c, 0x01, 0x2b, 0x25 }}
 
 [Guids.IA32, Guids.X64]
   ## Include/Guid/Cper.h
