@@ -1,5 +1,4 @@
 ## @file  SourceLevelDebugPkg.dec
-#
 # This package provides target side modules to support source level debug.
 # The target side components includes the Debug Agent Library instance
 # to communicate with host side modules, Debug Communication Library and
@@ -7,7 +6,7 @@
 # and host, PeCoffExtraActionLib instance to report symbol path information,
 # etc.
 #
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
