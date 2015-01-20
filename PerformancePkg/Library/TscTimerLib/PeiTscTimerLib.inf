@@ -12,7 +12,7 @@
 #  TSC reads are much more efficient and do not incur the overhead associated with a ring transition or
 #  access to a platform resource.
 #
-#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -54,7 +54,7 @@
   HobLib
 
 [Guids]
-  gEfiTscFrequencyGuid                          ## PRODUCES ## Hob
+  gEfiTscFrequencyGuid                          ## PRODUCES ## HOB
 
 [Pcd.common]
-  gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress
+  gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress     ## SOMETIMES_CONSUMES
