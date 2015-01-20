@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -302,17 +302,22 @@ NoExtrPush:
     mov     eax, dr0
     push    eax
 
-    ;; FX_SAVE_STATE_IA32 FxSaveState;
-    sub esp, 512
-    mov edi, esp
-    db 0fh, 0aeh, 00000111y ;fxsave [edi]
-
-    ;; save the exception data    
-    push    dword ptr [ebp + 8]
-
     ;; Clear Direction Flag
     cld
-    	
+
+    ;; FX_SAVE_STATE_IA32 FxSaveState;
+    sub     esp, 512
+    mov     edi, esp
+    ;; Clear the buffer
+    xor     eax, eax
+    mov     ecx, 128 ;= 512 / 4
+    rep     stosd
+    mov     edi, esp
+    db 0fh, 0aeh, 00000111y ;fxsave [edi]
+
+    ;; save the exception data
+    push    dword ptr [ebp + 8]
+
     ; call the C interrupt process function
     push    esp     ; Structure
     push    ebx     ; vector
@@ -323,7 +328,7 @@ NoExtrPush:
     add     esp, 4
 
     ;; FX_SAVE_STATE_IA32 FxSaveState;
-    mov esi, esp
+    mov     esi, esp
     db 0fh, 0aeh, 00001110y ; fxrstor [esi]
     add esp, 512
 

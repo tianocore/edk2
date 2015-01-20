@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -286,16 +286,23 @@ NoExtrPush:
     mov     rax, dr0
     push    rax
 
+    ;; Clear Direction Flag
+    cld
+
     sub     rsp, 512
+    mov     rdi, rsp
+    ;; Clear the buffer
+    xor     rax, rax
+    push    rcx
+    mov     rcx, 64 ;= 512 / 8
+    rep     stosq
+    pop     rcx
     mov     rdi, rsp
     db 0fh, 0aeh, 00000111y ;fxsave [rdi]
 
     ;; save the exception data
     push    qword ptr [rbp + 16]
 
-    ;; Clear Direction Flag
-    cld
-	
     ; call the C interrupt process function
     mov     rdx, rsp      ; Structure
     mov     r15, rcx      ; save vector in r15
