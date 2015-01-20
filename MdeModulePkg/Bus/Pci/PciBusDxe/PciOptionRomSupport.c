@@ -1,7 +1,7 @@
 /** @file
   PCI Rom supporting funtions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -310,6 +310,63 @@ GetOpRomInfo (
 }
 
 /**
+  Check if the RomImage contains EFI Images.
+
+  @param  RomImage  The ROM address of Image for check.
+  @param  RomSize   Size of ROM for check.
+
+  @retval TRUE     ROM contain EFI Image.
+  @retval FALSE    ROM not contain EFI Image.
+
+**/
+BOOLEAN
+ContainEfiImage (
+  IN VOID            *RomImage,
+  IN UINT64          RomSize
+  )
+{
+  PCI_EXPANSION_ROM_HEADER  *RomHeader;
+  PCI_DATA_STRUCTURE        *RomPcir;
+  UINT8                     Indicator;
+
+  Indicator = 0;
+  RomHeader = RomImage;
+  if (RomHeader == NULL) {
+    return FALSE;
+  }
+
+  do {
+    if (RomHeader->Signature != PCI_EXPANSION_ROM_HEADER_SIGNATURE) {
+      RomHeader = (PCI_EXPANSION_ROM_HEADER *) ((UINT8 *) RomHeader + 512);
+      continue;
+    }
+
+    //
+    // The PCI Data Structure must be DWORD aligned. 
+    //
+    if (RomHeader->PcirOffset == 0 ||
+        (RomHeader->PcirOffset & 3) != 0 ||
+        (UINT8 *) RomHeader + RomHeader->PcirOffset + sizeof (PCI_DATA_STRUCTURE) > (UINT8 *) RomImage + RomSize) {
+      break;
+    }
+
+    RomPcir = (PCI_DATA_STRUCTURE *) ((UINT8 *) RomHeader + RomHeader->PcirOffset);
+    if (RomPcir->Signature != PCI_DATA_STRUCTURE_SIGNATURE) {
+      break;
+    }
+
+    if (RomPcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) {
+      return TRUE;
+    }
+
+    Indicator = RomPcir->Indicator;
+    RomHeader = (PCI_EXPANSION_ROM_HEADER *) ((UINT8 *) RomHeader + RomPcir->ImageLength * 512);
+  } while (((UINT8 *) RomHeader < (UINT8 *) RomImage + RomSize) && ((Indicator & 0x80) == 0x00));
+
+  return FALSE;
+}
+
+/**
   Load Option Rom image for specified PCI device.
 
   @param PciDevice Pci device instance.
@@ -340,7 +397,6 @@ LoadOpRomImage (
   UINT32                    LegacyImageLength;
   UINT8                     *RomInMemory;
   UINT8                     CodeType;
-  BOOLEAN                   HasEfiOpRom;
 
   RomSize       = PciDevice->RomSize;
 
@@ -392,7 +448,6 @@ LoadOpRomImage (
   RetStatus     = EFI_NOT_FOUND;
   FirstCheck    = TRUE;
   LegacyImageLength = 0;
-  HasEfiOpRom   = FALSE;
 
   do {
     PciDevice->PciRootBridgeIo->Mem.Read (
@@ -443,8 +498,6 @@ LoadOpRomImage (
     if (RomPcir->CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
       CodeType = PCI_CODE_TYPE_PCAT_IMAGE;
       LegacyImageLength = ((UINT32)((EFI_LEGACY_EXPANSION_ROM_HEADER *)RomHeader)->Size512) * 512;
-    } else if (RomPcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) {
-      HasEfiOpRom = TRUE;
     }
     Indicator     = RomPcir->Indicator;
     RomImageSize  = RomImageSize + RomPcir->ImageLength * 512;
@@ -484,7 +537,6 @@ LoadOpRomImage (
 
   RomDecode (PciDevice, RomBarIndex, RomBar, FALSE);
 
-  PciDevice->HasEfiOpRom    = HasEfiOpRom;
   PciDevice->EmbeddedRom    = TRUE;
   PciDevice->PciIo.RomSize  = RomImageSize;
   PciDevice->PciIo.RomImage = RomInMemory;
