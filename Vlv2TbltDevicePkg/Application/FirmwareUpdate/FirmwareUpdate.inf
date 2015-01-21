@@ -1,0 +1,90 @@
+## @file
+# Implements a Tunnel Mountain specific flash update program.  This will allow
+# users to update all regions of the flash as needed in a given update.
+#
+# Copyright (c) 2006  - 2014, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FirmwareUpdate
+  FILE_GUID                      = AEFAF26C-FB6D-4fef-AF7A-9D78FF201FCA
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ShellCEntryLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  FirmwareUpdateStrings.uni
+  FirmwareUpdate.c
+  FirmwareUpdate.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  IA32FamilyCpuPkg/IA32FamilyCpuPkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DebugLib
+  FileHandleLib
+  #FlashDeviceLib
+  #SpiFlashCommonLib
+  MemoryAllocationLib
+  PcdLib
+  ShellCEntryLib
+  ShellLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
+  gEfiSpiProtocolGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize   ## CONSUMES
+
+[FixedPcd]
+#  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+#  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+#  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+#  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+#  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+#  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+
+  gPlatformModuleTokenSpaceGuid.PcdFlashChipBase
+  gPlatformModuleTokenSpaceGuid.PcdFlashChipSize
+  gPlatformModuleTokenSpaceGuid.PcdFlashDescriptorBase
+  gPlatformModuleTokenSpaceGuid.PcdFlashDescriptorSize
+  gPlatformModuleTokenSpaceGuid.PcdTxeRomBase
+  gPlatformModuleTokenSpaceGuid.PcdTxeRomSize
+  gPlatformModuleTokenSpaceGuid.PcdBiosRomBase
+  gPlatformModuleTokenSpaceGuid.PcdBiosRomSize
+
+[BuildOptions]
+  MSFT:*_*_X64_CC_FLAGS       = /Od 
+  INTEL:*_*_X64_CC_FLAGS       = /Od 

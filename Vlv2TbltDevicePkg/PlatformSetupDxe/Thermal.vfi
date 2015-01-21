@@ -1,0 +1,83 @@
+//
+//
+// Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+//                                                                                  
+// This program and the accompanying materials are licensed and made available under
+// the terms and conditions of the BSD License that accompanies this distribution.  
+// The full text of the license may be found at                                     
+// http://opensource.org/licenses/bsd-license.php.                                  
+//                                                                                  
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+//                                                                                  
+//
+//
+//
+// Module Name:
+//
+//   DPTF.vfr
+//
+// Abstract:
+//
+//   Driver Setup formset.
+//
+// Revision History:
+//   ------------------------------------------------------------------------------
+//   Rev   Date<MM/DD/YYYY>    Name    Description
+//   ------------------------------------------------------------------------------
+
+// --*/
+
+form formid = THERMAL_FORM_ID,
+
+  title  = STRING_TOKEN(STR_THERMAL_TITLE);
+
+  subtitle text = STRING_TOKEN(STR_THERMAL_CONFIGURATION);
+
+
+  suppressif TRUE;
+    numeric varid = Setup.PassiveTc1Value,
+      prompt  = STRING_TOKEN (STR_ACPI_PASSIVE_TC1_VALUE),
+      help    = STRING_TOKEN (STR_ACPI_PASSIVE_TC1_VALUE_HELP),
+      flags   = 0 | RESET_REQUIRED,
+      minimum = 1,
+      maximum = 16,
+      step    = 1,
+      default = 1,
+    endnumeric;
+
+    numeric varid = Setup.PassiveTc2Value,
+      prompt  = STRING_TOKEN (STR_ACPI_PASSIVE_TC2_VALUE),
+      help    = STRING_TOKEN (STR_ACPI_PASSIVE_TC2_VALUE_HELP),
+      flags   = 0 | RESET_REQUIRED,
+      minimum = 1,
+      maximum = 16,
+      step    = 1,
+      default = 5,
+    endnumeric;
+
+    numeric varid = Setup.PassiveTspValue,
+      prompt  = STRING_TOKEN (STR_ACPI_PASSIVE_TSP_VALUE),
+      help    = STRING_TOKEN (STR_ACPI_PASSIVE_TSP_VALUE_HELP),
+      flags   = 0 | RESET_REQUIRED,
+      minimum = 2,
+      maximum = 50,
+      step    = 2,
+      default = 50,
+    endnumeric;
+  endif;
+
+  subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+  oneof varid    = Setup.DisableActiveTripPoints,
+        prompt      = STRING_TOKEN(STR_DATP_PROMPT),
+        help        = STRING_TOKEN(STR_DATP_HELP),
+        option text = STRING_TOKEN(STR_DISABLED), value = 0, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLED),  value = 1, flags = RESET_REQUIRED;
+  endoneof;
+
+  subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+
+
+endform;

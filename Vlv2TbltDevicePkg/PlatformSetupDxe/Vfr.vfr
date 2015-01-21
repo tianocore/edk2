@@ -1,0 +1,128 @@
+//
+//
+//
+// Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+//                                                                                  
+// This program and the accompanying materials are licensed and made available under
+// the terms and conditions of the BSD License that accompanies this distribution.  
+// The full text of the license may be found at                                     
+// http://opensource.org/licenses/bsd-license.php.                                  
+//                                                                                  
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+//                                                                                  
+//
+//
+#include "Configuration.h"
+#include "PlatformSetupDxeStrDefs.h"
+#include "Guid/SetupVariable.h"
+
+formset
+  guid     = SYSTEM_CONFIGURATION_GUID,
+  title    = STRING_TOKEN(STR_SYSTEM_SETUP_TITLE),
+  help     = STRING_TOKEN(STR_SYSTEM_SETUP_HELP),
+  class    = 1,
+  subclass = 0,
+
+
+  varstore SYSTEM_CONFIGURATION, name = Setup, guid = SYSTEM_CONFIGURATION_GUID;
+  form formid = ROOT_FORM_ID,
+    title    = STRING_TOKEN(STR_SYSTEM_SETUP_TITLE);
+
+    //
+    // Jump to  2)Main Form
+    //
+    goto ROOT_MAIN_FORM_ID,
+      prompt = STRING_TOKEN(STR_MAIN_TITLE),
+      help   = STRING_TOKEN(STR_MAIN_HELP);
+
+    //
+    // Jump to  3)Uncore Configuration Form
+    //
+    goto UNCORE_FORM_ID,
+      prompt = STRING_TOKEN(STR_UNCORE_CONFIGURATION_TITLE),
+      help   = STRING_TOKEN(STR_UNCORE_CONFIGURATION_HELP);
+
+    //
+    // Jump to  4)South Cluster  Configuration Form
+    //
+    goto SOUTH_CLUSTER_FORM_ID,
+      prompt = STRING_TOKEN(STR_SOUTH_CLUSTER_TITLE),
+      help   = STRING_TOKEN(STR_SOUTH_CLUSTER_HELP);
+
+    // Jump to  5)Boot Form
+    //
+    goto BOOT_CONFIGURATION_FORM_ID,
+      prompt = STRING_TOKEN(STR_BOOT_CONFIGURATION_TITLE),
+      help   = STRING_TOKEN(STR_BOOT_CONFIGURATION_HELP);
+
+    //
+    // Jump to  6)Security Configuration Form
+    //
+    goto SECURITY_CONFIGURATION_FORM_ID,
+      prompt = STRING_TOKEN(STR_SECURITY_CONFIGURATION_TITLE),
+      help   = STRING_TOKEN(STR_SECURITY_CONFIGURATION_HELP);
+
+    //
+    // Jump to  7)Thermal Form
+    //
+    goto THERMAL_FORM_ID,
+      prompt = STRING_TOKEN(STR_THERMAL_TITLE),
+      help   = STRING_TOKEN(STR_THERMAL_HELP);
+
+    //
+    // Jump to 8) System Component Form
+    goto SYSTEM_COMPONENT_FORM_ID,
+      prompt = STRING_TOKEN(STR_SYSTEM_COMPONENT_TITLE),
+      help   = STRING_TOKEN(STR_SYSTEM_COMPONENT_HELP);
+
+    //
+    // Jump to  10)Debug Configuration Form
+    //
+#if (BYTI_PF_ENABLE == 0)
+    goto DEBUG_CONFIGURATION_FORM_ID,
+      prompt = STRING_TOKEN(STR_DEBUG_CONFIGURATION_TITLE),
+      help   = STRING_TOKEN(STR_DEBUG_CONFIGURATION_HELP);
+#endif
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+    //
+    // Commit change and exit
+    //
+    text
+      help   = STRING_TOKEN(STR_COMMIT_CHANGE_AND_EXIT_HELP),
+      text   = STRING_TOKEN(STR_COMMIT_CHANGE_AND_EXIT_PROMPT),
+      text   = STRING_TOKEN(STR_COMMIT_CHANGE_AND_EXIT_PROMPT),
+      flags  = INTERACTIVE,
+      key    = 0xF001;
+
+    //
+    // Discard change and exit
+    //
+    text
+      help   = STRING_TOKEN(STR_DISCARD_CHANGE_AND_EXIT_HELP),
+      text   = STRING_TOKEN(STR_DISCARD_CHANGE_AND_EXIT_PROMPT),
+      text   = STRING_TOKEN(STR_DISCARD_CHANGE_AND_EXIT_PROMPT),
+      flags  = INTERACTIVE,
+      key    = 0xF002;
+
+    //
+    // Load default and exit
+    //
+    text
+      help   = STRING_TOKEN(STR_LOAD_DEFAULT_AND_EXIT_HELP),
+      text   = STRING_TOKEN(STR_LOAD_DEFAULT_AND_EXIT_PROMPT),
+      text   = STRING_TOKEN(STR_LOAD_DEFAULT_AND_EXIT_PROMPT),
+      flags  = INTERACTIVE,
+      key    = 0xF003;
+  endform;
+
+  #include "Main.vfi"
+  #include "UnCore.vfi"
+  #include "SouthClusterConfig.vfi"
+  #include "Boot.vfi"
+  #include "Security.vfi"
+  #include "Thermal.vfi"
+  #include "SystemComponent.vfi"
+  #include "DebugConfig.vfi"
+endformset;

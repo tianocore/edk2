@@ -1,0 +1,96 @@
+## @file
+# This driver provides multi console supports.
+#
+# This driver acts as a virtual console, takes over the console I/O control from selected
+# standard console devices, and transmits console I/O to related console device drivers.
+# Consplitter could install Graphics Output protocol and/or UGA Draw protocol in system
+# table according PCD settings(PcdConOutGopSupport, and PcdConOutUgaSupport). It always
+# consumes Graphics Output protocol which is produced by display device, and consumes UGA Draw
+# protocol which is produced by display device according to PcdUgaConsumeSupport value.
+# Note: If only UGA Draw protocol is installed in system table, PcdUgaConsumeSupport
+# should be set to TRUE.
+#
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ConSplitterDxe
+  FILE_GUID                      = 408edcec-cf6d-477c-a5a8-b4844e3de281
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ConSplitterDriverEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gConSplitterConInDriverBinding
+#  COMPONENT_NAME                =  gConSplitterConInComponentName
+#  COMPONENT_NAME2               =  gConSplitterConInComponentName2
+#  DRIVER_BINDING                =  gConSplitterSimplePointerDriverBinding
+#  COMPONENT_NAME                =  gConSplitterSimplePointerComponentName
+#  COMPONENT_NAME2               =  gConSplitterSimplePointerComponentName2
+#  DRIVER_BINDING                =  gConSplitterConOutDriverBinding
+#  COMPONENT_NAME                =  gConSplitterConOutComponentName
+#  COMPONENT_NAME2               =  gConSplitterConOutComponentName2
+#  DRIVER_BINDING                =  gConSplitterStdErrDriverBinding
+#  COMPONENT_NAME                =  gConSplitterStdErrComponentName
+#  COMPONENT_NAME2               =  gConSplitterStdErrComponentName2
+#
+
+[Sources]
+  ConSplitterGraphics.c
+  ComponentName.c
+  ConSplitter.h
+  ConSplitter.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PcdLib
+
+[Guids]
+  gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMES
+  gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMES
+  gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMES
+  gConnectConInEventGuid                        ## ALWAYS_CONSUMES
+
+[Protocols]
+  gEfiSimplePointerProtocolGuid                 ## BY_START
+  gEfiAbsolutePointerProtocolGuid               ## BY_START
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiSimpleTextOutProtocolGuid                 ## BY_START
+  gEfiGraphicsOutputProtocolGuid                ## BY_START
+  gEfiUgaDrawProtocolGuid                       ## BY_START
+
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand

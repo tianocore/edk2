@@ -1,0 +1,54 @@
+#
+#
+# Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#  Module Name:
+#
+#    CpuPeim.inf
+#
+#  Abstract:
+#
+#    Component description file for CPU module
+#
+#
+#--*/
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FvInfoPei
+  FILE_GUID                      = 64AAEAE0-92DF-4980-8668-6EB5EAAF4393
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimInitializeFvInfo
+
+[sources.common]
+  FvInfoPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+
+[Pcd.common]
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvRecovery2Base
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvRecovery2Size
+
+[Ppis]
+  gEfiPeiFirmwareVolumeInfoPpiGuid
+
+[Depex]
+  TRUE
+

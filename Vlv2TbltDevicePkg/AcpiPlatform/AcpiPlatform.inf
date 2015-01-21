@@ -1,0 +1,90 @@
+#
+#
+# Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#  Module Name:
+#
+#   AcpiPlatformBB.inf
+#
+#  Abstract:
+#
+#
+
+
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiPlatform
+  FILE_GUID                      = F0F6F006-DAB4-44b2-A7A1-0F72EEDCA716
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
+
+[sources.common]
+  AcpiPlatformHooks.c
+  AcpiPlatform.c
+
+[Packages]
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+
+[LibraryClasses]
+  HobLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  IoLib
+  PchPlatformLib
+
+[Guids]
+  gACPIOSFRMfgStringVariableGuid
+  gEfiAcpiTableStorageGuid
+  gACPIOSFRMfgStringVariableGuid
+  gEfiBoardFeaturesGuid
+  gEfiPlatformInfoGuid
+  gEfiNormalSetupGuid
+  gACPIOSFRRefDataBlockVariableGuid
+  gACPIOSFRModelStringVariableGuid
+  gEfiPlatformCpuInfoGuid
+  gEfiVlv2VariableGuid
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEnhancedSpeedstepProtocolGuid
+  gEfiPlatformCpuProtocolGuid
+  gEfiAcpiSupportProtocolGuid
+  gEfiAcpiS3SaveProtocolGuid
+  gEfiCpuIoProtocolGuid
+  gEfiPs2PolicyProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiMpServiceProtocolGuid
+  gEfiGlobalNvsAreaProtocolGuid
+  gEfiTcgProtocolGuid
+  gEfiFirmwareVolumeProtocolGuid
+  gIgdOpRegionProtocolGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile
+
+[Depex]
+  gEfiAcpiSupportProtocolGuid AND
+  gEfiMpServiceProtocolGuid AND
+  gEfiCpuIoProtocolGuid
+

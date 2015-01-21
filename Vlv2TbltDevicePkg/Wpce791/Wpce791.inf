@@ -1,0 +1,68 @@
+#
+#
+# Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#
+#  Module Name:
+#
+#    SiO791.inf
+#
+#  Abstract:
+#
+#    Component description file for SIO791 module.
+#
+--*/
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SIO791
+  FILE_GUID                      = 04A76C80-06B9-445e-B73E-CB8C61A6A964
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = LpcDriverEntryPoint
+
+[sources.common]
+ LpcIsaAcpi.h
+ LpcSio.h
+ LpcDriver.h
+ LpcIsaAcpi.c
+ LpcSio.c
+ LpcDriver.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DevicePathLib
+  UefiLib
+  S3BootScriptLib
+  DebugLib
+
+[Ppis]
+
+[Protocols]
+  gEfiPciIoProtocolGuid
+  gEfiIsaAcpiProtocolGuid
+  gEfiLpcWpce791PolicyProtocolGuid
+
+[Guids]
+
+[Depex]
+  TRUE

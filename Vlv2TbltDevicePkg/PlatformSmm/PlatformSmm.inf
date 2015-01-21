@@ -1,0 +1,98 @@
+#
+#
+# Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#  Module Name:
+#
+#   Platform.inf
+#
+#  Abstract:
+#
+#    Component description file for SMM Platform handler module
+#
+#--*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformSmm
+  FILE_GUID                      = 99C20A37-042A-46e2-80F4-E4027FDBC86F
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePlatformSmm
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  S3Save.c
+  Platform.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  IoLib
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  HobLib
+  S3BootScriptLib
+  StallSmmLib
+  PchPlatformLib
+
+[Guids]
+  gEfiSetupVariableGuid
+  gDmiDataGuid
+  gEfiAcpiVariableCompatiblityGuid
+  gEfiPciLanInfoGuid
+  gEfiPciLanInfoGuid
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+
+[Protocols]
+  gEfiSmmBaseProtocolGuid
+  gEfiSmmIchnDispatchProtocolGuid
+  gEfiGlobalNvsAreaProtocolGuid
+  gEfiSmmSwDispatchProtocolGuid
+  gEfiSmmPowerButtonDispatchProtocolGuid
+  gEfiSmmSxDispatchProtocolGuid
+  gEfiSmmVariableProtocolGuid
+  gEfiCpuIo2ProtocolGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[Pcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+[Depex]
+  gEfiSmmBaseProtocolGuid                 AND
+  gEfiSmmAccess2ProtocolGuid               AND
+  gEfiSmmPowerButtonDispatchProtocolGuid  AND
+  gEfiSmmSxDispatchProtocolGuid           AND
+  gEfiSmmIchnDispatchProtocolGuid         AND
+  gEfiSmmSwDispatchProtocolGuid           AND
+  gEfiVariableArchProtocolGuid            AND
+  gEfiVariableWriteArchProtocolGuid       AND
+  gEfiGlobalNvsAreaProtocolGuid
+

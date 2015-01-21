@@ -1,0 +1,59 @@
+## @file
+#
+#  A helper driver to save information to SMRAM after SMRR is enabled.
+#
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmramSaveInfoHandlerSmm
+  FILE_GUID                      = 63296C52-01CF-4eea-A47C-782A14DA6894
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+  ENTRY_POINT                    = SmramSaveInfoHandlerSmmMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  SmramSaveInfoHandlerSmm.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  SmmServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  IoLib
+
+[Protocols]
+  gEfiSmmSwDispatchProtocolGuid      ## CONSUMED
+  gEfiSmmControlProtocolGuid         ## CONSUMED
+  gEfiSmmReadyToLockProtocolGuid     ## CONSUMED
+
+[Depex]
+  gEfiSmmSwDispatchProtocolGuid AND
+  gEfiSmmControlProtocolGuid
+

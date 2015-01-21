@@ -1,0 +1,122 @@
+#
+#
+# Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+#  Module Name:
+#
+#    PlatformEarlyInit.inf
+#
+#  Abstract:
+#
+#    Component description file for PlatformEarlyInit module
+#
+#--*/
+
+[defines]
+INF_VERSION 				   = 0x00010005
+BASE_NAME					   = PlatformEarlyInit
+FILE_GUID					   = 0A5EA2E1-BE0B-44a0-A775-F429C9A018A0
+MODULE_TYPE 				   = PEIM
+VERSION_STRING				   = 1.0
+PI_SPECIFICATION_VERSION	   = 0x0001000A
+ENTRY_POINT 				   = PlatformEarlyInitEntry
+
+[sources.common]
+  BootMode.c
+  CpuInitPeim.c
+  PchInitPeim.c
+  MchInit.c
+  MemoryCallback.c
+  MemoryPeim.c
+  PlatformEarlyInit.c
+  PlatformEarlyInit.h
+  PlatformInfoInit.c
+  LegacySpeaker.c
+  LegacySpeaker.h
+  Stall.c
+  PlatformSsaInitPeim.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  IA32FamilyCpuPkg/IA32FamilyCpuPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+  HobLib
+  IoLib
+#  PeiKscLib
+  MultiPlatformLib
+  PcdLib
+  PchPlatformLib
+  MtrrLib
+
+[Ppis]
+  gEfiPeiStallPpiGuid
+  gPeiSpeakerInterfacePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid
+  gVlvPolicyPpiGuid
+  gEfiPeiReadOnlyVariable2PpiGuid
+  gEfiPeiResetPpiGuid
+  gEfiEndOfPeiSignalPpiGuid
+  gPeiSmbusPolicyPpiGuid
+  gEfiFindFvPpiGuid
+  gPeiCapsulePpiGuid
+  gEfiPeiBootInRecoveryModePpiGuid
+  gEfiPeiRecoveryModulePpiGuid
+  gEfiPeiDeviceRecoveryModulePpiGuid
+  gPeiCachePpiGuid
+  gEfiPeiMasterBootModePpiGuid
+  gEfiPeiSmbusPpiGuid
+  gPchInitPpiGuid
+  gPchUsbPolicyPpiGuid
+
+[Guids]
+  gEfiSetupVariableGuid
+  gEfiPlatformInfoGuid
+  gEfiPlatformBootModeGuid
+  gEfiPlatformCpuInfoGuid
+  gEfiGlobalVariableGuid
+  gRecoveryOnFatFloppyDiskGuid
+  gRecoveryOnFatUsbDiskGuid
+  gRecoveryOnFatIdeDiskGuid
+  gRecoveryOnDataCdGuid
+  gMfgModeVariableGuid
+  gEfiNormalSetupGuid
+  gEfiMemoryTypeInformationGuid
+  gOsSelectionVariableGuid
+
+[Pcd.common]
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvMainBase
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvMainSize
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiIchTokenSpaceGuid.PcdPeiIchEhciControllerMemoryBaseAddress
+
+  gPlatformModuleTokenSpaceGuid.PcdFlashAreaBaseAddress
+  gPlatformModuleTokenSpaceGuid.PcdFlashAreaSize
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvRecovery2Base
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvRecovery2Size
+
+[Pcd]
+  gEfiVLVTokenSpaceGuid.PcdMeasuredBootEnable
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid  AND gPeiCachePpiGuid

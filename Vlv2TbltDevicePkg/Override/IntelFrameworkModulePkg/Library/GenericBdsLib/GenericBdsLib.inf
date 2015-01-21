@@ -1,0 +1,114 @@
+## @file
+#  
+#  General BDS defines and produce general interfaces for platform BDS driver including:
+#  1) BDS boot policy interface;
+#  2) BDS boot device connect interface;
+#  3) BDS Misc interfaces for mainting boot variable, ouput string, etc.
+#  
+#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GenericBdsLib
+  FILE_GUID                      = e405ec31-ccaa-4dd4-83e8-0aec01703f7e
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION 
+  CONSTRUCTOR                    = GenericBdsLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  DevicePath.c
+  Performance.c
+  BdsConnect.c
+  BdsMisc.c
+  BdsConsole.c
+  BdsBoot.c
+  InternalBdsLib.h
+  String.h
+  String.c
+  GenericBdsStrings.uni
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  PeCoffGetEntryPointLib
+  BaseLib
+  HobLib
+  UefiRuntimeServicesTableLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  PcdLib
+  PerformanceLib
+  TimerLib
+  DxeServicesLib
+  HiiLib
+  ReportStatusCodeLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID (The identifier of memory type information type in system table)
+  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootCurrent" (The boot option of current boot)
+  gEfiFileInfoGuid                              ## CONSUMES ## GUID
+  gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
+  gEfiUartDevicePathGuid                        ## CONSUMES ## GUID (Identify the device path for UARD device)
+  gLastEnumLangGuid                             ## SOMETIMES_PRODUCES ## Variable:L"LastEnumLang" (Platform language at last time enumeration.)
+  gHdBootDevicePathVariablGuid                  ## SOMETIMES_PRODUCES ## Variable:L"HDDP" (The device path of Boot file on Hard device.)
+  gBdsLibStringPackageGuid                      ## PRODUCES ## GUID (HII String PackageList Guid)
+  gEfiLegacyDevOrderVariableGuid                ## CONSUMES ## GUID
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL CONSUMES
+  gEfiLoadFileProtocolGuid                      # PROTOCOL CONSUMES
+  gEfiSimpleTextOutProtocolGuid                 # PROTOCOL CONSUMES
+  gEfiPciIoProtocolGuid                         # PROTOCOL CONSUMES
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL CONSUMES
+  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL CONSUMES
+  gEfiDebugPortProtocolGuid                     # PROTOCOL CONSUMES
+  gEfiSimpleTextInProtocolGuid                  # PROTOCOL CONSUMES
+  gEfiBlockIoProtocolGuid                       # PROTOCOL CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL CONSUMES
+  gEfiLegacyBiosProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMES
+  gEfiCpuArchProtocolGuid                       # PROTOCOL CONSUMES
+  gEfiDevicePathProtocolGuid                    # PROTOCOL CONSUMES
+  gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL CONSUMES
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid |gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
+  gEfiOEMBadgingProtocolGuid                    # PROTOCOL CONSUMES
+  gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
+  gEfiUserManagerProtocolGuid                   # PROTOCOL CONSUMES
+  gEfiUsbIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      # PROTOCOL SOMETIMES_CONSUMES
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile

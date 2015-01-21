@@ -1,0 +1,61 @@
+#/*++
+#
+# Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+
+#
+#  Module Name:
+#
+#   PlatformCpuInfoDxe.inf
+#
+#  Abstract:
+#
+#
+--*/
+
+
+[Defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = PlatformCpuInfoDxe
+  FILE_GUID            = 025F738B-4EBD-4d55-B728-5F421B601F20
+  MODULE_TYPE          = DXE_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = PlatformCpuInfoInit
+
+[Sources]
+  PlatformCpuInfoDxe.c
+  PlatformCpuInfoDxe.h
+
+[Guids]
+  gEfiPlatformCpuInfoGuid
+  gEfiVlv2VariableGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+  IA32FamilyCpuPkg/IA32FamilyCpuPkg.dec #CpuConfigLib.h
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  HobLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /Od /GL-
+  INTEL:*_*_*_CC_FLAGS = /Od /GL-
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND
+  gEfiVariableWriteArchProtocolGuid
+

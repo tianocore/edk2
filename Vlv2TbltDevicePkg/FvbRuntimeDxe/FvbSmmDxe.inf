@@ -1,0 +1,55 @@
+## @file
+# Component description file for Firmware Volume Block module.
+#
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FvbSmmDxe
+  FILE_GUID                      = 9E8AD3F4-383D-4ec3-816E-7A4749371290
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FvbSmmDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FvbSmmDxe.c
+  FvbSmmDxe.h
+  FvbSmmCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  DebugLib
+  DxeServicesTableLib
+  UefiDriverEntryPoint
+  PcdLib
+
+[Protocols]
+  gEfiFirmwareVolumeBlockProtocolGuid           ## ALWAYS_PRODUCES
+  gEfiSmmCommunicationProtocolGuid
+  gEfiSmmFirmwareVolumeBlockProtocolGuid
+
+[Depex]
+  gEfiSmmCommunicationProtocolGuid

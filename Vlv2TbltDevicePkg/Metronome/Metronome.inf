@@ -1,0 +1,54 @@
+#
+#
+# Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
+#
+
+#  Module Name:
+#
+#    LegacyMetronome.inf
+#
+#  Abstract:
+#
+#    Component description file for LegacyMetronome module
+#
+#--*/
+[defines]
+  INF_VERSION	       = 0x00010005
+  BASE_NAME            = LegacyMetronome
+  FILE_GUID            = 07A9330A-F347-11d4-9A49-0090273FC14D
+  MODULE_TYPE          = DXE_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT	       = InstallLegacyMetronome
+
+[sources.common]
+  LegacyMetronome.c
+  LegacyMetronome.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DevicePathLib
+  UefiLib
+
+[Protocols]
+
+gEfiMetronomeArchProtocolGuid
+gEfiCpuIoProtocolGuid
+
+[Depex]
+gEfiCpuIoProtocolGuid  AND  gEfiBootScriptSaveProtocolGuid
+
+
