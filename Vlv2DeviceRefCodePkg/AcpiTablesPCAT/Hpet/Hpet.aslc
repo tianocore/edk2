@@ -1,0 +1,69 @@
+/*++
+
+Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+
+
+Module Name:
+
+  Hpet.c
+
+Abstract:
+
+  This file contains a structure definition for the ACPI HPET Table.
+--*/
+
+//
+// Statements that include other files
+//
+#ifdef ECP_FLAG
+#include <Tiano.h>
+#endif
+#include <Hpet.h>
+#include "AcpiTablePlatform.h"
+
+// Hpet Table
+EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_HEADER HPET = {
+  {
+    EFI_ACPI_3_0_HIGH_PRECISION_EVENT_TIMER_TABLE_SIGNATURE,
+    sizeof (EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_HEADER),
+    EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_REVISION,
+    0,                          // to make sum of entire table == 0
+    EFI_ACPI_OEM_ID,            // OEMID is a 6 bytes long field
+    EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
+    EFI_ACPI_OEM_REVISION,      // OEM revision
+    EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
+    EFI_ACPI_CREATOR_REVISION   // ASL compiler revision number
+  },
+  0x0,                          // EventTimerBlockId
+  {
+    0x00,                     // Address_Space_ID = System Memory
+    0x40,                     // Register_Bit_Width = 32 bits, mentioned about write failures when in 64bit in SCU HAS
+    0x00,                     // Register_Bit_offset
+    0x00,                     // Dword access
+    HPET_BASE_ADDRESS,        // Base addresse of HPET
+  },
+  0x0,                          // Only HPET's _UID in Namespace
+  MAIN_COUNTER_MIN_PERIODIC_CLOCK_TICKS,
+  0x0
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from
+  // removing the data structure from the executable
+  //
+  return (VOID*)&HPET;
+}
