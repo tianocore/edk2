@@ -593,8 +593,8 @@ INF IntelFrameworkModulePkg/Bus/Isa/IsaIoDxe/IsaIoDxe.inf
 !if $(SOURCE_DEBUG_ENABLE) != TRUE
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
 !endif
-INF IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
-INF IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
+#INF IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
+#INF IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
 
 #
 # SDIO
