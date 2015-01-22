@@ -200,12 +200,12 @@ InternalHstiIsValidTable (
   //
   // Check ImplementationID
   //
-  for (Index = 0; Index < sizeof(Hsti->ImplementationID); Index++) {
+  for (Index = 0; Index < sizeof(Hsti->ImplementationID)/sizeof(Hsti->ImplementationID[0]); Index++) {
     if (Hsti->ImplementationID[Index] == 0) {
       break;
     }
   }
-  if (Index == sizeof(Hsti->ImplementationID)) {
+  if (Index == sizeof(Hsti->ImplementationID)/sizeof(Hsti->ImplementationID[0])) {
     DEBUG ((EFI_D_ERROR, "ImplementationID is no NUL CHAR\n"));
     return FALSE;
   }
