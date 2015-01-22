@@ -1,15 +1,24 @@
 /** @file
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
-                                                                                   
-  This program and the accompanying materials are licensed and made available under
-  the terms and conditions of the BSD License that accompanies this distribution.  
-  The full text of the license may be found at                                     
-  http://opensource.org/licenses/bsd-license.php.                                  
-                                                                                   
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-                                                                                   
+  Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
+                                                                                   
+
+  This program and the accompanying materials are licensed and made available under
+
+  the terms and conditions of the BSD License that accompanies this distribution.  
+
+  The full text of the license may be found at                                     
+
+  http://opensource.org/licenses/bsd-license.php.                                  
+
+                                                                                   
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+
+                                                                                   
+
 
 Module Name:
 
@@ -613,11 +622,11 @@ InitializePlatform (
   EFI_STATUS                          Status;
   UINTN                               VarSize;
   EFI_HANDLE                          Handle = NULL;
-
   EFI_EVENT                           mEfiExitBootServicesEvent;
-
-  //
-mImageHandle = ImageHandle;
+  EFI_EVENT                           RtcEvent;
+  VOID                                *RtcCallbackReg = NULL;
+  
+  mImageHandle = ImageHandle;
 
   Status = gBS->InstallProtocolInterface (
                   &Handle,
@@ -789,13 +798,24 @@ mImageHandle = ImageHandle;
                   &mEfiExitBootServicesEvent
                   );
 
+  //
+  // Adjust RTC deafult time to be BIOS-built time.
+  //
+  Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    AdjustDefaultRtcTimeCallback,
+                    NULL,
+                    &RtcEvent
+                    );
+  if (!EFI_ERROR (Status)) {
+      Status = gBS->RegisterProtocolNotify (
+                      &gExitPmAuthProtocolGuid,
+                      RtcEvent,
+                      &RtcCallbackReg
+                      );
 
-//
-// Tristae Lpc pins at last moment
-//
-if (mSystemConfiguration.TristateLpc == 1)
-{
-}
+  }
 
   return EFI_SUCCESS;
 }

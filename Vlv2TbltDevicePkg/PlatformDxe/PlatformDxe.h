@@ -1,15 +1,15 @@
 /*++
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
-                                                                                   
-  This program and the accompanying materials are licensed and made available under
-  the terms and conditions of the BSD License that accompanies this distribution.  
-  The full text of the license may be found at                                     
-  http://opensource.org/licenses/bsd-license.php.                                  
-                                                                                   
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-                                                                                   
+  Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
+                                                                                   
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.  
+  The full text of the license may be found at                                     
+  http://opensource.org/licenses/bsd-license.php.                                  
+                                                                                   
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+                                                                                   
 
 
 Module Name:
@@ -45,6 +45,7 @@ Abstract:
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/BaseCryptLib.h>
+#include <Library/BiosIdLib.h>
 #include <Protocol/GlobalNvsArea.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/IsaAcpi.h>
@@ -60,6 +61,7 @@ Abstract:
 #include <Protocol/DataHub.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/Speaker.h>
+#include <Protocol/ExitPmAuth.h>
 #include <IndustryStandard/Pci22.h>
 #include <Guid/SetupVariable.h>
 #include <Guid/PlatformInfo.h>
@@ -633,6 +635,13 @@ InitializeObservableProtocol();
 
 EFI_STATUS
 PciBusDriverHook();
+
+VOID
+EFIAPI
+AdjustDefaultRtcTimeCallback (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  );
 
 typedef struct _GOP_DISPLAY_BRIGHTNESS_PROTOCOL GOP_DISPLAY_BRIGHTNESS_PROTOCOL;
 
