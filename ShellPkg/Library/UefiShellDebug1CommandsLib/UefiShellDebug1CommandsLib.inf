@@ -1,7 +1,7 @@
 ##  @file
 # Provides shell Debug1 profile functions
 #
-# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -117,20 +117,20 @@
   BcfgCommandLib
 
 [Pcd]
-  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask              # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize        # ALWAYS_CONSUMED
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength      # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask              ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength      ## CONSUMES
 
 [Protocols]
-  gEfiPciRootBridgeIoProtocolGuid
-  gEfiBlockIoProtocolGuid
-  gEfiSimplePointerProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid             ## CONSUMES
+  gEfiBlockIoProtocolGuid                     ## CONSUMES
+  gEfiSimplePointerProtocolGuid               ## CONSUMES
 
 [Guids]
-  gEfiGlobalVariableGuid
-  gEfiSmbiosTableGuid
-  gEfiMpsTableGuid
-  gEfiSalSystemTableGuid
-  gEfiAcpi10TableGuid
-  gEfiAcpi20TableGuid
-  gShellDebug1HiiGuid
+  gEfiGlobalVariableGuid          ## SOMETIMES_CONSUMES ## GUID
+  gEfiSmbiosTableGuid             ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiMpsTableGuid                ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiSalSystemTableGuid          ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi10TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi20TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
+  gShellDebug1HiiGuid             ## SOMETIMES_CONSUMES ## HII

@@ -1,7 +1,7 @@
 ##  @file
 #  Provides interface to shell internal functions for shell commands.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
+#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -49,21 +49,21 @@
   HandleParsingLib
 
 [Protocols]
-  gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiShellProtocolGuid                                   # ALWAYS_CONSUMED
-  gEfiShellParametersProtocolGuid                         # ALWAYS_CONSUMED
-  gEfiShellDynamicCommandProtocolGuid                     # SOMETIMES_CONSUMED
-  gEfiUsbIoProtocolGuid                                   ## SOMETIMES_CONSUMED
+  gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
+  gEfiShellProtocolGuid                                   ## CONSUMES
+  gEfiShellParametersProtocolGuid                         ## CONSUMES
+  gEfiShellDynamicCommandProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiUsbIoProtocolGuid                                   ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiSasDevicePathGuid                                   # ALWAYS_CONSUMED
+  gEfiSasDevicePathGuid                                   ## CONSUMES ## GUID
 
 [Pcd.common]
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdUsbExtendedDecode         ## SOMETIMES_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames  ## SOMETIMES_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellVendorExtendedDecode ## SOMETIMES_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdUsbExtendedDecode         ## SOMETIMES_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames  ## SOMETIMES_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellVendorExtendedDecode ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiUnicodeCollation2ProtocolGuid
