@@ -50,6 +50,12 @@ EFI_PEI_PPI_DESCRIPTOR  mTpmInitializedPpiList = {
   NULL
 };
 
+EFI_PEI_PPI_DESCRIPTOR  mTpmInitializationDonePpiList = {
+  EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  &gPeiTpmInitializationDonePpiGuid,
+  NULL
+};
+
 EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredBaseFvInfo;
 UINT32 mMeasuredBaseFvIndex = 0;
 
@@ -737,6 +743,7 @@ PeimEntryMA (
   )
 {
   EFI_STATUS                        Status;
+  EFI_STATUS                        Status2;
   EFI_BOOT_MODE                     BootMode;
   TIS_TPM_HANDLE                    TpmHandle;
 
@@ -768,13 +775,13 @@ PeimEntryMA (
     Status = TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR)TpmHandle);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "TPM not detected!\n"));
-      return Status;
+      goto Done;
     }
 
     if (PcdGet8 (PcdTpmInitializationPolicy) == 1) {
       Status = TpmCommStartup ((EFI_PEI_SERVICES**)PeiServices, TpmHandle, BootMode);
       if (EFI_ERROR (Status) ) {
-        return Status;
+        goto Done;
       }
     }
 
@@ -784,20 +791,29 @@ PeimEntryMA (
     if (BootMode != BOOT_ON_S3_RESUME) {
       Status = TpmCommContinueSelfTest ((EFI_PEI_SERVICES**)PeiServices, TpmHandle);
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto Done;
       }
     }
 
+    //
+    // Only intall TpmInitializedPpi on success
+    //
     Status = PeiServicesInstallPpi (&mTpmInitializedPpiList);
     ASSERT_EFI_ERROR (Status);
   }
 
   if (mImageInMemory) {
     Status = PeimEntryMP ((EFI_PEI_SERVICES**)PeiServices);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    return Status;
   }
+
+Done:
+  //
+  // Always intall TpmInitializationDonePpi no matter success or fail.
+  // Other driver can know TPM initialization state by TpmInitializedPpi.
+  //
+  Status2 = PeiServicesInstallPpi (&mTpmInitializationDonePpiList);
+  ASSERT_EFI_ERROR (Status2);
 
   return Status;
 }

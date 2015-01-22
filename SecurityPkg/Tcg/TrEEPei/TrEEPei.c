@@ -62,6 +62,12 @@ EFI_PEI_PPI_DESCRIPTOR  mTpmInitializedPpiList = {
   NULL
 };
 
+EFI_PEI_PPI_DESCRIPTOR  mTpmInitializationDonePpiList = {
+  EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  &gPeiTpmInitializationDonePpiGuid,
+  NULL
+};
+
 EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredBaseFvInfo;
 UINT32 mMeasuredBaseFvIndex = 0;
 
@@ -621,21 +627,13 @@ PeimEntryMA (
   )
 {
   EFI_STATUS                        Status;
+  EFI_STATUS                        Status2;
   EFI_BOOT_MODE                     BootMode;
 
   if (CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceNoneGuid) ||
       CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
     DEBUG ((EFI_D_ERROR, "No TPM2 instance required!\n"));
     return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Update for Performance optimization
-  //
-  Status = Tpm2RequestUseTpm ();
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "TPM not detected!\n"));
-    return Status;
   }
 
   Status = PeiServicesGetBootMode (&BootMode);
@@ -658,6 +656,12 @@ PeimEntryMA (
     //
     // Initialize TPM device
     //
+    Status = Tpm2RequestUseTpm ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "TPM2 not detected!\n"));
+      goto Done;
+    }
+
     if (PcdGet8 (PcdTpm2InitializationPolicy) == 1) {
       if (BootMode == BOOT_ON_S3_RESUME) {
         Status = Tpm2Startup (TPM_SU_STATE);
@@ -668,7 +672,7 @@ PeimEntryMA (
         Status = Tpm2Startup (TPM_SU_CLEAR);
       }
       if (EFI_ERROR (Status) ) {
-        return Status;
+        goto Done;
       }
     }
 
@@ -679,21 +683,30 @@ PeimEntryMA (
       if (PcdGet8 (PcdTpm2SelfTestPolicy) == 1) {
         Status = Tpm2SelfTest (NO);
         if (EFI_ERROR (Status)) {
-          return Status;
+          goto Done;
         }
       }
     }
 
+    //
+    // Only intall TpmInitializedPpi on success
+    //
     Status = PeiServicesInstallPpi (&mTpmInitializedPpiList);
     ASSERT_EFI_ERROR (Status);
   }
 
   if (mImageInMemory) {
     Status = PeimEntryMP ((EFI_PEI_SERVICES**)PeiServices);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    return Status;
   }
+
+Done:
+  //
+  // Always intall TpmInitializationDonePpi no matter success or fail.
+  // Other driver can know TPM initialization state by TpmInitializedPpi.
+  //
+  Status2 = PeiServicesInstallPpi (&mTpmInitializationDonePpiList);
+  ASSERT_EFI_ERROR (Status2);
 
   return Status;
 }

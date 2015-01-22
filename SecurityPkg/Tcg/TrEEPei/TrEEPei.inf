@@ -64,7 +64,8 @@
   gEfiPeiFirmwareVolumeInfoPpiGuid                                     ## SOMETIMES_CONSUMES     ## NOTIFY
   gEfiPeiFirmwareVolumeInfo2PpiGuid                                    ## SOMETIMES_CONSUMES     ## NOTIFY
   gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid                  ## SOMETIMES_CONSUMES
-  gPeiTpmInitializedPpiGuid                                            ## PRODUCES
+  gPeiTpmInitializedPpiGuid                                            ## SOMETIMES_PRODUCES
+  gPeiTpmInitializationDonePpiGuid                                     ## PRODUCES
   gEfiEndOfPeiSignalPpiGuid                                            ## SOMETIMES_CONSUMES     ## NOTIFY
 
 [Pcd]
