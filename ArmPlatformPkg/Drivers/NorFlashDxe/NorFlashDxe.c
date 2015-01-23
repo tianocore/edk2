@@ -805,8 +805,7 @@ NorFlashRead (
   OUT VOID                *Buffer
   )
 {
-  UINT32              NumBlocks;
-  UINTN               StartAddress;
+  UINTN  StartAddress;
 
   // The buffer must be valid
   if (Buffer == NULL) {
@@ -818,15 +817,7 @@ NorFlashRead (
     return EFI_SUCCESS;
   }
 
-  // All blocks must be within the device
-  NumBlocks = ((UINT32)BufferSizeInBytes) / Instance->Media.BlockSize ;
-
-  if ((Lba + NumBlocks) > (Instance->Media.LastBlock + 1)) {
-    DEBUG ((EFI_D_ERROR, "NorFlashRead: ERROR - Read will exceed last block\n"));
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Offset + BufferSizeInBytes >= Instance->Size) {
+  if (((Lba * Instance->Media.BlockSize) + Offset + BufferSizeInBytes) > Instance->Size) {
     DEBUG ((EFI_D_ERROR, "NorFlashRead: ERROR - Read will exceed device size.\n"));
     return EFI_INVALID_PARAMETER;
   }
