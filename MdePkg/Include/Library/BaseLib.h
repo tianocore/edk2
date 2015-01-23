@@ -1627,7 +1627,7 @@ CHAR16*
 EFIAPI
 PathCleanUpDirectories(
   IN CHAR16 *Path
-);
+  );
 
 //
 // Linked List Functions and Macros
