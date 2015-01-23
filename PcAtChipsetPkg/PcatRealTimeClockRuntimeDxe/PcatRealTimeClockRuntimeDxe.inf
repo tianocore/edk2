@@ -38,6 +38,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
 
 [LibraryClasses]
   UefiRuntimeServicesTableLib
@@ -61,5 +62,8 @@
   
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout  ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear             ## CONSUMES
+
 [UserExtensions.TianoCore."ExtraFiles"]
   PcRtcExtra.uni
