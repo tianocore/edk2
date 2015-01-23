@@ -32,6 +32,7 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  AcpiLib
   ArmShellCmdRunAxfLib
   BaseMemoryLib
   BdsLib
