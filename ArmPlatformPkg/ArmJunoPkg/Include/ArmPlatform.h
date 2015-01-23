@@ -75,4 +75,9 @@
     EFI_ACPI_ARM_CREATOR_REVISION   /* UINT32  CreatorRevision */ \
   }
 
+#define JUNO_WATCHDOG_COUNT  2
+
+// Define if the exported ACPI Tables are based on ACPI 5.0 spec or latest
+//#define ARM_JUNO_ACPI_5_0
+
 #endif

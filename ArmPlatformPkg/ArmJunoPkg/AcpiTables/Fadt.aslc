@@ -17,12 +17,21 @@
 #include <Library/AcpiLib.h>
 #include <IndustryStandard/Acpi.h>
 
+#ifdef ARM_JUNO_ACPI_5_0
 EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
   ARM_ACPI_HEADER (
     EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
     EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE,
     EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION
   ),
+#else
+EFI_ACPI_5_1_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
+  ARM_ACPI_HEADER (
+    EFI_ACPI_5_1_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+    EFI_ACPI_5_1_FIXED_ACPI_DESCRIPTION_TABLE,
+    EFI_ACPI_5_1_FIXED_ACPI_DESCRIPTION_TABLE_REVISION
+  ),
+#endif
   0,                                                                        // UINT32     FirmwareCtrl
   0,                                                                        // UINT32     Dsdt
   EFI_ACPI_RESERVED_BYTE,                                                   // UINT8      Reserved0
@@ -63,7 +72,12 @@ EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
   EFI_ACPI_5_0_HW_REDUCED_ACPI | EFI_ACPI_5_0_LOW_POWER_S0_IDLE_CAPABLE,    // UINT32     Flags
   NULL_GAS,                                                                 // EFI_ACPI_5_0_GENERIC_ADDRESS_STRUCTURE  ResetReg
   0,                                                                        // UINT8      ResetValue
+#if ARM_JUNO_ACPI_5_0
   {EFI_ACPI_RESERVED_BYTE,EFI_ACPI_RESERVED_BYTE,EFI_ACPI_RESERVED_BYTE},   // UINT8      Reserved2[3]
+#else
+  EFI_ACPI_5_1_ARM_PSCI_COMPLIANT,                                          // UINT16     ArmBootArchFlags
+  EFI_ACPI_5_1_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION,                 // UINT8      MinorRevision
+#endif
   0,                                                                        // UINT64     XFirmwareCtrl
   0,                                                                        // UINT64     XDsdt
   NULL_GAS,                                                                 // EFI_ACPI_5_0_GENERIC_ADDRESS_STRUCTURE  XPm1aEvtBlk

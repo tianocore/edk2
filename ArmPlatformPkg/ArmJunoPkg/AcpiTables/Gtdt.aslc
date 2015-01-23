@@ -28,34 +28,73 @@
   #define GTDT_GLOBAL_FLAGS             (GTDT_GLOBAL_FLAGS_MAPPED | GTDT_GLOBAL_FLAGS_LEVEL)
 #else
   #define GTDT_GLOBAL_FLAGS             (GTDT_GLOBAL_FLAGS_NOT_MAPPED | GTDT_GLOBAL_FLAGS_LEVEL)
-  #define SYSTEM_TIMER_BASE_ADDRESS     0
+  #define SYSTEM_TIMER_BASE_ADDRESS     0xFFFFFFFFFFFFFFFF
 #endif
 
-#define GTDT_TIMER_EDGE_TRIGGERED   (1 << EFI_ACPI_5_0_GTDT_TIMER_FLAG_TIMER_INTERRUPT_MODE)
-#define GTDT_TIMER_LEVEL_TRIGGERED  (0 << EFI_ACPI_5_0_GTDT_TIMER_FLAG_TIMER_INTERRUPT_MODE)
-#define GTDT_TIMER_ACTIVE_LOW       (1 << EFI_ACPI_5_0_GTDT_TIMER_FLAG_TIMER_INTERRUPT_POLARITY)
-#define GTDT_TIMER_ACTIVE_HIGH      (0 << EFI_ACPI_5_0_GTDT_TIMER_FLAG_TIMER_INTERRUPT_POLARITY)
+#define GTDT_TIMER_EDGE_TRIGGERED   EFI_ACPI_5_0_GTDT_TIMER_FLAG_TIMER_INTERRUPT_MODE
+#define GTDT_TIMER_LEVEL_TRIGGERED  0 
+#define GTDT_TIMER_ACTIVE_LOW       EFI_ACPI_5_0_GTDT_TIMER_FLAG_TIMER_INTERRUPT_POLARITY
+#define GTDT_TIMER_ACTIVE_HIGH      0
 
 #define GTDT_GTIMER_FLAGS           (GTDT_TIMER_ACTIVE_LOW | GTDT_TIMER_LEVEL_TRIGGERED)
 
-EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE Gtdt = {
+#ifdef ARM_JUNO_ACPI_5_0
+  EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE Gtdt = {
     ARM_ACPI_HEADER(
       EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
       EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE,
       EFI_ACPI_5_0_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION
     ),
-  SYSTEM_TIMER_BASE_ADDRESS,                    // UINT64  PhysicalAddress
-  GTDT_GLOBAL_FLAGS,                            // UINT32  GlobalFlags
-  FixedPcdGet32 (PcdArmArchTimerSecIntrNum),    // UINT32  SecurePL1TimerGSIV
-  GTDT_GTIMER_FLAGS,                            // UINT32  SecurePL1TimerFlags
-  FixedPcdGet32 (PcdArmArchTimerIntrNum),       // UINT32  NonSecurePL1TimerGSIV
-  GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL1TimerFlags
-  FixedPcdGet32 (PcdArmArchTimerVirtIntrNum),   // UINT32  VirtualTimerGSIV
-  GTDT_GTIMER_FLAGS,                            // UINT32  VirtualTimerFlags
-  FixedPcdGet32 (PcdArmArchTimerHypIntrNum),    // UINT32  NonSecurePL2TimerGSIV
-  GTDT_GTIMER_FLAGS                             // UINT32  NonSecurePL2TimerFlags
-};
+    SYSTEM_TIMER_BASE_ADDRESS,                    // UINT64  PhysicalAddress
+    GTDT_GLOBAL_FLAGS,                            // UINT32  GlobalFlags
+    FixedPcdGet32 (PcdArmArchTimerSecIntrNum),    // UINT32  SecurePL1TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  SecurePL1TimerFlags
+    FixedPcdGet32 (PcdArmArchTimerIntrNum),       // UINT32  NonSecurePL1TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL1TimerFlags
+    FixedPcdGet32 (PcdArmArchTimerVirtIntrNum),   // UINT32  VirtualTimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  VirtualTimerFlags
+    FixedPcdGet32 (PcdArmArchTimerHypIntrNum),    // UINT32  NonSecurePL2TimerGSIV
+    GTDT_GTIMER_FLAGS                             // UINT32  NonSecurePL2TimerFlags
+  };
+#else
+  #pragma pack (1)
 
+  typedef struct {
+    EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE          Gtdt;
+    EFI_ACPI_5_1_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE     Watchdogs[JUNO_WATCHDOG_COUNT];
+  } EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLES;
+
+  #pragma pack ()
+
+  EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLES Gtdt = {
+    {
+      ARM_ACPI_HEADER(
+        EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
+        EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE,
+        EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION
+      ),
+      SYSTEM_TIMER_BASE_ADDRESS,                    // UINT64  PhysicalAddress
+      0,                                            // UINT32  Reserved
+      FixedPcdGet32 (PcdArmArchTimerSecIntrNum),    // UINT32  SecurePL1TimerGSIV
+      GTDT_GTIMER_FLAGS,                            // UINT32  SecurePL1TimerFlags
+      FixedPcdGet32 (PcdArmArchTimerIntrNum),       // UINT32  NonSecurePL1TimerGSIV
+      GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL1TimerFlags
+      FixedPcdGet32 (PcdArmArchTimerVirtIntrNum),   // UINT32  VirtualTimerGSIV
+      GTDT_GTIMER_FLAGS,                            // UINT32  VirtualTimerFlags
+      FixedPcdGet32 (PcdArmArchTimerHypIntrNum),    // UINT32  NonSecurePL2TimerGSIV
+      GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL2TimerFlags
+      0xFFFFFFFFFFFFFFFF,                           // UINT64  CntReadBasePhysicalAddress
+      JUNO_WATCHDOG_COUNT,                          // UINT32  PlatformTimerCount
+      sizeof (EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE) // UINT32 PlatfromTimerOffset
+    },
+    {
+      EFI_ACPI_5_1_SBSA_GENERIC_WATCHDOG_STRUCTURE_INIT(
+          FixedPcdGet32 (PcdGenericWatchdogRefreshBase), FixedPcdGet32 (PcdGenericWatchdogControlBase), 93, 0),
+      EFI_ACPI_5_1_SBSA_GENERIC_WATCHDOG_STRUCTURE_INIT(
+          FixedPcdGet32 (PcdGenericWatchdogRefreshBase), FixedPcdGet32 (PcdGenericWatchdogControlBase), 94, EFI_ACPI_5_1_GTDT_SBSA_GENERIC_WATCHDOG_FLAG_SECURE_TIMER)
+    }
+  };
+#endif
 
 VOID*
 ReferenceAcpiTable (

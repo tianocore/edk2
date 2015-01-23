@@ -1,7 +1,7 @@
 /** @file
   Differentiated System Description Table Fields (DSDT)
 
-  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2014-2015, ARM Ltd. All rights reserved.<BR>
     This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,27 +19,27 @@ DefinitionBlock("DsdtTable.aml", "DSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_O
     //
     // A57x2-A53x4 Processor declaration
     //
-    Device(CPU0) { // A57-0: Cluster 0, Cpu 0
+    Device(CPU0) { // A53-0: Cluster 1, Cpu 0
       Name(_HID, "ACPI0007")
       Name(_UID, 0)
     }
-    Device(CPU1) { // A57-1: Cluster 0, Cpu 1
+    Device(CPU1) { // A53-1: Cluster 1, Cpu 1
       Name(_HID, "ACPI0007")
       Name(_UID, 1)
     }
-    Device(CPU2) { // A53-0: Cluster 1, Cpu 0
+    Device(CPU2) { // A53-2: Cluster 1, Cpu 2
       Name(_HID, "ACPI0007")
       Name(_UID, 2)
     }
-    Device(CPU3) { // A53-1: Cluster 1, Cpu 1
+    Device(CPU3) { // A53-3: Cluster 1, Cpu 3
       Name(_HID, "ACPI0007")
       Name(_UID, 3)
     }
-    Device(CPU4) { // A53-2: Cluster 1, Cpu 2
+    Device(CPU4) { // A57-0: Cluster 0, Cpu 0
       Name(_HID, "ACPI0007")
       Name(_UID, 4)
     }
-    Device(CPU5) { // A53-3: Cluster 1, Cpu 3
+    Device(CPU5) { // A57-1: Cluster 0, Cpu 1
       Name(_HID, "ACPI0007")
       Name(_UID, 5)
     }
@@ -63,9 +63,21 @@ DefinitionBlock("DsdtTable.aml", "DSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_O
     //
     Device(ETH0) {
       Name(_HID, "ARMH9118")
+      Name(_UID, Zero)
       Name(_CRS, ResourceTemplate() {
               Memory32Fixed(ReadWrite, 0x1A000000, 0x1000)
               Interrupt(ResourceConsumer, Level, ActiveHigh, Exclusive) { 192 }
+      })
+    }
+
+    // UART PL011
+    Device(COM0) {
+      Name(_HID, "ARMH0011")
+      Name(_CID, "PL011")
+      Name(_UID, Zero)
+      Name(_CRS, ResourceTemplate() {
+        Memory32Fixed(ReadWrite, 0x7FF80000, 0x1000)
+        Interrupt(ResourceConsumer, Level, ActiveHigh, Exclusive) { 115 }
       })
     }
 

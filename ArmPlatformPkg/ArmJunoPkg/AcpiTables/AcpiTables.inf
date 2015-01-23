@@ -46,3 +46,6 @@
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase
