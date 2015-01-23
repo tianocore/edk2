@@ -1849,6 +1849,7 @@ ProcessCallBackFunction (
   )
 {
   EFI_STATUS                      Status;
+  EFI_STATUS                      InternalStatus;
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   EFI_HII_VALUE                   *HiiValue;
@@ -2038,8 +2039,8 @@ ProcessCallBackFunction (
         //
         // Do the question validation.
         //
-        Status = ValueChangedValidation (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement);
-        if (!EFI_ERROR (Status)) {
+        InternalStatus = ValueChangedValidation (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement);
+        if (!EFI_ERROR (InternalStatus)) {
           SetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
         }
       }
