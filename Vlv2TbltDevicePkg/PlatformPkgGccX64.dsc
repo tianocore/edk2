@@ -1371,6 +1371,7 @@
   DEFINE PDB_BUILD_OPTION = /Zi
 !endif
 
+  GCC:*_*_*_CC_FLAGS = -Wno-missing-braces
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable

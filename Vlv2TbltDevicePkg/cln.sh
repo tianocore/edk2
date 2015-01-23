@@ -6,6 +6,8 @@ echo
 echo Directories to clean...
 echo
 
+cd ..
+
 if [ -d "Build" ]; then
   rm -r Build
 fi

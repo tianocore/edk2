@@ -57,7 +57,7 @@ fi
 
 ## Setup EDK environment. Edksetup puts new copies of target.txt, tools_def.txt, build_rule.txt in WorkSpace\Conf
 ## Also run edksetup as soon as possible to avoid it from changing environment variables we're overriding
-. edksetup.sh
+. edksetup.sh BaseTools
 make -C BaseTools
 
 ## Define platform specific environment variables.
