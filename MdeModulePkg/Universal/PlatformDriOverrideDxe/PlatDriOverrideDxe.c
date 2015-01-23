@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1635,6 +1635,19 @@ PlatDriOverrideDxeInit (
   mCallbackInfo->PlatformDriverOverride.GetDriver      = GetDriver;
   mCallbackInfo->PlatformDriverOverride.GetDriverPath  = GetDriverPath;
   mCallbackInfo->PlatformDriverOverride.DriverLoaded   = DriverLoaded;
+
+  //
+  // Locate ConfigRouting protocol
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiConfigRoutingProtocolGuid,
+                  NULL,
+                  (VOID **) &mCallbackInfo->HiiConfigRouting
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Finish;
+  }
+
   //
   // Install Device Path Protocol and Config Access protocol to driver handle
   // Install Platform Driver Override Protocol to driver handle
@@ -1665,18 +1678,6 @@ PlatDriOverrideDxeInit (
                                      );
   if (mCallbackInfo->RegisteredHandle == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Finish;
-  }
-
-  //
-  // Locate ConfigRouting protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiHiiConfigRoutingProtocolGuid,
-                  NULL,
-                  (VOID **) &mCallbackInfo->HiiConfigRouting
-                  );
-  if (EFI_ERROR (Status)) {
     goto Finish;
   }
 
