@@ -35,6 +35,11 @@
 #define UARTICR                   0x044
 #define UARTDMACR                 0x048
 
+#define UARTPID0                  0xFE0
+#define UARTPID1                  0xFE4
+#define UARTPID2                  0xFE8
+#define UARTPID3                  0xFEC
+
 // Data status bits
 #define UART_DATA_ERROR_MASK      0x0F00
 
@@ -80,6 +85,9 @@
 #define PL011_UARTLCR_H_EPS       (1 << 2)  // Even parity select
 #define PL011_UARTLCR_H_PEN       (1 << 1)  // Parity Enable
 #define PL011_UARTLCR_H_BRK       (1 << 0)  // Send break
+
+#define PL011_UARTPID2_VER(X)     (((X) >> 4) & 0xF)
+#define PL011_VER_R1P4            0x2
 
 /*
 
