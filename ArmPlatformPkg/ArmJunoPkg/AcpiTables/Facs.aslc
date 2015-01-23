@@ -1,0 +1,68 @@
+/** @file
+*  Firmware ACPI Control Structure (FACS)
+*
+*  Copyright (c) 2012 - 2014, ARM Limited. All rights reserved.
+*
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*
+**/
+
+#include <IndustryStandard/Acpi.h>
+
+EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE Facs = {
+  EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE, // UINT32  Signature
+  sizeof (EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE),  // UINT32  Length
+  0xA152,                                                 // UINT32  HardwareSignature
+  0,                                                      // UINT32  FirmwareWakingVector
+  0,                                                      // UINT32  GlobalLock
+  0,                                                      // UINT32  Flags
+  0,                                                      // UINT64  XFirmwareWakingVector
+  EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION,   // UINT8   Version;
+    { EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved0[0]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved0[1]
+      EFI_ACPI_RESERVED_BYTE },                           // UINT8   Reserved0[2]
+  0,                                                      // UINT32  OspmFlags  "Platform firmware must
+                                                          //                    initialize this field to zero."
+    { EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[0]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[1]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[2]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[3]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[4]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[5]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[6]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[7]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[8]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[9]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[10]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[11]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[12]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[13]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[14]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[15]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[16]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[17]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[18]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[19]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[20]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[21]
+      EFI_ACPI_RESERVED_BYTE,                             // UINT8   Reserved1[22]
+      EFI_ACPI_RESERVED_BYTE },                           // UINT8   Reserved1[23]
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the executable
+  //
+  return (VOID*)&Facs;
+}

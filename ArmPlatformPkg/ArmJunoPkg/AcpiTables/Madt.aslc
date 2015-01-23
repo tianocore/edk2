@@ -1,0 +1,76 @@
+/** @file
+*  Multiple APIC Description Table (MADT)
+*
+*  Copyright (c) 2012 - 2014, ARM Limited. All rights reserved.
+*
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*
+**/
+
+#include "ArmPlatform.h"
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+#include <IndustryStandard/Acpi.h>
+
+#pragma pack (1)
+
+typedef struct {
+  EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_5_0_GIC_STRUCTURE                            GicInterfaces[FixedPcdGet32 (PcdCoreCount)];
+  EFI_ACPI_5_0_GIC_DISTRIBUTOR_STRUCTURE                GicDistributor;
+} EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+//
+// Multiple APIC Description Table
+//
+EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    ARM_ACPI_HEADER (
+      EFI_ACPI_1_0_APIC_SIGNATURE,
+      EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE,
+      EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION
+    ),
+    //
+    // MADT specific fields
+    //
+    0, // LocalApicAddress
+    0, // Flags
+  },
+  {
+    // Format: EFI_ACPI_5_0_GIC_STRUCTURE_INIT(GicId, AcpiCpuId, Flags, PmuIrq, GicBase)
+    // Note: The GIC Structure of the primary CPU must be the first entry (see note in 5.2.12.14 GIC Structure of
+    //       ACPI v5.0).
+    //       On Juno we can change the primary CPU changing the SCC register. It is not currently supported in the
+    //       Trusted Firmware. When supported, we will need to code to dynamically change the ordering.
+    //       For now we leave CPU2 (A53-0) at the first position.
+    //       The cores from a same cluster are kept together. It is not an ACPI requirement but in case the OSPM uses
+    //       the ACPI ARM Parking protocol, it might want to wake up the cores in the order of this table.
+    EFI_ACPI_5_0_GIC_STRUCTURE_INIT(2, 2, EFI_ACPI_5_0_GIC_ENABLED, 50, FixedPcdGet32 (PcdGicInterruptInterfaceBase)), // A53-0
+    EFI_ACPI_5_0_GIC_STRUCTURE_INIT(3, 3, EFI_ACPI_5_0_GIC_ENABLED, 54, FixedPcdGet32 (PcdGicInterruptInterfaceBase)), // A53-1
+    EFI_ACPI_5_0_GIC_STRUCTURE_INIT(4, 4, EFI_ACPI_5_0_GIC_ENABLED, 58, FixedPcdGet32 (PcdGicInterruptInterfaceBase)), // A53-2
+    EFI_ACPI_5_0_GIC_STRUCTURE_INIT(5, 5, EFI_ACPI_5_0_GIC_ENABLED, 62, FixedPcdGet32 (PcdGicInterruptInterfaceBase)), // A53-3
+    EFI_ACPI_5_0_GIC_STRUCTURE_INIT(0, 0, EFI_ACPI_5_0_GIC_ENABLED, 34, FixedPcdGet32 (PcdGicInterruptInterfaceBase)), // A57-0
+    EFI_ACPI_5_0_GIC_STRUCTURE_INIT(1, 1, EFI_ACPI_5_0_GIC_ENABLED, 38, FixedPcdGet32 (PcdGicInterruptInterfaceBase))  // A57-1
+  },
+  EFI_ACPI_5_0_GIC_DISTRIBUTOR_INIT(0, FixedPcdGet32 (PcdGicDistributorBase), 0)
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the executable
+  //
+  return (VOID*)&Madt;
+}

@@ -106,6 +106,7 @@ READ_LOCK_STATUS   = TRUE
   # ACPI Support
   #
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  INF RuleOverride=ACPITABLE ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
 
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
@@ -326,4 +327,10 @@ READ_LOCK_STATUS   = TRUE
     PE32      PE32                    |.efi
     UI        STRING="$(MODULE_NAME)" Optional
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.USER_DEFINED.ACPITABLE]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW ACPI               |.acpi
+    RAW ASL                |.aml
   }
