@@ -43,6 +43,25 @@
     GicId, AcpiCpuId, Flags, 0, PmuIrq, 0, GicBase \
   }
 
+// Note the parking protocol is configured by UEFI if required
+#define EFI_ACPI_5_1_GICC_STRUCTURE_INIT(GicId, AcpiCpuUid, Mpidr, Flags, PmuIrq,    \
+    GicBase, GicVBase, GicHBase, GsivId, GicRBase)                                   \
+  {                                                                                  \
+    EFI_ACPI_5_1_GIC, sizeof (EFI_ACPI_5_1_GIC_STRUCTURE), EFI_ACPI_RESERVED_WORD,   \
+    GicId, AcpiCpuUid, Flags, 0, PmuIrq, 0, GicBase, GicVBase, GicHBase,             \
+    GsivId, GicRBase, Mpidr                                                          \
+  }
+
+//
+// SBSA Generic Watchdog
+//
+#define EFI_ACPI_5_1_SBSA_GENERIC_WATCHDOG_STRUCTURE_INIT(RefreshFramePhysicalAddress,                  \
+    ControlFramePhysicalAddress, WatchdogTimerGSIV, WatchdogTimerFlags)                                 \
+  {                                                                                                     \
+    EFI_ACPI_5_1_GTDT_SBSA_GENERIC_WATCHDOG, sizeof(EFI_ACPI_5_1_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE), \
+    EFI_ACPI_RESERVED_WORD, RefreshFramePhysicalAddress, ControlFramePhysicalAddress,                   \
+    WatchdogTimerGSIV, WatchdogTimerFlags                                                               \
+  }
 
 /**
   Locate and Install the ACPI tables from the Firmware Volume
