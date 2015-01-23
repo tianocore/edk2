@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -135,7 +135,20 @@ CHAR16            *gMiniString;
 CHAR16            *gOptionMismatch;
 CHAR16            *gFormSuppress;
 CHAR16            *gProtocolNotFound;
-
+CHAR16            *gConfirmDefaultMsg;
+CHAR16            *gConfirmSubmitMsg;
+CHAR16            *gConfirmDiscardMsg;
+CHAR16            *gConfirmResetMsg;
+CHAR16            *gConfirmExitMsg;
+CHAR16            *gConfirmSubmitMsg2nd;
+CHAR16            *gConfirmDefaultMsg2nd;
+CHAR16            *gConfirmResetMsg2nd;
+CHAR16            *gConfirmExitMsg2nd;
+CHAR16            *gConfirmOpt;
+CHAR16            *gConfirmOptYes;
+CHAR16            *gConfirmOptNo;
+CHAR16            *gConfirmMsgConnect;
+CHAR16            *gConfirmMsgEnd;
 CHAR16            gModalSkipColumn;
 CHAR16            gPromptBlockWidth;
 CHAR16            gOptionBlockWidth;
@@ -213,6 +226,20 @@ InitializeDisplayStrings (
   gFormNotFound         = GetToken (STRING_TOKEN (STATUS_BROWSER_FORM_NOT_FOUND), gHiiHandle);
   gNoSubmitIf           = GetToken (STRING_TOKEN (STATUS_BROWSER_NO_SUBMIT_IF), gHiiHandle);
   gBrwoserError         = GetToken (STRING_TOKEN (STATUS_BROWSER_ERROR), gHiiHandle);
+  gConfirmDefaultMsg    = GetToken (STRING_TOKEN (CONFIRM_DEFAULT_MESSAGE), gHiiHandle);
+  gConfirmDiscardMsg    = GetToken (STRING_TOKEN (CONFIRM_DISCARD_MESSAGE), gHiiHandle);
+  gConfirmSubmitMsg     = GetToken (STRING_TOKEN (CONFIRM_SUBMIT_MESSAGE), gHiiHandle);
+  gConfirmResetMsg      = GetToken (STRING_TOKEN (CONFIRM_RESET_MESSAGE), gHiiHandle);
+  gConfirmExitMsg       = GetToken (STRING_TOKEN (CONFIRM_EXIT_MESSAGE), gHiiHandle);
+  gConfirmDefaultMsg2nd = GetToken (STRING_TOKEN (CONFIRM_DEFAULT_MESSAGE_2ND), gHiiHandle);
+  gConfirmSubmitMsg2nd  = GetToken (STRING_TOKEN (CONFIRM_SUBMIT_MESSAGE_2ND), gHiiHandle);
+  gConfirmResetMsg2nd   = GetToken (STRING_TOKEN (CONFIRM_RESET_MESSAGE_2ND), gHiiHandle);
+  gConfirmExitMsg2nd    = GetToken (STRING_TOKEN (CONFIRM_EXIT_MESSAGE_2ND), gHiiHandle);
+  gConfirmOpt           = GetToken (STRING_TOKEN (CONFIRM_OPTION), gHiiHandle);
+  gConfirmOptYes        = GetToken (STRING_TOKEN (CONFIRM_OPTION_YES), gHiiHandle);
+  gConfirmOptNo         = GetToken (STRING_TOKEN (CONFIRM_OPTION_NO), gHiiHandle);
+  gConfirmMsgConnect    = GetToken (STRING_TOKEN (CONFIRM_OPTION_CONNECT), gHiiHandle);
+  gConfirmMsgEnd        = GetToken (STRING_TOKEN (CONFIRM_OPTION_END), gHiiHandle);
 }
 
 /**
@@ -248,6 +275,20 @@ FreeDisplayStrings (
   FreePool (gBrwoserError);
   FreePool (gNoSubmitIf);
   FreePool (gFormNotFound);
+  FreePool (gConfirmDefaultMsg);
+  FreePool (gConfirmSubmitMsg);
+  FreePool (gConfirmDiscardMsg);
+  FreePool (gConfirmResetMsg);
+  FreePool (gConfirmExitMsg);
+  FreePool (gConfirmDefaultMsg2nd);
+  FreePool (gConfirmSubmitMsg2nd);
+  FreePool (gConfirmResetMsg2nd);
+  FreePool (gConfirmExitMsg2nd);
+  FreePool (gConfirmOpt);
+  FreePool (gConfirmOptYes);
+  FreePool (gConfirmOptNo);
+  FreePool (gConfirmMsgConnect);
+  FreePool (gConfirmMsgEnd);
 }
 
 /**
@@ -2071,6 +2112,146 @@ HasOptionString (
   return TRUE;
 }
 
+/**
+  Double confirm with user about the action.
+
+  @param  Action               The user input action.
+
+  @retval TRUE                 User confirm with the input or not need user confirm.
+  @retval FALSE                User want ignore this input.
+
+**/
+BOOLEAN
+FxConfirmPopup (
+  IN UINT32   Action
+  )
+{
+  EFI_INPUT_KEY                   Key;
+  CHAR16                          *CfmStr;
+  UINTN                           CfmStrLen;
+  UINT32                          CheckFlags;
+  BOOLEAN                         RetVal;
+  UINTN                           CatLen;
+
+  CfmStrLen = 0;
+  CatLen    = StrLen (gConfirmMsgConnect);
+
+  //
+  // Below action need extra popup dialog to confirm.
+  // 
+  CheckFlags = BROWSER_ACTION_DISCARD | 
+               BROWSER_ACTION_DEFAULT |
+               BROWSER_ACTION_SUBMIT |
+               BROWSER_ACTION_RESET |
+               BROWSER_ACTION_EXIT;
+
+  //
+  // Not need to confirm with user, just return TRUE.
+  //
+  if ((Action & CheckFlags) == 0) {
+    return TRUE;
+  }
+
+  if ((Action & BROWSER_ACTION_DISCARD) == BROWSER_ACTION_DISCARD) {
+    CfmStrLen += StrLen (gConfirmDiscardMsg);
+  } 
+
+  if ((Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
+    if (CfmStrLen != 0) {
+      CfmStrLen += CatLen;
+    } 
+
+    CfmStrLen += StrLen (gConfirmDefaultMsg);
+  }
+
+  if ((Action & BROWSER_ACTION_SUBMIT)  == BROWSER_ACTION_SUBMIT) {
+    if (CfmStrLen != 0) {
+      CfmStrLen += CatLen;
+    } 
+
+    CfmStrLen += StrLen (gConfirmSubmitMsg);
+  }
+
+  if ((Action & BROWSER_ACTION_RESET)  == BROWSER_ACTION_RESET) {
+    if (CfmStrLen != 0) {
+      CfmStrLen += CatLen;
+    } 
+
+    CfmStrLen += StrLen (gConfirmResetMsg);
+  }
+
+  if ((Action & BROWSER_ACTION_EXIT)  == BROWSER_ACTION_EXIT) {
+    if (CfmStrLen != 0) {
+      CfmStrLen += CatLen;
+    } 
+
+    CfmStrLen += StrLen (gConfirmExitMsg);
+  }
+
+  //
+  // Allocate buffer to save the string.
+  // String + "?" + "\0"
+  //
+  CfmStr = AllocateZeroPool ((CfmStrLen + 1 + 1) * sizeof (CHAR16));
+  ASSERT (CfmStr != NULL);
+
+  if ((Action & BROWSER_ACTION_DISCARD) == BROWSER_ACTION_DISCARD) {
+    StrCpy (CfmStr, gConfirmDiscardMsg);
+  }
+
+  if ((Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
+    if (CfmStr[0] != 0) {
+      StrCat (CfmStr, gConfirmMsgConnect);
+      StrCat (CfmStr, gConfirmDefaultMsg2nd);
+    } else {
+      StrCpy (CfmStr, gConfirmDefaultMsg);
+    }
+  }
+
+  if ((Action & BROWSER_ACTION_SUBMIT)  == BROWSER_ACTION_SUBMIT) {
+    if (CfmStr[0] != 0) {
+      StrCat (CfmStr, gConfirmMsgConnect);
+      StrCat (CfmStr, gConfirmSubmitMsg2nd);
+    } else {
+      StrCpy (CfmStr, gConfirmSubmitMsg);
+    }
+  }
+
+  if ((Action & BROWSER_ACTION_RESET)  == BROWSER_ACTION_RESET) {
+    if (CfmStr[0] != 0) {
+      StrCat (CfmStr, gConfirmMsgConnect);
+      StrCat (CfmStr, gConfirmResetMsg2nd);
+    } else {
+      StrCpy (CfmStr, gConfirmResetMsg);
+    }
+  }
+
+  if ((Action & BROWSER_ACTION_EXIT)  == BROWSER_ACTION_EXIT) {
+    if (CfmStr[0] != 0) {
+      StrCat (CfmStr, gConfirmMsgConnect);
+      StrCat (CfmStr, gConfirmExitMsg2nd);
+    } else {
+      StrCpy (CfmStr, gConfirmExitMsg);
+    }
+  }
+
+  StrCat (CfmStr, gConfirmMsgEnd);
+
+  do {
+    CreateDialog (&Key, gEmptyString, CfmStr, gConfirmOpt, gEmptyString, NULL);
+  } while (((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (gConfirmOptYes[0] | UPPER_LOWER_CASE_OFFSET)) &&
+           ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (gConfirmOptNo[0] | UPPER_LOWER_CASE_OFFSET)));
+
+  if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (gConfirmOptYes[0] | UPPER_LOWER_CASE_OFFSET)) {
+    RetVal = TRUE;
+  } else {
+    RetVal = FALSE;
+  }
+
+  FreePool (CfmStr);
+
+  return RetVal;
+}
 
 /**
   Print string for this menu option.
@@ -3096,8 +3277,16 @@ UiDisplayMenu (
       ControlFlag = CfRepaint;
 
       ASSERT (HotKey != NULL);
-      gUserInput->Action = HotKey->Action;
-      ControlFlag = CfExit;
+
+      if (FxConfirmPopup(HotKey->Action)) {
+        gUserInput->Action = HotKey->Action;
+        ControlFlag = CfExit;
+      } else {
+        Repaint     = TRUE;
+        NewLine     = TRUE;
+        ControlFlag = CfRepaint;
+      }
+
       break;
 
     case CfUiLeft:
