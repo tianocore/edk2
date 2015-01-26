@@ -621,6 +621,7 @@ AddTableToList (
       //
       if ((UINT64)(UINTN)AcpiTableInstance->Facs3 < BASE_4GB) {
         AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
+        ZeroMem (&AcpiTableInstance->Fadt3->XFirmwareCtrl, sizeof (UINT64));
       } else {
         Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
         CopyMem (
@@ -628,6 +629,7 @@ AddTableToList (
           &Buffer64,
           sizeof (UINT64)
           );
+        AcpiTableInstance->Fadt3->FirmwareCtrl = 0;
       }
       AcpiTableInstance->Fadt3->Dsdt  = (UINT32) (UINTN) AcpiTableInstance->Dsdt3;
       Buffer64                          = (UINT64) (UINTN) AcpiTableInstance->Dsdt3;
@@ -750,6 +752,7 @@ AddTableToList (
         //
         if ((UINT64)(UINTN)AcpiTableInstance->Facs3 < BASE_4GB) {
           AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
+          ZeroMem (&AcpiTableInstance->Fadt3->XFirmwareCtrl, sizeof (UINT64));
         } else {
           Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
           CopyMem (
@@ -757,6 +760,7 @@ AddTableToList (
             &Buffer64,
             sizeof (UINT64)
             );
+          AcpiTableInstance->Fadt3->FirmwareCtrl = 0;
         }
 
         //
