@@ -393,13 +393,13 @@ PlatformBdsEnterFrontPageWithHotKey (
    );
    
    
-   EFI_STATUS
+ EFI_STATUS
  InitBMPackage  (
    VOID
    );
    
       
-   EFI_STATUS
+ VOID
  FreeBMPackage  (
    VOID
    );
