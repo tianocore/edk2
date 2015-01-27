@@ -127,7 +127,7 @@ if /i "%~2" == "RELEASE" (
 :: Additional EDK Build Setup/Configuration
 ::**********************************************************************
 echo.
-echo Setting the Build environment for VS2008/VS2010...
+echo Setting the Build environment for VS2008/VS2010/VS2012/VS2013...
 if defined VS90COMNTOOLS (
    if not defined VSINSTALLDIR call "%VS90COMNTOOLS%\vsvars32.bat"
    if /I "%VS90COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 9.0\Common7\Tools\" (
@@ -139,13 +139,27 @@ if defined VS90COMNTOOLS (
   if not defined VSINSTALLDIR call "%VS100COMNTOOLS%\vsvars32.bat"
   if /I "%VS100COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 10.0\Common7\Tools\" (
     set TOOL_CHAIN_TAG=VS2010
-) else (
+  ) else (
     set TOOL_CHAIN_TAG=VS2010x86
- )
+  )
+) else if defined VS110COMNTOOLS (
+  if not defined VSINSTALLDIR call "%VS110COMNTOOLS%\vsvars32.bat"
+  if /I "%VS110COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 11.0\Common7\Tools\" (
+    set TOOL_CHAIN_TAG=VS2012
+  ) else (
+    set TOOL_CHAIN_TAG=VS2012x86
+  )
+) else if defined VS120COMNTOOLS (
+  if not defined VSINSTALLDIR call "%VS120COMNTOOLS%\vsvars32.bat"
+  if /I "%VS120COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 12.0\Common7\Tools\" (
+    set TOOL_CHAIN_TAG=VS2013
+  ) else (
+    set TOOL_CHAIN_TAG=VS2013x86
+  )
 ) else (
-   echo  --ERROR: VS2008/VS2010 not installed correctly. VS90COMNTOOLS/VS100COMNTOOLS not defined ^^!
-   echo.
-   goto :BldFail
+  echo  --ERROR: VS2008/VS2010/VS2012/VS2013 not installed correctly. VS90COMNTOOLS/VS100COMNTOOLS/VS110COMNTOOLS/VS120COMNTOOLS not defined ^^!
+  echo.
+  goto :BldFail
 )
 
 echo Ensuring correct build directory is present for GenBiosId...
