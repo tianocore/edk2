@@ -1,7 +1,7 @@
 /** @file
   This is THE shell (application)
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1381,8 +1381,8 @@ StripUnreplacedEnvironmentVariables(
       break;
     }
 
-    if (FirstQuote < FirstPercent) {
-      SecondQuote = FirstQuote!= NULL?FindNextInstance(FirstQuote+1, L"\"", TRUE):NULL;
+    if (FirstQuote!= NULL && FirstQuote < FirstPercent) {
+      SecondQuote = FindNextInstance(FirstQuote+1, L"\"", TRUE);
       //
       // Quote is first found
       //
@@ -1400,8 +1400,8 @@ StripUnreplacedEnvironmentVariables(
       }
       continue;
     }
-    ASSERT(FirstPercent < FirstQuote);
-    if (SecondPercent < FirstQuote) {
+    
+    if (FirstQuote == NULL || SecondPercent < FirstQuote) {
       if (IsValidEnvironmentVariableName(FirstPercent, SecondPercent)) {
         //
         // We need to remove from FirstPercent to SecondPercent
@@ -1415,7 +1415,6 @@ StripUnreplacedEnvironmentVariables(
       }
       continue;
     }
-    ASSERT(FirstQuote < SecondPercent);
     CurrentLocator = FirstQuote;
   }
   return (EFI_SUCCESS);
@@ -1530,12 +1529,12 @@ ShellConvertVariables (
     ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, AliasListNode->Alias, AliasListNode->CommandString, TRUE, FALSE);
     StrnCpy(NewCommandLine1, NewCommandLine2, NewSize/sizeof(CHAR16)-1);
     }
-
-    //
-    // Remove non-existant environment variables in scripts only
-    //
-    StripUnreplacedEnvironmentVariables(NewCommandLine1);
   }
+
+  //
+  // Remove non-existant environment variables
+  //
+  StripUnreplacedEnvironmentVariables(NewCommandLine1);
 
   //
   // Now cleanup any straggler intentionally ignored "%" characters
