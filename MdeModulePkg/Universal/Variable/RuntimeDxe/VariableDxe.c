@@ -282,6 +282,10 @@ OnReadyToBoot (
   // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
   //
   mEndOfDxe = TRUE;
+  //
+  // The initialization for variable quota.
+  //
+  InitializeVariableQuota ();
   ReclaimForOS ();
   if (FeaturePcdGet (PcdVariableCollectStatistics)) {
     gBS->InstallConfigurationTable (&gEfiVariableGuid, gVariableInfo);
@@ -305,6 +309,10 @@ OnEndOfDxe (
   )
 {
   mEndOfDxe = TRUE;
+  //
+  // The initialization for variable quota.
+  //
+  InitializeVariableQuota ();
 }
 
 /**

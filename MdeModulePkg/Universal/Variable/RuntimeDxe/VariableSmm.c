@@ -693,6 +693,10 @@ SmmVariableHandler (
 
     case SMM_VARIABLE_FUNCTION_READY_TO_BOOT:
       mEndOfDxe = TRUE;
+      //
+      // The initialization for variable quota.
+      //
+      InitializeVariableQuota ();
       if (AtRuntime()) {
         Status = EFI_UNSUPPORTED;
         break;
@@ -824,6 +828,10 @@ SmmEndOfDxeCallback (
 {
   DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
   mEndOfDxe = TRUE;
+  //
+  // The initialization for variable quota.
+  //
+  InitializeVariableQuota ();
   return EFI_SUCCESS;
 }
 

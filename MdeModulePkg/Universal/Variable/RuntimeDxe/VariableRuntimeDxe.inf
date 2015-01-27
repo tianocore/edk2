@@ -91,6 +91,7 @@
   gEfiEndOfDxeEventGroupGuid                    ## CONSUMES             ## Event
   ## SOMETIMES_CONSUMES   ## HOB
   gEdkiiFaultTolerantWriteGuid
+  gEdkiiVarErrorFlagGuid                        ## CONSUMES             ## GUID
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize      ## CONSUMES
@@ -100,6 +101,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxUserNvVariableSpaceSize           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBoottimeReservedNvVariableSpaceSize  ## CONSUMES
   
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## CONSUMES # statistic the information of variable.

@@ -42,6 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/FaultTolerantWrite.h>
 #include <Guid/HardwareErrorVariable.h>
+#include <Guid/VarErrorFlag.h>
 
 #define VARIABLE_ATTRIBUTE_BS_RT        (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)
 #define VARIABLE_ATTRIBUTE_NV_BS_RT     (VARIABLE_ATTRIBUTE_BS_RT | EFI_VARIABLE_NON_VOLATILE)
@@ -85,7 +86,11 @@ typedef struct {
   VARIABLE_GLOBAL VariableGlobal;
   UINTN           VolatileLastVariableOffset;
   UINTN           NonVolatileLastVariableOffset;
+  UINTN           CommonVariableSpace;
+  UINTN           CommonMaxUserVariableSpace;
+  UINTN           CommonRuntimeVariableSpace;
   UINTN           CommonVariableTotalSize;
+  UINTN           CommonUserVariableTotalSize;
   UINTN           HwErrVariableTotalSize;
   CHAR8           *PlatformLangCodes;
   CHAR8           *LangCodes;
@@ -361,6 +366,41 @@ GetFvbInfoByAddress (
   );
 
 /**
+  Finds variable in storage blocks of volatile and non-volatile storage areas.
+
+  This code finds variable in storage blocks of volatile and non-volatile storage areas.
+  If VariableName is an empty string, then we just return the first
+  qualified variable without comparing VariableName and VendorGuid.
+  If IgnoreRtCheck is TRUE, then we ignore the EFI_VARIABLE_RUNTIME_ACCESS attribute check
+  at runtime when searching existing variable, only VariableName and VendorGuid are compared.
+  Otherwise, variables without EFI_VARIABLE_RUNTIME_ACCESS are not visible at runtime.
+
+  @param  VariableName                Name of the variable to be found.
+  @param  VendorGuid                  Vendor GUID to be found.
+  @param  PtrTrack                    VARIABLE_POINTER_TRACK structure for output,
+                                      including the range searched and the target position.
+  @param  Global                      Pointer to VARIABLE_GLOBAL structure, including
+                                      base of volatile variable storage area, base of
+                                      NV variable storage area, and a lock.
+  @param  IgnoreRtCheck               Ignore EFI_VARIABLE_RUNTIME_ACCESS attribute
+                                      check at runtime when searching variable.
+
+  @retval EFI_INVALID_PARAMETER       If VariableName is not an empty string, while
+                                      VendorGuid is NULL.
+  @retval EFI_SUCCESS                 Variable successfully found.
+  @retval EFI_NOT_FOUND               Variable not found
+
+**/
+EFI_STATUS
+FindVariable (
+  IN  CHAR16                  *VariableName,
+  IN  EFI_GUID                *VendorGuid,
+  OUT VARIABLE_POINTER_TRACK  *PtrTrack,
+  IN  VARIABLE_GLOBAL         *Global,
+  IN  BOOLEAN                 IgnoreRtCheck
+  );
+
+/**
 
   This code finds variable in storage blocks (Volatile or Non-Volatile).
 
@@ -616,6 +656,25 @@ VarCheckVariablePropertySet (
   );
 
 /**
+  Internal variable property get.
+
+  @param[in]  Name              Pointer to the variable name.
+  @param[in]  Guid              Pointer to the vendor GUID.
+  @param[out] VariableProperty  Pointer to the output variable property.
+
+  @retval EFI_SUCCESS           The property of variable specified by the Name and Guid was got successfully.
+  @retval EFI_NOT_FOUND         The property of variable specified by the Name and Guid was not found.
+
+**/
+EFI_STATUS
+EFIAPI
+InternalVarCheckVariablePropertyGet (
+  IN CHAR16                         *Name,
+  IN EFI_GUID                       *Guid,
+  OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
+  );
+
+/**
   Variable property get.
 
   @param[in]  Name              Pointer to the variable name.
@@ -633,6 +692,15 @@ VarCheckVariablePropertyGet (
   IN CHAR16                         *Name,
   IN EFI_GUID                       *Guid,
   OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
+  );
+
+/**
+  Initialize variable quota.
+
+**/
+VOID
+InitializeVariableQuota (
+  VOID
   );
 
 extern VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
