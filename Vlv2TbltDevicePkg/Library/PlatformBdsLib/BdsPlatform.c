@@ -2051,7 +2051,11 @@ PlatformBdsEnterFrontPageWithHotKey (
       goto Exit;
     }
   }
-
+  //
+  // Install BM HiiPackages. 
+  // Keep BootMaint HiiPackage, so that it can be covered by global setting. 
+  //
+	InitBMPackage ();
   do {
 
     BdsSetConsoleMode (TRUE);
@@ -2113,11 +2117,20 @@ PlatformBdsEnterFrontPageWithHotKey (
       break;
 
     case FRONT_PAGE_KEY_BOOT_MANAGER:
+      //
+	  // Remove the installed BootMaint HiiPackages when exit.
+      //
+      FreeBMPackage ();
 
       //
       // User chose to run the Boot Manager
       //
       CallBootManager ();
+	  
+	  //
+      // Reinstall BootMaint HiiPackages after exiting from Boot Manager.
+      //
+      InitBMPackage ();
       break;
 
     case FRONT_PAGE_KEY_DEVICE_MANAGER:
@@ -2145,6 +2158,10 @@ PlatformBdsEnterFrontPageWithHotKey (
   //Will leave browser, check any reset required change is applied? if yes, reset system
   //
   SetupResetReminder ();
+  //
+  // Remove the installed BootMaint HiiPackages when exit.
+  //
+  FreeBMPackage ();
 
 Exit:
   //

@@ -391,7 +391,20 @@ PlatformBdsEnterFrontPageWithHotKey (
  UpdateFrontPageStrings (
    VOID
    );
-
+   
+   
+ EFI_STATUS
+ InitBMPackage  (
+   VOID
+   );
+   
+      
+ VOID
+ FreeBMPackage  (
+   VOID
+   );
+   
+   
  EFI_STATUS
  CallFrontPage (
    VOID
