@@ -1870,12 +1870,12 @@ IsValidSplit(
       return (EFI_OUT_OF_RESOURCES);
     }
     TempWalker = (CHAR16*)Temp;
-    GetNextParameter(&TempWalker, &FirstParameter, StrSize(CmdLine));
-
-    if (GetOperationType(FirstParameter) == Unknown_Invalid) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
-      SetLastError(SHELL_NOT_FOUND);
-      Status = EFI_NOT_FOUND;
+    if (!EFI_ERROR(GetNextParameter(&TempWalker, &FirstParameter, StrSize(CmdLine)))) {
+      if (GetOperationType(FirstParameter) == Unknown_Invalid) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        SetLastError(SHELL_NOT_FOUND);
+        Status = EFI_NOT_FOUND;
+      }
     }
   }
 
@@ -2030,24 +2030,25 @@ DoHelpUpdate(
   Walker = *CmdLine;
   while(Walker != NULL && *Walker != CHAR_NULL) {
     LastWalker = Walker;
-    GetNextParameter(&Walker, &CurrentParameter, StrSize(*CmdLine));
-    if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
-      LastWalker[0] = L' ';
-      LastWalker[1] = L' ';
-      NewCommandLine = AllocateZeroPool(StrSize(L"help ") + StrSize(*CmdLine));
-      if (NewCommandLine == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
+    if (!EFI_ERROR(GetNextParameter(&Walker, &CurrentParameter, StrSize(*CmdLine)))) {
+      if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
+        LastWalker[0] = L' ';
+        LastWalker[1] = L' ';
+        NewCommandLine = AllocateZeroPool(StrSize(L"help ") + StrSize(*CmdLine));
+        if (NewCommandLine == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
+
+        //
+        // We know the space is sufficient since we just calculated it.
+        //
+        StrnCpy(NewCommandLine, L"help ", 5);
+        StrnCat(NewCommandLine, *CmdLine, StrLen(*CmdLine));
+        SHELL_FREE_NON_NULL(*CmdLine);
+        *CmdLine = NewCommandLine;
         break;
       }
-
-      //
-      // We know the space is sufficient since we just calculated it.
-      //
-      StrnCpy(NewCommandLine, L"help ", 5);
-      StrnCat(NewCommandLine, *CmdLine, StrLen(*CmdLine));
-      SHELL_FREE_NON_NULL(*CmdLine);
-      *CmdLine = NewCommandLine;
-      break;
     }
   }
 
@@ -2499,27 +2500,30 @@ RunCommand(
     return (EFI_OUT_OF_RESOURCES);
   }
   TempWalker = CleanOriginal;
-  GetNextParameter(&TempWalker, &FirstParameter, StrSize(CleanOriginal));
-
-  //
-  // Depending on the first parameter we change the behavior
-  //
-  switch (Type = GetOperationType(FirstParameter)) {
-    case   File_Sys_Change:
-      Status = ChangeMappedDrive (FirstParameter);
-      break;
-    case   Internal_Command:
-    case   Script_File_Name:
-    case   Efi_Application:
-      Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol);
-      break;
-    default:
-      //
-      // Whatever was typed, it was invalid.
-      //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
-      SetLastError(SHELL_NOT_FOUND);
-      break;
+  if (!EFI_ERROR(GetNextParameter(&TempWalker, &FirstParameter, StrSize(CleanOriginal)))) {
+    //
+    // Depending on the first parameter we change the behavior
+    //
+    switch (Type = GetOperationType(FirstParameter)) {
+      case   File_Sys_Change:
+        Status = ChangeMappedDrive (FirstParameter);
+        break;
+      case   Internal_Command:
+      case   Script_File_Name:
+      case   Efi_Application:
+        Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol);
+        break;
+      default:
+        //
+        // Whatever was typed, it was invalid.
+        //
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        SetLastError(SHELL_NOT_FOUND);
+        break;
+    }
+  } else {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+    SetLastError(SHELL_NOT_FOUND);
   }
  
   SHELL_FREE_NON_NULL(CleanOriginal);
