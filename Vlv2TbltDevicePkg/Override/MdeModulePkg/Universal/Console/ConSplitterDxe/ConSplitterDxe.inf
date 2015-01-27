@@ -7,10 +7,10 @@
 # table according PCD settings(PcdConOutGopSupport, and PcdConOutUgaSupport). It always
 # consumes Graphics Output protocol which is produced by display device, and consumes UGA Draw
 # protocol which is produced by display device according to PcdUgaConsumeSupport value.
-# Note: If only UGA Draw protocol is installed in system table, PcdUgaConsumeSupport
-# should be set to TRUE.
+# Note: If only UGA Draw protocol is installed in system, PcdUgaConsumeSupport should be
+# set to TRUE.
 #
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +25,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ConSplitterDxe
+  MODULE_UNI_FILE                = ConSplitterDxe.uni
   FILE_GUID                      = 408edcec-cf6d-477c-a5a8-b4844e3de281
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -70,27 +71,49 @@
   PcdLib
 
 [Guids]
-  gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMES
-  gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMES
-  gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMES
-  gConnectConInEventGuid                        ## ALWAYS_CONSUMES
+  gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMES ## UNDEFINED # protocol GUID installed on device handle
+  gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMES ## UNDEFINED # protocol GUID installed on device handle
+  gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMES ## UNDEFINED # protocol GUID installed on device handle
+  ## SOMETIMES_PRODUCES ## Event
+  ## SOMETIMES_CONSUMES ## Event
+  gConnectConInEventGuid
 
 [Protocols]
-  gEfiSimplePointerProtocolGuid                 ## BY_START
-  gEfiAbsolutePointerProtocolGuid               ## BY_START
-  gEfiSimpleTextInProtocolGuid                  ## BY_START
-  gEfiSimpleTextInputExProtocolGuid             ## BY_START
-  gEfiSimpleTextOutProtocolGuid                 ## BY_START
-  gEfiGraphicsOutputProtocolGuid                ## BY_START
-  gEfiUgaDrawProtocolGuid                       ## BY_START
-
+  ## PRODUCES
+  ## TO_START
+  gEfiSimplePointerProtocolGuid
+  ## PRODUCES
+  ## TO_START
+  gEfiAbsolutePointerProtocolGuid
+  ## PRODUCES
+  ## TO_START
+  gEfiSimpleTextInProtocolGuid
+  ## PRODUCES
+  ## TO_START
+  gEfiSimpleTextInputExProtocolGuid
+  ## PRODUCES
+  ## TO_START 
+  gEfiSimpleTextOutProtocolGuid
+  ## SOMETIMES_PRODUCES
+  ## SOMETIMES_CONSUMES
+  gEfiGraphicsOutputProtocolGuid
+  ## SOMETIMES_PRODUCES
+  ## SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport   ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport        ## CONSUMES
 
 [Pcd]
+  ## SOMETIMES_PRODUCES
+  ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  ## SOMETIMES_PRODUCES
+  ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand  ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ConSplitterDxeExtra.uni
