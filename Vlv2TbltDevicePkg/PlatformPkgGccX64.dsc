@@ -300,7 +300,7 @@
 
 !if $(PERFORMANCE_ENABLE) == TRUE
   PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
-  TimerLib|PerformancePkg/Library/TscTimerLib/PeiTscTimerLib.inf
+  TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
 !endif
 
 !if $(TARGET) == RELEASE
@@ -353,7 +353,7 @@
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
 !if $(PERFORMANCE_ENABLE) == TRUE
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-  TimerLib|PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
+  TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
 !endif
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -366,7 +366,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 !if $(PERFORMANCE_ENABLE) == TRUE
   PerformanceLib|MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
-  TimerLib|PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
+  TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
 !endif
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -925,9 +925,7 @@
   }
   IntelFrameworkModulePkg/Universal/CpuIoDxe/CpuIoDxe.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-!if $(PERFORMANCE_ENABLE) == TRUE
-  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
-!endif
+
   MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf  {
     <LibraryClasses>
@@ -1053,6 +1051,14 @@
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/VlvInitDxe.inf
 
   IntelFrameworkModulePkg/Universal/LegacyRegionDxe/LegacyRegionDxe.inf
+  
+  PerformancePkg/Dp_App/Dp.inf {
+  <LibraryClasses>
+  !if $(PERFORMANCE_ENABLE) == TRUE
+    PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+    TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
+  !endif
+  }
 
   Vlv2TbltDevicePkg/VlvPlatformInitDxe/VlvPlatformInitDxe.inf{
     <LibraryClasses>
