@@ -44,6 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/FaultTolerantWrite.h>
 #include <Guid/HardwareErrorVariable.h>
+#include <Guid/VarErrorFlag.h>
 
 #define EFI_VARIABLE_ATTRIBUTES_MASK (EFI_VARIABLE_NON_VOLATILE | \
                                       EFI_VARIABLE_BOOTSERVICE_ACCESS | \
@@ -59,7 +60,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define VARIABLE_ATTRIBUTE_NV_BS_RT_AT  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
 #define VARIABLE_ATTRIBUTE_NV_BS_RT_HR  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_HARDWARE_ERROR_RECORD)
 #define VARIABLE_ATTRIBUTE_NV_BS_RT_AW  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
- 
+#define VARIABLE_ATTRIBUTE_NV_BS_RT_AT_HR_AW  (VARIABLE_ATTRIBUTE_NV_BS_RT_AT | EFI_VARIABLE_HARDWARE_ERROR_RECORD | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
+
 ///
 /// The size of a 3 character ISO639 language code.
 ///
@@ -98,7 +100,11 @@ typedef struct {
   VARIABLE_GLOBAL VariableGlobal;
   UINTN           VolatileLastVariableOffset;
   UINTN           NonVolatileLastVariableOffset;
+  UINTN           CommonVariableSpace;
+  UINTN           CommonMaxUserVariableSpace;
+  UINTN           CommonRuntimeVariableSpace;
   UINTN           CommonVariableTotalSize;
+  UINTN           CommonUserVariableTotalSize;
   UINTN           HwErrVariableTotalSize;
   CHAR8           *PlatformLangCodes;
   CHAR8           *LangCodes;
@@ -736,6 +742,25 @@ VarCheckRegisterSetVariableCheckHandler (
   );
 
 /**
+  Internal variable property get.
+
+  @param[in]  Name              Pointer to the variable name.
+  @param[in]  Guid              Pointer to the vendor GUID.
+  @param[out] VariableProperty  Pointer to the output variable property.
+
+  @retval EFI_SUCCESS           The property of variable specified by the Name and Guid was got successfully.
+  @retval EFI_NOT_FOUND         The property of variable specified by the Name and Guid was not found.
+
+**/
+EFI_STATUS
+EFIAPI
+InternalVarCheckVariablePropertyGet (
+  IN CHAR16                         *Name,
+  IN EFI_GUID                       *Guid,
+  OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
+  );
+
+/**
   Variable property set.
 
   @param[in] Name               Pointer to the variable name.
@@ -776,6 +801,15 @@ VarCheckVariablePropertyGet (
   IN CHAR16                         *Name,
   IN EFI_GUID                       *Guid,
   OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
+  );
+
+/**
+  Initialize variable quota.
+
+**/
+VOID
+InitializeVariableQuota (
+  VOID
   );
 
 extern VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;

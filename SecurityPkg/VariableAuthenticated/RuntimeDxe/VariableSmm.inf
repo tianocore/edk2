@@ -139,7 +139,8 @@
   gEfiSystemNvDataFvGuid                   ## CONSUMES               ## GUID
   gEfiHardwareErrorVariableGuid            ## SOMETIMES_CONSUMES     ## Variable:L"HwErrRec####"
   gEdkiiFaultTolerantWriteGuid             ## SOMETIMES_CONSUMES     ## HOB
-  
+  gEdkiiVarErrorFlagGuid                   ## CONSUMES               ## GUID
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase       ## SOMETIMES_CONSUMES
@@ -148,7 +149,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize     ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                 ## CONSUMES
-  
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxUserNvVariableSpaceSize           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBoottimeReservedNvVariableSpaceSize  ## CONSUMES
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics        ## CONSUMES  # statistic the information of variable.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate       ## CONSUMES  # Auto update PlatformLang/Lang
