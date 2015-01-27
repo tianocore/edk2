@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -4557,7 +4557,7 @@ ConSplitterTextOutSetAttribute (
   //
   // Check whether param Attribute is valid.
   //
-  if ( (Attribute > (UINTN)(((UINT32)-1)>>1)) ) {
+  if ((Attribute | 0x7F) != 0x7F) {
     return EFI_UNSUPPORTED;
   }
 
