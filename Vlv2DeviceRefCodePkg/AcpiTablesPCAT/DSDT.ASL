@@ -5,7 +5,7 @@
 ;*    Family of Customer Reference Boards.                                *;
 ;*                                                                        *;
 ;*                                                                        *;
-;*    Copyright (c) 2012  - 2014, Intel Corporation. All rights reserved    *;
+;*    Copyright (c) 2012  - 2015, Intel Corporation. All rights reserved    *;
 ;
 ; This program and the accompanying materials are licensed and made available under
 ; the terms and conditions of the BSD License that accompanies this distribution.
@@ -56,7 +56,7 @@ DefinitionBlock (
   include ("PCI_DRC.ASL")
   include ("Video.asl")
   include ("Gpe.asl")
-  include ("IoTVirtualDevice.asl")
+  //include ("IoTVirtualDevice.asl")
 
   // Sleep states supported by Chipset/Board.
   // SSx - BIOS setup controlled enabled _Sx Sleep state status
