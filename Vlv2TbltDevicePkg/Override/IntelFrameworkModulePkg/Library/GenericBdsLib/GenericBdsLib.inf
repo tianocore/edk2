@@ -1,11 +1,12 @@
 ## @file
+#  General BDS library.
 #  
 #  General BDS defines and produce general interfaces for platform BDS driver including:
 #  1) BDS boot policy interface;
 #  2) BDS boot device connect interface;
 #  3) BDS Misc interfaces for mainting boot variable, ouput string, etc.
 #  
-#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = GenericBdsLib
+  MODULE_UNI_FILE                = GenericBdsLib.uni
   FILE_GUID                      = e405ec31-ccaa-4dd4-83e8-0aec01703f7e
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -68,47 +70,78 @@
   DxeServicesLib
   HiiLib
   ReportStatusCodeLib
+  NetLib
 
 [Guids]
-  gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID (The identifier of memory type information type in system table)
-  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootCurrent" (The boot option of current boot)
-  gEfiFileInfoGuid                              ## CONSUMES ## GUID
-  gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
-  gEfiUartDevicePathGuid                        ## CONSUMES ## GUID (Identify the device path for UARD device)
-  gLastEnumLangGuid                             ## SOMETIMES_PRODUCES ## Variable:L"LastEnumLang" (Platform language at last time enumeration.)
-  gHdBootDevicePathVariablGuid                  ## SOMETIMES_PRODUCES ## Variable:L"HDDP" (The device path of Boot file on Hard device.)
-  gBdsLibStringPackageGuid                      ## PRODUCES ## GUID (HII String PackageList Guid)
-  gEfiLegacyDevOrderVariableGuid                ## CONSUMES ## GUID
+  ## SOMETIMES_CONSUMES ## HOB         # The hob holding memory type information
+  ## SOMETIMES_CONSUMES ## SystemTable # The identifier of memory type information type in system table
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
+  ## SOMETIMES_PRODUCES ## Variable:L"MemoryTypeInformation"
+  gEfiMemoryTypeInformationGuid                 
+  ## SOMETIMES_CONSUMES ## Variable:L"BootXXXX"    # Boot option variable
+  ## SOMETIMES_PRODUCES ## Variable:L"BootXXXX"    # Boot option variable
+  ## SOMETIMES_CONSUMES ## Variable:L"DriverXXXX"  # Driver load option.
+  ## SOMETIMES_PRODUCES ## Variable:L"DriverXXXX"  # Driver load option.
+  ## SOMETIMES_CONSUMES ## Variable:L"BootNext"    # Next Boot Option
+  ## SOMETIMES_PRODUCES ## Variable:L"BootNext"    # Next Boot Option
+  ## SOMETIMES_CONSUMES ## Variable:L"BootOrder"   # The boot option array
+  ## SOMETIMES_PRODUCES ## Variable:L"BootOrder"   # The boot option array
+  ## SOMETIMES_CONSUMES ## Variable:L"DriverOrder" # The driver order list
+  ## SOMETIMES_CONSUMES ## Variable:L"ConIn"       # The device path of console in device
+  ## SOMETIMES_PRODUCES ## Variable:L"ConIn"       # The device path of console in device
+  ## SOMETIMES_CONSUMES ## Variable:L"ConOut"      # The device path of console out device
+  ## SOMETIMES_PRODUCES ## Variable:L"ConOut"      # The device path of console out device
+  ## SOMETIMES_CONSUMES ## Variable:L"ErrOut"      # The device path of error out device
+  ## SOMETIMES_PRODUCES ## Variable:L"ErrOut"      # The device path of error out device
+  ## SOMETIMES_PRODUCES ## Variable:L"BootCurrent" # The boot option of current boot
+  ## SOMETIMES_PRODUCES ## Variable:L"BootNext"    # The number of next boot option
+  gEfiGlobalVariableGuid
+  gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
+  gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" # The ACPI address of performance data
+  gLastEnumLangGuid                             ## SOMETIMES_PRODUCES ## Variable:L"LastEnumLang" # Platform language at last time enumeration.
+  gHdBootDevicePathVariablGuid                  ## SOMETIMES_PRODUCES ## Variable:L"HDDP" # The device path of Boot file on Hard device.
+  gBdsLibStringPackageGuid                      ## CONSUMES ## HII # HII String PackageList Guid
+  ## SOMETIMES_PRODUCES ## Variable:L"LegacyDevOrder"
+  ## SOMETIMES_CONSUMES ## Variable:L"LegacyDevOrder"
+  gEfiLegacyDevOrderVariableGuid
+  gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL CONSUMES
-  gEfiLoadFileProtocolGuid                      # PROTOCOL CONSUMES
-  gEfiSimpleTextOutProtocolGuid                 # PROTOCOL CONSUMES
-  gEfiPciIoProtocolGuid                         # PROTOCOL CONSUMES
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL CONSUMES
-  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL CONSUMES
-  gEfiDebugPortProtocolGuid                     # PROTOCOL CONSUMES
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL CONSUMES
-  gEfiBlockIoProtocolGuid                       # PROTOCOL CONSUMES
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL CONSUMES
-  gEfiLegacyBiosProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMES
-  gEfiCpuArchProtocolGuid                       # PROTOCOL CONSUMES
-  gEfiDevicePathProtocolGuid                    # PROTOCOL CONSUMES
-  gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL CONSUMES
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
-  gEfiUgaDrawProtocolGuid |gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
-  gEfiOEMBadgingProtocolGuid                    # PROTOCOL CONSUMES
-  gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
-  gEfiUserManagerProtocolGuid                   # PROTOCOL CONSUMES
-  gEfiUsbIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMES
-  gEfiBootLogoProtocolGuid                      # PROTOCOL SOMETIMES_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiSimpleTextOutProtocolGuid                 ## CONSUMES
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiSimpleNetworkProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiDebugPortProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiSimpleTextInProtocolGuid                  ## CONSUMES
+  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiLegacyBiosProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiAcpiS3SaveProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid |gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## SOMETIMES_CONSUMES
+  gEfiOEMBadgingProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiHiiFontProtocolGuid                       ## CONSUMES
+  gEfiUserManagerProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiUsbIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport                   ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange
-  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
-  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable      ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile      ## CONSUMES
+
+#
+# [BootMode] 
+#   RECOVERY_FULL    ## SOMETIMES_CONSUMES # Memory Type Information variable
+#
+
