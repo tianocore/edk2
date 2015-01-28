@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -250,6 +250,13 @@ Returns:
   Volume = OFile->Volume;
   Task   = NULL;
 
+  //
+  // Write to a directory is unsupported
+  //
+  if ((OFile->ODir != NULL) && (IoMode == WRITE_DATA)) {
+    return EFI_UNSUPPORTED;
+  }
+
   if (OFile->Error == EFI_NOT_FOUND) {
     return EFI_DEVICE_ERROR;
   }
@@ -296,16 +303,10 @@ Returns:
   if (!EFI_ERROR (Status)) {
     if (OFile->ODir != NULL) {
       //
-      // Access a directory
+      // Read a directory is supported
       //
-      Status = EFI_UNSUPPORTED;
-      if (IoMode == READ_DATA) {
-        //
-        // Read a directory is supported
-        //
-        Status = FatIFileReadDir (IFile, BufferSize, Buffer);
-      }
-
+      ASSERT (IoMode == READ_DATA);
+      Status = FatIFileReadDir (IFile, BufferSize, Buffer);
       OFile = NULL;
     } else {
       //
