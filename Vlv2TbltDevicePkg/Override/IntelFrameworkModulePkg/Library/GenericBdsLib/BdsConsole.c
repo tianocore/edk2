@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which contain all the code to connect console device
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -65,9 +65,9 @@ IsNvNeed (
   @param  VarName            The name of the EFI console variable.
   @param  ConsoleGuid        Specified Console protocol GUID.
   @param  ConsoleHandle      On IN,  console handle in System Table to be checked. 
-                             On OUT, new console hanlde in system table.
+                             On OUT, new console handle in system table.
   @param  ProtocolInterface  On IN,  console protocol on console handle in System Table to be checked. 
-                             On OUT, new console protocol on new console hanlde in system table.
+                             On OUT, new console protocol on new console handle in system table.
 
   @retval TRUE               System Table has been updated.
   @retval FALSE              System Table hasn't been updated.
@@ -285,17 +285,16 @@ BdsLibUpdateConsoleVariable (
   // Finally, Update the variable of the default console by NewDevicePath
   //
   DevicePathSize = GetDevicePathSize (NewDevicePath);
-  Status = gRT->SetVariable (
-                  ConVarName,
-                  &gEfiGlobalVariableGuid,
-                  Attributes,
-                  DevicePathSize,
-                  NewDevicePath
-                  );
+  Status = SetVariableAndReportStatusCodeOnError (
+             ConVarName,
+             &gEfiGlobalVariableGuid,
+             Attributes,
+             DevicePathSize,
+             NewDevicePath
+             );
   if ((DevicePathSize == 0) && (Status == EFI_NOT_FOUND)) {
     Status = EFI_SUCCESS;
   }
-  ASSERT_EFI_ERROR (Status);
 
   if (VarConsole == NewDevicePath) {
     if (VarConsole != NULL) {
