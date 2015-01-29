@@ -149,12 +149,12 @@ DefinitionBlock ("RHPX.aml", "SSDT", 1, "MSFT", "RHPROXY", 1)
                     Package(2) { "bus-SPI-SPI0", Package() { 0 }},
 
                     // TODO: Intel will need to provide the right value for SPI0 properties
-                    Package(2) { "SPI0-MinClockInHz", 100 },
-                    Package(2) { "SPI0-MaxClockInHz", 8000000 },
+                    Package(2) { "SPI0-MinClockInHz", 100000 },
+                    Package(2) { "SPI0-MaxClockInHz", 15000000 },
                     // SupportedDataBitLengths takes a list of support data bit length
                     // Example : Package(2) { "SPI0-SupportedDataBitLengths", Package() { 8, 7, 16 }},
-                    Package(2) { "SPI0-SupportedDataBitLengths", Package() { 8 }},
-                     // I2C Mapping
+                    Package(2) { "SPI0-SupportedDataBitLengths", Package() { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 }},
+                    // I2C Mapping
                     Package(2) { "bus-I2C-I2C5", Package() { 1 }},
                     // UART Mapping
                     Package(2) { "bus-UART-UART2", Package() { 2 }},
