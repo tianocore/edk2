@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -621,6 +621,7 @@ ProcessStorage (
   CHAR16                *StrPtr;
   UINTN                 BufferSize;
   UINTN                 TmpSize;
+  FORMSET_STORAGE       *BrowserStorage;
 
   if (RetrieveData) {
     //
@@ -635,9 +636,11 @@ ProcessStorage (
     // Skip <ConfigHdr> and '&' to point to <ConfigBody> when first copy the configbody.
     // Also need to consider add "\0" at first time.
     //
-    StrPtr     = ConfigResp + StrLen (Storage->ConfigHdr) + 1;
+    StrPtr = StrStr (ConfigResp, L"PATH");
+    ASSERT (StrPtr != NULL);
+    StrPtr = StrStr (StrPtr, L"&");
+    StrPtr += 1;
     BufferSize = StrSize (StrPtr);
-
 
     //
     // Copy the data if the input buffer is bigger enough.
@@ -652,12 +655,14 @@ ProcessStorage (
     //
     // Prepare <ConfigResp>
     //
+    BrowserStorage = GetFstStgFromBrsStg (Storage);
+    ASSERT (BrowserStorage != NULL);
     TmpSize = StrLen (*ResultsData);
-    BufferSize = (TmpSize + StrLen (Storage->ConfigHdr) + 2) * sizeof (CHAR16);
+    BufferSize = (TmpSize + StrLen (BrowserStorage->ConfigHdr) + 2) * sizeof (CHAR16);
     ConfigResp = AllocateZeroPool (BufferSize);
     ASSERT (ConfigResp != NULL);
 
-    StrCpy (ConfigResp, Storage->ConfigHdr);
+    StrCpy (ConfigResp, BrowserStorage->ConfigHdr);
     StrCat (ConfigResp, L"&");
     StrCat (ConfigResp, *ResultsData);
 
@@ -1217,6 +1222,7 @@ StorageToConfigResp (
   LIST_ENTRY              *Link;
   NAME_VALUE_NODE         *Node;
   UINT8                   *SourceBuf;
+  FORMSET_STORAGE         *FormsetStorage;
 
   Status = EFI_SUCCESS;
 
@@ -1236,7 +1242,9 @@ StorageToConfigResp (
 
   case EFI_HII_VARSTORE_NAME_VALUE:
     *ConfigResp = NULL;
-    NewStringCat (ConfigResp, Storage->ConfigHdr);
+    FormsetStorage = GetFstStgFromBrsStg(Storage);
+    ASSERT (FormsetStorage != NULL);
+    NewStringCat (ConfigResp, FormsetStorage->ConfigHdr);
 
     Link = GetFirstNode (&Storage->NameValueListHead);
     while (!IsNull (&Storage->NameValueListHead, Link)) {
@@ -1475,6 +1483,7 @@ GetQuestionValue (
   UINTN               StorageWidth;
   EFI_TIME            EfiTime;
   BROWSER_STORAGE     *Storage;
+  FORMSET_STORAGE     *FormsetStorage;
   EFI_IFR_TYPE_VALUE  *QuestionValue;
   CHAR16              *ConfigRequest;
   CHAR16              *Progress;
@@ -1659,21 +1668,23 @@ GetQuestionValue (
       FreePool (Value);
     }
   } else {
+    FormsetStorage = GetFstStgFromVarId(FormSet, Question->VarStoreId);
+    ASSERT (FormsetStorage != NULL);
     //
     // <ConfigRequest> ::= <ConfigHdr> + <BlockName> ||
     //                   <ConfigHdr> + "&" + <VariableName>
     //
     if (IsBufferStorage) {
-      Length = StrLen (Storage->ConfigHdr);
+      Length = StrLen (FormsetStorage->ConfigHdr);
       Length += StrLen (Question->BlockName);
     } else {
-      Length = StrLen (Storage->ConfigHdr);
+      Length = StrLen (FormsetStorage->ConfigHdr);
       Length += StrLen (Question->VariableName) + 1;
     }
     ConfigRequest = AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
     ASSERT (ConfigRequest != NULL);
 
-    StrCpy (ConfigRequest, Storage->ConfigHdr);
+    StrCpy (ConfigRequest, FormsetStorage->ConfigHdr);
     if (IsBufferStorage) {
       StrCat (ConfigRequest, Question->BlockName);
     } else {
@@ -1771,6 +1782,7 @@ SetQuestionValue (
   UINTN               BufferLen;
   UINTN               StorageWidth;
   BROWSER_STORAGE     *Storage;
+  FORMSET_STORAGE     *FormsetStorage;
   EFI_IFR_TYPE_VALUE  *QuestionValue;
   CHAR16              *ConfigResp;
   CHAR16              *Progress;
@@ -1965,10 +1977,12 @@ SetQuestionValue (
     } else {
       Length += (StorageWidth * 2);
     }
-    ConfigResp = AllocateZeroPool ((StrLen (Storage->ConfigHdr) + Length + 1) * sizeof (CHAR16));
+    FormsetStorage = GetFstStgFromVarId(FormSet, Question->VarStoreId);
+    ASSERT (FormsetStorage != NULL);
+    ConfigResp = AllocateZeroPool ((StrLen (FormsetStorage->ConfigHdr) + Length + 1) * sizeof (CHAR16));
     ASSERT (ConfigResp != NULL);
 
-    StrCpy (ConfigResp, Storage->ConfigHdr);
+    StrCpy (ConfigResp, FormsetStorage->ConfigHdr);
     if (IsBufferStorage) {
       StrCat (ConfigResp, Question->BlockName);
       StrCat (ConfigResp, L"&VALUE=");
@@ -2678,6 +2692,11 @@ FindQuestionFromProgress (
         LinkStatement = GetNextNode (&Form->StatementListHead, LinkStatement);
 
         if (Statement->BlockName != NULL && StrStr (Statement->BlockName, Progress) != NULL) {
+          *RetQuestion = Statement;
+          break;
+        }
+
+        if (Statement->VariableName != NULL && StrStr (Statement->VariableName, Progress) != NULL) {
           *RetQuestion = Statement;
           break;
         }
@@ -4645,13 +4664,13 @@ RemoveElement (
 /**
   Adjust config request in storage, remove the request elements existed in the input ConfigRequest.
 
-  @param  Storage                Pointer to the browser storage.
+  @param  Storage                Pointer to the formset storage.
   @param  ConfigRequest          The pointer to the Request element.
 
 **/
 VOID
 RemoveConfigRequest (
-  BROWSER_STORAGE   *Storage,
+  FORMSET_STORAGE   *Storage,
   CHAR16            *ConfigRequest
   )
 {
@@ -4666,7 +4685,7 @@ RemoveConfigRequest (
     return;
   }
 
-  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
     //
     // "&Name1&Name2" section for EFI_HII_VARSTORE_NAME_VALUE storage
     //
@@ -4681,7 +4700,7 @@ RemoveConfigRequest (
   //
   // Find SearchKey storage
   //
-  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
     RequestElement = StrStr (ConfigRequest, L"PATH");
     ASSERT (RequestElement != NULL);
     RequestElement = StrStr (RequestElement, SearchKey);    
@@ -4705,7 +4724,7 @@ RemoveConfigRequest (
       *NextRequestElement = L'\0';
     }
 
-    RemoveElement (Storage, RequestElement);
+    RemoveElement (Storage->BrowserStorage, RequestElement);
 
     if (NextRequestElement != NULL) {
       //
@@ -4720,10 +4739,10 @@ RemoveConfigRequest (
   //
   // If no request element remain, just remove the ConfigRequest string.
   //
-  if (StrCmp (Storage->ConfigRequest, Storage->ConfigHdr) == 0) {
-    FreePool (Storage->ConfigRequest);
-    Storage->ConfigRequest = NULL;
-    Storage->SpareStrLen   = 0;
+  if (StrCmp (Storage->BrowserStorage->ConfigRequest, Storage->ConfigHdr) == 0) {
+    FreePool (Storage->BrowserStorage->ConfigRequest);
+    Storage->BrowserStorage->ConfigRequest = NULL;
+    Storage->BrowserStorage->SpareStrLen   = 0;
   }
 }
 
@@ -4751,7 +4770,7 @@ CleanBrowserStorage (
         continue;
       }
 
-      RemoveConfigRequest (Storage->BrowserStorage, Storage->ConfigRequest);
+      RemoveConfigRequest (Storage, Storage->ConfigRequest);
     } else if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_BUFFER ||
                Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
       if (Storage->BrowserStorage->ConfigRequest != NULL) { 
@@ -5011,14 +5030,14 @@ LoadStorage (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWW"followed by a Null-terminator
     //
-    StrLen = StrSize (Storage->BrowserStorage->ConfigHdr) + 20 * sizeof (CHAR16);
+    StrLen = StrSize (Storage->ConfigHdr) + 20 * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (StrLen);
     ASSERT (ConfigRequest != NULL);
     UnicodeSPrint (
                ConfigRequest, 
                StrLen, 
                L"%s&OFFSET=0&WIDTH=%04x", 
-               Storage->BrowserStorage->ConfigHdr,
+               Storage->ConfigHdr,
                Storage->BrowserStorage->Size);
   } else {
     ConfigRequest = Storage->ConfigRequest;

@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -320,20 +320,20 @@ CreateExpression (
 EFI_STATUS
 InitializeConfigHdr (
   IN FORM_BROWSER_FORMSET  *FormSet,
-  IN OUT BROWSER_STORAGE   *Storage
+  IN OUT FORMSET_STORAGE   *Storage
   )
 {
   CHAR16      *Name;
 
-  if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
-      Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
-    Name = Storage->Name;
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_BUFFER || 
+      Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+    Name = Storage->BrowserStorage->Name;
   } else {
     Name = NULL;
   }
 
   Storage->ConfigHdr = HiiConstructConfigHdr (
-                         &Storage->Guid,
+                         &Storage->BrowserStorage->Guid,
                          Name,
                          FormSet->DriverHandle
                          );
@@ -559,27 +559,106 @@ CreateStorage (
     }
 
     BrowserStorage->HiiHandle = FormSet->HiiHandle;
-    InitializeConfigHdr (FormSet, BrowserStorage);
 
     BrowserStorage->Initialized = FALSE;
-  } else {
-    if ((StorageType == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) && 
-        (FormSet->DriverHandle != NULL) && 
-        (!IsDevicePathExist (BrowserStorage->ConfigHdr))) {
-      //
-      // If this storage not has device path info but new formset has,
-      // update the device path info.
-      //
-      FreePool (BrowserStorage->ConfigHdr);
-      InitializeConfigHdr (FormSet, BrowserStorage);
-    }
   }
 
   Storage->BrowserStorage = BrowserStorage;
-  Storage->ConfigRequest = AllocateCopyPool (StrSize (BrowserStorage->ConfigHdr), BrowserStorage->ConfigHdr);
+  InitializeConfigHdr (FormSet, Storage);
+  Storage->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigHdr), Storage->ConfigHdr);
   Storage->SpareStrLen = 0;
 
   return Storage;
+}
+
+/**
+  Get Formset_storage base on the input varstoreid info.
+
+  @param  FormSet                Pointer of the current FormSet.
+  @param  VarStoreId             Varstore ID info.
+
+  @return Pointer to a FORMSET_STORAGE data structure.
+
+**/
+FORMSET_STORAGE *
+GetFstStgFromVarId (
+  IN FORM_BROWSER_FORMSET  *FormSet,
+  IN EFI_VARSTORE_ID       VarStoreId
+  )
+{
+  FORMSET_STORAGE  *FormsetStorage;
+  LIST_ENTRY       *Link;
+  BOOLEAN          Found;
+
+  Found = FALSE;
+  FormsetStorage = NULL;
+  //
+  // Find Formset Storage for this Question
+  //
+  Link = GetFirstNode (&FormSet->StorageListHead);
+  while (!IsNull (&FormSet->StorageListHead, Link)) {
+    FormsetStorage = FORMSET_STORAGE_FROM_LINK (Link);
+
+    if (FormsetStorage->VarStoreId == VarStoreId) {
+      Found = TRUE;
+      break;
+    }
+
+    Link = GetNextNode (&FormSet->StorageListHead, Link);
+  }
+
+  return Found ? FormsetStorage : NULL;
+}
+
+/**
+  Get Formset_storage base on the input browser storage.
+
+  More than one formsets may share the same browser storage,
+  this function just get the first formset storage which
+  share the browser storage.
+
+  @param  Storage              browser storage info.
+
+  @return Pointer to a FORMSET_STORAGE data structure.
+  
+
+**/
+FORMSET_STORAGE *
+GetFstStgFromBrsStg (
+  IN BROWSER_STORAGE       *Storage
+  )
+{
+  FORMSET_STORAGE      *FormsetStorage;
+  LIST_ENTRY           *Link;
+  LIST_ENTRY           *FormsetLink;
+  FORM_BROWSER_FORMSET *FormSet;
+  BOOLEAN              Found;
+
+  Found = FALSE;
+  FormsetStorage = NULL;
+
+  FormsetLink = GetFirstNode (&gBrowserFormSetList);
+  while (!IsNull (&gBrowserFormSetList, FormsetLink)) {
+    FormSet = FORM_BROWSER_FORMSET_FROM_LINK (FormsetLink);
+    FormsetLink = GetNextNode (&gBrowserFormSetList, FormsetLink);
+
+    Link = GetFirstNode (&FormSet->StorageListHead);
+    while (!IsNull (&FormSet->StorageListHead, Link)) {
+      FormsetStorage = FORMSET_STORAGE_FROM_LINK (Link);
+      Link = GetNextNode (&FormSet->StorageListHead, Link);
+
+      if (FormsetStorage->BrowserStorage == Storage) {
+        Found = TRUE;
+        break;
+      }
+    }
+
+    if (Found) {
+      break;
+    }
+  }
+
+  return Found ? FormsetStorage : NULL;
 }
 
 /**
@@ -651,17 +730,7 @@ InitializeRequestElement (
   //
   // Find Formset Storage for this Question
   //
-  FormsetStorage = NULL;
-  Link = GetFirstNode (&FormSet->StorageListHead);
-  while (!IsNull (&FormSet->StorageListHead, Link)) {
-    FormsetStorage = FORMSET_STORAGE_FROM_LINK (Link);
-
-    if (FormsetStorage->VarStoreId == Question->VarStoreId) {
-      break;
-    }
-
-    Link = GetNextNode (&FormSet->StorageListHead, Link);
-  }
+  FormsetStorage = GetFstStgFromVarId(FormSet, Question->VarStoreId);
   ASSERT (FormsetStorage != NULL);
 
   //
@@ -695,7 +764,7 @@ InitializeRequestElement (
   while (!IsNull (&Form->ConfigRequestHead, Link)) {
     ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (Link);
 
-    if (ConfigInfo != NULL && ConfigInfo->Storage == Storage) {
+    if (ConfigInfo != NULL && ConfigInfo->Storage == FormsetStorage->BrowserStorage) {
       Find = TRUE;
       break;
     }
@@ -707,10 +776,10 @@ InitializeRequestElement (
     ConfigInfo = AllocateZeroPool(sizeof (FORM_BROWSER_CONFIG_REQUEST));
     ASSERT (ConfigInfo != NULL);
     ConfigInfo->Signature     = FORM_BROWSER_CONFIG_REQUEST_SIGNATURE;
-    ConfigInfo->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigHdr), Storage->ConfigHdr);
+    ConfigInfo->ConfigRequest = AllocateCopyPool (StrSize (FormsetStorage->ConfigHdr), FormsetStorage->ConfigHdr);
     ASSERT (ConfigInfo->ConfigRequest != NULL);
     ConfigInfo->SpareStrLen   = 0;
-    ConfigInfo->Storage       = Storage;
+    ConfigInfo->Storage       = FormsetStorage->BrowserStorage;
     InsertTailList(&Form->ConfigRequestHead, &ConfigInfo->Link);
   }
 
