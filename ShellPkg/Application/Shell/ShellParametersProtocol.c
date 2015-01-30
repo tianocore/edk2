@@ -18,31 +18,6 @@
 #include "Shell.h"
 
 /**
-  Return the next location of a non-escaped character from a command line string;
-
-  @param[in] String        the string to parse
-  @param[in] Character     the character to look for
-
-  @retval the location of the character in the string or the end of the string
-**/
-CONST CHAR16*
-EFIAPI
-FindCharacter(
-  IN CONST CHAR16 *String,
-  IN CONST CHAR16 Character
-  )
-{
-  CONST CHAR16 *Walker;
-
-  for (Walker = String ; *Walker != Character && *Walker != CHAR_NULL; Walker++) {
-    if (*Walker == L'^') {
-      Walker++;
-    }
-  }
-  return Walker;
-}
-
-/**
   Return the next parameter's end from a command line string;
 
   @param[in] String        the string to parse
@@ -53,14 +28,10 @@ FindEndOfParameter(
   IN CONST CHAR16 *String
   )
 {
-  CONST CHAR16 *NextSpace;
-  CONST CHAR16 *NextQuote;
   CONST CHAR16 *First;
   CONST CHAR16 *CloseQuote;
 
-  NextSpace = FindCharacter (String, L' ' );
-  NextQuote = FindCharacter (String, L'\"');
-  First = MIN (NextQuote, NextSpace);
+  First = FindFirstCharacter(String, L" \"", L'^');
 
   //
   // nothing, all one parameter remaining
@@ -73,14 +44,14 @@ FindEndOfParameter(
   // If space before a quote (or neither found, i.e. both CHAR_NULL),
   // then that's the end.
   //
-  if (First == NextSpace) {
-    return (NextSpace);
+  if (*First == L' ') {
+    return (First);
   }
 
-  CloseQuote = FindCharacter (First+1, L'\"');
+  CloseQuote = FindFirstCharacter (First+1, L"\"", L'^');
 
   //
-  // We did not find a terminator... return the end of the string
+  // We did not find a terminator...
   //
   if (*CloseQuote == CHAR_NULL) {
     return (NULL);
@@ -117,7 +88,7 @@ GetNextParameter(
   IN CONST UINTN  Length
   )
 {
-  CHAR16 *NextDelim;
+  CONST CHAR16 *NextDelim;
 
   if (Walker           == NULL
     ||*Walker          == NULL
@@ -145,7 +116,7 @@ DEBUG_CODE_END();
     return (EFI_INVALID_PARAMETER);
   }
 
-  NextDelim = (CHAR16*)FindEndOfParameter(*Walker);
+  NextDelim = FindEndOfParameter(*Walker);
 
   if (NextDelim == NULL){
 DEBUG_CODE_BEGIN();
@@ -163,52 +134,32 @@ DEBUG_CODE_END();
     (*TempParameter)[NextDelim - *Walker] = CHAR_NULL;
   }
 
-  *Walker = NextDelim;
-
   //
-  // Now remove any quotes surrounding entire parameters
+  // Update Walker for the next iteration through the function
   //
-  if ((*TempParameter)[0] == L'\"' && (*TempParameter)[StrLen (*TempParameter)-1] == L'\"') {
-    (*TempParameter)[StrLen (*TempParameter)-1] = CHAR_NULL;
-    CopyMem ((*TempParameter), (*TempParameter)+1, StrSize ((*TempParameter)+1));
-  }
+  *Walker = (CHAR16*)NextDelim;
 
   //
   // Remove any non-escaped quotes in the string
+  // Remove any remaining escape characters in the string
   //
-  for (NextDelim = StrStr(*TempParameter, L"\""); NextDelim != NULL && *NextDelim != CHAR_NULL; NextDelim = StrStr(NextDelim, L"\"")) {
-    //
-    // Make sure I found a quote character properly.
-    //
-    ASSERT(*NextDelim == L'\"');
-
-    //
-    // Only remove quotes that do not have a preceeding ^
-    //
-    if ((NextDelim > (*TempParameter) && (*(NextDelim - 1) != L'^')) || (NextDelim == (*TempParameter))) {
-      CopyMem (NextDelim, NextDelim + 1, StrSize (NextDelim + 1));
-    } else {
-      NextDelim++;
-    }
-  }
-
-  //
-  // Remove any escape charactersin the parameter before returning it
-  // all escape character processing is complete at this time
-  //
-  for (NextDelim = StrStr(*TempParameter, L"^"); NextDelim != NULL && *NextDelim != CHAR_NULL; NextDelim = StrStr(NextDelim, L"^")) {
-    //
-    // Make sure I found an escape character properly.
-    //
-    ASSERT(*NextDelim == L'^');
-
-    CopyMem (NextDelim, NextDelim + 1, StrSize (NextDelim + 1));
-
-    //
-    // If we had 2 escapes in a row, leave one behind
-    //
+  for (NextDelim = FindFirstCharacter(*TempParameter, L"\"^", CHAR_NULL) 
+    ; *NextDelim != CHAR_NULL 
+    ; NextDelim = FindFirstCharacter(NextDelim, L"\"^", CHAR_NULL)
+    ) {
     if (*NextDelim == L'^') {
+
+      //
+      // eliminate the escape ^
+      //
+      CopyMem ((CHAR16*)NextDelim, NextDelim + 1, StrSize (NextDelim + 1));
       NextDelim++;
+    } else if (*NextDelim == L'\"') {
+
+      //
+      // eliminate the unescaped quote
+      //
+      CopyMem ((CHAR16*)NextDelim, NextDelim + 1, StrSize (NextDelim + 1));
     }
   }
 
