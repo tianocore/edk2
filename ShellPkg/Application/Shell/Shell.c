@@ -190,33 +190,6 @@ IsValidEnvironmentVariableName(
 }
 
 /**
-  Find a command line contains a split operation
-
-  @param[in] CmdLine      The command line to parse.
-
-  @retval                 A pointer to the | character in CmdLine or NULL if not present.
-**/
-CONST CHAR16*
-EFIAPI
-FindSplit(
-  IN CONST CHAR16 *CmdLine
-  )
-{
-  CONST CHAR16 *TempSpot;
-  TempSpot = NULL;
-  if (StrStr(CmdLine, L"|") != NULL) {
-    for (TempSpot = CmdLine ; TempSpot != NULL && *TempSpot != CHAR_NULL ; TempSpot++) {
-      if (*TempSpot == L'^' && *(TempSpot+1) == L'|') {
-        TempSpot++;
-      } else if (*TempSpot == L'|') {
-        break;
-      }
-    }
-  }
-  return (TempSpot);
-}
-
-/**
   Determine if a command line contains a split operation
 
   @param[in] CmdLine      The command line to parse.
@@ -236,7 +209,7 @@ ContainsSplit(
 
   FirstQuote    = FindNextInstance (CmdLine, L"\"", TRUE);
   SecondQuote   = NULL;
-  TempSpot      = FindSplit(CmdLine);
+  TempSpot      = FindFirstCharacter(CmdLine, L"|", L'^');
 
   if (FirstQuote == NULL    || 
       TempSpot == NULL      || 
@@ -259,7 +232,7 @@ ContainsSplit(
       continue;
     } else {
       FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
-      TempSpot = FindSplit(TempSpot + 1);
+      TempSpot = FindFirstCharacter(TempSpot + 1, L"|", L'^');
       continue;
     } 
   }
@@ -1919,7 +1892,7 @@ VerifySplit(
   //
   // recurse to verify the next item
   //
-  TempSpot = FindSplit(CmdLine)+1;
+  TempSpot = FindFirstCharacter(CmdLine, L"|", L'^') + 1;
   return (VerifySplit(TempSpot));
 }
 
@@ -2920,4 +2893,39 @@ RunScriptFile (
   RestoreArgcArgv(ParamProtocol, &Argv, &Argc);
 
   return (Status);
+}
+
+/**
+  Return the pointer to the first occurance of any character from a list of characters
+
+  @param[in] String           the string to parse
+  @param[in] CharacterList    the list of character to look for
+  @param[in] EscapeCharacter  An escape character to skip
+
+  @return the location of the first character in the string
+  @retval CHAR_NULL no instance of any character in CharacterList was found in String
+**/
+CONST CHAR16*
+EFIAPI
+FindFirstCharacter(
+  IN CONST CHAR16 *String,
+  IN CONST CHAR16 *CharacterList,
+  IN CONST CHAR16 EscapeCharacter
+  )
+{
+  UINT32 WalkChar;
+  UINT32 WalkStr;
+
+  for (WalkStr = 0; WalkStr < StrLen(String); WalkStr++) {
+    if (String[WalkStr] == EscapeCharacter) {
+      WalkStr++;
+      continue;
+    }
+    for (WalkChar = 0; WalkChar < StrLen(CharacterList); WalkChar++) {
+      if (String[WalkStr] == CharacterList[WalkChar]) {
+        return (&String[WalkStr]);
+      }
+    }
+  }
+  return (String + StrLen(String));
 }

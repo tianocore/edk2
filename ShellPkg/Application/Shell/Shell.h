@@ -2,7 +2,7 @@
   function definitions for internal to shell functions.
 
   (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -342,6 +342,23 @@ RunScriptFile (
   IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
   );
 
+/**
+  Return the pointer to the first occurance of any character from a list of characters
+
+  @param[in] String           the string to parse
+  @param[in] CharacterList    the list of character to look for
+  @param[in] EscapeCharacter  An escape character to skip
+
+  @return the location of the first character in the string
+  @retval CHAR_NULL no instance of any character in CharacterList was found in String
+**/
+CONST CHAR16*
+EFIAPI
+FindFirstCharacter(
+  IN CONST CHAR16 *String,
+  IN CONST CHAR16 *CharacterList,
+  IN CONST CHAR16 EscapeCharacter
+  );
 
 #endif //_SHELL_INTERNAL_HEADER_
 
