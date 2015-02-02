@@ -96,7 +96,13 @@ MicroSecondDelay (
   // Calculate counter ticks that can represent requested delay:
   //  = MicroSeconds x TICKS_PER_MICRO_SEC
   //  = MicroSeconds x Frequency.10^-6
-  TimerTicks64 = ((UINT64)MicroSeconds * PcdGet32 (PcdArmArchTimerFreqInHz)) / 1000000U;
+  TimerTicks64 = DivU64x32 (
+                   MultU64x32 (
+                     MicroSeconds,
+                     PcdGet32 (PcdArmArchTimerFreqInHz)
+                     ),
+                   1000000U
+                   );
 
   // Read System Counter value
   SystemCounterVal = ArmGenericTimerGetSystemCount ();
