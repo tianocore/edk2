@@ -29,6 +29,7 @@
 [Sources]
   AcpiPlatform.c
   Qemu.c
+  QemuFwCfgAcpi.c
   Xen.c
 
 [Packages]
