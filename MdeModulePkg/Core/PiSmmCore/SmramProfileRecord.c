@@ -1,7 +1,7 @@
 /** @file
   Support routines for SMRAM profile.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1176,61 +1176,6 @@ SmramProfileReadyToLock (
 ////////////////////
 
 /**
-  This function check if the address is in SMRAM.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is in SMRAM.
-  @retval FALSE this address is NOT in SMRAM.
-
-**/
-BOOLEAN
-InternalIsAddressInSmram (
-  IN PHYSICAL_ADDRESS   Buffer,
-  IN UINT64             Length
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < mFullSmramRangeCount; Index ++) {
-    if (((Buffer >= mFullSmramRanges[Index].CpuStart) && (Buffer < mFullSmramRanges[Index].CpuStart + mFullSmramRanges[Index].PhysicalSize)) ||
-        ((mFullSmramRanges[Index].CpuStart >= Buffer) && (mFullSmramRanges[Index].CpuStart < Buffer + Length))) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  This function check if the address refered by Buffer and Length is valid.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is valid.
-  @retval FALSE this address is NOT valid.
-**/
-BOOLEAN
-InternalIsAddressValid (
-  IN UINTN                 Buffer,
-  IN UINTN                 Length
-  )
-{
-  if (Buffer > (MAX_ADDRESS - Length)) {
-    //
-    // Overflow happen
-    //
-    return FALSE;
-  }
-  if (InternalIsAddressInSmram ((PHYSICAL_ADDRESS) Buffer, (UINT64)Length)) {
-    return FALSE;
-  }
-  return TRUE;
-}
-
-/**
   Get SMRAM profile data size.
 
   @return SMRAM profile data size.
@@ -1485,7 +1430,7 @@ SmramProfileHandlerGetData (
   //
   // Sanity check
   //
-  if (!InternalIsAddressValid ((UINTN) SmramProfileGetData.ProfileBuffer, (UINTN) ProfileSize)) {
+  if (!SmmIsBufferOutsideSmmValid ((UINTN) SmramProfileGetData.ProfileBuffer, (UINTN) ProfileSize)) {
     DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetData: SMM ProfileBuffer in SMRAM or overflow!\n"));
     SmramProfileParameterGetData->ProfileSize = ProfileSize;
     SmramProfileParameterGetData->Header.ReturnStatus = (UINT64) (INT64) (INTN) EFI_ACCESS_DENIED;
@@ -1610,7 +1555,7 @@ SmramProfileHandler (
     return EFI_SUCCESS;
   }
 
-  if (mSmramReadyToLock && !InternalIsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+  if (mSmramReadyToLock && !SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }

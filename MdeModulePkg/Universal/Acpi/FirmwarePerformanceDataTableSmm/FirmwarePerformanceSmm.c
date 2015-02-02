@@ -11,7 +11,7 @@
 
   FpdtSmiHandler() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/SynchronizationLib.h>
+#include <Library/SmmMemLib.h>
 
 #define EXTENSION_RECORD_SIZE     0x1000
 
@@ -49,8 +50,6 @@ UINT32                        mBootRecordSize = 0;
 UINT32                        mBootRecordMaxSize = 0;
 UINT8                         *mBootRecordBuffer = NULL;
 
-EFI_SMRAM_DESCRIPTOR          *mSmramRanges;
-UINTN                         mSmramRangeCount;
 SPIN_LOCK                     mSmmFpdtLock;
 BOOLEAN                       mSmramIsOutOfResource = FALSE;
 
@@ -178,60 +177,6 @@ FpdtStatusCodeListenerSmm (
 }
 
 /**
-  This function check if the address is in SMRAM.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is in SMRAM.
-  @retval FALSE this address is NOT in SMRAM.
-**/
-BOOLEAN
-InternalIsAddressInSmram (
-  IN EFI_PHYSICAL_ADDRESS  Buffer,
-  IN UINT64                Length
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < mSmramRangeCount; Index ++) {
-    if (((Buffer >= mSmramRanges[Index].CpuStart) && (Buffer < mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize)) ||
-        ((mSmramRanges[Index].CpuStart >= Buffer) && (mSmramRanges[Index].CpuStart < Buffer + Length))) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  This function check if the address refered by Buffer and Length is valid.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is valid.
-  @retval FALSE this address is NOT valid.
-**/
-BOOLEAN
-InternalIsAddressValid (
-  IN UINTN                 Buffer,
-  IN UINTN                 Length
-  )
-{
-  if (Buffer > (MAX_ADDRESS - Length)) {
-    //
-    // Overflow happen
-    //
-    return FALSE;
-  }
-  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)Buffer, (UINT64)Length)) {
-    return FALSE;
-  }
-  return TRUE;
-}
-
-/**
   Communication service SMI Handler entry.
 
   This SMI handler provides services for report SMM boot records. 
@@ -283,7 +228,7 @@ FpdtSmiHandler (
     return EFI_SUCCESS;
   }
   
-  if (!InternalIsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM communication data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
@@ -309,7 +254,7 @@ FpdtSmiHandler (
        // Sanity check
        //
        SmmCommData->BootRecordSize = mBootRecordSize;
-       if (!InternalIsAddressValid ((UINTN)BootRecordData, mBootRecordSize)) {
+       if (!SmmIsBufferOutsideSmmValid ((UINTN)BootRecordData, mBootRecordSize)) {
          DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM Data buffer in SMRAM or overflow!\n"));
          Status = EFI_ACCESS_DENIED;
          break;
@@ -350,8 +295,6 @@ FirmwarePerformanceSmmEntryPoint (
 {
   EFI_STATUS                Status;
   EFI_HANDLE                Handle;
-  EFI_SMM_ACCESS2_PROTOCOL  *SmmAccess;
-  UINTN                     Size;
 
   //
   // Initialize spin lock
@@ -373,28 +316,6 @@ FirmwarePerformanceSmmEntryPoint (
   //
   Status = mRscHandlerProtocol->Register (FpdtStatusCodeListenerSmm);
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get SMRAM information
-  //
-  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **)&SmmAccess);
-  ASSERT_EFI_ERROR (Status);
-
-  Size = 0;
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-  Status = gSmst->SmmAllocatePool (
-                    EfiRuntimeServicesData,
-                    Size,
-                    (VOID **)&mSmramRanges
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmramRanges);
-  ASSERT_EFI_ERROR (Status);
-
-  mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
 
   //
   // Register SMI handler.

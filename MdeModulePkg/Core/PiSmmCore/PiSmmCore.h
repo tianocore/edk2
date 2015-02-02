@@ -51,6 +51,7 @@
 #include <Library/PerformanceLib.h>
 #include <Library/TimerLib.h>
 #include <Library/HobLib.h>
+#include <Library/SmmMemLib.h>
 
 #include "PiSmmCorePrivateData.h"
 

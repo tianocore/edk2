@@ -33,13 +33,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmVarCheck.h>
 
 #include <Library/SmmServicesTableLib.h>
+#include <Library/SmmMemLib.h>
 
 #include <Guid/VariableFormat.h>
 #include <Guid/SmmVariableCommon.h>
 #include "Variable.h"
-
-EFI_SMRAM_DESCRIPTOR                                 *mSmramRanges;
-UINTN                                                mSmramRangeCount;
 
 extern VARIABLE_INFO_ENTRY                           *gVariableInfo;
 EFI_HANDLE                                           mSmmVariableHandle      = NULL;
@@ -118,60 +116,6 @@ AtRuntime (
   )
 {
   return mAtRuntime;
-}
-
-/**
-  This function check if the address is in SMRAM.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is in SMRAM.
-  @retval FALSE this address is NOT in SMRAM.
-**/
-BOOLEAN
-InternalIsAddressInSmram (
-  IN EFI_PHYSICAL_ADDRESS  Buffer,
-  IN UINT64                Length
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < mSmramRangeCount; Index ++) {
-    if (((Buffer >= mSmramRanges[Index].CpuStart) && (Buffer < mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize)) ||
-        ((mSmramRanges[Index].CpuStart >= Buffer) && (mSmramRanges[Index].CpuStart < Buffer + Length))) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  This function check if the address refered by Buffer and Length is valid.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is valid.
-  @retval FALSE this address is NOT valid.
-**/
-BOOLEAN
-InternalIsAddressValid (
-  IN UINTN                 Buffer,
-  IN UINTN                 Length
-  )
-{
-  if (Buffer > (MAX_ADDRESS - Length)) {
-    //
-    // Overflow happen
-    //
-    return FALSE;
-  }
-  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)Buffer, (UINT64)Length)) {
-    return FALSE;
-  }
-  return TRUE;
 }
 
 /**
@@ -528,7 +472,7 @@ SmmVariableHandler (
     return EFI_SUCCESS;
   }
 
-  if (!InternalIsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmVariableHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
@@ -719,7 +663,7 @@ SmmVariableHandler (
       // It is covered by previous CommBuffer check 
       //
      
-      if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBufferSize, sizeof(UINTN))) {
+      if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBufferSize, sizeof(UINTN))) {
         DEBUG ((EFI_D_ERROR, "GetStatistics: SMM communication buffer in SMRAM!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -937,8 +881,6 @@ VariableServiceInitialize (
   EFI_STATUS                              Status;
   EFI_HANDLE                              VariableHandle;
   VOID                                    *SmmFtwRegistration;
-  EFI_SMM_ACCESS2_PROTOCOL                *SmmAccess;
-  UINTN                                   Size;
   VOID                                    *SmmEndOfDxeRegistration;
 
   //
@@ -966,28 +908,6 @@ VariableServiceInitialize (
                     &mSmmVarCheck
                     );
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get SMRAM information
-  //
-  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **)&SmmAccess);
-  ASSERT_EFI_ERROR (Status);
-
-  Size = 0;
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-  Status = gSmst->SmmAllocatePool (
-                    EfiRuntimeServicesData,
-                    Size,
-                    (VOID **)&mSmramRanges
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmramRanges);
-  ASSERT_EFI_ERROR (Status);
-
-  mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
 
   mVariableBufferPayloadSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) +
                                OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - sizeof (VARIABLE_HEADER);
