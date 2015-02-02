@@ -63,6 +63,8 @@ BOOLEAN                mEnableLocking         = TRUE;
 //
 VAR_ERROR_FLAG         mCurrentBootVarErrFlag = VAR_ERROR_FLAG_NO_ERROR;
 
+/**
+
   SecureBoot Hook for auth variable update.
 
   @param[in] VariableName                 Name of Variable to be found.
