@@ -1,7 +1,7 @@
 /** @file
   Functions to deal with file buffer.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -173,7 +173,7 @@ HFileImageRead (
   // NULL pointer is only also a failure for a non-zero file size.
   //
   if ((EFI_ERROR(Status)) || (Buffer == NULL && HFileImage.Size != 0)) {
-    UnicodeBuffer = CatSPrint(NULL, L"Read error on file &s: %r", FileName, Status);
+    UnicodeBuffer = CatSPrint(NULL, L"Read error on file %s: %r", FileName, Status);
     if (UnicodeBuffer == NULL) {
       SHELL_FREE_NON_NULL(Buffer);
       return EFI_OUT_OF_RESOURCES;

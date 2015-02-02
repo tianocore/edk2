@@ -18,7 +18,7 @@
 #include "Shell.h"
 
 /**
-  Return the next parameter's end from a command line string;
+  Return the next parameter's end from a command line string.
 
   @param[in] String        the string to parse
 **/
@@ -61,7 +61,7 @@ FindEndOfParameter(
 }
 
 /**
-  Return the next parameter from a command line string;
+  Return the next parameter from a command line string.
 
   This function moves the next parameter from Walker into TempParameter and moves
   Walker up past that parameter for recursive calling.  When the final parameter
