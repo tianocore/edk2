@@ -317,6 +317,9 @@ OnEndOfDxe (
   // The initialization for variable quota.
   //
   InitializeVariableQuota ();
+  if (PcdGetBool (PcdReclaimVariableSpaceAtEndOfDxe)) {
+    ReclaimForOS ();
+  }
 }
 
 /**

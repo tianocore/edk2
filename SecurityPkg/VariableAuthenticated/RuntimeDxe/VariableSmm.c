@@ -854,6 +854,9 @@ SmmEndOfDxeCallback (
   // The initialization for variable quota.
   //
   InitializeVariableQuota ();
+  if (PcdGetBool (PcdReclaimVariableSpaceAtEndOfDxe)) {
+    ReclaimForOS ();
+  }
   return EFI_SUCCESS;
 }
 
