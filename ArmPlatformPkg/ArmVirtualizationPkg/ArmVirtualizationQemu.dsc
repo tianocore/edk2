@@ -131,9 +131,9 @@
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
   #
-  # ARM Virtual Architectural Timer
+  # ARM Virtual Architectural Timer -- fetch frequency from QEMU (TCG) or KVM
   #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|100000000
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
 
   #
   # NV Storage PCDs. Use base of 0x04000000 for NOR1
