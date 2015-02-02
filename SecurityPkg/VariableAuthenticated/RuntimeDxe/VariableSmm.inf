@@ -75,6 +75,7 @@
   HobLib
   PcdLib
   DevicePathLib
+  SmmMemLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
