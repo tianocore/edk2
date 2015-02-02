@@ -3124,6 +3124,15 @@ ReclaimForOS(
   EFI_STATUS                     Status;
   UINTN                          RemainingCommonRuntimeVariableSpace;
   UINTN                          RemainingHwErrVariableSpace;
+  STATIC BOOLEAN                 Reclaimed;
+
+  //
+  // This function will be called only once at EndOfDxe or ReadyToBoot event.
+  //
+  if (Reclaimed) {
+    return;
+  }
+  Reclaimed = TRUE;
 
   Status  = EFI_SUCCESS;
 

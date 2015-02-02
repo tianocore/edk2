@@ -738,6 +738,12 @@
   # @Prompt Boottime reserved NV variable space size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdBoottimeReservedNvVariableSpaceSize|0x00|UINT32|0x30000007
 
+  ## Reclaim variable space at EndOfDxe.<BR><BR>
+  # The value is FALSE as default for compatibility that variable driver tries to reclaim variable space at ReadyToBoot event.<BR>
+  # If the value is set to TRUE, variable driver tries to reclaim variable space at EndOfDxe event.<BR>
+  # @Prompt Reclaim variable space at EndOfDxe.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe|FALSE|BOOLEAN|0x30000008
+
   ## The size of volatile buffer. This buffer is used to store VOLATILE attribute variables.
   # @Prompt Variable storage size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
