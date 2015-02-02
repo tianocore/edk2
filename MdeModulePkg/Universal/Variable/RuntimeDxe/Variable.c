@@ -55,6 +55,10 @@ BOOLEAN                mEndOfDxe              = FALSE;
 ///
 BOOLEAN                mEnableLocking         = TRUE;
 
+//
+// It will record the current boot error flag before EndOfDxe.
+//
+VAR_ERROR_FLAG         mCurrentBootVarErrFlag = VAR_ERROR_FLAG_NO_ERROR;
 
 /**
   Routine used to track statistical information about variable usage. 
@@ -561,6 +565,17 @@ RecordVarErrorFlag (
     }
   );
 
+  if (!mEndOfDxe) {
+    //
+    // Before EndOfDxe, just record the current boot variable error flag to local variable,
+    // and leave the variable error flag in NV flash as the last boot variable error flag.
+    // After EndOfDxe in InitializeVarErrorFlag (), the variable error flag in NV flash
+    // will be initialized to this local current boot variable error flag.
+    //
+    mCurrentBootVarErrFlag &= Flag;
+    return;
+  }
+
   //
   // Record error flag (it should have be initialized).
   //
@@ -619,7 +634,7 @@ InitializeVarErrorFlag (
     return;
   }
 
-  Flag = VAR_ERROR_FLAG_NO_ERROR;
+  Flag = mCurrentBootVarErrFlag;
   DEBUG ((EFI_D_INFO, "Initialize variable error flag (%02x)\n", Flag));
 
   Status = FindVariable (
