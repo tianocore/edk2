@@ -101,48 +101,6 @@ TrimSpaces(
 }
 
 /**
-  Parse for the next instance of one string within another string. Can optionally make sure that 
-  the string was not escaped (^ character) per the shell specification.
-
-  @param[in] SourceString             The string to search within
-  @param[in] FindString               The string to look for
-  @param[in] CheckForEscapeCharacter  TRUE to skip escaped instances of FinfString, otherwise will return even escaped instances
-**/
-CHAR16*
-EFIAPI
-FindNextInstance(
-  IN CONST CHAR16   *SourceString,
-  IN CONST CHAR16   *FindString,
-  IN CONST BOOLEAN  CheckForEscapeCharacter
-  )
-{
-  CHAR16 *Temp;
-  if (SourceString == NULL) {
-    return (NULL);
-  }
-  Temp = StrStr(SourceString, FindString);
-
-  //
-  // If nothing found, or we dont care about escape characters
-  //
-  if (Temp == NULL || !CheckForEscapeCharacter) {
-    return (Temp);
-  }
-
-  //
-  // If we found an escaped character, try again on the remainder of the string
-  //
-  if ((Temp > (SourceString)) && *(Temp-1) == L'^') {
-    return FindNextInstance(Temp+1, FindString, CheckForEscapeCharacter);
-  }
-
-  //
-  // we found the right character
-  //
-  return (Temp);
-}
-
-/**
   Check whether the string between a pair of % is a valid envifronment variable name.
 
   @param[in] BeginPercent       pointer to the first percent.
@@ -207,7 +165,7 @@ ContainsSplit(
   CONST CHAR16 *FirstQuote;
   CONST CHAR16 *SecondQuote;
 
-  FirstQuote    = FindNextInstance (CmdLine, L"\"", TRUE);
+  FirstQuote    = FindFirstCharacter (CmdLine, L"\"", L'^');
   SecondQuote   = NULL;
   TempSpot      = FindFirstCharacter(CmdLine, L"|", L'^');
 
@@ -223,15 +181,15 @@ ContainsSplit(
     if (FirstQuote == NULL || FirstQuote > TempSpot) {
       break;
     }    
-    SecondQuote = FindNextInstance (FirstQuote + 1, L"\"", TRUE);
+    SecondQuote = FindFirstCharacter (FirstQuote + 1, L"\"", L'^');
     if (SecondQuote == NULL) {
       break;
     }
     if (SecondQuote < TempSpot) {
-      FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
+      FirstQuote = FindFirstCharacter (SecondQuote + 1, L"\"", L'^');
       continue;
     } else {
-      FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
+      FirstQuote = FindFirstCharacter (SecondQuote + 1, L"\"", L'^');
       TempSpot = FindFirstCharacter(TempSpot + 1, L"|", L'^');
       continue;
     } 
@@ -1344,9 +1302,9 @@ StripUnreplacedEnvironmentVariables(
   CHAR16 *CurrentLocator;
 
   for (CurrentLocator = CmdLine ; CurrentLocator != NULL ; ) {
-    FirstQuote = FindNextInstance(CurrentLocator, L"\"", TRUE);
-    FirstPercent = FindNextInstance(CurrentLocator, L"%", TRUE);
-    SecondPercent = FirstPercent!=NULL?FindNextInstance(FirstPercent+1, L"%", TRUE):NULL;
+    FirstQuote = FindFirstCharacter(CurrentLocator, L"\"", L'^');
+    FirstPercent = FindFirstCharacter(CurrentLocator, L"%", L'^');
+    SecondPercent = FirstPercent!=NULL?FindFirstCharacter(FirstPercent+1, L"%", L'^'):NULL;
     if (FirstPercent == NULL || SecondPercent == NULL) {
       //
       // If we ever dont have 2 % we are done.
@@ -1355,11 +1313,10 @@ StripUnreplacedEnvironmentVariables(
     }
 
     if (FirstQuote!= NULL && FirstQuote < FirstPercent) {
-      SecondQuote = FindNextInstance(FirstQuote+1, L"\"", TRUE);
+      SecondQuote = FindFirstCharacter(FirstQuote+1, L"\"", L'^');
       //
       // Quote is first found
       //
-
       if (SecondQuote < FirstPercent) {
         //
         // restart after the pair of "
