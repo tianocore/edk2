@@ -1,6 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -60,7 +61,7 @@ ShellCommandRunCd (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cd", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -74,7 +75,7 @@ ShellCommandRunCd (
   if (ShellCommandLineGetFlag(Package, L"-?")) {
     ASSERT(FALSE);
   } else if (ShellCommandLineGetRawValue(Package, 2) != NULL) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");  
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
@@ -92,7 +93,7 @@ ShellCommandRunCd (
       if (Directory != NULL) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_PRINT), gShellLevel2HiiHandle, Directory);
       } else {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
         ShellStatus = SHELL_NOT_FOUND;
       }
     } else {
@@ -117,7 +118,7 @@ ShellCommandRunCd (
           //
           Directory = ShellGetCurrentDir(NULL);
           if (Directory == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             Drive = GetFullyQualifiedPath(Directory);
@@ -129,7 +130,7 @@ ShellCommandRunCd (
             //
             Status = gEfiShellProtocol->SetCurDir(NULL, Drive);
             if (Status == EFI_NOT_FOUND) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
               ShellStatus = SHELL_NOT_FOUND;
             }
           }
@@ -139,7 +140,7 @@ ShellCommandRunCd (
           //
           Directory = ShellGetCurrentDir(NULL);
           if (Directory == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             Drive = GetFullyQualifiedPath(Directory);
@@ -151,7 +152,7 @@ ShellCommandRunCd (
             //
             Status = gEfiShellProtocol->SetCurDir(NULL, Drive);
             if (Status == EFI_NOT_FOUND) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
               ShellStatus = SHELL_NOT_FOUND;
             }
           }
@@ -160,7 +161,7 @@ ShellCommandRunCd (
           // change directory without a drive identifier
           //
           if (ShellGetCurrentDir(NULL) == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             ASSERT((Drive == NULL && DriveSize == 0) || (Drive != NULL));
@@ -176,10 +177,10 @@ ShellCommandRunCd (
             //
             Status = gEfiShellProtocol->OpenFileByName(Drive, &Handle, EFI_FILE_MODE_READ);
             if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, Drive);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cd", Drive);  
               ShellStatus = SHELL_NOT_FOUND;
             } else if (EFI_ERROR(FileHandleIsDirectory(Handle))) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, Drive);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cd", Drive);  
               ShellStatus = SHELL_NOT_FOUND;
             }
             if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
@@ -188,7 +189,7 @@ ShellCommandRunCd (
               //
               Status = gEfiShellProtocol->SetCurDir(NULL, Drive);
               if (Status == EFI_NOT_FOUND) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
                 ShellStatus = SHELL_NOT_FOUND;
               }
             }
@@ -203,21 +204,21 @@ ShellCommandRunCd (
           //
           Drive = AllocateCopyPool(StrSize(Param1Copy), Param1Copy);
           if (Drive == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle, L"cd");  
             ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
             Path = StrStr(Drive, L":");
             ASSERT(Path != NULL);
             if (EFI_ERROR(ShellIsDirectory(Param1Copy))) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, Param1Copy);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cd", Param1Copy);  
               ShellStatus = SHELL_NOT_FOUND;
             } else if (*(Path+1) == CHAR_NULL) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
               ShellStatus = SHELL_NOT_FOUND;
             } else {
               *(Path+1) = CHAR_NULL;
               if (Path == Drive + StrLen(Drive)) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
                 ShellStatus = SHELL_NOT_FOUND;
               } else {
                 Status = gEfiShellProtocol->SetCurDir(Drive, Path+2);
@@ -225,10 +226,10 @@ ShellCommandRunCd (
               }
             }
             if (Status == EFI_NOT_FOUND) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
               Status = SHELL_NOT_FOUND;
             } else if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, Param1Copy);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cd", Param1Copy);  
               Status = SHELL_NOT_FOUND;
             }
           }

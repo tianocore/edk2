@@ -1,6 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -213,7 +214,7 @@ ShellCommandRunLoad (
   Status = ShellCommandLineParse (LoadParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"load", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -229,7 +230,7 @@ ShellCommandRunLoad (
       //
       // we didnt get a single file to load parameter
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"load");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       for ( ParamCount = 1
@@ -260,7 +261,7 @@ ShellCommandRunLoad (
           //
           // no files found.
           //
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, (CHAR16*)ShellCommandLineGetRawValue(Package, ParamCount));
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"load", (CHAR16*)ShellCommandLineGetRawValue(Package, ParamCount));  
           ShellStatus = SHELL_NOT_FOUND;
         }
       } // for loop for params

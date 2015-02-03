@@ -1,7 +1,7 @@
 /** @file
   Main file for Parse shell level 2 function.
 
-  (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2013 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -55,10 +55,10 @@ PerformParsing(
 
   Status = ShellOpenFileByName(FileName, &FileHandle, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR(Status)) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, FileName);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"parse", FileName);  
     ShellStatus = SHELL_NOT_FOUND;
   } else if (!EFI_ERROR (FileHandleIsDirectory (FileHandle))) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_FILE), gShellLevel2HiiHandle, FileName);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_FILE), gShellLevel2HiiHandle, L"parse", FileName);  
     ShellStatus = SHELL_NOT_FOUND;
   } else {
     for (LoopVariable = 0 ; LoopVariable < ShellCommandInstance && !ShellFileHandleEof(FileHandle);) {
@@ -99,7 +99,7 @@ PerformParsing(
             }
             if (ColumnLoop == ColumnIndex) {
               if (ColumnPointer == NULL) {
-                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"Column Index");
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"parse", L"Column Index");  
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
                 TempSpot = StrStr (ColumnPointer, L",\"");
@@ -172,7 +172,7 @@ ShellCommandRunParse (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"parse", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -180,10 +180,10 @@ ShellCommandRunParse (
     }
   } else {
     if (ShellCommandLineGetCount(Package) < 4) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"parse");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount(Package) > 4) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"parse");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       FileName      = ShellCommandLineGetRawValue(Package, 1);

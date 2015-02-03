@@ -1,6 +1,7 @@
 /** @file
   Main file for vol shell level 2 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -63,7 +64,7 @@ HandleVol(
       StrStr(Name, L"/") != NULL ||
       StrStr(Name, L" ") != NULL )
       ){
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, Name);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"vol", Name);  
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -73,7 +74,7 @@ HandleVol(
     Name != NULL?EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE:EFI_FILE_MODE_READ);
 
   if (EFI_ERROR(Status) || ShellFileHandle == NULL) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, Path);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"vol", Path);  
     return (SHELL_ACCESS_DENIED);
   }
 
@@ -114,7 +115,7 @@ HandleVol(
     if (Size1 > Size2) {
       SysInfo = ReallocatePool((UINTN)SysInfo->Size, (UINTN)SysInfo->Size + Size1 - Size2, SysInfo);
       if (SysInfo == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"vol");  
         ShellStatus = SHELL_OUT_OF_RESOURCES;
       } 
     }
@@ -133,7 +134,7 @@ HandleVol(
 
   if (Delete || Name != NULL) {
     if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_AD), gShellLevel2HiiHandle, Path);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_AD), gShellLevel2HiiHandle, L"vol", Path);  
       ShellStatus = SHELL_ACCESS_DENIED;
     }
   }
@@ -238,7 +239,7 @@ ShellCommandRunVol (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"vol", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -253,7 +254,7 @@ ShellCommandRunVol (
     }
 
     if (ShellCommandLineGetCount(Package) > 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"vol");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       PathName = ShellCommandLineGetRawValue(Package, 1);
@@ -261,7 +262,7 @@ ShellCommandRunVol (
         CurDir = gEfiShellProtocol->GetCurDir(NULL);
         if (CurDir == NULL) {
           ShellStatus = SHELL_NOT_FOUND;
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"vol");  
         } else {
           PathName = CurDir;
         }
@@ -280,13 +281,13 @@ ShellCommandRunVol (
         DeleteMode = ShellCommandLineGetFlag(Package, L"-d");
         NewName    = ShellCommandLineGetValue(Package, L"-n");
         if (DeleteMode && ShellCommandLineGetFlag(Package, L"-n")) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellLevel2HiiHandle, L"vol", L"-d", L"-n");  
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (ShellCommandLineGetFlag(Package, L"-n") && NewName == NULL) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"-n");
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"vol", L"-n");  
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (NewName != NULL && StrLen(NewName) > 11) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"-n");
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"vol", NewName, L"-n");  
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (ShellStatus == SHELL_SUCCESS) {
           ShellStatus = HandleVol(

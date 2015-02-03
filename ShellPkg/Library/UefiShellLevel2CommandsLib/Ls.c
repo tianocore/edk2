@@ -1,7 +1,7 @@
 /** @file
   Main file for ls shell level 2 function.
 
-  Copyright (c) 2013 - 2014, Hewlett-Packard Development Company, L.P.<BR>
+  Copyright (c) 2013 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -586,7 +586,7 @@ ShellCommandRunLs (
   Status = ShellCommandLineParse (LsParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"ls", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -601,7 +601,7 @@ ShellCommandRunLs (
     }
 
     if (ShellCommandLineGetCount(Package) > 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -639,7 +639,7 @@ ShellCommandRunLs (
               Count++;
               continue;
             default:
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ATTRIBUTE), gShellLevel2HiiHandle, ShellCommandLineGetValue(Package, L"-a"));
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ATTRIBUTE), gShellLevel2HiiHandle, L"ls", ShellCommandLineGetValue(Package, L"-a"));  
               ShellStatus = SHELL_INVALID_PARAMETER;
               break;
           } // switch
@@ -660,7 +660,7 @@ ShellCommandRunLs (
           CurDir = gEfiShellProtocol->GetCurDir(NULL);
           if (CurDir == NULL) {
             ShellStatus = SHELL_NOT_FOUND;
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");  
           }
           //
           // Copy to the 2 strings for starting path and file search string
@@ -675,7 +675,7 @@ ShellCommandRunLs (
             // If we got something and it doesnt have a fully qualified path, then we needed to have a CWD.
             //
             ShellStatus = SHELL_NOT_FOUND;
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");  
           } else {
             //
             // We got a valid fully qualified path or we have a CWD
@@ -712,7 +712,7 @@ ShellCommandRunLs (
         }
         Status = gRT->GetTime(&TheTime, NULL);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"ls", L"gRT->GetTime", Status);  
           TheTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
         }
 
@@ -728,15 +728,15 @@ ShellCommandRunLs (
             (INT16)(TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:TheTime.TimeZone)
            );
           if (ShellStatus == SHELL_NOT_FOUND) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle, L"ls", FullPath);  
           } else if (ShellStatus == SHELL_INVALID_PARAMETER) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);  
           } else if (ShellStatus == SHELL_ABORTED) {
             //
             // Ignore aborting.
             //
           } else if (ShellStatus != SHELL_SUCCESS) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);  
           }
         }
       }
