@@ -1,6 +1,7 @@
 /** @file
   Main file for connect shell Driver1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -439,7 +440,7 @@ ShellCommandRunConnect (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"connect", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -457,7 +458,7 @@ ShellCommandRunConnect (
       //
       // error for too many parameters
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"connect");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag(Package, L"-c")) {
       //
@@ -505,7 +506,7 @@ ShellCommandRunConnect (
         Status  = ShellConvertStringToUint64(Param1, &Intermediate, TRUE, FALSE);
         Handle1 = ConvertHandleIndexToHandle((UINTN)Intermediate);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
       } else {
@@ -516,7 +517,7 @@ ShellCommandRunConnect (
         Status  = ShellConvertStringToUint64(Param2, &Intermediate, TRUE, FALSE);
         Handle2 = ConvertHandleIndexToHandle((UINTN)Intermediate);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
       } else {
@@ -525,13 +526,13 @@ ShellCommandRunConnect (
       
       if (ShellStatus == SHELL_SUCCESS) {
         if (Param1 != NULL && Handle1 == NULL){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param1);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (Param2 != NULL && Handle2 == NULL) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (Handle2 != NULL && Handle1 != NULL && EFI_ERROR(gBS->OpenProtocol(Handle2, &gEfiDriverBindingProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Param2);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           Status = ConvertAndConnectControllers(Handle1, Handle2, ShellCommandLineGetFlag(Package, L"-r"), (BOOLEAN)(Count!=0));

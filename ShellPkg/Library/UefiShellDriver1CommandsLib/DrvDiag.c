@@ -1,6 +1,7 @@
 /** @file
   Main file for DrvDiag shell Driver1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -99,8 +100,8 @@ DoDiagnostics (
   } else {
     DriverHandleList = GetHandleListByProtocolList(DiagGuidList);
     if (DriverHandleList == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROTOCOL_NF), gShellDriver1HiiHandle, L"gEfiDriverDiagnosticsProtocolGuid", &gEfiDriverDiagnosticsProtocolGuid);
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROTOCOL_NF), gShellDriver1HiiHandle, L"gEfiDriverDiagnostics2ProtocolGuid", &gEfiDriverDiagnostics2ProtocolGuid);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROTOCOL_NF), gShellDriver1HiiHandle, L"drvdiag", L"gEfiDriverDiagnosticsProtocolGuid", &gEfiDriverDiagnosticsProtocolGuid);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROTOCOL_NF), gShellDriver1HiiHandle, L"drvdiag", L"gEfiDriverDiagnostics2ProtocolGuid", &gEfiDriverDiagnostics2ProtocolGuid);  
       return (EFI_NOT_FOUND);
     } 
     for (Walker = DriverHandleList ; Walker != NULL && *Walker != NULL ; DriverHandleListCount++, Walker++);
@@ -348,7 +349,7 @@ ShellCommandRunDrvDiag (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drvdiag", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -366,7 +367,7 @@ ShellCommandRunDrvDiag (
       //
       // error for too many parameters
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drvdiag");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if ((ShellCommandLineGetFlag(Package, L"-s"))
             || (ShellCommandLineGetFlag(Package, L"-e"))
@@ -394,7 +395,7 @@ ShellCommandRunDrvDiag (
     Lang = ShellCommandLineGetValue(Package, L"-l");
     if (ShellCommandLineGetFlag(Package, L"-l") && Lang == NULL) {
       ASSERT(Language == NULL);
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"-l");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvdiag",  L"-l");  
       ShellCommandLineFreeVarList (Package);
       return (SHELL_INVALID_PARAMETER);
     } else if (Lang != NULL) {

@@ -1,7 +1,7 @@
 /** @file
   Main file for DevTree shell Driver1 function.
 
-  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
+  Copyright (c) 2014 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -184,7 +184,7 @@ ShellCommandRunDevTree (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devtree", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -192,7 +192,7 @@ ShellCommandRunDevTree (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devtree");  
       ShellCommandLineFreeVarList (Package);
       return (SHELL_INVALID_PARAMETER);
     }
@@ -206,7 +206,7 @@ ShellCommandRunDevTree (
 //      AsciiSPrint(Language, 10, "en-us");
     } else {
       ASSERT(Language == NULL);
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"-l");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devtree",  L"-l");  
       ShellCommandLineFreeVarList (Package);
       return (SHELL_INVALID_PARAMETER);
     }
@@ -259,7 +259,7 @@ ShellCommandRunDevTree (
     } else {
       Status = ShellConvertStringToUint64(Lang, &Intermediate, TRUE, FALSE);
       if (EFI_ERROR(Status) || ConvertHandleIndexToHandle((UINTN)Intermediate) == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, Lang);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"devtree", Lang);  
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         ShellStatus = DoDevTreeForHandle(ConvertHandleIndexToHandle((UINTN)Intermediate), Language, FlagD, 0, HiiString);

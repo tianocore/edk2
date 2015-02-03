@@ -1,7 +1,7 @@
 /** @file
   Main file for devices shell Driver1 function.
 
-  Copyright (c) 2012-2014, Hewlett-Packard Development Company, L.P.<BR>
+  Copyright (c) 2012-2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -169,7 +169,7 @@ ShellCommandRunDevices (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devices", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -183,7 +183,7 @@ ShellCommandRunDevices (
       //
       // error for too many parameters
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -199,7 +199,7 @@ ShellCommandRunDevices (
 //        AsciiSPrint(Language, 10, "en-us");
       } else {
         ASSERT(Language == NULL);
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"-l");
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices",  L"-l");  
         ShellCommandLineFreeVarList (Package);
         return (SHELL_INVALID_PARAMETER);
       }
