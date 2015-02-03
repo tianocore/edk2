@@ -1,7 +1,7 @@
 /** @file
   Support routines for UEFI memory profile.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -483,13 +483,15 @@ GetFileNameFromFilePath (
   EFI_GUID                              *FileName;
 
   FileName = NULL;
-  ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) FilePath;
-  while (!IsDevicePathEnd (ThisFilePath)) {
-    FileName = EfiGetNameGuidFromFwVolDevicePathNode (ThisFilePath);
-    if (FileName != NULL) {
-      break;
+  if (FilePath != NULL) {
+    ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) FilePath;
+    while (!IsDevicePathEnd (ThisFilePath)) {
+      FileName = EfiGetNameGuidFromFwVolDevicePathNode (ThisFilePath);
+      if (FileName != NULL) {
+        break;
+      }
+      ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) NextDevicePathNode (ThisFilePath);
     }
-    ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) NextDevicePathNode (ThisFilePath);
   }
 
   return FileName;
