@@ -1,7 +1,7 @@
 /** @file
   The implementation for ifcommand shell command.
 
-  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2013 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -1253,7 +1253,7 @@ IfconfigSetNicAddr (
     // Validate the parameter for DHCP, two valid forms: eth0 DHCP and eth0 DHCP permanent
     //
     if ((Argc != 2) && (Argc!= 3)) {
-      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, Temp);
+      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PARAM_INV), gShellNetwork1HiiHandle, L"ifconfig", Temp);  
       ASSERT(ShellStatus == SHELL_INVALID_PARAMETER);
       goto ON_EXIT;
     }
@@ -1266,7 +1266,7 @@ IfconfigSetNicAddr (
 
       PermTemp = PermanentString;
       if (StringNoCaseCompare(&Temp, &PermTemp) != 0) {
-        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_OP2), gShellNetwork1HiiHandle, Temp, PermanentString, L"Nothing");
+        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_OP2), gShellNetwork1HiiHandle, L"ifconfig", Temp, PermanentString, L"Nothing");  
         ASSERT(ShellStatus == SHELL_INVALID_PARAMETER);
         goto ON_EXIT;
       }
@@ -1289,7 +1289,7 @@ IfconfigSetNicAddr (
     // eth0 static IP NETMASK GATEWAY permanent 
     //
     if ((Argc != 5) && (Argc != 6)) {
-      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, Temp);
+      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PARAM_INV), gShellNetwork1HiiHandle, L"ifconfig", Temp);  
       ASSERT(ShellStatus == SHELL_INVALID_PARAMETER);
       goto ON_EXIT;
     }
@@ -1337,7 +1337,7 @@ IfconfigSetNicAddr (
 
       PermTemp = PermanentString;
       if (StringNoCaseCompare(&Temp, &PermTemp) != 0) {
-        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_OP2), gShellNetwork1HiiHandle, Temp, PermanentString, L"Nothing");
+        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_OP2), gShellNetwork1HiiHandle, L"ifconfig", Temp, PermanentString, L"Nothing");  
         ASSERT(ShellStatus == SHELL_INVALID_PARAMETER);
         goto ON_EXIT;
       }
@@ -1383,7 +1383,7 @@ IfconfigSetNicAddr (
     CopyMem (&Config->Ip4Info.RouteTable[1].GatewayAddress, &Gateway.v4, sizeof (EFI_IPv4_ADDRESS));
   } else {
     // neither static or DHCP.  error.
-    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_TOO_FEW), gShellNetwork1HiiHandle);
+    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_TOO_FEW), gShellNetwork1HiiHandle, L"ifconfig");  
     ASSERT(ShellStatus == SHELL_INVALID_PARAMETER);
     goto ON_EXIT;
   }
@@ -1660,7 +1660,7 @@ ShellCommandRunIfconfig (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellNetwork1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellNetwork1HiiHandle, L"ifconfig", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -1678,11 +1678,11 @@ ShellCommandRunIfconfig (
     ||(SetOperation   && ListOperation)
     ||(ClearOperation && SetOperation)
     ) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellNetwork1HiiHandle);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellNetwork1HiiHandle, L"ifconfig");  
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto Done;
   } else if (!ClearOperation && !ListOperation && !SetOperation) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellNetwork1HiiHandle);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellNetwork1HiiHandle, L"ifconfig");  
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto Done;
   }
@@ -1693,7 +1693,7 @@ ShellCommandRunIfconfig (
     if (mIp4ConfigExist) {
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_GET_NIC_FAIL), gShellNetwork1HiiHandle, Status);
     } else {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROTOCOL_NF), gShellNetwork1HiiHandle, L"gEfiIp4ConfigProtocolGuid", &gEfiIp4ConfigProtocolGuid);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROTOCOL_NF), gShellNetwork1HiiHandle, L"ifconfig", L"gEfiIp4ConfigProtocolGuid", &gEfiIp4ConfigProtocolGuid);  
     }
 
     return SHELL_NOT_FOUND;
@@ -1703,7 +1703,7 @@ ShellCommandRunIfconfig (
     Item = ShellCommandLineGetValue (Package, L"-l");
 
     if (Item != NULL && CountSubItems(Item) > 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, L"-l");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, L"ifconfig", Item, L"-l");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     } 
@@ -1721,7 +1721,7 @@ ShellCommandRunIfconfig (
     // IfConfig -s eth0 static ip netmask gateway [permanent]
     //
     if (Item == NULL || (CountSubItems(Item) < 2) || (CountSubItems(Item) > 6) || (CountSubItems(Item) == 4)) {
-      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, L"-s");
+      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_NO_VALUE), gShellNetwork1HiiHandle, L"ifconfig", L"-s");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -1731,7 +1731,7 @@ ShellCommandRunIfconfig (
     Item = ShellCommandLineGetValue (Package, L"-c");
 
     if (Item != NULL && CountSubItems(Item) > 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, L"-c");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, L"ifconfig", Item, L"-c");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
