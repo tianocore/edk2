@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2048,8 +2048,15 @@ ProcessCallBackFunction (
       // According the spec, return fail from call back of "changing" and 
       // "retrieve", should restore the question's value.
       //
-      if ((Action == EFI_BROWSER_ACTION_CHANGING && Status != EFI_UNSUPPORTED) || 
-           Action == EFI_BROWSER_ACTION_RETRIEVE) {
+      if (Action == EFI_BROWSER_ACTION_CHANGING && Status != EFI_UNSUPPORTED) {
+        if (Statement->Storage != NULL) {
+          GetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
+        } else if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
+          ProcessCallBackFunction (Selection, FormSet, Form, Question, EFI_BROWSER_ACTION_RETRIEVE, FALSE);
+        }
+      }
+
+      if (Action == EFI_BROWSER_ACTION_RETRIEVE) {
         GetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
       }
 
