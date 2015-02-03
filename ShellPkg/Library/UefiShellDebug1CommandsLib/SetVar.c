@@ -1,6 +1,7 @@
 /** @file
   Main file for SetVar shell Debug1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -71,7 +72,7 @@ ShellCommandRunSetVar (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setvar", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -79,10 +80,10 @@ ShellCommandRunSetVar (
     }
   } else {
     if (ShellCommandLineGetCount(Package) < 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setvar");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount(Package) > 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"setvar");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       VariableName  = ShellCommandLineGetRawValue(Package, 1);
@@ -93,7 +94,7 @@ ShellCommandRunSetVar (
         StringGuid = ShellCommandLineGetValue(Package, L"-guid");
         Status = ConvertStringToGuid(StringGuid, &Guid);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, StringGuid);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
       }
@@ -113,7 +114,7 @@ ShellCommandRunSetVar (
           }
           ShellPrintEx(-1, -1, L"\r\n");
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_GET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_GET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);  
           ShellStatus = SHELL_ACCESS_DENIED;
         }
       } else if (StrCmp(Data, L"=") == 0) {
@@ -122,7 +123,7 @@ ShellCommandRunSetVar (
         //
         Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, 0, NULL);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);  
           ShellStatus = SHELL_ACCESS_DENIED;
         } else {
           ASSERT(ShellStatus == SHELL_SUCCESS);
@@ -167,7 +168,7 @@ ShellCommandRunSetVar (
         //
         if (ShellIsHexOrDecimalNumber(Data, TRUE, FALSE)) {
           if (StrLen(Data) % 2 != 0) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, Data);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", Data);  
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             //
@@ -184,7 +185,7 @@ ShellCommandRunSetVar (
               Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrLen(Data) / 2, Buffer);
             }
             if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);  
               ShellStatus = SHELL_ACCESS_DENIED;
             } else {
               ASSERT(ShellStatus == SHELL_SUCCESS);
@@ -204,7 +205,7 @@ ShellCommandRunSetVar (
             Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, AsciiStrSize(Buffer)-sizeof(CHAR8), Buffer);
           }
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);  
             ShellStatus = SHELL_ACCESS_DENIED;
           } else {
             ASSERT(ShellStatus == SHELL_SUCCESS);
@@ -217,7 +218,7 @@ ShellCommandRunSetVar (
           Data++;
           Buffer = AllocateZeroPool(StrSize(Data));
           if (Buffer == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");  
             ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
             UnicodeSPrint(Buffer, StrSize(Data), L"%s", Data);
@@ -225,7 +226,7 @@ ShellCommandRunSetVar (
 
             Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrSize(Buffer)-sizeof(CHAR16), Buffer);
             if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);  
               ShellStatus = SHELL_ACCESS_DENIED;
             } else {
               ASSERT(ShellStatus == SHELL_SUCCESS);
@@ -239,19 +240,19 @@ ShellCommandRunSetVar (
           Data++;
           DevPath = ConvertTextToDevicePath(Data);
           if (DevPath == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_DPFT), gShellDebug1HiiHandle, Status);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_DPFT), gShellDebug1HiiHandle, L"setvar");  
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, GetDevicePathSize(DevPath), DevPath);
             if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, &Guid, VariableName, Status);
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);  
               ShellStatus = SHELL_ACCESS_DENIED;
             } else {
               ASSERT(ShellStatus == SHELL_SUCCESS);
             }
           }
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Data);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", Data);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
       }

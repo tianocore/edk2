@@ -1,7 +1,7 @@
 /** @file
   Main file for Mode shell Debug1 function.
 
-  (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2013 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -136,7 +136,7 @@ ShellCommandRunMemMap (
   Status = ShellCommandLineParse (SfoParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"memmap", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -144,7 +144,7 @@ ShellCommandRunMemMap (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"memmap");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       Status = gBS->GetMemoryMap(&Size, Buffer, &MapKey, &ItemSize, &Version);
@@ -154,7 +154,7 @@ ShellCommandRunMemMap (
         Status = gBS->GetMemoryMap(&Size, Buffer, &MapKey, &ItemSize, &Version);
       }
       if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MEMMAP_GET_FAILED), gShellDebug1HiiHandle, Status);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MEMMAP_GET_FAILED), gShellDebug1HiiHandle, L"memmap");  
         ShellStatus = SHELL_ACCESS_DENIED;
       } else {
         ASSERT(Version == EFI_MEMORY_DESCRIPTOR_VERSION);

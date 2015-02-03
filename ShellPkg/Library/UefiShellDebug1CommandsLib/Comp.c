@@ -1,6 +1,7 @@
 /** @file
   Main file for Comp shell Debug1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -76,7 +77,7 @@ ShellCommandRunComp (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"comp", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -84,22 +85,22 @@ ShellCommandRunComp (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"comp");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount(Package) < 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"comp");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       TempParam = ShellCommandLineGetRawValue(Package, 1);
       ASSERT(TempParam != NULL);
       FileName1 = ShellFindFilePath(TempParam);
       if (FileName1 == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, TempParam);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);  
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         Status = ShellOpenFileByName(FileName1, &FileHandle1, EFI_FILE_MODE_READ, 0);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, TempParam, Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);  
           ShellStatus = SHELL_NOT_FOUND;
         }
       }
@@ -107,12 +108,12 @@ ShellCommandRunComp (
       ASSERT(TempParam != NULL);
       FileName2 = ShellFindFilePath(TempParam);
       if (FileName2 == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, TempParam);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);  
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         Status = ShellOpenFileByName(FileName2, &FileHandle2, EFI_FILE_MODE_READ, 0);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, TempParam, Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);  
           ShellStatus = SHELL_NOT_FOUND;
         }
       }

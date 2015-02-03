@@ -1,6 +1,7 @@
 /** @file
   Tools of clarify the content of the smbios table.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -61,7 +62,7 @@ ShellCommandRunSmbiosView (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"smbiosview", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -69,13 +70,13 @@ ShellCommandRunSmbiosView (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetValue(Package, L"-t") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-t");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"smbiosview", L"-t");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag(Package, L"-h") && ShellCommandLineGetValue(Package, L"-h") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-h");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"smbiosview", L"-h");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (
         (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetFlag(Package, L"-h")) ||
@@ -85,7 +86,7 @@ ShellCommandRunSmbiosView (
         (ShellCommandLineGetFlag(Package, L"-h") && ShellCommandLineGetFlag(Package, L"-a")) ||
         (ShellCommandLineGetFlag(Package, L"-s") && ShellCommandLineGetFlag(Package, L"-a"))
       ) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
 

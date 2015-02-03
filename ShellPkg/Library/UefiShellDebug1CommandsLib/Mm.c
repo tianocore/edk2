@@ -1,6 +1,7 @@
 /** @file
   Main file for Mm shell Debug1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -73,7 +74,7 @@ ReadMem (
       *(UINT64 *) Buffer = *(UINT64 *) (UINTN) Address;
       Address -= 8;
     } else {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_READ_ERROR), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_READ_ERROR), gShellDebug1HiiHandle, L"mm");  
       break;
     }
     Size--;
@@ -252,7 +253,7 @@ ShellCommandRunMm (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
@@ -261,15 +262,15 @@ ShellCommandRunMm (
     }
   } else {
     if (ShellCommandLineGetCount(Package) < 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mm");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     } else if (ShellCommandLineGetCount(Package) > 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     } else if (ShellCommandLineGetFlag(Package, L"-w") && ShellCommandLineGetValue(Package, L"-w") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-w");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"mm", L"-w"); 
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     } else {
@@ -280,7 +281,7 @@ ShellCommandRunMm (
           ||ShellCommandLineGetFlag(Package, L"-pci")
           ||ShellCommandLineGetFlag(Package, L"-pcie")
         ){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");  
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -290,7 +291,7 @@ ShellCommandRunMm (
           ||ShellCommandLineGetFlag(Package, L"-pci")
           ||ShellCommandLineGetFlag(Package, L"-pcie")
         ){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");  
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -299,7 +300,7 @@ ShellCommandRunMm (
         if (ShellCommandLineGetFlag(Package, L"-pci")
           ||ShellCommandLineGetFlag(Package, L"-pcie")
         ){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");  
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -307,7 +308,7 @@ ShellCommandRunMm (
         AccessType = EfiPciConfig;
         if (ShellCommandLineGetFlag(Package, L"-pcie")
         ){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");  
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -349,7 +350,7 @@ ShellCommandRunMm (
         break;
 
       default:
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"-w");
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"mm", Temp, L"-w");  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -357,7 +358,7 @@ ShellCommandRunMm (
 
     Temp = ShellCommandLineGetRawValue(Package, 1);
     if (!ShellIsHexOrDecimalNumber(Temp, TRUE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp, (UINT64*)&Address, TRUE, FALSE))) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -370,7 +371,7 @@ ShellCommandRunMm (
       Interactive = FALSE;
 
       if (!ShellIsHexOrDecimalNumber(Temp, TRUE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp, &Value, TRUE, FALSE))) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -398,14 +399,14 @@ ShellCommandRunMm (
       }
 
       if (ShellStatus != SHELL_SUCCESS) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
     }
 
     if ((Address & (Size - 1)) != 0) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_NOT_ALIGNED), gShellDebug1HiiHandle, Address);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_NOT_ALIGNED), gShellDebug1HiiHandle, L"mm", Address);  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -421,7 +422,7 @@ ShellCommandRunMm (
                  &HandleBuffer
                 );
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"mm");  
         ShellStatus = SHELL_NOT_FOUND;
         goto Done;
       }
@@ -455,14 +456,14 @@ ShellCommandRunMm (
         }
       }
       if (IoDev == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_SEGMENT_NOT_FOUND), gShellDebug1HiiHandle, SegmentNumber);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_SEGMENT_NOT_FOUND), gShellDebug1HiiHandle, L"mm", SegmentNumber);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
     }
 
     if (AccessType == EfiIo && Address + Size > 0x10000) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS_RANGE), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS_RANGE), gShellDebug1HiiHandle, L"mm");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -547,7 +548,7 @@ ShellCommandRunMm (
     Complete = FALSE;
     do {
       if (AccessType == EfiIo && Address + Size > 0x10000) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS_RANGE2), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS_RANGE2), gShellDebug1HiiHandle, L"mm");  
         break;
       }
 
@@ -617,7 +618,7 @@ ShellCommandRunMm (
           WriteMem (Width, Address, 1, &Buffer);
         }
       } else {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle, L"mm");  
         continue;
   //      PrintToken (STRING_TOKEN (STR_IOMOD_ERROR), HiiHandle);
       }

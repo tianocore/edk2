@@ -1,6 +1,7 @@
 /** @file
   Main file for EfiDecompress shell Debug1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -74,7 +75,7 @@ ShellCommandRunEfiDecompress (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"efidecompress", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -82,10 +83,10 @@ ShellCommandRunEfiDecompress (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"efidecompress");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount(Package) < 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"efidecompress");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       TempParam = ShellCommandLineGetRawValue(Package, 1);
@@ -93,21 +94,21 @@ ShellCommandRunEfiDecompress (
       InFileName = ShellFindFilePath(TempParam);
       OutFileName = ShellCommandLineGetRawValue(Package, 2);
       if (InFileName == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, TempParam);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"efidecompress", TempParam);  
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         if (ShellIsDirectory(InFileName) == EFI_SUCCESS){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, InFileName);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", InFileName);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
         if (ShellIsDirectory(OutFileName) == EFI_SUCCESS){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, OutFileName);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", OutFileName);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
         if (ShellStatus == SHELL_SUCCESS) {
           Status = ShellOpenFileByName(InFileName, &InFileHandle, EFI_FILE_MODE_READ, 0);
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue(Package, 1), Status);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue(Package, 1));  
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
@@ -151,7 +152,7 @@ ShellCommandRunEfiDecompress (
                 Status = gEfiShellProtocol->WriteFile(OutFileHandle, &OutSizeTemp, OutBuffer);
                 OutSize = (UINT32)OutSizeTemp;
                 if (EFI_ERROR(Status)) {
-                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, OutFileName, Status);
+                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"efidecompress", OutFileName, Status);  
                   ShellStatus = SHELL_DEVICE_ERROR;
                 }
               }

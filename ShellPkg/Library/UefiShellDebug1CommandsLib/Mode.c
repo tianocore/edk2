@@ -1,6 +1,7 @@
 /** @file
   Main file for Mode shell Debug1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -57,7 +58,7 @@ ShellCommandRunMode (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mode", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -65,21 +66,21 @@ ShellCommandRunMode (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mode");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount(Package) == 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mode");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount(Package) == 3) {
       Temp = ShellCommandLineGetRawValue(Package, 1);
       if (!ShellIsHexOrDecimalNumber(Temp, FALSE, FALSE)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
       }
       NewCol = ShellStrToUintn(Temp);
       Temp = ShellCommandLineGetRawValue(Package, 2);
       if (!ShellIsHexOrDecimalNumber(Temp, FALSE, FALSE)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
       }
       NewRow = ShellStrToUintn(Temp);
@@ -92,7 +93,7 @@ ShellCommandRunMode (
         if (Col == NewCol && Row == NewRow) {
           Status = gST->ConOut->SetMode(gST->ConOut, LoopVar);
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MODE_SET_FAIL), gShellDebug1HiiHandle, Status);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MODE_SET_FAIL), gShellDebug1HiiHandle, L"mode");  
             ShellStatus = SHELL_DEVICE_ERROR;
           } else {
             // worked fine...
@@ -103,7 +104,7 @@ ShellCommandRunMode (
       }
 
       if (!Done) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MODE_NO_MATCH), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MODE_NO_MATCH), gShellDebug1HiiHandle, L"mode");  
         ShellStatus = SHELL_INVALID_PARAMETER;
       }
 

@@ -1,7 +1,7 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
-  (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2013 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2495,7 +2495,7 @@ ShellCommandRunPci (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"pci", ProblemParam);  
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -2504,18 +2504,18 @@ ShellCommandRunPci (
   } else {
 
     if (ShellCommandLineGetCount(Package) == 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"pci");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
 
     if (ShellCommandLineGetCount(Package) > 4) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"pci");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
     if (ShellCommandLineGetFlag(Package, L"-s") && ShellCommandLineGetValue(Package, L"-s") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"-s");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"pci", L"-s");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -2527,7 +2527,7 @@ ShellCommandRunPci (
     HandleBufSize = sizeof (EFI_HANDLE);
     HandleBuf     = (EFI_HANDLE *) AllocateZeroPool (HandleBufSize);
     if (HandleBuf == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");  
       ShellStatus = SHELL_OUT_OF_RESOURCES;
       goto Done;
     }
@@ -2543,7 +2543,7 @@ ShellCommandRunPci (
     if (Status == EFI_BUFFER_TOO_SMALL) {
       HandleBuf = ReallocatePool (sizeof (EFI_HANDLE), HandleBufSize, HandleBuf);
       if (HandleBuf == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");  
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto Done;
       }
@@ -2558,7 +2558,7 @@ ShellCommandRunPci (
     }
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"pci");  
       ShellStatus = SHELL_NOT_FOUND;
       goto Done;
     }
@@ -2594,7 +2594,7 @@ ShellCommandRunPci (
                   &Descriptors
                  );
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, Status);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"pci");  
           ShellStatus = SHELL_NOT_FOUND;
           goto Done;
         }
@@ -2607,7 +2607,7 @@ ShellCommandRunPci (
           Status = PciGetNextBusRange (&Descriptors, &MinBus, &MaxBus, &IsEnd);
 
           if (EFI_ERROR (Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_BUS_RANGE_ERR), gShellDebug1HiiHandle, Status);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_BUS_RANGE_ERR), gShellDebug1HiiHandle, L"pci");  
             ShellStatus = SHELL_NOT_FOUND;
             goto Done;
           }
@@ -2731,7 +2731,7 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Segment = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2749,13 +2749,13 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Bus = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
 
       if (Bus > MAX_BUS_NUMBER) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2768,13 +2768,13 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Device = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
 
       if (Device > MAX_DEVICE_NUMBER){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2788,13 +2788,13 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Func = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
 
       if (Func > MAX_FUNCTION_NUMBER){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2814,7 +2814,7 @@ ShellCommandRunPci (
 
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx(
-        -1, -1, NULL, STRING_TOKEN (STR_PCI_NO_FIND), gShellDebug1HiiHandle,
+        -1, -1, NULL, STRING_TOKEN (STR_PCI_NO_FIND), gShellDebug1HiiHandle, L"pci",  
         Segment,
         Bus
        );
@@ -2832,7 +2832,7 @@ ShellCommandRunPci (
                          );
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_NO_CFG), gShellDebug1HiiHandle, Status);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_NO_CFG), gShellDebug1HiiHandle, L"pci");  
       ShellStatus = SHELL_ACCESS_DENIED;
       goto Done;
     }
