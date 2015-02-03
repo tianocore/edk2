@@ -1,6 +1,7 @@
 /** @file
   Main file for goto shell level 1 function.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -58,7 +59,7 @@ ShellCommandRunGoto (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel1HiiHandle, ProblemParam);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel1HiiHandle, L"goto", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -66,10 +67,10 @@ ShellCommandRunGoto (
     }
   } else {
     if (ShellCommandLineGetRawValue(Package, 2) != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"goto");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetRawValue(Package, 1) == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"goto");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       Size = 0;

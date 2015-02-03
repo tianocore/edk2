@@ -1,6 +1,7 @@
 /** @file
   Main file for endfor and for shell level 1 functions.
 
+  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -75,12 +76,12 @@ ShellCommandRunEndFor (
   ASSERT_EFI_ERROR(Status);
 
   if (!gEfiShellProtocol->BatchIsActive()) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"EndFor");
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"endfor");
     return (SHELL_UNSUPPORTED);
   }
 
   if (gEfiShellParametersProtocol->Argc > 1) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"endfor");
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -323,12 +324,12 @@ ShellCommandRunFor (
   ASSERT_EFI_ERROR(Status);
 
   if (!gEfiShellProtocol->BatchIsActive()) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"For");
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"for");
     return (SHELL_UNSUPPORTED);
   }
 
   if (gEfiShellParametersProtocol->Argc < 4) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"for");
     return (SHELL_INVALID_PARAMETER);
   }
 
