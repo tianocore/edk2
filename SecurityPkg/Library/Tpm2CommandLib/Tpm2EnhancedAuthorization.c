@@ -44,6 +44,16 @@ typedef struct {
 typedef struct {
   TPM2_COMMAND_HEADER       Header;
   TPMI_SH_POLICY            PolicySession;
+  TPML_DIGEST               HashList;
+} TPM2_POLICY_OR_COMMAND;
+
+typedef struct {
+  TPM2_RESPONSE_HEADER      Header;
+} TPM2_POLICY_OR_RESPONSE;
+
+typedef struct {
+  TPM2_COMMAND_HEADER       Header;
+  TPMI_SH_POLICY            PolicySession;
   TPM_CC                    Code;
 } TPM2_POLICY_COMMAND_CODE_COMMAND;
 
@@ -178,6 +188,74 @@ Tpm2PolicySecret (
   PolicyTicket->digest.size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
   Buffer += sizeof(UINT16);
   CopyMem (PolicyTicket->digest.buffer, Buffer, PolicyTicket->digest.size);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This command allows options in authorizations without requiring that the TPM evaluate all of the options.
+  If a policy may be satisfied by different sets of conditions, the TPM need only evaluate one set that
+  satisfies the policy. This command will indicate that one of the required sets of conditions has been
+  satisfied.
+
+  @param[in] PolicySession      Handle for the policy session being extended.
+  @param[in] HashList           the list of hashes to check for a match.
+  
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PolicyOR (
+  IN TPMI_SH_POLICY           PolicySession,
+  IN TPML_DIGEST              *HashList
+  )
+{
+  EFI_STATUS                        Status;
+  TPM2_POLICY_OR_COMMAND            SendBuffer;
+  TPM2_POLICY_OR_RESPONSE           RecvBuffer;
+  UINT32                            SendBufferSize;
+  UINT32                            RecvBufferSize;
+  UINT8                             *Buffer;
+  UINTN                             Index;
+
+  //
+  // Construct command
+  //
+  SendBuffer.Header.tag = SwapBytes16(TPM_ST_NO_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PolicyOR);
+
+  SendBuffer.PolicySession = SwapBytes32 (PolicySession);
+  Buffer = (UINT8 *)&SendBuffer.HashList;
+  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (HashList->count));
+  Buffer += sizeof(UINT32);
+  for (Index = 0; Index < HashList->count; Index++) {
+    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (HashList->digests[Index].size));
+    Buffer += sizeof(UINT16);
+    CopyMem (Buffer, HashList->digests[Index].buffer, HashList->digests[Index].size);
+    Buffer += HashList->digests[Index].size;
+  }
+
+  SendBufferSize = (UINT32)((UINTN)Buffer - (UINTN)&SendBuffer);
+  SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
+
+  //
+  // send Tpm command
+  //
+  RecvBufferSize = sizeof (RecvBuffer);
+  Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
+    DEBUG ((EFI_D_ERROR, "Tpm2PolicyOR - RecvBufferSize Error - %x\n", RecvBufferSize));
+    return EFI_DEVICE_ERROR;
+  }
+  if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "Tpm2PolicyOR - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    return EFI_DEVICE_ERROR;
+  }
 
   return EFI_SUCCESS;
 }

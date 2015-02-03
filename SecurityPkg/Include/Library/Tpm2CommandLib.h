@@ -873,6 +873,25 @@ Tpm2PolicySecret (
   );
 
 /**
+  This command allows options in authorizations without requiring that the TPM evaluate all of the options.
+  If a policy may be satisfied by different sets of conditions, the TPM need only evaluate one set that
+  satisfies the policy. This command will indicate that one of the required sets of conditions has been
+  satisfied.
+
+  @param[in] PolicySession      Handle for the policy session being extended.
+  @param[in] HashList           the list of hashes to check for a match.
+  
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PolicyOR (
+  IN TPMI_SH_POLICY           PolicySession,
+  IN TPML_DIGEST              *HashList
+  );
+
+/**
   This command indicates that the authorization will be limited to a specific command code.
 
   @param[in]  PolicySession      Handle for the policy session being extended.
