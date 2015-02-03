@@ -1,7 +1,7 @@
 /** @file
   HOB Library implementation for DxeCore driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -231,6 +231,38 @@ BuildModuleHob (
   IN EFI_PHYSICAL_ADDRESS   MemoryAllocationModule,
   IN UINT64                 ModuleLength,
   IN EFI_PHYSICAL_ADDRESS   EntryPoint
+  )
+{
+  //
+  // PEI HOB is read only for DXE phase
+  //
+  ASSERT (FALSE);
+}
+
+/**
+  Builds a HOB that describes a chunk of system memory with Owner GUID.
+
+  This function builds a HOB that describes a chunk of system memory.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  ResourceType        The type of resource described by this HOB.
+  @param  ResourceAttribute   The resource attributes of the memory described by this HOB.
+  @param  PhysicalStart       The 64 bit physical address of memory described by this HOB.
+  @param  NumberOfBytes       The length of the memory described by this HOB in bytes.
+  @param  OwnerGUID           GUID for the owner of this resource.
+
+**/
+VOID
+EFIAPI
+BuildResourceDescriptorWithOwnerHob (
+  IN EFI_RESOURCE_TYPE            ResourceType,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       NumberOfBytes,
+  IN EFI_GUID                     *OwnerGUID
   )
 {
   //
