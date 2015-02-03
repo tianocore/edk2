@@ -838,6 +838,7 @@ CoreUpdateProfileAllocate (
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
+  ASSERT (AllocInfoData != NULL);
   AllocInfo = &AllocInfoData->AllocInfo;
   AllocInfoData->Signature      = MEMORY_PROFILE_ALLOC_INFO_SIGNATURE;
   AllocInfo->Header.Signature   = MEMORY_PROFILE_ALLOC_INFO_SIGNATURE;
