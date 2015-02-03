@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to send TPM2 command.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -138,6 +138,27 @@ EFI_STATUS
 EFIAPI
 Tpm2SelfTest (
   IN TPMI_YES_NO          FullTest
+  );
+
+/**
+  This command allows setting of the authorization policy for the platform hierarchy (platformPolicy), the
+  storage hierarchy (ownerPolicy), and and the endorsement hierarchy (endorsementPolicy).
+
+  @param[in]  AuthHandle            TPM_RH_ENDORSEMENT, TPM_RH_OWNER or TPM_RH_PLATFORM+{PP} parameters to be validated
+  @param[in]  AuthSession           Auth Session context
+  @param[in]  AuthPolicy            An authorization policy hash
+  @param[in]  HashAlg               The hash algorithm to use for the policy
+
+  @retval EFI_SUCCESS      Operation completed successfully.
+  @retval EFI_DEVICE_ERROR Unexpected device behavior.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2SetPrimaryPolicy (
+  IN  TPMI_RH_HIERARCHY_AUTH    AuthHandle,
+  IN  TPMS_AUTH_COMMAND         *AuthSession,
+  IN  TPM2B_DIGEST              *AuthPolicy,
+  IN  TPMI_ALG_HASH             HashAlg
   );
 
 /**
@@ -772,6 +793,116 @@ Tpm2SetAlgorithmSet (
   IN  TPMI_RH_PLATFORM          AuthHandle,
   IN  TPMS_AUTH_COMMAND         *AuthSession,
   IN  UINT32                    AlgorithmSet
+  );
+
+/**
+  This command is used to start an authorization session using alternative methods of
+  establishing the session key (sessionKey) that is used for authorization and encrypting value.
+
+  @param[in]  TpmKey             Handle of a loaded decrypt key used to encrypt salt.
+  @param[in]  Bind               Entity providing the authValue.
+  @param[in]  NonceCaller        Initial nonceCaller, sets nonce size for the session.
+  @param[in]  Salt               Value encrypted according to the type of tpmKey.
+  @param[in]  SessionType        Indicates the type of the session.
+  @param[in]  Symmetric          The algorithm and key size for parameter encryption.
+  @param[in]  AuthHash           Hash algorithm to use for the session.
+  @param[out] SessionHandle      Handle for the newly created session.
+  @param[out] NonceTPM           The initial nonce from the TPM, used in the computation of the sessionKey.
+  
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2StartAuthSession (
+  IN      TPMI_DH_OBJECT            TpmKey,
+  IN      TPMI_DH_ENTITY            Bind,
+  IN      TPM2B_NONCE               *NonceCaller,
+  IN      TPM2B_ENCRYPTED_SECRET    *Salt,
+  IN      TPM_SE                    SessionType,
+  IN      TPMT_SYM_DEF              *Symmetric,
+  IN      TPMI_ALG_HASH             AuthHash,
+     OUT  TPMI_SH_AUTH_SESSION      *SessionHandle,
+     OUT  TPM2B_NONCE               *NonceTPM
+  );
+
+/**
+  This command causes all context associated with a loaded object or session to be removed from TPM memory.
+
+  @param[in]  FlushHandle        The handle of the item to flush.
+  
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2FlushContext (
+  IN      TPMI_DH_CONTEXT           FlushHandle
+  );
+
+/**
+  This command includes a secret-based authorization to a policy.
+  The caller proves knowledge of the secret value using an authorization
+  session using the authValue associated with authHandle.
+  
+  @param[in]  AuthHandle         Handle for an entity providing the authorization
+  @param[in]  PolicySession      Handle for the policy session being extended.
+  @param[in]  AuthSession        Auth Session context
+  @param[in]  NonceTPM           The policy nonce for the session.
+  @param[in]  CpHashA            Digest of the command parameters to which this authorization is limited.
+  @param[in]  PolicyRef          A reference to a policy relating to the authorization.
+  @param[in]  Expiration         Time when authorization will expire, measured in seconds from the time that nonceTPM was generated.
+  @param[out] Timeout            Time value used to indicate to the TPM when the ticket expires.
+  @param[out] PolicyTicket       A ticket that includes a value indicating when the authorization expires.
+  
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PolicySecret (
+  IN      TPMI_DH_ENTITY            AuthHandle,
+  IN      TPMI_SH_POLICY            PolicySession,
+  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPM2B_NONCE               *NonceTPM,
+  IN      TPM2B_DIGEST              *CpHashA,
+  IN      TPM2B_NONCE               *PolicyRef,
+  IN      INT32                     Expiration,
+  OUT     TPM2B_TIMEOUT             *Timeout,
+  OUT     TPMT_TK_AUTH              *PolicyTicket
+  );
+
+/**
+  This command indicates that the authorization will be limited to a specific command code.
+
+  @param[in]  PolicySession      Handle for the policy session being extended.
+  @param[in]  Code               The allowed commandCode.
+  
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PolicyCommandCode (
+  IN      TPMI_SH_POLICY            PolicySession,
+  IN      TPM_CC                    Code
+  );
+
+/**
+  This command returns the current policyDigest of the session. This command allows the TPM
+  to be used to perform the actions required to precompute the authPolicy for an object.
+
+  @param[in]  PolicySession      Handle for the policy session.
+  @param[out] PolicyHash         the current value of the policyHash of policySession.
+  
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PolicyGetDigest (
+  IN      TPMI_SH_POLICY            PolicySession,
+     OUT  TPM2B_DIGEST              *PolicyHash
   );
 
 //
