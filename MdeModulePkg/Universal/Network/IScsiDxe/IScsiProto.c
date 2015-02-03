@@ -1291,22 +1291,26 @@ IScsiCheckOpParams (
   //
   // DataPDUInOrder, result function is OR.
   //
-  Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_PDU_IN_ORDER);
-  if (Value == NULL) {
-    goto ON_ERROR;
-  }
+  if (!Session->DataPDUInOrder) {
+    Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_PDU_IN_ORDER);
+    if (Value == NULL) {
+      goto ON_ERROR;
+    }
 
-  Session->DataPDUInOrder = (BOOLEAN) (Session->DataPDUInOrder || (AsciiStrCmp (Value, "Yes") == 0));
+    Session->DataPDUInOrder = (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+  }
 
   //
   // DataSequenceInorder, result function is OR.
   //
-  Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_SEQUENCE_IN_ORDER);
-  if (Value == NULL) {
-    goto ON_ERROR;
-  }
+  if (!Session->DataSequenceInOrder) {
+    Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_SEQUENCE_IN_ORDER);
+    if (Value == NULL) {
+      goto ON_ERROR;
+    }
 
-  Session->DataSequenceInOrder = (BOOLEAN) (Session->DataSequenceInOrder || (AsciiStrCmp (Value, "Yes") == 0));
+    Session->DataSequenceInOrder = (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+  }
 
   //
   // DefaultTime2Wait, result function is Maximum.
@@ -1361,6 +1365,11 @@ IScsiCheckOpParams (
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_SESSION_TYPE);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_ALIAS);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_PORTAL_GROUP_TAG);
+  //
+  // Remove the key-value that may not needed for result function is OR.
+  //
+  IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_PDU_IN_ORDER);
+  IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_SEQUENCE_IN_ORDER);
 
   if (IsListEmpty (KeyValueList)) {
     //
