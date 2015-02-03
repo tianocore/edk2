@@ -16,56 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-#define LOADED_IMAGE_PRIVATE_DATA_SIGNATURE   SIGNATURE_32('l','d','r','i')
-
-typedef struct {
-  UINTN                       Signature;
-  /// Image handle
-  EFI_HANDLE                  Handle;   
-  /// Image type
-  UINTN                       Type;           
-  /// If entrypoint has been called
-  BOOLEAN                     Started;        
-  /// The image's entry point
-  EFI_IMAGE_ENTRY_POINT       EntryPoint;     
-  /// loaded image protocol
-  EFI_LOADED_IMAGE_PROTOCOL   Info;           
-  /// Location in memory
-  EFI_PHYSICAL_ADDRESS        ImageBasePage;  
-  /// Number of pages
-  UINTN                       NumberOfPages;  
-  /// Original fixup data
-  CHAR8                       *FixupData;     
-  /// Tpl of started image
-  EFI_TPL                     Tpl;            
-  /// Status returned by started image
-  EFI_STATUS                  Status;         
-  /// Size of ExitData from started image
-  UINTN                       ExitDataSize;   
-  /// Pointer to exit data from started image
-  VOID                        *ExitData;      
-  /// Pointer to pool allocation for context save/retore
-  VOID                        *JumpBuffer;    
-  /// Pointer to buffer for context save/retore
-  BASE_LIBRARY_JUMP_BUFFER    *JumpContext;  
-  /// Machine type from PE image
-  UINT16                      Machine;        
-  /// EBC Protocol pointer
-  EFI_EBC_PROTOCOL            *Ebc;           
-  /// Runtime image list
-  EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   
-  /// Pointer to Loaded Image Device Path Protocl
-  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  
-  /// PeCoffLoader ImageContext
-  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; 
-  /// Status returned by LoadImage() service.
-  EFI_STATUS                  LoadImageStatus;
-} LOADED_IMAGE_PRIVATE_DATA;
-
-#define LOADED_IMAGE_PRIVATE_DATA_FROM_THIS(a) \
-          CR(a, LOADED_IMAGE_PRIVATE_DATA, Info, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE)
-
-
 #define LOAD_PE32_IMAGE_PRIVATE_DATA_SIGNATURE  SIGNATURE_32('l','p','e','i')
 
 typedef struct {

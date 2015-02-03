@@ -175,7 +175,7 @@ LookupPoolHead (
 **/
 EFI_STATUS
 EFIAPI
-CoreAllocatePool (
+CoreInternalAllocatePool (
   IN EFI_MEMORY_TYPE  PoolType,
   IN UINTN            Size,
   OUT VOID            **Buffer
@@ -218,7 +218,35 @@ CoreAllocatePool (
   return (*Buffer != NULL) ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES;
 }
 
+/**
+  Allocate pool of a particular type.
 
+  @param  PoolType               Type of pool to allocate
+  @param  Size                   The amount of pool to allocate
+  @param  Buffer                 The address to return a pointer to the allocated
+                                 pool
+
+  @retval EFI_INVALID_PARAMETER  PoolType not valid or Buffer is NULL. 
+  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
+  @retval EFI_SUCCESS            Pool successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreAllocatePool (
+  IN EFI_MEMORY_TYPE  PoolType,
+  IN UINTN            Size,
+  OUT VOID            **Buffer
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = CoreInternalAllocatePool (PoolType, Size, Buffer);
+  if (!EFI_ERROR (Status)) {
+    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionAllocatePool, PoolType, Size, *Buffer);
+  }
+  return Status;
+}
 
 /**
   Internal function to allocate pool of a particular type.
@@ -373,7 +401,7 @@ Done:
 **/
 EFI_STATUS
 EFIAPI
-CoreFreePool (
+CoreInternalFreePool (
   IN VOID        *Buffer
   )
 {
@@ -389,7 +417,29 @@ CoreFreePool (
   return Status;
 }
 
+/**
+  Frees pool.
 
+  @param  Buffer                 The allocated pool entry to free
+
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value.
+  @retval EFI_SUCCESS            Pool successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreFreePool (
+  IN VOID  *Buffer
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = CoreInternalFreePool (Buffer);
+  if (!EFI_ERROR (Status)) {
+    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePool, 0, 0, Buffer);
+  }
+  return Status;
+}
 
 /**
   Internal function to free a pool entry.
@@ -558,3 +608,4 @@ CoreFreePoolI (
 
   return EFI_SUCCESS;
 }
+

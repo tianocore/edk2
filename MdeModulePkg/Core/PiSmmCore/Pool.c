@@ -1,7 +1,7 @@
 /** @file
   SMM Memory pool management functions.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -13,33 +13,6 @@
 **/
 
 #include "PiSmmCore.h"
-
-//
-// MIN_POOL_SHIFT must not be less than 5
-//
-#define MIN_POOL_SHIFT  6
-#define MIN_POOL_SIZE   (1 << MIN_POOL_SHIFT)
-
-//
-// MAX_POOL_SHIFT must not be less than EFI_PAGE_SHIFT - 1
-//
-#define MAX_POOL_SHIFT  (EFI_PAGE_SHIFT - 1)
-#define MAX_POOL_SIZE   (1 << MAX_POOL_SHIFT)
-
-//
-// MAX_POOL_INDEX are calculated by maximum and minimum pool sizes
-//
-#define MAX_POOL_INDEX  (MAX_POOL_SHIFT - MIN_POOL_SHIFT + 1)
-
-typedef struct {
-  UINTN        Size;
-  BOOLEAN      Available;
-} POOL_HEADER;
-
-typedef struct {
-  POOL_HEADER  Header;
-  LIST_ENTRY   Link;
-} FREE_POOL_HEADER;
 
 LIST_ENTRY  mSmmPoolLists[MAX_POOL_INDEX];
 //
@@ -141,16 +114,18 @@ InternalAllocPoolByIndex (
   OUT FREE_POOL_HEADER  **FreePoolHdr
   )
 {
-  EFI_STATUS        Status;
-  FREE_POOL_HEADER  *Hdr;
+  EFI_STATUS            Status;
+  FREE_POOL_HEADER      *Hdr;
+  EFI_PHYSICAL_ADDRESS  Address;
 
   ASSERT (PoolIndex <= MAX_POOL_INDEX);
   Status = EFI_SUCCESS;
   if (PoolIndex == MAX_POOL_INDEX) {
-    Hdr = (FREE_POOL_HEADER *)AllocatePages (EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1));
-    if (Hdr == NULL) {
+    Status = SmmInternalAllocatePages (AllocateAnyPages, EfiRuntimeServicesData, EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1), &Address);
+    if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
+    Hdr = (FREE_POOL_HEADER *) (UINTN) Address;
   } else if (!IsListEmpty (&mSmmPoolLists[PoolIndex])) {
     Hdr = BASE_CR (GetFirstNode (&mSmmPoolLists[PoolIndex]), FREE_POOL_HEADER, Link);
     RemoveEntryList (&Hdr->Link);
@@ -214,7 +189,7 @@ InternalFreePoolByIndex (
 **/
 EFI_STATUS
 EFIAPI
-SmmAllocatePool (
+SmmInternalAllocatePool (
   IN   EFI_MEMORY_TYPE  PoolType,
   IN   UINTN            Size,
   OUT  VOID             **Buffer
@@ -234,7 +209,7 @@ SmmAllocatePool (
   Size += sizeof (*PoolHdr);
   if (Size > MAX_POOL_SIZE) {
     Size = EFI_SIZE_TO_PAGES (Size);
-    Status = SmmAllocatePages (AllocateAnyPages, PoolType, Size, &Address);
+    Status = SmmInternalAllocatePages (AllocateAnyPages, PoolType, Size, &Address);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -258,6 +233,36 @@ SmmAllocatePool (
 }
 
 /**
+  Allocate pool of a particular type.
+
+  @param  PoolType               Type of pool to allocate.
+  @param  Size                   The amount of pool to allocate.
+  @param  Buffer                 The address to return a pointer to the allocated
+                                 pool.
+
+  @retval EFI_INVALID_PARAMETER  PoolType not valid.
+  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
+  @retval EFI_SUCCESS            Pool successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmAllocatePool (
+  IN   EFI_MEMORY_TYPE  PoolType,
+  IN   UINTN            Size,
+  OUT  VOID             **Buffer
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = SmmInternalAllocatePool (PoolType, Size, Buffer);
+  if (!EFI_ERROR (Status)) {
+    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionAllocatePool, PoolType, Size, *Buffer);
+  }
+  return Status;
+}
+
+/**
   Frees pool.
 
   @param  Buffer                 The allocated pool entry to free.
@@ -268,7 +273,7 @@ SmmAllocatePool (
 **/
 EFI_STATUS
 EFIAPI
-SmmFreePool (
+SmmInternalFreePool (
   IN VOID  *Buffer
   )
 {
@@ -284,10 +289,34 @@ SmmFreePool (
   if (FreePoolHdr->Header.Size > MAX_POOL_SIZE) {
     ASSERT (((UINTN)FreePoolHdr & EFI_PAGE_MASK) == 0);
     ASSERT ((FreePoolHdr->Header.Size & EFI_PAGE_MASK) == 0);
-    return SmmFreePages (
+    return SmmInternalFreePages (
              (EFI_PHYSICAL_ADDRESS)(UINTN)FreePoolHdr,
              EFI_SIZE_TO_PAGES (FreePoolHdr->Header.Size)
              );
   }
   return InternalFreePoolByIndex (FreePoolHdr);
+}
+
+/**
+  Frees pool.
+
+  @param  Buffer                 The allocated pool entry to free.
+
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value.
+  @retval EFI_SUCCESS            Pool successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmFreePool (
+  IN VOID  *Buffer
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = SmmInternalFreePool (Buffer);
+  if (!EFI_ERROR (Status)) {
+    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePool, 0, 0, Buffer);
+  }
+  return Status;
 }

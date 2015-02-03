@@ -874,10 +874,12 @@ SmmDispatcher (
       //
       // For each SMM driver, pass NULL as ImageHandle
       //
+      RegisterSmramProfileImage (DriverEntry, TRUE);
       PERF_START (DriverEntry->ImageHandle, "StartImage:", NULL, 0);
       Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, gST);
       PERF_END (DriverEntry->ImageHandle, "StartImage:", NULL, 0);
       if (EFI_ERROR(Status)){
+        UnregisterSmramProfileImage (DriverEntry, TRUE);
         SmmFreePages(DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
       }
 

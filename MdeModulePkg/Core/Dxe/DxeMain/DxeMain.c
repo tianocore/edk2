@@ -269,6 +269,8 @@ DxeMain (
   //
   CoreInitializeMemoryServices (&HobStart, &MemoryBaseAddress, &MemoryLength);
 
+  MemoryProfileInit (HobStart);
+
   //
   // Allocate the EFI System Table and EFI Runtime Service Table from EfiRuntimeServicesData
   // Use the templates to initialize the contents of the EFI System Table and EFI Runtime Services Table
@@ -382,6 +384,8 @@ DxeMain (
   //
   Status = CoreInitializeEventServices ();
   ASSERT_EFI_ERROR (Status);
+
+  MemoryProfileInstallProtocol ();
 
   //
   // Get persisted vector hand-off info from GUIDeed HOB again due to HobStart may be updated,

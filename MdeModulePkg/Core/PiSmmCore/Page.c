@@ -1,7 +1,7 @@
 /** @file
   SMM Memory page management functions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -15,11 +15,6 @@
 #include "PiSmmCore.h"
 
 #define TRUNCATE_TO_PAGES(a)  ((a) >> EFI_PAGE_SHIFT)
-
-typedef struct {
-  LIST_ENTRY  Link;
-  UINTN       NumberOfPages;
-} FREE_PAGE_LIST;
 
 LIST_ENTRY  mSmmMemoryMap = INITIALIZE_LIST_HEAD_VARIABLE (mSmmMemoryMap);
 
@@ -151,7 +146,7 @@ InternalAllocAddress (
 **/
 EFI_STATUS
 EFIAPI
-SmmAllocatePages (
+SmmInternalAllocatePages (
   IN  EFI_ALLOCATE_TYPE     Type,
   IN  EFI_MEMORY_TYPE       MemoryType,
   IN  UINTN                 NumberOfPages,
@@ -203,6 +198,40 @@ SmmAllocatePages (
 }
 
 /**
+  Allocates pages from the memory map.
+
+  @param  Type                   The type of allocation to perform.
+  @param  MemoryType             The type of memory to turn the allocated pages
+                                 into.
+  @param  NumberOfPages          The number of pages to allocate.
+  @param  Memory                 A pointer to receive the base allocated memory
+                                 address.
+
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate.
+  @retval EFI_SUCCESS            Pages successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmAllocatePages (
+  IN  EFI_ALLOCATE_TYPE     Type,
+  IN  EFI_MEMORY_TYPE       MemoryType,
+  IN  UINTN                 NumberOfPages,
+  OUT EFI_PHYSICAL_ADDRESS  *Memory
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = SmmInternalAllocatePages (Type, MemoryType, NumberOfPages, Memory);
+  if (!EFI_ERROR (Status)) {
+    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionAllocatePages, MemoryType, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) *Memory);
+  }
+  return Status;
+}
+
+/**
   Internal Function. Merge two adjacent nodes.
 
   @param  First             The first of two nodes to merge.
@@ -242,7 +271,7 @@ InternalMergeNodes (
 **/
 EFI_STATUS
 EFIAPI
-SmmFreePages (
+SmmInternalFreePages (
   IN EFI_PHYSICAL_ADDRESS  Memory,
   IN UINTN                 NumberOfPages
   )
@@ -291,6 +320,33 @@ SmmFreePages (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Frees previous allocated pages.
+
+  @param  Memory                 Base address of memory being freed.
+  @param  NumberOfPages          The number of pages to free.
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range.
+  @retval EFI_INVALID_PARAMETER  Address not aligned.
+  @return EFI_SUCCESS            Pages successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmFreePages (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = SmmInternalFreePages (Memory, NumberOfPages);
+  if (!EFI_ERROR (Status)) {
+    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePages, 0, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) Memory);
+  }
+  return Status;
 }
 
 /**

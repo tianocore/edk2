@@ -1,0 +1,62 @@
+## @file
+#  Shell application to dump UEFI memory and SMRAM profile information.
+#
+#  Note that if the feature is not enabled by setting PcdMemoryProfilePropertyMask,
+#  the application will not display memory profile information.
+#
+#  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemoryProfileInfo
+  MODULE_UNI_FILE                = MemoryProfileInfo.uni
+  FILE_GUID                      = 21429B90-5F67-4e93-AF55-1D314D646E12
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  MemoryProfileInfo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  BaseLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  UefiLib
+  MemoryAllocationLib
+  DxeServicesLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  
+[Guids]
+  ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
+  ## SOMETIMES_CONSUMES   ## GUID # SmiHandlerRegister
+  gEdkiiMemoryProfileGuid
+  gZeroGuid                            ## SOMETIMES_CONSUMES   ## GUID
+
+[Protocols]
+  gEfiSmmCommunicationProtocolGuid     ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  MemoryProfileInfoExtra.uni

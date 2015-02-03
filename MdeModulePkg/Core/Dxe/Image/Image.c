@@ -1626,6 +1626,7 @@ CoreStartImage (
   // Subsequent calls to LongJump() cause a non-zero value to be returned by SetJump().
   //
   if (SetJumpFlag == 0) {
+    RegisterMemoryProfileImage (Image, (Image->ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION ? EFI_FV_FILETYPE_APPLICATION : EFI_FV_FILETYPE_DRIVER));
     //
     // Call the image's entry point
     //
@@ -1851,6 +1852,7 @@ CoreUnloadImage (
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
+  UnregisterMemoryProfileImage (Image);
 
   if (Image->Started) {
     //
