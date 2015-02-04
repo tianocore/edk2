@@ -3,7 +3,7 @@
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
   Copyright (c) 2014, ARM Limited. All rights reserved. <BR>
-  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

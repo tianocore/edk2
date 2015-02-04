@@ -1,7 +1,7 @@
 /** @file
   The implementation for ifcommand shell command.
 
-  Copyright (c) 2013 - 2015, Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials

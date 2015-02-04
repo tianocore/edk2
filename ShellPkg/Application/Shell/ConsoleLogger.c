@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell console logger.
 
-  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
+  (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

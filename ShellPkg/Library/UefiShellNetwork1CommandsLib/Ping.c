@@ -1,7 +1,7 @@
 /** @file
   The implementation for Ping shell command.
 
-  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials

@@ -2,7 +2,7 @@
   Module for clarifying the content of the smbios structure element information.
 
   Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at

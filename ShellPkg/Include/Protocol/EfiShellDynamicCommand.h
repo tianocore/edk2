@@ -1,7 +1,7 @@
 /** @file
   EFI Shell Dynamic Command registration protocol
 
-  (C) Copyright 2012-2014, Hewlett-Packard Development Company, L.P.
+  (C) Copyright 2012-2014 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at

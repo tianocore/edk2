@@ -1,7 +1,7 @@
 /** @file
   EFI Shell protocol as defined in the UEFI Shell 2.0 specification including errata.
 
-  (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
