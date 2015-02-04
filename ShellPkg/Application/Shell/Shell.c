@@ -1302,9 +1302,9 @@ StripUnreplacedEnvironmentVariables(
   CHAR16 *CurrentLocator;
 
   for (CurrentLocator = CmdLine ; CurrentLocator != NULL ; ) {
-    FirstQuote = FindFirstCharacter(CurrentLocator, L"\"", L'^');
-    FirstPercent = FindFirstCharacter(CurrentLocator, L"%", L'^');
-    SecondPercent = FirstPercent!=NULL?FindFirstCharacter(FirstPercent+1, L"%", L'^'):NULL;
+    FirstQuote = (CHAR16*)FindFirstCharacter(CurrentLocator, L"\"", L'^');
+    FirstPercent = (CHAR16*)FindFirstCharacter(CurrentLocator, L"%", L'^');
+    SecondPercent = FirstPercent!=NULL?(CHAR16*)FindFirstCharacter(FirstPercent+1, L"%", L'^'):NULL;
     if (FirstPercent == NULL || SecondPercent == NULL) {
       //
       // If we ever dont have 2 % we are done.
@@ -1313,7 +1313,7 @@ StripUnreplacedEnvironmentVariables(
     }
 
     if (FirstQuote!= NULL && FirstQuote < FirstPercent) {
-      SecondQuote = FindFirstCharacter(FirstQuote+1, L"\"", L'^');
+      SecondQuote = (CHAR16*)FindFirstCharacter(FirstQuote+1, L"\"", L'^');
       //
       // Quote is first found
       //
