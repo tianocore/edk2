@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -656,10 +656,12 @@ PeiBotDetectMedia (
                   PeiServices,
                   PeiBotDev
                   );
-        //
-        // retry the ReadFormatCapacity command
-        //
-        PeiBotDev->DeviceType = USBFLOPPY2;
+        if (EFI_ERROR (Status)) {
+          //
+          // retry the ReadFormatCapacity command
+          //
+          PeiBotDev->DeviceType = USBFLOPPY2;
+        }
         break;
 
       default:
