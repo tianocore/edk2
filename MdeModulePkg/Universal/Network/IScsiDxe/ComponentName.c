@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for iSCSI.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,10 +37,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIScsiDriverNameTable[] =
   {NULL, NULL}
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mIScsiControllerNameTable[] = {
-  {"eng;en", L"iSCSI (IPv4)"},
-  {NULL, NULL}
-};
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *mIScsiControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user readable name of the EFI Driver.
@@ -85,6 +82,77 @@ IScsiComponentNameGetDriverName (
           DriverName,
           (BOOLEAN)(This == &gIScsiComponentName)
           );
+}
+
+/**
+  Update the component name for the iSCSI instance.
+
+  @param[in]  IScsiExtScsiPassThru  A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  
+  @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
+  @retval EFI_UNSUPPORTED           Can't get the corresponding NIC info from the Controller handle.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN   EFI_EXT_SCSI_PASS_THRU_PROTOCOL *IScsiExtScsiPassThru
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[150];
+  ISCSI_DRIVER_DATA                *Private;
+  EFI_MAC_ADDRESS                  MacAddress;
+  UINTN                            HwAddressSize;
+  UINT16                           VlanId;
+  CHAR16                           MacString[70];
+
+  if (IScsiExtScsiPassThru == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  Private  = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (IScsiExtScsiPassThru);
+
+  //
+  // Get the mac string, it's the name of various variable
+  //
+  Status = NetLibGetMacAddress (Private->Controller, &MacAddress, &HwAddressSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  VlanId = NetLibGetVlanId (Private->Controller);
+  IScsiMacAddrToStr (&MacAddress, (UINT32) HwAddressSize, VlanId, MacString);
+    
+  UnicodeSPrint (
+    HandleName,
+    sizeof (HandleName),
+    L"iSCSI IPv4 (MacString=%s)",
+    MacString
+  );
+
+  if (mIScsiControllerNameTable != NULL) {
+    FreeUnicodeStringTable (mIScsiControllerNameTable);
+    mIScsiControllerNameTable = NULL;
+  }
+
+  Status = AddUnicodeString2 (
+             "eng",
+             gIScsiComponentName.SupportedLanguages,
+             &mIScsiControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return AddUnicodeString2 (
+           "en",
+           gIScsiComponentName2.SupportedLanguages,
+           &mIScsiControllerNameTable,
+           HandleName,
+           FALSE
+           );
 }
 
 /**
@@ -136,10 +204,17 @@ IScsiComponentNameGetControllerName (
   OUT CHAR16                        **ControllerName
   )
 {
+  EFI_STATUS                      Status;
+
   EFI_HANDLE                      IScsiController;
   ISCSI_PRIVATE_PROTOCOL          *IScsiIdentifier;
-  EFI_STATUS                      Status;
-  
+
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *IScsiExtScsiPassThru;
+
+  if (ControllerHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
   //
   // Get the handle of the controller we are controling.
   //
@@ -158,6 +233,43 @@ IScsiComponentNameGetControllerName (
                   );
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (ChildHandle != NULL) {
+    //
+    // Make sure this driver produced ChildHandle
+    //
+    Status = EfiTestChildHandle (
+               ControllerHandle,
+               ChildHandle,
+               &gEfiTcp4ProtocolGuid
+               );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Retrieve an instance of a produced protocol from ChildHandle
+      //
+      Status = gBS->OpenProtocol (
+                      ChildHandle,
+                      &gEfiExtScsiPassThruProtocolGuid,
+                     (VOID **)&IScsiExtScsiPassThru,
+                      NULL,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Update the component name for this child handle.
+      //
+      Status = UpdateName (IScsiExtScsiPassThru);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    } else {
+      return Status;
+    }
   }
   
   return LookupUnicodeString2 (
