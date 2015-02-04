@@ -393,7 +393,7 @@ InternalHstiRecordFeaturesVerified (
   UINT8                            *SecurityFeaturesVerified;
   EFI_STATUS                       Status;
 
-  Aip = InternalHstiFindAip (Role, ImplementationID, &Hsti, &HstiSize);
+  Aip = InternalHstiFindAip (Role, ImplementationID, (VOID **)&Hsti, &HstiSize);
   if (Aip == NULL) {
     return EFI_NOT_STARTED;
   }
@@ -518,7 +518,7 @@ InternalHstiRecordErrorString (
   UINTN                            Offset;
   EFI_STATUS                       Status;
 
-  Aip = InternalHstiFindAip (Role, ImplementationID, &Hsti, &HstiSize);
+  Aip = InternalHstiFindAip (Role, ImplementationID, (VOID **)&Hsti, &HstiSize);
   if (Aip == NULL) {
     return EFI_NOT_STARTED;
   }
