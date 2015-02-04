@@ -3290,6 +3290,9 @@ UiDisplayMenu (
 
       if (FxConfirmPopup(HotKey->Action)) {
         gUserInput->Action = HotKey->Action;
+        if ((HotKey->Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
+          gUserInput->DefaultId = HotKey->DefaultId;
+        }
         ControlFlag = CfExit;
       } else {
         Repaint     = TRUE;
