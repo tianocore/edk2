@@ -8,7 +8,7 @@
 
   ExecutePendingTpmRequest() will receive untrusted input and do validation.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -34,9 +34,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HiiLib.h>
 #include <Guid/EventGroup.h>
 #include <Guid/PhysicalPresenceData.h>
+#include <Library/TcgPpVendorLib.h>
 
-#define TPM_PP_USER_ABORT           ((TPM_RESULT)(-0x10))
-#define TPM_PP_BIOS_FAILURE         ((TPM_RESULT)(-0x0f))
 #define CONFIRM_BUFFER_SIZE         4096
 
 EFI_HII_HANDLE mPpStringPackHandle;
@@ -184,12 +183,12 @@ TpmPhysicalPresence (
   @param[in] AdditionalParameterSize  Additional parameter size.  
   @param[in] AdditionalParameters     Pointer to the Additional paramaters.  
   
-  @retval TPM_PP_BIOS_FAILURE         Error occurred during sending command to TPM or 
-                                      receiving response from TPM.
-  @retval Others                      Return code from the TPM device after command execution.
+  @retval TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE  Error occurred during sending command to TPM or 
+                                                  receiving response from TPM.
+  @retval Others                                  Return code from the TPM device after command execution.
 
 **/
-TPM_RESULT
+UINT32
 TpmCommandNoReturnData (
   IN      EFI_TCG_PROTOCOL          *TcgProtocol,
   IN      TPM_COMMAND_CODE          Ordinal,
@@ -204,7 +203,7 @@ TpmCommandNoReturnData (
 
   TpmRqu = (TPM_RQU_COMMAND_HDR*) AllocatePool (sizeof (*TpmRqu) + AdditionalParameterSize);
   if (TpmRqu == NULL) {
-    return TPM_PP_BIOS_FAILURE;
+    return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
   }
 
   TpmRqu->tag       = SwapBytes16 (TPM_TAG_RQU_COMMAND);
@@ -222,7 +221,7 @@ TpmCommandNoReturnData (
                           );
   FreePool (TpmRqu);
   if (EFI_ERROR (Status) || (TpmRsp.tag != SwapBytes16 (TPM_TAG_RSP_COMMAND))) {
-    return TPM_PP_BIOS_FAILURE;
+    return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
   }
   return SwapBytes32 (TpmRsp.returnCode);
 }
@@ -234,21 +233,21 @@ TpmCommandNoReturnData (
   @param[in]      CommandCode         Physical presence operation value.
   @param[in, out] PpiFlags            The physical presence interface flags.
   
-  @retval TPM_PP_BIOS_FAILURE         Unknown physical presence operation.
-  @retval TPM_PP_BIOS_FAILURE         Error occurred during sending command to TPM or 
-                                      receiving response from TPM.
-  @retval Others                      Return code from the TPM device after command execution.
+  @retval TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE  Unknown physical presence operation.
+  @retval TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE  Error occurred during sending command to TPM or 
+                                                  receiving response from TPM.
+  @retval Others                                  Return code from the TPM device after command execution.
 
 **/
-TPM_RESULT
+UINT32
 ExecutePhysicalPresence (
-  IN      EFI_TCG_PROTOCOL          *TcgProtocol,
-  IN      UINT8                     CommandCode,
-  IN OUT  UINT8                     *PpiFlags
+  IN      EFI_TCG_PROTOCOL            *TcgProtocol,
+  IN      UINT32                      CommandCode,
+  IN OUT  EFI_PHYSICAL_PRESENCE_FLAGS *PpiFlags
   )
 {
   BOOLEAN                           BoolVal;
-  TPM_RESULT                        TpmResponse;
+  UINT32                            TpmResponse;
   UINT32                            InData[5];
 
   switch (CommandCode) {
@@ -331,12 +330,12 @@ ExecutePhysicalPresence (
       // PHYSICAL_PRESENCE_ENABLE_ACTIVATE + PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE
       // PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE will be executed after reboot
       //
-      if ((*PpiFlags & FLAG_RESET_TRACK) == 0) {
+      if ((PpiFlags->PPFlags & TCG_VENDOR_LIB_FLAG_RESET_TRACK) == 0) {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_ENABLE_ACTIVATE, PpiFlags);
-        *PpiFlags |= FLAG_RESET_TRACK;
+        PpiFlags->PPFlags |= TCG_VENDOR_LIB_FLAG_RESET_TRACK;
       } else {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE, PpiFlags);
-        *PpiFlags &= ~FLAG_RESET_TRACK;
+        PpiFlags->PPFlags &= ~TCG_VENDOR_LIB_FLAG_RESET_TRACK;
       }
       return TpmResponse;
 
@@ -366,7 +365,7 @@ ExecutePhysicalPresence (
       // This command requires UI to prompt user for Auth data
       // Here it is NOT implemented
       //
-      return TPM_PP_BIOS_FAILURE;
+      return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
 
     case PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE:
       TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_CLEAR, PpiFlags);
@@ -376,27 +375,27 @@ ExecutePhysicalPresence (
       return TpmResponse;
 
     case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_FALSE:
-      *PpiFlags &= ~FLAG_NO_PPI_PROVISION;
+      PpiFlags->PPFlags &= ~TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION;
       return 0;
 
     case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_TRUE:
-      *PpiFlags |= FLAG_NO_PPI_PROVISION;
+      PpiFlags->PPFlags |= TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION;
       return 0;
 
     case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_FALSE:
-      *PpiFlags &= ~FLAG_NO_PPI_CLEAR;
+      PpiFlags->PPFlags &= ~TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR;
       return 0;
 
     case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_TRUE:
-      *PpiFlags |= FLAG_NO_PPI_CLEAR;
+      PpiFlags->PPFlags |= TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR;
       return 0;
 
     case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_FALSE:
-      *PpiFlags &= ~FLAG_NO_PPI_MAINTENANCE;
+      PpiFlags->PPFlags &= ~TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_MAINTENANCE;
       return 0;
 
     case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_TRUE:
-      *PpiFlags |= FLAG_NO_PPI_MAINTENANCE;
+      PpiFlags->PPFlags |= TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_MAINTENANCE;
       return 0;
   
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR:
@@ -404,12 +403,12 @@ ExecutePhysicalPresence (
       // PHYSICAL_PRESENCE_ENABLE_ACTIVATE + PHYSICAL_PRESENCE_CLEAR
       // PHYSICAL_PRESENCE_CLEAR will be executed after reboot.
       //
-      if ((*PpiFlags & FLAG_RESET_TRACK) == 0) {
+      if ((PpiFlags->PPFlags & TCG_VENDOR_LIB_FLAG_RESET_TRACK) == 0) {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_ENABLE_ACTIVATE, PpiFlags);
-        *PpiFlags |= FLAG_RESET_TRACK;
+        PpiFlags->PPFlags |= TCG_VENDOR_LIB_FLAG_RESET_TRACK;
       } else {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_CLEAR, PpiFlags);
-        *PpiFlags &= ~FLAG_RESET_TRACK;
+        PpiFlags->PPFlags &= ~TCG_VENDOR_LIB_FLAG_RESET_TRACK;
       }
       return TpmResponse;
 
@@ -418,19 +417,19 @@ ExecutePhysicalPresence (
       // PHYSICAL_PRESENCE_ENABLE_ACTIVATE + PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE
       // PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE will be executed after reboot.
       //
-      if ((*PpiFlags & FLAG_RESET_TRACK) == 0) {
+      if ((PpiFlags->PPFlags & TCG_VENDOR_LIB_FLAG_RESET_TRACK) == 0) {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_ENABLE_ACTIVATE, PpiFlags);
-        *PpiFlags |= FLAG_RESET_TRACK;
+        PpiFlags->PPFlags |= TCG_VENDOR_LIB_FLAG_RESET_TRACK;
       } else {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE, PpiFlags);
-        *PpiFlags &= ~FLAG_RESET_TRACK;
+        PpiFlags->PPFlags &= ~TCG_VENDOR_LIB_FLAG_RESET_TRACK;
       } 
       return TpmResponse;
 
     default:
       ;
   }
-  return TPM_PP_BIOS_FAILURE;
+  return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
 }
 
 
@@ -519,7 +518,7 @@ TcgPhysicalPresenceLibConstructor (
 **/
 BOOLEAN
 UserConfirm (
-  IN      UINT8                     TpmPpCommand
+  IN      UINT32                    TpmPpCommand
   )
 {
   CHAR16                            *ConfirmText;
@@ -910,11 +909,12 @@ UserConfirm (
 **/
 BOOLEAN
 HaveValidTpmRequest  (
-  IN      EFI_PHYSICAL_PRESENCE     *TcgPpData,
-  IN      UINT8                     Flags,
-  OUT     BOOLEAN                   *RequestConfirmed
+  IN      EFI_PHYSICAL_PRESENCE       *TcgPpData,
+  IN      EFI_PHYSICAL_PRESENCE_FLAGS Flags,
+  OUT     BOOLEAN                     *RequestConfirmed
   )
 {
+  BOOLEAN  IsRequestValid;
 
   *RequestConfirmed = FALSE;
 
@@ -933,27 +933,27 @@ HaveValidTpmRequest  (
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE:
     case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE:
     case PHYSICAL_PRESENCE_SET_OPERATOR_AUTH:
-      if ((Flags & FLAG_NO_PPI_PROVISION) != 0) {
+      if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION) != 0) {
         *RequestConfirmed = TRUE;
       }
       break;
 
     case PHYSICAL_PRESENCE_CLEAR:
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR:
-      if ((Flags & FLAG_NO_PPI_CLEAR) != 0) {
+      if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0) {
         *RequestConfirmed = TRUE;
       }
       break;
 
     case PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE:
-      if ((Flags & FLAG_NO_PPI_MAINTENANCE) != 0) {
+      if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_MAINTENANCE) != 0) {
         *RequestConfirmed = TRUE;
       }
       break;
 
     case PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE:
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
-      if ((Flags & FLAG_NO_PPI_CLEAR) != 0 && (Flags & FLAG_NO_PPI_PROVISION) != 0) {
+      if ((Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0 && (Flags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION) != 0) {
         *RequestConfirmed = TRUE;
       }
       break;
@@ -970,13 +970,22 @@ HaveValidTpmRequest  (
       break;
 
     default:
-      //
-      // Wrong Physical Presence command
-      //
-      return FALSE;
+      if (TcgPpData->PPRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+        IsRequestValid = TcgPpVendorLibHasValidRequest (TcgPpData->PPRequest, Flags.PPFlags, RequestConfirmed);
+        if (!IsRequestValid) {
+          return FALSE;
+        } else {
+          break;
+        }
+      } else {
+        //
+        // Wrong Physical Presence command
+        //
+        return FALSE;
+      }
   }
 
-  if ((Flags & FLAG_RESET_TRACK) != 0) {
+  if ((Flags.PPFlags & TCG_VENDOR_LIB_FLAG_RESET_TRACK) != 0) {
     //
     // It had been confirmed in last boot, it doesn't need confirm again.
     //
@@ -1004,21 +1013,23 @@ HaveValidTpmRequest  (
 **/
 VOID
 ExecutePendingTpmRequest (
-  IN      EFI_TCG_PROTOCOL          *TcgProtocol,
-  IN      EFI_PHYSICAL_PRESENCE     *TcgPpData,
-  IN      UINT8                     Flags
+  IN      EFI_TCG_PROTOCOL            *TcgProtocol,
+  IN      EFI_PHYSICAL_PRESENCE       *TcgPpData,
+  IN      EFI_PHYSICAL_PRESENCE_FLAGS Flags
   )
 {
   EFI_STATUS                        Status;
   UINTN                             DataSize;
   BOOLEAN                           RequestConfirmed;
-  UINT8                             NewFlags;
+  EFI_PHYSICAL_PRESENCE_FLAGS       NewFlags;
+  BOOLEAN                           ResetRequired;
+  UINT32                            NewPPFlags;
 
   if (!HaveValidTpmRequest(TcgPpData, Flags, &RequestConfirmed)) {
     //
     // Invalid operation request.
     //
-    TcgPpData->PPResponse = TPM_PP_BIOS_FAILURE;
+    TcgPpData->PPResponse = TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
     TcgPpData->LastPPRequest = TcgPpData->PPRequest;
     TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;
     DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
@@ -1032,43 +1043,50 @@ ExecutePendingTpmRequest (
     return;
   }
 
-  if (!RequestConfirmed) {
-    //
-    // Print confirm text and wait for approval. 
-    //
-    RequestConfirmed = UserConfirm (TcgPpData->PPRequest);
-  }
+  ResetRequired = FALSE;
+  if (TcgPpData->PPRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+    NewFlags = Flags;
+    NewPPFlags = NewFlags.PPFlags;
+    TcgPpData->PPResponse = TcgPpVendorLibExecutePendingRequest (TcgPpData->PPRequest, &NewPPFlags, &ResetRequired);
+    NewFlags.PPFlags = (UINT8)NewPPFlags;
+  } else {
+    if (!RequestConfirmed) {
+      //
+      // Print confirm text and wait for approval. 
+      //
+      RequestConfirmed = UserConfirm (TcgPpData->PPRequest);
+    }
 
-  //
-  // Execute requested physical presence command
-  //
-  TcgPpData->PPResponse = TPM_PP_USER_ABORT;
-  NewFlags = Flags;
-  if (RequestConfirmed) {
-    TcgPpData->PPResponse = ExecutePhysicalPresence (TcgProtocol, TcgPpData->PPRequest, &NewFlags);
+    //
+    // Execute requested physical presence command
+    //
+    TcgPpData->PPResponse = TCG_PP_OPERATION_RESPONSE_USER_ABORT;
+    NewFlags = Flags;
+    if (RequestConfirmed) {
+      TcgPpData->PPResponse = ExecutePhysicalPresence (TcgProtocol, TcgPpData->PPRequest, &NewFlags);
+    }
   }
 
   //
   // Save the flags if it is updated.
   //
-  if (Flags != NewFlags) {
+  if (CompareMem (&Flags, &NewFlags, sizeof(EFI_PHYSICAL_PRESENCE_FLAGS)) != 0) {
     Status   = gRT->SetVariable (
                       PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                       &gEfiPhysicalPresenceGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      sizeof (UINT8),
+                      sizeof (EFI_PHYSICAL_PRESENCE_FLAGS),
                       &NewFlags
                       ); 
     if (EFI_ERROR (Status)) {
       return;
     }
   }
-
-
+  
   //
   // Clear request
   //
-  if ((NewFlags & FLAG_RESET_TRACK) == 0) {
+  if ((NewFlags.PPFlags & TCG_VENDOR_LIB_FLAG_RESET_TRACK) == 0) {
     TcgPpData->LastPPRequest = TcgPpData->PPRequest;
     TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;    
   }
@@ -1088,7 +1106,7 @@ ExecutePendingTpmRequest (
     return;
   }
 
-  if (TcgPpData->PPResponse == TPM_PP_USER_ABORT) {
+  if (TcgPpData->PPResponse == TCG_PP_OPERATION_RESPONSE_USER_ABORT) {
     return;
   }
 
@@ -1109,6 +1127,13 @@ ExecutePendingTpmRequest (
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:      
       break;
     default:
+      if (TcgPpData->LastPPRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+        if (ResetRequired) {
+          break;
+        } else {
+          return ;
+        }
+      }
       if (TcgPpData->PPRequest != PHYSICAL_PRESENCE_NO_ACTION) {
         break;
       }
@@ -1146,7 +1171,7 @@ TcgPhysicalPresenceLibProcessRequest (
   EFI_PHYSICAL_PRESENCE             TcgPpData;
   EFI_TCG_PROTOCOL                  *TcgProtocol;
   EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
-  UINT8                             PpiFlags;
+  EFI_PHYSICAL_PRESENCE_FLAGS       PpiFlags;
   
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
   if (EFI_ERROR (Status)) {
@@ -1156,7 +1181,7 @@ TcgPhysicalPresenceLibProcessRequest (
   //
   // Initialize physical presence flags.
   //
-  DataSize = sizeof (UINT8);
+  DataSize = sizeof (EFI_PHYSICAL_PRESENCE_FLAGS);
   Status = gRT->GetVariable (
                   PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                   &gEfiPhysicalPresenceGuid,
@@ -1165,12 +1190,12 @@ TcgPhysicalPresenceLibProcessRequest (
                   &PpiFlags
                   );
   if (EFI_ERROR (Status)) {
-    PpiFlags = FLAG_NO_PPI_PROVISION;
+    PpiFlags.PPFlags = TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION;
     Status   = gRT->SetVariable (
                       PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                       &gEfiPhysicalPresenceGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      sizeof (UINT8),
+                      sizeof (EFI_PHYSICAL_PRESENCE_FLAGS),
                       &PpiFlags
                       );
     if (EFI_ERROR (Status)) {
@@ -1178,7 +1203,7 @@ TcgPhysicalPresenceLibProcessRequest (
       return ;
     }
   }
-  DEBUG ((EFI_D_INFO, "[TPM] PpiFlags = %x\n", PpiFlags));
+  DEBUG ((EFI_D_INFO, "[TPM] PpiFlags = %x\n", PpiFlags.PPFlags));
 
   //
   // This flags variable controls whether physical presence is required for TPM command. 
@@ -1224,7 +1249,7 @@ TcgPhysicalPresenceLibProcessRequest (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "[TPM] Flags=%x, PPRequest=%x\n", PpiFlags, TcgPpData.PPRequest));
+  DEBUG ((EFI_D_INFO, "[TPM] Flags=%x, PPRequest=%x\n", PpiFlags.PPFlags, TcgPpData.PPRequest));
 
   if (TcgPpData.PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
     //
@@ -1284,14 +1309,14 @@ TcgPhysicalPresenceLibNeedUserConfirm(
   VOID
   )
 {
-  EFI_STATUS              Status;
-  EFI_PHYSICAL_PRESENCE   TcgPpData;
-  UINTN                   DataSize;
-  BOOLEAN                 RequestConfirmed;
-  BOOLEAN                 LifetimeLock;
-  BOOLEAN                 CmdEnable;
-  EFI_TCG_PROTOCOL        *TcgProtocol;
-  UINT8                   PpiFlags;
+  EFI_STATUS                   Status;
+  EFI_PHYSICAL_PRESENCE        TcgPpData;
+  UINTN                        DataSize;
+  BOOLEAN                      RequestConfirmed;
+  BOOLEAN                      LifetimeLock;
+  BOOLEAN                      CmdEnable;
+  EFI_TCG_PROTOCOL             *TcgProtocol;
+  EFI_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
   
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
   if (EFI_ERROR (Status)) {
@@ -1313,7 +1338,7 @@ TcgPhysicalPresenceLibNeedUserConfirm(
     return FALSE;
   }
 
-  DataSize = sizeof (UINT8);
+  DataSize = sizeof (EFI_PHYSICAL_PRESENCE_FLAGS);
   Status = gRT->GetVariable (
                   PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                   &gEfiPhysicalPresenceGuid,

@@ -9,7 +9,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -66,11 +66,11 @@ PhysicalPresenceCallback (
   IN OUT UINTN                   *CommBufferSize
   )
 {
-  EFI_STATUS                     Status;
-  UINTN                          DataSize;
-  EFI_TREE_PHYSICAL_PRESENCE     PpData;
-  UINT8                          Flags;
-  BOOLEAN                        RequestConfirmed;
+  EFI_STATUS                        Status;
+  UINTN                             DataSize;
+  EFI_TREE_PHYSICAL_PRESENCE        PpData;
+  EFI_TREE_PHYSICAL_PRESENCE_FLAGS  Flags;
+  BOOLEAN                           RequestConfirmed;
 
   //
   // Get the Physical Presence variable
@@ -83,24 +83,33 @@ PhysicalPresenceCallback (
                            &DataSize,
                            &PpData
                            );
-  if (EFI_ERROR (Status)) {
-    mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
-    DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
-    return EFI_SUCCESS;
-  }
 
   DEBUG ((EFI_D_INFO, "[TPM2] PP callback, Parameter = %x, Request = %x\n", mTcgNvs->PhysicalPresence.Parameter, mTcgNvs->PhysicalPresence.Request));
 
   if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_RETURN_REQUEST_RESPONSE_TO_OS) {
+    if (EFI_ERROR (Status)) {
+      mTcgNvs->PhysicalPresence.ReturnCode  = PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE;
+      mTcgNvs->PhysicalPresence.LastRequest = 0;
+      mTcgNvs->PhysicalPresence.Response    = 0;
+      DEBUG ((EFI_D_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
+      return EFI_SUCCESS;
+    }
+    mTcgNvs->PhysicalPresence.ReturnCode  = PP_RETURN_TPM_OPERATION_RESPONSE_SUCCESS;
     mTcgNvs->PhysicalPresence.LastRequest = PpData.LastPPRequest;
     mTcgNvs->PhysicalPresence.Response    = PpData.PPResponse;
   } else if ((mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS) 
           || (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2)) {
-    if (mTcgNvs->PhysicalPresence.Request > TREE_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
+    if (EFI_ERROR (Status)) {
+      mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+      DEBUG ((EFI_D_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
+      return EFI_SUCCESS;
+    }
+    if ((mTcgNvs->PhysicalPresence.Request > TREE_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
+        (mTcgNvs->PhysicalPresence.Request < TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) ) {
       //
       // This command requires UI to prompt user for Auth data.
       //
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_NOT_IMPLEMENTED;
+      mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
       return EFI_SUCCESS;
     }
 
@@ -117,16 +126,36 @@ PhysicalPresenceCallback (
     }
 
     if (EFI_ERROR (Status)) { 
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
-      DEBUG ((EFI_D_ERROR, "[TPM] Set PP variable failure! Status = %r\n", Status));
+      mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+      DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
-    mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_SUCCESS;
+    mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS;
+
+    if (mTcgNvs->PhysicalPresence.Request >= TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+      DataSize = sizeof (EFI_TREE_PHYSICAL_PRESENCE_FLAGS);
+      Status = mSmmVariable->SmmGetVariable (
+                               TREE_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+                               &gEfiTrEEPhysicalPresenceGuid,
+                               NULL,
+                               &DataSize,
+                               &Flags
+                               );
+      if (EFI_ERROR (Status)) {
+        Flags.PPFlags = 0;
+      }
+      mTcgNvs->PhysicalPresence.ReturnCode = TrEEPpVendorLibSubmitRequestToPreOSFunction (mTcgNvs->PhysicalPresence.Request, Flags.PPFlags);
+    }
   } else if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST) {
+    if (EFI_ERROR (Status)) {
+      mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
+      DEBUG ((EFI_D_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
+      return EFI_SUCCESS;
+    }
     //
     // Get the Physical Presence flags
     //
-    DataSize = sizeof (UINT8);
+    DataSize = sizeof (EFI_TREE_PHYSICAL_PRESENCE_FLAGS);
     Status = mSmmVariable->SmmGetVariable (
                              TREE_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                              &gEfiTrEEPhysicalPresenceGuid,
@@ -135,8 +164,8 @@ PhysicalPresenceCallback (
                              &Flags
                              );
     if (EFI_ERROR (Status)) {
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
-      DEBUG ((EFI_D_ERROR, "[TPM] Get PP flags failure! Status = %r\n", Status));
+      mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
+      DEBUG ((EFI_D_ERROR, "[TPM2] Get PP flags failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
 
@@ -148,7 +177,7 @@ PhysicalPresenceCallback (
       case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_2:
       case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_3:
       case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_4:
-        if ((Flags & TREE_FLAG_NO_PPI_CLEAR) != 0) {
+        if ((Flags.PPFlags & TREE_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0) {
           RequestConfirmed = TRUE;
         }
         break;
@@ -164,17 +193,22 @@ PhysicalPresenceCallback (
         if (mTcgNvs->PhysicalPresence.Request <= TREE_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
           RequestConfirmed = TRUE;
         } else {
-          mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_NOT_IMPLEMENTED; 
-          return EFI_SUCCESS;
+          if (mTcgNvs->PhysicalPresence.Request < TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+            mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED; 
+            return EFI_SUCCESS;
+          }
         }
         break;
     }
 
     if (RequestConfirmed) {
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_ALLOWED_AND_PPUSER_NOT_REQUIRED;
+      mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED;
     } else {
-      mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_ALLOWED_AND_PPUSER_REQUIRED;
+      mTcgNvs->PhysicalPresence.ReturnCode = TREE_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_REQUIRED;
     }    
+    if (mTcgNvs->PhysicalPresence.Request >= TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+      mTcgNvs->PhysicalPresence.ReturnCode = TrEEPpVendorLibGetUserConfirmationStatusFunction (mTcgNvs->PhysicalPresence.Request, Flags.PPFlags);
+    }
   } 
 
   return EFI_SUCCESS;

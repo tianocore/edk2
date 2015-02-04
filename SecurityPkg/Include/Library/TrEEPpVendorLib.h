@@ -1,0 +1,164 @@
+/** @file
+  Ihis library is to support Trusted Execution Environment (TrEE) ACPI Profile
+  >= 128 Vendor Specific PPI Operation.
+
+  The Vendor Specific PPI operation may change TPM state, BIOS TPM management
+  flags, and may need additional boot cycle.
+  
+  Caution: This function may receive untrusted input.
+
+Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials 
+are licensed and made available under the terms and conditions of the BSD License 
+which accompanies this distribution.  The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#ifndef _TREE_PP_VENDOR_LIB_H_
+#define _TREE_PP_VENDOR_LIB_H_
+
+#include <IndustryStandard/Tpm20.h>
+#include <Protocol/TrEEProtocol.h>
+
+//
+// The definition of physical presence operation actions
+//
+#define TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION                         128
+
+//
+// The definition bit of the BIOS TPM Management Flags
+//
+// BIT0 is reserved
+#define TREE_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR                        BIT1
+// BIT2 is reserved
+#define TREE_VENDOR_LIB_FLAG_RESET_TRACK                                  BIT3
+
+//
+// The definition for TPM Operation Response to OS Environment
+//
+#define TREE_PP_OPERATION_RESPONSE_SUCCESS              0x0
+#define TREE_PP_OPERATION_RESPONSE_USER_ABORT           0xFFFFFFF0
+#define TREE_PP_OPERATION_RESPONSE_BIOS_FAILURE         0xFFFFFFF1
+
+//
+// The return code for Sumbit TPM Request to Pre-OS Environment
+// and Sumbit TPM Request to Pre-OS Environment 2
+//
+#define TREE_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS                                  0
+#define TREE_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED                          1
+#define TREE_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE                          2
+#define TREE_PP_SUBMIT_REQUEST_TO_PREOS_BLOCKED_BY_BIOS_SETTINGS                 3
+
+//
+// The return code for Get User Confirmation Status for Operation
+//
+#define TREE_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED                                 0
+#define TREE_PP_GET_USER_CONFIRMATION_BIOS_ONLY                                       1
+#define TREE_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION                   2
+#define TREE_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_REQUIRED                     3
+#define TREE_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED                 4
+
+/**
+  Check and execute the requested physical presence command.
+
+  This API should be invoked in BIOS boot phase to process pending request.
+  
+  Caution: This function may receive untrusted input.
+  
+  If OperationRequest < 128, then ASSERT().
+
+  @param[in]      PlatformAuth     platform auth value. NULL means no platform auth change.
+  @param[in]      OperationRequest TPM physical presence operation request.
+  @param[in, out] ManagementFlags  BIOS TPM Management Flags.
+  @param[out]     ResetRequired    If reset is required to vendor settings in effect.
+                                   True, it indicates the reset is required.
+                                   False, it indicates the reset is not required.
+
+  @return TPM Operation Response to OS Environment.
+**/
+UINT32
+EFIAPI
+TrEEPpVendorLibExecutePendingRequest (
+  IN TPM2B_AUTH             *PlatformAuth,  OPTIONAL
+  IN UINT32                 OperationRequest,
+  IN OUT UINT32             *ManagementFlags,
+  OUT BOOLEAN               *ResetRequired
+  );
+
+/**
+  Check if there is a valid physical presence command request.
+
+  This API should be invoked in BIOS boot phase to process pending request.
+  
+  Caution: This function may receive untrusted input.
+
+  If OperationRequest < 128, then ASSERT().
+
+  @param[in]      OperationRequest TPM physical presence operation request.
+  @param[in]      ManagementFlags  BIOS TPM Management Flags.
+  @param[out]     RequestConfirmed If the physical presence operation command required user confirm from UI.
+                                   True, it indicates the command doesn't require user confirm.
+                                   False, it indicates the command need user confirm from UI.
+
+  @retval  TRUE        Physical Presence operation command is valid.
+  @retval  FALSE       Physical Presence operation command is invalid.
+**/
+BOOLEAN
+EFIAPI
+TrEEPpVendorLibHasValidRequest (
+  IN UINT32                 OperationRequest,
+  IN UINT32                 ManagementFlags,
+  OUT BOOLEAN               *RequestConfirmed
+  );
+
+/**
+  The callback for TPM vendor specific physical presence which is called for
+  Submit TPM Operation Request to Pre-OS Environment and
+  Submit TPM Operation Request to Pre-OS Environment 2.
+
+  This API should be invoked in OS runtime phase to interface with ACPI method.
+
+  Caution: This function may receive untrusted input.
+  
+  If OperationRequest < 128, then ASSERT().
+
+  @param[in]      OperationRequest TPM physical presence operation request.
+  @param[in]      ManagementFlags  BIOS TPM Management Flags.
+
+  @return Return Code for Submit TPM Operation Request to Pre-OS Environment and
+          Submit TPM Operation Request to Pre-OS Environment 2.
+**/
+UINT32
+EFIAPI
+TrEEPpVendorLibSubmitRequestToPreOSFunction (
+  IN UINT32                 OperationRequest,
+  IN UINT32                 ManagementFlags
+  );
+
+/**
+  The callback for TPM vendor specific physical presence which is called for
+  Get User Confirmation Status for Operation.
+
+  This API should be invoked in OS runtime phase to interface with ACPI method.
+
+  Caution: This function may receive untrusted input.
+  
+  If OperationRequest < 128, then ASSERT().
+
+  @param[in]      OperationRequest TPM physical presence operation request.
+  @param[in]      ManagementFlags  BIOS TPM Management Flags.
+
+  @return Return Code for Get User Confirmation Status for Operation.
+**/
+UINT32
+EFIAPI
+TrEEPpVendorLibGetUserConfirmationStatusFunction (
+  IN UINT32                 OperationRequest,
+  IN UINT32                 ManagementFlags
+  );
+
+#endif

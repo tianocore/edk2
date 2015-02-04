@@ -7,7 +7,7 @@
 
   TrEEExecutePendingTpmRequest() will receive untrusted input and do validation.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -34,10 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 #include <Guid/TrEEPhysicalPresenceData.h>
 #include <Library/Tpm2CommandLib.h>
-
-#define TPM_PP_SUCCESS              0
-#define TPM_PP_USER_ABORT           ((TPM_RESULT)(-0x10))
-#define TPM_PP_BIOS_FAILURE         ((TPM_RESULT)(-0x0f))
+#include <Library/TrEEPpVendorLib.h>
 
 #define CONFIRM_BUFFER_SIZE         4096
 
@@ -113,16 +110,16 @@ Done:
   @param[in]      CommandCode         Physical presence operation value.
   @param[in, out] PpiFlags            The physical presence interface flags.
   
-  @retval TPM_PP_BIOS_FAILURE         Unknown physical presence operation.
-  @retval TPM_PP_BIOS_FAILURE         Error occurred during sending command to TPM or 
-                                      receiving response from TPM.
-  @retval Others                      Return code from the TPM device after command execution.
+  @retval TREE_PP_OPERATION_RESPONSE_BIOS_FAILURE  Unknown physical presence operation.
+  @retval TREE_PP_OPERATION_RESPONSE_BIOS_FAILURE  Error occurred during sending command to TPM or 
+                                                   receiving response from TPM.
+  @retval Others                                   Return code from the TPM device after command execution.
 **/
-TPM_RESULT
+UINT32
 TrEEExecutePhysicalPresence (
-  IN      TPM2B_AUTH                *PlatformAuth,  OPTIONAL
-  IN      UINT8                     CommandCode,
-  IN OUT  UINT8                     *PpiFlags
+  IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
+  IN      UINT32                           CommandCode,
+  IN OUT  EFI_TREE_PHYSICAL_PRESENCE_FLAGS *PpiFlags
   )
 {
   EFI_STATUS  Status;
@@ -134,24 +131,24 @@ TrEEExecutePhysicalPresence (
     case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_4:
       Status = TpmCommandClear (PlatformAuth);
       if (EFI_ERROR (Status)) {
-        return TPM_PP_BIOS_FAILURE;
+        return TREE_PP_OPERATION_RESPONSE_BIOS_FAILURE;
       } else {
-        return TPM_PP_SUCCESS;
+        return TREE_PP_OPERATION_RESPONSE_SUCCESS;
       }
 
     case TREE_PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_FALSE:
-      *PpiFlags &= ~TREE_FLAG_NO_PPI_CLEAR;
-      return TPM_PP_SUCCESS;
+      PpiFlags->PPFlags &= ~TREE_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR;
+      return TREE_PP_OPERATION_RESPONSE_SUCCESS;
 
     case TREE_PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_TRUE:
-      *PpiFlags |= TREE_FLAG_NO_PPI_CLEAR;
-      return TPM_PP_SUCCESS;
+      PpiFlags->PPFlags |= TREE_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR;
+      return TREE_PP_OPERATION_RESPONSE_SUCCESS;
 
     default:
       if (CommandCode <= TREE_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
-        return TPM_PP_SUCCESS;
+        return TREE_PP_OPERATION_RESPONSE_SUCCESS;
       } else {
-        return TPM_PP_BIOS_FAILURE;
+        return TREE_PP_OPERATION_RESPONSE_BIOS_FAILURE;
       }
   }
 }
@@ -233,7 +230,7 @@ TrEEPhysicalPresenceLibConstructor (
 **/
 BOOLEAN
 TrEEUserConfirm (
-  IN      UINT8                     TpmPpCommand
+  IN      UINT32                    TpmPpCommand
   )
 {
   CHAR16                            *ConfirmText;
@@ -346,11 +343,13 @@ TrEEUserConfirm (
 **/
 BOOLEAN
 TrEEHaveValidTpmRequest  (
-  IN      EFI_TREE_PHYSICAL_PRESENCE     *TcgPpData,
-  IN      UINT8                          Flags,
-  OUT     BOOLEAN                        *RequestConfirmed
+  IN      EFI_TREE_PHYSICAL_PRESENCE       *TcgPpData,
+  IN      EFI_TREE_PHYSICAL_PRESENCE_FLAGS Flags,
+  OUT     BOOLEAN                          *RequestConfirmed
   )
 {
+  BOOLEAN  IsRequestValid;
+
   *RequestConfirmed = FALSE;
 
   switch (TcgPpData->PPRequest) {
@@ -361,7 +360,7 @@ TrEEHaveValidTpmRequest  (
     case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_2:
     case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_3:
     case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_4:
-      if ((Flags & TREE_FLAG_NO_PPI_CLEAR) != 0) {
+      if ((Flags.PPFlags & TREE_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0) {
         *RequestConfirmed = TRUE;
       }
       break;
@@ -374,13 +373,22 @@ TrEEHaveValidTpmRequest  (
       break;
 
     default:
-      //
-      // Wrong Physical Presence command
-      //
-      return FALSE;
+      if (TcgPpData->PPRequest >= TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+        IsRequestValid = TrEEPpVendorLibHasValidRequest (TcgPpData->PPRequest, Flags.PPFlags, RequestConfirmed);
+        if (!IsRequestValid) {
+          return FALSE;
+        } else {
+          break;
+        }
+      } else {
+        //
+        // Wrong Physical Presence command
+        //
+        return FALSE;
+      }
   }
 
-  if ((Flags & TREE_FLAG_RESET_TRACK) != 0) {
+  if ((Flags.PPFlags & TREE_VENDOR_LIB_FLAG_RESET_TRACK) != 0) {
     //
     // It had been confirmed in last boot, it doesn't need confirm again.
     //
@@ -407,15 +415,17 @@ TrEEHaveValidTpmRequest  (
 **/
 VOID
 TrEEExecutePendingTpmRequest (
-  IN      TPM2B_AUTH                     *PlatformAuth,  OPTIONAL
-  IN      EFI_TREE_PHYSICAL_PRESENCE     *TcgPpData,
-  IN      UINT8                          Flags
+  IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
+  IN      EFI_TREE_PHYSICAL_PRESENCE       *TcgPpData,
+  IN      EFI_TREE_PHYSICAL_PRESENCE_FLAGS Flags
   )
 {
   EFI_STATUS                        Status;
   UINTN                             DataSize;
   BOOLEAN                           RequestConfirmed;
-  UINT8                             NewFlags;
+  EFI_TREE_PHYSICAL_PRESENCE_FLAGS  NewFlags;
+  BOOLEAN                           ResetRequired;
+  UINT32                            NewPPFlags;
 
   if (TcgPpData->PPRequest == TREE_PHYSICAL_PRESENCE_NO_ACTION) {
     //
@@ -429,9 +439,9 @@ TrEEExecutePendingTpmRequest (
     // Invalid operation request.
     //
     if (TcgPpData->PPRequest <= TREE_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
-      TcgPpData->PPResponse = TPM_PP_SUCCESS;
+      TcgPpData->PPResponse = TREE_PP_OPERATION_RESPONSE_SUCCESS;
     } else {
-      TcgPpData->PPResponse = TPM_PP_BIOS_FAILURE;
+      TcgPpData->PPResponse = TREE_PP_OPERATION_RESPONSE_BIOS_FAILURE;
     }
     TcgPpData->LastPPRequest = TcgPpData->PPRequest;
     TcgPpData->PPRequest = TREE_PHYSICAL_PRESENCE_NO_ACTION;
@@ -446,33 +456,41 @@ TrEEExecutePendingTpmRequest (
     return;
   }
 
-  if (!RequestConfirmed) {
-    //
-    // Print confirm text and wait for approval. 
-    //
-    RequestConfirmed = TrEEUserConfirm (TcgPpData->PPRequest
-                                        );
-  }
+  ResetRequired = FALSE;
+  if (TcgPpData->PPRequest >= TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+    NewFlags = Flags;
+    NewPPFlags = NewFlags.PPFlags;
+    TcgPpData->PPResponse = TrEEPpVendorLibExecutePendingRequest (PlatformAuth, TcgPpData->PPRequest, &NewPPFlags, &ResetRequired);
+    NewFlags.PPFlags = (UINT8)NewPPFlags;
+  } else {
+    if (!RequestConfirmed) {
+      //
+      // Print confirm text and wait for approval. 
+      //
+      RequestConfirmed = TrEEUserConfirm (TcgPpData->PPRequest
+                                          );
+    }
 
-  //
-  // Execute requested physical presence command
-  //
-  TcgPpData->PPResponse = TPM_PP_USER_ABORT;
-  NewFlags = Flags;
-  if (RequestConfirmed) {
-    TcgPpData->PPResponse = TrEEExecutePhysicalPresence (PlatformAuth, TcgPpData->PPRequest, 
-                                                         &NewFlags);
+    //
+    // Execute requested physical presence command
+    //
+    TcgPpData->PPResponse = TREE_PP_OPERATION_RESPONSE_USER_ABORT;
+    NewFlags = Flags;
+    if (RequestConfirmed) {
+      TcgPpData->PPResponse = TrEEExecutePhysicalPresence (PlatformAuth, TcgPpData->PPRequest, 
+                                                           &NewFlags);
+    }
   }
 
   //
   // Save the flags if it is updated.
   //
-  if (Flags != NewFlags) {
+  if (CompareMem (&Flags, &NewFlags, sizeof(EFI_TREE_PHYSICAL_PRESENCE_FLAGS)) != 0) {
     Status   = gRT->SetVariable (
                       TREE_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                       &gEfiTrEEPhysicalPresenceGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      sizeof (UINT8),
+                      sizeof (EFI_TREE_PHYSICAL_PRESENCE_FLAGS),
                       &NewFlags
                       ); 
   }
@@ -480,7 +498,7 @@ TrEEExecutePendingTpmRequest (
   //
   // Clear request
   //
-  if ((NewFlags & TREE_FLAG_RESET_TRACK) == 0) {
+  if ((NewFlags.PPFlags & TREE_VENDOR_LIB_FLAG_RESET_TRACK) == 0) {
     TcgPpData->LastPPRequest = TcgPpData->PPRequest;
     TcgPpData->PPRequest = TREE_PHYSICAL_PRESENCE_NO_ACTION;    
   }
@@ -500,7 +518,7 @@ TrEEExecutePendingTpmRequest (
     return;
   }
 
-  if (TcgPpData->PPResponse == TPM_PP_USER_ABORT) {
+  if (TcgPpData->PPResponse == TREE_PP_OPERATION_RESPONSE_USER_ABORT) {
     return;
   }
 
@@ -514,6 +532,13 @@ TrEEExecutePendingTpmRequest (
     case TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR_4:
       break;
     default:
+      if (TcgPpData->LastPPRequest >= TREE_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+        if (ResetRequired) {
+          break;
+        } else {
+          return ;
+        }
+      }
       if (TcgPpData->PPRequest != TREE_PHYSICAL_PRESENCE_NO_ACTION) {
         break;
       }
@@ -549,7 +574,7 @@ TrEEPhysicalPresenceLibProcessRequest (
   EFI_TREE_PHYSICAL_PRESENCE        TcgPpData;
   EFI_TREE_PROTOCOL                 *TreeProtocol;
   EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
-  UINT8                             PpiFlags;
+  EFI_TREE_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
 
   Status = gBS->LocateProtocol (&gEfiTrEEProtocolGuid, NULL, (VOID **) &TreeProtocol);
   if (EFI_ERROR (Status)) {
@@ -559,7 +584,7 @@ TrEEPhysicalPresenceLibProcessRequest (
   //
   // Initialize physical presence flags.
   //
-  DataSize = sizeof (UINT8);
+  DataSize = sizeof (EFI_TREE_PHYSICAL_PRESENCE_FLAGS);
   Status = gRT->GetVariable (
                   TREE_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                   &gEfiTrEEPhysicalPresenceGuid,
@@ -568,12 +593,12 @@ TrEEPhysicalPresenceLibProcessRequest (
                   &PpiFlags
                   );
   if (EFI_ERROR (Status)) {
-    PpiFlags = 0;
+    PpiFlags.PPFlags = 0;
     Status   = gRT->SetVariable (
                       TREE_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                       &gEfiTrEEPhysicalPresenceGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      sizeof (UINT8),
+                      sizeof (EFI_TREE_PHYSICAL_PRESENCE_FLAGS),
                       &PpiFlags
                       );
     if (EFI_ERROR (Status)) {
@@ -581,7 +606,7 @@ TrEEPhysicalPresenceLibProcessRequest (
       return ;
     }
   }
-  DEBUG ((EFI_D_INFO, "[TPM2] PpiFlags = %x\n", PpiFlags));
+  DEBUG ((EFI_D_INFO, "[TPM2] PpiFlags = %x\n", PpiFlags.PPFlags));
 
   //
   // This flags variable controls whether physical presence is required for TPM command. 
@@ -627,13 +652,13 @@ TrEEPhysicalPresenceLibProcessRequest (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "[TPM2] Flags=%x, PPRequest=%x (LastPPRequest=%x)\n", PpiFlags, TcgPpData.PPRequest, TcgPpData.LastPPRequest));
+  DEBUG ((EFI_D_INFO, "[TPM2] Flags=%x, PPRequest=%x (LastPPRequest=%x)\n", PpiFlags.PPFlags, TcgPpData.PPRequest, TcgPpData.LastPPRequest));
 
   //
   // Execute pending TPM request.
   //  
   TrEEExecutePendingTpmRequest (PlatformAuth, &TcgPpData, PpiFlags);
-  DEBUG ((EFI_D_INFO, "[TPM2] PPResponse = %x (LastPPRequest=%x, Flags=%x)\n", TcgPpData.PPResponse, TcgPpData.LastPPRequest, PpiFlags));
+  DEBUG ((EFI_D_INFO, "[TPM2] PPResponse = %x (LastPPRequest=%x, Flags=%x)\n", TcgPpData.PPResponse, TcgPpData.LastPPRequest, PpiFlags.PPFlags));
 
 }
 
@@ -658,7 +683,7 @@ TrEEPhysicalPresenceLibNeedUserConfirm(
   UINTN                             DataSize;
   BOOLEAN                           RequestConfirmed;
   EFI_TREE_PROTOCOL                 *TreeProtocol;
-  UINT8                             PpiFlags;
+  EFI_TREE_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
 
   Status = gBS->LocateProtocol (&gEfiTrEEProtocolGuid, NULL, (VOID **) &TreeProtocol);
   if (EFI_ERROR (Status)) {
@@ -680,7 +705,7 @@ TrEEPhysicalPresenceLibNeedUserConfirm(
     return FALSE;
   }
 
-  DataSize = sizeof (UINT8);
+  DataSize = sizeof (EFI_TREE_PHYSICAL_PRESENCE_FLAGS);
   Status = gRT->GetVariable (
                   TREE_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                   &gEfiTrEEPhysicalPresenceGuid,

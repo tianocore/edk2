@@ -5,7 +5,7 @@
 #  It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 #  and libraries instances, which are used for those features.
 #
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
 # The full text of the license may be found at
@@ -39,6 +39,10 @@
   #
   TcgPhysicalPresenceLib|Include/Library/TcgPhysicalPresenceLib.h
   
+  ##  @libraryclass  Provides support for TCG PP >= 128 Vendor Specific PPI Operation.
+  #
+  TcgPpVendorLib|Include/Library/TcgPpVendorLib.h
+  
   ##  @libraryclass  Provides interfaces for other modules to send TPM 2.0 command.
   #
   Tpm2CommandLib|Include/Library/Tpm2CommandLib.h
@@ -66,6 +70,10 @@
   ##  @libraryclass  Provides interfaces to handle TPM 2.0 request.
   #
   TrEEPhysicalPresenceLib|Include/Library/TrEEPhysicalPresenceLib.h
+  
+  ##  @libraryclass  Provides support for TrEE PP >= 128 Vendor Specific PPI Operation.
+  #
+  TrEEPpVendorLib|Include/Library/TrEEPpVendorLib.h
 
 [Guids]
   ## Security package token space guid.
