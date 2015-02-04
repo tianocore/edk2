@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -374,7 +374,7 @@ DxeMain (
       if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV2) {
         DEBUG ((DEBUG_INFO | DEBUG_LOAD, "FV2 Hob           0x%0lx - 0x%0lx\n", Hob.FirmwareVolume2->BaseAddress, Hob.FirmwareVolume2->BaseAddress + Hob.FirmwareVolume2->Length - 1));
       } else if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV) {
-        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "FV Hob            0x%0lx - 0x%0lx\n", Hob.FirmwareVolume->BaseAddress, Hob.FirmwareVolume->BaseAddress + Hob.FirmwareVolume2->Length - 1));
+        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "FV Hob            0x%0lx - 0x%0lx\n", Hob.FirmwareVolume->BaseAddress, Hob.FirmwareVolume->BaseAddress + Hob.FirmwareVolume->Length - 1));
       }
     }
   DEBUG_CODE_END ();
