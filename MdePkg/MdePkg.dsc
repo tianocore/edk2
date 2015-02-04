@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -91,6 +91,7 @@
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
   MdePkg/Library/DxeIoLibCpuIo2/DxeIoLibCpuIo2.inf
+  MdePkg/Library/DxeHstiLib/DxeHstiLib.inf
 
   MdePkg/Library/DxeRuntimePciExpressLib/DxeRuntimePciExpressLib.inf
 
