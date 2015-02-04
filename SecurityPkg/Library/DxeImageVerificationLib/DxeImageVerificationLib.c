@@ -12,7 +12,7 @@
   DxeImageVerificationHandler(), HashPeImageByType(), HashPeImage() function will accept
   untrusted PE/COFF image and validate its data structure within this image buffer before use.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1214,6 +1214,12 @@ IsForbiddenByDbx (
   BOOLEAN                   IsForbidden;
   UINT8                     *Data;
   UINTN                     DataSize;
+  EFI_SIGNATURE_LIST        *CertList;
+  UINTN                     CertListSize;
+  EFI_SIGNATURE_DATA        *CertData;
+  UINT8                     *RootCert;
+  UINTN                     RootCertSize;
+  UINTN                     CertCount;
   UINTN                     Index;
   UINT8                     *CertBuffer;
   UINTN                     BufferLength;
@@ -1230,6 +1236,10 @@ IsForbiddenByDbx (
   //
   IsForbidden       = FALSE;
   Data              = NULL;
+  CertList          = NULL;
+  CertData          = NULL;
+  RootCert          = NULL;
+  RootCertSize      = 0;
   Cert              = NULL;
   CertBuffer        = NULL;
   BufferLength      = 0;
@@ -1255,6 +1265,52 @@ IsForbiddenByDbx (
   }
 
   //
+  // Verify image signature with RAW X509 certificates in DBX database.
+  // If passed, the image will be forbidden.
+  //
+  CertList     = (EFI_SIGNATURE_LIST *) Data;
+  CertListSize = DataSize;
+  while ((CertListSize > 0) && (CertListSize >= CertList->SignatureListSize)) {
+    if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
+      CertData  = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
+      CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
+
+      for (Index = 0; Index < CertCount; Index++) {
+        //
+        // Iterate each Signature Data Node within this CertList for verify.
+        //
+        RootCert     = CertData->SignatureData;
+        RootCertSize = CertList->SignatureSize - sizeof (EFI_GUID);
+
+        //
+        // Call AuthenticodeVerify library to Verify Authenticode struct.
+        //
+        IsForbidden = AuthenticodeVerify (
+                        AuthData,
+                        AuthDataSize,
+                        RootCert,
+                        RootCertSize,
+                        mImageDigest,
+                        mImageDigestSize
+                        );
+        if (IsForbidden) {
+          SecureBootHook (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, Cert);
+          goto Done;
+        }
+
+        CertData = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertData + CertList->SignatureSize);
+      }
+    }
+
+    CertListSize -= CertList->SignatureListSize;
+    CertList      = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
+  }
+
+  //
+  // Check X.509 Certificate Hash & Possible Timestamp.
+  //
+
+  //
   // Retrieve the certificate stack from AuthData
   // The output CertStack format will be:
   //       UINT8  CertNumber;
@@ -1273,20 +1329,13 @@ IsForbiddenByDbx (
   }
 
   //
-  // Check if any certificates in AuthData is in the forbidden database.
+  // Check if any hash of certificates embedded in AuthData is in the forbidden database.
   //
   CertNumber = (UINT8) (*CertBuffer);
   CertPtr    = CertBuffer + 1;
   for (Index = 0; Index < CertNumber; Index++) {
     CertSize = (UINTN) ReadUnaligned32 ((UINT32 *)CertPtr);
     Cert     = (UINT8 *)CertPtr + sizeof (UINT32);
-    if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, Cert, &gEfiCertX509Guid, CertSize)) {
-      //
-      // Raw certificate in dbx means the image signed by the certificate is forbidden.
-      //
-      IsForbidden = TRUE;
-      goto Done;
-    }
 
     if (IsCertHashFoundInDatabase (Cert, CertSize, (EFI_SIGNATURE_LIST *)Data, DataSize, &RevocationTime)) {
       //
@@ -1339,6 +1388,9 @@ IsAllowedByDb (
   UINTN                     RootCertSize;
   UINTN                     Index;
   UINTN                     CertCount;
+  UINTN                     DbxDataSize;
+  UINT8                     *DbxData;
+  EFI_TIME                  RevocationTime;
 
   Data         = NULL;
   CertList     = NULL;
@@ -1388,7 +1440,30 @@ IsAllowedByDb (
                            mImageDigestSize
                            );
           if (VerifyStatus) {
-            SecureBootHook (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, Cert);
+            //
+            // Here We still need to check if this RootCert's Hash is revoked
+            //
+            Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DbxDataSize, NULL);
+            if (Status == EFI_BUFFER_TOO_SMALL) {
+              goto Done;
+            }
+            DbxData = (UINT8 *) AllocateZeroPool (DataSize);
+            if (DbxData == NULL) {
+              goto Done;
+            }
+
+            Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DbxDataSize, (VOID *) DbxData);
+            if (EFI_ERROR (Status)) {
+              goto Done;
+            }
+
+            if (IsCertHashFoundInDatabase (RootCert, RootCertSize, (EFI_SIGNATURE_LIST *)DbxData, DbxDataSize, &RevocationTime)) {
+              //
+              // Check the timestamp signature and signing time to determine if the image can be trusted.
+              //
+              VerifyStatus = PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime);
+            }
+
             goto Done;
           }
 
@@ -1402,8 +1477,15 @@ IsAllowedByDb (
   }
 
 Done:
+  if (VerifyStatus) {
+    SecureBootHook (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, Cert);
+  }
+
   if (Data != NULL) {
     FreePool (Data);
+  }
+  if (DbxData != NULL) {
+    FreePool (DbxData);
   }
 
   return VerifyStatus;
