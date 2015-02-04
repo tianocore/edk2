@@ -211,21 +211,20 @@ ContainsSplit(
   SecondQuote   = NULL;
   TempSpot      = FindFirstCharacter(CmdLine, L"|", L'^');
 
-  if (FirstQuote == NULL        || 
-      *FirstQuote == CHAR_NULL  ||
-      TempSpot == NULL          || 
-      *TempSpot == CHAR_NULL    || 
+  if (FirstQuote == NULL    || 
+      TempSpot == NULL      || 
+      TempSpot == CHAR_NULL || 
       FirstQuote > TempSpot
       ) {
     return (BOOLEAN) ((TempSpot != NULL) && (*TempSpot != CHAR_NULL));
   }
 
   while ((TempSpot != NULL) && (*TempSpot != CHAR_NULL)) {
-    if (FirstQuote == NULL || *FirstQuote == CHAR_NULL || FirstQuote > TempSpot) {
+    if (FirstQuote == NULL || FirstQuote > TempSpot) {
       break;
     }    
     SecondQuote = FindNextInstance (FirstQuote + 1, L"\"", TRUE);
-    if (SecondQuote == NULL || *SecondQuote == CHAR_NULL) {
+    if (SecondQuote == NULL) {
       break;
     }
     if (SecondQuote < TempSpot) {
@@ -1375,7 +1374,7 @@ StripUnreplacedEnvironmentVariables(
       continue;
     }
     
-    if (FirstQuote == NULL || *FirstQuote == CHAR_NULL || SecondPercent < FirstQuote) {
+    if (FirstQuote == NULL || SecondPercent < FirstQuote) {
       if (IsValidEnvironmentVariableName(FirstPercent, SecondPercent)) {
         //
         // We need to remove from FirstPercent to SecondPercent
