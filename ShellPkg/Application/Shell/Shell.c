@@ -2853,7 +2853,7 @@ RunScriptFile (
 }
 
 /**
-  Return the pointer to the first occurance of any character from a list of characters
+  Return the pointer to the first occurance of any character from a list of characters.
 
   @param[in] String           the string to parse
   @param[in] CharacterList    the list of character to look for
