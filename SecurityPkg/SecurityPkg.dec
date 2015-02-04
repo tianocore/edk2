@@ -112,6 +112,10 @@
   #  Include/Guid/TcgEventHob.h
   gTcgEventEntryHobGuid              = { 0x2b9ffb52, 0x1b13, 0x416f, { 0xa8, 0x7b, 0xbc, 0x93, 0xd, 0xef, 0x92, 0xa8 }}
 
+  ## HOB GUID used to record TPM device error.
+  #  Include/Guid/TcgEventHob.h
+  gTpmErrorHobGuid                   = { 0xef598499, 0xb25e, 0x473a, { 0xbf, 0xaf, 0xe7, 0xe5, 0x7d, 0xce, 0x82, 0xc4 }}
+
   ## HOB GUID used to pass all PEI measured FV info to DXE Driver.
   #  Include/Guid/MeasuredFvHob.h
   gMeasuredFvHobGuid                 = { 0xb2360b42, 0x7173, 0x420a, { 0x86, 0x96, 0x46, 0xca, 0x6b, 0xab, 0x10, 0x60 }}
@@ -253,6 +257,12 @@
   # @Prompt Select platform type.
   # @ValidRange 0x80000001 | 0x00 - 0x1 
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass|0|UINT8|0x00000006
+  
+  ## Progress Code for TPM device subclass definitions.<BR><BR>
+  #  EFI_PERIPHERAL_TPM  = (EFI_PERIPHERAL | 0x000D0000) = 0x010D0000<BR>
+  # @Prompt Status Code for TPM device definitions
+  # @ValidList  0x80000003 | 0x010D0000
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice|0x010D0000|UINT32|0x00000007
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Indicates the presence or absence of the platform operator during firmware booting.
