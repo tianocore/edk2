@@ -1,7 +1,7 @@
 /** @file
   The implementation of iSCSI protocol based on RFC3720.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1225,12 +1225,14 @@ IScsiCheckOpParams (
   //
   // InitialR2T, result function is OR.
   //
-  Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_INITIAL_R2T);
-  if (Value == NULL) {
-    goto ON_ERROR;
-  }
+  if (!Session->InitialR2T) {
+    Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_INITIAL_R2T);
+    if (Value == NULL) {
+      goto ON_ERROR;
+    }
 
-  Session->InitialR2T = (BOOLEAN) (Session->InitialR2T || (AsciiStrCmp (Value, "Yes") == 0));
+    Session->InitialR2T = (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+  }
 
   //
   // ImmediateData, result function is AND.
@@ -1240,7 +1242,7 @@ IScsiCheckOpParams (
     goto ON_ERROR;
   }
 
-  Session->ImmediateData = (BOOLEAN) (Session->ImmediateData && (AsciiStrCmp (Value, "Yes") == 0));
+  Session->ImmediateData = (BOOLEAN) (Session->ImmediateData && (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0));
 
   //
   // MaxRecvDataSegmentLength is declarative.
@@ -1265,13 +1267,15 @@ IScsiCheckOpParams (
   // ImmediateData=No.
   // This Key/Value is negotiation type.
   //
-  Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_FIRST_BURST_LENGTH);
-  if (Value == NULL) {
-    goto ON_ERROR;
-  }
+  if (!(Session->InitialR2T && !Session->ImmediateData)) {
+    Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_FIRST_BURST_LENGTH);
+    if (Value == NULL) {
+      goto ON_ERROR;
+    }
 
-  NumericValue              = AsciiStrDecimalToUintn (Value);
-  Session->FirstBurstLength = (UINT32) MIN (Session->FirstBurstLength, NumericValue);
+    NumericValue              = AsciiStrDecimalToUintn (Value);
+    Session->FirstBurstLength = (UINT32) MIN (Session->FirstBurstLength, NumericValue);
+  }
 
   //
   // MaxConnections, result function is Minimum.
@@ -1360,7 +1364,7 @@ IScsiCheckOpParams (
   Session->MaxOutstandingR2T = (UINT16) MIN (Session->MaxOutstandingR2T, NumericValue);
 
   //
-  // Remove declarative key-value paris if any.
+  // Remove declarative key-value pairs, if any.
   //
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_SESSION_TYPE);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_ALIAS);
@@ -1368,8 +1372,16 @@ IScsiCheckOpParams (
   //
   // Remove the key-value that may not needed for result function is OR.
   //
+  IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_INITIAL_R2T);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_PDU_IN_ORDER);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_SEQUENCE_IN_ORDER);
+
+  //
+  // Remove irrelevant parameter, if any.
+  //
+  if (Session->InitialR2T && !Session->ImmediateData) {
+    IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_FIRST_BURST_LENGTH);
+  }
 
   if (IsListEmpty (KeyValueList)) {
     //
