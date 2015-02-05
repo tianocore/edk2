@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -262,7 +262,7 @@ XhcCheckUrbResult (
       // Internal buffer is used by next read.
       //
       Handle->DataCount = (UINT8) (Handle->UrbIn.DataLen - EvtTrb->Length);
-      CopyMem (Handle->Data, (VOID *)(UINTN)Handle->UrbIn.Data, Handle->DataCount);
+      CopyMem ((VOID *)(UINTN)Handle->Data, (VOID *)(UINTN)Handle->UrbIn.Data, Handle->DataCount);
       //
       // Fill this TRB complete with CycleBit, otherwise next read will fail with old TRB.
       //
@@ -459,7 +459,6 @@ XhcCreateTransferTrb (
   XhcSyncTrsRing (Handle, EPRing);
 
   Urb->Trb = EPRing->RingEnqueue;
-  Trb = (TRB *)(UINTN)EPRing->RingEnqueue;
   Trb = (TRB *)(UINTN)EPRing->RingEnqueue;
   Trb->TrbNormal.TRBPtrLo  = XHC_LOW_32BIT (Urb->Data);
   Trb->TrbNormal.TRBPtrHi  = XHC_HIGH_32BIT (Urb->Data);

@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -571,7 +571,7 @@ CreateDebugCapabilityContext (
   //
   DebugCapabilityContext->EpOutContext.CErr             = 0x3;
   DebugCapabilityContext->EpOutContext.EPType           = ED_BULK_OUT;
-  DebugCapabilityContext->EpOutContext.MaxPacketSize    = 0x400;
+  DebugCapabilityContext->EpOutContext.MaxPacketSize    = XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE;
   DebugCapabilityContext->EpOutContext.AverageTRBLength = 0x1000;
   
   //
@@ -579,7 +579,7 @@ CreateDebugCapabilityContext (
   //
   DebugCapabilityContext->EpInContext.CErr             = 0x3;
   DebugCapabilityContext->EpInContext.EPType           = ED_BULK_IN;
-  DebugCapabilityContext->EpInContext.MaxPacketSize    = 0x400;
+  DebugCapabilityContext->EpInContext.MaxPacketSize    = XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE;
   DebugCapabilityContext->EpInContext.AverageTRBLength = 0x1000;
   
   //
@@ -709,9 +709,11 @@ InitializeUsbDebugHardware (
   }
 
   //
-  // Initialize for PEI phase when AllocatePages can work
+  // Initialize for PEI phase when AllocatePages can work.
+  // Allocate data buffer with max packet size for data read and data poll.
+  // Allocate data buffer for data write.
   //
-  Buffer = AllocateAlignBuffer (XHC_DEBUG_PORT_DATA_LENGTH);
+  Buffer = AllocateAlignBuffer (XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE * 2 + USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE);
   if (Buffer == NULL) {
     //
     // AllocatePages can not still work now, return fail and do not initialize now.
@@ -728,10 +730,11 @@ InitializeUsbDebugHardware (
   }
 
   //
-  // Construct the buffer for URB in and URB out
+  // Construct the buffer for read, poll and write.
   //
   Handle->UrbIn.Data  = (EFI_PHYSICAL_ADDRESS)(UINTN) Buffer;
-  Handle->UrbOut.Data = (EFI_PHYSICAL_ADDRESS)(UINTN) Buffer + XHC_DEBUG_PORT_DATA_LENGTH;
+  Handle->Data        = (EFI_PHYSICAL_ADDRESS)(UINTN) Buffer + XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE;
+  Handle->UrbOut.Data = Handle->UrbIn.Data + XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE * 2;
    
   //
   // Initialize event ring
@@ -831,6 +834,7 @@ DebugPortReadBuffer (
   UINT64                    TimeoutTicker;
   UINT64                    TimerRound;
   EFI_PHYSICAL_ADDRESS      XhciMmioBase;
+  UINT8                     *Data;
 
   if (NumberOfBytes == 0 || Buffer == NULL) {
     return 0;
@@ -864,6 +868,8 @@ DebugPortReadBuffer (
     }
   }
 
+  Data = (UINT8 *)(UINTN)UsbDebugPortHandle->Data;
+
   //
   // First read data from buffer, then read debug port hw to get received data.
   //
@@ -875,14 +881,14 @@ DebugPortReadBuffer (
     }
 
     for (Index = 0; Index < Total; Index++) {
-      Buffer[Index] = UsbDebugPortHandle->Data[Index];
+      Buffer[Index] = Data[Index];
     }
 
     for (Index = 0; Index < UsbDebugPortHandle->DataCount - Total; Index++) {
-      if (Total + Index >= 8) {
+      if (Total + Index >= XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE) {
         return 0;
       }
-      UsbDebugPortHandle->Data[Index] = UsbDebugPortHandle->Data[Total + Index];
+      Data[Index] = Data[Total + Index];
     }
     UsbDebugPortHandle->DataCount = (UINT8)(UsbDebugPortHandle->DataCount - (UINT8)Total);
   }
@@ -928,12 +934,12 @@ DebugPortReadBuffer (
       }
     }
     Remaining = NumberOfBytes - Total;
-    if (Remaining >= USB3_DEBUG_PORT_MAX_PACKET_SIZE) {
-      Received = USB3_DEBUG_PORT_MAX_PACKET_SIZE;
+    if (Remaining >= XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE) {
+      Received = XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE;
       Status = XhcDataTransfer (UsbDebugPortHandle, EfiUsbDataIn, Buffer + Total, &Received, DATA_TRANSFER_READ_TIMEOUT);
     } else {
-      Received = USB3_DEBUG_PORT_MAX_PACKET_SIZE;
-      Status = XhcDataTransfer (UsbDebugPortHandle, EfiUsbDataIn, &UsbDebugPortHandle->Data[0], &Received, DATA_TRANSFER_READ_TIMEOUT);
+      Received = XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE;
+      Status = XhcDataTransfer (UsbDebugPortHandle, EfiUsbDataIn, (VOID *)Data, &Received, DATA_TRANSFER_READ_TIMEOUT);
       UsbDebugPortHandle->DataCount = (UINT8) Received;
 
       if (Remaining <= Received) {
@@ -952,7 +958,7 @@ DebugPortReadBuffer (
       // Copy required data from the data buffer to user buffer.
       //
       for (Index = 0; Index < Length; Index++) {
-        (Buffer + Total)[Index] = UsbDebugPortHandle->Data[Index];
+        (Buffer + Total)[Index] = Data[Index];
         UsbDebugPortHandle->DataCount--;
       }
 
@@ -960,10 +966,10 @@ DebugPortReadBuffer (
       // reorder the data buffer to make available data arranged from the beginning of the data buffer.
       //
       for (Index = 0; Index < Received - Length; Index++) {
-        if (Length + Index >= 8) {
+        if (Length + Index >= XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE) {
           return 0;
         }
-        UsbDebugPortHandle->Data[Index] = UsbDebugPortHandle->Data[Length + Index];
+        Data[Index] = Data[Length + Index];
       }
       //
       // fixup the real required length of data.
@@ -1050,8 +1056,8 @@ DebugPortWriteBuffer (
 
   Index = 0;
   while ((Total < NumberOfBytes)) {
-    if (NumberOfBytes - Total > USB3_DEBUG_PORT_MAX_PACKET_SIZE) {
-      Sent = USB3_DEBUG_PORT_MAX_PACKET_SIZE;
+    if (NumberOfBytes - Total > USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE) {
+      Sent = USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE;
     } else {
       Sent = (UINT8)(NumberOfBytes - Total);
     }
@@ -1084,7 +1090,6 @@ DebugPortPollBuffer (
   USB3_DEBUG_PORT_HANDLE     *UsbDebugPortHandle;
   UINTN                     Length;
   RETURN_STATUS             Status;
-  UINT8                     Buffer[XHC_DEBUG_PORT_DATA_LENGTH];
   EFI_PHYSICAL_ADDRESS      XhciMmioBase;
 
   //
@@ -1120,12 +1125,12 @@ DebugPortPollBuffer (
   }
 
   //
-  // Read most 8-bytes data
+  // Read data as much as we can
   //
-  Length = XHC_DEBUG_PORT_DATA_LENGTH;
-  XhcDataTransfer (Handle, EfiUsbDataIn, Buffer, &Length, DATA_TRANSFER_POLL_TIMEOUT);
+  Length = XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE;
+  XhcDataTransfer (Handle, EfiUsbDataIn, (VOID *)(UINTN)UsbDebugPortHandle->Data, &Length, DATA_TRANSFER_POLL_TIMEOUT);
 
-  if (Length > 8) {
+  if (Length > XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE) {
     return FALSE;
   }
 
@@ -1136,7 +1141,6 @@ DebugPortPollBuffer (
   //
   // Store data into internal buffer for use later
   //
-  CopyMem (UsbDebugPortHandle->Data, Buffer, Length);
   UsbDebugPortHandle->DataCount = (UINT8) Length;
   return TRUE;
 }

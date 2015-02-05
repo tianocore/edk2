@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,13 +30,6 @@
 #include <Library/TimerLib.h>
 #include <Library/DebugCommunicationLib.h>
 #include <Library/PciLib.h>
-#include <Library/SerialPortLib.h>      // Todo: remove in future
-
-//
-// Internal serial debug - remove finally
-//
-#include <Library/SerialPortLib.h>
-#include <Library/PrintLib.h>
 
 //
 // USB Debug GUID value
@@ -54,7 +47,12 @@
 #define USB3DBG_ENABLED       2   // The XHCI debug device is enabled
 #define USB3DBG_NOT_ENABLED   4   // The XHCI debug device is not enabled
 
-#define USB3_DEBUG_PORT_MAX_PACKET_SIZE 0x08
+#define USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE 0x08
+
+//
+// MaxPacketSize for DbC Endpoint Descriptor IN and OUT
+//
+#define XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE    0x400
 
 #define XHCI_DEBUG_DEVICE_VENDOR_ID   0x0525
 #define XHCI_DEBUG_DEVICE_PRODUCT_ID  0x127A
@@ -78,11 +76,6 @@
 #define XHC_USBCMD_RESET              BIT1  // Host Controller Reset
 
 #define XHC_USBSTS_HALT               BIT0
-
-//
-// Transfer the data of 8 bytes each time
-//
-#define XHC_DEBUG_PORT_DATA_LENGTH   8
 
 //
 // Indicate the timeout when data is transferred in microsecond. 0 means infinite timeout.
@@ -528,9 +521,9 @@ typedef struct _USB3_DEBUG_PORT_INSTANCE {
   //
   UINT8                                   DataCount;
   //
-  // The data buffer. Maximum length is 8 bytes.
+  // The data buffer address for data read and poll.
   //
-  UINT8                                   Data[8];
+  EFI_PHYSICAL_ADDRESS                    Data;
   //
   // Timter settings
   //
