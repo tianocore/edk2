@@ -785,6 +785,9 @@ SmmEndOfDxeCallback (
 {
   DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
   mEndOfDxe = TRUE;
+  if (PcdGetBool (PcdReclaimVariableSpaceAtEndOfDxe)) {
+    ReclaimForOS ();
+  }
   return EFI_SUCCESS;
 }
 

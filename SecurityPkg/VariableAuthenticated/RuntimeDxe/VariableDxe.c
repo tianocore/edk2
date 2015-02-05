@@ -310,6 +310,9 @@ OnEndOfDxe (
   )
 {
   mEndOfDxe = TRUE;
+  if (PcdGetBool (PcdReclaimVariableSpaceAtEndOfDxe)) {
+    ReclaimForOS ();
+  }
 }
 
 /**
