@@ -1396,6 +1396,7 @@ IsAllowedByDb (
   CertList     = NULL;
   Cert         = NULL;
   RootCert     = NULL;
+  DbxData      = NULL;
   RootCertSize = 0;
   VerifyStatus = FALSE;
 
