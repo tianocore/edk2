@@ -127,7 +127,7 @@ SMBIOS_TABLE_TYPE4 mCpuSmbiosType4 = {
 
 CHAR8 *mCpuSmbiosType4Strings[] = {
   "Socket",
-  "edk2.svn.sourceforge.net",
+  "http://www.tianocore.org/edk2/",
   "Emulated Processor",
   "1.0",
   "1.0",

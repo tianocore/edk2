@@ -6,7 +6,7 @@ emulated under an environment where a full UEFI compatible
 environment is not possible.  (For example, running under an OS
 where an OS process hosts the UEFI emulation environment.)
 
-http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=EmulatorPkg
+https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 
 === Status ===
 

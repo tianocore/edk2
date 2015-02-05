@@ -95,7 +95,7 @@ SMBIOS_TABLE_TYPE0 gSmbiosType0Template = {
   0xFF,                    // EmbeddedControllerFirmwareMinorRelease
 };
 CHAR8 *gSmbiosType0Strings[] = {
-  "edk2.sourceforge.net",     // Vendor String
+  "http://www.tianocore.org/edk2/",     // Vendor String
   __TIME__,                   // BiosVersion String
   __DATE__,                   // BiosReleaseDate String
   NULL
@@ -113,7 +113,7 @@ SMBIOS_TABLE_TYPE1 gSmbiosType1Template = {
   6,    // Family String
 };
 CHAR8  *gSmbiosType1Strings[] = {
-  "edk2.sourceforge.net",
+  "http://www.tianocore.org/edk2/",
   "EmulatorPkg",
   "1.0",
   "System Serial#",
@@ -144,7 +144,7 @@ SMBIOS_TABLE_TYPE2  gSmbiosType2Template = {
   { 0 }                     // ContainedObjectHandles[1];
 };
 CHAR8  *gSmbiosType2Strings[] = {
-  "edk2.sourceforge.net",
+  "http://www.tianocore.org/edk2/",
   "EmulatorPkg",
   "1.0",
   "Base Board Serial#",
@@ -172,7 +172,7 @@ SMBIOS_TABLE_TYPE3  gSmbiosType3Template = {
   { { 0 } },    // ContainedElements[1];
 };
 CHAR8  *gSmbiosType3Strings[] = {
-  "edk2.sourceforge.net",
+  "http://www.tianocore.org/edk2/",
   "EmulatorPkg",
   "Chassis Board Serial#",
   "Chassis Board Asset Tag#",
@@ -335,7 +335,7 @@ SMBIOS_TABLE_TYPE11 gSmbiosType11Template = {
   1 // StringCount
 };
 CHAR8 *gSmbiosType11Strings[] = {
-  "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EmulatorPkg/",
+  "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EmulatorPkg/",
   NULL
 };
 
@@ -345,7 +345,7 @@ SMBIOS_TABLE_TYPE12 gSmbiosType12Template = {
   1 // StringCount
 };
 CHAR8 *gSmbiosType12Strings[] = {
-  "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EmulatorPkg/EmulatorPkg.dsc",
+  "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EmulatorPkg/EmulatorPkg.dsc",
   NULL
 };
 

@@ -140,7 +140,7 @@ main (
     fclose (GdbTempFile);
   }
 
-  printf ("\nEDK II UNIX Host Emulation Environment from edk2.sourceforge.net\n");
+  printf ("\nEDK II UNIX Host Emulation Environment from http://www.tianocore.org/edk2/\n");
 
   setbuf (stdout, 0);
   setbuf (stderr, 0);
