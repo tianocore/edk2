@@ -27,7 +27,7 @@ Descriptions of section entries:
 
 EDK II
 ------
-W: http://tianocore.github.io/edk2/
+W: http://www.tianocore.org/edk2/
 L: https://lists.sourceforge.net/lists/listinfo/edk2-devel
 T: git - https://github.com/tianocore/edk2.git
 T: git - https://bitbucket.org/tianocore/edk2.git
@@ -41,7 +41,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/Security
 EDK II Releases:
 ----------------
 UDK2014
-W: http://tianocore.github.io/udk2014/
+W: http://www.tianocore.org/udk2014/
 S: Supported
 
 EDK II Packages:
@@ -141,7 +141,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/OptionRomPkg
 M: Ruiyu Ni <ruiyu.ni@intel.com>
 
 OvmfPkg
-W: http://tianocore.github.io/ovmf/
+W: http://www.tianocore.org/ovmf/
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Laszlo Ersek <lersek@redhat.com>
 S: Maintained
