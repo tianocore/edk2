@@ -3,7 +3,7 @@
   initialized.  PEIMs that must execute after TPM hardware initialization
   may use this GUID in their dependency expressions.
     
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -26,5 +26,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   }
 
 extern EFI_GUID gPeiTpmInitializedPpiGuid;
+
+///
+/// Global ID for the PEI_TPM_INITIALIZATION_DONE_PPI which always uses a NULL interface. 
+///
+#define PEI_TPM_INITIALIZATION_DONE_PPI_GUID \
+  { \
+    0xa030d115, 0x54dd, 0x447b, { 0x90, 0x64, 0xf2, 0x6, 0x88, 0x3d, 0x7c, 0xcc \
+  }
+
+extern EFI_GUID gPeiTpmInitializationDonePpiGuid;
 
 #endif
