@@ -701,6 +701,12 @@
   # @Prompt HwErr variable storage size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x0000|UINT32|0x30000006
 
+  ## Reclaim variable space at EndOfDxe.<BR><BR>
+  # The value is FALSE as default for compatibility that variable driver tries to reclaim variable space at ReadyToBoot event.<BR>
+  # If the value is set to TRUE, variable driver tries to reclaim variable space at EndOfDxe event.<BR>
+  # @Prompt Reclaim variable space at EndOfDxe.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe|FALSE|BOOLEAN|0x30000008
+
   ## The size of volatile buffer. This buffer is used to store VOLATILE attribute variables.
   # @Prompt Variable storage size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
