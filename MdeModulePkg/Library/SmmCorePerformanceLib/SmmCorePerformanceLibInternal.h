@@ -35,7 +35,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/SmmMemLib.h>
 
 #include <Protocol/SmmBase2.h>
-#include <Protocol/SmmAccess2.h>
 
 //
 // Interface declarations for SMM PerformanceEx Protocol.

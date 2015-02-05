@@ -28,7 +28,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmVariable.h>
 #include <Protocol/SmmFirmwareVolumeBlock.h>
 #include <Protocol/SmmFaultTolerantWrite.h>
-#include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmEndOfDxe.h>
 #include <Protocol/SmmVarCheck.h>
 
