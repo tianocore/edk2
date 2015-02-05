@@ -424,6 +424,12 @@ DxeLoadCore (
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "FSP HOB is located at 0x%08X\n", HobList));
 
   //
+  // End of PEI phase signal
+  //
+  Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
+  ASSERT_EFI_ERROR (Status);
+
+  //
   // Give control back to bootloader after FspInit
   //
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "FSP is waiting for NOTIFY\n"));
@@ -434,11 +440,6 @@ DxeLoadCore (
   //
   FspWaitForNotify ();
 
-  //
-  // End of PEI phase signal
-  //
-  Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Give control back to the boot loader framework caller
