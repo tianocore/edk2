@@ -1,7 +1,7 @@
 /** @file
   RTC Architectural Protocol GUID as defined in DxeCis 0.96.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -955,8 +955,8 @@ RtcTimeFieldsValid (
   IN EFI_TIME *Time
   )
 {
-  if (Time->Year < 1998 ||
-      Time->Year > 2099 ||
+  if (Time->Year < PcdGet16 (PcdMinimalValidYear) ||
+      Time->Year > PcdGet16 (PcdMaximalValidYear) ||
       Time->Month < 1 ||
       Time->Month > 12 ||
       (!DayValid (Time)) ||
