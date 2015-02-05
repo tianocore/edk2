@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Tcp4Dxe driver.
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -256,6 +256,7 @@ UpdateName (
   // Format the child name into the string buffer as:
   // TCPv4 (SrcPort=59, DestPort=60, ActiveFlag=TRUE)
   //
+  ZeroMem (&Tcp4ConfigData, sizeof (Tcp4ConfigData));
   Status = Tcp4->GetModeData (Tcp4, NULL, &Tcp4ConfigData, NULL, NULL, NULL);
   if (!EFI_ERROR (Status)) {
     UnicodeSPrint (HandleName, sizeof (HandleName),
@@ -264,7 +265,7 @@ UpdateName (
       Tcp4ConfigData.AccessPoint.RemotePort,
       (Tcp4ConfigData.AccessPoint.ActiveFlag ? L"TRUE" : L"FALSE")
       );
-  } if (Status == EFI_NOT_STARTED) {
+  } else if (Status == EFI_NOT_STARTED) {
     UnicodeSPrint (
       HandleName,
       sizeof (HandleName),
