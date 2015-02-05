@@ -5,7 +5,7 @@ The Open Virtual Machine Firmware (OVMF) project aims
 to support firmware for Virtual Machines using the edk2
 code base.  More information can be found at:
 
-http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=OVMF
+http://www.tianocore.org/ovmf/
 
 === STATUS ===
 
@@ -55,7 +55,7 @@ these binary outputs:
 
 More information on building OVMF can be found at:
 
-http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVMF
+https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
 
 === RUNNING OVMF on QEMU ===
 

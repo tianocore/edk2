@@ -134,7 +134,7 @@ shown below.
 One sub-component of the OVMF project is a FAT filesystem driver.  The FAT
 filesystem driver code is also BSD licensed, but the code license contains
 one additional term.  This license can be found at
-http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Edk2-fat-driver,
+https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
 and a copy is shown below (following the normal BSD license).
 
 === BSD license: START ===
