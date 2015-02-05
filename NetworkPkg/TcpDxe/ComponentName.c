@@ -2,7 +2,7 @@
   Implementation of protocols EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -253,6 +253,7 @@ UpdateTcp4Name (
   // Format the child name into the string buffer as:
   // TCPv4 (SrcPort=59, DestPort=60, ActiveFlag=TRUE)
   //
+  ZeroMem (&Tcp4ConfigData, sizeof (Tcp4ConfigData));
   Status = Tcp4->GetModeData (Tcp4, NULL, &Tcp4ConfigData, NULL, NULL, NULL);
   if (!EFI_ERROR (Status)) {
     UnicodeSPrint (HandleName, sizeof (HandleName),
@@ -261,7 +262,7 @@ UpdateTcp4Name (
       Tcp4ConfigData.AccessPoint.RemotePort,
       (Tcp4ConfigData.AccessPoint.ActiveFlag ? L"TRUE" : L"FALSE")
       );
-  } if (Status == EFI_NOT_STARTED) {
+  } else if (Status == EFI_NOT_STARTED) {
     UnicodeSPrint (
       HandleName,
       sizeof (HandleName),
@@ -322,6 +323,7 @@ UpdateTcp6Name (
   //
   // Format the child name into the string buffer.
   //
+  ZeroMem (&Tcp6ConfigData, sizeof (Tcp6ConfigData));
   Status = Tcp6->GetModeData (Tcp6, NULL, &Tcp6ConfigData, NULL, NULL, NULL);
   if (!EFI_ERROR (Status)) {
     UnicodeSPrint (HandleName, sizeof (HandleName),
