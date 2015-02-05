@@ -79,7 +79,6 @@
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
-  gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
   
   ## PRODUCES
   ## UNDEFINED     # SmiHandlerRegister
