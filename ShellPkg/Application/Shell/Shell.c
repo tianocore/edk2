@@ -123,7 +123,7 @@ FindNextInstance(
   Temp = StrStr(SourceString, FindString);
 
   //
-  // If nothing found, or we dont care about escape characters
+  // If nothing found, or we don't care about escape characters
   //
   if (Temp == NULL || !CheckForEscapeCharacter) {
     return (Temp);
@@ -143,7 +143,7 @@ FindNextInstance(
 }
 
 /**
-  Check whether the string between a pair of % is a valid envifronment variable name.
+  Check whether the string between a pair of % is a valid environment variable name.
 
   @param[in] BeginPercent       pointer to the first percent.
   @param[in] EndPercent          pointer to the last percent.
@@ -245,7 +245,7 @@ ContainsSplit(
   feature's enabled state was not known when the shell initially launched.
 
   @retval EFI_SUCCESS           The feature is enabled.
-  @retval EFI_OUT_OF_RESOURCES  There is not enough mnemory available.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough memory available.
 **/
 EFI_STATUS
 EFIAPI
@@ -684,7 +684,7 @@ FreeResources:
 /**
   Sets all the alias' that were registered with the ShellCommandLib library.
 
-  @retval EFI_SUCCESS           all init commands were run sucessfully.
+  @retval EFI_SUCCESS           all init commands were run successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -769,10 +769,10 @@ IsScriptOnlyCommand(
   loaded image protocol installed on it.  The FilePath will point to the device path
   for the file that was loaded.
 
-  @param[in, out] DevPath       On a sucessful return the device path to the loaded image.
-  @param[in, out] FilePath      On a sucessful return the device path to the file.
+  @param[in, out] DevPath       On a successful return the device path to the loaded image.
+  @param[in, out] FilePath      On a successful return the device path to the file.
 
-  @retval EFI_SUCCESS           The 2 device paths were sucessfully returned.
+  @retval EFI_SUCCESS           The 2 device paths were successfully returned.
   @retval other                 A error from gBS->HandleProtocol.
 
   @sa HandleProtocol
@@ -979,7 +979,7 @@ ProcessCommandLine(
                                    ) == 0) {
       ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit         = TRUE;
     } else if (StrnCmp (L"-", CurrentArg, 1) == 0) {
-      // Unrecognised option
+      // Unrecognized option
       ShellPrintHiiEx(-1, -1, NULL,
         STRING_TOKEN (STR_GEN_PROBLEM),
         ShellInfoObject.HiiHandle,
@@ -1167,7 +1167,7 @@ DoStartupScript(
     FileStringPath = ShellFindFilePath(mStartupScript);
     if (FileStringPath == NULL) {
       //
-      // we return success since we dont need to have a startup script
+      // we return success since we don't need to have a startup script
       //
       Status = EFI_SUCCESS;
       ASSERT(FileHandle == NULL);
@@ -1349,7 +1349,7 @@ StripUnreplacedEnvironmentVariables(
     SecondPercent = FirstPercent!=NULL?FindNextInstance(FirstPercent+1, L"%", TRUE):NULL;
     if (FirstPercent == NULL || SecondPercent == NULL) {
       //
-      // If we ever dont have 2 % we are done.
+      // If we ever don't have 2 % we are done.
       //
       break;
     }
@@ -1381,7 +1381,7 @@ StripUnreplacedEnvironmentVariables(
         //
         CopyMem(FirstPercent, SecondPercent + 1, StrSize(SecondPercent + 1));
         //
-        // dont need to update the locator.  both % characters are gone.
+        // don't need to update the locator.  both % characters are gone.
         //
       } else {
         CurrentLocator = SecondPercent + 1;
@@ -1401,7 +1401,7 @@ StripUnreplacedEnvironmentVariables(
 
   @param[in] OriginalCommandLine    The original command line
 
-  @retval NULL                      An error ocurred.
+  @retval NULL                      An error occurred.
   @return                           The new command line with no environment variables present.
 **/
 CHAR16*
@@ -1442,7 +1442,7 @@ ShellConvertVariables (
         ;  Temp = StrStr(Temp+1, AliasListNode->Alias)
        ){
         //
-        // we need a preceeding and if there is space no ^ preceeding (if no space ignore)
+        // we need a preceding and if there is space no ^ preceding (if no space ignore)
         //
         if ((((Temp-OriginalCommandLine)>2) && *(Temp-2) != L'^') || ((Temp-OriginalCommandLine)<=2)) {
           NewSize += StrSize(AliasListNode->CommandString);
@@ -1463,7 +1463,7 @@ ShellConvertVariables (
       ;  Temp = StrStr(Temp+1, MasterEnvList)
      ){
       //
-      // we need a preceeding and following % and if there is space no ^ preceeding (if no space ignore)
+      // we need a preceding and following % and if there is space no ^ preceding (if no space ignore)
       //
       if (*(Temp-1) == L'%' && *(Temp+StrLen(MasterEnvList)) == L'%' &&
         ((((Temp-OriginalCommandLine)>2) && *(Temp-2) != L'^') || ((Temp-OriginalCommandLine)<=2))) {
@@ -1505,7 +1505,7 @@ ShellConvertVariables (
   }
 
   //
-  // Remove non-existant environment variables
+  // Remove non-existent environment variables
   //
   StripUnreplacedEnvironmentVariables(NewCommandLine1);
 
@@ -1902,7 +1902,7 @@ VerifySplit(
   @param[in] CmdLine    pointer to the command line to process
 
   @retval EFI_SUCCESS   The operation was successful
-  @return               an error occured.
+  @return               an error occurred.
 **/
 EFI_STATUS
 EFIAPI
@@ -2058,7 +2058,7 @@ SetLastError(
 
   @retval EFI_SUCCESS           The operation was successful
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
-  @return                       some other error occured
+  @return                       some other error occurred
 **/
 EFI_STATUS
 EFIAPI
@@ -2103,7 +2103,7 @@ ProcessCommandLineToFinal(
 /**
   Run an internal shell command.
 
-  This API will upadate the shell's environment since these commands are libraries.
+  This API will update the shell's environment since these commands are libraries.
   
   @param[in] CmdLine          the command line to run.
   @param[in] FirstParameter   the first parameter on the command line
@@ -2181,13 +2181,13 @@ RunInternalCommand(
   }
 
   //
-  // This is guarenteed to be called after UpdateArgcArgv no matter what else happened.
+  // This is guaranteed to be called after UpdateArgcArgv no matter what else happened.
   // This is safe even if the update API failed.  In this case, it may be a no-op.
   //
   RestoreArgcArgv(ParamProtocol, &Argv, &Argc);
 
   //
-  // If a script is running and the command is not a scipt only command, then
+  // If a script is running and the command is not a script only command, then
   // change return value to success so the script won't halt (unless aborted).
   //
   // Script only commands have to be able halt the script since the script will
@@ -2425,7 +2425,7 @@ RunCommand(
   // NULL out comments (leveraged from RunScriptFileHandle() ).
   // The # character on a line is used to denote that all characters on the same line
   // and to the right of the # are to be ignored by the shell.
-  // Afterward, again remove spaces, in case any were between the last command-parameter and '#'.
+  // Afterwards, again remove spaces, in case any were between the last command-parameter and '#'.
   //
   for (TempWalker = CleanOriginal; TempWalker != NULL && *TempWalker != CHAR_NULL; TempWalker++) {
     if (*TempWalker == L'^') {
@@ -2454,7 +2454,7 @@ RunCommand(
   }
 
   //
-  // We dont do normal processing with a split command line (output from one command input to another)
+  // We don't do normal processing with a split command line (output from one command input to another)
   //
   if (ContainsSplit(CleanOriginal)) {
     Status = ProcessNewSplitCommandLine(CleanOriginal);
@@ -2505,7 +2505,7 @@ RunCommand(
 
 STATIC CONST UINT16 InvalidChars[] = {L'*', L'?', L'<', L'>', L'\\', L'/', L'\"', 0x0001, 0x0002};
 /**
-  Function determins if the CommandName COULD be a valid command.  It does not determine whether
+  Function determines if the CommandName COULD be a valid command.  It does not determine whether
   this is a valid command.  It only checks for invalid characters.
 
   @param[in] CommandName    The name to check
@@ -2541,7 +2541,7 @@ IsValidCommandName(
   @param[in] Handle             The handle to the already opened file.
   @param[in] Name               The name of the script file.
 
-  @retval EFI_SUCCESS           the script completed sucessfully
+  @retval EFI_SUCCESS           the script completed successfully
 **/
 EFI_STATUS
 EFIAPI
@@ -2837,7 +2837,7 @@ RunScriptFileHandle (
   @param[in] CmdLine            the command line to run.
   @param[in] ParamProtocol      the shell parameters protocol pointer
 
-  @retval EFI_SUCCESS           the script completed sucessfully
+  @retval EFI_SUCCESS           the script completed successfully
 **/
 EFI_STATUS
 EFIAPI
@@ -2885,7 +2885,7 @@ RunScriptFile (
   }
 
   //
-  // This is guarenteed to be called after UpdateArgcArgv no matter what else happened.
+  // This is guaranteed to be called after UpdateArgcArgv no matter what else happened.
   // This is safe even if the update API failed.  In this case, it may be a no-op.
   //
   RestoreArgcArgv(ParamProtocol, &Argv, &Argc);
@@ -2894,7 +2894,7 @@ RunScriptFile (
 }
 
 /**
-  Return the pointer to the first occurance of any character from a list of characters.
+  Return the pointer to the first occurrence of any character from a list of characters.
 
   @param[in] String           the string to parse
   @param[in] CharacterList    the list of character to look for
