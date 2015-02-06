@@ -49,4 +49,4 @@
   MemoryAllocationLib
 
 [Protocols]
-  gEfiSmmAccess2ProtocolGuid
+  gEfiSmmAccess2ProtocolGuid    ## SOMETIMES_CONSUMES
