@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from INF statement
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
 #
 #  This program and the accompanying materials
@@ -32,6 +32,7 @@ from Common.String import *
 from Common.Misc import PathClass
 from Common.Misc import GuidStructureByteArrayToGuidString
 from Common.Misc import ProcessDuplicatedInf
+from Common.Misc import GetVariableOffset
 from Common import EdkLogger
 from Common.BuildToolError import *
 from GuidSection import GuidSection
@@ -988,47 +989,9 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #   @retval RetValue              A list contain offset of UNI/INF object.
     #    
     def __GetBuildOutputMapFileVfrUniInfo(self, VfrUniBaseName):
-        
-        RetValue = []
-        
         MapFileName = os.path.join(self.EfiOutputPath, self.BaseName + ".map")
-        try:
-            fInputfile = open(MapFileName, "r", 0)
-            try:
-                FileLinesList = fInputfile.readlines()
-            except:
-                EdkLogger.error("GenFds", FILE_READ_FAILURE, "File read failed for %s" %MapFileName,None)
-            finally:
-                fInputfile.close()
-        except:
-            EdkLogger.error("GenFds", FILE_OPEN_FAILURE, "File open failed for %s" %MapFileName,None)
-        
-        IsHex = False
-        for eachLine in FileLinesList:
-            for eachName in VfrUniBaseName.values():
-                if eachLine.find(eachName) != -1:
-                    eachLine = eachLine.strip()
-                    Element  = eachLine.split()
-                    #
-                    # MSFT/ICC/EBC map file
-                    #
-                    if (len(Element) == 4):
-                        try:
-                            int (Element[2], 16)
-                            IsHex = True
-                        except:
-                            IsHex = False
-                    
-                        if IsHex:
-                            RetValue.append((eachName, Element[2]))
-                            IsHex = False
-                    #
-                    # GCC map file
-                    #
-                    elif (len(Element) == 2) and Element[0].startswith("0x"):
-                        RetValue.append((eachName, Element[0]))
-        
-        return RetValue
+        EfiFileName = os.path.join(self.EfiOutputPath, self.BaseName + ".efi")
+        return GetVariableOffset(MapFileName, EfiFileName, VfrUniBaseName.values())
     
     ## __GenUniVfrOffsetFile() method
     #
