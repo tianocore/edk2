@@ -1606,6 +1606,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014
 
   ## This flag is used to control build time optimization based on debug print level.
+  #  Its default value is 0xFFFFFFFF to expose all debug print level.
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
   #  BIT2  - Load Event message.<BR>
@@ -1624,10 +1625,9 @@
   #  BIT20 - Global Coherency Database changes message.<BR>
   #  BIT21 - Memory range cachability changes message.<BR>
   #  BIT22 - Detailed debug message.<BR>
-  #  BIT28 - Error message.<BR>
+  #  BIT31 - Error message.<BR>
   # @Prompt Fixed Debug Message Print Level.
-  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel & 0x7F84AA00) == 0
-  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel|0x80000000|UINT32|0x30001016
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel|0xFFFFFFFF|UINT32|0x30001016
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Indicates the maximum length of unicode string used in the following
@@ -1693,7 +1693,7 @@
   #  BIT20 - Global Coherency Database changes message.<BR>
   #  BIT21 - Memory range cachability changes message.<BR>
   #  BIT22 - Detailed debug message.<BR>
-  #  BIT28 - Error message.<BR>
+  #  BIT31 - Error message.<BR>
   # @Prompt Debug Message Print Level.
   # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel & 0x7F84AA00) == 0
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
