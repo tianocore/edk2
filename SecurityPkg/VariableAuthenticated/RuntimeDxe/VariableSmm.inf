@@ -72,6 +72,7 @@
   BaseCryptLib
   PlatformSecureLib
   HobLib
+  SmmMemLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
