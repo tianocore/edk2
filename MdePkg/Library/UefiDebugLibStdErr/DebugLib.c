@@ -1,7 +1,7 @@
 /** @file
   UEFI Debug Lib that sends messages to the Standard Error Device in the EFI System Table.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -257,4 +257,22 @@ DebugClearMemoryEnabled (
   )
 {
   return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+}
+
+/**
+  Returns TRUE if any one of the bit is set both in ErrorLevel and PcdFixedDebugPrintErrorLevel.
+
+  This function compares the bit mask of ErrorLevel and PcdFixedDebugPrintErrorLevel.
+
+  @retval  TRUE    Current ErrorLevel is supported.
+  @retval  FALSE   Current ErrorLevel is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DebugPrintLevelEnabled (
+  IN  CONST UINTN        ErrorLevel
+  )
+{
+  return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
 }
