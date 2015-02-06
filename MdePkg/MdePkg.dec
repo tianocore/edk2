@@ -235,6 +235,10 @@
   #                  Only available to SMM/DXE Combined and SMM module types.
   SmmServicesTableLib|Include/Library/SmmServicesTableLib.h
 
+  ##  @libraryclass  Provides services for Smm Memory Operation.
+  #
+  SmmMemLib|Include/Library/SmmMemLib.h
+
   ##  @libraryclass  Provides services to enable/disable periodic SMI handlers.
   #
   SmmPeriodicSmiLib|Include/Library/SmmPeriodicSmiLib.h

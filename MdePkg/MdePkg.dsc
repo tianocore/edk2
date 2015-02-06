@@ -150,6 +150,7 @@
   MdePkg/Library/BaseS3PciLib/BaseS3PciLib.inf
   MdePkg/Library/BaseS3SmbusLib/BaseS3SmbusLib.inf
   MdePkg/Library/BaseS3StallLib/BaseS3StallLib.inf
+  MdePkg/Library/SmmMemLib/SmmMemLib.inf
 
 [Components.IPF]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
