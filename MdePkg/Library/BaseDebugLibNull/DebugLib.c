@@ -1,7 +1,7 @@
 /** @file
   Null Base Debug Library instance with empty functions.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -177,3 +177,22 @@ DebugClearMemoryEnabled (
 {
   return FALSE;
 }
+
+/**
+  Returns TRUE if any one of the bit is set both in ErrorLevel and PcdFixedDebugPrintErrorLevel.
+
+  This function compares the bit mask of ErrorLevel and PcdFixedDebugPrintErrorLevel.
+
+  @retval  TRUE    Current ErrorLevel is supported.
+  @retval  FALSE   Current ErrorLevel is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DebugPrintLevelEnabled (
+  IN  CONST UINTN        ErrorLevel
+  )
+{
+  return FALSE;
+}
+
