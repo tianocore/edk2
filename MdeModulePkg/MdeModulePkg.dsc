@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI Reference Module Package for All Architectures
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -127,6 +127,7 @@
   MemoryAllocationLib|MdeModulePkg/Library/PiSmmCoreMemoryAllocationLib/PiSmmCoreMemoryAllocationLib.inf
   SmmServicesTableLib|MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
   SmmCorePlatformHookLib|MdeModulePkg/Library/SmmCorePlatformHookLibNull/SmmCorePlatformHookLibNull.inf  
+  SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -134,6 +135,7 @@
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
+  SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf

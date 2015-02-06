@@ -43,7 +43,7 @@
   Caution: This module requires additional review when modified.
   This driver need to make sure the CommBuffer is not in the SMRAM range. 
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -56,6 +56,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiSmm.h>
 #include <Library/SmmServicesTableLib.h>
+#include <Library/SmmMemLib.h>
 #include <Protocol/SmmSwapAddressRange.h>
 #include "FaultTolerantWrite.h"
 #include "FaultTolerantWriteSmmCommon.h"
@@ -64,67 +65,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_EVENT                                 mFvbRegistration = NULL;
 EFI_FTW_DEVICE                            *mFtwDevice      = NULL;
-EFI_SMRAM_DESCRIPTOR                      *mSmramRanges;
-UINTN                                     mSmramRangeCount;
 
 ///
 /// The flag to indicate whether the platform has left the DXE phase of execution.
 ///
 BOOLEAN                                   mEndOfDxe = FALSE;
-
-/**
-  This function check if the address is in SMRAM.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is in SMRAM.
-  @retval FALSE this address is NOT in SMRAM.
-**/
-BOOLEAN
-InternalIsAddressInSmram (
-  IN EFI_PHYSICAL_ADDRESS  Buffer,
-  IN UINT64                Length
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < mSmramRangeCount; Index ++) {
-    if (((Buffer >= mSmramRanges[Index].CpuStart) && (Buffer < mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize)) ||
-        ((mSmramRanges[Index].CpuStart >= Buffer) && (mSmramRanges[Index].CpuStart < Buffer + Length))) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  This function check if the address refered by Buffer and Length is valid.
-
-  @param Buffer  the buffer address to be checked.
-  @param Length  the buffer length to be checked.
-
-  @retval TRUE  this address is valid.
-  @retval FALSE this address is NOT valid.
-**/
-BOOLEAN
-InternalIsAddressValid (
-  IN UINTN                 Buffer,
-  IN UINTN                 Length
-  )
-{
-  if (Buffer > (MAX_ADDRESS - Length)) {
-    //
-    // Overflow happen
-    //
-    return FALSE;
-  }
-  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)Buffer, (UINT64)Length)) {
-    return FALSE;
-  }
-  return TRUE;
-}
 
 /**
   Retrive the SMM FVB protocol interface by HANDLE.
@@ -391,7 +336,7 @@ SmmFaultTolerantWriteHandler (
   }
   CommBufferPayloadSize = TempCommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE;
 
-  if (!InternalIsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmFtwHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
@@ -670,8 +615,6 @@ SmmFaultTolerantWriteInitialize (
   )
 {
   EFI_STATUS                              Status;
-  EFI_SMM_ACCESS2_PROTOCOL                *SmmAccess;
-  UINTN                                   Size;
   VOID                                    *SmmEndOfDxeRegistration;
 
   //
@@ -681,28 +624,6 @@ SmmFaultTolerantWriteInitialize (
   if (EFI_ERROR(Status)) {
     return Status;
   }
-
-  //
-  // Get SMRAM information
-  //
-  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **)&SmmAccess);
-  ASSERT_EFI_ERROR (Status);
-
-  Size = 0;
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-  Status = gSmst->SmmAllocatePool (
-                    EfiRuntimeServicesData,
-                    Size,
-                    (VOID **)&mSmramRanges
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmramRanges);
-  ASSERT_EFI_ERROR (Status);
-
-  mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
 
   //
   // Register EFI_SMM_END_OF_DXE_PROTOCOL_GUID notify function.

@@ -4,7 +4,7 @@
   This header file borrows the PiSmmCore Memory Allocation services as the primitive
   for memory allocation. 
 
-  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -17,6 +17,39 @@
 
 #ifndef _PI_SMM_CORE_MEMORY_ALLOCATION_SERVICES_H_
 #define _PI_SMM_CORE_MEMORY_ALLOCATION_SERVICES_H_
+
+typedef struct {
+  UINTN                           Signature;
+  ///
+  /// The ImageHandle passed into the entry point of the SMM IPL.  This ImageHandle
+  /// is used by the SMM Core to fill in the ParentImageHandle field of the Loaded
+  /// Image Protocol for each SMM Driver that is dispatched by the SMM Core.
+  ///
+  EFI_HANDLE                      SmmIplImageHandle;
+  ///
+  /// The number of SMRAM ranges passed from the SMM IPL to the SMM Core.  The SMM
+  /// Core uses these ranges of SMRAM to initialize the SMM Core memory manager.
+  ///
+  UINTN                           SmramRangeCount;
+  ///
+  /// A table of SMRAM ranges passed from the SMM IPL to the SMM Core.  The SMM
+  /// Core uses these ranges of SMRAM to initialize the SMM Core memory manager.
+  ///
+  EFI_SMRAM_DESCRIPTOR            *SmramRanges;
+} SMM_CORE_PRIVATE_DATA;
+
+/**
+  Called to initialize the memory service.
+
+  @param   SmramRangeCount       Number of SMRAM Regions
+  @param   SmramRanges           Pointer to SMRAM Descriptors
+
+**/
+VOID
+SmmInitializeMemoryServices (
+  IN UINTN                 SmramRangeCount,
+  IN EFI_SMRAM_DESCRIPTOR  *SmramRanges
+  );
 
 /**
   Allocates pages from the memory map.
