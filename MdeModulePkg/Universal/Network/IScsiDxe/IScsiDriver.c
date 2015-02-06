@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -277,6 +277,30 @@ IScsiDriverBindingStart (
   }
 
   //
+  // ISCSI children should share the default Tcp child, just open the default Tcp child via BY_CHILD_CONTROLLER.
+  //
+  Status = gBS->OpenProtocol (
+                  Private->ChildHandle, /// Default Tcp child
+                  &gEfiTcp4ProtocolGuid,
+                  &Interface,
+                  This->DriverBindingHandle,
+                  Private->ExtScsiPassThruHandle,
+                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  );              
+  if (EFI_ERROR (Status)) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           Private->ExtScsiPassThruHandle,
+           &gEfiExtScsiPassThruProtocolGuid,
+           &Private->IScsiExtScsiPassThru,
+           &gEfiDevicePathProtocolGuid,
+           Private->DevicePath,
+           NULL
+           );
+    
+    goto ON_ERROR;
+  }
+
+  //
   // Update/Publish the iSCSI Boot Firmware Table.
   //
   IScsiPublishIbft ();
@@ -356,6 +380,13 @@ IScsiDriverBindingStop (
     // the protocol here but not uninstall the device path protocol and
     // EXT SCSI PASS THRU protocol installed on ExtScsiPassThruHandle.
     //
+    gBS->CloseProtocol (
+           Private->ChildHandle,
+           &gEfiTcp4ProtocolGuid,
+           Private->Image,
+           Private->ExtScsiPassThruHandle
+           );
+    
     gBS->CloseProtocol (
           Conn->Tcp4Io.Handle,
           &gEfiTcp4ProtocolGuid,
