@@ -60,7 +60,6 @@
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid                  ## CONSUMES
-  gEfiSmmAccess2ProtocolGuid                ## CONSUMES
 
 [Guids]
   ## PRODUCES ## UNDEFINED # Install protocol

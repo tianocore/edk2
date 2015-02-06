@@ -72,7 +72,6 @@
   ## PRODUCES
   ## UNDEFINED # SmiHandlerRegister
   gEfiSmmFaultTolerantWriteProtocolGuid
-  gEfiSmmAccess2ProtocolGuid                       ## CONSUMES
   gEfiSmmEndOfDxeProtocolGuid                      ## CONSUMES
 
 [FeaturePcd]

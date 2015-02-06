@@ -35,7 +35,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCommunication.h>
-#include <Protocol/SmmAccess2.h>
 #include <Protocol/LockBox.h>
 #include <Guid/SmmLockBox.h>
 

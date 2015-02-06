@@ -54,7 +54,6 @@
 
 [Protocols]
   gEfiSmmRscHandlerProtocolGuid                 ## CONSUMES
-  gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## UNDEFINED # SaveLockBox

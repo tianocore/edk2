@@ -72,7 +72,6 @@
   ## PRODUCES
   ## UNDEFINED # SmiHandlerRegister
   gEfiSmmVariableProtocolGuid
-  gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
   gEfiSmmEndOfDxeProtocolGuid                   ## CONSUMES
 
 [Guids]

@@ -25,7 +25,6 @@
 #include <PiSmm.h>
 
 #include <Protocol/SmmReportStatusCodeHandler.h>
-#include <Protocol/SmmAccess2.h>
 
 #include <Guid/FirmwarePerformance.h>
 

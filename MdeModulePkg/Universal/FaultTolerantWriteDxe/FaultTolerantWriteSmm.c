@@ -60,7 +60,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmSwapAddressRange.h>
 #include "FaultTolerantWrite.h"
 #include "FaultTolerantWriteSmmCommon.h"
-#include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmEndOfDxe.h>
 
 EFI_EVENT                                 mFvbRegistration = NULL;
