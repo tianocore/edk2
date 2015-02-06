@@ -1989,7 +1989,6 @@ DoHelpUpdate(
 {
   CHAR16 *CurrentParameter;
   CHAR16 *Walker;
-  CHAR16 *LastWalker;
   CHAR16 *NewCommandLine;
   EFI_STATUS Status;
 
@@ -2002,11 +2001,10 @@ DoHelpUpdate(
 
   Walker = *CmdLine;
   while(Walker != NULL && *Walker != CHAR_NULL) {
-    LastWalker = Walker;
     if (!EFI_ERROR(GetNextParameter(&Walker, &CurrentParameter, StrSize(*CmdLine)))) {
       if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
-        LastWalker[0] = L' ';
-        LastWalker[1] = L' ';
+        CurrentParameter[0] = L' ';
+        CurrentParameter[1] = L' ';
         NewCommandLine = AllocateZeroPool(StrSize(L"help ") + StrSize(*CmdLine));
         if (NewCommandLine == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
