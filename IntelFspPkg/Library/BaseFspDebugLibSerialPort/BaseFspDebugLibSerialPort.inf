@@ -47,4 +47,5 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue       ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel   ## CONSUMES
 
