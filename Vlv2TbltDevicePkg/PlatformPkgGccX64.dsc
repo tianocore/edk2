@@ -379,6 +379,7 @@
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
 
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   !if $(TARGET) != RELEASE
@@ -396,6 +397,7 @@
   SmmServicesTableLib|MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
   SmmCorePlatformHookLib|MdeModulePkg/Library/SmmCorePlatformHookLibNull/SmmCorePlatformHookLibNull.inf
+  SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
 
 !if $(TPM_ENABLED) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
