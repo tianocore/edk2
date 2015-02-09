@@ -6,7 +6,7 @@
 # If SVN is available, the tool will obtain the current checked out version of
 # the source tree for including the the --version commands.
 
-#  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -32,8 +32,8 @@ from types import IntType, ListType
 SYS_ENV_ERR = "ERROR : %s system environment variable must be set prior to running this tool.\n"
 
 __execname__ = "UpdateBuildVersions.py"
-SVN_REVISION = "$Revision: 3 $"
-SVN_REVISION = SVN_REVISION.replace("$Revision:", "").replace("$", "").strip()
+SVN_REVISION = "$LastChangedRevision: 3 $"
+SVN_REVISION = SVN_REVISION.replace("$LastChangedRevision:", "").replace("$", "").strip()
 __copyright__ = "Copyright (c) 2014, Intel Corporation. All rights reserved."
 VERSION_NUMBER = "0.7.0"
 __version__ = "Version %s.%s" % (VERSION_NUMBER, SVN_REVISION)

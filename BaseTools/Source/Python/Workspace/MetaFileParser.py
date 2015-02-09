@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse meta files
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1338,18 +1338,6 @@ class DscParser(MetaFileParser):
             self._SubsectionType = MODEL_UNKNOWN
 
     def __RetrievePcdValue(self):
-        Records = self._RawTable.Query(MODEL_PCD_FEATURE_FLAG, BelongsToItem= -1.0)
-        for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, ID, Line in Records:
-            Name = TokenSpaceGuid + '.' + PcdName
-            ValList, Valid, Index = AnalyzeDscPcd(Value, MODEL_PCD_FEATURE_FLAG)
-            self._Symbols[Name] = ValList[Index]
-
-        Records = self._RawTable.Query(MODEL_PCD_FIXED_AT_BUILD, BelongsToItem= -1.0)
-        for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, ID, Line in Records:
-            Name = TokenSpaceGuid + '.' + PcdName
-            ValList, Valid, Index = AnalyzeDscPcd(Value, MODEL_PCD_FIXED_AT_BUILD)
-            self._Symbols[Name] = ValList[Index]
-
         Content = open(str(self.MetaFile), 'r').readlines()
         GlobalData.gPlatformOtherPcds['DSCFILE'] = str(self.MetaFile)
         for PcdType in (MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_HII,
@@ -1542,7 +1530,9 @@ class DscParser(MetaFileParser):
         if ValList[Index] == 'False':
             ValList[Index] = '0'
 
-        GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
+        if (not self._DirectiveEvalStack) or (False not in self._DirectiveEvalStack):
+            GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
+            self._Symbols[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
         self._ValueList[2] = '|'.join(ValList)
 
     def __ProcessComponent(self):
