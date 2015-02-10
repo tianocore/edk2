@@ -252,13 +252,15 @@ DebugPrintLevelEnabled (
 
   This macro calls DebugPrint() passing in the debug error level, a format 
   string, and a variable argument list.
+  __VA_ARGS__ is not supported by ECB compiler, Microsoft Visual Studio .NET 2003
+  and Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830.
 
   @param  Expression  Expression containing an error level, a format string, 
                       and a variable argument list based on the format string.
 
 **/
 
-#if !defined(MDE_CPU_EBC)
+#if !defined(MDE_CPU_EBC) && (!defined (_MSC_VER) || _MSC_VER >= 1400)
   #define _DEBUG_PRINT(PrintLevel, ...)              \
     do {                                             \
       if (DebugPrintLevelEnabled (PrintLevel)) {     \
