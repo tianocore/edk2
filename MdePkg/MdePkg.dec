@@ -150,6 +150,9 @@
 
   ##  @libraryclass  Provide services to access I/O Ports and MMIO registers.
   IoLib|Include/Library/IoLib.h
+  
+  ##  @libraryclass  Provide services to create, get and update HSTI table in AIP protocol.
+  HstiLib|Include/Library/HstiLib.h
 
   ##  @libraryclass  Provides services to create and parse HOBs. Only available for PEI and DXE module types.
   HobLib|Include/Library/HobLib.h
