@@ -1,7 +1,7 @@
 /** @file
   Sample to provide FSP hob process related function.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -132,7 +132,7 @@ GetPeiMemSize (
 }
 
 /**
-  BIOS process FspBobList.
+  BIOS process FspBobList for Memory Resource Descriptor.
 
   @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
 
@@ -140,7 +140,7 @@ GetPeiMemSize (
 **/
 EFI_STATUS
 EFIAPI
-FspHobProcess (
+FspHobProcessForMemoryResource (
   IN VOID                 *FspHobList
   )
 {
@@ -331,9 +331,45 @@ FspHobProcess (
     }
   }
 
-  //
-  // NV Storage Hob
-  //
-
   return EFI_SUCCESS;
+}
+
+/**
+  BIOS process FspBobList for other data (not Memory Resource Descriptor).
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+  @return If platform process the FSP hob list successfully.
+**/
+EFI_STATUS
+EFIAPI
+FspHobProcessForOtherData (
+  IN VOID                 *FspHobList
+  )
+{
+  return EFI_SUCCESS;
+}
+
+/**
+  BIOS process FspBobList.
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+  @return If platform process the FSP hob list successfully.
+**/
+EFI_STATUS
+EFIAPI
+FspHobProcess (
+  IN VOID                 *FspHobList
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = FspHobProcessForMemoryResource (FspHobList);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = FspHobProcessForOtherData (FspHobList);
+
+  return Status;
 }

@@ -1,7 +1,7 @@
 /** @file
   Provide FSP API related function.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,9 +37,9 @@ FspFindFspHeader (
   @param[in] FspHeader     FSP header pointer.
   @param[in] FspInitParams Address pointer to the FSP_INIT_PARAMS structure.
 
-  @return FSP status returned by FspInit API.
+  @return EFI status returned by FspInit API.
 **/
-FSP_STATUS
+EFI_STATUS
 EFIAPI
 CallFspInit (
   IN FSP_INFO_HEADER     *FspHeader,
@@ -52,13 +52,58 @@ CallFspInit (
   @param[in] FspHeader         FSP header pointer.
   @param[in] NotifyPhaseParams Address pointer to the NOTIFY_PHASE_PARAMS structure.
 
-  @return FSP status returned by FspNotifyPhase API.
+  @return EFI status returned by FspNotifyPhase API.
 **/
-FSP_STATUS
+EFI_STATUS
 EFIAPI
 CallFspNotifyPhase (
   IN FSP_INFO_HEADER     *FspHeader,
   IN NOTIFY_PHASE_PARAMS *NotifyPhaseParams
+  );
+
+/**
+  Call FSP API - FspMemoryInit.
+
+  @param[in]     FspHeader           FSP header pointer.
+  @param[in,out] FspMemoryInitParams Address pointer to the FSP_MEMORY_INIT_PARAMS structure.
+
+  @return EFI status returned by FspMemoryInit API.
+**/
+EFI_STATUS
+EFIAPI
+CallFspMemoryInit (
+  IN FSP_INFO_HEADER            *FspHeader,
+  IN OUT FSP_MEMORY_INIT_PARAMS *FspMemoryInitParams
+  );
+
+/**
+  Call FSP API - TempRamExit.
+
+  @param[in]     FspHeader           FSP header pointer.
+  @param[in,out] TempRamExitParam    Address pointer to the TempRamExit parameters structure.
+
+  @return EFI status returned by TempRamExit API.
+**/
+EFI_STATUS
+EFIAPI
+CallTempRamExit (
+  IN FSP_INFO_HEADER            *FspHeader,
+  IN OUT VOID                   *TempRamExitParam
+  );
+
+/**
+  Call FSP API - FspSiliconInit.
+
+  @param[in]     FspHeader           FSP header pointer.
+  @param[in,out] FspSiliconInitParam Address pointer to the Silicon Init parameters structure.
+
+  @return EFI status returned by FspSiliconInit API.
+**/
+EFI_STATUS
+EFIAPI
+CallFspSiliconInit (
+  IN FSP_INFO_HEADER            *FspHeader,
+  IN OUT VOID                   *FspSiliconInitParam
   );
 
 #endif

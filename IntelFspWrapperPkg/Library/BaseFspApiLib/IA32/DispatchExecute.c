@@ -1,7 +1,7 @@
 /** @file
   Execute 32-bit code in Protected Mode.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
 #include <FspApi.h>
 
 typedef
-FSP_STATUS
-(FSPAPI *FSP_FUNCTION) (
+EFI_STATUS
+(EFIAPI *FSP_FUNCTION) (
   IN VOID *Param1
   );
 
@@ -28,16 +28,16 @@ FSP_STATUS
   @param[in] Function     The 32bit code entry to be executed.
   @param[in] Param1       The first parameter to pass to 32bit code.
 
-  @return FSP_STATUS.
+  @return EFI_STATUS.
 **/
-FSP_STATUS
+EFI_STATUS
 Execute32BitCode (
   IN UINT64      Function,
   IN UINT64      Param1
   )
 {
   FSP_FUNCTION               EntryFunc;
-  FSP_STATUS                 Status;
+  EFI_STATUS                 Status;
 
   EntryFunc = (FSP_FUNCTION) (UINTN) (Function);
   Status    = EntryFunc ((VOID *)(UINTN)Param1);

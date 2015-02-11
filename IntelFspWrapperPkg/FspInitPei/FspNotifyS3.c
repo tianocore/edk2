@@ -1,7 +1,7 @@
 /** @file
   In EndOfPei notify, it will call FspNotifyPhase API.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -58,29 +58,23 @@ S3EndOfPeiNotify (
   )
 {
   NOTIFY_PHASE_PARAMS NotifyPhaseParams;
-  FSP_STATUS          FspStatus;
+  EFI_STATUS          Status;
   FSP_INFO_HEADER     *FspHeader;
 
   FspHeader = FspFindFspHeader (PcdGet32 (PcdFlashFvFspBase));
   if (FspHeader == NULL) {
     return EFI_DEVICE_ERROR;
   }
-
+  
+  DEBUG ((DEBUG_INFO, "S3EndOfPeiNotify enter\n"));
+  
   NotifyPhaseParams.Phase = EnumInitPhaseAfterPciEnumeration;
-  FspStatus = CallFspNotifyPhase (FspHeader, &NotifyPhaseParams);
-  if (FspStatus != FSP_SUCCESS) {
-    DEBUG((DEBUG_ERROR, "FSP S3NotifyPhase AfterPciEnumeration failed, status: 0x%x\n", FspStatus));
-  } else {
-    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration Success.\n"));
-  }
+  Status = CallFspNotifyPhase (FspHeader, &NotifyPhaseParams);
+  DEBUG((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration status: 0x%x\n", Status));
 
   NotifyPhaseParams.Phase = EnumInitPhaseReadyToBoot;
-  FspStatus = CallFspNotifyPhase (FspHeader, &NotifyPhaseParams);
-  if (FspStatus != FSP_SUCCESS) {
-    DEBUG((DEBUG_ERROR, "FSP S3NotifyPhase ReadyToBoot failed, status: 0x%x\n", FspStatus));
-  } else {
-    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot Success.\n"));
-  }
+  Status = CallFspNotifyPhase (FspHeader, &NotifyPhaseParams);
+  DEBUG((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot status: 0x%x\n", Status));
 
   return EFI_SUCCESS;
 }
