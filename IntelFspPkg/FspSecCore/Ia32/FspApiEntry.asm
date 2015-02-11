@@ -1,6 +1,7 @@
-;------------------------------------------------------------------------------
+;; @file
+;  Provide FSP API entry points.
 ;
-; Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -8,12 +9,7 @@
 ;
 ; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-;
-; Abstract:
-;
-;   Provide FSP API entry points.
-;
-;------------------------------------------------------------------------------
+;;
 
     .586p
     .model  flat,C
@@ -29,11 +25,12 @@ INCLUDE    UcodeLoad.inc
 EXTERN   PcdGet32(PcdTemporaryRamBase):DWORD
 EXTERN   PcdGet32(PcdTemporaryRamSize):DWORD
 EXTERN   PcdGet32(PcdFspTemporaryRamSize):DWORD
+EXTERN   PcdGet32(PcdFspAreaSize):DWORD
 
 ;
 ; Following functions will be provided in C
 ;
-EXTERN   FspImageSizeOffset:DWORD
+
 EXTERN   SecStartup:PROC
 EXTERN   FspApiCallingCheck:PROC
 
@@ -42,11 +39,12 @@ EXTERN   FspApiCallingCheck:PROC
 ;
 EXTERN   GetFspBaseAddress:PROC
 EXTERN   GetBootFirmwareVolumeOffset:PROC
-EXTERN   PlatformTempRamInit:PROC
 EXTERN   Pei2LoaderSwitchStack:PROC
 EXTERN   FspSelfCheck(FspSelfCheckDflt):PROC
 EXTERN   PlatformBasicInit(PlatformBasicInitDflt):PROC
 EXTERN   LoadUcode(LoadUcodeDflt):PROC
+EXTERN   SecPlatformInit:PROC
+EXTERN   SecCarInit:PROC
 
 ;
 ; Define the data length that we saved on the stack top
@@ -54,6 +52,35 @@ EXTERN   LoadUcode(LoadUcodeDflt):PROC
 DATA_LEN_OF_PER0         EQU   18h
 DATA_LEN_OF_MCUD         EQU   18h
 DATA_LEN_AT_STACK_TOP    EQU   (DATA_LEN_OF_PER0 + DATA_LEN_OF_MCUD + 4)
+
+;
+; Define SSE macros
+;
+LOAD_MMX_EXT MACRO   ReturnAddress, MmxRegister
+  mov     esi, ReturnAddress
+  movd    MmxRegister, esi              ; save ReturnAddress into MM7  
+ENDM
+
+CALL_MMX_EXT MACRO   RoutineLabel, MmxRegister
+  local   ReturnAddress
+  mov     esi, offset ReturnAddress
+  movd    MmxRegister, esi              ; save ReturnAddress into MM7
+  jmp     RoutineLabel
+ReturnAddress:
+ENDM
+
+RET_ESI_EXT  MACRO   MmxRegister
+  movd    esi, MmxRegister              ; restore ESP from MM7
+  jmp     esi
+ENDM
+
+CALL_MMX MACRO   RoutineLabel
+         CALL_MMX_EXT  RoutineLabel, mm7
+ENDM
+
+RET_ESI  MACRO
+         RET_ESI_EXT   mm7  
+ENDM
 
 ;------------------------------------------------------------------------------
 FspSelfCheckDflt PROC NEAR PUBLIC
@@ -106,7 +133,7 @@ LoadUcodeDflt   PROC  NEAR PUBLIC
    ;
    ;
    ; Save return address to EBP
-   mov    ebp, eax
+   movd   ebp, mm7
 
    cmp    esp, 0
    jz     paramerror
@@ -276,6 +303,67 @@ exit:
 
 LoadUcodeDflt   ENDP
 
+EstablishStackFsp    PROC    NEAR    PRIVATE
+  ; Following is the code copied from BYTFSP, need to figure out what it is doing..
+  ;
+  ; Save parameter pointer in edx  
+  ;
+  mov       edx, dword ptr [esp + 4]  
+              
+  ;
+  ; Enable FSP STACK
+  ;
+  mov       esp, PcdGet32 (PcdTemporaryRamBase)
+  add       esp, PcdGet32 (PcdTemporaryRamSize) 
+
+  push      DATA_LEN_OF_MCUD     ; Size of the data region 
+  push      4455434Dh            ; Signature of the  data region 'MCUD'
+  push      dword ptr [edx + 12] ; Code size
+  push      dword ptr [edx + 8]  ; Code base
+  cmp       edx, 0               ; Is parameter pointer valid ?
+  jz        InvalidMicrocodeRegion
+  push      dword ptr [edx + 4]  ; Microcode size
+  push      dword ptr [edx]      ; Microcode base   
+  jmp       @F
+
+InvalidMicrocodeRegion:
+  push      0                    ; Microcode size
+  push      0                    ; Microcode base
+    
+@@:
+  ;
+  ; Save API entry/exit timestamp into stack
+  ;
+  push      DATA_LEN_OF_PER0     ; Size of the data region 
+  push      30524550h            ; Signature of the  data region 'PER0'
+  movd      eax, xmm4
+  push      eax
+  movd      eax, xmm5
+  push      eax
+  rdtsc
+  push      edx
+  push      eax
+
+  ;
+  ; Terminator for the data on stack
+  ; 
+  push      0
+
+  ;
+  ; Set ECX/EDX to the bootloader temporary memory range
+  ;
+  mov       ecx, PcdGet32 (PcdTemporaryRamBase)
+  mov       edx, ecx
+  add       edx, PcdGet32 (PcdTemporaryRamSize)
+  sub       edx, PcdGet32 (PcdFspTemporaryRamSize)
+
+  xor       eax, eax
+  
+  RET_ESI
+
+EstablishStackFsp    ENDP
+
+
 ;----------------------------------------------------------------------------
 ; TempRamInit API
 ;
@@ -299,17 +387,9 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   ; Save timestamp into XMM4 & XMM5
   ;
   rdtsc
-  SAVE_EAX
-  SAVE_EDX
-
-  ;
-  ; Check Parameter
-  ;
-  mov       eax, dword ptr [esp + 4]
-  cmp       eax, 0
-  mov       eax, 80000002h
-  jz        NemInitExit
-
+  movd      xmm4, edx
+  movd      xmm5, eax
+  
   ;
   ; CPUID/DeviceID check
   ;
@@ -319,82 +399,18 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   cmp       eax, 0
   jnz       NemInitExit
 
-  ;
-  ; Platform Basic Init.
-  ;
-  mov       eax, @F
-  jmp       PlatformBasicInit
-@@:
-  cmp       eax, 0
-  jnz       NemInitExit
+  CALL_MMX  SecPlatformInit
 
-  ;
+  ; Call Sec CAR Init
+  CALL_MMX  SecCarInit
+  
+  ; @todo: ESP has been modified, we need to restore here.
+  LOAD_REGS
+  SAVE_REGS
   ; Load microcode
-  ;
-  mov       eax, @F
-  add       esp, 4
-  jmp       LoadUcode
-@@:
-  LOAD_ESP
-  cmp       eax, 0
-  jnz       NemInitExit
+  CALL_MMX  LoadUcode
 
-  ;
-  ; Call platform NEM init
-  ;
-  mov       eax, @F
-  add       esp, 4
-  jmp       PlatformTempRamInit
-@@:
-  LOAD_ESP
-  cmp       eax, 0
-  jnz       NemInitExit
-
-  ;
-  ; Save parameter pointer in edx
-  ;
-  mov       edx, dword ptr [esp + 4]
-
-  ;
-  ; Enable FSP STACK
-  ;
-  mov       esp, PcdGet32(PcdTemporaryRamBase)
-  add       esp, PcdGet32(PcdTemporaryRamSize)
-
-  push      DATA_LEN_OF_MCUD     ; Size of the data region
-  push      4455434Dh            ; Signature of the  data region 'MCUD'
-  push      dword ptr [edx +  4] ; Microcode size
-  push      dword ptr [edx +  0] ; Microcode base
-  push      dword ptr [edx + 12] ; Code size
-  push      dword ptr [edx + 8]  ; Code base
-
-  ;
-  ; Save API entry/exit timestamp into stack
-  ;
-  push      DATA_LEN_OF_PER0     ; Size of the data region
-  push      30524550h            ; Signature of the  data region 'PER0'
-  rdtsc
-  push      edx
-  push      eax
-  LOAD_EAX
-  LOAD_EDX
-  push      edx
-  push      eax
-
-  ;
-  ; Terminator for the data on stack
-  ;
-  push      0
-
-  ;
-  ; Set ECX/EDX to the bootloader temporary memory range
-  ;
-  mov       ecx, PcdGet32(PcdTemporaryRamBase)
-  mov       edx, ecx
-  add       edx, PcdGet32(PcdTemporaryRamSize)
-  sub       edx, PcdGet32(PcdFspTemporaryRamSize)
-
-  xor       eax, eax
+  CALL_MMX  EstablishStackFsp
 
 NemInitExit:
   ;
@@ -413,31 +429,106 @@ TempRamInitApi   ENDP
 ;
 ;----------------------------------------------------------------------------
 FspInitApi   PROC    NEAR    PUBLIC
+  mov    eax,  1
+  jmp    FspApiCommon
+  FspInitApi   ENDP
+
+;----------------------------------------------------------------------------
+; NotifyPhase API
+;
+; This FSP API will notify the FSP about the different phases in the boot
+; process
+;
+;----------------------------------------------------------------------------
+NotifyPhaseApi   PROC C PUBLIC
+  mov    eax,  2
+  jmp    FspApiCommon
+NotifyPhaseApi   ENDP
+
+;----------------------------------------------------------------------------
+; FspMemoryInit API
+;
+; This FSP API is called after TempRamInit and initializes the memory.
+;
+;----------------------------------------------------------------------------
+FspMemoryInitApi   PROC    NEAR    PUBLIC
+  mov    eax,  3
+  jmp    FspApiCommon
+FspMemoryInitApi   ENDP
+
+
+;----------------------------------------------------------------------------
+; TempRamExitApi API
+;
+; This API tears down temporary RAM
+;
+;----------------------------------------------------------------------------
+TempRamExitApi   PROC C PUBLIC
+  mov    eax,  4
+  jmp    FspApiCommon
+TempRamExitApi   ENDP
+
+
+;----------------------------------------------------------------------------
+; FspSiliconInit API
+;
+; This FSP API initializes the CPU and the chipset including the IO
+; controllers in the chipset to enable normal operation of these devices.
+;
+;----------------------------------------------------------------------------
+FspSiliconInitApi   PROC C PUBLIC
+  mov    eax,  5
+  jmp    FspApiCommon
+FspSiliconInitApi   ENDP
+
+;----------------------------------------------------------------------------
+; FspApiCommon API
+;
+; This is the FSP API common entry point to resume the FSP execution
+;
+;----------------------------------------------------------------------------
+FspApiCommon   PROC C PUBLIC
+  ;
+  ; EAX holds the API index
+  ;
+
   ;
   ; Stack must be ready
-  ;
-  push   087654321h
-  pop    eax
-  cmp    eax, 087654321h
+  ;  
+  push   eax
+  add    esp, 4
+  cmp    eax, dword ptr [esp - 4]
   jz     @F
   mov    eax, 080000003h
   jmp    exit
 
 @@:
   ;
-  ; Additional check
+  ; Verify the calling condition
   ;
   pushad
-  push   1
+  push   eax
   call   FspApiCallingCheck
   add    esp, 4
-  mov    dword ptr [esp + 4 * 7],  eax
-  popad
   cmp    eax, 0
   jz     @F
-  jmp    exit
+  mov    dword ptr [esp + 4 * 7], eax
+  popad
+  ret
 
 @@:
+  popad
+  cmp    eax, 1   ; FspInit API
+  jz     @F
+  cmp    eax, 3   ; FspMemoryInit API
+  jz     @F
+  jmp    Pei2LoaderSwitchStack
+
+@@:  
+  ;
+  ; FspInit and FspMemoryInit APIs, setup the initial stack frame
+  ;  
+  
   ;
   ; Store the address in FSP which will return control to the BL
   ;
@@ -452,30 +543,34 @@ FspInitApi   PROC    NEAR    PUBLIC
 
   ; Reserve 8 bytes for IDT save/restore
   sub     esp, 8
-  sidt    fword ptr [esp]
+  sidt    fword ptr [esp]  
 
   ;
   ; Setup new FSP stack
   ;
-  mov     eax, esp
+  mov     edi, esp
   mov     esp, PcdGet32(PcdTemporaryRamBase)
   add     esp, PcdGet32(PcdTemporaryRamSize)
   sub     esp, (DATA_LEN_AT_STACK_TOP + 40h)
 
   ;
-  ; Save the bootloader's stack pointer
+  ; Pass the API Idx to SecStartup
   ;
   push    eax
+  
+  ;
+  ; Pass the bootloader stack to SecStartup
+  ;
+  push    edi
 
   ;
   ; Pass entry point of the PEI core
   ;
   call    GetFspBaseAddress
-  mov     edi, FspImageSizeOffset
-  mov     edi, DWORD PTR [eax + edi]
-  add     edi, eax
+  mov     edi, eax
+  add     edi, PcdGet32 (PcdFspAreaSize) 
   sub     edi, 20h
-  add     eax, DWORD PTR [edi]
+  add     eax, DWORD PTR ds:[edi]
   push    eax
 
   ;
@@ -505,53 +600,9 @@ FspInitApi   PROC    NEAR    PUBLIC
   ;
   call    SecStartup
 
-exit:
+exit:  
   ret
 
-FspInitApi   ENDP
-
-;----------------------------------------------------------------------------
-; NotifyPhase API
-;
-; This FSP API will notify the FSP about the different phases in the boot
-; process
-;
-;----------------------------------------------------------------------------
-NotifyPhaseApi   PROC C PUBLIC
-  ;
-  ; Stack must be ready
-  ;
-  push   087654321h
-  pop    eax
-  cmp    eax, 087654321h
-  jz     @F
-  mov    eax, 080000003h
-  jmp    err_exit
-
-@@:
-  ;
-  ; Verify the calling condition
-  ;
-  pushad
-  push   2
-  call   FspApiCallingCheck
-  add    esp, 4
-  mov    dword ptr [esp + 4 * 7],  eax
-  popad
-
-  cmp    eax, 0
-  jz     @F
-
-  ;
-  ; Error return
-  ;
-err_exit:
-  ret
-
-@@:
-  jmp    Pei2LoaderSwitchStack
-
-NotifyPhaseApi   ENDP
-
+FspApiCommon   ENDP
 
 END

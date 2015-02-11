@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -15,8 +15,6 @@
 #
 #------------------------------------------------------------------------------
 
-ASM_GLOBAL ASM_PFX(Pei2LoaderSwitchStack)
-ASM_GLOBAL ASM_PFX(Loader2PeiSwitchStack)
 
 #------------------------------------------------------------------------------
 # UINT32
@@ -37,26 +35,29 @@ ASM_PFX(Pei2LoaderSwitchStack):
 #------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(Loader2PeiSwitchStack)
 ASM_PFX(Loader2PeiSwitchStack):
-#Save current contexts
+    #
+    #Save current contexts
+    #
     push    $exit
-    pushf
     pushf
     cli
     pusha
-    push    $0x0
-    push    $0x0
+    sub     $0x08, %esp
     sidt    (%esp)
 
+    #
     # Load new stack
+    #
     push   %esp
     call   ASM_PFX(SwapStack)
-    mov    %eax,%esp
+    movl   %eax, %esp
 
+    #
     # Restore previous contexts
+    #
     lidt    (%esp)
-    add     $8,%esp
+    add     $0x08,%esp
     popa
-    popf
     popf
 exit:
     ret

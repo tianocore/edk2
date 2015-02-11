@@ -30,6 +30,7 @@
 
 [LibraryClasses]
   BaseMemoryLib
+  MemoryAllocationLib
 
 [Pcd]
   gIntelFspPkgTokenSpaceGuid.PcdGlobalDataPointerAddress    ## CONSUMES
@@ -38,7 +39,7 @@
   gIntelFspPkgTokenSpaceGuid.PcdFspTemporaryRamSize         ## CONSUMES
 
 [Guids]
-  gFspBootLoaderTemporaryMemoryGuid                     ## PRODUCES ## HOB
+  gFspBootLoaderTempMemoryGuid                              ## PRODUCES ## HOB
 
 [FixedPcd]
   gIntelFspPkgTokenSpaceGuid.PcdFspMaxPatchEntry        ## CONSUMES

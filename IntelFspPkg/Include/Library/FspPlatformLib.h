@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,6 +34,16 @@ FspGetSystemMemorySize (
 VOID
 EFIAPI
 FspMigrateTemporaryMemory (
+  VOID
+  );
+
+/**
+  Set a new stack frame for the continuation function
+
+**/
+VOID
+EFIAPI
+FspSetNewStackFrame (
   VOID
   );
 

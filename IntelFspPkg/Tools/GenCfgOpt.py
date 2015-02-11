@@ -1,6 +1,6 @@
 ## @ GenCfgOpt.py
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -254,9 +254,10 @@ EndList
                                     ElifStack[-1] = ElifStack[-1] + 1
                             else:
                                 if len(DscLine) > 0 and DscLine[0] == '!':
-                                    self.Error = "Invalid DscLine '%s'" % DscLine
-                                    Error = 3
-                                    break;
+								    #
+								    # Current it can only handle build switch.
+									# It does not support INF file in included dsc.
+									#
                                 else:
                                     if reduce(lambda x,y: x and y, IfStack):
                                         Handle = True

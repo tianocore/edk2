@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -168,6 +168,39 @@ UINT64
 EFIAPI
 SetFspMeasurePoint (
   IN UINT8  Id
+  );
+
+/**
+  This function gets the FSP info header pointer.
+
+  @retval FspInfoHeader   FSP info header pointer
+**/
+FSP_INFO_HEADER *
+EFIAPI
+GetFspInfoHeader (
+  VOID
+  );
+
+/**
+  This function gets FSP API calling mode
+
+  @retval API calling mode
+**/
+UINT8
+EFIAPI
+GetFspApiCallingMode (
+  VOID
+  );
+
+/**
+  This function sets FSP API calling mode
+
+  @param[in] Mode     API calling mode
+**/
+VOID
+EFIAPI
+SetFspApiCallingMode (
+  UINT8  Mode
   );
 
 #endif

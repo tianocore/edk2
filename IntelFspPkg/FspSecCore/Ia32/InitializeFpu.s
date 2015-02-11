@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -58,7 +58,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     # Set OSFXSR bit 9 in CR4
     #
     movl    %cr4, %eax
-    or      BIT9, %eax
+    orl     $BIT9, %eax
     movl    %eax, %cr4
 
     #

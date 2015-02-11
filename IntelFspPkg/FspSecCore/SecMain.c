@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -41,7 +41,9 @@ UINT64  mIdtEntryTemplate = 0xffff8e000008ffe4ULL;
   @param[in] SizeOfRam          Size of the temporary memory available for use.
   @param[in] TempRamBase        Base address of tempory ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
-  @param[in] PeiCoreEntry       Pei Core entrypoint.
+  @param[in] PeiCore            PeiCore entry point.
+  @param[in] BootloaderStack    Bootloader stack.
+  @param[in] ApiIdx             the index of API
 
   @return This function never returns.
 
@@ -52,7 +54,9 @@ SecStartup (
   IN UINT32                   SizeOfRam,
   IN UINT32                   TempRamBase,
   IN VOID                    *BootFirmwareVolume,
-  IN UINTN                    PeiCoreEntry
+  IN PEI_CORE_ENTRY           PeiCore,
+  IN UINT32                   BootloaderStack,
+  IN UINT32                   ApiIdx
   )
 {
   EFI_SEC_PEI_HAND_OFF        SecCoreData;
@@ -60,7 +64,6 @@ SecStartup (
   SEC_IDT_TABLE               IdtTableInStack;
   UINT32                      Index;
   FSP_GLOBAL_DATA             PeiFspData;
-  PEI_CORE_ENTRY              PeiCore;
   UINT64                      ExceptionHandler;
 
   //
@@ -103,7 +106,7 @@ SecStartup (
   //
   // Iniitalize the global FSP data region
   //
-  FspGlobalDataInit (&PeiFspData, &BootFirmwareVolume);
+  FspGlobalDataInit (&PeiFspData, BootloaderStack, (UINT8)ApiIdx);
 
   //
   // Update the base address and length of Pei temporary memory
@@ -120,8 +123,7 @@ SecStartup (
 
   //
   // Call PeiCore Entry
-  //
-  PeiCore = (PEI_CORE_ENTRY)(PeiCoreEntry);
+  //  
   PeiCore (&SecCoreData, mPeiSecPlatformInformationPpi);
 
   //

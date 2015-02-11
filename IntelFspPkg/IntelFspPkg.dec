@@ -21,6 +21,25 @@
 [Includes]
   Include
   Include/Private
+  
+[LibraryClasses]
+  ##  @libraryclass  Provides cache-as-ram support.
+  CacheAsRamLib|IntelFspPkg/Include/Library/CacheAsRamLib.h
+
+  ##  @libraryclass  Provides cache setting on MTRR.
+  CacheLib|IntelFspPkg/Include/Library/CacheLib.h
+
+  ##  @libraryclass  Provides debug device abstraction.
+  DebugDeviceLib|IntelFspPkg/Include/Library/DebugDeviceLib.h
+
+  ##  @libraryclass  Provides FSP related services.
+  FspCommonLib|IntelFspPkg/Include/Library/FspCommonLib.h
+
+  ##  @libraryclass  Provides FSP platform related actions.
+  FspPlatformLib|IntelFspPkg/Include/Library/FspPlatformLib.h
+
+  ##  @libraryclass  Provides FSP switch stack function.
+  FspSwitchStackLib|IntelFspPkg/Include/Library/FspSwitchStackLib.h
 
 [Guids]
   #
@@ -30,6 +49,7 @@
 
   # Guid define in FSP EAS
   gFspHeaderFileGuid                    = { 0x912740BE, 0x2284, 0x4734, { 0xB9, 0x71, 0x84, 0xB0, 0x27, 0x35, 0x3F, 0x0C } }
+  gFspBootLoaderTempMemoryGuid          = { 0xbbcff46c, 0xc8d3, 0x4113, { 0x89, 0x85, 0xb9, 0xd4, 0xf3, 0xb3, 0xf6, 0x4e } }
   gFspBootLoaderTemporaryMemoryGuid     = { 0xbbcff46c, 0xc8d3, 0x4113, { 0x89, 0x85, 0xb9, 0xd4, 0xf3, 0xb3, 0xf6, 0x4e } }
   gFspReservedMemoryResourceHobGuid     = { 0x69a79759, 0x1373, 0x4367, { 0xa6, 0xc4, 0xc7, 0xf5, 0x9e, 0xfd, 0x98, 0x6e } }
   gFspNonVolatileStorageHobGuid         = { 0x721acf02, 0x4d77, 0x4c2a, { 0xb3, 0xdc, 0x27, 0x0b, 0x7b, 0xa9, 0xe4, 0xb0 } }

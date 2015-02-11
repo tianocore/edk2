@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -98,26 +98,43 @@ FspInitDone (
   VOID
   )
 {
-  FSP_INIT_PARAMS           *FspInitParams;
+  FSP_INIT_PARAMS        *FspInitParams;
 
-  FspInitParams   = (FSP_INIT_PARAMS *)GetFspApiParameter ();
+  if (GetFspApiCallingMode() == 0) {
+  	//
+  	// FspInit API is used, so jump into the ContinuationFunc
+  	//
+    FspInitParams   = (FSP_INIT_PARAMS *)GetFspApiParameter ();
+  
+    //
+    // Modify the parameters for ContinuationFunc
+    //
+    SetFspContinuationFuncParameter(EFI_SUCCESS, 0);
+    SetFspContinuationFuncParameter((UINT32)GetHobList(), 1);
+  
+    //
+    // Modify the return address to ContinuationFunc
+    //
+    SetFspApiReturnAddress((UINT32)FspInitParams->ContinuationFunc);
+  
+    //
+    // Give control back to the boot loader framework caller after FspInit is done
+    // It is done throught the continuation function
+    //
+    SetFspMeasurePoint (FSP_PERF_ID_API_FSPINIT_EXIT);
+  } else {
+    //
+    // FspMemoryInit API is used, so return directly
+    //
 
-  //
-  // Modify the parameters for ContinuationFunc
-  //
-  SetFspContinuationFuncParameter(EFI_SUCCESS, 0);
-  SetFspContinuationFuncParameter((UINT32)GetHobList(), 1);
+    //
+    // This is the end of the FspSiliconInit API
+    // Give control back to the boot loader
+    //
+    DEBUG ((DEBUG_INFO | DEBUG_INIT, "FspSiliconInitApi() - End\n"));
+    SetFspApiReturnStatus (EFI_SUCCESS);
+  }
 
-  //
-  // Modify the return address to ContinuationFunc
-  //
-  SetFspApiReturnAddress((UINT32)FspInitParams->ContinuationFunc);
-
-  //
-  // Give control back to the boot loader framework caller after FspInit is done
-  // It is done throught the continuation function
-  //
-  SetFspMeasurePoint (FSP_PERF_ID_API_FSPINIT_EXIT);
   Pei2LoaderSwitchStack();
 }
 
@@ -151,12 +168,14 @@ FspWaitForNotify (
       //
       // Notify code does not follow the predefined order
       //
+      DEBUG ((DEBUG_INFO, "Unsupported FSP Notification Value\n"));
       SetFspApiReturnStatus(EFI_UNSUPPORTED);
     } else {
       //
       // Process Notification and Give control back to the boot loader framework caller
       //
       Status = FspNotificationHandler (NotificationValue);
+      DEBUG ((DEBUG_INFO, "FSP Notification Handler Returns : 0x%08X\n", Status));
       SetFspApiReturnStatus(Status);
       if (!EFI_ERROR(Status)) {
         NotificationCount++;

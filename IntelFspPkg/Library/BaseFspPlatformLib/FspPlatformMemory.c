@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@
 #include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
@@ -76,17 +77,20 @@ FspMigrateTemporaryMemory (
   VOID
  )
 {
-  FSP_INIT_RT_COMMON_BUFFER  *FspInitRtBuffer;
-  UINT32             BootLoaderTempRamStart;
-  UINT32             BootLoaderTempRamEnd;
-  UINT32             BootLoaderTempRamSize;
-  UINT32             OffsetGap;
-  UINT32             FspParamPtr;
-  FSP_INIT_PARAMS   *FspInitParams;
-  UINT32            *NewStackTop;
-  VOID              *BootLoaderTempRamHob;
-  VOID              *UpdDataRgnPtr;
-  VOID              *PlatformDataPtr;
+  FSP_INIT_RT_COMMON_BUFFER *FspInitRtBuffer;
+  UINT32                    BootLoaderTempRamStart;
+  UINT32                    BootLoaderTempRamEnd;
+  UINT32                    BootLoaderTempRamSize;
+  UINT32                    OffsetGap;
+  UINT32                    FspParamPtr;
+  FSP_INIT_PARAMS           *FspInitParams;
+  UINT32                    *NewStackTop;
+  VOID                      *BootLoaderTempRamHob;
+  VOID                      *UpdDataRgnPtr;
+  VOID                      *PlatformDataPtr;
+  UINT8                      ApiMode;
+    
+  ApiMode = GetFspApiCallingMode ();
 
   //
   // Get the temporary memory range used by the bootloader
@@ -98,17 +102,24 @@ FspMigrateTemporaryMemory (
   //
   // Build a Boot Loader Temporary Memory GUID HOB
   //
-  BootLoaderTempRamHob = BuildGuidHob (&gFspBootLoaderTemporaryMemoryGuid, BootLoaderTempRamSize);
+  if (ApiMode == 0) {
+    BootLoaderTempRamHob = BuildGuidHob (&gFspBootLoaderTempMemoryGuid, BootLoaderTempRamSize);
+  } else {
+  	BootLoaderTempRamHob = (VOID *)AllocatePool (BootLoaderTempRamSize);
+  }
+
   CopyMem (BootLoaderTempRamHob, (VOID *)BootLoaderTempRamStart, BootLoaderTempRamSize);
   OffsetGap = (UINT32)BootLoaderTempRamHob - BootLoaderTempRamStart;
 
   //
   // Set a new stack frame for the continuation function
   //
-  FspInitParams   = (FSP_INIT_PARAMS *)GetFspApiParameter ();
-  FspInitRtBuffer = (FSP_INIT_RT_COMMON_BUFFER *)FspInitParams->RtBufferPtr;
-  NewStackTop     = (UINT32 *)FspInitRtBuffer->StackTop - 1;
-  SetFspCoreStackPointer (NewStackTop);
+  if (ApiMode == 0) {
+    FspInitParams   = (FSP_INIT_PARAMS *)GetFspApiParameter ();
+    FspInitRtBuffer = (FSP_INIT_RT_COMMON_BUFFER *)FspInitParams->RtBufferPtr;
+    NewStackTop     = (UINT32 *)FspInitRtBuffer->StackTop - 1;
+    SetFspCoreStackPointer (NewStackTop);
+  }
 
   //
   // Fix the FspInit Parameter Pointers to the new location.
@@ -151,5 +162,4 @@ FspMigrateTemporaryMemory (
       ((UINT32)PlatformDataPtr <  BootLoaderTempRamEnd)) {
     SetFspPlatformDataPointer ((UINT8 *)PlatformDataPtr + OffsetGap);
   }
-
 }
