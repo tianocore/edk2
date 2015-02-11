@@ -260,12 +260,10 @@ ScanSections64 (
   EFI_IMAGE_OPTIONAL_HEADER_UNION *NtHdr;
   UINT32                          CoffEntry;
   UINT32                          SectionCount;
-  BOOLEAN                         FoundText;
+  BOOLEAN                         FoundSection;
 
   CoffEntry = 0;
   mCoffOffset = 0;
-  mTextOffset = 0;
-  FoundText = FALSE;
 
   //
   // Coff file start with a DOS header.
@@ -291,6 +289,8 @@ ScanSections64 (
   // First text sections.
   //
   mCoffOffset = CoffAlign(mCoffOffset);
+  mTextOffset = mCoffOffset;
+  FoundSection = FALSE;
   SectionCount = 0;
   for (i = 0; i < mEhdr->e_shnum; i++) {
     Elf_Shdr *shdr = GetShdrByIndex(i);
@@ -318,9 +318,9 @@ ScanSections64 (
       //
       // Set mTextOffset with the offset of the first '.text' section
       //
-      if (!FoundText) {
+      if (!FoundSection) {
         mTextOffset = mCoffOffset;
-        FoundText = TRUE;
+        FoundSection = TRUE;
       }
 
       mCoffSectionsOffset[i] = mCoffOffset;
@@ -329,7 +329,7 @@ ScanSections64 (
     }
   }
 
-  if (!FoundText) {
+  if (!FoundSection) {
     Error (NULL, 0, 3000, "Invalid", "Did not find any '.text' section.");
     assert (FALSE);
   }
@@ -346,6 +346,7 @@ ScanSections64 (
   //  Then data sections.
   //
   mDataOffset = mCoffOffset;
+  FoundSection = FALSE;
   SectionCount = 0;
   for (i = 0; i < mEhdr->e_shnum; i++) {
     Elf_Shdr *shdr = GetShdrByIndex(i);
@@ -362,6 +363,14 @@ ScanSections64 (
           // Normally doing nothing here works great.
           Error (NULL, 0, 3000, "Invalid", "Unsupported section alignment.");
         }
+      }
+
+      //
+      // Set mDataOffset with the offset of the first '.data' section
+      //
+      if (!FoundSection) {
+        mDataOffset = mCoffOffset;
+        FoundSection = TRUE;
       }
       mCoffSectionsOffset[i] = mCoffOffset;
       mCoffOffset += (UINT32) shdr->sh_size;
@@ -395,6 +404,7 @@ ScanSections64 (
         }
       }
       if (shdr->sh_size != 0) {
+        mHiiRsrcOffset = mCoffOffset;
         mCoffSectionsOffset[i] = mCoffOffset;
         mCoffOffset += (UINT32) shdr->sh_size;
         mCoffOffset = CoffAlign(mCoffOffset);
