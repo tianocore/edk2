@@ -28,4 +28,30 @@ FspHobProcess (
   IN VOID                 *FspHobList
   );
 
+/**
+  BIOS process FspBobList for Memory Resource Descriptor.
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+  @return If platform process the FSP hob list successfully.
+**/
+EFI_STATUS
+EFIAPI
+FspHobProcessForMemoryResource (
+  IN VOID                 *FspHobList
+  );
+
+/**
+  BIOS process FspBobList for other data (not Memory Resource Descriptor).
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+  @return If platform process the FSP hob list successfully.
+**/
+EFI_STATUS
+EFIAPI
+FspHobProcessForOtherData (
+  IN VOID                 *FspHobList
+  );
+
 #endif

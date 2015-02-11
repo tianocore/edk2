@@ -69,6 +69,32 @@ UpdateFspUpdConfigs (
   );
 
 /**
+  Get TempRamExit parameter.
+
+  @note At this point, memory is ready, PeiServices are available to use.
+
+  @return TempRamExit parameter.
+**/
+VOID *
+EFIAPI
+GetTempRamExitParam (
+  VOID
+  );
+
+/**
+  Get FspSiliconInit parameter.
+
+  @note At this point, memory is ready, PeiServices are available to use.
+
+  @return FspSiliconInit parameter.
+**/
+VOID *
+EFIAPI
+GetFspSiliconInitParam (
+  VOID
+  );
+
+/**
   Get S3 PEI memory information.
 
   @note At this point, memory is ready, and PeiServices are available to use.

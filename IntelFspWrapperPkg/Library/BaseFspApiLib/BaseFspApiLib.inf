@@ -61,6 +61,7 @@
   IntelFspWrapperPkg/IntelFspWrapperPkg.dec
 
 [LibraryClasses]
+  BaseLib
 
 [Guids]
   gFspHeaderFileGuid            ## CONSUMES ## GUID

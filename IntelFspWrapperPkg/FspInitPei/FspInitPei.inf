@@ -1,9 +1,13 @@
 ## @file
 # FSP PEI Module
 #
-# This PEIM will be invoked twice by pei core. In 1st entry, it will call FspInit API.
-# In 2nd entry, it will parse the hoblist from fsp and report them into pei core.
-# including install the memory as required.
+# This PEIM initialize FSP.
+# In FSP API V1 mode, it will be invoked twice by pei core. In 1st entry, it will
+# call FspInit API. In 2nd entry, it will parse the hoblist from fsp and report
+# them into pei core.
+# In FSP API V2 mode, it will be invoked only once. It will call FspMemoryInit API,
+# register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
+# notify to call FspSiliconInit API.
 #
 #  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 #
@@ -33,11 +37,12 @@
 [Sources]
   FspInitPei.c
   FspInitPei.h
+  FspInitPeiV1.c
+  FspInitPeiV2.c
   FspNotifyS3.c
   SecMain.c
   SecMain.h
   FindPeiCore.c
-  SecFspInitDone.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -67,6 +72,8 @@
   gTopOfTemporaryRamPpiGuid             ## PRODUCES
   gFspInitDonePpiGuid                   ## PRODUCES
   gEfiEndOfPeiSignalPpiGuid             ## PRODUCES
+  gEfiTemporaryRamDonePpiGuid           ## PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid        ## PRODUCES
 
 [FixedPcd]
   gFspWrapperTokenSpaceGuid.PcdSecCoreMaxPpiSupported         ## CONSUMES
@@ -76,6 +83,7 @@
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase                 ## CONSUMES
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspSize                 ## CONSUMES
   gFspWrapperTokenSpaceGuid.PcdMaxUpdRegionSize               ## CONSUMES
+  gFspWrapperTokenSpaceGuid.PcdFspApiVersion                  ## CONSUMES
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid

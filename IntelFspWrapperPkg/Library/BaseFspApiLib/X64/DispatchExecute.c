@@ -3,7 +3,7 @@
   Provide a thunk function to transition from long mode to compatibility mode to execute 32-bit code and then transit
   back to long mode.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -81,9 +81,9 @@ AsmExecute32BitCode (
   @param[in] Function     The 32bit code entry to be executed.
   @param[in] Param1       The first parameter to pass to 32bit code.
 
-  @return FSP_STATUS.
+  @return EFI_STATUS.
 **/
-FSP_STATUS
+EFI_STATUS
 Execute32BitCode (
   IN UINT64      Function,
   IN UINT64      Param1
