@@ -1813,6 +1813,8 @@ ShowProgressHotKey (
     return EFI_TIMEOUT;
   }
 
+  gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
+    
   if (DebugAssertEnabled())
   {
     DEBUG ((EFI_D_INFO, "\n\nStart showing progress bar... Press any key to stop it, or press <F2> or <DEL> to enter setup page! ...Zzz....\n"));

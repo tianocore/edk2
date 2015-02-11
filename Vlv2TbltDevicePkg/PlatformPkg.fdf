@@ -625,7 +625,7 @@ INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 # Console
 #
 INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-INF Vlv2TbltDevicePkg/Override/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
 INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 INF IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
