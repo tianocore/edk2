@@ -2,7 +2,7 @@
   Dhcp6 internal functions implementation.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2812,6 +2812,7 @@ Dhcp6ReceivePacket (
   LIST_ENTRY                *Next1;
   LIST_ENTRY                *Entry2;
   LIST_ENTRY                *Next2;
+  EFI_STATUS                Status;
 
   ASSERT (Udp6Wrap != NULL);
   ASSERT (Context != NULL);
@@ -2890,6 +2891,18 @@ Dhcp6ReceivePacket (
   }
 
 ON_CONTINUE:
+
+  if (!IsDispatched) {
+    Status = UdpIoRecvDatagram (
+             Service->UdpIo,
+             Dhcp6ReceivePacket,
+             Service,
+             0
+             );
+    if (EFI_ERROR (Status)) {
+      Dhcp6CleanupRetry (Instance, DHCP6_PACKET_ALL);
+    }
+  }
 
   NetbufFree (Udp6Wrap);
 
