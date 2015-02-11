@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -165,7 +165,6 @@ ASM_GLOBAL    ASM_PFX(_gPcd_FixedAtBuild_PcdFspTemporaryRamSize)
 #
 # Following functions will be provided in C
 #
-ASM_GLOBAL    ASM_PFX(FspImageSizeOffset)
 ASM_GLOBAL    ASM_PFX(SecStartup)
 ASM_GLOBAL    ASM_PFX(FspApiCallingCheck)
 
@@ -245,7 +244,8 @@ ASM_PFX(LoadUcode):
    #
    # Save return address to EBP
    #
-   movl   %eax, %ebp
+   movd   %xmm7, %ebp
+
    cmpl   $0x00, %esp
    jz     ParamError
    movl   (%esp), %eax                       #dword ptr []     Parameter pointer
@@ -449,6 +449,71 @@ LoadUcodeExit:
 
 
 #----------------------------------------------------------------------------
+# EstablishStackFsp
+#
+# Following is the code copied from BYTFSP, need to figure out what it is doing..
+#
+#----------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(EstablishStackFsp)
+ASM_PFX(EstablishStackFsp):
+  #
+  # Save parameter pointer in edx  
+  #
+  movl    4(%esp), %edx
+              
+  #
+  # Enable FSP STACK
+  #
+  movl    PcdGet32(PcdTemporaryRamBase), %esp
+  addl    PcdGet32(PcdTemporaryRamSize), %esp
+
+  pushl   $DATA_LEN_OF_MCUD                  # Size of the data region
+  pushl   $0x4455434D                        # Signature of the  data region 'MCUD'
+  pushl   12(%edx)                           # Code size
+  pushl   8(%edx)                            # Code base
+  cmpl    $0, %edx                           # Is parameter pointer valid ?
+  jz      InvalidMicrocodeRegion
+  pushl   4(%edx)                            # Microcode size
+  pushl   (%edx)                             # Microcode base
+  jmp     EstablishStackFspExit
+
+InvalidMicrocodeRegion:
+  push    $0                                 # Microcode size
+  push    $0                                 # Microcode base
+    
+EstablishStackFspExit:
+  #
+  # Save API entry/exit timestamp into stack
+  #
+  pushl   $DATA_LEN_OF_PER0                  # Size of the data region
+  pushl   $0x30524550                        # Signature of the  data region 'PER0'
+  movd    %xmm4, %eax
+  pushl   %eax
+  movd    %xmm5, %eax
+  pushl   %eax
+  rdtsc
+  pushl   %edx
+  pushl   %eax
+
+  #
+  # Terminator for the data on stack
+  # 
+  push    $0x00
+
+  #
+  # Set ECX/EDX to the bootloader temporary memory range
+  #
+  movl       PcdGet32 (PcdTemporaryRamBase), %ecx
+  movl       %ecx, %edx
+  addl       PcdGet32 (PcdTemporaryRamSize), %edx
+  subl       PcdGet32 (PcdFspTemporaryRamSize), %edx
+
+  xorl       %eax, %eax
+ 
+  movd       %mm7, %esi                      #RET_ESI
+  jmp        *%esi
+
+#----------------------------------------------------------------------------
 # TempRamInit API
 #
 # This FSP API will load the microcode update, enable code caching for the
@@ -472,103 +537,54 @@ ASM_PFX(TempRamInitApi):
   # Save timestamp into XMM4 & XMM5
   #
   rdtsc
-  SAVE_EAX
-  SAVE_EDX
-
-  #
-  # Check Parameter
-  #
-  movl    4(%esp), %eax
-  cmpl    $0x00, %eax
-  movl    $0x80000002, %eax
-  jz      NemInitExit
+  movd    %edx, %xmm4
+  movd    %eax, %xmm5
 
   #
   # CPUID/DeviceID check
   #
   movl    $TempRamInitApiL0, %eax
-  jmp     ASM_PFX(FspSelfCheckDflt)  # Note: ESP can not be changed.
+  jmp     ASM_PFX(FspSelfCheckDflt)  # @note: ESP can not be changed.
 TempRamInitApiL0:
   cmpl    $0x00, %eax
   jnz     NemInitExit
 
   #
-  # Platform Basic Init.
+  # Sec Platform Init
   #
-  movl    $TempRamInitApiL1, %eax
-  jmp     ASM_PFX(PlatformBasicInitDflt)
+  movl    $TempRamInitApiL1, %esi            #CALL_MMX  SecPlatformInit
+  movd    %mm7, %esi
+  jmp     ASM_PFX(SecPlatformInit)
 TempRamInitApiL1:
-  cmpl    $0x00, %eax
-  jnz     NemInitExit
+
+  #
+  # Call Sec CAR Init
+  #
+  movl    $TempRamInitApiL2, %esi            #CALL_MMX  SecCarInit
+  movd    %mm7, %esi
+  jmp     ASM_PFX(SecCarInit)
+TempRamInitApiL2:
+
+  # @todo: ESP has been modified, we need to restore here.
+
+  LOAD_REGS
+  SAVE_REGS
 
   #
   # Load microcode
   #
-  movl    $TempRamInitApiL2, %eax
-  addl    $0x04, %esp
-  jmp     LoadUcode
-
-TempRamInitApiL2:
-  LOAD_ESP
-  cmpl    $0x00, %eax
-  jnz     NemInitExit
-
-  #
-  # Call platform NEM init
-  #
-  movl    $TempRamInitApiL3, %eax
-  addl    $0x04, %esp
-  jmp     ASM_PFX(PlatformTempRamInit)
+  movl    $TempRamInitApiL3, %esi            #CALL_MMX  LoadUcode
+  movd    %mm7, %esi
+  jmp     ASM_PFX(LoadUcode)
 TempRamInitApiL3:
-  subl    $0x04, %esp
-  cmpl    $0x00, %eax
-  jnz     NemInitExit
 
   #
-  # Save parameter pointer in edx
+  # EstablishStackFsp
   #
-  movl    4(%esp), %edx
-
-  #
-  # Enable FSP STACK
-  #
-  movl    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamBase), %esp
-  addl    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamSize), %esp
-
-  pushl   $DATA_LEN_OF_MCUD     # Size of the data region
-  pushl   $0x4455434D           # Signature of the  data region 'MCUD'
-  pushl   4(%edx)               # Microcode size
-  pushl   (%edx)                # Microcode base
-  pushl   12(%edx)              # Code size
-  pushl   8(%edx)               # Code base
-
-  #
-  # Save API entry/exit timestamp into stack
-  #
-  pushl   $DATA_LEN_OF_PER0      # Size of the data region
-  pushl   $0x30524550            # Signature of the  data region 'PER0'
-  rdtsc
-  pushl   %edx
-  pushl   %eax
-  LOAD_EAX
-  LOAD_EDX
-  pushl   %edx
-  pushl   %eax
-
-  #
-  # Terminator for the data on stack
-  #
-  pushl   $0x00
-
-  #
-  # Set ECX/EDX to the bootloader temporary memory range
-  #
-  movl    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamBase), %ecx
-  movl    %ecx, %edx
-  addl    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamSize), %edx
-  subl    ASM_PFX(_gPcd_FixedAtBuild_PcdFspTemporaryRamSize), %edx
-
-  xorl    %eax, %eax
+  movl    $TempRamInitApiL4, %esi            #CALL_MMX  EstablishStackFsp
+  movd    %mm7, %esi
+  jmp     ASM_PFX(EstablishStackFsp)
+TempRamInitApiL4:
 
 NemInitExit:
   #
@@ -576,7 +592,6 @@ NemInitExit:
   #
   LOAD_REGS
   ret
-
 
 #----------------------------------------------------------------------------
 # FspInit API
@@ -588,40 +603,113 @@ NemInitExit:
 #----------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(FspInitApi)
 ASM_PFX(FspInitApi):
+  movl   $0x01, %eax
+  jmp    FspApiCommon
+
+#----------------------------------------------------------------------------
+# NotifyPhase API
+#
+# This FSP API will notify the FSP about the different phases in the boot
+# process
+#
+#----------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(NotifyPhaseApi)
+ASM_PFX(NotifyPhaseApi):
+  movl   $0x02, %eax
+  jmp    FspApiCommon
+
+#----------------------------------------------------------------------------
+# FspMemoryInit API
+#
+# This FSP API is called after TempRamInit and initializes the memory.
+#
+#----------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(FspMemoryInitApi)
+ASM_PFX(FspMemoryInitApi):
+  movl   $0x03, %eax
+  jmp    FspApiCommon
+
+#----------------------------------------------------------------------------
+# TempRamExitApi API
+#
+# This API tears down temporary RAM
+#
+#----------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(TempRamExitApi)
+ASM_PFX(TempRamExitApi):
+  movl   $0x04, %eax
+  jmp    FspApiCommon
+
+#----------------------------------------------------------------------------
+# FspSiliconInit API
+#
+# This FSP API initializes the CPU and the chipset including the IO
+# controllers in the chipset to enable normal operation of these devices.
+#
+#----------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(FspSiliconInitApi)
+ASM_PFX(FspSiliconInitApi):
+  movl   $0x05, %eax
+  jmp    FspApiCommon
+
+#----------------------------------------------------------------------------
+# FspApiCommon API
+#
+# This is the FSP API common entry point to resume the FSP execution
+#
+#----------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(FspApiCommon)
+ASM_PFX(FspApiCommon):
+  #
+  # EAX holds the API index
+  #
+
   #
   # Stack must be ready
-  #
-  pushl   $0x087654321
-  popl    %eax
-  cmpl    $0x087654321, %eax
-  jz      FspInitApiL0
+  #  
+  pushl   %eax
+  addl    $0x04, %esp
+  cmpl    -4(%esp), %eax
+  jz      FspApiCommonL0
   movl    $0x080000003, %eax
-  jmp     FspInitApiexit
+  jmp     FspApiCommonExit
 
-FspInitApiL0:
+FspApiCommonL0:
   #
-  # Additional check
+  # Verify the calling condition
   #
-  pusha
-  pushl   $0x01
+  pushal
+  pushl   %eax
   call    ASM_PFX(FspApiCallingCheck)
   addl    $0x04, %esp
-  movl    %eax, 28(%esp)
-  popa
   cmpl    $0x00, %eax
-  jz      FspInitApiL1
-  jmp     FspInitApiexit
+  jz      FspApiCommonL1
+  movl    %eax, 0x1C(%esp)                   # mov    dword ptr [esp + 4 * 7], eax
+  popal
+  ret
 
-FspInitApiL1:
+FspApiCommonL1:
+  popal
+  cmpl    $0x01, %eax                        # FspInit API
+  jz      FspApiCommonL2
+  cmpl    $0x03, %eax                        # FspMemoryInit API
+  jz      FspApiCommonL2
+  jmp     Pei2LoaderSwitchStack
+
+FspApiCommonL2:
+  #
+  # FspInit and FspMemoryInit APIs, setup the initial stack frame
+  #  
+  
   #
   # Store the address in FSP which will return control to the BL
   #
-  pushl   $FspInitApiexit
+  pushl   $FspApiCommonExit
 
   #
   # Create a Task Frame in the stack for the Boot Loader
   #
-  pushfl     # 2 pushf for 4 byte alignment
+  pushfl                                     # 2 pushf for 4 byte alignment
   cli
   pushal
 
@@ -634,25 +722,30 @@ FspInitApiL1:
   #
   # Setup new FSP stack
   #
-  movl    %esp, %eax
-  movl    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamBase), %esp
-  addl    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamSize), %esp
+  movl    %esp, %edi
+  movl    PcdGet32(PcdTemporaryRamBase), %esp
+  addl    PcdGet32(PcdTemporaryRamSize), %esp
   subl    $(DATA_LEN_AT_STACK_TOP + 0x40), %esp
 
-  # Save the bootloader's stack pointer
   #
-  pushl    %eax
+  # Pass the API Idx to SecStartup
+  #
+  pushl   %eax
+  
+  #
+  # Pass the bootloader stack to SecStartup
+  #
+  pushl   %edi
 
   #
   # Pass entry point of the PEI core
   #
-  call     ASM_PFX(GetFspBaseAddress)
-  movl     ASM_PFX(FspImageSizeOffset), %edi
-  movl     (%eax, %edi), %edi
-  addl     %eax, %edi
-  subl     $0x20, %edi
-  addl     (%edi), %eax
-  pushl    %eax
+  call    ASM_PFX(GetFspBaseAddress)
+  movl    %eax, %edi
+  addl    PcdGet32(PcdFspAreaSize), %edi
+  subl    $0x20, %edi
+  addl    %ds:(%edi), %eax
+  pushl   %eax
 
   #
   # Pass BFV into the PEI Core
@@ -661,72 +754,27 @@ FspInitApiL1:
   # PcdFspAreaBaseAddress are the same. For FSP with mulitple FVs,
   # they are different. The code below can handle both cases.
   #
-  call     ASM_PFX(GetFspBaseAddress)
-  movl     %eax , %edi
-  call     ASM_PFX(GetBootFirmwareVolumeOffset)
-  addl     %edi ,%eax
-  pushl    %eax
+  call    ASM_PFX(GetFspBaseAddress)
+  movl    %eax, %edi
+  call    ASM_PFX(GetBootFirmwareVolumeOffset)
+  addl    %edi, %eax
+  pushl   %eax
 
   #
   # Pass stack base and size into the PEI Core
   #
-  movl     ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamBase), %eax
-  addl     ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamSize), %eax
-  subl     ASM_PFX(_gPcd_FixedAtBuild_PcdFspTemporaryRamSize), %eax
-  pushl    %eax
-  pushl    ASM_PFX(_gPcd_FixedAtBuild_PcdFspTemporaryRamSize)
+  movl    PcdGet32(PcdTemporaryRamBase), %eax
+  addl    PcdGet32(PcdTemporaryRamSize), %eax
+  subl    PcdGet32(PcdFspTemporaryRamSize), %eax
+  pushl   %eax
+  pushl   PcdGet32(PcdFspTemporaryRamSize)
 
   #
   # Pass Control into the PEI Core
   #
   call    ASM_PFX(SecStartup)
 
-FspInitApiexit:
+FspApiCommonExit:
   ret
 
 
-#----------------------------------------------------------------------------
-# NotifyPhase API
-#
-# This FSP API will notify the FSP about the different phases in the boot
-# process
-#
-#----------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(NotifyPhaseApi)
-ASM_PFX(NotifyPhaseApi):
-  #
-  # Stack must be ready
-  #
-  pushl  $0x0087654321
-  popl   %eax
-  cmpl   $0x087654321, %eax
-  jz     NotifyPhaseApiL0
-  movl   $0x080000003, %eax
-  jmp    NotifyPhaseApiErrExit
-
-NotifyPhaseApiL0:
-  #
-  # Verify the calling condition
-  #
-  pusha
-  pushl  $0x02
-  call   ASM_PFX(FspApiCallingCheck)
-  addl   $0x04, %esp
-  movl   %eax, 28(%esp)
-  popa
-
-  cmpl   $0x00, %eax
-  jz     NotifyPhaseApiL1
-
-  #
-  # Error return
-  #
-NotifyPhaseApiErrExit:
-  ret
-
-NotifyPhaseApiL1:
-  jmp    ASM_PFX(Pei2LoaderSwitchStack)
-
-
-
-#END

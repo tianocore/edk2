@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -107,7 +107,8 @@ InitializeFloatingPointUnits (
   @param[in] SizeOfRam          Size of the temporary memory available for use.
   @param[in] TempRamBase        Base address of tempory ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
-  @param[in] PeiCoreEntry       Pei Core entrypoint.
+  @param[in] PeiCore            PeiCore entry point.
+  @param[in] BootloaderStack    Bootloader stack.
 
   @return This function never returns.
 
@@ -118,7 +119,9 @@ SecStartup (
   IN UINT32                   SizeOfRam,
   IN UINT32                   TempRamBase,
   IN VOID                    *BootFirmwareVolume,
-  IN UINTN                    PeiCoreEntry
+  IN PEI_CORE_ENTRY           PeiCore,
+  IN UINT32                   BootloaderStack,
+  IN UINT32                   ApiIdx
   );
 
 /**

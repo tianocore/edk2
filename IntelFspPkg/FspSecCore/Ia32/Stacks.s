@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -28,12 +28,12 @@ ASM_GLOBAL ASM_PFX(SecSwitchStack)
 ASM_GLOBAL ASM_PFX(SecSwitchStack)
 ASM_PFX(SecSwitchStack):
 #
-# Save three register: eax, ebx, ecx
+# Save four registers: eax, ebx, ecx, edx
 #
-    push  %eax
-    push  %ebx
-    push  %ecx
-    push  %edx
+    pushl  %eax
+    pushl  %ebx
+    pushl  %ecx
+    pushl  %edx
 
 #
 # !!CAUTION!! this function address's is pushed into stack after
@@ -67,7 +67,6 @@ ASM_PFX(SecSwitchStack):
 #
 # Fixup the ebp point to permenent memory
 #
-
     movl   %ebp, %eax
     subl   %ebx, %eax
     addl   %ecx, %eax
@@ -76,13 +75,12 @@ ASM_PFX(SecSwitchStack):
 #
 # Fixup callee's ebp point for PeiDispatch
 #
-    movl   %ebp, %eax
-    subl   %ebx, %eax
-    addl   %ecx, %eax
-    movl   %eax, %ebp                #  From now, ebp is pointed to permenent memory
-
-    pop   %edx
-    pop   %ecx
-    pop   %ebx
-    pop   %eax
+#    movl   %ebp, %eax
+#    subl   %ebx, %eax
+#    addl   %ecx, %eax
+#    movl   %eax, %ebp                #  From now, ebp is pointed to permenent memory
+    popl   %edx
+    popl   %ecx
+    popl   %ebx
+    popl   %eax    
     ret

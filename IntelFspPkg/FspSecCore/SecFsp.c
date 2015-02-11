@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,6 @@
 **/
 
 #include "SecFsp.h"
-
-UINT32  FspImageSizeOffset = FSP_INFO_HEADER_OFF + OFFSET_IN_FSP_INFO_HEADER(ImageSize);
 
 /**
 
@@ -140,13 +138,15 @@ SecGetPlatformData (
   It needs to be done as soon as possible after the stack is setup.
 
   @param[in,out] PeiFspData             Pointer of the FSP global data.
-  @param[in]     BootFirmwareVolume     Point to the address of BootFirmwareVolume in stack.
+  @param[in]     BootloaderStack        Bootloader stack.
+  @param[in]     ApiIdx                 The index of the FSP API.
 
 **/
 VOID
 FspGlobalDataInit (
   IN OUT  FSP_GLOBAL_DATA    *PeiFspData,
-  IN      VOID              **BootFirmwareVolume
+  IN UINT32                   BootloaderStack,
+  IN UINT8                    ApiIdx
   )
 {
   VOID              *UpdDataRgnPtr;
@@ -162,7 +162,7 @@ FspGlobalDataInit (
   ZeroMem  ((VOID *)PeiFspData, sizeof(FSP_GLOBAL_DATA));
 
   PeiFspData->Signature          = FSP_GLOBAL_DATA_SIGNATURE;
-  PeiFspData->CoreStack          = *(UINTN *)(BootFirmwareVolume + 2);
+  PeiFspData->CoreStack          = BootloaderStack;
   PeiFspData->PerfIdx            = 2;
 
   SetFspMeasurePoint (FSP_PERF_ID_API_FSPINIT_ENTRY);
@@ -173,6 +173,11 @@ FspGlobalDataInit (
   //
   PeiFspData->FspInfoHeader      = (FSP_INFO_HEADER *)(GetFspBaseAddress() + FSP_INFO_HEADER_OFF);
   SecGetPlatformData (PeiFspData);
+
+  //
+  // Set API calling mode
+  //
+  SetFspApiCallingMode (ApiIdx == 1 ? 0 : 1);
 
   //
   // Initialize UPD pointer.
@@ -202,8 +207,13 @@ FspGlobalDataInit (
   }
   ImageId[Idx] = 0;
 
-  DEBUG ((DEBUG_INFO | DEBUG_INIT, "\n============= PEIM FSP  (%a 0x%08X) =============\n", \
-         ImageId, PeiFspData->FspInfoHeader->ImageRevision));
+  DEBUG ((DEBUG_INFO | DEBUG_INIT, "\n============= PEIM FSP v1.%x (%a v%x.%x.%x.%x) =============\n", \
+         PeiFspData->FspInfoHeader->HeaderRevision - 1, \
+         ImageId, \
+         (PeiFspData->FspInfoHeader->ImageRevision >> 24) & 0xff, \
+         (PeiFspData->FspInfoHeader->ImageRevision >> 16) & 0xff, \
+         (PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xff, \
+         (PeiFspData->FspInfoHeader->ImageRevision >> 0) & 0xff));
 
 }
 
@@ -252,6 +262,35 @@ FspApiCallingCheck (
   } else if (ApiIdx == 2) {
     //
     // NotifyPhase check
+    //
+    if ((FspData == NULL) || ((UINT32)FspData == 0xFFFFFFFF)) {
+      Status = EFI_UNSUPPORTED;
+    } else {
+      if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
+        Status = EFI_UNSUPPORTED;
+      }
+    }
+  } else if (ApiIdx == 3) {
+    //
+    // FspMemoryInit check
+    //
+    if ((UINT32)FspData != 0xFFFFFFFF) {
+      Status = EFI_UNSUPPORTED;
+    }
+  } else if (ApiIdx == 4) {
+    //
+    // TempRamExit check
+    //
+    if ((FspData == NULL) || ((UINT32)FspData == 0xFFFFFFFF)) {
+      Status = EFI_UNSUPPORTED;
+    } else {
+      if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
+        Status = EFI_UNSUPPORTED;
+      }
+    }
+  } else if (ApiIdx == 5) {
+    //
+    // FspSiliconInit check
     //
     if ((FspData == NULL) || ((UINT32)FspData == 0xFFFFFFFF)) {
       Status = EFI_UNSUPPORTED;
