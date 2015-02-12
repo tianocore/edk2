@@ -254,10 +254,10 @@ EndList
                                     ElifStack[-1] = ElifStack[-1] + 1
                             else:
                                 if len(DscLine) > 0 and DscLine[0] == '!':
-								    #
-								    # Current it can only handle build switch.
-									# It does not support INF file in included dsc.
-									#
+                                    #
+                                    # Current it can only handle build switch.
+                                    # It does not support INF file in included dsc.
+                                    #
                                 else:
                                     if reduce(lambda x,y: x and y, IfStack):
                                         Handle = True
@@ -619,8 +619,8 @@ EndList
                 ImageRev = struct.unpack('<I', BinFd.read(0x04))
                 BinFd.close()
 
-                HeaderFd.write("#define VPD_IMAGE_ID    0x%016X        /* '%s' */\n" % (ImageId[0], IdStr))
-                HeaderFd.write("#define VPD_IMAGE_REV   0x%08X \n\n" % ImageRev[0])
+                HeaderFd.write("#define FSP_IMAGE_ID    0x%016X        /* '%s' */\n" % (ImageId[0], IdStr))
+                HeaderFd.write("#define FSP_IMAGE_REV   0x%08X \n\n" % ImageRev[0])
 
             HeaderFd.write("typedef struct _" + Region[0]  + "PD_DATA_REGION {\n")
             NextOffset  = 0

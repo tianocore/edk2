@@ -38,7 +38,6 @@ typedef struct  {
    UINT8              Reserved[3];
    UINT32             PerfIdx;
    UINT64             PerfData[32];
-//   UINT64             PerfData[FixedPcdGet32(PcdFspMaxPerfEntry)];
 } FSP_GLOBAL_DATA;
 
 #pragma pack()
