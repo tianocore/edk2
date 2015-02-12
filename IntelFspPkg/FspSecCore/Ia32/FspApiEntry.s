@@ -183,7 +183,7 @@ ASM_GLOBAL    ASM_PFX(Pei2LoaderSwitchStack)
 .equ          DATA_LEN_AT_STACK_TOP, (DATA_LEN_OF_PER0 + DATA_LEN_OF_MCUD + 4)
 
 #------------------------------------------------------------------------------
-# FspSelfCheckDflt
+# FspSelfCheckDefault
 # Inputs:
 #   eax -> Return address
 # Outputs:
@@ -192,20 +192,20 @@ ASM_GLOBAL    ASM_PFX(Pei2LoaderSwitchStack)
 #   eax is cleared and ebp is used for return address.
 #   All others reserved.
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(FspSelfCheckDflt)
-ASM_PFX(FspSelfCheckDflt):
+ASM_GLOBAL ASM_PFX(FspSelfCheckDefault)
+ASM_PFX(FspSelfCheckDefault):
    #
    # Save return address to EBP
    #
    movl  %eax, %ebp
    xorl  %eax, %eax
 
-FspSelfCheckDfltExit:
+FspSelfCheckDefaultExit:
    jmp   *%ebp
 
 
 #------------------------------------------------------------------------------
-# SecPlatformInitDflt
+# SecPlatformInitDefault
 # Inputs:
 #   eax -> Return address
 # Outputs:
@@ -214,15 +214,15 @@ FspSelfCheckDfltExit:
 #   eax is cleared and ebp is used for return address.
 #   All others reserved.
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(SecPlatformInitDflt)
-ASM_PFX(SecPlatformInitDflt):
+ASM_GLOBAL ASM_PFX(SecPlatformInitDefault)
+ASM_PFX(SecPlatformInitDefault):
    #
    # Save return address to EBP
    #
    movl   %eax, %ebp
    xorl   %eax, %eax
 
-SecPlatformInitDfltExit:
+SecPlatformInitDefaultExit:
    jmp   *%ebp
 
 
@@ -550,7 +550,7 @@ ASM_PFX(TempRamInitApi):
   # CPUID/DeviceID check
   #
   movl    $TempRamInitApiL0, %eax
-  jmp     ASM_PFX(FspSelfCheckDflt)  # @note: ESP can not be changed.
+  jmp     ASM_PFX(FspSelfCheckDefault)  # @note: ESP can not be changed.
 TempRamInitApiL0:
   cmpl    $0x00, %eax
   jnz     NemInitExit

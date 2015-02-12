@@ -40,9 +40,9 @@ EXTERN   FspApiCallingCheck:PROC
 EXTERN   GetFspBaseAddress:PROC
 EXTERN   GetBootFirmwareVolumeOffset:PROC
 EXTERN   Pei2LoaderSwitchStack:PROC
-EXTERN   FspSelfCheck(FspSelfCheckDflt):PROC
-EXTERN   LoadUcode(LoadUcodeDflt):PROC
-EXTERN   SecPlatformInit(SecPlatformInitDflt):PROC
+EXTERN   FspSelfCheck(FspSelfCheckDefault):PROC
+EXTERN   LoadUcode(LoadUcodeDefault):PROC
+EXTERN   SecPlatformInit(SecPlatformInitDefault):PROC
 EXTERN   SecCarInit:PROC
 
 ;
@@ -82,7 +82,7 @@ RET_ESI  MACRO
 ENDM
 
 ;------------------------------------------------------------------------------
-FspSelfCheckDflt PROC NEAR PUBLIC
+FspSelfCheckDefault PROC NEAR PUBLIC
    ; Inputs:
    ;   eax -> Return address
    ; Outputs:
@@ -97,10 +97,10 @@ FspSelfCheckDflt PROC NEAR PUBLIC
    xor   eax, eax
 exit:
    jmp   ebp
-FspSelfCheckDflt   ENDP
+FspSelfCheckDefault   ENDP
 
 ;------------------------------------------------------------------------------
-SecPlatformInitDflt PROC NEAR PUBLIC
+SecPlatformInitDefault PROC NEAR PUBLIC
    ; Inputs:
    ;   eax -> Return address
    ; Outputs:
@@ -115,10 +115,10 @@ SecPlatformInitDflt PROC NEAR PUBLIC
    xor   eax, eax
 exit:
    jmp   ebp
-SecPlatformInitDflt   ENDP
+SecPlatformInitDefault   ENDP
 
 ;------------------------------------------------------------------------------
-LoadUcodeDflt   PROC  NEAR PUBLIC
+LoadUcodeDefault   PROC  NEAR PUBLIC
    ; Inputs:
    ;   esp -> LOAD_UCODE_PARAMS pointer
    ; Register Usage:
@@ -300,7 +300,7 @@ done:
 exit:
    jmp   ebp
 
-LoadUcodeDflt   ENDP
+LoadUcodeDefault   ENDP
 
 EstablishStackFsp    PROC    NEAR    PRIVATE
   ;
