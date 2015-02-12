@@ -42,17 +42,21 @@ FspPeiEntryPoint (
     return EFI_DEVICE_ERROR;
   }
 
+  ASSERT (FspHeader->TempRamInitEntryOffset != 0);
+  ASSERT (FspHeader->FspInitEntryOffset != 0);
+  ASSERT (FspHeader->NotifyPhaseEntryOffset != 0);
+
   if ((PcdGet8 (PcdFspApiVersion) >= 2) &&
       (FspHeader->HeaderRevision >= FSP_HEADER_REVISION_2) &&
-      (FspHeader->ApiEntryNum >= 6) &&
-      (FspHeader->FspMemoryInitEntryOffset != 0) &&
-      (FspHeader->TempRamExitEntryOffset != 0) &&
-      (FspHeader->FspSiliconInitEntryOffset != 0) ) {
-    PcdFspApiVersion = FSP_HEADER_REVISION_2;
+      (FspHeader->ApiEntryNum >= 6) ) {
+    ASSERT (FspHeader->FspMemoryInitEntryOffset != 0);
+    ASSERT (FspHeader->TempRamExitEntryOffset != 0);
+    ASSERT (FspHeader->FspSiliconInitEntryOffset != 0);
+    PcdFspApiVersion = PcdGet8 (PcdFspApiVersion);
   }
   DEBUG ((DEBUG_INFO, "PcdFspApiVersion - 0x%x\n", PcdFspApiVersion));
 
-  if (PcdFspApiVersion == FSP_HEADER_REVISION_1) {
+  if (PcdFspApiVersion == 1) {
     PeiFspInitV1 (FspHeader);
   } else {
     PeiFspInitV2 (FspHeader);

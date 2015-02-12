@@ -25,7 +25,6 @@ typedef struct  {
   UINT8   Reserved;
   UINT32  PatchEntryNum;
   UINT32  PatchData[FixedPcdGet32(PcdFspMaxPatchEntry)];
-  UINT32  VpdBase;
 } FSP_PATCH_TABLE;
 
 #pragma pack()

@@ -205,7 +205,7 @@ FspSelfCheckDfltExit:
 
 
 #------------------------------------------------------------------------------
-# PlatformBasicInitDflt
+# SecPlatformInitDflt
 # Inputs:
 #   eax -> Return address
 # Outputs:
@@ -214,15 +214,15 @@ FspSelfCheckDfltExit:
 #   eax is cleared and ebp is used for return address.
 #   All others reserved.
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(PlatformBasicInitDflt)
-ASM_PFX(PlatformBasicInitDflt):
+ASM_GLOBAL ASM_PFX(SecPlatformInitDflt)
+ASM_PFX(SecPlatformInitDflt):
    #
    # Save return address to EBP
    #
    movl   %eax, %ebp
    xorl   %eax, %eax
 
-PlatformBasicInitDfltExit:
+SecPlatformInitDfltExit:
    jmp   *%ebp
 
 
@@ -244,7 +244,7 @@ ASM_PFX(LoadUcode):
    #
    # Save return address to EBP
    #
-   movd   %xmm7, %ebp
+   movd   %mm7, %ebp
 
    cmpl   $0x00, %esp
    jz     ParamError
@@ -451,8 +451,6 @@ LoadUcodeExit:
 #----------------------------------------------------------------------------
 # EstablishStackFsp
 #
-# Following is the code copied from BYTFSP, need to figure out what it is doing..
-#
 #----------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(EstablishStackFsp)
 ASM_PFX(EstablishStackFsp):
@@ -487,9 +485,9 @@ EstablishStackFspExit:
   #
   pushl   $DATA_LEN_OF_PER0                  # Size of the data region
   pushl   $0x30524550                        # Signature of the  data region 'PER0'
-  movd    %xmm4, %eax
-  pushl   %eax
-  movd    %xmm5, %eax
+  LOAD_EDX
+  pushl   %edx
+  LOAD_EAX
   pushl   %eax
   rdtsc
   pushl   %edx
@@ -537,8 +535,16 @@ ASM_PFX(TempRamInitApi):
   # Save timestamp into XMM4 & XMM5
   #
   rdtsc
-  movd    %edx, %xmm4
-  movd    %eax, %xmm5
+  SAVE_EAX
+  SAVE_EDX
+
+  #
+  # Check Parameter
+  #
+  movl    4(%esp), %eax
+  cmpl    $0x00, %eax
+  movl    $0x80000002, %eax
+  jz      NemInitExit
 
   #
   # CPUID/DeviceID check
@@ -556,31 +562,35 @@ TempRamInitApiL0:
   movd    %mm7, %esi
   jmp     ASM_PFX(SecPlatformInit)
 TempRamInitApiL1:
-
-  #
-  # Call Sec CAR Init
-  #
-  movl    $TempRamInitApiL2, %esi            #CALL_MMX  SecCarInit
-  movd    %mm7, %esi
-  jmp     ASM_PFX(SecCarInit)
-TempRamInitApiL2:
-
-  # @todo: ESP has been modified, we need to restore here.
-
-  LOAD_REGS
-  SAVE_REGS
+  cmpl    $0x00, %eax
+  jnz     NemInitExit
 
   #
   # Load microcode
   #
-  movl    $TempRamInitApiL3, %esi            #CALL_MMX  LoadUcode
+  LOAD_ESP
+  movl    $TempRamInitApiL2, %esi            #CALL_MMX  LoadUcode
   movd    %mm7, %esi
   jmp     ASM_PFX(LoadUcode)
+TempRamInitApiL2:
+  cmpl    $0x00, %eax
+  jnz     NemInitExit
+
+  #
+  # Call Sec CAR Init
+  #
+  LOAD_ESP
+  movl    $TempRamInitApiL3, %esi            #CALL_MMX  SecCarInit
+  movd    %mm7, %esi
+  jmp     ASM_PFX(SecCarInit)
 TempRamInitApiL3:
+  cmpl    $0x00, %eax
+  jnz     NemInitExit
 
   #
   # EstablishStackFsp
   #
+  LOAD_ESP
   movl    $TempRamInitApiL4, %esi            #CALL_MMX  EstablishStackFsp
   movd    %mm7, %esi
   jmp     ASM_PFX(EstablishStackFsp)

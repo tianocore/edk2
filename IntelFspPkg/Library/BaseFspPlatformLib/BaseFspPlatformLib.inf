@@ -39,7 +39,7 @@
   gIntelFspPkgTokenSpaceGuid.PcdFspTemporaryRamSize         ## CONSUMES
 
 [Guids]
-  gFspBootLoaderTempMemoryGuid                              ## PRODUCES ## HOB
+  gFspBootLoaderTemporaryMemoryGuid                         ## PRODUCES ## HOB
 
 [FixedPcd]
   gIntelFspPkgTokenSpaceGuid.PcdFspMaxPatchEntry        ## CONSUMES

@@ -103,10 +103,11 @@ FspMigrateTemporaryMemory (
   // Build a Boot Loader Temporary Memory GUID HOB
   //
   if (ApiMode == 0) {
-    BootLoaderTempRamHob = BuildGuidHob (&gFspBootLoaderTempMemoryGuid, BootLoaderTempRamSize);
+    BootLoaderTempRamHob = BuildGuidHob (&gFspBootLoaderTemporaryMemoryGuid, BootLoaderTempRamSize);
   } else {
-  	BootLoaderTempRamHob = (VOID *)AllocatePool (BootLoaderTempRamSize);
+    BootLoaderTempRamHob = (VOID *)AllocatePool (BootLoaderTempRamSize);
   }
+  ASSERT(BootLoaderTempRamHob != NULL);
 
   CopyMem (BootLoaderTempRamHob, (VOID *)BootLoaderTempRamStart, BootLoaderTempRamSize);
   OffsetGap = (UINT32)BootLoaderTempRamHob - BootLoaderTempRamStart;

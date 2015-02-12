@@ -41,9 +41,8 @@ EXTERN   GetFspBaseAddress:PROC
 EXTERN   GetBootFirmwareVolumeOffset:PROC
 EXTERN   Pei2LoaderSwitchStack:PROC
 EXTERN   FspSelfCheck(FspSelfCheckDflt):PROC
-EXTERN   PlatformBasicInit(PlatformBasicInitDflt):PROC
 EXTERN   LoadUcode(LoadUcodeDflt):PROC
-EXTERN   SecPlatformInit:PROC
+EXTERN   SecPlatformInit(SecPlatformInitDflt):PROC
 EXTERN   SecCarInit:PROC
 
 ;
@@ -101,7 +100,7 @@ exit:
 FspSelfCheckDflt   ENDP
 
 ;------------------------------------------------------------------------------
-PlatformBasicInitDflt PROC NEAR PUBLIC
+SecPlatformInitDflt PROC NEAR PUBLIC
    ; Inputs:
    ;   eax -> Return address
    ; Outputs:
@@ -116,7 +115,7 @@ PlatformBasicInitDflt PROC NEAR PUBLIC
    xor   eax, eax
 exit:
    jmp   ebp
-PlatformBasicInitDflt   ENDP
+SecPlatformInitDflt   ENDP
 
 ;------------------------------------------------------------------------------
 LoadUcodeDflt   PROC  NEAR PUBLIC
@@ -304,7 +303,6 @@ exit:
 LoadUcodeDflt   ENDP
 
 EstablishStackFsp    PROC    NEAR    PRIVATE
-  ; Following is the code copied from BYTFSP, need to figure out what it is doing..
   ;
   ; Save parameter pointer in edx  
   ;
@@ -336,9 +334,9 @@ InvalidMicrocodeRegion:
   ;
   push      DATA_LEN_OF_PER0     ; Size of the data region 
   push      30524550h            ; Signature of the  data region 'PER0'
-  movd      eax, xmm4
-  push      eax
-  movd      eax, xmm5
+  LOAD_EDX
+  push      edx
+  LOAD_EAX
   push      eax
   rdtsc
   push      edx
@@ -387,9 +385,17 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   ; Save timestamp into XMM4 & XMM5
   ;
   rdtsc
-  movd      xmm4, edx
-  movd      xmm5, eax
-  
+  SAVE_EAX
+  SAVE_EDX
+
+  ;
+  ; Check Parameter
+  ;
+  mov       eax, dword ptr [esp + 4]
+  cmp       eax, 0
+  mov       eax, 80000002h
+  jz        NemInitExit
+
   ;
   ; CPUID/DeviceID check
   ;
@@ -400,16 +406,22 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   jnz       NemInitExit
 
   CALL_MMX  SecPlatformInit
+  cmp       eax, 0
+  jnz       NemInitExit
+  
+  ; Load microcode
+  LOAD_ESP
+  CALL_MMX  LoadUcode
+  cmp       eax, 0
+  jnz       NemInitExit
 
   ; Call Sec CAR Init
+  LOAD_ESP
   CALL_MMX  SecCarInit
-  
-  ; @todo: ESP has been modified, we need to restore here.
-  LOAD_REGS
-  SAVE_REGS
-  ; Load microcode
-  CALL_MMX  LoadUcode
+  cmp       eax, 0
+  jnz       NemInitExit
 
+  LOAD_ESP
   CALL_MMX  EstablishStackFsp
 
 NemInitExit:

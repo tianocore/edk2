@@ -16,8 +16,7 @@
 #ifndef __GUID_HOB_FSP_EAS_GUID__
 #define __GUID_HOB_FSP_EAS_GUID__
 
-extern EFI_GUID gFspBootLoaderTempMemoryGuid;
-extern EFI_GUID gFspBootLoaderTemporaryMemoryGuid; // Same as gFspBootLoaderTempMemoryGuid
+extern EFI_GUID gFspBootLoaderTemporaryMemoryGuid;
 
 extern EFI_GUID gFspReservedMemoryResourceHobGuid;
 extern EFI_GUID gFspNonVolatileStorageHobGuid;

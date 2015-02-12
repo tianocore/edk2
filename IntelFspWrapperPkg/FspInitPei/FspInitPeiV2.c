@@ -169,6 +169,7 @@ PeiFspMemoryInit (
   FspMemoryInitParams.NvsBufferPtr = GetNvsBuffer ();
   DEBUG ((DEBUG_INFO, "NvsBufferPtr - 0x%x\n", FspMemoryInitParams.NvsBufferPtr));
   FspMemoryInitParams.RtBufferPtr  = (VOID *)&FspRtBuffer;
+  FspHobList = NULL;
   FspMemoryInitParams.HobListPtr   = &FspHobList;
 
   DEBUG ((DEBUG_INFO, "FspMemoryInitParams - 0x%x\n", &FspMemoryInitParams));
@@ -184,6 +185,7 @@ PeiFspMemoryInit (
   ASSERT_EFI_ERROR (Status);
 
   DEBUG ((DEBUG_INFO, "  HobListPtr (returned) - 0x%x\n", FspHobList));
+  ASSERT (FspHobList != NULL);
 
   FspHobProcessForMemoryResource (FspHobList);
 
