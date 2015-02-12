@@ -109,6 +109,7 @@ InitializeFloatingPointUnits (
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
   @param[in] PeiCore            PeiCore entry point.
   @param[in] BootloaderStack    Bootloader stack.
+  @param[in] ApiIdx             the index of API.
 
   @return This function never returns.
 

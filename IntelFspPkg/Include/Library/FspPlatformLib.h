@@ -38,7 +38,7 @@ FspMigrateTemporaryMemory (
   );
 
 /**
-  Set a new stack frame for the continuation function
+  Set a new stack frame for the continuation function.
 
 **/
 VOID
