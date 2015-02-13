@@ -1,7 +1,7 @@
 ##  @file
 # Provides interface to shell functionality for shell commands and applications.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+#   Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -41,10 +41,10 @@
   PcdLib
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid             # ALWAYS_USED
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiFileInfoGuid                              # ALWAYS_CONSUMED
+  gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd.common]
-  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize ## SOMETIMES_CONSUMES
