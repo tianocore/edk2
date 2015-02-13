@@ -110,7 +110,7 @@ SecPlatformInitDefault PROC NEAR PUBLIC
    ;   All others reserved.
    
    ; Save return address to EBP
-   mov   ebp, mm7
+   movd  ebp, mm7
 
    xor   eax, eax
 exit:
