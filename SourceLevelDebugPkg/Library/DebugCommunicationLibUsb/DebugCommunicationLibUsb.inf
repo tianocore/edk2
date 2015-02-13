@@ -1,7 +1,7 @@
 ## @file
 #  Debug Communication Library instance based on usb debug port.
 #
-#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -34,17 +34,17 @@
   SourceLevelDebugPkg/SourceLevelDebugPkg.dec
 
 [Pcd]
-  ## The memory BAR of usb debug port, it may be different with the memory bar of ehci host controller.
-  ## Note that the memory BAR address is only used before Pci bus resource allocation.
+  # The memory BAR of usb debug port, it may be different with the memory bar of ehci host controller.
+  # Note that the memory BAR address is only used before Pci bus resource allocation.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbDebugPortMemorySpaceBase    ## SOMETIMES_CONSUMES
-  ## The memory BAR of ehci host controller, in which usb debug feature is enabled.
-  ## Note that the memory BAR address is only used before Pci bus resource allocation.
+  # The memory BAR of ehci host controller, in which usb debug feature is enabled.
+  # Note that the memory BAR address is only used before Pci bus resource allocation.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciMemorySpaceBase         ## SOMETIMES_CONSUMES
-  ## The pci address of ehci host controller, in which usb debug feature is enabled.
-  ## The format of pci address please refer to SourceLevelDebugPkg.dec
+  # The pci address of ehci host controller, in which usb debug feature is enabled.
+  # The format of pci address please refer to SourceLevelDebugPkg.dec
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress              ## CONSUMES
-  ## The value of data buffer size used for USB debug port handle.
-  ## It should be equal to sizeof (USB_DEBUG_PORT_HANDLE).
+  # The value of data buffer size used for USB debug port handle.
+  # It should be equal to sizeof (USB_DEBUG_PORT_HANDLE).
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|40   ## SOMETIMES_CONSUMES
 
 [LibraryClasses]
