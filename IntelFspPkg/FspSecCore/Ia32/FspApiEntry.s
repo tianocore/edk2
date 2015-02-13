@@ -207,7 +207,7 @@ FspSelfCheckDefaultExit:
 #------------------------------------------------------------------------------
 # SecPlatformInitDefault
 # Inputs:
-#   eax -> Return address
+#   mm7 -> Return address
 # Outputs:
 #   eax -> 0 - Successful, Non-zero - Failed.
 # Register Usage:
@@ -219,7 +219,7 @@ ASM_PFX(SecPlatformInitDefault):
    #
    # Save return address to EBP
    #
-   movl   %eax, %ebp
+   movd   %mm7, %ebp
    xorl   %eax, %eax
 
 SecPlatformInitDefaultExit:
@@ -532,7 +532,7 @@ ASM_PFX(TempRamInitApi):
   SAVE_REGS
 
   #
-  # Save timestamp into XMM4 & XMM5
+  # Save timestamp into XMM6
   #
   rdtsc
   SAVE_EAX

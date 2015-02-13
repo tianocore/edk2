@@ -57,19 +57,19 @@ DATA_LEN_AT_STACK_TOP    EQU   (DATA_LEN_OF_PER0 + DATA_LEN_OF_MCUD + 4)
 ;
 LOAD_MMX_EXT MACRO   ReturnAddress, MmxRegister
   mov     esi, ReturnAddress
-  movd    MmxRegister, esi              ; save ReturnAddress into MM7  
+  movd    MmxRegister, esi              ; save ReturnAddress into MMX
 ENDM
 
 CALL_MMX_EXT MACRO   RoutineLabel, MmxRegister
   local   ReturnAddress
   mov     esi, offset ReturnAddress
-  movd    MmxRegister, esi              ; save ReturnAddress into MM7
+  movd    MmxRegister, esi              ; save ReturnAddress into MMX
   jmp     RoutineLabel
 ReturnAddress:
 ENDM
 
 RET_ESI_EXT  MACRO   MmxRegister
-  movd    esi, MmxRegister              ; restore ESP from MM7
+  movd    esi, MmxRegister              ; restore ESP from MMX
   jmp     esi
 ENDM
 
@@ -102,15 +102,15 @@ FspSelfCheckDefault   ENDP
 ;------------------------------------------------------------------------------
 SecPlatformInitDefault PROC NEAR PUBLIC
    ; Inputs:
-   ;   eax -> Return address
+   ;   mm7 -> Return address
    ; Outputs:
    ;   eax -> 0 - Successful, Non-zero - Failed.
    ; Register Usage:
    ;   eax is cleared and ebp is used for return address.
    ;   All others reserved.
-
+   
    ; Save return address to EBP
-   mov   ebp, eax
+   mov   ebp, mm7
 
    xor   eax, eax
 exit:
@@ -382,7 +382,7 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   SAVE_REGS
 
   ;
-  ; Save timestamp into XMM4 & XMM5
+  ; Save timestamp into XMM6
   ;
   rdtsc
   SAVE_EAX
