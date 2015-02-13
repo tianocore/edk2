@@ -680,6 +680,126 @@
   #  Note this PCD could be set to TRUE for best boot performance and set to FALSE for best device compatibility.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection|TRUE
 
+  #######################################################################################################
+  #
+  # Begin of MRC parameters
+  #
+  
+  ## Memory Parameter Patchable.
+  #  FALSE - MRC Parameters are fixed for MinnowBoard Max<BR>
+  #  TRUE  - MRC Parameters are patchable by following PCDs<BR>
+  # @Prompt Memory Parameter Patchable.
+  # @ValidList 0x80000001 | 0, 1  
+  gVlvRefCodePkgTokenSpaceGuid.PcdMemoryParameterPatchable|FALSE
+  
+  ## Memory Down or DIMM slot.
+  #  0 - DIMM<BR>
+  #  1 - Memory Down<BR>
+  # @Prompt Enable Memory Down
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdEnableMemoryDown|1
+     
+  ## The speed of DRAM.
+  #  0 - 800 MHz<BR>
+  #  1 - 1066 MHz<BR>
+  #  2 - 1333 MHz<BR>
+  #  3 - 1600 MHz<BR>
+  # @Prompt DRAM Speed
+  # @ValidList 0x80000001 | 0, 1, 2, 3
+  gVlvRefCodePkgTokenSpaceGuid.PcdDramSpeed|1
+
+  ## DRAM Type.
+  #  0 - DDR3<BR>
+  #  1 - DDR3L<BR>
+  #  2 - DDR3U<BR>
+  #  3 - DDR3All<BR>
+  #  4 - LPDDR2<BR>
+  #  5 - LPDDR3<BR>
+  #  6 - DDR4<BR>
+  # @Prompt DRAM Type
+  # @ValidList 0x80000001 | 0, 1, 2, 3, 4, 5, 6
+  gVlvRefCodePkgTokenSpaceGuid.PcdDramType|1
+    
+  ## Please populate DIMM slot 0 if only one DIMM is supported.
+  #  0 - Disable<BR>
+  #  1 - Enable<BR>
+  # @Prompt DIMM 0 Enable 
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdEnableDimm0|1
+
+  ## DIMM 1 has to be identical to DIMM 0.
+  #  0 - Disable<BR>
+  #  1 - Enable<BR>
+  # @Prompt DIMM 1 Enable Type
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdEnableDimm1|0
+  
+  ## DRAM device data width.
+  #  0 - x8<BR>
+  #  1 - x16<BR>
+  #  2 - x32<BR>
+  # @Prompt DIMM_DWIDTH
+  # @ValidList 0x80000001 | 0, 1, 2
+  gVlvRefCodePkgTokenSpaceGuid.PcdDimmDataWidth|1
+
+  ## DRAM device data density.
+  #  0 - 1 Gbit<BR>
+  #  1 - 2 Gbit<BR>
+  #  2 - 4 Gbit<BR>
+  #  3 - 8 Gbit<BR>
+  # @Prompt DIMM_Density
+  # @ValidList 0x80000001 | 0, 1, 2, 3
+  gVlvRefCodePkgTokenSpaceGuid.PcdDimmDensity|2
+  
+  ## DRAM device data bus width.
+  #  0 - 8 bits<BR>
+  #  1 - 16 bits<BR>
+  #  2 - 32 bits<BR>
+  #  3 - 64 bits<BR>
+  # @Prompt DIMM_BusWidth
+  # @ValidList 0x80000001 | 0, 1, 2, 3
+  gVlvRefCodePkgTokenSpaceGuid.PcdDimmBusWidth|3
+
+  ## Ranks Per DIMM or Sides Per DIMM.
+  #  0 - 1 Rank<BR>
+  #  1 - 2 Ranks<BR>
+  # @Prompt DIMM_Sides
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdRankPerDimm|0
+
+  ## tCL.<BR><BR>
+  # @Prompt tCL
+  gVlvRefCodePkgTokenSpaceGuid.PcdTcl|11
+
+  ## tRP and tRCD in DRAM clk - 5:12.5ns, 6:15ns, etc.
+  # @Prompt tRP_tRCD 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTrpTrcd|11
+
+  ## tWR in DRAM clk. 
+  # @Prompt tWR 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTwr|12
+  
+  ## tWTR in DRAM clk.  
+  # @Prompt tWTR 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTwtr|6
+  
+  ## tRRD in DRAM clk. 
+  # @Prompt tRRD 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTrrd|6
+   
+  ## tRTP in DRAM clk.  
+  # @Prompt tRTP 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTrtp|6
+
+  ## tFAW in DRAM clk.
+  # @Prompt tFAW 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTfaw|32
+  
+  #
+  # End of MRC parameters.
+  # 
+  ###############################################################################################
+
 [PcdsDynamicHii.common.DEFAULT]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5 # Variable: L"Timeout"
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|L"HwErrRecSupport"|gEfiGlobalVariableGuid|0x0|1 # Variable: L"HwErrRecSupport"
