@@ -119,3 +119,114 @@
   gVlvRefCodePkgTokenSpaceGuid.PcdCeAtaSupport|FALSE|BOOLEAN|0x12
   gVlvRefCodePkgTokenSpaceGuid.PcdMmcSdMultiBlockSupport|TRUE|BOOLEAN|0x13
 
+[PcdsPatchableInModule]
+
+  ## Memory Down or DIMM slot.<BR><BR>
+  #  0 - DIMM<BR>
+  #  1 - Memory Down<BR>
+  # @Prompt Enable Memory Down
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdEnableMemoryDown|1|UINT8|0x20000000
+  
+  ## Memory Parameter Patchable.<BR><BR>
+  #  0 - Fixed Parameter for MinnowBoard Max<BR>
+  #  1 - Patchable Parameter for Customization<BR>
+  # @Prompt Memory Parameter Patchable.
+  # @ValidList 0x80000001 | 0, 1  
+  gVlvRefCodePkgTokenSpaceGuid.PcdMemoryParameterPatchable|FALSE|BOOLEAN|0x20000010
+    
+  ## The speed of DRAM.<BR><BR>
+  #  0 - 800 MHz<BR>
+  #  1 - 1066 MHz<BR>
+  #  2 - 1333 MHz<BR>
+  #  3 - 1600 MHz<BR>
+  # @Prompt DRAM Speed
+  # @ValidList 0x80000001 | 0, 1, 2, 3
+  gVlvRefCodePkgTokenSpaceGuid.PcdDramSpeed|1|UINT8|0x20000001
+
+  ## DRAM Type.<BR><BR>
+  #  0 - DDR3<BR>
+  #  1 - DDR3L<BR>
+  #  2 - DDR3U<BR>
+  #  3 - DDR3All<BR>
+  #  4 - LPDDR2<BR>
+  #  5 - LPDDR3<BR>
+  #  6 - DDR4<BR>
+  # @Prompt DRAM Type
+  # @ValidList 0x80000001 | 0, 1, 2, 3, 4, 5, 6
+  gVlvRefCodePkgTokenSpaceGuid.PcdDramType|1|UINT8|0x20000002
+    
+  ## Please populate DIMM slot 0 if only one DIMM is supported.<BR><BR>
+  #  0 - Disable<BR>
+  #  1 - Enable<BR>
+  # @Prompt DIMM 0 Enable 
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdEnableDimm0|1|UINT8|0x20000003
+
+  ## DIMM 1 has to be identical to DIMM 0.<BR><BR>
+  #  0 - Disable<BR>
+  #  1 - Enable<BR>
+  # @Prompt DIMM 1 Enable Type
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdEnableDimm1|0|UINT8|0x20000004
+  
+  ## DRAM device data width.<BR><BR>
+  #  0 - x8<BR>
+  #  1 - x16<BR>
+  #  2 - x32<BR>
+  # @Prompt DIMM_DWIDTH
+  # @ValidList 0x80000001 | 0, 1, 2
+  gVlvRefCodePkgTokenSpaceGuid.PcdDimmDataWidth|1|UINT8|0x20000005
+
+  ## DRAM device data density.<BR><BR>
+  #  0 - 1 Gbit<BR>
+  #  1 - 2 Gbit<BR>
+  #  2 - 4 Gbit<BR>
+  #  3 - 8 Gbit<BR>
+  # @Prompt DIMM_Density
+  # @ValidList 0x80000001 | 0, 1, 2, 3
+  gVlvRefCodePkgTokenSpaceGuid.PcdDimmDensity|2|UINT8|0x20000006
+  
+  ## DRAM device data bus width.<BR><BR>
+  #  0 - 8 bits<BR>
+  #  1 - 16 bits<BR>
+  #  2 - 32 bits<BR>
+  #  3 - 64 bits<BR>
+  # @Prompt DIMM_BusWidth
+  # @ValidList 0x80000001 | 0, 1, 2, 3
+  gVlvRefCodePkgTokenSpaceGuid.PcdDimmBusWidth|3|UINT8|0x20000007
+
+  ## Ranks Per DIMM or Sides Per DIMM.<BR><BR>
+  #  0 - 1 Rank<BR>
+  #  1 - 2 Ranks<BR>
+  # @Prompt DIMM_Sides
+  # @ValidList 0x80000001 | 0, 1
+  gVlvRefCodePkgTokenSpaceGuid.PcdRankPerDimm|0|UINT8|0x20000008
+
+  ## tCL.<BR><BR>
+  # @Prompt tCL
+  gVlvRefCodePkgTokenSpaceGuid.PcdTcl|11|UINT8|0x20000009
+
+  ## tRP and tRCD in DRAM clk - 5:12.5ns, 6:15ns, etc.<BR><BR>   
+  # @Prompt tRP_tRCD 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTrpTrcd|11|UINT8|0x2000000A
+
+  ## tWR in DRAM clk.<BR><BR>   
+  # @Prompt tWR 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTwr|12|UINT8|0x2000000B
+  
+  ## tWTR in DRAM clk.<BR><BR>   
+  # @Prompt tWTR 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTwtr|6|UINT8|0x2000000C
+  
+  ## tRRD in DRAM clk.<BR><BR>   
+  # @Prompt tRRD 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTrrd|6|UINT8|0x2000000D
+   
+  ## tRTP in DRAM clk.<BR><BR>   
+  # @Prompt tRTP 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTrtp|6|UINT8|0x2000000E
+
+  ## tFAW in DRAM clk.<BR><BR>   
+  # @Prompt tFAW 
+  gVlvRefCodePkgTokenSpaceGuid.PcdTfaw|32|UINT8|0x2000000F
