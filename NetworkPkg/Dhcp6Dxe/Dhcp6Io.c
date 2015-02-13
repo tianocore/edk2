@@ -2900,7 +2900,10 @@ ON_CONTINUE:
              0
              );
     if (EFI_ERROR (Status)) {
-      Dhcp6CleanupRetry (Instance, DHCP6_PACKET_ALL);
+      NET_LIST_FOR_EACH_SAFE (Entry1, Next1, &Service->Child) {
+        Instance = NET_LIST_USER_STRUCT (Entry1, DHCP6_INSTANCE, Link);
+        Dhcp6CleanupRetry (Instance, DHCP6_PACKET_ALL);
+      }
     }
   }
 
