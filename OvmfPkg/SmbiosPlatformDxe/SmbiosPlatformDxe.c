@@ -16,6 +16,51 @@
 
 #include "SmbiosPlatformDxe.h"
 
+//
+// Type definition and contents of the default Type 0 SMBIOS table.
+//
+#pragma pack(1)
+typedef struct {
+  SMBIOS_TABLE_TYPE0 Base;
+  UINT8              Strings[];
+} OVMF_TYPE0;
+#pragma pack()
+
+STATIC CONST OVMF_TYPE0 mOvmfDefaultType0 = {
+  {
+    // SMBIOS_STRUCTURE Hdr
+    {
+      EFI_SMBIOS_TYPE_BIOS_INFORMATION, // UINT8 Type
+      sizeof (SMBIOS_TABLE_TYPE0),      // UINT8 Length
+    },
+    1,     // SMBIOS_TABLE_STRING       Vendor
+    2,     // SMBIOS_TABLE_STRING       BiosVersion
+    0xE800,// UINT16                    BiosSegment
+    3,     // SMBIOS_TABLE_STRING       BiosReleaseDate
+    0,     // UINT8                     BiosSize
+    {      // MISC_BIOS_CHARACTERISTICS BiosCharacteristics
+      0,     // Reserved                                      :2
+      0,     // Unknown                                       :1
+      1,     // BiosCharacteristicsNotSupported               :1
+             // Remaining BiosCharacteristics bits left unset :60
+    },
+    {      // BIOSCharacteristicsExtensionBytes[2]
+      0,     // BiosReserved
+      0x1C   // SystemReserved = VirtualMachineSupported |
+             //                  UefiSpecificationSupported |
+             //                  TargetContentDistributionEnabled
+    },
+    0,     // UINT8                     SystemBiosMajorRelease
+    0,     // UINT8                     SystemBiosMinorRelease
+    0xFF,  // UINT8                     EmbeddedControllerFirmwareMajorRelease
+    0xFF   // UINT8                     EmbeddedControllerFirmwareMinorRelease
+  },
+  // Text strings (unformatted area)
+  "EFI Development Kit II / OVMF\0"     // Vendor
+  "0.0.0\0"                             // BiosVersion
+  "02/06/2015\0"                        // BiosReleaseDate
+};
+
 
 /**
   Validates the SMBIOS entry point structure
@@ -96,11 +141,14 @@ InstallAllStructures (
   EFI_STATUS                Status;
   SMBIOS_STRUCTURE_POINTER  SmbiosTable;
   EFI_SMBIOS_HANDLE         SmbiosHandle;
+  BOOLEAN                   NeedSmbiosType0;
 
   SmbiosTable.Raw = TableAddress;
   if (SmbiosTable.Raw == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  NeedSmbiosType0 = TRUE;
 
   while (SmbiosTable.Hdr->Type != 127) {
     //
@@ -115,10 +163,28 @@ InstallAllStructures (
                        );
     ASSERT_EFI_ERROR (Status);
 
+    if (SmbiosTable.Hdr->Type == 0) {
+      NeedSmbiosType0 = FALSE;
+    }
+
     //
     // Get the next structure address
     //
     SmbiosTable.Raw = (UINT8 *)(SmbiosTable.Raw + SmbiosTableLength (SmbiosTable));
+  }
+
+  if (NeedSmbiosType0) {
+    //
+    // Add OVMF default Type 0 (BIOS Information) table
+    //
+    SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
+    Status = Smbios->Add (
+                       Smbios,
+                       NULL,
+                       &SmbiosHandle,
+                       (EFI_SMBIOS_TABLE_HEADER*) &mOvmfDefaultType0
+                       );
+    ASSERT_EFI_ERROR (Status);
   }
 
   return EFI_SUCCESS;
