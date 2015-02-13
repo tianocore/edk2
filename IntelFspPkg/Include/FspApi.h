@@ -213,7 +213,7 @@ EFI_STATUS
   each FSP release.
   After FspMemInit completes its execution, it passes the pointer to the HobList and
   returns to the boot loader from where it was called. Bootloader is responsible to 
-  migrate it’s stack and data to Memory.
+  migrate it's stack and data to Memory.
   FspMemoryInit, TempRamExit and FspSiliconInit APIs provide an alternate method to
   complete the silicon initialization and provides bootloader an opportunity to get
   control after system memory is available and before the temporary RAM is torn down.

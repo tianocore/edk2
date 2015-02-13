@@ -332,7 +332,7 @@ GetFspInfoHeader (
 }
 
 /**
-  This function gets FSP API calling mode
+  This function gets FSP API calling mode.
 
   @retval API calling mode
 **/
@@ -346,7 +346,7 @@ GetFspApiCallingMode (
 }
 
 /**
-  This function sets FSP API calling mode
+  This function sets FSP API calling mode.
 
   @param[in] Mode     API calling mode
 **/
