@@ -1201,7 +1201,7 @@
 # Console
 #
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-  Vlv2TbltDevicePkg/Override/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
