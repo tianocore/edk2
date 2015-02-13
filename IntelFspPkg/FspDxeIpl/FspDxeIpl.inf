@@ -1,6 +1,7 @@
 ## @file
+#  PEIM for DXE IPL
 #
-#  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -53,17 +54,17 @@
 [Ppis]
   gEfiDxeIplPpiGuid                       ## PRODUCES
   gEfiEndOfPeiSignalPpiGuid               ## SOMETIMES_PRODUCES(Not produced on S3 boot path)
-  gEfiPeiDecompressPpiGuid
+  gEfiPeiDecompressPpiGuid                ## CONSUMES
 
 [Protocols]
-  gEfiPciEnumerationCompleteProtocolGuid  # ALWAYS_PRODUCED
+  gEfiPciEnumerationCompleteProtocolGuid  ## PRODUCES
 
 [Guids]
-  gEfiEventReadyToBootGuid                # ALWAYS_PRODUCED
+  gEfiEventReadyToBootGuid                ## PRODUCES ## Event
 
 [FixedPcd]
-  gIntelFspPkgTokenSpaceGuid.PcdFspMaxPatchEntry
-  gIntelFspPkgTokenSpaceGuid.PcdFspMaxPerfEntry
+  gIntelFspPkgTokenSpaceGuid.PcdFspMaxPatchEntry    ## CONSUMES 
+  gIntelFspPkgTokenSpaceGuid.PcdFspMaxPerfEntry     ## CONSUMES  
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiLoadFilePpiGuid
