@@ -2,7 +2,7 @@
 #  This is the shell application
 #
 #  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
-#  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -73,39 +73,39 @@
   PathLib
 
 [Guids]
-  gShellVariableGuid                                      # ALWAYS_CONSUMED
-  gShellMapGuid                                           # ALWAYS_CONSUMED
-  gShellAliasGuid                                         # ALWAYS_CONSUMED
+  gShellVariableGuid                                      ## CONSUMES ## GUID
+  gShellMapGuid                                           ## CONSUMES ## GUID
+  gShellAliasGuid                                         ## CONSUMES ## GUID
 
 [Protocols]
-  gEfiShellProtocolGuid                                   # ALWAYS_PRODUCED
-                                                          # SOMETIMES_CONSUMED
-  gEfiShellParametersProtocolGuid                         # ALWAYS_PRODUCED
-                                                          # SOMETIMES_CONSUMED
+  gEfiShellProtocolGuid                                   ## PRODUCES
+                                                          ## SOMETIMES_CONSUMES
+  gEfiShellParametersProtocolGuid                         ## PRODUCES
+                                                          ## SOMETIMES_CONSUMES
 
-#  gEfiShellEnvironment2Guid                               # SOMETIMES_PRODUCED
-#  gEfiShellInterfaceGuid                                  # SOMETIMES_PRODUCED
+#  gEfiShellEnvironment2Guid                              ## SOMETIMES_PRODUCES
+#  gEfiShellInterfaceGuid                                 ## SOMETIMES_PRODUCES
 
-  gEfiSimpleTextInputExProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiSimpleTextInProtocolGuid                            # ALWAYS_CONSUMED
-  gEfiSimpleTextOutProtocolGuid                           # ALWAYS_CONSUMED
-  gEfiSimpleFileSystemProtocolGuid                        # ALWAYS_CONSUMED
-  gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMED
-  gEfiComponentName2ProtocolGuid                          # ALWAYS_CONSUMED
-  gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                              # ALWAYS_CONSUMED
+  gEfiSimpleTextInputExProtocolGuid                       ## CONSUMES
+  gEfiSimpleTextInProtocolGuid                            ## CONSUMES
+  gEfiSimpleTextOutProtocolGuid                           ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                        ## CONSUMES
+  gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiComponentName2ProtocolGuid                          ## CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
+  gEfiDevicePathProtocolGuid                              ## CONSUMES
 
 [Pcd]
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols  # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform   # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii  # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault     # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize    # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault    # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount       # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         # ALWAYS_CONSUMED
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier             # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols  ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform   ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii  ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault     ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize    ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault    ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount       ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier             ## CONSUMES
 
