@@ -1,7 +1,7 @@
 ## @file
 # Capsule library instance for DXE_DRIVER, DXE_RUNTIME_DRIVER.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -51,5 +51,5 @@
   gEfiFirmwareManagementProtocolGuid      ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiCapsuleGuid                         ## SOMETIMES_CONSUMED ## GUID # Capsule Image Header Guid
-  gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMED ## GUID
+  gEfiCapsuleGuid                         ## SOMETIMES_CONSUMES ## GUID # Capsule Image Header Guid
+  gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
