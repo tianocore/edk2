@@ -1,7 +1,7 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v2.8.0.
+  Industry Standard Definitions of SMBIOS Table Specification v3.0.0.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -71,6 +71,19 @@ typedef struct {
   UINT16  NumberOfSmbiosStructures;
   UINT8   SmbiosBcdRevision;
 } SMBIOS_TABLE_ENTRY_POINT;
+
+typedef struct {
+  UINT8   AnchorString[5];
+  UINT8   EntryPointStructureChecksum;
+  UINT8   EntryPointLength;
+  UINT8   MajorVersion;
+  UINT8   MinorVersion;
+  UINT8   DocRev;
+  UINT8   EntryPointRevision;
+  UINT8   Reserved;
+  UINT32  TableMaximumSize;
+  UINT64  TableAddress;
+} SMBIOS_TABLE_3_0_ENTRY_POINT;
 
 ///
 /// The Smbios structure header.
@@ -301,7 +314,10 @@ typedef enum {
   MiscChassisCompactPCI               = 0x1A,
   MiscChassisAdvancedTCA              = 0x1B,
   MiscChassisBlade                    = 0x1C,
-  MiscChassisBladeEnclosure           = 0x1D
+  MiscChassisBladeEnclosure           = 0x1D,
+  MiscChassisTablet                   = 0x1E,
+  MiscChassisConvertible              = 0x1F,
+  MiscChassisDetachable               = 0x20
 } MISC_CHASSIS_TYPE;
 
 ///
@@ -422,6 +438,7 @@ typedef enum {
   ProcessorFamilyIntelCoreDuoMobile     = 0x29,
   ProcessorFamilyIntelCoreSoloMobile    = 0x2A,
   ProcessorFamilyIntelAtom              = 0x2B,
+  ProcessorFamilyIntelCoreM             = 0x2C,
   ProcessorFamilyAlpha                  = 0x30,
   ProcessorFamilyAlpha21064             = 0x31,
   ProcessorFamilyAlpha21066             = 0x32,
@@ -469,6 +486,9 @@ typedef enum {
   ProcessorFamily68010                  = 0x63,
   ProcessorFamily68020                  = 0x64,
   ProcessorFamily68030                  = 0x65,
+  ProcessorFamilyAmdAthlonX4QuadCore    = 0x66,
+  ProcessorFamilyAmdOpteronX1000Series  = 0x67,
+  ProcessorFamilyAmdOpteronX2000Series  = 0x68,
   ProcessorFamilyHobbit                 = 0x70,
   ProcessorFamilyCrusoeTM5000           = 0x78,
   ProcessorFamilyCrusoeTM3000           = 0x79,
@@ -649,7 +669,11 @@ typedef enum {
   ProcessorUpgradeSocketFM1     = 0x29,
   ProcessorUpgradeSocketFM2     = 0x2A,
   ProcessorUpgradeSocketLGA2011_3 = 0x2B,
-  ProcessorUpgradeSocketLGA1356_3 = 0x2C
+  ProcessorUpgradeSocketLGA1356_3 = 0x2C,
+  ProcessorUpgradeSocketLGA1150   = 0x2D,
+  ProcessorUpgradeSocketBGA1168   = 0x2E,
+  ProcessorUpgradeSocketBGA1234   = 0x2F,
+  ProcessorUpgradeSocketBGA1364   = 0x30
 } PROCESSOR_UPGRADE;
 
 ///
@@ -745,6 +769,12 @@ typedef struct {
   // Add for smbios 2.6
   //
   UINT16                ProcessorFamily2;
+  //
+  // Add for smbios 3.0
+  //
+  UINT16                CoreCount2;
+  UINT16                EnabledCoreCount2;
+  UINT16                ThreadCount2;
 } SMBIOS_TABLE_TYPE4;
 
 ///
@@ -1079,6 +1109,19 @@ typedef enum {
   SlotTypeAgp4X                        = 0x11,
   SlotTypePciX                         = 0x12,
   SlotTypeAgp4x                        = 0x13,
+  SlotTypeM2Socket1_DP                 = 0x14,
+  SlotTypeM2Socket1_SD                 = 0x15,
+  SlotTypeM2Socket2                    = 0x16,
+  SlotTypeM2Socket3                    = 0x17,
+  SlotTypeMxmTypeI                     = 0x18,
+  SlotTypeMxmTypeII                    = 0x19,
+  SlotTypeMxmTypeIIIStandard           = 0x1A,
+  SlotTypeMxmTypeIIIHe                 = 0x1B,
+  SlotTypeMxmTypeIV                    = 0x1C,
+  SlotTypeMxm30TypeA                   = 0x1D,
+  SlotTypeMxm30TypeB                   = 0x1E,
+  SlotTypePciExpressGen2Sff_8639       = 0x1F,
+  SlotTypePciExpressGen3Sff_8639       = 0x20,
   SlotTypePC98C20                      = 0xA0,
   SlotTypePC98C24                      = 0xA1,
   SlotTypePC98E                        = 0xA2,
@@ -1477,7 +1520,12 @@ typedef enum {
   MemoryTypeDdr2                           = 0x13,
   MemoryTypeDdr2FbDimm                     = 0x14,
   MemoryTypeDdr3                           = 0x18,
-  MemoryTypeFbd2                           = 0x19
+  MemoryTypeFbd2                           = 0x19,
+  MemoryTypeDdr4                           = 0x1A,
+  MemoryTypeLpddr                          = 0x1B,
+  MemoryTypeLpddr2                         = 0x1C,
+  MemoryTypeLpddr3                         = 0x1D,
+  MemoryTypeLpddr4                         = 0x1E
 } MEMORY_DEVICE_TYPE;
 
 typedef struct {
