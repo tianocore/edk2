@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2015, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -118,8 +118,13 @@ typedef enum {
 //
 // ARM MP Core IDs
 //
-#define ARM_CORE_MASK         0xFF
-#define ARM_CLUSTER_MASK      (0xFF << 8)
+#define ARM_CORE_AFF0         0xFF
+#define ARM_CORE_AFF1         (0xFF << 8)
+#define ARM_CORE_AFF2         (0xFF << 16)
+#define ARM_CORE_AFF3         (0xFFULL << 32)
+
+#define ARM_CORE_MASK         ARM_CORE_AFF0
+#define ARM_CLUSTER_MASK      ARM_CORE_AFF1
 #define GET_CORE_ID(MpId)     ((MpId) & ARM_CORE_MASK)
 #define GET_CLUSTER_ID(MpId)  (((MpId) & ARM_CLUSTER_MASK) >> 8)
 #define GET_MPID(ClusterId, CoreId)   (((ClusterId) << 8) | (CoreId))
