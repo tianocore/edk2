@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -157,6 +157,7 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C002000
 !else
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x2f000000
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x2f100000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C000000
 !endif
 

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV3Protocol;
 
 STATIC UINTN mGicDistributorBase;
+STATIC UINTN mGicRedistributorsBase;
 
 /**
   Enable interrupt source Source.
@@ -243,8 +244,9 @@ GicV3DxeInitialize (
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicDistributorBase = PcdGet32 (PcdGicDistributorBase);
-  mGicNumInterrupts = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
+  mGicDistributorBase    = PcdGet32 (PcdGicDistributorBase);
+  mGicRedistributorsBase = PcdGet32 (PcdGicRedistributorsBase);
+  mGicNumInterrupts      = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
