@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -14,11 +14,65 @@
 
 #include <Base.h>
 #include <Library/ArmGicLib.h>
+#include <Library/ArmLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/PcdLib.h>
 
 #include "GicV2/ArmGicV2Lib.h"
 #include "GicV3/ArmGicV3Lib.h"
+
+/**
+ * Return the base address of the GIC redistributor for the current CPU
+ *
+ * @param Revision  GIC Revision. The GIC redistributor might have a different
+ *                  granularity following the GIC revision.
+ *
+ * @retval Base address of the associated GIC Redistributor
+ */
+STATIC
+UINTN
+GicGetCpuRedistributorBase (
+  IN UINTN                 GicRedistributorBase,
+  IN ARM_GIC_ARCH_REVISION Revision
+  )
+{
+  UINTN Index;
+  UINTN MpId;
+  UINTN CpuAffinity;
+  UINTN Affinity;
+  UINTN GicRedistributorGranularity;
+  UINTN GicCpuRedistributorBase;
+
+  MpId = ArmReadMpidr ();
+  // Define CPU affinity as Affinity0[0:8], Affinity1[9:15], Affinity2[16:23], Affinity3[24:32]
+  // whereas Affinity3 is defined at [32:39] in MPIDR
+  CpuAffinity = (MpId & (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2)) | ((MpId & ARM_CORE_AFF3) >> 8);
+
+  if (Revision == ARM_GIC_ARCH_REVISION_3) {
+    // 2 x 64KB frame: Redistributor control frame + SGI Control & Generation frame
+    GicRedistributorGranularity = ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_SGI_PPI_FRAME_SIZE;
+  } else {
+    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+    return 0;
+  }
+
+  GicCpuRedistributorBase = GicRedistributorBase;
+
+  for (Index = 0; Index < PcdGet32 (PcdCoreCount); Index++) {
+    Affinity = MmioRead64 (GicCpuRedistributorBase + ARM_GICR_TYPER) >> 32;
+    if (Affinity == CpuAffinity) {
+      return GicCpuRedistributorBase;
+    }
+
+    // Move to the next GIC Redistributor frame
+    GicRedistributorBase += GicRedistributorGranularity;
+  }
+
+  // The Redistributor has not been found for the current CPU
+  ASSERT_EFI_ERROR (EFI_NOT_FOUND);
+  return 0;
+}
 
 UINTN
 EFIAPI
