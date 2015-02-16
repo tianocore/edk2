@@ -69,6 +69,9 @@
   # Linux (instead of PSCI)
   gArmTokenSpaceGuid.PcdArmLinuxSpinTable|FALSE|BOOLEAN|0x00000033
 
+  # Define if the GICv3 controller should use the GICv2 legacy
+  gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
+
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
 

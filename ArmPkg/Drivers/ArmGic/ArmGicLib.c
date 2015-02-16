@@ -186,7 +186,7 @@ ArmGicEnableInterrupt (
   RegShift = Source % 32;
 
   Revision = ArmGicGetSupportedArchRevision ();
-  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) || FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
     // Write set-enable register
     MmioWrite32 (GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset), 1 << RegShift);
   } else {
@@ -219,7 +219,7 @@ ArmGicDisableInterrupt (
   RegShift = Source % 32;
 
   Revision = ArmGicGetSupportedArchRevision ();
-  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) || FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
     // Write clear-enable register
     MmioWrite32 (GicDistributorBase + ARM_GIC_ICDICER + (4 * RegOffset), 1 << RegShift);
   } else {
@@ -252,7 +252,7 @@ ArmGicIsInterruptEnabled (
   RegShift = Source % 32;
 
   Revision = ArmGicGetSupportedArchRevision ();
-  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) || FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
     Interrupts = ((MmioRead32 (GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)) & (1 << RegShift)) != 0);
   } else {
     GicCpuRedistributorBase = GicGetCpuRedistributorBase (GicRedistributorBase, Revision);

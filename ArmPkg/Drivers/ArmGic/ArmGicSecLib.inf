@@ -48,3 +48,6 @@
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdCoreCount
+
+[FeaturePcd]
+  gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy

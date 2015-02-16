@@ -53,6 +53,9 @@ typedef enum {
 // GICv3 specific registers
 #define ARM_GICD_IROUTER        0x6100 // Interrupt Routing Registers
 
+// the Affinity Routing Enable (ARE) bit in GICD_CTLR
+#define ARM_GIC_ICDDCR_ARE      (1 << 4)
+
 //
 // GIC Redistributor
 //

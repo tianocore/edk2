@@ -249,6 +249,14 @@ GicV3DxeInitialize (
   mGicRedistributorsBase = PcdGet32 (PcdGicRedistributorsBase);
   mGicNumInterrupts      = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
+  //
+  // We will be driving this GIC in native v3 mode, i.e., with Affinity
+  // Routing enabled. So ensure that the ARE bit is set.
+  //
+  if (!FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
+    MmioOr32 (mGicDistributorBase + ARM_GIC_ICDDCR, ARM_GIC_ICDDCR_ARE);
+  }
+
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
 
