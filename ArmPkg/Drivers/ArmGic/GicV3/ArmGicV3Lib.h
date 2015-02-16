@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2014-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials are licensed and made available
 *  under the terms and conditions of the BSD License which accompanies this
@@ -16,6 +16,8 @@
 #define _ARM_GIC_V3_H_
 
 #define ICC_SRE_EL2_SRE         (1 << 0)
+
+#define ARM_GICD_IROUTER_IRM BIT31
 
 UINT32
 EFIAPI

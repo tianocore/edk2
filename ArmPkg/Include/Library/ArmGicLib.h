@@ -208,6 +208,7 @@ VOID
 EFIAPI
 ArmGicEnableInterrupt (
   IN UINTN                  GicDistributorBase,
+  IN UINTN                  GicRedistributorBase,
   IN UINTN                  Source
   );
 
@@ -215,6 +216,7 @@ VOID
 EFIAPI
 ArmGicDisableInterrupt (
   IN UINTN                  GicDistributorBase,
+  IN UINTN                  GicRedistributorBase,
   IN UINTN                  Source
   );
 
@@ -222,6 +224,7 @@ BOOLEAN
 EFIAPI
 ArmGicIsInterruptEnabled (
   IN UINTN                  GicDistributorBase,
+  IN UINTN                  GicRedistributorBase,
   IN UINTN                  Source
   );
 

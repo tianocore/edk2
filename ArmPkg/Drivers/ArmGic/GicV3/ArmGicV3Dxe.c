@@ -44,7 +44,7 @@ GicV3EnableInterruptSource (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicEnableInterrupt (mGicDistributorBase, Source);
+  ArmGicEnableInterrupt (mGicDistributorBase, mGicRedistributorsBase, Source);
 
   return EFI_SUCCESS;
 }
@@ -71,7 +71,7 @@ GicV3DisableInterruptSource (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicDisableInterrupt (mGicDistributorBase, Source);
+  ArmGicDisableInterrupt (mGicDistributorBase, mGicRedistributorsBase, Source);
 
   return EFI_SUCCESS;
 }
@@ -100,7 +100,7 @@ GicV3GetInterruptSourceState (
     return EFI_UNSUPPORTED;
   }
 
-  *InterruptState = ArmGicIsInterruptEnabled (mGicDistributorBase, Source);
+  *InterruptState = ArmGicIsInterruptEnabled (mGicDistributorBase, mGicRedistributorsBase, Source);
 
   return EFI_SUCCESS;
 }
@@ -239,7 +239,8 @@ GicV3DxeInitialize (
   UINTN                   Index;
   UINT32                  RegOffset;
   UINTN                   RegShift;
-  UINT32                  CpuTarget;
+  UINT64                  CpuTarget;
+  UINT64                  MpId;
 
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
@@ -265,22 +266,12 @@ GicV3DxeInitialize (
   // Targets the interrupts to the Primary Cpu
   //
 
-  // Only Primary CPU will run this code. We can identify our GIC CPU ID by reading
-  // the GIC Distributor Target register. The 8 first GICD_ITARGETSRn are banked to each
-  // connected CPU. These 8 registers hold the CPU targets fields for interrupts 0-31.
-  // More Info in the GIC Specification about "Interrupt Processor Targets Registers"
-  //
-  // Read the first Interrupt Processor Targets Register (that corresponds to the 4
-  // first SGIs)
-  CpuTarget = MmioRead32 (mGicDistributorBase + ARM_GIC_ICDIPTR);
+  MpId = ArmReadMpidr ();
+  CpuTarget = MpId & (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2 | ARM_CORE_AFF3);
 
-  // The CPU target is a bit field mapping each CPU to a GIC CPU Interface. This value
-  // is 0 when we run on a uniprocessor platform.
-  if (CpuTarget != 0) {
-    // The 8 first Interrupt Processor Targets Registers are read-only
-    for (Index = 8; Index < (mGicNumInterrupts / 4); Index++) {
-      MmioWrite32 (mGicDistributorBase + ARM_GIC_ICDIPTR + (Index * 4), CpuTarget);
-    }
+  // Route the SPIs to the primary CPU. SPIs start at the INTID 32
+  for (Index = 0; Index < (mGicNumInterrupts - 32); Index++) {
+    MmioWrite32 (mGicDistributorBase + ARM_GICD_IROUTER + (Index * 8), CpuTarget | ARM_GICD_IROUTER_IRM);
   }
 
   // Set binary point reg to 0x7 (no preemption)

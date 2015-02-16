@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -22,9 +22,16 @@ ArmGicEnableDistributor (
   IN  INTN          GicDistributorBase
   )
 {
+  ARM_GIC_ARCH_REVISION Revision;
+
   /*
    * Enable GIC distributor in Non-Secure world.
    * Note: The ICDDCR register is banked when Security extensions are implemented
    */
-  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
+  Revision = ArmGicGetSupportedArchRevision ();
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
+  } else {
+    MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x2);
+  }
 }
