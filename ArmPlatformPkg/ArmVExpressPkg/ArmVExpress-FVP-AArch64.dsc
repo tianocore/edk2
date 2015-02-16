@@ -159,6 +159,12 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x2f000000
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x2f100000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C000000
+
+  # Force the UEFI GIC driver to use GICv2 legacy mode. To use
+  # GICv3 without GICv2 legacy in UEFI, the ARM Trusted Firmware needs
+  # to configure the Non-Secure interrupts in the GIC Redistributors
+  # which is not supported at the moment.
+  gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|TRUE
 !endif
 
   #
