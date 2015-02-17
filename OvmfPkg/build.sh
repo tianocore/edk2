@@ -61,7 +61,13 @@ case `uname` in
     ;;
   Darwin*)
     Major=$(uname -r | cut -f 1 -d '.')
+    # Major is Darwin version, not OS X version.
+    # OS X Yosemite 10.10.2 returns 14.
     case $Major in
+      [156789])
+        echo OvmfPkg requires OS X Snow Leopard 10.6 or newer OS
+        exit 1
+        ;;
       10)
         TARGET_TOOLS=XCODE32
         ;;
@@ -69,8 +75,8 @@ case `uname` in
         TARGET_TOOLS=XCLANG
         ;;
        *)
-        echo OvmfPkg requires Snow Leopard or later OS
-        exit 1
+        # Mavericks and future assume XCODE5 (clang + lldb)
+        TARGET_TOOLS=XCODE5
         ;;
     esac
     ;;
