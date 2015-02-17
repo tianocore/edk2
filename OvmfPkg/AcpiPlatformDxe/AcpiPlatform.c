@@ -250,9 +250,7 @@ AcpiPlatformEntryPoint (
                   NULL,
                   (VOID**)&AcpiTable
                   );
-  if (EFI_ERROR (Status)) {
-    return EFI_ABORTED;
-  }
+  ASSERT_EFI_ERROR (Status);
 
   if (XenDetected ()) {
     Status = InstallXenTables (AcpiTable);

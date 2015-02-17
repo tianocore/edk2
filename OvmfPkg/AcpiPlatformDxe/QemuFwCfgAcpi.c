@@ -714,9 +714,7 @@ QemuFwCfgAcpiPlatformEntryPoint (
                   NULL,
                   (VOID**)&AcpiTable
                   );
-  if (EFI_ERROR (Status)) {
-    return EFI_ABORTED;
-  }
+  ASSERT_EFI_ERROR (Status);
 
   Status = InstallAllQemuLinkedTables (AcpiTable);
   return Status;
