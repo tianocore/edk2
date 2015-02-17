@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -273,9 +273,8 @@ if [[ "$RUN_QEMU" == "yes" ]]; then
   if [[ "$ADD_QEMU_HDA" == "yes" ]]; then
     QEMU_COMMAND="$QEMU_COMMAND -hda fat:$BUILD_ROOT_ARCH"
   fi
-  QEMU_COMMAND="$QEMU_COMMAND $*"
-  echo Running: $QEMU_COMMAND
-  $QEMU_COMMAND
+  echo Running: $QEMU_COMMAND "$@"
+  $QEMU_COMMAND "$@"
   exit $?
 fi
 
