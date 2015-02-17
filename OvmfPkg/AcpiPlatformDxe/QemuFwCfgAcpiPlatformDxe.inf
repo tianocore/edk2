@@ -27,7 +27,6 @@
 #
 
 [Sources]
-  QemuFwCfgAcpiPlatform.c
   QemuFwCfgAcpi.c
 
 [Packages]
