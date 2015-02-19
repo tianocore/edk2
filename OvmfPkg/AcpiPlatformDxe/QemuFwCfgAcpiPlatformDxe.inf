@@ -18,7 +18,7 @@
   FILE_GUID                      = 17985e6f-e778-4d94-aefa-c5dd2b77e186
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = QemuFwCfgAcpiPlatformEntryPoint
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -27,7 +27,9 @@
 #
 
 [Sources]
+  QemuFwCfgAcpiPlatform.c
   QemuFwCfgAcpi.c
+  EntryPoint.c
 
 [Packages]
   MdePkg/MdePkg.dec

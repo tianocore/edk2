@@ -31,6 +31,7 @@
   Qemu.c
   QemuFwCfgAcpi.c
   Xen.c
+  EntryPoint.c
 
 [Packages]
   MdePkg/MdePkg.dec

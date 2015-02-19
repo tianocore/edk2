@@ -228,7 +228,7 @@ InstallOvmfFvTables (
 }
 
 /**
-  Entrypoint of Acpi Platform driver.
+  Effective entrypoint of Acpi Platform driver.
 
   @param  ImageHandle
   @param  SystemTable
@@ -240,23 +240,11 @@ InstallOvmfFvTables (
 **/
 EFI_STATUS
 EFIAPI
-AcpiPlatformEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+InstallAcpiTables (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiTable
   )
 {
   EFI_STATUS                         Status;
-  EFI_ACPI_TABLE_PROTOCOL            *AcpiTable;
-
-  //
-  // Find the AcpiTable protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiAcpiTableProtocolGuid,
-                  NULL,
-                  (VOID**)&AcpiTable
-                  );
-  ASSERT_EFI_ERROR (Status);
 
   if (XenDetected ()) {
     Status = InstallXenTables (AcpiTable);

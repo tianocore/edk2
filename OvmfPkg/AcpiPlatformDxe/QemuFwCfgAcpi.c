@@ -683,39 +683,3 @@ FreeLoader:
 
   return Status;
 }
-
-
-/**
-  Entrypoint of QEMU fw-cfg Acpi Platform driver.
-
-  @param  ImageHandle
-  @param  SystemTable
-
-  @return EFI_SUCCESS
-  @return EFI_LOAD_ERROR
-  @return EFI_OUT_OF_RESOURCES
-
-**/
-EFI_STATUS
-EFIAPI
-QemuFwCfgAcpiPlatformEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-{
-  EFI_STATUS                         Status;
-  EFI_ACPI_TABLE_PROTOCOL            *AcpiTable;
-
-  //
-  // Find the AcpiTable protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiAcpiTableProtocolGuid,
-                  NULL,
-                  (VOID**)&AcpiTable
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = InstallQemuFwCfgTables (AcpiTable);
-  return Status;
-}
