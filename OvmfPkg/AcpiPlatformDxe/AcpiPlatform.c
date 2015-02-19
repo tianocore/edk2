@@ -130,14 +130,20 @@ LocateFvInstanceWithTables (
 
 
 /**
-  Find ACPI tables in an FV and parses them. This function is useful for QEMU and KVM.
+  Find ACPI tables in an FV and install them. 
+
+  This is now a fall-back path. Normally, we will search for tables provided
+  by the VMM first.
+
+  If that fails, we use this function to load the ACPI tables from an FV. The
+  sources for the FV based tables is located under OvmfPkg/AcpiTables.
 
   @param  AcpiTable     Protocol instance pointer    
 
 **/
 EFI_STATUS
 EFIAPI
-FindAcpiTablesInFv (
+InstallOvmfFvTables (
   IN  EFI_ACPI_TABLE_PROTOCOL     *AcpiTable
   )
 {
@@ -259,7 +265,7 @@ AcpiPlatformEntryPoint (
   }
 
   if (EFI_ERROR (Status)) {
-    Status = FindAcpiTablesInFv (AcpiTable);
+    Status = InstallOvmfFvTables (AcpiTable);
   }
 
   return Status;
