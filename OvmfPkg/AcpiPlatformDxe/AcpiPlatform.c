@@ -261,7 +261,7 @@ AcpiPlatformEntryPoint (
   if (XenDetected ()) {
     Status = InstallXenTables (AcpiTable);
   } else {
-    Status = InstallAllQemuLinkedTables (AcpiTable);
+    Status = InstallQemuFwCfgTables (AcpiTable);
   }
 
   if (EFI_ERROR (Status)) {
