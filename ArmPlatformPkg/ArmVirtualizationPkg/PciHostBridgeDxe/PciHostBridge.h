@@ -457,6 +457,7 @@ typedef struct {
   UINT64                 BusLimit;     
   UINT64                 MemLimit;    
   UINT64                 IoLimit;     
+  UINT64                 IoTranslation;
 
   EFI_DEVICE_PATH_PROTOCOL                *DevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         Io;
