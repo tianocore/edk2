@@ -236,7 +236,6 @@ BltLibVideoFill (
   )
 {
   UINTN                           DstY;
-  VOID                            *BltMemSrc;
   VOID                            *BltMemDst;
   UINTN                           X;
   UINT8                           Uint8;
@@ -347,7 +346,6 @@ BltLibVideoFill (
               );
             X = X + MIN (X, Width - X);
           }
-          BltMemSrc = (VOID *) mBltLibLineBuffer;
           LineBufferReady = TRUE;
         }
         CopyMem (BltMemDst, mBltLibLineBuffer, WidthInBytes);
