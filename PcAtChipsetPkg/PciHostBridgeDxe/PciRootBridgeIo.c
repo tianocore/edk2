@@ -621,7 +621,7 @@ UINT8 mOutStride[] = {
   @param Protocol         Point to protocol instance
   @param HostBridgeHandle Handle of host bridge
   @param Attri            Attribute of host bridge
-  @param ResAppeture      ResourceAppeture for host bridge
+  @param ResAperture      ResourceAperture for host bridge
 
   @retval EFI_SUCCESS Success to initialize the Pci Root Bridge.
 
@@ -631,7 +631,7 @@ RootBridgeConstructor (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL    *Protocol,
   IN EFI_HANDLE                         HostBridgeHandle,
   IN UINT64                             Attri,
-  IN PCI_ROOT_BRIDGE_RESOURCE_APPETURE  *ResAppeture
+  IN PCI_ROOT_BRIDGE_RESOURCE_APERTURE  *ResAperture
   )
 {
   EFI_STATUS                        Status;
@@ -644,21 +644,21 @@ RootBridgeConstructor (
   // The host to pci bridge, the host memory and io addresses are
   // direct mapped to pci addresses, so no need translate, set bases to 0.
   //
-  PrivateData->MemBase = ResAppeture->MemBase;
-  PrivateData->IoBase  = ResAppeture->IoBase;
+  PrivateData->MemBase = ResAperture->MemBase;
+  PrivateData->IoBase  = ResAperture->IoBase;
 
   //
   // The host bridge only supports 32bit addressing for memory
   // and standard IA32 16bit io
   //
-  PrivateData->MemLimit = ResAppeture->MemLimit;
-  PrivateData->IoLimit  = ResAppeture->IoLimit;
+  PrivateData->MemLimit = ResAperture->MemLimit;
+  PrivateData->IoLimit  = ResAperture->IoLimit;
 
   //
-  // Bus Appeture for this Root Bridge (Possible Range)
+  // Bus Aperture for this Root Bridge (Possible Range)
   //
-  PrivateData->BusBase  = ResAppeture->BusBase;
-  PrivateData->BusLimit = ResAppeture->BusLimit;
+  PrivateData->BusBase  = ResAperture->BusBase;
+  PrivateData->BusLimit = ResAperture->BusLimit;
   
   //
   // Specific for this chipset

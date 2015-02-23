@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Hard code: Root Bridge Number within the host bridge
 //            Root Bridge's attribute
 //            Root Bridge's device path
-//            Root Bridge's resource appeture
+//            Root Bridge's resource aperture
 //
 UINTN RootBridgeNumber[1] = { 1 };
 
@@ -52,7 +52,7 @@ EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath[1][1] = {
   }
 };
 
-PCI_ROOT_BRIDGE_RESOURCE_APPETURE  mResAppeture[1][1] = {
+PCI_ROOT_BRIDGE_RESOURCE_APERTURE  mResAperture[1][1] = {
   {{0, 0xff, 0x80000000, 0xffffffff, 0, 0xffff}}
 };
 
@@ -145,7 +145,7 @@ InitializePciHostBridge (
         &PrivateData->Io, 
         HostBridge->HostBridgeHandle, 
         RootBridgeAttribute[Loop1][Loop2], 
-        &mResAppeture[Loop1][Loop2]
+        &mResAperture[Loop1][Loop2]
         );
     
       Status = gBS->InstallMultipleProtocolInterfaces(

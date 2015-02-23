@@ -403,7 +403,7 @@ typedef struct {
   
   UINT64          IoBase; 
   UINT64          IoLimit;     
-} PCI_ROOT_BRIDGE_RESOURCE_APPETURE;
+} PCI_ROOT_BRIDGE_RESOURCE_APERTURE;
 
 typedef enum {
   TypeIo = 0,
@@ -482,7 +482,7 @@ typedef struct {
   @param Protocol         Point to protocol instance
   @param HostBridgeHandle Handle of host bridge
   @param Attri            Attribute of host bridge
-  @param ResAppeture      ResourceAppeture for host bridge
+  @param ResAperture      ResourceAperture for host bridge
 
   @retval EFI_SUCCESS Success to initialize the Pci Root Bridge.
 
@@ -492,7 +492,7 @@ RootBridgeConstructor (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL    *Protocol,
   IN EFI_HANDLE                         HostBridgeHandle,
   IN UINT64                             Attri,
-  IN PCI_ROOT_BRIDGE_RESOURCE_APPETURE  *ResAppeture
+  IN PCI_ROOT_BRIDGE_RESOURCE_APERTURE  *ResAperture
   );
 
 #endif
