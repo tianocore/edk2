@@ -670,9 +670,6 @@ RootBridgeConstructor (
     PrivateData->ResAllocNode[Index].Status    = ResNone;
   }
   
-  PrivateData->PciAddress = 0xCF8;
-  PrivateData->PciData    = 0xCFC;
-
   PrivateData->RootBridgeAttrib = Attri;
   
   PrivateData->Supports    = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO | EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO | \
