@@ -86,6 +86,9 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|FALSE
 
+  # Activate KVM workaround for now.
+  gArmVirtualizationTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|TRUE
+
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 

@@ -56,3 +56,28 @@
 
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0|UINT64|0x00000004
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0|UINT64|0x00000005
+
+[PcdsFeatureFlag]
+  #
+  # "Map PCI MMIO as Cached"
+  #
+  # Due to the way Stage1 and Stage2 mappings are combined on Aarch64, and
+  # because KVM -- for the time being -- does not try to interfere with the
+  # Stage1 mappings, we must not set EFI_MEMORY_UC for emulated PCI MMIO
+  # regions.
+  #
+  # EFI_MEMORY_UC is mapped to Device-nGnRnE, and that Stage1 attribute would
+  # direct guest writes to host DRAM immediately, bypassing the cache
+  # regardless of Stage2 attributes. However, QEMU's reads of the same range
+  # can easily be served from the (stale) CPU cache.
+  #
+  # Setting this PCD to TRUE will use EFI_MEMORY_WB for mapping PCI MMIO
+  # regions, which ensures that guest writes to such regions go through the CPU
+  # cache. Strictly speaking this is wrong, but it is needed as a temporary
+  # workaround for emulated PCI devices. Setting the PCD to FALSE results in
+  # the theoretically correct EFI_MEMORY_UC mapping, and should be the long
+  # term choice, especially with assigned devices.
+  #
+  # The default is to turn off the kludge; DSC's can selectively enable it.
+  #
+  gArmVirtualizationTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|FALSE|BOOLEAN|0x00000006

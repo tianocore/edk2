@@ -24,6 +24,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -60,5 +61,9 @@
   gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
 
+[FeaturePcd]
+  gArmVirtualizationTokenSpaceGuid.PcdKludgeMapPciMmioAsCached
+
 [depex]
-  gEfiMetronomeArchProtocolGuid
+  gEfiMetronomeArchProtocolGuid AND
+  gEfiCpuArchProtocolGuid
