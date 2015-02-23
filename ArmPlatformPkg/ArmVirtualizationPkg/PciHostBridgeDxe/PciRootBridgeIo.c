@@ -754,7 +754,7 @@ RootBridgeIoCheckParameter (
 {
   PCI_ROOT_BRIDGE_INSTANCE                     *PrivateData;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS  *PciRbAddr;
-  UINT64                                       MaxCount;
+  UINT32                                       Stride;
   UINT64                                       Base;
   UINT64                                       Limit;
 
@@ -792,7 +792,8 @@ RootBridgeIoCheckParameter (
   //
   // Check to see if Address is aligned
   //
-  if ((Address & (UINT64)(mInStride[Width] - 1)) != 0) {
+  Stride = mInStride[Width];
+  if ((Address & (UINT64)(Stride - 1)) != 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -809,9 +810,6 @@ RootBridgeIoCheckParameter (
   // Since Limit can be the maximum integer value supported by the CPU and Count 
   // can also be the maximum integer value supported by the CPU, this range
   // check must be adjusted to avoid all oveflow conditions.
-  //   
-  // The following form of the range check is equivalent but assumes that 
-  // Limit is of the form (2^n - 1).
   //
   if (OperationType == IoOperation) {
     Base = PrivateData->IoBase;
@@ -838,20 +836,31 @@ RootBridgeIoCheckParameter (
     Limit = MAX_PCI_REG_ADDRESS;
   }
 
+  if (Limit < Address) {
+      return EFI_INVALID_PARAMETER;
+  }
+
   if (Address < Base) {
       return EFI_INVALID_PARAMETER;
   }
 
-  if (Count == 0) {
-    if (Address > Limit) {
+  //
+  // Base <= Address <= Limit
+  //
+  if (Address == 0 && Limit == MAX_UINT64) {
+    //
+    // 2^64 bytes are valid to transfer. With Stride == 1, that's simply
+    // impossible to reach in Count; with Stride in {2, 4, 8}, we can divide
+    // both 2^64 and Stride with 2.
+    //
+    if (Stride > 1 && Count > DivU64x32 (BIT63, Stride / 2)) {
       return EFI_UNSUPPORTED;
     }
-  } else {  
-    MaxCount = RShiftU64 (Limit, Width);
-    if (MaxCount < (Count - 1)) {
-      return EFI_UNSUPPORTED;
-    }
-    if (Address > LShiftU64 (MaxCount - Count + 1, Width)) {
+  } else {
+    //
+    // (Limit - Address) does not wrap, and it is smaller than MAX_UINT64.
+    //
+    if (Count > DivU64x32 (Limit - Address + 1, Stride)) {
       return EFI_UNSUPPORTED;
     }
   }
