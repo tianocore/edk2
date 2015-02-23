@@ -109,85 +109,8 @@ GetConsoleDevicePathFromVariable (
 }
 
 STATIC
-EFI_STATUS
-InitializeConsolePipe (
-  IN EFI_DEVICE_PATH    *ConsoleDevicePaths,
-  IN EFI_GUID           *Protocol,
-  OUT EFI_HANDLE        *Handle,
-  OUT VOID*             *Interface
-  )
-{
-  EFI_STATUS                Status;
-  UINTN                     Size;
-  UINTN                     NoHandles;
-  EFI_HANDLE                *Buffer;
-  EFI_DEVICE_PATH_PROTOCOL* DevicePath;
-
-  // Connect all the Device Path Consoles
-  while (ConsoleDevicePaths != NULL) {
-    DevicePath = GetNextDevicePathInstance (&ConsoleDevicePaths, &Size);
-
-    Status = BdsConnectDevicePath (DevicePath, Handle, NULL);
-    DEBUG_CODE_BEGIN ();
-      if (EFI_ERROR (Status)) {
-        // We convert back to the text representation of the device Path
-        EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
-        CHAR16* DevicePathTxt;
-        EFI_STATUS Status;
-
-        Status = gBS->LocateProtocol (&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
-        if (!EFI_ERROR (Status)) {
-          DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (DevicePath, TRUE, TRUE);
-
-          DEBUG ((EFI_D_ERROR, "Fail to start the console with the Device Path '%s'. (Error '%r')\n", DevicePathTxt, Status));
-
-          FreePool (DevicePathTxt);
-        }
-      }
-    DEBUG_CODE_END ();
-
-    // If the console splitter driver is not supported by the platform then use the first Device Path
-    // instance for the console interface.
-    if (!EFI_ERROR (Status) && (*Interface == NULL)) {
-      Status = gBS->HandleProtocol (*Handle, Protocol, Interface);
-    }
-  }
-
-  // No Device Path has been defined for this console interface. We take the first protocol implementation
-  if (*Interface == NULL) {
-    Status = gBS->LocateHandleBuffer (ByProtocol, Protocol, NULL, &NoHandles, &Buffer);
-    if (EFI_ERROR (Status)) {
-      BdsConnectAllDrivers ();
-      Status = gBS->LocateHandleBuffer (ByProtocol, Protocol, NULL, &NoHandles, &Buffer);
-    }
-
-    if (!EFI_ERROR (Status)) {
-      *Handle = Buffer[0];
-      Status = gBS->HandleProtocol (*Handle, Protocol, Interface);
-      ASSERT_EFI_ERROR (Status);
-    }
-    FreePool (Buffer);
-  } else {
-    Status = EFI_SUCCESS;
-  }
-
-  return Status;
-}
-
-/**
-  Connect the predefined platform default console device. Always try to find
-  and enable the vga device if have.
-
-  @param PlatformConsole          Predefined platform default console device array.
-
-  @retval EFI_SUCCESS             Success connect at least one ConIn and ConOut
-                                  device, there must have one ConOut device is
-                                  active vga device.
-  @return Return the status of BdsLibConnectAllDefaultConsoles ()
-
-**/
-EFI_STATUS
-PlatformBdsConnectConsole (
+VOID
+SetConsoleVariables (
   VOID
   )
 {
@@ -205,20 +128,6 @@ PlatformBdsConnectConsole (
   ASSERT_EFI_ERROR (Status);
   Status = GetConsoleDevicePathFromVariable (L"ErrOut", (CHAR16*)PcdGetPtr (PcdDefaultConOutPaths), &ConErrDevicePaths);
   ASSERT_EFI_ERROR (Status);
-
-  // Initialize the Consoles
-  Status = InitializeConsolePipe (ConOutDevicePaths, &gEfiSimpleTextOutProtocolGuid, &gST->ConsoleOutHandle, (VOID **)&gST->ConOut);
-  ASSERT_EFI_ERROR (Status);
-  Status = InitializeConsolePipe (ConInDevicePaths, &gEfiSimpleTextInProtocolGuid, &gST->ConsoleInHandle, (VOID **)&gST->ConIn);
-  ASSERT_EFI_ERROR (Status);
-  Status = InitializeConsolePipe (ConErrDevicePaths, &gEfiSimpleTextOutProtocolGuid, &gST->StandardErrorHandle, (VOID **)&gST->StdErr);
-  if (EFI_ERROR (Status)) {
-    // In case of error, we reuse the console output for the error output
-    gST->StandardErrorHandle = gST->ConsoleOutHandle;
-    gST->StdErr = gST->ConOut;
-  }
-
-  return Status;
 }
 
 /**
@@ -284,11 +193,7 @@ PlatformBdsPolicyBehavior (
   IN BASEM_MEMORY_TEST               BaseMemoryTest
   )
 {
-  EFI_STATUS Status;
-
-  Status = PlatformBdsConnectConsole ();
-  ASSERT_EFI_ERROR (Status);
-
+  SetConsoleVariables ();
   BdsLibConnectAll ();
 
   //
