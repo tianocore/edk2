@@ -45,7 +45,7 @@
 
 #define MAX_PCI_DEVICE_NUMBER      31
 #define MAX_PCI_FUNCTION_NUMBER    7
-#define MAX_PCI_REG_ADDRESS        0xFF
+#define MAX_PCI_REG_ADDRESS        (SIZE_4KB - 1)
 
 typedef enum {
   IoOperation,
