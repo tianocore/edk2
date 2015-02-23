@@ -123,6 +123,28 @@ InitializePciHostBridge (
   mResAperture[0][0].IoTranslation = PcdGet64 (PcdPciIoTranslation);
 
   //
+  // Add IO and MMIO memory space, so that resources can be allocated in the
+  // EfiPciHostBridgeAllocateResources phase.
+  //
+  Status = gDS->AddIoSpace (
+                  EfiGcdIoTypeIo,
+                  PcdGet64 (PcdPciIoBase),
+                  PcdGet64 (PcdPciIoSize)
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->AddMemorySpace (
+                  EfiGcdMemoryTypeMemoryMappedIo,
+                  PcdGet32 (PcdPciMmio32Base),
+                  PcdGet32 (PcdPciMmio32Size),
+                  EFI_MEMORY_UC
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a: AddMemorySpace: %r\n", __FUNCTION__, Status));
+    return Status;
+  }
+
+  //
   // Create Host Bridge Device Handle
   //
   for (Loop1 = 0; Loop1 < HOST_BRIDGE_NUMBER; Loop1++) {
