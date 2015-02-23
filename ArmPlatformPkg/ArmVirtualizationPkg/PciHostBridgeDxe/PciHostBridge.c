@@ -85,6 +85,7 @@ PCI_HOST_BRIDGE_INSTANCE mPciHostBridgeInstanceTemplate = {
   @param ImageHandle     Handle of driver image
   @param SystemTable     Point to EFI_SYSTEM_TABLE
 
+  @retval EFI_ABORTED           PCI host bridge not present
   @retval EFI_OUT_OF_RESOURCES  Can not allocate memory resource
   @retval EFI_DEVICE_ERROR      Can not install the protocol instance
   @retval EFI_SUCCESS           Success to initialize the Pci host bridge.
@@ -102,6 +103,11 @@ InitializePciHostBridge (
   PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE    *PrivateData;
  
+  if (PcdGet64 (PcdPciExpressBaseAddress) == 0) {
+    DEBUG ((EFI_D_INFO, "%a: PCI host bridge not present\n", __FUNCTION__));
+    return EFI_ABORTED;
+  }
+
   mDriverImageHandle = ImageHandle;
   
   mResAperture[0][0].BusBase  = PcdGet32 (PcdPciBusMin);
