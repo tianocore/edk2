@@ -1079,7 +1079,15 @@ GetProposedResources(
       }
       
       if (Number ==  0) {
-        return EFI_INVALID_PARAMETER;
+        EFI_ACPI_END_TAG_DESCRIPTOR *End;
+
+        End = AllocateZeroPool (sizeof *End);
+        if (End == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+        End->Desc = ACPI_END_TAG_DESCRIPTOR;
+        *Configuration = End;
+        return EFI_SUCCESS;
       }
 
       Buffer = AllocateZeroPool (Number * sizeof(EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof(EFI_ACPI_END_TAG_DESCRIPTOR));
