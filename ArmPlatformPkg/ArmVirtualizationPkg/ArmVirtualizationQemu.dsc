@@ -79,7 +79,7 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|FALSE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|TRUE
 
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
@@ -308,3 +308,10 @@
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+
+  #
+  # PCI support
+  #
+  ArmPlatformPkg/ArmVirtualizationPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf

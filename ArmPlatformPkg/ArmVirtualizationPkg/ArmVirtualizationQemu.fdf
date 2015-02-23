@@ -197,6 +197,13 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
 
+  #
+  # PCI support
+  #
+  INF ArmPlatformPkg/ArmVirtualizationPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  INF OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1

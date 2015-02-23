@@ -100,6 +100,10 @@
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
+  # PCI Libraries
+  PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
+  PciExpressLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
+
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ArmPlatformSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf
