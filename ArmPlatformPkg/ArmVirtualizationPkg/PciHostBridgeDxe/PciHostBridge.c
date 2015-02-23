@@ -52,9 +52,7 @@ EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath[1][1] = {
   }
 };
 
-PCI_ROOT_BRIDGE_RESOURCE_APERTURE  mResAperture[1][1] = {
-  {{0, 0xff, 0x80000000, 0xffffffff, 0, 0xffff}}
-};
+STATIC PCI_ROOT_BRIDGE_RESOURCE_APERTURE  mResAperture[1][1];
 
 EFI_HANDLE mDriverImageHandle;
 
@@ -106,6 +104,18 @@ InitializePciHostBridge (
  
   mDriverImageHandle = ImageHandle;
   
+  mResAperture[0][0].BusBase  = PcdGet32 (PcdPciBusMin);
+  mResAperture[0][0].BusLimit = PcdGet32 (PcdPciBusMax);
+
+  mResAperture[0][0].MemBase  = PcdGet32 (PcdPciMmio32Base);
+  mResAperture[0][0].MemLimit = (UINT64)PcdGet32 (PcdPciMmio32Base) +
+                                PcdGet32 (PcdPciMmio32Size) - 1;
+
+  mResAperture[0][0].IoBase        = PcdGet64 (PcdPciIoBase);
+  mResAperture[0][0].IoLimit       = PcdGet64 (PcdPciIoBase) +
+                                     PcdGet64 (PcdPciIoSize) - 1;
+  mResAperture[0][0].IoTranslation = PcdGet64 (PcdPciIoTranslation);
+
   //
   // Create Host Bridge Device Handle
   //

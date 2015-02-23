@@ -23,6 +23,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -36,6 +37,7 @@
   DevicePathLib
   IoLib
   PciLib
+  PcdLib
 
 [Sources]
   PciHostBridge.c
@@ -47,6 +49,15 @@
   gEfiPciRootBridgeIoProtocolGuid                       ## PRODUCES
   gEfiMetronomeArchProtocolGuid                         ## CONSUMES
   gEfiDevicePathProtocolGuid                            ## PRODUCES
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPciBusMin
+  gArmPlatformTokenSpaceGuid.PcdPciBusMax
+  gArmPlatformTokenSpaceGuid.PcdPciIoBase
+  gArmPlatformTokenSpaceGuid.PcdPciIoSize
+  gArmPlatformTokenSpaceGuid.PcdPciIoTranslation
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
 
 [depex]
   gEfiMetronomeArchProtocolGuid
