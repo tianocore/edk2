@@ -104,6 +104,9 @@
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   PciExpressLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
 
+  # USB Libraries
+  UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ArmPlatformSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf

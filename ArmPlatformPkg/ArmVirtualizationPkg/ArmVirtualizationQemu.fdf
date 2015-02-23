@@ -210,6 +210,14 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
   INF OvmfPkg/PlatformDxe/Platform.inf
 
+  #
+  # USB Support
+  #
+  INF MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
