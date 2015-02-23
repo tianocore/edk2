@@ -84,7 +84,8 @@
 
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
   # Activate KVM workaround for now.
   gArmVirtualizationTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|TRUE
@@ -128,8 +129,13 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"root=/dev/vda2 console=ttyAMA0 earlycon uefi_debug"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0
 
+  #
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
+  #
+  # For the PCI VGA device path to work, you must start QEMU with the option
+  # '-device VGA,addr=01.0' (see "Pci(0x1,0x0)").
+  #
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100();PciRoot(0x0)/Pci(0x1,0x0)/AcpiAdr(0x80010100)"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
@@ -205,6 +211,15 @@
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
 
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
+
+  #
+  # Set video resolution for boot options and for text setup.
+  # PlatformDxe can set the former at runtime.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
 
 ################################################################################
 #
@@ -315,3 +330,12 @@
   ArmPlatformPkg/ArmVirtualizationPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+
+  #
+  # Video support
+  #
+  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
+    <LibraryClasses>
+      BltLib|OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+  }
+  OvmfPkg/PlatformDxe/Platform.inf

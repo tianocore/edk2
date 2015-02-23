@@ -204,6 +204,12 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   INF OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
 
+  #
+  # Video support
+  #
+  INF OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+  INF OvmfPkg/PlatformDxe/Platform.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
