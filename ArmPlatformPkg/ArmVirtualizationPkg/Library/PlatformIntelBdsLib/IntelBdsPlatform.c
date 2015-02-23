@@ -289,14 +289,17 @@ PlatformBdsPolicyBehavior (
   Status = PlatformBdsConnectConsole ();
   ASSERT_EFI_ERROR (Status);
 
+  BdsLibConnectAll ();
+
   //
-  // Process QEMU's -kernel command line option
+  // Process QEMU's -kernel command line option. Note that the kernel booted
+  // this way should receive ACPI tables, which is why we connect all devices
+  // first (see above) -- PCI enumeration blocks ACPI table installation, if
+  // there is a PCI host.
   //
   TryRunningQemuKernel ();
 
-  BdsLibConnectAll ();
   BdsLibEnumerateAllBootOption (BootOptionList);
-
   SetBootOrderFromQemu (BootOptionList);
   //
   // The BootOrder variable may have changed, reload the in-memory list with
