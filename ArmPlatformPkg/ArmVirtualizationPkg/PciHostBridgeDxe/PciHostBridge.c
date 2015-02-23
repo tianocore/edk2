@@ -929,12 +929,19 @@ SubmitResources(
   while (List != &HostBridgeInstance->Head) {
     RootBridgeInstance = DRIVER_INSTANCE_FROM_LIST_ENTRY (List);
     if (RootBridgeHandle == RootBridgeInstance->Handle) {
-      while ( *Temp == 0x8A) {
+      for (;
+           *Temp == 0x8A;
+           Temp += sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR)
+           ) {
         Ptr = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Temp ;
 
         //
         // Check Address Length
         //
+        if (Ptr->AddrLen == 0) {
+          HostBridgeInstance->ResourceSubmited = TRUE;
+          continue;
+        }
         if (Ptr->AddrLen > 0xffffffff) {
           return EFI_INVALID_PARAMETER;
         }
@@ -1002,8 +1009,6 @@ SubmitResources(
         default:
             break;
         };
-    
-        Temp += sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) ;
       } 
       
       return EFI_SUCCESS;
