@@ -27,7 +27,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
 
 [Sources]
