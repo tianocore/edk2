@@ -1008,13 +1008,13 @@ RootBridgeIoIoRW (
     if (Write) {
       switch (OperationWidth) {
         case EfiPciWidthUint8:
-          IoWrite8 ((UINTN)Address, *Uint8Buffer);
+          MmioWrite8 ((UINTN)Address, *Uint8Buffer);
           break;
         case EfiPciWidthUint16:
-          IoWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
+          MmioWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
           break;
         case EfiPciWidthUint32:
-          IoWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
+          MmioWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
           break;
         default:
           //
@@ -1027,13 +1027,13 @@ RootBridgeIoIoRW (
     } else {
       switch (OperationWidth) {
         case EfiPciWidthUint8:
-          *Uint8Buffer = IoRead8 ((UINTN)Address);
+          *Uint8Buffer = MmioRead8 ((UINTN)Address);
           break;
         case EfiPciWidthUint16:
-          *((UINT16 *)Uint8Buffer) = IoRead16 ((UINTN)Address);
+          *((UINT16 *)Uint8Buffer) = MmioRead16 ((UINTN)Address);
           break;
         case EfiPciWidthUint32:
-          *((UINT32 *)Uint8Buffer) = IoRead32 ((UINTN)Address);
+          *((UINT32 *)Uint8Buffer) = MmioRead32 ((UINTN)Address);
           break;
         default:
           //
