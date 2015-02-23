@@ -27,6 +27,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
@@ -57,6 +58,15 @@
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
+  gArmPlatformTokenSpaceGuid.PcdPciBusMin
+  gArmPlatformTokenSpaceGuid.PcdPciBusMax
+  gArmPlatformTokenSpaceGuid.PcdPciIoBase
+  gArmPlatformTokenSpaceGuid.PcdPciIoSize
+  gArmPlatformTokenSpaceGuid.PcdPciIoTranslation
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
 
 [Protocols]
   gEfiDevicePathProtocolGuid

@@ -156,11 +156,11 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
 !endif
 
+[PcdsDynamicDefault.common]
   ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
 
-[PcdsDynamicDefault.common]
   # System Memory Size -- 1 MB initially, actual size will be fetched from DT
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x00100000
 
@@ -180,6 +180,15 @@
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
+
+  gArmPlatformTokenSpaceGuid.PcdPciBusMin|0x0
+  gArmPlatformTokenSpaceGuid.PcdPciBusMax|0x0
+  gArmPlatformTokenSpaceGuid.PcdPciIoBase|0x0
+  gArmPlatformTokenSpaceGuid.PcdPciIoSize|0x0
+  gArmPlatformTokenSpaceGuid.PcdPciIoTranslation|0x0
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base|0x0
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x0
 
   gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0
 
