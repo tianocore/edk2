@@ -20,11 +20,15 @@
 #include <Library/PcdLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
-
+#include <Library/HiiLib.h>
 #include <Library/BdsLib.h>
+#include <Library/ShellLib.h>
 
+#include <Protocol/DevicePathToText.h>
 #include <Protocol/DevicePathFromText.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/EfiShell.h>
+#include <Protocol/EfiShellDynamicCommand.h>
 
 #include <Guid/EventGroup.h>
 #include <Guid/Fdt.h>
@@ -34,6 +38,7 @@
 //
 // Internal types
 //
+
 STATIC VOID OnEndOfDxe (
   IN EFI_EVENT  Event,
   IN VOID       *Context
@@ -45,6 +50,48 @@ STATIC EFI_STATUS InstallFdt (
   IN CONST CHAR16*  TextDevicePath
   );
 
+STATIC SHELL_STATUS EFIAPI ShellDynCmdSetFdtHandler (
+  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *This,
+  IN EFI_SYSTEM_TABLE                    *SystemTable,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL       *ShellParameters,
+  IN EFI_SHELL_PROTOCOL                  *Shell
+  );
+
+STATIC CHAR16* EFIAPI ShellDynCmdSetFdtGetHelp (
+  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *This,
+  IN CONST CHAR8                         *Language
+  );
+
+STATIC SHELL_STATUS UpdateFdtTextDevicePath (
+  IN EFI_SHELL_PROTOCOL  *Shell,
+  IN CONST CHAR16        *FilePath
+  );
+
+STATIC SHELL_STATUS EfiCodeToShellCode (
+  IN EFI_STATUS  Status
+  );
+
+//
+// Internal variables
+//
+
+STATIC CONST EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mShellDynCmdProtocolSetFdt = {
+    L"setfdt",                // Name of the command
+    ShellDynCmdSetFdtHandler, // Handler
+    ShellDynCmdSetFdtGetHelp  // GetHelp
+};
+
+STATIC CONST EFI_GUID  mFdtPlatformDxeHiiGuid = {
+                         0x8afa7610, 0x62b1, 0x46aa,
+                         {0xb5, 0x34, 0xc3, 0xde, 0xff, 0x39, 0x77, 0x8c}
+                         };
+STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
+  {L"-i", TypeFlag },
+  {NULL , TypeMax  }
+};
+
+STATIC EFI_HANDLE  mFdtPlatformDxeHiiHandle;
+
 /**
   Main entry point of the FDT platform driver.
 
@@ -53,7 +100,10 @@ STATIC EFI_STATUS InstallFdt (
   @param[in]  *SystemTable  A pointer to the EFI System table.
 
   @retval  EFI_SUCCESS           The driver was initialized.
-  @retval  EFI_OUT_OF_RESOURCES  The "End of DXE" event could not be allocated.
+  @retval  EFI_OUT_OF_RESOURCES  The "End of DXE" event could not be allocated or
+                                 there was not enough memory in pool to install
+                                 the Shell Dynamic Command protocol.
+  @retval  EFI_LOAD_ERROR        Unable to add the HII package.
 
 **/
 EFI_STATUS
@@ -79,6 +129,57 @@ FdtPlatformEntryPoint (
                   &gEfiEndOfDxeEventGroupGuid,
                   &EndOfDxeEvent
                   );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // If the development features are enabled, install the dynamic shell
+  // command "setfdt" to be able to define a device path for the FDT
+  // that has precedence over the device paths defined by
+  // "PcdFdtDevicePaths".
+  //
+
+  if (FeaturePcdGet (PcdOverridePlatformFdt)) {
+    //
+    // Register the strings for the user interface in the HII Database.
+    // This shows the way to the multi-language support, even if
+    // only the English language is actually supported. The strings to register
+    // are stored in the "FdtPlatformDxeStrings[]" array. This array is
+    // built by the building process from the "*.uni" file associated to
+    // the present driver (cf. FdtPlatfromDxe.inf). Examine your Build
+    // folder under your package's DEBUG folder and you will find the array
+    // defined in a xxxStrDefs.h file.
+    //
+    mFdtPlatformDxeHiiHandle = HiiAddPackages (
+                                 &mFdtPlatformDxeHiiGuid,
+                                 ImageHandle,
+                                 FdtPlatformDxeStrings,
+                                 NULL
+                                 );
+
+    if (mFdtPlatformDxeHiiHandle != NULL) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &ImageHandle,
+                      &gEfiShellDynamicCommandProtocolGuid,
+                      &mShellDynCmdProtocolSetFdt,
+                      NULL
+                      );
+      if (EFI_ERROR (Status)) {
+        HiiRemovePackages (mFdtPlatformDxeHiiHandle);
+      }
+    } else {
+      Status = EFI_LOAD_ERROR;
+    }
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        EFI_D_WARN,
+        "Unable to install \"setfdt\" EFI Shell command - %r \n",
+        Status
+        ));
+    }
+  }
 
   return Status;
 }
@@ -351,8 +452,6 @@ Error :
 
   return Status;
 }
-
-=======
 
 /**
   This is the shell command "setfdt" handler function. This function handles
@@ -739,4 +838,3 @@ EfiCodeToShellCode (
 
   return ShellStatus;
 }
->>>>>>> 4ac4fed... EmbeddedPkg/FdtPlatformDxe: Fix typo issue

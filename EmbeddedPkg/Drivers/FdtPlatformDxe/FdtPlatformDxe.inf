@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION     = 0x00010006
   BASE_NAME       = FdtPlatformDxe
+  MODULE_UNI_FILE = FdtPlatformDxe.uni
   FILE_GUID       = 6e9a4c69-57c6-4fcd-b083-4f2c3bdb6051
   MODULE_TYPE     = DXE_DRIVER
   VERSION_STRING  = 0.1
@@ -22,11 +23,14 @@
 
 [Sources.common]
   FdtPlatform.c
+  FdtPlatformDxe.uni
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -36,9 +40,13 @@
   DebugLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
+  HiiLib
+  ShellLib
 
 [Protocols]
+  gEfiDevicePathToTextProtocolGuid
   gEfiDevicePathFromTextProtocolGuid
+  gEfiShellDynamicCommandProtocolGuid
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
