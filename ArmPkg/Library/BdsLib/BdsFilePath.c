@@ -467,7 +467,7 @@ BdsFileSystemSupport (
 
 EFI_STATUS
 BdsFileSystemLoadImage (
-  IN     EFI_DEVICE_PATH       *DevicePath,
+  IN OUT EFI_DEVICE_PATH       **DevicePath,
   IN     EFI_HANDLE            Handle,
   IN     EFI_DEVICE_PATH       *RemainingDevicePath,
   IN     EFI_ALLOCATE_TYPE     Type,
@@ -560,9 +560,9 @@ BdsMemoryMapSupport (
 
 EFI_STATUS
 BdsMemoryMapLoadImage (
-  IN     EFI_DEVICE_PATH *DevicePath,
-  IN     EFI_HANDLE Handle,
-  IN     EFI_DEVICE_PATH *RemainingDevicePath,
+  IN OUT EFI_DEVICE_PATH       **DevicePath,
+  IN     EFI_HANDLE            Handle,
+  IN     EFI_DEVICE_PATH       *RemainingDevicePath,
   IN     EFI_ALLOCATE_TYPE     Type,
   IN OUT EFI_PHYSICAL_ADDRESS* Image,
   OUT    UINTN                 *ImageSize
@@ -575,8 +575,8 @@ BdsMemoryMapLoadImage (
   if (IS_DEVICE_PATH_NODE (RemainingDevicePath, HARDWARE_DEVICE_PATH, HW_MEMMAP_DP)) {
     MemMapPathDevicePath = (MEMMAP_DEVICE_PATH*)RemainingDevicePath;
   } else {
-    ASSERT (IS_DEVICE_PATH_NODE (DevicePath, HARDWARE_DEVICE_PATH, HW_MEMMAP_DP));
-    MemMapPathDevicePath = (MEMMAP_DEVICE_PATH*)DevicePath;
+    ASSERT (IS_DEVICE_PATH_NODE (*DevicePath, HARDWARE_DEVICE_PATH, HW_MEMMAP_DP));
+    MemMapPathDevicePath = (MEMMAP_DEVICE_PATH*)*DevicePath;
   }
 
   Size = MemMapPathDevicePath->EndingAddress - MemMapPathDevicePath->StartingAddress;
@@ -612,9 +612,9 @@ BdsFirmwareVolumeSupport (
 
 EFI_STATUS
 BdsFirmwareVolumeLoadImage (
-  IN     EFI_DEVICE_PATH *DevicePath,
-  IN     EFI_HANDLE Handle,
-  IN     EFI_DEVICE_PATH *RemainingDevicePath,
+  IN OUT EFI_DEVICE_PATH       **DevicePath,
+  IN     EFI_HANDLE            Handle,
+  IN     EFI_DEVICE_PATH       *RemainingDevicePath,
   IN     EFI_ALLOCATE_TYPE     Type,
   IN OUT EFI_PHYSICAL_ADDRESS* Image,
   OUT    UINTN                 *ImageSize
@@ -733,12 +733,12 @@ BdsPxeSupport (
 
 EFI_STATUS
 BdsPxeLoadImage (
-  IN     EFI_DEVICE_PATH*       DevicePath,
-  IN     EFI_HANDLE             Handle,
-  IN     EFI_DEVICE_PATH*       RemainingDevicePath,
-  IN     EFI_ALLOCATE_TYPE      Type,
-  IN OUT EFI_PHYSICAL_ADDRESS   *Image,
-  OUT    UINTN                  *ImageSize
+  IN OUT EFI_DEVICE_PATH       **DevicePath,
+  IN     EFI_HANDLE            Handle,
+  IN     EFI_DEVICE_PATH       *RemainingDevicePath,
+  IN     EFI_ALLOCATE_TYPE     Type,
+  IN OUT EFI_PHYSICAL_ADDRESS* Image,
+  OUT    UINTN                 *ImageSize
   )
 {
   EFI_STATUS              Status;
@@ -752,14 +752,14 @@ BdsPxeLoadImage (
     return Status;
   }
 
-  Status = LoadFileProtocol->LoadFile (LoadFileProtocol, DevicePath, TRUE, &BufferSize, NULL);
+  Status = LoadFileProtocol->LoadFile (LoadFileProtocol, *DevicePath, TRUE, &BufferSize, NULL);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(BufferSize), Image);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    Status = LoadFileProtocol->LoadFile (LoadFileProtocol, DevicePath, TRUE, &BufferSize, (VOID*)(UINTN)(*Image));
+    Status = LoadFileProtocol->LoadFile (LoadFileProtocol, *DevicePath, TRUE, &BufferSize, (VOID*)(UINTN)(*Image));
     if (!EFI_ERROR (Status) && (ImageSize != NULL)) {
       *ImageSize = BufferSize;
     }
@@ -1018,12 +1018,12 @@ Mtftp4CheckPacket (
 **/
 EFI_STATUS
 BdsTftpLoadImage (
-  IN     EFI_DEVICE_PATH*       DevicePath,
-  IN     EFI_HANDLE             ControllerHandle,
-  IN     EFI_DEVICE_PATH*       RemainingDevicePath,
-  IN     EFI_ALLOCATE_TYPE      Type,
-  IN OUT EFI_PHYSICAL_ADDRESS   *Image,
-  OUT    UINTN                  *ImageSize
+  IN OUT EFI_DEVICE_PATH       **DevicePath,
+  IN     EFI_HANDLE            ControllerHandle,
+  IN     EFI_DEVICE_PATH       *RemainingDevicePath,
+  IN     EFI_ALLOCATE_TYPE     Type,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Image,
+  OUT    UINTN                 *ImageSize
   )
 {
   EFI_STATUS               Status;
@@ -1340,7 +1340,7 @@ BdsLoadImageAndUpdateDevicePath (
   FileLoader = FileLoaders;
   while (FileLoader->Support != NULL) {
     if (FileLoader->Support (*DevicePath, Handle, RemainingDevicePath)) {
-      return FileLoader->LoadImage (*DevicePath, Handle, RemainingDevicePath, Type, Image, FileSize);
+      return FileLoader->LoadImage (DevicePath, Handle, RemainingDevicePath, Type, Image, FileSize);
     }
     FileLoader++;
   }
