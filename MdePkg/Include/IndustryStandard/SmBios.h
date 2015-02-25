@@ -1108,7 +1108,7 @@ typedef enum {
   SlotTypeApg2X                        = 0x10,
   SlotTypeAgp4X                        = 0x11,
   SlotTypePciX                         = 0x12,
-  SlotTypeAgp4x                        = 0x13,
+  SlotTypeAgp8X                        = 0x13,
   SlotTypeM2Socket1_DP                 = 0x14,
   SlotTypeM2Socket1_SD                 = 0x15,
   SlotTypeM2Socket2                    = 0x16,
