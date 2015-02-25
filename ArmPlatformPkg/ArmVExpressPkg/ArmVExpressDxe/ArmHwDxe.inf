@@ -22,10 +22,12 @@
 
 [Sources.common]
   ArmHwDxe.c
+  ArmVExpressCommon.c
 
 [Packages]
-  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
 
 [LibraryClasses]
   ArmShellCmdRunAxfLib

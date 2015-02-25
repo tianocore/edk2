@@ -22,15 +22,26 @@
 
 [Sources.common]
   ArmFvpDxe.c
+  ArmVExpressCommon.c
+
+[Sources.ARM]
+  Arm/ArmFvpDxeArm.c
+
+[Sources.AARCH64]
+  AArch64/ArmFvpDxeAArch64.c
 
 [Packages]
   MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   ArmShellCmdRunAxfLib
+  ArmLib
+  ArmPlatformLib
+  BaseMemoryLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   VirtioMmioDeviceLib
-  BaseMemoryLib

@@ -41,6 +41,19 @@ typedef struct {
 } ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR;
 
 /**
+  Return the core per cluster. The method may differ per core type
+
+  This function might be called from assembler before any stack is set.
+
+  @return   Return the core count per cluster
+
+**/
+UINTN
+ArmGetCpuCountPerCluster (
+  VOID
+  );
+
+/**
   Return the core position from the value of its MpId register
 
   This function returns the core position from the position 0 in the processor.

@@ -12,10 +12,9 @@
 
 **/
 
-#include <Library/UefiLib.h>
+#include "ArmVExpressInternal.h"
+
 #include <Library/VirtioMmioDeviceLib.h>
-#include <Library/DebugLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/ArmShellCmdLib.h>
 
 #define ARM_FVP_BASE_VIRTIO_BLOCK_BASE    0x1c130000

@@ -21,12 +21,6 @@
 
 #include <ArmPlatform.h>
 
-
-UINTN
-ArmGetCpuCountPerCluster (
-  VOID
-  );
-
 ARM_CORE_INFO mVersatileExpressMpCoreInfoTable[] = {
   {
     // Cluster 0, Core 0

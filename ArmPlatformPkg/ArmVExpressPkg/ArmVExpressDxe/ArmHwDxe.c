@@ -12,9 +12,42 @@
 
 **/
 
-#include <Library/UefiLib.h>
-#include <Library/DebugLib.h>
+#include "ArmVExpressInternal.h"
 #include <Library/ArmShellCmdLib.h>
+
+//
+// Description of the four hardware platforms :
+// just the platform id for the time being.
+// Platform ids are defined in ArmVExpressInternal.h for
+// all "ArmVExpress-like" platforms (AARCH64 or ARM architecture,
+// model or hardware platforms).
+//
+CONST ARM_VEXPRESS_PLATFORM ArmVExpressPlatforms[] = {
+  { ARM_HW_A9x4 },
+  { ARM_HW_A15x2_A7x3 },
+  { ARM_HW_A15 },
+  { ARM_HW_A5 },
+  { ARM_FVP_VEXPRESS_UNKNOWN }
+};
+
+/**
+  Get information about the VExpress platform the firmware is running on.
+
+  @param[out]  Platform   Address where the pointer to the platform information
+                          (type ARM_VEXPRESS_PLATFORM*) should be stored.
+                          The returned pointer does not point to an allocated
+                          memory area. Not used here.
+
+  @retval  EFI_NOT_FOUND  The platform was not recognised.
+
+**/
+EFI_STATUS
+ArmVExpressGetPlatform (
+  OUT CONST ARM_VEXPRESS_PLATFORM** Platform
+  )
+{
+  return EFI_NOT_FOUND;
+}
 
 EFI_STATUS
 EFIAPI
