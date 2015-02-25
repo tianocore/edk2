@@ -1,6 +1,7 @@
 ## @file
 #  Implementation for PlatformBdsLib library class interfaces.
 #
+#  Copyright (C) 2015, Red Hat, Inc.
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
@@ -53,6 +54,12 @@
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
 
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
 [Guids]
   gEfiFileInfoGuid
   gEfiFileSystemInfoGuid
@@ -60,5 +67,7 @@
 
 [Protocols]
   gEfiDevicePathProtocolGuid
+  gEfiGraphicsOutputProtocolGuid
   gEfiLoadedImageProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
