@@ -2,16 +2,17 @@
 #  Implementation for PlatformBdsLib library class interfaces.
 #  using ARM Platform framework.
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
 #
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
+#  IMPLIED.
 #
 ##
 
@@ -31,15 +32,14 @@
 
 [Sources]
   IntelBdsPlatform.c
-  IntelBdsPlatform.h
   QemuKernel.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
@@ -48,13 +48,13 @@
   BdsLib
   DebugLib
   DevicePathLib
-  MemoryAllocationLib
-  UefiBootServicesTableLib
-  PcdLib
   GenericBdsLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
   QemuBootOrderLib
   QemuFwCfgLib
-  PrintLib
+  UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
 
 [Guids]
@@ -69,7 +69,7 @@
 
 [Protocols]
   gEfiDevicePathFromTextProtocolGuid
-  gEfiDevicePathToTextProtocolGuid
   gEfiDevicePathProtocolGuid
+  gEfiDevicePathToTextProtocolGuid
   gEfiLoadedImageProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
