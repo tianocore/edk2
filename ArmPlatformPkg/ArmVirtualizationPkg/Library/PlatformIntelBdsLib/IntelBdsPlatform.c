@@ -398,6 +398,11 @@ PlatformBdsPolicyBehavior (
   BdsLibConnectAllDefaultConsoles ();
 
   //
+  // Show the splash screen.
+  //
+  EnableQuietBoot (PcdGetPtr (PcdLogoFile));
+
+  //
   // Connect the rest of the devices.
   //
   BdsLibConnectAll ();

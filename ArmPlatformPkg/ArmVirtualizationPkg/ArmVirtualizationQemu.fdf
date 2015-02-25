@@ -218,6 +218,15 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 
+!ifdef INTEL_BDS
+  #
+  # TianoCore logo (splash screen)
+  #
+  FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
+    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
+  }
+!endif
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
