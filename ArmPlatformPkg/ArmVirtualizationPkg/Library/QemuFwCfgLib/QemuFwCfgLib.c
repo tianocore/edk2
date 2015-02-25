@@ -331,7 +331,7 @@ QemuFwCfgFindFile (
     InternalQemuFwCfgReadBytes (sizeof (FName), FName);
 
     if (AsciiStrCmp (Name, FName) == 0) {
-      *Item = SwapBytes16 (FileSelect);
+      *Item = (FIRMWARE_CONFIG_ITEM) SwapBytes16 (FileSelect);
       *Size = SwapBytes32 (FileSize);
       return RETURN_SUCCESS;
     }
