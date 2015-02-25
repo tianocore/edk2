@@ -1,0 +1,55 @@
+#/** @file
+#
+#  Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION     = 0x00010006
+  BASE_NAME       = FdtPlatformDxe
+  FILE_GUID       = 6e9a4c69-57c6-4fcd-b083-4f2c3bdb6051
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 0.1
+  ENTRY_POINT     = FdtPlatformEntryPoint
+
+[Sources.common]
+  FdtPlatform.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BdsLib
+  DxeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiDevicePathFromTextProtocolGuid
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gFdtTableGuid
+  gFdtVariableGuid
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths
+
+[Depex]
+  TRUE

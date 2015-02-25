@@ -52,6 +52,7 @@
   ## FDT Configuration Table
   # Include/Guid/Fdt.h
   gFdtTableGuid = { 0xb1b621d5, 0xf19c, 0x41a5, { 0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0 } }
+  gFdtVariableGuid = { 0x25a4fd4a, 0x9703, 0x4ba9, { 0xa1, 0x90, 0xb7, 0xc8, 0x4e, 0xfb, 0x3e, 0x57 } }
 
 [Protocols.common]
   gHardwareInterruptProtocolGuid =  { 0x2890B3EA, 0x053D, 0x1643, { 0xAD, 0x0C, 0xD6, 0x48, 0x08, 0xDA, 0x3F, 0xF1 } }
@@ -79,6 +80,7 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
+  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE|BOOLEAN|0x00000054
 
 
 [PcdsFixedAtBuild.common]
@@ -148,6 +150,7 @@
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId|0xbeef|UINT32|0x00000023
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootTcpPort|1234|UINT32|0x00000024
 
+
 [PcdsFixedAtBuild.ARM]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
@@ -169,3 +172,6 @@
 [PcdsFixedAtBuild.X64]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|52|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
+
+[PcdsFixedAtBuild.common, PcdsDynamic.common]
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L""|VOID*|0x00000055
