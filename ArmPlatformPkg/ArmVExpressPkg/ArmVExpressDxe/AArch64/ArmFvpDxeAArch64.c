@@ -13,9 +13,10 @@
 **/
 
 #include "ArmVExpressInternal.h"
+#include <Library/ArmGicLib.h>
 
 //
-// Description of the two AARCH64 model platforms :
+// Description of the AARCH64 model platforms :
 // just the platform id for the time being.
 // Platform ids are defined in ArmVExpressInternal.h for
 // all "ArmVExpress-like" platforms (AARCH64 or ARM architecture,
@@ -23,8 +24,12 @@
 //
 CONST ARM_VEXPRESS_PLATFORM ArmVExpressPlatforms[] = {
   { ARM_FVP_VEXPRESS_AEMv8x4 },
-  { ARM_FVP_BASE_AEMv8x4_AEMv8x4 },
-  { ARM_FVP_FOUNDATION },
+  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2 },
+  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2_LEGACY },
+  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV3 },
+  { ARM_FVP_FOUNDATION_GICV2 },
+  { ARM_FVP_FOUNDATION_GICV2_LEGACY },
+  { ARM_FVP_FOUNDATION_GICV3 },
   { ARM_FVP_VEXPRESS_UNKNOWN }
 };
 
@@ -47,6 +52,9 @@ ArmVExpressGetPlatform (
 {
   EFI_STATUS            Status;
   UINT32                SysId;
+  UINT32                FvpSysId;
+  UINT32                VariantSysId;
+  ARM_GIC_ARCH_REVISION GicRevision;
 
   ASSERT (Platform != NULL);
 
@@ -54,15 +62,46 @@ ArmVExpressGetPlatform (
 
   SysId = MmioRead32 (ARM_VE_SYS_ID_REG);
   if (SysId != ARM_RTSM_SYS_ID) {
-    // Take out the FVP GIC variant to reduce the permutations. The GIC driver
-    // detects the version and does the right thing.
-    SysId &= ~ARM_FVP_SYS_ID_VARIANT_MASK;
-    if (SysId == (ARM_FVP_BASE_SYS_ID & ~ARM_FVP_SYS_ID_VARIANT_MASK)) {
-      Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE_AEMv8x4_AEMv8x4, Platform);
-    } else if (SysId == (ARM_FVP_FOUNDATION_SYS_ID & ~ARM_FVP_SYS_ID_VARIANT_MASK)) {
-      Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION, Platform);
+    // Remove the GIC variant to identify if we are running on the FVP Base or
+    // Foundation models
+    FvpSysId     = SysId & (ARM_FVP_SYS_ID_HBI_MASK |
+                            ARM_FVP_SYS_ID_PLAT_MASK );
+    // Extract the variant from the SysId
+    VariantSysId = SysId & ARM_FVP_SYS_ID_VARIANT_MASK;
+
+    if (FvpSysId == ARM_FVP_BASE_BOARD_SYS_ID) {
+      if (VariantSysId == ARM_FVP_GIC_VE_MMAP) {
+        // FVP Base Model with legacy GIC memory map
+        Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2_LEGACY, Platform);
+      } else {
+        GicRevision = ArmGicGetSupportedArchRevision ();
+
+        if (GicRevision == ARM_GIC_ARCH_REVISION_2) {
+          // FVP Base Model with GICv2 support
+          Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2, Platform);
+        } else {
+          // FVP Base Model with GICv3 support
+          Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV3, Platform);
+        }
+      }
+    } else if (FvpSysId == ARM_FVP_FOUNDATION_BOARD_SYS_ID) {
+      if (VariantSysId == ARM_FVP_GIC_VE_MMAP) {
+        // FVP Foundation Model with legacy GIC memory map
+        Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION_GICV2_LEGACY, Platform);
+      } else {
+        GicRevision = ArmGicGetSupportedArchRevision ();
+
+        if (GicRevision == ARM_GIC_ARCH_REVISION_2) {
+          // FVP Foundation Model with GICv2
+          Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION_GICV2, Platform);
+        } else {
+          // FVP Foundation Model with GICv3
+          Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION_GICV3, Platform);
+        }
+      }
     }
   } else {
+    // FVP Versatile Express AEMv8
     Status = ArmVExpressGetPlatformFromId (ARM_FVP_VEXPRESS_AEMv8x4, Platform);
   }
 

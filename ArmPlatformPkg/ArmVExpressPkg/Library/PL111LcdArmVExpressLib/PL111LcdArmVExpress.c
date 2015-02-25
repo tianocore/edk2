@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -269,7 +269,7 @@ LcdPlatformSetMode (
   if (SysId != ARM_RTSM_SYS_ID) {
     // Take out the FVP GIC variant to reduce the permutations.
     SysId &= ~ARM_FVP_SYS_ID_VARIANT_MASK;
-    if (SysId != (ARM_FVP_BASE_SYS_ID & ~ARM_FVP_SYS_ID_VARIANT_MASK)) {
+    if (SysId != ARM_FVP_BASE_BOARD_SYS_ID) {
       // Set the DVI into the new mode
       Status = ArmPlatformSysConfigSet (SYS_CFG_DVIMODE, mResolutions[ModeNumber].Mode);
       if (EFI_ERROR(Status)) {
