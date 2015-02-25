@@ -130,25 +130,10 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0
 
   #
-  # Use the serial console (ConIn & ConOut), the USB keyboard (ConIn), and the
-  # Graphic driver (ConOut).
+  # Settings for ARM BDS -- use the serial console (ConIn & ConOut).
   #
-  # For the PCI VGA device path to work, you must start QEMU with the option
-  # '-device VGA,addr=01.0' (see "Pci(0x1,0x0)").
-  #
-  # For the USB keyboard device path to work, the following QEMU options are
-  # needed (see "docs/usb2.txt" and "docs/ich9-ehci-uhci.cfg"):
-  #
-  # -device ich9-usb-ehci1,multifunction=on,addr=1d.7,id=ehci
-  # -device ich9-usb-uhci1,multifunction=on,addr=1d.0,masterbus=ehci.0,firstport=0
-  # -device ich9-usb-uhci2,multifunction=on,addr=1d.1,masterbus=ehci.0,firstport=2
-  # -device ich9-usb-uhci3,multifunction=on,addr=1d.2,masterbus=ehci.0,firstport=4
-  # -device usb-kbd,bus=ehci.0
-  #
-  # Note the match between addr=1d.7 and Pci(0x1D,0x7).
-  #
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100();PciRoot(0x0)/Pci(0x1,0x0)/AcpiAdr(0x80010100)"
-  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100();PciRoot(0x0)/Pci(0x1D,0x7)/USB(0x0,0x0)"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
   #

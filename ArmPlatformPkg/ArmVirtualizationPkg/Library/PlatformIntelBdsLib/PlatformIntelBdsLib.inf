@@ -1,6 +1,5 @@
 ## @file
 #  Implementation for PlatformBdsLib library class interfaces.
-#  using ARM Platform framework.
 #
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
@@ -35,8 +34,6 @@
   QemuKernel.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
@@ -45,7 +42,6 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  BdsLib
   DebugLib
   DevicePathLib
   GenericBdsLib
@@ -58,18 +54,11 @@
   UefiRuntimeServicesTableLib
 
 [Guids]
-  gArmGlobalVariableGuid
   gEfiFileInfoGuid
   gEfiFileSystemInfoGuid
   gEfiFileSystemVolumeLabelInfoIdGuid
 
-[Pcd]
-  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths
-
 [Protocols]
-  gEfiDevicePathFromTextProtocolGuid
   gEfiDevicePathProtocolGuid
-  gEfiDevicePathToTextProtocolGuid
   gEfiLoadedImageProtocolGuid
   gEfiSimpleFileSystemProtocolGuid

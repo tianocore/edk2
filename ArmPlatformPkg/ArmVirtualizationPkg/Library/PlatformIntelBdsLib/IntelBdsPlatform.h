@@ -16,22 +16,13 @@
 #ifndef _INTEL_BDS_PLATFORM_H_
 #define _INTEL_BDS_PLATFORM_H_
 
-#include <Protocol/DevicePathFromText.h>
-#include <Protocol/DevicePathToText.h>
-
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/BdsLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/GenericBdsLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
-#include <Library/PlatformBdsLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-
-#include <Guid/GlobalVariable.h>
 
 VOID
 PlatformBdsEnterFrontPage (
