@@ -38,11 +38,11 @@ UINTN                mSmmMemLibInternalSmramCount;
 EFI_PHYSICAL_ADDRESS  mSmmMemLibInternalMaximumSupportAddress = 0;
 
 /**
-  Caculate and save the maximum support address.
+  Calculate and save the maximum support address.
 
 **/
 VOID
-SmmMemLibInternalCaculateMaximumSupportAddress (
+SmmMemLibInternalCalculateMaximumSupportAddress (
   VOID
   )
 {
@@ -315,9 +315,9 @@ SmmMemLibConstructor (
   mSmmMemLibInternalSmramCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
 
   //
-  // Caculate and save maximum support address
+  // Calculate and save maximum support address
   //
-  SmmMemLibInternalCaculateMaximumSupportAddress ();
+  SmmMemLibInternalCalculateMaximumSupportAddress ();
 
   return EFI_SUCCESS;
 }
