@@ -46,7 +46,6 @@ gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription      : Description of the D
 gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath       : DevicePath of the Default Boot Entry
 gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument         : Argument for the Default Boot Entry
 gArmPlatformTokenSpaceGuid.PcdDefaultBootType             : Define the binary type of the Default Boot Entry (0=EFI application, 1=Linux kernel with ATAG support, 2=Linux Kernel with FDT support)  
-gArmPlatformTokenSpaceGuid.PcdFdtDevicePath               : DevicePath of the Platform Device Tree
 gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut         : Timeout before booting on the Device Boot entry (by default the auto boot is skipped)
 gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths           : List of Device Path use for the Console Input
 gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths          : List of Device Path use for the Console Output

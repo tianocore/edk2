@@ -140,7 +140,6 @@
   #
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NOR Flash"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/Image"
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno.dtb"
 
   # Support the Linux EFI stub by default
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L"console=ttyAMA0,115200 earlycon=pl011,0x7ff80000 root=/dev/sda1 rootwait verbose debug"

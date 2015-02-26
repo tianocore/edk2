@@ -36,10 +36,10 @@
   AArch64/BdsLinuxLoaderHelper.S
 
 [Packages]
-  MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
@@ -63,6 +63,7 @@
   gEfiFileInfoGuid
   gArmMpCoreInfoGuid
   gArmGlobalVariableGuid
+  gFdtTableGuid
 
 [Protocols]
   gEfiBdsArchProtocolGuid

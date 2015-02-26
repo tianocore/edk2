@@ -132,7 +132,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/Image"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"root=/dev/vda2 rw console=ttyAMA0 earlyprintk=pl011,0x1c090000 maxcpus=4 debug user_debug=31 loglevel=9"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/foundation-v8.dtb"
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi();"
@@ -141,7 +140,7 @@
   #
   # ARM Architectural Timer Frequency
   #
-  # Set model tick to 100Mhz. This depends a lot on workstation performance.
+  # Set model tick to 100MHz. This depends a lot on workstation performance.
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|100000000
 
 [PcdsDynamicDefault.common]

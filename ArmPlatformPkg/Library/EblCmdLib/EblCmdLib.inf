@@ -61,6 +61,4 @@
 
 [Guids]
   gEfiDebugImageInfoTableGuid
-
-[Pcd]
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath
+  gFdtTableGuid

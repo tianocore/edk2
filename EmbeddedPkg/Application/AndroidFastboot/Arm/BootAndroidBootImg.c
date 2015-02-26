@@ -56,7 +56,6 @@ BootAndroidBootImg (
   IN VOID    *Buffer
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL           *FdtDevicePath;
   EFI_STATUS                          Status;
   CHAR8                               KernelArgs[BOOTIMG_KERNEL_ARGS_SIZE];
   VOID                               *Kernel;
@@ -93,20 +92,10 @@ BootAndroidBootImg (
     RamdiskDevicePath->Node1.EndingAddress   = ((EFI_PHYSICAL_ADDRESS)(UINTN) Ramdisk) + RamdiskSize;
   }
 
-  // Get the default FDT device path
-  Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", &gArmGlobalVariableGuid,
-             NULL, 0, (VOID **)&FdtDevicePath);
-  if (Status == EFI_NOT_FOUND) {
-    DEBUG ((EFI_D_ERROR, "Error: Please update FDT path in boot manager\n"));
-    return EFI_DEVICE_ERROR;
-  }
-  ASSERT_EFI_ERROR (Status);
-
   Status = BdsBootLinuxFdt (
               (EFI_DEVICE_PATH_PROTOCOL *) &KernelDevicePath,
               (EFI_DEVICE_PATH_PROTOCOL *) RamdiskDevicePath,
-              KernelArgs,
-              FdtDevicePath
+              KernelArgs
               );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Couldn't Boot Linux: %d\n", Status));
@@ -116,8 +105,6 @@ BootAndroidBootImg (
   if (RamdiskDevicePath) {
     FreePool (RamdiskDevicePath);
   }
-
-  FreePool (FdtDevicePath);
 
   // If we got here we do a confused face because BootLinuxFdt returned,
   // reporting success.

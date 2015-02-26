@@ -160,9 +160,9 @@ BdsBootLinuxAtag (
 /**
   Start a Linux kernel from a Device Path
 
-  @param  LinuxKernel           Device Path to the Linux Kernel
-  @param  Parameters            Linux kernel arguments
-  @param  Fdt                   Device Path to the Flat Device Tree
+  @param[in]  LinuxKernelDevicePath  Device Path to the Linux Kernel
+  @param[in]  InitrdDevicePath       Device Path to the Initrd
+  @param[in]  Arguments              Linux kernel arguments
 
   @retval EFI_SUCCESS           All drivers have been connected
   @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
@@ -173,8 +173,7 @@ EFI_STATUS
 BdsBootLinuxFdt (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
-  IN  CONST CHAR8*              Arguments,
-  IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
+  IN  CONST CHAR8*              Arguments
   );
 
 /**

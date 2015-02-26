@@ -14,6 +14,8 @@
 #include <Library/ArmGicLib.h>
 #include <Ppi/ArmMpCoreInfo.h>
 #include <Library/IoLib.h>
+#include <Guid/Fdt.h>
+#include <libfdt.h>
 
 #include "BdsInternal.h"
 #include "BdsLinuxLoader.h"
@@ -171,9 +173,9 @@ BdsBootLinuxAtag (
 /**
   Start a Linux kernel from a Device Path
 
-  @param  LinuxKernel           Device Path to the Linux Kernel
-  @param  Parameters            Linux kernel agruments
-  @param  Fdt                   Device Path to the Flat Device Tree
+  @param[in]  LinuxKernelDevicePath  Device Path to the Linux Kernel
+  @param[in]  InitrdDevicePath       Device Path to the Initrd
+  @param[in]  Arguments              Linux kernel arguments
 
   @retval EFI_SUCCESS           All drivers have been connected
   @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
@@ -184,26 +186,26 @@ EFI_STATUS
 BdsBootLinuxFdt (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
-  IN  CONST CHAR8*              Arguments,
-  IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
+  IN  CONST CHAR8*              Arguments
   )
 {
-  EFI_STATUS            Status;
-  EFI_STATUS            PenBaseStatus;
-  UINTN                 LinuxImageSize;
-  UINTN                 InitrdImageSize;
-  UINTN                 InitrdImageBaseSize;
-  UINTN                 FdtBlobSize;
-  EFI_PHYSICAL_ADDRESS  FdtBlobBase;
-  EFI_PHYSICAL_ADDRESS  LinuxImage;
-  EFI_PHYSICAL_ADDRESS  InitrdImage;
-  EFI_PHYSICAL_ADDRESS  InitrdImageBase;
-  ARM_PROCESSOR_TABLE   *ArmProcessorTable;
-  ARM_CORE_INFO         *ArmCoreInfoTable;
-  UINTN                 Index;
-  EFI_PHYSICAL_ADDRESS  PenBase;
-  UINTN                 PenSize;
-  UINTN                 MailBoxBase;
+  EFI_STATUS               Status;
+  EFI_STATUS               PenBaseStatus;
+  UINTN                    LinuxImageSize;
+  UINTN                    InitrdImageSize;
+  UINTN                    InitrdImageBaseSize;
+  VOID                     *InstalledFdtBase;
+  UINTN                    FdtBlobSize;
+  EFI_PHYSICAL_ADDRESS     FdtBlobBase;
+  EFI_PHYSICAL_ADDRESS     LinuxImage;
+  EFI_PHYSICAL_ADDRESS     InitrdImage;
+  EFI_PHYSICAL_ADDRESS     InitrdImageBase;
+  ARM_PROCESSOR_TABLE      *ArmProcessorTable;
+  ARM_CORE_INFO            *ArmCoreInfoTable;
+  UINTN                    Index;
+  EFI_PHYSICAL_ADDRESS     PenBase;
+  UINTN                    PenSize;
+  UINTN                    MailBoxBase;
 
   PenBaseStatus = EFI_UNSUPPORTED;
   PenSize = 0;
@@ -259,14 +261,18 @@ BdsBootLinuxFdt (
     }
   }
 
-  // Load the FDT binary from a device path.
-  // The FDT will be reloaded later to a more appropriate location for the Linux kernel.
-  FdtBlobBase = LINUX_KERNEL_MAX_OFFSET;
-  Status = BdsLoadImage (FdtDevicePath, AllocateMaxAddress, &FdtBlobBase, &FdtBlobSize);
-  if (EFI_ERROR(Status)) {
-    Print (L"ERROR: Did not find Device Tree blob (%r).\n", Status);
+  //
+  // Get the FDT from the Configuration Table.
+  // The FDT will be reloaded in PrepareFdt() to a more appropriate
+  // location for the Linux Kernel.
+  //
+  Status = EfiGetSystemConfigurationTable (&gFdtTableGuid, &InstalledFdtBase);
+  if (EFI_ERROR (Status)) {
+    Print (L"ERROR: Did not get the Device Tree blob (%r).\n", Status);
     goto EXIT_FREE_INITRD;
   }
+  FdtBlobBase = (EFI_PHYSICAL_ADDRESS)InstalledFdtBase;
+  FdtBlobSize = fdt_totalsize (InstalledFdtBase);
 
   //
   // Install secondary core pens if the Power State Coordination Interface is not supported

@@ -27,6 +27,7 @@
 #include <Protocol/DevicePathFromText.h>
 
 #include <Guid/ArmGlobalVariableHob.h>
+#include <Guid/Fdt.h>
 
 #include <libfdt.h>
 
@@ -178,41 +179,28 @@ EblDumpFdt (
   IN CHAR8  **Argv
   )
 {
-  EFI_STATUS           Status;
-  EFI_DEVICE_PATH*     FdtDevicePath;
-  EFI_PHYSICAL_ADDRESS FdtBlob;
-  UINTN                FdtBlobSize;
-  UINTN                Ret;
-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
+  EFI_STATUS  Status;
+  VOID        *FdtBlob;
+  UINTN       Ret;
 
   // If no FDT file is passed to the argument then get the one from the platform
   if (Argc < 2) {
-    Status = GetEnvironmentVariable (L"Fdt", &gArmGlobalVariableGuid, NULL, NULL, (VOID**)&FdtDevicePath);
-    if (Status == EFI_NOT_FOUND) {
-      // No set yet, get the Default Device Path
-      Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
-      ASSERT_EFI_ERROR(Status);
-      FdtDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdFdtDevicePath));
+    Status = EfiGetSystemConfigurationTable (&gFdtTableGuid, &FdtBlob);
+    if (EFI_ERROR (Status)) {
+      Print (L"ERROR: Did not find the Fdt Blob.\n");
+      return Status;
     }
   } else {
     return EFI_NOT_FOUND;
   }
 
-  Status = BdsLoadImage (FdtDevicePath, AllocateAnyPages, &FdtBlob, &FdtBlobSize);
-  if (EFI_ERROR(Status)) {
-    Print (L"ERROR: Did not find the Fdt Blob.\n");
-    return Status;
-  }
-
-  Ret = fdt_check_header((CONST VOID*)(UINTN)FdtBlob);
+  Ret = fdt_check_header (FdtBlob);
   if (Ret != 0) {
-    Print (L"ERROR: Device Tree header not valid (err:%d)\n",Ret);
-    return Status;
+    Print (L"ERROR: Device Tree header not valid (err:%d)\n", Ret);
+    return EFI_INVALID_PARAMETER;
   }
 
-  DumpFdt ((VOID*)(UINTN)FdtBlob);
-
-  FreePool (FdtDevicePath);
+  DumpFdt (FdtBlob);
 
   return EFI_SUCCESS;
 }

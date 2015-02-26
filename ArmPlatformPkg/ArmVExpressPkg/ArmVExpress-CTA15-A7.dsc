@@ -190,7 +190,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0xE000000,0xE800000)"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,38400 earlyprintk debug verbose"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0x0E800000,0x0E803000)"
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   # PL111 - CLCD

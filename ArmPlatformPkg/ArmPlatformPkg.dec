@@ -135,7 +135,6 @@
   #  - 1 = a Linux kernel with ATAG support
   #  - 2 = a Linux kernel with FDT support
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0|UINT32|0x00000010
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L""|VOID*|0x00000011
 
   ## Timeout value for displaying progressing bar in before boot OS.
   #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.

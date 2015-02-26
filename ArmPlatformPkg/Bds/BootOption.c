@@ -21,13 +21,9 @@ BootOptionStart (
   )
 {
   EFI_STATUS                            Status;
-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL*   EfiDevicePathFromTextProtocol;
   UINT32                                LoaderType;
   ARM_BDS_LOADER_OPTIONAL_DATA*         OptionalData;
   ARM_BDS_LINUX_ARGUMENTS*              LinuxArguments;
-  EFI_DEVICE_PATH_PROTOCOL*             FdtDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL*             DefaultFdtDevicePath;
-  UINTN                                 FdtDevicePathSize;
   UINTN                                 CmdLineSize;
   UINTN                                 InitrdSize;
   EFI_DEVICE_PATH*                      Initrd;
@@ -69,25 +65,11 @@ BootOptionStart (
       } else {
         Initrd = NULL;
       }
-
-      // Get the default FDT device path
-      Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
-      ASSERT_EFI_ERROR(Status);
-      DefaultFdtDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdFdtDevicePath));
-
-      // Get the FDT device path
-      FdtDevicePathSize = GetDevicePathSize (DefaultFdtDevicePath);
-      Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", &gArmGlobalVariableGuid,
-                 DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
-      ASSERT_EFI_ERROR(Status);
-
-      Status = BdsBootLinuxFdt (BootOption->FilePathList,
-                                Initrd, // Initrd
-                                (CHAR8*)(LinuxArguments + 1),
-                                FdtDevicePath);
-
-      FreePool (DefaultFdtDevicePath);
-      FreePool (FdtDevicePath);
+      Status = BdsBootLinuxFdt (
+                 BootOption->FilePathList,
+                 Initrd,
+                 (CHAR8*)(LinuxArguments + 1)
+                 );
     }
   } else {
     // Connect all the drivers if the EFI Application is not a EFI OS Loader

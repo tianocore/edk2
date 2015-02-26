@@ -73,7 +73,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths
