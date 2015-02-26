@@ -97,17 +97,17 @@ ArmJunoEntryPoint (
   switch (CpuType) {
   case ARM_CPU_TYPE_A53:
     if (CpuRev == ARM_CPU_REV (0, 0)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR0FdtDevicePath);
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR0FdtDevicePath);
     } else if (CpuRev == ARM_CPU_REV (0, 3)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR1FdtDevicePath);
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR1A57x2FdtDevicePath);
     }
     break;
 
   case ARM_CPU_TYPE_A57:
     if (CpuRev == ARM_CPU_REV (0, 0)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR0FdtDevicePath);
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR0FdtDevicePath);
     } else if (CpuRev == ARM_CPU_REV (1, 1)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR1FdtDevicePath);
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR1A57x2FdtDevicePath);
     }
   }
 
