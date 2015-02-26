@@ -73,8 +73,12 @@
   gArmJunoTokenSpaceGuid.PcdJunoR1A57x2FdtDevicePath
   gArmJunoTokenSpaceGuid.PcdJunoR1A57x2A53x4FdtDevicePath
 
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument
+
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths
 
 [Depex]
-  TRUE
+  # We depend on these protocols to create the default boot entries
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
