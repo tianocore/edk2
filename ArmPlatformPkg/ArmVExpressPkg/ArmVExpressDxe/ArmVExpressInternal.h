@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, ARM Ltd. All rights reserved.
+  Copyright (c) 2014-2015, ARM Ltd. All rights reserved.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -50,7 +50,10 @@ typedef enum {
 
 typedef struct {
   ARM_VEXPRESS_PLATFORM_ID  Id;
-  // Will be extended with platform specific information
+
+  // Flattened Device Tree (FDT) File
+  EFI_GUID                  FdtGuid; /// Name of the FDT when present into the FV
+  CONST CHAR16*             FdtName; /// Name of the FDT when present into a File System
 } ARM_VEXPRESS_PLATFORM;
 
 // Array that contains the list of the VExpress based platform supported by this DXE driver

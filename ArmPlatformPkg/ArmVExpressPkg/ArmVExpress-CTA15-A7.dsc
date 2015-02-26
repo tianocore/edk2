@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2012-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -72,6 +72,11 @@
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+
+  #
+  # FDT installation : enable the development specific features
+  #
+  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
@@ -170,6 +175,11 @@
 
   # Ethernet (SMSC LAN9118)
   gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x1A000000
+
+  #
+  # Define the device path to the FDT for the platform
+  #
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0x0E800000,0x0E803000)"
 
   #
   # ARM OS Loader

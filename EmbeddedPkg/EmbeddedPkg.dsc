@@ -3,7 +3,7 @@
 #
 #
 # Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2012-2014, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2012-2015, ARM Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -270,7 +270,6 @@
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
 
   # FDT installation
-  EmbeddedPkg/Library/FdtLoadLib/FdtLoadLib.inf
   EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
 
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf

@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -195,6 +195,11 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
 
   #
+  # FDT installation
+  #
+  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
+
+  #
   # Multimedia Card Interface
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
@@ -242,6 +247,11 @@ READ_LOCK_STATUS   = TRUE
 
   # FV Filesystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  # Example to add a Device Tree to the Firmware Volume
+  #FILE FREEFORM = PCD(gArmVExpressTokenSpaceGuid.PcdFdtVExpressHwA9x4) {
+  #  SECTION RAW = ArmPlatformPkg/ArmVExpressPkg/Fdts/vexpress-v2p-ca9.dtb
+  #}
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8

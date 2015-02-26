@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -98,6 +98,11 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
 
+  #
+  # FDT installation : enable the development specific features
+  #
+  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
+
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
@@ -171,6 +176,11 @@
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x1e001000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x1e000100
+
+  #
+  # Define the device path to the FDT for the platform
+  #
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0x46800000,0x46803000)"
 
   #
   # ARM OS Loader

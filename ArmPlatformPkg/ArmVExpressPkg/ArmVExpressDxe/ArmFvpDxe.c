@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@
 
 #include <Library/VirtioMmioDeviceLib.h>
 #include <Library/ArmShellCmdLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #define ARM_FVP_BASE_VIRTIO_BLOCK_BASE    0x1c130000
 
@@ -49,6 +50,10 @@ VIRTIO_BLK_DEVICE_PATH mVirtioBlockDevicePath =
   }
 };
 
+/**
+ * Generic UEFI Entrypoint for 'ArmFvpDxe' driver
+ * See UEFI specification for the details of the parameters
+ */
 EFI_STATUS
 EFIAPI
 ArmFvpInitialise (
@@ -56,13 +61,37 @@ ArmFvpInitialise (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  CONST ARM_VEXPRESS_PLATFORM* Platform;
+  EFI_STATUS                   Status;
+  CHAR16                       *TextDevicePath;
+  UINTN                        TextDevicePathSize;
+  VOID                         *Buffer;
 
   Status = gBS->InstallProtocolInterface (&ImageHandle,
                  &gEfiDevicePathProtocolGuid, EFI_NATIVE_INTERFACE,
                  &mVirtioBlockDevicePath);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  Status = ArmVExpressGetPlatform (&Platform);
+  if (!EFI_ERROR (Status)) {
+    TextDevicePathSize  = StrSize ((CHAR16*)PcdGetPtr (PcdFvpFdtDevicePathsBase)) - sizeof (CHAR16);
+    TextDevicePathSize += StrSize (Platform->FdtName);
+
+    TextDevicePath = AllocatePool (TextDevicePathSize);
+    if (TextDevicePath != NULL) {
+      StrCpy (TextDevicePath, ((CHAR16*)PcdGetPtr (PcdFvpFdtDevicePathsBase)));
+      StrCat (TextDevicePath, Platform->FdtName);
+      Buffer = PcdSetPtr (PcdFdtDevicePaths, &TextDevicePathSize, TextDevicePath);
+      if (Buffer == NULL) {
+        DEBUG ((
+          EFI_D_ERROR,
+          "ArmFvpDxe: Setting of FDT device path in PcdFdtDevicePaths failed - %r\n", EFI_BUFFER_TOO_SMALL
+          ));
+      }
+      FreePool (TextDevicePath);
+    }
   }
 
   // Declare the Virtio BlockIo device

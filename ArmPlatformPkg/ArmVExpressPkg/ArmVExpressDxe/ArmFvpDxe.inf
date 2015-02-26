@@ -35,16 +35,25 @@
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  PcdLib
   ArmShellCmdRunAxfLib
   ArmLib
   ArmPlatformLib
   BaseMemoryLib
+  MemoryAllocationLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   VirtioMmioDeviceLib
 
 [LibraryClasses.AARCH64]
   ArmGicLib
+
+[FixedPcd]
+  gArmVExpressTokenSpaceGuid.PcdFvpFdtDevicePathsBase
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths

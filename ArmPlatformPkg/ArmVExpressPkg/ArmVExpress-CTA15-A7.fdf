@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2012-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -26,12 +26,12 @@
 
 [FD.ARM_VEXPRESS_CTA15A7_EFI]
 BaseAddress   = 0xB0000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
-Size          = 0x000B8000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
+Size          = 0x000C0000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x00001000
-NumBlocks     = 0xB8
+NumBlocks     = 0xC0
 
-0x00000000|0x000B8000
+0x00000000|0x000C0000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
@@ -105,6 +105,11 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmHwDxe.inf
 
   #
+  # FDT installation
+  #
+  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
+
+  #
   # Multimedia Card Interface
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
@@ -173,6 +178,11 @@ READ_LOCK_STATUS   = TRUE
 
   # FV Filesystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  # Example to add a Device Tree to the Firmware Volume
+  #FILE FREEFORM = PCD(gArmVExpressTokenSpaceGuid.PcdFdtVExpressHwA15x2A7x3) {
+  #  SECTION RAW = ArmPlatformPkg/ArmVExpressPkg/Fdts/vexpress-v2p-ca15_a7.dtb
+  #}
 
 [FV.FVMAIN_COMPACT]
 FvBaseAddress      = 0xB0000000

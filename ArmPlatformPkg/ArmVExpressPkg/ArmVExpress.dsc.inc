@@ -378,6 +378,8 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
 
 [Components.common]
+  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+
   # Versatile Express FileSystem
   ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
 

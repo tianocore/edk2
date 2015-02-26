@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -23,11 +23,11 @@
 // model or hardware platforms).
 //
 CONST ARM_VEXPRESS_PLATFORM ArmVExpressPlatforms[] = {
-  { ARM_HW_A9x4 },
-  { ARM_HW_A15x2_A7x3 },
-  { ARM_HW_A15 },
-  { ARM_HW_A5 },
-  { ARM_FVP_VEXPRESS_UNKNOWN }
+  { ARM_HW_A9x4, { 0x2fd21cf6, 0xe6e8, 0x4ff2, { 0xa9, 0xca, 0x3b, 0x9f, 0x00, 0xe9, 0x28, 0x89 } }, L"vexpress-v2p-ca9.dtb" },
+  { ARM_HW_A15x2_A7x3, { 0xd5e606eb, 0x83df, 0x4e90, { 0x81, 0xe8, 0xc3, 0xdb, 0x2f, 0x77, 0x17, 0x9a } }, L"vexpress-v2p-ca15_a7.dtb" },
+  { ARM_HW_A15, { 0x6b8947c2, 0x4287, 0x4d91, { 0x8f, 0xe0, 0xa3, 0x81, 0xea, 0x5b, 0x56, 0x8f } }, L"vexpress-v2p-ca15-tc1.dtb" },
+  { ARM_HW_A5, { 0xa2cc7663, 0x4d7c, 0x448a, { 0xaa, 0xb5, 0x4c, 0x03, 0x4b, 0x6f, 0xda, 0xb7 } }, L"vexpress-v2p-ca5s.dtb" },
+  { ARM_FVP_VEXPRESS_UNKNOWN, { 0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 } } }
 };
 
 /**
@@ -49,6 +49,10 @@ ArmVExpressGetPlatform (
   return EFI_NOT_FOUND;
 }
 
+/**
+ * Generic UEFI Entrypoint for 'ArmHwDxe' driver
+ * See UEFI specification for the details of the parameters
+ */
 EFI_STATUS
 EFIAPI
 ArmHwInitialise (

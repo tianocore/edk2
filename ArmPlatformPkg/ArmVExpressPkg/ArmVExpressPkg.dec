@@ -1,11 +1,11 @@
 #/** @file
 # Arm Versatile Express package.
 #
-#  Copyright (c) 2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2012-2015, ARM Limited. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
 #
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -47,11 +47,30 @@
   #
   # For a list of mode numbers look in LcdArmVExpress.c
   #
-  gArmVExpressTokenSpaceGuid.PcdPL111LcdMaxMode|3|UINT32|0x00000003
-  gArmVExpressTokenSpaceGuid.PcdPL111LcdVideoModeOscId|1|UINT32|0x00000004
-  gArmVExpressTokenSpaceGuid.PcdHdLcdVideoModeOscId|0|UINT32|0x00000009
+  gArmVExpressTokenSpaceGuid.PcdPL111LcdMaxMode|3|UINT32|0x00000001
+  gArmVExpressTokenSpaceGuid.PcdPL111LcdVideoModeOscId|1|UINT32|0x00000002
+  gArmVExpressTokenSpaceGuid.PcdHdLcdVideoModeOscId|0|UINT32|0x00000003
 
   #
   # Device path of block device on which Fastboot will flash partitions
   #
-  gArmVExpressTokenSpaceGuid.PcdAndroidFastbootNvmDevicePath|""|VOID*|0x00000001
+  gArmVExpressTokenSpaceGuid.PcdAndroidFastbootNvmDevicePath|""|VOID*|0x00000004
+
+  # FVP platforms : install FDT from SemiHosting
+  gArmVExpressTokenSpaceGuid.PcdFvpFdtDevicePathsBase|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/"|VOID*|0x00000005
+  # HW platforms : install FDT from NOR Flash
+  gArmVExpressTokenSpaceGuid.PcdHwFdtDevicePathsBase|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/"|VOID*|0x00000006
+
+  #
+  # ARM Versatile Express FDT Guids
+  #
+  # FVP platforms
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA9x4|{ 0xe9, 0x2a, 0x3f, 0x94, 0xb2, 0x51, 0xb2, 0x48, 0x48, 0xb2, 0x82, 0xc4, 0x9a, 0xeb, 0x2c, 0x21, 0xd8, 0xe1 }|VOID*|0x00000007
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA15x1|{ 0xc3, 0x30, 0x19, 0x58 0x53, 0x9f, 0x53, 0x4c, 0x4, 0xc53, 0x91, 0x23, 0x43, 0xb8, 0x65, 0xdf, 0x3f, 0x23 }|VOID*|0x00000008
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA15x2|{ 0x4a, 0xb3, 0x10, 0x3f 0x10, 0xa3, 0x2c, 0x47, 0xac, 0xb9, 0x36, 0x0b, 0x1d, 0xb5, 0x7a, 0x8b }|VOID*|0x00000009
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA15x4|{ 0x38, 0x38, 0x78, 0x9a, 0x77, 0x8a, 0xdb, 0x4c, 0x82, 0xa4, 0x35, 0x91, 0x2c, 0x08, 0x8a, 0x2e }|VOID*|0x0000000A
+  # HW platforms
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressHwA9x4|{ 0xf6, 0x1c, 0xd2, 0x2f, 0xe8, 0xe6, 0xf2, 0x4f, 0xa9, 0xca, 0x3b, 0x9f, 0x00, 0xe9, 0x28, 0x89 }|VOID*|0x0000000B
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressHwA15x2A7x3|{ 0xeb, 0x06, e6, 0xd5, 0xdf, 0x83, 0x90, 0x4e, 0x81, 0xe8, 0xc3, 0xdb, 0x2f, 0x77, 0x17, 0x9a }|VOID*|0x0000000C
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressHwA15|{ 0xc2, 0x47, 0x89, 0x6b, 0x87, 0x42, 0x91, 0x4d, 0x8f, 0xe0, 0xa3, 0x81, 0xea, 0x5b, 0x56, 0x8f }|VOID*|0x0000000D
+  gArmVExpressTokenSpaceGuid.PcdFdtVExpressHwA5|{ 0x63, 0x76, 0xcc, 0xa2, 0x7c, 0x4d, 0x8a, 0x44, 0xaa, 0xb5, 0x4c, 0x03, 0x4b, 0x6f, 0xda, 0xb7 }|VOID*|0x0000000E
