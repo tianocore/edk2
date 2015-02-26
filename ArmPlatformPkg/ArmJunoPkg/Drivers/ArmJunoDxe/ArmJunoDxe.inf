@@ -20,7 +20,6 @@
 
 [Sources.common]
   ArmJunoDxe.c
-  InstallFdt.c
   PciEmulation.c
   PciRootBridgeIo.c
 
@@ -39,7 +38,6 @@
   DebugLib
   DmaLib
   DxeServicesTableLib
-  FdtLib
   IoLib
   PcdLib
   PrintLib
@@ -53,8 +51,6 @@
   gArmGlobalVariableGuid
   gEfiEndOfDxeEventGroupGuid
   gEfiFileInfoGuid
-  gFdtTableGuid
-  gArmPlatformUpdateFdtEventGuid
 
 [Protocols]
   gEfiBlockIoProtocolGuid

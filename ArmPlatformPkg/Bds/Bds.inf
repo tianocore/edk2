@@ -53,7 +53,6 @@
   gEfiEndOfDxeEventGroupGuid
   gEfiFileSystemInfoGuid
   gArmGlobalVariableGuid
-  gArmPlatformUpdateFdtEventGuid
 
 [Protocols]
   gEfiBdsArchProtocolGuid

@@ -83,9 +83,5 @@ ArmJunoEntryPoint (
     return Status;
   }
 
-  // Try to install the Flat Device Tree (FDT). This function actually installs the
-  // UEFI Driver Binding Protocol.
-  Status = JunoFdtInstall (ImageHandle);
-
   return Status;
 }

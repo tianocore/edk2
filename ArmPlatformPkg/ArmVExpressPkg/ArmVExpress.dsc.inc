@@ -411,3 +411,8 @@
 
   # FV Filesystem
   MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  #
+  # FDT installation
+  #
+  EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf

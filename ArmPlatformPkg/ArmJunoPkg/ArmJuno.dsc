@@ -77,6 +77,11 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
+  #
+  # FDT installation : enable the development specific features
+  #
+  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
+
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Juno"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmJuno"
@@ -126,6 +131,22 @@
 
   # List of Device Paths that support BootMonFs
   gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)"
+
+  #
+  # Define the device path to the FDT for its installation
+  #
+!ifdef $(JUNO_EMULATOR)
+  # From DRAM
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(30F57E4A-69CE-4FB7-B7A1-4C7CE49D57A6)/MemoryMapped(0x0,0x88000000,0x88200000)"
+!else
+!ifdef $(JUNO_MODEL)
+  # From semi-hosting
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/juno.dtb"
+!else
+  # From NOR flash
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno.dtb"
+!endif
+!endif
 
   #
   # ARM OS Loader

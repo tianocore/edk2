@@ -28,9 +28,4 @@ PciEmulationEntryPoint (
   VOID
   );
 
-EFI_STATUS
-JunoFdtInstall (
-  IN EFI_HANDLE                            ImageHandle
-  );
-
 #endif // __ARM_JUNO_DXE_INTERNAL_H__
