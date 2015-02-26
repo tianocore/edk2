@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 echo
 echo Run build cleanall...
 echo
