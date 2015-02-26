@@ -26,8 +26,14 @@ ArmJunoEntryPoint (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS           Status;
-  EFI_PHYSICAL_ADDRESS HypBase;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  HypBase;
+  CHAR16                *TextDevicePath;
+  UINTN                 TextDevicePathSize;
+  VOID                  *Buffer;
+  UINT32                Midr;
+  UINT32                CpuType;
+  UINT32                CpuRev;
 
   Status = PciEmulationEntryPoint ();
   if (EFI_ERROR (Status)) {
@@ -77,11 +83,52 @@ ArmJunoEntryPoint (
     DEBUG ((EFI_D_ERROR, "ArmJunoDxe: Failed to install ShellDynCmdRunAxf\n"));
   }
 
-  // Try to install the ACPI Tables
-  Status = LocateAndInstallAcpiFromFv (&mJunoAcpiTableFile);
+  //
+  // Set up the device path to the FDT.
+  // We detect whether we are running on a Juno r0 or Juno r1 board at
+  // runtime by checking the value of the MIDR register.
+  //
+
+  Midr    = ArmReadMidr ();
+  CpuType = (Midr >> ARM_CPU_TYPE_SHIFT) & ARM_CPU_TYPE_MASK;
+  CpuRev  = Midr & ARM_CPU_REV_MASK;
+  TextDevicePath = NULL;
+
+  switch (CpuType) {
+  case ARM_CPU_TYPE_A53:
+    if (CpuRev == ARM_CPU_REV (0, 0)) {
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR0FdtDevicePath);
+    } else if (CpuRev == ARM_CPU_REV (0, 3)) {
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR1FdtDevicePath);
+    }
+    break;
+
+  case ARM_CPU_TYPE_A57:
+    if (CpuRev == ARM_CPU_REV (0, 0)) {
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR0FdtDevicePath);
+    } else if (CpuRev == ARM_CPU_REV (1, 1)) {
+      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdR1FdtDevicePath);
+    }
+  }
+
+  if (TextDevicePath != NULL) {
+    TextDevicePathSize = StrSize (TextDevicePath);
+    Buffer = PcdSetPtr (PcdFdtDevicePaths, &TextDevicePathSize, TextDevicePath);
+    Status = (Buffer != NULL) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL;
+  } else {
+    Status = EFI_NOT_FOUND;
+  }
+
   if (EFI_ERROR (Status)) {
+    DEBUG (
+      (EFI_D_ERROR,
+      "ArmJunoDxe: Setting of FDT device path in PcdFdtDevicePaths failed - %r\n", Status)
+      );
     return Status;
   }
+
+  // Try to install the ACPI Tables
+  Status = LocateAndInstallAcpiFromFv (&mJunoAcpiTableFile);
 
   return Status;
 }

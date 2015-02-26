@@ -32,6 +32,7 @@
 
 [LibraryClasses]
   AcpiLib
+  ArmLib
   ArmShellCmdRunAxfLib
   BaseMemoryLib
   BdsLib
@@ -68,7 +69,11 @@
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbEhciBaseAddress
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbOhciBaseAddress
 
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath
+  gArmJunoTokenSpaceGuid.PcdR0FdtDevicePath
+  gArmJunoTokenSpaceGuid.PcdR1FdtDevicePath
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths
 
 [Depex]
   TRUE

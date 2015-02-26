@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2013-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2013-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -58,6 +58,9 @@
   PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
+
+[LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_DRIVER]
+  PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
 
 [BuildOptions]
   *_*_*_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmJunoPkg/Include
@@ -133,22 +136,6 @@
   gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)"
 
   #
-  # Define the device path to the FDT for its installation
-  #
-!ifdef $(JUNO_EMULATOR)
-  # From DRAM
-  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(30F57E4A-69CE-4FB7-B7A1-4C7CE49D57A6)/MemoryMapped(0x0,0x88000000,0x88200000)"
-!else
-!ifdef $(JUNO_MODEL)
-  # From semi-hosting
-  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/juno.dtb"
-!else
-  # From NOR flash
-  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno.dtb"
-!endif
-!endif
-
-  #
   # ARM OS Loader
   #
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NOR Flash"
@@ -174,6 +161,14 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1920
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|1080
 
+[PcdsDynamicDefault.common]
+  #
+  # The size of a dynamic PCD of the (VOID*) type can not be increased at run
+  # time from its size at build time. Set the "PcdFdtDevicePaths" PCD to a 128
+  # character "empty" string, to allow to be able to set FDT text device paths
+  # up to 128 characters long.
+  #
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"                                                                                                                                "
 
 ################################################################################
 #
