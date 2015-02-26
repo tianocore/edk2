@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ##**********************************************************************
 ## Function define
 ##**********************************************************************
@@ -14,8 +15,6 @@ function Usage ( ) {
   echo "       See  Stitch/Stitch_Config.txt  for additional stitching settings."
   echo
   echo
-  echo "Press any key......"
-  read
   exit 0
 }
 
