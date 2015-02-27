@@ -363,6 +363,11 @@ SmbiosPrintStructure (
       PRINT_STRUCT_VALUE (Struct, Type4, ThreadCount);
       DisplayProcessorCharacteristics (Struct->Type4->ProcessorCharacteristics, Option);
     }
+    if (AE_SMBIOS_VERSION (0x3, 0x0) && (Struct->Hdr->Length > 0x2A)) {
+      PRINT_STRUCT_VALUE (Struct, Type4, CoreCount2);
+      PRINT_STRUCT_VALUE (Struct, Type4, EnabledCoreCount2);
+      PRINT_STRUCT_VALUE (Struct, Type4, ThreadCount2);
+    }
     break;
 
   //
