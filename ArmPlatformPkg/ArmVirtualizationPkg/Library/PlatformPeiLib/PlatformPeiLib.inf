@@ -41,11 +41,9 @@
   gArmTokenSpaceGuid.PcdFvSize
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 
-[Pcd]
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress
-
 [Guids]
   gEarlyPL011BaseAddressGuid
+  gFdtHobGuid
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid

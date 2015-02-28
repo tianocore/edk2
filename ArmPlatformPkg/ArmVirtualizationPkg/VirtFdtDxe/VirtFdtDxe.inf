@@ -41,13 +41,14 @@
   DxeServicesLib
   FdtLib
   VirtioMmioDeviceLib
+  HobLib
 
 [Guids]
   gFdtTableGuid
   gVirtioMmioTransportGuid
+  gFdtHobGuid
 
 [Pcd]
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress
   gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress

@@ -30,11 +30,10 @@
 
 [LibraryClasses]
   IoLib
+  MemoryAllocationLib
   ArmLib
   PrintLib
   FdtLib
-  SerialPortLib
-  HobLib
 
 [Sources.common]
   Virt.c

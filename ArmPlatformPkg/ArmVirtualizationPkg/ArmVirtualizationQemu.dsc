@@ -176,9 +176,6 @@
   # System Memory Size -- 1 MB initially, actual size will be fetched from DT
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x00100000
 
-  # location of the device tree blob passed by QEMU
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress|0x0
-
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0

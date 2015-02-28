@@ -22,6 +22,7 @@
 #include <libfdt.h>
 
 #include <Guid/EarlyPL011BaseAddress.h>
+#include <Guid/FdtHob.h>
 
 EFI_STATUS
 EFIAPI
@@ -32,6 +33,7 @@ PlatformPeim (
   VOID               *Base;
   VOID               *NewBase;
   UINTN              FdtSize;
+  UINT64             *FdtHobData;
   UINT64             *UartHobData;
   INT32              Node, Prev;
   CONST CHAR8        *Compatible;
@@ -41,15 +43,18 @@ PlatformPeim (
   UINT64             UartBase;
 
 
-  Base = (VOID*)(UINTN)FixedPcdGet64 (PcdDeviceTreeInitialBaseAddress);
+  Base = (VOID*)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
+  ASSERT (Base != NULL);
   ASSERT (fdt_check_header (Base) == 0);
 
   FdtSize = fdt_totalsize (Base);
   NewBase = AllocatePages (EFI_SIZE_TO_PAGES (FdtSize));
   ASSERT (NewBase != NULL);
-
   CopyMem (NewBase, Base, FdtSize);
-  PcdSet64 (PcdDeviceTreeBaseAddress, (UINT64)(UINTN)NewBase);
+
+  FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
+  ASSERT (FdtHobData != NULL);
+  *FdtHobData = (UINTN)NewBase;
 
   UartHobData = BuildGuidHob (&gEarlyPL011BaseAddressGuid, sizeof *UartHobData);
   ASSERT (UartHobData != NULL);

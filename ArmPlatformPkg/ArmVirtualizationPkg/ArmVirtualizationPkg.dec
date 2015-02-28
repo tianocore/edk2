@@ -44,8 +44,6 @@
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0|UINT64|0x00000001
 
 [PcdsDynamic, PcdsFixedAtBuild]
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress|0x0|UINT64|0x00000002
-
   #
   # ARM PSCI function invocations can be done either through hypervisor
   # calls (HVC) or secure monitor calls (SMC).

@@ -24,10 +24,12 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DxeServicesLib.h>
+#include <Library/HobLib.h>
 #include <libfdt.h>
 
 #include <Guid/Fdt.h>
 #include <Guid/VirtioMmioTransport.h>
+#include <Guid/FdtHob.h>
 
 #pragma pack (1)
 typedef struct {
@@ -277,6 +279,7 @@ InitializeVirtFdtDxe (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
+  VOID                           *Hob;
   VOID                           *DeviceTreeBase;
   INT32                          Node, Prev;
   INT32                          RtcNode;
@@ -297,8 +300,11 @@ InitializeVirtFdtDxe (
   UINT64                         FwCfgDataAddress;
   UINT64                         FwCfgDataSize;
 
-  DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeBaseAddress);
-  ASSERT (DeviceTreeBase != NULL);
+  Hob = GetFirstGuidHob(&gFdtHobGuid);
+  if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
+    return EFI_NOT_FOUND;
+  }
+  DeviceTreeBase = (VOID *)(UINTN)*(UINT64 *)GET_GUID_HOB_DATA (Hob);
 
   if (fdt_check_header (DeviceTreeBase) != 0) {
     DEBUG ((EFI_D_ERROR, "%a: No DTB found @ 0x%p\n", __FUNCTION__, DeviceTreeBase));
