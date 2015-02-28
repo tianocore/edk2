@@ -78,11 +78,12 @@
 
 [Sources.ARM]
   Synchronization.c
-  Arm/Synchronization.c
+  Arm/Synchronization.asm       | RVCT
+  Arm/Synchronization.S         | GCC
 
 [Sources.AARCH64]
   Synchronization.c
-  AArch64/Synchronization.c
+  AArch64/Synchronization.S
 
 [Packages]
   MdePkg/MdePkg.dec
