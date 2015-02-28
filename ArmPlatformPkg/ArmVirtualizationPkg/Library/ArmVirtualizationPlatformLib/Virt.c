@@ -96,7 +96,7 @@ ArmPlatformInitializeSystemMemory (
   ASSERT (HobData != NULL);
   *HobData = 0;
 
-  DeviceTreeBase = (VOID *)(UINTN)FixedPcdGet64 (PcdDeviceTreeInitialBaseAddress);
+  DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (DeviceTreeBase != NULL);
 
   //
