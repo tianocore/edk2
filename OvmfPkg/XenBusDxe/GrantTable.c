@@ -160,7 +160,7 @@ XenGrantTableInit (
     Parameters.domid = DOMID_SELF;
     Parameters.idx = Index;
     Parameters.space = XENMAPSPACE_grant_table;
-    Parameters.gpfn = (((xen_pfn_t) GrantTable) >> EFI_PAGE_SHIFT) + Index;
+    Parameters.gpfn = (xen_pfn_t) ((UINTN) GrantTable >> EFI_PAGE_SHIFT) + Index;
     ReturnCode = XenHypercallMemoryOp (Dev, XENMEM_add_to_physmap, &Parameters);
     if (ReturnCode != 0) {
       DEBUG ((EFI_D_ERROR, "Xen GrantTable, add_to_physmap hypercall error: %d\n", ReturnCode));
@@ -182,7 +182,7 @@ XenGrantTableDeinit (
 
   for (Index = NR_GRANT_FRAMES - 1; Index >= 0; Index--) {
     Parameters.domid = DOMID_SELF;
-    Parameters.gpfn = (((xen_pfn_t) GrantTable) >> EFI_PAGE_SHIFT) + Index;
+    Parameters.gpfn = (xen_pfn_t) ((UINTN) GrantTable >> EFI_PAGE_SHIFT) + Index;
     DEBUG ((EFI_D_INFO, "Xen GrantTable, removing %X\n", Parameters.gpfn));
     ReturnCode = XenHypercallMemoryOp (Dev, XENMEM_remove_from_physmap, &Parameters);
     if (ReturnCode != 0) {
