@@ -47,6 +47,7 @@ typedef enum {
   PropertyTypePsci,
   PropertyTypeFwCfg,
   PropertyTypePciHost,
+  PropertyTypeGicV3,
 } PROPERTY_TYPE;
 
 typedef struct {
@@ -64,6 +65,7 @@ STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypePsci,    "arm,psci-0.2"          },
   { PropertyTypeFwCfg,   "qemu,fw-cfg-mmio"      },
   { PropertyTypePciHost, "pci-host-ecam-generic" },
+  { PropertyTypeGicV3,   "arm,gic-v3"            },
   { PropertyTypeUnknown, ""                      }
 };
 
@@ -286,7 +288,7 @@ InitializeVirtFdtDxe (
   VIRTIO_TRANSPORT_DEVICE_PATH   *DevicePath;
   EFI_HANDLE                     Handle;
   UINT64                         RegBase;
-  UINT64                         DistBase, CpuBase;
+  UINT64                         DistBase, CpuBase, RedistBase;
   CONST INTERRUPT_PROPERTY       *InterruptProp;
   INT32                          SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
   CONST CHAR8                    *PsciMethod;
@@ -432,6 +434,36 @@ InitializeVirtFdtDxe (
       PcdSet32 (PcdGicInterruptInterfaceBase, (UINT32)CpuBase);
 
       DEBUG ((EFI_D_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
+      break;
+
+    case PropertyTypeGicV3:
+      //
+      // The GIC v3 DT binding describes a series of at least 3 physical (base
+      // addresses, size) pairs: the distributor interface (GICD), at least one
+      // redistributor region (GICR) containing dedicated redistributor
+      // interfaces for all individual CPUs, and the CPU interface (GICC).
+      // Under virtualization, we assume that the first redistributor region
+      // listed covers the boot CPU. Also, our GICv3 driver only supports the
+      // system register CPU interface, so we can safely ignore the MMIO version
+      // which is listed after the sequence of redistributor interfaces.
+      // This means we are only interested in the first two memory regions
+      // supplied, and ignore everything else.
+      //
+      ASSERT (Len >= 32);
+
+      // RegProp[0..1] == { GICD base, GICD size }
+      DistBase = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
+      ASSERT (DistBase < MAX_UINT32);
+
+      // RegProp[2..3] == { GICR base, GICR size }
+      RedistBase = fdt64_to_cpu (((UINT64 *)RegProp)[2]);
+      ASSERT (RedistBase < MAX_UINT32);
+
+      PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
+      PcdSet32 (PcdGicRedistributorsBase, (UINT32)RedistBase);
+
+      DEBUG ((EFI_D_INFO, "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
+        DistBase, RedistBase));
       break;
 
     case PropertyTypeRtc:

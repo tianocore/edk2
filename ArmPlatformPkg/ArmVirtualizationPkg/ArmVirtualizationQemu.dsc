@@ -188,6 +188,7 @@
   # ARM General Interrupt Controller
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
 
   ## PL031 RealTimeClock
