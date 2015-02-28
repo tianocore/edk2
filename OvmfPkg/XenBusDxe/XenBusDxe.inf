@@ -34,8 +34,6 @@
   DriverBinding.h
   ComponentName.c
   ComponentName.h
-  InterlockedCompareExchange16.c
-  InterlockedCompareExchange16.h
   GrantTable.c
   GrantTable.h
   EventChannel.c
@@ -45,14 +43,7 @@
   XenBus.c
   XenBus.h
   Helpers.c
-
-[Sources.IA32]
-  Ia32/InterlockedCompareExchange16.nasm
-  Ia32/TestAndClearBit.nasm
-
-[Sources.X64]
-  X64/InterlockedCompareExchange16.nasm
-  X64/TestAndClearBit.nasm
+  TestAndClearBit.c
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -64,6 +55,7 @@
   DevicePathLib
   DebugLib
   XenHypercallLib
+  SynchronizationLib
 
 [Protocols]
   gEfiDriverBindingProtocolGuid

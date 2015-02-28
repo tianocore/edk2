@@ -122,7 +122,7 @@ INT32
 EFIAPI
 TestAndClearBit (
   IN INT32 Bit,
-  IN volatile VOID *Address
+  IN VOID  *Address
   );
 
 CHAR8*

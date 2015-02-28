@@ -35,9 +35,9 @@
 #include <IndustryStandard/Xen/memory.h>
 
 #include <Library/XenHypercallLib.h>
+#include <Library/SynchronizationLib.h>
 
 #include "GrantTable.h"
-#include "InterlockedCompareExchange16.h"
 
 #define NR_RESERVED_ENTRIES 8
 
