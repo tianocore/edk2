@@ -44,5 +44,8 @@
 [Pcd]
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeBaseAddress
 
+[Guids]
+  gEarlyPL011BaseAddressGuid
+
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid

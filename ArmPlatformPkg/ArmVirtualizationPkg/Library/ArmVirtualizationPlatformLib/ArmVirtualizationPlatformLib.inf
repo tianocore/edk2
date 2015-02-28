@@ -62,6 +62,3 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCore
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFdSize
-
-[Guids]
-  gEarlyPL011BaseAddressGuid

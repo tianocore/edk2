@@ -21,6 +21,8 @@
 #include <Library/PcdLib.h>
 #include <libfdt.h>
 
+#include <Guid/EarlyPL011BaseAddress.h>
+
 EFI_STATUS
 EFIAPI
 PlatformPeim (
@@ -30,6 +32,14 @@ PlatformPeim (
   VOID               *Base;
   VOID               *NewBase;
   UINTN              FdtSize;
+  UINT64             *UartHobData;
+  INT32              Node, Prev;
+  CONST CHAR8        *Compatible;
+  CONST CHAR8        *CompItem;
+  INT32              Len;
+  CONST UINT64       *RegProp;
+  UINT64             UartBase;
+
 
   Base = (VOID*)(UINTN)FixedPcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (fdt_check_header (Base) == 0);
@@ -40,6 +50,44 @@ PlatformPeim (
 
   CopyMem (NewBase, Base, FdtSize);
   PcdSet64 (PcdDeviceTreeBaseAddress, (UINT64)(UINTN)NewBase);
+
+  UartHobData = BuildGuidHob (&gEarlyPL011BaseAddressGuid, sizeof *UartHobData);
+  ASSERT (UartHobData != NULL);
+  *UartHobData = 0;
+
+  //
+  // Look for a UART node
+  //
+  for (Prev = 0;; Prev = Node) {
+    Node = fdt_next_node (Base, Prev, NULL);
+    if (Node < 0) {
+      break;
+    }
+
+    //
+    // Check for UART node
+    //
+    Compatible = fdt_getprop (Base, Node, "compatible", &Len);
+
+    //
+    // Iterate over the NULL-separated items in the compatible string
+    //
+    for (CompItem = Compatible; CompItem != NULL && CompItem < Compatible + Len;
+      CompItem += 1 + AsciiStrLen (CompItem)) {
+
+      if (AsciiStrCmp (CompItem, "arm,pl011") == 0) {
+        RegProp = fdt_getprop (Base, Node, "reg", &Len);
+        ASSERT (Len == 16);
+
+        UartBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
+
+        DEBUG ((EFI_D_INFO, "%a: PL011 UART @ 0x%lx\n", __FUNCTION__, UartBase));
+
+        *UartHobData = UartBase;
+        break;
+      }
+    }
+  }
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
 

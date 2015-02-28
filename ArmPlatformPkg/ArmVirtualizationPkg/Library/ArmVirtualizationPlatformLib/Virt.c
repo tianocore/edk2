@@ -24,9 +24,6 @@
 #include <Pi/PiBootMode.h>
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiMultiPhase.h>
-#include <Pi/PiHob.h>
-#include <Library/HobLib.h>
-#include <Guid/EarlyPL011BaseAddress.h>
 
 /**
   Return the current Boot Mode
@@ -77,24 +74,12 @@ ArmPlatformInitializeSystemMemory (
   INT32        Node, Prev;
   UINT64       NewBase;
   UINT64       NewSize;
-  BOOLEAN      HaveMemory, HaveUART;
-  UINT64       *HobData;
   CONST CHAR8  *Type;
-  CONST CHAR8  *Compatible;
-  CONST CHAR8  *CompItem;
   INT32        Len;
   CONST UINT64 *RegProp;
-  UINT64       UartBase;
 
   NewBase = 0;
   NewSize = 0;
-
-  HaveMemory = FALSE;
-  HaveUART   = FALSE;
-
-  HobData = BuildGuidHob (&gEarlyPL011BaseAddressGuid, sizeof *HobData);
-  ASSERT (HobData != NULL);
-  *HobData = 0;
 
   DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (DeviceTreeBase != NULL);
@@ -107,7 +92,7 @@ ArmPlatformInitializeSystemMemory (
   //
   // Look for a memory node
   //
-  for (Prev = 0; !(HaveMemory && HaveUART); Prev = Node) {
+  for (Prev = 0;; Prev = Node) {
     Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
     if (Node < 0) {
       break;
@@ -140,34 +125,7 @@ ArmPlatformInitializeSystemMemory (
         DEBUG ((EFI_D_ERROR, "%a: Failed to parse FDT memory node\n",
                __FUNCTION__));
       }
-      HaveMemory = TRUE;
-      continue;
-    }
-
-    //
-    // Check for UART node
-    //
-    Compatible = fdt_getprop (DeviceTreeBase, Node, "compatible", &Len);
-
-    //
-    // Iterate over the NULL-separated items in the compatible string
-    //
-    for (CompItem = Compatible; CompItem != NULL && CompItem < Compatible + Len;
-      CompItem += 1 + AsciiStrLen (CompItem)) {
-
-      if (AsciiStrCmp (CompItem, "arm,pl011") == 0) {
-        RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
-        ASSERT (Len == 16);
-
-        UartBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-
-        DEBUG ((EFI_D_INFO, "%a: PL011 UART @ 0x%lx\n", __FUNCTION__, UartBase));
-
-        *HobData = UartBase;
-
-        HaveUART = TRUE;
-        continue;
-      }
+      break;
     }
   }
 
