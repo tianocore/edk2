@@ -34,8 +34,6 @@
   DriverBinding.h
   ComponentName.c
   ComponentName.h
-  XenHypercall.c
-  XenHypercall.h
   InterlockedCompareExchange16.c
   InterlockedCompareExchange16.h
   GrantTable.c
@@ -49,12 +47,10 @@
   Helpers.c
 
 [Sources.IA32]
-  Ia32/hypercall.nasm
   Ia32/InterlockedCompareExchange16.nasm
   Ia32/TestAndClearBit.nasm
 
 [Sources.X64]
-  X64/hypercall.nasm
   X64/InterlockedCompareExchange16.nasm
   X64/TestAndClearBit.nasm
 
@@ -67,8 +63,7 @@
   UefiLib
   DevicePathLib
   DebugLib
-  HobLib
-
+  XenHypercallLib
 
 [Protocols]
   gEfiDriverBindingProtocolGuid
@@ -76,8 +71,4 @@
   gEfiComponentName2ProtocolGuid
   gEfiComponentNameProtocolGuid
   gXenBusProtocolGuid
-
-
-[Guids]
-  gEfiXenInfoGuid
 

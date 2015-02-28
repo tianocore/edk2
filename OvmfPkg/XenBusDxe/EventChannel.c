@@ -16,7 +16,8 @@
 
 **/
 #include "EventChannel.h"
-#include "XenHypercall.h"
+
+#include <Library/XenHypercallLib.h>
 
 UINT32
 XenEventChannelNotify (

@@ -34,7 +34,7 @@
 
 #include <IndustryStandard/Xen/memory.h>
 
-#include "XenHypercall.h"
+#include <Library/XenHypercallLib.h>
 
 #include "GrantTable.h"
 #include "InterlockedCompareExchange16.h"

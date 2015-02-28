@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef __XENBUS_DXE_HYPERCALL_H__
-#define __XENBUS_DXE_HYPERCALL_H__
+#ifndef __XEN_HYPERCALL_LIB_H__
+#define __XEN_HYPERCALL_LIB_H__
 
 /**
   This function will put the two arguments in the right place (registers) and
@@ -29,21 +29,9 @@
 INTN
 EFIAPI
 XenHypercall2 (
-  IN     INTN HypercallID,
-  IN OUT INTN Arg1,
-  IN OUT INTN Arg2
-  );
-
-/**
-  Get the page where all hypercall are from the XenInfo hob.
-
-  @param Dev    A XENBUS_DEVICE instance.
-
-  @retval EFI_NOT_FOUND   hyperpage could not be found.
-  @retval EFI_SUCCESS     Successfully retrieve the hyperpage pointer.
-**/
-EFI_STATUS
-XenHyperpageInit (
+  IN     UINTN  HypercallID,
+  IN OUT INTN   Arg1,
+  IN OUT INTN   Arg2
   );
 
 /**

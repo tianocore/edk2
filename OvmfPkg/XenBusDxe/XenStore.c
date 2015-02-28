@@ -60,8 +60,8 @@
 
 #include <IndustryStandard/Xen/hvm/params.h>
 
-#include "XenHypercall.h"
 #include "EventChannel.h"
+#include <Library/XenHypercallLib.h>
 
 //
 // Private Data Structures

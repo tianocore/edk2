@@ -14,43 +14,12 @@
 **/
 
 #include <PiDxe.h>
-#include <Library/HobLib.h>
-#include <Guid/XenInfo.h>
-
-#include "XenBusDxe.h"
-#include "XenHypercall.h"
 
 #include <IndustryStandard/Xen/hvm/params.h>
 #include <IndustryStandard/Xen/memory.h>
 
-STATIC VOID       *HyperPage;
-
-//
-// Interface exposed by the ASM implementation of the core hypercall
-//
-INTN
-EFIAPI
-__XenHypercall2 (
-  IN     VOID *HypercallAddr,
-  IN OUT INTN Arg1,
-  IN OUT INTN Arg2
-  );
-
-EFI_STATUS
-XenHyperpageInit (
-  )
-{
-  EFI_HOB_GUID_TYPE   *GuidHob;
-  EFI_XEN_INFO        *XenInfo;
-
-  GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
-  if (GuidHob == NULL) {
-    return EFI_NOT_FOUND;
-  }
-  XenInfo = (EFI_XEN_INFO *) GET_GUID_HOB_DATA (GuidHob);
-  HyperPage = XenInfo->HyperPages;
-  return EFI_SUCCESS;
-}
+#include <Library/DebugLib.h>
+#include <Library/XenHypercallLib.h>
 
 UINT64
 XenHypercallHvmGetParam (
@@ -91,17 +60,4 @@ XenHypercallEventChannelOp (
 {
   return XenHypercall2 (__HYPERVISOR_event_channel_op,
                         Operation, (INTN) Arguments);
-}
-
-INTN
-EFIAPI
-XenHypercall2 (
-  IN     UINTN  HypercallID,
-  IN OUT INTN   Arg1,
-  IN OUT INTN   Arg2
-  )
-{
-  ASSERT (HyperPage != NULL);
-
-  return __XenHypercall2 ((UINT8*)HyperPage + HypercallID * 32, Arg1, Arg2);
 }

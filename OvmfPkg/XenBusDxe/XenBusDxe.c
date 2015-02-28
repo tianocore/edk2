@@ -26,10 +26,10 @@
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Acpi.h>
 #include <Library/DebugLib.h>
+#include <Library/XenHypercallLib.h>
 
 #include "XenBusDxe.h"
 
-#include "XenHypercall.h"
 #include "GrantTable.h"
 #include "XenStore.h"
 #include "XenBus.h"
@@ -389,13 +389,6 @@ XenBusDxeDriverBindingStart (
   DEBUG ((EFI_D_INFO, "XenBus: BAR at %LX\n", BarDesc->AddrRangeMin));
   MmioAddr = BarDesc->AddrRangeMin;
   FreePool (BarDesc);
-
-  Status = XenHyperpageInit ();
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XenBus: Unable to retrieve the hyperpage.\n"));
-    Status = EFI_UNSUPPORTED;
-    goto ErrorAllocated;
-  }
 
   Status = XenGetSharedInfoPage (Dev);
   if (EFI_ERROR (Status)) {
