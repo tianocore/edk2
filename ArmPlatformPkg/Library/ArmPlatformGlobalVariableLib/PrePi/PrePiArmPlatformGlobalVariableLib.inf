@@ -34,7 +34,6 @@
   PcdLib
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFdSize
 
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
@@ -43,4 +42,5 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmTokenSpaceGuid.PcdFdBaseAddress
 
