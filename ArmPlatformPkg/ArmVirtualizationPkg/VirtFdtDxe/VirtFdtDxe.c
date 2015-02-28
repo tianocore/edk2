@@ -452,7 +452,7 @@ InitializeVirtFdtDxe (
       //  hypervisor timers, in that order.
       //
       InterruptProp = fdt_getprop (DeviceTreeBase, Node, "interrupts", &Len);
-      ASSERT (Len == 48);
+      ASSERT (Len == 36 || Len == 48);
 
       SecIntrNum = fdt32_to_cpu (InterruptProp[0].Number)
                    + (InterruptProp[0].Type ? 16 : 0);
@@ -460,8 +460,8 @@ InitializeVirtFdtDxe (
                 + (InterruptProp[1].Type ? 16 : 0);
       VirtIntrNum = fdt32_to_cpu (InterruptProp[2].Number)
                     + (InterruptProp[2].Type ? 16 : 0);
-      HypIntrNum = fdt32_to_cpu (InterruptProp[3].Number)
-                   + (InterruptProp[3].Type ? 16 : 0);
+      HypIntrNum = Len < 48 ? 0 : fdt32_to_cpu (InterruptProp[3].Number)
+                                  + (InterruptProp[3].Type ? 16 : 0);
 
       DEBUG ((EFI_D_INFO, "Found Timer interrupts %d, %d, %d, %d\n",
         SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum));

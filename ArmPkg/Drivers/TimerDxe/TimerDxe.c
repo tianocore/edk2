@@ -369,7 +369,8 @@ TimerInitialize (
 {
   EFI_HANDLE  Handle = NULL;
   EFI_STATUS  Status;
-  UINTN TimerCtrlReg;
+  UINTN       TimerCtrlReg;
+  UINT32      TimerHypIntrNum;
 
   if (ArmIsArchTimerImplemented () == 0) {
     DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence cann't use this Driver \n"));
@@ -395,8 +396,15 @@ TimerInitialize (
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerVirtIntrNum), TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
-  Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerHypIntrNum), TimerInterruptHandler);
-  ASSERT_EFI_ERROR (Status);
+  //
+  // The hypervisor timer interrupt may be omitted by implementations that
+  // execute under virtualization.
+  //
+  TimerHypIntrNum = PcdGet32 (PcdArmArchTimerHypIntrNum);
+  if (TimerHypIntrNum != 0) {
+    Status = gInterrupt->RegisterInterruptSource (gInterrupt, TimerHypIntrNum, TimerInterruptHandler);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerSecIntrNum), TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
