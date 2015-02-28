@@ -96,14 +96,6 @@
   gArmTokenSpaceGuid.PcdSecureFvSize|0x0|UINT32|0x00000030
 
   #
-  # ARM Normal (or Non Secure) Firmware PCDs
-  #
-  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
-  gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
-  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
-  gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
-
-  #
   # ARM Hypervisor Firmware PCDs
   #
   gArmTokenSpaceGuid.PcdHypFdBaseAddress|0|UINT32|0x0000003A
@@ -130,6 +122,15 @@
   # Maximum file size for TFTP servers that do not support 'tsize' extension
   gArmTokenSpaceGuid.PcdMaxTftpFileSize|0x01000000|UINT32|0x00000000
 
+  #
+  # ARM Normal (or Non Secure) Firmware PCDs
+  #
+  gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
+  gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
+
+[PcdsFixedAtBuild.common, PcdsPatchableInModule.common]
+  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
+  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
 
 [PcdsFixedAtBuild.ARM]
   #
@@ -210,16 +211,18 @@
 
 
 #
-# These PCDs are also defined as 'PcdsDynamic' to be redefined when using UEFI in a
-# context of virtual machine.
+# These PCDs are also defined as 'PcdsDynamic' or 'PcdsPatchableInModule' to be
+# redefined when using UEFI in a context of virtual machine.
 #
-[PcdsFixedAtBuild.common, PcdsDynamic.common]
+[PcdsFixedAtBuild.common, PcdsDynamic.common, PcdsPatchableInModule.common]
+
   # System Memory (DRAM): These PCDs define the region of in-built system memory
   # Some platforms can get DRAM extensions, these additional regions will be declared
   # to UEFI by ArmPlatformLib
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
   gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
 
+[PcdsFixedAtBuild.common, PcdsDynamic.common]
   #
   # ARM Architectural Timer
   #
