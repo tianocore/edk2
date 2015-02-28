@@ -1,6 +1,7 @@
 //  Implementation of synchronization functions for ARM architecture
 //
 //  Copyright (c) 2012-2015, ARM Limited. All rights reserved.
+//  Copyright (c) 2015, Linaro Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -12,12 +13,55 @@
 //
 //
 
+    EXPORT  InternalSyncCompareExchange16
     EXPORT  InternalSyncCompareExchange32
     EXPORT  InternalSyncCompareExchange64
     EXPORT  InternalSyncIncrement
     EXPORT  InternalSyncDecrement
 
     AREA   ArmSynchronization, CODE, READONLY
+
+/**
+  Performs an atomic compare exchange operation on a 16-bit unsigned integer.
+
+  Performs an atomic compare exchange operation on the 16-bit unsigned integer
+  specified by Value.  If Value is equal to CompareValue, then Value is set to
+  ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
+  then Value is returned.  The compare exchange operation must be performed using
+  MP safe mechanisms.
+
+  @param  Value         A pointer to the 16-bit value for the compare exchange
+                        operation.
+  @param  CompareValue  16-bit value used in compare operation.
+  @param  ExchangeValue 16-bit value used in exchange operation.
+
+  @return The original *Value before exchange.
+
+**/
+//UINT16
+//EFIAPI
+//InternalSyncCompareExchange16 (
+//  IN      volatile UINT16           *Value,
+//  IN      UINT16                    CompareValue,
+//  IN      UINT16                    ExchangeValue
+//  )
+InternalSyncCompareExchange16
+  dmb
+
+InternalSyncCompareExchange16Again
+  ldrexh  r3, [r0]
+  cmp     r3, r1
+  bne     InternalSyncCompareExchange16Fail
+
+InternalSyncCompareExchange16Exchange
+  strexh  ip, r2, [r0]
+  cmp     ip, #0
+  bne     InternalSyncCompareExchange16Again
+
+InternalSyncCompareExchange16Fail
+  dmb
+  mov     r0, r3
+  bx      lr
 
 /**
   Performs an atomic compare exchange operation on a 32-bit unsigned integer.

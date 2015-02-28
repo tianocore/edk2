@@ -32,12 +32,14 @@
 [Sources.IA32]
   Ia32/InterlockedCompareExchange64.c | MSFT 
   Ia32/InterlockedCompareExchange32.c | MSFT 
+  Ia32/InterlockedCompareExchange16.c | MSFT
   Ia32/InterlockedDecrement.c | MSFT 
   Ia32/InterlockedIncrement.c | MSFT 
   SynchronizationMsc.c  | MSFT
 
   Ia32/InterlockedCompareExchange64.asm | INTEL 
   Ia32/InterlockedCompareExchange32.asm | INTEL 
+  Ia32/InterlockedCompareExchange16.asm | INTEL
   Ia32/InterlockedDecrement.asm | INTEL 
   Ia32/InterlockedIncrement.asm | INTEL 
   Synchronization.c | INTEL
@@ -48,9 +50,11 @@
 [Sources.X64]
   X64/InterlockedCompareExchange64.c | MSFT
   X64/InterlockedCompareExchange32.c | MSFT
+  X64/InterlockedCompareExchange16.c | MSFT
   
   X64/InterlockedCompareExchange64.asm | INTEL
   X64/InterlockedCompareExchange32.asm | INTEL
+  X64/InterlockedCompareExchange16.asm | INTEL
   
   X64/InterlockedDecrement.c | MSFT 
   X64/InterlockedIncrement.c | MSFT 
@@ -67,6 +71,7 @@
   Ipf/Synchronization.c
   Ipf/InterlockedCompareExchange64.s
   Ipf/InterlockedCompareExchange32.s
+  Ipf/InterlockedCompareExchange16.s
 
   Synchronization.c     | INTEL 
   SynchronizationMsc.c  | MSFT 

@@ -16,10 +16,54 @@
 .text
 .align 3
 
+GCC_ASM_EXPORT(InternalSyncCompareExchange16)
 GCC_ASM_EXPORT(InternalSyncCompareExchange32)
 GCC_ASM_EXPORT(InternalSyncCompareExchange64)
 GCC_ASM_EXPORT(InternalSyncIncrement)
 GCC_ASM_EXPORT(InternalSyncDecrement)
+
+/**
+  Performs an atomic compare exchange operation on a 16-bit unsigned integer.
+
+  Performs an atomic compare exchange operation on the 16-bit unsigned integer
+  specified by Value.  If Value is equal to CompareValue, then Value is set to
+  ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
+  then Value is returned.  The compare exchange operation must be performed using
+  MP safe mechanisms.
+
+  @param  Value         A pointer to the 16-bit value for the compare exchange
+                        operation.
+  @param  CompareValue  16-bit value used in compare operation.
+  @param  ExchangeValue 16-bit value used in exchange operation.
+
+  @return The original *Value before exchange.
+
+**/
+//UINT16
+//EFIAPI
+//InternalSyncCompareExchange16 (
+//  IN      volatile UINT16           *Value,
+//  IN      UINT16                    CompareValue,
+//  IN      UINT16                    ExchangeValue
+//  )
+ASM_PFX(InternalSyncCompareExchange16):
+  uxth    w1, w1
+  uxth    w2, w2
+  dmb     sy
+
+InternalSyncCompareExchange16Again:
+  ldxrh   w3, [x0]
+  cmp     w3, w1
+  bne     InternalSyncCompareExchange16Fail
+
+InternalSyncCompareExchange16Exchange:
+  stxrh   w4, w2, [x0]
+  cbnz    w4, InternalSyncCompareExchange16Again
+
+InternalSyncCompareExchange16Fail:
+  dmb     sy
+  mov     w0, w3
+  ret
 
 /**
   Performs an atomic compare exchange operation on a 32-bit unsigned integer.
