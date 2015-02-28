@@ -18,10 +18,6 @@
 
 #include <Uefi.h>
 
-//
-// Xen interface version used
-//
-#define __XEN_INTERFACE_VERSION__ 0x00040400
 #define xen_mb() MemoryFence()
 #define xen_rmb() MemoryFence()
 #define xen_wmb() MemoryFence()
