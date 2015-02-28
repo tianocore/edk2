@@ -1,0 +1,108 @@
+#/** @file
+#
+#  Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmVirtPrePiUniCoreRelocatable
+  FILE_GUID                      = f7d9fd14-9335-4389-80c5-334d6abfcced
+  MODULE_TYPE                    = SEC
+  VALID_ARCHITECTURES            = AARCH64
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  PrePi.c
+
+[Sources.AArch64]
+  AArch64/ArchPrePi.c
+  AArch64/ModuleEntryPoint.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  ArmLib
+  IoLib
+  TimerLib
+  SerialPortLib
+  ExtractGuidedSectionLib
+  LzmaDecompressLib
+  PeCoffGetEntryPointLib
+  PrePiLib
+  ArmPlatformLib
+  ArmPlatformStackLib
+  MemoryAllocationLib
+  HobLib
+  PrePiHobListPointerLib
+  PlatformPeiLib
+  MemoryInitPeiLib
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
+
+[Guids]
+  gArmGlobalVariableGuid
+  gArmMpCoreInfoGuid
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
+  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
+  gArmTokenSpaceGuid.PcdVFPEnabled
+
+  gArmTokenSpaceGuid.PcdFdSize
+  gArmTokenSpaceGuid.PcdFvSize
+
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
+
+  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
+
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+
+[BuildOptions]
+  GCC:*_*_AARCH64_DLINK_FLAGS = -pie -T $(MODULE_DIR)/Scripts/PrePi-PIE.lds
