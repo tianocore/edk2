@@ -139,8 +139,7 @@ XenGrantTableEndAccess (
 
 VOID
 XenGrantTableInit (
-  IN XENBUS_DEVICE  *Dev,
-  IN UINT64         MmioAddr
+  IN XENBUS_DEVICE  *Dev
   )
 {
   xen_add_to_physmap_t Parameters;
@@ -155,7 +154,7 @@ XenGrantTableInit (
     XenGrantTablePutFreeEntry ((grant_ref_t)Index);
   }
 
-  GrantTable = (VOID*)(UINTN) MmioAddr;
+  GrantTable = (VOID*)(UINTN) Dev->XenIo->GrantTableAddress;
   for (Index = 0; Index < NR_GRANT_FRAMES; Index++) {
     Parameters.domid = DOMID_SELF;
     Parameters.idx = Index;

@@ -39,7 +39,7 @@
 //
 // Consumed Protocols
 //
-#include <Protocol/PciIo.h>
+#include <Protocol/XenIo.h>
 
 
 //
@@ -73,10 +73,6 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gXenBusDxeComponentName;
 //
 #include <IndustryStandard/Xen/xen.h>
 
-#define PCI_VENDOR_ID_XEN                0x5853
-#define PCI_DEVICE_ID_XEN_PLATFORM       0x0001
-
-
 typedef struct _XENBUS_DEVICE_PATH XENBUS_DEVICE_PATH;
 typedef struct _XENBUS_DEVICE XENBUS_DEVICE;
 
@@ -86,7 +82,7 @@ struct _XENBUS_DEVICE {
   UINT32                        Signature;
   EFI_DRIVER_BINDING_PROTOCOL   *This;
   EFI_HANDLE                    ControllerHandle;
-  EFI_PCI_IO_PROTOCOL           *PciIo;
+  XENIO_PROTOCOL                *XenIo;
   EFI_EVENT                     ExitBootEvent;
   EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
   LIST_ENTRY                    ChildList;

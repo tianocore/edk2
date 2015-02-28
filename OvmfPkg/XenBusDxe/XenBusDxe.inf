@@ -67,8 +67,8 @@
 
 [Protocols]
   gEfiDriverBindingProtocolGuid
-  gEfiPciIoProtocolGuid
   gEfiComponentName2ProtocolGuid
   gEfiComponentNameProtocolGuid
   gXenBusProtocolGuid
+  gXenIoProtocolGuid
 

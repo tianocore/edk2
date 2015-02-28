@@ -29,8 +29,7 @@
 **/
 VOID
 XenGrantTableInit (
-  IN XENBUS_DEVICE  *Dev,
-  IN UINT64         MmioAddr
+  IN XENBUS_DEVICE  *Dev
   );
 
 /**

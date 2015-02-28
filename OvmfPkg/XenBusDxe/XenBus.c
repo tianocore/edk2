@@ -138,7 +138,7 @@ XenBusAddDevice (
   XENBUS_PRIVATE_DATA *Private;
   EFI_STATUS Status;
   XENBUS_DEVICE_PATH *TempXenBusPath;
-  VOID *ChildPciIo;
+  VOID *ChildXenIo;
 
   AsciiSPrint (DevicePath, sizeof (DevicePath),
                "device/%a/%a", Type, Id);
@@ -208,8 +208,8 @@ XenBusAddDevice (
     }
 
     Status = gBS->OpenProtocol (Dev->ControllerHandle,
-               &gEfiPciIoProtocolGuid,
-               &ChildPciIo, Dev->This->DriverBindingHandle,
+               &gXenIoProtocolGuid,
+               &ChildXenIo, Dev->This->DriverBindingHandle,
                Private->Handle,
                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER);
     if (EFI_ERROR (Status)) {

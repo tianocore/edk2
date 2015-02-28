@@ -155,7 +155,7 @@ XenBusDxeComponentNameGetControllerName (
   Status = EfiTestManagedDevice (
              ControllerHandle,
              gXenBusDxeDriverBinding.DriverBindingHandle,
-             &gEfiPciIoProtocolGuid
+             &gXenIoProtocolGuid
              );
   if (EFI_ERROR (Status)) {
     return Status;
