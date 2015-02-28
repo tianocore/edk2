@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -183,6 +183,10 @@ Returns:
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
+  UINT32                ProcessAffinityMask;
+  UINT32                SystemAffinityMask;
+  INT32                 LowBit;
+
 
   //
   // Enable the privilege so that RTC driver can successfully run SetTime()
@@ -198,6 +202,20 @@ Returns:
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdWinNtFirmwareVolume);
 
   SecPrint ("\nEDK II SEC Main NT Emulation Environment from www.TianoCore.org\n");
+
+  //
+  // Determine the first thread available to this process.
+  //
+  if (GetProcessAffinityMask (GetCurrentProcess (), &ProcessAffinityMask, &SystemAffinityMask)) {
+    LowBit = (INT32)LowBitSet32 (ProcessAffinityMask);
+    if (LowBit != -1) {
+      //
+      // Force the system to bind the process to a single thread to work
+      // around odd semaphore type crashes.
+      //
+      SetProcessAffinityMask (GetCurrentProcess (), (INTN)(BIT0 << LowBit));
+    }
+  }
 
   //
   // Make some Windows calls to Set the process to the highest priority in the
