@@ -33,6 +33,7 @@ PlatformPeim (
   VOID               *Base;
   VOID               *NewBase;
   UINTN              FdtSize;
+  UINTN              FdtPages;
   UINT64             *FdtHobData;
   UINT64             *UartHobData;
   INT32              Node, Prev;
@@ -47,10 +48,11 @@ PlatformPeim (
   ASSERT (Base != NULL);
   ASSERT (fdt_check_header (Base) == 0);
 
-  FdtSize = fdt_totalsize (Base);
-  NewBase = AllocatePages (EFI_SIZE_TO_PAGES (FdtSize));
+  FdtSize = fdt_totalsize (Base) + PcdGet32 (PcdDeviceTreeAllocationPadding);
+  FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
+  NewBase = AllocatePages (FdtPages);
   ASSERT (NewBase != NULL);
-  CopyMem (NewBase, Base, FdtSize);
+  fdt_open_into (Base, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
 
   FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
   ASSERT (FdtHobData != NULL);

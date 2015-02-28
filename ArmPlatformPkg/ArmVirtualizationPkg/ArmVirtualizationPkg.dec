@@ -43,6 +43,12 @@
   #
   gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0|UINT64|0x00000001
 
+  #
+  # Padding in bytes to add to the device tree allocation, so that the DTB can
+  # be modified in place (default: 256 bytes)
+  #
+  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x00000002
+
 [PcdsDynamic, PcdsFixedAtBuild]
   #
   # ARM PSCI function invocations can be done either through hypervisor
