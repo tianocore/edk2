@@ -18,9 +18,9 @@
 
 /**
   This function will put the two arguments in the right place (registers) and
-  call HypercallAddr, which correspond to an entry in the hypercall pages.
+  invoke the hypercall identified by HypercallID.
 
-  @param HypercallAddr  A memory address where the hypercall to call is.
+  @param HypercallID    The symbolic ID of the hypercall to be invoked
   @param Arg1           First argument.
   @param Arg2           Second argument.
 
@@ -29,7 +29,7 @@
 INTN
 EFIAPI
 XenHypercall2 (
-  IN     VOID *HypercallAddr,
+  IN     INTN HypercallID,
   IN OUT INTN Arg1,
   IN OUT INTN Arg2
   );
@@ -44,27 +44,23 @@ XenHypercall2 (
 **/
 EFI_STATUS
 XenHyperpageInit (
-  XENBUS_DEVICE *Dev
   );
 
 /**
   Return the value of the HVM parameter Index.
 
-  @param Dev    A XENBUS_DEVICE instance.
   @param Index  The parameter to get, e.g. HVM_PARAM_STORE_EVTCHN.
 
   @return   The value of the asked parameter or 0 in case of error.
 **/
 UINT64
 XenHypercallHvmGetParam (
-  XENBUS_DEVICE *Dev,
   UINT32 Index
   );
 
 /**
   Hypercall to do different operation on the memory.
 
-  @param Dev        A XENBUS_DEVICE instance.
   @param Operation  The operation number, e.g. XENMEM_add_to_physmap.
   @param Arguments  The arguments associated to the operation.
 
@@ -73,7 +69,6 @@ XenHypercallHvmGetParam (
 **/
 INTN
 XenHypercallMemoryOp (
-  IN     XENBUS_DEVICE *Dev,
   IN     UINTN Operation,
   IN OUT VOID *Arguments
   );
@@ -81,7 +76,6 @@ XenHypercallMemoryOp (
 /**
   Do an operation on the event channels.
 
-  @param Dev        A XENBUS_DEVICE instance.
   @param Operation  The operation number, e.g. EVTCHNOP_send.
   @param Arguments  The argument associated to the operation.
 
@@ -90,24 +84,8 @@ XenHypercallMemoryOp (
 **/
 INTN
 XenHypercallEventChannelOp (
-  IN     XENBUS_DEVICE *Dev,
   IN     INTN Operation,
   IN OUT VOID *Arguments
-  );
-
-/**
-  Map the shared_info_t page into memory.
-
-  @param Dev    A XENBUS_DEVICE instance.
-
-  @retval EFI_SUCCESS     Dev->SharedInfo whill contain a pointer to
-                          the shared info page
-  @retval EFI_LOAD_ERROR  The shared info page could not be mapped. The
-                          hypercall returned an error.
-**/
-EFI_STATUS
-XenGetSharedInfoPage (
-  IN OUT XENBUS_DEVICE *Dev
   );
 
 #endif

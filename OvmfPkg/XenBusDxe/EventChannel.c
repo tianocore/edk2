@@ -28,7 +28,7 @@ XenEventChannelNotify (
   evtchn_send_t Send;
 
   Send.port = Port;
-  ReturnCode = XenHypercallEventChannelOp (Dev, EVTCHNOP_send, &Send);
+  ReturnCode = XenHypercallEventChannelOp (EVTCHNOP_send, &Send);
   return (UINT32)ReturnCode;
 }
 
@@ -40,15 +40,12 @@ XenBusEventChannelAllocate (
   OUT evtchn_port_t   *Port
   )
 {
-  XENBUS_PRIVATE_DATA *Private;
   evtchn_alloc_unbound_t Parameter;
   UINT32 ReturnCode;
 
-  Private = XENBUS_PRIVATE_DATA_FROM_THIS (This);
-
   Parameter.dom = DOMID_SELF;
   Parameter.remote_dom = DomainId;
-  ReturnCode = (UINT32)XenHypercallEventChannelOp (Private->Dev,
+  ReturnCode = (UINT32)XenHypercallEventChannelOp (
                                    EVTCHNOP_alloc_unbound,
                                    &Parameter);
   if (ReturnCode != 0) {
@@ -79,10 +76,8 @@ XenBusEventChannelClose (
   IN evtchn_port_t   Port
   )
 {
-  XENBUS_PRIVATE_DATA *Private;
   evtchn_close_t Close;
 
-  Private = XENBUS_PRIVATE_DATA_FROM_THIS (This);
   Close.port = Port;
-  return (UINT32)XenHypercallEventChannelOp (Private->Dev, EVTCHNOP_close, &Close);
+  return (UINT32)XenHypercallEventChannelOp (EVTCHNOP_close, &Close);
 }

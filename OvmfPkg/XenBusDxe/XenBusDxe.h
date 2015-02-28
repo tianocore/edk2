@@ -91,7 +91,6 @@ struct _XENBUS_DEVICE {
   EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
   LIST_ENTRY                    ChildList;
 
-  VOID                          *Hyperpage;
   shared_info_t                 *SharedInfo;
 };
 

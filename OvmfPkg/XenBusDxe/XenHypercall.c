@@ -23,9 +23,21 @@
 #include <IndustryStandard/Xen/hvm/params.h>
 #include <IndustryStandard/Xen/memory.h>
 
+STATIC VOID       *HyperPage;
+
+//
+// Interface exposed by the ASM implementation of the core hypercall
+//
+INTN
+EFIAPI
+__XenHypercall2 (
+  IN     VOID *HypercallAddr,
+  IN OUT INTN Arg1,
+  IN OUT INTN Arg2
+  );
+
 EFI_STATUS
 XenHyperpageInit (
-  IN OUT XENBUS_DEVICE *Dev
   )
 {
   EFI_HOB_GUID_TYPE   *GuidHob;
@@ -36,24 +48,21 @@ XenHyperpageInit (
     return EFI_NOT_FOUND;
   }
   XenInfo = (EFI_XEN_INFO *) GET_GUID_HOB_DATA (GuidHob);
-  Dev->Hyperpage = XenInfo->HyperPages;
+  HyperPage = XenInfo->HyperPages;
   return EFI_SUCCESS;
 }
 
 UINT64
 XenHypercallHvmGetParam (
-  IN XENBUS_DEVICE *Dev,
   IN UINT32        Index
   )
 {
   xen_hvm_param_t     Parameter;
   INTN                Error;
 
-  ASSERT (Dev->Hyperpage != NULL);
-
   Parameter.domid = DOMID_SELF;
   Parameter.index = Index;
-  Error = XenHypercall2 ((UINT8*)Dev->Hyperpage + __HYPERVISOR_hvm_op * 32,
+  Error = XenHypercall2 (__HYPERVISOR_hvm_op,
                          HVMOP_get_param, (INTN) &Parameter);
   if (Error != 0) {
     DEBUG ((EFI_D_ERROR,
@@ -66,53 +75,33 @@ XenHypercallHvmGetParam (
 
 INTN
 XenHypercallMemoryOp (
-  IN     XENBUS_DEVICE *Dev,
   IN     UINTN Operation,
   IN OUT VOID *Arguments
   )
 {
-  ASSERT (Dev->Hyperpage != NULL);
-  return XenHypercall2 ((UINT8*)Dev->Hyperpage + __HYPERVISOR_memory_op * 32,
+  return XenHypercall2 (__HYPERVISOR_memory_op,
                         Operation, (INTN) Arguments);
 }
 
 INTN
 XenHypercallEventChannelOp (
-  IN     XENBUS_DEVICE *Dev,
   IN     INTN Operation,
   IN OUT VOID *Arguments
   )
 {
-  ASSERT (Dev->Hyperpage != NULL);
-  return XenHypercall2 ((UINT8*)Dev->Hyperpage + __HYPERVISOR_event_channel_op * 32,
+  return XenHypercall2 (__HYPERVISOR_event_channel_op,
                         Operation, (INTN) Arguments);
 }
 
-EFI_STATUS
-XenGetSharedInfoPage (
-  IN OUT XENBUS_DEVICE *Dev
+INTN
+EFIAPI
+XenHypercall2 (
+  IN     UINTN  HypercallID,
+  IN OUT INTN   Arg1,
+  IN OUT INTN   Arg2
   )
 {
-  xen_add_to_physmap_t Parameter;
+  ASSERT (HyperPage != NULL);
 
-  ASSERT (Dev->SharedInfo == NULL);
-
-  Parameter.domid = DOMID_SELF;
-  Parameter.space = XENMAPSPACE_shared_info;
-  Parameter.idx = 0;
-
-  //
-  // using reserved page because the page is not released when Linux is
-  // starting because of the add_to_physmap. QEMU might try to access the
-  // page, and fail because it have no right to do so (segv).
-  //
-  Dev->SharedInfo = AllocateReservedPages (1);
-  Parameter.gpfn = (UINTN) Dev->SharedInfo >> EFI_PAGE_SHIFT;
-  if (XenHypercallMemoryOp (Dev, XENMEM_add_to_physmap, &Parameter) != 0) {
-    FreePages (Dev->SharedInfo, 1);
-    Dev->SharedInfo = NULL;
-    return EFI_LOAD_ERROR;
-  }
-
-  return EFI_SUCCESS;
+  return __XenHypercall2 ((UINT8*)HyperPage + HypercallID * 32, Arg1, Arg2);
 }

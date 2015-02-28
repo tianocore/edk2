@@ -1057,8 +1057,8 @@ XenStoreInit (
 
   xs.Dev = Dev;
 
-  xs.EventChannel = (evtchn_port_t)XenHypercallHvmGetParam (Dev, HVM_PARAM_STORE_EVTCHN);
-  XenStoreGpfn = (UINTN)XenHypercallHvmGetParam (Dev, HVM_PARAM_STORE_PFN);
+  xs.EventChannel = (evtchn_port_t)XenHypercallHvmGetParam (HVM_PARAM_STORE_EVTCHN);
+  XenStoreGpfn = (UINTN)XenHypercallHvmGetParam (HVM_PARAM_STORE_PFN);
   xs.XenStore = (VOID *) (XenStoreGpfn << EFI_PAGE_SHIFT);
   DEBUG ((EFI_D_INFO, "XenBusInit: XenBus rings @%p, event channel %x\n",
           xs.XenStore, xs.EventChannel));

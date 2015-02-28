@@ -3,13 +3,13 @@ SECTION .text
 
 ; INTN
 ; EFIAPI
-; XenHypercall2 (
+; __XenHypercall2 (
 ;   IN     VOID *HypercallAddr,
 ;   IN OUT INTN Arg1,
 ;   IN OUT INTN Arg2
 ;   );
-global ASM_PFX(XenHypercall2)
-ASM_PFX(XenHypercall2):
+global ASM_PFX(__XenHypercall2)
+ASM_PFX(__XenHypercall2):
   push rdi
   push rsi
   ; Copy HypercallAddr to rax

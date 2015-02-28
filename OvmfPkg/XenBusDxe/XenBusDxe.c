@@ -34,6 +34,8 @@
 #include "XenStore.h"
 #include "XenBus.h"
 
+#include <IndustryStandard/Xen/hvm/params.h>
+#include <IndustryStandard/Xen/memory.h>
 
 ///
 /// Driver Binding Protocol instance
@@ -50,6 +52,46 @@ EFI_DRIVER_BINDING_PROTOCOL gXenBusDxeDriverBinding = {
 
 STATIC EFI_LOCK       mMyDeviceLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_CALLBACK);
 STATIC XENBUS_DEVICE *mMyDevice = NULL;
+
+/**
+  Map the shared_info_t page into memory.
+
+  @param Dev    A XENBUS_DEVICE instance.
+
+  @retval EFI_SUCCESS     Dev->SharedInfo whill contain a pointer to
+                          the shared info page
+  @retval EFI_LOAD_ERROR  The shared info page could not be mapped. The
+                          hypercall returned an error.
+**/
+STATIC
+EFI_STATUS
+XenGetSharedInfoPage (
+  IN OUT XENBUS_DEVICE *Dev
+  )
+{
+  xen_add_to_physmap_t Parameter;
+
+  ASSERT (Dev->SharedInfo == NULL);
+
+  Parameter.domid = DOMID_SELF;
+  Parameter.space = XENMAPSPACE_shared_info;
+  Parameter.idx = 0;
+
+  //
+  // using reserved page because the page is not released when Linux is
+  // starting because of the add_to_physmap. QEMU might try to access the
+  // page, and fail because it have no right to do so (segv).
+  //
+  Dev->SharedInfo = AllocateReservedPages (1);
+  Parameter.gpfn = (UINTN) Dev->SharedInfo >> EFI_PAGE_SHIFT;
+  if (XenHypercallMemoryOp (XENMEM_add_to_physmap, &Parameter) != 0) {
+    FreePages (Dev->SharedInfo, 1);
+    Dev->SharedInfo = NULL;
+    return EFI_LOAD_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Unloads an image.
@@ -348,7 +390,7 @@ XenBusDxeDriverBindingStart (
   MmioAddr = BarDesc->AddrRangeMin;
   FreePool (BarDesc);
 
-  Status = XenHyperpageInit (Dev);
+  Status = XenHyperpageInit ();
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "XenBus: Unable to retrieve the hyperpage.\n"));
     Status = EFI_UNSUPPORTED;
