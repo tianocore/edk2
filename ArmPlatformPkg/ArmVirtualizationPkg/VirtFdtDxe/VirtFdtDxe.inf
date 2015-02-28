@@ -42,6 +42,7 @@
   FdtLib
   VirtioMmioDeviceLib
   HobLib
+  XenIoMmioLib
 
 [Guids]
   gFdtTableGuid

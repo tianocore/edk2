@@ -26,6 +26,7 @@
 #include <Library/DxeServicesLib.h>
 #include <Library/HobLib.h>
 #include <libfdt.h>
+#include <Library/XenIoMmioLib.h>
 
 #include <Guid/Fdt.h>
 #include <Guid/VirtioMmioTransport.h>
@@ -50,6 +51,7 @@ typedef enum {
   PropertyTypeFwCfg,
   PropertyTypePciHost,
   PropertyTypeGicV3,
+  PropertyTypeXen,
 } PROPERTY_TYPE;
 
 typedef struct {
@@ -68,6 +70,7 @@ STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypeFwCfg,   "qemu,fw-cfg-mmio"      },
   { PropertyTypePciHost, "pci-host-ecam-generic" },
   { PropertyTypeGicV3,   "arm,gic-v3"            },
+  { PropertyTypeXen,     "xen,xen"               },
   { PropertyTypeUnknown, ""                      }
 };
 
@@ -521,6 +524,26 @@ InitializeVirtFdtDxe (
         DEBUG ((EFI_D_ERROR, "%a: Unknown PSCI method \"%a\"\n", __FUNCTION__,
           PsciMethod));
       }
+      break;
+
+    case PropertyTypeXen:
+      ASSERT (Len == 16);
+
+      //
+      // Retrieve the reg base from this node and wire it up to the
+      // MMIO flavor of the XenBus root device I/O protocol
+      //
+      RegBase = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
+      Handle = NULL;
+      Status = XenIoMmioInstall (&Handle, RegBase);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "%a: XenIoMmioInstall () failed on a new handle "
+          "(Status == %r)\n", __FUNCTION__, Status));
+        break;
+      }
+
+      DEBUG ((EFI_D_INFO, "Found Xen node with Grant table @ 0x%Lx\n", RegBase));
+
       break;
 
     default:
