@@ -101,7 +101,7 @@ InitializeMemory (
   UINTN                                 FdTop;
   UINTN                                 UefiMemoryBase;
 
-  DEBUG ((EFI_D_ERROR, "Memory Init PEIM Loaded\n"));
+  DEBUG ((EFI_D_LOAD | EFI_D_INFO, "Memory Init PEIM Loaded\n"));
 
   //
   // Initialize the System Memory (DRAM)

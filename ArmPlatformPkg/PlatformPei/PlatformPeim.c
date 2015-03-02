@@ -108,7 +108,7 @@ InitializePlatformPeim (
   ARM_GLOBAL_VARIABLE_PPI       *ArmGlobalVariablePpi;
   EFI_PHYSICAL_ADDRESS          GlobalVariableBase;
 
-  DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
+  DEBUG ((EFI_D_LOAD | EFI_D_INFO, "Platform PEIM Loaded\n"));
 
   PlatformPeim ();
 
