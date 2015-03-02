@@ -949,6 +949,11 @@ TryRunningQemuKernel (
   InitrdBlob      = &mKernelBlob[KernelBlobTypeInitrd];
   CommandLineBlob = &mKernelBlob[KernelBlobTypeCommandLine];
 
+  if (KernelBlob->Data == NULL) {
+    Status = EFI_NOT_FOUND;
+    goto FreeBlobs;
+  }
+
   //
   // Create a new handle with a single VenHw() node device path protocol on it,
   // plus a custom SimpleFileSystem protocol on it.
