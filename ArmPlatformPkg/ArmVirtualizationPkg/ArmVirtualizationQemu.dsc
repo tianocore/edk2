@@ -91,8 +91,6 @@
   gArmVirtualizationTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|TRUE
 
 [PcdsFixedAtBuild.common]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
-
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"QEMU"
 
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1

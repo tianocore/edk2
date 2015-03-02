@@ -79,8 +79,6 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
-
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"XEN-UEFI"
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
 

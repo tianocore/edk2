@@ -12,6 +12,9 @@
 #
 #
 
+[Defines]
+  DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
+
 [LibraryClasses.common]
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -277,8 +280,8 @@
   #  DEBUG_FS        0x00000008  // EFI File system
   #  DEBUG_POOL      0x00000010  // Alloc & Free's
   #  DEBUG_PAGE      0x00000020  // Alloc & Free's
-  #  DEBUG_INFO      0x00000040  // Verbose
-  #  DEBUG_DISPATCH  0x00000080  // PEI/DXE Dispatchers
+  #  DEBUG_INFO      0x00000040  // Informational debug messages
+  #  DEBUG_DISPATCH  0x00000080  // PEI/DXE/SMM Dispatchers
   #  DEBUG_VARIABLE  0x00000100  // Variable
   #  DEBUG_BM        0x00000400  // Boot Manager
   #  DEBUG_BLKIO     0x00001000  // BlkIo Driver
@@ -288,8 +291,10 @@
   #  DEBUG_EVENT     0x00080000  // Event messages
   #  DEBUG_GCD       0x00100000  // Global Coherency Database changes
   #  DEBUG_CACHE     0x00200000  // Memory range cachability changes
+  #  DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+  #                              // significantly impact boot performance
   #  DEBUG_ERROR     0x80000000  // Error
-  # gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL)
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
 
