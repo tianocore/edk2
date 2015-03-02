@@ -127,7 +127,6 @@ formset
     text
       help   = STRING_TOKEN (STR_SAVE_CHANGES_HELP),
       text   = STRING_TOKEN (STR_SAVE_CHANGES),
-        text   = STRING_TOKEN (STR_NULL),
       flags  = INTERACTIVE,
       key    = KEY_SAVE_CHANGES;
 
@@ -166,14 +165,12 @@ formset
     text
       help   = STRING_TOKEN (STR_SAVE_AND_EXIT),
       text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
-        text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
       flags  = INTERACTIVE,
       key    = KEY_SAVE_CONFIG_CHANGES;
 
     text
       help   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
       text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
-        text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
       flags  = INTERACTIVE,
       key    = KEY_IGNORE_CONFIG_CHANGES;
 

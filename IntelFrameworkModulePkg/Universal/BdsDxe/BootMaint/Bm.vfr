@@ -82,7 +82,6 @@ formset
     text
          help   = STRING_TOKEN(STR_RESET),
          text   = STRING_TOKEN(STR_RESET),
-         text   = STRING_TOKEN(STR_NULL_STRING),
          flags  = INTERACTIVE,
          key    = FORM_RESET;
 

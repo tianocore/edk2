@@ -207,7 +207,6 @@ formset
     text
       help   = STRING_TOKEN (STR_SAVE_CHANGES),
       text   = STRING_TOKEN (STR_SAVE_CHANGES),
-        text   = STRING_TOKEN (STR_SAVE_CHANGES),
       flags  = INTERACTIVE,
       key    = KEY_SAVE_CHANGES;
       
