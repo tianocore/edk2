@@ -33,7 +33,7 @@
 [LibraryClasses]
   SerialPortLib|OvmfPkg/Library/XenConsoleSerialPortLib/XenConsoleSerialPortLib.inf
   RealTimeClockLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/XenRealTimeClockLib/XenRealTimeClockLib.inf
-  XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLibArm.inf
+  XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLib.inf
 
 [LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf

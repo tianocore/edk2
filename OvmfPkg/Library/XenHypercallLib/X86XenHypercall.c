@@ -37,7 +37,7 @@ __XenHypercall2 (
 
 RETURN_STATUS
 EFIAPI
-XenHypercallLibIntelInit (
+XenHypercallLibInit (
   VOID
   )
 {

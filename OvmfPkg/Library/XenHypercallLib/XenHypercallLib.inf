@@ -1,5 +1,5 @@
 ## @file
-#  Xen Hypercall abstraction lib for Intel architecture
+#  Xen Hypercall abstraction lib for Intel and ARM architectures
 #
 #  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
 #  This program and the accompanying materials
@@ -14,27 +14,38 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = XenHypercallLibIntel
+  BASE_NAME                      = XenHypercallLib
   FILE_GUID                      = B5EE9A32-CA5A-49A8-82E3-ADA4CCB77C7C
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
+
+[Defines.IA32, Defines.X64]
   LIBRARY_CLASS                  = XenHypercallLib|DXE_DRIVER UEFI_DRIVER
-  CONSTRUCTOR                    = XenHypercallLibIntelInit
+  CONSTRUCTOR                    = XenHypercallLibInit
+
+[Defines.ARM, Defines.AARCH64]
+  LIBRARY_CLASS                  = XenHypercallLib
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
 #
 
-[Sources]
-  XenHypercallIntel.c
+[Sources.IA32, Sources.X64]
+  X86XenHypercall.c
 
 [Sources.IA32]
   Ia32/hypercall.nasm
 
 [Sources.X64]
   X64/hypercall.nasm
+
+[Sources.ARM]
+  Arm/Hypercall.S
+
+[Sources.AARCH64]
+  Aarch64/Hypercall.S
 
 [Sources]
   XenHypercall.c
@@ -43,10 +54,10 @@
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
-[LibraryClasses]
+[LibraryClasses.IA32, LibraryClasses.X64]
   BaseLib
   HobLib
   DebugLib
 
-[Guids]
+[Guids.IA32, Guids.X64]
   gEfiXenInfoGuid
