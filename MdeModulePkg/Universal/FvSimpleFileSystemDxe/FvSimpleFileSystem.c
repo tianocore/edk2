@@ -139,7 +139,7 @@ FvFsGetFileSize (
     //
     // Get the size of the first executable section out of the file.
     //
-    Status = FvFsFindExecutableSection (FvProtocol, FvFileInfo, &FvFileInfo->FileInfo.FileSize, &IgnoredPtr);
+    Status = FvFsFindExecutableSection (FvProtocol, FvFileInfo, (UINTN*)&FvFileInfo->FileInfo.FileSize, &IgnoredPtr);
     if (Status == EFI_WARN_BUFFER_TOO_SMALL) {
       return EFI_SUCCESS;
     }
@@ -153,7 +153,7 @@ FvFsGetFileSize (
                            EFI_SECTION_RAW,
                            0,
                            &IgnoredPtr,
-                           &FvFileInfo->FileInfo.FileSize,
+                           (UINTN*)&FvFileInfo->FileInfo.FileSize,
                            &AuthenticationStatus
                            );
     if (Status == EFI_WARN_BUFFER_TOO_SMALL) {
@@ -167,7 +167,7 @@ FvFsGetFileSize (
                            FvProtocol,
                            &FvFileInfo->NameGuid,
                            NULL,
-                           &FvFileInfo->FileInfo.FileSize,
+                           (UINTN*)&FvFileInfo->FileInfo.FileSize,
                            &FoundType,
                            &Attributes,
                            &AuthenticationStatus
@@ -181,7 +181,7 @@ FvFsGetFileSize (
                          FvProtocol,
                          &FvFileInfo->NameGuid,
                          NULL,
-                         &FvFileInfo->FileInfo.FileSize,
+                         (UINTN*)&FvFileInfo->FileInfo.FileSize,
                          &FoundType,
                          &Attributes,
                          &AuthenticationStatus
@@ -303,7 +303,7 @@ FvFsGetFileInfo (
 {
   UINTN                      InfoSize;
 
-  InfoSize = FvFileInfo->FileInfo.Size;
+  InfoSize = (UINTN)FvFileInfo->FileInfo.Size;
   if (*BufferSize < InfoSize) {
     *BufferSize = InfoSize;
     return EFI_BUFFER_TOO_SMALL;
@@ -650,7 +650,7 @@ FvSimpleFileSystemRead (
       return EFI_SUCCESS;
     }
   } else {
-    FileSize = File->FvFileInfo->FileInfo.FileSize;
+    FileSize = (UINTN)File->FvFileInfo->FileInfo.FileSize;
 
     FileBuffer = AllocateZeroPool (FileSize);
     if (FileBuffer == NULL) {
@@ -663,7 +663,7 @@ FvSimpleFileSystemRead (
     }
 
     if (*BufferSize + File->Position > FileSize) {
-      *BufferSize = FileSize - File->Position;
+      *BufferSize = (UINTN)(FileSize - File->Position);
     }
 
     CopyMem (Buffer, (UINT8*)FileBuffer + File->Position, *BufferSize);
