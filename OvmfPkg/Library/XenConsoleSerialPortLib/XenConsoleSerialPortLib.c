@@ -40,6 +40,10 @@ SerialPortInitialize (
   VOID
   )
 {
+  if (! XenHypercallIsAvailable ()) {
+    return RETURN_NOT_FOUND;
+  }
+
   if (!mXenConsoleInterface) {
     mXenConsoleEventChain.port = (UINT32)XenHypercallHvmGetParam (HVM_PARAM_CONSOLE_EVTCHN);
     mXenConsoleInterface = (struct xencons_interface *)(UINTN)

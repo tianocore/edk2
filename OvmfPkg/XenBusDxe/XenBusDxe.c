@@ -165,6 +165,7 @@ XenBusDxeUnload (
   @param  SystemTable           A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_ABORTED           Xen hypercalls are not available.
   @retval Others                An unexpected error occurred.
 **/
 EFI_STATUS
@@ -175,6 +176,10 @@ XenBusDxeDriverEntryPoint (
   )
 {
   EFI_STATUS  Status;
+
+  if (! XenHypercallIsAvailable ()) {
+    return EFI_ABORTED;
+  }
 
   //
   // Install UEFI Driver Model protocol(s).
