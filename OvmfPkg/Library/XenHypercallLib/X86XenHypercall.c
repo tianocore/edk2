@@ -19,6 +19,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 STATIC VOID    *HyperPage;
 
+/**
+  Check if the Xen Hypercall library is able to make calls to the Xen
+  hypervisor.
+
+  Client code should call further functions in this library only if, and after,
+  this function returns TRUE.
+
+  @retval TRUE   Hypercalls are available.
+  @retval FALSE  Hypercalls are not available.
+**/
+BOOLEAN
+EFIAPI
+XenHypercallIsAvailable (
+  VOID
+  )
+{
+  return HyperPage != NULL;
+}
+
 //
 // Interface exposed by the ASM implementation of the core hypercall
 //

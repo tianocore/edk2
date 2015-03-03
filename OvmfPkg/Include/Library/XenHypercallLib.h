@@ -17,6 +17,22 @@
 #define __XEN_HYPERCALL_LIB_H__
 
 /**
+  Check if the Xen Hypercall library is able to make calls to the Xen
+  hypervisor.
+
+  Client code should call further functions in this library only if, and after,
+  this function returns TRUE.
+
+  @retval TRUE   Hypercalls are available.
+  @retval FALSE  Hypercalls are not available.
+**/
+BOOLEAN
+EFIAPI
+XenHypercallIsAvailable (
+  VOID
+  );
+
+/**
   This function will put the two arguments in the right place (registers) and
   invoke the hypercall identified by HypercallID.
 
