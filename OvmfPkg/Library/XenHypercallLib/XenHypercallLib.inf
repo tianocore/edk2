@@ -18,10 +18,10 @@
   FILE_GUID                      = B5EE9A32-CA5A-49A8-82E3-ADA4CCB77C7C
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = XenHypercallLibInit
 
 [Defines.IA32, Defines.X64]
   LIBRARY_CLASS                  = XenHypercallLib|DXE_DRIVER UEFI_DRIVER
-  CONSTRUCTOR                    = XenHypercallLibInit
 
 [Defines.ARM, Defines.AARCH64]
   LIBRARY_CLASS                  = XenHypercallLib
@@ -40,6 +40,9 @@
 
 [Sources.X64]
   X64/hypercall.nasm
+
+[Sources.ARM, Sources.AARCH64]
+  ArmXenHypercall.c
 
 [Sources.ARM]
   Arm/Hypercall.S
