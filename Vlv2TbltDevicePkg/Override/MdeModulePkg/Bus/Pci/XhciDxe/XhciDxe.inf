@@ -1,0 +1,76 @@
+## @file
+#  The XhciDxe driver is responsible for managing the behavior of XHCI controller.
+#  It implements the interfaces of monitoring the status of all ports and transferring
+#  Control, Bulk, Interrupt and Isochronous requests to those attached usb LS/FS/HS/SS devices.
+#
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XhciDxe
+  MODULE_UNI_FILE                = XhciDxe.uni
+  FILE_GUID                      = B7F50E91-A759-412c-ADE4-DCD03E7F7C28
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = XhcDriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gXhciDriverBinding
+#  COMPONENT_NAME                =  gXhciComponentName
+#  COMPONENT_NAME2               =  gXhciComponentName2
+#
+
+[Sources]
+  Xhci.c
+  XhciReg.c
+  XhciSched.c
+  UsbHcMem.c
+  UsbHcMem.h  
+  ComponentName.c
+  ComponentName.h
+  Xhci.h
+  XhciReg.h
+  XhciSched.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  ReportStatusCodeLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+
+[Protocols]
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiUsb2HcProtocolGuid                        ## BY_START
+
+# [Event]
+# EVENT_TYPE_PERIODIC_TIMER       ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  XhciDxeExtra.uni

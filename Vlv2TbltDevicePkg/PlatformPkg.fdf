@@ -642,7 +642,7 @@ INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+INF Vlv2TbltDevicePkg/Override/MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 !endif
 
   #
