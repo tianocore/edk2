@@ -499,6 +499,9 @@ FvSimpleFileSystemOpen (
   Instance = File->Instance;
 
   FileName = TrimFilePathToAbsolutePath (FileName);
+  if (FileName == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (FileName[0] == L'\\') {
     FileName++;
