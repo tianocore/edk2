@@ -752,6 +752,11 @@ PeimEntryMA (
     return EFI_UNSUPPORTED;
   }
 
+  if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
+    DEBUG ((EFI_D_ERROR, "TPM error!\n"));
+    return EFI_DEVICE_ERROR;
+  }
+
   //
   // Initialize TPM device
   //
@@ -808,6 +813,14 @@ PeimEntryMA (
   }
 
 Done:
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "TPM error! Build Hob\n"));
+    BuildGuidHob (&gTpmErrorHobGuid,0);
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (PcdGet32 (PcdStatusCodeSubClassTpmDevice) | EFI_P_EC_INTERFACE_ERROR)
+      );
+  }
   //
   // Always intall TpmInitializationDonePpi no matter success or fail.
   // Other driver can know TPM initialization state by TpmInitializedPpi.

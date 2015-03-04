@@ -192,6 +192,7 @@
 # [Error.gEfiSecurityPkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
 #   0x80000002 | Reserved bits must be set to zero.
+#   0x80000003 | Incorrect progress or error code provided.
 #
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
