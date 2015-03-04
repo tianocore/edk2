@@ -88,8 +88,206 @@ are permitted provided that the following conditions are met:
 **/
 """
 
+class CLogicalExpression:
+    def __init__(self):
+        self.index    = 0
+        self.string   = ''
+
+    def errExit(self, err = ''):
+        print "ERROR: Express parsing for:"
+        print "       %s" % self.string
+        print "       %s^" % (' ' * self.index)
+        if err:
+            print "INFO : %s" % err
+        raise SystemExit
+
+    def getNonNumber (self, n1, n2):
+        if not n1.isdigit():
+            return n1
+        if not n2.isdigit():
+            return n2
+        return None
+
+    def getCurr(self, lens = 1):
+        try:
+            if lens == -1:
+                return self.string[self.index :]
+            else:
+                if self.index + lens > len(self.string):
+                    lens = len(self.string) - self.index
+                return self.string[self.index : self.index + lens]
+        except Exception:
+            return ''
+
+    def isLast(self):
+        return self.index == len(self.string)
+
+    def moveNext(self, len = 1):
+        self.index += len
+
+    def skipSpace(self):
+        while not self.isLast():
+            if self.getCurr() in ' \t':
+                self.moveNext()
+            else:
+                return
+
+    def normNumber (self, val):
+        return True if val else False
+
+    def getNumber(self, var):
+        var = var.strip()
+        if   re.match('^0x[a-fA-F0-9]+$', var):
+            value = int(var, 16)
+        elif re.match('^[+-]?\d+$', var):
+            value = int(var, 10)
+        else:
+            value = None
+        return value
+
+    def parseValue(self):
+        self.skipSpace()
+        var = ''
+        while not self.isLast():
+            char = self.getCurr()
+            if re.match('^[\w.]', char):
+                var += char
+                self.moveNext()
+            else:
+                break
+        val = self.getNumber(var)
+        if val is None:
+            value = var
+        else:
+            value = "%d" % val
+        return value
+
+    def parseSingleOp(self):
+        self.skipSpace()
+        if re.match('^NOT\W', self.getCurr(-1)):
+            self.moveNext(3)
+            op  = self.parseBrace()
+            val = self.getNumber (op)
+            if val is None:
+                self.errExit ("'%s' is not a number" % op)
+            return "%d" % (not self.normNumber(int(op)))
+        else:
+            return self.parseValue()
+
+    def parseBrace(self):
+        self.skipSpace()
+        char = self.getCurr()
+        if char == '(':
+            self.moveNext()
+            value = self.parseExpr()
+            self.skipSpace()
+            if self.getCurr() != ')':
+                self.errExit ("Expecting closing brace or operator")
+            self.moveNext()
+            return value
+        else:
+            value = self.parseSingleOp()
+            return value
+
+    def parseCompare(self):
+        value = self.parseBrace()
+        while True:
+            self.skipSpace()
+            char = self.getCurr()
+            if char in ['<', '>']:
+                self.moveNext()
+                next = self.getCurr()
+                if next == '=':
+                    op = char + next
+                    self.moveNext()
+                else:
+                    op = char
+                result = self.parseBrace()
+                test = self.getNonNumber(result, value)
+                if test is None:
+                    value = "%d" % self.normNumber(eval (value + op + result))
+                else:
+                    self.errExit ("'%s' is not a valid number for comparision" % test)
+            elif char in ['=', '!']:
+                op = self.getCurr(2)
+                if op in ['==', '!=']:
+                    self.moveNext(2)
+                    result = self.parseBrace()
+                    test = self.getNonNumber(result, value)
+                    if test is None:
+                        value = "%d" % self.normNumber((eval (value + op + result)))
+                    else:
+                        value = "%d" % self.normNumber(eval ("'" + value + "'" + op + "'" + result + "'"))
+                else:
+                    break
+            else:
+                break
+        return value
+
+    def parseAnd(self):
+        value = self.parseCompare()
+        while True:
+            self.skipSpace()
+            if re.match('^AND\W', self.getCurr(-1)):
+                self.moveNext(3)
+                result = self.parseCompare()
+                test = self.getNonNumber(result, value)
+                if test is None:
+                    value = "%d" % self.normNumber(int(value) & int(result))
+                else:
+                    self.errExit ("'%s' is not a valid op number for AND" % test)
+            else:
+                break
+        return value
+
+    def parseOrXor(self):
+        value  = self.parseAnd()
+        op     = None
+        while True:
+            self.skipSpace()
+            op = None
+            if re.match('^XOR\W', self.getCurr(-1)):
+                self.moveNext(3)
+                op = '^'
+            elif re.match('^OR\W', self.getCurr(-1)):
+                self.moveNext(2)
+                op = '|'
+            else:
+                break
+            if op:
+                result = self.parseAnd()
+                test = self.getNonNumber(result, value)
+                if test is None:
+                    value = "%d" % self.normNumber(eval (value + op + result))
+                else:
+                    self.errExit ("'%s' is not a valid op number for XOR/OR" % test)
+        return value
+
+    def parseExpr(self):
+        return self.parseOrXor()
+
+    def getResult(self):
+        value = self.parseExpr()
+        self.skipSpace()
+        if not self.isLast():
+            self.errExit ("Unexpected character found '%s'" % self.getCurr())
+        test = self.getNumber(value)
+        if test is None:
+            self.errExit ("Result '%s' is not a number" % value)
+        return int(value)
+
+    def evaluateExpress (self, Expr):
+        self.index     = 0
+        self.string    = Expr
+        if self.getResult():
+            Result = True
+        else:
+            Result = False
+        return Result
+
 class CGenCfgOpt:
     def __init__(self):
+        self.Debug          = False
         self.Error          = ''
 
         self._GlobalDataDef = """
@@ -139,12 +337,71 @@ EndList
                     if Match:
                         self._MacroDict[Match.group(1)] = ''
         if len(self._MacroDict) == 0:
-            self.Error = "Invalid MACRO arguments"
             Error = 1
         else:
             Error = 0
+            if self.Debug:
+                print "INFO : Macro dictionary:"
+                for Each in self._MacroDict:
+                    print "       $(%s) = [ %s ]" % (Each , self._MacroDict[Each])
         return Error
 
+    def EvaulateIfdef   (self, Macro):
+        Result = Macro in self._MacroDict
+        if self.Debug:
+            print "INFO : Eval Ifdef [%s] : %s" % (Macro, Result)
+        return  Result
+
+    def ExpandMacros (self, Input):
+        Line = Input
+        Match = re.findall("\$\(\w+\)", Input)
+        if Match:
+            for Each in Match:
+              Variable = Each[2:-1]
+              if Variable in self._MacroDict:
+                  Line = Line.replace(Each, self._MacroDict[Variable])
+              else:
+                  if self.Debug:
+                      print "WARN : %s is not defined" % Each
+                  Line = Line.replace(Each, Each[2:-1])
+        return Line
+
+    def EvaluateExpress (self, Expr):
+        ExpExpr = self.ExpandMacros(Expr)
+        LogExpr = CLogicalExpression()
+        Result  = LogExpr.evaluateExpress (ExpExpr)
+        if self.Debug:
+            print "INFO : Eval Express [%s] : %s" % (Expr, Result)
+        return Result
+
+    def FormatListValue(self, ConfigDict):
+        Struct = ConfigDict['struct']
+        if Struct not in ['UINT8','UINT16','UINT32','UINT64']:
+            return
+
+        dataarray = []
+        binlist = ConfigDict['value'][1:-1].split(',')
+        for each in binlist:
+            each = each.strip()
+            if each.startswith('0x'):
+                value = int(each, 16)
+            else:
+                value = int(each)
+            dataarray.append(value)
+
+        unit = int(Struct[4:]) / 8
+        if int(ConfigDict['length']) != unit * len(dataarray):
+            raise Exception("Array size is not proper for '%s' !" % ConfigDict['cname'])
+
+        bytearray = []
+        for each in dataarray:
+            value = each
+            for loop in xrange(unit):
+                bytearray.append("0x%02X" % (value & 0xFF))
+                value = value >> 8
+        newvalue  = '{'  + ','.join(bytearray) + '}'
+        ConfigDict['value'] = newvalue
+        return ""
 
     def ParseDscFile (self, DscFile, FvDir):
         self._CfgItemList = []
@@ -158,20 +415,19 @@ EndList
         IsVpdSect       = False
         Found           = False
 
-        IfStack         = [True]
+        IfStack         = []
         ElifStack       = []
         Error           = 0
+        ConfigDict      = {}
 
         DscFd        = open(DscFile, "r")
         DscLines     = DscFd.readlines()
         DscFd.close()
 
-        ConfigDict      = {}
-
-        for DscLine in DscLines:
-            Handle     = False
-            DscLine = DscLine.strip()
-            Match = re.match("^\[(.+)\]", DscLine)
+        while len(DscLines):
+            DscLine  = DscLines.pop(0).strip()            
+            Handle   = False
+            Match    = re.match("^\[(.+)\]", DscLine)
             if Match is not None:
                 if  Match.group(1).lower() == "Defines".lower():
                     IsDefSect = True
@@ -210,66 +466,78 @@ EndList
                     IsVpdSect = False
             else:
                 if IsDefSect or IsUpdSect or IsVpdSect:
-                    if DscLine == "!else":
-                        IfStack[-1] = not IfStack[-1]
-                    elif DscLine == "!endif":
-                        IfStack.pop()
-                        Level = ElifStack.pop()
-                        while Level > 0:
+                    if re.match("^!else($|\s+#.+)", DscLine):
+                        if IfStack:
+                            IfStack[-1] = not IfStack[-1]
+                        else:
+                            print("ERROR: No paired '!if' found for '!else' for line '%s'" % DscLine)
+                            raise SystemExit
+                    elif re.match("^!endif($|\s+#.+)", DscLine):
+                        if IfStack:
                             IfStack.pop()
-                            Level = Level - 1
+                            Level = ElifStack.pop()
+                            if Level > 0:
+                                del IfStack[-Level:]
+                        else:
+                            print("ERROR: No paired '!if' found for '!endif' for line '%s'" % DscLine)
+                            raise SystemExit
                     else:
                         Result = False
-                        Match = re.match("!(ifdef|ifndef)\s+\$\((\w+)\)", DscLine)
-                        if Match is not None:
-                            if Match.group(2) in self._MacroDict:
-                                if Match.group(1) == 'ifdef':
-                                    Result = True
-                            else:
-                                if Match.group(1) == 'ifndef':
-                                    Result = True
-                            ElifStack.append(0)
+                        Match = re.match("!(ifdef|ifndef)\s+(.+)", DscLine)
+                        if Match:
+                            Result = self.EvaulateIfdef (Match.group(2))
+                            if Match.group(1) == 'ifndef':
+                                Result = not Result
                             IfStack.append(Result)
+                            ElifStack.append(0)
                         else:
-                            Match = re.match("!(if|elseif)\s+\$\\((\w+)\)\s*==\s*(\w+|\$\(\w+\))", DscLine)
-                            if Match is not None:
-                                if Match.group(2) in self._MacroDict:
-                                    MacroName = self._MacroDict[Match.group(2)]
-                                else:
-                                    MacroName = ''
-                                Value = Match.group(3)
-                                if Value.startswith('$'):
-                                    if Value[2:-1] in self._MacroDict:
-                                        Value = self._MacroDict[Value[2:-1]]
-                                    else:
-                                        Value = ''
-                                if MacroName == Value:
-                                    Result = True
+                            Match  = re.match("!(if|elseif)\s+(.+)", DscLine)
+                            if Match:
+                                Result = self.EvaluateExpress(Match.group(2))
                                 if Match.group(1) == "if":
                                     ElifStack.append(0)
                                     IfStack.append(Result)
                                 else:   #elseif
-                                    IfStack[-1] = not IfStack[-1]
-                                    IfStack.append(Result)
-                                    ElifStack[-1] = ElifStack[-1] + 1
+                                    if IfStack:
+                                        IfStack[-1] = not IfStack[-1]
+                                        IfStack.append(Result)
+                                        ElifStack[-1] = ElifStack[-1] + 1
+                                    else:
+                                        print("ERROR: No paired '!if' found for '!elif' for line '%s'" % DscLine)
+                                        raise SystemExit
                             else:
-                                if len(DscLine) > 0 and DscLine[0] == '!':
-                                    #
-                                    # Current it can only handle build switch.
-                                    # It does not support INF file in included dsc.
-                                    #
+                                if IfStack:
+                                    Handle = reduce(lambda x,y: x and y, IfStack)
                                 else:
-                                    if reduce(lambda x,y: x and y, IfStack):
-                                        Handle = True
-
+                                    Handle = True
+                                if Handle:
+                                    Match = re.match("!include\s+(.+)", DscLine)
+                                    if Match:
+                                        IncludeFilePath = Match.group(1)
+                                        IncludeFilePath = self.ExpandMacros(IncludeFilePath)
+                                        try:
+                                            IncludeDsc  = open(IncludeFilePath, "r")
+                                        except:
+                                            print("ERROR: Cannot open file '%s'" % IncludeFilePath)
+                                            raise SystemExit
+                                        NewDscLines = IncludeDsc.readlines()
+                                        IncludeDsc.close()
+                                        DscLines = NewDscLines + DscLines
+                                    else:
+                                        if DscLine.startswith('!'):
+                                            print("ERROR: Unrecoginized directive for line '%s'" % DscLine)
+                                            raise SystemExit
+                                        
             if not Handle:
                 continue
 
             if IsDefSect:
                 #DEFINE UPD_TOOL_GUID = 8C3D856A-9BE6-468E-850A-24F7A8D38E09
-                Match = re.match("^\s*(?:DEFINE\s+)*(\w+)\s*=\s*([-\w]+)", DscLine)
+                Match = re.match("^\s*(?:DEFINE\s+)*(\w+)\s*=\s*([-.\w]+)", DscLine)
                 if Match:
                     self._MacroDict[Match.group(1)] = Match.group(2)
+                    if self.Debug:
+                        print "INFO : DEFINE %s = [ %s ]" % (Match.group(1), Match.group(2))
             else:
                 Match = re.match("^\s*#\s+!(BSF|HDR)\s+(.+)", DscLine)
                 if Match:
@@ -338,7 +606,11 @@ EndList
                     if Match:
                         if Match.group(1) in self._MacroDict:
                             Value = self._MacroDict[Match.group(1)]
+
                     ConfigDict['value']  = Value
+                    if (len(Value) > 0)  and (Value[0] == '{'):
+                        Value = self.FormatListValue(ConfigDict)
+
                     if ConfigDict['name']  == '':
                         # Clear BSF specific items
                         ConfigDict['help']   = ''
@@ -502,26 +774,29 @@ EndList
         TxtFd.close()
         return 0
 
-    def CreateField (self, Name, Length, Offset, Struct):
+    def CreateField (self, Item, Name, Length, Offset, Struct):
         PosName    = 28
         PosComment = 30
 
         IsArray = False
-        if Length == 1:
-            Type = "UINT8"
-        elif Length == 2:
-            Type = "UINT16"
-        elif Length == 4:
-            Type = "UINT32"
-        elif Length == 8:
-            Type = "UINT64"
+        if Length in [1,2,4,8]:
+            Type = "UINT%d" % (Length * 8)
         else:
+            IsArray = True
+            Type = "UINT8"
+
+        if Item['value'].startswith('{'):
             Type = "UINT8"
             IsArray = True
 
         if Struct != '':
-            IsArray = False
             Type = Struct
+            if Struct in ['UINT8','UINT16','UINT32','UINT64']:
+                IsArray = True
+                Unit = int(Type[4:]) / 8
+                Length = Length / Unit
+            else:
+                IsArray = False
 
         if IsArray:
             Name = Name + '[%d]' % Length
@@ -644,12 +919,12 @@ EndList
                         NextVisible = True
                         Name = "Reserved" + Region[0] + "pdSpace%d" % ResvIdx
                         ResvIdx = ResvIdx + 1
-                        HeaderFd.write(self.CreateField (Name, Item["offset"] - ResvOffset, ResvOffset, ''))
+                        HeaderFd.write(self.CreateField (Item, Name, Item["offset"] - ResvOffset, ResvOffset, ''))
 
                 if  Offset < Item["offset"]:
                     if IsInternal or LastVisible:
                         Name = "Unused" + Region[0] + "pdSpace%d" % SpaceIdx
-                        LineBuffer.append(self.CreateField (Name, Item["offset"] - Offset, Offset, ''))
+                        LineBuffer.append(self.CreateField (Item, Name, Item["offset"] - Offset, Offset, ''))
                     SpaceIdx = SpaceIdx + 1
                     Offset   = Item["offset"]
 
@@ -665,7 +940,7 @@ EndList
                     for Each in LineBuffer:
                         HeaderFd.write (Each)
                     LineBuffer = []
-                    HeaderFd.write(self.CreateField (Item["cname"], Item["length"], Item["offset"], Item['struct']))
+                    HeaderFd.write(self.CreateField (Item, Item["cname"], Item["length"], Item["offset"], Item['struct']))
 
             HeaderFd.write("} " + Region[0] + "PD_DATA_REGION;\n\n")
         HeaderFd.write("#pragma pack()\n\n")
@@ -845,7 +1120,6 @@ def Main():
         if GenCfgOpt.ParseDscFile(DscFile, FvDir) != 0:
             print "ERROR: %s !" % GenCfgOpt.Error
             return 5
-
 
         if GenCfgOpt.UpdateVpdSizeField() != 0:
             print "ERROR: %s !" % GenCfgOpt.Error
