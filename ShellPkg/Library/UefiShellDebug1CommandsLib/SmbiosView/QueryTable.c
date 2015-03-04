@@ -2,7 +2,7 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2718,11 +2718,11 @@ TABLE_ITEM  CoolingDeviceTypeTable[] = {
     L" Integrated Refrigeration "
   },
   {
-    0x0A,
+    0x10,
     L" Active Cooling "
   },
   {
-    0x0B,
+    0x11,
     L" Passive Cooling "
   },
 };
