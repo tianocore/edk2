@@ -1815,16 +1815,17 @@ DriverEntry (
     return EFI_UNSUPPORTED;
   }
 
+  if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
+    DEBUG ((EFI_D_ERROR, "TPM2 error!\n"));
+    return EFI_DEVICE_ERROR;
+  }
+  
   Status = Tpm2RequestUseTpm ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TPM not detected!\n"));
+    DEBUG ((EFI_D_ERROR, "TPM2 not detected!\n"));
     return Status;
   }
   
-  if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
-    mTcgDxeData.BsCap.TrEEPresentFlag = FALSE;
-  }
-
   //
   // Fill information
   //
