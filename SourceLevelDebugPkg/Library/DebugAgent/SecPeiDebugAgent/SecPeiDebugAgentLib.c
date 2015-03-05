@@ -1,7 +1,7 @@
 /** @file
   SEC Core Debug Agent Library instance implementition.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,17 +14,17 @@
 
 #include "SecPeiDebugAgentLib.h"
 
-BOOLEAN  mSkipBreakpoint = FALSE;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN  mSkipBreakpoint = FALSE;
 
 
-EFI_PEI_VECTOR_HANDOFF_INFO_PPI mVectorHandoffInfoPpi = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_VECTOR_HANDOFF_INFO_PPI mVectorHandoffInfoPpi = {
   &mVectorHandoffInfoDebugAgent[0]
 };
 
 //
 // Ppis to be installed
 //
-EFI_PEI_PPI_DESCRIPTOR           mVectorHandoffInfoPpiList[] = { 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_PPI_DESCRIPTOR           mVectorHandoffInfoPpiList[] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiVectorHandoffInfoPpiGuid,
@@ -32,7 +32,7 @@ EFI_PEI_PPI_DESCRIPTOR           mVectorHandoffInfoPpiList[] = {
   }
 };
 
-EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList[1] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList[1] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiPeiMemoryDiscoveredPpiGuid,
@@ -98,7 +98,7 @@ DebugReadBreakSymbol (
       *BreakSymbol = *Data8;
       DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Debug Timer attach symbol received %x", *BreakSymbol);
       return EFI_SUCCESS;
-    } 
+    }
     if (*Data8 == DEBUG_STARTING_SYMBOL_NORMAL) {
       Status = ReadRemainingBreakPacket (Handle, &DebugHeader);
       if (Status == EFI_SUCCESS) {
@@ -111,7 +111,7 @@ DebugReadBreakSymbol (
       }
     }
   }
-  
+
   return EFI_NOT_FOUND;
 }
 
@@ -183,7 +183,7 @@ GetMailboxPointer (
   UINT64               *MailboxLocationInIdt;
   UINT64               *MailboxLocationInHob;
   DEBUG_AGENT_MAILBOX  *Mailbox;
-  
+
   //
   // Get mailbox from IDT entry firstly
   //
@@ -198,7 +198,7 @@ GetMailboxPointer (
     // If mailbox was setup in SEC or the current CPU arch is different from the init arch
     // Debug Agent initialized, return the mailbox from IDT entry directly.
     // Otherwise, we need to check the mailbox location saved in GUIDed HOB further.
-    // 
+    //
     return Mailbox;
   }
 
@@ -239,7 +239,7 @@ GetDebugPortHandle (
   )
 {
   DEBUG_AGENT_MAILBOX    *DebugAgentMailbox;
-  
+
   DebugAgentMailbox = GetMailboxPointer ();
 
   return (DEBUG_PORT_HANDLE) (UINTN)(DebugAgentMailbox->DebugPortHandle);
@@ -266,7 +266,7 @@ DebugAgentCallbackMemoryDiscoveredPpi (
   EFI_STATUS                     Status;
   DEBUG_AGENT_MAILBOX            *Mailbox;
   BOOLEAN                        InterruptStatus;
-  EFI_PHYSICAL_ADDRESS           Address; 
+  EFI_PHYSICAL_ADDRESS           Address;
   DEBUG_AGENT_MAILBOX            *NewMailbox;
   UINT64                         *MailboxLocationInHob;
 
@@ -320,7 +320,7 @@ DebugAgentCallbackMemoryDiscoveredPpi (
   // Restore interrupt state.
   //
   SetInterruptState (InterruptStatus);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -374,8 +374,8 @@ InitializeDebugAgent (
   UINT64                           DebugPortHandle;
   UINT64                           MailboxLocation;
   UINT64                           *MailboxLocationPointer;
-  EFI_PHYSICAL_ADDRESS             Address; 
-  
+  EFI_PHYSICAL_ADDRESS             Address;
+
   DisableInterrupts ();
 
   switch (InitFlag) {
@@ -591,7 +591,7 @@ InitializeDebugAgent (
 
   default:
     //
-    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this 
+    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this
     // Debug Agent library instance.
     //
     DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
@@ -659,7 +659,7 @@ InitializeDebugAgentPhase2 (
 
   if (Phase2Context->InitFlag == DEBUG_AGENT_INIT_PREMEM_SEC) {
     //
-    // If Temporary RAM region is below 128 MB, then send message to 
+    // If Temporary RAM region is below 128 MB, then send message to
     // host to disable low memory filtering.
     //
     SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Phase2Context->Context;

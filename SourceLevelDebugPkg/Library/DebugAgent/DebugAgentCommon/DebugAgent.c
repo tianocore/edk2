@@ -18,16 +18,16 @@
 #include "DebugAgent.h"
 #include "Ia32/DebugException.h"
 
-CHAR8 mErrorMsgVersionAlert[]       = "\rThe SourceLevelDebugPkg you are using requires a newer version of the Intel(R) UDK Debugger Tool.\r\n";
-CHAR8 mErrorMsgSendInitPacket[]     = "\rSend INIT break packet and try to connect the HOST (Intel(R) UDK Debugger Tool v1.4) ...\r\n";
-CHAR8 mErrorMsgConnectOK[]          = "HOST connection is successful!\r\n";
-CHAR8 mErrorMsgConnectFail[]        = "HOST connection is failed!\r\n";
-CHAR8 mWarningMsgIngoreBreakpoint[] = "Ignore break point in SMM for SMI issued during DXE debugging!\r\n";
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mErrorMsgVersionAlert[]       = "\rThe SourceLevelDebugPkg you are using requires a newer version of the Intel(R) UDK Debugger Tool.\r\n";
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mErrorMsgSendInitPacket[]     = "\rSend INIT break packet and try to connect the HOST (Intel(R) UDK Debugger Tool v1.4) ...\r\n";
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mErrorMsgConnectOK[]          = "HOST connection is successful!\r\n";
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mErrorMsgConnectFail[]        = "HOST connection is failed!\r\n";
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mWarningMsgIngoreBreakpoint[] = "Ignore break point in SMM for SMI issued during DXE debugging!\r\n";
 
 //
 // Vector Handoff Info list used by Debug Agent for persist
 //
-EFI_VECTOR_HANDOFF_INFO mVectorHandoffInfoDebugAgent[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_VECTOR_HANDOFF_INFO mVectorHandoffInfoDebugAgent[] = {
   {
     DEBUG_EXCEPT_DIVIDE_ERROR,         // Vector 0
     EFI_VECTOR_HANDOFF_HOOK_BEFORE,
@@ -130,7 +130,7 @@ EFI_VECTOR_HANDOFF_INFO mVectorHandoffInfoDebugAgent[] = {
   }
 };
 
-UINTN mVectorHandoffInfoCount = sizeof (mVectorHandoffInfoDebugAgent) / sizeof (EFI_VECTOR_HANDOFF_INFO);
+GLOBAL_REMOVE_IF_UNREFERENCED UINTN mVectorHandoffInfoCount = sizeof (mVectorHandoffInfoDebugAgent) / sizeof (EFI_VECTOR_HANDOFF_INFO);
 
 /**
   Calculate CRC16 for target data.
@@ -174,7 +174,7 @@ CalculateCrc16 (
   @retval  FALSE    IDT entries were not setup by Debug Agent.
 
 **/
-BOOLEAN 
+BOOLEAN
 IsDebugAgentInitialzed (
   VOID
   )
@@ -191,13 +191,13 @@ IsDebugAgentInitialzed (
 
 /**
   Find and report module image info to HOST.
-  
+
   @param[in] AlignSize      Image aligned size.
-  
+
 **/
-VOID 
+VOID
 FindAndReportModuleImageInfo (
-  IN UINTN          AlignSize                   
+  IN UINTN          AlignSize
   )
 {
   UINTN                                Pe32Data;
@@ -243,7 +243,7 @@ FindAndReportModuleImageInfo (
 
     //
     // Not found the image base, check the previous aligned address
-    // 
+    //
     Pe32Data -= AlignSize;
   }
 
@@ -303,7 +303,7 @@ UpdateMailboxChecksum (
   IN DEBUG_AGENT_MAILBOX    *Mailbox
   )
 {
-  Mailbox->CheckSum = CalculateCheckSum8 ((UINT8 *)Mailbox, sizeof (DEBUG_AGENT_MAILBOX) - 2);    
+  Mailbox->CheckSum = CalculateCheckSum8 ((UINT8 *)Mailbox, sizeof (DEBUG_AGENT_MAILBOX) - 2);
 }
 
 /**
@@ -314,16 +314,16 @@ UpdateMailboxChecksum (
   @param[in]  Mailbox  Debug Agent Mailbox pointer.
 
 **/
-VOID 
+VOID
 VerifyMailboxChecksum (
   IN DEBUG_AGENT_MAILBOX    *Mailbox
   )
 {
   UINT8                     CheckSum;
-  
+
   CheckSum = CalculateCheckSum8 ((UINT8 *) Mailbox, sizeof (DEBUG_AGENT_MAILBOX) - 2);
   //
-  // The checksum updating process may be disturbed by hardware SMI, we need to check CheckSum field 
+  // The checksum updating process may be disturbed by hardware SMI, we need to check CheckSum field
   // and ToBeCheckSum field to validate the mail box.
   //
   if (CheckSum != Mailbox->CheckSum && CheckSum != Mailbox->ToBeCheckSum) {
@@ -339,10 +339,10 @@ VerifyMailboxChecksum (
   @param[in]  Mailbox  Debug Agent Mailbox pointer.
   @param[in]  Index    Mailbox content index.
   @param[in]  Value    Value to be set into Mailbox.
-  
+
 **/
 VOID
-UpdateMailboxContent ( 
+UpdateMailboxContent (
   IN DEBUG_AGENT_MAILBOX    *Mailbox,
   IN UINTN                  Index,
   IN UINT64                 Value
@@ -351,7 +351,7 @@ UpdateMailboxContent (
   AcquireMpSpinLock (&mDebugMpContext.MailboxSpinLock);
   switch (Index) {
   case DEBUG_MAILBOX_DEBUG_FLAG_INDEX:
-    Mailbox->ToBeCheckSum = Mailbox->CheckSum + CalculateSum8 ((UINT8 *)&Mailbox->DebugFlag.Uint64, sizeof(UINT64)) 
+    Mailbox->ToBeCheckSum = Mailbox->CheckSum + CalculateSum8 ((UINT8 *)&Mailbox->DebugFlag.Uint64, sizeof(UINT64))
                                               - CalculateSum8 ((UINT8 *)&Value, sizeof(UINT64));
     Mailbox->DebugFlag.Uint64 = Value;
     break;
@@ -391,10 +391,10 @@ UpdateMailboxContent (
   @param[in]  FlagValue     Debug flag value.
 
 **/
-VOID 
+VOID
 SetDebugFlag (
   IN UINT64                 FlagMask,
-  IN UINT32                 FlagValue                          
+  IN UINT32                 FlagValue
   )
 {
   DEBUG_AGENT_MAILBOX    *Mailbox;
@@ -410,7 +410,7 @@ SetDebugFlag (
   Get debug flag in mailbox.
 
   @param[in]  FlagMask      Debug flag mask value.
-  
+
   @return Debug flag value.
 
 **/
@@ -438,12 +438,12 @@ GetDebugFlag (
 VOID
 SendDebugMsgPacket (
   IN CHAR8         *Buffer,
-  IN UINTN         Length         
+  IN UINTN         Length
   )
 {
   DEBUG_PACKET_HEADER  DebugHeader;
   DEBUG_PORT_HANDLE    Handle;
-  
+
   Handle = GetDebugPortHandle();
 
   DebugHeader.StartSymbol = DEBUG_STARTING_SYMBOL_NORMAL;
@@ -468,7 +468,7 @@ SendDebugMsgPacket (
 
   @param[in] ErrorLevel  The error level of the debug message.
   @param[in] Format      Format string for the debug message to print.
-  @param[in] ...         Variable argument list whose contents are accessed 
+  @param[in] ...         Variable argument list whose contents are accessed
                          based on the format string specified by Format.
 
 **/
@@ -503,15 +503,15 @@ DebugAgentMsgPrint (
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
 
-  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function 
-  GetDebugPrintErrorLevel (), then print the message specified by Format and the 
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and the
   associated variable argument list to the debug output device.
 
   If Format is NULL, then ASSERT().
 
   @param[in] ErrorLevel  The error level of the debug message.
   @param[in] IsSend      Flag of debug message to declare that the data is being sent or being received.
-  @param[in] Data        Variable argument list whose contents are accessed 
+  @param[in] Data        Variable argument list whose contents are accessed
   @param[in] Length      based on the format string specified by Format.
 
 **/
@@ -521,7 +521,7 @@ DebugAgentDataMsgPrint (
   IN UINT8             ErrorLevel,
   IN BOOLEAN           IsSend,
   IN UINT8             *Data,
-  IN UINT8             Length  
+  IN UINT8             Length
   )
 {
   CHAR8                Buffer[DEBUG_DATA_MAXIMUM_REAL_DATA];
@@ -546,7 +546,7 @@ DebugAgentDataMsgPrint (
   while (TRUE) {
     if (DestBuffer - Buffer > DEBUG_DATA_MAXIMUM_REAL_DATA - 6) {
       //
-      // If there was no enough space in buffer, send out the debug message, 
+      // If there was no enough space in buffer, send out the debug message,
       // reserving 6 bytes is for the last data and end characters "]\n".
       //
       SendDebugMsgPacket (Buffer, DestBuffer - Buffer);
@@ -608,7 +608,7 @@ ReadRemainingBreakPacket (
   if (((DebugHeader->Command & DEBUG_COMMAND_RESPONSE) == 0) &&
        (DebugHeader->SequenceNo == (UINT8) (Mailbox->HostSequenceNo + 1))) {
     //
-    // Only updagte HostSequenceNo for new command packet 
+    // Only updagte HostSequenceNo for new command packet
     //
     UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, DebugHeader->SequenceNo);
     return EFI_SUCCESS;
@@ -639,7 +639,7 @@ IsHostAttached (
   Set HOST connect flag in Mailbox.
 
   @param[in] Attached        Attach status.
-  
+
 **/
 VOID
 SetHostAttached (
@@ -654,14 +654,14 @@ SetHostAttached (
   Set debug setting of Debug Agent in Mailbox.
 
   @param DebugSetting         Pointer to Debug Setting defined by transfer protocol.
-  
+
   @retval RETURN_SUCCESS      The setting is set successfully.
   @retval RETURN_UNSUPPORTED  The Key value is not supported.
 
 **/
 RETURN_STATUS
 SetDebugSetting (
-  IN DEBUG_DATA_SET_DEBUG_SETTING  *DebugSetting               
+  IN DEBUG_DATA_SET_DEBUG_SETTING  *DebugSetting
   )
 {
   RETURN_STATUS                Status;
@@ -994,7 +994,7 @@ ReceivePacket (
   } else {
     TimeoutForStartSymbol = Timeout;
   }
-  
+
   DebugHeader = (DEBUG_PACKET_HEADER *) InputPacket;
   while (TRUE) {
     //
@@ -1189,13 +1189,13 @@ GetBreakCause (
 
       if (CpuContext->Dr3 == IO_PORT_BREAKPOINT_ADDRESS) {
 
-        Cause = (UINT8) ((CpuContext->Dr0 == IMAGE_LOAD_SIGNATURE) ? 
+        Cause = (UINT8) ((CpuContext->Dr0 == IMAGE_LOAD_SIGNATURE) ?
           DEBUG_DATA_BREAK_CAUSE_IMAGE_LOAD : DEBUG_DATA_BREAK_CAUSE_IMAGE_UNLOAD);
       }
       break;
 
     case SOFT_INTERRUPT_SIGNATURE:
-   
+
       if (CpuContext->Dr1 == MEMORY_READY_SIGNATURE) {
         Cause = DEBUG_DATA_BREAK_CAUSE_MEMORY_READY;
         CpuContext->Dr0 = 0;
@@ -1359,7 +1359,7 @@ ReadMemoryAndSendResponsePacket (
     DebugHeader->Crc = CalculateCrc16 ((UINT8 *) DebugHeader, DebugHeader->Length, 0);
 
     DebugAgentDataMsgPrint (DEBUG_AGENT_VERBOSE, TRUE, (UINT8 *) DebugHeader, DebugHeader->Length);
-    
+
     DebugPortWriteBuffer (Handle, (UINT8 *) DebugHeader, DebugHeader->Length);
 
     while (TRUE) {
@@ -1439,12 +1439,12 @@ SendBreakCausePacket (
 
 /**
   Try to attach the HOST.
-  
+
   Send init break packet to HOST:
-  If no acknowlege received in specified Timeout, return RETURN_TIMEOUT. 
-  If received acknowlege, check the revision of HOST. 
-  Set Attach Flag if attach successfully.  
-  
+  If no acknowlege received in specified Timeout, return RETURN_TIMEOUT.
+  If received acknowlege, check the revision of HOST.
+  Set Attach Flag if attach successfully.
+
   @param[in]  BreakCause     Break cause of this break event.
   @param[in]  Timeout        Time out value to wait for acknowlege from HOST.
                              The unit is microsecond.
@@ -1465,7 +1465,7 @@ AttachHost (
 
   IncompatibilityFlag = FALSE;
   Handle = GetDebugPortHandle();
-    
+
   //
   // Send init break and wait ack in Timeout
   //
@@ -1483,7 +1483,7 @@ AttachHost (
     DebugPortWriteBuffer (Handle, (UINT8 *) mErrorMsgVersionAlert, AsciiStrLen (mErrorMsgVersionAlert));
     CpuDeadLoop ();
   }
-  
+
   if (RETURN_ERROR (Status)) {
     DebugPortWriteBuffer (Handle, (UINT8 *) mErrorMsgConnectFail, AsciiStrLen (mErrorMsgConnectFail));
   } else {
@@ -1497,8 +1497,8 @@ AttachHost (
 }
 
 /**
-  Send Break point packet to HOST. 
-  
+  Send Break point packet to HOST.
+
   Only the first breaking processor could sent BREAK_POINT packet.
 
   @param[in]  BreakCause     Break cause of this break event.
@@ -1506,7 +1506,7 @@ AttachHost (
   @param[out] BreakReceived  If BreakReceived is not NULL,
                              TRUE is retured if break-in symbol received.
                              FALSE is retured if break-in symbol not received.
-                            
+
 **/
 VOID
 SendBreakPacketToHost (
@@ -1517,9 +1517,9 @@ SendBreakPacketToHost (
 {
   UINT8                 InputCharacter;
   DEBUG_PORT_HANDLE     Handle;
-  
+
   Handle = GetDebugPortHandle();
-  
+
   if (IsHostAttached ()) {
     DebugAgentMsgPrint (DEBUG_AGENT_INFO, "processor[%x]:Send Break Packet to HOST.\n", ProcessorIndex);
     SendCommandAndWaitForAckOK (DEBUG_COMMAND_BREAK_POINT, READ_PACKET_TIMEOUT, BreakReceived, NULL);
@@ -1530,17 +1530,17 @@ SendBreakPacketToHost (
     //
     //
     // Poll Attach symbols from HOST and ack OK
-    //  
+    //
     do {
       DebugPortReadBuffer (Handle, &InputCharacter, 1, 0);
     } while (InputCharacter != DEBUG_STARTING_SYMBOL_ATTACH);
     SendAckPacket (DEBUG_COMMAND_OK);
-    
+
     //
     // Try to attach HOST
     //
     while (AttachHost (BreakCause, 0, NULL) != RETURN_SUCCESS);
-   
+
   }
 }
 
@@ -1601,7 +1601,7 @@ CommandCommunication (
     SetCpuStopFlagByIndex (ProcessorIndex, TRUE);
     if (mDebugMpContext.ViewPointIndex == ProcessorIndex) {
       //
-      // Only the current view processor could set AgentInProgress Flag. 
+      // Only the current view processor could set AgentInProgress Flag.
       //
       IssuedViewPoint = ProcessorIndex;
     }
@@ -1612,7 +1612,7 @@ CommandCommunication (
     // Set AgentInProgress Flag.
     //
     SetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS, 1);
-  }  
+  }
 
   Handle = GetDebugPortHandle();
 
@@ -1666,7 +1666,7 @@ CommandCommunication (
       ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
       continue;
     }
-    
+
     //
     // Save CPU content before executing HOST commond
     //
@@ -1682,7 +1682,7 @@ CommandCommunication (
     }
 
     DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Processor[%x]:Received one command(%x)\n", mDebugMpContext.ViewPointIndex, DebugHeader->Command);
-    
+
     switch (DebugHeader->Command) {
 
     case DEBUG_COMMAND_HALT:
@@ -1724,7 +1724,7 @@ CommandCommunication (
       // Clear Stepping Flag
       //
       SetDebugFlag (DEBUG_AGENT_FLAG_STEPPING, 0);
-      
+
       if (!HaltDeferred) {
         //
         // If no HALT command received when being in-active mode
@@ -1733,7 +1733,7 @@ CommandCommunication (
           Data32 = FindNextPendingBreakCpu ();
           if (Data32 != -1) {
             //
-            // If there are still others processors being in break state,          
+            // If there are still others processors being in break state,
             // send OK packet to HOST to finish this go command
             //
             SendAckPacket (DEBUG_COMMAND_OK);
@@ -1763,7 +1763,7 @@ CommandCommunication (
           SetCpuRunningFlag (TRUE);
           CpuPause ();
           //
-          // Wait for all processors are in running state 
+          // Wait for all processors are in running state
           //
           while (TRUE) {
             if (IsAllCpuRunning ()) {
@@ -2019,7 +2019,7 @@ CommandCommunication (
     case DEBUG_COMMAND_CPUID:
       Cpuid = (DEBUG_DATA_CPUID *) (DebugHeader + 1);
       AsmCpuidEx (
-        Cpuid->Eax, Cpuid->Ecx, 
+        Cpuid->Eax, Cpuid->Ecx,
         &CpuidResponse.Eax, &CpuidResponse.Ebx,
         &CpuidResponse.Ecx, &CpuidResponse.Edx
         );
@@ -2028,7 +2028,7 @@ CommandCommunication (
 
    case DEBUG_COMMAND_SEARCH_SIGNATURE:
       SearchSignature = (DEBUG_DATA_SEARCH_SIGNATURE *) (DebugHeader + 1);
-      if ((SearchSignature->Alignment != 0) && 
+      if ((SearchSignature->Alignment != 0) &&
           (SearchSignature->Alignment == GetPowerOfTwo32 (SearchSignature->Alignment))
          ) {
         if (SearchSignature->Positive) {
@@ -2148,7 +2148,7 @@ InterruptProcess (
 
   if (MultiProcessorDebugSupport()) {
     //
-    // If RUN commmand is executing, wait for it done.  
+    // If RUN commmand is executing, wait for it done.
     //
     while (mDebugMpContext.RunCommandSet) {
       CpuPause ();
@@ -2207,7 +2207,7 @@ InterruptProcess (
       //
       // Continue to run the following common code
       //
-      
+
     case DEBUG_DATA_BREAK_CAUSE_HW_BREAKPOINT:
     case DEBUG_DATA_BREAK_CAUSE_SW_BREAKPOINT:
     default:
@@ -2217,12 +2217,12 @@ InterruptProcess (
       AcquireMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
       //
       // Only the first breaking processor could send BREAK_POINT to HOST
-      // 
+      //
       if (IsFirstBreakProcessor (ProcessorIndex)) {
         SendBreakPacketToHost (BreakCause, ProcessorIndex, &BreakReceived);
       }
       ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
-      
+
       if (Vector == DEBUG_INT3_VECTOR) {
         //
         // go back address located "0xCC"
@@ -2359,13 +2359,13 @@ InterruptProcess (
         AcquireMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
         //
         // Only the first breaking processor could send BREAK_POINT to HOST
-        // 
+        //
         if (IsFirstBreakProcessor (ProcessorIndex)) {
           SendBreakPacketToHost (BreakCause, ProcessorIndex, &BreakReceived);
         }
         ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
       }
-      
+
       CommandCommunication (Vector, CpuContext, BreakReceived);
     }
     break;

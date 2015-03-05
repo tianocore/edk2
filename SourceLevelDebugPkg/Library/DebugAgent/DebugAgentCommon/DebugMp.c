@@ -1,7 +1,7 @@
 /** @file
   Multi-Processor support functions implementation.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,9 +14,9 @@
 
 #include "DebugAgent.h"
 
-DEBUG_MP_CONTEXT volatile  mDebugMpContext = {0,0,0,{0},{0},0,0,0,0,FALSE,FALSE};
+GLOBAL_REMOVE_IF_UNREFERENCED DEBUG_MP_CONTEXT volatile  mDebugMpContext = {0,0,0,{0},{0},0,0,0,0,FALSE,FALSE};
 
-DEBUG_CPU_DATA volatile  mDebugCpuData = {0};
+GLOBAL_REMOVE_IF_UNREFERENCED DEBUG_CPU_DATA volatile  mDebugCpuData = {0};
 
 /**
   Acquire a spin lock when Multi-processor supported.
@@ -90,7 +90,7 @@ HaltOtherProcessors (
   // Send fixed IPI to other processors.
   //
   SendFixedIpiAllExcludingSelf (DEBUG_TIMER_VECTOR);
-  
+
 }
 
 /**
@@ -304,7 +304,7 @@ FindNextPendingBreakCpu (
   )
 {
   UINT32               Index;
-  
+
   for (Index = 0; Index < DEBUG_CPU_MAX_COUNT / 8; Index ++) {
     if (mDebugMpContext.CpuBreakMask[Index] != 0) {
       return  (UINT32) LowBitSet32 (mDebugMpContext.CpuBreakMask[Index]) + Index * 8;
@@ -312,7 +312,7 @@ FindNextPendingBreakCpu (
   }
   return (UINT32)-1;
 }
-  
+
 /**
   Check if all processors are in running status.
 
@@ -326,7 +326,7 @@ IsAllCpuRunning (
   )
 {
   UINTN              Index;
-  
+
   for (Index = 0; Index < DEBUG_CPU_MAX_COUNT / 8; Index ++) {
     if (mDebugMpContext.CpuStopStatusMask[Index] != 0) {
       return FALSE;
@@ -338,13 +338,13 @@ IsAllCpuRunning (
 /**
   Check if the current processor is the first breaking processor.
 
-  If yes, halt other processors.  
-  
+  If yes, halt other processors.
+
   @param[in] ProcessorIndex   Processor index value.
-  
+
   @return TRUE       This processor is the first breaking processor.
   @return FALSE      This processor is not the first breaking processor.
-                            
+
 **/
 BOOLEAN
 IsFirstBreakProcessor (
@@ -367,5 +367,5 @@ IsFirstBreakProcessor (
     }
   }
   return TRUE;
-} 
+}
 
