@@ -41,19 +41,24 @@ typedef struct {
   UINTN       Size;
 } POOL_TAIL;
 
-
-#define POOL_SHIFT  7
-
 #define POOL_OVERHEAD (SIZE_OF_POOL_HEAD + sizeof(POOL_TAIL))
 
 #define HEAD_TO_TAIL(a)   \
   ((POOL_TAIL *) (((CHAR8 *) (a)) + (a)->Size - sizeof(POOL_TAIL)));
 
+//
+// Each element is the sum of the 2 previous ones: this allows us to migrate
+// blocks between bins by splitting them up, while not wasting too much memory
+// as we would in a strict power-of-2 sequence
+//
+STATIC CONST UINT16 mPoolSizeTable[] = {
+  64, 128, 192, 320, 512, 832, 1344, 2176, 3520, 5696, 9216, 14912, 24128
+};
 
-#define SIZE_TO_LIST(a)   ((a) >> POOL_SHIFT)
-#define LIST_TO_SIZE(a)   ((a+1) << POOL_SHIFT)
+#define SIZE_TO_LIST(a)   (GetPoolIndexFromSize (a))
+#define LIST_TO_SIZE(a)   (mPoolSizeTable [a])
 
-#define MAX_POOL_LIST       SIZE_TO_LIST(DEFAULT_PAGE_ALLOCATION)
+#define MAX_POOL_LIST     (sizeof (mPoolSizeTable) / sizeof (mPoolSizeTable[0]))
 
 #define MAX_POOL_SIZE     (MAX_ADDRESS - POOL_OVERHEAD)
 
@@ -80,6 +85,21 @@ POOL            mPoolHead[EfiMaxMemoryType];
 //
 LIST_ENTRY      mPoolHeadList = INITIALIZE_LIST_HEAD_VARIABLE (mPoolHeadList);
 
+STATIC
+UINTN
+GetPoolIndexFromSize (
+  UINTN   Size
+  )
+{
+  UINTN   Index;
+
+  for (Index = 0; Index < MAX_POOL_LIST; Index++) {
+    if (mPoolSizeTable [Index] >= Size) {
+      return Index;
+    }
+  }
+  return MAX_POOL_LIST;
+}
 
 /**
   Called to initialize the pool.
@@ -311,7 +331,7 @@ CoreAllocatePoolI (
   // If allocation is over max size, just allocate pages for the request
   // (slow)
   //
-  if (Index >= MAX_POOL_LIST) {
+  if (Index >= SIZE_TO_LIST (Granularity)) {
     NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
     NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
     Head = CoreAllocatePoolPages (PoolType, NoPages, Granularity);
@@ -539,7 +559,7 @@ CoreFreePoolI (
   //
   // If it's not on the list, it must be pool pages
   //
-  if (Index >= MAX_POOL_LIST) {
+  if (Index >= SIZE_TO_LIST (Granularity)) {
 
     //
     // Return the memory pages back to free memory
