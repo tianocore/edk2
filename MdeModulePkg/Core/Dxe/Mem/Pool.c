@@ -274,8 +274,19 @@ CoreAllocatePoolI (
   UINTN       FSize;
   UINTN       Offset;
   UINTN       NoPages;
+  UINTN       Granularity;
 
   ASSERT_LOCKED (&gMemoryLock);
+
+  if  (PoolType == EfiACPIReclaimMemory   ||
+       PoolType == EfiACPIMemoryNVS       ||
+       PoolType == EfiRuntimeServicesCode ||
+       PoolType == EfiRuntimeServicesData) {
+
+    Granularity = EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT;
+  } else {
+    Granularity = DEFAULT_PAGE_ALLOCATION;
+  }
 
   //
   // Adjust the size by the pool header & tail overhead
@@ -301,9 +312,9 @@ CoreAllocatePoolI (
   // (slow)
   //
   if (Index >= MAX_POOL_LIST) {
-    NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1;
-    NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1);
-    Head = CoreAllocatePoolPages (PoolType, NoPages, DEFAULT_PAGE_ALLOCATION);
+    NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
+    NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
+    Head = CoreAllocatePoolPages (PoolType, NoPages, Granularity);
     goto Done;
   }
 
@@ -315,7 +326,7 @@ CoreAllocatePoolI (
     //
     // Get another page
     //
-    NewPage = CoreAllocatePoolPages(PoolType, EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION), DEFAULT_PAGE_ALLOCATION);
+    NewPage = CoreAllocatePoolPages(PoolType, EFI_SIZE_TO_PAGES (Granularity), Granularity);
     if (NewPage == NULL) {
       goto Done;
     }
@@ -324,11 +335,11 @@ CoreAllocatePoolI (
     // Carve up new page into free pool blocks
     //
     Offset = 0;
-    while (Offset < DEFAULT_PAGE_ALLOCATION) {
+    while (Offset < Granularity) {
       ASSERT (Index < MAX_POOL_LIST);
       FSize = LIST_TO_SIZE(Index);
 
-      while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
+      while (Offset + FSize <= Granularity) {
         Free = (POOL_FREE *) &NewPage[Offset];
         Free->Signature = POOL_FREE_SIGNATURE;
         Free->Index     = (UINT32)Index;
@@ -339,7 +350,7 @@ CoreAllocatePoolI (
       Index -= 1;
     }
 
-    ASSERT (Offset == DEFAULT_PAGE_ALLOCATION);
+    ASSERT (Offset == Granularity);
     Index = SIZE_TO_LIST(Size);
   }
 
@@ -467,6 +478,7 @@ CoreFreePoolI (
   UINTN       FSize;
   UINTN       Offset;
   BOOLEAN     AllFree;
+  UINTN       Granularity;
 
   ASSERT(Buffer != NULL);
   //
@@ -508,6 +520,16 @@ CoreFreePoolI (
   Pool->Used -= Size;
   DEBUG ((DEBUG_POOL, "FreePool: %p (len %lx) %,ld\n", Head->Data, (UINT64)(Head->Size - POOL_OVERHEAD), (UINT64) Pool->Used));
 
+  if  (Head->Type == EfiACPIReclaimMemory   ||
+       Head->Type == EfiACPIMemoryNVS       ||
+       Head->Type == EfiRuntimeServicesCode ||
+       Head->Type == EfiRuntimeServicesData) {
+
+    Granularity = EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT;
+  } else {
+    Granularity = DEFAULT_PAGE_ALLOCATION;
+  }
+
   //
   // Determine the pool list
   //
@@ -522,8 +544,8 @@ CoreFreePoolI (
     //
     // Return the memory pages back to free memory
     //
-    NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1;
-    NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1);
+    NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
+    NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
     CoreFreePoolPages ((EFI_PHYSICAL_ADDRESS) (UINTN) Head, NoPages);
 
   } else {
@@ -541,7 +563,7 @@ CoreFreePoolI (
     // See if all the pool entries in the same page as Free are freed pool
     // entries
     //
-    NewPage = (CHAR8 *)((UINTN)Free & ~((DEFAULT_PAGE_ALLOCATION) -1));
+    NewPage = (CHAR8 *)((UINTN)Free & ~(Granularity - 1));
     Free = (POOL_FREE *) &NewPage[0];
     ASSERT(Free != NULL);
 
@@ -552,9 +574,9 @@ CoreFreePoolI (
       AllFree = TRUE;
       Offset = 0;
 
-      while ((Offset < DEFAULT_PAGE_ALLOCATION) && (AllFree)) {
+      while ((Offset < Granularity) && (AllFree)) {
         FSize = LIST_TO_SIZE(Index);
-        while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
+        while (Offset + FSize <= Granularity) {
           Free = (POOL_FREE *) &NewPage[Offset];
           ASSERT(Free != NULL);
           if (Free->Signature != POOL_FREE_SIGNATURE) {
@@ -577,9 +599,9 @@ CoreFreePoolI (
         Index = Free->Index;
         Offset = 0;
 
-        while (Offset < DEFAULT_PAGE_ALLOCATION) {
+        while (Offset < Granularity) {
           FSize = LIST_TO_SIZE(Index);
-          while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
+          while (Offset + FSize <= Granularity) {
             Free = (POOL_FREE *) &NewPage[Offset];
             ASSERT(Free != NULL);
             RemoveEntryList (&Free->Link);
@@ -591,7 +613,7 @@ CoreFreePoolI (
         //
         // Free the page
         //
-        CoreFreePoolPages ((EFI_PHYSICAL_ADDRESS) (UINTN)NewPage, EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION));
+        CoreFreePoolPages ((EFI_PHYSICAL_ADDRESS) (UINTN)NewPage, EFI_SIZE_TO_PAGES (Granularity));
       }
     }
   }
