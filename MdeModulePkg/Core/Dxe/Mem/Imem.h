@@ -22,6 +22,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT  (EFI_PAGE_SIZE * 2)
 #define DEFAULT_PAGE_ALLOCATION                     (EFI_PAGE_SIZE * 2)
 
+#elif defined (MDE_CPU_AARCH64)
+///
+/// 64-bit ARM systems allow the OS to execute with 64 KB page size,
+/// so for improved interoperability with the firmware, align the
+/// runtime regions to 64 KB as well
+///
+#define EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT  (SIZE_64KB)
+#define DEFAULT_PAGE_ALLOCATION                     (EFI_PAGE_SIZE)
+
 #else
 ///
 /// For genric EFI machines make the default allocations 4K aligned
