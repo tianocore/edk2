@@ -292,7 +292,7 @@ CoreAllocatePoolI (
   VOID        *Buffer;
   UINTN       Index;
   UINTN       FSize;
-  UINTN       Offset;
+  UINTN       Offset, MaxOffset;
   UINTN       NoPages;
   UINTN       Granularity;
 
@@ -343,6 +343,22 @@ CoreAllocatePoolI (
   //
   if (IsListEmpty (&Pool->FreeList[Index])) {
 
+    Offset = LIST_TO_SIZE (Index);
+    MaxOffset = Granularity;
+
+    //
+    // Check the bins holding larger blocks, and carve one up if needed
+    //
+    while (++Index < SIZE_TO_LIST (Granularity)) {
+      if (!IsListEmpty (&Pool->FreeList[Index])) {
+        Free = CR (Pool->FreeList[Index].ForwardLink, POOL_FREE, Link, POOL_FREE_SIGNATURE);
+        RemoveEntryList (&Free->Link);
+        NewPage = (VOID *) Free;
+        MaxOffset = LIST_TO_SIZE (Index);
+        goto Carve;
+      }
+    }
+
     //
     // Get another page
     //
@@ -354,29 +370,28 @@ CoreAllocatePoolI (
     //
     // Serve the allocation request from the head of the allocated block
     //
+Carve:
     Head = (POOL_HEAD *) NewPage;
-    Offset = LIST_TO_SIZE (Index);
 
     //
     // Carve up remaining space into free pool blocks
     //
-    Index = SIZE_TO_LIST (Granularity) - 1;
-    while (Offset < Granularity) {
+    Index--;
+    while (Offset < MaxOffset) {
       ASSERT (Index < MAX_POOL_LIST);
       FSize = LIST_TO_SIZE(Index);
 
-      while (Offset + FSize <= Granularity) {
+      while (Offset + FSize <= MaxOffset) {
         Free = (POOL_FREE *) &NewPage[Offset];
         Free->Signature = POOL_FREE_SIGNATURE;
         Free->Index     = (UINT32)Index;
         InsertHeadList (&Pool->FreeList[Index], &Free->Link);
         Offset += FSize;
       }
-
       Index -= 1;
     }
 
-    ASSERT (Offset == Granularity);
+    ASSERT (Offset == MaxOffset);
     goto Done;
   }
 
