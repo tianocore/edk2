@@ -352,9 +352,15 @@ CoreAllocatePoolI (
     }
 
     //
-    // Carve up new page into free pool blocks
+    // Serve the allocation request from the head of the allocated block
     //
-    Offset = 0;
+    Head = (POOL_HEAD *) NewPage;
+    Offset = LIST_TO_SIZE (Index);
+
+    //
+    // Carve up remaining space into free pool blocks
+    //
+    Index = SIZE_TO_LIST (Granularity) - 1;
     while (Offset < Granularity) {
       ASSERT (Index < MAX_POOL_LIST);
       FSize = LIST_TO_SIZE(Index);
@@ -371,7 +377,7 @@ CoreAllocatePoolI (
     }
 
     ASSERT (Offset == Granularity);
-    Index = SIZE_TO_LIST(Size);
+    goto Done;
   }
 
   //
