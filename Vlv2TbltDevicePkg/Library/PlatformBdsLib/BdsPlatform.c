@@ -41,6 +41,9 @@ Abstract:
 #include <Library/SerialPortLib.h>
 #include <Library/DebugLib.h>
 
+#include <Library/GenericBdsLib/InternalBdsLib.h>
+#include <Library/GenericBdsLib/String.h>
+#include <Library/NetLib.h>
 
 EFI_GUID *ConnectDriverTable[] = {
   &gEfiMmioDeviceProtocolGuid,
@@ -983,6 +986,549 @@ PlatformBdsDiagnostics (
 
 
 /**
+  For EFI boot option, BDS separate them as six types:
+  1. Network - The boot option points to the SimpleNetworkProtocol device.
+               Bds will try to automatically create this type boot option when enumerate.
+  2. Shell   - The boot option points to internal flash shell.
+               Bds will try to automatically create this type boot option when enumerate.
+  3. Removable BlockIo      - The boot option only points to the removable media
+                              device, like USB flash disk, DVD, Floppy etc.
+                              These device should contain a *removable* blockIo
+                              protocol in their device handle.
+                              Bds will try to automatically create this type boot option
+                              when enumerate.
+  4. Fixed BlockIo          - The boot option only points to a Fixed blockIo device,
+                              like HardDisk.
+                              These device should contain a *fixed* blockIo
+                              protocol in their device handle.
+                              BDS will skip fixed blockIo devices, and NOT
+                              automatically create boot option for them. But BDS
+                              will help to delete those fixed blockIo boot option,
+                              whose description rule conflict with other auto-created
+                              boot options.
+  5. Non-BlockIo Simplefile - The boot option points to a device whose handle
+                              has SimpleFileSystem Protocol, but has no blockio
+                              protocol. These devices do not offer blockIo
+                              protocol, but BDS still can get the
+                              \EFI\BOOT\boot{machinename}.EFI by SimpleFileSystem
+                              Protocol.
+  6. File    - The boot option points to a file. These boot options are usually
+               created by user manually or OS loader. BDS will not delete or modify
+               these boot options.
+
+  This function will enumerate all possible boot device in the system, and
+  automatically create boot options for Network, Shell, Removable BlockIo,
+  and Non-BlockIo Simplefile devices.
+  It will only execute once of every boot.
+
+  @param  BdsBootOptionList      The header of the link list which indexed all
+                                 current boot options
+
+  @retval EFI_SUCCESS            Finished all the boot device enumerate and create
+                                 the boot option base on that boot device
+
+  @retval EFI_OUT_OF_RESOURCES   Failed to enumerate the boot device and create the boot option list
+**/
+EFI_STATUS
+EFIAPI
+PlatformBdsLibEnumerateAllBootOption (
+  IN OUT LIST_ENTRY          *BdsBootOptionList
+  )
+{
+  EFI_STATUS                    Status;
+  UINT16                        FloppyNumber;
+  UINT16                        HarddriveNumber;
+  UINT16                        CdromNumber;
+  UINT16                        UsbNumber;
+  UINT16                        MiscNumber;
+  UINT16                        ScsiNumber;
+  UINT16                        NonBlockNumber;
+  UINTN                         NumberBlockIoHandles;
+  EFI_HANDLE                    *BlockIoHandles;
+  EFI_BLOCK_IO_PROTOCOL         *BlkIo;
+  BOOLEAN                       Removable[2];
+  UINTN                         RemovableIndex;
+  UINTN                         Index;
+  UINTN                         NumOfLoadFileHandles;
+  EFI_HANDLE                    *LoadFileHandles;
+  UINTN                         FvHandleCount;
+  EFI_HANDLE                    *FvHandleBuffer;
+  EFI_FV_FILETYPE               Type;
+  UINTN                         Size;
+  EFI_FV_FILE_ATTRIBUTES        Attributes;
+  UINT32                        AuthenticationStatus;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  UINTN                         DevicePathType;
+  CHAR16                        Buffer[40];
+  EFI_HANDLE                    *FileSystemHandles;
+  UINTN                         NumberFileSystemHandles;
+  BOOLEAN                       NeedDelete;
+  EFI_IMAGE_DOS_HEADER          DosHeader;
+  CHAR8                         *PlatLang;
+  CHAR8                         *LastLang;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION       HdrData;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
+  CHAR16                        *MacStr;
+  CHAR16                        *IPverStr;
+  EFI_HANDLE                    *NetworkHandles;
+  UINTN                         BufferSize;
+
+  FloppyNumber    = 0;
+  HarddriveNumber = 0;
+  CdromNumber     = 0;
+  UsbNumber       = 0;
+  MiscNumber      = 0;
+  ScsiNumber      = 0;
+  PlatLang        = NULL;
+  LastLang        = NULL;
+  ZeroMem (Buffer, sizeof (Buffer));
+
+  //
+  // If the boot device enumerate happened, just get the boot
+  // device from the boot order variable
+  //
+  if (mEnumBootDevice) {
+    GetVariable2 (LAST_ENUM_LANGUAGE_VARIABLE_NAME, &gLastEnumLangGuid, (VOID**)&LastLang, NULL);
+    GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatLang, NULL);
+    ASSERT (PlatLang != NULL);
+    if ((LastLang != NULL) && (AsciiStrCmp (LastLang, PlatLang) == 0)) {
+      Status = BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");
+      FreePool (LastLang);
+      FreePool (PlatLang);
+      return Status;
+    } else {
+      Status = gRT->SetVariable (
+        LAST_ENUM_LANGUAGE_VARIABLE_NAME,
+        &gLastEnumLangGuid,
+        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+        AsciiStrSize (PlatLang),
+        PlatLang
+        );
+      //
+      // Failure to set the variable only impacts the performance next time enumerating the boot options.
+      //
+
+      if (LastLang != NULL) {
+        FreePool (LastLang);
+      }
+      FreePool (PlatLang);
+    }
+  }
+
+  //
+  // Notes: this dirty code is to get the legacy boot option from the
+  // BBS table and create to variable as the EFI boot option, it should
+  // be removed after the CSM can provide legacy boot option directly
+  //
+  REFRESH_LEGACY_BOOT_OPTIONS;
+
+  //
+  // Delete invalid boot option
+  //
+  BdsDeleteAllInvalidEfiBootOption ();
+
+  //
+  // Parse removable media followed by fixed media.
+  // The Removable[] array is used by the for-loop below to create removable media boot options 
+  // at first, and then to create fixed media boot options.
+  //
+  Removable[0]  = FALSE;
+  Removable[1]  = TRUE;
+
+  gBS->LocateHandleBuffer (
+        ByProtocol,
+        &gEfiBlockIoProtocolGuid,
+        NULL,
+        &NumberBlockIoHandles,
+        &BlockIoHandles
+        );
+
+  for (RemovableIndex = 0; RemovableIndex < 2; RemovableIndex++) {
+    for (Index = 0; Index < NumberBlockIoHandles; Index++) {
+      Status = gBS->HandleProtocol (
+                      BlockIoHandles[Index],
+                      &gEfiBlockIoProtocolGuid,
+                      (VOID **) &BlkIo
+                      );
+      //
+      // skip the logical partition
+      //
+      if (EFI_ERROR (Status) || BlkIo->Media->LogicalPartition) {
+        continue;
+      }
+
+      //
+      // firstly fixed block io then the removable block io
+      //
+      if (BlkIo->Media->RemovableMedia == Removable[RemovableIndex]) {
+        continue;
+      }
+      DevicePath  = DevicePathFromHandle (BlockIoHandles[Index]);
+      DevicePathType = BdsGetBootTypeFromDevicePath (DevicePath);
+
+      switch (DevicePathType) {
+      case BDS_EFI_ACPI_FLOPPY_BOOT:
+        if (FloppyNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY)), FloppyNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        FloppyNumber++;
+        break;
+
+      //
+      // Assume a removable SATA device should be the DVD/CD device, a fixed SATA device should be the Hard Drive device.
+      //
+      case BDS_EFI_MESSAGE_ATAPI_BOOT:
+      case BDS_EFI_MESSAGE_SATA_BOOT:
+        if (BlkIo->Media->RemovableMedia) {
+          if (CdromNumber != 0) {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)), CdromNumber);
+          } else {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_CD_DVD)));
+          }
+          CdromNumber++;
+        } else {
+          if (HarddriveNumber != 0) {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_HARDDRIVE)), HarddriveNumber);
+          } else {
+            UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_HARDDRIVE)));
+          }
+          HarddriveNumber++;
+        }
+        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Buffer: %S\n", Buffer));
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        break;
+
+      case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
+        if (UsbNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_USB)), UsbNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_USB)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        UsbNumber++;
+        break;
+
+      case BDS_EFI_MESSAGE_SCSI_BOOT:
+        if (ScsiNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI)), ScsiNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        ScsiNumber++;
+        break;
+
+      case BDS_EFI_MESSAGE_MISC_BOOT:
+      default:
+        if (MiscNumber != 0) {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC)), MiscNumber);
+        } else {
+          UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC)));
+        }
+        BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+        MiscNumber++;
+        break;
+      }
+    }
+  }
+
+  if (NumberBlockIoHandles != 0) {
+    FreePool (BlockIoHandles);
+  }
+
+  //
+  // If there is simple file protocol which does not consume block Io protocol, create a boot option for it here.
+  //
+  NonBlockNumber = 0;
+  gBS->LocateHandleBuffer (
+        ByProtocol,
+        &gEfiSimpleFileSystemProtocolGuid,
+        NULL,
+        &NumberFileSystemHandles,
+        &FileSystemHandles
+        );
+  for (Index = 0; Index < NumberFileSystemHandles; Index++) {
+    Status = gBS->HandleProtocol (
+                    FileSystemHandles[Index],
+                    &gEfiBlockIoProtocolGuid,
+                    (VOID **) &BlkIo
+                    );
+     if (!EFI_ERROR (Status)) {
+      //
+      //  Skip if the file system handle supports a BlkIo protocol,
+      //
+      continue;
+    }
+
+    //
+    // Do the removable Media thing. \EFI\BOOT\boot{machinename}.EFI
+    //  machinename is ia32, ia64, x64, ...
+    //
+    Hdr.Union  = &HdrData;
+    NeedDelete = TRUE;
+    Status     = BdsLibGetImageHeader (
+                   FileSystemHandles[Index],
+                   EFI_REMOVABLE_MEDIA_FILE_NAME,
+                   &DosHeader,
+                   Hdr
+                   );
+    if (!EFI_ERROR (Status) &&
+        EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Hdr.Pe32->FileHeader.Machine) &&
+        Hdr.Pe32->OptionalHeader.Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
+      NeedDelete = FALSE;
+    }
+
+    if (NeedDelete) {
+      //
+      // No such file or the file is not a EFI application, delete this boot option
+      //
+      BdsLibDeleteOptionFromHandle (FileSystemHandles[Index]);
+    } else {
+      if (NonBlockNumber != 0) {
+        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s %d", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_NON_BLOCK)), NonBlockNumber);
+      } else {
+        UnicodeSPrint (Buffer, sizeof (Buffer), L"%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_NON_BLOCK)));
+      }
+      BdsLibBuildOptionFromHandle (FileSystemHandles[Index], BdsBootOptionList, Buffer);
+      NonBlockNumber++;
+    }
+  }
+
+  if (NumberFileSystemHandles != 0) {
+    FreePool (FileSystemHandles);
+  }
+
+  //
+  // Check if we have on flash shell
+  //
+  gBS->LocateHandleBuffer (
+        ByProtocol,
+        &gEfiFirmwareVolume2ProtocolGuid,
+        NULL,
+        &FvHandleCount,
+        &FvHandleBuffer
+        );
+  for (Index = 0; Index < FvHandleCount; Index++) {
+    gBS->HandleProtocol (
+          FvHandleBuffer[Index],
+          &gEfiFirmwareVolume2ProtocolGuid,
+          (VOID **) &Fv
+          );
+
+    Status = Fv->ReadFile (
+                  Fv,
+                  PcdGetPtr(PcdShellFile),
+                  NULL,
+                  &Size,
+                  &Type,
+                  &Attributes,
+                  &AuthenticationStatus
+                  );
+    if (EFI_ERROR (Status)) {
+      //
+      // Skip if no shell file in the FV
+      //
+      continue;
+    }
+    //
+    // Build the shell boot option
+    //
+    BdsLibBuildOptionFromShell (FvHandleBuffer[Index], BdsBootOptionList);
+  }
+
+  if (FvHandleCount != 0) {
+    FreePool (FvHandleBuffer);
+  }
+
+  //
+  // Parse Network Boot Device
+  //
+  NumOfLoadFileHandles = 0;
+  //
+  // Search Load File protocol for PXE boot option.
+  //
+  gBS->LocateHandleBuffer (
+        ByProtocol,
+        &gEfiLoadFileProtocolGuid,
+        NULL,
+        &NumOfLoadFileHandles,
+        &LoadFileHandles
+        );
+
+  for (Index = 0; Index < NumOfLoadFileHandles; Index++) {
+
+//
+//Locate EFI_DEVICE_PATH_PROTOCOL to dynamically get IPv4/IPv6 protocol information.
+//
+
+ Status = gBS->HandleProtocol (
+                  LoadFileHandles[Index],
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &DevicePath
+                  );
+  
+ ASSERT_EFI_ERROR (Status);
+
+  while (!IsDevicePathEnd (DevicePath)) {
+    if ((DevicePath->Type == MESSAGING_DEVICE_PATH) &&
+        (DevicePath->SubType == MSG_IPv4_DP)) {
+
+  //
+  //Get handle infomation
+  //
+  BufferSize = 0;
+  NetworkHandles = NULL;
+  Status = gBS->LocateHandle (
+                  ByProtocol, 
+                  &gEfiSimpleNetworkProtocolGuid,
+                  NULL,
+                  &BufferSize,
+                  NetworkHandles
+                  );
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    NetworkHandles = AllocateZeroPool(BufferSize);
+    if (NetworkHandles == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
+    Status = gBS->LocateHandle(
+                    ByProtocol,
+                    &gEfiSimpleNetworkProtocolGuid,
+                    NULL,
+                    &BufferSize,
+                    NetworkHandles
+                    );
+ }
+               
+  //
+  //Get the MAC string
+  //
+  Status = NetLibGetMacString (
+             *NetworkHandles,
+             NULL,
+             &MacStr
+             );
+  if (EFI_ERROR (Status)) {	
+    return Status;
+  }
+  IPverStr = L" IPv4";
+  UnicodeSPrint (Buffer, sizeof (Buffer), L"%s%s%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK)),MacStr,IPverStr);
+  break;
+  }
+    if((DevicePath->Type == MESSAGING_DEVICE_PATH) &&
+        (DevicePath->SubType == MSG_IPv6_DP)) {
+
+  //
+  //Get handle infomation
+  //
+  BufferSize = 0;
+  NetworkHandles = NULL;
+  Status = gBS->LocateHandle (
+                  ByProtocol, 
+                  &gEfiSimpleNetworkProtocolGuid,
+                  NULL,
+                  &BufferSize,
+                  NetworkHandles
+                  );
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    NetworkHandles = AllocateZeroPool(BufferSize);
+    if (NetworkHandles == NULL) {
+       return (EFI_OUT_OF_RESOURCES);
+    }
+    Status = gBS->LocateHandle(
+                    ByProtocol,
+                    &gEfiSimpleNetworkProtocolGuid,
+                    NULL,
+                    &BufferSize,
+                    NetworkHandles
+                    );
+ }
+                    
+  //
+  //Get the MAC string
+  //
+  Status = NetLibGetMacString (
+             *NetworkHandles,
+             NULL,
+             &MacStr
+             );
+  if (EFI_ERROR (Status)) {	
+    return Status;
+  }
+      IPverStr = L" IPv6";
+      UnicodeSPrint (Buffer, sizeof (Buffer), L"%s%s%s", BdsLibGetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK)),MacStr,IPverStr);
+      break;
+    }
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+  
+    BdsLibBuildOptionFromHandle (LoadFileHandles[Index], BdsBootOptionList, Buffer);
+  }
+
+  if (NumOfLoadFileHandles != 0) {
+    FreePool (LoadFileHandles);
+  }
+
+  //
+  // Check if we have on flash shell
+  //
+ /* gBS->LocateHandleBuffer (
+        ByProtocol,
+        &gEfiFirmwareVolume2ProtocolGuid,
+        NULL,
+        &FvHandleCount,
+        &FvHandleBuffer
+        );
+  for (Index = 0; Index < FvHandleCount; Index++) {
+    gBS->HandleProtocol (
+          FvHandleBuffer[Index],
+          &gEfiFirmwareVolume2ProtocolGuid,
+          (VOID **) &Fv
+          );
+
+    Status = Fv->ReadFile (
+                  Fv,
+                  PcdGetPtr(PcdShellFile),
+                  NULL,
+                  &Size,
+                  &Type,
+                  &Attributes,
+                  &AuthenticationStatus
+                  );
+    if (EFI_ERROR (Status)) {
+      //
+      // Skip if no shell file in the FV
+      //
+      continue;
+    }
+    //
+    // Build the shell boot option
+    //
+    BdsLibBuildOptionFromShell (FvHandleBuffer[Index], BdsBootOptionList);
+  }
+
+  if (FvHandleCount != 0) {
+    FreePool (FvHandleBuffer);
+  } */
+  
+  //
+  // Make sure every boot only have one time
+  // boot device enumerate
+  //
+  Status = BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");
+  mEnumBootDevice = TRUE;
+
+  return Status;
+} 
+
+
+
+/**
 
   The function will excute with as the platform policy, current policy
   is driven by boot mode. IBV/OEM can customize this code for their specific
@@ -1415,6 +1961,11 @@ FULL_CONFIGURATION:
     InstallReadyToLock ();
 
     //
+    // Here we have enough time to do the enumeration of boot device
+    //
+    PlatformBdsLibEnumerateAllBootOption (BootOptionList);
+
+    //
     // Give one chance to enter the setup if we
     // have the time out
     //
@@ -1439,10 +1990,7 @@ FULL_CONFIGURATION:
       return;
     }
 
-    //
-    // Here we have enough time to do the enumeration of boot device
-    //
-    BdsLibEnumerateAllBootOption (BootOptionList);
+    
     break;
   }
 

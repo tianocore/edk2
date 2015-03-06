@@ -37,6 +37,7 @@
   BdsPlatform.c
   BdsPlatform.h
   PlatformData.c
+  PlatformBdsStrings.uni
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -60,6 +61,7 @@
   PcdLib
   GenericBdsLib
   DevicePathLib
+  NetLib
   UefiLib
   HobLib
   PciLib
