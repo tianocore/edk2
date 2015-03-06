@@ -77,6 +77,9 @@ extern EFI_DEVICE_PATH_PROTOCOL  *gUserAuthenticationDevice[];
 extern BDS_CONSOLE_CONNECT_ENTRY gPlatformSimpleConsole [];
 extern EFI_DEVICE_PATH_PROTOCOL  *gPlatformSimpleBootOption [];
 
+extern BOOLEAN mEnumBootDevice;
+
+
 //
 // the short form device path for Usb keyboard
 //
@@ -435,6 +438,16 @@ EFI_STATUS
 WaitForSingleEvent (
   IN EFI_EVENT                  Event,
   IN UINT64                     Timeout OPTIONAL
+  );
+
+EFI_STATUS
+BdsLibDeleteOptionFromHandle (
+  IN  EFI_HANDLE                 Handle
+  );
+
+EFI_STATUS
+BdsDeleteAllInvalidEfiBootOption (
+  VOID
   );
 
 
