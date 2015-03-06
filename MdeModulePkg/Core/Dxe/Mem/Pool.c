@@ -495,7 +495,6 @@ CoreFreePoolI (
   UINTN       NoPages;
   UINTN       Size;
   CHAR8       *NewPage;
-  UINTN       FSize;
   UINTN       Offset;
   BOOLEAN     AllFree;
   UINTN       Granularity;
@@ -589,22 +588,16 @@ CoreFreePoolI (
 
     if (Free->Signature == POOL_FREE_SIGNATURE) {
 
-      Index = Free->Index;
-
       AllFree = TRUE;
       Offset = 0;
 
       while ((Offset < Granularity) && (AllFree)) {
-        FSize = LIST_TO_SIZE(Index);
-        while (Offset + FSize <= Granularity) {
-          Free = (POOL_FREE *) &NewPage[Offset];
-          ASSERT(Free != NULL);
-          if (Free->Signature != POOL_FREE_SIGNATURE) {
-            AllFree = FALSE;
-          }
-          Offset += FSize;
+        Free = (POOL_FREE *) &NewPage[Offset];
+        ASSERT(Free != NULL);
+        if (Free->Signature != POOL_FREE_SIGNATURE) {
+          AllFree = FALSE;
         }
-        Index -= 1;
+        Offset += LIST_TO_SIZE(Free->Index);
       }
 
       if (AllFree) {
@@ -616,18 +609,13 @@ CoreFreePoolI (
         //
         Free = (POOL_FREE *) &NewPage[0];
         ASSERT(Free != NULL);
-        Index = Free->Index;
         Offset = 0;
 
         while (Offset < Granularity) {
-          FSize = LIST_TO_SIZE(Index);
-          while (Offset + FSize <= Granularity) {
-            Free = (POOL_FREE *) &NewPage[Offset];
-            ASSERT(Free != NULL);
-            RemoveEntryList (&Free->Link);
-            Offset += FSize;
-          }
-          Index -= 1;
+          Free = (POOL_FREE *) &NewPage[Offset];
+          ASSERT(Free != NULL);
+          RemoveEntryList (&Free->Link);
+          Offset += LIST_TO_SIZE(Free->Index);
         }
 
         //
