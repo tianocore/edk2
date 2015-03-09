@@ -298,9 +298,15 @@ CheckAndUpdateAllAPsToIdleState (
           SetApProcedure (&mMpSystemData.CpuDatas[NextNumber],
                           mMpSystemData.Procedure,
                           mMpSystemData.ProcedureArgument);
+          //
+          // If this AP previous state is blocked, we should
+          // wake up this AP by sent a SIPI. and avoid
+          // re-involve the sleeping state. we must call
+          // SetApProcedure() first.
+          //
+          ResetProcessorToIdleState (&mMpSystemData.CpuDatas[NextNumber]);
         }
       }
-
       SetApState (CpuData, CpuStateIdle);
     }
   }
@@ -343,7 +349,8 @@ ResetAllFailedAPs (
     }
 
     CpuState = GetApState (CpuData);
-    if (CpuState != CpuStateIdle) {
+    if (CpuState != CpuStateIdle &&
+        CpuState != CpuStateSleeping) {
       if (mMpSystemData.FailedList != NULL) {
         (*mMpSystemData.FailedList)[mMpSystemData.FailedListIndex++] = Number;
       }
@@ -615,6 +622,7 @@ StartupAllAPs (
   CPU_DATA_BLOCK        *CpuData;
   UINTN                 Number;
   CPU_STATE             APInitialState;
+  CPU_STATE             CpuState;
 
   CpuData = NULL;
 
@@ -655,7 +663,9 @@ StartupAllAPs (
       continue;
     }
 
-    if (GetApState (CpuData) != CpuStateIdle) {
+    CpuState = GetApState (CpuData);
+    if (CpuState != CpuStateIdle &&
+        CpuState != CpuStateSleeping) {
       return EFI_NOT_READY;
     }
   }
@@ -694,13 +704,24 @@ StartupAllAPs (
     // state 1 by 1, until the previous 1 finished its task
     // if not "SingleThread", all APs are put to ready state from the beginning
     //
-    if (GetApState (CpuData) == CpuStateIdle) {
+    CpuState = GetApState (CpuData);
+    if (CpuState == CpuStateIdle ||
+        CpuState == CpuStateSleeping) {
       mMpSystemData.StartCount++;
 
       SetApState (CpuData, APInitialState);
 
       if (APInitialState == CpuStateReady) {
         SetApProcedure (CpuData, Procedure, ProcedureArgument);
+        //
+        // If this AP previous state is Sleeping, we should
+        // wake up this AP by sent a SIPI. and avoid
+        // re-involve the sleeping state. we must call
+        // SetApProcedure() first.
+        //
+        if (CpuState == CpuStateSleeping) {
+          ResetProcessorToIdleState (CpuData);
+        }
       }
 
       if (SingleThread) {
@@ -847,6 +868,7 @@ StartupThisAP (
   )
 {
   CPU_DATA_BLOCK        *CpuData;
+  CPU_STATE             CpuState;
 
   CpuData = NULL;
 
@@ -877,13 +899,24 @@ StartupThisAP (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (GetApState (CpuData) != CpuStateIdle) {
+  CpuState = GetApState (CpuData);
+  if (CpuState != CpuStateIdle &&
+      CpuState != CpuStateSleeping) {
     return EFI_NOT_READY;
   }
 
   SetApState (CpuData, CpuStateReady);
 
   SetApProcedure (CpuData, Procedure, ProcedureArgument);
+  //
+  // If this AP previous state is Sleeping, we should
+  // wake up this AP by sent a SIPI. and avoid
+  // re-involve the sleeping state. we must call
+  // SetApProcedure() first.
+  //
+  if (CpuState == CpuStateSleeping) {
+    ResetProcessorToIdleState (CpuData);
+  }
 
   CpuData->Timeout = TimeoutInMicroseconds;
   CpuData->WaitEvent = WaitEvent;
@@ -1021,6 +1054,7 @@ EnableDisableAP (
 {
   CPU_DATA_BLOCK *CpuData;
   BOOLEAN        TempStopCheckState;
+  CPU_STATE      CpuState;
 
   CpuData = NULL;
   TempStopCheckState = FALSE;
@@ -1046,7 +1080,9 @@ EnableDisableAP (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (GetApState (CpuData) != CpuStateIdle) {
+  CpuState = GetApState (CpuData);
+  if (CpuState != CpuStateIdle &&
+      CpuState != CpuStateSleeping) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1201,6 +1237,20 @@ ProcessorToIdleState (
       CpuData->Procedure = NULL;
       CpuData->State = CpuStateFinished;
       ReleaseMpSpinLock (CpuData);
+    } else {
+      //
+      // if no procedure to execution, we simply put AP
+      // into sleeping state, and waiting BSP sent SIPI.
+      //
+      GetMpSpinLock (CpuData);
+      if (CpuData->State == CpuStateIdle) {
+          CpuData->State = CpuStateSleeping;
+      }
+      ReleaseMpSpinLock (CpuData);
+    }
+
+    if (GetApState (CpuData) == CpuStateSleeping) {
+      CpuSleep ();
     }
 
     CpuPause ();
