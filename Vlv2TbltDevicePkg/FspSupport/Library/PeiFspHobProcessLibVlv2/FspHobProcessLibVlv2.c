@@ -144,7 +144,7 @@ GetPeiMemSize (
 **/
 EFI_STATUS
 EFIAPI
-FspHobProcess (
+FspHobProcessForMemoryResource (
   IN VOID                 *FspHobList
   )
 {
@@ -375,13 +375,54 @@ FspHobProcess (
     SmramHobDescriptorBlock->Descriptor[0].PhysicalSize  = TsegSize;
     SmramHobDescriptorBlock->Descriptor[0].RegionState   = EFI_SMRAM_CLOSED;
   }
-  //
-  // NV Storage Hob
-  //
+  return EFI_SUCCESS;
+}
+
+/**
+  BIOS process FspBobList for other data (not Memory Resource Descriptor).
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+  @return If platform process the FSP hob list successfully.
+**/
+EFI_STATUS
+EFIAPI
+FspHobProcessForOtherData (
+  IN VOID                 *FspHobList
+  )
+{
+  EFI_PEI_SERVICES     **PeiServices;
+
+  PeiServices = (EFI_PEI_SERVICES **)GetPeiServicesTablePointer ();
+
   //
   // Other hob for platform
   //
   PlatformHobCreateFromFsp ( PeiServices,  FspHobList);
 
   return EFI_SUCCESS;
+}
+
+/**
+  BIOS process FspBobList.
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+  @return If platform process the FSP hob list successfully.
+**/
+EFI_STATUS
+EFIAPI
+FspHobProcess (
+  IN VOID                 *FspHobList
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = FspHobProcessForMemoryResource (FspHobList);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = FspHobProcessForOtherData (FspHobList);
+
+  return Status;
 }
