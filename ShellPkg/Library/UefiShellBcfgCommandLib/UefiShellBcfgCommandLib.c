@@ -353,7 +353,7 @@ BcfgAdd(
   if (UseHandle) {
     CurHandle = ConvertHandleIndexToHandle(HandleNumber);
     if (CurHandle == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellBcfgHiiHandle, L"Handle Number");
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"Handle Number");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       if (Target == BcfgTargetBootOrder) {
