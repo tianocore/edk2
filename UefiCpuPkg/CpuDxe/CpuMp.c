@@ -1176,11 +1176,14 @@ ProcessorToIdleState (
   }
 
   //
-  // Avoid forcibly reset AP caused the AP State is not updated.
+  // Avoid forcibly reset AP caused the timeout AP State is not
+  // updated.
   //
   GetMpSpinLock (CpuData);
+  if (CpuData->State == CpuStateBusy) {
+    CpuData->Procedure = NULL;
+  }
   CpuData->State = CpuStateIdle;
-  CpuData->Procedure = NULL;
   ReleaseMpSpinLock (CpuData);
 
   while (TRUE) {
@@ -1190,6 +1193,8 @@ ProcessorToIdleState (
     ReleaseMpSpinLock (CpuData);
 
     if (Procedure != NULL) {
+      SetApState (CpuData, CpuStateBusy);
+
       Procedure (ProcedureArgument);
 
       GetMpSpinLock (CpuData);
