@@ -1407,7 +1407,7 @@ FillInProcessorInformation (
   CpuData->Info.Location.Package = ProcessorId;
   CpuData->Info.Location.Core    = 0;
   CpuData->Info.Location.Thread  = 0;
-  CpuData->State = Bsp ? CpuStateBuzy : CpuStateIdle;
+  CpuData->State = Bsp ? CpuStateBusy : CpuStateIdle;
 
   CpuData->Procedure        = NULL;
   CpuData->Parameter        = NULL;
