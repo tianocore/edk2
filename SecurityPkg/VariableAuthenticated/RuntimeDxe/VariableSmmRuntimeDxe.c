@@ -473,10 +473,6 @@ RuntimeServiceGetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((*DataSize != 0) && (Data == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   TempDataSize          = *DataSize;
   VariableNameSize      = StrSize (VariableName);
   SmmVariableHeader     = NULL;
@@ -541,7 +537,11 @@ RuntimeServiceGetVariable (
     goto Done;
   }
 
-  CopyMem (Data, (UINT8 *)SmmVariableHeader->Name + SmmVariableHeader->NameSize, SmmVariableHeader->DataSize);
+  if (Data != NULL) {
+    CopyMem (Data, (UINT8 *)SmmVariableHeader->Name + SmmVariableHeader->NameSize, SmmVariableHeader->DataSize);
+  } else {
+    Status = EFI_INVALID_PARAMETER;
+  }
 
 Done:
   ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
