@@ -94,8 +94,8 @@ typedef struct {
   INTN                           LockSelf;
   volatile CPU_STATE             State;
 
-  EFI_AP_PROCEDURE               Procedure;
-  VOID                           *Parameter;
+  volatile EFI_AP_PROCEDURE      Procedure;
+  volatile VOID*                 Parameter;
   BOOLEAN                        *Finished;
   INTN                           Timeout;
   EFI_EVENT                      WaitEvent;

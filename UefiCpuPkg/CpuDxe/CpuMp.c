@@ -1193,7 +1193,7 @@ ProcessorToIdleState (
   UINTN                 ProcessorNumber;
   CPU_DATA_BLOCK        *CpuData;
   EFI_AP_PROCEDURE      Procedure;
-  VOID                  *ProcedureArgument;
+  volatile VOID         *ProcedureArgument;
 
   AsmApDoneWithCommonStack ();
 
@@ -1231,7 +1231,7 @@ ProcessorToIdleState (
     if (Procedure != NULL) {
       SetApState (CpuData, CpuStateBusy);
 
-      Procedure (ProcedureArgument);
+      Procedure ((VOID*) ProcedureArgument);
 
       GetMpSpinLock (CpuData);
       CpuData->Procedure = NULL;
