@@ -730,6 +730,12 @@
   gEfiVLVTokenSpaceGuid.PcdFTPMResponse|0
   gEfiVLVTokenSpaceGuid.PcdFTPMNotRespond|FALSE
   gEfiVLVTokenSpaceGuid.PcdFTPMStatus|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr|0
+  gEfiCpuTokenSpaceGuid.PcdCpuS3DataAddress|0
+  gEfiCpuTokenSpaceGuid.PcdCpuHotPlugDataAddress|0
+  gEfiCpuTokenSpaceGuid.PcdCpuCallbackSignal|0
+  gEfiCpuTokenSpaceGuid.PcdCpuConfigContextBuffer|0
 
 [Components.IA32]
 
