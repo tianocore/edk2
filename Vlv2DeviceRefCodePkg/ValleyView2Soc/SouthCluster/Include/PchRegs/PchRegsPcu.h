@@ -119,6 +119,8 @@ typedef enum {
 #define V_PCH_LPC_RID_B                           0x0C  // B3 Stepping (25 x 27)
 #define V_PCH_LPC_RID_C                           0x0D  // C0 Stepping (17 x 17)
 #define V_PCH_LPC_RID_D                           0x0E  // C0 Stepping (25 x 27)
+#define V_PCH_LPC_RID_E                           0x10  // D0 Stepping (17 x 17)
+#define V_PCH_LPC_RID_F                           0x11  // D0 Stepping (25 x 27)
 
 #define R_PCH_LPC_MLT                             0x0D  // Master Latency Timer
 #define B_PCH_LPC_MLT_MLC                         0xF8  // Master Latency Count

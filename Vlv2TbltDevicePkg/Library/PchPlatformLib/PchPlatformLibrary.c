@@ -83,7 +83,12 @@ PchStepping (
     case V_PCH_LPC_RID_D:
       return PchC0;
       break;
-
+    
+    case V_PCH_LPC_RID_E:
+    case V_PCH_LPC_RID_F:
+      return PchD0;
+      break;
+        
     default:
       return PchSteppingMax;
       break;
