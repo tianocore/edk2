@@ -85,6 +85,14 @@ POOL            mPoolHead[EfiMaxMemoryType];
 //
 LIST_ENTRY      mPoolHeadList = INITIALIZE_LIST_HEAD_VARIABLE (mPoolHeadList);
 
+/**
+  Get pool size table index from the specified size.
+
+  @param  Size          The specified size to get index from pool table.
+
+  @return               The index of pool size table.
+
+**/
 STATIC
 UINTN
 GetPoolIndexFromSize (
