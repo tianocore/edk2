@@ -1,7 +1,7 @@
 /** @file
   EFI internal structures for the EFI UNDI driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -174,13 +174,6 @@ VOID
 UNDI_notify_virtual (
   EFI_EVENT event,
   VOID      *context
-  );
-
-VOID
-EFIAPI
-UndiNotifyExitBs (
-  EFI_EVENT Event,
-  VOID      *Context
   );
 
 EFI_STATUS
