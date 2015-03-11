@@ -717,12 +717,12 @@
   # Note that this value must be less than (PcdFlashNvStorageVariableSize - EFI_FIRMWARE_VOLUME_HEADER.HeaderLength - sizeof (VARIABLE_STORE_HEADER) - PcdHwErrStorageSize).<BR>
   # If the value is 0, it means user variable share the same NV storage with system variable,
   # this is designed to keep the compatibility for the platform that does not allocate special region for user variable.<BR>
-  # If the value is non-0, the below 4 types of variables will be regarded as System Variable, their property could be got by VarCheck protocol,
+  # If the value is non-0, the below 4 types of variables will be regarded as System Variable after EndOfDxe, their property could be got by VarCheck protocol,
   # otherwise the variable will be regarded as user variable.<BR>
   #  1) UEFI defined variables (gEfiGlobalVariableGuid and gEfiImageSecurityDatabaseGuid(auth variable) variables at least).<BR>
   #  2) Variables managed by Variable driver internally.<BR>
   #  3) Variables need to be locked, they MUST be set by VariableLock protocol.<BR>
-  #  4) Important during platform boot, their property SHOULD be set by VarCheck protocol.<BR>
+  #  4) Important variables during platform boot, their property SHOULD be set by VarCheck protocol.<BR>
   # The PCD is used to guarantee the space of system variable and not populated by user variable.<BR>
   # @Prompt Maximum user NV variable space size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxUserNvVariableSpaceSize|0x00|UINT32|0x00000009
