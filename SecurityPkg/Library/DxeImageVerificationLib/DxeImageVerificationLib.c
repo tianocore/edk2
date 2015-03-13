@@ -270,7 +270,7 @@ GetImageType (
 }
 
 /**
-  Caculate hash of Pe/Coff image based on the authenticode image hashing in
+  Calculate hash of Pe/Coff image based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A
 
   Caution: This function may receive untrusted input.
@@ -609,7 +609,7 @@ Done:
 }
 
 /**
-  Recognize the Hash algorithm in PE/COFF Authenticode and caculate hash of
+  Recognize the Hash algorithm in PE/COFF Authenticode and calculate hash of
   Pe/Coff image based on the authenticode image hashing in PE/COFF Specification
   8.0 Appendix A
 
