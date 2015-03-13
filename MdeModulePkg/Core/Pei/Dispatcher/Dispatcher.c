@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core dispatch services
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -863,7 +863,7 @@ PeiDispatcher (
 
             if (Private->SwitchStackSignal) {
               //
-              // Before switch stack from temporary memory to permenent memory, caculate the heap and stack
+              // Before switch stack from temporary memory to permenent memory, calculate the heap and stack
               // usage in temporary memory for debuging.
               //
               DEBUG_CODE_BEGIN ();
@@ -913,7 +913,7 @@ PeiDispatcher (
               ASSERT (NewStackSize >= SecCoreData->StackSize);
 
               //
-              // Caculate stack offset and heap offset between temporary memory and new permement 
+              // Calculate stack offset and heap offset between temporary memory and new permement 
               // memory seperately.
               //
               TopOfOldStack = (UINTN)SecCoreData->StackBase + SecCoreData->StackSize;
@@ -969,7 +969,7 @@ PeiDispatcher (
                 DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
 
                 //
-                // Caculate new HandOffTable and PrivateData address in permanent memory's stack
+                // Calculate new HandOffTable and PrivateData address in permanent memory's stack
                 //
                 if (StackOffsetPositive) {
                   SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData + StackOffset);
