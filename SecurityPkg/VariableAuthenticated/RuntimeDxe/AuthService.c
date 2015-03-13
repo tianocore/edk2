@@ -19,7 +19,7 @@
   They will do basic validation for authentication data structure, then call crypto library
   to verify the signature.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -127,36 +127,6 @@ InCustomMode (
   }
 
   return FALSE;
-}
-
-
-/**
-  Internal function to delete a Variable given its name and GUID, no authentication
-  required.
-
-  @param[in]      VariableName            Name of the Variable.
-  @param[in]      VendorGuid              GUID of the Variable.
-
-  @retval EFI_SUCCESS              Variable deleted successfully.
-  @retval Others                   The driver failded to start the device.
-
-**/
-EFI_STATUS
-DeleteVariable (
-  IN  CHAR16                    *VariableName,
-  IN  EFI_GUID                  *VendorGuid
-  )
-{
-  EFI_STATUS              Status;
-  VARIABLE_POINTER_TRACK  Variable;
-
-  Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
-  if (EFI_ERROR (Status)) {
-    return EFI_SUCCESS;
-  }
-
-  ASSERT (Variable.CurrPtr != NULL);
-  return UpdateVariable (VariableName, VendorGuid, NULL, 0, 0, 0, 0, &Variable, NULL);
 }
 
 /**
@@ -1282,6 +1252,59 @@ ProcessVarWithKek (
 }
 
 /**
+  Check if it is to delete auth variable.
+
+  @param[in] Data               Data pointer.
+  @param[in] DataSize           Size of Data.
+  @param[in] Variable           The variable information which is used to keep track of variable usage.
+  @param[in] Attributes         Attribute value of the variable.
+
+  @retval TRUE                  It is to delete auth variable.
+  @retval FALSE                 It is not to delete auth variable.
+
+**/
+BOOLEAN
+IsDeleteAuthVariable (
+  IN  VOID                      *Data,
+  IN  UINTN                     DataSize,
+  IN  VARIABLE_POINTER_TRACK    *Variable,
+  IN  UINT32                    Attributes
+  )
+{
+  BOOLEAN                       Del;
+  UINT8                         *Payload;
+  UINTN                         PayloadSize;
+
+  Del = FALSE;
+
+  //
+  // To delete a variable created with the EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
+  // or the EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute,
+  // SetVariable must be used with attributes matching the existing variable
+  // and the DataSize set to the size of the AuthInfo descriptor.
+  //
+  if ((Variable->CurrPtr != NULL) &&
+      (Attributes == Variable->CurrPtr->Attributes) &&
+      ((Attributes & (EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)) != 0)) {
+    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+      Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
+      PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
+      if (PayloadSize == 0) {
+        Del = TRUE;
+      }
+    } else {
+      Payload = (UINT8 *) Data + AUTHINFO_SIZE;
+      PayloadSize = DataSize - AUTHINFO_SIZE;
+      if (PayloadSize == 0) {
+        Del = TRUE;
+      }
+    }
+  }
+
+  return Del;
+}
+
+/**
   Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
 
   Caution: This function may receive untrusted input.
@@ -1295,8 +1318,7 @@ ProcessVarWithKek (
   @param[in]  VendorGuid                  Variable vendor GUID.
 
   @param[in]  Data                        Data pointer.
-  @param[in]  DataSize                    Size of Data found. If size is less than the
-                                          data, this value contains the required size.
+  @param[in]  DataSize                    Size of Data.
   @param[in]  Variable                    The variable information which is used to keep track of variable usage.
   @param[in]  Attributes                  Attribute value of the variable.
 
@@ -1336,11 +1358,36 @@ ProcessVariable (
   PubKey      = NULL;
   IsDeletion  = FALSE;
 
-  if (NeedPhysicallyPresent(VariableName, VendorGuid) && !UserPhysicalPresent()) {
+  if (UserPhysicalPresent()) {
     //
-    // This variable is protected, only physical present user could modify its value.
+    // Allow the delete operation of common authenticated variable at user physical presence.
     //
-    return EFI_SECURITY_VIOLATION;
+    if (IsDeleteAuthVariable (Data, DataSize, Variable, Attributes)) {
+      if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+        Status = DeleteCertsFromDb (VariableName, VendorGuid);
+      }
+      if (!EFI_ERROR (Status)) {
+        Status = UpdateVariable (
+                   VariableName,
+                   VendorGuid,
+                   NULL,
+                   0,
+                   0,
+                   0,
+                   0,
+                   Variable,
+                   NULL
+                   );
+      }
+      return Status;
+    }
+  } else {
+    if (NeedPhysicallyPresent(VariableName, VendorGuid)) {
+      //
+      // This variable is protected, only physical present user could modify its value.
+      //
+      return EFI_SECURITY_VIOLATION;
+    }
   }
 
   //

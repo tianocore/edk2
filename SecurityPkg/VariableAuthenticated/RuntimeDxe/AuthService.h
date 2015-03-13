@@ -12,7 +12,7 @@
   may not be modified without authorization. If platform fails to protect these resources, 
   the authentication service provided in this driver will be broken, and the behavior is undefined.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -289,6 +289,24 @@ CompareTimeStamp (
   IN EFI_TIME               *SecondTime
   );
 
+/**
+  Delete matching signer's certificates when deleting common authenticated
+  variable by corresponding VariableName and VendorGuid from "certdb".
+
+  @param[in]  VariableName   Name of authenticated Variable.
+  @param[in]  VendorGuid     Vendor GUID of authenticated Variable.
+
+  @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
+  @retval  EFI_NOT_FOUND         Fail to find "certdb" or matching certs.
+  @retval  EFI_OUT_OF_RESOURCES  The operation is failed due to lack of resources.
+  @retval  EFI_SUCCESS           The operation is completed successfully.
+
+**/
+EFI_STATUS
+DeleteCertsFromDb (
+  IN     CHAR16           *VariableName,
+  IN     EFI_GUID         *VendorGuid
+  );
 
 /**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set

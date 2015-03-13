@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Variable.h"
+#include "AuthService.h"
 #include <Library/DevicePathLib.h>
 
 extern LIST_ENTRY mLockedVariableList;
@@ -668,7 +669,7 @@ VARIABLE_DRIVER_VARIABLE_ENTRY mVariableDriverVariableList[] = {
     EFI_VENDOR_KEYS_NV_VARIABLE_NAME,
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
-      0,
+      VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
       VARIABLE_ATTRIBUTE_NV_BS_RT_AT,
       sizeof (UINT8),
       sizeof (UINT8)
@@ -676,10 +677,10 @@ VARIABLE_DRIVER_VARIABLE_ENTRY mVariableDriverVariableList[] = {
   },
   {
     &gEfiAuthenticatedVariableGuid,
-    L"AuthVarKeyDatabase",
+    AUTHVAR_KEYDB_NAME,
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
-      0,
+      VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
       VARIABLE_ATTRIBUTE_NV_BS_RT_AW,
       sizeof (UINT8),
       MAX_UINTN
@@ -687,10 +688,10 @@ VARIABLE_DRIVER_VARIABLE_ENTRY mVariableDriverVariableList[] = {
   },
   {
     &gEfiCertDbGuid,
-    L"certdb",
+    EFI_CERT_DB_NAME,
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
-      0,
+      VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
       VARIABLE_ATTRIBUTE_NV_BS_RT_AT,
       sizeof (UINT32),
       MAX_UINTN
