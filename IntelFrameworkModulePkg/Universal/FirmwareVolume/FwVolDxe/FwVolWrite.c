@@ -1,7 +1,7 @@
 /** @file
   Implements write firmware file.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -17,9 +17,9 @@
 #include "FwVolDriver.h"
 
 /**
-  Caculate the checksum for the FFS header.
+  Calculate the checksum for the FFS header.
 
-  @param FfsHeader   FFS File Header which needs to caculate the checksum
+  @param FfsHeader   FFS File Header which needs to calculate the checksum
 
 **/
 VOID
@@ -60,9 +60,9 @@ SetHeaderChecksum (
 }
 
 /**
-  Caculate the checksum for the FFS File.
+  Calculate the checksum for the FFS File.
 
-  @param FfsHeader       FFS File Header which needs to caculate the checksum
+  @param FfsHeader       FFS File Header which needs to calculate the checksum
   @param ActualFileSize  The whole Ffs File Length.
 
 **/
@@ -130,7 +130,7 @@ GetRequiredAlignment (
 }
 
 /**
-  Caculate the leading Pad file size to meet the alignment requirement.
+  Calculate the leading Pad file size to meet the alignment requirement.
 
   @param FvDevice          Cached Firmware Volume.
   @param StartAddress      The starting address to write the FFS File.
@@ -141,7 +141,7 @@ GetRequiredAlignment (
 
 **/
 UINTN
-CaculatePadFileSize (
+CalculatePadFileSize (
   IN FV_DEVICE            *FvDevice,
   IN EFI_PHYSICAL_ADDRESS StartAddress,
   IN UINTN                BufferSize,
@@ -330,7 +330,7 @@ FvLocateFreeSpaceEntry (
   // required the file size
   //
   while ((LIST_ENTRY *) FreeSpaceListEntry != &FvDevice->FreeSpaceHeader) {
-    PadFileSize = CaculatePadFileSize (
+    PadFileSize = CalculatePadFileSize (
                     FvDevice,
                     (EFI_PHYSICAL_ADDRESS) (UINTN) FreeSpaceListEntry->StartingAddress,
                     Size,
@@ -400,7 +400,7 @@ FvLocatePadFile (
         PadAreaLength = FFS_FILE_SIZE (FileHeader) - HeaderSize;
       }
 
-      PadFileSize = CaculatePadFileSize (
+      PadFileSize = CalculatePadFileSize (
                       FvDevice,
                       (EFI_PHYSICAL_ADDRESS) (UINTN) FileHeader + HeaderSize,
                       Size,
@@ -477,7 +477,7 @@ FvSearchSuitablePadFile (
       TotalSize     = 0;
 
       for (Index = 0; Index < NumOfFiles; Index++) {
-        PadSize[Index] = CaculatePadFileSize (
+        PadSize[Index] = CalculatePadFileSize (
                       FvDevice,
                       (EFI_PHYSICAL_ADDRESS) (UINTN) FileHeader + HeaderSize + TotalSize,
                       BufferSize[Index],
@@ -546,14 +546,14 @@ FvSearchSuitableFreeSpace (
     StartAddr = FreeSpaceListEntry->StartingAddress;
 
     //
-    // Caculate the totalsize we need
+    // Calculate the totalsize we need
     //
     for (Index = 0; Index < NumOfFiles; Index++) {
       //
       // Perhaps we don't need an EFI_FFS_FILE_HEADER, the first file
       // have had its leading pad file.
       //
-      PadSize[Index] = CaculatePadFileSize (
+      PadSize[Index] = CalculatePadFileSize (
                     FvDevice,
                     (EFI_PHYSICAL_ADDRESS) (UINTN) StartAddr + TotalSize,
                     BufferSize[Index],
@@ -956,7 +956,7 @@ FvCreateNewFile (
   FreeSpaceEntry->Length -= (BufferSize - HeaderSize);
 
   //
-  // Caculate File Checksum
+  // Calculate File Checksum
   //
   SetFileChecksum (FileHeader, ActualFileSize);
 

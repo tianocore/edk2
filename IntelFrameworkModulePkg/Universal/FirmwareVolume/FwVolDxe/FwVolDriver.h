@@ -1,7 +1,7 @@
 /** @file
   Common defines and definitions for a FwVolDxe driver.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -52,7 +52,7 @@
 #define MAX_FILES 32
 
 //
-// Used to caculate from address -> Lba
+// Used to calculate from address -> Lba
 //
 typedef struct {
   LIST_ENTRY      Link;
@@ -616,9 +616,9 @@ FvCreateMultipleFiles (
   );
 
 /**
-  Caculate the checksum for the FFS header.
+  Calculate the checksum for the FFS header.
 
-  @param FfsHeader   FFS File Header which needs to caculate the checksum
+  @param FfsHeader   FFS File Header which needs to calculate the checksum
 
 **/
 VOID
@@ -627,9 +627,9 @@ SetHeaderChecksum (
   );
 
 /**
-  Caculate the checksum for the FFS File.
+  Calculate the checksum for the FFS File.
 
-  @param FfsHeader       FFS File Header which needs to caculate the checksum
+  @param FfsHeader       FFS File Header which needs to calculate the checksum
   @param ActualFileSize  The whole Ffs File Length.
 
 **/

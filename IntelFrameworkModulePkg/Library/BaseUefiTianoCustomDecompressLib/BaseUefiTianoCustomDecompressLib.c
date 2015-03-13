@@ -2,7 +2,7 @@
   UEFI and Tiano Custom Decompress Library 
   It will do Tiano or UEFI decompress with different verison parameter.
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -59,7 +59,7 @@ FillBuf (
   }
 
   //
-  // Caculate additional bit count read to update mBitCount
+  // Calculate additional bit count read to update mBitCount
   //
   Sd->mBitCount = (UINT16) (Sd->mBitCount - NumOfBits);
   
@@ -784,7 +784,7 @@ UefiTianoDecompress (
   Sd->mSrcBase  = (UINT8 *)Src;
   Sd->mDstBase  = Dst;
   //
-  // CompSize and OrigSize are caculated in bytes
+  // CompSize and OrigSize are calculated in bytes
   //
   Sd->mCompSize = CompSize;
   Sd->mOrigSize = OrigSize;
