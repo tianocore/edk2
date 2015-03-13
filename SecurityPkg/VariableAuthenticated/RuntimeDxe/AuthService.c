@@ -1357,6 +1357,7 @@ ProcessVariable (
   CertBlock   = NULL;
   PubKey      = NULL;
   IsDeletion  = FALSE;
+  Status      = EFI_SUCCESS;
 
   if (UserPhysicalPresent()) {
     //
