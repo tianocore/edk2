@@ -338,7 +338,7 @@ IsDebugAgentInitialzed (
   );
 
 /**
-  Caculate Mailbox checksum and update the checksum field.
+  Calculate Mailbox checksum and update the checksum field.
 
   @param[in]  Mailbox  Debug Agent Mailbox pointer.
 
