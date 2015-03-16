@@ -1,7 +1,7 @@
 /** @file
   The internal functions and routines to transmit the IP6 packet.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -91,7 +91,7 @@ Ip6CandidateSource (
 }
 
 /**
-  Caculate how many bits are the same between two IPv6 addresses.
+  Calculate how many bits are the same between two IPv6 addresses.
 
   @param[in]       AddressA         Points to an IPv6 address.
   @param[in]       AddressB         Points to another IPv6 address.

@@ -1,7 +1,7 @@
 /** @file
   The implementation of Payloads Creation.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1614,7 +1614,7 @@ Ikev2EncodeSa (
   //
   TotalTransforms = 0;
   //
-  // Caculate the Proposal numbers and Transform numbers.
+  // Calculate the Proposal numbers and Transform numbers.
   //
   for (ProposalIndex = 0; ProposalIndex < SaData->NumProposals; ProposalIndex++) {
 
@@ -1777,7 +1777,7 @@ Ikev2DecodeSa (
   Proposal               = (IKEV2_PROPOSAL *)((IKEV2_SA *)(Sa)+1);
 
   //
-  // Caculate the number of Proposal payload and the total numbers of
+  // Calculate the number of Proposal payload and the total numbers of
   // Transforms payload (the transforms in all proposal payload).
   //
   while (SaRemaining > sizeof (IKEV2_PROPOSAL)) {

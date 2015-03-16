@@ -1,7 +1,7 @@
 /** @file
   The implementation for Ping6 application.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -60,11 +60,11 @@ CONST CHAR16      *mIp6DstString;
 CONST CHAR16      *mIp6SrcString;
 UINT64            mFrequency = 0;
 /**
-  Get and caculate the frequency in tick/ms.
+  Get and calculate the frequency in tick/ms.
   The result is saved in the globle variable mFrequency
 
-  @retval EFI_SUCCESS    Caculated the frequency successfully.
-  @retval Others         Failed to caculate the frequency.
+  @retval EFI_SUCCESS    Calculated the frequency successfully.
+  @retval Others         Failed to calculate the frequency.
 
 **/
 EFI_STATUS
@@ -102,7 +102,7 @@ Ping6GetFrequency (
 }
 
 /**
-  Get and caculate the duration in ms.
+  Get and calculate the duration in ms.
 
   @param[in]  Begin    The start point of time.
   @param[in]  End      The end point of time.
