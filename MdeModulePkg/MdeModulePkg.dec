@@ -1165,6 +1165,16 @@
   # @Prompt SMBIOS version.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0300|UINT16|0x00010055
 
+  ## SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.
+  # @Prompt SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0|UINT8|0x0001006A
+
+  ## SMBIOS produce method.
+  #  BIT0 set indicates 32-bit entry point and table are produced.<BR>
+  #  BIT1 set indicates 64-bit entry point and table are produced.<BR>
+  # @Prompt The policy to produce SMBIOS entry point and table.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosEntryPointProvideMethod|0x3|UINT32|0x00010069
+
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for
   #  the extension FPDT boot records received after ReadyToBoot and before ExitBootService.
   # @Prompt Pad size for extension FPDT boot records.
