@@ -129,6 +129,7 @@
 [Guids]
   gEfiGlobalVariableGuid          ## SOMETIMES_CONSUMES ## GUID
   gEfiSmbiosTableGuid             ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiSmbios3TableGuid            ## SOMETIMES_CONSUMES ## SystemTable
   gEfiMpsTableGuid                ## SOMETIMES_CONSUMES ## SystemTable
   gEfiSalSystemTableGuid          ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid             ## SOMETIMES_CONSUMES ## SystemTable

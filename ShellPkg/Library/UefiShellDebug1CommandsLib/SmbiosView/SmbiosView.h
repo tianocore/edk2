@@ -1,7 +1,7 @@
 /** @file
   Tools of clarify the content of the smbios table.
 
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -48,6 +48,27 @@ SMBiosView (
   );
 
 /**
+  Query all structures Data from SMBIOS table and Display
+  the information to users as required display option.
+
+  @param[in] QueryType      Structure type to view.
+  @param[in] QueryHandle    Structure handle to view.
+  @param[in] Option         Display option: none,outline,normal,detail.
+  @param[in] RandomView     Support for -h parameter.
+
+  @retval EFI_SUCCESS           print is successful.
+  @retval EFI_BAD_BUFFER_SIZE   structure is out of the range of SMBIOS table.
+**/
+EFI_STATUS
+EFIAPI
+SMBios64View (
+  IN  UINT8     QueryType,
+  IN  UINT16    QueryHandle,
+  IN  UINT8     Option,
+  IN  BOOLEAN   RandomView
+  );
+
+/**
   Function to initialize the global mStatisticsTable object.
 
   @retval EFI_SUCCESS           print is successful.
@@ -55,6 +76,17 @@ SMBiosView (
 EFI_STATUS
 EFIAPI
 InitSmbiosTableStatistics (
+  VOID
+  );
+
+/**
+  Function to initialize the global mSmbios64BitStatisticsTable object.
+
+  @retval EFI_SUCCESS           print is successful.
+**/
+EFI_STATUS
+EFIAPI
+InitSmbios64BitTableStatistics (
   VOID
   );
 
@@ -72,6 +104,19 @@ DisplayStatisticsTable (
   );
 
 /**
+  Function to display the global mSmbios64BitStatisticsTable object.
+
+  @param[in] Option             ECHO, NORMAL, or DETAIL control the amount of detail displayed.
+
+  @retval EFI_SUCCESS           print is successful.
+**/
+EFI_STATUS
+EFIAPI
+DisplaySmbios64BitStatisticsTable (
+  IN UINT8 Option
+  );
+
+/**
   function to return a string of the detail level.
 
   @param[in] ShowType         The detail level whose name is desired in clear text.
@@ -85,5 +130,7 @@ GetShowTypeString (
   );
 
 extern UINT8  gShowType;
+
+extern UINTN  mSmbios64BitTableLength;
 
 #endif

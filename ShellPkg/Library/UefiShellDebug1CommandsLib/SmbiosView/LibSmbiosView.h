@@ -1,7 +1,7 @@
 /** @file
   API for SMBIOS Plug and Play functions, access to SMBIOS table and structures.
 
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -40,12 +40,22 @@
 #define EFI_SMBIOSERR_UNSUPPORTED       EFI_SMBIOSERR (4)
 
 /**
-  Init the SMBIOS VIEW API's environment.
+  Init the SMBIOS VIEW API's environment for the 32-bit table..
 
   @retval EFI_SUCCESS  Successful to init the SMBIOS VIEW Lib.
 **/
 EFI_STATUS
 LibSmbiosInit (
+  VOID
+  );
+
+/**
+  Init the SMBIOS VIEW API's environment for the 64-bit table..
+
+  @retval EFI_SUCCESS  Successful to init the SMBIOS VIEW Lib.
+**/
+EFI_STATUS
+LibSmbios64BitInit (
   VOID
   );
 
@@ -58,6 +68,14 @@ LibSmbiosCleanup (
   );
 
 /**
+  Cleanup the Smbios information.
+**/
+VOID
+LibSmbios64BitCleanup (
+  VOID
+  );
+
+/**
   Get the entry point structure for the table.
 
   @param[out] EntryPointStructure  The pointer to populate.
@@ -65,6 +83,16 @@ LibSmbiosCleanup (
 VOID
 LibSmbiosGetEPS (
   OUT SMBIOS_TABLE_ENTRY_POINT **EntryPointStructure
+  );
+
+/**
+  Get the entry point structure for the 64-bit table.
+
+  @param[out] EntryPointStructure  The pointer to populate.
+**/
+VOID
+LibSmbios64BitGetEPS (
+  OUT SMBIOS_TABLE_3_0_ENTRY_POINT **EntryPointStructure
   );
 
 /**
@@ -100,6 +128,29 @@ LibGetSmbiosString (
 **/
 EFI_STATUS
 LibGetSmbiosStructure (
+  IN  OUT UINT16  *Handle,
+  OUT UINT8       **Buffer,
+  OUT UINT16      *Length
+  );
+
+/**
+    Get SMBIOS structure for the given Handle in 64-bit table,
+    Handle is changed to the next handle or 0xFFFF when the end is
+    reached or the handle is not found.
+
+    @param[in, out] Handle     0xFFFF: get the first structure
+                               Others: get a structure according to this value.
+    @param[out] Buffer         The pointer to the pointer to the structure.
+    @param[out] Length         Length of the structure.
+
+    @retval DMI_SUCCESS   Handle is updated with next structure handle or
+                          0xFFFF(end-of-list).
+
+    @retval DMI_INVALID_HANDLE  Handle is updated with first structure handle or
+                                0xFFFF(end-of-list).
+**/
+EFI_STATUS
+LibGetSmbios64BitStructure (
   IN  OUT UINT16  *Handle,
   OUT UINT8       **Buffer,
   OUT UINT16      *Length

@@ -200,6 +200,75 @@ SmbiosPrintEPSInfo (
 }
 
 /**
+  Print the info of 64-bit EPS(Entry Point Structure).
+
+  @param[in] SmbiosTable    Pointer to the SMBIOS table entry point.
+  @param[in] Option         Display option.
+**/
+VOID
+Smbios64BitPrintEPSInfo (
+  IN  SMBIOS_TABLE_3_0_ENTRY_POINT  *SmbiosTable,
+  IN  UINT8                         Option
+  )
+{
+  UINT8 Anchor[5];
+
+  if (SmbiosTable == NULL) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SMBIOSTABLE_NULL), gShellDebug1HiiHandle);
+    return ;
+  }
+
+  if (Option == SHOW_NONE) {
+    return ;
+  }
+
+  if (Option >= SHOW_NORMAL) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_64_BIT_ENTRY_POINT_SIGN), gShellDebug1HiiHandle);
+
+    MemToString (Anchor, SmbiosTable->AnchorString, 5);
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ANCHOR_STR), gShellDebug1HiiHandle, Anchor);
+
+    ShellPrintHiiEx(-1,-1,NULL,
+      STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_EPS_CHECKSUM),
+      gShellDebug1HiiHandle,
+      SmbiosTable->EntryPointStructureChecksum
+     );
+
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ENTRY_POINT_LEN), gShellDebug1HiiHandle, SmbiosTable->EntryPointLength);
+
+    ShellPrintHiiEx(-1,-1,NULL,
+      STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VERSION),
+      gShellDebug1HiiHandle,
+      SmbiosTable->MajorVersion,
+      SmbiosTable->MinorVersion
+     );
+
+    ShellPrintHiiEx(-1,-1,NULL,
+      STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DOCREV),
+      gShellDebug1HiiHandle,
+      SmbiosTable->DocRev
+     );
+
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TABLE_MAX_SIZE), gShellDebug1HiiHandle, SmbiosTable->TableMaximumSize);
+
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TABLE_ADDR), gShellDebug1HiiHandle, SmbiosTable->TableAddress);
+
+  }
+  //
+  // If SHOW_ALL, also print followings.
+  //
+  if (Option >= SHOW_DETAIL) {
+    ShellPrintHiiEx(-1,-1,NULL,
+      STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ENTRY_POINT_REVISION),
+      gShellDebug1HiiHandle,
+      SmbiosTable->EntryPointRevision
+     );
+  }
+
+  Print (L"\n");
+}
+
+/**
   This function print the content of the structure pointed by Struct.
 
   @param[in] Struct       Point to the structure to be printed.

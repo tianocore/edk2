@@ -1,7 +1,7 @@
 /** @file
   Module to clarify the element info of the smbios structure.
 
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -44,6 +44,18 @@ VOID
 SmbiosPrintEPSInfo (
   IN  SMBIOS_TABLE_ENTRY_POINT  *SmbiosTable,
   IN  UINT8                     Option
+  );
+
+/**
+  Print the info of 64-bit EPS(Entry Point Structure).
+
+  @param[in] SmbiosTable    Pointer to the SMBIOS table entry point.
+  @param[in] Option         Display option.
+**/
+VOID
+Smbios64BitPrintEPSInfo (
+  IN  SMBIOS_TABLE_3_0_ENTRY_POINT  *SmbiosTable,
+  IN  UINT8                         Option
   );
 
 /**
