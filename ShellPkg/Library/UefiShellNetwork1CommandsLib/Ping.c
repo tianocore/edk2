@@ -2,7 +2,7 @@
   The implementation for Ping shell command.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -249,11 +249,11 @@ ReadTime (
 
 
 /**
-  Get and caculate the frequency in tick/ms.
-  The result is saved in the globle variable mFrequency
+  Get and calculate the frequency in ticks/ms.
+  The result is saved in the global variable mFrequency
 
-  @retval EFI_SUCCESS    Caculated the frequency successfully.
-  @retval Others         Failed to caculate the frequency.
+  @retval EFI_SUCCESS    Calculated the frequency successfully.
+  @retval Others         Failed to calculate the frequency.
 
 **/
 EFI_STATUS
@@ -279,7 +279,7 @@ GetFrequency (
 
   //
   // The timer period is in femtosecond (1 femtosecond is 1e-15 second).
-  // So 1e+12 is divided by timer period to produce the freq in tick/ms.
+  // So 1e+12 is divided by timer period to produce the freq in ticks/ms.
   //
   mFrequency = DivU64x64Remainder (1000000000000ULL, TimerPeriod, NULL);
 
@@ -287,7 +287,7 @@ GetFrequency (
 }
 
 /**
-  Caculate a duration in ms.
+  Calculate a duration in ms.
 
   @param[in]  Begin     The start point of time.
   @param[in]  End       The end point of time.
