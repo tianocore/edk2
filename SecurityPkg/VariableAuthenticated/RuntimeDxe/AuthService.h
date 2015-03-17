@@ -351,6 +351,5 @@ extern UINT8  *mPubKeyStore;
 extern UINT8  *mCertDbStore;
 extern UINT32 mPubKeyNumber;
 extern VOID   *mHashCtx;
-extern UINT8  *mSerializationRuntimeBuffer;
 
 #endif

@@ -56,14 +56,6 @@ CONST UINT8 mRsaE[] = { 0x01, 0x00, 0x01 };
 VOID  *mHashCtx = NULL;
 
 //
-// The serialization of the values of the VariableName, VendorGuid and Attributes
-// parameters of the SetVariable() call and the TimeStamp component of the
-// EFI_VARIABLE_AUTHENTICATION_2 descriptor followed by the variable's new value
-// i.e. (VariableName, VendorGuid, Attributes, TimeStamp, Data)
-//
-UINT8 *mSerializationRuntimeBuffer = NULL;
-
-//
 // Requirement for different signature type which have been defined in UEFI spec.
 // These data are used to peform SignatureList format check while setting PK/KEK variable.
 //
@@ -179,15 +171,6 @@ AutenticatedVariableServiceInitialize (
   mMaxCertDbSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (EFI_CERT_DB_NAME);
   mCertDbStore   = AllocateRuntimePool (mMaxCertDbSize);
   if (mCertDbStore == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Prepare runtime buffer for serialized data of time-based authenticated
-  // Variable, i.e. (VariableName, VendorGuid, Attributes, TimeStamp, Data).
-  //
-  mSerializationRuntimeBuffer = AllocateRuntimePool (PcdGet32 (PcdMaxVariableSize) + sizeof (EFI_GUID) + sizeof (UINT32) + sizeof (EFI_TIME));
-  if (mSerializationRuntimeBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -2267,11 +2250,21 @@ VerifyTimeBasedPayload (
   PayloadSize = DataSize - OFFSET_OF_AUTHINFO2_CERT_DATA - (UINTN) SigDataSize;
 
   //
-  // Construct a buffer to fill with (VariableName, VendorGuid, Attributes, TimeStamp, Data).
+  // Construct a serialization buffer of the values of the VariableName, VendorGuid and Attributes
+  // parameters of the SetVariable() call and the TimeStamp component of the
+  // EFI_VARIABLE_AUTHENTICATION_2 descriptor followed by the variable's new value
+  // i.e. (VariableName, VendorGuid, Attributes, TimeStamp, Data)
   //
   NewDataSize = PayloadSize + sizeof (EFI_TIME) + sizeof (UINT32) +
                 sizeof (EFI_GUID) + StrSize (VariableName) - sizeof (CHAR16);
-  NewData = mSerializationRuntimeBuffer;
+  //
+  // Here is to reuse scratch data area(at the end of volatile variable store)
+  // to reduce SMRAM consumption for SMM variable driver.
+  // The scratch buffer is enough to hold the serialized data and safe to use,
+  // because it will be used at here to do verification only first
+  // and then used in UpdateVariable() for a time based auth variable set.
+  //
+  NewData = (UINT8 *) GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
 
   Buffer = NewData;
   Length = StrLen (VariableName) * sizeof (CHAR16);

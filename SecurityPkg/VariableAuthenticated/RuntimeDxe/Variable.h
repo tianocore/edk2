@@ -196,6 +196,23 @@ FindVariable (
 
 /**
 
+  Gets the pointer to the end of the variable storage area.
+
+  This function gets pointer to the end of the variable storage
+  area, according to the input variable store header.
+
+  @param VarStoreHeader  Pointer to the Variable Store Header.
+
+  @return Pointer to the end of the variable storage area.
+
+**/
+VARIABLE_HEADER *
+GetEndPointer (
+  IN VARIABLE_STORE_HEADER       *VarStoreHeader
+  );
+
+/**
+
   This code gets the pointer to the variable data.
 
   @param Variable        Pointer to the Variable Header.
