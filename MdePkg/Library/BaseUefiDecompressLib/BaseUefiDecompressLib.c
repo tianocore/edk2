@@ -1,7 +1,7 @@
 /** @file
   UEFI Decompress Library implementation refer to UEFI specification.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -68,7 +68,7 @@ FillBuf (
   }
 
   //
-  // Caculate additional bit count read to update mBitCount
+  // Calculate additional bit count read to update mBitCount
   //
   Sd->mBitCount = (UINT16) (Sd->mBitCount - NumOfBits);
   
@@ -777,7 +777,7 @@ UefiDecompress (
   Sd->mSrcBase  = (UINT8 *)Src;
   Sd->mDstBase  = Dst;
   //
-  // CompSize and OrigSize are caculated in bytes
+  // CompSize and OrigSize are calculated in bytes
   //
   Sd->mCompSize = CompSize;
   Sd->mOrigSize = OrigSize;
