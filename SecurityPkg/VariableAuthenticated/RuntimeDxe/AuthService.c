@@ -1359,36 +1359,34 @@ ProcessVariable (
   IsDeletion  = FALSE;
   Status      = EFI_SUCCESS;
 
-  if (UserPhysicalPresent()) {
+  if (IsDeleteAuthVariable (Data, DataSize, Variable, Attributes) && UserPhysicalPresent()) {
     //
     // Allow the delete operation of common authenticated variable at user physical presence.
     //
-    if (IsDeleteAuthVariable (Data, DataSize, Variable, Attributes)) {
-      if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-        Status = DeleteCertsFromDb (VariableName, VendorGuid);
-      }
-      if (!EFI_ERROR (Status)) {
-        Status = UpdateVariable (
-                   VariableName,
-                   VendorGuid,
-                   NULL,
-                   0,
-                   0,
-                   0,
-                   0,
-                   Variable,
-                   NULL
-                   );
-      }
-      return Status;
+    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+      Status = DeleteCertsFromDb (VariableName, VendorGuid);
     }
-  } else {
-    if (NeedPhysicallyPresent(VariableName, VendorGuid)) {
-      //
-      // This variable is protected, only physical present user could modify its value.
-      //
-      return EFI_SECURITY_VIOLATION;
+    if (!EFI_ERROR (Status)) {
+      Status = UpdateVariable (
+                 VariableName,
+                 VendorGuid,
+                 NULL,
+                 0,
+                 0,
+                 0,
+                 0,
+                 Variable,
+                 NULL
+                 );
     }
+    return Status;
+  }
+
+  if (NeedPhysicallyPresent (VariableName, VendorGuid) && !UserPhysicalPresent()) {
+    //
+    // This variable is protected, only physical present user could modify its value.
+    //
+    return EFI_SECURITY_VIOLATION;
   }
 
   //
