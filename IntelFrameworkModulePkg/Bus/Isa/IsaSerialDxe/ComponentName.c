@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name and Name2 protocol for Isa serial driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Serial.h"
 
-#define SERIAL_PORT_NAME  "ISA Serial Port # "
 //
 // EFI Component Name Protocol
 //
@@ -44,6 +43,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIsaSerialDriverNameTable
     NULL
   }
 };
+
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 mSerialPortName[] = L"ISA Serial Port # ";
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -242,22 +243,19 @@ AddName (
   IN  EFI_ISA_IO_PROTOCOL                      *IsaIo
   )
 {
-  CHAR16  SerialPortName[sizeof (SERIAL_PORT_NAME)];
-
-  StrCpy (SerialPortName, L"ISA Serial Port # ");
-  SerialPortName[sizeof (SERIAL_PORT_NAME) - 2] = (CHAR16) (L'0' + (UINT8) IsaIo->ResourceList->Device.UID);
+  mSerialPortName[(sizeof (mSerialPortName) / 2) - 2] = (CHAR16) (L'0' + (UINT8) IsaIo->ResourceList->Device.UID);
   AddUnicodeString2 (
     "eng",
     gIsaSerialComponentName.SupportedLanguages,
     &SerialDevice->ControllerNameTable,
-    (CHAR16 *) SerialPortName,
+    mSerialPortName,
     TRUE
     );
   AddUnicodeString2 (
     "en",
     gIsaSerialComponentName2.SupportedLanguages,
     &SerialDevice->ControllerNameTable,
-    (CHAR16 *) SerialPortName,
+    mSerialPortName,
     FALSE
     );
 
