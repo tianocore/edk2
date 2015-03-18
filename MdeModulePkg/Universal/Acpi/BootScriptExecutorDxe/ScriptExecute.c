@@ -4,7 +4,7 @@
   This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory
   in the entry point. The functionality is to interpret and restore the S3 boot script
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -307,7 +307,11 @@ ReadyToLockEventNotify (
   //
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   ASSERT_EFI_ERROR (Status);
-  Pages = EFI_SIZE_TO_PAGES(BufferSize + ImageContext.SectionAlignment);
+  if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
+    Pages = EFI_SIZE_TO_PAGES (ImageContext.ImageSize + ImageContext.SectionAlignment);
+  } else {
+    Pages = EFI_SIZE_TO_PAGES (ImageContext.ImageSize);
+  }
   FfsBuffer = 0xFFFFFFFF;
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
