@@ -2,7 +2,7 @@
   Implementation for S3 Boot Script Save thunk driver.
   This thunk driver consumes PI S3SaveState protocol to produce framework S3BootScriptSave Protocol 
   
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -899,7 +899,11 @@ InitializeScriptSaveOnS3SaveState (
     ASSERT_EFI_ERROR (Status);
 
     MemoryAddress = SIZE_4GB - 1;
-    PageNumber    = EFI_SIZE_TO_PAGES (BufferSize + ImageContext.SectionAlignment);
+    if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
+      PageNumber = EFI_SIZE_TO_PAGES (ImageContext.ImageSize + ImageContext.SectionAlignment);
+    } else {
+      PageNumber = EFI_SIZE_TO_PAGES (ImageContext.ImageSize);
+    }
     Status  = gBS->AllocatePages (
                      AllocateMaxAddress,
                      EfiReservedMemoryType,
