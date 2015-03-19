@@ -900,9 +900,9 @@ InitializeScriptSaveOnS3SaveState (
 
     MemoryAddress = SIZE_4GB - 1;
     if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
-      PageNumber = EFI_SIZE_TO_PAGES (ImageContext.ImageSize + ImageContext.SectionAlignment);
+      PageNumber = EFI_SIZE_TO_PAGES ((UINTN) (ImageContext.ImageSize + ImageContext.SectionAlignment));
     } else {
-      PageNumber = EFI_SIZE_TO_PAGES (ImageContext.ImageSize);
+      PageNumber = EFI_SIZE_TO_PAGES ((UINTN) ImageContext.ImageSize);
     }
     Status  = gBS->AllocatePages (
                      AllocateMaxAddress,
