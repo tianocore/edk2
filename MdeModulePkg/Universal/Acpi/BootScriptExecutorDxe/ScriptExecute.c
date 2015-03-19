@@ -308,9 +308,9 @@ ReadyToLockEventNotify (
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   ASSERT_EFI_ERROR (Status);
   if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
-    Pages = EFI_SIZE_TO_PAGES (ImageContext.ImageSize + ImageContext.SectionAlignment);
+    Pages = EFI_SIZE_TO_PAGES ((UINTN) (ImageContext.ImageSize + ImageContext.SectionAlignment));
   } else {
-    Pages = EFI_SIZE_TO_PAGES (ImageContext.ImageSize);
+    Pages = EFI_SIZE_TO_PAGES ((UINTN) ImageContext.ImageSize);
   }
   FfsBuffer = 0xFFFFFFFF;
   Status = gBS->AllocatePages (
