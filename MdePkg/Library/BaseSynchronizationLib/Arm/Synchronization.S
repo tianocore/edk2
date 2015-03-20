@@ -179,6 +179,7 @@ TryInternalSyncIncrement:
   cmp     r2, #0
   bne     TryInternalSyncIncrement
   dmb
+  mov     r0, r1
   bx      lr
 
 /**
@@ -208,4 +209,5 @@ TryInternalSyncDecrement:
   cmp     r2, #0
   bne     TryInternalSyncDecrement
   dmb
+  mov     r0, r1
   bx      lr
