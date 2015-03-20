@@ -1,7 +1,7 @@
 /** @file
   GUIDs and definitions used for Common Platform Error Record.
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  GUIDs introduced from UEFI 2.3.1 Specification.
+  GUIDs defined in UEFI 2.4 Specification.
 
 **/
 
@@ -765,6 +765,10 @@ typedef enum {
 #define EFI_PLATFORM_MEMORY_ERROR_RANK_NUM_VALID               BIT15
 #define EFI_PLATFORM_MEMORY_ERROR_CARD_HANDLE_VALID            BIT16
 #define EFI_PLATFORM_MEMORY_ERROR_MODULE_HANDLE_VALID          BIT17
+#define EFI_PLATFORM_MEMORY_ERROR_EXTENDED_ROW_BIT_16_17_VALID BIT18
+#define EFI_PLATFORM_MEMORY_ERROR_BANK_GROUP_VALID             BIT19
+#define EFI_PLATFORM_MEMORY_ERROR_BANK_ADDRESS_VALID           BIT20
+#define EFI_PLATFORM_MEMORY_ERROR_CHIP_IDENTIFICATION_VALID    BIT21
 ///@}
 
 ///
@@ -809,7 +813,7 @@ typedef struct {
   UINT64                   ResponderId;
   UINT64                   TargetId;
   UINT8                    ErrorType;
-  UINT8                    Resv1;
+  UINT8                    Extended;
   UINT16                   RankNum;
   UINT16                   CardHandle;
   UINT16                   ModuleHandle;
