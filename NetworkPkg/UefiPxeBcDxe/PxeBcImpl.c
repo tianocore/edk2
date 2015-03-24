@@ -1,7 +1,7 @@
 /** @file
   This implementation of EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
 
-  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -346,6 +346,7 @@ EfiPxeBcStop (
       gBS->CloseEvent (Private->IcmpToken.Event);
       Private->IcmpToken.Event = NULL;
     }
+    Private->BootFileName = NULL;
   }
 
   gBS->CloseEvent (Private->UdpTimeOutEvent);
