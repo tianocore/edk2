@@ -104,7 +104,7 @@ PeCoffLoaderExtraActionCommon (
   Dr1 = AsmReadDr1 ();
   Dr2 = AsmReadDr2 ();
   Dr3 = AsmReadDr3 ();
-  Dr7 = AsmReadDr7 ();
+  Dr7 = AsmReadDr7 () | BIT10; // H/w sets bit 10, some simulators don't
   Cr4 = AsmReadCr4 ();
 
   //
@@ -115,7 +115,7 @@ PeCoffLoaderExtraActionCommon (
   // DR7 = Disables all HW breakpoints except for DR3 I/O port access of length 1 byte
   // CR4 = Make sure DE(BIT3) is set
   //
-  AsmWriteDr7 (0);
+  AsmWriteDr7 (BIT10);
   AsmWriteDr0 (Signature);
   AsmWriteDr1 ((UINTN) ImageContext->PdbPointer);
   AsmWriteDr2 ((UINTN) ImageContext);
@@ -144,7 +144,7 @@ PeCoffLoaderExtraActionCommon (
   // E.g.: User halts the target and sets the HW breakpoint while target is 
   //       in the above exception handler
   //
-  NewDr7 = AsmReadDr7 ();
+  NewDr7 = AsmReadDr7 () | BIT10; // H/w sets bit 10, some simulators don't
   if (!IsDrxEnabled (0, NewDr7) && (AsmReadDr0 () == 0 || AsmReadDr0 () == Signature)) {
     //
     // If user changed Dr3 (by setting HW bp in the above exception handler,
@@ -161,11 +161,17 @@ PeCoffLoaderExtraActionCommon (
   if (!IsDrxEnabled (3, NewDr7) && (AsmReadDr3 () == IO_PORT_BREAKPOINT_ADDRESS)) {
     AsmWriteDr3 (Dr3);
   }
-  if (AsmReadCr4 () == (Cr4 | BIT3)) {
-    AsmWriteCr4 (Cr4);
-  }
-  if (NewDr7 == 0x20000480) {
-    AsmWriteDr7 (Dr7);
+  if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT) {
+    if (AsmReadCr4 () == (Cr4 | BIT3)) {
+      AsmWriteCr4 (Cr4);
+    }
+    if (NewDr7 == 0x20000480) {
+      AsmWriteDr7 (Dr7);
+    }
+  } else if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3) {
+    if (NewDr7 == BIT10) {
+      AsmWriteDr7 (Dr7);
+    }
   }
   //
   // Restore original IDT entry for INT1 if it was hooked.
