@@ -1,0 +1,279 @@
+Index: crypto/bio/bss_file.c
+===================================================================
+--- crypto/bio/bss_file.c	(revision 1)
++++ crypto/bio/bss_file.c	(working copy)
+@@ -418,6 +418,23 @@
+     return (ret);
+ }
+ 
++#else
++
++BIO_METHOD *BIO_s_file(void)
++{
++    return NULL;
++}
++
++BIO *BIO_new_file(const char *filename, const char *mode)
++{
++    return NULL;
++}
++
++BIO *BIO_new_fp(FILE *stream, int close_flag)
++{
++    return NULL;
++}
++
+ # endif                         /* OPENSSL_NO_STDIO */
+ 
+ #endif                          /* HEADER_BSS_FILE_C */
+Index: crypto/crypto.h
+===================================================================
+--- crypto/crypto.h	(revision 1)
++++ crypto/crypto.h	(working copy)
+@@ -239,15 +239,15 @@
+ # ifndef OPENSSL_NO_LOCKING
+ #  ifndef CRYPTO_w_lock
+ #   define CRYPTO_w_lock(type)     \
+-        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,NULL,0)
+ #   define CRYPTO_w_unlock(type)   \
+-        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,NULL,0)
+ #   define CRYPTO_r_lock(type)     \
+-        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,NULL,0)
+ #   define CRYPTO_r_unlock(type)   \
+-        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,NULL,0)
+ #   define CRYPTO_add(addr,amount,type)    \
+-        CRYPTO_add_lock(addr,amount,type,__FILE__,__LINE__)
++        CRYPTO_add_lock(addr,amount,type,NULL,0)
+ #  endif
+ # else
+ #  define CRYPTO_w_lock(a)
+@@ -374,19 +374,19 @@
+ # define MemCheck_off()  CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_DISABLE)
+ # define is_MemCheck_on() CRYPTO_is_mem_check_on()
+ 
+-# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,__FILE__,__LINE__)
+-# define OPENSSL_strdup(str)     CRYPTO_strdup((str),__FILE__,__LINE__)
++# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,NULL,0)
++# define OPENSSL_strdup(str)     CRYPTO_strdup((str),NULL,0)
+ # define OPENSSL_realloc(addr,num) \
+-        CRYPTO_realloc((char *)addr,(int)num,__FILE__,__LINE__)
++        CRYPTO_realloc((char *)addr,(int)num,NULL,0)
+ # define OPENSSL_realloc_clean(addr,old_num,num) \
+-        CRYPTO_realloc_clean(addr,old_num,num,__FILE__,__LINE__)
++        CRYPTO_realloc_clean(addr,old_num,num,NULL,0)
+ # define OPENSSL_remalloc(addr,num) \
+-        CRYPTO_remalloc((char **)addr,(int)num,__FILE__,__LINE__)
++        CRYPTO_remalloc((char **)addr,(int)num,NULL,0)
+ # define OPENSSL_freeFunc        CRYPTO_free
+ # define OPENSSL_free(addr)      CRYPTO_free(addr)
+ 
+ # define OPENSSL_malloc_locked(num) \
+-        CRYPTO_malloc_locked((int)num,__FILE__,__LINE__)
++        CRYPTO_malloc_locked((int)num,NULL,0)
+ # define OPENSSL_free_locked(addr) CRYPTO_free_locked(addr)
+ 
+ const char *SSLeay_version(int type);
+@@ -531,7 +531,7 @@
+ long CRYPTO_get_mem_debug_options(void);
+ 
+ # define CRYPTO_push_info(info) \
+-        CRYPTO_push_info_(info, __FILE__, __LINE__);
++        CRYPTO_push_info_(info, NULL, 0);
+ int CRYPTO_push_info_(const char *info, const char *file, int line);
+ int CRYPTO_pop_info(void);
+ int CRYPTO_remove_all_info(void);
+@@ -578,7 +578,7 @@
+ 
+ /* die if we have to */
+ void OpenSSLDie(const char *file, int line, const char *assertion);
+-# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(__FILE__, __LINE__, #e),1))
++# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(NULL, 0, #e),1))
+ 
+ unsigned long *OPENSSL_ia32cap_loc(void);
+ # define OPENSSL_ia32cap (*(OPENSSL_ia32cap_loc()))
+@@ -585,10 +585,10 @@
+ int OPENSSL_isservice(void);
+ 
+ # ifdef OPENSSL_FIPS
+-#  define FIPS_ERROR_IGNORED(alg) OpenSSLDie(__FILE__, __LINE__, \
++#  define FIPS_ERROR_IGNORED(alg) OpenSSLDie(NULL, 0, \
+                 alg " previous FIPS forbidden algorithm error ignored");
+ 
+-#  define FIPS_BAD_ABORT(alg) OpenSSLDie(__FILE__, __LINE__, \
++#  define FIPS_BAD_ABORT(alg) OpenSSLDie(NULL, 0, \
+                 #alg " Algorithm forbidden in FIPS mode");
+ 
+ #  ifdef OPENSSL_FIPS_STRICT
+Index: crypto/err/err.c
+===================================================================
+--- crypto/err/err.c	(revision 1)
++++ crypto/err/err.c	(working copy)
+@@ -321,7 +321,12 @@
+     es->err_data_flags[i] = flags;
+ }
+ 
++/* Add EFIAPI for UEFI version. */
++#if defined(OPENSSL_SYS_UEFI)
++void EFIAPI ERR_add_error_data(int num, ...)
++#else
+ void ERR_add_error_data(int num, ...)
++#endif
+ {
+     va_list args;
+     int i, n, s;
+Index: crypto/err/err.h
+===================================================================
+--- crypto/err/err.h	(revision 1)
++++ crypto/err/err.h	(working copy)
+@@ -285,7 +285,13 @@
+ # endif
+ # ifndef OPENSSL_NO_BIO
+ void ERR_print_errors(BIO *bp);
++
++/* Add EFIAPI for UEFI version. */
++#if defined(OPENSSL_SYS_UEFI)
++void EFIAPI ERR_add_error_data(int num, ...);
++#else
+ void ERR_add_error_data(int num, ...);
++#endif
+ # endif
+ void ERR_load_strings(int lib, ERR_STRING_DATA str[]);
+ void ERR_unload_strings(int lib, ERR_STRING_DATA str[]);
+Index: crypto/opensslconf.h
+===================================================================
+--- crypto/opensslconf.h	(revision 1)
++++ crypto/opensslconf.h	(working copy)
+@@ -162,6 +162,9 @@
+ /* The prime number generation stuff may not work when
+  * EIGHT_BIT but I don't care since I've only used this mode
+  * for debuging the bignum libraries */
++
++/* Bypass following definition for UEFI version. */
++#if !defined(OPENSSL_SYS_UEFI)
+ #undef SIXTY_FOUR_BIT_LONG
+ #undef SIXTY_FOUR_BIT
+ #define THIRTY_TWO_BIT
+@@ -169,6 +172,8 @@
+ #undef EIGHT_BIT
+ #endif
+ 
++#endif
++
+ #if defined(HEADER_RC4_LOCL_H) && !defined(CONFIG_HEADER_RC4_LOCL_H)
+ #define CONFIG_HEADER_RC4_LOCL_H
+ /* if this is defined data[i] is used instead of *data, this is a %20
+Index: crypto/pkcs7/pk7_smime.c
+===================================================================
+--- crypto/pkcs7/pk7_smime.c	(revision 1)
++++ crypto/pkcs7/pk7_smime.c	(working copy)
+@@ -90,7 +90,14 @@
+     if (!PKCS7_content_new(p7, NID_pkcs7_data))
+         goto err;
+ 
++#if defined(OPENSSL_SYS_UEFI)
++    /*
++     * NOTE: Update to SHA-256 digest algorithm for UEFI version.
++     */
++    if (!(si = PKCS7_add_signature(p7, signcert, pkey, EVP_sha256()))) {
++#else
+     if (!(si = PKCS7_add_signature(p7, signcert, pkey, EVP_sha1()))) {
++#endif
+         PKCS7err(PKCS7_F_PKCS7_SIGN, PKCS7_R_PKCS7_ADD_SIGNATURE_ERROR);
+         goto err;
+     }
+@@ -175,7 +182,8 @@
+     STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
+     PKCS7_SIGNER_INFO *si;
+     X509_STORE_CTX cert_ctx;
+-    char buf[4096];
++    char *buf = NULL;
++    int bufsiz;
+     int i, j = 0, k, ret = 0;
+     BIO *p7bio;
+     BIO *tmpin, *tmpout;
+@@ -286,6 +294,12 @@
+     } else
+         tmpout = out;
+ 
++    bufsiz = 4096;
++    buf = OPENSSL_malloc (bufsiz);
++    if (buf == NULL) {
++      goto err;
++    }
++
+     /* We now have to 'read' from p7bio to calculate digests etc. */
+     for (;;) {
+         i = BIO_read(p7bio, buf, sizeof(buf));
+@@ -328,6 +342,10 @@
+ 
+     sk_X509_free(signers);
+ 
++    if (buf != NULL) {
++      OPENSSL_free (buf);
++    }
++
+     return ret;
+ }
+ 
+Index: crypto/rand/rand_egd.c
+===================================================================
+--- crypto/rand/rand_egd.c	(revision 1)
++++ crypto/rand/rand_egd.c	(working copy)
+@@ -95,7 +95,7 @@
+  *   RAND_egd() is a wrapper for RAND_egd_bytes() with numbytes=255.
+  */
+ 
+-#if defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_VOS)
++#if defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_VOS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_query_egd_bytes(const char *path, unsigned char *buf, int bytes)
+ {
+     return (-1);
+Index: crypto/rand/rand_unix.c
+===================================================================
+--- crypto/rand/rand_unix.c	(revision 1)
++++ crypto/rand/rand_unix.c	(working copy)
+@@ -116,7 +116,7 @@
+ #include <openssl/rand.h>
+ #include "rand_lcl.h"
+ 
+-#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE))
++#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_UEFI))
+ 
+ # include <sys/types.h>
+ # include <sys/time.h>
+@@ -332,7 +332,7 @@
+                                  * defined(OPENSSL_SYS_VXWORKS) ||
+                                  * defined(OPENSSL_SYS_NETWARE)) */
+ 
+-#if defined(OPENSSL_SYS_VXWORKS)
++#if defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_poll(void)
+ {
+     return 0;
+Index: crypto/x509/x509_vfy.c
+===================================================================
+--- crypto/x509/x509_vfy.c	(revision 1)
++++ crypto/x509/x509_vfy.c	(working copy)
+@@ -871,6 +871,10 @@
+ 
+ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
+ {
++#if defined(OPENSSL_SYS_UEFI)
++  /* Bypass Certificate Time Checking for UEFI version. */
++  return 1;
++#else
+     time_t *ptime;
+     int i;
+ 
+@@ -910,6 +914,7 @@
+     }
+ 
+     return 1;
++#endif
+ }
+ 
+ static int internal_verify(X509_STORE_CTX *ctx)
