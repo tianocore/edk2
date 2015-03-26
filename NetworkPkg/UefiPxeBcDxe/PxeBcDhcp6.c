@@ -2,7 +2,7 @@
   Functions implementation related with DHCPv6 for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -793,8 +793,8 @@ PxeBcRequestBootService (
     
   Status = PxeBc->UdpRead (
                     PxeBc,
-                    EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP,
-                    &Private->StationIp,
+                    EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP | EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_IP,
+                    NULL,
                     &SrcPort,
                     &Private->ServerIp,
                     &DestPort,
@@ -1807,7 +1807,6 @@ PxeBcDhcp6Discover (
   UINT8                               *RequestOpt;
   UINT8                               *DiscoverOpt;
   UINTN                               ReadSize;
-  UINT16                              OpFlags;
   UINT16                              OpCode;
   UINT16                              OpLen;
   UINT32                              Xid;
@@ -1818,7 +1817,6 @@ PxeBcDhcp6Discover (
   Request     = Private->Dhcp6Request;
   SrcPort     = PXEBC_BS_DISCOVER_PORT;
   DestPort    = PXEBC_BS_DISCOVER_PORT;
-  OpFlags     = 0;
 
   if (!UseBis && Layer != NULL) {
     *Layer &= EFI_PXE_BASE_CODE_BOOT_LAYER_MASK;
@@ -1862,7 +1860,7 @@ PxeBcDhcp6Discover (
 
   Status = PxeBc->UdpWrite (
                     PxeBc,
-                    OpFlags,
+                    0,
                     &Private->ServerIp,
                     &DestPort,
                     NULL,
@@ -1899,8 +1897,8 @@ PxeBcDhcp6Discover (
   
   Status = PxeBc->UdpRead (
                     PxeBc,
-                    OpFlags,
-                    &Private->StationIp,
+                    EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_IP,
+                    NULL,
                     &SrcPort,
                     &Private->ServerIp,
                     &DestPort,

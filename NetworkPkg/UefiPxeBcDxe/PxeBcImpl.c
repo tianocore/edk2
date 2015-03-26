@@ -1265,7 +1265,7 @@ EfiPxeBcUdpRead (
   UINTN                       FragmentIndex;
   UINT8                       *FragmentBuffer;
 
-  if (This == NULL || DestIp == NULL || DestPort == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1276,9 +1276,9 @@ EfiPxeBcUdpRead (
   Udp4Rx    = NULL;
   Udp6Rx    = NULL;
 
-  if (((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_PORT) != 0 && DestPort == NULL) ||
-      ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP) != 0 && SrcIp == NULL) ||
-      ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_PORT) != 0 && SrcPort == NULL)) {
+  if (((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_PORT) == 0 && DestPort == NULL) ||
+      ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP) == 0 && SrcIp == NULL) ||
+      ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_PORT) == 0 && SrcPort == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
