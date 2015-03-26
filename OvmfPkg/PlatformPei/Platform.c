@@ -232,7 +232,8 @@ MiscInitialization (
   UINT16 HostBridgeDevId;
   UINTN  PmCmd;
   UINTN  Pmba;
-  UINTN  PmRegMisc;
+  UINTN  AcpiCtlReg;
+  UINT8  AcpiEnBit;
 
   //
   // Disable A20 Mask
@@ -250,14 +251,16 @@ MiscInitialization (
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   switch (HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
-      PmCmd     = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
-      Pmba      = POWER_MGMT_REGISTER_PIIX4 (0x40);
-      PmRegMisc = POWER_MGMT_REGISTER_PIIX4 (0x80);
+      PmCmd      = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
+      Pmba       = POWER_MGMT_REGISTER_PIIX4 (0x40);
+      AcpiCtlReg = POWER_MGMT_REGISTER_PIIX4 (0x80); // PMREGMISC
+      AcpiEnBit  = BIT0; // PIIX4_PMIOSE
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
-      PmCmd     = POWER_MGMT_REGISTER_Q35 (PCI_COMMAND_OFFSET);
-      Pmba      = POWER_MGMT_REGISTER_Q35 (0x40);
-      PmRegMisc = POWER_MGMT_REGISTER_Q35 (0x80);
+      PmCmd      = POWER_MGMT_REGISTER_Q35 (PCI_COMMAND_OFFSET);
+      Pmba       = POWER_MGMT_REGISTER_Q35 (0x40);
+      AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (0x44); // ACPI_CNTL
+      AcpiEnBit  = BIT7; // Q35_ACPI_EN
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
@@ -268,13 +271,13 @@ MiscInitialization (
   PcdSet16 (PcdOvmfHostBridgePciDevId, HostBridgeDevId);
 
   //
-  // If PMREGMISC/PMIOSE is set, assume the ACPI PMBA has been configured (for
-  // example by Xen) and skip the setup here. This matches the logic in
-  // AcpiTimerLibConstructor ().
+  // If the appropriate IOspace enable bit is set, assume the ACPI PMBA
+  // has been configured (e.g., by Xen) and skip the setup here.
+  // This matches the logic in AcpiTimerLibConstructor ().
   //
-  if ((PciRead8 (PmRegMisc) & 0x01) == 0) {
+  if ((PciRead8 (AcpiCtlReg) & AcpiEnBit) == 0) {
     //
-    // The PEI phase should be exited with fully accessibe PIIX4 IO space:
+    // The PEI phase should be exited with fully accessibe ACPI PM IO space:
     // 1. set PMBA
     //
     PciAndThenOr32 (Pmba, (UINT32) ~0xFFC0, PcdGet16 (PcdAcpiPmBaseAddress));
@@ -285,9 +288,9 @@ MiscInitialization (
     PciOr8 (PmCmd, EFI_PCI_COMMAND_IO_SPACE);
 
     //
-    // 3. set PMREGMISC/PMIOSE
+    // 3. set ACPI PM IO enable bit (PMREGMISC:PMIOSE or ACPI_CNTL:ACPI_EN)
     //
-    PciOr8 (PmRegMisc, 0x01);
+    PciOr8 (AcpiCtlReg, AcpiEnBit);
   }
 }
 
