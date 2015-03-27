@@ -256,22 +256,14 @@ L30:
 	GCC_ASM_EXPORT(InternalMathSwapBytes64)
 
 ASM_PFX(InternalMathSwapBytes64):
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
-	stmfd	sp!, {r4, r5, r6, r7, lr}
-	add	r7, sp, #12
+	stmfd	sp!, {r4, r5, r7, lr}
 	mov	r5, r1
 	bl	ASM_PFX(SwapBytes32)
-	mov	r6, r0
+	mov	r4, r0
 	mov	r0, r5
 	bl	ASM_PFX(SwapBytes32)
-	mov	r4, r6
-	mov	r5, r4, asr #31
-	mov	r2, #0
-	mov	r1, r0, asr #31
-	orr	r0, r0, r2
-	orr	r1, r1, r4
-	ldmfd	sp!, {r4, r5, r6, r7, pc}
+	mov	r1, r4
+	ldmfd	sp!, {r4, r5, r7, pc}
 
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
