@@ -179,8 +179,8 @@ InitializeConsolePipe (
       *Handle = Buffer[0];
       Status = gBS->HandleProtocol (*Handle, Protocol, Interface);
       ASSERT_EFI_ERROR (Status);
+      FreePool (Buffer);
     }
-    FreePool (Buffer);
   } else {
     Status = EFI_SUCCESS;
   }
