@@ -25,6 +25,17 @@
 #include <IndustryStandard/Xen/event_channel.h>
 
 //
+// We can't use DebugLib due to a constructor dependency cycle between DebugLib
+// and ourselves.
+//
+#define ASSERT(Expression)      \
+  do {                          \
+    if (!(Expression)) {        \
+      CpuDeadLoop ();           \
+    }                           \
+  } while (FALSE)
+
+//
 // The code below expects these global variables to be mutable, even in the case
 // that we have been incorporated into SEC or PEIM phase modules (which is
 // allowed by our INF description). While this is a dangerous assumption to make
@@ -34,6 +45,17 @@
 STATIC evtchn_send_t              mXenConsoleEventChain;
 STATIC struct xencons_interface   *mXenConsoleInterface;
 
+/**
+  Initialize the serial device hardware.
+
+  If no initialization is required, then return RETURN_SUCCESS.
+  If the serial device was successfully initialized, then return RETURN_SUCCESS.
+  If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
+
+  @retval RETURN_SUCCESS        The serial device was initialized.
+  @retval RETURN_DEVICE_ERROR   The serial device could not be initialized.
+
+**/
 RETURN_STATUS
 EFIAPI
 SerialPortInitialize (
@@ -41,7 +63,7 @@ SerialPortInitialize (
   )
 {
   if (! XenHypercallIsAvailable ()) {
-    return RETURN_NOT_FOUND;
+    return RETURN_DEVICE_ERROR;
   }
 
   if (!mXenConsoleInterface) {
@@ -57,13 +79,20 @@ SerialPortInitialize (
 }
 
 /**
-  Write data to serial device.
+  Write data from buffer to serial device.
 
-  @param  Buffer           Point of data buffer which need to be written.
-  @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
+  Writes NumberOfBytes data bytes from Buffer to the serial device.
+  The number of bytes actually written to the serial device is returned.
+  If the return value is less than NumberOfBytes, then the write operation failed.
+  If Buffer is NULL, then ASSERT().
+  If NumberOfBytes is zero, then return 0.
 
-  @retval 0                Write data failed.
-  @retval !0               Actual number of bytes written to serial device.
+  @param  Buffer           Pointer to the data buffer to be written.
+  @param  NumberOfBytes    Number of bytes to written to the serial device.
+
+  @retval 0                NumberOfBytes is 0.
+  @retval >0               The number of bytes written to the serial device.
+                           If this value is less than NumberOfBytes, then the write operation failed.
 
 **/
 UINTN
@@ -76,38 +105,50 @@ SerialPortWrite (
   XENCONS_RING_IDX  Consumer, Producer;
   UINTN             Sent;
 
+  ASSERT (Buffer != NULL);
+
+  if (NumberOfBytes == 0) {
+    return 0;
+  }
+
   if (!mXenConsoleInterface) {
     return 0;
   }
 
-  Consumer = mXenConsoleInterface->out_cons;
-  Producer = mXenConsoleInterface->out_prod;
-
-  MemoryFence ();
-
   Sent = 0;
-  while (Sent < NumberOfBytes && ((Producer - Consumer) < sizeof (mXenConsoleInterface->out)))
-    mXenConsoleInterface->out[MASK_XENCONS_IDX(Producer++, mXenConsoleInterface->out)] = Buffer[Sent++];
+  do {
+    Consumer = mXenConsoleInterface->out_cons;
+    Producer = mXenConsoleInterface->out_prod;
 
-  MemoryFence ();
+    MemoryFence ();
 
-  mXenConsoleInterface->out_prod = Producer;
+    while (Sent < NumberOfBytes && ((Producer - Consumer) < sizeof (mXenConsoleInterface->out)))
+      mXenConsoleInterface->out[MASK_XENCONS_IDX(Producer++, mXenConsoleInterface->out)] = Buffer[Sent++];
 
-  if (Sent > 0) {
+    MemoryFence ();
+
+    mXenConsoleInterface->out_prod = Producer;
+
     XenHypercallEventChannelOp (EVTCHNOP_send, &mXenConsoleEventChain);
-  }
+
+  } while (Sent < NumberOfBytes);
 
   return Sent;
 }
 
 /**
-  Read data from serial device and save the data in buffer.
+  Read data from serial device and save the datas in buffer.
 
-  @param  Buffer           Point of data buffer which need to be written.
-  @param  NumberOfBytes    Size of Buffer[].
+  Reads NumberOfBytes data bytes from a serial device into the buffer
+  specified by Buffer. The number of bytes actually read is returned.
+  If Buffer is NULL, then ASSERT().
+  If NumberOfBytes is zero, then return 0.
 
-  @retval 0                Read data failed.
-  @retval !0               Actual number of bytes read from serial device.
+  @param  Buffer           Pointer to the data buffer to store the data read from the serial device.
+  @param  NumberOfBytes    Number of bytes which will be read.
+
+  @retval 0                Read data failed, no data is to be read.
+  @retval >0               Actual number of bytes read from serial device.
 
 **/
 UINTN
@@ -119,6 +160,12 @@ SerialPortRead (
 {
   XENCONS_RING_IDX  Consumer, Producer;
   UINTN             Received;
+
+  ASSERT (Buffer != NULL);
+
+  if (NumberOfBytes == 0) {
+    return 0;
+  }
 
   if (!mXenConsoleInterface) {
     return 0;
@@ -143,10 +190,10 @@ SerialPortRead (
 }
 
 /**
-  Check to see if any data is available to be read from the debug device.
+  Polls a serial device to see if there is any data waiting to be read.
 
-  @retval TRUE       At least one byte of data is available to be read
-  @retval FALSE      No data is available to be read
+  @retval TRUE             Data is waiting to be read from the serial device.
+  @retval FALSE            There is no data waiting to be read from the serial device.
 
 **/
 BOOLEAN
