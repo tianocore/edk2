@@ -1,0 +1,59 @@
+## @file
+# Coreboot Support DXE Module
+#
+# Report some MMIO/IO resources to dxe core, extract smbios and acpi tables from coreboot and install.
+#
+#  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CbSupportDxe
+  FILE_GUID                      = C68DAA4E-7AB5-41e8-A91D-5954421053F3
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CbDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  CbSupportDxe.c
+  CbSupportDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  CorebootModulePkg/CorebootModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+  DebugLib
+  BaseMemoryLib
+  UefiLib
+  IoLib
+  HobLib
+
+[Guids]  
+  gEfiAcpiTableGuid
+  gEfiSmbiosTableGuid
+  gUefiSystemTableInfoGuid
+  gUefiAcpiBoardInfoGuid
+
+[Depex]
+  TRUE
