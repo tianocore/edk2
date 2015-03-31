@@ -1,0 +1,55 @@
+#/** @file
+#  
+#  Convert SerialLib into SerialIo protocol
+#  
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SerialDxe
+  FILE_GUID                      = D3987D4B-971A-435F-8CAF-4967EB627241
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = SerialDxeInitialize
+
+[Sources.common]
+  SerialIo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  ReportStatusCodeLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiDriverEntryPoint
+  SerialPortLib
+  
+
+[Protocols]
+  gEfiSerialIoProtocolGuid    
+  gEfiDevicePathProtocolGuid
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
+[Depex] 
+  TRUE

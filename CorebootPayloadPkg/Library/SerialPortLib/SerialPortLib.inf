@@ -1,0 +1,42 @@
+## @file
+#   SerialPortLib instance for UART device upon coreboot
+#
+#  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SerialPortLib
+  FILE_GUID                      = 40A2CBC6-CFB8-447b-A90E-198E88FD345E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+  
+  CONSTRUCTOR                    = SerialPortInitialize
+  
+[Sources]
+  SerialPortLib.c
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CorebootModulePkg/CorebootModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  IoLib
+  CbParseLib
+  
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialLineControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl
