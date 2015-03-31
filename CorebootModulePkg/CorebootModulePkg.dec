@@ -1,0 +1,59 @@
+## @file
+# Coreboot Support Package
+#
+# Provides drivers and definitions to support coreboot in EDKII bios. 
+#
+# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials are licensed and made available under 
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php.                                                                          
+# 
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = CorebootModulePkg
+  PACKAGE_GUID                   = DE1750CE-FEE7-4dd1-8E9C-B7B8BAEBCF4F
+  PACKAGE_VERSION                = 0.1
+  
+[Includes]
+  Include
+  
+[LibraryClasses]
+  CbParseLib|Include/Library/CbParseLib.h
+  
+[Guids]
+  #
+  ## Defines the token space for the Coreboot Module Package PCDs.
+  #
+  gUefiCorebootModulePkgTokenSpaceGuid  = {0xe6ff49a0, 0x15df, 0x48fd, {0x9a, 0xcf, 0xd7, 0xdc, 0x27, 0x1b, 0x39, 0xd5}}
+  gUefiSystemTableInfoGuid = {0x16c8a6d0, 0xfe8a, 0x4082, {0xa2, 0x8, 0xcf, 0x89, 0xc4, 0x29, 0x4, 0x33}}
+  gUefiFrameBufferInfoGuid = {0xdc2cd8bd, 0x402c, 0x4dc4, {0x9b, 0xe0, 0xc, 0x43, 0x2b, 0x7, 0xfa, 0x34}}
+  gUefiAcpiBoardInfoGuid   = {0xad3d31b, 0xb3d8, 0x4506, {0xae, 0x71, 0x2e, 0xf1, 0x10, 0x6, 0xd9, 0xf}}
+
+
+[Ppis]
+
+[Protocols]
+
+
+################################################################################
+#
+# PCD Declarations section - list of all PCDs Declared by this Package
+#                            Only this package should be providing the
+#                            declaration, other packages should not.
+#
+################################################################################
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+## Indicates the base address of the payload binary in memory
+gUefiCorebootModulePkgTokenSpaceGuid.PcdPayloadFdMemBase|0|UINT32|0x10000001
+## Provides the size of the payload binary in memory
+gUefiCorebootModulePkgTokenSpaceGuid.PcdPayloadFdMemSize|0|UINT32|0x10000002
+
+[PcdsDynamicEx]
+gUefiCorebootModulePkgTokenSpaceGuid.PcdCbHeaderPointer|0|UINT32|0x10000003
+ 
