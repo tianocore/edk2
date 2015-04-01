@@ -1,7 +1,7 @@
 /** @file
   Debug Agent library implementition for Dxe Core and Dxr modules.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -355,6 +355,7 @@ InitializeDebugAgent (
   IA32_DESCRIPTOR              IdtDescriptor;
   IA32_DESCRIPTOR              *Ia32Idtr;
   IA32_IDT_ENTRY               *Ia32IdtEntry;
+  UINT32                       DebugTimerFrequency;
 
   if (InitFlag == DEBUG_AGENT_INIT_DXE_AP) {
     //
@@ -398,10 +399,6 @@ InitializeDebugAgent (
     mSaveIdtTableSize = IdtDescriptor.Limit + 1;
     mSavedIdtTable    = AllocateCopyPool (mSaveIdtTableSize, (VOID *) IdtDescriptor.Base);
     //
-    // Initialize Debug Timer hardware and save its initial count
-    //
-    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer ();
-    //
     // Check if Debug Agent initialized in DXE phase
     //
     Mailbox = GetMailboxFromConfigurationTable ();
@@ -416,6 +413,11 @@ InitializeDebugAgent (
     // Set up IDT table and prepare for IDT entries
     //
     SetupDebugAgentEnviroment (Mailbox);
+    //
+    // Initialize Debug Timer hardware and save its initial count and frequency
+    //
+    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer (&DebugTimerFrequency);
+    UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
     //
     // For DEBUG_AGENT_INIT_S3, needn't to install configuration table and EFI Serial IO protocol
     // For DEBUG_AGENT_INIT_DXE_CORE, InternalConstructorWorker() will invoked in Constructor()
@@ -496,10 +498,6 @@ InitializeDebugAgent (
     mDxeCoreFlag                = TRUE;
     mMultiProcessorDebugSupport = TRUE;
     //
-    // Initialize Debug Timer hardware and its initial count
-    //
-    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer ();
-    //
     // Try to get mailbox from GUIDed HOB build in PEI
     //
     HobList = Context;
@@ -508,6 +506,11 @@ InitializeDebugAgent (
     // Set up IDT table and prepare for IDT entries
     //
     SetupDebugAgentEnviroment (Mailbox);
+    //
+    // Initialize Debug Timer hardware and save its initial count and frequency
+    //
+    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer (&DebugTimerFrequency);
+    UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
     //
     // Enable interrupt to receive Debug Timer interrupt
     //

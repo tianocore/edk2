@@ -1,7 +1,7 @@
 /** @file
   Install Serial IO Protocol that layers on top of a Debug Communication Library instance.
 
-  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -676,7 +676,7 @@ SerialRead (
       if (!DebugPortPollBuffer (Handle)) {
         break;
       }
-      DebugPortReadBuffer (Handle, Data8, 1, 0);
+      DebugAgentReadBuffer (Handle, Data8, 1, 0);
 
       if (*Data8 == DEBUG_STARTING_SYMBOL_ATTACH) {
         //
@@ -752,7 +752,7 @@ DebugReadBreakFromDebugPort (
     //
     // Try to read the start symbol
     //
-    DebugPortReadBuffer (Handle, Data8, 1, 0);
+    DebugAgentReadBuffer (Handle, Data8, 1, 0);
     if (*Data8 == DEBUG_STARTING_SYMBOL_ATTACH) {
       DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Debug Timer attach symbol received %x", *Data8);
       *BreakSymbol = *Data8;

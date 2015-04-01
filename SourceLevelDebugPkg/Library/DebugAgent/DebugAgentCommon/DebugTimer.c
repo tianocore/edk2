@@ -1,7 +1,7 @@
 /** @file
   Code for debug timer to support debug agent library implementation.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,31 +17,42 @@
 /**
   Initialize CPU local APIC timer.
 
+  @param[out]   Local APIC timer frequency returned.
+ 
   @return   32-bit Local APIC timer init count.
 **/
 UINT32
 InitializeDebugTimer (
-  VOID
+  OUT UINT32     *TimerFrequency
   )
 {
   UINTN       ApicTimerDivisor;
   UINT32      InitialCount;
+  UINT32      ApicTimerFrequency;
 
   GetApicTimerState (&ApicTimerDivisor, NULL, NULL);
-
+  ApicTimerFrequency = PcdGet32(PcdFSBClock) / (UINT32)ApicTimerDivisor;
   //
   // Cpu Local Apic timer interrupt frequency, it is set to 0.1s
   //
   InitialCount = (UINT32)DivU64x32 (
                    MultU64x64 (
-                     PcdGet32(PcdFSBClock) / (UINT32)ApicTimerDivisor,
-                     100
+                     ApicTimerFrequency,
+                     DEBUG_TIMER_INTERVAL
                      ),
-                   1000
+                   1000000u
                    );
 
   InitializeApicTimer (ApicTimerDivisor, InitialCount, TRUE, DEBUG_TIMER_VECTOR);
 
+  DEBUG ((EFI_D_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32(PcdFSBClock))); 
+  DEBUG ((EFI_D_INFO, "Debug Timer: Divisor      = %d\n", ApicTimerDivisor)); 
+  DEBUG ((EFI_D_INFO, "Debug Timer: Frequency    = %d\n", ApicTimerFrequency)); 
+  DEBUG ((EFI_D_INFO, "Debug Timer: InitialCount = %d\n", InitialCount)); 
+
+  if (TimerFrequency != NULL) {
+    *TimerFrequency = ApicTimerFrequency;
+  }
   return InitialCount;
 }
 
@@ -85,5 +96,43 @@ SaveAndSetDebugTimerInterrupt (
   }
 
   return OldDebugTimerInterruptState;
+}
+
+/**
+  Check if the timer is time out.
+  
+  @param[in] TimerCycle             Timer total count.
+  @param[in] Timer                  The start timer from the begin.
+  @param[in] TimeoutTicker          Ticker number need time out.
+
+  @return TRUE  Timer time out occurs.
+  @retval FALSE Timer does not time out.
+
+**/
+BOOLEAN
+IsDebugTimerTimeout (
+  IN UINT32                     TimerCycle,
+  IN UINT32                     Timer,
+  IN UINT32                     TimeoutTicker
+  )
+{
+  UINT64  CurrentTimer;
+  UINT64  Delta;
+
+  CurrentTimer = GetApicTimerCurrentCount ();
+
+  //
+  // This timer counter counts down.  Check for roll over condition.
+  //
+  if (CurrentTimer < Timer) {
+    Delta = Timer - CurrentTimer;
+  } else {
+    //
+    // Handle one roll-over. 
+    //
+    Delta = TimerCycle - (CurrentTimer - Timer);
+  }
+ 
+  return (BOOLEAN) (Delta >= TimeoutTicker);
 }
 

@@ -45,7 +45,7 @@
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress              ## CONSUMES
   # The value of data buffer size used for USB debug port handle.
   # It should be equal to sizeof (USB_DEBUG_PORT_HANDLE).
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|40   ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|23   ## SOMETIMES_CONSUMES
 
 [LibraryClasses]
   TimerLib

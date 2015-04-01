@@ -1,7 +1,7 @@
 /** @file
   SEC Core Debug Agent Library instance implementition.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -93,7 +93,7 @@ DebugReadBreakSymbol (
     //
     // Try to read the start symbol
     //
-    DebugPortReadBuffer (Handle, Data8, 1, 0);
+    DebugAgentReadBuffer (Handle, Data8, 1, 0);
     if (*Data8 == DEBUG_STARTING_SYMBOL_ATTACH) {
       *BreakSymbol = *Data8;
       DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Debug Timer attach symbol received %x", *BreakSymbol);
@@ -375,6 +375,7 @@ InitializeDebugAgent (
   UINT64                           MailboxLocation;
   UINT64                           *MailboxLocationPointer;
   EFI_PHYSICAL_ADDRESS             Address;
+  UINT32                           DebugTimerFrequency;
 
   DisableInterrupts ();
 
@@ -399,8 +400,11 @@ InitializeDebugAgent (
     // Save init arch type when debug agent initialized
     //
     SetDebugFlag (DEBUG_AGENT_FLAG_INIT_ARCH, DEBUG_ARCH_SYMBOL);
-
-    InitializeDebugTimer ();
+    //
+    // Initialize Debug Timer hardware and save its frequency
+    //
+    InitializeDebugTimer (&DebugTimerFrequency);
+    UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
 
     Phase2Context.InitFlag = InitFlag;
     Phase2Context.Context  = Context;
@@ -524,8 +528,11 @@ InitializeDebugAgent (
                                &MailboxLocation,
                                sizeof (UINT64)
                                );
-
-    InitializeDebugTimer ();
+    //
+    // Initialize Debug Timer hardware and save its frequency
+    //
+    InitializeDebugTimer (&DebugTimerFrequency);
+    UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
     //
     // Update IDT entry to save the location pointer saved mailbox pointer
     //

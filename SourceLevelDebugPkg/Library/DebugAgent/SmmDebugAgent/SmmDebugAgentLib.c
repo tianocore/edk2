@@ -1,7 +1,7 @@
 /** @file
   Debug Agent library implementition.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -189,6 +189,7 @@ InitializeDebugAgent (
   UINT16                        IdtEntryCount;
   DEBUG_AGENT_MAILBOX           *Mailbox;
   UINT64                        *MailboxLocation;
+  UINT32                        DebugTimerFrequency;
 
   switch (InitFlag) {
   case DEBUG_AGENT_INIT_SMM:
@@ -236,6 +237,12 @@ InitializeDebugAgent (
     // Initialized Debug Agent
     //
     InitializeDebugIdt ();
+    //
+    // Initialize Debug Timer hardware and save its frequency
+    //
+    InitializeDebugTimer (&DebugTimerFrequency);
+    UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
+
     DebugPortHandle = (UINT64) (UINTN)DebugPortInitialize ((DEBUG_PORT_HANDLE) (UINTN)Mailbox->DebugPortHandle, NULL);
     UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_PORT_HANDLE_INDEX, DebugPortHandle);
     mMailboxPointer = Mailbox;
@@ -329,9 +336,10 @@ InitializeDebugAgent (
 
       InitializeDebugIdt ();
       //
-      // Initialize Debug Timer hardware and enable interrupt.
+      // Initialize Debug Timer hardware and save its frequency
       //
-      InitializeDebugTimer ();
+      InitializeDebugTimer (&DebugTimerFrequency);
+      UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
       EnableInterrupts ();
 
       FindAndReportModuleImageInfo (SIZE_4KB);

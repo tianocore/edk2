@@ -35,13 +35,4 @@
 
 [LibraryClasses]
   SerialPortLib
-  TimerLib
   DebugLib
-  BaseMemoryLib
-  BaseLib
-
-[PCD]
-  # The value of data buffer size used for Serial debug port handle.
-  # It should be equal to sizeof (SERIAL_DEBUG_PORT_HANDLE).
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|17   ## SOMETIMES_CONSUMES
-

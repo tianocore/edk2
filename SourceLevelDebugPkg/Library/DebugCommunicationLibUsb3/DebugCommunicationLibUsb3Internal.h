@@ -83,7 +83,7 @@
 #define DATA_TRANSFER_WRITE_TIMEOUT      0
 #define DATA_TRANSFER_READ_TIMEOUT       50000
 #define DATA_TRANSFER_POLL_TIMEOUT       1000
-
+#define XHC_DEBUG_PORT_1_MILLISECOND     1000
 //
 // XHCI port power off/on delay
 //
@@ -524,13 +524,6 @@ typedef struct _USB3_DEBUG_PORT_INSTANCE {
   // The data buffer address for data read and poll.
   //
   EFI_PHYSICAL_ADDRESS                    Data;
-  //
-  // Timter settings
-  //
-  UINT64                                  TimerFrequency;
-  UINT64                                  TimerCycle;
-  BOOLEAN                                 TimerCountDown;
-
 } USB3_DEBUG_PORT_HANDLE;
 
 #pragma pack()
@@ -733,24 +726,6 @@ XhcDataTransfer (
   IN OUT VOID                                *Data,
   IN OUT UINTN                               *DataLength,
   IN     UINTN                               Timeout
-  );
-
-/**
-  Check if the timer is timeout.
-  
-  @param[in] UsbDebugPortHandle  Pointer to USB Debug port handle
-  @param[in] Timer               The start timer from the begin.
-  @param[in] TimeoutTicker       Ticker number need time out.
-
-  @return TRUE  Timer time out occurs.
-  @retval FALSE Timer does not time out.
-
-**/
-BOOLEAN
-IsTimerTimeout (
-  IN USB3_DEBUG_PORT_HANDLE  *UsbDebugPortHandle,
-  IN UINT64                  Timer,
-  IN UINT64                  TimeoutTicker
   );
 
 #endif //__SERIAL_PORT_LIB_USB__

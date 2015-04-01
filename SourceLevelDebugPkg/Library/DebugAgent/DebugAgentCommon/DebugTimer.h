@@ -1,7 +1,7 @@
 /** @file
   Header file for debug timer to support debug agent library implementation.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,11 +18,31 @@
 /**
   Initialize CPU local APIC timer.
 
+  @param[out]   Local APIC timer frequency returned.
+ 
   @return   32-bit Local APIC timer init count.
 **/
 UINT32
 InitializeDebugTimer (
-  VOID
+  OUT UINT32     *TimerFrequency
+  );
+
+/**
+  Check if the timer is time out.
+  
+  @param[in] TimerCycle             Timer total count.
+  @param[in] Timer                  The start timer from the begin.
+  @param[in] TimeoutTicker          Ticker number need time out.
+
+  @return TRUE  Timer time out occurs.
+  @retval FALSE Timer does not time out.
+
+**/
+BOOLEAN
+IsDebugTimerTimeout (
+  IN UINT32                     TimerCycle,
+  IN UINT32                     Timer,
+  IN UINT32                     TimeoutTicker
   );
 
 #endif

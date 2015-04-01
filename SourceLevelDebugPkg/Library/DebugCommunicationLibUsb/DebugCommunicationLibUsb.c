@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb debug port.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -147,12 +147,6 @@ typedef struct _USB_DEBUG_PORT_HANDLE{
   // The data buffer. Maximum length is 8 bytes.
   //
   UINT8        Data[8];
-  //
-  // Timter settings
-  //
-  UINT64       TimerFrequency;
-  UINT64       TimerCycle;
-  BOOLEAN      TimerCountDown;
 } USB_DEBUG_PORT_HANDLE;
 #pragma pack()
 
@@ -160,58 +154,6 @@ typedef struct _USB_DEBUG_PORT_HANDLE{
 // The global variable which can be used after memory is ready.
 //
 USB_DEBUG_PORT_HANDLE     mDebugCommunicationLibUsbDebugPortHandle;
-
-/**
-  Check if the timer is timeout.
-  
-  @param[in] UsbDebugPortHandle  Pointer to USB Debug port handle
-  @param[in] Timer               The start timer from the begin.
-  @param[in] TimeoutTicker       Ticker number need time out.
-
-  @return TRUE  Timer time out occurs.
-  @retval FALSE Timer does not time out.
-
-**/
-BOOLEAN
-IsTimerTimeout (
-  IN USB_DEBUG_PORT_HANDLE   *UsbDebugPortHandle,
-  IN UINT64                  Timer,
-  IN UINT64                  TimeoutTicker
-  )
-{
-  UINT64  CurrentTimer;
-  UINT64  Delta;
-
-  CurrentTimer = GetPerformanceCounter ();
-
-  if (UsbDebugPortHandle->TimerCountDown) {
-    //
-    // The timer counter counts down.  Check for roll over condition.
-    //
-    if (CurrentTimer < Timer) {
-      Delta = Timer - CurrentTimer;
-    } else {
-      //
-      // Handle one roll-over. 
-      //
-      Delta = UsbDebugPortHandle->TimerCycle - (CurrentTimer - Timer);
-    }
-  } else {
-    //
-    // The timer counter counts up.  Check for roll over condition.
-    //
-    if (CurrentTimer > Timer) {
-      Delta = CurrentTimer - Timer;
-    } else {
-      //
-      // Handle one roll-over. 
-      //
-      Delta = UsbDebugPortHandle->TimerCycle - (Timer - CurrentTimer);
-    }
-  }
- 
-  return (BOOLEAN) (Delta >= TimeoutTicker);
-}
 
 /**
   Calculate the usb debug port bar address.
@@ -834,22 +776,11 @@ DebugPortReadBuffer (
   USB_DEBUG_PORT_HANDLE     *UsbDebugPortHandle;
   USB_DEBUG_PORT_REGISTER   *UsbDebugPortRegister;
   RETURN_STATUS             Status;
-  UINT8                     Received;
-  UINTN                     Total;
-  UINTN                     Remaining;
   UINT8                     Index;
-  UINT8                     Length;
-  UINT64                    Begin;
-  UINT64                    TimeoutTicker;
-  UINT64                    TimerRound;
 
-  if (NumberOfBytes == 0 || Buffer == NULL) {
+  if (NumberOfBytes != 1 || Buffer == NULL || Timeout != 0) {
     return 0;
   }
-
-  Received  = 0;
-  Total     = 0;
-  Remaining = 0;
 
   //
   // If Handle is NULL, it means memory is ready for use.
@@ -871,117 +802,21 @@ DebugPortReadBuffer (
   UsbDebugPortRegister = (USB_DEBUG_PORT_REGISTER *)(UINTN)(UsbDebugPortHandle->UsbDebugPortMemoryBase + UsbDebugPortHandle->DebugPortOffset);
 
   //
-  // First read data from buffer, then read debug port hw to get received data.
+  // Read data from buffer
   //
-  if (UsbDebugPortHandle->DataCount > 0) {
-    if (NumberOfBytes <= UsbDebugPortHandle->DataCount) {
-      Total = NumberOfBytes;
-    } else {
-      Total = UsbDebugPortHandle->DataCount;
-    }
-
-    for (Index = 0; Index < Total; Index++) {
-      Buffer[Index] = UsbDebugPortHandle->Data[Index];
-    }
-
-    for (Index = 0; Index < UsbDebugPortHandle->DataCount - Total; Index++) {
-      if (Total + Index >= 8) {
+  if (UsbDebugPortHandle->DataCount < 1) {
+    return 0;
+  } else {
+    *Buffer = UsbDebugPortHandle->Data[0];
+    for (Index = 0; Index < UsbDebugPortHandle->DataCount - 1; Index++) {
+      if ((Index + 1) >= USB_DEBUG_PORT_MAX_PACKET_SIZE) {
         return 0;
       }
-      UsbDebugPortHandle->Data[Index] = UsbDebugPortHandle->Data[Total + Index];
+      UsbDebugPortHandle->Data[Index] = UsbDebugPortHandle->Data[Index + 1];
     }
-    UsbDebugPortHandle->DataCount = (UINT8)(UsbDebugPortHandle->DataCount - (UINT8)Total);
+    UsbDebugPortHandle->DataCount = (UINT8)(UsbDebugPortHandle->DataCount - 1);
+    return 1;
   }
-
-  //
-  // If Timeout is equal to 0, then it means it should always wait until all datum required are received.
-  //
-  Begin         = 0;
-  TimeoutTicker = 0;  
-  TimerRound    = 0;
-  if (Timeout != 0) {
-    Begin = GetPerformanceCounter ();
-    TimeoutTicker = DivU64x32 (
-                      MultU64x64 (
-                        UsbDebugPortHandle->TimerFrequency,
-                        Timeout
-                        ),
-                      1000000u
-                      );
-    TimerRound = DivU64x64Remainder (
-                   TimeoutTicker,
-                   DivU64x32 (UsbDebugPortHandle->TimerCycle, 2),
-                   &TimeoutTicker
-                   );
-  }
-
-  //
-  // Read remaining data by executing one or more usb debug transfer transactions at usb debug port hw.
-  //
-  while (Total < NumberOfBytes) {
-    if (Timeout != 0) {
-      if (TimerRound == 0) {
-        if (IsTimerTimeout (UsbDebugPortHandle, Begin, TimeoutTicker)) {
-          //
-          // If time out occurs.
-          //
-          return 0;
-        }
-      } else {
-        if (IsTimerTimeout (UsbDebugPortHandle, Begin, DivU64x32 (UsbDebugPortHandle->TimerCycle, 2))) {
-          TimerRound --;
-        }
-      }
-    }
-    Remaining = NumberOfBytes - Total;
-    if (Remaining >= USB_DEBUG_PORT_MAX_PACKET_SIZE) {
-      Status = UsbDebugPortIn(UsbDebugPortRegister, Buffer + Total, &Received, INPUT_PID, 0x7f, 0x82, UsbDebugPortHandle->BulkInToggle);
-
-      if (RETURN_ERROR(Status)) {
-        return Total;
-      }
-    } else {
-      Status = UsbDebugPortIn(UsbDebugPortRegister, &UsbDebugPortHandle->Data[0], &Received, INPUT_PID, 0x7f, 0x82, UsbDebugPortHandle->BulkInToggle);
-
-      if (RETURN_ERROR(Status)) {
-        return Total;
-      }
-
-      UsbDebugPortHandle->DataCount = Received;
-
-      if (Remaining <= Received) {
-        Length = (UINT8)Remaining;
-      } else {
-        Length = (UINT8)Received;
-      }
-
-      //
-      // Copy required data from the data buffer to user buffer.
-      //
-      for (Index = 0; Index < Length; Index++) {
-        (Buffer + Total)[Index] = UsbDebugPortHandle->Data[Index];
-        UsbDebugPortHandle->DataCount--;
-      }
-
-      //
-      // reorder the data buffer to make available data arranged from the beginning of the data buffer.
-      //
-      for (Index = 0; Index < Received - Length; Index++) {
-        if (Length + Index >= 8) {
-          return 0;
-        }
-        UsbDebugPortHandle->Data[Index] = UsbDebugPortHandle->Data[Length + Index];
-      }
-      //
-      // fixup the real received length in Buffer.
-      //
-      Received = Length;
-    }
-    UsbDebugPortHandle->BulkInToggle ^= 1;
-    Total += Received;
-  }
-
-  return Total;
 }
 
 /**
@@ -1208,8 +1043,6 @@ DebugPortInitialize (
   RETURN_STATUS             Status;
   USB_DEBUG_PORT_HANDLE     Handle;
   USB_DEBUG_PORT_HANDLE     *UsbDebugPortHandle;
-  UINT64                    TimerStartValue;
-  UINT64                    TimerEndValue;
 
   //
   // Validate the PCD PcdDebugPortHandleBufferSize value 
@@ -1222,22 +1055,6 @@ DebugPortInitialize (
     ZeroMem(&Handle, sizeof (USB_DEBUG_PORT_HANDLE));
     UsbDebugPortHandle = &Handle;
   }
-
-  UsbDebugPortHandle->TimerFrequency = GetPerformanceCounterProperties (
-                                         &TimerStartValue,
-                                         &TimerEndValue
-                                         );
-  DEBUG ((EFI_D_INFO, "USB Debug Port: TimerFrequency  = 0x%lx\n", UsbDebugPortHandle->TimerFrequency)); 
-  DEBUG ((EFI_D_INFO, "USB Debug Port: TimerStartValue = 0x%lx\n", TimerStartValue)); 
-  DEBUG ((EFI_D_INFO, "USB Debug Port: TimerEndValue   = 0x%lx\n", TimerEndValue)); 
-
-  if (TimerEndValue < TimerStartValue) {
-    UsbDebugPortHandle->TimerCountDown = TRUE;
-    UsbDebugPortHandle->TimerCycle     = TimerStartValue - TimerEndValue;
-  } else {
-    UsbDebugPortHandle->TimerCountDown = FALSE;
-    UsbDebugPortHandle->TimerCycle     = TimerEndValue - TimerStartValue;
-  }   
 
   if (Function == NULL && Context != NULL) {
     return (DEBUG_PORT_HANDLE *) Context;

@@ -380,10 +380,92 @@ UpdateMailboxContent (
                                               - CalculateSum8 ((UINT8 *)&Value, sizeof(UINT8));
     Mailbox->HostSequenceNo = (UINT8) Value;
     break;
+  case DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY:
+    Mailbox->ToBeCheckSum = Mailbox->CheckSum + CalculateSum8 ((UINT8 *)&Mailbox->HostSequenceNo, sizeof(UINT32))
+                                              - CalculateSum8 ((UINT8 *)&Value, sizeof(UINT32));
+    Mailbox->DebugTimerFrequency = (UINT32) Value;
+    break;
   }
   UpdateMailboxChecksum (Mailbox);
   ReleaseMpSpinLock (&mDebugMpContext.MailboxSpinLock);
 }
+
+/**
+  Read data from debug device and save the data in buffer.
+
+  Reads NumberOfBytes data bytes from a debug device into the buffer
+  specified by Buffer. The number of bytes actually read is returned.
+  If the return value is less than NumberOfBytes, then the rest operation failed.
+  If NumberOfBytes is zero, then return 0.
+
+  @param  Handle           Debug port handle.
+  @param  Buffer           Pointer to the data buffer to store the data read from the debug device.
+  @param  NumberOfBytes    Number of bytes which will be read.
+  @param  Timeout          Timeout value for reading from debug device. It unit is Microsecond.
+
+  @retval 0                Read data failed, no data is to be read.
+  @retval >0               Actual number of bytes read from debug device.
+
+**/
+UINTN
+DebugAgentReadBuffer (
+  IN DEBUG_PORT_HANDLE     Handle,
+  IN UINT8                 *Buffer,
+  IN UINTN                 NumberOfBytes,
+  IN UINTN                 Timeout
+  )
+{
+  UINTN                    Index;
+  UINT32                   Begin;
+  UINT32                   TimeoutTicker;
+  UINT32                   TimerRound;
+  UINT32                   TimerFrequency;
+  UINT32                   TimerCycle;
+  
+  Begin         = 0;
+  TimeoutTicker = 0;  
+  TimerRound    = 0;
+  TimerFrequency = GetMailboxPointer()->DebugTimerFrequency;
+  TimerCycle = GetApicTimerInitCount ();
+
+  if (Timeout != 0) {
+    Begin = GetApicTimerCurrentCount ();
+    TimeoutTicker = (UINT32) DivU64x32 (
+                      MultU64x64 (
+                        TimerFrequency,
+                        Timeout
+                        ),
+                      1000000u
+                      );
+    TimerRound = (UINT32) DivU64x32Remainder (TimeoutTicker,  TimerCycle / 2, &TimeoutTicker);
+  }
+  Index = 0;
+  while (Index < NumberOfBytes) {
+    if (DebugPortPollBuffer (Handle)) {
+      DebugPortReadBuffer (Handle, Buffer + Index, 1, 0);
+      Index ++; 
+      continue;
+    }
+    if (Timeout != 0) {
+      if (TimerRound == 0) {
+        if (IsDebugTimerTimeout (TimerCycle, Begin, TimeoutTicker)) {
+          //
+          // If time out occurs.
+          //
+          return 0;
+        }
+      } else {
+        if (IsDebugTimerTimeout (TimerCycle, Begin, TimerCycle / 2)) {
+          TimerRound --;
+          Begin = GetApicTimerCurrentCount ();
+        }
+      }
+    }
+  }
+
+  return Index;
+}
+
 /**
   Set debug flag in mailbox.
 
@@ -589,7 +671,7 @@ ReadRemainingBreakPacket (
   //
   // Has received start symbol, try to read the rest part
   //
-  if (DebugPortReadBuffer (Handle, (UINT8 *)DebugHeader + OFFSET_OF (DEBUG_PACKET_HEADER, Command), sizeof (DEBUG_PACKET_HEADER) - OFFSET_OF (DEBUG_PACKET_HEADER, Command), READ_PACKET_TIMEOUT) == 0) {
+  if (DebugAgentReadBuffer (Handle, (UINT8 *)DebugHeader + OFFSET_OF (DEBUG_PACKET_HEADER, Command), sizeof (DEBUG_PACKET_HEADER) - OFFSET_OF (DEBUG_PACKET_HEADER, Command), READ_PACKET_TIMEOUT) == 0) {
     //
     // Timeout occur, exit
     //
@@ -1046,9 +1128,9 @@ ReceivePacket (
     //
     // Find the valid start symbol
     //
-    Received = DebugPortReadBuffer (Handle, &DebugHeader->StartSymbol, sizeof (DebugHeader->StartSymbol), TimeoutForStartSymbol);
+    Received = DebugAgentReadBuffer (Handle, &DebugHeader->StartSymbol, sizeof (DebugHeader->StartSymbol), TimeoutForStartSymbol);
     if (Received < sizeof (DebugHeader->StartSymbol)) {
-      DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "DebugPortReadBuffer(StartSymbol) timeout\n");
+      DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "DebugAgentReadBuffer(StartSymbol) timeout\n");
       return RETURN_TIMEOUT;
     }
 
@@ -1060,14 +1142,14 @@ ReceivePacket (
     //
     // Read Package header till field Length
     //
-    Received = DebugPortReadBuffer (
+    Received = DebugAgentReadBuffer (
                  Handle,
                  (UINT8 *) DebugHeader + OFFSET_OF (DEBUG_PACKET_HEADER, Command),
                  OFFSET_OF (DEBUG_PACKET_HEADER, Length) + sizeof (DebugHeader->Length) - sizeof (DebugHeader->StartSymbol),
                  Timeout
                  );
     if (Received == 0) {
-      DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "DebugPortReadBuffer(Command) timeout\n");
+      DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "DebugAgentReadBuffer(Command) timeout\n");
       return RETURN_TIMEOUT;
     }
     if (DebugHeader->Length < sizeof (DEBUG_PACKET_HEADER)) {
@@ -1086,9 +1168,9 @@ ReceivePacket (
       //
       // Read the payload data include the CRC field
       //
-      Received = DebugPortReadBuffer (Handle, &DebugHeader->SequenceNo, (UINT8) (DebugHeader->Length - OFFSET_OF (DEBUG_PACKET_HEADER, SequenceNo)), Timeout);
+      Received = DebugAgentReadBuffer (Handle, &DebugHeader->SequenceNo, (UINT8) (DebugHeader->Length - OFFSET_OF (DEBUG_PACKET_HEADER, SequenceNo)), Timeout);
       if (Received == 0) {
-        DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "DebugPortReadBuffer(SequenceNo) timeout\n");
+        DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "DebugAgentReadBuffer(SequenceNo) timeout\n");
         return RETURN_TIMEOUT;
       }
       //
@@ -1681,7 +1763,7 @@ SendBreakPacketToHost (
     // Poll Attach symbols from HOST and ack OK
     //
     do {
-      DebugPortReadBuffer (Handle, &InputCharacter, 1, 0);
+      DebugAgentReadBuffer (Handle, &InputCharacter, 1, 0);
     } while (InputCharacter != DEBUG_STARTING_SYMBOL_ATTACH);
     SendAckPacket (DEBUG_COMMAND_OK);
 
@@ -2408,7 +2490,7 @@ InterruptProcess (
         //
         CurrentDebugTimerInitCount = GetApicTimerInitCount ();
         if (mDebugMpContext.DebugTimerInitCount != CurrentDebugTimerInitCount) {
-          InitializeDebugTimer ();
+          InitializeDebugTimer (NULL);
         }
       }
 
