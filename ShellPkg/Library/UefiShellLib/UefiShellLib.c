@@ -2105,36 +2105,17 @@ InternalCommandLineParse (
       //
       // get the item VALUE for a previous flag
       //
-      if (StrStr(Argv[LoopCounter], L" ") == NULL) {
-        CurrentValueSize = ValueSize + StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
-        CurrentItemPackage->Value = ReallocatePool(ValueSize, CurrentValueSize, CurrentItemPackage->Value);
-        ASSERT(CurrentItemPackage->Value != NULL);
-        if (ValueSize == 0) {
-          StrnCpy(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1);
-        } else {
-          StrnCat(CurrentItemPackage->Value, L" ", CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-          StrnCat(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-        }
-        ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
+      CurrentValueSize = ValueSize + StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
+      CurrentItemPackage->Value = ReallocatePool(ValueSize, CurrentValueSize, CurrentItemPackage->Value);
+      ASSERT(CurrentItemPackage->Value != NULL);
+      if (ValueSize == 0) {
+        StrnCpy(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1);
       } else {
-        //
-        // the parameter has spaces.  must be quoted.
-        //
-        CurrentValueSize =  ValueSize + StrSize(Argv[LoopCounter]) + sizeof(CHAR16) + sizeof(CHAR16) + sizeof(CHAR16);
-        CurrentItemPackage->Value = ReallocatePool(ValueSize, CurrentValueSize, CurrentItemPackage->Value);
-        ASSERT(CurrentItemPackage->Value != NULL);
-        if (ValueSize == 0) {
-          StrnCpy(CurrentItemPackage->Value, L"\"", CurrentValueSize/sizeof(CHAR16) - 1);
-          StrnCat(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-          StrnCat(CurrentItemPackage->Value, L"\"", CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-        } else {
-          StrnCat(CurrentItemPackage->Value, L" ", CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-          StrnCat(CurrentItemPackage->Value, L"\"", CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-          StrnCat(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-          StrnCat(CurrentItemPackage->Value, L"\"", CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-       }
-        ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
+        StrnCat(CurrentItemPackage->Value, L" ", CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
+        StrnCat(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
       }
+      ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
+      
       GetItemValue--;
       if (GetItemValue == 0) {
         InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
