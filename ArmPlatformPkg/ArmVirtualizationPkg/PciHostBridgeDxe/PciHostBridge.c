@@ -466,11 +466,9 @@ NotifyPhase(
       }
 
       return ReturnStatus;
-
     } else {
       return EFI_NOT_READY;
     }
-    break;
 
   case EfiPciHostBridgeSetResources:
     break;
