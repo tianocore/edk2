@@ -307,7 +307,7 @@ SetJunoR1DefaultBootEntries (
   Size = 0;
   Status = gRT->GetVariable (L"BootOrder", &gEfiGlobalVariableGuid, NULL, &Size, NULL);
   if (Status != EFI_NOT_FOUND) {
-    return Status;
+    return EFI_SUCCESS;
   }
 
   Status = gBS->LocateProtocol (
@@ -377,7 +377,7 @@ SetJunoR1DefaultBootEntries (
              (UINT8*)DefaultBootArgument1, DefaultBootArgument1Size
              );
   if (EFI_ERROR (Status)) {
-    ASSERT (TRUE);
+    ASSERT_EFI_ERROR (Status);
     goto Error;
   }
 
@@ -390,7 +390,7 @@ SetJunoR1DefaultBootEntries (
              (UINT8*)DefaultBootArgument2, DefaultBootArgument2Size
              );
   if (EFI_ERROR (Status)) {
-    ASSERT (TRUE);
+    ASSERT_EFI_ERROR (Status);
     goto Error;
   }
 
@@ -409,7 +409,7 @@ SetJunoR1DefaultBootEntries (
                   BootOrder
                   );
 
-  Error:
+Error:
   if (BootDevicePath != NULL) {
     FreePool (BootDevicePath);
   }
