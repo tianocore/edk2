@@ -1,7 +1,7 @@
 /** @file
   This is THE shell (application)
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -101,30 +101,92 @@ TrimSpaces(
 }
 
 /**
-  Find a command line contains a split operation
+  Parse for the next instance of one string within another string. Can optionally make sure that 
+  the string was not escaped (^ character) per the shell specification.
 
-  @param[in] CmdLine      The command line to parse.
-
-  @retval                 A pointer to the | character in CmdLine or NULL if not present.
+  @param[in] SourceString             The string to search within
+  @param[in] FindString               The string to look for
+  @param[in] CheckForEscapeCharacter  TRUE to skip escaped instances of FinfString, otherwise will return even escaped instances
 **/
-CONST CHAR16*
+CHAR16*
 EFIAPI
-FindSplit(
-  IN CONST CHAR16 *CmdLine
+FindNextInstance(
+  IN CONST CHAR16   *SourceString,
+  IN CONST CHAR16   *FindString,
+  IN CONST BOOLEAN  CheckForEscapeCharacter
   )
 {
-  CONST CHAR16 *TempSpot;
-  TempSpot = NULL;
-  if (StrStr(CmdLine, L"|") != NULL) {
-    for (TempSpot = CmdLine ; TempSpot != NULL && *TempSpot != CHAR_NULL ; TempSpot++) {
-      if (*TempSpot == L'^' && *(TempSpot+1) == L'|') {
-        TempSpot++;
-      } else if (*TempSpot == L'|') {
-        break;
+  CHAR16 *Temp;
+  if (SourceString == NULL) {
+    return (NULL);
+  }
+  Temp = StrStr(SourceString, FindString);
+
+  //
+  // If nothing found, or we dont care about escape characters
+  //
+  if (Temp == NULL || !CheckForEscapeCharacter) {
+    return (Temp);
+  }
+
+  //
+  // If we found an escaped character, try again on the remainder of the string
+  //
+  if ((Temp > (SourceString)) && *(Temp-1) == L'^') {
+    return FindNextInstance(Temp+1, FindString, CheckForEscapeCharacter);
+  }
+
+  //
+  // we found the right character
+  //
+  return (Temp);
+}
+
+/**
+  Check whether the string between a pair of % is a valid envifronment variable name.
+
+  @param[in] BeginPercent       pointer to the first percent.
+  @param[in] EndPercent          pointer to the last percent.
+
+  @retval TRUE                          is a valid environment variable name.
+  @retval FALSE                         is NOT a valid environment variable name.
+**/
+BOOLEAN
+IsValidEnvironmentVariableName(
+  IN CONST CHAR16     *BeginPercent,
+  IN CONST CHAR16     *EndPercent
+  )
+{
+  CONST CHAR16    *Walker;
+  
+  Walker = NULL;
+
+  ASSERT (BeginPercent != NULL);
+  ASSERT (EndPercent != NULL);
+  ASSERT (BeginPercent < EndPercent);
+  
+  if ((BeginPercent + 1) == EndPercent) {
+    return FALSE;
+  }
+
+  for (Walker = BeginPercent + 1; Walker < EndPercent; Walker++) {
+    if (
+        (*Walker >= L'0' && *Walker <= L'9') ||
+        (*Walker >= L'A' && *Walker <= L'Z') ||
+        (*Walker >= L'a' && *Walker <= L'z') ||
+        (*Walker == L'_')
+      ) {
+      if (Walker == BeginPercent + 1 && (*Walker >= L'0' && *Walker <= L'9')) {
+        return FALSE;
+      } else {
+        continue;
       }
+    } else {
+      return FALSE;
     }
   }
-  return (TempSpot);
+
+  return TRUE;
 }
 
 /**
@@ -142,7 +204,39 @@ ContainsSplit(
   )
 {
   CONST CHAR16 *TempSpot;
-  TempSpot = FindSplit(CmdLine);
+  CONST CHAR16 *FirstQuote;
+  CONST CHAR16 *SecondQuote;
+
+  FirstQuote    = FindNextInstance (CmdLine, L"\"", TRUE);
+  SecondQuote   = NULL;
+  TempSpot      = FindFirstCharacter(CmdLine, L"|", L'^');
+
+  if (FirstQuote == NULL    || 
+      TempSpot == NULL      || 
+      TempSpot == CHAR_NULL || 
+      FirstQuote > TempSpot
+      ) {
+    return (BOOLEAN) ((TempSpot != NULL) && (*TempSpot != CHAR_NULL));
+  }
+
+  while ((TempSpot != NULL) && (*TempSpot != CHAR_NULL)) {
+    if (FirstQuote == NULL || FirstQuote > TempSpot) {
+      break;
+    }    
+    SecondQuote = FindNextInstance (FirstQuote + 1, L"\"", TRUE);
+    if (SecondQuote == NULL) {
+      break;
+    }
+    if (SecondQuote < TempSpot) {
+      FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
+      continue;
+    } else {
+      FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
+      TempSpot = FindFirstCharacter(TempSpot + 1, L"|", L'^');
+      continue;
+    } 
+  }
+  
   return (BOOLEAN) ((TempSpot != NULL) && (*TempSpot != CHAR_NULL));
 }
 
@@ -1233,48 +1327,6 @@ ShellConvertAlias(
 }
 
 /**
-  Parse for the next instance of one string within another string. Can optionally make sure that 
-  the string was not escaped (^ character) per the shell specification.
-
-  @param[in] SourceString             The string to search within
-  @param[in] FindString               The string to look for
-  @param[in] CheckForEscapeCharacter  TRUE to skip escaped instances of FinfString, otherwise will return even escaped instances
-**/
-CHAR16*
-EFIAPI
-FindNextInstance(
-  IN CONST CHAR16   *SourceString,
-  IN CONST CHAR16   *FindString,
-  IN CONST BOOLEAN  CheckForEscapeCharacter
-  )
-{
-  CHAR16 *Temp;
-  if (SourceString == NULL) {
-    return (NULL);
-  }
-  Temp = StrStr(SourceString, FindString);
-
-  //
-  // If nothing found, or we dont care about escape characters
-  //
-  if (Temp == NULL || !CheckForEscapeCharacter) {
-    return (Temp);
-  }
-
-  //
-  // If we found an escaped character, try again on the remainder of the string
-  //
-  if ((Temp > (SourceString)) && *(Temp-1) == L'^') {
-    return FindNextInstance(Temp+1, FindString, CheckForEscapeCharacter);
-  }
-
-  //
-  // we found the right character
-  //
-  return (Temp);
-}
-
-/**
   This function will eliminate unreplaced (and therefore non-found) environment variables.
 
   @param[in,out] CmdLine   The command line to update.
@@ -1302,8 +1354,8 @@ StripUnreplacedEnvironmentVariables(
       break;
     }
 
-    if (FirstQuote < FirstPercent) {
-      SecondQuote = FirstQuote!= NULL?FindNextInstance(FirstQuote+1, L"\"", TRUE):NULL;
+    if (FirstQuote!= NULL && FirstQuote < FirstPercent) {
+      SecondQuote = FindNextInstance(FirstQuote+1, L"\"", TRUE);
       //
       // Quote is first found
       //
@@ -1321,19 +1373,21 @@ StripUnreplacedEnvironmentVariables(
       }
       continue;
     }
-    ASSERT(FirstPercent < FirstQuote);
-    if (SecondPercent < FirstQuote) {
-      FirstPercent[0] = L'\"';
-      SecondPercent[0] = L'\"';
-
-      //
-      // We need to remove from FirstPercent to SecondPercent
-      //
-      CopyMem(FirstPercent + 1, SecondPercent, StrSize(SecondPercent));
-      CurrentLocator = FirstPercent + 2;
+    
+    if (FirstQuote == NULL || SecondPercent < FirstQuote) {
+      if (IsValidEnvironmentVariableName(FirstPercent, SecondPercent)) {
+        //
+        // We need to remove from FirstPercent to SecondPercent
+        //
+        CopyMem(FirstPercent, SecondPercent + 1, StrSize(SecondPercent + 1));
+        //
+        // dont need to update the locator.  both % characters are gone.
+        //
+      } else {
+        CurrentLocator = SecondPercent + 1;
+      }
       continue;
     }
-    ASSERT(FirstQuote < SecondPercent);
     CurrentLocator = FirstQuote;
   }
   return (EFI_SUCCESS);
@@ -1448,12 +1502,12 @@ ShellConvertVariables (
     ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, AliasListNode->Alias, AliasListNode->CommandString, TRUE, FALSE);
     StrnCpy(NewCommandLine1, NewCommandLine2, NewSize/sizeof(CHAR16)-1);
     }
-
-    //
-    // Remove non-existant environment variables in scripts only
-    //
-    StripUnreplacedEnvironmentVariables(NewCommandLine1);
   }
+
+  //
+  // Remove non-existant environment variables
+  //
+  StripUnreplacedEnvironmentVariables(NewCommandLine1);
 
   //
   // Now cleanup any straggler intentionally ignored "%" characters
@@ -1789,12 +1843,12 @@ IsValidSplit(
       return (EFI_OUT_OF_RESOURCES);
     }
     TempWalker = (CHAR16*)Temp;
-    GetNextParameter(&TempWalker, &FirstParameter, StrSize(CmdLine));
-
-    if (GetOperationType(FirstParameter) == Unknown_Invalid) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
-      SetLastError(SHELL_NOT_FOUND);
-      Status = EFI_NOT_FOUND;
+    if (!EFI_ERROR(GetNextParameter(&TempWalker, &FirstParameter, StrSize(CmdLine)))) {
+      if (GetOperationType(FirstParameter) == Unknown_Invalid) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        SetLastError(SHELL_NOT_FOUND);
+        Status = EFI_NOT_FOUND;
+      }
     }
   }
 
@@ -1838,7 +1892,7 @@ VerifySplit(
   //
   // recurse to verify the next item
   //
-  TempSpot = FindSplit(CmdLine)+1;
+  TempSpot = FindFirstCharacter(CmdLine, L"|", L'^') + 1;
   return (VerifySplit(TempSpot));
 }
 
@@ -1949,24 +2003,25 @@ DoHelpUpdate(
   Walker = *CmdLine;
   while(Walker != NULL && *Walker != CHAR_NULL) {
     LastWalker = Walker;
-    GetNextParameter(&Walker, &CurrentParameter, StrSize(*CmdLine));
-    if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
-      LastWalker[0] = L' ';
-      LastWalker[1] = L' ';
-      NewCommandLine = AllocateZeroPool(StrSize(L"help ") + StrSize(*CmdLine));
-      if (NewCommandLine == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
+    if (!EFI_ERROR(GetNextParameter(&Walker, &CurrentParameter, StrSize(*CmdLine)))) {
+      if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
+        LastWalker[0] = L' ';
+        LastWalker[1] = L' ';
+        NewCommandLine = AllocateZeroPool(StrSize(L"help ") + StrSize(*CmdLine));
+        if (NewCommandLine == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
+
+        //
+        // We know the space is sufficient since we just calculated it.
+        //
+        StrnCpy(NewCommandLine, L"help ", 5);
+        StrnCat(NewCommandLine, *CmdLine, StrLen(*CmdLine));
+        SHELL_FREE_NON_NULL(*CmdLine);
+        *CmdLine = NewCommandLine;
         break;
       }
-
-      //
-      // We know the space is sufficient since we just calculated it.
-      //
-      StrnCpy(NewCommandLine, L"help ", 5);
-      StrnCat(NewCommandLine, *CmdLine, StrLen(*CmdLine));
-      SHELL_FREE_NON_NULL(*CmdLine);
-      *CmdLine = NewCommandLine;
-      break;
     }
   }
 
@@ -2418,27 +2473,30 @@ RunCommand(
     return (EFI_OUT_OF_RESOURCES);
   }
   TempWalker = CleanOriginal;
-  GetNextParameter(&TempWalker, &FirstParameter, StrSize(CleanOriginal));
-
-  //
-  // Depending on the first parameter we change the behavior
-  //
-  switch (Type = GetOperationType(FirstParameter)) {
-    case   File_Sys_Change:
-      Status = ChangeMappedDrive (FirstParameter);
-      break;
-    case   Internal_Command:
-    case   Script_File_Name:
-    case   Efi_Application:
-      Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol);
-      break;
-    default:
-      //
-      // Whatever was typed, it was invalid.
-      //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
-      SetLastError(SHELL_NOT_FOUND);
-      break;
+  if (!EFI_ERROR(GetNextParameter(&TempWalker, &FirstParameter, StrSize(CleanOriginal)))) {
+    //
+    // Depending on the first parameter we change the behavior
+    //
+    switch (Type = GetOperationType(FirstParameter)) {
+      case   File_Sys_Change:
+        Status = ChangeMappedDrive (FirstParameter);
+        break;
+      case   Internal_Command:
+      case   Script_File_Name:
+      case   Efi_Application:
+        Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol);
+        break;
+      default:
+        //
+        // Whatever was typed, it was invalid.
+        //
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        SetLastError(SHELL_NOT_FOUND);
+        break;
+    }
+  } else {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+    SetLastError(SHELL_NOT_FOUND);
   }
  
   SHELL_FREE_NON_NULL(CleanOriginal);
@@ -2631,34 +2689,34 @@ RunScriptFileHandle (
       if (NewScriptFile->Argv != NULL) {
         switch (NewScriptFile->Argc) {
           default:
-            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%9", NewScriptFile->Argv[9], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%9", NewScriptFile->Argv[9], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 9:
-            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%8", NewScriptFile->Argv[8], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%8", NewScriptFile->Argv[8], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 8:
-            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%7", NewScriptFile->Argv[7], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%7", NewScriptFile->Argv[7], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 7:
-            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%6", NewScriptFile->Argv[6], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%6", NewScriptFile->Argv[6], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 6:
-            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%5", NewScriptFile->Argv[5], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%5", NewScriptFile->Argv[5], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 5:
-            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%4", NewScriptFile->Argv[4], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%4", NewScriptFile->Argv[4], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 4:
-            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%3", NewScriptFile->Argv[3], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%3", NewScriptFile->Argv[3], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 3:
-            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%2", NewScriptFile->Argv[2], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%2", NewScriptFile->Argv[2], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 2:
-            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%1", NewScriptFile->Argv[1], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine2,  CommandLine, PcdGet16 (PcdShellPrintBufferSize), L"%1", NewScriptFile->Argv[1], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
           case 1:
-            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%0", NewScriptFile->Argv[0], FALSE, FALSE);
+            Status = ShellCopySearchAndReplace(CommandLine,  CommandLine2, PcdGet16 (PcdShellPrintBufferSize), L"%0", NewScriptFile->Argv[0], FALSE, TRUE);
             ASSERT_EFI_ERROR(Status);
             break;
           case 0:
@@ -2835,4 +2893,39 @@ RunScriptFile (
   RestoreArgcArgv(ParamProtocol, &Argv, &Argc);
 
   return (Status);
+}
+
+/**
+  Return the pointer to the first occurance of any character from a list of characters
+
+  @param[in] String           the string to parse
+  @param[in] CharacterList    the list of character to look for
+  @param[in] EscapeCharacter  An escape character to skip
+
+  @return the location of the first character in the string
+  @retval CHAR_NULL no instance of any character in CharacterList was found in String
+**/
+CONST CHAR16*
+EFIAPI
+FindFirstCharacter(
+  IN CONST CHAR16 *String,
+  IN CONST CHAR16 *CharacterList,
+  IN CONST CHAR16 EscapeCharacter
+  )
+{
+  UINT32 WalkChar;
+  UINT32 WalkStr;
+
+  for (WalkStr = 0; WalkStr < StrLen(String); WalkStr++) {
+    if (String[WalkStr] == EscapeCharacter) {
+      WalkStr++;
+      continue;
+    }
+    for (WalkChar = 0; WalkChar < StrLen(CharacterList); WalkChar++) {
+      if (String[WalkStr] == CharacterList[WalkChar]) {
+        return (&String[WalkStr]);
+      }
+    }
+  }
+  return (String + StrLen(String));
 }
