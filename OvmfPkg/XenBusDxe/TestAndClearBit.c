@@ -2,6 +2,7 @@
   Implementation of TestAndClearBit using compare-exchange primitive
 
   Copyright (C) 2015, Linaro Ltd.
+  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -32,7 +33,7 @@ TestAndClearBit (
   // ensure we round towards -Inf, and end up with a positive shift in
   // 'Bit', even if 'Bit' itself is negative.
   //
-  Address += (Bit >> 4) * sizeof(UINT16);
+  Address = (VOID*)((UINT8*) Address + ((Bit >> 4) * sizeof(UINT16)));
   Mask = 1U << (Bit & 15);
 
   for (Word = *(UINT16 *) Address; Word & Mask; Word = Read) {
