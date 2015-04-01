@@ -80,4 +80,12 @@
 // Define if the exported ACPI Tables are based on ACPI 5.0 spec or latest
 //#define ARM_JUNO_ACPI_5_0
 
+//
+// Address of the system registers that contain the MAC address
+// assigned to the PCI Gigabyte Ethernet device.
+//
+
+#define ARM_JUNO_SYS_PCIGBE_L  (ARM_VE_BOARD_PERIPH_BASE + 0x74)
+#define ARM_JUNO_SYS_PCIGBE_H  (ARM_VE_BOARD_PERIPH_BASE + 0x78)
+
 #endif

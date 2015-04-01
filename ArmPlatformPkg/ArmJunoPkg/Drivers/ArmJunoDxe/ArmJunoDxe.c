@@ -13,6 +13,7 @@
 **/
 
 #include "ArmJunoDxeInternal.h"
+#include <ArmPlatform.h>
 
 #include <Protocol/DevicePathFromText.h>
 
@@ -24,6 +25,31 @@
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/IoLib.h>
+#include <Library/PrintLib.h>
+
+//
+// Size in number of characters of the Linux boot argument
+// passing the MAC address to be used by the PCI GigaByte
+// Ethernet device : " sky2.mac_address=0x11,0x22,0x33,0x44,0x55,0x66"
+//
+#define SKY2_MAC_ADDRESS_BOOTARG_LEN  47
+
+//
+// Hardware platform identifiers
+//
+typedef enum {
+  UNKNOWN,
+  JUNO_R0,
+  JUNO_R1
+} JUNO_REVISION;
+
+//
+// Function prototypes
+//
+STATIC EFI_STATUS SetJunoR1DefaultBootEntries (
+  VOID
+  );
 
 // This GUID must match the FILE_GUID in ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
 STATIC CONST EFI_GUID mJunoAcpiTableFile = { 0xa1dd808e, 0x1e95, 0x4399, { 0xab, 0xc0, 0x65, 0x3c, 0x82, 0xe8, 0x53, 0x0c } };
@@ -112,8 +138,9 @@ ArmJunoEntryPoint (
   UINT32                Midr;
   UINT32                CpuType;
   UINT32                CpuRev;
-  BOOLEAN               IsJunoR1;
+  JUNO_REVISION         JunoRevision;
 
+  JunoRevision = UNKNOWN;
   Status = PciEmulationEntryPoint ();
   if (EFI_ERROR (Status)) {
     return Status;
@@ -163,34 +190,56 @@ ArmJunoEntryPoint (
   }
 
   //
-  // Set up the device path to the FDT.
   // We detect whether we are running on a Juno r0 or Juno r1 board at
   // runtime by checking the value of the MIDR register.
   //
 
-  Midr           = ArmReadMidr ();
-  CpuType        = (Midr >> ARM_CPU_TYPE_SHIFT) & ARM_CPU_TYPE_MASK;
-  CpuRev         = Midr & ARM_CPU_REV_MASK;
-  TextDevicePath = NULL;
-  IsJunoR1       = FALSE;
+  Midr     = ArmReadMidr ();
+  CpuType  = (Midr >> ARM_CPU_TYPE_SHIFT) & ARM_CPU_TYPE_MASK;
+  CpuRev   = Midr & ARM_CPU_REV_MASK;
 
   switch (CpuType) {
   case ARM_CPU_TYPE_A53:
     if (CpuRev == ARM_CPU_REV (0, 0)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR0FdtDevicePath);
+      JunoRevision = JUNO_R0;
     } else if (CpuRev == ARM_CPU_REV (0, 3)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR1A57x2FdtDevicePath);
-      IsJunoR1       = TRUE;
+      JunoRevision = JUNO_R1;
     }
     break;
 
   case ARM_CPU_TYPE_A57:
     if (CpuRev == ARM_CPU_REV (0, 0)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR0FdtDevicePath);
+      JunoRevision = JUNO_R0;
     } else if (CpuRev == ARM_CPU_REV (1, 1)) {
-      TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR1A57x2FdtDevicePath);
-      IsJunoR1       = TRUE;
+      JunoRevision = JUNO_R1;
     }
+  }
+
+  //
+  // Set the R1 two boot options if not already done.
+  //
+
+  if (JunoRevision == JUNO_R1) {
+    Status = SetJunoR1DefaultBootEntries ();
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Set up the device path to the FDT.
+  //
+  switch (JunoRevision) {
+  case JUNO_R0:
+    TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR0FdtDevicePath);
+    break;
+
+  case JUNO_R1:
+    TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR1A57x2FdtDevicePath);
+    break;
+
+  default:
+    TextDevicePath = NULL;
   }
 
   if (TextDevicePath != NULL) {
@@ -212,77 +261,171 @@ ArmJunoEntryPoint (
   // Try to install the ACPI Tables
   Status = LocateAndInstallAcpiFromFv (&mJunoAcpiTableFile);
 
+  return Status;
+}
+
+/**
+ * If no boot entry is currently defined, define the two default boot entries
+ * for Juno R1.
+ *
+ * @return EFI_SUCCESS             Some boot entries were already defined or
+ *                                 the default boot entries were set successfully.
+ * @return EFI_OUT_OF_RESOURCES    A memory allocation failed.
+ * @return EFI_DEVICE_ERROR        An UEFI variable could not be saved due to a hardware failure.
+ * @return EFI_WRITE_PROTECTED     An UEFI variable is read-only.
+ * @return EFI_SECURITY_VIOLATION  An UEFI variable could not be written.
+ */
+STATIC
+EFI_STATUS
+SetJunoR1DefaultBootEntries (
+  VOID
+  )
+{
+  EFI_STATUS                          Status;
+  CONST CHAR16*                       ExtraBootArgument = L" dtb=juno-r1-ca57x2_ca53x4.dtb";
+  UINTN                               Size;
+  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
+  EFI_DEVICE_PATH*                    BootDevicePath;
+  UINT32                              SysPciGbeL;
+  UINT32                              SysPciGbeH;
+  CHAR16*                             DefaultBootArgument;
+  CHAR16*                             DefaultBootArgument1;
+  UINTN                               DefaultBootArgument1Size;
+  CHAR16*                             DefaultBootArgument2;
+  UINTN                               DefaultBootArgument2Size;
+  UINT16                              BootOrder[2];
+
+  BootDevicePath       = NULL;
+  DefaultBootArgument1 = NULL;
+  DefaultBootArgument2 = NULL;
+
   //
-  // If Juno R1 and it is the first boot then default boot entries will be created
+  // Because the driver has a dependency on gEfiVariable(Write)ArchProtocolGuid
+  // (see [Depex] section of the INF file), we know we can safely access the
+  // UEFI Variable at that stage.
   //
-  if (IsJunoR1) {
-    CONST CHAR16*                       ExtraBootArgument = L" dtb=juno-r1-ca57x2_ca53x4.dtb";
-    UINTN                               Size;
-    EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL* EfiDevicePathFromTextProtocol;
-    EFI_DEVICE_PATH*                    BootDevicePath;
-    CHAR16*                             DefaultBootArgument;
-    UINTN                               DefaultBootArgumentSize;
-    CHAR16*                             DefaultBootArgument2;
-    UINTN                               DefaultBootArgument2Size;
-    UINT16                              BootOrder[2];
+  Size = 0;
+  Status = gRT->GetVariable (L"BootOrder", &gEfiGlobalVariableGuid, NULL, &Size, NULL);
+  if (Status != EFI_NOT_FOUND) {
+    return Status;
+  }
 
-    // Because the driver has a dependency on gEfiVariable(Write)ArchProtocolGuid (see [Depex]
-    // section of the INF file), we know we can safely access the UEFI Variable at that stage.
-    Size = 0;
-    Status = gRT->GetVariable (L"BootOrder", &gEfiGlobalVariableGuid, NULL, &Size, NULL);
-    if (Status == EFI_NOT_FOUND) {
-      Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);
-      if (EFI_ERROR (Status)) {
-        // You must provide an implementation of DevicePathFromTextProtocol in your firmware (eg: DevicePathDxe)
-        DEBUG ((EFI_D_ERROR, "Error: Require DevicePathFromTextProtocol\n"));
-        return Status;
-      }
-      // We use the same default kernel
-      BootDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr (PcdDefaultBootDevicePath));
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathFromTextProtocolGuid,
+                  NULL,
+                  (VOID **)&EfiDevicePathFromTextProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    //
+    // You must provide an implementation of DevicePathFromTextProtocol
+    // in your firmware (eg: DevicePathDxe)
+    //
+    DEBUG ((EFI_D_ERROR, "Error: Require DevicePathFromTextProtocol\n"));
+    return Status;
+  }
+  //
+  // We use the same default kernel.
+  //
+  BootDevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath (
+                     (CHAR16*)PcdGetPtr (PcdDefaultBootDevicePath)
+                     );
+  if (BootDevicePath == NULL) {
+    return EFI_UNSUPPORTED;
+  }
 
-      // Create the entry if the Default values are correct
-      if (BootDevicePath != NULL) {
-        DefaultBootArgument = (CHAR16*)PcdGetPtr (PcdDefaultBootArgument);
-        DefaultBootArgumentSize = StrSize (DefaultBootArgument);
-        DefaultBootArgument2Size = DefaultBootArgumentSize + StrSize (ExtraBootArgument);
+  DefaultBootArgument = (CHAR16*)PcdGetPtr (PcdDefaultBootArgument);
+  DefaultBootArgument1Size = StrSize (DefaultBootArgument) +
+                             (SKY2_MAC_ADDRESS_BOOTARG_LEN * sizeof (CHAR16));
+  DefaultBootArgument2Size = DefaultBootArgument1Size + StrSize (ExtraBootArgument);
 
-        DefaultBootArgument2 = AllocatePool (DefaultBootArgument2Size);
-        if (DefaultBootArgument2 == NULL) {
-          FreePool (BootDevicePath);
-          return EFI_OUT_OF_RESOURCES;
-        }
-        CopyMem (DefaultBootArgument2, DefaultBootArgument, DefaultBootArgumentSize);
-        CopyMem ((UINT8*)DefaultBootArgument2 + (StrLen (DefaultBootArgument2) * sizeof (CHAR16)), ExtraBootArgument, StrSize (ExtraBootArgument));
+  Status = EFI_OUT_OF_RESOURCES;
+  DefaultBootArgument1 = AllocatePool (DefaultBootArgument1Size);
+  if (DefaultBootArgument1 == NULL) {
+    goto Error;
+  }
+  DefaultBootArgument2 = AllocatePool (DefaultBootArgument2Size);
+  if (DefaultBootArgument2 == NULL) {
+    goto Error;
+  }
 
-        // Create Boot0001 environment variable
-        Status = BootOptionCreate (L"Boot0001", LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
-            L"Linux with A57x2", BootDevicePath,
-            (UINT8*)DefaultBootArgument, DefaultBootArgumentSize);
-        ASSERT_EFI_ERROR (Status);
+  SysPciGbeL = MmioRead32 (ARM_JUNO_SYS_PCIGBE_L);
+  SysPciGbeH = MmioRead32 (ARM_JUNO_SYS_PCIGBE_H);
 
-        // Create Boot0002 environment variable
-        Status = BootOptionCreate (L"Boot0002", LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
-            L"Linux with A57x2_A53x4", BootDevicePath,
-            (UINT8*)DefaultBootArgument2, DefaultBootArgument2Size);
-        ASSERT_EFI_ERROR (Status);
+  UnicodeSPrint (
+    DefaultBootArgument1,
+    DefaultBootArgument1Size,
+    L"%s sky2.mac_address=0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x",
+    DefaultBootArgument,
+    (SysPciGbeH >> 8 ) & 0xFF, (SysPciGbeH      ) & 0xFF,
+    (SysPciGbeL >> 24) & 0xFF, (SysPciGbeL >> 16) & 0xFF,
+    (SysPciGbeL >> 8 ) & 0xFF, (SysPciGbeL      ) & 0xFF
+    );
 
-        // Add the new Boot Index to the list
-        BootOrder[0] = 1; // Boot0001
-        BootOrder[1] = 2; // Boot0002
-        Status = gRT->SetVariable (
-            L"BootOrder",
-            &gEfiGlobalVariableGuid,
-            EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-            sizeof (BootOrder),
-            BootOrder
-            );
+  CopyMem (DefaultBootArgument2, DefaultBootArgument1, DefaultBootArgument1Size);
+  CopyMem (
+    (UINT8*)DefaultBootArgument2 + DefaultBootArgument1Size - sizeof (CHAR16),
+    ExtraBootArgument,
+    StrSize (ExtraBootArgument)
+  );
 
-        FreePool (BootDevicePath);
-        FreePool (DefaultBootArgument2);
-      } else {
-        Status = EFI_UNSUPPORTED;
-      }
-    }
+  //
+  // Create Boot0001 environment variable
+  //
+  Status = BootOptionCreate (
+             L"Boot0001", LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
+             L"Linux with A57x2", BootDevicePath,
+             (UINT8*)DefaultBootArgument1, DefaultBootArgument1Size
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (TRUE);
+    goto Error;
+  }
+
+  //
+  // Create Boot0002 environment variable
+  //
+  Status = BootOptionCreate (
+             L"Boot0002", LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
+             L"Linux with A57x2_A53x4", BootDevicePath,
+             (UINT8*)DefaultBootArgument2, DefaultBootArgument2Size
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (TRUE);
+    goto Error;
+  }
+
+  //
+  // Add the new Boot Index to the list
+  //
+  BootOrder[0] = 1; // Boot0001
+  BootOrder[1] = 2; // Boot0002
+  Status = gRT->SetVariable (
+                  L"BootOrder",
+                  &gEfiGlobalVariableGuid,
+                  EFI_VARIABLE_NON_VOLATILE       |
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS |
+                  EFI_VARIABLE_RUNTIME_ACCESS,
+                  sizeof (BootOrder),
+                  BootOrder
+                  );
+
+  Error:
+  if (BootDevicePath != NULL) {
+    FreePool (BootDevicePath);
+  }
+  if (DefaultBootArgument1 != NULL) {
+    FreePool (DefaultBootArgument1);
+  }
+  if (DefaultBootArgument2 != NULL) {
+    FreePool (DefaultBootArgument2);
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      EFI_D_ERROR,
+      "ArmJunoDxe - The setting of the default boot entries failed - %r\n",
+      Status
+      ));
   }
 
   return Status;
