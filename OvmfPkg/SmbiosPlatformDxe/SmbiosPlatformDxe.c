@@ -2,7 +2,7 @@
   This driver installs SMBIOS information for OVMF
 
   Copyright (c) 2011, Bei Guan <gbtju85@gmail.com>
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -16,13 +16,17 @@
 
 #include "SmbiosPlatformDxe.h"
 
+#define TYPE0_STRINGS \
+  "EFI Development Kit II / OVMF\0"     /* Vendor */ \
+  "0.0.0\0"                             /* BiosVersion */ \
+  "02/06/2015\0"                        /* BiosReleaseDate */
 //
 // Type definition and contents of the default Type 0 SMBIOS table.
 //
 #pragma pack(1)
 typedef struct {
   SMBIOS_TABLE_TYPE0 Base;
-  UINT8              Strings[];
+  UINT8              Strings[sizeof(TYPE0_STRINGS)];
 } OVMF_TYPE0;
 #pragma pack()
 
@@ -56,9 +60,7 @@ STATIC CONST OVMF_TYPE0 mOvmfDefaultType0 = {
     0xFF   // UINT8                     EmbeddedControllerFirmwareMinorRelease
   },
   // Text strings (unformatted area)
-  "EFI Development Kit II / OVMF\0"     // Vendor
-  "0.0.0\0"                             // BiosVersion
-  "02/06/2015\0"                        // BiosReleaseDate
+  TYPE0_STRINGS
 };
 
 
