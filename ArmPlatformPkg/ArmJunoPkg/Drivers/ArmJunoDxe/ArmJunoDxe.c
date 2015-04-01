@@ -282,7 +282,7 @@ SetJunoR1DefaultBootEntries (
   )
 {
   EFI_STATUS                          Status;
-  CONST CHAR16*                       ExtraBootArgument = L" dtb=juno-r1-ca57x2_ca53x4.dtb";
+  CONST CHAR16*                       ExtraBootArgument = L" dtb=r1a57a53.dtb";
   UINTN                               Size;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
   EFI_DEVICE_PATH*                    BootDevicePath;

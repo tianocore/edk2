@@ -37,5 +37,5 @@
 
   # Juno Device Trees are loaded from NOR Flash
   gArmJunoTokenSpaceGuid.PcdJunoR0FdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno-r0.dtb"|VOID*|0x00000006
-  gArmJunoTokenSpaceGuid.PcdJunoR1A57x2FdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno-r1-ca57x2.dtb"|VOID*|0x00000007
-  gArmJunoTokenSpaceGuid.PcdJunoR1A57x2A53x4FdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/juno-r1-ca57x2_ca53x4.dtb"|VOID*|0x00000008
+  gArmJunoTokenSpaceGuid.PcdJunoR1A57x2FdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/r1a57.dtb"|VOID*|0x00000007
+  gArmJunoTokenSpaceGuid.PcdJunoR1A57x2A53x4FdtDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/r1a57a53.dtb"|VOID*|0x00000008
