@@ -1412,12 +1412,6 @@ SnpReceive (
   PLength = GET_RXSTATUS_PACKET_LENGTH(RxFifoStatus);
   LanDriver->Stats.RxTotalBytes += (PLength - 4);
 
-  // Check buffer size
-  if (*BuffSize < PLength) {
-    *BuffSize = PLength;
-    return EFI_BUFFER_TOO_SMALL;
-  }
-
   // If padding is applied, read more DWORDs
   if (PLength % 4) {
     Padding = 4 - (PLength % 4);
@@ -1425,6 +1419,12 @@ SnpReceive (
   } else {
     ReadLimit = PLength/4;
     Padding = 0;
+  }
+
+  // Check buffer size
+  if (*BuffSize < (PLength + Padding)) {
+    *BuffSize = PLength + Padding;
+    return EFI_BUFFER_TOO_SMALL;
   }
 
   // Set the amount of data to be transfered out of FIFO for THIS packet
