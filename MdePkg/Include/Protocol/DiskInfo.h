@@ -204,5 +204,6 @@ extern EFI_GUID gEfiDiskInfoIdeInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoScsiInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoUsbInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoAhciInterfaceGuid;
+extern EFI_GUID gEfiDiskInfoNvmeInterfaceGuid;
 
 #endif
