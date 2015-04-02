@@ -19,11 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 #define INIT_CAR_VALUE 0x5AA55AA5
 
-typedef struct {
-  EFI_STATUS_CODE_DATA  DataHeader;
-  EFI_HANDLE            Handle;
-} PEIM_FILE_HANDLE_EXTENDED_DATA;
-
 /**
 
   Discover all Peims and optional Apriori file in one FV. There is at most one
@@ -659,7 +654,6 @@ PeiDispatcher (
   UINTN                               SaveCurrentPeimCount;
   UINTN                               SaveCurrentFvCount;
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
-  PEIM_FILE_HANDLE_EXTENDED_DATA      ExtendedData;
   EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   *TemporaryRamSupportPpi;
   UINT64                              NewStackSize;
   UINTN                               HeapTemporaryRamSize;
@@ -827,13 +821,11 @@ PeiDispatcher (
                 //
                 PERF_START (PeimFileHandle, "PEIM", NULL, 0);
 
-                ExtendedData.Handle = (EFI_HANDLE)PeimFileHandle;
-
                 REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                   EFI_PROGRESS_CODE,
                   (EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_BEGIN),
-                  (VOID *)(&ExtendedData),
-                  sizeof (ExtendedData)
+                  (VOID *)(&PeimFileHandle),
+                  sizeof (PeimFileHandle)
                   );
 
                 Status = VerifyPeim (Private, CoreFvHandle->FvHandle, PeimFileHandle, AuthenticationState);
@@ -853,8 +845,8 @@ PeiDispatcher (
                 REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                   EFI_PROGRESS_CODE,
                   (EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_END),
-                  (VOID *)(&ExtendedData),
-                  sizeof (ExtendedData)
+                  (VOID *)(&PeimFileHandle),
+                  sizeof (PeimFileHandle)
                   );
                 PERF_END (PeimFileHandle, "PEIM", NULL, 0);
 
