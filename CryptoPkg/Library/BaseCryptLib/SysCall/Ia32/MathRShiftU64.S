@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -53,7 +53,7 @@ ASM_PFX(__ashrdi3):
 More32:
     movl    %edx, %eax
     xor     %edx, %edx
-    and     $32, %cl
+    and     $31, %cl
     shr     %cl, %eax
     ret
 

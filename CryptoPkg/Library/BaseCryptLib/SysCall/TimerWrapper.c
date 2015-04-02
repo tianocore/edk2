@@ -148,14 +148,14 @@ struct tm * gmtime (const time_t *timer)
   GmTime->tm_yday = (int) DayNo;
 
   for (MonthNo = 12; MonthNo > 1; MonthNo--) {
-    if (DayNo > CumulativeDays[IsLeap(Year)][MonthNo]) {
+    if (DayNo >= CumulativeDays[IsLeap(Year)][MonthNo]) {
       DayNo = (UINT16) (DayNo - (UINT16) (CumulativeDays[IsLeap(Year)][MonthNo]));
       break;
     }
   }
 
-  GmTime->tm_mon  = (int) MonthNo;
-  GmTime->tm_mday = (int) DayNo;
+  GmTime->tm_mon  = (int) MonthNo - 1;
+  GmTime->tm_mday = (int) DayNo + 1;
 
   GmTime->tm_isdst  = 0;
   GmTime->tm_gmtoff = 0;
