@@ -1,0 +1,66 @@
+## @file
+#  LzmaArchCustomDecompressLib produces LZMA custom decompression algorithm with the converter for the different arch code.
+#
+#  It is based on the LZMA SDK 4.65.
+#  LZMA SDK 4.65 was placed in the public domain on 2009-02-03.
+#  It was released on the http://www.7-zip.org/sdk.html website.
+#
+#  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LzmaArchDecompressLib
+  MODULE_UNI_FILE                = LzmaArchDecompressLib.uni
+  FILE_GUID                      = A853C1D2-E003-4cc4-9DD1-8824AD79FE48
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = LzmaArchDecompressLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  LzmaDecompress.c
+  Sdk/C/Bra.h
+  Sdk/C/LzFind.c
+  Sdk/C/LzmaDec.c
+  Sdk/C/7zVersion.h
+  Sdk/C/CpuArch.h
+  Sdk/C/LzFind.h
+  Sdk/C/LzHash.h
+  Sdk/C/LzmaDec.h
+  Sdk/C/Types.h  
+  UefiLzma.h
+  LzmaDecompressLibInternal.h
+
+[Sources.Ia32, Sources.X64]
+  Sdk/C/Bra86.c
+  F86GuidedSectionExtraction.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Guids.Ia32, Guids.X64]
+  gLzmaF86CustomDecompressGuid    ## PRODUCES  ## GUID # specifies LZMA custom decompress algorithm with converter for x86 code.
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  ExtractGuidedSectionLib
+
