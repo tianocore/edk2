@@ -15,7 +15,7 @@
 
 **/
 
-#include <FrameworkPei.h>
+#include <PiPei.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
