@@ -18,7 +18,7 @@
 /**
   Initialize CPU local APIC timer.
 
-  @param[out]   Local APIC timer frequency returned.
+  @param[out] TimerFrequency  Local APIC timer frequency returned.
  
   @return   32-bit Local APIC timer init count.
 **/
