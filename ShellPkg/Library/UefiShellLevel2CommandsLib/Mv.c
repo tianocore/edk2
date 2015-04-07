@@ -128,7 +128,7 @@ IsValidMove(
   //
   // If they're the same, or if source is "above" dest on file path tree
   //
-  if ( StrCmp(DestPathWalker, SourcePath) == 0 
+  if ( StringNoCaseCompare (&DestPathWalker, &SourcePath) == 0 
     || StrStr(DestPathWalker, SourcePath) == DestPathWalker 
     ) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MV_INV_SUB), gShellLevel2HiiHandle);
@@ -291,25 +291,33 @@ MoveBetweenFileSystems(
   OUT VOID                **Resp
   )
 {
-  EFI_STATUS    Status;
+  SHELL_STATUS    ShellStatus;
 
   //
   // First we copy the file
   //
-  Status = CopySingleFile(Node->FullName, DestPath, Resp, TRUE);
+  ShellStatus = CopySingleFile (Node->FullName, DestPath, Resp, TRUE, L"mv");
 
   //
   // Check our result
   //
-  if (!EFI_ERROR(Status)) {
+  if (ShellStatus == SHELL_SUCCESS) {
     //
     // The copy was successful.  delete the source file.
     //
     CascadeDelete(Node, TRUE);
     Node->Handle = NULL;
+  } else if (ShellStatus == SHELL_ABORTED) {
+    return EFI_ABORTED;
+  } else if (ShellStatus == SHELL_ACCESS_DENIED) {
+    return EFI_ACCESS_DENIED;
+  } else if (ShellStatus == SHELL_VOLUME_FULL) {
+    return EFI_VOLUME_FULL;
+  } else {
+    return EFI_UNSUPPORTED;
   }
 
-  return (Status);
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -587,13 +595,18 @@ ValidateAndMoveFiles(
       Status = MoveBetweenFileSystems(Node, FullDestPath!=NULL? FullDestPath:DestPath, &Response);
     } else {
       Status = MoveWithinFileSystems(Node, DestPath, &Response);
+      //
+      // Display error status
+      //
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"mv", Status);
+      }
     }
 
     //
     // Check our result
     //
     if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, Status);
       ShellStatus = SHELL_INVALID_PARAMETER;
       if (Status == EFI_SECURITY_VIOLATION) {
         ShellStatus = SHELL_SECURITY_VIOLATION;

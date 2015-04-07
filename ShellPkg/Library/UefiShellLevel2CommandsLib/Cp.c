@@ -53,6 +53,7 @@ ValidateAndCopyFiles(
   @param[in] Dest       pointer to destination file name
   @param[out] Resp      pointer to response from question.  Pass back on looped calling
   @param[in] SilentMode whether to run in quiet mode or not
+  @param[in] CmdName    Source command name requesting single file copy
 
   @retval SHELL_SUCCESS   The source file was copied to the destination
 **/
@@ -62,7 +63,8 @@ CopySingleFile(
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Dest,
   OUT VOID        **Resp,
-  IN BOOLEAN      SilentMode
+  IN BOOLEAN      SilentMode,
+  IN CONST CHAR16 *CmdName
   )
 {
   VOID                  *Response;
@@ -132,7 +134,7 @@ CopySingleFile(
   if (ShellIsDirectory(Source) == EFI_SUCCESS) {
     Status = ShellCreateDirectory(Dest, &DestHandle);
     if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_DIR_FAIL), gShellLevel2HiiHandle, L"cp", Dest);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_DIR_FAIL), gShellLevel2HiiHandle, CmdName, Dest);  
       return (SHELL_ACCESS_DENIED);
     }
 
@@ -161,7 +163,7 @@ CopySingleFile(
     //
     Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
     if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_OPEN_FAIL), gShellLevel2HiiHandle, L"cp", Dest);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_OPEN_FAIL), gShellLevel2HiiHandle, CmdName, Dest);  
       return (SHELL_ACCESS_DENIED);
     }
 
@@ -217,7 +219,7 @@ CopySingleFile(
       //not enough space on destination directory to copy file
       //
       SHELL_FREE_NON_NULL(DestVolumeInfo);
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_FAIL), gShellLevel2HiiHandle, L"cp");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_FAIL), gShellLevel2HiiHandle, CmdName);  
       return(SHELL_VOLUME_FULL);
     } else {
       //
@@ -231,12 +233,12 @@ CopySingleFile(
           Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
           if (EFI_ERROR(Status)) {
             ShellStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_WRITE_ERROR), gShellLevel2HiiHandle, L"cp", Dest);   
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_WRITE_ERROR), gShellLevel2HiiHandle, CmdName, Dest);   
             break;
           }
         } else {
           ShellStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_READ_ERROR), gShellLevel2HiiHandle, L"cp", Source);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_READ_ERROR), gShellLevel2HiiHandle, CmdName, Source);  
           break;
         }
       }
@@ -531,7 +533,7 @@ ValidateAndCopyFiles(
     //
     // copy single file...
     //
-    ShellStatus = CopySingleFile(Node->FullName, DestPath, &Response, SilentMode);
+    ShellStatus = CopySingleFile(Node->FullName, DestPath, &Response, SilentMode, L"cp");
     if (ShellStatus != SHELL_SUCCESS) {
       break;
     }
