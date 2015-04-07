@@ -23,6 +23,35 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
   };
 
+
+/**
+  Check if the input is a (potentially empty) string of hexadecimal nibbles.
+
+  @param[in] String  The CHAR16 string to check.
+
+  @retval FALSE  A character has been found in String for which
+                 ShellIsHexaDecimalDigitCharacter() returned FALSE.
+
+  @retval TRUE   Otherwise. (Note that this covers the case when String is
+                 empty.)
+**/
+BOOLEAN
+EFIAPI
+IsStringOfHexNibbles (
+  IN CONST CHAR16  *String
+  )
+{
+  CONST CHAR16 *Pos;
+
+  for (Pos = String; *Pos != L'\0'; ++Pos) {
+    if (!ShellIsHexaDecimalDigitCharacter (*Pos)) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+
 /**
   Function for 'setvar' command.
 
@@ -135,6 +164,7 @@ ShellCommandRunSetVar (
 
         ASSERT(Data[0] == L'=');
         Data++;
+        ASSERT(Data[0] != L'\0');
 
         //
         // Determine if the variable exists and get the attributes
@@ -166,7 +196,7 @@ ShellCommandRunSetVar (
         //
         // What type is the new data.
         //
-        if (ShellIsHexOrDecimalNumber(Data, TRUE, FALSE)) {
+        if (IsStringOfHexNibbles(Data)) {
           if (StrLen(Data) % 2 != 0) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", Data);  
             ShellStatus = SHELL_INVALID_PARAMETER;
