@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2283,14 +2283,14 @@ BdsLibBootViaBootOption (
   }
 
   //
-  // Report Status Code to indicate ReadyToBoot event will be signalled
-  //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_READY_TO_BOOT_EVENT));
-
-  //
   // Signal the EVT_SIGNAL_READY_TO_BOOT event
   //
   EfiSignalEventReadyToBoot();
+
+  //
+  // Report Status Code to indicate ReadyToBoot event was signalled
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_READY_TO_BOOT_EVENT));
 
   //
   // Expand USB Class or USB WWID device path node to be full device path of a USB
