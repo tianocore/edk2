@@ -9,7 +9,7 @@
   Thunk is the code that switches from 32-bit protected environment into the 16-bit real-mode
 	environment. Reverse thunk is the code that does the opposite.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
-  Version 0.97.
+  Version 0.98.
 
 **/
 
@@ -228,6 +228,31 @@ typedef struct {
   /// Maximum PCI bus number assigned.
   ///
   UINT8                             LastPciBus;
+
+  ///
+  /// Start Address of Upper Memory Area (UMA) to be set as Read/Write. If
+  /// UmaAddress is a valid address in the shadow RAM, it also indicates that the region
+  /// from 0xC0000 to (UmaAddress ¨C 1) can be used for Option ROM.
+  ///
+  UINT32                            UmaAddress;
+
+  ///
+  /// Upper Memory Area size in bytes to be set as Read/Write. If zero, no UMA region
+  /// will be set as Read/Write (i.e. all Shadow RAM is set as Read-Only).
+  ///
+  UINT32                            UmaSize;
+
+  ///
+  /// Start Address of high memory that can be used for permanent allocation. If zero,
+  /// high memory is not available for permanent allocation.
+  ///
+  UINT32                            HiPermanentMemoryAddress;
+
+  ///
+  /// Size of high memory that can be used for permanent allocation in bytes. If zero,
+  /// high memory is not available for permanent allocation.
+  ///
+  UINT32                            HiPermanentMemorySize;
 } EFI_COMPATIBILITY16_TABLE;
 
 ///
