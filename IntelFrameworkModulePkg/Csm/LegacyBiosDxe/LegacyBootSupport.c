@@ -1238,6 +1238,24 @@ GenericLegacyBoot (
                            0x40000,
                            &Granularity
                            );
+
+  if ((Private->Legacy16Table->TableLength >= OFFSET_OF (EFI_COMPATIBILITY16_TABLE, HiPermanentMemoryAddress)) &&
+      ((Private->Legacy16Table->UmaAddress != 0) && (Private->Legacy16Table->UmaSize != 0))) {
+    //
+    // Here we could reduce UmaAddress down as far as Private->OptionRom, taking into
+    // account the granularity of the access control.
+    //
+    DEBUG((EFI_D_INFO, "Unlocking UMB RAM region 0x%x-0x%x\n", Private->Legacy16Table->UmaAddress,
+                        Private->Legacy16Table->UmaAddress + Private->Legacy16Table->UmaSize));
+
+    Private->LegacyRegion->UnLock (
+                             Private->LegacyRegion,
+                             Private->Legacy16Table->UmaAddress,
+                             Private->Legacy16Table->UmaSize,
+                             &Granularity
+                             );
+  }
+
   //
   // Lock attributes of the Legacy Region if chipset supports
   //
