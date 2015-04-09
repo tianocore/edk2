@@ -294,11 +294,6 @@ RuntimeDriverSetVirtualAddressMap (
   }
 
   //
-  // Report Status Code here since EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event was signalled.
-  //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT));
-
-  //
   // Relocate runtime images. All runtime images are stored in a list in Runtime AP.
   //
   for (Link = mRuntime.ImageHead.ForwardLink; Link != &mRuntime.ImageHead; Link = Link->ForwardLink) {
@@ -362,6 +357,10 @@ RuntimeDriverSetVirtualAddressMap (
   //
   mVirtualMap = NULL;
 
+  //
+  // Report Status Code here since EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event was signalled.
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT));
   return EFI_SUCCESS;
 }
 
