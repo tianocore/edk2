@@ -1046,7 +1046,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     }
     
    
-    SkuObj = SkuClass(Platform.Platform.SkuName,Platform.Platform.SkuIds)
+    SkuObj = SkuClass(Platform.Platform.AvilableSkuIds, Platform.Platform.SkuIds)
     Dict['SYSTEM_SKU_ID_VALUE'] = Platform.Platform.SkuIds[SkuObj.SystemSkuId]
 
     Dict['PCD_INFO_FLAG'] = Platform.Platform.PcdInfoFlag
@@ -1592,6 +1592,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     if NumberOfSkuEnabledPcd != 0: 
         Dict['SKU_HEAD_SIZE'] = str(NumberOfSkuEnabledPcd) + 'U'
     
+    for AvailableSkuNumber in SkuObj.SkuIdNumberSet:
+        if AvailableSkuNumber not in Dict['SKUID_VALUE']:
+            Dict['SKUID_VALUE'].append(AvailableSkuNumber)
     Dict['SKUID_VALUE'][0] = len(Dict['SKUID_VALUE']) - 1
     
     AutoGenH.Append(gPcdDatabaseAutoGenH.Replace(Dict))

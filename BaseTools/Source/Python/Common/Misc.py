@@ -1955,17 +1955,26 @@ class SkuClass():
         
         self.AvailableSkuIds = sdict()
         self.SkuIdSet = []
-        
+        self.SkuIdNumberSet = []
         if SkuIdentifier == '' or SkuIdentifier is None:
             self.SkuIdSet = ['DEFAULT']
+            self.SkuIdNumberSet = ['0U']
         elif SkuIdentifier == 'ALL':
             self.SkuIdSet = SkuIds.keys()
+            self.SkuIdNumberSet = [num.strip() + 'U' for num in SkuIds.values()]
         else:
             r = SkuIdentifier.split('|') 
             self.SkuIdSet=[r[k].strip() for k in range(len(r))]      
+            k = None
+            try: 
+                self.SkuIdNumberSet = [SkuIds[k].strip() + 'U' for k in self.SkuIdSet]   
+            except Exception:
+                EdkLogger.error("build", PARAMETER_INVALID,
+                            ExtraData = "SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
+                                      % (k, " ".join(SkuIds.keys())))
         if len(self.SkuIdSet) == 2 and 'DEFAULT' in self.SkuIdSet and SkuIdentifier != 'ALL':
             self.SkuIdSet.remove('DEFAULT')
-                
+            self.SkuIdNumberSet.remove('0U')
         for each in self.SkuIdSet:
             if each in SkuIds:
                 self.AvailableSkuIds[each] = SkuIds[each]
@@ -1992,11 +2001,12 @@ class SkuClass():
             return self.SkuIdSet[0]
         else:
             return 'DEFAULT'
-            
+    def __GetAvailableSkuIdNumber(self):
+        return self.SkuIdNumberSet
     SystemSkuId = property(__GetSystemSkuID)
     AvailableSkuIdSet = property(__GetAvailableSkuIds)
     SkuUsageType = property(__SkuUsageType)
-
+    AvailableSkuIdNumSet = property(__GetAvailableSkuIdNumber)
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another

@@ -132,6 +132,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._BuildTargets      = None
         self._SkuName           = None
         self._SkuIdentifier     = None
+        self._AvilableSkuIds = None
         self._PcdInfoFlag       = None
         self._VarCheckFlag = None
         self._FlashDefinition   = None
@@ -232,6 +233,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if self._SkuName == None:
                     self._SkuName = Record[2]
                 self._SkuIdentifier = Record[2]
+                self._AvilableSkuIds = Record[2]
             elif Name == TAB_DSC_DEFINES_PCD_INFO_GENERATION:
                 self._PcdInfoFlag = Record[2]
             elif Name == TAB_DSC_DEFINES_PCD_VAR_CHECK_GENERATION:
@@ -362,7 +364,10 @@ class DscBuildData(PlatformBuildClassObject):
             return True
         else:
             return False
-            
+    def _GetAviableSkuIds(self):
+        if self._AvilableSkuIds:
+            return self._AvilableSkuIds
+        return self.SkuIdentifier
     def _GetSkuIdentifier(self):
         if self._SkuName:
             return self._SkuName
@@ -1177,6 +1182,7 @@ class DscBuildData(PlatformBuildClassObject):
     BuildTargets        = property(_GetBuildTarget)
     SkuName             = property(_GetSkuName, _SetSkuName)
     SkuIdentifier       = property(_GetSkuIdentifier)
+    AvilableSkuIds = property(_GetAviableSkuIds)
     PcdInfoFlag         = property(_GetPcdInfoFlag)
     VarCheckFlag = property(_GetVarCheckFlag)
     FlashDefinition     = property(_GetFdfFile)
