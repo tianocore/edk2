@@ -280,6 +280,11 @@ RuntimeDriverSetVirtualAddressMap (
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP));
 
   //
+  // Report Status Code here since EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event will be signalled.
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT));
+
+  //
   // Signal all the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE events.
   // All runtime events are stored in a list in Runtime AP.
   //
@@ -357,10 +362,6 @@ RuntimeDriverSetVirtualAddressMap (
   //
   mVirtualMap = NULL;
 
-  //
-  // Report Status Code here since EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event was signalled.
-  //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT));
   return EFI_SUCCESS;
 }
 
