@@ -20,9 +20,6 @@
   PACKAGE_GUID                   = 58ABC905-951E-472e-8590-77BA8A50BE63
   PACKAGE_VERSION                = 0.1
   
-[Includes]
-  Include
-  
 [LibraryClasses]
   
 [Guids]
