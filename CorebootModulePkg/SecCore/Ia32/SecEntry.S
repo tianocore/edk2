@@ -46,7 +46,7 @@ ASM_PFX(_ModuleEntryPoint):
   #
   # Construct the temporary memory at 0x80000, length 0x10000
   #
-  movl ($BASE_512KB + $SIZE_64KB), %esp
+  movl $(BASE_512KB + SIZE_64KB), %esp
 
   #
   # Pass BFV into the PEI Core
