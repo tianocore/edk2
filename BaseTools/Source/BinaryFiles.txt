@@ -28,6 +28,7 @@ build.exe
 BPDG.exe
 BootSectImage.exe
 Common.PyUtility.pyd
+Ecc.exe
 EfiCompressor.pyd
 EfiLdrImage.exe
 EfiRom.exe
@@ -60,6 +61,8 @@ VolInfo.exe
 
 [ExtraFiles.Win32]
 TestSigningPrivateKey.pem
+config.ini
+exception.xml
 
 [CxFreeze.Win32]
 _ctypes.pyd
