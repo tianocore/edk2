@@ -37,18 +37,18 @@ typedef struct {
 
 SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
   {
-    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, sizeof (VENDOR_DEVICE_PATH), 0},
+    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, { sizeof (VENDOR_DEVICE_PATH), 0} },
     EFI_SERIAL_IO_PROTOCOL_GUID // Use the drivers GUID
   },
   {
-    { MESSAGING_DEVICE_PATH, MSG_UART_DP, sizeof (UART_DEVICE_PATH), 0},
+    { MESSAGING_DEVICE_PATH, MSG_UART_DP, { sizeof (UART_DEVICE_PATH), 0} },
     0,        // Reserved
     FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
     FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
     FixedPcdGet8 (PcdUartDefaultParity),      // Parity (N)
     FixedPcdGet8 (PcdUartDefaultStopBits)     // StopBits
   },
-  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 } }
 };
 
 EFI_HANDLE  gHandle = NULL;
