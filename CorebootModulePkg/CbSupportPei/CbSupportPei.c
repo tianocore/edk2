@@ -121,7 +121,7 @@ CbPeiReportRemainedFvs (
 		if (IsFvHeaderValid ((EFI_FIRMWARE_VOLUME_HEADER* )TempPtr)) {
 			if (TempPtr != (UINT8* )(UINTN) PcdGet32 (PcdPayloadFdMemBase))  {
 				// Skip the PEI FV
-				DEBUG((EFI_D_ERROR, "Found one valid fv : 0x%x.\n", TempPtr, ((EFI_FIRMWARE_VOLUME_HEADER* )TempPtr)->FvLength));	
+				DEBUG((EFI_D_ERROR, "Found one valid fv : 0x%lx.\n", TempPtr, ((EFI_FIRMWARE_VOLUME_HEADER* )TempPtr)->FvLength));	
 				
 				PeiServicesInstallFvInfoPpi (
 			    NULL,
@@ -176,8 +176,8 @@ CbPeiEntryPoint (
 	if (EFI_ERROR(Status)) 
 		return Status;
 		
-	DEBUG((EFI_D_ERROR, "LowMemorySize: 0x%x.\n", LowMemorySize));
-	DEBUG((EFI_D_ERROR, "HighMemorySize: 0x%x.\n", HighMemorySize));
+	DEBUG((EFI_D_ERROR, "LowMemorySize: 0x%lx.\n", LowMemorySize));
+	DEBUG((EFI_D_ERROR, "HighMemorySize: 0x%lx.\n", HighMemorySize));
 	
 	ASSERT (LowMemorySize > 0);
 	
@@ -248,8 +248,8 @@ CbPeiEntryPoint (
 	//
 	PeiMemBase = (LowMemorySize - PeiMemSize) & (~(BASE_64KB - 1));
 	
-	DEBUG((EFI_D_ERROR, "PeiMemBase: 0x%x.\n", PeiMemBase));
-	DEBUG((EFI_D_ERROR, "PeiMemSize: 0x%x.\n", PeiMemSize)); 
+	DEBUG((EFI_D_ERROR, "PeiMemBase: 0x%lx.\n", PeiMemBase));
+	DEBUG((EFI_D_ERROR, "PeiMemSize: 0x%lx.\n", PeiMemSize)); 
    
 	Status = PeiServicesInstallPeiMemory (
 	       PeiMemBase,            
@@ -319,7 +319,7 @@ CbPeiEntryPoint (
   pCbHeader = NULL;
   if ((CbParseGetCbHeader (1, &pCbHeader) == RETURN_SUCCESS) 
   	&& ((UINTN)pCbHeader > BASE_4KB)) {
-  	DEBUG((EFI_D_ERROR, "Actual Coreboot header: 0x%x.\n", (UINTN)pCbHeader)); 	
+  	DEBUG((EFI_D_ERROR, "Actual Coreboot header: %p.\n", pCbHeader)); 	
   	PcdSet32 (PcdCbHeaderPointer, (UINT32)(UINTN)pCbHeader);
   }
   
@@ -345,8 +345,8 @@ CbPeiEntryPoint (
  	pSystemTableInfo->AcpiTableSize = AcpiTableSize; 	
  	pSystemTableInfo->SmbiosTableBase = (UINT64) (UINTN)pSmbiosTable;
  	pSystemTableInfo->SmbiosTableSize = SmbiosTableSize;
- 	DEBUG ((EFI_D_ERROR, "Detected Acpi Table at 0x%x, length 0x%x\n", (UINTN)pSystemTableInfo->AcpiTableBase, pSystemTableInfo->AcpiTableSize));	
- 	DEBUG ((EFI_D_ERROR, "Detected Smbios Table at 0x%x, length 0x%x\n", (UINTN)pSystemTableInfo->SmbiosTableBase, pSystemTableInfo->SmbiosTableSize));	
+ 	DEBUG ((EFI_D_ERROR, "Detected Acpi Table at 0x%lx, length 0x%x\n", pSystemTableInfo->AcpiTableBase, pSystemTableInfo->AcpiTableSize));	
+ 	DEBUG ((EFI_D_ERROR, "Detected Smbios Table at 0x%lx, length 0x%x\n", pSystemTableInfo->SmbiosTableBase, pSystemTableInfo->SmbiosTableSize));	
  	DEBUG ((EFI_D_ERROR, "Create system table info guid hob\n"));
  	
  	//

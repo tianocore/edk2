@@ -143,7 +143,7 @@ FindCbMemTable (
     	if (pMemTableSize)
     		*pMemTableSize = root->entries[Idx].size;
     	
-    	DEBUG ((EFI_D_ERROR, "Find CbMemTable Id 0x%x, base 0x%x, size 0x%x\n", TableId, *pMemTable, *pMemTableSize));
+    	DEBUG ((EFI_D_ERROR, "Find CbMemTable Id 0x%x, base %p, size 0x%x\n", TableId, *pMemTable, *pMemTableSize));
     	return RETURN_SUCCESS;
     }
   }
@@ -209,7 +209,7 @@ CbParseMemoryInfo (
     }
   }
   
-  DEBUG ((EFI_D_ERROR, "Low memory 0x%x, High Memory 0x%x\n", *pLowMemorySize, *pHighMemorySize));
+  DEBUG ((EFI_D_ERROR, "Low memory 0x%lx, High Memory 0x%lx\n", *pLowMemorySize, *pHighMemorySize));
   
   return RETURN_SUCCESS;	
 }
@@ -351,8 +351,8 @@ CbParseFadtInfo (
 	if (!Rsdp)
 		return RETURN_NOT_FOUND;
 		
-	DEBUG ((EFI_D_ERROR, "Find Rsdp at 0x%x\n", Rsdp));
-	DEBUG ((EFI_D_ERROR, "Find Rsdt 0x%x, Xsdt 0x%x\n", Rsdp->RsdtAddress, Rsdp->XsdtAddress));
+	DEBUG ((EFI_D_ERROR, "Find Rsdp at %p\n", Rsdp));
+	DEBUG ((EFI_D_ERROR, "Find Rsdt 0x%x, Xsdt 0x%lx\n", Rsdp->RsdtAddress, Rsdp->XsdtAddress));
 	
 	//
 	// Search Rsdt First
@@ -374,7 +374,7 @@ CbParseFadtInfo (
 	      	
 	      if (pResetReg)   
 	      	*pResetReg = (UINTN)Fadt->ResetReg.Address; 
-	      DEBUG ((EFI_D_ERROR, "Reset Reg 0x%x\n", Fadt->ResetReg.Address));
+	      DEBUG ((EFI_D_ERROR, "Reset Reg 0x%lx\n", Fadt->ResetReg.Address));
 	      	
 	      if (pResetValue)   
 	      	*pResetValue = Fadt->ResetValue;
@@ -405,7 +405,7 @@ CbParseFadtInfo (
 	      	
 	      if (pResetReg)   
 	      	*pResetReg = (UINTN)Fadt->ResetReg.Address; 
-	      DEBUG ((EFI_D_ERROR, "Reset Reg 0x%x\n", Fadt->ResetReg.Address));
+	      DEBUG ((EFI_D_ERROR, "Reset Reg 0x%lx\n", Fadt->ResetReg.Address));
 	      	
 	      if (pResetValue)   
 	      	*pResetValue = Fadt->ResetValue;
@@ -522,7 +522,7 @@ CbParseFbInfo (
 		return RETURN_NOT_FOUND;
 		
   DEBUG ((EFI_D_ERROR, "Found coreboot video frame buffer information\n"));
-  DEBUG ((EFI_D_ERROR, "physical_address: 0x%x\n", CbFbRec->physical_address));
+  DEBUG ((EFI_D_ERROR, "physical_address: 0x%lx\n", CbFbRec->physical_address));
   DEBUG ((EFI_D_ERROR, "x_resolution: 0x%x\n", CbFbRec->x_resolution));
   DEBUG ((EFI_D_ERROR, "y_resolution: 0x%x\n", CbFbRec->y_resolution));
   DEBUG ((EFI_D_ERROR, "bits_per_pixel: 0x%x\n", CbFbRec->bits_per_pixel));

@@ -49,7 +49,7 @@ CbReserveResourceInGcd (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         EFI_D_ERROR,
-        "Failed to add memory space :0x%x 0x%x\n",
+        "Failed to add memory space :0x%lx 0x%lx\n",
         BaseAddress,
         Length
         ));
@@ -109,7 +109,7 @@ OnReadyToBoot (
 	//
 	IoOr16 (mPmCtrlReg, BIT0);
 	
-	DEBUG ((EFI_D_ERROR, "Enable SCI bit at 0x%x before boot\n", mPmCtrlReg));	
+	DEBUG ((EFI_D_ERROR, "Enable SCI bit at 0x%lx before boot\n", (UINT64)mPmCtrlReg));	
 }
 
 /**
@@ -158,7 +158,7 @@ CbDxeEntryPoint (
 	// Install Acpi Table
 	//
 	if (pSystemTableInfo->AcpiTableBase != 0 && pSystemTableInfo->AcpiTableSize != 0) {		
-		DEBUG ((EFI_D_ERROR, "Install Acpi Table at 0x%x, length 0x%x\n", (UINTN)pSystemTableInfo->AcpiTableBase, pSystemTableInfo->AcpiTableSize));	
+		DEBUG ((EFI_D_ERROR, "Install Acpi Table at 0x%lx, length 0x%x\n", pSystemTableInfo->AcpiTableBase, pSystemTableInfo->AcpiTableSize));	
 		Status = gBS->InstallConfigurationTable (&gEfiAcpiTableGuid, (VOID *)(UINTN)pSystemTableInfo->AcpiTableBase);
 		ASSERT_EFI_ERROR (Status);
 	}
@@ -167,7 +167,7 @@ CbDxeEntryPoint (
 	// Install Smbios Table
 	//
 	if (pSystemTableInfo->SmbiosTableBase != 0 && pSystemTableInfo->SmbiosTableSize != 0) {			
-		DEBUG ((EFI_D_ERROR, "Install Smbios Table at 0x%x, length 0x%x\n", (UINTN)pSystemTableInfo->SmbiosTableBase, pSystemTableInfo->SmbiosTableSize));	
+		DEBUG ((EFI_D_ERROR, "Install Smbios Table at 0x%lx, length 0x%x\n", pSystemTableInfo->SmbiosTableBase, pSystemTableInfo->SmbiosTableSize));	
 		Status = gBS->InstallConfigurationTable (&gEfiSmbiosTableGuid, (VOID *)(UINTN)pSystemTableInfo->SmbiosTableBase);
 		ASSERT_EFI_ERROR (Status);
 	}
@@ -180,7 +180,7 @@ CbDxeEntryPoint (
   pAcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob); 
   
   mPmCtrlReg = (UINTN)pAcpiBoardInfo->PmCtrlRegBase;
-	DEBUG ((EFI_D_ERROR, "PmCtrlReg at 0x%x\n", mPmCtrlReg));	
+	DEBUG ((EFI_D_ERROR, "PmCtrlReg at 0x%lx\n", (UINT64)mPmCtrlReg));	
 	 
 	//
 	// Register callback on the ready to boot event 
