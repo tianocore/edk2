@@ -123,6 +123,7 @@ OnReadyToBoot (
 
 **/
 EFI_STATUS
+EFIAPI
 CbDxeEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
