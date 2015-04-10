@@ -3,7 +3,7 @@
   produce the implementation of native PCD protocol and EFI_PCD_PROTOCOL defined in
   PI 1.2 Vol3.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -129,7 +129,8 @@ PcdDxeInit (
   )
 {
   EFI_STATUS Status;
-  
+  VOID       *Registration;
+
   //
   // Make sure the Pcd Protocol is not already installed in the system
   //
@@ -166,6 +167,18 @@ PcdDxeInit (
                     );
     ASSERT_EFI_ERROR (Status);
   }
+
+  //
+  // Register callback function upon VariableLockProtocol
+  // to lock the variables referenced by DynamicHii PCDs with RO property set in *.dsc.
+  //
+  EfiCreateProtocolNotifyEvent (
+    &gEdkiiVariableLockProtocolGuid,
+    TPL_CALLBACK,
+    VariableLockCallBack,
+    NULL,
+    &Registration
+    );
 
   return Status;
 }

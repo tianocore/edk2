@@ -1112,6 +1112,7 @@ SetWorker (
   EFI_GUID            *Guid;
   UINT16              *Name;
   UINTN               VariableOffset;
+  UINT32              Attributes;
   VOID                *InternalData;
   VARIABLE_HEAD       *VariableHead;
   UINTN               Offset;
@@ -1223,20 +1224,8 @@ SetWorker (
       Guid = GuidTable + VariableHead->GuidTableIndex;
       Name = (UINT16*) (StringTable + VariableHead->StringIndex);
       VariableOffset = VariableHead->Offset;
-      Status = SetHiiVariable (Guid, Name, Data, *Size, VariableOffset);
-
-      if (EFI_NOT_FOUND == Status) {
-        if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING))  {
-          CopyMem (
-            StringTable + *(STRING_HEAD *)(PcdDb + VariableHead->DefaultValueOffset),
-            Data,
-            *Size
-            );
-        } else {
-          CopyMem (PcdDb + VariableHead->DefaultValueOffset, Data, *Size);
-        } 
-        Status = EFI_SUCCESS;
-      }
+      Attributes = VariableHead->Attributes;
+      Status = SetHiiVariable (Guid, Name, Attributes, Data, *Size, VariableOffset);
       break;
       
     case PCD_TYPE_DATA:
@@ -1373,6 +1362,7 @@ ExSetWorker (
   
   @param VariableGuid    Guid of variable which stored value of a HII-type PCD.
   @param VariableName    Unicode name of variable which stored value of a HII-type PCD.
+  @param SetAttributes   Attributes bitmask to set for the variable.
   @param Data            Value want to be set.
   @param DataSize        Size of value
   @param Offset          Value offset of HII-type PCD in variable.
@@ -1384,6 +1374,7 @@ EFI_STATUS
 SetHiiVariable (
   IN  EFI_GUID     *VariableGuid,
   IN  UINT16       *VariableName,
+  IN  UINT32       SetAttributes,
   IN  CONST VOID   *Data,
   IN  UINTN        DataSize,
   IN  UINTN        Offset
@@ -1413,7 +1404,7 @@ SetHiiVariable (
     //
     // Patch new PCD's value to offset in given HII variable.
     //
-    if  (Size >= (DataSize + Offset)) {
+    if (Size >= (DataSize + Offset)) {
       SetSize = Size;
     } else {
       SetSize = DataSize + Offset;
@@ -1433,10 +1424,14 @@ SetHiiVariable (
 
     CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
 
+    if (SetAttributes == 0) {
+      SetAttributes = Attribute;
+    }
+
     Status = gRT->SetVariable (
               VariableName,
               VariableGuid,
-              Attribute,
+              SetAttributes,
               SetSize,
               Buffer
               );
@@ -1454,11 +1449,15 @@ SetHiiVariable (
     ASSERT (Buffer != NULL);
     
     CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
-    
+
+    if (SetAttributes == 0) {
+      SetAttributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+    }
+
     Status = gRT->SetVariable (
               VariableName,
               VariableGuid,
-              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+              SetAttributes,
               Size,
               Buffer
               );
@@ -1468,8 +1467,7 @@ SetHiiVariable (
   }
   
   //
-  // If we drop to here, the value is failed to be written in to variable area
-  // So, we will save the data in the PCD Database's volatile area.
+  // If we drop to here, the value is failed to be written in to variable area.
   //
   return Status;
 }
@@ -1820,3 +1818,91 @@ SetPtrTypeSize (
     }
   }
 }
+
+/**
+  VariableLock DynamicHiiPcd.
+
+  @param[in] IsPeiDb        If TRUE, the pcd entry is initialized in PEI phase,
+                            If FALSE, the pcd entry is initialized in DXE phase.
+  @param[in] VariableLock   Pointer to VariableLockProtocol.
+
+**/
+VOID
+VariableLockDynamicHiiPcd (
+  IN BOOLEAN                        IsPeiDb,
+  IN EDKII_VARIABLE_LOCK_PROTOCOL   *VariableLock
+  )
+{
+  EFI_STATUS                Status;
+  PCD_DATABASE_INIT         *Database;
+  UINT32                    LocalTokenCount; 
+  UINTN                     TokenNumber;
+  UINT32                    LocalTokenNumber;
+  UINTN                     Offset;
+  EFI_GUID                  *GuidTable;
+  UINT8                     *StringTable;
+  VARIABLE_HEAD             *VariableHead;
+  EFI_GUID                  *Guid;
+  UINT16                    *Name;
+
+  Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
+  LocalTokenCount = IsPeiDb ? mPeiLocalTokenCount: mDxeLocalTokenCount;
+
+  //
+  // Go through PCD database to find out DynamicHii PCDs.
+  //
+  for (TokenNumber = 0; TokenNumber < LocalTokenCount; TokenNumber++) {
+    if (IsPeiDb) {
+      LocalTokenNumber = GetLocalTokenNumber (TRUE, TokenNumber);
+    } else {
+      LocalTokenNumber = GetLocalTokenNumber (FALSE, TokenNumber + mPeiLocalTokenCount);
+    }
+    if ((LocalTokenNumber & PCD_TYPE_HII) != 0) {
+      Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+      VariableHead = (VARIABLE_HEAD *) ((UINT8 *) Database + Offset);
+      //
+      // Why not to set property by VarCheckProtocol with Attributes and Property directly here?
+      // It is because that set property by VarCheckProtocol will indicate the variable to
+      // be a system variable, but the unknown max size of the variable is dangerous to
+      // the system variable region.
+      //
+      if ((VariableHead->Property & VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY) != 0) {
+        //
+        // DynamicHii PCD with RO property set in *.dsc.
+        //
+        StringTable = (UINT8 *) ((UINT8 *) Database + Database->StringTableOffset);
+        GuidTable = (EFI_GUID *) ((UINT8 *) Database + Database->GuidTableOffset);
+        Guid = GuidTable + VariableHead->GuidTableIndex;
+        Name = (UINT16*) (StringTable + VariableHead->StringIndex);
+        Status = VariableLock->RequestToLock (VariableLock, Name, Guid);
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+  }
+}
+
+/**
+  VariableLockProtocol callback
+  to lock the variables referenced by DynamicHii PCDs with RO property set in *.dsc.
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    Pointer to the notification function's context.
+
+**/
+VOID
+EFIAPI
+VariableLockCallBack (
+  IN EFI_EVENT          Event,
+  IN VOID               *Context
+  )
+{
+  EFI_STATUS                    Status;
+  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+  if (!EFI_ERROR (Status)) {
+    VariableLockDynamicHiiPcd (TRUE, VariableLock);
+    VariableLockDynamicHiiPcd (FALSE, VariableLock);
+  }
+}
+
