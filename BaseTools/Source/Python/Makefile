@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for Python tools build.
 #
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -31,7 +31,7 @@ EDK_TOOLS_PATH  = $(EDK_TOOLS_PATH::\\=:\)
 
 BIN_DIR=$(EDK_TOOLS_PATH)\Bin\Win32
 
-APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe $(BIN_DIR)\Rsa2048Sha256Sign.exe $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe
+APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe $(BIN_DIR)\Rsa2048Sha256Sign.exe $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe $(BIN_DIR)\Ecc.exe
 
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
@@ -232,7 +232,6 @@ CMD_UPT=$(BASE_TOOLS_PATH)\Source\Python\UPT\Core\DependencyRules.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParser.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParserMisc.py
 
-              
 all: SetPythonPath $(APPLICATIONS)
 
 SetPythonPath:
@@ -271,6 +270,11 @@ $(BIN_DIR)\Rsa2048Sha256Sign.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256
   
 $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256GenerateKeys.py
   @pushd . & @cd Rsa2048Sha256Sign & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256GenerateKeys.py & @popd
+
+$(BIN_DIR)\Ecc.exe: $(BASE_TOOLS_PATH)\Source\Python\Ecc\Ecc.py $(CMD_ECC)
+  @pushd . & @cd Ecc & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Ecc.py & @popd
+  @pushd . & @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\config.ini $(BIN_DIR)\config.ini & @popd
+  @pushd . & @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\exception.xml $(BIN_DIR)\exception.xml & @popd
   
 clean:
 cleanall:  
