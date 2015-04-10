@@ -31,16 +31,6 @@ static UINT64 cb_unpack64(struct cbuint64 val)
   return LShiftU64 (val.hi, 32) | val.lo;
 }
 
-static const char *cb_mb_vendor_string(const struct cb_mainboard *cbm)
-{
-  return (char *)(cbm->strings + cbm->vendor_idx);
-}
-
-static const char *cb_mb_part_string(const struct cb_mainboard *cbm)
-{
-  return (char *)(cbm->strings + cbm->part_number_idx);
-}
-
 UINT16
 CbCheckSum16 (
   IN UINT16   *Buffer,
