@@ -1,7 +1,7 @@
 ## @file
 # Routines for generating Pcd Database
 #
-# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -14,8 +14,12 @@ from StringIO import StringIO
 from Common.Misc import *
 from Common.String import StringToArray
 from struct import pack
+from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER
+from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB
+from ValidCheckingInfoObject import VAR_VALID_OBJECT_FACTORY
+from Common.VariableAttributes import VariableAttributes
 
-DATABASE_VERSION = 4
+DATABASE_VERSION = 5
 
 gPcdDatabaseAutoGenC = TemplateString("""
 //
@@ -444,7 +448,7 @@ class DbVariableTableItemList (DbComItemList):
             RawDataList = []
         DbComItemList.__init__(self, ItemSize, DataList, RawDataList)
     def PackData(self):
-        PackStr = "=LLHH"
+        PackStr = "=LLHHLHH"
         Buffer = ''
         for DataList in self.RawDataList:
             for Data in DataList:
@@ -452,7 +456,10 @@ class DbVariableTableItemList (DbComItemList):
                                GetIntegerValue(Data[0]),
                                GetIntegerValue(Data[1]),
                                GetIntegerValue(Data[2]),
-                               GetIntegerValue(Data[3]))
+                               GetIntegerValue(Data[3]),
+                               GetIntegerValue(Data[4]),
+                               GetIntegerValue(Data[5]),
+                               GetIntegerValue(0))
         return Buffer
 
 class DbStringHeadTableItemList(DbItemList):
@@ -712,7 +719,7 @@ def BuildExDataBase(Dict):
     # DbItemList to DbStringHeadTableItemList
     DbStringHeadValue = DbStringHeadTableItemList(4, RawDataList = StringHeadValue)
     VariableTable = Dict['VARIABLE_DB_VALUE']
-    DbVariableTable = DbVariableTableItemList(12, RawDataList = VariableTable)
+    DbVariableTable = DbVariableTableItemList(20, RawDataList = VariableTable)
     NumberOfSkuEnabledPcd = GetIntegerValue(Dict['SKU_HEAD_SIZE'])
     Dict['SKUHEAD_TABLE_VALUE'] = [(0,0) for i in xrange(NumberOfSkuEnabledPcd)]
     SkuTable = Dict['SKUHEAD_TABLE_VALUE']  # Generated later
@@ -852,7 +859,7 @@ def BuildExDataBase(Dict):
     for VariableEntries in VariableTable:
         skuindex = 0
         for VariableEntryPerSku in VariableEntries:
-            (VariableHeadGuidIndex, VariableHeadStringIndex, SKUVariableOffset, VariableOffset, VariableRefTable) = VariableEntryPerSku[:]
+            (VariableHeadGuidIndex, VariableHeadStringIndex, SKUVariableOffset, VariableOffset, VariableRefTable, VariableAttribute) = VariableEntryPerSku[:]
             DbIndex = 0
             DbOffset = FixedHeaderLen
             for DbIndex in xrange(len(DbTotal)):
@@ -867,8 +874,8 @@ def BuildExDataBase(Dict):
             skuindex += 1
             if DbIndex >= InitTableNum:
                 assert(False)
-
-            VariableEntryPerSku[:] = (VariableHeadStringIndex, DbOffset, VariableHeadGuidIndex, SKUVariableOffset)
+            VarAttr, VarProp = VariableAttributes.GetVarAttributes(VariableAttribute)
+            VariableEntryPerSku[:] = (VariableHeadStringIndex, DbOffset, VariableHeadGuidIndex, SKUVariableOffset, VarAttr, VarProp)
 
     # calculate various table offset now
     DbTotalLength = FixedHeaderLen
@@ -1113,6 +1120,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     NumberOfSizeItems = 0
     NumberOfSkuEnabledPcd = 0
     GuidList = []
+    VarCheckTab = VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER()
     i = 0
     ReorderedDynPcdList = GetOrderedDynamicPcdList(Platform.DynamicPcdList, Platform.PcdTokenNumber)
     for Pcd in ReorderedDynPcdList:
@@ -1182,6 +1190,29 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
             SkuIdIndex += 1
     
             if len(Sku.VariableName) > 0:
+                VariableGuidStructure = Sku.VariableGuidValue
+                VariableGuid = GuidStructureStringToGuidValueName(VariableGuidStructure)
+                if Platform.Platform.VarCheckFlag:
+                    var_check_obj = VAR_CHECK_PCD_VARIABLE_TAB(VariableGuidStructure, StringToArray(Sku.VariableName))
+                    try:
+                        var_check_obj.push_back(VAR_VALID_OBJECT_FACTORY.Get_valid_object(Pcd, Sku.VariableOffset))
+                        VarAttr, _ = VariableAttributes.GetVarAttributes(Sku.VariableAttribute)
+                        var_check_obj.SetAttributes(VarAttr)
+                        var_check_obj.UpdateSize()
+                        VarCheckTab.push_back(var_check_obj)
+                    except Exception:
+                        ValidInfo = ''
+                        if Pcd.validateranges:
+                            ValidInfo = Pcd.validateranges[0]
+                        if Pcd.validlists:
+                            ValidInfo = Pcd.validlists[0]
+                        if ValidInfo:
+                            EdkLogger.error("build", PCD_VALIDATION_INFO_ERROR,
+                                                "The PCD '%s.%s' Validation information defined in DEC file has incorrect format." % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                                ExtraData = "[%s]" % str(ValidInfo))
+                        else:
+                            EdkLogger.error("build", PCD_VALIDATION_INFO_ERROR,
+                                                "The PCD '%s.%s' Validation information defined in DEC file has incorrect format." % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
                 Pcd.TokenTypeList += ['PCD_TYPE_HII']
                 Pcd.InitString = 'INIT'
                 # Store all variable names of one HII PCD under different SKU to stringTable
@@ -1215,8 +1246,6 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                         
                 VariableHeadStringIndex = VariableHeadList[SkuIdIndex - 2]
                 # store VariableGuid to GuidTable and get the VariableHeadGuidIndex
-                VariableGuidStructure = Sku.VariableGuidValue
-                VariableGuid = GuidStructureStringToGuidValueName(VariableGuidStructure)
 
                 if VariableGuid not in GuidList:
                     GuidList += [VariableGuid]
@@ -1268,7 +1297,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                     # the Pcd default value was filled before
                     VariableOffset = len(Dict['VARDEF_DB_VALUE_' + Pcd.DatumType]) - 1
                     VariableRefTable = Dict['VARDEF_DB_VALUE_' + Pcd.DatumType]
-                VariableDbValueList.append([VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset, VariableOffset, VariableRefTable])
+                VariableDbValueList.append([VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset, VariableOffset, VariableRefTable, Sku.VariableAttribute])
 
             elif Sku.VpdOffset != '':
                 Pcd.TokenTypeList += ['PCD_TYPE_VPD']
@@ -1600,6 +1629,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 
         AutoGenC.Append(gPcdDatabaseAutoGenC.Replace(Dict))
     
+    if Platform.Platform.VarCheckFlag:
+        dest = os.path.join(Platform.BuildDir, 'FV')
+        VarCheckTab.dump(dest, Phase)
     Buffer = BuildExDataBase(Dict)
     return AutoGenH, AutoGenC, Buffer
 

@@ -1,7 +1,7 @@
 ## @file
 # Generate AutoGen.h, AutoGen.c and *.depex files
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1813,6 +1813,9 @@ class PlatformAutoGen(AutoGen):
             if not IsValid:
                 EdkLogger.error('build', FORMAT_INVALID, Cause, File=self.MetaFile,
                                 ExtraData="%s.%s" % (ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName))
+            ToPcd.validateranges = FromPcd.validateranges
+            ToPcd.validlists = FromPcd.validlists
+            ToPcd.expressions = FromPcd.expressions
 
         if ToPcd.DatumType == "VOID*" and ToPcd.MaxDatumSize in ['', None]:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \

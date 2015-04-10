@@ -376,7 +376,8 @@ class MetaFileParser(object):
                 File=self.MetaFile,
                 Line=self._LineIndex + 1
                 )
-
+    def GetValidExpression(self, TokenSpaceGuid, PcdCName):
+        return self._Table.GetValidExpression(TokenSpaceGuid, PcdCName)
     def _GetMacros(self):
         Macros = {}
         Macros.update(self._FileLocalMacros)
@@ -814,6 +815,7 @@ class DscParser(MetaFileParser):
         "PLATFORM_VERSION",
         "SKUID_IDENTIFIER",
         "PCD_INFO_GENERATION",
+        "PCD_VAR_CHECK_GENERATION",
         "SUPPORTED_ARCHITECTURES",
         "BUILD_TARGETS",
         "OUTPUT_DIRECTORY",

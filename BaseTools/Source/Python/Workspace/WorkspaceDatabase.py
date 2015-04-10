@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ from Common.Misc import AnalyzeDscPcd
 from Common.Misc import ProcessDuplicatedInf
 import re
 from Common.Parsing import IsValidWord
-
+from Common.VariableAttributes import VariableAttributes
 import Common.GlobalData as GlobalData
 
 ## Platform build information from DSC file
@@ -133,6 +133,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._SkuName           = None
         self._SkuIdentifier     = None
         self._PcdInfoFlag       = None
+        self._VarCheckFlag = None
         self._FlashDefinition   = None
         self._BuildNumber       = None
         self._MakefileName      = None
@@ -233,6 +234,8 @@ class DscBuildData(PlatformBuildClassObject):
                 self._SkuIdentifier = Record[2]
             elif Name == TAB_DSC_DEFINES_PCD_INFO_GENERATION:
                 self._PcdInfoFlag = Record[2]
+            elif Name == TAB_DSC_DEFINES_PCD_VAR_CHECK_GENERATION:
+                self._VarCheckFlag = Record[2]
             elif Name == TAB_FIX_LOAD_TOP_MEMORY_ADDRESS:
                 try:
                     self._LoadFixAddress = int (Record[2], 0)
@@ -349,6 +352,13 @@ class DscBuildData(PlatformBuildClassObject):
         if self._PcdInfoFlag == None or self._PcdInfoFlag.upper() == 'FALSE':
             return False
         elif self._PcdInfoFlag.upper() == 'TRUE':
+            return True
+        else:
+            return False
+    def _GetVarCheckFlag(self):  
+        if self._VarCheckFlag == None or self._VarCheckFlag.upper() == 'FALSE':
+            return False
+        elif self._VarCheckFlag.upper() == 'TRUE':
             return True
         else:
             return False
@@ -898,6 +908,17 @@ class DscBuildData(PlatformBuildClassObject):
                
         return Pcds
 
+    def CompareVarAttr(self, Attr1, Attr2):
+        if not Attr1 or not Attr2:  # for empty string
+            return True
+        Attr1s = [attr.strip() for attr in Attr1.split(",")]
+        Attr1Set = set(Attr1s)
+        Attr2s = [attr.strip() for attr in Attr2.split(",")]
+        Attr2Set = set(Attr2s)
+        if Attr2Set == Attr1Set:
+            return True
+        else:
+            return False
     ## Retrieve dynamic HII PCD settings
     #
     #   @param  Type    PCD type
@@ -907,6 +928,7 @@ class DscBuildData(PlatformBuildClassObject):
     def _GetDynamicHiiPcd(self, Type):
         
         SkuObj = SkuClass(self.SkuIdentifier,self.SkuIds)
+        VariableAttrs = {}
         
         Pcds = sdict()
         #
@@ -931,8 +953,12 @@ class DscBuildData(PlatformBuildClassObject):
             Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
-            VariableName, VariableGuid, VariableOffset, DefaultValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
+            VariableName, VariableGuid, VariableOffset, DefaultValue, VarAttribute = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
             
+            rt, Msg = VariableAttributes.ValidateVarAttributes(VarAttribute)
+            if not rt:
+                EdkLogger.error("build", PCD_VARIABLE_ATTRIBUTES_ERROR, "Variable attributes settings for %s is incorrect.\n %s" % (".".join((TokenSpaceGuid, PcdCName)), Msg),
+                        ExtraData = "[%s]" % VarAttribute)
             ExceedMax = False
             FormatCorrect = True
             if VariableOffset.isdigit():
@@ -955,8 +981,14 @@ class DscBuildData(PlatformBuildClassObject):
             
             if ExceedMax:
                 EdkLogger.error('Build', OPTION_VALUE_INVALID, "The variable offset value must not exceed the maximum value of 0xFFFF (UINT16) for %s." % ".".join((TokenSpaceGuid,PcdCName)))
+            if (VariableName, VariableGuid) not in VariableAttrs:
+                VariableAttrs[(VariableName, VariableGuid)] = VarAttribute
+            else:
+                if not self.CompareVarAttr(VariableAttrs[(VariableName, VariableGuid)], VarAttribute):
+                    EdkLogger.error('Build', PCD_VARIABLE_ATTRIBUTES_CONFLICT_ERROR, "The variable %s.%s for DynamicHii PCDs has conflicting attributes [%s] and [%s] " % (VariableGuid, VariableName, VarAttribute, VariableAttrs[(VariableName, VariableGuid)]))
             
-            SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName], VariableName, VariableGuid, VariableOffset, DefaultValue)
+            SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName], VariableName, VariableGuid, VariableOffset, DefaultValue, VariableAttribute = VarAttribute)
+            pcdDecObject = self._DecPcds[PcdCName, TokenSpaceGuid]
             if (PcdCName,TokenSpaceGuid) in Pcds.keys():  
                 pcdObject = Pcds[PcdCName,TokenSpaceGuid]
                 pcdObject.SkuInfoList[SkuName] = SkuInfo
@@ -971,7 +1003,10 @@ class DscBuildData(PlatformBuildClassObject):
                                                 '',
                                                 {SkuName : SkuInfo},
                                                 False,
-                                                None
+                                                None,
+                                                pcdDecObject.validateranges,
+                                                pcdDecObject.validlists,
+                                                pcdDecObject.expressions
                                                 )
                 
 
@@ -1143,6 +1178,7 @@ class DscBuildData(PlatformBuildClassObject):
     SkuName             = property(_GetSkuName, _SetSkuName)
     SkuIdentifier       = property(_GetSkuIdentifier)
     PcdInfoFlag         = property(_GetPcdInfoFlag)
+    VarCheckFlag = property(_GetVarCheckFlag)
     FlashDefinition     = property(_GetFdfFile)
     BuildNumber         = property(_GetBuildNumber)
     MakefileName        = property(_GetMakefileName)
@@ -1462,6 +1498,7 @@ class DecBuildData(PackageBuildClassObject):
 
             DefaultValue, DatumType, TokenNumber = AnalyzePcdData(Setting)
                                        
+            validateranges, validlists, expressions = self._RawData.GetValidExpression(TokenSpaceGuid, PcdCName)                          
             Pcds[PcdCName, TokenSpaceGuid, self._PCD_TYPE_STRING_[Type]] = PcdClassObject(
                                                                             PcdCName,
                                                                             TokenSpaceGuid,
@@ -1472,7 +1509,10 @@ class DecBuildData(PackageBuildClassObject):
                                                                             '',
                                                                             {},
                                                                             False,
-                                                                            None
+                                                                            None,
+                                                                            list(validateranges),
+                                                                            list(validlists),
+                                                                            list(expressions)
                                                                             )
         return Pcds
 

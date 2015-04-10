@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common static strings used by INF/DEC/DSC files
 #
-# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -398,6 +398,7 @@ TAB_DSC_DEFINES_SUPPORTED_ARCHITECTURES = 'SUPPORTED_ARCHITECTURES'
 TAB_DSC_DEFINES_BUILD_TARGETS = 'BUILD_TARGETS'
 TAB_DSC_DEFINES_SKUID_IDENTIFIER = 'SKUID_IDENTIFIER'
 TAB_DSC_DEFINES_PCD_INFO_GENERATION = 'PCD_INFO_GENERATION'
+TAB_DSC_DEFINES_PCD_VAR_CHECK_GENERATION = 'PCD_VAR_CHECK_GENERATION'
 TAB_DSC_DEFINES_FLASH_DEFINITION = 'FLASH_DEFINITION'
 TAB_DSC_DEFINES_BUILD_NUMBER = 'BUILD_NUMBER'
 TAB_DSC_DEFINES_MAKEFILE_NAME = 'MAKEFILE_NAME'

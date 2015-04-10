@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase a meta file table
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -225,6 +225,26 @@ class PackageTable(MetaFileTable):
         SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
         return self.Exec(SqlCommand)
 
+    def GetValidExpression(self, TokenSpaceGuid, PcdCName):
+        SqlCommand = "select Value1 from %s WHERE Value2='%s' and Value3='%s'" % (self.Table, TokenSpaceGuid, PcdCName)
+        self.Cur.execute(SqlCommand)
+        validateranges = []
+        validlists = []
+        expressions = []
+        for row in self.Cur:
+            comment = row[0]
+            comment = comment.strip("#")
+            comment = comment.strip()
+            if comment.startswith("@ValidRange"):
+                comment = comment.replace("@ValidRange", "", 1)
+                validateranges.append(comment.split("|")[1].strip())
+            if comment.startswith("@ValidList"):
+                comment = comment.replace("@ValidList", "", 1)
+                validlists.append(comment.split("|")[1].strip())
+            if comment.startswith("@Expression"):
+                comment = comment.replace("@Expression", "", 1)
+                expressions.append(comment.split("|")[1].strip())
+        return set(validateranges), set(validlists), set(expressions)
 ## Python class representation of table storing platform data
 class PlatformTable(MetaFileTable):
     _COLUMN_ = '''

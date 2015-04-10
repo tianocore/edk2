@@ -1,7 +1,7 @@
 ## @file
 # Standardized Error Hanlding infrastructures.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -81,6 +81,9 @@ EOT_ERROR = 0xF005
 DDC_ERROR = 0xF009
 WARNING_AS_ERROR = 0xF006
 MIGRATION_ERROR = 0xF010
+PCD_VALIDATION_INFO_ERROR = 0xF011
+PCD_VARIABLE_ATTRIBUTES_ERROR = 0xF012
+PCD_VARIABLE_ATTRIBUTES_CONFLICT_ERROR = 0xF013
 ABORT_ERROR = 0xFFFE
 UNKNOWN_ERROR = 0xFFFF
 
