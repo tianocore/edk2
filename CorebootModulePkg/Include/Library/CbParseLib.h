@@ -63,7 +63,7 @@ CbParseCbMemTable (
 **/
 RETURN_STATUS
 CbParseAcpiTable (
-  IN VOID**     pMemTable,
+  IN VOID*      pMemTable,
   IN UINT32*    pMemTableSize
   );
   
