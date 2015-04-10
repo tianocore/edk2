@@ -45,7 +45,9 @@
 #ifndef _COREBOOT_PEI_H_INCLUDED_
 #define _COREBOOT_PEI_H_INCLUDED_
 
+#if defined(_MSC_VER)
 #pragma warning( disable : 4200 )
+#endif
 
 #define DYN_CBMEM_ALIGN_SIZE (4096)
 
