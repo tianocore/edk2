@@ -381,7 +381,7 @@ UpdateMailboxContent (
     Mailbox->HostSequenceNo = (UINT8) Value;
     break;
   case DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY:
-    Mailbox->ToBeCheckSum = Mailbox->CheckSum + CalculateSum8 ((UINT8 *)&Mailbox->HostSequenceNo, sizeof(UINT32))
+    Mailbox->ToBeCheckSum = Mailbox->CheckSum + CalculateSum8 ((UINT8 *)&Mailbox->DebugTimerFrequency, sizeof(UINT32))
                                               - CalculateSum8 ((UINT8 *)&Value, sizeof(UINT32));
     Mailbox->DebugTimerFrequency = (UINT32) Value;
     break;

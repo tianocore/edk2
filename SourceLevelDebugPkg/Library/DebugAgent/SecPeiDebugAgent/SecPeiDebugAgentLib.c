@@ -522,6 +522,10 @@ InitializeDebugAgent (
     // Build mailbox in HOB and setup Mailbox Set In Pei flag
     //
     Mailbox = AllocateZeroPool (sizeof (DEBUG_AGENT_MAILBOX));
+    if (Mailbox == NULL) {
+      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to allocate memory!\n"));
+      CpuDeadLoop ();
+    }
     MailboxLocation = (UINT64)(UINTN)Mailbox;
     MailboxLocationPointer = BuildGuidDataHob (
                                &gEfiDebugAgentGuid,
