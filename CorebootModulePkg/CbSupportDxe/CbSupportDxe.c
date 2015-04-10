@@ -98,9 +98,10 @@ CbReserveResourceInGcd (
 
 **/
 VOID
+EFIAPI
 OnReadyToBoot (
-  EFI_EVENT  Event,
-  VOID       *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {	
 	//
