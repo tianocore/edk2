@@ -260,7 +260,7 @@ DebugPrintLevelEnabled (
 
 **/
 
-#if !defined(MDE_CPU_EBC) && (!defined (_MSC_VER) || _MSC_VER >= 1400)
+#if !defined(MDE_CPU_EBC) && (!defined (_MSC_VER) || _MSC_VER > 1400)
   #define _DEBUG_PRINT(PrintLevel, ...)              \
     do {                                             \
       if (DebugPrintLevelEnabled (PrintLevel)) {     \
