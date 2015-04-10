@@ -1615,7 +1615,7 @@ EfiMemoryTypeToE820Type (
   case EfiConventionalMemory:
   //
   // The memory of EfiRuntimeServicesCode and EfiRuntimeServicesData are
-  // usable memory for legacy OS.
+  // usable memory for legacy OS, because legacy OS is not aware of EFI runtime concept.
   // In ACPI specification, EfiRuntimeServiceCode and EfiRuntimeServiceData
   // should be mapped to AddressRangeReserved. This statement is for UEFI OS, not for legacy OS.
   //
