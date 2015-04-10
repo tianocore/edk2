@@ -27,7 +27,7 @@
   SUPPORTED_ARCHITECTURES             = IA32|X64
   BUILD_TARGETS                       = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER                    = DEFAULT
-  OUTPUT_DIRECTORY                    = Build/CorebootPayloadPkg
+  OUTPUT_DIRECTORY                    = Build/CorebootPayloadPkgX64
   FLASH_DEFINITION                    = CorebootPayloadPkg/CorebootPayloadPkg.fdf
   
   DEFINE SECURE_BOOT_ENABLE      = FALSE
