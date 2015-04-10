@@ -210,6 +210,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
   
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0  
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
 
 !if $(SOURCE_DEBUG_ENABLE)
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
