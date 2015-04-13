@@ -1,7 +1,7 @@
 /** @file
   Interpret and execute the S3 data in S3 boot script. 
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -1643,6 +1643,7 @@ S3BootScriptExecute (
   AndMask       = 0;
   OrMask        = 0;
 
+  DEBUG ((EFI_D_INFO, "TableHeader.Version - 0x%04x\n", (UINTN)TableHeader.Version));
   DEBUG ((EFI_D_INFO, "TableHeader.TableLength - 0x%08x\n", (UINTN)TableLength));
 
   while ((UINTN) Script < (UINTN) (StartAddress + TableLength)) {

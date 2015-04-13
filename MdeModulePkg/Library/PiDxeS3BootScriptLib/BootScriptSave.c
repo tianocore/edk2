@@ -1,7 +1,7 @@
 /** @file
   Save the S3 data to S3 boot script. 
  
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -423,6 +423,7 @@ S3BootScriptGetBootTimeEntryAddAddress (
      ScriptTableInfo              = (EFI_BOOT_SCRIPT_TABLE_HEADER*)(UINTN)S3TableBase;
      ScriptTableInfo->OpCode      = S3_BOOT_SCRIPT_LIB_TABLE_OPCODE;
      ScriptTableInfo->Length      = (UINT8) sizeof (EFI_BOOT_SCRIPT_TABLE_HEADER);
+     ScriptTableInfo->Version     = BOOT_SCRIPT_TABLE_VERSION;
      ScriptTableInfo->TableLength = 0;   // will be calculate at CloseTable
      mS3BootScriptTablePtr->TableLength = sizeof (EFI_BOOT_SCRIPT_TABLE_HEADER);
      mS3BootScriptTablePtr->TableBase = (UINT8*)(UINTN)S3TableBase;

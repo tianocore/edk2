@@ -2,7 +2,7 @@
   This file declares the internal Framework Boot Script format used by
   the PI implementation of Script Saver and Executor.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -182,5 +182,7 @@ typedef struct {
 #pragma pack()
 
 #define BOOT_SCRIPT_NODE_MAX_LENGTH   1024
+
+#define BOOT_SCRIPT_TABLE_VERSION     0x0001
 
 #endif
