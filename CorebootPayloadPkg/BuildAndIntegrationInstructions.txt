@@ -37,10 +37,10 @@ B. HOW TO BUILD
    edksetup.bat
    
    For debug ia32 build:
-   build -a IA32 -p CorebootPayloadPkg\CorebootPayloadPkgIA32.dsc -b DEBUG -t <ToolChain>
+   build -a IA32 -p CorebootPayloadPkg\CorebootPayloadPkgIa32.dsc -b DEBUG -t <ToolChain>
    
    For release ia32 build:
-   build -a IA32 -p CorebootPayloadPkg\CorebootPayloadPkgIA32.dsc -b RELEASE -t <ToolChain>
+   build -a IA32 -p CorebootPayloadPkg\CorebootPayloadPkgIa32.dsc -b RELEASE -t <ToolChain>
    
    For debug X64 build:
    build -a IA32 -a X64 -p CorebootPayloadPkg\CorebootPayloadPkgX64.dsc -b DEBUG -t <ToolChain>
@@ -80,12 +80,3 @@ C. HOW TO INTEGRATE
    choose Yes.
    
 6. Run "make" to build the coreboot firmware image.
-
-
-  
-   
-
-            
-            
-   
-   
