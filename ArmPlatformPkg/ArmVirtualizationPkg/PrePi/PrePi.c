@@ -20,6 +20,7 @@
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/CacheMaintenanceLib.h>
 
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/ArmMpCoreInfo.h>
@@ -102,12 +103,6 @@ PrePiMain (
   // Initialize the architecture specific bits
   ArchInitialize ();
 
-  // Initialize the Serial Port
-  SerialPortInitialize ();
-  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"UEFI firmware (version %s built at %a on %a)\n\r",
-    (CHAR16*)PcdGetPtr(PcdFirmwareVersionString), __TIME__, __DATE__);
-  SerialPortWrite ((UINT8 *) Buffer, CharCount);
-
   // Declare the PI/UEFI memory region
   HobList = HobConstructor (
     (VOID*)UefiMemoryBase,
@@ -117,9 +112,22 @@ PrePiMain (
     );
   PrePeiSetHobList (HobList);
 
+  //
+  // Ensure that the loaded image is invalidated in the caches, so that any
+  // modifications we made with the caches and MMU off (such as the applied
+  // relocations) don't become invisible once we turn them on.
+  //
+  InvalidateDataCacheRange((VOID *)(UINTN)PcdGet64 (PcdFdBaseAddress), PcdGet32 (PcdFdSize));
+
   // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)
   Status = MemoryPeim (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
   ASSERT_EFI_ERROR (Status);
+
+  // Initialize the Serial Port
+  SerialPortInitialize ();
+  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"UEFI firmware (version %s built at %a on %a)\n\r",
+    (CHAR16*)PcdGetPtr(PcdFirmwareVersionString), __TIME__, __DATE__);
+  SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
   // Create the Stacks HOB (reserve the memory for all stacks)
   StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize);
