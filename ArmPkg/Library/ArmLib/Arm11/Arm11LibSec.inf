@@ -43,5 +43,4 @@
   gArmTokenSpaceGuid.PcdRelocateVectorTable
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdArmCacheOperationThreshold
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress

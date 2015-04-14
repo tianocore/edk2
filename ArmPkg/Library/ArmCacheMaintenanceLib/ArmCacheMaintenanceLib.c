@@ -20,27 +20,20 @@ VOID
 CacheRangeOperation (
   IN  VOID            *Start,
   IN  UINTN           Length,
-  IN  CACHE_OPERATION CacheOperation,
   IN  LINE_OPERATION  LineOperation
   )
 {
   UINTN ArmCacheLineLength         = ArmDataCacheLineLength();
   UINTN ArmCacheLineAlignmentMask  = ArmCacheLineLength - 1;
-  UINTN ArmCacheOperationThreshold = PcdGet32(PcdArmCacheOperationThreshold);
 
-  if ((CacheOperation != NULL) && (Length >= ArmCacheOperationThreshold)) {
-    ArmDrainWriteBuffer ();
-    CacheOperation ();
-  } else {
-    // Align address (rounding down)
-    UINTN AlignedAddress = (UINTN)Start - ((UINTN)Start & ArmCacheLineAlignmentMask);
-    UINTN EndAddress     = (UINTN)Start + Length;
+  // Align address (rounding down)
+  UINTN AlignedAddress = (UINTN)Start - ((UINTN)Start & ArmCacheLineAlignmentMask);
+  UINTN EndAddress     = (UINTN)Start + Length;
 
-    // Perform the line operation on an address in each cache line
-    while (AlignedAddress < EndAddress) {
-      LineOperation(AlignedAddress);
-      AlignedAddress += ArmCacheLineLength;
-    }
+  // Perform the line operation on an address in each cache line
+  while (AlignedAddress < EndAddress) {
+    LineOperation(AlignedAddress);
+    AlignedAddress += ArmCacheLineLength;
   }
 }
 
@@ -70,7 +63,7 @@ InvalidateInstructionCacheRange (
   IN      UINTN                     Length
   )
 {
-  CacheRangeOperation (Address, Length, ArmCleanDataCacheToPoU, ArmCleanDataCacheEntryByMVA);
+  CacheRangeOperation (Address, Length, ArmCleanDataCacheEntryByMVA);
   ArmInvalidateInstructionCache ();
   return Address;
 }
@@ -91,7 +84,7 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  CacheRangeOperation(Address, Length, ArmCleanInvalidateDataCache, ArmCleanInvalidateDataCacheEntryByMVA);
+  CacheRangeOperation(Address, Length, ArmCleanInvalidateDataCacheEntryByMVA);
   return Address;
 }
 
@@ -111,7 +104,7 @@ WriteBackDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  CacheRangeOperation(Address, Length, ArmCleanDataCache, ArmCleanDataCacheEntryByMVA);
+  CacheRangeOperation(Address, Length, ArmCleanDataCacheEntryByMVA);
   return Address;
 }
 
@@ -122,6 +115,6 @@ InvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  CacheRangeOperation(Address, Length, NULL, ArmInvalidateDataCacheEntryByMVA);
+  CacheRangeOperation(Address, Length, ArmInvalidateDataCacheEntryByMVA);
   return Address;
 }

@@ -82,8 +82,7 @@
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000080000000|UINT64|0x00000002
   # This PCD will free the unallocated buffers if their size reach this threshold.
   # We set the default value to 512MB.
-  gArmTokenSpaceGuid.PcdArmFreeUncachedMemorySizeThreshold|0x20000000|UINT64|0x00000043
-  gArmTokenSpaceGuid.PcdArmCacheOperationThreshold|1024|UINT32|0x00000003
+  gArmTokenSpaceGuid.PcdArmFreeUncachedMemorySizeThreshold|0x20000000|UINT64|0x00000003
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT32|0x00000004
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
 

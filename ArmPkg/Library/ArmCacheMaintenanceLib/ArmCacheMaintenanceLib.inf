@@ -31,6 +31,3 @@
 [LibraryClasses]
   ArmLib
   BaseLib
-
-[FixedPcd]
-  gArmTokenSpaceGuid.PcdArmCacheOperationThreshold
