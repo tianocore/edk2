@@ -35,6 +35,7 @@
   HobLib
   ArmLib
   ArmPlatformLib
+  CacheMaintenanceLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
