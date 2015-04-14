@@ -77,6 +77,7 @@
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
 
   PlatformPeiLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/PlatformPeiLib/PlatformPeiLib.inf
+  MemoryInitPeiLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationMemoryInitPeiLib/ArmVirtualizationMemoryInitPeiLib.inf
   EfiResetSystemLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationPsciResetSystemLib/ArmVirtualizationPsciResetSystemLib.inf
 
   # ARM PL031 RTC Driver

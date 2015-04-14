@@ -163,7 +163,6 @@
       PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
       HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
       PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
-      MemoryInitPeiLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationMemoryInitPeiLib/ArmVirtualizationMemoryInitPeiLib.inf
       ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64LibPrePi.inf
       MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
