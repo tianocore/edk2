@@ -1,7 +1,7 @@
 /** @file 
   All Pcd Ppi services are implemented here.
   
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -158,15 +158,10 @@ PcdPeimInit (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Only install PcdInfo PPI when PCD info content is present. 
+  // Install GET_PCD_INFO_PPI and EFI_GET_PCD_INFO_PPI.
   //
-  if (DataBase->PcdNameTableOffset != 0) {
-    //
-    // Install GET_PCD_INFO_PPI and EFI_GET_PCD_INFO_PPI.
-    //
-    Status = PeiServicesInstallPpi (&mPpiList2[0]);
-    ASSERT_EFI_ERROR (Status);
-  }
+  Status = PeiServicesInstallPpi (&mPpiList2[0]);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
@@ -262,9 +257,24 @@ PeiPcdSetSku (
   IN  UINTN                  SkuId
   )
 {
+  PEI_PCD_DATABASE  *PeiPcdDb;
+  SKU_ID            *SkuIdTable;
+  UINTN             Index;
 
-  GetPcdDatabase()->SystemSkuId = (SKU_ID) SkuId;
+  PeiPcdDb = GetPcdDatabase();
+  SkuIdTable = (SKU_ID *) ((UINT8 *) PeiPcdDb + PeiPcdDb->SkuIdTableOffset);
+  for (Index = 0; Index < SkuIdTable[0]; Index++) {
+    if (SkuId == SkuIdTable[Index + 1]) {
+      PeiPcdDb->SystemSkuId = (SKU_ID) SkuId;
+      return;
+    }
+  }
 
+  //
+  // Invalid input SkuId, the default SKU Id will be used for the system.
+  //
+  DEBUG ((EFI_D_INFO, "PcdPei - Invalid input SkuId, the default SKU Id will be used.\n"));
+  PeiPcdDb->SystemSkuId = (SKU_ID) 0;
   return;
 }
 

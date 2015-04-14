@@ -152,21 +152,16 @@ PcdDxeInit (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Only install PcdInfo PROTOCOL when PCD info content is present. 
+  // Install GET_PCD_INFO_PROTOCOL to handle dynamic type PCD
+  // Install EFI_GET_PCD_INFO_PROTOCOL to handle dynamicEx type PCD
   //
-  if (mPcdDatabase.DxeDb->PcdNameTableOffset != 0) {
-    //
-    // Install GET_PCD_INFO_PROTOCOL to handle dynamic type PCD
-    // Install EFI_GET_PCD_INFO_PROTOCOL to handle dynamicEx type PCD
-    //
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mPcdHandle,
-                    &gGetPcdInfoProtocolGuid,     &mGetPcdInfoInstance,
-                    &gEfiGetPcdInfoProtocolGuid,  &mEfiGetPcdInfoInstance,
-                    NULL
-                    );
-    ASSERT_EFI_ERROR (Status);
-  }
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mPcdHandle,
+                  &gGetPcdInfoProtocolGuid,     &mGetPcdInfoInstance,
+                  &gEfiGetPcdInfoProtocolGuid,  &mEfiGetPcdInfoInstance,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Register callback function upon VariableLockProtocol
@@ -274,8 +269,22 @@ DxePcdSetSku (
   IN  UINTN         SkuId
   )
 {
-  mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID) SkuId;
-  
+  SKU_ID    *SkuIdTable;
+  UINTN     Index;
+
+  SkuIdTable = (SKU_ID *) ((UINT8 *) mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SkuIdTableOffset);
+  for (Index = 0; Index < SkuIdTable[0]; Index++) {
+    if (SkuId == SkuIdTable[Index + 1]) {
+      mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID) SkuId;
+      return;
+    }
+  }
+
+  //
+  // Invalid input SkuId, the default SKU Id will be used for the system.
+  //
+  DEBUG ((EFI_D_INFO, "PcdDxe - Invalid input SkuId, the default SKU Id will be used.\n"));
+  mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID) 0;
   return;
 }
 
