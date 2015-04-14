@@ -585,7 +585,7 @@
 [PcdsFixedAtBuild.common]
 !if $(MINNOW2_FSP_BUILD) == TRUE
 # $(FLASH_REGION_VLVMICROCODE_BASE)
-  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0xFFE00000
+  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0xFFDD0000
 # $(FLASH_REGION_VLVMICROCODE_SIZE)
   gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x00030000
   gFspWrapperTokenSpaceGuid.PcdFlashMicroCodeOffset|0x60
@@ -594,7 +594,7 @@
 # $(FLASH_AREA_SIZE)
   gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00800000
 # $(FLASH_REGION_FSPBIN_BASE)
-  gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase|0xFFDB0000
+  gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase|0xFFD80000
 !endif
 
 !if $(PERFORMANCE_ENABLE) == TRUE
@@ -813,10 +813,12 @@
 
   ## This PCD defines the video horizontal resolution.
   #  This PCD could be set to 0 then video resolution could be at highest resolution.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
+  #gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
   ## This PCD defines the video vertical resolution.
   #  This PCD could be set to 0 then video resolution could be at highest resolution.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
+  #gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
 
   ## This PCD defines the Console output column and the default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output could be at max column and max row.
