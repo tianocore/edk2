@@ -525,22 +525,23 @@ InitializeDebugAgent (
     if (Mailbox == NULL) {
       DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to allocate memory!\n"));
       CpuDeadLoop ();
+    } else {
+      MailboxLocation = (UINT64)(UINTN)Mailbox;
+      MailboxLocationPointer = BuildGuidDataHob (
+                                 &gEfiDebugAgentGuid,
+                                 &MailboxLocation,
+                                 sizeof (UINT64)
+                                 );
+      //
+      // Initialize Debug Timer hardware and save its frequency
+      //
+      InitializeDebugTimer (&DebugTimerFrequency);
+      UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
+      //
+      // Update IDT entry to save the location pointer saved mailbox pointer
+      //
+      SetLocationSavedMailboxPointerInIdtEntry (MailboxLocationPointer);
     }
-    MailboxLocation = (UINT64)(UINTN)Mailbox;
-    MailboxLocationPointer = BuildGuidDataHob (
-                               &gEfiDebugAgentGuid,
-                               &MailboxLocation,
-                               sizeof (UINT64)
-                               );
-    //
-    // Initialize Debug Timer hardware and save its frequency
-    //
-    InitializeDebugTimer (&DebugTimerFrequency);
-    UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
-    //
-    // Update IDT entry to save the location pointer saved mailbox pointer
-    //
-    SetLocationSavedMailboxPointerInIdtEntry (MailboxLocationPointer);
     //
     // Save init arch type when debug agent initialized
     //
