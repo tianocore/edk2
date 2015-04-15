@@ -5,7 +5,7 @@
   from a software point of view. The path must persist from boot to boot, so 
   it can not contain things like PCI bus numbers that change from boot to boot.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __EFI_DEVICE_PATH_PROTOCOL_H__
 
 #include <Guid/PcAnsi.h>
-
+#include <IndustryStandard/Bluetooth.h>
 ///
 /// Device Path protocol.
 ///
@@ -846,6 +846,18 @@ typedef struct {
   UINT16                          VlanId;
 } VLAN_DEVICE_PATH;
 
+///
+/// Bluetooth Device Path SubType.
+///
+#define MSG_BLUETOOTH_DP     0x1b
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// 48bit Bluetooth device address.
+  ///
+  BLUETOOTH_ADDRESS               BD_ADDR;
+} BLUETOOTH_DEVICE_PATH;
+
 //
 // Media Device Path
 //
@@ -1094,6 +1106,7 @@ typedef union {
   SAS_DEVICE_PATH                            Sas;
   SASEX_DEVICE_PATH                          SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 NvmeNamespace;
+  BLUETOOTH_DEVICE_PATH                      Bluetooth;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
   CDROM_DEVICE_PATH                          CD;
 
@@ -1144,6 +1157,7 @@ typedef union {
   SAS_DEVICE_PATH                            *Sas;
   SASEX_DEVICE_PATH                          *SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 *NvmeNamespace;
+  BLUETOOTH_DEVICE_PATH                      *Bluetooth;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;
   CDROM_DEVICE_PATH                          *CD;
 
