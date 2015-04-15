@@ -5,7 +5,7 @@
   from a software point of view. The path must persist from boot to boot, so 
   it can not contain things like PCI bus numbers that change from boot to boot.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -273,14 +273,14 @@ typedef struct {
 #define ACPI_ADR_DISPLAY_TYPE_INTERNAL_DIGITAL  4
 
 #define ACPI_DISPLAY_ADR(_DeviceIdScheme, _HeadId, _NonVgaOutput, _BiosCanDetect, _VendorInfo, _Type, _Port, _Index) \
-          ((UINT32)( (((_DeviceIdScheme) & 0x1) << 31) |  \
-                      (((_HeadId)         & 0x7) << 18) |  \
-                      (((_NonVgaOutput)   & 0x1) << 17) |  \
-                      (((_BiosCanDetect)  & 0x1) << 16) |  \
-                      (((_VendorInfo)     & 0xf) << 12) |  \
-                      (((_Type)           & 0xf) << 8)  |  \
-                      (((_Port)           & 0xf) << 4)  |  \
-                       ((_Index)          & 0xf) ))
+          ((UINT32)(  ((UINT32)((_DeviceIdScheme) & 0x1) << 31) |  \
+                      (((_HeadId)                 & 0x7) << 18) |  \
+                      (((_NonVgaOutput)           & 0x1) << 17) |  \
+                      (((_BiosCanDetect)          & 0x1) << 16) |  \
+                      (((_VendorInfo)             & 0xf) << 12) |  \
+                      (((_Type)                   & 0xf) << 8)  |  \
+                      (((_Port)                   & 0xf) << 4)  |  \
+                       ((_Index)                  & 0xf) ))
 
 ///
 /// Messaging Device Paths.
