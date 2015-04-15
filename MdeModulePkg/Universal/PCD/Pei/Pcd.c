@@ -146,10 +146,9 @@ PcdPeimInit (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS        Status;
-  PEI_PCD_DATABASE  *DataBase;
+  EFI_STATUS Status;
 
-  DataBase = BuildPcdDatabase (FileHandle);
+  BuildPcdDatabase (FileHandle);
 
   //
   // Install PCD_PPI and EFI_PEI_PCD_PPI.
