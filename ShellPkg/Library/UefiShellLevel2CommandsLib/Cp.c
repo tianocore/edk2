@@ -170,8 +170,11 @@ CopySingleFile(
     //
     // open source file
     //
-    Status = ShellOpenFileByName(Source, &SourceHandle, EFI_FILE_MODE_READ, 0);
-    ASSERT_EFI_ERROR(Status);
+    Status = ShellOpenFileByName (Source, &SourceHandle, EFI_FILE_MODE_READ, 0);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_CP_SRC_OPEN_FAIL), gShellLevel2HiiHandle, CmdName, Source);
+      return (SHELL_ACCESS_DENIED);
+    }
 
     //
     //get file size of source file and freespace available on destination volume
