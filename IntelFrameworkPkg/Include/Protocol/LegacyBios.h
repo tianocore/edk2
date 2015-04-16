@@ -232,7 +232,7 @@ typedef struct {
   ///
   /// Start Address of Upper Memory Area (UMA) to be set as Read/Write. If
   /// UmaAddress is a valid address in the shadow RAM, it also indicates that the region
-  /// from 0xC0000 to (UmaAddress ¨C 1) can be used for Option ROM.
+  /// from 0xC0000 to (UmaAddress - 1) can be used for Option ROM.
   ///
   UINT32                            UmaAddress;
 
