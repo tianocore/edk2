@@ -1,7 +1,7 @@
 /** @file
   TCP input process routines.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -531,8 +531,8 @@ TcpDeliverData (
       Urgent = 0;
 
       if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_URG) &&
-          TCP_SEQ_LEQ (Seg->Seq, Tcb->RcvUp)
-          ) {
+          TCP_SEQ_LEQ (Seg->Seq, Tcb->RcvUp))
+      {
 
         if (TCP_SEQ_LEQ (Seg->End, Tcb->RcvUp)) {
           Urgent = Nbuf->TotalSize;
@@ -596,8 +596,7 @@ TcpQueueData (
   //
   for (Prev = Head, Cur = Head->ForwardLink;
        Cur != Head;
-       Prev = Cur, Cur = Cur->ForwardLink
-       ) {
+       Prev = Cur, Cur = Cur->ForwardLink) {
 
     Node = NET_LIST_USER_STRUCT (Cur, NET_BUF, List);
 
@@ -753,7 +752,7 @@ TcpInput (
 
   if ((Head->HeadLen < 5) || (Len < 0)) {
 
-    DEBUG ((EFI_D_INFO, "TcpInput: received an mal-formated packet\n"));
+    DEBUG ((EFI_D_INFO, "TcpInput: received a malformed packet\n"));
     goto DISCARD;
   }
 
@@ -788,7 +787,7 @@ TcpInput (
           );
 
   if ((Tcb == NULL) || (Tcb->State == TCP_CLOSED)) {
-    DEBUG ((EFI_D_INFO, "TcpInput: send reset because no TCB find\n"));
+    DEBUG ((EFI_D_INFO, "TcpInput: send reset because no TCB found\n"));
 
     Tcb = NULL;
     goto SEND_RESET;
@@ -803,7 +802,7 @@ TcpInput (
   if (TcpParseOption (Nbuf->Tcp, &Option) == -1) {
     DEBUG (
       (EFI_D_ERROR,
-      "TcpInput: reset the peer because of mal-format option for Tcb %p\n",
+      "TcpInput: reset the peer because of malformed option for TCB %p\n",
       Tcb)
       );
 
@@ -860,7 +859,7 @@ TcpInput (
       if (Tcb == NULL) {
         DEBUG (
           (EFI_D_ERROR,
-          "TcpInput: discard a segment because failed to clone a child for TCB%p\n",
+          "TcpInput: discard a segment because failed to clone a child for TCB %p\n",
           Tcb)
           );
 
@@ -940,7 +939,7 @@ TcpInput (
     //
 
     //
-    // Fourth step: Check SYN. Pay attention to sitimulatous open
+    // Fourth step: Check SYN. Pay attention to simultaneous open
     //
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN)) {
 
@@ -961,8 +960,8 @@ TcpInput (
         TcpDeliverData (Tcb);
 
         if ((Tcb->CongestState == TCP_CONGEST_OPEN) &&
-            TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RTT_ON)
-            ) {
+            TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RTT_ON))
+        {
 
           TcpComputeRtt (Tcb, Tcb->RttMeasure);
           TCP_CLEAR_FLG (Tcb->CtrlFlag, TCP_CTRL_RTT_ON);
@@ -992,7 +991,7 @@ TcpInput (
 
         DEBUG (
           (EFI_D_WARN,
-          "TcpInput: simultanous open for TCB %p in SYN_SENT\n",
+          "TcpInput: simultaneous open for TCB %p in SYN_SENT\n",
           Tcb)
           );
 
@@ -1034,8 +1033,8 @@ TcpInput (
 
   if ((TCP_SEQ_LT (Seg->Seq, Tcb->RcvWl2)) &&
       (Tcb->RcvWl2 == Seg->End) &&
-      !TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN | TCP_FLG_FIN)
-        ) {
+      !TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN | TCP_FLG_FIN))
+  {
 
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
   }
@@ -1058,10 +1057,10 @@ TcpInput (
       // if it comes from a LISTEN TCB.
       //
     } else if ((Tcb->State == TCP_ESTABLISHED) ||
-             (Tcb->State == TCP_FIN_WAIT_1) ||
-             (Tcb->State == TCP_FIN_WAIT_2) ||
-             (Tcb->State == TCP_CLOSE_WAIT)
-            ) {
+               (Tcb->State == TCP_FIN_WAIT_1) ||
+               (Tcb->State == TCP_FIN_WAIT_2) ||
+               (Tcb->State == TCP_CLOSE_WAIT))
+    {
 
       SOCK_ERROR (Tcb->Sk, EFI_CONNECTION_RESET);
 
@@ -1114,7 +1113,9 @@ TcpInput (
 
   if (Tcb->State == TCP_SYN_RCVD) {
 
-    if (TCP_SEQ_LT (Tcb->SndUna, Seg->Ack) && TCP_SEQ_LEQ (Seg->Ack, Tcb->SndNxt)) {
+    if (TCP_SEQ_LT (Tcb->SndUna, Seg->Ack) &&
+        TCP_SEQ_LEQ (Seg->Ack, Tcb->SndNxt))
+    {
 
       Tcb->SndWnd     = Seg->Wnd;
       Tcb->SndWndMax  = MAX (Tcb->SndWnd, Tcb->SndWndMax);
@@ -1127,7 +1128,7 @@ TcpInput (
 
       DEBUG (
         (EFI_D_INFO,
-        "TcpInput: connection established  for TCB %p in SYN_RCVD\n",
+        "TcpInput: connection established for TCB %p in SYN_RCVD\n",
         Tcb)
         );
 
@@ -1176,7 +1177,9 @@ TcpInput (
     // RcvWl2 equals to the variable "LastAckSent"
     // defined there.
     //
-    if (TCP_SEQ_LEQ (Seg->Seq, Tcb->RcvWl2) && TCP_SEQ_LT (Tcb->RcvWl2, Seg->End)) {
+    if (TCP_SEQ_LEQ (Seg->Seq, Tcb->RcvWl2) &&
+        TCP_SEQ_LT (Tcb->RcvWl2, Seg->End))
+    {
 
       Tcb->TsRecent     = Option.TSVal;
       Tcb->TsRecentAge  = mTcpTick;
@@ -1206,8 +1209,8 @@ TcpInput (
   if ((Seg->Ack == Tcb->SndUna) &&
       (Tcb->SndUna != Tcb->SndNxt) &&
       (Seg->Wnd == Tcb->SndWnd) &&
-      (0 == Len)
-      ) {
+      (0 == Len))
+  {
 
     Tcb->DupAck++;
   } else {
@@ -1219,8 +1222,8 @@ TcpInput (
   // Congestion avoidance, fast recovery and fast retransmission.
   //
   if (((Tcb->CongestState == TCP_CONGEST_OPEN) && (Tcb->DupAck < 3)) ||
-      (Tcb->CongestState == TCP_CONGEST_LOSS)
-      ) {
+      (Tcb->CongestState == TCP_CONGEST_LOSS))
+  {
 
     if (TCP_SEQ_GT (Seg->Ack, Tcb->SndUna)) {
 
@@ -1249,8 +1252,8 @@ TcpInput (
     Tcb->SndUna = Seg->Ack;
 
     if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_SND_URG) &&
-        TCP_SEQ_LT (Tcb->SndUp, Seg->Ack)
-        ) {
+        TCP_SEQ_LT (Tcb->SndUp, Seg->Ack))
+    {
 
       TCP_CLEAR_FLG (Tcb->CtrlFlag, TCP_CTRL_SND_URG);
     }
@@ -1260,8 +1263,8 @@ TcpInput (
   // Update window info
   //
   if (TCP_SEQ_LT (Tcb->SndWl1, Seg->Seq) ||
-      ((Tcb->SndWl1 == Seg->Seq) && TCP_SEQ_LEQ (Tcb->SndWl2, Seg->Ack))
-      ) {
+      ((Tcb->SndWl1 == Seg->Seq) && TCP_SEQ_LEQ (Tcb->SndWl2, Seg->Ack)))
+  {
 
     Right = Seg->Ack + Seg->Wnd;
 
@@ -1269,8 +1272,8 @@ TcpInput (
 
       if ((Tcb->SndWl1 == Seg->Seq) &&
           (Tcb->SndWl2 == Seg->Ack) &&
-          (Len == 0)
-          ) {
+          (Len == 0))
+      {
 
         goto NO_UPDATE;
       }
@@ -1281,12 +1284,16 @@ TcpInput (
         Tcb)
         );
 
-      if ((Tcb->CongestState == TCP_CONGEST_RECOVER) && (TCP_SEQ_LT (Right, Tcb->Recover))) {
+      if ((Tcb->CongestState == TCP_CONGEST_RECOVER) &&
+          (TCP_SEQ_LT (Right, Tcb->Recover)))
+      {
 
         Tcb->Recover = Right;
       }
 
-      if ((Tcb->CongestState == TCP_CONGEST_LOSS) && (TCP_SEQ_LT (Right, Tcb->LossRecover))) {
+      if ((Tcb->CongestState == TCP_CONGEST_LOSS) &&
+          (TCP_SEQ_LT (Right, Tcb->LossRecover)))
+      {
 
         Tcb->LossRecover = Right;
       }
@@ -1311,7 +1318,9 @@ TcpInput (
 
 NO_UPDATE:
 
-  if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_FIN_SENT) && (Tcb->SndUna == Tcb->SndNxt)) {
+  if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_FIN_SENT) &&
+      (Tcb->SndUna == Tcb->SndNxt))
+  {
 
     DEBUG (
       (EFI_D_INFO,
@@ -1417,7 +1426,9 @@ StepSix:
 
     Urg = Seg->Seq + Seg->Urg;
 
-    if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_URG) && TCP_SEQ_GT (Urg, Tcb->RcvUp)) {
+    if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_URG) &&
+        TCP_SEQ_GT (Urg, Tcb->RcvUp))
+    {
 
       Tcb->RcvUp = Urg;
     } else {
@@ -1480,8 +1491,8 @@ StepSix:
 
   if ((Tcb->State != TCP_CLOSED) &&
       (TcpToSendData (Tcb, 0) == 0) &&
-      (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW) || (Nbuf->TotalSize != 0))
-      ) {
+      (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW) || (Nbuf->TotalSize != 0)))
+  {
 
     TcpToSendAck (Tcb);
   }
@@ -1574,7 +1585,12 @@ TcpIcmpInput (
     goto CLEAN_EXIT;
   }
 
-  IcmpErrStatus = IpIoGetIcmpErrStatus (IcmpErr, Tcb->Sk->IpVersion, &IcmpErrIsHard, &IcmpErrNotify);
+  IcmpErrStatus = IpIoGetIcmpErrStatus (
+                    IcmpErr,
+                    Tcb->Sk->IpVersion,
+                    &IcmpErrIsHard,
+                    &IcmpErrNotify
+                    );
 
   if (IcmpErrNotify) {
 

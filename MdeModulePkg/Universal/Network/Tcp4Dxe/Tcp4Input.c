@@ -1,7 +1,7 @@
 /** @file
   TCP input process routines.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -61,7 +61,7 @@ TcpFastRecover (
     //
     // Step 1A: Invoking fast retransmission.
     //
-    FlightSize = TCP_SUB_SEQ (Tcb->SndNxt, Tcb->SndUna);
+    FlightSize        = TCP_SUB_SEQ (Tcb->SndNxt, Tcb->SndUna);
 
     Tcb->Ssthresh     = MAX (FlightSize >> 1, (UINT32) (2 * Tcb->SndMss));
     Tcb->Recover      = Tcb->SndNxt;
@@ -109,7 +109,7 @@ TcpFastRecover (
       // Step 5 - Full ACK:
       // deflate the congestion window, and exit fast recovery
       //
-      FlightSize = TCP_SUB_SEQ (Tcb->SndNxt, Tcb->SndUna);
+      FlightSize        = TCP_SUB_SEQ (Tcb->SndNxt, Tcb->SndUna);
 
       Tcb->CWnd         = MIN (Tcb->Ssthresh, FlightSize + Tcb->SndMss);
 
@@ -556,15 +556,15 @@ TcpQueueData (
   if (IsListEmpty (Head)) {
 
     InsertTailList (Head, &Nbuf->List);
-    return ;
+    return;
   }
 
   //
   // Find the point to insert the buffer
   //
   for (Prev = Head, Cur = Head->ForwardLink;
-      Cur != Head;
-      Prev = Cur, Cur = Cur->ForwardLink) {
+       Cur != Head;
+       Prev = Cur, Cur = Cur->ForwardLink) {
 
     Node = NET_LIST_USER_STRUCT (Cur, NET_BUF, List);
 
@@ -585,7 +585,7 @@ TcpQueueData (
       if (TCP_SEQ_LEQ (Seg->End, TCPSEG_NETBUF (Node)->End)) {
 
         NetbufFree (Nbuf);
-        return ;
+        return;
       }
 
       TcpTrimSegment (Nbuf, TCPSEG_NETBUF (Node)->End, Seg->End);
@@ -737,7 +737,7 @@ TcpInput (
           );
 
   if ((Tcb == NULL) || (Tcb->State == TCP_CLOSED)) {
-    DEBUG ((EFI_D_INFO, "TcpInput: send reset because no TCB find\n"));
+    DEBUG ((EFI_D_INFO, "TcpInput: send reset because no TCB found\n"));
 
     Tcb = NULL;
     goto SEND_RESET;
@@ -751,7 +751,7 @@ TcpInput (
   //
   if (TcpParseOption (Nbuf->Tcp, &Option) == -1) {
     DEBUG ((EFI_D_ERROR, "TcpInput: reset the peer because"
-      " of mal-format option for Tcb %p\n", Tcb));
+      " of malformed option for TCB %p\n", Tcb));
 
     goto SEND_RESET;
   }
@@ -799,7 +799,7 @@ TcpInput (
       Tcb     = TcpCloneTcb (Parent);
       if (Tcb == NULL) {
         DEBUG ((EFI_D_ERROR, "TcpInput: discard a segment because"
-          " failed to clone a child for TCB%x\n", Tcb));
+          " failed to clone a child for TCB %p\n", Tcb));
 
         goto DISCARD;
       }
@@ -865,7 +865,7 @@ TcpInput (
     //
 
     //
-    // Fourth step: Check SYN. Pay attention to sitimulatous open
+    // Fourth step: Check SYN. Pay attention to simultaneous open
     //
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN)) {
 
@@ -902,7 +902,7 @@ TcpInput (
         goto StepSix;
       } else {
         //
-        // Received a SYN segment without ACK, simultanous open.
+        // Received a SYN segment without ACK, simultaneous open.
         //
         TcpSetState (Tcb, TCP_SYN_RCVD);
 
@@ -911,7 +911,7 @@ TcpInput (
 
         TcpTrimInWnd (Tcb, Nbuf);
 
-        DEBUG ((EFI_D_WARN, "TcpInput: simultanous open "
+        DEBUG ((EFI_D_WARN, "TcpInput: simultaneous open "
           "for TCB %p in SYN_SENT\n", Tcb));
 
         goto StepSix;
@@ -1290,7 +1290,8 @@ StepSix:
   TcpSetKeepaliveTimer (Tcb);
 
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_URG) &&
-      !TCP_FIN_RCVD (Tcb->State)) {
+      !TCP_FIN_RCVD (Tcb->State)) 
+  {
 
     DEBUG ((EFI_D_INFO, "TcpInput: received urgent data "
       "from peer for connected TCB %p\n", Tcb));
