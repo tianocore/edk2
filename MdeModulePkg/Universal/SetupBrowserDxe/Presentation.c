@@ -1426,6 +1426,8 @@ ProcessQuestionConfig (
   ConfigResp = GetToken (Question->QuestionConfig, Selection->FormSet->HiiHandle);
   if (ConfigResp == NULL) {
     return EFI_NOT_FOUND;
+  } else if (ConfigResp[0] == L'\0') {
+    return EFI_SUCCESS;
   }
 
   //
