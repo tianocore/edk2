@@ -633,4 +633,19 @@ RefreshTimeOutProcess (
   IN  VOID         *Context
   );
 
+/**
+  Record the highlight menu and top of screen menu info.
+
+  @param  Highlight               The menu opton which is highlight.
+  @param  TopOfScreen             The menu opton which is at the top of the form.
+  @param  SkipValue               The skip line info for the top of screen menu.
+
+**/
+VOID
+UpdateHighlightMenuInfo (
+  IN  LIST_ENTRY                      *Highlight,
+  IN  LIST_ENTRY                      *TopOfScreen,
+  IN  UINTN                           SkipValue
+  );
+
 #endif

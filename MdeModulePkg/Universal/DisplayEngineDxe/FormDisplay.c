@@ -1901,6 +1901,11 @@ FindTopMenu (
     }
     *SkipValue     = 0;
   }
+
+  //
+  // First enter to show the menu, update highlight info.
+  //
+  UpdateHighlightMenuInfo (*HighlightMenu, *TopOfScreen, *SkipValue);
 }
 
 /**
