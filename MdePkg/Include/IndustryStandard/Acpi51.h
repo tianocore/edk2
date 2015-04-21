@@ -2,7 +2,7 @@
   ACPI 5.1 definitions from the ACPI Specification Revision 5.1 July, 2014.
 
   Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -1257,7 +1257,7 @@ typedef struct {
 ///
 /// GTDT Version (as defined in ACPI 5.1 spec.)
 ///
-#define EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION 0x01
+#define EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION 0x02
 
 ///
 /// Timer Flags.  All other bits are reserved and must be 0.
