@@ -108,6 +108,9 @@
   ## @libraryclass   Provides core boot manager functions
   UefiBootManagerLib|Include/Library/UefiBootManagerLib.h
 
+  ## @libraryclass   Provides core boot manager functions
+  PlatformBootManagerLib|Include/Library/PlatformBootManagerLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
