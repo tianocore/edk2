@@ -1,6 +1,6 @@
 ## @file
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -25,7 +25,7 @@
   FILE_GUID                      = A6F691AC-31C8-4444-854C-E2C1A6950F92
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformBdsLib|DXE_DRIVER   
+  LIBRARY_CLASS                  = PlatformBdsLib|DXE_DRIVER
 
 [Sources]
   BdsPlatform.c
@@ -37,7 +37,7 @@
   MdeModulePkg/MdeModulePkg.dec
   DuetPkg/DuetPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-  
+
 [LibraryClasses]
   BaseLib
   MemoryAllocationLib
@@ -58,8 +58,8 @@
   gEfiSmbiosTableGuid
   gEfiAcpiTableGuid
   gLdrMemoryDescriptorGuid
-  
+
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut  
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile  
-  
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
+
