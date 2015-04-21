@@ -1952,10 +1952,6 @@ CommandCommunication (
       if (Data8 == DEBUG_DATA_BREAK_CAUSE_IMAGE_LOAD || Data8 == DEBUG_DATA_BREAK_CAUSE_IMAGE_UNLOAD) {
         CpuContext->Dr0 = 0;
       }
-      //
-      // Clear Stepping Flag
-      //
-      SetDebugFlag (DEBUG_AGENT_FLAG_STEPPING, 0);
 
       if (!HaltDeferred) {
         //
@@ -2410,6 +2406,10 @@ InterruptProcess (
         mDebugMpContext.BreakAtCpuIndex = ProcessorIndex;
       }
       SendAckPacket (DEBUG_COMMAND_OK);
+      //
+      // Clear Stepping Flag
+      //
+      SetDebugFlag (DEBUG_AGENT_FLAG_STEPPING, 0);
       CommandCommunication (Vector, CpuContext, BreakReceived);
       break;
 
