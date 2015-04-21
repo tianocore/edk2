@@ -145,7 +145,7 @@
 
   gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0
 
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
 ################################################################################
 #

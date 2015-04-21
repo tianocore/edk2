@@ -58,7 +58,7 @@
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
 
 [Protocols]
   gEfiDevicePathFromTextProtocolGuid
