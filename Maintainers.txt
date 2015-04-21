@@ -162,7 +162,7 @@ M: Daryl Mcdaniel <daryl.mcdaniel@intel.com>
 
 SecurityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
-M: Guo Dong <guo.dong@intel.com>
+M: Chao Zhang <chao.b.zhang@intel.com>
 
 ShellPkg, ShellBinPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
