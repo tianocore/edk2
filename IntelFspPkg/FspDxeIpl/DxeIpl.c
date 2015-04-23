@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -430,13 +430,13 @@ DxeLoadCore (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Give control back to bootloader after FspInit
+  // Give control back to BootLoader after FspInit
   //
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "FSP is waiting for NOTIFY\n"));
   FspInitDone ();
 
   //
-  // Bootloader called FSP again through NotifyPhase
+  // BootLoader called FSP again through NotifyPhase
   //
   FspWaitForNotify ();
 

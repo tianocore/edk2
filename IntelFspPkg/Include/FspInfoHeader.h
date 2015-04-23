@@ -64,7 +64,7 @@ typedef struct  {
   ///
   UINT32  ImageSize;
   ///
-  /// Byte 0x18: FSP binary preferred base address
+  /// Byte 0x1C: FSP binary preferred base address
   ///
   UINT32  ImageBase;
 
@@ -78,7 +78,7 @@ typedef struct  {
   ///
   UINT32  CfgRegionOffset;
   ///
-  /// Byte 0x24: Size of the FSP configuration region
+  /// Byte 0x28: Size of the FSP configuration region
   ///
   UINT32  CfgRegionSize;
   ///
@@ -103,7 +103,7 @@ typedef struct  {
   UINT32  NotifyPhaseEntryOffset;
 
   ///
-  /// Below field is added in FSP 1.1
+  /// Below fields are added in FSP Revision 2
   ///
 
   ///
@@ -122,7 +122,7 @@ typedef struct  {
 } FSP_INFO_HEADER;
 
 ///
-/// Below structure is added in FSP 1.1
+/// Below structure is added in FSP version 2
 ///
 typedef struct  {
   ///

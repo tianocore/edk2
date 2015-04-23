@@ -36,10 +36,12 @@
   Ia32/Stack.asm  | MSFT
   Ia32/InitializeFpu.asm  | MSFT
   Ia32/FspApiEntry.asm  | MSFT
+  Ia32/FspHelper.asm  | MSFT
 
   Ia32/Stacks.s | GCC
   Ia32/InitializeFpu.s | GCC
   Ia32/FspApiEntry.s | GCC
+  Ia32/FspHelper.s | GCC
 
 [Binaries.Ia32]
   RAW|Vtf0/Bin/ResetVec.ia32.raw |GCC
@@ -56,6 +58,7 @@
   SerialPortLib
   FspSwitchStackLib
   FspCommonLib
+  FspSecPlatformLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress           ## UNDEFINED
@@ -63,6 +66,9 @@
   gIntelFspPkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
   gIntelFspPkgTokenSpaceGuid.PcdTemporaryRamSize              ## CONSUMES
   gIntelFspPkgTokenSpaceGuid.PcdFspTemporaryRamSize           ## CONSUMES
+  gIntelFspPkgTokenSpaceGuid.PcdFspBootFirmwareVolumeBase     ## CONSUMES
+  gIntelFspPkgTokenSpaceGuid.PcdFspAreaBaseAddress            ## CONSUMES
+  gIntelFspPkgTokenSpaceGuid.PcdFspAreaSize                   ## CONSUMES
 
 [FixedPcd]
   gIntelFspPkgTokenSpaceGuid.PcdFspMaxPatchEntry              ## CONSUMES

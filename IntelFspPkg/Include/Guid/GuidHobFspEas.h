@@ -18,6 +18,7 @@
 
 extern EFI_GUID gFspBootLoaderTemporaryMemoryGuid;
 
+extern EFI_GUID gFspBootLoaderTolumHobGuid; // FSP EAS v1.1
 extern EFI_GUID gFspReservedMemoryResourceHobGuid;
 extern EFI_GUID gFspNonVolatileStorageHobGuid;
 

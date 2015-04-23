@@ -108,7 +108,7 @@ InitializeFloatingPointUnits (
   @param[in] TempRamBase        Base address of tempory ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
   @param[in] PeiCore            PeiCore entry point.
-  @param[in] BootloaderStack    Bootloader stack.
+  @param[in] BootLoaderStack    BootLoader stack.
   @param[in] ApiIdx             the index of API.
 
   @return This function never returns.
@@ -121,7 +121,7 @@ SecStartup (
   IN UINT32                   TempRamBase,
   IN VOID                    *BootFirmwareVolume,
   IN PEI_CORE_ENTRY           PeiCore,
-  IN UINT32                   BootloaderStack,
+  IN UINT32                   BootLoaderStack,
   IN UINT32                   ApiIdx
   );
 

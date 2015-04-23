@@ -15,41 +15,31 @@
 #
 #------------------------------------------------------------------------------
 
-#.INCLUDE   "UcodeLoadGcc.inc" - begin
 
 .equ MSR_IA32_PLATFORM_ID,                   0x00000017
 .equ MSR_IA32_BIOS_UPDT_TRIG,                0x00000079
 .equ MSR_IA32_BIOS_SIGN_ID,                  0x0000008b
 
-Ucode:
-.equ        UcodeVersion,                    0x0000
-.equ        UcodeRevision,                   0x0004
-.equ        UcodeDate,                       0x0008
-.equ        UcodeProcessor,                  0x000C
-.equ        UcodeChecksum,                   0x0010
-.equ        UcodeLoader,                     0x0014
-.equ        UcodeRsvd,                       0x0018
-UcodeEnd:
 
-UcodeHdr:
-.equ        UcodeHdrVersion,                 0x0000
-.equ        UcodeHdrRevision,                0x0004
-.equ        UcodeHdrDate,                    0x0008
-.equ        UcodeHdrProcessor,               0x000c
-.equ        UcodeHdrChecksum,                0x0010
-.equ        UcodeHdrLoader,                  0x0014
-.equ        UcodeHdrFlags,                   0x0018
-.equ        UcodeHdrDataSize,                0x001C
-.equ        UcodeHdrTotalSize,               0x0020
-.equ        UcodeHdrRsvd,                    0x0024
-UcodeHdrEnd:
-.equ        UcodeHdrLength,                  0x0030  # UcodeHdrLength = UcodeHdrEnd - UcodeHdr
+MicrocodeHdr:
+.equ        MicrocodeHdrVersion,                 0x0000
+.equ        MicrocodeHdrRevision,                0x0004
+.equ        MicrocodeHdrDate,                    0x0008
+.equ        MicrocodeHdrProcessor,               0x000c
+.equ        MicrocodeHdrChecksum,                0x0010
+.equ        MicrocodeHdrLoader,                  0x0014
+.equ        MicrocodeHdrFlags,                   0x0018
+.equ        MicrocodeHdrDataSize,                0x001C
+.equ        MicrocodeHdrTotalSize,               0x0020
+.equ        MicrocodeHdrRsvd,                    0x0024
+MicrocodeHdrEnd:
+.equ        MicrocodeHdrLength,                  0x0030  # MicrocodeHdrLength = MicrocodeHdrEnd - MicrocodeHdr
 
 
 ExtSigHdr:
 .equ        ExtSigHdrCount,                  0x0000
 .equ        ExtSigHdrChecksum,               0x0004
-.equ        rsvd,                            0x0008
+.equ        ExtSigHdrRsvd,                   0x0008
 ExtSigHdrEnd:
 .equ        ExtSigHdrLength,                 0x0014  #ExtSigHdrLength = ExtSigHdrEnd - ExtSigHdr
 
@@ -60,14 +50,12 @@ ExtSig:
 ExtSigEnd:
 .equ        ExtSigLength,                    0x000C  #ExtSigLength = ExtSigEnd - ExtSig
 
-LoadUcodeParams:
-.equ        LoadUcodeParamsUcodeCodeAddr,    0x0000
-.equ        LoadUcodeParamsUcodeCodeSize,    0x0004
-LoadUcodeParamsEnd:
+LoadMicrocodeParams:
+.equ        MicrocodeCodeAddr,               0x0000
+.equ        MicrocodeCodeSize,               0x0004
+LoadMicrocodeParamsEnd:
 
-#.INCLUDE   "UcodeLoadGcc.inc" - end
 
-#.INCLUDE   "SaveRestoreSseGcc.inc" - begin
 
 .macro SAVE_REGS
   pinsrw     $0x00, %ebp, %xmm7
@@ -147,12 +135,68 @@ LoadUcodeParamsEnd:
 .endm
 
 .macro ENABLE_SSE
-  movl       %cr4, %eax
-  orl        $0x00000600, %eax               # Set OSFXSR bit (bit #9) & OSXMMEXCPT bit (bit #10)
-  movl       %eax,%cr4
+    jmp     NextAddress
+.align 4
+    #
+    # Float control word initial value:
+    # all exceptions masked, double-precision, round-to-nearest
+    #
+ASM_PFX(mFpuControlWord): .word     0x027F
+    #
+    # Multimedia-extensions control word:
+    # all exceptions masked, round-to-nearest, flush to zero for masked underflow
+    #
+ASM_PFX(mMmxControlWord): .long     0x01F80
+SseError:      
+    #
+    # Processor has to support SSE
+    #
+    jmp     SseError      
+NextAddress:            
+    #
+    # Initialize floating point units
+    #
+    finit
+    fldcw   ASM_PFX(mFpuControlWord)
+
+    #
+    # Use CpuId instructuion (CPUID.01H:EDX.SSE[bit 25] = 1) to test
+    # whether the processor supports SSE instruction.
+    #
+    movl    $1,  %eax
+    cpuid
+    btl     $25, %edx
+    jnc     SseError
+
+    #
+    # Set OSFXSR bit (bit #9) & OSXMMEXCPT bit (bit #10)
+    #
+    movl    %cr4, %eax
+    orl     $BIT9, %eax
+    movl    %eax, %cr4
+
+    #
+    # The processor should support SSE instruction and we can use
+    # ldmxcsr instruction
+    #
+    ldmxcsr ASM_PFX(mMmxControlWord)
 .endm
 
-#.INCLUDE   "SaveRestoreSseGcc.inc" - end
+#Save in ECX-SLOT 3 in xmm6.
+.macro SAVE_EAX_MICROCODE_RET_STATUS
+  pinsrw     $0x6, %eax, %xmm6
+  ror        $0x10, %eax
+  pinsrw     $0x7, %eax, %xmm6
+  rol        $0x10, %eax
+.endm
+
+#Restore from ECX-SLOT 3 in xmm6.
+.macro LOAD_EAX_MICROCODE_RET_STATUS
+  pshufd     $0x93, %xmm6, %xmm6
+  movd       %xmm6, %eax
+  pshufd     $0x39, %xmm6, %xmm6
+.endm
+
 
 
 #
@@ -183,28 +227,6 @@ ASM_GLOBAL    ASM_PFX(Pei2LoaderSwitchStack)
 .equ          DATA_LEN_AT_STACK_TOP, (DATA_LEN_OF_PER0 + DATA_LEN_OF_MCUD + 4)
 
 #------------------------------------------------------------------------------
-# FspSelfCheckDefault
-# Inputs:
-#   eax -> Return address
-# Outputs:
-#   eax -> 0 - Successful, Non-zero - Failed.
-# Register Usage:
-#   eax is cleared and ebp is used for return address.
-#   All others reserved.
-#------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(FspSelfCheckDefault)
-ASM_PFX(FspSelfCheckDefault):
-   #
-   # Save return address to EBP
-   #
-   movl  %eax, %ebp
-   xorl  %eax, %eax
-
-FspSelfCheckDefaultExit:
-   jmp   *%ebp
-
-
-#------------------------------------------------------------------------------
 # SecPlatformInitDefault
 # Inputs:
 #   mm7 -> Return address
@@ -227,10 +249,10 @@ SecPlatformInitDefaultExit:
 
 
 #------------------------------------------------------------------------------
-# LoadUcode
+# LoadMicrocodeDefault
 #
 # Inputs:
-#   esp -> LOAD_UCODE_PARAMS pointer
+#   esp -> LoadMicrocodeParams pointer
 # Register Usage:
 #   esp  Preserved
 #   All others destroyed
@@ -239,8 +261,8 @@ SecPlatformInitDefaultExit:
 #   Executed by SBSP and NBSP
 #   Beginning of microcode update region starts on paragraph boundary
 #------------------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(LoadUcode)
-ASM_PFX(LoadUcode):   
+ASM_GLOBAL ASM_PFX(LoadMicrocodeDefault)
+ASM_PFX(LoadMicrocodeDefault):
    #
    # Save return address to EBP
    #
@@ -248,17 +270,17 @@ ASM_PFX(LoadUcode):
 
    cmpl   $0x00, %esp
    jz     ParamError
-   movl   (%esp), %eax                       #dword ptr []     Parameter pointer
+   movl   4(%esp), %eax                       #dword ptr []     Parameter pointer
    cmpl   $0x00, %eax
    jz     ParamError
    movl   %eax, %esp
-   movl   LoadUcodeParamsUcodeCodeAddr(%esp), %esi          #mov    esi, [esp].LOAD_UCODE_PARAMS.ucode_code_addr
+   movl   MicrocodeCodeAddr(%esp), %esi
    cmpl   $0x00, %esi
    jnz    CheckMainHeader
 
 ParamError:
    movl   $0x080000002, %eax
-   jmp    LoadUcodeExit
+   jmp    LoadMicrocodeExit
 
 CheckMainHeader:
    #
@@ -291,68 +313,68 @@ CheckMainHeader:
    # Minimal test checking for header version and loader version as 1
    #
    movl   $0x01, %eax
-   cmpl   %eax, UcodeHdrVersion(%esi)        #cmp   [esi].ucode_hdr.version, eax
+   cmpl   %eax, MicrocodeHdrVersion(%esi)
    jne    AdvanceFixedSize
-   cmpl   %eax, UcodeHdrLoader(%esi)         #cmp   [esi].ucode_hdr.loader, eax
+   cmpl   %eax, MicrocodeHdrLoader(%esi)
    jne    AdvanceFixedSize
 
    #
    # Check if signature and plaform ID match
    #
-   cmpl   UcodeHdrProcessor(%esi), %ebx      #cmp   ebx, [esi].ucode_hdr.processor 
-   jne    LoadUcodeL0
-   testl  UcodeHdrFlags(%esi), %edx          #test  edx, [esi].ucode_hdr.flags
+   cmpl   MicrocodeHdrProcessor(%esi), %ebx
+   jne    LoadMicrocodeL0
+   testl  MicrocodeHdrFlags(%esi), %edx
    jnz    LoadCheck                          #Jif signature and platform ID match
 
-LoadUcodeL0:
+LoadMicrocodeL0:
    #
    # Check if extended header exists
-   # First check if total_size and data_size are valid
+   # First check if MicrocodeHdrTotalSize and MicrocodeHdrDataSize are valid
    #
    xorl   %eax, %eax
-   cmpl   %eax, UcodeHdrTotalSize(%esi)      #cmp   [esi].ucode_hdr.total_size, eax
+   cmpl   %eax, MicrocodeHdrTotalSize(%esi)
    je     NextMicrocode
-   cmpl   %eax, UcodeHdrDataSize(%esi)       #cmp   [esi].ucode_hdr.data_size, eax
+   cmpl   %eax, MicrocodeHdrDataSize(%esi)
    je     NextMicrocode
 
    #
    # Then verify total size - sizeof header > data size
    #
-   movl   UcodeHdrTotalSize(%esi), %ecx      #mov   ecx, [esi].ucode_hdr.total_size
-   subl   $UcodeHdrLength, %ecx              #sub   ecx, sizeof ucode_hdr
-   cmpl   UcodeHdrDataSize(%esi), %ecx       #cmp   ecx, [esi].ucode_hdr.data_size
-   jle NextMicrocode                         
+   movl   MicrocodeHdrTotalSize(%esi), %ecx
+   subl   $MicrocodeHdrLength, %ecx
+   cmpl   MicrocodeHdrDataSize(%esi), %ecx
+   jle NextMicrocode
 
    #
    # Set edi -> extended header
    #
    movl   %esi, %edi
-   addl   $UcodeHdrLength, %edi              #add   edi, sizeof ucode_hdr
-   addl   UcodeHdrDataSize(%esi), %edi       #add   edi, [esi].ucode_hdr.data_size
+   addl   $MicrocodeHdrLength, %edi
+   addl   MicrocodeHdrDataSize(%esi), %edi
 
    #
    # Get count of extended structures
    #
-   movl   ExtSigHdrCount(%edi), %ecx         #mov   ecx, [edi].ext_sig_hdr.count
+   movl   ExtSigHdrCount(%edi), %ecx
 
    #
    # Move pointer to first signature structure
    #
-   addl   ExtSigHdrLength, %edi              #add   edi, sizeof ext_sig_hdr
+   addl   ExtSigHdrLength, %edi
 
 CheckExtSig:
    #
    # Check if extended signature and platform ID match
    #
-   cmpl   %ebx, ExtSigProcessor(%edi)        #cmp   [edi].ext_sig.processor, ebx
-   jne    LoadUcodeL1
-   test   %edx, ExtSigFlags(%edi)            #test  [edi].ext_sig.flags, edx
+   cmpl   %ebx, ExtSigProcessor(%edi)
+   jne    LoadMicrocodeL1
+   test   %edx, ExtSigFlags(%edi)
    jnz    LoadCheck                          # Jif signature and platform ID match
-LoadUcodeL1:
+LoadMicrocodeL1:
    #
    # Check if any more extended signatures exist
    #
-   addl   $ExtSigLength, %edi                #add   edi, sizeof ext_sig
+   addl   $ExtSigLength, %edi
    loop   CheckExtSig
 
 NextMicrocode:
@@ -360,11 +382,11 @@ NextMicrocode:
    # Advance just after end of this microcode
    #
    xorl   %eax, %eax
-   cmpl   %eax, UcodeHdrTotalSize(%esi)      #cmp   [esi].ucode_hdr.total_size, eax
-   je     LoadUcodeL2
-   addl   UcodeHdrTotalSize(%esi), %esi      #add   esi, [esi].ucode_hdr.total_size
+   cmpl   %eax, MicrocodeHdrTotalSize(%esi)
+   je     LoadMicrocodeL2
+   addl   MicrocodeHdrTotalSize(%esi), %esi
    jmp    CheckAddress
-LoadUcodeL2:
+LoadMicrocodeL2:
    addl   $0x800, %esi                       #add   esi, dword ptr 2048
    jmp    CheckAddress
 
@@ -378,24 +400,24 @@ CheckAddress:
    #
    # Is valid Microcode start point ?
    #
-   cmpl   $0x0ffffffff, UcodeHdrVersion(%esi)
+   cmpl   $0x0ffffffff, MicrocodeHdrVersion(%esi)
 
    #
    # Is automatic size detection ?
    #
-   movl   LoadUcodeParamsUcodeCodeSize(%esp), %eax
+   movl   MicrocodeCodeSize(%esp), %eax
    cmpl   $0x0ffffffff, %eax
-   jz     LoadUcodeL3
+   jz     LoadMicrocodeL3
    #
    # Address >= microcode region address + microcode region size?
    #
-   addl   LoadUcodeParamsUcodeCodeAddr(%esp), %eax                    #mov   eax, [esp].LOAD_UCODE_PARAMS.ucode_code_addr
+   addl   MicrocodeCodeAddr(%esp), %eax
 
    cmpl   %eax, %esi
-   jae    Done                               #Jif address is outside of ucode region
+   jae    Done                               #Jif address is outside of microcode region
    jmp    CheckMainHeader
 
-LoadUcodeL3:
+LoadMicrocodeL3:
 LoadCheck:
    #
    # Get the revision of the current microcode update loaded
@@ -413,10 +435,10 @@ LoadCheck:
    #
    # Verify this microcode update is not already loaded
    #
-   cmpl   %edx, UcodeHdrRevision(%esi)       #cmp   [esi].ucode_hdr.revision, edx
+   cmpl   %edx, MicrocodeHdrRevision(%esi)
    je     Continue
 
-LoadMicrocode:
+LoadMicrocode0:
    #
    # EAX contains the linear address of the start of the Update Data
    # EDX contains zero
@@ -424,7 +446,7 @@ LoadMicrocode:
    # Start microcode load with wrmsr
    #
    movl   %esi, %eax
-   addl   $UcodeHdrLength, %eax              #add   eax, sizeof ucode_hdr
+   addl   $MicrocodeHdrLength, %eax
    xorl   %edx, %edx
    movl   $MSR_IA32_BIOS_UPDT_TRIG, %ecx
    wrmsr
@@ -441,10 +463,10 @@ Done:
    rdmsr                                     # Get current microcode signature
    xorl   %eax, %eax
    cmpl   $0x00, %edx
-   jnz    LoadUcodeExit
+   jnz    LoadMicrocodeExit
    movl   $0x08000000E, %eax
 
-LoadUcodeExit:
+LoadMicrocodeExit:
    jmp   *%ebp
 
 
@@ -455,10 +477,10 @@ LoadUcodeExit:
 ASM_GLOBAL ASM_PFX(EstablishStackFsp)
 ASM_PFX(EstablishStackFsp):
   #
-  # Save parameter pointer in edx  
+  # Save parameter pointer in edx
   #
   movl    4(%esp), %edx
-              
+
   #
   # Enable FSP STACK
   #
@@ -469,17 +491,9 @@ ASM_PFX(EstablishStackFsp):
   pushl   $0x4455434D                        # Signature of the  data region 'MCUD'
   pushl   12(%edx)                           # Code size
   pushl   8(%edx)                            # Code base
-  cmpl    $0, %edx                           # Is parameter pointer valid ?
-  jz      InvalidMicrocodeRegion
   pushl   4(%edx)                            # Microcode size
   pushl   (%edx)                             # Microcode base
-  jmp     EstablishStackFspExit
 
-InvalidMicrocodeRegion:
-  push    $0                                 # Microcode size
-  push    $0                                 # Microcode base
-    
-EstablishStackFspExit:
   #
   # Save API entry/exit timestamp into stack
   #
@@ -495,11 +509,11 @@ EstablishStackFspExit:
 
   #
   # Terminator for the data on stack
-  # 
+  #
   push    $0x00
 
   #
-  # Set ECX/EDX to the bootloader temporary memory range
+  # Set ECX/EDX to the BootLoader temporary memory range
   #
   movl       PcdGet32 (PcdTemporaryRamBase), %ecx
   movl       %ecx, %edx
@@ -507,7 +521,7 @@ EstablishStackFspExit:
   subl       PcdGet32 (PcdFspTemporaryRamSize), %edx
 
   xorl       %eax, %eax
- 
+
   movd       %mm7, %esi                      #RET_ESI
   jmp        *%esi
 
@@ -548,18 +562,12 @@ ASM_PFX(TempRamInitApi):
 
   #
   # CPUID/DeviceID check
-  #
-  movl    $TempRamInitApiL0, %eax
-  jmp     ASM_PFX(FspSelfCheckDefault)  # @note: ESP can not be changed.
-TempRamInitApiL0:
-  cmpl    $0x00, %eax
-  jnz     NemInitExit
-
-  #
-  # Sec Platform Init
+  # and Sec Platform Init
   #
   movl    $TempRamInitApiL1, %esi            #CALL_MMX  SecPlatformInit
-  movd    %mm7, %esi
+  movd    %esi, %mm7
+  .weak   ASM_PFX(SecPlatformInit)
+  .set    ASM_PFX(SecPlatformInit), ASM_PFX(SecPlatformInitDefault)
   jmp     ASM_PFX(SecPlatformInit)
 TempRamInitApiL1:
   cmpl    $0x00, %eax
@@ -569,19 +577,21 @@ TempRamInitApiL1:
   # Load microcode
   #
   LOAD_ESP
-  movl    $TempRamInitApiL2, %esi            #CALL_MMX  LoadUcode
-  movd    %mm7, %esi
-  jmp     ASM_PFX(LoadUcode)
+  movl    $TempRamInitApiL2, %esi            #CALL_MMX  LoadMicrocode
+  movd    %esi, %mm7
+  .weak   ASM_PFX(LoadMicrocode)
+  .set    ASM_PFX(LoadMicrocode), ASM_PFX(LoadMicrocodeDefault)
+  jmp     ASM_PFX(LoadMicrocode)
 TempRamInitApiL2:
-  cmpl    $0x00, %eax
-  jnz     NemInitExit
+  SAVE_EAX_MICROCODE_RET_STATUS              #Save microcode return status in ECX-SLOT 3 in xmm6.
+  #@note If return value eax is not 0, microcode did not load, but continue and attempt to boot from ECX-SLOT 3 in xmm6.
 
   #
   # Call Sec CAR Init
   #
   LOAD_ESP
   movl    $TempRamInitApiL3, %esi            #CALL_MMX  SecCarInit
-  movd    %mm7, %esi
+  movd    %esi, %mm7
   jmp     ASM_PFX(SecCarInit)
 TempRamInitApiL3:
   cmpl    $0x00, %eax
@@ -592,9 +602,11 @@ TempRamInitApiL3:
   #
   LOAD_ESP
   movl    $TempRamInitApiL4, %esi            #CALL_MMX  EstablishStackFsp
-  movd    %mm7, %esi
+  movd    %esi, %mm7
   jmp     ASM_PFX(EstablishStackFsp)
 TempRamInitApiL4:
+
+  LOAD_EAX_MICROCODE_RET_STATUS              #Restore microcode status if no CAR init error.
 
 NemInitExit:
   #
@@ -602,6 +614,7 @@ NemInitExit:
   #
   LOAD_REGS
   ret
+
 
 #----------------------------------------------------------------------------
 # FspInit API
@@ -743,7 +756,7 @@ FspApiCommonL2:
   pushl   %eax
   
   #
-  # Pass the bootloader stack to SecStartup
+  # Pass the BootLoader stack to SecStartup
   #
   pushl   %edi
 
@@ -786,5 +799,4 @@ FspApiCommonL2:
 
 FspApiCommonExit:
   ret
-
 

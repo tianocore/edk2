@@ -1,6 +1,6 @@
 ## @ PatchFv.py
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -23,13 +23,32 @@ def readDataFromFile (binfile, offset, len=1):
         offval = fsize - (0xFFFFFFFF - offval + 1)
     fd.seek(offval)
     bytearray = [ord(b) for b in fd.read(len)]
-    value = 0;
-    idx   = len - 1;
+    value = 0
+    idx   = len - 1
     while  idx >= 0:
         value = value << 8 | bytearray[idx]
         idx = idx - 1
     fd.close()
     return value
+
+def IsFspHeaderValid (binfile):
+    fd     = open (binfile, "rb")
+    bindat = fd.read(0x200)
+    fd.close()
+    HeaderList = ['FSPH' , 'FSPP' , 'FSPE']
+    OffsetList = []
+    for each in HeaderList:
+        if each in bindat:
+            idx = bindat.index(each)
+        else:
+            idx = 0
+        OffsetList.append(idx)
+    if not OffsetList[0] or not OffsetList[1]:
+        return False
+    Revision = ord(bindat[OffsetList[0] + 0x0B])
+    if Revision > 1 and not OffsetList[2]:
+        return False
+    return True
 
 def patchDataInFile (binfile, offset, value, len=1):
     fd     = open(binfile, "r+b")
@@ -38,7 +57,7 @@ def patchDataInFile (binfile, offset, value, len=1):
     if (offval & 0x80000000):
         offval = fsize - (0xFFFFFFFF - offval + 1)
     bytearray = []
-    idx = 0;
+    idx = 0
     while  idx < len:
         bytearray.append(value & 0xFF)
         value          = value >> 8
@@ -46,7 +65,7 @@ def patchDataInFile (binfile, offset, value, len=1):
     fd.seek(offval)
     fd.write("".join(chr(b) for b in bytearray))
     fd.close()
-    return len;
+    return len
 
 
 class Symbols:
@@ -346,7 +365,7 @@ class Symbols:
                 values.append(self.parseBrace())
             else:
                 break
-        value  = 1;
+        value  = 1
         for each in values:
             value *= each
         return value
@@ -354,7 +373,7 @@ class Symbols:
     def parseAndOr(self):
         values = [self.parseMul()]
         op     = None
-        value  = 0xFFFFFFFF;
+        value  = 0xFFFFFFFF
         while True:
             self.skipSpace()
             char = self.getCurr()
@@ -500,6 +519,9 @@ def main():
     fdSize = symTables.getFdSize()
 
     try:
+        ret = IsFspHeaderValid(fdFile)
+        if ret == False:
+          raise Exception ("The FSP header is not valid. Stop patching FD.")
         comment = ""
         for fvFile in  sys.argv[3:]:
             items = fvFile.split(",")

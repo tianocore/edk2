@@ -42,7 +42,7 @@ UINT64  mIdtEntryTemplate = 0xffff8e000008ffe4ULL;
   @param[in] TempRamBase        Base address of tempory ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
   @param[in] PeiCore            PeiCore entry point.
-  @param[in] BootloaderStack    Bootloader stack.
+  @param[in] BootLoaderStack    BootLoader stack.
   @param[in] ApiIdx             the index of API.
 
   @return This function never returns.
@@ -55,7 +55,7 @@ SecStartup (
   IN UINT32                   TempRamBase,
   IN VOID                    *BootFirmwareVolume,
   IN PEI_CORE_ENTRY           PeiCore,
-  IN UINT32                   BootloaderStack,
+  IN UINT32                   BootLoaderStack,
   IN UINT32                   ApiIdx
   )
 {
@@ -106,7 +106,7 @@ SecStartup (
   //
   // Iniitalize the global FSP data region
   //
-  FspGlobalDataInit (&PeiFspData, BootloaderStack, (UINT8)ApiIdx);
+  FspGlobalDataInit (&PeiFspData, BootLoaderStack, (UINT8)ApiIdx);
 
   //
   // Update the base address and length of Pei temporary memory
