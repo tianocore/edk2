@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -357,6 +357,8 @@ ConvertHandleIndexToHandle(
 /**
   Function to get all handles that support a given protocol or all handles.
 
+  The caller is responsible to free this memory.
+
   @param[in] ProtocolGuid The guid of the protocol to get handles for.  If NULL
                           then the function will return all handles.
 
@@ -371,6 +373,8 @@ GetHandleListByProtocol (
 
 /**
   Function to get all handles that support some protocols.
+
+  The caller is responsible to free this memory.
 
   @param[in] ProtocolGuids  A NULL terminated list of protocol GUIDs.
 
