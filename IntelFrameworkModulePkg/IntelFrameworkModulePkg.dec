@@ -188,41 +188,6 @@
   # @Prompt Boot State Flag
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
 
-  ## The number of seconds that the firmware will wait before initiating the original default boot selection. 
-  #  A value of 0 indicates that the default boot selection is to be initiated immediately on boot. 
-  #  The value of 0xFFFF then firmware will wait for user input before booting.
-  # @Prompt Boot Timeout (s)
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
-
-  ## Error level for hardware recorder. 
-  #  If value 0, platform does not support feature of hardware error record.
-  # @Prompt Error Level For Hardware Recorder
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
-
-[PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
-  #  The 4 PCDs below are used to specify the video resolution and text mode of text setup.
-  #  To make text setup work in this resolution, PcdVideoHorizontalResolution, PcdVideoVerticalResolution,
-  #  PcdConOutColumn and PcdConOutRow in MdeModulePkg.dec should be created as PcdsDynamic or PcdsDynamicEx
-  #  in platform DSC file. Then BDS setup will update these PCDs defined in MdeModulePkg.dec and reconnect
-  #  console drivers (GraphicsConsole, Terminal, Consplitter) to make the video resolution and text mode work
-  #  for text setup.
-
-  ## Specify the video horizontal resolution of text setup.
-  # @Prompt Video Horizontal Resolution of Text Setup
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|800|UINT32|0x50000001
-  
-  ## Specify the video vertical resolution of text setup.
-  # @Prompt Video Vertical Resolution of Text Setup
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|600|UINT32|0x50000002
-
-  ## Specify the console output column of text setup.
-  # @Prompt Console Output Column of Text Setup
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn|80|UINT32|0x50000003
-  
-  ## Specify the console output row of text setup.
-  # @Prompt Console Output Row of Text Setup
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x50000004
-
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
   ## I/O Base address of floppy device controller.
   # @Prompt I/O Base Address of Floppy Device Controller
