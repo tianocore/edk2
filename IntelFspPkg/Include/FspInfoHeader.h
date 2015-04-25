@@ -130,11 +130,11 @@ typedef struct  {
   ///
   UINT32  Signature;
   ///
-  /// Byte 0x04: Length of the FSP Extended Header
+  /// Byte 0x04: Length of the table in bytes, including all additional FSP producer defined data.
   ///
-  UINT32  HeaderLength;
+  UINT32  Length;
   ///
-  /// Byte 0x08: Revision of the FSP Extended Header
+  /// Byte 0x08: FSP producer defined revision of the table.
   ///
   UINT8   Revision;
   ///
@@ -142,15 +142,22 @@ typedef struct  {
   ///
   UINT8   Reserved;
   ///
-  /// Byte 0x0A: An OEM-supplied string that defines the OEM
+  /// Byte 0x0A: FSP producer identification string 
   ///
-  CHAR8   OemId[6];
+  CHAR8   FspProducerId[6];
   ///
-  /// Byte 0x10: An OEM-supplied revision number. Larger numbers are assumed to be newer revisions.
+  /// Byte 0x10: FSP producer implementation revision number. Larger numbers are assumed to be newer revisions.
   ///
-  UINT32  OemRevision;
+  UINT32  FspProducerRevision;
+  ///
+  /// Byte 0x14: Size of the FSP producer defined data (n) in bytes.
+  ///
+  UINT32  FspProducerDataSize;
+  ///
+  /// Byte 0x18: FSP producer defined data of size (n) defined by FspProducerDataSize.
+  ///
 
-} FSP_EXTENTED_HEADER;
+} FSP_INFO_EXTENTED_HEADER;
 
 #pragma pack()
 
