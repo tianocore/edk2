@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -56,6 +56,8 @@ L0:
     jne     L0
 L1:
     leal    -8(%edi), %eax
-    cmovne  %ecx, %eax
+    jz      L2
+    movl    %ecx, %eax
+L2:    
     pop     %edi
     ret
