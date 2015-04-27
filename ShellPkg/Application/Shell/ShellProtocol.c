@@ -3,7 +3,7 @@
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,8 @@
 **/
 
 #include "Shell.h"
+
+#define INIT_NAME_BUFFER_SIZE  128
 
 /**
   Close an open file handle.
@@ -3102,20 +3104,17 @@ EFIAPI
 InternalEfiShellGetListAlias(
   )
 {
-  UINT64            MaxStorSize;
-  UINT64            RemStorSize;
-  UINT64            MaxVarSize;
+  
   EFI_STATUS        Status;
   EFI_GUID          Guid;
   CHAR16            *VariableName;
   UINTN             NameSize;
+  UINTN             NameBufferSize;
   CHAR16            *RetVal;
   UINTN             RetSize;
 
-  Status = gRT->QueryVariableInfo(EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS, &MaxStorSize, &RemStorSize, &MaxVarSize);
-  ASSERT_EFI_ERROR(Status);
-
-  VariableName  = AllocateZeroPool((UINTN)MaxVarSize);
+  NameBufferSize = INIT_NAME_BUFFER_SIZE;
+  VariableName  = AllocateZeroPool(NameBufferSize);
   RetSize       = 0;
   RetVal        = NULL;
 
@@ -3126,22 +3125,38 @@ InternalEfiShellGetListAlias(
   VariableName[0] = CHAR_NULL;
 
   while (TRUE) {
-    NameSize = (UINTN)MaxVarSize;
+    NameSize = NameBufferSize;
     Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     if (Status == EFI_NOT_FOUND){
       break;
+    } else if (Status == EFI_BUFFER_TOO_SMALL) {
+      NameBufferSize = NameSize > NameBufferSize * 2 ? NameSize : NameBufferSize * 2;
+      SHELL_FREE_NON_NULL(VariableName);
+      VariableName = AllocateZeroPool(NameBufferSize);
+      if (VariableName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        SHELL_FREE_NON_NULL(RetVal);
+        RetVal = NULL;
+        break;
+      }
+      
+      NameSize = NameBufferSize;
+      Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     }
-    ASSERT_EFI_ERROR(Status);
-    if (EFI_ERROR(Status)) {
+    
+    if (EFI_ERROR (Status)) {
+      SHELL_FREE_NON_NULL(RetVal);
+      RetVal = NULL;
       break;
     }
+    
     if (CompareGuid(&Guid, &gShellAliasGuid)){
       ASSERT((RetVal == NULL && RetSize == 0) || (RetVal != NULL));
       RetVal = StrnCatGrow(&RetVal, &RetSize, VariableName, 0);
       RetVal = StrnCatGrow(&RetVal, &RetSize, L";", 0);
     } // compare guid
   } // while
-  FreePool(VariableName);
+  SHELL_FREE_NON_NULL(VariableName);
 
   return (RetVal);
 }
