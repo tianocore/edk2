@@ -1335,8 +1335,12 @@ GetBreakCause (
       if ((CpuContext->Dr6 & BIT14) != 0) {
         Cause = DEBUG_DATA_BREAK_CAUSE_STEPPING;
         //
-        // If it's single step, no need to check DR0, to ensure single step work in PeCoffExtraActionLib
-        // (right after triggering a breakpoint to report image load/unload).
+        // DR6.BIT14 Indicates (when set) that the debug exception was
+        // triggered by the single step execution mode.
+        // The single-step mode is the highest priority debug exception.
+        // This is single step, no need to check DR0, to ensure single step
+        // work in PeCoffExtraActionLib (right after triggering a breakpoint
+        // to report image load/unload).
         //
         return Cause;
 
@@ -2392,9 +2396,16 @@ InterruptProcess (
     // Check if this exception is issued by Debug Agent itself
     // If yes, fill the debug agent exception buffer and LongJump() back to
     // the saved CPU content in CommandCommunication()
+    // If exception is issued when executing Stepping, will be handled in
+    // exception handle procedure.
     //
     if (GetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS) == 1) {
-      DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "Debug agent meet one Exception, ExceptionNum is %d, EIP = 0x%x.\n", Vector, (UINTN)CpuContext->Eip);
+      DebugAgentMsgPrint (
+        DEBUG_AGENT_ERROR,
+        "Debug agent meet one Exception, ExceptionNum is %d, EIP = 0x%x.\n",
+        Vector,
+        (UINTN)CpuContext->Eip
+        );
       ExceptionBuffer = (DEBUG_AGENT_EXCEPTION_BUFFER *) (UINTN) GetMailboxPointer()->ExceptionBufferPointer;
       ExceptionBuffer->ExceptionContent.ExceptionNum  = (UINT8) Vector;
       ExceptionBuffer->ExceptionContent.ExceptionData = (UINT32) CpuContext->ExceptionData;
@@ -2604,9 +2615,16 @@ InterruptProcess (
 
   default:
     if (Vector <= DEBUG_EXCEPT_SIMD) {
+      DebugAgentMsgPrint (
+        DEBUG_AGENT_ERROR,
+        "Exception happened, ExceptionNum is %d, EIP = 0x%x.\n",
+        Vector,
+        (UINTN) CpuContext->Eip
+        );
       if (BreakCause == DEBUG_DATA_BREAK_CAUSE_STEPPING) {
         //
-        // Stepping is finished, send Ack package.
+        // If exception happened when executing Stepping, send Ack package.
+        // HOST consider Stepping command was finished.
         //
         if (MultiProcessorDebugSupport()) {
           mDebugMpContext.BreakAtCpuIndex = ProcessorIndex;
