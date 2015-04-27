@@ -3,7 +3,7 @@
   NVM Express specification.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -256,9 +256,15 @@ NvmeCreatePrpList (
   //
   // Calculate total PrpList number.
   //
-  *PrpListNo = (UINTN)DivU64x64Remainder ((UINT64)Pages, (UINT64)PrpEntryNo, &Remainder);
-  if (Remainder != 0) {
+  *PrpListNo = (UINTN)DivU64x64Remainder ((UINT64)Pages, (UINT64)PrpEntryNo - 1, &Remainder);
+  if (*PrpListNo == 0) {
+    *PrpListNo = 1;
+  } else if (Remainder != 0) && (Remainder != 1) {
     *PrpListNo += 1;
+  } else if (Remainder == 1) {
+    Remainder = PrpEntryNo;
+  } else if (Remainder == 0) {
+    Remainder = PrpEntryNo - 1;
   }
 
   Status = PciIo->AllocateBuffer (
@@ -293,7 +299,7 @@ NvmeCreatePrpList (
   //
   ZeroMem (*PrpListHost, Bytes);
   for (PrpListIndex = 0; PrpListIndex < *PrpListNo - 1; ++PrpListIndex) {
-    PrpListBase = *(UINT8*)PrpListHost + PrpListIndex * EFI_PAGE_SIZE;
+    PrpListBase = *(UINT64*)PrpListHost + PrpListIndex * EFI_PAGE_SIZE;
 
     for (PrpEntryIndex = 0; PrpEntryIndex < PrpEntryNo; ++PrpEntryIndex) {
       if (PrpEntryIndex != PrpEntryNo - 1) {
@@ -314,7 +320,7 @@ NvmeCreatePrpList (
   // Fill last PRP list.
   //
   PrpListBase = *(UINT64*)PrpListHost + PrpListIndex * EFI_PAGE_SIZE;
-  for (PrpEntryIndex = 0; PrpEntryIndex < ((Remainder != 0) ? Remainder : PrpEntryNo); ++PrpEntryIndex) {
+  for (PrpEntryIndex = 0; PrpEntryIndex < Remainder; ++PrpEntryIndex) {
     *((UINT64*)(UINTN)PrpListBase + PrpEntryIndex) = PhysicalAddr;
     PhysicalAddr += EFI_PAGE_SIZE;
   }
