@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials
 #*   are licensed and made available under the terms and conditions of the BSD License
 #*   which accompanies this distribution.  The full text of the license may be found at
@@ -447,10 +447,25 @@ ErrorCodeAndVectorOnStack:
     pushl   %eax
 
 #; UINT32  Cr0, Cr1, Cr2, Cr3, Cr4;
+## insure FXSAVE/FXRSTOR is enabled in CR4...
+## ... while we're at it, make sure DE is also enabled...
+    mov     $1, %eax
+    pushl   %ebx                         # temporarily save value of ebx on stack 
+    cpuid                                # use CPUID to determine if FXSAVE/FXRESTOR
+                                         # and DE are supported
+    popl    %ebx                         # retore value of ebx that was overwritten
+                                         # by CPUID 
     movl    %cr4, %eax
-    orl     $0x208, %eax
+    pushl   %eax                         # push cr4 firstly
+    testl   $BIT24, %edx                 # Test for FXSAVE/FXRESTOR support
+    jz      L1
+    orl     $BIT9, %eax                  # Set CR4.OSFXSR
+L1:    
+    testl   $BIT2, %edx                  # Test for Debugging Extensions support
+    jz      L2
+    orl     $BIT3, %eax                  # Set CR4.DE
+L2:    
     movl    %eax, %cr4
-    pushl   %eax
     movl    %cr3, %eax
     pushl   %eax
     movl    %cr2, %eax
@@ -477,7 +492,11 @@ ErrorCodeAndVectorOnStack:
 #; FX_SAVE_STATE_IA32 FxSaveState;
     subl    $512, %esp
     movl    %esp, %edi
+    testl   $BIT24, %edx     # Test for FXSAVE/FXRESTOR support.  
+                             # edx still contains result from CPUID above
+    jz      L3
     .byte      0x0f, 0x0ae, 0x07 #fxsave [edi]
+L3:  
 
 #; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
     cld
@@ -503,7 +522,13 @@ ErrorCodeAndVectorOnStack:
 
 #; FX_SAVE_STATE_IA32 FxSaveState;
     movl    %esp, %esi
+    movl    $1, %eax
+    cpuid                    # use CPUID to determine if FXSAVE/FXRESTOR 
+                             # are supported
+    testl   $BIT24, %edx     # Test for FXSAVE/FXRESTOR support
+    jz      L4
     .byte      0x0f, 0x0ae, 0x0e # fxrstor [esi]
+L4:  
     addl    $512, %esp
 
 #; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
