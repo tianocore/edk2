@@ -19,7 +19,7 @@
   MODULE_UNI_FILE                = SmmDebugAgentLib.uni
   FILE_GUID                      = CB07D74C-598F-4268-A5D1-644FB4A481E8
   MODULE_TYPE                    = DXE_SMM_DRIVER
-  VERSION_STRING                 = 0.7
+  VERSION_STRING                 = 0.8
   LIBRARY_CLASS                  = DebugAgentLib|DXE_SMM_DRIVER
 
 #
