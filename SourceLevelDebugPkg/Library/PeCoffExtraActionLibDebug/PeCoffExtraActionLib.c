@@ -1,7 +1,7 @@
 /** @file
   PE/Coff Extra Action library instances.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -65,6 +65,7 @@ PeCoffLoaderExtraActionCommon (
   IA32_DESCRIPTOR            IdtDescriptor;
   IA32_IDT_GATE_DESCRIPTOR   OriginalIdtEntry;
   BOOLEAN                    IdtEntryHooked;
+  UINT32                     RegEdx;
 
   ASSERT (ImageContext != NULL);
 
@@ -79,6 +80,16 @@ PeCoffLoaderExtraActionCommon (
 
   IdtEntryHooked  = FALSE;
   LoadImageMethod = PcdGet8 (PcdDebugLoadImageMethod);
+  if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT) {
+    //
+    // If the CPU does not support Debug Extensions(CPUID:01 EDX:BIT2)
+    // then force use of DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3 
+    //
+    AsmCpuid (1, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT2) == 0) {
+      LoadImageMethod = DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3;
+    }
+  }
   AsmReadIdtr (&IdtDescriptor);
   if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3) {
     if (!CheckDebugAgentHandler (&IdtDescriptor, SOFT_INT_VECTOR_NUM)) {
