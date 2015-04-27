@@ -259,7 +259,7 @@ NvmeCreatePrpList (
   *PrpListNo = (UINTN)DivU64x64Remainder ((UINT64)Pages, (UINT64)PrpEntryNo - 1, &Remainder);
   if (*PrpListNo == 0) {
     *PrpListNo = 1;
-  } else if (Remainder != 0) && (Remainder != 1) {
+  } else if ((Remainder != 0) && (Remainder != 1)) {
     *PrpListNo += 1;
   } else if (Remainder == 1) {
     Remainder = PrpEntryNo;
