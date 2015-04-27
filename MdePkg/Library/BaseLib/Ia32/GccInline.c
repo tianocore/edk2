@@ -1,7 +1,7 @@
 /** @file
   GCC inline implementation of BaseLib processor specific functions.
   
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1745,6 +1745,19 @@ AsmFlushCacheLine (
   IN      VOID                      *LinearAddress
   )
 {
+  UINT32  RegEdx;
+
+  //
+  // If the CPU does not support CLFLUSH instruction, 
+  // then promote flush range to flush entire cache.
+  //
+  AsmCpuid (0x01, NULL, NULL, NULL, &RegEdx);
+  if ((RegEdx & BIT19) == 0) {
+    __asm__ __volatile__ ("wbinvd":::"memory");
+    return LinearAddress;
+  }
+
+
   __asm__ __volatile__ (
     "clflush (%0)"
     : "+a" (LinearAddress) 
@@ -1752,7 +1765,7 @@ AsmFlushCacheLine (
     : "memory"
     );
     
-    return LinearAddress;
+  return LinearAddress;
 }
 
 
