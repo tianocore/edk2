@@ -2,7 +2,7 @@
 
   This file contains the definition for XHCI host controller schedule routines.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -224,7 +224,7 @@ typedef struct _TRANSFER_TRB_NORMAL {
 
   UINT32                  TRBPtrHi;
 
-  UINT32                  Lenth:17;
+  UINT32                  Length:17;
   UINT32                  TDSize:5;
   UINT32                  IntTarget:10;
 
@@ -253,7 +253,7 @@ typedef struct _TRANSFER_TRB_CONTROL_SETUP {
   UINT32                  wIndex:16;
   UINT32                  wLength:16;
 
-  UINT32                  Lenth:17;
+  UINT32                  Length:17;
   UINT32                  RsvdZ1:5;
   UINT32                  IntTarget:10;
 
@@ -276,7 +276,7 @@ typedef struct _TRANSFER_TRB_CONTROL_DATA {
 
   UINT32                  TRBPtrHi;
 
-  UINT32                  Lenth:17;
+  UINT32                  Length:17;
   UINT32                  TDSize:5;
   UINT32                  IntTarget:10;
 
@@ -325,7 +325,7 @@ typedef struct _EVT_TRB_TRANSFER {
 
   UINT32                  TRBPtrHi;
 
-  UINT32                  Lenth:24;
+  UINT32                  Length:24;
   UINT32                  Completecode:8;
 
   UINT32                  CycleBit:1;

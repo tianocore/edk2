@@ -2,7 +2,7 @@
 
   XHCI transfer scheduling routines.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -295,7 +295,7 @@ XhcCreateTransferTrb (
       TrbStart->TrbCtrSetup.wValue        = Urb->Request->Value;
       TrbStart->TrbCtrSetup.wIndex        = Urb->Request->Index;
       TrbStart->TrbCtrSetup.wLength       = Urb->Request->Length;
-      TrbStart->TrbCtrSetup.Lenth         = 8;
+      TrbStart->TrbCtrSetup.Length        = 8;
       TrbStart->TrbCtrSetup.IntTarget     = 0;
       TrbStart->TrbCtrSetup.IOC           = 1;
       TrbStart->TrbCtrSetup.IDT           = 1;
@@ -321,7 +321,7 @@ XhcCreateTransferTrb (
         TrbStart = (TRB *)(UINTN)EPRing->RingEnqueue;
         TrbStart->TrbCtrData.TRBPtrLo  = XHC_LOW_32BIT(Urb->DataPhy);
         TrbStart->TrbCtrData.TRBPtrHi  = XHC_HIGH_32BIT(Urb->DataPhy);
-        TrbStart->TrbCtrData.Lenth     = (UINT32) Urb->DataLen;
+        TrbStart->TrbCtrData.Length    = (UINT32) Urb->DataLen;
         TrbStart->TrbCtrData.TDSize    = 0;
         TrbStart->TrbCtrData.IntTarget = 0;
         TrbStart->TrbCtrData.ISP       = 1;
@@ -387,7 +387,7 @@ XhcCreateTransferTrb (
         TrbStart = (TRB *)(UINTN)EPRing->RingEnqueue;
         TrbStart->TrbNormal.TRBPtrLo  = XHC_LOW_32BIT((UINT8 *) Urb->DataPhy + TotalLen);
         TrbStart->TrbNormal.TRBPtrHi  = XHC_HIGH_32BIT((UINT8 *) Urb->DataPhy + TotalLen);
-        TrbStart->TrbNormal.Lenth     = (UINT32) Len;
+        TrbStart->TrbNormal.Length    = (UINT32) Len;
         TrbStart->TrbNormal.TDSize    = 0;
         TrbStart->TrbNormal.IntTarget = 0;
         TrbStart->TrbNormal.ISP       = 1;
@@ -422,7 +422,7 @@ XhcCreateTransferTrb (
         TrbStart = (TRB *)(UINTN)EPRing->RingEnqueue;
         TrbStart->TrbNormal.TRBPtrLo  = XHC_LOW_32BIT((UINT8 *) Urb->DataPhy + TotalLen);
         TrbStart->TrbNormal.TRBPtrHi  = XHC_HIGH_32BIT((UINT8 *) Urb->DataPhy + TotalLen);
-        TrbStart->TrbNormal.Lenth     = (UINT32) Len;
+        TrbStart->TrbNormal.Length    = (UINT32) Len;
         TrbStart->TrbNormal.TDSize    = 0;
         TrbStart->TrbNormal.IntTarget = 0;
         TrbStart->TrbNormal.ISP       = 1;
@@ -1137,7 +1137,7 @@ XhcCheckUrbResult (
         if ((TRBType == TRB_TYPE_DATA_STAGE) ||
             (TRBType == TRB_TYPE_NORMAL) ||
             (TRBType == TRB_TYPE_ISOCH)) {
-          CheckedUrb->Completed += (CheckedUrb->DataLen - EvtTrb->Lenth);
+          CheckedUrb->Completed += (CheckedUrb->DataLen - EvtTrb->Length);
         }
 
         break;
