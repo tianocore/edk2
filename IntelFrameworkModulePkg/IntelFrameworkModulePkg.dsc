@@ -3,7 +3,7 @@
 #
 # This file is used to build all modules in IntelFrameworkModulePkg.
 #
-#Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #This program and the accompanying materials are licensed and made available under 
 #the terms and conditions of the BSD License that accompanies this distribution.  
 #The full text of the license may be found at
@@ -139,6 +139,7 @@
   IntelFrameworkModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   IntelFrameworkModulePkg/Library/DxeCapsuleLib/DxeCapsuleLib.inf
+  IntelFrameworkModulePkg/Library/LegacyBootManagerLib/LegacyBootManagerLib.inf
 
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf

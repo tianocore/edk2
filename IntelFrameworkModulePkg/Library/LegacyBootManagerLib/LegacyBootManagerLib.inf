@@ -1,0 +1,65 @@
+## @file
+#  This function deal with the legacy boot option, it create, delete
+#  and manage the legacy boot option, all legacy boot option is getting from
+#  the legacy BBS table.
+#
+#  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LegacyBootManagerLib
+  FILE_GUID                      = F1B87BE4-0ACC-409A-A52B-7BFFABCC96A0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = LegacyBootManagerLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  LegacyBm.c
+  InternalLegacyBm.h
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DevicePathLib
+  MemoryAllocationLib
+  UefiLib
+  DebugLib
+  PrintLib
+  PerformanceLib
+  UefiBootManagerLib
+
+[Guids]
+  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"Boot####" (Boot option variable)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"BootOrder" (The boot option array)
+  gEfiLegacyDevOrderVariableGuid
+
+[Protocols]
+  gEfiLegacyBiosProtocolGuid                    ## SOMETIMES_CONSUMES
+
+[FeaturePcd]
+
+[Pcd]

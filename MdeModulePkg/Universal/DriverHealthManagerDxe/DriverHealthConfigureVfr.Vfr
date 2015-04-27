@@ -1,0 +1,39 @@
+///** @file
+//  
+//    VFR to produce the formset used by BDS. This form only lists
+//    the Configure Required driver health instances.
+//  
+//  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+//  This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+//**/
+#include "DriverHealthManagerVfr.h"
+
+formset
+  guid      = DRIVER_HEALTH_CONFIGURE_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_TITLE),
+  help      = STRING_TOKEN(STR_FORM_HELP),
+  classguid = DRIVER_HEALTH_CONFIGURE_FORMSET_GUID,
+
+  form formid = DRIVER_HEALTH_FORM_ID,
+      title  = STRING_TOKEN(STR_FORM_TITLE);
+
+      label LABEL_BEGIN;
+      label LABEL_END;
+            
+      suppressif TRUE;
+          text
+              help  = STRING_TOKEN(STR_NULL),
+              text  = STRING_TOKEN(STR_NULL),
+              flags = INTERACTIVE,
+              key   = QUESTION_ID_REFRESH_CONFIGURE;
+      endif;
+
+  endform;
+endformset;

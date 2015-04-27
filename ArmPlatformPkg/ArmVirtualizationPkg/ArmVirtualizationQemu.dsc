@@ -203,7 +203,7 @@
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
 
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
   #
   # Set video resolution for boot options and for text setup.
@@ -211,8 +211,8 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
 
 ################################################################################
 #

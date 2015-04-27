@@ -105,6 +105,12 @@
   ## @libraryclass   Provides sorting functions
   SortLib|Include/Library/SortLib.h
 
+  ## @libraryclass   Provides core boot manager functions
+  UefiBootManagerLib|Include/Library/UefiBootManagerLib.h
+
+  ## @libraryclass   Provides core boot manager functions
+  PlatformBootManagerLib|Include/Library/PlatformBootManagerLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -915,7 +921,16 @@
   ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
   # @Prompt Serial Port Extended Transmit FIFO Size in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|64|UINT32|0x00010068
-  
+
+  ## This PCD points to the file name GUID of the BootManagerMenuApp
+  #  Platform can customize the PCD to point to different application for Boot Manager Menu
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0xdc, 0x5b, 0xc2, 0xee, 0xf2, 0x67, 0x95, 0x4d, 0xb1, 0xd5, 0xf8, 0x1b, 0x20, 0x39, 0xd1, 0x1d }|VOID*|0x0001006b
+
+  ## This PCD points to the formset GUID of the driver health management form
+  #  The form will be popped up by BDS core when there are Configuration Required driver health intances.
+  #  Platform can customize the PCD to point to different formset.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDriverHealthConfigureForm|{ 0xf4, 0xd9, 0x96, 0x42, 0xfc, 0xf6, 0xde, 0x4d, 0x86, 0x85, 0x8c, 0xe2, 0xd7, 0x9d, 0x90, 0xf0 }|VOID*|0x0001006c
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -936,6 +951,29 @@
   #  If this PCD is set to 0 then video resolution would be at highest resolution.
   # @Prompt Video vertical resolution.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600|UINT32|0x4000000a
+
+  #  The 4 PCDs below are used to specify the video resolution and text mode of text setup.
+  #  To make text setup work in this resolution, PcdVideoHorizontalResolution, PcdVideoVerticalResolution,
+  #  PcdConOutColumn and PcdConOutRow should be created as PcdsDynamic or PcdsDynamicEx in platform DSC file.
+  #  Then BDS setup will update these PCDs defined in MdeModulePkg.dec and reconnect console drivers
+  #  (GraphicsConsole, Terminal, Consplitter) to make the video resolution and text mode work
+  #  for text setup.
+
+  ## Specify the video horizontal resolution of text setup.
+  # @Prompt Video Horizontal Resolution of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|800|UINT32|0x4000000b
+
+  ## Specify the video vertical resolution of text setup.
+  # @Prompt Video Vertical Resolution of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|600|UINT32|0x4000000c
+
+  ## Specify the console output column of text setup.
+  # @Prompt Console Output Column of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn|80|UINT32|0x4000000d
+
+  ## Specify the console output row of text setup.
+  # @Prompt Console Output Row of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x4000000e
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Base address of the NV variable range in flash device.
