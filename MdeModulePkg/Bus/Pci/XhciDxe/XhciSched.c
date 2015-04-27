@@ -1137,7 +1137,7 @@ XhcCheckUrbResult (
         if ((TRBType == TRB_TYPE_DATA_STAGE) ||
             (TRBType == TRB_TYPE_NORMAL) ||
             (TRBType == TRB_TYPE_ISOCH)) {
-          CheckedUrb->Completed += (CheckedUrb->DataLen - EvtTrb->Length);
+          CheckedUrb->Completed += (((TRANSFER_TRB_NORMAL*)TRBPtr)->Length - EvtTrb->Length);
         }
 
         break;
