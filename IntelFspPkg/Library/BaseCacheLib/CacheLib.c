@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,17 +16,6 @@
 #include <Library/CacheLib.h>
 #include <Library/CacheAsRamLib.h>
 #include "CacheLibInternal.h"
-
-/**
-  Calculate the maximum value which is a power of 2, but less the Input.
-
-  @param[in]  Input        The number to pass in.
-  @return The maximum value which is align to power of 2 and less the Input
-**/
-UINT32
-SetPower2 (
-  IN  UINT32                    Input
-  );
 
 /**
   Search the memory cache type for specific memory from MTRR.
@@ -236,11 +225,7 @@ Power2MaxMemory (
   //
   // Compute inital power of 2 size to return
   //
-  if (RShiftU64(MemoryLength, 32)) {
-    Result = LShiftU64((UINT64)SetPower2((UINT32) RShiftU64(MemoryLength, 32)), 32);
-  } else {
-    Result = (UINT64)SetPower2((UINT32)MemoryLength);
-  }
+  Result = GetPowerOfTwo64(MemoryLength);
 
   //
   // Special case base of 0 as all ranges are valid
@@ -293,37 +278,6 @@ CheckMtrrAlignment (
   // Return the results to the caller of the MOD
   //
   return ShiftedBase % ShiftedSize;
-}
-
-/**
-  Calculate the maximum value which is a power of 2, but less the Input.
-
-  @param[in]  Input        The number to pass in.
-
-  @return The maximum value which is align to power of 2 and less the Input.
-**/
-UINT32
-SetPower2 (
-  IN UINT32 Input
-  )
-{
-  UINT32 Result;
-
-  Result = 0;
-#if defined(__GCC__)
-  asm("bsr %1, \
-      %%eax; \
-     bts %%eax, \
-      %0;" :"=r"(Result) :
-    "r"(Input)
-  );
-#elif defined(_MSC_VER)
-  _asm {
-    bsr eax, Input
-    bts Result, eax
-  }
-#endif
-  return Result;
 }
 
 /**
