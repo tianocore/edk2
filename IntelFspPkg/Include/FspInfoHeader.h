@@ -157,7 +157,7 @@ typedef struct  {
   /// Byte 0x18: FSP producer defined data of size (n) defined by FspProducerDataSize.
   ///
 
-} FSP_INFO_EXTENTED_HEADER;
+} FSP_INFO_EXTENDED_HEADER;
 
 #pragma pack()
 
