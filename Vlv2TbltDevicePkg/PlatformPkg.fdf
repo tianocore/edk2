@@ -22,54 +22,39 @@ DEFINE FLASH_NUM_BLOCKS = 0x300           #The number of blocks in 3Mb FLASH Dev
 DEFINE FLASH_AREA_BASE_ADDRESS                                = 0xFF800000
 DEFINE FLASH_AREA_SIZE                                        = 0x00800000
 
+DEFINE FLASH_REGION_VLVMICROCODE_OFFSET                       = 0x00000000 
+DEFINE FLASH_REGION_VLVMICROCODE_SIZE                         = 0x00030000
+DEFINE FLASH_REGION_VLVMICROCODE_BASE                         = 0xFFD00000
 
-DEFINE FLASH_REGION_VPD_OFFSET                                = 0x00000000
+DEFINE FLASH_REGION_VPD_OFFSET                                = 0x00030000
 DEFINE FLASH_REGION_VPD_SIZE                                  = 0x0003E000
 
-DEFINE FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_WORKING_OFFSET = 0x0003E000
+DEFINE FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_WORKING_OFFSET = 0x0006E000
 DEFINE FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_WORKING_SIZE   = 0x00002000
 
 
-DEFINE FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET   = 0x00040000
+DEFINE FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET   = 0x00070000
 DEFINE FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_SPARE_SIZE     = 0x00040000
 
 !if $(MINNOW2_FSP_BUILD) == TRUE
-DEFINE FLASH_REGION_FSPBIN_OFFSET                             = 0x00080000
+DEFINE FLASH_REGION_FSPBIN_OFFSET                             = 0x000B0000
 DEFINE FLASH_REGION_FSPBIN_SIZE                               = 0x00048000
-DEFINE FLASH_REGION_FSPBIN_BASE                               = 0xFFD80000
+DEFINE FLASH_REGION_FSPBIN_BASE                               = 0xFFDB0000
 
-DEFINE FLASH_REGION_AZALIABIN_OFFSET                          = 0x000C8000
+DEFINE FLASH_REGION_AZALIABIN_OFFSET                          = 0x000F8000
 DEFINE FLASH_REGION_AZALIABIN_SIZE                            = 0x00008000
-DEFINE FLASH_REGION_AZALIABIN_BASE                            = 0xFFDC8000
+DEFINE FLASH_REGION_AZALIABIN_BASE                            = 0xFFDF8000
 
 !endif
 
-DEFINE FLASH_REGION_VLVMICROCODE_OFFSET                       = 0x000D0000 
-DEFINE FLASH_REGION_VLVMICROCODE_SIZE                         = 0x00030000
-DEFINE FLASH_REGION_VLVMICROCODE_BASE                         = 0xFFDD0000
-
-!if $(TARGET) == RELEASE
 DEFINE FLASH_REGION_FVMAIN_OFFSET                             = 0x00100000
-DEFINE FLASH_REGION_FVMAIN_SIZE                               = 0x001AF000
-!else
-DEFINE FLASH_REGION_FVMAIN_OFFSET                             = 0x00100000
-DEFINE FLASH_REGION_FVMAIN_SIZE                               = 0x001A6000
-!endif
+DEFINE FLASH_REGION_FVMAIN_SIZE                               = 0x001A5000
 
-!if $(TARGET) == RELEASE
-DEFINE FLASH_REGION_FV_RECOVERY2_OFFSET                       = 0x002AF000
-DEFINE FLASH_REGION_FV_RECOVERY2_SIZE                         = 0x00021000
-
-DEFINE FLASH_REGION_FV_RECOVERY_OFFSET                        = 0x002D0000
-DEFINE FLASH_REGION_FV_RECOVERY_SIZE                          = 0x00030000
-!else
-
-DEFINE FLASH_REGION_FV_RECOVERY2_OFFSET                       = 0x002A6000
+DEFINE FLASH_REGION_FV_RECOVERY2_OFFSET                       = 0x002A5000
 DEFINE FLASH_REGION_FV_RECOVERY2_SIZE                         = 0x0002D000
 
-DEFINE FLASH_REGION_FV_RECOVERY_OFFSET                        = 0x002D3000
-DEFINE FLASH_REGION_FV_RECOVERY_SIZE                          = 0x0002D000
-!endif
+DEFINE FLASH_REGION_FV_RECOVERY_OFFSET                        = 0x002D2000
+DEFINE FLASH_REGION_FV_RECOVERY_SIZE                          = 0x0002E000
 
 ################################################################################
 #
@@ -124,6 +109,13 @@ SET gPlatformModuleTokenSpaceGuid.PcdFlashAreaSize                   = $(FLASH_A
 # Fv Size can be adjusted; FVMAIN_COMPACT can be reduced to 0x120000, and FV_RECOVERY can be enlarged to 0x80000
 #
 ################################################################################
+  #
+  # CPU Microcodes
+  #
+
+$(FLASH_REGION_VLVMICROCODE_OFFSET)|$(FLASH_REGION_VLVMICROCODE_SIZE)
+gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeAddress|gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeSize
+FV = MICROCODE_FV
 $(FLASH_REGION_VPD_OFFSET)|$(FLASH_REGION_VPD_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
@@ -195,13 +187,6 @@ gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTok
   FILE = Vlv2TbltDevicePkg/FspAzaliaConfigData/AzaliaConfig.bin
 
 !endif
-  #
-  # CPU Microcodes
-  #
-
-$(FLASH_REGION_VLVMICROCODE_OFFSET)|$(FLASH_REGION_VLVMICROCODE_SIZE)
-gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeAddress|gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeSize
-FV = MICROCODE_FV
 
   #
   # Main Block
