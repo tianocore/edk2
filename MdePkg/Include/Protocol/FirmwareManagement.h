@@ -8,7 +8,7 @@
   CheckImage(), GetPackageInfo(), and SetPackageInfo() shall return 
   EFI_UNSUPPORTED if not supported by the driver.
     
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2013 - 2014, Hewlett-Packard Development Company, L.P.<BR>  
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -44,8 +44,8 @@ typedef struct {
   /// 
   UINT8                            ImageIndex;
   ///
-  /// A unique number identifying the firmware image type.  
-  /// 
+  /// A unique GUID identifying the firmware image type.
+  ///
   EFI_GUID                         ImageTypeId;
   /// 
   /// A unique number identifying the firmware image. 
@@ -91,6 +91,32 @@ typedef struct {
   /// present in version 2 or higher.
   ///
   UINT32                           LowestSupportedImageVersion;
+  ///
+  /// Describes the version that was last attempted to update. If no update attempted the
+  /// value will be 0. If the update attempted was improperly formatted and no version
+  /// number was available then the value will be zero. Only present in version 3 or higher.
+  UINT32                           LastAttemptVersion;
+  ///
+  /// Describes the status that was last attempted to update. If no update has been attempted
+  /// the value will be LAST_ATTEMPT_STATUS_SUCCESS. Only present in version 3 or higher.
+  ///
+  UINT32                           LastAttemptStatus;
+  ///
+  /// An optional number to identify the unique hardware instance within the system for
+  /// devices that may have multiple instances (Example: a plug in pci network card). This
+  /// number must be unique within the namespace of the ImageTypeId GUID and
+  /// ImageIndex. For FMP instances that have multiple descriptors for a single
+  /// hardware instance, all descriptors must have the same HardwareInstance value.
+  /// This number must be consistent between boots and should be based on some sort of
+  /// hardware identified unique id (serial number, etc) whenever possible. If a hardware
+  /// based number is not available the FMP provider may use some other characteristic
+  /// such as device path, bus/dev/function, slot num, etc for generating the
+  /// HardwareInstance. For implementations that will never have more than one
+  /// instance a zero can be used. A zero means the FMP provider is not able to determine a
+  /// unique hardware instance number or a hardware instance number is not needed. Only
+  /// present in version 3 or higher.
+  ///
+  UINT64                           HardwareInstance;
 } EFI_FIRMWARE_IMAGE_DESCRIPTOR;
 
 
@@ -137,7 +163,7 @@ typedef struct {
 ///
 /// Descriptor Version exposed by GetImageInfo() function
 ///
-#define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION   2
+#define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION   3
 
 
 ///
