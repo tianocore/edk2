@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -48,7 +48,9 @@ InternalMemScanMem32    PROC    USES    edi
     mov     eax, [esp + 16]
     repne   scasd
     lea     eax, [edi - 4]
-    cmovnz  eax, ecx
+    jz      @F
+    mov     eax, ecx
+@@:    
     ret
 InternalMemScanMem32    ENDP
 

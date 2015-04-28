@@ -230,9 +230,21 @@ NoExtrPush:
     ;; UINT32  Cr0, Cr1, Cr2, Cr3, Cr4;
     ;; insure FXSAVE/FXRSTOR is enabled in CR4...
     ;; ... while we're at it, make sure DE is also enabled...
+    mov     eax, 1
+    push    ebx         ; temporarily save value of ebx on stack 
+    cpuid               ; use CPUID to determine if FXSAVE/FXRESTOR and
+                        ; DE are supported
+    pop     ebx         ; retore value of ebx that was overwritten by CPUID 
     mov     eax, cr4
-    push    eax       ; push cr4 firstly
-    or      eax, 208h
+    push    eax         ; push cr4 firstly
+    test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support
+    jz      @F
+    or      eax, BIT9   ; Set CR4.OSFXSR
+@@:    
+    test    edx, BIT2   ; Test for Debugging Extensions support
+    jz      @F
+    or      eax, BIT3   ; Set CR4.DE
+@@:    
     mov     cr4, eax
     mov     eax, cr3
     push    eax
@@ -313,7 +325,12 @@ NoExtrPush:
     mov     ecx, 128 ;= 512 / 4
     rep     stosd
     mov     edi, esp
+
+    test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support.
+                        ; edx still contains result from CPUID above
+    jz      @F
     db 0fh, 0aeh, 00000111y ;fxsave [edi]
+@@:    
 
     ;; save the exception data
     push    dword ptr [ebp + 8]
@@ -329,7 +346,12 @@ NoExtrPush:
 
     ;; FX_SAVE_STATE_IA32 FxSaveState;
     mov     esi, esp
+    mov     eax, 1
+    cpuid               ; use CPUID to determine if FXSAVE/FXRESTOR are supported
+    test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support
+    jz      @F
     db 0fh, 0aeh, 00001110y ; fxrstor [esi]
+@@:    
     add esp, 512
 
     ;; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;

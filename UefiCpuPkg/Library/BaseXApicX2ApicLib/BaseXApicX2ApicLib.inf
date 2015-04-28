@@ -21,7 +21,7 @@
   MODULE_UNI_FILE                = BaseXApicX2ApicLib.uni
   FILE_GUID                      = 967B6E05-F10D-4c10-8BF7-365291CA143F
   MODULE_TYPE                    = BASE
-  VERSION_STRING                 = 1.0
+  VERSION_STRING                 = 1.1
   LIBRARY_CLASS                  = LocalApicLib 
 
 #
@@ -42,7 +42,8 @@
   DebugLib
   TimerLib
   IoLib
+  PcdLib
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds   ## SOMETIMES_CONSUMES
-
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds  ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress        ## SOMETIMES_CONSUMES

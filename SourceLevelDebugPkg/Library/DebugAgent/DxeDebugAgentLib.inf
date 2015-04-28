@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for Dxe Core and Dxe modules.
 #
-#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,7 @@
   MODULE_UNI_FILE                = DxeDebugAgentLib.uni
   FILE_GUID                      = BA6BAD25-B814-4747-B0B0-0FBB61D40B90
   MODULE_TYPE                    = DXE_DRIVER
-  VERSION_STRING                 = 0.7
+  VERSION_STRING                 = 0.8
   LIBRARY_CLASS                  = DebugAgentLib|DXE_CORE DXE_DRIVER
 
   CONSTRUCTOR                    = DxeDebugAgentLibConstructor

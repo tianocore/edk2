@@ -2,7 +2,7 @@
   16550 UART Serial Port library functions
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -77,9 +77,9 @@ SerialPortReadRegister (
   )
 {
   if (PcdGetBool (PcdSerialUseMmio)) {
-    return MmioRead8 (Base + Offset);
+    return MmioRead8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride));
   } else {
-    return IoRead8 (Base + Offset);
+    return IoRead8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride));
   }
 }
 
@@ -104,9 +104,9 @@ SerialPortWriteRegister (
   )
 {
   if (PcdGetBool (PcdSerialUseMmio)) {
-    return MmioWrite8 (Base + Offset, Value);
+    return MmioWrite8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride), Value);
   } else {
-    return IoWrite8 (Base + Offset, Value);
+    return IoWrite8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride), Value);
   }
 }
 

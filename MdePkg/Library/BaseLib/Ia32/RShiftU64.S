@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -37,8 +37,10 @@ ASM_PFX(InternalMathRShiftU64):
     xorl    %edx, %edx
     movl    8(%esp), %eax
     testb   $32, %cl                    # Count >= 32?
-    cmovz   %eax, %edx
-    cmovz   0x4(%esp), %eax
+    jnz     L0
+    movl    %eax, %edx
+    movl    0x4(%esp), %eax
+L0:    
     shrdl   %cl, %edx, %eax
     shr     %cl, %edx
     ret

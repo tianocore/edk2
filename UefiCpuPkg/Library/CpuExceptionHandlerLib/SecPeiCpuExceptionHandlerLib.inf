@@ -1,7 +1,7 @@
 ## @file
 #  CPU Exception Handler library instance for SEC/PEI modules.
 #
-#  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,7 @@
   MODULE_UNI_FILE                = SecPeiCpuExceptionHandlerLib.uni
   FILE_GUID                      = CA4BBC99-DFC6-4234-B553-8B6586B7B113
   MODULE_TYPE                    = PEIM
-  VERSION_STRING                 = 1.0
+  VERSION_STRING                 = 1.1
   LIBRARY_CLASS                  = CpuExceptionHandlerLib|SEC PEI_CORE PEIM
 
 #

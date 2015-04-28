@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -36,8 +36,10 @@ InternalMathARShiftU64  PROC
     mov     eax, [esp + 8]
     cdq
     test    cl, 32
-    cmovz   edx, eax
-    cmovz   eax, [esp + 4]
+    jnz     @F
+    mov     edx, eax
+    mov     eax, [esp + 4]
+@@:    
     shrd    eax, edx, cl
     sar     edx, cl
     ret

@@ -20,7 +20,7 @@
   PACKAGE_NAME                   = MdeModulePkg
   PACKAGE_UNI_FILE               = MdeModulePkg.uni
   PACKAGE_GUID                   = BA0D78D6-2CAF-414b-BD4D-B6762A894288
-  PACKAGE_VERSION                = 0.94
+  PACKAGE_VERSION                = 0.96
 
 [Includes]
   Include
@@ -915,6 +915,10 @@
   ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
   # @Prompt Serial Port Extended Transmit FIFO Size in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|64|UINT32|0x00010068
+  
+  ## The number of bytes between registers in serial device.  The default is 1 byte.
+  # @Prompt Serial Port Register Stride in Bytes
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1|UINT32|0x0001006B
   
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
