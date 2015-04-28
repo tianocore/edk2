@@ -2,7 +2,7 @@
   Guid & data structure used for Delivering Capsules Containing Updates to Firmware
   Management Protocol
 
-  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -56,7 +56,7 @@ typedef struct {
   UINT32   Version;
 
   ///
-  /// Used to identifiy device firmware targeted by this update. This guid is matched by
+  /// Used to identify device firmware targeted by this update. This guid is matched by
   /// system firmware against ImageTypeId field within a EFI_FIRMWARE_IMAGE_DESCRIPTOR
   ///
   EFI_GUID UpdateImageTypeId;
@@ -73,16 +73,25 @@ typedef struct {
   UINT32   UpdateImageSize;
 
   ///
-  ///Size of the VendorCode bytes which optionally immediately follow binary update image in the capsule
+  /// Size of the VendorCode bytes which optionally immediately follow binary update image in the capsule
   ///
   UINT32   UpdateVendorCodeSize;
+
+  ///
+  /// The HardwareInstance to target with this update. If value is zero it means match all
+  /// HardwareInstances. This field allows update software to target only a single device in
+  /// cases where there are more than one device with the same ImageTypeId GUID.
+  /// This header is outside the signed data of the Authentication Info structure and
+  /// therefore can be modified without changing the Auth data.
+  ///
+  UINT64   UpdateHardwareInstance;
 } EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER;
 
 #pragma pack()
 
 
-#define EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION       0x00000001  
-#define EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION 0x00000001
+#define EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION       0x00000001
+#define EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION 0x00000002
 
 extern EFI_GUID gEfiFmpCapsuleGuid;
 
