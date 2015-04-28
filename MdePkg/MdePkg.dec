@@ -645,6 +645,12 @@
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Nvme interface.
   ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoNvmeInterfaceGuid  = { 0x3ab14680, 0x5d3f, 0x4a4d, { 0xbc, 0xdc, 0xcc, 0x38, 0x0, 0x18, 0xc7, 0xf7 }}
+  
+  #
+  # GUID defined in PI1.4
+  #
+  ## Include/Guid/GraphicsInfoHob.h
+  gEfiGraphicsInfoHobGuid           = { 0x39f62cce, 0x6825, 0x4669, { 0xbb, 0x56, 0x54, 0x1a, 0xba, 0x75, 0x3a, 0x07 }}
 
 [Guids.IA32, Guids.X64]
   ## Include/Guid/Cper.h
@@ -767,6 +773,13 @@
 
   ## Include/Ppi/FirmwareVolumeInfo2.h
   gEfiPeiFirmwareVolumeInfo2PpiGuid  = { 0xea7ca24b, 0xded5, 0x4dad, { 0xa3, 0x89, 0xbf, 0x82, 0x7e, 0x8f, 0x9b, 0x38 } }
+
+  #
+  # PPIs defined in PI 1.4.
+  #
+
+  ## Include/Ppi/Graphics.h
+  gEfiPeiGraphicsPpiGuid             = { 0x6ecd1463, 0x4a4a, 0x461b, { 0xaf, 0x5f, 0x5a, 0x33, 0xe3, 0xb2, 0x16, 0x2b } }
 
 
 
