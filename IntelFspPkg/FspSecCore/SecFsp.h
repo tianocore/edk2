@@ -47,14 +47,14 @@ FspGetExceptionHandler(
   It needs to be done as soon as possible after the stack is setup.
 
   @param[in,out] PeiFspData             Pointer of the FSP global data.
-  @param[in]     BootloaderStack        Bootloader stack.
+  @param[in]     BootLoaderStack        BootLoader stack.
   @param[in]     ApiIdx                 The index of the FSP API.
 
 **/
 VOID
 FspGlobalDataInit (
   IN OUT  FSP_GLOBAL_DATA    *PeiFspData,
-  IN UINT32                   BootloaderStack,
+  IN UINT32                   BootLoaderStack,
   IN UINT8                    ApiIdx
   );
 

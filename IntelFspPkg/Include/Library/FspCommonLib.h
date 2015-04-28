@@ -76,7 +76,7 @@ SetFspContinuationFuncParameter (
   );
 
 /**
-  This function changes the Bootloader return address in stack.
+  This function changes the BootLoader return address in stack.
 
   @param[in] ReturnAddress       Address to return.
 
@@ -88,7 +88,7 @@ SetFspApiReturnAddress (
   );
 
 /**
-  This function set the API status code returned to the bootloader.
+  This function set the API status code returned to the BootLoader.
 
   @param[in] ReturnStatus       Status code to return.
 
@@ -178,6 +178,17 @@ SetFspMeasurePoint (
 FSP_INFO_HEADER *
 EFIAPI
 GetFspInfoHeader (
+  VOID
+  );
+
+/**
+  This function gets the VPD data pointer.
+
+  @return VpdDataRgnPtr   VPD data pointer.
+**/
+VOID *
+EFIAPI
+GetFspVpdDataPointer (
   VOID
   );
 

@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +47,9 @@ LXMMN        MACRO   XMM, REG, IDX
              ENDM
 ENDIF
 
-
+;
+; XMM7 to save/restore EBP, EBX, ESI, EDI
+; 
 SAVE_REGS    MACRO
   SXMMN      xmm7, 0, ebp
   SXMMN      xmm7, 1, ebx
@@ -64,6 +66,9 @@ LOAD_REGS    MACRO
   LOAD_ESP
              ENDM
 
+;
+; XMM6 to save/restore EAX, EDX, ECX, ESP
+; 
 LOAD_EAX     MACRO
   LXMMN      xmm6, eax, 1
              ENDM
@@ -95,9 +100,85 @@ SAVE_ESP     MACRO
 LOAD_ESP     MACRO
   movd       esp,  xmm6
              ENDM
-
-ENABLE_SSE   MACRO
-  mov        eax, cr4
-  or         eax, 00000600h
-  mov        cr4, eax
+             
+;
+; XMM5 for calling stack
+;
+CALL_XMM     MACRO  Entry
+             local   ReturnAddress
+             mov     esi, offset ReturnAddress
+             pslldq  xmm5, 4
+IFDEF USE_SSE41_FLAG
+             pinsrd  xmm5, esi, 0
+ELSE             
+             pinsrw  xmm5, esi, 0
+             ror     esi,  16
+             pinsrw  xmm5, esi, 1                        
+ENDIF             
+             mov     esi,  Entry
+             jmp     esi
+ReturnAddress:             
              ENDM
+            
+RET_XMM      MACRO               
+             movd    esi, xmm5
+             psrldq  xmm5, 4
+             jmp     esi
+             ENDM
+             
+ENABLE_SSE   MACRO
+            ;
+            ; Initialize floating point units
+            ;
+            local   NextAddress            
+            jmp     NextAddress
+ALIGN 4
+            ;
+            ; Float control word initial value:
+            ; all exceptions masked, double-precision, round-to-nearest
+            ;
+FpuControlWord       DW      027Fh
+            ;
+            ; Multimedia-extensions control word:
+            ; all exceptions masked, round-to-nearest, flush to zero for masked underflow
+            ;
+MmxControlWord       DD      01F80h 
+SseError:      
+            ;
+            ; Processor has to support SSE
+            ;
+            jmp     SseError      
+NextAddress:            
+            finit
+            fldcw   FpuControlWord
+
+            ;
+            ; Use CpuId instructuion (CPUID.01H:EDX.SSE[bit 25] = 1) to test
+            ; whether the processor supports SSE instruction.
+            ;
+            mov     eax, 1
+            cpuid
+            bt      edx, 25
+            jnc     SseError
+
+IFDEF USE_SSE41_FLAG
+            ;
+            ; SSE 4.1 support
+            ;
+            bt      ecx, 19   
+            jnc     SseError
+ENDIF
+
+            ;
+            ; Set OSFXSR bit (bit #9) & OSXMMEXCPT bit (bit #10)
+            ;
+            mov     eax, cr4
+            or      eax, 00000600h
+            mov     cr4, eax
+
+            ;
+            ; The processor should support SSE instruction and we can use
+            ; ldmxcsr instruction
+            ;
+            ldmxcsr MmxControlWord
+            ENDM

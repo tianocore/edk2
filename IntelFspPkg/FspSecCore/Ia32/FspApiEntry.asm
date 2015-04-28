@@ -17,7 +17,7 @@
     .xmm
 
 INCLUDE    SaveRestoreSse.inc
-INCLUDE    UcodeLoad.inc
+INCLUDE    MicrocodeLoad.inc
 
 ;
 ; Following are fixed PCDs
@@ -40,8 +40,7 @@ EXTERN   FspApiCallingCheck:PROC
 EXTERN   GetFspBaseAddress:PROC
 EXTERN   GetBootFirmwareVolumeOffset:PROC
 EXTERN   Pei2LoaderSwitchStack:PROC
-EXTERN   FspSelfCheck(FspSelfCheckDefault):PROC
-EXTERN   LoadUcode(LoadUcodeDefault):PROC
+EXTERN   LoadMicrocode(LoadMicrocodeDefault):PROC
 EXTERN   SecPlatformInit(SecPlatformInitDefault):PROC
 EXTERN   SecCarInit:PROC
 
@@ -69,7 +68,7 @@ ReturnAddress:
 ENDM
 
 RET_ESI_EXT  MACRO   MmxRegister
-  movd    esi, MmxRegister              ; restore ESP from MMX
+  movd    esi, MmxRegister              ; move ReturnAddress from MMX to ESI
   jmp     esi
 ENDM
 
@@ -78,26 +77,8 @@ CALL_MMX MACRO   RoutineLabel
 ENDM
 
 RET_ESI  MACRO
-         RET_ESI_EXT   mm7  
+         RET_ESI_EXT   mm7
 ENDM
-
-;------------------------------------------------------------------------------
-FspSelfCheckDefault PROC NEAR PUBLIC
-   ; Inputs:
-   ;   eax -> Return address
-   ; Outputs:
-   ;   eax -> 0 - Successful, Non-zero - Failed.
-   ; Register Usage:
-   ;   eax is cleared and ebp is used for return address.
-   ;   All others reserved.
-
-   ; Save return address to EBP
-   mov   ebp, eax
-
-   xor   eax, eax
-exit:
-   jmp   ebp
-FspSelfCheckDefault   ENDP
 
 ;------------------------------------------------------------------------------
 SecPlatformInitDefault PROC NEAR PUBLIC
@@ -118,9 +99,9 @@ exit:
 SecPlatformInitDefault   ENDP
 
 ;------------------------------------------------------------------------------
-LoadUcodeDefault   PROC  NEAR PUBLIC
+LoadMicrocodeDefault   PROC  NEAR PUBLIC
    ; Inputs:
-   ;   esp -> LOAD_UCODE_PARAMS pointer
+   ;   esp -> LoadMicrocodeParams pointer
    ; Register Usage:
    ;   esp  Preserved
    ;   All others destroyed
@@ -136,11 +117,11 @@ LoadUcodeDefault   PROC  NEAR PUBLIC
 
    cmp    esp, 0
    jz     paramerror
-   mov    eax, dword ptr [esp]    ; Parameter pointer
+   mov    eax, dword ptr [esp + 4]    ; Parameter pointer
    cmp    eax, 0
    jz     paramerror
    mov    esp, eax
-   mov    esi, [esp].LOAD_UCODE_PARAMS.ucode_code_addr
+   mov    esi, [esp].LoadMicrocodeParams.MicrocodeCodeAddr
    cmp    esi, 0
    jnz    check_main_header
 
@@ -148,7 +129,7 @@ paramerror:
    mov    eax, 080000002h
    jmp    exit
 
-   mov    esi, [esp].LOAD_UCODE_PARAMS.ucode_code_addr
+   mov    esi, [esp].LoadMicrocodeParams.MicrocodeCodeAddr
 
 check_main_header:
    ; Get processor signature and platform ID from the installed processor
@@ -175,60 +156,60 @@ check_main_header:
    ; Check for valid microcode header
    ; Minimal test checking for header version and loader version as 1
    mov   eax, dword ptr 1
-   cmp   [esi].ucode_hdr.version, eax
+   cmp   [esi].MicrocodeHdr.MicrocodeHdrVersion, eax
    jne   advance_fixed_size
-   cmp   [esi].ucode_hdr.loader, eax
+   cmp   [esi].MicrocodeHdr.MicrocodeHdrLoader, eax
    jne   advance_fixed_size
 
    ; Check if signature and plaform ID match
-   cmp   ebx, [esi].ucode_hdr.processor
+   cmp   ebx, [esi].MicrocodeHdr.MicrocodeHdrProcessor
    jne   @f
-   test  edx, [esi].ucode_hdr.flags
+   test  edx, [esi].MicrocodeHdr.MicrocodeHdrFlags
    jnz   load_check  ; Jif signature and platform ID match
 
 @@:
    ; Check if extended header exists
-   ; First check if total_size and data_size are valid
+   ; First check if MicrocodeHdrTotalSize and MicrocodeHdrDataSize are valid
    xor   eax, eax
-   cmp   [esi].ucode_hdr.total_size, eax
+   cmp   [esi].MicrocodeHdr.MicrocodeHdrTotalSize, eax
    je    next_microcode
-   cmp   [esi].ucode_hdr.data_size, eax
+   cmp   [esi].MicrocodeHdr.MicrocodeHdrDataSize, eax
    je    next_microcode
 
    ; Then verify total size - sizeof header > data size
-   mov   ecx, [esi].ucode_hdr.total_size
-   sub   ecx, sizeof ucode_hdr
-   cmp   ecx, [esi].ucode_hdr.data_size
+   mov   ecx, [esi].MicrocodeHdr.MicrocodeHdrTotalSize
+   sub   ecx, sizeof MicrocodeHdr
+   cmp   ecx, [esi].MicrocodeHdr.MicrocodeHdrDataSize
    jng   next_microcode    ; Jif extended header does not exist
 
    ; Set edi -> extended header
    mov   edi, esi
-   add   edi, sizeof ucode_hdr
-   add   edi, [esi].ucode_hdr.data_size
+   add   edi, sizeof MicrocodeHdr
+   add   edi, [esi].MicrocodeHdr.MicrocodeHdrDataSize
 
    ; Get count of extended structures
-   mov   ecx, [edi].ext_sig_hdr.count
+   mov   ecx, [edi].ExtSigHdr.ExtSigHdrCount
 
    ; Move pointer to first signature structure
-   add   edi, sizeof ext_sig_hdr
+   add   edi, sizeof ExtSigHdr
 
 check_ext_sig:
    ; Check if extended signature and platform ID match
-   cmp   [edi].ext_sig.processor, ebx
+   cmp   [edi].ExtSig.ExtSigProcessor, ebx
    jne   @f
-   test  [edi].ext_sig.flags, edx
+   test  [edi].ExtSig.ExtSigFlags, edx
    jnz   load_check     ; Jif signature and platform ID match
 @@:
    ; Check if any more extended signatures exist
-   add   edi, sizeof ext_sig
+   add   edi, sizeof ExtSig
    loop  check_ext_sig
 
 next_microcode:
    ; Advance just after end of this microcode
    xor   eax, eax
-   cmp   [esi].ucode_hdr.total_size, eax
+   cmp   [esi].MicrocodeHdr.MicrocodeHdrTotalSize, eax
    je    @f
-   add   esi, [esi].ucode_hdr.total_size
+   add   esi, [esi].MicrocodeHdr.MicrocodeHdrTotalSize
    jmp   check_address
 @@:
    add   esi, dword ptr 2048
@@ -240,18 +221,18 @@ advance_fixed_size:
 
 check_address:
    ; Is valid Microcode start point ?
-   cmp   dword ptr [esi].ucode_hdr.version, 0ffffffffh
+   cmp   dword ptr [esi].MicrocodeHdr.MicrocodeHdrVersion, 0ffffffffh
    jz    done
 
    ; Is automatic size detection ?
-   mov   eax, [esp].LOAD_UCODE_PARAMS.ucode_code_size
+   mov   eax, [esp].LoadMicrocodeParams.MicrocodeCodeSize
    cmp   eax, 0ffffffffh
    jz    @f
 
    ; Address >= microcode region address + microcode region size?
-   add   eax, [esp].LOAD_UCODE_PARAMS.ucode_code_addr
+   add   eax, [esp].LoadMicrocodeParams.MicrocodeCodeAddr
    cmp   esi, eax
-   jae   done        ;Jif address is outside of ucode region
+   jae   done        ;Jif address is outside of microcode region
    jmp   check_main_header
 
 @@:
@@ -268,7 +249,7 @@ load_check:
    rdmsr                         ; Get current microcode signature
 
    ; Verify this microcode update is not already loaded
-   cmp   [esi].ucode_hdr.revision, edx
+   cmp   [esi].MicrocodeHdr.MicrocodeHdrRevision, edx
    je    continue
 
 load_microcode:
@@ -277,7 +258,7 @@ load_microcode:
    ; ECX contains 79h (IA32_BIOS_UPDT_TRIG)
    ; Start microcode load with wrmsr
    mov   eax, esi
-   add   eax, sizeof ucode_hdr
+   add   eax, sizeof MicrocodeHdr
    xor   edx, edx
    mov   ecx, MSR_IA32_BIOS_UPDT_TRIG
    wrmsr
@@ -300,35 +281,27 @@ done:
 exit:
    jmp   ebp
 
-LoadUcodeDefault   ENDP
+LoadMicrocodeDefault   ENDP
 
 EstablishStackFsp    PROC    NEAR    PRIVATE
   ;
-  ; Save parameter pointer in edx  
+  ; Save parameter pointer in edx
   ;
-  mov       edx, dword ptr [esp + 4]  
-              
+  mov       edx, dword ptr [esp + 4]
+
   ;
   ; Enable FSP STACK
   ;
   mov       esp, PcdGet32 (PcdTemporaryRamBase)
-  add       esp, PcdGet32 (PcdTemporaryRamSize) 
+  add       esp, PcdGet32 (PcdTemporaryRamSize)
 
-  push      DATA_LEN_OF_MCUD     ; Size of the data region 
+  push      DATA_LEN_OF_MCUD     ; Size of the data region
   push      4455434Dh            ; Signature of the  data region 'MCUD'
   push      dword ptr [edx + 12] ; Code size
   push      dword ptr [edx + 8]  ; Code base
-  cmp       edx, 0               ; Is parameter pointer valid ?
-  jz        InvalidMicrocodeRegion
   push      dword ptr [edx + 4]  ; Microcode size
-  push      dword ptr [edx]      ; Microcode base   
-  jmp       @F
+  push      dword ptr [edx]      ; Microcode base
 
-InvalidMicrocodeRegion:
-  push      0                    ; Microcode size
-  push      0                    ; Microcode base
-    
-@@:
   ;
   ; Save API entry/exit timestamp into stack
   ;
@@ -348,7 +321,7 @@ InvalidMicrocodeRegion:
   push      0
 
   ;
-  ; Set ECX/EDX to the bootloader temporary memory range
+  ; Set ECX/EDX to the BootLoader temporary memory range
   ;
   mov       ecx, PcdGet32 (PcdTemporaryRamBase)
   mov       edx, ecx
@@ -356,7 +329,7 @@ InvalidMicrocodeRegion:
   sub       edx, PcdGet32 (PcdFspTemporaryRamSize)
 
   xor       eax, eax
-  
+
   RET_ESI
 
 EstablishStackFsp    ENDP
@@ -398,22 +371,17 @@ TempRamInitApi   PROC    NEAR    PUBLIC
 
   ;
   ; CPUID/DeviceID check
+  ; and Sec Platform Init
   ;
-  mov       eax, @F
-  jmp       FspSelfCheck  ; Note: ESP can not be changed.
-@@:
-  cmp       eax, 0
-  jnz       NemInitExit
-
   CALL_MMX  SecPlatformInit
   cmp       eax, 0
   jnz       NemInitExit
   
   ; Load microcode
   LOAD_ESP
-  CALL_MMX  LoadUcode
-  cmp       eax, 0
-  jnz       NemInitExit
+  CALL_MMX  LoadMicrocode
+  SXMMN     xmm6, 3, eax            ;Save microcode return status in ECX-SLOT 3 in xmm6.
+  ;@note If return value eax is not 0, microcode did not load, but continue and attempt to boot.
 
   ; Call Sec CAR Init
   LOAD_ESP
@@ -423,6 +391,8 @@ TempRamInitApi   PROC    NEAR    PUBLIC
 
   LOAD_ESP
   CALL_MMX  EstablishStackFsp
+
+  LXMMN      xmm6, eax, 3  ;Restore microcode status if no CAR init error from ECX-SLOT 3 in xmm6.
 
 NemInitExit:
   ;
@@ -519,9 +489,10 @@ FspApiCommon   PROC C PUBLIC
   ; Verify the calling condition
   ;
   pushad
+  push   [esp + 4 * 8 + 4]
   push   eax
   call   FspApiCallingCheck
-  add    esp, 4
+  add    esp, 8
   cmp    eax, 0
   jz     @F
   mov    dword ptr [esp + 4 * 7], eax
@@ -536,10 +507,10 @@ FspApiCommon   PROC C PUBLIC
   jz     @F
   jmp    Pei2LoaderSwitchStack
 
-@@:  
+@@:
   ;
   ; FspInit and FspMemoryInit APIs, setup the initial stack frame
-  ;  
+  ;
   
   ;
   ; Store the address in FSP which will return control to the BL
@@ -555,7 +526,7 @@ FspApiCommon   PROC C PUBLIC
 
   ; Reserve 8 bytes for IDT save/restore
   sub     esp, 8
-  sidt    fword ptr [esp]  
+  sidt    fword ptr [esp]
 
   ;
   ; Setup new FSP stack
@@ -571,7 +542,7 @@ FspApiCommon   PROC C PUBLIC
   push    eax
   
   ;
-  ; Pass the bootloader stack to SecStartup
+  ; Pass the BootLoader stack to SecStartup
   ;
   push    edi
 
@@ -612,7 +583,7 @@ FspApiCommon   PROC C PUBLIC
   ;
   call    SecStartup
 
-exit:  
+exit:
   ret
 
 FspApiCommon   ENDP

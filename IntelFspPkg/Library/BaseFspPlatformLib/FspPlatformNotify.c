@@ -89,7 +89,7 @@ FspNotificationHandler (
 
 /**
   This function transfer control to the ContinuationFunc passed in by the
-  bootloader.
+  BootLoader.
 
 **/
 VOID
@@ -101,9 +101,9 @@ FspInitDone (
   FSP_INIT_PARAMS        *FspInitParams;
 
   if (GetFspApiCallingMode() == 0) {
-  	//
-  	// FspInit API is used, so jump into the ContinuationFunc
-  	//
+    //
+    // FspInit API is used, so jump into the ContinuationFunc
+    //
     FspInitParams   = (FSP_INIT_PARAMS *)GetFspApiParameter ();
   
     //
@@ -139,8 +139,8 @@ FspInitDone (
 }
 
 /**
-  This function handle NotifyPhase API call from the bootloader.
-  It gives control back to the bootloader after it is handled. If the
+  This function handle NotifyPhase API call from the BootLoader.
+  It gives control back to the BootLoader after it is handled. If the
   Notification code is a ReadyToBoot event, this function will return
   and FSP continues the remaining execution until it reaches the DxeIpl.
 

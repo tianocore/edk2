@@ -46,6 +46,7 @@
   FspCommonLib|IntelFspPkg/Library/BaseFspCommonLib/BaseFspCommonLib.inf
   FspPlatformLib|IntelFspPkg/Library/BaseFspPlatformLib/BaseFspPlatformLib.inf
   FspSwitchStackLib|IntelFspPkg/Library/BaseFspSwitchStackLib/BaseFspSwitchStackLib.inf
+  FspSecPlatformLib|IntelFspPkg/Library/SecFspSecPlatformLibNull/SecFspSecPlatformLibNull.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -64,10 +65,7 @@
   IntelFspPkg/Library/BaseFspPlatformLib/BaseFspPlatformLib.inf
   IntelFspPkg/Library/BaseFspSwitchStackLib/BaseFspSwitchStackLib.inf
 
-  IntelFspPkg/FspSecCore/FspSecCore.inf {
-    <LibraryClasses>
-    NULL|IntelFspPkg/Library/SecPlatformSecLibNull/SecPlatformSecLibNull.inf
-  }
+  IntelFspPkg/FspSecCore/FspSecCore.inf
   IntelFspPkg/FspDxeIpl/FspDxeIpl.inf
 
 [PcdsFixedAtBuild.common]

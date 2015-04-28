@@ -68,7 +68,7 @@ FspGetSystemMemorySize (
 }
 
 /**
-  Migrate bootloader data before destroying CAR.
+  Migrate BootLoader data before destroying CAR.
 
 **/
 VOID
@@ -93,7 +93,7 @@ FspMigrateTemporaryMemory (
   ApiMode = GetFspApiCallingMode ();
 
   //
-  // Get the temporary memory range used by the bootloader
+  // Get the temporary memory range used by the BootLoader
   //
   BootLoaderTempRamStart = PcdGet32(PcdTemporaryRamBase);
   BootLoaderTempRamSize  = PcdGet32(PcdTemporaryRamSize) - PcdGet32(PcdFspTemporaryRamSize);
