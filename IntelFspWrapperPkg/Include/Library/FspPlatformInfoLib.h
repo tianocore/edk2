@@ -69,6 +69,19 @@ UpdateFspUpdConfigs (
   );
 
 /**
+  Get BootLoader Tolum size.
+
+  @note At this point, memory is NOT ready, PeiServices are available to use.
+
+  @return BootLoader Tolum size.
+**/
+UINT32
+EFIAPI
+GetBootLoaderTolumSize (
+  VOID
+  );
+
+/**
   Get TempRamExit parameter.
 
   @note At this point, memory is ready, PeiServices are available to use.

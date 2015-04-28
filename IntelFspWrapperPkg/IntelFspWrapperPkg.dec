@@ -23,16 +23,16 @@
 
 [LibraryClasses]
   ##  @libraryclass  Provide FSP API related function.
-  FspApiLib|IntelFspWrapperPkg/Include/Library/FspApiLib.h
+  FspApiLib|Include/Library/FspApiLib.h
 
   ##  @libraryclass  Provide FSP hob process related function.
-  FspHobProcessLib|IntelFspWrapperPkg/Include/Library/FspHobProcessLib.h
+  FspHobProcessLib|Include/Library/FspHobProcessLib.h
 
   ##  @libraryclass  Provide FSP platform information related function.
-  FspPlatformInfoLib|IntelFspWrapperPkg/Include/Library/FspPlatformInfoLib.h
+  FspPlatformInfoLib|Include/Library/FspPlatformInfoLib.h
 
   ##  @libraryclass  Provide FSP wrapper platform sec related function.
-  FspPlatformSecLib|IntelFspWrapperPkg/Include/Library/FspPlatformSecLib.h
+  FspPlatformSecLib|Include/Library/FspPlatformSecLib.h
 
 [Guids]
   #

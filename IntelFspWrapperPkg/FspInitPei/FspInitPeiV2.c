@@ -164,6 +164,7 @@ PeiFspMemoryInit (
   ASSERT(sizeof(FspUpdRgn) >= UpdRegionSize);
   ZeroMem (FspUpdRgn, UpdRegionSize);
   FspRtBuffer.UpdDataRgnPtr = UpdateFspUpdConfigs (FspUpdRgn);
+  FspRtBuffer.BootLoaderTolumSize = GetBootLoaderTolumSize ();
 
   ZeroMem (&FspMemoryInitParams, sizeof(FspMemoryInitParams));
   FspMemoryInitParams.NvsBufferPtr = GetNvsBuffer ();
