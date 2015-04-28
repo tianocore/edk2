@@ -1,7 +1,7 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -230,15 +230,16 @@ ScsiDiskDriverBindingStart (
     return Status;
   }
 
-  ScsiDiskDevice->Signature         = SCSI_DISK_DEV_SIGNATURE;
-  ScsiDiskDevice->ScsiIo            = ScsiIo;
-  ScsiDiskDevice->BlkIo.Revision    = EFI_BLOCK_IO_PROTOCOL_REVISION3;
-  ScsiDiskDevice->BlkIo.Media       = &ScsiDiskDevice->BlkIoMedia;
-  ScsiDiskDevice->BlkIo.Reset       = ScsiDiskReset;
-  ScsiDiskDevice->BlkIo.ReadBlocks  = ScsiDiskReadBlocks;
-  ScsiDiskDevice->BlkIo.WriteBlocks = ScsiDiskWriteBlocks;
-  ScsiDiskDevice->BlkIo.FlushBlocks = ScsiDiskFlushBlocks;
-  ScsiDiskDevice->Handle            = Controller;
+  ScsiDiskDevice->Signature            = SCSI_DISK_DEV_SIGNATURE;
+  ScsiDiskDevice->ScsiIo               = ScsiIo;
+  ScsiDiskDevice->BlkIo.Revision       = EFI_BLOCK_IO_PROTOCOL_REVISION3;
+  ScsiDiskDevice->BlkIo.Media          = &ScsiDiskDevice->BlkIoMedia;
+  ScsiDiskDevice->BlkIo.Media->IoAlign = ScsiIo->IoAlign;
+  ScsiDiskDevice->BlkIo.Reset          = ScsiDiskReset;
+  ScsiDiskDevice->BlkIo.ReadBlocks     = ScsiDiskReadBlocks;
+  ScsiDiskDevice->BlkIo.WriteBlocks    = ScsiDiskWriteBlocks;
+  ScsiDiskDevice->BlkIo.FlushBlocks    = ScsiDiskFlushBlocks;
+  ScsiDiskDevice->Handle               = Controller;
 
   ScsiIo->GetDeviceType (ScsiIo, &(ScsiDiskDevice->DeviceType));
   switch (ScsiDiskDevice->DeviceType) {
