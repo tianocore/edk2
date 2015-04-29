@@ -324,6 +324,9 @@
   ## Include/Ppi/SerialPortPei.h
   gPeiSerialPortPpiGuid         =  { 0x490e9d85, 0x8aef, 0x4193, { 0x8e, 0x56, 0xf7, 0x34, 0xa9, 0xff, 0xac, 0x8b}}
 
+  ## Include/Ppi/UfsHostController.h
+  gEdkiiPeiUfsHostControllerPpiGuid  =  { 0xdc54b283, 0x1a77, 0x4cd6, { 0x83, 0xbb, 0xfd, 0xda, 0x46, 0x9a, 0x2e, 0xc6 }}
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
@@ -400,6 +403,9 @@
 
   ## Include/Protocol/FormBrowserEx2.h
   gEdkiiFormBrowserEx2ProtocolGuid = { 0xa770c357, 0xb693, 0x4e6d, { 0xa6, 0xcf, 0xd2, 0x1c, 0x72, 0x8e, 0x55, 0xb } }
+
+  ## Include/Protocol/UfsHostController.h
+  gEdkiiUfsHostControllerProtocolGuid = { 0xebc01af5, 0x7a9, 0x489e, { 0xb7, 0xce, 0xdc, 0x8, 0x9e, 0x45, 0x9b, 0x2f } }
 
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
@@ -1213,6 +1219,12 @@
   # performance for large Disk I/O requests.
   # @Prompt Disk I/O - Number of Data Buffer block.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDiskIoDataBufferBlockNum|64|UINT32|0x30001039
+
+  ## This PCD specifies the PCI-based UFS host controller mmio base address.
+  # Define the mmio base address of the pci-based UFS host controller. If there are multiple UFS
+  # host controllers, their mmio base addresses are calculated one by one from this base address.
+  # @Prompt Mmio base address of pci-based UFS host controller.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUfsPciHostControllerMmioBase|0xd0000000|UINT32|0x10000061
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

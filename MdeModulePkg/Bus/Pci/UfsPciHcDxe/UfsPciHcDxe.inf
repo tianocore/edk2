@@ -1,0 +1,56 @@
+## @file
+#  Component Description File For Universal Flash Storage Pci Host Controller Module.
+#
+#  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UfsPciHcDxe
+  MODULE_UNI_FILE                = UfsPciHcDxe.uni
+  FILE_GUID                      = AF43E178-C2E9-4712-A7CD-08BFDAC7482C
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 0.9
+  ENTRY_POINT                    = UfsHcDriverEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gUfsHcDriverBinding
+#  COMPONENT_NAME                =  gUfsHcComponentName
+#  COMPONENT_NAME2               =  gUfsHcComponentName2
+
+[Sources]
+  ComponentName.c
+  UfsPciHcDxe.c
+  UfsPciHcDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DevicePathLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid                       ## TO_START
+  gEfiDevicePathProtocolGuid                  ## TO_START
+  gEdkiiUfsHostControllerProtocolGuid         ## BY_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UfsPciHcDxeExtra.uni
