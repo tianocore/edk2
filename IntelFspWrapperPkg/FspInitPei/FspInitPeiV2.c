@@ -261,7 +261,11 @@ PeiMemoryDiscoveredNotify (
   VOID                      *FspHobList;
   EFI_HOB_GUID_TYPE         *GuidHob;
 
-  FspHeader = FspFindFspHeader (PcdGet32 (PcdFlashFvFspBase));
+  if (PcdGet32 (PcdFlashFvSecondFspBase) == 0) {
+    FspHeader = FspFindFspHeader (PcdGet32 (PcdFlashFvFspBase));
+  } else {
+    FspHeader = FspFindFspHeader (PcdGet32 (PcdFlashFvSecondFspBase));
+  }
   if (FspHeader == NULL) {
     return EFI_DEVICE_ERROR;
   }
