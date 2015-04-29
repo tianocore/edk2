@@ -25,20 +25,33 @@
 #------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(Pei2LoaderSwitchStack)
 ASM_PFX(Pei2LoaderSwitchStack):
-    jmp     ASM_PFX(Loader2PeiSwitchStack)
+    xorl    %eax, %eax
+    jmp     ASM_PFX(FspSwitchStack)
 
 #------------------------------------------------------------------------------
 # UINT32
 # EFIAPI
 # Loader2PeiSwitchStack (
+#   VOID
 #   )
 #------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(Loader2PeiSwitchStack)
 ASM_PFX(Loader2PeiSwitchStack):
+    jmp     ASM_PFX(FspSwitchStack)
+
+#------------------------------------------------------------------------------
+# UINT32
+# EFIAPI
+# FspSwitchStack (
+#   VOID
+#   )
+#------------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(FspSwitchStack)
+ASM_PFX(FspSwitchStack):
     #
     #Save current contexts
     #
-    push    $exit
+    push    %eax
     pushf
     cli
     pusha
@@ -59,7 +72,7 @@ ASM_PFX(Loader2PeiSwitchStack):
     add     $0x08,%esp
     popa
     popf
-exit:
+    add     $0x04,%esp
     ret
 
 
