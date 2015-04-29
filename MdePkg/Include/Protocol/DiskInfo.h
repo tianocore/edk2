@@ -2,7 +2,7 @@
   Provides the basic interfaces to abstract platform information regarding an 
   IDE controller.  
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,6 +71,14 @@ typedef struct _EFI_DISK_INFO_PROTOCOL  EFI_DISK_INFO_PROTOCOL;
 #define EFI_DISK_INFO_NVME_INTERFACE_GUID \
   { \
     0x3ab14680, 0x5d3f, 0x4a4d, {0xbc, 0xdc, 0xcc, 0x38, 0x0, 0x18, 0xc7, 0xf7 } \
+  }
+
+///
+/// Global ID for a UFS interface.  Used to fill in EFI_DISK_INFO_PROTOCOL.Interface
+///
+#define EFI_DISK_INFO_UFS_INTERFACE_GUID \
+  { \
+    0x4b3029cc, 0x6b98, 0x47fb, { 0xbc, 0x96, 0x76, 0xdc, 0xb8, 0x4, 0x41, 0xf0 } \
   }
 
 /**
@@ -205,5 +213,6 @@ extern EFI_GUID gEfiDiskInfoScsiInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoUsbInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoAhciInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoNvmeInterfaceGuid;
+extern EFI_GUID gEfiDiskInfoUfsInterfaceGuid;
 
 #endif

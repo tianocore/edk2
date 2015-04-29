@@ -796,6 +796,22 @@ typedef struct {
 } NVME_NAMESPACE_DEVICE_PATH;
 
 ///
+/// Universal Flash Storage (UFS) Device Path SubType.
+///
+#define MSG_UFS_DP                0x19
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// Target ID on the UFS bus (PUN).
+  ///
+  UINT8                           Pun;
+  ///
+  /// Logical Unit Number (LUN).
+  ///
+  UINT8                           Lun;
+} UFS_DEVICE_PATH;
+
+///
 /// iSCSI Device Path SubType
 ///
 #define MSG_ISCSI_DP              0x13
@@ -1094,6 +1110,7 @@ typedef union {
   SAS_DEVICE_PATH                            Sas;
   SASEX_DEVICE_PATH                          SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 NvmeNamespace;
+  UFS_DEVICE_PATH                            Ufs;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
   CDROM_DEVICE_PATH                          CD;
 
@@ -1144,6 +1161,7 @@ typedef union {
   SAS_DEVICE_PATH                            *Sas;
   SASEX_DEVICE_PATH                          *SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 *NvmeNamespace;
+  UFS_DEVICE_PATH                            *Ufs;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;
   CDROM_DEVICE_PATH                          *CD;
 
