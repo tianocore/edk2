@@ -895,6 +895,7 @@
   #  EfiMemoryMappedIO              0x0800<BR>
   #  EfiMemoryMappedIOPortSpace     0x1000<BR>
   #  EfiPalCode                     0x2000<BR>
+  #  EfiPersistentMemory            0x4000<BR>
   #  OS Reserved        0x8000000000000000<BR>
   #
   # e.g. Reserved+ACPINvs+ACPIReclaim+RuntimeCode+RuntimeData are needed, 0x661 should be used.<BR>
