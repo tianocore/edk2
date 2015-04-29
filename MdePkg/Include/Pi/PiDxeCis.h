@@ -1,7 +1,7 @@
 /** @file
   Include file matches things in PI.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -11,7 +11,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.2
+  PI Version 1.4
 
 **/
 
@@ -48,6 +48,11 @@ typedef enum {
   /// access I/O devices in the platform.
   ///
   EfiGcdMemoryTypeMemoryMappedIo,
+  ///
+  /// A memory region that is visible to the boot processor. 
+  /// This memory supports byte-addressable non-volatility. 
+  ///
+  EfiGcdMemoryTypePersistentMemory,
   EfiGcdMemoryTypeMaximum
 } EFI_GCD_MEMORY_TYPE;
 

@@ -75,6 +75,11 @@ typedef enum {
 #define EFI_MEMORY_RP   0x0000000000002000ULL
 #define EFI_MEMORY_XP   0x0000000000004000ULL
 //
+// Physical memory persistence attribute. 
+// The memory region supports byte-addressable non-volatility.
+//
+#define EFI_MEMORY_NV   0x0000000000008000ULL
+//
 // Runtime memory attribute
 //
 #define EFI_MEMORY_RUNTIME  0x8000000000000000ULL
@@ -128,6 +133,7 @@ typedef struct {
                                 AllocateMaxAddress or AllocateAddress.
                                 2) MemoryType is in the range
                                 3) Memory is NULL.
+                                4) MemoryType was EfiPersistentMemory.
                                 EfiMaxMemoryType..0x7FFFFFFF.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
   @retval EFI_NOT_FOUND         The requested pages could not be found.
@@ -207,6 +213,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
   @retval EFI_INVALID_PARAMETER PoolType was invalid or Buffer is NULL.
+                                PoolType was EfiPersistentMemory.
 
 **/
 typedef
