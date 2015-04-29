@@ -59,10 +59,22 @@
   ## Provides the size of the BIOS Flash Device.
   gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00200000|UINT32|0x10000002
 
-  ## Indicates the base address of the FSP binary.
+  ## Indicates the base address of the factory FSP binary.
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase|0xFFF80000|UINT32|0x10000003
-  ## Provides the size of the FSP binary.
+  ## Indicates the base address of the updatable FSP binary to support Dual FSP.
+  #  There could be two FSP images at different locations in a flash - 
+  #  one factory version (default) and updatable version (updatable).
+  #  TempRamInit, FspMemoryInit and TempRamExit are always executed from factory version.
+  #  FspSiliconInit and NotifyPhase can be executed from updatable version if it is available,
+  #  FspSiliconInit and NotifyPhase are executed from factory version if there is no updateable version,
+  #  PcdFlashFvFspBase is base address of factory FSP, and PcdFlashFvSecondFspBase
+  #  is base address of updatable FSP. If PcdFlashFvSecondFspBase is 0, that means
+  #  there is no updatable FSP.
+  gFspWrapperTokenSpaceGuid.PcdFlashFvSecondFspBase|0x00000000|UINT32|0x10000008
+  ## Provides the size of the factory FSP binary.
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspSize|0x00048000|UINT32|0x10000004
+  ## Provides the size of the updatable FSP binary to support Dual FSP.
+  gFspWrapperTokenSpaceGuid.PcdFlashFvSecondFspSize|0x00000000|UINT32|0x10000009
 
   ## Indicates the base address of the first Microcode Patch in the Microcode Region
   gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x10000005

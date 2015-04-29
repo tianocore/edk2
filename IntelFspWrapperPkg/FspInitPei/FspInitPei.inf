@@ -81,6 +81,7 @@
 [Pcd]
   gFspWrapperTokenSpaceGuid.PcdPeiTemporaryRamStackSize       ## CONSUMES
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase                 ## CONSUMES
+  gFspWrapperTokenSpaceGuid.PcdFlashFvSecondFspBase           ## CONSUMES
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspSize                 ## CONSUMES
   gFspWrapperTokenSpaceGuid.PcdMaxUpdRegionSize               ## CONSUMES
   gFspWrapperTokenSpaceGuid.PcdFspApiVersion                  ## CONSUMES
