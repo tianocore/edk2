@@ -182,6 +182,17 @@ GetFspInfoHeader (
   );
 
 /**
+  This function gets the FSP info header pointer from the API context.
+
+  @retval FspInfoHeader   FSP info header pointer
+**/
+FSP_INFO_HEADER *
+EFIAPI
+GetFspInfoHeaderFromApiContext (
+  VOID
+  );
+
+/**
   This function gets the VPD data pointer.
 
   @return VpdDataRgnPtr   VPD data pointer.

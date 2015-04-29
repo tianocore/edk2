@@ -215,8 +215,10 @@ ASM_GLOBAL    ASM_PFX(FspApiCallingCheck)
 #
 # Following functions will be provided in PlatformSecLib
 #
+ASM_GLOBAL    ASM_PFX(GetFspBaseAddress)
+ASM_GLOBAL    ASM_PFX(GetFspInfoHdr)
 ASM_GLOBAL    ASM_PFX(GetBootFirmwareVolumeOffset)
-ASM_GLOBAL    ASM_PFX(Pei2LoaderSwitchStack)
+ASM_GLOBAL    ASM_PFX(Loader2PeiSwitchStack)
 
 
 #
@@ -561,8 +563,7 @@ ASM_PFX(TempRamInitApi):
   jz      NemInitExit
 
   #
-  # CPUID/DeviceID check
-  # and Sec Platform Init
+  # Sec Platform Init
   #
   movl    $TempRamInitApiL1, %esi            #CALL_MMX  SecPlatformInit
   movd    %esi, %mm7
@@ -717,7 +718,8 @@ FspApiCommonL1:
   jz      FspApiCommonL2
   cmpl    $0x03, %eax                        # FspMemoryInit API
   jz      FspApiCommonL2
-  jmp     Pei2LoaderSwitchStack
+  call    ASM_PFX(GetFspInfoHdr)
+  jmp     Loader2PeiSwitchStack
 
 FspApiCommonL2:
   #
@@ -725,9 +727,17 @@ FspApiCommonL2:
   #  
   
   #
-  # Store the address in FSP which will return control to the BL
+  # Place holder to store the FspInfoHeader pointer
   #
-  pushl   $FspApiCommonExit
+  pushl  %eax
+
+  #
+  # Update the FspInfoHeader pointer
+  #
+  pushl  %eax
+  call   ASM_PFX(GetFspInfoHdr)
+  movl   %eax, 4(%esp)
+  popl   %eax
 
   #
   # Create a Task Frame in the stack for the Boot Loader
@@ -796,7 +806,7 @@ FspApiCommonL2:
   # Pass Control into the PEI Core
   #
   call    ASM_PFX(SecStartup)
-
+  addl    $4, %esp
 FspApiCommonExit:
   ret
 

@@ -27,7 +27,7 @@
 //   API Parameter                +0x34
 //   API return address           +0x30
 //
-//   push    offset exit          +0x2C
+//   push    FspInfoHeader        +0x2C
 //   pushfd                       +0x28
 //   cli
 //   pushad                       +0x24
@@ -47,7 +47,7 @@ typedef struct {
   UINT32    Ecx;
   UINT32    Eax;
   UINT16    Flags[2];
-  UINT32    ExitOff;
+  UINT32    FspInfoHeader;
   UINT32    ApiRet;
   UINT32    ApiParam;
 } CONTEXT_STACK;
@@ -329,6 +329,23 @@ GetFspInfoHeader (
   )
 {
   return  GetFspGlobalDataPointer()->FspInfoHeader;
+}
+
+/**
+  This function gets the FSP info header pointer using the API stack context.
+
+  @retval FspInfoHeader   FSP info header pointer using the API stack context
+**/
+FSP_INFO_HEADER *
+EFIAPI
+GetFspInfoHeaderFromApiContext (
+  VOID
+  )
+{
+  FSP_GLOBAL_DATA  *FspData;
+
+  FspData  = GetFspGlobalDataPointer ();
+  return  (FSP_INFO_HEADER *)(*(UINT32 *)(UINTN)(FspData->CoreStack + CONTEXT_STACK_OFFSET(FspInfoHeader)));
 }
 
 /**

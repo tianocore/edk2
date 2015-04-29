@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,8 @@
 ;------------------------------------------------------------------------------
 EXTERNDEF  C   MeasurePoint:PROC
 Pei2LoaderSwitchStack   PROC C PUBLIC
-    jmp     Loader2PeiSwitchStack
+    xor     eax, eax
+    jmp     FspSwitchStack
 Pei2LoaderSwitchStack   ENDP
 
 ;------------------------------------------------------------------------------
@@ -38,10 +39,21 @@ Pei2LoaderSwitchStack   ENDP
 ;   VOID
 ;   )
 ;------------------------------------------------------------------------------
-EXTERNDEF  C   SwapStack:PROC
 Loader2PeiSwitchStack   PROC C PUBLIC
+    jmp     FspSwitchStack
+Loader2PeiSwitchStack   ENDP
+
+;------------------------------------------------------------------------------
+; UINT32
+; EFIAPI
+; FspSwitchStack (
+;   VOID
+;   )
+;------------------------------------------------------------------------------
+EXTERNDEF  C   SwapStack:PROC
+FspSwitchStack   PROC C PUBLIC
     ; Save current contexts
-    push    offset exit
+    push    eax
     pushfd
     cli
     pushad
@@ -58,8 +70,8 @@ Loader2PeiSwitchStack   PROC C PUBLIC
     add     esp, 8
     popad
     popfd
-exit:
+    add     esp, 4
     ret
-Loader2PeiSwitchStack   ENDP
+FspSwitchStack   ENDP
 
     END

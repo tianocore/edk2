@@ -38,8 +38,9 @@ EXTERN   FspApiCallingCheck:PROC
 ; Following functions will be provided in PlatformSecLib
 ;
 EXTERN   GetFspBaseAddress:PROC
+EXTERN   GetFspInfoHdr:PROC
 EXTERN   GetBootFirmwareVolumeOffset:PROC
-EXTERN   Pei2LoaderSwitchStack:PROC
+EXTERN   Loader2PeiSwitchStack:PROC
 EXTERN   LoadMicrocode(LoadMicrocodeDefault):PROC
 EXTERN   SecPlatformInit(SecPlatformInitDefault):PROC
 EXTERN   SecCarInit:PROC
@@ -370,8 +371,7 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   jz        NemInitExit
 
   ;
-  ; CPUID/DeviceID check
-  ; and Sec Platform Init
+  ; Sec Platform Init
   ;
   CALL_MMX  SecPlatformInit
   cmp       eax, 0
@@ -505,7 +505,9 @@ FspApiCommon   PROC C PUBLIC
   jz     @F
   cmp    eax, 3   ; FspMemoryInit API
   jz     @F
-  jmp    Pei2LoaderSwitchStack
+
+  call   GetFspInfoHdr
+  jmp    Loader2PeiSwitchStack
 
 @@:
   ;
@@ -513,9 +515,17 @@ FspApiCommon   PROC C PUBLIC
   ;
   
   ;
-  ; Store the address in FSP which will return control to the BL
+  ; Place holder to store the FspInfoHeader pointer
   ;
-  push   offset exit
+  push   eax
+
+  ;
+  ; Update the FspInfoHeader pointer
+  ;
+  push   eax
+  call   GetFspInfoHdr
+  mov    [esp + 4], eax
+  pop    eax
 
   ;
   ; Create a Task Frame in the stack for the Boot Loader
@@ -582,7 +592,7 @@ FspApiCommon   PROC C PUBLIC
   ; Pass Control into the PEI Core
   ;
   call    SecStartup
-
+  add     esp, 4
 exit:
   ret
 
