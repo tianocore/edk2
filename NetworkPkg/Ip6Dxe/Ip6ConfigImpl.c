@@ -52,7 +52,8 @@ Ip6ConfigOnPolicyChanged (
   LIST_ENTRY      *Next;
   IP6_INTERFACE   *IpIf;
   IP6_DAD_ENTRY   *DadEntry;
-
+  IP6_DELAY_JOIN_LIST       *DelayNode;
+  
   //
   // Currently there are only two policies: Manual and Automatic. Regardless of
   // what transition is going on, i.e., Manual -> Automatic and Automatic ->
@@ -94,9 +95,17 @@ Ip6ConfigOnPolicyChanged (
 
   NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
     //
-    // remove all pending DAD entries for the global addresses.
+    // remove all pending delay node and DAD entries for the global addresses.
     //
     IpIf = NET_LIST_USER_STRUCT_S (Entry, IP6_INTERFACE, Link, IP6_INTERFACE_SIGNATURE);
+
+    NET_LIST_FOR_EACH_SAFE (Entry2, Next, &IpIf->DelayJoinList) {
+      DelayNode = NET_LIST_USER_STRUCT (Entry2, IP6_DELAY_JOIN_LIST, Link);
+      if (!NetIp6IsLinkLocalAddr (&DelayNode->AddressInfo->Address)) {
+        RemoveEntryList (&DelayNode->Link);
+        FreePool (DelayNode);
+      }
+    }
 
     NET_LIST_FOR_EACH_SAFE (Entry2, Next, &IpIf->DupAddrDetectList) {
       DadEntry = NET_LIST_USER_STRUCT_S (Entry2, IP6_DAD_ENTRY, Link, IP6_DAD_ENTRY_SIGNATURE);
