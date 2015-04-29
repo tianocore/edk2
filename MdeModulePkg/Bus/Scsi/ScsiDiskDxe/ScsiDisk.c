@@ -1150,7 +1150,7 @@ ScsiDiskTestUnitReady (
   UINT8       Index;
   UINT8       MaxRetry;
 
-  SenseDataLength     = 0;
+  SenseDataLength     = (UINT8) (ScsiDiskDevice->SenseDataNumber * sizeof (EFI_SCSI_SENSE_DATA));
   *NumberOfSenseKeys  = 0;
 
   //
@@ -1159,7 +1159,7 @@ ScsiDiskTestUnitReady (
   Status = ScsiTestUnitReadyCommand (
             ScsiDiskDevice->ScsiIo,
             SCSI_DISK_TIMEOUT,
-            NULL,
+            ScsiDiskDevice->SenseData,
             &SenseDataLength,
             &HostAdapterStatus,
             &TargetStatus
@@ -1205,6 +1205,12 @@ ScsiDiskTestUnitReady (
   } else if (Status == EFI_DEVICE_ERROR) {
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
+  }
+
+  if (SenseDataLength != 0) {
+    *NumberOfSenseKeys = SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA);
+    *SenseDataArray    = ScsiDiskDevice->SenseData;
+    return EFI_SUCCESS;
   }
 
   MaxRetry = 3;
@@ -1740,14 +1746,6 @@ GetMediaInfo (
   }
 
   ScsiDiskDevice->BlkIo.Media->MediaPresent = TRUE;
-  
-  if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
-    ScsiDiskDevice->BlkIo.Media->BlockSize = 0x200;
-  }
-
-  if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_CDROM) {
-    ScsiDiskDevice->BlkIo.Media->BlockSize = 0x800;
-  }
 }
 
 /**
@@ -3102,7 +3100,7 @@ ScsiDiskInfoIdentify (
   EFI_STATUS      Status;
   SCSI_DISK_DEV   *ScsiDiskDevice;
 
-  if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid)) {
+  if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid) || CompareGuid (&This->Interface, &gEfiDiskInfoUfsInterfaceGuid)) {
     //
     // Physical SCSI bus does not support this data class. 
     //
@@ -3171,7 +3169,7 @@ ScsiDiskInfoWhichIde (
 {
   SCSI_DISK_DEV   *ScsiDiskDevice;
 
-  if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid)) {
+  if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid) || CompareGuid (&This->Interface, &gEfiDiskInfoUfsInterfaceGuid)) {
     //
     // This is not an IDE physical device.
     //
@@ -3301,6 +3299,10 @@ InitializeInstallDiskInfo (
           return;
         }
       } while (--IdentifyRetry > 0);
+    } else if ((DevicePathType (ChildDevicePathNode) == MESSAGING_DEVICE_PATH) &&
+       (DevicePathSubType (ChildDevicePathNode) == MSG_UFS_DP)) {
+      CopyGuid (&ScsiDiskDevice->DiskInfo.Interface, &gEfiDiskInfoUfsInterfaceGuid);
+      break;
     }
     DevicePathNode = ChildDevicePathNode;
   }

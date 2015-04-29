@@ -63,6 +63,7 @@
   gEfiDiskInfoScsiInterfaceGuid                 ## SOMETIMES_PRODUCES ## UNDEFINED
   gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED
   gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_PRODUCES ## UNDEFINED
+  gEfiDiskInfoUfsInterfaceGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED
 
 # [Event]
 # EVENT_TYPE_RELATIVE_TIMER       ## CONSUMES
