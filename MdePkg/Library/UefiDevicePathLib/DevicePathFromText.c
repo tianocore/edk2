@@ -1810,6 +1810,37 @@ DevPathFromTextNVMe (
 }
 
 /**
+  Converts a text device path node to UFS device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created UFS device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextUfs (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16            *PunStr;
+  CHAR16            *LunStr;
+  UFS_DEVICE_PATH   *Ufs;
+
+  PunStr = GetNextParamStr (&TextDeviceNode);
+  LunStr = GetNextParamStr (&TextDeviceNode);
+  Ufs    = (UFS_DEVICE_PATH *) CreateDeviceNode (
+                                 MESSAGING_DEVICE_PATH,
+                                 MSG_UFS_DP,
+                                 (UINT16) sizeof (UFS_DEVICE_PATH)
+                                 );
+
+  Ufs->Pun = (UINT8) Strtoi (PunStr);
+  Ufs->Lun = (UINT8) Strtoi (LunStr);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) Ufs;
+}
+
+/**
   Converts a text device path node to Debug Port device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3079,6 +3110,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"SAS",                     DevPathFromTextSAS                     },
   {L"SasEx",                   DevPathFromTextSasEx                   },
   {L"NVMe",                    DevPathFromTextNVMe                    },
+  {L"UFS",                     DevPathFromTextUfs                     },
   {L"DebugPort",               DevPathFromTextDebugPort               },
   {L"MAC",                     DevPathFromTextMAC                     },
   {L"IPv4",                    DevPathFromTextIPv4                    },
