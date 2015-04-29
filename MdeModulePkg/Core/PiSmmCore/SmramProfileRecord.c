@@ -1793,6 +1793,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mMemoryTypeString[] = {
   L"EfiMemoryMappedIO",
   L"EfiMemoryMappedIOPortSpace",
   L"EfiPalCode",
+  L"EfiPersistentMemory",
   L"EfiOSReserved",
 };
 
