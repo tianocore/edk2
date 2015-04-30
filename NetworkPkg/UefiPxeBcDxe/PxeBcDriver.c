@@ -2,7 +2,7 @@
   Driver Binding functions implementationfor for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -442,6 +442,103 @@ PxeBcDestroyIp6Children (
   Private->Mode.Ipv6Available = FALSE;
 }
 
+/**
+  Check whether UNDI protocol supports IPv6.
+
+  @param[in]   ControllerHandle  Controller handle.
+  @param[in]   Private           Pointer to PXEBC_PRIVATE_DATA.
+  @param[out]  Ipv6Support       TRUE if UNDI supports IPv6.
+
+  @retval EFI_SUCCESS            Get the result whether UNDI supports IPv6 by NII or AIP protocol successfully.
+  @retval EFI_NOT_FOUND          Don't know whether UNDI supports IPv6 since NII or AIP is not available.
+
+**/
+EFI_STATUS
+PxeBcCheckIpv6Support (
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  PXEBC_PRIVATE_DATA           *Private,
+  OUT BOOLEAN                      *Ipv6Support
+  )
+{
+  EFI_HANDLE                       Handle;
+  EFI_ADAPTER_INFORMATION_PROTOCOL *Aip;
+  EFI_STATUS                       Status;
+  EFI_GUID                         *InfoTypesBuffer;
+  UINTN                            InfoTypeBufferCount;
+  UINTN                            TypeIndex;
+  BOOLEAN                          Supported;
+  VOID                             *InfoBlock;
+  UINTN                            InfoBlockSize;
+
+  ASSERT (Private != NULL && Ipv6Support != NULL);
+
+  //
+  // Check whether the UNDI supports IPv6 by NII protocol.
+  //
+  if (Private->Nii != NULL) {
+    *Ipv6Support = Private->Nii->Ipv6Supported;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Check whether the UNDI supports IPv6 by AIP protocol.
+  //
+
+  //
+  // Get the NIC handle by SNP protocol.
+  //  
+  Handle = NetLibGetSnpHandle (ControllerHandle, NULL);
+  if (Handle == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  Aip    = NULL;
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiAdapterInformationProtocolGuid,
+                  (VOID *) &Aip
+                  );
+  if (EFI_ERROR (Status) || Aip == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  InfoTypesBuffer     = NULL;
+  InfoTypeBufferCount = 0;
+  Status = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
+  if (EFI_ERROR (Status) || InfoTypesBuffer == NULL) {
+    FreePool (InfoTypesBuffer);
+    return EFI_NOT_FOUND;
+  }
+
+  Supported = FALSE;
+  for (TypeIndex = 0; TypeIndex < InfoTypeBufferCount; TypeIndex++) {
+    if (CompareGuid (&InfoTypesBuffer[TypeIndex], &gEfiAdapterInfoUndiIpv6SupportGuid)) {
+      Supported = TRUE;
+      break;
+    }
+  }
+
+  FreePool (InfoTypesBuffer);
+  if (!Supported) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // We now have adapter information block.
+  //
+  InfoBlock     = NULL;
+  InfoBlockSize = 0;
+  Status = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
+  if (EFI_ERROR (Status) || InfoBlock == NULL) {
+    FreePool (InfoBlock);
+    return EFI_NOT_FOUND;
+  }  
+
+  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
+  FreePool (InfoBlock);
+  return EFI_SUCCESS;
+
+}
 
 /**
   Create the opened instances based on IPv4.
@@ -1057,7 +1154,18 @@ PxeBcCreateIp6Children (
   // Set IPv6 avaiable flag and set default configure data for
   // Udp6Read and Ip6 instance.
   //
-  Private->Mode.Ipv6Available     = TRUE;
+  Status = PxeBcCheckIpv6Support (ControllerHandle, Private, &Private->Mode.Ipv6Available);
+  if (EFI_ERROR (Status)) {
+    //
+    // Fail to get the data whether UNDI supports IPv6. Set default value.
+    //
+    Private->Mode.Ipv6Available   = TRUE;
+  }
+
+  if (!Private->Mode.Ipv6Available) {
+    goto ON_ERROR;
+  }
+
   Udp6CfgData                     = &Private->Udp6CfgData;
   Ip6CfgData                      = &Private->Ip6CfgData;
 

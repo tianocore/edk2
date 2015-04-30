@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/PciIo.h>
 #include <Protocol/NetworkInterfaceIdentifier.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/AdapterInformation.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiRuntimeLib.h>
@@ -30,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include <IndustryStandard/Pci.h>
 
@@ -57,10 +59,12 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gUndiComponentName2;
 #define UNDI_DEV_SIGNATURE   SIGNATURE_32('u','n','d','i')
 #define UNDI_DEV_FROM_THIS(a) CR(a, UNDI32_DEV, NIIProtocol_31, UNDI_DEV_SIGNATURE)
 #define UNDI_DEV_FROM_NIC(a) CR(a, UNDI32_DEV, NicInfo, UNDI_DEV_SIGNATURE)
+#define UNDI_DEV_FROM_AIP(a) CR(a, UNDI32_DEV, Aip, UNDI_DEV_SIGNATURE)
 
 typedef struct {
   UINTN                                     Signature;
   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL NIIProtocol_31;
+  EFI_ADAPTER_INFORMATION_PROTOCOL          Aip;
   EFI_HANDLE                                DeviceHandle;
   EFI_DEVICE_PATH_PROTOCOL                  *Undi32BaseDevPath;
   EFI_DEVICE_PATH_PROTOCOL                  *Undi32DevPath;
@@ -342,5 +346,100 @@ INT32 validate_mcip (PXE_MAC_ADDR *MCastAddr);
 
 VOID PxeStructInit (PXE_SW_UNDI *PxePtr);
 VOID PxeUpdate (NIC_DATA_INSTANCE *NicPtr, PXE_SW_UNDI *PxePtr);
+
+//
+// functions defined in UndiAipImpl.c
+//
+
+/**
+  Returns the current state information for the adapter.
+
+  This function returns information of type InformationType from the adapter.
+  If an adapter does not support the requested informational type, then
+  EFI_UNSUPPORTED is returned. 
+
+  @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
+  @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
+  @param[out] InforamtionBlock       The service returns a pointer to the buffer with the InformationBlock
+                                     structure which contains details about the data specific to InformationType.
+  @param[out] InforamtionBlockSize   The driver returns the size of the InformationBlock in bytes.
+
+  @retval EFI_SUCCESS                The InformationType information was retrieved.
+  @retval EFI_UNSUPPORTED            The InformationType is not known.
+  @retval EFI_DEVICE_ERROR           The device reported an error.
+  @retval EFI_OUT_OF_RESOURCES       The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER      This is NULL. 
+  @retval EFI_INVALID_PARAMETER      InformationBlock is NULL. 
+  @retval EFI_INVALID_PARAMETER      InformationBlockSize is NULL.
+
+**/  
+EFI_STATUS
+EFIAPI
+UndiAipGetInfo (
+  IN   EFI_ADAPTER_INFORMATION_PROTOCOL *This,
+  IN   EFI_GUID                         *InformationType,
+  OUT  VOID                             **InformationBlock,
+  OUT  UINTN                            *InformationBlockSize
+  );
+
+/**
+  Sets state information for an adapter.
+
+  This function sends information of type InformationType for an adapter.
+  If an adapter does not support the requested information type, then EFI_UNSUPPORTED
+  is returned.
+
+  @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
+  @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
+  @param[in]  InforamtionBlock       A pointer to the InformationBlock structure which contains details
+                                     about the data specific to InformationType.
+  @param[in]  InforamtionBlockSize   The size of the InformationBlock in bytes.
+
+  @retval EFI_SUCCESS                The information was received and interpreted successfully.
+  @retval EFI_UNSUPPORTED            The InformationType is not known.
+  @retval EFI_DEVICE_ERROR           The device reported an error.
+  @retval EFI_INVALID_PARAMETER      This is NULL.
+  @retval EFI_INVALID_PARAMETER      InformationBlock is NULL.
+  @retval EFI_WRITE_PROTECTED        The InformationType cannot be modified using EFI_ADAPTER_INFO_SET_INFO().
+
+**/                        
+EFI_STATUS
+EFIAPI
+UndiAipSetInfo (
+  IN   EFI_ADAPTER_INFORMATION_PROTOCOL *This,
+  IN   EFI_GUID                         *InformationType,
+  IN   VOID                             *InformationBlock,
+  IN   UINTN                            InformationBlockSize
+  );
+
+/**
+  Get a list of supported information types for this instance of the protocol.
+
+  This function returns a list of InformationType GUIDs that are supported on an
+  adapter with this instance of EFI_ADAPTER_INFORMATION_PROTOCOL. The list is returned
+  in InfoTypesBuffer, and the number of GUID pointers in InfoTypesBuffer is returned in
+  InfoTypesBufferCount.
+
+  @param[in]  This                  A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
+  @param[out] InfoTypesBuffer       A pointer to the list of InformationType GUID pointers that are supported
+                                    by This.
+  @param[out] InfoTypesBufferCount  A pointer to the number of GUID pointers present in InfoTypesBuffer.
+
+  @retval EFI_SUCCESS               The list of information type GUIDs that are supported on this adapter was
+                                    returned in InfoTypesBuffer. The number of information type GUIDs was
+                                    returned in InfoTypesBufferCount.
+  @retval EFI_INVALID_PARAMETER     This is NULL.
+  @retval EFI_INVALID_PARAMETER     InfoTypesBuffer is NULL.
+  @retval EFI_INVALID_PARAMETER     InfoTypesBufferCount is NULL.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough pool memory to store the results.
+
+**/                        
+EFI_STATUS
+EFIAPI
+UndiAipGetSupportedTypes (
+  IN    EFI_ADAPTER_INFORMATION_PROTOCOL *This,
+  OUT   EFI_GUID                         **InfoTypesBuffer,
+  OUT   UINTN                            *InfoTypesBufferCount
+  );
 
 #endif

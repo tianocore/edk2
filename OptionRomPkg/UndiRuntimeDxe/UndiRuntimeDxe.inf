@@ -36,10 +36,10 @@
   Decode.c
   Init.c
   ComponentName.c
+  UndiAipImpl.c
 
 [Packages]
   MdePkg/MdePkg.dec
-
 
 [LibraryClasses]
   UefiLib
@@ -49,15 +49,18 @@
   UefiRuntimeLib
   UefiDriverEntryPoint
   BaseLib
+  MemoryAllocationLib
 
 [Protocols]
   gEfiNetworkInterfaceIdentifierProtocolGuid_31
   gEfiPciIoProtocolGuid
   gEfiDevicePathProtocolGuid
+  gEfiAdapterInformationProtocolGuid
 
 [Guids]
   gEfiEventExitBootServicesGuid        ## PRODUCES ## Event
   gEfiEventVirtualAddressChangeGuid    ## PRODUCES ## Event
+  gEfiAdapterInfoUndiIpv6SupportGuid   ## PRODUCES
 
 [Depex]
   gEfiBdsArchProtocolGuid AND

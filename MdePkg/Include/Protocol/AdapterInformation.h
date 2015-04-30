@@ -3,7 +3,7 @@
   The EFI Adapter Information Protocol is used to dynamically and quickly discover
   or set device information for an adapter.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -41,6 +41,11 @@
     0x114da5ef, 0x2cf1, 0x4e12, {0x9b, 0xbb, 0xc4, 0x70, 0xb5, 0x52, 0x5, 0xd9 } \
   }
 
+#define EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT_GUID \
+  { \
+    0x4bd56be3, 0x4975, 0x4d8a, {0xa0, 0xad, 0xc4, 0x91, 0x20, 0x4b, 0x5d, 0x4d} \
+  }
+
 typedef struct _EFI_ADAPTER_INFORMATION_PROTOCOL EFI_ADAPTER_INFORMATION_PROTOCOL;
 
 ///
@@ -54,7 +59,7 @@ typedef struct {
   /// not any media attached to the network.
   ///
   EFI_STATUS                    MediaState;
-}EFI_ADAPTER_INFO_MEDIA_STATE;
+} EFI_ADAPTER_INFO_MEDIA_STATE;
 
 ///
 /// EFI_ADAPTER_INFO_NETWORK_BOOT
@@ -96,7 +101,7 @@ typedef struct {
   /// TRUE if the adapter is currently configured to boot from FCoE targets.
   ///
   BOOLEAN                       FCoeBoot;
-}EFI_ADAPTER_INFO_NETWORK_BOOT;
+} EFI_ADAPTER_INFO_NETWORK_BOOT;
 
 ///
 /// EFI_ADAPTER_INFO_SAN_MAC_ADDRESS
@@ -107,7 +112,17 @@ typedef struct {
   /// networking and Fibre-Channel Over Ethernet (FCOE), this conveys the FCOE SAN MAC address from the adapter.
   ///
   EFI_MAC_ADDRESS                    SanMacAddress;
-}EFI_ADAPTER_INFO_SAN_MAC_ADDRESS;
+} EFI_ADAPTER_INFO_SAN_MAC_ADDRESS;
+
+///
+/// EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT
+///
+typedef struct {
+  ///
+  /// Returns capability of UNDI to support IPv6 traffic.
+  ///
+  BOOLEAN                            Ipv6Support; 
+} EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT;
 
 /**
   Returns the current state information for the adapter.
@@ -220,5 +235,7 @@ extern EFI_GUID gEfiAdapterInfoMediaStateGuid;
 extern EFI_GUID gEfiAdapterInfoNetworkBootGuid;
 
 extern EFI_GUID gEfiAdapterInfoSanMacAddressGuid;
+
+extern EFI_GUID gEfiAdapterInfoUndiIpv6SupportGuid;
 
 #endif

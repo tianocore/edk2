@@ -435,7 +435,7 @@ UndiDriverStart (
   UNDI32Device->NIIProtocol_31.MinorVer       = PXE_ROMID_MINORVER_31;
   UNDI32Device->NIIProtocol_31.ImageSize      = 0;
   UNDI32Device->NIIProtocol_31.ImageAddr      = 0;
-  UNDI32Device->NIIProtocol_31.Ipv6Supported  = FALSE;
+  UNDI32Device->NIIProtocol_31.Ipv6Supported  = TRUE;
 
   UNDI32Device->NIIProtocol_31.StringId[0]    = 'U';
   UNDI32Device->NIIProtocol_31.StringId[1]    = 'N';
@@ -443,6 +443,10 @@ UndiDriverStart (
   UNDI32Device->NIIProtocol_31.StringId[3]    = 'I';
 
   UNDI32Device->DeviceHandle                  = NULL;
+
+  UNDI32Device->Aip.GetInformation            = UndiAipGetInfo;
+  UNDI32Device->Aip.SetInformation            = UndiAipSetInfo;
+  UNDI32Device->Aip.GetSupportedTypes         = UndiAipGetSupportedTypes;
 
   //
   // install both the 3.0 and 3.1 NII protocols.
@@ -453,6 +457,8 @@ UndiDriverStart (
                   &UNDI32Device->NIIProtocol_31,
                   &gEfiDevicePathProtocolGuid,
                   UNDI32Device->Undi32DevPath,
+                  &gEfiAdapterInformationProtocolGuid,
+                  &UNDI32Device->Aip,
                   NULL
                   );
 
@@ -497,6 +503,8 @@ UndiErrorAllocDataPointer:
                   &UNDI32Device->NIIProtocol_31,
                   &gEfiDevicePathProtocolGuid,
                   UNDI32Device->Undi32DevPath,
+                  &gEfiAdapterInformationProtocolGuid,
+                  &UNDI32Device->Aip,
                   NULL
                   );
 
