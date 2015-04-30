@@ -16,7 +16,7 @@
 
 #pragma pack(1)
 
-#define FSP_PATCH_TABLE_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'P')
+#define FSP_PATCH_TABLE_SIGNATURE  FSP_FSPP_SIGNATURE
 
 typedef struct  {
   UINT32  Signature;

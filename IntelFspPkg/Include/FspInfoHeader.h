@@ -163,6 +163,12 @@ typedef struct  {
 
 } FSP_INFO_EXTENDED_HEADER;
 
+//
+// A generic table search algorithm for additional tables can be implemented with a
+// signature search algorithm until a terminator signature 'FSPP' is found.
+//
+#define FSP_FSPP_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'P')
+
 #pragma pack()
 
 #endif
