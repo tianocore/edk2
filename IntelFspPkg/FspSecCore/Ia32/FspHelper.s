@@ -23,16 +23,16 @@ ASM_PFX(FspInfoHeaderRelativeOff):
    .long    0x012345678
 
 
-ASM_GLOBAL ASM_PFX(GetFspBaseAddress)
-ASM_PFX(GetFspBaseAddress):
-   mov    $GetFspBaseAddress, %eax
+ASM_GLOBAL ASM_PFX(AsmGetFspBaseAddress)
+ASM_PFX(AsmGetFspBaseAddress):
+   mov    $AsmGetFspBaseAddress, %eax
    sub    $FspInfoHeaderRelativeOff, %eax
    add    $0x01C, %eax
    mov    (%eax), %eax
    ret
 
-ASM_GLOBAL ASM_PFX(GetFspInfoHdr)
-ASM_PFX(GetFspInfoHdr):
-   mov    $GetFspBaseAddress, %eax
+ASM_GLOBAL ASM_PFX(AsmGetFspInfoHeader)
+ASM_PFX(AsmGetFspInfoHeader):
+   mov    $AsmGetFspBaseAddress, %eax
    sub    $FspInfoHeaderRelativeOff, %eax
    ret

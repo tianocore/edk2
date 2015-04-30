@@ -32,7 +32,7 @@ FspGetExceptionHandler(
   IA32_IDT_GATE_DESCRIPTOR *IdtGateDescriptor;
   FSP_INFO_HEADER          *FspInfoHeader;
 
-  FspInfoHeader     = (FSP_INFO_HEADER *)(GetFspBaseAddress() + FSP_INFO_HEADER_OFF);
+  FspInfoHeader     = (FSP_INFO_HEADER *)AsmGetFspInfoHeader();
   ExceptionHandler  = IdtEntryTemplate;
   IdtGateDescriptor = (IA32_IDT_GATE_DESCRIPTOR *)&ExceptionHandler;
   Entry = (IdtGateDescriptor->Bits.OffsetHigh << 16) | IdtGateDescriptor->Bits.OffsetLow;
@@ -171,7 +171,7 @@ FspGlobalDataInit (
   // Get FSP Header offset
   // It may have multiple FVs, so look into the last one for FSP header
   //
-  PeiFspData->FspInfoHeader      = (FSP_INFO_HEADER *)(GetFspBaseAddress() + FSP_INFO_HEADER_OFF);
+  PeiFspData->FspInfoHeader      = (FSP_INFO_HEADER *)AsmGetFspInfoHeader();
   SecGetPlatformData (PeiFspData);
 
   //

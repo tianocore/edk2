@@ -215,8 +215,8 @@ ASM_GLOBAL    ASM_PFX(FspApiCallingCheck)
 #
 # Following functions will be provided in PlatformSecLib
 #
-ASM_GLOBAL    ASM_PFX(GetFspBaseAddress)
-ASM_GLOBAL    ASM_PFX(GetFspInfoHdr)
+ASM_GLOBAL    ASM_PFX(AsmGetFspBaseAddress)
+ASM_GLOBAL    ASM_PFX(AsmGetFspInfoHeader)
 ASM_GLOBAL    ASM_PFX(GetBootFirmwareVolumeOffset)
 ASM_GLOBAL    ASM_PFX(Loader2PeiSwitchStack)
 
@@ -718,7 +718,7 @@ FspApiCommonL1:
   jz      FspApiCommonL2
   cmpl    $0x03, %eax                        # FspMemoryInit API
   jz      FspApiCommonL2
-  call    ASM_PFX(GetFspInfoHdr)
+  call    ASM_PFX(AsmGetFspInfoHeader)
   jmp     Loader2PeiSwitchStack
 
 FspApiCommonL2:
@@ -735,7 +735,7 @@ FspApiCommonL2:
   # Update the FspInfoHeader pointer
   #
   pushl  %eax
-  call   ASM_PFX(GetFspInfoHdr)
+  call   ASM_PFX(AsmGetFspInfoHeader)
   movl   %eax, 4(%esp)
   popl   %eax
 
@@ -773,7 +773,7 @@ FspApiCommonL2:
   #
   # Pass entry point of the PEI core
   #
-  call    ASM_PFX(GetFspBaseAddress)
+  call    ASM_PFX(AsmGetFspBaseAddress)
   movl    %eax, %edi
   addl    PcdGet32(PcdFspAreaSize), %edi
   subl    $0x20, %edi
@@ -787,7 +787,7 @@ FspApiCommonL2:
   # PcdFspAreaBaseAddress are the same. For FSP with mulitple FVs,
   # they are different. The code below can handle both cases.
   #
-  call    ASM_PFX(GetFspBaseAddress)
+  call    ASM_PFX(AsmGetFspBaseAddress)
   movl    %eax, %edi
   call    ASM_PFX(GetBootFirmwareVolumeOffset)
   addl    %edi, %eax

@@ -22,18 +22,18 @@ FspInfoHeaderRelativeOff    PROC      NEAR    PUBLIC
    DD    012345678h
 FspInfoHeaderRelativeOff    ENDP
 
-GetFspBaseAddress           PROC      NEAR    PUBLIC
-   mov   eax, GetFspBaseAddress
+AsmGetFspBaseAddress        PROC      NEAR    PUBLIC
+   mov   eax, AsmGetFspBaseAddress
    sub   eax, dword ptr [FspInfoHeaderRelativeOff]
    add   eax, 01Ch
    mov   eax, dword ptr [eax]
    ret
-GetFspBaseAddress           ENDP
+AsmGetFspBaseAddress        ENDP
 
-GetFspInfoHdr               PROC      NEAR    PUBLIC
-   mov   eax, GetFspBaseAddress
+AsmGetFspInfoHeader         PROC      NEAR    PUBLIC
+   mov   eax, AsmGetFspBaseAddress
    sub   eax, dword ptr [FspInfoHeaderRelativeOff]
    ret
-GetFspInfoHdr               ENDP
+AsmGetFspInfoHeader         ENDP
 
      END

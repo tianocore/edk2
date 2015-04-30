@@ -37,8 +37,8 @@ EXTERN   FspApiCallingCheck:PROC
 ;
 ; Following functions will be provided in PlatformSecLib
 ;
-EXTERN   GetFspBaseAddress:PROC
-EXTERN   GetFspInfoHdr:PROC
+EXTERN   AsmGetFspBaseAddress:PROC
+EXTERN   AsmGetFspInfoHeader:PROC
 EXTERN   GetBootFirmwareVolumeOffset:PROC
 EXTERN   Loader2PeiSwitchStack:PROC
 EXTERN   LoadMicrocode(LoadMicrocodeDefault):PROC
@@ -506,7 +506,7 @@ FspApiCommon   PROC C PUBLIC
   cmp    eax, 3   ; FspMemoryInit API
   jz     @F
 
-  call   GetFspInfoHdr
+  call   AsmGetFspInfoHeader
   jmp    Loader2PeiSwitchStack
 
 @@:
@@ -523,7 +523,7 @@ FspApiCommon   PROC C PUBLIC
   ; Update the FspInfoHeader pointer
   ;
   push   eax
-  call   GetFspInfoHdr
+  call   AsmGetFspInfoHeader
   mov    [esp + 4], eax
   pop    eax
 
@@ -559,7 +559,7 @@ FspApiCommon   PROC C PUBLIC
   ;
   ; Pass entry point of the PEI core
   ;
-  call    GetFspBaseAddress
+  call    AsmGetFspBaseAddress
   mov     edi, eax
   add     edi, PcdGet32 (PcdFspAreaSize) 
   sub     edi, 20h
@@ -573,7 +573,7 @@ FspApiCommon   PROC C PUBLIC
   ; PcdFspAreaBaseAddress are the same. For FSP with mulitple FVs,
   ; they are different. The code below can handle both cases.
   ;
-  call    GetFspBaseAddress
+  call    AsmGetFspBaseAddress
   mov     edi, eax
   call    GetBootFirmwareVolumeOffset
   add     eax, edi
