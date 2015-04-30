@@ -1,16 +1,16 @@
 #/** @file
 # platform configuration file.
 #
-# Copyright (c) 2012  - 2014, Intel Corporation. All rights reserved.<BR>
-#                                                                                  
-# This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.  
-# The full text of the license may be found at                                     
-# http://opensource.org/licenses/bsd-license.php.                                  
-#                                                                                  
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-#                                                                                  
+# Copyright (c) 2012  - 2015, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                  
 #
 #**/
 
@@ -43,11 +43,16 @@ DEFINE CLKGEN_CONFIG_EXTRA_ENABLE=TRUE
 #
 DEFINE USE_HPET_TIMER = FALSE
 
+
 #
 # Feature selection
 #
 
 DEFINE TPM_ENABLED = FALSE
+
+DEFINE SEC_ENABLE = FALSE
+DEFINE SEC_DEBUG_INFO_ENABLE = FALSE
+DEFINE FTPM_ENABLE = FALSE
 
 DEFINE ACPI50_ENABLE = TRUE
 DEFINE PERFORMANCE_ENABLE = FALSE

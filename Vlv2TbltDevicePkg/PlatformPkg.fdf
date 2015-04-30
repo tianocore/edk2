@@ -1,7 +1,7 @@
 #/** @file
 # FDF file of Platform.
 #
-# Copyright (c) 2008  - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008  - 2015, Intel Corporation. All rights reserved.<BR>
 #                                                                                  
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.  
@@ -294,6 +294,9 @@ INF SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf
 INF SecurityPkg/Tcg/TcgPei/TcgPei.inf
 INF SecurityPkg/Tcg/PhysicalPresencePei/PhysicalPresencePei.inf
 !endif
+!if $(FTPM_ENABLE) == TRUE
+INF  SecurityPkg/Tcg/TrEEPei/TrEEPei.inf #use PCD config
+!endif
 INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 !if $(ACPI50_ENABLE) == TRUE
@@ -347,6 +350,10 @@ INF $(PLATFORM_PACKAGE)/PlatformPei/PlatformPei.inf
 
 !if $(MINNOW2_FSP_BUILD) == FALSE
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/SeCUma.inf
+!endif
+
+!if $(FTPM_ENABLE) == TRUE
+INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 !endif
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -497,10 +504,23 @@ INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET
 INF IntelFrameworkModulePkg/Universal/LegacyRegionDxe/LegacyRegionDxe.inf
 INF Vlv2TbltDevicePkg/VlvPlatformInitDxe/VlvPlatformInitDxe.inf
 !endif
+!if $(MINNOW2_FSP_BUILD) == FALSE
+  !if $(SEC_ENABLE) == TRUE
+  INF  RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/HeciDrv.inf
+  INF  RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/SeCPolicyInitDxe.inf
+  !endif
+!endif
 !if $(TPM_ENABLED) == TRUE
 INF SecurityPkg/Tcg/TcgConfigDxe/TcgConfigDxe.inf
 INF SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
 INF RuleOverride = DRIVER_ACPITABLE SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
+!endif
+!if $(FTPM_ENABLE) == TRUE
+INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/Tpm2DeviceSeCPei.inf
+INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/Tpm2DeviceSeCDxe.inf
+INF SecurityPkg/Tcg/MemoryOverwriteControl/TcgMor.inf
+INF SecurityPkg/Tcg/TrEEDxe/TrEEDxe.inf
+INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/FtpmSmm.inf
 !endif
 
 #
@@ -1010,6 +1030,7 @@ FV = BiosUpdate
   FILE SMM = $(NAMED_GUID) {
     SMM_DEPEX SMM_DEPEX                |.depex
     PE32      PE32                     |.efi
+    RAW       BIN  Optional            |.aml
     UI        STRING="$(MODULE_NAME)" Optional
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
