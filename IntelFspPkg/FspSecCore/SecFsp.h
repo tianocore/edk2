@@ -80,7 +80,19 @@ FspDataPointerFixUp (
 **/
 UINT32
 EFIAPI
-GetFspBaseAddress (
+AsmGetFspBaseAddress (
+  VOID
+  );
+
+/**
+  This interface gets FspInfoHeader pointer
+
+  @return   FSP binary base address.
+
+**/
+UINT32
+EFIAPI
+AsmGetFspInfoHeader (
   VOID
   );
 

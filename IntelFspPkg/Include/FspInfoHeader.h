@@ -29,6 +29,8 @@
 
 #define  OFFSET_IN_FSP_INFO_HEADER(x)  (UINT32)&((FSP_INFO_HEADER *)(UINTN)0)->x
 
+#define FSP_INFO_HEADER_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'H')
+
 #pragma pack(1)
 
 typedef struct  {
@@ -124,6 +126,8 @@ typedef struct  {
 ///
 /// Below structure is added in FSP version 2
 ///
+#define FSP_INFO_EXTENDED_HEADER_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'E')
+
 typedef struct  {
   ///
   /// Byte 0x00: Signature ('FSPE') for the FSP Extended Information Header
