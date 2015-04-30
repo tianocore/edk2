@@ -39,7 +39,9 @@ AsmFlushCacheLine   PROC
     ; then promote flush range to flush entire cache.
     ;
     mov     eax, 1
+    push    ebx
     cpuid
+    pop     ebx
     mov     eax, [esp + 4]
     test    edx, BIT19
     jz      @F

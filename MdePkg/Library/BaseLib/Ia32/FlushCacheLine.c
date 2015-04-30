@@ -45,7 +45,7 @@ AsmFlushCacheLine (
     cpuid
     test    edx, BIT19
     jz      NoClflush
-    mov     eax, [esp + 4]
+    mov     eax, dword ptr [LinearAddress]
     clflush [eax]
     jmp     Done
 NoClflush:
