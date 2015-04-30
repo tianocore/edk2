@@ -785,7 +785,7 @@ CommandGo (
 }
 
 /**
-  Exectue Stepping command.
+  Execute Stepping command.
 
   @param[in] CpuContext        Pointer to saved CPU context.
 
@@ -800,6 +800,39 @@ CommandStepping (
   Eflags = (IA32_EFLAGS32 *) &CpuContext->Eflags;
   Eflags->Bits.TF = 1;
   Eflags->Bits.RF = 1;
+  //
+  // Save and clear EFLAGS.IF to avoid interrupt happen when executing Stepping
+  //
+  SetDebugFlag (DEBUG_AGENT_FLAG_INTERRUPT_FLAG, Eflags->Bits.IF);
+  Eflags->Bits.IF = 0;
+  //
+  // Set Stepping Flag
+  //
+  SetDebugFlag (DEBUG_AGENT_FLAG_STEPPING, 1);
+}
+
+/**
+  Do some cleanup after Stepping command done.
+
+  @param[in] CpuContext        Pointer to saved CPU context.
+
+**/
+VOID
+CommandSteppingCleanup (
+  IN DEBUG_CPU_CONTEXT          *CpuContext
+  )
+{
+  IA32_EFLAGS32                *Eflags;
+
+  Eflags = (IA32_EFLAGS32 *) &CpuContext->Eflags;
+  //
+  // Restore EFLAGS.IF
+  //
+  Eflags->Bits.IF = GetDebugFlag (DEBUG_AGENT_FLAG_INTERRUPT_FLAG);
+  //
+  // Clear Stepping flag
+  //
+  SetDebugFlag (DEBUG_AGENT_FLAG_STEPPING, 0);
 }
 
 /**
@@ -1302,8 +1335,12 @@ GetBreakCause (
       if ((CpuContext->Dr6 & BIT14) != 0) {
         Cause = DEBUG_DATA_BREAK_CAUSE_STEPPING;
         //
-        // If it's single step, no need to check DR0, to ensure single step work in PeCoffExtraActionLib
-        // (right after triggering a breakpoint to report image load/unload).
+        // DR6.BIT14 Indicates (when set) that the debug exception was
+        // triggered by the single step execution mode.
+        // The single-step mode is the highest priority debug exception.
+        // This is single step, no need to check DR0, to ensure single step
+        // work in PeCoffExtraActionLib (right after triggering a breakpoint
+        // to report image load/unload).
         //
         return Cause;
 
@@ -2066,10 +2103,6 @@ CommandCommunication (
       }
 
       mDebugMpContext.BreakAtCpuIndex = (UINT32) (-1);
-      //
-      // Set Stepping Flag
-      //
-      SetDebugFlag (DEBUG_AGENT_FLAG_STEPPING, 1);
       ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
       //
       // Executing stepping command directly without sending ACK packet,
@@ -2363,9 +2396,16 @@ InterruptProcess (
     // Check if this exception is issued by Debug Agent itself
     // If yes, fill the debug agent exception buffer and LongJump() back to
     // the saved CPU content in CommandCommunication()
+    // If exception is issued when executing Stepping, will be handled in
+    // exception handle procedure.
     //
     if (GetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS) == 1) {
-      DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "Debug agent meet one Exception, ExceptionNum is %d, EIP = 0x%x.\n", Vector, (UINTN)CpuContext->Eip);
+      DebugAgentMsgPrint (
+        DEBUG_AGENT_ERROR,
+        "Debug agent meet one Exception, ExceptionNum is %d, EIP = 0x%x.\n",
+        Vector,
+        (UINTN)CpuContext->Eip
+        );
       ExceptionBuffer = (DEBUG_AGENT_EXCEPTION_BUFFER *) (UINTN) GetMailboxPointer()->ExceptionBufferPointer;
       ExceptionBuffer->ExceptionContent.ExceptionNum  = (UINT8) Vector;
       ExceptionBuffer->ExceptionContent.ExceptionData = (UINT32) CpuContext->ExceptionData;
@@ -2405,11 +2445,11 @@ InterruptProcess (
       if (MultiProcessorDebugSupport()) {
         mDebugMpContext.BreakAtCpuIndex = ProcessorIndex;
       }
+      //
+      // Clear Stepping Flag and restore EFLAGS.IF
+      //
+      CommandSteppingCleanup (CpuContext);
       SendAckPacket (DEBUG_COMMAND_OK);
-      //
-      // Clear Stepping Flag
-      //
-      SetDebugFlag (DEBUG_AGENT_FLAG_STEPPING, 0);
       CommandCommunication (Vector, CpuContext, BreakReceived);
       break;
 
@@ -2575,13 +2615,24 @@ InterruptProcess (
 
   default:
     if (Vector <= DEBUG_EXCEPT_SIMD) {
+      DebugAgentMsgPrint (
+        DEBUG_AGENT_ERROR,
+        "Exception happened, ExceptionNum is %d, EIP = 0x%x.\n",
+        Vector,
+        (UINTN) CpuContext->Eip
+        );
       if (BreakCause == DEBUG_DATA_BREAK_CAUSE_STEPPING) {
         //
-        // Stepping is finished, send Ack package.
+        // If exception happened when executing Stepping, send Ack package.
+        // HOST consider Stepping command was finished.
         //
         if (MultiProcessorDebugSupport()) {
           mDebugMpContext.BreakAtCpuIndex = ProcessorIndex;
         }
+        //
+        // Clear Stepping flag and restore EFLAGS.IF
+        //
+        CommandSteppingCleanup (CpuContext);
         SendAckPacket (DEBUG_COMMAND_OK);
       } else {
         //

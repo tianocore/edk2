@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -481,7 +481,8 @@ typedef enum {
   EfiAcpiAddressRangeMemory   = 1,
   EfiAcpiAddressRangeReserved = 2,
   EfiAcpiAddressRangeACPI     = 3,
-  EfiAcpiAddressRangeNVS      = 4
+  EfiAcpiAddressRangeNVS      = 4,
+  EfiAddressRangePersistentMemory = 7
 } EFI_ACPI_MEMORY_TYPE;
 
 typedef struct {

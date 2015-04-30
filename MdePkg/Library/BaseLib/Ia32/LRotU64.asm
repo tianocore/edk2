@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -40,9 +40,11 @@ InternalMathLRotU64 PROC    USES    ebx
     ror     ebx, cl
     shld    eax, ebx, cl
     test    cl, 32                      ; Count >= 32?
-    cmovnz  ecx, eax
-    cmovnz  eax, edx
-    cmovnz  edx, ecx
+    jz      @F
+    mov     ecx, eax
+    mov     eax, edx
+    mov     edx, ecx
+@@:    
     ret
 InternalMathLRotU64 ENDP
 

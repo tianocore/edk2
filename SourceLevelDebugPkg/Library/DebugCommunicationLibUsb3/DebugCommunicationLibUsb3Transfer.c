@@ -277,7 +277,7 @@ XhcCheckUrbResult (
       //
       // The length of data which were transferred.
       //
-      CheckedUrb->Completed += (CheckedUrb->DataLen - EvtTrb->Length);
+      CheckedUrb->Completed += (((TRANSFER_TRB_NORMAL*)TRBPtr)->Length - EvtTrb->Length);
     } else {
       CheckedUrb->Result  |= EFI_USB_ERR_TIMEOUT;
     }

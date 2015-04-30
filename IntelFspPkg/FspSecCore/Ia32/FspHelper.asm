@@ -15,7 +15,7 @@
     .model  flat,C
     .code
 
-FspInfoHeaderRelativeOff    PROC      NEAR    PRIVATE
+FspInfoHeaderRelativeOff    PROC      NEAR    PUBLIC
    ;
    ; This value will be pached by the build script
    ;
@@ -29,5 +29,11 @@ GetFspBaseAddress           PROC      NEAR    PUBLIC
    mov   eax, dword ptr [eax]
    ret
 GetFspBaseAddress           ENDP
+
+GetFspInfoHdr               PROC      NEAR    PUBLIC
+   mov   eax, GetFspBaseAddress
+   sub   eax, dword ptr [FspInfoHeaderRelativeOff]
+   ret
+GetFspInfoHdr               ENDP
 
      END

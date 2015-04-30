@@ -10,7 +10,7 @@
   Block I/O PPIs that are provided by the PEI ATAPI driver and PEI legacy floppy 
   driver are the same, here we define a set of general PPIs for both drivers to use.
   
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -54,6 +54,9 @@ typedef enum {
   IdeCDROM      = 1,   ///< The recovery device is an IDE CD-ROM
   IdeLS120      = 2,   ///< The recovery device is an IDE LS-120
   UsbMassStorage= 3,   ///< The recovery device is a USB Mass Storage device
+  SD            = 4,   ///< The recovery device is a Secure Digital device
+  EMMC          = 5,   ///< The recovery device is a eMMC device
+  UfsDevice     = 6,   ///< The recovery device is a Universal Flash Storage device
   MaxDeviceType
 } EFI_PEI_BLOCK_DEVICE_TYPE;
 

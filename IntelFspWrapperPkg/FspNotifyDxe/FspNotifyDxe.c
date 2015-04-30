@@ -120,7 +120,11 @@ FspDxeEntryPoint (
   VOID       *Registration;
   EFI_EVENT  ProtocolNotifyEvent;
 
-  mFspHeader = FspFindFspHeader (PcdGet32 (PcdFlashFvFspBase));
+  if (PcdGet32 (PcdFlashFvSecondFspBase) == 0) {
+    mFspHeader = FspFindFspHeader (PcdGet32 (PcdFlashFvFspBase));
+  } else {
+    mFspHeader = FspFindFspHeader (PcdGet32 (PcdFlashFvSecondFspBase));
+  }
   DEBUG ((DEBUG_INFO, "FspHeader - 0x%x\n", mFspHeader));
   if (mFspHeader == NULL) {
     return EFI_DEVICE_ERROR;

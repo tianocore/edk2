@@ -1,7 +1,7 @@
 /** @file
   Cache Maintenance Functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,12 +16,6 @@
 #include <Base.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-
-//
-// This size must be at or below the smallest cache size possible among all
-// supported processors
-//
-#define CACHE_LINE_SIZE             0x20
 
 /**
   Invalidates the entire instruction cache in cache coherency domain of the
@@ -128,6 +122,9 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
+  UINT32                            RegEbx;
+  UINT32                            RegEdx;
+  UINTN                             CacheLineSize;
   UINTN                             Start;
   UINTN                             End;
 
@@ -137,15 +134,30 @@ WriteBackInvalidateDataCacheRange (
 
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Address));
 
+  //
+  // If the CPU does not support CLFLUSH instruction, 
+  // then promote flush range to flush entire cache.
+  //
+  AsmCpuid (0x01, NULL, &RegEbx, NULL, &RegEdx);
+  if ((RegEdx & BIT19) == 0) {
+    AsmWbinvd ();
+    return Address;
+  }
+
+  //
+  // Cache line size is 8 * Bits 15-08 of EBX returned from CPUID 01H
+  //
+  CacheLineSize = (RegEbx & 0xff00) >> 5;
+
   Start = (UINTN)Address;
   //
   // Calculate the cache line alignment
-  // 
-  End = (Start + Length + (CACHE_LINE_SIZE - 1)) & ~(CACHE_LINE_SIZE - 1);
-  Start &= ~((UINTN) CACHE_LINE_SIZE - 1);
+  //
+  End = (Start + Length + (CacheLineSize - 1)) & ~(CacheLineSize - 1);
+  Start &= ~((UINTN)CacheLineSize - 1);
 
   do {
-    Start = (UINTN)AsmFlushCacheLine ((VOID*)Start) + CACHE_LINE_SIZE;
+    Start = (UINTN)AsmFlushCacheLine ((VOID*)Start) + CacheLineSize;
   } while (Start != End);
   return Address;
 }

@@ -1,7 +1,7 @@
 /** @file
   function declarations for shell environment functions.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,9 @@
 **/
 
 #include "Shell.h"
+
+#define INIT_NAME_BUFFER_SIZE  128
+#define INIT_DATA_BUFFER_SIZE  1024
 
 /**
   Reports whether an environment variable is Volatile or Non-Volatile.
@@ -125,59 +128,72 @@ GetEnvironmentVariableList(
 {
   CHAR16            *VariableName;
   UINTN             NameSize;
-  UINT64            MaxStorSize;
-  UINT64            RemStorSize;
-  UINT64            MaxVarSize;
+  UINTN             NameBufferSize;
   EFI_STATUS        Status;
   EFI_GUID          Guid;
   UINTN             ValSize;
+  UINTN             ValBufferSize;
   ENV_VAR_LIST      *VarList;
 
   if (ListHead == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
-
-  if (gRT->Hdr.Revision >= EFI_2_00_SYSTEM_TABLE_REVISION) {
-    Status = gRT->QueryVariableInfo(EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS, &MaxStorSize, &RemStorSize, &MaxVarSize);
-    if (EFI_ERROR(Status)) {
-      return (Status);
-    }
-  } else {
-    Status = EFI_SUCCESS;
-    MaxVarSize = 16384;
-  }
-
-  NameSize = (UINTN)MaxVarSize;
-  VariableName = AllocateZeroPool(NameSize);
+  
+  Status = EFI_SUCCESS;
+  
+  ValBufferSize = INIT_DATA_BUFFER_SIZE;
+  NameBufferSize = INIT_NAME_BUFFER_SIZE;
+  VariableName = AllocateZeroPool(NameBufferSize);
   if (VariableName == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
   *VariableName = CHAR_NULL;
 
   while (!EFI_ERROR(Status)) {
-    NameSize = (UINTN)MaxVarSize;
+    NameSize = NameBufferSize;
     Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     if (Status == EFI_NOT_FOUND){
       Status = EFI_SUCCESS;
       break;
+    } else if (Status == EFI_BUFFER_TOO_SMALL) {
+      NameBufferSize = NameSize > NameBufferSize * 2 ? NameSize : NameBufferSize * 2;
+      SHELL_FREE_NON_NULL(VariableName);
+      VariableName = AllocateZeroPool(NameBufferSize);
+      if (VariableName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
+      NameSize = NameBufferSize;
+      Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     }
+    
     if (!EFI_ERROR(Status) && CompareGuid(&Guid, &gShellVariableGuid)){
       VarList = AllocateZeroPool(sizeof(ENV_VAR_LIST));
       if (VarList == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
       } else {
-        ValSize = 0;
+        ValSize = ValBufferSize;
+        VarList->Val = AllocateZeroPool(ValSize);
+        if (VarList->Val == NULL) {
+            SHELL_FREE_NON_NULL(VarList);
+            Status = EFI_OUT_OF_RESOURCES;
+            break;
+        }
         Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
         if (Status == EFI_BUFFER_TOO_SMALL){
-          VarList->Val = AllocateZeroPool(ValSize);
+          ValBufferSize = ValSize > ValBufferSize * 2 ? ValSize : ValBufferSize * 2;
+          SHELL_FREE_NON_NULL (VarList->Val);
+          VarList->Val = AllocateZeroPool(ValBufferSize);
           if (VarList->Val == NULL) {
             SHELL_FREE_NON_NULL(VarList);
             Status = EFI_OUT_OF_RESOURCES;
-          } else {
-            Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
+            break;
           }
+          
+          ValSize = ValBufferSize;
+          Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
         }
-        if (!EFI_ERROR(Status) && VarList != NULL) {
+        if (!EFI_ERROR(Status)) {
           VarList->Key = AllocateCopyPool(StrSize(VariableName), VariableName);
           if (VarList->Key == NULL) {
             SHELL_FREE_NON_NULL(VarList->Val);
@@ -186,11 +202,14 @@ GetEnvironmentVariableList(
           } else {
             InsertTailList(ListHead, &VarList->Link);
           }
+        } else {
+          SHELL_FREE_NON_NULL(VarList->Val);
+          SHELL_FREE_NON_NULL(VarList);
         }
-      }
+      } // if (VarList == NULL) ... else ...
     } // compare guid
   } // while
-  FreePool(VariableName);
+  SHELL_FREE_NON_NULL (VariableName);
 
   if (EFI_ERROR(Status)) {
     FreeEnvironmentVariableList(ListHead);

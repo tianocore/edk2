@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +47,8 @@ ASM_PFX(InternalMemScanMem8):
     movb    16(%esp), %al
     repne   scasb
     leal    -1(%edi), %eax
-    cmovnz  %ecx, %eax
+    jz      L0
+    movl    %ecx, %eax
+L0:    
     pop     %edi
     ret

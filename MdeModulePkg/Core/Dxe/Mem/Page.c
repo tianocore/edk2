@@ -67,6 +67,7 @@ EFI_MEMORY_TYPE_STATISTICS mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
   { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiMemoryMappedIO
   { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiMemoryMappedIOPortSpace
   { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiPalCode
+  { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiPersistentMemory
   { 0, MAX_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE }   // EfiMaxMemoryType
 };
 
@@ -88,6 +89,7 @@ EFI_MEMORY_TYPE_INFORMATION gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
   { EfiMemoryMappedIO,          0 },
   { EfiMemoryMappedIOPortSpace, 0 },
   { EfiPalCode,                 0 },
+  { EfiPersistentMemory,        0 },
   { EfiMaxMemoryType,           0 }
 };
 //
@@ -1198,7 +1200,7 @@ CoreInternalAllocatePages (
   }
 
   if ((MemoryType >= EfiMaxMemoryType && MemoryType <= 0x7fffffff) ||
-       MemoryType == EfiConventionalMemory) {
+       (MemoryType == EfiConventionalMemory) || (MemoryType == EfiPersistentMemory)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1528,7 +1530,7 @@ CoreGetMemoryMap (
   EFI_STATUS                        Status;
   UINTN                             Size;
   UINTN                             BufferSize;
-  UINTN                             NumberOfRuntimeEntries;
+  UINTN                             NumberOfEntries;
   LIST_ENTRY                        *Link;
   MEMORY_MAP                        *Entry;
   EFI_GCD_MAP_ENTRY                 *GcdMapEntry;
@@ -1545,16 +1547,17 @@ CoreGetMemoryMap (
   CoreAcquireGcdMemoryLock ();
 
   //
-  // Count the number of Reserved and MMIO entries that are marked for runtime use
+  // Count the number of Reserved and runtime MMIO entries
+  // And, count the number of Persistent entries.
   //
-  NumberOfRuntimeEntries = 0;
+  NumberOfEntries = 0;
   for (Link = mGcdMemorySpaceMap.ForwardLink; Link != &mGcdMemorySpaceMap; Link = Link->ForwardLink) {
     GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
-    if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
-        (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo)) {
-      if ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME) {
-        NumberOfRuntimeEntries++;
-      }
+    if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistentMemory) || 
+        (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
+        ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
+        ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME))) {
+      NumberOfEntries ++;
     }
   }
 
@@ -1580,7 +1583,7 @@ CoreGetMemoryMap (
   //
   // Compute the buffer size needed to fit the entire map
   //
-  BufferSize = Size * NumberOfRuntimeEntries;
+  BufferSize = Size * NumberOfEntries;
   for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
     BufferSize += Size;
   }
@@ -1645,33 +1648,48 @@ CoreGetMemoryMap (
   for (Link = mGcdMemorySpaceMap.ForwardLink; Link != &mGcdMemorySpaceMap; Link = Link->ForwardLink) {
     GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
     if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
-        (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo)) {
-      if ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME) {
-        // 
-        // Create EFI_MEMORY_DESCRIPTOR for every Reserved and MMIO GCD entries
-        // that are marked for runtime use
-        //
-        MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
-        MemoryMap->VirtualStart  = 0;
-        MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
-        MemoryMap->Attribute     = GcdMapEntry->Attributes & ~EFI_MEMORY_PORT_IO;
+        ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
+        ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME))) {
+      // 
+      // Create EFI_MEMORY_DESCRIPTOR for every Reserved and runtime MMIO GCD entries
+      //
+      MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
+      MemoryMap->VirtualStart  = 0;
+      MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
+      MemoryMap->Attribute     = GcdMapEntry->Attributes & ~EFI_MEMORY_PORT_IO;
 
-        if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) {
-          MemoryMap->Type = EfiReservedMemoryType;
-        } else if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
-          if ((GcdMapEntry->Attributes & EFI_MEMORY_PORT_IO) == EFI_MEMORY_PORT_IO) {
-            MemoryMap->Type = EfiMemoryMappedIOPortSpace;
-          } else {
-            MemoryMap->Type = EfiMemoryMappedIO;
-          }
+      if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) {
+        MemoryMap->Type = EfiReservedMemoryType;
+      } else if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
+        if ((GcdMapEntry->Attributes & EFI_MEMORY_PORT_IO) == EFI_MEMORY_PORT_IO) {
+          MemoryMap->Type = EfiMemoryMappedIOPortSpace;
+        } else {
+          MemoryMap->Type = EfiMemoryMappedIO;
         }
-
-        //
-        // Check to see if the new Memory Map Descriptor can be merged with an 
-        // existing descriptor if they are adjacent and have the same attributes
-        //
-        MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
       }
+
+      //
+      // Check to see if the new Memory Map Descriptor can be merged with an 
+      // existing descriptor if they are adjacent and have the same attributes
+      //
+      MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
+    }
+    
+    if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistentMemory) {
+      // 
+      // Create EFI_MEMORY_DESCRIPTOR for every Persistent GCD entries
+      //
+      MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
+      MemoryMap->VirtualStart  = 0;
+      MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
+      MemoryMap->Attribute     = GcdMapEntry->Attributes | EFI_MEMORY_NV;
+      MemoryMap->Type          = EfiPersistentMemory;
+      
+      //
+      // Check to see if the new Memory Map Descriptor can be merged with an 
+      // existing descriptor if they are adjacent and have the same attributes
+      //
+      MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
     }
   }
 

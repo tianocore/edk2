@@ -1,0 +1,61 @@
+## @file
+# Description file for the Universal Flash Storage (UFS) Peim driver.
+#
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UfsBlockIoPei
+  MODULE_UNI_FILE                = UfsBlockIoPei.uni
+  FILE_GUID                      = BE189D38-C963-41CF-B695-D90E9E545A13
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 0.9
+
+  ENTRY_POINT                    = InitializeUfsBlockIoPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  UfsBlockIoPei.c
+  UfsBlockIoPei.h
+  UfsHci.c
+  UfsHci.h
+  UfsHcMem.c
+  UfsHcMem.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  BaseMemoryLib
+  PeimEntryPoint
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
+  gEdkiiPeiUfsHostControllerPpiGuid             ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEdkiiPeiUfsHostControllerPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UfsBlockIoPeiExtra.uni
+

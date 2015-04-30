@@ -31,3 +31,8 @@ ASM_PFX(GetFspBaseAddress):
    mov    (%eax), %eax
    ret
 
+ASM_GLOBAL ASM_PFX(GetFspInfoHdr)
+ASM_PFX(GetFspInfoHdr):
+   mov    $GetFspBaseAddress, %eax
+   sub    $FspInfoHeaderRelativeOff, %eax
+   ret

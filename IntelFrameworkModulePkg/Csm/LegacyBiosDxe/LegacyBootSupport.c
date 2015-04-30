@@ -1623,6 +1623,9 @@ EfiMemoryTypeToE820Type (
   case EfiRuntimeServicesData:
     return EfiAcpiAddressRangeMemory;
 
+  case EfiPersistentMemory:
+    return EfiAddressRangePersistentMemory;
+
   case EfiACPIReclaimMemory:
     return EfiAcpiAddressRangeACPI;
 

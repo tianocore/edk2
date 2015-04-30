@@ -1,7 +1,7 @@
 /** @file
   64-bit arithmetic right shift function for IA-32.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -40,8 +40,10 @@ InternalMathARShiftU64 (
     mov     eax, dword ptr [Operand + 4]
     cdq
     test    cl, 32
-    cmovz   edx, eax
-    cmovz   eax, dword ptr [Operand + 0]
+    jnz     L0
+    mov     edx, eax
+    mov     eax, dword ptr [Operand + 0]
+L0:
     shrd    eax, edx, cl
     sar     edx, cl
   }

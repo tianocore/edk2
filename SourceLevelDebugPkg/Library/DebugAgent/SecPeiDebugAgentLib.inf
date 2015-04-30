@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for SEC Core and PEI modules.
 #
-#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,7 @@
   MODULE_UNI_FILE                = SecPeiDebugAgentLib.uni
   FILE_GUID                      = 508B7D59-CD4E-4a6b-A45B-6D3B2D90111E
   MODULE_TYPE                    = PEIM
-  VERSION_STRING                 = 0.7
+  VERSION_STRING                 = 0.8
   LIBRARY_CLASS                  = DebugAgentLib|SEC PEIM
 
 #

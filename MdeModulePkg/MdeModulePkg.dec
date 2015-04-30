@@ -20,7 +20,7 @@
   PACKAGE_NAME                   = MdeModulePkg
   PACKAGE_UNI_FILE               = MdeModulePkg.uni
   PACKAGE_GUID                   = BA0D78D6-2CAF-414b-BD4D-B6762A894288
-  PACKAGE_VERSION                = 0.94
+  PACKAGE_VERSION                = 0.96
 
 [Includes]
   Include
@@ -330,6 +330,9 @@
   ## Include/Ppi/SerialPortPei.h
   gPeiSerialPortPpiGuid         =  { 0x490e9d85, 0x8aef, 0x4193, { 0x8e, 0x56, 0xf7, 0x34, 0xa9, 0xff, 0xac, 0x8b}}
 
+  ## Include/Ppi/UfsHostController.h
+  gEdkiiPeiUfsHostControllerPpiGuid  =  { 0xdc54b283, 0x1a77, 0x4cd6, { 0x83, 0xbb, 0xfd, 0xda, 0x46, 0x9a, 0x2e, 0xc6 }}
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
@@ -406,6 +409,9 @@
 
   ## Include/Protocol/FormBrowserEx2.h
   gEdkiiFormBrowserEx2ProtocolGuid = { 0xa770c357, 0xb693, 0x4e6d, { 0xa6, 0xcf, 0xd2, 0x1c, 0x72, 0x8e, 0x55, 0xb } }
+
+  ## Include/Protocol/UfsHostController.h
+  gEdkiiUfsHostControllerProtocolGuid = { 0xebc01af5, 0x7a9, 0x489e, { 0xb7, 0xce, 0xdc, 0x8, 0x9e, 0x45, 0x9b, 0x2f } }
 
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
@@ -895,6 +901,7 @@
   #  EfiMemoryMappedIO              0x0800<BR>
   #  EfiMemoryMappedIOPortSpace     0x1000<BR>
   #  EfiPalCode                     0x2000<BR>
+  #  EfiPersistentMemory            0x4000<BR>
   #  OS Reserved        0x8000000000000000<BR>
   #
   # e.g. Reserved+ACPINvs+ACPIReclaim+RuntimeCode+RuntimeData are needed, 0x661 should be used.<BR>
@@ -930,6 +937,10 @@
   #  The form will be popped up by BDS core when there are Configuration Required driver health intances.
   #  Platform can customize the PCD to point to different formset.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDriverHealthConfigureForm|{ 0xf4, 0xd9, 0x96, 0x42, 0xfc, 0xf6, 0xde, 0x4d, 0x86, 0x85, 0x8c, 0xe2, 0xd7, 0x9d, 0x90, 0xf0 }|VOID*|0x0001006c
+
+  ## The number of bytes between registers in serial device.  The default is 1 byte.
+  # @Prompt Serial Port Register Stride in Bytes
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1|UINT32|0x0001006B
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
@@ -1247,6 +1258,12 @@
   # performance for large Disk I/O requests.
   # @Prompt Disk I/O - Number of Data Buffer block.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDiskIoDataBufferBlockNum|64|UINT32|0x30001039
+
+  ## This PCD specifies the PCI-based UFS host controller mmio base address.
+  # Define the mmio base address of the pci-based UFS host controller. If there are multiple UFS
+  # host controllers, their mmio base addresses are calculated one by one from this base address.
+  # @Prompt Mmio base address of pci-based UFS host controller.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUfsPciHostControllerMmioBase|0xd0000000|UINT32|0x10000061
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

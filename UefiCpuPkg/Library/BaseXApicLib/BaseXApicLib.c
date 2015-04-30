@@ -3,7 +3,7 @@
 
   This local APIC library instance supports xAPIC mode only.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,10 +21,38 @@
 #include <Library/LocalApicLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
+#include <Library/PcdLib.h>
 
 //
 // Library internal functions
 //
+
+/**
+  Determine if the CPU supports the Local APIC Base Address MSR.
+
+  @retval TRUE  The CPU supports the Local APIC Base Address MSR.
+  @retval FALSE The CPU does not support the Local APIC Base Address MSR.
+
+**/
+BOOLEAN
+LocalApicBaseAddressMsrSupported (
+  VOID
+  )
+{
+  UINT32  RegEax;
+  UINTN   FamilyId;
+  
+  AsmCpuid (1, &RegEax, NULL, NULL, NULL);
+  FamilyId = BitFieldRead32 (RegEax, 8, 11);
+  if (FamilyId == 0x04 || FamilyId == 0x05) {
+    //
+    // CPUs with a FamilyId of 0x04 or 0x05 do not support the 
+    // Local APIC Base Address MSR
+    //
+    return FALSE;
+  }
+  return TRUE;
+}
 
 /**
   Retrieve the base address of local APIC.
@@ -38,8 +66,16 @@ GetLocalApicBaseAddress (
   VOID
   )
 {
-  MSR_IA32_APIC_BASE ApicBaseMsr;
-  
+  MSR_IA32_APIC_BASE  ApicBaseMsr;
+
+  if (!LocalApicBaseAddressMsrSupported ()) {
+    //
+    // If CPU does not support Local APIC Base Address MSR, then retrieve
+    // Local APIC Base Address from PCD
+    //
+    return PcdGet32 (PcdCpuLocalApicBaseAddress);
+  }
+
   ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
   
   return (UINTN)(LShiftU64 ((UINT64) ApicBaseMsr.Bits.ApicBaseHigh, 32)) +
@@ -60,9 +96,16 @@ SetLocalApicBaseAddress (
   IN UINTN                BaseAddress
   )
 {
-  MSR_IA32_APIC_BASE ApicBaseMsr;
+  MSR_IA32_APIC_BASE  ApicBaseMsr;
 
   ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
+
+  if (!LocalApicBaseAddressMsrSupported ()) {
+    //
+    // Ignore set request if the CPU does not support APIC Base Address MSR
+    //
+    return;
+  }
 
   ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
 
@@ -202,14 +245,19 @@ GetApicMode (
 {
   DEBUG_CODE (
     {
-      MSR_IA32_APIC_BASE ApicBaseMsr;
+      MSR_IA32_APIC_BASE  ApicBaseMsr;
 
-      ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
       //
-      // Local APIC should have been enabled
+      // Check to see if the CPU supports the APIC Base Address MSR 
       //
-      ASSERT (ApicBaseMsr.Bits.En != 0);
-      ASSERT (ApicBaseMsr.Bits.Extd == 0);
+      if (LocalApicBaseAddressMsrSupported ()) {
+        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+        //
+        // Local APIC should have been enabled
+        //
+        ASSERT (ApicBaseMsr.Bits.En != 0);
+        ASSERT (ApicBaseMsr.Bits.Extd == 0);
+      }
     }
   );
   return LOCAL_APIC_MODE_XAPIC;

@@ -93,6 +93,7 @@ typedef struct {
 #define DEBUG_AGENT_FLAG_STEPPING              BIT3
 #define DEBUG_AGENT_FLAG_CHECK_MAILBOX_IN_HOB  BIT4
 #define DEBUG_AGENT_FLAG_INIT_ARCH             BIT5|BIT6
+#define DEBUG_AGENT_FLAG_INTERRUPT_FLAG        BIT7
 #define DEBUG_AGENT_FLAG_BREAK_ON_NEXT_SMI     BIT32
 #define DEBUG_AGENT_FLAG_PRINT_ERROR_LEVEL     (BIT33|BIT34|BIT35|BIT36)
 #define DEBUG_AGENT_FLAG_BREAK_BOOT_SCRIPT     BIT37
@@ -117,7 +118,8 @@ typedef union {
     UINT32  SteppingFlag      : 1;   // 1: Agent is running stepping command
     UINT32  CheckMailboxInHob : 1;   // 1: Need to check mailbox saved in HOB
     UINT32  InitArch          : 2;   // value of DEBUG_DATA_RESPONSE_ARCH_MODE
-    UINT32  Reserved1         : 25;
+    UINT32  InterruptFlag     : 1;   // 1: EFLAGS.IF is set
+    UINT32  Reserved1         : 24;
     //
     // Higher 32bits to control the behavior of DebugAgent
     //

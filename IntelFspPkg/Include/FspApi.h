@@ -1,6 +1,6 @@
 /** @file
   Intel FSP API definition from Intel Firmware Support Package External
-  Architecture Specification, April 2014, revision 001.
+  Architecture Specification v1.1, April 2015, revision 001.
 
   Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials

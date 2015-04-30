@@ -49,6 +49,7 @@
 
 [Pcd]
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase       ## CONSUMES
+  gFspWrapperTokenSpaceGuid.PcdFlashFvSecondFspBase ## CONSUMES
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspSize       ## CONSUMES
 
 [Depex]

@@ -1,7 +1,7 @@
 /** @file
   Multi-Processor support functions implementation.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -138,9 +138,18 @@ GetProcessorIndex (
 **/
 BOOLEAN
 IsBsp (
-  IN UINT32             ProcessorIndex
+  IN UINT32  ProcessorIndex
   )
 {
+  //
+  // If there are less than 2 CPUs detected, then the currently executing CPU
+  // must be the BSP.  This avoids an access to an MSR that may not be supported 
+  // on single core CPUs.
+  //
+  if (mDebugCpuData.CpuCount < 2) {
+    return TRUE;
+  }
+
   if (AsmMsrBitFieldRead64 (MSR_IA32_APIC_BASE_ADDRESS, 8, 8) == 1) {
     if (mDebugMpContext.BspIndex != ProcessorIndex) {
       AcquireMpSpinLock (&mDebugMpContext.MpContextSpinLock);
