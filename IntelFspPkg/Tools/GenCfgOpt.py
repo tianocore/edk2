@@ -774,9 +774,10 @@ EndList
         TxtFd.close()
         return 0
 
-    def CreateField (self, Item, Name, Length, Offset, Struct):
+    def CreateField (self, Item, Name, Length, Offset, Struct, Help):
         PosName    = 28
         PosComment = 30
+        HelpLine=''
 
         IsArray = False
         if Length in [1,2,4,8]:
@@ -810,8 +811,10 @@ EndList
             Space2 = PosComment - len(Name)
         else:
             Space2 = 1
+        if Help != '':
+            HelpLine="   %s \n" % Help
 
-        return "  %s%s%s;%s/* Offset 0x%04X */\n" % (Type, ' ' * Space1, Name, ' ' * Space2, Offset)
+        return "/**Offset 0x%04X \n%s**/\n  %s%s%s;%s\n" % (Offset, HelpLine, Type, ' ' * Space1, Name, ' ' * Space2)
 
 
     def CreateHeaderFile (self, InputHeaderFile, IsInternal):
@@ -919,12 +922,12 @@ EndList
                         NextVisible = True
                         Name = "Reserved" + Region[0] + "pdSpace%d" % ResvIdx
                         ResvIdx = ResvIdx + 1
-                        HeaderFd.write(self.CreateField (Item, Name, Item["offset"] - ResvOffset, ResvOffset, ''))
+                        HeaderFd.write(self.CreateField (Item, Name, Item["offset"] - ResvOffset, ResvOffset, '', ''))
 
                 if  Offset < Item["offset"]:
                     if IsInternal or LastVisible:
                         Name = "Unused" + Region[0] + "pdSpace%d" % SpaceIdx
-                        LineBuffer.append(self.CreateField (Item, Name, Item["offset"] - Offset, Offset, ''))
+                        LineBuffer.append(self.CreateField (Item, Name, Item["offset"] - Offset, Offset, '',''))
                     SpaceIdx = SpaceIdx + 1
                     Offset   = Item["offset"]
 
@@ -940,7 +943,7 @@ EndList
                     for Each in LineBuffer:
                         HeaderFd.write (Each)
                     LineBuffer = []
-                    HeaderFd.write(self.CreateField (Item, Item["cname"], Item["length"], Item["offset"], Item['struct']))
+                    HeaderFd.write(self.CreateField (Item, Item["cname"], Item["length"], Item["offset"], Item['struct'], Item['help']))
 
             HeaderFd.write("} " + Region[0] + "PD_DATA_REGION;\n\n")
         HeaderFd.write("#pragma pack()\n\n")
