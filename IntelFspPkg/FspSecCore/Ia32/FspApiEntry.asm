@@ -489,8 +489,8 @@ FspApiCommon   PROC C PUBLIC
   ; Verify the calling condition
   ;
   pushad
-  push   [esp + 4 * 8 + 4]
-  push   eax
+  push   [esp + 4 * 8 + 4]  ; push ApiParam
+  push   eax                ; push ApiIdx
   call   FspApiCallingCheck
   add    esp, 8
   cmp    eax, 0
