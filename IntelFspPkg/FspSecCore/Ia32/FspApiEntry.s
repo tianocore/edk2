@@ -703,9 +703,10 @@ FspApiCommonL0:
   # Verify the calling condition
   #
   pushal
-  pushl   %eax
+  pushl   36(%esp)  #push ApiParam  [esp + 4 * 8 + 4]
+  pushl   %eax      #push ApiIdx
   call    ASM_PFX(FspApiCallingCheck)
-  addl    $0x04, %esp
+  addl    $0x08, %esp
   cmpl    $0x00, %eax
   jz      FspApiCommonL1
   movl    %eax, 0x1C(%esp)                   # mov    dword ptr [esp + 4 * 7], eax
