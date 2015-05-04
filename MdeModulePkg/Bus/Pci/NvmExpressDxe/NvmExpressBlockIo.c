@@ -2,7 +2,7 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
-  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,9 +37,9 @@ ReadSectors (
 {
   NVME_CONTROLLER_PRIVATE_DATA             *Controller;
   UINT32                                   Bytes;
-  NVM_EXPRESS_PASS_THRU_COMMAND_PACKET     CommandPacket;
-  NVM_EXPRESS_COMMAND                      Command;
-  NVM_EXPRESS_RESPONSE                     Response;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
   UINT32                                   BlockSize;
 
@@ -47,21 +47,20 @@ ReadSectors (
   BlockSize  = Device->Media.BlockSize;
   Bytes      = Blocks * BlockSize;
 
-  ZeroMem (&CommandPacket, sizeof(NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(NVM_EXPRESS_COMMAND));
-  ZeroMem (&Response, sizeof(NVM_EXPRESS_RESPONSE));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
-  CommandPacket.NvmeCmd      = &Command;
-  CommandPacket.NvmeResponse = &Response;
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
 
   CommandPacket.NvmeCmd->Cdw0.Opcode = NVME_IO_READ_OPC;
-  CommandPacket.NvmeCmd->Cdw0.Cid    = Controller->Cid[1]++;
   CommandPacket.NvmeCmd->Nsid        = Device->NamespaceId;
   CommandPacket.TransferBuffer       = (VOID *)(UINTN)Buffer;
 
   CommandPacket.TransferLength = Bytes;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueId        = NVME_IO_QUEUE;
+  CommandPacket.QueueType      = NVME_IO_QUEUE;
 
   CommandPacket.NvmeCmd->Cdw10 = (UINT32)Lba;
   CommandPacket.NvmeCmd->Cdw11 = (UINT32)(Lba >> 32);
@@ -72,7 +71,6 @@ ReadSectors (
   Status = Controller->Passthru.PassThru (
                                   &Controller->Passthru,
                                   Device->NamespaceId,
-                                  0,
                                   &CommandPacket,
                                   NULL
                                   );
@@ -101,9 +99,9 @@ WriteSectors (
   )
 {
   NVME_CONTROLLER_PRIVATE_DATA             *Controller;
-  NVM_EXPRESS_PASS_THRU_COMMAND_PACKET     CommandPacket;
-  NVM_EXPRESS_COMMAND                      Command;
-  NVM_EXPRESS_RESPONSE                     Response;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
   UINT32                                   Bytes;
   UINT32                                   BlockSize;
@@ -112,21 +110,20 @@ WriteSectors (
   BlockSize  = Device->Media.BlockSize;
   Bytes      = Blocks * BlockSize;
 
-  ZeroMem (&CommandPacket, sizeof(NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(NVM_EXPRESS_COMMAND));
-  ZeroMem (&Response, sizeof(NVM_EXPRESS_RESPONSE));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
-  CommandPacket.NvmeCmd      = &Command;
-  CommandPacket.NvmeResponse = &Response;
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
 
   CommandPacket.NvmeCmd->Cdw0.Opcode = NVME_IO_WRITE_OPC;
-  CommandPacket.NvmeCmd->Cdw0.Cid    = Controller->Cid[1]++;
   CommandPacket.NvmeCmd->Nsid  = Device->NamespaceId;
   CommandPacket.TransferBuffer = (VOID *)(UINTN)Buffer;
 
   CommandPacket.TransferLength = Bytes;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueId        = NVME_IO_QUEUE;
+  CommandPacket.QueueType      = NVME_IO_QUEUE;
 
   CommandPacket.NvmeCmd->Cdw10 = (UINT32)Lba;
   CommandPacket.NvmeCmd->Cdw11 = (UINT32)(Lba >> 32);
@@ -140,7 +137,6 @@ WriteSectors (
   Status = Controller->Passthru.PassThru (
                                   &Controller->Passthru,
                                   Device->NamespaceId,
-                                  0,
                                   &CommandPacket,
                                   NULL
                                   );
@@ -281,30 +277,28 @@ NvmeFlush (
   )
 {
   NVME_CONTROLLER_PRIVATE_DATA             *Controller;
-  NVM_EXPRESS_PASS_THRU_COMMAND_PACKET     CommandPacket;
-  NVM_EXPRESS_COMMAND                      Command;
-  NVM_EXPRESS_RESPONSE                     Response;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
 
   Controller = Device->Controller;
 
-  ZeroMem (&CommandPacket, sizeof(NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(NVM_EXPRESS_COMMAND));
-  ZeroMem (&Response, sizeof(NVM_EXPRESS_RESPONSE));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
-  CommandPacket.NvmeCmd      = &Command;
-  CommandPacket.NvmeResponse = &Response;
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
 
   CommandPacket.NvmeCmd->Cdw0.Opcode = NVME_IO_FLUSH_OPC;
-  CommandPacket.NvmeCmd->Cdw0.Cid    = Controller->Cid[1]++;
   CommandPacket.NvmeCmd->Nsid  = Device->NamespaceId;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueId        = NVME_IO_QUEUE;
+  CommandPacket.QueueType      = NVME_IO_QUEUE;
 
   Status = Controller->Passthru.PassThru (
                                   &Controller->Passthru,
                                   Device->NamespaceId,
-                                  0,
                                   &CommandPacket,
                                   NULL
                                   );

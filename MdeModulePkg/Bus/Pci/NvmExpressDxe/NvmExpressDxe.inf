@@ -4,7 +4,7 @@
 #  NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
 #  NVM Express specification.
 #
-#  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -45,7 +45,6 @@
   NvmExpressHci.c
   NvmExpressHci.h
   NvmExpressPassthru.c
-  NvmExpressPassthru.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -66,6 +65,7 @@
   ## BY_START
   ## TO_START
   gEfiDevicePathProtocolGuid
+  gEfiNvmExpressPassThruProtocolGuid          ## BY_START
   gEfiBlockIoProtocolGuid                     ## BY_START
   gEfiDiskInfoProtocolGuid                    ## BY_START
   gEfiDriverSupportedEfiVersionProtocolGuid   ## PRODUCES

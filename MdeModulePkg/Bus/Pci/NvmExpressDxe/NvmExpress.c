@@ -35,6 +35,15 @@ EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL gNvmExpressDriverSupportedEfiVersion =
   0                                                   // Version number to be filled at start up.
 };
 
+//
+// Template for NVM Express Pass Thru Mode data structure.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_NVM_EXPRESS_PASS_THRU_MODE gEfiNvmExpressPassThruMode = {
+  EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL | EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_LOGICAL | EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_CMD_SET_NVM,
+  sizeof (UINTN),
+  0x10100
+};
+
 /**
   Check if the specified Nvm Express device namespace is active, and create child handles
   for them with BlockIo and DiskInfo protocol instances.
@@ -43,8 +52,6 @@ EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL gNvmExpressDriverSupportedEfiVersion =
   @param[in] NamespaceId     The NVM Express namespace ID  for which a device path node is to be
                              allocated and built. Caller must set the NamespaceId to zero if the
                              device path node will contain a valid UUID.
-  @param[in] NamespaceUuid   The NVM Express namespace UUID for which a device path node is to be
-                             allocated and built. UUID will only be valid of the Namespace ID is zero.
 
   @retval EFI_SUCCESS        All the namespaces in the device are successfully enumerated.
   @return Others             Some error occurs when enumerating the namespaces.
@@ -53,8 +60,7 @@ EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL gNvmExpressDriverSupportedEfiVersion =
 EFI_STATUS
 EnumerateNvmeDevNamespace (
   IN NVME_CONTROLLER_PRIVATE_DATA       *Private,
-  UINT32                                NamespaceId,
-  UINT64                                NamespaceUuid
+  UINT32                                NamespaceId
   )
 {
   NVME_ADMIN_NAMESPACE_DATA             *NamespaceData;
@@ -159,7 +165,6 @@ EnumerateNvmeDevNamespace (
     Status = Private->Passthru.BuildDevicePath (
                                  &Private->Passthru,
                                  Device->NamespaceId,
-                                 Device->NamespaceUuid,
                                  &NewDevicePathNode
                                  );
 
@@ -281,18 +286,15 @@ DiscoverAllNamespaces (
 {
   EFI_STATUS                            Status;
   UINT32                                NamespaceId;
-  UINT64                                NamespaceUuid;
-  NVM_EXPRESS_PASS_THRU_PROTOCOL        *Passthru;
+  EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL    *Passthru;
 
   NamespaceId   = 0xFFFFFFFF;
-  NamespaceUuid = 0;
   Passthru      = &Private->Passthru;
 
   while (TRUE) {
     Status = Passthru->GetNextNamespace (
                          Passthru,
-                         (UINT32 *)&NamespaceId,
-                         (UINT64 *)&NamespaceUuid
+                         (UINT32 *)&NamespaceId
                          );
 
     if (EFI_ERROR (Status)) {
@@ -301,8 +303,7 @@ DiscoverAllNamespaces (
 
     Status = EnumerateNvmeDevNamespace (
                Private,
-               NamespaceId,
-               NamespaceUuid
+               NamespaceId
                );
 
     if (EFI_ERROR(Status)) {
@@ -609,18 +610,19 @@ NvmExpressDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                        Status;
-  EFI_PCI_IO_PROTOCOL               *PciIo;
-  NVME_CONTROLLER_PRIVATE_DATA      *Private;
-  EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
-  UINT32                            NamespaceId;
-  UINT64                            NamespaceUuid;
-  EFI_PHYSICAL_ADDRESS              MappedAddr;
-  UINTN                             Bytes;
+  EFI_STATUS                          Status;
+  EFI_PCI_IO_PROTOCOL                 *PciIo;
+  NVME_CONTROLLER_PRIVATE_DATA        *Private;
+  EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath;
+  UINT32                              NamespaceId;
+  EFI_PHYSICAL_ADDRESS                MappedAddr;
+  UINTN                               Bytes;
+  EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL  *Passthru;
 
   DEBUG ((EFI_D_INFO, "NvmExpressDriverBindingStart: start\n"));
 
-  Private = NULL;
+  Private          = NULL;
+  Passthru         = NULL;
   ParentDevicePath = NULL;
 
   Status = gBS->OpenProtocol (
@@ -657,7 +659,7 @@ NvmExpressDriverBindingStart (
     if (Private == NULL) {
       DEBUG ((EFI_D_ERROR, "NvmExpressDriverBindingStart: allocating pool for Nvme Private Data failed!\n"));
       Status = EFI_OUT_OF_RESOURCES;
-      goto Exit2;
+      goto Exit;
     }
 
     //
@@ -678,7 +680,7 @@ NvmExpressDriverBindingStart (
                       0
                       );
     if (EFI_ERROR (Status)) {
-      goto Exit2;
+      goto Exit;
     }
 
     Bytes = EFI_PAGES_TO_SIZE (4);
@@ -692,7 +694,7 @@ NvmExpressDriverBindingStart (
                       );
 
     if (EFI_ERROR (Status) || (Bytes != EFI_PAGES_TO_SIZE (4))) {
-      goto Exit2;
+      goto Exit;
     }
 
     Private->BufferPciAddr = (UINT8 *)(UINTN)MappedAddr;
@@ -709,36 +711,36 @@ NvmExpressDriverBindingStart (
     Private->Passthru.GetNextNamespace = NvmExpressGetNextNamespace;
     Private->Passthru.BuildDevicePath  = NvmExpressBuildDevicePath;
     Private->Passthru.GetNamespace     = NvmExpressGetNamespace;
-    Private->PassThruMode.Attributes   = NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL;
+    CopyMem (&Private->PassThruMode, &gEfiNvmExpressPassThruMode, sizeof (EFI_NVM_EXPRESS_PASS_THRU_MODE));
 
     Status = NvmeControllerInit (Private);
-
     if (EFI_ERROR(Status)) {
-      goto Exit2;
+      goto Exit;
     }
 
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &Controller,
-                    &gEfiCallerIdGuid,
-                    Private,
+                    &gEfiNvmExpressPassThruProtocolGuid,
+                    &Private->Passthru,
                     NULL
                     );
     if (EFI_ERROR (Status)) {
-      goto Exit2;
+      goto Exit;
     }
   } else {
     Status = gBS->OpenProtocol (
                     Controller,
-                    &gEfiCallerIdGuid,
-                    (VOID **) &Private,
+                    &gEfiNvmExpressPassThruProtocolGuid,
+                    (VOID **) &Passthru,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
     if (EFI_ERROR (Status)) {
-      Private = NULL;
-      goto Exit1;
+      goto Exit;
     }
+
+    Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (Passthru);
   }
 
   if (RemainingDevicePath == NULL) {
@@ -756,30 +758,21 @@ NvmExpressDriverBindingStart (
     Status = Private->Passthru.GetNamespace (
                                  &Private->Passthru,
                                  RemainingDevicePath,
-                                 &NamespaceId,
-                                 &NamespaceUuid
+                                 &NamespaceId
                                  );
 
     if (!EFI_ERROR (Status)) {
-        Status = EnumerateNvmeDevNamespace (
-                   Private,
-                   NamespaceId,
-                   NamespaceUuid
-                   );
+      Status = EnumerateNvmeDevNamespace (
+                 Private,
+                 NamespaceId
+                 );
     }
   }
 
   DEBUG ((EFI_D_INFO, "NvmExpressDriverBindingStart: end successfully\n"));
   return EFI_SUCCESS;
 
-Exit1:
-  gBS->UninstallMultipleProtocolInterfaces (
-         Controller,
-         &gEfiCallerIdGuid,
-         Private,
-         NULL
-         );
-Exit2:
+Exit:
   if ((Private != NULL) && (Private->Mapping != NULL)) {
     PciIo->Unmap (PciIo, Private->Mapping);
   }

@@ -2,7 +2,7 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
-  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -509,13 +509,12 @@ NvmeEnableController (
   UINT8                  Timeout;
 
   //
-  // Enable the controller
+  // Enable the controller.
+  // CC.AMS, CC.MPS and CC.CSS are all set to 0.
   //
   ZeroMem (&Cc, sizeof (NVME_CC));
-  Cc.En     = 1;
-  Cc.Iosqes = 6;
-  Cc.Iocqes = 4;
-  Status    = WriteNvmeControllerConfiguration (Private, &Cc);
+  Cc.En  = 1;
+  Status = WriteNvmeControllerConfiguration (Private, &Cc);
 
   if (EFI_ERROR(Status)) {
     return Status;
@@ -572,17 +571,16 @@ NvmeIdentifyController (
   IN VOID                               *Buffer
   )
 {
-  NVM_EXPRESS_PASS_THRU_COMMAND_PACKET     CommandPacket;
-  NVM_EXPRESS_COMMAND                      Command;
-  NVM_EXPRESS_RESPONSE                     Response;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
 
-  ZeroMem (&CommandPacket, sizeof(NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(NVM_EXPRESS_COMMAND));
-  ZeroMem (&Response, sizeof(NVM_EXPRESS_RESPONSE));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
   Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_OPC;
-  Command.Cdw0.Cid    = Private->Cid[0]++;
   //
   // According to Nvm Express 1.1 spec Figure 38, When not used, the field shall be cleared to 0h.
   // For the Identify command, the Namespace Identifier is only used for the Namespace data structure.
@@ -590,11 +588,11 @@ NvmeIdentifyController (
   Command.Nsid        = 0;
 
   CommandPacket.NvmeCmd        = &Command;
-  CommandPacket.NvmeResponse   = &Response;
+  CommandPacket.NvmeCompletion = &Completion;
   CommandPacket.TransferBuffer = Buffer;
   CommandPacket.TransferLength = sizeof (NVME_ADMIN_CONTROLLER_DATA);
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueId        = NVME_ADMIN_QUEUE;
+  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
   //
   // Set bit 0 (Cns bit) to 1 to identify a controller
   //
@@ -604,7 +602,6 @@ NvmeIdentifyController (
   Status = Private->Passthru.PassThru (
                                &Private->Passthru,
                                NVME_CONTROLLER_ID,
-                               0,
                                &CommandPacket,
                                NULL
                                );
@@ -630,25 +627,24 @@ NvmeIdentifyNamespace (
   IN VOID                              *Buffer
   )
 {
-  NVM_EXPRESS_PASS_THRU_COMMAND_PACKET     CommandPacket;
-  NVM_EXPRESS_COMMAND                      Command;
-  NVM_EXPRESS_RESPONSE                     Response;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
 
-  ZeroMem (&CommandPacket, sizeof(NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(NVM_EXPRESS_COMMAND));
-  ZeroMem (&Response, sizeof(NVM_EXPRESS_RESPONSE));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
-  CommandPacket.NvmeCmd      = &Command;
-  CommandPacket.NvmeResponse = &Response;
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
 
   Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_OPC;
-  Command.Cdw0.Cid    = Private->Cid[0]++;
   Command.Nsid        = NamespaceId;
   CommandPacket.TransferBuffer = Buffer;
   CommandPacket.TransferLength = sizeof (NVME_ADMIN_NAMESPACE_DATA);
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueId        = NVME_ADMIN_QUEUE;
+  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
   //
   // Set bit 0 (Cns bit) to 1 to identify a namespace
   //
@@ -658,7 +654,6 @@ NvmeIdentifyNamespace (
   Status = Private->Passthru.PassThru (
                                &Private->Passthru,
                                NamespaceId,
-                               0,
                                &CommandPacket,
                                NULL
                                );
@@ -680,26 +675,25 @@ NvmeCreateIoCompletionQueue (
   IN NVME_CONTROLLER_PRIVATE_DATA      *Private
   )
 {
-  NVM_EXPRESS_PASS_THRU_COMMAND_PACKET     CommandPacket;
-  NVM_EXPRESS_COMMAND                      Command;
-  NVM_EXPRESS_RESPONSE                     Response;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
   NVME_ADMIN_CRIOCQ                        CrIoCq;
 
-  ZeroMem (&CommandPacket, sizeof(NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(NVM_EXPRESS_COMMAND));
-  ZeroMem (&Response, sizeof(NVM_EXPRESS_RESPONSE));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
   ZeroMem (&CrIoCq, sizeof(NVME_ADMIN_CRIOCQ));
 
-  CommandPacket.NvmeCmd      = &Command;
-  CommandPacket.NvmeResponse = &Response;
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
 
   Command.Cdw0.Opcode = NVME_ADMIN_CRIOCQ_OPC;
-  Command.Cdw0.Cid    = Private->Cid[0]++;
   CommandPacket.TransferBuffer = Private->CqBufferPciAddr[1];
   CommandPacket.TransferLength = EFI_PAGE_SIZE;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueId        = NVME_ADMIN_QUEUE;
+  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
   CrIoCq.Qid   = NVME_IO_QUEUE;
   CrIoCq.Qsize = NVME_CCQ_SIZE;
@@ -709,7 +703,6 @@ NvmeCreateIoCompletionQueue (
 
   Status = Private->Passthru.PassThru (
                                &Private->Passthru,
-                               0,
                                0,
                                &CommandPacket,
                                NULL
@@ -732,26 +725,25 @@ NvmeCreateIoSubmissionQueue (
   IN NVME_CONTROLLER_PRIVATE_DATA      *Private
   )
 {
-  NVM_EXPRESS_PASS_THRU_COMMAND_PACKET     CommandPacket;
-  NVM_EXPRESS_COMMAND                      Command;
-  NVM_EXPRESS_RESPONSE                     Response;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
   NVME_ADMIN_CRIOSQ                        CrIoSq;
 
-  ZeroMem (&CommandPacket, sizeof(NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(NVM_EXPRESS_COMMAND));
-  ZeroMem (&Response, sizeof(NVM_EXPRESS_RESPONSE));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
   ZeroMem (&CrIoSq, sizeof(NVME_ADMIN_CRIOSQ));
 
-  CommandPacket.NvmeCmd      = &Command;
-  CommandPacket.NvmeResponse = &Response;
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
 
   Command.Cdw0.Opcode = NVME_ADMIN_CRIOSQ_OPC;
-  Command.Cdw0.Cid    = Private->Cid[0]++;
   CommandPacket.TransferBuffer = Private->SqBufferPciAddr[1];
   CommandPacket.TransferLength = EFI_PAGE_SIZE;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueId        = NVME_ADMIN_QUEUE;
+  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
   CrIoSq.Qid   = NVME_IO_QUEUE;
   CrIoSq.Qsize = NVME_CSQ_SIZE;
@@ -763,7 +755,6 @@ NvmeCreateIoSubmissionQueue (
 
   Status = Private->Passthru.PassThru (
                                &Private->Passthru,
-                               0,
                                0,
                                &CommandPacket,
                                NULL
@@ -930,22 +921,6 @@ NvmeControllerInit (
   }
 
   //
-  // Create one I/O completion queue.
-  //
-  Status = NvmeCreateIoCompletionQueue (Private);
-  if (EFI_ERROR(Status)) {
-   return Status;
-  }
-
-  //
-  // Create one I/O Submission queue.
-  //
-  Status = NvmeCreateIoSubmissionQueue (Private);
-  if (EFI_ERROR(Status)) {
-   return Status;
-  }
-
-  //
   // Allocate buffer for Identify Controller data
   //
   Private->ControllerData = (NVME_ADMIN_CONTROLLER_DATA *)AllocateZeroPool (sizeof(NVME_ADMIN_CONTROLLER_DATA));
@@ -982,6 +957,22 @@ NvmeControllerInit (
   DEBUG ((EFI_D_INFO, "    SQES      : 0x%x\n", Private->ControllerData->Sqes));
   DEBUG ((EFI_D_INFO, "    CQES      : 0x%x\n", Private->ControllerData->Cqes));
   DEBUG ((EFI_D_INFO, "    NN        : 0x%x\n", Private->ControllerData->Nn));
+
+  //
+  // Create one I/O completion queue.
+  //
+  Status = NvmeCreateIoCompletionQueue (Private);
+  if (EFI_ERROR(Status)) {
+   return Status;
+  }
+
+  //
+  // Create one I/O Submission queue.
+  //
+  Status = NvmeCreateIoSubmissionQueue (Private);
+  if (EFI_ERROR(Status)) {
+   return Status;
+  }
 
   return Status;
 }
