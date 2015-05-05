@@ -24,6 +24,7 @@
 [Sources.common]
   FdtPlatform.c
   FdtPlatformDxe.uni
+  ShellSetFdt.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
