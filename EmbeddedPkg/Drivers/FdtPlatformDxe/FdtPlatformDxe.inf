@@ -17,7 +17,7 @@
   BASE_NAME       = FdtPlatformDxe
   MODULE_UNI_FILE = FdtPlatformDxe.uni
   FILE_GUID       = 6e9a4c69-57c6-4fcd-b083-4f2c3bdb6051
-  MODULE_TYPE     = DXE_DRIVER
+  MODULE_TYPE     = UEFI_DRIVER
   VERSION_STRING  = 0.1
   ENTRY_POINT     = FdtPlatformEntryPoint
 
@@ -61,6 +61,3 @@
 
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths
-
-[Depex]
-  TRUE
