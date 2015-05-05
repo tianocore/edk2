@@ -270,6 +270,14 @@ FdtPlatformEntryPoint (
   been asked to be retrieved for. For each device path, try to install
   the FDT. Stop as soon as an installation succeeds.
 
+  @param[in]  SuccessfullDevicePath  If not NULL, address where to store the
+                                     pointer to the text device path from
+                                     which the FDT was successfully retrieved.
+                                     Not used if the FDT installation failed.
+                                     The returned address is the address of
+                                     an allocated buffer that has to be
+                                     freed by the caller.
+
   @retval  EFI_SUCCESS            The FDT was installed.
   @retval  EFI_NOT_FOUND          Failed to locate a protocol or a file.
   @retval  EFI_INVALID_PARAMETER  Invalid device path.
@@ -280,31 +288,30 @@ FdtPlatformEntryPoint (
 STATIC
 EFI_STATUS
 RunFdtInstallation (
-  VOID
+  OUT CHAR16  **SuccessfullDevicePath
   )
 {
   EFI_STATUS  Status;
   UINTN       DataSize;
-  VOID        *Data;
+  CHAR16      *TextDevicePath;
   CHAR16      *TextDevicePathStart;
   CHAR16      *TextDevicePathSeparator;
   UINTN       TextDevicePathLen;
-  CHAR16      *TextDevicePath;
 
+  TextDevicePath = NULL;
   //
   // For development purpose, if enabled through the "PcdOverridePlatformFdt"
   // feature PCD, try first to install the FDT specified by the device path in
   // text form stored in the "Fdt" UEFI variable.
   //
   if (FeaturePcdGet (PcdOverridePlatformFdt)) {
-    Data     = NULL;
     DataSize = 0;
     Status = gRT->GetVariable (
                     L"Fdt",
                     &gFdtVariableGuid,
                     NULL,
                     &DataSize,
-                    Data
+                    NULL
                     );
 
     //
@@ -312,39 +319,39 @@ RunFdtInstallation (
     //
 
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      Data = AllocatePool (DataSize);
-      if (Data == NULL) {
+      TextDevicePath = AllocatePool (DataSize);
+      if (TextDevicePath == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
-      } else {
-        Status = gRT->GetVariable (
-                        L"Fdt",
-                        &gFdtVariableGuid,
-                        NULL,
-                        &DataSize,
-                        Data
-                        );
-        if (!EFI_ERROR (Status)) {
-          Status = InstallFdt ((CHAR16*)Data);
-          if (!EFI_ERROR (Status)) {
-            DEBUG ((
-              EFI_D_WARN,
-              "Installation of the FDT using the device path <%s> completed.\n",
-              (CHAR16*)Data
-              ));
-          }
-        }
-        FreePool (Data);
+        goto Error;
       }
 
+      Status = gRT->GetVariable (
+                      L"Fdt",
+                      &gFdtVariableGuid,
+                      NULL,
+                      &DataSize,
+                      TextDevicePath
+                      );
       if (EFI_ERROR (Status)) {
-        DEBUG ((
-          EFI_D_ERROR,
-          "Installation of the FDT specified by the \"Fdt\" UEFI variable failed - %r\n",
-          Status
-          ));
-      } else {
-        return Status;
+        FreePool (TextDevicePath);
+        goto Error;
       }
+
+      Status = InstallFdt (TextDevicePath);
+      if (!EFI_ERROR (Status)) {
+        DEBUG ((
+          EFI_D_WARN,
+          "Installation of the FDT using the device path <%s> completed.\n",
+          TextDevicePath
+          ));
+        goto Done;
+      }
+      DEBUG ((
+        EFI_D_ERROR,
+        "Installation of the FDT specified by the \"Fdt\" UEFI variable failed - %r\n",
+        Status
+        ));
+      FreePool (TextDevicePath);
     }
   }
 
@@ -353,7 +360,7 @@ RunFdtInstallation (
   // paths are in text form and separated by a semi-colon.
   //
 
-  Status = EFI_SUCCESS;
+  Status = EFI_NOT_FOUND;
   for (TextDevicePathStart = (CHAR16*)PcdGetPtr (PcdFdtDevicePaths);
        *TextDevicePathStart != L'\0'                               ; ) {
     TextDevicePathSeparator = StrStr (TextDevicePathStart, L";");
@@ -362,48 +369,55 @@ RunFdtInstallation (
     // Last device path of the list
     //
     if (TextDevicePathSeparator == NULL) {
-      TextDevicePath = TextDevicePathStart;
+      TextDevicePathLen = StrLen (TextDevicePathStart);
     } else {
       TextDevicePathLen = (UINTN)(TextDevicePathSeparator - TextDevicePathStart);
-      TextDevicePath = AllocateCopyPool (
-                         (TextDevicePathLen + 1) * sizeof (CHAR16),
-                         TextDevicePathStart
-                         );
-      if (TextDevicePath == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        DEBUG ((EFI_D_ERROR, "Memory allocation error during FDT installation process.\n"));
-        break;
-      }
-      TextDevicePath[TextDevicePathLen] = L'\0';
     }
 
+    TextDevicePath = AllocateCopyPool (
+                       (TextDevicePathLen + 1) * sizeof (CHAR16),
+                       TextDevicePathStart
+                       );
+    if (TextDevicePath == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Error;
+    }
+    TextDevicePath[TextDevicePathLen] = L'\0';
+
     Status = InstallFdt (TextDevicePath);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN, "Installation of the FDT using the device path <%s> failed - %r.\n",
-        TextDevicePath, Status
-        ));
-    } else {
+    if (!EFI_ERROR (Status)) {
       DEBUG ((EFI_D_WARN, "Installation of the FDT using the device path <%s> completed.\n",
         TextDevicePath
         ));
+      goto Done;
     }
 
+    DEBUG ((EFI_D_WARN, "Installation of the FDT using the device path <%s> failed - %r.\n",
+      TextDevicePath, Status
+      ));
+    FreePool (TextDevicePath);
+
     if (TextDevicePathSeparator == NULL) {
-      break;
-    } else {
-      FreePool (TextDevicePath);
-      if (!EFI_ERROR (Status)) {
-        break;
-      }
-      TextDevicePathStart = TextDevicePathSeparator + 1;
+      goto Error;
     }
+    TextDevicePathStart = TextDevicePathSeparator + 1;
   }
+
+Error:
+Done:
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Failed to install the FDT - %r.\n", Status));
+    return Status;
   }
 
-  return Status;
+  if (SuccessfullDevicePath != NULL) {
+    *SuccessfullDevicePath = TextDevicePath;
+  } else {
+    FreePool (TextDevicePath);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -445,6 +459,7 @@ ShellDynCmdSetFdtHandler (
   LIST_ENTRY    *ParamPackage;
   BOOLEAN       FilePath;
   CONST CHAR16  *ValueStr;
+  CHAR16        *TextDevicePath;
 
   ShellStatus  = SHELL_SUCCESS;
   ParamPackage = NULL;
@@ -538,14 +553,16 @@ ShellDynCmdSetFdtHandler (
       STRING_TOKEN (STR_SETFDT_INSTALLING),
       mFdtPlatformDxeHiiHandle
       );
-    Status = RunFdtInstallation ();
+    Status = RunFdtInstallation (&TextDevicePath);
     ShellStatus = EfiCodeToShellCode (Status);
     if (!EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL,
         STRING_TOKEN (STR_SETFDT_INSTALL_SUCCEEDED),
-        mFdtPlatformDxeHiiHandle
+        mFdtPlatformDxeHiiHandle,
+        TextDevicePath
         );
+      FreePool (TextDevicePath);
     } else {
       if (Status == EFI_INVALID_PARAMETER) {
         ShellPrintHiiEx (
@@ -823,8 +840,7 @@ Error:
       ShellPrintHiiEx (
         -1, -1, NULL,
         STRING_TOKEN (STR_SETFDT_UPDATE_DELETED),
-        mFdtPlatformDxeHiiHandle,
-        FdtVariableValue
+        mFdtPlatformDxeHiiHandle
         );
     }
   } else {
