@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2013-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -219,6 +219,14 @@ BdsLoadImage (
   IN     EFI_ALLOCATE_TYPE     Type,
   IN OUT EFI_PHYSICAL_ADDRESS* Image,
   OUT    UINTN                 *FileSize
+  );
+
+/**
+ * Call BS.ExitBootServices with the appropriate Memory Map information
+ */
+EFI_STATUS
+ShutdownUefiBootServices (
+  VOID
   );
 
 #endif

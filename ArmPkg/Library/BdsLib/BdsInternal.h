@@ -104,11 +104,6 @@ typedef struct {
 
 // BdsHelper.c
 EFI_STATUS
-ShutdownUefiBootServices (
-  VOID
-  );
-
-EFI_STATUS
 GetSystemMemoryResources (
   LIST_ENTRY *ResourceList
   );
