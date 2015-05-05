@@ -30,7 +30,6 @@
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellDynamicCommand.h>
 
-#include <Guid/EventGroup.h>
 #include <Guid/Fdt.h>
 
 #include <libfdt.h>
@@ -38,17 +37,6 @@
 //
 // Internal types
 //
-
-STATIC VOID OnEndOfDxe (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  );
-STATIC EFI_STATUS RunFdtInstallation (
-  VOID
-  );
-STATIC EFI_STATUS InstallFdt (
-  IN CONST CHAR16*  TextDevicePath
-  );
 
 STATIC SHELL_STATUS EFIAPI ShellDynCmdSetFdtHandler (
   IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *This,
@@ -93,6 +81,105 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
 STATIC EFI_HANDLE  mFdtPlatformDxeHiiHandle;
 
 /**
+  Install the FDT specified by its device path in text form.
+
+  @param[in]  TextDevicePath  Device path of the FDT to install in text form
+
+  @retval  EFI_SUCCESS            The FDT was installed.
+  @retval  EFI_NOT_FOUND          Failed to locate a protocol or a file.
+  @retval  EFI_INVALID_PARAMETER  Invalid device path.
+  @retval  EFI_UNSUPPORTED        Device path not supported.
+  @retval  EFI_OUT_OF_RESOURCES   An allocation failed.
+**/
+STATIC
+EFI_STATUS
+InstallFdt (
+  IN CONST CHAR16*  TextDevicePath
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
+  EFI_DEVICE_PATH                     *DevicePath;
+  EFI_PHYSICAL_ADDRESS                FdtBlobBase;
+  UINTN                               FdtBlobSize;
+  UINTN                               NumPages;
+  EFI_PHYSICAL_ADDRESS                FdtConfigurationTableBase;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathFromTextProtocolGuid,
+                  NULL,
+                  (VOID **)&EfiDevicePathFromTextProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "InstallFdt() - Failed to locate EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL protocol\n"));
+    return Status;
+  }
+
+  DevicePath = (EFI_DEVICE_PATH*)EfiDevicePathFromTextProtocol->ConvertTextToDevicePath (TextDevicePath);
+  if (DevicePath == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Load the FDT given its device path.
+  // This operation may fail if the device path is not supported.
+  //
+  FdtBlobBase = 0;
+  NumPages    = 0;
+  Status = BdsLoadImage (DevicePath, AllocateAnyPages, &FdtBlobBase, &FdtBlobSize);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  // Check the FDT header is valid. We only make this check in DEBUG mode in
+  // case the FDT header change on production device and this ASSERT() becomes
+  // not valid.
+  ASSERT (fdt_check_header ((VOID*)(UINTN)FdtBlobBase) == 0);
+
+  //
+  // Ensure the Size of the Device Tree is smaller than the size of the read file
+  //
+  ASSERT ((UINTN)fdt_totalsize ((VOID*)(UINTN)FdtBlobBase) <= FdtBlobSize);
+
+  //
+  // Store the FDT as Runtime Service Data to prevent the Kernel from
+  // overwritting its data.
+  //
+  NumPages = EFI_SIZE_TO_PAGES (FdtBlobSize);
+  Status = gBS->AllocatePages (
+                  AllocateAnyPages, EfiRuntimeServicesData,
+                  NumPages, &FdtConfigurationTableBase
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+  CopyMem (
+    (VOID*)(UINTN)FdtConfigurationTableBase,
+    (VOID*)(UINTN)FdtBlobBase,
+    FdtBlobSize
+    );
+
+  //
+  // Install the FDT into the Configuration Table
+  //
+  Status = gBS->InstallConfigurationTable (
+                  &gFdtTableGuid,
+                  (VOID*)(UINTN)FdtConfigurationTableBase
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->FreePages (FdtConfigurationTableBase, NumPages);
+  }
+
+Error:
+  if (FdtBlobBase != 0) {
+    gBS->FreePages (FdtBlobBase, NumPages);
+  }
+  FreePool (DevicePath);
+
+  return Status;
+}
+
+/**
   Main entry point of the FDT platform driver.
 
   @param[in]  ImageHandle   The firmware allocated handle for the present driver
@@ -113,23 +200,11 @@ FdtPlatformEntryPoint (
   )
 {
   EFI_STATUS  Status;
-  EFI_EVENT   EndOfDxeEvent;
 
   //
-  // Create an event belonging to the "gEfiEndOfDxeEventGroupGuid" group.
-  // The "OnEndOfDxe()" function is declared as the call back function.
-  // It will be called at the end of the DXE phase when an event of the
-  // same group is signalled to inform about the end of the DXE phase.
+  // Install the Device Tree from its expected location
   //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  OnEndOfDxe,
-                  NULL,
-                  &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent
-                  );
-
+  Status = RunFdtInstallation (NULL);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -182,32 +257,6 @@ FdtPlatformEntryPoint (
   }
 
   return Status;
-}
-
-/**
-  Notification function of the event defined as belonging to the
-  EFI_END_OF_DXE_EVENT_GROUP_GUID event group that was created in
-  the entry point of the driver.
-
-  This function is called when an event belonging to the
-  EFI_END_OF_DXE_EVENT_GROUP_GUID event group is signalled. Such an
-  event is signalled once at the end of the dispatching of all
-  drivers (end of the so called DXE phase).
-
-  @param[in]  Event    Event declared in the entry point of the driver whose
-                       notification function is being invoked.
-  @param[in]  Context  NULL
-
-**/
-STATIC
-VOID
-OnEndOfDxe (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  RunFdtInstallation ();
-  gBS->CloseEvent (Event);
 }
 
 /**
@@ -349,106 +398,6 @@ RunFdtInstallation (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Failed to install the FDT - %r.\n", Status));
   }
-
-  return Status;
-}
-
-/**
-  Install the FDT specified by its device path in text form.
-
-  @param[in]  TextDevicePath  Device path of the FDT to install in text form
-
-  @retval  EFI_SUCCESS            The FDT was installed.
-  @retval  EFI_NOT_FOUND          Failed to locate a protocol or a file.
-  @retval  EFI_INVALID_PARAMETER  Invalid device path.
-  @retval  EFI_UNSUPPORTED        Device path not supported.
-  @retval  EFI_OUT_OF_RESOURCES   An allocation failed.
-**/
-STATIC
-EFI_STATUS
-InstallFdt (
-  IN CONST CHAR16*  TextDevicePath
-  )
-{
-  EFI_STATUS                          Status;
-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
-  EFI_DEVICE_PATH                     *DevicePath;
-  EFI_PHYSICAL_ADDRESS                FdtBlobBase;
-  UINTN                               FdtBlobSize;
-  UINTN                               NbPages;
-  EFI_PHYSICAL_ADDRESS                RsFdtBlobBase;
-
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathFromTextProtocolGuid,
-                  NULL,
-                  (VOID **)&EfiDevicePathFromTextProtocol
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "InstallFdt() - Failed to locate EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL protocol\n"));
-    return Status;
-  }
-
-  DevicePath = (EFI_DEVICE_PATH*)EfiDevicePathFromTextProtocol->ConvertTextToDevicePath (TextDevicePath);
-  if (DevicePath == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Load the FDT given its device path.
-  // This operation may fail if the device path is not supported.
-  //
-  FdtBlobBase = 0;
-  NbPages     = 0;
-  Status = BdsLoadImage (DevicePath, AllocateAnyPages, &FdtBlobBase, &FdtBlobSize);
-  if (EFI_ERROR (Status)) {
-    goto Error;
-  }
-
-  // Check the FDT header is valid. We only make this check in DEBUG mode in
-  // case the FDT header change on production device and this ASSERT() becomes
-  // not valid.
-  ASSERT (fdt_check_header ((VOID*)(UINTN)FdtBlobBase) == 0);
-
-  //
-  // Ensure the Size of the Device Tree is smaller than the size of the read file
-  //
-  ASSERT ((UINTN)fdt_totalsize ((VOID*)(UINTN)FdtBlobBase) <= FdtBlobSize);
-
-  //
-  // Store the FDT as Runtime Service Data to prevent the Kernel from
-  // overwritting its data.
-  //
-  NbPages = EFI_SIZE_TO_PAGES (FdtBlobSize);
-  Status = gBS->AllocatePages (
-                  AllocateAnyPages, EfiRuntimeServicesData,
-                  NbPages, &RsFdtBlobBase
-                  );
-  if (EFI_ERROR (Status)) {
-    goto Error;
-  }
-  CopyMem (
-    (VOID*)((UINTN)RsFdtBlobBase),
-    (VOID*)((UINTN)FdtBlobBase),
-    FdtBlobSize
-    );
-
-  //
-  // Install the FDT into the Configuration Table
-  //
-  Status = gBS->InstallConfigurationTable (
-                  &gFdtTableGuid,
-                  (VOID*)((UINTN)RsFdtBlobBase)
-                  );
-  if (EFI_ERROR (Status)) {
-    gBS->FreePages (RsFdtBlobBase, NbPages);
-  }
-
-Error :
-
-  if (FdtBlobBase != 0) {
-    gBS->FreePages (FdtBlobBase, NbPages);
-  }
-  FreePool (DevicePath);
 
   return Status;
 }
@@ -612,7 +561,6 @@ ShellDynCmdSetFdtHandler (
   }
 
 Error:
-
   gBS->UninstallMultipleProtocolInterfaces (
          gImageHandle,
          &gEfiShellProtocolGuid, Shell,
