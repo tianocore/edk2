@@ -170,6 +170,14 @@
 
   SecurityPkg/Library/HashLibTpm2/HashLibTpm2.inf
 
+  #
+  # Hash2
+  #
+  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+  #
+  # Other
+  #
   SecurityPkg/Library/DxeRsa2048Sha256GuidedSectionExtractLib/DxeRsa2048Sha256GuidedSectionExtractLib.inf
   SecurityPkg/Library/PeiRsa2048Sha256GuidedSectionExtractLib/PeiRsa2048Sha256GuidedSectionExtractLib.inf
   
