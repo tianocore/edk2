@@ -747,52 +747,55 @@ UpdateFdtTextDevicePath (
   SHELL_STATUS                        ShellStatus;
 
   ASSERT (FilePath != NULL);
+  DevicePath       = NULL;
   TextDevicePath   = NULL;
   FdtVariableValue = NULL;
 
-  DevicePath = Shell->GetDevicePathFromFilePath (FilePath);
-  if (DevicePath != NULL) {
-    Status = gBS->LocateProtocol (
-                    &gEfiDevicePathToTextProtocolGuid,
-                    NULL,
-                    (VOID **)&EfiDevicePathToTextProtocol
-                    );
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
+  if (*FilePath != L'\0') {
+    DevicePath = Shell->GetDevicePathFromFilePath (FilePath);
+    if (DevicePath != NULL) {
+      Status = gBS->LocateProtocol (
+                      &gEfiDevicePathToTextProtocolGuid,
+                      NULL,
+                      (VOID **)&EfiDevicePathToTextProtocol
+                      );
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
 
-    TextDevicePath = EfiDevicePathToTextProtocol->ConvertDevicePathToText (
-                                                    DevicePath,
-                                                    FALSE,
-                                                    FALSE
+      TextDevicePath = EfiDevicePathToTextProtocol->ConvertDevicePathToText (
+                                                      DevicePath,
+                                                      FALSE,
+                                                      FALSE
+                                                      );
+      if (TextDevicePath == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error;
+      }
+      FdtVariableValue = TextDevicePath;
+    } else {
+      //
+      // Try to convert back the EFI Device Path String into a EFI device Path
+      // to ensure the format is valid
+      //
+      Status = gBS->LocateProtocol (
+                      &gEfiDevicePathFromTextProtocolGuid,
+                      NULL,
+                      (VOID **)&EfiDevicePathFromTextProtocol
+                      );
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
+
+      DevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath (
+                                                    FilePath
                                                     );
-    if (TextDevicePath == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Error;
+      if (DevicePath == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Error;
+      }
+      FdtVariableValue = (CHAR16*)FilePath;
     }
-    FdtVariableValue = TextDevicePath;
-  } else {
-    //
-    // Try to convert back the EFI Device Path String into a EFI device Path
-    // to ensure the format is valid
-    //
-    Status = gBS->LocateProtocol (
-                    &gEfiDevicePathFromTextProtocolGuid,
-                    NULL,
-                    (VOID **)&EfiDevicePathFromTextProtocol
-                    );
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
-
-    DevicePath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath (
-                                                  FilePath
-                                                  );
-    if (DevicePath == NULL) {
-      Status = EFI_INVALID_PARAMETER;
-      goto Error;
-    }
-    FdtVariableValue = (CHAR16*)FilePath;
   }
 
   Status = gRT->SetVariable (
@@ -801,19 +804,29 @@ UpdateFdtTextDevicePath (
                   EFI_VARIABLE_RUNTIME_ACCESS    |
                   EFI_VARIABLE_NON_VOLATILE      |
                   EFI_VARIABLE_BOOTSERVICE_ACCESS ,
-                  StrSize (FdtVariableValue),
+                  (FdtVariableValue != NULL) ?
+                  StrSize (FdtVariableValue) : 0,
                   FdtVariableValue
                   );
 
 Error:
   ShellStatus = EfiCodeToShellCode (Status);
   if (!EFI_ERROR (Status)) {
-    ShellPrintHiiEx (
-      -1, -1, NULL,
-      STRING_TOKEN (STR_SETFDT_UPDATE_SUCCEEDED),
-      mFdtPlatformDxeHiiHandle,
-      FdtVariableValue
-      );
+    if (FdtVariableValue != NULL) {
+      ShellPrintHiiEx (
+        -1, -1, NULL,
+        STRING_TOKEN (STR_SETFDT_UPDATE_SUCCEEDED),
+        mFdtPlatformDxeHiiHandle,
+        FdtVariableValue
+        );
+    } else {
+      ShellPrintHiiEx (
+        -1, -1, NULL,
+        STRING_TOKEN (STR_SETFDT_UPDATE_DELETED),
+        mFdtPlatformDxeHiiHandle,
+        FdtVariableValue
+        );
+    }
   } else {
     if (Status == EFI_INVALID_PARAMETER) {
       ShellPrintHiiEx (
