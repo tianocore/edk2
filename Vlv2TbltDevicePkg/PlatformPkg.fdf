@@ -51,10 +51,10 @@ DEFINE FLASH_REGION_FVMAIN_OFFSET                             = 0x00100000
 DEFINE FLASH_REGION_FVMAIN_SIZE                               = 0x001A5000
 
 DEFINE FLASH_REGION_FV_RECOVERY2_OFFSET                       = 0x002A5000
-DEFINE FLASH_REGION_FV_RECOVERY2_SIZE                         = 0x0002D000
+DEFINE FLASH_REGION_FV_RECOVERY2_SIZE                         = 0x0002C000
 
-DEFINE FLASH_REGION_FV_RECOVERY_OFFSET                        = 0x002D2000
-DEFINE FLASH_REGION_FV_RECOVERY_SIZE                          = 0x0002E000
+DEFINE FLASH_REGION_FV_RECOVERY_OFFSET                        = 0x002D1000
+DEFINE FLASH_REGION_FV_RECOVERY_SIZE                          = 0x0002F000
 
 ################################################################################
 #
