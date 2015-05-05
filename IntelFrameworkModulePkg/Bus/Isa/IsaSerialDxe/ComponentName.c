@@ -180,16 +180,11 @@ IsaSerialComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  EFI_STATUS              Status;
-  EFI_SERIAL_IO_PROTOCOL  *SerialIo;
-  SERIAL_DEV              *SerialDevice;
+  EFI_STATUS                Status;
+  EFI_SERIAL_IO_PROTOCOL    *SerialIo;
+  SERIAL_DEV                *SerialDevice;
+  EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
 
-  //
-  // This is a device driver, so ChildHandle must be NULL.
-  //
-  if (ChildHandle != NULL) {
-    return EFI_UNSUPPORTED;
-  }
   //
   // Make sure this driver is currently managing ControllerHandle
   //
@@ -201,29 +196,44 @@ IsaSerialComponentNameGetControllerName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Get the Block I/O Protocol on Controller
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiSerialIoProtocolGuid,
-                  (VOID **) &SerialIo,
-                  gSerialControllerDriver.DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+
+  ControllerNameTable = NULL;
+  if (ChildHandle != NULL) {
+    Status = EfiTestChildHandle (
+               ControllerHandle,
+               ChildHandle,
+               &gEfiIsaIoProtocolGuid
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Get the Serial I/O Protocol from the child handle
+    //
+    Status = gBS->OpenProtocol (
+                    ChildHandle,
+                    &gEfiSerialIoProtocolGuid,
+                    (VOID **) &SerialIo,
+                    gSerialControllerDriver.DriverBindingHandle,
+                    ChildHandle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Get the Serial Controller's Device structure
+    //
+    SerialDevice = SERIAL_DEV_FROM_THIS (SerialIo);
+    ControllerNameTable = SerialDevice->ControllerNameTable;
   }
-  //
-  // Get the Serial Controller's Device structure
-  //
-  SerialDevice = SERIAL_DEV_FROM_THIS (SerialIo);
 
   return LookupUnicodeString2 (
            Language,
            This->SupportedLanguages,
-           SerialDevice->ControllerNameTable,
+           ControllerNameTable,
            ControllerName,
            (BOOLEAN)(This == &gIsaSerialComponentName)
            );
