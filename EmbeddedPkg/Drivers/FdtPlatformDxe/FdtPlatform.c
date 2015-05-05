@@ -50,6 +50,10 @@ STATIC CHAR16* EFIAPI ShellDynCmdSetFdtGetHelp (
   IN CONST CHAR8                         *Language
   );
 
+STATIC VOID DisplayFdtDevicePaths (
+  VOID
+  );
+
 STATIC SHELL_STATUS UpdateFdtTextDevicePath (
   IN EFI_SHELL_PROTOCOL  *Shell,
   IN CONST CHAR16        *FilePath
@@ -478,10 +482,10 @@ ShellDynCmdSetFdtHandler (
     switch (ShellCommandLineGetCount (ParamPackage)) {
     case 1:
       //
-      // Case "setfdt -i"
+      // Case "setfdt" or "setfdt -i"
       //
       if (!ShellCommandLineGetFlag (ParamPackage, L"-i")) {
-        Status = EFI_INVALID_PARAMETER;
+        DisplayFdtDevicePaths ();
       }
       break;
 
@@ -557,6 +561,7 @@ ShellDynCmdSetFdtHandler (
           Status
           );
       }
+      DisplayFdtDevicePaths ();
     }
   }
 
@@ -599,6 +604,109 @@ ShellDynCmdSetFdtGetHelp (
                 STRING_TOKEN (STR_GET_HELP_SETFDT),
                 Language
                 );
+}
+
+/**
+  Display FDT device paths.
+
+  Display in text form the device paths used to install the FDT from the
+  highest to the lowest priority.
+
+**/
+STATIC
+VOID
+DisplayFdtDevicePaths (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       DataSize;
+  CHAR16      *TextDevicePath;
+  CHAR16      *TextDevicePaths;
+  CHAR16      *TextDevicePathSeparator;
+
+  ShellPrintHiiEx (
+    -1, -1, NULL,
+    STRING_TOKEN (STR_SETFDT_DEVICE_PATH_LIST),
+    mFdtPlatformDxeHiiHandle
+    );
+
+  if (FeaturePcdGet (PcdOverridePlatformFdt)) {
+    DataSize = 0;
+    Status = gRT->GetVariable (
+                    L"Fdt",
+                    &gFdtVariableGuid,
+                    NULL,
+                    &DataSize,
+                    NULL
+                    );
+
+    //
+    // Keep going only if the "Fdt" variable is defined.
+    //
+
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      TextDevicePath = AllocatePool (DataSize);
+      if (TextDevicePath == NULL) {
+        return;
+      }
+
+      Status = gRT->GetVariable (
+                      L"Fdt",
+                      &gFdtVariableGuid,
+                      NULL,
+                      &DataSize,
+                      TextDevicePath
+                      );
+      if (!EFI_ERROR (Status)) {
+        ShellPrintHiiEx (
+          -1, -1, NULL,
+          STRING_TOKEN (STR_SETFDT_DEVICE_PATH),
+          mFdtPlatformDxeHiiHandle,
+          TextDevicePath
+          );
+      }
+
+      FreePool (TextDevicePath);
+    }
+  }
+
+  //
+  // Loop over the device path list provided by "PcdFdtDevicePaths". The device
+  // paths are in text form and separated by a semi-colon.
+  //
+
+  TextDevicePaths = AllocateCopyPool (
+                      StrSize ((CHAR16*)PcdGetPtr (PcdFdtDevicePaths)),
+                      (CHAR16*)PcdGetPtr (PcdFdtDevicePaths)
+                      );
+  if (TextDevicePaths == NULL) {
+    return;
+  }
+
+  for (TextDevicePath = TextDevicePaths;
+       *TextDevicePath != L'\0'        ; ) {
+    TextDevicePathSeparator = StrStr (TextDevicePath, L";");
+
+    if (TextDevicePathSeparator != NULL) {
+      *TextDevicePathSeparator = L'\0';
+    }
+
+    ShellPrintHiiEx (
+      -1, -1, NULL,
+      STRING_TOKEN (STR_SETFDT_DEVICE_PATH),
+      mFdtPlatformDxeHiiHandle,
+      TextDevicePath
+      );
+
+    if (TextDevicePathSeparator == NULL) {
+      break;
+    }
+    TextDevicePath = TextDevicePathSeparator + 1;
+  }
+
+  FreePool (TextDevicePaths);
+
 }
 
 /**
