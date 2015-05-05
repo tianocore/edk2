@@ -113,11 +113,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF RuleOverride=ACPITABLE ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
 
-  #
-  # FDT installation
-  #
-  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
-
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   #
@@ -191,6 +186,13 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF ArmPlatformPkg/Bds/Bds.inf
+
+  #
+  # FDT installation
+  #
+  # The UEFI driver is at the end of the list of the driver to be dispatched
+  # after the device drivers (eg: Ethernet) to ensure we have support for them.
+  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8

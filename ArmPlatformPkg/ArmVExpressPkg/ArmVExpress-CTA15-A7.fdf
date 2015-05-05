@@ -105,11 +105,6 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmHwDxe.inf
 
   #
-  # FDT installation
-  #
-  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
-
-  #
   # Multimedia Card Interface
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
@@ -178,6 +173,13 @@ READ_LOCK_STATUS   = TRUE
 
   # FV Filesystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  #
+  # FDT installation
+  #
+  # The UEFI driver is at the end of the list of the driver to be dispatched
+  # after the device drivers (eg: Ethernet) to ensure we have support for them.
+  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
 
   # Example to add a Device Tree to the Firmware Volume
   #FILE FREEFORM = PCD(gArmVExpressTokenSpaceGuid.PcdFdtVExpressHwA15x2A7x3) {

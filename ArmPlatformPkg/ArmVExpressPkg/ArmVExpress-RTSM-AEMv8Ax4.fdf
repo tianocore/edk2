@@ -176,11 +176,6 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 
   #
-  # FDT installation
-  #
-  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
-
-  #
   # UEFI application (Shell Embedded Boot Loader)
   #
   INF ShellBinPkg/UefiShell/UefiShell.inf
@@ -193,6 +188,13 @@ READ_LOCK_STATUS   = TRUE
 
   # FV Filesystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  #
+  # FDT installation
+  #
+  # The UEFI driver is at the end of the list of the driver to be dispatched
+  # after the device drivers (eg: Ethernet) to ensure we have support for them.
+  INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
