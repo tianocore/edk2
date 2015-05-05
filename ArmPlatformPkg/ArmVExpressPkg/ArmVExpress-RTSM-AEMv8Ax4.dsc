@@ -76,11 +76,6 @@
   # This PCD ensures the secondary cores are parked into the AArch64 Linux parking protocol.
   gArmTokenSpaceGuid.PcdArmLinuxSpinTable|TRUE
 
-  #
-  # FDT installation : enable the development specific features
-  #
-  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
-
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress-RTSM"

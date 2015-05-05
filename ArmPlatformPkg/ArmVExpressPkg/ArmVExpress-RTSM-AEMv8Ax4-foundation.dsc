@@ -74,11 +74,6 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|FALSE
 
-  #
-  # FDT installation : enable the development specific features
-  #
-  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
-
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Foundation Model"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmFoundation"

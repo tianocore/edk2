@@ -80,11 +80,6 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
 
-  #
-  # FDT installation : enable the development specific features
-  #
-  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
-
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress-RTSM"

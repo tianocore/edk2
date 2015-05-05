@@ -82,11 +82,6 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
-  #
-  # FDT installation : enable the development specific features
-  #
-  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
-
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Juno"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmJuno"

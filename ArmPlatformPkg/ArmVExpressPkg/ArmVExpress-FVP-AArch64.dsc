@@ -80,10 +80,6 @@
   # to configure the Non-Secure interrupts in the GIC Redistributors
   # which is not supported at the moment.
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|TRUE
-  #
-  # FDT installation : enable the development specific features
-  #
-  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Fixed Virtual Platform"
