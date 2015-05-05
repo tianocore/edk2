@@ -20,8 +20,6 @@
 
 #include <Protocol/DevicePath.h>
 
-#include <libfdt.h>
-
 //
 // Internal variables
 //
@@ -30,6 +28,12 @@ STATIC CONST EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mShellDynCmdProtocolSetFdt = {
     L"setfdt",                // Name of the command
     ShellDynCmdSetFdtHandler, // Handler
     ShellDynCmdSetFdtGetHelp  // GetHelp
+};
+
+STATIC CONST EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mShellDynCmdProtocolDumpFdt = {
+    L"dumpfdt",                // Name of the command
+    ShellDynCmdDumpFdtHandler, // Handler
+    ShellDynCmdDumpFdtGetHelp  // GetHelp
 };
 
 STATIC CONST EFI_GUID  mFdtPlatformDxeHiiGuid = {
@@ -159,6 +163,7 @@ FdtPlatformEntryPoint (
   )
 {
   EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   //
   // Install the Device Tree from its expected location
@@ -168,14 +173,7 @@ FdtPlatformEntryPoint (
     return Status;
   }
 
-  //
-  // If the development features are enabled, install the dynamic shell
-  // command "setfdt" to be able to define a device path for the FDT
-  // that has precedence over the device paths defined by
-  // "PcdFdtDevicePaths".
-  //
-
-  if (FeaturePcdGet (PcdOverridePlatformFdt)) {
+  if (FeaturePcdGet (PcdOverridePlatformFdt) || FeaturePcdGet (PcdDumpFdtShellCommand)) {
     //
     // Register the strings for the user interface in the HII Database.
     // This shows the way to the multi-language support, even if
@@ -192,10 +190,22 @@ FdtPlatformEntryPoint (
                                  FdtPlatformDxeStrings,
                                  NULL
                                  );
+  }
 
+  //
+  // If the development features are enabled, install the dynamic shell
+  // command "setfdt" to be able to define a device path for the FDT
+  // that has precedence over the device paths defined by
+  // "PcdFdtDevicePaths".
+  //
+
+  if (FeaturePcdGet (PcdOverridePlatformFdt)) {
     if (mFdtPlatformDxeHiiHandle != NULL) {
+      // We install dynamic EFI command on separate handles as we cannot register
+      // more than one protocol of the same protocol interface on the same handle.
+      Handle = NULL;
       Status = gBS->InstallMultipleProtocolInterfaces (
-                      &ImageHandle,
+                      &Handle,
                       &gEfiShellDynamicCommandProtocolGuid,
                       &mShellDynCmdProtocolSetFdt,
                       NULL
@@ -210,6 +220,32 @@ FdtPlatformEntryPoint (
       DEBUG ((
         EFI_D_WARN,
         "Unable to install \"setfdt\" EFI Shell command - %r \n",
+        Status
+        ));
+    }
+  }
+
+  if (FeaturePcdGet (PcdDumpFdtShellCommand)) {
+    if (mFdtPlatformDxeHiiHandle != NULL) {
+      // We install dynamic EFI command on separate handles as we cannot register
+      // more than one protocol of the same protocol interface on the same handle.
+      Handle = NULL;
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &Handle,
+                      &gEfiShellDynamicCommandProtocolGuid,
+                      &mShellDynCmdProtocolDumpFdt,
+                      NULL
+                      );
+      if (EFI_ERROR (Status)) {
+        HiiRemovePackages (mFdtPlatformDxeHiiHandle);
+      }
+    } else {
+      Status = EFI_LOAD_ERROR;
+    }
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        EFI_D_WARN,
+        "Unable to install \"dumpfdt\" EFI Shell command - %r \n",
         Status
         ));
     }

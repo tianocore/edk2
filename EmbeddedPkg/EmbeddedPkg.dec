@@ -82,7 +82,10 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
+  # Enable the development specific features
   gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE|BOOLEAN|0x00000054
+  # Add 'dumpfdt' EFI Shell command
+  gEmbeddedTokenSpaceGuid.PcdDumpFdtShellCommand|TRUE|BOOLEAN|0x00000056
 
 
 [PcdsFixedAtBuild.common]

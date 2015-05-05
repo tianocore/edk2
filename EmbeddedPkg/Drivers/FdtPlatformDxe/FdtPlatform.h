@@ -127,4 +127,48 @@ ShellDynCmdSetFdtGetHelp (
   IN CONST CHAR8                         *Language
   );
 
+/**
+  This is the shell command "dumpfdt" handler function. This function handles
+  the command when it is invoked in the shell.
+
+  @param[in]  This             The instance of the
+                               EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL.
+  @param[in]  SystemTable      The pointer to the UEFI system table.
+  @param[in]  ShellParameters  The parameters associated with the command.
+  @param[in]  Shell            The instance of the shell protocol used in the
+                               context of processing this command.
+
+  @return  SHELL_SUCCESS            The operation was successful.
+  @return  SHELL_ABORTED            Operation aborted due to internal error.
+  @return  SHELL_NOT_FOUND          Failed to locate the Device Tree into the EFI Configuration Table
+  @return  SHELL_OUT_OF_RESOURCES   A memory allocation failed.
+
+**/
+SHELL_STATUS
+EFIAPI
+ShellDynCmdDumpFdtHandler (
+  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *This,
+  IN EFI_SYSTEM_TABLE                    *SystemTable,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL       *ShellParameters,
+  IN EFI_SHELL_PROTOCOL                  *Shell
+  );
+
+/**
+  This is the shell command "dumpfdt" help handler function. This
+  function returns the formatted help for the "dumpfdt" command.
+  The format matchs that in Appendix B of the revision 2.1 of the
+  UEFI Shell Specification.
+
+  @param[in]  This      The instance of the EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL.
+  @param[in]  Language  The pointer to the language string to use.
+
+  @return  CHAR16*  Pool allocated help string, must be freed by caller.
+**/
+CHAR16*
+EFIAPI
+ShellDynCmdDumpFdtGetHelp (
+  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *This,
+  IN CONST CHAR8                         *Language
+  );
+
 #endif /* __FDT_PLATFORM_DXE_H__ */

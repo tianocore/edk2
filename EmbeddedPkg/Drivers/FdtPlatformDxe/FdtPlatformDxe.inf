@@ -24,6 +24,7 @@
 [Sources.common]
   FdtPlatform.c
   FdtPlatformDxe.uni
+  ShellDumpFdt.c
   ShellSetFdt.c
 
 [Packages]
@@ -56,6 +57,7 @@
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt
+  gEmbeddedTokenSpaceGuid.PcdDumpFdtShellCommand
 
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths
