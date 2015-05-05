@@ -1511,12 +1511,6 @@
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
   INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
-!if $(TARGET) == DEBUG
-  DEFINE SOURCE_LEVEL_DEBUG_BUILD_OPTIONS = /Od /Oy-
-!endif
-!else
-  DEFINE SOURCE_LEVEL_DEBUG_BUILD_OPTIONS =
-
 !endif
 
 [BuildOptions.Common.EDK]
