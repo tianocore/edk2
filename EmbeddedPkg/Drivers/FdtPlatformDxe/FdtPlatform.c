@@ -94,15 +94,16 @@ InstallFdt (
     goto Error;
   }
 
-  // Check the FDT header is valid. We only make this check in DEBUG mode in
-  // case the FDT header change on production device and this ASSERT() becomes
-  // not valid.
-  ASSERT (fdt_check_header ((VOID*)(UINTN)FdtBlobBase) == 0);
-
   //
-  // Ensure the Size of the Device Tree is smaller than the size of the read file
+  // Ensure that the FDT header is valid and that the Size of the Device Tree
+  // is smaller than the size of the read file
   //
-  ASSERT ((UINTN)fdt_totalsize ((VOID*)(UINTN)FdtBlobBase) <= FdtBlobSize);
+  if (fdt_check_header ((VOID*)(UINTN)FdtBlobBase) != 0 ||
+      (UINTN)fdt_totalsize ((VOID*)(UINTN)FdtBlobBase) > FdtBlobSize) {
+    DEBUG ((EFI_D_ERROR, "InstallFdt() - loaded FDT binary image seems corrupt\n"));
+    Status = EFI_LOAD_ERROR;
+    goto Error;
+  }
 
   //
   // Store the FDT as Runtime Service Data to prevent the Kernel from
