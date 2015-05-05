@@ -209,6 +209,9 @@ FindFileEx (
     FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)*FileHeader + FileOccupiedSize);
   }
 
+  // FFS files begin with a header that is aligned on an 8-byte boundary
+  FfsFileHeader = ALIGN_POINTER (FfsFileHeader, 8);
+
   FileOffset = (UINT32) ((UINT8 *)FfsFileHeader - (UINT8 *)FwVolHeader);
   ASSERT (FileOffset <= 0xFFFFFFFF);
 
