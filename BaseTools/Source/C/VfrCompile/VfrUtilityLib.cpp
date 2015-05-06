@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -110,6 +110,10 @@ SConfigInfo::SConfigInfo (
   case EFI_IFR_TYPE_STRING :
     memcpy (mValue, &Value.string, mWidth);
     break;
+  case EFI_IFR_TYPE_BUFFER :
+    memcpy (mValue, &Value.u8, mWidth);
+    break;
+
   case EFI_IFR_TYPE_OTHER :
     return;
   }

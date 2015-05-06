@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -595,6 +595,7 @@ public:
 
 static CIfrQuestionHeader *gCurrentQuestion  = NULL;
 static CIfrMinMaxStepData *gCurrentMinMaxData = NULL;
+static BOOLEAN            gIsOrderedList = FALSE;
 
 /*
  * The definition of all of the UEFI IFR Objects
@@ -1710,6 +1711,7 @@ public:
   }
 
   EFI_VFR_RETURN_CODE SetFlags (IN UINT8 LFlags) {
+    mOneOfOption->Flags = 0;
     if (_FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_OPTION_DEFAULT)) {
       mOneOfOption->Flags |= EFI_IFR_OPTION_DEFAULT;
     }
