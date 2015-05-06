@@ -68,6 +68,7 @@ typedef struct {
   UINT8   GetDefaultValueFromAccess;
   EFI_HII_TIME  Time;
   UINT8   RefreshGuidCount;
+  UINT8   Match2;
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //

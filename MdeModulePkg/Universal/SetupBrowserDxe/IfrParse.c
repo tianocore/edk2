@@ -1152,7 +1152,8 @@ IsExpressionOpCode (
       (Operand == EFI_IFR_TO_UPPER_OP) ||
       (Operand == EFI_IFR_MAP_OP)      ||
       (Operand == EFI_IFR_VERSION_OP)  ||
-      (Operand == EFI_IFR_SECURITY_OP)) {
+      (Operand == EFI_IFR_SECURITY_OP) ||
+      (Operand == EFI_IFR_MATCH2_OP)) {
     return TRUE;
   } else {
     return FALSE;
@@ -1207,7 +1208,7 @@ IsUnKnownOpCode (
   IN UINT8              Operand
   )
 {
-  return Operand > EFI_IFR_WARNING_IF_OP ? TRUE : FALSE;
+  return Operand > EFI_IFR_MATCH2_OP ? TRUE : FALSE;
 }
 
 /**
@@ -1477,6 +1478,10 @@ ParseOpCodes (
 
       case EFI_IFR_SECURITY_OP:
         CopyMem (&ExpressionOpCode->Guid, &((EFI_IFR_SECURITY *) OpCodeData)->Permissions, sizeof (EFI_GUID));
+        break;
+
+      case EFI_IFR_MATCH2_OP:
+        CopyMem (&ExpressionOpCode->Guid, &((EFI_IFR_MATCH2 *) OpCodeData)->SyntaxType, sizeof (EFI_GUID));
         break;
 
       case EFI_IFR_GET_OP:

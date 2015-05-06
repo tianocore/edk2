@@ -46,6 +46,9 @@
 #define EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID \
   { 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } }
 
+#define PERL_GUID \
+  { 0x63E60A51, 0x497D, 0xD427, {0xC4, 0xA5, 0xB8, 0xAB, 0xDC, 0x3A, 0xAE, 0xB6 }}
+
 //
 // Labels definition
 //
@@ -649,6 +652,16 @@ formset
             default = 0,
             refresh interval = 3             // Refresh interval in seconds
     endnumeric;
+
+    grayoutif  match2 (stringref(STRING_TOKEN(STR_STRING)), stringref(STRING_TOKEN(STR_PATTERN)), PERL_GUID);
+      numeric 
+        varid   = MyIfrNVData.Match2,
+        prompt  = STRING_TOKEN(STR_MATCH2_PROMPT),
+        help    = STRING_TOKEN(STR_MATCH2_HELP),
+        minimum = 0,
+        maximum = 243,
+      endnumeric;
+    endif;
 
     label LABEL_UPDATE2;
     label LABEL_END;
