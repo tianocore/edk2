@@ -1,7 +1,7 @@
 ## @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -356,11 +356,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
 
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
   # Set video resolution for text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
 
 ################################################################################
 #
