@@ -3944,9 +3944,43 @@ GetQuestionDefault (
     //
     // Take minimum value as numeric default value
     //
-    if ((HiiValue->Value.u64 < Question->Minimum) || (HiiValue->Value.u64 > Question->Maximum)) {
-      HiiValue->Value.u64 = Question->Minimum;
-      Status = EFI_SUCCESS;
+    if ((Question->Flags & EFI_IFR_DISPLAY) == 0) {
+      //
+      // In EFI_IFR_DISPLAY_INT_DEC type, should check value with int* type.
+      //
+      switch (Question->Flags & EFI_IFR_NUMERIC_SIZE) {
+      case EFI_IFR_NUMERIC_SIZE_1:
+        if (((INT8) HiiValue->Value.u8 < (INT8) Question->Minimum) || ((INT8) HiiValue->Value.u8 > (INT8) Question->Maximum)) {
+          HiiValue->Value.u8 = (UINT8) Question->Minimum;
+          Status = EFI_SUCCESS;
+        }
+        break;
+      case EFI_IFR_NUMERIC_SIZE_2:
+        if (((INT16) HiiValue->Value.u16 < (INT16) Question->Minimum) || ((INT16) HiiValue->Value.u16 > (INT16) Question->Maximum)) {
+          HiiValue->Value.u16 = (UINT16) Question->Minimum;
+          Status = EFI_SUCCESS;
+        }
+        break;
+      case EFI_IFR_NUMERIC_SIZE_4:
+        if (((INT32) HiiValue->Value.u32 < (INT32) Question->Minimum) || ((INT32) HiiValue->Value.u32 > (INT32) Question->Maximum)) {
+          HiiValue->Value.u32 = (UINT32) Question->Minimum;
+          Status = EFI_SUCCESS;
+        }
+        break;
+      case EFI_IFR_NUMERIC_SIZE_8:
+        if (((INT64) HiiValue->Value.u64 < (INT64) Question->Minimum) || ((INT64) HiiValue->Value.u64 > (INT64) Question->Maximum)) {
+          HiiValue->Value.u64 = Question->Minimum;
+          Status = EFI_SUCCESS;
+        }
+        break;
+      default:
+        break;     
+      }
+    } else {
+      if ((HiiValue->Value.u64 < Question->Minimum) || (HiiValue->Value.u64 > Question->Maximum)) {
+        HiiValue->Value.u64 = Question->Minimum;
+        Status = EFI_SUCCESS;
+      }
     }
     break;
 

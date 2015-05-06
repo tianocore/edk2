@@ -368,6 +368,9 @@ AdjustQuestionValue (
   Get field info from numeric opcode.
 
   @param  OpCode            Pointer to the current input opcode.
+  @param  IntInput          Whether question shows with EFI_IFR_DISPLAY_INT_DEC type.
+  @param  QuestionValue     Input question value, with EFI_HII_VALUE type.
+  @param  Value             Return question value, always return UINT64 type.
   @param  Minimum           The minimum size info for this opcode.
   @param  Maximum           The maximum size info for this opcode.
   @param  Step              The step size info for this opcode.
@@ -377,6 +380,9 @@ AdjustQuestionValue (
 VOID
 GetValueFromNum (
   IN  EFI_IFR_OP_HEADER     *OpCode,
+  IN  BOOLEAN               IntInput,
+  IN  EFI_HII_VALUE         *QuestionValue,
+  OUT UINT64                *Value,
   OUT UINT64                *Minimum,
   OUT UINT64                *Maximum,
   OUT UINT64                *Step,
@@ -389,29 +395,57 @@ GetValueFromNum (
   
   switch (NumericOp->Flags & EFI_IFR_NUMERIC_SIZE) {
   case EFI_IFR_NUMERIC_SIZE_1:
-    *Minimum = NumericOp->data.u8.MinValue;
-    *Maximum = NumericOp->data.u8.MaxValue;
+    if (IntInput) {
+      *Minimum = (INT64) (INT8) NumericOp->data.u8.MinValue;
+      *Maximum = (INT64) (INT8) NumericOp->data.u8.MaxValue;
+      *Value   = (INT64) (INT8) QuestionValue->Value.u8;
+    } else {
+      *Minimum = NumericOp->data.u8.MinValue;
+      *Maximum = NumericOp->data.u8.MaxValue;
+      *Value   = QuestionValue->Value.u8;
+    }
     *Step    = NumericOp->data.u8.Step;
     *StorageWidth = (UINT16) sizeof (UINT8);
     break;
   
   case EFI_IFR_NUMERIC_SIZE_2:
-    *Minimum = NumericOp->data.u16.MinValue;
-    *Maximum = NumericOp->data.u16.MaxValue;
+    if (IntInput) {
+      *Minimum = (INT64) (INT16) NumericOp->data.u16.MinValue;
+      *Maximum = (INT64) (INT16) NumericOp->data.u16.MaxValue;
+      *Value   = (INT64) (INT16) QuestionValue->Value.u16;
+    } else {
+      *Minimum = NumericOp->data.u16.MinValue;
+      *Maximum = NumericOp->data.u16.MaxValue;
+      *Value   = QuestionValue->Value.u16;
+    }
     *Step    = NumericOp->data.u16.Step;
     *StorageWidth = (UINT16) sizeof (UINT16);
     break;
   
   case EFI_IFR_NUMERIC_SIZE_4:
-    *Minimum = NumericOp->data.u32.MinValue;
-    *Maximum = NumericOp->data.u32.MaxValue;
+    if (IntInput) {
+      *Minimum = (INT64) (INT32) NumericOp->data.u32.MinValue;
+      *Maximum = (INT64) (INT32) NumericOp->data.u32.MaxValue;
+      *Value   = (INT64) (INT32) QuestionValue->Value.u32;
+    } else {
+      *Minimum = NumericOp->data.u32.MinValue;
+      *Maximum = NumericOp->data.u32.MaxValue;
+      *Value   = QuestionValue->Value.u32;
+    }
     *Step    = NumericOp->data.u32.Step;
     *StorageWidth = (UINT16) sizeof (UINT32);
     break;
   
   case EFI_IFR_NUMERIC_SIZE_8:
-    *Minimum = NumericOp->data.u64.MinValue;
-    *Maximum = NumericOp->data.u64.MaxValue;
+    if (IntInput) {
+      *Minimum = (INT64) NumericOp->data.u64.MinValue;
+      *Maximum = (INT64) NumericOp->data.u64.MaxValue;
+      *Value   = (INT64) QuestionValue->Value.u64;
+    } else {
+      *Minimum = NumericOp->data.u64.MinValue;
+      *Maximum = NumericOp->data.u64.MaxValue;
+      *Value   = QuestionValue->Value.u64;
+    }
     *Step    = NumericOp->data.u64.Step;
     *StorageWidth = (UINT16) sizeof (UINT64);
     break;
@@ -448,6 +482,9 @@ GetNumericInput (
   UINTN                   Loop;
   BOOLEAN                 ManualInput;
   BOOLEAN                 HexInput;
+  BOOLEAN                 IntInput;
+  BOOLEAN                 Negative;
+  BOOLEAN                 ValidateFail;
   BOOLEAN                 DateOrTime;
   UINTN                   InputWidth;
   UINT64                  EditValue;
@@ -472,6 +509,10 @@ GetNumericInput (
   Minimum           = 0;
   Maximum           = 0;
   NumericOp         = NULL;
+  IntInput          = FALSE;
+  HexInput          = FALSE;
+  Negative          = FALSE;
+  ValidateFail      = FALSE;
 
   Question      = MenuOption->ThisTag;
   QuestionValue = &Question->CurrentValue;
@@ -568,16 +609,19 @@ GetNumericInput (
   } else {
     ASSERT (Question->OpCode->OpCode == EFI_IFR_NUMERIC_OP);
     NumericOp = (EFI_IFR_NUMERIC *) Question->OpCode;
-    GetValueFromNum(Question->OpCode, &Minimum, &Maximum, &Step, &StorageWidth);
-    EditValue = QuestionValue->Value.u64;
+    GetValueFromNum(Question->OpCode, (NumericOp->Flags & EFI_IFR_DISPLAY) == 0, QuestionValue, &EditValue, &Minimum, &Maximum, &Step, &StorageWidth);
     EraseLen  = gOptionBlockWidth;
   }
 
-  if ((Question->OpCode->OpCode == EFI_IFR_NUMERIC_OP) && (NumericOp != NULL) &&
-      ((NumericOp->Flags & EFI_IFR_DISPLAY) == EFI_IFR_DISPLAY_UINT_HEX)) {
-    HexInput = TRUE;
-  } else {
-    HexInput = FALSE;
+  if ((Question->OpCode->OpCode == EFI_IFR_NUMERIC_OP) && (NumericOp != NULL)) {
+    if ((NumericOp->Flags & EFI_IFR_DISPLAY) == EFI_IFR_DISPLAY_UINT_HEX){
+      HexInput = TRUE;
+    } else if ((NumericOp->Flags & EFI_IFR_DISPLAY) == 0){
+      //
+      // Display with EFI_IFR_DISPLAY_INT_DEC type. Support negative number.
+      //
+      IntInput = TRUE;
+    }
   }
 
   //
@@ -608,6 +652,13 @@ GetNumericInput (
         default:
           InputWidth = 0;
           break;
+        }
+
+        if (IntInput) {
+          //
+          // Support an extra '-' for negative number.
+          //
+          InputWidth += 1;
         }
       }
 
@@ -691,13 +742,27 @@ TheKey2:
 
     case '+':
     case '-':
-      if (Key.UnicodeChar == '+') {
-        Key.ScanCode = SCAN_RIGHT;
+      if (ManualInput && IntInput) {
+        //
+        // In Manual input mode, check whether input the negative flag.
+        //
+        if (Key.UnicodeChar == '-') {
+          if (Negative) {
+            break;
+          }
+          Negative = TRUE;
+          PrintCharAt (Column++, Row, Key.UnicodeChar);
+        }
       } else {
-        Key.ScanCode = SCAN_LEFT;
+        if (Key.UnicodeChar == '+') {
+          Key.ScanCode = SCAN_RIGHT;
+        } else {
+          Key.ScanCode = SCAN_LEFT;
+        }
+        Key.UnicodeChar = CHAR_NULL;
+        goto TheKey2;
       }
-      Key.UnicodeChar = CHAR_NULL;
-      goto TheKey2;
+      break;
 
     case CHAR_NULL:
       switch (Key.ScanCode) {
@@ -715,20 +780,40 @@ TheKey2:
 
         if ((Step != 0) && !ManualInput) {
           if (Key.ScanCode == SCAN_LEFT) {
-            if (EditValue >= Minimum + Step) {
-              EditValue = EditValue - Step;
-            } else if (EditValue > Minimum){
-              EditValue = Minimum;
+            if (IntInput) {
+              if ((INT64) EditValue >= (INT64) Minimum + (INT64) Step) {
+                EditValue = EditValue - Step;
+              } else if ((INT64) EditValue > (INT64) Minimum){
+                EditValue = Minimum;
+              } else {
+                EditValue = Maximum;
+              }
             } else {
-              EditValue = Maximum;
+              if (EditValue >= Minimum + Step) {
+                EditValue = EditValue - Step;
+              } else if (EditValue > Minimum){
+                EditValue = Minimum;
+              } else {
+                EditValue = Maximum;
+              }
             }
           } else if (Key.ScanCode == SCAN_RIGHT) {
-            if (EditValue + Step <= Maximum) {
-              EditValue = EditValue + Step;
-            } else if (EditValue < Maximum) {
-              EditValue = Maximum;
+            if (IntInput) {
+              if ((INT64) EditValue + (INT64) Step <= (INT64) Maximum) {
+                EditValue = EditValue + Step;
+              } else if ((INT64) EditValue < (INT64) Maximum) {
+                EditValue = Maximum;
+              } else {
+                EditValue = Minimum;
+              }
             } else {
-              EditValue = Minimum;
+              if (EditValue + Step <= Maximum) {
+                EditValue = EditValue + Step;
+              } else if (EditValue < Maximum) {
+                EditValue = Maximum;
+              } else {
+                EditValue = Minimum;
+              }
             }
           }
 
@@ -808,13 +893,29 @@ EnterCarriageReturn:
       //
       // Validate input value with Minimum value.
       //
-      if (EditValue < Minimum) {
+      ValidateFail = FALSE;
+      if (IntInput) {
+        //
+        // After user input Enter, need to check whether the input value.
+        // If input a negative value, should compare with maximum value. 
+        // else compare with the minimum value.
+        //
+        if (Negative) {
+          ValidateFail = (INT64) EditValue > (INT64) Maximum ? TRUE : FALSE;
+        } else {
+          ValidateFail = (INT64) EditValue < (INT64) Minimum ? TRUE : FALSE;
+        }
+
+        if (ValidateFail) {
+          UpdateStatusBar (INPUT_ERROR, TRUE);
+          break;
+        }
+      } else if (EditValue < Minimum) {
         UpdateStatusBar (INPUT_ERROR, TRUE);
         break;
-      } else {
-        UpdateStatusBar (INPUT_ERROR, FALSE);
       }
-      
+
+      UpdateStatusBar (INPUT_ERROR, FALSE);
       CopyMem (&gUserInput->InputValue, &Question->CurrentValue, sizeof (EFI_HII_VALUE));
       QuestionValue = &gUserInput->InputValue;
       //
@@ -877,6 +978,11 @@ EnterCarriageReturn:
     case CHAR_BACKSPACE:
       if (ManualInput) {
         if (Count == 0) {
+          if (Negative) {
+            Negative = FALSE;
+            Column--;
+            PrintStringAt (Column, Row, L" ");
+          }
           break;
         }
         //
@@ -922,25 +1028,56 @@ EnterCarriageReturn:
         if (Count != 0) {
           if (HexInput) {
             EditValue = LShiftU64 (EditValue, 4) + Digital;
+          } else if (IntInput && Negative) {
+            //
+            // Save the negative number.
+            //
+            EditValue = ~(MultU64x32 (~(EditValue - 1), 10) + (Key.UnicodeChar - L'0')) + 1;
           } else {
             EditValue = MultU64x32 (EditValue, 10) + (Key.UnicodeChar - L'0');
           }
         } else {
           if (HexInput) {
             EditValue = Digital;
+          } else if (IntInput && Negative) {
+            //
+            // Save the negative number.
+            //
+            EditValue = ~(Key.UnicodeChar - L'0') + 1;
           } else {
             EditValue = Key.UnicodeChar - L'0';
           }
         }
 
-        if (EditValue > Maximum) {
-          UpdateStatusBar (INPUT_ERROR, TRUE);
-          ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
-          EditValue = PreviousNumber[Count];
-          break;
+        if (IntInput) {
+          ValidateFail = FALSE;
+          //
+          // When user input a new value, should check the current value.
+          // If user input a negative value, should compare it with minimum
+          // value, else compare it with maximum value.
+          //
+          if (Negative) {
+            ValidateFail = (INT64) EditValue < (INT64) Minimum ? TRUE : FALSE;
+          } else {
+            ValidateFail = (INT64) EditValue > (INT64) Maximum ? TRUE : FALSE;
+          }
+
+          if (ValidateFail) {
+            UpdateStatusBar (INPUT_ERROR, TRUE);
+            ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
+            EditValue = PreviousNumber[Count];
+            break;
+          }
         } else {
-          UpdateStatusBar (INPUT_ERROR, FALSE);
+          if (EditValue > Maximum) {
+            UpdateStatusBar (INPUT_ERROR, TRUE);
+            ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
+            EditValue = PreviousNumber[Count];
+            break;
+          }
         }
+
+        UpdateStatusBar (INPUT_ERROR, FALSE);
 
         Count++;
         ASSERT (Count < (sizeof (PreviousNumber) / sizeof (PreviousNumber[0])));

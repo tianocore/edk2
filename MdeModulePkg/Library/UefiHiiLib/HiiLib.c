@@ -1298,41 +1298,77 @@ ValidateQuestionFromVfr (
             VarValue = 0;
             CopyMem (&VarValue, VarBuffer +  Offset, Width);
           }
-          switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
-          case EFI_IFR_NUMERIC_SIZE_1:
-            if ((UINT8) VarValue < IfrNumeric->data.u8.MinValue || (UINT8) VarValue > IfrNumeric->data.u8.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              return EFI_INVALID_PARAMETER;
+          if ((IfrNumeric->Flags & EFI_IFR_DISPLAY) == 0) {
+            switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
+            case EFI_IFR_NUMERIC_SIZE_1:
+              if ((INT8) VarValue < (INT8) IfrNumeric->data.u8.MinValue || (INT8) VarValue > (INT8) IfrNumeric->data.u8.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
+            case EFI_IFR_NUMERIC_SIZE_2:
+              if ((INT16) VarValue < (INT16) IfrNumeric->data.u16.MinValue || (INT16) VarValue > (INT16) IfrNumeric->data.u16.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
+            case EFI_IFR_NUMERIC_SIZE_4:
+              if ((INT32) VarValue < (INT32) IfrNumeric->data.u32.MinValue || (INT32) VarValue > (INT32) IfrNumeric->data.u32.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
+            case EFI_IFR_NUMERIC_SIZE_8:
+              if ((INT64) VarValue < (INT64) IfrNumeric->data.u64.MinValue || (INT64) VarValue > (INT64) IfrNumeric->data.u64.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
             }
-            break;
-          case EFI_IFR_NUMERIC_SIZE_2:
-            if ((UINT16) VarValue < IfrNumeric->data.u16.MinValue || (UINT16) VarValue > IfrNumeric->data.u16.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              return EFI_INVALID_PARAMETER;
+          } else {
+            switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
+            case EFI_IFR_NUMERIC_SIZE_1:
+              if ((UINT8) VarValue < IfrNumeric->data.u8.MinValue || (UINT8) VarValue > IfrNumeric->data.u8.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
+            case EFI_IFR_NUMERIC_SIZE_2:
+              if ((UINT16) VarValue < IfrNumeric->data.u16.MinValue || (UINT16) VarValue > IfrNumeric->data.u16.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
+            case EFI_IFR_NUMERIC_SIZE_4:
+              if ((UINT32) VarValue < IfrNumeric->data.u32.MinValue || (UINT32) VarValue > IfrNumeric->data.u32.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
+            case EFI_IFR_NUMERIC_SIZE_8:
+              if ((UINT64) VarValue < IfrNumeric->data.u64.MinValue || (UINT64) VarValue > IfrNumeric->data.u64.MaxValue) {
+                //
+                // Not in the valid range.
+                //
+                return EFI_INVALID_PARAMETER;
+              }
+              break;
             }
-            break;
-          case EFI_IFR_NUMERIC_SIZE_4:
-            if ((UINT32) VarValue < IfrNumeric->data.u32.MinValue || (UINT32) VarValue > IfrNumeric->data.u32.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              return EFI_INVALID_PARAMETER;
-            }
-            break;
-          case EFI_IFR_NUMERIC_SIZE_8:
-            if ((UINT64) VarValue < IfrNumeric->data.u64.MinValue || (UINT64) VarValue > IfrNumeric->data.u64.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              return EFI_INVALID_PARAMETER;
-            }
-            break;
           }
-
           break;
         case EFI_IFR_CHECKBOX_OP:
           //
