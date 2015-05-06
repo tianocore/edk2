@@ -690,6 +690,7 @@ typedef union {
 #define EFI_IFR_MODAL_TAG_OP           0x61
 #define EFI_IFR_REFRESH_ID_OP          0x62
 #define EFI_IFR_WARNING_IF_OP          0x63
+#define EFI_IFR_MATCH2_OP              0x64
 
 
 typedef struct _EFI_IFR_OP_HEADER {
@@ -1267,6 +1268,11 @@ typedef struct _EFI_IFR_LESS_THAN {
 typedef struct _EFI_IFR_MATCH {
   EFI_IFR_OP_HEADER        Header;
 } EFI_IFR_MATCH;
+
+typedef struct _EFI_IFR_MATCH2 {
+  EFI_IFR_OP_HEADER        Header;
+  EFI_GUID                 SyntaxType;
+} EFI_IFR_MATCH2;
 
 typedef struct _EFI_IFR_MULTIPLY {
   EFI_IFR_OP_HEADER        Header;

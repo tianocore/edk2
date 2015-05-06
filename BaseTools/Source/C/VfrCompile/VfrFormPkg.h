@@ -2656,6 +2656,21 @@ public:
   }
 };
 
+class CIfrMatch2 : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_MATCH2 *mMatch2;
+
+public:
+  CIfrMatch2 (
+  IN UINT32   LineNo,
+  IN EFI_GUID *Guid
+  ) : CIfrObj (EFI_IFR_MATCH2_OP, (CHAR8 **)&mMatch2),
+      CIfrOpHeader (EFI_IFR_MATCH2_OP, &mMatch2->Header) {
+    SetLineNo (LineNo);
+    memmove (&mMatch2->SyntaxType, Guid, sizeof (EFI_GUID));
+  }
+};
+
 class CIfrMultiply : public CIfrObj, public CIfrOpHeader {
 private:
   EFI_IFR_MULTIPLY *mMultiply;

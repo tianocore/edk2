@@ -3401,6 +3401,7 @@ vfrStatementInvalidSaveRestoreDefaults :
 #token ToUpper("toupper")                       "toupper"
 #token ToLower("tolower")                       "tolower"
 #token Match("match")                           "match"
+#token Match2("match2")                         "match2"
 #token Catenate("catenate")                     "catenate"
 #token QuestionRefVal("questionrefval")         "questionrefval"
 #token StringRefVal("stringrefval")             "stringrefval"
@@ -3569,6 +3570,7 @@ castTerm [UINT32 & RootLevel, UINT32 & ExpOpCount]:
 atomTerm [UINT32 & RootLevel, UINT32 & ExpOpCount]:
     vfrExpressionCatenate[$RootLevel, $ExpOpCount]
   | vfrExpressionMatch[$RootLevel, $ExpOpCount]
+  | vfrExpressionMatch2[$RootLevel, $ExpOpCount]
   | vfrExpressionParen[$RootLevel, $ExpOpCount]
   | vfrExpressionBuildInFunction[$RootLevel, $ExpOpCount]
   | vfrExpressionConstant[$RootLevel, $ExpOpCount]
@@ -3597,6 +3599,20 @@ vfrExpressionMatch [UINT32 & RootLevel, UINT32 & ExpOpCount]:
   ","
   vfrStatementExpressionSub[$RootLevel + 1, $ExpOpCount]
   "\)"                                                 << { CIfrMatch MObj(L->getLine()); $ExpOpCount++; } >>
+  ;
+
+vfrExpressionMatch2 [UINT32 & RootLevel, UINT32 & ExpOpCount]:
+  <<
+    EFI_GUID      Guid;
+  >>
+  L:Match2
+  "\("
+  vfrStatementExpressionSub[$RootLevel + 1, $ExpOpCount]
+  ","
+  vfrStatementExpressionSub[$RootLevel + 1, $ExpOpCount]
+  ","
+  guidDefinition[Guid]
+  "\)"                                                 << { CIfrMatch2 M2Obj(L->getLine(), &Guid); $ExpOpCount++; } >>
   ;
 
 vfrExpressionParen [UINT32 & RootLevel, UINT32 & ExpOpCount]:
