@@ -1,7 +1,7 @@
 #/** @file
 # Platform description.
 #
-# Copyright (c) 2012  - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012  - 2015, Intel Corporation. All rights reserved.<BR>
 #                                                                                  
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.  
@@ -801,8 +801,8 @@
   ###############################################################################################
 
 [PcdsDynamicHii.common.DEFAULT]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5 # Variable: L"Timeout"
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|L"HwErrRecSupport"|gEfiGlobalVariableGuid|0x0|1 # Variable: L"HwErrRecSupport"
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5 # Variable: L"Timeout"
+  gEfiMdePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|L"HwErrRecSupport"|gEfiGlobalVariableGuid|0x0|1 # Variable: L"HwErrRecSupport"
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|L"BootState"|gEfiBootStateGuid|0x0|TRUE
 
 [PcdsDynamicDefault.common.DEFAULT]
@@ -828,13 +828,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|100
 
   ## The PCD is used to specify the video horizontal resolution of text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|800
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|800
   ## The PCD is used to specify the video vertical resolution of text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|600
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|600
   ## The PCD is used to specify the console output column of text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn|100
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn|100
   ## The PCD is used to specify the console output column of text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow|31
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|31
 
 !if $(TPM_ENABLED) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy|1
