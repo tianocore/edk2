@@ -1458,7 +1458,8 @@ vfrFormDefinition :
     // Just for framework vfr compatibility
     vfrStatementInvalid                      |
     vfrStatementExtension                    |
-    vfrStatementModal
+    vfrStatementModal                        |
+    vfrStatementRefreshEvent ";"
   )*
   E:EndForm                                         <<
                                                       if (mCompatibleMode) {
@@ -1504,7 +1505,8 @@ vfrFormMapDefinition :
     vfrStatementLabel                        |
     vfrStatementBanner                       |
     vfrStatementExtension                    |
-    vfrStatementModal
+    vfrStatementModal                        |
+    vfrStatementRefreshEvent ";"
   )*
   E:EndForm                                         << CRT_END_OP (E); >>
   ";"
@@ -2710,7 +2712,7 @@ vfrStatementQuestionTag :
   vfrStatementRefresh           |
   vfrStatementVarstoreDevice    |
   vfrStatementExtension         |
-  vfrStatementRefreshEvent      |
+  vfrStatementRefreshEvent ","  |
   vfrStatementWarningIf
   ;
 
@@ -2940,7 +2942,7 @@ vfrStatementRefreshEvent :
     EFI_GUID      Guid;
   >>
   L:RefreshGuid                                        << RiObj.SetLineNo(L->getLine()); >>
-  "="  guidDefinition[Guid] ","                        << RiObj.SetRefreshEventGroutId (&Guid);  >>
+  "="  guidDefinition[Guid]                            << RiObj.SetRefreshEventGroutId (&Guid);  >>
   ;
 
 vfrStatementVarstoreDevice :
