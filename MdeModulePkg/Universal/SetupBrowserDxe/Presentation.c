@@ -242,9 +242,9 @@ CreateRefreshEventForStatement (
 }
 
 /**
-  Create refresh hook event for statement which has refresh event or interval.
+  Create refresh hook event for form which has refresh event or interval.
 
-  @param Statement           The statement need to check.
+  @param Form           The form need to check.
 
 **/
 VOID
