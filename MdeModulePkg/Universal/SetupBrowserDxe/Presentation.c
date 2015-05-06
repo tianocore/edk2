@@ -178,7 +178,7 @@ UpdateStatement (
 **/
 VOID
 EFIAPI
-RefreshEventNotify(
+RefreshEventNotifyForStatement(
   IN      EFI_EVENT Event,
   IN      VOID      *Context
   )
@@ -190,6 +190,23 @@ RefreshEventNotify(
   gBS->SignalEvent (mValueChangedEvent);
 }
 
+/**
+  Refresh the questions within this form.
+  
+  @param Event    The event which has this function related.
+  @param Context  The input context info related to this event or the status code return to the caller.
+**/
+VOID
+EFIAPI
+RefreshEventNotifyForForm(
+  IN      EFI_EVENT Event,
+  IN      VOID      *Context
+  )
+{
+  gCurrentSelection->Action = UI_ACTION_REFRESH_FORMSET;
+
+  gBS->SignalEvent (mValueChangedEvent);
+}
 
 /**
   Create refresh hook event for statement which has refresh event or interval.
@@ -198,7 +215,7 @@ RefreshEventNotify(
 
 **/
 VOID
-CreateRefreshEvent (
+CreateRefreshEventForStatement (
   IN     FORM_BROWSER_STATEMENT        *Statement
   )
 {
@@ -212,9 +229,42 @@ CreateRefreshEvent (
   Status = gBS->CreateEventEx (
                     EVT_NOTIFY_SIGNAL,
                     TPL_CALLBACK,
-                    RefreshEventNotify,
+                    RefreshEventNotifyForStatement,
                     Statement,
                     &Statement->RefreshGuid,
+                    &RefreshEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  EventNode = AllocateZeroPool (sizeof (FORM_BROWSER_REFRESH_EVENT_NODE));
+  ASSERT (EventNode != NULL);
+  EventNode->RefreshEvent = RefreshEvent;
+  InsertTailList(&mRefreshEventList, &EventNode->Link);
+}
+
+/**
+  Create refresh hook event for statement which has refresh event or interval.
+
+  @param Statement           The statement need to check.
+
+**/
+VOID
+CreateRefreshEventForForm (
+  IN     FORM_BROWSER_FORM        *Form
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_EVENT                       RefreshEvent;
+  FORM_BROWSER_REFRESH_EVENT_NODE *EventNode;
+
+  //
+  // If question has refresh guid, create the notify function.
+  //
+  Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    RefreshEventNotifyForForm,
+                    Form,
+                    &Form->RefreshGuid,
                     &RefreshEvent);
   ASSERT_EFI_ERROR (Status);
 
@@ -308,7 +358,7 @@ InitializeDisplayStatement (
   // Create the refresh event process function.
   //
   if (!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) {
-    CreateRefreshEvent (Statement);
+    CreateRefreshEventForStatement (Statement);
   }
 
   //
@@ -557,6 +607,16 @@ AddStatementToDisplayForm (
     ASSERT (EventNode != NULL);
     EventNode->RefreshEvent = RefreshIntervalEvent;
     InsertTailList(&mRefreshEventList, &EventNode->Link);
+  }
+
+  //
+  // Create the refresh event process function for Form.
+  //
+  if (!CompareGuid (&gCurrentSelection->Form->RefreshGuid, &gZeroGuid)) {
+    CreateRefreshEventForForm (gCurrentSelection->Form);
+    if (gDisplayFormData.FormRefreshEvent == NULL) {
+      gDisplayFormData.FormRefreshEvent = mValueChangedEvent;
+    }
   }
 
   //
