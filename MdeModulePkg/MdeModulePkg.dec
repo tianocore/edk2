@@ -105,6 +105,9 @@
   ## @libraryclass   Provides sorting functions
   SortLib|Include/Library/SortLib.h
 
+  ## @libraryclass   Provides core boot manager functions
+  UefiBootManagerLib|Include/Library/UefiBootManagerLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -922,7 +925,16 @@
   ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
   # @Prompt Serial Port Extended Transmit FIFO Size in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|64|UINT32|0x00010068
-  
+
+  ## This PCD points to the file name GUID of the BootManagerMenuApp
+  #  Platform can customize the PCD to point to different application for Boot Manager Menu
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0xdc, 0x5b, 0xc2, 0xee, 0xf2, 0x67, 0x95, 0x4d, 0xb1, 0xd5, 0xf8, 0x1b, 0x20, 0x39, 0xd1, 0x1d }|VOID*|0x0001006b
+
+  ## This PCD points to the formset GUID of the driver health management form
+  #  The form will be popped up by BDS core when there are Configuration Required driver health intances.
+  #  Platform can customize the PCD to point to different formset.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDriverHealthConfigureForm|{ 0xf4, 0xd9, 0x96, 0x42, 0xfc, 0xf6, 0xde, 0x4d, 0x86, 0x85, 0x8c, 0xe2, 0xd7, 0x9d, 0x90, 0xf0 }|VOID*|0x0001006c
+
   ## The number of bytes between registers in serial device.  The default is 1 byte.
   # @Prompt Serial Port Register Stride in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1|UINT32|0x0001006B
