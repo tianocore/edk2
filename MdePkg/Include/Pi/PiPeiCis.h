@@ -12,7 +12,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.2.
+  PI Version 1.4.
 
 **/
 
@@ -808,7 +808,7 @@ EFI_STATUS
 // PEI Specification Revision information
 //
 #define PEI_SPECIFICATION_MAJOR_REVISION  1
-#define PEI_SPECIFICATION_MINOR_REVISION  30
+#define PEI_SPECIFICATION_MINOR_REVISION  40
 ///
 /// Specification inconsistency here: 
 /// In the PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 

@@ -1,8 +1,8 @@
 /** @file
-  Common definitions in the Platform Initialization Specification version 1.2
+  Common definitions in the Platform Initialization Specification version 1.4
   VOLUME 4 System Management Mode Core Interface version.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,10 +26,10 @@ typedef struct _EFI_SMM_SYSTEM_TABLE2  EFI_SMM_SYSTEM_TABLE2;
 ///
 #define SMM_SMST_SIGNATURE            SIGNATURE_32 ('S', 'M', 'S', 'T')
 ///
-/// The System Management System Table (SMST) revision is 1.2
+/// The System Management System Table (SMST) revision is 1.4
 ///
 #define SMM_SPECIFICATION_MAJOR_REVISION  1
-#define SMM_SPECIFICATION_MINOR_REVISION  30
+#define SMM_SPECIFICATION_MINOR_REVISION  40
 #define EFI_SMM_SYSTEM_TABLE2_REVISION    ((SMM_SPECIFICATION_MAJOR_REVISION<<16) | (SMM_SPECIFICATION_MINOR_REVISION))
 
 /**
