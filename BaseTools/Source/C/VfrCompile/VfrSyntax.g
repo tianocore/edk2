@@ -1395,7 +1395,14 @@ vfrQuestionDataFieldName [EFI_QUESTION_ID &QId, UINT32 &Mask, CHAR8 *&VarIdStr, 
 
 vfrConstantValueField[UINT8 Type, EFI_IFR_TYPE_VALUE &Value, BOOLEAN &ListType] :
   <<  
-    EFI_GUID Guid;
+    EFI_GUID    Guid;
+    BOOLEAN     Negative = FALSE;
+    BOOLEAN     IntDecStyle = FALSE;
+    CIfrNumeric *NumericQst = NULL;
+    if (gCurrentMinMaxData != NULL && gCurrentMinMaxData->IsNumericOpcode()) {
+      NumericQst = (CIfrNumeric *) gCurrentQuestion;
+      IntDecStyle = (NumericQst->GetNumericFlags() & EFI_IFR_DISPLAY) == 0 ? TRUE : FALSE;
+    }
     UINT8    *Type8  = (UINT8  *) &Value;
     UINT16   *Type16 = (UINT16 *) &Value;
     UINT32   *Type32 = (UINT32 *) &Value;
@@ -1403,19 +1410,78 @@ vfrConstantValueField[UINT8 Type, EFI_IFR_TYPE_VALUE &Value, BOOLEAN &ListType] 
     UINT16   Index = 0;
     ListType = FALSE;
   >>
+    {
+      "\-"                                          << Negative = TRUE;  >>
+    }
     N1:Number                                       <<
                                                        switch ($Type) {
                                                        case EFI_IFR_TYPE_NUM_SIZE_8 :
-                                                         $Value.u8     = _STOU8(N1->getText(), N1->getLine());
+                                                         $Value.u8 = _STOU8(N1->getText(), N1->getLine());
+                                                         if (IntDecStyle) {
+                                                           if (Negative) {
+                                                             if ($Value.u8 > 0x80) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT8 type can't big than 0x7F, small than -0x80");
+                                                             }
+                                                           } else {
+                                                             if ($Value.u8 > 0x7F) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT8 type can't big than 0x7F, small than -0x80");
+                                                             }
+                                                           }
+                                                         }
+                                                         if (Negative) {
+                                                           $Value.u8 = ~$Value.u8 + 1;
+                                                         }
                                                        break;
                                                        case EFI_IFR_TYPE_NUM_SIZE_16 :
-                                                         $Value.u16    = _STOU16(N1->getText(), N1->getLine());
+                                                         $Value.u16 = _STOU16(N1->getText(), N1->getLine());
+                                                         if (IntDecStyle) {
+                                                           if (Negative) {
+                                                             if ($Value.u16 > 0x8000) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT16 type can't big than 0x7FFF, small than -0x8000");
+                                                             }
+                                                           } else {
+                                                             if ($Value.u16 > 0x7FFF) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT16 type can't big than 0x7FFF, small than -0x8000");
+                                                             }
+                                                           }
+                                                         }
+                                                         if (Negative) {
+                                                           $Value.u16 = ~$Value.u16 + 1;
+                                                         }
                                                        break;
                                                        case EFI_IFR_TYPE_NUM_SIZE_32 :
                                                          $Value.u32    = _STOU32(N1->getText(), N1->getLine());
+                                                         if (IntDecStyle) {
+                                                           if (Negative) {
+                                                             if ($Value.u32 > 0x80000000) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT32 type can't big than 0x7FFFFFFF, small than -0x80000000");
+                                                             }
+                                                           } else {
+                                                             if ($Value.u32 > 0X7FFFFFFF) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT32 type can't big than 0x7FFFFFFF, small than -0x80000000");
+                                                             }
+                                                           }
+                                                         }
+                                                         if (Negative) {
+                                                           $Value.u32 = ~$Value.u32 + 1;
+                                                         }
                                                        break;
                                                        case EFI_IFR_TYPE_NUM_SIZE_64 :
                                                          $Value.u64    = _STOU64(N1->getText(), N1->getLine());
+                                                         if (IntDecStyle) {
+                                                           if (Negative) {
+                                                             if ($Value.u64 > 0x8000000000000000) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT64 type can't big than 0x7FFFFFFFFFFFFFFF, small than -0x8000000000000000");
+                                                             }
+                                                           } else {
+                                                             if ($Value.u64 > 0x7FFFFFFFFFFFFFFF) {
+                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "INT64 type can't big than 0x7FFFFFFFFFFFFFFF, small than -0x8000000000000000");
+                                                             }
+                                                           }
+                                                         }
+                                                         if (Negative) {
+                                                           $Value.u64 = ~$Value.u64 + 1;
+                                                         }
                                                        break;
                                                        case EFI_IFR_TYPE_BOOLEAN :
                                                          $Value.b      = _STOU8(N1->getText(), N1->getLine());
@@ -1590,6 +1656,7 @@ vfrStatementDefault :
      UINT16                *Type16       = (UINT16 *) ValueList;
      UINT32                *Type32       = (UINT32 *) ValueList;
      UINT64                *Type64       = (UINT64 *) ValueList;
+     CIfrNumeric           *NumericQst   = NULL;
 
   >>
   D:Default                                         
@@ -1599,8 +1666,40 @@ vfrStatementDefault :
                                                     << 
                                                         if (gCurrentMinMaxData != NULL && gCurrentMinMaxData->IsNumericOpcode()) {
                                                           //check default value is valid for Numeric Opcode
-                                                          if (Val->u64 < gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE()) || Val->u64 > gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE())) {
-                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                          NumericQst = (CIfrNumeric *) gCurrentQuestion;
+                                                          if ((NumericQst->GetNumericFlags() & EFI_IFR_DISPLAY) == 0) {
+                                                            switch (_GET_CURRQEST_DATATYPE()) {
+                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
+                                                              if (((INT8) Val.u8 < (INT8) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT8) Val.u8 > (INT8) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
+                                                              if (((INT16) Val.u16 < (INT16) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT16) Val.u16 > (INT16) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
+                                                              if (((INT32) Val.u32 < (INT32) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT32) Val.u32 > (INT32) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
+                                                              if (((INT64) Val.u64 < (INT64) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT64) Val.u64 > (INT64) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            default:
+                                                              break;
+                                                            }
+                                                          } else {
+                                                            if (Val.u64 < gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE()) || Val.u64 > gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE())) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                            }
                                                           }
                                                         }
                                                         if (_GET_CURRQEST_DATATYPE() == EFI_IFR_TYPE_OTHER) {
@@ -2313,41 +2412,205 @@ vfrSetMinMaxStep[CIfrMinMaxStepData & MMSDObj] :
      UINT32 MaxU4 = 0, MinU4 = 0, StepU4 = 0;
      UINT16 MaxU2 = 0, MinU2 = 0, StepU2 = 0;
      UINT8  MaxU1 = 0, MinU1 = 0, StepU1 = 0;
+     BOOLEAN IntDecStyle = FALSE;
+     CIfrNumeric *NObj = (CIfrNumeric *) (&MMSDObj);
+     if ((NObj->GetOpCode() == EFI_IFR_NUMERIC_OP) && ((NObj->GetNumericFlags() & EFI_IFR_DISPLAY) == 0)) {
+       IntDecStyle = TRUE;
+     }
+     BOOLEAN MinNegative = FALSE;
+     BOOLEAN MaxNegative = FALSE;
   >>
-  Minimum   "=" I:Number ","
-                                                       <<
+  Minimum   "=" 
+  {
+    "\-"                                               << MinNegative = TRUE; >>
+  }
+  I:Number ","                                         <<
+                                                          if (!IntDecStyle &&  MinNegative) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "\"-\" can't be used when not in int decimal type. ");
+                                                          }
                                                           switch (_GET_CURRQEST_DATATYPE()) {
-                                                          case EFI_IFR_TYPE_NUM_SIZE_64 : MinU8 = _STOU64(I->getText(), I->getLine()); break;
-                                                          case EFI_IFR_TYPE_NUM_SIZE_32 : MinU4 = _STOU32(I->getText(), I->getLine()); break;
-                                                          case EFI_IFR_TYPE_NUM_SIZE_16 : MinU2 = _STOU16(I->getText(), I->getLine()); break;
-                                                          case EFI_IFR_TYPE_NUM_SIZE_8 :  MinU1 = _STOU8(I->getText(), I->getLine());  break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_64 :
+                                                            MinU8 = _STOU64(I->getText(), I->getLine());
+                                                            if (IntDecStyle) {
+                                                              if (MinNegative) { 
+                                                                if (MinU8 > 0x8000000000000000) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT64 type minimum can't small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF");
+                                                                }
+                                                              } else {
+                                                                if (MinU8 > 0x7FFFFFFFFFFFFFFF) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT64 type minimum can't small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MinNegative) {
+                                                              MinU8 = ~MinU8 + 1;
+                                                            }
+                                                            break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_32 :
+                                                            MinU4 = _STOU32(I->getText(), I->getLine());
+                                                            if (IntDecStyle) {
+                                                              if (MinNegative) { 
+                                                                if (MinU4 > 0x80000000) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT32 type minimum can't small than -0x80000000, big than 0x7FFFFFFF");
+                                                                }
+                                                              } else {
+                                                                if (MinU4 > 0x7FFFFFFF) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT32 type minimum can't small than -0x80000000, big than 0x7FFFFFFF");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MinNegative) {
+                                                              MinU4 = ~MinU4 + 1;
+                                                            }
+                                                            break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_16 :
+                                                            MinU2 = _STOU16(I->getText(), I->getLine());
+                                                            if (IntDecStyle) {
+                                                              if (MinNegative) { 
+                                                                if (MinU2 > 0x8000) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT16 type minimum can't small than -0x8000, big than 0x7FFF");
+                                                                }
+                                                              } else {
+                                                                if (MinU2 > 0x7FFF) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT16 type minimum can't small than -0x8000, big than 0x7FFF");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MinNegative) {
+                                                              MinU2 = ~MinU2 + 1;
+                                                            }
+                                                            break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_8 :
+                                                            MinU1 = _STOU8(I->getText(), I->getLine());
+                                                            if (IntDecStyle) {
+                                                              if (MinNegative) { 
+                                                                if (MinU1 > 0x80) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT8 type minimum can't small than -0x80, big than 0x7F");
+                                                                }
+                                                              } else {
+                                                                if (MinU1 > 0x7F) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, I->getLine(), "INT8 type minimum can't small than -0x80, big than 0x7F");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MinNegative) {
+                                                              MinU1 = ~MinU1 + 1;
+                                                            }
+                                                            break;
                                                           }
                                                        >>
-  Maximum   "=" A:Number ","
-                                                       <<
+  Maximum   "=" 
+  { 
+    "\-"                                               << MaxNegative = TRUE; >>
+  }
+  A:Number ","                                         <<
+                                                          if (!IntDecStyle && MaxNegative) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "\"-\" can't be used when not in int decimal type. ");
+                                                          }
+
                                                           switch (_GET_CURRQEST_DATATYPE()) {
                                                           case EFI_IFR_TYPE_NUM_SIZE_64 : 
                                                             MaxU8 = _STOU64(A->getText(), A->getLine()); 
-                                                            if (MaxU8 < MinU8) {
-                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            if (IntDecStyle) {
+                                                              if (MaxNegative) {
+                                                                if (MaxU8 > 0x8000000000000000) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT64 type maximum can't small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF");
+                                                                }
+                                                              } else {
+                                                                if (MaxU8 > 0x7FFFFFFFFFFFFFFF) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT64 type maximum can't small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MaxNegative) {
+                                                              MaxU8 = ~MaxU8 + 1;
+                                                            }
+                                                            if (IntDecStyle) {
+                                                              if ((INT64) MaxU8 < (INT64) MinU8) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
+                                                            } else {
+                                                              if (MaxU8 < MinU8) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
                                                             }
                                                             break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_32 : 
-                                                            MaxU4 = _STOU32(A->getText(), A->getLine()); 
-                                                            if (MaxU4 < MinU4) {
-                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            MaxU4 = _STOU32(A->getText(), A->getLine());
+                                                            if (IntDecStyle) {
+                                                              if (MaxNegative) {
+                                                                if (MaxU4 > 0x80000000) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT32 type maximum can't small than -0x80000000, big than 0x7FFFFFFF");
+                                                                }
+                                                              } else {
+                                                                if (MaxU4 > 0x7FFFFFFF) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT32 type maximum can't small than -0x80000000, big than 0x7FFFFFFF");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MaxNegative) {
+                                                              MaxU4 = ~MaxU4 + 1;
+                                                            }
+                                                            if (IntDecStyle) {
+                                                              if ((INT32) MaxU4 < (INT32) MinU4) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
+                                                            } else {
+                                                              if (MaxU4 < MinU4) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
                                                             }
                                                             break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_16 : 
                                                             MaxU2 = _STOU16(A->getText(), A->getLine()); 
-                                                            if (MaxU2 < MinU2) {
-                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            if (IntDecStyle) {
+                                                              if (MaxNegative) {
+                                                                if (MaxU2 > 0x8000) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT16 type maximum can't small than -0x8000, big than 0x7FFF");
+                                                                }
+                                                              } else {
+                                                                if (MaxU2 > 0x7FFF) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT16 type maximum can't small than -0x8000, big than 0x7FFF");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MaxNegative) {
+                                                              MaxU2 = ~MaxU2 + 1;
+                                                            }
+                                                            if (IntDecStyle) {
+                                                              if ((INT16) MaxU2 < (INT16) MinU2) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
+                                                            } else {
+                                                              if (MaxU2 < MinU2) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
                                                             }
                                                             break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_8 :  
-                                                            MaxU1 = _STOU8(A->getText(), A->getLine());  
-                                                            if (MaxU1 < MinU1) {
-                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            MaxU1 = _STOU8(A->getText(), A->getLine());
+                                                            if (IntDecStyle) {
+                                                              if (MaxNegative) {
+                                                                if (MaxU1 > 0x80) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT8 type maximum can't small than -0x80, big than 0x7F");
+                                                                }
+                                                              } else {
+                                                                if (MaxU1 > 0x7F) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "INT8 type maximum can't small than -0x80, big than 0x7F");
+                                                                }
+                                                              }
+                                                            }
+                                                            if (MaxNegative) {
+                                                              MaxU1 = ~MaxU1 + 1;
+                                                            }
+                                                            if (IntDecStyle) {
+                                                              if ((INT8) MaxU1 < (INT8) MinU1) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
+                                                            } else {
+                                                              if (MaxU1 < MinU1) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                              }
                                                             }
                                                             break;
                                                           }

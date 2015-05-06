@@ -310,6 +310,10 @@ public:
   VOID UpdateHeader (IN EFI_IFR_OP_HEADER *Header) {
     mHeader = Header;
   }
+
+  UINT8 GetOpCode () {
+    return mHeader->OpCode;
+  }
 };
 
 extern UINT8 gScopeCount;
@@ -1358,6 +1362,10 @@ public:
       mNumeric->Flags = LFlags;
     }
     return VFR_RETURN_SUCCESS;
+  }
+
+  UINT8 GetNumericFlags () {
+    return mNumeric->Flags;
   }
 };
 
