@@ -1670,26 +1670,26 @@ vfrStatementDefault :
                                                           if ((NumericQst->GetNumericFlags() & EFI_IFR_DISPLAY) == 0) {
                                                             switch (_GET_CURRQEST_DATATYPE()) {
                                                             case EFI_IFR_TYPE_NUM_SIZE_8:
-                                                              if (((INT8) Val.u8 < (INT8) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
-                                                                  ((INT8) Val.u8 > (INT8) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                              if (((INT8) Val->u8 < (INT8) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT8) Val->u8 > (INT8) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
                                                                 _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
                                                               }
                                                               break;
                                                             case EFI_IFR_TYPE_NUM_SIZE_16:
-                                                              if (((INT16) Val.u16 < (INT16) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
-                                                                  ((INT16) Val.u16 > (INT16) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                              if (((INT16) Val->u16 < (INT16) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT16) Val->u16 > (INT16) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
                                                                 _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
                                                               }
                                                               break;
                                                             case EFI_IFR_TYPE_NUM_SIZE_32:
-                                                              if (((INT32) Val.u32 < (INT32) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
-                                                                  ((INT32) Val.u32 > (INT32) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                              if (((INT32) Val->u32 < (INT32) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT32) Val->u32 > (INT32) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
                                                                 _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
                                                               }
                                                               break;
                                                             case EFI_IFR_TYPE_NUM_SIZE_64:
-                                                              if (((INT64) Val.u64 < (INT64) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
-                                                                  ((INT64) Val.u64 > (INT64) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
+                                                              if (((INT64) Val->u64 < (INT64) gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE())) || 
+                                                                  ((INT64) Val->u64 > (INT64) gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE()))) {
                                                                 _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
                                                               }
                                                               break;
@@ -1697,7 +1697,7 @@ vfrStatementDefault :
                                                               break;
                                                             }
                                                           } else {
-                                                            if (Val.u64 < gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE()) || Val.u64 > gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE())) {
+                                                            if (Val->u64 < gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE()) || Val->u64 > gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE())) {
                                                               _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
                                                             }
                                                           }
