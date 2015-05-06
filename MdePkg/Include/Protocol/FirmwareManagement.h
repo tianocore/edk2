@@ -191,7 +191,9 @@ typedef struct {
 //
 ///
 /// IMAGE_UPDATABLE_VALID indicates SetImage() will accept the new image and update the
-/// device with the new image.
+/// device with the new image. The version of the new image could be higher or lower than
+/// the current image. SetImage VendorCode is optional but can be used for vendor
+/// specific action.
 ///
 #define  IMAGE_UPDATABLE_VALID                     0x0000000000000001
 ///
@@ -211,6 +213,12 @@ typedef struct {
 /// version downgrade.
 ///
 #define  IMAGE_UPDATABLE_INVALID_OLD               0x0000000000000008
+///
+/// IMAGE_UPDATABLE_VALID_WITH_VENDOR_CODE indicates SetImage() will accept and update
+/// the new image only if a correct VendorCode is provided or else image would be
+/// rejected and SetImage will return appropriate error.
+///
+#define IMAGE_UPDATABLE_VALID_WITH_VENDOR_CODE     0x0000000000000010
 
 
 //
