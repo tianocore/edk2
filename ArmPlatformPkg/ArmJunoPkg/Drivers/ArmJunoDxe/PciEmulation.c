@@ -558,7 +558,7 @@ PciInstallDevice (
 
   // Unique device path.
   CopyMem (&Private->DevicePath, &PciIoDevicePathTemplate, sizeof (PciIoDevicePathTemplate));
-  Private->DevicePath.AcpiDevicePath.UID = 0;
+  Private->DevicePath.AcpiDevicePath.UID = 1; // Use '1' to differentiate from PLDA root complex
   Private->DevicePath.PciDevicePath.Device = DeviceId;
 
   // Copy protocol structure
