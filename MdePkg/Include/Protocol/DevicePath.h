@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __EFI_DEVICE_PATH_PROTOCOL_H__
 
 #include <Guid/PcAnsi.h>
-
+#include <IndustryStandard/Bluetooth.h>
 ///
 /// Device Path protocol.
 ///
@@ -862,6 +862,18 @@ typedef struct {
   UINT16                          VlanId;
 } VLAN_DEVICE_PATH;
 
+///
+/// Bluetooth Device Path SubType.
+///
+#define MSG_BLUETOOTH_DP     0x1b
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// 48bit Bluetooth device address.
+  ///
+  BLUETOOTH_ADDRESS               BD_ADDR;
+} BLUETOOTH_DEVICE_PATH;
+
 //
 // Media Device Path
 //
@@ -1110,6 +1122,7 @@ typedef union {
   SAS_DEVICE_PATH                            Sas;
   SASEX_DEVICE_PATH                          SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 NvmeNamespace;
+  BLUETOOTH_DEVICE_PATH                      Bluetooth;
   UFS_DEVICE_PATH                            Ufs;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
   CDROM_DEVICE_PATH                          CD;
@@ -1161,6 +1174,7 @@ typedef union {
   SAS_DEVICE_PATH                            *Sas;
   SASEX_DEVICE_PATH                          *SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 *NvmeNamespace;
+  BLUETOOTH_DEVICE_PATH                      *Bluetooth;
   UFS_DEVICE_PATH                            *Ufs;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;
   CDROM_DEVICE_PATH                          *CD;
