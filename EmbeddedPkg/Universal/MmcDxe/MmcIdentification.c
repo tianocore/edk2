@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -11,8 +11,6 @@
 *  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
-
-#include <Library/TimerLib.h>
 
 #include "Mmc.h"
 
@@ -322,7 +320,7 @@ MmcIdentificationMode (
 
     if (!EFI_ERROR (Status)) {
       if (!MmcHostInstance->CardInfo.OCRData.PowerUp) {
-        MicroSecondDelay (1);
+        gBS->Stall (1);
         Timeout--;
       } else {
         if ((MmcHostInstance->CardInfo.CardType == SD_CARD_2) && (MmcHostInstance->CardInfo.OCRData.AccessMode & BIT1)) {
@@ -332,7 +330,7 @@ MmcIdentificationMode (
         break;  // The MMC/SD card is ready. Continue the Identification Mode
       }
     } else {
-      MicroSecondDelay (1);
+      gBS->Stall (1);
       Timeout--;
     }
   }

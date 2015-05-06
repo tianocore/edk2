@@ -59,8 +59,6 @@
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
 
-  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
 
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
@@ -265,14 +263,25 @@
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/SerialDxe/SerialDxe.inf
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
-  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf {
+    <LibraryClasses>
+      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  }
 
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
 
   # FDT installation
-  EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
+  EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf {
+    <LibraryClasses>
+      # It depends on BdsLib that depends on TimerLib
+      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  }
 
-  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
+  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf {
+    <LibraryClasses>
+      # It depends on BdsLib that depends on TimerLib
+      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  }
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
 

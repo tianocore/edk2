@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -13,7 +13,6 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
-#include <Library/TimerLib.h>
 
 #include "Mmc.h"
 
@@ -268,7 +267,7 @@ MmcIoBlocks (
           break;  // Prevents delay once finished
         }
       }
-      NanoSecondDelay (100);
+      gBS->Stall (1);
     }
 
     Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
