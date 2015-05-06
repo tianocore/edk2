@@ -7,7 +7,7 @@
   This module register report status code listener to collect performance data
   for S3 Resume Performance Record on S3 resume boot path.
 
-  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -156,57 +156,51 @@ FirmwarePerformancePeiEntryPoint (
   )
 {
   EFI_STATUS               Status;
-  EFI_BOOT_MODE            BootMode;
   EFI_PEI_RSC_HANDLER_PPI  *RscHandler;
   PEI_SEC_PERFORMANCE_PPI  *SecPerf;
   FIRMWARE_SEC_PERFORMANCE Performance;
 
-  Status = PeiServicesGetBootMode(&BootMode);
-  ASSERT_EFI_ERROR (Status);
-
-  if (BootMode == BOOT_ON_S3_RESUME) {
-    if (FeaturePcdGet (PcdFirmwarePerformanceDataTableS3Support)) {
-      //
-      // S3 resume - register status code listener for OS wake vector.
-      //
-      Status = PeiServicesLocatePpi (
-                 &gEfiPeiRscHandlerPpiGuid,
-                 0,
-                 NULL,
-                 (VOID **) &RscHandler
-                 );
-      ASSERT_EFI_ERROR (Status);
-
-      Status = RscHandler->Register (FpdtStatusCodeListenerPei);
-      ASSERT_EFI_ERROR (Status);
-    }
-  } else {
+  if (FeaturePcdGet (PcdFirmwarePerformanceDataTableS3Support)) {
     //
-    // Normal boot - build Hob for SEC performance data.
+    // S3 resume - register status code listener for OS wake vector.
     //
     Status = PeiServicesLocatePpi (
-               &gPeiSecPerformancePpiGuid,
+               &gEfiPeiRscHandlerPpiGuid,
                0,
                NULL,
-               (VOID **) &SecPerf
+               (VOID **) &RscHandler
                );
-    if (!EFI_ERROR (Status)) {
-      Status = SecPerf->GetPerformance (PeiServices, SecPerf, &Performance);
-    }
-    if (!EFI_ERROR (Status)) {
-      BuildGuidDataHob (
-        &gEfiFirmwarePerformanceGuid,
-        &Performance,
-        sizeof (FIRMWARE_SEC_PERFORMANCE)
-      );
-      DEBUG ((EFI_D_INFO, "FPDT: SEC Performance Hob ResetEnd = %ld\n", Performance.ResetEnd));
-    } else {
-      //
-      // SEC performance PPI is not installed or fail to get performance data
-      // from SEC Performance PPI.
-      //
-      DEBUG ((EFI_D_ERROR, "FPDT: WARNING: SEC Performance PPI not installed or failed!\n"));
-    }
+    ASSERT_EFI_ERROR (Status);
+
+    Status = RscHandler->Register (FpdtStatusCodeListenerPei);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Normal boot - build Hob for SEC performance data.
+  //
+  Status = PeiServicesLocatePpi (
+             &gPeiSecPerformancePpiGuid,
+             0,
+             NULL,
+             (VOID **) &SecPerf
+             );
+  if (!EFI_ERROR (Status)) {
+    Status = SecPerf->GetPerformance (PeiServices, SecPerf, &Performance);
+  }
+  if (!EFI_ERROR (Status)) {
+    BuildGuidDataHob (
+      &gEfiFirmwarePerformanceGuid,
+      &Performance,
+      sizeof (FIRMWARE_SEC_PERFORMANCE)
+    );
+    DEBUG ((EFI_D_INFO, "FPDT: SEC Performance Hob ResetEnd = %ld\n", Performance.ResetEnd));
+  } else {
+    //
+    // SEC performance PPI is not installed or fail to get performance data
+    // from SEC Performance PPI.
+    //
+    DEBUG ((EFI_D_ERROR, "FPDT: WARNING: SEC Performance PPI not installed or failed!\n"));
   }
 
   return EFI_SUCCESS;
