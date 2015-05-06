@@ -902,6 +902,9 @@ DestroyStatement (
     Default = QUESTION_DEFAULT_FROM_LINK (Link);
     RemoveEntryList (&Default->Link);
 
+    if (Default->Value.Buffer != NULL) {
+      FreePool (Default->Value.Buffer);
+    }
     FreePool (Default);
   }
 
@@ -2113,7 +2116,11 @@ ParseOpCodes (
 
       CurrentDefault->Value.Type = ((EFI_IFR_DEFAULT *) OpCodeData)->Type;
       CopyMem (&CurrentDefault->DefaultId, &((EFI_IFR_DEFAULT *) OpCodeData)->DefaultId, sizeof (UINT16));
-      if (OpCodeLength > OFFSET_OF (EFI_IFR_DEFAULT, Value)) {
+      if (CurrentDefault->Value.Type == EFI_IFR_TYPE_BUFFER) {
+        CurrentDefault->Value.BufferLen = (UINT16) (OpCodeLength - OFFSET_OF (EFI_IFR_DEFAULT, Value));
+        CurrentDefault->Value.Buffer = AllocateCopyPool (CurrentDefault->Value.BufferLen, &((EFI_IFR_DEFAULT *) OpCodeData)->Value);
+        ASSERT (CurrentDefault->Value.Buffer != NULL);
+      } else {
         CopyMem (&CurrentDefault->Value.Value, &((EFI_IFR_DEFAULT *) OpCodeData)->Value, OpCodeLength - OFFSET_OF (EFI_IFR_DEFAULT, Value));
         ExtendValueToU64 (&CurrentDefault->Value);
       }
@@ -2132,6 +2139,32 @@ ParseOpCodes (
     // Option
     //
     case EFI_IFR_ONE_OF_OPTION_OP:
+      if (ParentStatement->Operand == EFI_IFR_ORDERED_LIST_OP && ((((EFI_IFR_ONE_OF_OPTION *) OpCodeData)->Flags & (EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG)) != 0)) {
+        //
+        // It's keep the default value for ordered list opcode.
+        //
+        CurrentDefault = AllocateZeroPool (sizeof (QUESTION_DEFAULT));
+        ASSERT (CurrentDefault != NULL);
+        CurrentDefault->Signature = QUESTION_DEFAULT_SIGNATURE;
+
+        CurrentDefault->Value.Type = EFI_IFR_TYPE_BUFFER;
+        if ((((EFI_IFR_ONE_OF_OPTION *) OpCodeData)->Flags & EFI_IFR_OPTION_DEFAULT) != 0) {
+          CurrentDefault->DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
+        } else {
+          CurrentDefault->DefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
+        }
+
+        CurrentDefault->Value.BufferLen = (UINT16) (OpCodeLength - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
+        CurrentDefault->Value.Buffer = AllocateCopyPool (CurrentDefault->Value.BufferLen, &((EFI_IFR_ONE_OF_OPTION *) OpCodeData)->Value);
+        ASSERT (CurrentDefault->Value.Buffer != NULL);
+
+        //
+        // Insert to Default Value list of current Question
+        //
+        InsertTailList (&ParentStatement->DefaultListHead, &CurrentDefault->Link);
+        break;
+      }
+
       //
       // EFI_IFR_ONE_OF_OPTION appear in scope of a Question.
       // It create a selection for use in current Question.

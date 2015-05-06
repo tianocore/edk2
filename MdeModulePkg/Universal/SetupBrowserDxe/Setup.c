@@ -3859,7 +3859,12 @@ GetQuestionDefault (
           //
           // Default value is embedded in EFI_IFR_DEFAULT
           //
-          CopyMem (HiiValue, &Default->Value, sizeof (EFI_HII_VALUE));
+          if (Default->Value.Type == EFI_IFR_TYPE_BUFFER) {
+            ASSERT (HiiValue->Buffer != NULL);
+            CopyMem (HiiValue->Buffer, Default->Value.Buffer, Default->Value.BufferLen);
+          } else {
+            CopyMem (HiiValue, &Default->Value, sizeof (EFI_HII_VALUE));
+          }
         }
 
         if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
