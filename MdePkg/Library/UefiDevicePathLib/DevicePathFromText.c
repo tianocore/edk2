@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2697,6 +2697,51 @@ DevPathFromTextVlan (
 }
 
 /**
+  Converts a text device path node to Bluetooth device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Bluetooth device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextBluetooth (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                  *BluetoothStr;
+  CHAR16                  *Walker;
+  CHAR16                  *TempNumBuffer;
+  UINTN                   TempBufferSize;
+  INT32                   Index;
+  BLUETOOTH_DEVICE_PATH   *BluetoothDp;
+
+  BluetoothStr = GetNextParamStr (&TextDeviceNode);
+  BluetoothDp = (BLUETOOTH_DEVICE_PATH *) CreateDeviceNode (
+                                   MESSAGING_DEVICE_PATH,
+                                   MSG_BLUETOOTH_DP,
+                                   (UINT16) sizeof (BLUETOOTH_DEVICE_PATH)
+                                   );
+
+  Index = sizeof (BLUETOOTH_ADDRESS) - 1;
+  while (!IS_NULL(BluetoothStr) && Index >= 0) {
+    Walker = SplitStr (&BluetoothStr, L':');
+    TempBufferSize = StrSize (Walker) + StrLen (L"0x") * sizeof (CHAR16);
+    TempNumBuffer = AllocateZeroPool (TempBufferSize);
+    if (TempNumBuffer == NULL) {
+      break;
+    }
+    StrnCpy (TempNumBuffer, L"0x", TempBufferSize / sizeof (CHAR16));
+    StrnCat (TempNumBuffer + StrLen (L"0x"), Walker, TempBufferSize / sizeof (CHAR16) - StrLen (L"0x") );
+    BluetoothDp->BD_ADDR.Address[Index] = (UINT8)Strtoi (TempNumBuffer);
+    FreePool (TempNumBuffer);
+    Index--;
+  }
+  
+  return (EFI_DEVICE_PATH_PROTOCOL *) BluetoothDp;
+}
+
+/**
   Converts a media text device path node to media device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3136,7 +3181,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Unit",                    DevPathFromTextUnit                    },
   {L"iSCSI",                   DevPathFromTextiSCSI                   },
   {L"Vlan",                    DevPathFromTextVlan                    },
-
+  {L"Bluetooth",               DevPathFromTextBluetooth               },
   {L"MediaPath",               DevPathFromTextMediaPath               },
   {L"HD",                      DevPathFromTextHD                      },
   {L"CDROM",                   DevPathFromTextCDROM                   },
