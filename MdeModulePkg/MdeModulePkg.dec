@@ -948,6 +948,29 @@
   # @Prompt Video vertical resolution.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600|UINT32|0x4000000a
 
+  #  The 4 PCDs below are used to specify the video resolution and text mode of text setup.
+  #  To make text setup work in this resolution, PcdVideoHorizontalResolution, PcdVideoVerticalResolution,
+  #  PcdConOutColumn and PcdConOutRow should be created as PcdsDynamic or PcdsDynamicEx in platform DSC file.
+  #  Then BDS setup will update these PCDs defined in MdeModulePkg.dec and reconnect console drivers
+  #  (GraphicsConsole, Terminal, Consplitter) to make the video resolution and text mode work
+  #  for text setup.
+
+  ## Specify the video horizontal resolution of text setup.
+  # @Prompt Video Horizontal Resolution of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|800|UINT32|0x4000000b
+
+  ## Specify the video vertical resolution of text setup.
+  # @Prompt Video Vertical Resolution of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|600|UINT32|0x4000000c
+
+  ## Specify the console output column of text setup.
+  # @Prompt Console Output Column of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn|80|UINT32|0x4000000d
+
+  ## Specify the console output row of text setup.
+  # @Prompt Console Output Row of Text Setup
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x4000000e
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Base address of the NV variable range in flash device.
   # @Prompt Base address of flash NV variable range.

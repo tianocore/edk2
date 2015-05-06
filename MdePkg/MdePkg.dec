@@ -1900,5 +1900,16 @@
   # @ValidRange 0x80000001 | 0 - 3
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
 
+  ## Error level for hardware recorder. 
+  #  If value 0, platform does not support feature of hardware error record.
+  # @Prompt Error Level For Hardware Recorder
+  gEfiMdePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x0000002b
+
+  ## The number of seconds that the firmware will wait before initiating the original default boot selection. 
+  #  A value of 0 indicates that the default boot selection is to be initiated immediately on boot. 
+  #  The value of 0xFFFF then firmware will wait for user input before booting.
+  # @Prompt Boot Timeout (s)
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000002c
+
 [UserExtensions.TianoCore."ExtraFiles"]
   MdePkgExtra.uni
