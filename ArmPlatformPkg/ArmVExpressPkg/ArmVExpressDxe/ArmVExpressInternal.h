@@ -52,8 +52,8 @@ typedef struct {
   ARM_VEXPRESS_PLATFORM_ID  Id;
 
   // Flattened Device Tree (FDT) File
-  EFI_GUID                  FdtGuid; /// Name of the FDT when present into the FV
-  CONST CHAR16*             FdtName; /// Name of the FDT when present into a File System
+  CONST EFI_GUID            *FdtGuid; /// Name of the FDT when present into the FV
+  CONST CHAR16              *FdtName; /// Name of the FDT when present into a File System
 } ARM_VEXPRESS_PLATFORM;
 
 // Array that contains the list of the VExpress based platform supported by this DXE driver
