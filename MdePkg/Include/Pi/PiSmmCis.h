@@ -112,8 +112,9 @@ EFI_STATUS
   @param[in]  Function          Points to the notification function.
   @param[out] Registration      A pointer to a memory location to receive the registration value.
 
-  @retval EFI_SUCCESS           Successfully returned the registration record that has been added.
-  @retval EFI_INVALID_PARAMETER One or more of Protocol, Function and Registration is NULL.
+  @retval EFI_SUCCESS           Successfully returned the registration record
+                                that has been added or unhooked.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL or Registration is NULL.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory resource to finish the request.
   @retval EFI_NOT_FOUND         If the registration is not found when Function == NULL.
 **/
