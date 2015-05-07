@@ -169,6 +169,10 @@ typedef struct {
   { \
     0xa5bc1114, 0x6f64, 0x4ede, { 0xb8, 0x63, 0x3e, 0x83, 0xed, 0x7c, 0x83, 0xb1 } \
   }
+#define EFI_ERROR_SECTION_PLATFORM_MEMORY2_GUID \
+  { \
+    0x61EC04FC, 0x48E6, 0xD813, { 0x25, 0xC9, 0x8D, 0xAA, 0x44, 0x75, 0x0B, 0x12 } \
+  }
 #define EFI_ERROR_SECTION_PCIE_GUID \
   { \
     0xd995e954, 0xbbc1, 0x430f, { 0xad, 0x91, 0xb4, 0x4d, 0xcb, 0x3c, 0x6f, 0x35 } \
@@ -820,6 +824,84 @@ typedef struct {
 } EFI_PLATFORM_MEMORY_ERROR_DATA;
 
 ///
+/// Validation bit mask indicates which fields in the memory error record 2 are valid
+/// in Memory Error section 2
+///@{
+#define EFI_PLATFORM_MEMORY2_ERROR_STATUS_VALID                 BIT0
+#define EFI_PLATFORM_MEMORY2_PHY_ADDRESS_VALID                  BIT1
+#define EFI_PLATFORM_MEMORY2_PHY_ADDRESS_MASK_VALID             BIT2
+#define EFI_PLATFORM_MEMORY2_NODE_VALID                         BIT3
+#define EFI_PLATFORM_MEMORY2_CARD_VALID                         BIT4
+#define EFI_PLATFORM_MEMORY2_MODULE_VALID                       BIT5
+#define EFI_PLATFORM_MEMORY2_BANK_VALID                         BIT6
+#define EFI_PLATFORM_MEMORY2_DEVICE_VALID                       BIT7
+#define EFI_PLATFORM_MEMORY2_ROW_VALID                          BIT8
+#define EFI_PLATFORM_MEMORY2_COLUMN_VALID                       BIT9
+#define EFI_PLATFORM_MEMORY2_RANK_VALID                         BIT10
+#define EFI_PLATFORM_MEMORY2_BIT_POS_VALID                      BIT11
+#define EFI_PLATFORM_MEMORY2_CHIP_ID_VALID                      BIT12
+#define EFI_PLATFORM_MEMORY2_MEMORY_ERROR_TYPE_VALID            BIT13
+#define EFI_PLATFORM_MEMORY2_STATUS_VALID                       BIT14
+#define EFI_PLATFORM_MEMORY2_REQUESTOR_ID_VALID                 BIT15
+#define EFI_PLATFORM_MEMORY2_RESPONDER_ID_VALID                 BIT16
+#define EFI_PLATFORM_MEMORY2_TARGET_ID_VALID                    BIT17
+#define EFI_PLATFORM_MEMORY2_CARD_HANDLE_VALID                  BIT18
+#define EFI_PLATFORM_MEMORY2_MODULE_HANDLE_VALID                BIT19
+#define EFI_PLATFORM_MEMORY2_BANK_GROUP_VALID                   BIT20
+#define EFI_PLATFORM_MEMORY2_BANK_ADDRESS_VALID                 BIT21
+///@}
+
+///
+/// Memory Error Type identifies the type of error that occurred in Memory
+/// Error section 2
+///@{
+#define EFI_PLATFORM_MEMORY2_ERROR_UNKNOWN                      0x00
+#define EFI_PLATFORM_MEMORY2_ERROR_NONE                         0x01
+#define EFI_PLATFORM_MEMORY2_ERROR_SINGLEBIT_ECC                0x02
+#define EFI_PLATFORM_MEMORY2_ERROR_MLTIBIT_ECC                  0x03
+#define EFI_PLATFORM_MEMORY2_ERROR_SINGLESYMBOL_CHIPKILL        0x04
+#define EFI_PLATFORM_MEMORY2_ERROR_MULTISYMBOL_CHIPKILL         0x05
+#define EFI_PLATFORM_MEMORY2_ERROR_MASTER_ABORT                 0x06
+#define EFI_PLATFORM_MEMORY2_ERROR_TARGET_ABORT                 0x07
+#define EFI_PLATFORM_MEMORY2_ERROR_PARITY                       0x08
+#define EFI_PLATFORM_MEMORY2_ERROR_WDT                          0x09
+#define EFI_PLATFORM_MEMORY2_ERROR_INVALID_ADDRESS              0x0A
+#define EFI_PLATFORM_MEMORY2_ERROR_MIRROR_BROKEN                0x0B
+#define EFI_PLATFORM_MEMORY2_ERROR_MEMORY_SPARING               0x0C
+#define EFI_PLATFORM_MEMORY2_ERROR_SCRUB_CORRECTED              0x0D
+#define EFI_PLATFORM_MEMORY2_ERROR_SCRUB_UNCORRECTED            0x0E
+#define EFI_PLATFORM_MEMORY2_ERROR_MEMORY_MAP_EVENT             0x0F
+///@}
+
+///
+/// Memory Error Section 2
+///
+typedef struct {
+  UINT64                    ValidFields;
+  EFI_GENERIC_ERROR_STATUS  ErrorStatus;
+  UINT64                    PhysicalAddress;      // Error physical address
+  UINT64                    PhysicalAddressMask;  // Grnaularity
+  UINT16                    Node;                 // Node #
+  UINT16                    Card;
+  UINT16                    Module;               // Module or Rank#
+  UINT16                    Bank;
+  UINT32                    Device;
+  UINT32                    Row;
+  UINT32                    Column;
+  UINT32                    Rank;
+  UINT32                    BitPosition;
+  UINT8                     ChipId;
+  UINT8                     MemErrorType;
+  UINT8                     Status;
+  UINT8                     Reserved;
+  UINT64                    RequestorId;
+  UINT64                    ResponderId;
+  UINT64                    TargetId;
+  UINT32                    CardHandle;
+  UINT32                    ModuleHandle;
+} EFI_PLATFORM_MEMORY2_ERROR_DATA;
+
+///
 /// Validation bits mask indicates which of the following fields is valid
 /// in PCI Express Error Record.
 ///@{
@@ -1097,6 +1179,7 @@ extern EFI_GUID gEfiEventNotificationTypeDmarGuid;
 extern EFI_GUID gEfiProcessorGenericErrorSectionGuid;
 extern EFI_GUID gEfiProcessorSpecificErrorSectionGuid;
 extern EFI_GUID gEfiPlatformMemoryErrorSectionGuid;
+extern EFI_GUID gEfiPlatformMemory2ErrorSectionGuid;
 extern EFI_GUID gEfiPcieErrorSectionGuid;
 extern EFI_GUID gEfiFirmwareErrorSectionGuid;
 extern EFI_GUID gEfiPciBusErrorSectionGuid;
