@@ -28,6 +28,12 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationQemu.fdf
 
+  #
+  # Defines for default states.  These can be changed on the command line.
+  # -D FLAG=VALUE
+  #
+  DEFINE SECURE_BOOT_ENABLE      = FALSE
+
 !include ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualization.dsc.inc
 
 [LibraryClasses.AARCH64]
@@ -48,6 +54,7 @@
   ArmPlatformSysConfigLib|ArmPlatformPkg/Library/ArmPlatformSysConfigLibNull/ArmPlatformSysConfigLibNull.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+  NorFlashPlatformLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
 
 !ifdef INTEL_BDS
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
@@ -233,7 +240,15 @@
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+  }
+!else
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+!endif
+
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
@@ -253,9 +268,22 @@
   #
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+    <LibraryClasses>
+      NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+  }
+  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  }
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
@@ -272,10 +300,11 @@
 
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf {
-    <LibraryClasses>
-    NorFlashPlatformLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
-  }
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashAuthenticatedDxe.inf
+!else
+  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
+!endif
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   #
