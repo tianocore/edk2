@@ -99,7 +99,7 @@ Tpm2RequestUseTpm (
   
   Status = mPttPassThruProtocol->Tpm2RequestUseTpm (mPttPassThruProtocol);
            
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**

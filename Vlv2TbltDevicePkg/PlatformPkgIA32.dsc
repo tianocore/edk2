@@ -77,6 +77,9 @@
 
   DEFINE   PLATFORM_PCIEXPRESS_BASE   = 0E0000000
 
+  DEFINE SEC_ENABLE = TRUE
+  DEFINE SEC_DEBUG_INFO_ENABLE = TRUE
+  DEFINE FTPM_ENABLE = TRUE
 
 ################################################################################
 #

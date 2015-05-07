@@ -107,6 +107,7 @@
   gPeiMfgMemoryTestPpiGuid
   gPeiSha256HashPpiGuid
   gVlvMmioPolicyPpiGuid
+  gSeCfTPMPolicyPpiGuid
 
 [Guids]
   gEfiSetupVariableGuid

@@ -37,19 +37,32 @@ form formid = SECURITY_CONFIGURATION_FORM_ID,
   //TPM related
   //
   subtitle text = STRING_TOKEN(STR_TPM_CONFIGURATION_PROMPT);
+grayoutif ideqval Setup.ETpm== 0x1;
+  oneof   varid   = Setup.fTPM,
+    prompt      = STRING_TOKEN(STR_PTT_PROMPT),
+    help        = STRING_TOKEN(STR_PTT_HELP),
+      option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_DISABLE), value= 0, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+  endoneof;
+endif;
+
+grayoutif ideqval Setup.fTPM == 0x1;
   oneof   varid   = Setup.ETpm,
     prompt      = STRING_TOKEN(STR_TPM_PROMPT),
     help        = STRING_TOKEN(STR_TPM_HELP),
-      option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
-      option text = STRING_TOKEN(STR_DISABLE), value= 0, flags= RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_DISABLE), value= 0, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
   endoneof;
+endif;
 
+suppressif ideqval Setup.fTPM == 0;
   oneof varid = Setup.MeasuredBootEnable,
     prompt      = STRING_TOKEN(STR_MEASURED_BOOT_ENABLE_PROMPT),
     help        = STRING_TOKEN(STR_MEASURED_BOOT_ENABLE_HELP),
     option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
     option text = STRING_TOKEN(STR_ENABLE), value = 1, flags =  DEFAULT | MANUFACTURING | RESET_REQUIRED;
   endoneof;
+endif;
 
   subtitle text = STRING_TOKEN(STR_NULL_STRING);
 

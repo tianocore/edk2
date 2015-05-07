@@ -127,7 +127,7 @@ Tpm2RequestUseTpm (
 
   Status = SecPttPassThruPpi->Tpm2RequestUseTpm (SecPttPassThruPpi);
   
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
