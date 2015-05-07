@@ -697,7 +697,7 @@ BdsFirmwareVolumeLoadImage (
         Status = FwVol->ReadFile (
                                 FwVol,
                                 FvNameGuid,
-                                (VOID*)(UINTN)(*Image),
+                                (VOID**)Image,
                                 ImageSize,
                                 &FvType,
                                 &Attrib,
