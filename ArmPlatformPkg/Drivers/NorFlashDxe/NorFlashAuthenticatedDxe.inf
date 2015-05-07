@@ -1,8 +1,9 @@
 #/** @file
 #
-#  Component description file for NorFlashDxe module
+#  Component description file for NorFlashAuthenticatedDxe module
 #
 #  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,8 +17,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmVeNorFlashDxe
-  FILE_GUID                      = 93E34C7E-B50E-11DF-9223-2443DFD72085
+  BASE_NAME                      = NorFlashAuthenticatedDxe
+  FILE_GUID                      = 10B86CEA-F2FE-456A-B1C7-4F506CA46005
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = NorFlashInitialise
@@ -26,12 +27,13 @@
   NorFlashDxe.c
   NorFlashFvbDxe.c
   NorFlashBlockIoDxe.c
-  NorFlashVariableDep.c
+  NorFlashAuthenticatedVariableDep.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   IoLib
@@ -47,7 +49,7 @@
 
 [Guids]
   gEfiSystemNvDataFvGuid
-  gEfiVariableGuid
+  gEfiAuthenticatedVariableGuid
   gEfiEventVirtualAddressChangeGuid
 
 [Protocols]
@@ -68,6 +70,7 @@
 
 [Depex]
   #
-  # NorFlashDxe must be loaded before VariableRuntimeDxe in case empty flash needs populating with default values
+  # NorFlashAuthenticatedDxe must be loaded before VariableAuthenticatedRuntimeDxe
+  # in case empty flash needs populating with default values
   #
-  BEFORE gVariableRuntimeDxeFileGuid
+  BEFORE gVariableAuthenticatedRuntimeDxeFileGuid

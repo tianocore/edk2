@@ -36,6 +36,10 @@
   # Following Guid must match FILE_GUID in MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   #
   gVariableRuntimeDxeFileGuid = { 0xcbd2e4d5, 0x7068, 0x4ff5, { 0xb4, 0x62, 0x98, 0x22, 0xb4, 0xad, 0x8d, 0x60 } }
+  #
+  # Following Guid must match FILE_GUID in SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
+  #
+  gVariableAuthenticatedRuntimeDxeFileGuid = { 0x2226f30f, 0x3d5b, 0x402d,  {0x99, 0x36, 0xa9, 0x71, 0x84, 0xEB, 0x45, 0x16 } }
 
   ## Include/Guid/ArmGlobalVariableHob.h
   gArmGlobalVariableGuid      = { 0xc3253c90, 0xa24f, 0x4599, { 0xa6, 0x64, 0x1f, 0x88, 0x13, 0x77, 0x8f, 0xc9} }
