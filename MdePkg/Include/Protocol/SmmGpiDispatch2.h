@@ -9,7 +9,7 @@
   given event types.  Several inputs can be enabled.  This purpose of this interface is to generate an 
   SMI in response to any of these inputs having a true value provided.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,8 +38,9 @@
 ///
 typedef struct {
   ///
-  /// A bit mask of 64 possible GPIs that can generate an SMI.  Bit 0 corresponds to logical 
-  /// GPI[0], 1 corresponds to logical GPI[1], and so on.
+  /// A number from one of 2^64 possible GPIs that can generate an SMI. A
+  /// 0 corresponds to logical GPI[0]; 1 corresponds to logical GPI[1]; and
+  /// GpiNum of N corresponds to GPI[N], where N can span from 0 to 2^64-1.
   ///
   UINT64 GpiNum;
 } EFI_SMM_GPI_REGISTER_CONTEXT;
