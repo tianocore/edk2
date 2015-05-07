@@ -49,9 +49,14 @@
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   VirtioMmioDeviceLib
+  DevicePathLib
 
 [LibraryClasses.AARCH64]
   ArmGicLib
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiDevicePathProtocolGuid
 
 [FixedPcd]
   gArmVExpressTokenSpaceGuid.PcdFvpFdtDevicePathsBase
