@@ -940,7 +940,7 @@
 
   ## The number of bytes between registers in serial device.  The default is 1 byte.
   # @Prompt Serial Port Register Stride in Bytes
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1|UINT32|0x0001006B
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1|UINT32|0x0001006d
   
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
