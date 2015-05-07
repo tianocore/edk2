@@ -652,7 +652,6 @@ FindFileSystem (
 {
   UINTN                     NoBlkIoHandles;
   UINTN                     NoSimpleFsHandles;
-  UINTN                     NoLoadFileHandles;
   EFI_HANDLE                *BlkIoHandle;
   EFI_HANDLE                *SimpleFsHandle;
   UINT16                    *VolumeLabel;
@@ -669,7 +668,6 @@ FindFileSystem (
 
 
   NoSimpleFsHandles = 0;
-  NoLoadFileHandles = 0;
   OptionNumber      = 0;
   InitializeListHead (&FsOptionMenu.Head);
 

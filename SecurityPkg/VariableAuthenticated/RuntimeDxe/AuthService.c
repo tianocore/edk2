@@ -1255,7 +1255,6 @@ IsDeleteAuthVariable (
   )
 {
   BOOLEAN                       Del;
-  UINT8                         *Payload;
   UINTN                         PayloadSize;
 
   Del = FALSE;
@@ -1270,13 +1269,11 @@ IsDeleteAuthVariable (
       (Attributes == Variable->CurrPtr->Attributes) &&
       ((Attributes & (EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)) != 0)) {
     if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
       PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
       if (PayloadSize == 0) {
         Del = TRUE;
       }
     } else {
-      Payload = (UINT8 *) Data + AUTHINFO_SIZE;
       PayloadSize = DataSize - AUTHINFO_SIZE;
       if (PayloadSize == 0) {
         Del = TRUE;
@@ -2179,7 +2176,6 @@ VerifyTimeBasedPayload (
   UINT8                            *Buffer;
   UINTN                            Length;
   UINT8                            *SignerCerts;
-  UINT8                            *WrapSigData;
   UINTN                            CertStackSize;
   UINT8                            *CertsInCertDb;
   UINT32                           CertsSizeinDb;
@@ -2188,7 +2184,6 @@ VerifyTimeBasedPayload (
   CertData               = NULL;
   NewData                = NULL;
   Attr                   = Attributes;
-  WrapSigData            = NULL;
   SignerCerts            = NULL;
   RootCert               = NULL;
   CertsInCertDb          = NULL;
