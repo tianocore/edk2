@@ -824,6 +824,15 @@ typedef struct {
 } UFS_DEVICE_PATH;
 
 ///
+/// SD (Secure Digital) Device Path SubType.
+///
+#define MSG_SD_DP                 0x1A
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  UINT8                           SlotNumber;
+} SD_DEVICE_PATH;
+
+///
 /// iSCSI Device Path SubType
 ///
 #define MSG_ISCSI_DP              0x13
@@ -1137,6 +1146,7 @@ typedef union {
   URI_DEVICE_PATH                            Uri;
   BLUETOOTH_DEVICE_PATH                      Bluetooth;
   UFS_DEVICE_PATH                            Ufs;
+  SD_DEVICE_PATH                             Sd;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
   CDROM_DEVICE_PATH                          CD;
 
@@ -1190,6 +1200,7 @@ typedef union {
   URI_DEVICE_PATH                            *Uri;
   BLUETOOTH_DEVICE_PATH                      *Bluetooth;
   UFS_DEVICE_PATH                            *Ufs;
+  SD_DEVICE_PATH                             *Sd;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;
   CDROM_DEVICE_PATH                          *CD;
 
