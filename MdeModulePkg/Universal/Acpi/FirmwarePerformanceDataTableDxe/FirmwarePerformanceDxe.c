@@ -5,7 +5,7 @@
   for Firmware Basic Boot Performance Record and other boot performance records, 
   and install FPDT to ACPI table.
 
-  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -556,46 +556,6 @@ FpdtReadyToBootEventNotify (
 }
 
 /**
-  Notify function for event group EFI_EVENT_LEGACY_BOOT_GUID. This is used to
-  record performance data for OsLoaderLoadImageStart in FPDT for legacy boot.
-
-  @param[in]  Event   The Event that is being processed.
-  @param[in]  Context The Event Context.
-
-**/
-VOID
-EFIAPI
-FpdtLegacyBootEventNotify (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-{
-  if (mAcpiBootPerformanceTable == NULL) {
-    //
-    // Firmware Performance Data Table not installed, do nothing.
-    //
-    return ;
-  }
-
-  //
-  // Update Firmware Basic Boot Performance Record for legacy boot.
-  //
-  mAcpiBootPerformanceTable->BasicBoot.OsLoaderLoadImageStart  = 0;
-  mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart = GetTimeInNanoSecond (GetPerformanceCounter ());
-  mAcpiBootPerformanceTable->BasicBoot.ExitBootServicesEntry   = 0;
-  mAcpiBootPerformanceTable->BasicBoot.ExitBootServicesExit    = 0;
-
-  //
-  // Dump FPDT Boot Performance record.
-  //
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ResetEnd                = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ResetEnd));
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderLoadImageStart  = 0\n"));
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderStartImageStart = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart));
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesEntry   = 0\n"));
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesExit    = 0\n"));
-}
-
-/**
   Report status code listener of FPDT. This is used to collect performance data
   for OsLoaderLoadImageStart and OsLoaderStartImageStart in FPDT.
 
@@ -682,6 +642,27 @@ FpdtStatusCodeListenerDxe (
     // Update ExitBootServicesExit for UEFI boot.
     //
     mAcpiBootPerformanceTable->BasicBoot.ExitBootServicesExit = GetTimeInNanoSecond (GetPerformanceCounter ());
+  } else if (Value == (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_LEGACY_BOOT_EVENT)) {
+    if (mAcpiBootPerformanceTable == NULL) {
+      //
+      // Firmware Performance Data Table not installed, do nothing.
+      //
+      return Status;
+    }
+
+    //
+    // Update Firmware Basic Boot Performance Record for legacy boot.
+    //
+    mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart = GetTimeInNanoSecond (GetPerformanceCounter ());
+
+    //
+    // Dump FPDT Boot Performance record.
+    //
+    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ResetEnd                = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ResetEnd));
+    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderLoadImageStart  = 0\n"));
+    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderStartImageStart = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart));
+    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesEntry   = 0\n"));
+    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesExit    = 0\n"));
   } else if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
     //
     // Append one or more Boot records
@@ -845,19 +826,6 @@ FirmwarePerformanceDxeEntryPoint (
                   NULL,
                   &gEfiEventReadyToBootGuid,
                   &mReadyToBootEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Create legacy boot event to log OsLoaderStartImageStart for legacy boot.
-  //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  FpdtLegacyBootEventNotify,
-                  NULL,
-                  &gEfiEventLegacyBootGuid,
-                  &mLegacyBootEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
