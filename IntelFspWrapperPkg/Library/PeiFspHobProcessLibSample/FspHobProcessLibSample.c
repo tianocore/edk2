@@ -155,7 +155,7 @@ FspHobProcessForMemoryResource (
   BOOLEAN              FoundFspMemHob;
   EFI_STATUS           Status;
   EFI_BOOT_MODE        BootMode;
-  PEI_CAPSULE_PPI      *Capsule;
+  EFI_PEI_CAPSULE_PPI  *Capsule;
   VOID                 *CapsuleBuffer;
   UINTN                CapsuleBufferLength;
   UINT64               RequiredMemSize;
@@ -271,7 +271,7 @@ FspHobProcessForMemoryResource (
     CapsuleBufferLength = 0;
     if (BootMode == BOOT_ON_FLASH_UPDATE) {
       Status = PeiServicesLocatePpi (
-                 &gPeiCapsulePpiGuid,
+                 &gEfiPeiCapsulePpiGuid,
                  0,
                  NULL,
                  (VOID **) &Capsule

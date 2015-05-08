@@ -72,4 +72,4 @@
   gEfiMemoryTypeInformationGuid                           ## CONSUMES ## GUID
 
 [Ppis]
-  gPeiCapsulePpiGuid                                      ## CONSUMES
+  gEfiPeiCapsulePpiGuid                                   ## CONSUMES
