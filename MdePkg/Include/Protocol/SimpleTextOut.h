@@ -6,7 +6,7 @@
   a single hardware device or a virtual device that is an aggregation
   of multiple physical devices.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -115,7 +115,7 @@ typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 #define EFI_BROWN                 (EFI_GREEN | EFI_RED)
 #define EFI_LIGHTGRAY             (EFI_BLUE | EFI_GREEN | EFI_RED)
 #define EFI_BRIGHT                0x08
-#define EFI_DARKGRAY              (EFI_BRIGHT)
+#define EFI_DARKGRAY              (EFI_BLACK | EFI_BRIGHT)
 #define EFI_LIGHTBLUE             (EFI_BLUE | EFI_BRIGHT)
 #define EFI_LIGHTGREEN            (EFI_GREEN | EFI_BRIGHT)
 #define EFI_LIGHTCYAN             (EFI_CYAN | EFI_BRIGHT)
@@ -124,7 +124,18 @@ typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 #define EFI_YELLOW                (EFI_BROWN | EFI_BRIGHT)
 #define EFI_WHITE                 (EFI_BLUE | EFI_GREEN | EFI_RED | EFI_BRIGHT)
 
-#define EFI_TEXT_ATTR(f, b)       ((f) | ((b) << 4))
+//
+// Macro to accept color values in their raw form to create 
+// a value that represents both a foreground and background 
+// color in a single byte.
+// For Foreground, and EFI_* value is valid from EFI_BLACK(0x00) to
+// EFI_WHITE (0x0F).
+// For Background, only EFI_BLACK, EFI_BLUE, EFI_GREEN, EFI_CYAN,
+// EFI_RED, EFI_MAGENTA, EFI_BROWN, and EFI_LIGHTGRAY are acceptable
+//
+// Do not use EFI_BACKGROUND_xxx values with this macro.
+//
+#define EFI_TEXT_ATTR(Foreground,Background) ((Foreground) | ((Background) << 4))
 
 #define EFI_BACKGROUND_BLACK      0x00
 #define EFI_BACKGROUND_BLUE       0x10
