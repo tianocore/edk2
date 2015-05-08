@@ -33,13 +33,18 @@
 **/
 #define TRANSLATION_OUTPUT_SIZE 0x100
 
+/**
+  Output buffer size for OpenFirmware to UEFI device path fragment translation,
+  in CHAR16's, for a sequence of PCI bridges.
+**/
+#define BRIDGE_TRANSLATION_OUTPUT_SIZE 0x40
 
 /**
   Numbers of nodes in OpenFirmware device paths that are required and examined.
 **/
 #define REQUIRED_PCI_OFW_NODES  2
 #define REQUIRED_MMIO_OFW_NODES 1
-#define EXAMINED_OFW_NODES      4
+#define EXAMINED_OFW_NODES      6
 
 
 /**
@@ -581,6 +586,9 @@ TranslatePciOfwNodes (
   IN OUT  UINTN          *TranslatedSize
   )
 {
+  UINTN  FirstNonBridge;
+  CHAR16 Bridges[BRIDGE_TRANSLATION_OUTPUT_SIZE];
+  UINTN  BridgesLen;
   UINT64 PciDevFun[2];
   UINTN  NumEntries;
   UINTN  Written;
@@ -593,10 +601,63 @@ TranslatePciOfwNodes (
       ) {
     return RETURN_UNSUPPORTED;
   }
+
+  //
+  // Translate a sequence of PCI bridges. For each bridge, the OFW node is:
+  //
+  //   pci-bridge@1e[,0]
+  //              ^   ^
+  //              PCI slot & function on the parent, holding the bridge
+  //
+  // and the UEFI device path node is:
+  //
+  //   Pci(0x1E,0x0)
+  //
+  FirstNonBridge = 1;
+  Bridges[0] = L'\0';
+  BridgesLen = 0;
+  do {
+    UINT64 BridgeDevFun[2];
+    UINTN  BridgesFreeBytes;
+
+    if (!SubstringEq (OfwNode[FirstNonBridge].DriverName, "pci-bridge")) {
+      break;
+    }
+
+    BridgeDevFun[1] = 0;
+    NumEntries = sizeof BridgeDevFun / sizeof BridgeDevFun[0];
+    if (ParseUnitAddressHexList (OfwNode[FirstNonBridge].UnitAddress,
+          BridgeDevFun, &NumEntries) != RETURN_SUCCESS) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    BridgesFreeBytes = sizeof Bridges - BridgesLen * sizeof Bridges[0];
+    Written = UnicodeSPrintAsciiFormat (Bridges + BridgesLen, BridgesFreeBytes,
+                "/Pci(0x%Lx,0x%Lx)", BridgeDevFun[0], BridgeDevFun[1]);
+    BridgesLen += Written;
+
+    //
+    // There's no way to differentiate between "completely used up without
+    // truncation" and "truncated", so treat the former as the latter.
+    //
+    if (BridgesLen + 1 == BRIDGE_TRANSLATION_OUTPUT_SIZE) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    ++FirstNonBridge;
+  } while (FirstNonBridge < NumNodes);
+
+  if (FirstNonBridge == NumNodes) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  //
+  // Parse the OFW nodes starting with the first non-bridge node.
+  //
   PciDevFun[1] = 0;
   NumEntries = sizeof (PciDevFun) / sizeof (PciDevFun[0]);
   if (ParseUnitAddressHexList (
-        OfwNode[1].UnitAddress,
+        OfwNode[FirstNonBridge].UnitAddress,
         PciDevFun,
         &NumEntries
         ) != RETURN_SUCCESS
@@ -604,10 +665,10 @@ TranslatePciOfwNodes (
     return RETURN_UNSUPPORTED;
   }
 
-  if (NumNodes >= 4 &&
-      SubstringEq (OfwNode[1].DriverName, "ide") &&
-      SubstringEq (OfwNode[2].DriverName, "drive") &&
-      SubstringEq (OfwNode[3].DriverName, "disk")
+  if (NumNodes >= FirstNonBridge + 3 &&
+      SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "ide") &&
+      SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "drive") &&
+      SubstringEq (OfwNode[FirstNonBridge + 2].DriverName, "disk")
       ) {
     //
     // OpenFirmware device path (IDE disk, IDE CD-ROM):
@@ -630,13 +691,13 @@ TranslatePciOfwNodes (
 
     NumEntries = 1;
     if (ParseUnitAddressHexList (
-          OfwNode[2].UnitAddress,
+          OfwNode[FirstNonBridge + 1].UnitAddress,
           &Secondary,
           &NumEntries
           ) != RETURN_SUCCESS ||
         Secondary > 1 ||
         ParseUnitAddressHexList (
-          OfwNode[3].UnitAddress,
+          OfwNode[FirstNonBridge + 2].UnitAddress,
           &Slave,
           &NumEntries // reuse after previous single-element call
           ) != RETURN_SUCCESS ||
@@ -648,16 +709,17 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Ata(%a,%a,0x0)",
+      "PciRoot(0x0)%s/Pci(0x%Lx,0x%Lx)/Ata(%a,%a,0x0)",
+      Bridges,
       PciDevFun[0],
       PciDevFun[1],
       Secondary ? "Secondary" : "Primary",
       Slave ? "Slave" : "Master"
       );
-  } else if (NumNodes >= 4 &&
-             SubstringEq (OfwNode[1].DriverName, "isa") &&
-             SubstringEq (OfwNode[2].DriverName, "fdc") &&
-             SubstringEq (OfwNode[3].DriverName, "floppy")
+  } else if (NumNodes >= FirstNonBridge + 3 &&
+             SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "isa") &&
+             SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "fdc") &&
+             SubstringEq (OfwNode[FirstNonBridge + 2].DriverName, "floppy")
              ) {
     //
     // OpenFirmware device path (floppy disk):
@@ -679,7 +741,7 @@ TranslatePciOfwNodes (
 
     NumEntries = 1;
     if (ParseUnitAddressHexList (
-          OfwNode[3].UnitAddress,
+          OfwNode[FirstNonBridge + 2].UnitAddress,
           &AcpiUid,
           &NumEntries
           ) != RETURN_SUCCESS ||
@@ -691,14 +753,15 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Floppy(0x%Lx)",
+      "PciRoot(0x0)%s/Pci(0x%Lx,0x%Lx)/Floppy(0x%Lx)",
+      Bridges,
       PciDevFun[0],
       PciDevFun[1],
       AcpiUid
       );
-  } else if (NumNodes >= 3 &&
-             SubstringEq (OfwNode[1].DriverName, "scsi") &&
-             SubstringEq (OfwNode[2].DriverName, "disk")
+  } else if (NumNodes >= FirstNonBridge + 2 &&
+             SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "scsi") &&
+             SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "disk")
              ) {
     //
     // OpenFirmware device path (virtio-blk disk):
@@ -718,14 +781,15 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/HD(",
+      "PciRoot(0x0)%s/Pci(0x%Lx,0x%Lx)/HD(",
+      Bridges,
       PciDevFun[0],
       PciDevFun[1]
       );
-  } else if (NumNodes >= 4 &&
-             SubstringEq (OfwNode[1].DriverName, "scsi") &&
-             SubstringEq (OfwNode[2].DriverName, "channel") &&
-             SubstringEq (OfwNode[3].DriverName, "disk")
+  } else if (NumNodes >= FirstNonBridge + 3 &&
+             SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "scsi") &&
+             SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "channel") &&
+             SubstringEq (OfwNode[FirstNonBridge + 2].DriverName, "disk")
              ) {
     //
     // OpenFirmware device path (virtio-scsi disk):
@@ -750,7 +814,7 @@ TranslatePciOfwNodes (
     TargetLun[1] = 0;
     NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
     if (ParseUnitAddressHexList (
-          OfwNode[3].UnitAddress,
+          OfwNode[FirstNonBridge + 2].UnitAddress,
           TargetLun,
           &NumEntries
           ) != RETURN_SUCCESS
@@ -761,7 +825,8 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)/Scsi(0x%Lx,0x%Lx)",
+      "PciRoot(0x0)%s/Pci(0x%Lx,0x%Lx)/Scsi(0x%Lx,0x%Lx)",
+      Bridges,
       PciDevFun[0],
       PciDevFun[1],
       TargetLun[0],
@@ -784,7 +849,8 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x0)/Pci(0x%Lx,0x%Lx)",
+      "PciRoot(0x0)%s/Pci(0x%Lx,0x%Lx)",
+      Bridges,
       PciDevFun[0],
       PciDevFun[1]
       );
