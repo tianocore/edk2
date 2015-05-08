@@ -41,7 +41,19 @@ ArmPlatformSecTrustzoneInit (
   IN  UINTN                     MpId
   )
 {
-  // No TZPC or TZASC on RTSM to initialize
+  // Initialize TSC-400 to open all DRAM below 4G to nonsecure world
+  
+  // configure security errors to be bus errors (data/prefetch aborts);
+  MmioWrite32(ARM_VE_TZC400_BASE + 0x004, 0x01);
+
+  // enable gate keepers for all four filter enables
+  MmioWrite32(ARM_VE_TZC400_BASE + 0x008, BIT3 | BIT2 | BIT1 | BIT0);
+
+  // enable secure reads and writes to region 0 - s_wr_en, s_rd_en
+  MmioOr32(ARM_VE_TZC400_BASE + 0x110, BIT31 | BIT30);
+  
+  // enable all IDs to do non-secure read and writes
+  MmioWrite32(ARM_VE_TZC400_BASE + 0x114, 0xFFFFFFFF);
 }
 
 /**

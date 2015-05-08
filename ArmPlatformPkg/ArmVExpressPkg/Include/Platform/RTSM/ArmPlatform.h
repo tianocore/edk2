@@ -51,6 +51,9 @@
 // This can be any value since we only support motherboard PL111
 #define LCD_VRAM_CORE_TILE_BASE                 0x00000000
 
+// TZC-400 Address Space Controller
+#define ARM_VE_TZC400_BASE                      0x2a4a0000
+
 // On-chip peripherals (Snoop Control Unit etc...)
 #define ARM_VE_ON_CHIP_PERIPH_BASE              0x2C000000
 // Note: The TRM says not all the peripherals are implemented
