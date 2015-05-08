@@ -427,6 +427,8 @@ typedef struct {
       0x2f87ba6a, 0x5c04, 0x4385, {0xa7, 0x80, 0xf3, 0xbf, 0x78, 0xa9, 0x7b, 0xec} \
     }
 
+extern EFI_GUID gEfiBlockIoCryptoAlgoAesXtsGuid;
+
 typedef struct {
   EFI_BLOCK_IO_CRYPTO_IV_INPUT Header;
   UINT64                       CryptoBlockNumber;
@@ -437,6 +439,8 @@ typedef struct {
     { \
       0x689e4c62, 0x70bf, 0x4cf3, {0x88, 0xbb, 0x33, 0xb3, 0x18, 0x26, 0x86, 0x70} \
     }
+
+extern EFI_GUID gEfiBlockIoCryptoAlgoAesCbcMsBitlockerGuid;
 
 typedef struct {
   EFI_BLOCK_IO_CRYPTO_IV_INPUT  Header;
