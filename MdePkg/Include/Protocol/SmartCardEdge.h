@@ -157,6 +157,9 @@ typedef UINT8 SMART_CARD_CSN[SCARD_CSN_SIZE];
   { \
     0x9317ec24, 0x7cb0, 0x4d0e, {0x8b, 0x32, 0x2e, 0xd9, 0x20, 0x9c, 0xd8, 0xaf} \
   }
+
+extern EFI_GUID gEfiPaddingRsassaPkcs1V1P5Guid;
+
 //
 // RSASSA-PSS padding method, for signature
 //
@@ -164,6 +167,8 @@ typedef UINT8 SMART_CARD_CSN[SCARD_CSN_SIZE];
   { \
     0x7b2349e0, 0x522d, 0x4f8e, {0xb9, 0x27, 0x69, 0xd9, 0x7c, 0x9e, 0x79, 0x5f} \
   }
+
+extern EFI_GUID gEfiPaddingRsassaPssGuid;
 
 //
 // Padding methods GUIDs for decryption
@@ -175,6 +180,9 @@ typedef UINT8 SMART_CARD_CSN[SCARD_CSN_SIZE];
   { \
     0x3629ddb1, 0x228c, 0x452e, {0xb6, 0x16, 0x09, 0xed, 0x31, 0x6a, 0x97, 0x00} \
   }
+
+extern EFI_GUID gEfiPaddingNoneGuid;
+
 //
 // RSAES-PKCS#1-V1.5 padding, for decryption
 //
@@ -182,6 +190,9 @@ typedef UINT8 SMART_CARD_CSN[SCARD_CSN_SIZE];
   { \
     0xe1c1d0a9, 0x40b1, 0x4632, {0xbd, 0xcc, 0xd9, 0xd6, 0xe5, 0x29, 0x56, 0x31} \
   }
+
+extern EFI_GUID gEfiPaddingRsaesPkcs1V1P5Guid;
+
 //
 // RSAES-OAEP padding, for decryption
 //
@@ -189,6 +200,8 @@ typedef UINT8 SMART_CARD_CSN[SCARD_CSN_SIZE];
   { \
     0xc1e63ac4, 0xd0cf, 0x4ce6, {0x83, 0x5b, 0xee, 0xd0, 0xe6, 0xa8, 0xa4, 0x5b} \
   }
+
+extern EFI_GUID gEfiPaddingRsaesOaepGuid;
 
 /**
   This function retrieves the context driver.
