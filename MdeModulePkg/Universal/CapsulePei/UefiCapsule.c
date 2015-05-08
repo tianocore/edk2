@@ -1,7 +1,7 @@
 /** @file
   Capsule update PEIM for UEFI2.0
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1053,7 +1053,7 @@ CreateState (
   return EFI_SUCCESS;
 }
 
-CONST PEI_CAPSULE_PPI        mCapsulePpi = {
+CONST EFI_PEI_CAPSULE_PPI        mCapsulePpi = {
   CapsuleCoalesce,
   CheckCapsuleUpdate,
   CreateState
@@ -1061,8 +1061,8 @@ CONST PEI_CAPSULE_PPI        mCapsulePpi = {
 
 CONST EFI_PEI_PPI_DESCRIPTOR mUefiPpiListCapsule = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gPeiCapsulePpiGuid,
-  (PEI_CAPSULE_PPI *) &mCapsulePpi
+  &gEfiPeiCapsulePpiGuid,
+  (EFI_PEI_CAPSULE_PPI *) &mCapsulePpi
 };
 
 /**
