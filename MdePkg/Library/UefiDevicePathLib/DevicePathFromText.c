@@ -2742,6 +2742,38 @@ DevPathFromTextBluetooth (
 }
 
 /**
+  Converts a text device path node to URI device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created URI device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextUri (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16           *UriStr;
+  UINTN            UriLength;
+  URI_DEVICE_PATH  *Uri;
+
+  UriStr = GetNextParamStr (&TextDeviceNode);
+  UriLength = StrnLenS (UriStr, MAX_UINT16 - sizeof (URI_DEVICE_PATH));
+  Uri    = (URI_DEVICE_PATH *) CreateDeviceNode (
+                                 MESSAGING_DEVICE_PATH,
+                                 MSG_URI_DP,
+                                 (UINT16) (sizeof (URI_DEVICE_PATH) + UriLength)
+                                 );
+
+  while (UriLength-- != 0) {
+    Uri->Uri[UriLength] = (CHAR8) UriStr[UriLength];
+  }
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) Uri;
+}
+
+/**
   Converts a media text device path node to media device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3181,6 +3213,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Unit",                    DevPathFromTextUnit                    },
   {L"iSCSI",                   DevPathFromTextiSCSI                   },
   {L"Vlan",                    DevPathFromTextVlan                    },
+  {L"Uri",                     DevPathFromTextUri                     },
   {L"Bluetooth",               DevPathFromTextBluetooth               },
   {L"MediaPath",               DevPathFromTextMediaPath               },
   {L"HD",                      DevPathFromTextHD                      },

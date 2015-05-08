@@ -1531,6 +1531,45 @@ DevPathToTextBluetooth (
 }
 
 /**
+  Converts a URI device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextUri (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  )
+{
+  URI_DEVICE_PATH    *Uri;
+  UINTN              UriLength;
+  CHAR8              *UriStr;
+
+  //
+  // Uri in the device path may not be null terminated.
+  //
+  Uri       = DevPath;
+  UriLength = DevicePathNodeLength (Uri) - sizeof (URI_DEVICE_PATH);
+  UriStr = AllocatePool (UriLength + 1);
+  ASSERT (UriStr != NULL);
+
+  CopyMem (UriStr, Uri->Uri, UriLength);
+  UriStr[UriLength] = '\0';
+  UefiDevicePathLibCatPrint (Str, L"Uri(%a)", UriStr);
+  FreePool (UriStr);
+}
+
+/**
   Converts a Hard drive device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -1948,6 +1987,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE mUefiDevicePathLib
   {MESSAGING_DEVICE_PATH, MSG_VENDOR_DP,                    DevPathToTextVendor         },
   {MESSAGING_DEVICE_PATH, MSG_ISCSI_DP,                     DevPathToTextiSCSI          },
   {MESSAGING_DEVICE_PATH, MSG_VLAN_DP,                      DevPathToTextVlan           },
+  {MESSAGING_DEVICE_PATH, MSG_URI_DP,                       DevPathToTextUri            },
   {MESSAGING_DEVICE_PATH, MSG_BLUETOOTH_DP,                 DevPathToTextBluetooth      },
   {MEDIA_DEVICE_PATH,     MEDIA_HARDDRIVE_DP,               DevPathToTextHardDrive      },
   {MEDIA_DEVICE_PATH,     MEDIA_CDROM_DP,                   DevPathToTextCDROM          },
