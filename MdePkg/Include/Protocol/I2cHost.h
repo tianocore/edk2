@@ -4,7 +4,7 @@
   This protocol provides callers with the ability to do I/O transactions 
   to all of the devices on the I2C bus.
 
-  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -72,12 +72,6 @@ typedef struct _EFI_I2C_HOST_PROTOCOL EFI_I2C_HOST_PROTOCOL;
   the I2C host protocol calls the I2C master protocol to start the
   I2C transaction.
 
-  If the I2C host protocol has pending I2C transactions queued when
-  the driver binding Stop() routine is called then the I2C host
-  protocol completes all of the pending I2C transactions by returning
-  EFI_ABORTED status.  This notifies the upper layers allowing them
-  to take corrective action or prepare to stop.
-
   When Event is NULL, QueueRequest() operates synchronously and
   returns the I2C completion status as its return value.
 
@@ -107,8 +101,6 @@ typedef struct _EFI_I2C_HOST_PROTOCOL EFI_I2C_HOST_PROTOCOL;
                                 queued when Event is not NULL.
   @retval EFI_SUCCESS           The transaction completed successfully when
                                 Event is NULL.
-  @retval EFI_ABORTED           The request did not complete because the
-                                driver binding Stop() routine was called.
   @retval EFI_BAD_BUFFER_SIZE   The RequestPacket->LengthInBytes value is
                                 too large.
   @retval EFI_DEVICE_ERROR      There was an I2C error (NACK) during the
