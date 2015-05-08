@@ -1115,7 +1115,6 @@ RegisterI2cDevice (
   @retval EFI_DEVICE_ERROR      There was an I2C error (NACK) during the
                                 transaction.
   @retval EFI_INVALID_PARAMETER RequestPacket is NULL
-  @retval EFI_NOT_FOUND         Reserved bit set in the SlaveAddress parameter
   @retval EFI_NO_MAPPING        The EFI_I2C_HOST_PROTOCOL could not set the
                                 bus configuration required to access this I2C
                                 device.
