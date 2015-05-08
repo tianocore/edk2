@@ -1,0 +1,66 @@
+#/** @file
+# 
+#
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#                                                                                  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution. 
+# The full text of the license may be found at                                     
+# http://opensource.org/licenses/bsd-license.php.                                  
+#                                                                                  
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+#                                                                                 
+#
+#
+#
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2DeviceLibSeC
+  FILE_GUID                      = 1EEA2BFE-01CB-40cc-A34E-CB224C800AA2
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2DeviceLib | PEI_DRIVER PEIM
+  CONSTRUCTOR                    = Tpm2DeviceLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  Tpm2DeviceLibSeC.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  IoLib
+  PciLib
+  TimerLib
+  PcdLib
+  PeiServicesLib
+  PeimEntryPoint
+
+  
+[Guids]
+
+[Ppis]
+  gPttPassThruPpiGuid
+  
+[Depex]
+  gPttPassThruPpiGuid
+  
+

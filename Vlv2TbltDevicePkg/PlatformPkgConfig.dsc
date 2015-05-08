@@ -1,7 +1,7 @@
 #/** @file
 # platform configuration file.
 #
-# Copyright (c) 2012  - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012  - 2015, Intel Corporation. All rights reserved.<BR>
 #                                                                                  
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.  
@@ -42,6 +42,7 @@ DEFINE CLKGEN_CONFIG_EXTRA_ENABLE=TRUE
 # FALSE - 8254 timer is used.
 #
 DEFINE USE_HPET_TIMER = FALSE
+
 
 #
 # Feature selection

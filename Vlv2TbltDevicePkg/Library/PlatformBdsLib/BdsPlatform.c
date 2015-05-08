@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -1763,10 +1763,12 @@ PlatformBdsPolicyBehavior (
     }
 
 
-#ifdef TPM_ENABLED
-       TcgPhysicalPresenceLibProcessRequest();
-#endif
-
+    #ifdef TPM_ENABLED
+    TcgPhysicalPresenceLibProcessRequest();
+    #endif
+    #ifdef FTPM_ENABLE
+    TrEEPhysicalPresenceLibProcessRequest(NULL);
+    #endif
     //
     // Close boot script and install ready to lock
     //
@@ -1951,10 +1953,12 @@ FULL_CONFIGURATION:
         PlatformBdsConnectSequence ();
       }
     }
-#ifdef TPM_ENABLED
+   #ifdef TPM_ENABLED
    TcgPhysicalPresenceLibProcessRequest();
-#endif
-
+   #endif
+   #ifdef FTPM_ENABLE
+   TrEEPhysicalPresenceLibProcessRequest(NULL);
+   #endif
     //
     // Close boot script and install ready to lock
     //

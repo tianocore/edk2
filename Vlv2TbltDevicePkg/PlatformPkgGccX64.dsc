@@ -77,6 +77,9 @@
 
   DEFINE   PLATFORM_PCIEXPRESS_BASE   = 0E0000000
 
+  DEFINE SEC_ENABLE = FALSE
+  DEFINE SEC_DEBUG_INFO_ENABLE = FALSE
+  DEFINE FTPM_ENABLE = FALSE
 
 ################################################################################
 #
@@ -266,9 +269,18 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
-
+!if $(FTPM_ENABLE) == TRUE
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+!endif
   TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
   TrEEPhysicalPresenceLib|SecurityPkg/Library/DxeTrEEPhysicalPresenceLib/DxeTrEEPhysicalPresenceLib.inf
+!if $(FTPM_ENABLE) == TRUE  
+  TrEEPpVendorLib|SecurityPkg/Library/TrEEPpVendorLibNull/TrEEPpVendorLibNull.inf
+!endif  
+  
+  
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
 !if $(MINNOW2_FSP_BUILD) == TRUE
   FspApiLib|IntelFspWrapperPkg/Library/BaseFspApiLib/BaseFspApiLib.inf
@@ -319,8 +331,9 @@
  !if $(MINNOW2_FSP_BUILD) == TRUE
  PlatformFspLib|Vlv2TbltDevicePkg/Library/PlatformFspLib/PlatformFspLib.inf
  !endif
-
-
+!if $(FTPM_ENABLE) == TRUE 
+  Tpm2DeviceLib|Vlv2TbltDevicePkg/Library/Tpm2DeviceLibSeCPei/Tpm2DeviceLibSeC.inf
+!endif
 
 [LibraryClasses.X64]
   #
@@ -584,7 +597,7 @@
 
 [PcdsFixedAtBuild.common]
 !if $(MINNOW2_FSP_BUILD) == TRUE
-# $(FLASH_REGION_VLVMICROCODE_BASE) 
+# $(FLASH_REGION_VLVMICROCODE_BASE)
   gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0xFFD00000
 # $(FLASH_REGION_VLVMICROCODE_SIZE)
   gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x00030000
@@ -595,7 +608,6 @@
   gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00800000
 # $(FLASH_REGION_FSPBIN_BASE)
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase|0xFFDB0000
-
 !endif
 
 !if $(PERFORMANCE_ENABLE) == TRUE
@@ -811,6 +823,9 @@
   !if $(TPM_ENABLED) == TRUE
     gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x7b, 0x3a, 0xcd, 0x72, 0xA5, 0xFE, 0x5e, 0x4f, 0x91, 0x65, 0x4d, 0xd1, 0x21, 0x87, 0xbb, 0x13}
   !endif
+  !if $(FTPM_ENABLE) == TRUE
+    gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x7b, 0x3a, 0xcd, 0x72, 0xA5, 0xFE, 0x5e, 0x4f, 0x91, 0x65, 0x4d, 0xd1, 0x21, 0x87, 0xbb, 0x13}
+  !endif
 
   ## This PCD defines the video horizontal resolution.
   #  This PCD could be set to 0 then video resolution could be at highest resolution.
@@ -902,10 +917,18 @@
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/MemoryInit.inf {
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000046
+    <BuildOptions>
+      !if $(FTPM_ENABLE)==TRUE
+        *_*_IA32_CC_FLAGS = /D FTPM_ENABLE
+      !endif
   }
 
 !if $(RC_BINARY_RELEASE) == TRUE
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/SeCUma.inf
+!endif
+
+!if $(FTPM_ENABLE) == TRUE
+$(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 !endif
 
 !if $(RC_BINARY_RELEASE) == TRUE
@@ -929,6 +952,9 @@
     }
 !endif
 
+!if $(FTPM_ENABLE) == TRUE
+  $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/Tpm2DeviceSeCPei.inf
+!endif
 
 !if $(TPM_ENABLED) == TRUE
   SecurityPkg/Tcg/PhysicalPresencePei/PhysicalPresencePei.inf
@@ -989,6 +1015,17 @@
 !endif
  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
 
+!if $(FTPM_ENABLE) == TRUE
+   SecurityPkg/Tcg/TrEEPei/TrEEPei.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000046
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+      NULL|SecurityPkg/Library\HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  }
+!endif
 !if $(TPM_ENABLED) == TRUE
   SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf {
     <LibraryClasses>
@@ -1084,6 +1121,9 @@
 !if $(TPM_ENABLED) == TRUE
       NULL|SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
 !endif
+!if $(FTPM_ENABLE) == TRUE
+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!endif
   }
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MpCpu.inf
   $(PLATFORM_PACKAGE)/Metronome/Metronome.inf
@@ -1097,6 +1137,11 @@
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
       SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
+    !if $(FTPM_ENABLE) == TRUE  
+      Tpm2DeviceLib|Vlv2TbltDevicePkg/Library/Tpm2DeviceLibSeCDxe/Tpm2DeviceLibSeC.inf
+    !else
+      TrEEPhysicalPresenceLib|$(PLATFORM_PACKAGE)/Library/DxeTrEEPhysicalPresenceLibNull/DxeTrEEPhysicalPresenceLibNull.inf
+    !endif  
   }
 
   $(PLATFORM_PACKAGE)/UiApp/UiApp.inf
@@ -1200,6 +1245,32 @@
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/Dptf.inf
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PnpDxe.inf
 
+!if $(SEC_ENABLE) == TRUE
+  $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/HeciDrv.inf {
+!if $(SEC_DEBUG_INFO_ENABLE) == TRUE
+    <BuildOptions>
+      *_*_X64_CC_FLAGS      = /DSEC_DEBUG_INFO=1
+!else
+    <BuildOptions>
+      *_*_X64_CC_FLAGS      = /DSEC_DEBUG_INFO=0
+!endif
+  }
+  
+  $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/SeCPolicyInitDxe.inf
+!endif
+
+!if $(FTPM_ENABLE) == TRUE
+  $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/Tpm2DeviceSeCDxe.inf
+  SecurityPkg/Tcg/MemoryOverwriteControl/TcgMor.inf
+  SecurityPkg/Tcg/TrEEDxe/TrEEDxe.inf{
+    <LibraryClasses>
+      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      PcdLib|MdePkg/Library\DxePcdLib/DxePcdLib.inf
+      Tpm2DeviceLib|Vlv2TbltDevicePkg/Library/Tpm2DeviceLibSeCDxe/Tpm2DeviceLibSeC.inf
+  }
+  $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/FtpmSmm.inf
+!endif
 !if $(TPM_ENABLED) == TRUE
   SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf {
     <LibraryClasses>
@@ -1494,6 +1565,11 @@
   DEFINE X64_BUILD_ENABLE =
 !endif
 
+!if $(FTPM_ENABLE) == TRUE
+  DEFINE DSC_FTPM_BUILD_OPTIONS = -DFTPM_ENABLE
+!else
+  DEFINE DSC_FTPM_BUILD_OPTIONS = 
+!endif
 !if $(TPM_ENABLED) == TRUE
   DEFINE DSC_TPM_BUILD_OPTIONS = -DTPM_ENABLED
 !else
@@ -1501,7 +1577,7 @@
 !endif
 
 
-  DEFINE EDK_EDKII_DSC_FEATURE_BUILD_OPTIONS = $(MINNOW2_FSP_OPTION) $(MINNOW2_BUILD_OPTION) $(ENBDT_PF_ENABLE) $(EXTERNAL_VGA_BUILD_OPTION) $(PCIE_ENUM_WA_BUILD_OPTION) $(X0_WA_ENABLE_BUILD_OPTION) $(A0_WA_ENABLE_BUILD_OPTION) $(MICROCODE_FREE_BUILD_OPTIONS) $(SIMICS_BUILD_OPTIONS) $(HYBRID_BUILD_OPTIONS) $(COMPACT_BUILD_OPTIONS) $(VP_BUILD_OPTIONS) $(SYSCTL_ID_BUILD_OPTION) $(CLKGEN_CONFIG_EXTRA_BUILD_OPTION) $(SYSCTL_X0_CONVERT_BOARD_OPTION) $(ENBDT_S3_SUPPORT_OPTIONS) $(SATA_SUPPORT_BUILD_OPTION) $(PCIESC_SUPPORT_BUILD_OPTION) $(DSC_FTPM_ERROR_WR_BUILD_OPTIONS) $(DSC_TPM_BUILD_OPTIONS) $(DSC_BYTI_SECURE_BOOT_BUILD_OPTIONS)
+  DEFINE EDK_EDKII_DSC_FEATURE_BUILD_OPTIONS = $(MINNOW2_FSP_OPTION) $(MINNOW2_BUILD_OPTION) $(ENBDT_PF_ENABLE) $(EXTERNAL_VGA_BUILD_OPTION) $(PCIE_ENUM_WA_BUILD_OPTION) $(X0_WA_ENABLE_BUILD_OPTION) $(A0_WA_ENABLE_BUILD_OPTION) $(MICROCODE_FREE_BUILD_OPTIONS) $(SIMICS_BUILD_OPTIONS) $(HYBRID_BUILD_OPTIONS) $(COMPACT_BUILD_OPTIONS) $(VP_BUILD_OPTIONS) $(SYSCTL_ID_BUILD_OPTION) $(CLKGEN_CONFIG_EXTRA_BUILD_OPTION) $(SYSCTL_X0_CONVERT_BOARD_OPTION) $(ENBDT_S3_SUPPORT_OPTIONS) $(SATA_SUPPORT_BUILD_OPTION) $(PCIESC_SUPPORT_BUILD_OPTION) $(DSC_FTPM_BUILD_OPTIONS) $(DSC_FTPM_ERROR_WR_BUILD_OPTIONS) $(DSC_TPM_BUILD_OPTIONS) $(DSC_BYTI_SECURE_BOOT_BUILD_OPTIONS)
 !if $(PERFORMANCE_ENABLE) == TRUE
   DEFINE PDB_BUILD_OPTION = /Zi
 !endif

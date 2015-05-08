@@ -28,6 +28,7 @@ Module Name:
 #include <Ppi/MfgMemoryTest.h>
 #include <Guid/SetupVariable.h>
 #include <Guid/Vlv2Variable.h>
+#include <Ppi/fTPMPolicy.h>
 
 //
 // Start::Alpine Valley platform
@@ -189,6 +190,67 @@ PeiSmbusExec (
   UINT8 *Length,
   UINT8 *Buffer
   );
+
+
+EFI_STATUS
+FtpmPolicyInit (
+  IN CONST EFI_PEI_SERVICES             **PeiServices,
+  IN SYSTEM_CONFIGURATION         *pSystemConfiguration
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_PEI_PPI_DESCRIPTOR          *mFtpmPolicyPpiDesc;
+  SEC_FTPM_POLICY_PPI             *mFtpmPolicyPpi;
+
+
+  DEBUG((EFI_D_INFO, "FtpmPolicyInit Entry \n"));
+
+  if (NULL == PeiServices ||  NULL == pSystemConfiguration) {
+    DEBUG((EFI_D_ERROR, "Input error. \n"));
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  Status = (*PeiServices)->AllocatePool(
+                             PeiServices,
+                             sizeof (EFI_PEI_PPI_DESCRIPTOR),
+                             (void **)&mFtpmPolicyPpiDesc
+                             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = (*PeiServices)->AllocatePool(
+                             PeiServices,
+                             sizeof (SEC_FTPM_POLICY_PPI),
+                             (void **)&mFtpmPolicyPpi
+                             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Initialize PPI
+  //
+  (*PeiServices)->SetMem ((VOID *)mFtpmPolicyPpi, sizeof (SEC_FTPM_POLICY_PPI), 0);
+  mFtpmPolicyPpiDesc->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+  mFtpmPolicyPpiDesc->Guid = &gSeCfTPMPolicyPpiGuid;
+  mFtpmPolicyPpiDesc->Ppi = mFtpmPolicyPpi;
+
+
+  DEBUG((EFI_D_INFO, "pSystemConfiguration->fTPM = 0x%x \n", pSystemConfiguration->fTPM)); 
+  if(pSystemConfiguration->fTPM == 1) {
+    mFtpmPolicyPpi->fTPMEnable = TRUE;
+  } else {
+    mFtpmPolicyPpi->fTPMEnable = FALSE;
+  }
+
+  Status = (*PeiServices)->InstallPpi(
+                             PeiServices,
+                             mFtpmPolicyPpiDesc
+                             );
+  ASSERT_EFI_ERROR (Status);
+
+  DEBUG((EFI_D_INFO, "FtpmPolicyInit done \n"));
+  
+  return EFI_SUCCESS;
+}
+
 
 /**
   This routine attempts to acquire the SMBus
@@ -695,6 +757,14 @@ PeiInitPlatform (
     &PlatformInfo,
     sizeof (EFI_PLATFORM_INFO_HOB)
     );
+
+
+#ifdef FTPM_ENABLE
+  Status = FtpmPolicyInit(PeiServices, &SystemConfiguration);
+  if (EFI_ERROR (Status)) {
+    DEBUG((EFI_D_ERROR, "fTPM init failed.\n"));
+  }
+#endif
 
 
   //

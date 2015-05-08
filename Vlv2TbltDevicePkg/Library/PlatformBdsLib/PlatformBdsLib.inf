@@ -68,7 +68,7 @@
   PrintLib
   BaseCryptLib
 #  TcgPhysicalPresenceLib
-#  TrEEPhysicalPresenceLib
+  TrEEPhysicalPresenceLib  
   FileHandleLib
   S3BootScriptLib
   SerialPortLib
