@@ -215,6 +215,15 @@
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
 
+  #
+  # PSCI support in EL3 may not be available if we are not running under a PSCI
+  # compliant secure firmware, but since the default VExpress EfiResetSystemLib
+  # cannot be supported at runtime (due to the fact that the syscfg MMIO registers
+  # cannot be runtime remapped), it is our best bet to get ResetSystem functionality
+  # on these platforms.
+  #
+  EfiResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
+
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
