@@ -4,7 +4,7 @@
   required for EFI drivers that are on PCI and other plug-in
   cards.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -36,8 +36,7 @@ typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
   /// 
   UINT32 Length;
   ///
-  /// The version of the EFI specification that this driver conforms to.
-  /// EFI_2_10_SYSTEM_TABLE_REVISION for this version of this specification.  
+  /// The latest version of the UEFI specification that this driver conforms to.
   ///
   UINT32 FirmwareVersion;
 } EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL;
