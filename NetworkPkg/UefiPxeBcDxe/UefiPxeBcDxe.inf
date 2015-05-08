@@ -100,9 +100,9 @@
   gEfiAdapterInformationProtocolGuid                   ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiAdapterInfoUndiIpv6SupportGuid
+  gEfiAdapterInfoUndiIpv6SupportGuid                   ## SOMETIMES_CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize      ## SOMETIMES_CONSUMES
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiPxeBcDxeExtra.uni
