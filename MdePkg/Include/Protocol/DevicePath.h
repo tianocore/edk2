@@ -796,6 +796,18 @@ typedef struct {
 } NVME_NAMESPACE_DEVICE_PATH;
 
 ///
+/// Uniform Resource Identifiers (URI) Device Path SubType
+///
+#define MSG_URI_DP                0x18
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// Instance of the URI pursuant to RFC 3986.
+  ///
+  CHAR8                           Uri[];
+} URI_DEVICE_PATH;
+
+///
 /// Universal Flash Storage (UFS) Device Path SubType.
 ///
 #define MSG_UFS_DP                0x19
@@ -1122,6 +1134,7 @@ typedef union {
   SAS_DEVICE_PATH                            Sas;
   SASEX_DEVICE_PATH                          SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 NvmeNamespace;
+  URI_DEVICE_PATH                            Uri;
   BLUETOOTH_DEVICE_PATH                      Bluetooth;
   UFS_DEVICE_PATH                            Ufs;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
@@ -1174,6 +1187,7 @@ typedef union {
   SAS_DEVICE_PATH                            *Sas;
   SASEX_DEVICE_PATH                          *SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 *NvmeNamespace;
+  URI_DEVICE_PATH                            *Uri;
   BLUETOOTH_DEVICE_PATH                      *Bluetooth;
   UFS_DEVICE_PATH                            *Ufs;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;
