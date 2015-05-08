@@ -171,11 +171,6 @@
   SecurityPkg/Library/HashLibTpm2/HashLibTpm2.inf
 
   #
-  # Hash2
-  #
-  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
-
-  #
   # Other
   #
   SecurityPkg/Library/DxeRsa2048Sha256GuidedSectionExtractLib/DxeRsa2048Sha256GuidedSectionExtractLib.inf
@@ -228,6 +223,11 @@
     <LibraryClasses>
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTrEE/Tpm2DeviceLibTrEE.inf
   }
+  
+  #
+  # Hash2
+  #
+  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmm.inf
