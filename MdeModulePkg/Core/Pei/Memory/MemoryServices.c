@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core memory services
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -123,7 +123,7 @@ PeiInstallPeiMemory (
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
   @retval EFI_INVALID_PARAMETER Type is not equal to EfiLoaderCode, EfiLoaderData, EfiRuntimeServicesCode, 
                                 EfiRuntimeServicesData, EfiBootServicesCode, EfiBootServicesData,
-                                EfiACPIReclaimMemory, or EfiACPIMemoryNVS.
+                                EfiACPIReclaimMemory, EfiReservedMemoryType, or EfiACPIMemoryNVS.
 
 **/
 EFI_STATUS
@@ -148,6 +148,7 @@ PeiAllocatePages (
       (MemoryType != EfiBootServicesCode) &&
       (MemoryType != EfiBootServicesData) &&
       (MemoryType != EfiACPIReclaimMemory) &&
+      (MemoryType != EfiReservedMemoryType) &&
       (MemoryType != EfiACPIMemoryNVS)) {
     return EFI_INVALID_PARAMETER;
   }
