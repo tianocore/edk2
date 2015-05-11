@@ -11,7 +11,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  PI Version 1.0
+  PI Version 1.4
 
 **/
 
@@ -294,6 +294,14 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 
 #define EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED      0x00040000
 #define EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE    0x00800000
+
+//
+// Physical memory relative reliability attribute. This
+// memory provides higher reliability relative to other
+// memory in the system. If all memory has the same
+// reliability, then this bit is not used.
+//
+#define EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE            0x02000000
 
 ///
 /// Describes the resource properties of all fixed,

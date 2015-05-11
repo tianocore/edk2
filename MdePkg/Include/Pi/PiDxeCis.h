@@ -53,6 +53,11 @@ typedef enum {
   /// This memory supports byte-addressable non-volatility. 
   ///
   EfiGcdMemoryTypePersistentMemory,
+  ///
+  /// A memory region that provides higher reliability relative to other memory in the
+  /// system. If all memory has the same reliability, then this bit is not used.
+  ///
+  EfiGcdMemoryTypeMoreReliable,
   EfiGcdMemoryTypeMaximum
 } EFI_GCD_MEMORY_TYPE;
 
