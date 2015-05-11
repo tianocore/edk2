@@ -3,7 +3,7 @@
 #
 # This Package provides headers and libraries that conform to EFI/PI Industry standards.
 # Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2012-2014, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2012-2015, ARM Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available under
 #    the terms and conditions of the BSD License which accompanies this distribution.
@@ -87,6 +87,8 @@
   # Add 'dumpfdt' EFI Shell command
   gEmbeddedTokenSpaceGuid.PcdDumpFdtShellCommand|TRUE|BOOLEAN|0x00000056
 
+  gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeaturePMPSupport|FALSE|BOOLEAN|0x00000050
+  gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeatureDirectCommandIssuing|FALSE|BOOLEAN|0x00000051
 
 [PcdsFixedAtBuild.common]
   gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|L""|VOID*|0x00000007
