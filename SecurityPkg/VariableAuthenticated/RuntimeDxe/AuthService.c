@@ -277,7 +277,25 @@ AutenticatedVariableServiceInitialize (
   SecureBootEnable = SECURE_BOOT_DISABLE;
   FindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
   if (Variable.CurrPtr != NULL) {
-    SecureBootEnable = *(GetVariableDataPtr (Variable.CurrPtr));
+    if (mPlatformMode == SETUP_MODE){
+      //
+      // PK is cleared in runtime. "SecureBootMode" is not updated before reboot 
+      // Delete "SecureBootMode" in SetupMode
+      //
+      Status = UpdateVariable (
+                 EFI_SECURE_BOOT_ENABLE_NAME,
+                 &gEfiSecureBootEnableDisableGuid,
+                 &SecureBootEnable,
+                 0,
+                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                 0,
+                 0,
+                 &Variable,
+                 NULL
+                 );
+    } else {
+      SecureBootEnable = *(GetVariableDataPtr (Variable.CurrPtr));
+    }
   } else if (mPlatformMode == USER_MODE) {
     //
     // "SecureBootEnable" not exist, initialize it in USER_MODE.
