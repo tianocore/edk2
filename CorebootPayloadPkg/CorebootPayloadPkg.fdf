@@ -110,7 +110,7 @@ INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 #
 # PCI Support
 #
-INF PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
+INF DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
 INF DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf 
 
 #

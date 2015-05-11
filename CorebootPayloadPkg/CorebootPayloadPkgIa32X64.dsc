@@ -313,8 +313,8 @@
   
   #
   # PCI Support
-  #
-  PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  #  
+  DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
   DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf 
   
   #
