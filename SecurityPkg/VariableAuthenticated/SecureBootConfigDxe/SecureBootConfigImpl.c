@@ -1643,15 +1643,17 @@ LoadPeImage (
   // Note the size of FileHeader field is constant for both IA32 and X64 arch
   //
   if ((NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32)
-      || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_EBC)) {
+      || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_EBC)
+      || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_ARMTHUMB_MIXED)) {
     //
-    // IA-32 Architecture
+    // 32-bits Architecture
     //
     mImageType = ImageType_IA32;
     mSecDataDir = (EFI_IMAGE_SECURITY_DATA_DIRECTORY*) &(NtHeader32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]);
   }
   else if ((NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64)
-          || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_X64)) {
+          || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_X64)
+          || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_AARCH64)) {
     //
     // 64-bits Architecture
     //
