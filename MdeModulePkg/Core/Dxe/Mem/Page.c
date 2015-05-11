@@ -416,7 +416,11 @@ PromoteMemoryResource (
       //
       // Update the GCD map
       //
-      Entry->GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
+      if ((Entry->Capabilities & EFI_MEMORY_MORE_RELIABLE) == EFI_MEMORY_MORE_RELIABLE) {
+        Entry->GcdMemoryType = EfiGcdMemoryTypeMoreReliable;
+      } else {
+        Entry->GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
+      }
       Entry->Capabilities |= EFI_MEMORY_TESTED;
       Entry->ImageHandle  = gDxeCoreImageHandle;
       Entry->DeviceHandle = NULL;

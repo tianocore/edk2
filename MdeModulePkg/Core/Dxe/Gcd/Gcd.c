@@ -83,20 +83,21 @@ EFI_GCD_MAP_ENTRY mGcdIoSpaceMapEntryTemplate = {
 };
 
 GCD_ATTRIBUTE_CONVERSION_ENTRY mAttributeConversionTable[] = {
-  { EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE,             EFI_MEMORY_UC,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED,       EFI_MEMORY_UCE,         TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE,       EFI_MEMORY_WC,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE, EFI_MEMORY_WT,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE,    EFI_MEMORY_WB,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE,        EFI_MEMORY_RP,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE,       EFI_MEMORY_WP,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE,   EFI_MEMORY_XP,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE,   EFI_MEMORY_RO,          TRUE  },
-  { EFI_RESOURCE_ATTRIBUTE_PRESENT,                 EFI_MEMORY_PRESENT,     FALSE },
-  { EFI_RESOURCE_ATTRIBUTE_INITIALIZED,             EFI_MEMORY_INITIALIZED, FALSE },
-  { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,      FALSE },
-  { EFI_RESOURCE_ATTRIBUTE_PERSISTABLE,             EFI_MEMORY_NV,          TRUE  },
-  { 0,                                              0,                      FALSE }
+  { EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE,             EFI_MEMORY_UC,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED,       EFI_MEMORY_UCE,             TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE,       EFI_MEMORY_WC,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE, EFI_MEMORY_WT,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE,    EFI_MEMORY_WB,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE,        EFI_MEMORY_RP,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE,       EFI_MEMORY_WP,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE,   EFI_MEMORY_XP,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE,   EFI_MEMORY_RO,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_PRESENT,                 EFI_MEMORY_PRESENT,         FALSE },
+  { EFI_RESOURCE_ATTRIBUTE_INITIALIZED,             EFI_MEMORY_INITIALIZED,     FALSE },
+  { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,          FALSE },
+  { EFI_RESOURCE_ATTRIBUTE_PERSISTABLE,             EFI_MEMORY_NV,              TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE,           EFI_MEMORY_MORE_RELIABLE,   TRUE  },
+  { 0,                                              0,                          FALSE }
 };
 
 ///
@@ -108,6 +109,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdMemoryTypeNames[] = {
   "SystemMem",  // EfiGcdMemoryTypeSystemMemory
   "MMIO     ",  // EfiGcdMemoryTypeMemoryMappedIo
   "PersistentMem",// EfiGcdMemoryTypePersistentMemory
+  "MoreRelia",  // EfiGcdMemoryTypeMoreReliable
   "Unknown  "   // EfiGcdMemoryTypeMaximum
 };
 
@@ -1383,9 +1385,9 @@ CoreAddMemorySpace (
 
   Status = CoreInternalAddMemorySpace (GcdMemoryType, BaseAddress, Length, Capabilities);
 
-  if (!EFI_ERROR (Status) && GcdMemoryType == EfiGcdMemoryTypeSystemMemory) {
+  if (!EFI_ERROR (Status) && ((GcdMemoryType == EfiGcdMemoryTypeSystemMemory) || (GcdMemoryType == EfiGcdMemoryTypeMoreReliable))) {
 
-    PageBaseAddress = PageAlignLength (BaseAddress);
+    PageBaseAddress = PageAlignAddress (BaseAddress);
     PageLength      = PageAlignLength (BaseAddress + Length - PageBaseAddress);
 
     Status = CoreAllocateMemorySpace (
@@ -1991,7 +1993,7 @@ CoreConvertResourceDescriptorHobAttributesToCapabilities (
   // Convert the Resource HOB Attributes to an EFI Memory Capabilities mask
   //
   for (Capabilities = 0, Conversion = mAttributeConversionTable; Conversion->Attribute != 0; Conversion++) {
-    if (Conversion->Memory || (GcdMemoryType != EfiGcdMemoryTypeSystemMemory)) {
+    if (Conversion->Memory || ((GcdMemoryType != EfiGcdMemoryTypeSystemMemory) && (GcdMemoryType != EfiGcdMemoryTypeMoreReliable))) {
       if (Attributes & Conversion->Attribute) {
         Capabilities |= Conversion->Capability;
       }
@@ -2245,7 +2247,11 @@ CoreInitializeMemoryServices (
   //
   // Convert the Resource HOB Attributes to an EFI Memory Capabilities mask
   //
-  Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (EfiGcdMemoryTypeSystemMemory, Attributes);
+  if ((Attributes & EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) == EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) {
+    Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (EfiGcdMemoryTypeMoreReliable, Attributes);
+  } else {
+    Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (EfiGcdMemoryTypeSystemMemory, Attributes);
+  }
 
   //
   // Declare the very first memory region, so the EFI Memory Services are available.
@@ -2358,7 +2364,11 @@ CoreInitializeGcdServices (
       switch (ResourceHob->ResourceType) {
       case EFI_RESOURCE_SYSTEM_MEMORY:
         if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES) {
-          GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
+          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) == EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) {
+            GcdMemoryType = EfiGcdMemoryTypeMoreReliable;
+          } else {
+            GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
+          }
         }
         if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == INITIALIZED_MEMORY_ATTRIBUTES) {
           GcdMemoryType = EfiGcdMemoryTypeReserved;
@@ -2421,15 +2431,20 @@ CoreInitializeGcdServices (
   //
   // Allocate first memory region from the GCD by the DXE core
   //
-  Status = CoreAllocateMemorySpace (
-             EfiGcdAllocateAddress,
-             EfiGcdMemoryTypeSystemMemory,
-             0,
-             MemoryLength,
-             &MemoryBaseAddress,
-             gDxeCoreImageHandle,
-             NULL
-             );
+  Status = CoreGetMemorySpaceDescriptor (MemoryBaseAddress, &Descriptor);
+  if (!EFI_ERROR (Status)) {
+    ASSERT ((Descriptor.GcdMemoryType == EfiGcdMemoryTypeSystemMemory) ||
+            (Descriptor.GcdMemoryType == EfiGcdMemoryTypeMoreReliable));
+    Status = CoreAllocateMemorySpace (
+               EfiGcdAllocateAddress,
+               Descriptor.GcdMemoryType,
+               0,
+               MemoryLength,
+               &MemoryBaseAddress,
+               gDxeCoreImageHandle,
+               NULL
+               );
+  }
 
   //
   // Walk the HOB list and allocate all memory space that is consumed by memory allocation HOBs,
@@ -2450,7 +2465,9 @@ CoreInitializeGcdServices (
                    gDxeCoreImageHandle,
                    NULL
                    );
-        if (!EFI_ERROR (Status) && Descriptor.GcdMemoryType == EfiGcdMemoryTypeSystemMemory) {
+        if (!EFI_ERROR (Status) &&
+            ((Descriptor.GcdMemoryType == EfiGcdMemoryTypeSystemMemory) ||
+             (Descriptor.GcdMemoryType == EfiGcdMemoryTypeMoreReliable))) {
           CoreAddMemoryDescriptor (
             MemoryHob->AllocDescriptor.MemoryType,
             MemoryHob->AllocDescriptor.MemoryBaseAddress,
@@ -2495,7 +2512,8 @@ CoreInitializeGcdServices (
   ASSERT (Status == EFI_SUCCESS);
 
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) {
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) ||
+        (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMoreReliable)) {
       if (MemorySpaceMap[Index].ImageHandle == NULL) {
         BaseAddress  = PageAlignAddress (MemorySpaceMap[Index].BaseAddress);
         Length       = PageAlignLength  (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - BaseAddress);
@@ -2510,7 +2528,7 @@ CoreInitializeGcdServices (
           );
         Status = CoreAllocateMemorySpace (
                    EfiGcdAllocateAddress,
-                   EfiGcdMemoryTypeSystemMemory,
+                   MemorySpaceMap[Index].GcdMemoryType,
                    0,
                    Length,
                    &BaseAddress,
