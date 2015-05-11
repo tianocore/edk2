@@ -15,14 +15,12 @@
 #ifndef __BDS_ENTRY_H__
 #define __BDS_ENTRY_H__
 
-typedef UINT8* EFI_LOAD_OPTION;
-
 /**
   This is defined by the UEFI specs, don't change it
 **/
 typedef struct {
   UINT16                      LoadOptionIndex;
-  EFI_LOAD_OPTION             LoadOption;
+  EFI_LOAD_OPTION             *LoadOption;
   UINTN                       LoadOptionSize;
 
   UINT32                      Attributes;

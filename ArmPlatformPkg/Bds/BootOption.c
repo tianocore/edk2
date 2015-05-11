@@ -141,7 +141,7 @@ BootOptionSetFields (
   IN UINTN                      OptionalDataSize
   )
 {
-  EFI_LOAD_OPTION               EfiLoadOption;
+  EFI_LOAD_OPTION               *EfiLoadOption;
   UINTN                         EfiLoadOptionSize;
   UINTN                         BootDescriptionSize;
   UINT16                        FilePathListLength;
@@ -168,8 +168,8 @@ BootOptionSetFields (
 
   // Allocate the memory for the EFI Load Option
   EfiLoadOptionSize = sizeof(UINT32) + sizeof(UINT16) + BootDescriptionSize + FilePathListLength + OptionalDataSize;
-  EfiLoadOption = (EFI_LOAD_OPTION)AllocatePool(EfiLoadOptionSize);
-  EfiLoadOptionPtr = EfiLoadOption;
+  EfiLoadOption = (EFI_LOAD_OPTION *)AllocatePool(EfiLoadOptionSize);
+  EfiLoadOptionPtr = (UINT8 *)EfiLoadOption;
 
   //
   // Populate the EFI Load Option and BDS Boot Option structures

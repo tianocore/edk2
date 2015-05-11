@@ -16,13 +16,14 @@
 
 EFI_STATUS
 BootOptionParseLoadOption (
-  IN     EFI_LOAD_OPTION EfiLoadOption,
+  IN     EFI_LOAD_OPTION *EfiLoadOption,
   IN     UINTN           EfiLoadOptionSize,
   IN OUT BDS_LOAD_OPTION **BdsLoadOption
   )
 {
   BDS_LOAD_OPTION *LoadOption;
   UINTN           DescriptionLength;
+  UINTN           EfiLoadOptionPtr;
 
   if (EfiLoadOption == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -41,22 +42,23 @@ BootOptionParseLoadOption (
     LoadOption = *BdsLoadOption;
   }
 
+  EfiLoadOptionPtr           = (UINTN)EfiLoadOption;
   LoadOption->LoadOption     = EfiLoadOption;
   LoadOption->LoadOptionSize = EfiLoadOptionSize;
 
-  LoadOption->Attributes         = *(UINT32*)EfiLoadOption;
-  LoadOption->FilePathListLength = *(UINT16*)(EfiLoadOption + sizeof(UINT32));
-  LoadOption->Description        = (CHAR16*)(EfiLoadOption + sizeof(UINT32) + sizeof(UINT16));
+  LoadOption->Attributes         = *(UINT32*)EfiLoadOptionPtr;
+  LoadOption->FilePathListLength = *(UINT16*)(EfiLoadOptionPtr + sizeof(UINT32));
+  LoadOption->Description        = (CHAR16*)(EfiLoadOptionPtr + sizeof(UINT32) + sizeof(UINT16));
   DescriptionLength              = StrSize (LoadOption->Description);
-  LoadOption->FilePathList       = (EFI_DEVICE_PATH_PROTOCOL*)(EfiLoadOption + sizeof(UINT32) + sizeof(UINT16) + DescriptionLength);
+  LoadOption->FilePathList       = (EFI_DEVICE_PATH_PROTOCOL*)(EfiLoadOptionPtr + sizeof(UINT32) + sizeof(UINT16) + DescriptionLength);
 
   // If ((End of EfiLoadOptiony - Start of EfiLoadOption) == EfiLoadOptionSize) then No Optional Data
-  if ((UINTN)((UINTN)LoadOption->FilePathList + LoadOption->FilePathListLength - (UINTN)EfiLoadOption) == EfiLoadOptionSize) {
+  if ((UINTN)((UINTN)LoadOption->FilePathList + LoadOption->FilePathListLength - EfiLoadOptionPtr) == EfiLoadOptionSize) {
     LoadOption->OptionalData     = NULL;
     LoadOption->OptionalDataSize = 0;
   } else {
     LoadOption->OptionalData     = (VOID*)((UINTN)(LoadOption->FilePathList) + LoadOption->FilePathListLength);
-    LoadOption->OptionalDataSize = EfiLoadOptionSize - ((UINTN)LoadOption->OptionalData - (UINTN)EfiLoadOption);
+    LoadOption->OptionalDataSize = EfiLoadOptionSize - ((UINTN)LoadOption->OptionalData - EfiLoadOptionPtr);
   }
 
   if (*BdsLoadOption == NULL) {
@@ -73,7 +75,7 @@ BootOptionFromLoadOptionVariable (
   )
 {
   EFI_STATUS            Status;
-  EFI_LOAD_OPTION       EfiLoadOption;
+  EFI_LOAD_OPTION       *EfiLoadOption;
   UINTN                 EfiLoadOptionSize;
 
   Status = GetGlobalEnvironmentVariable (BootVariableName, NULL, &EfiLoadOptionSize, (VOID**)&EfiLoadOption);
@@ -141,12 +143,12 @@ BootOptionToLoadOptionVariable (
   // Allocate the memory for the EFI Load Option
   BdsLoadOption->LoadOptionSize = sizeof(UINT32) + sizeof(UINT16) + DescriptionSize + BdsLoadOption->FilePathListLength + BdsLoadOption->OptionalDataSize;
 
-  BdsLoadOption->LoadOption = (EFI_LOAD_OPTION)AllocateZeroPool (BdsLoadOption->LoadOptionSize);
+  BdsLoadOption->LoadOption = (EFI_LOAD_OPTION *)AllocateZeroPool (BdsLoadOption->LoadOptionSize);
   if (BdsLoadOption->LoadOption == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  EfiLoadOptionPtr = BdsLoadOption->LoadOption;
+  EfiLoadOptionPtr = (UINT8 *) BdsLoadOption->LoadOption;
 
   //
   // Populate the EFI Load Option and BDS Boot Option structures
