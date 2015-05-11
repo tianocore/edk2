@@ -1,7 +1,7 @@
 /** @file
   PI PEI master include file. This file should match the PI spec.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -585,6 +585,30 @@ EFI_STATUS
   );
 
 /**
+  Resets the entire platform.
+
+  @param[in] ResetType      The type of reset to perform.
+  @param[in] ResetStatus    The status code for the reset.
+  @param[in] DataSize       The size, in bytes, of WatchdogData.
+  @param[in] ResetData      For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
+                            the data buffer starts with a Null-terminated string, optionally
+                            followed by additional binary data. The string is a description
+                            that the caller may use to further indicate the reason for the
+                            system reset. ResetData is only valid if ResetStatus is something
+                            other than EFI_SUCCESS unless the ResetType is EfiResetPlatformSpecific
+                            where a minimum amount of ResetData is always required.
+
+**/
+typedef
+VOID
+(EFIAPI *EFI_PEI_RESET2_SYSTEM) (
+  IN EFI_RESET_TYPE     ResetType,
+  IN EFI_STATUS         ResetStatus,
+  IN UINTN              DataSize,
+  IN VOID               *ResetData OPTIONAL
+  );
+
+/**
   Find a file within a volume by its name.
 
   This service searches for files with a specific name, within
@@ -903,6 +927,7 @@ struct _EFI_PEI_SERVICES {
   EFI_PEI_REGISTER_FOR_SHADOW     RegisterForShadow;
   EFI_PEI_FFS_FIND_SECTION_DATA3  FindSectionData3;
   EFI_PEI_FFS_GET_FILE_INFO2      FfsGetFileInfo2;
+  EFI_PEI_RESET2_SYSTEM           ResetSystem2;
 };
 
 
