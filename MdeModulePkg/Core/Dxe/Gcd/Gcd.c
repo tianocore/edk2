@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                        EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED      | \
                                        EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED     | \
                                        EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED | \
+                                       EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED | \
                                        EFI_RESOURCE_ATTRIBUTE_16_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_32_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_64_BIT_IO           | \
@@ -90,6 +91,7 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE,        EFI_MEMORY_RP,          TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE,       EFI_MEMORY_WP,          TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE,   EFI_MEMORY_XP,          TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE,   EFI_MEMORY_RO,          TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_PRESENT,                 EFI_MEMORY_PRESENT,     FALSE },
   { EFI_RESOURCE_ATTRIBUTE_INITIALIZED,             EFI_MEMORY_INITIALIZED, FALSE },
   { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,      FALSE },
@@ -234,6 +236,8 @@ CoreValidateResourceDescriptorHobAttributes (
           ((Attributes & EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE) != 0));
   ASSERT (((Attributes & EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED) == 0) ||
           ((Attributes & EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE) != 0));
+  ASSERT (((Attributes & EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED) == 0) ||
+          ((Attributes & EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE) != 0));
   ASSERT (((Attributes & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == 0) ||
           ((Attributes & EFI_RESOURCE_ATTRIBUTE_PERSISTABLE) != 0));
 }
