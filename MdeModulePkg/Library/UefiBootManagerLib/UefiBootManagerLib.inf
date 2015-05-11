@@ -60,7 +60,7 @@
   ReportStatusCodeLib
   PerformanceLib
   HiiLib
-  BaseSortLib
+  SortLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID (The identifier of memory type information type in system table)
