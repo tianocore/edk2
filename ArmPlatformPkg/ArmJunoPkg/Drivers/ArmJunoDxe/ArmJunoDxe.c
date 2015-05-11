@@ -16,7 +16,9 @@
 #include <ArmPlatform.h>
 
 #include <Protocol/DevicePathFromText.h>
+#include <Protocol/PciRootBridgeIo.h>
 
+#include <Guid/EventGroup.h>
 #include <Guid/GlobalVariable.h>
 
 #include <Library/ArmShellCmdLib.h>
@@ -53,6 +55,28 @@ STATIC EFI_STATUS SetJunoR1DefaultBootEntries (
 
 // This GUID must match the FILE_GUID in ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
 STATIC CONST EFI_GUID mJunoAcpiTableFile = { 0xa1dd808e, 0x1e95, 0x4399, { 0xab, 0xc0, 0x65, 0x3c, 0x82, 0xe8, 0x53, 0x0c } };
+
+typedef struct {
+  ACPI_HID_DEVICE_PATH      AcpiDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  EndDevicePath;
+} EFI_PCI_ROOT_BRIDGE_DEVICE_PATH;
+
+STATIC CONST EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mPciRootComplexDevicePath = {
+    {
+      { ACPI_DEVICE_PATH,
+        ACPI_DP,
+        { (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)),
+          (UINT8) ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8) }
+      },
+      EISA_PNP_ID (0x0A03),
+      0
+    },
+    {
+      END_DEVICE_PATH_TYPE,
+      END_ENTIRE_DEVICE_PATH_SUBTYPE,
+      { END_DEVICE_PATH_LENGTH, 0 }
+    }
+};
 
 /**
  * Build and Set UEFI Variable Boot####
@@ -123,6 +147,46 @@ BootOptionCreate (
       );
 }
 
+/**
+  Notification function of the event defined as belonging to the
+  EFI_END_OF_DXE_EVENT_GROUP_GUID event group that was created in
+  the entry point of the driver.
+
+  This function is called when an event belonging to the
+  EFI_END_OF_DXE_EVENT_GROUP_GUID event group is signalled. Such an
+  event is signalled once at the end of the dispatching of all
+  drivers (end of the so called DXE phase).
+
+  @param[in]  Event    Event declared in the entry point of the driver whose
+                       notification function is being invoked.
+  @param[in]  Context  NULL
+**/
+STATIC
+VOID
+OnEndOfDxe (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL* PciRootComplexDevicePath;
+  EFI_HANDLE                Handle;
+  EFI_STATUS                Status;
+
+  //
+  // PCI Root Complex initialization
+  // At the end of the DXE phase, we should get all the driver dispatched.
+  // Force the PCI Root Complex to be initialized. It allows the OS to skip
+  // this step.
+  //
+  PciRootComplexDevicePath = (EFI_DEVICE_PATH_PROTOCOL*) &mPciRootComplexDevicePath;
+  Status = gBS->LocateDevicePath (&gEfiPciRootBridgeIoProtocolGuid,
+                                  &PciRootComplexDevicePath,
+                                  &Handle);
+
+  Status = gBS->ConnectController (Handle, NULL, PciRootComplexDevicePath, FALSE);
+  ASSERT_EFI_ERROR (Status);
+}
+
 EFI_STATUS
 EFIAPI
 ArmJunoEntryPoint (
@@ -182,6 +246,22 @@ ArmJunoEntryPoint (
       return Status;
     }
   }
+
+  //
+  // Create an event belonging to the "gEfiEndOfDxeEventGroupGuid" group.
+  // The "OnEndOfDxe()" function is declared as the call back function.
+  // It will be called at the end of the DXE phase when an event of the
+  // same group is signalled to inform about the end of the DXE phase.
+  // Install the INSTALL_FDT_PROTOCOL protocol.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  OnEndOfDxe,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
 
   // Install dynamic Shell command to run baremetal binaries.
   Status = ShellDynCmdRunAxfInstall (ImageHandle);

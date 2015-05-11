@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2013-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2013-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -52,3 +52,13 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
 
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+
+  gArmJunoTokenSpaceGuid.PcdPcieControlBaseAddress
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceBaseAddress
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceSize
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
+  gArmPlatformTokenSpaceGuid.PcdPciMmio64Base
+  gArmPlatformTokenSpaceGuid.PcdPciMmio64Size

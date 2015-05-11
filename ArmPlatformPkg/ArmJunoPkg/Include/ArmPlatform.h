@@ -40,6 +40,9 @@
 #define ARM_JUNO_PERIPHERALS_BASE             0x20000000
 #define ARM_JUNO_PERIPHERALS_SZ               0x0E000000
 
+#define ARM_JUNO_GIV2M_MSI_BASE               0x2c1c0000
+#define ARM_JUNO_GIV2M_MSI_SZ                 SIZE_256KB
+
 // On-Chip non-secure SRAM
 #define ARM_JUNO_NON_SECURE_SRAM_BASE         0x2E000000
 #define ARM_JUNO_NON_SECURE_SRAM_SZ           SIZE_16MB

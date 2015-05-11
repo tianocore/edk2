@@ -129,6 +129,17 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x2C010000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x2C02F000
 
+  #
+  # PLDA PCI Root Complex
+  #
+  gArmPlatformTokenSpaceGuid.PcdPciBusMax|255
+  gArmPlatformTokenSpaceGuid.PcdPciIoBase|0x5f800000
+  gArmPlatformTokenSpaceGuid.PcdPciIoSize|0x00800000
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base|0x50000000
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x08000000
+  gArmPlatformTokenSpaceGuid.PcdPciMmio64Base|0x4000000000
+  gArmPlatformTokenSpaceGuid.PcdPciMmio64Size|0x100000000
+
   # List of Device Paths that support BootMonFs
   gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)"
 
@@ -235,7 +246,24 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
+  # Required by PCI
+  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
+
+  #
+  # PCI Support
+  #
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  ArmPlatformPkg/ArmJunoPkg/Drivers/PciHostBridgeDxe/PciHostBridgeDxe.inf
+
+  #
+  # SATA Controller
+  #
+  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+  EmbeddedPkg/Drivers/SataSiI3132Dxe/SataSiI3132Dxe.inf
+
+  #
   # Networking stack
+  #
   EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
 
   #

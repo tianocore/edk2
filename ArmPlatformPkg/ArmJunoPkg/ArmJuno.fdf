@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2013-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2013-2015, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -142,6 +142,9 @@ READ_LOCK_STATUS   = TRUE
   INF FatBinPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
+  # Required by PCI
+  INF UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
+
   # FV FileSystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
 
@@ -153,6 +156,18 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
+
+  #
+  # PCI Support
+  #
+  INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  INF ArmPlatformPkg/ArmJunoPkg/Drivers/PciHostBridgeDxe/PciHostBridgeDxe.inf
+
+  #
+  # SATA Controller
+  #
+  INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+  INF EmbeddedPkg/Drivers/SataSiI3132Dxe/SataSiI3132Dxe.inf
 
   #
   # Networking stack

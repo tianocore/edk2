@@ -57,6 +57,7 @@
   gEfiBlockIoProtocolGuid
   gEfiDevicePathFromTextProtocolGuid
   gEfiPciIoProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
 
 [FixedPcd]
