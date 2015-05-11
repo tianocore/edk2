@@ -304,6 +304,9 @@ ArmJunoEntryPoint (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
+    // Enable PCI enumeration
+    PcdSetBool (PcdPciDisableBusEnumeration, FALSE);
   }
 
   //

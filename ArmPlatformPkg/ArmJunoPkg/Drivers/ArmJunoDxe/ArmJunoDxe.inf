@@ -29,6 +29,7 @@
   ArmPlatformPkg/ArmJunoPkg/ArmJuno.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   AcpiLib
@@ -79,6 +80,7 @@
 
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
 
 [Depex]
   # We depend on these protocols to create the default boot entries
