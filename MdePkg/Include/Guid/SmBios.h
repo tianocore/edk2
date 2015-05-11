@@ -1,7 +1,7 @@
 /** @file
-  GUIDs used to locate the SMBIOS tables in the UEFI 2.0 system table.
+  GUIDs used to locate the SMBIOS tables in the UEFI 2.5 system table.
 
-  This GUID in the system table is the only legal way to search for and 
+  These GUIDs in the system table are the only legal ways to search for and
   locate the SMBIOS tables. Do not search the 0xF0000 segment to find SMBIOS
   tables.
 
@@ -15,7 +15,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  GUIDs defined in UEFI 2.0 spec.
+  GUIDs defined in UEFI 2.5 spec.
 
 **/
 
