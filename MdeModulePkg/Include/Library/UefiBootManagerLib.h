@@ -27,8 +27,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Load Option Type
 //
 typedef enum {
-  LoadOptionTypeBoot,
   LoadOptionTypeDriver,
+  LoadOptionTypeSysPrep,
+  LoadOptionTypeBoot,
   LoadOptionTypeMax
 } EFI_BOOT_MANAGER_LOAD_OPTION_TYPE;
 
@@ -51,6 +52,7 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL          *FilePath;          // Load Option Device Path
   UINT8                             *OptionalData;      // Load Option optional data to pass into image
   UINT32                            OptionalDataSize;   // Load Option size of OptionalData
+  EFI_GUID                          VendorGuid;
 
   //
   // Used at runtime
@@ -172,11 +174,11 @@ EfiBootManagerLoadOptionToVariable (
   );
 
 /**
-  This function will update the Boot####/Driver#### and the BootOrder/DriverOrder
-  to add a new load option.
+  This function will update the Boot####/Driver####/SysPrep#### and the 
+  BootOrder/DriverOrder/SysPrepOrder to add a new load option.
 
   @param  Option        Pointer to load option to add.
-  @param  Position      Position of the new load option to put in the BootOrder/DriverOrder.
+  @param  Position      Position of the new load option to put in the BootOrder/DriverOrder/SysPrepOrder.
 
   @retval EFI_SUCCESS   The load option has been successfully added.
   @retval Others        Error status returned by RT->SetVariable.
@@ -458,17 +460,20 @@ EfiBootManagerConnectAll (
 /**
   This function will create all handles associate with every device
   path node. If the handle associate with one device path node can not
-  be created successfully, then still give one chance to do the dispatch,
+  be created successfully, then still give chance to do the dispatch,
   which load the missing drivers if possible.
 
-  @param  DevicePathToConnect   The device path which will be connected, it CANNOT be
+  @param  DevicePathToConnect   The device path which will be connected, it can be
                                 a multi-instance device path
   @param  MatchingHandle        Return the controller handle closest to the DevicePathToConnect
 
-  @retval EFI_INVALID_PARAMETER DevicePathToConnect is NULL.
-  @retval EFI_NOT_FOUND         Failed to create all handles associate with every device path node.
-  @retval EFI_SUCCESS           Successful to create all handles associate with every device path node.
-
+  @retval EFI_SUCCESS            All handles associate with every device path node
+                                 have been created.
+  @retval EFI_OUT_OF_RESOURCES   There is no resource to create new handles.
+  @retval EFI_NOT_FOUND          Create the handle associate with one device path
+                                 node failed.
+  @retval EFI_SECURITY_VIOLATION The user has no permission to start UEFI device 
+                                 drivers on the DevicePath.
 **/
 EFI_STATUS
 EFIAPI
@@ -508,8 +513,12 @@ typedef enum {
 /**
   This function will connect all the console devices base on the console
   device variable ConIn, ConOut and ErrOut.
+
+  @retval EFI_DEVICE_ERROR         All the consoles were not connected due to an error.
+  @retval EFI_SUCCESS              Success connect any one instance of the console
+                                   device path base on the variable ConVarName.
 **/
-VOID
+EFI_STATUS
 EFIAPI
 EfiBootManagerConnectAllDefaultConsoles (
   VOID
@@ -654,4 +663,19 @@ EfiBootManagerFreeDriverHealthInfo (
   UINTN                                Count
   );
 
+/**
+  Process (load and execute) the load option.
+
+  @param LoadOption  Pointer to the load option.
+
+  @retval EFI_INVALID_PARAMETER  The load option type is invalid, 
+                                 or the load option file path doesn't point to a valid file.
+  @retval EFI_UNSUPPORTED        The load option type is of LoadOptionTypeBoot.
+  @retval EFI_SUCCESS            The load option is inactive, or successfully loaded and executed.
+**/
+EFI_STATUS
+EFIAPI
+EfiBootManagerProcessLoadOption (
+  EFI_BOOT_MANAGER_LOAD_OPTION       *LoadOption
+  );
 #endif

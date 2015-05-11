@@ -102,12 +102,13 @@ EfiBootManagerConnectAll (
                                 a multi-instance device path
   @param  MatchingHandle        Return the controller handle closest to the DevicePathToConnect
 
-  @retval EFI_SUCCESS           All handles associate with every device path  node
-                                have been created
-  @retval EFI_OUT_OF_RESOURCES  There is no resource to create new handles
-  @retval EFI_NOT_FOUND         Create the handle associate with one device  path
-                                node failed
-
+  @retval EFI_SUCCESS            All handles associate with every device path node
+                                 have been created.
+  @retval EFI_OUT_OF_RESOURCES   There is no resource to create new handles.
+  @retval EFI_NOT_FOUND          Create the handle associate with one device path
+                                 node failed.
+  @retval EFI_SECURITY_VIOLATION The user has no permission to start UEFI device 
+                                 drivers on the DevicePath.
 **/
 EFI_STATUS
 EFIAPI
@@ -166,9 +167,8 @@ EfiBootManagerConnectDevicePath (
         // Connect all drivers that apply to Handle and RemainingDevicePath,
         // the Recursive flag is FALSE so only one level will be expanded.
         //
-        // Do not check the connect status here, if the connect controller fail,
-        // then still give the chance to do dispatch, because partial
-        // RemainingDevicepath may be in the new FV
+        // If ConnectController fails to find a driver, then still give the chance to 
+        // do dispatch, because partial RemainingDevicePath may be in the new FV
         //
         // 1. If the connect fail, RemainingDevicepath and handle will not
         //    change, so next time will do the dispatch, then dispatch's status
@@ -177,7 +177,10 @@ EfiBootManagerConnectDevicePath (
         //    change, then avoid the dispatch, we have chance to continue the
         //    next connection
         //
-        gBS->ConnectController (Handle, NULL, RemainingDevicePath, FALSE);
+        Status = gBS->ConnectController (Handle, NULL, RemainingDevicePath, FALSE);
+        if (Status == EFI_NOT_FOUND) {
+          Status = EFI_SUCCESS;
+        }
         if (MatchingHandle != NULL) {
           *MatchingHandle = Handle;
         }

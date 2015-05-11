@@ -121,146 +121,6 @@ BmMatchDevicePaths (
 }
 
 /**
-  Get the headers (dos, image, optional header) from an image
-
-  @param  Device                SimpleFileSystem device handle
-  @param  FileName              File name for the image
-  @param  DosHeader             Pointer to dos header
-  @param  Hdr                   The buffer in which to return the PE32, PE32+, or TE header.
-
-  @retval EFI_SUCCESS           Successfully get the machine type.
-  @retval EFI_NOT_FOUND         The file is not found.
-  @retval EFI_LOAD_ERROR        File is not a valid image file.
-
-**/
-EFI_STATUS
-BmGetImageHeader (
-  IN  EFI_HANDLE                  Device,
-  IN  CHAR16                      *FileName,
-  OUT EFI_IMAGE_DOS_HEADER        *DosHeader,
-  OUT EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr
-  )
-{
-  EFI_STATUS                       Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Volume;
-  EFI_FILE_HANDLE                  Root;
-  EFI_FILE_HANDLE                  ThisFile;
-  UINTN                            BufferSize;
-  UINT64                           FileSize;
-  EFI_FILE_INFO                    *Info;
-
-  Root     = NULL;
-  ThisFile = NULL;
-  //
-  // Handle the file system interface to the device
-  //
-  Status = gBS->HandleProtocol (
-                  Device,
-                  &gEfiSimpleFileSystemProtocolGuid,
-                  (VOID *) &Volume
-                  );
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-
-  Status = Volume->OpenVolume (
-                     Volume,
-                     &Root
-                     );
-  if (EFI_ERROR (Status)) {
-    Root = NULL;
-    goto Done;
-  }
-  ASSERT (Root != NULL);
-  Status = Root->Open (Root, &ThisFile, FileName, EFI_FILE_MODE_READ, 0);
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-  ASSERT (ThisFile != NULL);
-
-  //
-  // Get file size
-  //
-  BufferSize  = SIZE_OF_EFI_FILE_INFO + 200;
-  do {
-    Info   = NULL;
-    Status = gBS->AllocatePool (EfiBootServicesData, BufferSize, (VOID **) &Info);
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-    Status = ThisFile->GetInfo (
-                         ThisFile,
-                         &gEfiFileInfoGuid,
-                         &BufferSize,
-                         Info
-                         );
-    if (!EFI_ERROR (Status)) {
-      break;
-    }
-    if (Status != EFI_BUFFER_TOO_SMALL) {
-      FreePool (Info);
-      goto Done;
-    }
-    FreePool (Info);
-  } while (TRUE);
-
-  FileSize = Info->FileSize;
-  FreePool (Info);
-
-  //
-  // Read dos header
-  //
-  BufferSize = sizeof (EFI_IMAGE_DOS_HEADER);
-  Status = ThisFile->Read (ThisFile, &BufferSize, DosHeader);
-  if (EFI_ERROR (Status) ||
-      BufferSize < sizeof (EFI_IMAGE_DOS_HEADER) ||
-      FileSize <= DosHeader->e_lfanew ||
-      DosHeader->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
-    Status = EFI_LOAD_ERROR;
-    goto Done;
-  }
-
-  //
-  // Move to PE signature
-  //
-  Status = ThisFile->SetPosition (ThisFile, DosHeader->e_lfanew);
-  if (EFI_ERROR (Status)) {
-    Status = EFI_LOAD_ERROR;
-    goto Done;
-  }
-
-  //
-  // Read and check PE signature
-  //
-  BufferSize = sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION);
-  Status = ThisFile->Read (ThisFile, &BufferSize, Hdr.Pe32);
-  if (EFI_ERROR (Status) ||
-      BufferSize < sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION) ||
-      Hdr.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
-    Status = EFI_LOAD_ERROR;
-    goto Done;
-  }
-
-  //
-  // Check PE32 or PE32+ magic
-  //
-  if (Hdr.Pe32->OptionalHeader.Magic != EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC &&
-      Hdr.Pe32->OptionalHeader.Magic != EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
-    Status = EFI_LOAD_ERROR;
-    goto Done;
-  }
-
- Done:
-  if (ThisFile != NULL) {
-    ThisFile->Close (ThisFile);
-  }
-  if (Root != NULL) {
-    Root->Close (Root);
-  }
-  return Status;
-}
-
-/**
   This routine adjust the memory information for different memory type and 
   save them into the variables for next boot.
 **/
@@ -505,3 +365,22 @@ BmSetVariableAndReportStatusCodeOnError (
   return Status;
 }
 
+
+/**
+  Print the device path info.
+
+  @param DevicePath           The device path need to print.
+**/
+VOID
+BmPrintDp (
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePath
+  )
+{
+  CHAR16                              *Str;
+
+  Str = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
+  DEBUG ((EFI_D_INFO, "%s", Str));
+  if (Str != NULL) {
+    FreePool (Str);
+  }
+}

@@ -100,6 +100,37 @@ CHAR16 *
   IN EFI_HANDLE          Handle
   );
 
+#define BM_OPTION_NAME_LEN                          sizeof ("SysPrep####")
+extern CHAR16  *mBmLoadOptionName[];
+
+typedef
+VOID
+(*VARIABLE_VISITOR) (
+  CHAR16                *Name,
+  EFI_GUID              *Guid,
+  VOID                  *Context
+  );
+
+/**
+  Call Visitor function for each variable in variable storage.
+
+  @param Visitor   Visitor function.
+  @param Context   The context passed to Visitor function.
+**/
+VOID
+ForEachVariable (
+  VARIABLE_VISITOR            Visitor,
+  VOID                        *Context
+  );
+
+/**
+  Repair all the controllers according to the Driver Health status queried.
+**/
+VOID
+BmRepairAllControllers (
+  VOID
+  );
+
 #define BM_HOTKEY_SIGNATURE SIGNATURE_32 ('b', 'm', 'h', 'k')
 typedef struct {
   UINT32                    Signature;
@@ -139,7 +170,7 @@ BmLoadEfiBootOption (
 /**
   Get the Option Number that wasn't used.
 
-  @param  OrderVariableName   Could be L"BootOrder" or L"DriverOrder".
+  @param  LoadOptionType      Load option type.
   @param  FreeOptionNumber    To receive the minimal free option number.
 
   @retval EFI_SUCCESS           The option number is found
@@ -149,8 +180,8 @@ BmLoadEfiBootOption (
 **/
 EFI_STATUS
 BmGetFreeOptionNumber (
-  IN  CHAR16    *OrderVariableName,
-  OUT UINT16    *FreeOptionNumber
+  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType,
+  OUT UINT16                            *FreeOptionNumber
   );
 
 /**
@@ -295,6 +326,42 @@ BmSetVariableAndReportStatusCodeOnError (
   );
 
 /**
+  Get the load option by its device path.
+
+  @param FilePath  The device path pointing to a load option.
+                   It could be a short-form device path.
+  @param FullPath  Return the full device path of the load option after
+                   short-form device path expanding.
+                   Caller is responsible to free it.
+  @param FileSize  Return the load option size.
+
+  @return The load option buffer. Caller is responsible to free the memory.
+**/
+VOID *
+BmGetLoadOptionBuffer (
+  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
+  OUT UINTN                             *FileSize
+  );
+
+/**
+  Return whether the PE header of the load option is valid or not.
+
+  @param[in] Type       The load option type.
+  @param[in] FileBuffer The PE file buffer of the load option.
+  @param[in] FileSize   The size of the load option file.
+
+  @retval TRUE  The PE header of the load option is valid.
+  @retval FALSE The PE header of the load option is not valid.
+**/
+BOOLEAN
+BmIsLoadOptionPeHeaderValid (
+  IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE Type,
+  IN VOID                              *FileBuffer,
+  IN UINTN                             FileSize
+  );
+
+/**
   Function compares a device path data structure to that of all the nodes of a
   second device path instance.
 
@@ -359,6 +426,16 @@ BmFindLoadOption (
 VOID
 BmRepairAllControllers (
   VOID
+  );
+
+/**
+  Print the device path info.
+
+  @param DevicePath           The device path need to print.
+**/
+VOID
+BmPrintDp (
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePath
   );
 
 #endif // _INTERNAL_BM_H_

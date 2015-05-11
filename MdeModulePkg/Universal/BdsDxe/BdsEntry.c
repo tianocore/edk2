@@ -47,6 +47,12 @@ CHAR16  *mReadOnlyVariables[] = {
   EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME
   };
 
+CHAR16 *mBdsLoadOptionName[] = {
+  L"Driver",
+  L"SysPrep",
+  L"Boot"
+};
+
 CHAR16  mRecoveryBoot[] = L"Recovery Boot";
 /**
   Event to Connect ConIn.
@@ -75,7 +81,7 @@ BdsDxeOnConnectConInCallBack (
     // Should not enter this case, if enter, the keyboard will not work.
     // May need platfrom policy to connect keyboard.
     //
-    DEBUG ((EFI_D_WARN, "[Bds] ASSERT Connect ConIn failed!!!\n"));
+    DEBUG ((EFI_D_WARN, "[Bds] Connect ConIn failed - %r!!!\n", Status));
   }
 }
 
@@ -553,103 +559,55 @@ DefaultBootBehavior (
 }
 
 /**
-  The function will go through the driver option link list, load and start
-  every driver the driver option device path point to.
+  The function will load and start every Driver####/SysPrep####.
 
-  @param  DriverOption        Input driver option array.
-  @param  DriverOptionCount   Input driver option count.
+  @param  LoadOptions        Load option array.
+  @param  LoadOptionCount    Load option count.
 
 **/
 VOID
-LoadDrivers (
-  IN EFI_BOOT_MANAGER_LOAD_OPTION       *DriverOption,
-  IN UINTN                              DriverOptionCount
+ProcessLoadOptions (
+  IN EFI_BOOT_MANAGER_LOAD_OPTION       *LoadOptions,
+  IN UINTN                              LoadOptionCount
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     Index;
-  EFI_HANDLE                ImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL *ImageInfo;
-  BOOLEAN                   ReconnectAll;
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  BOOLEAN                           ReconnectAll;
+  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType;
 
   ReconnectAll = FALSE;
+  LoadOptionType = LoadOptionTypeMax;
 
   //
   // Process the driver option
   //
-  for (Index = 0; Index < DriverOptionCount; Index++) {
+  for (Index = 0; Index < LoadOptionCount; Index++) {
     //
-    // If a load option is not marked as LOAD_OPTION_ACTIVE,
-    // the boot manager will not automatically load the option.
+    // All the load options in the array should be of the same type.
     //
-    if ((DriverOption[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) {
-      continue;
+    if (LoadOptionType == LoadOptionTypeMax) {
+      LoadOptionType = LoadOptions[Index].OptionType;
     }
-    
-    //
-    // If a driver load option is marked as LOAD_OPTION_FORCE_RECONNECT,
-    // then all of the EFI drivers in the system will be disconnected and
-    // reconnected after the last driver load option is processed.
-    //
-    if ((DriverOption[Index].Attributes & LOAD_OPTION_FORCE_RECONNECT) != 0) {
+    ASSERT (LoadOptionType == LoadOptions[Index].OptionType);
+    ASSERT (LoadOptionType == LoadOptionTypeDriver || LoadOptionType == LoadOptionTypeSysPrep);
+
+    Status = EfiBootManagerProcessLoadOption (&LoadOptions[Index]);
+
+    if (!EFI_ERROR (Status) && ((LoadOptions[Index].Attributes & LOAD_OPTION_FORCE_RECONNECT) != 0)) {
       ReconnectAll = TRUE;
     }
-    
-    //
-    // Make sure the driver path is connected.
-    //
-    EfiBootManagerConnectDevicePath (DriverOption[Index].FilePath, NULL);
-
-    //
-    // Load and start the image that Driver#### describes
-    //
-    Status = gBS->LoadImage (
-                    FALSE,
-                    gImageHandle,
-                    DriverOption[Index].FilePath,
-                    NULL,
-                    0,
-                    &ImageHandle
-                    );
-
-    if (!EFI_ERROR (Status)) {
-      gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &ImageInfo);
-
-      //
-      // Verify whether this image is a driver, if not,
-      // exit it and continue to parse next load option
-      //
-      if (ImageInfo->ImageCodeType != EfiBootServicesCode && ImageInfo->ImageCodeType != EfiRuntimeServicesCode) {
-        gBS->Exit (ImageHandle, EFI_INVALID_PARAMETER, 0, NULL);
-        continue;
-      }
-
-      ImageInfo->LoadOptionsSize  = DriverOption[Index].OptionalDataSize;
-      ImageInfo->LoadOptions      = DriverOption[Index].OptionalData;
-      //
-      // Before calling the image, enable the Watchdog Timer for
-      // the 5 Minute period
-      //
-      gBS->SetWatchdogTimer (5 * 60, 0x0000, 0x00, NULL);
-
-      DriverOption[Index].Status = gBS->StartImage (ImageHandle, &DriverOption[Index].ExitDataSize, &DriverOption[Index].ExitData);
-      DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Driver Return Status = %r\n", DriverOption[Index].Status));
-
-      //
-      // Clear the Watchdog Timer after the image returns
-      //
-      gBS->SetWatchdogTimer (0x0000, 0x0000, 0x0000, NULL);
-    }
   }
-  
+
   //
-  // Process the LOAD_OPTION_FORCE_RECONNECT driver option
+  // If a driver load option is marked as LOAD_OPTION_FORCE_RECONNECT,
+  // then all of the EFI drivers in the system will be disconnected and
+  // reconnected after the last driver load option is processed.
   //
-  if (ReconnectAll) {
+  if (ReconnectAll && LoadOptionType == LoadOptionTypeDriver) {
     EfiBootManagerDisconnectAll ();
     EfiBootManagerConnectAll ();
   }
-
 }
 
 /**
@@ -855,9 +813,8 @@ BdsEntry (
   IN EFI_BDS_ARCH_PROTOCOL  *This
   )
 {
-  EFI_BOOT_MANAGER_LOAD_OPTION    *DriverOption;
-  EFI_BOOT_MANAGER_LOAD_OPTION    BootOption;
-  UINTN                           DriverOptionCount;
+  EFI_BOOT_MANAGER_LOAD_OPTION    *LoadOptions;
+  UINTN                           LoadOptionCount;
   CHAR16                          *FirmwareVendor;
   EFI_EVENT                       HotkeyTriggered;
   UINT64                          OsIndication;
@@ -867,8 +824,11 @@ BdsEntry (
   UINT16                          BootTimeOut;
   EDKII_VARIABLE_LOCK_PROTOCOL    *VariableLock;
   UINTN                           Index;
+  EFI_BOOT_MANAGER_LOAD_OPTION    BootOption;
   UINT16                          *BootNext;
   CHAR16                          BootNextVariableName[sizeof ("Boot####")];
+  EFI_BOOT_MANAGER_LOAD_OPTION    BootManagerMenu;
+  BOOLEAN                         BootFwUi;
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
@@ -939,7 +899,7 @@ BdsEntry (
   // Initialize L"BootOptionSupport" EFI global variable.
   // Lazy-ConIn implictly disables BDS hotkey.
   //
-  BootOptionSupport = EFI_BOOT_OPTION_SUPPORT_APP;
+  BootOptionSupport = EFI_BOOT_OPTION_SUPPORT_APP | EFI_BOOT_OPTION_SUPPORT_SYSPREP;
   if (!PcdGetBool (PcdConInConnectOnDemand)) {
     BootOptionSupport |= EFI_BOOT_OPTION_SUPPORT_KEY;
     SET_BOOT_OPTION_SUPPORT_KEY_COUNT (BootOptionSupport, 3);
@@ -1010,11 +970,11 @@ BdsEntry (
   EfiBootManagerStartHotkeyService (&HotkeyTriggered);
 
   //
-  // Load Driver Options
+  // Execute Driver Options
   //
-  DriverOption = EfiBootManagerGetLoadOptions (&DriverOptionCount, LoadOptionTypeDriver);
-  LoadDrivers (DriverOption, DriverOptionCount);
-  EfiBootManagerFreeLoadOptions (DriverOption, DriverOptionCount);
+  LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeDriver);
+  ProcessLoadOptions (LoadOptions, LoadOptionCount);
+  EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
 
   //
   // Connect consoles
@@ -1059,23 +1019,28 @@ BdsEntry (
   PERF_END   (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
 
   DEBUG_CODE (
-    EFI_BOOT_MANAGER_LOAD_OPTION    *BootOptions;
-    UINTN                           BootOptionCount;
-    UINTN                           Index;
-
-    BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
-    DEBUG ((EFI_D_INFO, "[Bds]=============Dumping Boot Options=============\n"));
-    for (Index = 0; Index < BootOptionCount; Index++) {
+    UINTN                             Index;
+    EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType;
+    DEBUG ((EFI_D_INFO, "[Bds]=============Begin Load Options Dumping ...=============\n"));
+    for (LoadOptionType = 0; LoadOptionType < LoadOptionTypeMax; LoadOptionType++) {
       DEBUG ((
-        EFI_D_INFO, "[Bds]Boot%04x: %s \t\t 0x%04x\n",
-        BootOptions[Index].OptionNumber, 
-        BootOptions[Index].Description, 
-        BootOptions[Index].Attributes
+        EFI_D_INFO, "  %s Options:\n",
+        mBdsLoadOptionName[LoadOptionType]
         ));
+      LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionType);
+      for (Index = 0; Index < LoadOptionCount; Index++) {
+        DEBUG ((
+          EFI_D_INFO, "    %s%04x: %s \t\t 0x%04x\n",
+          mBdsLoadOptionName[LoadOptionType],
+          LoadOptions[Index].OptionNumber,
+          LoadOptions[Index].Description,
+          LoadOptions[Index].Attributes
+          ));
+      }
+      EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
     }
-    DEBUG ((EFI_D_INFO, "[Bds]=============Dumping Boot Options Finished====\n"));
-    EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
-    );
+    DEBUG ((EFI_D_INFO, "[Bds]=============End Load Options Dumping=============\n"));
+  );
 
   //
   // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
@@ -1088,10 +1053,15 @@ BdsEntry (
                   &DataSize,
                   &OsIndication
                   );
-  if (!EFI_ERROR(Status) && ((OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0)) {
-    //
-    // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
-    // 
+  if (EFI_ERROR (Status)) {
+    OsIndication = 0;
+  }
+
+  BootFwUi = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0);
+  //
+  // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
+  // 
+  if (BootFwUi) {
     OsIndication &= ~((UINT64) EFI_OS_INDICATIONS_BOOT_TO_FW_UI);
     Status = gRT->SetVariable (
                L"OsIndications",
@@ -1104,7 +1074,12 @@ BdsEntry (
     // Changing the content without increasing its size with current variable implementation shouldn't fail.
     //
     ASSERT_EFI_ERROR (Status);
+  }
 
+  //
+  // Launch Boot Manager Menu directly when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
+  //
+  if (BootFwUi) {
     //
     // Follow generic rule, Call BdsDxeOnConnectConInCallBack to connect ConIn before enter UI
     //
@@ -1113,23 +1088,34 @@ BdsEntry (
     }
 
     //
-    // Directly boot to Boot Manager Menu.
+    // Directly enter the setup page.
+    // BootManagerMenu always contains the correct information even call fails.
     //
-    EfiBootManagerGetBootManagerMenu (&BootOption);
-    EfiBootManagerBoot (&BootOption);
-    EfiBootManagerFreeLoadOption (&BootOption);
-  } else {
-    PERF_START (NULL, "BdsWait", "BDS", 0);
-    BdsWait (HotkeyTriggered);
-    PERF_END   (NULL, "BdsWait", "BDS", 0);
-
-    //
-    // BdsReadKeys() be removed after all keyboard drivers invoke callback in timer callback.
-    //
-    BdsReadKeys ();
-    
-    EfiBootManagerHotkeyBoot ();
+    EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
+    EfiBootManagerBoot (&BootManagerMenu);
+    EfiBootManagerFreeLoadOption (&BootManagerMenu);
   }
+
+  //
+  // Execute SysPrep####
+  //
+  LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeSysPrep);
+  ProcessLoadOptions (LoadOptions, LoadOptionCount);
+  EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+
+  //
+  // Execute Key####
+  //
+  PERF_START (NULL, "BdsWait", "BDS", 0);
+  BdsWait (HotkeyTriggered);
+  PERF_END   (NULL, "BdsWait", "BDS", 0);
+
+  //
+  // BdsReadKeys() be removed after all keyboard drivers invoke callback in timer callback.
+  //
+  BdsReadKeys ();
+
+  EfiBootManagerHotkeyBoot ();
 
   //
   // Boot to "BootNext"

@@ -695,28 +695,42 @@ EfiBootManagerConnectAllConsoles (
 /**
   This function will connect all the console devices base on the console
   device variable ConIn, ConOut and ErrOut.
+
+  @retval EFI_DEVICE_ERROR         All the consoles were not connected due to an error.
+  @retval EFI_SUCCESS              Success connect any one instance of the console
+                                   device path base on the variable ConVarName.
 **/
-VOID
+EFI_STATUS
 EFIAPI
 EfiBootManagerConnectAllDefaultConsoles (
   VOID
   )
 {
+  EFI_STATUS                Status;
+  BOOLEAN                   OneConnected;
   BOOLEAN                   SystemTableUpdated;
 
-  EfiBootManagerConnectConsoleVariable (ConOut);
+  OneConnected = FALSE;
+
+  Status = EfiBootManagerConnectConsoleVariable (ConOut);
+  if (!EFI_ERROR (Status)) {
+    OneConnected = TRUE;
+  }
   PERF_START (NULL, "ConOutReady", "BDS", 1);
   PERF_END   (NULL, "ConOutReady", "BDS", 0);
 
   
-  EfiBootManagerConnectConsoleVariable (ConIn);
+  Status = EfiBootManagerConnectConsoleVariable (ConIn);
+  if (!EFI_ERROR (Status)) {
+    OneConnected = TRUE;
+  }
   PERF_START (NULL, "ConInReady", "BDS", 1);
   PERF_END   (NULL, "ConInReady", "BDS", 0);
 
-  //
-  // The _ModuleEntryPoint err out var is legal.
-  //
-  EfiBootManagerConnectConsoleVariable (ErrOut);
+  Status = EfiBootManagerConnectConsoleVariable (ErrOut);
+  if (!EFI_ERROR (Status)) {
+    OneConnected = TRUE;
+  }
   PERF_START (NULL, "ErrOutReady", "BDS", 1);
   PERF_END   (NULL, "ErrOutReady", "BDS", 0);
 
@@ -745,4 +759,6 @@ EfiBootManagerConnectAllDefaultConsoles (
           &gST->Hdr.CRC32
           );
   }
+
+  return OneConnected ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 }
