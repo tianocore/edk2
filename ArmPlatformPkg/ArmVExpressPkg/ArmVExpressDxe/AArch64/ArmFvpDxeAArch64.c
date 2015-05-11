@@ -22,13 +22,13 @@
 // model or hardware platforms).
 //
 CONST ARM_VEXPRESS_PLATFORM ArmVExpressPlatforms[] = {
-  { ARM_FVP_VEXPRESS_AEMv8x4,                  FixedPcdGetPtr(PcdFdtFvpVExpressAEMv8x4),        L"rtsm_ve-aemv8a.dtb"                  },
-  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2,        FixedPcdGetPtr(PcdFdtFvpBaseAEMv8x4GicV2),       L"fvp-base-gicv2-psci.dtb"             },
-  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2_LEGACY, FixedPcdGetPtr(PcdFdtFvpBaseAEMv8x4GicV2Legacy), L"fvp-base-gicv2legacy-psci.dtb"       },
-  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV3,        FixedPcdGetPtr(PcdFdtFvpBaseAEMv8x4GicV3),       L"fvp-base-gicv3-psci.dtb"             },
-  { ARM_FVP_FOUNDATION_GICV2,                  FixedPcdGetPtr(PcdFdtFvpFoundationGicV2),        L"fvp-foundation-gicv2-psci.dtb"       },
-  { ARM_FVP_FOUNDATION_GICV2_LEGACY,           FixedPcdGetPtr(PcdFdtFvpFoundationGicV2Legacy),  L"fvp-foundation-gicv2legacy-psci.dtb" },
-  { ARM_FVP_FOUNDATION_GICV3,                  FixedPcdGetPtr(PcdFdtFvpFoundationGicV3),        L"fvp-foundation-gicv3-psci.dtb"       },
+  { ARM_FVP_VEXPRESS_AEMv8x4,                  FixedPcdGetPtr (PcdFdtFvpVExpressAEMv8x4),        L"rtsm_ve-aemv8a.dtb"                  },
+  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2,        FixedPcdGetPtr (PcdFdtFvpBaseAEMv8x4GicV2),       L"fvp-base-gicv2-psci.dtb"             },
+  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2_LEGACY, FixedPcdGetPtr (PcdFdtFvpBaseAEMv8x4GicV2Legacy), L"fvp-base-gicv2legacy-psci.dtb"       },
+  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV3,        FixedPcdGetPtr (PcdFdtFvpBaseAEMv8x4GicV3),       L"fvp-base-gicv3-psci.dtb"             },
+  { ARM_FVP_FOUNDATION_GICV2,                  FixedPcdGetPtr (PcdFdtFvpFoundationGicV2),        L"fvp-foundation-gicv2-psci.dtb"       },
+  { ARM_FVP_FOUNDATION_GICV2_LEGACY,           FixedPcdGetPtr (PcdFdtFvpFoundationGicV2Legacy),  L"fvp-foundation-gicv2legacy-psci.dtb" },
+  { ARM_FVP_FOUNDATION_GICV3,                  FixedPcdGetPtr (PcdFdtFvpFoundationGicV3),        L"fvp-foundation-gicv3-psci.dtb"       },
   { ARM_FVP_VEXPRESS_UNKNOWN }
 };
 

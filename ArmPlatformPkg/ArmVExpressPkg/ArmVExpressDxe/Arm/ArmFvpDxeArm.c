@@ -22,10 +22,10 @@
 // model or hardware platforms).
 //
 CONST ARM_VEXPRESS_PLATFORM ArmVExpressPlatforms[] = {
-  { ARM_FVP_VEXPRESS_A9x4,  FixedPcdGetPtr(PcdFdtVExpressFvpA9x4),  L"rtsm_ve-cortex_a9x4.dtb"  },
-  { ARM_FVP_VEXPRESS_A15x1, FixedPcdGetPtr(PcdFdtVExpressFvpA15x1), L"rtsm_ve-cortex_a15x1.dtb" },
-  { ARM_FVP_VEXPRESS_A15x2, FixedPcdGetPtr(PcdFdtVExpressFvpA15x2), L"rtsm_ve-cortex_a15x2.dtb" },
-  { ARM_FVP_VEXPRESS_A15x4, FixedPcdGetPtr(PcdFdtVExpressFvpA15x4), L"rtsm_ve-cortex_a15x4.dtb" },
+  { ARM_FVP_VEXPRESS_A9x4,  FixedPcdGetPtr (PcdFdtVExpressFvpA9x4),  L"rtsm_ve-cortex_a9x4.dtb"  },
+  { ARM_FVP_VEXPRESS_A15x1, FixedPcdGetPtr (PcdFdtVExpressFvpA15x1), L"rtsm_ve-cortex_a15x1.dtb" },
+  { ARM_FVP_VEXPRESS_A15x2, FixedPcdGetPtr (PcdFdtVExpressFvpA15x2), L"rtsm_ve-cortex_a15x2.dtb" },
+  { ARM_FVP_VEXPRESS_A15x4, FixedPcdGetPtr (PcdFdtVExpressFvpA15x4), L"rtsm_ve-cortex_a15x4.dtb" },
   { ARM_FVP_VEXPRESS_UNKNOWN, }
 };
 
