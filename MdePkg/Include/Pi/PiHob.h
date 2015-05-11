@@ -255,6 +255,13 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 #define EFI_RESOURCE_ATTRIBUTE_INITIALIZED              0x00000002
 #define EFI_RESOURCE_ATTRIBUTE_TESTED                   0x00000004
 #define EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED           0x00000080
+//
+// This is typically used as memory cacheability attribute today.
+// NOTE: Since PI spec 1.4, please use EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED
+// as Physical write protected attribute, and EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED
+// means Memory cacheability attribute: The memory supports being programmed with
+// a writeprotected cacheable attribute.
+//
 #define EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED          0x00000100
 #define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED      0x00000200
 #define EFI_RESOURCE_ATTRIBUTE_PERSISTENT               0x00800000
@@ -274,9 +281,19 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 #define EFI_RESOURCE_ATTRIBUTE_64_BIT_IO                0x00010000
 #define EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED        0x00020000
 #define EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE         0x00100000
+//
+// This is typically used as memory cacheability attribute today.
+// NOTE: Since PI spec 1.4, please use EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE
+// as Memory capability attribute: The memory supports being protected from processor
+// writes, and EFI_RESOURCE_ATTRIBUTE_WRITE_PROTEC TABLE means Memory cacheability attribute:
+// The memory supports being programmed with a writeprotected cacheable attribute.
+//
 #define EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE        0x00200000
 #define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE    0x00400000
 #define EFI_RESOURCE_ATTRIBUTE_PERSISTABLE              0x01000000
+
+#define EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED      0x00040000
+#define EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE    0x00800000
 
 ///
 /// Describes the resource properties of all fixed,

@@ -71,9 +71,13 @@ typedef enum {
 //
 // Physical memory protection attributes
 //
+// Note: UEFI spec 2.5 and following: use EFI_MEMORY_RO as write-protected physical memory
+// protection attribute. Also, EFI_MEMORY_WP means cacheability attribute.
+//
 #define EFI_MEMORY_WP   0x0000000000001000ULL
 #define EFI_MEMORY_RP   0x0000000000002000ULL
 #define EFI_MEMORY_XP   0x0000000000004000ULL
+#define EFI_MEMORY_RO   0x0000000000020000ULL
 //
 // Physical memory persistence attribute. 
 // The memory region supports byte-addressable non-volatility.
