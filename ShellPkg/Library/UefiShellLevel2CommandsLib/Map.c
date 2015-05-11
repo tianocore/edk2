@@ -2,7 +2,7 @@
   Main file for map shell level 2 command.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -224,6 +224,8 @@ MappingListHasType(
   )
 {
   CHAR16 *NewSpecific;
+  RETURN_STATUS  Status;
+  
   //
   // specific has priority
   //
@@ -233,7 +235,11 @@ MappingListHasType(
       return FALSE;
     }
     if (NewSpecific[StrLen(NewSpecific)-1] != L':') {
-      StrnCat(NewSpecific, L":", 2);
+      Status = StrnCatS(NewSpecific, (StrSize(Specific) + sizeof(CHAR16))/sizeof(CHAR16), L":", StrLen(L":"));
+      if (EFI_ERROR (Status)) {
+        FreePool(NewSpecific);
+        return FALSE;
+      }
     }
 
     if (SearchList(MapList, NewSpecific, NULL, TRUE, FALSE, L";")) {
@@ -875,13 +881,18 @@ AddMappingFromMapping(
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   EFI_STATUS                      Status;
   CHAR16                          *NewSName;
+  RETURN_STATUS                   StrRetStatus;
   
   NewSName = AllocateCopyPool(StrSize(SName) + sizeof(CHAR16), SName);
   if (NewSName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
   }
   if (NewSName[StrLen(NewSName)-1] != L':') {
-    StrnCat(NewSName, L":", 2);
+    StrRetStatus = StrnCatS(NewSName, (StrSize(SName) + sizeof(CHAR16))/sizeof(CHAR16), L":", StrLen(L":"));
+    if (EFI_ERROR(StrRetStatus)) {
+      FreePool(NewSName);
+      return ((SHELL_STATUS) (StrRetStatus & (~MAX_BIT)));
+    }
   }
 
   if (!IsNumberLetterOnly(NewSName, StrLen(NewSName)-1)) {
@@ -927,13 +938,18 @@ AddMappingFromHandle(
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   EFI_STATUS                Status;
   CHAR16                    *NewSName;
+  RETURN_STATUS             StrRetStatus;
   
   NewSName = AllocateCopyPool(StrSize(SName) + sizeof(CHAR16), SName);
   if (NewSName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
   }
   if (NewSName[StrLen(NewSName)-1] != L':') {
-    StrnCat(NewSName, L":", 2);
+    StrRetStatus = StrnCatS(NewSName, (StrSize(SName) + sizeof(CHAR16))/sizeof(CHAR16), L":", StrLen(L":"));
+    if (EFI_ERROR(StrRetStatus)) {
+      FreePool(NewSName);
+      return ((SHELL_STATUS) (StrRetStatus & (~MAX_BIT)));
+    }
   }
 
   if (!IsNumberLetterOnly(NewSName, StrLen(NewSName)-1)) {
