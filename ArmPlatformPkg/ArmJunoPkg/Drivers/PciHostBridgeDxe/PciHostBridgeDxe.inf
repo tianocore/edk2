@@ -1,0 +1,76 @@
+#/** @file
+#  INF file for the Xpress-RICH3 PCIe Root Complex
+#
+#  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciHostBridge
+  FILE_GUID                      = C62F4B20-681E-11DF-8F0D-0002A5D5C51B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PciHostBridgeEntryPoint
+  UNLOAD_IMAGE                   = PciHostBridgeUnload
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/ArmJunoPkg/ArmJuno.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  DxeServicesTableLib
+  CacheMaintenanceLib
+  DmaLib
+
+[Sources]
+  PciHostBridge.c
+  PciHostBridgeResourceAllocation.c
+  PciRootBridge.c
+  XPressRich3.c
+
+[Protocols]
+  gEfiPciHostBridgeResourceAllocationProtocolGuid # Produced
+  gEfiPciRootBridgeIoProtocolGuid                 # Produced
+  gEfiDevicePathProtocolGuid                      # Produced
+  gEfiCpuIo2ProtocolGuid                          # Consumed
+  gEfiMetronomeArchProtocolGuid                   # Consumed
+
+[FeaturePcd]
+  gArmJunoTokenSpaceGuid.PcdPciMaxPayloadFixup
+
+[Pcd.common]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+  gArmPlatformTokenSpaceGuid.PcdPciBusMin
+  gArmPlatformTokenSpaceGuid.PcdPciBusMax
+  gArmPlatformTokenSpaceGuid.PcdPciIoBase
+  gArmPlatformTokenSpaceGuid.PcdPciIoSize
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
+  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
+  gArmPlatformTokenSpaceGuid.PcdPciMmio64Base
+  gArmPlatformTokenSpaceGuid.PcdPciMmio64Size
+
+  gArmJunoTokenSpaceGuid.PcdPcieControlBaseAddress
+  gArmJunoTokenSpaceGuid.PcdPcieRootPortBaseAddress
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceBaseAddress
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceSize
+
+[Depex]
+  gEfiCpuIo2ProtocolGuid AND gEfiMetronomeArchProtocolGuid

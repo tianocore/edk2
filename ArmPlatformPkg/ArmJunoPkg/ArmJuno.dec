@@ -31,7 +31,15 @@
 [Guids.common]
   gArmJunoTokenSpaceGuid    =  { 0xa1147a20, 0x3144, 0x4f8d, { 0x82, 0x95, 0xb4, 0x83, 0x11, 0xc8, 0xe4, 0xa4 } }
 
+[PcdsFeatureFlag.common]
+  gArmJunoTokenSpaceGuid.PcdPciMaxPayloadFixup|FALSE|BOOLEAN|0x00000013
+
 [PcdsFixedAtBuild.common]
+  gArmJunoTokenSpaceGuid.PcdPcieControlBaseAddress|0x7FF20000|UINT64|0x0000000B
+  gArmJunoTokenSpaceGuid.PcdPcieRootPortBaseAddress|0x7FF30000|UINT64|0x0000000C
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceBaseAddress|0x40000000|UINT64|0x00000011
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceSize|0x10000000|UINT64|0x00000012
+
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbOhciBaseAddress|0x7FFB0000|UINT32|0x00000004
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbEhciBaseAddress|0x7FFC0000|UINT32|0x00000005
 
