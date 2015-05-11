@@ -58,3 +58,51 @@ PeiResetSystem (
   return  EFI_NOT_AVAILABLE_YET;
 }
 
+/**
+  Resets the entire platform.
+
+  @param[in] ResetType      The type of reset to perform.
+  @param[in] ResetStatus    The status code for the reset.
+  @param[in] DataSize       The size, in bytes, of WatchdogData.
+  @param[in] ResetData      For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
+                            the data buffer starts with a Null-terminated string, optionally
+                            followed by additional binary data. The string is a description
+                            that the caller may use to further indicate the reason for the
+                            system reset. ResetData is only valid if ResetStatus is something
+                            other than EFI_SUCCESS unless the ResetType is EfiResetPlatformSpecific
+                            where a minimum amount of ResetData is always required.
+
+**/
+VOID
+EFIAPI
+PeiResetSystem2 (
+  IN EFI_RESET_TYPE     ResetType,
+  IN EFI_STATUS         ResetStatus,
+  IN UINTN              DataSize,
+  IN VOID               *ResetData OPTIONAL
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PEI_RESET2_PPI    *Reset2Ppi;
+
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiReset2PpiGuid,
+             0,
+             NULL,
+             (VOID **)&Reset2Ppi
+             );
+
+  if (!EFI_ERROR (Status)) {
+    Reset2Ppi->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
+    return;
+  }
+
+  //
+  // Report Status Code that Reset2 PPI is not available.
+  //
+  REPORT_STATUS_CODE (
+    EFI_ERROR_CODE | EFI_ERROR_MINOR,
+    (EFI_SOFTWARE_PEI_CORE | EFI_SW_PS_EC_RESET_NOT_AVAILABLE)
+    );
+}
+

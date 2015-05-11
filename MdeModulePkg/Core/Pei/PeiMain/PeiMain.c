@@ -63,7 +63,8 @@ EFI_PEI_SERVICES  gPs = {
   PeiFfsGetVolumeInfo,
   PeiRegisterForShadow,
   PeiFfsFindSectionData3,
-  PeiFfsGetFileInfo2
+  PeiFfsGetFileInfo2,
+  PeiResetSystem2
 };
 
 /**
