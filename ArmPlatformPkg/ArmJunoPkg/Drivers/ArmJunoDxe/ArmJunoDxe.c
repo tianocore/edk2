@@ -203,6 +203,7 @@ ArmJunoEntryPoint (
   UINT32                CpuType;
   UINT32                CpuRev;
   JUNO_REVISION         JunoRevision;
+  EFI_EVENT             EndOfDxeEvent;
 
   JunoRevision = UNKNOWN;
   Status = PciEmulationEntryPoint ();
