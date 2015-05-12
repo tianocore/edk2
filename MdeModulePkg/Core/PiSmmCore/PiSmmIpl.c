@@ -1042,6 +1042,7 @@ SmmIplEntry (
   UINT64                          SmmCodeSize;
   EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    *LMFAConfigurationTable;
   EFI_CPU_ARCH_PROTOCOL           *CpuArch;
+  EFI_STATUS                      SetAttrStatus;
 
   //
   // Fill in the image handle of the SMM IPL so the SMM Core can use this as the 
@@ -1213,12 +1214,12 @@ SmmIplEntry (
       // Attempt to reset SMRAM cacheability to UC
       //
       if (CpuArch != NULL) {
-        Status = gDS->SetMemorySpaceAttributes(
-                        mSmramCacheBase, 
-                        mSmramCacheSize,
-                        EFI_MEMORY_UC
-                        );
-        if (EFI_ERROR (Status)) {
+        SetAttrStatus = gDS->SetMemorySpaceAttributes(
+                               mSmramCacheBase, 
+                               mSmramCacheSize,
+                               EFI_MEMORY_UC
+                               );
+        if (EFI_ERROR (SetAttrStatus)) {
           DEBUG ((DEBUG_WARN, "SMM IPL failed to reset SMRAM window to EFI_MEMORY_UC\n"));
         }  
       }
