@@ -1506,7 +1506,7 @@ EfiBootManagerBoot (
   // 5. Load EFI boot option to ImageHandle
   //
   ImageHandle = NULL;
-  if (BmDevicePathType (BootOption->FilePath) != BBS_DEVICE_PATH) {
+  if (DevicePathType (BootOption->FilePath) != BBS_DEVICE_PATH) {
     Status     = EFI_NOT_FOUND;
     FileBuffer = BmGetLoadOptionBuffer (BootOption->FilePath, &FilePath, &FileSize);
     DEBUG_CODE (
