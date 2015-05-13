@@ -58,7 +58,7 @@ ASM_PFX(ArmReadCntkCtl):
 
 
 ASM_PFX(ArmWriteCntkCtl):
-  mrs   x0, cntkctl_el1          // Write to CNTK_CTL (Timer PL1 Control Register)
+  msr   cntkctl_el1, x0          // Write to CNTK_CTL (Timer PL1 Control Register)
   ret
 
 
