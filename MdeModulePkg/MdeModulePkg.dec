@@ -409,6 +409,9 @@
 
   ## Include/Protocol/UfsHostController.h
   gEdkiiUfsHostControllerProtocolGuid = { 0xebc01af5, 0x7a9, 0x489e, { 0xb7, 0xce, 0xdc, 0x8, 0x9e, 0x45, 0x9b, 0x2f } }
+  
+  ## Include/Protocol/EsrtManagement.h
+  gEsrtManagementProtocolGuid         = { 0xa340c064, 0x723c, 0x4a9c, { 0xa4, 0xdd, 0xd5, 0xb4, 0x7a, 0x26, 0xfb, 0xb0 }}
 
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
@@ -925,7 +928,7 @@
   ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
   # @Prompt Serial Port Extended Transmit FIFO Size in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|64|UINT32|0x00010068
-
+  
   ## This PCD points to the file name GUID of the BootManagerMenuApp
   #  Platform can customize the PCD to point to different application for Boot Manager Menu
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0xdc, 0x5b, 0xc2, 0xee, 0xf2, 0x67, 0x95, 0x4d, 0xb1, 0xd5, 0xf8, 0x1b, 0x20, 0x39, 0xd1, 0x1d }|VOID*|0x0001006b
@@ -1261,6 +1264,21 @@
   # host controllers, their mmio base addresses are calculated one by one from this base address.
   # @Prompt Mmio base address of pci-based UFS host controller.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUfsPciHostControllerMmioBase|0xd0000000|UINT32|0x10000061
+
+  ## Specify Max ESRT cache entry number supported for FMP instances
+  #
+  # @Prompt Max FMP ESRT entry number to be synced & cached in repository.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxFmpEsrtCacheNum|32|UINT32|0x0000006b
+
+  ## Specify Max ESRT cache entry number supported for Non FMP instances
+  #
+  # @Prompt Max Non-FMP ESRT entry number to be cached in repository.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxNonFmpEsrtCacheNum|32|UINT32|0x0000006c
+
+  ## Specify of Capsule Flag defined by CapsuleGuid to request system reboot after capsule process
+  #
+  # @Prompt Flag to request system reboot after processing capsule.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag|0x0001|UINT16|0x0000006d
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
