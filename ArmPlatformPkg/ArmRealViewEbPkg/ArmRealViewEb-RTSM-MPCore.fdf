@@ -154,6 +154,9 @@ READ_LOCK_STATUS   = TRUE
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
 
+  # FV Filesystem
+  INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
   #
   # FAT filesystem + GPT/MBR partitioning
   #
