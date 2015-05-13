@@ -32,4 +32,9 @@
 //
 #define POWER_MGMT_REGISTER_PIIX4(Offset) PCI_LIB_ADDRESS (0, 1, 3, (Offset))
 
+#define PIIX4_PMBA             0x40
+
+#define PIIX4_PMREGMISC        0x80
+#define PIIX4_PMREGMISC_PMIOSE   BIT0
+
 #endif
