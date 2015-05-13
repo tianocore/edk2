@@ -2,7 +2,7 @@
 Implementation for EFI_HII_STRING_PROTOCOL.
 
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1834,6 +1834,12 @@ HiiGetLanguages (
        Link = Link->ForwardLink
       ) {
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
+    if (AsciiStrnCmp (StringPackage->StringPkgHdr->Language, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) == 0) {
+      //
+      // Skip string package used for keyword protocol.
+      //
+      continue;
+    }
     ResultSize += AsciiStrSize (StringPackage->StringPkgHdr->Language);
     if (ResultSize <= *LanguagesSize) {
       AsciiStrCpy (Languages, StringPackage->StringPkgHdr->Language);
