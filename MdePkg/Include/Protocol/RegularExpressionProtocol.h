@@ -3,13 +3,13 @@
   Unicode strings against Regular Expression patterns.
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -40,7 +40,7 @@ typedef struct _EFI_REGULAR_EXPRESSION_PROTOCOL  EFI_REGULAR_EXPRESSION_PROTOCOL
 
 
 typedef struct {
-  CONST CHAR16 *CapturePtr; // Pointer to the start of the captured sub-expression 
+  CONST CHAR16 *CapturePtr; // Pointer to the start of the captured sub-expression
                             // within matched String.
 
   UINTN        Length;      // Length of captured sub-expression.
@@ -56,29 +56,29 @@ typedef EFI_GUID EFI_REGEX_SYNTAX_TYPE;
   by the implementation.
 
   This                     A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL
-                           instance. 
+                           instance.
 
   RegExSyntaxTypeListSize  On input, the size in bytes of RegExSyntaxTypeList.
                            On output with a return code of EFI_SUCCESS, the
-                           size in bytes of the data returned in 
+                           size in bytes of the data returned in
                            RegExSyntaxTypeList. On output with a return code
-                           of EFI_BUFFER_TOO_SMALL, the size of 
+                           of EFI_BUFFER_TOO_SMALL, the size of
                            RegExSyntaxTypeListrequired to obtain the list.
 
-  RegExSyntaxTypeList      A caller-allocated memory buffer filled by the 
+  RegExSyntaxTypeList      A caller-allocated memory buffer filled by the
                            driver with one EFI_REGEX_SYNTAX_TYPEelement
-                           for each supported Regular expression syntax 
+                           for each supported Regular expression syntax
                            type. The list must not change across multiple
-                           calls to the same driver. The first syntax 
+                           calls to the same driver. The first syntax
                            type in the list is the default type for the
                            driver.
 
-  @retval EFI_SUCCESS            The regular expression syntax types list 
+  @retval EFI_SUCCESS            The regular expression syntax types list
                                  was returned successfully.
   @retval EFI_UNSUPPORTED        The service is not supported by this driver.
-  @retval EFI_DEVICE_ERROR       The list of syntax types could not be 
+  @retval EFI_DEVICE_ERROR       The list of syntax types could not be
                                  retrieved due to a hardware or firmware error.
-  @retval EFI_BUFFER_TOO_SMALL   The buffer RegExSyntaxTypeList is too small 
+  @retval EFI_BUFFER_TOO_SMALL   The buffer RegExSyntaxTypeList is too small
                                  to hold the result.
   @retval EFI_INVALID_PARAMETER  RegExSyntaxTypeListSize is NULL
 
@@ -94,9 +94,9 @@ EFI_STATUS
 /**
   Checks if the input string matches to the regular expression pattern.
 
-  This          A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL instance. 
+  This          A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL instance.
                 Type EFI_REGULAR_EXPRESSION_PROTOCOL is defined in Section
-                XYZ. 
+                XYZ.
 
   String        A pointer to a NULL terminated string to match against the
                 regular expression string specified by Pattern.
@@ -106,37 +106,37 @@ EFI_STATUS
 
   SyntaxType    A pointer to the EFI_REGEX_SYNTAX_TYPE that identifies the
                 regular expression syntax type to use. May be NULL in which
-                case the function will use its default regular expression 
+                case the function will use its default regular expression
                 syntax type.
 
-  Result        On return, points to TRUE if String fully matches against 
+  Result        On return, points to TRUE if String fully matches against
                 the regular expression Pattern using the regular expression
                 SyntaxType. Otherwise, points to FALSE.
 
   Captures      A Pointer to an array of EFI_REGEX_CAPTURE objects to receive
-                the captured groups in the event of a match. The full 
+                the captured groups in the event of a match. The full
                 sub-string match is put in Captures[0], and the results of N
-                capturing groups are put in Captures[1:N]. If Captures is 
+                capturing groups are put in Captures[1:N]. If Captures is
                 NULL, then this function doesn't allocate the memory for the
                 array and does not build up the elements. It only returns the
                 number of matching patterns in CapturesCount. If Captures is
-                not NULL, this function returns a pointer to an array and 
-                builds up the elements in the array. CapturesCount is also 
+                not NULL, this function returns a pointer to an array and
+                builds up the elements in the array. CapturesCount is also
                 updated to the number of matching patterns found. It is the
                 caller's responsibility to free the memory pool in Captures
                 and in each CapturePtr in the array elements.
 
-  CapturesCount On output, CapturesCount is the number of matching patterns 
-                found in String. Zero means no matching patterns were found 
+  CapturesCount On output, CapturesCount is the number of matching patterns
+                found in String. Zero means no matching patterns were found
                 in the string.
 
-  @retval EFI_SUCCESS            The regular expression string matching 
+  @retval EFI_SUCCESS            The regular expression string matching
                                  completed successfully.
-  @retval EFI_UNSUPPORTED        The regular expression syntax specified by 
+  @retval EFI_UNSUPPORTED        The regular expression syntax specified by
                                  SyntaxTypeis not supported by this driver.
-  @retval EFI_DEVICE_ERROR       The regular expression string matching 
+  @retval EFI_DEVICE_ERROR       The regular expression string matching
                                  failed due to a hardware or firmware error.
-  @retval EFI_INVALID_PARAMETER  String, Pattern, Result, or CapturesCountis 
+  @retval EFI_INVALID_PARAMETER  String, Pattern, Result, or CapturesCountis
                                  NULL.
 
 **/
@@ -152,15 +152,15 @@ EFI_STATUS
   OUT UINTN                           *CapturesCount
   );
 
-struct _EFI_REGULAR_EXPRESSION_PROTOCOL { 
-  EFI_REGULAR_EXPRESSION_MATCH     MatchString; 
+struct _EFI_REGULAR_EXPRESSION_PROTOCOL {
+  EFI_REGULAR_EXPRESSION_MATCH     MatchString;
   EFI_REGULAR_EXPRESSION_GET_INFO  GetInfo;
 } ;
 
 extern EFI_GUID gEfiRegularExpressionProtocolGuid;
 
 //
-// For regular expression rules specified in the POSIX Extended Regular 
+// For regular expression rules specified in the POSIX Extended Regular
 // Expression (ERE) Syntax:
 //
 extern EFI_GUID gEfiRegexSyntaxTypePosixExtendedGuid;
