@@ -170,9 +170,6 @@ FdtPlatformEntryPoint (
   // Install the Device Tree from its expected location
   //
   Status = RunFdtInstallation (NULL);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   if (FeaturePcdGet (PcdOverridePlatformFdt) || FeaturePcdGet (PcdDumpFdtShellCommand)) {
     //
