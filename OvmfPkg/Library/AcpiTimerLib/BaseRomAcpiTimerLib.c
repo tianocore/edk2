@@ -23,7 +23,6 @@
 // Power Management PCI Configuration Register fields
 //
 #define PMBA_RTE      BIT0
-#define PIIX4_PMIOSE  BIT0
 
 //
 // Offset in the Power Management Base Address to the ACPI Timer
@@ -56,9 +55,9 @@ AcpiTimerLibConstructor (
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   switch (HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
-      Pmba       = POWER_MGMT_REGISTER_PIIX4 (0x40);
-      AcpiCtlReg = POWER_MGMT_REGISTER_PIIX4 (0x80); // PMREGMISC
-      AcpiEnBit  = PIIX4_PMIOSE;
+      Pmba       = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
+      AcpiCtlReg = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMREGMISC);
+      AcpiEnBit  = PIIX4_PMREGMISC_PMIOSE;
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       Pmba       = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
@@ -114,7 +113,7 @@ InternalAcpiGetTimerTick (
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   switch (HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
-      Pmba = POWER_MGMT_REGISTER_PIIX4 (0x40);
+      Pmba = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);

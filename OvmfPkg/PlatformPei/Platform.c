@@ -252,9 +252,9 @@ MiscInitialization (
   switch (HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
-      Pmba       = POWER_MGMT_REGISTER_PIIX4 (0x40);
-      AcpiCtlReg = POWER_MGMT_REGISTER_PIIX4 (0x80); // PMREGMISC
-      AcpiEnBit  = BIT0; // PIIX4_PMIOSE
+      Pmba       = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
+      AcpiCtlReg = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMREGMISC);
+      AcpiEnBit  = PIIX4_PMREGMISC_PMIOSE;
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_Q35 (PCI_COMMAND_OFFSET);

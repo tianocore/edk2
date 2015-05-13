@@ -860,7 +860,7 @@ PciAcpiInitialization (
   mHostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
   switch (mHostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
-      Pmba = POWER_MGMT_REGISTER_PIIX4 (0x40);
+      Pmba = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
       //
       // 00:01.0 ISA Bridge (PIIX4) LNK routing targets
       //
