@@ -4,7 +4,7 @@
 # This driver produces all required HII serivces that includes HiiDataBase, HiiString,
 # HiiFont, HiiConfigRouting. To support UEFI HII, this driver is required.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials       
 #  are licensed and made available under the terms and conditions of the BSD License   
@@ -40,6 +40,7 @@
   String.c
   Database.c
   Font.c
+  ConfigKeywordHandler.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -67,6 +68,7 @@
   gEfiHiiDatabaseProtocolGuid                                           ## PRODUCES
   gEfiHiiFontProtocolGuid                                               ## PRODUCES
   gEfiHiiConfigAccessProtocolGuid                                       ## SOMETIMES_CONSUMES
+  gEfiConfigKeywordHandlerProtocolGuid                                  ## PRODUCES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol   ## CONSUMES

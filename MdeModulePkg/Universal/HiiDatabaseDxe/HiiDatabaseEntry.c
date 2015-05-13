@@ -2,7 +2,7 @@
 This file contains the entry code to the HII database, which is defined by
 UEFI 2.1 specification.
 
-Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -71,6 +71,10 @@ HII_DATABASE_PRIVATE_DATA mPrivate = {
     HiiBlockToConfig,
     HiiConfigToBlock,
     HiiGetAltCfg
+  },
+  {
+    EfiConfigKeywordHandlerSetData,
+    EfiConfigKeywordHandlerGetData
   },
   {
     (LIST_ENTRY *) NULL,
@@ -153,6 +157,7 @@ InitializeHiiDatabase (
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiImageProtocolGuid);
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiStringProtocolGuid);
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiConfigRoutingProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiConfigKeywordHandlerProtocolGuid);
   
   InitializeListHead (&mPrivate.DatabaseList);
   InitializeListHead (&mPrivate.DatabaseNotifyList);
@@ -185,6 +190,8 @@ InitializeHiiDatabase (
                   &mPrivate.HiiDatabase,
                   &gEfiHiiConfigRoutingProtocolGuid,
                   &mPrivate.ConfigRouting,
+                  &gEfiConfigKeywordHandlerProtocolGuid,
+                  &mPrivate.ConfigKeywordHandler,
                   NULL
                   );
 

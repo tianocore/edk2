@@ -1,7 +1,7 @@
 /** @file
 Private structures definitions in HiiDatabase.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiConfigAccess.h>
+#include <Protocol/HiiConfigKeyword.h>
 #include <Protocol/SimpleTextOut.h>
 
 #include <Guid/HiiKeyBoardLayout.h>
@@ -107,6 +108,19 @@ typedef struct {
 #define EFI_HII_VARSTORE_NAME_VALUE          1
 #define EFI_HII_VARSTORE_EFI_VARIABLE        2
 #define EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER 3
+
+//
+// Keyword handler protocol filter type.
+//
+#define EFI_KEYWORD_FILTER_READONY           0x01
+#define EFI_KEYWORD_FILTER_REAWRITE          0x02
+#define EFI_KEYWORD_FILTER_BUFFER            0x10
+#define EFI_KEYWORD_FILTER_NUMERIC           0x20
+#define EFI_KEYWORD_FILTER_NUMERIC_1         0x30
+#define EFI_KEYWORD_FILTER_NUMERIC_2         0x40
+#define EFI_KEYWORD_FILTER_NUMERIC_4         0x50
+#define EFI_KEYWORD_FILTER_NUMERIC_8         0x60
+
 
 #define HII_FORMSET_STORAGE_SIGNATURE           SIGNATURE_32 ('H', 'S', 'T', 'G')
 typedef struct {
@@ -288,6 +302,7 @@ typedef struct _HII_DATABASE_PRIVATE_DATA {
   EFI_HII_STRING_PROTOCOL               HiiString;
   EFI_HII_DATABASE_PROTOCOL             HiiDatabase;
   EFI_HII_CONFIG_ROUTING_PROTOCOL       ConfigRouting;
+  EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL   ConfigKeywordHandler;
   LIST_ENTRY                            HiiHandleList;
   INTN                                  HiiHandleCount;
   LIST_ENTRY                            FontInfoList;  // global font info list
@@ -331,9 +346,47 @@ typedef struct _HII_DATABASE_PRIVATE_DATA {
       HII_DATABASE_PRIVATE_DATA_SIGNATURE \
       )
 
+#define CONFIG_KEYWORD_HANDLER_DATABASE_PRIVATE_DATA_FROM_THIS(a) \
+  CR (a, \
+      HII_DATABASE_PRIVATE_DATA, \
+      ConfigKeywordHandler, \
+      HII_DATABASE_PRIVATE_DATA_SIGNATURE \
+      )
+
 //
 // Internal function prototypes.
 //
+
+/**
+  Generate a sub string then output it.
+
+  This is a internal function.
+
+  @param  String                 A constant string which is the prefix of the to be
+                                 generated string, e.g. GUID=
+
+  @param  BufferLen              The length of the Buffer in bytes.
+
+  @param  Buffer                 Points to a buffer which will be converted to be the 
+                                 content of the generated string.
+
+  @param  Flag                   If 1, the buffer contains data for the value of GUID or PATH stored in 
+                                 UINT8 *; if 2, the buffer contains unicode string for the value of NAME;
+                                 if 3, the buffer contains other data.
+
+  @param  SubStr                 Points to the output string. It's caller's
+                                 responsibility to free this buffer.
+
+
+**/
+VOID
+GenerateSubStr (
+  IN CONST EFI_STRING              String,
+  IN  UINTN                        BufferLen,
+  IN  VOID                         *Buffer,
+  IN  UINT8                        Flag,
+  OUT EFI_STRING                   *SubStr
+  );
 
 /**
   This function checks whether a handle is a valid EFI_HII_HANDLE.
@@ -1776,6 +1829,151 @@ HiiGetAltCfg (
   OUT EFI_STRING                               *AltCfgResp
   );
 
+/**
+
+  This function accepts a <MultiKeywordResp> formatted string, finds the associated
+  keyword owners, creates a <MultiConfigResp> string from it and forwards it to the
+  EFI_HII_ROUTING_PROTOCOL.RouteConfig function.
+  
+  If there is an issue in resolving the contents of the KeywordString, then the 
+  function returns an error and also sets the Progress and ProgressErr with the 
+  appropriate information about where the issue occurred and additional data about
+  the nature of the issue. 
+  
+  In the case when KeywordString containing multiple keywords, when an EFI_NOT_FOUND
+  error is generated during processing the second or later keyword element, the system
+  storage associated with earlier keywords is not modified. All elements of the 
+  KeywordString must successfully pass all tests for format and access prior to making
+  any modifications to storage.
+  
+  In the case when EFI_DEVICE_ERROR is returned from the processing of a KeywordString
+  containing multiple keywords, the state of storage associated with earlier keywords
+  is undefined.
+
+
+  @param This             Pointer to the EFI_KEYWORD_HANDLER _PROTOCOL instance.
+
+  @param KeywordString    A null-terminated string in <MultiKeywordResp> format. 
+
+  @param Progress         On return, points to a character in the KeywordString. 
+                          Points to the string's NULL terminator if the request 
+                          was successful. Points to the most recent '&' before 
+                          the first failing string element if the request was 
+                          not successful.
+
+  @param ProgressErr      If during the processing of the KeywordString there was
+                          a failure, this parameter gives additional information 
+                          about the possible source of the problem. The various 
+                          errors are defined in "Related Definitions" below.
+
+
+  @retval EFI_SUCCESS             The specified action was completed successfully.
+
+  @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
+                                  1. KeywordString is NULL.
+                                  2. Parsing of the KeywordString resulted in an 
+                                     error. See Progress and ProgressErr for more data.
+
+  @retval EFI_NOT_FOUND           An element of the KeywordString was not found. 
+                                  See ProgressErr for more data.
+
+  @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.  
+                                  See ProgressErr for more data.
+                                  
+  @retval EFI_ACCESS_DENIED       The action violated system policy. See ProgressErr 
+                                  for more data.
+
+  @retval EFI_DEVICE_ERROR        An unexpected system error occurred. See ProgressErr
+                                  for more data.
+
+**/
+EFI_STATUS
+EFIAPI 
+EfiConfigKeywordHandlerSetData (
+  IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *This,
+  IN CONST EFI_STRING                    KeywordString,
+  OUT EFI_STRING                         *Progress,
+  OUT UINT32                             *ProgressErr
+  );
+
+/**
+
+  This function accepts a <MultiKeywordRequest> formatted string, finds the underlying 
+  keyword owners, creates a <MultiConfigRequest> string from it and forwards it to the
+  EFI_HII_ROUTING_PROTOCOL.ExtractConfig function.
+  
+  If there is an issue in resolving the contents of the KeywordString, then the function
+  returns an EFI_INVALID_PARAMETER and also set the Progress and ProgressErr with the
+  appropriate information about where the issue occurred and additional data about the
+  nature of the issue.
+  
+  In the case when KeywordString is NULL, or contains multiple keywords, or when
+  EFI_NOT_FOUND is generated while processing the keyword elements, the Results string
+  contains values returned for all keywords processed prior to the keyword generating the 
+  error but no values for the keyword with error or any following keywords.
+
+  
+  @param This           Pointer to the EFI_KEYWORD_HANDLER _PROTOCOL instance.
+  
+  @param NameSpaceId    A null-terminated string containing the platform configuration
+                        language to search through in the system. If a NULL is passed
+                        in, then it is assumed that any platform configuration language
+                        with the prefix of "x-UEFI-" are searched.
+                        
+  @param KeywordString  A null-terminated string in <MultiKeywordRequest> format. If a
+                        NULL is passed in the KeywordString field, all of the known 
+                        keywords in the system for the NameSpaceId specified are 
+                        returned in the Results field.
+  
+  @param Progress       On return, points to a character in the KeywordString. Points
+                        to the string's NULL terminator if the request was successful. 
+                        Points to the most recent '&' before the first failing string
+                        element if the request was not successful.
+                        
+  @param ProgressErr    If during the processing of the KeywordString there was a
+                        failure, this parameter gives additional information about the 
+                        possible source of the problem. See the definitions in SetData()
+                        for valid value definitions.
+  
+  @param Results        A null-terminated string in <MultiKeywordResp> format is returned
+                        which has all the values filled in for the keywords in the 
+                        KeywordString. This is a callee-allocated field, and must be freed
+                        by the caller after being used. 
+
+  @retval EFI_SUCCESS             The specified action was completed successfully.
+  
+  @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
+                                  1.Progress, ProgressErr, or Resuts is NULL.
+                                  2.Parsing of the KeywordString resulted in an error. See
+                                    Progress and ProgressErr for more data.
+  
+
+  @retval EFI_NOT_FOUND           An element of the KeywordString was not found. See
+                                  ProgressErr for more data.
+
+  @retval EFI_NOT_FOUND           The NamespaceId specified was not found.  See ProgressErr
+                                  for more data.
+
+  @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.  See
+                                  ProgressErr for more data.
+                                  
+  @retval EFI_ACCESS_DENIED       The action violated system policy.  See ProgressErr for
+                                  more data.
+
+  @retval EFI_DEVICE_ERROR        An unexpected system error occurred.  See ProgressErr
+                                  for more data.
+
+**/
+EFI_STATUS
+EFIAPI 
+EfiConfigKeywordHandlerGetData (
+  IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL  *This,
+  IN CONST EFI_STRING                     NameSpaceId, OPTIONAL
+  IN CONST EFI_STRING                     KeywordString, OPTIONAL
+  OUT EFI_STRING                          *Progress, 
+  OUT UINT32                              *ProgressErr,
+  OUT EFI_STRING                          *Results
+  );
 
 /**
   Compare whether two names of languages are identical.
@@ -1793,6 +1991,29 @@ HiiCompareLanguage (
   IN  CHAR8  *Language2
   )
 ;
+
+/**
+  Retrieves a pointer to the a Null-terminated ASCII string containing the list 
+  of languages that an HII handle in the HII Database supports.  The returned 
+  string is allocated using AllocatePool().  The caller is responsible for freeing
+  the returned string using FreePool().  The format of the returned string follows
+  the language format assumed the HII Database.
+  
+  If HiiHandle is NULL, then ASSERT().
+
+  @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
+
+  @retval NULL   HiiHandle is not registered in the HII database
+  @retval NULL   There are not enough resources available to retrieve the suported 
+                 languages.
+  @retval NULL   The list of suported languages could not be retrieved.
+  @retval Other  A pointer to the Null-terminated ASCII string of supported languages.
+
+**/
+CHAR8 *
+GetSupportedLanguages (
+  IN EFI_HII_HANDLE           HiiHandle
+  );
 
 //
 // Global variables
