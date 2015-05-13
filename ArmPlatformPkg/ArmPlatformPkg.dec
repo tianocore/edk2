@@ -140,10 +140,6 @@
   #  - 2 = a Linux kernel with FDT support
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0|UINT32|0x00000010
 
-  ## Timeout value for displaying progressing bar in before boot OS.
-  #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.
-  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000001A
-
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
 

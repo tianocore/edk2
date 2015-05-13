@@ -139,7 +139,7 @@
   #
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
-  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|3
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
   #
   # ARM Virtual Architectural Timer -- fetch frequency from QEMU (TCG) or KVM
@@ -209,8 +209,6 @@
 
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
   gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
-
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
   #
   # Set video resolution for boot options and for text setup.
