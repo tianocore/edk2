@@ -870,7 +870,7 @@ PciAcpiInitialization (
       PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x63), 0x0a); // D
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
-      Pmba = POWER_MGMT_REGISTER_Q35 (0x40);
+      Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       //
       // 00:1f.0 LPC Bridge (Q35) LNK routing targets
       //

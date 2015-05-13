@@ -64,7 +64,7 @@ AcpiTimerLibConstructor (
       Pmba = POWER_MGMT_REGISTER_PIIX4 (0x40);
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
-      Pmba = POWER_MGMT_REGISTER_Q35 (0x40);
+      Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",

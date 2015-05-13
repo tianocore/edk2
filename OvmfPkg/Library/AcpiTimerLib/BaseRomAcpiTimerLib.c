@@ -24,7 +24,6 @@
 //
 #define PMBA_RTE      BIT0
 #define PIIX4_PMIOSE  BIT0
-#define Q35_ACPI_EN   BIT7
 
 //
 // Offset in the Power Management Base Address to the ACPI Timer
@@ -62,9 +61,9 @@ AcpiTimerLibConstructor (
       AcpiEnBit  = PIIX4_PMIOSE;
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
-      Pmba       = POWER_MGMT_REGISTER_Q35 (0x40);
-      AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (0x44); // ACPI_CNTL
-      AcpiEnBit  = Q35_ACPI_EN;
+      Pmba       = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
+      AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (ICH9_ACPI_CNTL);
+      AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
@@ -118,7 +117,7 @@ InternalAcpiGetTimerTick (
       Pmba = POWER_MGMT_REGISTER_PIIX4 (0x40);
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
-      Pmba = POWER_MGMT_REGISTER_Q35 (0x40);
+      Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",

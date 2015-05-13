@@ -258,9 +258,9 @@ MiscInitialization (
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_Q35 (PCI_COMMAND_OFFSET);
-      Pmba       = POWER_MGMT_REGISTER_Q35 (0x40);
-      AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (0x44); // ACPI_CNTL
-      AcpiEnBit  = BIT7; // Q35_ACPI_EN
+      Pmba       = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
+      AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (ICH9_ACPI_CNTL);
+      AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
