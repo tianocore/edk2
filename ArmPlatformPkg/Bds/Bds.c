@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -258,7 +258,11 @@ DefineDefaultBootEntries (
       ASSERT_EFI_ERROR(Status);
       DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (BootDevicePath, TRUE, TRUE);
 
-      ASSERT (StrCmp ((CHAR16*)PcdGetPtr(PcdDefaultBootDevicePath), DevicePathTxt) == 0);
+      if (StrCmp ((CHAR16*)PcdGetPtr (PcdDefaultBootDevicePath), DevicePathTxt) != 0) {
+        DEBUG ((EFI_D_ERROR, "Device Path given: '%s' Device Path expected: '%s'\n",
+            (CHAR16*)PcdGetPtr (PcdDefaultBootDevicePath), DevicePathTxt));
+        ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      }
 
       FreePool (DevicePathTxt);
     DEBUG_CODE_END();
