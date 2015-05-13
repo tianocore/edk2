@@ -27,4 +27,14 @@
 #define OVMF_HOSTBRIDGE_DID \
   PCI_LIB_ADDRESS (0, 0, 0, PCI_DEVICE_ID_OFFSET)
 
+//
+// Common bits in same-purpose registers
+//
+#define PMBA_RTE BIT0
+
+//
+// Common IO ports relative to the Power Management Base Address
+//
+#define ACPI_TIMER_OFFSET 0x8
+
 #endif

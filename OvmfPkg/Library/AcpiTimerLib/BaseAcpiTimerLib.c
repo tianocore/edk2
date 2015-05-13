@@ -19,16 +19,6 @@
 #include <OvmfPlatforms.h>
 
 //
-// Power Management PCI Configuration Register fields
-//
-#define PMBA_RTE      BIT0
-
-//
-// Offset in the Power Management Base Address to the ACPI Timer
-//
-#define ACPI_TIMER_OFFSET  0x8
-
-//
 // Cached ACPI Timer IO Address
 //
 STATIC UINT32 mAcpiTimerIoAddr;
