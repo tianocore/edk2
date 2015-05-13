@@ -2,7 +2,7 @@
 //
 //    Sample Setup formset.
 //
-//  Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -280,7 +280,7 @@ formset
     endoneof;
 
     oneof varid  = MyIfrNVData.QuestionAboutTreeHugging,
-      prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT),
+      prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT_KEYWORD),
       help        = STRING_TOKEN(STR_ONE_OF_HELP),
       flags       = RESET_REQUIRED,
       option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = 0;

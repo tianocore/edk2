@@ -2,7 +2,7 @@
 This is an example of how a driver might export data to the HII protocol to be
 later utilized by the Setup Protocol
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1279,6 +1279,10 @@ DriverCallback (
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   MY_EFI_VARSTORE_DATA            *EfiData;
   EFI_FORM_ID                     FormId;
+  EFI_STRING                      Progress;
+  EFI_STRING                      Results;
+  UINT32                          ProgressErr;
+  CHAR16                          *TmpStr;
   
   if (((Value == NULL) && (Action != EFI_BROWSER_ACTION_FORM_OPEN) && (Action != EFI_BROWSER_ACTION_FORM_CLOSE))||
     (ActionRequest == NULL)) {
@@ -1287,6 +1291,7 @@ DriverCallback (
 
 
   FormId = 0;
+  ProgressErr = 0;
   Status = EFI_SUCCESS;
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
 
@@ -1753,7 +1758,78 @@ DriverCallback (
         //
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
         break;
+
+      case 0x1231:
+        //
+        // 1. Check to see whether system support keyword.
+        //
+        Status = PrivateData->HiiKeywordHandler->GetData (PrivateData->HiiKeywordHandler,
+                                                          L"NAMESPACE=x-UEFI-ns",
+                                                          L"KEYWORD=iSCSIBootEnable",
+                                                          &Progress,
+                                                          &ProgressErr,
+                                                          &Results
+                                                         );
+        if (EFI_ERROR (Status)) {
+          do {
+            CreatePopUp (
+              EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+              &Key,
+              L"",
+              L"This system not support this keyword!",
+              L"Press ENTER to continue ...",
+              L"",
+              NULL
+              );
+          } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+          Status = EFI_SUCCESS;
+          break;
+        }
+
+        //
+        // 2. If system support this keyword, just try to change value.
+        //
         
+        //
+        // Change value from '0' to '1' or from '1' to '0'
+        //
+        TmpStr = StrStr (Results, L"&VALUE=");
+        ASSERT (TmpStr != NULL);
+        TmpStr += StrLen (L"&VALUE=");
+        TmpStr++;
+        if (*TmpStr == L'0') {
+          *TmpStr = L'1';
+        } else {
+          *TmpStr = L'0';
+        }
+
+        //
+        // 3. Call the keyword handler protocol to change the value.
+        //
+        Status = PrivateData->HiiKeywordHandler->SetData (PrivateData->HiiKeywordHandler,
+                                                          Results,
+                                                          &Progress,
+                                                          &ProgressErr
+                                                         );
+        if (EFI_ERROR (Status)) {
+          do {
+            CreatePopUp (
+              EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+              &Key,
+              L"",
+              L"Set keyword to the system failed!",
+              L"Press ENTER to continue ...",
+              L"",
+              NULL
+              );
+          } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+          Status = EFI_SUCCESS;
+          break;
+        }
+        break;
+
       default:
       break;
     }
@@ -1790,6 +1866,7 @@ DriverSampleInit (
   EFI_HII_STRING_PROTOCOL         *HiiString;
   EFI_FORM_BROWSER2_PROTOCOL      *FormBrowser2;
   EFI_HII_CONFIG_ROUTING_PROTOCOL *HiiConfigRouting;
+  EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *HiiKeywordHandler;
   CHAR16                          *NewString;
   UINTN                           BufferSize;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
@@ -1867,6 +1944,15 @@ DriverSampleInit (
   }
   PrivateData->HiiConfigRouting = HiiConfigRouting;
 
+  //
+  // Locate keyword handler protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiConfigKeywordHandlerProtocolGuid, NULL, (VOID **) &HiiKeywordHandler);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  PrivateData->HiiKeywordHandler = HiiKeywordHandler;
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &DriverHandle[0],
                   &gEfiDevicePathProtocolGuid,
@@ -1902,6 +1988,8 @@ DriverSampleInit (
                   &DriverHandle[1],
                   &gEfiDevicePathProtocolGuid,
                   &mHiiVendorDevicePath1,
+                  &gEfiHiiConfigAccessProtocolGuid,
+                  &PrivateData->ConfigAccess,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

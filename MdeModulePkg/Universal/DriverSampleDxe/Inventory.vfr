@@ -2,7 +2,7 @@
 //
 //    Sample Inventory Data
 //
-//  Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -103,6 +103,12 @@ formset
 	    text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
       flags  = 0,
       key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_CHECK_KEYWORD_SUPPORT),
+      text   = STRING_TOKEN(STR_CHECK_KEYWORD_SUPPORT),
+      flags  = INTERACTIVE,
+      key    = 0x1231;
 
     subtitle text = STRING_TOKEN(STR_INV_EMPTY_STRING);
 

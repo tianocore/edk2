@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,6 +32,7 @@ Revision History
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
 #include <Protocol/FormBrowserEx.h>
+#include <Protocol/HiiConfigKeyword.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Library/DebugLib.h>
@@ -97,6 +98,8 @@ typedef struct {
   EFI_HII_DATABASE_PROTOCOL        *HiiDatabase;
   EFI_HII_STRING_PROTOCOL          *HiiString;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
+  EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *HiiKeywordHandler;
+
   EFI_FORM_BROWSER2_PROTOCOL       *FormBrowser2;
 
   //
