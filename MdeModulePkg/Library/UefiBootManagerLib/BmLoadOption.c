@@ -556,7 +556,7 @@ EfiBootManagerDeleteLoadOptionVariable (
     //
     // If the associated *Order exists, just remove the reference in *Order.
     //
-    GetEfiGlobalVariable2 (mBmLoadOptionOrderName[OptionType], &OptionOrder, &OptionOrderSize);
+    GetEfiGlobalVariable2 (mBmLoadOptionOrderName[OptionType], (VOID **) &OptionOrder, &OptionOrderSize);
     for (Index = 0; Index < OptionOrderSize / sizeof (UINT16); Index++) {
       if (OptionOrder[Index] == OptionNumber) {
         OptionOrderSize -= sizeof (UINT16);
