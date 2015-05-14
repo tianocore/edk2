@@ -1562,7 +1562,7 @@ IfrMatch2 (
                         HandleBuffer);
 
   } else if (EFI_ERROR (Status)) {
-    Value->Type = EFI_IFR_TYPE_UNDEFINED;
+    Result->Type = EFI_IFR_TYPE_UNDEFINED;
     Status = EFI_SUCCESS;
     goto Done;
   }
@@ -1628,7 +1628,7 @@ IfrMatch2 (
   // Type specified by SyntaxType is not supported 
   // in any of the EFI_REGULAR_EXPRESSION_PROTOCOL instances.
   //
-  Value->Type = EFI_IFR_TYPE_UNDEFINED;
+  Result->Type = EFI_IFR_TYPE_UNDEFINED;
   Status = EFI_SUCCESS;
 
 Done:
