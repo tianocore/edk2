@@ -346,6 +346,7 @@
   #  TPM_DEVICE_INTERFACE_NONE means disable.<BR>
   #  TPM_DEVICE_INTERFACE_TPM12 means TPM 1.2 DTPM.<BR>
   #  TPM_DEVICE_INTERFACE_DTPM2 means TPM 2.0 DTPM.<BR>
+  #  Other GUID value means other TPM 2.0 device.<BR>
   # @Prompt TPM device type identifier
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid |{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x0001000F
 
