@@ -2565,7 +2565,6 @@ EnumerateAllKeywords (
   UINT8                               *DevicePathPkg;
   UINT8                               *DevicePath;
   HII_DATABASE_RECORD                 *DataBaseRecord;
-  UINTN                               DevicePathSize;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_STRING_PACKAGE_INSTANCE         *StringPackage;
   CHAR8                               *LocalNameSpace;
@@ -2580,7 +2579,6 @@ EnumerateAllKeywords (
   BOOLEAN                             ReadOnly;
 
   DataBaseRecord   = NULL;
-  DevicePathSize   = 0;
   Status           = EFI_SUCCESS;
   MultiKeywordResp = NULL;
   DevicePath       = NULL;
@@ -2600,7 +2598,6 @@ EnumerateAllKeywords (
     DataBaseRecord = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
     if ((DevicePathPkg = DataBaseRecord->PackageList->DevicePathPkg) != NULL) {
       DevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-      DevicePathSize    = GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) DevicePath);
     }
     PackageListNode = DataBaseRecord->PackageList;
 
