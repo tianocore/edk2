@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1010,6 +1010,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
 // PI Spec ones
 //
   {STRING_TOKEN(STR_IDE_CONT_INIT),         &gEfiIdeControllerInitProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_DISK_INFO),             &gEfiDiskInfoProtocolGuid,                        NULL},
 
 //
 // UEFI Shell Spec 2.0
