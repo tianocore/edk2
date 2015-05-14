@@ -806,7 +806,7 @@ GetStringIdFromString (
       Offset = sizeof (EFI_HII_STRING_BLOCK);
       StringTextPtr = BlockHdr + Offset;
       BlockSize += Offset + AsciiStrSize ((CHAR8 *) StringTextPtr);
-      if (AsciiStrCmp(AsciiKeywordValue, StringTextPtr) == 0) {
+      if (AsciiStrCmp(AsciiKeywordValue, (CHAR8 *) StringTextPtr) == 0) {
         *StringId = CurrentStringId;
         goto Done;
       }
@@ -816,7 +816,7 @@ GetStringIdFromString (
     case EFI_HII_SIBT_STRING_SCSU_FONT:
       Offset = sizeof (EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK) - sizeof (UINT8);
       StringTextPtr = BlockHdr + Offset;
-      if (AsciiStrCmp(AsciiKeywordValue, StringTextPtr) == 0) {
+      if (AsciiStrCmp(AsciiKeywordValue, (CHAR8 *) StringTextPtr) == 0) {
         *StringId = CurrentStringId;
         goto Done;
       }
@@ -831,7 +831,7 @@ GetStringIdFromString (
 
       for (Index = 0; Index < StringCount; Index++) {
         BlockSize += AsciiStrSize ((CHAR8 *) StringTextPtr);
-        if (AsciiStrCmp(AsciiKeywordValue, StringTextPtr) == 0) {
+        if (AsciiStrCmp(AsciiKeywordValue, (CHAR8 *) StringTextPtr) == 0) {
           *StringId = CurrentStringId;
           goto Done;
         }
@@ -851,7 +851,7 @@ GetStringIdFromString (
 
       for (Index = 0; Index < StringCount; Index++) {
         BlockSize += AsciiStrSize ((CHAR8 *) StringTextPtr);
-        if (AsciiStrCmp(AsciiKeywordValue, StringTextPtr) == 0) {
+        if (AsciiStrCmp(AsciiKeywordValue, (CHAR8 *) StringTextPtr) == 0) {
           *StringId = CurrentStringId;
           goto Done;
         }
@@ -1069,7 +1069,7 @@ GetNextStringId (
         if (*KeywordValue == NULL) {
           return 0;
         }
-        AsciiStrToUnicodeStr(StringTextPtr, *KeywordValue);
+        AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
         return CurrentStringId;
       } else if (CurrentStringId == StringId) {
         FindString = TRUE;
@@ -1088,7 +1088,7 @@ GetNextStringId (
         if (*KeywordValue == NULL) {
           return 0;
         }
-        AsciiStrToUnicodeStr(StringTextPtr, *KeywordValue);
+        AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
         return CurrentStringId;
       } else if (CurrentStringId == StringId) {
         FindString = TRUE;
@@ -1109,7 +1109,7 @@ GetNextStringId (
           if (*KeywordValue == NULL) {
             return 0;
           }
-          AsciiStrToUnicodeStr(StringTextPtr, *KeywordValue);
+          AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
           return CurrentStringId;
         } else if (CurrentStringId == StringId) {
           FindString = TRUE;
@@ -1136,7 +1136,7 @@ GetNextStringId (
           if (*KeywordValue == NULL) {
             return 0;
           }
-          AsciiStrToUnicodeStr(StringTextPtr, *KeywordValue);
+          AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
           return CurrentStringId;
         } else if (CurrentStringId == StringId) {
           FindString = TRUE;
@@ -1674,7 +1674,7 @@ ConstructConfigHdr (
   switch (((EFI_IFR_OP_HEADER *)OpCodeData)->OpCode) {
   case EFI_IFR_VARSTORE_OP:
     Guid      = (EFI_GUID *)(UINTN *)&((EFI_IFR_VARSTORE *) OpCodeData)->Guid;
-    AsciiName = ((EFI_IFR_VARSTORE *) OpCodeData)->Name;
+    AsciiName = (CHAR8 *) ((EFI_IFR_VARSTORE *) OpCodeData)->Name;
     break;
   
   case EFI_IFR_VARSTORE_NAME_VALUE_OP:
@@ -1684,7 +1684,7 @@ ConstructConfigHdr (
   
   case EFI_IFR_VARSTORE_EFI_OP:
     Guid      = (EFI_GUID *)(UINTN *)&((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Guid;
-    AsciiName = ((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Name;
+    AsciiName = (CHAR8 *) ((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Name;
     break;
   
   default:
@@ -2571,7 +2571,7 @@ EnumerateAllKeywords (
   CHAR8                               *LocalNameSpace;
   EFI_STRING_ID                       NextStringId;
   EFI_STATUS                          Status;
-  CHAR8                               *OpCode;
+  UINT8                               *OpCode;
   CHAR16                              *ConfigRequest;
   CHAR16                              *ValueElement;
   CHAR16                              *KeywordResp;
