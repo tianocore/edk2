@@ -1,19 +1,24 @@
 ## @file
 #  Define and produce general Boot Manager related interfaces.
-#  
+#
+#  The implementation provides richful library functions supporting load option
+#  manipulation, hotkey registration, UEFI boot, connect/disconnect, console
+#  manipulation, driver health checking and etc.
+#
 #  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiBootManagerLib
+  MODULE_UNI_FILE                = UefiBootManagerLib.uni
   FILE_GUID                      = 8D4752BC-595E-49a2-B4AF-F3F57B601DE9
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
