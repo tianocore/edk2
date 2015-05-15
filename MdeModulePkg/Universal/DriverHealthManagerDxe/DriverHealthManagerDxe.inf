@@ -1,4 +1,6 @@
 ## @file
+#  Driver Health Manager DXE driver.
+#
 #  This module produces two driver health manager forms.
 #  One will be used by BDS core to configure the Configured Required
 #  driver health instances, the other will be automatically included by
@@ -22,6 +24,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DriverHealthManagerDxe
+  MODULE_UNI_FILE                = DriverHealthManagerDxe.uni
   FILE_GUID                      = EBF8ED7C-0DD1-4787-84F1-F48D537DCACF
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -72,3 +75,6 @@
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiFormBrowser2ProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DriverHealthManagerDxeExtra.uni
