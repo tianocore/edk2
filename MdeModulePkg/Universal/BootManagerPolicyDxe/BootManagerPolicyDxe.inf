@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BootManagerPolicyDxe
+  MODULE_UNI_FILE                = BootManagerPolicyDxe.uni
   FILE_GUID                      = E622443C-284E-4b47-A984-FD66B482DAC0
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0 
@@ -56,3 +57,6 @@
 
 [Depex]
   TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BootManagerPolicyDxeExtra.uni
