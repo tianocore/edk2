@@ -65,6 +65,10 @@ typedef enum {
 
 // GIC Redistributor Control frame
 #define ARM_GICR_TYPER          0x0008  // Redistributor Type Register
+#define ARM_GICR_WAKER          0x0014  // Redistributors Wake Request Register
+
+// GIC Redistributor WAKER fields
+#define ARM_GICR_WAKER_PS       0x00000002  // ProcessorSleep
 
 // GIC SGI & PPI Redistributor frame
 #define ARM_GICR_ISENABLER      0x0100  // Interrupt Set-Enable Registers
@@ -136,9 +140,10 @@ ArmGicSetSecureInterrupts (
 
 VOID
 EFIAPI
-ArmGicEnableInterruptInterface (
-  IN  INTN          GicInterruptInterfaceBase
-  );
+ArmGicEnableInterruptInterface(
+  IN  INTN          GicInterruptInterfaceBase,
+  IN  INTN          GicRedistributorBase
+);
 
 VOID
 EFIAPI

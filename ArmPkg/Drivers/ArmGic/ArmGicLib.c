@@ -280,15 +280,31 @@ ArmGicDisableDistributor (
 VOID
 EFIAPI
 ArmGicEnableInterruptInterface (
-  IN  INTN          GicInterruptInterfaceBase
+  IN  INTN          GicInterruptInterfaceBase,
+  IN  INTN          GicRedistributorBase
   )
 {
   ARM_GIC_ARCH_REVISION Revision;
+  UINTN                 GicCpuRedistributorBase;
 
   Revision = ArmGicGetSupportedArchRevision ();
   if (Revision == ARM_GIC_ARCH_REVISION_2) {
     ArmGicV2EnableInterruptInterface (GicInterruptInterfaceBase);
   } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
+
+    if (GicRedistributorBase != 0) {
+      GicCpuRedistributorBase = GicGetCpuRedistributorBase(GicRedistributorBase, Revision);
+      if (GicCpuRedistributorBase == 0) {
+        ASSERT_EFI_ERROR(EFI_NOT_FOUND);
+        return;
+      }
+
+      // The ProcessorSleep bit in the redistributor must be cleared for interrupts to be delivered
+      // this must be done regardless of whether we're running in a GICv2 compatible mode.
+      // This write only takes effect in secure mode and is ignored in non-secure mode.
+      MmioAnd32(GicCpuRedistributorBase + ARM_GICR_WAKER, ~ARM_GICR_WAKER_PS);
+    }
+
     ArmGicV3EnableInterruptInterface ();
   } else {
     ASSERT_EFI_ERROR (EFI_UNSUPPORTED);

@@ -76,6 +76,7 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize
 
   gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
 
   gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize
