@@ -84,6 +84,9 @@ ArmPlatformSecInitialize (
   // Configure SP810 to use 1MHz clock and disable
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
 
+  // start the base FVP reference counter
+  MmioOr32(ARM_REFCNT_BASE + 0, 0x01);
+
   // Read the GIC Identification Register
   Identification = ArmGicGetInterfaceIdentification (PcdGet32 (PcdGicInterruptInterfaceBase));
 

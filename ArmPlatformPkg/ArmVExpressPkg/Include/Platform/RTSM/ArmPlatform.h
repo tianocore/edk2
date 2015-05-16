@@ -52,6 +52,7 @@
 #define LCD_VRAM_CORE_TILE_BASE                 0x00000000
 
 // TZC-400 Address Space Controller
+#define ARM_REFCNT_BASE                         0x2a430000
 #define ARM_VE_TZC400_BASE                      0x2a4a0000
 
 // On-chip peripherals (Snoop Control Unit etc...)
