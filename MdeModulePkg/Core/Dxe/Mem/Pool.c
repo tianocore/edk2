@@ -154,10 +154,11 @@ LookupPoolHead (
   }
 
   //
-  // MemoryType values in the range 0x80000000..0xFFFFFFFF are reserved for use by UEFI 
-  // OS loaders that are provided by operating system vendors
+  // MemoryType values in the range 0x80000000..0xFFFFFFFF are reserved for use by UEFI
+  // OS loaders that are provided by operating system vendors.
+  // MemoryType values in the range 0x70000000..0x7FFFFFFF are reserved for OEM use.
   //
-  if ((INT32)MemoryType < 0) {
+  if ((UINT32) MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
 
     for (Link = mPoolHeadList.ForwardLink; Link != &mPoolHeadList; Link = Link->ForwardLink) {
       Pool = CR(Link, POOL, Link, POOL_SIGNATURE);
@@ -215,7 +216,7 @@ CoreInternalAllocatePool (
   //
   // If it's not a valid type, fail it
   //
-  if ((PoolType >= EfiMaxMemoryType && PoolType <= 0x7fffffff) ||
+  if ((PoolType >= EfiMaxMemoryType && PoolType < MEMORY_TYPE_OEM_RESERVED_MIN) ||
        (PoolType == EfiConventionalMemory) || (PoolType == EfiPersistentMemory)) {
     return EFI_INVALID_PARAMETER;
   }

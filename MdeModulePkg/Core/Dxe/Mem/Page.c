@@ -544,7 +544,7 @@ CoreAddMemoryDescriptor (
     return;
   }
 
-  if (Type >= EfiMaxMemoryType && Type <= 0x7fffffff) {
+  if (Type >= EfiMaxMemoryType && Type < MEMORY_TYPE_OEM_RESERVED_MIN) {
     return;
   }
   CoreAcquireMemoryLock ();
@@ -1203,7 +1203,7 @@ CoreInternalAllocatePages (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((MemoryType >= EfiMaxMemoryType && MemoryType <= 0x7fffffff) ||
+  if ((MemoryType >= EfiMaxMemoryType && MemoryType < MEMORY_TYPE_OEM_RESERVED_MIN) ||
        (MemoryType == EfiConventionalMemory) || (MemoryType == EfiPersistentMemory)) {
     return EFI_INVALID_PARAMETER;
   }
