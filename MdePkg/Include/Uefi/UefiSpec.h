@@ -1,8 +1,8 @@
 /** @file
   Include file that supports UEFI.
 
-  This include file must contain things defined in the UEFI 2.4 specification.
-  If a code construct is defined in the UEFI 2.4 specification it must be included
+  This include file must contain things defined in the UEFI 2.5 specification.
+  If a code construct is defined in the UEFI 2.5 specification it must be included
   by this include file.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
@@ -133,6 +133,11 @@ typedef struct {
 
   @param[in]       Type         The type of allocation to perform.
   @param[in]       MemoryType   The type of memory to allocate.
+                                MemoryType values in the range 0x70000000..0x7FFFFFFF
+                                are reserved for OEM use. MemoryType values in the range
+                                0x80000000..0xFFFFFFFF are reserved for use by UEFI OS loaders
+                                that are provided by operating system vendors. The only illegal
+                                memory type values are those in the range EfiMaxMemoryType..0x6FFFFFFF.
   @param[in]       Pages        The number of contiguous 4 KB pages to allocate.
   @param[in, out]  Memory       The pointer to a physical address. On input, the way in which the address is
                                 used depends on the value of Type.
@@ -141,9 +146,9 @@ typedef struct {
   @retval EFI_INVALID_PARAMETER 1) Type is not AllocateAnyPages or
                                 AllocateMaxAddress or AllocateAddress.
                                 2) MemoryType is in the range
+                                EfiMaxMemoryType..0x6FFFFFFF.
                                 3) Memory is NULL.
                                 4) MemoryType was EfiPersistentMemory.
-                                EfiMaxMemoryType..0x7FFFFFFF.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
   @retval EFI_NOT_FOUND         The requested pages could not be found.
 
@@ -215,6 +220,11 @@ EFI_STATUS
   Allocates pool memory.
 
   @param[in]   PoolType         The type of pool to allocate.
+                                MemoryType values in the range 0x70000000..0x7FFFFFFF
+                                are reserved for OEM use. MemoryType values in the range
+                                0x80000000..0xFFFFFFFF are reserved for use by UEFI OS loaders
+                                that are provided by operating system vendors. The only illegal
+                                memory type values are those in the range EfiMaxMemoryType..0x6FFFFFFF.
   @param[in]   Size             The number of bytes to allocate from the pool.
   @param[out]  Buffer           A pointer to a pointer to the allocated buffer if the call succeeds;
                                 undefined otherwise.
