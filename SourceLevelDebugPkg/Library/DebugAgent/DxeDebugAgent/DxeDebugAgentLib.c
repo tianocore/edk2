@@ -235,19 +235,24 @@ GetDebugPortHandle (
 }
 
 /**
-  Worker function to setup IDT table and initialize the IDT entries.
+  Worker function to set up Debug Agent environment.
+
+  This function will set up IDT table and initialize the IDT entries and 
+  initialize CPU LOCAL APIC timer.
+  It also tries to connect HOST if Debug Agent was not initialized before.
 
   @param[in] Mailbox        Pointer to Mailbox.
 
 **/
 VOID
-SetupDebugAgentEnviroment (
+SetupDebugAgentEnvironment (
   IN DEBUG_AGENT_MAILBOX       *Mailbox
   )
 {
   IA32_DESCRIPTOR              Idtr;
   UINT16                       IdtEntryCount;
   UINT64                       DebugPortHandle;
+  UINT32                       DebugTimerFrequency;
 
   if (mMultiProcessorDebugSupport) {
     InitializeSpinLock (&mDebugMpContext.MpContextSpinLock);
@@ -299,6 +304,11 @@ SetupDebugAgentEnviroment (
   }
 
   //
+  // Initialize Debug Timer hardware and save its initial count and frequency
+  //
+  mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer (&DebugTimerFrequency);
+  UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
+  //
   // Initialize debug communication port
   //
   DebugPortHandle = (UINT64) (UINTN)DebugPortInitialize ((VOID *)(UINTN)mMailboxPointer->DebugPortHandle, NULL);
@@ -326,7 +336,7 @@ SetupDebugAgentEnviroment (
 /**
   Initialize debug agent.
 
-  This function is used to set up debug enviroment for DXE phase.
+  This function is used to set up debug environment for DXE phase.
 
   If this function is called by DXE Core, Context must be the pointer
   to HOB list which will be used to get GUIDed HOB. It will enable
@@ -355,7 +365,6 @@ InitializeDebugAgent (
   IA32_DESCRIPTOR              IdtDescriptor;
   IA32_DESCRIPTOR              *Ia32Idtr;
   IA32_IDT_ENTRY               *Ia32IdtEntry;
-  UINT32                       DebugTimerFrequency;
 
   if (InitFlag == DEBUG_AGENT_INIT_DXE_AP) {
     //
@@ -410,14 +419,9 @@ InitializeDebugAgent (
       Mailbox = GetMailboxFromHob (HobList);
     }
     //
-    // Set up IDT table and prepare for IDT entries
+    // Set up Debug Agent Environment and try to connect HOST if required
     //
-    SetupDebugAgentEnviroment (Mailbox);
-    //
-    // Initialize Debug Timer hardware and save its initial count and frequency
-    //
-    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer (&DebugTimerFrequency);
-    UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
+    SetupDebugAgentEnvironment (Mailbox);
     //
     // For DEBUG_AGENT_INIT_S3, needn't to install configuration table and EFI Serial IO protocol
     // For DEBUG_AGENT_INIT_DXE_CORE, InternalConstructorWorker() will invoked in Constructor()
@@ -503,14 +507,9 @@ InitializeDebugAgent (
     HobList = Context;
     Mailbox = GetMailboxFromHob (HobList);
     //
-    // Set up IDT table and prepare for IDT entries
+    // Set up Debug Agent Environment and try to connect HOST if required
     //
-    SetupDebugAgentEnviroment (Mailbox);
-    //
-    // Initialize Debug Timer hardware and save its initial count and frequency
-    //
-    mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer (&DebugTimerFrequency);
-    UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
+    SetupDebugAgentEnvironment (Mailbox);
     //
     // Enable interrupt to receive Debug Timer interrupt
     //
@@ -533,9 +532,9 @@ InitializeDebugAgent (
     //
     mMailboxPointer = Mailbox;
     //
-    // Set up IDT table and prepare for IDT entries
+    // Set up Debug Agent Environment and try to connect HOST if required
     //
-    SetupDebugAgentEnviroment (Mailbox);
+    SetupDebugAgentEnvironment (Mailbox);
     //
     // Disable interrupt
     //
