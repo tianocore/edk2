@@ -710,8 +710,7 @@ UnregisterSmramProfileImage (
 
 /**
   Return if this memory type needs to be recorded into memory profile.
-  If BIOS memory type (0 ~ EfiMaxMemoryType), it checks bit (1 << MemoryType).
-  If OS memory type (0x80000000 ~ 0xFFFFFFFF), it checks bit63 - 0x8000000000000000.
+  Only need to record EfiRuntimeServicesCode and EfiRuntimeServicesData for SMRAM profile.
 
   @param MemoryType     Memory type.
 
@@ -726,11 +725,12 @@ SmmCoreNeedRecordProfile (
 {
   UINT64 TestBit;
 
-  if ((UINT32) MemoryType >= 0x80000000) {
-    TestBit = BIT63;
-  } else {
-    TestBit = LShiftU64 (1, MemoryType);
+  if (MemoryType != EfiRuntimeServicesCode &&
+      MemoryType != EfiRuntimeServicesData) {
+    return FALSE;
   }
+
+  TestBit = LShiftU64 (1, MemoryType);
 
   if ((PcdGet64 (PcdMemoryProfileMemoryType) & TestBit) != 0) {
     return TRUE;
@@ -741,8 +741,9 @@ SmmCoreNeedRecordProfile (
 
 /**
   Convert EFI memory type to profile memory index. The rule is:
-  If BIOS memory type (0 ~ EfiMaxMemoryType), ProfileMemoryIndex = MemoryType.
-  If OS memory type (0x80000000 ~ 0xFFFFFFFF), ProfileMemoryIndex = EfiMaxMemoryType.
+  If BIOS memory type (0 ~ EfiMaxMemoryType - 1), ProfileMemoryIndex = MemoryType.
+  As SMRAM profile is only to record EfiRuntimeServicesCode and EfiRuntimeServicesData,
+  so return input memory type directly.
 
   @param MemoryType     Memory type.
 
@@ -754,11 +755,7 @@ GetProfileMemoryIndex (
   IN EFI_MEMORY_TYPE    MemoryType
   )
 {
-  if ((UINT32) MemoryType >= 0x80000000) {
-    return EfiMaxMemoryType;
-  } else {
-    return MemoryType;
-  }
+  return MemoryType;
 }
 
 /**
@@ -1778,25 +1775,38 @@ GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mActionString[] = {
   L"FreePool",
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mMemoryTypeString[] = {
-  L"EfiReservedMemoryType",
-  L"EfiLoaderCode",
-  L"EfiLoaderData",
-  L"EfiBootServicesCode",
-  L"EfiBootServicesData",
-  L"EfiRuntimeServicesCode",
-  L"EfiRuntimeServicesData",
-  L"EfiConventionalMemory",
-  L"EfiUnusableMemory",
-  L"EfiACPIReclaimMemory",
-  L"EfiACPIMemoryNVS",
-  L"EfiMemoryMappedIO",
-  L"EfiMemoryMappedIOPortSpace",
-  L"EfiPalCode",
-  L"EfiPersistentMemory",
-  L"EfiOSReserved",
+typedef struct {
+  EFI_MEMORY_TYPE   MemoryType;
+  CHAR16            *MemoryTypeStr;
+} PROFILE_MEMORY_TYPE_STRING;
+
+GLOBAL_REMOVE_IF_UNREFERENCED PROFILE_MEMORY_TYPE_STRING mMemoryTypeString[] = {
+  {EfiRuntimeServicesCode, L"EfiRuntimeServicesCode"},
+  {EfiRuntimeServicesData, L"EfiRuntimeServicesData"}
 };
 
+/**
+  Memory type to string.
+
+  @param[in] MemoryType Memory type.
+
+  @return Pointer to string.
+
+**/
+CHAR16 *
+ProfileMemoryTypeToStr (
+  IN EFI_MEMORY_TYPE    MemoryType
+  )
+{
+  UINTN     Index;
+  for (Index = 0; Index < sizeof (mMemoryTypeString) / sizeof (mMemoryTypeString[0]); Index++) {
+    if (mMemoryTypeString[Index].MemoryType == MemoryType) {
+      return mMemoryTypeString[Index].MemoryTypeStr;
+    }
+  }
+
+  return L"UnexpectedMemoryType";
+}
 
 /**
   Dump SMRAM profile.
@@ -1836,11 +1846,11 @@ DumpSmramProfile (
 
   DEBUG ((EFI_D_INFO, "  CurrentTotalUsage     - 0x%016lx\n", Context->CurrentTotalUsage));
   DEBUG ((EFI_D_INFO, "  PeakTotalUsage        - 0x%016lx\n", Context->PeakTotalUsage));
-  for (TypeIndex = 0; TypeIndex <= EfiMaxMemoryType; TypeIndex++) {
+  for (TypeIndex = 0; TypeIndex < sizeof (Context->CurrentTotalUsageByType) / sizeof (Context->CurrentTotalUsageByType[0]); TypeIndex++) {
     if ((Context->CurrentTotalUsageByType[TypeIndex] != 0) ||
         (Context->PeakTotalUsageByType[TypeIndex] != 0)) {
-      DEBUG ((EFI_D_INFO, "  CurrentTotalUsage[0x%02x]  - 0x%016lx (%s)\n", TypeIndex, Context->CurrentTotalUsageByType[TypeIndex], mMemoryTypeString[TypeIndex]));
-      DEBUG ((EFI_D_INFO, "  PeakTotalUsage[0x%02x]     - 0x%016lx (%s)\n", TypeIndex, Context->PeakTotalUsageByType[TypeIndex], mMemoryTypeString[TypeIndex]));
+      DEBUG ((EFI_D_INFO, "  CurrentTotalUsage[0x%02x]  - 0x%016lx (%s)\n", TypeIndex, Context->CurrentTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+      DEBUG ((EFI_D_INFO, "  PeakTotalUsage[0x%02x]     - 0x%016lx (%s)\n", TypeIndex, Context->PeakTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
     }
   }
   DEBUG ((EFI_D_INFO, "  TotalImageSize        - 0x%016lx\n", Context->TotalImageSize));
@@ -1867,11 +1877,11 @@ DumpSmramProfile (
     DEBUG ((EFI_D_INFO, "    FileType            - 0x%02x\n", DriverInfo->FileType));
     DEBUG ((EFI_D_INFO, "    CurrentUsage        - 0x%016lx\n", DriverInfo->CurrentUsage));
     DEBUG ((EFI_D_INFO, "    PeakUsage           - 0x%016lx\n", DriverInfo->PeakUsage));
-    for (TypeIndex = 0; TypeIndex <= EfiMaxMemoryType; TypeIndex++) {
+    for (TypeIndex = 0; TypeIndex < sizeof (DriverInfo->CurrentUsageByType) / sizeof (DriverInfo->CurrentUsageByType[0]); TypeIndex++) {
       if ((DriverInfo->CurrentUsageByType[TypeIndex] != 0) ||
           (DriverInfo->PeakUsageByType[TypeIndex] != 0)) {
-        DEBUG ((EFI_D_INFO, "    CurrentUsage[0x%02x]     - 0x%016lx (%s)\n", TypeIndex, DriverInfo->CurrentUsageByType[TypeIndex], mMemoryTypeString[TypeIndex]));
-        DEBUG ((EFI_D_INFO, "    PeakUsage[0x%02x]        - 0x%016lx (%s)\n", TypeIndex, DriverInfo->PeakUsageByType[TypeIndex], mMemoryTypeString[TypeIndex]));
+        DEBUG ((EFI_D_INFO, "    CurrentUsage[0x%02x]     - 0x%016lx (%s)\n", TypeIndex, DriverInfo->CurrentUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+        DEBUG ((EFI_D_INFO, "    PeakUsage[0x%02x]        - 0x%016lx (%s)\n", TypeIndex, DriverInfo->PeakUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
       }
     }
     DEBUG ((EFI_D_INFO, "    AllocRecordCount    - 0x%08x\n", DriverInfo->AllocRecordCount));
