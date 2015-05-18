@@ -437,39 +437,11 @@ InitializeDebugAgent (
 
     *(EFI_STATUS *)Context = EFI_SUCCESS;
 
-    if (gST->ConOut != NULL) {
-      Print (L"Debug Agent: Initialized successfully!\r\n");
-      Print (L"If the Debug Port is serial port, please make sure this serial port isn't connected by ISA Serial driver\r\n");
-      Print (L"You could do the following steps to disconnect the serial port:\r\n");
-      Print (L"1: Shell> drivers\r\n");
-      Print (L"   ...\r\n");
-      Print (L"   V  VERSION  E G G #D #C DRIVER NAME                         IMAGE NAME\r\n");
-      Print (L"   == ======== = = = == == =================================== ===================\r\n");
-      Print (L"   8F 0000000A B - -  1 14 PCI Bus Driver                      PciBusDxe\r\n");
-      Print (L"   91 00000010 ? - -  -  - ATA Bus Driver                      AtaBusDxe\r\n");
-      Print (L"   ...\r\n");
-      Print (L"   A7 0000000A B - -  1  1 ISA Serial Driver                   IsaSerialDxe\r\n");
-      Print (L"   ...\r\n");
-      Print (L"2: Shell> dh -d A7\r\n");
-      Print (L"   A7: Image(IsaSerialDxe) ImageDevPath (..9FB3-11D4-9A3A-0090273FC14D))DriverBinding ComponentName ComponentName2\r\n");
-      Print (L"        Driver Name    : ISA Serial Driver\r\n");
-      Print (L"        Image Name     : FvFile(93B80003-9FB3-11D4-9A3A-0090273FC14D)\r\n");
-      Print (L"        Driver Version : 0000000A\r\n");
-      Print (L"        Driver Type    : BUS\r\n");
-      Print (L"        Configuration  : NO\r\n");
-      Print (L"        Diagnostics    : NO\r\n");
-      Print (L"        Managing       :\r\n");
-      Print (L"          Ctrl[EA] : PciRoot(0x0)/Pci(0x1F,0x0)/Serial(0x0)\r\n");
-      Print (L"            Child[EB] : PciRoot(0x0)/Pci(0x1F,0x0)/Serial(0x0)/Uart(115200,8,N,1)\r\n");
-      Print (L"3: Shell> disconnect EA\r\n");
-      Print (L"4: Shell> load -nc DebugAgentDxe.efi\r\n\r\n");
-    }
     break;
 
   case DEBUG_AGENT_INIT_DXE_UNLOAD:
     if (mDebugAgentInitialized) {
       if (IsHostAttached ()) {
-        Print (L"Debug Agent: Host is still connected, please de-attach TARGET firstly!\r\n");
         *(EFI_STATUS *)Context = EFI_ACCESS_DENIED;
         //
         // Enable Debug Timer interrupt again
@@ -488,7 +460,6 @@ InitializeDebugAgent (
         *(EFI_STATUS *)Context = EFI_SUCCESS;
       }
     } else {
-      Print (L"Debug Agent: It hasn't been initialized, cannot unload it!\r\n");
       *(EFI_STATUS *)Context = EFI_NOT_STARTED;
     }
 
