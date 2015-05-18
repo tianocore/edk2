@@ -21,52 +21,8 @@
 #include <Library/DebugLib.h>
 #include "PiSmmCoreMemoryAllocationServices.h"
 
-EFI_SMRAM_DESCRIPTOR  *mSmramRanges    = NULL;
-UINTN                 mSmramRangeCount = 0;
-
-/**
-  This function gets and caches SMRAM ranges that are present in the system.
-    
-  It will ASSERT() if SMM Access2 Protocol doesn't exist.
-  It will ASSERT() if SMRAM ranges can't be got.
-  It will ASSERT() if Resource can't be allocated for cache SMRAM range. 
-
-**/
-VOID
-EFIAPI
-GetSmramRanges (
-  VOID
-  )
-{
-  EFI_STATUS                Status;
-  EFI_SMM_ACCESS2_PROTOCOL  *SmmAccess;
-  UINTN                     Size;
-
-  //
-  // Locate SMM Access2 Protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiSmmAccess2ProtocolGuid, 
-                  NULL, 
-                  (VOID **)&SmmAccess
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get SMRAM range information
-  //
-  Size = 0;
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-  mSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
-  ASSERT (mSmramRanges != NULL);
-
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmramRanges);
-  ASSERT_EFI_ERROR (Status);
-
-  mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
-}
+EFI_SMRAM_DESCRIPTOR  *mSmmCoreMemoryAllocLibSmramRanges    = NULL;
+UINTN                 mSmmCoreMemoryAllocLibSmramRangeCount = 0;
 
 /**
   Check whether the start address of buffer is within any of the SMRAM ranges.
@@ -84,16 +40,9 @@ BufferInSmram (
 {
   UINTN  Index;
 
-  if (mSmramRanges == NULL) {
-    //
-    // SMRAM ranges is not got. Try to get them all.
-    //
-    GetSmramRanges();
-  }
-
-  for (Index = 0; Index < mSmramRangeCount; Index ++) {
-    if (((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer >= mSmramRanges[Index].CpuStart) && 
-        ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer < (mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize))) {
+  for (Index = 0; Index < mSmmCoreMemoryAllocLibSmramRangeCount; Index ++) {
+    if (((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer >= mSmmCoreMemoryAllocLibSmramRanges[Index].CpuStart) && 
+        ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer < (mSmmCoreMemoryAllocLibSmramRanges[Index].CpuStart + mSmmCoreMemoryAllocLibSmramRanges[Index].PhysicalSize))) {
       return TRUE;
     }
   }
@@ -953,11 +902,19 @@ PiSmmCoreMemoryAllocationLibConstructor (
   )
 {
   SMM_CORE_PRIVATE_DATA  *SmmCorePrivate;
+  UINTN                  Size;
 
   SmmCorePrivate = (SMM_CORE_PRIVATE_DATA *)ImageHandle;
   //
   // Initialize memory service using free SMRAM
   //
   SmmInitializeMemoryServices (SmmCorePrivate->SmramRangeCount, SmmCorePrivate->SmramRanges);
+
+  mSmmCoreMemoryAllocLibSmramRangeCount = SmmCorePrivate->FullSmramRangeCount;
+  Size = mSmmCoreMemoryAllocLibSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR);
+  mSmmCoreMemoryAllocLibSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  ASSERT (mSmmCoreMemoryAllocLibSmramRanges != NULL);
+  CopyMem (mSmmCoreMemoryAllocLibSmramRanges, SmmCorePrivate->FullSmramRanges, Size);
+
   return EFI_SUCCESS;
 }
