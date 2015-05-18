@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformBootManagerLib
-  FILE_GUID                      = 95C097CC-8943-4038-BB8A-1C70CF2E9F3C
+  FILE_GUID                      = F0D9063A-DADB-4185-85E2-D7ACDA93F7A6
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
