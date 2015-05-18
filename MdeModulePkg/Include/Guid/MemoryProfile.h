@@ -1,7 +1,7 @@
 /** @file
   Memory profile data structure.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,9 @@
 #define _MEMORY_PROFILE_H_
 
 //
-// For BIOS MemoryType (0 ~ EfiMaxMemoryType), it is recorded in UsageByType[MemoryType]. (Each valid entry has one entry)
+// For BIOS MemoryType (0 ~ EfiMaxMemoryType - 1), it is recorded in UsageByType[MemoryType]. (Each valid entry has one entry)
 // For OS MemoryType (0x80000000 ~ 0xFFFFFFFF), it is recorded in UsageByType[EfiMaxMemoryType]. (All types are combined into one entry)
+// For OEM MemoryType (0x70000000 ~ 0x7FFFFFFF), it is recorded in UsageByType[EfiMaxMemoryType + 1]. (All types are combined into one entry)
 //
 
 typedef struct {
@@ -27,21 +28,21 @@ typedef struct {
 } MEMORY_PROFILE_COMMON_HEADER;
 
 #define MEMORY_PROFILE_CONTEXT_SIGNATURE SIGNATURE_32 ('M','P','C','T')
-#define MEMORY_PROFILE_CONTEXT_REVISION 0x0001
+#define MEMORY_PROFILE_CONTEXT_REVISION 0x0002
 
 typedef struct {
   MEMORY_PROFILE_COMMON_HEADER  Header;
   UINT64                        CurrentTotalUsage;
   UINT64                        PeakTotalUsage;
-  UINT64                        CurrentTotalUsageByType[EfiMaxMemoryType + 1];
-  UINT64                        PeakTotalUsageByType[EfiMaxMemoryType + 1];
+  UINT64                        CurrentTotalUsageByType[EfiMaxMemoryType + 2];
+  UINT64                        PeakTotalUsageByType[EfiMaxMemoryType + 2];
   UINT64                        TotalImageSize;
   UINT32                        ImageCount;
   UINT32                        SequenceCount;
 } MEMORY_PROFILE_CONTEXT;
 
 #define MEMORY_PROFILE_DRIVER_INFO_SIGNATURE SIGNATURE_32 ('M','P','D','I')
-#define MEMORY_PROFILE_DRIVER_INFO_REVISION 0x0001
+#define MEMORY_PROFILE_DRIVER_INFO_REVISION 0x0002
 
 typedef struct {
   MEMORY_PROFILE_COMMON_HEADER  Header;
@@ -55,8 +56,8 @@ typedef struct {
   UINT32                        AllocRecordCount;
   UINT64                        CurrentUsage;
   UINT64                        PeakUsage;
-  UINT64                        CurrentUsageByType[EfiMaxMemoryType + 1];
-  UINT64                        PeakUsageByType[EfiMaxMemoryType + 1];
+  UINT64                        CurrentUsageByType[EfiMaxMemoryType + 2];
+  UINT64                        PeakUsageByType[EfiMaxMemoryType + 2];
 } MEMORY_PROFILE_DRIVER_INFO;
 
 typedef enum {
