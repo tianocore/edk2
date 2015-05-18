@@ -1471,31 +1471,32 @@ CopyMemByWidth (
   2. Compute the CRC of the compressed data buffer;
   3. Compress the data and send to the debug channel.
 
+  @param[in]  Handle           The debug channel handle to send the compressed data buffer.
   @param[in]  Data             The data buffer.
   @param[in]  Length           The length of the data buffer.
+  @param[in]  Send             TRUE to send the compressed data buffer.
   @param[out] CompressedLength Return the length of the compressed data buffer.
                                It may be larger than the Length in some cases.
   @param[out] CompressedCrc    Return the CRC of the compressed data buffer.
-  @param[in]  Handle           The debug channel handle to send the compressed data buffer.
 **/
 VOID
-CompressDataThenSend (
+CompressData (
+  IN  DEBUG_PORT_HANDLE Handle,
   IN  UINT8             *Data,
   IN  UINT8             Length,
+  IN  BOOLEAN           Send,
   OUT UINTN             *CompressedLength,  OPTIONAL
-  OUT UINT16            *CompressedCrc,     OPTIONAL
-  IN  DEBUG_PORT_HANDLE Handle              OPTIONAL
+  OUT UINT16            *CompressedCrc      OPTIONAL
   )
 {
-  UINTN  Index;
-  UINT8  LastChar;
-  UINT8  LastCharCount;
-  UINT8  CurrentChar;
-  UINTN  CompressedIndex;
+  UINTN                 Index;
+  UINT8                 LastChar;
+  UINT8                 LastCharCount;
+  UINT8                 CurrentChar;
+  UINTN                 CompressedIndex;
 
   ASSERT (Length > 0);
-
-  LastChar = Data[0] + 1; // Just ensure it's different from the first byte.
+  LastChar      = Data[0] + 1; // Just ensure it's different from the first byte.
   LastCharCount = 0;
 
   for (Index = 0, CompressedIndex = 0; Index <= Length; Index++) {
@@ -1510,7 +1511,7 @@ CompressDataThenSend (
         if (CompressedCrc != NULL) {
           *CompressedCrc = CalculateCrc16 (&LastChar, 1, *CompressedCrc);
         }
-        if (Handle != NULL) {
+        if (Send) {
           DebugPortWriteBuffer (Handle, &LastChar, 1);
         }
         
@@ -1522,7 +1523,7 @@ CompressDataThenSend (
           *CompressedCrc = CalculateCrc16 (&LastChar, 1, *CompressedCrc);
           *CompressedCrc = CalculateCrc16 (&LastCharCount, 1, *CompressedCrc);
         }
-        if (Handle != NULL) {
+        if (Send) {
           DebugPortWriteBuffer (Handle, &LastChar, 1);
           DebugPortWriteBuffer (Handle, &LastChar, 1);
           DebugPortWriteBuffer (Handle, &LastCharCount, 1);
@@ -1605,11 +1606,12 @@ ReadMemoryAndSendResponsePacket (
       //
       // Get the compressed data size without modifying the packet.
       //
-      CompressDataThenSend (
+      CompressData (
+        Handle,
         (UINT8 *) (DebugHeader + 1),
         CurrentDataSize,
+        FALSE,
         &CompressedDataSize,
-        NULL,
         NULL
         );
     } else {
@@ -1622,12 +1624,13 @@ ReadMemoryAndSendResponsePacket (
       // Compute the CRC of the packet head without modifying the packet.
       //
       DebugHeader->Crc = CalculateCrc16 ((UINT8 *) DebugHeader, sizeof (DEBUG_PACKET_HEADER), 0);
-      CompressDataThenSend (
+      CompressData (
+        Handle,
         (UINT8 *) (DebugHeader + 1),
         CurrentDataSize,
+        FALSE,
         NULL,
-        &DebugHeader->Crc,
-        NULL
+        &DebugHeader->Crc
         );
       //
       // Send out the packet head.
@@ -1636,12 +1639,13 @@ ReadMemoryAndSendResponsePacket (
       //
       // Compress and send out the packet data.
       //
-      CompressDataThenSend (
+      CompressData (
+        Handle,
         (UINT8 *) (DebugHeader + 1),
         CurrentDataSize,
+        TRUE,
         NULL,
-        NULL,
-        Handle
+        NULL
         );
     } else {
 
