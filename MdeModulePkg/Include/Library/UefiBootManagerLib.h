@@ -213,7 +213,7 @@ EfiBootManagerDeleteLoadOptionVariable (
   reflect the new order.
 
   @param OptionType        The type of the load option.
-  @param Comparator        The comparator function pointer.
+  @param CompareFunction   The comparator function pointer.
 **/
 VOID
 EFIAPI
