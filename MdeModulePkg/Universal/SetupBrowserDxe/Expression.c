@@ -1561,12 +1561,15 @@ IfrMatch2 (
                         &BufferSize,
                         HandleBuffer);
 
-  } else if (EFI_ERROR (Status)) {
+  }
+
+  if (EFI_ERROR (Status)) {
     Result->Type = EFI_IFR_TYPE_UNDEFINED;
     Status = EFI_SUCCESS;
     goto Done;
   }
 
+  ASSERT (HandleBuffer != NULL);
   for ( Index = 0; Index < BufferSize / sizeof(EFI_HANDLE); Index ++) {
     Status = gBS->HandleProtocol (
                   HandleBuffer[Index],

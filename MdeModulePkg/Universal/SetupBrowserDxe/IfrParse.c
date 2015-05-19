@@ -2144,6 +2144,7 @@ ParseOpCodes (
     // Option
     //
     case EFI_IFR_ONE_OF_OPTION_OP:
+      ASSERT (ParentStatement != NULL);
       if (ParentStatement->Operand == EFI_IFR_ORDERED_LIST_OP && ((((EFI_IFR_ONE_OF_OPTION *) OpCodeData)->Flags & (EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG)) != 0)) {
         //
         // It's keep the default value for ordered list opcode.
@@ -2198,7 +2199,6 @@ ParseOpCodes (
         CopyMem (CurrentOption->SuppressExpression->Expression, GetConditionalExpressionList(ExpressOption), (UINTN) (sizeof (FORM_EXPRESSION *) * ConditionalExprCount));
       }
 
-      ASSERT (ParentStatement != NULL);
       //
       // Insert to Option list of current Question
       //
