@@ -997,6 +997,7 @@ VariableSmmRuntimeInitialize (
   VOID                                      *SmmVariableWriteRegistration;
   EFI_EVENT                                 OnReadyToBootEvent;
   EFI_EVENT                                 ExitBootServiceEvent;
+  EFI_EVENT                                 LegacyBootEvent;
 
   EfiInitializeLock (&mVariableServicesLock, TPL_NOTIFY);
 
@@ -1063,6 +1064,17 @@ VariableSmmRuntimeInitialize (
          &gEfiEventExitBootServicesGuid,
          &ExitBootServiceEvent
          ); 
+
+  //
+  // Register the event to inform SMM variable that it is at runtime for legacy boot.
+  // Reuse OnExitBootServices() here.
+  //
+  EfiCreateEventLegacyBootEx(
+    TPL_NOTIFY,
+    OnExitBootServices,
+    NULL,
+    &LegacyBootEvent
+    );
 
   //
   // Register the event to convert the pointer for runtime.
