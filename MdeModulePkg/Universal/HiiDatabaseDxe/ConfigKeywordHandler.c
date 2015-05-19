@@ -1321,10 +1321,12 @@ GetStringIdFromRecord (
   HII_STRING_PACKAGE_INSTANCE         *StringPackage;
   EFI_STATUS                          Status;
   CHAR8                               *Name;
+  UINT32                              RetVal;
 
   ASSERT (DatabaseRecord != NULL && NameSpace != NULL && KeywordValue != NULL);
 
   PackageListNode = DatabaseRecord->PackageList;
+  RetVal = KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND;
 
   if (*NameSpace != NULL) {
     Name = *NameSpace;
@@ -1338,7 +1340,8 @@ GetStringIdFromRecord (
     if (AsciiStrnCmp(Name, StringPackage->StringPkgHdr->Language, AsciiStrLen (Name)) == 0) {
       Status = GetStringIdFromString (StringPackage, KeywordValue, StringId); 
       if (EFI_ERROR (Status)) {
-        return KEYWORD_HANDLER_KEYWORD_NOT_FOUND;
+        RetVal = KEYWORD_HANDLER_KEYWORD_NOT_FOUND;
+        continue;
       } else {
         if (*NameSpace == NULL) {
           *NameSpace = AllocateCopyPool (AsciiStrSize (StringPackage->StringPkgHdr->Language), StringPackage->StringPkgHdr->Language);
@@ -1351,7 +1354,7 @@ GetStringIdFromRecord (
     }
   }
 
-  return KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND;
+  return RetVal;
 }
 
 /**
