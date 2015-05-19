@@ -49,14 +49,14 @@
   UefiLib
 
 [Guids]
-  gEfiHashAlgorithmSha1Guid
-  gEfiHashAlgorithmSha256Guid
-  gEfiHashAlgorithmSha384Guid
-  gEfiHashAlgorithmSha512Guid
+  gEfiHashAlgorithmSha1Guid             ## CONSUMES               ## GUID
+  gEfiHashAlgorithmSha256Guid           ## CONSUMES               ## GUID
+  gEfiHashAlgorithmSha384Guid           ## CONSUMES               ## GUID
+  gEfiHashAlgorithmSha512Guid           ## CONSUMES               ## GUID
 
 [Protocols]
-  gEfiHash2ProtocolGuid
-  gEfiHash2ServiceBindingProtocolGuid
+  gEfiHash2ProtocolGuid                 ## PRODUCES
+  gEfiHash2ServiceBindingProtocolGuid   ## PRODUCES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   Hash2DxeCryptoExtra.uni
