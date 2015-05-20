@@ -1,7 +1,7 @@
 /** @file
   FAT recovery PEIM entry point, Ppi Functions and FAT Api functions.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -45,24 +45,28 @@ BlockIoNotifyEntry (
 
   @param  PrivateData             Global memory map for accessing global 
                                   variables. 
+  @param  BlockIo2                Boolean to show whether using BlockIo2 or BlockIo
 
   @retval EFI_SUCCESS             The function completed successfully.
 
 **/
 EFI_STATUS
 UpdateBlocksAndVolumes (
-  IN OUT PEI_FAT_PRIVATE_DATA            *PrivateData
+  IN OUT PEI_FAT_PRIVATE_DATA            *PrivateData,
+  IN     BOOLEAN                         BlockIo2
   )
 {
-  EFI_STATUS                    Status;
-  EFI_PEI_PPI_DESCRIPTOR        *TempPpiDescriptor;
-  UINTN                         BlockIoPpiInstance;
-  EFI_PEI_RECOVERY_BLOCK_IO_PPI *BlockIoPpi;
-  UINTN                         NumberBlockDevices;
-  UINTN                         Index;
-  EFI_PEI_BLOCK_IO_MEDIA        Media;
-  PEI_FAT_VOLUME                Volume;
-  EFI_PEI_SERVICES              **PeiServices;
+  EFI_STATUS                     Status;
+  EFI_PEI_PPI_DESCRIPTOR         *TempPpiDescriptor;
+  UINTN                          BlockIoPpiInstance;
+  EFI_PEI_RECOVERY_BLOCK_IO_PPI  *BlockIoPpi;
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *BlockIo2Ppi;
+  UINTN                          NumberBlockDevices;
+  UINTN                          Index;
+  EFI_PEI_BLOCK_IO_MEDIA         Media;
+  EFI_PEI_BLOCK_IO2_MEDIA        Media2;
+  PEI_FAT_VOLUME                 Volume;
+  EFI_PEI_SERVICES               **PeiServices;
 
   PeiServices = (EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
 
@@ -80,12 +84,21 @@ UpdateBlocksAndVolumes (
   // Assuming all device Block Io Peims are dispatched already
   //
   for (BlockIoPpiInstance = 0; BlockIoPpiInstance < PEI_FAT_MAX_BLOCK_IO_PPI; BlockIoPpiInstance++) {
-    Status = PeiServicesLocatePpi (
-              &gEfiPeiVirtualBlockIoPpiGuid,
-              BlockIoPpiInstance,
-              &TempPpiDescriptor,
-              (VOID **) &BlockIoPpi
-              );
+    if (BlockIo2) {
+      Status = PeiServicesLocatePpi (
+                &gEfiPeiVirtualBlockIo2PpiGuid,
+                BlockIoPpiInstance,
+                &TempPpiDescriptor,
+                (VOID **) &BlockIo2Ppi
+                );
+    } else {
+      Status = PeiServicesLocatePpi (
+                &gEfiPeiVirtualBlockIoPpiGuid,
+                BlockIoPpiInstance,
+                &TempPpiDescriptor,
+                (VOID **) &BlockIoPpi
+                );
+    }
     if (EFI_ERROR (Status)) {
       //
       // Done with all Block Io Ppis
@@ -93,29 +106,47 @@ UpdateBlocksAndVolumes (
       break;
     }
 
-    Status = BlockIoPpi->GetNumberOfBlockDevices (
-                          PeiServices,
-                          BlockIoPpi,
-                          &NumberBlockDevices
-                          );
+    if (BlockIo2) {
+      Status = BlockIo2Ppi->GetNumberOfBlockDevices (
+                              PeiServices,
+                              BlockIo2Ppi,
+                              &NumberBlockDevices
+                              );
+    } else {
+      Status = BlockIoPpi->GetNumberOfBlockDevices (
+                             PeiServices,
+                             BlockIoPpi,
+                             &NumberBlockDevices
+                             );
+    }
     if (EFI_ERROR (Status)) {
       continue;
     }
 
     for (Index = 1; Index <= NumberBlockDevices && PrivateData->BlockDeviceCount < PEI_FAT_MAX_BLOCK_DEVICE; Index++) {
 
-      Status = BlockIoPpi->GetBlockDeviceMediaInfo (
-                            PeiServices,
-                            BlockIoPpi,
-                            Index,
-                            &Media
-                            );
-      if (EFI_ERROR (Status) || !Media.MediaPresent) {
-        continue;
+      if (BlockIo2) {
+        Status = BlockIo2Ppi->GetBlockDeviceMediaInfo (
+                                PeiServices,
+                                BlockIo2Ppi,
+                                Index,
+                                &Media2
+                                );
+        if (EFI_ERROR (Status) || !Media2.MediaPresent) {
+          continue;
+        }
+      } else {
+        Status = BlockIoPpi->GetBlockDeviceMediaInfo (
+                               PeiServices,
+                               BlockIoPpi,
+                               Index,
+                               &Media
+                               );
+        if (EFI_ERROR (Status) || !Media.MediaPresent) {
+          continue;
+        }
       }
 
-      PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockSize = (UINT32) Media.BlockSize;
-      PrivateData->BlockDevice[PrivateData->BlockDeviceCount].LastBlock = Media.LastBlock;
       PrivateData->BlockDevice[PrivateData->BlockDeviceCount].IoAlign   = 0;
       //
       // Not used here
@@ -123,10 +154,18 @@ UpdateBlocksAndVolumes (
       PrivateData->BlockDevice[PrivateData->BlockDeviceCount].Logical           = FALSE;
       PrivateData->BlockDevice[PrivateData->BlockDeviceCount].PartitionChecked  = FALSE;
 
-      PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockIo           = BlockIoPpi;
       PrivateData->BlockDevice[PrivateData->BlockDeviceCount].PhysicalDevNo     = (UINT8) Index;
-      PrivateData->BlockDevice[PrivateData->BlockDeviceCount].DevType           = Media.DeviceType;
-
+      if (BlockIo2) {
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockIo2        = BlockIo2Ppi;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].InterfaceType   = Media2.InterfaceType;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].LastBlock       = Media2.LastBlock;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockSize       = Media2.BlockSize;
+      } else {
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockIo    = BlockIoPpi;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].DevType    = Media.DeviceType;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].LastBlock  = Media.LastBlock;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockSize  = (UINT32) Media.BlockSize;
+    }
       PrivateData->BlockDeviceCount++;
     }
   }
@@ -184,8 +223,11 @@ BlockIoNotifyEntry (
   IN VOID                       *Ppi
   )
 {
-  UpdateBlocksAndVolumes (mPrivateData);
-
+  if (CompareGuid (NotifyDescriptor->Guid, &gEfiPeiVirtualBlockIo2PpiGuid)) {
+    UpdateBlocksAndVolumes (mPrivateData, TRUE);
+  } else {
+    UpdateBlocksAndVolumes (mPrivateData, FALSE);
+  }
   return EFI_SUCCESS;
 }
 
@@ -247,7 +289,7 @@ FatPeimEntry (
 
   PrivateData->PpiDescriptor.Flags                          = (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
   PrivateData->PpiDescriptor.Guid = &gEfiPeiDeviceRecoveryModulePpiGuid;
-  PrivateData->PpiDescriptor.Ppi = &PrivateData->DeviceRecoveryPpi;
+  PrivateData->PpiDescriptor.Ppi  = &PrivateData->DeviceRecoveryPpi;
 
   Status = PeiServicesInstallPpi (&PrivateData->PpiDescriptor);
   if (EFI_ERROR (Status)) {
@@ -258,7 +300,8 @@ FatPeimEntry (
   //
   PrivateData->BlockDeviceCount = 0;
 
-  UpdateBlocksAndVolumes (PrivateData);
+  UpdateBlocksAndVolumes (PrivateData, TRUE);
+  UpdateBlocksAndVolumes (PrivateData, FALSE);
 
   //
   // PrivateData is allocated now, set it to the module variable
@@ -268,14 +311,20 @@ FatPeimEntry (
   //
   // Installs Block Io Ppi notification function
   //
-  PrivateData->NotifyDescriptor.Flags =
+  PrivateData->NotifyDescriptor[0].Flags =
+    (
+      EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK
+    );
+  PrivateData->NotifyDescriptor[0].Guid    = &gEfiPeiVirtualBlockIoPpiGuid;
+  PrivateData->NotifyDescriptor[0].Notify  = BlockIoNotifyEntry;
+  PrivateData->NotifyDescriptor[1].Flags  =
     (
       EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK |
       EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST
     );
-  PrivateData->NotifyDescriptor.Guid    = &gEfiPeiVirtualBlockIoPpiGuid;
-  PrivateData->NotifyDescriptor.Notify  = BlockIoNotifyEntry;
-  return PeiServicesNotifyPpi (&PrivateData->NotifyDescriptor);
+  PrivateData->NotifyDescriptor[1].Guid    = &gEfiPeiVirtualBlockIo2PpiGuid;
+  PrivateData->NotifyDescriptor[1].Notify  = BlockIoNotifyEntry;
+  return PeiServicesNotifyPpi (&PrivateData->NotifyDescriptor[0]);
 }
 
 
@@ -428,22 +477,38 @@ GetRecoveryCapsuleInfo (
       // Fill in the Capsule Type GUID according to the block device type
       //
       if (BlockDeviceNo < PrivateData->BlockDeviceCount) {
-        switch (PrivateData->BlockDevice[BlockDeviceNo].DevType) {
-        case LegacyFloppy:
-          CopyGuid (CapsuleType, &gRecoveryOnFatFloppyDiskGuid);
-          break;
+        if (PrivateData->BlockDevice[BlockDeviceNo].BlockIo2 != NULL) {
+          switch (PrivateData->BlockDevice[BlockDeviceNo].InterfaceType) {
+          case MSG_ATAPI_DP:
+            CopyGuid (CapsuleType, &gRecoveryOnFatIdeDiskGuid);
+            break;
 
-        case IdeCDROM:
-        case IdeLS120:
-          CopyGuid (CapsuleType, &gRecoveryOnFatIdeDiskGuid);
-          break;
+          case MSG_USB_DP:
+            CopyGuid (CapsuleType, &gRecoveryOnFatUsbDiskGuid);
+            break;
 
-        case UsbMassStorage:
-          CopyGuid (CapsuleType, &gRecoveryOnFatUsbDiskGuid);
-          break;
+          default:
+            break;
+          }
+        }
+        if (PrivateData->BlockDevice[BlockDeviceNo].BlockIo != NULL) {
+          switch (PrivateData->BlockDevice[BlockDeviceNo].DevType) {
+          case LegacyFloppy:
+            CopyGuid (CapsuleType, &gRecoveryOnFatFloppyDiskGuid);
+            break;
 
-        default:
-          break;
+          case IdeCDROM:
+          case IdeLS120:
+            CopyGuid (CapsuleType, &gRecoveryOnFatIdeDiskGuid);
+            break;
+
+          case UsbMassStorage:
+            CopyGuid (CapsuleType, &gRecoveryOnFatUsbDiskGuid);
+            break;
+
+          default:
+            break;
+          }
         }
       }
 

@@ -1,7 +1,7 @@
 /** @file
   General purpose supporting routines for FAT recovery PEIM
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -87,7 +87,17 @@ FatReadBlock (
     // Status = BlockDev->ReadFunc
     //  (PrivateData->PeiServices, BlockDev->PhysicalDevNo, Lba, BufferSize, Buffer);
     //
-    Status = BlockDev->BlockIo->ReadBlocks (
+    if (BlockDev->BlockIo2 != NULL) {
+      Status = BlockDev->BlockIo2->ReadBlocks (
+                                    (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
+                                    BlockDev->BlockIo2,
+                                    BlockDev->PhysicalDevNo,
+                                    Lba,
+                                    BufferSize,
+                                    Buffer
+                                    );
+    } else {
+      Status = BlockDev->BlockIo->ReadBlocks (
                                   (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
                                   BlockDev->BlockIo,
                                   BlockDev->PhysicalDevNo,
@@ -95,6 +105,7 @@ FatReadBlock (
                                   BufferSize,
                                   Buffer
                                   );
+    }
 
   } else {
     Status = FatReadDisk (
