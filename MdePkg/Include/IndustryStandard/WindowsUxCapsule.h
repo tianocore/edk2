@@ -13,8 +13,9 @@
 
 --*/
 
-#ifndef _WINDOWS_UX_CAPSULE_GUID_H
-#define _WINDOWS_UX_CAPSULE_GUID_H
+
+#ifndef _WINDOWS_UX_CAPSULE_GUID_H_
+#define _WINDOWS_UX_CAPSULE_GUID_H_
 
 #pragma pack(1)
 
