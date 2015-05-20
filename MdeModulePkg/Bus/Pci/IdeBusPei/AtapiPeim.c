@@ -1,9 +1,11 @@
 /** @file
-PEIM to produce gEfiPeiVirtualBlockIoPpiGuid PPI for ATA controllers in the platform.
-This PPI canl be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
+PEIM to produce gEfiPeiVirtualBlockIoPpiGuid & gEfiPeiVirtualBlockIo2PpiGuid PPI for
+ATA controllers in the platform.
+
+This PPI can be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
 for Atapi CD ROM device.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -68,10 +70,18 @@ AtapiPeimEntry (
   AtapiBlkIoDev->AtapiBlkIo.GetNumberOfBlockDevices = AtapiGetNumberOfBlockDevices;
   AtapiBlkIoDev->AtapiBlkIo.GetBlockDeviceMediaInfo = AtapiGetBlockDeviceMediaInfo;
   AtapiBlkIoDev->AtapiBlkIo.ReadBlocks              = AtapiReadBlocks;
+  AtapiBlkIoDev->AtapiBlkIo2.Revision                = EFI_PEI_RECOVERY_BLOCK_IO2_PPI_REVISION;
+  AtapiBlkIoDev->AtapiBlkIo2.GetNumberOfBlockDevices = AtapiGetNumberOfBlockDevices2;
+  AtapiBlkIoDev->AtapiBlkIo2.GetBlockDeviceMediaInfo = AtapiGetBlockDeviceMediaInfo2;
+  AtapiBlkIoDev->AtapiBlkIo2.ReadBlocks              = AtapiReadBlocks2;
 
-  AtapiBlkIoDev->PpiDescriptor.Flags                = (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
+  AtapiBlkIoDev->PpiDescriptor.Flags                = EFI_PEI_PPI_DESCRIPTOR_PPI;
   AtapiBlkIoDev->PpiDescriptor.Guid                 = &gEfiPeiVirtualBlockIoPpiGuid;
   AtapiBlkIoDev->PpiDescriptor.Ppi                  = &AtapiBlkIoDev->AtapiBlkIo;
+
+  AtapiBlkIoDev->PpiDescriptor2.Flags                = (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
+  AtapiBlkIoDev->PpiDescriptor2.Guid                 = &gEfiPeiVirtualBlockIo2PpiGuid;
+  AtapiBlkIoDev->PpiDescriptor2.Ppi                  = &AtapiBlkIoDev->AtapiBlkIo2;
 
   DEBUG ((EFI_D_INFO, "Atatpi Device Count is %d\n", AtapiBlkIoDev->DeviceCount));
   if (AtapiBlkIoDev->DeviceCount != 0) {
@@ -195,7 +205,8 @@ AtapiGetBlockDeviceMediaInfo (
   Status = DetectMedia (
              AtapiBlkIoDev,
              AtapiBlkIoDev->DeviceInfo[Index].DevicePosition,
-             &AtapiBlkIoDev->DeviceInfo[Index].MediaInfo
+             &AtapiBlkIoDev->DeviceInfo[Index].MediaInfo,
+             &AtapiBlkIoDev->DeviceInfo[Index].MediaInfo2
              );
   if (Status != EFI_SUCCESS) {
     return EFI_DEVICE_ERROR;
@@ -262,10 +273,10 @@ AtapiReadBlocks (
 {
 
   EFI_PEI_BLOCK_IO_MEDIA  MediaInfo;
-  EFI_STATUS          Status;
-  UINTN               NumberOfBlocks;
-  UINTN               BlockSize;
-  ATAPI_BLK_IO_DEV    *AtapiBlkIoDev;
+  EFI_STATUS              Status;
+  UINTN                   NumberOfBlocks;
+  UINTN                   BlockSize;
+  ATAPI_BLK_IO_DEV        *AtapiBlkIoDev;
 
   AtapiBlkIoDev = NULL;
 
@@ -305,7 +316,7 @@ AtapiReadBlocks (
 
   NumberOfBlocks = BufferSize / BlockSize;
 
-  if ((StartLBA + NumberOfBlocks - 1) > AtapiBlkIoDev->DeviceInfo[DeviceIndex - 1].MediaInfo.LastBlock) {
+  if ((StartLBA + NumberOfBlocks - 1) > AtapiBlkIoDev->DeviceInfo[DeviceIndex - 1].MediaInfo2.LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -325,6 +336,182 @@ AtapiReadBlocks (
 }
 
 /**
+  Gets the count of block I/O devices that one specific block driver detects.
+
+  This function is used for getting the count of block I/O devices that one
+  specific block driver detects.  To the PEI ATAPI driver, it returns the number
+  of all the detected ATAPI devices it detects during the enumeration process.
+  To the PEI legacy floppy driver, it returns the number of all the legacy
+  devices it finds during its enumeration process. If no device is detected,
+  then the function will return zero.
+
+  @param[in]  PeiServices          General-purpose services that are available
+                                   to every PEIM.
+  @param[in]  This                 Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI
+                                   instance.
+  @param[out] NumberBlockDevices   The number of block I/O devices discovered.
+
+  @retval     EFI_SUCCESS          Operation performed successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+AtapiGetNumberOfBlockDevices2 (
+  IN   EFI_PEI_SERVICES                  **PeiServices,
+  IN   EFI_PEI_RECOVERY_BLOCK_IO2_PPI    *This,
+  OUT  UINTN                             *NumberBlockDevices
+  )
+{
+  EFI_STATUS        Status;
+  ATAPI_BLK_IO_DEV  *AtapiBlkIoDev;
+
+  AtapiBlkIoDev = PEI_RECOVERY_ATAPI_FROM_BLKIO2_THIS (This);
+
+  Status = AtapiGetNumberOfBlockDevices (
+             PeiServices,
+             &AtapiBlkIoDev->AtapiBlkIo,
+             NumberBlockDevices
+             );
+
+  return Status;
+}
+
+/**
+  Gets a block device's media information.
+
+  This function will provide the caller with the specified block device's media
+  information. If the media changes, calling this function will update the media
+  information accordingly.
+
+  @param[in]  PeiServices   General-purpose services that are available to every
+                            PEIM
+  @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI instance.
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants
+                            to talk. Because the driver that implements Block I/O
+                            PPIs will manage multiple block devices, the PPIs that
+                            want to talk to a single device must specify the
+                            device index that was assigned during the enumeration
+                            process. This index is a number from one to
+                            NumberBlockDevices.
+  @param[out] MediaInfo     The media information of the specified block media.
+                            The caller is responsible for the ownership of this
+                            data structure.
+
+  @retval EFI_SUCCESS           Media information about the specified block device
+                                was obtained successfully.
+  @retval EFI_DEVICE_ERROR      Cannot get the media information due to a hardware
+                                error.
+  @retval Others                Other failure occurs.
+
+**/
+EFI_STATUS
+EFIAPI
+AtapiGetBlockDeviceMediaInfo2 (
+  IN   EFI_PEI_SERVICES                     **PeiServices,
+  IN   EFI_PEI_RECOVERY_BLOCK_IO2_PPI       *This,
+  IN   UINTN                                DeviceIndex,
+  OUT  EFI_PEI_BLOCK_IO2_MEDIA              *MediaInfo
+  )
+{
+  ATAPI_BLK_IO_DEV           *AtapiBlkIoDev;
+  EFI_STATUS                 Status;
+  EFI_PEI_BLOCK_IO_MEDIA     Media;
+
+  AtapiBlkIoDev = NULL;
+
+  if (This == NULL || MediaInfo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AtapiBlkIoDev = PEI_RECOVERY_ATAPI_FROM_BLKIO2_THIS (This);
+
+  Status = AtapiGetBlockDeviceMediaInfo (
+             PeiServices,
+             &AtapiBlkIoDev->AtapiBlkIo,
+             DeviceIndex,
+             &Media
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  //
+  // Get media info from AtapiBlkIoDev
+  //
+  CopyMem (MediaInfo, &AtapiBlkIoDev->DeviceInfo[DeviceIndex - 1].MediaInfo2, sizeof(EFI_PEI_BLOCK_IO2_MEDIA));
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Reads the requested number of blocks from the specified block device.
+
+  The function reads the requested number of blocks from the device. All the
+  blocks are read, or an error is returned. If there is no media in the device,
+  the function returns EFI_NO_MEDIA.
+
+  @param[in]  PeiServices   General-purpose services that are available to
+                            every PEIM.
+  @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI instance.
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants
+                            to talk. Because the driver that implements Block I/O
+                            PPIs will manage multiple block devices, the PPIs that
+                            want to talk to a single device must specify the device
+                            index that was assigned during the enumeration process.
+                            This index is a number from one to NumberBlockDevices.
+  @param[in]  StartLBA      The starting logical block address (LBA) to read from
+                            on the device
+  @param[in]  BufferSize    The size of the Buffer in bytes. This number must be
+                            a multiple of the intrinsic block size of the device.
+  @param[out] Buffer        A pointer to the destination buffer for the data.
+                            The caller is responsible for the ownership of the
+                            buffer.
+
+  @retval EFI_SUCCESS             The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting
+                                  to perform the read operation.
+  @retval EFI_INVALID_PARAMETER   The read request contains LBAs that are not
+                                  valid, or the buffer is not properly aligned.
+  @retval EFI_NO_MEDIA            There is no media in the device.
+  @retval EFI_BAD_BUFFER_SIZE     The BufferSize parameter is not a multiple of
+                                  the intrinsic block size of the device.
+
+**/
+EFI_STATUS
+EFIAPI
+AtapiReadBlocks2 (
+  IN   EFI_PEI_SERVICES                  **PeiServices,
+  IN   EFI_PEI_RECOVERY_BLOCK_IO2_PPI    *This,
+  IN   UINTN                             DeviceIndex,
+  IN   EFI_PEI_LBA                       StartLBA,
+  IN   UINTN                             BufferSize,
+  OUT  VOID                              *Buffer
+  )
+{
+  EFI_STATUS          Status;
+  ATAPI_BLK_IO_DEV    *AtapiBlkIoDev;
+
+  AtapiBlkIoDev = NULL;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AtapiBlkIoDev = PEI_RECOVERY_ATAPI_FROM_BLKIO2_THIS (This);
+
+  Status = AtapiReadBlocks (
+             PeiServices,
+             &AtapiBlkIoDev->AtapiBlkIo,
+             DeviceIndex,
+             StartLBA,
+             BufferSize,
+             Buffer
+             );
+
+  return Status;
+}
+
+
+/**
   Enumerate Atapi devices.
 
   This function is used to enumerate Atatpi device in Ide channel.
@@ -337,16 +524,17 @@ AtapiEnumerateDevices (
   IN  ATAPI_BLK_IO_DEV  *AtapiBlkIoDev
   )
 {
-  UINT8               Index1;
-  UINT8               Index2;
-  UINTN               DevicePosition;
+  UINT8                   Index1;
+  UINT8                   Index2;
+  UINTN                   DevicePosition;
   EFI_PEI_BLOCK_IO_MEDIA  MediaInfo;
-  EFI_STATUS          Status;
-  UINTN               DeviceCount;
-  UINT16              CommandBlockBaseAddr;
-  UINT16              ControlBlockBaseAddr;
-  UINT32              IdeEnabledNumber;
-  IDE_REGS_BASE_ADDR  IdeRegsBaseAddr[MAX_IDE_CHANNELS];
+  EFI_PEI_BLOCK_IO2_MEDIA MediaInfo2;
+  EFI_STATUS              Status;
+  UINTN                   DeviceCount;
+  UINT16                  CommandBlockBaseAddr;
+  UINT16                  ControlBlockBaseAddr;
+  UINT32                  IdeEnabledNumber;
+  IDE_REGS_BASE_ADDR      IdeRegsBaseAddr[MAX_IDE_CHANNELS];
 
   DeviceCount = 0;
   DevicePosition = 0;
@@ -407,7 +595,7 @@ AtapiEnumerateDevices (
       //
       DevicePosition = (UINTN) (Index1 * 2 + Index2);
 
-      if (DiscoverAtapiDevice (AtapiBlkIoDev, DevicePosition, &MediaInfo)) {
+      if (DiscoverAtapiDevice (AtapiBlkIoDev, DevicePosition, &MediaInfo, &MediaInfo2)) {
         //
         // ATAPI Device at DevicePosition is found.
         //
@@ -415,9 +603,10 @@ AtapiEnumerateDevices (
         //
         // Retrieve Media Info
         //
-        Status  = DetectMedia (AtapiBlkIoDev, DevicePosition, &MediaInfo);
+        Status  = DetectMedia (AtapiBlkIoDev, DevicePosition, &MediaInfo, &MediaInfo2);
         CopyMem (&(AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo), &MediaInfo, sizeof (MediaInfo));
-       
+        CopyMem (&(AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo2), &MediaInfo2, sizeof (MediaInfo2));
+
         DEBUG ((EFI_D_INFO, "Atatpi Device Position is %d\n", DevicePosition));
         DEBUG ((EFI_D_INFO, "Atatpi DeviceType is   %d\n", MediaInfo.DeviceType));
         DEBUG ((EFI_D_INFO, "Atatpi MediaPresent is %d\n", MediaInfo.MediaPresent));
@@ -426,6 +615,8 @@ AtapiEnumerateDevices (
         if (EFI_ERROR (Status)) {
           AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo.MediaPresent = FALSE;
           AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo.LastBlock    = 0;
+          AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo2.MediaPresent = FALSE;
+          AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo2.LastBlock    = 0;
         }
         DeviceCount += 1;
       }
@@ -441,6 +632,7 @@ AtapiEnumerateDevices (
   @param[in]  AtapiBlkIoDev   A pointer to atapi block IO device.
   @param[in]  DevicePosition  An integer to signify device position.
   @param[out] MediaInfo       The media information of the specified block media.
+  @param[out] MediaInfo2      The media information 2 of the specified block media.
 
   @retval TRUE                Atapi device exists in specified position.
   @retval FALSE               Atapi device does not exist in specified position.
@@ -450,7 +642,8 @@ BOOLEAN
 DiscoverAtapiDevice (
   IN  ATAPI_BLK_IO_DEV              *AtapiBlkIoDev,
   IN  UINTN                         DevicePosition,
-  OUT EFI_PEI_BLOCK_IO_MEDIA        *MediaInfo
+  OUT EFI_PEI_BLOCK_IO_MEDIA        *MediaInfo,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA       *MediaInfo2
   )
 {
   EFI_STATUS  Status;
@@ -463,7 +656,7 @@ DiscoverAtapiDevice (
   //
   if (ATAPIIdentify (AtapiBlkIoDev, DevicePosition) == EFI_SUCCESS) {
 
-    Status = Inquiry (AtapiBlkIoDev, DevicePosition, MediaInfo);
+    Status = Inquiry (AtapiBlkIoDev, DevicePosition, MediaInfo, MediaInfo2);
     if (!EFI_ERROR (Status)) {
       return TRUE;
     }
@@ -1032,24 +1225,24 @@ ATAPIIdentify (
   )
 {
   ATAPI_IDENTIFY_DATA  AtapiIdentifyData;
-  UINT8       Channel;
-  UINT8       Device;
-  UINT16      StatusReg;
-  UINT16      HeadReg;
-  UINT16      CommandReg;
-  UINT16      DataReg;
-  UINT16      SectorCountReg;
-  UINT16      SectorNumberReg;
-  UINT16      CylinderLsbReg;
-  UINT16      CylinderMsbReg;
+  UINT8                Channel;
+  UINT8                Device;
+  UINT16               StatusReg;
+  UINT16               HeadReg;
+  UINT16               CommandReg;
+  UINT16               DataReg;
+  UINT16               SectorCountReg;
+  UINT16               SectorNumberReg;
+  UINT16               CylinderLsbReg;
+  UINT16               CylinderMsbReg;
 
-  UINT32      WordCount;
-  UINT32      Increment;
-  UINT32      Index;
-  UINT32      ByteCount;
-  UINT16      *Buffer16;
+  UINT32               WordCount;
+  UINT32               Increment;
+  UINT32               Index;
+  UINT32               ByteCount;
+  UINT16               *Buffer16;
 
-  EFI_STATUS  Status;
+  EFI_STATUS           Status;
 
   ByteCount       = sizeof (AtapiIdentifyData);
   Buffer16        = (UINT16 *) &AtapiIdentifyData;
@@ -1421,6 +1614,7 @@ AtapiPacketCommandIn (
   @param[in]  AtapiBlkIoDev   A pointer to atapi block IO device.
   @param[in]  DevicePosition  An integer to signify device position.
   @param[out] MediaInfo       The media information of the specified block media.
+  @param[out] MediaInfo2      The media information 2 of the specified block media.
 
   @retval EFI_SUCCESS        Command executed successfully.
   @retval EFI_DEVICE_ERROR   Device cannot be executed command successfully.
@@ -1431,11 +1625,12 @@ EFI_STATUS
 Inquiry (
   IN  ATAPI_BLK_IO_DEV              *AtapiBlkIoDev,
   IN  UINTN                         DevicePosition,
-  OUT EFI_PEI_BLOCK_IO_MEDIA        *MediaInfo
+  OUT EFI_PEI_BLOCK_IO_MEDIA        *MediaInfo,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA       *MediaInfo2
   )
 {
-  ATAPI_PACKET_COMMAND  Packet;
-  EFI_STATUS            Status;
+  ATAPI_PACKET_COMMAND        Packet;
+  EFI_STATUS                  Status;
   ATAPI_INQUIRY_DATA          Idata;
 
   //
@@ -1476,6 +1671,12 @@ Inquiry (
     MediaInfo->MediaPresent = FALSE;
     MediaInfo->LastBlock    = 0;
     MediaInfo->BlockSize    = 0x200;
+    MediaInfo2->InterfaceType  = MSG_ATAPI_DP;
+    MediaInfo2->RemovableMedia = TRUE;
+    MediaInfo2->MediaPresent   = FALSE;
+    MediaInfo2->ReadOnly       = FALSE;
+    MediaInfo2->BlockSize      = 0x200;
+    MediaInfo2->LastBlock      = 0;
     break;
 
   case 0x05:
@@ -1486,6 +1687,12 @@ Inquiry (
     MediaInfo->MediaPresent = FALSE;
     MediaInfo->LastBlock    = 0;
     MediaInfo->BlockSize    = 0x800;
+    MediaInfo2->InterfaceType  = MSG_ATAPI_DP;
+    MediaInfo2->RemovableMedia = TRUE;
+    MediaInfo2->MediaPresent   = FALSE;
+    MediaInfo2->ReadOnly       = TRUE;
+    MediaInfo2->BlockSize      = 0x200;
+    MediaInfo2->LastBlock      = 0;
     break;
 
   default:
@@ -1502,7 +1709,8 @@ Inquiry (
 
   @param[in]  AtapiBlkIoDev     A pointer to atapi block IO device.
   @param[in]  DevicePosition    An integer to signify device position.
-  @param[in, out] MediaInfo         The media information of the specified block media.
+  @param[in, out] MediaInfo     The media information of the specified block media.
+  @param[in, out] MediaInfo2    The media information 2 of the specified block media.
 
   @retval EFI_SUCCESS           Command executed successfully.
   @retval EFI_DEVICE_ERROR      Some device errors happen.
@@ -1513,18 +1721,19 @@ EFI_STATUS
 DetectMedia (
   IN  ATAPI_BLK_IO_DEV              *AtapiBlkIoDev,
   IN  UINTN                         DevicePosition,
-  IN OUT EFI_PEI_BLOCK_IO_MEDIA     *MediaInfo
+  IN OUT EFI_PEI_BLOCK_IO_MEDIA     *MediaInfo,
+  IN OUT EFI_PEI_BLOCK_IO2_MEDIA    *MediaInfo2
   )
 {
 
-  UINTN                   Index;
-  UINTN                   RetryNum;
-  UINTN                   MaxRetryNum;
-  ATAPI_REQUEST_SENSE_DATA      *SenseBuffers;
-  BOOLEAN                 NeedReadCapacity;
-  BOOLEAN                 NeedRetry;
-  EFI_STATUS              Status;
-  UINT8                   SenseCounts;
+  UINTN                     Index;
+  UINTN                     RetryNum;
+  UINTN                     MaxRetryNum;
+  ATAPI_REQUEST_SENSE_DATA  *SenseBuffers;
+  BOOLEAN                   NeedReadCapacity;
+  BOOLEAN                   NeedRetry;
+  EFI_STATUS                Status;
+  UINT8                     SenseCounts;
 
   SenseBuffers = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (*SenseBuffers)));
   if (SenseBuffers == NULL) {
@@ -1580,6 +1789,8 @@ DetectMedia (
       NeedReadCapacity        = FALSE;
       MediaInfo->MediaPresent = FALSE;
       MediaInfo->LastBlock    = 0;
+      MediaInfo2->MediaPresent = FALSE;
+      MediaInfo2->LastBlock    = 0;
     }
 
     if (IsMediaError (SenseBuffers, SenseCounts)) {
@@ -1598,7 +1809,7 @@ DetectMedia (
     //
     for (Index = 0; (Index < RetryNum) && (Index < MaxRetryNum); Index++) {
 
-      Status = ReadCapacity (AtapiBlkIoDev, DevicePosition, MediaInfo);
+      Status = ReadCapacity (AtapiBlkIoDev, DevicePosition, MediaInfo, MediaInfo2);
       MicroSecondDelay (200000);
       SenseCounts = MAX_SENSE_KEY_COUNT;
 
@@ -1632,6 +1843,8 @@ DetectMedia (
 
           MediaInfo->MediaPresent = FALSE;
           MediaInfo->LastBlock    = 0;
+          MediaInfo2->MediaPresent = FALSE;
+          MediaInfo2->LastBlock    = 0;
           break;
         }
 
@@ -1864,9 +2077,10 @@ RequestSense (
   This command will return the information regarding the capacity of the
   media in the device.
 
-  @param[in]  AtapiBlkIoDev   A pointer to atapi block IO device.
-  @param[in]  DevicePosition  An integer to signify device position.
-  @param[in, out] MediaInfo       The media information of the specified block media.
+  @param[in]  AtapiBlkIoDev     A pointer to atapi block IO device.
+  @param[in]  DevicePosition    An integer to signify device position.
+  @param[in, out] MediaInfo     The media information of the specified block media.
+  @param[in, out] MediaInfo2    The media information 2 of the specified block media.
 
   @retval EFI_SUCCESS           Command executed successfully.
   @retval EFI_DEVICE_ERROR      Some device errors happen.
@@ -1876,7 +2090,8 @@ EFI_STATUS
 ReadCapacity (
   IN  ATAPI_BLK_IO_DEV              *AtapiBlkIoDev,
   IN  UINTN                         DevicePosition,
-  IN OUT EFI_PEI_BLOCK_IO_MEDIA     *MediaInfo
+  IN OUT EFI_PEI_BLOCK_IO_MEDIA     *MediaInfo,
+  IN OUT EFI_PEI_BLOCK_IO2_MEDIA    *MediaInfo2
   )
 {
   EFI_STATUS                Status;
@@ -1931,7 +2146,11 @@ ReadCapacity (
       // Because the user data portion in the sector of the Data CD supported
       // is always 800h
       //
-      MediaInfo->BlockSize = 0x800;
+      MediaInfo->BlockSize     = 0x800;
+
+      MediaInfo2->LastBlock    = MediaInfo->LastBlock;
+      MediaInfo2->MediaPresent = MediaInfo->MediaPresent;
+      MediaInfo2->BlockSize    = (UINT32)MediaInfo->BlockSize;
     }
 
     if (MediaInfo->DeviceType == IdeLS120) {
@@ -1939,6 +2158,8 @@ ReadCapacity (
       if (FormatData.DesCode == 3) {
         MediaInfo->MediaPresent = FALSE;
         MediaInfo->LastBlock    = 0;
+        MediaInfo2->MediaPresent = FALSE;
+        MediaInfo2->LastBlock    = 0;
       } else {
         MediaInfo->LastBlock = (FormatData.LastLba3 << 24) |
           (FormatData.LastLba2 << 16) |
@@ -1949,6 +2170,10 @@ ReadCapacity (
         MediaInfo->MediaPresent = TRUE;
 
         MediaInfo->BlockSize    = 0x200;
+
+        MediaInfo2->LastBlock    = MediaInfo->LastBlock;
+        MediaInfo2->MediaPresent = MediaInfo->MediaPresent;
+        MediaInfo2->BlockSize    = (UINT32)MediaInfo->BlockSize;
 
       }
     }
@@ -2080,8 +2305,8 @@ IsNoMedia (
   )
 {
   ATAPI_REQUEST_SENSE_DATA  *SensePtr;
-  UINTN               Index;
-  BOOLEAN             IsNoMedia;
+  UINTN                     Index;
+  BOOLEAN                   IsNoMedia;
 
   IsNoMedia = FALSE;
 
@@ -2116,8 +2341,8 @@ IsDeviceStateUnclear (
   )
 {
   ATAPI_REQUEST_SENSE_DATA  *SensePtr;
-  UINTN               Index;
-  BOOLEAN             Unclear;
+  UINTN                     Index;
+  BOOLEAN                   Unclear;
 
   Unclear  = FALSE;
 
@@ -2157,8 +2382,8 @@ IsMediaError (
   )
 {
   ATAPI_REQUEST_SENSE_DATA  *SensePtr;
-  UINTN               Index;
-  BOOLEAN             IsError;
+  UINTN                     Index;
+  BOOLEAN                   IsError;
 
   IsError   = FALSE;
 
@@ -2232,8 +2457,8 @@ IsDriveReady (
   )
 {
   ATAPI_REQUEST_SENSE_DATA  *SensePtr;
-  UINTN               Index;
-  BOOLEAN             IsReady;
+  UINTN                     Index;
+  BOOLEAN                   IsReady;
 
   IsReady     = TRUE;
   *NeedRetry  = FALSE;
