@@ -1,7 +1,7 @@
 /** @file
 Usb Peim definition.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Ppi/UsbIo.h>
 #include <Ppi/BlockIo.h>
+#include <Ppi/BlockIo2.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>

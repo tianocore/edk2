@@ -31,10 +31,24 @@ EFI_PEI_RECOVERY_BLOCK_IO_PPI    mRecoveryBlkIoPpi = {
   BotReadBlocks
 };
 
-EFI_PEI_PPI_DESCRIPTOR           mPpiList = {
-  EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
-  &gEfiPeiVirtualBlockIoPpiGuid,
-  NULL
+EFI_PEI_RECOVERY_BLOCK_IO2_PPI   mRecoveryBlkIo2Ppi = {
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI_REVISION,
+  BotGetNumberOfBlockDevices2,
+  BotGetMediaInfo2,
+  BotReadBlocks2
+};
+
+EFI_PEI_PPI_DESCRIPTOR           mPpiList[2] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gEfiPeiVirtualBlockIoPpiGuid,
+    NULL
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    &gEfiPeiVirtualBlockIo2PpiGuid,
+    NULL
+  }
 };
 
 /**
@@ -200,6 +214,10 @@ InitUsbBot (
   //
   PeiBotDevice->Media.DeviceType  = UsbMassStorage;
   PeiBotDevice->Media.BlockSize   = 0x200;
+  PeiBotDevice->Media2.InterfaceType = MSG_USB_DP;
+  PeiBotDevice->Media2.BlockSize     = 0x200;
+  PeiBotDevice->Media2.RemovableMedia = FALSE;
+  PeiBotDevice->Media2.ReadOnly       = FALSE;
 
   //
   // Check its Bulk-in/Bulk-out endpoint
@@ -229,11 +247,22 @@ InitUsbBot (
     sizeof (EFI_PEI_RECOVERY_BLOCK_IO_PPI)
     );
   CopyMem (
+    &(PeiBotDevice->BlkIo2Ppi),
+    &mRecoveryBlkIo2Ppi,
+    sizeof (EFI_PEI_RECOVERY_BLOCK_IO2_PPI)
+    );
+  CopyMem (
     &(PeiBotDevice->BlkIoPpiList),
-    &mPpiList,
+    &mPpiList[0],
+    sizeof (EFI_PEI_PPI_DESCRIPTOR)
+    );
+  CopyMem (
+    &(PeiBotDevice->BlkIo2PpiList),
+    &mPpiList[1],
     sizeof (EFI_PEI_PPI_DESCRIPTOR)
     );
   PeiBotDevice->BlkIoPpiList.Ppi  = &PeiBotDevice->BlkIoPpi;
+  PeiBotDevice->BlkIo2PpiList.Ppi = &PeiBotDevice->BlkIo2Ppi;
 
   Status                          = PeiUsbInquiry (PeiServices, PeiBotDevice);
   if (EFI_ERROR (Status)) {
@@ -435,7 +464,7 @@ BotReadBlocks (
     Status = EFI_BAD_BUFFER_SIZE;
   }
 
-  if (StartLBA > PeiBotDev->Media.LastBlock) {
+  if (StartLBA > PeiBotDev->Media2.LastBlock) {
     Status = EFI_INVALID_PARAMETER;
   }
 
@@ -489,11 +518,11 @@ BotReadBlocks (
       return EFI_BAD_BUFFER_SIZE;
     }
 
-    if (StartLBA > PeiBotDev->Media.LastBlock) {
+    if (StartLBA > PeiBotDev->Media2.LastBlock) {
       return EFI_INVALID_PARAMETER;
     }
 
-    if ((StartLBA + NumberOfBlocks - 1) > PeiBotDev->Media.LastBlock) {
+    if ((StartLBA + NumberOfBlocks - 1) > PeiBotDev->Media2.LastBlock) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -542,6 +571,168 @@ BotReadBlocks (
 }
 
 /**
+  Gets the count of block I/O devices that one specific block driver detects.
+
+  This function is used for getting the count of block I/O devices that one
+  specific block driver detects.  To the PEI ATAPI driver, it returns the number
+  of all the detected ATAPI devices it detects during the enumeration process.
+  To the PEI legacy floppy driver, it returns the number of all the legacy
+  devices it finds during its enumeration process. If no device is detected,
+  then the function will return zero.
+
+  @param[in]  PeiServices          General-purpose services that are available
+                                   to every PEIM.
+  @param[in]  This                 Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI
+                                   instance.
+  @param[out] NumberBlockDevices   The number of block I/O devices discovered.
+
+  @retval     EFI_SUCCESS          Operation performed successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+BotGetNumberOfBlockDevices2 (
+  IN  EFI_PEI_SERVICES                         **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI           *This,
+  OUT UINTN                                    *NumberBlockDevices
+  )
+{
+  //
+  // For Usb devices, this value should be always 1
+  //
+  *NumberBlockDevices = 1;
+  return EFI_SUCCESS;
+}
+
+/**
+  Gets a block device's media information.
+
+  This function will provide the caller with the specified block device's media
+  information. If the media changes, calling this function will update the media
+  information accordingly.
+
+  @param[in]  PeiServices   General-purpose services that are available to every
+                            PEIM
+  @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI instance.
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants
+                            to talk. Because the driver that implements Block I/O
+                            PPIs will manage multiple block devices, the PPIs that
+                            want to talk to a single device must specify the
+                            device index that was assigned during the enumeration
+                            process. This index is a number from one to
+                            NumberBlockDevices.
+  @param[out] MediaInfo     The media information of the specified block media.
+                            The caller is responsible for the ownership of this
+                            data structure.
+
+  @retval EFI_SUCCESS        Media information about the specified block device
+                             was obtained successfully.
+  @retval EFI_DEVICE_ERROR   Cannot get the media information due to a hardware
+                             error.
+
+**/
+EFI_STATUS
+EFIAPI
+BotGetMediaInfo2 (
+  IN  EFI_PEI_SERVICES                          **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI            *This,
+  IN  UINTN                                     DeviceIndex,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA                   *MediaInfo
+  )
+{
+  PEI_BOT_DEVICE  *PeiBotDev;
+  EFI_STATUS      Status;
+
+  PeiBotDev = PEI_BOT_DEVICE2_FROM_THIS (This);
+
+  Status = BotGetMediaInfo (
+             PeiServices,
+             &PeiBotDev->BlkIoPpi,
+             DeviceIndex,
+             &PeiBotDev->Media
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  CopyMem (
+    MediaInfo,
+    &(PeiBotDev->Media2),
+    sizeof (EFI_PEI_BLOCK_IO2_MEDIA)
+    );
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Reads the requested number of blocks from the specified block device.
+
+  The function reads the requested number of blocks from the device. All the
+  blocks are read, or an error is returned. If there is no media in the device,
+  the function returns EFI_NO_MEDIA.
+
+  @param[in]  PeiServices   General-purpose services that are available to
+                            every PEIM.
+  @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI instance.
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants
+                            to talk. Because the driver that implements Block I/O
+                            PPIs will manage multiple block devices, the PPIs that
+                            want to talk to a single device must specify the device
+                            index that was assigned during the enumeration process.
+                            This index is a number from one to NumberBlockDevices.
+  @param[in]  StartLBA      The starting logical block address (LBA) to read from
+                            on the device
+  @param[in]  BufferSize    The size of the Buffer in bytes. This number must be
+                            a multiple of the intrinsic block size of the device.
+  @param[out] Buffer        A pointer to the destination buffer for the data.
+                            The caller is responsible for the ownership of the
+                            buffer.
+
+  @retval EFI_SUCCESS             The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting
+                                  to perform the read operation.
+  @retval EFI_INVALID_PARAMETER   The read request contains LBAs that are not
+                                  valid, or the buffer is not properly aligned.
+  @retval EFI_NO_MEDIA            There is no media in the device.
+  @retval EFI_BAD_BUFFER_SIZE     The BufferSize parameter is not a multiple of
+                                  the intrinsic block size of the device.
+
+**/
+EFI_STATUS
+EFIAPI
+BotReadBlocks2 (
+  IN  EFI_PEI_SERVICES                          **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI            *This,
+  IN  UINTN                                     DeviceIndex,
+  IN  EFI_PEI_LBA                               StartLBA,
+  IN  UINTN                                     BufferSize,
+  OUT VOID                                      *Buffer
+  )
+{
+  PEI_BOT_DEVICE  *PeiBotDev;
+  EFI_STATUS      Status;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status    = EFI_SUCCESS;
+  PeiBotDev = PEI_BOT_DEVICE2_FROM_THIS (This);
+
+  Status = BotReadBlocks (
+             PeiServices,
+             &PeiBotDev->BlkIoPpi,
+             DeviceIndex,
+             StartLBA,
+             BufferSize,
+             Buffer
+             );
+
+  return Status;
+}
+
+/**
   Detect whether the removable media is present and whether it has changed.
 
   @param[in]  PeiServices   General-purpose services that are available to every
@@ -554,17 +745,17 @@ BotReadBlocks (
 **/
 EFI_STATUS
 PeiBotDetectMedia (
-  IN  EFI_PEI_SERVICES                          **PeiServices,
-  IN  PEI_BOT_DEVICE                            *PeiBotDev
+  IN  EFI_PEI_SERVICES        **PeiServices,
+  IN  PEI_BOT_DEVICE          *PeiBotDev
   )
 {
-  EFI_STATUS            Status;
-  EFI_STATUS            FloppyStatus;
-  UINTN                 SenseCounts;
-  BOOLEAN               NeedReadCapacity;
-  EFI_PHYSICAL_ADDRESS  AllocateAddress;
+  EFI_STATUS                  Status;
+  EFI_STATUS                  FloppyStatus;
+  UINTN                       SenseCounts;
+  BOOLEAN                     NeedReadCapacity;
+  EFI_PHYSICAL_ADDRESS        AllocateAddress;
   ATAPI_REQUEST_SENSE_DATA    *SensePtr;
-  UINTN                 Retry;
+  UINTN                       Retry;
 
   //
   // if there is no media present,or media not changed,
@@ -601,12 +792,15 @@ PeiBotDetectMedia (
       NeedReadCapacity              = FALSE;
       PeiBotDev->Media.MediaPresent = FALSE;
       PeiBotDev->Media.LastBlock    = 0;
+      PeiBotDev->Media2.MediaPresent = FALSE;
+      PeiBotDev->Media2.LastBlock    = 0;
     } else {
       //
       // Media Changed
       //
       if (IsMediaChange (SensePtr, SenseCounts)) {
-        PeiBotDev->Media.MediaPresent = TRUE;
+        PeiBotDev->Media.MediaPresent  = TRUE;
+        PeiBotDev->Media2.MediaPresent = TRUE;
       }
       //
       // Media Error
@@ -617,6 +811,8 @@ PeiBotDetectMedia (
         //
         PeiBotDev->Media.MediaPresent = FALSE;
         PeiBotDev->Media.LastBlock    = 0;
+        PeiBotDev->Media2.MediaPresent = FALSE;
+        PeiBotDev->Media2.LastBlock    = 0;
       }
 
     }
@@ -647,7 +843,7 @@ PeiBotDetectMedia (
           // retry the ReadCapacity command
           //
           PeiBotDev->DeviceType = USBFLOPPY;
-            Status = EFI_DEVICE_ERROR;
+          Status = EFI_DEVICE_ERROR;
         }
         break;
 
@@ -694,6 +890,8 @@ PeiBotDetectMedia (
       if (IsNoMedia (SensePtr, SenseCounts)) {
         PeiBotDev->Media.MediaPresent = FALSE;
         PeiBotDev->Media.LastBlock    = 0;
+        PeiBotDev->Media2.MediaPresent = FALSE;
+        PeiBotDev->Media2.LastBlock    = 0;
         break;
       }
 
@@ -703,6 +901,8 @@ PeiBotDetectMedia (
         //
         PeiBotDev->Media.MediaPresent = FALSE;
         PeiBotDev->Media.LastBlock    = 0;
+        PeiBotDev->Media2.MediaPresent = FALSE;
+        PeiBotDev->Media2.LastBlock    = 0;
         break;
       }
     }
