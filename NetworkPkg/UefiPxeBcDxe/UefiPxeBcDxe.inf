@@ -100,7 +100,7 @@
   gEfiAdapterInformationProtocolGuid                   ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiAdapterInfoUndiIpv6SupportGuid                   ## SOMETIMES_CONSUMES
+  gEfiAdapterInfoUndiIpv6SupportGuid                   ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize      ## SOMETIMES_CONSUMES
