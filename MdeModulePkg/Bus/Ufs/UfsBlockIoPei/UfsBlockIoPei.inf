@@ -51,6 +51,7 @@
 
 [Ppis]
   gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
+  gEfiPeiVirtualBlockIo2PpiGuid                 ## PRODUCES
   gEdkiiPeiUfsHostControllerPpiGuid             ## CONSUMES
 
 [Depex]

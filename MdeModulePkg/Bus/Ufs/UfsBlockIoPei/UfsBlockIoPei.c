@@ -25,59 +25,86 @@ UFS_PEIM_HC_PRIVATE_DATA   gUfsHcPeimTemplate = {
     UfsBlockIoPeimGetMediaInfo,
     UfsBlockIoPeimReadBlocks
   },
+  {                               // BlkIo2Ppi
+    EFI_PEI_RECOVERY_BLOCK_IO2_PPI_REVISION,
+    UfsBlockIoPeimGetDeviceNo2,
+    UfsBlockIoPeimGetMediaInfo2,
+    UfsBlockIoPeimReadBlocks2
+  },
   {                               // BlkIoPpiList
-    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiPeiVirtualBlockIoPpiGuid,
+    NULL
+  },
+  {                               // BlkIo2PpiList
+    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    &gEfiPeiVirtualBlockIo2PpiGuid,
     NULL
   },
   {                               // Media
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     },
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     },
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     },
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     },
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     },
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     },
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     },
     {
-      UfsDevice,
+      MSG_UFS_DP,
+      FALSE,
       TRUE,
-      0,
-      0x1000
+      FALSE,
+      0x1000,
+      0
     }
   },
   0,                              // UfsHcBase
@@ -505,7 +532,7 @@ UfsPeimRead16 (
 **/
 EFI_STATUS
 UfsPeimParsingSenseKeys (
-  IN     EFI_PEI_BLOCK_IO_MEDIA    *Media,
+  IN     EFI_PEI_BLOCK_IO2_MEDIA   *Media,
   IN     EFI_SCSI_SENSE_DATA       *SenseData,
      OUT BOOLEAN                   *NeedRetry
   )
@@ -710,16 +737,18 @@ UfsBlockIoPeimGetMediaInfo (
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-    MediaInfo->LastBlock  = (Capacity16.LastLba3 << 24) | (Capacity16.LastLba2 << 16) | (Capacity16.LastLba1 << 8) | Capacity16.LastLba0;
-    MediaInfo->LastBlock |= ((UINT64)Capacity16.LastLba7 << 56) | ((UINT64)Capacity16.LastLba6 << 48) | ((UINT64)Capacity16.LastLba5 << 40) | ((UINT64)Capacity16.LastLba4 << 32);
-    MediaInfo->BlockSize  = (Capacity16.BlockSize3 << 24) | (Capacity16.BlockSize2 << 16) | (Capacity16.BlockSize1 << 8) | Capacity16.BlockSize0;
+    Private->Media[DeviceIndex].LastBlock  = (Capacity16.LastLba3 << 24) | (Capacity16.LastLba2 << 16) | (Capacity16.LastLba1 << 8) | Capacity16.LastLba0;
+    Private->Media[DeviceIndex].LastBlock |= ((UINT64)Capacity16.LastLba7 << 56) | ((UINT64)Capacity16.LastLba6 << 48) | ((UINT64)Capacity16.LastLba5 << 40) | ((UINT64)Capacity16.LastLba4 << 32);
+    Private->Media[DeviceIndex].BlockSize  = (Capacity16.BlockSize3 << 24) | (Capacity16.BlockSize2 << 16) | (Capacity16.BlockSize1 << 8) | Capacity16.BlockSize0;
   } else {
-    MediaInfo->LastBlock  = (Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
-    MediaInfo->BlockSize  = (Capacity.BlockSize3 << 24) | (Capacity.BlockSize2 << 16) | (Capacity.BlockSize1 << 8) | Capacity.BlockSize0;
+    Private->Media[DeviceIndex].LastBlock  = (Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
+    Private->Media[DeviceIndex].BlockSize  = (Capacity.BlockSize3 << 24) | (Capacity.BlockSize2 << 16) | (Capacity.BlockSize1 << 8) | Capacity.BlockSize0;
   }
 
   MediaInfo->DeviceType   = UfsDevice;
-  MediaInfo->MediaPresent = TRUE;
+  MediaInfo->MediaPresent = Private->Media[DeviceIndex].MediaPresent;
+  MediaInfo->LastBlock    = (UINTN)Private->Media[DeviceIndex].LastBlock;
+  MediaInfo->BlockSize    = Private->Media[DeviceIndex].BlockSize;
 
   return EFI_SUCCESS;
 }
@@ -838,7 +867,7 @@ UfsBlockIoPeimReadBlocks (
   } while (NeedRetry);
 
   SenseDataLength = 0;
-  if (Private->Media[DeviceIndex].LastBlock != ~((UINTN)0)) {
+  if (Private->Media[DeviceIndex].LastBlock < 0xfffffffful) {
     Status = UfsPeimRead10 (
                Private,
                DeviceIndex,
@@ -861,6 +890,174 @@ UfsBlockIoPeimReadBlocks (
                &SenseDataLength
                );
   }
+  return Status;
+}
+
+/**
+  Gets the count of block I/O devices that one specific block driver detects.
+
+  This function is used for getting the count of block I/O devices that one 
+  specific block driver detects.  To the PEI ATAPI driver, it returns the number
+  of all the detected ATAPI devices it detects during the enumeration process. 
+  To the PEI legacy floppy driver, it returns the number of all the legacy 
+  devices it finds during its enumeration process. If no device is detected, 
+  then the function will return zero.  
+  
+  @param[in]  PeiServices          General-purpose services that are available 
+                                   to every PEIM.
+  @param[in]  This                 Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI 
+                                   instance.
+  @param[out] NumberBlockDevices   The number of block I/O devices discovered.
+
+  @retval     EFI_SUCCESS          The operation performed successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+UfsBlockIoPeimGetDeviceNo2 (
+  IN  EFI_PEI_SERVICES               **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
+  OUT UINTN                          *NumberBlockDevices
+  )
+{
+  //
+  // For Ufs device, it has up to 8 normal Luns plus some well-known Luns.
+  // At PEI phase, we will only expose normal Luns to user.
+  // For those disabled Lun, when user try to access it, the operation would fail.
+  //
+  *NumberBlockDevices = UFS_PEIM_MAX_LUNS;
+  return EFI_SUCCESS;
+}
+
+/**
+  Gets a block device's media information.
+
+  This function will provide the caller with the specified block device's media 
+  information. If the media changes, calling this function will update the media 
+  information accordingly.
+
+  @param[in]  PeiServices   General-purpose services that are available to every
+                            PEIM
+  @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI instance.
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants 
+                            to talk. Because the driver that implements Block I/O 
+                            PPIs will manage multiple block devices, the PPIs that 
+                            want to talk to a single device must specify the 
+                            device index that was assigned during the enumeration
+                            process. This index is a number from one to 
+                            NumberBlockDevices.
+  @param[out] MediaInfo     The media information of the specified block media.  
+                            The caller is responsible for the ownership of this 
+                            data structure.
+
+  @par Note: 
+      The MediaInfo structure describes an enumeration of possible block device 
+      types.  This enumeration exists because no device paths are actually passed 
+      across interfaces that describe the type or class of hardware that is publishing 
+      the block I/O interface. This enumeration will allow for policy decisions
+      in the Recovery PEIM, such as "Try to recover from legacy floppy first, 
+      LS-120 second, CD-ROM third." If there are multiple partitions abstracted 
+      by a given device type, they should be reported in ascending order; this 
+      order also applies to nested partitions, such as legacy MBR, where the 
+      outermost partitions would have precedence in the reporting order. The 
+      same logic applies to systems such as IDE that have precedence relationships 
+      like "Master/Slave" or "Primary/Secondary". The master device should be 
+      reported first, the slave second.
+  
+  @retval EFI_SUCCESS        Media information about the specified block device 
+                             was obtained successfully.
+  @retval EFI_DEVICE_ERROR   Cannot get the media information due to a hardware 
+                             error.
+
+**/
+EFI_STATUS
+EFIAPI
+UfsBlockIoPeimGetMediaInfo2 (
+  IN  EFI_PEI_SERVICES               **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
+  IN  UINTN                          DeviceIndex,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA        *MediaInfo
+  )
+{
+  EFI_STATUS                         Status;
+  UFS_PEIM_HC_PRIVATE_DATA           *Private;
+  EFI_PEI_BLOCK_IO_MEDIA             Media;
+
+  Private   = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
+  
+  Status    = UfsBlockIoPeimGetMediaInfo (
+                PeiServices,
+                &Private->BlkIoPpi,
+                DeviceIndex,
+                &Media
+                );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  CopyMem (MediaInfo, &(Private->Media[DeviceIndex]), sizeof (EFI_PEI_BLOCK_IO2_MEDIA));
+  return EFI_SUCCESS;
+}
+
+/**
+  Reads the requested number of blocks from the specified block device.
+
+  The function reads the requested number of blocks from the device. All the 
+  blocks are read, or an error is returned. If there is no media in the device,
+  the function returns EFI_NO_MEDIA.
+
+  @param[in]  PeiServices   General-purpose services that are available to 
+                            every PEIM.
+  @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO2_PPI instance.
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants 
+                            to talk. Because the driver that implements Block I/O 
+                            PPIs will manage multiple block devices, PPIs that 
+                            want to talk to a single device must specify the device 
+                            index that was assigned during the enumeration process. 
+                            This index is a number from one to NumberBlockDevices.
+  @param[in]  StartLBA      The starting logical block address (LBA) to read from
+                            on the device
+  @param[in]  BufferSize    The size of the Buffer in bytes. This number must be
+                            a multiple of the intrinsic block size of the device.
+  @param[out] Buffer        A pointer to the destination buffer for the data.
+                            The caller is responsible for the ownership of the 
+                            buffer.
+                         
+  @retval EFI_SUCCESS             The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting 
+                                  to perform the read operation.
+  @retval EFI_INVALID_PARAMETER   The read request contains LBAs that are not 
+                                  valid, or the buffer is not properly aligned.
+  @retval EFI_NO_MEDIA            There is no media in the device.
+  @retval EFI_BAD_BUFFER_SIZE     The BufferSize parameter is not a multiple of
+                                  the intrinsic block size of the device.
+
+**/
+EFI_STATUS
+EFIAPI
+UfsBlockIoPeimReadBlocks2 (
+  IN  EFI_PEI_SERVICES               **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
+  IN  UINTN                          DeviceIndex,
+  IN  EFI_PEI_LBA                    StartLBA,
+  IN  UINTN                          BufferSize,
+  OUT VOID                           *Buffer
+  )
+{
+  EFI_STATUS                         Status;
+  UFS_PEIM_HC_PRIVATE_DATA           *Private; 
+
+  Status    = EFI_SUCCESS;
+  Private   = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
+
+  Status  = UfsBlockIoPeimReadBlocks (
+              PeiServices,
+              &Private->BlkIoPpi,
+              DeviceIndex,
+              StartLBA,
+              BufferSize,
+              Buffer
+              );
   return Status;
 }
 
@@ -926,8 +1123,9 @@ InitializeUfsBlockIoPeim (
       break;
     }
 
-    Private->BlkIoPpiList.Ppi = &Private->BlkIoPpi;
-    Private->UfsHcBase        = MmioBase;
+    Private->BlkIoPpiList.Ppi  = &Private->BlkIoPpi;
+    Private->BlkIo2PpiList.Ppi = &Private->BlkIo2Ppi;
+    Private->UfsHcBase         = MmioBase;
 
     //
     // Initialize the memory pool which will be used in all transactions.
