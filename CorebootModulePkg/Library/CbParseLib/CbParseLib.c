@@ -306,11 +306,11 @@ CbParseCbMemTable (
 **/
 RETURN_STATUS
 CbParseAcpiTable (
-  IN VOID*      pMemTable,
-  IN UINT32*    pMemTableSize
+  IN VOID       **pMemTable,
+  IN UINT32     *pMemTableSize
   )
 {
-  return CbParseCbMemTable (SIGNATURE_32 ('I', 'P', 'C', 'A'), (VOID **)pMemTable, pMemTableSize);
+  return CbParseCbMemTable (SIGNATURE_32 ('I', 'P', 'C', 'A'), pMemTable, pMemTableSize);
 }
 
 /**
