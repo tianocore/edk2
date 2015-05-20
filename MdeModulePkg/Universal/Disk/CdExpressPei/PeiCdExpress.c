@@ -1,7 +1,7 @@
 /** @file
   Source file for CD recovery PEIM
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -60,7 +60,8 @@ CdExpressPeimEntry (
   }
 
   PrivateData->CapsuleCount = 0;
-  Status                    = UpdateBlocksAndVolumes (PrivateData);
+  Status = UpdateBlocksAndVolumes (PrivateData, TRUE);
+  Status = UpdateBlocksAndVolumes (PrivateData, FALSE);
 
   //
   // Installs Ppi
@@ -69,9 +70,9 @@ CdExpressPeimEntry (
   PrivateData->DeviceRecoveryPpi.GetRecoveryCapsuleInfo     = GetRecoveryCapsuleInfo;
   PrivateData->DeviceRecoveryPpi.LoadRecoveryCapsule        = LoadRecoveryCapsule;
 
-  PrivateData->PpiDescriptor.Flags                          = (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
-  PrivateData->PpiDescriptor.Guid = &gEfiPeiDeviceRecoveryModulePpiGuid;
-  PrivateData->PpiDescriptor.Ppi = &PrivateData->DeviceRecoveryPpi;
+  PrivateData->PpiDescriptor.Flags = (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
+  PrivateData->PpiDescriptor.Guid  = &gEfiPeiDeviceRecoveryModulePpiGuid;
+  PrivateData->PpiDescriptor.Ppi   = &PrivateData->DeviceRecoveryPpi;
 
   Status = PeiServicesInstallPpi (&PrivateData->PpiDescriptor);
   if (EFI_ERROR (Status)) {
@@ -87,11 +88,19 @@ CdExpressPeimEntry (
   //
   PrivateData->NotifyDescriptor.Flags =
     (
-      EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK |
-      EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST
+      EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK
     );
   PrivateData->NotifyDescriptor.Guid    = &gEfiPeiVirtualBlockIoPpiGuid;
   PrivateData->NotifyDescriptor.Notify  = BlockIoNotifyEntry;
+
+  PrivateData->NotifyDescriptor2.Flags =
+    (
+      EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK |
+      EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST
+    );
+  PrivateData->NotifyDescriptor2.Guid    = &gEfiPeiVirtualBlockIo2PpiGuid;
+  PrivateData->NotifyDescriptor2.Notify  = BlockIoNotifyEntry;
+
   return PeiServicesNotifyPpi (&PrivateData->NotifyDescriptor);
 
 }
@@ -117,7 +126,11 @@ BlockIoNotifyEntry (
   IN VOID                       *Ppi
   )
 {
-  UpdateBlocksAndVolumes (mPrivateData);
+  if (CompareGuid (NotifyDescriptor->Guid, &gEfiPeiVirtualBlockIo2PpiGuid)) {
+    UpdateBlocksAndVolumes (mPrivateData, TRUE);
+  } else {
+    UpdateBlocksAndVolumes (mPrivateData, FALSE);
+  }
 
   return EFI_SUCCESS;
 }
@@ -126,22 +139,26 @@ BlockIoNotifyEntry (
   Finds out all the current Block IO PPIs in the system and add them into private data.
 
   @param PrivateData                    The private data structure that contains recovery module information.
+  @param BlockIo2                       Boolean to show whether using BlockIo2 or BlockIo.
 
   @retval EFI_SUCCESS                   The blocks and volumes are updated successfully.
 
 **/
 EFI_STATUS
 UpdateBlocksAndVolumes (
-  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA     *PrivateData
+  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA     *PrivateData,
+  IN     BOOLEAN                         BlockIo2
   )
 {
   EFI_STATUS                      Status;
   EFI_PEI_PPI_DESCRIPTOR          *TempPpiDescriptor;
   UINTN                           BlockIoPpiInstance;
   EFI_PEI_RECOVERY_BLOCK_IO_PPI   *BlockIoPpi;
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *BlockIo2Ppi;
   UINTN                           NumberBlockDevices;
   UINTN                           IndexBlockDevice;
   EFI_PEI_BLOCK_IO_MEDIA          Media;
+  EFI_PEI_BLOCK_IO2_MEDIA         Media2;
   EFI_PEI_SERVICES                **PeiServices;
 
   IndexBlockDevice = 0;
@@ -150,12 +167,21 @@ UpdateBlocksAndVolumes (
   // Assuming all device Block Io Peims are dispatched already
   //
   for (BlockIoPpiInstance = 0; BlockIoPpiInstance < PEI_CD_EXPRESS_MAX_BLOCK_IO_PPI; BlockIoPpiInstance++) {
-    Status = PeiServicesLocatePpi (
-                              &gEfiPeiVirtualBlockIoPpiGuid,
-                              BlockIoPpiInstance,
-                              &TempPpiDescriptor,
-                              (VOID **) &BlockIoPpi
-                              );
+    if (BlockIo2) {
+      Status = PeiServicesLocatePpi (
+                                &gEfiPeiVirtualBlockIo2PpiGuid,
+                                BlockIoPpiInstance,
+                                &TempPpiDescriptor,
+                                (VOID **) &BlockIo2Ppi
+                                );
+    } else {
+      Status = PeiServicesLocatePpi (
+                                &gEfiPeiVirtualBlockIoPpiGuid,
+                                BlockIoPpiInstance,
+                                &TempPpiDescriptor,
+                                (VOID **) &BlockIoPpi
+                                );
+    }
     if (EFI_ERROR (Status)) {
       //
       // Done with all Block Io Ppis
@@ -164,11 +190,19 @@ UpdateBlocksAndVolumes (
     }
 
     PeiServices = (EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
-    Status = BlockIoPpi->GetNumberOfBlockDevices (
-                          PeiServices,
-                          BlockIoPpi,
-                          &NumberBlockDevices
-                          );
+    if (BlockIo2) {
+      Status = BlockIo2Ppi->GetNumberOfBlockDevices (
+                              PeiServices,
+                              BlockIo2Ppi,
+                              &NumberBlockDevices
+                              );
+    } else {
+      Status = BlockIoPpi->GetNumberOfBlockDevices (
+                            PeiServices,
+                            BlockIoPpi,
+                            &NumberBlockDevices
+                            );
+    }
     if (EFI_ERROR (Status) || (NumberBlockDevices == 0)) {
       continue;
     }
@@ -176,28 +210,51 @@ UpdateBlocksAndVolumes (
     // Just retrieve the first block, should emulate all blocks.
     //
     for (IndexBlockDevice = 1; IndexBlockDevice <= NumberBlockDevices && PrivateData->CapsuleCount < PEI_CD_EXPRESS_MAX_CAPSULE_NUMBER; IndexBlockDevice ++) {
-      Status = BlockIoPpi->GetBlockDeviceMediaInfo (
-                            PeiServices,
-                            BlockIoPpi,
-                            IndexBlockDevice,
-                            &Media
-                            );
-      if (EFI_ERROR (Status) ||
-          !Media.MediaPresent ||
-           ((Media.DeviceType != IdeCDROM) && (Media.DeviceType != UsbMassStorage)) ||
-          (Media.BlockSize != PEI_CD_BLOCK_SIZE)
-          ) {
-        continue;
+      if (BlockIo2) {
+        Status = BlockIo2Ppi->GetBlockDeviceMediaInfo (
+                                PeiServices,
+                                BlockIo2Ppi,
+                                IndexBlockDevice,
+                                &Media2
+                                );
+        if (EFI_ERROR (Status) ||
+            !Media2.MediaPresent ||
+             ((Media2.InterfaceType != MSG_ATAPI_DP) && (Media2.InterfaceType != MSG_USB_DP)) ||
+            (Media2.BlockSize != PEI_CD_BLOCK_SIZE)
+            ) {
+          continue;
+        }
+        DEBUG ((EFI_D_INFO, "PeiCdExpress InterfaceType is %d\n", Media2.InterfaceType));
+        DEBUG ((EFI_D_INFO, "PeiCdExpress MediaPresent is %d\n", Media2.MediaPresent));
+        DEBUG ((EFI_D_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media2.BlockSize));
+      } else {
+        Status = BlockIoPpi->GetBlockDeviceMediaInfo (
+                              PeiServices,
+                              BlockIoPpi,
+                              IndexBlockDevice,
+                              &Media
+                              );
+        if (EFI_ERROR (Status) ||
+            !Media.MediaPresent ||
+             ((Media.DeviceType != IdeCDROM) && (Media.DeviceType != UsbMassStorage)) ||
+            (Media.BlockSize != PEI_CD_BLOCK_SIZE)
+            ) {
+          continue;
+        }
+        DEBUG ((EFI_D_INFO, "PeiCdExpress DeviceType is %d\n", Media.DeviceType));
+        DEBUG ((EFI_D_INFO, "PeiCdExpress MediaPresent is %d\n", Media.MediaPresent));
+        DEBUG ((EFI_D_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media.BlockSize));
       }
 
-      DEBUG ((EFI_D_INFO, "PeiCdExpress DeviceType is   %d\n", Media.DeviceType));
-      DEBUG ((EFI_D_INFO, "PeiCdExpress MediaPresent is %d\n", Media.MediaPresent));
-      DEBUG ((EFI_D_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media.BlockSize));
       DEBUG ((EFI_D_INFO, "PeiCdExpress Status is %d\n", Status));
 
       DEBUG ((EFI_D_INFO, "IndexBlockDevice is %d\n", IndexBlockDevice));
-      PrivateData->CapsuleData[PrivateData->CapsuleCount].IndexBlock = IndexBlockDevice;  
-      PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo    = BlockIoPpi;
+      PrivateData->CapsuleData[PrivateData->CapsuleCount].IndexBlock = IndexBlockDevice;
+      if (BlockIo2) {
+        PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo2 = BlockIo2Ppi;
+      } else {
+        PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo  = BlockIoPpi;
+      }
       Status = FindRecoveryCapsules (PrivateData);
       DEBUG ((EFI_D_INFO, "Status is %d\n", Status));
 
@@ -231,6 +288,7 @@ FindRecoveryCapsules (
   EFI_STATUS                      Status;
   UINTN                           Lba;
   EFI_PEI_RECOVERY_BLOCK_IO_PPI   *BlockIoPpi;
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *BlockIo2Ppi;
   UINTN                           BufferSize;
   UINT8                           *Buffer;
   UINT8                           Type;
@@ -251,6 +309,7 @@ FindRecoveryCapsules (
   //
   IndexBlockDevice = PrivateData->CapsuleData[PrivateData->CapsuleCount].IndexBlock;
   BlockIoPpi       = PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo;
+  BlockIo2Ppi      = PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo2;
 
   VolumeSpaceSize = 0;
   StartOfVolume   = TRUE;
@@ -258,14 +317,25 @@ FindRecoveryCapsules (
 
   while (TRUE) {
     SetMem (Buffer, BufferSize, 0);
-    Status = BlockIoPpi->ReadBlocks (
-                          (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
-                          BlockIoPpi,
-                          IndexBlockDevice,
-                          Lba,
-                          BufferSize,
-                          Buffer
-                          );
+    if (BlockIo2Ppi != NULL) {
+      Status = BlockIo2Ppi->ReadBlocks (
+                            (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
+                            BlockIo2Ppi,
+                            IndexBlockDevice,
+                            Lba,
+                            BufferSize,
+                            Buffer
+                            );
+    } else {
+      Status = BlockIoPpi->ReadBlocks (
+                            (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
+                            BlockIoPpi,
+                            IndexBlockDevice,
+                            Lba,
+                            BufferSize,
+                            Buffer
+                            );
+    }
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -302,7 +372,7 @@ FindRecoveryCapsules (
     RoorDirRecord   = (PEI_CD_EXPRESS_DIR_FILE_RECORD *) (Buffer + PEI_CD_EXPRESS_ROOT_DIR_RECORD_OFFSET);
     RootDirLBA      = RoorDirRecord->LocationOfExtent[0];
 
-    Status          = RetrieveCapsuleFileFromRoot (PrivateData, BlockIoPpi, IndexBlockDevice, RootDirLBA);
+    Status          = RetrieveCapsuleFileFromRoot (PrivateData, BlockIoPpi, BlockIo2Ppi, IndexBlockDevice, RootDirLBA);
     if (!EFI_ERROR (Status)) {
       //
       // Just look for the first primary descriptor
@@ -321,6 +391,7 @@ FindRecoveryCapsules (
 
   @param PrivateData                    The private data structure that contains recovery module information.
   @param BlockIoPpi                     The Block IO PPI used to access the volume.
+  @param BlockIo2Ppi                    The Block IO 2 PPI used to access the volume.
   @param IndexBlockDevice               The index of current block device.
   @param Lba                            The starting logic block address to retrieve capsule.
 
@@ -334,6 +405,7 @@ EFIAPI
 RetrieveCapsuleFileFromRoot (
   IN OUT PEI_CD_EXPRESS_PRIVATE_DATA        *PrivateData,
   IN EFI_PEI_RECOVERY_BLOCK_IO_PPI          *BlockIoPpi,
+  IN EFI_PEI_RECOVERY_BLOCK_IO2_PPI         *BlockIo2Ppi,
   IN UINTN                                  IndexBlockDevice,
   IN UINT32                                 Lba
   )
@@ -349,14 +421,25 @@ RetrieveCapsuleFileFromRoot (
 
   SetMem (Buffer, BufferSize, 0);
 
-  Status = BlockIoPpi->ReadBlocks (
-                        (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
-                        BlockIoPpi,
-                        IndexBlockDevice,
-                        Lba,
-                        BufferSize,
-                        Buffer
-                        );
+  if (BlockIo2Ppi != NULL) {
+    Status = BlockIo2Ppi->ReadBlocks (
+                          (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
+                          BlockIo2Ppi,
+                          IndexBlockDevice,
+                          Lba,
+                          BufferSize,
+                          Buffer
+                          );
+  } else {
+    Status = BlockIoPpi->ReadBlocks (
+                          (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
+                          BlockIoPpi,
+                          IndexBlockDevice,
+                          Lba,
+                          BufferSize,
+                          Buffer
+                          );
+  }
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -440,7 +523,8 @@ GetNumberRecoveryCapsules (
   PEI_CD_EXPRESS_PRIVATE_DATA *PrivateData;
 
   PrivateData = PEI_CD_EXPRESS_PRIVATE_DATA_FROM_THIS (This);
-  UpdateBlocksAndVolumes (PrivateData);
+  UpdateBlocksAndVolumes (PrivateData, TRUE);
+  UpdateBlocksAndVolumes (PrivateData, FALSE);
   *NumberRecoveryCapsules = PrivateData->CapsuleCount;
 
   if (*NumberRecoveryCapsules == 0) {
@@ -546,6 +630,7 @@ LoadRecoveryCapsule (
   EFI_STATUS                      Status;
   PEI_CD_EXPRESS_PRIVATE_DATA     *PrivateData;
   EFI_PEI_RECOVERY_BLOCK_IO_PPI   *BlockIoPpi;
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *BlockIo2Ppi;
   UINTN                           NumberRecoveryCapsules;
 
   Status = GetNumberRecoveryCapsules (PeiServices, This, &NumberRecoveryCapsules);
@@ -564,15 +649,27 @@ LoadRecoveryCapsule (
 
   PrivateData = PEI_CD_EXPRESS_PRIVATE_DATA_FROM_THIS (This);
   BlockIoPpi  = PrivateData->CapsuleData[CapsuleInstance - 1].BlockIo;
+  BlockIo2Ppi = PrivateData->CapsuleData[CapsuleInstance - 1].BlockIo2;
 
-  Status = BlockIoPpi->ReadBlocks (
-                        PeiServices,
-                        BlockIoPpi,
-                        PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
-                        PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,
-                        PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleSize,
-                        Buffer
-                        );
+  if (BlockIo2Ppi != NULL) {
+    Status = BlockIo2Ppi->ReadBlocks (
+                          PeiServices,
+                          BlockIo2Ppi,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleSize,
+                          Buffer
+                          );
+  } else {
+    Status = BlockIoPpi->ReadBlocks (
+                          PeiServices,
+                          BlockIoPpi,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleSize,
+                          Buffer
+                          );
+  }
   return Status;
 }
 
