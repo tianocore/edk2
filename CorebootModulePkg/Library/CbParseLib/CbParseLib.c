@@ -24,13 +24,34 @@
 
 #include "Coreboot.h"
 
-/* Helpful inlines */
 
-static UINT64 cb_unpack64(struct cbuint64 val)
+/**
+  Convert a packed value from cbuint64 to a UINT64 value.
+
+  @param  val      The pointer to packed data.
+
+  @return          the UNIT64 value after convertion.
+
+**/
+UINT64 
+cb_unpack64 (
+  IN struct cbuint64 val
+  )
 {
   return LShiftU64 (val.hi, 32) | val.lo;
 }
 
+
+/**
+  Returns the sum of all elements in a buffer of 16-bit values.  During
+  calculation, the carry bits are also been added.
+
+  @param  Buffer      The pointer to the buffer to carry out the sum operation.
+  @param  Length      The size, in bytes, of Buffer.
+
+  @return Sum         The sum of Buffer with carry bits included during additions.
+
+**/
 UINT16
 CbCheckSum16 (
   IN UINT16   *Buffer,
@@ -60,9 +81,21 @@ CbCheckSum16 (
   return (UINT16)((~Sum) & 0xFFFF);
 }
 
+
+/**
+  Find coreboot record with given Tag from the memory Start in 4096
+  bytes range.
+
+  @param  Start              The start memory to be searched in
+  @param  Tag                The tag id to be found
+
+  @retval NULL              The Tag is not found.
+  @retval Others            The poiter to the record found.
+
+**/
 VOID *
 FindCbTag (
-  IN  VOID    *Start,
+  IN  VOID     *Start,
   IN  UINT32   Tag
   )
 {
@@ -76,17 +109,19 @@ FindCbTag (
   Header = NULL;
   TmpPtr = (UINT8 *)Start;
   for (Idx = 0; Idx < 4096; Idx += 16, TmpPtr += 16) {
-    Header = (struct cb_header   *)TmpPtr;
+    Header = (struct cb_header *)TmpPtr;
     if (Header->signature == CB_HEADER_SIGNATURE) {
       break;
     }
   }
 
-  if (Idx >= 4096)
+  if (Idx >= 4096) {
     return NULL;
+  }
 
-  if (Header == NULL || !Header->table_bytes)
+  if ((Header == NULL) || (Header->table_bytes == 0)) {
     return NULL;
+  }
 
   //
   // Check the checksum of the coreboot table header
@@ -109,10 +144,11 @@ FindCbTag (
     Record = (struct cb_record *)TmpPtr;
     if (Record->tag == CB_TAG_FORWARD) {
       TmpPtr = (VOID *)(UINTN)((struct cb_forward *)(UINTN)Record)->forward;
-      if (Tag == CB_TAG_FORWARD)
+      if (Tag == CB_TAG_FORWARD) {
         return TmpPtr;
-      else
+      } else {
         return FindCbTag (TmpPtr, Tag);
+      }
     }
     if (Record->tag == Tag) {
       TagPtr = TmpPtr;
@@ -124,6 +160,20 @@ FindCbTag (
   return TagPtr;
 }
 
+
+/**
+  Find the given table with TableId from the given coreboot memory Root.
+
+  @param  Root               The coreboot memory table to be searched in
+  @param  TableId            Table id to be found
+  @param  pMemTable          To save the base address of the memory table found
+  @param  pMemTableSize      To save the size of memory table found
+
+  @retval RETURN_SUCCESS            Successfully find out the memory table.
+  @retval RETURN_INVALID_PARAMETER  Invalid input parameters.
+  @retval RETURN_NOT_FOUND          Failed to find the memory table.
+
+**/
 RETURN_STATUS
 FindCbMemTable (
   IN  struct cbmem_root  *Root,
@@ -143,11 +193,11 @@ FindCbMemTable (
   // Check if the entry is CBMEM or IMD
   // and handle them separately
   //
-  Entries    = Root->entries;
+  Entries = Root->entries;
   if (Entries[0].magic == CBMEM_ENTRY_MAGIC) {
     IsImdEntry = FALSE;
   } else {
-    Entries    = (struct cbmem_entry *)((struct imd_root *)Root)->entries;
+    Entries = (struct cbmem_entry *)((struct imd_root *)Root)->entries;
     if (Entries[0].magic == IMD_ENTRY_MAGIC) {
       IsImdEntry = TRUE;
     } else {
@@ -188,28 +238,31 @@ FindCbMemTable (
 **/
 RETURN_STATUS
 CbParseMemoryInfo (
-  IN UINT64*    pLowMemorySize,
-  IN UINT64*    pHighMemorySize
+  OUT UINT64     *pLowMemorySize,
+  OUT UINT64     *pHighMemorySize
   )
 {
-  struct cb_memory*        rec;
-  struct cb_memory_range*  Range;
+  struct cb_memory         *rec;
+  struct cb_memory_range   *Range;
   UINT64                   Start;
   UINT64                   Size;
   UINTN                    Index;
 
-  if ((!pLowMemorySize) || (!pHighMemorySize))
+  if ((pLowMemorySize == NULL) || (pHighMemorySize == NULL)) {
     return RETURN_INVALID_PARAMETER;
+  }
 
   //
   // Get the coreboot memory table
   //
   rec = (struct cb_memory *)FindCbTag (0, CB_TAG_MEMORY);
-  if (!rec)
+  if (rec == NULL) {
     rec = (struct cb_memory *)FindCbTag ((VOID *)(UINTN)PcdGet32 (PcdCbHeaderPointer), CB_TAG_MEMORY);
+  }
 
-  if (!rec)
+  if (rec == NULL) {
     return RETURN_NOT_FOUND;
+  }
 
   *pLowMemorySize = 0;
   *pHighMemorySize = 0;
@@ -218,7 +271,7 @@ CbParseMemoryInfo (
     Range = MEM_RANGE_PTR(rec, Index);
     Start = cb_unpack64(Range->start);
     Size = cb_unpack64(Range->size);
-    DEBUG ((EFI_D_ERROR, "%d. %016lx - %016lx [%02x]\n",
+    DEBUG ((EFI_D_INFO, "%d. %016lx - %016lx [%02x]\n",
             Index, Start, Start + Size - 1, Range->type));
 
     if (Range->type != CB_MEM_RAM) {
@@ -232,7 +285,7 @@ CbParseMemoryInfo (
     }
   }
 
-  DEBUG ((EFI_D_ERROR, "Low memory 0x%lx, High Memory 0x%lx\n", *pLowMemorySize, *pHighMemorySize));
+  DEBUG ((EFI_D_INFO, "Low memory 0x%lx, High Memory 0x%lx\n", *pLowMemorySize, *pHighMemorySize));
 
   return RETURN_SUCCESS;
 }
@@ -252,31 +305,33 @@ CbParseMemoryInfo (
 **/
 RETURN_STATUS
 CbParseCbMemTable (
-  IN UINT32     TableId,
-  IN VOID**     pMemTable,
-  IN UINT32*    pMemTableSize
+  IN  UINT32     TableId,
+  OUT VOID       **pMemTable,
+  OUT UINT32     *pMemTableSize
   )
 {
-  struct cb_memory*        rec;
-  struct cb_memory_range*  Range;
+  struct cb_memory         *rec;
+  struct cb_memory_range   *Range;
   UINT64                   Start;
   UINT64                   Size;
   UINTN                    Index;
 
-  if (!pMemTable)
+  if (pMemTable == NULL) {
     return RETURN_INVALID_PARAMETER;
-
+  }
   *pMemTable = NULL;
 
   //
   // Get the coreboot memory table
   //
   rec = (struct cb_memory *)FindCbTag (0, CB_TAG_MEMORY);
-  if (!rec)
+  if (rec == NULL) {
     rec = (struct cb_memory *)FindCbTag ((VOID *)(UINTN)PcdGet32 (PcdCbHeaderPointer), CB_TAG_MEMORY);
+  }
 
-  if (!rec)
+  if (rec == NULL) {
     return RETURN_NOT_FOUND;
+  }
 
   for (Index = 0; Index < MEM_RANGE_COUNT(rec); Index++) {
     Range = MEM_RANGE_PTR(rec, Index);
@@ -306,8 +361,8 @@ CbParseCbMemTable (
 **/
 RETURN_STATUS
 CbParseAcpiTable (
-  IN VOID       **pMemTable,
-  IN UINT32     *pMemTableSize
+  OUT VOID       **pMemTable,
+  OUT UINT32     *pMemTableSize
   )
 {
   return CbParseCbMemTable (SIGNATURE_32 ('I', 'P', 'C', 'A'), pMemTable, pMemTableSize);
@@ -326,8 +381,8 @@ CbParseAcpiTable (
 **/
 RETURN_STATUS
 CbParseSmbiosTable (
-  IN VOID**     pMemTable,
-  IN UINT32*    pMemTableSize
+  OUT VOID       **pMemTable,
+  OUT UINT32     *pMemTableSize
   )
 {
   return CbParseCbMemTable (SIGNATURE_32 ('T', 'B', 'M', 'S'), pMemTable, pMemTableSize);
@@ -347,19 +402,19 @@ CbParseSmbiosTable (
 **/
 RETURN_STATUS
 CbParseFadtInfo (
-  IN UINTN*     pPmCtrlReg,
-  IN UINTN*     pPmTimerReg,
-  IN UINTN*     pResetReg,
-  IN UINTN*     pResetValue
+  OUT UINTN      *pPmCtrlReg,
+  OUT UINTN      *pPmTimerReg,
+  OUT UINTN      *pResetReg,
+  OUT UINTN      *pResetValue
   )
 {
-  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER* Rsdp;
-  EFI_ACPI_DESCRIPTION_HEADER*                  Rsdt;
-  UINT32*                                       Entry32;
+  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
+  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
+  UINT32                                        *Entry32;
   UINTN                                         Entry32Num;
-  EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE*    Fadt;
-  EFI_ACPI_DESCRIPTION_HEADER*                  Xsdt;
-  UINT64*                                       Entry64;
+  EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
+  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
+  UINT64                                        *Entry64;
   UINTN                                         Entry64Num;
   UINTN                                         Idx;
   RETURN_STATUS                                 Status;
@@ -368,14 +423,16 @@ CbParseFadtInfo (
   Status = RETURN_SUCCESS;
 
   Status = CbParseAcpiTable (&Rsdp, NULL);
-  if (RETURN_ERROR(Status))
+  if (RETURN_ERROR(Status)) {
     return Status;
+  }
 
-  if (!Rsdp)
+  if (Rsdp == NULL) {
     return RETURN_NOT_FOUND;
+  }
 
-  DEBUG ((EFI_D_ERROR, "Find Rsdp at %p\n", Rsdp));
-  DEBUG ((EFI_D_ERROR, "Find Rsdt 0x%x, Xsdt 0x%lx\n", Rsdp->RsdtAddress, Rsdp->XsdtAddress));
+  DEBUG ((EFI_D_INFO, "Find Rsdp at %p\n", Rsdp));
+  DEBUG ((EFI_D_INFO, "Find Rsdt 0x%x, Xsdt 0x%lx\n", Rsdp->RsdtAddress, Rsdp->XsdtAddress));
 
   //
   // Search Rsdt First
@@ -387,21 +444,25 @@ CbParseFadtInfo (
     for (Idx = 0; Idx < Entry32Num; Idx++) {
       if (*(UINT32 *)(UINTN)(Entry32[Idx]) == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
         Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)(UINTN)(Entry32[Idx]);
-        if (pPmCtrlReg)
+        if (pPmCtrlReg != NULL) {
           *pPmCtrlReg = Fadt->Pm1aCntBlk;
-        DEBUG ((EFI_D_ERROR, "PmCtrl Reg 0x%x\n", Fadt->Pm1aCntBlk));
+        }
+        DEBUG ((EFI_D_INFO, "PmCtrl Reg 0x%x\n", Fadt->Pm1aCntBlk));
 
-        if (pPmTimerReg)
+        if (pPmTimerReg != NULL) {
           *pPmTimerReg = Fadt->PmTmrBlk;
-        DEBUG ((EFI_D_ERROR, "PmTimer Reg 0x%x\n", Fadt->PmTmrBlk));
+        }
+        DEBUG ((EFI_D_INFO, "PmTimer Reg 0x%x\n", Fadt->PmTmrBlk));
 
-        if (pResetReg)
+        if (pResetReg != NULL) {
           *pResetReg = (UINTN)Fadt->ResetReg.Address;
-        DEBUG ((EFI_D_ERROR, "Reset Reg 0x%lx\n", Fadt->ResetReg.Address));
+        }
+        DEBUG ((EFI_D_INFO, "Reset Reg 0x%lx\n", Fadt->ResetReg.Address));
 
-        if (pResetValue)
+        if (pResetValue != NULL) {
           *pResetValue = Fadt->ResetValue;
-        DEBUG ((EFI_D_ERROR, "Reset Value 0x%x\n", Fadt->ResetValue));
+        }
+        DEBUG ((EFI_D_INFO, "Reset Value 0x%x\n", Fadt->ResetValue));
 
         return RETURN_SUCCESS;
       }
@@ -455,28 +516,33 @@ CbParseFadtInfo (
 **/
 RETURN_STATUS
 CbParseSerialInfo (
-  IN UINT32*     pRegBase,
-  IN UINT32*     pRegAccessType,
-  IN UINT32*     pBaudrate
+  OUT UINT32      *pRegBase,
+  OUT UINT32      *pRegAccessType,
+  OUT UINT32      *pBaudrate
   )
 {
-  struct cb_serial*   CbSerial;
+  struct cb_serial    *CbSerial;
 
   CbSerial = FindCbTag (0, CB_TAG_SERIAL);
-  if (!CbSerial)
+  if (CbSerial == NULL) {
     CbSerial = FindCbTag ((VOID *)(UINTN)PcdGet32 (PcdCbHeaderPointer), CB_TAG_SERIAL);
+  }
 
-  if (!CbSerial)
+  if (CbSerial == NULL) {
     return RETURN_NOT_FOUND;
+  }
 
-  if (pRegBase)
+  if (pRegBase != NULL) {
     *pRegBase = CbSerial->baseaddr;
+  }
 
-  if (pRegAccessType)
+  if (pRegAccessType != NULL) {
     *pRegAccessType = CbSerial->type;
+  }
 
-  if (pBaudrate)
+  if (pBaudrate != NULL) {
     *pBaudrate = CbSerial->baud;
+  }
 
   return RETURN_SUCCESS;
 }
@@ -493,21 +559,23 @@ CbParseSerialInfo (
 **/
 RETURN_STATUS
 CbParseGetCbHeader (
-  IN UINTN  Level,
-  IN VOID** HeaderPtr
+  IN  UINTN  Level,
+  OUT VOID   **HeaderPtr
   )
 {
   UINTN Index;
-  VOID* TempPtr;
+  VOID  *TempPtr;
 
-  if (!HeaderPtr)
+  if (HeaderPtr == NULL) {
     return RETURN_NOT_FOUND;
+  }
 
   TempPtr = NULL;
   for (Index = 0; Index < Level; Index++) {
     TempPtr = FindCbTag (TempPtr, CB_TAG_FORWARD);
-    if (!TempPtr)
+    if (TempPtr == NULL) {
       break;
+    }
   }
 
   if ((Index >= Level) && (TempPtr != NULL)) {
@@ -529,36 +597,39 @@ CbParseGetCbHeader (
 **/
 RETURN_STATUS
 CbParseFbInfo (
-  IN FRAME_BUFFER_INFO*     pFbInfo
+  OUT FRAME_BUFFER_INFO       *pFbInfo
   )
 {
-  struct cb_framebuffer*   CbFbRec;
+  struct cb_framebuffer       *CbFbRec;
 
-  if (!pFbInfo)
+  if (pFbInfo == NULL) {
     return RETURN_INVALID_PARAMETER;
+  }
 
   CbFbRec = FindCbTag (0, CB_TAG_FRAMEBUFFER);
-  if (!CbFbRec)
+  if (CbFbRec == NULL) {
     CbFbRec = FindCbTag ((VOID *)(UINTN)PcdGet32 (PcdCbHeaderPointer), CB_TAG_FRAMEBUFFER);
+  }
 
-  if (!CbFbRec)
+  if (CbFbRec == NULL) {
     return RETURN_NOT_FOUND;
+  }
 
-  DEBUG ((EFI_D_ERROR, "Found coreboot video frame buffer information\n"));
-  DEBUG ((EFI_D_ERROR, "physical_address: 0x%lx\n", CbFbRec->physical_address));
-  DEBUG ((EFI_D_ERROR, "x_resolution: 0x%x\n", CbFbRec->x_resolution));
-  DEBUG ((EFI_D_ERROR, "y_resolution: 0x%x\n", CbFbRec->y_resolution));
-  DEBUG ((EFI_D_ERROR, "bits_per_pixel: 0x%x\n", CbFbRec->bits_per_pixel));
-  DEBUG ((EFI_D_ERROR, "bytes_per_line: 0x%x\n", CbFbRec->bytes_per_line));
+  DEBUG ((EFI_D_INFO, "Found coreboot video frame buffer information\n"));
+  DEBUG ((EFI_D_INFO, "physical_address: 0x%lx\n", CbFbRec->physical_address));
+  DEBUG ((EFI_D_INFO, "x_resolution: 0x%x\n", CbFbRec->x_resolution));
+  DEBUG ((EFI_D_INFO, "y_resolution: 0x%x\n", CbFbRec->y_resolution));
+  DEBUG ((EFI_D_INFO, "bits_per_pixel: 0x%x\n", CbFbRec->bits_per_pixel));
+  DEBUG ((EFI_D_INFO, "bytes_per_line: 0x%x\n", CbFbRec->bytes_per_line));
 
-  DEBUG ((EFI_D_ERROR, "red_mask_size: 0x%x\n", CbFbRec->red_mask_size));
-  DEBUG ((EFI_D_ERROR, "red_mask_pos: 0x%x\n", CbFbRec->red_mask_pos));
-  DEBUG ((EFI_D_ERROR, "green_mask_size: 0x%x\n", CbFbRec->green_mask_size));
-  DEBUG ((EFI_D_ERROR, "green_mask_pos: 0x%x\n", CbFbRec->green_mask_pos));
-  DEBUG ((EFI_D_ERROR, "blue_mask_size: 0x%x\n", CbFbRec->blue_mask_size));
-  DEBUG ((EFI_D_ERROR, "blue_mask_pos: 0x%x\n", CbFbRec->blue_mask_pos));
-  DEBUG ((EFI_D_ERROR, "reserved_mask_size: 0x%x\n", CbFbRec->reserved_mask_size));
-  DEBUG ((EFI_D_ERROR, "reserved_mask_pos: 0x%x\n", CbFbRec->reserved_mask_pos));
+  DEBUG ((EFI_D_INFO, "red_mask_size: 0x%x\n", CbFbRec->red_mask_size));
+  DEBUG ((EFI_D_INFO, "red_mask_pos: 0x%x\n", CbFbRec->red_mask_pos));
+  DEBUG ((EFI_D_INFO, "green_mask_size: 0x%x\n", CbFbRec->green_mask_size));
+  DEBUG ((EFI_D_INFO, "green_mask_pos: 0x%x\n", CbFbRec->green_mask_pos));
+  DEBUG ((EFI_D_INFO, "blue_mask_size: 0x%x\n", CbFbRec->blue_mask_size));
+  DEBUG ((EFI_D_INFO, "blue_mask_pos: 0x%x\n", CbFbRec->blue_mask_pos));
+  DEBUG ((EFI_D_INFO, "reserved_mask_size: 0x%x\n", CbFbRec->reserved_mask_size));
+  DEBUG ((EFI_D_INFO, "reserved_mask_pos: 0x%x\n", CbFbRec->reserved_mask_pos));
 
   pFbInfo->LinearFrameBuffer    = CbFbRec->physical_address;
   pFbInfo->HorizontalResolution = CbFbRec->x_resolution;
