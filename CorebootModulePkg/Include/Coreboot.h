@@ -1,7 +1,7 @@
 /** @file
   Coreboot PEI module include file.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -51,6 +51,9 @@
 
 #define DYN_CBMEM_ALIGN_SIZE (4096)
 
+#define IMD_ENTRY_MAGIC      (~0xC0389481)
+#define CBMEM_ENTRY_MAGIC    (~0xC0389479)
+
 struct cbmem_entry {
   UINT32 magic;
   UINT32 start;
@@ -64,6 +67,22 @@ struct cbmem_root {
   UINT32 locked;
   UINT32 size;
   struct cbmem_entry entries[0];
+};
+
+struct imd_entry {
+  UINT32 magic;
+  UINT32 start_offset;
+  UINT32 size;
+  UINT32 id;
+};
+
+struct imd_root {
+  UINT32 max_entries;
+  UINT32 num_entries;
+  UINT32 flags;
+  UINT32 entry_align;        
+  UINT32 max_offset;
+  struct imd_entry entries[0];
 };
 
 struct cbuint64 {

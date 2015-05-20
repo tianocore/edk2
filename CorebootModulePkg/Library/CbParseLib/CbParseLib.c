@@ -2,7 +2,7 @@
   This library will parse the coreboot table in memory and extract those required
   information.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -126,24 +126,48 @@ FindCbTag (
 
 RETURN_STATUS
 FindCbMemTable (  
-  struct  cbmem_root  *root,
-  IN UINT32     TableId, 
-  IN VOID**     pMemTable,
-  IN UINT32*    pMemTableSize
+  IN  struct cbmem_root  *Root,
+  IN  UINT32             TableId,
+  OUT VOID               **pMemTable,
+  OUT UINT32             *pMemTableSize
 )
 {	
-	UINTN Idx;
+  UINTN                Idx;
+  BOOLEAN              IsImdEntry;
+  struct cbmem_entry  *Entries;
 	
-	if ((!root) || (!pMemTable))
-		return RETURN_INVALID_PARAMETER;
+  if ((Root == NULL) || (pMemTable == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
 		
-	for (Idx = 0; Idx < root->num_entries; Idx++) {
-    if (root->entries[Idx].id == TableId) {
-    	*pMemTable = (VOID *) (UINTN)root->entries[Idx].start;
-    	if (pMemTableSize)
-    		*pMemTableSize = root->entries[Idx].size;
+  //
+  // Check if the entry is CBMEM or IMD
+  // and handle them separately
+  //
+  Entries    = Root->entries;
+  if (Entries[0].magic == CBMEM_ENTRY_MAGIC) {
+    IsImdEntry = FALSE;
+  } else {
+    Entries    = (struct cbmem_entry *)((struct imd_root *)Root)->entries;
+    if (Entries[0].magic == IMD_ENTRY_MAGIC) {
+      IsImdEntry = TRUE;
+    } else {
+      return RETURN_NOT_FOUND;
+    }
+  }
+
+  for (Idx = 0; Idx < Root->num_entries; Idx++) {
+    if (Entries[Idx].id == TableId) {
+      if (IsImdEntry) {
+        *pMemTable = (VOID *) ((UINTN)Entries[Idx].start + (UINTN)Root);
+      } else {
+        *pMemTable = (VOID *) (UINTN)Entries[Idx].start;
+      }
+      if (pMemTableSize != NULL) {
+        *pMemTableSize = Entries[Idx].size;
+      }
     	
-    	DEBUG ((EFI_D_ERROR, "Find CbMemTable Id 0x%x, base %p, size 0x%x\n", TableId, *pMemTable, *pMemTableSize));
+      DEBUG ((EFI_D_INFO, "Find CbMemTable Id 0x%x, base %p, size 0x%x\n", TableId, *pMemTable, *pMemTableSize));
     	return RETURN_SUCCESS;
     }
   }
