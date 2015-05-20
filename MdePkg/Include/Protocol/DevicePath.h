@@ -895,6 +895,18 @@ typedef struct {
   BLUETOOTH_ADDRESS               BD_ADDR;
 } BLUETOOTH_DEVICE_PATH;
 
+///
+/// Wi-Fi Device Path SubType.
+///
+#define MSG_WIFI_DP               0x1C
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// Service set identifier. A 32-byte octets string.
+  ///
+  UINT8                           SSId[32];
+} WIFI_DEVICE_PATH;
+
 //
 // Media Device Path
 //
@@ -1145,6 +1157,7 @@ typedef union {
   NVME_NAMESPACE_DEVICE_PATH                 NvmeNamespace;
   URI_DEVICE_PATH                            Uri;
   BLUETOOTH_DEVICE_PATH                      Bluetooth;
+  WIFI_DEVICE_PATH                           WiFi;
   UFS_DEVICE_PATH                            Ufs;
   SD_DEVICE_PATH                             Sd;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
@@ -1199,6 +1212,7 @@ typedef union {
   NVME_NAMESPACE_DEVICE_PATH                 *NvmeNamespace;
   URI_DEVICE_PATH                            *Uri;
   BLUETOOTH_DEVICE_PATH                      *Bluetooth;
+  WIFI_DEVICE_PATH                           *WiFi;
   UFS_DEVICE_PATH                            *Ufs;
   SD_DEVICE_PATH                             *Sd;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;

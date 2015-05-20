@@ -2770,6 +2770,36 @@ DevPathFromTextBluetooth (
 }
 
 /**
+  Converts a text device path node to Wi-Fi device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Wi-Fi device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextWiFi (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                *SSIdStr;
+  CHAR8                 *AsciiStr;
+  WIFI_DEVICE_PATH      *WiFiDp;
+
+  SSIdStr = GetNextParamStr (&TextDeviceNode);
+  WiFiDp  = (WIFI_DEVICE_PATH *) CreateDeviceNode (
+                                   MESSAGING_DEVICE_PATH,
+                                   MSG_WIFI_DP,
+                                   (UINT16) sizeof (WIFI_DEVICE_PATH)
+                                   );
+
+  AsciiStr = WiFiDp->SSId;
+  StrToAscii (SSIdStr, &AsciiStr);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) WiFiDp;
+}
+
+/**
   Converts a text device path node to URI device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3244,6 +3274,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Vlan",                    DevPathFromTextVlan                    },
   {L"Uri",                     DevPathFromTextUri                     },
   {L"Bluetooth",               DevPathFromTextBluetooth               },
+  {L"WiFi",                    DevPathFromTextWiFi                    },
   {L"MediaPath",               DevPathFromTextMediaPath               },
   {L"HD",                      DevPathFromTextHD                      },
   {L"CDROM",                   DevPathFromTextCDROM                   },
