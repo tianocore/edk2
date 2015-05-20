@@ -30,6 +30,7 @@
 #
 
 [Sources]
+  EsrtImpl.h
   EsrtImpl.c
   EsrtDxe.c
 
@@ -50,8 +51,8 @@
   PrintLib
 
 [Guids]
-  gEfiSystemResourceTableGuid             ## PRODUCES
-  gEfiEventReadyToBootGuid                ## CONSUMES
+  gEfiSystemResourceTableGuid             ## PRODUCES             ## SystemTable
+  gEfiEventReadyToBootGuid                ## CONSUMES             ## Event
 
 [Protocols]
   gEfiFirmwareManagementProtocolGuid      ## SOMETIMES_CONSUMES

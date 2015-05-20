@@ -137,9 +137,9 @@ UpdateEsrtEntry(
 /**
   Init one ESRT entry according to input FmpImageInfo (V1, V2, V3) .
 
-  @param[in]    EsrtEntry                Esrt entry to be Init
-  @param[in]    FmpImageInfo        FMP image info descriptor
-  @param[in]   DescriptorVersion    FMP Image info descriptor version
+  @param[in, out]    EsrtEntry             Esrt entry to be Init
+  @param[in]         FmpImageInfo          FMP image info descriptor
+  @param[in]         DescriptorVersion     FMP Image info descriptor version
   
 **/
 VOID 
@@ -153,7 +153,7 @@ SetEsrtEntryFromFmpInfo (
   Get ESRT entry from ESRT Cache by FwClass Guid 
 
   @param[in]       FwClass                FwClass of Esrt entry to get  
-  @param[in out]  Entry                   Esrt entry returned 
+  @param[in, out]  Entry                  Esrt entry returned 
   
   @retval EFI_SUCCESS                   The variable saving this Esrt Entry exists.
   @retval EF_NOT_FOUND                  No correct variable found.
@@ -215,7 +215,7 @@ EsrtDxeRegisterEsrtEntry(
 /**
   This function syn up Cached ESRT with data from FMP instances
   Function should be called after Connect All in order to locate all FMP protocols
-  installed
+  installed.
 
   @retval EFI_SUCCESS                      Successfully sync cache repository from FMP instances
   @retval EFI_NOT_FOUND                   No FMP Instance are found

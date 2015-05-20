@@ -33,7 +33,7 @@ ESRT_MANAGEMENT_PROTOCOL  mEsrtManagementProtocolTemplate = {
   Get ESRT entry from ESRT Cache by FwClass Guid 
 
   @param[in]       FwClass                FwClass of Esrt entry to get  
-  @param[in out]  Entry                   Esrt entry returned 
+  @param[in, out]  Entry                  Esrt entry returned 
   
   @retval EFI_SUCCESS                   The variable saving this Esrt Entry exists.
   @retval EF_NOT_FOUND                  No correct variable found.
@@ -217,7 +217,7 @@ EsrtDxeRegisterEsrtEntry(
 /**
   This function syn up Cached ESRT with data from FMP instances
   Function should be called after Connect All in order to locate all FMP protocols
-  installed
+  installed.
 
   @retval EFI_SUCCESS                      Successfully sync cache repository from FMP instances
   @retval EFI_NOT_FOUND                   No FMP Instance are found
@@ -587,8 +587,13 @@ EsrtReadyToBootEventNotify (
   EsrtTable->FwResourceCount    = (UINT32)((NonFmpRepositorySize + FmpRepositorySize) / sizeof(EFI_SYSTEM_RESOURCE_ENTRY));  
   EsrtTable->FwResourceCountMax = PcdGet32(PcdMaxNonFmpEsrtCacheNum) + PcdGet32(PcdMaxFmpEsrtCacheNum);
 
-  CopyMem(EsrtTable + 1, NonFmpEsrtRepository, NonFmpRepositorySize);
-  CopyMem((UINT8 *)(EsrtTable + 1) + NonFmpRepositorySize, FmpEsrtRepository, FmpRepositorySize);
+  if (NonFmpRepositorySize != 0 && NonFmpEsrtRepository != NULL) {
+    CopyMem(EsrtTable + 1, NonFmpEsrtRepository, NonFmpRepositorySize);
+  }
+
+  if (FmpRepositorySize != 0 && FmpEsrtRepository != NULL) {
+    CopyMem((UINT8 *)(EsrtTable + 1) + NonFmpRepositorySize, FmpEsrtRepository, FmpRepositorySize);
+  }
 
   //
   // Publish Esrt to system config table
@@ -611,7 +616,17 @@ EXIT:
   }
 }
 
+/**
+  The module Entry Point of the Esrt DXE driver that manages cached ESRT repository 
+  & publishes ESRT table
 
+  @param[in]  ImageHandle    The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable    A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS    The entry point is executed successfully.
+  @retval Other          Some error occurs when executing this entry point.
+
+**/
 EFI_STATUS
 EFIAPI
 EsrtDxeEntryPoint (

@@ -174,7 +174,7 @@ InsertEsrtEntry(
       goto EXIT;
     }
 
-    if (RepositorySize != 0) {
+    if (RepositorySize != 0 && EsrtRepository != NULL) {
       CopyMem(EsrtRepositoryNew, EsrtRepository, RepositorySize);
     }
     CopyMem((UINT8 *)EsrtRepositoryNew + RepositorySize, Entry, sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
@@ -393,9 +393,9 @@ EXIT:
 /**
   Init one ESRT entry according to input FmpImageInfo (V1, V2, V3) .
 
-  @param[in]    EsrtEntry                Esrt entry to be Init
-  @param[in]    FmpImageInfo        FMP image info descriptor
-  @param[in]   DescriptorVersion    FMP Image info descriptor version
+  @param[in, out]     EsrtEntry            Esrt entry to be Init
+  @param[in]          FmpImageInfo         FMP image info descriptor
+  @param[in]          DescriptorVersion    FMP Image info descriptor version
   
 **/
 VOID 
