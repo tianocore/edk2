@@ -100,6 +100,8 @@ BmGetFreeOptionNumber (
           LoadOptionType == LoadOptionTypeSysPrep);
 
   GetEfiGlobalVariable2 (mBmLoadOptionOrderName[LoadOptionType], (VOID **) &OptionOrder, &OptionOrderSize);
+  ASSERT ((OptionOrder != NULL && OptionOrderSize != 0) || (OptionOrder == NULL && OptionOrderSize == 0));
+
   BootNext = NULL;
   if (LoadOptionType == LoadOptionTypeBoot) {
     GetEfiGlobalVariable2 (L"BootNext", (VOID**) &BootNext, NULL);
@@ -268,6 +270,7 @@ BmAddOptionNumberToOrderVariable (
   // Update the option order variable
   //
   GetEfiGlobalVariable2 (OptionOrderName, (VOID **) &OptionOrder, &OptionOrderSize);
+  ASSERT ((OptionOrder != NULL && OptionOrderSize != 0) || (OptionOrder == NULL && OptionOrderSize == 0));
 
   Status = EFI_SUCCESS;
   for (Index = 0; Index < OptionOrderSize / sizeof (UINT16); Index++) {
@@ -557,6 +560,8 @@ EfiBootManagerDeleteLoadOptionVariable (
     // If the associated *Order exists, just remove the reference in *Order.
     //
     GetEfiGlobalVariable2 (mBmLoadOptionOrderName[OptionType], (VOID **) &OptionOrder, &OptionOrderSize);
+    ASSERT ((OptionOrder != NULL && OptionOrderSize != 0) || (OptionOrder == NULL && OptionOrderSize == 0));
+
     for (Index = 0; Index < OptionOrderSize / sizeof (UINT16); Index++) {
       if (OptionOrder[Index] == OptionNumber) {
         OptionOrderSize -= sizeof (UINT16);
