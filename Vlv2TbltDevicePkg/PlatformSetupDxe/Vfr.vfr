@@ -21,8 +21,6 @@ formset
   guid     = SYSTEM_CONFIGURATION_GUID,
   title    = STRING_TOKEN(STR_SYSTEM_SETUP_TITLE),
   help     = STRING_TOKEN(STR_SYSTEM_SETUP_HELP),
-  class    = 1,
-  subclass = 0,
 
 
   varstore SYSTEM_CONFIGURATION, name = Setup, guid = SYSTEM_CONFIGURATION_GUID;

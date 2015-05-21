@@ -19,8 +19,6 @@ formset
   guid     = EFI_NIC_IP4_CONFIG_NVDATA_GUID,
   title    = STRING_TOKEN(STR_IP4_CONFIG_FORM_TITLE),
   help     = STRING_TOKEN(STR_IP4_CONFIG_FORM_HELP),
-  class    = EFI_NETWORK_DEVICE_CLASS,
-  subclass = 0x03,
 
   varstore IP4_CONFIG_IFR_NVDATA,
     name = EfiNicIp4ConfigVariable,

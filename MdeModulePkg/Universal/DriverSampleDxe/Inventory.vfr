@@ -19,8 +19,6 @@ formset
   guid     = DRIVER_SAMPLE_INVENTORY_GUID,
   title    = STRING_TOKEN(STR_INV_FORM_SET_TITLE),
   help     = STRING_TOKEN(STR_INV_FORM_SET_HELP),
-  class    = 0x04,
-  subclass = 0x03,
 
   form formid = 1,
        title  = STRING_TOKEN(STR_INV_FORM1_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code

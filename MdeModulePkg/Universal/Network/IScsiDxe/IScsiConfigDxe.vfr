@@ -20,8 +20,6 @@ formset
   guid     = IP4_ISCSI_CONFIG_GUID,
   title    = STRING_TOKEN(STR_ISCSI_CONFIG_FORM_TITLE),
   help     = STRING_TOKEN(STR_ISCSI_CONFIG_FORM_HELP),
-  class    = EFI_NETWORK_DEVICE_CLASS,
-  subclass = 0x03,
 
   varstore ISCSI_CONFIG_IFR_NVDATA,
     name = ISCSI_CONFIG_IFR_NVDATA,

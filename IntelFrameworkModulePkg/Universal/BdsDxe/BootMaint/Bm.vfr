@@ -20,8 +20,6 @@ formset
   title = STRING_TOKEN(STR_FORM_MAIN_TITLE),
   help = STRING_TOKEN(STR_NULL_STRING),
   classguid = BOOT_MAINT_FORMSET_GUID,
-  class = 0,
-  subclass = 0,
 
   varstore BMM_FAKE_NV_DATA,
     varid = VARSTORE_ID_BOOT_MAINT,

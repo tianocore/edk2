@@ -41,8 +41,6 @@ formset
   title    = STRING_TOKEN(STR_FRONT_PAGE_TITLE),
   help     = STRING_TOKEN(STR_NULL_STRING),
   classguid = FRONT_PAGE_FORMSET_GUID,
-  class    = FRONT_PAGE_CLASS,
-  subclass = FRONT_PAGE_SUBCLASS,
 
   form formid = FRONT_PAGE_FORM_ID,
        title  = STRING_TOKEN(STR_FRONT_PAGE_TITLE);

@@ -28,8 +28,6 @@ formset
   guid     = PLAT_OVER_MNGR_GUID,
   title    = STRING_TOKEN(STR_ENTRY_TITLE),
   help     = STRING_TOKEN(STR_TITLE_HELP),
-  class    = EFI_DISK_DEVICE_CLASS,
-  subclass = 0xff,
 
   varstore PLAT_OVER_MNGR_DATA,
     varid = VARSTORE_ID_PLAT_OVER_MNGR,

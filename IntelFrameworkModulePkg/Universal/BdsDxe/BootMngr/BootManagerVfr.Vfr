@@ -28,8 +28,6 @@ formset
   title     = STRING_TOKEN(STR_BM_BANNER),
   help      = STRING_TOKEN(STR_LAST_STRING),
   classguid = BOOT_MANAGER_FORMSET_GUID,
-  class     = BOOT_MANAGER_CLASS,
-  subclass  = BOOT_MANAGER_SUBCLASS,
 
   form formid = BOOT_MANAGER_FORM_ID,
        title  = STRING_TOKEN(STR_BM_BANNER);
