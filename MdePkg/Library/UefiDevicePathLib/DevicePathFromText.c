@@ -2793,7 +2793,7 @@ DevPathFromTextWiFi (
                                    (UINT16) sizeof (WIFI_DEVICE_PATH)
                                    );
 
-  AsciiStr = WiFiDp->SSId;
+  AsciiStr = (CHAR8 *) WiFiDp->SSId;
   StrToAscii (SSIdStr, &AsciiStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) WiFiDp;
