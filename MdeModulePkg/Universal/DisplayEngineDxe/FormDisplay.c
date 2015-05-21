@@ -2296,6 +2296,7 @@ DisplayOneMenu (
   UINTN                           Temp3;
   EFI_STATUS                      Status;
   UINTN                           Row;
+  BOOLEAN                         IsProcessingFirstRow;
   UINTN                           Col;
   UINTN                           PromptLineNum;
   UINTN                           OptionLineNum;
@@ -2310,6 +2311,7 @@ DisplayOneMenu (
   PromptLineNum = 0;
   OptionLineNum = 0;
   MaxRow        = 0;
+  IsProcessingFirstRow = TRUE;
 
   //
   // Set default color.
@@ -2413,7 +2415,7 @@ DisplayOneMenu (
         //
         PrintStringAtWithWidth (BeginCol, Row, L"", SkipWidth);
         
-        if (Statement->OpCode->OpCode == EFI_IFR_REF_OP && MenuOption->Col >= 2) {
+        if (Statement->OpCode->OpCode == EFI_IFR_REF_OP && MenuOption->Col >= 2 && IsProcessingFirstRow) {
           //
           // Print Arrow for Goto button.
           //
@@ -2422,6 +2424,7 @@ DisplayOneMenu (
             Row,
             GEOMETRICSHAPE_RIGHT_TRIANGLE
             );
+          IsProcessingFirstRow = FALSE;
         }
         DisplayMenuString (MenuOption, MenuOption->Col, Row, OutputString, PromptWidth + AdjustValue, Highlight);
         PromptLineNum ++;
