@@ -69,7 +69,8 @@ UpdateBlocksAndVolumes (
   EFI_PEI_SERVICES               **PeiServices;
 
   PeiServices = (EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
-
+  BlockIo2Ppi = NULL;
+  BlockIoPpi  = NULL;
   //
   // Clean up caches
   //
@@ -135,6 +136,10 @@ UpdateBlocksAndVolumes (
         if (EFI_ERROR (Status) || !Media2.MediaPresent) {
           continue;
         }
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockIo2        = BlockIo2Ppi;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].InterfaceType   = Media2.InterfaceType;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].LastBlock       = Media2.LastBlock;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockSize       = Media2.BlockSize;
       } else {
         Status = BlockIoPpi->GetBlockDeviceMediaInfo (
                                PeiServices,
@@ -145,9 +150,13 @@ UpdateBlocksAndVolumes (
         if (EFI_ERROR (Status) || !Media.MediaPresent) {
           continue;
         }
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockIo    = BlockIoPpi;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].DevType    = Media.DeviceType;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].LastBlock  = Media.LastBlock;
+        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockSize  = (UINT32) Media.BlockSize;
       }
 
-      PrivateData->BlockDevice[PrivateData->BlockDeviceCount].IoAlign   = 0;
+      PrivateData->BlockDevice[PrivateData->BlockDeviceCount].IoAlign = 0;
       //
       // Not used here
       //
@@ -155,17 +164,6 @@ UpdateBlocksAndVolumes (
       PrivateData->BlockDevice[PrivateData->BlockDeviceCount].PartitionChecked  = FALSE;
 
       PrivateData->BlockDevice[PrivateData->BlockDeviceCount].PhysicalDevNo     = (UINT8) Index;
-      if (BlockIo2) {
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockIo2        = BlockIo2Ppi;
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].InterfaceType   = Media2.InterfaceType;
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].LastBlock       = Media2.LastBlock;
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockSize       = Media2.BlockSize;
-      } else {
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockIo    = BlockIoPpi;
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].DevType    = Media.DeviceType;
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].LastBlock  = Media.LastBlock;
-        PrivateData->BlockDevice[PrivateData->BlockDeviceCount].BlockSize  = (UINT32) Media.BlockSize;
-    }
       PrivateData->BlockDeviceCount++;
     }
   }
