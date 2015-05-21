@@ -1444,6 +1444,7 @@ IsLineBreak (
     //
     // Mandatory line break characters, which force a line-break
     //
+    case 0x000A:
     case 0x000C:
     case 0x000D:
     case 0x2028:
