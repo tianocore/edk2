@@ -162,6 +162,8 @@ UpdateBlocksAndVolumes (
   EFI_PEI_SERVICES                **PeiServices;
 
   IndexBlockDevice = 0;
+  BlockIo2Ppi      = NULL;
+  BlockIoPpi       = NULL;
   //
   // Find out all Block Io Ppi instances within the system
   // Assuming all device Block Io Peims are dispatched already
