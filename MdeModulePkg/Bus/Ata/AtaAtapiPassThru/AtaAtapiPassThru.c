@@ -2,7 +2,7 @@
   This file implements ATA_PASSTHRU_PROCTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
   for managed ATA controllers.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1255,6 +1255,7 @@ AtaPassThruPassThru (
   UINT32                          MaxSectorCount;
   ATA_NONBLOCK_TASK               *Task;
   EFI_TPL                         OldTpl;
+  UINT32                          BlockSize;
 
   Instance = ATA_PASS_THRU_PRIVATE_DATA_FROM_THIS (This);
 
@@ -1280,22 +1281,6 @@ AtaPassThruPassThru (
   }
 
   //
-  // convert the transfer length from sector count to byte.
-  //
-  if (((Packet->Length & EFI_ATA_PASS_THRU_LENGTH_BYTES) == 0) &&
-       (Packet->InTransferLength != 0)) {
-    Packet->InTransferLength = Packet->InTransferLength * 0x200;
-  }
-
-  //
-  // convert the transfer length from sector count to byte.
-  //
-  if (((Packet->Length & EFI_ATA_PASS_THRU_LENGTH_BYTES) == 0) &&
-       (Packet->OutTransferLength != 0)) {
-    Packet->OutTransferLength = Packet->OutTransferLength * 0x200;
-  }
-
-  //
   // Check whether this device needs 48-bit addressing (ATAPI-6 ata device).
   // Per ATA-6 spec, word83: bit15 is zero and bit14 is one.
   // If bit10 is one, it means the ata device support 48-bit addressing.
@@ -1314,13 +1299,39 @@ AtaPassThruPassThru (
     }
   }
 
+  BlockSize = 0x200;
+  if ((IdentifyData->AtaData.phy_logic_sector_support & (BIT14 | BIT15)) == BIT14) {
+    //
+    // Check logical block size
+    //
+    if ((IdentifyData->AtaData.phy_logic_sector_support & BIT12) != 0) {
+      BlockSize = (UINT32) (((IdentifyData->AtaData.logic_sector_size_hi << 16) | IdentifyData->AtaData.logic_sector_size_lo) * sizeof (UINT16));
+    }
+  }
+
+  //
+  // convert the transfer length from sector count to byte.
+  //
+  if (((Packet->Length & EFI_ATA_PASS_THRU_LENGTH_BYTES) == 0) &&
+       (Packet->InTransferLength != 0)) {
+    Packet->InTransferLength = Packet->InTransferLength * BlockSize;
+  }
+
+  //
+  // convert the transfer length from sector count to byte.
+  //
+  if (((Packet->Length & EFI_ATA_PASS_THRU_LENGTH_BYTES) == 0) &&
+       (Packet->OutTransferLength != 0)) {
+    Packet->OutTransferLength = Packet->OutTransferLength * BlockSize;
+  }
+
   //
   // If the data buffer described by InDataBuffer/OutDataBuffer and InTransferLength/OutTransferLength
   // is too big to be transferred in a single command, then no data is transferred and EFI_BAD_BUFFER_SIZE
   // is returned.
   //
-  if (((Packet->InTransferLength != 0) && (Packet->InTransferLength > MaxSectorCount * 0x200)) ||
-      ((Packet->OutTransferLength != 0) && (Packet->OutTransferLength > MaxSectorCount * 0x200))) {
+  if (((Packet->InTransferLength != 0) && (Packet->InTransferLength > MaxSectorCount * BlockSize)) ||
+      ((Packet->OutTransferLength != 0) && (Packet->OutTransferLength > MaxSectorCount * BlockSize))) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -2074,7 +2085,7 @@ ExtScsiPassThruPassThru (
       // no more sense key or number of sense keys exceeds predefined,
       // skip the loop.
       //
-      if ((PtrSenseData->Sense_Key == EFI_SCSI_SK_NO_SENSE) || 
+      if ((PtrSenseData->Sense_Key == EFI_SCSI_SK_NO_SENSE) ||
           (SenseDataLen + sizeof (EFI_SCSI_SENSE_DATA) > Packet->SenseDataLength)) {
         SenseReq = FALSE;
       }
