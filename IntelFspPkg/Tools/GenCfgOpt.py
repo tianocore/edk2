@@ -822,9 +822,9 @@ EndList
         FvDir = self._FvDir
 
         if IsInternal:
-            HeaderFile = os.path.join(FvDir, 'VpdHeader.h')
+            HeaderFile = os.path.join(FvDir, 'FspUpdVpdInternal.h')
         else:
-            HeaderFile = os.path.join(FvDir, 'fsp_vpd.h')
+            HeaderFile = os.path.join(FvDir, 'FspUpdVpd.h')
 
         # Check if header needs to be recreated
         ReCreate = False
