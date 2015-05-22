@@ -143,8 +143,8 @@ check_main_header:
    mov   ecx, MSR_IA32_PLATFORM_ID
    rdmsr
    mov   ecx, edx
-   shr   ecx, 50-32
-   and   ecx, 7h
+   shr   ecx, 50-32                          ; shift (50d-32d=18d=0x12) bits
+   and   ecx, 7h                             ; platform id at bit[52..50]
    mov   edx, 1
    shl   edx, cl
 
@@ -569,7 +569,7 @@ FspApiCommon   PROC C PUBLIC
   ;
   ; Pass BFV into the PEI Core
   ; It uses relative address to calucate the actual boot FV base
-  ; For FSP impleantion with single FV, PcdFlashFvRecoveryBase and
+  ; For FSP implementation with single FV, PcdFspBootFirmwareVolumeBase and
   ; PcdFspAreaBaseAddress are the same. For FSP with mulitple FVs,
   ; they are different. The code below can handle both cases.
   ;
