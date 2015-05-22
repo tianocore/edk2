@@ -2031,6 +2031,7 @@ ExtractConfigRequest (
       }
       RequestElement = ConstructRequestElement(Name, Offset, Width);
       ConfigHdr = ConstructConfigHdr(Storage, DatabaseRecord->DriverHandle);
+      ASSERT (ConfigHdr != NULL);
 
       Length = (StrLen (ConfigHdr) + 1 + StrLen(RequestElement) + 1) * sizeof (CHAR16);
       *ConfigRequest = AllocatePool (Length);
@@ -2138,6 +2139,7 @@ ExtractConfigResp (
       RequestElement = ConstructRequestElement(Name, Offset, Width);
 
       ConfigHdr = ConstructConfigHdr(Storage, DatabaseRecord->DriverHandle);
+      ASSERT (ConfigHdr != NULL);
 
       Length = (StrLen (ConfigHdr) + 1 + StrLen(RequestElement) + 1 + StrLen (L"VALUE=") + StrLen(ValueElement) + 1) * sizeof (CHAR16);
       *ConfigResp = AllocatePool (Length);
