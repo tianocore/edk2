@@ -190,6 +190,8 @@ InitializeDebugAgent (
   DEBUG_AGENT_MAILBOX           *Mailbox;
   UINT64                        *MailboxLocation;
   UINT32                        DebugTimerFrequency;
+  BOOLEAN                       PeriodicMode;
+  UINTN                         TimerCycle;
 
   switch (InitFlag) {
   case DEBUG_AGENT_INIT_SMM:
@@ -275,7 +277,15 @@ InitializeDebugAgent (
   case DEBUG_AGENT_INIT_ENTER_SMI:
     SaveDebugRegister ();
     InitializeDebugIdt ();
-
+    //
+    // Check if CPU APIC Timer is working, otherwise initialize it.
+    //
+    GetApicTimerState (NULL, &PeriodicMode, NULL);
+    TimerCycle = GetApicTimerInitCount ();
+    if (PeriodicMode != TRUE || TimerCycle == 0) {
+      InitializeDebugTimer (NULL);
+      DisableApicTimerInterrupt ();
+    }
     Mailbox = GetMailboxPointer ();
     if (GetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS) == 1) {
       //
