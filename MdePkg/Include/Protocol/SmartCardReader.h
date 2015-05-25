@@ -215,7 +215,6 @@ EFI_STATUS
   IN     UINTN                             CAPDULength,
      OUT UINT8                             *RAPDU,
   IN OUT UINTN                             *RAPDULength
-);
   );
 
 /**
