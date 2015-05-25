@@ -18,12 +18,14 @@
   Initialize CPU local APIC timer.
 
   @param[out] TimerFrequency  Local APIC timer frequency returned.
+  @param[in]  DumpFlag        If TRUE, dump Local APIC timer's parameter.
  
   @return   32-bit Local APIC timer init count.
 **/
 UINT32
 InitializeDebugTimer (
-  OUT UINT32     *TimerFrequency
+  OUT UINT32     *TimerFrequency,
+  IN  BOOLEAN    DumpFlag
   )
 {
   UINTN       ApicTimerDivisor;
@@ -45,11 +47,12 @@ InitializeDebugTimer (
 
   InitializeApicTimer (ApicTimerDivisor, InitialCount, TRUE, DEBUG_TIMER_VECTOR);
 
-  DEBUG ((EFI_D_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32(PcdFSBClock))); 
-  DEBUG ((EFI_D_INFO, "Debug Timer: Divisor      = %d\n", ApicTimerDivisor)); 
-  DEBUG ((EFI_D_INFO, "Debug Timer: Frequency    = %d\n", ApicTimerFrequency)); 
-  DEBUG ((EFI_D_INFO, "Debug Timer: InitialCount = %d\n", InitialCount)); 
-
+  if (DumpFlag) {
+    DEBUG ((EFI_D_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32(PcdFSBClock)));
+    DEBUG ((EFI_D_INFO, "Debug Timer: Divisor      = %d\n", ApicTimerDivisor));
+    DEBUG ((EFI_D_INFO, "Debug Timer: Frequency    = %d\n", ApicTimerFrequency));
+    DEBUG ((EFI_D_INFO, "Debug Timer: InitialCount = %d\n", InitialCount));
+  }
   if (TimerFrequency != NULL) {
     *TimerFrequency = ApicTimerFrequency;
   }

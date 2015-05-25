@@ -242,7 +242,7 @@ InitializeDebugAgent (
     //
     // Initialize Debug Timer hardware and save its frequency
     //
-    InitializeDebugTimer (&DebugTimerFrequency);
+    InitializeDebugTimer (&DebugTimerFrequency, TRUE);
     UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
 
     DebugPortHandle = (UINT64) (UINTN)DebugPortInitialize ((DEBUG_PORT_HANDLE) (UINTN)Mailbox->DebugPortHandle, NULL);
@@ -283,7 +283,7 @@ InitializeDebugAgent (
     GetApicTimerState (NULL, &PeriodicMode, NULL);
     TimerCycle = GetApicTimerInitCount ();
     if (PeriodicMode != TRUE || TimerCycle == 0) {
-      InitializeDebugTimer (NULL);
+      InitializeDebugTimer (NULL, FALSE);
       DisableApicTimerInterrupt ();
     }
     Mailbox = GetMailboxPointer ();
@@ -348,7 +348,7 @@ InitializeDebugAgent (
       //
       // Initialize Debug Timer hardware and save its frequency
       //
-      InitializeDebugTimer (&DebugTimerFrequency);
+      InitializeDebugTimer (&DebugTimerFrequency, TRUE);
       UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
       EnableInterrupts ();
 

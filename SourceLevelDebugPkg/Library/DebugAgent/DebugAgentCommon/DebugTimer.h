@@ -19,12 +19,14 @@
   Initialize CPU local APIC timer.
 
   @param[out] TimerFrequency  Local APIC timer frequency returned.
+  @param[in]  DumpFlag        If TRUE, dump Local APIC timer's parameter.
  
   @return   32-bit Local APIC timer init count.
 **/
 UINT32
 InitializeDebugTimer (
-  OUT UINT32     *TimerFrequency
+  OUT UINT32     *TimerFrequency,
+  IN  BOOLEAN    DumpFlag
   );
 
 /**

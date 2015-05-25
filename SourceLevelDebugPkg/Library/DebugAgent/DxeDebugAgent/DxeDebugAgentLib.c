@@ -306,7 +306,7 @@ SetupDebugAgentEnvironment (
   //
   // Initialize Debug Timer hardware and save its initial count and frequency
   //
-  mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer (&DebugTimerFrequency);
+  mDebugMpContext.DebugTimerInitCount = InitializeDebugTimer (&DebugTimerFrequency, TRUE);
   UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
   //
   // Initialize debug communication port

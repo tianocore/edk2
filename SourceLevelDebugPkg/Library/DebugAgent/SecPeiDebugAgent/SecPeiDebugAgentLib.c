@@ -403,7 +403,7 @@ InitializeDebugAgent (
     //
     // Initialize Debug Timer hardware and save its frequency
     //
-    InitializeDebugTimer (&DebugTimerFrequency);
+    InitializeDebugTimer (&DebugTimerFrequency, TRUE);
     UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
 
     Phase2Context.InitFlag = InitFlag;
@@ -535,7 +535,7 @@ InitializeDebugAgent (
       //
       // Initialize Debug Timer hardware and save its frequency
       //
-      InitializeDebugTimer (&DebugTimerFrequency);
+      InitializeDebugTimer (&DebugTimerFrequency, TRUE);
       UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
       //
       // Update IDT entry to save the location pointer saved mailbox pointer
