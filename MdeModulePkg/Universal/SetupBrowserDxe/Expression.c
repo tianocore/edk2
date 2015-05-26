@@ -2481,7 +2481,7 @@ GetQuestionValueFromForm (
   //
   // Get the question value.
   //
-  Status = GetQuestionValue(FormSet, Form, Question, GetSetValueWithHiiDriver);
+  Status = GetQuestionValue(FormSet, Form, Question, GetSetValueWithEditBuffer);
   if (EFI_ERROR (Status)) {
     GetTheVal = FALSE;
     goto Done;

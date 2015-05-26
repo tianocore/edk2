@@ -2067,6 +2067,11 @@ ProcessCallBackFunction (
         Status = ValueChangedValidation (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement);
         if (!EFI_ERROR (Status)) {
           //
+          //check whether the question value  changed compared with edit buffer before updating edit buffer
+          // if changed, set the ValueChanged flag to TRUE,in order to trig the CHANGED callback function
+          //
+          IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
+          //
           // According the spec, return value from call back of "changing" and 
           // "retrieve" should update to the question's temp buffer.
           //
@@ -2103,6 +2108,11 @@ ProcessCallBackFunction (
         //
         InternalStatus = ValueChangedValidation (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement);
         if (!EFI_ERROR (InternalStatus)) {
+          //
+          //check whether the question value  changed compared with edit buffer before updating edit buffer
+          // if changed, set the ValueChanged flag to TRUE,in order to trig the CHANGED callback function
+          //
+          IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
           SetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
         }
       }
@@ -2437,10 +2447,6 @@ SetupBrowser (
           }
         }
 
-        //
-        // Verify whether question value has checked, update the ValueChanged flag in Question.
-        //
-        IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
 
         if (!EFI_ERROR (Status) && 
             (Statement->Operand != EFI_IFR_REF_OP) && 
@@ -2449,6 +2455,11 @@ SetupBrowser (
           // Only question value has been changed, browser will trig CHANGED callback.
           //
           ProcessCallBackFunction(Selection, Selection->FormSet, Selection->Form, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
+          //
+          //check whether the question value changed compared with buffer value
+          //if doesn't change ,set the ValueChanged flag to FALSE ,in order not to display the "configuration changed "information on the screen
+          //
+          IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
         }
       } else {
         //
