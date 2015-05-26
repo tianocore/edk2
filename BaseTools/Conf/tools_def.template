@@ -6276,6 +6276,7 @@ NOOPT_MYTOOLS_IPF_DLINK_FLAGS            = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 #   XCODE32         - Xcode 3.2 Tools (Snow Leopard)
 *_XCODE32_*_*_FAMILY            = GCC
 *_XCODE32_*_*_BUILDRULEFAMILY   = XCODE
+*_XCODE32_*_*_BUILDRULEORDER    = S s nasm Nasm NASM
 
 
 *_XCODE32_*_ASL_PATH          = /usr/bin/iasl
@@ -6385,6 +6386,7 @@ RELEASE_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-inter
 #   CLANG         - clang that produce Mach-O with EFI x86_64 ABI
 *_XCLANG_*_*_FAMILY            = GCC
 *_XCLANG_*_*_BUILDRULEFAMILY   = XCODE
+*_XCLANG_*_*_BUILDRULEORDER    = S s nasm Nasm NASM
 
 *_XCLANG_*_ASL_PATH          = /usr/bin/iasl
 
@@ -6448,6 +6450,7 @@ RELEASE_XCLANG_X64_CC_FLAGS   = -ccc-host-triple x86_64-pc-win32-macho -c    -Os
 
 *_XCODE5_*_*_FAMILY            = GCC
 *_XCODE5_*_*_BUILDRULEFAMILY   = XCODE
+*_XCODE5_*_*_BUILDRULEORDER    = S s nasm Nasm NASM
 
 *_XCODE5_*_ASL_PATH          = /usr/bin/iasl
 
@@ -6940,3 +6943,8 @@ RELEASE_ARMLINUXGCC_AARCH64_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC
 *_*_*_NASM_PATH                = ENV(NASM_PREFIX)nasm
 # NASMB uses NASM produce a .bin from a .nasmb NASM source file
 *_*_*_NASMB_FLAGS              = -f bin
+
+#################
+# Build rule order
+#################
+*_*_*_*_BUILDRULEORDER = nasm Nasm NASM asm Asm ASM S s
