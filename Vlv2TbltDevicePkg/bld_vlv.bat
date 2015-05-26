@@ -217,10 +217,10 @@ echo Running fce...
 
 pushd %PLATFORM_PACKAGE%
 :: Extract Hii data from build and store in HiiDefaultData.txt
-fce read -i ..\%BUILD_PATH%\FV\Vlv.fd > ..\%BUILD_PATH%\FV\HiiDefaultData.txt 1>>EDK2.log 2>&1
+fce read -i ..\%BUILD_PATH%\FV\Vlv.fd > ..\%BUILD_PATH%\FV\HiiDefaultData.txt
 
-:: copy the Setup variable to the SetupDefault variable and save changes to VlvXXX.fd
-fce mirror -i ..\%BUILD_PATH%\FV\Vlv.fd -o ..\%BUILD_PATH%\FV\Vlv%Arch%.fd Setup SetupDefault 1>>EDK2.log 2>&1
+:: save changes to VlvXXX.fd
+fce update -i ..\%BUILD_PATH%\FV\Vlv.fd -s ..\%BUILD_PATH%\FV\HiiDefaultData.txt -o ..\%BUILD_PATH%\FV\Vlv%Arch%.fd
 
 popd
 

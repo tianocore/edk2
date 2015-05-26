@@ -126,6 +126,7 @@
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMED
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCED
   gEfiDevicePathToTextProtocolGuid              ## CONSUMED
+  gEdkiiFormBrowserEx2ProtocolGuid
 
   gEfiDataHubProtocolGuid
   gEfiLegacyBiosProtocolGuid

@@ -1364,12 +1364,7 @@ InitMfgAndConfigModeStateVar()
 {
   EFI_PLATFORM_SETUP_ID           *BootModeBuffer;
   VOID                            *HobList;
-  UINT16                          State;
 
-  //
-  // Variable initialization
-  //
-  State = FALSE;
 
   HobList = GetFirstGuidHob(&gEfiPlatformBootModeGuid);
   if (HobList != NULL) {
@@ -1386,16 +1381,8 @@ InitMfgAndConfigModeStateVar()
         mMfgMode = TRUE;
       }
 
-      //
-      // Check if in safe mode
-      //
-      if ( !CompareMem (
-              &BootModeBuffer->SetupName,
-              SAFE_SETUP_NAME,
-              StrSize (SAFE_SETUP_NAME)
-              ) ) {
-        State = TRUE;
-      }
+
+
   }
 
 }

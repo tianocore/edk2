@@ -386,16 +386,16 @@ SetPlatformBootMode (
     // Recovery mode
     //
     CopyMem (&PlatformSetupId.SetupName,
-             SAFE_SETUP_NAME,
-             StrSize (SAFE_SETUP_NAME));
+             &NORMAL_SETUP_NAME,
+             StrSize (NORMAL_SETUP_NAME));    
     PlatformSetupId.PlatformBootMode = PLATFORM_RECOVERY_MODE;
   } else if (CheckIfSafeMode(PeiServices, PlatformInfoHob)) {
     //
     // Safe mode also called config mode or maintenace mode.
     //
     CopyMem (&PlatformSetupId.SetupName,
-             SAFE_SETUP_NAME,
-             StrSize (SAFE_SETUP_NAME));
+             &NORMAL_SETUP_NAME,
+             StrSize (NORMAL_SETUP_NAME));
     PlatformSetupId.PlatformBootMode = PLATFORM_SAFE_MODE;
 
   } else if(0) { // else if (CheckIfManufacturingMode(PeiServices)) {

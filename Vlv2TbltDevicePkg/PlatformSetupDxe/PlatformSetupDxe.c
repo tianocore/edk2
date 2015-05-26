@@ -17,6 +17,8 @@ Module Name:
 
 #include "PlatformSetupDxe.h"
 #include "Guid/SetupVariable.h"
+#include <Protocol/FormBrowserEx2.h>
+
 
 #define EFI_CALLBACK_INFO_SIGNATURE SIGNATURE_32 ('C', 'l', 'b', 'k')
 #define EFI_CALLBACK_INFO_FROM_THIS(a)  CR (a, EFI_CALLBACK_INFO, ConfigAccess, EFI_CALLBACK_INFO_SIGNATURE)
@@ -358,6 +360,7 @@ SystemConfigCallback (
   EFI_STATUS                    Status;
   UINTN                         DataSize;
   UINT8                         OsSelection;
+  EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL *FormBrowserEx2;
 
   StringBuffer1 = AllocateZeroPool (200 * sizeof (CHAR16));
   ASSERT (StringBuffer1 != NULL);
@@ -596,33 +599,31 @@ SystemConfigCallback (
       // If the user hits the YES Response key
       //
       if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-        //
-        // Load default
-        //
+
+        Status = gBS->LocateProtocol (&gEdkiiFormBrowserEx2ProtocolGuid, NULL, (VOID **) &FormBrowserEx2);
+        FormBrowserEx2->ExecuteAction(BROWSER_ACTION_DEFAULT, EFI_HII_DEFAULT_CLASS_STANDARD);
+
         FakeNvData = AllocateZeroPool (sizeof(SYSTEM_CONFIGURATION));
 
         if (FakeNvData == NULL) {
           return EFI_OUT_OF_RESOURCES;
         }
-
-        SizeOfNvStore = sizeof(SYSTEM_CONFIGURATION);
-        Status = gRT->GetVariable(
-                        L"SetupDefault",
-                        &mNormalSetupGuid,
-                        NULL,
-                        &SizeOfNvStore,
-                        FakeNvData
-                        );
+        
+        Status = HiiGetBrowserData (
+		           &mSystemConfigGuid,
+				   mVariableName,
+				   sizeof (SYSTEM_CONFIGURATION),
+				   (UINT8 *) FakeNvData
+				   );
+        
         if (!EFI_ERROR (Status)) {
-          if(SizeOfNvStore >= sizeof(SYSTEM_CONFIGURATION)) {
-            Status = gRT->SetVariable (
-                            L"Setup",
-                            &mNormalSetupGuid,
-                            EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                            sizeof(SYSTEM_CONFIGURATION),
-                            FakeNvData
-                            );
-          }
+          Status = gRT->SetVariable (
+                          L"Setup",
+                          &mNormalSetupGuid,
+                          EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                          sizeof(SYSTEM_CONFIGURATION),
+                          FakeNvData
+                          );
         }
 
         FreePool (FakeNvData);
