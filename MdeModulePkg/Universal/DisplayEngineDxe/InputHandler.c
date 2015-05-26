@@ -190,6 +190,13 @@ ReadString (
         gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
         return EFI_DEVICE_ERROR;
 
+       case SCAN_DELETE:
+        for (Index = CurrentCursor; StringPtr[Index] != CHAR_NULL; Index++) {
+          StringPtr[Index] = StringPtr[Index + 1];
+          PrintCharAt (Start + Index + 1, Top + 3, IsPassword && StringPtr[Index] != CHAR_NULL? L'*' : StringPtr[Index]);
+        }
+        break;
+
       default:
         break;
       }
