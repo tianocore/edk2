@@ -38,7 +38,8 @@ typedef UINT16 EFI_SIO_REGISTER;
   The register is specified as an 8-bit logical device number and an 8-bit
   register value. The logical device numbers for specific SIO devices can be
   determined using the Info member of the PPI structure.
- 
+
+  @param PeiServices  A pointer to a pointer to the PEI Services.
   @param This         A pointer to this instance of the EFI_SIO_PPI.
   @param ExitCfgMode  A boolean specifying whether the driver should turn on
                       configuration mode (FALSE) or turn off configuration mode
@@ -53,7 +54,7 @@ typedef UINT16 EFI_SIO_REGISTER;
   @param IoData       A pointer to the returned register value.
 
   @retval EFI_SUCCESS            Success.
-  @regval EFI_TIMEOUT            The register could not be read in the a reasonable
+  @retval EFI_TIMEOUT            The register could not be read in the a reasonable
                                  amount of time. The exact time is device-specific.
   @retval EFI_INVALID_PARAMETERS Register was out of range for this device.
   @retval EFI_INVALID_PARAMETERS IoData was NULL
@@ -76,6 +77,7 @@ EFI_STATUS
   value. The logical device numbers for specific SIO devices can be determined
   using the Info member of the PPI structure.
 
+  @param PeiServices  A pointer to a pointer to the PEI Services.
   @param This         A pointer to this instance of the EFI_SIO_PPI.
   @param ExitCfgMode  A boolean specifying whether the driver should turn on
                       configuration mode (FALSE) or turn off configuration mode
@@ -90,7 +92,7 @@ EFI_STATUS
   @param IoData       A pointer to the returned register value.
 
   @retval EFI_SUCCESS            Success.
-  @regval EFI_TIMEOUT            The register could not be read in the a reasonable
+  @retval EFI_TIMEOUT            The register could not be read in the a reasonable
                                  amount of time. The exact time is device-specific.
   @retval EFI_INVALID_PARAMETERS Register was out of range for this device.
   @retval EFI_INVALID_PARAMETERS IoData was NULL
@@ -117,7 +119,8 @@ EFI_STATUS
   must track the current state of the Super I/O and enable the configuration mode
   of Super I/O if necessary prior to table processing. Once the table is processed,
   the Super I/O device must be returned to the original state.
- 
+
+  @param PeiServices      A pointer to a pointer to the PEI Services.
   @param This             A pointer to this instance of the EFI_SIO_PPI.
   @param Command          A pointer to an array of NumberOfCommands EFI_SIO_REGISTER_MODIFY
                           structures. Each structure specifies a single Super I/O register
