@@ -231,6 +231,7 @@
   MdeModulePkg/Bus/I2c/I2cDxe/I2cBusDxe.inf
   MdeModulePkg/Bus/I2c/I2cDxe/I2cHostDxe.inf
   MdeModulePkg/Bus/I2c/I2cDxe/I2cDxe.inf
+  MdeModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
 
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
