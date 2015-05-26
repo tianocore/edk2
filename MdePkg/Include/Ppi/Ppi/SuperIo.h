@@ -62,6 +62,7 @@ typedef UINT16 EFI_SIO_REGISTER;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SIO_REGISTER_READ)(
+  IN EFI_PEI_SERVICES       **PeiServices,
   IN CONST EFI_SIO_PPI      *This,
   IN BOOLEAN                ExitCfgMode,
   IN EFI_SIO_REGISTER       Register,
@@ -98,6 +99,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SIO_REGISTER_WRITE)(
+  IN EFI_PEI_SERVICES       **PeiServices,
   IN CONST EFI_SIO_PPI      *This,
   IN BOOLEAN                ExitCfgMode,
   IN EFI_SIO_REGISTER       Register,
@@ -128,6 +130,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SIO_REGISTER_MODIFY)(
+  IN EFI_PEI_SERVICES              **PeiServices,
   IN CONST EFI_SIO_PPI             *This,
   IN CONST EFI_SIO_REGISTER_MODIFY *Command,
   IN UINTN                         NumberOfCommands
