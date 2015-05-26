@@ -2082,6 +2082,13 @@ class PlatformAutoGen(AutoGen):
         else:
             PlatformModuleOptions = {}
 
+        BuildRuleOrder = None
+        for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, PlatformModuleOptions]:
+            for Tool in Options:
+                for Attr in Options[Tool]:
+                    if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
+                        BuildRuleOrder = Options[Tool][Attr]
+
         AllTools = set(ModuleOptions.keys() + PlatformOptions.keys() + PlatformModuleOptions.keys() + self.ToolDefinition.keys())
         BuildOptions = {}
         for Tool in AllTools:
@@ -2093,6 +2100,11 @@ class PlatformAutoGen(AutoGen):
                     continue
                 for Attr in Options[Tool]:
                     Value = Options[Tool][Attr]
+                    #
+                    # Do not generate it in Makefile
+                    #
+                    if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
+                        continue
                     if Attr not in BuildOptions[Tool]:
                         BuildOptions[Tool][Attr] = ""
                     # check if override is indicated
@@ -2107,7 +2119,7 @@ class PlatformAutoGen(AutoGen):
             if 'BUILD' not in BuildOptions:
                 BuildOptions['BUILD'] = {}
             BuildOptions['BUILD']['FLAGS'] = self.Workspace.UniFlag
-        return BuildOptions
+        return BuildOptions, BuildRuleOrder
 
     Platform            = property(_GetPlatform)
     Name                = property(_GetName)
@@ -2195,6 +2207,7 @@ class ModuleAutoGen(AutoGen):
         self.DepexGenerated = False
 
         self.BuildDatabase = self.Workspace.BuildDatabase
+        self.BuildRuleOrder = None
 
         self._Module          = None
         self._Name            = None
@@ -2587,7 +2600,9 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetModuleBuildOption(self):
         if self._BuildOption == None:
-            self._BuildOption = self.PlatformInfo.ApplyBuildOption(self.Module)
+            self._BuildOption, self.BuildRuleOrder = self.PlatformInfo.ApplyBuildOption(self.Module)
+            if self.BuildRuleOrder:
+                self.BuildRuleOrder = ['.%s' % Ext for Ext in self.BuildRuleOrder.split()]
         return self._BuildOption
 
     ## Get include path list from tool option for the module build
@@ -2746,6 +2761,11 @@ class ModuleAutoGen(AutoGen):
         RuleChain = []
         SourceList = [File]
         Index = 0
+        #
+        # Make sure to get build rule order value
+        #
+        self._GetModuleBuildOption()
+
         while Index < len(SourceList):
             Source = SourceList[Index]
             Index = Index + 1
@@ -2779,7 +2799,7 @@ class ModuleAutoGen(AutoGen):
                     self._FinalBuildTargetList.add(LastTarget)
                 break
 
-            Target = RuleObject.Apply(Source)
+            Target = RuleObject.Apply(Source, self.BuildRuleOrder)
             if not Target:
                 if LastTarget:
                     self._FinalBuildTargetList.add(LastTarget)
