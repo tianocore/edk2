@@ -58,6 +58,7 @@ STATIC CONST EFI_GUID mJunoAcpiTableFile = { 0xa1dd808e, 0x1e95, 0x4399, { 0xab,
 
 typedef struct {
   ACPI_HID_DEVICE_PATH      AcpiDevicePath;
+  PCI_DEVICE_PATH           PciDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  EndDevicePath;
 } EFI_PCI_ROOT_BRIDGE_DEVICE_PATH;
 
@@ -69,6 +70,15 @@ STATIC CONST EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mPciRootComplexDevicePath = {
           (UINT8) ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8) }
       },
       EISA_PNP_ID (0x0A03),
+      0
+    },
+    {
+      { HARDWARE_DEVICE_PATH,
+        HW_PCI_DP,
+        { (UINT8) (sizeof (PCI_DEVICE_PATH)),
+          (UINT8) ((sizeof (PCI_DEVICE_PATH)) >> 8) }
+      },
+      0,
       0
     },
     {
