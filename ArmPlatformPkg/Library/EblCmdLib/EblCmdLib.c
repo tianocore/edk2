@@ -325,14 +325,23 @@ EblDumpGcd (
     if (MemorySpaceMap[i].Attributes & EFI_MEMORY_XP)
         AsciiPrint (" MEM_XP");
 
-    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeNonExistent)
+    switch (MemorySpaceMap[i].GcdMemoryType) {
+      case EfiGcdMemoryTypeNonExistent:
         AsciiPrint (" TYPE_NONEXISTENT");
-    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeReserved)
+        break;
+      case EfiGcdMemoryTypeReserved:
         AsciiPrint (" TYPE_RESERVED");
-    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeSystemMemory)
+        break;
+      case EfiGcdMemoryTypeSystemMemory:
         AsciiPrint (" TYPE_SYSMEM");
-    if (MemorySpaceMap[i].GcdMemoryType & EfiGcdMemoryTypeMemoryMappedIo)
+        break;
+      case EfiGcdMemoryTypeMemoryMappedIo:
         AsciiPrint (" TYPE_MEMMAP");
+        break;
+      default:
+        AsciiPrint (" TYPE_UNKNOWN");
+        break;
+    }
 
     AsciiPrint ("\n");
   }
@@ -347,12 +356,20 @@ EblDumpGcd (
     AsciiPrint ("IO  %08lx - %08lx",IoSpaceMap[i].BaseAddress,IoSpaceMap[i].BaseAddress+IoSpaceMap[i].Length);
     AsciiPrint ("\t%08x %08x",IoSpaceMap[i].ImageHandle,IoSpaceMap[i].DeviceHandle);
 
-    if (IoSpaceMap[i].GcdIoType & EfiGcdMemoryTypeNonExistent)
+    switch (IoSpaceMap[i].GcdIoType) {
+      case EfiGcdIoTypeNonExistent:
         AsciiPrint (" TYPE_NONEXISTENT");
-    if (IoSpaceMap[i].GcdIoType & EfiGcdMemoryTypeReserved)
+        break;
+      case EfiGcdIoTypeReserved:
         AsciiPrint (" TYPE_RESERVED");
-    if (IoSpaceMap[i].GcdIoType & EfiGcdIoTypeIo)
+        break;
+      case EfiGcdIoTypeIo:
         AsciiPrint (" TYPE_IO");
+        break;
+      default:
+        AsciiPrint (" TYPE_UNKNOWN");
+        break;
+    }
 
     AsciiPrint ("\n");
   }
