@@ -191,6 +191,7 @@ VfrParserStart (
 #token InteractiveFlag("INTERACTIVE")           "INTERACTIVE"
 #token NVAccessFlag("NV_ACCESS")                "NV_ACCESS"
 #token ResetRequiredFlag("RESET_REQUIRED")      "RESET_REQUIRED"
+#token ReconnectRequiredFlag("RECONNECT_REQUIRED") "RECONNECT_REQUIRED"
 #token LateCheckFlag("LATE_CHECK")              "LATE_CHECK"
 #token ReadOnlyFlag("READ_ONLY")                "READ_ONLY"
 #token OptionOnlyFlag("OPTIONS_ONLY")           "OPTIONS_ONLY"
@@ -1186,6 +1187,7 @@ questionheaderFlagsField[UINT8 & Flags] :
     ReadOnlyFlag                                    << $Flags |= 0x01; >>
   | InteractiveFlag                                 << $Flags |= 0x04; >>
   | ResetRequiredFlag                               << $Flags |= 0x10; >>
+  | ReconnectRequiredFlag                           << $Flags |= 0x40; >>
   | O:OptionOnlyFlag                                << 
                                                        if (mCompatibleMode) {
                                                          $Flags |= 0x80;
@@ -1842,6 +1844,7 @@ flagsField :
   | ManufacturingFlag 
   | DefaultFlag 
   | ResetRequiredFlag 
+  | ReconnectRequiredFlag
   | N:NVAccessFlag                                     << 
                                                           if (!mCompatibleMode) {
                                                             gCVfrErrorHandle.HandleWarning (
@@ -3501,6 +3504,7 @@ oneofoptionFlagsField [UINT8 & HFlags, UINT8 & LFlags] :
   | "OPTION_DEFAULT_MFG"                               << $LFlags |= 0x20; >>
   | InteractiveFlag                                    << $HFlags |= 0x04; >>
   | ResetRequiredFlag                                  << $HFlags |= 0x10; >>
+  | ReconnectRequiredFlag                              << $HFlags |= 0x40; >>
   | ManufacturingFlag                                  << $LFlags |= 0x20; >>
   | DefaultFlag                                        << $LFlags |= 0x10; >>
   | A:NVAccessFlag                                     << 

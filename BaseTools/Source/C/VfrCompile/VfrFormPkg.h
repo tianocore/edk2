@@ -422,7 +422,11 @@ public:
     if (_FLAG_TEST_AND_CLEAR (Flags, EFI_IFR_FLAG_RESET_REQUIRED)) {
       mHeader->Flags |= EFI_IFR_FLAG_RESET_REQUIRED;
     }
-    
+
+    if (_FLAG_TEST_AND_CLEAR (Flags, EFI_IFR_FLAG_RECONNECT_REQUIRED)) {
+      mHeader->Flags |= EFI_IFR_FLAG_RECONNECT_REQUIRED;
+    }
+
     //
     //  Set LateCheck Flag to compatible for framework flag
     //  but it uses 0x20 as its flag, if in the future UEFI may take this flag

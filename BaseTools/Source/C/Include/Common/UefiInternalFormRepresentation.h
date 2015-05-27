@@ -6,7 +6,7 @@
   @par Revision Reference:
   These definitions are from UEFI2.1.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -715,10 +715,11 @@ typedef struct _EFI_IFR_QUESTION_HEADER {
   UINT8                    Flags;
 } EFI_IFR_QUESTION_HEADER;
 
-#define EFI_IFR_FLAG_READ_ONLY         0x01
-#define EFI_IFR_FLAG_CALLBACK          0x04
-#define EFI_IFR_FLAG_RESET_REQUIRED    0x10
-#define EFI_IFR_FLAG_OPTIONS_ONLY      0x80
+#define EFI_IFR_FLAG_READ_ONLY          0x01
+#define EFI_IFR_FLAG_CALLBACK           0x04
+#define EFI_IFR_FLAG_RESET_REQUIRED     0x10
+#define EFI_IFR_FLAG_RECONNECT_REQUIRED 0x40
+#define EFI_IFR_FLAG_OPTIONS_ONLY       0x80
 
 typedef struct _EFI_IFR_DEFAULTSTORE {
   EFI_IFR_OP_HEADER        Header;
