@@ -5,7 +5,7 @@
   The definitions in this file are defined in UEFI Specification 2.3.1B, which have
   not been verified by one implementation yet.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -44,10 +44,11 @@ typedef VOID *  EFI_PORT_HANDLE;
 
 //
 // EAP_TYPE MD5, OTP and TOEKN_CARD has been removed from UEFI2.3.1B.
+// Definitions are kept for backward compatibility.
 //
-#define EFI_EAP_TYPE_MD5                0x4
-#define EFI_EAP_TYPE_OTP                0x5
-#define EFI_EAP_TYPE_TOKEN_CARD         0x6
+#define EFI_EAP_TYPE_MD5                4
+#define EFI_EAP_TYPE_OTP                5
+#define EFI_EAP_TYPE_TOKEN_CARD         6
 
 /**
   One user provided EAP authentication method.
