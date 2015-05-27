@@ -422,7 +422,7 @@ CbParseFadtInfo (
   Rsdp = NULL;
   Status = RETURN_SUCCESS;
 
-  Status = CbParseAcpiTable (&Rsdp, NULL);
+  Status = CbParseAcpiTable ((VOID **)&Rsdp, NULL);
   if (RETURN_ERROR(Status)) {
     return Status;
   }
