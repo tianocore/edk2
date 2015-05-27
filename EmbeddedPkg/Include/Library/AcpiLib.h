@@ -52,6 +52,12 @@
     GsivId, GicRBase, Mpidr                                                          \
   }
 
+#define EFI_ACPI_6_0_GIC_MSI_FRAME_INIT(GicMsiFrameId, PhysicalBaseAddress, Flags, SPICount, SPIBase) \
+  { \
+    EFI_ACPI_6_0_GIC_MSI_FRAME, sizeof (EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE), EFI_ACPI_RESERVED_WORD, \
+    GicMsiFrameId, PhysicalBaseAddress, Flags, SPICount, SPIBase \
+  }
+
 //
 // SBSA Generic Watchdog
 //
