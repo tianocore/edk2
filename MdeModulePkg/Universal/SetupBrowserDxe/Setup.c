@@ -55,6 +55,8 @@ LIST_ENTRY      gBrowserSaveFailFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBr
 BOOLEAN               mSystemSubmit = FALSE;
 BOOLEAN               gResetRequired;
 BOOLEAN               gExitRequired;
+BOOLEAN               gFlagReconnect;
+BOOLEAN               gCallbackReconnect;
 BROWSER_SETTING_SCOPE gBrowserSettingScope = FormSetLevel;
 BOOLEAN               mBrowserScopeFirstSet = TRUE;
 EXIT_HANDLER          ExitHandlerFunction = NULL;
@@ -483,6 +485,7 @@ SendForm (
   UINTN                         Index;
   FORM_BROWSER_FORMSET          *FormSet;
   FORM_ENTRY_INFO               *MenuList;
+  BOOLEAN                       RetVal;
 
   //
   // If EDKII_FORM_DISPLAY_ENGINE_PROTOCOL not found, return EFI_UNSUPPORTED.
@@ -496,8 +499,10 @@ SendForm (
   //
   SaveBrowserContext ();
 
+  gFlagReconnect = FALSE;
   gResetRequired = FALSE;
   gExitRequired  = FALSE;
+  gCallbackReconnect = FALSE;
   Status         = EFI_SUCCESS;
   gEmptyString   = L"";
   gDisplayFormData.ScreenDimensions = (EFI_SCREEN_DESCRIPTOR *) ScreenDimensions;
@@ -546,6 +551,15 @@ SendForm (
 
       gCurrentSelection = NULL;
       mSystemLevelFormSet = NULL;
+
+      if (gFlagReconnect || gCallbackReconnect) {
+        RetVal = ReconnectController (FormSet->DriverHandle);
+        if (!RetVal) {
+          PopupErrorMessage(BROWSER_RECONNECT_FAIL, NULL, NULL, NULL);
+        }
+        gFlagReconnect = FALSE;
+        gCallbackReconnect = FALSE;
+      }
 
       //
       // If no data is changed, don't need to save current FormSet into the maintain list.
@@ -2523,8 +2537,14 @@ UpdateFlagForForm (
     //
     // Only the changed data has been saved, then need to set the reset flag.
     //
-    if (SetFlag && OldValue && !Question->ValueChanged && ((Question->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0)) {
-      gResetRequired = TRUE;
+    if (SetFlag && OldValue && !Question->ValueChanged) {
+      if ((Question->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0) {
+        gResetRequired = TRUE;
+      }
+
+      if ((Question->QuestionFlags & EFI_IFR_FLAG_RECONNECT_REQUIRED) != 0) {
+        gFlagReconnect = TRUE;
+      }
     } 
   }
 }
@@ -5524,6 +5544,8 @@ SaveBrowserContext (
   //
   Context->Selection            = gCurrentSelection;
   Context->ResetRequired        = gResetRequired;
+  Context->FlagReconnect        = gFlagReconnect;
+  Context->CallbackReconnect    = gCallbackReconnect;
   Context->ExitRequired         = gExitRequired;
   Context->HiiHandle            = mCurrentHiiHandle;
   Context->FormId               = mCurrentFormId;
@@ -5579,6 +5601,8 @@ RestoreBrowserContext (
   //
   gCurrentSelection     = Context->Selection;
   gResetRequired        = Context->ResetRequired;
+  gFlagReconnect        = Context->FlagReconnect;
+  gCallbackReconnect    = Context->CallbackReconnect;
   gExitRequired         = Context->ExitRequired;
   mCurrentHiiHandle     = Context->HiiHandle;
   mCurrentFormId        = Context->FormId;

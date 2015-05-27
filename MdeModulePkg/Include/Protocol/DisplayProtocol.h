@@ -1,7 +1,7 @@
 /** @file
   FormDiplay protocol to show Form
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -39,6 +39,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define BROWSER_INCONSISTENT_IF           BROWSER_ERROR | 0x06
 #define BROWSER_WARNING_IF                BROWSER_ERROR | 0x07
 #define BROWSER_SUBMIT_FAIL_NO_SUBMIT_IF  BROWSER_ERROR | 0x08
+#define BROWSER_RECONNECT_REQUIRED        BROWSER_ERROR | 0x09
+#define BROWSER_RECONNECT_FAIL            BROWSER_ERROR | 0x0A
+#define BROWSER_RECONNECT_SAVE_CHANGES    BROWSER_ERROR | 0x0B
 
 #define FORM_DISPLAY_ENGINE_STATEMENT_VERSION_1  0x10000
 #define FORM_DISPLAY_ENGINE_VERSION_1            0x10000

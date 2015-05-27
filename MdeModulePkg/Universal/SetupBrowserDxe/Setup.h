@@ -528,6 +528,8 @@ typedef struct {
   //
   // Globals defined in Setup.c
   //
+  BOOLEAN                  FlagReconnect;
+  BOOLEAN                  CallbackReconnect;
   BOOLEAN                  ResetRequired;
   BOOLEAN                  ExitRequired;
   EFI_HII_HANDLE           HiiHandle;
@@ -566,6 +568,8 @@ extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
 extern EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL *mPathFromText;
 extern EDKII_FORM_DISPLAY_ENGINE_PROTOCOL *mFormDisplay;
 
+extern BOOLEAN               gCallbackReconnect;
+extern BOOLEAN               gFlagReconnect;
 extern BOOLEAN               gResetRequired;
 extern BOOLEAN               gExitRequired;
 extern LIST_ENTRY            gBrowserFormSetList;
@@ -1829,6 +1833,20 @@ GetFstStgFromVarId (
 FORMSET_STORAGE *
 GetFstStgFromBrsStg (
   IN BROWSER_STORAGE       *Storage
+  );
+
+/**
+  Reconnect the controller.
+
+  @param DriverHandle          The controller handle which need to be reconnect.
+
+  @retval   TRUE     do the reconnect behavior success.
+  @retval   FALSE    do the reconnect behavior failed.
+  
+**/
+BOOLEAN
+ReconnectController (
+  IN EFI_HANDLE   DriverHandle
   );
 
 #endif

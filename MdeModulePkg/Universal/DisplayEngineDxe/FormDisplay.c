@@ -113,9 +113,13 @@ FORM_ENTRY_INFO               gOldFormEntry = {0};
 //
 // Browser Global Strings
 //
+CHAR16            *gReconnectConfirmChanges;
+CHAR16            *gReconnectFail;
+CHAR16            *gReconnectRequired;
+CHAR16            *gChangesOpt;
 CHAR16            *gFormNotFound;
 CHAR16            *gNoSubmitIf;
-CHAR16            *gBrwoserError;
+CHAR16            *gBrowserError;
 CHAR16            *gSaveFailed;
 CHAR16            *gNoSubmitIfFailed;
 CHAR16            *gSaveProcess;
@@ -203,9 +207,13 @@ InitializeDisplayStrings (
   VOID
   )
 {
+  gReconnectConfirmChanges = GetToken (STRING_TOKEN (RECONNECT_CONFIRM_CHANGES), gHiiHandle);
   mUnknownString        = GetToken (STRING_TOKEN (UNKNOWN_STRING), gHiiHandle);
   gSaveFailed           = GetToken (STRING_TOKEN (SAVE_FAILED), gHiiHandle);
   gNoSubmitIfFailed     = GetToken (STRING_TOKEN (NO_SUBMIT_IF_CHECK_FAILED), gHiiHandle);
+  gReconnectFail        = GetToken (STRING_TOKEN (RECONNECT_FAILED), gHiiHandle);
+  gReconnectRequired    = GetToken (STRING_TOKEN (RECONNECT_REQUIRED), gHiiHandle);
+  gChangesOpt           = GetToken (STRING_TOKEN (RECONNECT_CHANGES_OPTIONS), gHiiHandle);
   gSaveProcess          = GetToken (STRING_TOKEN (DISCARD_OR_JUMP), gHiiHandle);
   gSaveNoSubmitProcess  = GetToken (STRING_TOKEN (DISCARD_OR_CHECK), gHiiHandle);
   gDiscardChange        = GetToken (STRING_TOKEN (DISCARD_OR_JUMP_DISCARD), gHiiHandle);
@@ -225,7 +233,7 @@ InitializeDisplayStrings (
   gProtocolNotFound     = GetToken (STRING_TOKEN (PROTOCOL_NOT_FOUND), gHiiHandle);
   gFormNotFound         = GetToken (STRING_TOKEN (STATUS_BROWSER_FORM_NOT_FOUND), gHiiHandle);
   gNoSubmitIf           = GetToken (STRING_TOKEN (STATUS_BROWSER_NO_SUBMIT_IF), gHiiHandle);
-  gBrwoserError         = GetToken (STRING_TOKEN (STATUS_BROWSER_ERROR), gHiiHandle);
+  gBrowserError         = GetToken (STRING_TOKEN (STATUS_BROWSER_ERROR), gHiiHandle);
   gConfirmDefaultMsg    = GetToken (STRING_TOKEN (CONFIRM_DEFAULT_MESSAGE), gHiiHandle);
   gConfirmDiscardMsg    = GetToken (STRING_TOKEN (CONFIRM_DISCARD_MESSAGE), gHiiHandle);
   gConfirmSubmitMsg     = GetToken (STRING_TOKEN (CONFIRM_SUBMIT_MESSAGE), gHiiHandle);
@@ -256,6 +264,10 @@ FreeDisplayStrings (
   FreePool (gEmptyString);
   FreePool (gSaveFailed);
   FreePool (gNoSubmitIfFailed);
+  FreePool (gReconnectFail);
+  FreePool (gReconnectRequired);
+  FreePool (gChangesOpt);
+  FreePool (gReconnectConfirmChanges);
   FreePool (gSaveProcess);
   FreePool (gSaveNoSubmitProcess);
   FreePool (gDiscardChange);
@@ -272,7 +284,7 @@ FreeDisplayStrings (
   FreePool (gOptionMismatch);
   FreePool (gFormSuppress);
   FreePool (gProtocolNotFound);
-  FreePool (gBrwoserError);
+  FreePool (gBrowserError);
   FreePool (gNoSubmitIf);
   FreePool (gFormNotFound);
   FreePool (gConfirmDefaultMsg);
@@ -3776,8 +3788,20 @@ BrowserStatusProcess (
       ErrorInfo = gNoSubmitIfFailed;
       break;
 
+    case BROWSER_RECONNECT_FAIL:
+      ErrorInfo = gReconnectFail;
+      break;
+
+    case BROWSER_RECONNECT_SAVE_CHANGES:
+      ErrorInfo = gReconnectConfirmChanges;
+      break;
+
+    case BROWSER_RECONNECT_REQUIRED:
+      ErrorInfo = gReconnectRequired;
+      break;
+
     default:
-      ErrorInfo = gBrwoserError;
+      ErrorInfo = gBrowserError;
       break;
     }
   }
@@ -3785,15 +3809,21 @@ BrowserStatusProcess (
   switch (gFormData->BrowserStatus) {
   case BROWSER_SUBMIT_FAIL:
   case BROWSER_SUBMIT_FAIL_NO_SUBMIT_IF:
+  case BROWSER_RECONNECT_SAVE_CHANGES:
     ASSERT (gUserInput != NULL);
     if (gFormData->BrowserStatus == (BROWSER_SUBMIT_FAIL)) {
       PrintString = gSaveProcess;
       JumpToFormSet = gJumpToFormSet[0];
+      DiscardChange = gDiscardChange[0];
+    } else if (gFormData->BrowserStatus == (BROWSER_RECONNECT_SAVE_CHANGES)){
+      PrintString = gChangesOpt;
+      JumpToFormSet = gConfirmOptYes[0];
+      DiscardChange = gConfirmOptNo[0];
     } else {
       PrintString = gSaveNoSubmitProcess;
       JumpToFormSet = gCheckError[0];
+      DiscardChange = gDiscardChange[0];
     }
-    DiscardChange = gDiscardChange[0];
 
     do {
       CreateDialog (&Key, gEmptyString, ErrorInfo, PrintString, gEmptyString, NULL);

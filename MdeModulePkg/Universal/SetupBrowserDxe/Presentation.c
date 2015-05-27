@@ -1885,6 +1885,30 @@ FindNextMenu (
 }
 
 /**
+  Reconnect the controller.
+
+  @param DriverHandle          The controller handle which need to be reconnect.
+
+  @retval   TRUE     do the reconnect behavior success.
+  @retval   FALSE    do the reconnect behavior failed.
+  
+**/
+BOOLEAN
+ReconnectController (
+  IN EFI_HANDLE   DriverHandle
+  )
+{
+  EFI_STATUS                      Status;
+
+  Status = gBS->DisconnectController(DriverHandle, NULL, NULL);
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->ConnectController(DriverHandle, NULL, NULL, TRUE);
+  }
+
+  return Status == EFI_SUCCESS;
+}
+
+/**
   Call the call back function for the question and process the return action.
 
   @param Selection             On input, Selection tell setup browser the information
@@ -2055,6 +2079,10 @@ ProcessCallBackFunction (
           SettingLevel          = FormLevel;
           break;
 
+        case EFI_BROWSER_ACTION_REQUEST_RECONNECT:
+          gCallbackReconnect    = TRUE;
+          break;
+
         default:
           break;
         }
@@ -2153,6 +2181,28 @@ ProcessCallBackFunction (
     if (Question != NULL) {
       break;
     }
+  }
+
+  if (gCallbackReconnect && (EFI_BROWSER_ACTION_CHANGED == Action)) {
+    //
+    // Confirm changes with user first.
+    //
+    if (IsNvUpdateRequiredForFormSet(FormSet)) {
+      if (BROWSER_ACTION_DISCARD == PopupErrorMessage(BROWSER_RECONNECT_SAVE_CHANGES, NULL, NULL, NULL)) {
+        gCallbackReconnect = FALSE;
+        DiscardFormIsRequired = TRUE;
+      } else {
+        SubmitFormIsRequired = TRUE;
+      }
+    } else {
+      PopupErrorMessage(BROWSER_RECONNECT_REQUIRED, NULL, NULL, NULL);
+    }
+
+    //
+    // Exit current formset before do the reconnect.
+    //
+    NeedExit = TRUE;
+    SettingLevel = FormSetLevel;
   }
 
   if (SubmitFormIsRequired && !SkipSaveOrDiscard) {
@@ -2476,13 +2526,18 @@ SetupBrowser (
       }
 
       //
-      // If question has EFI_IFR_FLAG_RESET_REQUIRED flag and without storage and process question success till here, 
-      // trig the gResetFlag.
+      // If question has EFI_IFR_FLAG_RESET_REQUIRED/EFI_IFR_FLAG_RECONNECT_REQUIRED flag and without storage 
+      // and process question success till here, trig the gResetFlag/gFlagReconnect.
       //
       if ((Status == EFI_SUCCESS) && 
-          (Statement->Storage == NULL) && 
-          ((Statement->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0)) {
-        gResetRequired = TRUE;
+          (Statement->Storage == NULL)) { 
+        if ((Statement->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0) {
+          gResetRequired = TRUE;
+        }
+
+        if ((Statement->QuestionFlags & EFI_IFR_FLAG_RECONNECT_REQUIRED) != 0) {
+          gFlagReconnect = TRUE;
+        }
       }
     }
 
