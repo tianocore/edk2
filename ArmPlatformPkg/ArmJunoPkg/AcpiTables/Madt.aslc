@@ -71,6 +71,7 @@
     EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
     EFI_ACPI_5_1_GIC_STRUCTURE                            GicInterfaces[FixedPcdGet32 (PcdCoreCount)];
     EFI_ACPI_5_0_GIC_DISTRIBUTOR_STRUCTURE                GicDistributor;
+    EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE                  MsiFrame;
   } EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
 
   #pragma pack ()
@@ -117,7 +118,8 @@
           1, 5, GET_MPID(0, 1),  EFI_ACPI_5_0_GIC_ENABLED, 38, FixedPcdGet32 (PcdGicInterruptInterfaceBase),
           0x2C06F000, 0x2C04F000, 25, 0 /* GicRBase */),
     },
-    EFI_ACPI_5_0_GIC_DISTRIBUTOR_INIT(0, FixedPcdGet32 (PcdGicDistributorBase), 0)
+    EFI_ACPI_5_0_GIC_DISTRIBUTOR_INIT(0, FixedPcdGet32 (PcdGicDistributorBase), 0),
+    EFI_ACPI_6_0_GIC_MSI_FRAME_INIT(0, ARM_JUNO_GIV2M_MSI_BASE, 0, 0, 0)
   };
 #endif
 
