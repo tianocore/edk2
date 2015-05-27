@@ -23,12 +23,24 @@
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
+
+#include <Protocol/AcpiTable.h>
 
 #include <IndustryStandard/Acpi.h>
 
 EFI_STATUS
 PciEmulationEntryPoint (
   VOID
+  );
+
+/**
+ * Callback called when ACPI Protocol is installed
+ */
+VOID
+AcpiPciNotificationEvent (
+  IN  EFI_EVENT                Event,
+  IN  VOID                     *Context
   );
 
 #endif // __ARM_JUNO_DXE_INTERNAL_H__

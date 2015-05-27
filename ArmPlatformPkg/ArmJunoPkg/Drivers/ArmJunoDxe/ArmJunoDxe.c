@@ -78,6 +78,8 @@ STATIC CONST EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mPciRootComplexDevicePath = {
     }
 };
 
+EFI_EVENT mAcpiRegistration = NULL;
+
 /**
  * Build and Set UEFI Variable Boot####
  *
@@ -185,6 +187,24 @@ OnEndOfDxe (
 
   Status = gBS->ConnectController (Handle, NULL, PciRootComplexDevicePath, FALSE);
   ASSERT_EFI_ERROR (Status);
+}
+
+STATIC
+BOOLEAN
+AcpiTableJunoR0Check (
+  IN  EFI_ACPI_DESCRIPTION_HEADER *AcpiHeader
+  )
+{
+  return TRUE;
+}
+
+STATIC
+BOOLEAN
+AcpiTableJunoR1Check (
+  IN  EFI_ACPI_DESCRIPTION_HEADER *AcpiHeader
+  )
+{
+  return TRUE;
 }
 
 EFI_STATUS
@@ -297,9 +317,19 @@ ArmJunoEntryPoint (
   }
 
   //
+  // Try to install the ACPI Tables
+  //
+  if (JunoRevision == JUNO_R0) {
+    Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR0Check);
+  } else if (JunoRevision == JUNO_R1) {
+    Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR1Check);
+  }
+  ASSERT_EFI_ERROR (Status);
+
+
+  //
   // Set the R1 two boot options if not already done.
   //
-
   if (JunoRevision == JUNO_R1) {
     Status = SetJunoR1DefaultBootEntries ();
     if (EFI_ERROR (Status)) {
@@ -308,6 +338,15 @@ ArmJunoEntryPoint (
 
     // Enable PCI enumeration
     PcdSetBool (PcdPciDisableBusEnumeration, FALSE);
+
+    // Declare the related ACPI Tables
+    EfiCreateProtocolNotifyEvent (
+        &gEfiAcpiTableProtocolGuid,
+        TPL_CALLBACK,
+        AcpiPciNotificationEvent,
+        NULL,
+        &mAcpiRegistration
+        );
   }
 
   //
@@ -341,9 +380,6 @@ ArmJunoEntryPoint (
       );
     return Status;
   }
-
-  // Try to install the ACPI Tables
-  Status = LocateAndInstallAcpiFromFv (&mJunoAcpiTableFile);
 
   return Status;
 }
