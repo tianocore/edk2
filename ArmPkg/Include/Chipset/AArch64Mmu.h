@@ -51,8 +51,8 @@
 #define TT_ALIGNMENT_BLOCK_ENTRY                BIT12
 #define TT_ALIGNMENT_DESCRIPTION_TABLE          BIT12
 
-#define TT_ADDRESS_MASK_BLOCK_ENTRY             (0xFFFFFFFULL << 12)
-#define TT_ADDRESS_MASK_DESCRIPTION_TABLE       (0xFFFFFFFULL << 12)
+#define TT_ADDRESS_MASK_BLOCK_ENTRY             (0xFFFFFFFFFULL << 12)
+#define TT_ADDRESS_MASK_DESCRIPTION_TABLE       (0xFFFFFFFFFULL << 12)
 
 #define TT_TYPE_MASK                            0x3
 #define TT_TYPE_TABLE_ENTRY                     0x3
