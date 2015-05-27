@@ -76,6 +76,15 @@ form formid = THERMAL_FORM_ID,
         option text = STRING_TOKEN(STR_ENABLED),  value = 1, flags = RESET_REQUIRED;
   endoneof;
 
+  suppressif TRUE;  
+  oneof varid     = Setup.EnableDigitalThermalSensor,
+    prompt      = STRING_TOKEN(STR_DTS_PROMPT),
+    help        = STRING_TOKEN(STR_DTS_PROMPT_HELP),
+    option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+    option text = STRING_TOKEN(STR_ENABLE),  value = 1, flags = MANUFACTURING |RESET_REQUIRED |DEFAULT;
+  endoneof;
+  endif;
+
   subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
 
