@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -812,10 +812,11 @@ typedef struct _EFI_IFR_QUESTION_HEADER {
 //
 // Flag values of EFI_IFR_QUESTION_HEADER
 //
-#define EFI_IFR_FLAG_READ_ONLY         0x01
-#define EFI_IFR_FLAG_CALLBACK          0x04
-#define EFI_IFR_FLAG_RESET_REQUIRED    0x10
-#define EFI_IFR_FLAG_OPTIONS_ONLY      0x80
+#define EFI_IFR_FLAG_READ_ONLY          0x01
+#define EFI_IFR_FLAG_CALLBACK           0x04
+#define EFI_IFR_FLAG_RESET_REQUIRED     0x10
+#define EFI_IFR_FLAG_RECONNECT_REQUIRED 0x40
+#define EFI_IFR_FLAG_OPTIONS_ONLY       0x80
 
 //
 // Definition for Opcode Reference
