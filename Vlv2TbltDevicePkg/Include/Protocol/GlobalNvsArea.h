@@ -104,7 +104,7 @@ typedef struct {
   UINT8       PassiveTc2Value;                            // 23
   UINT8       PassiveTspValue;                            // 24
   UINT8       CriticalThermalTripPoint;                   // 25
-  UINT8       ReserveD;
+  UINT8       EnableDigitalThermalSensor;                 // 26
   UINT8       BspDigitalThermalSensorTemperature;         // 27   Temperature of BSP
   UINT8       ApDigitalThermalSensorTemperature;          // 28   Temperature of AP
   UINT8       DigitalThermalSensorSmiFunction;            // 29   SMI function call via DTS IO Trap

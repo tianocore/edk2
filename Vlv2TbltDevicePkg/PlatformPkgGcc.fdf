@@ -516,6 +516,7 @@ INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET
 INF $(PLATFORM_PACKAGE)/SmmSwDispatch2OnSmmSwDispatchThunk/SmmSwDispatch2OnSmmSwDispatchThunk.inf
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PowerManagement2.inf
 # INF Vlv2DeviceRefCodePkg/ValleyView2Soc/CPU/Dts/Smm/DigitalThermalSensor.inf
+INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/DigitalThermalSensor.inf
   #
   # ACPI
   #
