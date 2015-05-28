@@ -23,6 +23,175 @@
 #include <Protocol/EfiShellDynamicCommand.h>
 
 /**
+   function to insert string items into a list in the correct alphabetical place
+
+   the resultant list is a double NULL terminated list of NULL terminated strings.
+
+   upon successful return the memory must be caller freed (unless passed back in 
+   via a loop where it will get reallocated).
+
+   @param[in,out] DestList    double pointer to the list. may be NULL.
+   @param[in,out] DestSize    pointer to the size of list. may be 0, if DestList is NULL.
+   @param[in]     Item        the item to insert.
+
+   @retval EFI_SUCCESS        the operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+LexicalInsertIntoList(
+  IN OUT   CHAR16 **DestList, 
+  IN OUT   UINTN  *DestSize,
+  IN CONST CHAR16 *Item
+  )
+{
+  CHAR16                              *NewList;
+  INTN                                LexicalMatchValue;
+  CHAR16                              *LexicalSpot;
+  UINTN                               SizeOfAddedNameInBytes;
+
+  //
+  // If there are none, then just return with success
+  //
+  if (Item == NULL || *Item == CHAR_NULL || StrLen(Item)==0) {
+    return (EFI_SUCCESS);
+  }
+
+  NewList = *DestList;
+
+  SizeOfAddedNameInBytes = StrSize(Item);
+  NewList = ReallocatePool(*DestSize, (*DestSize) + SizeOfAddedNameInBytes, NewList);
+  (*DestSize) = (*DestSize) + SizeOfAddedNameInBytes;
+
+  //
+  // Find the correct spot in the list
+  //
+  for (LexicalSpot = NewList
+    ; LexicalSpot != NULL && LexicalSpot < NewList + (*DestSize)
+    ; LexicalSpot += StrLen(LexicalSpot) + 1
+    ) {
+    //
+    // Get Lexical Comparison Value between PrevCommand and Command list entry
+    //
+    LexicalMatchValue = gUnicodeCollation->StriColl (
+                                              gUnicodeCollation,
+                                              (CHAR16 *)LexicalSpot,
+                                              (CHAR16 *)Item
+                                              );
+    //
+    // The new item goes before this one.
+    //
+    if (LexicalMatchValue > 0 || StrLen(LexicalSpot) == 0) {
+      if (StrLen(LexicalSpot) != 0) {
+        //
+        // Move this and all other items out of the way
+        //
+        CopyMem(
+          LexicalSpot + (SizeOfAddedNameInBytes/sizeof(CHAR16)),
+          LexicalSpot,
+          (*DestSize) - SizeOfAddedNameInBytes - ((LexicalSpot - NewList) * sizeof(CHAR16))
+          );
+      }
+
+      //
+      // Stick this one in place
+      //
+      StrCpyS(LexicalSpot, SizeOfAddedNameInBytes/sizeof(CHAR16), Item);
+      break;
+    }
+  }
+
+  *DestList = NewList;
+  return (EFI_SUCCESS);
+}
+
+/**
+   function to add each command name from the linked list to the string list.
+
+   the resultant list is a double NULL terminated list of NULL terminated strings.
+
+   @param[in,out] DestList    double pointer to the list. may be NULL.
+   @param[in,out] DestSize    pointer to the size of list. may be 0, if DestList is NULL.
+   @param[in]     SourceList  the double linked list of commands.
+
+   @retval EFI_SUCCESS        the operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+CopyListOfCommandNames(
+  IN OUT   CHAR16       **DestList, 
+  IN OUT   UINTN        *DestSize,
+  IN CONST COMMAND_LIST *SourceList
+  )
+{
+  CONST COMMAND_LIST  *Node;
+
+  for ( Node = (COMMAND_LIST*)GetFirstNode(&SourceList->Link)
+      ; SourceList != NULL && !IsListEmpty(&SourceList->Link) && !IsNull(&SourceList->Link, &Node->Link)
+      ; Node = (COMMAND_LIST*)GetNextNode(&SourceList->Link, &Node->Link)
+    ) {
+    LexicalInsertIntoList(DestList, DestSize, Node->CommandString);
+  }
+  return (EFI_SUCCESS);
+}
+
+/**
+   function to add each dynamic command name to the string list.
+
+   the resultant list is a double NULL terminated list of NULL terminated strings.
+
+   @param[in,out] DestList    double pointer to the list. may be NULL.
+   @param[in,out] DestSize    pointer to the size of list. may be 0, if DestList is NULL.
+
+   @retval EFI_SUCCESS        the operation was successful.
+   @return an error from HandleProtocol
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CopyListOfCommandNamesWithDynamic(
+  IN OUT  CHAR16** DestList, 
+  IN OUT  UINTN    *DestSize
+  )
+{
+  EFI_HANDLE                          *CommandHandleList;
+  CONST EFI_HANDLE                    *NextCommand;
+  EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *DynamicCommand;
+  EFI_STATUS                          Status;
+
+  CommandHandleList = GetHandleListByProtocol(&gEfiShellDynamicCommandProtocolGuid);
+
+  //
+  // If there are none, then just return with success
+  //
+  if (CommandHandleList == NULL) {
+    return (EFI_SUCCESS);
+  }
+
+  Status = EFI_SUCCESS;
+
+  //
+  // Append those to the list.
+  //
+  for (NextCommand = CommandHandleList ; *NextCommand != NULL && !EFI_ERROR(Status) ; NextCommand++) {
+    Status = gBS->HandleProtocol(
+      *NextCommand,
+      &gEfiShellDynamicCommandProtocolGuid,
+      (VOID **)&DynamicCommand
+      );
+
+    if (EFI_ERROR(Status)) {
+      continue;
+    }
+
+    Status = LexicalInsertIntoList(DestList, DestSize, DynamicCommand->CommandName);
+  }
+
+  SHELL_FREE_NON_NULL(CommandHandleList);
+  return (Status);
+}
+
+
+/**
   Attempt to print help from a dynamically added command.
 
   @param[in]  CommandToGetHelpOn  The unicode name of the command that help is
@@ -38,9 +207,9 @@
 EFI_STATUS
 EFIAPI
 PrintDynamicCommandHelp(
-  IN CHAR16  *CommandToGetHelpOn,
-  IN CHAR16  *SectionToGetHelpOn,
-  IN BOOLEAN  PrintCommandText
+  IN CONST CHAR16  *CommandToGetHelpOn,
+  IN CONST CHAR16  *SectionToGetHelpOn,
+  IN BOOLEAN       PrintCommandText
  )
 {
   EFI_STATUS                          Status;
@@ -80,7 +249,7 @@ PrintDynamicCommandHelp(
       break;
     }
 
-    if ((gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)DynamicCommand->CommandName, CommandToGetHelpOn)) ||
+    if ((gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)DynamicCommand->CommandName, (CHAR16*)CommandToGetHelpOn)) ||
       (gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL) != NULL && (gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)DynamicCommand->CommandName, (CHAR16*)(gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL)))))) {
       // Print as Shell Help if in ManPage format.
       Status = ShellPrintHelp (DynamicCommand->CommandName, SectionToGetHelpOn,
@@ -128,13 +297,14 @@ ShellCommandRunHelp (
   LIST_ENTRY          *Package;
   CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
-  CONST COMMAND_LIST  *CommandList;
-  CONST COMMAND_LIST  *Node;
+  CHAR16              *SortedCommandList;
+  CONST CHAR16        *CurrentCommand;
   CHAR16              *CommandToGetHelpOn;
   CHAR16              *SectionToGetHelpOn;
   CHAR16              *HiiString;
   BOOLEAN             Found;
   BOOLEAN             PrintCommandText;
+  UINTN               SortedCommandListSize;
 
   PrintCommandText    = TRUE;
   ProblemParam        = NULL;
@@ -224,41 +394,42 @@ ShellCommandRunHelp (
         FreePool(HiiString);
         Found = TRUE;
       } else {
-        CommandList = ShellCommandGetCommandList(TRUE);
-        ASSERT(CommandList != NULL);
-        for ( Node = (COMMAND_LIST*)GetFirstNode(&CommandList->Link)
-            ; CommandList != NULL && !IsListEmpty(&CommandList->Link) && !IsNull(&CommandList->Link, &Node->Link)
-            ; Node = (COMMAND_LIST*)GetNextNode(&CommandList->Link, &Node->Link)
-           ){
+        SortedCommandList = NULL;
+        SortedCommandListSize = 0;
+        CopyListOfCommandNames(&SortedCommandList, &SortedCommandListSize, ShellCommandGetCommandList(TRUE));
+        CopyListOfCommandNamesWithDynamic(&SortedCommandList, &SortedCommandListSize);
+
+        for (CurrentCommand = SortedCommandList 
+          ; CurrentCommand != NULL && *CurrentCommand != CHAR_NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof(CHAR16)
+          ; CurrentCommand += StrLen(CurrentCommand) + 1
+          ) {
           //
           // Checking execution break flag when print multiple command help information.
           //
           if (ShellGetExecutionBreakFlag ()) {
             break;
           } 
-          if ((gUnicodeCollation->MetaiMatch(gUnicodeCollation, Node->CommandString, CommandToGetHelpOn)) ||
-             (gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL) != NULL && (gUnicodeCollation->MetaiMatch(gUnicodeCollation, Node->CommandString, (CHAR16*)(gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL)))))) {
+
+          if ((gUnicodeCollation->MetaiMatch(gUnicodeCollation, (CHAR16*)CurrentCommand, CommandToGetHelpOn)) ||
+             (gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL) != NULL && (gUnicodeCollation->MetaiMatch(gUnicodeCollation, (CHAR16*)CurrentCommand, (CHAR16*)(gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL)))))) {
             //
             // We have a command to look for help on.
             //
-            Status = ShellPrintHelp(Node->CommandString, SectionToGetHelpOn, PrintCommandText);
+            Status = ShellPrintHelp(CurrentCommand, SectionToGetHelpOn, PrintCommandText);
+            if (EFI_ERROR(Status)) {
+              //
+              // now try to match against the dynamic command list and print help
+              //
+              Status = PrintDynamicCommandHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
+            }
             if (Status == EFI_DEVICE_ERROR) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, Node->CommandString);
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CurrentCommand);
             } else if (EFI_ERROR(Status)) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, Node->CommandString);
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CurrentCommand);
             } else {
                 Found = TRUE;
             }
           }
-        }
-
-        //
-        // now try to match against the dynamic command list and print help
-        //
-        Status = PrintDynamicCommandHelp (CommandToGetHelpOn, SectionToGetHelpOn,
-                                          PrintCommandText);
-        if (!EFI_ERROR(Status)) {
-          Found = TRUE;
         }
 
         //
