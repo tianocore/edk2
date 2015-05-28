@@ -2,7 +2,7 @@
   UfsHcDxe driver is used to provide platform-dependent info, mainly UFS host controller
   MMIO base, to upper layer UFS drivers.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
 #include <Uefi.h>
 
 #include <IndustryStandard/Pci.h>
+#include <IndustryStandard/Acpi.h>
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
@@ -56,6 +57,7 @@ struct _UFS_HOST_CONTROLLER_PRIVATE_DATA {
 
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL UfsHc;
   EFI_PCI_IO_PROTOCOL                *PciIo;  
+  UINT8                              BarIndex;
   UINT64                             PciAttributes;
 };
 
@@ -448,6 +450,62 @@ EFI_STATUS
 EFIAPI
 UfsHcFlush (
   IN  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *This
+  );
+
+/**                                                                 
+  Enable a UFS bus driver to access UFS MMIO registers in the UFS Host Controller memory space.
+
+  @param  This                  A pointer to the EDKII_UFS_HOST_CONTROLLER_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory operations.
+  @param  Offset                The offset within the UFS Host Controller MMIO space to start the
+                                memory operation.
+  @param  Count                 The number of memory operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results.
+                                For write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the UFS host controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the UFS Host Controller memory space.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+UfsHcMmioRead (
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL        *This,
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                    Offset,
+  IN     UINTN                                     Count,
+  IN OUT VOID                                      *Buffer
+  );
+
+/**                                                                 
+  Enable a UFS bus driver to access UFS MMIO registers in the UFS Host Controller memory space.
+
+  @param  This                  A pointer to the EDKII_UFS_HOST_CONTROLLER_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory operations.
+  @param  Offset                The offset within the UFS Host Controller MMIO space to start the
+                                memory operation.
+  @param  Count                 The number of memory operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results.
+                                For write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the UFS host controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the UFS Host Controller memory space.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+UfsHcMmioWrite (
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL        *This,
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                    Offset,
+  IN     UINTN                                     Count,
+  IN OUT VOID                                      *Buffer
   );
 
 #endif

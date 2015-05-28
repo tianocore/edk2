@@ -52,7 +52,6 @@
   UefiDriverEntryPoint
   DebugLib
   DevicePathLib
-  IoLib
   TimerLib
 
 [Protocols]

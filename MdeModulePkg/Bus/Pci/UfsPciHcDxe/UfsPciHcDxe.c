@@ -2,7 +2,7 @@
   UfsHcDxe driver is used to provide platform-dependent info, mainly UFS host controller
   MMIO base, to upper layer UFS drivers.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -39,9 +39,12 @@ UFS_HOST_CONTROLLER_PRIVATE_DATA gUfsHcTemplate = {
     UfsHcFreeBuffer,
     UfsHcMap,
     UfsHcUnmap,
-    UfsHcFlush
+    UfsHcFlush,
+    UfsHcMmioRead,
+    UfsHcMmioWrite
   },
   NULL,                           // PciIo
+  0,                              // BarIndex
   0                               // PciAttributes
 };
 
@@ -64,25 +67,32 @@ UfsHcGetMmioBar (
   UFS_HOST_CONTROLLER_PRIVATE_DATA  *Private;
   EFI_PCI_IO_PROTOCOL               *PciIo;
   EFI_STATUS                        Status;
+  UINT8                             BarIndex;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *BarDesc;
 
   if ((This == NULL) || (MmioBar == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Private = UFS_HOST_CONTROLLER_PRIVATE_DATA_FROM_UFSHC (This);
-  PciIo   = Private->PciIo;
+  BarDesc  = NULL;
+  Private  = UFS_HOST_CONTROLLER_PRIVATE_DATA_FROM_UFSHC (This);
+  PciIo    = Private->PciIo;
+  BarIndex = Private->BarIndex;
 
-  Status = PciIo->Pci.Read (
-                        PciIo,
-                        EfiPciIoWidthUint8,
-                        PCI_BASE_ADDRESSREG_OFFSET,
-                        sizeof (UINT32),
-                        MmioBar
-                        );
-
-  if (!EFI_ERROR (Status)) {
-    *MmioBar &= (UINTN)~0xF;
+  Status = PciIo->GetBarAttributes (
+                    PciIo,
+                    BarIndex,
+                    NULL,
+                    (VOID**) &BarDesc
+                    );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  *MmioBar = (UINTN)BarDesc->AddrRangeMin;
+
+  FreePool (BarDesc);
+
   return Status;
 }
 
@@ -269,6 +279,90 @@ UfsHcFlush (
   PciIo   = Private->PciIo;
 
   Status  = PciIo->Flush (PciIo);
+  return Status;
+}
+
+/**                                                                 
+  Enable a UFS bus driver to access UFS MMIO registers in the UFS Host Controller memory space.
+
+  @param  This                  A pointer to the EDKII_UFS_HOST_CONTROLLER_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory operations.
+  @param  Offset                The offset within the UFS Host Controller MMIO space to start the
+                                memory operation.
+  @param  Count                 The number of memory operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results.
+                                For write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the UFS host controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the UFS Host Controller memory space.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+UfsHcMmioRead (
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL        *This,
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                    Offset,
+  IN     UINTN                                     Count,
+  IN OUT VOID                                      *Buffer
+  )
+{
+  UFS_HOST_CONTROLLER_PRIVATE_DATA  *Private;
+  EFI_PCI_IO_PROTOCOL               *PciIo;
+  EFI_STATUS                        Status;
+  UINT8                             BarIndex;
+
+  Private  = UFS_HOST_CONTROLLER_PRIVATE_DATA_FROM_UFSHC (This);
+  PciIo    = Private->PciIo;
+  BarIndex = Private->BarIndex;
+
+  Status   = PciIo->Mem.Read (PciIo, (EFI_PCI_IO_PROTOCOL_WIDTH)Width, BarIndex, Offset, Count, Buffer);
+
+  return Status;
+}
+
+/**                                                                 
+  Enable a UFS bus driver to access UFS MMIO registers in the UFS Host Controller memory space.
+
+  @param  This                  A pointer to the EDKII_UFS_HOST_CONTROLLER_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory operations.
+  @param  Offset                The offset within the UFS Host Controller MMIO space to start the
+                                memory operation.
+  @param  Count                 The number of memory operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results.
+                                For write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the UFS host controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the UFS Host Controller memory space.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+UfsHcMmioWrite (
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL        *This,
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                    Offset,
+  IN     UINTN                                     Count,
+  IN OUT VOID                                      *Buffer
+  )
+{
+  UFS_HOST_CONTROLLER_PRIVATE_DATA  *Private;
+  EFI_PCI_IO_PROTOCOL               *PciIo;
+  EFI_STATUS                        Status;
+  UINT8                             BarIndex;
+
+  Private  = UFS_HOST_CONTROLLER_PRIVATE_DATA_FROM_UFSHC (This);
+  PciIo    = Private->PciIo;
+  BarIndex = Private->BarIndex;
+
+  Status   = PciIo->Mem.Write (PciIo, (EFI_PCI_IO_PROTOCOL_WIDTH)Width, BarIndex, Offset, Count, Buffer);
+
   return Status;
 }
 
@@ -468,10 +562,13 @@ UfsHcDriverBindingStart (
   EFI_PCI_IO_PROTOCOL               *PciIo;
   UFS_HOST_CONTROLLER_PRIVATE_DATA  *Private;
   UINT64                            Supports;
+  UINT8                             BarIndex;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *BarDesc;
 
   PciIo    = NULL;
   Private  = NULL;
   Supports = 0;
+  BarDesc  = NULL;
 
   //
   // Now test and open the EfiPciIoProtocol
@@ -506,6 +603,28 @@ UfsHcDriverBindingStart (
   }
 
   Private->PciIo = PciIo;
+
+  for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
+    Status = PciIo->GetBarAttributes (
+                      PciIo,
+                      BarIndex,
+                      NULL,
+                      (VOID**) &BarDesc
+                      );
+    if (Status == EFI_UNSUPPORTED) {
+      continue;
+    } else if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    if (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
+      Private->BarIndex = BarIndex;
+      FreePool (BarDesc);
+      break;
+    }
+
+    FreePool (BarDesc);
+  }
 
   Status = PciIo->Attributes (
                     PciIo,

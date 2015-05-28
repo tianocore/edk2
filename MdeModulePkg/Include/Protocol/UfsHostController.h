@@ -2,7 +2,7 @@
 
   EDKII Universal Flash Storage Host Controller Protocol.
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -185,6 +185,42 @@ EFI_STATUS
   IN  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *This
   );
 
+typedef enum {
+  EfiUfsHcWidthUint8      = 0,
+  EfiUfsHcWidthUint16,
+  EfiUfsHcWidthUint32,
+  EfiUfsHcWidthUint64,
+  EfiUfsHcWidthMaximum
+} EDKII_UFS_HOST_CONTROLLER_PROTOCOL_WIDTH;
+
+/**
+  Enable a UFS bus driver to access UFS MMIO registers in the UFS Host Controller memory space.
+
+  @param  This                  A pointer to the EDKII_UFS_HOST_CONTROLLER_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory operations.
+  @param  Offset                The offset within the UFS Host Controller MMIO space to start the
+                                memory operation.
+  @param  Count                 The number of memory operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results.
+                                For write operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the UFS host controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the UFS Host Controller memory space.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_UFS_HC_MMIO_READ_WRITE)(
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL        *This,
+  IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL_WIDTH  Width,
+  IN     UINT64                                    Offset,
+  IN     UINTN                                     Count,
+  IN OUT VOID                                      *Buffer
+  );
+
 ///
 ///  UFS Host Controller Protocol structure.
 ///
@@ -195,6 +231,8 @@ struct _EDKII_UFS_HOST_CONTROLLER_PROTOCOL {
   EDKII_UFS_HC_MAP                    Map;
   EDKII_UFS_HC_UNMAP                  Unmap;
   EDKII_UFS_HC_FLUSH                  Flush;
+  EDKII_UFS_HC_MMIO_READ_WRITE        Read;
+  EDKII_UFS_HC_MMIO_READ_WRITE        Write;
 };
 
 ///
