@@ -1574,7 +1574,6 @@ GetWidth (
     
     case EFI_IFR_TYPE_NUM_SIZE_64:
       return (UINT16) sizeof (UINT64) * ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
-      break;
     
     default:
       ASSERT (FALSE);
