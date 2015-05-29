@@ -1038,7 +1038,7 @@ BdsTftpLoadImage (
   EFI_DHCP4_MODE_DATA      Dhcp4Mode;
   EFI_MTFTP4_CONFIG_DATA   Mtftp4CfgData;
   IPv4_DEVICE_PATH         *IPv4DevicePathNode;
-  FILEPATH_DEVICE_PATH     *FilePathDevicePathNode;
+  CHAR16                   *PathName;
   CHAR8                    *AsciiFilePath;
   EFI_MTFTP4_TOKEN         Mtftp4Token;
   UINT64                   FileSize;
@@ -1185,17 +1185,10 @@ BdsTftpLoadImage (
     goto Error;
   }
 
-  //
-  // Convert the Unicode path of the file to Ascii
-  //
-
-  FilePathDevicePathNode = (FILEPATH_DEVICE_PATH*)(IPv4DevicePathNode + 1);
-  AsciiFilePath = AllocatePool ((StrLen (FilePathDevicePathNode->PathName) + 1) * sizeof (CHAR8));
-  if (AsciiFilePath == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Error;
-  }
-  UnicodeStrToAsciiStr (FilePathDevicePathNode->PathName, AsciiFilePath);
+  // The Device Path might contain multiple FilePath nodes
+  PathName      = ConvertDevicePathToText ((EFI_DEVICE_PATH_PROTOCOL*)(IPv4DevicePathNode + 1), FALSE, FALSE);
+  AsciiFilePath = AllocatePool (StrLen (PathName) + 1);
+  UnicodeStrToAsciiStr (PathName, AsciiFilePath);
 
   //
   // Try to get the size of the file in bytes from the server. If it fails,
@@ -1241,7 +1234,7 @@ BdsTftpLoadImage (
     Mtftp4Token.CheckPacket = Mtftp4CheckPacket;
     Mtftp4Token.Context     = (VOID*)TftpContext;
 
-    Print (L"Downloading the file <%s> from the TFTP server\n", FilePathDevicePathNode->PathName);
+    Print (L"Downloading the file <%a> from the TFTP server\n", AsciiFilePath);
     Status = Mtftp4->ReadFile (Mtftp4, &Mtftp4Token);
     Print (L"\n");
     if (EFI_ERROR (Status)) {
@@ -1303,6 +1296,7 @@ Error:
   }
 
   if (EFI_ERROR (Status)) {
+    *Image = 0;
     Print (L"Failed to download the file - Error=%r\n", Status);
   }
 
