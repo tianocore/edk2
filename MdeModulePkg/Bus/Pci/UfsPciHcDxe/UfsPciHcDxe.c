@@ -137,7 +137,7 @@ UfsHcMap (
   Private = UFS_HOST_CONTROLLER_PRIVATE_DATA_FROM_UFSHC (This);
   PciIo   = Private->PciIo;
 
-  Status  = PciIo->Map (PciIo, Operation, HostAddress, NumberOfBytes, DeviceAddress, Mapping);
+  Status  = PciIo->Map (PciIo, (EFI_PCI_IO_PROTOCOL_OPERATION)Operation, HostAddress, NumberOfBytes, DeviceAddress, Mapping);
   return Status;
 }
 
