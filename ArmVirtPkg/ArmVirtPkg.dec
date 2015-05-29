@@ -14,7 +14,7 @@
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
-  PACKAGE_NAME                   = ArmVirtualizationPkg
+  PACKAGE_NAME                   = ArmVirtPkg
   PACKAGE_GUID                   = A0B31216-508E-4025-BEAB-56D836C66F0A
   PACKAGE_VERSION                = 0.1
 
@@ -31,7 +31,7 @@
   Include                        # Root include for the package
 
 [Guids.common]
-  gArmVirtualizationTokenSpaceGuid = { 0x0B6F5CA7, 0x4F53, 0x445A, { 0xB7, 0x6E, 0x2E, 0x36, 0x5B, 0x80, 0x63, 0x66 } }
+  gArmVirtTokenSpaceGuid = { 0x0B6F5CA7, 0x4F53, 0x445A, { 0xB7, 0x6E, 0x2E, 0x36, 0x5B, 0x80, 0x63, 0x66 } }
   gEarlyPL011BaseAddressGuid       = { 0xB199DEA9, 0xFD5C, 0x4A84, { 0x80, 0x82, 0x2F, 0x41, 0x70, 0x78, 0x03, 0x05 } }
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
@@ -41,13 +41,13 @@
   # can do a first pass over the device tree in the SEC phase to discover the
   # UART base address.
   #
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0|UINT64|0x00000001
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0|UINT64|0x00000001
 
   #
   # Padding in bytes to add to the device tree allocation, so that the DTB can
   # be modified in place (default: 256 bytes)
   #
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x00000002
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x00000002
 
 [PcdsDynamic, PcdsFixedAtBuild]
   #
@@ -56,10 +56,10 @@
   # PcdArmPsciMethod == 1 : use HVC
   # PcdArmPsciMethod == 2 : use SMC
   #
-  gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0|UINT32|0x00000003
+  gArmVirtTokenSpaceGuid.PcdArmPsciMethod|0|UINT32|0x00000003
 
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0|UINT64|0x00000004
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0|UINT64|0x00000005
+  gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0|UINT64|0x00000004
+  gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress|0x0|UINT64|0x00000005
 
 [PcdsFeatureFlag]
   #
@@ -84,4 +84,4 @@
   #
   # The default is to turn off the kludge; DSC's can selectively enable it.
   #
-  gArmVirtualizationTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|FALSE|BOOLEAN|0x00000006
+  gArmVirtTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|FALSE|BOOLEAN|0x00000006

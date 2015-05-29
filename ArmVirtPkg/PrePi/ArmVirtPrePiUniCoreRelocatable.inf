@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -34,7 +34,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
@@ -101,7 +101,7 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFvBaseAddress
 

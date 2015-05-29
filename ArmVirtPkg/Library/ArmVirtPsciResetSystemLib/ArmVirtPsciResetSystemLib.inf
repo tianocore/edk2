@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmVirtualizationPsciResetSystemLib
+  BASE_NAME                      = ArmVirtPsciResetSystemLib
   FILE_GUID                      = c81d76ed-66fa-44a3-ac4a-f163120187a9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -24,11 +24,11 @@
   CONSTRUCTOR                    = ArmPsciResetSystemLibConstructor
 
 [Sources]
-  ArmVirtualizationPsciResetSystemLib.c
+  ArmVirtPsciResetSystemLib.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
 
@@ -39,4 +39,4 @@
   ArmHvcLib
 
 [Pcd]
-  gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod
+  gArmVirtTokenSpaceGuid.PcdArmPsciMethod

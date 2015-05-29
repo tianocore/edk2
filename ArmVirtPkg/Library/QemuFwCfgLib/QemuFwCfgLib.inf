@@ -39,7 +39,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -48,5 +48,5 @@
   PcdLib
 
 [Pcd]
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress
+  gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress
+  gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress

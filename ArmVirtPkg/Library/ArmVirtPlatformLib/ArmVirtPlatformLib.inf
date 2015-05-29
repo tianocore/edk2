@@ -14,7 +14,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmVirtualizationPlatformLib
+  BASE_NAME                      = ArmVirtPlatformLib
   FILE_GUID                      = 00214cc1-06d1-45fe-9700-dca5726ad7bf
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -26,7 +26,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
   IoLib
@@ -54,7 +54,7 @@
   gArmTokenSpaceGuid.PcdSystemMemorySize
 
 [FixedPcd]
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
   gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask

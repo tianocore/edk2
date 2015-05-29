@@ -2,7 +2,7 @@
 #
 #  Component description file for PL011SerialPortLib module
 #
-#  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -35,7 +35,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
   ArmPkg/ArmPkg.dec
 
 [FixedPcd]

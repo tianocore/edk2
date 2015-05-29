@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #
 #  This program and the accompanying materials
@@ -26,7 +26,7 @@
 
 [Packages]
   ArmPkg/ArmPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
@@ -38,11 +38,11 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeAllocationPadding
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeAllocationPadding
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 
 [Guids]
   gEarlyPL011BaseAddressGuid

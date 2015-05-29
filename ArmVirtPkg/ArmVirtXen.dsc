@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #
 #  This program and the accompanying materials
@@ -18,21 +18,21 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = ArmVirtualizationXen
+  PLATFORM_NAME                  = ArmVirtXen
   PLATFORM_GUID                  = d1c43be3-3373-4a06-86fb-d1cb3083a207
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/ArmVirtualizationXen-$(ARCH)
+  OUTPUT_DIRECTORY               = Build/ArmVirtXen-$(ARCH)
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationXen.fdf
+  FLASH_DEFINITION               = ArmVirtPkg/ArmVirtXen.fdf
 
-!include ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualization.dsc.inc
+!include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses]
   SerialPortLib|OvmfPkg/Library/XenConsoleSerialPortLib/XenConsoleSerialPortLib.inf
-  RealTimeClockLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/XenRealTimeClockLib/XenRealTimeClockLib.inf
+  RealTimeClockLib|ArmVirtPkg/Library/XenRealTimeClockLib/XenRealTimeClockLib.inf
   XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLib.inf
 
 [LibraryClasses.AARCH64]
@@ -48,7 +48,7 @@
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
 
-  ArmPlatformLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmXenRelocatablePlatformLib/ArmXenRelocatablePlatformLib.inf
+  ArmPlatformLib|ArmVirtPkg/Library/ArmXenRelocatablePlatformLib/ArmXenRelocatablePlatformLib.inf
   ArmPlatformSysConfigLib|ArmPlatformPkg/Library/ArmPlatformSysConfigLibNull/ArmPlatformSysConfigLibNull.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
@@ -68,9 +68,9 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
 
 [BuildOptions]
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
-  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
-  GCC:*_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmVirtPkg/Include
+  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmVirtPkg/Include
+  GCC:*_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmVirtPkg/Include
 
 ################################################################################
 #
@@ -106,7 +106,7 @@
   #
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x0
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x0
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0
 
   gArmTokenSpaceGuid.PcdFdBaseAddress|0x0
   gArmTokenSpaceGuid.PcdFvBaseAddress|0x0
@@ -140,10 +140,10 @@
   gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x0
 
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
+  gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
+  gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress|0x0
 
-  gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0
+  gArmVirtTokenSpaceGuid.PcdArmPsciMethod|0
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
@@ -156,7 +156,7 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/ArmVirtualizationPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf {
+  ArmVirtPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf {
     <LibraryClasses>
       ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
       LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
@@ -206,7 +206,7 @@
   #
   # Platform Driver
   #
-  ArmPlatformPkg/ArmVirtualizationPkg/VirtFdtDxe/VirtFdtDxe.inf
+  ArmVirtPkg/VirtFdtDxe/VirtFdtDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning

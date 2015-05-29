@@ -36,7 +36,7 @@
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
-  HobLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationDxeHobLib/ArmVirtualizationDxeHobLib.inf
+  HobLib|ArmVirtPkg/Library/ArmVirtDxeHobLib/ArmVirtDxeHobLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -76,15 +76,15 @@
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
 
-  PlatformPeiLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/PlatformPeiLib/PlatformPeiLib.inf
-  MemoryInitPeiLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationMemoryInitPeiLib/ArmVirtualizationMemoryInitPeiLib.inf
-  EfiResetSystemLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationPsciResetSystemLib/ArmVirtualizationPsciResetSystemLib.inf
+  PlatformPeiLib|ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.inf
+  MemoryInitPeiLib|ArmVirtPkg/Library/ArmVirtMemoryInitPeiLib/ArmVirtMemoryInitPeiLib.inf
+  EfiResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemLib/ArmVirtPsciResetSystemLib.inf
 
   # ARM PL031 RTC Driver
   RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
-  SerialPortLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/FdtPL011SerialPortLib/FdtPL011SerialPortLib.inf
+  SerialPortLib|ArmVirtPkg/Library/FdtPL011SerialPortLib/FdtPL011SerialPortLib.inf
   SerialPortExtLib|EmbeddedPkg/Library/SerialPortExtLibNull/SerialPortExtLibNull.inf
 
   #
@@ -106,7 +106,7 @@
 
   # PCI Libraries
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
-  PciExpressLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
+  PciExpressLib|ArmVirtPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
 
   # USB Libraries
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
@@ -133,7 +133,7 @@
 
   DebugAgentLib|ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLibBase.inf
-  SerialPortLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/FdtPL011SerialPortLib/EarlyFdtPL011SerialPortLib.inf
+  SerialPortLib|ArmVirtPkg/Library/FdtPL011SerialPortLib/EarlyFdtPL011SerialPortLib.inf
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|ArmPlatformPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
@@ -154,7 +154,7 @@
 
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   PeiServicesTablePointerLib|ArmPlatformPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  SerialPortLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/FdtPL011SerialPortLib/EarlyFdtPL011SerialPortLib.inf
+  SerialPortLib|ArmVirtPkg/Library/FdtPL011SerialPortLib/EarlyFdtPL011SerialPortLib.inf
 
 [LibraryClasses.common.PEIM]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -172,7 +172,7 @@
 
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   PeiServicesTablePointerLib|ArmPlatformPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  SerialPortLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/FdtPL011SerialPortLib/EarlyFdtPL011SerialPortLib.inf
+  SerialPortLib|ArmVirtPkg/Library/FdtPL011SerialPortLib/EarlyFdtPL011SerialPortLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf

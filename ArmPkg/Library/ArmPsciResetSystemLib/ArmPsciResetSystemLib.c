@@ -2,11 +2,11 @@
   Support ResetSystem Runtime call using PSCI calls
 
   Note: A similar library is implemented in
-  ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationPsciResetSystemLib
+  ArmVirtPkg/Library/ArmVirtualizationPsciResetSystemLib
   So similar issues might exist in this implementation too.
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials

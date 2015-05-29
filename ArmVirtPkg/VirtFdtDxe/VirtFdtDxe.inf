@@ -30,7 +30,7 @@
   MdeModulePkg/MdeModulePkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   OvmfPkg/OvmfPkg.dec
 
@@ -50,9 +50,9 @@
   gFdtHobGuid
 
 [Pcd]
-  gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress
+  gArmVirtTokenSpaceGuid.PcdArmPsciMethod
+  gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress
+  gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase

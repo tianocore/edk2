@@ -1,5 +1,5 @@
 #/* @file
-#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #
 #  This program and the accompanying materials
@@ -26,7 +26,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
   IoLib
@@ -46,7 +46,7 @@
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
 
 [PatchPcd]
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdSystemMemoryBase

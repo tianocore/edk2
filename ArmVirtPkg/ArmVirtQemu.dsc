@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #
 #  This program and the accompanying materials
@@ -18,15 +18,15 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = ArmVirtualizationQemu
+  PLATFORM_NAME                  = ArmVirtQemu
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/ArmVirtualizationQemu-$(ARCH)
+  OUTPUT_DIRECTORY               = Build/ArmVirtQemu-$(ARCH)
   SUPPORTED_ARCHITECTURES        = AARCH64|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationQemu.fdf
+  FLASH_DEFINITION               = ArmVirtPkg/ArmVirtQemu.fdf
 
   #
   # Defines for default states.  These can be changed on the command line.
@@ -34,7 +34,7 @@
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
 
-!include ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualization.dsc.inc
+!include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf
@@ -48,18 +48,18 @@
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
-  QemuFwCfgLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
+  QemuFwCfgLib|ArmVirtPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
 
-  ArmPlatformLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/ArmVirtualizationPlatformLib/ArmVirtualizationPlatformLib.inf
+  ArmPlatformLib|ArmVirtPkg/Library/ArmVirtPlatformLib/ArmVirtPlatformLib.inf
   ArmPlatformSysConfigLib|ArmPlatformPkg/Library/ArmPlatformSysConfigLibNull/ArmPlatformSysConfigLibNull.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
-  NorFlashPlatformLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
+  NorFlashPlatformLib|ArmVirtPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
 
 !ifdef INTEL_BDS
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
-  PlatformBdsLib|ArmPlatformPkg/ArmVirtualizationPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
+  PlatformBdsLib|ArmVirtPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
 !endif
@@ -74,9 +74,9 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
 
 [BuildOptions]
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
-  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
-  *_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmPlatformPkg/ArmVirtualizationPkg/Include
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmVirtPkg/Include
+  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmVirtPkg/Include
+  *_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmVirtPkg/Include
 
 
 ################################################################################
@@ -95,7 +95,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
   # Activate KVM workaround for now.
-  gArmVirtualizationTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|TRUE
+  gArmVirtTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|TRUE
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"QEMU"
@@ -160,7 +160,7 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
 
   # initial location of the device tree blob passed by QEMU -- base of DRAM
-  gArmVirtualizationTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x40000000
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x40000000
 
 !ifdef INTEL_BDS
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
@@ -205,10 +205,10 @@
   gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x0
 
-  gArmVirtualizationTokenSpaceGuid.PcdArmPsciMethod|0
+  gArmVirtTokenSpaceGuid.PcdArmPsciMethod|0
 
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
-  gArmVirtualizationTokenSpaceGuid.PcdFwCfgDataAddress|0x0
+  gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
+  gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress|0x0
 
   #
   # Set video resolution for boot options and for text setup.
@@ -308,7 +308,7 @@
   #
   # Platform Driver
   #
-  ArmPlatformPkg/ArmVirtualizationPkg/VirtFdtDxe/VirtFdtDxe.inf
+  ArmVirtPkg/VirtFdtDxe/VirtFdtDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/VirtioNetDxe/VirtioNet.inf
@@ -347,7 +347,7 @@
   #
   # PCI support
   #
-  ArmPlatformPkg/ArmVirtualizationPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  ArmVirtPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
 

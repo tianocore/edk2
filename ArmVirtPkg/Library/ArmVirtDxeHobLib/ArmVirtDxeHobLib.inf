@@ -20,7 +20,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmVirtualizationDxeHobLib
+  BASE_NAME                      = ArmVirtDxeHobLib
   FILE_GUID                      = 3CD90EEC-EBF3-425D-AAE8-B16215AC4F50
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
