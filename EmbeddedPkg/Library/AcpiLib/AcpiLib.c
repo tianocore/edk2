@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2014-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -24,18 +24,21 @@
 #include <IndustryStandard/Acpi.h>
 
 /**
-  Locate and Install the ACPI tables from the Firmware Volume
+  Locate and Install the ACPI tables from the Firmware Volume if it verifies
+  the function condition.
 
-  @param  AcpiFile              Guid of the ACPI file into the Firmware Volume
+  @param  AcpiFile                Guid of the ACPI file into the Firmware Volume
+  @param  CheckAcpiTableFunction  Function that checks if the ACPI table should be installed
 
-  @return EFI_SUCCESS           The function completed successfully.
-  @return EFI_NOT_FOUND         The protocol could not be located.
-  @return EFI_OUT_OF_RESOURCES  There are not enough resources to find the protocol.
+  @return EFI_SUCCESS             The function completed successfully.
+  @return EFI_NOT_FOUND           The protocol could not be located.
+  @return EFI_OUT_OF_RESOURCES    There are not enough resources to find the protocol.
 
 **/
 EFI_STATUS
-LocateAndInstallAcpiFromFv (
-  IN CONST EFI_GUID* AcpiFile
+LocateAndInstallAcpiFromFvConditional (
+  IN CONST EFI_GUID*        AcpiFile,
+  IN EFI_LOCATE_ACPI_CHECK  CheckAcpiTableFunction
   )
 {
   EFI_STATUS                    Status;
@@ -50,6 +53,7 @@ LocateAndInstallAcpiFromFv (
   EFI_ACPI_COMMON_HEADER       *AcpiTable;
   UINTN                         AcpiTableSize;
   UINTN                         AcpiTableKey;
+  BOOLEAN                       Valid;
 
   // Ensure the ACPI Table is present
   Status = gBS->LocateProtocol (
@@ -116,13 +120,23 @@ LocateAndInstallAcpiFromFv (
             ((((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature >> 16) & 0xFF),
             ((((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature >> 24) & 0xFF)));
 
+        // Is the ACPI table valid?
+        if (CheckAcpiTableFunction) {
+          Valid = CheckAcpiTableFunction ((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable);
+        } else {
+          Valid = TRUE;
+        }
+
         // Install the ACPI Table
-        Status = AcpiProtocol->InstallAcpiTable (
-                               AcpiProtocol,
-                               AcpiTable,
-                               AcpiTableSize,
-                               &AcpiTableKey
-                               );
+        if (Valid) {
+          Status = AcpiProtocol->InstallAcpiTable (
+                                 AcpiProtocol,
+                                 AcpiTable,
+                                 AcpiTableSize,
+                                 &AcpiTableKey
+                                 );
+        }
+
         // Free memory allocated by ReadSection
         gBS->FreePool (AcpiTable);
 
@@ -143,4 +157,22 @@ FREE_HANDLE_BUFFER:
   gBS->FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
+}
+
+/**
+  Locate and Install the ACPI tables from the Firmware Volume
+
+  @param  AcpiFile              Guid of the ACPI file into the Firmware Volume
+
+  @return EFI_SUCCESS           The function completed successfully.
+  @return EFI_NOT_FOUND         The protocol could not be located.
+  @return EFI_OUT_OF_RESOURCES  There are not enough resources to find the protocol.
+
+**/
+EFI_STATUS
+LocateAndInstallAcpiFromFv (
+  IN CONST EFI_GUID* AcpiFile
+  )
+{
+  return LocateAndInstallAcpiFromFvConditional (AcpiFile, NULL);
 }

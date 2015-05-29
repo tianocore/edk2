@@ -1,7 +1,7 @@
 /** @file
   Helper Library for ACPI
 
-  Copyright (c) 2014, ARM Ltd. All rights reserved.
+  Copyright (c) 2014-2015, ARM Ltd. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,8 @@
 #define __ACPI_LIB_H__
 
 #include <Uefi.h>
+
+#include <IndustryStandard/Acpi10.h>
 
 //
 // Macros for the Generic Address Space
@@ -68,6 +70,30 @@
     EFI_ACPI_RESERVED_WORD, RefreshFramePhysicalAddress, ControlFramePhysicalAddress,                   \
     WatchdogTimerGSIV, WatchdogTimerFlags                                                               \
   }
+
+typedef
+BOOLEAN
+(EFIAPI *EFI_LOCATE_ACPI_CHECK) (
+  IN  EFI_ACPI_DESCRIPTION_HEADER *AcpiHeader
+  );
+
+/**
+  Locate and Install the ACPI tables from the Firmware Volume if it verifies
+  the function condition.
+
+  @param  AcpiFile                Guid of the ACPI file into the Firmware Volume
+  @param  CheckAcpiTableFunction  Function that checks if the ACPI table should be installed
+
+  @return EFI_SUCCESS             The function completed successfully.
+  @return EFI_NOT_FOUND           The protocol could not be located.
+  @return EFI_OUT_OF_RESOURCES    There are not enough resources to find the protocol.
+
+**/
+EFI_STATUS
+LocateAndInstallAcpiFromFvConditional (
+  IN CONST EFI_GUID*        AcpiFile,
+  IN EFI_LOCATE_ACPI_CHECK  CheckAcpiTableFunction
+  );
 
 /**
   Locate and Install the ACPI tables from the Firmware Volume
