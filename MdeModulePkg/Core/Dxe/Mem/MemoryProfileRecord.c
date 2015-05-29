@@ -778,10 +778,10 @@ CoreNeedRecordProfile (
 
   @param MemoryType     Memory type.
 
-  @return EFI memory type as profile memory index.
+  @return Profile memory index.
 
 **/
-EFI_MEMORY_TYPE
+UINTN
 GetProfileMemoryIndex (
   IN EFI_MEMORY_TYPE    MemoryType
   )
@@ -824,7 +824,7 @@ CoreUpdateProfileAllocate (
   MEMORY_PROFILE_CONTEXT_DATA       *ContextData;
   MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
   MEMORY_PROFILE_ALLOC_INFO_DATA    *AllocInfoData;
-  EFI_MEMORY_TYPE                   ProfileMemoryIndex;
+  UINTN                             ProfileMemoryIndex;
 
   AllocInfoData = NULL;
 
@@ -977,7 +977,7 @@ CoreUpdateProfileFree (
   LIST_ENTRY                       *DriverInfoList;
   MEMORY_PROFILE_DRIVER_INFO_DATA  *ThisDriverInfoData;
   MEMORY_PROFILE_ALLOC_INFO_DATA   *AllocInfoData;
-  EFI_MEMORY_TYPE                  ProfileMemoryIndex;
+  UINTN                            ProfileMemoryIndex;
 
   ContextData = GetMemoryProfileContext ();
   if (ContextData == NULL) {
