@@ -58,6 +58,11 @@ ArmPlatformPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
 M: Olivier Martin <olivier.martin@arm.com>
 
+ArmVirtPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
+M: Laszlo Ersek <lersek@redhat.com>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
 BaseTools
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
 M: Yingke D Liu <yingke.d.liu@intel.com>
