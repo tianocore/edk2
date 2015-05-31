@@ -856,26 +856,6 @@
   # @Prompt Shadow Peim On S3 Boot. 
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot|FALSE|BOOLEAN|0x30001028
 
-  ## Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification.
-  # @Prompt Default OEM ID for ACPI table creation.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"INTEL "|VOID*|0x30001034
-
-  ## Default OEM Table ID for ACPI table creation, it is "EDK2    ".
-  # @Prompt Default OEM Table ID for ACPI table creation.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId|0x20202020324B4445|UINT64|0x30001035
-
-  ## Default OEM Revision for ACPI table creation.
-  # @Prompt Default OEM Revision for ACPI table creation.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision|0x00000002|UINT32|0x30001036
-
-  ## Default Creator ID for ACPI table creation.
-  # @Prompt Default Creator ID for ACPI table creation.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId|0x20202020|UINT32|0x30001037
-
-  ## Default Creator Revision for ACPI table creation.
-  # @Prompt Default Creator Revision for ACPI table creation.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
-
   ## The mask is used to control memory profile behavior.<BR><BR>
   #  BIT0 - Enable UEFI memory profile.<BR>
   #  BIT1 - Enable SMRAM profile.<BR>
@@ -1280,6 +1260,26 @@
   #
   # @Prompt Flag to request system reboot after processing capsule.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag|0x0001|UINT16|0x0000006d
+
+  ## Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification.
+  # @Prompt Default OEM ID for ACPI table creation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"INTEL "|VOID*|0x30001034
+
+  ## Default OEM Table ID for ACPI table creation, it is "EDK2    ".
+  # @Prompt Default OEM Table ID for ACPI table creation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId|0x20202020324B4445|UINT64|0x30001035
+
+  ## Default OEM Revision for ACPI table creation.
+  # @Prompt Default OEM Revision for ACPI table creation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision|0x00000002|UINT32|0x30001036
+
+  ## Default Creator ID for ACPI table creation.
+  # @Prompt Default Creator ID for ACPI table creation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId|0x20202020|UINT32|0x30001037
+
+  ## Default Creator Revision for ACPI table creation.
+  # @Prompt Default Creator Revision for ACPI table creation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
