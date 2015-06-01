@@ -194,7 +194,7 @@
 
 [Nasm-Assembly-Code-File.COMMON.COMMON]
     <InputFile>
-        ?.nasm, ?.Nasm, ?.NASM
+        ?.nasm
 
     <ExtraDependency>
         $(MAKE_FILE)
@@ -479,7 +479,7 @@
 
 [Nasm-to-Binary-Code-File]
     <InputFile>
-        ?.nasmb, ?.NASMB
+        ?.nasmb
 
     <ExtraDependency>
         $(MAKE_FILE)
