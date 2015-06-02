@@ -123,6 +123,13 @@ ForEachVariable (
   VOID                        *Context
   );
 
+#define BM_BOOT_DESCRIPTION_ENTRY_SIGNATURE SIGNATURE_32 ('b', 'm', 'd', 'h')
+typedef struct {
+  UINT32                                    Signature;
+  LIST_ENTRY                                Link;
+  EFI_BOOT_MANAGER_BOOT_DESCRIPTION_HANDLER Handler;
+} BM_BOOT_DESCRIPTION_ENTRY;
+
 /**
   Repair all the controllers according to the Driver Health status queried.
 **/

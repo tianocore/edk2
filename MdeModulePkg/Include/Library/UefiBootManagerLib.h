@@ -440,6 +440,36 @@ EfiBootManagerRegisterLegacyBootSupport (
   EFI_BOOT_MANAGER_LEGACY_BOOT                  LegacyBoot
   );
 
+/**
+  Return the platform provided boot option description for the controller.
+
+  @param Handle                Controller handle.
+  @param DefaultDescription    Default boot description provided by core.
+
+  @return  The callee allocated description string
+           or NULL if the handler wants to use DefaultDescription.
+**/
+typedef
+CHAR16 *
+(EFIAPI *EFI_BOOT_MANAGER_BOOT_DESCRIPTION_HANDLER) (
+  IN EFI_HANDLE                  Handle,
+  IN CONST CHAR16                *DefaultDescription
+  );
+
+/**
+  Register the platform provided boot description handler.
+
+  @param Handler  The platform provided boot description handler
+
+  @retval EFI_SUCCESS          The handler was registered successfully.
+  @retval EFI_ALREADY_STARTED  The handler was already registered.
+  @retval EFI_OUT_OF_RESOURCES There is not enough resource to perform the registration.
+**/
+EFI_STATUS
+EFIAPI
+EfiBootManagerRegisterBootDescriptionHandler (
+  IN EFI_BOOT_MANAGER_BOOT_DESCRIPTION_HANDLER  Handler
+  );
 
 //
 // Boot Manager connect and disconnect library functions
