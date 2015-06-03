@@ -189,6 +189,52 @@ ParseReturnStdInLine (
 }
 
 /**
+  Handle stings for SFO Output with escape character ^ in a string
+  1. Quotation marks in the string must be escaped by using a ^ character (i.e. ^”). 
+  2. The ^ character may be inserted using ^^.
+
+  @param[in]  String  The Unicode NULL-terminated string.
+ 
+  @retval NewString   The new string handled for SFO.
+**/
+EFI_STRING
+HandleStringWithEscapeCharForParse (
+  IN      CHAR16  *String
+  )
+{
+  EFI_STRING  NewStr;
+  EFI_STRING  StrWalker;
+  EFI_STRING  ReturnStr;
+
+  if (String == NULL) {
+    return NULL;
+  }
+  
+  //
+  // start to parse the input string.
+  //
+  NewStr = AllocateZeroPool (StrSize (String));
+  if (NewStr == NULL) {
+    return NULL;
+  }
+  ReturnStr = NewStr;
+  StrWalker = String;
+  while (*StrWalker != CHAR_NULL) {
+    if (*StrWalker == L'^' && (*(StrWalker + 1) == L'^' || *(StrWalker + 1) == L'"')) {
+      *NewStr = *(StrWalker + 1);
+      StrWalker++;
+    } else {
+      *NewStr = *StrWalker;
+    }
+    StrWalker++;
+    NewStr++;
+  }
+  
+  return ReturnStr;
+}
+
+
+/**
   Do the actual parsing of the file.  the file should be SFO output from a 
   shell command or a similar format.
 
@@ -222,6 +268,7 @@ PerformParsing(
   CHAR16            *ColumnPointer;
   SHELL_STATUS      ShellStatus;
   CHAR16            *TempSpot;
+  CHAR16            *SfoString;
 
   ASSERT(FileName   != NULL);
   ASSERT(TableName  != NULL);
@@ -299,8 +346,11 @@ PerformParsing(
                 if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[StrLen (ColumnPointer) - 1] == L'\"'){
                   ColumnPointer[StrLen (ColumnPointer) - 1] = CHAR_NULL;
                 }
-
-                ShellPrintEx (-1, -1, L"%s\r\n", ColumnPointer);
+                SfoString = HandleStringWithEscapeCharForParse (ColumnPointer);
+                if (SfoString != NULL) {
+                  ShellPrintEx (-1, -1, L"%s\r\n", SfoString);
+                  SHELL_FREE_NON_NULL (SfoString);
+                }
               }
             }
           }
