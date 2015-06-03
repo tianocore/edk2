@@ -1,7 +1,7 @@
 /** @file
   Header file for AHCI mode of ATA host controller.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1525,7 +1525,7 @@ AtaUdmaInOut (
   UINTN                         PrdTableSize;
   EFI_PHYSICAL_ADDRESS          PrdTableMapAddr;
   VOID                          *PrdTableMap;
-  EFI_ATA_DMA_PRD               *PrdBaseAddr;
+  EFI_PHYSICAL_ADDRESS          PrdTableBaseAddr;
   EFI_ATA_DMA_PRD               *TempPrdBaseAddr;
   UINTN                         PrdTableNum;
 
@@ -1543,12 +1543,17 @@ AtaUdmaInOut (
   EFI_PCI_IO_PROTOCOL           *PciIo;
   EFI_TPL                       OldTpl;
 
+  UINTN                         AlignmentMask;
+  UINTN                         RealPageCount;
+  EFI_PHYSICAL_ADDRESS          BaseAddr;
+  EFI_PHYSICAL_ADDRESS          BaseMapAddr;
 
   Status        = EFI_SUCCESS;
-  PrdBaseAddr   = NULL;
   PrdTableMap   = NULL;
   BufferMap     = NULL;
   PageCount     = 0;
+  RealPageCount = 0;
+  BaseAddr      = 0;
   PciIo         = Instance->PciIo;
 
   if ((PciIo == NULL) || (IdeRegisters == NULL) || (DataBuffer == NULL) || (AtaCommandBlock == NULL)) {
@@ -1606,40 +1611,56 @@ AtaUdmaInOut (
 
     //
     // Allocate buffer for PRD table initialization.
+    // Note Ide Bus Master spec said the descriptor table must be aligned on a 4 byte
+    // boundary and the table cannot cross a 64K boundary in memory.
     //
-    PageCount = EFI_SIZE_TO_PAGES (PrdTableSize);
+    PageCount     = EFI_SIZE_TO_PAGES (PrdTableSize);
+    RealPageCount = PageCount + EFI_SIZE_TO_PAGES (SIZE_64KB);
+
+    //
+    // Make sure that PageCount plus EFI_SIZE_TO_PAGES (SIZE_64KB) does not overflow.
+    //
+    ASSERT (RealPageCount > PageCount);
+
     Status    = PciIo->AllocateBuffer (
                          PciIo,
                          AllocateAnyPages,
                          EfiBootServicesData,
-                         PageCount,
-                         (VOID **)&PrdBaseAddr,
+                         RealPageCount,
+                         (VOID **)&BaseAddr,
                          0
                          );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    ByteCount = EFI_PAGES_TO_SIZE (PageCount);
+    ByteCount = EFI_PAGES_TO_SIZE (RealPageCount);
     Status    = PciIo->Map (
                          PciIo,
                          EfiPciIoOperationBusMasterCommonBuffer,
-                         PrdBaseAddr,
+                         (VOID*)(UINTN)BaseAddr,
                          &ByteCount,
-                         &PrdTableMapAddr,
+                         &BaseMapAddr,
                          &PrdTableMap
                          );
-    if (EFI_ERROR (Status) || (ByteCount != EFI_PAGES_TO_SIZE (PageCount))) {
+    if (EFI_ERROR (Status) || (ByteCount != EFI_PAGES_TO_SIZE (RealPageCount))) {
       //
       // If the data length actually mapped is not equal to the requested amount,
       // it means the DMA operation may be broken into several discontinuous smaller chunks.
       // Can't handle this case.
       //
-      PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
+      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID*)(UINTN)BaseAddr);
       return EFI_OUT_OF_RESOURCES;
     }
 
-    ZeroMem ((VOID *) ((UINTN) PrdBaseAddr), ByteCount);
+    ZeroMem ((VOID *) ((UINTN) BaseAddr), ByteCount);
+
+    //
+    // Calculate the 64K align address as PRD Table base address.
+    //
+    AlignmentMask    = SIZE_64KB - 1;
+    PrdTableBaseAddr = ((UINTN) BaseAddr + AlignmentMask) & ~AlignmentMask;
+    PrdTableMapAddr  = ((UINTN) BaseMapAddr + AlignmentMask) & ~AlignmentMask;
 
     //
     // Map the host address of DataBuffer to DMA master address.
@@ -1661,7 +1682,7 @@ AtaUdmaInOut (
                          );
     if (EFI_ERROR (Status) || (ByteCount != DataLength)) {
       PciIo->Unmap (PciIo, PrdTableMap);
-      PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
+      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID*)(UINTN)BaseAddr);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1675,7 +1696,7 @@ AtaUdmaInOut (
     // Fill the PRD table with appropriate bus master address of data buffer and data length.
     //
     ByteRemaining   = ByteCount;
-    TempPrdBaseAddr = PrdBaseAddr;
+    TempPrdBaseAddr = (EFI_ATA_DMA_PRD*)(UINTN)PrdTableBaseAddr;
     while (ByteRemaining != 0) {
       if (ByteRemaining <= 0x10000) {
         TempPrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
@@ -1731,8 +1752,8 @@ AtaUdmaInOut (
     if (Task != NULL) {
       Task->Map            = BufferMap;
       Task->TableMap       = PrdTableMap;
-      Task->MapBaseAddress = PrdBaseAddr;
-      Task->PageCount      = PageCount;
+      Task->MapBaseAddress = (EFI_ATA_DMA_PRD*)(UINTN)BaseAddr;
+      Task->PageCount      = RealPageCount;
       Task->IsStart        = TRUE;
     }
 
@@ -1819,7 +1840,7 @@ Exit:
       PciIo->Unmap (PciIo, Task->Map);
     } else {
       PciIo->Unmap (PciIo, PrdTableMap);
-      PciIo->FreeBuffer (PciIo, PageCount, PrdBaseAddr);
+      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID*)(UINTN)BaseAddr);
       PciIo->Unmap (PciIo, BufferMap);
     }
 
