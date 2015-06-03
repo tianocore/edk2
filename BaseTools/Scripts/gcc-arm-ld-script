@@ -1,0 +1,46 @@
+SECTIONS
+{
+  /* Start at 0 so we can meet more aggressive alignment requires after the PE-COFF conversion
+     like those for ARM exception vectors.  This requires debugger scripts to offset past
+     the PE-COFF header (typically 0x260).  When the PE-COFF conversion occurs we will
+     get proper alignment since the ELF section alignment is applied in the conversion process. */
+  . = 0;
+  .text ALIGN(0x20) :
+  {
+    *(.text .stub .text.* .gnu.linkonce.t.*)
+    . = ALIGN(0x20);
+  } =0x90909090
+  .data ALIGN(0x20) :
+  {
+    *(
+      .rodata .rodata.* .gnu.linkonce.r.*
+      .data .data.* .gnu.linkonce.d.*
+      .bss .bss.*
+      *COM*
+    )
+    . = ALIGN(0x20);
+  }
+  .eh_frame ALIGN(0x20) :
+  {
+    KEEP (*(.eh_frame))
+  }
+  .got ALIGN(0x20) :
+  {
+    *(.got .got.*)
+    . = ALIGN(0x20);
+  }
+  .rela ALIGN(0x20) :
+  {
+    *(.rela .rela.*)
+  }
+  /DISCARD/ : {
+    *(.note.GNU-stack) *(.gnu_debuglink)
+    *(.interp)
+    *(.dynsym)
+    *(.dynstr)
+    *(.dynamic)
+    *(.hash)
+    *(.comment)
+  }
+}
+
