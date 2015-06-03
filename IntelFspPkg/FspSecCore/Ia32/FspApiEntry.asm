@@ -368,15 +368,15 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   mov       eax, dword ptr [esp + 4]
   cmp       eax, 0
   mov       eax, 80000002h
-  jz        NemInitExit
+  jz        TempRamInitExit
 
   ;
   ; Sec Platform Init
   ;
   CALL_MMX  SecPlatformInit
   cmp       eax, 0
-  jnz       NemInitExit
-  
+  jnz       TempRamInitExit
+
   ; Load microcode
   LOAD_ESP
   CALL_MMX  LoadMicrocode
@@ -387,14 +387,14 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   LOAD_ESP
   CALL_MMX  SecCarInit
   cmp       eax, 0
-  jnz       NemInitExit
+  jnz       TempRamInitExit
 
   LOAD_ESP
   CALL_MMX  EstablishStackFsp
 
   LXMMN      xmm6, eax, 3  ;Restore microcode status if no CAR init error from ECX-SLOT 3 in xmm6.
 
-NemInitExit:
+TempRamInitExit:
   ;
   ; Load EBP, EBX, ESI, EDI & ESP from XMM7 & XMM6
   ;
