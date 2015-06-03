@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1622,7 +1622,6 @@ ShellFileHandleEof(
 
   gEfiShellProtocol->GetFilePosition(Handle, &Pos);
   Info = gEfiShellProtocol->GetFileInfo (Handle);
-  ASSERT(Info != NULL);
   gEfiShellProtocol->SetFilePosition(Handle, Pos);
 
   if (Info == NULL) {
