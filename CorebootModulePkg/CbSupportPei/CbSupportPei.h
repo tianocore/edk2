@@ -1,7 +1,7 @@
 /** @file
   The header file of Coreboot Support PEIM.
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/CbParseLib.h>
 #include <Library/MtrrLib.h>
+#include <Library/IoLib.h>
 
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/MemoryTypeInformation.h>

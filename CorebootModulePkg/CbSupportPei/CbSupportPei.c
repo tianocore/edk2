@@ -2,7 +2,7 @@
   This PEIM will parse coreboot table in memory and report resource information into pei core. 
   This file contains the main entrypoint of the PEIM.
   
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #include "CbSupportPei.h"
+
+#define LEGACY_8259_MASK_REGISTER_MASTER  0x21
+#define LEGACY_8259_MASK_REGISTER_SLAVE   0xA1
 
 EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
   { EfiACPIReclaimMemory,   0x008 },     
@@ -374,7 +377,13 @@ CbPeiEntryPoint (
  		CopyMem (pFbInfo, &FbInfo, sizeof (FRAME_BUFFER_INFO)); 
  		DEBUG ((EFI_D_ERROR, "Create frame buffer info guid hob\n")); 		
  	}
-    	  
+
+  //
+  // Mask off all legacy 8259 interrupt sources
+  //
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE,  0xFF);
+
   return EFI_SUCCESS;
 }
 
