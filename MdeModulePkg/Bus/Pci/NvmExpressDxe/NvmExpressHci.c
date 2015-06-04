@@ -513,9 +513,11 @@ NvmeEnableController (
   // CC.AMS, CC.MPS and CC.CSS are all set to 0.
   //
   ZeroMem (&Cc, sizeof (NVME_CC));
-  Cc.En  = 1;
-  Status = WriteNvmeControllerConfiguration (Private, &Cc);
+  Cc.En     = 1;
+  Cc.Iosqes = 6;
+  Cc.Iocqes = 4;
 
+  Status = WriteNvmeControllerConfiguration (Private, &Cc);
   if (EFI_ERROR(Status)) {
     return Status;
   }
