@@ -41,6 +41,9 @@ UINTN                           mGaugeNumberOfEntries = 0;
 GAUGE_DATA_ENTRY_EX             *mGaugeDataEx = NULL;
 UINTN                           mGaugeNumberOfEntriesEx = 0;
 
+BOOLEAN                         mNoSmmPerfHandler = FALSE;
+BOOLEAN                         mNoSmmPerfExHandler = FALSE;
+
 //
 // The cached Performance Protocol and PerformanceEx Protocol interface.
 //
@@ -372,7 +375,7 @@ GetByPerformanceProtocol (
                                   On exit, the key of the next performance log entry.
 
   @retval !NULL           Get all gauge data success.
-  @retval NULL            Get all guage data failed.
+  @retval NULL            Get all gauge data failed.
 **/
 GAUGE_DATA_ENTRY *
 EFIAPI
@@ -386,13 +389,21 @@ GetAllSmmGaugeData (
   UINTN                       CommSize;
   UINTN                       DataSize;
 
+  if (mNoSmmPerfHandler) {
+    //
+    // Not try to get the SMM gauge data again
+    // if no SMM Performance handler found.
+    //
+    return NULL;
+  }
+
   if (LogEntryKey != 0) {
     if (mGaugeData != NULL) {
       return mGaugeData;
     }
   } else {
     //
-    // Reget the SMM guage data at the first entry get.
+    // Reget the SMM gauge data at the first entry get.
     //
     if (mGaugeData != NULL) {
       FreePool (mGaugeData);
@@ -418,10 +429,13 @@ GetAllSmmGaugeData (
   CommSize = SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE;
 
   //
-  // Get totol number of SMM gauge entries
+  // Get total number of SMM gauge entries
   //
   SmmPerfCommData->Function = SMM_PERF_FUNCTION_GET_GAUGE_ENTRY_NUMBER;
   Status = mSmmCommunication->Communicate (mSmmCommunication, mSmmPerformanceBuffer, &CommSize);
+  if (Status == EFI_NOT_FOUND) {
+    mNoSmmPerfHandler = TRUE;
+  }
   if (EFI_ERROR (Status) || EFI_ERROR (SmmPerfCommData->ReturnStatus) || SmmPerfCommData->NumberOfEntries == 0) {
     return NULL;
   }
@@ -459,7 +473,7 @@ GetAllSmmGaugeData (
                                   On exit, the key of the next performance log entry.
 
   @retval !NULL           Get all gauge data success.
-  @retval NULL            Get all guage data failed.
+  @retval NULL            Get all gauge data failed.
 **/
 GAUGE_DATA_ENTRY_EX *
 EFIAPI
@@ -473,13 +487,21 @@ GetAllSmmGaugeDataEx (
   UINTN                       CommSize;
   UINTN                       DataSize;
 
+  if (mNoSmmPerfExHandler) {
+    //
+    // Not try to get the SMM gauge data again
+    // if no SMM PerformanceEx handler found.
+    //
+    return NULL;
+  }
+
   if (LogEntryKey != 0) {
     if (mGaugeDataEx != NULL) {
       return mGaugeDataEx;
     }
   } else {
     //
-    // Reget the SMM guage data at the first entry get.
+    // Reget the SMM gauge data at the first entry get.
     //
     if (mGaugeDataEx != NULL) {
       FreePool (mGaugeDataEx);
@@ -505,10 +527,13 @@ GetAllSmmGaugeDataEx (
   CommSize = SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE;
 
   //
-  // Get totol number of SMM gauge entries
+  // Get total number of SMM gauge entries
   //
   SmmPerfCommData->Function = SMM_PERF_FUNCTION_GET_GAUGE_ENTRY_NUMBER;
   Status = mSmmCommunication->Communicate (mSmmCommunication, mSmmPerformanceBuffer, &CommSize);
+  if (Status == EFI_NOT_FOUND) {
+    mNoSmmPerfExHandler = TRUE;
+  }
   if (EFI_ERROR (Status) || EFI_ERROR (SmmPerfCommData->ReturnStatus) || SmmPerfCommData->NumberOfEntries == 0) {
     return NULL;
   }
@@ -658,7 +683,15 @@ GetPerformanceMeasurementEx (
       GaugeData = (GAUGE_DATA_ENTRY_EX *) &mGaugeData[LogEntryKey++];
       *Identifier = 0;
     } else {
-      return 0;
+      return GetByPerformanceProtocol (
+               LogEntryKey,
+               Handle,
+               Token,
+               Module,
+               StartTimeStamp,
+               EndTimeStamp,
+               Identifier
+               );
     }
   }
 
