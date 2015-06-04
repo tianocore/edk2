@@ -282,7 +282,7 @@ InitializeDebugAgent (
     //
     GetApicTimerState (NULL, &PeriodicMode, NULL);
     TimerCycle = GetApicTimerInitCount ();
-    if (PeriodicMode != TRUE || TimerCycle == 0) {
+    if (!PeriodicMode || TimerCycle == 0) {
       InitializeDebugTimer (NULL, FALSE);
       DisableApicTimerInterrupt ();
     }

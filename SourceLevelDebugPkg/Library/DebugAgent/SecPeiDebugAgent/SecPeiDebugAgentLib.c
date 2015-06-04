@@ -657,7 +657,7 @@ InitializeDebugAgentPhase2 (
   MailboxLocation = GetLocationSavedMailboxPointerInIdtEntry ();
   Mailbox = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
   BufferSize = PcdGet16(PcdDebugPortHandleBufferSize);
-  if (Phase2Context->InitFlag == DEBUG_AGENT_INIT_PEI) {
+  if (Phase2Context->InitFlag == DEBUG_AGENT_INIT_PEI && BufferSize != 0) {
     NewDebugPortHandle = (UINT64)(UINTN)AllocateCopyPool (BufferSize, DebugPortHandle);
   } else {
     NewDebugPortHandle = (UINT64)(UINTN)DebugPortHandle;
