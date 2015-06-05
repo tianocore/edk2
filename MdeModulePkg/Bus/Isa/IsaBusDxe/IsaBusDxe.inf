@@ -55,5 +55,7 @@
   DebugLib
 
 [Protocols]
-  gEfiIsaHcProtocolGuid
-  gEfiIsaHcServiceBindingProtocolGuid
+  ## CONSUMES 
+  ## PRODUCES
+  gEfiIsaHcProtocolGuid                 
+  gEfiIsaHcServiceBindingProtocolGuid   ## PRODUCES
