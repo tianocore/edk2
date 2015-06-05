@@ -387,6 +387,8 @@ DxeMain (
 
   MemoryProfileInstallProtocol ();
 
+  CoreInitializePropertiesTable ();
+
   //
   // Get persisted vector hand-off info from GUIDeed HOB again due to HobStart may be updated,
   // and install configuration table

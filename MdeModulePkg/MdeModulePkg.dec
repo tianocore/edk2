@@ -1261,6 +1261,28 @@
   # @Prompt Flag to request system reboot after processing capsule.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag|0x0001|UINT16|0x0000006d
 
+  ## Publish PropertiesTable or not.
+  #
+  # If this PCD is TRUE, DxeCore publishs PropertiesTable.
+  # DxeCore evaluates if all runtime drivers has 4K aligned PE sections. If all
+  # PE sections in runtime drivers are 4K aligned, DxeCore sets BIT0 in
+  # PropertiesTable. Or DxeCore clears BIT0 in PropertiesTable.
+  # If this PCD is FALSE, DxeCore does not publish PropertiesTable.
+  #
+  # If PropertiesTable has BIT0 set, DxeCore uses below policy in UEFI memory map:
+  #   1) Use EfiRuntimeServicesCode for runtime driver PE image code section and
+  #      use EfiRuntimeServicesData for runtime driver PE image header and other section.
+  #   2) Set EfiRuntimeServicesCode to be EFI_MEMORY_RO.
+  #   3) Set EfiRuntimeServicesData to be EFI_MEMORY_XP.
+  #   4) Set EfiMemoryMappedIO and EfiMemoryMappedIOPortSpace to be EFI_MEMORY_XP.
+  #
+  # NOTE: Platform need gurantee this PCD is set correctly. Platform should set
+  # this PCD to be TURE if and only if all runtime driver has seperated Code/Data
+  # section. If PE code/data sections are merged, the result is unpredictable.
+  #
+  # @Prompt Publish UEFI PropertiesTable.
+  gEfiMdeModulePkgTokenSpaceGuid.PropertiesTableEnable|TRUE|BOOLEAN|0x0000006e
+
   ## Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification.
   # @Prompt Default OEM ID for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"INTEL "|VOID*|0x30001034

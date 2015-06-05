@@ -40,6 +40,7 @@
   Misc/Stall.c
   Misc/SetWatchdogTimer.c
   Misc/InstallConfigurationTable.c
+  Misc/PropertiesTable.c
   Library/Library.c
   Hand/DriverSupport.c
   Hand/Notify.c
@@ -123,6 +124,8 @@
   gEfiVectorHandoffTableGuid                    ## SOMETIMES_PRODUCES   ## SystemTable
   gEdkiiMemoryProfileGuid                       ## SOMETIMES_PRODUCES   ## GUID # Install protocol
   gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
+  gEfiPropertiesTableGuid                       ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiEndOfDxeEventGroupGuid                    ## SOMETIMES_CONSUMES   ## Event
 
 [Ppis]
   gEfiVectorHandoffInfoPpiGuid                  ## UNDEFINED # HOB
@@ -182,6 +185,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PropertiesTableEnable                      ## CONSUMES
 
 # [Hob]
 # RESOURCE_DESCRIPTOR   ## CONSUMES

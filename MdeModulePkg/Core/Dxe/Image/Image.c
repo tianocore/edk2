@@ -710,6 +710,7 @@ CoreLoadPeImage (
       Image->RuntimeData->RelocationData = Image->ImageContext.FixupData;
       Image->RuntimeData->Handle         = Image->Handle;
       InsertTailList (&gRuntime->ImageHead, &Image->RuntimeData->Link);
+      InsertImageRecord (Image->RuntimeData);
     }
   }
 
@@ -952,6 +953,7 @@ CoreUnloadAndCloseImage (
       // Remove the Image from the Runtime Image list as we are about to Free it!
       //
       RemoveEntryList (&Image->RuntimeData->Link);
+      RemoveImageRecord (Image->RuntimeData);
     }
     CoreFreePool (Image->RuntimeData);
   }

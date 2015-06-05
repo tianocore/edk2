@@ -2858,4 +2858,33 @@ CoreUpdateMemoryAttributes (
   IN UINT64                NewAttributes
   );
 
+/**
+  Initialize PropertiesTable support.
+**/
+VOID
+EFIAPI
+CoreInitializePropertiesTable (
+  VOID
+  );
+
+/**
+  Insert image record.
+
+  @param  RuntimeImage    Runtime image information
+**/
+VOID
+InsertImageRecord (
+  IN EFI_RUNTIME_IMAGE_ENTRY  *RuntimeImage
+  );
+
+/**
+  Remove Image record.
+
+  @param  RuntimeImage    Runtime image information
+**/
+VOID
+RemoveImageRecord (
+  IN EFI_RUNTIME_IMAGE_ENTRY  *RuntimeImage
+  );
+
 #endif
