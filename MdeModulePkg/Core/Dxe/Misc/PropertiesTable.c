@@ -1107,10 +1107,8 @@ InsertImageRecord (
   EFI_IMAGE_DOS_HEADER                 *DosHdr;
   UINT32                               PeCoffHeaderOffset;
   UINT32                               SectionAlignment;
-  UINT16                               ImageType;
   EFI_IMAGE_SECTION_HEADER             *Section;
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
-  UINT16                               Magic;
   UINT8                                *Name;
   UINTN                                Index;
   IMAGE_PROPERTIES_RECORD              *ImageRecord;
@@ -1168,15 +1166,11 @@ InsertImageRecord (
     //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
     //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
     //
-    Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-    ImageType         = Hdr.Pe32->OptionalHeader.Subsystem;
     SectionAlignment  = Hdr.Pe32->OptionalHeader.SectionAlignment;
   } else {
     //
     // Get the magic value from the PE/COFF Optional Header
     //
-    Magic = Hdr.Pe32->OptionalHeader.Magic;
-    ImageType         = Hdr.Pe32Plus->OptionalHeader.Subsystem;
     SectionAlignment  = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
   }
 
