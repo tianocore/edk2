@@ -1215,7 +1215,9 @@ SmmDriverDispatchHandler (
   EFI_SMM_DRIVER_ENTRY          *DriverEntry;
   EFI_GUID                      *AprioriFile;
   UINTN                         AprioriEntryCount;
-  UINTN                         Index;
+  UINTN                         HandleIndex;
+  UINTN                         SmmTypeIndex;
+  UINTN                         AprioriIndex;
   LIST_ENTRY                    *Link;
   UINT32                        AuthenticationStatus;
   UINTN                         SizeOfBuffer;
@@ -1232,8 +1234,8 @@ SmmDriverDispatchHandler (
     return EFI_NOT_FOUND;
   }
 
-  for (Index = 0; Index < HandleCount; Index++) {
-    FvHandle = HandleBuffer[Index];
+  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
+    FvHandle = HandleBuffer[HandleIndex];
 
     if (FvHasBeenProcessed (FvHandle)) {
       //
@@ -1268,13 +1270,13 @@ SmmDriverDispatchHandler (
     // Discover Drivers in FV and add them to the Discovered Driver List.
     // Process EFI_FV_FILETYPE_SMM type and then EFI_FV_FILETYPE_COMBINED_SMM_DXE
     //
-    for (Index = 0; Index < sizeof (mSmmFileTypes)/sizeof (EFI_FV_FILETYPE); Index++) {
+    for (SmmTypeIndex = 0; SmmTypeIndex < sizeof (mSmmFileTypes)/sizeof (EFI_FV_FILETYPE); SmmTypeIndex++) {
       //
       // Initialize the search key
       //
       Key = 0;
       do {
-        Type = mSmmFileTypes[Index];
+        Type = mSmmFileTypes[SmmTypeIndex];
         GetNextFileStatus = Fv->GetNextFile (
                                   Fv,
                                   &Key,
@@ -1315,10 +1317,10 @@ SmmDriverDispatchHandler (
     // is only valid for the FV that it resided in.
     //
 
-    for (Index = 0; Index < AprioriEntryCount; Index++) {
+    for (AprioriIndex = 0; AprioriIndex < AprioriEntryCount; AprioriIndex++) {
       for (Link = mDiscoveredList.ForwardLink; Link != &mDiscoveredList; Link = Link->ForwardLink) {
         DriverEntry = CR(Link, EFI_SMM_DRIVER_ENTRY, Link, EFI_SMM_DRIVER_ENTRY_SIGNATURE);
-        if (CompareGuid (&DriverEntry->FileName, &AprioriFile[Index]) &&
+        if (CompareGuid (&DriverEntry->FileName, &AprioriFile[AprioriIndex]) &&
             (FvHandle == DriverEntry->FvHandle)) {
           DriverEntry->Dependent = FALSE;
           DriverEntry->Scheduled = TRUE;
