@@ -210,6 +210,8 @@
   # Add support for GCC stack protector
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
+  ArmExceptionLib|ArmPkg\Library\ArmExceptionLib\ArmExceptionLib.inf
+
 [BuildOptions]
   RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
