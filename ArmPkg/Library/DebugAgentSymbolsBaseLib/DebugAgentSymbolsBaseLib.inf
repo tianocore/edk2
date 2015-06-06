@@ -22,13 +22,6 @@
 [Sources.common]
   DebugAgentSymbolsBaseLib.c
 
-[Sources.ARM]
-  Arm/DebugAgentException.asm        | RVCT
-  Arm/DebugAgentException.S          | GCC
-
-[Sources.AARCH64]
-  AArch64/DebugAgentException.S
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -37,7 +30,6 @@
 [LibraryClasses]
   ArmLib
   DebugLib
-  DefaultExceptionHandlerLib
   PcdLib
   PeCoffExtraActionLib
   PeCoffLib
