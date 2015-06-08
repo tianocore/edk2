@@ -1051,6 +1051,11 @@ CoreFindFreePagesI (
 
     DescEnd = ((DescEnd + 1) & (~(Alignment - 1))) - 1;
 
+    // Skip if DescEnd is less than DescStart after alignment clipping
+    if (DescEnd < DescStart) {
+      continue;
+    }
+
     //
     // Compute the number of bytes we can used from this
     // descriptor, and see it's enough to satisfy the request
