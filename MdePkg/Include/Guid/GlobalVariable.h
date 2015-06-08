@@ -36,6 +36,7 @@ extern EFI_GUID gEfiGlobalVariableGuid;
 // Note: except the globally defined variables defined below, the spec also defines
 // L"Boot####"      - A boot load option.
 // L"Driver####"    - A driver load option.
+// L"SysPrep####"   - A System Prep application load option.
 // L"Key####"       - Describes hot key relationship with a Boot#### load option.
 // The attribute for them is NV+BS+RT, #### is a printed hex value, and no 0x or h
 // is included in the hex value. They can not be expressed as a #define like other globally
