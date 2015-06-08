@@ -2,7 +2,7 @@
   Provides services to print a formatted string to a buffer. All combinations of
   Unicode and ASCII strings are supported.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -89,6 +89,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     - d
       - The argument is a signed decimal number.  If the flag 'L' is not specified, 
         then the argument is assumed to be size int.  
+    - u
+      - The argument is a unsigned decimal number.  If the flag 'L' is not specified, 
+        then the argument is assumed to be size int.
     - p
       - The argument is a pointer that is a (VOID *), and it is printed as an 
         unsigned hexadecimal number  The characters used are 0..9 and A..F.

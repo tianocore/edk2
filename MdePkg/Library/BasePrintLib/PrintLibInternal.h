@@ -1,7 +1,7 @@
 /** @file
   Base Print Library instance Internal Functions definition.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,6 +34,7 @@
 #define PRECISION             BIT11
 #define ARGUMENT_REVERSED     BIT12
 #define COUNT_ONLY_NO_PRINT   BIT13
+#define UNSIGNED_TYPE         BIT14
 
 //
 // Record date and time information
