@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -491,7 +491,8 @@
         "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
         Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         "$(NASM)" -I${s_path}(+) -l ${d_path}(+)${s_base}.lst $(NASMB_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
-
+        # copy the output file with .com postfix that be same to the output file of .asm16
+        $(CP) ${dst} $(OUTPUT_DIR)(+)${s_base}.com
 
 [Microcode-File.USER_DEFINED, Microcode-File.Microcode]
     <InputFile>
