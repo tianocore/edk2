@@ -405,6 +405,17 @@ UEFI_DEFINED_VARIABLE_ENTRY mGlobalVariableList[] = {
     InternalVarCheckSizeArray
   },
   {
+    EFI_SYS_PREP_ORDER_VARIABLE_NAME,
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_NV_BS_RT,
+      sizeof (UINT16),
+      MAX_UINTN
+    },
+    InternalVarCheckSizeArray
+  },
+  {
     EFI_HW_ERR_REC_SUPPORT_VARIABLE_NAME,
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
@@ -573,6 +584,17 @@ UEFI_DEFINED_VARIABLE_ENTRY mGlobalVariableList2[] = {
   },
   {
     L"Driver####",
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_NV_BS_RT,
+      sizeof (UINT32) + sizeof (UINT16),
+      MAX_UINTN
+    },
+    InternalVarCheckLoadOption
+  },
+  {
+    L"SysPrep####",
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
       0,
