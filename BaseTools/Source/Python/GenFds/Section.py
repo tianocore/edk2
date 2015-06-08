@@ -141,10 +141,27 @@ class Section (SectionClassObject):
                 else:
                     GenFdsGlobalVariable.InfLogger ("\nCurrent ARCH \'%s\' of File %s is not in the Support Arch Scope of %s specified by INF %s in FDF" %(FfsInf.CurrentArch, File.File, File.Arch, FfsInf.InfFileName))
 
-        if Suffix != None:
-            SuffixMap = FfsInf.GetFinalTargetSuffixMap()
-            if Suffix in SuffixMap:
-                FileList.extend(SuffixMap[Suffix])
+        if Suffix != None and os.path.exists(FfsInf.EfiOutputPath):
+            #
+            # Get Makefile path and time stamp
+            #
+            MakefileDir = FfsInf.EfiOutputPath[:-len('OUTPUT')]
+            Makefile = os.path.join(MakefileDir, 'Makefile')
+            if not os.path.exists(Makefile):
+                Makefile = os.path.join(MakefileDir, 'GNUmakefile')
+            if not os.path.exists(Makefile):
+                SuffixMap = FfsInf.GetFinalTargetSuffixMap()
+                if Suffix in SuffixMap:
+                    FileList.extend(SuffixMap[Suffix])
+            else:
+                # Update to search files with suffix in all sub-dirs.
+                Tuple = os.walk(FfsInf.EfiOutputPath)
+                for Dirpath, Dirnames, Filenames in Tuple:
+                    for F in Filenames:
+                        if os.path.splitext(F)[1] in (Suffix):
+                            FullName = os.path.join(Dirpath, F)
+                            if os.path.getmtime(FullName) > os.path.getmtime(Makefile):
+                                FileList.append(FullName)
 
         #Process the file lists is alphabetical for a same section type
         if len (FileList) > 1:
