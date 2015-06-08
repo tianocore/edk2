@@ -284,7 +284,6 @@ InitializeDebugAgent (
     TimerCycle = GetApicTimerInitCount ();
     if (!PeriodicMode || TimerCycle == 0) {
       InitializeDebugTimer (NULL, FALSE);
-      DisableApicTimerInterrupt ();
     }
     Mailbox = GetMailboxPointer ();
     if (GetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS) == 1) {
@@ -350,6 +349,10 @@ InitializeDebugAgent (
       //
       InitializeDebugTimer (&DebugTimerFrequency, TRUE);
       UpdateMailboxContent (mMailboxPointer, DEBUG_MAILBOX_DEBUG_TIMER_FREQUENCY, DebugTimerFrequency);
+      //
+      // Enable Debug Timer interrupt and CPU interrupt
+      //
+      SaveAndSetDebugTimerInterrupt (TRUE);
       EnableInterrupts ();
 
       FindAndReportModuleImageInfo (SIZE_4KB);

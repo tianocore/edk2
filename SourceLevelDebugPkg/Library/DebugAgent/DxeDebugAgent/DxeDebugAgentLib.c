@@ -428,6 +428,10 @@ InitializeDebugAgent (
     //
     InternalConstructorWorker ();
     //
+    // Enable Debug Timer interrupt
+    //
+    SaveAndSetDebugTimerInterrupt (TRUE);
+    //
     // Enable interrupt to receive Debug Timer interrupt
     //
     EnableInterrupts ();
@@ -481,6 +485,10 @@ InitializeDebugAgent (
     // Set up Debug Agent Environment and try to connect HOST if required
     //
     SetupDebugAgentEnvironment (Mailbox);
+    //
+    // Enable Debug Timer interrupt
+    //
+    SaveAndSetDebugTimerInterrupt (TRUE);
     //
     // Enable interrupt to receive Debug Timer interrupt
     //

@@ -612,6 +612,10 @@ InitializeDebugAgent (
   }
 
   //
+  // Enable Debug Timer interrupt
+  //
+  SaveAndSetDebugTimerInterrupt (TRUE);
+  //
   // Enable CPU interrupts so debug timer interrupts can be delivered
   //
   EnableInterrupts ();

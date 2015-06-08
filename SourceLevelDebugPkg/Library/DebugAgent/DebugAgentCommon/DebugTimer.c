@@ -46,6 +46,11 @@ InitializeDebugTimer (
                    );
 
   InitializeApicTimer (ApicTimerDivisor, InitialCount, TRUE, DEBUG_TIMER_VECTOR);
+  //
+  // Disable Debug Timer interrupt to avoid it is delivered before Debug Port
+  // is initialized
+  //
+  DisableApicTimerInterrupt ();
 
   if (DumpFlag) {
     DEBUG ((EFI_D_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32(PcdFSBClock)));

@@ -2535,6 +2535,7 @@ InterruptProcess (
         CurrentDebugTimerInitCount = GetApicTimerInitCount ();
         if (mDebugMpContext.DebugTimerInitCount != CurrentDebugTimerInitCount) {
           InitializeDebugTimer (NULL, FALSE);
+          SaveAndSetDebugTimerInterrupt (TRUE);
         }
       }
 
