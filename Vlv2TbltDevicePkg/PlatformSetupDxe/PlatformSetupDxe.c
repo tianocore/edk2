@@ -308,7 +308,7 @@ SystemConfigRouteConfig (
   gRT->SetVariable(
          mSetupName,
          &mNormalSetupGuid,
-         EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
          sizeof(SYSTEM_CONFIGURATION),
          &Private->FakeNvData
          );
@@ -477,7 +477,7 @@ SystemConfigCallback (
           Status = gRT->SetVariable (
                           L"Setup",
                           &mNormalSetupGuid,
-                          EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                           sizeof(SYSTEM_CONFIGURATION),
                           &Private->FakeNvData
                           );
@@ -528,7 +528,7 @@ SystemConfigCallback (
           Status = gRT->SetVariable (
                           L"Setup",
                           &mNormalSetupGuid,
-                          EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                           sizeof(SYSTEM_CONFIGURATION),
                           &Private->FakeNvData
                           );
@@ -620,7 +620,7 @@ SystemConfigCallback (
           Status = gRT->SetVariable (
                           L"Setup",
                           &mNormalSetupGuid,
-                          EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                            EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                           sizeof(SYSTEM_CONFIGURATION),
                           FakeNvData
                           );

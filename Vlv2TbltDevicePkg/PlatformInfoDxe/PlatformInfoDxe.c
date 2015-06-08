@@ -113,7 +113,7 @@ PlatformInfoInit (
         Status = gRT->SetVariable (
                         NORMAL_SETUP_NAME,
                         &gEfiNormalSetupGuid,
-                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                         sizeof(SYSTEM_CONFIGURATION),
                         &SystemConfiguration
                         );
