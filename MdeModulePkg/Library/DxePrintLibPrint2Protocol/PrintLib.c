@@ -177,6 +177,7 @@ DxePrintLibPrint2ProtocolVaListToBaseList (
         }
       case 'X':
       case 'x':
+      case 'u':
       case 'd':
         if (Long) {
           BASE_ARG (BaseListMarker, INT64) = VA_ARG (VaListMarker, INT64);
@@ -943,6 +944,7 @@ AsciiValueToString (
 #define PRECISION             BIT11
 #define ARGUMENT_REVERSED     BIT12
 #define COUNT_ONLY_NO_PRINT   BIT13
+#define UNSIGNED_TYPE         BIT14
 
 //
 // Record date and time information
@@ -1429,10 +1431,18 @@ InternalPrintLibSPrintMarker (
         //
         // break skipped on purpose
         //
+      case 'u':
+        if ((Flags & RADIX_HEX) == 0) {
+          Flags &= ~((UINTN) (PREFIX_SIGN));
+          Flags |= UNSIGNED_TYPE;
+        }
+        //
+        // break skipped on purpose
+        //
       case 'd':
         if ((Flags & LONG_TYPE) == 0) {
           //
-          // 'd','x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
+          // 'd', 'u', 'x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
           // This assumption is made so the format string definition is compatible with the ANSI C
           // Specification for formatted strings.  It is recommended that the Base Types be used 
           // everywhere, but in this one case, compliance with ANSI C is more important, and 
@@ -1466,17 +1476,27 @@ InternalPrintLibSPrintMarker (
             Flags &= ~((UINTN) PREFIX_ZERO);
             Precision = 1;
           }
-          if (Value < 0) {
+          if (Value < 0 && (Flags & UNSIGNED_TYPE) == 0) {
             Flags |= PREFIX_SIGN;
             Prefix = '-';
             Value = -Value;
+          } else if ((Flags & UNSIGNED_TYPE) != 0 && (Flags & LONG_TYPE) == 0) {
+            //
+            // 'd', 'u', 'x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
+            // This assumption is made so the format string definition is compatible with the ANSI C
+            // Specification for formatted strings.  It is recommended that the Base Types be used 
+            // everywhere, but in this one case, compliance with ANSI C is more important, and 
+            // provides an implementation that is compatible with that largest possible set of CPU 
+            // architectures.  This is why the type "unsigned int" is used in this one case.
+            //
+            Value = (unsigned int)Value;
           }
         } else {
           Radix = 16;
           Comma = FALSE;
           if ((Flags & LONG_TYPE) == 0 && Value < 0) {
             //
-            // 'd','x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
+            // 'd', 'u', 'x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
             // This assumption is made so the format string definition is compatible with the ANSI C
             // Specification for formatted strings.  It is recommended that the Base Types be used 
             // everywhere, but in this one case, compliance with ANSI C is more important, and 

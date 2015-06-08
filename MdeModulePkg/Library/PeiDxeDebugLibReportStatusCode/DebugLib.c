@@ -182,7 +182,7 @@ DebugPrint (
     if ((*Format == 'p') && (sizeof (VOID *) > 4)) {
       Long = TRUE;
     }
-    if (*Format == 'p' || *Format == 'X' || *Format == 'x' || *Format == 'd') {
+    if (*Format == 'p' || *Format == 'X' || *Format == 'x' || *Format == 'd' || *Format == 'u') {
       if (Long) {
         BASE_ARG (BaseListMarker, INT64) = VA_ARG (VaListMarker, INT64);
       } else {
