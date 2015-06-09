@@ -346,7 +346,18 @@ ConfigurePlatformClocks (
                                    NULL,
                                    &VariableSize,
                                    &SystemConfiguration);
-
+  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VariableSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = Variable->GetVariable(Variable,
+              L"SetupRecovery",
+              &gEfiSetupVariableGuid,
+              NULL,
+              &VariableSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }  
   if(!EFI_ERROR (Status)){
     EnableSpreadSpectrum = SystemConfiguration.EnableClockSpreadSpec;
   }

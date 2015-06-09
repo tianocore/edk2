@@ -49,6 +49,8 @@ Abstract:
 #include <Protocol/GlobalNvsArea.h>
 #include <Protocol/IgdOpRegion.h>
 #include <Library/PcdLib.h>
+#include <Protocol/VariableLock.h>
+
 
 //
 // VLV2 GPIO GROUP OFFSET
@@ -198,6 +200,82 @@ VOID
 InitRC6Policy(
   VOID
   );
+
+
+EFI_STATUS
+EFIAPI
+SaveSetupRecoveryVar(
+  VOID
+  )
+{
+  EFI_STATUS                   Status = EFI_SUCCESS;
+  UINTN                        SizeOfNvStore = 0;
+  UINTN                        SizeOfSetupVar = 0;
+  SYSTEM_CONFIGURATION         *SetupData = NULL;
+  SYSTEM_CONFIGURATION         *RecoveryNvData = NULL;
+  EDKII_VARIABLE_LOCK_PROTOCOL *VariableLock = NULL;
+
+
+  DEBUG ((EFI_D_INFO, "SaveSetupRecoveryVar() Entry \n"));
+  SizeOfNvStore = sizeof(SYSTEM_CONFIGURATION);
+  RecoveryNvData = AllocateZeroPool (sizeof(SYSTEM_CONFIGURATION));
+  if (NULL == RecoveryNvData) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit; 
+  }
+  
+  Status = gRT->GetVariable(
+                L"SetupRecovery",
+                &gEfiNormalSetupGuid,
+                NULL,
+                &SizeOfNvStore,
+                RecoveryNvData
+                );
+  
+  if (EFI_ERROR (Status)) {
+    // Don't find the "SetupRecovery" variable.
+    // have to copy "Setup" variable to "SetupRecovery" variable.
+    SetupData = AllocateZeroPool (sizeof(SYSTEM_CONFIGURATION));
+    if (NULL == SetupData) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;      
+    }
+    SizeOfSetupVar = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+                    NORMAL_SETUP_NAME,
+                    &gEfiNormalSetupGuid,
+                    NULL,
+                    &SizeOfSetupVar,
+                    SetupData
+                    );
+    ASSERT_EFI_ERROR (Status);
+    
+    Status = gRT->SetVariable (
+                    L"SetupRecovery",
+                    &gEfiNormalSetupGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof(SYSTEM_CONFIGURATION),
+                    SetupData
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+      if (!EFI_ERROR (Status)) {
+        Status = VariableLock->RequestToLock (VariableLock, L"SetupRecovery", &gEfiNormalSetupGuid);
+        ASSERT_EFI_ERROR (Status);
+    }
+    
+  }
+
+Exit:
+  if (RecoveryNvData)
+    FreePool (RecoveryNvData);
+  if (SetupData)
+    FreePool (SetupData);
+  
+  return Status;
+    
+}
 
 
 VOID
@@ -662,6 +740,10 @@ InitializePlatform (
   //
   InitializeObservableProtocol();
 
+  Status = SaveSetupRecoveryVar();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "InitializePlatform() Save SetupRecovery variable failed \n"));
+  }
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
@@ -671,8 +753,26 @@ InitializePlatform (
                   &VarSize,
                   &mSystemConfiguration
                   );
-
-
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &mSystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+    Status = gRT->SetVariable (
+                    NORMAL_SETUP_NAME,
+                    &gEfiNormalSetupGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof(SYSTEM_CONFIGURATION),
+                    &mSystemConfiguration
+                    );    
+  }
+    
   Status = EfiCreateEventReadyToBootEx (
              TPL_CALLBACK,
              ReadyToBootFunction,
@@ -1544,6 +1644,19 @@ UpdateDVMTSetup(
                   &VarSize,
                   &SystemConfiguration
                   );
+
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   if((SystemConfiguration.GraphicsDriverMemorySize < 4) && !EFI_ERROR(Status) ) {
     switch (SystemConfiguration.GraphicsDriverMemorySize){

@@ -202,6 +202,19 @@ UpdateBootMode (
                            &VarSize,
                            &SystemConfiguration
                            );
+      if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+        //The setup variable is corrupted
+        VarSize = sizeof(SYSTEM_CONFIGURATION);
+        Status = Variable->GetVariable(
+                  Variable,
+                  L"SetupRecovery",
+                  &gEfiSetupVariableGuid,
+                  NULL,
+                  &VarSize,
+                  &SystemConfiguration
+                  );
+        ASSERT_EFI_ERROR (Status);
+      }      
 
       if (SystemConfiguration.FastBoot == 1) {
             BootMode = BOOT_WITH_MINIMAL_CONFIGURATION;

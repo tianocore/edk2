@@ -73,7 +73,18 @@ InitExI (
                   &SystemConfiguration
                   );
 
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }  
 
   if (SystemConfiguration.ExISupport == 1) {
 	  MmioOr32 ((UINTN) (GetPmcBase() + R_PCH_PMC_MTPMC1), (UINT32) BIT0+BIT1+BIT2);

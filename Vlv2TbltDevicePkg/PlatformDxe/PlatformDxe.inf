@@ -127,6 +127,7 @@
   gEfiCpuIo2ProtocolGuid
   gIgdOpRegionProtocolGuid
   gExitPmAuthProtocolGuid
+  gEdkiiVariableLockProtocolGuid
 
 [Pcd.common]
   gPlatformModuleTokenSpaceGuid.PcdPBTNDisableInterval

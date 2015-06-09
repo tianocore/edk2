@@ -62,6 +62,19 @@ PlatformInfoInit (
                   &VarSize,
                   &SystemConfiguration
                   );
+  
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }    
 
   VarSize = sizeof(Selection);
   Status = gRT->GetVariable(

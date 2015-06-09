@@ -322,7 +322,18 @@ GetGopDevicePath (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &mSystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }    
 
   if(mSystemConfiguration.BootDisplayDevice != 0x0)
   {
@@ -624,7 +635,18 @@ PlatformBdsForceActiveVga (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &mSystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }    
 
 
   if ((PlugInPciVgaDevicePath == NULL && OnboardPciVgaDevicePath != NULL) ) {
@@ -680,7 +702,18 @@ UpdateConsoleResolution(
                   &VarSize,
                   &SystemConfiguration
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }  
 
   switch (SystemConfiguration.IgdFlatPanel) {
 
@@ -1584,9 +1617,19 @@ PlatformBdsPolicyBehavior (
                   &VarSize,
                   &SystemConfiguration
                   );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
+
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }  
 
   //
   // Load the driver option as the driver option list
