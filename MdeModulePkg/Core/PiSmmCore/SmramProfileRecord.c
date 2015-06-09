@@ -69,10 +69,19 @@ GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA mSmramProfileContext =
   },
   &mImageQueue,
 };
-GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA *mSmramProfileContextPtr;
+GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA *mSmramProfileContextPtr = NULL;
 
 BOOLEAN mSmramReadyToLock;
 BOOLEAN mSmramProfileRecordingStatus = FALSE;
+
+/**
+  Dump SMRAM infromation.
+
+**/
+VOID
+DumpSmramInfo (
+  VOID
+  );
 
 /**
   Return SMRAM profile context.
