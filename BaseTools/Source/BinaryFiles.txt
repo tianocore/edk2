@@ -74,4 +74,3 @@ pyexpat.pyd
 python27.dll
 select.pyd
 sqlite3.dll
-msvcr71.dll
