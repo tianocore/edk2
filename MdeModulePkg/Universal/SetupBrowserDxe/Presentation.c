@@ -546,6 +546,21 @@ AddStatementToDisplayForm (
   }
 
   //
+  // treat formset as statement outside the form,get its opcode.
+  //
+  DisplayStatement = AllocateZeroPool (sizeof (FORM_DISPLAY_ENGINE_STATEMENT));
+  ASSERT (DisplayStatement != NULL);
+
+  DisplayStatement->Signature = FORM_DISPLAY_ENGINE_STATEMENT_SIGNATURE;
+  DisplayStatement->Version   = FORM_DISPLAY_ENGINE_STATEMENT_VERSION_1;
+  DisplayStatement->OpCode = gCurrentSelection->FormSet->OpCode;
+
+  InitializeListHead (&DisplayStatement->NestStatementList);
+  InitializeListHead (&DisplayStatement->OptionListHead);
+
+  InsertTailList(&gDisplayFormData.StatementListOSF, &DisplayStatement->DisplayLink);
+
+  //
   // Process the statement in this form.
   //
   Link = GetFirstNode (&gCurrentSelection->Form->StatementListHead);

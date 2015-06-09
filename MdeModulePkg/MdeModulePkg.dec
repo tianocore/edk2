@@ -968,6 +968,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x4000000e
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This PCD points to the front page formset GUID
+  #  Compare the FormsetGuid or ClassGuid with this PCD value can detect whether in front page
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrontPageFormSetGuid|{ 0xbc, 0x30, 0x0c, 0x9e,0x06, 0x3f, 0xa6, 0x4b, 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe }|VOID*|0x0001006e
+
   ## Base address of the NV variable range in flash device.
   # @Prompt Base address of flash NV variable range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001

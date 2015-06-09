@@ -1709,6 +1709,7 @@ ParseOpCodes (
 
       CopyMem (&FormSet->FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
       CopyMem (&FormSet->Help,         &((EFI_IFR_FORM_SET *) OpCodeData)->Help,         sizeof (EFI_STRING_ID));
+      FormSet->OpCode = (EFI_IFR_OP_HEADER *) OpCodeData;//save the opcode address of formset
 
       if (OpCodeLength > OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
         //

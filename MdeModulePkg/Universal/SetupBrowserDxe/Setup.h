@@ -454,6 +454,7 @@ typedef struct {
   UINT16                          Class;                // Tiano extended Class code
   UINT16                          SubClass;             // Tiano extended Subclass code
   EFI_IMAGE_ID                    ImageId;
+  EFI_IFR_OP_HEADER               *OpCode;              //mainly for formset op to get ClassGuid
 
   FORM_BROWSER_STATEMENT          *StatementBuffer;     // Buffer for all Statements and Questions
   EXPRESSION_OPCODE               *ExpressionBuffer;    // Buffer for all Expression OpCode

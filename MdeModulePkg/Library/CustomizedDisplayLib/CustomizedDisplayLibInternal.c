@@ -2,7 +2,7 @@
 
   This library class defines a set of interfaces to customize Display module
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013-2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -256,7 +256,32 @@ ProcessUserOpcode(
   IN  EFI_IFR_OP_HEADER         *OpCodeData
   )
 {
+  EFI_GUID *   ClassGuid;
+  UINT8        ClassGuidNum;
+
+  ClassGuid    = NULL;
+  ClassGuidNum = 0;
+
   switch (OpCodeData->OpCode) {
+    case EFI_IFR_FORM_SET_OP:
+      //
+      // process the statement outside of form,if it is formset op, get its formsetguid or classguid and compared with gFrontPageFormSetGuid
+      //
+      if (CompareGuid((EFI_GUID*)PcdGetPtr (PcdFrontPageFormSetGuid),(EFI_GUID*)&((EFI_IFR_FORM_SET *) OpCodeData)->Guid)){
+        gClassOfVfr = FORMSET_CLASS_FRONT_PAGE;
+      } else{
+        ClassGuidNum = (UINT8)(((EFI_IFR_FORM_SET *)OpCodeData)->Flags & 0x3);
+        ClassGuid    = (EFI_GUID *)(VOID *)((UINT8 *)OpCodeData + sizeof (EFI_IFR_FORM_SET));
+        while (ClassGuidNum-- > 0){
+          if (CompareGuid((EFI_GUID*)PcdGetPtr (PcdFrontPageFormSetGuid),ClassGuid)){
+            gClassOfVfr = FORMSET_CLASS_FRONT_PAGE;
+            break;
+          }
+          ClassGuid ++;
+        }
+      }
+      break;
+
     case EFI_IFR_GUID_OP:     
       if (CompareGuid (&gEfiIfrTianoGuid, (EFI_GUID *)((CHAR8*) OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
         //
