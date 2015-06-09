@@ -190,7 +190,7 @@ ParseReturnStdInLine (
 
 /**
   Handle stings for SFO Output with escape character ^ in a string
-  1. Quotation marks in the string must be escaped by using a ^ character (i.e. ^”). 
+  1. Quotation marks in the string must be escaped by using a ^ character (i.e. ^"). 
   2. The ^ character may be inserted using ^^.
 
   @param[in]  String  The Unicode NULL-terminated string.
@@ -290,7 +290,7 @@ PerformParsing(
        TempLine = ShellFileHandleReturnLine (FileHandle, &Ascii); 
      }
 
-      if ((TempLine == NULL) || (*TempLine == CHAR_NULL && StreamingUnicode == TRUE)) {
+      if ((TempLine == NULL) || (*TempLine == CHAR_NULL && StreamingUnicode)) {
          break;
       }
 
