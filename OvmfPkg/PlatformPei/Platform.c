@@ -61,6 +61,8 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
 };
 
 
+UINT16 mHostBridgeDevId;
+
 EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
 
 BOOLEAN mS3Supported = FALSE;
@@ -229,7 +231,6 @@ MiscInitialization (
   VOID
   )
 {
-  UINT16 HostBridgeDevId;
   UINTN  PmCmd;
   UINTN  Pmba;
   UINTN  AcpiCtlReg;
@@ -246,10 +247,9 @@ MiscInitialization (
   BuildCpuHob (36, 16);
 
   //
-  // Query Host Bridge DID to determine platform type and save to PCD
+  // Determine platform type and save Host Bridge DID to PCD
   //
-  HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
-  switch (HostBridgeDevId) {
+  switch (mHostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
       Pmba       = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
@@ -264,11 +264,11 @@ MiscInitialization (
       break;
     default:
       DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__, HostBridgeDevId));
+        __FUNCTION__, mHostBridgeDevId));
       ASSERT (FALSE);
       return;
   }
-  PcdSet16 (PcdOvmfHostBridgePciDevId, HostBridgeDevId);
+  PcdSet16 (PcdOvmfHostBridgePciDevId, mHostBridgeDevId);
 
   //
   // If the appropriate IOspace enable bit is set, assume the ACPI PMBA
@@ -399,6 +399,11 @@ InitializePlatform (
     DEBUG ((EFI_D_INFO, "Xen was detected\n"));
     InitializeXen ();
   }
+
+  //
+  // Query Host Bridge DID
+  //
+  mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
 
   if (mBootMode != BOOT_ON_S3_RESUME) {
     ReserveEmuVariableNvStore ();
