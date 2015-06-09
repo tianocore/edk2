@@ -2,7 +2,7 @@
 
   Provides some data struct used by EHCI controller driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -66,10 +66,10 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 
 //
 // Sync and Async transfer polling interval, set by experience,
-// and the unit of Async is 100us, means 50ms as interval.
+// and the unit of Async is 100us, means 1ms as interval.
 //
 #define EHC_SYNC_POLL_INTERVAL       (1 * EHC_1_MILLISECOND)
-#define EHC_ASYNC_POLL_INTERVAL      (50 * 10000U)
+#define EHC_ASYNC_POLL_INTERVAL      EFI_TIMER_PERIOD_MILLISECONDS(1)
 
 //
 // EHCI debug port control status register bit definition
