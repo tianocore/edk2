@@ -2,7 +2,7 @@
 
   The definition for UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -78,7 +78,7 @@ typedef struct _USB_HC_DEV  USB_HC_DEV;
 // and the unit of Async is 100us.
 //
 #define UHC_SYNC_POLL_INTERVAL        (1 * UHC_1_MILLISECOND)
-#define UHC_ASYNC_POLL_INTERVAL       (50 * 10000UL)
+#define UHC_ASYNC_POLL_INTERVAL       EFI_TIMER_PERIOD_MILLISECONDS(1)
 
 //
 // UHC raises TPL to TPL_NOTIFY to serialize all its operations
