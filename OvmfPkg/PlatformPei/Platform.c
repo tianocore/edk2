@@ -214,13 +214,18 @@ MemMapInitialization (
     // 0xFEC00000    IO-APIC                        4 KB
     // 0xFEC01000    gap                         1020 KB
     // 0xFED00000    HPET                           1 KB
-    // 0xFED00400    gap                         1023 KB
+    // 0xFED00400    gap                          111 KB
+    // 0xFED1C000    gap (PIIX4) / RCRB (ICH9)     16 KB
+    // 0xFED20000    gap                          896 KB
     // 0xFEE00000    LAPIC                          1 MB
     //
     AddIoMemoryRangeHob (TopOfLowRam < BASE_2GB ?
                          BASE_2GB : TopOfLowRam, 0xFC000000);
     AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
     AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
+    if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+      AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
+    }
     AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
   }
 }
@@ -291,6 +296,16 @@ MiscInitialization (
     // 3. set ACPI PM IO enable bit (PMREGMISC:PMIOSE or ACPI_CNTL:ACPI_EN)
     //
     PciOr8 (AcpiCtlReg, AcpiEnBit);
+  }
+
+  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+    //
+    // Set Root Complex Register Block BAR
+    //
+    PciWrite32 (
+      POWER_MGMT_REGISTER_Q35 (ICH9_RCBA),
+      ICH9_ROOT_COMPLEX_BASE | ICH9_RCBA_EN
+      );
   }
 }
 

@@ -77,6 +77,9 @@
 #define ICH9_GEN_PMCON_1          0xA0
 #define ICH9_GEN_PMCON_1_SMI_LOCK   BIT4
 
+#define ICH9_RCBA                 0xF0
+#define ICH9_RCBA_EN                BIT0
+
 //
 // IO ports
 //
@@ -89,5 +92,7 @@
 #define ICH9_PMBASE_OFS_SMI_EN 0x30
 #define ICH9_SMI_EN_APMC_EN      BIT5
 #define ICH9_SMI_EN_GBL_SMI_EN   BIT0
+
+#define ICH9_ROOT_COMPLEX_BASE 0xFED1C000
 
 #endif
