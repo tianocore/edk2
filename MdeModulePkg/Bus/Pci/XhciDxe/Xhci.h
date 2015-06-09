@@ -67,9 +67,9 @@ typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
 #define XHC_POLL_DELAY               (1000)
 //
 // XHC async transfer timer interval, set by experience.
-// The unit is 100us, takes 50ms as interval.
+// The unit is 100us, takes 1ms as interval.
 //
-#define XHC_ASYNC_TIMER_INTERVAL     EFI_TIMER_PERIOD_MILLISECONDS(50)
+#define XHC_ASYNC_TIMER_INTERVAL     EFI_TIMER_PERIOD_MILLISECONDS(1)
 
 //
 // XHC raises TPL to TPL_NOTIFY to serialize all its operations
