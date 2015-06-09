@@ -267,7 +267,7 @@ ProcessUserOpcode(
       //
       // process the statement outside of form,if it is formset op, get its formsetguid or classguid and compared with gFrontPageFormSetGuid
       //
-      if (CompareGuid((EFI_GUID*)PcdGetPtr (PcdFrontPageFormSetGuid),(EFI_GUID*)&((EFI_IFR_FORM_SET *) OpCodeData)->Guid)){
+       if (CompareMem (PcdGetPtr (PcdFrontPageFormSetGuid), &((EFI_IFR_FORM_SET *) OpCodeData)->Guid, sizeof (EFI_GUID)) == 0){
         gClassOfVfr = FORMSET_CLASS_FRONT_PAGE;
       } else{
         ClassGuidNum = (UINT8)(((EFI_IFR_FORM_SET *)OpCodeData)->Flags & 0x3);
