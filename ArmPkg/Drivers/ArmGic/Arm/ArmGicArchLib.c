@@ -23,6 +23,8 @@ ArmGicGetSupportedArchRevision (
   VOID
   )
 {
+  UINT32    IccSre;
+
   // Ideally we would like to use the GICC IIDR Architecture version here, but
   // this does not seem to be very reliable as the implementation could easily
   // get it wrong. It is more reliable to check if the GICv3 System Register
@@ -37,8 +39,12 @@ ArmGicGetSupportedArchRevision (
     // Note: We do not need to set ICC_SRE_EL2.Enable because the OS is started
     // at the same exception level.
     // It is the OS responsibility to set this bit.
-    ArmGicV3SetControlSystemRegisterEnable (ArmGicV3GetControlSystemRegisterEnable () | ICC_SRE_EL2_SRE);
-    if (ArmGicV3GetControlSystemRegisterEnable () & ICC_SRE_EL2_SRE) {
+    IccSre = ArmGicV3GetControlSystemRegisterEnable ();
+    if (!(IccSre & ICC_SRE_EL2_SRE)) {
+      ArmGicV3SetControlSystemRegisterEnable (IccSre| ICC_SRE_EL2_SRE);
+      IccSre = ArmGicV3GetControlSystemRegisterEnable ();
+    }
+    if (IccSre & ICC_SRE_EL2_SRE) {
       return ARM_GIC_ARCH_REVISION_3;
     }
   }
