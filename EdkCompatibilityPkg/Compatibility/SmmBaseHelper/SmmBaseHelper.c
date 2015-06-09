@@ -11,7 +11,7 @@
 
   SmmHandlerEntry() will receive untrusted input and do validation.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,7 +34,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/CpuLib.h>
-#include <Library/PcdLib.h>
 #include <Guid/SmmBaseThunkCommunication.h>
 #include <Protocol/SmmBaseHelperReady.h>
 #include <Protocol/SmmCpu.h>
@@ -734,10 +733,10 @@ LoadImage (
     RegisterSmramProfileImage (FilePath, DstBuffer, PageCount);
     Status = gBS->StartImage (*ImageHandle, NULL, NULL);
     if (EFI_ERROR (Status)) {
+      UnregisterSmramProfileImage (FilePath, DstBuffer, PageCount);
       mLoadPe32Image->UnLoadPeImage (mLoadPe32Image, *ImageHandle);
       *ImageHandle = NULL;
       FreePages ((VOID *)(UINTN)DstBuffer, PageCount);
-      UnregisterSmramProfileImage (FilePath, DstBuffer, PageCount);
     }
   }
 
