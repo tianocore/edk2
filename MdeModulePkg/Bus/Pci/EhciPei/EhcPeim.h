@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -61,12 +61,9 @@ typedef struct _PEI_USB2_HC_DEV PEI_USB2_HC_DEV;
 #define EHC_ROOT_PORT_RECOVERY_STALL (20 * EHC_1_MILLISECOND)
 
 //
-// Sync and Async transfer polling interval, set by experience, 
-// and the unit of Async is 100us, means 50ms as interval.
+// Sync transfer polling interval, set by experience.
 //
 #define EHC_SYNC_POLL_INTERVAL       (6 * EHC_1_MILLISECOND)
-
-#define EHC_ASYNC_POLL_INTERVAL      (50 * 10000U)
 
 //
 //Iterate through the doule linked list. NOT delete safe
