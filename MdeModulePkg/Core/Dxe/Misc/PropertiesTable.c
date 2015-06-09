@@ -543,6 +543,7 @@ GetMaxSplitRecordCount (
                                  The caller gurantee the buffer size be 1 +
                                  (SplitRecordCount * DescriptorSize) calculated
                                  below.
+  @param  MaxSplitRecordCount    The max number of splitted entries
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 
   @retval  0 no entry is splitted.
@@ -934,7 +935,7 @@ SortImageRecordCodeSection (
 }
 
 /**
-  Check if code section in image record is valid
+  Check if code section in image record is valid.
 
   @param  ImageRecord    image record to be checked
 
@@ -1066,7 +1067,7 @@ SortImageRecord (
 }
 
 /**
-  Dump image record
+  Dump image record.
 **/
 VOID
 DumpImageRecord (

@@ -1,5 +1,4 @@
 ## @file
-#
 # This module sets default policy for attributes of EfiACPIMemoryNVS and EfiReservedMemoryType.
 #
 # This module sets EFI_MEMORY_XP for attributes of EfiACPIMemoryNVS and EfiReservedMemoryType
