@@ -126,7 +126,7 @@ UpdateMemoryAttributesDefault (
   EFI_PROPERTIES_TABLE        *PropertiesTable;
 
   DEBUG ((EFI_D_INFO, "UpdateMemoryAttributesDefault\n"));
-  Status = EfiGetSystemConfigurationTable (&gEfiPropertiesTableGuid, &PropertiesTable);
+  Status = EfiGetSystemConfigurationTable (&gEfiPropertiesTableGuid, (VOID **) &PropertiesTable);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
