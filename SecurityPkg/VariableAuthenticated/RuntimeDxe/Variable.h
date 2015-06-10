@@ -61,6 +61,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define VARIABLE_ATTRIBUTE_NV_BS_RT_HR  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_HARDWARE_ERROR_RECORD)
 #define VARIABLE_ATTRIBUTE_NV_BS_RT_AW  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
 #define VARIABLE_ATTRIBUTE_NV_BS_RT_AT_HR_AW  (VARIABLE_ATTRIBUTE_NV_BS_RT_AT | EFI_VARIABLE_HARDWARE_ERROR_RECORD | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
+#define VARIABLE_ATTRIBUTE_AT_AW        (EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
+
+#define MAX_NV_VARIABLE_SIZE (MAX (MAX (PcdGet32 (PcdMaxVariableSize), \
+                                        PcdGet32 (PcdMaxAuthVariableSize)), \
+                                   PcdGet32 (PcdMaxHardwareErrorVariableSize)))
 
 ///
 /// The size of a 3 character ISO639 language code.
@@ -106,6 +111,9 @@ typedef struct {
   UINTN           CommonVariableTotalSize;
   UINTN           CommonUserVariableTotalSize;
   UINTN           HwErrVariableTotalSize;
+  UINTN           MaxVariableSize;
+  UINTN           MaxAuthVariableSize;
+  UINTN           ScratchBufferSize;
   CHAR8           *PlatformLangCodes;
   CHAR8           *LangCodes;
   CHAR8           *PlatformLang;

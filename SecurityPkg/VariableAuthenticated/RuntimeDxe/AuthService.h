@@ -139,13 +139,18 @@ UpdatePlatformMode (
 /**
   Initializes for authenticated varibale service.
 
+  @param[in] MaxAuthVariableSize    Reflect the overhead associated with the saving
+                                    of a single EFI authenticated variable with the exception
+                                    of the overhead associated with the length
+                                    of the string name of the EFI variable.
+
   @retval EFI_SUCCESS           Function successfully executed.
-  @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resource.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resources.
 
 **/
 EFI_STATUS
 AutenticatedVariableServiceInitialize (
-  VOID
+  IN UINTN      MaxAuthVariableSize
   );
 
 /**

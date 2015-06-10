@@ -932,7 +932,7 @@ VariableServiceInitialize (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  mVariableBufferPayloadSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) +
+  mVariableBufferPayloadSize = MAX_NV_VARIABLE_SIZE +
                                OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - sizeof (VARIABLE_HEADER);
 
   Status = gSmst->SmmAllocatePool (

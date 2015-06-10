@@ -59,6 +59,10 @@ EFI_LOCK                         mVariableServicesLock;
 EDKII_VARIABLE_LOCK_PROTOCOL     mVariableLock;
 EDKII_VAR_CHECK_PROTOCOL         mVarCheck;
 
+#define MAX_NV_VARIABLE_SIZE (MAX (MAX (PcdGet32 (PcdMaxVariableSize), \
+                                        PcdGet32 (PcdMaxAuthVariableSize)), \
+                                   PcdGet32 (PcdMaxHardwareErrorVariableSize)))
+
 /**
   SecureBoot Hook for SetVariable.
 
@@ -931,7 +935,7 @@ SmmVariableReady (
   //
   // Allocate memory for variable communicate buffer.
   //
-  mVariableBufferPayloadSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) +
+  mVariableBufferPayloadSize = MAX_NV_VARIABLE_SIZE +
                                OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - sizeof (VARIABLE_HEADER);
   mVariableBufferSize  = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + mVariableBufferPayloadSize;
   mVariableBuffer      = AllocateRuntimePool (mVariableBufferSize);

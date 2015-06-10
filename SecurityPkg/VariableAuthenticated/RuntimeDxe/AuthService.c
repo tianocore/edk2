@@ -124,13 +124,18 @@ InCustomMode (
 /**
   Initializes for authenticated varibale service.
 
+  @param[in] MaxAuthVariableSize    Reflect the overhead associated with the saving
+                                    of a single EFI authenticated variable with the exception
+                                    of the overhead associated with the length
+                                    of the string name of the EFI variable.
+
   @retval EFI_SUCCESS           Function successfully executed.
   @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resources.
 
 **/
 EFI_STATUS
 AutenticatedVariableServiceInitialize (
-  VOID
+  IN UINTN      MaxAuthVariableSize
   )
 {
   EFI_STATUS              Status;
@@ -158,7 +163,7 @@ AutenticatedVariableServiceInitialize (
   //
   // Reserve runtime buffer for public key database. The size excludes variable header and name size.
   //
-  mMaxKeyDbSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (AUTHVAR_KEYDB_NAME);
+  mMaxKeyDbSize = (UINT32) (MaxAuthVariableSize - sizeof (AUTHVAR_KEYDB_NAME));
   mMaxKeyNumber = mMaxKeyDbSize / EFI_CERT_TYPE_RSA2048_SIZE;
   mPubKeyStore  = AllocateRuntimePool (mMaxKeyDbSize);
   if (mPubKeyStore == NULL) {
@@ -168,7 +173,7 @@ AutenticatedVariableServiceInitialize (
   //
   // Reserve runtime buffer for certificate database. The size excludes variable header and name size.
   //
-  mMaxCertDbSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (EFI_CERT_DB_NAME);
+  mMaxCertDbSize = (UINT32) (MaxAuthVariableSize - sizeof (EFI_CERT_DB_NAME));
   mCertDbStore   = AllocateRuntimePool (mMaxCertDbSize);
   if (mCertDbStore == NULL) {
     return EFI_OUT_OF_RESOURCES;

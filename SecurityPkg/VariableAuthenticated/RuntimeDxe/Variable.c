@@ -2153,7 +2153,7 @@ UpdateVariable (
       // Trying to update NV variable prior to the installation of EFI_VARIABLE_WRITE_ARCH_PROTOCOL
       //
       return EFI_NOT_AVAILABLE_YET;
-    } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    } else if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       //
       // Trying to update volatile authenticated variable prior to the installation of EFI_VARIABLE_WRITE_ARCH_PROTOCOL
       // The authenticated variable perhaps is not initialized, just return here.
@@ -2190,7 +2190,7 @@ UpdateVariable (
   // as a temporary storage.
   //
   NextVariable = GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
-  ScratchSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize));
+  ScratchSize = mVariableModuleGlobal->ScratchBufferSize;
   SetMem (NextVariable, ScratchSize, 0xff);
   DataReady = FALSE;
 
@@ -2309,9 +2309,13 @@ UpdateVariable (
         CopyMem (BufferForMerge, (UINT8 *) ((UINTN) Variable->CurrPtr + DataOffset), Variable->CurrPtr->DataSize);
 
         //
-        // Set Max Common Variable Data Size as default MaxDataSize
+        // Set Max Common/Auth Variable Data Size as default MaxDataSize
         //
-        MaxDataSize = PcdGet32 (PcdMaxVariableSize) - DataOffset;
+        if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
+          MaxDataSize = mVariableModuleGlobal->MaxAuthVariableSize - DataOffset;
+        } else {
+          MaxDataSize = mVariableModuleGlobal->MaxVariableSize - DataOffset;
+        }
 
         if ((CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) &&
             ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0) ||
@@ -2351,7 +2355,7 @@ UpdateVariable (
         } else {
           //
           // For other Variables, append the new data to the end of existing data.
-          // Max Harware error record variable data size is different from common variable
+          // Max Harware error record variable data size is different from common/auth variable
           //
           if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
             MaxDataSize = PcdGet32 (PcdMaxHardwareErrorVariableSize) - DataOffset;
@@ -3237,7 +3241,7 @@ VariableServiceSetVariable (
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
   //  the DataSize is limited to maximum size of PcdGet32 (PcdMaxHardwareErrorVariableSize)
-  //  bytes for HwErrRec, and PcdGet32 (PcdMaxVariableSize) bytes for the others.
+  //  bytes for HwErrRec.
   //
   if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
     if (StrSize (VariableName) + PayloadSize > PcdGet32 (PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER)) {
@@ -3249,10 +3253,16 @@ VariableServiceSetVariable (
   } else {
     //
     //  The size of the VariableName, including the Unicode Null in bytes plus
-    //  the DataSize is limited to maximum size of PcdGet32 (PcdMaxVariableSize) bytes.
+    //  the DataSize is limited to maximum size of Max(Auth)VariableSize bytes.
     //
-    if (StrSize (VariableName) + PayloadSize > PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER)) {
-      return EFI_INVALID_PARAMETER;
+    if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
+      if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxAuthVariableSize - sizeof (VARIABLE_HEADER)) {
+        return EFI_INVALID_PARAMETER;
+      }
+    } else {
+      if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxVariableSize - sizeof (VARIABLE_HEADER)) {
+        return EFI_INVALID_PARAMETER;
+      }
     }
   }
 
@@ -3442,9 +3452,13 @@ VariableServiceQueryVariableInfoInternal (
     }
 
     //
-    // Let *MaximumVariableSize be PcdGet32 (PcdMaxVariableSize) with the exception of the variable header size.
+    // Let *MaximumVariableSize be Max(Auth)VariableSize with the exception of the variable header size.
     //
-    *MaximumVariableSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
+    if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
+      *MaximumVariableSize = mVariableModuleGlobal->MaxAuthVariableSize - sizeof (VARIABLE_HEADER);
+    } else {
+      *MaximumVariableSize = mVariableModuleGlobal->MaxVariableSize - sizeof (VARIABLE_HEADER);
+    }
   }
 
   //
@@ -3636,11 +3650,13 @@ ReclaimForOS(
   }
 
   RemainingHwErrVariableSpace = PcdGet32 (PcdHwErrStorageSize) - mVariableModuleGlobal->HwErrVariableTotalSize;
+
   //
   // Check if the free area is below a threshold.
   //
-  if ((RemainingCommonRuntimeVariableSpace < PcdGet32 (PcdMaxVariableSize))
-    || ((PcdGet32 (PcdHwErrStorageSize) != 0) &&
+  if (((RemainingCommonRuntimeVariableSpace < mVariableModuleGlobal->MaxVariableSize) ||
+       (RemainingCommonRuntimeVariableSpace < mVariableModuleGlobal->MaxAuthVariableSize)) ||
+      ((PcdGet32 (PcdHwErrStorageSize) != 0) &&
        (RemainingHwErrVariableSpace < PcdGet32 (PcdMaxHardwareErrorVariableSize)))){
     Status = Reclaim (
             mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
@@ -3767,17 +3783,17 @@ InitNonVolatileVariableStore (
   // Note that in EdkII variable driver implementation, Hardware Error Record type variable
   // is stored with common variable in the same NV region. So the platform integrator should
   // ensure that the value of PcdHwErrStorageSize is less than the value of
-  // VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)).
+  // (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)).
   //
   ASSERT (HwErrStorageSize < (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)));
   //
   // Ensure that the value of PcdMaxUserNvVariableSpaceSize is less than the value of
-  // VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)) - PcdGet32 (PcdHwErrStorageSize).
+  // (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)) - PcdGet32 (PcdHwErrStorageSize).
   //
   ASSERT (MaxUserNvVariableSpaceSize < (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER) - HwErrStorageSize));
   //
   // Ensure that the value of PcdBoottimeReservedNvVariableSpaceSize is less than the value of
-  // VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)) - PcdGet32 (PcdHwErrStorageSize).
+  // (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)) - PcdGet32 (PcdHwErrStorageSize).
   //
   ASSERT (BoottimeReservedNvVariableSpaceSize < (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER) - HwErrStorageSize));
 
@@ -3788,9 +3804,12 @@ InitNonVolatileVariableStore (
   DEBUG ((EFI_D_INFO, "Variable driver common space: 0x%x 0x%x 0x%x\n", mVariableModuleGlobal->CommonVariableSpace, mVariableModuleGlobal->CommonMaxUserVariableSpace, mVariableModuleGlobal->CommonRuntimeVariableSpace));
 
   //
-  // The max variable or hardware error variable size should be < variable store size.
+  // The max NV variable size should be < (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)).
   //
-  ASSERT(MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) < VariableStoreLength);
+  ASSERT (MAX_NV_VARIABLE_SIZE < (VariableStoreLength - sizeof (VARIABLE_STORE_HEADER)));
+
+  mVariableModuleGlobal->MaxVariableSize = PcdGet32 (PcdMaxVariableSize);
+  mVariableModuleGlobal->MaxAuthVariableSize = ((PcdGet32 (PcdMaxAuthVariableSize) != 0) ? PcdGet32 (PcdMaxAuthVariableSize) : mVariableModuleGlobal->MaxVariableSize);
 
   //
   // Parse non-volatile variable data and get last variable offset.
@@ -3963,7 +3982,7 @@ VariableWriteServiceInitialize (
   //
   // Authenticated variable initialize.
   //
-  Status = AutenticatedVariableServiceInitialize ();
+  Status = AutenticatedVariableServiceInitialize (mVariableModuleGlobal->MaxAuthVariableSize - sizeof (VARIABLE_HEADER));
 
   return Status;
 }
@@ -4019,7 +4038,8 @@ VariableCommonInitialize (
   //
   // Allocate memory for volatile variable store, note that there is a scratch space to store scratch data.
   //
-  ScratchSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize));
+  ScratchSize = MAX_NV_VARIABLE_SIZE;
+  mVariableModuleGlobal->ScratchBufferSize = ScratchSize;
   VolatileVariableStore = AllocateRuntimePool (PcdGet32 (PcdVariableStoreSize) + ScratchSize);
   if (VolatileVariableStore == NULL) {
     if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
