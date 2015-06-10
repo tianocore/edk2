@@ -66,6 +66,8 @@
 #   $(LIBS)             Static library files of current module
 #   $(<tool>_FLAGS)     Tools flags of current module
 #   $(MODULE_NAME)      Current module name
+#   $(MODULE_NAME_GUID) Current module name with module FILE_GUID if same $(MODULE_NAME) exists
+#                       in different modules, otherwise its value is same as $(MODULE_NAME)
 #   $(MODULE_TYPE)      Current module type
 #   $(MODULE_GUID)      Current module guid
 #   $(ARCH)             Architecture of current module
@@ -334,7 +336,7 @@
     <Command.MSFT, Command.INTEL, Command.RVCT, Command.ARMGCC, Command.ARMLINUXGCC>  
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
         $(CP) ${dst} $(OUTPUT_DIR)
-        $(CP) ${dst} $(BIN_DIR)
+        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
     <Command.GCC>
@@ -345,11 +347,11 @@
         #The below 2 lines are only needed for UNIXGCC tool chain, which genereates PE image directly
         #
         -$(OBJCOPY) $(OBJCOPY_ADDDEBUGFLAG) ${src}
-        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)
+        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)(+)$(MODULE_NAME_GUID).debug
 
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
         $(CP) ${dst} $(OUTPUT_DIR)
-        $(CP) ${dst} $(BIN_DIR)
+        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         
     <Command.XCODE>
@@ -359,7 +361,7 @@
         -$(DSYMUTIL) ${src}
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff $(GENFW_FLAGS)
         $(CP) ${dst} $(OUTPUT_DIR)
-        $(CP) ${dst} $(BIN_DIR)
+        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
 
 [Dependency-Expression-File]
@@ -516,7 +518,7 @@
 
     <Command>
         "$(GENFW)" -o ${dst} -j $(MICROCODE_BINARY_FILES) $(GENFW_FLAGS)
-        -$(CP) ${dst} $(BIN_DIR)
+        -$(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).bin
 
 [EFI-Image-File]
     <InputFile>
@@ -542,7 +544,7 @@
         ?.efi, ?.EFI, ?.Efi
 
     <OutputFile>
-        $(BIN_DIR)(+)$(MODULE_NAME).rom
+        $(BIN_DIR)(+)$(MODULE_NAME_GUID).rom
 
     <Command>
         $(OPTROM) -i $(PCI_DEVICE_ID) -f $(PCI_VENDOR_ID) -l $(PCI_CLASS_CODE) -r $(PCI_REVISION) -o $dst $(OPTROM_FLAGS) $src

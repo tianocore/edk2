@@ -241,6 +241,7 @@ PLATFORM_OUTPUT_DIR = ${platform_output_directory}
 #
 MODULE_NAME = ${module_name}
 MODULE_GUID = ${module_guid}
+MODULE_NAME_GUID = ${module_name_guid}
 MODULE_VERSION = ${module_version}
 MODULE_TYPE = ${module_type}
 MODULE_FILE = ${module_file}
@@ -569,6 +570,7 @@ cleanlib:
 
             "module_name"               : self._AutoGenObject.Name,
             "module_guid"               : self._AutoGenObject.Guid,
+            "module_name_guid"          : self._AutoGenObject._GetUniqueBaseName(),
             "module_version"            : self._AutoGenObject.Version,
             "module_type"               : self._AutoGenObject.ModuleType,
             "module_file"               : self._AutoGenObject.MetaFile.Name,
@@ -846,6 +848,7 @@ PLATFORM_OUTPUT_DIR = ${platform_output_directory}
 #
 MODULE_NAME = ${module_name}
 MODULE_GUID = ${module_guid}
+MODULE_NAME_GUID = ${module_name_guid}
 MODULE_VERSION = ${module_version}
 MODULE_TYPE = ${module_type}
 MODULE_FILE = ${module_file}
@@ -970,6 +973,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
 
             "module_name"               : self._AutoGenObject.Name,
             "module_guid"               : self._AutoGenObject.Guid,
+            "module_name_guid"          : self._AutoGenObject._GetUniqueBaseName(),
             "module_version"            : self._AutoGenObject.Version,
             "module_type"               : self._AutoGenObject.ModuleType,
             "module_file"               : self._AutoGenObject.MetaFile,

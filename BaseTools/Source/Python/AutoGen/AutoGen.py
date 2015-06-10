@@ -17,6 +17,7 @@ import Common.LongFilePathOs as os
 import re
 import os.path as path
 import copy
+import uuid
 
 import GenC
 import GenMake
@@ -2285,12 +2286,26 @@ class ModuleAutoGen(AutoGen):
                 
         return self._FixedAtBuildPcds        
 
+    def _GetUniqueBaseName(self):
+        BaseName = self.Name
+        for Module in self.PlatformInfo.ModuleAutoGenList:
+            if Module.MetaFile == self.MetaFile:
+                continue
+            if Module.Name == self.Name:
+                EdkLogger.warn('build', 'Modules have same BaseName:\n  %s\n  %s' % (Module.MetaFile, self.MetaFile))
+                if uuid.UUID(Module.Guid) == uuid.UUID(self.Guid):
+                    EdkLogger.error("build", FILE_DUPLICATED, 'Modules have same BaseName and FILE_GUID:\n'
+                                    '  %s\n  %s' % (Module.MetaFile, self.MetaFile))
+                BaseName = '%s_%s' % (self.Name, self.Guid)
+        return BaseName
+
     # Macros could be used in build_rule.txt (also Makefile)
     def _GetMacros(self):
         if self._Macro == None:
             self._Macro = sdict()
             self._Macro["WORKSPACE"             ] = self.WorkspaceDir
             self._Macro["MODULE_NAME"           ] = self.Name
+            self._Macro["MODULE_NAME_GUID"      ] = self._GetUniqueBaseName()
             self._Macro["MODULE_GUID"           ] = self.Guid
             self._Macro["MODULE_VERSION"        ] = self.Version
             self._Macro["MODULE_TYPE"           ] = self.ModuleType
