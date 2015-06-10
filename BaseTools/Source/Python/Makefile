@@ -94,7 +94,10 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenPcdDb.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\InfSectionParser.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\StrGather.py \
-              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\UniClassObject.py
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\UniClassObject.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\ValidCheckingInfoObject.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\RangeExpression.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\VariableAttributes.py
 
 CMD_BUILD=$(BASE_TOOLS_PATH)\Source\Python\build\BuildReport.py \
     $(BASE_TOOLS_PATH)\Source\Python\GenPatchPcdTable\GenPatchPcdTable.py \
