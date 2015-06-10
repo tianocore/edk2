@@ -1609,6 +1609,11 @@ PlatformBdsPolicyBehavior (
   UINTN                              BootOrderSize;
 
   Timeout = PcdGet16 (PcdPlatformBootTimeOut);
+  if (Timeout > 10 ) {
+    //we think the Timeout variable is corrupted
+    Timeout = 10;
+  }
+  	
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
                   NORMAL_SETUP_NAME,

@@ -159,7 +159,7 @@ PlatformInfoInit (
       Status = gRT->SetVariable(
                       L"PlatformInfo",
                       &gEfiVlv2VariableGuid,
-                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                       sizeof(EFI_PLATFORM_INFO_HOB),
                       PlatformInfoHobPtr
                       );
