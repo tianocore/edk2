@@ -717,6 +717,11 @@
   # @Prompt Maximum variable size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400|UINT32|0x30000003
 
+  ## The maximum size of a single authenticated variable.
+  # The value is 0 as default for compatibility that maximum authenticated variable size is specified by PcdMaxVariableSize.
+  # @Prompt Maximum authenticated variable size.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x00|UINT32|0x30000009
+
   ## The maximum size of single hardware error record variable.<BR><BR>
   # In IA32/X64 platforms, this value should be larger than 1KB.<BR>
   # In IA64 platforms, this value should be larger than 128KB.<BR>
