@@ -1,7 +1,7 @@
 /** @file
   Serial driver for standard UARTS on an ISA bus.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1393,7 +1393,7 @@ IsaSerialSetAttributes (
   // Compute divisor use to program the baud rate using a round determination
   //
   Divisor = (UINT32) DivU64x32Remainder (
-                       SERIAL_PORT_INPUT_CLOCK,
+                       PcdGet32 (PcdSerialClockRate),
                        ((UINT32) BaudRate * 16),
                        &Remained
                        );
@@ -1410,7 +1410,7 @@ IsaSerialSetAttributes (
   //
   // Compute the actual baud rate that the serial port will be programmed for.
   //
-  BaudRate = SERIAL_PORT_INPUT_CLOCK / Divisor / 16;
+  BaudRate = PcdGet32 (PcdSerialClockRate) / Divisor / 16;
 
   //
   // Put serial port on Divisor Latch Mode

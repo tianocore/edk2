@@ -1,7 +1,7 @@
 /** @file
   Include for Serial Driver
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -127,12 +127,6 @@ typedef struct {
                                                  EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE | \
                                                  EFI_SERIAL_OUTPUT_BUFFER_EMPTY          | \
                                                  EFI_SERIAL_INPUT_BUFFER_EMPTY)
-
-
-//
-// (24000000/13)MHz input clock
-//
-#define SERIAL_PORT_INPUT_CLOCK 1843200
 
 //
 // 115200 baud with rounding errors
