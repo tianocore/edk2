@@ -365,8 +365,18 @@ InitializeDebugAgent (
   IA32_DESCRIPTOR              IdtDescriptor;
   IA32_DESCRIPTOR              *Ia32Idtr;
   IA32_IDT_ENTRY               *Ia32IdtEntry;
+  BOOLEAN                      PeriodicMode;
+  UINTN                        TimerCycle;
 
   if (InitFlag == DEBUG_AGENT_INIT_DXE_AP) {
+    //
+    // Check if CPU APIC Timer is working, otherwise initialize it.
+    //
+    GetApicTimerState (NULL, &PeriodicMode, NULL);
+    TimerCycle = GetApicTimerInitCount ();
+    if (!PeriodicMode || TimerCycle == 0) {
+      InitializeDebugTimer (NULL, FALSE);
+    }
     //
     // Invoked by AP, enable interrupt to let AP could receive IPI from other processors
     //
