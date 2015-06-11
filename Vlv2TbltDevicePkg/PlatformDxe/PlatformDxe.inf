@@ -62,6 +62,7 @@
   Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
   SecurityPkg/SecurityPkg.dec
   CryptoPkg/CryptoPkg.dec
+  IntelFspWrapperPkg/IntelFspWrapperPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -134,7 +135,13 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
   gPlatformModuleTokenSpaceGuid.PcdFlashAreaBaseAddress
   gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeAddress
+  gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeSize
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvMainBase
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvRecoveryBase
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvRecoverySize
+  gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase
+  
 
 [Depex]
   gEfiPciRootBridgeIoProtocolGuid     AND

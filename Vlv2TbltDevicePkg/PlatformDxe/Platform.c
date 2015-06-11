@@ -431,12 +431,23 @@ SpiBiosProtectionFunction(
 {
 
   UINTN                             mPciD31F0RegBase;
-  UINTN                             BiosFlaLower = 0;
-  UINTN                             BiosFlaLimit = 0x7fffff;
+  UINTN                             BiosFlaLower0;
+  UINTN                             BiosFlaLimit0;
+  UINTN                             BiosFlaLower1;
+  UINTN                             BiosFlaLimit1;  
+  
 
-  BiosFlaLower = PcdGet32(PcdFlashMicroCodeAddress)-PcdGet32(PcdFlashAreaBaseAddress);
+  BiosFlaLower0 = PcdGet32(PcdFlashMicroCodeAddress)-PcdGet32(PcdFlashAreaBaseAddress);
+  BiosFlaLimit0 = PcdGet32(PcdFlashMicroCodeSize)-1;  
+  #ifdef MINNOW2_FSP_BUILD
+  BiosFlaLower1 = PcdGet32(PcdFlashFvFspBase)-PcdGet32(PcdFlashAreaBaseAddress);
+  BiosFlaLimit1 = (PcdGet32(PcdFlashFvRecoveryBase)-PcdGet32(PcdFlashFvFspBase)+PcdGet32(PcdFlashFvRecoverySize))-1;
+  #else
+  BiosFlaLower1 = PcdGet32(PcdFlashFvMainBase)-PcdGet32(PcdFlashAreaBaseAddress);
+  BiosFlaLimit1 = (PcdGet32(PcdFlashFvRecoveryBase)-PcdGet32(PcdFlashFvMainBase)+PcdGet32(PcdFlashFvRecoverySize))-1;
+  #endif
 
-
+  
   mPciD31F0RegBase = MmPciAddress (0,
                          DEFAULT_PCI_BUS_NUMBER_PCH,
                          PCI_DEVICE_NUMBER_PCH_LPC,
@@ -469,7 +480,7 @@ SpiBiosProtectionFunction(
   //
   MmioOr32((UINTN)(SpiBase + R_PCH_SPI_PR0),
     B_PCH_SPI_PR0_RPE|B_PCH_SPI_PR0_WPE|\
-    (B_PCH_SPI_PR0_PRB_MASK&(BiosFlaLower>>12))|(B_PCH_SPI_PR0_PRL_MASK&(BiosFlaLimit>>12)<<16));
+    (B_PCH_SPI_PR0_PRB_MASK&(BiosFlaLower0>>12))|(B_PCH_SPI_PR0_PRL_MASK&(BiosFlaLimit0>>12)<<16));
 
   //
   //Lock down PR0
@@ -483,6 +494,25 @@ SpiBiosProtectionFunction(
     DEBUG((EFI_D_ERROR, "Failed to lock down PR0.\n"));
   }
 
+  //
+  //Set PR1
+  //
+
+  MmioOr32((UINTN)(SpiBase + R_PCH_SPI_PR1),
+    B_PCH_SPI_PR1_RPE|B_PCH_SPI_PR1_WPE|\
+    (B_PCH_SPI_PR1_PRB_MASK&(BiosFlaLower1>>12))|(B_PCH_SPI_PR1_PRL_MASK&(BiosFlaLimit1>>12)<<16));
+
+  //
+  //Lock down PR1
+  //
+  MmioOr16 ((UINTN) (SpiBase + R_PCH_SPI_HSFS), (UINT16) (B_PCH_SPI_HSFS_FLOCKDN));
+
+  //
+  // Verify if it's really locked.
+  //
+  if ((MmioRead16 (SpiBase + R_PCH_SPI_HSFS) & B_PCH_SPI_HSFS_FLOCKDN) == 0) {
+    DEBUG((EFI_D_ERROR, "Failed to lock down PR1.\n"));
+  }
   return;
 
 }
@@ -790,7 +820,7 @@ InitializePlatform (
              &mReadyToBootEvent
              );
   //
-  // Create a ReadyToBoot Event to run enable PR0 and lock down
+  // Create a ReadyToBoot Event to run enable PR0/PR1 and lock down,unlock variable region
   //
   if(mSystemConfiguration.SpiRwProtect==1) {
     Status = EfiCreateEventReadyToBootEx (
