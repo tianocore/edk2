@@ -3116,6 +3116,76 @@ class ModuleAutoGen(AutoGen):
 
         return HiiExPcds
 
+    def _GenOffsetBin(self):
+        VfrUniBaseName = {}
+        for SourceFile in self.Module.Sources:
+            if SourceFile.Type.upper() == ".VFR" :
+                #
+                # search the .map file to find the offset of vfr binary in the PE32+/TE file. 
+                #
+                VfrUniBaseName[SourceFile.BaseName] = (SourceFile.BaseName + "Bin")
+            if SourceFile.Type.upper() == ".UNI" :
+                #
+                # search the .map file to find the offset of Uni strings binary in the PE32+/TE file. 
+                #
+                VfrUniBaseName["UniOffsetName"] = (self.Name + "Strings")
+
+        if len(VfrUniBaseName) == 0:
+            return None
+        MapFileName = os.path.join(self.OutputDir, self.Name + ".map")
+        EfiFileName = os.path.join(self.OutputDir, self.Name + ".efi")
+        VfrUniOffsetList = GetVariableOffset(MapFileName, EfiFileName, VfrUniBaseName.values())
+        if not VfrUniOffsetList:
+            return None
+
+        OutputName = '%sOffset.bin' % self.Name
+        UniVfrOffsetFileName    =  os.path.join( self.OutputDir, OutputName)
+
+        try:
+            fInputfile = open(UniVfrOffsetFileName, "wb+", 0)
+        except:
+            EdkLogger.error("build", FILE_OPEN_FAILURE, "File open failed for %s" % UniVfrOffsetFileName,None)
+
+        # Use a instance of StringIO to cache data
+        fStringIO = StringIO('')  
+
+        for Item in VfrUniOffsetList:
+            if (Item[0].find("Strings") != -1):
+                #
+                # UNI offset in image.
+                # GUID + Offset
+                # { 0x8913c5e0, 0x33f6, 0x4d86, { 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66 } }
+                #
+                UniGuid = [0xe0, 0xc5, 0x13, 0x89, 0xf6, 0x33, 0x86, 0x4d, 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66]
+                UniGuid = [chr(ItemGuid) for ItemGuid in UniGuid]
+                fStringIO.write(''.join(UniGuid))            
+                UniValue = pack ('Q', int (Item[1], 16))
+                fStringIO.write (UniValue)
+            else:
+                #
+                # VFR binary offset in image.
+                # GUID + Offset
+                # { 0xd0bc7cb4, 0x6a47, 0x495f, { 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2 } };
+                #
+                VfrGuid = [0xb4, 0x7c, 0xbc, 0xd0, 0x47, 0x6a, 0x5f, 0x49, 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2]
+                VfrGuid = [chr(ItemGuid) for ItemGuid in VfrGuid]
+                fStringIO.write(''.join(VfrGuid))                   
+                type (Item[1]) 
+                VfrValue = pack ('Q', int (Item[1], 16))
+                fStringIO.write (VfrValue)
+        #
+        # write data into file.
+        #
+        try :  
+            fInputfile.write (fStringIO.getvalue())
+        except:
+            EdkLogger.error("build", FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the "
+                            "file been locked or using by other applications." %UniVfrOffsetFileName,None)
+
+        fStringIO.close ()
+        fInputfile.close ()
+        return OutputName
+
     ## Create AsBuilt INF file the module
     #
     def CreateAsBuiltInf(self):
@@ -3269,6 +3339,10 @@ class ModuleAutoGen(AutoGen):
               AsBuiltInfDict['binary_item'] += ['DXE_DEPEX|' + self.Name + '.depex']
             if self.ModuleType in ['DXE_SMM_DRIVER']:
               AsBuiltInfDict['binary_item'] += ['SMM_DEPEX|' + self.Name + '.depex']
+
+        Bin = self._GenOffsetBin()
+        if Bin:
+            AsBuiltInfDict['binary_item'] += ['BIN|%s' % Bin]
 
         for Root, Dirs, Files in os.walk(OutputDir):
             for File in Files:
