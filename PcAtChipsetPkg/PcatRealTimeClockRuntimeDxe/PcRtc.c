@@ -100,7 +100,6 @@ PcRtcInit (
   RTC_REGISTER_A  RegisterA;
   RTC_REGISTER_B  RegisterB;
   RTC_REGISTER_D  RegisterD;
-  UINT8           Century;
   EFI_TIME        Time;
   UINTN           DataSize;
   UINT32          TimerVar;
@@ -163,8 +162,6 @@ PcRtcInit (
   Time.Month  = RtcRead (RTC_ADDRESS_MONTH);
   Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
 
-  Century = RtcRead (RTC_ADDRESS_CENTURY);
-  
   //
   // Set RTC configuration after get original time
   // The value of bit AIE should be reserved.
@@ -201,7 +198,7 @@ PcRtcInit (
   //
   // Validate time fields
   //
-  Status = ConvertRtcTimeToEfiTime (&Time, Century, RegisterB);
+  Status = ConvertRtcTimeToEfiTime (&Time, RegisterB);
   if (!EFI_ERROR (Status)) {
     Status = RtcTimeFieldsValid (&Time);
   }
@@ -218,7 +215,7 @@ PcRtcInit (
     Time.Hour   = RTC_INIT_HOUR;
     Time.Day    = RTC_INIT_DAY;
     Time.Month  = RTC_INIT_MONTH;
-    Time.Year   = RTC_INIT_YEAR;
+    Time.Year   = PcdGet16 (PcdMinimalValidYear);
     Time.Nanosecond  = 0;
     Time.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
     Time.Daylight = 0;
@@ -251,7 +248,7 @@ PcRtcInit (
   Time.Hour   = RTC_INIT_HOUR;
   Time.Day    = RTC_INIT_DAY;
   Time.Month  = RTC_INIT_MONTH;
-  Time.Year   = RTC_INIT_YEAR;
+  Time.Year   = PcdGet16 (PcdMinimalValidYear);
   Time.Nanosecond  = 0;
   Time.TimeZone = Global->SavedTimeZone;
   Time.Daylight = Global->Daylight;;
@@ -272,8 +269,8 @@ PcRtcInit (
     }
     return EFI_DEVICE_ERROR;
   }
-  
-  ConvertEfiTimeToRtcTime (&Time, RegisterB, &Century);
+
+  ConvertEfiTimeToRtcTime (&Time, RegisterB);
 
   //
   // Set the Y/M/D info to variable as it has no corresponding hw registers.
@@ -343,7 +340,6 @@ PcRtcGetTime (
 {
   EFI_STATUS      Status;
   RTC_REGISTER_B  RegisterB;
-  UINT8           Century;
 
   //
   // Check parameters for null pointer
@@ -383,8 +379,6 @@ PcRtcGetTime (
   Time->Month   = RtcRead (RTC_ADDRESS_MONTH);
   Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
 
-  Century = RtcRead (RTC_ADDRESS_CENTURY);
-  
   //
   // Release RTC Lock.
   //
@@ -401,7 +395,7 @@ PcRtcGetTime (
   //
   // Make sure all field values are in correct range
   //
-  Status = ConvertRtcTimeToEfiTime (Time, Century, RegisterB);
+  Status = ConvertRtcTimeToEfiTime (Time, RegisterB);
   if (!EFI_ERROR (Status)) {
     Status = RtcTimeFieldsValid (Time);
   }
@@ -447,7 +441,6 @@ PcRtcSetTime (
   EFI_STATUS      Status;
   EFI_TIME        RtcTime;
   RTC_REGISTER_B  RegisterB;
-  UINT8           Century;
   UINT32          TimerVar;
 
   if (Time == NULL) {
@@ -506,7 +499,7 @@ PcRtcSetTime (
   RegisterB.Bits.Set  = 1;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
-  ConvertEfiTimeToRtcTime (&RtcTime, RegisterB, &Century);
+  ConvertEfiTimeToRtcTime (&RtcTime, RegisterB);
 
   RtcWrite (RTC_ADDRESS_SECONDS, RtcTime.Second);
   RtcWrite (RTC_ADDRESS_MINUTES, RtcTime.Minute);
@@ -514,7 +507,6 @@ PcRtcSetTime (
   RtcWrite (RTC_ADDRESS_DAY_OF_THE_MONTH, RtcTime.Day);
   RtcWrite (RTC_ADDRESS_MONTH, RtcTime.Month);
   RtcWrite (RTC_ADDRESS_YEAR, (UINT8) RtcTime.Year);
-  RtcWrite (RTC_ADDRESS_CENTURY, Century);
 
   //
   // Allow updates of the RTC registers
@@ -564,7 +556,6 @@ PcRtcGetWakeupTime (
   EFI_STATUS      Status;
   RTC_REGISTER_B  RegisterB;
   RTC_REGISTER_C  RegisterC;
-  UINT8           Century;
   EFI_TIME        RtcTime;
   UINTN           DataSize;
 
@@ -612,8 +603,6 @@ PcRtcGetWakeupTime (
   Time->TimeZone = Global->SavedTimeZone;
   Time->Daylight = Global->Daylight;
 
-  Century = RtcRead (RTC_ADDRESS_CENTURY);
-
   //
   // Get the alarm info from variable
   //
@@ -644,7 +633,7 @@ PcRtcGetWakeupTime (
   //
   // Make sure all field values are in correct range
   //
-  Status = ConvertRtcTimeToEfiTime (Time, Century, RegisterB);
+  Status = ConvertRtcTimeToEfiTime (Time, RegisterB);
   if (!EFI_ERROR (Status)) {
     Status = RtcTimeFieldsValid (Time);
   }
@@ -680,7 +669,6 @@ PcRtcSetWakeupTime (
   EFI_STATUS            Status;
   EFI_TIME              RtcTime;
   RTC_REGISTER_B        RegisterB;
-  UINT8                 Century;
   EFI_TIME_CAPABILITIES Capabilities;
 
   ZeroMem (&RtcTime, sizeof (RtcTime));
@@ -736,7 +724,7 @@ PcRtcSetWakeupTime (
   RegisterB.Data = RtcRead (RTC_ADDRESS_REGISTER_B);
 
   if (Enable) {
-    ConvertEfiTimeToRtcTime (&RtcTime, RegisterB, &Century);
+    ConvertEfiTimeToRtcTime (&RtcTime, RegisterB);
   } else {
     //
     // if the alarm is disable, record the current setting.
@@ -837,7 +825,6 @@ CheckAndConvertBcd8ToDecimal8 (
 
   @param   Time       On input, the time data read from RTC to convert
                       On output, the time converted to UEFI format
-  @param   Century    Value of century read from RTC.
   @param   RegisterB  Value of Register B of RTC, indicating data mode
                       and hour format.
 
@@ -848,11 +835,11 @@ CheckAndConvertBcd8ToDecimal8 (
 EFI_STATUS
 ConvertRtcTimeToEfiTime (
   IN OUT EFI_TIME        *Time,
-  IN     UINT8           Century,
   IN     RTC_REGISTER_B  RegisterB
   )
 {
   BOOLEAN IsPM;
+  UINT8   Century;
 
   if ((Time->Hour & 0x80) != 0) {
     IsPM = TRUE;
@@ -870,14 +857,21 @@ ConvertRtcTimeToEfiTime (
     Time->Minute  = CheckAndConvertBcd8ToDecimal8 (Time->Minute);
     Time->Second  = CheckAndConvertBcd8ToDecimal8 (Time->Second);
   }
-  Century       = CheckAndConvertBcd8ToDecimal8 (Century);
 
   if (Time->Year == 0xff || Time->Month == 0xff || Time->Day == 0xff ||
-      Time->Hour == 0xff || Time->Minute == 0xff || Time->Second == 0xff ||
-      Century == 0xff) {
+      Time->Hour == 0xff || Time->Minute == 0xff || Time->Second == 0xff) {
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // For minimal/maximum year range [1970, 2069],
+  //   Century is 19 if RTC year >= 70,
+  //   Century is 20 otherwise.
+  //
+  Century = (UINT8) (PcdGet16 (PcdMinimalValidYear) / 100);
+  if (Time->Year < PcdGet16 (PcdMinimalValidYear) % 100) {
+    Century++;
+  }
   Time->Year = (UINT16) (Century * 100 + Time->Year);
 
   //
@@ -1053,14 +1047,11 @@ IsLeapYear (
   @param   Time       On input, the time data read from UEFI to convert
                       On output, the time converted to RTC format
   @param   RegisterB  Value of Register B of RTC, indicating data mode
-  @param   Century    It is set according to EFI_TIME Time.
-
 **/
 VOID
 ConvertEfiTimeToRtcTime (
   IN OUT EFI_TIME        *Time,
-  IN     RTC_REGISTER_B  RegisterB,
-     OUT UINT8           *Century
+  IN     RTC_REGISTER_B  RegisterB
   )
 {
   BOOLEAN IsPM;
@@ -1081,10 +1072,8 @@ ConvertEfiTimeToRtcTime (
     }
   }
   //
-  // Set the Time/Date/Daylight Savings values.
+  // Set the Time/Date values.
   //
-  *Century    = DecimalToBcd8 ((UINT8) (Time->Year / 100));
-
   Time->Year  = (UINT16) (Time->Year % 100);
 
   if (RegisterB.Bits.Dm == 0) {

@@ -123,7 +123,8 @@
 
   ## This PCD specifies the maximal valid year in RTC.
   # @Prompt Maximal valid year in RTC.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear|2099|UINT16|0x0000000E
+  # @Expression gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear < gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear + 100
+  gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear|2097|UINT16|0x0000000E
   
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Defines the ACPI register set base address.
