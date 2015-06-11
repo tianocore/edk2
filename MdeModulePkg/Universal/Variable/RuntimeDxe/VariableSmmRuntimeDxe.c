@@ -935,6 +935,26 @@ SmmVariableReady (
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
+
+  mVariableLock.RequestToLock = VariableLockRequestToLock;
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mHandle,
+                  &gEdkiiVariableLockProtocolGuid,
+                  &mVariableLock,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  mVarCheck.RegisterSetVariableCheckHandler = VarCheckRegisterSetVariableCheckHandler;
+  mVarCheck.VariablePropertySet = VarCheckVariablePropertySet;
+  mVarCheck.VariablePropertyGet = VarCheckVariablePropertyGet;
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mHandle,
+                  &gEdkiiVarCheckProtocolGuid,
+                  &mVarCheck,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
 }
 
 
@@ -992,7 +1012,6 @@ VariableSmmRuntimeInitialize (
   IN EFI_SYSTEM_TABLE                       *SystemTable
   )
 {
-  EFI_STATUS                                Status;
   VOID                                      *SmmVariableRegistration;
   VOID                                      *SmmVariableWriteRegistration;
   EFI_EVENT                                 OnReadyToBootEvent;
@@ -1000,26 +1019,6 @@ VariableSmmRuntimeInitialize (
   EFI_EVENT                                 LegacyBootEvent;
 
   EfiInitializeLock (&mVariableServicesLock, TPL_NOTIFY);
-
-  mVariableLock.RequestToLock = VariableLockRequestToLock;
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mHandle,
-                  &gEdkiiVariableLockProtocolGuid,
-                  &mVariableLock,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  mVarCheck.RegisterSetVariableCheckHandler = VarCheckRegisterSetVariableCheckHandler;
-  mVarCheck.VariablePropertySet = VarCheckVariablePropertySet;
-  mVarCheck.VariablePropertyGet = VarCheckVariablePropertyGet;
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mHandle,
-                  &gEdkiiVarCheckProtocolGuid,
-                  &mVarCheck,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Smm variable service is ready
