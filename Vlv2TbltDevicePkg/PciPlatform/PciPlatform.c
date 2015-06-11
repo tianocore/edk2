@@ -343,7 +343,18 @@ PciPlatformDriverEntry (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &mSystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }  
 
   //
   // Install on a new handle

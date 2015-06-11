@@ -716,7 +716,20 @@ PeiInitPlatform (
                        &VariableSize,
                        &SystemConfiguration
 					   );
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VariableSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = Variable->GetVariable(
+              Variable,
+              L"SetupRecovery",
+              &gEfiSetupVariableGuid,
+              NULL,
+              &VariableSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
+  
   if (EFI_ERROR (Status)) {
     GGC = ((2 << 3) | 0x200);
     PciCfg16Write(EC_BASE, 0, 2, 0, 0x50, GGC);

@@ -181,7 +181,19 @@ PlatformGOPPolicyEntryPoint (
                   &VarSize,
                   &SystemConfiguration
                   );
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
+  
   if (SystemConfiguration.GOPEnable == 1)
   {
   Status = gBS->InstallMultipleProtocolInterfaces (

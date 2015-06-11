@@ -697,7 +697,18 @@ OnReadyToBoot (
                   &VariableSize,
                   &SetupVarBuffer
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VariableSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &mSystemConfigurationGuid,
+              NULL,
+              &VariableSize,
+              &SetupVarBuffer
+              );
+    ASSERT_EFI_ERROR (Status);
+  }    
 
   //
   // Find the AcpiSupport protocol.
@@ -817,7 +828,18 @@ AcpiPlatformEntryPoint (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &mSystemConfigurationGuid,
+              NULL,
+              &VarSize,
+              &mSystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Find the AcpiSupport protocol.
@@ -842,6 +864,19 @@ AcpiPlatformEntryPoint (
                   &SysCfgSize,
                   &mSystemConfig
                   );
+  if (EFI_ERROR (Status) || SysCfgSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    SysCfgSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &SysCfgSize,
+              &mSystemConfig
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
+
 
   Status    = EFI_SUCCESS;
   Instance  = 0;

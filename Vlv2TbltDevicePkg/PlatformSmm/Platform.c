@@ -170,6 +170,18 @@ InitializePlatformSmm (
                           &VarSize,
                           &mSystemConfiguration
                           );
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = SystemTable->RuntimeServices->GetVariable(
+              L"SetupRecovery",
+              &gEfiSetupVariableGuid,
+              NULL,
+              &VarSize,
+              &mSystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }  
   if (!EFI_ERROR(Status)) {
     mAcLossVariable = mSystemConfiguration.StateAfterG3;
 
@@ -848,7 +860,20 @@ EnableS5WakeOnRtc()
                            &VarSize,
                            &mSystemConfiguration
                            );
-  if (EFI_ERROR(Status) || (!mSystemConfiguration.WakeOnRtcS5)) {
+  if (EFI_ERROR(Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = mSmmVariable->SmmGetVariable(
+              L"SetupRecovery",
+              &gEfiSetupVariableGuid,
+              NULL,
+              &VarSize,
+              &mSystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  if (!mSystemConfiguration.WakeOnRtcS5) {
     return;
   }
   mWakeupDay = HexToBcd((UINT8)mSystemConfiguration.RTCWakeupDate);

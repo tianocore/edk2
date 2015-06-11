@@ -62,6 +62,19 @@ PlatformInfoInit (
                   &VarSize,
                   &SystemConfiguration
                   );
+  
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
+    //The setup variable is corrupted
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+    Status = gRT->GetVariable(
+              L"SetupRecovery",
+              &gEfiNormalSetupGuid,
+              NULL,
+              &VarSize,
+              &SystemConfiguration
+              );
+    ASSERT_EFI_ERROR (Status);
+  }    
 
   VarSize = sizeof(Selection);
   Status = gRT->GetVariable(
@@ -113,7 +126,7 @@ PlatformInfoInit (
         Status = gRT->SetVariable (
                         NORMAL_SETUP_NAME,
                         &gEfiNormalSetupGuid,
-                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                         sizeof(SYSTEM_CONFIGURATION),
                         &SystemConfiguration
                         );
@@ -146,7 +159,7 @@ PlatformInfoInit (
       Status = gRT->SetVariable(
                       L"PlatformInfo",
                       &gEfiVlv2VariableGuid,
-                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                       sizeof(EFI_PLATFORM_INFO_HOB),
                       PlatformInfoHobPtr
                       );
