@@ -1,6 +1,6 @@
 /**
 
-Copyright (c) 2011  - 2014, Intel Corporation. All rights reserved
+Copyright (c) 2011  - 2015, Intel Corporation. All rights reserved
 
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
@@ -61,6 +61,12 @@ Copyright (c) 2011  - 2014, Intel Corporation. All rights reserved
 #define B_PCH_SPI_PR0_PRL_MASK               0x1FFF0000 // Protected Range Limit Mask, [28:16] here represents upper limit of address [24:12]
 #define B_PCH_SPI_PR0_RPE                    BIT15 // Read Protection Enable
 #define B_PCH_SPI_PR0_PRB_MASK               0x00001FFF // Protected Range Base Mask, [12:0] here represents base limit of address [24:12]
+
+#define R_PCH_SPI_PR1                        0x78  // Protected Region 1 Register
+#define B_PCH_SPI_PR1_WPE                    BIT31 // Write Protection Enable
+#define B_PCH_SPI_PR1_PRL_MASK               0x1FFF0000 // Protected Range Limit Mask, [28:16] here represents upper limit of address [24:12]
+#define B_PCH_SPI_PR1_RPE                    BIT15 // Read Protection Enable
+#define B_PCH_SPI_PR1_PRB_MASK               0x00001FFF // Protected Range Base Mask, [12:0] here represents base limit of address [24:12]
 
 #define R_PCH_SPI_PREOP                      0x94  // Prefix Opcode Configuration Register (16 bits)
 #define B_PCH_SPI_PREOP1_MASK                0xFF00 // Prefix Opcode 1 Mask
