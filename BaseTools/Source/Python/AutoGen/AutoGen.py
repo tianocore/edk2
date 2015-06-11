@@ -2074,8 +2074,11 @@ class PlatformAutoGen(AutoGen):
         # Get the different options for the different style module
         if Module.AutoGenVersion < 0x00010005:
             PlatformOptions = self.EdkBuildOption
+            ModuleTypeOptions = self.Platform.GetBuildOptionsByModuleType(EDK_NAME, Module.ModuleType)
         else:
             PlatformOptions = self.EdkIIBuildOption
+            ModuleTypeOptions = self.Platform.GetBuildOptionsByModuleType(EDKII_NAME, Module.ModuleType)
+        ModuleTypeOptions = self._ExpandBuildOption(ModuleTypeOptions)
         ModuleOptions = self._ExpandBuildOption(Module.BuildOptions)
         if Module in self.Platform.Modules:
             PlatformModule = self.Platform.Modules[str(Module)]
@@ -2084,19 +2087,21 @@ class PlatformAutoGen(AutoGen):
             PlatformModuleOptions = {}
 
         BuildRuleOrder = None
-        for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, PlatformModuleOptions]:
+        for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, ModuleTypeOptions, PlatformModuleOptions]:
             for Tool in Options:
                 for Attr in Options[Tool]:
                     if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
                         BuildRuleOrder = Options[Tool][Attr]
 
-        AllTools = set(ModuleOptions.keys() + PlatformOptions.keys() + PlatformModuleOptions.keys() + self.ToolDefinition.keys())
+        AllTools = set(ModuleOptions.keys() + PlatformOptions.keys() +
+                       PlatformModuleOptions.keys() + ModuleTypeOptions.keys() +
+                       self.ToolDefinition.keys())
         BuildOptions = {}
         for Tool in AllTools:
             if Tool not in BuildOptions:
                 BuildOptions[Tool] = {}
 
-            for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, PlatformModuleOptions]:
+            for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, ModuleTypeOptions, PlatformModuleOptions]:
                 if Tool not in Options:
                     continue
                 for Attr in Options[Tool]:

@@ -147,6 +147,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._Pcds              = None
         self._DecPcds           = None
         self._BuildOptions      = None
+        self._ModuleTypeOptions = None
         self._LoadFixAddress    = None
         self._RFCLanguages      = None
         self._ISOLanguages      = None
@@ -766,6 +767,19 @@ class DscBuildData(PlatformBuildClassObject):
             for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
                 self._BuildOptions[ToolChainFamily, ToolChain, EDK_NAME] = Option
         return self._BuildOptions
+
+    def GetBuildOptionsByModuleType(self, Edk, ModuleType):
+        if self._ModuleTypeOptions == None:
+            self._ModuleTypeOptions = sdict()
+        if (Edk, ModuleType) not in self._ModuleTypeOptions:
+            options = sdict()
+            self._ModuleTypeOptions[Edk, ModuleType] = options
+            DriverType = '%s.%s' % (Edk, ModuleType)
+            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, DriverType]
+            for ToolChainFamily, ToolChain, Option, Arch, Type, Dummy3, Dummy4 in RecordList:
+                if Arch == self._Arch and Type == DriverType:
+                    options[ToolChainFamily, ToolChain, Edk] = Option
+        return self._ModuleTypeOptions[Edk, ModuleType]
 
     ## Retrieve non-dynamic PCD settings
     #
