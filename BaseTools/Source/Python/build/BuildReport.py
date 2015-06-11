@@ -1237,10 +1237,10 @@ class FdRegionReport(object):
         #
         # Collect PCDs defined in DSC common section
         #
-        for Platform in Wa.BuildDatabase.WorkspaceDb.PlatformList:
-            for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
-                DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
-                PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
+        Platform = Wa.BuildDatabase[Wa.MetaFile, 'COMMON']
+        for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
+            DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
+            PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
         #
         # Add PEI and DXE a priori files GUIDs defined in PI specification.
