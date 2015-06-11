@@ -1864,7 +1864,7 @@ VariableLockDynamicHiiPcd (
   //
   // Go through PCD database to find out DynamicHii PCDs.
   //
-  for (TokenNumber = 0; TokenNumber < LocalTokenCount; TokenNumber++) {
+  for (TokenNumber = 1; TokenNumber <= LocalTokenCount; TokenNumber++) {
     if (IsPeiDb) {
       LocalTokenNumber = GetLocalTokenNumber (TRUE, TokenNumber);
     } else {
