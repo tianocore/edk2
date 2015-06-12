@@ -2297,7 +2297,6 @@ class ModuleAutoGen(AutoGen):
             if Module.MetaFile == self.MetaFile:
                 continue
             if Module.Name == self.Name:
-                EdkLogger.warn('build', 'Modules have same BaseName:\n  %s\n  %s' % (Module.MetaFile, self.MetaFile))
                 if uuid.UUID(Module.Guid) == uuid.UUID(self.Guid):
                     EdkLogger.error("build", FILE_DUPLICATED, 'Modules have same BaseName and FILE_GUID:\n'
                                     '  %s\n  %s' % (Module.MetaFile, self.MetaFile))
