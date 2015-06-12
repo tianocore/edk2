@@ -34,6 +34,11 @@
 [Guids]
   gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
 
+#
+# [Error.gPcAtChipsetPkgTokenSpaceGuid]
+#   0x80000001 | Invalid value provided.
+#
+
 [PcdsFeatureFlag]
   ## Indicates the HPET Timer will be configured to use MSI interrupts if the HPET timer supports them, or use I/O APIC interrupts.<BR><BR>
   #   TRUE  - Configures the HPET Timer to use MSI interrupts if the HPET Timer supports them.<BR>
@@ -123,7 +128,7 @@
 
   ## This PCD specifies the maximal valid year in RTC.
   # @Prompt Maximal valid year in RTC.
-  # @Expression gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear < gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear + 100
+  # @Expression 0x80000001 | gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear < gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear + 100
   gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear|2097|UINT16|0x0000000E
   
 [PcdsFixedAtBuild, PcdsPatchableInModule]
