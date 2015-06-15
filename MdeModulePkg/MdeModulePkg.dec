@@ -111,6 +111,10 @@
   ## @libraryclass   Provides core boot manager functions
   PlatformBootManagerLib|Include/Library/PlatformBootManagerLib.h
 
+  ## @libraryclass  Provides common interfaces about TPM measurement for other modules.
+  #
+  TpmMeasurementLib|Include/Library/TpmMeasurementLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
