@@ -227,6 +227,12 @@ ConsoleLoggerStopHistory(
   if (ConsoleInfo->CurrentStartRow == ConsoleInfo->OriginalStartRow) {
     return (EFI_SUCCESS);
   }
+
+  //
+  // Clear the screen
+  //
+  ConsoleInfo->OldConOut->ClearScreen(ConsoleInfo->OldConOut);
+
   ConsoleInfo->CurrentStartRow = ConsoleInfo->OriginalStartRow;
   return (UpdateDisplayFromHistory(ConsoleInfo));
 }
