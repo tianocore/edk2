@@ -136,7 +136,6 @@
   #
   # Application
   #
-  SecurityPkg/Application/VariableInfo/VariableInfo.inf
   SecurityPkg/Application/RngTest/RngTest.inf
 
   #
