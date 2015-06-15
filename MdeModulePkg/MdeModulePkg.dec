@@ -115,6 +115,10 @@
   #
   TpmMeasurementLib|Include/Library/TpmMeasurementLib.h
 
+  ## @libraryclass  Provides authenticated variable services.
+  #
+  AuthVaribleLib|Include/Library/AuthVaribleLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

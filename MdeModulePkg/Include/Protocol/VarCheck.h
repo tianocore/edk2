@@ -63,6 +63,12 @@ typedef struct {
   UINTN                             MaxSize;
 } VAR_CHECK_VARIABLE_PROPERTY;
 
+typedef struct {
+  EFI_GUID                      *Guid;
+  CHAR16                        *Name;
+  VAR_CHECK_VARIABLE_PROPERTY   VariableProperty;
+} VARIABLE_ENTRY_PROPERTY;
+
 /**
   Variable property set.
   Variable driver will do check according to the VariableProperty before
