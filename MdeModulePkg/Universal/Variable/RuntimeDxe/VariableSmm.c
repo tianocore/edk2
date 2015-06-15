@@ -1,7 +1,6 @@
 /** @file
-
-  The sample implementation for SMM variable protocol. And this driver 
-  implements  an SMI handler to communicate with the DXE runtime driver 
+  The sample implementation for SMM variable protocol. And this driver
+  implements an SMI handler to communicate with the DXE runtime driver
   to provide variable services.
 
   Caution: This module requires additional review when modified.
@@ -11,20 +10,21 @@
 
   SmmVariableHandler() will receive untrusted input and do basic validation.
 
-  Each sub function VariableServiceGetVariable(), VariableServiceGetNextVariableName(), 
-  VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(), 
+  Each sub function VariableServiceGetVariable(), VariableServiceGetNextVariableName(),
+  VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(),
   SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
 Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+
 #include <Protocol/SmmVariable.h>
 #include <Protocol/SmmFirmwareVolumeBlock.h>
 #include <Protocol/SmmFaultTolerantWrite.h>
@@ -34,7 +34,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/SmmServicesTableLib.h>
 #include <Library/SmmMemLib.h>
 
-#include <Guid/VariableFormat.h>
 #include <Guid/SmmVariableCommon.h>
 #include "Variable.h"
 
@@ -47,6 +46,23 @@ UINT8                                                *mVariableBufferPayload = N
 UINTN                                                mVariableBufferPayloadSize;
 extern BOOLEAN                                       mEndOfDxe;
 extern BOOLEAN                                       mEnableLocking;
+
+/**
+  SecureBoot Hook for SetVariable.
+
+  @param[in] VariableName                 Name of Variable to be found.
+  @param[in] VendorGuid                   Variable vendor GUID.
+
+**/
+VOID
+EFIAPI
+SecureBootHook (
+  IN CHAR16                                 *VariableName,
+  IN EFI_GUID                               *VendorGuid
+  )
+{
+  return ;
+}
 
 /**
 
@@ -320,10 +336,11 @@ GetFvbCountAndBuffer (
   @param[in, out]  InfoSize     On input, the size of the variable information buffer.
                                 On output, the returned variable information size.
 
-  @retval EFI_SUCCESS          The variable information is found and returned successfully.
-  @retval EFI_UNSUPPORTED      No variable inoformation exists in variable driver. The 
-                               PcdVariableCollectStatistics should be set TRUE to support it.
-  @retval EFI_BUFFER_TOO_SMALL The buffer is too small to hold the next variable information.
+  @retval EFI_SUCCESS           The variable information is found and returned successfully.
+  @retval EFI_UNSUPPORTED       No variable inoformation exists in variable driver. The 
+                                PcdVariableCollectStatistics should be set TRUE to support it.
+  @retval EFI_BUFFER_TOO_SMALL  The buffer is too small to hold the next variable information.
+  @retval EFI_INVALID_PARAMETER Input parameter is invalid.
 
 **/
 EFI_STATUS
@@ -337,8 +354,11 @@ SmmVariableGetStatistics (
   UINTN                                                StatisticsInfoSize;
   CHAR16                                               *InfoName;
   EFI_GUID                                             VendorGuid;
-
-  ASSERT (InfoEntry != NULL);
+ 
+  if (InfoEntry == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   VariableInfo = gVariableInfo; 
   if (VariableInfo == NULL) {
     return EFI_UNSUPPORTED;
@@ -381,7 +401,7 @@ SmmVariableGetStatistics (
     }
     VariableInfo = VariableInfo->Next;
   };
-    
+
   if (VariableInfo == NULL) {
     *InfoSize = 0;
     return EFI_SUCCESS;
@@ -399,7 +419,7 @@ SmmVariableGetStatistics (
   CopyMem (InfoEntry, VariableInfo, sizeof (VARIABLE_INFO_ENTRY));
   CopyMem (InfoName, VariableInfo->Name, StrSize (VariableInfo->Name));
   *InfoSize = StatisticsInfoSize;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -444,6 +464,7 @@ SmmVariableHandler (
   SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE         *SmmVariableHeader;
   SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME  *GetNextVariableName;
   SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO     *QueryVariableInfo;
+  SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE        *GetPayloadSize;
   VARIABLE_INFO_ENTRY                              *VariableInfo;
   SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE           *VariableToLock;
   SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY *CommVariableProperty;
@@ -632,6 +653,16 @@ SmmVariableHandler (
                  &QueryVariableInfo->RemainingVariableStorageSize,
                  &QueryVariableInfo->MaximumVariableSize
                  );
+      break;
+
+    case SMM_VARIABLE_FUNCTION_GET_PAYLOAD_SIZE:
+      if (CommBufferPayloadSize < sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE)) {
+        DEBUG ((EFI_D_ERROR, "GetPayloadSize: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+      GetPayloadSize = (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE *) SmmVariableFunctionHeader->Data;
+      GetPayloadSize->VariablePayloadSize = mVariableBufferPayloadSize;
+      Status = EFI_SUCCESS;
       break;
 
     case SMM_VARIABLE_FUNCTION_READY_TO_BOOT:
@@ -841,7 +872,9 @@ SmmFtwNotificationEvent (
   mVariableModuleGlobal->FvbInstance = FvbProtocol;
   
   Status = VariableWriteServiceInitialize ();
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
+  }
  
   //
   // Notify the variable wrapper driver the variable write service is ready
@@ -908,8 +941,8 @@ VariableServiceInitialize (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  mVariableBufferPayloadSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) +
-                               OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - sizeof (VARIABLE_HEADER);
+  mVariableBufferPayloadSize = GetNonVolatileMaxVariableSize () +
+                               OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - GetVariableHeaderSize ();
 
   Status = gSmst->SmmAllocatePool (
                     EfiRuntimeServicesData,
