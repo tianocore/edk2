@@ -62,10 +62,6 @@
   ##  @libraryclass  Provides TPM Interface Specification (TIS) interfaces for TPM command.
   #
   TpmCommLib|Include/Library/TpmCommLib.h
-    
-  ##  @libraryclass  Provides common interfaces about TPM measurement for other modules.
-  #
-  TpmMeasurementLib|Include/Library/TpmMeasurementLib.h
   
   ##  @libraryclass  Provides interfaces to handle TPM 2.0 request.
   #
