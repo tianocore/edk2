@@ -180,7 +180,6 @@
 #  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
 #  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # TPM
@@ -235,8 +234,6 @@
   SecurityPkg/Pkcs7Verify/Pkcs7VerifyDxe/Pkcs7VerifyDxe.inf
 
 [Components.IA32, Components.X64]
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmm.inf
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmmRuntimeDxe.inf
   SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
   SecurityPkg/Tcg/TrEESmm/TrEESmm.inf
   #
