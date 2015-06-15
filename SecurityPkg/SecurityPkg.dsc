@@ -126,7 +126,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1
 
 [Components]
-  SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf
   SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
   #SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
   SecurityPkg/Library/DxeImageAuthenticationStatusLib/DxeImageAuthenticationStatusLib.inf
