@@ -1,7 +1,7 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -242,15 +242,14 @@ FileHandleFlush (
 /**
   Function to determine if a given handle is a directory handle.
 
-  If DirHandle is NULL, then ASSERT().
-
-  Open the file information on the DirHandle, and verify that the Attribute
+  Open the file information on the DirHandle and verify that the Attribute
   includes EFI_FILE_DIRECTORY bit set.
 
-  @param[in] DirHandle          The handle to open the file.
+  @param[in] DirHandle          Handle to open file.
 
   @retval EFI_SUCCESS           DirHandle is a directory.
-  @retval EFI_INVALID_PARAMETER DirHandle did not have EFI_FILE_INFO available.
+  @retval EFI_INVALID_PARAMETER DirHandle is NULL. 
+                                The file information returns from FileHandleGetInfo is NULL. 
   @retval EFI_NOT_FOUND         DirHandle is not a directory.
 **/
 EFI_STATUS
