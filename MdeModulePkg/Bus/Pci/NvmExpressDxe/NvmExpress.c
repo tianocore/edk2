@@ -213,8 +213,8 @@ EnumerateNvmeDevNamespace (
     }
     gBS->OpenProtocol (
            Private->ControllerHandle,
-           &gEfiPciIoProtocolGuid,
-           (VOID **) &Private->PciIo,
+           &gEfiNvmExpressPassThruProtocolGuid,
+           (VOID **) &Private->Passthru,
            Private->DriverBindingHandle,
            Device->DeviceHandle,
            EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -336,9 +336,9 @@ UnregisterNvmeNamespace (
   )
 {
   EFI_STATUS                               Status;
-  EFI_PCI_IO_PROTOCOL                      *PciIo;
   EFI_BLOCK_IO_PROTOCOL                    *BlockIo;
   NVME_DEVICE_PRIVATE_DATA                 *Device;
+  NVME_CONTROLLER_PRIVATE_DATA             *Private;
 
   BlockIo = NULL;
 
@@ -354,14 +354,15 @@ UnregisterNvmeNamespace (
     return Status;
   }
 
-  Device = NVME_DEVICE_PRIVATE_DATA_FROM_BLOCK_IO (BlockIo);
+  Device  = NVME_DEVICE_PRIVATE_DATA_FROM_BLOCK_IO (BlockIo);
+  Private = Device->Controller;
 
   //
   // Close the child handle
   //
   gBS->CloseProtocol (
          Controller,
-         &gEfiPciIoProtocolGuid,
+         &gEfiNvmExpressPassThruProtocolGuid,
          This->DriverBindingHandle,
          Handle
          );
@@ -384,8 +385,8 @@ UnregisterNvmeNamespace (
   if (EFI_ERROR (Status)) {
     gBS->OpenProtocol (
            Controller,
-           &gEfiPciIoProtocolGuid,
-           (VOID **) &PciIo,
+           &gEfiNvmExpressPassThruProtocolGuid,
+           (VOID **) &Private->Passthru,
            This->DriverBindingHandle,
            Handle,
            EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -844,22 +845,24 @@ NvmExpressDriverBindingStop (
   BOOLEAN                             AllChildrenStopped;
   UINTN                               Index;
   NVME_CONTROLLER_PRIVATE_DATA        *Private;
+  EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL  *PassThru;
 
   if (NumberOfChildren == 0) {
     Status = gBS->OpenProtocol (
                     Controller,
-                    &gEfiCallerIdGuid,
-                    (VOID **) &Private,
+                    &gEfiNvmExpressPassThruProtocolGuid,
+                    (VOID **) &PassThru,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
 
     if (!EFI_ERROR (Status)) {
+      Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (PassThru);
       gBS->UninstallMultipleProtocolInterfaces (
             Controller,
-            &gEfiCallerIdGuid,
-            Private,
+            &gEfiNvmExpressPassThruProtocolGuid,
+            PassThru,
             NULL
             );
 
@@ -940,7 +943,7 @@ NvmExpressUnload (
   DeviceHandleBuffer = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiCallerIdGuid,
+                  &gEfiNvmExpressPassThruProtocolGuid,
                   NULL,
                   &DeviceHandleCount,
                   &DeviceHandleBuffer
