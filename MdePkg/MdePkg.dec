@@ -150,7 +150,7 @@
 
   ##  @libraryclass  Provide services to access I/O Ports and MMIO registers.
   IoLib|Include/Library/IoLib.h
-  
+
   ##  @libraryclass  Provide services to create, get and update HSTI table in AIP protocol.
   HstiLib|Include/Library/HstiLib.h
 
@@ -557,7 +557,7 @@
   #
   # GUIDs defined in UEFI2.5
   #
-  
+
   ## Include/Guid/PropertiesTable.h
   gEfiPropertiesTableGuid        = { 0x880aaca3, 0x4adc, 0x4a04, {0x90, 0x79, 0xb7, 0x47, 0x34, 0x8, 0x25, 0xe5 }}
 
@@ -575,7 +575,7 @@
 
   ## Include/Protocol/RegularExpressionProtocol.h
   gEfiRegexSyntaxTypePerlGuid = {0x63E60A51, 0x497D, 0xD427, {0xC4, 0xA5, 0xB8, 0xAB, 0xDC, 0x3A, 0xAE, 0xB6 }}
-  
+
   ## Include/Guid/Cper.h
   gEfiPlatformMemory2ErrorSectionGuid = { 0x61EC04FC, 0x48E6, 0xD813, { 0x25, 0xC9, 0x8D, 0xAA, 0x44, 0x75, 0x0B, 0x12 }}
 
@@ -689,7 +689,7 @@
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Nvme interface.
   ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoNvmeInterfaceGuid  = { 0x3ab14680, 0x5d3f, 0x4a4d, { 0xbc, 0xdc, 0xcc, 0x38, 0x0, 0x18, 0xc7, 0xf7 }}
-  
+
   #
   # GUID defined in PI1.4
   #
@@ -840,7 +840,7 @@
 
   ## Include/Ppi/Graphics.h
   gEfiPeiGraphicsPpiGuid             = { 0x6ecd1463, 0x4a4a, 0x461b, { 0xaf, 0x5f, 0x5a, 0x33, 0xe3, 0xb2, 0x16, 0x2b } }
-  
+
   ## Include/Ppi/MpServices.h
   gEfiPeiMpServicesPpiGuid           = { 0xee16160a, 0xe8be, 0x47a6, { 0x82, 0xa, 0xc6, 0x90, 0xd, 0xb0, 0x25, 0xa } }
 
@@ -854,6 +854,9 @@
 
   ## Include/Ppi/BlockIo2.h
   gEfiPeiVirtualBlockIo2PpiGuid     = { 0x26cc0fad, 0xbeb3, 0x478a, { 0x91, 0xb2, 0xc, 0x18, 0x8f, 0x72, 0x61, 0x98 }}
+
+  ## Include/Ppi/SecPlatformInformation.h
+  gEfiSecPlatformInformation2PpiGuid = { 0x9e9f374b, 0x8f16, 0x4230, {0x98, 0x24, 0x58, 0x46, 0xee, 0x76, 0x6a, 0x97 } }
 
 [Protocols]
   ## Include/Protocol/Pcd.h
@@ -1508,14 +1511,14 @@
 
   ## Include/Protocol/UsbFunctionIo.h
   gEfiUsbFunctionIoProtocolGuid        = { 0x32d2963a, 0xfe5d, 0x4f30, {0xb6, 0x33, 0x6e, 0x5d, 0xc5, 0x58, 0x3, 0xcc }}
-  
+
   ## Include/Protocol/BluetoothHc.h
   gEfiBluetoothHcProtocolGuid         = { 0xb3930571, 0xbeba, 0x4fc5, { 0x92, 0x3, 0x94, 0x27, 0x24, 0x2e, 0x6a, 0x43 }}
-  
+
   ## Include/Protocol/BluetoothIo.h
   gEfiBluetoothIoServiceBindingProtocolGuid   = { 0x388278d3, 0x7b85, 0x42f0, { 0xab, 0xa9, 0xfb, 0x4b, 0xfd, 0x69, 0xf5, 0xab }}
   gEfiBluetoothIoProtocolGuid                 = { 0x467313de, 0x4e30, 0x43f1, { 0x94, 0x3e, 0x32, 0x3f, 0x89, 0x84, 0x5d, 0xb5 }}
-  
+
   ## Include/Protocol/BluetoothConfig.h
   gEfiBluetoothConfigProtocolGuid             = { 0x62960cf3, 0x40ff, 0x4263, { 0xa7, 0x7c, 0xdf, 0xde, 0xbd, 0x19, 0x1b, 0x4b }}
 
@@ -1525,9 +1528,9 @@
   ## Include/Protocol/BootManagerPolicy.h
   gEfiBootManagerPolicyProtocolGuid    = { 0xfedf8e0c, 0xe147, 0x11e3, { 0x99, 0x03, 0xb8, 0xe8, 0x56, 0x2c, 0xba, 0xfa }}
 
-  ## Include/Protocol/HiiConfigKeyword.h 
-  gEfiConfigKeywordHandlerProtocolGuid = {0x0a8badd5, 0x03b8, 0x4d19, {0xb1, 0x28, 0x7b, 0x8f, 0x0e, 0xda, 0xa5, 0x96}} 
-  
+  ## Include/Protocol/HiiConfigKeyword.h
+  gEfiConfigKeywordHandlerProtocolGuid = {0x0a8badd5, 0x03b8, 0x4d19, {0xb1, 0x28, 0x7b, 0x8f, 0x0e, 0xda, 0xa5, 0x96}}
+
   ## Include/Protocol/WiFi.h
   gEfiWiFiProtocolGuid                 = { 0xda55bc9, 0x45f8, 0x4bb4, {0x87, 0x19, 0x52, 0x24, 0xf1, 0x8a, 0x4d, 0x45 }}
 
@@ -1539,10 +1542,10 @@
 
   ## Include/Protocol/Pkcs7Verify.h
   gEfiPkcs7VerifyProtocolGuid          = { 0x47889fb2, 0xd671, 0x4fab, { 0xa0, 0xca, 0xdf, 0x0e, 0x44, 0xdf, 0x70, 0xd6 }}
-  
+
   ## Include/Protocol/Ip4Config2.h
   gEfiIp4Config2ProtocolGuid           =  { 0x5b446ed1, 0xe30b, 0x4faa, {0x87, 0x1a, 0x36, 0x54, 0xec, 0xa3, 0x60, 0x80 }}
-  
+
   ## Include/Protocol/Dns4.h
   gEfiDns4ServiceBindingProtocolGuid   = { 0xb625b186, 0xe063, 0x44f7, { 0x89, 0x5, 0x6a, 0x74, 0xdc, 0x6f, 0x52, 0xb4 }}
 
@@ -1557,7 +1560,7 @@
 
   ## Include/Protocol/Http.h
   gEfiHttpServiceBindingProtocolGuid   = { 0xbdc8e6af, 0xd9bc, 0x4379, {0xa7, 0x2a, 0xe0, 0xc4, 0xe7, 0x5d, 0xae, 0x1c }}
-  
+
   ## Include/Protocol/Http.h
   gEfiHttpProtocolGuid                 = { 0x7a59b29b, 0x910b, 0x4171, {0x82, 0x42, 0xa8, 0x5a, 0x0d, 0xf2, 0x5b, 0x5b }}
 
@@ -2007,13 +2010,13 @@
   # @ValidRange 0x80000001 | 0 - 3
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
 
-  ## Error level for hardware recorder. 
+  ## Error level for hardware recorder.
   #  If value 0, platform does not support feature of hardware error record.
   # @Prompt Error Level For Hardware Recorder
   gEfiMdePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x0000002b
 
-  ## The number of seconds that the firmware will wait before initiating the original default boot selection. 
-  #  A value of 0 indicates that the default boot selection is to be initiated immediately on boot. 
+  ## The number of seconds that the firmware will wait before initiating the original default boot selection.
+  #  A value of 0 indicates that the default boot selection is to be initiated immediately on boot.
   #  The value of 0xFFFF then firmware will wait for user input before booting.
   # @Prompt Boot Timeout (s)
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000002c
