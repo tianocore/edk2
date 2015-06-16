@@ -10,7 +10,7 @@
   WrapPkcs7Data(), Pkcs7GetSigners(), Pkcs7Verify() will get UEFI Authenticated
   Variable and will do basic check for data structure.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -273,7 +273,7 @@ X509PopCertificate (
     goto _Exit;
   }
 
-  Length = ((BUF_MEM *) CertBio->ptr)->length;
+  Length = (INT32)(((BUF_MEM *) CertBio->ptr)->length);
   if (Length <= 0) {
     goto _Exit;
   }
@@ -343,7 +343,7 @@ Pkcs7GetSigners (
   PKCS7            *Pkcs7;
   BOOLEAN          Status;
   UINT8            *SignedData;
-  UINT8            *Temp;
+  CONST UINT8      *Temp;
   UINTN            SignedDataSize;
   BOOLEAN          Wrapped;
   STACK_OF(X509)   *Stack;
@@ -549,7 +549,7 @@ Pkcs7Verify (
   X509        *Cert;
   X509_STORE  *CertStore;
   UINT8       *SignedData;
-  UINT8       *Temp;
+  CONST UINT8 *Temp;
   UINTN       SignedDataSize;
   BOOLEAN     Wrapped;
 
@@ -618,7 +618,8 @@ Pkcs7Verify (
   //
   // Read DER-encoded root certificate and Construct X509 Certificate
   //
-  Cert = d2i_X509 (NULL, &TrustedCert, (long) CertLength);
+  Temp = TrustedCert;
+  Cert = d2i_X509 (NULL, &Temp, (long) CertLength);
   if (Cert == NULL) {
     goto _Exit;
   }

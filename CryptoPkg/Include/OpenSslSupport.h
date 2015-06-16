@@ -1,7 +1,7 @@
 /** @file
   Root include file to support building OpenSSL Crypto Library.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -108,6 +108,11 @@ struct tm {
   long  tm_gmtoff;  /* offset from CUT in seconds */
   char  *tm_zone;   /* timezone abbreviation */
 };
+
+struct timeval {
+  long tv_sec;      /* time value, in seconds */
+  long tv_usec;     /* time value, in microseconds */
+} timeval;
 
 struct dirent {
   UINT32  d_fileno;         /* file number of entry */
@@ -240,5 +245,6 @@ extern FILE  *stdout;
 #define assert(expression)
 #define localtime(timer)                  NULL
 #define gmtime_r(timer,result)            (result = NULL)
+#define atoi(nptr)                        AsciiStrDecimalToUintn(nptr)
 
 #endif

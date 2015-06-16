@@ -5,7 +5,7 @@
   the lifetime of the signature when a signing certificate expires or is later
   revoked.
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -441,11 +441,12 @@ TimestampTokenVerify (
   CONST UINT8  *TokenTemp;
   PKCS7        *Pkcs7;
   X509         *Cert;
+  CONST UINT8  *CertTemp;
   X509_STORE   *CertStore;
   BIO          *OutBio;
   UINT8        *TstData;
   UINTN        TstSize;
-  UINT8        *TstTemp;
+  CONST UINT8  *TstTemp;
   TS_TST_INFO  *TstInfo;
 
   Status = FALSE;
@@ -490,7 +491,8 @@ TimestampTokenVerify (
   //
   // Read the trusted TSA certificate (DER-encoded), and Construct X509 Certificate.
   //
-  Cert = d2i_X509 (NULL, &TsaCert, (long) CertSize);
+  CertTemp = TsaCert;
+  Cert = d2i_X509 (NULL, &CertTemp, (long) CertSize);
   if (Cert == NULL) {
     goto _Exit;
   }
@@ -605,6 +607,7 @@ ImageTimestampVerify (
 {
   BOOLEAN                      Status;
   PKCS7                        *Pkcs7;
+  CONST UINT8                  *Temp;
   STACK_OF(PKCS7_SIGNER_INFO)  *SignerInfos;
   PKCS7_SIGNER_INFO            *SignInfo;
   UINTN                        Index;
@@ -644,7 +647,8 @@ ImageTimestampVerify (
   //
   // Decode ASN.1-encoded Authenticode data into PKCS7 structure.
   //
-  Pkcs7 = d2i_PKCS7 (NULL, (const unsigned char **) &AuthData, (int) DataSize);
+  Temp  = AuthData;
+  Pkcs7 = d2i_PKCS7 (NULL, (const unsigned char **) &Temp, (int) DataSize);
   if (Pkcs7 == NULL) {
     goto _Exit;
   }

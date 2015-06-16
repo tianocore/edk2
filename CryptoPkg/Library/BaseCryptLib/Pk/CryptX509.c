@@ -1,7 +1,7 @@
 /** @file
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,8 @@ X509ConstructCertificate (
   OUT  UINT8        **SingleX509Cert
   )
 {
-  X509     *X509Cert;
+  X509         *X509Cert;
+  CONST UINT8  *Temp;
 
   //
   // Check input parameters.
@@ -50,7 +51,8 @@ X509ConstructCertificate (
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
   //
-  X509Cert = d2i_X509 (NULL, &Cert, (long) CertSize);
+  Temp     = Cert;
+  X509Cert = d2i_X509 (NULL, &Temp, (long) CertSize);
   if (X509Cert == NULL) {
     return FALSE;
   }
@@ -123,6 +125,9 @@ X509ConstructCertificateStack (
     }
 
     CertSize = VA_ARG (Args, UINTN);
+    if (CertSize == 0) {
+      break;
+    }
 
     //
     // Construct X509 Object from the given DER-encoded certificate data.
@@ -133,7 +138,9 @@ X509ConstructCertificateStack (
                (UINT8 **) &X509Cert
                );
     if (!Status) {
-      X509_free (X509Cert);
+      if (X509Cert != NULL) {
+        X509_free (X509Cert);
+      }
       break;
     }
 
@@ -518,7 +525,8 @@ X509GetTBSCert (
   //
   // Check input parameters.
   //
-  if ((Cert == NULL) || (TBSCert == NULL) || (TBSCertSize == NULL)) {
+  if ((Cert == NULL) || (TBSCert == NULL) ||
+      (TBSCertSize == NULL) || (CertSize > INT_MAX)) {
     return FALSE;
   }
 

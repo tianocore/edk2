@@ -9,7 +9,7 @@
   AuthenticodeVerify() will get PE/COFF Authenticode and will do basic check for
   data structure.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -72,6 +72,7 @@ AuthenticodeVerify (
 {
   BOOLEAN      Status;
   PKCS7        *Pkcs7;
+  CONST UINT8  *Temp;
   CONST UINT8  *OrigAuthData;
   UINT8        *SpcIndirectDataContent;
   UINT8        Asn1Byte;
@@ -96,7 +97,8 @@ AuthenticodeVerify (
   //
   // Retrieve & Parse PKCS#7 Data (DER encoding) from Authenticode Signature
   //
-  Pkcs7 = d2i_PKCS7 (NULL, &AuthData, (int)DataSize);
+  Temp  = AuthData;
+  Pkcs7 = d2i_PKCS7 (NULL, &Temp, (int)DataSize);
   if (Pkcs7 == NULL) {
     goto _Exit;
   }
