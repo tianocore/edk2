@@ -35,7 +35,7 @@ ReadSectors (
   IN UINT32                             Blocks
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Controller;
+  NVME_CONTROLLER_PRIVATE_DATA             *Private;
   UINT32                                   Bytes;
   EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
   EFI_NVM_EXPRESS_COMMAND                  Command;
@@ -43,7 +43,7 @@ ReadSectors (
   EFI_STATUS                               Status;
   UINT32                                   BlockSize;
 
-  Controller = Device->Controller;
+  Private    = Device->Controller;
   BlockSize  = Device->Media.BlockSize;
   Bytes      = Blocks * BlockSize;
 
@@ -68,12 +68,12 @@ ReadSectors (
 
   CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID | CDW12_VALID;
 
-  Status = Controller->Passthru.PassThru (
-                                  &Controller->Passthru,
-                                  Device->NamespaceId,
-                                  &CommandPacket,
-                                  NULL
-                                  );
+  Status = Private->Passthru.PassThru (
+                               &Private->Passthru,
+                               Device->NamespaceId,
+                               &CommandPacket,
+                               NULL
+                               );
 
   return Status;
 }
@@ -98,7 +98,7 @@ WriteSectors (
   IN UINT32                        Blocks
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Controller;
+  NVME_CONTROLLER_PRIVATE_DATA             *Private;
   EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
   EFI_NVM_EXPRESS_COMMAND                  Command;
   EFI_NVM_EXPRESS_COMPLETION               Completion;
@@ -106,7 +106,7 @@ WriteSectors (
   UINT32                                   Bytes;
   UINT32                                   BlockSize;
 
-  Controller = Device->Controller;
+  Private    = Device->Controller;
   BlockSize  = Device->Media.BlockSize;
   Bytes      = Blocks * BlockSize;
 
@@ -134,12 +134,12 @@ WriteSectors (
 
   CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID | CDW12_VALID;
 
-  Status = Controller->Passthru.PassThru (
-                                  &Controller->Passthru,
-                                  Device->NamespaceId,
-                                  &CommandPacket,
-                                  NULL
-                                  );
+  Status = Private->Passthru.PassThru (
+                               &Private->Passthru,
+                               Device->NamespaceId,
+                               &CommandPacket,
+                               NULL
+                               );
 
   return Status;
 }
@@ -166,17 +166,17 @@ NvmeRead (
 {
   EFI_STATUS                       Status;
   UINT32                           BlockSize;
-  NVME_CONTROLLER_PRIVATE_DATA     *Controller;
+  NVME_CONTROLLER_PRIVATE_DATA     *Private;
   UINT32                           MaxTransferBlocks;
   UINTN                            OrginalBlocks;
 
   Status        = EFI_SUCCESS;
-  Controller    = Device->Controller;
+  Private       = Device->Controller;
   BlockSize     = Device->Media.BlockSize;
   OrginalBlocks = Blocks;
 
-  if (Controller->ControllerData->Mdts != 0) {
-    MaxTransferBlocks = (1 << (Controller->ControllerData->Mdts)) * (1 << (Controller->Cap.Mpsmin + 12)) / BlockSize;
+  if (Private->ControllerData->Mdts != 0) {
+    MaxTransferBlocks = (1 << (Private->ControllerData->Mdts)) * (1 << (Private->Cap.Mpsmin + 12)) / BlockSize;
   } else {
     MaxTransferBlocks = 1024;
   }
@@ -225,17 +225,17 @@ NvmeWrite (
 {
   EFI_STATUS                       Status;
   UINT32                           BlockSize;
-  NVME_CONTROLLER_PRIVATE_DATA     *Controller;
+  NVME_CONTROLLER_PRIVATE_DATA     *Private;
   UINT32                           MaxTransferBlocks;
   UINTN                            OrginalBlocks;
 
   Status        = EFI_SUCCESS;
-  Controller    = Device->Controller;
+  Private       = Device->Controller;
   BlockSize     = Device->Media.BlockSize;
   OrginalBlocks = Blocks;
 
-  if (Controller->ControllerData->Mdts != 0) {
-    MaxTransferBlocks = (1 << (Controller->ControllerData->Mdts)) * (1 << (Controller->Cap.Mpsmin + 12)) / BlockSize;
+  if (Private->ControllerData->Mdts != 0) {
+    MaxTransferBlocks = (1 << (Private->ControllerData->Mdts)) * (1 << (Private->Cap.Mpsmin + 12)) / BlockSize;
   } else {
     MaxTransferBlocks = 1024;
   }
@@ -276,13 +276,13 @@ NvmeFlush (
   IN NVME_DEVICE_PRIVATE_DATA      *Device
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Controller;
+  NVME_CONTROLLER_PRIVATE_DATA             *Private;
   EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
   EFI_NVM_EXPRESS_COMMAND                  Command;
   EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
 
-  Controller = Device->Controller;
+  Private = Device->Controller;
 
   ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
   ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
@@ -296,12 +296,12 @@ NvmeFlush (
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
   CommandPacket.QueueType      = NVME_IO_QUEUE;
 
-  Status = Controller->Passthru.PassThru (
-                                  &Controller->Passthru,
-                                  Device->NamespaceId,
-                                  &CommandPacket,
-                                  NULL
-                                  );
+  Status = Private->Passthru.PassThru (
+                               &Private->Passthru,
+                               Device->NamespaceId,
+                               &CommandPacket,
+                               NULL
+                               );
 
   return Status;
 }
