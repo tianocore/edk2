@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module.
 
-  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1521,6 +1521,89 @@ InitMpSystemData (
 }
 
 /**
+  Collects BIST data from HOB.
+
+  This function collects BIST data from HOB built from Sec Platform Information
+  PPI or SEC Platform Information2 PPI.
+
+**/
+VOID
+CollectBistDataFromHob (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE                     *GuidHob;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD2  *SecPlatformInformation2;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD   *SecPlatformInformation;
+  UINTN                                 NumberOfData;
+  EFI_SEC_PLATFORM_INFORMATION_CPU      *CpuInstance;
+  EFI_SEC_PLATFORM_INFORMATION_CPU      BspCpuInstance;
+  UINTN                                 ProcessorNumber;
+  UINT32                                InitialLocalApicId;
+  CPU_DATA_BLOCK                        *CpuData;
+
+  SecPlatformInformation2 = NULL;
+  SecPlatformInformation  = NULL;
+
+  //
+  // Get gEfiSecPlatformInformation2PpiGuid Guided HOB firstly
+  //
+  GuidHob = GetFirstGuidHob (&gEfiSecPlatformInformation2PpiGuid);
+  if (GuidHob != NULL) {
+    //
+    // Sec Platform Information2 PPI includes BSP/APs' BIST information
+    //
+    SecPlatformInformation2 = GET_GUID_HOB_DATA (GuidHob);
+    NumberOfData = SecPlatformInformation2->NumberOfCpus;
+    CpuInstance  = SecPlatformInformation2->CpuInstance;
+  } else {
+    //
+    // Otherwise, get gEfiSecPlatformInformationPpiGuid Guided HOB
+    //
+    GuidHob = GetFirstGuidHob (&gEfiSecPlatformInformationPpiGuid);
+    if (GuidHob != NULL) {
+      SecPlatformInformation = GET_GUID_HOB_DATA (GuidHob);
+      NumberOfData = 1;
+      //
+      // SEC Platform Information only includes BSP's BIST information
+      // does not have BSP's APIC ID
+      //
+      BspCpuInstance.CpuLocation = GetApicId ();
+      BspCpuInstance.InfoRecord.IA32HealthFlags.Uint32  = SecPlatformInformation->IA32HealthFlags.Uint32;
+      CpuInstance = &BspCpuInstance;
+    } else {
+      DEBUG ((EFI_D_INFO, "Does not find any HOB stored CPU BIST information!\n"));
+      //
+      // Does not find any HOB stored BIST information
+      //
+      return;
+    }
+  }
+
+  while (NumberOfData--) {
+    for (ProcessorNumber = 0; ProcessorNumber < mMpSystemData.NumberOfProcessors; ProcessorNumber++) {
+      CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
+      InitialLocalApicId = (UINT32) CpuData->Info.ProcessorId;
+      if (InitialLocalApicId == CpuInstance[NumberOfData].CpuLocation) {
+        //
+        // Update CPU health status for MP Services Protocol according to BIST data.
+        //
+        if (CpuInstance[NumberOfData].InfoRecord.IA32HealthFlags.Uint32 != 0) {
+          CpuData->Info.StatusFlag &= ~PROCESSOR_HEALTH_STATUS_BIT;
+          //
+          // Report Status Code that self test is failed
+          //
+          REPORT_STATUS_CODE (
+            EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+            (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_SELF_TEST)
+            );
+        }
+      }
+    }
+  }
+}
+
+/**
   Callback function for ExitBootServices.
 
   @param  Event                 Event whose notification function is being invoked.
@@ -1596,6 +1679,11 @@ InitializeMpSupport (
                              mMpSystemData.CpuDatas);
 
   mAPsAlreadyInitFinished = TRUE;
+
+  //
+  // Update CPU healthy information from Guided HOB
+  //
+  CollectBistDataFromHob ();
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mMpServiceHandle,
