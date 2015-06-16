@@ -1,7 +1,7 @@
 /** @file
   Internal header file for Extended SAL variable service module.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -66,7 +66,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// The maximum size of the public key database, restricted by maximum individal EFI 
 /// varible size, and excluding the variable header and name size.
 ///
-#define MAX_KEYDB_SIZE  (FixedPcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - AUTHVAR_KEYDB_NAME_SIZE)
+#define MAX_KEYDB_SIZE  (FixedPcdGet32 (PcdMaxVariableSize) - sizeof (AUTHENTICATED_VARIABLE_HEADER) - AUTHVAR_KEYDB_NAME_SIZE)
 #define MAX_KEY_NUM     (MAX_KEYDB_SIZE / EFI_CERT_TYPE_RSA2048_SIZE)
 
 ///
@@ -432,7 +432,7 @@ GetVariableDataPtr (
 **/
 UINTN
 DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  AUTHENTICATED_VARIABLE_HEADER     *Variable
   );
 
 /**
@@ -479,7 +479,7 @@ UpdateVariable (
                                  FALSE - Variable is non-volatile.
   @param[in]  Global             Pointer to VARAIBLE_GLOBAL structure.
   @param[in]  Instance           Instance of FV Block services.
-  @param[out] VariableHeader     Pointer to VARIABLE_HEADER for output.
+  @param[out] VariableHeader     Pointer to AUTHENTICATED_VARIABLE_HEADER for output.
 
   @retval TRUE                   Variable header is valid.
   @retval FALSE                  Variable header is not valid.
@@ -487,11 +487,11 @@ UpdateVariable (
 **/
 BOOLEAN
 IsValidVariableHeader (
-  IN  EFI_PHYSICAL_ADDRESS   VariableAddress,
-  IN  BOOLEAN                Volatile,
-  IN  VARIABLE_GLOBAL        *Global,
-  IN  UINTN                  Instance,
-  OUT VARIABLE_HEADER        *VariableHeader  OPTIONAL
+  IN  EFI_PHYSICAL_ADDRESS              VariableAddress,
+  IN  BOOLEAN                           Volatile,
+  IN  VARIABLE_GLOBAL                   *Global,
+  IN  UINTN                             Instance,
+  OUT AUTHENTICATED_VARIABLE_HEADER     *VariableHeader  OPTIONAL
   );
 
 /**
