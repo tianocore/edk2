@@ -555,8 +555,16 @@ cleanlib:
             LibraryMakeCommandList.append(Command)
 
         package_rel_dir = self._AutoGenObject.SourceDir
-        if os.sep in package_rel_dir:
-            package_rel_dir = package_rel_dir[package_rel_dir.index(os.sep) + 1:]
+        current_dir = self.Macros["WORKSPACE"]
+        found = False
+        while not found and os.sep in package_rel_dir:
+            index = package_rel_dir.index(os.sep)
+            current_dir = os.path.join(current_dir, package_rel_dir[:index])
+            for fl in os.listdir(current_dir):
+                if fl.endswith('.dec'):
+                    found = True
+                    break
+            package_rel_dir = package_rel_dir[index + 1:]
 
         MakefileTemplateDict = {
             "makefile_header"           : self._FILE_HEADER_[self._FileType],
