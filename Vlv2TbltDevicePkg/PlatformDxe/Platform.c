@@ -483,18 +483,6 @@ SpiBiosProtectionFunction(
     (B_PCH_SPI_PR0_PRB_MASK&(BiosFlaLower0>>12))|(B_PCH_SPI_PR0_PRL_MASK&(BiosFlaLimit0>>12)<<16));
 
   //
-  //Lock down PR0
-  //
-  MmioOr16 ((UINTN) (SpiBase + R_PCH_SPI_HSFS), (UINT16) (B_PCH_SPI_HSFS_FLOCKDN));
-
-  //
-  // Verify if it's really locked.
-  //
-  if ((MmioRead16 (SpiBase + R_PCH_SPI_HSFS) & B_PCH_SPI_HSFS_FLOCKDN) == 0) {
-    DEBUG((EFI_D_ERROR, "Failed to lock down PR0.\n"));
-  }
-
-  //
   //Set PR1
   //
 
@@ -503,7 +491,7 @@ SpiBiosProtectionFunction(
     (B_PCH_SPI_PR1_PRB_MASK&(BiosFlaLower1>>12))|(B_PCH_SPI_PR1_PRL_MASK&(BiosFlaLimit1>>12)<<16));
 
   //
-  //Lock down PR1
+  //Lock down PRx
   //
   MmioOr16 ((UINTN) (SpiBase + R_PCH_SPI_HSFS), (UINT16) (B_PCH_SPI_HSFS_FLOCKDN));
 
@@ -511,7 +499,7 @@ SpiBiosProtectionFunction(
   // Verify if it's really locked.
   //
   if ((MmioRead16 (SpiBase + R_PCH_SPI_HSFS) & B_PCH_SPI_HSFS_FLOCKDN) == 0) {
-    DEBUG((EFI_D_ERROR, "Failed to lock down PR1.\n"));
+    DEBUG((EFI_D_ERROR, "Failed to lock down PRx.\n"));
   }
   return;
 
