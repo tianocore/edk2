@@ -582,7 +582,7 @@ NvmeIdentifyController (
   ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
   ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
-  Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_OPC;
+  Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_CMD;
   //
   // According to Nvm Express 1.1 spec Figure 38, When not used, the field shall be cleared to 0h.
   // For the Identify command, the Namespace Identifier is only used for the Namespace data structure.
@@ -641,7 +641,7 @@ NvmeIdentifyNamespace (
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
-  Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_OPC;
+  Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_CMD;
   Command.Nsid        = NamespaceId;
   CommandPacket.TransferBuffer = Buffer;
   CommandPacket.TransferLength = sizeof (NVME_ADMIN_NAMESPACE_DATA);
@@ -691,7 +691,7 @@ NvmeCreateIoCompletionQueue (
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
-  Command.Cdw0.Opcode = NVME_ADMIN_CRIOCQ_OPC;
+  Command.Cdw0.Opcode = NVME_ADMIN_CRIOCQ_CMD;
   CommandPacket.TransferBuffer = Private->CqBufferPciAddr[1];
   CommandPacket.TransferLength = EFI_PAGE_SIZE;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
@@ -741,7 +741,7 @@ NvmeCreateIoSubmissionQueue (
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
-  Command.Cdw0.Opcode = NVME_ADMIN_CRIOSQ_OPC;
+  Command.Cdw0.Opcode = NVME_ADMIN_CRIOSQ_CMD;
   CommandPacket.TransferBuffer = Private->SqBufferPciAddr[1];
   CommandPacket.TransferLength = EFI_PAGE_SIZE;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;

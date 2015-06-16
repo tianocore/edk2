@@ -2,7 +2,7 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
-  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -348,6 +348,10 @@ typedef struct {
   // Admin Command Set Attributes
   //
   UINT16 Oacs;                /* Optional Admin Command Support */
+    #define NAMESPACE_MANAGEMENT_SUPPORTED  BIT3
+    #define FW_DOWNLOAD_ACTIVATE_SUPPORTED  BIT2
+    #define FORMAT_NVM_SUPPORTED            BIT1
+    #define SECURITY_SEND_RECEIVE_SUPPORTED BIT0
   UINT8  Acl;                 /* Abort Command Limit */
   UINT8  Aerl;                /* Async Event Request Limit */
   UINT8  Frmw;                /* Firmware updates */
@@ -556,9 +560,9 @@ typedef struct {
   // CDW 10
   //
   UINT32 Lid:8;               /* Log Page Identifier */
-    #define LID_ERROR_INFO
-    #define LID_SMART_INFO
-    #define LID_FW_SLOT_INFO
+    #define LID_ERROR_INFO   0x1
+    #define LID_SMART_INFO   0x2
+    #define LID_FW_SLOT_INFO 0x3
   UINT32 Rsvd1:8;
   UINT32 Numd:12;             /* Number of Dwords */
   UINT32 Rsvd2:4;             /* Reserved as of Nvm Express 1.1 Spec */
@@ -724,9 +728,23 @@ typedef struct {
 //
 // Nvm Express Admin cmd opcodes
 //
-#define NVME_ADMIN_CRIOSQ_OPC                1
-#define NVME_ADMIN_CRIOCQ_OPC                5
-#define NVME_ADMIN_IDENTIFY_OPC              6
+#define NVME_ADMIN_DEIOSQ_CMD                0x00
+#define NVME_ADMIN_CRIOSQ_CMD                0x01
+#define NVME_ADMIN_GET_LOG_PAGE_CMD          0x02
+#define NVME_ADMIN_DEIOCQ_CMD                0x04
+#define NVME_ADMIN_CRIOCQ_CMD                0x05
+#define NVME_ADMIN_IDENTIFY_CMD              0x06
+#define NVME_ADMIN_ABORT_CMD                 0x08
+#define NVME_ADMIN_SET_FEATURES_CMD          0x09
+#define NVME_ADMIN_GET_FEATURES_CMD          0x0A
+#define NVME_ADMIN_ASYNC_EVENT_REQUEST_CMD   0x0C
+#define NVME_ADMIN_NAMESACE_MANAGEMENT_CMD   0x0D
+#define NVME_ADMIN_FW_COMMIT_CMD             0x10
+#define NVME_ADMIN_FW_IAMGE_DOWNLOAD_CMD     0x11
+#define NVME_ADMIN_NAMESACE_ATTACHMENT_CMD   0x15
+#define NVME_ADMIN_FORMAT_NVM_CMD            0x80
+#define NVME_ADMIN_SECURITY_SEND_CMD         0x81
+#define NVME_ADMIN_SECURITY_RECEIVE_CMD      0x82
 
 #define NVME_IO_FLUSH_OPC                    0
 #define NVME_IO_WRITE_OPC                    1

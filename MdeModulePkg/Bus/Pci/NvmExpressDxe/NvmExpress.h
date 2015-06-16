@@ -30,6 +30,7 @@
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskInfo.h>
 #include <Protocol/DriverSupportedEfiVersion.h>
+#include <Protocol/StorageSecurityCommand.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -152,29 +153,30 @@ struct _NVME_CONTROLLER_PRIVATE_DATA {
 // Nvme device private data structure
 //
 struct _NVME_DEVICE_PRIVATE_DATA {
-  UINT32                            Signature;
+  UINT32                                   Signature;
 
-  EFI_HANDLE                        DeviceHandle;
-  EFI_HANDLE                        ControllerHandle;
-  EFI_HANDLE                        DriverBindingHandle;
+  EFI_HANDLE                               DeviceHandle;
+  EFI_HANDLE                               ControllerHandle;
+  EFI_HANDLE                               DriverBindingHandle;
 
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL                 *DevicePath;
 
-  EFI_UNICODE_STRING_TABLE          *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE                 *ControllerNameTable;
 
-  UINT32                            NamespaceId;
-  UINT64                            NamespaceUuid;
+  UINT32                                   NamespaceId;
+  UINT64                                   NamespaceUuid;
 
-  EFI_BLOCK_IO_MEDIA                Media;
-  EFI_BLOCK_IO_PROTOCOL             BlockIo;
-  EFI_DISK_INFO_PROTOCOL            DiskInfo;
+  EFI_BLOCK_IO_MEDIA                       Media;
+  EFI_BLOCK_IO_PROTOCOL                    BlockIo;
+  EFI_DISK_INFO_PROTOCOL                   DiskInfo;
+  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    StorageSecurity;
 
-  EFI_LBA                           NumBlocks;
+  EFI_LBA                                  NumBlocks;
 
-  CHAR16                            ModelName[80];
-  NVME_ADMIN_NAMESPACE_DATA         NamespaceData;
+  CHAR16                                   ModelName[80];
+  NVME_ADMIN_NAMESPACE_DATA                NamespaceData;
 
-  NVME_CONTROLLER_PRIVATE_DATA      *Controller;
+  NVME_CONTROLLER_PRIVATE_DATA             *Controller;
 
 };
 
@@ -193,6 +195,13 @@ struct _NVME_DEVICE_PRIVATE_DATA {
       NVME_DEVICE_PRIVATE_DATA, \
       DiskInfo, \
       NVME_DEVICE_PRIVATE_DATA_SIGNATURE \
+      )
+
+#define NVME_DEVICE_PRIVATE_DATA_FROM_STORAGE_SECURITY(a)\
+  CR (a,                                                 \
+      NVME_DEVICE_PRIVATE_DATA,                          \
+      StorageSecurity,                                   \
+      NVME_DEVICE_PRIVATE_DATA_SIGNATURE                 \
       )
 
 /**

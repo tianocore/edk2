@@ -433,7 +433,7 @@ NvmExpressPassThru (
   // these two cmds are special which requires their data buffer must support simultaneous access by both the
   // processor and a PCI Bus Master. It's caller's responsbility to ensure this.
   //
-  if (((Sq->Opc & (BIT0 | BIT1)) != 0) && (Sq->Opc != NVME_ADMIN_CRIOCQ_OPC) && (Sq->Opc != NVME_ADMIN_CRIOSQ_OPC)) {
+  if (((Sq->Opc & (BIT0 | BIT1)) != 0) && (Sq->Opc != NVME_ADMIN_CRIOCQ_CMD) && (Sq->Opc != NVME_ADMIN_CRIOSQ_CMD)) {
     if ((Sq->Opc & BIT0) != 0) {
       Flag = EfiPciIoOperationBusMasterRead;
     } else {
@@ -567,21 +567,31 @@ NvmExpressPassThru (
     }
   }
 
+  //
+  // Check the NVMe cmd execution result
+  //
+  if (Status != EFI_TIMEOUT) {
+    if ((Cq->Sct == 0) && (Cq->Sc == 0)) {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_DEVICE_ERROR;
+      //
+      // Copy the Respose Queue entry for this command to the callers response buffer
+      //
+      CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+    
+      //
+      // Dump every completion entry status for debugging.
+      //
+      DEBUG_CODE_BEGIN();
+        NvmeDumpStatus(Cq);
+      DEBUG_CODE_END();
+    }
+  }
+
   if ((Private->CqHdbl[QueueType].Cqh ^= 1) == 0) {
     Private->Pt[QueueType] ^= 1;
   }
-
-  //
-  // Copy the Respose Queue entry for this command to the callers response buffer
-  //
-  CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
-
-  //
-  // Dump every completion entry status for debugging.
-  //
-  DEBUG_CODE_BEGIN();
-    NvmeDumpStatus(Cq);
-  DEBUG_CODE_END();
 
   Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueType]);
   PciIo->Mem.Write (
