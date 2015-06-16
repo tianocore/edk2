@@ -51,7 +51,7 @@
 @set SVN_REVISION=$Revision$
 @set RESET_ENVIRONMENT=FALSE
 @set NT32PKG=FALSE
-@set NT32_64=FALSE
+@set NT32_X64=
 @set BUILD_TOOLS_WITH=
 @set LOCATION=
 @set REBUILD_TOOLS=
@@ -180,7 +180,7 @@
     @REM This option will try to set the environment for building the Nt32Pkg/Nt32Pkg; on a 64-bit 
     @REM Windows OS
     @if /I "%2"=="X64" (
-        @set NT32_64=TRUE
+        @set NT32_X64=TRUE
         @shift
     )
   @shift
@@ -377,7 +377,6 @@
     @if not defined VSINSTALLDIR @set "PATH=%ORIGINAL_PATH%"
     @if not defined NT32_X64 @call "%WORKSPACE%\BaseTools\get_vsvars.bat"
     @if defined NT32_X64 call "%WORKSPACE%\BaseTools\Scripts\SetVisualStudio.bat"
-    @set NT32_X64=
 )
 @if "%NT32PKG%"=="TRUE" (
     @if not defined VS_PATH set "VS_PATH=%PATH%"
@@ -447,7 +446,6 @@
 @set RESET_ENVIRONMENT=
 @set RECONFIG=
 @set NT32PKG=
-@set NT32_64=
 @set BUILD_TOOLS_WITH=
 @set LOCATION=
 @set REBUILD_TOOLS=
@@ -467,7 +465,6 @@
 @set RESET_ENVIRONMENT=
 @set RECONFIG=
 @set NT32PKG=
-@set NT32_64=
 @set BUILD_TOOLS_WITH=
 @set LOCATION=
 @set REBUILD_TOOLS=
