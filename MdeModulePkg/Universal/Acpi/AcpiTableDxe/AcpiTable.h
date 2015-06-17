@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Driver
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -40,32 +40,12 @@
 #include "AcpiSdt.h"
 
 //
-// From Protocol/AcpiSupport.h
+// Great than or equal to 2.0.
 //
-
-//
-// ACPI Version bitmap definition:
-//
-// EFI_ACPI_TABLE_VERSION_1_0B - ACPI Version 1.0b
-// EFI_ACPI_TABLE_VERSION_2_0 - ACPI Version 2.0
-// EFI_ACPI_TABLE_VERSION_3_0 - ACPI Version 3.0
-// EFI_ACPI_TABLE_VERSION_NONE - No ACPI Versions.  This might be used
-//  to create memory-based operation regions or other information
-//  that is not part of the ACPI "tree" but must still be found
-//  in ACPI memory space and/or managed by the core ACPI driver.
-//
-// Note that EFI provides discrete GUIDs for each version of ACPI
-// that is supported.  It is expected that each EFI GUIDed
-// version of ACPI will also have a corresponding bitmap
-// definition.  This allows maintenance of separate ACPI trees
-// for each distinctly different version of ACPI.
-//
-#define EFI_ACPI_TABLE_VERSION      UINT32
-
-#define EFI_ACPI_TABLE_VERSION_NONE (1 << 0)
-#define EFI_ACPI_TABLE_VERSION_1_0B (1 << 1)
-#define EFI_ACPI_TABLE_VERSION_2_0  (1 << 2)
-#define EFI_ACPI_TABLE_VERSION_3_0  (1 << 3)
+#define ACPI_TABLE_VERSION_GTE_2_0 (EFI_ACPI_TABLE_VERSION_2_0  | \
+                                    EFI_ACPI_TABLE_VERSION_3_0  | \
+                                    EFI_ACPI_TABLE_VERSION_4_0  | \
+                                    EFI_ACPI_TABLE_VERSION_5_0)
 
 //
 // Private Driver Data
