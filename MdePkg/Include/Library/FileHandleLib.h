@@ -316,17 +316,16 @@ FileHandleFindNextFile(
 /**
   Retrieve the size of a file.
 
-  If FileHandle is NULL then ASSERT().
-  If Size is NULL then ASSERT().
-
   This function extracts the file size info from the FileHandle's EFI_FILE_INFO
   data.
 
   @param[in] FileHandle         The file handle from which size is retrieved.
   @param[out] Size              The pointer to size.
 
-  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_SUCCESS           Operation was completed sucessfully.
   @retval EFI_DEVICE_ERROR      Cannot access the file.
+  @retval EFI_INVALID_PARAMETER FileHandle is NULL.
+                                Size is NULL.
 **/
 EFI_STATUS
 EFIAPI
@@ -338,8 +337,6 @@ FileHandleGetSize (
 /**
   Set the size of a file.
 
-  If FileHandle is NULL then ASSERT().
-
   This function changes the file size info from the FileHandle's EFI_FILE_INFO
   data.
 
@@ -348,6 +345,7 @@ FileHandleGetSize (
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_DEVICE_ERROR      Cannot access the file.
+  @retval EFI_INVALID_PARAMETER FileHandle is NULL.
 **/
 EFI_STATUS
 EFIAPI
@@ -437,14 +435,13 @@ FileHandleReturnLine(
 /**
   Function to write a line of unicode text to a file.
 
-  If Handle is NULL, ASSERT.
-
   @param[in]     Handle         FileHandle to write to.
   @param[in]     Buffer         Buffer to write, if NULL the function will
                                 take no action and return EFI_SUCCESS.
 
-  @retval  EFI_SUCCESS          The data was written.
-  @retval  other                Failure.
+  @retval  EFI_SUCCESS            The data was written.
+                                  Buffer is NULL.
+  @retval  EFI_INVALID_PARAMETER  Handle is NULL.
 
   @sa FileHandleWrite
 **/
