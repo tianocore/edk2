@@ -1,7 +1,7 @@
 /** @file
   This protocol provides services for creating ACPI system description tables.
   
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -26,6 +26,7 @@ typedef VOID    *EFI_ACPI_HANDLE;
 #define EFI_ACPI_TABLE_VERSION_2_0  (1 << 2)
 #define EFI_ACPI_TABLE_VERSION_3_0  (1 << 3)
 #define EFI_ACPI_TABLE_VERSION_4_0  (1 << 4)
+#define EFI_ACPI_TABLE_VERSION_5_0  (1 << 5)
   
 typedef UINT32 EFI_ACPI_DATA_TYPE;
 #define EFI_ACPI_DATA_TYPE_NONE         0
@@ -66,16 +67,19 @@ EFI_STATUS
   - Root System Description Table (RSDT)
   - Extended System Description Table (XSDT)
   Version is updated with a bit map containing all the versions of ACPI of which the table is a
-  member.
+  member. For tables installed via the EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() interface,
+  the function returns the value of EFI_ACPI_STD_PROTOCOL.AcpiVersion.
   
   @param[in]    Index       The zero-based index of the table to retrieve.
   @param[out]   Table       Pointer for returning the table buffer.
   @param[out]   Version     On return, updated with the ACPI versions to which this table belongs. Type
                             EFI_ACPI_TABLE_VERSION is defined in "Related Definitions" in the
                             EFI_ACPI_SDT_PROTOCOL.    
-  @param[out]   TableKey    On return, points to the table key for the specified ACPI system definition table. This
-                            is identical to the table key used in the EFI_ACPI_TABLE_PROTOCOL.  
-                            
+  @param[out]   TableKey    On return, points to the table key for the specified ACPI system definition table.
+                            This is identical to the table key used in the EFI_ACPI_TABLE_PROTOCOL.
+                            The TableKey can be passed to EFI_ACPI_TABLE_PROTOCOL.UninstallAcpiTable()
+                            to uninstall the table.
+
   @retval EFI_SUCCESS       The function completed successfully.
   @retval EFI_NOT_FOUND     The requested index is too large and a table was not found.                                  
 **/  
@@ -243,7 +247,7 @@ EFI_STATUS
 
 typedef struct _EFI_ACPI_SDT_PROTOCOL {
   ///
-  /// Specifies the ACPI version supported by this protocol.
+  /// A bit map containing all the ACPI versions supported by this protocol.
   ///
   EFI_ACPI_TABLE_VERSION    AcpiVersion;
   EFI_ACPI_GET_ACPI_TABLE2  GetAcpiTable;
