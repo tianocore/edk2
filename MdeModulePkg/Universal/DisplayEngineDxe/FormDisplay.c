@@ -2545,6 +2545,8 @@ UiDisplayMenu (
   UINTN                           BottomRow;
   UINTN                           Index;
   CHAR16                          *StringPtr;
+  CHAR16                          *StringRightPtr;
+  CHAR16                          *StringErrorPtr;
   CHAR16                          *OptionString;
   CHAR16                          *HelpString;
   CHAR16                          *HelpHeaderString;
@@ -2579,6 +2581,7 @@ UiDisplayMenu (
   EFI_STRING_ID                   HelpInfo;
   UI_EVENT_TYPE                   EventType;
   BOOLEAN                         SkipHighLight;
+  EFI_HII_VALUE                   *StatementValue;
 
   EventType           = UIEventNone;
   Status              = EFI_SUCCESS;
@@ -2885,10 +2888,26 @@ UiDisplayMenu (
           //
           ASSERT(MenuOption != NULL);
           HelpInfo = ((EFI_IFR_STATEMENT_HEADER *) ((CHAR8 *)MenuOption->ThisTag->OpCode + sizeof (EFI_IFR_OP_HEADER)))->Help;
+          Statement = MenuOption->ThisTag;
+          StatementValue = &Statement->CurrentValue;
           if (HelpInfo == 0 || !IsSelectable (MenuOption)) {
-            StringPtr = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
+            if ((Statement->OpCode->OpCode == EFI_IFR_DATE_OP && StatementValue->Value.date.Month== 0xff)||(Statement->OpCode->OpCode == EFI_IFR_TIME_OP && StatementValue->Value.time.Hour == 0xff)){
+              StringPtr = GetToken (STRING_TOKEN (GET_TIME_FAIL), gHiiHandle);
+            } else {
+              StringPtr = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
+            }
           } else {
-            StringPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+            if ((Statement->OpCode->OpCode == EFI_IFR_DATE_OP && StatementValue->Value.date.Month== 0xff)||(Statement->OpCode->OpCode == EFI_IFR_TIME_OP && StatementValue->Value.time.Hour == 0xff)){
+              StringRightPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+              StringErrorPtr = GetToken (STRING_TOKEN (GET_TIME_FAIL), gHiiHandle);
+              StringPtr = AllocateZeroPool ((StrLen (StringRightPtr) + StrLen (StringErrorPtr)+ 1 ) * sizeof (CHAR16));
+              StrCpyS (StringPtr, StrLen (StringRightPtr) + StrLen (StringErrorPtr) + 1, StringRightPtr);
+              StrCatS (StringPtr, StrLen (StringRightPtr) + StrLen (StringErrorPtr) + 1, StringErrorPtr);
+              FreePool (StringRightPtr);
+              FreePool (StringErrorPtr);
+            } else {
+              StringPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+            }
           }
         }
 

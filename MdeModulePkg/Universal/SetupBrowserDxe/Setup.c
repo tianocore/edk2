@@ -1595,7 +1595,16 @@ GetQuestionValue (
       }
 
       if (EFI_ERROR (Status)) {
-        return Status;
+        if (Question->Operand == EFI_IFR_DATE_OP){
+          QuestionValue->date.Year  = 0xff;
+          QuestionValue->date.Month = 0xff;
+          QuestionValue->date.Day   = 0xff;
+        } else {
+          QuestionValue->time.Hour   = 0xff;
+          QuestionValue->time.Minute = 0xff;
+          QuestionValue->time.Second = 0xff;
+        }
+        return EFI_SUCCESS;
       }
 
       if (Question->Operand == EFI_IFR_DATE_OP) {
