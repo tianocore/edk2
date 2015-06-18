@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1191,7 +1191,10 @@ Dhcp4InstanceConfigUdpIo (
   DHCP_SERVICE                      *DhcpSb;
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
   EFI_UDP4_CONFIG_DATA              UdpConfigData;
-  IP4_ADDR                          Ip;
+  IP4_ADDR                          ClientAddr;
+  IP4_ADDR                          Ip;   
+  INTN                              Class; 
+  IP4_ADDR                          SubnetMask;
 
   Instance = (DHCP_PROTOCOL *) Context;
   DhcpSb   = Instance->Service;
@@ -1204,10 +1207,14 @@ Dhcp4InstanceConfigUdpIo (
   UdpConfigData.TimeToLive         = 64;
   UdpConfigData.DoNotFragment      = TRUE;
 
-  Ip = HTONL (DhcpSb->ClientAddr);
+  ClientAddr = EFI_NTOHL (Token->Packet->Dhcp4.Header.ClientAddr);
+  Ip = HTONL (ClientAddr);
   CopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
-
-  Ip = HTONL (DhcpSb->Netmask);
+  
+  Class = NetGetIpClass (ClientAddr);
+  ASSERT (Class < IP4_ADDR_CLASSE);
+  SubnetMask = gIp4AllMasks[Class << 3];
+  Ip = HTONL (SubnetMask);
   CopyMem (&UdpConfigData.SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   if ((Token->ListenPointCount == 0) || (Token->ListenPoints[0].ListenPort == 0)) {
@@ -1357,7 +1364,7 @@ PxeDhcpInput (
   //
   if ((Head->OpCode != BOOTP_REPLY) ||
       (Head->Xid != Token->Packet->Dhcp4.Header.Xid) ||
-      (CompareMem (DhcpSb->ClientAddressSendOut, Head->ClientHwAddr, Head->HwAddrLen) != 0)) {
+      (CompareMem (&Token->Packet->Dhcp4.Header.ClientHwAddr[0], Head->ClientHwAddr, Head->HwAddrLen) != 0)) {
     goto RESTART;
   }
 
@@ -1481,6 +1488,8 @@ EfiDhcp4TransmitReceive (
   IP4_ADDR       Ip;
   DHCP_SERVICE   *DhcpSb;
   EFI_IP_ADDRESS Gateway;
+  IP4_ADDR       ClientAddr;
+  INTN           Class;
   IP4_ADDR       SubnetMask;
 
   if ((This == NULL) || (Token == NULL) || (Token->Packet == NULL)) {
@@ -1489,6 +1498,7 @@ EfiDhcp4TransmitReceive (
 
   Instance = DHCP_INSTANCE_FROM_THIS (This);
   DhcpSb   = Instance->Service;
+  DhcpSb->ActiveChild = Instance;
 
   if (Instance->Token != NULL) {
     //
@@ -1512,8 +1522,9 @@ EfiDhcp4TransmitReceive (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (DhcpSb->ClientAddr == 0) {
-
+  ClientAddr = EFI_NTOHL (Token->Packet->Dhcp4.Header.ClientAddr);
+  
+  if (ClientAddr == 0) {
     return EFI_NO_MAPPING;
   }
 
@@ -1573,9 +1584,11 @@ EfiDhcp4TransmitReceive (
   //
   // Get the gateway.
   //
-  SubnetMask = DhcpSb->Netmask;
+  Class = NetGetIpClass (ClientAddr);
+  ASSERT (Class < IP4_ADDR_CLASSE);
+  SubnetMask = gIp4AllMasks[Class << 3];
   ZeroMem (&Gateway, sizeof (Gateway));
-  if (!IP4_NET_EQUAL (DhcpSb->ClientAddr, EndPoint.RemoteAddr.Addr[0], SubnetMask)) {
+  if (!IP4_NET_EQUAL (ClientAddr, EndPoint.RemoteAddr.Addr[0], SubnetMask)) {
     CopyMem (&Gateway.v4, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
     Gateway.Addr[0] = NTOHL (Gateway.Addr[0]);
   }
