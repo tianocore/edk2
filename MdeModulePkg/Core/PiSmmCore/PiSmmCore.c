@@ -80,7 +80,7 @@ SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
   { SmmLegacyBootHandler,       &gEfiEventLegacyBootGuid,           NULL, FALSE },
   { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,     NULL, FALSE },
   { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,          NULL, FALSE },
-  { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,        NULL, FALSE },
+  { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,        NULL, TRUE },
   { NULL,                       NULL,                               NULL, FALSE }
 };
 

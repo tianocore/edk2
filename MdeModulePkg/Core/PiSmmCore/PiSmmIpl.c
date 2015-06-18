@@ -267,7 +267,7 @@ SMM_IPL_EVENT_NOTIFICATION  mSmmIplEvents[] = {
   // the associated event is immediately signalled, so the notification function will be executed and the 
   // SMM End Of Dxe Protocol will be found if it is already in the handle database.
   //
-  { FALSE, FALSE,  &gEfiEndOfDxeEventGroupGuid,        SmmIplGuidedEventNotify,           &gEfiEndOfDxeEventGroupGuid,        TPL_CALLBACK, NULL },
+  { FALSE, TRUE,  &gEfiEndOfDxeEventGroupGuid,        SmmIplGuidedEventNotify,           &gEfiEndOfDxeEventGroupGuid,        TPL_CALLBACK, NULL },
   //
   // Declare event notification on the DXE Dispatch Event Group.  This event is signaled by the DXE Core
   // each time the DXE Core dispatcher has completed its work.  When this event is signalled, the SMM Core
