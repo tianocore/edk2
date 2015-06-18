@@ -72,6 +72,9 @@
   gEfiSecurity2ArchProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEdkiiSmmExitBootServicesProtocolGuid         ## SOMETIMES_PRODUCES
+  gEdkiiSmmLegacyBootProtocolGuid               ## SOMETIMES_PRODUCES
+  gEdkiiSmmReadyToBootProtocolGuid              ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
@@ -83,6 +86,8 @@
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
   gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEventLegacyBootGuid                       ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEventExitBootServicesGuid                 ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEventReadyToBootGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
   ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister

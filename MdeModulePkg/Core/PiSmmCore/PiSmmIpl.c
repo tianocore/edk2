@@ -283,8 +283,19 @@ SMM_IPL_EVENT_NOTIFICATION  mSmmIplEvents[] = {
   // Declare event notification on Legacy Boot Event Group.  This is used to inform the SMM Core that the platform 
   // is performing a legacy boot operation, and that the UEFI environment is no longer available and the SMM Core 
   // must guarantee that it does not access any UEFI related structures outside of SMRAM.
+  // It is also to inform the SMM Core to notify SMM driver that system enter legacy boot.
   //
   { FALSE, FALSE, &gEfiEventLegacyBootGuid,           SmmIplGuidedEventNotify,           &gEfiEventLegacyBootGuid,           TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on Exit Boot Services Event Group.  This is used to inform the SMM Core
+  // to notify SMM driver that system enter exit boot services.
+  //
+  { FALSE, FALSE, &gEfiEventExitBootServicesGuid,     SmmIplGuidedEventNotify,           &gEfiEventExitBootServicesGuid,     TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on Ready To Boot Event Group.  This is used to inform the SMM Core
+  // to notify SMM driver that system enter ready to boot.
+  //
+  { FALSE, FALSE, &gEfiEventReadyToBootGuid,          SmmIplGuidedEventNotify,           &gEfiEventReadyToBootGuid,          TPL_CALLBACK, NULL },
   //
   // Declare event notification on SetVirtualAddressMap() Event Group.  This is used to convert gSmmCorePrivate 
   // and mSmmControl2 from physical addresses to virtual addresses.

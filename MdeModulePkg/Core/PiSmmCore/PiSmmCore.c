@@ -1,7 +1,7 @@
 /** @file
   SMM Core Main Entry Point
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -66,7 +66,7 @@ EFI_SMM_SYSTEM_TABLE2  gSmmCoreSmst = {
 //
 // Flag to determine if the platform has performed a legacy boot.
 // If this flag is TRUE, then the runtime code and runtime data associated with the 
-// SMM IPL are converted to free memory, so the SMM COre must guarantee that is
+// SMM IPL are converted to free memory, so the SMM Core must guarantee that is
 // does not touch of the code/data associated with the SMM IPL if this flag is TRUE.
 //
 BOOLEAN  mInLegacyBoot = FALSE;
@@ -75,11 +75,13 @@ BOOLEAN  mInLegacyBoot = FALSE;
 // Table of SMI Handlers that are registered by the SMM Core when it is initialized
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
-  { SmmDriverDispatchHandler, &gEfiEventDxeDispatchGuid,          NULL, TRUE  },
-  { SmmReadyToLockHandler,    &gEfiDxeSmmReadyToLockProtocolGuid, NULL, TRUE }, 
-  { SmmLegacyBootHandler,     &gEfiEventLegacyBootGuid,           NULL, FALSE },
-  { SmmEndOfDxeHandler,       &gEfiEndOfDxeEventGroupGuid,        NULL, FALSE },
-  { NULL,                     NULL,                               NULL, FALSE }
+  { SmmDriverDispatchHandler,   &gEfiEventDxeDispatchGuid,          NULL, TRUE  },
+  { SmmReadyToLockHandler,      &gEfiDxeSmmReadyToLockProtocolGuid, NULL, TRUE }, 
+  { SmmLegacyBootHandler,       &gEfiEventLegacyBootGuid,           NULL, FALSE },
+  { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,     NULL, FALSE },
+  { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,          NULL, FALSE },
+  { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,        NULL, FALSE },
+  { NULL,                       NULL,                               NULL, FALSE }
 };
 
 UINTN                           mFullSmramRangeCount;
@@ -121,7 +123,8 @@ SmmEfiNotAvailableYetArg5 (
   Core uses this signal to know that a Legacy Boot has been performed and that 
   gSmmCorePrivate that is shared between the UEFI and SMM execution environments can
   not be accessed from SMM anymore since that structure is considered free memory by
-  a legacy OS.
+  a legacy OS. Then the SMM Core also install SMM Legacy Boot protocol to notify SMM
+  driver that system enter legacy boot.
 
   @param  DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
   @param  Context         Points to an optional handler context which was specified when the handler was registered.
@@ -141,8 +144,109 @@ SmmLegacyBootHandler (
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
+  EFI_STATUS    Status;
+  EFI_HANDLE    SmmHandle;
+
+  //
+  // Install SMM Legacy Boot protocol.
+  //
+  SmmHandle = NULL;
+  Status = SmmInstallProtocolInterface (
+             &SmmHandle,
+             &gEdkiiSmmLegacyBootProtocolGuid,
+             EFI_NATIVE_INTERFACE,
+             NULL
+             );
+
   mInLegacyBoot = TRUE;
-  return EFI_SUCCESS;
+
+  SmiHandlerUnRegister (DispatchHandle);
+
+  return Status;
+}
+
+/**
+  Software SMI handler that is called when an Exit Boot Services event is signalled.
+  Then the SMM Core also install SMM Exit Boot Services protocol to notify SMM driver
+  that system enter exit boot services.
+
+  @param  DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param  Context         Points to an optional handler context which was specified when the handler was registered.
+  @param  CommBuffer      A pointer to a collection of data in memory that will
+                          be conveyed from a non-SMM environment into an SMM environment.
+  @param  CommBufferSize  The size of the CommBuffer.
+
+  @return Status Code
+
+**/
+EFI_STATUS
+EFIAPI
+SmmExitBootServicesHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context,        OPTIONAL
+  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
+  )
+{
+  EFI_STATUS    Status;
+  EFI_HANDLE    SmmHandle;
+
+  //
+  // Install SMM Exit Boot Services protocol.
+  //
+  SmmHandle = NULL;
+  Status = SmmInstallProtocolInterface (
+             &SmmHandle,
+             &gEdkiiSmmExitBootServicesProtocolGuid,
+             EFI_NATIVE_INTERFACE,
+             NULL
+             );
+
+  SmiHandlerUnRegister (DispatchHandle);
+
+  return Status;
+}
+
+/**
+  Software SMI handler that is called when an Ready To Boot event is signalled.
+  Then the SMM Core also install SMM Ready To Boot protocol to notify SMM driver
+  that system enter ready to boot.
+
+  @param  DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param  Context         Points to an optional handler context which was specified when the handler was registered.
+  @param  CommBuffer      A pointer to a collection of data in memory that will
+                          be conveyed from a non-SMM environment into an SMM environment.
+  @param  CommBufferSize  The size of the CommBuffer.
+
+  @return Status Code
+
+**/
+EFI_STATUS
+EFIAPI
+SmmReadyToBootHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context,        OPTIONAL
+  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
+  )
+{
+  EFI_STATUS    Status;
+  EFI_HANDLE    SmmHandle;
+
+  //
+  // Install SMM Ready To Boot protocol.
+  //
+  SmmHandle = NULL;
+  Status = SmmInstallProtocolInterface (
+             &SmmHandle,
+             &gEdkiiSmmReadyToBootProtocolGuid,
+             EFI_NATIVE_INTERFACE,
+             NULL
+             );
+
+  SmiHandlerUnRegister (DispatchHandle);
+
+  return Status;
 }
 
 /**
