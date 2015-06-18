@@ -3,8 +3,9 @@
 
   This protocol is a mandatory protocol published by the PI platform code prior to invoking any
   3rd party content, including options ROM's and UEFI executables that are not from the platform manufacturer.
+  There is an associated event GUID that is signaled for the DXE drivers called EFI_END_OF_DXE_EVENT_GUID.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at

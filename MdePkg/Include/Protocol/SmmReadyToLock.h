@@ -3,9 +3,10 @@
 
   This SMM protocol indicates that SMM is about to be locked.
   This protocol is a mandatory protocol published by the SMM Foundation code when the system is 
-  preparing to lock SMM. 
+  preparing to lock SMM. This protocol should be installed immediately after
+  EFI_END_OF_DXE_EVENT_GROUP_GUID with no intervening modules dispatched.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
