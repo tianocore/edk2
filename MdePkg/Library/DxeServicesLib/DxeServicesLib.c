@@ -2,7 +2,7 @@
   MDE DXE Services Library provides functions that simplify the development of DXE Drivers.  
   These functions help access data from sections of FFS files or from file path.
 
-  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -796,18 +796,20 @@ GetFileBufferByFilePath (
           }
           
           if (!EFI_ERROR (Status) && (FileInfo != NULL)) {
-            //
-            // Allocate space for the file
-            //
-            ImageBuffer = AllocatePool ((UINTN)FileInfo->FileSize);
-            if (ImageBuffer == NULL) {
-              Status = EFI_OUT_OF_RESOURCES;
-            } else {
+            if ((FileInfo->Attribute & EFI_FILE_DIRECTORY) == 0) {
               //
-              // Read the file into the buffer we allocated
+              // Allocate space for the file
               //
-              ImageBufferSize = (UINTN)FileInfo->FileSize;
-              Status          = FileHandle->Read (FileHandle, &ImageBufferSize, ImageBuffer);
+              ImageBuffer = AllocatePool ((UINTN)FileInfo->FileSize);
+              if (ImageBuffer == NULL) {
+                Status = EFI_OUT_OF_RESOURCES;
+              } else {
+                //
+                // Read the file into the buffer we allocated
+                //
+                ImageBufferSize = (UINTN)FileInfo->FileSize;
+                Status          = FileHandle->Read (FileHandle, &ImageBufferSize, ImageBuffer);
+              }
             }
           }
         }
