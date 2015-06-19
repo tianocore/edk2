@@ -753,19 +753,24 @@ class DscBuildData(PlatformBuildClassObject):
     ## Retrieve [BuildOptions]
     def _GetBuildOptions(self):
         if self._BuildOptions == None:
+            OverrideTool = set()
             self._BuildOptions = sdict()
             #
-            # Retrieve build option for EDKII style module
+            # Retrieve build option for EDKII and EDK style module
             #
-            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, EDKII_NAME]
-            for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
-                self._BuildOptions[ToolChainFamily, ToolChain, EDKII_NAME] = Option
-            #
-            # Retrieve build option for EDK style module
-            #
-            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, EDK_NAME]     
-            for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
-                self._BuildOptions[ToolChainFamily, ToolChain, EDK_NAME] = Option
+            for CodeBase in (EDKII_NAME, EDK_NAME):
+                RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, CodeBase]
+                for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
+                    CurKey = (ToolChainFamily, ToolChain, CodeBase)
+                    if Option.startswith('='):
+                        OverrideTool.add(CurKey)
+                    #
+                    # Only flags can be appended
+                    #
+                    if CurKey not in self._BuildOptions or not ToolChain.endswith('_FLAGS') or CurKey in OverrideTool:
+                        self._BuildOptions[CurKey] = Option
+                    else:
+                        self._BuildOptions[CurKey] += ' ' + Option
         return self._BuildOptions
 
     def GetBuildOptionsByModuleType(self, Edk, ModuleType):
@@ -773,12 +778,19 @@ class DscBuildData(PlatformBuildClassObject):
             self._ModuleTypeOptions = sdict()
         if (Edk, ModuleType) not in self._ModuleTypeOptions:
             options = sdict()
+            OverrideTool = set()
             self._ModuleTypeOptions[Edk, ModuleType] = options
             DriverType = '%s.%s' % (Edk, ModuleType)
             RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, DriverType]
             for ToolChainFamily, ToolChain, Option, Arch, Type, Dummy3, Dummy4 in RecordList:
                 if Arch == self._Arch and Type == DriverType:
-                    options[ToolChainFamily, ToolChain, Edk] = Option
+                    Key = (ToolChainFamily, ToolChain, Edk)
+                    if Option.startswith('='):
+                        OverrideTool.add(Key)
+                    if Key not in options or not ToolChain.endswith('_FLAGS') or Key in OverrideTool:
+                        options[Key] = Option
+                    else:
+                        options[Key] += ' ' + Option
         return self._ModuleTypeOptions[Edk, ModuleType]
 
     ## Retrieve non-dynamic PCD settings
@@ -2007,7 +2019,7 @@ class InfBuildData(ModuleBuildClassObject):
             if self._Header_ == None:
                 self._GetHeaderInfo()
             if self._Guid == None:
-                self._Guid = '00000000-0000-0000-000000000000'
+                self._Guid = '00000000-0000-0000-0000-000000000000'
         return self._Guid
 
     ## Retrieve module version

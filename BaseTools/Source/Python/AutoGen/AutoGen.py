@@ -1963,7 +1963,8 @@ class PlatformAutoGen(AutoGen):
             # Key[0] -- tool family
             # Key[1] -- TARGET_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE
             #
-            if Key[0] == self.BuildRuleFamily :
+            if (Key[0] == self.BuildRuleFamily and
+                (ModuleStyle == None or len(Key) < 3 or (len(Key) > 2 and Key[2] == ModuleStyle))):
                 Target, ToolChain, Arch, CommandType, Attr = Key[1].split('_')
                 if Target == self.BuildTarget or Target == "*":
                     if ToolChain == self.ToolChain or ToolChain == "*":
@@ -1999,7 +2000,7 @@ class PlatformAutoGen(AutoGen):
                                             if Options.get((self.BuildRuleFamily, NowKey)) != None: 
                                                 Options.pop((self.BuildRuleFamily, NowKey))
                                                            
-        
+        OverrideOpt = set()
         for Key in Options:
             if ModuleStyle != None and len (Key) > 2:
                 # Check Module style is EDK or EDKII.
@@ -2025,7 +2026,9 @@ class PlatformAutoGen(AutoGen):
                     if Arch == "*" or Arch == self.Arch:
                         if Tool not in BuildOptions:
                             BuildOptions[Tool] = {}
-                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool]:
+                        if Options[Key].startswith('='):
+                            OverrideOpt.add((Tool, Attr))
+                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or (Tool, Attr) in OverrideOpt:
                             BuildOptions[Tool][Attr] = Options[Key]
                         else:
                             # append options for the same tool
@@ -2033,7 +2036,8 @@ class PlatformAutoGen(AutoGen):
         # Build Option Family has been checked, which need't to be checked again for family.
         if FamilyMatch or FamilyIsNull:
             return BuildOptions
-        
+
+        OverrideOpt = set()
         for Key in Options:
             if ModuleStyle != None and len (Key) > 2:
                 # Check Module style is EDK or EDKII.
@@ -2057,7 +2061,9 @@ class PlatformAutoGen(AutoGen):
                     if Arch == "*" or Arch == self.Arch:
                         if Tool not in BuildOptions:
                             BuildOptions[Tool] = {}
-                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool]:
+                        if Options[Key].startswith('='):
+                            OverrideOpt.add((Tool, Attr))
+                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or (Tool, Attr) in OverrideOpt:
                             BuildOptions[Tool][Attr] = Options[Key]
                         else:
                             # append options for the same tool
@@ -2097,6 +2103,7 @@ class PlatformAutoGen(AutoGen):
                        PlatformModuleOptions.keys() + ModuleTypeOptions.keys() +
                        self.ToolDefinition.keys())
         BuildOptions = {}
+        OverrideTool = set()
         for Tool in AllTools:
             if Tool not in BuildOptions:
                 BuildOptions[Tool] = {}
@@ -2115,8 +2122,9 @@ class PlatformAutoGen(AutoGen):
                         BuildOptions[Tool][Attr] = ""
                     # check if override is indicated
                     if Value.startswith('='):
+                        OverrideTool.add((Tool, Attr))
                         BuildOptions[Tool][Attr] = Value[1:]
-                    else:
+                    elif (Tool, Attr) not in OverrideTool:
                         BuildOptions[Tool][Attr] += " " + Value
         if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag != None:
             #
