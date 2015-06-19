@@ -1188,7 +1188,6 @@ Dhcp4InstanceConfigUdpIo (
   )
 {
   DHCP_PROTOCOL                     *Instance;
-  DHCP_SERVICE                      *DhcpSb;
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
   EFI_UDP4_CONFIG_DATA              UdpConfigData;
   IP4_ADDR                          ClientAddr;
@@ -1197,7 +1196,6 @@ Dhcp4InstanceConfigUdpIo (
   IP4_ADDR                          SubnetMask;
 
   Instance = (DHCP_PROTOCOL *) Context;
-  DhcpSb   = Instance->Service;
   Token    = Instance->Token;
 
   ZeroMem (&UdpConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
@@ -1309,7 +1307,6 @@ PxeDhcpInput (
   )
 {
   DHCP_PROTOCOL                     *Instance;
-  DHCP_SERVICE                      *DhcpSb;
   EFI_DHCP4_HEADER                  *Head;
   NET_BUF                           *Wrap;
   EFI_DHCP4_PACKET                  *Packet;
@@ -1320,7 +1317,6 @@ PxeDhcpInput (
   Wrap     = NULL;
   Instance = (DHCP_PROTOCOL *) Context;
   Token    = Instance->Token;
-  DhcpSb   = Instance->Service;
 
   //
   // Don't restart receive if error occurs or DHCP is destroyed.
