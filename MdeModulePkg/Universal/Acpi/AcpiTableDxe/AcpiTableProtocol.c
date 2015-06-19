@@ -169,7 +169,7 @@ PublishTables (
     AcpiTableInstance->TablesInstalled1 = TRUE;
   }
 
-  if ((Version & ACPI_TABLE_VERSION_GTE_2_0) &&
+  if (((Version & ACPI_TABLE_VERSION_GTE_2_0) != 0) &&
       !AcpiTableInstance->TablesInstalled3) {
     Status = gBS->InstallConfigurationTable (&gEfiAcpiTableGuid, AcpiTableInstance->Rsdp3);
     if (EFI_ERROR (Status)) {
