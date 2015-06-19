@@ -909,25 +909,29 @@ FileHandleReturnLine(
 }
 
 /**
-  Function to read a single line (up to but not including the \n) from a EFI_FILE_HANDLE.
+  Function to read a single line (up to but not including the \n) from a file.
 
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
 
-  @param[in]       Handle        FileHandle to read from
-  @param[in, out]  Buffer        pointer to buffer to read into
-  @param[in, out]  Size          pointer to number of bytes in buffer
-  @param[in]       Truncate      if TRUE then allows for truncation of the line to fit.
-                                 if FALSE will reset the position to the begining of the
-                                 line if the buffer is not large enough.
-  @param[in, out]  Ascii         Boolean value for indicating whether the file is Ascii (TRUE) or UCS2 (FALSE);
+  @param[in]       Handle        FileHandle to read from.
+  @param[in, out]  Buffer        The pointer to buffer to read into.
+  @param[in, out]  Size          The pointer to number of bytes in Buffer.
+  @param[in]       Truncate      If the buffer is large enough, this has no effect.
+                                 If the buffer is is too small and Truncate is TRUE,
+                                 the line will be truncated.
+                                 If the buffer is is too small and Truncate is FALSE,
+                                 then no read will occur.
 
-  @retval EFI_SUCCESS           the operation was sucessful.  the line is stored in
+  @param[in, out]  Ascii         Boolean value for indicating whether the file is
+                                 Ascii (TRUE) or UCS2 (FALSE).
+
+  @retval EFI_SUCCESS           The operation was successful.  The line is stored in
                                 Buffer.
   @retval EFI_INVALID_PARAMETER Handle was NULL.
   @retval EFI_INVALID_PARAMETER Size was NULL.
-  @retval EFI_BUFFER_TOO_SMALL  Size was not enough space to store the line.
-                                Size was updated to minimum space required.
+  @retval EFI_BUFFER_TOO_SMALL  Size was not large enough to store the line.
+                                Size was updated to the minimum space required.
   @sa FileHandleRead
 **/
 EFI_STATUS
@@ -942,20 +946,29 @@ FileHandleReadLine(
 {
   EFI_STATUS  Status;
   CHAR16      CharBuffer;
+  UINT64      FileSize;
   UINTN       CharSize;
   UINTN       CountSoFar;
   UINT64      OriginalFilePosition;
-
 
   if (Handle == NULL
     ||Size   == NULL
     ||(Buffer==NULL&&*Size!=0)
    ){
     return (EFI_INVALID_PARAMETER);
-  }
+  } 
+  
   if (Buffer != NULL) {
     *Buffer = CHAR_NULL;
   }
+  
+  Status = FileHandleGetSize (Handle, &FileSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  } else if (FileSize == 0) {
+    return EFI_SUCCESS;
+  }  
+  
   FileHandleGetPosition(Handle, &OriginalFilePosition);
   if (OriginalFilePosition == 0) {
     CharSize = sizeof(CHAR16);
