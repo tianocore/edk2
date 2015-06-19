@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2051,6 +2051,35 @@ Pkcs7Verify (
   IN  UINTN        CertLength,
   IN  CONST UINT8  *InData,
   IN  UINTN        DataLength
+  );
+
+/**
+  Extracts the attached content from a PKCS#7 signed data if existed. The input signed
+  data could be wrapped in a ContentInfo structure.
+
+  If P7Data, Content, or ContentSize is NULL, then return FALSE. If P7Length overflow,
+  then return FAlSE. If the P7Data is not correctly formatted, then return FALSE.
+
+  Caution: This function may receive untrusted input. So this function will do
+           basic check for PKCS#7 data structure.
+
+  @param[in]   P7Data       Pointer to the PKCS#7 signed data to process.
+  @param[in]   P7Length     Length of the PKCS#7 signed data in bytes.
+  @param[out]  Content      Pointer to the extracted content from the PKCS#7 signedData.
+                            It's caller's responsiblity to free the buffer.
+  @param[out]  ContentSize  The size of the extracted content in bytes.
+
+  @retval     TRUE          The P7Data was correctly formatted for processing.
+  @retval     FALSE         The P7Data was not correctly formatted for processing.
+
+*/
+BOOLEAN
+EFIAPI
+Pkcs7GetAttachedContent (
+  IN  CONST UINT8  *P7Data,
+  IN  UINTN        P7Length,
+  OUT VOID         **Content,
+  OUT UINTN        *ContentSize
   );
 
 /**
