@@ -229,6 +229,11 @@
   #
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 
+  #
+  # PKCS7 Verification
+  #
+  SecurityPkg/Pkcs7Verify/Pkcs7VerifyDxe/Pkcs7VerifyDxe.inf
+
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmm.inf
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmmRuntimeDxe.inf
