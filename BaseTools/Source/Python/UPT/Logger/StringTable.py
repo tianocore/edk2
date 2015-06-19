@@ -32,7 +32,7 @@ import gettext
 _ = gettext.gettext
 
 MSG_USAGE_STRING = _("\n"
-    "Intel(r) UEFI Packaging Tool (Intel(r) UEFIPT)\n"
+    "UEFI Packaging Tool (UEFIPT)\n"
     "%prog [options]"
     )
 
@@ -40,12 +40,12 @@ MSG_USAGE_STRING = _("\n"
 # Version and Copyright
 #
 MSG_VERSION_NUMBER = _("1.0")
-MSG_VERSION = _("Intel(r) UEFI Packaging Tool (Intel(r) UEFIPT) - Revision " + \
+MSG_VERSION = _("UEFI Packaging Tool (UEFIPT) - Revision " + \
                 MSG_VERSION_NUMBER)
-MSG_COPYRIGHT = _("Copyright (c) 2011 Intel Corporation All Rights Reserved.")
+MSG_COPYRIGHT = _("Copyright (c) 2011 - 2015 Intel Corporation All Rights Reserved.")
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
 MSG_USAGE = _("%s [options]\n%s" % ("UPT", MSG_VERSION_COPYRIGHT))
-MSG_DESCRIPTION = _("The Intel(r) UEFIUPT is used to create, " + \
+MSG_DESCRIPTION = _("The UEFIUPT is used to create, " + \
                     "install or remove a UEFI Distribution Package.")
 
 
