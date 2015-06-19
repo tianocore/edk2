@@ -1580,7 +1580,7 @@ CollectBistDataFromHob (
     }
   }
 
-  while (NumberOfData--) {
+  while ((NumberOfData--) > 0) {
     for (ProcessorNumber = 0; ProcessorNumber < mMpSystemData.NumberOfProcessors; ProcessorNumber++) {
       CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
       InitialLocalApicId = (UINT32) CpuData->Info.ProcessorId;
