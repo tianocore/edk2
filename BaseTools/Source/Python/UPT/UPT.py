@@ -38,6 +38,7 @@ from Logger.ToolError import OPTION_MISSING
 from Logger.ToolError import FILE_TYPE_MISMATCH
 from Logger.ToolError import OPTION_CONFLICT
 from Logger.ToolError import FatalError
+from Logger.ToolError import UPT_ALREADY_INSTALLED_ERROR
 
 import MkPkg
 import InstallPkg
@@ -282,7 +283,7 @@ def Main():
                          format_exc())
     finally:
         try:
-            if ReturnCode != 0:
+            if ReturnCode != 0 and ReturnCode != UPT_ALREADY_INSTALLED_ERROR:
                 Logger.Quiet(ST.MSG_RECOVER_START)
                 GlobalData.gDB.RollBack()
                 Mgr.rollback()

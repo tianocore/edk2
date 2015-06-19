@@ -1,7 +1,7 @@
 ## @file
 # Install distribution package.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -556,15 +556,16 @@ def Main(Options = None):
         Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),
             platform) + format_exc())
     finally:
-        Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_STARTED)
-        if DistFile:
-            DistFile.Close()
-        if ContentZipFile:
-            ContentZipFile.Close()
-        if GlobalData.gUNPACK_DIR:
-            rmtree(GlobalData.gUNPACK_DIR)
-            GlobalData.gUNPACK_DIR = None
-        Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)
+        if ReturnCode != UPT_ALREADY_INSTALLED_ERROR:
+            Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_STARTED)
+            if DistFile:
+                DistFile.Close()
+            if ContentZipFile:
+                ContentZipFile.Close()
+            if GlobalData.gUNPACK_DIR:
+                rmtree(GlobalData.gUNPACK_DIR)
+                GlobalData.gUNPACK_DIR = None
+            Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)
     if ReturnCode == 0:
         Logger.Quiet(ST.MSG_FINISH)
     return ReturnCode
