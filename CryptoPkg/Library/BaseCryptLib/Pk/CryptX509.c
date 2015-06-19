@@ -67,7 +67,7 @@ X509ConstructCertificate (
 
   If X509Stack is NULL, then return FALSE.
 
-  @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
+  @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
                               On output, pointer to the X509 stack object with new
                               inserted X509 certificate.
   @param           ...        A list of DER-encoded single certificate data followed
@@ -132,6 +132,7 @@ X509ConstructCertificateStack (
     //
     // Construct X509 Object from the given DER-encoded certificate data.
     //
+    X509Cert = NULL;
     Status = X509ConstructCertificate (
                (CONST UINT8 *) Cert,
                CertSize,

@@ -1631,6 +1631,8 @@ RsaGenerateKey (
 
 /**
   Validates key components of RSA context.
+  NOTE: This function performs integrity checks on all the RSA key material, so
+        the RSA key structure must contain all the private key data.
 
   This function validates key compoents of RSA context in following aspects:
   - Whether p is a prime
@@ -1859,7 +1861,7 @@ X509ConstructCertificate (
   If X509Stack is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
+  @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
                               On output, pointer to the X509 stack object with new
                               inserted X509 certificate.
   @param           ...        A list of DER-encoded single certificate data followed

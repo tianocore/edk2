@@ -44,7 +44,7 @@ X509ConstructCertificate (
 
   Return FALSE to indicate this interface is not supported.
 
-  @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
+  @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
                               On output, pointer to the X509 stack object with new
                               inserted X509 certificate.
   @param           ...        A list of DER-encoded single certificate data followed
