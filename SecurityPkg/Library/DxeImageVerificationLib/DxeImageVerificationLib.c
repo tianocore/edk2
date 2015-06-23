@@ -1,5 +1,5 @@
 /** @file
-  Implement image verification services for secure boot service in UEFI2.3.1.
+  Implement image verification services for secure boot service
 
   Caution: This file requires additional review when modified.
   This library will have external input - PE/COFF image.
@@ -769,7 +769,7 @@ AddImageExeInfo (
   }
 
   DevicePathSize            = GetDevicePathSize (DevicePath);
-  NewImageExeInfoEntrySize  = sizeof (EFI_IMAGE_EXECUTION_INFO) - sizeof (EFI_SIGNATURE_LIST) + NameStringLen + DevicePathSize + SignatureSize;
+  NewImageExeInfoEntrySize  = sizeof (EFI_IMAGE_EXECUTION_INFO) + NameStringLen + DevicePathSize + SignatureSize;
   NewImageExeInfoTable      = (EFI_IMAGE_EXECUTION_INFO_TABLE *) AllocateRuntimePool (ImageExeInfoTableSize + NewImageExeInfoEntrySize);
   if (NewImageExeInfoTable == NULL) {
     return ;
