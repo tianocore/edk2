@@ -671,6 +671,14 @@ Returns:
       *(PathPointer + 2) = '\0';
       strcat (mCommonLibFullPath, PathPointer + 3);
     }
+    
+    //
+    // Convert ".\\" to "", because it doesn't work with WINDOWS_EXTENSION_PATH.
+    //
+    while ((PathPointer = strstr (mCommonLibFullPath, ".\\")) != NULL) {
+      *PathPointer = '\0';
+      strcat (mCommonLibFullPath, PathPointer + 2);
+    }
         
     //
     // Convert "\\.\\" to "\\", because it doesn't work with WINDOWS_EXTENSION_PATH.
@@ -679,7 +687,7 @@ Returns:
       *PathPointer = '\0';
       strcat (mCommonLibFullPath, PathPointer + 2);
     }
-    
+
     //
     // Convert "\\..\\" to last directory, because it doesn't work with WINDOWS_EXTENSION_PATH.
     //
