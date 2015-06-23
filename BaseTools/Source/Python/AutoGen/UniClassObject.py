@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
 import Common.LongFilePathOs as os, codecs, re
 import distutils.util
 import Common.EdkLogger as EdkLogger
+import StringIO
 from Common.BuildToolError import *
 from Common.String import GetLineNo
 from Common.Misc import PathClass
@@ -147,6 +148,37 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
 
     EdkLogger.error("Unicode File Parser", FORMAT_INVALID, "Invalid RFC 4646 language code : %s" % LangName, File)
 
+## Ucs2Codec
+#
+# This is only a partial codec implementation. It only supports
+# encoding, and is primarily used to check that all the characters are
+# valid for UCS-2.
+#
+class Ucs2Codec(codecs.Codec):
+    def __init__(self):
+        self.__utf16 = codecs.lookup('utf-16')
+
+    def encode(self, input, errors='strict'):
+        for Char in input:
+            CodePoint = ord(Char)
+            if CodePoint >= 0xd800 and CodePoint <= 0xdfff:
+                raise ValueError("Code Point is in range reserved for " +
+                                 "UTF-16 surrogate pairs")
+            elif CodePoint > 0xffff:
+                raise ValueError("Code Point too large to encode in UCS-2")
+        return self.__utf16.encode(input)
+
+TheUcs2Codec = Ucs2Codec()
+def Ucs2Search(name):
+    if name == 'ucs-2':
+        return codecs.CodecInfo(
+            name=name,
+            encode=TheUcs2Codec.encode,
+            decode=TheUcs2Codec.decode)
+    else:
+        return None
+codecs.register(Ucs2Search)
+
 ## StringDefClassObject
 #
 # A structure for language definition
@@ -209,7 +241,7 @@ class UniFileClassObject(object):
         Lang = distutils.util.split_quoted((Line.split(u"//")[0]))
         if len(Lang) != 3:
             try:
-                FileIn = codecs.open(LongFilePath(File.Path), mode='rb', encoding='utf-16').read()
+                FileIn = self.OpenUniFile(LongFilePath(File.Path))
             except UnicodeError, X:
                 EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File);
             except:
@@ -252,6 +284,58 @@ class UniFileClassObject(object):
                     self.OrderedStringList[LangName].append (StringDefClassObject(Item.StringName, '', Item.Referenced, Item.Token, OtherLang))
                     self.OrderedStringDict[LangName][Item.StringName] = len(self.OrderedStringList[LangName]) - 1
         return True
+
+    def OpenUniFile(self, FileName):
+        #
+        # Read file
+        #
+        try:
+            UniFile = open(FileName, mode='rb')
+            FileIn = UniFile.read()
+            UniFile.close()
+        except:
+            EdkLogger.Error("build", FILE_OPEN_FAILURE, ExtraData=File)
+
+        #
+        # We currently only support UTF-16
+        #
+        Encoding = 'utf-16'
+
+        self.VerifyUcs2Data(FileIn, FileName, Encoding)
+
+        UniFile = StringIO.StringIO(FileIn)
+        Info = codecs.lookup(Encoding)
+        (Reader, Writer) = (Info.streamreader, Info.streamwriter)
+        return codecs.StreamReaderWriter(UniFile, Reader, Writer)
+
+    def VerifyUcs2Data(self, FileIn, FileName, Encoding):
+        Ucs2Info = codecs.lookup('ucs-2')
+        #
+        # Convert to unicode
+        #
+        try:
+            FileDecoded = codecs.decode(FileIn, Encoding)
+            Ucs2Info.encode(FileDecoded)
+        except:
+            UniFile = StringIO.StringIO(FileIn)
+            Info = codecs.lookup(Encoding)
+            (Reader, Writer) = (Info.streamreader, Info.streamwriter)
+            File = codecs.StreamReaderWriter(UniFile, Reader, Writer)
+            LineNumber = 0
+            ErrMsg = lambda Encoding, LineNumber: \
+                     '%s contains invalid %s characters on line %d.' % \
+                     (FileName, Encoding, LineNumber)
+            while True:
+                LineNumber = LineNumber + 1
+                try:
+                    Line = File.readline()
+                    if Line == '':
+                        EdkLogger.error('Unicode File Parser', PARSER_ERROR,
+                                        ErrMsg(Encoding, LineNumber))
+                    Ucs2Info.encode(Line)
+                except:
+                    EdkLogger.error('Unicode File Parser', PARSER_ERROR,
+                                    ErrMsg('UCS-2', LineNumber))
 
     #
     # Get String name and value
@@ -305,7 +389,7 @@ class UniFileClassObject(object):
             EdkLogger.error("Unicode File Parser", FILE_NOT_FOUND, ExtraData=File.Path)
 
         try:
-            FileIn = codecs.open(LongFilePath(File.Path), mode='rb', encoding='utf-16')
+            FileIn = self.OpenUniFile(LongFilePath(File.Path))
         except UnicodeError, X:
             EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File.Path);
         except:
