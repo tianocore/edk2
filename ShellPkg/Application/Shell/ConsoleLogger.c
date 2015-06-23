@@ -416,7 +416,7 @@ ConsoleLoggerReset (
   //
   if (!EFI_ERROR (Status)) {
     ConsoleLoggerResetBuffers(ConsoleInfo);
-    if (ExtendedVerification == TRUE) {
+    if (ExtendedVerification) {
       ConsoleInfo->OriginalStartRow = 0;
       ConsoleInfo->CurrentStartRow = 0;
     }
