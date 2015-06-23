@@ -139,6 +139,30 @@ class Tests(TestTools.BaseToolsTest):
 
         self.CheckFile('utf_8', shouldPass=False, string=data)
 
+    def testSurrogatePairUnicodeCharInUtf8File(self):
+        #
+        # Surrogate Pair code points are used in UTF-16 files to
+        # encode the Supplementary Plane characters. In UTF-8, it is
+        # trivial to encode these code points, but they are not valid
+        # code points for characters, since they are reserved for the
+        # UTF-16 Surrogate Pairs.
+        #
+        # This test makes sure that BaseTools rejects these characters
+        # if seen in a .uni file.
+        #
+        data = '\xed\xa0\x81'
+
+        self.CheckFile(encoding=None, shouldPass=False, string=data)
+
+    def testSurrogatePairUnicodeCharInUtf8FileWithBom(self):
+        #
+        # Same test as testSurrogatePairUnicodeCharInUtf8File, but add
+        # the UTF-8 BOM
+        #
+        data = codecs.BOM_UTF8 + '\xed\xa0\x81'
+
+        self.CheckFile(encoding=None, shouldPass=False, string=data)
+
 TheTestSuite = TestTools.MakeTheTestSuite(locals())
 
 if __name__ == '__main__':
