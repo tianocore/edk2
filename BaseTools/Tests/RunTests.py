@@ -21,8 +21,6 @@ import unittest
 
 import TestTools
 
-sys.path.append(TestTools.PythonSourceDir)
-
 def GetCTestSuite():
     import CToolsTests
     return CToolsTests.TheTestSuite()

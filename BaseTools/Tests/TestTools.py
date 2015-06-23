@@ -1,7 +1,7 @@
 ## @file
 # Utility functions and classes for BaseTools unit tests
 #
-#  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -30,6 +30,13 @@ BaseToolsDir = os.path.realpath(os.path.join(TestsDir, '..'))
 CSourceDir = os.path.join(BaseToolsDir, 'Source', 'C')
 PythonSourceDir = os.path.join(BaseToolsDir, 'Source', 'Python')
 TestTempDir = os.path.join(TestsDir, 'TestTempDir')
+
+if PythonSourceDir not in sys.path:
+    #
+    # Allow unit tests to import BaseTools python modules. This is very useful
+    # for writing unit tests.
+    #
+    sys.path.append(PythonSourceDir)
 
 def MakeTheTestSuite(localItems):
     tests = []
