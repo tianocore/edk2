@@ -53,6 +53,11 @@ QEMU_VIDEO_CARD gQemuVideoCardList[] = {
         QEMU_VIDEO_BOCHS,
         L"QEMU QXL VGA"
     },{
+        0x1af4,
+        0x1050,
+        QEMU_VIDEO_BOCHS_MMIO,
+        L"QEMU VirtIO VGA"
+    },{
         0 /* end of list */
     }
 };
