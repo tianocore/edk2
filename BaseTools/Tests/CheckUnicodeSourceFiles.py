@@ -114,6 +114,17 @@ class Tests(TestTools.BaseToolsTest):
 
         self.CheckFile(encoding=None, shouldPass=False, string=data)
 
+    def testValidUtf8File(self):
+        self.CheckFile(encoding='utf_8', shouldPass=True)
+
+    def testValidUtf8FileWithBom(self):
+        #
+        # Same test as testValidUtf8File, but add the UTF-8 BOM
+        #
+        data = codecs.BOM_UTF8 + codecs.encode(self.SampleData, 'utf_8')
+
+        self.CheckFile(encoding=None, shouldPass=True, string=data)
+
     def test32bitUnicodeCharInUtf8File(self):
         data = u'''
             #langdef en-US "English"
