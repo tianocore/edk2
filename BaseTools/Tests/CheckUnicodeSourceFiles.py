@@ -114,6 +114,31 @@ class Tests(TestTools.BaseToolsTest):
 
         self.CheckFile(encoding=None, shouldPass=False, string=data)
 
+    def test32bitUnicodeCharInUtf8File(self):
+        data = u'''
+            #langdef en-US "English"
+            #string STR_A #language en-US "CodePoint (\U00010300) > 0xFFFF"
+        '''
+
+        self.CheckFile('utf_16', shouldPass=False, string=data)
+
+    def test32bitUnicodeCharInUtf8File(self):
+        data = u'''
+            #langdef en-US "English"
+            #string STR_A #language en-US "CodePoint (\U00010300) > 0xFFFF"
+        '''
+
+        self.CheckFile('utf_8', shouldPass=False, string=data)
+
+    def test32bitUnicodeCharInUtf8Comment(self):
+        data = u'''
+            // Even in comments, we reject non-UCS-2 chars: \U00010300
+            #langdef en-US "English"
+            #string STR_A #language en-US "A"
+        '''
+
+        self.CheckFile('utf_8', shouldPass=False, string=data)
+
 TheTestSuite = TestTools.MakeTheTestSuite(locals())
 
 if __name__ == '__main__':
