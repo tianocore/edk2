@@ -20,7 +20,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Pkcs7VerifyDxe
-  FILE_GUID                      = D681A765-6AE9-5E3A-6F3A-770429EDF09
+  FILE_GUID                      = DC952D08-C62B-41c6-BAC7-70ED054F91E5
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = Pkcs7VerifyDriverEntry
