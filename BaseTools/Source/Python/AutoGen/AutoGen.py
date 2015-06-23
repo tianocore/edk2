@@ -651,7 +651,7 @@ class WorkspaceAutoGen(AutoGen):
         for Pa in self.AutoGenObjectList:
             for Package in Pa.PackageList:
                 PcdList = Package.Pcds.values()
-                PcdList.sort(lambda x, y: cmp(x.TokenValue, y.TokenValue)) 
+                PcdList.sort(lambda x, y: cmp(int(x.TokenValue, 0), int(y.TokenValue, 0))) 
                 Count = 0
                 while (Count < len(PcdList) - 1) :
                     Item = PcdList[Count]
@@ -659,13 +659,13 @@ class WorkspaceAutoGen(AutoGen):
                     #
                     # Make sure in the same token space the TokenValue should be unique
                     #
-                    if (Item.TokenValue == ItemNext.TokenValue):
+                    if (int(Item.TokenValue, 0) == int(ItemNext.TokenValue, 0)):
                         SameTokenValuePcdList = []
                         SameTokenValuePcdList.append(Item)
                         SameTokenValuePcdList.append(ItemNext)
                         RemainPcdListLength = len(PcdList) - Count - 2
                         for ValueSameCount in range(RemainPcdListLength):
-                            if PcdList[len(PcdList) - RemainPcdListLength + ValueSameCount].TokenValue == Item.TokenValue:
+                            if int(PcdList[len(PcdList) - RemainPcdListLength + ValueSameCount].TokenValue, 0) == int(Item.TokenValue, 0):
                                 SameTokenValuePcdList.append(PcdList[len(PcdList) - RemainPcdListLength + ValueSameCount])
                             else:
                                 break;
@@ -699,7 +699,7 @@ class WorkspaceAutoGen(AutoGen):
                     #
                     # Check PCDs with same TokenSpaceGuidCName.TokenCName have same token value as well.
                     #
-                    if (Item.TokenSpaceGuidCName == ItemNext.TokenSpaceGuidCName) and (Item.TokenCName == ItemNext.TokenCName) and (Item.TokenValue != ItemNext.TokenValue):
+                    if (Item.TokenSpaceGuidCName == ItemNext.TokenSpaceGuidCName) and (Item.TokenCName == ItemNext.TokenCName) and (int(Item.TokenValue, 0) != int(ItemNext.TokenValue, 0)):
                         EdkLogger.error(
                                     'build',
                                     FORMAT_INVALID,
