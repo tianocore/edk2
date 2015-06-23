@@ -38,7 +38,10 @@ class Tests(TestTools.BaseToolsTest):
     def EncodeToFile(self, encoding, string=None):
         if string is None:
             string = self.SampleData
-        data = codecs.encode(string, encoding)
+        if encoding is not None:
+            data = codecs.encode(string, encoding)
+        else:
+            data = string
         path = 'input.uni'
         self.WriteTmpFile(path, data)
         return PathClass(self.GetTmpFilePath(path))
@@ -80,6 +83,36 @@ class Tests(TestTools.BaseToolsTest):
 
     def testUtf16InUniFile(self):
         self.CheckFile('utf_16', shouldPass=True)
+
+    def testSupplementaryPlaneUnicodeCharInUtf16File(self):
+        #
+        # Supplementary Plane characters can exist in UTF-16 files,
+        # but they are not valid UCS-2 characters.
+        #
+        # This test makes sure that BaseTools rejects these characters
+        # if seen in a .uni file.
+        #
+        data = u'''
+            #langdef en-US "English"
+            #string STR_A #language en-US "CodePoint (\U00010300) > 0xFFFF"
+        '''
+
+        self.CheckFile('utf_16', shouldPass=False, string=data)
+
+    def testSurrogatePairUnicodeCharInUtf16File(self):
+        #
+        # Surrogate Pair code points are used in UTF-16 files to
+        # encode the Supplementary Plane characters. But, a Surrogate
+        # Pair code point which is not followed by another Surrogate
+        # Pair code point might be interpreted as a single code point
+        # with the Surrogate Pair code point.
+        #
+        # This test makes sure that BaseTools rejects these characters
+        # if seen in a .uni file.
+        #
+        data = codecs.BOM_UTF16_LE + '//\x01\xd8 '
+
+        self.CheckFile(encoding=None, shouldPass=False, string=data)
 
 TheTestSuite = TestTools.MakeTheTestSuite(locals())
 
