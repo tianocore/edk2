@@ -17,6 +17,7 @@
 import uuid
 
 import Common.EdkLogger as EdkLogger
+from Common.BuildToolError import FORMAT_INVALID
 
 from MetaDataTable import Table, TableFile
 from MetaDataTable import ConvertToSqlString
@@ -226,24 +227,39 @@ class PackageTable(MetaFileTable):
         return self.Exec(SqlCommand)
 
     def GetValidExpression(self, TokenSpaceGuid, PcdCName):
-        SqlCommand = "select Value1 from %s WHERE Value2='%s' and Value3='%s'" % (self.Table, TokenSpaceGuid, PcdCName)
+        SqlCommand = "select Value1,StartLine from %s WHERE Value2='%s' and Value3='%s'" % (self.Table, TokenSpaceGuid, PcdCName)
         self.Cur.execute(SqlCommand)
         validateranges = []
         validlists = []
         expressions = []
-        for row in self.Cur:
-            comment = row[0]
-            comment = comment.strip("#")
-            comment = comment.strip()
-            if comment.startswith("@ValidRange"):
-                comment = comment.replace("@ValidRange", "", 1)
-                validateranges.append(comment.split("|")[1].strip())
-            if comment.startswith("@ValidList"):
-                comment = comment.replace("@ValidList", "", 1)
-                validlists.append(comment.split("|")[1].strip())
-            if comment.startswith("@Expression"):
-                comment = comment.replace("@Expression", "", 1)
-                expressions.append(comment.split("|")[1].strip())
+        try:
+            for row in self.Cur:
+                comment = row[0]
+                
+                LineNum = row[1]
+                comment = comment.strip("#")
+                comment = comment.strip()
+                oricomment = comment
+                if comment.startswith("@ValidRange"):
+                    comment = comment.replace("@ValidRange", "", 1)
+                    validateranges.append(comment.split("|")[1].strip())
+                if comment.startswith("@ValidList"):
+                    comment = comment.replace("@ValidList", "", 1)
+                    validlists.append(comment.split("|")[1].strip())
+                if comment.startswith("@Expression"):
+                    comment = comment.replace("@Expression", "", 1)
+                    expressions.append(comment.split("|")[1].strip())
+        except Exception, Exc:
+            ValidType = ""
+            if oricomment.startswith("@ValidRange"):
+                ValidType = "@ValidRange"
+            if oricomment.startswith("@ValidList"):
+                ValidType = "@ValidList"
+            if oricomment.startswith("@Expression"):
+                ValidType = "@Expression"
+            EdkLogger.error('Parser', FORMAT_INVALID, "The syntax for %s of PCD %s.%s is incorrect" % (ValidType,TokenSpaceGuid, PcdCName),
+                            ExtraData=oricomment,File=self.MetaFile, Line=LineNum)
+            return set(), set(), set()
         return set(validateranges), set(validlists), set(expressions)
 ## Python class representation of table storing platform data
 class PlatformTable(MetaFileTable):
