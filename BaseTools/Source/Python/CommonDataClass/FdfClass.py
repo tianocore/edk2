@@ -360,6 +360,7 @@ class CapsuleClassObject :
         # TokensDict[var] = value
         self.TokensDict = {}
         self.CapsuleDataList = []
+        self.FmpPayloadList = []
 
 ## VTF data in FDF
 #

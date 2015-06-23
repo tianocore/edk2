@@ -194,6 +194,7 @@ class FileProfile :
         self.VtfList = []
         self.RuleDict = {}
         self.OptRomDict = {}
+        self.FmpPayloadDict = {}
 
 ## The syntax parser for FDF
 #
@@ -1304,6 +1305,9 @@ class FdfParser:
             while self.__GetFv():
                 pass
 
+            while self.__GetFmp():
+                pass
+
             while self.__GetCapsule():
                 pass
 
@@ -1387,7 +1391,7 @@ class FdfParser:
 
         S = self.__Token.upper()
         if S.startswith("[") and not S.startswith("[FD."):
-            if not S.startswith("[FV.") and not S.startswith("[CAPSULE.") \
+            if not S.startswith("[FV.") and not S.startswith('[FMPPAYLOAD.') and not S.startswith("[CAPSULE.") \
                 and not S.startswith("[VTF.") and not S.startswith("[RULE.") and not S.startswith("[OPTIONROM."):
                 raise Warning("Unknown section", self.FileName, self.CurrentLineNumber)
             self.__UndoToken()
@@ -2024,7 +2028,7 @@ class FdfParser:
 
         S = self.__Token.upper()
         if S.startswith("[") and not S.startswith("[FV."):
-            if not S.startswith("[CAPSULE.") \
+            if not S.startswith('[FMPPAYLOAD.') and not S.startswith("[CAPSULE.") \
                 and not S.startswith("[VTF.") and not S.startswith("[RULE.") and not S.startswith("[OPTIONROM."):
                 raise Warning("Unknown section or section appear sequence error (The correct sequence should be [FD.], [FV.], [Capsule.], [VTF.], [Rule.], [OptionRom.])", self.FileName, self.CurrentLineNumber)
             self.__UndoToken()
@@ -2996,6 +3000,67 @@ class FdfParser:
         else:
             return True
 
+    def __GetFmp(self):
+        if not self.__GetNextToken():
+            return False
+        S = self.__Token.upper()
+        if not S.startswith("[FMPPAYLOAD."):
+            if not S.startswith("[CAPSULE.") and not S.startswith("[VTF.") and not S.startswith("[RULE.") and not S.startswith("[OPTIONROM."):
+                raise Warning("Unknown section or section appear sequence error (The correct sequence should be [FD.], [FV.], [FmpPayload.], [Capsule.], [VTF.], [Rule.], [OptionRom.])", self.FileName, self.CurrentLineNumber)
+            self.__UndoToken()
+            return False
+
+        self.__UndoToken()
+        self.__SkipToToken("[FMPPAYLOAD.", True)
+        FmpUiName = self.__GetUiName().upper()
+        if FmpUiName in self.Profile.FmpPayloadDict:
+            raise Warning("Duplicated FMP UI name found: %s" % FmpUiName, self.FileName, self.CurrentLineNumber)
+
+        FmpData = CapsuleData.CapsulePayload()
+        FmpData.UiName = FmpUiName
+
+        if not self.__IsToken( "]"):
+            raise Warning("expected ']'", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("The FMP payload section is empty!", self.FileName, self.CurrentLineNumber)
+        FmpKeyList = ['IMAGE_HEADER_INIT_VERSION', 'IMAGE_TYPE_ID', 'IMAGE_INDEX', 'HARDWARE_INSTANCE']
+        while self.__Token in FmpKeyList:
+            Name = self.__Token
+            FmpKeyList.remove(Name)
+            if not self.__IsToken("="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+            if Name == 'IMAGE_TYPE_ID':
+                if not self.__GetNextGuid():
+                    raise Warning("expected GUID value for IMAGE_TYPE_ID", self.FileName, self.CurrentLineNumber)
+                FmpData.ImageTypeId = self.__Token
+            else:
+                if not self.__GetNextToken():
+                    raise Warning("expected value of %s" % Name, self.FileName, self.CurrentLineNumber)
+                Value = self.__Token
+                if Name == 'IMAGE_HEADER_INIT_VERSION':
+                    FmpData.Version = Value
+                elif Name == 'IMAGE_INDEX':
+                    FmpData.ImageIndex = Value
+                elif Name == 'HARDWARE_INSTANCE':
+                    FmpData.HardwareInstance = Value
+            if not self.__GetNextToken():
+                break
+        else:
+            self.__UndoToken()
+
+        if FmpKeyList:
+            raise Warning("Missing keywords %s in FMP payload section" % ', '.join(FmpKeyList), self.FileName, self.CurrentLineNumber)
+        ImageFile = self.__ParseRawFileStatement()
+        if not ImageFile:
+            raise Warning("Missing image file in FMP payload section", self.FileName, self.CurrentLineNumber)
+        FmpData.ImageFile = ImageFile
+        VendorCodeFile = self.__ParseRawFileStatement()
+        if VendorCodeFile:
+            FmpData.VendorCodeFile = VendorCodeFile
+        self.Profile.FmpPayloadDict[FmpUiName] = FmpData
+        return True
+
     ## __GetCapsule() method
     #
     #   Get capsule section contents and store its data into capsule list of self.Profile
@@ -3070,7 +3135,7 @@ class FdfParser:
     def __GetCapsuleTokens(self, Obj):
         if not self.__GetNextToken():
             return False
-        while self.__Token in ("CAPSULE_GUID", "CAPSULE_HEADER_SIZE", "CAPSULE_FLAGS", "OEM_CAPSULE_FLAGS"):
+        while self.__Token in ("CAPSULE_GUID", "CAPSULE_HEADER_SIZE", "CAPSULE_FLAGS", "OEM_CAPSULE_FLAGS", "CAPSULE_HEADER_INIT_VERSION"):
             Name = self.__Token.strip()
             if not self.__IsToken("="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -3121,7 +3186,8 @@ class FdfParser:
             IsFd = self.__GetFdStatement(Obj)
             IsAnyFile = self.__GetAnyFileStatement(Obj)
             IsAfile = self.__GetAfileStatement(Obj)
-            if not (IsInf or IsFile or IsFv or IsFd or IsAnyFile or IsAfile):
+            IsFmp = self.__GetFmpStatement(Obj)
+            if not (IsInf or IsFile or IsFv or IsFd or IsAnyFile or IsAfile or IsFmp):
                 break
 
     ## __GetFvStatement() method
@@ -3180,23 +3246,32 @@ class FdfParser:
         CapsuleObj.CapsuleDataList.append(CapsuleFd)
         return True
 
-    ## __GetAnyFileStatement() method
-    #
-    #   Get AnyFile for capsule
-    #
-    #   @param  self        The object pointer
-    #   @param  CapsuleObj  for whom AnyFile is got
-    #   @retval True        Successfully find a Anyfile statement
-    #   @retval False       Not able to find a AnyFile statement
-    #
-    def __GetAnyFileStatement(self, CapsuleObj):
-
-        if not self.__IsKeyword("FILE"):
+    def __GetFmpStatement(self, CapsuleObj):
+        if not self.__IsKeyword("FMP"):
             return False
+
+        if not self.__IsKeyword("PAYLOAD"):
+            self.__UndoToken()
+            return False
+
+        if not self.__IsToken("="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected payload name after FMP PAYLOAD =", self.FileName, self.CurrentLineNumber)
+        Payload = self.__Token.upper()
+        if Payload not in self.Profile.FmpPayloadDict:
+            raise Warning("This FMP Payload does not exist: %s" % self.__Token, self.FileName, self.CurrentLineNumber)
+        CapsuleObj.FmpPayloadList.append(self.Profile.FmpPayloadDict[Payload])
+        return True
+
+    def __ParseRawFileStatement(self):
+        if not self.__IsKeyword("FILE"):
+            return None
 
         if not self.__IsKeyword("DATA"):
             self.__UndoToken()
-            return False
+            return None
 
         if not self.__IsToken("="):
             raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -3208,6 +3283,21 @@ class FdfParser:
         AnyFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(AnyFileName)
         if not os.path.exists(AnyFileName):
             raise Warning("File %s not exists"%AnyFileName, self.FileName, self.CurrentLineNumber)
+        return AnyFileName
+
+    ## __GetAnyFileStatement() method
+    #
+    #   Get AnyFile for capsule
+    #
+    #   @param  self        The object pointer
+    #   @param  CapsuleObj  for whom AnyFile is got
+    #   @retval True        Successfully find a Anyfile statement
+    #   @retval False       Not able to find a AnyFile statement
+    #
+    def __GetAnyFileStatement(self, CapsuleObj):
+        AnyFileName = self.__ParseRawFileStatement()
+        if not AnyFileName:
+            return False
 
         CapsuleAnyFile = CapsuleData.CapsuleAnyFile()
         CapsuleAnyFile.FileName = AnyFileName

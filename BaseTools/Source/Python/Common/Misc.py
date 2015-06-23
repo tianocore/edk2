@@ -24,6 +24,7 @@ import re
 import cPickle
 import array
 import shutil
+from struct import pack
 from UserDict import IterableUserDict
 from UserList import UserList
 
@@ -2007,6 +2008,26 @@ class SkuClass():
     AvailableSkuIdSet = property(__GetAvailableSkuIds)
     SkuUsageType = property(__SkuUsageType)
     AvailableSkuIdNumSet = property(__GetAvailableSkuIdNumber)
+
+#
+# Pack a registry format GUID
+#
+def PackRegistryFormatGuid(Guid):
+    Guid = Guid.split('-')
+    return pack('=LHHBBBBBBBB',
+                int(Guid[0], 16),
+                int(Guid[1], 16),
+                int(Guid[2], 16),
+                int(Guid[3][-4:-2], 16),
+                int(Guid[3][-2:], 16),
+                int(Guid[4][-12:-10], 16),
+                int(Guid[4][-10:-8], 16),
+                int(Guid[4][-8:-6], 16),
+                int(Guid[4][-6:-4], 16),
+                int(Guid[4][-4:-2], 16),
+                int(Guid[4][-2:], 16)
+                )
+
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another
