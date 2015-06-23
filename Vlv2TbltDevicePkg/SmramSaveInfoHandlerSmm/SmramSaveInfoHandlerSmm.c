@@ -3,7 +3,7 @@
 
   This driver is for ECP platforms.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -27,6 +27,7 @@
 #include <Protocol/SmmSwDispatch.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmControl.h>
+#include <Guid/Vlv2DeviceRefCodePkgTokenSpace.h>
 
 #define SMM_FROM_SMBASE_DRIVER        0x55
 #define SMM_FROM_CPU_DRIVER_SAVE_INFO 0x81
@@ -61,29 +62,15 @@ SmramSaveInfoHandler (
   IN  EFI_SMM_SW_DISPATCH_CONTEXT   *DispatchContext
   )
 {
-  EFI_STATUS Status;
-  UINT64     VarData[3];
-  UINTN      VarSize;
-
   ASSERT (DispatchContext != NULL);
   ASSERT (DispatchContext->SwSmiInputValue == SMM_FROM_SMBASE_DRIVER);
 
   if (!mLocked && IoRead8 (mSmiDataRegister) == SMM_FROM_CPU_DRIVER_SAVE_INFO) {
-    VarSize = sizeof (VarData);
-    Status = gRT->GetVariable (
-                    L"SmramCpuNvs",
-                    &mSmramCpuNvsHeaderGuid,
-                    NULL,
-                    &VarSize,
-                    VarData
-                    );
-    if (!EFI_ERROR (Status) && VarSize == sizeof (VarData)) {
       CopyMem (
-        (VOID *)(UINTN)(VarData[0]),
-        (VOID *)(UINTN)(VarData[1]),
-        (UINTN)(VarData[2])
+        (VOID *)(UINTN)(PcdGetEx64 (&gEfiVLVTokenSpaceGuid, PcdCpuLockBoxDataAddress)),
+        (VOID *)(UINTN)(PcdGetEx64 (&gEfiVLVTokenSpaceGuid, PcdCpuSmramCpuDataAddress)),
+        (UINTN)(PcdGetEx64 (&gEfiVLVTokenSpaceGuid, PcdCpuLockBoxSize))
         );
-    }
   }
 }
 

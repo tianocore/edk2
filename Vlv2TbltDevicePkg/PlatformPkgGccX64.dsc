@@ -872,6 +872,9 @@
   gEfiCpuTokenSpaceGuid.PcdCpuHotPlugDataAddress|0
   gEfiCpuTokenSpaceGuid.PcdCpuCallbackSignal|0
   gEfiCpuTokenSpaceGuid.PcdCpuConfigContextBuffer|0
+  gEfiVLVTokenSpaceGuid.PcdCpuLockBoxDataAddress|0
+  gEfiVLVTokenSpaceGuid.PcdCpuSmramCpuDataAddress|0
+  gEfiVLVTokenSpaceGuid.PcdCpuLockBoxSize|0
 
 [Components.IA32]
 
