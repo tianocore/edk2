@@ -293,8 +293,8 @@ class UniFileClassObject(object):
             if ((Line.count(u'"', 0, CommentPos) - Line.count(u'\\"', 0, CommentPos)) & 1) == 1:
                 CommentPos = Line.find (Comment, CommentPos + 1)
             else:
-                return Line[:CommentPos]
-        return Line
+                return Line[:CommentPos].strip()
+        return Line.strip()
                 
 
     #
