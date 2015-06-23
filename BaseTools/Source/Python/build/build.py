@@ -1965,6 +1965,7 @@ def Main():
     EdkLogger.quiet(time.strftime("Build start time: %H:%M:%S, %b.%d %Y\n", time.localtime()));
     ReturnCode = 0
     MyBuild = None
+    BuildError = True
     try:
         if len(Target) == 0:
             Target = "all"
@@ -2035,6 +2036,10 @@ def Main():
             SqlCommand = """drop table IF EXISTS %s""" % TmpTableName
             TmpTableDict[TmpTableName].execute(SqlCommand)
         #MyBuild.DumpBuildData()
+        #
+        # All job done, no error found and no exception raised
+        #
+        BuildError = False
     except FatalError, X:
         if MyBuild != None:
             # for multi-thread build exits safely
@@ -2095,7 +2100,8 @@ def Main():
     else:
         BuildDurationStr = time.strftime("%H:%M:%S", BuildDuration)
     if MyBuild != None:
-        MyBuild.BuildReport.GenerateReport(BuildDurationStr)
+        if not BuildError:
+            MyBuild.BuildReport.GenerateReport(BuildDurationStr)
         MyBuild.Db.Close()
     EdkLogger.SetLevel(EdkLogger.QUIET)
     EdkLogger.quiet("\n- %s -" % Conclusion)
