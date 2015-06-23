@@ -297,9 +297,12 @@ class UniFileClassObject(object):
             EdkLogger.Error("build", FILE_OPEN_FAILURE, ExtraData=File)
 
         #
-        # We currently only support UTF-16
+        # Detect Byte Order Mark at beginning of file.  Default to UTF-8
         #
-        Encoding = 'utf-16'
+        Encoding = 'utf-8'
+        if (FileIn.startswith(codecs.BOM_UTF16_BE) or
+            FileIn.startswith(codecs.BOM_UTF16_LE)):
+            Encoding = 'utf-16'
 
         self.VerifyUcs2Data(FileIn, FileName, Encoding)
 
