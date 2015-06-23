@@ -1142,7 +1142,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                 TokenSpaceGuid,
                                                 self._PCD_TYPE_STRING_[Type],
                                                 '',
-                                                '',
+                                                InitialValue,
                                                 '',
                                                 MaxDatumSize,
                                                 {SkuName : SkuInfo},
