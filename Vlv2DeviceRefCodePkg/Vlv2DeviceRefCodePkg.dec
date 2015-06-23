@@ -116,6 +116,9 @@
   gEfiVLVTokenSpaceGuid.PcdFTPMResponse|0|UINT32|0x1000020E
   gEfiVLVTokenSpaceGuid.PcdFTPMNotRespond|FALSE|BOOLEAN|0x1000020F
   gEfiVLVTokenSpaceGuid.PcdFTPMStatus|0|UINT32|0x10000210
+  gEfiVLVTokenSpaceGuid.PcdCpuLockBoxDataAddress|0x0|UINT64|0x10000211
+  gEfiVLVTokenSpaceGuid.PcdCpuSmramCpuDataAddress|0x0|UINT64|0x10000212
+  gEfiVLVTokenSpaceGuid.PcdCpuLockBoxSize|0x0|UINT64|0x10000213
 
 [PcdsFeatureFlag]
   gVlvRefCodePkgTokenSpaceGuid.PcdCeAtaSupport|FALSE|BOOLEAN|0x12
