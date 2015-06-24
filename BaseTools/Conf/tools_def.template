@@ -3821,7 +3821,7 @@ DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mword-relocations -m
 DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mcmodel=large -mlittle-endian -fno-short-enums -save-temps -fverbose-asm -fsigned-char  -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-builtin -Wno-address
 DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
 DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
-DEFINE GCC_ARM_AARCH64_DLINK_COMMON= -Ttext=0x0 --emit-relocs -nostdlib --gc-sections -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+DEFINE GCC_ARM_AARCH64_DLINK_COMMON= --script=$(EDK_TOOLS_PATH)/Scripts/gcc-arm-ld-script --emit-relocs -nostdlib --gc-sections -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 DEFINE GCC_IA32_X64_ASLDLINK_FLAGS = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
 DEFINE GCC_ARM_AARCH64_ASLDLINK_FLAGS = DEF(GCC_ARM_AARCH64_DLINK_COMMON) --entry ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
 DEFINE GCC_IA32_X64_DLINK_FLAGS    = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
