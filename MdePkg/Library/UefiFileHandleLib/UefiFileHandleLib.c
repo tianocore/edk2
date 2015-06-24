@@ -1027,7 +1027,13 @@ FileHandleReadLine(
 }
 
 /**
-  Function to write a line of unicode text to a file.
+  Function to write a line of text to a file.
+  
+  If the file is a Unicode file (with UNICODE file tag) then write the unicode 
+  text.
+  If the file is an ASCII file then write the ASCII text.
+  If the size of file is zero (without file tag at the beginning) then write 
+  ASCII text as default.
 
   @param[in]     Handle         FileHandle to write to.
   @param[in]     Buffer         Buffer to write, if NULL the function will
@@ -1036,6 +1042,8 @@ FileHandleReadLine(
   @retval  EFI_SUCCESS            The data was written.
                                   Buffer is NULL.
   @retval  EFI_INVALID_PARAMETER  Handle is NULL.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate temporary space for ASCII 
+                                  string due to out of resources.
 
   @sa FileHandleWrite
 **/
@@ -1046,8 +1054,14 @@ FileHandleWriteLine(
   IN CHAR16          *Buffer
   )
 {
-  EFI_STATUS Status;
-  UINTN      Size;
+  EFI_STATUS  Status;
+  CHAR16      CharBuffer;
+  UINTN       Size;
+  UINTN       CharSize;
+  UINT64      FileSize;
+  UINT64      OriginalFilePosition;
+  BOOLEAN     Ascii;
+  CHAR8       *AsciiBuffer;
 
   if (Buffer == NULL) {
     return (EFI_SUCCESS);
@@ -1056,14 +1070,79 @@ FileHandleWriteLine(
   if (Handle == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
-
-  Size = StrSize(Buffer) - sizeof(Buffer[0]);
-  Status = FileHandleWrite(Handle, &Size, Buffer);
+  
+  Ascii = FALSE;
+  AsciiBuffer = NULL;
+  
+  Status = FileHandleGetPosition(Handle, &OriginalFilePosition);
   if (EFI_ERROR(Status)) {
-    return (Status);
+    return Status;
   }
-  Size = StrSize(L"\r\n") - sizeof(CHAR16);
-  return FileHandleWrite(Handle, &Size, L"\r\n");
+  
+  Status = FileHandleSetPosition(Handle, 0);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+  
+  Status = FileHandleGetSize(Handle, &FileSize);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+  
+  if (FileSize == 0) {
+    Ascii = TRUE;
+  } else {
+    CharSize = sizeof (CHAR16);
+    Status = FileHandleRead (Handle, &CharSize, &CharBuffer);
+    ASSERT_EFI_ERROR (Status);
+    if (CharBuffer == gUnicodeFileTag) {
+      Ascii = FALSE;
+    } else {
+      Ascii = TRUE;
+    }
+  }
+  
+  Status = FileHandleSetPosition(Handle, OriginalFilePosition);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+  
+  if (Ascii) {
+    Size = ( StrSize(Buffer) / sizeof(CHAR16) ) * sizeof(CHAR8);
+    AsciiBuffer = (CHAR8 *)AllocateZeroPool(Size);
+    if (AsciiBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    UnicodeStrToAsciiStr (Buffer, AsciiBuffer);
+    
+    Size = AsciiStrSize(AsciiBuffer) - sizeof(CHAR8);
+    Status = FileHandleWrite(Handle, &Size, AsciiBuffer);
+    if (EFI_ERROR(Status)) {
+      FreePool (AsciiBuffer);
+      return (Status);
+    }
+    Size = AsciiStrSize("\r\n") - sizeof(CHAR8);
+    Status = FileHandleWrite(Handle, &Size, "\r\n");
+  } else {
+    if (OriginalFilePosition == 0) {
+      Status = FileHandleSetPosition (Handle, sizeof(CHAR16));
+      if (EFI_ERROR(Status)) {
+        return Status;
+      }
+    }
+    Size = StrSize(Buffer) - sizeof(CHAR16);
+    Status = FileHandleWrite(Handle, &Size, Buffer);
+    if (EFI_ERROR(Status)) {
+      return (Status);
+    }
+    Size = StrSize(L"\r\n") - sizeof(CHAR16);
+    Status = FileHandleWrite(Handle, &Size, L"\r\n");
+  }
+  
+  if (AsciiBuffer != NULL) {
+    FreePool (AsciiBuffer);
+  }
+  return Status;
 }
 
 /**

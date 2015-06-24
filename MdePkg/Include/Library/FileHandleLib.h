@@ -433,7 +433,13 @@ FileHandleReturnLine(
   );
 
 /**
-  Function to write a line of unicode text to a file.
+  Function to write a line of text to a file.
+  
+  If the file is a Unicode file (with UNICODE file tag) then write the unicode 
+  text.
+  If the file is an ASCII file then write the ASCII text.
+  If the size of file is zero (without file tag at the beginning) then write 
+  ASCII text as default.
 
   @param[in]     Handle         FileHandle to write to.
   @param[in]     Buffer         Buffer to write, if NULL the function will
@@ -442,6 +448,8 @@ FileHandleReturnLine(
   @retval  EFI_SUCCESS            The data was written.
                                   Buffer is NULL.
   @retval  EFI_INVALID_PARAMETER  Handle is NULL.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate temporary space for ASCII 
+                                  string due to out of resources.
 
   @sa FileHandleWrite
 **/
