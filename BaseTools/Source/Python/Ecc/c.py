@@ -1172,6 +1172,8 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall=False, TargetTy
             else:
                 TypeList = GetDataTypeFromModifier(Param.Modifier).split()
                 Type = TypeList[-1]
+                if Type == '*' and len(TypeList) >= 2:
+                    Type = TypeList[-2]
                 if len(TypeList) > 1 and StarList != None:
                     for Star in StarList:
                         Type = Type.strip()
