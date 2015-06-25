@@ -65,6 +65,7 @@
   gEfiFileInfoGuid
   gEfiFileSystemInfoGuid
   gEfiFileSystemVolumeLabelInfoIdGuid
+  gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid
