@@ -22,6 +22,7 @@ import copy
 import Common.EdkLogger as EdkLogger
 import Common.GlobalData as GlobalData
 import EccGlobalData
+import EccToolError
 
 from CommonDataClass.DataClass import *
 from Common.DataType import *
@@ -1782,6 +1783,89 @@ class DecParser(MetaFileParser):
         if not IsValid:
             EdkLogger.error('Parser', FORMAT_INVALID, Cause, ExtraData=self._CurrentLine,
                             File=self.MetaFile, Line=self._LineIndex+1)
+        
+        if EccGlobalData.gConfig.UniCheckPCDInfo == '1' or EccGlobalData.gConfig.UniCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+            # check Description, Prompt information
+            PatternDesc = re.compile('##\s*([\x21-\x7E\s]*)', re.S)
+            PatternPrompt = re.compile('#\s+@Prompt\s+([\x21-\x7E\s]*)', re.S)
+            Description = None
+            Prompt = None
+            # check @ValidRange, @ValidList and @Expression format valid
+            ErrorCodeValid = '0x0 <= %s <= 0xFFFFFFFF'
+            PatternValidRangeIn = '(NOT)?\s*(\d+\s*-\s*\d+|0[xX][a-fA-F0-9]+\s*-\s*0[xX][a-fA-F0-9]+|LT\s*\d+|LT\s*0[xX][a-fA-F0-9]+|GT\s*\d+|GT\s*0[xX][a-fA-F0-9]+|LE\s*\d+|LE\s*0[xX][a-fA-F0-9]+|GE\s*\d+|GE\s*0[xX][a-fA-F0-9]+|XOR\s*\d+|XOR\s*0[xX][a-fA-F0-9]+|EQ\s*\d+|EQ\s*0[xX][a-fA-F0-9]+)'
+            PatternValidRng = re.compile('^' + '(NOT)?\s*' + PatternValidRangeIn + '$')
+            for Comment in self._Comments:
+                Comm = Comment[0].strip()
+                if not Comm:
+                    continue
+                if not Description:
+                    Description = PatternDesc.findall(Comm)
+                if not Prompt:
+                    Prompt = PatternPrompt.findall(Comm)
+                if Comm[0] == '#':
+                    ValidFormt = Comm.lstrip('#')
+                    ValidFormt = ValidFormt.lstrip()
+                    if ValidFormt[0:11] == '@ValidRange':
+                        ValidFormt = ValidFormt[11:]
+                        ValidFormt = ValidFormt.lstrip()
+                        try:
+                            ErrorCode, Expression = ValidFormt.split('|', 1)
+                        except ValueError:
+                            ErrorCode = '0x0'
+                            Expression = ValidFormt
+                        ErrorCode, Expression = ErrorCode.strip(), Expression.strip()
+                        try:
+                            if not eval(ErrorCodeValid % ErrorCode):
+                                EdkLogger.warn('Parser', '@ValidRange ErrorCode(%s) of PCD %s is not valid UINT32 value.' % (ErrorCode, TokenList[0]))
+                        except:
+                            EdkLogger.warn('Parser', '@ValidRange ErrorCode(%s) of PCD %s is not valid UINT32 value.' % (ErrorCode, TokenList[0]))
+                        if not PatternValidRng.search(Expression):
+                            EdkLogger.warn('Parser', '@ValidRange Expression(%s) of PCD %s is incorrect format.' % (Expression, TokenList[0]))
+                    if ValidFormt[0:10] == '@ValidList':
+                        ValidFormt = ValidFormt[10:]
+                        ValidFormt = ValidFormt.lstrip()
+                        try:
+                            ErrorCode, Expression = ValidFormt.split('|', 1)
+                        except ValueError:
+                            ErrorCode = '0x0'
+                            Expression = ValidFormt
+                        ErrorCode, Expression = ErrorCode.strip(), Expression.strip()
+                        try:
+                            if not eval(ErrorCodeValid % ErrorCode):
+                                EdkLogger.warn('Parser', '@ValidList ErrorCode(%s) of PCD %s is not valid UINT32 value.' % (ErrorCode, TokenList[0]))
+                        except:
+                            EdkLogger.warn('Parser', '@ValidList ErrorCode(%s) of PCD %s is not valid UINT32 value.' % (ErrorCode, TokenList[0]))
+                        Values = Expression.split(',')
+                        for Value in Values:
+                            Value = Value.strip()
+                            try:
+                                eval(Value)
+                            except:
+                                EdkLogger.warn('Parser', '@ValidList Expression of PCD %s include a invalid value(%s).' % (TokenList[0], Value))
+                                break
+                    if ValidFormt[0:11] == '@Expression':
+                        ValidFormt = ValidFormt[11:]
+                        ValidFormt = ValidFormt.lstrip()
+                        try:
+                            ErrorCode, Expression = ValidFormt.split('|', 1)
+                        except ValueError:
+                            ErrorCode = '0x0'
+                            Expression = ValidFormt
+                        ErrorCode, Expression = ErrorCode.strip(), Expression.strip()
+                        try:
+                            if not eval(ErrorCodeValid % ErrorCode):
+                                EdkLogger.warn('Parser', '@Expression ErrorCode(%s) of PCD %s is not valid UINT32 value.' % (ErrorCode, TokenList[0]))
+                        except:
+                            EdkLogger.warn('Parser', '@Expression ErrorCode(%s) of PCD %s is not valid UINT32 value.' % (ErrorCode, TokenList[0]))
+                        if not Expression:
+                            EdkLogger.warn('Parser', '@Expression Expression of PCD %s is incorrect format.' % TokenList[0])
+            if not Description:
+                EdkLogger.warn('Parser', 'PCD %s Description information is not provided.' % TokenList[0])
+            if not Prompt:
+                EdkLogger.warn('Parser', 'PCD %s Prompt information is not provided.' % TokenList[0])
+            # check Description, Prompt localization information
+            if self._UniObj:
+                self._UniObj.CheckPcdInfo(TokenList[0])
 
         if ValueList[0] in ['True', 'true', 'TRUE']:
             ValueList[0] = '1'
