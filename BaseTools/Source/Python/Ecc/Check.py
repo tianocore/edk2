@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define checkpoints used by ECC tool
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -100,6 +100,9 @@ class Check(object):
                         Dirnames.append(Dirname)
             if IgnoredPattern.match(Dirpath.upper()):
                 continue
+            for f in Filenames[:]:
+                if f.lower() in EccGlobalData.gConfig.SkipFileList:
+                    Filenames.remove(f)
             yield (Dirpath, Dirnames, Filenames)
 
     # Check whether return type exists and in the first line

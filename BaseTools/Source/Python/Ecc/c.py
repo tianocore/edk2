@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the c coding style checking of ECC tool
 #
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -514,6 +514,8 @@ def CollectSourceCodeDataIntoDB(RootDir):
                     dirnames.append(Dirname)
 
         for f in filenames:
+            if f.lower() in EccGlobalData.gConfig.SkipFileList:
+                continue
             collector = None
             FullName = os.path.normpath(os.path.join(dirpath, f))
             model = DataClass.MODEL_FILE_OTHERS

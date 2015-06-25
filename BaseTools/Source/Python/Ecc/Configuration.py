@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define class Configuration
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -256,6 +256,9 @@ class Configuration(object):
 
         # The directory listed here will not be parsed, split with ','
         self.SkipDirList = []
+        
+        # The file listed here will not be parsed, split with ','
+        self.SkipFileList = []
 
         # A list for binary file ext name
         self.BinaryExtList = []
@@ -285,6 +288,8 @@ class Configuration(object):
                 if List[0] == 'MetaDataFileCheckPathOfGenerateFileList' and List[1] == "":
                     continue
                 if List[0] == 'SkipDirList':
+                    List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
+                if List[0] == 'SkipFileList':
                     List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
                 if List[0] == 'BinaryExtList':
                     List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
