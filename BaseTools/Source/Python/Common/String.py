@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common string related functions used in parsing process
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -272,7 +272,8 @@ def ReplaceMacro(String, MacroDefinitions={}, SelfReplacement=False, RaiseError=
                 if SelfReplacement:
                     String = String.replace("$(%s)" % Macro, '')
                 continue
-            String = String.replace("$(%s)" % Macro, MacroDefinitions[Macro])
+            if "$(%s)" % Macro not in MacroDefinitions[Macro]:
+                String = String.replace("$(%s)" % Macro, MacroDefinitions[Macro])
         # in case there's macro not defined
         if String == LastString:
             break

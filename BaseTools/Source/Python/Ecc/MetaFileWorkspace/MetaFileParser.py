@@ -1312,6 +1312,9 @@ class DscParser(MetaFileParser):
                                 File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
                                 Line=self._LineIndex+1)
                 Result = Excpt.result
+            except BadExpression, Exc:
+                EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc), self._ValueList[1])
+                Result = False
 
         if self._ItemType in [MODEL_META_DATA_CONDITIONAL_STATEMENT_IF,
                               MODEL_META_DATA_CONDITIONAL_STATEMENT_IFDEF,
