@@ -171,6 +171,8 @@ CbPeiEntryPoint (
   FRAME_BUFFER_INFO*   pFbInfo;
   ACPI_BOARD_INFO*     pAcpiBoardInfo;
   UINTN                PmCtrlRegBase, PmTimerRegBase, ResetRegAddress, ResetValue;
+  UINTN                PmEvtBase;
+  UINTN                PmGpeEnBase;
 
   LowMemorySize = 0;
   HighMemorySize = 0;
@@ -355,7 +357,7 @@ CbPeiEntryPoint (
   //
   // Create guid hob for acpi board information
   //
-  Status = CbParseFadtInfo (&PmCtrlRegBase, &PmTimerRegBase, &ResetRegAddress, &ResetValue);
+  Status = CbParseFadtInfo (&PmCtrlRegBase, &PmTimerRegBase, &ResetRegAddress, &ResetValue, &PmEvtBase, &PmGpeEnBase);
   ASSERT_EFI_ERROR (Status);
   pAcpiBoardInfo = NULL;
   pAcpiBoardInfo = BuildGuidHob (&gUefiAcpiBoardInfoGuid, sizeof (ACPI_BOARD_INFO));
@@ -364,6 +366,8 @@ CbPeiEntryPoint (
   pAcpiBoardInfo->PmTimerRegBase = (UINT64)PmTimerRegBase;
   pAcpiBoardInfo->ResetRegAddress = (UINT64)ResetRegAddress;
   pAcpiBoardInfo->ResetValue = (UINT8)ResetValue;
+  pAcpiBoardInfo->PmEvtBase = (UINT64)PmEvtBase;
+  pAcpiBoardInfo->PmGpeEnBase = (UINT64)PmGpeEnBase;
   DEBUG ((EFI_D_ERROR, "Create acpi board info guid hob\n"));
 
   //

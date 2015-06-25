@@ -20,7 +20,9 @@
 ///
 extern EFI_GUID gUefiAcpiBoardInfoGuid;
 
-typedef struct {  
+typedef struct {
+  UINT64             PmEvtBase;
+  UINT64             PmGpeEnBase;
   UINT64             PmCtrlRegBase;
   UINT64             PmTimerRegBase;
   UINT64             ResetRegAddress;

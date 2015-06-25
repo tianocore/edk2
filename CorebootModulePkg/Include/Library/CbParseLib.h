@@ -91,6 +91,8 @@ CbParseSmbiosTable (
   @param  pPmTimerReg        Pointer to the address of power management timer register
   @param  pResetReg          Pointer to the address of system reset register
   @param  pResetValue        Pointer to the value to be writen to the system reset register
+  @param  pPmEvtReg          Pointer to the address of power management event register
+  @param  pPmGpeEnReg        Pointer to the address of power management GPE enable register
 
   @retval RETURN_SUCCESS     Successfully find out all the required fadt information.
   @retval RETURN_NOT_FOUND   Failed to find the fadt table.
@@ -101,7 +103,9 @@ CbParseFadtInfo (
   IN UINTN*     pPmCtrlReg,
   IN UINTN*     pPmTimerReg,
   IN UINTN*     pResetReg,
-  IN UINTN*     pResetValue
+  IN UINTN*     pResetValue,
+  IN UINTN*     pPmEvtReg,
+  IN UINTN*     pPmGpeEnReg
   );
   
 /**
