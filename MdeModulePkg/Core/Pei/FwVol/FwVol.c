@@ -1,7 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -203,16 +203,34 @@ FileHandleToVolume (
   UINTN                       Index;
   PEI_CORE_INSTANCE           *PrivateData;
   EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  UINTN                       BestIndex;
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
+  BestIndex   = PrivateData->FvCount;
   
+  //
+  // Find the best matched FV image that includes this FileHandle.
+  // FV may include the child FV, and they are in the same continuous space. 
+  // If FileHandle is from the child FV, the updated logic can find its matched FV.
+  //
   for (Index = 0; Index < PrivateData->FvCount; Index++) {
     FwVolHeader = PrivateData->Fv[Index].FvHeader;
     if (((UINT64) (UINTN) FileHandle > (UINT64) (UINTN) FwVolHeader ) &&   \
         ((UINT64) (UINTN) FileHandle <= ((UINT64) (UINTN) FwVolHeader + FwVolHeader->FvLength - 1))) {
-      return &PrivateData->Fv[Index];
+      if (BestIndex == PrivateData->FvCount) {
+        BestIndex = Index;
+      } else {
+        if ((UINT64) (UINTN) PrivateData->Fv[BestIndex].FvHeader < (UINT64) (UINTN) FwVolHeader) {
+          BestIndex = Index;
+        }
+      }
     }
   }
+
+  if (BestIndex < PrivateData->FvCount) {
+    return &PrivateData->Fv[BestIndex];
+  }
+
   return NULL;
 }
 
