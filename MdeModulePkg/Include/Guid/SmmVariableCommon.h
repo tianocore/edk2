@@ -71,6 +71,8 @@ typedef struct {
 
 #define SMM_VARIABLE_FUNCTION_VAR_CHECK_VARIABLE_PROPERTY_GET  10
 
+#define SMM_VARIABLE_FUNCTION_GET_PAYLOAD_SIZE        11
+
 ///
 /// Size of SMM communicate header, without including the payload.
 ///
@@ -119,5 +121,9 @@ typedef struct {
   VAR_CHECK_VARIABLE_PROPERTY   VariableProperty;
   CHAR16                        Name[1];
 } SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY;
+
+typedef struct {
+  UINTN                         VariablePayloadSize;
+} SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE;
 
 #endif // _SMM_VARIABLE_COMMON_H_

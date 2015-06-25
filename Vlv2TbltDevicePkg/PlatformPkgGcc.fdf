@@ -298,11 +298,7 @@ INF IntelFspWrapperPkg/FspInitPei/FspInitPei.inf
 !endif
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/CpuPeim.inf
 INF MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
-!if $(SECURE_BOOT_ENABLE) == TRUE
-INF SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf
-!else
 INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-!endif
 
 INF $(PLATFORM_PACKAGE)/PlatformPei/PlatformPei.inf
 
@@ -393,19 +389,13 @@ INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF IntelFrameworkModulePkg/Universal/Acpi/AcpiS3SaveDxe/AcpiS3SaveDxe.inf
 
-!if $(SECURE_BOOT_ENABLE)
-INF SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmmRuntimeDxe.inf
-INF SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmm.inf
-INF $(PLATFORM_PACKAGE)/FvbRuntimeDxe/FvbSmm.inf
-INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PchSpiSmm.inf
-INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-!else
 INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
 INF $(PLATFORM_PACKAGE)/FvbRuntimeDxe/FvbSmm.inf
 INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PchSpiSmm.inf
+!if $(SECURE_BOOT_ENABLE)
+INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !endif
 
 INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf

@@ -126,7 +126,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1
 
 [Components]
-  SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf
   SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
   #SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
   SecurityPkg/Library/DxeImageAuthenticationStatusLib/DxeImageAuthenticationStatusLib.inf
@@ -136,7 +135,6 @@
   #
   # Application
   #
-  SecurityPkg/Application/VariableInfo/VariableInfo.inf
   SecurityPkg/Application/RngTest/RngTest.inf
 
   #
@@ -175,12 +173,13 @@
   #
   SecurityPkg/Library/DxeRsa2048Sha256GuidedSectionExtractLib/DxeRsa2048Sha256GuidedSectionExtractLib.inf
   SecurityPkg/Library/PeiRsa2048Sha256GuidedSectionExtractLib/PeiRsa2048Sha256GuidedSectionExtractLib.inf
-  
+
+  SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+
 [Components.IA32, Components.X64, Components.IPF]
 #  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
 #  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # TPM
@@ -235,8 +234,6 @@
   SecurityPkg/Pkcs7Verify/Pkcs7VerifyDxe/Pkcs7VerifyDxe.inf
 
 [Components.IA32, Components.X64]
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmm.inf
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmmRuntimeDxe.inf
   SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
   SecurityPkg/Tcg/TrEESmm/TrEESmm.inf
   #

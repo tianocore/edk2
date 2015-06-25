@@ -347,7 +347,7 @@ GetVarStoreHeader (
                                  FALSE - Variable is non-volatile.
   @param[in]  Global             Pointer to VARAIBLE_GLOBAL structure.
   @param[in]  Instance           Instance of FV Block services.
-  @param[out] VariableHeader     Pointer to VARIABLE_HEADER for output.
+  @param[out] VariableHeader     Pointer to AUTHENTICATED_VARIABLE_HEADER for output.
 
   @retval TRUE                   Variable header is valid.
   @retval FALSE                  Variable header is not valid.
@@ -355,15 +355,15 @@ GetVarStoreHeader (
 **/
 BOOLEAN
 IsValidVariableHeader (
-  IN  EFI_PHYSICAL_ADDRESS   VariableAddress,
-  IN  BOOLEAN                Volatile,
-  IN  VARIABLE_GLOBAL        *Global,
-  IN  UINTN                  Instance,
-  OUT VARIABLE_HEADER        *VariableHeader  OPTIONAL
+  IN  EFI_PHYSICAL_ADDRESS              VariableAddress,
+  IN  BOOLEAN                           Volatile,
+  IN  VARIABLE_GLOBAL                   *Global,
+  IN  UINTN                             Instance,
+  OUT AUTHENTICATED_VARIABLE_HEADER     *VariableHeader  OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  VARIABLE_HEADER       LocalVariableHeader;
+  EFI_STATUS                            Status;
+  AUTHENTICATED_VARIABLE_HEADER         LocalVariableHeader;
 
   Status = AccessVariableStore (
              FALSE,
@@ -371,7 +371,7 @@ IsValidVariableHeader (
              Volatile,
              Instance,
              VariableAddress,
-             sizeof (VARIABLE_HEADER),
+             sizeof (AUTHENTICATED_VARIABLE_HEADER),
              &LocalVariableHeader    
              );
 
@@ -380,7 +380,7 @@ IsValidVariableHeader (
   }
 
   if (VariableHeader != NULL) {
-    CopyMem (VariableHeader, &LocalVariableHeader, sizeof (VARIABLE_HEADER));
+    CopyMem (VariableHeader, &LocalVariableHeader, sizeof (AUTHENTICATED_VARIABLE_HEADER));
   }
 
   return TRUE;
@@ -439,7 +439,7 @@ GetVariableStoreStatus (
 **/
 UINTN
 NameSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  AUTHENTICATED_VARIABLE_HEADER     *Variable
   )
 {
   if (Variable->State    == (UINT8) (-1) ||
@@ -465,7 +465,7 @@ NameSizeOfVariable (
 **/
 UINTN
 DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  AUTHENTICATED_VARIABLE_HEADER     *Variable
   )
 {
   if (Variable->State    == (UINT8)  -1 ||
@@ -500,10 +500,10 @@ GetVariableNamePtr (
   OUT CHAR16                 *VariableName
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Address;
-  VARIABLE_HEADER       VariableHeader;
-  BOOLEAN               IsValid;
+  EFI_STATUS                        Status;
+  EFI_PHYSICAL_ADDRESS              Address;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
+  BOOLEAN                           IsValid;
 
   IsValid = IsValidVariableHeader (VariableAddress, Volatile, Global, Instance, &VariableHeader);
   ASSERT (IsValid);
@@ -511,7 +511,7 @@ GetVariableNamePtr (
   //
   // Name area follows variable header.
   //
-  Address = VariableAddress + sizeof (VARIABLE_HEADER);
+  Address = VariableAddress + sizeof (AUTHENTICATED_VARIABLE_HEADER);
 
   Status = AccessVariableStore (
              FALSE,
@@ -548,10 +548,10 @@ GetVariableDataPtr (
   OUT CHAR16                 *VariableData
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Address;
-  VARIABLE_HEADER       VariableHeader;
-  BOOLEAN               IsValid;
+  EFI_STATUS                        Status;
+  EFI_PHYSICAL_ADDRESS              Address;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
+  BOOLEAN                           IsValid;
 
   IsValid = IsValidVariableHeader (VariableAddress, Volatile, Global, Instance, &VariableHeader);
   ASSERT (IsValid);
@@ -560,7 +560,7 @@ GetVariableDataPtr (
   // Data area follows variable name.
   // Be careful about pad size for alignment
   //
-  Address =  VariableAddress + sizeof (VARIABLE_HEADER);
+  Address =  VariableAddress + sizeof (AUTHENTICATED_VARIABLE_HEADER);
   Address += NameSizeOfVariable (&VariableHeader);
   Address += GET_PAD_SIZE (NameSizeOfVariable (&VariableHeader));
 
@@ -601,8 +601,8 @@ GetNextVariablePtr (
   IN  UINTN                  Instance
   )
 {
-  EFI_PHYSICAL_ADDRESS  Address;
-  VARIABLE_HEADER       VariableHeader;
+  EFI_PHYSICAL_ADDRESS              Address;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
 
   if (!IsValidVariableHeader (VariableAddress, Volatile, Global, Instance, &VariableHeader)) {
     return 0x0;
@@ -611,7 +611,7 @@ GetNextVariablePtr (
   //
   // Header of next variable follows data area of this variable
   //
-  Address =  VariableAddress + sizeof (VARIABLE_HEADER);
+  Address =  VariableAddress + sizeof (AUTHENTICATED_VARIABLE_HEADER);
   Address += NameSizeOfVariable (&VariableHeader);
   Address += GET_PAD_SIZE (NameSizeOfVariable (&VariableHeader));
   Address += DataSizeOfVariable (&VariableHeader);
@@ -964,14 +964,14 @@ FindVariable (
   IN  UINTN                   Instance
   )
 {
-  EFI_PHYSICAL_ADDRESS    Variable[2];
-  EFI_PHYSICAL_ADDRESS    InDeletedVariable;
-  EFI_PHYSICAL_ADDRESS    VariableStoreHeader[2];
-  UINTN                   InDeletedStorageIndex;
-  UINTN                   Index;
-  CHAR16                  LocalVariableName[MAX_NAME_SIZE];
-  BOOLEAN                 Volatile;
-  VARIABLE_HEADER         VariableHeader;
+  EFI_PHYSICAL_ADDRESS              Variable[2];
+  EFI_PHYSICAL_ADDRESS              InDeletedVariable;
+  EFI_PHYSICAL_ADDRESS              VariableStoreHeader[2];
+  UINTN                             InDeletedStorageIndex;
+  UINTN                             Index;
+  CHAR16                            LocalVariableName[MAX_NAME_SIZE];
+  BOOLEAN                           Volatile;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
 
   //
   // 0: Volatile, 1: Non-Volatile
@@ -1120,24 +1120,24 @@ Reclaim (
   IN  EFI_PHYSICAL_ADDRESS  UpdatingVariable
   )
 {
-  EFI_PHYSICAL_ADDRESS  Variable;
-  EFI_PHYSICAL_ADDRESS  AddedVariable;
-  EFI_PHYSICAL_ADDRESS  NextVariable;
-  EFI_PHYSICAL_ADDRESS  NextAddedVariable;
-  VARIABLE_STORE_HEADER VariableStoreHeader;
-  VARIABLE_HEADER       VariableHeader;
-  VARIABLE_HEADER       AddedVariableHeader;
-  CHAR16                VariableName[MAX_NAME_SIZE];
-  CHAR16                AddedVariableName[MAX_NAME_SIZE];
-  UINT8                 *ValidBuffer;
-  UINTN                 MaximumBufferSize;
-  UINTN                 VariableSize;
-  UINTN                 NameSize;
-  UINT8                 *CurrPtr;
-  BOOLEAN               FoundAdded;
-  EFI_STATUS            Status;
-  VARIABLE_GLOBAL       *VariableGlobal;
-  UINT32                Instance;
+  EFI_PHYSICAL_ADDRESS              Variable;
+  EFI_PHYSICAL_ADDRESS              AddedVariable;
+  EFI_PHYSICAL_ADDRESS              NextVariable;
+  EFI_PHYSICAL_ADDRESS              NextAddedVariable;
+  VARIABLE_STORE_HEADER             VariableStoreHeader;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER     AddedVariableHeader;
+  CHAR16                            VariableName[MAX_NAME_SIZE];
+  CHAR16                            AddedVariableName[MAX_NAME_SIZE];
+  UINT8                             *ValidBuffer;
+  UINTN                             MaximumBufferSize;
+  UINTN                             VariableSize;
+  UINTN                             NameSize;
+  UINT8                             *CurrPtr;
+  BOOLEAN                           FoundAdded;
+  EFI_STATUS                        Status;
+  VARIABLE_GLOBAL                   *VariableGlobal;
+  UINT32                            Instance;
 
   VariableGlobal = &Global->VariableGlobal[VirtualMode];
   Instance = Global->FvbInstance;
@@ -1200,9 +1200,9 @@ Reclaim (
       VariableSize = NextVariable - Variable;
       CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
       CurrPtr += VariableSize;
-      if ((!IsVolatile) && ((((VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+      if ((!IsVolatile) && ((((AUTHENTICATED_VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
         Global->HwErrVariableTotalSize += VariableSize;
-      } else if ((!IsVolatile) && ((((VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+      } else if ((!IsVolatile) && ((((AUTHENTICATED_VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
         Global->CommonVariableTotalSize += VariableSize;
       }
     }
@@ -1254,12 +1254,12 @@ Reclaim (
           // 1. No valid instance of this variable exists.
           // 2. It is not the variable that is going to be updated.
           //
-          ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
+          ((AUTHENTICATED_VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
         }
         CurrPtr += VariableSize;
-        if ((!IsVolatile) && ((((VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        if ((!IsVolatile) && ((((AUTHENTICATED_VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
           Global->HwErrVariableTotalSize += VariableSize;
-        } else if ((!IsVolatile) && ((((VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        } else if ((!IsVolatile) && ((((AUTHENTICATED_VARIABLE_HEADER*)Variable)->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
           Global->CommonVariableTotalSize += VariableSize;
         }
       }
@@ -1729,7 +1729,7 @@ AutoUpdateLangVariable(
                VariableGlobal,
                Variable.Volatile,
                Instance,
-               (UINTN) &(((VARIABLE_HEADER *)Variable.CurrPtr)->DataSize),
+               (UINTN) &(((AUTHENTICATED_VARIABLE_HEADER *)Variable.CurrPtr)->DataSize),
                sizeof (DataSize),
                &DataSize
                ); 
@@ -1865,15 +1865,15 @@ UpdateVariable (
   )
 {
   EFI_STATUS                          Status;
-  VARIABLE_HEADER                     *NextVariable;
+  AUTHENTICATED_VARIABLE_HEADER       *NextVariable;
   UINTN                               VarNameOffset;
   UINTN                               VarDataOffset;
   UINTN                               VarNameSize;
   UINTN                               VarSize;
   BOOLEAN                             Volatile;
   UINT8                               State;
-  VARIABLE_HEADER                     VariableHeader;
-  VARIABLE_HEADER                     *NextVariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER       VariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER       *NextVariableHeader;
   BOOLEAN                             Valid;
   BOOLEAN                             Reclaimed;
   VARIABLE_STORE_HEADER               VariableStoreHeader;
@@ -1930,7 +1930,7 @@ UpdateVariable (
                  VariableGlobal,
                  Variable->Volatile,
                  Instance,
-                 (UINTN) &(((VARIABLE_HEADER *)Variable->CurrPtr)->State),
+                 (UINTN) &(((AUTHENTICATED_VARIABLE_HEADER *)Variable->CurrPtr)->State),
                  sizeof (UINT8),
                  &State
                  ); 
@@ -1946,7 +1946,7 @@ UpdateVariable (
     // then return to the caller immediately.
     //
     if (DataSizeOfVariable (&VariableHeader) == DataSize) {
-      NextVariable = (VARIABLE_HEADER *)GetEndPointer (VariableGlobal->VolatileVariableBase, TRUE, VariableGlobal, Instance);
+      NextVariable = (AUTHENTICATED_VARIABLE_HEADER *)GetEndPointer (VariableGlobal->VolatileVariableBase, TRUE, VariableGlobal, Instance);
       GetVariableDataPtr (Variable->CurrPtr, Variable->Volatile, VariableGlobal, Instance, (CHAR16 *) NextVariable);
       if  (CompareMem (Data, (VOID *) NextVariable, DataSize) == 0) {
         UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
@@ -1968,7 +1968,7 @@ UpdateVariable (
                  VariableGlobal,
                  Variable->Volatile,
                  Instance,
-                 (UINTN) &(((VARIABLE_HEADER *)Variable->CurrPtr)->State),
+                 (UINTN) &(((AUTHENTICATED_VARIABLE_HEADER *)Variable->CurrPtr)->State),
                  sizeof (UINT8),
                  &State
                  );      
@@ -2007,9 +2007,9 @@ UpdateVariable (
   // Tricky part: Use scratch data area at the end of volatile variable store
   // as a temporary storage.
   //
-  NextVariable = (VARIABLE_HEADER *)GetEndPointer (VariableGlobal->VolatileVariableBase, TRUE, VariableGlobal, Instance);
+  NextVariable = (AUTHENTICATED_VARIABLE_HEADER *)GetEndPointer (VariableGlobal->VolatileVariableBase, TRUE, VariableGlobal, Instance);
   ScratchSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize));
-  NextVariableHeader = (VARIABLE_HEADER *) NextVariable;
+  NextVariableHeader = (AUTHENTICATED_VARIABLE_HEADER *) NextVariable;
 
   SetMem (NextVariableHeader, ScratchSize, 0xff);
 
@@ -2018,7 +2018,7 @@ UpdateVariable (
   NextVariableHeader->PubKeyIndex     = KeyIndex;
   NextVariableHeader->MonotonicCount  = MonotonicCount;
   NextVariableHeader->Reserved        = 0;
-  VarNameOffset                       = sizeof (VARIABLE_HEADER);
+  VarNameOffset                       = sizeof (AUTHENTICATED_VARIABLE_HEADER);
   VarNameSize                         = StrSize (VariableName);
   CopyMem (
     (UINT8 *) ((UINTN)NextVariable + VarNameOffset),
@@ -2096,7 +2096,7 @@ UpdateVariable (
                FALSE,
                Instance,
                VariableGlobal->NonVolatileVariableBase + Global->NonVolatileLastVariableOffset,
-               sizeof (VARIABLE_HEADER),
+               sizeof (AUTHENTICATED_VARIABLE_HEADER),
                (UINT8 *) NextVariable
                );
 
@@ -2114,7 +2114,7 @@ UpdateVariable (
                FALSE,
                Instance,
                VariableGlobal->NonVolatileVariableBase + Global->NonVolatileLastVariableOffset,
-               sizeof (VARIABLE_HEADER),
+               sizeof (AUTHENTICATED_VARIABLE_HEADER),
                (UINT8 *) NextVariable
                );
 
@@ -2129,9 +2129,9 @@ UpdateVariable (
                VariableGlobal,
                FALSE,
                Instance,
-               VariableGlobal->NonVolatileVariableBase + Global->NonVolatileLastVariableOffset + sizeof (VARIABLE_HEADER),
-               (UINT32) VarSize - sizeof (VARIABLE_HEADER),
-               (UINT8 *) NextVariable + sizeof (VARIABLE_HEADER)
+               VariableGlobal->NonVolatileVariableBase + Global->NonVolatileLastVariableOffset + sizeof (AUTHENTICATED_VARIABLE_HEADER),
+               (UINT32) VarSize - sizeof (AUTHENTICATED_VARIABLE_HEADER),
+               (UINT8 *) NextVariable + sizeof (AUTHENTICATED_VARIABLE_HEADER)
                );
 
     if (EFI_ERROR (Status)) {
@@ -2147,7 +2147,7 @@ UpdateVariable (
                FALSE,
                Instance,
                VariableGlobal->NonVolatileVariableBase + Global->NonVolatileLastVariableOffset,
-               sizeof (VARIABLE_HEADER),
+               sizeof (AUTHENTICATED_VARIABLE_HEADER),
                (UINT8 *) NextVariable
                );
 
@@ -2212,7 +2212,7 @@ UpdateVariable (
   // has already been eliminated, so no need to delete it.
   //
   if (!Reclaimed && !EFI_ERROR (Status) && Variable->CurrPtr != 0) {
-    State = ((VARIABLE_HEADER *)Variable->CurrPtr)->State;
+    State = ((AUTHENTICATED_VARIABLE_HEADER *)Variable->CurrPtr)->State;
     State &= VAR_DELETED;
 
     Status = AccessVariableStore (
@@ -2220,7 +2220,7 @@ UpdateVariable (
                VariableGlobal,
                Variable->Volatile,
                Instance,
-               (UINTN) &(((VARIABLE_HEADER *)Variable->CurrPtr)->State),
+               (UINTN) &(((AUTHENTICATED_VARIABLE_HEADER *)Variable->CurrPtr)->State),
                sizeof (UINT8),
                &State
                );
@@ -2277,13 +2277,13 @@ EsalGetVariable (
   IN      ESAL_VARIABLE_GLOBAL  *Global
   )
 {
-  VARIABLE_POINTER_TRACK  Variable;
-  UINTN                   VarDataSize;
-  EFI_STATUS              Status;
-  VARIABLE_HEADER         VariableHeader;
-  BOOLEAN                 Valid;
-  VARIABLE_GLOBAL         *VariableGlobal;
-  UINT32                  Instance;
+  VARIABLE_POINTER_TRACK            Variable;
+  UINTN                             VarDataSize;
+  EFI_STATUS                        Status;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
+  BOOLEAN                           Valid;
+  VARIABLE_GLOBAL                   *VariableGlobal;
+  UINT32                            Instance;
 
   if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2400,12 +2400,12 @@ EsalGetNextVariableName (
   IN      ESAL_VARIABLE_GLOBAL  *Global
   )
 {
-  VARIABLE_POINTER_TRACK  Variable;
-  UINTN                   VarNameSize;
-  EFI_STATUS              Status;
-  VARIABLE_HEADER         VariableHeader;
-  VARIABLE_GLOBAL         *VariableGlobal;
-  UINT32                  Instance;
+  VARIABLE_POINTER_TRACK            Variable;
+  UINTN                             VarNameSize;
+  EFI_STATUS                        Status;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
+  VARIABLE_GLOBAL                   *VariableGlobal;
+  UINT32                            Instance;
 
   if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2607,7 +2607,7 @@ EsalSetVariable (
     // For variable for hardware error record, the size of the VariableName, including the Unicode Null
     // in bytes plus the DataSize is limited to maximum size of PcdGet32(PcdMaxHardwareErrorVariableSize) bytes.
     //
-    if (StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER)) {
+    if (StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (AUTHENTICATED_VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
     }
     //
@@ -2623,7 +2623,7 @@ EsalSetVariable (
     // For variable not for hardware error record, the size of the VariableName, including the
     // Unicode Null in bytes plus the DataSize is limited to maximum size of PcdGet32(PcdMaxVariableSize) bytes.
     //
-    if (StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER)) {
+    if (StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxVariableSize) - sizeof (AUTHENTICATED_VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
     }  
   }  
@@ -2746,17 +2746,17 @@ EsalQueryVariableInfo (
   IN  ESAL_VARIABLE_GLOBAL   *Global
   )
 {
-  EFI_PHYSICAL_ADDRESS   Variable;
-  EFI_PHYSICAL_ADDRESS   NextVariable;
-  UINT64                 VariableSize;
-  EFI_PHYSICAL_ADDRESS   VariableStoreHeaderAddress;
-  BOOLEAN                Volatile;
-  VARIABLE_STORE_HEADER  VarStoreHeader;
-  VARIABLE_HEADER        VariableHeader;
-  UINT64                 CommonVariableTotalSize;
-  UINT64                 HwErrVariableTotalSize;
-  VARIABLE_GLOBAL        *VariableGlobal;
-  UINT32                 Instance;
+  EFI_PHYSICAL_ADDRESS              Variable;
+  EFI_PHYSICAL_ADDRESS              NextVariable;
+  UINT64                            VariableSize;
+  EFI_PHYSICAL_ADDRESS              VariableStoreHeaderAddress;
+  BOOLEAN                           Volatile;
+  VARIABLE_STORE_HEADER             VarStoreHeader;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
+  UINT64                            CommonVariableTotalSize;
+  UINT64                            HwErrVariableTotalSize;
+  VARIABLE_GLOBAL                   *VariableGlobal;
+  UINT32                            Instance;
 
   CommonVariableTotalSize = 0;
   HwErrVariableTotalSize = 0;
@@ -2818,7 +2818,7 @@ EsalQueryVariableInfo (
   //
   if ((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
     *MaximumVariableStorageSize = PcdGet32(PcdHwErrStorageSize);
-    *MaximumVariableSize = PcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER);
+    *MaximumVariableSize = PcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (AUTHENTICATED_VARIABLE_HEADER);
   } else {
     if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       ASSERT (PcdGet32(PcdHwErrStorageSize) < VarStoreHeader.Size);
@@ -2828,7 +2828,7 @@ EsalQueryVariableInfo (
     //
     // Let *MaximumVariableSize be PcdGet32(PcdMaxVariableSize) with the exception of the variable header size.
     //
-    *MaximumVariableSize = PcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
+    *MaximumVariableSize = PcdGet32(PcdMaxVariableSize) - sizeof (AUTHENTICATED_VARIABLE_HEADER);
   }
 
   //
@@ -2882,10 +2882,10 @@ EsalQueryVariableInfo (
     *RemainingVariableStorageSize = *MaximumVariableStorageSize - CommonVariableTotalSize;
   }
 
-  if (*RemainingVariableStorageSize < sizeof (VARIABLE_HEADER)) {
+  if (*RemainingVariableStorageSize < sizeof (AUTHENTICATED_VARIABLE_HEADER)) {
     *MaximumVariableSize = 0;
-  } else if ((*RemainingVariableStorageSize - sizeof (VARIABLE_HEADER)) < *MaximumVariableSize) {
-    *MaximumVariableSize = *RemainingVariableStorageSize - sizeof (VARIABLE_HEADER);
+  } else if ((*RemainingVariableStorageSize - sizeof (AUTHENTICATED_VARIABLE_HEADER)) < *MaximumVariableSize) {
+    *MaximumVariableSize = *RemainingVariableStorageSize - sizeof (AUTHENTICATED_VARIABLE_HEADER);
   }
 
   ReleaseLockOnlyAtBootTime (&VariableGlobal->VariableServicesLock);
@@ -2955,7 +2955,7 @@ FlushHob2Nv (
   EFI_STATUS                      Status;
   VOID                            *GuidHob;
   VARIABLE_STORE_HEADER           *VariableStoreHeader;
-  VARIABLE_HEADER                 *VariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER   *VariableHeader;
   //
   // Get HOB variable store.
   //
@@ -2970,11 +2970,11 @@ FlushHob2Nv (
       //
       // Flush the HOB variable to NV Variable storage.
       //
-      for ( VariableHeader = (VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader + 1)
-          ; (VariableHeader < (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VariableStoreHeader + VariableStoreHeader->Size)
+      for ( VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *) HEADER_ALIGN (VariableStoreHeader + 1)
+          ; (VariableHeader < (AUTHENTICATED_VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VariableStoreHeader + VariableStoreHeader->Size)
             &&
             (VariableHeader->StartId == VARIABLE_DATA))
-          ; VariableHeader = (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) (VariableHeader + 1)
+          ; VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) (VariableHeader + 1)
                            + VariableHeader->NameSize + GET_PAD_SIZE (VariableHeader->NameSize)
                            + VariableHeader->DataSize + GET_PAD_SIZE (VariableHeader->DataSize)
                            )
@@ -3198,7 +3198,7 @@ VariableCommonInitialize (
                        Instance
                        );
       VariableSize = NextVariable - Variable;
-      if ((((VARIABLE_HEADER *)Variable)->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+      if ((((AUTHENTICATED_VARIABLE_HEADER *)Variable)->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
         mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
       } else {
         mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;

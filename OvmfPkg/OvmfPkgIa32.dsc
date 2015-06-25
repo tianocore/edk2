@@ -454,7 +454,18 @@
       PlatformFvbLib|OvmfPkg/Library/EmuVariableFvbLib/EmuVariableFvbLib.inf
   }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+!if $(SECURE_BOOT_ENABLE) == TRUE
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+      TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
+      AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+!else
+      TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+      AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+!endif
+  }
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -592,11 +603,6 @@
 !endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  }
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !endif
 

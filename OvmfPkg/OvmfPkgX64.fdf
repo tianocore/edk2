@@ -231,11 +231,9 @@ INF  OvmfPkg/XenIoPciDxe/XenIoPciDxe.inf
 INF  OvmfPkg/XenBusDxe/XenBusDxe.inf
 INF  OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
 
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE
-  INF  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-!else
-  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
 
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf

@@ -1,6 +1,7 @@
 #
 #  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -238,14 +239,7 @@
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-  }
-!else
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-!endif
 
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
     <LibraryClasses>
@@ -266,20 +260,26 @@
   #
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+!if $(SECURE_BOOT_ENABLE) == TRUE
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+      TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
+      AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+!else
+      TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+      AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+!endif
+  }
 !if $(SECURE_BOOT_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
   }
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  }
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
