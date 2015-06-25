@@ -1665,7 +1665,9 @@ CoreGetMemoryMap (
       MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
       MemoryMap->VirtualStart  = 0;
       MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
-      MemoryMap->Attribute     = GcdMapEntry->Attributes & ~EFI_MEMORY_PORT_IO;
+      MemoryMap->Attribute     = (GcdMapEntry->Attributes & ~EFI_MEMORY_PORT_IO) | 
+                                (GcdMapEntry->Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
+                                EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
 
       if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) {
         MemoryMap->Type = EfiReservedMemoryType;
@@ -1691,7 +1693,9 @@ CoreGetMemoryMap (
       MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
       MemoryMap->VirtualStart  = 0;
       MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
-      MemoryMap->Attribute     = GcdMapEntry->Attributes | EFI_MEMORY_NV;
+      MemoryMap->Attribute     = GcdMapEntry->Attributes | EFI_MEMORY_NV | 
+                                (GcdMapEntry->Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
+                                EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
       MemoryMap->Type          = EfiPersistentMemory;
       
       //
