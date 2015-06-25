@@ -1,7 +1,7 @@
 ## @file
 # Standardized Error Hanlding infrastructures.
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@ ERROR_GENERAL_CHECK_CARRIAGE_RETURN = 1006
 ERROR_GENERAL_CHECK_FILE_EXISTENCE = 1007
 ERROR_GENERAL_CHECK_NON_ACSII = 1008
 ERROR_GENERAL_CHECK_UNI = 1009
+ERROR_GENERAL_CHECK_UNI_HELP_INFO = 1010
 
 ERROR_SPACE_CHECK_ALL = 2000
 
@@ -114,6 +115,7 @@ gEccErrorMessage = {
     ERROR_GENERAL_CHECK_FILE_EXISTENCE : "File not found",
     ERROR_GENERAL_CHECK_NON_ACSII : "File has invalid Non-ACSII char",
     ERROR_GENERAL_CHECK_UNI : "File is not a valid UTF-16 UNI file",
+    ERROR_GENERAL_CHECK_UNI_HELP_INFO : "UNI file that is associated by INF or DEC file need define the prompt and help information.",
 
     ERROR_SPACE_CHECK_ALL : "",
 

@@ -1,7 +1,7 @@
 ## @file
 # Override built in function file.open to provide support for long file path
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@
 import os
 import platform
 import shutil
+import codecs
 
 ##
 # OpenLongPath
@@ -36,6 +37,9 @@ def LongFilePath(FileName):
 #
 def OpenLongFilePath(FileName, Mode='r', Buffer= -1):
     return open(LongFilePath(FileName), Mode, Buffer)
+
+def CodecOpenLongFilePath(Filename, Mode='rb', Encoding=None, Errors='strict', Buffering=1):
+    return codecs.open(LongFilePath(Filename), Mode, Encoding, Errors, Buffering)
 
 ##
 # CopyLongFilePath

@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for ECC reports
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -83,6 +83,13 @@ class TableReport(Table):
     def Query(self):
         SqlCommand = """select ID, ErrorID, OtherMsg, BelongsToTable, BelongsToItem, Corrected from %s
                         where Enabled > -1 order by ErrorID, BelongsToItem""" % (self.Table)
+        return self.Exec(SqlCommand)
+
+    ## Update table
+    #
+    def UpdateBelongsToItemByFile(self, ItemID=-1, File=""):
+        SqlCommand = """update Report set BelongsToItem=%s where BelongsToTable='File' and BelongsToItem=-2
+                        and OtherMsg like '%%%s%%'""" % (ItemID, File)
         return self.Exec(SqlCommand)
 
     ## Convert to CSV

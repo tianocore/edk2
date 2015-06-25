@@ -246,6 +246,13 @@ class Configuration(object):
         self.MetaDataFileCheckModuleFilePpiFormat = 1
         # Check Pcd Format in INF files
         self.MetaDataFileCheckModuleFilePcdFormat = 1
+        
+        # Check UNI file
+        self.UniCheckAll = 0
+        # Check INF or DEC file whether defined the localized information in the associated UNI file.
+        self.UniCheckHelpInfo = 1
+        # Check PCD whether defined the prompt, help in the DEC file and localized information in the associated UNI file.
+        self.UniCheckPCDInfo = 1
 
         #
         # The check points in this section are reserved

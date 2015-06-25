@@ -251,7 +251,8 @@ class Ecc(object):
                         Filename = os.path.normpath(os.path.join(Root, File))
                         EdkLogger.quiet("Parsing %s" % Filename)
                         Op.write("%s\r" % Filename)
-                        EccGlobalData.gDb.TblFile.InsertFile(Filename, MODEL_FILE_UNI)
+                        FileID = EccGlobalData.gDb.TblFile.InsertFile(Filename, MODEL_FILE_UNI)
+                        EccGlobalData.gDb.TblReport.UpdateBelongsToItemByFile(FileID, File)
                         continue
 
         Op.close()

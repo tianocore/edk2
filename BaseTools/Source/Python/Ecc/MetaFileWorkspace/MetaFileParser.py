@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse meta files
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -33,6 +33,7 @@ from CommonDataClass.Exceptions import *
 from MetaFileTable import MetaFileStorage
 from GenFds.FdfParser import FdfParser
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.LongFilePathSupport import CodecOpenLongFilePath
 
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
@@ -174,6 +175,9 @@ class MetaFileParser(object):
         self._PostProcessed = False
         # Different version of meta-file has different way to parse.
         self._Version = 0
+        # UNI object and extra UNI object
+        self._UniObj = None
+        self._UniExtraObj = None
 
     ## Store the parsed data in table
     def _Store(self, *Args):
@@ -258,8 +262,16 @@ class MetaFileParser(object):
 
     ## Skip unsupported data
     def _Skip(self):
-        EdkLogger.warn("Parser", "Unrecognized content", File=self.MetaFile,
-                        Line=self._LineIndex+1, ExtraData=self._CurrentLine);
+        if self._SectionName == TAB_USER_EXTENSIONS.upper() and self._CurrentLine.upper().endswith('.UNI'):
+            if EccGlobalData.gConfig.UniCheckHelpInfo == '1' or EccGlobalData.gConfig.UniCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+                ExtraUni = self._CurrentLine.strip()
+                ExtraUniFile = os.path.join(os.path.dirname(self.MetaFile), ExtraUni)
+                IsModuleUni = self.MetaFile.upper().endswith('.INF')
+                self._UniExtraObj = UniParser(ExtraUniFile, IsExtraUni=True, IsModuleUni=IsModuleUni)
+                self._UniExtraObj.Start()
+        else:
+            EdkLogger.warn("Parser", "Unrecognized content", File=self.MetaFile,
+                            Line=self._LineIndex + 1, ExtraData=self._CurrentLine);
         self._ValueList[0:1] = [self._CurrentLine]
 
     ## Section header parser
@@ -328,7 +340,20 @@ class MetaFileParser(object):
             except:
                 EdkLogger.error('Parser', FORMAT_INVALID, "Invalid version number",
                                 ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex+1)
-
+        elif Name == 'MODULE_UNI_FILE':
+            UniFile = os.path.join(os.path.dirname(self.MetaFile), Value)
+            if os.path.exists(UniFile):
+                self._UniObj = UniParser(UniFile, IsExtraUni=False, IsModuleUni=True)
+                self._UniObj.Start()
+            else:
+                EdkLogger.error('Parser', FILE_NOT_FOUND, "Module UNI file %s is missing." % Value,
+                                ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex+1,
+                                RaiseError=False)
+        elif Name == 'PACKAGE_UNI_FILE':
+            UniFile = os.path.join(os.path.dirname(self.MetaFile), Value)
+            if os.path.exists(UniFile):
+                self._UniObj = UniParser(UniFile, IsExtraUni=False, IsModuleUni=False)
+        
         if type(self) == InfParser and self._Version < 0x00010005:
             # EDK module allows using defines as macros
             self._FileLocalMacros[Name] = Value
@@ -1872,6 +1897,69 @@ class Fdf(FdfObject):
                 StartLine = Fdf.Profile.InfFileLineList[Index][1]
                 BelongsToFile = self.InsertFile(FileName)
                 self.TblFdf.Insert(Model, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled)
+
+class UniParser(object):
+    # IsExtraUni defined the UNI file is Module UNI or extra Module UNI
+    # IsModuleUni defined the UNI file is Module UNI or Package UNI
+    def __init__(self, FilePath, IsExtraUni=False, IsModuleUni=True):
+        self.FilePath = FilePath
+        self.FileName = os.path.basename(FilePath)
+        self.IsExtraUni = IsExtraUni
+        self.IsModuleUni = IsModuleUni
+        self.FileIn = None
+        self.Missing = []
+        self.__read()
+    
+    def __read(self):
+        try:
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode = 'rb', Encoding = 'utf_16').read()
+        except UnicodeError:
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode = 'rb', Encoding = 'utf_16_le').read()
+        except IOError:
+            self.FileIn = ""
+    
+    def Start(self):
+        if self.IsModuleUni:
+            if self.IsExtraUni:
+                ModuleName = self.CheckKeyValid('STR_PROPERTIES_MODULE_NAME')
+                self.PrintLog('STR_PROPERTIES_MODULE_NAME', ModuleName)
+            else:
+                ModuleAbstract = self.CheckKeyValid('STR_MODULE_ABSTRACT')
+                self.PrintLog('STR_MODULE_ABSTRACT', ModuleAbstract)
+                ModuleDescription = self.CheckKeyValid('STR_MODULE_DESCRIPTION')
+                self.PrintLog('STR_MODULE_DESCRIPTION', ModuleDescription)
+        else:
+            if self.IsExtraUni:
+                PackageName = self.CheckKeyValid('STR_PROPERTIES_PACKAGE_NAME')
+                self.PrintLog('STR_PROPERTIES_PACKAGE_NAME', PackageName)
+            else:
+                PackageAbstract = self.CheckKeyValid('STR_PACKAGE_ABSTRACT')
+                self.PrintLog('STR_PACKAGE_ABSTRACT', PackageAbstract)
+                PackageDescription = self.CheckKeyValid('STR_PACKAGE_DESCRIPTION')
+                self.PrintLog('STR_PACKAGE_DESCRIPTION', PackageDescription)
+                
+    def CheckKeyValid(self, Key, Contents=None):
+        if not Contents:
+            Contents = self.FileIn
+        KeyPattern = re.compile('#string\s+%s\s+.*?#language.*?".*?"' % Key, re.S)
+        if KeyPattern.search(Contents):
+            return True
+        return False
+    
+    def CheckPcdInfo(self, PcdCName):
+        PromptKey = 'STR_%s_PROMPT' % PcdCName.replace('.', '_')
+        PcdPrompt = self.CheckKeyValid(PromptKey)
+        self.PrintLog(PromptKey, PcdPrompt)
+        HelpKey = 'STR_%s_HELP' % PcdCName.replace('.', '_')
+        PcdHelp = self.CheckKeyValid(HelpKey)
+        self.PrintLog(HelpKey, PcdHelp)
+    
+    def PrintLog(self, Key, Value):
+        if not Value and Key not in self.Missing:
+            Msg = '%s is missing in the %s file.' % (Key, self.FileName)
+            EdkLogger.warn('Parser', Msg)
+            EccGlobalData.gDb.TblReport.Insert(EccToolError.ERROR_GENERAL_CHECK_UNI_HELP_INFO, OtherMsg=Msg, BelongsToTable='File', BelongsToItem=-2)
+            self.Missing.append(Key)
 
 ##
 #
