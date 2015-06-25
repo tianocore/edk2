@@ -112,10 +112,37 @@ ResetShutdown (
   VOID
   )
 {
-  AcpiPmControl (7);
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  ACPI_BOARD_INFO    *pAcpiBoardInfo;
+  UINTN              PmCtrlReg;
+
+  //
+  // Find the acpi board information guid hob
+  //
+  GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
+  ASSERT (GuidHob != NULL);
+  pAcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob); 
+  
+  //
+  // GPE0_EN should be disabled to avoid any GPI waking up the system from S5
+  //
+  IoWrite16 ((UINTN)pAcpiBoardInfo->PmGpeEnBase,  0);
+
+  //
+  // Clear Power Button Status
+  //
+  IoWrite16((UINTN) pAcpiBoardInfo->PmEvtBase, BIT8);
+  
+  //
+  // Transform system into S5 sleep state
+  //
+  PmCtrlReg = (UINTN)pAcpiBoardInfo->PmCtrlRegBase; 
+  IoAndThenOr16 (PmCtrlReg, (UINT16) ~0x3c00, (UINT16) (7 << 10));
+  IoOr16 (PmCtrlReg, BIT13);
+  CpuDeadLoop ();
+
   ASSERT (FALSE);
 }
-
 
 /**
   Calling this function causes the system to enter a power state for capsule
