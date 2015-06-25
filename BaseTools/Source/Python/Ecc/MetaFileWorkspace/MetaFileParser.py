@@ -1709,7 +1709,8 @@ class DecParser(MetaFileParser):
                     continue
                 else:
                     if GuidValue.startswith('{'):
-                        HexList.append('0x' + str(GuidValue[3:]))
+                        GuidValue = GuidValue.lstrip(' {')
+                        HexList.append('0x' + str(GuidValue[2:]))
                         Index += 1
             self._ValueList[1] = "{ %s, %s, %s, { %s, %s, %s, %s, %s, %s, %s, %s }}" % (HexList[0], HexList[1], HexList[2],HexList[3],HexList[4],HexList[5],HexList[6],HexList[7],HexList[8],HexList[9],HexList[10])
         else:

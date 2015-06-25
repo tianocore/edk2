@@ -1116,7 +1116,7 @@ class Check(object):
                      """ % (Table.Table, Table.Table, Model, Model)
         RecordSet = Table.Exec(SqlCommand)
         for Record in RecordSet:     
-            if not EccGlobalData.gException.IsException(ErrorID, Record[1] + ':' + Record[2]):
+            if not EccGlobalData.gException.IsException(ErrorID, Record[2]):
                 EccGlobalData.gDb.TblReport.Insert(ErrorID, OtherMsg="The %s value [%s] is used more than one time" % (Name.upper(), Record[2]), BelongsToTable=Table.Table, BelongsToItem=Record[0])
 
     # Naming Convention Check
