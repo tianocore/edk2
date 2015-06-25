@@ -220,6 +220,8 @@ class Configuration(object):
         self.MetaDataFileCheckLibraryInstanceOrder = 1
         # Check whether the unnecessary inclusion of library classes in the INF file
         self.MetaDataFileCheckLibraryNoUse = 1
+        # Check the header file in Include\Library directory whether be defined in the package DEC file.
+        self.MetaDataFileCheckLibraryDefinedInDec = 1
         # Check whether an INF file is specified in the FDF file, but not in the DSC file, then the INF file must be for a Binary module only
         self.MetaDataFileCheckBinaryInfInFdf = 1
         # Not to report error and warning related OS include file such as "windows.h" and "stdio.h"
