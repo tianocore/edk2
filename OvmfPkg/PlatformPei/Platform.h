@@ -59,6 +59,11 @@ AddUntestedMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryLimit
   );
 
+VOID
+AddressWidthInitialization (
+  VOID
+  );
+
 EFI_STATUS
 PublishPeiMemory (
   VOID
@@ -99,5 +104,7 @@ XenPublishRamRegions (
 extern EFI_BOOT_MODE mBootMode;
 
 extern BOOLEAN mS3Supported;
+
+extern UINT8 mPhysMemAddressWidth;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_

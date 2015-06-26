@@ -36,6 +36,8 @@ Module Name:
 #include "Platform.h"
 #include "Cmos.h"
 
+UINT8 mPhysMemAddressWidth;
+
 UINT32
 GetSystemMemorySizeBelow4gb (
   VOID
@@ -84,6 +86,112 @@ GetSystemMemorySizeAbove4gb (
   return LShiftU64 (Size, 16);
 }
 
+
+/**
+  Initialize the mPhysMemAddressWidth variable, based on guest RAM size.
+**/
+VOID
+AddressWidthInitialization (
+  VOID
+  )
+{
+  UINT64 FirstNonAddress;
+
+  //
+  // As guest-physical memory size grows, the permanent PEI RAM requirements
+  // are dominated by the identity-mapping page tables built by the DXE IPL.
+  // The DXL IPL keys off of the physical address bits advertized in the CPU
+  // HOB. To conserve memory, we calculate the minimum address width here.
+  //
+  FirstNonAddress      = BASE_4GB + GetSystemMemorySizeAbove4gb ();
+  mPhysMemAddressWidth = (UINT8)HighBitSet64 (FirstNonAddress);
+
+  //
+  // If FirstNonAddress is not an integral power of two, then we need an
+  // additional bit.
+  //
+  if ((FirstNonAddress & (FirstNonAddress - 1)) != 0) {
+    ++mPhysMemAddressWidth;
+  }
+
+  //
+  // The minimum address width is 36 (covers up to and excluding 64 GB, which
+  // is the maximum for Ia32 + PAE). The theoretical architecture maximum for
+  // X64 long mode is 52 bits, but the DXE IPL clamps that down to 48 bits. We
+  // can simply assert that here, since 48 bits are good enough for 256 TB.
+  //
+  if (mPhysMemAddressWidth <= 36) {
+    mPhysMemAddressWidth = 36;
+  }
+  ASSERT (mPhysMemAddressWidth <= 48);
+}
+
+
+/**
+  Calculate the cap for the permanent PEI memory.
+**/
+STATIC
+UINT32
+GetPeiMemoryCap (
+  VOID
+  )
+{
+  BOOLEAN Page1GSupport;
+  UINT32  RegEax;
+  UINT32  RegEdx;
+  UINT32  Pml4Entries;
+  UINT32  PdpEntries;
+  UINTN   TotalPages;
+
+  //
+  // If DXE is 32-bit, then just return the traditional 64 MB cap.
+  //
+#ifdef MDE_CPU_IA32
+  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+    return SIZE_64MB;
+  }
+#endif
+
+  //
+  // Dependent on physical address width, PEI memory allocations can be
+  // dominated by the page tables built for 64-bit DXE. So we key the cap off
+  // of those. The code below is based on CreateIdentityMappingPageTables() in
+  // "MdeModulePkg/Core/DxeIplPeim/X64/VirtualMemory.c".
+  //
+  Page1GSupport = FALSE;
+  if (PcdGetBool (PcdUse1GPageTable)) {
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000001) {
+      AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+      if ((RegEdx & BIT26) != 0) {
+        Page1GSupport = TRUE;
+      }
+    }
+  }
+
+  if (mPhysMemAddressWidth <= 39) {
+    Pml4Entries = 1;
+    PdpEntries = 1 << (mPhysMemAddressWidth - 30);
+    ASSERT (PdpEntries <= 0x200);
+  } else {
+    Pml4Entries = 1 << (mPhysMemAddressWidth - 39);
+    ASSERT (Pml4Entries <= 0x200);
+    PdpEntries = 512;
+  }
+
+  TotalPages = Page1GSupport ? Pml4Entries + 1 :
+                               (PdpEntries + 1) * Pml4Entries + 1;
+  ASSERT (TotalPages <= 0x40201);
+
+  //
+  // Add 64 MB for miscellaneous allocations. Note that for
+  // mPhysMemAddressWidth values close to 36, the cap will actually be
+  // dominated by this increment.
+  //
+  return (UINT32)(EFI_PAGES_TO_SIZE (TotalPages) + SIZE_64MB);
+}
+
+
 /**
   Publish PEI core memory
 
@@ -99,6 +207,7 @@ PublishPeiMemory (
   EFI_PHYSICAL_ADDRESS        MemoryBase;
   UINT64                      MemorySize;
   UINT64                      LowerMemorySize;
+  UINT32                      PeiMemoryCap;
 
   if (mBootMode == BOOT_ON_S3_RESUME) {
     MemoryBase = PcdGet32 (PcdS3AcpiReservedMemoryBase);
@@ -106,14 +215,18 @@ PublishPeiMemory (
   } else {
     LowerMemorySize = GetSystemMemorySizeBelow4gb ();
 
+    PeiMemoryCap = GetPeiMemoryCap ();
+    DEBUG ((EFI_D_INFO, "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
+      __FUNCTION__, mPhysMemAddressWidth, PeiMemoryCap >> 10));
+
     //
     // Determine the range of memory to use during PEI
     //
     MemoryBase = PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
     MemorySize = LowerMemorySize - MemoryBase;
-    if (MemorySize > SIZE_64MB) {
-      MemoryBase = LowerMemorySize - SIZE_64MB;
-      MemorySize = SIZE_64MB;
+    if (MemorySize > PeiMemoryCap) {
+      MemoryBase = LowerMemorySize - PeiMemoryCap;
+      MemorySize = PeiMemoryCap;
     }
   }
 
