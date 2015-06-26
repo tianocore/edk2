@@ -252,6 +252,8 @@ QemuInitializeRam (
 {
   UINT64                      LowerMemorySize;
   UINT64                      UpperMemorySize;
+  MTRR_SETTINGS               MtrrSettings;
+  EFI_STATUS                  Status;
 
   DEBUG ((EFI_D_INFO, "%a called\n", __FUNCTION__));
 
@@ -272,12 +274,49 @@ QemuInitializeRam (
     }
   }
 
-  MtrrSetMemoryAttribute (BASE_1MB, LowerMemorySize - BASE_1MB, CacheWriteBack);
+  //
+  // We'd like to keep the following ranges uncached:
+  // - [640 KB, 1 MB)
+  // - [LowerMemorySize, 4 GB)
+  //
+  // Everything else should be WB. Unfortunately, programming the inverse (ie.
+  // keeping the default UC, and configuring the complement set of the above as
+  // WB) is not reliable in general, because the end of the upper RAM can have
+  // practically any alignment, and we may not have enough variable MTRRs to
+  // cover it exactly.
+  //
+  if (IsMtrrSupported ()) {
+    MtrrGetAllMtrrs (&MtrrSettings);
 
-  MtrrSetMemoryAttribute (0, BASE_512KB + BASE_128KB, CacheWriteBack);
+    //
+    // MTRRs disabled, fixed MTRRs disabled, default type is uncached
+    //
+    ASSERT ((MtrrSettings.MtrrDefType & BIT11) == 0);
+    ASSERT ((MtrrSettings.MtrrDefType & BIT10) == 0);
+    ASSERT ((MtrrSettings.MtrrDefType & 0xFF) == 0);
 
-  if (UpperMemorySize != 0) {
-    MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
+    //
+    // flip default type to writeback
+    //
+    SetMem (&MtrrSettings.Fixed, sizeof MtrrSettings.Fixed, 0x06);
+    ZeroMem (&MtrrSettings.Variables, sizeof MtrrSettings.Variables);
+    MtrrSettings.MtrrDefType |= BIT11 | BIT10 | 6;
+    MtrrSetAllMtrrs (&MtrrSettings);
+
+    //
+    // Set memory range from 640KB to 1MB to uncacheable
+    //
+    Status = MtrrSetMemoryAttribute (BASE_512KB + BASE_128KB,
+               BASE_1MB - (BASE_512KB + BASE_128KB), CacheUncacheable);
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Set memory range from the "top of lower RAM" (RAM below 4GB) to 4GB as
+    // uncacheable
+    //
+    Status = MtrrSetMemoryAttribute (LowerMemorySize,
+               SIZE_4GB - LowerMemorySize, CacheUncacheable);
+    ASSERT_EFI_ERROR (Status);
   }
 }
 
