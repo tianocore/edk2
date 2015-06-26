@@ -4,7 +4,7 @@
   This file defines common data structures, macro definitions and some module
   internal function header files.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,6 @@
 
 #include <Uefi.h>
 
-#include <Guid/MemoryOverwriteControl.h>
 #include <Protocol/AtaPassThru.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/BlockIo2.h>
@@ -84,21 +83,6 @@
 #define ATA_DEVICE_SIGNATURE              SIGNATURE_32 ('A', 'B', 'I', 'D')
 #define ATA_SUB_TASK_SIGNATURE            SIGNATURE_32 ('A', 'S', 'T', 'S')
 #define IS_ALIGNED(addr, size)            (((UINTN) (addr) & (size - 1)) == 0)
-
-#define ROUNDUP512(x) (((x) % 512 == 0) ? (x) : ((x) / 512 + 1) * 512)
-
-#define SECURITY_PROTOCOL_TCG      0x02
-#define SECURITY_PROTOCOL_IEEE1667 0xEE
-
-//
-// ATA Supported Security Protocols List Description.
-// Refer to ATA8-ACS Spec 7.57.6.2 Table 69.
-//
-typedef struct  {
-  UINT8                            Reserved1[6];
-  UINT8                            SupportedSecurityListLength[2];
-  UINT8                            SupportedSecurityProtocol[1];
-} SUPPORTED_SECURITY_PROTOCOLS_PARAMETER_DATA;
 
 //
 // ATA bus data structure for ATA controller
