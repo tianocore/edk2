@@ -249,9 +249,11 @@ MiscInitialization (
   IoOr8 (0x92, BIT1);
 
   //
-  // Build the CPU hob with 36-bit addressing and 16-bits of IO space.
+  // Build the CPU HOB with guest RAM size dependent address width and 16-bits
+  // of IO space. (Side note: unlike other HOBs, the CPU HOB is needed during
+  // S3 resume as well, so we build it unconditionally.)
   //
-  BuildCpuHob (36, 16);
+  BuildCpuHob (mPhysMemAddressWidth, 16);
 
   //
   // Determine platform type and save Host Bridge DID to PCD
