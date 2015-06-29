@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to iSCSI.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2160,6 +2160,25 @@ IScsiFormCallback (
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
     switch (QuestionId) {
     case KEY_ADD_ATTEMPT:
+      //
+      // Check whether iSCSI initiator name is configured already.
+      //
+      mPrivate->InitiatorNameLength = ISCSI_NAME_MAX_SIZE;
+      Status = gIScsiInitiatorName.Get (
+                                     &gIScsiInitiatorName,
+                                     &mPrivate->InitiatorNameLength,
+                                     mPrivate->InitiatorName
+                                     );
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Error: please configure iSCSI initiator name first!",
+          NULL
+          );        
+        break;
+      }
+      
       Status = IScsiConfigAddAttempt ();
       break;
 
