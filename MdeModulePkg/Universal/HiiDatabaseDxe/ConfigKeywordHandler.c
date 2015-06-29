@@ -1670,6 +1670,7 @@ ConstructConfigHdr (
   CHAR16                    *Name;
   CHAR8                     *AsciiName;
   EFI_GUID                  *Guid;
+  UINTN                     MaxLen;
 
   ASSERT (OpCodeData != NULL);
 
@@ -1733,7 +1734,8 @@ ConstructConfigHdr (
   // GUID=<HexCh>32&NAME=<Char>NameLength&PATH=<HexChar>DevicePathSize <Null>
   // | 5 | sizeof (EFI_GUID) * 2 | 6 | NameStrLen*4 | 6 | DevicePathSize * 2 | 1 |
   //
-  String = AllocateZeroPool ((5 + sizeof (EFI_GUID) * 2 + 6 + NameLength * 4 + 6 + DevicePathSize * 2 + 1) * sizeof (CHAR16));
+  MaxLen = 5 + sizeof (EFI_GUID) * 2 + 6 + NameLength * 4 + 6 + DevicePathSize * 2 + 1;
+  String = AllocateZeroPool (MaxLen * sizeof (CHAR16));
   if (String == NULL) {
     return NULL;
   }
@@ -1741,7 +1743,8 @@ ConstructConfigHdr (
   //
   // Start with L"GUID="
   //
-  ReturnString = StrCpy (String, L"GUID=");
+  StrCpyS (String, MaxLen, L"GUID=");
+  ReturnString = String;
   String += StrLen (String);
 
   if (Guid != NULL) {
@@ -1756,7 +1759,7 @@ ConstructConfigHdr (
   //
   // Append L"&NAME="
   //
-  StrCpy (String, L"&NAME=");
+  StrCpyS (String, MaxLen, L"&NAME=");
   String += StrLen (String);
 
   if (Name != NULL) {
@@ -1771,7 +1774,7 @@ ConstructConfigHdr (
   //
   // Append L"&PATH="
   //
-  StrCpy (String, L"&PATH=");
+  StrCpyS (String, MaxLen, L"&PATH=");
   String += StrLen (String);
 
   //
@@ -1991,7 +1994,7 @@ ExtractConfigRequest (
   UINT16                              Width;
   CHAR16                              *ConfigHdr;
   CHAR16                              *RequestElement;
-  UINTN                               Length;
+  UINTN                               MaxLen;
   CHAR16                              *StringPtr;
 
   ASSERT (DatabaseRecord != NULL && OpCodeData != NULL && ConfigRequest != NULL);
@@ -2032,8 +2035,8 @@ ExtractConfigRequest (
       ConfigHdr = ConstructConfigHdr(Storage, DatabaseRecord->DriverHandle);
       ASSERT (ConfigHdr != NULL);
 
-      Length = (StrLen (ConfigHdr) + 1 + StrLen(RequestElement) + 1) * sizeof (CHAR16);
-      *ConfigRequest = AllocatePool (Length);
+      MaxLen = StrLen (ConfigHdr) + 1 + StrLen(RequestElement) + 1;
+      *ConfigRequest = AllocatePool (MaxLen * sizeof (CHAR16));
       if (*ConfigRequest == NULL) {
         FreePool (ConfigHdr);
         FreePool (RequestElement);
@@ -2041,13 +2044,13 @@ ExtractConfigRequest (
       }
       StringPtr = *ConfigRequest;
 
-      StrCpy (StringPtr, ConfigHdr);
+      StrCpyS (StringPtr, MaxLen, ConfigHdr);
       StringPtr += StrLen (StringPtr);
 
       *StringPtr = L'&';
       StringPtr++;
 
-      StrCpy (StringPtr, RequestElement);
+      StrCpyS (StringPtr, MaxLen, RequestElement);
       StringPtr += StrLen (StringPtr);
       *StringPtr = L'\0';
 
@@ -2098,7 +2101,7 @@ ExtractConfigResp (
   UINT16                              Width;
   CHAR16                              *ConfigHdr;
   CHAR16                              *RequestElement;
-  UINTN                               Length;
+  UINTN                               MaxLen;
   CHAR16                              *StringPtr;
 
   ASSERT ((DatabaseRecord != NULL) && (OpCodeData != NULL) && (ConfigResp != NULL) && (ValueElement != NULL));
@@ -2140,8 +2143,8 @@ ExtractConfigResp (
       ConfigHdr = ConstructConfigHdr(Storage, DatabaseRecord->DriverHandle);
       ASSERT (ConfigHdr != NULL);
 
-      Length = (StrLen (ConfigHdr) + 1 + StrLen(RequestElement) + 1 + StrLen (L"VALUE=") + StrLen(ValueElement) + 1) * sizeof (CHAR16);
-      *ConfigResp = AllocatePool (Length);
+      MaxLen = StrLen (ConfigHdr) + 1 + StrLen(RequestElement) + 1 + StrLen (L"VALUE=") + StrLen(ValueElement) + 1;
+      *ConfigResp = AllocatePool (MaxLen * sizeof (CHAR16));
       if (*ConfigResp == NULL) {
         FreePool (ConfigHdr);
         FreePool (RequestElement);
@@ -2149,22 +2152,22 @@ ExtractConfigResp (
       }
       StringPtr = *ConfigResp;
 
-      StrCpy (StringPtr, ConfigHdr);
+      StrCpyS (StringPtr, MaxLen, ConfigHdr);
       StringPtr += StrLen (StringPtr);
 
       *StringPtr = L'&';
       StringPtr++;
 
-      StrCpy (StringPtr, RequestElement);
+      StrCpyS (StringPtr, MaxLen, RequestElement);
       StringPtr += StrLen (StringPtr);
       
       *StringPtr = L'&';
       StringPtr++;
 
-      StrCpy (StringPtr, L"VALUE=");
+      StrCpyS (StringPtr, MaxLen, L"VALUE=");
       StringPtr += StrLen (StringPtr);
 
-      StrCpy (StringPtr, ValueElement);
+      StrCpyS (StringPtr, MaxLen, ValueElement);
       StringPtr += StrLen (StringPtr);
       *StringPtr = L'\0';
 
@@ -2433,9 +2436,10 @@ GenerateKeywordResp (
   }
 
   //
-  // 2. Allocate the buffer and create the KeywordResp string.
+  // 2. Allocate the buffer and create the KeywordResp string include '\0'.
   //
-  *KeywordResp = AllocatePool ((RespStrLen + 1) * sizeof (CHAR16));
+  RespStrLen += 1;
+  *KeywordResp = AllocatePool (RespStrLen * sizeof (CHAR16));
   if (*KeywordResp == NULL) {
     if (UnicodeNameSpace != NULL) {
       FreePool (UnicodeNameSpace);
@@ -2448,36 +2452,36 @@ GenerateKeywordResp (
   //
   // 2.1 Copy NameSpaceId section.
   //
-  StrCpy (RespStr, L"NAMESPACE=");
+  StrCpyS (RespStr, RespStrLen, L"NAMESPACE=");
   RespStr += StrLen (RespStr);
-  StrCpy (RespStr, UnicodeNameSpace);
+  StrCpyS (RespStr, RespStrLen, UnicodeNameSpace);
   RespStr += StrLen (RespStr);
 
   //
   // 2.2 Copy PathHdr section.
   //
-  StrCpy (RespStr, PathHdr);
+  StrCpyS (RespStr, RespStrLen, PathHdr);
   RespStr += StrLen (RespStr);
 
   //
   // 2.3 Copy Keyword section.
   //
-  StrCpy (RespStr, L"KEYWORD=");
+  StrCpyS (RespStr, RespStrLen, L"KEYWORD=");
   RespStr += StrLen (RespStr);
-  StrCpy (RespStr, KeywordData);
+  StrCpyS (RespStr, RespStrLen, KeywordData);
   RespStr += StrLen (RespStr);
 
   //
   // 2.4 Copy the Value section.
   //
-  StrCpy (RespStr, ValueStr);
+  StrCpyS (RespStr, RespStrLen, ValueStr);
   RespStr += StrLen (RespStr);
 
   //
   // 2.5 Copy ReadOnly section if exist.
   //
   if (ReadOnly) {
-    StrCpy (RespStr, L"&READONLY");
+    StrCpyS (RespStr, RespStrLen, L"&READONLY");
     RespStr += StrLen (RespStr);
   }
 
@@ -2538,7 +2542,7 @@ MergeToMultiKeywordResp (
   *StringPtr = L'&';
   StringPtr++;
 
-  StrCpy (StringPtr, *KeywordResp);
+  StrCpyS (StringPtr, MultiKeywordRespLen / sizeof (CHAR16), *KeywordResp);
 
   return EFI_SUCCESS;
 }

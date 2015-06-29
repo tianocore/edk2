@@ -1324,6 +1324,7 @@ IfrCatenate (
   UINT16         Length0;
   UINT16         Length1;
   UINT8          *TmpBuf;
+  UINTN          MaxLen;
 
   //
   // String[0] - The second string
@@ -1363,10 +1364,11 @@ IfrCatenate (
 
   if (Value[0].Type == EFI_IFR_TYPE_STRING) {
     Size = StrSize (String[0]);
-    StringPtr= AllocatePool (StrSize (String[1]) + Size);
+    MaxLen = (StrSize (String[1]) + Size) / sizeof (CHAR16);
+    StringPtr= AllocatePool (MaxLen * sizeof (CHAR16));
     ASSERT (StringPtr != NULL);
-    StrCpy (StringPtr, String[1]);
-    StrCat (StringPtr, String[0]);
+    StrCpyS (StringPtr, MaxLen, String[1]);
+    StrCatS (StringPtr, MaxLen, String[0]);
 
     Result->Type = EFI_IFR_TYPE_STRING;
     Result->Value.string = NewString (StringPtr, FormSet->HiiHandle);

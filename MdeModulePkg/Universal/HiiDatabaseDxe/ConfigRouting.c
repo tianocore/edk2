@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -252,8 +252,7 @@ GenerateSubStr (
   Str    = AllocateZeroPool (Length * sizeof (CHAR16));
   ASSERT (Str != NULL);
 
-  StrCpy (Str, String);
-  Length = (BufferLen * 2 + 1) * sizeof (CHAR16);
+  StrCpyS (Str, Length, String);
 
   StringHeader = Str + StrLen (String);
   TemString    = (CHAR16 *) StringHeader;
@@ -297,7 +296,7 @@ GenerateSubStr (
   //
   // Convert the uppercase to lowercase since <HexAf> is defined in lowercase format.
   //
-  StrCat (Str, L"&");  
+  StrCatS (Str, Length, L"&");  
   HiiToLower (Str);
 
   *SubStr = Str;
@@ -392,6 +391,7 @@ AppendToMultiString (
 {
   UINTN AppendStringSize;
   UINTN MultiStringSize;
+  UINTN MaxLen;
 
   if (MultiString == NULL || *MultiString == NULL || AppendString == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -399,6 +399,7 @@ AppendToMultiString (
 
   AppendStringSize = StrSize (AppendString);
   MultiStringSize  = StrSize (*MultiString);
+  MaxLen = MAX_STRING_LENGTH / sizeof (CHAR16);
 
   //
   // Enlarge the buffer each time when length exceeds MAX_STRING_LENGTH.
@@ -410,12 +411,13 @@ AppendToMultiString (
                                   MultiStringSize + AppendStringSize,
                                   (VOID *) (*MultiString)
                                   );
+    MaxLen = (MultiStringSize + AppendStringSize) / sizeof (CHAR16);
     ASSERT (*MultiString != NULL);
   }
   //
   // Append the incoming string
   //
-  StrCat (*MultiString, AppendString);
+  StrCatS (*MultiString, MaxLen, AppendString);
 
   return EFI_SUCCESS;
 }
@@ -536,6 +538,8 @@ MergeDefaultString (
   EFI_STRING   AltConfigHdr;
   UINTN        HeaderLength;
   UINTN        SizeAltCfgResp;
+  UINTN        MaxLen;
+  UINTN        TotalSize;
   
   if (*AltCfgResp == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -572,13 +576,14 @@ MergeDefaultString (
   // Construct AltConfigHdr string  "&<ConfigHdr>&ALTCFG=XXXX\0"
   //                                  |1| StrLen (ConfigHdr) | 8 | 4 | 1 |
   //
-  AltConfigHdr = AllocateZeroPool ((1 + HeaderLength + 8 + 4 + 1) * sizeof (CHAR16));
+  MaxLen = 1 + HeaderLength + 8 + 4 + 1;
+  AltConfigHdr = AllocateZeroPool (MaxLen * sizeof (CHAR16));
   if (AltConfigHdr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  StrCpy (AltConfigHdr, L"&");
-  StrnCat (AltConfigHdr, *AltCfgResp, HeaderLength);
-  StrCat (AltConfigHdr, L"&ALTCFG=");
+  StrCpyS (AltConfigHdr, MaxLen, L"&");
+  StrnCatS (AltConfigHdr, MaxLen, *AltCfgResp, HeaderLength);
+  StrCatS (AltConfigHdr, MaxLen, L"&ALTCFG=");
   HeaderLength = StrLen (AltConfigHdr);
   
   StringPtrDefault = StrStr (DefaultAltCfgResp, AltConfigHdr);
@@ -586,7 +591,7 @@ MergeDefaultString (
     //
     // Get AltCfg Name
     //
-    StrnCat (AltConfigHdr, StringPtrDefault + HeaderLength, 4);
+    StrnCatS (AltConfigHdr, MaxLen, StringPtrDefault + HeaderLength, 4);
     StringPtr = StrStr (*AltCfgResp, AltConfigHdr); 
     
     //
@@ -595,34 +600,35 @@ MergeDefaultString (
     if (StringPtr == NULL) {
       StringPtrEnd   = StrStr (StringPtrDefault + 1, L"&GUID");
       SizeAltCfgResp = StrSize (*AltCfgResp);
+      TotalSize = SizeAltCfgResp + StrSize (StringPtrDefault);
       if (StringPtrEnd == NULL) {
         //
         // No more default string is found.
         //
         *AltCfgResp    = (EFI_STRING) ReallocatePool (
                                      SizeAltCfgResp,
-                                     SizeAltCfgResp + StrSize (StringPtrDefault),
+                                     TotalSize,
                                      (VOID *) (*AltCfgResp)
                                      );
         if (*AltCfgResp == NULL) {
           FreePool (AltConfigHdr);
           return EFI_OUT_OF_RESOURCES;
         }
-        StrCat (*AltCfgResp, StringPtrDefault);
+        StrCatS (*AltCfgResp, TotalSize / sizeof (CHAR16), StringPtrDefault);
         break;
       } else {
         TempChar = *StringPtrEnd;
         *StringPtrEnd = L'\0';
         *AltCfgResp = (EFI_STRING) ReallocatePool (
                                      SizeAltCfgResp,
-                                     SizeAltCfgResp + StrSize (StringPtrDefault),
+                                     TotalSize,
                                      (VOID *) (*AltCfgResp)
                                      );
         if (*AltCfgResp == NULL) {
           FreePool (AltConfigHdr);
           return EFI_OUT_OF_RESOURCES;
         }
-        StrCat (*AltCfgResp, StringPtrDefault);
+        StrCatS (*AltCfgResp, TotalSize / sizeof (CHAR16), StringPtrDefault);
         *StringPtrEnd = TempChar;
       }
     }
@@ -1188,8 +1194,8 @@ GetVarStoreType (
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      StrCpy (TempStr, GuidStr);
-      StrCat (TempStr, NameStr);
+      StrCpyS (TempStr, LengthString, GuidStr);
+      StrCatS (TempStr, LengthString, NameStr);
       if (ConfigHdr == NULL || StrnCmp (ConfigHdr, TempStr, StrLen (TempStr)) == 0) {
         *EfiVarStore = (EFI_IFR_VARSTORE_EFI *) AllocateZeroPool (IfrOpHdr->Length);
         if (*EfiVarStore == NULL) {
@@ -1304,8 +1310,8 @@ IsThisVarstore (
     goto Done;
   }
 
-  StrCpy (TempStr, GuidStr);
-  StrCat (TempStr, NameStr);
+  StrCpyS (TempStr, LengthString, GuidStr);
+  StrCatS (TempStr, LengthString, NameStr);
 
   if (ConfigHdr == NULL || StrnCmp (ConfigHdr, TempStr, StrLen (TempStr)) == 0) {
     RetVal = TRUE;
@@ -2666,7 +2672,7 @@ GenerateConfigRequest (
   //
   // Start with <ConfigHdr>
   //
-  StrCpy (StringPtr, ConfigHdr);
+  StrCpyS (StringPtr, Length, ConfigHdr);
   StringPtr += StrLen (StringPtr);
 
   //
@@ -2765,12 +2771,12 @@ GenerateHdr (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  StrCpy (*ConfigHdr, GuidStr);
-  StrCat (*ConfigHdr, NameStr);
+  StrCpyS (*ConfigHdr, Length, GuidStr);
+  StrCatS (*ConfigHdr, Length, NameStr);
   if (VarStorageData->Name == NULL) {
-    StrCat (*ConfigHdr, L"&");
+    StrCatS (*ConfigHdr, Length, L"&");
   }
-  StrCat (*ConfigHdr, PathStr);
+  StrCatS (*ConfigHdr, Length, PathStr);
 
   //
   // Remove the last character L'&'
@@ -2934,7 +2940,7 @@ GenerateAltConfigResp (
   //
   // Start with <ConfigHdr>
   //
-  StrCpy (StringPtr, ConfigHdr);
+  StrCpyS (StringPtr, Length, ConfigHdr);
   StringPtr += StrLen (StringPtr);
 
   for (Link = DefaultIdArray->Entry.ForwardLink; Link != &DefaultIdArray->Entry; Link = Link->ForwardLink) {
@@ -4612,8 +4618,8 @@ HiiBlockToConfig (
       *(ConfigElement + (StringPtr - TmpPtr)) = L'&';
     }
     *(ConfigElement + (StringPtr - TmpPtr) + 1) = 0;
-    StrCat (ConfigElement, L"VALUE=");
-    StrCat (ConfigElement, ValueStr);
+    StrCatS (ConfigElement, Length, L"VALUE=");
+    StrCatS (ConfigElement, Length, ValueStr);
 
     AppendToMultiString (Config, ConfigElement);
 
@@ -5130,8 +5136,8 @@ Exit:
     if (*AltCfgResp == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
     } else {
-      StrnCpy (*AltCfgResp, HdrStart, HdrEnd - HdrStart);
-      StrCat (*AltCfgResp, Result);
+      StrnCpyS (*AltCfgResp, Length, HdrStart, HdrEnd - HdrStart);
+      StrCatS (*AltCfgResp, Length, Result);
       Status = EFI_SUCCESS;
     }
   }

@@ -330,7 +330,7 @@ ValidatePassword (
   //
   EncodedPassword = AllocateZeroPool (PasswordMaxSize);
   ASSERT (EncodedPassword != NULL);
-  StrnCpy (EncodedPassword, Password, StrLen (Password));
+  StrnCpyS (EncodedPassword, PasswordMaxSize / sizeof (CHAR16), Password, StrLen (Password));
   EncodePassword (EncodedPassword, StrLen (EncodedPassword) * sizeof (CHAR16));
   if (CompareMem (EncodedPassword, PrivateData->Configuration.WhatIsThePassword2, PasswordMaxSize) != 0) {
     //
@@ -400,7 +400,7 @@ SetPassword (
     FreePool (TempPassword);
     return EFI_NOT_READY;
   }
-  StrnCpy (Password, TempPassword, StrLen (TempPassword));
+  StrnCpyS (Password, PasswordSize / sizeof (CHAR16), TempPassword, StrLen (TempPassword));
   FreePool (TempPassword);
 
   //
@@ -601,7 +601,7 @@ CreateAltCfgString (
 
   TmpStr = StringPtr;
   if (Result != NULL) {
-    StrCpy (StringPtr, Result);
+    StrCpyS (StringPtr, NewLen / sizeof (CHAR16), Result);
     StringPtr += StrLen (Result);  
     FreePool (Result);
   }
@@ -908,7 +908,7 @@ ExtractConfig (
       1 + sizeof (PrivateData->Configuration.NameValueVar2) * 2 + 1) * sizeof (CHAR16);
     *Results = AllocateZeroPool (BufferSize);
     ASSERT (*Results != NULL);
-    StrCpy (*Results, ConfigRequest);
+    StrCpyS (*Results, BufferSize / sizeof (CHAR16), ConfigRequest);
     Value = *Results;
 
     //
@@ -1184,7 +1184,7 @@ RouteConfig (
       StrBuffer = (CHAR16 *) PrivateData->Configuration.NameValueVar2;
       ZeroMem (TemStr, sizeof (TemStr));
       while (Value < StrPtr) {
-        StrnCpy (TemStr, Value, 4);
+        StrnCpyS (TemStr, sizeof (TemStr) / sizeof (CHAR16), Value, 4);
         *(StrBuffer++) = (CHAR16) StrHexToUint64 (TemStr);
         Value += 4;
       }

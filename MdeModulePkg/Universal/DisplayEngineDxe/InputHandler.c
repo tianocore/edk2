@@ -1,7 +1,7 @@
 /** @file
 Implementation for handling user input from the User Interfaces.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -84,6 +84,7 @@ ReadString (
   UINTN                   Maximum;
   FORM_DISPLAY_ENGINE_STATEMENT  *Question;
   BOOLEAN                 IsPassword;
+  UINTN                   MaxLen;
 
   DimensionsWidth  = gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn;
   DimensionsHeight = gStatementDimensions.BottomRow - gStatementDimensions.TopRow;
@@ -102,7 +103,8 @@ ReadString (
     IsPassword = FALSE;
   }
 
-  TempString = AllocateZeroPool ((Maximum + 1)* sizeof (CHAR16));
+  MaxLen = Maximum + 1;
+  TempString = AllocateZeroPool (MaxLen * sizeof (CHAR16));
   ASSERT (TempString);
 
   if (ScreenSize < (Maximum + 1)) {
@@ -244,7 +246,7 @@ ReadString (
         //
         // Effectively truncate string by 1 character
         //
-        StrCpy (StringPtr, TempString);
+        StrCpyS (StringPtr, MaxLen, TempString);
         CurrentCursor --;
       }
 
@@ -253,7 +255,7 @@ ReadString (
       // If it is the beginning of the string, don't worry about checking maximum limits
       //
       if ((StringPtr[0] == CHAR_NULL) && (Key.UnicodeChar != CHAR_BACKSPACE)) {
-        StrnCpy (StringPtr, &Key.UnicodeChar, 1);
+        StrnCpyS (StringPtr, MaxLen, &Key.UnicodeChar, 1);
         CurrentCursor++;
       } else if ((GetStringWidth (StringPtr) < ((Maximum + 1) * sizeof (CHAR16))) && (Key.UnicodeChar != CHAR_BACKSPACE)) {
         KeyPad[0] = Key.UnicodeChar;
@@ -264,11 +266,11 @@ ReadString (
             TempString[Index] = StringPtr[Index];
           }
 		  TempString[Index] = CHAR_NULL;
-          StrCat (TempString, KeyPad);
-          StrCat (TempString, StringPtr + CurrentCursor);
-          StrCpy (StringPtr, TempString);
+          StrCatS (TempString, MaxLen, KeyPad);
+          StrCatS (TempString, MaxLen, StringPtr + CurrentCursor);
+          StrCpyS (StringPtr, MaxLen, TempString);
         } else {
-          StrCat (StringPtr, KeyPad);
+          StrCatS (StringPtr, MaxLen, KeyPad);
         }
         CurrentCursor++;
       }
@@ -1447,7 +1449,7 @@ GetSelectionInputPopUp (
         CopyMem (TempStringPtr, StringPtr, (sizeof (CHAR16) * (PopUpWidth - 5)));
         FreePool (StringPtr);
         StringPtr = TempStringPtr;
-        StrCat (StringPtr, L"...");
+        StrCatS (StringPtr, PopUpWidth - 1, L"...");
       }
 
       if (Index == HighlightOptionIndex) {

@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 NewStrCat (
   IN OUT CHAR16               *Destination,
+  IN     UINTN                DestMax,
   IN     CHAR16               *Source
   )
 {
@@ -45,7 +46,7 @@ NewStrCat (
   Destination[Length] = NARROW_CHAR;
   Length++;
 
-  StrCpy (Destination + Length, Source);
+  StrCpyS (Destination + Length, DestMax - Length, Source);
 }
 
 /**
@@ -957,6 +958,7 @@ ProcessOptions (
   UINT8                           ValueType;
   EFI_IFR_ORDERED_LIST            *OrderList;
   BOOLEAN                         ValueInvalid;
+  UINTN                           MaxLen;
 
   Status        = EFI_SUCCESS;
 
@@ -999,7 +1001,8 @@ ProcessOptions (
       // We now know how many strings we will have, so we can allocate the
       // space required for the array or strings.
       //
-      *OptionString = AllocateZeroPool (OrderList->MaxContainers * BufferSize);
+      MaxLen = OrderList->MaxContainers * BufferSize / sizeof (CHAR16);
+      *OptionString = AllocateZeroPool (MaxLen * sizeof (CHAR16));
       ASSERT (*OptionString);
 
       HiiValue.Type = ValueType;
@@ -1057,14 +1060,14 @@ ProcessOptions (
         }
 
         Character[0] = LEFT_ONEOF_DELIMITER;
-        NewStrCat (OptionString[0], Character);
+        NewStrCat (OptionString[0], MaxLen, Character);
         StringPtr = GetToken (OneOfOption->OptionOpCode->Option, gFormData->HiiHandle);
         ASSERT (StringPtr != NULL);
-        NewStrCat (OptionString[0], StringPtr);
+        NewStrCat (OptionString[0], MaxLen, StringPtr);
         Character[0] = RIGHT_ONEOF_DELIMITER;
-        NewStrCat (OptionString[0], Character);
+        NewStrCat (OptionString[0], MaxLen, Character);
         Character[0] = CHAR_CARRIAGE_RETURN;
-        NewStrCat (OptionString[0], Character);
+        NewStrCat (OptionString[0], MaxLen, Character);
         FreePool (StringPtr);
       }
 
@@ -1092,14 +1095,14 @@ ProcessOptions (
           // Not report error, just get the correct option string info.
           //
           Character[0] = LEFT_ONEOF_DELIMITER;
-          NewStrCat (OptionString[0], Character);
+          NewStrCat (OptionString[0], MaxLen, Character);
           StringPtr = GetToken (OneOfOption->OptionOpCode->Option, gFormData->HiiHandle);
           ASSERT (StringPtr != NULL);
-          NewStrCat (OptionString[0], StringPtr);
+          NewStrCat (OptionString[0], MaxLen, StringPtr);
           Character[0] = RIGHT_ONEOF_DELIMITER;
-          NewStrCat (OptionString[0], Character);
+          NewStrCat (OptionString[0], MaxLen, Character);
           Character[0] = CHAR_CARRIAGE_RETURN;
-          NewStrCat (OptionString[0], Character);
+          NewStrCat (OptionString[0], MaxLen, Character);
           FreePool (StringPtr);
 
           continue;
@@ -1151,6 +1154,7 @@ ProcessOptions (
       //
       Status = GetSelectionInputPopUp (MenuOption);
     } else {
+      MaxLen = BufferSize / sizeof(CHAR16);
       *OptionString = AllocateZeroPool (BufferSize);
       ASSERT (*OptionString);
 
@@ -1204,12 +1208,12 @@ ProcessOptions (
       }
 
       Character[0] = LEFT_ONEOF_DELIMITER;
-      NewStrCat (OptionString[0], Character);
+      NewStrCat (OptionString[0], MaxLen, Character);
       StringPtr = GetToken (OneOfOption->OptionOpCode->Option, gFormData->HiiHandle);
       ASSERT (StringPtr != NULL);
-      NewStrCat (OptionString[0], StringPtr);
+      NewStrCat (OptionString[0], MaxLen, StringPtr);
       Character[0] = RIGHT_ONEOF_DELIMITER;
-      NewStrCat (OptionString[0], Character);
+      NewStrCat (OptionString[0], MaxLen, Character);
 
       FreePool (StringPtr);
     }

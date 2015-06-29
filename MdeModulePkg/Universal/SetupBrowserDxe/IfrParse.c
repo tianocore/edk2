@@ -688,6 +688,7 @@ InitializeRequestElement (
   LIST_ENTRY       *Link;
   BOOLEAN          Find;
   FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
+  UINTN            MaxLen;
 
   Storage = Question->Storage;
   if (Storage == NULL) {
@@ -732,6 +733,8 @@ InitializeRequestElement (
   //
   FormsetStorage = GetFstStgFromVarId(FormSet, Question->VarStoreId);
   ASSERT (FormsetStorage != NULL);
+  StringSize = (FormsetStorage->ConfigRequest != NULL) ? StrSize (FormsetStorage->ConfigRequest) : sizeof (CHAR16);
+  MaxLen = StringSize / sizeof (CHAR16) + FormsetStorage->SpareStrLen;
 
   //
   // Append <RequestElement> to <ConfigRequest>
@@ -740,8 +743,8 @@ InitializeRequestElement (
     //
     // Old String buffer is not sufficient for RequestElement, allocate a new one
     //
-    StringSize = (FormsetStorage->ConfigRequest != NULL) ? StrSize (FormsetStorage->ConfigRequest) : sizeof (CHAR16);
-    NewStr = AllocateZeroPool (StringSize + CONFIG_REQUEST_STRING_INCREMENTAL * sizeof (CHAR16));
+    MaxLen = StringSize / sizeof (CHAR16) + CONFIG_REQUEST_STRING_INCREMENTAL;
+    NewStr = AllocateZeroPool (MaxLen * sizeof (CHAR16));
     ASSERT (NewStr != NULL);
     if (FormsetStorage->ConfigRequest != NULL) {
       CopyMem (NewStr, FormsetStorage->ConfigRequest, StringSize);
@@ -751,7 +754,7 @@ InitializeRequestElement (
     FormsetStorage->SpareStrLen   = CONFIG_REQUEST_STRING_INCREMENTAL;
   }
 
-  StrCat (FormsetStorage->ConfigRequest, RequestElement);
+  StrCatS (FormsetStorage->ConfigRequest, MaxLen, RequestElement);
   FormsetStorage->ElementCount++;
   FormsetStorage->SpareStrLen -= StrLen;
 
@@ -782,6 +785,8 @@ InitializeRequestElement (
     ConfigInfo->Storage       = FormsetStorage->BrowserStorage;
     InsertTailList(&Form->ConfigRequestHead, &ConfigInfo->Link);
   }
+  StringSize = (ConfigInfo->ConfigRequest != NULL) ? StrSize (ConfigInfo->ConfigRequest) : sizeof (CHAR16);
+  MaxLen = StringSize / sizeof (CHAR16) + ConfigInfo->SpareStrLen;
 
   //
   // Append <RequestElement> to <ConfigRequest>
@@ -790,8 +795,8 @@ InitializeRequestElement (
     //
     // Old String buffer is not sufficient for RequestElement, allocate a new one
     //
-    StringSize = (ConfigInfo->ConfigRequest != NULL) ? StrSize (ConfigInfo->ConfigRequest) : sizeof (CHAR16);
-    NewStr = AllocateZeroPool (StringSize + CONFIG_REQUEST_STRING_INCREMENTAL * sizeof (CHAR16));
+    MaxLen = StringSize / sizeof (CHAR16) + CONFIG_REQUEST_STRING_INCREMENTAL;
+    NewStr = AllocateZeroPool (MaxLen * sizeof (CHAR16));
     ASSERT (NewStr != NULL);
     if (ConfigInfo->ConfigRequest != NULL) {
       CopyMem (NewStr, ConfigInfo->ConfigRequest, StringSize);
@@ -801,7 +806,7 @@ InitializeRequestElement (
     ConfigInfo->SpareStrLen   = CONFIG_REQUEST_STRING_INCREMENTAL;
   }
 
-  StrCat (ConfigInfo->ConfigRequest, RequestElement);
+  StrCatS (ConfigInfo->ConfigRequest, MaxLen, RequestElement);
   ConfigInfo->ElementCount++;
   ConfigInfo->SpareStrLen -= StrLen;
   return EFI_SUCCESS;

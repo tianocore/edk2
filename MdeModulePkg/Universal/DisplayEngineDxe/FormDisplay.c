@@ -2149,6 +2149,7 @@ FxConfirmPopup (
   UINT32                          CheckFlags;
   BOOLEAN                         RetVal;
   UINTN                           CatLen;
+  UINTN                           MaxLen;
 
   CfmStrLen = 0;
   CatLen    = StrLen (gConfirmMsgConnect);
@@ -2209,50 +2210,51 @@ FxConfirmPopup (
   // Allocate buffer to save the string.
   // String + "?" + "\0"
   //
-  CfmStr = AllocateZeroPool ((CfmStrLen + 1 + 1) * sizeof (CHAR16));
+  MaxLen = CfmStrLen + 1 + 1;
+  CfmStr = AllocateZeroPool (MaxLen * sizeof (CHAR16));
   ASSERT (CfmStr != NULL);
 
   if ((Action & BROWSER_ACTION_DISCARD) == BROWSER_ACTION_DISCARD) {
-    StrCpy (CfmStr, gConfirmDiscardMsg);
+    StrCpyS (CfmStr, MaxLen, gConfirmDiscardMsg);
   }
 
   if ((Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
     if (CfmStr[0] != 0) {
-      StrCat (CfmStr, gConfirmMsgConnect);
-      StrCat (CfmStr, gConfirmDefaultMsg2nd);
+      StrCatS (CfmStr, MaxLen, gConfirmMsgConnect);
+      StrCatS (CfmStr, MaxLen, gConfirmDefaultMsg2nd);
     } else {
-      StrCpy (CfmStr, gConfirmDefaultMsg);
+      StrCpyS (CfmStr, MaxLen, gConfirmDefaultMsg);
     }
   }
 
   if ((Action & BROWSER_ACTION_SUBMIT)  == BROWSER_ACTION_SUBMIT) {
     if (CfmStr[0] != 0) {
-      StrCat (CfmStr, gConfirmMsgConnect);
-      StrCat (CfmStr, gConfirmSubmitMsg2nd);
+      StrCatS (CfmStr, MaxLen, gConfirmMsgConnect);
+      StrCatS (CfmStr, MaxLen, gConfirmSubmitMsg2nd);
     } else {
-      StrCpy (CfmStr, gConfirmSubmitMsg);
+      StrCpyS (CfmStr, MaxLen, gConfirmSubmitMsg);
     }
   }
 
   if ((Action & BROWSER_ACTION_RESET)  == BROWSER_ACTION_RESET) {
     if (CfmStr[0] != 0) {
-      StrCat (CfmStr, gConfirmMsgConnect);
-      StrCat (CfmStr, gConfirmResetMsg2nd);
+      StrCatS (CfmStr, MaxLen, gConfirmMsgConnect);
+      StrCatS (CfmStr, MaxLen, gConfirmResetMsg2nd);
     } else {
-      StrCpy (CfmStr, gConfirmResetMsg);
+      StrCpyS (CfmStr, MaxLen, gConfirmResetMsg);
     }
   }
 
   if ((Action & BROWSER_ACTION_EXIT)  == BROWSER_ACTION_EXIT) {
     if (CfmStr[0] != 0) {
-      StrCat (CfmStr, gConfirmMsgConnect);
-      StrCat (CfmStr, gConfirmExitMsg2nd);
+      StrCatS (CfmStr, MaxLen, gConfirmMsgConnect);
+      StrCatS (CfmStr, MaxLen, gConfirmExitMsg2nd);
     } else {
-      StrCpy (CfmStr, gConfirmExitMsg);
+      StrCpyS (CfmStr, MaxLen, gConfirmExitMsg);
     }
   }
 
-  StrCat (CfmStr, gConfirmMsgEnd);
+  StrCatS (CfmStr, MaxLen, gConfirmMsgEnd);
 
   do {
     CreateDialog (&Key, gEmptyString, CfmStr, gConfirmOpt, gEmptyString, NULL);
