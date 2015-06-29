@@ -96,7 +96,7 @@ STATIC Elf_Phdr *mPhdrBase;
 //
 // Coff information
 //
-STATIC const UINT32 mCoffAlignment = 0x20;
+STATIC UINT32 mCoffAlignment = 0x20;
 
 //
 // PE section alignment.
@@ -290,6 +290,20 @@ ScanSections32 (
 
   mTableOffset = mCoffOffset;
   mCoffOffset += mCoffNbrSections * sizeof(EFI_IMAGE_SECTION_HEADER);
+
+  //
+  // Set mCoffAlignment to the maximum alignment of the input sections
+  // we care about
+  //
+  for (i = 0; i < mEhdr->e_shnum; i++) {
+    Elf_Shdr *shdr = GetShdrByIndex(i);
+    if (shdr->sh_addralign <= mCoffAlignment) {
+      continue;
+    }
+    if (IsTextShdr(shdr) || IsDataShdr(shdr) || IsHiiRsrcShdr(shdr)) {
+      mCoffAlignment = (UINT32)shdr->sh_addralign;
+    }
+  }
 
   //
   // First text sections.

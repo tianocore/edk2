@@ -96,11 +96,11 @@ CoffAddFixup(
 
     mCoffFile = realloc (
       mCoffFile,
-      mCoffOffset + sizeof(EFI_IMAGE_BASE_RELOCATION) + 2*0x1000
+      mCoffOffset + sizeof(EFI_IMAGE_BASE_RELOCATION) + 2 * MAX_COFF_ALIGNMENT
       );
     memset (
       mCoffFile + mCoffOffset, 0,
-      sizeof(EFI_IMAGE_BASE_RELOCATION) + 2*0x1000
+      sizeof(EFI_IMAGE_BASE_RELOCATION) + 2 * MAX_COFF_ALIGNMENT
       );
 
     mCoffBaseRel = (EFI_IMAGE_BASE_RELOCATION*)(mCoffFile + mCoffOffset);
