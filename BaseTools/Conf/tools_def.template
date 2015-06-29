@@ -246,8 +246,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   VS2005      -win32-  Requires:
 #                             Microsoft Visual Studio 2005 Team Suite Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -255,8 +255,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   VS2008      -win32-  Requires:
 #                             Microsoft Visual Studio 2008 Team Suite Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -264,8 +264,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   VS2010      -win32-  Requires:
 #                             Microsoft Visual Studio 2010 Premium Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -273,8 +273,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   VS2012      -win32-  Requires:
 #                             Microsoft Visual Studio 2012 Professional Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -282,8 +282,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   VS2013      -win32-  Requires:
 #                             Microsoft Visual Studio 2013 Professional Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -291,65 +291,65 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   DDK3790     -win32-  Requires:
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   UNIXGCC     -UNIX-   Requires:
 #                             GCC 4.3.0
 #                             binutils 2.20.51.0.5
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   GCC44       -Linux,Windows-  Requires:
 #                             GCC 4.4 targeting x86_64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   GCC45       -Linux,Windows-  Requires:
 #                             GCC 4.5 targeting x86_64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   GCC46       -Linux,Windows-  Requires:
 #                             GCC 4.6 targeting x86_64-linux-gnu or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   GCC47       -Linux,Windows-  Requires:
 #                             GCC 4.7 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   GCC48       -Linux,Windows-  Requires:
 #                             GCC 4.8 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   GCC49       -Linux,Windows-  Requires:
 #                             GCC 4.9 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   ELFGCC      -Linux-  Requires:
 #                             GCC(this tool chain uses whatever version of gcc and binutils that is installed in /usr/bin)
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   CYGGCC      -win32-  Requires:
 #                             CygWin, GCC 4.3.0, binutils 2.20.51.0.5
 #                             Microsoft Visual Studio 2005 or 2008
@@ -357,8 +357,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   ICC         -win32-  Requires:
 #                             Intel C Compiler V9.1
 #                        Dependencies:
@@ -369,8 +369,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   ICC11       -win32-  Requires:
 #                             Intel C Compiler V11.1
 #                        Dependencies:
@@ -381,8 +381,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   MYTOOLS     -win32-  Requires:
 #                             Microsoft Visual Studio 2008 for IA32/X64
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830 for IPF
@@ -390,8 +390,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   VS2003xASL  -win32-  Requires:
 #                             Microsoft Visual Studio .NET 2003
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -494,36 +494,36 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php 
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads 
 #   VS2008x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2008 (x86)
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php 
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads 
 #   VS2010x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2010 (x86) Premium Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php 
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads 
 #   VS2012x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2012 (x86) Professional Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   VS2013x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2013 (x86) Professional Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
 #   ICCx86      -win64-  Requires:
 #                             Intel C Compiler V9.1(x86)
 #                        Dependencies:
@@ -534,8 +534,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php 
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads 
 #   ICC11x86    -win64-  Requires:
 #                             Intel C Compiler V11.1(x86)
 #                        Dependencies:
@@ -546,8 +546,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php 
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads 
 #  VS2005x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2005 Team Suite Edition (x86)
 #                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
@@ -616,8 +616,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php 
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads 
 #  CYGGCCx86xASL -win64- Requires:
 #                             CygWin, GCC 4.3.0, binutils 2.20.51.0.5
 #                             Microsoft Visual Studio 2005 or 2008
@@ -631,14 +631,14 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             ARM None EABI GCC 4.6.0
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   ARMLINUXGCC -unix-   Requires:
 #                             ARM Linux GNU EABI GCC 4.6.0
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   RVCT        -win-   Requires:
 #                             ARM C/C++ Compiler, 5.00
 #                        Optional:
@@ -651,8 +651,8 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             ARM C/C++ Compiler, 5.00
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler v20101013 from
-#                               http://www.acpica.org/downloads/previous_releases.php
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 # * Commented out - All versions of VS2005 use the same standard install directory
 #
 ####################################################################################
