@@ -1,6 +1,7 @@
 /** @file
   This module implements Hash2 Protocol.
 
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
@@ -125,6 +126,7 @@ typedef struct {
 } EFI_HASH_INFO;
 
 EFI_HASH_INFO  mHashInfo[] = {
+  {&gEfiHashAlgorithmMD5Guid,     sizeof(EFI_MD5_HASH2),    Md5GetContextSize,    Md5Init,    Md5Update,    Md5Final  },
   {&gEfiHashAlgorithmSha1Guid,    sizeof(EFI_SHA1_HASH2),   Sha1GetContextSize,   Sha1Init,   Sha1Update,   Sha1Final   },
   {&gEfiHashAlgorithmSha256Guid,  sizeof(EFI_SHA256_HASH2), Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Final },
   {&gEfiHashAlgorithmSha384Guid,  sizeof(EFI_SHA384_HASH2), Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Final },
