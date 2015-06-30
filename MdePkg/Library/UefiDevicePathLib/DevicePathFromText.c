@@ -2596,7 +2596,16 @@ DevPathFromTextUsbWwid (
   UsbWwid->VendorId        = (UINT16) Strtoi (VIDStr);
   UsbWwid->ProductId       = (UINT16) Strtoi (PIDStr);
   UsbWwid->InterfaceNumber = (UINT16) Strtoi (InterfaceNumStr);
-  StrnCpy ((CHAR16 *) ((UINT8 *) UsbWwid + sizeof (USB_WWID_DEVICE_PATH)), SerialNumberStr, SerialNumberStrLen);
+
+  //
+  // There is no memory allocated in UsbWwid for the '\0' in SerialNumberStr.
+  // Therefore, the '\0' will not be copied.
+  //
+  CopyMem (
+    (UINT8 *) UsbWwid + sizeof (USB_WWID_DEVICE_PATH),
+    SerialNumberStr,
+    SerialNumberStrLen * sizeof (CHAR16)
+    );
 
   return (EFI_DEVICE_PATH_PROTOCOL *) UsbWwid;
 }
@@ -2759,8 +2768,8 @@ DevPathFromTextBluetooth (
     if (TempNumBuffer == NULL) {
       break;
     }
-    StrnCpy (TempNumBuffer, L"0x", TempBufferSize / sizeof (CHAR16));
-    StrnCat (TempNumBuffer + StrLen (L"0x"), Walker, TempBufferSize / sizeof (CHAR16) - StrLen (L"0x") );
+    StrCpyS (TempNumBuffer, TempBufferSize / sizeof (CHAR16), L"0x");
+    StrCatS (TempNumBuffer, TempBufferSize / sizeof (CHAR16), Walker);
     BluetoothDp->BD_ADDR.Address[Index] = (UINT8)Strtoi (TempNumBuffer);
     FreePool (TempNumBuffer);
     Index--;
@@ -2982,7 +2991,7 @@ DevPathFromTextFilePath (
                                     (UINT16) (sizeof (FILEPATH_DEVICE_PATH) + StrLen (TextDeviceNode) * 2)
                                     );
 
-  StrCpy (File->PathName, TextDeviceNode);
+  StrCpyS (File->PathName, StrLen (TextDeviceNode) + 1, TextDeviceNode);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) File;
 }
