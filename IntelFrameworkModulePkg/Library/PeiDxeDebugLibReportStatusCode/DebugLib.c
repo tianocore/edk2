@@ -56,6 +56,7 @@ DebugPrint (
   UINT64          Buffer[(EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)) + 1];
   EFI_DEBUG_INFO  *DebugInfo;
   UINTN           TotalSize;
+  UINTN           DestBufferSize;
   VA_LIST         VaListMarker;
   BASE_LIST       BaseListMarker;
   CHAR8           *FormatString;
@@ -115,7 +116,13 @@ DebugPrint (
   //
   // Copy the Format string into the record
   //
-  AsciiStrCpy (FormatString, Format);
+  // According to the content structure of Buffer shown above, the size of
+  // the FormatString buffer is the size of Buffer minus the Padding
+  // (4 bytes), minus the size of EFI_DEBUG_INFO, minus the size of
+  // variable arguments (12 * sizeof (UINT64)).
+  //
+  DestBufferSize = sizeof (Buffer) - 4 - sizeof (EFI_DEBUG_INFO) - 12 * sizeof (UINT64);
+  AsciiStrCpyS (FormatString, DestBufferSize / sizeof (CHAR8), Format);
 
   //
   // The first 12 * sizeof (UINT64) bytes following EFI_DEBUG_INFO are for variable arguments
