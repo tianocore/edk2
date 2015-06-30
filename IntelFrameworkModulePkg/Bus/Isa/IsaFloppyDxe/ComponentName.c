@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Isa Floppy driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -227,7 +227,7 @@ AddName (
   CHAR16  FloppyDriveName[FLOPPY_DRIVE_NAME_LEN + 1];
 
   if (!(FeaturePcdGet(PcdComponentNameDisable) && FeaturePcdGet(PcdComponentName2Disable))) {
-    StrCpy (FloppyDriveName, FLOPPY_DRIVE_NAME);
+    StrCpyS (FloppyDriveName, FLOPPY_DRIVE_NAME_LEN + 1, FLOPPY_DRIVE_NAME);
     FloppyDriveName[FLOPPY_DRIVE_NAME_LEN - 1] = (CHAR16) (L'0' + FdcDev->Disk);
 
     AddUnicodeString2 (
