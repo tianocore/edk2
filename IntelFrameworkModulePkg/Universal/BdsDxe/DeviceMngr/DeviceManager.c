@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implementation
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -374,13 +374,12 @@ GetMacAddressString(
   // The size is the Number size + ":" size + Vlan size(\XXXX) + End
   //
   BufferLen = (4 + 2 * HwAddressSize + (HwAddressSize - 1) + 5 + 1) * sizeof (CHAR16);
-  String = AllocateZeroPool (BufferLen);
+  String = AllocateCopyPool (BufferLen, L"MAC:");
   if (String == NULL) {
     return FALSE;
   }
 
   *PBuffer = String;
-  StrCpy(String, L"MAC:");
   String += 4;
   
   //
@@ -1383,15 +1382,15 @@ CallDriverHealth (
        String = (EFI_STRING) AllocateZeroPool (StringSize);
        ASSERT (String != NULL);
        
-       StrnCpy (String, DriverName, StringSize / sizeof(CHAR16));
+       StrCpyS (String, StringSize / sizeof(CHAR16), DriverName);
        if (!IsControllerNameEmpty) {
-        StrnCat (String, L"    ", StringSize / sizeof(CHAR16) - StrLen(String) - 1);
-        StrnCat (String, ControllerName, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+        StrCatS (String, StringSize / sizeof(CHAR16), L"    ");
+        StrCatS (String, StringSize / sizeof(CHAR16), ControllerName);
        }
 
-       StrnCat (String, L"    ", StringSize / sizeof(CHAR16) - StrLen(String) - 1);
-       StrnCat (String, TmpString, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
-       
+       StrCatS (String, StringSize / sizeof(CHAR16), L"    ");
+       StrCatS (String, StringSize / sizeof(CHAR16), TmpString);
+
     } else {
       //
       // Update the string will be displayed base on the driver's health status
@@ -1423,13 +1422,13 @@ CallDriverHealth (
       String = (EFI_STRING) AllocateZeroPool (StringSize);
       ASSERT (String != NULL);
       
-      StrnCpy (String, DriverName, StringSize / sizeof(CHAR16));
+      StrCpyS (String, StringSize / sizeof (CHAR16), DriverName);
       if (!IsControllerNameEmpty) {
-        StrnCat (String, L"    ", StringSize / sizeof(CHAR16) - StrLen(String) - 1);
-        StrnCat (String, ControllerName, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+        StrCatS (String, StringSize / sizeof (CHAR16), L"    ");
+        StrCatS (String, StringSize / sizeof (CHAR16), ControllerName);
       }
 
-      StrnCat (String, TmpString, StringSize / sizeof(CHAR16) - StrLen(String) - 1);
+      StrCatS (String, StringSize / sizeof (CHAR16), TmpString);
     }
 
     FreePool (TmpString);
