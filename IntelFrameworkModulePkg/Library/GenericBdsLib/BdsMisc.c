@@ -1,7 +1,7 @@
 /** @file
   Misc BDS library function
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1127,12 +1127,16 @@ SetupResetReminder (
   if (IsResetReminderFeatureEnable ()) {
     if (IsResetRequired ()) {
 
-      StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+      StringBuffer1 = AllocateCopyPool (
+                        MAX_STRING_LEN * sizeof (CHAR16),
+                        L"Configuration changed. Reset to apply it Now."
+                        );
       ASSERT (StringBuffer1 != NULL);
-      StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+      StringBuffer2 = AllocateCopyPool (
+                        MAX_STRING_LEN * sizeof (CHAR16),
+                        L"Press ENTER to reset"
+                        );
       ASSERT (StringBuffer2 != NULL);
-      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now.");
-      StrCpy (StringBuffer2, L"Press ENTER to reset");
       //
       // Popup a menu to notice user
       //

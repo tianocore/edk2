@@ -3,7 +3,7 @@
   performance, all the function will only include if the performance
   switch is set.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -40,7 +40,7 @@ GetShortPdbFileName (
   UINTN EndIndex;
 
   if (PdbFileName == NULL) {
-    AsciiStrCpy (GaugeString, " ");
+    AsciiStrCpyS (GaugeString, PERF_TOKEN_LENGTH, " ");
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
@@ -91,7 +91,7 @@ GetNameFromHandle (
   CHAR8                       *PdbFileName;
   EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
 
-  AsciiStrCpy (GaugeString, " ");
+  AsciiStrCpyS (GaugeString, PERF_TOKEN_LENGTH, " ");
 
   //
   // Get handle name from image protocol
@@ -287,7 +287,7 @@ WriteBootToOsPerformanceData (
 
       GetNameFromHandle (Handles[Index], GaugeString);
 
-      AsciiStrCpy (mPerfData.Token, GaugeString);
+      AsciiStrCpyS (mPerfData.Token, PERF_TOKEN_SIZE, GaugeString);
       mPerfData.Duration = Duration;
 
       CopyMem (Ptr, &mPerfData, sizeof (PERF_DATA));
@@ -316,7 +316,7 @@ WriteBootToOsPerformanceData (
 
       ZeroMem (&mPerfData, sizeof (PERF_DATA));
 
-      AsciiStrnCpy (mPerfData.Token, Token, PERF_TOKEN_LENGTH);
+      AsciiStrnCpyS (mPerfData.Token, PERF_TOKEN_SIZE, Token, PERF_TOKEN_LENGTH);
       if (StartTicker == 1) {
         StartTicker = StartValue;
       }
