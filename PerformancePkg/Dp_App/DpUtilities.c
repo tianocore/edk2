@@ -1,7 +1,7 @@
 /** @file
   Utility functions used by the Dp application.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -159,7 +159,7 @@ GetShortPdbFileName (
   ZeroMem (UnicodeBuffer, DXE_PERFORMANCE_STRING_LENGTH * sizeof (CHAR16));
 
   if (PdbFileName == NULL) {
-    StrCpy (UnicodeBuffer, L" ");
+    StrCpyS (UnicodeBuffer, DXE_PERFORMANCE_STRING_SIZE, L" ");
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
@@ -290,8 +290,11 @@ GetNameFromHandle (
                                );
     SafeFreePool (BestLanguage);
     if (!EFI_ERROR (Status)) {
-      StrnCpy (mGaugeString, StringPtr, DP_GAUGE_STRING_LENGTH);
-      mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+      StrCpyS (
+        mGaugeString,
+        DP_GAUGE_STRING_LENGTH + 1,
+        StringPtr
+        );
       return;
     }
   }
@@ -334,8 +337,11 @@ GetNameFromHandle (
         //
         // Method 3. Get the name string from FFS UI section
         //
-        StrnCpy (mGaugeString, NameString, DP_GAUGE_STRING_LENGTH);
-        mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+        StrCpyS (
+          mGaugeString,
+          DP_GAUGE_STRING_LENGTH + 1,
+          NameString
+          );
         FreePool (NameString);
       } else {
         //
@@ -350,8 +356,11 @@ GetNameFromHandle (
       //
       NameString = ConvertDevicePathToText (LoadedImageDevicePath, TRUE, FALSE);
       if (NameString != NULL) {
-        StrnCpy (mGaugeString, NameString, DP_GAUGE_STRING_LENGTH);
-        mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+        StrCpyS (
+          mGaugeString,
+          DP_GAUGE_STRING_LENGTH + 1,
+          NameString
+          );
         FreePool (NameString);
         return;
       }
@@ -363,7 +372,7 @@ GetNameFromHandle (
   //
   StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_ERROR_NAME), NULL);
   ASSERT (StringPtr != NULL);
-  StrCpy (mGaugeString, StringPtr);
+  StrCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, StringPtr);
   FreePool (StringPtr);
   return;
 }
