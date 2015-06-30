@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -628,9 +628,9 @@ ConvertProcessorToString (
   StringBuffer = AllocateZeroPool (0x20);
   ASSERT (StringBuffer != NULL);
   Index = UnicodeValueToString (StringBuffer, LEFT_JUSTIFY, FreqMhz / 1000, 3);
-  StrCat (StringBuffer, L".");
+  StrCatS (StringBuffer, 0x20 / sizeof (CHAR16), L".");
   UnicodeValueToString (StringBuffer + Index + 1, PREFIX_ZERO, (FreqMhz % 1000) / 10, 2);
-  StrCat (StringBuffer, L" GHz");
+  StrCatS (StringBuffer, 0x20 / sizeof (CHAR16), L" GHz");
   *String = (CHAR16 *) StringBuffer;
   return ;
 }
@@ -654,7 +654,7 @@ ConvertMemorySizeToString (
   StringBuffer = AllocateZeroPool (0x20);
   ASSERT (StringBuffer != NULL);
   UnicodeValueToString (StringBuffer, LEFT_JUSTIFY, MemorySize, 6);
-  StrCat (StringBuffer, L" MB RAM");
+  StrCatS (StringBuffer, 0x20 / sizeof (CHAR16), L" MB RAM");
 
   *String = (CHAR16 *) StringBuffer;
 
