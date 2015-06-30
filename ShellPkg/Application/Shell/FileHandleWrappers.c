@@ -516,11 +516,11 @@ FileInterfaceStdInRead(
             StrnCatS( TabStr, 
                       (*BufferSize)/sizeof(CHAR16), 
                       CurrentString + TabPos, 
-                      (StringLen - TabPos) * sizeof (CHAR16)
+                      StringLen - TabPos
                       );
           } else {
             *TabStr = CHAR_NULL;
-            StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos, (StringLen - TabPos) * sizeof (CHAR16));
+            StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos, StringLen - TabPos);
           }
         } else {
           StrCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos);
