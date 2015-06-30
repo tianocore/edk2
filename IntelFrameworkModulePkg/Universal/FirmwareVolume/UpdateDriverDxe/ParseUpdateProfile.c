@@ -3,7 +3,7 @@
   configuration file and pass the information to the update driver
   so that the driver can perform updates accordingly.
 
-  Copyright (c) 2002 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2002 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -674,11 +674,10 @@ UpdateStringToGuid (
   UINT8                                 Digits[3];
 
   StrLen          = AsciiStrLen  ((CONST CHAR8 *) Str);
-  Buffer          = AllocatePool (StrLen + 1);
+  Buffer          = AllocateCopyPool (StrLen + 1, Str);
   if (Buffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  AsciiStrCpy ((CHAR8 *)Buffer, (CHAR8 *)Str);
 
   //
   // Data1
@@ -997,7 +996,7 @@ ParseUpdateDataFile (
     //
     // Get the section name of each update
     //
-    AsciiStrCpy (Entry, "Update");
+    AsciiStrCpyS (Entry, MAX_LINE_LENGTH, "Update");
     UpdateStrCatNumber ((UINT8 *) Entry, Index);
     Value               = NULL;
     Status              = UpdateGetProfileString (
