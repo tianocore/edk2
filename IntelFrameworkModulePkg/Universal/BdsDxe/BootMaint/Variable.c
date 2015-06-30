@@ -1,7 +1,7 @@
 /** @file
   Variable operation that will be used by bootmaint
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -579,7 +579,7 @@ Var_UpdateDriverOption (
     );
 
   if (*DescriptionData == 0x0000) {
-    StrCpy (DescriptionData, DriverString);
+    StrCpyS (DescriptionData, DESCRIPTION_DATA_SIZE, DriverString);
   }
 
   BufferSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (DescriptionData);
@@ -763,7 +763,11 @@ Var_UpdateBootOption (
   UnicodeSPrint (BootString, sizeof (BootString), L"Boot%04x", Index);
 
   if (NvRamMap->BootDescriptionData[0] == 0x0000) {
-    StrCpy (NvRamMap->BootDescriptionData, BootString);
+    StrCpyS (
+      NvRamMap->BootDescriptionData,
+      sizeof (NvRamMap->BootDescriptionData) / sizeof (NvRamMap->BootDescriptionData[0]),
+      BootString
+      );
   }
 
   BufferSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (NvRamMap->BootDescriptionData);

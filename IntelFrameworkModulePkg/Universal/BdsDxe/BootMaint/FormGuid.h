@@ -1,7 +1,7 @@
 /** @file
   Formset guids, form id and VarStore data structure for Boot Maintenance Manager.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -219,14 +219,20 @@ typedef struct {
 #define KEY_VALUE_SAVE_AND_EXIT_DRIVER         0x1002
 #define KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER      0x1003
 
+//
+// Description data and optional data size
+//
+#define DESCRIPTION_DATA_SIZE                  75
+#define OPTIONAL_DATA_SIZE                     127
+
 ///
 /// This is the data structure used by File Explorer formset
 ///
 typedef struct {
-  UINT16  BootDescriptionData[75];
-  UINT16  BootOptionalData[127];
-  UINT16  DriverDescriptionData[75];
-  UINT16  DriverOptionalData[127];
+  UINT16  BootDescriptionData[DESCRIPTION_DATA_SIZE];
+  UINT16  BootOptionalData[OPTIONAL_DATA_SIZE];
+  UINT16  DriverDescriptionData[DESCRIPTION_DATA_SIZE];
+  UINT16  DriverOptionalData[OPTIONAL_DATA_SIZE];
   BOOLEAN BootOptionChanged;
   BOOLEAN DriverOptionChanged;
   UINT8   Active;

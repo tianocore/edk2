@@ -1,7 +1,7 @@
 /** @file
 Dynamically update the pages.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -830,7 +830,7 @@ UpdateConModePage (
     //
     UnicodeValueToString (ModeString, 0, Col, 0);
     PStr = &ModeString[0];
-    StrnCat (PStr, L" x ", StrLen(L" x ") + 1);
+    StrCatS (PStr, sizeof (ModeString) / sizeof (ModeString[0]), L" x ");
     PStr = PStr + StrLen (PStr);
     UnicodeValueToString (PStr , 0, Row, 0);
 

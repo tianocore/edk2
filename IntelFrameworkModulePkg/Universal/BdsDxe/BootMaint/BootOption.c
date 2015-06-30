@@ -5,7 +5,7 @@
 
   Boot option manipulation
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1010,11 +1010,9 @@ BOpt_GetBootOptions (
     
     StringSize = StrSize((UINT16*)LoadOptionPtr);
 
-    NewLoadContext->Description = AllocateZeroPool (StrSize((UINT16*)LoadOptionPtr));
+    NewLoadContext->Description = AllocateCopyPool (StrSize((UINT16*)LoadOptionPtr), LoadOptionPtr);
     ASSERT (NewLoadContext->Description != NULL);
-    StrCpy (NewLoadContext->Description, (UINT16*)LoadOptionPtr);
-    
-    ASSERT (NewLoadContext->Description != NULL);
+
     NewMenuEntry->DisplayString = NewLoadContext->Description;
 
     LoadOptionPtr += StringSize;
@@ -1089,6 +1087,7 @@ BOpt_AppendFileName (
 {
   UINTN   Size1;
   UINTN   Size2;
+  UINTN   MaxLen;
   CHAR16  *Str;
   CHAR16  *TmpStr;
   CHAR16  *Ptr;
@@ -1096,18 +1095,18 @@ BOpt_AppendFileName (
 
   Size1 = StrSize (Str1);
   Size2 = StrSize (Str2);
-  Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
+  MaxLen = (Size1 + Size2 + sizeof (CHAR16)) / sizeof (CHAR16);
+  Str   = AllocateCopyPool (MaxLen * sizeof (CHAR16), Str1);
   ASSERT (Str != NULL);
 
-  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16)); 
+  TmpStr = AllocateZeroPool (MaxLen * sizeof (CHAR16)); 
   ASSERT (TmpStr != NULL);
 
-  StrCat (Str, Str1);
   if (!((*Str == '\\') && (*(Str + 1) == 0))) {
-    StrCat (Str, L"\\");
+    StrCatS (Str, MaxLen, L"\\");
   }
 
-  StrCat (Str, Str2);
+  StrCatS (Str, MaxLen, Str2);
 
   Ptr       = Str;
   LastSlash = Str;
@@ -1120,11 +1119,11 @@ BOpt_AppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 3);
-      StrCpy (LastSlash, TmpStr);
+      StrCpyS (TmpStr, MaxLen, Ptr + 3);
+      StrCpyS (LastSlash, MaxLen - (UINTN) (LastSlash - Str), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
@@ -1132,11 +1131,11 @@ BOpt_AppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 2);
-      StrCpy (Ptr, TmpStr);
+      StrCpyS (TmpStr, MaxLen, Ptr + 2);
+      StrCpyS (Ptr, MaxLen - (UINTN) (Ptr - Str), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;
