@@ -2,7 +2,7 @@
   Mde UEFI library API implementation.
   Print to StdErr or ConOut defined in EFI_SYSTEM_TABLE
 
-  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -754,14 +754,10 @@ CatVSPrint (
     SizeRequired = sizeof(CHAR16) + (CharactersRequired * sizeof(CHAR16));
   }
 
-  BufferToReturn = AllocateZeroPool(SizeRequired);
+  BufferToReturn = AllocateCopyPool(SizeRequired, String);
 
   if (BufferToReturn == NULL) {
     return NULL;
-  }
-
-  if (String != NULL) {
-    StrCpy(BufferToReturn, String);
   }
 
   UnicodeVSPrint(BufferToReturn + StrLen(BufferToReturn), (CharactersRequired+1) * sizeof(CHAR16), FormatString, Marker);
