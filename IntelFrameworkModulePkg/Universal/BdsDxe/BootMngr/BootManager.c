@@ -1,7 +1,7 @@
 /** @file
   The platform boot manager reference implementation
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -205,11 +205,11 @@ CallBootManager (
   EFI_STRING_ID               Token;
   EFI_INPUT_KEY               Key;
   CHAR16                      *HelpString;
+  UINTN                       HelpSize;
   EFI_STRING_ID               HelpToken;
   UINT16                      *TempStr;
   EFI_HII_HANDLE              HiiHandle;
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
-  UINTN                       TempSize;
   VOID                        *StartOpCodeHandle;
   VOID                        *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL          *StartLabel;
@@ -318,11 +318,10 @@ CallBootManager (
     Token = HiiSetString (HiiHandle, 0, Option->Description, NULL);
 
     TempStr = DevicePathToStr (Option->DevicePath);
-    TempSize = StrSize (TempStr);
-    HelpString = AllocateZeroPool (TempSize + StrSize (L"Device Path : "));
+    HelpSize = StrSize (TempStr) + StrSize (L"Device Path : ");
+    HelpString = AllocateCopyPool (HelpSize, L"Device Path : ");
     ASSERT (HelpString != NULL);
-    StrCat (HelpString, L"Device Path : ");
-    StrCat (HelpString, TempStr);
+    StrCatS (HelpString, HelpSize / sizeof (CHAR16), TempStr);
 
     HelpToken = HiiSetString (HiiHandle, 0, HelpString, NULL);
 
