@@ -719,17 +719,17 @@ Pkcs7GetAttachedContent (
   CONST UINT8        *Temp;
   ASN1_OCTET_STRING  *OctStr;
 
-  *Content   = NULL;
-  Pkcs7      = NULL;
-  SignedData = NULL;
-  OctStr     = NULL;
-
   //
   // Check input parameter.
   //
   if ((P7Data == NULL) || (P7Length > INT_MAX) || (Content == NULL) || (ContentSize == NULL)) {
     return FALSE;
   }
+
+  *Content   = NULL;
+  Pkcs7      = NULL;
+  SignedData = NULL;
+  OctStr     = NULL;
 
   Status = WrapPkcs7Data (P7Data, P7Length, &Wrapped, &SignedData, &SignedDataSize);
   if (!Status || (SignedDataSize > INT_MAX)) {
@@ -771,6 +771,10 @@ Pkcs7GetAttachedContent (
     if ((OctStr->length > 0) && (OctStr->data != NULL)) {
       *ContentSize = OctStr->length;
       *Content     = malloc (*ContentSize);
+      if (*Content == NULL) {
+        *ContentSize = 0;
+        goto _Exit;
+      }
       CopyMem (*Content, OctStr->data, *ContentSize);
     }
   }
