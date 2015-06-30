@@ -156,10 +156,10 @@ GetShortPdbFileName (
   UINTN StartIndex;
   UINTN EndIndex;
 
-  ZeroMem (UnicodeBuffer, DXE_PERFORMANCE_STRING_LENGTH * sizeof (CHAR16));
+  ZeroMem (UnicodeBuffer, (DP_GAUGE_STRING_LENGTH + 1) * sizeof (CHAR16));
 
   if (PdbFileName == NULL) {
-    StrCpyS (UnicodeBuffer, DXE_PERFORMANCE_STRING_SIZE, L" ");
+    StrCpyS (UnicodeBuffer, DP_GAUGE_STRING_LENGTH + 1, L" ");
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
@@ -178,8 +178,8 @@ GetShortPdbFileName (
     for (IndexA = StartIndex; IndexA < EndIndex; IndexA++) {
       UnicodeBuffer[IndexU] = (CHAR16) PdbFileName[IndexA];
       IndexU++;
-      if (IndexU >= DXE_PERFORMANCE_STRING_LENGTH) {
-        UnicodeBuffer[DXE_PERFORMANCE_STRING_LENGTH] = 0;
+      if (IndexU >= DP_GAUGE_STRING_LENGTH) {
+        UnicodeBuffer[DP_GAUGE_STRING_LENGTH] = 0;
         break;
       }
     }
