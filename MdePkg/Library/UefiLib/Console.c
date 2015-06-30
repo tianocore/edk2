@@ -1,7 +1,7 @@
 /** @file
   This module provide help function for displaying unicode string.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -517,8 +517,8 @@ CreatePopUp (
       UefiLibGetStringWidth (String, TRUE, MaxLength, &Length);
       TmpString = AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
       ASSERT (TmpString != NULL);
-      StrnCpy(TmpString, String, Length - 3);
-      StrCat (TmpString, L"...");
+      StrnCpyS (TmpString, Length + 1, String, Length - 3);
+      StrCatS (TmpString, Length + 1, L"...");
 
       ConOut->SetCursorPosition (ConOut, Column + 1, Row++);
       ConOut->OutputString (ConOut, TmpString);
