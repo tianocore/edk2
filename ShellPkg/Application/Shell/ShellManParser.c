@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell MAN file parser.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,8 +43,16 @@ GetManFileName(
   } else {
     Buffer = AllocateZeroPool(StrSize(ManFileName) + 4*sizeof(CHAR16));
     if (Buffer != NULL) {
-      StrnCpy(Buffer, ManFileName, StrLen(ManFileName));
-      StrnCat(Buffer, L".man", 4);
+      StrnCpyS( Buffer, 
+                (StrSize(ManFileName) + 4*sizeof(CHAR16))/sizeof(CHAR16), 
+                ManFileName, 
+                StrLen(ManFileName)
+                );
+      StrnCatS( Buffer, 
+                (StrSize(ManFileName) + 4*sizeof(CHAR16))/sizeof(CHAR16),
+                L".man", 
+                4
+                );
     }
   }
   return (Buffer);
@@ -392,9 +400,9 @@ ManBufferFindTitleSection(
   if (TitleString == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
-  StrnCpy(TitleString, StartString, TitleLength/sizeof(CHAR16) - 1);
-  StrnCat(TitleString, Command,     TitleLength/sizeof(CHAR16) - 1 - StrLen(TitleString));
-  StrnCat(TitleString, EndString,   TitleLength/sizeof(CHAR16) - 1 - StrLen(TitleString));
+  StrCpyS(TitleString, TitleLength/sizeof(CHAR16), StartString);
+  StrCatS(TitleString, TitleLength/sizeof(CHAR16), Command);
+  StrCatS(TitleString, TitleLength/sizeof(CHAR16), EndString);
 
   CurrentLocation = StrStr(*Buffer, TitleString);
   if (CurrentLocation == NULL){
@@ -418,7 +426,7 @@ ManBufferFindTitleSection(
         if (*BriefDesc == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
         } else {
-          StrnCpy(*BriefDesc, CurrentLocation, TitleEnd-CurrentLocation);
+          StrnCpyS(*BriefDesc, (*BriefSize)/sizeof(CHAR16), CurrentLocation, TitleEnd-CurrentLocation);
         }
       }
 
@@ -495,8 +503,8 @@ ManFileFindTitleSection(
     FreePool(ReadLine);
     return (EFI_OUT_OF_RESOURCES);
   }
-  StrnCpy(TitleString, L".TH ", TitleSize/sizeof(CHAR16) - 1);
-  StrnCat(TitleString, Command, TitleSize/sizeof(CHAR16) - 1 - StrLen(TitleString));
+  StrCpyS(TitleString, TitleSize/sizeof(CHAR16), L".TH ");
+  StrCatS(TitleString, TitleSize/sizeof(CHAR16), Command);
 
   TitleLen = StrLen(TitleString);
   for (;!ShellFileHandleEof(Handle);Size = 1024) {
@@ -532,7 +540,7 @@ ManFileFindTitleSection(
           Status = EFI_OUT_OF_RESOURCES;
           break;
         }
-        StrnCpy(*BriefDesc, TitleEnd, (*BriefSize)/sizeof(CHAR16) - 1);
+        StrCpyS(*BriefDesc, (*BriefSize)/sizeof(CHAR16), TitleEnd);
       }
       break;
     }

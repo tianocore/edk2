@@ -125,7 +125,7 @@ DEBUG_CODE_END();
     return (EFI_NOT_FOUND);
   }
 
-  StrnCpy(*TempParameter, (*Walker), NextDelim - *Walker);
+  StrnCpyS(*TempParameter, Length, (*Walker), NextDelim - *Walker);
 
   //
   // Add a CHAR_NULL if we didnt get one via the copy
@@ -1012,7 +1012,7 @@ UpdateStdInStdOutStdErr(
   //
   // re-populate the string to support any filenames that were in quotes.
   //
-  StrnCpy(CommandLineCopy, NewCommandLine, StrLen(NewCommandLine));
+  StrnCpyS(CommandLineCopy, StrSize(CommandLineCopy)/sizeof(CHAR16), NewCommandLine, StrLen(NewCommandLine));
 
   if (FirstLocation != CommandLineCopy + StrLen(CommandLineCopy)
     && ((UINTN)(FirstLocation - CommandLineCopy) < StrLen(NewCommandLine))

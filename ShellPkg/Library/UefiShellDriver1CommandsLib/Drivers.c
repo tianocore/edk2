@@ -2,7 +2,7 @@
   Main file for Drivers shell Driver1 function.
 
   (C) Copyright 2012-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -282,7 +282,7 @@ ShellCommandRunDrivers (
         TruncatedDriverName = NULL;
         if (!SfoFlag && (FullDriverName != NULL)) {
           TruncatedDriverName = AllocateZeroPool ((MAX_LEN_DRIVER_NAME + 1) * sizeof (CHAR16));
-          StrnCpy (TruncatedDriverName, FullDriverName, MAX_LEN_DRIVER_NAME);
+          StrCpyS (TruncatedDriverName, MAX_LEN_DRIVER_NAME + 1, FullDriverName);
         }
 
         ShellPrintEx(

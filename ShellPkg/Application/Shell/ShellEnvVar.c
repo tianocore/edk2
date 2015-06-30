@@ -339,7 +339,10 @@ SetEnvironmentVariables(
     //
     // Copy the string into the Key, leaving the last character allocated as NULL to terminate
     //
-    StrnCpy(Node->Key, CurrentString, StrStr(CurrentString, L"=") - CurrentString);
+    StrCpyS( Node->Key, 
+              StrStr(CurrentString, L"=") - CurrentString + 1, 
+              CurrentString
+              );
 
     //
     // ValueSize = TotalSize - already removed size - size for '=' + size for terminator (the last 2 items cancel each other)

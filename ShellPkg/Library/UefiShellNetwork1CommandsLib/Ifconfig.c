@@ -2,7 +2,7 @@
   The implementation for ifcommand shell command.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -251,6 +251,8 @@ GetChildHandle (
   Append OFFSET/WIDTH/VALUE items at the beginning of string.
 
   @param[in, out]  String      The pointer to the string to append onto.
+  @param[in]       MaxLen      The max number of UNICODE char in String
+                               including the terminate NULL char.
   @param[in]       Offset      Offset value.
   @param[in]       Width       Width value.
   @param[in]       Block       Point to data buffer.
@@ -261,6 +263,7 @@ UINTN
 EFIAPI
 AppendOffsetWidthValue (
   IN OUT CHAR16               *String,
+  IN UINTN                    MaxLen,
   IN UINTN                    Offset,
   IN UINTN                    Width,
   IN CONST UINT8              *Block
@@ -271,16 +274,16 @@ AppendOffsetWidthValue (
 
   OriString = String;
 
-  StrnCpy (String, L"&OFFSET=", 9);
+  StrnCpyS (String, MaxLen, L"&OFFSET=", 9);
   String += StrLen (L"&OFFSET=");
   String += UnicodeSPrint (String, 20, L"%x", Offset);
 
-  StrnCpy (String,L"&WIDTH=", 8);
+  StrnCpyS (String, MaxLen, L"&WIDTH=", 8);
   String += StrLen (L"&WIDTH=");
   String += UnicodeSPrint (String, 20, L"%x", Width);
 
   if (Block != NULL) {
-    StrnCpy (String,L"&VALUE=", 8);
+    StrnCpyS (String, MaxLen, L"&VALUE=", 8);
     String += StrLen (L"&VALUE=");
     while ((Width--) != 0) {
       String += UnicodeSPrint (String, 20, L"%x", Block[Width]);
@@ -342,6 +345,7 @@ ConstructConfigHdr (
 {
   EFI_STATUS                 Status;
   CHAR16                     *ConfigHdr;
+  UINTN                      ConfigHdrBufferSize;
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
   CHAR16                     *String;
   UINTN                      Index;
@@ -363,13 +367,14 @@ ConstructConfigHdr (
 
   DevicePathLength = GetDevicePathSize (DevicePath);
   NameLength = StrLen (Name);
-  ConfigHdr = AllocateZeroPool ((5 + sizeof (EFI_GUID) * 2 + 6 + NameLength * 4 + 6 + DevicePathLength * 2 + 1) * sizeof (CHAR16));
+  ConfigHdrBufferSize = (5 + sizeof (EFI_GUID) * 2 + 6 + NameLength * 4 + 6 + DevicePathLength * 2 + 1) * sizeof (CHAR16);
+  ConfigHdr = AllocateZeroPool (ConfigHdrBufferSize);
   if (ConfigHdr == NULL) {
     return NULL;
   } 
 
   String = ConfigHdr;
-  StrnCpy (String, L"GUID=", 6);
+  StrnCpyS (String, ConfigHdrBufferSize/sizeof(CHAR16), L"GUID=", 6);
   String += StrLen (L"GUID=");
 
   //
@@ -382,7 +387,7 @@ ConstructConfigHdr (
   //
   // Append L"&NAME="
   //
-  StrnCpy (String, L"&NAME=", 7);
+  StrnCpyS (String, ConfigHdrBufferSize/sizeof(CHAR16), L"&NAME=", 7);
   String += StrLen (L"&NAME=");
   for (Index = 0; Index < NameLength ; Index++) {
     String += UnicodeSPrint (String, 10, L"00%x", Name[Index]);
@@ -391,7 +396,7 @@ ConstructConfigHdr (
   //
   // Append L"&PATH="
   //
-  StrnCpy (String, L"&PATH=", 7);
+  StrnCpyS (String, ConfigHdrBufferSize/sizeof(CHAR16), L"&PATH=", 7);
   String += StrLen (L"&PATH=");
   for (Index = 0, Buffer = (UINT8 *) DevicePath; Index < DevicePathLength; Index++) {
     String += UnicodeSPrint (String, 6, L"%02x", *Buffer++);
@@ -548,6 +553,7 @@ IfconfigGetAllNicInfoByHii (
   EFI_HANDLE                    *Handles;
   UINTN                         HandleCount;
   CHAR16                        *ConfigResp;
+  UINTN                         ConfigRespBufferSize;
   CHAR16                        *ConfigHdr;
   UINTN                         Index;
   CHAR16                        *AccessProgress;
@@ -612,13 +618,14 @@ IfconfigGetAllNicInfoByHii (
     } else {
       Length = 0;
     }
-    ConfigResp = AllocateZeroPool ((Length + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
+    ConfigRespBufferSize = (Length + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16);
+    ConfigResp = AllocateZeroPool (ConfigRespBufferSize);
     if (ConfigResp == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_ERROR;
     }
     if (ConfigHdr != NULL) {
-      StrnCpy (ConfigResp, ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100 - 1);
+      StrnCpyS (ConfigResp, ConfigRespBufferSize/sizeof(CHAR16), ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100 - 1);
     }
  
     //
@@ -626,7 +633,12 @@ IfconfigGetAllNicInfoByHii (
     //
     String = ConfigResp + Length;
     Offset = 0;
-    AppendOffsetWidthValue (String, Offset, NIC_ITEM_CONFIG_SIZE, NULL);
+    AppendOffsetWidthValue (String, 
+                            ConfigRespBufferSize/sizeof(CHAR16) - Length, 
+                            Offset, 
+                            NIC_ITEM_CONFIG_SIZE, 
+                            NULL
+                            );
 
     NicInfo = AllocateZeroPool (sizeof (NIC_INFO));
     if (NicInfo == NULL) {
@@ -754,6 +766,7 @@ IfconfigSetNicAddrByHii (
   SHELL_STATUS                  ShellStatus;
   NIC_IP4_CONFIG_INFO           *NicConfig;
   CHAR16                        *ConfigResp;
+  UINTN                         ConfigRespBufferSize;
   CHAR16                        *ConfigHdr;
   CHAR16                        *AccessProgress;
   CHAR16                        *AccessResults;
@@ -785,13 +798,14 @@ IfconfigSetNicAddrByHii (
     ShellStatus = SHELL_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  ConfigResp = AllocateZeroPool ((Length + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
+  ConfigRespBufferSize = (Length + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16);
+  ConfigResp = AllocateZeroPool (ConfigRespBufferSize);
   if (ConfigResp == NULL) {
     ShellStatus = SHELL_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
   if (ConfigHdr != NULL) {
-    StrnCpy (ConfigResp, ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100 - 1);
+    StrnCpyS (ConfigResp, ConfigRespBufferSize/sizeof(CHAR16), ConfigHdr, Length + NIC_ITEM_CONFIG_SIZE * 2 + 100 - 1);
   }
 
   NicConfig = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
@@ -809,7 +823,12 @@ IfconfigSetNicAddrByHii (
   //
   String = ConfigResp + Length;
   Offset = 0;
-  AppendOffsetWidthValue (String, Offset, NIC_ITEM_CONFIG_SIZE, NULL);
+  AppendOffsetWidthValue (String, 
+                          ConfigRespBufferSize/sizeof(CHAR16) - Length,
+                          Offset, 
+                          NIC_ITEM_CONFIG_SIZE, 
+                          NULL
+                          );
 
   //
   // Call HII helper function to generate configuration string

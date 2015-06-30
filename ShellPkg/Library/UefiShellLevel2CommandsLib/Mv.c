@@ -2,7 +2,7 @@
   Main file for mv shell level 2 function.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -187,7 +187,7 @@ GetDestinationLocation(
     if (DestPath == NULL) {
       return (SHELL_OUT_OF_RESOURCES);
     }
-    StrCpy(DestPath, Cwd);
+    StrCpyS(DestPath, StrSize(Cwd) / sizeof(CHAR16), Cwd);
     while (PathRemoveLastItem(DestPath)) ;
 
     //
@@ -220,13 +220,13 @@ GetDestinationLocation(
         ShellCloseFileMetaArg(&DestList);
         return (SHELL_OUT_OF_RESOURCES);
       }
-      StrCpy(DestPath, Cwd);
+      StrCpyS(DestPath, NewSize / sizeof(CHAR16), Cwd);
       if (DestPath[StrLen(DestPath)-1] != L'\\' && DestParameter[0] != L'\\') {
-        StrCat(DestPath, L"\\");
+        StrCatS(DestPath, NewSize / sizeof(CHAR16), L"\\");
       } else if (DestPath[StrLen(DestPath)-1] == L'\\' && DestParameter[0] == L'\\') {
         ((CHAR16*)DestPath)[StrLen(DestPath)-1] = CHAR_NULL;
       }
-      StrCat(DestPath, DestParameter);
+      StrCatS(DestPath, NewSize / sizeof(CHAR16), DestParameter);
     } else {
       ASSERT(DestPath == NULL);
       DestPath = StrnCatGrow(&DestPath, NULL, DestParameter, 0);
@@ -256,8 +256,8 @@ GetDestinationLocation(
         ShellCloseFileMetaArg(&DestList);
         return (SHELL_OUT_OF_RESOURCES);
       }
-      StrCpy(DestPath, Node->FullName);
-      StrCat(DestPath, L"\\");
+      StrCpyS(DestPath, (StrSize(Node->FullName)+sizeof(CHAR16)) / sizeof(CHAR16), Node->FullName);
+      StrCatS(DestPath, (StrSize(Node->FullName)+sizeof(CHAR16)) / sizeof(CHAR16), L"\\");
     } else {
       //
       // cant move multiple files onto a single file.
@@ -351,11 +351,11 @@ CreateFullDestPath(
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  StrnCpy(*FullDestPath, *DestPath, Size / sizeof(CHAR16) - 1);
+  StrCpyS(*FullDestPath, Size / sizeof(CHAR16), *DestPath);
   if ((*FullDestPath)[StrLen(*FullDestPath)-1] != L'\\' && FileName[0] != L'\\') {
-    StrnCat(*FullDestPath, L"\\",Size / sizeof(CHAR16) - 1 - StrLen(*FullDestPath));
+    StrCatS(*FullDestPath, Size / sizeof(CHAR16), L"\\");
   }
-  StrnCat(*FullDestPath, FileName, Size / sizeof(CHAR16) - 1 - StrLen(*FullDestPath));
+  StrCatS(*FullDestPath, Size / sizeof(CHAR16), FileName);
 
   return (EFI_SUCCESS);
 }
@@ -403,10 +403,10 @@ MoveWithinFileSystems(
   } else {
     CopyMem(NewFileInfo, Node->Info, SIZE_OF_EFI_FILE_INFO);
     if (DestPath[0] != L'\\') {
-      StrCpy(NewFileInfo->FileName, L"\\");
-      StrCat(NewFileInfo->FileName, DestPath);
+      StrCpyS(NewFileInfo->FileName, (NewSize - SIZE_OF_EFI_FILE_INFO) / sizeof(CHAR16), L"\\");
+      StrCatS(NewFileInfo->FileName, (NewSize - SIZE_OF_EFI_FILE_INFO) / sizeof(CHAR16), DestPath);
     } else {
-      StrCpy(NewFileInfo->FileName, DestPath);
+      StrCpyS(NewFileInfo->FileName, (NewSize - SIZE_OF_EFI_FILE_INFO) / sizeof(CHAR16), DestPath);
     }
     Length = StrLen(NewFileInfo->FileName);
     if (Length > 0) {
@@ -419,7 +419,7 @@ MoveWithinFileSystems(
         //
         NewFileInfo->FileName[Length] = CHAR_NULL;
       }
-      StrCat(NewFileInfo->FileName, Node->FileName);
+      StrCatS(NewFileInfo->FileName, (NewSize - SIZE_OF_EFI_FILE_INFO) / sizeof(CHAR16), Node->FileName);
     }
     NewFileInfo->Size = SIZE_OF_EFI_FILE_INFO + StrSize(NewFileInfo->FileName);
 

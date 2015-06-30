@@ -2,7 +2,7 @@
   EFI_FILE_PROTOCOL wrappers for other items (Like Environment Variables,
   StdIn, StdOut, StdErr, etc...).
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -509,19 +509,23 @@ FileInterfaceStdInRead(
         if (StrStr(CurrentString + TabPos, L":") == NULL) {
           Cwd = ShellInfoObject.NewEfiShellProtocol->GetCurDir(NULL);
           if (Cwd != NULL) {
-            StrnCpy(TabStr, Cwd, (*BufferSize)/sizeof(CHAR16) - 1);
+            StrCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), Cwd);
             if (TabStr[StrLen(TabStr)-1] == L'\\' && *(CurrentString + TabPos) == L'\\' ) {
               TabStr[StrLen(TabStr)-1] = CHAR_NULL;
             }
-            StrnCat(TabStr, CurrentString + TabPos, (StringLen - TabPos) * sizeof (CHAR16));
+            StrnCatS( TabStr, 
+                      (*BufferSize)/sizeof(CHAR16), 
+                      CurrentString + TabPos, 
+                      (StringLen - TabPos) * sizeof (CHAR16)
+                      );
           } else {
             *TabStr = CHAR_NULL;
-            StrnCat(TabStr, CurrentString + TabPos, (StringLen - TabPos) * sizeof (CHAR16));
+            StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos, (StringLen - TabPos) * sizeof (CHAR16));
           }
         } else {
-          StrnCpy(TabStr, CurrentString + TabPos, (*BufferSize)/sizeof(CHAR16) - 1);
+          StrCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos);
         }
-        StrnCat(TabStr, L"*", (*BufferSize)/sizeof(CHAR16) - 1 - StrLen(TabStr));
+        StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), L"*", (*BufferSize)/sizeof(CHAR16) - 1 - StrLen(TabStr));
         FoundFileList = NULL;
         Status  = ShellInfoObject.NewEfiShellProtocol->FindFiles(TabStr, &FoundFileList);
         for ( TempStr = CurrentString

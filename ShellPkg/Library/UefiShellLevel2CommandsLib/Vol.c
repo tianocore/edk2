@@ -2,7 +2,7 @@
   Main file for vol shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -120,7 +120,10 @@ HandleVol(
       } 
     }
     if (SysInfo != NULL) {
-      StrnCpy ((CHAR16 *) SysInfo->VolumeLabel, Name, (Size1 > Size2?Size1/sizeof(CHAR16):Size2/sizeof(CHAR16))-1);
+      StrCpyS ( (CHAR16 *) SysInfo->VolumeLabel, 
+                  (Size1>Size2? Size1/sizeof(CHAR16) : Size2/sizeof(CHAR16)), 
+                  Name
+                  );
       SysInfo->Size = SIZE_OF_EFI_FILE_SYSTEM_INFO + Size1;
       Status = EfiFpHandle->SetInfo(
         EfiFpHandle,

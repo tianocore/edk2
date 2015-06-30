@@ -537,12 +537,12 @@ EfiShellGetDevicePathFromFilePath(
     if (NewPath == NULL) {
       return (NULL);
     }
-    StrnCpy(NewPath, Cwd, Size/sizeof(CHAR16)-1);
+    StrCpyS(NewPath, Size/sizeof(CHAR16), Cwd);
     if (*Path == L'\\') {
       Path++;
       while (PathRemoveLastItem(NewPath)) ;
     }
-    StrnCat(NewPath, Path, Size/sizeof(CHAR16) - 1 - StrLen(NewPath));
+    StrCatS(NewPath, Size/sizeof(CHAR16), Path);
     DevicePathForReturn = EfiShellGetDevicePathFromFilePath(NewPath);
     FreePool(NewPath);
     return (DevicePathForReturn);
@@ -2220,7 +2220,7 @@ ShellSearchHandle(
 
   CurrentFilePattern = AllocateZeroPool((NextFilePatternStart-FilePattern+1)*sizeof(CHAR16));
   ASSERT(CurrentFilePattern != NULL);
-  StrnCpy(CurrentFilePattern, FilePattern, NextFilePatternStart-FilePattern);
+  StrCpyS(CurrentFilePattern, NextFilePatternStart-FilePattern+1, FilePattern);
 
   if (CurrentFilePattern[0]   == CHAR_NULL
     &&NextFilePatternStart[0] == CHAR_NULL
@@ -2284,8 +2284,8 @@ ShellSearchHandle(
             if (NewFullName == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
             } else {
-              StrnCpy(NewFullName, MapName, Size/sizeof(CHAR16)-1);
-              StrnCat(NewFullName, ShellInfoNode->FullName+1, (Size/sizeof(CHAR16))-StrLen(NewFullName)-1);
+              StrCpyS(NewFullName, Size/sizeof(CHAR16), MapName);
+              StrCatS(NewFullName, Size/sizeof(CHAR16), ShellInfoNode->FullName+1);
               FreePool((VOID*)ShellInfoNode->FullName);
               ShellInfoNode->FullName = NewFullName;
             }
@@ -2615,7 +2615,10 @@ EfiShellGetEnvEx(
       ; Node = (ENV_VAR_LIST*)GetNextNode(&List, &Node->Link)
      ){
       ASSERT(Node->Key != NULL);
-      StrnCpy(CurrentWriteLocation, Node->Key,  (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)) - 1);
+      StrCpyS( CurrentWriteLocation, 
+                (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)), 
+                Node->Key
+                );
       CurrentWriteLocation += StrLen(CurrentWriteLocation) + 1;
     }
 
@@ -3046,7 +3049,11 @@ EfiShellGetHelpText(
       FixCommand = AllocateZeroPool(StrSize(Command) - 4 * sizeof (CHAR16));
       ASSERT(FixCommand != NULL);
 
-      StrnCpy(FixCommand, Command, StrLen(Command)-4);
+      StrnCpyS( FixCommand, 
+                (StrSize(Command) - 4 * sizeof (CHAR16))/sizeof(CHAR16), 
+                Command, 
+                StrLen(Command)-4
+                );
       Status = ProcessManFile(FixCommand, FixCommand, Sections, NULL, HelpText);
       FreePool(FixCommand);
       return Status;

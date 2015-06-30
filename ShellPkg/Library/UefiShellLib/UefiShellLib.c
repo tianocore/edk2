@@ -1713,8 +1713,8 @@ ShellFindFilePath (
     if (TestPath == NULL) {
       return (NULL);
     }
-    StrnCpy(TestPath, Path, Size/sizeof(CHAR16) - 1);
-    StrnCat(TestPath, FileName, Size/sizeof(CHAR16) - 1 - StrLen(TestPath));
+    StrCpyS(TestPath, Size/sizeof(CHAR16), Path);
+    StrCatS(TestPath, Size/sizeof(CHAR16), FileName);
     Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
     if (!EFI_ERROR(Status)){
       if (FileHandleIsDirectory(Handle) != EFI_SUCCESS) {
@@ -1746,12 +1746,12 @@ ShellFindFilePath (
           *TempChar = CHAR_NULL;
         }
         if (TestPath[StrLen(TestPath)-1] != L'\\') {
-          StrnCat(TestPath, L"\\", Size/sizeof(CHAR16) - 1 - StrLen(TestPath));
+          StrCatS(TestPath, Size/sizeof(CHAR16), L"\\");
         }
         if (FileName[0] == L'\\') {
           FileName++;
         }
-        StrnCat(TestPath, FileName, Size/sizeof(CHAR16) - 1 - StrLen(TestPath));
+        StrCatS(TestPath, Size/sizeof(CHAR16), FileName);
         if (StrStr(Walker, L";") != NULL) {
           Walker = StrStr(Walker, L";") + 1;
         } else {
@@ -1820,9 +1820,9 @@ ShellFindFilePathEx (
     return (NULL);
   }
   for (ExtensionWalker = FileExtension, TempChar2 = (CHAR16*)FileExtension;  TempChar2 != NULL ; ExtensionWalker = TempChar2 + 1){
-    StrnCpy(TestPath, FileName, Size/sizeof(CHAR16) - 1);
+    StrCpyS(TestPath, Size/sizeof(CHAR16), FileName);
     if (ExtensionWalker != NULL) {
-      StrnCat(TestPath, ExtensionWalker, Size/sizeof(CHAR16) - 1 - StrLen(TestPath));
+      StrCatS(TestPath, Size/sizeof(CHAR16), ExtensionWalker);
     }
     TempChar = StrStr(TestPath, L";");
     if (TempChar != NULL) {
@@ -2109,10 +2109,19 @@ InternalCommandLineParse (
       CurrentItemPackage->Value = ReallocatePool(ValueSize, CurrentValueSize, CurrentItemPackage->Value);
       ASSERT(CurrentItemPackage->Value != NULL);
       if (ValueSize == 0) {
-        StrnCpy(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1);
+        StrCpyS( CurrentItemPackage->Value, 
+                  CurrentValueSize/sizeof(CHAR16), 
+                  Argv[LoopCounter]
+                  );
       } else {
-        StrnCat(CurrentItemPackage->Value, L" ", CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
-        StrnCat(CurrentItemPackage->Value, Argv[LoopCounter], CurrentValueSize/sizeof(CHAR16) - 1 - StrLen(CurrentItemPackage->Value));
+        StrCatS( CurrentItemPackage->Value, 
+                  CurrentValueSize/sizeof(CHAR16), 
+                  L" "
+                  );
+        StrCatS( CurrentItemPackage->Value, 
+                  CurrentValueSize/sizeof(CHAR16), 
+                  Argv[LoopCounter]
+                  );
       }
       ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
       
@@ -2635,14 +2644,14 @@ ShellCopySearchAndReplace(
         FreePool(Replace);
         return (EFI_BUFFER_TOO_SMALL);
       }
-      StrnCat(NewString, Replace, NewSize/sizeof(CHAR16) - 1 - StrLen(NewString));
+      StrCatS(NewString, NewSize/sizeof(CHAR16), Replace);
     } else {
       Size = StrSize(NewString);
       if (Size + sizeof(CHAR16) > NewSize) {
         FreePool(Replace);
         return (EFI_BUFFER_TOO_SMALL);
       }
-      StrnCat(NewString, SourceString, 1);
+      StrnCatS(NewString, NewSize/sizeof(CHAR16), SourceString, 1);
       SourceString++;
     }
   }
@@ -3254,7 +3263,9 @@ StrnCatGrow (
   if (*Destination == NULL) {
     return (NULL);
   }
-  return StrnCat(*Destination, Source, Count);
+  
+  StrCatS(*Destination, Count + 1, Source);
+  return *Destination;
 }
 
 /**

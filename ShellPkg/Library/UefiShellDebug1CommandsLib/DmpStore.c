@@ -2,7 +2,7 @@
   Main file for DmpStore shell Debug1 function.
    
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -406,7 +406,7 @@ CascadeProcessVariables (
     FoundVarName = AllocateZeroPool (NameSize);
     if (FoundVarName != NULL) {
       if (PrevName != NULL) {
-        StrnCpy(FoundVarName, PrevName, NameSize/sizeof(CHAR16)-1);
+        StrCpyS(FoundVarName, NameSize/sizeof(CHAR16), PrevName);
       }
 
       Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
