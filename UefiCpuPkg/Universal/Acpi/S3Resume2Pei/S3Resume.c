@@ -4,7 +4,7 @@
   This module will excute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -366,8 +366,7 @@ WriteToOsS3PerformanceData (
       if ((AsciiStrnCmp (Token, "PEIM", PEI_PERFORMANCE_STRING_SIZE) == 0) && (Handle != NULL)) {
         AsciiSPrint (PerfData->Token, PERF_TOKEN_LENGTH, "0x%11p", Handle);
       } else {
-        AsciiStrnCpy (PerfData->Token, Token, PERF_TOKEN_LENGTH);
-        PerfData->Token[PERF_TOKEN_LENGTH] = '\0';
+        AsciiStrCpyS (PerfData->Token, PERF_TOKEN_SIZE, Token);
       }
       if (StartTicker == 1) {
         StartTicker = StartValue;
