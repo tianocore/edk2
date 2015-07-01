@@ -3,12 +3,12 @@ SECTIONS
 {
   /* . = 0 + SIZEOF_HEADERS; */
   . = 0x280;
-  .text: ALIGN(0x1000) 
+  .text : ALIGN(0x1000)
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
     . = ALIGN(0x20);
   }
-  .data: ALIGN(0x1000)
+  .data : ALIGN(0x1000)
   {
     *(
       .rodata .rodata.* .gnu.linkonce.r.*
@@ -18,16 +18,16 @@ SECTIONS
     )
     . = ALIGN(0x20);
   }
-  .eh_frame: ALIGN(0x1000)
+  .eh_frame : ALIGN(0x1000)
   {
     KEEP (*(.eh_frame))
   }
-  .got: ALIGN(0x1000)
+  .got : ALIGN(0x1000)
   {
     *(.got .got.*)
     . = ALIGN(0x20);
   }
-  .rela: ALIGN(0x1000)
+  .rela : ALIGN(0x1000)
   {
     *(.rela .rela.*)
   }
