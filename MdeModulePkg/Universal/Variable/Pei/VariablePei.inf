@@ -1,7 +1,9 @@
 ## @file
-#  Implement ReadOnly Variable Services required by PEIM and install PEI ReadOnly Varaiable2 PPI.
+#  Implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This module implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI.
+#
+#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -46,6 +48,9 @@
 
 [Guids]
   ## CONSUMES             ## GUID # Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiAuthenticatedVariableGuid
+  ## SOMETIMES_CONSUMES   ## GUID # Variable store header
   ## SOMETIMES_CONSUMES   ## HOB
   gEfiVariableGuid
   ## SOMETIMES_PRODUCES   ## HOB

@@ -1,9 +1,8 @@
 /** @file
-
   Implement ReadOnly Variable Services required by PEIM and install
   PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,8 +33,8 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
 
 /**
   Provide the functionality of the variable services.
-  
-  @param  FileHandle   Handle of the file being invoked. 
+
+  @param  FileHandle   Handle of the file being invoked.
                        Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
   @param  PeiServices  General purpose services available to every PEIM.
 
@@ -114,27 +113,65 @@ IsValidVariableHeader (
   return TRUE;
 }
 
+/**
+  This code gets the size of variable header.
+
+  @param AuthFlag   Authenticated variable flag.
+
+  @return Size of variable header in bytes in type UINTN.
+
+**/
+UINTN
+GetVariableHeaderSize (
+  IN  BOOLEAN       AuthFlag
+  )
+{
+  UINTN Value;
+
+  if (AuthFlag) {
+    Value = sizeof (AUTHENTICATED_VARIABLE_HEADER);
+  } else {
+    Value = sizeof (VARIABLE_HEADER);
+  }
+
+  return Value;
+}
 
 /**
   This code gets the size of name of variable.
 
   @param  Variable  Pointer to the Variable Header.
+  @param  AuthFlag  Authenticated variable flag.
 
   @return Size of variable in bytes in type UINTN.
 
 **/
 UINTN
 NameSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFlag
   )
 {
-  if (Variable->State    == (UINT8) (-1) ||
-      Variable->DataSize == (UINT32) (-1) ||
-      Variable->NameSize == (UINT32) (-1) ||
-      Variable->Attributes == (UINT32) (-1)) {
-    return 0;
+  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  if (AuthFlag) {
+    if (AuthVariable->State == (UINT8) (-1) ||
+       AuthVariable->DataSize == (UINT32) (-1) ||
+       AuthVariable->NameSize == (UINT32) (-1) ||
+       AuthVariable->Attributes == (UINT32) (-1)) {
+      return 0;
+    }
+    return (UINTN) AuthVariable->NameSize;
+  } else {
+    if (Variable->State == (UINT8) (-1) ||
+       Variable->DataSize == (UINT32) (-1) ||
+       Variable->NameSize == (UINT32) (-1) ||
+       Variable->Attributes == (UINT32) (-1)) {
+      return 0;
+    }
+    return (UINTN) Variable->NameSize;
   }
-  return (UINTN) Variable->NameSize;
 }
 
 
@@ -142,46 +179,88 @@ NameSizeOfVariable (
   This code gets the size of data of variable.
 
   @param  Variable  Pointer to the Variable Header.
+  @param  AuthFlag  Authenticated variable flag.
 
   @return Size of variable in bytes in type UINTN.
 
 **/
 UINTN
 DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFlag
   )
 {
-  if (Variable->State    == (UINT8)  (-1) ||
-      Variable->DataSize == (UINT32) (-1) ||
-      Variable->NameSize == (UINT32) (-1) ||
-      Variable->Attributes == (UINT32) (-1)) {
-    return 0;
+  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  if (AuthFlag) {
+    if (AuthVariable->State == (UINT8) (-1) ||
+       AuthVariable->DataSize == (UINT32) (-1) ||
+       AuthVariable->NameSize == (UINT32) (-1) ||
+       AuthVariable->Attributes == (UINT32) (-1)) {
+      return 0;
+    }
+    return (UINTN) AuthVariable->DataSize;
+  } else {
+    if (Variable->State == (UINT8) (-1) ||
+       Variable->DataSize == (UINT32) (-1) ||
+       Variable->NameSize == (UINT32) (-1) ||
+       Variable->Attributes == (UINT32) (-1)) {
+      return 0;
+    }
+    return (UINTN) Variable->DataSize;
   }
-  return (UINTN) Variable->DataSize;
 }
 
 /**
   This code gets the pointer to the variable name.
 
   @param   Variable  Pointer to the Variable Header.
+  @param   AuthFlag  Authenticated variable flag.
 
   @return  A CHAR16* pointer to Variable Name.
 
 **/
 CHAR16 *
 GetVariableNamePtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN VARIABLE_HEADER    *Variable,
+  IN BOOLEAN            AuthFlag
   )
 {
-  return (CHAR16 *) (Variable + 1);
+  return (CHAR16 *) ((UINTN) Variable + GetVariableHeaderSize (AuthFlag));
 }
 
+/**
+  This code gets the pointer to the variable guid.
+
+  @param Variable   Pointer to the Variable Header.
+  @param AuthFlag   Authenticated variable flag.
+
+  @return A EFI_GUID* pointer to Vendor Guid.
+
+**/
+EFI_GUID *
+GetVendorGuidPtr (
+  IN VARIABLE_HEADER    *Variable,
+  IN BOOLEAN            AuthFlag
+  )
+{
+  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  if (AuthFlag) {
+    return &AuthVariable->VendorGuid;
+  } else {
+    return &Variable->VendorGuid;
+  }
+}
 
 /**
   This code gets the pointer to the variable data.
 
   @param   Variable         Pointer to the Variable Header.
   @param   VariableHeader   Pointer to the Variable Header that has consecutive content.
+  @param   AuthFlag         Authenticated variable flag.
 
   @return  A UINT8* pointer to Variable Data.
 
@@ -189,17 +268,18 @@ GetVariableNamePtr (
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable,
-  IN  VARIABLE_HEADER   *VariableHeader
+  IN  VARIABLE_HEADER   *VariableHeader,
+  IN  BOOLEAN           AuthFlag
   )
 {
   UINTN Value;
-  
+
   //
   // Be careful about pad size for alignment
   //
-  Value =  (UINTN) GetVariableNamePtr (Variable);
-  Value += NameSizeOfVariable (VariableHeader);
-  Value += GET_PAD_SIZE (NameSizeOfVariable (VariableHeader));
+  Value =  (UINTN) GetVariableNamePtr (Variable, AuthFlag);
+  Value += NameSizeOfVariable (VariableHeader, AuthFlag);
+  Value += GET_PAD_SIZE (NameSizeOfVariable (VariableHeader, AuthFlag));
 
   return (UINT8 *) Value;
 }
@@ -226,9 +306,9 @@ GetNextVariablePtr (
   EFI_PHYSICAL_ADDRESS  SpareAddress;
   UINTN                 Value;
 
-  Value =  (UINTN) GetVariableDataPtr (Variable, VariableHeader);
-  Value += DataSizeOfVariable (VariableHeader);
-  Value += GET_PAD_SIZE (DataSizeOfVariable (VariableHeader));
+  Value =  (UINTN) GetVariableDataPtr (Variable, VariableHeader, StoreInfo->AuthFlag);
+  Value += DataSizeOfVariable (VariableHeader, StoreInfo->AuthFlag);
+  Value += GET_PAD_SIZE (DataSizeOfVariable (VariableHeader, StoreInfo->AuthFlag));
   //
   // Be careful about pad size for alignment
   //
@@ -263,7 +343,8 @@ GetVariableStoreStatus (
   IN VARIABLE_STORE_HEADER *VarStoreHeader
   )
 {
-  if (CompareGuid (&VarStoreHeader->Signature, &gEfiVariableGuid) &&
+  if ((CompareGuid (&VarStoreHeader->Signature, &gEfiAuthenticatedVariableGuid) ||
+       CompareGuid (&VarStoreHeader->Signature, &gEfiVariableGuid)) &&
       VarStoreHeader->Format == VARIABLE_STORE_FORMATTED &&
       VarStoreHeader->State == VARIABLE_STORE_HEALTHY
       ) {
@@ -383,7 +464,10 @@ CompareWithValidVariable (
   OUT VARIABLE_POINTER_TRACK        *PtrTrack
   )
 {
-  VOID  *Point;
+  VOID      *Point;
+  EFI_GUID  *TempVendorGuid;
+
+  TempVendorGuid = GetVendorGuidPtr (VariableHeader, StoreInfo->AuthFlag);
 
   if (VariableName[0] == 0) {
     PtrTrack->CurrPtr = Variable;
@@ -394,14 +478,14 @@ CompareWithValidVariable (
     // Instead we compare the GUID a UINT32 at a time and branch
     // on the first failed comparison.
     //
-    if ((((INT32 *) VendorGuid)[0] == ((INT32 *) &VariableHeader->VendorGuid)[0]) &&
-        (((INT32 *) VendorGuid)[1] == ((INT32 *) &VariableHeader->VendorGuid)[1]) &&
-        (((INT32 *) VendorGuid)[2] == ((INT32 *) &VariableHeader->VendorGuid)[2]) &&
-        (((INT32 *) VendorGuid)[3] == ((INT32 *) &VariableHeader->VendorGuid)[3])
+    if ((((INT32 *) VendorGuid)[0] == ((INT32 *) TempVendorGuid)[0]) &&
+        (((INT32 *) VendorGuid)[1] == ((INT32 *) TempVendorGuid)[1]) &&
+        (((INT32 *) VendorGuid)[2] == ((INT32 *) TempVendorGuid)[2]) &&
+        (((INT32 *) VendorGuid)[3] == ((INT32 *) TempVendorGuid)[3])
         ) {
-      ASSERT (NameSizeOfVariable (VariableHeader) != 0);
-      Point = (VOID *) GetVariableNamePtr (Variable);
-      if (CompareVariableName (StoreInfo, VariableName, Point, NameSizeOfVariable (VariableHeader))) {
+      ASSERT (NameSizeOfVariable (VariableHeader, StoreInfo->AuthFlag) != 0);
+      Point = (VOID *) GetVariableNamePtr (Variable, StoreInfo->AuthFlag);
+      if (CompareVariableName (StoreInfo, VariableName, Point, NameSizeOfVariable (VariableHeader, StoreInfo->AuthFlag))) {
         PtrTrack->CurrPtr = Variable;
         return EFI_SUCCESS;
       }
@@ -435,12 +519,20 @@ GetVariableStore (
 
   StoreInfo->IndexTable = NULL;
   StoreInfo->FtwLastWriteData = NULL;
+  StoreInfo->AuthFlag = FALSE;
   VariableStoreHeader = NULL;
   switch (Type) {
     case VariableStoreTypeHob:
-      GuidHob     = GetFirstGuidHob (&gEfiVariableGuid);
+      GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
       if (GuidHob != NULL) {
         VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+        StoreInfo->AuthFlag = TRUE;
+      } else {
+        GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+        if (GuidHob != NULL) {
+          VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+          StoreInfo->AuthFlag = FALSE;
+        }
       }
       break;
 
@@ -451,8 +543,8 @@ GetVariableStore (
         //
 
         NvStorageSize = PcdGet32 (PcdFlashNvStorageVariableSize);
-        NvStorageBase = (EFI_PHYSICAL_ADDRESS) (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ? 
-                                                PcdGet64 (PcdFlashNvStorageVariableBase64) : 
+        NvStorageBase = (EFI_PHYSICAL_ADDRESS) (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ?
+                                                PcdGet64 (PcdFlashNvStorageVariableBase64) :
                                                 PcdGet32 (PcdFlashNvStorageVariableBase)
                                                );
         //
@@ -496,6 +588,8 @@ GetVariableStore (
 
         VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINT8 *) FvHeader + FvHeader->HeaderLength);
 
+        StoreInfo->AuthFlag = (BOOLEAN) (CompareGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid));
+
         GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
         if (GuidHob != NULL) {
           StoreInfo->IndexTable = GET_GUID_HOB_DATA (GuidHob);
@@ -503,7 +597,7 @@ GetVariableStore (
           //
           // If it's the first time to access variable region in flash, create a guid hob to record
           // VAR_ADDED type variable info.
-          // Note that as the resource of PEI phase is limited, only store the limited number of 
+          // Note that as the resource of PEI phase is limited, only store the limited number of
           // VAR_ADDED type variables to reduce access time.
           //
           StoreInfo->IndexTable = (VARIABLE_INDEX_TABLE *) BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
@@ -551,9 +645,9 @@ GetVariableHeader (
     return FALSE;
   }
 
-   //
-   // First assume variable header pointed by Variable is consecutive.
-   //
+  //
+  // First assume variable header pointed by Variable is consecutive.
+  //
   *VariableHeader = Variable;
 
   if (StoreInfo->FtwLastWriteData != NULL) {
@@ -566,7 +660,7 @@ GetVariableHeader (
       //
       return FALSE;
     }
-    if (((UINTN) Variable < (UINTN) TargetAddress) && (((UINTN) Variable + sizeof (VARIABLE_HEADER)) > (UINTN) TargetAddress)) {
+    if (((UINTN) Variable < (UINTN) TargetAddress) && (((UINTN) Variable + GetVariableHeaderSize (StoreInfo->AuthFlag)) > (UINTN) TargetAddress)) {
       //
       // Variable header pointed by Variable is inconsecutive,
       // create a guid hob to combine the two partial variable header content together.
@@ -575,7 +669,7 @@ GetVariableHeader (
       if (GuidHob != NULL) {
         *VariableHeader = (VARIABLE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
       } else {
-        *VariableHeader = (VARIABLE_HEADER *) BuildGuidHob (&gEfiCallerIdGuid, sizeof (VARIABLE_HEADER));
+        *VariableHeader = (VARIABLE_HEADER *) BuildGuidHob (&gEfiCallerIdGuid, GetVariableHeaderSize (StoreInfo->AuthFlag));
         PartialHeaderSize = (UINTN) TargetAddress - (UINTN) Variable;
         //
         // Partial content is in NV storage.
@@ -584,7 +678,7 @@ GetVariableHeader (
         //
         // Another partial content is in spare block.
         //
-        CopyMem ((UINT8 *) *VariableHeader + PartialHeaderSize, (UINT8 *) (UINTN) SpareAddress, sizeof (VARIABLE_HEADER) - PartialHeaderSize);
+        CopyMem ((UINT8 *) *VariableHeader + PartialHeaderSize, (UINT8 *) (UINTN) SpareAddress, GetVariableHeaderSize (StoreInfo->AuthFlag) - PartialHeaderSize);
       }
     }
   } else {
@@ -619,7 +713,7 @@ GetVariableNameOrData (
   EFI_PHYSICAL_ADDRESS  TargetAddress;
   EFI_PHYSICAL_ADDRESS  SpareAddress;
   UINTN                 PartialSize;
- 
+
   if (StoreInfo->FtwLastWriteData != NULL) {
     TargetAddress = StoreInfo->FtwLastWriteData->TargetAddress;
     SpareAddress = StoreInfo->FtwLastWriteData->SpareAddress;
@@ -826,7 +920,7 @@ FindVariable (
     Status = FindVariableEx (
                StoreInfo,
                VariableName,
-               VendorGuid, 
+               VendorGuid,
                PtrTrack
                );
     if (!EFI_ERROR (Status)) {
@@ -840,7 +934,7 @@ FindVariable (
 /**
   This service retrieves a variable's value using its name and GUID.
 
-  Read the specified variable from the UEFI variable store. If the Data 
+  Read the specified variable from the UEFI variable store. If the Data
   buffer is too small to hold the contents of the variable, the error
   EFI_BUFFER_TOO_SMALL is returned and DataSize is set to the required buffer
   size to obtain the data.
@@ -856,8 +950,8 @@ FindVariable (
 
   @retval EFI_SUCCESS           The variable was read successfully.
   @retval EFI_NOT_FOUND         The variable could not be found.
-  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data. 
-                                DataSize is updated with the size required for 
+  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data.
+                                DataSize is updated with the size required for
                                 the specified variable.
   @retval EFI_INVALID_PARAMETER VariableName, VariableGuid, DataSize or Data is NULL.
   @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
@@ -898,13 +992,13 @@ PeiGetVariable (
   //
   // Get data size
   //
-  VarDataSize = DataSizeOfVariable (VariableHeader);
+  VarDataSize = DataSizeOfVariable (VariableHeader, StoreInfo.AuthFlag);
   if (*DataSize >= VarDataSize) {
     if (Data == NULL) {
       return EFI_INVALID_PARAMETER;
     }
 
-    GetVariableNameOrData (&StoreInfo, GetVariableDataPtr (Variable.CurrPtr, VariableHeader), VarDataSize, Data);
+    GetVariableNameOrData (&StoreInfo, GetVariableDataPtr (Variable.CurrPtr, VariableHeader, StoreInfo.AuthFlag), VarDataSize, Data);
 
     if (Attributes != NULL) {
       *Attributes = VariableHeader->Attributes;
@@ -921,11 +1015,11 @@ PeiGetVariable (
 /**
   Return the next variable name and GUID.
 
-  This function is called multiple times to retrieve the VariableName 
-  and VariableGuid of all variables currently available in the system. 
-  On each call, the previous results are passed into the interface, 
-  and, on return, the interface returns the data for the next 
-  interface. When the entire variable list has been returned, 
+  This function is called multiple times to retrieve the VariableName
+  and VariableGuid of all variables currently available in the system.
+  On each call, the previous results are passed into the interface,
+  and, on return, the interface returns the data for the next
+  interface. When the entire variable list has been returned,
   EFI_NOT_FOUND is returned.
 
   @param  This              A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
@@ -934,7 +1028,7 @@ PeiGetVariable (
                             On return, the size of the variable name buffer.
   @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
                             On return, points to the next variable's null-terminated name string.
-  @param  VariableGuid      On entry, a pointer to an EFI_GUID that is the variable's GUID. 
+  @param  VariableGuid      On entry, a pointer to an EFI_GUID that is the variable's GUID.
                             On return, a pointer to the next variable's GUID.
 
   @retval EFI_SUCCESS           The variable was read successfully.
@@ -1013,7 +1107,7 @@ PeiGetNextVariableName (
         }
       }
       //
-      // Capture the case that 
+      // Capture the case that
       // 1. current storage is the last one, or
       // 2. no further storage
       //
@@ -1035,8 +1129,8 @@ PeiGetNextVariableName (
         //
         Status = FindVariableEx (
                    &StoreInfo,
-                   GetVariableNamePtr (Variable.CurrPtr),
-                   &VariableHeader->VendorGuid,
+                   GetVariableNamePtr (Variable.CurrPtr, StoreInfo.AuthFlag),
+                   GetVendorGuidPtr (VariableHeader, StoreInfo.AuthFlag),
                    &VariablePtrTrack
                    );
         if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr != Variable.CurrPtr) {
@@ -1053,8 +1147,8 @@ PeiGetNextVariableName (
          ) {
         Status = FindVariableEx (
                    &StoreInfoForHob,
-                   GetVariableNamePtr (Variable.CurrPtr),
-                   &VariableHeader->VendorGuid, 
+                   GetVariableNamePtr (Variable.CurrPtr, StoreInfo.AuthFlag),
+                   GetVendorGuidPtr (VariableHeader, StoreInfo.AuthFlag),
                    &VariableInHob
                    );
         if (!EFI_ERROR (Status)) {
@@ -1063,13 +1157,13 @@ PeiGetNextVariableName (
         }
       }
 
-      VarNameSize = NameSizeOfVariable (VariableHeader);
+      VarNameSize = NameSizeOfVariable (VariableHeader, StoreInfo.AuthFlag);
       ASSERT (VarNameSize != 0);
 
       if (VarNameSize <= *VariableNameSize) {
-        GetVariableNameOrData (&StoreInfo, (UINT8 *) GetVariableNamePtr (Variable.CurrPtr), VarNameSize, (UINT8 *) VariableName);
+        GetVariableNameOrData (&StoreInfo, (UINT8 *) GetVariableNamePtr (Variable.CurrPtr, StoreInfo.AuthFlag), VarNameSize, (UINT8 *) VariableName);
 
-        CopyMem (VariableGuid, &VariableHeader->VendorGuid, sizeof (EFI_GUID));
+        CopyMem (VariableGuid, GetVendorGuidPtr (VariableHeader, StoreInfo.AuthFlag), sizeof (EFI_GUID));
 
         Status = EFI_SUCCESS;
       } else {
