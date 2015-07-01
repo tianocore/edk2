@@ -665,7 +665,7 @@ SmbiosUpdateString (
       //
       TargetStrLen = AsciiStrLen(StrStart);
       if (InputStrLen == TargetStrLen) {
-        AsciiStrCpy(StrStart, String);
+        AsciiStrCpyS(StrStart, TargetStrLen + 1, String);
         //
         // Some UEFI drivers (such as network) need some information in SMBIOS table.
         // Here we create SMBIOS table and publish it in
