@@ -395,6 +395,8 @@ CbParseSmbiosTable (
   @param  pPmTimerReg        Pointer to the address of power management timer register
   @param  pResetReg          Pointer to the address of system reset register
   @param  pResetValue        Pointer to the value to be writen to the system reset register
+  @param  pPmEvtReg          Pointer to the address of power management event register
+  @param  pPmGpeEnReg        Pointer to the address of power management GPE enable register
 
   @retval RETURN_SUCCESS     Successfully find out all the required fadt information.
   @retval RETURN_NOT_FOUND   Failed to find the fadt table.
@@ -405,7 +407,9 @@ CbParseFadtInfo (
   OUT UINTN      *pPmCtrlReg,
   OUT UINTN      *pPmTimerReg,
   OUT UINTN      *pResetReg,
-  OUT UINTN      *pResetValue
+  OUT UINTN      *pResetValue,
+  OUT UINTN      *pPmEvtReg,
+  OUT UINTN      *pPmGpeEnReg
   )
 {
   EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
@@ -464,6 +468,16 @@ CbParseFadtInfo (
         }
         DEBUG ((EFI_D_INFO, "Reset Value 0x%x\n", Fadt->ResetValue));
 
+        if (pPmEvtReg != NULL) {   
+          *pPmEvtReg = Fadt->Pm1aEvtBlk;
+          DEBUG ((EFI_D_INFO, "PmEvt Reg 0x%x\n", Fadt->Pm1aEvtBlk));
+        }
+
+        if (pPmGpeEnReg != NULL) {   
+          *pPmGpeEnReg = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
+          DEBUG ((EFI_D_INFO, "PmGpeEn Reg 0x%x\n", *pPmGpeEnReg));
+        }
+
         return RETURN_SUCCESS;
       }
     }
@@ -495,6 +509,15 @@ CbParseFadtInfo (
           *pResetValue = Fadt->ResetValue;
         DEBUG ((EFI_D_ERROR, "Reset Value 0x%x\n", Fadt->ResetValue));
 
+        if (pPmEvtReg != NULL) {   
+          *pPmEvtReg = Fadt->Pm1aEvtBlk;
+           DEBUG ((EFI_D_INFO, "PmEvt Reg 0x%x\n", Fadt->Pm1aEvtBlk));
+        }
+
+        if (pPmGpeEnReg != NULL) {   
+          *pPmGpeEnReg = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
+          DEBUG ((EFI_D_INFO, "PmGpeEn Reg 0x%x\n", *pPmGpeEnReg));
+        }        
         return RETURN_SUCCESS;
       }
     }
