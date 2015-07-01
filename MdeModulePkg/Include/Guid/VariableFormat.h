@@ -3,12 +3,12 @@
   VariableFormat.h defines variable data headers and variable storage region headers.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -81,7 +81,7 @@ typedef struct {
   ///
   EFI_GUID  Signature;
   ///
-  /// Size of entire variable store, 
+  /// Size of entire variable store,
   /// including size of variable store header but not including the size of FvHeader.
   ///
   UINT32  Size;
@@ -109,6 +109,18 @@ typedef struct {
 #define VAR_DELETED                   0xfd  ///< Variable is obsolete.
 #define VAR_HEADER_VALID_ONLY         0x7f  ///< Variable header has been valid.
 #define VAR_ADDED                     0x3f  ///< Variable has been completely added.
+
+///
+/// Variable Attribute combinations.
+///
+#define VARIABLE_ATTRIBUTE_NV_BS        (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS)
+#define VARIABLE_ATTRIBUTE_BS_RT        (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)
+#define VARIABLE_ATTRIBUTE_AT_AW        (EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
+#define VARIABLE_ATTRIBUTE_NV_BS_RT     (VARIABLE_ATTRIBUTE_BS_RT | EFI_VARIABLE_NON_VOLATILE)
+#define VARIABLE_ATTRIBUTE_NV_BS_RT_HR  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_HARDWARE_ERROR_RECORD)
+#define VARIABLE_ATTRIBUTE_NV_BS_RT_AT  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
+#define VARIABLE_ATTRIBUTE_NV_BS_RT_AW  (VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
+#define VARIABLE_ATTRIBUTE_NV_BS_RT_HR_AT_AW    (VARIABLE_ATTRIBUTE_NV_BS_RT_HR | VARIABLE_ATTRIBUTE_AT_AW)
 
 ///
 /// Single Variable Data Header Structure.
@@ -184,6 +196,12 @@ typedef struct {
   EFI_GUID    VendorGuid;
 } AUTHENTICATED_VARIABLE_HEADER;
 
+typedef struct {
+  EFI_GUID    *Guid;
+  CHAR16      *Name;
+  UINTN       VariableSize;
+} VARIABLE_ENTRY_CONSISTENCY;
+
 #pragma pack()
 
 typedef struct _VARIABLE_INFO_ENTRY  VARIABLE_INFO_ENTRY;
@@ -191,12 +209,12 @@ typedef struct _VARIABLE_INFO_ENTRY  VARIABLE_INFO_ENTRY;
 ///
 /// This structure contains the variable list that is put in EFI system table.
 /// The variable driver collects all variables that were used at boot service time and produces this list.
-/// This is an optional feature to dump all used variables in shell environment. 
+/// This is an optional feature to dump all used variables in shell environment.
 ///
 struct _VARIABLE_INFO_ENTRY {
   VARIABLE_INFO_ENTRY *Next;       ///< Pointer to next entry.
   EFI_GUID            VendorGuid;  ///< Guid of Variable.
-  CHAR16              *Name;       ///< Name of Variable. 
+  CHAR16              *Name;       ///< Name of Variable.
   UINT32              Attributes;  ///< Attributes of variable defined in UEFI specification.
   UINT32              ReadCount;   ///< Number of times to read this variable.
   UINT32              WriteCount;  ///< Number of times to write this variable.
