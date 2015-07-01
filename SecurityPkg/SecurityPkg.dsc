@@ -15,7 +15,7 @@
 [Defines]
   PLATFORM_NAME                  = SecurityPkg
   PLATFORM_GUID                  = B2C4614D-AE76-47ba-B876-5988BFED064F
-  PLATFORM_VERSION               = 0.94
+  PLATFORM_VERSION               = 0.95
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/SecurityPkg
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
@@ -126,7 +126,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1
 
 [Components]
-  SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf
   SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
   #SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
   SecurityPkg/Library/DxeImageAuthenticationStatusLib/DxeImageAuthenticationStatusLib.inf
@@ -136,7 +135,6 @@
   #
   # Application
   #
-  SecurityPkg/Application/VariableInfo/VariableInfo.inf
   SecurityPkg/Application/RngTest/RngTest.inf
 
   #
@@ -182,7 +180,6 @@
 #  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
 #  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # TPM
@@ -237,8 +234,6 @@
   SecurityPkg/Pkcs7Verify/Pkcs7VerifyDxe/Pkcs7VerifyDxe.inf
 
 [Components.IA32, Components.X64]
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmm.inf
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmmRuntimeDxe.inf
   SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
   SecurityPkg/Tcg/TrEESmm/TrEESmm.inf
   #

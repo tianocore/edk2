@@ -39,16 +39,16 @@ AutenticatedVariableServiceInitialize (
   VOID
   )
 {
-  EFI_STATUS              Status;
-  VARIABLE_POINTER_TRACK  Variable;
-  UINT8                   VarValue;
-  UINT32                  VarAttr;
-  UINTN                   DataSize;
-  UINTN                   CtxSize;
-  VARIABLE_HEADER         VariableHeader;
-  BOOLEAN                 Valid;
+  EFI_STATUS                        Status;
+  VARIABLE_POINTER_TRACK            Variable;
+  UINT8                             VarValue;
+  UINT32                            VarAttr;
+  UINTN                             DataSize;
+  UINTN                             CtxSize;
+  AUTHENTICATED_VARIABLE_HEADER     VariableHeader;
+  BOOLEAN                           Valid;
 
-  ZeroMem (&VariableHeader, sizeof (VARIABLE_HEADER));
+  ZeroMem (&VariableHeader, sizeof (AUTHENTICATED_VARIABLE_HEADER));
 
   mVariableModuleGlobal->AuthenticatedVariableGuid[Physical] = &gEfiAuthenticatedVariableGuid;
   mVariableModuleGlobal->CertRsa2048Sha256Guid[Physical]     = &gEfiCertRsa2048Sha256Guid;
@@ -477,16 +477,16 @@ ProcessVarWithPk (
   IN  BOOLEAN                   IsPk
   )
 {
-  EFI_STATUS                  Status;
-  VARIABLE_POINTER_TRACK      PkVariable;
-  EFI_SIGNATURE_LIST          *OldPkList;
-  EFI_SIGNATURE_DATA          *OldPkData;
-  EFI_VARIABLE_AUTHENTICATION *CertData;
-  VARIABLE_HEADER             VariableHeader;
-  BOOLEAN                     Valid;
+  EFI_STATUS                    Status;
+  VARIABLE_POINTER_TRACK        PkVariable;
+  EFI_SIGNATURE_LIST            *OldPkList;
+  EFI_SIGNATURE_DATA            *OldPkData;
+  EFI_VARIABLE_AUTHENTICATION   *CertData;
+  AUTHENTICATED_VARIABLE_HEADER VariableHeader;
+  BOOLEAN                       Valid;
 
   OldPkList = NULL;
-  ZeroMem (&VariableHeader, sizeof (VARIABLE_HEADER));
+  ZeroMem (&VariableHeader, sizeof (AUTHENTICATED_VARIABLE_HEADER));
 
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
     //
@@ -622,11 +622,11 @@ ProcessVarWithKek (
   EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
   BOOLEAN                         IsFound;
   UINT32                          Index;
-  VARIABLE_HEADER                 VariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER   VariableHeader;
   BOOLEAN                         Valid;
 
   KekList = NULL;
-  ZeroMem (&VariableHeader, sizeof (VARIABLE_HEADER));
+  ZeroMem (&VariableHeader, sizeof (AUTHENTICATED_VARIABLE_HEADER));
 
   if (mPlatformMode == USER_MODE) {
     if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == 0) {
@@ -771,7 +771,7 @@ VerifyVariable (
   UINT8                           *PubKey;
   EFI_VARIABLE_AUTHENTICATION     *CertData;
   EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
-  VARIABLE_HEADER                 VariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER   VariableHeader;
   BOOLEAN                         Valid;
 
   CertData    = NULL;
@@ -786,7 +786,7 @@ VerifyVariable (
   //
   // Determine if first time SetVariable with the EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS.
   //
-  ZeroMem (&VariableHeader, sizeof (VARIABLE_HEADER));
+  ZeroMem (&VariableHeader, sizeof (AUTHENTICATED_VARIABLE_HEADER));
   if (Variable->CurrPtr != 0x0) {
     Valid = IsValidVariableHeader (
               Variable->CurrPtr, 
