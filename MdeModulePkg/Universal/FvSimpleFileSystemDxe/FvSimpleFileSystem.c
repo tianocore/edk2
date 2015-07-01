@@ -12,7 +12,7 @@
   from the UEFI shell. It is entirely read-only.
 
 Copyright (c) 2014, ARM Limited. All rights reserved.
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -898,7 +898,11 @@ FvSimpleFileSystemGetInfo (
     FsInfoOut = (EFI_FILE_SYSTEM_INFO *) Buffer;
 
     CopyMem (FsInfoOut, &mFsInfoTemplate, sizeof (EFI_FILE_SYSTEM_INFO));
-    Status = StrnCpyS (FsInfoOut->VolumeLabel, (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16), Instance->VolumeLabel, StrLen (Instance->VolumeLabel));
+    Status = StrnCpyS ( FsInfoOut->VolumeLabel, 
+                        (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16), 
+                        Instance->VolumeLabel, 
+                        StrLen (Instance->VolumeLabel)
+                        );
     ASSERT_EFI_ERROR (Status);
     FsInfoOut->Size = Size;
     return Status;
@@ -919,7 +923,11 @@ FvSimpleFileSystemGetInfo (
     }
 
     FsVolumeLabel = (EFI_FILE_SYSTEM_VOLUME_LABEL*) Buffer;
-    Status        = StrnCpyS (FsVolumeLabel->VolumeLabel, (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel)) / sizeof (CHAR16), Instance->VolumeLabel, StrLen (Instance->VolumeLabel));
+    Status        = StrnCpyS (FsVolumeLabel->VolumeLabel, 
+                              (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel)) / sizeof (CHAR16),
+                              Instance->VolumeLabel, 
+                              StrLen (Instance->VolumeLabel)
+                              );
     ASSERT_EFI_ERROR (Status);
     return Status;
   } else {
