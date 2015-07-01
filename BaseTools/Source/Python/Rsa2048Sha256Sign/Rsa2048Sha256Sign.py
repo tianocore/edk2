@@ -65,7 +65,7 @@ if __name__ == '__main__':
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
   group.add_argument("-d", action="store_true", dest='Decode', help='decode file')
-  parser.add_argument("-o", "--output", dest='OutputFile', type=argparse.FileType('wb'), metavar='filename', help="specify the output filename", required=True)
+  parser.add_argument("-o", "--output", dest='OutputFile', type=str, metavar='filename', help="specify the output filename", required=True)
   parser.add_argument("--private-key", dest='PrivateKeyFile', type=argparse.FileType('rb'), help="specify the private key filename.  If not specified, a test signing key is used.")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
@@ -110,10 +110,13 @@ if __name__ == '__main__':
   args.InputFile.close()
 
   #
-  # Save output filename and close output file
+  # Save output filename and check if path exists
   #
-  args.OutputFileName = args.OutputFile.name
-  args.OutputFile.close()
+  OutputDir = os.path.dirname(args.OutputFile)
+  if not os.path.exists(OutputDir):
+    print 'ERROR: The output path does not exist: %s' % OutputDir
+    sys.exit(1)
+  args.OutputFileName = args.OutputFile
 
   #
   # Save private key filename and close private key file
