@@ -3,6 +3,7 @@
 #
 # This package provides network modules that conform to UEFI 2.4 specification.
 #
+# (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 # Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -67,6 +68,14 @@
   ## Private Key's size.
   # @Prompt Private Key's size.
   gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateKeySize|0x3d5|UINT32|0x00000006
+
+[PcdsDynamicEx]
+  ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
+  # 01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]
+  # 04 = UUID-Based DHCPv6 Unique Identifier (DUID-UUID)
+  # 02 = DUID Assigned by Vendor Based on Enterprise Number [DUID-EN] (not supported)
+  # 03 = DUID Based on Link-layer Address [DUID-LL] (not supported)
+  gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType|4|UINT8|0x10000001
 
 [UserExtensions.TianoCore."ExtraFiles"]
   NetworkPkgExtra.uni

@@ -1,6 +1,7 @@
 /** @file
   Dhcp6 support functions implementation.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -63,7 +64,7 @@ Dhcp6GenerateClientId (
   //
   // If System UUID is found from SMBIOS Table, use DUID-UUID type.
   //
-  if (!EFI_ERROR (NetLibGetSystemGuid (&Uuid))) {
+  if ((PcdGet8 (PcdDhcp6UidType) == Dhcp6DuidTypeUuid) && !EFI_ERROR (NetLibGetSystemGuid (&Uuid))) {
     //
     //
     //  The format of DUID-UUID:
