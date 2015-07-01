@@ -122,12 +122,6 @@ typedef struct {
 } VARIABLE_MODULE_GLOBAL;
 
 typedef struct {
-  EFI_GUID    *Guid;
-  CHAR16      *Name;
-  UINTN       VariableSize;
-} VARIABLE_ENTRY_CONSISTENCY;
-
-typedef struct {
   LIST_ENTRY  Link;
   EFI_GUID    Guid;
   //CHAR16      *Name;
