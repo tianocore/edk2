@@ -2,6 +2,7 @@
   This includes some definitions introduced in UEFI that will be used in both PEI 
   and DXE phases.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -35,6 +36,7 @@ typedef enum {
   EfiMemoryMappedIO,
   EfiMemoryMappedIOPortSpace,
   EfiPalCode,
+  EfiPersistentMemory,
   EfiMaxMemoryType
 } EFI_MEMORY_TYPE;
 
