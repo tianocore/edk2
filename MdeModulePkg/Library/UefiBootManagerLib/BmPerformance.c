@@ -26,12 +26,14 @@ EFI_PHYSICAL_ADDRESS      mBmAcpiLowMemoryBase = 0x0FFFFFFFFULL;
 
   @param PdbFileName     The long PDB file name.
   @param GaugeString     The output string to be logged by performance logger.
+  @param StringSize      The buffer size of GaugeString in bytes.
 
 **/
 VOID
 BmGetShortPdbFileName (
   IN  CONST CHAR8  *PdbFileName,
-  OUT       CHAR8  *GaugeString
+  OUT       CHAR8  *GaugeString,
+  IN        UINTN   StringSize
   )
 {
   UINTN Index;
@@ -40,7 +42,7 @@ BmGetShortPdbFileName (
   UINTN EndIndex;
 
   if (PdbFileName == NULL) {
-    AsciiStrCpy (GaugeString, " ");
+    AsciiStrCpyS (GaugeString, StringSize, " ");
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
@@ -78,12 +80,14 @@ BmGetShortPdbFileName (
 
   @param Handle          Driver handle.
   @param GaugeString     The output string to be logged by performance logger.
+  @param StringSize      The buffer size of GaugeString in bytes.
 
 **/
 VOID
 BmGetNameFromHandle (
   IN  EFI_HANDLE     Handle,
-  OUT CHAR8          *GaugeString
+  OUT CHAR8          *GaugeString,
+  IN  UINTN          StringSize
   )
 {
   EFI_STATUS                  Status;
@@ -91,7 +95,7 @@ BmGetNameFromHandle (
   CHAR8                       *PdbFileName;
   EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
 
-  AsciiStrCpy (GaugeString, " ");
+  AsciiStrCpyS (GaugeString, StringSize, " ");
 
   //
   // Get handle name from image protocol
@@ -127,7 +131,7 @@ BmGetNameFromHandle (
   PdbFileName = PeCoffLoaderGetPdbPointer (Image->ImageBase);
 
   if (PdbFileName != NULL) {
-    BmGetShortPdbFileName (PdbFileName, GaugeString);
+    BmGetShortPdbFileName (PdbFileName, GaugeString, StringSize);
   }
 
   return ;
@@ -285,9 +289,9 @@ BmWriteBootToOsPerformanceData (
 
     if (Duration > 0) {
 
-      BmGetNameFromHandle (Handles[Index], GaugeString);
+      BmGetNameFromHandle (Handles[Index], GaugeString, PERF_TOKEN_LENGTH);
 
-      AsciiStrCpy (mBmPerfData.Token, GaugeString);
+      AsciiStrCpyS (mBmPerfData.Token, PERF_TOKEN_SIZE, GaugeString);
       mBmPerfData.Duration = Duration;
 
       CopyMem (Ptr, &mBmPerfData, sizeof (PERF_DATA));
@@ -316,7 +320,7 @@ BmWriteBootToOsPerformanceData (
 
       ZeroMem (&mBmPerfData, sizeof (PERF_DATA));
 
-      AsciiStrnCpy (mBmPerfData.Token, Token, PERF_TOKEN_LENGTH);
+      AsciiStrCpyS (mBmPerfData.Token, PERF_TOKEN_SIZE, Token);
       if (StartTicker == 1) {
         StartTicker = StartValue;
       }

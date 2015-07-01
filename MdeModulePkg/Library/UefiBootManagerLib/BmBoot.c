@@ -552,6 +552,7 @@ BmGetUsbDescription (
   CHAR16                       *SerialNumber;
   CHAR16                       *Description;
   EFI_USB_DEVICE_DESCRIPTOR    DevDesc;
+  UINTN                        DescMaxSize;
 
   Status = gBS->HandleProtocol (
                   Handle,
@@ -606,15 +607,16 @@ BmGetUsbDescription (
     return NULL;
   }
 
-  Description = AllocateZeroPool (StrSize (Manufacturer) + StrSize (Product) + StrSize (SerialNumber));
+  DescMaxSize = StrSize (Manufacturer) + StrSize (Product) + StrSize (SerialNumber);
+  Description = AllocateZeroPool (DescMaxSize);
   ASSERT (Description != NULL);
-  StrCat (Description, Manufacturer);
-  StrCat (Description, L" ");
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), Manufacturer);
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), L" ");
 
-  StrCat (Description, Product);  
-  StrCat (Description, L" ");
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), Product);  
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), L" ");
 
-  StrCat (Description, SerialNumber);
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), SerialNumber);
 
   if (Manufacturer != &NullChar) {
     FreePool (Manufacturer);
@@ -774,8 +776,14 @@ BmGetBootDescription (
       //
       Temp = AllocatePool (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix)); 
       ASSERT (Temp != NULL);
-      StrCpy (Temp, mBmUefiPrefix);
-      StrCat (Temp, DefaultDescription);
+      StrCpyS ( Temp, 
+                (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix))/sizeof(CHAR16), 
+                mBmUefiPrefix
+                );
+      StrCatS ( Temp, 
+                (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix))/sizeof(CHAR16), 
+                DefaultDescription
+                );
       FreePool (DefaultDescription);
       DefaultDescription = Temp;
       break;
