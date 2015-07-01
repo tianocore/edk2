@@ -1046,7 +1046,7 @@ InternalVarCheckVariablePropertySet (
       goto Done;
     }
     VariableName = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
-    StrnCpy (VariableName, Name, StrLen (Name));
+    StrCpyS (VariableName, StrSize(Name)/sizeof(CHAR16), Name);
     CopyGuid (&Entry->Guid, Guid);
     CopyMem (&Entry->VariableProperty, VariableProperty, sizeof (*VariableProperty));
     InsertTailList (&mVarCheckVariableList, &Entry->Link);

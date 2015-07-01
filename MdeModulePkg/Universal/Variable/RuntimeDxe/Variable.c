@@ -158,7 +158,7 @@ UpdateVariableInfo (
       CopyGuid (&gVariableInfo->VendorGuid, VendorGuid);
       gVariableInfo->Name = AllocateZeroPool (StrSize (VariableName));
       ASSERT (gVariableInfo->Name != NULL);
-      StrnCpy (gVariableInfo->Name, VariableName, StrLen (VariableName));
+      StrCpyS (gVariableInfo->Name, StrSize(VariableName)/sizeof(CHAR16), VariableName);
       gVariableInfo->Volatile = Volatile;
     }
 
@@ -194,7 +194,7 @@ UpdateVariableInfo (
         CopyGuid (&Entry->Next->VendorGuid, VendorGuid);
         Entry->Next->Name = AllocateZeroPool (StrSize (VariableName));
         ASSERT (Entry->Next->Name != NULL);
-        StrnCpy (Entry->Next->Name, VariableName, StrLen (VariableName));
+        StrCpyS (Entry->Next->Name, StrSize(VariableName)/sizeof(CHAR16), VariableName);
         Entry->Next->Volatile = Volatile;
       }
 
@@ -2853,7 +2853,7 @@ VariableLockRequestToLock (
   }
 
   Name = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
-  StrnCpy   (Name, VariableName, StrLen (VariableName));
+  StrCpyS (Name, StrSize (VariableName)/sizeof(CHAR16), VariableName);
   CopyGuid (&Entry->Guid, VendorGuid);
   InsertTailList (&mLockedVariableList, &Entry->Link);
 
