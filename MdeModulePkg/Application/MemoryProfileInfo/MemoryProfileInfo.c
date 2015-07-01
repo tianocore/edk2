@@ -121,10 +121,10 @@ GetShortPdbFileName (
   UINTN StartIndex;
   UINTN EndIndex;
 
-  ZeroMem (UnicodeBuffer, PROFILE_NAME_STRING_LENGTH * sizeof (CHAR16));
+  ZeroMem (UnicodeBuffer, (PROFILE_NAME_STRING_LENGTH + 1) * sizeof (CHAR16));
 
   if (PdbFileName == NULL) {
-    StrnCpy (UnicodeBuffer, L" ", 1);
+    StrnCpyS (UnicodeBuffer, PROFILE_NAME_STRING_LENGTH + 1, L" ", 1);
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++);
@@ -201,7 +201,7 @@ GetDriverNameString (
       //
       // Method 2: Get the name string from FFS UI section
       //
-      StrnCpy (mNameString, NameString, PROFILE_NAME_STRING_LENGTH);
+      StrCpyS (mNameString, PROFILE_NAME_STRING_LENGTH + 1, NameString);
       mNameString[PROFILE_NAME_STRING_LENGTH] = 0;
       FreePool (NameString);
       return;
