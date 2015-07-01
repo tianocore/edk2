@@ -408,6 +408,9 @@ Returns:
   UINT32      i;
   
   mText       = malloc (WNDSIZ * 2 + MAXMATCH);
+  if (mText == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   for (i = 0 ; i < WNDSIZ * 2 + MAXMATCH; i ++) {
     mText[i] = 0;
   }
@@ -418,6 +421,10 @@ Returns:
   mParent     = malloc (WNDSIZ * 2 * sizeof(*mParent));
   mPrev       = malloc (WNDSIZ * 2 * sizeof(*mPrev));
   mNext       = malloc ((MAX_HASH_VAL + 1) * sizeof(*mNext));
+  if (mLevel == NULL || mChildCount == NULL || mPosition == NULL ||
+    mParent == NULL || mPrev == NULL || mNext == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   
   mBufSiz = 16 * 1024U;
   while ((mBuf = malloc(mBufSiz)) == NULL) {
