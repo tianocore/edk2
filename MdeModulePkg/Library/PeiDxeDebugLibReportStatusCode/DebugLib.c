@@ -115,7 +115,7 @@ DebugPrint (
   //
   // Copy the Format string into the record
   //
-  AsciiStrCpy (FormatString, Format);
+  AsciiStrCpyS (FormatString, sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)), Format);
 
   //
   // The first 12 * sizeof (UINT64) bytes following EFI_DEBUG_INFO are for variable arguments
