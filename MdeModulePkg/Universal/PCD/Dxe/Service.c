@@ -142,6 +142,7 @@ GetPcdName (
 {
   PCD_DATABASE_INIT *Database;
   UINT8             *StringTable;
+  UINTN             NameSize;
   PCD_NAME_INDEX    *PcdNameIndex;
   CHAR8             *TokenSpaceName;
   CHAR8             *PcdName;
@@ -188,14 +189,15 @@ GetPcdName (
     //
     // Need to get the full PCD name.
     //
-    Name = AllocateZeroPool (AsciiStrSize (TokenSpaceName) + AsciiStrSize (PcdName));
+    NameSize = AsciiStrSize (TokenSpaceName) + AsciiStrSize (PcdName);
+    Name = AllocateZeroPool (NameSize);
     ASSERT (Name != NULL);
     //
     // Catenate TokenSpaceCName and PcdCName with a '.' to form the full PCD name.
     //
-    AsciiStrCat (Name, TokenSpaceName);
+    AsciiStrCatS (Name, NameSize, TokenSpaceName);
     Name[AsciiStrSize (TokenSpaceName) - sizeof (CHAR8)] = '.';
-    AsciiStrCat (Name, PcdName);  
+    AsciiStrCatS (Name, NameSize, PcdName);  
   }
 
   return Name;
