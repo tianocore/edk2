@@ -4,6 +4,7 @@
 #
 #  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -70,7 +71,7 @@
 
 [Depex]
   #
-  # NorFlashAuthenticatedDxe must be loaded before VariableAuthenticatedRuntimeDxe
+  # NorFlashAuthenticatedDxe must be loaded before VariableRuntimeDxe
   # in case empty flash needs populating with default values
   #
-  BEFORE gVariableAuthenticatedRuntimeDxeFileGuid
+  BEFORE gVariableRuntimeDxeFileGuid
