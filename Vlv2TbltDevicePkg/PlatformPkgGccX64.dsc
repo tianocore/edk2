@@ -257,11 +257,16 @@
 
   StallSmmLib|$(PLATFORM_PACKAGE)/Library/StallSmmLib/StallSmmLib.inf
 
- !if $(SECURE_BOOT_ENABLE) == TRUE
-   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
- !endif
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
+  TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
+  AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+!else
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+!endif
 !if $(RC_BINARY_RELEASE) == TRUE
   I2cLib|Vlv2TbltDevicePkg/Library/I2CLib/I2CLibNull.inf
 !endif
