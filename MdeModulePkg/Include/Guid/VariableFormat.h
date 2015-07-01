@@ -2,7 +2,7 @@
   The variable data structures are related to EDK II-specific implementation of UEFI variables.
   VariableFormat.h defines variable data headers and variable storage region headers.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -19,7 +19,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_VARIABLE_GUID \
   { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d } }
 
+#define EFI_AUTHENTICATED_VARIABLE_GUID \
+  { 0xaaf32c78, 0x947b, 0x439a, { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 } }
+
 extern EFI_GUID gEfiVariableGuid;
+extern EFI_GUID gEfiAuthenticatedVariableGuid;
 
 ///
 /// Alignment of variable name and data, according to the architecture:
@@ -60,6 +64,7 @@ typedef enum {
 #pragma pack(1)
 
 #define VARIABLE_STORE_SIGNATURE  EFI_VARIABLE_GUID
+#define AUTHENTICATED_VARIABLE_STORE_SIGNATURE  EFI_AUTHENTICATED_VARIABLE_GUID
 
 ///
 /// Variable Store Header Format and State.
@@ -135,6 +140,49 @@ typedef struct {
   ///
   EFI_GUID    VendorGuid;
 } VARIABLE_HEADER;
+
+///
+/// Single Authenticated Variable Data Header Structure.
+///
+typedef struct {
+  ///
+  /// Variable Data Start Flag.
+  ///
+  UINT16      StartId;
+  ///
+  /// Variable State defined above.
+  ///
+  UINT8       State;
+  UINT8       Reserved;
+  ///
+  /// Attributes of variable defined in UEFI specification.
+  ///
+  UINT32      Attributes;
+  ///
+  /// Associated monotonic count value against replay attack.
+  ///
+  UINT64      MonotonicCount;
+  ///
+  /// Associated TimeStamp value against replay attack.
+  ///
+  EFI_TIME    TimeStamp;
+  ///
+  /// Index of associated public key in database.
+  ///
+  UINT32      PubKeyIndex;
+  ///
+  /// Size of variable null-terminated Unicode string name.
+  ///
+  UINT32      NameSize;
+  ///
+  /// Size of the variable data without this header.
+  ///
+  UINT32      DataSize;
+  ///
+  /// A unique identifier for the vendor that produces and consumes this varaible.
+  ///
+  EFI_GUID    VendorGuid;
+} AUTHENTICATED_VARIABLE_HEADER;
 
 #pragma pack()
 
