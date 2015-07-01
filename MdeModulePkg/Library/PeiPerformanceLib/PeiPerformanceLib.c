@@ -6,7 +6,7 @@
   performance data to the GUIDed HOB. Due to the limitation of temporary RAM, the maximum
   number of performance logging entry is specified by PcdMaxPeiPerformanceLogEntries.  
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -190,10 +190,10 @@ StartPerformanceMeasurementEx (
   LogEntryArray[Index].Handle = (EFI_PHYSICAL_ADDRESS) (UINTN) Handle;
 
   if (Token != NULL) {
-    AsciiStrnCpy (LogEntryArray[Index].Token, Token, PEI_PERFORMANCE_STRING_LENGTH);
+    AsciiStrCpyS (LogEntryArray[Index].Token, PEI_PERFORMANCE_STRING_SIZE, Token);
   }
   if (Module != NULL) {
-    AsciiStrnCpy (LogEntryArray[Index].Module, Module, PEI_PERFORMANCE_STRING_LENGTH);
+    AsciiStrCpyS (LogEntryArray[Index].Module, PEI_PERFORMANCE_STRING_SIZE, Module);
   }
 
   LogEntryArray[Index].EndTimeStamp = 0;
