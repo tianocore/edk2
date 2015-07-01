@@ -10,7 +10,7 @@
   This library is mainly used by DxeCore to start performance logging to ensure that
   Performance Protocol is installed at the very beginning of DXE phase.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -191,10 +191,10 @@ StartGaugeEx (
   GaugeEntryExArray[Index].Handle = (EFI_PHYSICAL_ADDRESS) (UINTN) Handle;
 
   if (Token != NULL) {
-    AsciiStrnCpy (GaugeEntryExArray[Index].Token, Token, DXE_PERFORMANCE_STRING_LENGTH);
+    AsciiStrCpyS (GaugeEntryExArray[Index].Token, DXE_PERFORMANCE_STRING_SIZE, Token);
   }
   if (Module != NULL) {
-    AsciiStrnCpy (GaugeEntryExArray[Index].Module, Module, DXE_PERFORMANCE_STRING_LENGTH);
+    AsciiStrCpyS (GaugeEntryExArray[Index].Module, DXE_PERFORMANCE_STRING_SIZE, Module);
   }
 
   GaugeEntryExArray[Index].EndTimeStamp = 0;
@@ -463,8 +463,8 @@ InternalGetPeiPerformance (
     NumberOfEntries = LogHob->NumberOfEntries;
     for (Index = 0; Index < NumberOfEntries; Index++) {
       GaugeEntryExArray[Index].Handle         = LogEntryArray[Index].Handle;
-      AsciiStrnCpy (GaugeEntryExArray[Index].Token,  LogEntryArray[Index].Token,  DXE_PERFORMANCE_STRING_LENGTH);
-      AsciiStrnCpy (GaugeEntryExArray[Index].Module, LogEntryArray[Index].Module, DXE_PERFORMANCE_STRING_LENGTH);
+      AsciiStrCpyS (GaugeEntryExArray[Index].Token,  DXE_PERFORMANCE_STRING_SIZE, LogEntryArray[Index].Token);
+      AsciiStrCpyS (GaugeEntryExArray[Index].Module, DXE_PERFORMANCE_STRING_SIZE, LogEntryArray[Index].Module);
       GaugeEntryExArray[Index].StartTimeStamp = LogEntryArray[Index].StartTimeStamp;
       GaugeEntryExArray[Index].EndTimeStamp   = LogEntryArray[Index].EndTimeStamp;
       GaugeEntryExArray[Index].Identifier     = 0;
