@@ -333,6 +333,7 @@ UpdateDeviceSelectPage (
   EFI_STATUS                                Status;
   UINTN                                     Index;
   UINTN                                     DevicePathHandleCount;
+  UINTN                                     NewStrSize;
   CHAR16                                    *NewString;
   EFI_STRING_ID                             NewStringToken;
   CHAR16                                    *ControllerName;
@@ -489,14 +490,15 @@ UpdateDeviceSelectPage (
     // Export the driver name string and create item in set options page
     //
     Len = StrSize (ControllerName);
-    NewString = AllocateZeroPool (Len + StrSize (L"--"));
+    NewStrSize = Len + StrSize (L"--");
+    NewString = AllocateZeroPool (NewStrSize);
     ASSERT (NewString != NULL);
     if (EFI_ERROR (CheckMapping (ControllerDevicePath,NULL, &mMappingDataBase, NULL, NULL))) {
-      StrCat (NewString, L"--");
+      StrCatS (NewString, NewStrSize/sizeof(CHAR16), L"--");
     } else {
-      StrCat (NewString, L"**");
+      StrCatS (NewString, NewStrSize/sizeof(CHAR16), L"**");
     }
-    StrCat (NewString, ControllerName);
+    StrCatS (NewString, NewStrSize/sizeof(CHAR16), ControllerName);
 
     NewStringToken = HiiSetString (Private->RegisteredHandle, mControllerToken[Index], NewString, NULL);
     ASSERT (NewStringToken != 0);
@@ -622,6 +624,7 @@ UpdateBindingDriverSelectPage (
 {
   EFI_STATUS                                Status;
   UINTN                                     Index;
+  UINTN                                     NewStrSize;
   CHAR16                                    *NewString;
   EFI_STRING_ID                             NewStringToken;
   EFI_STRING_ID                             NewStringHelpToken;
@@ -814,7 +817,8 @@ UpdateBindingDriverSelectPage (
     //
     // First create the driver image name
     //
-    NewString = AllocateZeroPool (StrSize (DriverName));
+    NewStrSize = StrSize (DriverName);
+    NewString = AllocateZeroPool (NewStrSize);
     ASSERT (NewString != NULL); 
     if (EFI_ERROR (CheckMapping (mControllerDevicePathProtocol[mSelectedCtrIndex], LoadedImageDevicePath, &mMappingDataBase, NULL, NULL))) {
       mDriSelection[Index] = FALSE;
@@ -822,7 +826,7 @@ UpdateBindingDriverSelectPage (
       mDriSelection[Index] = TRUE;
       mLastSavedDriverImageNum++;
     }
-    StrCat (NewString, DriverName);
+    StrCatS (NewString, NewStrSize/sizeof(CHAR16), DriverName);
     NewStringToken = HiiSetString (Private->RegisteredHandle, mDriverImageToken[Index], NewString, NULL);
     ASSERT (NewStringToken != 0);
     mDriverImageToken[Index] = NewStringToken;
@@ -836,9 +840,10 @@ UpdateBindingDriverSelectPage (
     //
     DriverName = DevicePathToStr (LoadedImageDevicePath);
 
-    NewString = AllocateZeroPool (StrSize (DriverName));
+    NewStrSize = StrSize (DriverName);
+    NewString = AllocateZeroPool (NewStrSize);
     ASSERT (NewString != NULL); 
-    StrCat (NewString, DriverName);
+    StrCatS (NewString, NewStrSize/sizeof(CHAR16), DriverName);
     NewStringHelpToken = HiiSetString (Private->RegisteredHandle, DriverImageFilePathToken[Index], NewString, NULL);
     ASSERT (NewStringHelpToken != 0);
     DriverImageFilePathToken[Index] = NewStringHelpToken;
