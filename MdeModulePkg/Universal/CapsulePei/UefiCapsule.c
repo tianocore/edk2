@@ -583,7 +583,7 @@ GetCapsuleDescriptors (
               (VOID **) &PPIVariableServices
               );
   if (Status == EFI_SUCCESS) {
-    StrCpy (CapsuleVarName, EFI_CAPSULE_VARIABLE_NAME);
+    StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CHAR16), EFI_CAPSULE_VARIABLE_NAME);
     TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
     Size = sizeof (CapsuleDataPtr64);
     while (1) {
@@ -773,7 +773,7 @@ CapsuleCoalesce (
     goto Done;
   }
   Size = sizeof (CapsuleDataPtr64);
-  StrCpy (CapsuleVarName, EFI_CAPSULE_VARIABLE_NAME);
+  StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CHAR16), EFI_CAPSULE_VARIABLE_NAME);
   TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
   while (TRUE) {
     if (Index > 0) {
