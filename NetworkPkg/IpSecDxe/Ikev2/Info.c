@@ -1,6 +1,7 @@
 /** @file
   The Implementations for Information Exchange.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -211,7 +212,6 @@ Ikev2InfoParser (
 {
   IKEV2_CHILD_SA_SESSION *ChildSaSession;
   IKEV2_SA_SESSION       *IkeSaSession;
-  IKE_PAYLOAD            *NotifyPayload;
   IKE_PAYLOAD            *DeletePayload;
   IKE_PAYLOAD            *IkePayload;
   IKEV2_DELETE           *Delete;
@@ -229,7 +229,6 @@ Ikev2InfoParser (
   
   IkeSaSession   = (IKEV2_SA_SESSION *) SaSession;
 
-  NotifyPayload  = NULL;
   DeletePayload  = NULL;
   Private        = NULL;
   RespondPacket  = NULL;

@@ -1,6 +1,7 @@
 /** @file
   The Common operations used by IKE Exchange Process.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -571,7 +572,6 @@ Ikev2ChildSaSessionReg (
   IKEV2_SESSION_COMMON         *SessionCommon;
   IKEV2_CHILD_SA_SESSION       *OldChildSaSession;
   IKEV2_SA_SESSION             *IkeSaSession;
-  IKEV2_SA_PARAMS              *SaParams;
   EFI_STATUS                   Status;
   UINT64                       Lifetime;
 
@@ -624,7 +624,6 @@ Ikev2ChildSaSessionReg (
   //
   // Start to count the lifetime of the IKE SA.
   //
-  SaParams = SessionCommon->SaParams;
   if (ChildSaSession->Spd->Data->ProcessingPolicy->SaLifetime.HardLifetime != 0){
     Lifetime = ChildSaSession->Spd->Data->ProcessingPolicy->SaLifetime.HardLifetime;
   } else {

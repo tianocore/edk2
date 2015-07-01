@@ -1,6 +1,7 @@
 /** @file
   The implementation of IPsec.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -898,7 +899,6 @@ IpSecIsIp6ExtsValid (
   UINT32                     Pointer;
   UINT8                      *Option;
   UINT8                      OptionLen;
-  BOOLEAN                    Flag;
   UINT8                      CountD;
   UINT8                      CountF;
   UINT8                      CountA;
@@ -918,7 +918,6 @@ IpSecIsIp6ExtsValid (
   }
 
   Pointer = 0;
-  Flag    = FALSE;
   CountD  = 0;
   CountF  = 0;
   CountA  = 0;
@@ -930,8 +929,6 @@ IpSecIsIp6ExtsValid (
       if (Pointer != 0) {
         return FALSE;
       }
-
-      Flag = TRUE;
 
     //
     // Fall through

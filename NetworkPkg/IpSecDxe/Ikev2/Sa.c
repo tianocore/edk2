@@ -1,6 +1,7 @@
 /** @file
   The operations for IKEv2 SA.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -1132,7 +1133,6 @@ Ikev2AuthCertParser (
   IKE_PAYLOAD            *TsiPayload;
   IKE_PAYLOAD            *TsrPayload;
   IKE_PAYLOAD            *CertPayload;
-  IKE_PAYLOAD            *CertReqPayload;
   IKE_PAYLOAD            *VerifiedAuthPayload;
   LIST_ENTRY             *Entry;
   EFI_STATUS             Status;
@@ -1151,7 +1151,6 @@ Ikev2AuthCertParser (
   TsiPayload          = NULL;
   TsrPayload          = NULL;
   CertPayload         = NULL;
-  CertReqPayload      = NULL;
   VerifiedAuthPayload = NULL;
   Status              = EFI_INVALID_PARAMETER;
 
@@ -1182,9 +1181,6 @@ Ikev2AuthCertParser (
     }
     if (IkePayload->PayloadType == IKEV2_PAYLOAD_TYPE_CERT) {
       CertPayload = IkePayload;
-    }
-    if (IkePayload->PayloadType == IKEV2_PAYLOAD_TYPE_CERTREQ) {
-      CertReqPayload = IkePayload;
     }
   }
 
@@ -1478,7 +1474,6 @@ Ikev2GenerateSaKeys (
 {
   EFI_STATUS          Status;
   IKEV2_SA_PARAMS     *SaParams;
-  IPSEC_PAD_ENTRY     *Pad;
   PRF_DATA_FRAGMENT   Fragments[4];
   UINT64              InitiatorCookieNet;
   UINT64              ResponderCookieNet;
@@ -1502,8 +1497,6 @@ Ikev2GenerateSaKeys (
   // Generate Gxy
   //
   Ikev2GenerateSaDhComputeKey (IkeSaSession->IkeKeys->DhBuffer, KePayload);
-
-  Pad = IkeSaSession->Pad;
 
   //
   // Get the key length of Authenticaion, Encryption, PRF, and Integrity.

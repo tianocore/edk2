@@ -1,6 +1,7 @@
 /** @file
   The implementation of Payloads Creation.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -284,7 +285,6 @@ Ikev2GenerateCertIdPayload (
   IKE_PAYLOAD    *IdPayload;
   IKEV2_ID       *Id;
   UINTN          IdSize;
-  UINT8          IpVersion;
   UINTN          SubjectSize;
   UINT8          *CertSubject;
 
@@ -304,7 +304,6 @@ Ikev2GenerateCertIdPayload (
 
   SubjectSize = 0;
   CertSubject = NULL;
-  IpVersion = CommonSession->UdpService->IpVersion;
   IpSecCryptoIoGetSubjectFromCert (
     InCert,
     CertSize,
@@ -615,7 +614,6 @@ Ikev2CertGenerateAuthPayload (
   UINTN              DigestSize;
   PRF_DATA_FRAGMENT  Fragments[3];
   UINT8              *KeyBuf;
-  UINTN              KeySize;
   IKE_PAYLOAD        *AuthPayload;
   IKEV2_AUTH         *PayloadBuf;
   EFI_STATUS         Status;
@@ -663,7 +661,6 @@ Ikev2CertGenerateAuthPayload (
   ASSERT (KeyBuf != NULL);
 
   CopyMem (KeyBuf, Digest, DigestSize);
-  KeySize = DigestSize;
 
   //
   // Calculate Prf(SK_Pi/r, IDi/r)
@@ -2558,14 +2555,12 @@ Ikev2DecryptPacket (
   IKEV2_CHILD_SA_SESSION *ChildSaSession;
   EFI_STATUS             Status;
   UINT8                  PadLen;
-  UINTN                  CryptKeyLength;
   HASH_DATA_FRAGMENT     Fragments[1];
 
   IvSize         = 0;
   IkeSaSession   = NULL;
   CryptBlockSize = 0;
   CheckSumSize   = 0;
-  CryptKeyLength = 0;
 
   //
   // Check if the first payload is the Encrypted payload
@@ -2583,7 +2578,7 @@ Ikev2DecryptPacket (
   if (SessionCommon->IkeSessionType == IkeSessionTypeIkeSa) {
 
     CryptBlockSize = (UINT8) IpSecGetEncryptBlockSize ((UINT8) SessionCommon->SaParams->EncAlgId);
-    CryptKeyLength = IpSecGetEncryptKeyLength ((UINT8) SessionCommon->SaParams->EncAlgId);
+
     CheckSumSize   = (UINT8) IpSecGetIcvLength ((UINT8) SessionCommon->SaParams->IntegAlgId);
     IkeSaSession   = IKEV2_SA_SESSION_FROM_COMMON (SessionCommon);
 
@@ -2592,7 +2587,6 @@ Ikev2DecryptPacket (
     ChildSaSession = IKEV2_CHILD_SA_SESSION_FROM_COMMON (SessionCommon);
     IkeSaSession   = ChildSaSession->IkeSaSession;
     CryptBlockSize = (UINT8) IpSecGetEncryptBlockSize ((UINT8) IkeSaSession->SessionCommon.SaParams->EncAlgId);
-    CryptKeyLength = IpSecGetEncryptKeyLength ((UINT8) IkeSaSession->SessionCommon.SaParams->EncAlgId);
     CheckSumSize   = (UINT8) IpSecGetIcvLength ((UINT8) IkeSaSession->SessionCommon.SaParams->IntegAlgId);
   } else {
     //
@@ -2768,7 +2762,6 @@ Ikev2EncryptPacket (
   UINT8                  *EncryptPayloadBuf;  // Contain whole Encrypted Payload
   UINTN                  EncryptPayloadSize;  // Total size of the Encrypted payload
   UINT8                  *IntegrityBuf;       // Buffer to be intergity
-  UINT32                 IntegrityBufSize;    // Buffer size of IntegrityBuf
   UINT8                  *IvBuffer;           // Initialization Vector
   UINT8                  IvSize;              // Iv Size
   UINT8                  CheckSumSize;        // Integrity Check Sum Size depends on intergrity Auth
@@ -2780,7 +2773,6 @@ Ikev2EncryptPacket (
   EFI_STATUS             Status;
   LIST_ENTRY             *Entry;
   IKE_PAYLOAD            *IkePayload;
-  UINTN                  CryptKeyLength;
   HASH_DATA_FRAGMENT     Fragments[1];
 
   Status = EFI_SUCCESS;
@@ -2795,7 +2787,6 @@ Ikev2EncryptPacket (
   IkeSaSession      = NULL;
   CryptBlockSize    = 0;
   CheckSumSize      = 0;
-  CryptKeyLength    = 0;
   IntegrityBuf      = NULL;
   //
   // Get the Block Size
@@ -2803,7 +2794,6 @@ Ikev2EncryptPacket (
   if (SessionCommon->IkeSessionType == IkeSessionTypeIkeSa) {
 
     CryptBlockSize = (UINT8) IpSecGetEncryptBlockSize ((UINT8) SessionCommon->SaParams->EncAlgId);
-    CryptKeyLength = IpSecGetEncryptKeyLength ((UINT8) SessionCommon->SaParams->EncAlgId);
     CheckSumSize   = (UINT8) IpSecGetIcvLength ((UINT8) SessionCommon->SaParams->IntegAlgId);
     IkeSaSession   = IKEV2_SA_SESSION_FROM_COMMON (SessionCommon);
 
@@ -2812,7 +2802,6 @@ Ikev2EncryptPacket (
     ChildSaSession = IKEV2_CHILD_SA_SESSION_FROM_COMMON (SessionCommon);
     IkeSaSession   = ChildSaSession->IkeSaSession;
     CryptBlockSize = (UINT8) IpSecGetEncryptBlockSize ((UINT8) IkeSaSession->SessionCommon.SaParams->EncAlgId);
-    CryptKeyLength = IpSecGetEncryptKeyLength ((UINT8) IkeSaSession->SessionCommon.SaParams->EncAlgId);
     CheckSumSize   = (UINT8) IpSecGetIcvLength ((UINT8) IkeSaSession->SessionCommon.SaParams->IntegAlgId);
   }
 
@@ -2919,7 +2908,6 @@ Ikev2EncryptPacket (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  IntegrityBufSize               = IkePacket->Header->Length;
   IkeHdrHostToNet (IkePacket->Header);
 
   CopyMem (IntegrityBuf, IkePacket->Header, sizeof (IKE_HEADER));
