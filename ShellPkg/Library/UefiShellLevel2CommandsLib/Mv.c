@@ -128,9 +128,11 @@ IsValidMove(
   //
   // If they're the same, or if source is "above" dest on file path tree
   //
-  if ( StringNoCaseCompare (&DestPathWalker, &SourcePath) == 0 
-    || StrStr(DestPathWalker, SourcePath) == DestPathWalker 
-    ) {
+  if ( StringNoCaseCompare (&DestPathWalker, &SourcePath) == 0 ||
+       ((StrStr(DestPathWalker, SourcePath) == DestPathWalker) && 
+        (DestPathWalker[StrLen(SourcePath)] == '\\')
+       )
+     ) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MV_INV_SUB), gShellLevel2HiiHandle);
     FreePool(DestPathCopy);
     return (FALSE);
