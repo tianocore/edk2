@@ -2,12 +2,12 @@
   Implementation functions and structures for var check protocol.
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -616,30 +616,49 @@ UEFI_DEFINED_VARIABLE_ENTRY mGlobalVariableList2[] = {
   },
 };
 
-typedef struct {
-  EFI_GUID                      *Guid;
-  CHAR16                        *Name;
-  VAR_CHECK_VARIABLE_PROPERTY   VariableProperty;
-} VARIABLE_DRIVER_VARIABLE_ENTRY;
-
-VARIABLE_DRIVER_VARIABLE_ENTRY mVariableDriverVariableList[] = {
+//
+// EFI_IMAGE_SECURITY_DATABASE_GUID
+//
+UEFI_DEFINED_VARIABLE_ENTRY mImageSecurityVariableList[] = {
   {
-    &gEdkiiVarErrorFlagGuid,
-    VAR_ERROR_FLAG_NAME,
+    EFI_IMAGE_SECURITY_DATABASE,
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
-      VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
-      VARIABLE_ATTRIBUTE_NV_BS_RT,
-      sizeof (VAR_ERROR_FLAG),
-      sizeof (VAR_ERROR_FLAG),
-    }
+      0,
+      VARIABLE_ATTRIBUTE_NV_BS_RT_AT,
+      1,
+      MAX_UINTN
+    },
+    NULL
+  },
+  {
+    EFI_IMAGE_SECURITY_DATABASE1,
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_NV_BS_RT_AT,
+      1,
+      MAX_UINTN
+    },
+    NULL
+  },
+  {
+    EFI_IMAGE_SECURITY_DATABASE2,
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_NV_BS_RT_AT,
+      1,
+      MAX_UINTN
+    },
+    NULL
   },
 };
 
 /**
-  Get UEFI defined global variable property.
-  The code will check if variable guid is global variable guid first.
-  If yes, further check if variable name is in mGlobalVariableList or mGlobalVariableList2.
+  Get UEFI defined global variable or image security database variable property.
+  The code will check if variable guid is global variable or image security database guid first.
+  If yes, further check if variable name is in mGlobalVariableList, mGlobalVariableList2 or mImageSecurityVariableList.
 
   @param[in]  VariableName      Pointer to variable name.
   @param[in]  VendorGuid        Variable Vendor Guid.
@@ -647,8 +666,8 @@ VARIABLE_DRIVER_VARIABLE_ENTRY mVariableDriverVariableList[] = {
   @param[out] VariableProperty  Pointer to variable property.
   @param[out] VarCheckFunction  Pointer to check function.
 
-  @retval EFI_SUCCESS           Variable is not global variable.
-  @retval EFI_INVALID_PARAMETER Variable is global variable, but variable name is not in the lists.
+  @retval EFI_SUCCESS           Variable is not global variable or image security database variable.
+  @retval EFI_INVALID_PARAMETER Variable is global variable or image security database variable, but variable name is not in the lists.
 
 **/
 EFI_STATUS
@@ -711,36 +730,24 @@ GetUefiDefinedVariableProperty (
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // It is not global variable.
-  //
-  return EFI_SUCCESS;
-}
-
-/**
-  Get variable property for variables managed by Varaible driver.
-
-  @param[in]  VariableName      Pointer to variable name.
-  @param[in]  VendorGuid        Variable Vendor Guid.
-
-  @return Pointer to variable property.
-
-**/
-VAR_CHECK_VARIABLE_PROPERTY *
-GetVariableDriverVariableProperty (
-  IN CHAR16                         *VariableName,
-  IN EFI_GUID                       *VendorGuid
-  )
-{
-  UINTN     Index;
-
-  for (Index = 0; Index < sizeof (mVariableDriverVariableList)/sizeof (mVariableDriverVariableList[0]); Index++) {
-    if ((CompareGuid (mVariableDriverVariableList[Index].Guid, VendorGuid)) && (StrCmp (mVariableDriverVariableList[Index].Name, VariableName) == 0)) {
-      return &mVariableDriverVariableList[Index].VariableProperty;
+  if (CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
+    for (Index = 0; Index < sizeof (mImageSecurityVariableList)/sizeof (mImageSecurityVariableList[0]); Index++) {
+      if (StrCmp (mImageSecurityVariableList[Index].Name, VariableName) == 0) {
+        if (VarCheckFunction != NULL) {
+          *VarCheckFunction = mImageSecurityVariableList[Index].CheckFunction;
+        }
+        *VariableProperty = &mImageSecurityVariableList[Index].VariableProperty;
+        return EFI_SUCCESS;
+      }
     }
+
+    return EFI_INVALID_PARAMETER;
   }
 
-  return NULL;
+  //
+  // It is not global variable, image security database variable.
+  //
+  return EFI_SUCCESS;
 }
 
 /**
@@ -800,12 +807,17 @@ InternalVarCheckSetVariableCheck (
     }
   }
   if (Property == NULL) {
-    Property = GetVariableDriverVariableProperty (VariableName, VendorGuid);
-  }
-  if (Property == NULL) {
     Status = GetUefiDefinedVariableProperty (VariableName, VendorGuid, TRUE, &Property, &VarCheckFunction);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "[Variable]: Var Check UEFI defined variable fail %r - %g:%s\n", Status, VendorGuid, VariableName));
+    //
+    // To prevent name collisions with possible future globally defined variables,
+    // other internal firmware data variables that are not defined here must be
+    // saved with a unique VendorGuid other than EFI_GLOBAL_VARIABLE or
+    // any other GUID defined by the UEFI Specification. Implementations must
+    // only permit the creation of variables with a UEFI Specification-defined
+    // VendorGuid when these variables are documented in the UEFI Specification.
+    //
+      DEBUG ((EFI_D_INFO, "Variable Check UEFI defined variable fail %r - %s not in %g namespace\n", Status, VariableName, VendorGuid));
       return Status;
     }
   }
@@ -814,27 +826,29 @@ InternalVarCheckSetVariableCheck (
       DEBUG ((EFI_D_INFO, "[Variable]: Var Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
       return EFI_WRITE_PROTECTED;
     }
-    if (!((DataSize == 0) || (Attributes == 0))) {
+    if (!((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0)) || (Attributes == 0))) {
       //
       // Not to delete variable.
       //
-      if (Attributes != Property->Attributes) {
-        DEBUG ((EFI_D_INFO, "[Variable]: Var Check Attributes(0x%08x to 0x%08x) fail %r - %g:%s\n", Property->Attributes, Attributes, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
+      if ((Attributes != 0) && ((Attributes & (~EFI_VARIABLE_APPEND_WRITE)) != Property->Attributes)) {
+        DEBUG ((EFI_D_INFO, "Variable Check Attributes(0x%08x to 0x%08x) fail %r - %g:%s\n", Property->Attributes, Attributes, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
         return EFI_INVALID_PARAMETER;
       }
-      if ((DataSize < Property->MinSize) || (DataSize > Property->MaxSize)) {
-        DEBUG ((EFI_D_INFO, "[Variable]: Var Check DataSize fail(0x%x not in 0x%x - 0x%x) %r - %g:%s\n", DataSize, Property->MinSize, Property->MaxSize, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
-        return EFI_INVALID_PARAMETER;
-      }
-      if (VarCheckFunction != NULL) {
-        Status = VarCheckFunction (
-                   Property,
-                   DataSize,
-                   Data
-                   );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_INFO, "[Variable]: Internal Var Check function fail %r - %g:%s\n", Status, VendorGuid, VariableName));
-          return Status;
+      if (DataSize != 0) {
+        if ((DataSize < Property->MinSize) || (DataSize > Property->MaxSize)) {
+          DEBUG ((EFI_D_INFO, "Variable Check DataSize fail(0x%x not in 0x%x - 0x%x) %r - %g:%s\n", DataSize, Property->MinSize, Property->MaxSize, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
+          return EFI_INVALID_PARAMETER;
+        }
+        if (VarCheckFunction != NULL) {
+          Status = VarCheckFunction (
+                     Property,
+                     DataSize,
+                     Data
+                     );
+          if (EFI_ERROR (Status)) {
+            DEBUG ((EFI_D_INFO, "Internal Variable Check function fail %r - %g:%s\n", Status, VendorGuid, VariableName));
+            return Status;
+          }
         }
       }
     }
@@ -849,7 +863,7 @@ InternalVarCheckSetVariableCheck (
                Data
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "[Variable]: Var Check handler fail %r - %g:%s\n", Status, VendorGuid, VariableName));
+      DEBUG ((EFI_D_INFO, "Variable Check handler fail %r - %g:%s\n", Status, VendorGuid, VariableName));
       return Status;
     }
   }
@@ -875,8 +889,8 @@ ReallocateHandlerTable (
   // Reallocate memory for check handler table.
   //
   HandlerTable = ReallocateRuntimePool (
-                     mMaxNumberOfHandler * sizeof (VAR_CHECK_SET_VARIABLE_CHECK_HANDLER), 
-                     (mMaxNumberOfHandler + VAR_CHECK_HANDLER_TABLE_SIZE) * sizeof (VAR_CHECK_SET_VARIABLE_CHECK_HANDLER), 
+                     mMaxNumberOfHandler * sizeof (VAR_CHECK_SET_VARIABLE_CHECK_HANDLER),
+                     (mMaxNumberOfHandler + VAR_CHECK_HANDLER_TABLE_SIZE) * sizeof (VAR_CHECK_SET_VARIABLE_CHECK_HANDLER),
                      mHandlerTable
                      );
 
@@ -927,6 +941,10 @@ VarCheckRegisterSetVariableCheckHandler (
 
   DEBUG ((EFI_D_INFO, "RegisterSetVariableCheckHandler - 0x%x\n", Handler));
 
+  Status = EFI_SUCCESS;
+
+  AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
   //
   // Check whether the handler list is enough to store new handler.
   //
@@ -936,7 +954,7 @@ VarCheckRegisterSetVariableCheckHandler (
     //
     Status = ReallocateHandlerTable();
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Done;
     }
   }
 
@@ -946,7 +964,10 @@ VarCheckRegisterSetVariableCheckHandler (
   mHandlerTable[mNumberOfHandler] = Handler;
   mNumberOfHandler++;
 
-  return EFI_SUCCESS;
+Done:
+  ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
+  return Status;
 }
 
 /**
@@ -971,6 +992,8 @@ VariablePropertyGetFunction (
   CHAR16                        *VariableName;
   VAR_CHECK_VARIABLE_PROPERTY   *Property;
 
+  Property = NULL;
+
   for ( Link = GetFirstNode (&mVarCheckVariableList)
       ; !IsNull (&mVarCheckVariableList, Link)
       ; Link = GetNextNode (&mVarCheckVariableList, Link)
@@ -982,12 +1005,55 @@ VariablePropertyGetFunction (
     }
   }
 
-  Property = GetVariableDriverVariableProperty (Name, Guid);
-  if (Property == NULL) {
-    GetUefiDefinedVariableProperty (Name, Guid, WildcardMatch, &Property, NULL);
-  }
+  GetUefiDefinedVariableProperty (Name, Guid, WildcardMatch, &Property, NULL);
 
   return Property;
+}
+
+/**
+  Internal variable property set.
+
+  @param[in] Name               Pointer to the variable name.
+  @param[in] Guid               Pointer to the vendor GUID.
+  @param[in] VariableProperty   Pointer to the input variable property.
+
+  @retval EFI_SUCCESS           The property of variable specified by the Name and Guid was set successfully.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource for the variable property set request.
+
+**/
+EFI_STATUS
+EFIAPI
+InternalVarCheckVariablePropertySet (
+  IN CHAR16                         *Name,
+  IN EFI_GUID                       *Guid,
+  IN VAR_CHECK_VARIABLE_PROPERTY    *VariableProperty
+  )
+{
+  EFI_STATUS                    Status;
+  VAR_CHECK_VARIABLE_ENTRY      *Entry;
+  CHAR16                        *VariableName;
+  VAR_CHECK_VARIABLE_PROPERTY   *Property;
+
+  Status = EFI_SUCCESS;
+
+  Property = VariablePropertyGetFunction (Name, Guid, FALSE);
+  if (Property != NULL) {
+    CopyMem (Property, VariableProperty, sizeof (*VariableProperty));
+  } else {
+    Entry = AllocateRuntimeZeroPool (sizeof (*Entry) + StrSize (Name));
+    if (Entry == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+    VariableName = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
+    StrnCpy (VariableName, Name, StrLen (Name));
+    CopyGuid (&Entry->Guid, Guid);
+    CopyMem (&Entry->VariableProperty, VariableProperty, sizeof (*VariableProperty));
+    InsertTailList (&mVarCheckVariableList, &Entry->Link);
+  }
+
+Done:
+  return Status;
 }
 
 /**
@@ -1014,9 +1080,6 @@ VarCheckVariablePropertySet (
   )
 {
   EFI_STATUS                    Status;
-  VAR_CHECK_VARIABLE_ENTRY      *Entry;
-  CHAR16                        *VariableName;
-  VAR_CHECK_VARIABLE_PROPERTY   *Property;
 
   if (Name == NULL || Name[0] == 0 || Guid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1034,27 +1097,10 @@ VarCheckVariablePropertySet (
     return EFI_ACCESS_DENIED;
   }
 
-  Status = EFI_SUCCESS;
-
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
-  Property = VariablePropertyGetFunction (Name, Guid, FALSE);
-  if (Property != NULL) {
-    CopyMem (Property, VariableProperty, sizeof (*VariableProperty));
-  } else {
-    Entry = AllocateRuntimeZeroPool (sizeof (*Entry) + StrSize (Name));
-    if (Entry == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Done;
-    }
-    VariableName = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
-    StrnCpy (VariableName, Name, StrLen (Name));
-    CopyGuid (&Entry->Guid, Guid);
-    CopyMem (&Entry->VariableProperty, VariableProperty, sizeof (*VariableProperty));
-    InsertTailList (&mVarCheckVariableList, &Entry->Link);
-  }
+  Status = InternalVarCheckVariablePropertySet (Name, Guid, VariableProperty);
 
-Done:
   ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   return Status;

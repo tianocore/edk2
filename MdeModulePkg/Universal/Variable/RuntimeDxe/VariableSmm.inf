@@ -1,16 +1,22 @@
 ## @file
+#  Provides SMM variable service.
+#
 #  This module installs SMM variable protocol into SMM protocol database,
-#  which can be used by SMM driver, and installs SMM variable protocol 
+#  which can be used by SMM driver, and installs SMM variable protocol
 #  into BS protocol database, which can be used to notify the SMM Runtime
 #  Dxe driver that the SMM variable service is ready.
-#  This module should be used with SMM Runtime DXE module together. The 
-#  SMM Runtime DXE module would install variable arch protocol and variable 
+#  This module should be used with SMM Runtime DXE module together. The
+#  SMM Runtime DXE module would install variable arch protocol and variable
 #  write arch protocol based on SMM variable module.
 #
 #  Caution: This module requires additional review when modified.
 #  This driver will have external input - variable data and communicate buffer in SMM mode.
-#  This external input must be validated carefully to avoid security issue like
-#  buffer overflow, integer overflow.
+#  This external input must be validated carefully to avoid security issues such as
+#  buffer overflow or integer overflow.
+#    The whole SMM authentication variable design relies on the integrity of flash part and SMM.
+#  which is assumed to be protected by platform.  All variable code and metadata in flash/SMM Memory
+#  may not be modified without authorization. If platform fails to protect these resources,
+#  the authentication service provided in this driver will be broken, and the behavior is undefined.
 #
 # Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
@@ -19,7 +25,6 @@
 # http://opensource.org/licenses/bsd-license.php
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
 #
 ##
 
@@ -46,6 +51,7 @@
   VariableSmm.c
   VarCheck.c
   Variable.h
+  VariableExLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -65,6 +71,7 @@
   PcdLib
   DevicePathLib
   SmmMemLib
+  AuthVariableLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
@@ -81,35 +88,55 @@
   ## PRODUCES             ## GUID # Signature of Variable store header
   ## CONSUMES             ## GUID # Signature of Variable store header
   ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiAuthenticatedVariableGuid
+
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiVariableGuid
+
   ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang"
   ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
   ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
   ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
   ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRecSupport"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SetupMode"
+  ## SOMETIMES_CONSUMES   ## Variable:L"PK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"KEK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SecureBoot"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SignatureSupport"
+  ## SOMETIMES_CONSUMES   ## Variable:L"VendorKeys"
   gEfiGlobalVariableGuid
-  gSmmVariableWriteGuid                         ## PRODUCES             ## UNDEFINED # Install protocol
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"DB"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBX"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBT"
+  gEfiImageSecurityDatabaseGuid
+
+  gSmmVariableWriteGuid                         ## PRODUCES             ## GUID # Install protocol
   gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
   gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRec####"
-  ## SOMETIMES_CONSUMES   ## HOB
-  gEdkiiFaultTolerantWriteGuid
+  gEdkiiFaultTolerantWriteGuid                  ## SOMETIMES_CONSUMES   ## HOB
   gEdkiiVarErrorFlagGuid                        ## CONSUMES             ## GUID
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize      ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase      ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                 ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize              ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxUserNvVariableSpaceSize           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdBoottimeReservedNvVariableSpaceSize  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe   ## CONSUMES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics   ## CONSUMES # statistic the information of variable.
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics        ## CONSUMES  # statistic the information of variable.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate       ## CONSUMES  # Auto update PlatformLang/Lang
 
 [Depex]
   TRUE
