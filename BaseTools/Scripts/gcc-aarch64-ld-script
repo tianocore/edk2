@@ -1,0 +1,39 @@
+SECTIONS {
+  /*
+   * Put the .text section at 0x0 explicitly. While we know it will minimally
+   * end up at 0x280, (the size of the PE/COFF headers being 0x250 bytes and the
+   * minimum alignment 0x40), choosing 0x280 as the offset causes problems when
+   * linking objects with a greater .text alignment, since the section's base
+   * must adhere to its own alignment.
+   * Using 0x0 will result in the PE/COFF binary's memory layout to be shifted
+   * with respect to the ELF version, but this shouldn't be a problem as long as
+   * the .data's offset relative to .text is kept the same.
+   */
+  .text 0x0 : ALIGN(0x40) {
+    *(.text .text.* .rodata .rodata.*)
+  }
+
+  /*
+   * The alignment of the .data section needs to be less than or equal to the
+   * alignment of the .text section. This ensures that the relative offset
+   * between these sections is the same in the ELF and the PE/COFF version of
+   * this binary.
+   */
+  .data : ALIGN(0x40) {
+    *(.data .data.*)
+    *(.bss .bss.* *COM*)
+  }
+  .rela ALIGN(0x20) : {
+    *(.rela .rela.*)
+  }
+
+  /DISCARD/ : {
+    *(.note.GNU-stack)
+    *(.interp)
+    *(.dynsym)
+    *(.dynstr)
+    *(.dynamic)
+    *(.hash)
+    *(.comment)
+  }
+}
