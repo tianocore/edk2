@@ -2000,7 +2000,6 @@ class PlatformAutoGen(AutoGen):
                                             if Options.get((self.BuildRuleFamily, NowKey)) != None: 
                                                 Options.pop((self.BuildRuleFamily, NowKey))
                                                            
-        OverrideOpt = set()
         for Key in Options:
             if ModuleStyle != None and len (Key) > 2:
                 # Check Module style is EDK or EDKII.
@@ -2026,9 +2025,7 @@ class PlatformAutoGen(AutoGen):
                     if Arch == "*" or Arch == self.Arch:
                         if Tool not in BuildOptions:
                             BuildOptions[Tool] = {}
-                        if Options[Key].startswith('='):
-                            OverrideOpt.add((Tool, Attr))
-                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or (Tool, Attr) in OverrideOpt:
+                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or Options[Key].startswith('='):
                             BuildOptions[Tool][Attr] = Options[Key]
                         else:
                             # append options for the same tool
@@ -2037,7 +2034,6 @@ class PlatformAutoGen(AutoGen):
         if FamilyMatch or FamilyIsNull:
             return BuildOptions
 
-        OverrideOpt = set()
         for Key in Options:
             if ModuleStyle != None and len (Key) > 2:
                 # Check Module style is EDK or EDKII.
@@ -2061,9 +2057,7 @@ class PlatformAutoGen(AutoGen):
                     if Arch == "*" or Arch == self.Arch:
                         if Tool not in BuildOptions:
                             BuildOptions[Tool] = {}
-                        if Options[Key].startswith('='):
-                            OverrideOpt.add((Tool, Attr))
-                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or (Tool, Attr) in OverrideOpt:
+                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or Options[Key].startswith('='):
                             BuildOptions[Tool][Attr] = Options[Key]
                         else:
                             # append options for the same tool
@@ -2103,7 +2097,6 @@ class PlatformAutoGen(AutoGen):
                        PlatformModuleOptions.keys() + ModuleTypeOptions.keys() +
                        self.ToolDefinition.keys())
         BuildOptions = {}
-        OverrideTool = set()
         for Tool in AllTools:
             if Tool not in BuildOptions:
                 BuildOptions[Tool] = {}
@@ -2122,9 +2115,8 @@ class PlatformAutoGen(AutoGen):
                         BuildOptions[Tool][Attr] = ""
                     # check if override is indicated
                     if Value.startswith('='):
-                        OverrideTool.add((Tool, Attr))
                         BuildOptions[Tool][Attr] = Value[1:]
-                    elif (Tool, Attr) not in OverrideTool:
+                    else:
                         BuildOptions[Tool][Attr] += " " + Value
         if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag != None:
             #

@@ -753,7 +753,6 @@ class DscBuildData(PlatformBuildClassObject):
     ## Retrieve [BuildOptions]
     def _GetBuildOptions(self):
         if self._BuildOptions == None:
-            OverrideTool = set()
             self._BuildOptions = sdict()
             #
             # Retrieve build option for EDKII and EDK style module
@@ -762,12 +761,10 @@ class DscBuildData(PlatformBuildClassObject):
                 RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, CodeBase]
                 for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
                     CurKey = (ToolChainFamily, ToolChain, CodeBase)
-                    if Option.startswith('='):
-                        OverrideTool.add(CurKey)
                     #
                     # Only flags can be appended
                     #
-                    if CurKey not in self._BuildOptions or not ToolChain.endswith('_FLAGS') or CurKey in OverrideTool:
+                    if CurKey not in self._BuildOptions or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
                         self._BuildOptions[CurKey] = Option
                     else:
                         self._BuildOptions[CurKey] += ' ' + Option
@@ -778,16 +775,13 @@ class DscBuildData(PlatformBuildClassObject):
             self._ModuleTypeOptions = sdict()
         if (Edk, ModuleType) not in self._ModuleTypeOptions:
             options = sdict()
-            OverrideTool = set()
             self._ModuleTypeOptions[Edk, ModuleType] = options
             DriverType = '%s.%s' % (Edk, ModuleType)
             RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, DriverType]
             for ToolChainFamily, ToolChain, Option, Arch, Type, Dummy3, Dummy4 in RecordList:
-                if Arch == self._Arch and Type == DriverType:
+                if Type == DriverType:
                     Key = (ToolChainFamily, ToolChain, Edk)
-                    if Option.startswith('='):
-                        OverrideTool.add(Key)
-                    if Key not in options or not ToolChain.endswith('_FLAGS') or Key in OverrideTool:
+                    if Key not in options or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
                         options[Key] = Option
                     else:
                         options[Key] += ' ' + Option
@@ -2399,7 +2393,7 @@ class InfBuildData(ModuleBuildClassObject):
                 ToolChainFamily = Record[0]
                 ToolChain = Record[1]
                 Option = Record[2]
-                if (ToolChainFamily, ToolChain) not in self._BuildOptions:
+                if (ToolChainFamily, ToolChain) not in self._BuildOptions or Option.startswith('='):
                     self._BuildOptions[ToolChainFamily, ToolChain] = Option
                 else:
                     # concatenate the option string if they're for the same tool
