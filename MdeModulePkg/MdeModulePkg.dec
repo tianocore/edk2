@@ -117,7 +117,7 @@
 
   ## @libraryclass  Provides authenticated variable services.
   #
-  AuthVaribleLib|Include/Library/AuthVaribleLib.h
+  AuthVariableLib|Include/Library/AuthVariableLib.h
 
 [Guids]
   ## MdeModule package token space guid
