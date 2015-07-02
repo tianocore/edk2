@@ -785,7 +785,7 @@ SetPropertiesTableSectionAlignment (
   IN UINT32  SectionAlignment
   )
 {
-  if (((SectionAlignment & (SIZE_4KB - 1)) != 0) &&
+  if (((SectionAlignment & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) &&
       ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) != 0)) {
     DEBUG ((EFI_D_VERBOSE, "SetPropertiesTableSectionAlignment - Clear\n"));
     mPropertiesTable.MemoryProtectionAttribute &= ~EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA;
@@ -1119,8 +1119,9 @@ InsertImageRecord (
   }
 
   SetPropertiesTableSectionAlignment (SectionAlignment);
-  if ((SectionAlignment & (SIZE_4KB - 1)) != 0) {
-    DEBUG ((EFI_D_ERROR, "!!!!!!!!  InsertImageRecord - Section Alignment(0x%x) is not 4K  !!!!!!!!\n", SectionAlignment));
+  if ((SectionAlignment & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) {
+    DEBUG ((EFI_D_ERROR, "!!!!!!!!  InsertImageRecord - Section Alignment(0x%x) is not %dK  !!!!!!!!\n",
+      SectionAlignment, EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT >> 10));
     PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageAddress);
     if (PdbPointer != NULL) {
       DEBUG ((EFI_D_ERROR, "!!!!!!!!  Image - %a  !!!!!!!!\n", PdbPointer));
