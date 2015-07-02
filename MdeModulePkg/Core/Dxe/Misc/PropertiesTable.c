@@ -94,6 +94,7 @@ EFI_LOCK           mPropertiesTableLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTI
   @return  The number of bytes associated with the number of EFI_PAGEs specified
            by Pages.
 **/
+STATIC
 UINT64
 EfiPagesToSize (
   IN UINT64 Pages
@@ -113,6 +114,7 @@ EfiPagesToSize (
            by Size.
 
 **/
+STATIC
 UINT64
 EfiSizeToPages (
   IN UINT64 Size
@@ -124,6 +126,7 @@ EfiSizeToPages (
 /**
   Acquire memory lock on mPropertiesTableLock.
 **/
+STATIC
 VOID
 CoreAcquirePropertiesTableLock (
   VOID
@@ -135,6 +138,7 @@ CoreAcquirePropertiesTableLock (
 /**
   Release memory lock on mPropertiesTableLock.
 **/
+STATIC
 VOID
 CoreReleasePropertiesTableLock (
   VOID
@@ -151,6 +155,7 @@ CoreReleasePropertiesTableLock (
   @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
+STATIC
 VOID
 SortMemoryMap (
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
@@ -195,6 +200,7 @@ SortMemoryMap (
                                  it is the size of new memory map after merge.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
+STATIC
 VOID
 MergeMemoryMap (
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
@@ -242,6 +248,7 @@ MergeMemoryMap (
   @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
+STATIC
 VOID
 EnforceMemoryMapAttribute (
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
@@ -283,6 +290,7 @@ EnforceMemoryMapAttribute (
 
   @return first image record covered by [buffer, length]
 **/
+STATIC
 IMAGE_PROPERTIES_RECORD *
 GetImageRecordByAddress (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
@@ -327,6 +335,7 @@ GetImageRecordByAddress (
   @param  OldRecord              A pointer to one old memory map entry.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
+STATIC
 UINTN
 SetNewRecord (
   IN IMAGE_PROPERTIES_RECORD       *ImageRecord,
@@ -422,6 +431,7 @@ SetNewRecord (
   @retval  0 no entry need to be splitted.
   @return  the max number of new splitted entries
 **/
+STATIC
 UINTN
 GetMaxSplitRecordCount (
   IN EFI_MEMORY_DESCRIPTOR *OldRecord
@@ -467,6 +477,7 @@ GetMaxSplitRecordCount (
   @retval  0 no entry is splitted.
   @return  the real number of splitted record.
 **/
+STATIC
 UINTN
 SplitRecord (
   IN EFI_MEMORY_DESCRIPTOR     *OldRecord,
@@ -595,6 +606,7 @@ SplitRecord (
                                  the current memory map.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
+STATIC
 VOID
 SplitTable (
   IN OUT UINTN                  *MemoryMapSize,
@@ -705,6 +717,7 @@ SplitTable (
   @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CoreGetMemoryMapPropertiesTable (
@@ -766,6 +779,7 @@ CoreGetMemoryMapPropertiesTable (
 
   @param  SectionAlignment    PE/COFF section alignment
 **/
+STATIC
 VOID
 SetPropertiesTableSectionAlignment (
   IN UINT32  SectionAlignment
@@ -787,6 +801,7 @@ SetPropertiesTableSectionAlignment (
   @param  FirstImageRecordCodeSection    first code section in image record
   @param  SecondImageRecordCodeSection   second code section in image record
 **/
+STATIC
 VOID
 SwapImageRecordCodeSection (
   IN IMAGE_PROPERTIES_RECORD_CODE_SECTION      *FirstImageRecordCodeSection,
@@ -810,6 +825,7 @@ SwapImageRecordCodeSection (
 
   @param  ImageRecord    image record to be sorted
 **/
+STATIC
 VOID
 SortImageRecordCodeSection (
   IN IMAGE_PROPERTIES_RECORD              *ImageRecord
@@ -860,6 +876,7 @@ SortImageRecordCodeSection (
   @retval TRUE  image record is valid
   @retval FALSE image record is invalid
 **/
+STATIC
 BOOLEAN
 IsImageRecordCodeSectionValid (
   IN IMAGE_PROPERTIES_RECORD              *ImageRecord
@@ -916,6 +933,7 @@ IsImageRecordCodeSectionValid (
   @param  FirstImageRecord   first image record.
   @param  SecondImageRecord  second image record.
 **/
+STATIC
 VOID
 SwapImageRecord (
   IN IMAGE_PROPERTIES_RECORD      *FirstImageRecord,
@@ -942,6 +960,7 @@ SwapImageRecord (
 /**
   Sort image record based upon the ImageBase from low to high.
 **/
+STATIC
 VOID
 SortImageRecord (
   VOID
@@ -987,6 +1006,7 @@ SortImageRecord (
 /**
   Dump image record.
 **/
+STATIC
 VOID
 DumpImageRecord (
   VOID
@@ -1205,6 +1225,7 @@ Finish:
 
   @return image record
 **/
+STATIC
 IMAGE_PROPERTIES_RECORD *
 FindImageRecord (
   IN EFI_PHYSICAL_ADDRESS  ImageBase,
