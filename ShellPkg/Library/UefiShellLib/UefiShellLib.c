@@ -3729,7 +3729,7 @@ InternalShellHexCharToUintn (
 /**
   Convert a Null-terminated Unicode hexadecimal string to a value of type UINT64.
 
-  This function returns a value of type UINTN by interpreting the contents
+  This function returns a value of type UINT64 by interpreting the contents
   of the Unicode string specified by String as a hexadecimal number.
   The format of the input Unicode string String is:
 
@@ -3797,16 +3797,16 @@ InternalShellStrHexToUint64 (
   Result = 0;
 
   //
-  // Skip spaces if requested
+  // there is a space where there should't be
   //
-  while (StopAtSpace && *String == L' ') {
-    String++;
+  if (*String == L' ') {
+    return (EFI_INVALID_PARAMETER);
   }
 
   while (ShellIsHexaDecimalDigitCharacter (*String)) {
     //
     // If the Hex Number represented by String overflows according
-    // to the range defined by UINTN, then ASSERT().
+    // to the range defined by UINT64, then return EFI_DEVICE_ERROR.
     //
     if (!(Result <= (RShiftU64((((UINT64) ~0) - InternalShellHexCharToUintn (*String)), 4)))) {
 //    if (!(Result <= ((((UINT64) ~0) - InternalShellHexCharToUintn (*String)) >> 4))) {
@@ -3889,15 +3889,18 @@ InternalShellStrDecimalToUint64 (
   Result = 0;
 
   //
-  // Skip spaces if requested
+  // Stop upon space if requested 
+  // (if the whole value was 0)
   //
-  while (StopAtSpace && *String == L' ') {
-    String++;
+  if (StopAtSpace && *String == L' ') {
+    *Value = Result;
+    return (EFI_SUCCESS);
   }
+
   while (ShellIsDecimalDigitCharacter (*String)) {
     //
     // If the number represented by String overflows according
-    // to the range defined by UINT64, then ASSERT().
+    // to the range defined by UINT64, then return EFI_DEVICE_ERROR.
     //
 
     if (!(Result <= (DivU64x32((((UINT64) ~0) - (*String - L'0')),10)))) {
