@@ -2364,7 +2364,10 @@ def CheckFileHeaderDoxygenComments(FullFileName):
             if CommentLine.startswith('Copyright'):
                 NoCopyrightFlag = False
                 if CommentLine.find('All rights reserved') == -1:
-                    PrintErrorMsg(ERROR_HEADER_CHECK_FILE, '""All rights reserved"" announcement should be following the ""Copyright"" at the same line', FileTable, ID)
+                    for Copyright in EccGlobalData.gConfig.Copyright:
+                        if CommentLine.find(Copyright) > -1:
+                            PrintErrorMsg(ERROR_HEADER_CHECK_FILE, '""All rights reserved"" announcement should be following the ""Copyright"" at the same line', FileTable, ID)
+                            break
                 if CommentLine.endswith('<BR>') == -1:
                     PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'The ""<BR>"" at the end of the Copyright line is required', FileTable, ID)
                 if NextLineIndex < len(CommentStrList) and CommentStrList[NextLineIndex].strip().startswith('Copyright') == False and CommentStrList[NextLineIndex].strip():

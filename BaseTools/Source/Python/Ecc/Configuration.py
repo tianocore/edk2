@@ -274,6 +274,9 @@ class Configuration(object):
         
         # A list for only scanned folders
         self.ScanOnlyDirList = []
+        
+        # A list for Copyright format
+        self.Copyright = []
 
         self.ParseConfig()
 
@@ -301,6 +304,8 @@ class Configuration(object):
                 if List[0] == 'SkipFileList':
                     List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
                 if List[0] == 'BinaryExtList':
+                    List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
+                if List[0] == 'Copyright':
                     List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
                 self.__dict__[List[0]] = List[1]
 
