@@ -1,4 +1,0 @@
-SECTIONS {
-  .text : ALIGN(0x10000) { }
-  .data : ALIGN(0x10000) { }
-}
