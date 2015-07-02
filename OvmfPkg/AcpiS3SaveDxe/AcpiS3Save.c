@@ -2,6 +2,7 @@
   This is an implementation of the ACPI S3 Save protocol.  This is defined in
   S3 boot path specification 0.9.
 
+Copyright (c) 2014-2015, Red Hat, Inc.<BR>
 Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -402,6 +403,8 @@ LegacyGetS3MemorySize (
   OUT UINTN                       *Size
   )
 {
+  ASSERT (FALSE);
+
   if (Size == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -490,6 +493,8 @@ S3Ready (
     return EFI_SUCCESS;
   }
   AlreadyEntered = TRUE;
+
+  ASSERT (LegacyMemoryAddress == NULL);
 
   AcpiS3Context = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof(*AcpiS3Context));
   ASSERT (AcpiS3Context != NULL);
