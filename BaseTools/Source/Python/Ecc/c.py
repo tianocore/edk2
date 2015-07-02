@@ -1632,8 +1632,11 @@ def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
         Field = Field.split('=')[0].strip()
         TokenList = Field.split()
         # Remove pointers before variable
-        if not Pattern.match(TokenList[-1].lstrip('*')):
-            ErrMsgList.append(TokenList[-1].lstrip('*'))
+        Token = TokenList[-1]
+        if Token in ['OPTIONAL']:
+            Token = TokenList[-2]
+        if not Pattern.match(Token.lstrip('*')):
+            ErrMsgList.append(Token.lstrip('*'))
 
     return ErrMsgList
 
