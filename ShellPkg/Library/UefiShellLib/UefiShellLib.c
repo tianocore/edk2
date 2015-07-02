@@ -3254,7 +3254,8 @@ StrnCatGrow (
       *CurrentSize = NewSize;
     }
   } else {
-    *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
+    NewSize = (Count+1)*sizeof(CHAR16);
+    *Destination = AllocateZeroPool(NewSize);
   }
 
   //
@@ -3264,7 +3265,7 @@ StrnCatGrow (
     return (NULL);
   }
   
-  StrCatS(*Destination, Count + 1, Source);
+  StrnCatS(*Destination, NewSize/sizeof(CHAR16), Source, Count);
   return *Destination;
 }
 
