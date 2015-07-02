@@ -1543,6 +1543,7 @@ CoreGetMemoryMap (
   LIST_ENTRY                        *Link;
   MEMORY_MAP                        *Entry;
   EFI_GCD_MAP_ENTRY                 *GcdMapEntry;
+  EFI_GCD_MAP_ENTRY                 MergeGcdMapEntry;
   EFI_MEMORY_TYPE                   Type;
   EFI_MEMORY_DESCRIPTOR             *MemoryMapStart;
 
@@ -1654,25 +1655,49 @@ CoreGetMemoryMap (
     MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
   }
 
-  for (Link = mGcdMemorySpaceMap.ForwardLink; Link != &mGcdMemorySpaceMap; Link = Link->ForwardLink) {
-    GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
-    if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
-        ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
-        ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME))) {
+ 
+  ZeroMem (&MergeGcdMapEntry, sizeof (MergeGcdMapEntry));
+  GcdMapEntry = NULL;
+  for (Link = mGcdMemorySpaceMap.ForwardLink; ; Link = Link->ForwardLink) {
+    if (Link != &mGcdMemorySpaceMap) {
+      //
+      // Merge adjacent same type and attribute GCD memory range
+      //
+      GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
+  
+      if ((MergeGcdMapEntry.Capabilities == GcdMapEntry->Capabilities) && 
+          (MergeGcdMapEntry.Attributes == GcdMapEntry->Attributes) &&
+          (MergeGcdMapEntry.GcdMemoryType == GcdMapEntry->GcdMemoryType) &&
+          (MergeGcdMapEntry.GcdIoType == GcdMapEntry->GcdIoType)) {
+        MergeGcdMapEntry.EndAddress  = GcdMapEntry->EndAddress;
+        continue;
+      }
+    }
+
+    if ((MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypeReserved) ||
+        ((MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
+        ((MergeGcdMapEntry.Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME))) {
+      //
+      // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR, 
+      // it will be recorded as page PhysicalStart and NumberOfPages. 
+      //
+      ASSERT ((MergeGcdMapEntry.BaseAddress & EFI_PAGE_MASK) == 0);
+      ASSERT (((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1) & EFI_PAGE_MASK) == 0);
+      
       // 
       // Create EFI_MEMORY_DESCRIPTOR for every Reserved and runtime MMIO GCD entries
       //
-      MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
+      MemoryMap->PhysicalStart = MergeGcdMapEntry.BaseAddress;
       MemoryMap->VirtualStart  = 0;
-      MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
-      MemoryMap->Attribute     = (GcdMapEntry->Attributes & ~EFI_MEMORY_PORT_IO) | 
-                                (GcdMapEntry->Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
+      MemoryMap->NumberOfPages = RShiftU64 ((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1), EFI_PAGE_SHIFT);
+      MemoryMap->Attribute     = (MergeGcdMapEntry.Attributes & ~EFI_MEMORY_PORT_IO) | 
+                                (MergeGcdMapEntry.Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
                                 EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
 
-      if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) {
+      if (MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypeReserved) {
         MemoryMap->Type = EfiReservedMemoryType;
-      } else if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
-        if ((GcdMapEntry->Attributes & EFI_MEMORY_PORT_IO) == EFI_MEMORY_PORT_IO) {
+      } else if (MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
+        if ((MergeGcdMapEntry.Attributes & EFI_MEMORY_PORT_IO) == EFI_MEMORY_PORT_IO) {
           MemoryMap->Type = EfiMemoryMappedIOPortSpace;
         } else {
           MemoryMap->Type = EfiMemoryMappedIO;
@@ -1686,15 +1711,22 @@ CoreGetMemoryMap (
       MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
     }
     
-    if (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistentMemory) {
+    if (MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypePersistentMemory) {
+      //
+      // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR, 
+      // it will be recorded as page PhysicalStart and NumberOfPages. 
+      //
+      ASSERT ((MergeGcdMapEntry.BaseAddress & EFI_PAGE_MASK) == 0);
+      ASSERT (((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1) & EFI_PAGE_MASK) == 0);
+
       // 
       // Create EFI_MEMORY_DESCRIPTOR for every Persistent GCD entries
       //
-      MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
+      MemoryMap->PhysicalStart = MergeGcdMapEntry.BaseAddress;
       MemoryMap->VirtualStart  = 0;
-      MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
-      MemoryMap->Attribute     = GcdMapEntry->Attributes | EFI_MEMORY_NV | 
-                                (GcdMapEntry->Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
+      MemoryMap->NumberOfPages = RShiftU64 ((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1), EFI_PAGE_SHIFT);
+      MemoryMap->Attribute     = MergeGcdMapEntry.Attributes | EFI_MEMORY_NV | 
+                                (MergeGcdMapEntry.Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
                                 EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
       MemoryMap->Type          = EfiPersistentMemory;
       
@@ -1703,6 +1735,18 @@ CoreGetMemoryMap (
       // existing descriptor if they are adjacent and have the same attributes
       //
       MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
+    }
+    if (Link == &mGcdMemorySpaceMap) {
+      //
+      // break loop when arrive at head.
+      //
+      break;
+    }
+    if (GcdMapEntry != NULL) {
+      //
+      // Copy new GCD map entry for the following GCD range merge
+      //
+      CopyMem (&MergeGcdMapEntry, GcdMapEntry, sizeof (MergeGcdMapEntry));
     }
   }
 
