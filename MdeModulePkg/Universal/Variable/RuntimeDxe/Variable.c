@@ -78,7 +78,10 @@ VARIABLE_ENTRY_PROPERTY mVariableEntryProperty[] = {
 
 AUTH_VAR_LIB_CONTEXT_IN mContextIn = {
   AUTH_VAR_LIB_CONTEXT_IN_STRUCT_VERSION,
-  sizeof (AUTH_VAR_LIB_CONTEXT_IN),
+  //
+  // StructSize, TO BE FILLED
+  //
+  0,
   //
   // MaxAuthVariableSize, TO BE FILLED
   //
@@ -4029,6 +4032,7 @@ VariableWriteServiceInitialize (
     //
     // Authenticated variable initialize.
     //
+    mContextIn.StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_IN);
     mContextIn.MaxAuthVariableSize = mVariableModuleGlobal->MaxAuthVariableSize - GetVariableHeaderSize ();
     Status = AuthVariableLibInitialize (&mContextIn, &mContextOut);
     if (!EFI_ERROR (Status)) {
