@@ -60,6 +60,7 @@
   ## SOMETIMES_CONSUMES ## Variable:L"AcpiGlobalVariable"
   ## SOMETIMES_PRODUCES ## Variable:L"AcpiGlobalVariable"
   gEfiAcpiVariableCompatiblityGuid
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES  ## Event
 
 [Protocols]
   gEfiAcpiS3SaveProtocolGuid                    ## PRODUCES

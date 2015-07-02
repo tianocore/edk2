@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/AcpiVariableCompatibility.h>
 #include <Guid/AcpiS3Context.h>
 #include <Guid/Acpi.h>
+#include <Guid/EventGroup.h>
 #include <Protocol/AcpiS3Save.h>
 #include <IndustryStandard/Acpi.h>
 
@@ -550,6 +551,40 @@ S3Ready (
 }
 
 /**
+  Callback function executed when the EndOfDxe event group is signaled.
+
+  @param[in] Event    Event whose notification function is being invoked.
+  @param[in] Context  The pointer to the notification function's context, which
+                      is implementation-dependent.
+**/
+VOID
+EFIAPI
+OnEndOfDxe (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // Our S3Ready() function ignores both of its parameters, and always
+  // succeeds.
+  //
+  Status = S3Ready (
+             NULL, // This
+             NULL  // LegacyMemoryAddress
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Close the event, deregistering the callback and freeing resources.
+  //
+  Status = gBS->CloseEvent (Event);
+  ASSERT_EFI_ERROR (Status);
+}
+
+
+/**
   The Driver Entry Point.
   
   The function is the driver Entry point which will produce AcpiS3SaveProtocol.
@@ -570,6 +605,7 @@ InstallAcpiS3Save (
   )
 {
   EFI_STATUS        Status;
+  EFI_EVENT         EndOfDxeEvent;
 
   if (!FeaturePcdGet(PcdPlatformCsmSupport)) {
     //
@@ -589,6 +625,16 @@ InstallAcpiS3Save (
                   &gEfiAcpiS3SaveProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mS3Save
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  OnEndOfDxe,
+                  NULL, /* NotifyContext */
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
                   );
   ASSERT_EFI_ERROR (Status);
   return Status;
