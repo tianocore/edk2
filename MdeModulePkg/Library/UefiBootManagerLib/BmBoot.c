@@ -1501,9 +1501,18 @@ BmGetLoadOptionBuffer (
   // Directly reads the load option when it doesn't reside in simple file system instance (LoadFile/LoadFile2),
   //   or it directly points to a file in simple file system instance.
   //
+  Node   = FilePath;
+  Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);
   FileBuffer = GetFileBufferByFilePath (TRUE, FilePath, FileSize, &AuthenticationStatus);
   if (FileBuffer != NULL) {
-    *FullPath = DuplicateDevicePath (FilePath);
+    if (EFI_ERROR (Status)) {
+      *FullPath = DuplicateDevicePath (FilePath);
+    } else {
+      //
+      // LoadFile () may cause the device path of the Handle be updated.
+      //
+      *FullPath = AppendDevicePath (DevicePathFromHandle (Handle), Node);
+    }
   }
 
   return FileBuffer;
