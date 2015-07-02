@@ -809,28 +809,28 @@ InternalVarCheckSetVariableCheck (
   if (Property == NULL) {
     Status = GetUefiDefinedVariableProperty (VariableName, VendorGuid, TRUE, &Property, &VarCheckFunction);
     if (EFI_ERROR (Status)) {
-    //
-    // To prevent name collisions with possible future globally defined variables,
-    // other internal firmware data variables that are not defined here must be
-    // saved with a unique VendorGuid other than EFI_GLOBAL_VARIABLE or
-    // any other GUID defined by the UEFI Specification. Implementations must
-    // only permit the creation of variables with a UEFI Specification-defined
-    // VendorGuid when these variables are documented in the UEFI Specification.
-    //
+      //
+      // To prevent name collisions with possible future globally defined variables,
+      // other internal firmware data variables that are not defined here must be
+      // saved with a unique VendorGuid other than EFI_GLOBAL_VARIABLE or
+      // any other GUID defined by the UEFI Specification. Implementations must
+      // only permit the creation of variables with a UEFI Specification-defined
+      // VendorGuid when these variables are documented in the UEFI Specification.
+      //
       DEBUG ((EFI_D_INFO, "Variable Check UEFI defined variable fail %r - %s not in %g namespace\n", Status, VariableName, VendorGuid));
       return Status;
     }
   }
   if (Property != NULL) {
     if (mEnableLocking && ((Property->Property & VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY) != 0)) {
-      DEBUG ((EFI_D_INFO, "[Variable]: Var Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
+      DEBUG ((EFI_D_INFO, "Variable Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
       return EFI_WRITE_PROTECTED;
     }
     if (!((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0)) || (Attributes == 0))) {
       //
       // Not to delete variable.
       //
-      if ((Attributes != 0) && ((Attributes & (~EFI_VARIABLE_APPEND_WRITE)) != Property->Attributes)) {
+      if ((Property->Attributes != 0) && ((Attributes & (~EFI_VARIABLE_APPEND_WRITE)) != Property->Attributes)) {
         DEBUG ((EFI_D_INFO, "Variable Check Attributes(0x%08x to 0x%08x) fail %r - %g:%s\n", Property->Attributes, Attributes, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
         return EFI_INVALID_PARAMETER;
       }
