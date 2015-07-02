@@ -144,35 +144,6 @@ CoreReleasePropertiesTableLock (
 }
 
 /**
-  Dump memory map.
-
-  @param  MemoryMap              A pointer to the buffer in which firmware places
-                                 the current memory map.
-  @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
-  @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-**/
-VOID
-DumpMemoryMap (
-  IN EFI_MEMORY_DESCRIPTOR  *MemoryMap,
-  IN UINTN                  MemoryMapSize,
-  IN UINTN                  DescriptorSize
-  )
-{
-  EFI_MEMORY_DESCRIPTOR       *MemoryMapEntry;
-  EFI_MEMORY_DESCRIPTOR       *MemoryMapEnd;
-  UINT64                      MemoryBlockLength;
-
-  DEBUG ((EFI_D_VERBOSE, "  MemoryMap:\n"));
-  MemoryMapEntry = MemoryMap;
-  MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + MemoryMapSize);
-  while (MemoryMapEntry < MemoryMapEnd) {
-    MemoryBlockLength = (UINT64) (EfiPagesToSize (MemoryMapEntry->NumberOfPages));
-    DEBUG ((EFI_D_VERBOSE, "    Entry(0x%02x) 0x%016lx - 0x%016lx (0x%016lx)\n", MemoryMapEntry->Type, MemoryMapEntry->PhysicalStart, MemoryMapEntry->PhysicalStart + MemoryBlockLength, MemoryMapEntry->Attribute));
-    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
-  }
-}
-
-/**
   Sort memory map entries based upon PhysicalStart, from low to high.
 
   @param  MemoryMap              A pointer to the buffer in which firmware places
@@ -299,59 +270,6 @@ EnforceMemoryMapAttribute (
     }
 
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
-  }
-
-  return ;
-}
-
-/**
-  Sort memory map entries whose type is EfiRuntimeServicesCode/EfiRuntimeServicesData,
-  from high to low.
-  This function assumes memory map is already from low to high, so it just reverts them.
-
-  @param  MemoryMap              A pointer to the buffer in which firmware places
-                                 the current memory map.
-  @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
-  @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-**/
-VOID
-RevertRuntimeMemoryMap (
-  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
-  IN UINTN                      MemoryMapSize,
-  IN UINTN                      DescriptorSize
-  )
-{
-  EFI_MEMORY_DESCRIPTOR       *MemoryMapEntry;
-  EFI_MEMORY_DESCRIPTOR       *MemoryMapEnd;
-  EFI_MEMORY_DESCRIPTOR       TempMemoryMap;
-
-  EFI_MEMORY_DESCRIPTOR       *RuntimeMapEntryBegin;
-  EFI_MEMORY_DESCRIPTOR       *RuntimeMapEntryEnd;
-
-  MemoryMapEntry = MemoryMap;
-  RuntimeMapEntryBegin = NULL;
-  RuntimeMapEntryEnd = NULL;
-  MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + MemoryMapSize);
-  while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
-    if ((MemoryMapEntry->Type == EfiRuntimeServicesCode) ||
-        (MemoryMapEntry->Type == EfiRuntimeServicesData)) {
-      if (RuntimeMapEntryBegin == NULL) {
-        RuntimeMapEntryBegin = MemoryMapEntry;
-      }
-      RuntimeMapEntryEnd = MemoryMapEntry;
-    }
-    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
-  }
-
-  MemoryMapEntry = RuntimeMapEntryBegin;
-  MemoryMapEnd = RuntimeMapEntryEnd;
-  while (MemoryMapEntry < MemoryMapEnd) {
-    CopyMem (&TempMemoryMap, MemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
-    CopyMem (MemoryMapEntry, MemoryMapEnd, sizeof(EFI_MEMORY_DESCRIPTOR));
-    CopyMem (MemoryMapEnd, &TempMemoryMap, sizeof(EFI_MEMORY_DESCRIPTOR));
-
-    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
-    MemoryMapEnd = PREVIOUS_MEMORY_DESCRIPTOR (MemoryMapEnd, DescriptorSize);
   }
 
   return ;
