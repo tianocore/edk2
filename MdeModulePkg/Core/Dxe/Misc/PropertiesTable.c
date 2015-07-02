@@ -1311,7 +1311,7 @@ InstallPropertiesTable (
   VOID                                    *Context
   )
 {
-  if (PcdGetBool (PropertiesTableEnable)) {
+  if (PcdGetBool (PcdPropertiesTableEnable)) {
     EFI_STATUS  Status;
 
     Status = gBS->InstallConfigurationTable (&gEfiPropertiesTableGuid, &mPropertiesTable);

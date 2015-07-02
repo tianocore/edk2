@@ -185,7 +185,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask               ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PropertiesTableEnable                      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable                   ## CONSUMES
 
 # [Hob]
 # RESOURCE_DESCRIPTOR   ## CONSUMES

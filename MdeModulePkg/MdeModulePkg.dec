@@ -1311,7 +1311,7 @@
   # section. If PE code/data sections are merged, the result is unpredictable.
   #
   # @Prompt Publish UEFI PropertiesTable.
-  gEfiMdeModulePkgTokenSpaceGuid.PropertiesTableEnable|TRUE|BOOLEAN|0x0000006e
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable|TRUE|BOOLEAN|0x0000006e
 
   ## Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification.
   # @Prompt Default OEM ID for ACPI table creation.
