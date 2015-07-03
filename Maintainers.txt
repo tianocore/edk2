@@ -122,6 +122,7 @@ M: Jeff Fan <jeff.fan@intel.com>
 IntelFrameworkPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkPkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
+M: Jeff Fan <jeff.fan@intel.com>
 
 IntelFspPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFspPkg
@@ -138,6 +139,7 @@ M: Feng Tian <feng.tian@intel.com>
 MdePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
+M: Liming Gao <liming.gao@intel.com>
 
 NetworkPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
@@ -177,6 +179,7 @@ M: Chao Zhang <chao.b.zhang@intel.com>
 ShellPkg, ShellBinPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
 M: Jaben Carsey <jaben.carsey@intel.com>
+M: Shumin Qiu <shumin.qiu@intel.com>
 
 SourceLevelDebugPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
