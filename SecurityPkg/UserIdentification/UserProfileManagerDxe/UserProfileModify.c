@@ -338,7 +338,7 @@ AddStr (
     StrLength = StrSize (Source2);
   } else {
     StrLength  = StrSize (*Source1);
-    StrLength += StrSize (Source2) -1;
+    StrLength += StrSize (Source2) - 2;
   }
 
   TmpStr     = AllocateZeroPool (StrLength);
