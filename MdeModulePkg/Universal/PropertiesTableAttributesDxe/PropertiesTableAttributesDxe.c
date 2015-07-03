@@ -130,6 +130,8 @@ UpdateMemoryAttributesDefault (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+  
+  ASSERT (PropertiesTable != NULL);
 
   DEBUG ((EFI_D_INFO, "MemoryProtectionAttribute - 0x%016lx\n", PropertiesTable->MemoryProtectionAttribute));
   if ((PropertiesTable->MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
