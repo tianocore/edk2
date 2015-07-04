@@ -2220,7 +2220,7 @@ ShellSearchHandle(
 
   CurrentFilePattern = AllocateZeroPool((NextFilePatternStart-FilePattern+1)*sizeof(CHAR16));
   ASSERT(CurrentFilePattern != NULL);
-  StrCpyS(CurrentFilePattern, NextFilePatternStart-FilePattern+1, FilePattern);
+  StrnCpyS(CurrentFilePattern, NextFilePatternStart-FilePattern+1, FilePattern, NextFilePatternStart-FilePattern);
 
   if (CurrentFilePattern[0]   == CHAR_NULL
     &&NextFilePatternStart[0] == CHAR_NULL
