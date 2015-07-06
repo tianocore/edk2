@@ -25,8 +25,10 @@ GCC_ASM_IMPORT(ArmReadMpidr)
 GCC_ASM_IMPORT(ArmPlatformPeiBootAction)
 GCC_ASM_IMPORT(ArmPlatformStackSet)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
+GCC_ASM_EXPORT(mSystemMemoryEnd)
 
 StartupAddr:        .8byte ASM_PFX(CEntryPoint)
+mSystemMemoryEnd:   .8byte 0
 
 ASM_PFX(_ModuleEntryPoint):
   //
@@ -80,6 +82,8 @@ _SetupStackPosition:
   ldr   x2, PcdGet64 (PcdSystemMemorySize)
   sub   x2, x2, #1
   add   x1, x1, x2      // x1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
+  adr   x2, mSystemMemoryEnd
+  str   x1, [x2]
 
   // Calculate Top of the Firmware Device
   ldr   x2, PcdGet64 (PcdFdBaseAddress)
