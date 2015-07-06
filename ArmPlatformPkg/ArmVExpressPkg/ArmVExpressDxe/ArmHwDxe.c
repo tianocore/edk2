@@ -28,11 +28,12 @@ CONST EFI_GUID NullGuid = { 0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
 // all "ArmVExpress-like" platforms (AARCH64 or ARM architecture,
 // model or hardware platforms).
 //
+//Note: File extensions are stripped with the VExpress NOR Flash FileSystem
 CONST ARM_VEXPRESS_PLATFORM ArmVExpressPlatforms[] = {
-  { ARM_HW_A9x4, &ArmHwA9x4Guid, L"vexpress-v2p-ca9.dtb" },
-  { ARM_HW_A15x2_A7x3, &ArmHwA15x2A7x3Guid, L"vexpress-v2p-ca15_a7.dtb" },
-  { ARM_HW_A15, &ArmHwA15Guid, L"vexpress-v2p-ca15-tc1.dtb" },
-  { ARM_HW_A5, &ArmHwA5Guid, L"vexpress-v2p-ca5s.dtb" },
+  { ARM_HW_A9x4, &ArmHwA9x4Guid, L"ca9" },
+  { ARM_HW_A15x2_A7x3, &ArmHwA15x2A7x3Guid, L"ca15a7" },
+  { ARM_HW_A15, &ArmHwA15Guid, L"ca15a7" },
+  { ARM_HW_A5, &ArmHwA5Guid, L"ca5s" },
   { ARM_FVP_VEXPRESS_UNKNOWN, &NullGuid, NULL }
 };
 
