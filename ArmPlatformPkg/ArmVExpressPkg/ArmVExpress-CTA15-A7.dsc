@@ -176,7 +176,7 @@
   #
   # Define the device path to the FDT for the platform
   #
-  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0x0E800000,0x0E803000)"
+  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/ca15a7"
 
   #
   # ARM OS Loader
