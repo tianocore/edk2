@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -302,7 +302,6 @@ Returns:
   CHAR16  Buffer[FAT_MAIN_NAME_LEN + 1 + FAT_EXTEND_NAME_LEN + 1];
   UINT8   OutCaseFlag;
 
-  ASSERT (StrSize (Str) <= sizeof (Buffer));
   //
   // Assume the case of input string is mixed
   //
@@ -311,7 +310,7 @@ Returns:
   // Lower case a copy of the string, if it matches the
   // original then the string is lower case
   //
-  StrCpy (Buffer, Str);
+  StrCpyS (Buffer, sizeof (Buffer) / sizeof (Buffer[0]), Str);
   FatStrLwr (Buffer);
   if (StrCmp (Str, Buffer) == 0) {
     OutCaseFlag = InCaseFlag;
@@ -320,7 +319,7 @@ Returns:
   // Upper case a copy of the string, if it matches the
   // original then the string is upper case
   //
-  StrCpy (Buffer, Str);
+  StrCpyS (Buffer, sizeof (Buffer) / sizeof (Buffer[0]), Str);
   FatStrUpr (Buffer);
   if (StrCmp (Str, Buffer) == 0) {
     OutCaseFlag = 0;
@@ -392,8 +391,9 @@ Returns:
 
 VOID
 FatGetFileNameViaCaseFlag (
-  IN  FAT_DIRENT    *DirEnt,
-  OUT CHAR16        *FileString
+  IN     FAT_DIRENT   *DirEnt,
+  IN OUT CHAR16       *FileString,
+  IN     UINTN        FileStringMax
   )
 /*++
 
@@ -425,7 +425,7 @@ Returns:
   FatNameToStr (File8Dot3Name + FAT_MAIN_NAME_LEN, FAT_EXTEND_NAME_LEN, CaseFlag & FAT_CASE_EXT_LOWER, &TempExt[1]);
   if (TempExt[1] != 0) {
     TempExt[0] = L'.';
-    StrCat (FileString, TempExt);
+    StrCatS (FileString, FileStringMax, TempExt);
   }
 }
 
