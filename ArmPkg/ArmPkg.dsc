@@ -78,6 +78,10 @@
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
 [LibraryClasses.ARM]
@@ -138,7 +142,7 @@
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
-  ArmPkg/Application/LinuxLoader/LinuxFdtLoader.inf
+  ArmPkg/Application/LinuxLoader/LinuxLoader.inf
 
 [Components.ARM]
   ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
@@ -153,8 +157,6 @@
 #  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
-
-  ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
