@@ -263,28 +263,28 @@ class RangeExpression(object):
         rangeContainer = RangeContainer()
         for range1 in rangeContainer1.pop():
             for range2 in rangeContainer2.pop():
-                if range1.start >= range2.start:
-                    start = range1.start
-                    end = range1.end
-                    range1.start = range2.start
-                    range1.end = range2.end
-                    range2.start = start
-                    range2.end = end
+                start1 = range1.start
+                end1 = range1.end
+                start2 = range2.start
+                end2 = range2.end
+                if start1 >= start2:
+                    start1, start2 = start2, start1
+                    end1, end2 = end2, end1
                 if range1.empty:
                     rangeid = str(uuid.uuid1())
                     rangeContainer.push(RangeObject(0, 0, True))
-                if range1.end < range2.start:
+                if end1 < start2:
                     rangeid = str(uuid.uuid1())
                     rangeContainer.push(RangeObject(0, 0, True))
-                elif range1.end == range2.start:
+                elif end1 == start2:
                     rangeid = str(uuid.uuid1())
-                    rangeContainer.push(RangeObject(range1.end, range1.end))
-                elif range1.end <= range2.end and range1.end > range2.start:
+                    rangeContainer.push(RangeObject(end1, end1))
+                elif end1 <= end2 and end1 > start2:
                     rangeid = str(uuid.uuid1())
-                    rangeContainer.push(RangeObject(range2.start, range1.end))
-                elif range1.end >= range2.end:
+                    rangeContainer.push(RangeObject(start2, end1))
+                elif end1 >= end2:
                     rangeid = str(uuid.uuid1())
-                    rangeContainer.push(RangeObject(range2.start, range2.end))
+                    rangeContainer.push(RangeObject(start2, end2))
         
         self.operanddict[rangeid] = rangeContainer
 #        rangeContainer.dump()
