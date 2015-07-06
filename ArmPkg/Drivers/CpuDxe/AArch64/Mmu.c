@@ -279,6 +279,9 @@ GetMemoryRegionRec (
     if (!EFI_ERROR(Status)) {
       return EFI_SUCCESS;
     }
+
+    // Now we processed the table move to the next entry
+    BlockEntry++;
   } else if (EntryType == BlockEntryType) {
     // We have found the BlockEntry attached to the address. We save its start address (the start
     // address might be before the 'BaseAdress') and attributes
