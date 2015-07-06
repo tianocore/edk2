@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -27,11 +27,13 @@
   IMPORT  ArmPlatformStackSet
 
   EXPORT  _ModuleEntryPoint
+  EXPORT  mSystemMemoryEnd
 
   PRESERVE8
   AREA    PrePiCoreEntryPoint, CODE, READONLY
 
 StartupAddr        DCD      CEntryPoint
+mSystemMemoryEnd   DCQ      0
 
 _ModuleEntryPoint
   // Do early platform specific actions
@@ -50,12 +52,23 @@ _SetSVCMode
 // Check if we can install the stack at the top of the System Memory or if we need
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)
-_SetupStackPosition
-  // Compute Top of System Memory
-  LoadConstantToReg (FixedPcdGet64 (PcdSystemMemoryBase), r1)
-  LoadConstantToReg (FixedPcdGet64 (PcdSystemMemorySize), r2)
+_SystemMemoryEndInit
+  ldr   r1, mSystemMemoryEnd
+
+  // Is mSystemMemoryEnd initialized?
+  cmp   r1, #0
+  bne   _SetupStackPosition
+
+  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryBase), r1)
+  LoadConstantToReg (FixedPcdGet32(PcdSystemMemorySize), r2)
   sub   r2, r2, #1
-  add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
+  add   r1, r1, r2
+  // Update the global variable
+  adr   r2, mSystemMemoryEnd
+  str   r1, [r2]
+
+_SetupStackPosition
+  // r1 = SystemMemoryTop
 
   // Calculate Top of the Firmware Device
   LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), r2)

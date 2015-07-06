@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,9 @@
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 
-#define IS_XIP() (((UINT32)PcdGet64 (PcdFdBaseAddress) > (UINT32)(PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize))) || \
+extern UINT64 mSystemMemoryEnd;
+
+#define IS_XIP() (((UINT32)PcdGet64 (PcdFdBaseAddress) > (UINT32)(mSystemMemoryEnd)) || \
                   ((PcdGet64 (PcdFdBaseAddress) + PcdGet32 (PcdFdSize)) < PcdGet64 (PcdSystemMemoryBase)))
 
 // Declared by ArmPlatformPkg/PrePi Module
@@ -40,7 +42,7 @@ ArmPlatformGetGlobalVariable (
   if (IS_XIP()) {
     // In Case of XIP, we expect the Primary Stack at the top of the System Memory
     // The size must be 64bit aligned to allow 64bit variable to be aligned
-    GlobalVariableBase = PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize) - ALIGN_VALUE(PcdGet32 (PcdPeiGlobalVariableSize),0x8);
+    GlobalVariableBase = mSystemMemoryEnd + 1 - ALIGN_VALUE (PcdGet32 (PcdPeiGlobalVariableSize), 0x8);
   } else {
     GlobalVariableBase = mGlobalVariableBase;
   }
@@ -69,7 +71,7 @@ ArmPlatformSetGlobalVariable (
   if (IS_XIP()) {
     // In Case of XIP, we expect the Primary Stack at the top of the System Memory
     // The size must be 64bit aligned to allow 64bit variable to be aligned
-    GlobalVariableBase = PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize) - ALIGN_VALUE(PcdGet32 (PcdPeiGlobalVariableSize),0x8);
+    GlobalVariableBase = mSystemMemoryEnd + 1 - ALIGN_VALUE (PcdGet32 (PcdPeiGlobalVariableSize), 0x8);
   } else {
     GlobalVariableBase = mGlobalVariableBase;
   }
@@ -96,7 +98,7 @@ ArmPlatformGetGlobalVariableAddress (
   if (IS_XIP()) {
     // In Case of XIP, we expect the Primary Stack at the top of the System Memory
     // The size must be 64bit aligned to allow 64bit variable to be aligned
-    GlobalVariableBase = PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize) - ALIGN_VALUE(PcdGet32 (PcdPeiGlobalVariableSize),0x8);
+    GlobalVariableBase = mSystemMemoryEnd + 1 - ALIGN_VALUE (PcdGet32 (PcdPeiGlobalVariableSize), 0x8);
   } else {
     GlobalVariableBase = mGlobalVariableBase;
   }
