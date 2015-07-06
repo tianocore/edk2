@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -25,18 +25,16 @@ BuildMemoryTypeInformationHob (
   VOID
   );
 
+STATIC
 VOID
 InitMmu (
-  VOID
+  IN ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable
   )
 {
-  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable;
+
   VOID                          *TranslationTableBase;
   UINTN                         TranslationTableSize;
   RETURN_STATUS                 Status;
-
-  // Get Virtual Memory Map from the Platform Library
-  ArmPlatformGetVirtualMemoryMap (&MemoryTable);
 
   //Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table resides in
   //      DRAM (even at the top of DRAM as it is the first permanent memory allocation)
@@ -69,13 +67,17 @@ MemoryPeim (
   IN UINT64                             UefiMemorySize
   )
 {
-  EFI_RESOURCE_ATTRIBUTE_TYPE ResourceAttributes;
-  UINT64                      ResourceLength;
-  EFI_PEI_HOB_POINTERS        NextHob;
-  EFI_PHYSICAL_ADDRESS        FdTop;
-  EFI_PHYSICAL_ADDRESS        SystemMemoryTop;
-  EFI_PHYSICAL_ADDRESS        ResourceTop;
-  BOOLEAN                     Found;
+  ARM_MEMORY_REGION_DESCRIPTOR *MemoryTable;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes;
+  UINT64                       ResourceLength;
+  EFI_PEI_HOB_POINTERS         NextHob;
+  EFI_PHYSICAL_ADDRESS         FdTop;
+  EFI_PHYSICAL_ADDRESS         SystemMemoryTop;
+  EFI_PHYSICAL_ADDRESS         ResourceTop;
+  BOOLEAN                      Found;
+
+  // Get Virtual Memory Map from the Platform Library
+  ArmPlatformGetVirtualMemoryMap (&MemoryTable);
 
   // Ensure PcdSystemMemorySize has been set
   ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
@@ -93,13 +95,35 @@ MemoryPeim (
       EFI_RESOURCE_ATTRIBUTE_TESTED
   );
 
+  //
+  // Check if the resource for the main system memory has been declared
+  //
+  Found = FALSE;
+  NextHob.Raw = GetHobList ();
+  while ((NextHob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, NextHob.Raw)) != NULL) {
+    if ((NextHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
+        (PcdGet64 (PcdSystemMemoryBase) >= NextHob.ResourceDescriptor->PhysicalStart) &&
+        (NextHob.ResourceDescriptor->PhysicalStart + NextHob.ResourceDescriptor->ResourceLength <= PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize)))
+    {
+      Found = TRUE;
+      break;
+    }
+    NextHob.Raw = GET_NEXT_HOB (NextHob);
+  }
+
+  if (!Found) {
+    // Reserved the memory space occupied by the firmware volume
+    BuildResourceDescriptorHob (
+        EFI_RESOURCE_SYSTEM_MEMORY,
+        ResourceAttributes,
+        PcdGet64 (PcdSystemMemoryBase),
+        PcdGet64 (PcdSystemMemorySize)
+    );
+  }
+
+  //
   // Reserved the memory space occupied by the firmware volume
-  BuildResourceDescriptorHob (
-      EFI_RESOURCE_SYSTEM_MEMORY,
-      ResourceAttributes,
-      PcdGet64 (PcdSystemMemoryBase),
-      PcdGet64 (PcdSystemMemorySize)
-  );
+  //
 
   SystemMemoryTop = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemoryBase) + (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemorySize);
   FdTop = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFdBaseAddress) + (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFdSize);
@@ -163,7 +187,7 @@ MemoryPeim (
   }
 
   // Build Memory Allocation Hob
-  InitMmu ();
+  InitMmu (MemoryTable);
 
   if (FeaturePcdGet (PcdPrePiProduceMemoryTypeInformationHob)) {
     // Optional feature that helps prevent EFI memory map fragmentation.
