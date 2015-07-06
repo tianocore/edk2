@@ -26,7 +26,9 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-CTA15-A7.fdf
-  DEFINE EDK2_SKIP_PEICORE=1
+
+  DEFINE EDK2_SKIP_PEICORE = 1
+  DEFINE ARM_BIGLITTLE_TC2 = 1 # We build for the TC2 hardware by default
 
 !include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress.dsc.inc
 
