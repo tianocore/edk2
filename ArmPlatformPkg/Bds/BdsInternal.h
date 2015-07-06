@@ -31,6 +31,7 @@
 #include <Protocol/DevicePathToText.h>
 
 #include <Guid/GlobalVariable.h>
+#include <Guid/Fdt.h>
 
 #define BOOT_DEVICE_DESCRIPTION_MAX   100
 #define BOOT_DEVICE_FILEPATH_MAX      100

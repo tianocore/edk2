@@ -16,7 +16,7 @@
 
 #include <Guid/ArmGlobalVariableHob.h>
 
-extern BDS_LOAD_OPTION_SUPPORT *BdsLoadOptionSupportList;
+#include <libfdt.h>
 
 /**
   Worker function that displays the list of boot options that is passed in.
@@ -824,6 +824,152 @@ ErrorExit:
   return Status ;
 }
 
+EFI_STATUS
+UpdateFdtPath (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  EFI_STATUS                Status;
+  BDS_SUPPORTED_DEVICE      *SupportedBootDevice;
+  EFI_DEVICE_PATH_PROTOCOL  *FdtDevicePathNodes;
+  EFI_DEVICE_PATH_PROTOCOL  *FdtDevicePath;
+  CHAR16                    *FdtTextDevicePath;
+  EFI_PHYSICAL_ADDRESS      FdtBlobBase;
+  UINTN                     FdtBlobSize;
+  UINTN                     NumPages;
+  EFI_PHYSICAL_ADDRESS      FdtConfigurationTableBase;
+
+  SupportedBootDevice = NULL;
+
+  Status = SelectBootDevice (&SupportedBootDevice);
+  if (EFI_ERROR (Status)) {
+    Status = EFI_ABORTED;
+    goto EXIT;
+  }
+
+  // Create the specific device path node
+  Status = SupportedBootDevice->Support->CreateDevicePathNode (L"FDT blob", &FdtDevicePathNodes);
+  if (EFI_ERROR (Status)) {
+    Status = EFI_ABORTED;
+    goto EXIT;
+  }
+
+  if (FdtDevicePathNodes != NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+
+    FdtDevicePath = AppendDevicePath (SupportedBootDevice->DevicePathProtocol, FdtDevicePathNodes);
+    FreePool (FdtDevicePathNodes);
+    if (FdtDevicePath == NULL) {
+      goto EXIT;
+    }
+
+    FdtTextDevicePath = ConvertDevicePathToText (FdtDevicePath, TRUE, TRUE);
+    if (FdtTextDevicePath == NULL) {
+      goto EXIT;
+    }
+
+    Status = gRT->SetVariable (
+                    (CHAR16*)L"Fdt",
+                    &gFdtVariableGuid,
+                    EFI_VARIABLE_RUNTIME_ACCESS |
+                    EFI_VARIABLE_NON_VOLATILE   |
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    StrSize (FdtTextDevicePath),
+                    FdtTextDevicePath
+                    );
+    ASSERT_EFI_ERROR (Status);
+    FreePool (FdtTextDevicePath);
+  } else {
+    Status = gRT->SetVariable (
+           (CHAR16*)L"Fdt",
+           &gFdtVariableGuid,
+           EFI_VARIABLE_RUNTIME_ACCESS |
+           EFI_VARIABLE_NON_VOLATILE   |
+           EFI_VARIABLE_BOOTSERVICE_ACCESS,
+           0,
+           NULL
+           );
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Try to load FDT from the new EFI Device Path
+  //
+
+  //
+  // Load the FDT given its device path.
+  // This operation may fail if the device path is not supported.
+  //
+  FdtBlobBase = 0;
+  NumPages    = 0;
+  Status = BdsLoadImage (FdtDevicePath, AllocateAnyPages, &FdtBlobBase, &FdtBlobSize);
+  FreePool (FdtDevicePath);
+
+  if (EFI_ERROR (Status)) {
+    goto EXIT_LOAD_FDT;
+  }
+
+  // Check the FDT header is valid. We only make this check in DEBUG mode in
+  // case the FDT header change on production device and this ASSERT() becomes
+  // not valid.
+  ASSERT (fdt_check_header ((VOID*)(UINTN)FdtBlobBase) == 0);
+
+  //
+  // Ensure the Size of the Device Tree is smaller than the size of the read file
+  //
+  ASSERT ((UINTN)fdt_totalsize ((VOID*)(UINTN)FdtBlobBase) <= FdtBlobSize);
+
+  //
+  // Store the FDT as Runtime Service Data to prevent the Kernel from
+  // overwritting its data.
+  //
+  NumPages = EFI_SIZE_TO_PAGES (FdtBlobSize);
+  Status = gBS->AllocatePages (
+                  AllocateAnyPages, EfiRuntimeServicesData,
+                  NumPages, &FdtConfigurationTableBase
+                  );
+  if (EFI_ERROR (Status)) {
+    goto EXIT_LOAD_FDT;
+  }
+  gBS->CopyMem (
+    (VOID*)(UINTN)FdtConfigurationTableBase,
+    (VOID*)(UINTN)FdtBlobBase,
+    FdtBlobSize
+    );
+
+  //
+  // Install the FDT into the Configuration Table
+  //
+  Status = gBS->InstallConfigurationTable (
+                  &gFdtTableGuid,
+                  (VOID*)(UINTN)FdtConfigurationTableBase
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->FreePages (FdtConfigurationTableBase, NumPages);
+  }
+
+EXIT_LOAD_FDT:
+  if (EFI_ERROR (Status)) {
+    Print (L"\nWarning: Did not manage to install the new device tree. Try to restart the platform.\n");
+  }
+
+  if (FdtBlobBase != 0) {
+    gBS->FreePages (FdtBlobBase, NumPages);
+  }
+
+EXIT:
+  if (Status == EFI_ABORTED) {
+    Print (L"\n");
+  }
+
+  if (SupportedBootDevice != NULL) {
+    FreePool (SupportedBootDevice);
+  }
+
+  return Status;
+}
+
 /**
   Set boot timeout
 
@@ -880,6 +1026,7 @@ struct BOOT_MANAGER_ENTRY {
     { L"Update Boot Device Entry", BootMenuUpdateBootOption },
     { L"Remove Boot Device Entry", BootMenuRemoveBootOption },
     { L"Reorder Boot Device Entries", BootMenuReorderBootOptions },
+    { L"Update FDT path", UpdateFdtPath },
     { L"Set Boot Timeout", BootMenuSetBootTimeout },
 };
 
