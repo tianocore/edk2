@@ -64,6 +64,7 @@ READ_ENABLED_CAP   = TRUE
 READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
+FvNameGuid         = 73dcb643-3862-4904-9076-a94af1890243
 
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
 
