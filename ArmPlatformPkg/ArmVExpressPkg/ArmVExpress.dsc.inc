@@ -12,6 +12,9 @@
 #
 #
 
+[BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
+  *_*_AARCH64_DLINK_FLAGS = --script=$(EDK_TOOLS_PATH)/Scripts/gcc-aarch64-64K-align-ld-script
+
 [LibraryClasses.common]
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
