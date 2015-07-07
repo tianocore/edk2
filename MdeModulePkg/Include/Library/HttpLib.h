@@ -1,0 +1,323 @@
+/** @file
+  This library is used to share code between UEFI network stack modules.
+  It provides the helper routines to parse the HTTP message byte stream.
+
+Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at<BR>
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#ifndef _HTTP_LIB_H_
+#define _HTTP_LIB_H_
+
+#include <Protocol/Http.h>
+
+/**
+  Decode a percent-encoded URI component to the ASCII character.
+  
+  Decode the input component in Buffer according to RFC 3986. The caller is responsible to make 
+  sure ResultBuffer points to a buffer with size equal or greater than ((AsciiStrSize (Buffer))
+  in bytes. 
+
+  @param[in]    Buffer           The pointer to a percent-encoded URI component.
+  @param[in]    BufferLength     Length of Buffer in bytes.
+  @param[out]   ResultBuffer     Point to the buffer to store the decode result.
+  @param[out]   ResultLength     Length of decoded string in ResultBuffer in bytes.
+
+  @retval EFI_SUCCESS            Successfully decoded the URI.
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid percent-encoded string.
+  
+**/
+EFI_STATUS
+EFIAPI
+UriPercentDecode (
+  IN      CHAR8            *Buffer,
+  IN      UINT32            BufferLength,
+     OUT  CHAR8            *ResultBuffer,
+     OUT  UINT32           *ResultLength
+  );
+
+/**
+  Create a URL parser for the input URL string.
+
+  This function will parse and dereference the input HTTP URL into it components. The original
+  content of the URL won't be modified and the result will be returned in UrlParser, which can
+  be used in other functions like NetHttpUrlGetHostName(). It is the caller's responsibility to
+  free the buffer returned in *UrlParser by HttpUrlFreeParser().
+
+  @param[in]    Url                The pointer to a HTTP URL string.
+  @param[in]    Length             Length of Url in bytes.
+  @param[in]    IsConnectMethod    Whether the Url is used in HTTP CONNECT method or not.
+  @param[out]   UrlParser          Pointer to the returned buffer to store the parse result.
+
+  @retval EFI_SUCCESS              Successfully dereferenced the HTTP URL.
+  @retval EFI_INVALID_PARAMETER    UrlParser is NULL or Url is not a valid HTTP URL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpParseUrl (
+  IN      CHAR8              *Url,
+  IN      UINT32             Length,
+  IN      BOOLEAN            IsConnectMethod,
+     OUT  VOID               **UrlParser
+  );
+
+/**
+  Get the Hostname from a HTTP URL.
+
+  This function will return the HostName according to the Url and previous parse result ,and
+  it is the caller's responsibility to free the buffer returned in *HostName.
+
+  @param[in]    Url                The pointer to a HTTP URL string.
+  @param[in]    UrlParser          URL Parse result returned by NetHttpParseUrl().
+  @param[out]   HostName           Pointer to a buffer to store the HostName.
+
+  @retval EFI_SUCCESS              Successfully get the required component.
+  @retval EFI_INVALID_PARAMETER    Uri is NULL or HostName is NULL or UrlParser is invalid.
+  @retval EFI_NOT_FOUND            No hostName component in the URL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpUrlGetHostName (
+  IN      CHAR8              *Url,
+  IN      VOID               *UrlParser,
+     OUT  CHAR8              **HostName
+  );
+
+/**
+  Get the IPv4 address from a HTTP URL.
+
+  This function will return the IPv4 address according to the Url and previous parse result.
+
+  @param[in]    Url                The pointer to a HTTP URL string.
+  @param[in]    UrlParser          URL Parse result returned by NetHttpParseUrl().
+  @param[out]   Ip4Address         Pointer to a buffer to store the IP address.
+
+  @retval EFI_SUCCESS              Successfully get the required component.
+  @retval EFI_INVALID_PARAMETER    Uri is NULL or Ip4Address is NULL or UrlParser is invalid.
+  @retval EFI_NOT_FOUND            No IPv4 address component in the URL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpUrlGetIp4 (
+  IN      CHAR8              *Url,
+  IN      VOID               *UrlParser,
+     OUT  EFI_IPv4_ADDRESS   *Ip4Address
+  );
+
+/**
+  Get the IPv6 address from a HTTP URL.
+
+  This function will return the IPv6 address according to the Url and previous parse result.
+
+  @param[in]    Url                The pointer to a HTTP URL string.
+  @param[in]    UrlParser          URL Parse result returned by NetHttpParseUrl().
+  @param[out]   Ip6Address         Pointer to a buffer to store the IP address.
+
+  @retval EFI_SUCCESS              Successfully get the required component.
+  @retval EFI_INVALID_PARAMETER    Uri is NULL or Ip6Address is NULL or UrlParser is invalid.
+  @retval EFI_NOT_FOUND            No IPv6 address component in the URL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpUrlGetIp6 (
+  IN      CHAR8              *Url,
+  IN      VOID               *UrlParser,
+     OUT  EFI_IPv6_ADDRESS   *Ip6Address
+  );
+
+/**
+  Get the port number from a HTTP URL.
+
+  This function will return the port number according to the Url and previous parse result.
+
+  @param[in]    Url                The pointer to a HTTP URL string.
+  @param[in]    UrlParser          URL Parse result returned by NetHttpParseUrl().
+  @param[out]   Port               Pointer to a buffer to store the port number.
+
+  @retval EFI_SUCCESS              Successfully get the required component.
+  @retval EFI_INVALID_PARAMETER    Uri is NULL or Port is NULL or UrlParser is invalid.
+  @retval EFI_NOT_FOUND            No port number in the URL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpUrlGetPort (
+  IN      CHAR8              *Url,
+  IN      VOID               *UrlParser,
+     OUT  UINT16             *Port
+  );
+
+/**
+  Release the resource of the URL parser.
+
+  @param[in]    UrlParser            Pointer to the parser.
+  
+**/
+VOID
+EFIAPI
+HttpUrlFreeParser (
+  IN      VOID               *UrlParser
+  );
+
+//
+// HTTP body parser interface.
+//
+
+typedef enum {
+  //
+  // Part of entity data.
+  // Length of entity body in Data.
+  //
+  BodyParseEventOnData,
+  //
+  // End of message body.
+  // Length is 0 and Data points to next byte after the end of the message.
+  //
+  BodyParseEventOnComplete
+} HTTP_BODY_PARSE_EVENT;
+
+/**
+  A callback function to intercept events during message parser.
+
+  This function will be invoked during HttpParseMessageBody() with various events type. An error
+  return status of the callback function will cause the HttpParseMessageBody() aborted.
+
+  @param[in]    EventType          Event type of this callback call.
+  @param[in]    Data               A pointer to data buffer.
+  @param[in]    Length             Length in bytes of the Data.
+  @param[in]    Context            Callback context set by HttpInitMsgParser().
+
+  @retval EFI_SUCCESS              Continue to parser the message body.
+  @retval Others                   Abort the parse.
+ 
+**/
+typedef
+EFI_STATUS
+(EFIAPI *HTTP_BODY_PARSER_CALLBACK) (
+  IN HTTP_BODY_PARSE_EVENT      EventType,
+  IN CHAR8                      *Data,
+  IN UINTN                      Length,
+  IN VOID                       *Context
+);
+
+/**
+  Initialize a HTTP message-body parser.
+
+  This function will create and initialize a HTTP message parser according to caller provided HTTP message
+  header information. It is the caller's responsibility to free the buffer returned in *UrlParser by HttpFreeMsgParser().
+
+  @param[in]    Method             The HTTP method (e.g. GET, POST) for this HTTP message.
+  @param[in]    StatusCode         Response status code returned by the remote host.
+  @param[in]    HeaderCount        Number of HTTP header structures in Headers.
+  @param[in]    Headers            Array containing list of HTTP headers.
+  @param[in]    Callback           Callback function that is invoked when parsing the HTTP message-body,
+                                   set to NULL to ignore all events.
+  @param[in]    Context            Pointer to the context that will be passed to Callback.
+  @param[out]   MsgParser          Pointer to the returned buffer to store the message parser.
+
+  @retval EFI_SUCCESS              Successfully initialized the parser.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  @retval EFI_INVALID_PARAMETER    MsgParser is NULL or HeaderCount is not NULL but Headers is NULL.
+  @retval Others                   Failed to initialize the parser.
+
+**/
+EFI_STATUS
+EFIAPI
+HttpInitMsgParser (
+  IN     EFI_HTTP_METHOD               Method,
+  IN     EFI_HTTP_STATUS_CODE          StatusCode,
+  IN     UINTN                         HeaderCount,
+  IN     EFI_HTTP_HEADER               *Headers,
+  IN     HTTP_BODY_PARSER_CALLBACK     Callback,
+  IN     VOID                          *Context,
+    OUT  VOID                          **MsgParser
+  );
+
+/**
+  Parse message body.
+
+  Parse BodyLength of message-body. This function can be called repeatedly to parse the message-body partially.
+
+  @param[in, out]    MsgParser            Pointer to the message parser.
+  @param[in]         BodyLength           Length in bytes of the Body.
+  @param[in]         Body                 Pointer to the buffer of the message-body to be parsed.
+
+  @retval EFI_SUCCESS                Successfully parse the message-body.
+  @retval EFI_INVALID_PARAMETER      MsgParser is NULL or Body is NULL or BodyLength is 0.
+  @retval Others                     Operation aborted.
+
+**/
+EFI_STATUS
+EFIAPI
+HttpParseMessageBody (
+  IN OUT VOID              *MsgParser,
+  IN     UINTN             BodyLength,
+  IN     CHAR8             *Body
+  );
+
+/**
+  Check whether the message-body is complete or not.
+
+  @param[in]    MsgParser            Pointer to the message parser.
+
+  @retval TRUE                       Message-body is complete.
+  @retval FALSE                      Message-body is not complete.
+
+**/
+BOOLEAN
+EFIAPI
+HttpIsMessageComplete (
+  IN VOID           *MsgParser
+  );
+
+/**
+  Get the content length of the entity.
+
+  Note that in trunk transfer, the entity length is not valid until the whole message body is received.
+
+  @param[in]    MsgParser            Pointer to the message parser.
+  @param[out]   ContentLength        Pointer to store the length of the entity.
+
+  @retval EFI_SUCCESS                Successfully to get the entity length.
+  @retval EFI_NOT_READY              Entity length is not valid yet.
+  @retval EFI_INVALID_PARAMETER      MsgParser is NULL or ContentLength is NULL.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpGetEntityLength (
+  IN  VOID           *MsgParser,
+  OUT UINTN          *ContentLength
+  );
+
+/**
+  Release the resource of the message parser.
+
+  @param[in]    MsgParser            Pointer to the message parser.
+  
+**/
+VOID
+EFIAPI
+HttpFreeMsgParser (
+  IN  VOID           *MsgParser
+  );
+
+
+#endif
+
