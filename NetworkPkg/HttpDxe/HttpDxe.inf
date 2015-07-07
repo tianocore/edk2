@@ -1,0 +1,64 @@
+## @file
+#  Implementation of EFI HTTP protocol interfaces.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = HttpDxe
+  FILE_GUID                 = 2366c20f-e15a-11e3-8bf1-e4115b28bc50
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = HttpDxeDriverEntryPoint
+  UNLOAD_IMAGE              = NetLibDefaultUnload
+  MODULE_UNI_FILE           = HttpDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  ComponentName.h
+  ComponentName.c
+  HttpDns.h
+  HttpDns.c
+  HttpDriver.h
+  HttpDriver.c
+  HttpImpl.h
+  HttpImpl.c
+  HttpProto.h
+  HttpProto.c
+  HttpUtilities.h
+  HttpUtilities.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  DebugLib
+  NetLib
+  HttpLib
+
+[Protocols]
+  gEfiHttpServiceBindingProtocolGuid               ## BY_START
+  gEfiHttpProtocolGuid                             ## BY_START
+  gEfiTcp4ServiceBindingProtocolGuid               ## TO_START
+  gEfiTcp4ProtocolGuid                             ## TO_START
+  gEfiDns4ServiceBindingProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiDns4ProtocolGuid                             ## SOMETIMES_CONSUMES
+  gEfiIp4Config2ProtocolGuid                       ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HttpDxeExtra.uni
