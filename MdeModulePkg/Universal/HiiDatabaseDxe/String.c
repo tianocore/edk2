@@ -1333,7 +1333,7 @@ HiiNewString (
     StringPackage->StringPkgHdr->StringInfoOffset = HeaderSize;
     CopyMem (StringPackage->StringPkgHdr->LanguageWindow, mLanguageWindow, 16 * sizeof (CHAR16));
     StringPackage->StringPkgHdr->LanguageName     = 1;
-    AsciiStrCpyS (StringPackage->StringPkgHdr->Language, sizeof(StringPackage->StringPkgHdr->Language) / sizeof (CHAR8), (CHAR8 *) Language);
+    AsciiStrCpyS (StringPackage->StringPkgHdr->Language, (HeaderSize - OFFSET_OF(EFI_HII_STRING_PACKAGE_HDR,Language)) / sizeof (CHAR8), (CHAR8 *) Language);
 
     //
     // Calculate the length of the string blocks, including string block to record

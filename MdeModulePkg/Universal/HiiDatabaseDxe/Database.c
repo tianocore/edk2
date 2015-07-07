@@ -1182,7 +1182,7 @@ InsertFontPackage (
   }
   FontInfo->FontStyle = FontPkgHdr->FontStyle;
   FontInfo->FontSize  = FontPkgHdr->Cell.Height;
-  StrCpyS (FontInfo->FontName, sizeof (FontInfo->FontName) / sizeof (CHAR16), FontPkgHdr->FontFamily);
+  StrCpyS (FontInfo->FontName, (FontInfoSize - OFFSET_OF(EFI_FONT_INFO,FontName)) / sizeof (CHAR16), FontPkgHdr->FontFamily);
 
   if (IsFontInfoExisted (Private, FontInfo, NULL, NULL, NULL)) {
     Status = EFI_UNSUPPORTED;
