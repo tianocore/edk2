@@ -86,6 +86,7 @@
   gEfiIfrFrameworkGuid
   gEfiHiiStandardFormGuid
   gFrameworkBdsFrontPageFormsetGuid
+  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
 
 [Protocols]
   gEfiHiiImageProtocolGuid
