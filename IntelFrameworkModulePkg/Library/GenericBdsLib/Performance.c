@@ -40,7 +40,7 @@ GetShortPdbFileName (
   UINTN EndIndex;
 
   if (PdbFileName == NULL) {
-    AsciiStrCpyS (GaugeString, PERF_TOKEN_LENGTH, " ");
+    AsciiStrCpyS (GaugeString, PERF_TOKEN_SIZE, " ");
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
@@ -60,7 +60,7 @@ GetShortPdbFileName (
     for (Index = StartIndex; Index < EndIndex; Index++) {
       GaugeString[Index1] = PdbFileName[Index];
       Index1++;
-      if (Index1 == PERF_TOKEN_LENGTH - 1) {
+      if (Index1 == PERF_TOKEN_LENGTH) {
         break;
       }
     }
@@ -91,7 +91,7 @@ GetNameFromHandle (
   CHAR8                       *PdbFileName;
   EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
 
-  AsciiStrCpyS (GaugeString, PERF_TOKEN_LENGTH, " ");
+  AsciiStrCpyS (GaugeString, PERF_TOKEN_SIZE, " ");
 
   //
   // Get handle name from image protocol
@@ -153,7 +153,7 @@ WriteBootToOsPerformanceData (
   UINT32                    LimitCount;
   EFI_HANDLE                *Handles;
   UINTN                     NoHandles;
-  CHAR8                     GaugeString[PERF_TOKEN_LENGTH];
+  CHAR8                     GaugeString[PERF_TOKEN_SIZE];
   UINT8                     *Ptr;
   UINT32                    Index;
   UINT64                    Ticker;
