@@ -1,7 +1,7 @@
 /** @file
   Ip4 internal functions and type defintions.
   
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,9 +19,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/IpSec.h>
 #include <Protocol/Ip4.h>
-#include <Protocol/Ip4Config.h>
+#include <Protocol/Ip4Config2.h>
 #include <Protocol/Arp.h>
 #include <Protocol/ManagedNetwork.h>
+#include <Protocol/Dhcp4.h>
+#include <Protocol/HiiConfigRouting.h>
+#include <Protocol/HiiConfigAccess.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -34,6 +37,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DpcLib.h>
 #include <Library/PrintLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/HiiLib.h>
+#include <Library/UefiHiiServicesLib.h>
 
 #include "Ip4Common.h"
 #include "Ip4Driver.h"
@@ -44,6 +50,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ip4Route.h"
 #include "Ip4Input.h"
 #include "Ip4Output.h"
+#include "Ip4Config2Impl.h"
+#include "Ip4Config2Nv.h"
+#include "Ip4NvData.h"
 
 #define IP4_PROTOCOL_SIGNATURE  SIGNATURE_32 ('I', 'P', '4', 'P')
 #define IP4_SERVICE_SIGNATURE   SIGNATURE_32 ('I', 'P', '4', 'S')
@@ -195,12 +204,11 @@ struct _IP4_SERVICE {
   EFI_EVENT                       Timer;
 
   //
-  // Auto configure staff
+  // IPv4 Configuration II Protocol instance
   //
-  EFI_IP4_CONFIG_PROTOCOL         *Ip4Config;
-  EFI_EVENT                       DoneEvent;
-  EFI_EVENT                       ReconfigEvent;
-  EFI_EVENT                       ActiveEvent;
+  IP4_CONFIG2_INSTANCE            Ip4Config2Instance;
+
+  CHAR16                          *MacString;
 
   UINT32                          MaxPacketSize;
   UINT32                          OldMaxPacketSize; ///< The MTU before IPsec enable.
@@ -211,6 +219,10 @@ struct _IP4_SERVICE {
 
 #define IP4_SERVICE_FROM_PROTOCOL(Sb)   \
           CR ((Sb), IP4_SERVICE, ServiceBinding, IP4_SERVICE_SIGNATURE)
+
+#define IP4_SERVICE_FROM_CONFIG2_INSTANCE(This) \
+  CR (This, IP4_SERVICE, Ip4Config2Instance, IP4_SERVICE_SIGNATURE)
+
 
 #define IP4_NO_MAPPING(IpInstance) (!(IpInstance)->Interface->Configured)
 
@@ -258,8 +270,8 @@ Ip4InitProtocol (
 
   @param[in]  IpInstance         The IP4 child to clean up.
 
-  @retval EFI_SUCCESS            The IP4 child is cleaned up
-  @retval EFI_DEVICE_ERROR       Some resources failed to be released
+  @retval EFI_SUCCESS            The IP4 child is cleaned up.
+  @retval EFI_DEVICE_ERROR       Some resources failed to be released.
 
 **/
 EFI_STATUS
@@ -270,13 +282,13 @@ Ip4CleanProtocol (
 /**
   Cancel the user's receive/transmit request.
 
-  @param[in]  IpInstance         The IP4 child
+  @param[in]  IpInstance         The IP4 child.
   @param[in]  Token              The token to cancel. If NULL, all token will be
                                  cancelled.
 
-  @retval EFI_SUCCESS            The token is cancelled
+  @retval EFI_SUCCESS            The token is cancelled.
   @retval EFI_NOT_FOUND          The token isn't found on either the
-                                 transmit/receive queue
+                                 transmit/receive queue.
   @retval EFI_DEVICE_ERROR       Not all token is cancelled when Token is NULL.
 
 **/
@@ -333,10 +345,10 @@ Ip4TimerTicking (
   packets.
 
   @param[in]  Map                    The IP4 child's transmit map.
-  @param[in]  Item                   Current transmitted packet
+  @param[in]  Item                   Current transmitted packet.
   @param[in]  Context                Not used.
 
-  @retval EFI_SUCCESS            Always returns EFI_SUCCESS
+  @retval EFI_SUCCESS            Always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS
@@ -365,7 +377,7 @@ Ip4SentPacketTicking (
   are bound together. Check the comments in Ip4Output for information
   about IP fragmentation.
 
-  @param[in]  Context                The token's wrap
+  @param[in]  Context                The token's wrap.
 
 **/
 VOID

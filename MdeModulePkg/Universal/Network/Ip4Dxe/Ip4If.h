@@ -1,7 +1,7 @@
 /** @file
   Definition for IP4 pesudo interface structure.
   
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -192,10 +192,10 @@ struct _IP4_INTERFACE {
   the interface is configured.
 
   @param[in]  Mnp               The shared MNP child of this IP4 service binding
-                                instance
+                                instance.
   @param[in]  Controller        The controller this IP4 service binding instance
                                 is installed. Most like the UNDI handle.
-  @param[in]  ImageHandle       This driver's image handle
+  @param[in]  ImageHandle       This driver's image handle.
 
   @return Point to the created IP4_INTERFACE, otherwise NULL.
 
@@ -211,9 +211,9 @@ Ip4CreateInterface (
   Set the interface's address, create and configure
   the ARP child if necessary.
 
-  @param  Interface         The interface to set the address
-  @param  IpAddr            The interface's IP address
-  @param  SubnetMask        The interface's netmask
+  @param  Interface         The interface to set the address.
+  @param  IpAddr            The interface's IP address.
+  @param  SubnetMask        The interface's netmask.
 
   @retval EFI_SUCCESS           The interface is configured with Ip/netmask pair,
                                 and a ARP is created for it.
@@ -234,7 +234,7 @@ Ip4SetAddress (
   Because the IpInstance is optional, the caller must remove
   IpInstance from the interface's instance list itself.
 
-  @param[in]  Interface         The interface used by the IpInstance
+  @param[in]  Interface         The interface used by the IpInstance.
   @param[in]  IpInstance        The Ip instance that free the interface. NULL if
                                 the Ip driver is releasing the default interface.
 
@@ -284,12 +284,12 @@ Ip4SendFrame (
   either queued on ARP queues or that have already been delivered to
   MNP and not yet recycled.
 
-  @param[in]  Interface         Interface to remove the frames from
+  @param[in]  Interface         Interface to remove the frames from.
   @param[in]  IoStatus          The transmit status returned to the frames'
-                                callback
+                                callback.
   @param[in]  FrameToCancel     Function to select the frame to cancel, NULL to
-                                select all
-  @param[in]  Context           Opaque parameters passed to FrameToCancel
+                                select all.
+  @param[in]  Context           Opaque parameters passed to FrameToCancel.
 
 **/
 VOID
@@ -320,14 +320,14 @@ Ip4CancelReceive (
 /**
   Request to receive the packet from the interface.
 
-  @param[in]  Interface         The interface to receive the frames from
+  @param[in]  Interface         The interface to receive the frames from.
   @param[in]  IpInstance        The instance that requests the receive. NULL for
                                 the driver itself.
   @param[in]  CallBack          Function to call when receive finished.
-  @param[in]  Context           Opaque parameter to the callback
+  @param[in]  Context           Opaque parameter to the callback.
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to receive
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to receive.
   @retval EFI_SUCCESS           The recieve request has been started.
   @retval other                 Other error occurs.
 

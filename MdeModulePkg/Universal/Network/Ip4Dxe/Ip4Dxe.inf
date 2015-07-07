@@ -6,7 +6,7 @@
 #  subset of the Internet Control Message Protocol (ICMP) and may include support for
 #  the Internet Group Management Protocol (IGMP).
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -60,12 +60,18 @@
   Ip4Route.c
   Ip4Icmp.h
   Ip4Input.c
+  Ip4Config2Impl.c
+  Ip4Config2Impl.h
+  Ip4Config2.vfr
+  Ip4DxeStrings.uni
+  Ip4NvData.h
+  Ip4Config2Nv.h
+  Ip4Config2Nv.c
 
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
 
 [LibraryClasses]
   UefiLib
@@ -76,6 +82,10 @@
   DebugLib
   NetLib
   DpcLib
+  HiiLib
+  PrintLib
+  DevicePathLib
+  UefiHiiServicesLib
 
 [Protocols]
   ## BY_START
@@ -85,9 +95,21 @@
   gEfiManagedNetworkServiceBindingProtocolGuid  ## TO_START
   gEfiManagedNetworkProtocolGuid                ## TO_START
   gEfiArpServiceBindingProtocolGuid             ## TO_START
-  gEfiIp4ConfigProtocolGuid                     ## TO_START
+  gEfiIp4Config2ProtocolGuid                    ## TO_START
   gEfiArpProtocolGuid                           ## TO_START
+  gEfiDhcp4ServiceBindingProtocolGuid           ## TO_START
+  gEfiDhcp4ProtocolGuid                         ## TO_START
   gEfiIpSec2ProtocolGuid                        ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## BY_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  
+[Guids]
+  ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData     EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_CONSUMES ## HII
+  gIp4Config2NvDataGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   Ip4DxeExtra.uni
+

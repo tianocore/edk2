@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -531,303 +531,6 @@ Ip4ServiceConfigMnp (
 
 
 /**
-  The event handle for IP4 auto configuration. If IP is asked
-  to reconfigure the default address. The original default
-  interface and route table are removed as the default. If there
-  is active IP children using the default address, the interface
-  will remain valid until all the children have freed their
-  references. If IP is signalled when auto configuration is done,
-  it will configure the default interface and default route table
-  with the configuration information retrieved by IP4_CONFIGURE.
-
-  @param[in]  Context                The IP4 service binding instance.
-
-**/
-VOID
-EFIAPI
-Ip4AutoConfigCallBackDpc (
-  IN VOID                   *Context
-  )
-{
-  EFI_IP4_CONFIG_PROTOCOL   *Ip4Config;
-  EFI_IP4_IPCONFIG_DATA     *Data;
-  EFI_IP4_ROUTE_TABLE       *RouteEntry;
-  IP4_SERVICE               *IpSb;
-  IP4_ROUTE_TABLE           *RouteTable;
-  IP4_INTERFACE             *IpIf;
-  EFI_STATUS                Status;
-  UINTN                     Len;
-  UINT32                    Index;
-  IP4_ADDR                  StationAddress;
-  IP4_ADDR                  SubnetMask;
-  IP4_ADDR                  SubnetAddress;
-  IP4_ADDR                  GatewayAddress;
-  IP4_PROTOCOL              *Ip4Instance;
-  EFI_ARP_PROTOCOL          *Arp;
-  LIST_ENTRY                *Entry;
-
-  IpSb      = (IP4_SERVICE *) Context;
-  NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
-
-  Ip4Config = IpSb->Ip4Config;
-
-  //
-  // IP is asked to do the reconfiguration. If the default interface
-  // has been configured, release the default interface and route
-  // table, then create a new one. If there are some IP children
-  // using it, the interface won't be physically freed until all the
-  // children have released their reference to it. Also remember to
-  // restart the receive on the default address. IP4 driver only receive
-  // frames on the default address, and when the default interface is
-  // freed, Ip4AcceptFrame won't be informed.
-  //
-  if (IpSb->ActiveEvent == IpSb->ReconfigEvent) {
-
-    if (IpSb->DefaultInterface->Configured) {
-      IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
-
-      if (IpIf == NULL) {
-        return;
-      }
-
-      RouteTable = Ip4CreateRouteTable ();
-
-      if (RouteTable == NULL) {
-        Ip4FreeInterface (IpIf, NULL);
-        return;
-      }
-
-      Ip4CancelReceive (IpSb->DefaultInterface);
-      Ip4FreeInterface (IpSb->DefaultInterface, NULL);
-      Ip4FreeRouteTable (IpSb->DefaultRouteTable);
-
-      IpSb->DefaultInterface  = IpIf;
-      InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
-
-      IpSb->DefaultRouteTable = RouteTable;
-      Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
-    }
-
-    Ip4Config->Stop (Ip4Config);
-    Ip4Config->Start (Ip4Config, IpSb->DoneEvent, IpSb->ReconfigEvent);
-    return ;
-  }
-
-  //
-  // Get the configure data in two steps: get the length then the data.
-  //
-  Len = 0;
-
-  if (Ip4Config->GetData (Ip4Config, &Len, NULL) != EFI_BUFFER_TOO_SMALL) {
-    return ;
-  }
-
-  Data = AllocatePool (Len);
-
-  if (Data == NULL) {
-    return ;
-  }
-
-  Status = Ip4Config->GetData (Ip4Config, &Len, Data);
-
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }
-
-  IpIf = IpSb->DefaultInterface;
-
-  //
-  // If the default address has been configured don't change it.
-  // This is unlikely to happen if EFI_IP4_CONFIG protocol has
-  // informed us to reconfigure each time it wants to change the
-  // configuration parameters.
-  //
-  if (IpIf->Configured) {
-    goto ON_EXIT;
-  }
-
-  //
-  // Set the default interface's address, then add a directed
-  // route for it, that is, the route whose nexthop is zero.
-  //
-  StationAddress = EFI_NTOHL (Data->StationAddress);
-  SubnetMask = EFI_NTOHL (Data->SubnetMask);
-  Status = Ip4SetAddress (IpIf, StationAddress, SubnetMask);
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }
-
-  if (IpIf->Arp != NULL) {
-    //   
-    // A non-NULL IpIf->Arp here means a new ARP child is created when setting default address, 
-    // but some IP children may have referenced the default interface before it is configured,
-    // these IP instances also consume this ARP protocol so they need to open it BY_CHILD_CONTROLLER.
-    //
-    Arp = NULL;
-    NET_LIST_FOR_EACH (Entry, &IpIf->IpInstances) {
-      Ip4Instance = NET_LIST_USER_STRUCT_S (Entry, IP4_PROTOCOL, AddrLink, IP4_PROTOCOL_SIGNATURE);
-      Status = gBS->OpenProtocol (
-                      IpIf->ArpHandle,
-                      &gEfiArpProtocolGuid,
-                      (VOID **) &Arp,
-                      gIp4DriverBinding.DriverBindingHandle,
-                      Ip4Instance->Handle,
-                      EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-                      );
-      if (EFI_ERROR (Status)) {
-        goto ON_EXIT;
-      }
-    }
-  }
-
-  Ip4AddRoute (
-    IpSb->DefaultRouteTable,
-    StationAddress,
-    SubnetMask,
-    IP4_ALLZERO_ADDRESS
-    );
-
-  //
-  // Add routes returned by EFI_IP4_CONFIG protocol.
-  //
-  for (Index = 0; Index < Data->RouteTableSize; Index++) {
-    RouteEntry = &Data->RouteTable[Index];
-
-    SubnetAddress = EFI_NTOHL (RouteEntry->SubnetAddress);
-    SubnetMask = EFI_NTOHL (RouteEntry->SubnetMask);
-    GatewayAddress = EFI_NTOHL (RouteEntry->GatewayAddress);
-    Ip4AddRoute (IpSb->DefaultRouteTable, SubnetAddress, SubnetMask, GatewayAddress);
-  }
-
-  IpSb->State = IP4_SERVICE_CONFIGED;
-
-ON_EXIT:
-  FreePool (Data);
-}
-
-/**
-  Request Ip4AutoConfigCallBackDpc as a DPC at TPL_CALLBACK.
-
-  @param Event     The event that is signalled.
-  @param Context   The IP4 service binding instance.
-
-**/
-VOID
-EFIAPI
-Ip4AutoConfigCallBack (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
-  )
-{
-  IP4_SERVICE  *IpSb;
-
-  IpSb              = (IP4_SERVICE *) Context;
-  IpSb->ActiveEvent = Event;
-
-  //
-  // Request Ip4AutoConfigCallBackDpc as a DPC at TPL_CALLBACK
-  //
-  QueueDpc (TPL_CALLBACK, Ip4AutoConfigCallBackDpc, Context);
-}
-
-
-/**
-  Start the auto configuration for this IP service instance.
-  It will locates the EFI_IP4_CONFIG_PROTOCOL, then start the
-  auto configuration.
-
-  @param[in]  IpSb               The IP4 service instance to configure
-
-  @retval EFI_SUCCESS            The auto configuration is successfull started
-  @retval Others                 Failed to start auto configuration.
-
-**/
-EFI_STATUS
-Ip4StartAutoConfig (
-  IN IP4_SERVICE            *IpSb
-  )
-{
-  EFI_IP4_CONFIG_PROTOCOL   *Ip4Config;
-  EFI_STATUS                Status;
-
-  if (IpSb->State > IP4_SERVICE_UNSTARTED) {
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Create the DoneEvent and ReconfigEvent to call EFI_IP4_CONFIG
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  Ip4AutoConfigCallBack,
-                  IpSb,
-                  &IpSb->DoneEvent
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  Ip4AutoConfigCallBack,
-                  IpSb,
-                  &IpSb->ReconfigEvent
-                  );
-
-  if (EFI_ERROR (Status)) {
-    goto CLOSE_DONE_EVENT;
-  }
-
-  //
-  // Open the EFI_IP4_CONFIG protocol then start auto configure
-  //
-  Status = gBS->OpenProtocol (
-                  IpSb->Controller,
-                  &gEfiIp4ConfigProtocolGuid,
-                  (VOID **) &Ip4Config,
-                  IpSb->Image,
-                  IpSb->Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER | EFI_OPEN_PROTOCOL_EXCLUSIVE
-                  );
-
-  if (EFI_ERROR (Status)) {
-    Status = EFI_UNSUPPORTED;
-    goto CLOSE_RECONFIG_EVENT;
-  }
-
-  Status = Ip4Config->Start (Ip4Config, IpSb->DoneEvent, IpSb->ReconfigEvent);
-
-  if (EFI_ERROR (Status)) {
-    gBS->CloseProtocol (
-           IpSb->Controller,
-           &gEfiIp4ConfigProtocolGuid,
-           IpSb->Image,
-           IpSb->Controller
-           );
-
-    goto CLOSE_RECONFIG_EVENT;
-  }
-
-  IpSb->Ip4Config = Ip4Config;
-  IpSb->State     = IP4_SERVICE_STARTED;
-  return Status;
-
-CLOSE_RECONFIG_EVENT:
-  gBS->CloseEvent (IpSb->ReconfigEvent);
-  IpSb->ReconfigEvent = NULL;
-
-CLOSE_DONE_EVENT:
-  gBS->CloseEvent (IpSb->DoneEvent);
-  IpSb->DoneEvent = NULL;
-
-  return Status;
-}
-
-
-/**
   Intiialize the IP4_PROTOCOL structure to the unconfigured states.
 
   @param  IpSb                   The IP4 service instance.
@@ -858,6 +561,7 @@ Ip4InitProtocol (
 
   EfiInitializeLock (&IpInstance->RecycleLock, TPL_NOTIFY);
 }
+
 
 
 /**
@@ -974,11 +678,8 @@ Ip4ConfigProtocol (
     // been started, start it.
     //
     if (IpSb->State == IP4_SERVICE_UNSTARTED) {
-      Status = Ip4StartAutoConfig (IpSb);
-
-      if (EFI_ERROR (Status)) {
-        goto ON_ERROR;
-      }
+      Status = EFI_NO_MAPPING;
+      goto ON_ERROR;
     }
 
     IpIf = IpSb->DefaultInterface;
@@ -1038,8 +739,8 @@ ON_ERROR:
 
   @param[in]  IpInstance         The IP4 child to clean up.
 
-  @retval EFI_SUCCESS            The IP4 child is cleaned up
-  @retval EFI_DEVICE_ERROR       Some resources failed to be released
+  @retval EFI_SUCCESS            The IP4 child is cleaned up.
+  @retval EFI_DEVICE_ERROR       Some resources failed to be released.
 
 **/
 EFI_STATUS
@@ -1112,11 +813,11 @@ Ip4CleanProtocol (
   address. Only continuous netmasks are supported. and check
   that StationAddress is a unicast address on the newtwork.
 
-  @param[in]  Ip                 The IP address to validate
-  @param[in]  Netmask            The netmaks of the IP
+  @param[in]  Ip                 The IP address to validate.
+  @param[in]  Netmask            The netmaks of the IP.
 
-  @retval TRUE                   The Ip/Netmask pair is valid
-  @retval FALSE                  The Ip/Netmask pair is invalid
+  @retval TRUE                   The Ip/Netmask pair is valid.
+  @retval FALSE                  The Ip/Netmask pair is invalid.
 
 **/
 BOOLEAN
@@ -1322,12 +1023,12 @@ ON_EXIT:
   should make sure that the parameters is valid.
 
   @param[in]  IpInstance             The IP4 child to change the setting.
-  @param[in]  JoinFlag               TRUE to join the group, otherwise leave it
-  @param[in]  GroupAddress           The target group address
+  @param[in]  JoinFlag               TRUE to join the group, otherwise leave it.
+  @param[in]  GroupAddress           The target group address.
 
-  @retval EFI_ALREADY_STARTED    Want to join the group, but already a member of it
+  @retval EFI_ALREADY_STARTED    Want to join the group, but already a member of it.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
-  @retval EFI_DEVICE_ERROR       Failed to set the group configuraton
+  @retval EFI_DEVICE_ERROR       Failed to set the group configuraton.
   @retval EFI_SUCCESS            Successfully updated the group setting.
   @retval EFI_NOT_FOUND          Try to leave the group which it isn't a member.
 
@@ -1624,10 +1325,10 @@ ON_EXIT:
 
   @param[in]  Map                    The container of either user's transmit or receive
                                      token.
-  @param[in]  Item                   Current item to check against
+  @param[in]  Item                   Current item to check against.
   @param[in]  Context                The Token to check againist.
 
-  @retval EFI_ACCESS_DENIED      The token or event has already been enqueued in IP
+  @retval EFI_ACCESS_DENIED      The token or event has already been enqueued in IP.
   @retval EFI_SUCCESS            The current item isn't the same token/event as the
                                  context.
 
@@ -1800,7 +1501,7 @@ Ip4TxTokenValid (
   are bound together. Check the comments in Ip4Output for information
   about IP fragmentation.
 
-  @param[in]  Context                The token's wrap
+  @param[in]  Context                The token's wrap.
 
 **/
 VOID
@@ -1848,9 +1549,9 @@ Ip4FreeTxToken (
   The callback function to Ip4Output to update the transmit status.
 
   @param  Ip4Instance            The Ip4Instance that request the transmit.
-  @param  Packet                 The user's transmit request
-  @param  IoStatus               The result of the transmission
-  @param  Flag                   Not used during transmission
+  @param  Packet                 The user's transmit request.
+  @param  IoStatus               The result of the transmission.
+  @param  Flag                   Not used during transmission.
   @param  Context                The token's wrap.
 
 **/
@@ -1911,7 +1612,7 @@ Ip4OnPacketSent (
   @retval  EFI_BAD_BUFFER_SIZE   The length of the IPv4 header + option length + total data length is
                                  greater than MTU (or greater than the maximum packet size if
                                  Token.Packet.TxData.OverrideData.
-                                 DoNotFragment is TRUE.)
+                                 DoNotFragment is TRUE).
 
 **/
 EFI_STATUS
@@ -2262,9 +1963,9 @@ ON_EXIT:
   Because Ip4CancelPacket and other functions are all called in
   line, so, after Ip4CancelPacket returns, the Item has been freed.
 
-  @param[in]  Map                    The IP4 child's transmit queue
-  @param[in]  Item                   The current transmitted packet to test.
-  @param[in]  Context                The user's token to cancel.
+  @param[in]  Map                The IP4 child's transmit queue.
+  @param[in]  Item               The current transmitted packet to test.
+  @param[in]  Context            The user's token to cancel.
 
   @retval EFI_SUCCESS            Continue to check the next Item.
   @retval EFI_ABORTED            The user's Token (Token != NULL) is cancelled.
@@ -2316,9 +2017,9 @@ Ip4CancelTxTokens (
   Cancel the receive request. This is quiet simple, because
   it is only enqueued in our local receive map.
 
-  @param[in]  Map                    The IP4 child's receive queue
-  @param[in]  Item                   Current receive request to cancel.
-  @param[in]  Context                The user's token to cancel
+  @param[in]  Map                The IP4 child's receive queue.
+  @param[in]  Item               Current receive request to cancel.
+  @param[in]  Context            The user's token to cancel.
 
   @retval EFI_SUCCESS            Continue to check the next receive request on the
                                  queue.
@@ -2361,13 +2062,13 @@ Ip4CancelRxTokens (
 /**
   Cancel the user's receive/transmit request.
 
-  @param[in]  IpInstance         The IP4 child
+  @param[in]  IpInstance         The IP4 child.
   @param[in]  Token              The token to cancel. If NULL, all token will be
                                  cancelled.
 
-  @retval EFI_SUCCESS            The token is cancelled
+  @retval EFI_SUCCESS            The token is cancelled.
   @retval EFI_NOT_FOUND          The token isn't found on either the
-                                 transmit/receive queue
+                                 transmit/receive queue.
   @retval EFI_DEVICE_ERROR       Not all token is cancelled when Token is NULL.
 
 **/
@@ -2563,10 +2264,10 @@ EfiIp4Poll (
   packets.
 
   @param[in]  Map                    The IP4 child's transmit map.
-  @param[in]  Item                   Current transmitted packet
+  @param[in]  Item                   Current transmitted packet.
   @param[in]  Context                Not used.
 
-  @retval EFI_SUCCESS            Always returns EFI_SUCCESS
+  @retval EFI_SUCCESS            Always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS

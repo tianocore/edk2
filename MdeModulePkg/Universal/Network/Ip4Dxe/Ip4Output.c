@@ -1,7 +1,7 @@
 /** @file
   Transmit the IP4 packet.
   
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -312,6 +312,13 @@ Ip4Output (
       CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src);
     } else {
       CacheEntry = Ip4Route (IpInstance->RouteTable, Head->Dst, Head->Src);
+      //
+      // If failed to route the packet by using the instance's route table,
+      // try to use the default route table.
+      //
+      if (CacheEntry == NULL) {
+        CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src);
+      }
     }
 
     if (CacheEntry == NULL) {

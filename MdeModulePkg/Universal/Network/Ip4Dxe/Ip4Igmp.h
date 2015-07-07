@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -78,11 +78,11 @@ Ip4InitIgmp (
 /**
   Join the multicast group on behalf of this IP4 child
 
-  @param[in]  IpInstance         The IP4 child that wants to join the group
-  @param[in]  Address            The group to join
+  @param[in]  IpInstance         The IP4 child that wants to join the group.
+  @param[in]  Address            The group to join.
 
-  @retval EFI_SUCCESS            Successfully join the multicast group
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources
+  @retval EFI_SUCCESS            Successfully join the multicast group.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources.
   @retval Others                 Failed to join the multicast group.
 
 **/
@@ -96,10 +96,10 @@ Ip4JoinGroup (
   Leave the IP4 multicast group on behalf of IpInstance.
 
   @param[in]  IpInstance         The IP4 child that wants to leave the group
-                                 address
-  @param[in]  Address            The group address to leave
+                                 address.
+  @param[in]  Address            The group address to leave.
 
-  @retval EFI_NOT_FOUND          The IP4 service instance isn't in the group
+  @retval EFI_NOT_FOUND          The IP4 service instance isn't in the group.
   @retval EFI_SUCCESS            Successfully leave the multicast group.
   @retval Others                 Failed to leave the multicast group.
 
@@ -113,9 +113,9 @@ Ip4LeaveGroup (
 /**
   Handle the received IGMP message for the IP4 service instance.
 
-  @param[in]  IpSb               The IP4 service instance that received the message
-  @param[in]  Head               The IP4 header of the received message
-  @param[in]  Packet             The IGMP message, without IP4 header
+  @param[in]  IpSb               The IP4 service instance that received the message.
+  @param[in]  Head               The IP4 header of the received message.
+  @param[in]  Packet             The IGMP message, without IP4 header.
 
   @retval EFI_INVALID_PARAMETER  The IGMP message is malformated.
   @retval EFI_SUCCESS            The IGMP message is successfully processed.
@@ -136,7 +136,7 @@ Ip4IgmpHandle (
   2. Decrease the report timer for each IGMP group in "delaying
      member" state.
 
-  @param[in]  IpSb                   The IP4 service instance that is ticking
+  @param[in]  IpSb                   The IP4 service instance that is ticking.
 
 **/
 VOID
@@ -151,9 +151,9 @@ Ip4IgmpTicking (
   assume the byte order of the both Source and Addr, the
   network byte order is used by the caller.
 
-  @param[in]  Source                 The array of group addresses to add to
-  @param[in]  Count                  The number of group addresses in the Source
-  @param[in]  Addr                   The IP4 multicast address to add
+  @param[in]  Source                 The array of group addresses to add to.
+  @param[in]  Count                  The number of group addresses in the Source.
+  @param[in]  Addr                   The IP4 multicast address to add.
 
   @return NULL if failed to allocate memory for the new groups,
           otherwise the new combined group addresses.
@@ -172,9 +172,9 @@ Ip4CombineGroups (
   both Groups and Addr, the network byte order is used by
   the caller.
 
-  @param  Groups            The array of group addresses to remove from
-  @param  Count             The number of group addresses in the Groups
-  @param  Addr              The IP4 multicast address to remove
+  @param  Groups            The array of group addresses to remove from.
+  @param  Count             The number of group addresses in the Groups.
+  @param  Addr              The IP4 multicast address to remove.
 
   @return The nubmer of group addresses in the Groups after remove.
           It is Count if the Addr isn't in the Groups.
@@ -191,8 +191,8 @@ Ip4RemoveGroupAddr (
   Find the IGMP_GROUP structure which contains the status of multicast
   group Address in this IGMP control block
 
-  @param[in]  IgmpCtrl               The IGMP control block to search from
-  @param[in]  Address                The multicast address to search
+  @param[in]  IgmpCtrl               The IGMP control block to search from.
+  @param[in]  Address                The multicast address to search.
 
   @return NULL if the multicast address isn't in the IGMP control block. Otherwise
           the point to the IGMP_GROUP which contains the status of multicast group

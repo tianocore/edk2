@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP4 driver.
 
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -121,7 +121,7 @@ Ip4DriverBindingSupported (
   destroyed, it is marked as that in case the destroy failed and
   being called again later.
 
-  @param[in]  IpSb               The IP4 serviceing binding instance to clean up
+  @param[in]  IpSb               The IP4 service binding instance to clean up
 
   @retval EFI_SUCCESS            The resource used by the instance are cleaned up
   @retval other                  Failed to clean up some of the resources.
@@ -166,7 +166,7 @@ Ip4CreateService (
   // empty resources, so if any thing goes wrong when allocating
   // resources, Ip4CleanService can be called to clean it up.
   //
-  IpSb = AllocatePool (sizeof (IP4_SERVICE));
+  IpSb = AllocateZeroPool (sizeof (IP4_SERVICE));
 
   if (IpSb == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -208,11 +208,7 @@ Ip4CreateService (
 
   ZeroMem (&IpSb->SnpMode, sizeof (EFI_SIMPLE_NETWORK_MODE));
 
-  IpSb->Timer                       = NULL;
-  IpSb->Ip4Config                   = NULL;
-  IpSb->DoneEvent                   = NULL;
-  IpSb->ReconfigEvent               = NULL;
-  IpSb->ActiveEvent                 = NULL;
+  IpSb->Timer = NULL;
 
   //
   // Create various resources. First create the route table, timer
@@ -280,6 +276,13 @@ Ip4CreateService (
     goto ON_ERROR;
   }
 
+  IpSb->MacString = NULL;
+  Status = NetLibGetMacString (IpSb->Controller, IpSb->Image, &IpSb->MacString);
+  
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
   IpSb->DefaultInterface = Ip4CreateInterface (IpSb->Mnp, Controller, ImageHandle);
 
   if (IpSb->DefaultInterface == NULL) {
@@ -288,6 +291,14 @@ Ip4CreateService (
   }
 
   InsertHeadList (&IpSb->Interfaces, &IpSb->DefaultInterface->Link);
+
+  ZeroMem (&IpSb->Ip4Config2Instance, sizeof (IP4_CONFIG2_INSTANCE));
+  
+  Status = Ip4Config2InitInstance (&IpSb->Ip4Config2Instance);
+
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   IpSb->MaxPacketSize = IpSb->SnpMode.MaxPacketSize - sizeof (IP4_HEAD);
   if (NetLibGetVlanId (IpSb->Controller) != 0) {
@@ -298,6 +309,7 @@ Ip4CreateService (
   }
   IpSb->OldMaxPacketSize = IpSb->MaxPacketSize;
   *Service = IpSb;
+
   return EFI_SUCCESS;
 
 ON_ERROR:
@@ -315,7 +327,7 @@ ON_ERROR:
   destroyed, it is marked as that in case the destroy failed and
   being called again later.
 
-  @param[in]  IpSb               The IP4 serviceing binding instance to clean up
+  @param[in]  IpSb               The IP4 service binding instance to clean up
 
   @retval EFI_SUCCESS            The resource used by the instance are cleaned up
   @retval other                  Failed to clean up some of the resources.
@@ -374,21 +386,11 @@ Ip4CleanService (
     IpSb->Timer = NULL;
   }
 
-  if (IpSb->Ip4Config != NULL) {
-    IpSb->Ip4Config->Stop (IpSb->Ip4Config);
-
-    gBS->CloseProtocol (
-          IpSb->Controller,
-          &gEfiIp4ConfigProtocolGuid,
-          IpSb->Image,
-          IpSb->Controller
-          );
-
-    gBS->CloseEvent (IpSb->DoneEvent);
-    gBS->CloseEvent (IpSb->ReconfigEvent);
-    IpSb->ActiveEvent = NULL;
-    IpSb->Ip4Config = NULL;
+  if (IpSb->MacString != NULL) {
+    FreePool (IpSb->MacString);
   }
+
+  Ip4Config2CleanInstance (&IpSb->Ip4Config2Instance);
 
   return EFI_SUCCESS;
 }
@@ -452,13 +454,13 @@ Ip4DestroyChildEntryInHandleBuffer (
 EFI_STATUS
 EFIAPI
 Ip4DriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
-{
-  IP4_SERVICE               *IpSb;
-  EFI_STATUS                Status;
+{ 
+  EFI_STATUS                    Status;
+  IP4_SERVICE                   *IpSb;
 
   //
   // Test for the Ip4 service binding protocol
@@ -475,12 +477,13 @@ Ip4DriverBindingStart (
   if (Status == EFI_SUCCESS) {
     return EFI_ALREADY_STARTED;
   }
-
+  
   Status = Ip4CreateService (ControllerHandle, This->DriverBindingHandle, &IpSb);
-
+  
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
   ASSERT (IpSb != NULL);
 
   //
@@ -490,19 +493,23 @@ Ip4DriverBindingStart (
                   &ControllerHandle,
                   &gEfiIp4ServiceBindingProtocolGuid,
                   &IpSb->ServiceBinding,
+                  &gEfiIp4Config2ProtocolGuid,
+                  &IpSb->Ip4Config2Instance.Ip4Config2,
                   NULL
                   );
 
   if (EFI_ERROR (Status)) {
     goto FREE_SERVICE;
   }
-
+ 
   //
-  // ready to go: start the receiving and timer
+  // Ready to go: start the receiving and timer.
+  // Ip4Config2SetPolicy maybe call Ip4ReceiveFrame() to set the default interface's RecvRequest first after
+  // Ip4Config2 instance is initialized. So, EFI_ALREADY_STARTED is the allowed return status.
   //
   Status = Ip4ReceiveFrame (IpSb->DefaultInterface, NULL, Ip4AccpetFrame, IpSb);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
     goto UNINSTALL_PROTOCOL;
   }
 
@@ -529,7 +536,6 @@ UNINSTALL_PROTOCOL:
 FREE_SERVICE:
   Ip4CleanService (IpSb);
   FreePool (IpSb);
-
   return Status;
 }
 
@@ -571,90 +577,23 @@ Ip4DriverBindingStop (
   IP4_INTERFACE                            *IpIf;
   IP4_ROUTE_TABLE                          *RouteTable;
 
-  //
-  // IP4 driver opens the MNP child, ARP children or the IP4_CONFIG protocol
-  // by driver. So the ControllerHandle may be the MNP child handle, ARP child
-  // handle, or the NIC (UNDI) handle because IP4_CONFIG protocol is installed
-  // in the NIC handle.
-  //
-  //
-  // First, check whether it is the IP4_CONFIG protocol being uninstalled.
-  // IP4_CONFIG protocol is installed on the NIC handle. It isn't necessary
-  // to clean up the default configuration if IP4_CONFIG is being stopped.
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiIp4ConfigProtocolGuid,
-                  NULL,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
-  if (Status == EFI_SUCCESS) {
-    //
-    // Retrieve the IP4 service binding protocol. If failed, it is
-    // likely that Ip4 ServiceBinding is uninstalled already. In this
-    // case, return immediately.
-    //
-    Status = gBS->OpenProtocol (
-                    ControllerHandle,
-                    &gEfiIp4ServiceBindingProtocolGuid,
-                    (VOID **) &ServiceBinding,
-                    This->DriverBindingHandle,
-                    ControllerHandle,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
-    if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
-    }
+  BOOLEAN                                  IsDhcp4;
 
-    IpSb = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
-    if (IpSb->Ip4Config != NULL && (IpSb->State != IP4_SERVICE_DESTROY)) {
-
-      IpSb->Ip4Config->Stop (IpSb->Ip4Config);
-
-      Status = gBS->CloseProtocol (
-                      ControllerHandle,
-                      &gEfiIp4ConfigProtocolGuid,
-                      IpSb->Image,
-                      ControllerHandle
-                      );
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      //
-      // If the auto configure hasn't complete, mark it as not started.
-      //
-      if (IpSb->State == IP4_SERVICE_STARTED) {
-        IpSb->State = IP4_SERVICE_UNSTARTED;
-      }
-
-      IpSb->Ip4Config = NULL;
-      gBS->CloseEvent (IpSb->DoneEvent);
-      gBS->CloseEvent (IpSb->ReconfigEvent);
-    }
-
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Either MNP or ARP protocol is being uninstalled. The controller
-  // handle is either the MNP child or ARP child. But, the IP4's
-  // service binding is installed on the NIC handle. So, need to open
-  // the protocol info to find the NIC handle.
-  //
+  IsDhcp4   = FALSE;
+   
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiManagedNetworkProtocolGuid);
   if (NicHandle == NULL) {
     NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiArpProtocolGuid);
     if (NicHandle == NULL) {
-      return EFI_SUCCESS;
+      NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp4ProtocolGuid);
+      if (NicHandle != NULL) {
+        IsDhcp4 = TRUE;  
+      } else {
+        return EFI_SUCCESS;
+      }
     }
   }
-
-  //
-  // Retrieve the IP4 service binding protocol
-  //
+   
   Status = gBS->OpenProtocol (
                   NicHandle,
                   &gEfiIp4ServiceBindingProtocolGuid,
@@ -666,9 +605,14 @@ Ip4DriverBindingStop (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
+  
+  IpSb = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
 
-  IpSb   = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
-  if (NumberOfChildren != 0) {
+  if (IsDhcp4) {
+    Status = Ip4Config2DestroyDhcp4 (&IpSb->Ip4Config2Instance);
+    gBS->CloseEvent (IpSb->Ip4Config2Instance.Dhcp4Event);
+    IpSb->Ip4Config2Instance.Dhcp4Event = NULL;
+  } else if (NumberOfChildren != 0) {
     List = &IpSb->Children;
     Context.ServiceBinding    = ServiceBinding;
     Context.NumberOfChildren  = NumberOfChildren;
@@ -680,6 +624,7 @@ Ip4DriverBindingStop (
                NULL
                );
   } else if (IpSb->DefaultInterface->ArpHandle == ControllerHandle) {
+  
     //
     // The ARP protocol for the default interface is being uninstalled and all
     // its IP child handles should have been destroyed before. So, release the
@@ -704,10 +649,8 @@ Ip4DriverBindingStop (
     IpSb->DefaultRouteTable = RouteTable;
     Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
 
-    if (IpSb->Ip4Config != NULL && IpSb->State != IP4_SERVICE_DESTROY) {
-      IpSb->Ip4Config->Stop (IpSb->Ip4Config);
-    }
     IpSb->State = IP4_SERVICE_UNSTARTED;
+
   } else if (IsListEmpty (&IpSb->Children)) {
     State           = IpSb->State;
     IpSb->State     = IP4_SERVICE_DESTROY;
@@ -721,10 +664,13 @@ Ip4DriverBindingStop (
       goto ON_ERROR;
     }
 
-    gBS->UninstallProtocolInterface (
+    gBS->UninstallMultipleProtocolInterfaces (
            NicHandle,
            &gEfiIp4ServiceBindingProtocolGuid,
-           ServiceBinding
+           ServiceBinding,
+           &gEfiIp4Config2ProtocolGuid,
+           &IpSb->Ip4Config2Instance.Ip4Config2,
+           NULL
            );
     
     if (gIp4ControllerNameTable != NULL) {

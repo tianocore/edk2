@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -158,9 +158,9 @@ Ip4ProcessIcmpRedirect (
   update call Ip4ProcessIcmpRedirect to update the IP instance's
   route cache, otherwise, deliver the packet to upper layer.
 
-  @param[in]  IpSb               The IP service that received the packet.
-  @param[in]  Head               The IP head of the ICMP error packet
-  @param[in]  Packet             The content of the ICMP error with IP head
+  @param[in]  IpSb               The IP4 service that received the packet.
+  @param[in]  Head               The IP4 head of the ICMP error packet
+  @param[in]  Packet             The content of the ICMP error with IP4 head
                                  removed.
 
   @retval EFI_SUCCESS            The ICMP error is processed successfully.
@@ -200,9 +200,9 @@ Ip4ProcessIcmpError (
 /**
   Replay an ICMP echo request.
 
-  @param[in]  IpSb               The IP service that receivd the packet
-  @param[in]  Head               The IP head of the ICMP error packet
-  @param[in]  Packet             The content of the ICMP error with IP head
+  @param[in]  IpSb               The IP4 service that receivd the packet
+  @param[in]  Head               The IP4 head of the ICMP error packet
+  @param[in]  Packet             The content of the ICMP error with IP4 head
                                  removed.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resource.
@@ -278,9 +278,9 @@ ON_EXIT:
   Process the ICMP query message. If it is an ICMP echo
   request, answer it. Otherwise deliver it to upper layer.
 
-  @param[in]  IpSb               The IP service that receivd the packet
-  @param[in]  Head               The IP head of the ICMP query packet
-  @param[in]  Packet             The content of the ICMP query with IP head
+  @param[in]  IpSb               The IP4 service that receivd the packet
+  @param[in]  Head               The IP4 head of the ICMP query packet
+  @param[in]  Packet             The content of the ICMP query with IP4 head
                                  removed.
 
   @retval EFI_INVALID_PARAMETER  The packet is invalid
@@ -317,9 +317,9 @@ Ip4ProcessIcmpQuery (
   then according to the message types, process it as query or
   error packet.
 
-  @param[in]  IpSb               The IP service that receivd the packet
-  @param[in]  Head               The IP head of the ICMP query packet
-  @param[in]  Packet             The content of the ICMP query with IP head
+  @param[in]  IpSb               The IP4 service that receivd the packet.
+  @param[in]  Head               The IP4 head of the ICMP query packet.
+  @param[in]  Packet             The content of the ICMP query with IP4 head
                                  removed.
 
   @retval EFI_INVALID_PARAMETER  The packet is malformated.
