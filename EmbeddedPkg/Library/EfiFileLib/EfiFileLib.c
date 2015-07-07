@@ -40,7 +40,10 @@ Fv2:         - EFI Firmware VOlume device 2
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/FirmwareVolumeBlock.h>
+
 #include <Guid/FileInfo.h>
+#include <Guid/ZeroGuid.h>
+
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
@@ -56,8 +59,6 @@ Fv2:         - EFI Firmware VOlume device 2
 
 
 CHAR8 *gCwd = NULL;
-
-CONST EFI_GUID gZeroGuid  = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 #define EFI_OPEN_FILE_GUARD_HEADER  0x4B4D4641
 #define EFI_OPEN_FILE_GUARD_FOOTER  0x444D5A56

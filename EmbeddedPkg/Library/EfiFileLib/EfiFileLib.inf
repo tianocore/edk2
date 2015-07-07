@@ -61,3 +61,4 @@
 [Guids]
   gEfiFileInfoGuid
   gEfiFileSystemInfoGuid
+  gZeroGuid
