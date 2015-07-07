@@ -1,0 +1,68 @@
+## @file
+#  This modules produce the Load File Protocol for UEFI HTTP boot.
+# 
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = HttpBootDxe
+  FILE_GUID                 = ecebcb00-d9c8-11e4-af3d-8cdcd426c973
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = HttpBootDxeDriverEntryPoint
+  UNLOAD_IMAGE              = NetLibDefaultUnload
+  MODULE_UNI_FILE           = HttpBootDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  HttpBootDxe.h
+  HttpBootDxe.c
+  HttpBootComponentName.h
+  HttpBootComponentName.c
+  HttpBootImpl.h
+  HttpBootImpl.c
+  HttpBootDhcp4.h
+  HttpBootDhcp4.c
+  HttpBootSupport.h
+  HttpBootSupport.c
+  HttpBootClient.h
+  HttpBootClient.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  NetLib
+  HttpLib
+
+[Protocols]
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+  
+  gEfiLoadFileProtocolGuid                        ## BY_START
+  gEfiHttpServiceBindingProtocolGuid              ## CONSUMES
+  gEfiHttpProtocolGuid                            ## CONSUMES
+  gEfiDhcp4ServiceBindingProtocolGuid             ## TO_START
+  gEfiDhcp4ProtocolGuid                           ## TO_START
+  gEfiIp4Config2ProtocolGuid                      ## TO_START
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31   ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HttpBootDxeExtra.uni
