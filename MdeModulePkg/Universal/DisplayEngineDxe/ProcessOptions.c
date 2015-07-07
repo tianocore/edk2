@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Concatenate a narrow string to another string.
 
   @param Destination The destination string.
+  @param DestMax     The Max length of destination string.
   @param Source      The source string. The string to be concatenated.
                      to the end of Destination.
 
