@@ -44,6 +44,7 @@
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   TcpIoLib|MdeModulePkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
+  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
@@ -99,6 +100,9 @@
   NetworkPkg/Udp6Dxe/Udp6Dxe.inf
   NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
   NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
+  NetworkPkg/DnsDxe/DnsDxe.inf
+  NetworkPkg/HttpDxe/HttpDxe.inf
+  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 
   NetworkPkg/Application/IfConfig6/IfConfig6.inf
   NetworkPkg/Application/IpsecConfig/IpSecConfig.inf
