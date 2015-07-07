@@ -69,6 +69,8 @@ EfiBootManagerRegisterLegacyBootSupport (
   @retval MessageNetworkBoot           If given device path contains MESSAGING_DEVICE_PATH type device path node
                                        and its last device path node's subtype is MSG_MAC_ADDR_DP, MSG_VLAN_DP,
                                        MSG_IPv4_DP or MSG_IPv6_DP.
+  @retval MessageHttpBoot              If given device path contains MESSAGING_DEVICE_PATH type device path node
+                                       and its last device path node's subtype is MSG_URI_DP.
   @retval UnsupportedBoot              If tiven device path doesn't match the above condition, it's not supported.
 
 **/
@@ -113,7 +115,7 @@ BmDevicePathType (
         // If the device path not only point to driver device, it is not a messaging device path,
         //
         if (!IsDevicePathEndType (NextNode)) {
-          break;
+          continue;
         }
 
         switch (DevicePathSubType (Node)) {
@@ -138,6 +140,10 @@ BmDevicePathType (
         case MSG_IPv4_DP:
         case MSG_IPv6_DP:
           return BmMessageNetworkBoot;
+          break;
+
+        case MSG_URI_DP:
+          return BmMessageHttpBoot;
           break;
         }
     }
@@ -684,6 +690,10 @@ BmGetMiscDescription (
 
   case BmMessageNetworkBoot:
     Description = L"Network";
+    break;
+
+  case BmMessageHttpBoot:
+    Description = L"Http";
     break;
 
   default:
