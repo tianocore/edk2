@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Guid/MeasuredFvHob.h>
+#include <Guid/ZeroGuid.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -51,7 +52,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Flag to check GPT partition. It only need be measured once.
 //
 BOOLEAN                           mTrEEMeasureGptTableFlag = FALSE;
-EFI_GUID                          mTrEEZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 UINTN                             mTrEEMeasureGptCount = 0;
 VOID                              *mTrEEFileBuffer;
 UINTN                             mTrEEImageSize;
@@ -201,7 +201,7 @@ TrEEMeasureGptTable (
   PartitionEntry    = (EFI_PARTITION_ENTRY *)EntryPtr;
   NumberOfPartition = 0;
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
-    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &mTrEEZeroGuid)) {
+    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &gZeroGuid)) {
       NumberOfPartition++;  
     }
     PartitionEntry = (EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntry + PrimaryHeader->SizeOfPartitionEntry);
@@ -237,7 +237,7 @@ TrEEMeasureGptTable (
   PartitionEntry    = (EFI_PARTITION_ENTRY*)EntryPtr;
   NumberOfPartition = 0;
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
-    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &mTrEEZeroGuid)) {
+    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &gZeroGuid)) {
       CopyMem (
         (UINT8 *)&GptData->Partitions + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry,
         (UINT8 *)PartitionEntry,
