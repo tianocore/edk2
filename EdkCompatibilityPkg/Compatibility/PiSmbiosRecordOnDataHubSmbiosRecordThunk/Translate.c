@@ -2,7 +2,7 @@
   Translate the DataHub records via EFI_DATA_HUB_PROTOCOL to Smbios recorders 
   via EFI_SMBIOS_PROTOCOL.
   
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Thunk.h"
 
-EFI_GUID  ZeroGuid = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 EFI_SMBIOS_PROTOCOL  *mSmbiosProtocol = NULL;
 
 /**
@@ -83,7 +82,7 @@ SmbiosProcessDataRecord (
     // Find a matching entry in the conversion table for this
     // (SubClass, RecordNumber) pair
     //
-    for (; !CompareGuid (&(mConversionTable[Index].SubClass), &ZeroGuid); Index++) {
+    for (; !CompareGuid (&(mConversionTable[Index].SubClass), &gZeroGuid); Index++) {
       if (CompareGuid (
             &(mConversionTable[Index].SubClass),
             &(RecordHeader->DataRecordGuid)
@@ -94,7 +93,7 @@ SmbiosProcessDataRecord (
       }
     }
 
-    if (CompareGuid (&(mConversionTable[Index].SubClass), &ZeroGuid)) {
+    if (CompareGuid (&(mConversionTable[Index].SubClass), &gZeroGuid)) {
       //
       // We cannot find a matching entry in conversion table,
       // this means this data record cannot be used for SMBIOS.
