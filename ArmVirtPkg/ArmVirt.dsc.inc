@@ -17,7 +17,7 @@
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
 
 [BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
-  *_*_AARCH64_DLINK_FLAGS = --script=$(EDK_TOOLS_PATH)/Scripts/gcc-aarch64-64K-align-ld-script
+  GCC:*_*_AARCH64_DLINK_FLAGS = --script=$(EDK_TOOLS_PATH)/Scripts/gcc-aarch64-64K-align-ld-script
 
 [LibraryClasses.common]
 !if $(TARGET) == RELEASE
