@@ -120,6 +120,7 @@
   gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRec####"
   gEdkiiFaultTolerantWriteGuid                  ## SOMETIMES_CONSUMES   ## HOB
   gEdkiiVarErrorFlagGuid                        ## CONSUMES             ## GUID
+  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize       ## CONSUMES

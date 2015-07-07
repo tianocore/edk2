@@ -35,13 +35,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/SmmMemLib.h>
 
 #include <Guid/SmmVariableCommon.h>
+#include <Guid/ZeroGuid.h>
 #include "Variable.h"
 
 extern VARIABLE_INFO_ENTRY                           *gVariableInfo;
 EFI_HANDLE                                           mSmmVariableHandle      = NULL;
 EFI_HANDLE                                           mVariableHandle         = NULL;
 BOOLEAN                                              mAtRuntime              = FALSE;
-EFI_GUID                                             mZeroGuid               = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 UINT8                                                *mVariableBufferPayload = NULL;
 UINTN                                                mVariableBufferPayloadSize;
 extern BOOLEAN                                       mEndOfDxe;
@@ -373,7 +373,7 @@ SmmVariableGetStatistics (
 
   CopyGuid (&VendorGuid, &InfoEntry->VendorGuid);
 
-  if (CompareGuid (&VendorGuid, &mZeroGuid)) {
+  if (CompareGuid (&VendorGuid, &gZeroGuid)) {
     //
     // Return the first variable info
     //
