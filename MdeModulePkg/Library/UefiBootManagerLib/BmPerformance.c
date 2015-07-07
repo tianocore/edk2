@@ -320,7 +320,7 @@ BmWriteBootToOsPerformanceData (
 
       ZeroMem (&mBmPerfData, sizeof (PERF_DATA));
 
-      AsciiStrCpyS (mBmPerfData.Token, PERF_TOKEN_SIZE, Token);
+      AsciiStrnCpyS (mBmPerfData.Token, PERF_TOKEN_SIZE, Token, PERF_TOKEN_LENGTH);
       if (StartTicker == 1) {
         StartTicker = StartValue;
       }
