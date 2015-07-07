@@ -61,6 +61,7 @@
   gEfiIfrFrameworkGuid                          ## SOMETIMES_CONSUMES  ## GUID
   gEfiHiiPlatformSetupFormsetGuid               ## SOMETIMES_CONSUMES  ## GUID
   gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES  ## GUID
+  gZeroGuid                                     ## SOMETIMES_CONSUMES  ## GUID
 
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_CONSUMES

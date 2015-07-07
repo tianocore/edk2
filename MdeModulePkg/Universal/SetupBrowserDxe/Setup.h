@@ -37,6 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/MdeModuleHii.h>
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/HiiFormMapMethodGuid.h>
+#include <Guid/ZeroGuid.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
@@ -583,8 +584,6 @@ extern SETUP_DRIVER_PRIVATE_DATA mPrivateData;
 // Browser Global Strings
 //
 extern CHAR16            *gEmptyString;
-
-extern EFI_GUID          gZeroGuid;
 
 extern UI_MENU_SELECTION  *gCurrentSelection;
 

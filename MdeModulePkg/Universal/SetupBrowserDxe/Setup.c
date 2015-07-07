@@ -68,8 +68,6 @@ FORM_BROWSER_FORMSET  *mSystemLevelFormSet;
 CHAR16            *gEmptyString;
 CHAR16            *mUnknownString = L"!";
 
-EFI_GUID  gZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
-
 extern EFI_GUID        mCurrentFormSetGuid;
 extern EFI_HII_HANDLE  mCurrentHiiHandle;
 extern UINT16          mCurrentFormId;
