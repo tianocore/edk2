@@ -22,14 +22,10 @@
 // model or hardware platforms).
 //
 CONST ARM_VEXPRESS_PLATFORM ArmVExpressPlatforms[] = {
-  { ARM_FVP_VEXPRESS_AEMv8x4,                  FixedPcdGetPtr (PcdFdtFvpVExpressAEMv8x4),        L"rtsm_ve-aemv8a.dtb"                  },
-  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2,        FixedPcdGetPtr (PcdFdtFvpBaseAEMv8x4GicV2),       L"fvp-base-gicv2-psci.dtb"             },
-  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2_LEGACY, FixedPcdGetPtr (PcdFdtFvpBaseAEMv8x4GicV2Legacy), L"fvp-base-gicv2legacy-psci.dtb"       },
-  { ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV3,        FixedPcdGetPtr (PcdFdtFvpBaseAEMv8x4GicV3),       L"fvp-base-gicv3-psci.dtb"             },
-  { ARM_FVP_FOUNDATION_GICV2,                  FixedPcdGetPtr (PcdFdtFvpFoundationGicV2),        L"fvp-foundation-gicv2-psci.dtb"       },
-  { ARM_FVP_FOUNDATION_GICV2_LEGACY,           FixedPcdGetPtr (PcdFdtFvpFoundationGicV2Legacy),  L"fvp-foundation-gicv2legacy-psci.dtb" },
-  { ARM_FVP_FOUNDATION_GICV3,                  FixedPcdGetPtr (PcdFdtFvpFoundationGicV3),        L"fvp-foundation-gicv3-psci.dtb"       },
-  { ARM_FVP_VEXPRESS_UNKNOWN }
+  { ARM_FVP_VEXPRESS_AEMv8x4, FixedPcdGetPtr (PcdFdtFvpVExpressAEMv8x4), L"rtsm_ve-aemv8a.dtb" },
+  { ARM_FVP_BASE, FixedPcdGetPtr (PcdFdtFvpBaseAEMv8x4), L"fvp-base.dtb" },
+  { ARM_FVP_FOUNDATION, FixedPcdGetPtr (PcdFdtFvpFoundation), L"fvp-foundation.dtb" },
+  { ARM_FVP_VEXPRESS_UNKNOWN, &gZeroGuid }
 };
 
 /**
@@ -49,11 +45,9 @@ ArmVExpressGetPlatform (
   OUT CONST ARM_VEXPRESS_PLATFORM** Platform
   )
 {
-  EFI_STATUS            Status;
-  UINT32                SysId;
-  UINT32                FvpSysId;
-  UINT32                VariantSysId;
-  ARM_GIC_ARCH_REVISION GicRevision;
+  EFI_STATUS  Status;
+  UINT32      SysId;
+  UINT32      FvpSysId;
 
   ASSERT (Platform != NULL);
 
@@ -61,46 +55,23 @@ ArmVExpressGetPlatform (
 
   SysId = MmioRead32 (ARM_VE_SYS_ID_REG);
   if (SysId != ARM_RTSM_SYS_ID) {
-    // Remove the GIC variant to identify if we are running on the FVP Base or
-    // Foundation models
-    FvpSysId     = SysId & (ARM_FVP_SYS_ID_HBI_MASK |
-                            ARM_FVP_SYS_ID_PLAT_MASK );
-    // Extract the variant from the SysId
-    VariantSysId = SysId & ARM_FVP_SYS_ID_VARIANT_MASK;
+    //
+    // Keep only the HBI board number and the platform type fields of the
+    // system id register to identify if we are running on the FVP base or
+    // foundation model.
+    //
+    FvpSysId = SysId & (ARM_FVP_SYS_ID_HBI_MASK |
+                        ARM_FVP_SYS_ID_PLAT_MASK );
 
     if (FvpSysId == ARM_FVP_BASE_BOARD_SYS_ID) {
-      if (VariantSysId == ARM_FVP_GIC_VE_MMAP) {
-        // FVP Base Model with legacy GIC memory map
-        Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2_LEGACY, Platform);
-      } else {
-        GicRevision = ArmGicGetSupportedArchRevision ();
-
-        if (GicRevision == ARM_GIC_ARCH_REVISION_2) {
-          // FVP Base Model with GICv2 support
-          Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2, Platform);
-        } else {
-          // FVP Base Model with GICv3 support
-          Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV3, Platform);
-        }
-      }
+      Status = ArmVExpressGetPlatformFromId (ARM_FVP_BASE, Platform);
     } else if (FvpSysId == ARM_FVP_FOUNDATION_BOARD_SYS_ID) {
-      if (VariantSysId == ARM_FVP_GIC_VE_MMAP) {
-        // FVP Foundation Model with legacy GIC memory map
-        Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION_GICV2_LEGACY, Platform);
-      } else {
-        GicRevision = ArmGicGetSupportedArchRevision ();
-
-        if (GicRevision == ARM_GIC_ARCH_REVISION_2) {
-          // FVP Foundation Model with GICv2
-          Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION_GICV2, Platform);
-        } else {
-          // FVP Foundation Model with GICv3
-          Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION_GICV3, Platform);
-        }
-      }
+      Status = ArmVExpressGetPlatformFromId (ARM_FVP_FOUNDATION, Platform);
     }
   } else {
+    //
     // FVP Versatile Express AEMv8
+    //
     Status = ArmVExpressGetPlatformFromId (ARM_FVP_VEXPRESS_AEMv8x4, Platform);
   }
 

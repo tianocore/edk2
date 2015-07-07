@@ -29,12 +29,16 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   ArmShellCmdRunAxfLib
   DxeServicesTableLib
   MemoryAllocationLib
   UefiDriverEntryPoint
+
+[Guids]
+  gZeroGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid
