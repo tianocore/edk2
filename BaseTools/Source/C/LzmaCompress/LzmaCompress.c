@@ -43,8 +43,8 @@ const char *kCantWriteMessage = "Can not write output file";
 const char *kCantAllocateMessage = "Can not allocate memory";
 const char *kDataErrorMessage = "Data error";
 
-static void *SzAlloc(void *p, size_t size) { p = p; return MyAlloc(size); }
-static void SzFree(void *p, void *address) { p = p; MyFree(address); }
+static void *SzAlloc(void *p, size_t size) { (void)p; return MyAlloc(size); }
+static void SzFree(void *p, void *address) { (void)p; MyFree(address); }
 static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 static Bool mQuietMode = False;
