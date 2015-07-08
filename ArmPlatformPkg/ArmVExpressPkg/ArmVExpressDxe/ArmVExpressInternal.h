@@ -24,8 +24,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
-#include <Guid/ZeroGuid.h>
-
 #include <VExpressMotherBoard.h>
 
 // This 'enum' is needed as variations based on existing platform exist
@@ -38,8 +36,12 @@ typedef enum {
   ARM_FVP_VEXPRESS_A15x1_A7x1,
   ARM_FVP_VEXPRESS_A15x4_A7x4,
   ARM_FVP_VEXPRESS_AEMv8x4,
-  ARM_FVP_BASE,
-  ARM_FVP_FOUNDATION,
+  ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2,
+  ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV2_LEGACY,
+  ARM_FVP_BASE_AEMv8x4_AEMv8x4_GICV3,
+  ARM_FVP_FOUNDATION_GICV2,
+  ARM_FVP_FOUNDATION_GICV2_LEGACY,
+  ARM_FVP_FOUNDATION_GICV3,
   ARM_HW_A9x4,
   ARM_HW_A15x2_A7x3,
   ARM_HW_A15,
