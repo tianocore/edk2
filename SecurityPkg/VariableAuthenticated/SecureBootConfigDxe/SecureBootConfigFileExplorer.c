@@ -1,7 +1,7 @@
 /** @file
   Internal file explorer functions for SecureBoot configuration module.
 
-Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -139,6 +139,7 @@ AppendFileName (
 {
   UINTN   Size1;
   UINTN   Size2;
+  UINTN   BufferSize;
   CHAR16  *Str;
   CHAR16  *TmpStr;
   CHAR16  *Ptr;
@@ -146,18 +147,20 @@ AppendFileName (
 
   Size1 = StrSize (Str1);
   Size2 = StrSize (Str2);
-  Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
+  BufferSize = Size1 + Size2 + sizeof (CHAR16);
+  Str   = AllocateZeroPool (BufferSize);
   ASSERT (Str != NULL);
 
-  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
+  TmpStr = AllocateZeroPool (BufferSize);
   ASSERT (TmpStr != NULL);
 
-  StrCat (Str, Str1);
+  StrCatS (Str, BufferSize / sizeof (CHAR16), Str1);
+
   if (!((*Str == '\\') && (*(Str + 1) == 0))) {
-    StrCat (Str, L"\\");
+    StrCatS (Str, BufferSize / sizeof (CHAR16), L"\\");
   }
 
-  StrCat (Str, Str2);
+  StrCatS (Str, BufferSize / sizeof (CHAR16), Str2);
 
   Ptr       = Str;
   LastSlash = Str;
@@ -170,11 +173,11 @@ AppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 3);
-      StrCpy (LastSlash, TmpStr);
+      StrCpyS (TmpStr, BufferSize / sizeof (CHAR16), Ptr + 3);
+      StrCpyS (LastSlash, BufferSize / sizeof (CHAR16), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
@@ -182,11 +185,11 @@ AppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 2);
-      StrCpy (Ptr, TmpStr);
+      StrCpyS (TmpStr, BufferSize / sizeof (CHAR16), Ptr + 2);
+      StrCpyS (Ptr, BufferSize / sizeof (CHAR16), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;

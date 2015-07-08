@@ -1,7 +1,7 @@
 /** @file
   The functions to modify a user profile.
     
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -345,11 +345,11 @@ AddStr (
   ASSERT (TmpStr != NULL);
 
   if (*Source1 == NULL) {
-    StrCpy (TmpStr, Source2);;
+    StrCpyS (TmpStr, StrLength / sizeof (CHAR16), Source2);
   } else {
-    StrCpy (TmpStr, *Source1);
+    StrCpyS (TmpStr, StrLength / sizeof (CHAR16), *Source1);
     FreePool (*Source1);
-    StrCat (TmpStr, Source2);
+    StrCatS (TmpStr, StrLength / sizeof (CHAR16),Source2);
   }
 
   *Source1 = TmpStr;
