@@ -328,11 +328,11 @@ Mtftp4SendRequest (
   for (Index = 0; Index < Token->OptionCount; ++Index) {
     Cur  = (UINT8 *) AsciiStrCpyS ((CHAR8 *) Cur, Len, (CHAR8 *) Options[Index].OptionStr);
     Cur += AsciiStrLen ((CHAR8 *) Options[Index].OptionStr) + 1;
-    Len -= (AsciiStrLen ((CHAR8 *) Options[Index].OptionStr) + 1);
+    Len -= (UINT32) AsciiStrLen ((CHAR8 *) Options[Index].OptionStr) + 1;
 
     Cur  = (UINT8 *) AsciiStrCpyS ((CHAR8 *) Cur, Len, (CHAR8 *) Options[Index].ValueStr);
     Cur += AsciiStrLen ((CHAR8 *) (CHAR8 *) Options[Index].ValueStr) + 1;
-    Len -= (AsciiStrLen ((CHAR8 *) (CHAR8 *) Options[Index].ValueStr) + 1);
+    Len -= (UINT32) AsciiStrLen ((CHAR8 *) (CHAR8 *) Options[Index].ValueStr) + 1;
   }
 
   return Mtftp4SendPacket (Instance, Nbuf);
