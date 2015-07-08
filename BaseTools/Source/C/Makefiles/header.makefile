@@ -21,11 +21,11 @@ CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
 LINUX:=$(findstring Linux, $(shell uname -s))
 DARWIN:=$(findstring Darwin, $(shell uname -s))
 
-CC = gcc
-CXX = g++
-AS = gcc
-AR = ar
-LD = ld
+CC ?= gcc
+CXX ?= g++
+AS ?= gcc
+AR ?= ar
+LD ?= ld
 LINKER ?= $(CC)
 ifeq ($(ARCH), IA32)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/Ia32/
