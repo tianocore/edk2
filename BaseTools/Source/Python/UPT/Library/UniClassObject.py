@@ -1,7 +1,7 @@
 ## @file
 # Collect all defined strings in multiple uni files.
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -529,7 +529,8 @@ class UniFileClassObject(object):
             Line = Line.replace(u'\t', u' ')
             Line = Line.replace(u'\u0006', u'\\')
 
-            IncList = gINCLUDE_PATTERN.findall(Line)
+            # IncList = gINCLUDE_PATTERN.findall(Line)
+            IncList = []
             if len(IncList) == 1:
                 for Dir in [File.Dir] + self.IncludePathList:
                     IncFile = PathClass(str(IncList[0]), Dir)
