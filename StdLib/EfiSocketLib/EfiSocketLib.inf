@@ -2,7 +2,7 @@
 # Component description file for the EFI socket library.
 #
 # This module implements the socket layer.
-# Copyright (c) 2011, Intel Corporation
+# Copyright (c) 2011 - 2015, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -52,7 +52,7 @@
   UefiLib
 
 [Protocols]
-  gEfiIp4ConfigProtocolGuid
+  gEfiIp4Config2ProtocolGuid
   gEfiIp6ConfigProtocolGuid
   gEfiIp4ProtocolGuid
   gEfiIp4ServiceBindingProtocolGuid
