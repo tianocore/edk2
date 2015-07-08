@@ -1,7 +1,7 @@
 /** @file
   IA32 CPU Exception Handler functons.
 
-  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -114,10 +114,12 @@ DumpCpuContent (
   UINTN                   EntryPoint;
 
   InternalPrintMessage (
-    "!!!! IA32 Exception Type - %08x    CPU Apic ID - %08x !!!!\n",
+    "!!!! IA32 Exception Type - %02x(%a)  CPU Apic ID - %08x !!!!\n",
     ExceptionType,
+    GetExceptionNameStr (ExceptionType),
     GetApicId ()
     );
+
   InternalPrintMessage (
     "EIP  - %08x, CS  - %08x, EFLAGS - %08x\n",
     SystemContext.SystemContextIa32->Eip,

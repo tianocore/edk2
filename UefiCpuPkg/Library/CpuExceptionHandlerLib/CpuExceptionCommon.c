@@ -1,7 +1,7 @@
 /** @file
   CPU Exception Handler Library common functions.
 
-  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,15 +24,61 @@ CONST UINT32 mErrorCodeFlag             = 0x00027d00;
 RESERVED_VECTORS_DATA *mReservedVectors = NULL;
 
 //
-// Define the maximum message length 
+// Define the maximum message length
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
+
+CONST CHAR8 mExceptionReservedStr[] = "Reserved";
+CONST CHAR8 *mExceptionNameStr[] = {
+  "#DE - Divide Error",
+  "#DB - Debug",
+  "NMI Interrupt",
+  "#BP - Breakpoint",
+  "#OF - Overflow",
+  "#BR - BOUND Range Exceeded",
+  "#UD - Invalid Opcode",
+  "#NM - Device Not Available",
+  "#DF - Double Fault",
+  "Coprocessor Segment Overrun",
+  "#TS - Invalid TSS",
+  "#NP - Segment Not Present",
+  "#SS - Stack Fault Fault",
+  "#GP - General Protection",
+  "#PF - Page-Fault",
+  "Reserved",
+  "#MF - x87 FPU Floating-Point Error",
+  "#AC - Alignment Check",
+  "#MC - Machine-Check",
+  "#XM - SIMD floating-point",
+  "#VE - Virtualization"
+};
+
+#define EXCEPTION_KNOWN_NAME_NUM  (sizeof (mExceptionNameStr) / sizeof (CHAR8 *))
+
+/**
+  Get ASCII format string exception name by exception type.
+
+  @param ExceptionType  Exception type.
+
+  @return  ASCII format string exception name.
+**/
+CONST CHAR8 *
+GetExceptionNameStr (
+  IN EFI_EXCEPTION_TYPE          ExceptionType
+  )
+{
+  if ((UINTN) ExceptionType < EXCEPTION_KNOWN_NAME_NUM) {
+    return mExceptionNameStr[ExceptionType];
+  } else {
+    return mExceptionReservedStr;
+  }
+}
 
 /**
   Prints a message to the serial port.
 
   @param  Format      Format string for the message to print.
-  @param  ...         Variable argument list whose contents are accessed 
+  @param  ...         Variable argument list whose contents are accessed
                       based on the format string specified by Format.
 
 **/
@@ -54,21 +100,21 @@ InternalPrintMessage (
   VA_END (Marker);
 
   //
-  // Send the print string to a Serial Port 
+  // Send the print string to a Serial Port
   //
   SerialPortWrite ((UINT8 *)Buffer, AsciiStrLen (Buffer));
 }
 
 /**
   Find and display image base address and return image base and its entry point.
-  
+
   @param CurrentEip      Current instruction pointer.
   @param EntryPoint      Return module entry point if module header is found.
-  
+
   @return !0     Image base address.
   @return 0      Image header cannot be found.
 **/
-UINTN 
+UINTN
 FindModuleImageBase (
   IN  UINTN              CurrentEip,
   OUT UINTN              *EntryPoint
@@ -121,7 +167,7 @@ FindModuleImageBase (
 
     //
     // Not found the image base, check the previous aligned address
-    // 
+    //
     Pe32Data -= mImageAlignSize;
   }
 
@@ -141,11 +187,11 @@ FindModuleImageBase (
 
 /**
   Read and save reserved vector information
-  
+
   @param[in]  VectorInfo        Pointer to reserved vector list.
   @param[out] ReservedVector    Pointer to reserved vector data buffer.
   @param[in]  VectorCount       Vector number to be updated.
-  
+
   @return EFI_SUCCESS           Read and save vector info successfully.
   @retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
 

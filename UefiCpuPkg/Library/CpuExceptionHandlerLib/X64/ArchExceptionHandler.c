@@ -1,7 +1,7 @@
 /** @file
   x64 CPU Exception Handler.
 
-  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -118,10 +118,12 @@ DumpCpuContent (
   UINTN                   EntryPoint;
 
   InternalPrintMessage (
-    "!!!! X64 Exception Type - %016lx     CPU Apic ID - %08x !!!!\n",
+    "!!!! X64 Exception Type - %02x(%a)  CPU Apic ID - %08x !!!!\n",
     ExceptionType,
+    GetExceptionNameStr (ExceptionType),
     GetApicId ()
     );
+
   InternalPrintMessage (
     "RIP  - %016lx, CS  - %016lx, RFLAGS - %016lx\n",
     SystemContext.SystemContextX64->Rip,
