@@ -175,7 +175,7 @@ IScsiDhcpExtractRootPath (
     goto ON_EXIT;
   }
 
-  AsciiStrCpy (ConfigNvData->TargetName, Field->Str);
+  AsciiStrCpyS (ConfigNvData->TargetName, ISCSI_NAME_MAX_SIZE, Field->Str);
 
 ON_EXIT:
 

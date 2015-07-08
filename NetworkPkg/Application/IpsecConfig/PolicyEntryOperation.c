@@ -1,7 +1,7 @@
 /** @file
   The implementation of policy entry operation function in IpSecConfig application.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1104,7 +1104,7 @@ CreatePadEntry (
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"--peer-id");
   if (ValueStr != NULL) {
     (*PadId)->PeerIdValid = TRUE;
-    StrnCpy ((CHAR16 *) (*PadId)->Id.PeerId, ValueStr, ARRAY_SIZE ((*PadId)->Id.PeerId) - 1);
+    StrnCpyS ((CHAR16 *) (*PadId)->Id.PeerId, MAX_PEERID_LEN / sizeof (CHAR16), ValueStr, MAX_PEERID_LEN / sizeof (CHAR16) - 1);
     *Mask |= PEER_ID;
   }
 
@@ -1399,7 +1399,7 @@ CombineSpdEntry (
   // Process Data
   //
   if ((Mask & NAME) != 0) {
-    AsciiStrCpy ((CHAR8 *) OldData->Name, (CHAR8 *) NewData->Name);
+    AsciiStrCpyS ((CHAR8 *) OldData->Name, MAX_PEERID_LEN, (CHAR8 *) NewData->Name);
   }
 
   if ((Mask & PACKET_FLAG) != 0) {

@@ -448,14 +448,16 @@ PxeBcUintnToAscDecWithFormat (
 
   @param[in]  Number         Numeric value to be converted.
   @param[in]  Buffer         Pointer to the buffer for ASCII string.
-
+  @param[in]  BufferSize     The maxsize of the buffer.
+  
   @return     Length         The actual length of the ASCII string.
 
 **/
 UINTN
 PxeBcUintnToAscDec (
   IN UINTN               Number,
-  IN UINT8               *Buffer
+  IN UINT8               *Buffer,
+  IN UINTN               BufferSize
   );
 
 /**

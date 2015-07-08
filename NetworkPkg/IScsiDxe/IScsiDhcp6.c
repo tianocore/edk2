@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP6 related configuration routines.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -203,7 +203,7 @@ IScsiDhcp6ExtractRootPath (
     goto ON_EXIT;
   }
 
-  AsciiStrCpy (ConfigNvData->TargetName, Field->Str);
+  AsciiStrCpyS (ConfigNvData->TargetName, ISCSI_NAME_MAX_SIZE, Field->Str);
 
 ON_EXIT:
 

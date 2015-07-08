@@ -2393,7 +2393,7 @@ IScsiFormCallback (
           NULL
           );
       } else {
-        AsciiStrCpy (Private->Current->SessionConfigData.TargetName, IScsiName);
+        AsciiStrCpyS (Private->Current->SessionConfigData.TargetName, ISCSI_NAME_MAX_SIZE, IScsiName);
       }
 
       break;

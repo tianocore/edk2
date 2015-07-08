@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 support functions implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -512,19 +512,22 @@ Mtftp6SendRequest (
 
   Packet->OpCode = HTONS (Operation);
   Cur            = Packet->Rrq.Filename;
-  Cur            = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Token->Filename);
+  Cur            = (UINT8 *) AsciiStrCpyS ((CHAR8 *) Cur, Len - 2, (CHAR8 *) Token->Filename);
   Cur           += AsciiStrLen ((CHAR8 *) Token->Filename) + 1;
-  Cur            = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Mode);
+  Cur            = (UINT8 *) AsciiStrCpyS ((CHAR8 *) Cur, Len - 2 - (AsciiStrLen ((CHAR8 *) Token->Filename) + 1), (CHAR8 *) Mode);
   Cur           += AsciiStrLen ((CHAR8 *) Mode) + 1;
+  Len -= ((UINT32) AsciiStrLen ((CHAR8 *) Token->Filename) + (UINT32) AsciiStrLen ((CHAR8 *) Mode) + 4);
 
   //
   // Copy all the extension options into the packet.
   //
   for (Index = 0; Index < Token->OptionCount; ++Index) {
-    Cur  = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Options[Index].OptionStr);
+    Cur  = (UINT8 *) AsciiStrCpyS ((CHAR8 *) Cur, Len, (CHAR8 *) Options[Index].OptionStr);
     Cur += AsciiStrLen ((CHAR8 *) Options[Index].OptionStr) + 1;
-    Cur  = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Options[Index].ValueStr);
+    Len -= (UINT32)(AsciiStrLen ((CHAR8 *) Options[Index].OptionStr) + 1);
+    Cur  = (UINT8 *) AsciiStrCpyS ((CHAR8 *) Cur, Len, (CHAR8 *) Options[Index].ValueStr);
     Cur += AsciiStrLen ((CHAR8 *) (CHAR8 *) Options[Index].ValueStr) + 1;
+    Len -= (UINT32)(AsciiStrLen ((CHAR8 *) Options[Index].ValueStr) + 1);
   }
 
   //
@@ -584,7 +587,7 @@ Mtftp6SendError (
   TftpError->OpCode          = HTONS (EFI_MTFTP6_OPCODE_ERROR);
   TftpError->Error.ErrorCode = HTONS (ErrCode);
 
-  AsciiStrCpy ((CHAR8 *) TftpError->Error.ErrorMessage, (CHAR8 *) ErrInfo);
+  AsciiStrCpyS ((CHAR8 *) TftpError->Error.ErrorMessage, sizeof (TftpError->Error.ErrorMessage) / sizeof (TftpError->Error.ErrorMessage[0]), (CHAR8 *) ErrInfo);
 
   //
   // Save the packet buf for retransmit

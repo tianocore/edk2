@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with Mtftp for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,7 @@
 #define PXE_MTFTP_OPTION_TSIZE_INDEX       2
 #define PXE_MTFTP_OPTION_MULTICAST_INDEX   3
 #define PXE_MTFTP_OPTION_MAXIMUM_INDEX     4
+#define PXE_MTFTP_OPTBUF_MAXNUM_INDEX      128
 
 #define PXE_MTFTP_ERROR_STRING_LENGTH      127   // refer to definition of struct EFI_PXE_BASE_CODE_TFTP_ERROR.
 #define PXE_MTFTP_DEFAULT_BLOCK_SIZE       512   // refer to rfc-1350.
