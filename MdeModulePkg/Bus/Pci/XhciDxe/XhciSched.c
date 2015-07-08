@@ -1027,7 +1027,7 @@ IsTransferRingTrb (
   @return Whether the result of URB transfer is finialized.
 
 **/
-EFI_STATUS
+BOOLEAN
 XhcCheckUrbResult (
   IN  USB_XHCI_INSTANCE   *Xhc,
   IN  URB                 *Urb
@@ -1058,7 +1058,6 @@ XhcCheckUrbResult (
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
     Urb->Result |= EFI_USB_ERR_SYSTEM;
-    Status       = EFI_DEVICE_ERROR;
     goto EXIT;
   }
 
@@ -1189,7 +1188,7 @@ EXIT:
     XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, XHC_HIGH_32BIT (PhyAddr));
   }
 
-  return Status;
+  return Urb->Finished;
 }
 
 
@@ -1219,6 +1218,7 @@ XhcExecTransfer (
   UINTN                   Loop;
   UINT8                   SlotId;
   UINT8                   Dci;
+  BOOLEAN                 Finished;
 
   if (CmdTransfer) {
     SlotId = 0;
@@ -1241,8 +1241,8 @@ XhcExecTransfer (
   XhcRingDoorBell (Xhc, SlotId, Dci);
 
   for (Index = 0; Index < Loop; Index++) {
-    Status = XhcCheckUrbResult (Xhc, Urb);
-    if (Urb->Finished) {
+    Finished = XhcCheckUrbResult (Xhc, Urb);
+    if (Finished) {
       break;
     }
     gBS->Stall (XHC_1_MICROSECOND);
@@ -1250,6 +1250,9 @@ XhcExecTransfer (
 
   if (Index == Loop) {
     Urb->Result = EFI_USB_ERR_TIMEOUT;
+    Status      = EFI_TIMEOUT;
+  } else if (Urb->Result != EFI_USB_NOERROR) {
+    Status      = EFI_DEVICE_ERROR;
   }
 
   return Status;
