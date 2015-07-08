@@ -203,10 +203,10 @@ StartGaugeEx (
   GaugeEntryExArray[Index].Handle = (EFI_PHYSICAL_ADDRESS) (UINTN) Handle;
 
   if (Token != NULL) {
-    AsciiStrCpyS (GaugeEntryExArray[Index].Token, SMM_PERFORMANCE_STRING_SIZE, Token);
+    AsciiStrnCpyS (GaugeEntryExArray[Index].Token, SMM_PERFORMANCE_STRING_SIZE, Token, SMM_PERFORMANCE_STRING_LENGTH);
   }
   if (Module != NULL) {
-    AsciiStrCpyS (GaugeEntryExArray[Index].Module, SMM_PERFORMANCE_STRING_SIZE, Module);
+    AsciiStrnCpyS (GaugeEntryExArray[Index].Module, SMM_PERFORMANCE_STRING_SIZE, Module, SMM_PERFORMANCE_STRING_LENGTH);
   }
 
   GaugeEntryExArray[Index].EndTimeStamp = 0;

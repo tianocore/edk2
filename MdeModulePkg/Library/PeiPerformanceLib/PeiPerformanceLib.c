@@ -190,10 +190,10 @@ StartPerformanceMeasurementEx (
   LogEntryArray[Index].Handle = (EFI_PHYSICAL_ADDRESS) (UINTN) Handle;
 
   if (Token != NULL) {
-    AsciiStrCpyS (LogEntryArray[Index].Token, PEI_PERFORMANCE_STRING_SIZE, Token);
+    AsciiStrnCpyS (LogEntryArray[Index].Token, PEI_PERFORMANCE_STRING_SIZE, Token, PEI_PERFORMANCE_STRING_LENGTH);
   }
   if (Module != NULL) {
-    AsciiStrCpyS (LogEntryArray[Index].Module, PEI_PERFORMANCE_STRING_SIZE, Module);
+    AsciiStrnCpyS (LogEntryArray[Index].Module, PEI_PERFORMANCE_STRING_SIZE, Module, PEI_PERFORMANCE_STRING_LENGTH);
   }
 
   LogEntryArray[Index].EndTimeStamp = 0;

@@ -201,7 +201,7 @@ GetDriverNameString (
       //
       // Method 2: Get the name string from FFS UI section
       //
-      StrCpyS (mNameString, PROFILE_NAME_STRING_LENGTH + 1, NameString);
+      StrnCpyS (mNameString, PROFILE_NAME_STRING_LENGTH + 1, NameString, PROFILE_NAME_STRING_LENGTH);
       mNameString[PROFILE_NAME_STRING_LENGTH] = 0;
       FreePool (NameString);
       return;
