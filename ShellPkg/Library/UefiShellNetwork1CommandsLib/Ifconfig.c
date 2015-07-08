@@ -517,14 +517,11 @@ IfConfigShowInterfaceInfo (
   IN LIST_ENTRY    *IfList
   )
 {
-  EFI_STATUS                Status;
   LIST_ENTRY                *Entry;
   LIST_ENTRY                *Next;
   IFCONFIG_INTERFACE_CB     *IfCb;
   EFI_IPv4_ADDRESS          Gateway;
   UINT32                    Index;
-
-  Status = EFI_SUCCESS;
 
   if (IsListEmpty (IfList)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_INTERFACE), gShellNetwork1HiiHandle);
