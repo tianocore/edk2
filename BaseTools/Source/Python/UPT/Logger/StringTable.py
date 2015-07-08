@@ -46,8 +46,11 @@ MSG_COPYRIGHT = _("Copyright (c) 2011 - 2015 Intel Corporation All Rights Reserv
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
 MSG_USAGE = _("%s [options]\n%s" % ("UPT", MSG_VERSION_COPYRIGHT))
 MSG_DESCRIPTION = _("The UEFIUPT is used to create, " + \
-                    "install or remove a UEFI Distribution Package.")
-
+                    "install or remove a UEFI Distribution Package. " + \
+                    "If WORKSPACE environment variable is present, " + \
+                    "then UPT will install packages to the location specified by WORKSPACE, " + \
+                    "otherwise UPT will install packages to the current directory. " + \
+                    "Option -n will override this default installation location")
 
 #
 # INF Parser related strings.
@@ -593,6 +596,7 @@ _("The string entry order in UNI file should be <AbstractStrings>, <DescriptionS
 ERR_UNIPARSE_STRTOKEN_FORMAT_ERROR = _("The String Token Type %s must be one of the '_PROMPT', '_HELP' and '_ERR_'.") 
 ERR_UNIPARSE_LINEFEED_UNDER_EXIST = _("Line feed should not exist under this line: %s.")
 ERR_UNIPARSE_LINEFEED_UP_EXIST = _("Line feed should not exist up this line: %s.")
+ERR_UNI_MISS_STRING_ENTRY = _("String entry missed in this Entry, %s.")
 ERR_UNI_MISS_LANGENTRY = _("Language entry missed in this Entry, %s.")
 ERR_BINARY_HEADER_ORDER           = _("Binary header must follow the file header.")
 ERR_NO_SOURCE_HEADER              = _("File header statement \"## @file\" must exist at the first place.")

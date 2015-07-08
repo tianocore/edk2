@@ -721,3 +721,12 @@ def IsValidUserId(UserId):
             return False
     return True
 
+#
+# Check if a UTF16-LE file has a BOM header
+#
+def CheckUTF16FileHeader(File):
+    FileIn = open(File, 'rb').read(2)
+    if FileIn != '\xff\xfe':
+        return False
+
+    return True
