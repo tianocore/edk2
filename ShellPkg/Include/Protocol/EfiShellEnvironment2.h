@@ -320,7 +320,7 @@ EFI_SHELL_INTERFACE*
   );
 
 /**
-  This function determins whether a script file is currently being processed.
+  This function determines whether a script file is currently being processed.
 
   A script file (.nsh file) can contain a series of commands and this is useful to
   know for some shell commands whether they are being run manually or as part of a
@@ -420,7 +420,7 @@ UINT32
   );
 
 /**
-  This function determins if the shell application should break.
+  This function determines if the shell application should break.
 
   This is used to inform a shell application that a break condition has been
   initiated.  Long loops should check this to prevent delays to the break.
@@ -455,7 +455,7 @@ VOID
   );
 
 /**
-  This function determins if the caller is running under the root shell.
+  This function determines if the caller is running under the root shell.
 
   @retval TRUE                  The caller is running under the root shell.
   @retval FALSE                 The caller is not running under the root shell.

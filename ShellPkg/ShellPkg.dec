@@ -98,7 +98,7 @@
   ## This is the character count for allocation for consistent mappings
   gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength|50|UINT8|0x00000009
 
-  ## This determins how many bytes are read out of files at a time for file operations (type, copy, etc...)
+  ## This determines how many bytes are read out of files at a time for file operations (type, copy, etc...)
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|1000|UINT32|0x0000000A
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
@@ -106,13 +106,13 @@
   #  If TRUE the shell will produce EFI_SHELL_ENVIRONMENT2 and EFI_SHELL_INTERFACE
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols|FALSE|BOOLEAN|0x00000002
 
-  ## this flag determins whether Page Break (-b) defaults to on or off in the shell
+  ## this flag determines whether Page Break (-b) defaults to on or off in the shell
   gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault|FALSE|BOOLEAN|0x00000006
 
-  ## this flag determins whether insert mode for typing is default (FALSE means typeover)
+  ## this flag determines whether insert mode for typing is default (FALSE means typeover)
   gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault|TRUE|BOOLEAN|0x00000007
 
-  ## this flag determins the default number of screens kept for history log.
+  ## this flag determines the default number of screens kept for history log.
   #  the spec defines 3 as the minimum
   gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount|3|UINT8|0x00000008
 

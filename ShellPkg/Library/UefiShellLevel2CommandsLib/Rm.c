@@ -188,7 +188,7 @@ CascadeDelete(
 }
 
 /**
-  Determins if a Node is a valid delete target.  Will prevent deleting the root directory.
+  Determines if a Node is a valid delete target.  Will prevent deleting the root directory.
 
   @param[in] List       RESERVED.  Not used.
   @param[in] Node       The node to analyze.

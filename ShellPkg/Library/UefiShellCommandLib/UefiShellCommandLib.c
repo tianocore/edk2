@@ -892,7 +892,7 @@ ShellCommandIsOnAliasList(
 }
 
 /**
-  Function to determine current state of ECHO.  Echo determins if lines from scripts
+  Function to determine current state of ECHO.  Echo determines if lines from scripts
   and ECHO commands are enabled.
 
   @retval TRUE    Echo is currently enabled
@@ -908,7 +908,7 @@ ShellCommandGetEchoState(
 }
 
 /**
-  Function to set current state of ECHO.  Echo determins if lines from scripts
+  Function to set current state of ECHO.  Echo determines if lines from scripts
   and ECHO commands are enabled.
 
   If State is TRUE, Echo will be enabled.
