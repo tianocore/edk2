@@ -1,7 +1,7 @@
 /** @file
   Provide IPsec Key Exchange (IKE) service general interfaces.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -212,15 +212,15 @@ IkeOpenOutputUdp (
   IN EFI_IP_ADDRESS            *RemoteIp
   )
 {
-  EFI_STATUS              Status;
-  EFI_IP4_CONFIG_PROTOCOL *Ip4Cfg;
-  EFI_IP4_IPCONFIG_DATA   *Ip4CfgData;
-  UINTN                   BufSize;
-  EFI_IP6_MODE_DATA       Ip6ModeData;
-  EFI_UDP6_PROTOCOL       *Udp6;
+  EFI_STATUS                       Status;
+  EFI_IP4_CONFIG2_PROTOCOL         *Ip4Cfg2;
+  EFI_IP4_CONFIG2_INTERFACE_INFO   *IfInfo;
+  UINTN                            BufSize;
+  EFI_IP6_MODE_DATA                Ip6ModeData;
+  EFI_UDP6_PROTOCOL                *Udp6;
 
   Status      = EFI_SUCCESS;
-  Ip4CfgData  = NULL;
+  IfInfo      = NULL;
   BufSize     = 0;
 
   //
@@ -236,35 +236,52 @@ IkeOpenOutputUdp (
     //
     Status = gBS->HandleProtocol (
                     UdpService->NicHandle,
-                    &gEfiIp4ConfigProtocolGuid,
-                    (VOID **) &Ip4Cfg
+                    &gEfiIp4Config2ProtocolGuid,
+                    (VOID **) &Ip4Cfg2
                     );
 
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
 
-    Status = Ip4Cfg->GetData (Ip4Cfg, &BufSize, NULL);
+    //
+    // Get the interface information size.
+    //
+    Status = Ip4Cfg2->GetData (
+                       Ip4Cfg2,
+                       Ip4Config2DataTypeInterfaceInfo,
+                       &BufSize,
+                       NULL
+                       );
 
     if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
       goto ON_EXIT;
     }
 
-    Ip4CfgData = AllocateZeroPool (BufSize);
+    IfInfo = AllocateZeroPool (BufSize);
 
-    if (Ip4CfgData == NULL) {
+    if (IfInfo == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
 
-    Status = Ip4Cfg->GetData (Ip4Cfg, &BufSize, Ip4CfgData);
+    //
+    // Get the interface info.
+    //
+    Status = Ip4Cfg2->GetData (
+                       Ip4Cfg2,
+                       Ip4Config2DataTypeInterfaceInfo,
+                       &BufSize,
+                       IfInfo
+                       );
+    
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
 
     CopyMem (
       &UdpService->DefaultAddress.v4,
-      &Ip4CfgData->StationAddress,
+      &IfInfo->StationAddress,
       sizeof (EFI_IPv4_ADDRESS)
       );
 
@@ -331,8 +348,8 @@ IkeOpenOutputUdp (
   UdpService->IsConfigured = TRUE;
 
 ON_EXIT:
-  if (Ip4CfgData != NULL) {
-    FreePool (Ip4CfgData);
+  if (IfInfo != NULL) {
+    FreePool (IfInfo);
   }
 
   return Status;

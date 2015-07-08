@@ -18,7 +18,7 @@
 
 #include <Protocol/Udp4.h>
 #include <Protocol/Udp6.h>
-#include <Protocol/Ip4Config.h>
+#include <Protocol/Ip4Config2.h>
  
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
