@@ -159,24 +159,18 @@ PublishTables (
   // Add the RSD_PTR to the system table and store that we have installed the
   // tables.
   //
-  if (((Version & EFI_ACPI_TABLE_VERSION_1_0B) != 0) &&
-      !AcpiTableInstance->TablesInstalled1) {
+  if ((Version & EFI_ACPI_TABLE_VERSION_1_0B) != 0) {
     Status = gBS->InstallConfigurationTable (&gEfiAcpi10TableGuid, AcpiTableInstance->Rsdp1);
     if (EFI_ERROR (Status)) {
       return EFI_ABORTED;
     }
-
-    AcpiTableInstance->TablesInstalled1 = TRUE;
   }
 
-  if (((Version & ACPI_TABLE_VERSION_GTE_2_0) != 0) &&
-      !AcpiTableInstance->TablesInstalled3) {
+  if ((Version & ACPI_TABLE_VERSION_GTE_2_0) != 0) {
     Status = gBS->InstallConfigurationTable (&gEfiAcpiTableGuid, AcpiTableInstance->Rsdp3);
     if (EFI_ERROR (Status)) {
       return EFI_ABORTED;
     }
-
-    AcpiTableInstance->TablesInstalled3= TRUE;
   }
 
   return EFI_SUCCESS;

@@ -114,8 +114,6 @@ typedef struct {
   UINTN                                         NumberOfTableEntries1;  // Number of ACPI 1.0 tables
   UINTN                                         NumberOfTableEntries3;  // Number of ACPI 3.0 tables
   UINTN                                         CurrentHandle;
-  BOOLEAN                                       TablesInstalled1;       // ACPI 1.0 tables published
-  BOOLEAN                                       TablesInstalled3;       // ACPI 3.0 tables published
   EFI_ACPI_TABLE_PROTOCOL                       AcpiTableProtocol;
   EFI_ACPI_SDT_PROTOCOL                         AcpiSdtProtocol;
   LIST_ENTRY                                    NotifyList;
