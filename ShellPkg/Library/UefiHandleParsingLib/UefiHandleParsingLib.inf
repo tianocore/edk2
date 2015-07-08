@@ -117,6 +117,7 @@
   gEfiIp4ServiceBindingProtocolGuid                       ## UNDEFINED
   gEfiIp4ProtocolGuid                                     ## UNDEFINED
   gEfiIp4ConfigProtocolGuid                               ## UNDEFINED
+  gEfiIp4Config2ProtocolGuid                              ## UNDEFINED
   gEfiUdp4ServiceBindingProtocolGuid                      ## UNDEFINED
   gEfiUdp4ProtocolGuid                                    ## UNDEFINED
   gEfiMtftp4ServiceBindingProtocolGuid                    ## UNDEFINED

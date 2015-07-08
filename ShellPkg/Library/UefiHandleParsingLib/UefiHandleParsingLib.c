@@ -2,7 +2,7 @@
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -909,6 +909,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_IPV4_SB),               &gEfiIp4ServiceBindingProtocolGuid,               NULL},
   {STRING_TOKEN(STR_IPV4),                  &gEfiIp4ProtocolGuid,                             NULL},
   {STRING_TOKEN(STR_IPV4_CFG),              &gEfiIp4ConfigProtocolGuid,                       NULL},
+  {STRING_TOKEN(STR_IPV4_CFG2),             &gEfiIp4Config2ProtocolGuid,                      NULL},
   {STRING_TOKEN(STR_UDPV4_SB),              &gEfiUdp4ServiceBindingProtocolGuid,              NULL},
   {STRING_TOKEN(STR_UDPV4),                 &gEfiUdp4ProtocolGuid,                            NULL},
   {STRING_TOKEN(STR_MTFTPV4_SB),            &gEfiMtftp4ServiceBindingProtocolGuid,            NULL},
