@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to Ip4.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -487,10 +487,10 @@ Ip4DeviceExtractConfig (
     *Results = AllocateZeroPool (Size * sizeof (CHAR16));
     ASSERT (*Results != NULL);
     StrPointer  = *Results;
-    StrCpy (StrPointer, DeviceResult);
+    StrCpyS (StrPointer, Size, DeviceResult);
     StrPointer  = StrPointer + StrLen (StrPointer);
     *StrPointer = L'&';
-    StrCpy (StrPointer + 1, FormResult);
+    StrCpyS (StrPointer + 1, StrLen (FormResult) + 1, FormResult);
     FreePool (DeviceResult);
     FreePool (FormResult);
   } else if (HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {

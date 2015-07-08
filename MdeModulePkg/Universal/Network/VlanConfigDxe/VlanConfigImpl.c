@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of VLAN configuration module.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -412,17 +412,17 @@ VlanUpdateForm (
   for (Index = 0; Index < NumberOfVlan; Index++) {
     String = VlanStr;
 
-    StrCpy (String, L"  VLAN ID:");
+    StrCpyS (String, (sizeof (VlanStr) /sizeof (CHAR16)), L"  VLAN ID:");
     String += 10;
     //
     // Pad VlanId string up to 4 characters with space
     //
     DigitalCount = UnicodeValueToString (VlanIdStr, 0, VlanData[Index].VlanId, 5);
     SetMem16 (String, (4 - DigitalCount) * sizeof (CHAR16), L' ');
-    StrCpy (String + 4 - DigitalCount, VlanIdStr);
+    StrCpyS (String + 4 - DigitalCount, (sizeof (VlanStr) /sizeof (CHAR16)) - 10 - (4 - DigitalCount), VlanIdStr);
     String += 4;
 
-    StrCpy (String, L", Priority:");
+    StrCpyS (String,  (sizeof (VlanStr) /sizeof (CHAR16)) - 10 - (4 - DigitalCount) - 4, L", Priority:");
     String += 11;
     String += UnicodeValueToString (String, 0, VlanData[Index].Priority, 4);
     *String = 0;
@@ -559,9 +559,9 @@ InstallVlanConfigForm (
   }
   PrivateData->MacString = MacString;
 
-  StrCpy (Str, L"VLAN Configuration (MAC:");
-  StrnCat (Str, MacString, sizeof (EFI_MAC_ADDRESS) * 2);
-  StrCat (Str, L")");
+  StrCpyS (Str, sizeof (Str) / sizeof (CHAR16), L"VLAN Configuration (MAC:");
+  StrCatS (Str, sizeof (Str) / sizeof (CHAR16), MacString);
+  StrCatS (Str, sizeof (Str) / sizeof (CHAR16), L")");
   HiiSetString (
     HiiHandle,
     STRING_TOKEN (STR_VLAN_FORM_SET_TITLE_HELP),

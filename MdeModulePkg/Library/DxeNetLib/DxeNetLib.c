@@ -3230,7 +3230,7 @@ NetLibIp6ToStr (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  StrCpy (String, Buffer);
+  StrCpyS (String, StringSize / sizeof (CHAR16), Buffer);
 
   return EFI_SUCCESS;
 }
