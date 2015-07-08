@@ -553,7 +553,7 @@ XhcPeiIsTransferRingTrb (
   @return Whether the result of URB transfer is finialized.
 
 **/
-EFI_STATUS
+BOOLEAN
 XhcPeiCheckUrbResult (
   IN PEI_XHC_DEV            *Xhc,
   IN URB                    *Urb
@@ -582,7 +582,6 @@ XhcPeiCheckUrbResult (
 
   if (XhcPeiIsHalt (Xhc) || XhcPeiIsSysError (Xhc)) {
     Urb->Result |= EFI_USB_ERR_SYSTEM;
-    Status       = EFI_DEVICE_ERROR;
     goto EXIT;
   }
 
@@ -711,7 +710,7 @@ EXIT:
     XhcPeiWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, XHC_HIGH_32BIT (PhyAddr));
   }
 
-  return Status;
+  return Urb->Finished;
 }
 
 /**
@@ -740,6 +739,7 @@ XhcPeiExecTransfer (
   UINTN         Loop;
   UINT8         SlotId;
   UINT8         Dci;
+  BOOLEAN       Finished;
 
   if (CmdTransfer) {
     SlotId = 0;
@@ -761,8 +761,8 @@ XhcPeiExecTransfer (
   XhcPeiRingDoorBell (Xhc, SlotId, Dci);
 
   for (Index = 0; Index < Loop; Index++) {
-    Status = XhcPeiCheckUrbResult (Xhc, Urb);
-    if (Urb->Finished) {
+    Finished = XhcPeiCheckUrbResult (Xhc, Urb);
+    if (Finished) {
       break;
     }
     MicroSecondDelay (XHC_1_MICROSECOND);
@@ -770,6 +770,9 @@ XhcPeiExecTransfer (
 
   if (Index == Loop) {
     Urb->Result = EFI_USB_ERR_TIMEOUT;
+    Status      = EFI_TIMEOUT;
+  } else if (Urb->Result != EFI_USB_NOERROR) {
+    Status      = EFI_DEVICE_ERROR;
   }
 
   return Status;
