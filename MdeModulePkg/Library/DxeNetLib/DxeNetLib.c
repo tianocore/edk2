@@ -1,7 +1,7 @@
 /** @file
   Network library.
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,12 +19,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/ManagedNetwork.h>
-#include <Protocol/HiiConfigRouting.h>
+#include <Protocol/Ip4Config2.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
-#include <Protocol/HiiConfigAccess.h>
 
-#include <Guid/NicIp4ConfigNvData.h>
 #include <Guid/SmBios.h>
 
 #include <Library/NetLib.h>
@@ -35,7 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
 
@@ -1687,86 +1684,6 @@ NetMapIterate (
 
 
 /**
-  Internal function to get the child handle of the NIC handle.
-
-  @param[in]   Controller    NIC controller handle.
-  @param[out]  ChildHandle   Returned child handle.
-
-  @retval EFI_SUCCESS        Successfully to get child handle.
-  @retval Others             Failed to get child handle.
-
-**/
-EFI_STATUS
-NetGetChildHandle (
-  IN EFI_HANDLE         Controller,
-  OUT EFI_HANDLE        *ChildHandle
-  )
-{
-  EFI_STATUS                 Status;
-  EFI_HANDLE                 *Handles;
-  UINTN                      HandleCount;
-  UINTN                      Index;
-  EFI_DEVICE_PATH_PROTOCOL   *ChildDeviceDevicePath;
-  VENDOR_DEVICE_PATH         *VendorDeviceNode;
-
-  //
-  // Locate all EFI Hii Config Access protocols
-  //
-  Status = gBS->LocateHandleBuffer (
-                 ByProtocol,
-                 &gEfiHiiConfigAccessProtocolGuid,
-                 NULL,
-                 &HandleCount,
-                 &Handles
-                 );
-  if (EFI_ERROR (Status) || (HandleCount == 0)) {
-    return Status;
-  }
-
-  Status = EFI_NOT_FOUND;
-
-  for (Index = 0; Index < HandleCount; Index++) {
-
-    Status = EfiTestChildHandle (Controller, Handles[Index], &gEfiManagedNetworkServiceBindingProtocolGuid);
-    if (!EFI_ERROR (Status)) {
-      //
-      // Get device path on the child handle
-      //
-      Status = gBS->HandleProtocol (
-                     Handles[Index],
-                     &gEfiDevicePathProtocolGuid,
-                     (VOID **) &ChildDeviceDevicePath
-                     );
-
-      if (!EFI_ERROR (Status)) {
-        while (!IsDevicePathEnd (ChildDeviceDevicePath)) {
-          ChildDeviceDevicePath = NextDevicePathNode (ChildDeviceDevicePath);
-          //
-          // Parse one instance
-          //
-          if (ChildDeviceDevicePath->Type == HARDWARE_DEVICE_PATH &&
-              ChildDeviceDevicePath->SubType == HW_VENDOR_DP) {
-            VendorDeviceNode = (VENDOR_DEVICE_PATH *) ChildDeviceDevicePath;
-            if (CompareMem (&VendorDeviceNode->Guid, &gEfiNicIp4ConfigVariableGuid, sizeof (EFI_GUID)) == 0) {
-              //
-              // Found item matched gEfiNicIp4ConfigVariableGuid
-              //
-              *ChildHandle = Handles[Index];
-              FreePool (Handles);
-              return EFI_SUCCESS;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  FreePool (Handles);
-  return Status;
-}
-
-
-/**
   This is the default unload handle for all the network drivers.
 
   Disconnect the driver specified by ImageHandle from all the devices in the handle database.
@@ -2564,12 +2481,11 @@ Exit:
   Check the default address used by the IPv4 driver is static or dynamic (acquired
   from DHCP).
 
-  If the controller handle does not have the NIC Ip4 Config Protocol installed, the
-  default address is static. If the EFI variable to save the configuration is not found,
-  the default address is static. Otherwise, get the result from the EFI variable which
-  saving the configuration.
+  If the controller handle does not have the EFI_IP4_CONFIG2_PROTOCOL installed, the
+  default address is static. If failed to get the policy from Ip4 Config2 Protocol, 
+  the default address is static. Otherwise, get the result from Ip4 Config2 Protocol.
 
-  @param[in]   Controller     The controller handle which has the NIC Ip4 Config Protocol
+  @param[in]   Controller     The controller handle which has the EFI_IP4_CONFIG2_PROTOCOL 
                               relative with the default address to judge.
 
   @retval TRUE           If the default address is static.
@@ -2582,107 +2498,34 @@ NetLibDefaultAddressIsStatic (
   )
 {
   EFI_STATUS                       Status;
-  EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
-  UINTN                            Len;
-  NIC_IP4_CONFIG_INFO              *ConfigInfo;
+  EFI_IP4_CONFIG2_PROTOCOL         *Ip4Config2;
+  UINTN                            DataSize;  
+  EFI_IP4_CONFIG2_POLICY           Policy;
   BOOLEAN                          IsStatic;
-  EFI_STRING                       ConfigHdr;
-  EFI_STRING                       ConfigResp;
-  EFI_STRING                       AccessProgress;
-  EFI_STRING                       AccessResults;
-  EFI_STRING                       String;
-  EFI_HANDLE                       ChildHandle;
 
-  ConfigInfo       = NULL;
-  ConfigHdr        = NULL;
-  ConfigResp       = NULL;
-  AccessProgress   = NULL;
-  AccessResults    = NULL;
-  IsStatic         = TRUE;
+  Ip4Config2 = NULL;
+  
+  DataSize = sizeof (EFI_IP4_CONFIG2_POLICY);
 
-  Status = gBS->LocateProtocol (
-                  &gEfiHiiConfigRoutingProtocolGuid,
-                  NULL,
-                  (VOID **) &HiiConfigRouting
-                  );
-  if (EFI_ERROR (Status)) {
-    return TRUE;
-  }
-
-  Status = NetGetChildHandle (Controller, &ChildHandle);
-  if (EFI_ERROR (Status)) {
-    return TRUE;
-  }
+  IsStatic   = TRUE;
 
   //
-  // Construct config request string header
+  // Get Ip4Config2 policy.
   //
-  ConfigHdr = HiiConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, ChildHandle);
-  if (ConfigHdr == NULL) {
-    return TRUE;
-  }
-
-  Len = StrLen (ConfigHdr);
-  ConfigResp = AllocateZeroPool ((Len + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
-  if (ConfigResp == NULL) {
-    goto ON_EXIT;
-  }
-  StrCpy (ConfigResp, ConfigHdr);
-
-  String = ConfigResp + Len;
-  UnicodeSPrint (
-    String,
-    (8 + 4 + 7 + 4 + 1) * sizeof (CHAR16),
-    L"&OFFSET=%04X&WIDTH=%04X",
-    OFFSET_OF (NIC_IP4_CONFIG_INFO, Source),
-    sizeof (UINT32)
-    );
-
-  Status = HiiConfigRouting->ExtractConfig (
-                               HiiConfigRouting,
-                               ConfigResp,
-                               &AccessProgress,
-                               &AccessResults
-                               );
+  Status = gBS->HandleProtocol (Controller, &gEfiIp4Config2ProtocolGuid, (VOID **) &Ip4Config2);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
 
-  ConfigInfo = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
-  if (ConfigInfo == NULL) {
-    goto ON_EXIT;
-  }
-
-  ConfigInfo->Source = IP4_CONFIG_SOURCE_STATIC;
-  Len = NIC_ITEM_CONFIG_SIZE;
-  Status = HiiConfigRouting->ConfigToBlock (
-                               HiiConfigRouting,
-                               AccessResults,
-                               (UINT8 *) ConfigInfo,
-                               &Len,
-                               &AccessProgress
-                               );
+  Status = Ip4Config2->GetData (Ip4Config2, Ip4Config2DataTypePolicy, &DataSize, &Policy);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-
-  IsStatic = (BOOLEAN) (ConfigInfo->Source == IP4_CONFIG_SOURCE_STATIC);
+  
+  IsStatic = (BOOLEAN) (Policy == Ip4Config2PolicyStatic);
 
 ON_EXIT:
-
-  if (AccessResults != NULL) {
-    FreePool (AccessResults);
-  }
-  if (ConfigInfo != NULL) {
-    FreePool (ConfigInfo);
-  }
-  if (ConfigResp != NULL) {
-    FreePool (ConfigResp);
-  }
-  if (ConfigHdr != NULL) {
-    FreePool (ConfigHdr);
-  }
-
+  
   return IsStatic;
 }
 

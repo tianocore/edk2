@@ -47,21 +47,19 @@
   UefiLib
   MemoryAllocationLib
   DevicePathLib
-  HiiLib
   PrintLib
 
+
 [Guids]
-  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr EFI_NIC_IP4_CONFIG_VARIABLE
-  ## UNDEFINED # Device Path Node 
-  gEfiNicIp4ConfigVariableGuid                  
   gEfiSmbiosTableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
+
 
 [Protocols]
   gEfiSimpleNetworkProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiManagedNetworkProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiManagedNetworkServiceBindingProtocolGuid  ## SOMETIMES_CONSUMES
+  gEfiIp4Config2ProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMES
-  gEfiHiiConfigRoutingProtocolGuid              ## SOMETIMES_CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_CONSUMES
-
+  gEfiHttpProtocolGuid
+  gEfiHttpServiceBindingProtocolGuid
