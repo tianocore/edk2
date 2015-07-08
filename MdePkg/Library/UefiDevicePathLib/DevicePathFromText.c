@@ -3111,6 +3111,206 @@ DevPathFromTextRelativeOffsetRange (
   return (EFI_DEVICE_PATH_PROTOCOL *) Offset;
 }
 
+/**
+  Converts a text device path node to text ram disk device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Text device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextRamDisk (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                                  *StartingAddrStr;
+  CHAR16                                  *EndingAddrStr;
+  CHAR16                                  *TypeGuidStr;
+  CHAR16                                  *InstanceStr;
+  MEDIA_RAM_DISK_DEVICE_PATH              *RamDisk;
+  UINT64                                  StartingAddr;
+  UINT64                                  EndingAddr;
+
+  StartingAddrStr = GetNextParamStr (&TextDeviceNode);
+  EndingAddrStr   = GetNextParamStr (&TextDeviceNode);
+  InstanceStr     = GetNextParamStr (&TextDeviceNode);
+  TypeGuidStr     = GetNextParamStr (&TextDeviceNode);
+  RamDisk         = (MEDIA_RAM_DISK_DEVICE_PATH *) CreateDeviceNode (
+                                                     MEDIA_DEVICE_PATH,
+                                                     MEDIA_RAM_DISK_DP,
+                                                     (UINT16) sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
+                                                     );
+
+  Strtoi64 (StartingAddrStr, &StartingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  Strtoi64 (EndingAddrStr, &EndingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
+  StrToGuid (TypeGuidStr, &RamDisk->TypeGuid);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) RamDisk;
+}
+
+/**
+  Converts a text device path node to text virtual disk device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Text device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextVirtualDisk (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                                  *StartingAddrStr;
+  CHAR16                                  *EndingAddrStr;
+  CHAR16                                  *InstanceStr;
+  MEDIA_RAM_DISK_DEVICE_PATH              *RamDisk;
+  UINT64                                  StartingAddr;
+  UINT64                                  EndingAddr;
+
+  StartingAddrStr = GetNextParamStr (&TextDeviceNode);
+  EndingAddrStr   = GetNextParamStr (&TextDeviceNode);
+  InstanceStr     = GetNextParamStr (&TextDeviceNode);
+
+  RamDisk         = (MEDIA_RAM_DISK_DEVICE_PATH *) CreateDeviceNode (
+                                                     MEDIA_DEVICE_PATH,
+                                                     MEDIA_RAM_DISK_DP,
+                                                     (UINT16) sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
+                                                     );
+
+  Strtoi64 (StartingAddrStr, &StartingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  Strtoi64 (EndingAddrStr, &EndingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
+  CopyGuid (&RamDisk->TypeGuid, &gEfiVirtualDiskGuid);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) RamDisk;
+}
+
+/**
+  Converts a text device path node to text virtual cd device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Text device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextVirtualCd (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                                  *StartingAddrStr;
+  CHAR16                                  *EndingAddrStr;
+  CHAR16                                  *InstanceStr;
+  MEDIA_RAM_DISK_DEVICE_PATH              *RamDisk;
+  UINT64                                  StartingAddr;
+  UINT64                                  EndingAddr;
+
+  StartingAddrStr = GetNextParamStr (&TextDeviceNode);
+  EndingAddrStr   = GetNextParamStr (&TextDeviceNode);
+  InstanceStr     = GetNextParamStr (&TextDeviceNode);
+
+  RamDisk         = (MEDIA_RAM_DISK_DEVICE_PATH *) CreateDeviceNode (
+                                                     MEDIA_DEVICE_PATH,
+                                                     MEDIA_RAM_DISK_DP,
+                                                     (UINT16) sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
+                                                     );
+
+  Strtoi64 (StartingAddrStr, &StartingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  Strtoi64 (EndingAddrStr, &EndingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
+  CopyGuid (&RamDisk->TypeGuid, &gEfiVirtualCdGuid);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) RamDisk;
+}
+
+/**
+  Converts a text device path node to text persistent virtual disk device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Text device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextPersistentVirtualDisk (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                                  *StartingAddrStr;
+  CHAR16                                  *EndingAddrStr;
+  CHAR16                                  *InstanceStr;
+  MEDIA_RAM_DISK_DEVICE_PATH              *RamDisk;
+  UINT64                                  StartingAddr;
+  UINT64                                  EndingAddr;
+
+  StartingAddrStr = GetNextParamStr (&TextDeviceNode);
+  EndingAddrStr   = GetNextParamStr (&TextDeviceNode);
+  InstanceStr     = GetNextParamStr (&TextDeviceNode);
+
+  RamDisk         = (MEDIA_RAM_DISK_DEVICE_PATH *) CreateDeviceNode (
+                                                     MEDIA_DEVICE_PATH,
+                                                     MEDIA_RAM_DISK_DP,
+                                                     (UINT16) sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
+                                                     );
+
+  Strtoi64 (StartingAddrStr, &StartingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  Strtoi64 (EndingAddrStr, &EndingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
+  CopyGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualDiskGuid);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) RamDisk;
+}
+
+/**
+  Converts a text device path node to text persistent virtual cd device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Text device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextPersistentVirtualCd (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                                  *StartingAddrStr;
+  CHAR16                                  *EndingAddrStr;
+  CHAR16                                  *InstanceStr;
+  MEDIA_RAM_DISK_DEVICE_PATH              *RamDisk;
+  UINT64                                  StartingAddr;
+  UINT64                                  EndingAddr;
+
+  StartingAddrStr = GetNextParamStr (&TextDeviceNode);
+  EndingAddrStr   = GetNextParamStr (&TextDeviceNode);
+  InstanceStr     = GetNextParamStr (&TextDeviceNode);
+
+  RamDisk         = (MEDIA_RAM_DISK_DEVICE_PATH *) CreateDeviceNode (
+                                                     MEDIA_DEVICE_PATH,
+                                                     MEDIA_RAM_DISK_DP,
+                                                     (UINT16) sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
+                                                     );
+
+  Strtoi64 (StartingAddrStr, &StartingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  Strtoi64 (EndingAddrStr, &EndingAddr);
+  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
+  CopyGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualCdGuid);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) RamDisk;
+}
 
 /**
   Converts a BBS text device path node to BBS device path structure.
@@ -3292,6 +3492,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Fv",                      DevPathFromTextFv                      },
   {L"FvFile",                  DevPathFromTextFvFile                  },
   {L"Offset",                  DevPathFromTextRelativeOffsetRange     },
+  {L"RamDisk",                 DevPathFromTextRamDisk                 },
+  {L"VirtualDisk",             DevPathFromTextVirtualDisk             },
+  {L"VirtualCD",               DevPathFromTextVirtualCd               },
+  {L"PersistentVirtualDisk",   DevPathFromTextPersistentVirtualDisk   },
+  {L"PersistentVirtualCD",     DevPathFromTextPersistentVirtualCd     },
 
   {L"BbsPath",                 DevPathFromTextBbsPath                 },
   {L"BBS",                     DevPathFromTextBBS                     },

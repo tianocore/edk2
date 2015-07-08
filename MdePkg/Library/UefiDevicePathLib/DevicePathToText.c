@@ -1858,6 +1858,75 @@ DevPathRelativeOffsetRange (
 }
 
 /**
+  Converts a Ram Disk device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextRamDisk (
+  IN OUT POOL_PRINT       *Str,
+  IN VOID                 *DevPath,
+  IN BOOLEAN              DisplayOnly,
+  IN BOOLEAN              AllowShortcuts
+  )
+{
+  MEDIA_RAM_DISK_DEVICE_PATH *RamDisk;
+
+  RamDisk = DevPath;
+
+  if (CompareGuid (&RamDisk->TypeGuid, &gEfiVirtualDiskGuid)) {
+    UefiDevicePathLibCatPrint (
+      Str,
+      L"VirtualDisk(0x%lx,0x%lx,%d)",
+      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      RamDisk->Instance
+      );
+  } else if (CompareGuid (&RamDisk->TypeGuid, &gEfiVirtualCdGuid)) {
+    UefiDevicePathLibCatPrint (
+      Str,
+      L"VirtualCD(0x%lx,0x%lx,%d)",
+      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      RamDisk->Instance
+      );
+  } else if (CompareGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualDiskGuid)) {
+    UefiDevicePathLibCatPrint (
+      Str,
+      L"PersistentVirtualDisk(0x%lx,0x%lx,%d)",
+      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      RamDisk->Instance
+      );
+  } else if (CompareGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualCdGuid)) {
+    UefiDevicePathLibCatPrint (
+      Str,
+      L"PersistentVirtualCD(0x%lx,0x%lx,%d)",
+      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      RamDisk->Instance
+      );
+  } else {
+    UefiDevicePathLibCatPrint (
+      Str,
+      L"RamDisk(0x%lx,0x%lx,%d,%g)",
+      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      RamDisk->Instance,
+      &RamDisk->TypeGuid
+      );
+  }
+}
+
+/**
   Converts a BIOS Boot Specification device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -2057,6 +2126,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE mUefiDevicePathLib
   {MEDIA_DEVICE_PATH,     MEDIA_PIWG_FW_VOL_DP,             DevPathToTextFv             },
   {MEDIA_DEVICE_PATH,     MEDIA_PIWG_FW_FILE_DP,            DevPathToTextFvFile         },
   {MEDIA_DEVICE_PATH,     MEDIA_RELATIVE_OFFSET_RANGE_DP,   DevPathRelativeOffsetRange  },
+  {MEDIA_DEVICE_PATH,     MEDIA_RAM_DISK_DP,                DevPathToTextRamDisk        },
   {BBS_DEVICE_PATH,       BBS_BBS_DP,                       DevPathToTextBBS            },
   {END_DEVICE_PATH_TYPE,  END_INSTANCE_DEVICE_PATH_SUBTYPE, DevPathToTextEndInstance    },
   {0, 0, NULL}
