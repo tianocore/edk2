@@ -81,6 +81,12 @@ TERMINAL_DEV  mTerminalDevTemplate = {
   NULL, // TwoSecondTimeOut
   INPUT_STATE_DEFAULT,
   RESET_STATE_DEFAULT,
+  {
+      0,
+      0,
+      0
+  },
+  0,
   FALSE,
   {   // SimpleTextInputEx
     TerminalConInResetEx,

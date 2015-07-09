@@ -99,6 +99,8 @@ typedef struct {
   EFI_EVENT                           TwoSecondTimeOut;
   UINT32                              InputState;
   UINT32                              ResetState;
+  UINT16                              TtyEscapeStr[3];
+  INTN                                TtyEscapeIndex;
 
   //
   // Esc could not be output to the screen by user,
@@ -118,6 +120,7 @@ typedef struct {
 #define INPUT_STATE_LEFTOPENBRACKET       0x04
 #define INPUT_STATE_O                     0x08
 #define INPUT_STATE_2                     0x10
+#define INPUT_STATE_LEFTOPENBRACKET_2     0x20
 
 #define RESET_STATE_DEFAULT               0x00
 #define RESET_STATE_ESC_R                 0x01
