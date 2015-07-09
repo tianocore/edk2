@@ -2506,7 +2506,7 @@ ShellCommandLineGetCount(
 }
 
 /**
-  Determins if a parameter is duplicated.
+  Determines if a parameter is duplicated.
 
   If Param is not NULL then it will point to a callee allocated string buffer
   with the parameter value if a duplicate is found.
