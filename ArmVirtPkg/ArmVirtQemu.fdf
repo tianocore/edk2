@@ -169,7 +169,7 @@ READ_LOCK_STATUS   = TRUE
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-!ifdef INTEL_BDS
+!if $(INTEL_BDS) == TRUE
   INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
@@ -227,7 +227,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 
-!ifdef INTEL_BDS
+!if $(INTEL_BDS) == TRUE
   #
   # TianoCore logo (splash screen)
   #

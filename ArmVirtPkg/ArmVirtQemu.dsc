@@ -57,7 +57,7 @@
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   NorFlashPlatformLib|ArmVirtPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
 
-!ifdef INTEL_BDS
+!if $(INTEL_BDS) == TRUE
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   PlatformBdsLib|ArmVirtPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
@@ -138,8 +138,13 @@
   #
   # Settings for ARM BDS -- use the serial console (ConIn & ConOut).
   #
+!if $(TTY_TERMINAL) == TRUE
+  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenMsg(7D916D80-5BB1-458C-A48F-E25FDD51EF94)"
+  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenMsg(7D916D80-5BB1-458C-A48F-E25FDD51EF94)"
+!else
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
+!endif
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
   #
@@ -163,7 +168,7 @@
   # initial location of the device tree blob passed by QEMU -- base of DRAM
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x40000000
 
-!ifdef INTEL_BDS
+!if $(INTEL_BDS) == TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
 !endif
@@ -313,7 +318,7 @@
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-!ifdef INTEL_BDS
+!if $(INTEL_BDS) == TRUE
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
