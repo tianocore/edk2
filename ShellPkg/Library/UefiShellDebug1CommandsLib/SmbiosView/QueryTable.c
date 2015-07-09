@@ -3229,8 +3229,8 @@ QueryTable (
     //
     if ((High > Low && Key >= Low && Key <= High) 
       || (Table[Index].Key == Key)) {
-      StrCpyS (Info, InfoLen, Table[Index].Info);
-      StrCatS (Info, InfoLen, L"\n");
+      StrnCpyS (Info, InfoLen, Table[Index].Info, InfoLen - 1);
+      StrnCatS (Info, InfoLen, L"\n", InfoLen - 1 - StrLen(Info));
       return Key;
     }
   }

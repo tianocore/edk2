@@ -406,7 +406,7 @@ CascadeProcessVariables (
     FoundVarName = AllocateZeroPool (NameSize);
     if (FoundVarName != NULL) {
       if (PrevName != NULL) {
-        StrCpyS(FoundVarName, NameSize/sizeof(CHAR16), PrevName);
+        StrnCpyS(FoundVarName, NameSize/sizeof(CHAR16), PrevName, NameSize/sizeof(CHAR16) - 1);
       }
 
       Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);

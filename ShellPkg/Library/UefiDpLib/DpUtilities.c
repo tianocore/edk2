@@ -261,7 +261,7 @@ GetNameFromHandle (
                                );
     if (!EFI_ERROR (Status)) {
       SHELL_FREE_NON_NULL (PlatformLanguage);
-      StrCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, StringPtr);
+      StrnCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, StringPtr, DP_GAUGE_STRING_LENGTH);
       mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
       return;
     }
@@ -305,7 +305,7 @@ GetNameFromHandle (
         //
         // Method 3. Get the name string from FFS UI section
         //
-        StrCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, NameString);
+        StrnCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, NameString, DP_GAUGE_STRING_LENGTH);
         mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
         FreePool (NameString);
       } else {
@@ -321,7 +321,7 @@ GetNameFromHandle (
       //
       NameString = ConvertDevicePathToText (LoadedImageDevicePath, TRUE, FALSE);
       if (NameString != NULL) {
-        StrCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, NameString);
+        StrnCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, NameString, DP_GAUGE_STRING_LENGTH);
         mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
         FreePool (NameString);
         return;
@@ -334,7 +334,7 @@ GetNameFromHandle (
   //
   StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_ERROR_NAME), NULL);
   ASSERT (StringPtr != NULL);
-  StrCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, StringPtr);
+  StrnCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, StringPtr, DP_GAUGE_STRING_LENGTH);
   FreePool (StringPtr);
 }
 

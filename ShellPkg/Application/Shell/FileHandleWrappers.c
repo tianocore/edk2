@@ -509,7 +509,7 @@ FileInterfaceStdInRead(
         if (StrStr(CurrentString + TabPos, L":") == NULL) {
           Cwd = ShellInfoObject.NewEfiShellProtocol->GetCurDir(NULL);
           if (Cwd != NULL) {
-            StrCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), Cwd);
+            StrnCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), Cwd, (*BufferSize)/sizeof(CHAR16) - 1);
             if (TabStr[StrLen(TabStr)-1] == L'\\' && *(CurrentString + TabPos) == L'\\' ) {
               TabStr[StrLen(TabStr)-1] = CHAR_NULL;
             }
@@ -523,7 +523,7 @@ FileInterfaceStdInRead(
             StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos, StringLen - TabPos);
           }
         } else {
-          StrCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos);
+          StrnCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos, (*BufferSize)/sizeof(CHAR16) - 1);
         }
         StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), L"*", (*BufferSize)/sizeof(CHAR16) - 1 - StrLen(TabStr));
         FoundFileList = NULL;
