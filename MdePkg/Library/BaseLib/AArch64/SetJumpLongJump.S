@@ -13,8 +13,8 @@
 .text
 .p2align 3
 
-ASM_GLOBAL ASM_PFX(SetJump)
-ASM_GLOBAL ASM_PFX(InternalLongJump)
+GCC_ASM_EXPORT(SetJump)
+GCC_ASM_EXPORT(InternalLongJump)
 
 #define GPR_LAYOUT                         \
         REG_PAIR (x19, x20,  0);           \

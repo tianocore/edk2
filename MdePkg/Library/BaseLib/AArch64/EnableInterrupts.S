@@ -17,7 +17,7 @@
 
 .text
 .p2align 2
-ASM_GLOBAL ASM_PFX(EnableInterrupts)
+GCC_ASM_EXPORT(EnableInterrupts)
 
 
 #/**

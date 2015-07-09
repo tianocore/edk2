@@ -17,7 +17,7 @@
 
 .text
 .p2align 2
-ASM_GLOBAL ASM_PFX(GetInterruptState)
+GCC_ASM_EXPORT(GetInterruptState)
 
 #/**
 #  Retrieves the current CPU interrupt state.

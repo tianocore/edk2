@@ -16,8 +16,8 @@
 .text
 .align 5
 
-ASM_GLOBAL ASM_PFX(InternalSwitchStackAsm)
-ASM_GLOBAL ASM_PFX(CpuPause)
+GCC_ASM_EXPORT(InternalSwitchStackAsm)
+GCC_ASM_EXPORT(CpuPause)
 
 /**
 //
