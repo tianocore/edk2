@@ -612,9 +612,11 @@ InitializeDebugAgent (
   }
 
   //
-  // Enable Debug Timer interrupt
+  // Enable Debug Timer interrupt. In post-memory SEC, the caller enables it.
   //
-  SaveAndSetDebugTimerInterrupt (TRUE);
+  if (InitFlag != DEBUG_AGENT_INIT_POSTMEM_SEC) {
+    SaveAndSetDebugTimerInterrupt (TRUE);
+  }
   //
   // Enable CPU interrupts so debug timer interrupts can be delivered
   //
