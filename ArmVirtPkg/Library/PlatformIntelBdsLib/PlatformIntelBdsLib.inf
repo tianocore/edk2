@@ -39,6 +39,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -60,6 +61,9 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer
 
 [Guids]
   gEfiFileInfoGuid

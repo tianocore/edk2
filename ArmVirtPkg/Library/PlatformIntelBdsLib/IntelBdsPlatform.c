@@ -35,7 +35,7 @@
 typedef struct {
   VENDOR_DEVICE_PATH         SerialDxe;
   UART_DEVICE_PATH           Uart;
-  VENDOR_DEFINED_DEVICE_PATH Vt100;
+  VENDOR_DEFINED_DEVICE_PATH TermType;
   EFI_DEVICE_PATH_PROTOCOL   End;
 } PLATFORM_SERIAL_CONSOLE;
 #pragma pack ()
@@ -67,14 +67,16 @@ STATIC PLATFORM_SERIAL_CONSOLE mSerialConsole = {
   },
 
   //
-  // VENDOR_DEFINED_DEVICE_PATH Vt100
+  // VENDOR_DEFINED_DEVICE_PATH TermType
   //
   {
     {
       MESSAGING_DEVICE_PATH, MSG_VENDOR_DP,
       DP_NODE_LEN (VENDOR_DEFINED_DEVICE_PATH)
-    },
-    EFI_VT_100_GUID
+    }
+    //
+    // Guid to be filled in dynamically
+    //
   },
 
   //
@@ -421,6 +423,8 @@ PlatformBdsPolicyBehavior (
   //
   // Add the hardcoded serial console device path to ConIn, ConOut, ErrOut.
   //
+  CopyGuid (&mSerialConsole.TermType.Guid,
+    PcdGetPtr (PcdTerminalTypeGuidBuffer));
   BdsLibUpdateConsoleVariable (L"ConIn",
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
   BdsLibUpdateConsoleVariable (L"ConOut",
