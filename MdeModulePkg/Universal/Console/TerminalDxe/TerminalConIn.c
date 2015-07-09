@@ -1561,8 +1561,14 @@ UnicodeToEfiKey (
     }
 
     if (UnicodeChar == DEL) {
-      Key.ScanCode    = SCAN_DELETE;
-      Key.UnicodeChar = 0;
+      if (TerminalDevice->TerminalType == TTYTERMTYPE) {
+        Key.ScanCode    = SCAN_NULL;
+        Key.UnicodeChar = CHAR_BACKSPACE;
+      }
+      else {
+        Key.ScanCode    = SCAN_DELETE;
+        Key.UnicodeChar = 0;
+      }
     } else {
       Key.ScanCode    = SCAN_NULL;
       Key.UnicodeChar = UnicodeChar;
