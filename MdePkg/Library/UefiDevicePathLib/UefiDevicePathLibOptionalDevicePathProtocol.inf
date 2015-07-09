@@ -65,6 +65,14 @@
   gEfiUartDevicePathGuid
   ## SOMETIMES_CONSUMES  ## GUID
   gEfiSasDevicePathGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiVirtualDiskGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiVirtualCdGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiPersistentVirtualDiskGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiPersistentVirtualCdGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
