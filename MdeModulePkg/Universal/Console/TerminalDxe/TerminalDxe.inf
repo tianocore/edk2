@@ -73,6 +73,7 @@
   gEfiVT100Guid                                 ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
   gEfiVT100PlusGuid                             ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
   gEfiPcAnsiGuid                                ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEfiTtyTermGuid                               ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]

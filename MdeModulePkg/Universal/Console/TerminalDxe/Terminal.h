@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/PcAnsi.h>
+#include <Guid/TtyTerm.h>
 #include <Guid/StatusCodeDataTypeVariable.h>
 
 #include <Protocol/SimpleTextOut.h>
@@ -136,6 +137,7 @@ typedef union {
 #define VT100TYPE                 1
 #define VT100PLUSTYPE             2
 #define VTUTF8TYPE                3
+#define TTYTERMTYPE               4
 
 #define LEFTOPENBRACKET           0x5b  // '['
 #define ACAP                      0x41

@@ -454,6 +454,7 @@ TranslateRawDataToEfiKey (
   case PCANSITYPE:
   case VT100TYPE:
   case VT100PLUSTYPE:
+  case TTYTERMTYPE:
     AnsiRawDataToUnicode (TerminalDevice);
     UnicodeToEfiKey (TerminalDevice);
     break;
@@ -1393,7 +1394,8 @@ UnicodeToEfiKey (
       if (TerminalDevice->TerminalType == PCANSITYPE    ||
           TerminalDevice->TerminalType == VT100TYPE     ||
           TerminalDevice->TerminalType == VT100PLUSTYPE ||
-          TerminalDevice->TerminalType == VTUTF8TYPE) {
+          TerminalDevice->TerminalType == VTUTF8TYPE    ||
+          TerminalDevice->TerminalType == TTYTERMTYPE) {
         switch (UnicodeChar) {
         case 'A':
           Key.ScanCode = SCAN_UP;

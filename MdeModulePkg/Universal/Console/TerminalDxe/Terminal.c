@@ -33,7 +33,8 @@ EFI_GUID  *gTerminalType[] = {
   &gEfiPcAnsiGuid,
   &gEfiVT100Guid,
   &gEfiVT100PlusGuid,
-  &gEfiVTUTF8Guid
+  &gEfiVTUTF8Guid,
+  &gEfiTtyTermGuid
 };
 
 
@@ -152,12 +153,13 @@ TerminalDriverBindingSupported (
 
       }
       //
-      // only supports PC ANSI, VT100, VT100+ and VT-UTF8 terminal types
+      // only supports PC ANSI, VT100, VT100+, VT-UTF8, and TtyTerm terminal types
       //
       if (!CompareGuid (&Node->Guid, &gEfiPcAnsiGuid) &&
           !CompareGuid (&Node->Guid, &gEfiVT100Guid) &&
           !CompareGuid (&Node->Guid, &gEfiVT100PlusGuid) &&
-          !CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
+          !CompareGuid (&Node->Guid, &gEfiVTUTF8Guid) &&
+          !CompareGuid (&Node->Guid, &gEfiTtyTermGuid)) {
 
         return EFI_UNSUPPORTED;
       }
@@ -274,6 +276,10 @@ BuildTerminalDevpath  (
   } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
 
     TerminalType = VTUTF8TYPE;
+
+  } else if (CompareGuid (&Node->Guid, &gEfiTtyTermGuid)) {
+
+    TerminalType = TTYTERMTYPE;
 
   } else {
     return NULL;
@@ -708,9 +714,9 @@ TerminalDriverBindingStart (
 
       TerminalType = PcdGet8 (PcdDefaultTerminalType);
       //
-      // Must be between PCANSITYPE (0) and VTUTF8TYPE (3)
+      // Must be between PCANSITYPE (0) and TTYTERMTYPE (4)
       //
-      ASSERT (TerminalType <= VTUTF8TYPE);
+      ASSERT (TerminalType <= TTYTERMTYPE);
 
       CopyMem (&DefaultNode->Guid, gTerminalType[TerminalType], sizeof (EFI_GUID));
       RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DefaultNode;
@@ -728,6 +734,8 @@ TerminalDriverBindingStart (
         TerminalType = VT100PLUSTYPE;
       } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
         TerminalType = VTUTF8TYPE;
+      } else if (CompareGuid (&Node->Guid, &gEfiTtyTermGuid)) {
+        TerminalType = TTYTERMTYPE;
       } else {
         goto Error;
       }
@@ -922,6 +930,24 @@ TerminalDriverBindingStart (
         gTerminalComponentName2.SupportedLanguages,
         &TerminalDevice->ControllerNameTable,
         (CHAR16 *)L"VT-UTF8 Serial Console",
+        FALSE
+        );
+
+      break;
+
+    case TTYTERMTYPE:
+      AddUnicodeString2 (
+        "eng",
+        gTerminalComponentName.SupportedLanguages,
+        &TerminalDevice->ControllerNameTable,
+        (CHAR16 *)L"Tty Terminal Serial Console",
+        TRUE
+        );
+      AddUnicodeString2 (
+        "en",
+        gTerminalComponentName2.SupportedLanguages,
+        &TerminalDevice->ControllerNameTable,
+        (CHAR16 *)L"Tty Terminal Serial Console",
         FALSE
         );
 
@@ -1441,7 +1467,7 @@ TerminalUpdateConsoleDevVariable (
   //
   // Append terminal device path onto the variable.
   //
-  for (TerminalType = PCANSITYPE; TerminalType <= VTUTF8TYPE; TerminalType++) {
+  for (TerminalType = PCANSITYPE; TerminalType <= TTYTERMTYPE; TerminalType++) {
     SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
     NewVariable = AppendDevicePathInstance (Variable, TempDevicePath);
     ASSERT (NewVariable != NULL);
@@ -1554,7 +1580,7 @@ TerminalRemoveConsoleDevVariable (
     // Loop through all the terminal types that this driver supports
     //
     Match = FALSE;
-    for (TerminalType = PCANSITYPE; TerminalType <= VTUTF8TYPE; TerminalType++) {
+    for (TerminalType = PCANSITYPE; TerminalType <= TTYTERMTYPE; TerminalType++) {
 
       SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
 
@@ -1656,6 +1682,10 @@ SetTerminalDevicePath (
 
   case VTUTF8TYPE:
     CopyGuid (&Node.Guid, &gEfiVTUTF8Guid);
+    break;
+
+  case TTYTERMTYPE:
+    CopyGuid (&Node.Guid, &gEfiTtyTermGuid);
     break;
 
   default:

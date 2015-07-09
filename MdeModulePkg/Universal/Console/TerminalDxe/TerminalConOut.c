@@ -223,6 +223,7 @@ TerminalConOutOutputString (
     case PCANSITYPE:
     case VT100TYPE:
     case VT100PLUSTYPE:
+    case TTYTERMTYPE:
 
       if (!TerminalIsValidTextGraphics (*WString, &GraphicChar, &AsciiChar)) {
         //
@@ -371,6 +372,7 @@ TerminalConOutTestString (
   case PCANSITYPE:
   case VT100TYPE:
   case VT100PLUSTYPE:
+  case TTYTERMTYPE:
     Status = AnsiTestString (TerminalDevice, WString);
     break;
 
