@@ -874,6 +874,10 @@ Ip4FormExtractConfig (
   EFI_STRING                       FormResult;
   UINTN                            Size;
   UINTN                            BufferSize;
+
+  if (Progress == NULL || Results == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   
   Status             = EFI_SUCCESS; 
   IfrFormNvData      = NULL;
@@ -886,10 +890,6 @@ Ip4FormExtractConfig (
   Ip4Config2Instance = IP4_CONFIG2_INSTANCE_FROM_FORM_CALLBACK(Private);
   BufferSize         = sizeof (IP4_CONFIG2_IFR_NVDATA);
   *Progress          = Request;
-  
-  if (Progress == NULL || Results == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
   
   //
   // Check Request data in <ConfigHdr>.
