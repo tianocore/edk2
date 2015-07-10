@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -394,6 +394,7 @@ UpdateLockBox (
     DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib UpdateLockBox - Exit (%r)\n", EFI_BUFFER_TOO_SMALL));
     return EFI_BUFFER_TOO_SMALL;
   }
+  ASSERT ((UINTN)LockBox->SmramBuffer <= (MAX_ADDRESS - Offset));
   CopyMem ((VOID *)((UINTN)LockBox->SmramBuffer + Offset), Buffer, Length);
 
   //
