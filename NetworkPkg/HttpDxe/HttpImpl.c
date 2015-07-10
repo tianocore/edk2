@@ -766,6 +766,10 @@ HttpResponseWorker (
   HTTP_TOKEN_WRAP               *ValueInItem;
   UINTN                         HdrLen;
 
+  if (Wrap == NULL || Wrap->HttpInstance == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   HttpInstance = Wrap->HttpInstance;
   Token = Wrap->HttpToken;
 

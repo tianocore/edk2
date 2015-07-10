@@ -79,7 +79,7 @@ HttpCleanService (
   IN HTTP_SERVICE     *HttpService
   )
 {
-  if (HttpService != NULL) {
+  if (HttpService == NULL) {
     return ;
   }
 

@@ -1049,6 +1049,7 @@ IsValidDnsResponse (
       continue;
     } else {
       TxString = NetbufGetByte (Packet, 0, NULL);
+      ASSERT (TxString != NULL);
       DnsHeader = (DNS_HEADER *) TxString;
       QueryName = (CHAR8 *) (TxString + sizeof (*DnsHeader));
       QuerySection = (DNS_QUERY_SECTION *) (QueryName + AsciiStrLen (QueryName) + 1);
@@ -1426,7 +1427,8 @@ DnsOnPacketReceived (
   ASSERT (Packet != NULL);
   
   RcvString = NetbufGetByte (Packet, 0, NULL);
-
+  ASSERT (RcvString != NULL);
+  
   //
   // Parse Dns Response
   //

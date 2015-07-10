@@ -301,6 +301,8 @@ GetDns4ServerFromDhcp4 (
   Data                       = NULL;
   InterfaceInfo              = NULL;
 
+  ZeroMem ((UINT8 *) ParaList, sizeof (ParaList));
+
   ZeroMem (&MnpConfigData, sizeof (EFI_MANAGED_NETWORK_CONFIG_DATA));
   
   ZeroMem (&DnsServerInfor, sizeof (DNS4_SERVER_INFOR));
