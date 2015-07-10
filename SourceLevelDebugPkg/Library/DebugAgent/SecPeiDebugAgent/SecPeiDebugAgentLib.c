@@ -376,8 +376,12 @@ InitializeDebugAgent (
   UINT64                           *MailboxLocationPointer;
   EFI_PHYSICAL_ADDRESS             Address;
   UINT32                           DebugTimerFrequency;
+  BOOLEAN                          CpuInterruptState;
 
-  DisableInterrupts ();
+  //
+  // Disable interrupts and save current interrupt state
+  //
+  CpuInterruptState = SaveAndDisableInterrupts();
 
   switch (InitFlag) {
 
@@ -611,17 +615,22 @@ InitializeDebugAgent (
     break;
   }
 
-  //
-  // Enable Debug Timer interrupt. In post-memory SEC, the caller enables it.
-  //
-  if (InitFlag != DEBUG_AGENT_INIT_POSTMEM_SEC) {
+  if (InitFlag == DEBUG_AGENT_INIT_POSTMEM_SEC) {
+    //
+    // Restore CPU Interrupt state and keep debug timer interrupt state as is
+    // in DEBUG_AGENT_INIT_POSTMEM_SEC case
+    //
+    SetInterruptState (CpuInterruptState);
+  } else {
+    //
+    // Enable Debug Timer interrupt
+    //
     SaveAndSetDebugTimerInterrupt (TRUE);
+    //
+    // Enable CPU interrupts so debug timer interrupts can be delivered
+    //
+    EnableInterrupts ();
   }
-  //
-  // Enable CPU interrupts so debug timer interrupts can be delivered
-  //
-  EnableInterrupts ();
-
   //
   // If Function is not NULL, invoke it always whatever debug agent was initialized sucesssfully or not.
   //
