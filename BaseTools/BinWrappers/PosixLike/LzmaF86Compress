@@ -13,7 +13,7 @@
 #
 
 for arg in $*; do
-  if [ "arg" = "-e" -o "arg" = "-d" ]; then
+  if [ "$arg" = "-e" -o "$arg" = "-d" ]; then
     FLAG=--f86
     break;
   fi
