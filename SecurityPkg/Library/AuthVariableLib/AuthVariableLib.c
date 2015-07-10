@@ -352,6 +352,15 @@ AuthVariableLibInitialize (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+  } else {
+    //
+    // Clean up Certs to make certDB & Time based auth variable consistent
+    //
+    Status = CleanCertsFromDb();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_INFO, "Clean up CertDB fail! Status %x\n", Status));
+      return Status;
+    }
   }
 
   //

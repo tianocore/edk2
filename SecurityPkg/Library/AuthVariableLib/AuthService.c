@@ -1205,18 +1205,17 @@ ProcessVariable (
     //
     // Allow the delete operation of common authenticated variable at user physical presence.
     //
-    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    Status = AuthServiceInternalUpdateVariable (
+              VariableName,
+              VendorGuid,
+              NULL,
+              0,
+              0
+              );
+    if (!EFI_ERROR (Status) && ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0)) {
       Status = DeleteCertsFromDb (VariableName, VendorGuid);
     }
-    if (!EFI_ERROR (Status)) {
-      Status = AuthServiceInternalUpdateVariable (
-                 VariableName,
-                 VendorGuid,
-                 NULL,
-                 0,
-                 0
-                 );
-    }
+
     return Status;
   }
 
@@ -1965,6 +1964,109 @@ InsertCertsToDb (
 }
 
 /**
+  Clean up signer's certificates for common authenticated variable
+  by corresponding VariableName and VendorGuid from "certdb".
+  Sytem may break down during Timebased Variable update & certdb update,
+  make them inconsistent,  this function is called in AuthVariable Init to ensure 
+  consistency
+  
+  @retval  EFI_NOT_FOUND         Fail to find matching certs.
+  @retval  EFI_SUCCESS           Find matching certs and output parameters.
+
+**/
+EFI_STATUS
+CleanCertsFromDb (
+  VOID
+  ){
+  UINT32                  Offset;
+  AUTH_CERT_DB_DATA       *Ptr;
+  UINT32                  NameSize;
+  UINT32                  NodeSize;
+  CHAR16                  *VariableName;
+  EFI_STATUS              Status;
+  BOOLEAN                 CertCleaned;
+  UINT8                   *Data;
+  UINTN                   DataSize;
+  UINT8                   *AuthVarData;
+  UINTN                   AuthVarDataSize;
+  EFI_GUID                AuthVarGuid;
+
+  Status = EFI_SUCCESS;
+
+  //
+  // Get corresponding certificates by VendorGuid and VariableName.
+  //
+  do {
+    CertCleaned = FALSE;
+
+    //
+    // Get latest variable "certdb"
+    //
+    Status = AuthServiceInternalFindVariable (
+               EFI_CERT_DB_NAME,
+               &gEfiCertDbGuid,
+               (VOID **) &Data,
+               &DataSize
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if ((DataSize == 0) || (Data == NULL)) {
+      ASSERT (FALSE);
+      return EFI_NOT_FOUND;
+    }
+
+    Offset = sizeof (UINT32);
+
+    while (Offset < (UINT32) DataSize) {
+      Ptr = (AUTH_CERT_DB_DATA *) (Data + Offset);
+      //
+      // Check whether VendorGuid matches.
+      //
+      NodeSize = ReadUnaligned32 (&Ptr->CertNodeSize);
+      NameSize = ReadUnaligned32 (&Ptr->NameSize);
+
+      //
+      // Get VarName tailed with '\0'
+      //
+      VariableName = AllocateZeroPool((NameSize + 1) * sizeof(CHAR16));
+      if (VariableName == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      CopyMem (VariableName, (UINT8 *) Ptr + sizeof (AUTH_CERT_DB_DATA), NameSize * sizeof(CHAR16));
+      //
+      // Keep VarGuid  aligned
+      //
+      CopyMem (&AuthVarGuid, &Ptr->VendorGuid, sizeof(EFI_GUID));
+
+      //
+      // Find corresponding time auth variable
+      //
+      Status = AuthServiceInternalFindVariable (
+                 VariableName,
+                 &AuthVarGuid,
+                 (VOID **) &AuthVarData,
+                 &AuthVarDataSize
+                 );
+
+      if (EFI_ERROR(Status)) {
+        Status      = DeleteCertsFromDb(VariableName, &AuthVarGuid);
+        CertCleaned = TRUE;
+        DEBUG((EFI_D_INFO, "Recovery!! Cert for Auth Variable %s Guid %g is removed for consistency\n", VariableName, &AuthVarGuid));
+        FreePool(VariableName);
+        break;
+      }
+
+      FreePool(VariableName);
+      Offset = Offset + NodeSize;
+    }
+  } while (CertCleaned);
+
+  return Status;
+}
+
+/**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
 
   Caution: This function may receive untrusted input.
@@ -2285,16 +2387,7 @@ VerifyTimeBasedPayload (
       goto Exit;
     }
 
-    //
-    // Delete signer's certificates when delete the common authenticated variable.
-    //
-    if ((PayloadSize == 0) && (OrgTimeStamp != NULL) && ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0)) {
-      Status = DeleteCertsFromDb (VariableName, VendorGuid);
-      if (EFI_ERROR (Status)) {
-        VerifyStatus = FALSE;
-        goto Exit;
-      }
-    } else if ((OrgTimeStamp == NULL) && (PayloadSize != 0)) {
+    if ((OrgTimeStamp == NULL) && (PayloadSize != 0)) {
       //
       // Insert signer's certificates when adding a new common authenticated variable.
       //
@@ -2389,6 +2482,7 @@ VerifyTimeBasedPayloadAndUpdate (
   UINTN                            PayloadSize;
   EFI_VARIABLE_AUTHENTICATION_2    *CertData;
   AUTH_VARIABLE_INFO               OrgVariableInfo;
+  BOOLEAN                          IsDel;
 
   ZeroMem (&OrgVariableInfo, sizeof (OrgVariableInfo));
   FindStatus = mAuthVarLibContextIn->FindVariable (
@@ -2412,8 +2506,12 @@ VerifyTimeBasedPayloadAndUpdate (
     return Status;
   }
 
-  if ((PayloadSize == 0) && (VarDel != NULL)) {
-    *VarDel = TRUE;
+  if (!EFI_ERROR(FindStatus)
+   && (PayloadSize == 0)
+   && ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0)) {
+    IsDel = TRUE;
+  } else {
+    IsDel = FALSE;
   }
 
   CertData = (EFI_VARIABLE_AUTHENTICATION_2 *) Data;
@@ -2421,12 +2519,29 @@ VerifyTimeBasedPayloadAndUpdate (
   //
   // Final step: Update/Append Variable if it pass Pkcs7Verify
   //
-  return AuthServiceInternalUpdateVariableWithTimeStamp (
-           VariableName,
-           VendorGuid,
-           PayloadPtr,
-           PayloadSize,
-           Attributes,
-           &CertData->TimeStamp
-           );
+  Status = AuthServiceInternalUpdateVariableWithTimeStamp (
+             VariableName,
+             VendorGuid,
+             PayloadPtr,
+             PayloadSize,
+             Attributes,
+             &CertData->TimeStamp
+             );
+
+  //
+  // Delete signer's certificates when delete the common authenticated variable.
+  //
+  if (IsDel && AuthVarType == AuthVarTypePriv && !EFI_ERROR(Status) ) {
+    Status = DeleteCertsFromDb (VariableName, VendorGuid);
+  }
+
+  if (VarDel != NULL) {
+    if (IsDel && !EFI_ERROR(Status)) {
+      *VarDel = TRUE;
+    } else {
+      *VarDel = FALSE;
+    }
+  }
+
+  return Status;
 }

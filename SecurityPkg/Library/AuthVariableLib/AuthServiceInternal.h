@@ -187,6 +187,22 @@ DeleteCertsFromDb (
   );
 
 /**
+  Clean up signer's certificates for common authenticated variable
+  by corresponding VariableName and VendorGuid from "certdb".
+  Sytem may break down during Timebased Variable update & certdb update,
+  make them inconsistent,  this function is called in AuthVariable Init to ensure 
+  consistency
+  
+  @retval  EFI_NOT_FOUND         Fail to find matching certs.
+  @retval  EFI_SUCCESS           Find matching certs and output parameters.
+
+**/
+EFI_STATUS
+CleanCertsFromDb (
+  VOID
+  );
+
+/**
   Filter out the duplicated EFI_SIGNATURE_DATA from the new data by comparing to the original data.
 
   @param[in]        Data          Pointer to original EFI_SIGNATURE_LIST.
