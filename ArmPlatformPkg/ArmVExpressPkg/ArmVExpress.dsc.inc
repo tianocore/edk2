@@ -223,6 +223,7 @@
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigRuntimeLib/ArmVExpressSysConfigRuntimeLib.inf
 
+[LibraryClasses.AARCH64.DXE_RUNTIME_DRIVER]
   #
   # PSCI support in EL3 may not be available if we are not running under a PSCI
   # compliant secure firmware, but since the default VExpress EfiResetSystemLib
