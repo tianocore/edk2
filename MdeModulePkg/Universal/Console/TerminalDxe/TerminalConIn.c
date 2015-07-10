@@ -1568,9 +1568,9 @@ UnicodeToEfiKey (
       if (TerminalDevice->TerminalType == TTYTERMTYPE) {
 
         if (UnicodeChar == '~' && TerminalDevice->TtyEscapeIndex <= 2) {
-          UINTN EscCode;
+          UINT16 EscCode;
           TerminalDevice->TtyEscapeStr[TerminalDevice->TtyEscapeIndex] = 0; /* Terminate string */
-          EscCode = StrDecimalToUintn(TerminalDevice->TtyEscapeStr);
+          EscCode = (UINT16) StrDecimalToUintn(TerminalDevice->TtyEscapeStr);
           switch (EscCode) {
           case 3:
               Key.ScanCode = SCAN_DELETE;
