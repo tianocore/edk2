@@ -127,7 +127,7 @@ SplitStrToList (
   ARG_LIST    *ArgList;
   ARG_LIST    *ArgNode;
 
-  if (*String == L'\0' || *String == NULL) {
+  if (String == NULL || *String == L'\0') {
     return NULL;
   }
 
