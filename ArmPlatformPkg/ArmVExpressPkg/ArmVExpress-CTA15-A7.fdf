@@ -150,7 +150,6 @@ FvNameGuid         = 73dcb643-3862-4904-9076-a94af1890243
   INF MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   INF MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
   INF MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-  INF MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
   INF MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
   INF MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
   INF MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
