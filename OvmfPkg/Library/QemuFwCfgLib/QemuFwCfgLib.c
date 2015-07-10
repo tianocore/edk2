@@ -283,6 +283,7 @@ QemuFwCfgFindFile (
     FileSize     = QemuFwCfgRead32 ();
     FileSelect   = QemuFwCfgRead16 ();
     FileReserved = QemuFwCfgRead16 ();
+    (VOID) FileReserved; /* Force a do-nothing reference. */
     InternalQemuFwCfgReadBytes (sizeof (FName), FName);
 
     if (AsciiStrCmp (Name, FName) == 0) {
