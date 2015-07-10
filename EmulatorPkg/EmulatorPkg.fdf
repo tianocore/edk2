@@ -1,7 +1,7 @@
 ## @file
 # This is Emulator FDF file with UEFI HII features enabled
 #
-# Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2009 - 2011, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -196,7 +196,6 @@ INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
 INF  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
 INF  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-INF  MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
 INF  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
 INF  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
 INF  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
