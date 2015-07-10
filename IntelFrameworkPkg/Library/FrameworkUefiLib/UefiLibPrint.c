@@ -754,10 +754,16 @@ CatVSPrint (
     SizeRequired = sizeof(CHAR16) + (CharactersRequired * sizeof(CHAR16));
   }
 
-  BufferToReturn = AllocateCopyPool(SizeRequired, String);
+  BufferToReturn = AllocatePool(SizeRequired);
 
   if (BufferToReturn == NULL) {
     return NULL;
+  } else {
+    BufferToReturn[0] = L'\0';
+  }
+
+  if (String != NULL) {
+    StrCpyS(BufferToReturn, SizeRequired, String);
   }
 
   UnicodeVSPrint(BufferToReturn + StrLen(BufferToReturn), (CharactersRequired+1) * sizeof(CHAR16), FormatString, Marker);
