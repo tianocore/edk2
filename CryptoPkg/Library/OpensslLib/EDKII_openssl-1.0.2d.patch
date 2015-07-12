@@ -210,7 +210,7 @@ diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
 diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
 --- crypto/x509/x509_vfy.c	Thu Jun 11 21:52:58 2015
 +++ crypto/x509/x509_vfy.c	Fri Jun 12 11:29:37 2015
-@@ -1647,6 +1647,10 @@
+@@ -1653,6 +1653,10 @@
  
  static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
  {
@@ -221,7 +221,7 @@ diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
      time_t *ptime;
      int i;
  
-@@ -1686,6 +1690,7 @@
+@@ -1692,6 +1696,7 @@
      }
  
      return 1;
