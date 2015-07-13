@@ -1127,16 +1127,20 @@ SetupResetReminder (
   if (IsResetReminderFeatureEnable ()) {
     if (IsResetRequired ()) {
 
-      StringBuffer1 = AllocateCopyPool (
-                        MAX_STRING_LEN * sizeof (CHAR16),
-                        L"Configuration changed. Reset to apply it Now."
-                        );
+      StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer1 != NULL);
-      StringBuffer2 = AllocateCopyPool (
-                        MAX_STRING_LEN * sizeof (CHAR16),
-                        L"Press ENTER to reset"
-                        );
+      StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer2 != NULL);
+      StrCpyS (
+        StringBuffer1,
+        MAX_STRING_LEN,
+        L"Configuration changed. Reset to apply it Now."
+        );
+      StrCpyS (
+        StringBuffer2,
+        MAX_STRING_LEN,
+        L"Press ENTER to reset"
+        );
       //
       // Popup a menu to notice user
       //
