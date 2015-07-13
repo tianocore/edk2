@@ -290,10 +290,11 @@ GetNameFromHandle (
                                );
     SafeFreePool (BestLanguage);
     if (!EFI_ERROR (Status)) {
-      StrCpyS (
+      StrnCpyS (
         mGaugeString,
         DP_GAUGE_STRING_LENGTH + 1,
-        StringPtr
+        StringPtr,
+        DP_GAUGE_STRING_LENGTH
         );
       return;
     }
@@ -337,10 +338,11 @@ GetNameFromHandle (
         //
         // Method 3. Get the name string from FFS UI section
         //
-        StrCpyS (
+        StrnCpyS (
           mGaugeString,
           DP_GAUGE_STRING_LENGTH + 1,
-          NameString
+          NameString,
+          DP_GAUGE_STRING_LENGTH
           );
         FreePool (NameString);
       } else {
@@ -356,10 +358,11 @@ GetNameFromHandle (
       //
       NameString = ConvertDevicePathToText (LoadedImageDevicePath, TRUE, FALSE);
       if (NameString != NULL) {
-        StrCpyS (
+        StrnCpyS (
           mGaugeString,
           DP_GAUGE_STRING_LENGTH + 1,
-          NameString
+          NameString,
+          DP_GAUGE_STRING_LENGTH
           );
         FreePool (NameString);
         return;
