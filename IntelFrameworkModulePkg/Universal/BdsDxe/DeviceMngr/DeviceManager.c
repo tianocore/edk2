@@ -374,12 +374,13 @@ GetMacAddressString(
   // The size is the Number size + ":" size + Vlan size(\XXXX) + End
   //
   BufferLen = (4 + 2 * HwAddressSize + (HwAddressSize - 1) + 5 + 1) * sizeof (CHAR16);
-  String = AllocateCopyPool (BufferLen, L"MAC:");
+  String = AllocateZeroPool (BufferLen);
   if (String == NULL) {
     return FALSE;
   }
 
   *PBuffer = String;
+  StrCpyS (String, BufferLen / sizeof (CHAR16), L"MAC:");
   String += 4;
   
   //
