@@ -319,8 +319,9 @@ CallBootManager (
 
     TempStr = DevicePathToStr (Option->DevicePath);
     HelpSize = StrSize (TempStr) + StrSize (L"Device Path : ");
-    HelpString = AllocateCopyPool (HelpSize, L"Device Path : ");
+    HelpString = AllocateZeroPool (HelpSize);
     ASSERT (HelpString != NULL);
+    StrCatS (HelpString, HelpSize / sizeof (CHAR16), L"Device Path : ");
     StrCatS (HelpString, HelpSize / sizeof (CHAR16), TempStr);
 
     HelpToken = HiiSetString (HiiHandle, 0, HelpString, NULL);
