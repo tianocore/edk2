@@ -141,7 +141,7 @@ StrnLenS (
   // String then StrnLenS returns MaxSize. At most the first MaxSize characters of String shall
   // be accessed by StrnLenS.
   //
-  for (Length = 0; (*String != 0) && (Length < MaxSize); String++, Length++) {
+  for (Length = 0; (Length < MaxSize) && (*String != 0); String++, Length++) {
     ;
   }
   return Length;
@@ -551,7 +551,7 @@ AsciiStrnLenS (
   // String then AsciiStrnLenS returns MaxSize. At most the first MaxSize characters of String shall
   // be accessed by AsciiStrnLenS.
   //
-  for (Length = 0; (*String != 0) && (Length < MaxSize); String++, Length++) {
+  for (Length = 0; (Length < MaxSize) && (*String != 0); String++, Length++) {
     ;
   }
   return Length;
