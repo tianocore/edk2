@@ -1096,12 +1096,13 @@ BOpt_AppendFileName (
   Size1 = StrSize (Str1);
   Size2 = StrSize (Str2);
   MaxLen = (Size1 + Size2 + sizeof (CHAR16)) / sizeof (CHAR16);
-  Str   = AllocateCopyPool (MaxLen * sizeof (CHAR16), Str1);
+  Str   = AllocateZeroPool (MaxLen * sizeof (CHAR16));
   ASSERT (Str != NULL);
 
   TmpStr = AllocateZeroPool (MaxLen * sizeof (CHAR16)); 
   ASSERT (TmpStr != NULL);
 
+  StrCatS (Str, MaxLen, Str1);
   if (!((*Str == '\\') && (*(Str + 1) == 0))) {
     StrCatS (Str, MaxLen, L"\\");
   }
