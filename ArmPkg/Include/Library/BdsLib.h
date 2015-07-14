@@ -193,24 +193,6 @@ BdsStartEfiApplication (
   IN VOID*                       LoadOptions
   );
 
-/**
-  Start an EFI Application from any Firmware Volume
-
-  @param  EfiApp                EFI Application Name
-
-  @retval EFI_SUCCESS           All drivers have been connected
-  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
-  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
-
-**/
-EFI_STATUS
-BdsLoadApplication (
-  IN EFI_HANDLE                  ParentImageHandle,
-  IN CHAR16*                     EfiApp,
-  IN UINTN                       LoadOptionsSize,
-  IN VOID*                       LoadOptions
-  );
-
 EFI_STATUS
 BdsLoadImage (
   IN     EFI_DEVICE_PATH       *DevicePath,
@@ -225,6 +207,40 @@ BdsLoadImage (
 EFI_STATUS
 ShutdownUefiBootServices (
   VOID
+  );
+
+/**
+  Locate an EFI application in a the Firmware Volumes by its name
+
+  @param  EfiAppGuid            Guid of the EFI Application into the Firmware Volume
+  @param  DevicePath            EFI Device Path of the EFI application
+
+  @return EFI_SUCCESS           The function completed successfully.
+  @return EFI_NOT_FOUND         The protocol could not be located.
+  @return EFI_OUT_OF_RESOURCES  There are not enough resources to find the protocol.
+
+**/
+EFI_STATUS
+LocateEfiApplicationInFvByName (
+  IN  CONST CHAR16*             EfiAppName,
+  OUT EFI_DEVICE_PATH           **DevicePath
+  );
+
+/**
+  Locate an EFI application in a the Firmware Volumes by its GUID
+
+  @param  EfiAppGuid            Guid of the EFI Application into the Firmware Volume
+  @param  DevicePath            EFI Device Path of the EFI application
+
+  @return EFI_SUCCESS           The function completed successfully.
+  @return EFI_NOT_FOUND         The protocol could not be located.
+  @return EFI_OUT_OF_RESOURCES  There are not enough resources to find the protocol.
+
+**/
+EFI_STATUS
+LocateEfiApplicationInFvByGuid (
+  IN  CONST EFI_GUID            *EfiAppGuid,
+  OUT EFI_DEVICE_PATH           **DevicePath
   );
 
 #endif

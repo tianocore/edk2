@@ -1069,17 +1069,27 @@ BootShell (
   IN LIST_ENTRY *BootOptionsList
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS       Status;
+  EFI_DEVICE_PATH* EfiShellDevicePath;
 
-  // Start EFI Shell
-  Status = BdsLoadApplication (gImageHandle, L"Shell", 0, NULL);
+  // Find the EFI Shell
+  Status = LocateEfiApplicationInFvByName (L"Shell", &EfiShellDevicePath);
   if (Status == EFI_NOT_FOUND) {
     Print (L"Error: EFI Application not found.\n");
-  } else if (EFI_ERROR(Status)) {
-    Print (L"Error: Status Code: 0x%X\n",(UINT32)Status);
-  }
+    return Status;
+  } else if (EFI_ERROR (Status)) {
+    Print (L"Error: Status Code: 0x%X\n", (UINT32)Status);
+    return Status;
+  } else {
+    // Need to connect every drivers to ensure no dependencies are missing for the application
+    Status = BdsConnectAllDrivers ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "FAIL to connect all drivers\n"));
+      return Status;
+    }
 
-  return Status;
+    return BdsStartEfiApplication (gImageHandle, EfiShellDevicePath, 0, NULL);
+  }
 }
 
 struct BOOT_MAIN_ENTRY {

@@ -37,6 +37,7 @@
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   BdsLib
@@ -78,6 +79,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths
+
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
 
 [Depex]
   TRUE
