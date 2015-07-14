@@ -17,36 +17,35 @@
 
 #include "PciHostBridge.h"
 
-//
-// Hard code: Root Bridge's device path
-//            Root Bridge's resource aperture
-//
-
-EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath[1] = {
+STATIC
+CONST
+EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
   {
     {
+      ACPI_DEVICE_PATH,
+      ACPI_DP,
       {
-        ACPI_DEVICE_PATH,
-        ACPI_DP,
-        {
-          (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
-          (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8)
-        }
-      },
-      EISA_PNP_ID(0x0A03),
-      0
-    },
-
-    {
-      END_DEVICE_PATH_TYPE,
-      END_ENTIRE_DEVICE_PATH_SUBTYPE,
-      {
-        END_DEVICE_PATH_LENGTH,
-        0
+        (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
+        (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8)
       }
+    },
+    EISA_PNP_ID(0x0A03), // HID
+    0                    // UID
+  },
+
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
     }
   }
 };
+
+//
+// Hard code: Root Bridge's resource aperture
+//
 
 PCI_ROOT_BRIDGE_RESOURCE_APERTURE  mResAperture[1] = {
   {0, 0xff, 0x80000000, 0xffffffff, 0, 0xffff}
@@ -135,8 +134,10 @@ InitializePciHostBridge (
     }
 
     PrivateData->Signature = PCI_ROOT_BRIDGE_SIGNATURE;
-    PrivateData->DevicePath =
-      (EFI_DEVICE_PATH_PROTOCOL *)&mEfiPciRootBridgeDevicePath[Loop2];
+
+    CopyMem (&PrivateData->DevicePath, &mRootBridgeDevicePathTemplate,
+      sizeof mRootBridgeDevicePathTemplate);
+    PrivateData->DevicePath.AcpiDevicePath.UID = Loop2;
 
     RootBridgeConstructor (
       &PrivateData->Io,
@@ -148,7 +149,7 @@ InitializePciHostBridge (
     Status = gBS->InstallMultipleProtocolInterfaces(
                     &PrivateData->Handle,
                     &gEfiDevicePathProtocolGuid,
-                    PrivateData->DevicePath,
+                    &PrivateData->DevicePath,
                     &gEfiPciRootBridgeIoProtocolGuid,
                     &PrivateData->Io,
                     NULL

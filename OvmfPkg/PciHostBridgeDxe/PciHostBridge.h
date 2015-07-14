@@ -1,6 +1,7 @@
 /** @file
   The Header file of the Pci Host Bridge Driver
 
+  Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -605,7 +606,7 @@ typedef struct {
   UINT64                 MemLimit;
   UINT64                 IoLimit;
 
-  EFI_DEVICE_PATH_PROTOCOL                *DevicePath;
+  EFI_PCI_ROOT_BRIDGE_DEVICE_PATH         DevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         Io;
 
 } PCI_ROOT_BRIDGE_INSTANCE;
