@@ -28,11 +28,9 @@
 #include <Library/DebugLib.h>
 #include <Library/BdsLib.h>
 #include <Library/PcdLib.h>
-#include <Library/PerformanceLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#include <Guid/ArmMpCoreInfo.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/FileInfo.h>
 
@@ -101,17 +99,6 @@ typedef struct {
   UINT64  DownloadedNbOfBytes;
   UINT64  LastReportedNbOfBytes;
 } BDS_TFTP_CONTEXT;
-
-// BdsHelper.c
-EFI_STATUS
-GetSystemMemoryResources (
-  LIST_ENTRY *ResourceList
-  );
-
-VOID
-PrintPerformance (
-  VOID
-  );
 
 EFI_STATUS
 BdsLoadImage (

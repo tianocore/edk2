@@ -39,6 +39,9 @@
   EmbeddedPkg/EmbeddedPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
+[Guids]
+  gFdtTableGuid
+
 [LibraryClasses]
   BdsLib
   TimerLib
@@ -49,6 +52,7 @@
   DebugLib
   PrintLib
   BaseLib
+  FdtLib
   NetLib
 
 [Guids]

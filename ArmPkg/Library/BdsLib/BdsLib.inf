@@ -25,15 +25,6 @@
   BdsAppLoader.c
   BdsHelper.c
   BdsLoadOption.c
-  BdsLinuxFdt.c
-
-[Sources.ARM]
-  Arm/BdsLinuxLoader.c
-  Arm/BdsLinuxAtag.c
-
-[Sources.AARCH64]
-  AArch64/BdsLinuxLoader.c
-  AArch64/BdsLinuxLoaderHelper.S
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -44,26 +35,16 @@
 
 [LibraryClasses]
   ArmLib
-  ArmSmcLib
   BaseLib
   DebugLib
   DevicePathLib
   HobLib
   PcdLib
-  PerformanceLib
-  SerialPortLib
-  FdtLib
-  TimerLib
   NetLib
-
-[LibraryClasses.AARCH64]
-  ArmGicLib
 
 [Guids]
   gEfiFileInfoGuid
-  gArmMpCoreInfoGuid
   gArmGlobalVariableGuid
-  gFdtTableGuid
 
 [Protocols]
   gEfiBdsArchProtocolGuid
@@ -82,27 +63,8 @@
   gEfiMtftp4ServiceBindingProtocolGuid
   gEfiMtftp4ProtocolGuid
 
-[FeaturePcd]
-  gArmTokenSpaceGuid.PcdArmLinuxSpinTable
-
-[Pcd]
-  gArmTokenSpaceGuid.PcdSystemMemoryBase
-  gArmTokenSpaceGuid.PcdSystemMemorySize
-
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdArmMachineType
-  gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset
-  gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment
-  gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset
-
   gArmTokenSpaceGuid.PcdMaxTftpFileSize
-
-[FixedPcd.ARM]
-  gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset
-
-[Pcd.AARCH64]
-  gArmTokenSpaceGuid.PcdGicDistributorBase
-  gArmTokenSpaceGuid.PcdGicSgiIntId
 
 [Depex]
   TRUE

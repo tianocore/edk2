@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -23,10 +23,6 @@ BootOptionStart (
   EFI_STATUS                            Status;
   UINT32                                LoaderType;
   ARM_BDS_LOADER_OPTIONAL_DATA*         OptionalData;
-  ARM_BDS_LINUX_ARGUMENTS*              LinuxArguments;
-  UINTN                                 CmdLineSize;
-  UINTN                                 InitrdSize;
-  EFI_DEVICE_PATH*                      Initrd;
   UINT16                                LoadOptionIndexSize;
 
   if (IS_ARM_BDS_BOOTENTRY (BootOption)) {
@@ -42,34 +38,9 @@ BootOptionStart (
 
       Status = BdsStartEfiApplication (gImageHandle, BootOption->FilePathList, 0, NULL);
     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
-      LinuxArguments = &(OptionalData->Arguments.LinuxArguments);
-      CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
-      InitrdSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->InitrdSize);
-
-      if (InitrdSize > 0) {
-        Initrd = GetAlignedDevicePath ((EFI_DEVICE_PATH*)((UINTN)(LinuxArguments + 1) + CmdLineSize));
-      } else {
-        Initrd = NULL;
-      }
-
-      Status = BdsBootLinuxAtag (BootOption->FilePathList,
-                                 Initrd, // Initrd
-                                 (CHAR8*)(LinuxArguments + 1)); // CmdLine
+      ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT) {
-      LinuxArguments = &(OptionalData->Arguments.LinuxArguments);
-      CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
-      InitrdSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->InitrdSize);
-
-      if (InitrdSize > 0) {
-        Initrd = GetAlignedDevicePath ((EFI_DEVICE_PATH*)((UINTN)(LinuxArguments + 1) + CmdLineSize));
-      } else {
-        Initrd = NULL;
-      }
-      Status = BdsBootLinuxFdt (
-                 BootOption->FilePathList,
-                 Initrd,
-                 (CHAR8*)(LinuxArguments + 1)
-                 );
+      ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
     }
   } else {
     // Connect all the drivers if the EFI Application is not a EFI OS Loader
