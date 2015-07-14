@@ -2,6 +2,7 @@
   Provides the basic interfaces to abstract a PCI Host Bridge Resource
   Allocation
 
+  Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -22,42 +23,40 @@
 //            Root Bridge's device path
 //            Root Bridge's resource aperture
 //
-UINTN RootBridgeNumber[1] = { 1 };
+UINTN RootBridgeNumber = 1;
 
-UINT64 RootBridgeAttribute[1][1] = {
-  { EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM }
+UINT64 RootBridgeAttribute[1] = {
+  EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM
 };
 
-EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath[1][1] = {
+EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath[1] = {
   {
     {
       {
+        ACPI_DEVICE_PATH,
+        ACPI_DP,
         {
-          ACPI_DEVICE_PATH,
-          ACPI_DP,
-          {
-            (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
-            (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8)
-          }
-        },
-        EISA_PNP_ID(0x0A03),
-        0
-      },
-
-      {
-        END_DEVICE_PATH_TYPE,
-        END_ENTIRE_DEVICE_PATH_SUBTYPE,
-        {
-          END_DEVICE_PATH_LENGTH,
-          0
+          (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
+          (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8)
         }
+      },
+      EISA_PNP_ID(0x0A03),
+      0
+    },
+
+    {
+      END_DEVICE_PATH_TYPE,
+      END_ENTIRE_DEVICE_PATH_SUBTYPE,
+      {
+        END_DEVICE_PATH_LENGTH,
+        0
       }
     }
   }
 };
 
-PCI_ROOT_BRIDGE_RESOURCE_APERTURE  mResAperture[1][1] = {
-  {{0, 0xff, 0x80000000, 0xffffffff, 0, 0xffff}}
+PCI_ROOT_BRIDGE_RESOURCE_APERTURE  mResAperture[1] = {
+  {0, 0xff, 0x80000000, 0xffffffff, 0, 0xffff}
 };
 
 EFI_HANDLE mDriverImageHandle;
@@ -103,7 +102,6 @@ InitializePciHostBridge (
   )
 {
   EFI_STATUS                  Status;
-  UINTN                       Loop1;
   UINTN                       Loop2;
   PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE    *PrivateData;
@@ -113,63 +111,61 @@ InitializePciHostBridge (
   //
   // Create Host Bridge Device Handle
   //
-  for (Loop1 = 0; Loop1 < HOST_BRIDGE_NUMBER; Loop1++) {
-    HostBridge = AllocateCopyPool (sizeof(PCI_HOST_BRIDGE_INSTANCE),
-                   &mPciHostBridgeInstanceTemplate);
-    if (HostBridge == NULL) {
+  HostBridge = AllocateCopyPool (sizeof(PCI_HOST_BRIDGE_INSTANCE),
+                 &mPciHostBridgeInstanceTemplate);
+  if (HostBridge == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  HostBridge->RootBridgeNumber = RootBridgeNumber;
+  InitializeListHead (&HostBridge->Head);
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &HostBridge->HostBridgeHandle,
+                  &gEfiPciHostBridgeResourceAllocationProtocolGuid,
+                  &HostBridge->ResAlloc,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    FreePool (HostBridge);
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Create Root Bridge Device Handle in this Host Bridge
+  //
+
+  for (Loop2 = 0; Loop2 < HostBridge->RootBridgeNumber; Loop2++) {
+    PrivateData = AllocateZeroPool (sizeof(PCI_ROOT_BRIDGE_INSTANCE));
+    if (PrivateData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    HostBridge->RootBridgeNumber = RootBridgeNumber[Loop1];
-    InitializeListHead (&HostBridge->Head);
+    PrivateData->Signature = PCI_ROOT_BRIDGE_SIGNATURE;
+    PrivateData->DevicePath =
+      (EFI_DEVICE_PATH_PROTOCOL *)&mEfiPciRootBridgeDevicePath[Loop2];
 
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &HostBridge->HostBridgeHandle,
-                    &gEfiPciHostBridgeResourceAllocationProtocolGuid,
-                    &HostBridge->ResAlloc,
+    RootBridgeConstructor (
+      &PrivateData->Io,
+      HostBridge->HostBridgeHandle,
+      RootBridgeAttribute[Loop2],
+      &mResAperture[Loop2]
+      );
+
+    Status = gBS->InstallMultipleProtocolInterfaces(
+                    &PrivateData->Handle,
+                    &gEfiDevicePathProtocolGuid,
+                    PrivateData->DevicePath,
+                    &gEfiPciRootBridgeIoProtocolGuid,
+                    &PrivateData->Io,
                     NULL
                     );
     if (EFI_ERROR (Status)) {
-      FreePool (HostBridge);
+      FreePool(PrivateData);
       return EFI_DEVICE_ERROR;
     }
 
-    //
-    // Create Root Bridge Device Handle in this Host Bridge
-    //
-
-    for (Loop2 = 0; Loop2 < HostBridge->RootBridgeNumber; Loop2++) {
-      PrivateData = AllocateZeroPool (sizeof(PCI_ROOT_BRIDGE_INSTANCE));
-      if (PrivateData == NULL) {
-        return EFI_OUT_OF_RESOURCES;
-      }
-
-      PrivateData->Signature = PCI_ROOT_BRIDGE_SIGNATURE;
-      PrivateData->DevicePath =
-        (EFI_DEVICE_PATH_PROTOCOL *)&mEfiPciRootBridgeDevicePath[Loop1][Loop2];
-
-      RootBridgeConstructor (
-        &PrivateData->Io,
-        HostBridge->HostBridgeHandle,
-        RootBridgeAttribute[Loop1][Loop2],
-        &mResAperture[Loop1][Loop2]
-        );
-
-      Status = gBS->InstallMultipleProtocolInterfaces(
-                      &PrivateData->Handle,
-                      &gEfiDevicePathProtocolGuid,
-                      PrivateData->DevicePath,
-                      &gEfiPciRootBridgeIoProtocolGuid,
-                      &PrivateData->Io,
-                      NULL
-                      );
-      if (EFI_ERROR (Status)) {
-        FreePool(PrivateData);
-        return EFI_DEVICE_ERROR;
-      }
-
-      InsertTailList (&HostBridge->Head, &PrivateData->Link);
-    }
+    InsertTailList (&HostBridge->Head, &PrivateData->Link);
   }
 
   return EFI_SUCCESS;

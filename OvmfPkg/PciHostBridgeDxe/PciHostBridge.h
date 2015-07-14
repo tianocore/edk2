@@ -37,12 +37,6 @@
 #include <Library/IoLib.h>
 #include <Library/PciLib.h>
 
-//
-// Hard code the host bridge number in the platform.
-// In this chipset, there is only one host bridge.
-//
-#define HOST_BRIDGE_NUMBER  1
-
 #define MAX_PCI_DEVICE_NUMBER      31
 #define MAX_PCI_FUNCTION_NUMBER    7
 #define MAX_PCI_REG_ADDRESS        0xFF
