@@ -619,12 +619,6 @@ _Exit:
   @param[in]  AllowedDb       Pointer to a list of pointers to EFI_SIGNATURE_LIST
                               structures which contains lists of X.509 certificates
                               of approved signers.
-  @param[out] Content         An optional caller-allocated buffer into which the
-                              function will copy the content of PKCS7 signedData.
-  @param[in,out] ContentSize  On input, points of the size in bytes of the optional
-                              buffer Content previously allocated by caller. On output,
-                              the value will contain the actual size of the content
-                              extracted from the signedData.
 
   @retval  EFI_SUCCESS             The PKCS7 signedData is trusted.
   @retval  EFI_SECURITY_VIOLATION  Fail to verify the signature in PKCS7 signedData.
