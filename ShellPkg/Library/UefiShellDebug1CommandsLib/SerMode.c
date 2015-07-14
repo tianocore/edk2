@@ -337,8 +337,16 @@ ShellCommandRunSerMode (
                               StopBits
                              );
           if (EFI_ERROR (Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_FAIL), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex(Handles[Index]));  
-            ShellStatus = SHELL_ACCESS_DENIED;
+            if (Status == EFI_INVALID_PARAMETER) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_UNSUPPORTED), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex(Handles[Index]));  
+              ShellStatus = SHELL_UNSUPPORTED;
+            } else if (Status == EFI_DEVICE_ERROR) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_DEV_ERROR), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex(Handles[Index]));  
+              ShellStatus = SHELL_ACCESS_DENIED;
+            } else {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_FAIL), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex(Handles[Index]));  
+              ShellStatus = SHELL_ACCESS_DENIED;
+            }
           } else {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_HANDLE), gShellDebug1HiiHandle, ConvertHandleToHandleIndex(Handles[Index]));
           }
