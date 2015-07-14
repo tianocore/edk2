@@ -18,16 +18,9 @@
 #include "PciHostBridge.h"
 
 //
-// Hard code: Root Bridge Number within the host bridge
-//            Root Bridge's attribute
-//            Root Bridge's device path
+// Hard code: Root Bridge's device path
 //            Root Bridge's resource aperture
 //
-UINTN RootBridgeNumber = 1;
-
-UINT64 RootBridgeAttribute[1] = {
-  EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM
-};
 
 EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath[1] = {
   {
@@ -117,7 +110,7 @@ InitializePciHostBridge (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  HostBridge->RootBridgeNumber = RootBridgeNumber;
+  HostBridge->RootBridgeNumber = 1;
   InitializeListHead (&HostBridge->Head);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
@@ -148,7 +141,7 @@ InitializePciHostBridge (
     RootBridgeConstructor (
       &PrivateData->Io,
       HostBridge->HostBridgeHandle,
-      RootBridgeAttribute[Loop2],
+      EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM,
       &mResAperture[Loop2]
       );
 
