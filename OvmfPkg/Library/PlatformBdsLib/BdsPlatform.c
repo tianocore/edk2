@@ -754,6 +754,7 @@ SetPciIntLine (
   UINTN                     Idx;
   UINT8                     IrqLine;
   EFI_STATUS                Status;
+  UINT32                    RootBusNumber;
 
   Status = EFI_SUCCESS;
 
@@ -762,6 +763,13 @@ SetPciIntLine (
     DevPathNode = DevicePathFromHandle (Handle);
     ASSERT (DevPathNode != NULL);
     DevPath = DevPathNode;
+
+    RootBusNumber = 0;
+    if (DevicePathType (DevPathNode) == ACPI_DEVICE_PATH &&
+        DevicePathSubType (DevPathNode) == ACPI_DP &&
+        ((ACPI_HID_DEVICE_PATH *)DevPathNode)->HID == EISA_PNP_ID(0x0A03)) {
+      RootBusNumber = ((ACPI_HID_DEVICE_PATH *)DevPathNode)->UID;
+    }
 
     //
     // Compute index into PciHostIrqs[] table by walking
@@ -794,7 +802,7 @@ SetPciIntLine (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    if (RootSlot == 0) {
+    if (RootBusNumber == 0 && RootSlot == 0) {
       DEBUG((
         EFI_D_ERROR,
         "%a: PCI host bridge (00:00.0) should have no interrupts!\n",
