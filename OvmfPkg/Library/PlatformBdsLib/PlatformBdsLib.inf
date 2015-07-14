@@ -64,4 +64,4 @@
 
 [Protocols]
   gEfiDecompressProtocolGuid
-
+  gEfiPciRootBridgeIoProtocolGuid

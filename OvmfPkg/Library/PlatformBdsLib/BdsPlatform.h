@@ -52,6 +52,7 @@ Abstract:
 #include <Protocol/PciIo.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/SimpleFileSystem.h>
+#include <Protocol/PciRootBridgeIo.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
@@ -64,7 +65,6 @@ Abstract:
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformDriverOption[];
-extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformRootBridges[];
 extern ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode;
 extern ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode;
 extern UART_DEVICE_PATH           gUartDeviceNode;
@@ -106,9 +106,6 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
     EISA_PNP_ID((PnpId)), \
     0 \
   }
-
-#define gPciRootBridge \
-  PNPID_DEVICE_PATH_NODE(0x0A03)
 
 #define gPciIsaBridge \
   PCI_DEVICE_PATH_NODE(0, 0x1f)
@@ -152,16 +149,6 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
     DEVICE_PATH_MESSAGING_PC_ANSI \
   }
 
-#define gEndEntire \
-  { \
-    END_DEVICE_PATH_TYPE, \
-    END_ENTIRE_DEVICE_PATH_SUBTYPE, \
-    { \
-      END_DEVICE_PATH_LENGTH, \
-      0 \
-    } \
-  }
-
 #define PCI_CLASS_SCC          0x07
 #define PCI_SUBCLASS_SERIAL    0x00
 #define PCI_IF_16550           0x02
@@ -171,14 +158,6 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
 #define SYS_TABLE_PAD(ptr) (((~ptr) +1) & 0x07 )
 
 #define IS_PCI_ISA_PDECODE(_p)        IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE, 0)
-
-//
-// Platform Root Bridge
-//
-typedef struct {
-  ACPI_HID_DEVICE_PATH      PciRootBridge;
-  EFI_DEVICE_PATH_PROTOCOL  End;
-} PLATFORM_ROOT_BRIDGE_DEVICE_PATH;
 
 typedef struct {
   ACPI_HID_DEVICE_PATH      PciRootBridge;
@@ -222,8 +201,6 @@ typedef struct {
   USB_CLASS_DEVICE_PATH           UsbClass;
   EFI_DEVICE_PATH_PROTOCOL        End;
 } USB_CLASS_FORMAT_DEVICE_PATH;  
-
-extern PLATFORM_ROOT_BRIDGE_DEVICE_PATH  gPlatformRootBridge0;
 
 //
 // Platform BDS Functions

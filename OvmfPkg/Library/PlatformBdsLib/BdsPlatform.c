@@ -116,49 +116,27 @@ Returns:
 
 
 EFI_STATUS
+EFIAPI
 ConnectRootBridge (
-  VOID
+  IN EFI_HANDLE  RootBridgeHandle,
+  IN VOID        *Instance,
+  IN VOID        *Context
   )
-/*++
-
-Routine Description:
-
-  Connect RootBridge
-
-Arguments:
-
-  None.
-
-Returns:
-
-  EFI_SUCCESS             - Connect RootBridge successfully.
-  EFI_STATUS              - Connect RootBridge fail.
-
---*/
 {
-  EFI_STATUS                Status;
-  EFI_HANDLE                RootHandle;
+  EFI_STATUS Status;
 
   //
-  // Make all the PCI_IO protocols on PCI Seg 0 show up
+  // Make the PCI bus driver connect the root bridge, non-recursively. This
+  // will produce a number of child handles with PciIo on them.
   //
-  BdsLibConnectDevicePath (gPlatformRootBridges[0]);
-
-  Status = gBS->LocateDevicePath (
-                  &gEfiDevicePathProtocolGuid,
-                  &gPlatformRootBridges[0],
-                  &RootHandle
+  Status = gBS->ConnectController (
+                  RootBridgeHandle, // ControllerHandle
+                  NULL,             // DriverImageHandle
+                  NULL,             // RemainingDevicePath -- produce all
+                                    //   children
+                  FALSE             // Recursive
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->ConnectController (RootHandle, NULL, NULL, FALSE);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 
@@ -1222,7 +1200,8 @@ Returns:
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
 
-  ConnectRootBridge ();
+  VisitAllInstancesOfProtocol (&gEfiPciRootBridgeIoProtocolGuid,
+    ConnectRootBridge, NULL);
 
   if (PcdGetBool (PcdOvmfFlashVariablesEnable)) {
     DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior: not restoring NvVars "

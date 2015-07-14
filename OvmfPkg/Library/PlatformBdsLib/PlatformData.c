@@ -26,19 +26,6 @@ UART_DEVICE_PATH           gUartDeviceNode            = gUart;
 VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode    = gPcAnsiTerminal;
 
 //
-// Predefined platform root bridge
-//
-PLATFORM_ROOT_BRIDGE_DEVICE_PATH  gPlatformRootBridge0 = {
-  gPciRootBridge,
-  gEndEntire
-};
-
-EFI_DEVICE_PATH_PROTOCOL          *gPlatformRootBridges[] = {
-  (EFI_DEVICE_PATH_PROTOCOL *) &gPlatformRootBridge0,
-  NULL
-};
-
-//
 // Platform specific keyboard device path
 //
 
