@@ -187,6 +187,9 @@ FvNameGuid         = 6685e0b5-d6bb-4c12-97ef-58bd87112dee
   # FV Filesystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
 
+  # Legacy Linux Loader
+  INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1

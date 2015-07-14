@@ -190,6 +190,7 @@ FvNameGuid         = B73FE497-B92E-416e-8326-45AD0D270092
   # UEFI applications
   #
   INF ShellBinPkg/UefiShell/UefiShell.inf
+  INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
 
   #
   # Juno platform driver

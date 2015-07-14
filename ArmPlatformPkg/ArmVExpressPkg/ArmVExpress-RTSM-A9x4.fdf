@@ -205,6 +205,9 @@ FvNameGuid         = 272e583c-b951-433f-af42-a9c6862af002
   #  SECTION RAW = ArmPlatformPkg/ArmVExpressPkg/Fdts/rtsm_ve-ca9x4.dtb
   #}
 
+  # Legacy Linux Loader
+  INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8
 ERASE_POLARITY     = 1

@@ -160,7 +160,7 @@
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux:
   gArmTokenSpaceGuid.PcdArmMachineType|2272
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"SemiHosting"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/zImage"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/Image"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)

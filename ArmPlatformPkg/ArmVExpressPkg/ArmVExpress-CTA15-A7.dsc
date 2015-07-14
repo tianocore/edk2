@@ -184,7 +184,7 @@
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux:
   gArmTokenSpaceGuid.PcdArmMachineType|2272
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NorFlash"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/MemoryMapped(0x0,0xE000000,0xE800000)"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/Image"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,38400 earlyprintk debug verbose"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
 

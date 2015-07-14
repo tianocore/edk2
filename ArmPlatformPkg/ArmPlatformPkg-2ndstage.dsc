@@ -89,6 +89,11 @@
   # Networking Requirements for ArmPlatformPkg/Bds
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
 
+  # These libraries are used by the dynamic EFI Shell commands
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+
   # EBL Related Libraries
   EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
@@ -298,6 +303,11 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
 
+  # We want to use the Shell Libraries but don't want it to initialise
+  # automatically. We initialise the libraries when the command is called by the
+  # Shell.
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+
   #
   # ARM Pcds
   #
@@ -369,3 +379,5 @@
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   ArmPlatformPkg/Bds/Bds.inf
 
+  # Legacy Linux Loader
+  ArmPkg/Application/LinuxLoader/LinuxLoader.inf

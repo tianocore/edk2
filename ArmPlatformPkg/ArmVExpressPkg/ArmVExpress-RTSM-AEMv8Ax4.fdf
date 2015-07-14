@@ -197,6 +197,9 @@ FvNameGuid         = a2fc72eb-4157-40a3-8110-14c010e810b4
   # after the device drivers (eg: Ethernet) to ensure we have support for them.
   INF EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
 
+  # Legacy Linux Loader
+  INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1

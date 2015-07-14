@@ -105,6 +105,11 @@
 
   GdbSerialLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/GdbSerialLib/GdbSerialLib.inf
 
+  # These libraries are used by the dynamic EFI Shell commands
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+
   # BDS Libraries
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
@@ -303,13 +308,18 @@
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x10000048
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x10005000
 
+  # We want to use the Shell Libraries but don't want it to initialise
+  # automatically. We initialise the libraries when the command is called by the
+  # Shell.
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+
   #
   # ARM OS Loader
   #
   gArmTokenSpaceGuid.PcdArmMachineType|827
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"SemiHosting"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/zImage-RTSM"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"Fv(14801114-DA6A-4113-985B-DC876337A15E)/LinuxLoader.efi"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/zImage-RTSM -a 827 -c \"console=ttyAMA0,38400n8\""
 
   # Use the Serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(407B4008-BF5B-11DF-9547-CF16E0D72085)"
@@ -325,3 +335,6 @@
 
   # FV Filesystem
   MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  # Legacy Linux Loader
+  ArmPkg/Application/LinuxLoader/LinuxLoader.inf
