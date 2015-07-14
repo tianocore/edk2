@@ -182,8 +182,8 @@
   # ARM OS Loader
   #
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NorFlash"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)/Image"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyAMA0,38400 earlyprintk debug verbose"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"Fv(73DCB643-3862-4904-9076-A94AF1890243)/LinuxLoader.efi"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/kernel -c \"console=ttyAMA0,38400 earlyprintk debug verbose\""
 
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   # PL111 - CLCD
