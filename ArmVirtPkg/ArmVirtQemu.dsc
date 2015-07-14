@@ -133,7 +133,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux (EFI stub) on virtio31:hd0:part0"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(837DCA9E-E874-4D82-B29A-23FE0E23D1E2,003E000A00000000)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/Image"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"root=/dev/vda2 console=ttyAMA0 earlycon uefi_debug"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|0
 
   #
   # Settings for ARM BDS -- use the serial console (ConIn & ConOut).
