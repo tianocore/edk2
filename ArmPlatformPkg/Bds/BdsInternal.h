@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -79,6 +79,12 @@ typedef struct _BDS_LOAD_OPTION_SUPPORT {
 #define LOAD_OPTION_ENTRY_FROM_LINK(a)  BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link)
 #define LOAD_OPTION_FROM_LINK(a)        ((BDS_LOAD_OPTION_ENTRY*)BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link))->BdsLoadOption
 
+// GUID of the EFI Linux Loader
+extern CONST EFI_GUID mLinuxLoaderAppGuid;
+
+// Device path of the EFI Linux Loader in the Firmware Volume
+extern EFI_DEVICE_PATH* mLinuxLoaderDevicePath;
+
 EFI_STATUS
 BootDeviceListSupportedInit (
   IN OUT LIST_ENTRY *SupportedDeviceList
@@ -139,11 +145,6 @@ EditHIInputIP (
 EFI_STATUS
 GetHIInputBoolean (
   OUT BOOLEAN *Value
-  );
-
-BOOLEAN
-HasFilePathEfiExtension (
-  IN CHAR16* FilePath
   );
 
 EFI_DEVICE_PATH*
@@ -258,6 +259,19 @@ EFIAPI
 EmptyCallbackFunction (
   IN EFI_EVENT                Event,
   IN VOID                     *Context
+  );
+
+/**
+ * This function check if the DevicePath defines an EFI binary
+ *
+ * This function is used when the BDS support Linux loader to
+ * detect if the binary is an EFI application or potentially a
+ * Linux kernel.
+ */
+EFI_STATUS
+IsEfiBinary (
+  IN  EFI_DEVICE_PATH* DevicePath,
+  OUT BOOLEAN          *EfiBinary
   );
 
 #endif /* _BDSINTERNAL_H_ */

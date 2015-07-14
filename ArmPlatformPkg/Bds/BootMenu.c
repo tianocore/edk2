@@ -269,6 +269,8 @@ BootMenuAddBootOption (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathNodes;
   UINT8*                    OptionalData;
   UINTN                     OptionalDataSize;
+  BOOLEAN                   EfiBinary;
+  CHAR16                    *LinuxDevicePath;
 
   Attributes                = 0;
   SupportedBootDevice = NULL;
@@ -281,8 +283,12 @@ BootMenuAddBootOption (
   }
 
   // Create the specific device path node
-  Status = SupportedBootDevice->Support->CreateDevicePathNode (L"EFI Application or the kernel", &DevicePathNodes);
-  if (EFI_ERROR(Status)) {
+  if (FeaturePcdGet (PcdBdsLinuxSupport) && mLinuxLoaderDevicePath) {
+    Status = SupportedBootDevice->Support->CreateDevicePathNode (L"EFI Application or the kernel", &DevicePathNodes);
+  } else {
+    Status = SupportedBootDevice->Support->CreateDevicePathNode (L"EFI Application", &DevicePathNodes);
+  }
+  if (EFI_ERROR (Status)) {
     Status = EFI_ABORTED;
     goto EXIT;
   }
@@ -293,8 +299,39 @@ BootMenuAddBootOption (
     goto EXIT;
   }
 
+  // Is it an EFI application?
+  if (FeaturePcdGet (PcdBdsLinuxSupport) && mLinuxLoaderDevicePath) {
+    Status = IsEfiBinary (DevicePath, &EfiBinary);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+      goto EXIT;
+    }
+
+    if (EfiBinary == FALSE) {
+      Print (L"It is assumed the binary is a Linux kernel and the embedded Linux Loader is going to be used.\n");
+      Print (L"Supported command line formats by the embedded Linux Loader:\n");
+      Print (L"- <EFI device path of the Linux kernel> -c \"<Linux kernel command line>\"\n");
+      Print (L"- <EFI device path of the Linux kernel> -c \"<Linux kernel command line>\" -f <EFI Device Path of the Linux initrd>\n");
+      Print (L"- <EFI device path of the Linux kernel> -c \"<Linux kernel command line>\" -a <Machine Type for ATAG Linux kernel>\n");
+
+      // Copy the Linux path into the command line
+      LinuxDevicePath = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
+      CopyMem (CmdLine, LinuxDevicePath, MAX (sizeof (CmdLine), StrSize (LinuxDevicePath)));
+      FreePool (LinuxDevicePath);
+
+      // Free the generated Device Path
+      FreePool (DevicePath);
+      // and use the embedded Linux Loader as the EFI application
+      DevicePath = mLinuxLoaderDevicePath;
+    } else {
+      CmdLine[0] = L'\0';
+    }
+  } else {
+    CmdLine[0] = L'\0';
+  }
+
   Print (L"Arguments to pass to the EFI Application: ");
-  Status = GetHIInputStr (CmdLine, BOOT_DEVICE_OPTION_MAX);
+  Status = EditHIInputStr (CmdLine, BOOT_DEVICE_OPTION_MAX);
   if (EFI_ERROR (Status)) {
     Status = EFI_ABORTED;
     goto EXIT;
@@ -366,11 +403,13 @@ BootMenuUpdateBootOption (
   CHAR16                        BootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
   CHAR8                         CmdLine[BOOT_DEVICE_OPTION_MAX];
   CHAR16                        UnicodeCmdLine[BOOT_DEVICE_OPTION_MAX];
+  CHAR16                        *LinuxDevicePath;
   EFI_DEVICE_PATH               *DevicePath;
   UINT8*                        OptionalData;
   UINTN                         OptionalDataSize;
   BOOLEAN                       IsPrintable;
   BOOLEAN                       IsUnicode;
+  BOOLEAN                       EfiBinary;
 
   DisplayBootOptions (BootOptionsList);
   Status = SelectBootOption (BootOptionsList, UPDATE_BOOT_ENTRY, &BootOptionEntry);
@@ -386,46 +425,87 @@ BootMenuUpdateBootOption (
     return EFI_UNSUPPORTED;
   }
 
-  Status = DeviceSupport->UpdateDevicePathNode (BootOption->FilePathList, L"EFI Application or the kernel", &DevicePath);
-  if (EFI_ERROR(Status)) {
-    Status = EFI_ABORTED;
-    goto EXIT;
+  EfiBinary = TRUE;
+  if (FeaturePcdGet (PcdBdsLinuxSupport) && mLinuxLoaderDevicePath) {
+    Status = DeviceSupport->UpdateDevicePathNode (BootOption->FilePathList, L"EFI Application or the kernel", &DevicePath);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+      goto EXIT;
+    }
+
+    // Is it an EFI application?
+    Status = IsEfiBinary (DevicePath, &EfiBinary);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+      goto EXIT;
+    }
+
+    if (EfiBinary == FALSE) {
+      Print (L"It is assumed the binary is a Linux kernel and the embedded Linux Loader is going to be used.\n");
+      Print (L"Supported command line formats by the embedded Linux Loader:\n");
+      Print (L"- <EFI device path of the Linux kernel> -c \"<Linux kernel command line>\"\n");
+      Print (L"- <EFI device path of the Linux kernel> -c \"<Linux kernel command line>\" -f <EFI Device Path of the Linux initrd>\n");
+      Print (L"- <EFI device path of the Linux kernel> -c \"<Linux kernel command line>\" -a <Machine Type for ATAG Linux kernel>\n");
+
+      // Copy the Linux path into the command line
+      LinuxDevicePath = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
+      CopyMem (UnicodeCmdLine, LinuxDevicePath, MAX (sizeof (UnicodeCmdLine), StrSize (LinuxDevicePath)));
+      FreePool (LinuxDevicePath);
+
+      // Free the generated Device Path
+      FreePool (DevicePath);
+      // and use the embedded Linux Loader as the EFI application
+      DevicePath = mLinuxLoaderDevicePath;
+
+      // The command line is a unicode printable string
+      IsPrintable = TRUE;
+      IsUnicode = TRUE;
+    }
+  } else {
+    Status = DeviceSupport->UpdateDevicePathNode (BootOption->FilePathList, L"EFI Application", &DevicePath);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+      goto EXIT;
+    }
   }
 
   Print (L"Arguments to pass to the EFI Application: ");
 
-  if (BootOption->OptionalDataSize > 0) {
-    IsPrintable = IsPrintableString (BootOption->OptionalData, &IsUnicode);
-    if (IsPrintable) {
-        //
-        // The size in bytes of the string, final zero included, should
-        // be equal to or at least lower than "BootOption->OptionalDataSize"
-        // and the "IsPrintableString()" has already tested that the length
-        // in number of characters is smaller than BOOT_DEVICE_OPTION_MAX,
-        // final '\0' included. We can thus copy the string for editing
-        // using "CopyMem()". Furthermore, note that in the case of an Unicode
-        // string "StrnCpy()" and "StrCpy()" can not be used to copy the
-        // string because the data pointed to by "BootOption->OptionalData"
-        // is not necessarily 2-byte aligned.
-        //
-      if (IsUnicode) {
-        CopyMem (
-          UnicodeCmdLine, BootOption->OptionalData,
-          MIN (sizeof (UnicodeCmdLine),
-               BootOption->OptionalDataSize)
-          );
-      } else {
-        CopyMem (
-          CmdLine, BootOption->OptionalData,
-          MIN (sizeof (CmdLine),
-               BootOption->OptionalDataSize)
-          );
+  // When the command line has not been initialized by the embedded Linux loader earlier
+  if (EfiBinary) {
+    if (BootOption->OptionalDataSize > 0) {
+      IsPrintable = IsPrintableString (BootOption->OptionalData, &IsUnicode);
+      if (IsPrintable) {
+          //
+          // The size in bytes of the string, final zero included, should
+          // be equal to or at least lower than "BootOption->OptionalDataSize"
+          // and the "IsPrintableString()" has already tested that the length
+          // in number of characters is smaller than BOOT_DEVICE_OPTION_MAX,
+          // final '\0' included. We can thus copy the string for editing
+          // using "CopyMem()". Furthermore, note that in the case of an Unicode
+          // string "StrnCpy()" and "StrCpy()" can not be used to copy the
+          // string because the data pointed to by "BootOption->OptionalData"
+          // is not necessarily 2-byte aligned.
+          //
+        if (IsUnicode) {
+          CopyMem (
+            UnicodeCmdLine, BootOption->OptionalData,
+            MIN (sizeof (UnicodeCmdLine),
+                 BootOption->OptionalDataSize)
+            );
+        } else {
+          CopyMem (
+            CmdLine, BootOption->OptionalData,
+            MIN (sizeof (CmdLine),
+                 BootOption->OptionalDataSize)
+            );
+        }
       }
+    } else {
+      UnicodeCmdLine[0] = L'\0';
+      IsPrintable = TRUE;
+      IsUnicode = TRUE;
     }
-  } else {
-    UnicodeCmdLine[0] = L'\0';
-    IsPrintable = TRUE;
-    IsUnicode = TRUE;
   }
 
   // We do not request arguments for OptionalData that cannot be printed
@@ -909,7 +989,6 @@ struct BOOT_MAIN_ENTRY {
     { L"Boot Manager", BootMenuManager },
 };
 
-
 EFI_STATUS
 BootMenuMain (
   VOID
@@ -928,6 +1007,12 @@ BootMenuMain (
 
   BootOption         = NULL;
   BootMainEntryCount = sizeof(BootMainEntries) / sizeof(struct BOOT_MAIN_ENTRY);
+
+  if (FeaturePcdGet (PcdBdsLinuxSupport)) {
+    // Check Linux Loader is present
+    Status = LocateEfiApplicationInFvByGuid (&mLinuxLoaderAppGuid, &mLinuxLoaderDevicePath);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   while (TRUE) {
     // Get Boot#### list

@@ -27,6 +27,7 @@
 [Sources]
   Bds.c
   BdsHelper.c
+  BootLinux.c
   BootMenu.c
   BootOption.c
   BootOptionSupport.c
@@ -71,6 +72,9 @@
   gEfiFirmwareVolumeBlock2ProtocolGuid
   gEfiDhcp4ServiceBindingProtocolGuid
   gEfiMtftp4ServiceBindingProtocolGuid
+
+[FeaturePcd]
+  gArmPlatformTokenSpaceGuid.PcdBdsLinuxSupport
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor

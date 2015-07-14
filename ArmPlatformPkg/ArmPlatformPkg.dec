@@ -61,6 +61,9 @@
   # we assume the OS will handle the FrameBuffer from the UEFI GOP information.
   gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices|FALSE|BOOLEAN|0x0000003D
 
+  # Enable Legacy Linux support in the BDS
+  gArmPlatformTokenSpaceGuid.PcdBdsLinuxSupport|TRUE|BOOLEAN|0x0000002E
+
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1|UINT32|0x00000039
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038
