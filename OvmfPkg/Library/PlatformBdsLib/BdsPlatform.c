@@ -749,6 +749,7 @@ SetPciIntLine (
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevPathNode;
+  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   UINTN                     RootSlot;
   UINTN                     Idx;
   UINT8                     IrqLine;
@@ -760,6 +761,7 @@ SetPciIntLine (
 
     DevPathNode = DevicePathFromHandle (Handle);
     ASSERT (DevPathNode != NULL);
+    DevPath = DevPathNode;
 
     //
     // Compute index into PciHostIrqs[] table by walking
@@ -831,6 +833,29 @@ SetPciIntLine (
     }
     Idx %= ARRAY_SIZE (PciHostIrqs);
     IrqLine = PciHostIrqs[Idx];
+
+    DEBUG_CODE_BEGIN ();
+    {
+      CHAR16        *DevPathString;
+      STATIC CHAR16 Fallback[] = L"<failed to convert>";
+      UINTN         Segment, Bus, Device, Function;
+
+      DevPathString = ConvertDevicePathToText (DevPath, FALSE, FALSE);
+      if (DevPathString == NULL) {
+        DevPathString = Fallback;
+      }
+      Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Function);
+      ASSERT_EFI_ERROR (Status);
+
+      DEBUG ((EFI_D_VERBOSE, "%a: [%02x:%02x.%x] %s -> 0x%02x\n", __FUNCTION__,
+        (UINT32)Bus, (UINT32)Device, (UINT32)Function, DevPathString,
+        IrqLine));
+
+      if (DevPathString != Fallback) {
+        FreePool (DevPathString);
+      }
+    }
+    DEBUG_CODE_END ();
 
     //
     // Set PCI Interrupt Line register for this device to PciHostIrqs[Idx]
