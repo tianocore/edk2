@@ -43,14 +43,6 @@ EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
   }
 };
 
-//
-// Hard code: Root Bridge's resource aperture
-//
-
-PCI_ROOT_BRIDGE_RESOURCE_APERTURE  mResAperture[1] = {
-  {0, 0xff, 0x80000000, 0xffffffff, 0, 0xffff}
-};
-
 EFI_HANDLE mDriverImageHandle;
 
 PCI_HOST_BRIDGE_INSTANCE mPciHostBridgeInstanceTemplate = {
@@ -80,8 +72,15 @@ PCI_HOST_BRIDGE_INSTANCE mPciHostBridgeInstanceTemplate = {
 
   param[in]  RootBusNumber     The bus number of the root bus (root bridge) to
                                create.
-                               RootBusNumber is expected to fall into the valid
-                               offset range of mResAperture.
+
+  param[in]  MaxSubBusNumber   The inclusive maximum bus number that can be
+                               assigned to any subordinate bus found behind any
+                               PCI bridge hanging off this root bus.
+
+                               The caller is repsonsible for ensuring that
+                               RootBusNumber <= MaxSubBusNumber. If
+                               RootBusNumber equals MaxSubBusNumber, then the
+                               root bus has no room for subordinate buses.
 
   param[in]  HostBridgeHandle  The EFI_HANDLE corresponding to the host bridge
                                that is the parent of the root bridge to create.
@@ -108,12 +107,16 @@ STATIC
 EFI_STATUS
 InitRootBridge (
   IN  UINT8                    RootBusNumber,
+  IN  UINT8                    MaxSubBusNumber,
   IN  EFI_HANDLE               HostBridgeHandle,
   OUT PCI_ROOT_BRIDGE_INSTANCE **RootBus
   )
 {
-  PCI_ROOT_BRIDGE_INSTANCE *PrivateData;
-  EFI_STATUS               Status;
+  PCI_ROOT_BRIDGE_INSTANCE          *PrivateData;
+  PCI_ROOT_BRIDGE_RESOURCE_APERTURE ResAperture;
+  EFI_STATUS                        Status;
+
+  ASSERT (RootBusNumber <= MaxSubBusNumber);
 
   PrivateData = AllocateZeroPool (sizeof *PrivateData);
   if (PrivateData == NULL) {
@@ -126,13 +129,18 @@ InitRootBridge (
     sizeof mRootBridgeDevicePathTemplate);
   PrivateData->DevicePath.AcpiDevicePath.UID = RootBusNumber;
 
+  ResAperture.BusBase  = RootBusNumber;
+  ResAperture.BusLimit = MaxSubBusNumber;
+  ResAperture.MemBase  = BASE_2GB;
+  ResAperture.MemLimit = BASE_4GB - 1;
+  ResAperture.IoBase   = 0;
+  ResAperture.IoLimit  = MAX_UINT16;
   //
   // The function call below allocates no resources and performs no actions
   // that have to be rolled back on later failure. It always succeeds.
   //
   Status = RootBridgeConstructor (&PrivateData->Io, HostBridgeHandle,
-             EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM,
-             &mResAperture[RootBusNumber]);
+             EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM, &ResAperture);
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->InstallMultipleProtocolInterfaces (&PrivateData->Handle,
@@ -143,6 +151,9 @@ InitRootBridge (
     goto FreePrivateData;
   }
 
+  DEBUG ((EFI_D_INFO,
+    "%a: installed root bus %d, with room for %d subordinate bus(es)\n",
+    __FUNCTION__, RootBusNumber, MaxSubBusNumber - RootBusNumber));
   *RootBus = PrivateData;
   return EFI_SUCCESS;
 
@@ -196,6 +207,7 @@ InitializePciHostBridge (
   )
 {
   EFI_STATUS                  Status;
+  UINTN                       LastRootBridgeNumber;
   UINTN                       RootBridgeNumber;
   PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE    *RootBus;
@@ -224,19 +236,54 @@ InitializePciHostBridge (
     goto FreeHostBridge;
   }
 
-  for (RootBridgeNumber = 0;
-       RootBridgeNumber < 1;
+  //
+  // The "main" root bus is always there.
+  //
+  LastRootBridgeNumber = 0;
+
+  //
+  // Scan all other root buses. If function 0 of any device on a bus returns a
+  // VendorId register value different from all-bits-one, then that bus is
+  // alive.
+  //
+  for (RootBridgeNumber = 1;
+       RootBridgeNumber < 256;
        ++RootBridgeNumber) {
-    Status = InitRootBridge (
-               (UINT8)RootBridgeNumber,
-               HostBridge->HostBridgeHandle,
-               &RootBus
-               );
-    if (EFI_ERROR (Status)) {
-      goto RollbackProtocols;
+    UINTN Device;
+
+    for (Device = 0; Device <= MAX_PCI_DEVICE_NUMBER; ++Device) {
+      if (PciRead16 (PCI_LIB_ADDRESS (RootBridgeNumber, Device, 0,
+                       PCI_VENDOR_ID_OFFSET)) != MAX_UINT16) {
+        break;
+      }
     }
-    InsertTailList (&HostBridge->Head, &RootBus->Link);
+    if (Device <= MAX_PCI_DEVICE_NUMBER) {
+      //
+      // Found the next root bus. We can now install the *previous* one,
+      // because now we know how big a bus number range *that* one has, for any
+      // subordinate buses that might exist behind PCI bridges hanging off it.
+      //
+      Status = InitRootBridge ((UINT8)LastRootBridgeNumber,
+                 (UINT8)(RootBridgeNumber - 1), HostBridge->HostBridgeHandle,
+                 &RootBus);
+      if (EFI_ERROR (Status)) {
+        goto RollbackProtocols;
+      }
+      InsertTailList (&HostBridge->Head, &RootBus->Link);
+      LastRootBridgeNumber = RootBridgeNumber;
+    }
   }
+
+  //
+  // Install the last root bus (which might be the only, ie. main, root bus, if
+  // we've found no extra root buses).
+  //
+  Status = InitRootBridge ((UINT8)LastRootBridgeNumber, 255,
+             HostBridge->HostBridgeHandle, &RootBus);
+  if (EFI_ERROR (Status)) {
+    goto RollbackProtocols;
+  }
+  InsertTailList (&HostBridge->Head, &RootBus->Link);
 
   return EFI_SUCCESS;
 
