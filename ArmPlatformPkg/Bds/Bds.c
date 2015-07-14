@@ -220,12 +220,6 @@ DefineDefaultBootEntries (
   EFI_STATUS                          Status;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL* EfiDevicePathFromTextProtocol;
   EFI_DEVICE_PATH*                    BootDevicePath;
-  UINT8*                              OptionalData;
-  UINTN                               OptionalDataSize;
-  ARM_BDS_LOADER_ARGUMENTS*           BootArguments;
-  ARM_BDS_LOADER_TYPE                 BootType;
-  EFI_DEVICE_PATH*                    InitrdPath;
-  UINTN                               InitrdSize;
   UINTN                               CmdLineSize;
   UINTN                               CmdLineAsciiSize;
   CHAR16*                             DefaultBootArgument;
@@ -269,8 +263,6 @@ DefineDefaultBootEntries (
 
     // Create the entry is the Default values are correct
     if (BootDevicePath != NULL) {
-      BootType = (ARM_BDS_LOADER_TYPE)PcdGet32 (PcdDefaultBootType);
-
       // We do not support NULL pointer
       ASSERT (PcdGetPtr (PcdDefaultBootArgument) != NULL);
 
@@ -308,33 +300,11 @@ DefineDefaultBootEntries (
         AsciiStrToUnicodeStr (AsciiDefaultBootArgument, DefaultBootArgument);
       }
 
-      if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-        InitrdPath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdDefaultBootInitrdPath));
-        InitrdSize = GetDevicePathSize (InitrdPath);
-
-        OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineAsciiSize + InitrdSize;
-        BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (OptionalDataSize);
-        if (BootArguments == NULL) {
-          return EFI_OUT_OF_RESOURCES;
-        }
-        BootArguments->LinuxArguments.CmdLineSize = CmdLineAsciiSize;
-        BootArguments->LinuxArguments.InitrdSize = InitrdSize;
-
-        CopyMem ((VOID*)(BootArguments + 1), AsciiDefaultBootArgument, CmdLineAsciiSize);
-        CopyMem ((VOID*)((UINTN)(BootArguments + 1) + CmdLineAsciiSize), InitrdPath, InitrdSize);
-
-        OptionalData = (UINT8*)BootArguments;
-      } else {
-        OptionalData = (UINT8*)DefaultBootArgument;
-        OptionalDataSize = CmdLineSize;
-      }
-
       BootOptionCreate (LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
-        (CHAR16*)PcdGetPtr(PcdDefaultBootDescription),
+        (CHAR16*)PcdGetPtr (PcdDefaultBootDescription),
         BootDevicePath,
-        BootType,
-        OptionalData,
-        OptionalDataSize,
+        (UINT8 *)DefaultBootArgument, // OptionalData
+        CmdLineSize,                  // OptionalDataSize
         &BdsLoadOption
         );
       FreePool (BdsLoadOption);

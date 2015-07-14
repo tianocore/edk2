@@ -24,7 +24,7 @@
 
   ENTRY_POINT                    = BdsInitialize
 
-[Sources.common]
+[Sources]
   Bds.c
   BdsHelper.c
   BootMenu.c
@@ -44,12 +44,11 @@
 
 [LibraryClasses]
   BdsLib
-  TimerLib
-  PerformanceLib
   UefiBootServicesTableLib
   DxeServicesTableLib
   UefiDriverEntryPoint
   DebugLib
+  PerformanceLib
   PrintLib
   BaseLib
   FdtLib
@@ -77,9 +76,7 @@
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths

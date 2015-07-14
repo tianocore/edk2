@@ -38,45 +38,9 @@
 #define BOOT_DEVICE_OPTION_MAX        300
 #define BOOT_DEVICE_ADDRESS_MAX       (sizeof(L"0x0000000000000000"))
 
-#define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
-
-#define IS_ARM_BDS_BOOTENTRY(ptr)  \
-  (((ptr)->OptionalData != NULL) && \
-   (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) \
-      == ARM_BDS_OPTIONAL_DATA_SIGNATURE))
-
 #define UPDATE_BOOT_ENTRY L"Update entry: "
 #define DELETE_BOOT_ENTRY L"Delete entry: "
 #define MOVE_BOOT_ENTRY   L"Move entry: "
-
-typedef enum {
-    BDS_LOADER_EFI_APPLICATION = 0,
-    BDS_LOADER_KERNEL_LINUX_ATAG,
-    BDS_LOADER_KERNEL_LINUX_FDT,
-} ARM_BDS_LOADER_TYPE;
-
-typedef struct {
-  UINT16                     CmdLineSize;
-  UINT16                     InitrdSize;
-
-  // These following fields have variable length and are packed:
-  //CHAR8                      *CmdLine;
-  //EFI_DEVICE_PATH_PROTOCOL   *InitrdPathList;
-} ARM_BDS_LINUX_ARGUMENTS;
-
-typedef union {
-  ARM_BDS_LINUX_ARGUMENTS    LinuxArguments;
-} ARM_BDS_LOADER_ARGUMENTS;
-
-typedef struct {
-  UINT32                     Signature;
-  ARM_BDS_LOADER_TYPE        LoaderType;
-} ARM_BDS_LOADER_OPTIONAL_DATA_HEADER;
-
-typedef struct {
-  ARM_BDS_LOADER_OPTIONAL_DATA_HEADER Header;
-  ARM_BDS_LOADER_ARGUMENTS            Arguments;
-} ARM_BDS_LOADER_OPTIONAL_DATA;
 
 typedef struct {
   LIST_ENTRY                  Link;
@@ -230,7 +194,6 @@ BootOptionCreate (
   IN  UINT32                    Attributes,
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
-  IN  ARM_BDS_LOADER_TYPE       BootType,
   IN  UINT8*                    OptionalData,
   IN  UINTN                     OptionalDataSize,
   OUT BDS_LOAD_OPTION**         BdsLoadOption
@@ -242,7 +205,6 @@ BootOptionUpdate (
   IN  UINT32                    Attributes,
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
-  IN  ARM_BDS_LOADER_TYPE       BootType,
   IN UINT8*                     OptionalData,
   IN UINTN                      OptionalDataSize
   );
@@ -250,13 +212,6 @@ BootOptionUpdate (
 EFI_STATUS
 BootOptionDelete (
   IN  BDS_LOAD_OPTION *BootOption
-  );
-
-EFI_STATUS
-BootDeviceGetType (
-  IN  EFI_DEVICE_PATH* DevicePath,
-  OUT ARM_BDS_LOADER_TYPE *BootType,
-  OUT UINT32 *Attributes
   );
 
 EFI_STATUS

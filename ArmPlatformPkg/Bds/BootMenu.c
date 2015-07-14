@@ -54,8 +54,6 @@ DisplayBootOptions (
     DEBUG_CODE_BEGIN ();
       CHAR16*                           DevicePathTxt;
       EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
-      ARM_BDS_LOADER_TYPE               LoaderType;
-      ARM_BDS_LOADER_OPTIONAL_DATA*     OptionalData;
 
       Status = gBS->LocateProtocol (
                      &gEfiDevicePathToTextProtocolGuid,
@@ -70,20 +68,11 @@ DisplayBootOptions (
                                                   );
       Print (L"\t- %s\n", DevicePathTxt);
 
-      OptionalData = BdsLoadOption->OptionalData;
-      if (IS_ARM_BDS_BOOTENTRY (BdsLoadOption)) {
-        LoaderType = (ARM_BDS_LOADER_TYPE)ReadUnaligned32 ((CONST UINT32*)&OptionalData->Header.LoaderType);
-        if ((LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) ||
-            (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT )   ) {
-          Print (L"\t- Arguments: %a\n", &OptionalData->Arguments.LinuxArguments + 1);
-        }
-      } else if (OptionalData != NULL) {
-        if (IsPrintableString (OptionalData, &IsUnicode)) {
-          if (IsUnicode) {
-            Print (L"\t- Arguments: %s\n", OptionalData);
-          } else {
-            AsciiPrint ("\t- Arguments: %a\n", OptionalData);
-          }
+      if (IsPrintableString (BdsLoadOption->OptionalData, &IsUnicode)) {
+        if (IsUnicode) {
+          Print (L"\t- Arguments: %s\n", BdsLoadOption->OptionalData);
+        } else {
+          AsciiPrint ("\t- Arguments: %a\n", BdsLoadOption->OptionalData);
         }
       }
 
@@ -272,20 +261,12 @@ BootMenuAddBootOption (
 {
   EFI_STATUS                Status;
   BDS_SUPPORTED_DEVICE*     SupportedBootDevice;
-  ARM_BDS_LOADER_ARGUMENTS* BootArguments;
   CHAR16                    BootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
-  CHAR8                     AsciiCmdLine[BOOT_DEVICE_OPTION_MAX];
   CHAR16                    CmdLine[BOOT_DEVICE_OPTION_MAX];
   UINT32                    Attributes;
-  ARM_BDS_LOADER_TYPE       BootType;
   BDS_LOAD_OPTION_ENTRY     *BdsLoadOptionEntry;
   EFI_DEVICE_PATH           *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathNodes;
-  EFI_DEVICE_PATH_PROTOCOL  *InitrdPathNodes;
-  EFI_DEVICE_PATH_PROTOCOL  *InitrdPath;
-  UINTN                     CmdLineSize;
-  BOOLEAN                   InitrdSupport;
-  UINTN                     InitrdSize;
   UINT8*                    OptionalData;
   UINTN                     OptionalDataSize;
 
@@ -312,79 +293,15 @@ BootMenuAddBootOption (
     goto EXIT;
   }
 
-  if (SupportedBootDevice->Support->RequestBootType) {
-    Status = BootDeviceGetType (DevicePath, &BootType, &Attributes);
-    if (EFI_ERROR(Status)) {
-      Status = EFI_ABORTED;
-      goto EXIT;
-    }
-  } else {
-    BootType = BDS_LOADER_EFI_APPLICATION;
+  Print (L"Arguments to pass to the EFI Application: ");
+  Status = GetHIInputStr (CmdLine, BOOT_DEVICE_OPTION_MAX);
+  if (EFI_ERROR (Status)) {
+    Status = EFI_ABORTED;
+    goto EXIT;
   }
 
-  if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-    Print(L"Add an initrd: ");
-    Status = GetHIInputBoolean (&InitrdSupport);
-    if (EFI_ERROR(Status)) {
-      Status = EFI_ABORTED;
-      goto EXIT;
-    }
-
-    if (InitrdSupport) {
-      // Create the specific device path node
-      Status = SupportedBootDevice->Support->CreateDevicePathNode (L"initrd", &InitrdPathNodes);
-      if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) { // EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
-        Status = EFI_ABORTED;
-        goto EXIT;
-      }
-
-      if (InitrdPathNodes != NULL) {
-        // Append the Device Path to the selected device path
-        InitrdPath = AppendDevicePath (SupportedBootDevice->DevicePathProtocol, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNodes);
-        // Free the InitrdPathNodes created by Support->CreateDevicePathNode()
-        FreePool (InitrdPathNodes);
-
-        if (InitrdPath == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto EXIT;
-        }
-      } else {
-        InitrdPath = NULL;
-      }
-    } else {
-      InitrdPath = NULL;
-    }
-
-    Print(L"Arguments to pass to the binary: ");
-    Status = GetHIInputAscii (AsciiCmdLine, BOOT_DEVICE_OPTION_MAX);
-    if (EFI_ERROR(Status)) {
-      Status = EFI_ABORTED;
-      goto FREE_DEVICE_PATH;
-    }
-
-    CmdLineSize = AsciiStrSize (AsciiCmdLine);
-    InitrdSize = GetDevicePathSize (InitrdPath);
-
-    OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize;
-    BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (OptionalDataSize);
-
-    BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
-    BootArguments->LinuxArguments.InitrdSize = InitrdSize;
-    CopyMem ((VOID*)(&BootArguments->LinuxArguments + 1), AsciiCmdLine, CmdLineSize);
-    CopyMem ((VOID*)((UINTN)(&BootArguments->LinuxArguments + 1) + CmdLineSize), InitrdPath, InitrdSize);
-
-    OptionalData = (UINT8*)BootArguments;
-  } else {
-    Print (L"Arguments to pass to the EFI Application: ");
-    Status = GetHIInputStr (CmdLine, BOOT_DEVICE_OPTION_MAX);
-    if (EFI_ERROR (Status)) {
-      Status = EFI_ABORTED;
-      goto EXIT;
-    }
-
-    OptionalData = (UINT8*)CmdLine;
-    OptionalDataSize = StrSize (CmdLine);
-  }
+  OptionalData = (UINT8*)CmdLine;
+  OptionalDataSize = StrSize (CmdLine);
 
   Print(L"Description for this new Entry: ");
   Status = GetHIInputStr (BootDescription, BOOT_DEVICE_DESCRIPTION_MAX);
@@ -395,7 +312,7 @@ BootMenuAddBootOption (
 
   // Create new entry
   BdsLoadOptionEntry = (BDS_LOAD_OPTION_ENTRY*)AllocatePool (sizeof(BDS_LOAD_OPTION_ENTRY));
-  Status = BootOptionCreate (Attributes, BootDescription, DevicePath, BootType, OptionalData, OptionalDataSize, &BdsLoadOptionEntry->BdsLoadOption);
+  Status = BootOptionCreate (Attributes, BootDescription, DevicePath, OptionalData, OptionalDataSize, &BdsLoadOptionEntry->BdsLoadOption);
   if (!EFI_ERROR(Status)) {
     InsertTailList (BootOptionsList, &BdsLoadOptionEntry->Link);
   }
@@ -446,20 +363,10 @@ BootMenuUpdateBootOption (
   BDS_LOAD_OPTION_ENTRY         *BootOptionEntry;
   BDS_LOAD_OPTION               *BootOption;
   BDS_LOAD_OPTION_SUPPORT*      DeviceSupport;
-  ARM_BDS_LOADER_ARGUMENTS*     BootArguments;
   CHAR16                        BootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
   CHAR8                         CmdLine[BOOT_DEVICE_OPTION_MAX];
   CHAR16                        UnicodeCmdLine[BOOT_DEVICE_OPTION_MAX];
   EFI_DEVICE_PATH               *DevicePath;
-  EFI_DEVICE_PATH               *TempInitrdPath;
-  ARM_BDS_LOADER_TYPE           BootType;
-  ARM_BDS_LOADER_OPTIONAL_DATA* LoaderOptionalData;
-  ARM_BDS_LINUX_ARGUMENTS*      LinuxArguments;
-  EFI_DEVICE_PATH               *InitrdPathNodes;
-  EFI_DEVICE_PATH               *InitrdPath;
-  UINTN                         InitrdSize;
-  UINTN                         CmdLineSize;
-  BOOLEAN                       InitrdSupport;
   UINT8*                        OptionalData;
   UINTN                         OptionalDataSize;
   BOOLEAN                       IsPrintable;
@@ -485,165 +392,67 @@ BootMenuUpdateBootOption (
     goto EXIT;
   }
 
-  if (DeviceSupport->RequestBootType) {
-    Status = BootDeviceGetType (DevicePath, &BootType, &BootOption->Attributes);
-    if (EFI_ERROR(Status)) {
-      Status = EFI_ABORTED;
-      goto EXIT;
-    }
-  }
+  Print (L"Arguments to pass to the EFI Application: ");
 
-  LoaderOptionalData = BootOption->OptionalData;
-  if (LoaderOptionalData != NULL) {
-    BootType = (ARM_BDS_LOADER_TYPE)ReadUnaligned32 ((UINT32 *)(&LoaderOptionalData->Header.LoaderType));
-  } else {
-    BootType = BDS_LOADER_EFI_APPLICATION;
-  }
-
-  if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-    LinuxArguments = &LoaderOptionalData->Arguments.LinuxArguments;
-
-    CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
-
-    InitrdSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->InitrdSize);
-    if (InitrdSize > 0) {
-      Print(L"Keep the initrd: ");
-    } else {
-      Print(L"Add an initrd: ");
-    }
-    Status = GetHIInputBoolean (&InitrdSupport);
-    if (EFI_ERROR(Status)) {
-      Status = EFI_ABORTED;
-      goto EXIT;
-    }
-
-    if (InitrdSupport) {
-      if (InitrdSize > 0) {
-        // Case we update the initrd device path
-        Status = DeviceSupport->UpdateDevicePathNode ((EFI_DEVICE_PATH*)((UINTN)(LinuxArguments + 1) + CmdLineSize), L"initrd", &InitrdPath);
-        if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) {// EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
-          Status = EFI_ABORTED;
-          goto EXIT;
-        }
-        InitrdSize = GetDevicePathSize (InitrdPath);
-      } else {
-        // Case we create the initrd device path
-
-        Status = DeviceSupport->CreateDevicePathNode (L"initrd", &InitrdPathNodes);
-        if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) { // EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
-          Status = EFI_ABORTED;
-          goto EXIT;
-        }
-
-        if (InitrdPathNodes != NULL) {
-          // Duplicate Linux kernel Device Path
-          TempInitrdPath = DuplicateDevicePath (BootOption->FilePathList);
-          // Replace Linux kernel Node by EndNode
-          SetDevicePathEndNode (GetLastDevicePathNode (TempInitrdPath));
-          // Append the Device Path to the selected device path
-          InitrdPath = AppendDevicePath (TempInitrdPath, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNodes);
-          FreePool (TempInitrdPath);
-          // Free the InitrdPathNodes created by Support->CreateDevicePathNode()
-          FreePool (InitrdPathNodes);
-          if (InitrdPath == NULL) {
-            Status = EFI_OUT_OF_RESOURCES;
-            goto EXIT;
-          }
-          InitrdSize = GetDevicePathSize (InitrdPath);
-        } else {
-          InitrdPath = NULL;
-        }
-      }
-    } else {
-      InitrdSize = 0;
-    }
-
-    Print(L"Arguments to pass to the binary: ");
-    if (CmdLineSize > 0) {
-      AsciiStrnCpy (CmdLine, (CONST CHAR8*)(LinuxArguments + 1), sizeof (CmdLine));
-      CmdLine[sizeof (CmdLine) - 1] = '\0';
-    } else {
-      CmdLine[0] = '\0';
-    }
-    Status = EditHIInputAscii (CmdLine, BOOT_DEVICE_OPTION_MAX);
-    if (EFI_ERROR(Status)) {
-      Status = EFI_ABORTED;
-      goto FREE_DEVICE_PATH;
-    }
-
-    CmdLineSize = AsciiStrSize (CmdLine);
-
-    OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize;
-    BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (OptionalDataSize);
-    BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
-    BootArguments->LinuxArguments.InitrdSize = InitrdSize;
-    CopyMem (&BootArguments->LinuxArguments + 1, CmdLine, CmdLineSize);
-    CopyMem ((VOID*)((UINTN)(&BootArguments->LinuxArguments + 1) + CmdLineSize), InitrdPath, InitrdSize);
-
-    OptionalData = (UINT8*)BootArguments;
-  } else {
-    Print (L"Arguments to pass to the EFI Application: ");
-
-    if (BootOption->OptionalDataSize > 0) {
-      IsPrintable = IsPrintableString (BootOption->OptionalData, &IsUnicode);
-      if (IsPrintable) {
-          //
-          // The size in bytes of the string, final zero included, should
-          // be equal to or at least lower than "BootOption->OptionalDataSize"
-          // and the "IsPrintableString()" has already tested that the length
-          // in number of characters is smaller than BOOT_DEVICE_OPTION_MAX,
-          // final '\0' included. We can thus copy the string for editing
-          // using "CopyMem()". Furthermore, note that in the case of an Unicode
-          // string "StrnCpy()" and "StrCpy()" can not be used to copy the
-          // string because the data pointed to by "BootOption->OptionalData"
-          // is not necessarily 2-byte aligned.
-          //
-        if (IsUnicode) {
-          CopyMem (
-            UnicodeCmdLine, BootOption->OptionalData,
-            MIN (sizeof (UnicodeCmdLine),
-                 BootOption->OptionalDataSize)
-            );
-        } else {
-          CopyMem (
-            CmdLine, BootOption->OptionalData,
-            MIN (sizeof (CmdLine),
-                 BootOption->OptionalDataSize)
-            );
-        }
-      }
-    } else {
-      UnicodeCmdLine[0] = L'\0';
-      IsPrintable = TRUE;
-      IsUnicode = TRUE;
-    }
-
-    // We do not request arguments for OptionalData that cannot be printed
+  if (BootOption->OptionalDataSize > 0) {
+    IsPrintable = IsPrintableString (BootOption->OptionalData, &IsUnicode);
     if (IsPrintable) {
+        //
+        // The size in bytes of the string, final zero included, should
+        // be equal to or at least lower than "BootOption->OptionalDataSize"
+        // and the "IsPrintableString()" has already tested that the length
+        // in number of characters is smaller than BOOT_DEVICE_OPTION_MAX,
+        // final '\0' included. We can thus copy the string for editing
+        // using "CopyMem()". Furthermore, note that in the case of an Unicode
+        // string "StrnCpy()" and "StrCpy()" can not be used to copy the
+        // string because the data pointed to by "BootOption->OptionalData"
+        // is not necessarily 2-byte aligned.
+        //
       if (IsUnicode) {
-        Status = EditHIInputStr (UnicodeCmdLine, BOOT_DEVICE_OPTION_MAX);
-        if (EFI_ERROR (Status)) {
-          Status = EFI_ABORTED;
-          goto FREE_DEVICE_PATH;
-        }
-
-        OptionalData = (UINT8*)UnicodeCmdLine;
-        OptionalDataSize = StrSize (UnicodeCmdLine);
+        CopyMem (
+          UnicodeCmdLine, BootOption->OptionalData,
+          MIN (sizeof (UnicodeCmdLine),
+               BootOption->OptionalDataSize)
+          );
       } else {
-        Status = EditHIInputAscii (CmdLine, BOOT_DEVICE_OPTION_MAX);
-        if (EFI_ERROR (Status)) {
-          Status = EFI_ABORTED;
-          goto FREE_DEVICE_PATH;
-        }
-
-        OptionalData = (UINT8*)CmdLine;
-        OptionalDataSize = AsciiStrSize (CmdLine);
+        CopyMem (
+          CmdLine, BootOption->OptionalData,
+          MIN (sizeof (CmdLine),
+               BootOption->OptionalDataSize)
+          );
       }
-    } else {
-      // We keep the former OptionalData
-      OptionalData = BootOption->OptionalData;
-      OptionalDataSize = BootOption->OptionalDataSize;
     }
+  } else {
+    UnicodeCmdLine[0] = L'\0';
+    IsPrintable = TRUE;
+    IsUnicode = TRUE;
+  }
+
+  // We do not request arguments for OptionalData that cannot be printed
+  if (IsPrintable) {
+    if (IsUnicode) {
+      Status = EditHIInputStr (UnicodeCmdLine, BOOT_DEVICE_OPTION_MAX);
+      if (EFI_ERROR (Status)) {
+        Status = EFI_ABORTED;
+        goto FREE_DEVICE_PATH;
+      }
+
+      OptionalData = (UINT8*)UnicodeCmdLine;
+      OptionalDataSize = StrSize (UnicodeCmdLine);
+    } else {
+      Status = EditHIInputAscii (CmdLine, BOOT_DEVICE_OPTION_MAX);
+      if (EFI_ERROR (Status)) {
+        Status = EFI_ABORTED;
+        goto FREE_DEVICE_PATH;
+      }
+
+      OptionalData = (UINT8*)CmdLine;
+      OptionalDataSize = AsciiStrSize (CmdLine);
+    }
+  } else {
+    // We keep the former OptionalData
+    OptionalData = BootOption->OptionalData;
+    OptionalDataSize = BootOption->OptionalDataSize;
   }
 
   Print(L"Description for this new Entry: ");
@@ -655,7 +464,7 @@ BootMenuUpdateBootOption (
   }
 
   // Update the entry
-  Status = BootOptionUpdate (BootOption, BootOption->Attributes, BootDescription, DevicePath, BootType, OptionalData, OptionalDataSize);
+  Status = BootOptionUpdate (BootOption, BootOption->Attributes, BootDescription, DevicePath, OptionalData, OptionalDataSize);
 
 FREE_DEVICE_PATH:
   FreePool (DevicePath);
@@ -1139,9 +948,6 @@ BootMenuMain (
       DEBUG_CODE_BEGIN();
         CHAR16*                           DevicePathTxt;
         EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
-        ARM_BDS_LOADER_OPTIONAL_DATA*     OptionalData;
-        UINTN                             CmdLineSize;
-        ARM_BDS_LOADER_TYPE               LoaderType;
 
         Status = gBS->LocateProtocol (&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
         if (EFI_ERROR(Status)) {
@@ -1153,39 +959,7 @@ BootMenuMain (
 
         Print(L"\t- %s\n",DevicePathTxt);
 
-        // If it is a supported BootEntry then print its details
-        if (IS_ARM_BDS_BOOTENTRY (BootOption)) {
-          OptionalData = BootOption->OptionalData;
-          LoaderType = (ARM_BDS_LOADER_TYPE)ReadUnaligned32 ((CONST UINT32*)&OptionalData->Header.LoaderType);
-          if ((LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) || (LoaderType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-            if (ReadUnaligned16 (&OptionalData->Arguments.LinuxArguments.InitrdSize) > 0) {
-              CmdLineSize = ReadUnaligned16 (&OptionalData->Arguments.LinuxArguments.CmdLineSize);
-              DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (
-                  GetAlignedDevicePath ((EFI_DEVICE_PATH*)((UINTN)(&OptionalData->Arguments.LinuxArguments + 1) + CmdLineSize)), TRUE, TRUE);
-              Print(L"\t- Initrd: %s\n", DevicePathTxt);
-            }
-            if (ReadUnaligned16 (&OptionalData->Arguments.LinuxArguments.CmdLineSize) > 0) {
-              Print(L"\t- Arguments: %a\n", (&OptionalData->Arguments.LinuxArguments + 1));
-            }
-          }
-
-          switch (LoaderType) {
-            case BDS_LOADER_EFI_APPLICATION:
-              Print(L"\t- LoaderType: EFI Application\n");
-              break;
-
-            case BDS_LOADER_KERNEL_LINUX_ATAG:
-              Print(L"\t- LoaderType: Linux kernel with ATAG support\n");
-              break;
-
-            case BDS_LOADER_KERNEL_LINUX_FDT:
-              Print(L"\t- LoaderType: Linux kernel with FDT support\n");
-              break;
-
-            default:
-              Print(L"\t- LoaderType: Not recognized (%d)\n", LoaderType);
-          }
-        } else if (BootOption->OptionalData != NULL) {
+        if (BootOption->OptionalData != NULL) {
           if (IsPrintableString (BootOption->OptionalData, &IsUnicode)) {
             if (IsUnicode) {
               Print (L"\t- Arguments: %s\n", BootOption->OptionalData);
