@@ -599,6 +599,7 @@ PingGenerateToken (
   Request->Type        = (UINT8)(Private->IpChoice==PING_IP_CHOICE_IP6?ICMP_V6_ECHO_REQUEST:ICMP_V4_ECHO_REQUEST);
   Request->Code        = 0;
   Request->SequenceNum = SequenceNum;
+  Request->TimeStamp   = TimeStamp; 
   Request->Identifier  = 0;
   Request->Checksum    = 0;
 
@@ -627,7 +628,6 @@ PingGenerateToken (
     ((EFI_IP4_TRANSMIT_DATA*)TxData)->DestinationAddress.Addr[3]      = Private->DstAddress[3];
 
     HeadSum = NetChecksum ((UINT8 *) Request, Private->BufferSize);
-    Request->TimeStamp   = TimeStamp;
     TempChecksum = NetChecksum ((UINT8 *) &Request->TimeStamp, sizeof (UINT64));
     Request->Checksum = (UINT16)(~NetAddChecksum (HeadSum, TempChecksum));
   }
@@ -803,11 +803,6 @@ Ping6OnTimerRoutine (
 
       RemoveEntryList (&TxInfo->Link);
       PingDestroyTxInfo (TxInfo, Private->IpChoice);
-
-      //
-      // We dont need to wait for this some other time...
-      //
-      Private->RxCount++;
 
       if (IsListEmpty (&Private->TxList) && (Private->TxCount == Private->SendNum)) {
         //
