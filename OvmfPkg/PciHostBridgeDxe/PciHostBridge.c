@@ -56,7 +56,6 @@ EFI_HANDLE mDriverImageHandle;
 PCI_HOST_BRIDGE_INSTANCE mPciHostBridgeInstanceTemplate = {
   PCI_HOST_BRIDGE_SIGNATURE,  // Signature
   NULL,                       // HostBridgeHandle
-  0,                          // RootBridgeNumber
   {NULL, NULL},               // Head
   FALSE,                      // ResourceSubiteed
   TRUE,                       // CanRestarted
@@ -213,7 +212,6 @@ InitializePciHostBridge (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  HostBridge->RootBridgeNumber = 1;
   InitializeListHead (&HostBridge->Head);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
@@ -227,7 +225,7 @@ InitializePciHostBridge (
   }
 
   for (RootBridgeNumber = 0;
-       RootBridgeNumber < HostBridge->RootBridgeNumber;
+       RootBridgeNumber < 1;
        ++RootBridgeNumber) {
     Status = InitRootBridge (
                (UINT8)RootBridgeNumber,

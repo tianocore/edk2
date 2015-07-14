@@ -52,7 +52,6 @@ typedef enum {
 typedef struct {
   UINTN                                             Signature;
   EFI_HANDLE                                        HostBridgeHandle;
-  UINTN                                             RootBridgeNumber;
   LIST_ENTRY                                        Head;
   BOOLEAN                                           ResourceSubmited;
   BOOLEAN                                           CanRestarted;
