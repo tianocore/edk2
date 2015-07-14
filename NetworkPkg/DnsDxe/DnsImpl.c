@@ -1574,8 +1574,8 @@ ConstructDNSQueryIp (
   //
   // Fill header
   //
-  DnsHeader = (DNS_HEADER *)Frag.Bulk; 
-  DnsHeader->Identification = (UINT16)AsmReadTsc ();
+  DnsHeader = (DNS_HEADER *) Frag.Bulk; 
+  DnsHeader->Identification = (UINT16)NET_RANDOM (NetRandomInitSeed());
   DnsHeader->Flags.Uint16 = 0x0000;
   DnsHeader->Flags.Bits.RD = 1;
   DnsHeader->Flags.Bits.OpCode = DNS_FLAGS_OPCODE_STANDARD;
@@ -1585,12 +1585,12 @@ ConstructDNSQueryIp (
   DnsHeader->AuthorityNum = 0;
   DnsHeader->AditionalNum = 0;
 
-  DnsHeader->Identification = HTONS(DnsHeader->Identification);
-  DnsHeader->Flags.Uint16 = HTONS(DnsHeader->Flags.Uint16);
-  DnsHeader->QuestionsNum = HTONS(DnsHeader->QuestionsNum);
-  DnsHeader->AnswersNum = HTONS(DnsHeader->AnswersNum);
-  DnsHeader->AuthorityNum = HTONS(DnsHeader->AuthorityNum);
-  DnsHeader->AditionalNum = HTONS(DnsHeader->AditionalNum);
+  DnsHeader->Identification = HTONS (DnsHeader->Identification);
+  DnsHeader->Flags.Uint16 = HTONS (DnsHeader->Flags.Uint16);
+  DnsHeader->QuestionsNum = HTONS (DnsHeader->QuestionsNum);
+  DnsHeader->AnswersNum = HTONS (DnsHeader->AnswersNum);
+  DnsHeader->AuthorityNum = HTONS (DnsHeader->AuthorityNum);
+  DnsHeader->AditionalNum = HTONS (DnsHeader->AditionalNum);
 
   Frag.Len = sizeof (*DnsHeader);
 
