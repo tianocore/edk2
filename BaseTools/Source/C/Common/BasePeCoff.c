@@ -57,14 +57,6 @@ PeCoffLoaderRelocateIa32Image (
   );
 
 RETURN_STATUS
-PeCoffLoaderRelocateX64Image (
-  IN UINT16      *Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  );
-
-RETURN_STATUS
 PeCoffLoaderRelocateIpfImage (
   IN UINT16      *Reloc,
   IN OUT CHAR8   *Fixup,
@@ -75,14 +67,6 @@ PeCoffLoaderRelocateIpfImage (
 RETURN_STATUS
 PeCoffLoaderRelocateArmImage (
   IN UINT16      **Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  );
-
-RETURN_STATUS
-PeCoffLoaderRelocateAArch64Image (
-  IN UINT16      *Reloc,
   IN OUT CHAR8   *Fixup,
   IN OUT CHAR8   **FixupData,
   IN UINT64      Adjust
@@ -619,6 +603,7 @@ Returns:
   CHAR8                                 *FixupBase;
   UINT16                                *F16;
   UINT32                                *F32;
+  UINT64                                *F64;
   CHAR8                                 *FixupData;
   PHYSICAL_ADDRESS                      BaseAddress;
   UINT16                                MachineType;
@@ -778,6 +763,16 @@ Returns:
         }
         break;
 
+      case EFI_IMAGE_REL_BASED_DIR64:
+        F64   = (UINT64 *) Fixup;
+        *F64  = *F64 + (UINT64) Adjust;
+        if (FixupData != NULL) {
+          FixupData             = ALIGN_POINTER (FixupData, sizeof (UINT64));
+          *(UINT64 *) FixupData = *F64;
+          FixupData             = FixupData + sizeof (UINT64);
+        }
+        break;
+
       case EFI_IMAGE_REL_BASED_HIGHADJ:
         //
         // Return the same EFI_UNSUPPORTED return code as
@@ -795,14 +790,8 @@ Returns:
         case EFI_IMAGE_MACHINE_ARMT:
           Status = PeCoffLoaderRelocateArmImage (&Reloc, Fixup, &FixupData, Adjust);
           break;
-        case EFI_IMAGE_MACHINE_X64:
-          Status = PeCoffLoaderRelocateX64Image (Reloc, Fixup, &FixupData, Adjust);
-          break;
         case EFI_IMAGE_MACHINE_IA64:
           Status = PeCoffLoaderRelocateIpfImage (Reloc, Fixup, &FixupData, Adjust);
-          break;
-        case EFI_IMAGE_MACHINE_AARCH64:
-          Status = PeCoffLoaderRelocateAArch64Image (Reloc, Fixup, &FixupData, Adjust);
           break;
         default:
           Status = RETURN_UNSUPPORTED;
