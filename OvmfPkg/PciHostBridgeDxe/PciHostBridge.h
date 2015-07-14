@@ -581,6 +581,13 @@ typedef struct {
   RES_STATUS        Status;
 } PCI_RES_NODE;
 
+#pragma pack(1)
+typedef struct {
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR SpaceDesc[TypeMax];
+  EFI_ACPI_END_TAG_DESCRIPTOR       EndDesc;
+} RESOURCE_CONFIGURATION;
+#pragma pack()
+
 #define PCI_ROOT_BRIDGE_SIGNATURE  SIGNATURE_32('e', '2', 'p', 'b')
 
 typedef struct {
@@ -609,6 +616,7 @@ typedef struct {
   EFI_PCI_ROOT_BRIDGE_DEVICE_PATH         DevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         Io;
 
+  RESOURCE_CONFIGURATION                  ConfigBuffer;
 } PCI_ROOT_BRIDGE_INSTANCE;
 
 

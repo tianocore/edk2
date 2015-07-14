@@ -1,6 +1,7 @@
 /** @file
   PCI Root Bridge Io Protocol implementation
 
+  Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -15,19 +16,18 @@
 #include "PciHostBridge.h"
 #include "IoFifo.h"
 
-typedef struct {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR     SpaceDesp[TypeMax];
-  EFI_ACPI_END_TAG_DESCRIPTOR           EndDesp;
-} RESOURCE_CONFIGURATION;
-
-RESOURCE_CONFIGURATION Configuration = {
-  {{0x8A, 0x2B, 1, 0, 0, 0, 0, 0, 0, 0},
-  {0x8A, 0x2B, 0, 0, 0, 32, 0, 0, 0, 0},
-  {0x8A, 0x2B, 0, 0, 6, 32, 0, 0, 0, 0},
-  {0x8A, 0x2B, 0, 0, 0, 64, 0, 0, 0, 0},
-  {0x8A, 0x2B, 0, 0, 6, 64, 0, 0, 0, 0},
-  {0x8A, 0x2B, 2, 0, 0, 0, 0, 0, 0, 0}},
-  {0x79, 0}
+STATIC
+CONST
+RESOURCE_CONFIGURATION mConfigurationTemplate = {
+  {
+    { 0x8A, 0x2B, 1, 0, 0,  0, 0, 0, 0, 0 }, // SpaceDesc[TypeIo]
+    { 0x8A, 0x2B, 0, 0, 0, 32, 0, 0, 0, 0 }, // SpaceDesc[TypeMem32]
+    { 0x8A, 0x2B, 0, 0, 6, 32, 0, 0, 0, 0 }, // SpaceDesc[TypePMem32]
+    { 0x8A, 0x2B, 0, 0, 0, 64, 0, 0, 0, 0 }, // SpaceDesc[TypeMem64]
+    { 0x8A, 0x2B, 0, 0, 6, 64, 0, 0, 0, 0 }, // SpaceDesc[TypePMem64]
+    { 0x8A, 0x2B, 2, 0, 0,  0, 0, 0, 0, 0 }  // SpaceDesc[TypeBus]
+  },
+  { 0x79, 0 }                                // EndDesc
 };
 
 //
@@ -2607,12 +2607,14 @@ RootBridgeIoConfiguration (
   UINTN                                 Index;
 
   PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS (This);
+  CopyMem (&PrivateData->ConfigBuffer, &mConfigurationTemplate,
+    sizeof mConfigurationTemplate);
 
   for (Index = 0; Index < TypeMax; Index++) {
     if (PrivateData->ResAllocNode[Index].Status == ResAllocated) {
       EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Desc;
 
-      Desc = &Configuration.SpaceDesp[Index];
+      Desc = &PrivateData->ConfigBuffer.SpaceDesc[Index];
       Desc->AddrRangeMin = PrivateData->ResAllocNode[Index].Base;
       Desc->AddrRangeMax = PrivateData->ResAllocNode[Index].Base +
                            PrivateData->ResAllocNode[Index].Length - 1;
@@ -2620,7 +2622,7 @@ RootBridgeIoConfiguration (
     }
   }
 
-  *Resources = &Configuration;
+  *Resources = &PrivateData->ConfigBuffer;
   return EFI_SUCCESS;
 }
 
