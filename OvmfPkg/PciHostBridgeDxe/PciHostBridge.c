@@ -154,6 +154,32 @@ FreePrivateData:
 
 
 /**
+  Uninitialize and free a root bridge set up with InitRootBridge().
+
+  On return, the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL instance and the device path
+  will have been released, freeing RootBus->Handle as well.
+
+  param[in] RootBus  The private PCI_ROOT_BRIDGE_INSTANCE that has been created
+                     with InitRootBridge(), and should be released.
+**/
+STATIC
+VOID
+UninitRootBridge (
+  IN PCI_ROOT_BRIDGE_INSTANCE *RootBus
+  )
+{
+  EFI_STATUS Status;
+
+  Status = gBS->UninstallMultipleProtocolInterfaces (RootBus->Handle,
+                  &gEfiDevicePathProtocolGuid,      &RootBus->DevicePath,
+                  &gEfiPciRootBridgeIoProtocolGuid, &RootBus->Io,
+                  NULL);
+  ASSERT_EFI_ERROR (Status);
+  FreePool (RootBus);
+}
+
+
+/**
   Entry point of this driver
 
   @param ImageHandle     Handle of driver image
@@ -174,6 +200,7 @@ InitializePciHostBridge (
   UINTN                       RootBridgeNumber;
   PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE    *RootBus;
+  EFI_STATUS                  UninstallStatus;
 
   mDriverImageHandle = ImageHandle;
 
@@ -196,8 +223,7 @@ InitializePciHostBridge (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (HostBridge);
-    return EFI_DEVICE_ERROR;
+    goto FreeHostBridge;
   }
 
   for (RootBridgeNumber = 0;
@@ -209,12 +235,34 @@ InitializePciHostBridge (
                &RootBus
                );
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto RollbackProtocols;
     }
     InsertTailList (&HostBridge->Head, &RootBus->Link);
   }
 
   return EFI_SUCCESS;
+
+RollbackProtocols:
+  while (!IsListEmpty (&HostBridge->Head)) {
+    LIST_ENTRY *Entry;
+
+    Entry = GetFirstNode (&HostBridge->Head);
+    RemoveEntryList (Entry);
+    RootBus = DRIVER_INSTANCE_FROM_LIST_ENTRY (Entry);
+    UninitRootBridge (RootBus);
+  }
+  UninstallStatus = gBS->UninstallMultipleProtocolInterfaces (
+                           HostBridge->HostBridgeHandle,
+                           &gEfiPciHostBridgeResourceAllocationProtocolGuid,
+                           &HostBridge->ResAlloc,
+                           NULL
+                           );
+  ASSERT_EFI_ERROR (UninstallStatus);
+
+FreeHostBridge:
+  FreePool (HostBridge);
+
+  return Status;
 }
 
 
