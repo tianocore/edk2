@@ -22,7 +22,7 @@ typedef struct {
 
 RESOURCE_CONFIGURATION Configuration = {
   {{0x8A, 0x2B, 1, 0, 0, 0, 0, 0, 0, 0},
-  {0x8A, 0x2B, 0, 0, 0, 32, 0, 0, 0, 0}, 
+  {0x8A, 0x2B, 0, 0, 0, 32, 0, 0, 0, 0},
   {0x8A, 0x2B, 0, 0, 6, 32, 0, 0, 0, 0},
   {0x8A, 0x2B, 0, 0, 0, 64, 0, 0, 0, 0},
   {0x8A, 0x2B, 0, 0, 6, 64, 0, 0, 0, 0},
@@ -80,7 +80,7 @@ RESOURCE_CONFIGURATION Configuration = {
 **/
 EFI_STATUS
 EFIAPI
-RootBridgeIoPollMem ( 
+RootBridgeIoPollMem (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN  UINT64                                 Address,
@@ -135,7 +135,7 @@ RootBridgeIoPollMem (
 **/
 EFI_STATUS
 EFIAPI
-RootBridgeIoPollIo ( 
+RootBridgeIoPollIo (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN  UINT64                                 Address,
@@ -723,8 +723,8 @@ RootBridgeIoSetAttributes (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *This,
   IN     UINT64                           Attributes,
   IN OUT UINT64                           *ResourceBase,
-  IN OUT UINT64                           *ResourceLength 
-  ); 
+  IN OUT UINT64                           *ResourceLength
+  );
 
 /**
   Retrieves the current resource settings of this PCI root bridge in the form
@@ -851,7 +851,7 @@ RootBridgeConstructor (
   //
   PrivateData->BusBase  = ResAperture->BusBase;
   PrivateData->BusLimit = ResAperture->BusLimit;
-  
+
   //
   // Specific for this chipset
   //
@@ -861,17 +861,20 @@ RootBridgeConstructor (
     PrivateData->ResAllocNode[Index].Length    = 0;
     PrivateData->ResAllocNode[Index].Status    = ResNone;
   }
-  
+
   PrivateData->RootBridgeAttrib = Attri;
-  
-  PrivateData->Supports    = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO | EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO | \
-                             EFI_PCI_ATTRIBUTE_ISA_IO_16 | EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO | \
-                             EFI_PCI_ATTRIBUTE_VGA_MEMORY | \
-                             EFI_PCI_ATTRIBUTE_VGA_IO_16  | EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
+
+  PrivateData->Supports    = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
+                             EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
+                             EFI_PCI_ATTRIBUTE_ISA_IO_16 |
+                             EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
+                             EFI_PCI_ATTRIBUTE_VGA_MEMORY |
+                             EFI_PCI_ATTRIBUTE_VGA_IO_16  |
+                             EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
   PrivateData->Attributes  = PrivateData->Supports;
 
   Protocol->ParentHandle   = HostBridgeHandle;
-  
+
   Protocol->PollMem        = RootBridgeIoPollMem;
   Protocol->PollIo         = RootBridgeIoPollIo;
 
@@ -901,7 +904,8 @@ RootBridgeConstructor (
 
   Protocol->SegmentNumber  = 0;
 
-  Status = gBS->LocateProtocol (&gEfiMetronomeArchProtocolGuid, NULL, (VOID **)&mMetronome);
+  Status = gBS->LocateProtocol (&gEfiMetronomeArchProtocolGuid, NULL,
+                  (VOID **)&mMetronome);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
@@ -1001,18 +1005,18 @@ RootBridgeIoCheckParameter (
   PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS (This);
 
   //
-  // Check to see if any address associated with this transfer exceeds the maximum 
-  // allowed address.  The maximum address implied by the parameters passed in is
-  // Address + Size * Count.  If the following condition is met, then the transfer
-  // is not supported.
+  // Check to see if any address associated with this transfer exceeds the
+  // maximum allowed address.  The maximum address implied by the parameters
+  // passed in is Address + Size * Count.  If the following condition is met,
+  // then the transfer is not supported.
   //
   //    Address + Size * Count > Limit + 1
   //
-  // Since Limit can be the maximum integer value supported by the CPU and Count 
-  // can also be the maximum integer value supported by the CPU, this range
-  // check must be adjusted to avoid all oveflow conditions.
-  //   
-  // The following form of the range check is equivalent but assumes that 
+  // Since Limit can be the maximum integer value supported by the CPU and
+  // Count can also be the maximum integer value supported by the CPU, this
+  // range check must be adjusted to avoid all oveflow conditions.
+  //
+  // The following form of the range check is equivalent but assumes that
   // Limit is of the form (2^n - 1).
   //
   if (OperationType == IoOperation) {
@@ -1023,11 +1027,13 @@ RootBridgeIoCheckParameter (
     Limit = PrivateData->MemLimit;
   } else {
     PciRbAddr = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS*) &Address;
-    if (PciRbAddr->Bus < PrivateData->BusBase || PciRbAddr->Bus > PrivateData->BusLimit) {
+    if (PciRbAddr->Bus < PrivateData->BusBase ||
+        PciRbAddr->Bus > PrivateData->BusLimit) {
       return EFI_INVALID_PARAMETER;
     }
 
-    if (PciRbAddr->Device > MAX_PCI_DEVICE_NUMBER || PciRbAddr->Function > MAX_PCI_FUNCTION_NUMBER) {
+    if (PciRbAddr->Device > MAX_PCI_DEVICE_NUMBER ||
+        PciRbAddr->Function > MAX_PCI_FUNCTION_NUMBER) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -1048,7 +1054,7 @@ RootBridgeIoCheckParameter (
     if (Address > Limit) {
       return EFI_UNSUPPORTED;
     }
-  } else {  
+  } else {
     MaxCount = RShiftU64 (Limit, Width);
     if (MaxCount < (Count - 1)) {
       return EFI_UNSUPPORTED;
@@ -1107,7 +1113,8 @@ RootBridgeIoMemRW (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  OperationWidth;
   UINT8                                  *Uint8Buffer;
 
-  Status = RootBridgeIoCheckParameter (This, MemOperation, Width, Address, Count, Buffer);
+  Status = RootBridgeIoCheckParameter (This, MemOperation, Width, Address,
+             Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1115,7 +1122,9 @@ RootBridgeIoMemRW (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+  for (Uint8Buffer = Buffer;
+       Count > 0;
+       Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (Write) {
       switch (OperationWidth) {
         case EfiPciWidthUint8:
@@ -1162,7 +1171,7 @@ RootBridgeIoMemRW (
       }
     }
   }
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1212,7 +1221,8 @@ RootBridgeIoIoRW (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  OperationWidth;
   UINT8                                  *Uint8Buffer;
 
-  Status = RootBridgeIoCheckParameter (This, IoOperation, Width, Address, Count, Buffer);
+  Status = RootBridgeIoCheckParameter (This, IoOperation, Width, Address,
+             Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1265,7 +1275,9 @@ RootBridgeIoIoRW (
   }
 #endif
 
-  for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+  for (Uint8Buffer = Buffer;
+       Count > 0;
+       Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (Write) {
       switch (OperationWidth) {
         case EfiPciWidthUint8:
@@ -1358,7 +1370,8 @@ RootBridgeIoPciRW (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS  *PciRbAddr;
   UINTN                                        PcieRegAddr;
 
-  Status = RootBridgeIoCheckParameter (This, PciOperation, Width, Address, Count, Buffer);
+  Status = RootBridgeIoCheckParameter (This, PciOperation, Width, Address,
+             Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1377,7 +1390,9 @@ RootBridgeIoPciRW (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  for (Uint8Buffer = Buffer; Count > 0; PcieRegAddr += InStride, Uint8Buffer += OutStride, Count--) {
+  for (Uint8Buffer = Buffer;
+       Count > 0;
+       PcieRegAddr += InStride, Uint8Buffer += OutStride, Count--) {
     if (Write) {
       switch (OperationWidth) {
         case EfiPciWidthUint8:
@@ -1468,7 +1483,7 @@ RootBridgeIoPciRW (
 **/
 EFI_STATUS
 EFIAPI
-RootBridgeIoPollMem ( 
+RootBridgeIoPollMem (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN  UINT64                                 Address,
@@ -1496,40 +1511,42 @@ RootBridgeIoPollMem (
   Status = This->Mem.Read (This, Width, Address, 1, Result);
   if (EFI_ERROR (Status)) {
     return Status;
-  }    
+  }
   if ((*Result & Mask) == Value) {
     return EFI_SUCCESS;
   }
 
   if (Delay == 0) {
     return EFI_SUCCESS;
-  
+
   } else {
 
     //
     // Determine the proper # of metronome ticks to wait for polling the
-    // location.  The nuber of ticks is Roundup (Delay / mMetronome->TickPeriod)+1
+    // location.  The nuber of ticks is Roundup (Delay /
+    // mMetronome->TickPeriod)+1
     // The "+1" to account for the possibility of the first tick being short
     // because we started in the middle of a tick.
     //
     // BugBug: overriding mMetronome->TickPeriod with UINT32 until Metronome
     // protocol definition is updated.
     //
-    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32) mMetronome->TickPeriod, &Remainder);
+    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32) mMetronome->TickPeriod,
+                      &Remainder);
     if (Remainder != 0) {
       NumberOfTicks += 1;
     }
     NumberOfTicks += 1;
-  
+
     while (NumberOfTicks != 0) {
 
       mMetronome->WaitForTick (mMetronome, 1);
-    
+
       Status = This->Mem.Read (This, Width, Address, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
       }
-    
+
       if ((*Result & Mask) == Value) {
         return EFI_SUCCESS;
       }
@@ -1584,7 +1601,7 @@ RootBridgeIoPollMem (
 **/
 EFI_STATUS
 EFIAPI
-RootBridgeIoPollIo ( 
+RootBridgeIoPollIo (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN  UINT64                                 Address,
@@ -1609,41 +1626,43 @@ RootBridgeIoPollIo (
   if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Status = This->Io.Read (This, Width, Address, 1, Result);
   if (EFI_ERROR (Status)) {
     return Status;
-  }    
+  }
   if ((*Result & Mask) == Value) {
     return EFI_SUCCESS;
   }
 
   if (Delay == 0) {
     return EFI_SUCCESS;
-  
+
   } else {
 
     //
     // Determine the proper # of metronome ticks to wait for polling the
-    // location.  The number of ticks is Roundup (Delay / mMetronome->TickPeriod)+1
+    // location.  The number of ticks is Roundup (Delay /
+    // mMetronome->TickPeriod)+1
     // The "+1" to account for the possibility of the first tick being short
     // because we started in the middle of a tick.
     //
-    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32)mMetronome->TickPeriod, &Remainder);
+    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32)mMetronome->TickPeriod,
+                      &Remainder);
     if (Remainder != 0) {
       NumberOfTicks += 1;
     }
     NumberOfTicks += 1;
-  
+
     while (NumberOfTicks != 0) {
 
       mMetronome->WaitForTick (mMetronome, 1);
-    
+
       Status = This->Io.Read (This, Width, Address, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
       }
-    
+
       if ((*Result & Mask) == Value) {
         return EFI_SUCCESS;
       }
@@ -1745,7 +1764,7 @@ RootBridgeIoMemWrite (
   IN     VOID                                   *Buffer
   )
 {
-  return RootBridgeIoMemRW (This, TRUE, Width, Address, Count, Buffer);  
+  return RootBridgeIoMemRW (This, TRUE, Width, Address, Count, Buffer);
 }
 
 /**
@@ -1787,7 +1806,7 @@ RootBridgeIoIoRead (
   OUT    VOID                                   *Buffer
   )
 {
-  return RootBridgeIoIoRW (This, FALSE, Width, Address, Count, Buffer);  
+  return RootBridgeIoIoRW (This, FALSE, Width, Address, Count, Buffer);
 }
 
 /**
@@ -1828,7 +1847,7 @@ RootBridgeIoIoWrite (
   IN       VOID                                    *Buffer
   )
 {
-  return RootBridgeIoIoRW (This, TRUE, Width, Address, Count, Buffer);  
+  return RootBridgeIoIoRW (This, TRUE, Width, Address, Count, Buffer);
 }
 
 /**
@@ -1886,7 +1905,7 @@ RootBridgeIoCopyMem (
 
   if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
-  }    
+  }
 
   if (DestAddress == SrcAddress) {
     return EFI_SUCCESS;
@@ -1895,7 +1914,8 @@ RootBridgeIoCopyMem (
   Stride = (UINTN)(1 << Width);
 
   Direction = TRUE;
-  if ((DestAddress > SrcAddress) && (DestAddress < (SrcAddress + Count * Stride))) {
+  if ((DestAddress > SrcAddress) &&
+      (DestAddress < (SrcAddress + Count * Stride))) {
     Direction   = FALSE;
     SrcAddress  = SrcAddress  + (Count-1) * Stride;
     DestAddress = DestAddress + (Count-1) * Stride;
@@ -2093,10 +2113,11 @@ RootBridgeIoMap (
   EFI_PHYSICAL_ADDRESS  PhysicalAddress;
   MAP_INFO              *MapInfo;
 
-  if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL || Mapping == NULL) {
+  if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL ||
+      Mapping == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Initialize the return values to their defaults
   //
@@ -2119,10 +2140,11 @@ RootBridgeIoMap (
 
     //
     // Common Buffer operations can not be remapped.  If the common buffer
-    // if above 4GB, then it is not possible to generate a mapping, so return 
+    // if above 4GB, then it is not possible to generate a mapping, so return
     // an error.
     //
-    if (Operation == EfiPciOperationBusMasterCommonBuffer || Operation == EfiPciOperationBusMasterCommonBuffer64) {
+    if (Operation == EfiPciOperationBusMasterCommonBuffer ||
+        Operation == EfiPciOperationBusMasterCommonBuffer64) {
       return EFI_UNSUPPORTED;
     }
 
@@ -2131,8 +2153,8 @@ RootBridgeIoMap (
     // called later.
     //
     Status = gBS->AllocatePool (
-                    EfiBootServicesData, 
-                    sizeof(MAP_INFO), 
+                    EfiBootServicesData,
+                    sizeof(MAP_INFO),
                     (VOID **)&MapInfo
                     );
     if (EFI_ERROR (Status)) {
@@ -2158,8 +2180,8 @@ RootBridgeIoMap (
     // Allocate a buffer below 4GB to map the transfer to.
     //
     Status = gBS->AllocatePages (
-                    AllocateMaxAddress, 
-                    EfiBootServicesData, 
+                    AllocateMaxAddress,
+                    EfiBootServicesData,
                     MapInfo->NumberOfPages,
                     &MapInfo->MappedHostAddress
                     );
@@ -2174,9 +2196,10 @@ RootBridgeIoMap (
     // then copy the contents of the real buffer into the mapped buffer
     // so the Bus Master can read the contents of the real buffer.
     //
-    if (Operation == EfiPciOperationBusMasterRead || Operation == EfiPciOperationBusMasterRead64) {
+    if (Operation == EfiPciOperationBusMasterRead ||
+        Operation == EfiPciOperationBusMasterRead64) {
       CopyMem (
-        (VOID *)(UINTN)MapInfo->MappedHostAddress, 
+        (VOID *)(UINTN)MapInfo->MappedHostAddress,
         (VOID *)(UINTN)MapInfo->HostAddress,
         MapInfo->NumberOfBytes
         );
@@ -2188,7 +2211,8 @@ RootBridgeIoMap (
     *DeviceAddress = MapInfo->MappedHostAddress;
   } else {
     //
-    // The transfer is below 4GB, so the DeviceAddress is simply the HostAddress
+    // The transfer is below 4GB, so the DeviceAddress is simply the
+    // HostAddress
     //
     *DeviceAddress = PhysicalAddress;
   }
@@ -2228,8 +2252,9 @@ RootBridgeIoUnmap (
   MAP_INFO    *MapInfo;
 
   //
-  // See if the Map() operation associated with this Unmap() required a mapping buffer.
-  // If a mapping buffer was not required, then this function simply returns EFI_SUCCESS.
+  // See if the Map() operation associated with this Unmap() required a mapping
+  // buffer. If a mapping buffer was not required, then this function simply
+  // returns EFI_SUCCESS.
   //
   if (Mapping != NULL) {
     //
@@ -2242,9 +2267,10 @@ RootBridgeIoUnmap (
     // then copy the contents of the mapped buffer into the real buffer
     // so the processor can read the contents of the real buffer.
     //
-    if (MapInfo->Operation == EfiPciOperationBusMasterWrite || MapInfo->Operation == EfiPciOperationBusMasterWrite64) {
+    if (MapInfo->Operation == EfiPciOperationBusMasterWrite ||
+        MapInfo->Operation == EfiPciOperationBusMasterWrite64) {
       CopyMem (
-        (VOID *)(UINTN)MapInfo->HostAddress, 
+        (VOID *)(UINTN)MapInfo->HostAddress,
         (VOID *)(UINTN)MapInfo->MappedHostAddress,
         MapInfo->NumberOfBytes
         );
@@ -2321,11 +2347,13 @@ RootBridgeIoAllocateBuffer (
   if (HostAddress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
- 
+
   //
-  // The only valid memory types are EfiBootServicesData and EfiRuntimeServicesData
+  // The only valid memory types are EfiBootServicesData and
+  // EfiRuntimeServicesData
   //
-  if (MemoryType != EfiBootServicesData && MemoryType != EfiRuntimeServicesData) {
+  if (MemoryType != EfiBootServicesData &&
+      MemoryType != EfiRuntimeServicesData) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2334,7 +2362,8 @@ RootBridgeIoAllocateBuffer (
   //
   PhysicalAddress = (EFI_PHYSICAL_ADDRESS)(0xffffffff);
 
-  Status = gBS->AllocatePages (AllocateMaxAddress, MemoryType, Pages, &PhysicalAddress);
+  Status = gBS->AllocatePages (AllocateMaxAddress, MemoryType, Pages,
+                  &PhysicalAddress);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -2451,13 +2480,13 @@ RootBridgeIoGetAttributes (
   // Set the return value for Supported and Attributes
   //
   if (Supported != NULL) {
-    *Supported  = PrivateData->Supports; 
+    *Supported  = PrivateData->Supports;
   }
 
   if (Attributes != NULL) {
     *Attributes = PrivateData->Attributes;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -2510,23 +2539,23 @@ RootBridgeIoSetAttributes (
   IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *This,
   IN     UINT64                           Attributes,
   IN OUT UINT64                           *ResourceBase,
-  IN OUT UINT64                           *ResourceLength 
+  IN OUT UINT64                           *ResourceLength
   )
 {
   PCI_ROOT_BRIDGE_INSTANCE            *PrivateData;
-  
+
   PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
-  
+
   if (Attributes != 0) {
     if ((Attributes & (~(PrivateData->Supports))) != 0) {
       return EFI_UNSUPPORTED;
     }
   }
-  
+
   //
   // This is a generic driver for a PC-AT class system.  It does not have any
-  // chipset specific knowlegde, so none of the attributes can be set or 
-  // cleared.  Any attempt to set attribute that are already set will succeed, 
+  // chipset specific knowlegde, so none of the attributes can be set or
+  // cleared.  Any attempt to set attribute that are already set will succeed,
   // and any attempt to set an attribute that is not supported will fail.
   //
   if (Attributes & (~PrivateData->Attributes)) {
@@ -2578,16 +2607,20 @@ RootBridgeIoConfiguration (
   UINTN                                 Index;
 
   PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS (This);
-  
+
   for (Index = 0; Index < TypeMax; Index++) {
     if (PrivateData->ResAllocNode[Index].Status == ResAllocated) {
-      Configuration.SpaceDesp[Index].AddrRangeMin = PrivateData->ResAllocNode[Index].Base;
-      Configuration.SpaceDesp[Index].AddrRangeMax = PrivateData->ResAllocNode[Index].Base + PrivateData->ResAllocNode[Index].Length - 1;
-      Configuration.SpaceDesp[Index].AddrLen      = PrivateData->ResAllocNode[Index].Length;
-    }  
-  }  
-    
-  *Resources = &Configuration;      
+      EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Desc;
+
+      Desc = &Configuration.SpaceDesp[Index];
+      Desc->AddrRangeMin = PrivateData->ResAllocNode[Index].Base;
+      Desc->AddrRangeMax = PrivateData->ResAllocNode[Index].Base +
+                           PrivateData->ResAllocNode[Index].Length - 1;
+      Desc->AddrLen      = PrivateData->ResAllocNode[Index].Length;
+    }
+  }
+
+  *Resources = &Configuration;
   return EFI_SUCCESS;
 }
 
