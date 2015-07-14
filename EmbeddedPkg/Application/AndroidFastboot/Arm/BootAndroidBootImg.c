@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -18,8 +18,15 @@
 
 #include <Library/BdsLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 
 #include <Guid/ArmGlobalVariableHob.h>
+
+#define LINUX_LOADER_COMMAND_LINE       L"%s -f %s -c %s"
+
+// This GUID is defined in the INGF file of ArmPkg/Application/LinuxLoader
+CONST EFI_GUID mLinuxLoaderAppGuid = { 0x701f54f2, 0x0d70, 0x4b89, { 0xbc, 0x0a, 0xd9, 0xca, 0x25, 0x37, 0x90, 0x59 }};
 
 // Device Path representing an image in memory
 #pragma pack(1)
@@ -64,6 +71,10 @@ BootAndroidBootImg (
   UINTN                               RamdiskSize;
   MEMORY_DEVICE_PATH                  KernelDevicePath;
   MEMORY_DEVICE_PATH*                 RamdiskDevicePath;
+  CHAR16*                             KernelDevicePathTxt;
+  CHAR16*                             RamdiskDevicePathTxt;
+  EFI_DEVICE_PATH*                    LinuxLoaderDevicePath;
+  CHAR16*                             LoadOptions;
 
   Status = ParseAndroidBootImg (
             Buffer,
@@ -92,19 +103,44 @@ BootAndroidBootImg (
     RamdiskDevicePath->Node1.EndingAddress   = ((EFI_PHYSICAL_ADDRESS)(UINTN) Ramdisk) + RamdiskSize;
   }
 
-  Status = BdsBootLinuxFdt (
-              (EFI_DEVICE_PATH_PROTOCOL *) &KernelDevicePath,
-              (EFI_DEVICE_PATH_PROTOCOL *) RamdiskDevicePath,
-              KernelArgs
-              );
+  //
+  // Boot Linux using the Legacy Linux Loader
+  //
+
+  Status = LocateEfiApplicationInFvByGuid (&mLinuxLoaderAppGuid, &LinuxLoaderDevicePath);
+  if (EFI_ERROR (Status)) {
+    Print (L"Couldn't Boot Linux: %d\n", Status);
+    return EFI_DEVICE_ERROR;
+  }
+
+  KernelDevicePathTxt = ConvertDevicePathToText ((EFI_DEVICE_PATH_PROTOCOL *) &KernelDevicePath, FALSE, FALSE);
+  if (KernelDevicePathTxt == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  RamdiskDevicePathTxt = ConvertDevicePathToText ((EFI_DEVICE_PATH_PROTOCOL *) RamdiskDevicePath, FALSE, FALSE);
+  if (RamdiskDevicePathTxt == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // Initialize Legacy Linux loader command line
+  LoadOptions = CatSPrint (NULL, LINUX_LOADER_COMMAND_LINE, KernelDevicePathTxt, RamdiskDevicePathTxt, KernelArgs);
+  if (LoadOptions == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = BdsStartEfiApplication (gImageHandle, LinuxLoaderDevicePath, StrSize (LoadOptions), LoadOptions);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Couldn't Boot Linux: %d\n", Status));
     return EFI_DEVICE_ERROR;
   }
 
   if (RamdiskDevicePath) {
+    FreePool (RamdiskDevicePathTxt);
     FreePool (RamdiskDevicePath);
   }
+
+  FreePool (KernelDevicePathTxt);
 
   // If we got here we do a confused face because BootLinuxFdt returned,
   // reporting success.
