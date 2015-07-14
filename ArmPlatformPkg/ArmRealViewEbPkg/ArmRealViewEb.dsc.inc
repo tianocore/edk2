@@ -316,7 +316,6 @@
   #
   # ARM OS Loader
   #
-  gArmTokenSpaceGuid.PcdArmMachineType|827
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"SemiHosting"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"Fv(14801114-DA6A-4113-985B-DC876337A15E)/LinuxLoader.efi"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/zImage-RTSM -a 827 -c \"console=ttyAMA0,38400n8\""

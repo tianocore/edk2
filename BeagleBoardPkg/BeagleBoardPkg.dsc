@@ -362,17 +362,10 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from SD"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(B615F1F5-5088-43CD-809C-A16E52487D00)/HD(1,MBR,0x00000000,0x3F,0x19FC0)/Image"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=tty0 console=ttyS2,115200n8 root=UUID=a4af765b-c2b5-48f4-9564-7a4e9104c4f6 rootwait ro earlyprintk"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi();VenHw(E68088EF-D1A4-4336-C1DB-4D3A204730A6)"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenPcAnsi()"
-
-  #
-  # ARM OS Loader
-  #
-  # BeagleBoard machine type (OMAP3_BEAGLE = 1546) required for ARM Linux:
-  gArmTokenSpaceGuid.PcdArmMachineType|1546
 
 ################################################################################
 #
