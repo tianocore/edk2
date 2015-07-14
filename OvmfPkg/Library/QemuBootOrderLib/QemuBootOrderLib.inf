@@ -32,6 +32,7 @@
 
 [Sources]
   QemuBootOrderLib.c
+  ExtraRootBusMap.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -49,6 +50,7 @@
   PrintLib
   DevicePathLib
   BaseMemoryLib
+  OrderedCollectionLib
 
 [Guids]
   gEfiGlobalVariableGuid
@@ -60,3 +62,7 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                            ## CONSUMES
+  gEfiPciRootBridgeIoProtocolGuid                       ## CONSUMES
