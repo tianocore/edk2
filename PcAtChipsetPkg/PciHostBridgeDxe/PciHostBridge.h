@@ -59,14 +59,14 @@ typedef struct {
   EFI_HANDLE                                        HostBridgeHandle;
   UINTN                                             RootBridgeNumber;
   LIST_ENTRY                                        Head;
-  BOOLEAN                                           ResourceSubmited;  
-  BOOLEAN                                           CanRestarted;  
+  BOOLEAN                                           ResourceSubmited;
+  BOOLEAN                                           CanRestarted;
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  ResAlloc;
 } PCI_HOST_BRIDGE_INSTANCE;
 
 #define INSTANCE_FROM_RESOURCE_ALLOCATION_THIS(a) \
   CR(a, PCI_HOST_BRIDGE_INSTANCE, ResAlloc, PCI_HOST_BRIDGE_SIGNATURE)
-  
+
 //
 //  HostBridge Resource Allocation interface
 //
@@ -551,13 +551,13 @@ typedef struct {
 
 typedef struct {
   UINT64          BusBase;
-  UINT64          BusLimit;     
-  
-  UINT64          MemBase;     
-  UINT64          MemLimit;    
-  
-  UINT64          IoBase; 
-  UINT64          IoLimit;     
+  UINT64          BusLimit;
+
+  UINT64          MemBase;
+  UINT64          MemLimit;
+
+  UINT64          IoBase;
+  UINT64          IoLimit;
 } PCI_ROOT_BRIDGE_RESOURCE_APERTURE;
 
 typedef enum {
@@ -595,21 +595,21 @@ typedef struct {
   UINT64                 RootBridgeAttrib;
   UINT64                 Attributes;
   UINT64                 Supports;
-  
+
   //
   // Specific for this memory controller: Bus, I/O, Mem
   //
   PCI_RES_NODE           ResAllocNode[6];
-  
+
   //
   // Addressing for Memory and I/O and Bus arrange
   //
   UINT64                 BusBase;
-  UINT64                 MemBase;     
-  UINT64                 IoBase; 
-  UINT64                 BusLimit;     
-  UINT64                 MemLimit;    
-  UINT64                 IoLimit;     
+  UINT64                 MemBase;
+  UINT64                 IoBase;
+  UINT64                 BusLimit;
+  UINT64                 MemLimit;
+  UINT64                 IoLimit;
 
   EFI_DEVICE_PATH_PROTOCOL                *DevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         Io;
