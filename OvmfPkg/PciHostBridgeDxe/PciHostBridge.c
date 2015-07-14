@@ -15,6 +15,8 @@
 
 **/
 
+#include <Library/QemuFwCfgLib.h>
+
 #include "PciHostBridge.h"
 
 STATIC
@@ -207,6 +209,9 @@ InitializePciHostBridge (
   )
 {
   EFI_STATUS                  Status;
+  FIRMWARE_CONFIG_ITEM        FwCfgItem;
+  UINTN                       FwCfgSize;
+  UINT64                      ExtraRootBridgesLeft;
   UINTN                       LastRootBridgeNumber;
   UINTN                       RootBridgeNumber;
   PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
@@ -237,6 +242,20 @@ InitializePciHostBridge (
   }
 
   //
+  // QEMU provides the number of extra root buses, shortening the exhaustive
+  // search below. If there is no hint, the feature is missing.
+  //
+  Status = QemuFwCfgFindFile ("etc/extra-pci-roots", &FwCfgItem, &FwCfgSize);
+  if (EFI_ERROR (Status) || FwCfgSize != sizeof ExtraRootBridgesLeft) {
+    ExtraRootBridgesLeft = 0;
+  } else {
+    QemuFwCfgSelectItem (FwCfgItem);
+    QemuFwCfgReadBytes (FwCfgSize, &ExtraRootBridgesLeft);
+    DEBUG ((EFI_D_INFO, "%a: %Lu extra root buses reported by QEMU\n",
+      __FUNCTION__, ExtraRootBridgesLeft));
+  }
+
+  //
   // The "main" root bus is always there.
   //
   LastRootBridgeNumber = 0;
@@ -247,7 +266,7 @@ InitializePciHostBridge (
   // alive.
   //
   for (RootBridgeNumber = 1;
-       RootBridgeNumber < 256;
+       RootBridgeNumber < 256 && ExtraRootBridgesLeft > 0;
        ++RootBridgeNumber) {
     UINTN Device;
 
@@ -271,6 +290,7 @@ InitializePciHostBridge (
       }
       InsertTailList (&HostBridge->Head, &RootBus->Link);
       LastRootBridgeNumber = RootBridgeNumber;
+      --ExtraRootBridgesLeft;
     }
   }
 

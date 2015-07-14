@@ -26,6 +26,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -39,6 +40,7 @@
   DevicePathLib
   IoLib
   PciLib
+  QemuFwCfgLib
 
 [Sources]
   PciHostBridge.c
