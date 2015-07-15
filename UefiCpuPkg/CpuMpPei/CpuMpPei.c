@@ -38,6 +38,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED IA32_DESCRIPTOR mGdt = {
   (UINTN) mGdtEntries
   };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiEndOfPeiSignalPpiGuid,
+  CpuMpEndOfPeiCallback
+};
+
 /**
   Sort the APIC ID of all processors.
 
@@ -317,6 +323,20 @@ BackupAndPrepareWakeupBuffer(
     PeiCpuMpData->AddressMap.RendezvousFunnelSize
     );
 }
+
+/**
+  Restore wakeup buffer data.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+RestoreWakeupBuffer(
+  IN PEI_CPU_MP_DATA         *PeiCpuMpData
+  )
+{
+  CopyMem ((VOID *) PeiCpuMpData->WakeupBuffer, (VOID *) PeiCpuMpData->BackupBuffer, PeiCpuMpData->BackupBufferSize);
+}
+
 /**
   This function will get CPU count in the system.
 
@@ -381,6 +401,7 @@ PrepareAPStartupVector (
   AsmGetAddressMap (&AddressMap);
   WakeupBufferSize = AddressMap.RendezvousFunnelSize + sizeof (MP_CPU_EXCHANGE_INFO);
   WakeupBuffer     = GetWakeupBuffer ((WakeupBufferSize + SIZE_4KB - 1) & ~(SIZE_4KB - 1));
+  ASSERT (WakeupBuffer != (UINTN) -1);
   DEBUG ((EFI_D_INFO, "CpuMpPei: WakeupBuffer = 0x%x\n", WakeupBuffer));
 
   //
@@ -409,6 +430,7 @@ PrepareAPStartupVector (
   PeiCpuMpData->CpuData                  = (PEI_CPU_DATA *) (PeiCpuMpData->MpCpuExchangeInfo + 1);
   PeiCpuMpData->CpuData[0].ApicId        = GetInitialApicId ();
   PeiCpuMpData->CpuData[0].Health.Uint32 = 0;
+  PeiCpuMpData->EndOfPeiFlag             = FALSE;
   CopyMem (&PeiCpuMpData->AddressMap, &AddressMap, sizeof (MP_ASSEMBLY_ADDRESS_MAP));
 
   //
@@ -418,6 +440,70 @@ PrepareAPStartupVector (
 
   return PeiCpuMpData;
 }
+
+/**
+  Notify function on End Of Pei PPI.
+
+  On S3 boot, this function will restore wakeup buffer data.
+  On normal boot, this function will flag wakeup buffer to be un-used type.
+
+  @param  PeiServices        The pointer to the PEI Services Table.
+  @param  NotifyDescriptor   Address of the notification descriptor data structure.
+  @param  Ppi                Address of the PPI that was installed.
+
+  @retval EFI_SUCCESS        When everything is OK.
+
+**/
+EFI_STATUS
+EFIAPI
+CpuMpEndOfPeiCallback (
+  IN      EFI_PEI_SERVICES        **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR    *NotifyDescriptor,
+  IN VOID                         *Ppi
+  )
+{
+  EFI_STATUS                Status;
+  EFI_BOOT_MODE             BootMode;
+  PEI_CPU_MP_DATA           *PeiCpuMpData;
+  EFI_PEI_HOB_POINTERS      Hob;
+  EFI_HOB_MEMORY_ALLOCATION *MemoryHob;
+
+  DEBUG ((EFI_D_INFO, "CpuMpPei: CpuMpEndOfPeiCallback () invokded\n"));
+
+  Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  PeiCpuMpData = GetMpHobData ();
+  ASSERT (PeiCpuMpData != NULL);
+
+  if (BootMode != BOOT_ON_S3_RESUME) {
+    //
+    // Get the HOB list for processing
+    //
+    Hob.Raw = GetHobList ();
+    //
+    // Collect memory ranges
+    //
+    while (!END_OF_HOB_LIST (Hob)) {
+      if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
+        MemoryHob = Hob.MemoryAllocation;
+        if(MemoryHob->AllocDescriptor.MemoryBaseAddress == PeiCpuMpData->WakeupBuffer) {
+          //
+          // Flag this HOB type to un-used
+          //
+          GET_HOB_TYPE (Hob) = EFI_HOB_TYPE_UNUSED;
+          break;
+        }
+      }
+      Hob.Raw = GET_NEXT_HOB (Hob);
+    }
+  } else {
+    RestoreWakeupBuffer (PeiCpuMpData);
+    PeiCpuMpData->EndOfPeiFlag = TRUE;
+  }
+  return EFI_SUCCESS;
+}
+
 /**
   The Entry point of the MP CPU PEIM.
 
@@ -465,6 +551,11 @@ CpuMpPeimInit (
   // Update and publish CPU BIST information
   //
   CollectBistDataFromPpi (PeiServices, PeiCpuMpData);
+  //
+  // register an event for EndOfPei
+  //
+  Status  = PeiServicesNotifyPpi (&mNotifyList);
+  ASSERT_EFI_ERROR (Status);
   //
   // Install CPU MP PPI
   //

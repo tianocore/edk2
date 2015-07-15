@@ -20,6 +20,7 @@
 #include <Ppi/MpServices.h>
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
+#include <Ppi/EndOfPeiPhase.h>
 
 #include <Register/LocalApic.h>
 
@@ -133,6 +134,7 @@ struct _PEI_CPU_MP_DATA {
   UINTN                          ApFunction;
   UINTN                          ApFunctionArgument;
   volatile UINT32                FinishedCount;
+  BOOLEAN                        EndOfPeiFlag;
   BOOLEAN                        InitFlag;
   CPU_EXCHANGE_ROLE_INFO         BSPInfo;
   CPU_EXCHANGE_ROLE_INFO         APInfo;
@@ -174,6 +176,47 @@ VOID
 EFIAPI
 AsmCliHltLoop (
   VOID
+  );
+
+/**
+  Get available system memory below 1MB by specified size.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+BackupAndPrepareWakeupBuffer(
+  IN PEI_CPU_MP_DATA         *PeiCpuMpData
+  );
+
+/**
+  Restore wakeup buffer data.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+RestoreWakeupBuffer(
+  IN PEI_CPU_MP_DATA         *PeiCpuMpData
+  );
+
+/**
+  Notify function on End Of Pei PPI.
+
+  On S3 boot, this function will restore wakeup buffer data.
+  On normal boot, this function will flag wakeup buffer to be un-used type.
+
+  @param  PeiServices        The pointer to the PEI Services Table.
+  @param  NotifyDescriptor   Address of the notification descriptor data structure.
+  @param  Ppi                Address of the PPI that was installed.
+
+  @retval EFI_SUCCESS        When everything is OK.
+
+**/
+EFI_STATUS
+EFIAPI
+CpuMpEndOfPeiCallback (
+  IN      EFI_PEI_SERVICES        **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR    *NotifyDescriptor,
+  IN VOID                         *Ppi
   );
 
 /**

@@ -480,6 +480,13 @@ PeiStartupAllAPs (
     return EFI_NOT_READY;
   }
 
+  if (PeiCpuMpData->EndOfPeiFlag) {
+    //
+    // Backup original data and copy AP reset vector in it
+    //
+    BackupAndPrepareWakeupBuffer(PeiCpuMpData);
+  }
+
   WaitCountNumber = TimeoutInMicroSeconds / CPU_CHECK_AP_INTERVAL + 1;
   WaitCountIndex = 0;
   FinishedCount = &PeiCpuMpData->FinishedCount;
@@ -529,6 +536,13 @@ PeiStartupAllAPs (
         }
       }
     }
+  }
+
+  if (PeiCpuMpData->EndOfPeiFlag) {
+    //
+    // Restore original data
+    //
+    RestoreWakeupBuffer(PeiCpuMpData);
   }
 
   return Status;
@@ -626,6 +640,13 @@ PeiStartupThisAP (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (PeiCpuMpData->EndOfPeiFlag) {
+    //
+    // Backup original data and copy AP reset vector in it
+    //
+    BackupAndPrepareWakeupBuffer(PeiCpuMpData);
+  }
+
   WaitCountNumber = TimeoutInMicroseconds / CPU_CHECK_AP_INTERVAL + 1;
   WaitCountIndex = 0;
   FinishedCount = &PeiCpuMpData->FinishedCount;
@@ -649,6 +670,13 @@ PeiStartupThisAP (
         break;
       }
     }
+  }
+
+  if (PeiCpuMpData->EndOfPeiFlag) {
+    //
+    // Backup original data and copy AP reset vector in it
+    //
+    RestoreWakeupBuffer(PeiCpuMpData);
   }
 
   return Status;
@@ -749,12 +777,26 @@ PeiSwitchBSP (
   PeiCpuMpData->BSPInfo.State = CPU_SWITCH_STATE_IDLE;
   PeiCpuMpData->APInfo.State  = CPU_SWITCH_STATE_IDLE;
 
+  if (PeiCpuMpData->EndOfPeiFlag) {
+    //
+    // Backup original data and copy AP reset vector in it
+    //
+    BackupAndPrepareWakeupBuffer(PeiCpuMpData);
+  }
+
   //
   // Need to wakeUp AP (future BSP).
   //
   WakeUpAP (PeiCpuMpData, FALSE, PeiCpuMpData->CpuData[ProcessorNumber].ApicId, FutureBSPProc, PeiCpuMpData);
 
   AsmExchangeRole (&PeiCpuMpData->BSPInfo, &PeiCpuMpData->APInfo);
+
+  if (PeiCpuMpData->EndOfPeiFlag) {
+    //
+    // Backup original data and copy AP reset vector in it
+    //
+    RestoreWakeupBuffer(PeiCpuMpData);
+  }
 
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP

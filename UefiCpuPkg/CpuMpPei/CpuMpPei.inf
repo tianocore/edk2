@@ -69,6 +69,7 @@
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                     ## NOTIFY
   gEfiSecPlatformInformationPpiGuid             ## SOMETIMES_CONSUMES
   ## SOMETIMES_CONSUMES
   ## SOMETIMES_PRODUCES
