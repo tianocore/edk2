@@ -61,5 +61,3 @@
   gEfiIp4Config2ProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMES
-  gEfiHttpProtocolGuid
-  gEfiHttpServiceBindingProtocolGuid
