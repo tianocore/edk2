@@ -119,9 +119,10 @@ ApCFunction (
     PeiCpuMpData->CpuData[NumApsExecuting].ApicId        = GetInitialApicId ();
     PeiCpuMpData->CpuData[NumApsExecuting].Health.Uint32 = (UINT32) BistData;
     //
-    // Sync BSP's Mtrr table to all wakeup APs
+    // Sync BSP's Mtrr table to all wakeup APs and load microcode on APs.
     //
     MtrrSetAllMtrrs (&PeiCpuMpData->MtrrTable);
+    MicrocodeDetect ();
   }
 
   //
@@ -288,7 +289,10 @@ CountProcessorNumber (
   IN PEI_CPU_MP_DATA            *PeiCpuMpData
   )
 {
-
+  //
+  // Load Microcode on BSP
+  //
+  MicrocodeDetect ();
   //
   // Store BSP's MTRR setting
   //

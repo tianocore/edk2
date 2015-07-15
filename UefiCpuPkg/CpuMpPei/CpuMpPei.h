@@ -19,6 +19,8 @@
 
 #include <Ppi/SecPlatformInformation.h>
 
+#include <Register/LocalApic.h>
+
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -31,6 +33,9 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/TimerLib.h>
 #include <Library/UefiCpuLib.h>
+
+#include "Microcode.h"
+
 //
 // AP state
 //
