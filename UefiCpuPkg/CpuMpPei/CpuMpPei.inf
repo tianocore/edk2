@@ -51,6 +51,7 @@
   BaseLib
   HobLib
   PeimEntryPoint
+  UefiCpuLib
 
 
 

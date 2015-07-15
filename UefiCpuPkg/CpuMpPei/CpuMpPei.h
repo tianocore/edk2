@@ -21,6 +21,7 @@
 #include <Library/BaseLib.h>
 #include <Library/HobLib.h>
 #include <Library/PeimEntryPoint.h>
+#include <Library/UefiCpuLib.h>
 
 #pragma pack(1)
 

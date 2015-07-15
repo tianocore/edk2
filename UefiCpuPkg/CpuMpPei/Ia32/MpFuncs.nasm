@@ -19,6 +19,7 @@
 ;-------------------------------------------------------------------------------
 
 %include "MpEqu.inc"
+extern ASM_PFX(InitializeFloatingPointUnits)
 
 SECTION .text
 
@@ -114,6 +115,8 @@ CProcedureInvoke:
     push       ebp
     mov        ebp, esp
 
+    mov        eax, ASM_PFX(InitializeFloatingPointUnits)
+    call       eax               ; Call assembly function to initialize FPU per UEFI spec
 
     push       ebx               ; Push NumApsExecuting
     mov        eax, esi

@@ -22,6 +22,7 @@
 .model  flat
 
 include  MpEqu.inc
+InitializeFloatingPointUnits PROTO C
 
 .code
 
@@ -124,6 +125,8 @@ CProcedureInvoke:
     push       ebp
     mov        ebp, esp
 
+    mov        eax, InitializeFloatingPointUnits
+    call       eax               ; Call assembly function to initialize FPU per UEFI spec
 
     push       ebx               ; Push NumApsExecuting
     mov        eax, esi

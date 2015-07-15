@@ -19,6 +19,8 @@
 ;-------------------------------------------------------------------------------
 
 include  MpEqu.inc
+extern   InitializeFloatingPointUnits:PROC
+
 .code
 ;-------------------------------------------------------------------------------------
 ;RendezvousFunnelProc  procedure follows. All APs execute their procedure. This
@@ -158,6 +160,10 @@ CProcedureInvoke:
     push       rbp
     mov        rbp, rsp
 
+    mov        rax, InitializeFloatingPointUnits
+    sub        rsp, 20h
+    call       rax               ; Call assembly function to initialize FPU per UEFI spec
+    add        rsp, 20h
 
     mov        edx, ebx          ; edx is NumApsExecuting
     mov        ecx, esi

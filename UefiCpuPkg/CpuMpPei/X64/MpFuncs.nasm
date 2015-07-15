@@ -19,6 +19,7 @@
 ;-------------------------------------------------------------------------------
 
 %include "MpEqu.inc"
+extern ASM_PFX(InitializeFloatingPointUnits)
 
 DEFAULT REL
 
@@ -155,6 +156,10 @@ CProcedureInvoke:
     push       rbp
     mov        rbp, rsp
 
+    mov        rax, ASM_PFX(InitializeFloatingPointUnits)
+    sub        rsp, 20h
+    call       rax               ; Call assembly function to initialize FPU per UEFI spec
+    add        rsp, 20h
 
     mov        edx, ebx          ; edx is NumApsExecuting
     mov        ecx, esi
