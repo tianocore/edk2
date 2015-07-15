@@ -144,6 +144,22 @@ CProcedureInvoke:
 RendezvousFunnelProc   ENDP
 RendezvousFunnelProcEnd::
 
+;-------------------------------------------------------------------------------------
+;  AsmGetAddressMap (&AddressMap);
+;-------------------------------------------------------------------------------------
+AsmGetAddressMap   PROC  near C  PUBLIC
+    pushad
+    mov        ebp,esp
+
+    mov        ebx, dword ptr [ebp+24h]
+    mov        dword ptr [ebx], RendezvousFunnelProcStart
+    mov        dword ptr [ebx +  4h], Flat32Start - RendezvousFunnelProcStart
+    mov        dword ptr [ebx +  8h], 0
+    mov        dword ptr [ebx + 0ch], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+
+    popad
+    ret
+AsmGetAddressMap   ENDP
 
 AsmInitializeGdt   PROC  near C  PUBLIC
   push         ebp

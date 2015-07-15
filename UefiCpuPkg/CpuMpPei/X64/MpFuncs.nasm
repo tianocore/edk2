@@ -175,6 +175,17 @@ CProcedureInvoke:
 
 RendezvousFunnelProcEnd:
 
+;-------------------------------------------------------------------------------------
+;  AsmGetAddressMap (&AddressMap);
+;-------------------------------------------------------------------------------------
+global ASM_PFX(AsmGetAddressMap)
+ASM_PFX(AsmGetAddressMap):
+    mov        rax, ASM_PFX(RendezvousFunnelProc)
+    mov        qword [rcx], rax
+    mov        qword [rcx +  8h], Flat32Start - RendezvousFunnelProcStart
+    mov        qword [rcx + 10h], LongModeStart - RendezvousFunnelProcStart
+    mov        qword [rcx + 18h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+    ret
 
 global ASM_PFX(AsmInitializeGdt)
 ASM_PFX(AsmInitializeGdt):

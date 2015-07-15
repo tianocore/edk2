@@ -23,6 +23,16 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/UefiCpuLib.h>
 
+//
+// AP reset code information
+//
+typedef struct {
+  UINT8             *RendezvousFunnelAddress;
+  UINTN             PModeEntryOffset;
+  UINTN             LModeEntryOffset;
+  UINTN             RendezvousFunnelSize;
+} MP_ASSEMBLY_ADDRESS_MAP;
+
 #pragma pack(1)
 
 typedef union {
@@ -62,6 +72,19 @@ typedef struct {
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
+
+/**
+  Assembly code to get starting address and size of the rendezvous entry for APs.
+  Information for fixing a jump instruction in the code is also returned.
+
+  @param AddressMap  Output buffer for address map information.
+**/
+VOID
+EFIAPI
+AsmGetAddressMap (
+  OUT MP_ASSEMBLY_ADDRESS_MAP    *AddressMap
+  );
+
 /**
   Assembly code to load GDT table and update segment accordingly.
 
