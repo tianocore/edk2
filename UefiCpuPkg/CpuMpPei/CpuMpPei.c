@@ -94,6 +94,31 @@ SortApicId (
     }
   }
 }
+
+/**
+  Get CPU MP Data pointer from the Guided HOB.
+
+  @return  Pointer to Pointer to PEI CPU MP Data
+**/
+PEI_CPU_MP_DATA *
+GetMpHobData (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  VOID                    *DataInHob;
+  PEI_CPU_MP_DATA         *CpuMpData;
+
+  CpuMpData = NULL;
+  GuidHob = GetFirstGuidHob (&gEfiCallerIdGuid);
+  if (GuidHob != NULL) {
+    DataInHob = GET_GUID_HOB_DATA (GuidHob);
+    CpuMpData = (PEI_CPU_MP_DATA *)(*(UINTN *)DataInHob);
+  }
+  ASSERT (CpuMpData != NULL);
+  return CpuMpData;
+}
+
 /**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
@@ -413,6 +438,14 @@ CpuMpPeimInit (
   // Count processor number and collect processor information
   //
   ProcessorCount = CountProcessorNumber (PeiCpuMpData);
+  //
+  // Build location of PEI CPU MP DATA buffer in HOB
+  //
+  BuildGuidDataHob (
+    &gEfiCallerIdGuid,
+    (VOID *)&PeiCpuMpData,
+    sizeof(UINT64)
+    );
 
   return EFI_SUCCESS;
 }
