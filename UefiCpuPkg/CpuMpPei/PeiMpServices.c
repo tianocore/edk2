@@ -748,6 +748,91 @@ PeiSwitchBSP (
   return EFI_SUCCESS;
 }
 
+/**
+  This service lets the caller enable or disable an AP from this point onward.
+  This service may only be called from the BSP.
+
+  This service allows the caller enable or disable an AP from this point onward.
+  The caller can optionally specify the health status of the AP by Health. If
+  an AP is being disabled, then the state of the disabled AP is implementation
+  dependent. If an AP is enabled, then the implementation must guarantee that a
+  complete initialization sequence is performed on the AP, so the AP is in a state
+  that is compatible with an MP operating system.
+
+  If the enable or disable AP operation cannot be completed prior to the return
+  from this service, then EFI_UNSUPPORTED must be returned.
+
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
+                                  total number of logical processors minus 1. The total
+                                  number of logical processors can be retrieved by
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+  @param[in] EnableAP             Specifies the new state for the processor for enabled,
+                                  FALSE for disabled.
+  @param[in] HealthFlag           If not NULL, a pointer to a value that specifies the
+                                  new health status of the AP. This flag corresponds to
+                                  StatusFlag defined in EFI_PEI_MP_SERVICES_PPI.GetProcessorInfo().
+                                  Only the PROCESSOR_HEALTH_STATUS_BIT is used. All other
+                                  bits are ignored. If it is NULL, this parameter is
+                                  ignored.
+
+  @retval EFI_SUCCESS             The specified AP was enabled or disabled successfully.
+  @retval EFI_UNSUPPORTED         Enabling or disabling an AP cannot be completed prior
+                                  to this service returning.
+  @retval EFI_UNSUPPORTED         Enabling or disabling an AP is not supported.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_NOT_FOUND           Processor with the handle specified by ProcessorNumber
+                                  does not exist.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the BSP.
+**/
+EFI_STATUS
+EFIAPI
+PeiEnableDisableAP (
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  EFI_PEI_MP_SERVICES_PPI   *This,
+  IN  UINTN                     ProcessorNumber,
+  IN  BOOLEAN                   EnableAP,
+  IN  UINT32                    *HealthFlag OPTIONAL
+  )
+{
+  PEI_CPU_MP_DATA         *PeiCpuMpData;
+  UINTN                   CallerNumber;
+
+  PeiCpuMpData = GetMpHobData ();
+  if (PeiCpuMpData == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Check whether caller processor is BSP
+  //
+  PeiWhoAmI (PeiServices, This, &CallerNumber);
+  if (CallerNumber != PeiCpuMpData->BspNumber) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (ProcessorNumber == PeiCpuMpData->BspNumber) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ProcessorNumber >= PeiCpuMpData->CpuCount) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (!EnableAP) {
+    PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateDisabled;
+  } else {
+    PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
+  }
+
+  if (HealthFlag != NULL) {
+    PeiCpuMpData->CpuData[ProcessorNumber].CpuHealthy =
+          (BOOLEAN) ((*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT) != 0);
+  }
+  return EFI_SUCCESS;
+}
 
 /**
   This return the handle number for the calling processor.  This service may be
