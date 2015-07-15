@@ -68,6 +68,7 @@
   UefiCpuLib
 
 [Ppis]
+  gEfiPeiMpServicesPpiGuid                      ## PRODUCES
   gEfiSecPlatformInformationPpiGuid             ## SOMETIMES_CONSUMES
   ## SOMETIMES_CONSUMES
   ## SOMETIMES_PRODUCES

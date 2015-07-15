@@ -436,7 +436,7 @@ CpuMpPeimInit (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-
+  EFI_STATUS           Status;
   PEI_CPU_MP_DATA      *PeiCpuMpData;
   UINT32               ProcessorCount;
 
@@ -464,6 +464,11 @@ CpuMpPeimInit (
   // Update and publish CPU BIST information
   //
   CollectBistDataFromPpi (PeiServices, PeiCpuMpData);
+  //
+  // Install CPU MP PPI
+  //
+  Status = PeiServicesInstallPpi(&mPeiCpuMpPpiDesc);
+  ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }

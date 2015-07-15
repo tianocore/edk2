@@ -140,6 +140,8 @@ struct _PEI_CPU_MP_DATA {
   PEI_CPU_DATA                   *CpuData;
   volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
 };
+extern EFI_PEI_PPI_DESCRIPTOR   mPeiCpuMpPpiDesc;
+
 
 /**
   Assembly code to get starting address and size of the rendezvous entry for APs.
