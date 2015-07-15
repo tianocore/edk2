@@ -31,6 +31,17 @@
   CpuMpPei.h
   CpuMpPei.c
 
+[Sources.IA32]
+  Ia32/MpEqu.inc
+  Ia32/MpFuncs.asm  | MSFT
+  Ia32/MpFuncs.asm  | INTEL
+  Ia32/MpFuncs.nasm | GCC
+
+[Sources.X64]
+  X64/MpEqu.inc
+  X64/MpFuncs.asm  | MSFT
+  X64/MpFuncs.asm  | INTEL
+  X64/MpFuncs.nasm | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
