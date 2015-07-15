@@ -959,8 +959,8 @@ MeasureVariable (
 
   Status = TcgDxeHashLogExtendEventI (
              &mTcgDxeData,
-             (UINT8*)VarData,
-             VarSize,
+             (UINT8*)VarLog,
+             TcgEvent.EventSize,
              &TcgEvent,
              (UINT8*)VarLog
              );

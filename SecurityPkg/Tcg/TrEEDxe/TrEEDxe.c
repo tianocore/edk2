@@ -1206,26 +1206,14 @@ MeasureVariable (
        );
   }
 
-  if (EventType == EV_EFI_VARIABLE_DRIVER_CONFIG) {
-    //
-    // Digest is the event data (EFI_VARIABLE_DATA_TREE)
-    //
-    Status = TcgDxeHashLogExtendEvent (
-               0,
-               (UINT8*)VarLog,
-               TcgEvent.EventSize,
-               &TcgEvent,
-               (UINT8*)VarLog
-               );
-  } else {
-    Status = TcgDxeHashLogExtendEvent (
-               0,
-               (UINT8*)VarData,
-               VarSize,
-               &TcgEvent,
-               (UINT8*)VarLog
-               );
-  }
+  Status = TcgDxeHashLogExtendEvent (
+             0,
+             (UINT8*)VarLog,
+             TcgEvent.EventSize,
+             &TcgEvent,
+             (UINT8*)VarLog
+             );
+
   FreePool (VarLog);
   return Status;
 }
