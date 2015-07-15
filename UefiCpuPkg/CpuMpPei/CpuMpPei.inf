@@ -33,6 +33,8 @@
   CpuBist.c
   Microcode.h
   Microcode.c
+  PeiMpServices.h
+  PeiMpServices.c
 
 [Sources.IA32]
   Ia32/MpEqu.inc

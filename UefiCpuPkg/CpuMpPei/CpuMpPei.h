@@ -17,6 +17,7 @@
 
 #include <PiPei.h>
 
+#include <Ppi/MpServices.h>
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
 
