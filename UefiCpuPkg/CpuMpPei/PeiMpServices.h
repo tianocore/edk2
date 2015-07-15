@@ -17,6 +17,9 @@
 
 #include "CpuMpPei.h"
 
+
+#define CPU_CHECK_AP_INTERVAL             0x100     // 100 microseconds
+
 /**
   This service retrieves the number of logical processor in the platform
   and the number of those logical processors that are enabled on this boot.
@@ -93,6 +96,80 @@ PeiGetProcessorInfo (
   IN  EFI_PEI_MP_SERVICES_PPI    *This,
   IN  UINTN                      ProcessorNumber,
   OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
+  );
+
+/**
+  This service executes a caller provided function on all enabled APs. APs can
+  run either simultaneously or one at a time in sequence. This service supports
+  both blocking requests only. This service may only
+  be called from the BSP.
+
+  This function is used to dispatch all the enabled APs to the function specified
+  by Procedure.  If any enabled AP is busy, then EFI_NOT_READY is returned
+  immediately and Procedure is not started on any AP.
+
+  If SingleThread is TRUE, all the enabled APs execute the function specified by
+  Procedure one by one, in ascending order of processor handle number. Otherwise,
+  all the enabled APs execute the function specified by Procedure simultaneously.
+
+  If the timeout specified by TimeoutInMicroSeconds expires before all APs return
+  from Procedure, then Procedure on the failed APs is terminated. All enabled APs
+  are always available for further calls to EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+  and EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If FailedCpuList is not NULL, its
+  content points to the list of processor handle numbers in which Procedure was
+  terminated.
+
+  Note: It is the responsibility of the consumer of the EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+  to make sure that the nature of the code that is executed on the BSP and the
+  dispatched APs is well controlled. The MP Services Ppi does not guarantee
+  that the Procedure function is MP-safe. Hence, the tasks that can be run in
+  parallel are limited to certain independent tasks and well-controlled exclusive
+  code. PEI services and Ppis may not be called by APs unless otherwise
+  specified.
+
+  In blocking execution mode, BSP waits until all APs finish or
+  TimeoutInMicroSeconds expires.
+
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] Procedure            A pointer to the function to be run on enabled APs of
+                                  the system.
+  @param[in] SingleThread         If TRUE, then all the enabled APs execute the function
+                                  specified by Procedure one by one, in ascending order
+                                  of processor handle number. If FALSE, then all the
+                                  enabled APs execute the function specified by Procedure
+                                  simultaneously.
+  @param[in] TimeoutInMicroSeconds
+                                  Indicates the time limit in microseconds for APs to
+                                  return from Procedure, for blocking mode only. Zero
+                                  means infinity. If the timeout expires before all APs
+                                  return from Procedure, then Procedure on the failed APs
+                                  is terminated. All enabled APs are available for next
+                                  function assigned by EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+                                  or EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If the
+                                  timeout expires in blocking mode, BSP returns
+                                  EFI_TIMEOUT.
+  @param[in] ProcedureArgument    The parameter passed into Procedure for all APs.
+
+  @retval EFI_SUCCESS             In blocking mode, all APs have finished before the
+                                  timeout expired.
+  @retval EFI_DEVICE_ERROR        Caller processor is AP.
+  @retval EFI_NOT_STARTED         No enabled APs exist in the system.
+  @retval EFI_NOT_READY           Any enabled APs are busy.
+  @retval EFI_TIMEOUT             In blocking mode, the timeout expired before all
+                                  enabled APs have finished.
+  @retval EFI_INVALID_PARAMETER   Procedure is NULL.
+**/
+EFI_STATUS
+EFIAPI
+PeiStartupAllAPs (
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  EFI_PEI_MP_SERVICES_PPI   *This,
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  BOOLEAN                   SingleThread,
+  IN  UINTN                     TimeoutInMicroSeconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL
   );
 
 

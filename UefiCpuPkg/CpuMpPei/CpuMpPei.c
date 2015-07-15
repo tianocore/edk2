@@ -133,6 +133,8 @@ ApCFunction (
   )
 {
   PEI_CPU_MP_DATA            *PeiCpuMpData;
+  UINTN                      ProcessorNumber;
+  EFI_AP_PROCEDURE           Procedure;
   UINTN                      BistData;
 
   PeiCpuMpData = ExchangeInfo->PeiCpuMpData;
@@ -148,6 +150,18 @@ ApCFunction (
     //
     MtrrSetAllMtrrs (&PeiCpuMpData->MtrrTable);
     MicrocodeDetect ();
+  } else {
+    //
+    // Execute AP function if AP is not disabled
+    //
+    GetProcessorNumber (PeiCpuMpData, &ProcessorNumber);
+    if ((PeiCpuMpData->CpuData[ProcessorNumber].State != CpuStateDisabled) &&
+        (PeiCpuMpData->ApFunction != 0)) {
+      PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateBusy;
+      Procedure = (EFI_AP_PROCEDURE)(UINTN)PeiCpuMpData->ApFunction;
+      Procedure ((VOID *)(UINTN)PeiCpuMpData->ApFunctionArgument);
+      PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
+    }
   }
 
   //

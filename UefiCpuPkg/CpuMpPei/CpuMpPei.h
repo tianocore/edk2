@@ -154,6 +154,25 @@ AsmInitializeGdt (
 
 
 /**
+  This function will be called by BSP to wakeup AP.
+
+  @param PeiCpuMpData       Pointer to PEI CPU MP Data
+  @param Broadcast          TRUE:  Send broadcast IPI to all APs
+                            FALSE: Send IPI to AP by ApicId
+  @param ApicId             Apic ID for the processor to be waked
+  @param Procedure          The function to be invoked by AP
+  @param ProcedureArgument  The argument to be passed into AP function
+**/
+VOID
+WakeUpAP (
+  IN PEI_CPU_MP_DATA           *PeiCpuMpData,
+  IN BOOLEAN                   Broadcast,
+  IN UINT32                    ApicId,
+  IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
+  IN VOID                      *ProcedureArgument      OPTIONAL
+  );
+
+/**
   Get CPU MP Data pointer from the Guided HOB.
 
   @return  Pointer to Pointer to PEI CPU MP Data
@@ -161,6 +180,21 @@ AsmInitializeGdt (
 PEI_CPU_MP_DATA *
 GetMpHobData (
   VOID
+  );
+
+/**
+  Find the current Processor number by APIC ID.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+  @param ProcessorNumber     Return the pocessor number found
+
+  @retval EFI_SUCCESS        ProcessorNumber is found and returned.
+  @retval EFI_NOT_FOUND      ProcessorNumber is not found.
+**/
+EFI_STATUS
+GetProcessorNumber (
+  IN PEI_CPU_MP_DATA         *PeiCpuMpData,
+  OUT UINTN                  *ProcessorNumber
   );
 
 /**
