@@ -24,6 +24,10 @@ PROTECT_MODE_DS               equ        18h
 VacantFlag                    equ        00h
 NotVacantFlag                 equ        0ffh
 
+CPU_SWITCH_STATE_IDLE         equ        0
+CPU_SWITCH_STATE_STORED       equ        1
+CPU_SWITCH_STATE_LOADED       equ        2
+
 LockLocation                  equ        (RendezvousFunnelProcEnd - RendezvousFunnelProcStart)
 StackStartAddressLocation     equ        LockLocation + 04h
 StackSizeLocation             equ        LockLocation + 08h

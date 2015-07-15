@@ -17,8 +17,29 @@
 
 #include "CpuMpPei.h"
 
+//
+//  The MP data for switch BSP
+//
+#define CPU_SWITCH_STATE_IDLE   0
+#define CPU_SWITCH_STATE_STORED 1
+#define CPU_SWITCH_STATE_LOADED 2
 
 #define CPU_CHECK_AP_INTERVAL             0x100     // 100 microseconds
+
+/**
+  This function is called by both the BSP and the AP which is to become the BSP to
+  Exchange execution context including stack between them. After return from this
+  function, the BSP becomes AP and the AP becomes the BSP.
+
+  @param MyInfo      Pointer to buffer holding the exchanging information for the executing processor.
+  @param OthersInfo  Pointer to buffer holding the exchanging information for the peer.
+**/
+VOID
+EFIAPI
+AsmExchangeRole (
+  IN   CPU_EXCHANGE_ROLE_INFO    *MyInfo,
+  IN   CPU_EXCHANGE_ROLE_INFO    *OthersInfo
+  );
 
 /**
   This service retrieves the number of logical processor in the platform
@@ -227,6 +248,49 @@ PeiStartupThisAP (
   IN  UINTN                     ProcessorNumber,
   IN  UINTN                     TimeoutInMicroseconds,
   IN  VOID                      *ProcedureArgument      OPTIONAL
+  );
+
+/**
+  This service switches the requested AP to be the BSP from that point onward.
+  This service changes the BSP for all purposes.   This call can only be performed
+  by the current BSP.
+
+  This service switches the requested AP to be the BSP from that point onward.
+  This service changes the BSP for all purposes. The new BSP can take over the
+  execution of the old BSP and continue seamlessly from where the old one left
+  off.
+
+  If the BSP cannot be switched prior to the return from this service, then
+  EFI_UNSUPPORTED must be returned.
+
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
+                                  total number of logical processors minus 1. The total
+                                  number of logical processors can be retrieved by
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+  @param[in] EnableOldBSP         If TRUE, then the old BSP will be listed as an enabled
+                                  AP. Otherwise, it will be disabled.
+
+  @retval EFI_SUCCESS             BSP successfully switched.
+  @retval EFI_UNSUPPORTED         Switching the BSP cannot be completed prior to this
+                                  service returning.
+  @retval EFI_UNSUPPORTED         Switching the BSP is not supported.
+  @retval EFI_SUCCESS             The calling processor is an AP.
+  @retval EFI_NOT_FOUND           The processor with the handle specified by
+                                  ProcessorNumber does not exist.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the current BSP or a disabled
+                                  AP.
+  @retval EFI_NOT_READY           The specified AP is busy.
+**/
+EFI_STATUS
+EFIAPI
+PeiSwitchBSP (
+  IN  CONST EFI_PEI_SERVICES   **PeiServices,
+  IN  EFI_PEI_MP_SERVICES_PPI  *This,
+  IN  UINTN                    ProcessorNumber,
+  IN  BOOLEAN                  EnableOldBSP
   );
 
 

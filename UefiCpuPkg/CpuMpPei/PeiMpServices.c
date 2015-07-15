@@ -154,6 +154,25 @@ GetProcessorNumber (
 }
 
 /**
+  Worker function for SwitchBSP().
+
+  Worker function for SwitchBSP(), assigned to the AP which is intended to become BSP.
+
+  @param Buffer        Pointer to CPU MP Data
+**/
+VOID
+EFIAPI
+FutureBSPProc (
+  IN  VOID                *Buffer
+  )
+{
+  PEI_CPU_MP_DATA         *DataInHob;
+
+  DataInHob = (PEI_CPU_MP_DATA *) Buffer;
+  AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
+}
+
+/**
   This service retrieves the number of logical processor in the platform
   and the number of those logical processors that are enabled on this boot.
   This service may only be called from the BSP.
@@ -615,6 +634,118 @@ PeiStartupThisAP (
   }
 
   return Status;
+}
+
+/**
+  This service switches the requested AP to be the BSP from that point onward.
+  This service changes the BSP for all purposes.   This call can only be performed
+  by the current BSP.
+
+  This service switches the requested AP to be the BSP from that point onward.
+  This service changes the BSP for all purposes. The new BSP can take over the
+  execution of the old BSP and continue seamlessly from where the old one left
+  off.
+
+  If the BSP cannot be switched prior to the return from this service, then
+  EFI_UNSUPPORTED must be returned.
+
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
+                                  total number of logical processors minus 1. The total
+                                  number of logical processors can be retrieved by
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+  @param[in] EnableOldBSP         If TRUE, then the old BSP will be listed as an enabled
+                                  AP. Otherwise, it will be disabled.
+
+  @retval EFI_SUCCESS             BSP successfully switched.
+  @retval EFI_UNSUPPORTED         Switching the BSP cannot be completed prior to this
+                                  service returning.
+  @retval EFI_UNSUPPORTED         Switching the BSP is not supported.
+  @retval EFI_SUCCESS             The calling processor is an AP.
+  @retval EFI_NOT_FOUND           The processor with the handle specified by
+                                  ProcessorNumber does not exist.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the current BSP or a disabled
+                                  AP.
+  @retval EFI_NOT_READY           The specified AP is busy.
+**/
+EFI_STATUS
+EFIAPI
+PeiSwitchBSP (
+  IN  CONST EFI_PEI_SERVICES   **PeiServices,
+  IN  EFI_PEI_MP_SERVICES_PPI  *This,
+  IN  UINTN                    ProcessorNumber,
+  IN  BOOLEAN                  EnableOldBSP
+  )
+{
+  PEI_CPU_MP_DATA         *PeiCpuMpData;
+  UINTN                   CallerNumber;
+  MSR_IA32_APIC_BASE      ApicBaseMsr;
+
+  PeiCpuMpData = GetMpHobData ();
+  if (PeiCpuMpData == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Check whether caller processor is BSP
+  //
+  PeiWhoAmI (PeiServices, This, &CallerNumber);
+  if (CallerNumber != PeiCpuMpData->BspNumber) {
+    return EFI_SUCCESS;
+  }
+
+  if (ProcessorNumber >= PeiCpuMpData->CpuCount) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Check whether specified AP is disabled
+  //
+  if (PeiCpuMpData->CpuData[ProcessorNumber].State == CpuStateDisabled) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether ProcessorNumber specifies the current BSP
+  //
+  if (ProcessorNumber == PeiCpuMpData->BspNumber) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether specified AP is busy
+  //
+  if (PeiCpuMpData->CpuData[ProcessorNumber].State == CpuStateBusy) {
+    return EFI_NOT_READY;
+  }
+
+  //
+  // Clear the BSP bit of MSR_IA32_APIC_BASE
+  //
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  ApicBaseMsr.Bits.Bsp = 0;
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+
+  PeiCpuMpData->BSPInfo.State = CPU_SWITCH_STATE_IDLE;
+  PeiCpuMpData->APInfo.State  = CPU_SWITCH_STATE_IDLE;
+
+  //
+  // Need to wakeUp AP (future BSP).
+  //
+  WakeUpAP (PeiCpuMpData, FALSE, PeiCpuMpData->CpuData[ProcessorNumber].ApicId, FutureBSPProc, PeiCpuMpData);
+
+  AsmExchangeRole (&PeiCpuMpData->BSPInfo, &PeiCpuMpData->APInfo);
+
+  //
+  // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
+  //
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  ApicBaseMsr.Bits.Bsp = 1;
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+
+  return EFI_SUCCESS;
 }
 
 

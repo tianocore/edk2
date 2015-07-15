@@ -161,6 +161,85 @@ AsmGetAddressMap   PROC  near C  PUBLIC
     ret
 AsmGetAddressMap   ENDP
 
+PAUSE32   MACRO
+    DB      0F3h
+    DB      090h
+    ENDM
+
+;-------------------------------------------------------------------------------------
+;AsmExchangeRole procedure follows. This procedure executed by current BSP, that is
+;about to become an AP. It switches it'stack with the current AP.
+;AsmExchangeRole (IN   CPU_EXCHANGE_INFO    *MyInfo, IN   CPU_EXCHANGE_INFO    *OthersInfo);
+;-------------------------------------------------------------------------------------
+AsmExchangeRole   PROC  near C  PUBLIC
+    ; DO NOT call other functions in this function, since 2 CPU may use 1 stack
+    ; at the same time. If 1 CPU try to call a function, stack will be corrupted.
+    pushad
+    mov        ebp,esp
+
+    ; esi contains MyInfo pointer
+    mov        esi, dword ptr [ebp+24h]
+
+    ; edi contains OthersInfo pointer
+    mov        edi, dword ptr [ebp+28h]
+
+    ;Store EFLAGS, GDTR and IDTR register to stack
+    pushfd
+    mov        eax, cr4
+    push       eax       ; push cr4 firstly
+    mov        eax, cr0
+    push       eax
+
+    sgdt       fword ptr [esi+8]
+    sidt       fword ptr [esi+14]
+
+    ; Store the its StackPointer
+    mov        dword ptr [esi+4],esp
+
+    ; update its switch state to STORED
+    mov        byte ptr [esi], CPU_SWITCH_STATE_STORED
+
+WaitForOtherStored:
+    ; wait until the other CPU finish storing its state
+    cmp        byte ptr [edi], CPU_SWITCH_STATE_STORED
+    jz         OtherStored
+    PAUSE32
+    jmp        WaitForOtherStored
+
+OtherStored:
+    ; Since another CPU already stored its state, load them
+    ; load GDTR value
+    lgdt       fword ptr [edi+8]
+
+    ; load IDTR value
+    lidt       fword ptr [edi+14]
+
+    ; load its future StackPointer
+    mov        esp, dword ptr [edi+4]
+
+    ; update the other CPU's switch state to LOADED
+    mov        byte ptr [edi], CPU_SWITCH_STATE_LOADED
+
+WaitForOtherLoaded:
+    ; wait until the other CPU finish loading new state,
+    ; otherwise the data in stack may corrupt
+    cmp        byte ptr [esi], CPU_SWITCH_STATE_LOADED
+    jz         OtherLoaded
+    PAUSE32
+    jmp        WaitForOtherLoaded
+
+OtherLoaded:
+    ; since the other CPU already get the data it want, leave this procedure
+    pop        eax
+    mov        cr0, eax
+    pop        eax
+    mov        cr4, eax
+    popfd
+
+    popad
+    ret
+AsmExchangeRole   ENDP
+
 AsmInitializeGdt   PROC  near C  PUBLIC
   push         ebp
   mov          ebp, esp

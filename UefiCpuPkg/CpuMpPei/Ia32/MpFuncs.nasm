@@ -149,6 +149,80 @@ ASM_PFX(AsmGetAddressMap):
     popad
     ret
 
+;-------------------------------------------------------------------------------------
+;AsmExchangeRole procedure follows. This procedure executed by current BSP, that is
+;about to become an AP. It switches it'stack with the current AP.
+;AsmExchangeRole (IN   CPU_EXCHANGE_INFO    *MyInfo, IN   CPU_EXCHANGE_INFO    *OthersInfo);
+;-------------------------------------------------------------------------------------
+global ASM_PFX(AsmExchangeRole)
+ASM_PFX(AsmExchangeRole):
+    ; DO NOT call other functions in this function, since 2 CPU may use 1 stack
+    ; at the same time. If 1 CPU try to call a function, stack will be corrupted.
+    pushad
+    mov        ebp,esp
+
+    ; esi contains MyInfo pointer
+    mov        esi, [ebp + 24h]
+
+    ; edi contains OthersInfo pointer
+    mov        edi, [ebp + 28h]
+
+    ;Store EFLAGS, GDTR and IDTR register to stack
+    pushfd
+    mov        eax, cr4
+    push       eax       ; push cr4 firstly
+    mov        eax, cr0
+    push       eax
+
+    sgdt       [esi + 8]
+    sidt       [esi + 14]
+
+    ; Store the its StackPointer
+    mov        [esi + 4],esp
+
+    ; update its switch state to STORED
+    mov        byte [esi], CPU_SWITCH_STATE_STORED
+
+WaitForOtherStored:
+    ; wait until the other CPU finish storing its state
+    cmp        byte [edi], CPU_SWITCH_STATE_STORED
+    jz         OtherStored
+    pause
+    jmp        WaitForOtherStored
+
+OtherStored:
+    ; Since another CPU already stored its state, load them
+    ; load GDTR value
+    lgdt       [edi + 8]
+
+    ; load IDTR value
+    lidt       [edi + 14]
+
+    ; load its future StackPointer
+    mov        esp, [edi + 4]
+
+    ; update the other CPU's switch state to LOADED
+    mov        byte [edi], CPU_SWITCH_STATE_LOADED
+
+WaitForOtherLoaded:
+    ; wait until the other CPU finish loading new state,
+    ; otherwise the data in stack may corrupt
+    cmp        byte [esi], CPU_SWITCH_STATE_LOADED
+    jz         OtherLoaded
+    pause
+    jmp        WaitForOtherLoaded
+
+OtherLoaded:
+    ; since the other CPU already get the data it want, leave this procedure
+    pop        eax
+    mov        cr0, eax
+    pop        eax
+    mov        cr4, eax
+    popfd
+
+    popad
+    ret
+
 global ASM_PFX(AsmInitializeGdt)
 ASM_PFX(AsmInitializeGdt):
   push         ebp

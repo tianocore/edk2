@@ -187,6 +187,112 @@ ASM_PFX(AsmGetAddressMap):
     mov        qword [rcx + 18h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
     ret
 
+;-------------------------------------------------------------------------------------
+;AsmExchangeRole procedure follows. This procedure executed by current BSP, that is
+;about to become an AP. It switches it'stack with the current AP.
+;AsmExchangeRole (IN   CPU_EXCHANGE_INFO    *MyInfo, IN   CPU_EXCHANGE_INFO    *OthersInfo);
+;-------------------------------------------------------------------------------------
+global ASM_PFX(AsmExchangeRole)
+ASM_PFX(AsmExchangeRole):
+    ; DO NOT call other functions in this function, since 2 CPU may use 1 stack
+    ; at the same time. If 1 CPU try to call a function, stack will be corrupted.
+
+    push       rax
+    push       rbx
+    push       rcx
+    push       rdx
+    push       rsi
+    push       rdi
+    push       rbp
+    push       r8
+    push       r9
+    push       r10
+    push       r11
+    push       r12
+    push       r13
+    push       r14
+    push       r15
+
+    mov        rax, cr0
+    push       rax
+
+    mov        rax, cr4
+    push       rax
+
+    ; rsi contains MyInfo pointer
+    mov        rsi, rcx
+
+    ; rdi contains OthersInfo pointer
+    mov        rdi, rdx
+
+    ;Store EFLAGS, GDTR and IDTR regiter to stack
+    pushfq
+    sgdt       [rsi + 16]
+    sidt       [rsi + 26]
+
+    ; Store the its StackPointer
+    mov        [rsi + 8], rsp
+
+    ; update its switch state to STORED
+    mov        byte [rsi], CPU_SWITCH_STATE_STORED
+
+WaitForOtherStored:
+    ; wait until the other CPU finish storing its state
+    cmp        byte [rdi], CPU_SWITCH_STATE_STORED
+    jz         OtherStored
+    pause
+    jmp        WaitForOtherStored
+
+OtherStored:
+    ; Since another CPU already stored its state, load them
+    ; load GDTR value
+    lgdt       [rdi + 16]
+
+    ; load IDTR value
+    lidt       [rdi + 26]
+
+    ; load its future StackPointer
+    mov        rsp, [rdi + 8]
+
+    ; update the other CPU's switch state to LOADED
+    mov        byte [rdi], CPU_SWITCH_STATE_LOADED
+
+WaitForOtherLoaded:
+    ; wait until the other CPU finish loading new state,
+    ; otherwise the data in stack may corrupt
+    cmp        byte [rsi], CPU_SWITCH_STATE_LOADED
+    jz         OtherLoaded
+    pause
+    jmp        WaitForOtherLoaded
+
+OtherLoaded:
+    ; since the other CPU already get the data it want, leave this procedure
+    popfq
+
+    pop        rax
+    mov        cr4, rax
+
+    pop        rax
+    mov        cr0, rax
+
+    pop        r15
+    pop        r14
+    pop        r13
+    pop        r12
+    pop        r11
+    pop        r10
+    pop        r9
+    pop        r8
+    pop        rbp
+    pop        rdi
+    pop        rsi
+    pop        rdx
+    pop        rcx
+    pop        rbx
+    pop        rax
+
+    ret
+
 global ASM_PFX(AsmInitializeGdt)
 ASM_PFX(AsmInitializeGdt):
     push       rbp

@@ -58,6 +58,16 @@ typedef struct {
   UINTN             RendezvousFunnelSize;
 } MP_ASSEMBLY_ADDRESS_MAP;
 
+//
+// CPU exchange information for switch BSP
+//
+typedef struct {
+  UINT8             State;        // offset 0
+  UINTN             StackPointer; // offset 4 / 8
+  IA32_DESCRIPTOR   Gdtr;         // offset 8 / 16
+  IA32_DESCRIPTOR   Idtr;         // offset 14 / 26
+} CPU_EXCHANGE_ROLE_INFO;
+
 typedef struct _PEI_CPU_MP_DATA  PEI_CPU_MP_DATA;
 
 #pragma pack()
@@ -124,6 +134,8 @@ struct _PEI_CPU_MP_DATA {
   UINTN                          ApFunctionArgument;
   volatile UINT32                FinishedCount;
   BOOLEAN                        InitFlag;
+  CPU_EXCHANGE_ROLE_INFO         BSPInfo;
+  CPU_EXCHANGE_ROLE_INFO         APInfo;
   MTRR_SETTINGS                  MtrrTable;
   PEI_CPU_DATA                   *CpuData;
   volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
