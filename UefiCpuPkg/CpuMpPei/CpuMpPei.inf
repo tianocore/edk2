@@ -49,12 +49,19 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
+  DebugLib
   HobLib
+  LocalApicLib
+  PcdLib
   PeimEntryPoint
+  PeiServicesLib
   UefiCpuLib
 
 
-
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid

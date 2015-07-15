@@ -17,11 +17,25 @@
 
 #include <PiPei.h>
 
+#include <Ppi/SecPlatformInformation.h>
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/HobLib.h>
+#include <Library/LocalApicLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
+#include <Library/PeiServicesLib.h>
 #include <Library/UefiCpuLib.h>
+//
+// AP state
+//
+typedef enum {
+  CpuStateIdle,
+  CpuStateBusy,
+  CpuStateDisabled
+} CPU_STATE;
 
 //
 // AP reset code information
@@ -33,7 +47,9 @@ typedef struct {
   UINTN             RendezvousFunnelSize;
 } MP_ASSEMBLY_ADDRESS_MAP;
 
-#pragma pack(1)
+typedef struct _PEI_CPU_MP_DATA  PEI_CPU_MP_DATA;
+
+#pragma pack()
 
 typedef union {
   struct {
@@ -72,6 +88,29 @@ typedef struct {
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
+
+typedef struct {
+  UINT32                         ApicId;
+  EFI_HEALTH_FLAGS               Health;
+  CPU_STATE                      State;
+  BOOLEAN                        CpuHealthy;
+} PEI_CPU_DATA;
+
+//
+// PEI CPU MP Data save in memory
+//
+struct _PEI_CPU_MP_DATA {
+  UINT32                         CpuCount;
+  UINT32                         BspNumber;
+  UINTN                          Buffer;
+  UINTN                          CpuApStackSize;
+  MP_ASSEMBLY_ADDRESS_MAP        AddressMap;
+  UINTN                          WakeupBuffer;
+  UINTN                          BackupBuffer;
+  UINTN                          BackupBufferSize;
+  PEI_CPU_DATA                   *CpuData;
+  volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
+};
 
 /**
   Assembly code to get starting address and size of the rendezvous entry for APs.
