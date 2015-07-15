@@ -56,11 +56,14 @@
   PcdLib
   PeimEntryPoint
   PeiServicesLib
+  SynchronizationLib
+  TimerLib
   UefiCpuLib
 
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
 
 [Depex]

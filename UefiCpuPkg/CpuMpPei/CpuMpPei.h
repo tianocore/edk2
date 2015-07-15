@@ -27,6 +27,8 @@
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/SynchronizationLib.h>
+#include <Library/TimerLib.h>
 #include <Library/UefiCpuLib.h>
 //
 // AP state
@@ -85,6 +87,7 @@ typedef struct {
   UINTN                 NumApsExecuting;
   UINTN                 LmodeOffset;
   UINTN                 Cr3;
+  PEI_CPU_MP_DATA       *PeiCpuMpData;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
@@ -108,6 +111,10 @@ struct _PEI_CPU_MP_DATA {
   UINTN                          WakeupBuffer;
   UINTN                          BackupBuffer;
   UINTN                          BackupBufferSize;
+  UINTN                          ApFunction;
+  UINTN                          ApFunctionArgument;
+  volatile UINT32                FinishedCount;
+  BOOLEAN                        InitFlag;
   PEI_CPU_DATA                   *CpuData;
   volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
 };

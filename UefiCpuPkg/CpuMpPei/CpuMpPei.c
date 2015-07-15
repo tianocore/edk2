@@ -39,6 +39,91 @@ GLOBAL_REMOVE_IF_UNREFERENCED IA32_DESCRIPTOR mGdt = {
   };
 
 /**
+  This function will be called from AP reset code if BSP uses WakeUpAP.
+
+  @param ExchangeInfo     Pointer to the MP exchange info buffer
+  @param NumApsExecuting  Number of curret executing AP
+**/
+VOID
+EFIAPI
+ApCFunction (
+  IN MP_CPU_EXCHANGE_INFO      *ExchangeInfo,
+  IN UINTN                     NumApsExecuting
+  )
+{
+  PEI_CPU_MP_DATA            *PeiCpuMpData;
+  UINTN                      BistData;
+
+  PeiCpuMpData = ExchangeInfo->PeiCpuMpData;
+  if (PeiCpuMpData->InitFlag) {
+    //
+    // This is first time AP wakeup, get BIST inforamtion from AP stack
+    //
+    BistData = *(UINTN *) (PeiCpuMpData->Buffer + NumApsExecuting * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
+    PeiCpuMpData->CpuData[NumApsExecuting].ApicId        = GetInitialApicId ();
+    PeiCpuMpData->CpuData[NumApsExecuting].Health.Uint32 = (UINT32) BistData;
+  }
+
+  //
+  // AP finished executing C code
+  //
+  InterlockedIncrement ((UINT32 *)&PeiCpuMpData->FinishedCount);
+
+}
+
+/**
+  This function will be called by BSP to wakeup AP.
+
+  @param PeiCpuMpData       Pointer to PEI CPU MP Data
+  @param Broadcast          TRUE:  Send broadcast IPI to all APs
+                            FALSE: Send IPI to AP by ApicId
+  @param ApicId             Apic ID for the processor to be waked
+  @param Procedure          The function to be invoked by AP
+  @param ProcedureArgument  The argument to be passed into AP function
+**/
+VOID
+WakeUpAP (
+  IN PEI_CPU_MP_DATA           *PeiCpuMpData,
+  IN BOOLEAN                   Broadcast,
+  IN UINT32                    ApicId,
+  IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
+  IN VOID                      *ProcedureArgument      OPTIONAL
+  )
+{
+  volatile MP_CPU_EXCHANGE_INFO    *ExchangeInfo;
+
+  PeiCpuMpData->ApFunction         = (UINTN) Procedure;
+  PeiCpuMpData->ApFunctionArgument = (UINTN) ProcedureArgument;
+  PeiCpuMpData->FinishedCount      = 0;
+
+  ExchangeInfo                     = PeiCpuMpData->MpCpuExchangeInfo;
+  ExchangeInfo->Lock               = 0;
+  ExchangeInfo->StackStart         = PeiCpuMpData->Buffer;
+  ExchangeInfo->StackSize          = PeiCpuMpData->CpuApStackSize;
+  ExchangeInfo->BufferStart        = PeiCpuMpData->WakeupBuffer;
+  ExchangeInfo->PmodeOffset        = PeiCpuMpData->AddressMap.PModeEntryOffset;
+  ExchangeInfo->LmodeOffset        = PeiCpuMpData->AddressMap.LModeEntryOffset;
+  ExchangeInfo->Cr3                = AsmReadCr3 ();
+  ExchangeInfo->CFunction          = (UINTN) ApCFunction;
+  ExchangeInfo->NumApsExecuting    = 0;
+  ExchangeInfo->PeiCpuMpData       = PeiCpuMpData;
+
+  //
+  // Get the BSP's data of GDT and IDT
+  //
+  CopyMem ((VOID *)&ExchangeInfo->GdtrProfile, &mGdt, sizeof(mGdt));
+  AsmReadIdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->IdtrProfile);
+
+  if (Broadcast) {
+    SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
+  } else {
+    SendInitSipiSipi (ApicId, (UINT32) ExchangeInfo->BufferStart);
+  }
+
+  return ;
+}
+
+/**
   Get available system memory below 1MB by specified size.
 
   @param  WakeupBufferSize   Wakeup buffer size required
@@ -132,6 +217,35 @@ BackupAndPrepareWakeupBuffer(
     );
 }
 /**
+  This function will get CPU count in the system.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+
+  @return  AP processor count
+**/
+UINT32
+CountProcessorNumber (
+  IN PEI_CPU_MP_DATA            *PeiCpuMpData
+  )
+{
+
+  //
+  // Send broadcast IPI to APs to wakeup APs
+  //
+  PeiCpuMpData->InitFlag = 1;
+  WakeUpAP (PeiCpuMpData, TRUE, 0, NULL, NULL);
+  //
+  // Wait for AP task to complete and then exit.
+  //
+  MicroSecondDelay (PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
+  PeiCpuMpData->InitFlag  = 0;
+  PeiCpuMpData->CpuCount += (UINT32) PeiCpuMpData->MpCpuExchangeInfo->NumApsExecuting;
+
+  DEBUG ((EFI_D_INFO, "CpuMpPei: Find %d processors in system.\n", PeiCpuMpData->CpuCount));
+  return PeiCpuMpData->CpuCount;
+}
+
+/**
   Prepare for AP wakeup buffer and copy AP reset code into it.
 
   Get wakeup buffer below 1MB. Allocate memory for CPU MP Data and APs Stack.
@@ -213,6 +327,7 @@ CpuMpPeimInit (
 {
 
   PEI_CPU_MP_DATA      *PeiCpuMpData;
+  UINT32               ProcessorCount;
 
   //
   // Load new GDT table on BSP
@@ -222,6 +337,10 @@ CpuMpPeimInit (
   // Get wakeup buffer and copy AP reset code in it
   //
   PeiCpuMpData = PrepareAPStartupVector ();
+  //
+  // Count processor number and collect processor information
+  //
+  ProcessorCount = CountProcessorNumber (PeiCpuMpData);
 
   return EFI_SUCCESS;
 }
