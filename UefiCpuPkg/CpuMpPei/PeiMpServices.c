@@ -44,6 +44,85 @@ GetProcessorNumber (
   return EFI_NOT_FOUND;
 }
 
+/**
+  This service retrieves the number of logical processor in the platform
+  and the number of those logical processors that are enabled on this boot.
+  This service may only be called from the BSP.
+
+  This function is used to retrieve the following information:
+    - The number of logical processors that are present in the system.
+    - The number of enabled logical processors in the system at the instant
+      this call is made.
+
+  Because MP Service Ppi provides services to enable and disable processors
+  dynamically, the number of enabled logical processors may vary during the
+  course of a boot session.
+
+  If this service is called from an AP, then EFI_DEVICE_ERROR is returned.
+  If NumberOfProcessors or NumberOfEnabledProcessors is NULL, then
+  EFI_INVALID_PARAMETER is returned. Otherwise, the total number of processors
+  is returned in NumberOfProcessors, the number of currently enabled processor
+  is returned in NumberOfEnabledProcessors, and EFI_SUCCESS is returned.
+
+  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in]  This                Pointer to this instance of the PPI.
+  @param[out] NumberOfProcessors  Pointer to the total number of logical processors in
+                                  the system, including the BSP and disabled APs.
+  @param[out] NumberOfEnabledProcessors
+                                  Number of processors in the system that are enabled.
+
+  @retval EFI_SUCCESS             The number of logical processors and enabled
+                                  logical processors was retrieved.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_INVALID_PARAMETER   NumberOfProcessors is NULL.
+                                  NumberOfEnabledProcessors is NULL.
+**/
+EFI_STATUS
+EFIAPI
+PeiGetNumberOfProcessors (
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  EFI_PEI_MP_SERVICES_PPI   *This,
+  OUT UINTN                     *NumberOfProcessors,
+  OUT UINTN                     *NumberOfEnabledProcessors
+  )
+{
+  PEI_CPU_MP_DATA         *PeiCpuMpData;
+  UINTN                   CallerNumber;
+  UINTN                   ProcessorNumber;
+  UINTN                   EnabledProcessorNumber;
+  UINTN                   Index;
+
+  PeiCpuMpData = GetMpHobData ();
+  if (PeiCpuMpData == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  if ((NumberOfProcessors == NULL) || (NumberOfEnabledProcessors == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether caller processor is BSP
+  //
+  PeiWhoAmI (PeiServices, This, &CallerNumber);
+  if (CallerNumber != PeiCpuMpData->BspNumber) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  ProcessorNumber        = PeiCpuMpData->CpuCount;
+  EnabledProcessorNumber = 0;
+  for (Index = 0; Index < ProcessorNumber; Index++) {
+    if (PeiCpuMpData->CpuData[Index].State != CpuStateDisabled) {
+      EnabledProcessorNumber ++;
+    }
+  }
+
+  *NumberOfProcessors = ProcessorNumber;
+  *NumberOfEnabledProcessors = EnabledProcessorNumber;
+
+  return EFI_SUCCESS;
+}
 
 /**
   This return the handle number for the calling processor.  This service may be

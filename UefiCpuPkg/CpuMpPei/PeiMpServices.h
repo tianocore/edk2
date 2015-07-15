@@ -17,6 +17,49 @@
 
 #include "CpuMpPei.h"
 
+/**
+  This service retrieves the number of logical processor in the platform
+  and the number of those logical processors that are enabled on this boot.
+  This service may only be called from the BSP.
+
+  This function is used to retrieve the following information:
+    - The number of logical processors that are present in the system.
+    - The number of enabled logical processors in the system at the instant
+      this call is made.
+
+  Because MP Service Ppi provides services to enable and disable processors
+  dynamically, the number of enabled logical processors may vary during the
+  course of a boot session.
+
+  If this service is called from an AP, then EFI_DEVICE_ERROR is returned.
+  If NumberOfProcessors or NumberOfEnabledProcessors is NULL, then
+  EFI_INVALID_PARAMETER is returned. Otherwise, the total number of processors
+  is returned in NumberOfProcessors, the number of currently enabled processor
+  is returned in NumberOfEnabledProcessors, and EFI_SUCCESS is returned.
+
+  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in]  This                Pointer to this instance of the PPI.
+  @param[out] NumberOfProcessors  Pointer to the total number of logical processors in
+                                  the system, including the BSP and disabled APs.
+  @param[out] NumberOfEnabledProcessors
+                                  Number of processors in the system that are enabled.
+
+  @retval EFI_SUCCESS             The number of logical processors and enabled
+                                  logical processors was retrieved.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_INVALID_PARAMETER   NumberOfProcessors is NULL.
+                                  NumberOfEnabledProcessors is NULL.
+**/
+EFI_STATUS
+EFIAPI
+PeiGetNumberOfProcessors (
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  EFI_PEI_MP_SERVICES_PPI   *This,
+  OUT UINTN                     *NumberOfProcessors,
+  OUT UINTN                     *NumberOfEnabledProcessors
+  );
+
 
 /**
   This return the handle number for the calling processor.  This service may be
