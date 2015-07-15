@@ -18,8 +18,25 @@
 ;
 ;-------------------------------------------------------------------------------
 
+PROTECT_MODE_CS               equ        10h
+PROTECT_MODE_DS               equ        18h
 LONG_MODE_CS                  equ        38h
 LONG_MODE_DS                  equ        30h
 
+VacantFlag                    equ        00h
+NotVacantFlag                 equ        0ffh
 
 
+LockLocation                  equ        (RendezvousFunnelProcEnd - RendezvousFunnelProcStart)
+StackStartAddressLocation     equ        LockLocation + 08h
+StackSizeLocation             equ        LockLocation + 10h
+ApProcedureLocation           equ        LockLocation + 18h
+GdtrLocation                  equ        LockLocation + 20h
+IdtrLocation                  equ        LockLocation + 2Ah
+BufferStartLocation           equ        LockLocation + 34h
+PmodeOffsetLocation           equ        LockLocation + 3Ch
+NumApsExecutingLoction        equ        LockLocation + 44h
+LmodeOffsetLocation           equ        LockLocation + 4Ch
+Cr3Location                   equ        LockLocation + 54h
+
+;-------------------------------------------------------------------------------
