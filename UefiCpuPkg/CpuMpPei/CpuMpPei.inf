@@ -30,6 +30,7 @@
 [Sources]
   CpuMpPei.h
   CpuMpPei.c
+  CpuBist.c
   Microcode.h
   Microcode.c
 
@@ -59,10 +60,16 @@
   PcdLib
   PeimEntryPoint
   PeiServicesLib
+  ReportStatusCodeLib
   SynchronizationLib
   TimerLib
   UefiCpuLib
 
+[Ppis]
+  gEfiSecPlatformInformationPpiGuid             ## SOMETIMES_CONSUMES
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecPlatformInformation2PpiGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber

@@ -18,6 +18,7 @@
 #include <PiPei.h>
 
 #include <Ppi/SecPlatformInformation.h>
+#include <Ppi/SecPlatformInformation2.h>
 
 #include <Register/LocalApic.h>
 
@@ -30,6 +31,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/ReportStatusCodeLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/TimerLib.h>
 #include <Library/UefiCpuLib.h>
@@ -149,5 +151,51 @@ AsmInitializeGdt (
   IN IA32_DESCRIPTOR  *Gdtr
   );
 
+
+/**
+  Get CPU MP Data pointer from the Guided HOB.
+
+  @return  Pointer to Pointer to PEI CPU MP Data
+**/
+PEI_CPU_MP_DATA *
+GetMpHobData (
+  VOID
+  );
+
+/**
+  Collects BIST data from PPI.
+
+  This function collects BIST data from Sec Platform Information2 PPI
+  or SEC Platform Information PPI.
+
+  @param PeiServices         Pointer to PEI Services Table
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+
+**/
+VOID
+CollectBistDataFromPpi (
+  IN CONST EFI_PEI_SERVICES             **PeiServices,
+  IN PEI_CPU_MP_DATA                    *PeiCpuMpData
+  );
+
+/**
+  Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
+
+  @param  PeiServices                The pointer to the PEI Services Table.
+  @param  StructureSize              The pointer to the variable describing size of the input buffer.
+  @param  PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
+
+  @retval EFI_SUCCESS                The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small. The current buffer size needed to
+                                     hold the record is returned in StructureSize.
+
+**/
+EFI_STATUS
+EFIAPI
+SecPlatformInformation2 (
+  IN CONST EFI_PEI_SERVICES                   **PeiServices,
+  IN OUT UINT64                               *StructureSize,
+     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
+  );
 
 #endif

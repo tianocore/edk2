@@ -446,6 +446,10 @@ CpuMpPeimInit (
     (VOID *)&PeiCpuMpData,
     sizeof(UINT64)
     );
+  //
+  // Update and publish CPU BIST information
+  //
+  CollectBistDataFromPpi (PeiServices, PeiCpuMpData);
 
   return EFI_SUCCESS;
 }
