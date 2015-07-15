@@ -242,7 +242,7 @@ EFI_STATUS
   );
 
 /**
-  Enable or disable an application processor.
+  Identify the currently executing processor.
 
   @param[in]  PeiServices         An indirect pointer to the PEI Services Table
                                   published by the PEI Foundation.
