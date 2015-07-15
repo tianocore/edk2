@@ -69,7 +69,7 @@
   # @Prompt Private Key's size.
   gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateKeySize|0x3d5|UINT32|0x00000006
 
-[PcdsDynamicEx]
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
   # 01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]
   # 04 = UUID-Based DHCPv6 Unique Identifier (DUID-UUID)
