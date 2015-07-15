@@ -24,6 +24,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/LocalApicLib.h>
+#include <Library/MtrrLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
@@ -115,6 +116,7 @@ struct _PEI_CPU_MP_DATA {
   UINTN                          ApFunctionArgument;
   volatile UINT32                FinishedCount;
   BOOLEAN                        InitFlag;
+  MTRR_SETTINGS                  MtrrTable;
   PEI_CPU_DATA                   *CpuData;
   volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
 };

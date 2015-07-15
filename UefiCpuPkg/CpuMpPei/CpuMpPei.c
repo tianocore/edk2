@@ -118,6 +118,10 @@ ApCFunction (
     BistData = *(UINTN *) (PeiCpuMpData->Buffer + NumApsExecuting * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
     PeiCpuMpData->CpuData[NumApsExecuting].ApicId        = GetInitialApicId ();
     PeiCpuMpData->CpuData[NumApsExecuting].Health.Uint32 = (UINT32) BistData;
+    //
+    // Sync BSP's Mtrr table to all wakeup APs
+    //
+    MtrrSetAllMtrrs (&PeiCpuMpData->MtrrTable);
   }
 
   //
@@ -285,6 +289,10 @@ CountProcessorNumber (
   )
 {
 
+  //
+  // Store BSP's MTRR setting
+  //
+  MtrrGetAllMtrrs (&PeiCpuMpData->MtrrTable);
   //
   // Send broadcast IPI to APs to wakeup APs
   //

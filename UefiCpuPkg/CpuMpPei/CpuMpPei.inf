@@ -53,6 +53,7 @@
   DebugLib
   HobLib
   LocalApicLib
+  MtrrLib
   PcdLib
   PeimEntryPoint
   PeiServicesLib
