@@ -38,6 +38,77 @@ GLOBAL_REMOVE_IF_UNREFERENCED IA32_DESCRIPTOR mGdt = {
   (UINTN) mGdtEntries
   };
 
+/**
+  Get available system memory below 1MB by specified size.
+
+  @param  WakeupBufferSize   Wakeup buffer size required
+
+  @retval other   Return wakeup buffer address below 1MB.
+  @retval -1      Cannot find free memory below 1MB.
+**/
+UINTN
+GetWakeupBuffer (
+  IN UINTN                WakeupBufferSize
+  )
+{
+  EFI_PEI_HOB_POINTERS    Hob;
+  UINTN                   WakeupBufferStart;
+  UINTN                   WakeupBufferEnd;
+
+  //
+  // Get the HOB list for processing
+  //
+  Hob.Raw = GetHobList ();
+
+  //
+  // Collect memory ranges
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if ((Hob.ResourceDescriptor->PhysicalStart < BASE_1MB) &&
+          (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
+          ((Hob.ResourceDescriptor->ResourceAttribute &
+            (EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
+             EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED
+             )) == 0)
+           ) {
+        //
+        // Need memory under 1MB to be collected here
+        //
+        WakeupBufferEnd = (UINTN) (Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength);
+        if (WakeupBufferEnd > BASE_1MB) {
+          //
+          // Wakeup buffer should be under 1MB
+          //
+          WakeupBufferEnd = BASE_1MB;
+        }
+        //
+        // Wakeup buffer should be aligned on 4KB
+        //
+        WakeupBufferStart = (WakeupBufferEnd - WakeupBufferSize) & ~(SIZE_4KB - 1);
+        if (WakeupBufferStart < Hob.ResourceDescriptor->PhysicalStart) {
+          continue;
+        }
+        //
+        // Create a memory allocation HOB.
+        //
+        BuildMemoryAllocationHob (
+          WakeupBufferStart,
+          WakeupBufferSize,
+          EfiBootServicesData
+          );
+        return WakeupBufferStart;
+      }
+    }
+    //
+    // Find the next HOB
+    //
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return (UINTN) -1;
+}
 
 /**
   The Entry point of the MP CPU PEIM.

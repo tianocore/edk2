@@ -49,6 +49,7 @@
 
 [LibraryClasses]
   BaseLib
+  HobLib
   PeimEntryPoint
 
 
