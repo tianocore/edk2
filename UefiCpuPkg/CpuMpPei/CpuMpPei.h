@@ -23,6 +23,7 @@
 #include <Library/PeimEntryPoint.h>
 
 #pragma pack(1)
+
 typedef union {
   struct {
     UINT32  LimitLow    : 16;
@@ -41,6 +42,24 @@ typedef union {
   } Bits;
   UINT64  Uint64;
 } IA32_GDT;
+
+//
+// MP CPU exchange information for AP reset code
+//
+typedef struct {
+  UINTN                 Lock;
+  UINTN                 StackStart;
+  UINTN                 StackSize;
+  UINTN                 CFunction;
+  IA32_DESCRIPTOR       GdtrProfile;
+  IA32_DESCRIPTOR       IdtrProfile;
+  UINTN                 BufferStart;
+  UINTN                 PmodeOffset;
+  UINTN                 NumApsExecuting;
+  UINTN                 LmodeOffset;
+  UINTN                 Cr3;
+} MP_CPU_EXCHANGE_INFO;
+
 #pragma pack()
 /**
   Assembly code to load GDT table and update segment accordingly.
