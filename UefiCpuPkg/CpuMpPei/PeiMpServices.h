@@ -172,6 +172,63 @@ PeiStartupAllAPs (
   IN  VOID                      *ProcedureArgument      OPTIONAL
   );
 
+/**
+  This service lets the caller get one enabled AP to execute a caller-provided
+  function. The caller can request the BSP to wait for the completion
+  of the AP. This service may only be called from the BSP.
+
+  This function is used to dispatch one enabled AP to the function specified by
+  Procedure passing in the argument specified by ProcedureArgument.
+  The execution is in blocking mode. The BSP waits until the AP finishes or
+  TimeoutInMicroSecondss expires.
+
+  If the timeout specified by TimeoutInMicroseconds expires before the AP returns
+  from Procedure, then execution of Procedure by the AP is terminated. The AP is
+  available for subsequent calls to EFI_PEI_MP_SERVICES_PPI.StartupAllAPs() and
+  EFI_PEI_MP_SERVICES_PPI.StartupThisAP().
+
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] Procedure            A pointer to the function to be run on enabled APs of
+                                  the system.
+  @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
+                                  total number of logical processors minus 1. The total
+                                  number of logical processors can be retrieved by
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+  @param[in] TimeoutInMicroseconds
+                                  Indicates the time limit in microseconds for APs to
+                                  return from Procedure, for blocking mode only. Zero
+                                  means infinity. If the timeout expires before all APs
+                                  return from Procedure, then Procedure on the failed APs
+                                  is terminated. All enabled APs are available for next
+                                  function assigned by EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+                                  or EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If the
+                                  timeout expires in blocking mode, BSP returns
+                                  EFI_TIMEOUT.
+  @param[in] ProcedureArgument    The parameter passed into Procedure for all APs.
+
+  @retval EFI_SUCCESS             In blocking mode, specified AP finished before the
+                                  timeout expires.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
+  @retval EFI_TIMEOUT             In blocking mode, the timeout expired before the
+                                  specified AP has finished.
+  @retval EFI_NOT_FOUND           The processor with the handle specified by
+                                  ProcessorNumber does not exist.
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the BSP or disabled AP.
+  @retval EFI_INVALID_PARAMETER   Procedure is NULL.
+**/
+EFI_STATUS
+EFIAPI
+PeiStartupThisAP (
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  EFI_PEI_MP_SERVICES_PPI   *This,
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  UINTN                     ProcessorNumber,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL
+  );
+
 
 /**
   This return the handle number for the calling processor.  This service may be
