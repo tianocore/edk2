@@ -76,7 +76,7 @@
 
  
 [Pcd]
-  gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType
+  gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType       ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   Dhcp6DxeExtra.uni
