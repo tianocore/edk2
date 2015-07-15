@@ -39,6 +39,62 @@ GLOBAL_REMOVE_IF_UNREFERENCED IA32_DESCRIPTOR mGdt = {
   };
 
 /**
+  Sort the APIC ID of all processors.
+
+  This function sorts the APIC ID of all processors so that processor number is
+  assigned in the ascending order of APIC ID which eases MP debugging.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+SortApicId (
+  IN PEI_CPU_MP_DATA   *PeiCpuMpData
+  )
+{
+  UINTN             Index1;
+  UINTN             Index2;
+  UINTN             Index3;
+  UINT32            ApicId;
+  EFI_HEALTH_FLAGS  Health;
+  UINT32            ApCount;
+
+  ApCount = PeiCpuMpData->CpuCount - 1;
+
+  if (ApCount != 0) {
+    for (Index1 = 0; Index1 < ApCount; Index1++) {
+      Index3 = Index1;
+      //
+      // Sort key is the hardware default APIC ID
+      //
+      ApicId = PeiCpuMpData->CpuData[Index1].ApicId;
+      for (Index2 = Index1 + 1; Index2 <= ApCount; Index2++) {
+        if (ApicId > PeiCpuMpData->CpuData[Index2].ApicId) {
+          Index3 = Index2;
+          ApicId = PeiCpuMpData->CpuData[Index2].ApicId;
+        }
+      }
+      if (Index3 != Index1) {
+        PeiCpuMpData->CpuData[Index3].ApicId = PeiCpuMpData->CpuData[Index1].ApicId;
+        PeiCpuMpData->CpuData[Index1].ApicId = ApicId;
+        Health = PeiCpuMpData->CpuData[Index3].Health;
+        PeiCpuMpData->CpuData[Index3].Health = PeiCpuMpData->CpuData[Index1].Health;
+        PeiCpuMpData->CpuData[Index1].Health = Health;
+      }
+    }
+
+    //
+    // Get the processor number for the BSP
+    //
+    ApicId = GetInitialApicId ();
+    for (Index1 = 0; Index1 < PeiCpuMpData->CpuCount; Index1++) {
+      if (PeiCpuMpData->CpuData[Index1].ApicId == ApicId) {
+        PeiCpuMpData->BspNumber = (UINT32) Index1;
+        break;
+      }
+    }
+  }
+}
+/**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param ExchangeInfo     Pointer to the MP exchange info buffer
@@ -240,6 +296,10 @@ CountProcessorNumber (
   MicroSecondDelay (PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
   PeiCpuMpData->InitFlag  = 0;
   PeiCpuMpData->CpuCount += (UINT32) PeiCpuMpData->MpCpuExchangeInfo->NumApsExecuting;
+  //
+  // Sort BSP/Aps by CPU APIC ID in ascending order
+  //
+  SortApicId (PeiCpuMpData);
 
   DEBUG ((EFI_D_INFO, "CpuMpPei: Find %d processors in system.\n", PeiCpuMpData->CpuCount));
   return PeiCpuMpData->CpuCount;
