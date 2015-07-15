@@ -1448,7 +1448,7 @@ IsAllowedByDb (
             if (Status == EFI_BUFFER_TOO_SMALL) {
               goto Done;
             }
-            DbxData = (UINT8 *) AllocateZeroPool (DataSize);
+            DbxData = (UINT8 *) AllocateZeroPool (DbxDataSize);
             if (DbxData == NULL) {
               goto Done;
             }
