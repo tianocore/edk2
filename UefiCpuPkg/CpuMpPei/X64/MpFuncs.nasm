@@ -175,6 +175,12 @@ CProcedureInvoke:
 
 RendezvousFunnelProcEnd:
 
+global ASM_PFX(AsmCliHltLoop)
+ASM_PFX(AsmCliHltLoop):
+    cli
+    hlt
+    jmp $-2
+
 ;-------------------------------------------------------------------------------------
 ;  AsmGetAddressMap (&AddressMap);
 ;-------------------------------------------------------------------------------------

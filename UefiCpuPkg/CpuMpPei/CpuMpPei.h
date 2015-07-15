@@ -166,6 +166,15 @@ AsmInitializeGdt (
   IN IA32_DESCRIPTOR  *Gdtr
   );
 
+/**
+  Assembly code to do CLI-HALT loop.
+
+**/
+VOID
+EFIAPI
+AsmCliHltLoop (
+  VOID
+  );
 
 /**
   This function will be called by BSP to wakeup AP.

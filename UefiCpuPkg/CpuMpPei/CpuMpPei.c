@@ -169,6 +169,7 @@ ApCFunction (
   //
   InterlockedIncrement ((UINT32 *)&PeiCpuMpData->FinishedCount);
 
+  AsmCliHltLoop ();
 }
 
 /**

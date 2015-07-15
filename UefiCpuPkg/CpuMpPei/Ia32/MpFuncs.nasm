@@ -132,6 +132,12 @@ CProcedureInvoke:
     jmp        $                 ; never reach here
 RendezvousFunnelProcEnd:
 
+global ASM_PFX(AsmCliHltLoop)
+ASM_PFX(AsmCliHltLoop):
+    cli
+    hlt
+    jmp        $-2
+
 ;-------------------------------------------------------------------------------------
 ;  AsmGetAddressMap (&AddressMap);
 ;-------------------------------------------------------------------------------------
