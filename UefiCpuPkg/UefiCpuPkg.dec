@@ -66,6 +66,12 @@
   ## Specifies timeout value in microseconds for the BSP to detect all APs for the first time.
   # @Prompt Timeout for the BSP to detect all APs for the first time.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000|UINT32|0x00000004
+  ## Specifies the base address of the first microcode Patch in the microcode Region.
+  # @Prompt Microcode Region base address.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x00000005
+  ## Specifies the size of the microcode Region.
+  # @Prompt Microcode Region size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x00000006
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
