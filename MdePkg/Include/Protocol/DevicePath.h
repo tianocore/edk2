@@ -172,6 +172,26 @@ typedef struct {
 } CONTROLLER_DEVICE_PATH;
 
 ///
+/// BMC Device Path SubType.
+///
+#define HW_BMC_DP                 0x06
+
+///
+/// BMC Device Path.
+///
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// Interface Type.
+  ///
+  UINT8                           InterfaceType;
+  ///
+  /// Base Address.
+  ///
+  UINT8                           BaseAddress[8];
+} BMC_DEVICE_PATH;
+
+///
 /// ACPI Device Paths.
 ///
 #define ACPI_DEVICE_PATH          0x02
@@ -1186,6 +1206,7 @@ typedef union {
   VENDOR_DEVICE_PATH                         Vendor;
 
   CONTROLLER_DEVICE_PATH                     Controller;
+  BMC_DEVICE_PATH                            Bmc;
   ACPI_HID_DEVICE_PATH                       Acpi;
   ACPI_EXTENDED_HID_DEVICE_PATH              ExtendedAcpi;
   ACPI_ADR_DEVICE_PATH                       AcpiAdr;
@@ -1241,6 +1262,7 @@ typedef union {
   VENDOR_DEVICE_PATH                         *Vendor;
 
   CONTROLLER_DEVICE_PATH                     *Controller;
+  BMC_DEVICE_PATH                            *Bmc;
   ACPI_HID_DEVICE_PATH                       *Acpi;
   ACPI_EXTENDED_HID_DEVICE_PATH              *ExtendedAcpi;
   ACPI_ADR_DEVICE_PATH                       *AcpiAdr;

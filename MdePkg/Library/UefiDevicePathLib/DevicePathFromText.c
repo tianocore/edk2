@@ -794,6 +794,40 @@ DevPathFromTextCtrl (
 }
 
 /**
+  Converts a text device path node to BMC device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created BMC device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextBmc (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                *InterfaceTypeStr;
+  CHAR16                *BaseAddressStr;
+  BMC_DEVICE_PATH       *BmcDp;
+
+  InterfaceTypeStr = GetNextParamStr (&TextDeviceNode);
+  BaseAddressStr   = GetNextParamStr (&TextDeviceNode);
+  BmcDp            = (BMC_DEVICE_PATH *) CreateDeviceNode (
+                                           HARDWARE_DEVICE_PATH,
+                                           HW_BMC_DP,
+                                           (UINT16) sizeof (BMC_DEVICE_PATH)
+                                           );
+
+  BmcDp->InterfaceType = (UINT8) Strtoi (InterfaceTypeStr);
+  WriteUnaligned64 (
+    (UINT64 *) (&BmcDp->BaseAddress),
+    StrHexToUint64 (BaseAddressStr)
+    );
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) BmcDp;
+}
+
+/**
   Converts a generic ACPI text device path node to ACPI device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3423,6 +3457,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"MemoryMapped",            DevPathFromTextMemoryMapped            },
   {L"VenHw",                   DevPathFromTextVenHw                   },
   {L"Ctrl",                    DevPathFromTextCtrl                    },
+  {L"Bmc",                     DevPathFromTextBmc                     },
 
   {L"AcpiPath",                DevPathFromTextAcpiPath                },
   {L"Acpi",                    DevPathFromTextAcpi                    },

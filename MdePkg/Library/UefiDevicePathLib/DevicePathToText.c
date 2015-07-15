@@ -307,6 +307,38 @@ DevPathToTextController (
 }
 
 /**
+  Converts a BMC device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextBmc (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  )
+{
+  BMC_DEVICE_PATH    *Bmc;
+
+  Bmc = DevPath;
+  UefiDevicePathLibCatPrint (
+    Str,
+    L"Bmc(0x%x,0x%lx)",
+    Bmc->InterfaceType,
+    ReadUnaligned64 ((UINT64 *) (&Bmc->BaseAddress))
+    );
+}
+
+/**
   Converts a ACPI device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -2089,6 +2121,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE mUefiDevicePathLib
   {HARDWARE_DEVICE_PATH,  HW_MEMMAP_DP,                     DevPathToTextMemMap         },
   {HARDWARE_DEVICE_PATH,  HW_VENDOR_DP,                     DevPathToTextVendor         },
   {HARDWARE_DEVICE_PATH,  HW_CONTROLLER_DP,                 DevPathToTextController     },
+  {HARDWARE_DEVICE_PATH,  HW_BMC_DP,                        DevPathToTextBmc            },
   {ACPI_DEVICE_PATH,      ACPI_DP,                          DevPathToTextAcpi           },
   {ACPI_DEVICE_PATH,      ACPI_EXTENDED_DP,                 DevPathToTextAcpiEx         },
   {ACPI_DEVICE_PATH,      ACPI_ADR_DP,                      DevPathToTextAcpiAdr        },
