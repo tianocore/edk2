@@ -97,6 +97,7 @@ class EfiSection (EfiSectionClassObject):
                 return FileList, self.Alignment
 
         Index = 0
+        Align = self.Alignment
 
         """ If Section type is 'VERSION'"""
         OutputFileList = []
@@ -229,9 +230,9 @@ class EfiSection (EfiSectionClassObject):
                     if self.Alignment == 'Auto' and (SectionType == 'PE32' or SectionType == 'TE'):
                         ImageObj = PeImageClass (File)
                         if ImageObj.SectionAlignment < 0x400:
-                            self.Alignment = str (ImageObj.SectionAlignment)
+                            Align = str (ImageObj.SectionAlignment)
                         else:
-                            self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
+                            Align = str (ImageObj.SectionAlignment / 0x400) + 'K'
 
                     if File[(len(File)-4):] == '.efi':
                         MapFile = File.replace('.efi', '.map')
@@ -272,4 +273,4 @@ class EfiSection (EfiSectionClassObject):
                                                          )
                     OutputFileList.append(OutputFile)
 
-        return OutputFileList, self.Alignment
+        return OutputFileList, Align
