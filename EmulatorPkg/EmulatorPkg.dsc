@@ -228,7 +228,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuCpuModel|L"Intel(R) Processor Model"
   gEmulatorPkgTokenSpaceGuid.PcdEmuCpuSpeed|L"3000"
 
-  #  0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
+  #  0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
 
 [PcdsDynamicDefault.common.DEFAULT]
