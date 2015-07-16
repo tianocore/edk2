@@ -667,7 +667,7 @@ BdsLoadOptionPxeList (
       // Allocate BDS Supported Device structure
       SupportedDevice = (BDS_SUPPORTED_DEVICE*)AllocatePool(sizeof(BDS_SUPPORTED_DEVICE));
 
-      Status = gBS->LocateProtocol (&gEfiSimpleNetworkProtocolGuid, NULL, (VOID **)&SimpleNet);
+      Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiSimpleNetworkProtocolGuid, (VOID **)&SimpleNet);
       if (!EFI_ERROR(Status)) {
         Mac = &SimpleNet->Mode->CurrentAddress;
         UnicodeSPrint (DeviceDescription,BOOT_DEVICE_DESCRIPTION_MAX,L"MAC Address: %02x:%02x:%02x:%02x:%02x:%02x", Mac->Addr[0],  Mac->Addr[1],  Mac->Addr[2],  Mac->Addr[3],  Mac->Addr[4],  Mac->Addr[5]);
