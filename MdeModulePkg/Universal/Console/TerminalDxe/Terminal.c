@@ -258,14 +258,13 @@ BuildTerminalDevpath  (
   EFI_STATUS                        Status;
 
   TerminalDevicePath = NULL;
-  TerminalType = PCANSITYPE;
 
   //
   // Use the RemainingDevicePath to determine the terminal type
   //
   Node = (VENDOR_DEVICE_PATH *) RemainingDevicePath;
   if (Node == NULL) {
-    TerminalType = PCANSITYPE;
+    TerminalType = PcdGet8 (PcdDefaultTerminalType);
 
   } else if (CompareGuid (&Node->Guid, &gEfiPcAnsiGuid)) {
 
@@ -545,7 +544,6 @@ TerminalDriverBindingStart (
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
   EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath;
   VENDOR_DEVICE_PATH                  *Node;
-  VENDOR_DEVICE_PATH                  *DefaultNode;
   EFI_SERIAL_IO_MODE                  *Mode;
   UINTN                               SerialInTimeOut;
   TERMINAL_DEV                        *TerminalDevice;
@@ -565,9 +563,8 @@ TerminalDriverBindingStart (
   UINTN                               ModeCount;
 
   TerminalDevice     = NULL;
-  DefaultNode        = NULL;
-  ConInSelected       = FALSE;
-  ConOutSelected      = FALSE;
+  ConInSelected      = FALSE;
+  ConOutSelected     = FALSE;
   NullRemaining      = FALSE;
   SimTxtInInstalled  = FALSE;
   SimTxtOutInstalled = FALSE;
@@ -709,23 +706,14 @@ TerminalDriverBindingStart (
     }
 
     //
-    // If RemainingDevicePath is NULL, then create default device path node
+    // If RemainingDevicePath is NULL, use default terminal type
     //
     if (RemainingDevicePath == NULL) {
-      DefaultNode = AllocateZeroPool (sizeof (VENDOR_DEVICE_PATH));
-      if (DefaultNode == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Error;
-      }
-
       TerminalType = PcdGet8 (PcdDefaultTerminalType);
       //
       // Must be between PCANSITYPE (0) and TTYTERMTYPE (4)
       //
       ASSERT (TerminalType <= TTYTERMTYPE);
-
-      CopyMem (&DefaultNode->Guid, gTerminalType[TerminalType], sizeof (EFI_GUID));
-      RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DefaultNode;
     } else if (!IsDevicePathEnd (RemainingDevicePath)) {
       //
       // If RemainingDevicePath isn't the End of Device Path Node,
@@ -1183,9 +1171,6 @@ TerminalDriverBindingStart (
       goto Error;
     }
   }
-  if (DefaultNode != NULL) {
-    FreePool (DefaultNode);
-  }
 
   return EFI_SUCCESS;
 
@@ -1252,10 +1237,6 @@ Error:
 
       FreePool (TerminalDevice);
     }
-  }
-
-  if (DefaultNode != NULL) {
-    FreePool (DefaultNode);
   }
 
   This->Stop (This, Controller, 0, NULL);
