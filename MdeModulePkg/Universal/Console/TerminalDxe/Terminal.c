@@ -568,7 +568,7 @@ TerminalDriverBindingStart (
   DefaultNode        = NULL;
   ConInSelected       = FALSE;
   ConOutSelected      = FALSE;
-  NullRemaining      = TRUE;
+  NullRemaining      = FALSE;
   SimTxtInInstalled  = FALSE;
   SimTxtOutInstalled = FALSE;
   FirstEnter         = FALSE;
