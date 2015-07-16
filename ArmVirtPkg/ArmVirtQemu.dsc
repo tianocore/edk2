@@ -140,9 +140,17 @@
 !if $(TTY_TERMINAL) == TRUE
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenMsg(7D916D80-5BB1-458C-A48F-E25FDD51EF94)"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenMsg(7D916D80-5BB1-458C-A48F-E25FDD51EF94)"
+  ## Terminal Type - TTYTERM, consistent with ConOut/ConIn Device Path.
+  ## 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
 !else
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenVt100()"
+  ## Terminal Type - VT100, consistent with ConOut/ConIn Device Path.
+  ## When Intel BDS is enabled, the above ConOut/ConIn device path is useless,
+  ## but we still use VT100 terminal type when TTY_TERMINAL is not TRUE.
+  ## 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
 !endif
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
