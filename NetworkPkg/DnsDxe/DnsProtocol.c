@@ -874,7 +874,7 @@ Dns6Configure (
     //
     // Configure the parameters for new operation.
     //
-    if (!NetIp6IsValidUnicast (&DnsConfigData->StationIp)) {
+    if (!NetIp6IsUnspecifiedAddr (&DnsConfigData->StationIp) && !NetIp6IsValidUnicast (&DnsConfigData->StationIp)) {
       Status = EFI_INVALID_PARAMETER;
       goto ON_EXIT;
     }
