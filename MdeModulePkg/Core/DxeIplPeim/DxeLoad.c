@@ -273,31 +273,36 @@ DxeLoadCore (
     //
   }
 
-  Status = PeiServicesLocatePpi (
-             &gEfiPeiReadOnlyVariable2PpiGuid,
-             0,
-             NULL,
-             (VOID **)&Variable
-             );
-  if (!EFI_ERROR (Status)) {
-    DataSize = sizeof (MemoryData);
-    Status = Variable->GetVariable ( 
-                         Variable, 
-                         EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
-                         &gEfiMemoryTypeInformationGuid,
-                         NULL,
-                         &DataSize,
-                         &MemoryData
-                         );
-    if (!EFI_ERROR (Status) && ValidateMemoryTypeInfoVariable(MemoryData, DataSize)) {
-      //
-      // Build the GUID'd HOB for DXE
-      //
-      BuildGuidDataHob (
-        &gEfiMemoryTypeInformationGuid,
-        MemoryData,
-        DataSize
-        );
+  if (GetFirstGuidHob ((CONST EFI_GUID *)&gEfiMemoryTypeInformationGuid) == NULL) {
+    //
+    // Don't build GuidHob if GuidHob has been installed.
+    //
+    Status = PeiServicesLocatePpi (
+               &gEfiPeiReadOnlyVariable2PpiGuid,
+               0,
+               NULL,
+               (VOID **)&Variable
+               );
+    if (!EFI_ERROR (Status)) {
+      DataSize = sizeof (MemoryData);
+      Status = Variable->GetVariable ( 
+                           Variable, 
+                           EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                           &gEfiMemoryTypeInformationGuid,
+                           NULL,
+                           &DataSize,
+                           &MemoryData
+                           );
+      if (!EFI_ERROR (Status) && ValidateMemoryTypeInfoVariable(MemoryData, DataSize)) {
+        //
+        // Build the GUID'd HOB for DXE
+        //
+        BuildGuidDataHob (
+          &gEfiMemoryTypeInformationGuid,
+          MemoryData,
+          DataSize
+          );
+      }
     }
   }
 
