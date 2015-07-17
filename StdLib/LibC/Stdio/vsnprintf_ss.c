@@ -142,7 +142,7 @@ vsnprintf_ss(char *sbuf, size_t slen, const char *fmt0, va_list ap)
   static const char xdigs_upper[16] = "0123456789ABCDEF";
 
 
-  _DIAGASSERT(n == 0 || sbuf != NULL);
+  _DIAGASSERT(sbuf != NULL);
   _DIAGASSERT(fmt != NULL);
 
   tailp = sbuf + slen;
