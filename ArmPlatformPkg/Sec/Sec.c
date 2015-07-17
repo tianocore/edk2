@@ -85,10 +85,10 @@ CEntryPoint (
     // - no other Interrupts are enabled,  doesn't have to worry about the priority.
     // - all the cores are in secure state, use secure SGI's
     ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
-    ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
+    ArmGicEnableInterruptInterface(PcdGet32(PcdGicInterruptInterfaceBase), PcdGet32(PcdGicRedistributorsBase));
   } else {
     // Enable the GIC CPU Interface
-    ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
+    ArmGicEnableInterruptInterface(PcdGet32(PcdGicInterruptInterfaceBase), PcdGet32(PcdGicRedistributorsBase));
   }
 
   // Enable Full Access to CoProcessors

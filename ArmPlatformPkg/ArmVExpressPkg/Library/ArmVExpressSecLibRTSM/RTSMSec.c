@@ -41,7 +41,19 @@ ArmPlatformSecTrustzoneInit (
   IN  UINTN                     MpId
   )
 {
-  // No TZPC or TZASC on RTSM to initialize
+  // Initialize TSC-400 to open all DRAM below 4G to nonsecure world
+  
+  // configure security errors to be bus errors (data/prefetch aborts);
+  MmioWrite32(ARM_VE_TZC400_BASE + 0x004, 0x01);
+
+  // enable gate keepers for all four filter enables
+  MmioWrite32(ARM_VE_TZC400_BASE + 0x008, BIT3 | BIT2 | BIT1 | BIT0);
+
+  // enable secure reads and writes to region 0 - s_wr_en, s_rd_en
+  MmioOr32(ARM_VE_TZC400_BASE + 0x110, BIT31 | BIT30);
+  
+  // enable all IDs to do non-secure read and writes
+  MmioWrite32(ARM_VE_TZC400_BASE + 0x114, 0xFFFFFFFF);
 }
 
 /**
@@ -71,6 +83,9 @@ ArmPlatformSecInitialize (
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER2_EN, SP810_SYS_CTRL_TIMER2_TIMCLK);
   // Configure SP810 to use 1MHz clock and disable
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
+
+  // start the base FVP reference counter
+  MmioOr32(ARM_REFCNT_BASE + 0, 0x01);
 
   // Read the GIC Identification Register
   Identification = ArmGicGetInterfaceIdentification (PcdGet32 (PcdGicInterruptInterfaceBase));
