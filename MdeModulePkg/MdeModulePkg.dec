@@ -709,6 +709,14 @@
   # @Prompt Enable S3 performance data support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support|TRUE|BOOLEAN|0x00010064
 
+  ## Indicates if PS2 keyboard does a extended verification during start.
+  #  Add this PCD mainly consider the use case of simulator. This PCD maybe set to FALSE for
+  #  Extended verification will take some performance. It can be set to FALSE for boot performance.<BR><BR>
+  #   TRUE  - Turn on PS2 keyboard extended verification.<BR>
+  #   FALSE - Turn off PS2 keyboard extended verification.<BR>
+  # @Prompt Turn on PS2 Keyboard Extended Verification
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification|TRUE|BOOLEAN|0x00010072
+
   ## Indicates if Serial device uses half hand shake.<BR><BR>
   #   TRUE  - Serial device uses half hand shake.<BR>
   #   FALSE - Serial device doesn't use half hand shake.<BR>
