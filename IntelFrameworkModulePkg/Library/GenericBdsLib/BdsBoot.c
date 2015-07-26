@@ -2236,6 +2236,7 @@ BdsLibBootViaBootOption (
   LIST_ENTRY                TempBootLists;
   EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
 
+  Status        = EFI_SUCCESS;
   *ExitDataSize = 0;
   *ExitData     = NULL;
 
