@@ -1617,7 +1617,7 @@ IpSecEspInboundPacket (
   //
   // Update the total length field in ip header since processed by esp.
   //
-  if (!SadData->Mode == EfiIPsecTunnel) {
+  if (SadData->Mode != EfiIPsecTunnel) {
     if (IpVersion == IP_VERSION_4) {
       ((IP4_HEAD *) IpHead)->TotalLen = HTONS ((UINT16) ((((IP4_HEAD *) IpHead)->HeadLen << 2) + PlainPayloadSize));
     } else {
