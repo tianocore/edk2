@@ -1,7 +1,7 @@
 /** @file
   Interface routines for PxeBc.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -626,7 +626,7 @@ EfiPxeBcDhcp (
   ZeroMem (Private->ProxyIndex, sizeof (Private->ProxyIndex));
 
   Status = Dhcp4->Start (Dhcp4, NULL);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
     if (Status == EFI_ICMP_ERROR) {
       Mode->IcmpErrorReceived = TRUE;
     }
