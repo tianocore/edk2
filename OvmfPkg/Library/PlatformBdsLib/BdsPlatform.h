@@ -59,6 +59,7 @@ Abstract:
 #include <Guid/Mps.h>
 #include <Guid/HobList.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/EventGroup.h>
 
 #include <OvmfPlatforms.h>
 
