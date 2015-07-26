@@ -523,10 +523,10 @@ SmmMain (
   //
   // Copy FullSmramRanges to SMRAM
   //
-  mFullSmramRangeCount = gSmmCorePrivate->FullSmramRangeCount;
+  mFullSmramRangeCount = gSmmCorePrivate->SmramRangeCount;
   mFullSmramRanges = AllocatePool (mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
   ASSERT (mFullSmramRanges != NULL);
-  CopyMem (mFullSmramRanges, gSmmCorePrivate->FullSmramRanges, mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
+  CopyMem (mFullSmramRanges, gSmmCorePrivate->SmramRanges, mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
 
   //
   // Register all SMI Handlers required by the SMM Core

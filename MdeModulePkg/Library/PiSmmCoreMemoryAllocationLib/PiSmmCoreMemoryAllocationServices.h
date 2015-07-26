@@ -94,9 +94,6 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS            PiSmmCoreImageBase;
   UINT64                          PiSmmCoreImageSize;
   EFI_PHYSICAL_ADDRESS            PiSmmCoreEntryPoint;
-
-  UINTN                           FullSmramRangeCount;
-  EFI_SMRAM_DESCRIPTOR            *FullSmramRanges;
 } SMM_CORE_PRIVATE_DATA;
 
 /**

@@ -861,17 +861,21 @@ GetPeCoffImageFixLoadingAssignedAddress(
 /**
   Load the SMM Core image into SMRAM and executes the SMM Core from SMRAM.
 
-  @param[in] SmramRange  Descriptor for the range of SMRAM to reload the 
-                         currently executing image.
-  @param[in] Context     Context to pass into SMM Core
+  @param[in, out] SmramRange            Descriptor for the range of SMRAM to reload the 
+                                        currently executing image, the rang of SMRAM to
+                                        hold SMM Core will be excluded.
+  @param[in, out] SmramRangeSmmCore     Descriptor for the range of SMRAM to hold SMM Core.
+
+  @param[in]      Context               Context to pass into SMM Core
 
   @return  EFI_STATUS
 
 **/
 EFI_STATUS
 ExecuteSmmCoreFromSmram (
-  IN EFI_SMRAM_DESCRIPTOR  *SmramRange,
-  IN VOID                  *Context
+  IN OUT EFI_SMRAM_DESCRIPTOR   *SmramRange,
+  IN OUT EFI_SMRAM_DESCRIPTOR   *SmramRangeSmmCore,
+  IN     VOID                   *Context
   )
 {
   EFI_STATUS                    Status;
@@ -879,7 +883,6 @@ ExecuteSmmCoreFromSmram (
   UINTN                         SourceSize;
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
   UINTN                         PageCount;
-  EFI_PHYSICAL_ADDRESS          DestinationBuffer;
   EFI_IMAGE_ENTRY_POINT         EntryPoint;
 
   //
@@ -924,7 +927,7 @@ ExecuteSmmCoreFromSmram (
       // Since the memory range to load SMM CORE will be cut out in SMM core, so no need to allocate and free this range
       //
       PageCount = 0;
-     } else {
+    } else {
       DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR: Loading module at fixed address at address failed\n"));
       //
       // Allocate memory for the image being loaded from the EFI_SRAM_DESCRIPTOR 
@@ -936,12 +939,15 @@ ExecuteSmmCoreFromSmram (
       ASSERT (SmramRange->PhysicalSize > EFI_PAGES_TO_SIZE (PageCount));
 
       SmramRange->PhysicalSize -= EFI_PAGES_TO_SIZE (PageCount);
-      DestinationBuffer = SmramRange->CpuStart + SmramRange->PhysicalSize;
+      SmramRangeSmmCore->CpuStart = SmramRange->CpuStart + SmramRange->PhysicalSize;
+      SmramRangeSmmCore->PhysicalStart = SmramRange->PhysicalStart + SmramRange->PhysicalSize;
+      SmramRangeSmmCore->RegionState = SmramRange->RegionState | EFI_ALLOCATED;
+      SmramRangeSmmCore->PhysicalSize = EFI_PAGES_TO_SIZE (PageCount);
 
       //
-      // Align buffer on section boundry
+      // Align buffer on section boundary
       //
-      ImageContext.ImageAddress = DestinationBuffer;
+      ImageContext.ImageAddress = SmramRangeSmmCore->CpuStart;
     }
   } else {
     //
@@ -954,12 +960,15 @@ ExecuteSmmCoreFromSmram (
     ASSERT (SmramRange->PhysicalSize > EFI_PAGES_TO_SIZE (PageCount));
 
     SmramRange->PhysicalSize -= EFI_PAGES_TO_SIZE (PageCount);
-    DestinationBuffer = SmramRange->CpuStart + SmramRange->PhysicalSize;
+    SmramRangeSmmCore->CpuStart = SmramRange->CpuStart + SmramRange->PhysicalSize;
+    SmramRangeSmmCore->PhysicalStart = SmramRange->PhysicalStart + SmramRange->PhysicalSize;
+    SmramRangeSmmCore->RegionState = SmramRange->RegionState | EFI_ALLOCATED;
+    SmramRangeSmmCore->PhysicalSize = EFI_PAGES_TO_SIZE (PageCount);
 
     //
-    // Align buffer on section boundry
+    // Align buffer on section boundary
     //
-    ImageContext.ImageAddress = DestinationBuffer;
+    ImageContext.ImageAddress = SmramRangeSmmCore->CpuStart;
   }
   
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
@@ -1006,20 +1015,424 @@ ExecuteSmmCoreFromSmram (
   }
 
   //
-  // If the load operation, relocate operation, or the image execution return an
-  // error, then free memory allocated from the EFI_SRAM_DESCRIPTOR specified by 
-  // SmramRange
-  //
-  if (EFI_ERROR (Status)) {
-    SmramRange->PhysicalSize += EFI_PAGES_TO_SIZE (PageCount);
-  }
-
-  //
   // Always free memory allocted by GetFileBufferByFilePath ()
   //
   FreePool (SourceBuffer);
 
   return Status;
+}
+
+/**
+  SMM split SMRAM entry.
+
+  @param[in, out] RangeToCompare             Pointer to EFI_SMRAM_DESCRIPTOR to compare.
+  @param[in, out] ReservedRangeToCompare     Pointer to EFI_SMM_RESERVED_SMRAM_REGION to compare.
+  @param[out]     Ranges                     Output pointer to hold split EFI_SMRAM_DESCRIPTOR entry.
+  @param[in, out] RangeCount                 Pointer to range count.
+  @param[out]     ReservedRanges             Output pointer to hold split EFI_SMM_RESERVED_SMRAM_REGION entry.
+  @param[in, out] ReservedRangeCount         Pointer to reserved range count.
+  @param[out]     FinalRanges                Output pointer to hold split final EFI_SMRAM_DESCRIPTOR entry
+                                             that no need to be split anymore.
+  @param[in, out] FinalRangeCount            Pointer to final range count.
+
+**/
+VOID
+SmmSplitSmramEntry (
+  IN OUT EFI_SMRAM_DESCRIPTOR           *RangeToCompare,
+  IN OUT EFI_SMM_RESERVED_SMRAM_REGION  *ReservedRangeToCompare,
+  OUT    EFI_SMRAM_DESCRIPTOR           *Ranges,
+  IN OUT UINTN                          *RangeCount,
+  OUT    EFI_SMM_RESERVED_SMRAM_REGION  *ReservedRanges,
+  IN OUT UINTN                          *ReservedRangeCount,
+  OUT    EFI_SMRAM_DESCRIPTOR           *FinalRanges,
+  IN OUT UINTN                          *FinalRangeCount
+  )
+{
+  UINT64    RangeToCompareEnd;
+  UINT64    ReservedRangeToCompareEnd;
+
+  RangeToCompareEnd         = RangeToCompare->CpuStart + RangeToCompare->PhysicalSize;
+  ReservedRangeToCompareEnd = ReservedRangeToCompare->SmramReservedStart + ReservedRangeToCompare->SmramReservedSize;
+
+  if ((RangeToCompare->CpuStart >= ReservedRangeToCompare->SmramReservedStart) &&
+      (RangeToCompare->CpuStart < ReservedRangeToCompareEnd)) {
+    if (RangeToCompareEnd < ReservedRangeToCompareEnd) {
+      //
+      // RangeToCompare  ReservedRangeToCompare
+      //                 ----                    ----    --------------------------------------
+      //                 |  |                    |  | -> 1. ReservedRangeToCompare
+      // ----            |  |                    |--|    --------------------------------------
+      // |  |            |  |                    |  |
+      // |  |            |  |                    |  | -> 2. FinalRanges[*FinalRangeCount] and increment *FinalRangeCount
+      // |  |            |  |                    |  |       RangeToCompare->PhysicalSize = 0
+      // ----            |  |                    |--|    --------------------------------------
+      //                 |  |                    |  | -> 3. ReservedRanges[*ReservedRangeCount] and increment *ReservedRangeCount
+      //                 ----                    ----    --------------------------------------
+      //
+
+      //
+      // 1. Update ReservedRangeToCompare.
+      //
+      ReservedRangeToCompare->SmramReservedSize = RangeToCompare->CpuStart - ReservedRangeToCompare->SmramReservedStart;
+      //
+      // 2. Update FinalRanges[FinalRangeCount] and increment *FinalRangeCount.
+      //    Zero RangeToCompare->PhysicalSize.
+      //
+      FinalRanges[*FinalRangeCount].CpuStart      = RangeToCompare->CpuStart;
+      FinalRanges[*FinalRangeCount].PhysicalStart = RangeToCompare->PhysicalStart;
+      FinalRanges[*FinalRangeCount].RegionState   = RangeToCompare->RegionState | EFI_ALLOCATED;
+      FinalRanges[*FinalRangeCount].PhysicalSize  = RangeToCompare->PhysicalSize;
+      *FinalRangeCount += 1;
+      RangeToCompare->PhysicalSize = 0;
+      //
+      // 3. Update ReservedRanges[*ReservedRangeCount] and increment *ReservedRangeCount.
+      //
+      ReservedRanges[*ReservedRangeCount].SmramReservedStart = FinalRanges[*FinalRangeCount - 1].CpuStart + FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+      ReservedRanges[*ReservedRangeCount].SmramReservedSize  = ReservedRangeToCompareEnd - RangeToCompareEnd;
+      *ReservedRangeCount += 1;
+    } else {
+      //
+      // RangeToCompare  ReservedRangeToCompare
+      //                 ----                    ----    --------------------------------------
+      //                 |  |                    |  | -> 1. ReservedRangeToCompare
+      // ----            |  |                    |--|    --------------------------------------
+      // |  |            |  |                    |  |
+      // |  |            |  |                    |  | -> 2. FinalRanges[*FinalRangeCount] and increment *FinalRangeCount
+      // |  |            |  |                    |  |
+      // |  |            ----                    |--|    --------------------------------------
+      // |  |                                    |  | -> 3. RangeToCompare
+      // ----                                    ----    --------------------------------------
+      //
+
+      //
+      // 1. Update ReservedRangeToCompare.
+      //
+      ReservedRangeToCompare->SmramReservedSize = RangeToCompare->CpuStart - ReservedRangeToCompare->SmramReservedStart;
+      //
+      // 2. Update FinalRanges[FinalRangeCount] and increment *FinalRangeCount.
+      //
+      FinalRanges[*FinalRangeCount].CpuStart      = RangeToCompare->CpuStart;
+      FinalRanges[*FinalRangeCount].PhysicalStart = RangeToCompare->PhysicalStart;
+      FinalRanges[*FinalRangeCount].RegionState   = RangeToCompare->RegionState | EFI_ALLOCATED;
+      FinalRanges[*FinalRangeCount].PhysicalSize  = ReservedRangeToCompareEnd - RangeToCompare->CpuStart;
+      *FinalRangeCount += 1;
+      //
+      // 3. Update RangeToCompare.
+      //
+      RangeToCompare->CpuStart      += FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+      RangeToCompare->PhysicalStart += FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+      RangeToCompare->PhysicalSize  -= FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+    }
+  } else if ((ReservedRangeToCompare->SmramReservedStart >= RangeToCompare->CpuStart) &&
+             (ReservedRangeToCompare->SmramReservedStart < RangeToCompareEnd)) {
+    if (ReservedRangeToCompareEnd < RangeToCompareEnd) {
+      //
+      // RangeToCompare  ReservedRangeToCompare
+      // ----                                    ----    --------------------------------------
+      // |  |                                    |  | -> 1. RangeToCompare
+      // |  |            ----                    |--|    --------------------------------------
+      // |  |            |  |                    |  |
+      // |  |            |  |                    |  | -> 2. FinalRanges[*FinalRangeCount] and increment *FinalRangeCount
+      // |  |            |  |                    |  |       ReservedRangeToCompare->SmramReservedSize = 0
+      // |  |            ----                    |--|    --------------------------------------
+      // |  |                                    |  | -> 3. Ranges[*RangeCount] and increment *RangeCount
+      // ----                                    ----    --------------------------------------
+      //
+
+      //
+      // 1. Update RangeToCompare.
+      //
+      RangeToCompare->PhysicalSize = ReservedRangeToCompare->SmramReservedStart - RangeToCompare->CpuStart;
+      //
+      // 2. Update FinalRanges[FinalRangeCount] and increment *FinalRangeCount.
+      //    ReservedRangeToCompare->SmramReservedSize = 0
+      //
+      FinalRanges[*FinalRangeCount].CpuStart      = ReservedRangeToCompare->SmramReservedStart;
+      FinalRanges[*FinalRangeCount].PhysicalStart = RangeToCompare->PhysicalStart + RangeToCompare->PhysicalSize;
+      FinalRanges[*FinalRangeCount].RegionState   = RangeToCompare->RegionState | EFI_ALLOCATED;
+      FinalRanges[*FinalRangeCount].PhysicalSize  = ReservedRangeToCompare->SmramReservedSize;
+      *FinalRangeCount += 1;
+      ReservedRangeToCompare->SmramReservedSize = 0;
+      //
+      // 3. Update Ranges[*RangeCount] and increment *RangeCount.
+      //
+      Ranges[*RangeCount].CpuStart      = FinalRanges[*FinalRangeCount - 1].CpuStart + FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+      Ranges[*RangeCount].PhysicalStart = FinalRanges[*FinalRangeCount - 1].PhysicalStart + FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+      Ranges[*RangeCount].RegionState   = RangeToCompare->RegionState;
+      Ranges[*RangeCount].PhysicalSize  = RangeToCompareEnd - ReservedRangeToCompareEnd;
+      *RangeCount += 1;
+    } else {
+      //
+      // RangeToCompare  ReservedRangeToCompare
+      // ----                                    ----    --------------------------------------
+      // |  |                                    |  | -> 1. RangeToCompare
+      // |  |            ----                    |--|    --------------------------------------
+      // |  |            |  |                    |  |
+      // |  |            |  |                    |  | -> 2. FinalRanges[*FinalRangeCount] and increment *FinalRangeCount
+      // |  |            |  |                    |  |
+      // ----            |  |                    |--|    --------------------------------------
+      //                 |  |                    |  | -> 3. ReservedRangeToCompare
+      //                 ----                    ----    --------------------------------------
+      //
+
+      //
+      // 1. Update RangeToCompare.
+      //
+      RangeToCompare->PhysicalSize = ReservedRangeToCompare->SmramReservedStart - RangeToCompare->CpuStart;
+      //
+      // 2. Update FinalRanges[FinalRangeCount] and increment *FinalRangeCount.
+      //    ReservedRangeToCompare->SmramReservedSize = 0
+      //
+      FinalRanges[*FinalRangeCount].CpuStart      = ReservedRangeToCompare->SmramReservedStart;
+      FinalRanges[*FinalRangeCount].PhysicalStart = RangeToCompare->PhysicalStart + RangeToCompare->PhysicalSize;
+      FinalRanges[*FinalRangeCount].RegionState   = RangeToCompare->RegionState | EFI_ALLOCATED;
+      FinalRanges[*FinalRangeCount].PhysicalSize  = RangeToCompareEnd - ReservedRangeToCompare->SmramReservedStart;
+      *FinalRangeCount += 1;
+      //
+      // 3. Update ReservedRangeToCompare.
+      //
+      ReservedRangeToCompare->SmramReservedStart += FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+      ReservedRangeToCompare->SmramReservedSize  -= FinalRanges[*FinalRangeCount - 1].PhysicalSize;
+    }
+  }
+}
+
+/**
+  Returns if SMRAM range and SMRAM reserved range are overlapped.
+
+  @param[in] RangeToCompare             Pointer to EFI_SMRAM_DESCRIPTOR to compare.
+  @param[in] ReservedRangeToCompare     Pointer to EFI_SMM_RESERVED_SMRAM_REGION to compare.
+
+  @retval TRUE  There is overlap.
+  @retval FALSE There is no overlap.
+
+**/
+BOOLEAN
+SmmIsSmramOverlap (
+  IN EFI_SMRAM_DESCRIPTOR           *RangeToCompare,
+  IN EFI_SMM_RESERVED_SMRAM_REGION  *ReservedRangeToCompare
+  )
+{
+  UINT64    RangeToCompareEnd;
+  UINT64    ReservedRangeToCompareEnd;
+
+  RangeToCompareEnd         = RangeToCompare->CpuStart + RangeToCompare->PhysicalSize;
+  ReservedRangeToCompareEnd = ReservedRangeToCompare->SmramReservedStart + ReservedRangeToCompare->SmramReservedSize;
+
+  if ((RangeToCompare->CpuStart >= ReservedRangeToCompare->SmramReservedStart) &&
+      (RangeToCompare->CpuStart < ReservedRangeToCompareEnd)) {
+    return TRUE;
+  } else if ((ReservedRangeToCompare->SmramReservedStart >= RangeToCompare->CpuStart) &&
+             (ReservedRangeToCompare->SmramReservedStart < RangeToCompareEnd)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+  Get full SMRAM ranges.
+
+  It will get SMRAM ranges from SmmAccess protocol and SMRAM reserved ranges from
+  SmmConfiguration protocol, split the entries if there is overlap between them.
+  It will also reserve one entry for SMM core.
+
+  @param[out] FullSmramRangeCount   Output pointer to full SMRAM range count.
+
+  @return Pointer to full SMRAM ranges.
+
+**/
+EFI_SMRAM_DESCRIPTOR *
+GetFullSmramRanges (
+  OUT UINTN     *FullSmramRangeCount
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_SMM_CONFIGURATION_PROTOCOL    *SmmConfiguration;
+  UINTN                             Size;
+  UINTN                             Index;
+  UINTN                             Index2;
+  EFI_SMRAM_DESCRIPTOR              *FullSmramRanges;
+  UINTN                             TempSmramRangeCount;
+  EFI_SMRAM_DESCRIPTOR              *TempSmramRanges;
+  UINTN                             SmramRangeCount;
+  EFI_SMRAM_DESCRIPTOR              *SmramRanges;
+  UINTN                             SmramReservedCount;
+  EFI_SMM_RESERVED_SMRAM_REGION     *SmramReservedRanges;
+  UINTN                             MaxCount;
+  BOOLEAN                           Rescan;
+
+  //
+  // Get SMM Configuration Protocol if it is present.
+  //
+  SmmConfiguration = NULL;
+  Status = gBS->LocateProtocol (&gEfiSmmConfigurationProtocolGuid, NULL, (VOID **) &SmmConfiguration);
+
+  //
+  // Get SMRAM information.
+  //
+  Size = 0;
+  Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, NULL);
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+
+  SmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  //
+  // Get SMRAM reserved region count.
+  //
+  SmramReservedCount = 0;
+  if (SmmConfiguration != NULL) {
+    while (SmmConfiguration->SmramReservedRegions[SmramReservedCount].SmramReservedSize != 0) {
+      SmramReservedCount++;
+    }
+  }
+
+  if (SmramReservedCount == 0) {
+    //
+    // No reserved SMRAM entry from SMM Configuration Protocol.
+    // Reserve one entry for SMM Core in the full SMRAM ranges.
+    //
+    *FullSmramRangeCount = SmramRangeCount + 1;
+    Size = (*FullSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR);
+    FullSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+    ASSERT (FullSmramRanges != NULL);
+
+    Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, FullSmramRanges);
+    ASSERT_EFI_ERROR (Status);
+
+    return FullSmramRanges;
+  }
+
+  //
+  // Why MaxCount = X + 2 * Y?
+  // Take Y = 1 as example below, Y > 1 case is just the iteration of Y = 1.
+  //
+  //   X = 1 Y = 1     MaxCount = 3 = 1 + 2 * 1
+  //   ----            ----
+  //   |  |  ----      |--|
+  //   |  |  |  |  ->  |  |
+  //   |  |  ----      |--|
+  //   ----            ----
+  //
+  //   X = 2 Y = 1     MaxCount = 4 = 2 + 2 * 1
+  //   ----            ----
+  //   |  |            |  |
+  //   |  |  ----      |--|
+  //   |  |  |  |      |  |
+  //   |--|  |  |  ->  |--|
+  //   |  |  |  |      |  |
+  //   |  |  ----      |--|
+  //   |  |            |  |
+  //   ----            ----
+  //
+  //   X = 3 Y = 1     MaxCount = 5 = 3 + 2 * 1
+  //   ----            ----
+  //   |  |            |  |
+  //   |  |  ----      |--|
+  //   |--|  |  |      |--|
+  //   |  |  |  |  ->  |  |
+  //   |--|  |  |      |--|
+  //   |  |  ----      |--|
+  //   |  |            |  |
+  //   ----            ----
+  //
+  //   ......
+  //
+  MaxCount = SmramRangeCount + 2 * SmramReservedCount;
+
+  Size = MaxCount * sizeof (EFI_SMM_RESERVED_SMRAM_REGION);
+  SmramReservedRanges = (EFI_SMM_RESERVED_SMRAM_REGION *) AllocatePool (Size);
+  ASSERT (SmramReservedRanges != NULL);
+  for (Index = 0; Index < SmramReservedCount; Index++) {
+    CopyMem (&SmramReservedRanges[Index], &SmmConfiguration->SmramReservedRegions[Index], sizeof (EFI_SMM_RESERVED_SMRAM_REGION));
+  }
+
+  Size = MaxCount * sizeof (EFI_SMRAM_DESCRIPTOR);
+  TempSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  ASSERT (TempSmramRanges != NULL);
+  TempSmramRangeCount = 0;
+
+  SmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  ASSERT (SmramRanges != NULL);
+  Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, SmramRanges);
+  ASSERT_EFI_ERROR (Status);
+
+  do {
+    Rescan = FALSE;
+    for (Index = 0; (Index < SmramRangeCount) && !Rescan; Index++) {
+      //
+      // Skip zero size entry.
+      //
+      if (SmramRanges[Index].PhysicalSize != 0) {
+        for (Index2 = 0; (Index2 < SmramReservedCount) && !Rescan; Index2++) {
+          //
+          // Skip zero size entry.
+          //
+          if (SmramReservedRanges[Index2].SmramReservedSize != 0) {
+            if (SmmIsSmramOverlap (
+                  &SmramRanges[Index],
+                  &SmramReservedRanges[Index2]
+                  )) {
+              //
+              // There is overlap, need to split entry and then rescan.
+              //
+              SmmSplitSmramEntry (
+                &SmramRanges[Index],
+                &SmramReservedRanges[Index2],
+                SmramRanges,
+                &SmramRangeCount,
+                SmramReservedRanges,
+                &SmramReservedCount,
+                TempSmramRanges,
+                &TempSmramRangeCount
+                );
+              Rescan = TRUE;
+            }
+          }
+        }
+        if (!Rescan) {
+          //
+          // No any overlap, copy the entry to the temp SMRAM ranges.
+          // Zero SmramRanges[Index].PhysicalSize = 0;
+          //
+          CopyMem (&TempSmramRanges[TempSmramRangeCount++], &SmramRanges[Index], sizeof (EFI_SMRAM_DESCRIPTOR));
+          SmramRanges[Index].PhysicalSize = 0;
+        }
+      }
+    }
+  } while (Rescan);
+  ASSERT (TempSmramRangeCount <= MaxCount);
+
+  //
+  // Sort the entries,
+  // and reserve one entry for SMM Core in the full SMRAM ranges.
+  //
+  FullSmramRanges = AllocatePool ((TempSmramRangeCount + 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
+  ASSERT (FullSmramRanges != NULL);
+  *FullSmramRangeCount = 0;
+  do {
+    for (Index = 0; Index < TempSmramRangeCount; Index++) {
+      if (TempSmramRanges[Index].PhysicalSize != 0) {
+        break;
+      }
+    }
+    ASSERT (Index < TempSmramRangeCount);
+    for (Index2 = 0; Index2 < TempSmramRangeCount; Index2++) {
+      if ((Index2 != Index) && (TempSmramRanges[Index2].PhysicalSize != 0) && (TempSmramRanges[Index2].CpuStart < TempSmramRanges[Index].CpuStart)) {
+        Index = Index2;
+      }
+    }
+    CopyMem (&FullSmramRanges[*FullSmramRangeCount], &TempSmramRanges[Index], sizeof (EFI_SMRAM_DESCRIPTOR));
+    *FullSmramRangeCount += 1;
+    TempSmramRanges[Index].PhysicalSize = 0;
+  } while (*FullSmramRangeCount < TempSmramRangeCount);
+  ASSERT (*FullSmramRangeCount == TempSmramRangeCount);
+  *FullSmramRangeCount += 1;
+
+  FreePool (SmramRanges);
+  FreePool (SmramReservedRanges);
+  FreePool (TempSmramRanges);
+
+  return FullSmramRanges;
 }
 
 /**
@@ -1044,10 +1457,7 @@ SmmIplEntry (
   )
 {
   EFI_STATUS                      Status;
-  EFI_SMM_CONFIGURATION_PROTOCOL  *SmmConfiguration;
-  UINTN                           Size;
   UINTN                           Index;
-  EFI_SMM_RESERVED_SMRAM_REGION   *SmramResRegion;
   UINT64                          MaxSize;
   VOID                            *Registration;
   UINT64                          SmmCodeSize;
@@ -1074,34 +1484,7 @@ SmmIplEntry (
   Status = gBS->LocateProtocol (&gEfiSmmControl2ProtocolGuid, NULL, (VOID **)&mSmmControl2);
   ASSERT_EFI_ERROR (Status);
 
-  //
-  // Get SMM Configuration Protocol if it is present
-  //
-  SmmConfiguration = NULL;
-  Status = gBS->LocateProtocol (&gEfiSmmConfigurationProtocolGuid, NULL, (VOID **) &SmmConfiguration);
-
-  //
-  // Get SMRAM information
-  //
-  Size = 0;
-  Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, NULL);
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-  gSmmCorePrivate->SmramRanges = (EFI_SMRAM_DESCRIPTOR *)AllocatePool (Size);
-  ASSERT (gSmmCorePrivate->SmramRanges != NULL);
-
-  Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, gSmmCorePrivate->SmramRanges);
-  ASSERT_EFI_ERROR (Status);
-
-  gSmmCorePrivate->SmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
-
-  //
-  // Save a full copy
-  //
-  gSmmCorePrivate->FullSmramRangeCount = gSmmCorePrivate->SmramRangeCount;
-  gSmmCorePrivate->FullSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
-  ASSERT (gSmmCorePrivate->FullSmramRanges != NULL);
-  CopyMem (gSmmCorePrivate->FullSmramRanges, gSmmCorePrivate->SmramRanges, Size);
+  gSmmCorePrivate->SmramRanges = GetFullSmramRanges (&gSmmCorePrivate->SmramRangeCount);
 
   //
   // Open all SMRAM ranges
@@ -1113,26 +1496,6 @@ SmmIplEntry (
   // Print debug message that the SMRAM window is now open.
   //
   DEBUG ((DEBUG_INFO, "SMM IPL opened SMRAM window\n"));
-
-  //
-  // Subtract SMRAM any reserved SMRAM regions.
-  //
-  if (SmmConfiguration != NULL) {
-    SmramResRegion = SmmConfiguration->SmramReservedRegions;
-    while (SmramResRegion->SmramReservedSize != 0) {
-      for (Index = 0; Index < gSmmCorePrivate->SmramRangeCount; Index ++) {
-        if ((SmramResRegion->SmramReservedStart >= gSmmCorePrivate->SmramRanges[Index].CpuStart)  &&      \
-           ((SmramResRegion->SmramReservedStart + SmramResRegion->SmramReservedSize) <=   \
-           (gSmmCorePrivate->SmramRanges[Index].CpuStart + gSmmCorePrivate->SmramRanges[Index].PhysicalSize))) {
-          //
-          // This range has reserved area, calculate the left free size
-          //
-          gSmmCorePrivate->SmramRanges[Index].PhysicalSize = SmramResRegion->SmramReservedStart - gSmmCorePrivate->SmramRanges[Index].CpuStart;
-        }
-      }
-      SmramResRegion++;
-    }
-  }
   
   //
   // Find the largest SMRAM range between 1MB and 4GB that is at least 256KB - 4K in size
@@ -1214,7 +1577,11 @@ SmmIplEntry (
     //
     // Load SMM Core into SMRAM and execute it from SMRAM
     //
-    Status = ExecuteSmmCoreFromSmram (mCurrentSmramRange, gSmmCorePrivate);
+    Status = ExecuteSmmCoreFromSmram (
+               mCurrentSmramRange,
+               &gSmmCorePrivate->SmramRanges[gSmmCorePrivate->SmramRangeCount - 1],
+               gSmmCorePrivate
+               );
     if (EFI_ERROR (Status)) {
       //
       // Print error message that the SMM Core failed to be loaded and executed.
@@ -1262,7 +1629,6 @@ SmmIplEntry (
     // Free all allocated resources
     //
     FreePool (gSmmCorePrivate->SmramRanges);
-    FreePool (gSmmCorePrivate->FullSmramRanges);
 
     return EFI_UNSUPPORTED;
   }

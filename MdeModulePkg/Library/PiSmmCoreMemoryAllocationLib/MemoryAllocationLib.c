@@ -919,11 +919,11 @@ PiSmmCoreMemoryAllocationLibConstructor (
   //
   SmmInitializeMemoryServices (SmmCorePrivate->SmramRangeCount, SmmCorePrivate->SmramRanges);
 
-  mSmmCoreMemoryAllocLibSmramRangeCount = SmmCorePrivate->FullSmramRangeCount;
+  mSmmCoreMemoryAllocLibSmramRangeCount = SmmCorePrivate->SmramRangeCount;
   Size = mSmmCoreMemoryAllocLibSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR);
   mSmmCoreMemoryAllocLibSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
   ASSERT (mSmmCoreMemoryAllocLibSmramRanges != NULL);
-  CopyMem (mSmmCoreMemoryAllocLibSmramRanges, SmmCorePrivate->FullSmramRanges, Size);
+  CopyMem (mSmmCoreMemoryAllocLibSmramRanges, SmmCorePrivate->SmramRanges, Size);
 
   return EFI_SUCCESS;
 }
