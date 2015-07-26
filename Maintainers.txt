@@ -48,7 +48,7 @@ EDK II Packages:
 ----------------
 AppPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/AppPkg
-M: Daryl Mcdaniel <daryl.mcdaniel@intel.com>
+M: Jaben Carsey <jaben.carsey@intel.com>
 
 ArmPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
@@ -170,7 +170,7 @@ M: Ruiyu Ni <ruiyu.ni@intel.com>
 
 PerformancePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/PerformancePkg
-M: Daryl Mcdaniel <daryl.mcdaniel@intel.com>
+M: Jaben Carsey <jaben.carsey@intel.com>
 
 SecurityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
@@ -187,7 +187,7 @@ M: Jeff Fan <jeff.fan@intel.com>
 
 StdLib, StdLibPrivateInternalFiles
 W: https://github.com/tianocore/tianocore.github.io/wiki/StdLib
-M: Daryl Mcdaniel <daryl.mcdaniel@intel.com>
+M: Jaben Carsey <jaben.carsey@intel.com>
 
 UefiCpuPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
