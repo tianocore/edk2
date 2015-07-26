@@ -33,7 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/PciIo.h>
-#include <Protocol/AcpiS3Save.h>
 #include <Protocol/OEMBadging.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>

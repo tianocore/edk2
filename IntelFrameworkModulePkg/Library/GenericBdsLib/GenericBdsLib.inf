@@ -119,7 +119,6 @@
   gEfiLegacyBiosProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiCpuArchProtocolGuid                       ## CONSUMES
   gEfiDevicePathProtocolGuid                    ## CONSUMES
-  gEfiAcpiS3SaveProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiUgaDrawProtocolGuid |gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## SOMETIMES_CONSUMES
   gEfiOEMBadgingProtocolGuid                    ## SOMETIMES_CONSUMES
