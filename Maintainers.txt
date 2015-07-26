@@ -52,13 +52,13 @@ M: Jaben Carsey <jaben.carsey@intel.com>
 
 ArmPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
-M: Olivier Martin <olivier.martin@arm.com>
 M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 ArmPlatformPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
-M: Olivier Martin <olivier.martin@arm.com>
 M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 ArmVirtPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
@@ -71,8 +71,8 @@ M: Yingke D Liu <yingke.d.liu@intel.com>
 
 BeagleBoardPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/BeagleBoardPkg
-M: Olivier Martin <olivier.martin@arm.com>
 M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 CorebootModulePkg, CorebootPayloadPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Coreboot_UEFI_payload
@@ -100,8 +100,8 @@ S: Obsolete (Use ShellPkg & ShellBinPkg instead)
 
 EmbeddedPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
-M: Olivier Martin <olivier.martin@arm.com>
 M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 EmulatorPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
@@ -151,8 +151,8 @@ M: Ruiyu Ni <ruiyu.ni@intel.com>
 
 Omap35xxPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Omap35xxPkg
-M: Olivier Martin <olivier.martin@arm.com>
 M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 OptionRomPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/OptionRomPkg
