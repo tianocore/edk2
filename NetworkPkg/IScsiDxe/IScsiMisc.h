@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous definitions for iSCSI driver.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _ISCSI_MISC_H_
 
 typedef struct _ISCSI_DRIVER_DATA ISCSI_DRIVER_DATA;
+
+///
+/// IPv4 Device Path Node Length
+///
+#define IPv4_NODE_LEN_NEW_VERSIONS    27
+
+///
+/// IPv6 Device Path Node Length
+///
+#define IPv6_NODE_LEN_OLD_VERSIONS    43
+#define IPv6_NODE_LEN_NEW_VERSIONS    60
+
+///
+/// The ignored field StaticIpAddress's offset in old IPv6 Device Path
+///
+#define IPv6_OLD_IPADDRESS_OFFSET      42;
 
 #pragma pack(1)
 typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
