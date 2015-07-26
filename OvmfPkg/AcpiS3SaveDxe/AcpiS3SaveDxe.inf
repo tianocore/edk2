@@ -58,6 +58,7 @@
   gEfiAcpiS3ContextGuid                         # ALWAYS_CONSUMED
   gEfiAcpi20TableGuid                           # ALWAYS_CONSUMED  System Table
   gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED  System Table
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES  ## Event
 
 [Protocols]
   gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
