@@ -814,15 +814,24 @@ IScsiGetTcpConnDevicePath (
       DPathNode->Ipv4.StaticIpAddress = 
         (BOOLEAN) (!Session->ConfigData.NvData.InitiatorInfoFromDhcp);
 
-      IP4_COPY_ADDRESS (
-        &DPathNode->Ipv4.GatewayIpAddress,
-        &Session->ConfigData.NvData.Gateway
-        );
+      //
+      //  Add a judgement here to support previous versions of IPv4_DEVICE_PATH.
+      //  In previous versions of IPv4_DEVICE_PATH, GatewayIpAddress and SubnetMask
+      //  do not exist.
+      //  In new version of IPv4_DEVICE_PATH, structcure length is 27.
+      //
+      if (DevicePathNodeLength (&DPathNode->Ipv4) == IPv4_NODE_LEN_NEW_VERSIONS) {  
 
-      IP4_COPY_ADDRESS (
-        &DPathNode->Ipv4.SubnetMask,
-        &Session->ConfigData.NvData.SubnetMask
-        );
+        IP4_COPY_ADDRESS (
+          &DPathNode->Ipv4.GatewayIpAddress,
+          &Session->ConfigData.NvData.Gateway
+          );
+
+        IP4_COPY_ADDRESS (
+          &DPathNode->Ipv4.SubnetMask,
+          &Session->ConfigData.NvData.SubnetMask
+          );
+      }
 
       break;
     }
