@@ -101,7 +101,7 @@ VARIABLE_ENTRY_PROPERTY mAuthVarEntry[] = {
   },
 };
 
-VOID *mAddressPointer[3];
+VOID **mAuthVarAddressPointer[10];
 
 AUTH_VAR_LIB_CONTEXT_IN *mAuthVarLibContextIn = NULL;
 
@@ -406,11 +406,18 @@ AuthVariableLibInitialize (
   AuthVarLibContextOut->StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_OUT);
   AuthVarLibContextOut->AuthVarEntry = mAuthVarEntry;
   AuthVarLibContextOut->AuthVarEntryCount = sizeof (mAuthVarEntry) / sizeof (mAuthVarEntry[0]);
-  mAddressPointer[0] = mHashCtx;
-  mAddressPointer[1] = mPubKeyStore;
-  mAddressPointer[2] = mCertDbStore;
-  AuthVarLibContextOut->AddressPointer = mAddressPointer;
-  AuthVarLibContextOut->AddressPointerCount = sizeof (mAddressPointer) / sizeof (mAddressPointer[0]);
+  mAuthVarAddressPointer[0] = (VOID **) &mPubKeyStore;
+  mAuthVarAddressPointer[1] = (VOID **) &mCertDbStore;
+  mAuthVarAddressPointer[2] = (VOID **) &mHashCtx;
+  mAuthVarAddressPointer[3] = (VOID **) &mAuthVarLibContextIn;
+  mAuthVarAddressPointer[4] = (VOID **) &(mAuthVarLibContextIn->FindVariable),
+  mAuthVarAddressPointer[5] = (VOID **) &(mAuthVarLibContextIn->FindNextVariable),
+  mAuthVarAddressPointer[6] = (VOID **) &(mAuthVarLibContextIn->UpdateVariable),
+  mAuthVarAddressPointer[7] = (VOID **) &(mAuthVarLibContextIn->GetScratchBuffer),
+  mAuthVarAddressPointer[8] = (VOID **) &(mAuthVarLibContextIn->CheckRemainingSpaceForConsistency),
+  mAuthVarAddressPointer[9] = (VOID **) &(mAuthVarLibContextIn->AtRuntime),
+  AuthVarLibContextOut->AddressPointer = mAuthVarAddressPointer;
+  AuthVarLibContextOut->AddressPointerCount = sizeof (mAuthVarAddressPointer) / sizeof (mAuthVarAddressPointer[0]);
 
   return Status;
 }
