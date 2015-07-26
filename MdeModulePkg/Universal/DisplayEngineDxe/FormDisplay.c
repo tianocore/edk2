@@ -1782,14 +1782,15 @@ FindTopMenu (
 
   TopRow    = gStatementDimensions.TopRow    + SCROLL_ARROW_HEIGHT;
   BottomRow = gStatementDimensions.BottomRow - SCROLL_ARROW_HEIGHT;
-
-  if (gMisMatch) {
+  //
+  // When option mismatch happens,there exist two cases,one is reenter the form, just like the if case below,
+  // and the other is exit current form and enter last form, it can be covered by the else case.
+  //
+  if (gMisMatch && gFormData->HiiHandle == gHighligthMenuInfo.HiiHandle && gFormData->FormId == gHighligthMenuInfo.FormId) {
     //
     // Reenter caused by option mismatch or auto exit caused by refresh form(refresh interval/guid), 
     // base on the record highlight info to find the highlight menu.
     //
-    ASSERT (gFormData->HiiHandle == gHighligthMenuInfo.HiiHandle &&
-            gFormData->FormId == gHighligthMenuInfo.FormId);
 
     *HighlightMenu = FindHighLightMenuOption(NULL);
     if (*HighlightMenu != NULL) {
@@ -1840,7 +1841,6 @@ FindTopMenu (
       *SkipValue = 0;
     }
 
-    gMisMatch = FALSE;
   } else if (FormData->HighLightedStatement != NULL) {
     if (IsSavedHighlightStatement (FormData->HighLightedStatement)) {
       //
@@ -1913,6 +1913,8 @@ FindTopMenu (
     }
     *SkipValue     = 0;
   }
+
+  gMisMatch = FALSE;
 
   //
   // First enter to show the menu, update highlight info.
