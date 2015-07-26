@@ -22,6 +22,41 @@
 #define XEN_SMBIOS_PHYSICAL_END           0x000F0000
 
 /**
+  Validates the SMBIOS entry point structure
+
+  @param  EntryPointStructure  SMBIOS entry point structure
+
+  @retval TRUE   The entry point structure is valid
+  @retval FALSE  The entry point structure is not valid
+
+**/
+STATIC
+BOOLEAN
+IsEntryPointStructureValid (
+  IN SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure
+  )
+{
+  UINTN                     Index;
+  UINT8                     Length;
+  UINT8                     Checksum;
+  UINT8                     *BytePtr;
+
+  BytePtr = (UINT8*) EntryPointStructure;
+  Length = EntryPointStructure->EntryPointLength;
+  Checksum = 0;
+
+  for (Index = 0; Index < Length; Index++) {
+    Checksum = Checksum + (UINT8) BytePtr[Index];
+  }
+
+  if (Checksum != 0) {
+    return FALSE;
+  } else {
+    return TRUE;
+  }
+}
+
+/**
   Locates the Xen SMBIOS data if it exists
 
   @return SMBIOS_TABLE_ENTRY_POINT   Address of Xen SMBIOS data
