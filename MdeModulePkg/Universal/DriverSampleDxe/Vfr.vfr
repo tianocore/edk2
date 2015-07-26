@@ -653,7 +653,7 @@ formset
             refresh interval = 3             // Refresh interval in seconds
     endnumeric;
 
-    grayoutif  match2 (stringref(STRING_TOKEN(STR_STRING)), stringref(STRING_TOKEN(STR_PATTERN)), PERL_GUID);
+    grayoutif  match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)), PERL_GUID);
       numeric 
         varid   = MyIfrNVData.Match2,
         prompt  = STRING_TOKEN(STR_MATCH2_PROMPT),
