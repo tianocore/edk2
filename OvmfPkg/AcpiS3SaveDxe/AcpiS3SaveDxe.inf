@@ -1,7 +1,6 @@
 ## @file
-# Component description file for AcpiS3Save module.
+# AcpiS3Save module installs EndOfDxe callback to prepare S3 boot data.
 #
-# This is an implementation of the ACPI S3 Save protocol.
 # Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
@@ -21,7 +20,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
-  ENTRY_POINT                    = InstallAcpiS3Save
+  ENTRY_POINT                    = InstallEndOfDxeCallback
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -30,7 +29,6 @@
 #
 
 [Sources]
-  AcpiS3Save.h
   AcpiS3Save.c
 
 [Packages]
@@ -61,14 +59,12 @@
   gEfiEndOfDxeEventGroupGuid                    ## CONSUMES  ## Event
 
 [Protocols]
-  gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
   gEfiLockBoxProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
   gFrameworkEfiMpServiceProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport          ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 [Pcd]
