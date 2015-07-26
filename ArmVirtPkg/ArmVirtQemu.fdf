@@ -201,6 +201,12 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 
   #
+  # SMBIOS Support
+  #
+  INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  INF OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+
+  #
   # ACPI Support
   #
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
