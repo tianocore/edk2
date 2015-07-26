@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1569,10 +1569,12 @@ PxeBcDhcp4Dora (
   ZeroMem (Private->OfferIndex, sizeof (Private->OfferIndex));
 
   //
-  // Start DHCPv4 D.O.R.A. process to acquire IPv4 address.
+  // Start DHCPv4 D.O.R.A. process to acquire IPv4 address. This may 
+  // have already been done, thus do not leave in error if the return
+  // code is EFI_ALREADY_STARTED.
   //
   Status = Dhcp4->Start (Dhcp4, NULL);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
     if (Status == EFI_ICMP_ERROR) {
       PxeMode->IcmpErrorReceived = TRUE;
     }
