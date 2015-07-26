@@ -1494,7 +1494,6 @@ EfiDhcp4TransmitReceive (
 
   Instance = DHCP_INSTANCE_FROM_THIS (This);
   DhcpSb   = Instance->Service;
-  DhcpSb->ActiveChild = Instance;
 
   if (Instance->Token != NULL) {
     //

@@ -1518,6 +1518,8 @@ DhcpOnTimerTick (
   IN VOID                   *Context
   )
 {
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   DHCP_SERVICE              *DhcpSb;
   DHCP_PROTOCOL             *Instance;
   EFI_STATUS                Status;
@@ -1665,10 +1667,17 @@ DhcpOnTimerTick (
   }
 
 ON_EXIT:
-  if ((Instance != NULL) && (Instance->Token != NULL)) {
-    Instance->Timeout--;
-    if (Instance->Timeout == 0) {
-      PxeDhcpDone (Instance);
+  //
+  // Iterate through all the DhcpSb Children.
+  //
+  NET_LIST_FOR_EACH_SAFE (Entry, Next, &DhcpSb->Children) {
+    Instance = NET_LIST_USER_STRUCT (Entry, DHCP_PROTOCOL, Link);
+    
+    if ((Instance != NULL) && (Instance->Token != NULL)) {
+      Instance->Timeout--;
+      if (Instance->Timeout == 0) {
+        PxeDhcpDone (Instance);
+      }
     }
   }
 
