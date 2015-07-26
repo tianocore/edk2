@@ -194,7 +194,7 @@ Returns:
     CharsToCopy = EndOfLine - InputFile->CurrentFilePointer;
   }
 
-  OutputString = malloc (CharsToCopy);
+  OutputString = malloc (CharsToCopy + 1);
   if (OutputString == NULL) {
     return NULL;
   }
