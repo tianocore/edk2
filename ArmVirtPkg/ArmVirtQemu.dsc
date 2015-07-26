@@ -232,6 +232,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
 
+  #
+  # SMBIOS entry point version
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0300
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
