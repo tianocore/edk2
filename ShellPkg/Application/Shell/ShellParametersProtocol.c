@@ -125,7 +125,7 @@ DEBUG_CODE_END();
     return (EFI_NOT_FOUND);
   }
 
-  StrnCpyS(*TempParameter, Length, (*Walker), NextDelim - *Walker);
+  StrnCpyS(*TempParameter, Length / sizeof(CHAR16), (*Walker), NextDelim - *Walker);
 
   //
   // Add a CHAR_NULL if we didnt get one via the copy
