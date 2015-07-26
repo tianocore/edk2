@@ -1869,6 +1869,66 @@ BmMatchPartitionDevicePathNode (
 }
 
 /**
+  Enumerate all boot option descriptions and append " 2"/" 3"/... to make
+  unique description.
+
+  @param BootOptions            Array of boot options.
+  @param BootOptionCount        Count of boot options.
+**/
+VOID
+BmMakeBootOptionDescriptionUnique (
+  EFI_BOOT_MANAGER_LOAD_OPTION         *BootOptions,
+  UINTN                                BootOptionCount
+  )
+{
+  UINTN                                Base;
+  UINTN                                Index;
+  UINTN                                DescriptionSize;
+  UINTN                                MaxSuffixSize;
+  BOOLEAN                              *Visited;
+  UINTN                                MatchCount;
+
+  if (BootOptionCount == 0) {
+    return;
+  }
+
+  //
+  // Calculate the maximum buffer size for the number suffix.
+  // The initial sizeof (CHAR16) is for the blank space before the number.
+  //
+  MaxSuffixSize = sizeof (CHAR16);
+  for (Index = BootOptionCount; Index != 0; Index = Index / 10) {
+    MaxSuffixSize += sizeof (CHAR16);
+  }
+
+  Visited = AllocateZeroPool (sizeof (BOOLEAN) * BootOptionCount);
+  ASSERT (Visited != NULL);
+
+  for (Base = 0; Base < BootOptionCount; Base++) {
+    if (!Visited[Base]) {
+      MatchCount      = 1;
+      Visited[Base]   = TRUE;
+      DescriptionSize = StrSize (BootOptions[Base].Description);
+      for (Index = Base + 1; Index < BootOptionCount; Index++) {
+        if (!Visited[Index] && StrCmp (BootOptions[Base].Description, BootOptions[Index].Description) == 0) {
+          Visited[Index] = TRUE;
+          MatchCount++;
+          FreePool (BootOptions[Index].Description);
+          BootOptions[Index].Description = AllocatePool (DescriptionSize + MaxSuffixSize);
+          UnicodeSPrint (
+            BootOptions[Index].Description, DescriptionSize + MaxSuffixSize,
+            L"%s %d",
+            BootOptions[Base].Description, MatchCount
+            );
+        }
+      }
+    }
+  }
+
+  FreePool (Visited);
+}
+
+/**
   Emuerate all possible bootable medias in the following order:
   1. Removable BlockIo            - The boot option only points to the removable media
                                     device, like USB key, DVD, Floppy etc.
@@ -2054,6 +2114,7 @@ BmEnumerateBootOptions (
     FreePool (Handles);
   }
 
+  BmMakeBootOptionDescriptionUnique (BootOptions, *BootOptionCount);
   return BootOptions;
 }
 
