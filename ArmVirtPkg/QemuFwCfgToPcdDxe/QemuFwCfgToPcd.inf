@@ -1,0 +1,42 @@
+## @file
+#  An "early" DXE driver that parses well-known fw-cfg files into dynamic PCDs
+#  that control other (universal) DXE drivers.
+#
+#  Copyright (C) 2015, Red Hat, Inc.
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
+#  IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuFwCfgToPcdDxe
+  FILE_GUID                      = 5bb7cc92-1a36-4833-84cf-db7f8258e48d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ParseQemuFwCfgToPcd
+
+[Sources]
+  QemuFwCfgToPcd.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  QemuFwCfgLib
+  UefiDriverEntryPoint
+
+[Pcd]
+
+[Depex]
+  TRUE
