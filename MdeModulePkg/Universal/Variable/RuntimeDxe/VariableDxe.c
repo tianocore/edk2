@@ -259,7 +259,7 @@ VariableClassAddressChangeEvent (
 
   if (mContextOut.AddressPointer != NULL) {
     for (Index = 0; Index < mContextOut.AddressPointerCount; Index++) {
-      EfiConvertPointer (0x0, (VOID **) &mContextOut.AddressPointer[Index]);
+      EfiConvertPointer (0x0, (VOID **) mContextOut.AddressPointer[Index]);
     }
   }
 }

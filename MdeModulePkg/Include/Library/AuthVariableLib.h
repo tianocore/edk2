@@ -202,7 +202,7 @@ typedef struct {
   //
   // Caller needs to ConvertPointer() for the pointers.
   //
-  VOID                                  **AddressPointer;
+  VOID                                  ***AddressPointer;
   UINTN                                 AddressPointerCount;
 } AUTH_VAR_LIB_CONTEXT_OUT;
 
