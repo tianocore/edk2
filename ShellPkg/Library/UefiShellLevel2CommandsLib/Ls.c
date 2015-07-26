@@ -725,7 +725,7 @@ ShellCommandRunLs (
             SearchString,
             NULL,
             Count,
-            (INT16)(TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:TheTime.TimeZone)
+            TheTime.TimeZone
            );
           if (ShellStatus == SHELL_NOT_FOUND) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle, L"ls", FullPath);  
