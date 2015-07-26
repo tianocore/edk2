@@ -47,12 +47,15 @@ Abstract:
 #include <Library/DevicePathLib.h>
 #include <Library/IoLib.h>
 #include <Library/NvVarsFileLib.h>
+#include <Library/QemuFwCfgLib.h>
 
 #include <Protocol/Decompress.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/PciRootBridgeIo.h>
+#include <Protocol/S3SaveState.h>
+#include <Protocol/DxeSmmReadyToLock.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
