@@ -31,6 +31,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #endif
 #include <assert.h>
 
+#include <Guid/FfsSectionAlignmentPadding.h>
+
 #include "GenFvInternalLib.h"
 #include "FvLib.h"
 #include "PeCoffLib.h"
@@ -39,10 +41,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 BOOLEAN mArm = FALSE;
 STATIC UINT32   MaxFfsAlignment = 0;
 
-EFI_GUID  mEfiFirmwareVolumeTopFileGuid = EFI_FFS_VOLUME_TOP_FILE_GUID;
+EFI_GUID  mEfiFirmwareVolumeTopFileGuid       = EFI_FFS_VOLUME_TOP_FILE_GUID;
 EFI_GUID  mFileGuidArray [MAX_NUMBER_OF_FILES_IN_FV];
-EFI_GUID  mZeroGuid                 = {0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}};
-EFI_GUID  mDefaultCapsuleGuid       = {0x3B6686BD, 0x0D76, 0x4030, { 0xB7, 0x0E, 0xB5, 0x51, 0x9E, 0x2F, 0xC5, 0xA0 }};
+EFI_GUID  mZeroGuid                           = {0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}};
+EFI_GUID  mDefaultCapsuleGuid                 = {0x3B6686BD, 0x0D76, 0x4030, { 0xB7, 0x0E, 0xB5, 0x51, 0x9E, 0x2F, 0xC5, 0xA0 }};
+EFI_GUID  mEfiFfsSectionAlignmentPaddingGuid  = EFI_FFS_SECTION_ALIGNMENT_PADDING_GUID;
 
 CHAR8      *mFvbAttributeName[] = {
   EFI_FVB2_READ_DISABLED_CAP_STRING, 
@@ -934,6 +937,153 @@ Returns:
   return EFI_SUCCESS;
 }
 
+STATIC
+BOOLEAN
+AdjustInternalFfsPadding (
+  IN OUT  EFI_FFS_FILE_HEADER   *FfsFile,
+  IN OUT  MEMORY_FILE           *FvImage,
+  IN      UINTN                 Alignment,
+  IN OUT  UINTN                 *FileSize
+  )
+/*++
+
+Routine Description:
+
+  This function looks for a dedicated alignment padding section in the FFS, and
+  shrinks it to the size required to line up subsequent sections correctly.
+
+Arguments:
+
+  FfsFile               A pointer to Ffs file image.
+  FvImage               The memory image of the FV to adjust it to.
+  Alignment             Current file alignment
+  FileSize              Reference to a variable holding the size of the FFS file
+
+Returns:
+
+  TRUE                  Padding section was found and updated successfully
+  FALSE                 Otherwise
+
+--*/
+{
+  EFI_FILE_SECTION_POINTER  PadSection;
+  UINT8                     *Remainder;
+  EFI_STATUS                Status;
+  UINT32                    FfsHeaderLength;
+  UINT32                    FfsFileLength;
+  UINT32                    PadSize;
+  UINTN                     Misalignment;
+  EFI_FFS_INTEGRITY_CHECK   *IntegrityCheck;
+
+  //
+  // Figure out the misalignment: all FFS sections are aligned relative to the
+  // start of the FFS payload, so use that as the base of the misalignment
+  // computation.
+  //
+  FfsHeaderLength = GetFfsHeaderLength(FfsFile);
+  Misalignment = (UINTN) FvImage->CurrentFilePointer -
+                 (UINTN) FvImage->FileImage + FfsHeaderLength;
+  Misalignment &= Alignment - 1;
+  if (Misalignment == 0) {
+    // Nothing to do, return success
+    return TRUE;
+  }
+
+  //
+  // We only apply this optimization to FFS files with the FIXED attribute set,
+  // since the FFS will not be loadable at arbitrary offsets anymore after
+  // we adjust the size of the padding section.
+  //
+  if ((FfsFile->Attributes & FFS_ATTRIB_FIXED) == 0) {
+    return FALSE;
+  }
+
+  //
+  // Look for a dedicated padding section that we can adjust to compensate
+  // for the misalignment. If such a padding section exists, it precedes all
+  // sections with alignment requirements, and so the adjustment will correct
+  // all of them.
+  //
+  Status = GetSectionByType (FfsFile, EFI_SECTION_FREEFORM_SUBTYPE_GUID, 1,
+             &PadSection);
+  if (EFI_ERROR (Status) ||
+      CompareGuid (&PadSection.FreeformSubtypeSection->SubTypeGuid,
+        &mEfiFfsSectionAlignmentPaddingGuid) != 0) {
+    return FALSE;
+  }
+
+  //
+  // Find out if the size of the padding section is sufficient to compensate
+  // for the misalignment.
+  //
+  PadSize = GetSectionFileLength (PadSection.CommonHeader);
+  if (Misalignment > PadSize - sizeof (EFI_FREEFORM_SUBTYPE_GUID_SECTION)) {
+    return FALSE;
+  }
+
+  //
+  // Move the remainder of the FFS file towards the front, and adjust the
+  // file size output parameter.
+  //
+  Remainder = (UINT8 *) PadSection.CommonHeader + PadSize;
+  memmove (Remainder - Misalignment, Remainder,
+           *FileSize - (UINTN) (Remainder - (UINTN) FfsFile));
+  *FileSize -= Misalignment;
+
+  //
+  // Update the padding section's length with the new values. Note that the
+  // padding is always < 64 KB, so we can ignore EFI_COMMON_SECTION_HEADER2
+  // ExtendedSize.
+  //
+  PadSize -= Misalignment;
+  PadSection.CommonHeader->Size[0] = (UINT8) (PadSize & 0xff);
+  PadSection.CommonHeader->Size[1] = (UINT8) ((PadSize & 0xff00) >> 8);
+  PadSection.CommonHeader->Size[2] = (UINT8) ((PadSize & 0xff0000) >> 16);
+
+  //
+  // Update the FFS header with the new overall length
+  //
+  FfsFileLength = GetFfsFileLength (FfsFile) - Misalignment;
+  if (FfsHeaderLength > sizeof(EFI_FFS_FILE_HEADER)) {
+    ((EFI_FFS_FILE_HEADER2 *)FfsFile)->ExtendedSize = FfsFileLength;
+  } else {
+    FfsFile->Size[0] = (UINT8) (FfsFileLength & 0x000000FF);
+    FfsFile->Size[1] = (UINT8) ((FfsFileLength & 0x0000FF00) >> 8);
+    FfsFile->Size[2] = (UINT8) ((FfsFileLength & 0x00FF0000) >> 16);
+  }
+
+  //
+  // Clear the alignment bits: these have become meaningless now that we have
+  // adjusted the padding section.
+  //
+  FfsFile->Attributes &= ~FFS_ATTRIB_DATA_ALIGNMENT;
+
+  //
+  // Recalculate the FFS header checksum. Instead of setting Header and State
+  // both to zero, set Header to (UINT8)(-State) so State preserves its original
+  // value
+  //
+  IntegrityCheck = &FfsFile->IntegrityCheck;
+  IntegrityCheck->Checksum.Header = (UINT8) (0x100 - FfsFile->State);
+  IntegrityCheck->Checksum.File = 0;
+
+  IntegrityCheck->Checksum.Header = CalculateChecksum8 (
+                                      (UINT8 *) FfsFile, FfsHeaderLength);
+
+  if (FfsFile->Attributes & FFS_ATTRIB_CHECKSUM) {
+    //
+    // Ffs header checksum = zero, so only need to calculate ffs body.
+    //
+    IntegrityCheck->Checksum.File = CalculateChecksum8 (
+                                      (UINT8 *) FfsFile + FfsHeaderLength,
+                                      FfsFileLength - FfsHeaderLength);
+  } else {
+    IntegrityCheck->Checksum.File = FFS_FIXED_CHECKSUM;
+  }
+
+  return TRUE;
+}
+
 EFI_STATUS
 AddFile (
   IN OUT MEMORY_FILE          *FvImage,
@@ -1140,11 +1290,14 @@ Returns:
   //
   // Add pad file if necessary
   //
-  Status = AddPadFile (FvImage, 1 << CurrentFileAlignment, *VtfFileImage, NULL, FileSize);
-  if (EFI_ERROR (Status)) {
-    Error (NULL, 0, 4002, "Resource", "FV space is full, could not add pad file for data alignment property.");
-    free (FileBuffer);
-    return EFI_ABORTED;
+  if (!AdjustInternalFfsPadding ((EFI_FFS_FILE_HEADER *) FileBuffer, FvImage,
+         1 << CurrentFileAlignment, &FileSize)) {
+    Status = AddPadFile (FvImage, 1 << CurrentFileAlignment, *VtfFileImage, NULL, FileSize);
+    if (EFI_ERROR (Status)) {
+      Error (NULL, 0, 4002, "Resource", "FV space is full, could not add pad file for data alignment property.");
+      free (FileBuffer);
+      return EFI_ABORTED;
+    }
   }
   //
   // Add file
