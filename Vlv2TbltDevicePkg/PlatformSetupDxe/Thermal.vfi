@@ -33,7 +33,26 @@ form formid = THERMAL_FORM_ID,
   title  = STRING_TOKEN(STR_THERMAL_TITLE);
 
   subtitle text = STRING_TOKEN(STR_THERMAL_CONFIGURATION);
-
+  oneof   varid   = Setup.CriticalThermalTripPoint,
+    prompt      = STRING_TOKEN(STR_ACPI_CRITICAL_THERMAL_TRIP_POINT),
+    help        = STRING_TOKEN(STR_ACPI_CRITICAL_THERMAL_TRIP_POINT_HELP),
+    option text = STRING_TOKEN (STR_85_C), value = 85, flags=0 | RESET_REQUIRED;     
+    option text = STRING_TOKEN (STR_87_C), value = 87, flags=0 | RESET_REQUIRED; 
+    option text = STRING_TOKEN (STR_90_C), value = 90, flags=0 | RESET_REQUIRED;
+    option text = STRING_TOKEN (STR_105_C), value = 105, flags=0 | RESET_REQUIRED;
+    option text = STRING_TOKEN (STR_110_C), value = 110, flags=0 | RESET_REQUIRED;
+    option text = STRING_TOKEN (STR_200_C), value = 200, flags=DEFAULT | MANUFACTURING | RESET_REQUIRED;
+  endoneof; 
+  oneof   varid   = Setup.PassiveThermalTripPoint,
+    prompt      = STRING_TOKEN (STR_ACPI_PASSIVE_THERMAL_TRIP_POINT),
+    help        = STRING_TOKEN (STR_ACPI_PASSIVE_THERMAL_TRIP_POINT_HELP),
+    option text = STRING_TOKEN (STR_85_C), value = 85, flags=0 | RESET_REQUIRED;
+    option text = STRING_TOKEN (STR_87_C), value = 87, flags=0 | RESET_REQUIRED;   
+    option text = STRING_TOKEN (STR_90_C), value = 90, flags=0 | RESET_REQUIRED;
+    option text = STRING_TOKEN (STR_100_C), value = 100, flags=0 | RESET_REQUIRED;
+    option text = STRING_TOKEN (STR_105_C), value = 105, flags=0 | RESET_REQUIRED;
+    option text = STRING_TOKEN (STR_180_C), value = 180, flags=DEFAULT | MANUFACTURING | RESET_REQUIRED;
+  endoneof;
 
   suppressif TRUE;
     numeric varid = Setup.PassiveTc1Value,

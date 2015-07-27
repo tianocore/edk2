@@ -564,6 +564,32 @@ InitPciDevPME (
   }
 }
 
+VOID
+EFIAPI
+InitThermalZone (
+  EFI_EVENT  Event,
+  VOID       *Context
+  )
+{
+  UINTN                  VarSize;
+  EFI_STATUS             Status;
+  EFI_GLOBAL_NVS_AREA_PROTOCOL       *GlobalNvsArea;
+  VarSize = sizeof(SYSTEM_CONFIGURATION);
+  Status = gRT->GetVariable(
+                  NORMAL_SETUP_NAME,
+                  &gEfiNormalSetupGuid,
+                  NULL,
+                  &VarSize,
+                  &mSystemConfiguration
+                  );
+  Status = gBS->LocateProtocol (
+                  &gEfiGlobalNvsAreaProtocolGuid,
+                  NULL,
+                  (void **)&GlobalNvsArea
+                  );
+  GlobalNvsArea->Area->CriticalThermalTripPoint = mSystemConfiguration.CriticalThermalTripPoint;
+  GlobalNvsArea->Area->PassiveThermalTripPoint = mSystemConfiguration.PassiveThermalTripPoint;
+}
 #if defined SUPPORT_LVDS_DISPLAY && SUPPORT_LVDS_DISPLAY
 
 #endif
@@ -818,7 +844,16 @@ InitializePlatform (
                &mReadyToBootEvent
                );
   }
-
+  //
+  // Create a ReadyToBoot Event to run the thermalzone init process
+  //
+  Status = EfiCreateEventReadyToBootEx (
+             TPL_CALLBACK,
+             InitThermalZone,
+             NULL,
+             &mReadyToBootEvent
+             );  
+ 
   ReportStatusCodeEx (
     EFI_PROGRESS_CODE,
     EFI_COMPUTING_UNIT_CHIPSET | EFI_CU_PLATFORM_DXE_STEP1,
