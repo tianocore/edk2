@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -16,13 +16,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #include "ScriptExecute.h"
 
+//
+// 8 extra pages for PF handler.
+//
+#define EXTRA_PAGE_TABLE_PAGES      8
+
 #define IA32_PG_P                   BIT0
 #define IA32_PG_RW                  BIT1
 #define IA32_PG_PS                  BIT7
 
-UINT64                             mPhyMask;
-VOID                               *mOriginalHandler;
-UINTN                              mS3NvsPageTableAddress;
+UINT64                              mPhyMask;
+VOID                                *mOriginalHandler;
+UINTN                               mPageFaultBuffer;
+UINTN                               mPageFaultIndex = 0;
+//
+// Store the uplink information for each page being used.
+//
+UINT64                              *mPageFaultUplink[EXTRA_PAGE_TABLE_PAGES];
 
 /**
   Page fault handler.
@@ -73,10 +83,46 @@ HookPageFaultHandler (
   IdtEntry->Bits.Reserved_1     = 0;
 
   if (mPage1GSupport) {
-    mS3NvsPageTableAddress = (UINTN)(AsmReadCr3 () & mPhyMask) + EFI_PAGES_TO_SIZE(2);
+    mPageFaultBuffer = (UINTN)(AsmReadCr3 () & mPhyMask) + EFI_PAGES_TO_SIZE(2);
   }else {
-    mS3NvsPageTableAddress = (UINTN)(AsmReadCr3 () & mPhyMask) + EFI_PAGES_TO_SIZE(6);
+    mPageFaultBuffer = (UINTN)(AsmReadCr3 () & mPhyMask) + EFI_PAGES_TO_SIZE(6);
   }
+  ZeroMem (mPageFaultUplink, sizeof (mPageFaultUplink));
+}
+
+/**
+  The function will check if current waking vector is long mode.
+
+  @param  AcpiS3Context                 a pointer to a structure of ACPI_S3_CONTEXT
+
+  @retval TRUE   Current context need long mode waking vector.
+  @retval FALSE  Current context need not long mode waking vector.
+**/
+BOOLEAN
+IsLongModeWakingVector (
+  IN ACPI_S3_CONTEXT                *AcpiS3Context
+  )
+{
+  EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
+
+  Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable));
+  if ((Facs == NULL) ||
+      (Facs->Signature != EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ||
+      ((Facs->FirmwareWakingVector == 0) && (Facs->XFirmwareWakingVector == 0)) ) {
+    // Something wrong with FACS
+    return FALSE;
+  }
+  if (Facs->XFirmwareWakingVector != 0) {
+    if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
+        ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
+        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+      // Both BIOS and OS wants 64bit vector
+      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
 }
 
 /**
@@ -124,27 +170,47 @@ SetIdtEntry (
     }
   );
 
-  IdtEntry = (IA32_IDT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (14 * sizeof (IA32_IDT_GATE_DESCRIPTOR)));
-  HookPageFaultHandler (IdtEntry);
+  //
+  // If both BIOS and OS wants long mode waking vector,
+  // S3ResumePei should have established 1:1 Virtual to Physical identity mapping page table,
+  // no need to hook page fault handler.
+  //
+  if (!IsLongModeWakingVector (AcpiS3Context)) {
+    IdtEntry = (IA32_IDT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (14 * sizeof (IA32_IDT_GATE_DESCRIPTOR)));
+    HookPageFaultHandler (IdtEntry);
+  }
 }
 
 /**
-  Get new page address.
+  Acquire page for page fault.
 
-  @param  PageNum  new page number needed
+  @param[in, out] Uplink        Pointer to up page table entry.
 
-  @return new page address
 **/
-UINTN
-GetNewPage (
-  IN UINTN  PageNum
+VOID
+AcquirePage (
+  IN OUT UINT64                 *Uplink
   )
 {
-  UINTN  NewPage;
-  NewPage = mS3NvsPageTableAddress;
-  ZeroMem ((VOID *)NewPage, EFI_PAGES_TO_SIZE(PageNum));
-  mS3NvsPageTableAddress += EFI_PAGES_TO_SIZE(PageNum);
-  return NewPage;
+  UINTN             Address;
+
+  Address = mPageFaultBuffer + EFI_PAGES_TO_SIZE (mPageFaultIndex);
+  ZeroMem ((VOID *) Address, EFI_PAGES_TO_SIZE (1));
+
+  //
+  // Cut the previous uplink if it exists and wasn't overwritten.
+  //
+  if ((mPageFaultUplink[mPageFaultIndex] != NULL) && ((*mPageFaultUplink[mPageFaultIndex] & mPhyMask) == Address)) {
+    *mPageFaultUplink[mPageFaultIndex] = 0;
+  }
+
+  //
+  // Link & Record the current uplink.
+  //
+  *Uplink = Address | IA32_PG_P | IA32_PG_RW;
+  mPageFaultUplink[mPageFaultIndex] = Uplink;
+
+  mPageFaultIndex = (mPageFaultIndex + 1) % EXTRA_PAGE_TABLE_PAGES;
 }
 
 /**
@@ -177,21 +243,21 @@ PageFaultHandler (
   PTIndex = BitFieldRead64 (PFAddress, 39, 47);
   // PML4E
   if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
-    PageTable[PTIndex] = GetNewPage (1) | IA32_PG_P | IA32_PG_RW;
+    AcquirePage (&PageTable[PTIndex]);
   }
   PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & mPhyMask);
   PTIndex = BitFieldRead64 (PFAddress, 30, 38);
   // PDPTE
   if (mPage1GSupport) {
-    PageTable[PTIndex] = PFAddress | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
+    PageTable[PTIndex] = (PFAddress & ~((1ull << 30) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
   } else {
     if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
-      PageTable[PTIndex] = GetNewPage (1) | IA32_PG_P | IA32_PG_RW;
+      AcquirePage (&PageTable[PTIndex]);
     }
     PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & mPhyMask);
     PTIndex = BitFieldRead64 (PFAddress, 21, 29);
     // PD
-    PageTable[PTIndex] = PFAddress | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
+    PageTable[PTIndex] = (PFAddress & ~((1ull << 21) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
   }
 
   return TRUE;
