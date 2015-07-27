@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -105,6 +105,13 @@ HiiSetString (
     for (; *Supported != 0 && *Supported != ';'; Supported++);
     if (*Supported != 0) {
       *(Supported++) = '\0';
+    }
+    
+    if ((SupportedLanguages == NULL) && AsciiStrnCmp (Language, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) == 0) {
+      //
+      // Skip string package used for keyword protocol.
+      //
+      continue;
     }
 
     //
