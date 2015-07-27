@@ -489,6 +489,7 @@ SendForm (
   // If EDKII_FORM_DISPLAY_ENGINE_PROTOCOL not found, return EFI_UNSUPPORTED.
   //
   if (mFormDisplay == NULL) {
+    DEBUG ((DEBUG_ERROR, "Fatal Error! EDKII_FORM_DISPLAY_ENGINE_PROTOCOL not found!"));
     return EFI_UNSUPPORTED;
   }
 
