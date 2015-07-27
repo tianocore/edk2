@@ -34,6 +34,7 @@ InitializeBoardOemId (
     switch (PlatformInfoHob->BoardId) {
 
       case BOARD_ID_MINNOW2:
+      case BOARD_ID_MINNOW2_COMPATIBLE:
       default:
         OemId = EFI_ACPI_OEM_ID_DEFAULT;
         OemTableId = EFI_ACPI_OEM_TABLE_ID_DEFAULT;

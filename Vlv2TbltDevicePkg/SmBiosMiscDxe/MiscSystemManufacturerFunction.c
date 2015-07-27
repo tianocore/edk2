@@ -30,6 +30,11 @@ Abstract:
 #include <Library/NetLib.h>
 #include "Library/DebugLib.h"
 #include <Uefi/UefiBaseType.h>
+#include <Guid/PlatformInfo.h>
+
+
+extern EFI_PLATFORM_INFO_HOB *mPlatformInfo;
+
 
 /**
 
@@ -70,77 +75,86 @@ AddSmbiosManuCallback (
   EFI_SMBIOS_PROTOCOL               *Smbios;
   CHAR16                            Buffer[40];
   
-  CHAR16                          *MacStr; 
-  EFI_HANDLE                      *Handles;
-  UINTN                           BufferSize;
+  CHAR16                            *MacStr; 
+  EFI_HANDLE                        *Handles;
+  UINTN                             BufferSize;
+  CHAR16                            PlatformNameBuffer[40];
 
   ForType1InputData = (EFI_MISC_SYSTEM_MANUFACTURER *)Context;
 
   //
   // First check for invalid parameters.
   //
-  if (Context == NULL) {
+  if (Context == NULL || mPlatformInfo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID *) &Smbios);
   ASSERT_EFI_ERROR (Status);
 
+
+  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
+    // Detect the board is compatible board platform
+    UnicodeSPrint (PlatformNameBuffer, sizeof (PlatformNameBuffer),L"%s",L"Minnowboard Compatible ");
+  } else {
+    UnicodeSPrint (PlatformNameBuffer, sizeof (PlatformNameBuffer),L"%s",L"Minnowboard Max ");
+  }
+
   //
   // Silicon Steppings
   //
   switch (PchStepping()) {
     case PchA0:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX A0 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"A0 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"A0");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
       DEBUG ((EFI_D_ERROR, "A0 Stepping Detected\n"));
       break;
     case PchA1:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX A1 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"A1 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"A1");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
       DEBUG ((EFI_D_ERROR, "A1 Stepping Detected\n"));
       break;
     case PchB0:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX B0 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"B0 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"B0");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
       DEBUG ((EFI_D_ERROR, "B0 Stepping Detected\n"));
       break;
     case PchB1:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX B1 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"B1 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"B1");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
       DEBUG ((EFI_D_ERROR, "B1 Stepping Detected\n"));
       break;
     case PchB2:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX B2 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"B2 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"B2");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
       DEBUG ((EFI_D_ERROR, "B2 Stepping Detected\n"));
       break;
     case PchB3:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX B3 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"B3 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"B3");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
       DEBUG ((EFI_D_ERROR, "B3 Stepping Detected\n"));
       break;
     case PchC0:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX C0 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"C0 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"C0");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
       DEBUG ((EFI_D_ERROR, "C0 Stepping Detected\n"));
       break;
    case PchD0:
-      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"MinnowBoard MAX D0 PLATFORM");
+      UnicodeSPrint (Buffer, sizeof (Buffer),L"%s%s", PlatformNameBuffer, L"D0 PLATFORM");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_PRODUCT_NAME), Buffer, NULL);
       UnicodeSPrint (Buffer, sizeof (Buffer),L"%s",L"D0");
       HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_VERSION), Buffer, NULL);
@@ -151,7 +165,10 @@ AddSmbiosManuCallback (
       break;
     }
 
-
+  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"Compatible Vendor");
+    HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_MANUFACTURER), Buffer, NULL);
+  }
   TokenToGet = STRING_TOKEN (STR_MISC_SYSTEM_MANUFACTURER);
   Manufacturer = SmbiosMiscGetString (TokenToGet);
   ManuStrLen = StrLen(Manufacturer);

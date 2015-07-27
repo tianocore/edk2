@@ -66,7 +66,7 @@ typedef enum {
 #define SF_DEVICE_ID0_W25XXX        0x30
 #define SF_DEVICE_ID1_W25X32        0x16
 #define SF_DEVICE_ID1_W25X64        0x17
-#define SF_DEVICE_ID0_W25QXX        0x60
+#define SF_DEVICE_ID0_W25QXX        0x40
 #define SF_DEVICE_ID1_W25Q16        0x15
 #define SF_DEVICE_ID1_W25Q32        0x16
 #define SF_DEVICE_ID1_W25Q64        0x17
@@ -152,7 +152,7 @@ typedef enum {
 
 #define SF_VENDOR_ID_WINBOND       0xEF
 #define SF_DEVICE_ID0_W25XXX       0x30
-#define SF_DEVICE_ID0_W25QXX       0x60
+
 #define SF_DEVICE_ID1_W25X80       0x14
 #define SF_DEVICE_ID1_W25X16       0x15
 #define SF_DEVICE_ID1_W25X32       0x16

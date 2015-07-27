@@ -29,7 +29,10 @@ Abstract:
 #include <Library/NetLib.h>
 #include "Library/DebugLib.h"
 #include <Uefi/UefiBaseType.h>
+#include <Guid/PlatformInfo.h>
 
+
+extern EFI_PLATFORM_INFO_HOB *mPlatformInfo;
 
 /**
   This function makes boot time changes to the contents of the
@@ -66,16 +69,21 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBaseBoardManufacturer)
   CHAR16                          *MacStr; 
   EFI_HANDLE                      *Handles;
   UINTN                           BufferSize;
+  CHAR16                          Buffer[40];
 
   ForType2InputData = (EFI_MISC_BASE_BOARD_MANUFACTURER *)RecordData;
 
   //
   // First check for invalid parameters.
   //
-  if (RecordData == NULL) {
+  if (RecordData == NULL || mPlatformInfo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"Compatible Vendor");
+    HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_BASE_BOARD_MANUFACTURER), Buffer, NULL);
+  }
   TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER);
   Manufacturer = SmbiosMiscGetString (TokenToGet);
   ManuStrLen = StrLen(Manufacturer);
@@ -83,6 +91,10 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBaseBoardManufacturer)
     return EFI_UNSUPPORTED;
   }
 
+  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"MinnowBoard Compatible Platform");
+    HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_BASE_BOARD_PRODUCT_NAME1), Buffer, NULL);
+  }
   TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_PRODUCT_NAME1);
   Product = SmbiosMiscGetString (TokenToGet);
   ProductStrLen = StrLen(Product);

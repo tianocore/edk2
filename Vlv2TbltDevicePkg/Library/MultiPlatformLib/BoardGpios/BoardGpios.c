@@ -150,7 +150,7 @@ MultiPlatformGpioTableInit (
   switch (PlatformInfoHob->BoardId) {
 
   case BOARD_ID_MINNOW2: // Minnow2
-  
+  case BOARD_ID_MINNOW2_COMPATIBLE: 
    Status = (**PeiServices).LocatePpi (
                              PeiServices,
                              &gEfiPeiReadOnlyVariable2PpiGuid,
@@ -509,6 +509,7 @@ MultiPlatformGpioProgram (
   //
   switch (PlatformInfoHob->BoardId) {
     case BOARD_ID_MINNOW2:
+    case BOARD_ID_MINNOW2_COMPATIBLE:
       DEBUG ((EFI_D_INFO, "Start to config Minnow2 GPIO pins\n"));
       InternalGpioConfig(GPIO_SCORE_OFFSET, sizeof(mMinnow2_GpioInitData_SC)/sizeof(mMinnow2_GpioInitData_SC[0]),   (GPIO_CONF_PAD_INIT *) (UINTN) PlatformInfoHob->PlatformGpioData_SC);
       InternalGpioConfig(GPIO_NCORE_OFFSET, sizeof(mMinnow2_GpioInitData_NC)/sizeof(mMinnow2_GpioInitData_NC[0]),   (GPIO_CONF_PAD_INIT *) (UINTN) PlatformInfoHob->PlatformGpioData_NC);
@@ -523,7 +524,7 @@ MultiPlatformGpioProgram (
    // configure the CFIO Pnp settings
    //
    if (PlatformInfoHob->CfioEnabled) {
-     if (PlatformInfoHob->BoardId == BOARD_ID_MINNOW2){
+     if (PlatformInfoHob->BoardId == BOARD_ID_MINNOW2 || PlatformInfoHob->BoardId == BOARD_ID_MINNOW2_COMPATIBLE){
        InternalGpioConfig(GPIO_SCORE_OFFSET, sizeof(mNB_BB_FAB3_GpioInitData_SC_TRI)/sizeof(mNB_BB_FAB3_GpioInitData_SC_TRI[0]), (GPIO_CONF_PAD_INIT *) (UINTN)PlatformInfoHob->PlatformGpioData_SC_TRI);
      }
    }

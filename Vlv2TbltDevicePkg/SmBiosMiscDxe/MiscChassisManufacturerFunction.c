@@ -25,8 +25,11 @@ Abstract:
 
 
 #include "CommonHeader.h"
-
 #include "MiscSubclassDriver.h"
+#include <Guid/PlatformInfo.h>
+
+
+extern EFI_PLATFORM_INFO_HOB *mPlatformInfo;
 
 /**
   This function makes boot time changes to the contents of the
@@ -55,16 +58,21 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscChassisManufacturer)
   EFI_SMBIOS_HANDLE               SmbiosHandle;
   SMBIOS_TABLE_TYPE3              *SmbiosRecord;
   EFI_MISC_CHASSIS_MANUFACTURER   *ForType3InputData;
+  CHAR16                          Buffer[40];
 
   ForType3InputData = (EFI_MISC_CHASSIS_MANUFACTURER *)RecordData;
 
   //
   // First check for invalid parameters.
   //
-  if (RecordData == NULL) {
+  if (RecordData == NULL || mPlatformInfo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"Compatible Vendor");
+    HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_CHASSIS_MANUFACTURER), Buffer, NULL);
+  }  
   TokenToGet = STRING_TOKEN (STR_MISC_CHASSIS_MANUFACTURER);
   Manufacturer = SmbiosMiscGetString (TokenToGet);
   ManuStrLen = StrLen(Manufacturer);

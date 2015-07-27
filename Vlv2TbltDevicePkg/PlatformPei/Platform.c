@@ -192,6 +192,57 @@ PeiSmbusExec (
   );
 
 
+/**
+
+  Detemine compatible board 
+  @return 0: Not compatible board
+          1: Compatible board 
+
+**/
+UINT32 
+DetermineCompatibleBoard (
+  void
+  )
+{
+  UINTN PciD31F0RegBase = 0;
+  UINT32 GpioValue = 0;
+  UINT32 TmpVal = 0;
+  UINT32 MmioConf0 = 0;
+  UINT32 MmioPadval = 0;
+  UINT32 PConf0Offset = 0x200; //GPIO_S5_4 pad_conf0 register offset
+  UINT32 PValueOffset = 0x208; //GPIO_S5_4 pad_value register offset
+  UINT32 SSUSOffset = 0x2000;
+  UINT32 IoBase = 0;
+
+  DEBUG ((EFI_D_ERROR, "DetermineCompatibleBoard() Entry\n"));
+  PciD31F0RegBase = MmPciAddress (0,
+                      0,
+                      PCI_DEVICE_NUMBER_PCH_LPC,
+                      PCI_FUNCTION_NUMBER_PCH_LPC,
+                      0
+                    );
+  IoBase = MmioRead32 (PciD31F0RegBase + R_PCH_LPC_IO_BASE) & B_PCH_LPC_IO_BASE_BAR;
+  
+  MmioConf0 = IoBase + SSUSOffset + PConf0Offset;
+  MmioPadval = IoBase + SSUSOffset + PValueOffset;
+  //0xFED0E200/0xFED0E208 is pad_Conf/pad_val register address of GPIO_S5_4
+  DEBUG ((EFI_D_ERROR, "MmioConf0[0x%x], MmioPadval[0x%x]\n", MmioConf0, MmioPadval));
+  
+  MmioWrite32 (MmioConf0, 0x2003CC00);  
+
+  TmpVal = MmioRead32 (MmioPadval);
+  TmpVal &= ~0x6; //Clear bit 1:2
+  TmpVal |= 0x2; // Set the pin as GPI
+  MmioWrite32 (MmioPadval, TmpVal); 
+
+  GpioValue = MmioRead32 (MmioPadval);
+
+  DEBUG ((EFI_D_ERROR, "Gpio_S5_4 value is 0x%x\n", GpioValue));
+  return (GpioValue & 0x1);
+}
+
+
+
 EFI_STATUS
 FtpmPolicyInit (
   IN CONST EFI_PEI_SERVICES             **PeiServices,
@@ -854,6 +905,7 @@ ReadPlatformIds (
     UINTN                           DataSize;
     EFI_PLATFORM_INFO_HOB           TmpHob;
     EFI_PEI_READ_ONLY_VARIABLE2_PPI *PeiVar;
+    UINT32                          CompatibleBoard = 0; 
 
     Status = (**PeiServices).LocatePpi (
                                PeiServices,
@@ -882,9 +934,15 @@ ReadPlatformIds (
       return Status;
     }
 
-
-    PlatformInfoHob->BoardId    = BOARD_ID_MINNOW2;
-    DEBUG ((EFI_D_INFO,  "I'm Minnow2!\n"));
+    CompatibleBoard = DetermineCompatibleBoard();
+   if (1 == CompatibleBoard) {
+     PlatformInfoHob->BoardId    = BOARD_ID_MINNOW2_COMPATIBLE;
+     DEBUG ((EFI_D_INFO,  "I'm MinnowBoard Compatible!\n"));
+   } else {       
+     PlatformInfoHob->BoardId    = BOARD_ID_MINNOW2;
+     DEBUG ((EFI_D_INFO,  "I'm MinnowBoard Max!\n"));
+   }
+    
 
     PlatformInfoHob->MemCfgID   = 0;
     PlatformInfoHob->BoardRev   = FabId + 1;	// FabId = 0 means FAB1 (BoardRev = 1), FabId = 1 means FAB2 (BoardRev = 2)...

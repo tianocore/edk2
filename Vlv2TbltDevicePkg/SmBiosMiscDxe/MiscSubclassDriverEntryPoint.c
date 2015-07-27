@@ -26,13 +26,14 @@ Abstract:
 
 
 #include "CommonHeader.h"
-
 #include "MiscSubclassDriver.h"
 #include <Protocol/HiiString.h>
+#include <Guid/PlatformInfo.h>
+
 
 EFI_HII_HANDLE  mHiiHandle;
 EFI_HII_STRING_PROTOCOL  *mHiiString;
-
+EFI_PLATFORM_INFO_HOB *mPlatformInfo=NULL;
 
 EFI_STRING
 EFIAPI
@@ -122,7 +123,19 @@ MiscSubclassDriverEntryPoint (
   UINTN                Index;
   EFI_STATUS           EfiStatus;
   EFI_SMBIOS_PROTOCOL  *Smbios;
+  EFI_PEI_HOB_POINTERS GuidHob;
 
+
+
+  GuidHob.Raw = GetHobList ();
+  if (GuidHob.Raw != NULL) {
+    if ((GuidHob.Raw = GetNextGuidHob (&gEfiPlatformInfoGuid, GuidHob.Raw)) != NULL) {
+      mPlatformInfo = GET_GUID_HOB_DATA (GuidHob.Guid);
+    }
+  }
+  
+  DEBUG ((EFI_D_ERROR, "PlatformInfoHob->BoardId [0x%x]\n", mPlatformInfo->BoardId));
+  
   //
   // Retrieve the pointer to the UEFI HII String Protocol
   //

@@ -114,6 +114,7 @@
   PchPlatformLib
   I2cLib
   NetLib
+  HobLib
   
 [Guids]
   gEfiProcessorSubClassGuid
