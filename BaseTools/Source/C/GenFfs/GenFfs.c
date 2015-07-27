@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Common/UefiBaseTypes.h>
 #include <Common/PiFirmwareFile.h>
 #include <IndustryStandard/PeImage.h>
+#include <Guid/FfsSectionAlignmentPadding.h>
 
 #include "CommonLib.h"
 #include "ParseInf.h"
@@ -57,6 +58,8 @@ STATIC CHAR8 *mFfsValidAlignName[] = {
 STATIC UINT32 mFfsValidAlign[] = {0, 8, 16, 128, 512, 1024, 4096, 32768, 65536};
 
 STATIC EFI_GUID mZeroGuid = {0};
+
+STATIC EFI_GUID mEfiFfsSectionAlignmentPaddingGuid = EFI_FFS_SECTION_ALIGNMENT_PADDING_GUID;
 
 STATIC
 VOID 
@@ -230,13 +233,14 @@ Returns:
 STATIC
 EFI_STATUS
 GetSectionContents (
-  IN  CHAR8   **InputFileName,
-  IN  UINT32  *InputFileAlign,
-  IN  UINT32  InputFileNum,
-  OUT UINT8   *FileBuffer,
-  OUT UINT32  *BufferLength,
-  OUT UINT32  *MaxAlignment,
-  OUT UINT8   *PESectionNum
+  IN  CHAR8                     **InputFileName,
+  IN  UINT32                    *InputFileAlign,
+  IN  UINT32                    InputFileNum,
+  IN  EFI_FFS_FILE_ATTRIBUTES   FfsAttrib,
+  OUT UINT8                     *FileBuffer,
+  OUT UINT32                    *BufferLength,
+  OUT UINT32                    *MaxAlignment,
+  OUT UINT8                     *PESectionNum
   )
 /*++
         
@@ -270,22 +274,24 @@ Returns:
   EFI_BUFFER_TOO_SMALL FileBuffer is not enough to contain all file data.
 --*/
 {
-  UINT32                     Size;
-  UINT32                     Offset;
-  UINT32                     FileSize;
-  UINT32                     Index;
-  FILE                       *InFile;
-  EFI_COMMON_SECTION_HEADER  *SectHeader;
-  EFI_COMMON_SECTION_HEADER2 TempSectHeader;
-  EFI_TE_IMAGE_HEADER        TeHeader;
-  UINT32                     TeOffset;
-  EFI_GUID_DEFINED_SECTION   GuidSectHeader;
-  EFI_GUID_DEFINED_SECTION2  GuidSectHeader2;
-  UINT32                     HeaderSize;
+  UINT32                              Size;
+  UINT32                              Offset;
+  UINT32                              FileSize;
+  UINT32                              Index;
+  FILE                                *InFile;
+  EFI_FREEFORM_SUBTYPE_GUID_SECTION   *SectHeader;
+  EFI_COMMON_SECTION_HEADER2          TempSectHeader;
+  EFI_TE_IMAGE_HEADER                 TeHeader;
+  UINT32                              TeOffset;
+  EFI_GUID_DEFINED_SECTION            GuidSectHeader;
+  EFI_GUID_DEFINED_SECTION2           GuidSectHeader2;
+  UINT32                              HeaderSize;
+  UINT32                              MaxEncounteredAlignment;
 
-  Size          = 0;
-  Offset        = 0;
-  TeOffset      = 0;
+  Size                    = 0;
+  Offset                  = 0;
+  TeOffset                = 0;
+  MaxEncounteredAlignment = 1;
 
   //
   // Go through our array of file names and copy their contents
@@ -299,13 +305,6 @@ Returns:
       Size++;
     }
     
-    //
-    // Get the Max alignment of all input file datas
-    //
-    if (*MaxAlignment < InputFileAlign [Index]) {
-      *MaxAlignment = InputFileAlign [Index];
-    }
-
     // 
     // Open file and read contents
     //
@@ -373,7 +372,7 @@ Returns:
     }
 
     //
-    // make sure section data meet its alignment requirement by adding one raw pad section.
+    // make sure section data meet its alignment requirement by adding one pad section.
     // But the different sections have the different section header. Necessary or not?
     // Based on section type to adjust offset? Todo
     //
@@ -386,16 +385,38 @@ Returns:
         // The maximal alignment is 64K, the raw section size must be less than 0xffffff
         //
         memset (FileBuffer + Size, 0, Offset);
-        SectHeader          = (EFI_COMMON_SECTION_HEADER *) (FileBuffer + Size);
-        SectHeader->Type    = EFI_SECTION_RAW;
-        SectHeader->Size[0] = (UINT8) (Offset & 0xff);
-        SectHeader->Size[1] = (UINT8) ((Offset & 0xff00) >> 8);
-        SectHeader->Size[2] = (UINT8) ((Offset & 0xff0000) >> 16);
+        SectHeader                        = (EFI_FREEFORM_SUBTYPE_GUID_SECTION *) (FileBuffer + Size);
+        SectHeader->CommonHeader.Size[0]  = (UINT8) (Offset & 0xff);
+        SectHeader->CommonHeader.Size[1]  = (UINT8) ((Offset & 0xff00) >> 8);
+        SectHeader->CommonHeader.Size[2]  = (UINT8) ((Offset & 0xff0000) >> 16);
+
+        //
+        // Only add a special reducible padding section if
+        // - this FFS has the FFS_ATTRIB_FIXED attribute,
+        // - none of the preceding sections have alignment requirements,
+        // - the size of the padding is sufficient for the
+        //   EFI_SECTION_FREEFORM_SUBTYPE_GUID header.
+        //
+        if ((FfsAttrib & FFS_ATTRIB_FIXED) != 0 &&
+            MaxEncounteredAlignment <= 1 &&
+            Offset >= sizeof (EFI_FREEFORM_SUBTYPE_GUID_SECTION)) {
+          SectHeader->CommonHeader.Type   = EFI_SECTION_FREEFORM_SUBTYPE_GUID;
+          SectHeader->SubTypeGuid         = mEfiFfsSectionAlignmentPaddingGuid;
+        } else {
+          SectHeader->CommonHeader.Type   = EFI_SECTION_RAW;
+        }
       }
       DebugMsg (NULL, 0, 9, "Pad raw section for section data alignment", 
                 "Pad Raw section size is %u", (unsigned) Offset);
 
       Size = Size + Offset;
+    }
+
+    //
+    // Get the Max alignment of all input file datas
+    //
+    if (MaxEncounteredAlignment < InputFileAlign [Index]) {
+      MaxEncounteredAlignment = InputFileAlign [Index];
     }
 
     //
@@ -413,7 +434,9 @@ Returns:
     fclose (InFile);
     Size += FileSize;
   }
-  
+
+  *MaxAlignment = MaxEncounteredAlignment;
+
   //
   // Set the actual length of the data.
   //
@@ -774,6 +797,7 @@ Returns:
              InputFileName,
              InputFileAlign,
              InputFileNum,
+             FfsAttrib,
              FileBuffer,
              &FileSize,
              &MaxAlignment,
@@ -810,6 +834,7 @@ Returns:
                InputFileName,
                InputFileAlign,
                InputFileNum,
+               FfsAttrib,
                FileBuffer,
                &FileSize,
                &MaxAlignment,
