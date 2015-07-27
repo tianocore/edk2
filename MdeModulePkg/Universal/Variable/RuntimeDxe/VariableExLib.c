@@ -67,7 +67,7 @@ VariableExLibFindVariable (
   if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
     AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable.CurrPtr;
     AuthVariableInfo->PubKeyIndex     = AuthVariable->PubKeyIndex;
-    AuthVariableInfo->MonotonicCount  = AuthVariable->MonotonicCount;
+    AuthVariableInfo->MonotonicCount  = ReadUnaligned64 (&(AuthVariable->MonotonicCount));
     AuthVariableInfo->TimeStamp       = &AuthVariable->TimeStamp;
   }
 
@@ -129,7 +129,7 @@ VariableExLibFindNextVariable (
   if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
     AuthVariablePtr = (AUTHENTICATED_VARIABLE_HEADER *) VariablePtr;
     AuthVariableInfo->PubKeyIndex     = AuthVariablePtr->PubKeyIndex;
-    AuthVariableInfo->MonotonicCount  = AuthVariablePtr->MonotonicCount;
+    AuthVariableInfo->MonotonicCount  = ReadUnaligned64 (&(AuthVariablePtr->MonotonicCount));
     AuthVariableInfo->TimeStamp       = &AuthVariablePtr->TimeStamp;
   }
 
