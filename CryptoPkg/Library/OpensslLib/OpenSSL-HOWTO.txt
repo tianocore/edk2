@@ -1,0 +1,40 @@
+
+================================================================================
+                                 Introduction
+================================================================================
+  OpenSSL is a well-known open source implementation of SSL and TLS protocols.
+The core library implements the basic cryptographic functions and provides various
+utility functions. The OpenSSL library is widely used in variety of security
+products development as base crypto provider. (See http://www.openssl.org/ for more
+information on OpenSSL).
+  UEFI (Unified Extensible Firmware Interface) is a specification detailing the
+interfaces between OS and platform firmware. Several security features were
+introduced (e.g. Authenticated Variable Service, Driver Signing, etc) from UEFI
+2.2 (http://www.uefi.org/). These security features highly depend on the
+cryptography. This HOWTO documents OpenSSL building under UEFI environment.
+
+
+================================================================================
+                                OpenSSL-Version
+================================================================================
+  EDKII supports building with the master branch of OpenSSL, which will
+  eventually be released as OpenSSL 1.1.0. In additional, fixes for the
+  following OpenSSL "Request Tracker" tickets are required:
+
+   RT4175: Fix regression using PKCS7_verify() with Authenticode
+   RT4309: Define PRIu64 for UEFI build
+
+  A clone of the OpenSSL git repository with all the required fixes is
+  available at git://git.infradead.org/users/dwmw2/openssl.git
+
+
+================================================================================
+                      HOW to Install Openssl for UEFI Building
+================================================================================
+
+1. Clone the above-referenced git repository into the directory
+      CryptoPkg/Library/OpensslLib/openssl/
+
+2. Copy the opensslconf.h file from this directory into the newly-created
+   CryptoPkg/Library/OpensslLib/openssl/include/openssl directory next to
+   the other OpenSSL include files.

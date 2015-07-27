@@ -24,7 +24,8 @@
 
 [Includes]
   Include
-  Library/OpensslLib/openssl-1.0.2g/include
+  Library/OpensslLib/openssl/include
+  Library/OpensslLib/openssl/crypto/include
 
 [LibraryClasses]
   ##  @libraryclass  Provides basic library functions for cryptographic primitives.
