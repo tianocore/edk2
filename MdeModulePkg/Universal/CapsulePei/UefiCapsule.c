@@ -42,24 +42,19 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST IA32_DESCRIPTOR mGdt = {
   };
 
 /**
-  Calculate the total size of page table.
-  
-  @return The size of page table.
-  
-  
+  The function will check if 1G page is supported.
+
+  @retval TRUE   1G page is supported.
+  @retval FALSE  1G page is not supported.
+
 **/
-UINTN
-CalculatePageTableSize (
+BOOLEAN
+IsPage1GSupport (
   VOID
   )
 {
   UINT32                                        RegEax;
   UINT32                                        RegEdx;
-  UINTN                                         TotalPagesNum;
-  UINT8                                         PhysicalAddressBits;
-  VOID                                          *Hob;
-  UINT32                                        NumberOfPml4EntriesNeeded;
-  UINT32                                        NumberOfPdpEntriesNeeded;
   BOOLEAN                                       Page1GSupport;
 
   Page1GSupport = FALSE;
@@ -73,29 +68,34 @@ CalculatePageTableSize (
     }
   }
 
-  //
-  // Get physical address bits supported.
-  //
-  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
-  if (Hob != NULL) {
-    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
-  } else {
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8) RegEax;
-    } else {
-      PhysicalAddressBits = 36;
-    }
-  }
+  return Page1GSupport;
+}
+
+/**
+  Calculate the total size of page table.
+
+  @param[in] Page1GSupport      1G page support or not.
+
+  @return The size of page table.
+
+**/
+UINTN
+CalculatePageTableSize (
+  IN BOOLEAN                                    Page1GSupport
+  )
+{
+  UINTN                                         ExtraPageTablePages;
+  UINTN                                         TotalPagesNum;
+  UINT8                                         PhysicalAddressBits;
+  UINT32                                        NumberOfPml4EntriesNeeded;
+  UINT32                                        NumberOfPdpEntriesNeeded;
 
   //
-  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
+  // Create 4G page table by default,
+  // and let PF handler to handle > 4G request.
   //
-  ASSERT (PhysicalAddressBits <= 52);
-  if (PhysicalAddressBits > 48) {
-    PhysicalAddressBits = 48;
-  }
+  PhysicalAddressBits = 32;
+  ExtraPageTablePages = EXTRA_PAGE_TABLE_PAGES;
 
   //
   // Calculate the table entries needed.
@@ -113,24 +113,25 @@ CalculatePageTableSize (
   } else {
     TotalPagesNum = NumberOfPml4EntriesNeeded + 1;
   }
+  TotalPagesNum += ExtraPageTablePages;
 
   return EFI_PAGES_TO_SIZE (TotalPagesNum);
 }
 
 /**
   Allocates and fills in the Page Directory and Page Table Entries to
-  establish a 1:1 Virtual to Physical mapping.
+  establish a 4G page table.
 
-  @param[in]  PageTablesAddress  The base address of page table.
+  @param[in] PageTablesAddress  The base address of page table.
+  @param[in] Page1GSupport      1G page support or not.
 
 **/
 VOID
-CreateIdentityMappingPageTables (
-  IN  EFI_PHYSICAL_ADDRESS  PageTablesAddress
+Create4GPageTables (
+  IN EFI_PHYSICAL_ADDRESS   PageTablesAddress,
+  IN BOOLEAN                Page1GSupport
   )
 {  
-  UINT32                                        RegEax;
-  UINT32                                        RegEdx;
   UINT8                                         PhysicalAddressBits;
   EFI_PHYSICAL_ADDRESS                          PageAddress;
   UINTN                                         IndexOfPml4Entries;
@@ -143,42 +144,13 @@ CreateIdentityMappingPageTables (
   PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
   PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
   UINTN                                         BigPageAddress;
-  VOID                                          *Hob;
-  BOOLEAN                                       Page1GSupport;
   PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
 
-  Page1GSupport = FALSE;
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-  if (RegEax >= 0x80000001) {
-    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-    if ((RegEdx & BIT26) != 0) {
-      Page1GSupport = TRUE;
-    }
-  }
-
   //
-  // Get physical address bits supported.
+  // Create 4G page table by default,
+  // and let PF handler to handle > 4G request.
   //
-  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
-  if (Hob != NULL) {
-    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
-  } else {
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8) RegEax;
-    } else {
-      PhysicalAddressBits = 36;
-    }
-  }
-
-  //
-  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
-  //
-  ASSERT (PhysicalAddressBits <= 52);
-  if (PhysicalAddressBits > 48) {
-    PhysicalAddressBits = 48;
-  }
+  PhysicalAddressBits = 32;
 
   //
   // Calculate the table entries needed.
@@ -290,20 +262,20 @@ ReturnFunction (
   SWITCH_32_TO_64_CONTEXT  *EntrypointContext,
   SWITCH_64_TO_32_CONTEXT  *ReturnContext
   )
-{ 
+{
   //
   // Restore original GDT
   //
   AsmWriteGdtr (&ReturnContext->Gdtr);
-  
+
   //
   // return to original caller
   //
   LongJump ((BASE_LIBRARY_JUMP_BUFFER  *)(UINTN)EntrypointContext->JumpBuffer, 1);
- 
+
   //
   // never be here
-  // 
+  //
   ASSERT (FALSE);
 }
 
@@ -335,10 +307,10 @@ Thunk32To64 (
   if (SetJumpFlag == 0) {
 
     //
-    // Build Page Tables for all physical memory processor supports
+    // Build 4G Page Tables.
     //
-    CreateIdentityMappingPageTables (PageTableAddress);
-    
+    Create4GPageTables (PageTableAddress, Context->Page1GSupport);
+
     //
     // Create 64-bit GDT
     //
@@ -364,7 +336,7 @@ Thunk32To64 (
       Context->StackBufferBase + Context->StackBufferLength
       );
   }
-  
+
   //
   // Convert to 32-bit Status and return
   //
@@ -407,6 +379,7 @@ ModeSwitch (
   BASE_LIBRARY_JUMP_BUFFER             JumpBuffer;
   EFI_PHYSICAL_ADDRESS                 ReservedRangeBase;
   EFI_PHYSICAL_ADDRESS                 ReservedRangeEnd;
+  BOOLEAN                              Page1GSupport;
 
   ZeroMem (&Context, sizeof (SWITCH_32_TO_64_CONTEXT));
   ZeroMem (&ReturnContext, sizeof (SWITCH_64_TO_32_CONTEXT));
@@ -415,17 +388,19 @@ ModeSwitch (
   MemorySize64  = (UINT64) (UINTN) *MemorySize;
   MemoryEnd64   = MemoryBase64 + MemorySize64;
 
+  Page1GSupport = IsPage1GSupport ();
+
   //
   // Merge memory range reserved for stack and page table  
   //
   if (LongModeBuffer->StackBaseAddress < LongModeBuffer->PageTableAddress) {
     ReservedRangeBase = LongModeBuffer->StackBaseAddress;
-    ReservedRangeEnd  = LongModeBuffer->PageTableAddress + CalculatePageTableSize ();
+    ReservedRangeEnd  = LongModeBuffer->PageTableAddress + CalculatePageTableSize (Page1GSupport);
   } else {
     ReservedRangeBase = LongModeBuffer->PageTableAddress;
     ReservedRangeEnd  = LongModeBuffer->StackBaseAddress + LongModeBuffer->StackSize;
   }
-  
+
   //
   // Check if memory range reserved is overlap with MemoryBase ~ MemoryBase + MemorySize.
   // If they are overlapped, get a larger range to process capsule data.
@@ -444,8 +419,8 @@ ModeSwitch (
     } else {
       MemorySize64 = (UINT64)(UINTN)(ReservedRangeBase - MemoryBase64);
     }
-  }  
-  
+  }
+
   //
   // Initialize context jumping to 64-bit enviroment
   //
@@ -456,6 +431,7 @@ ModeSwitch (
   Context.BlockListAddr         = BlockListAddr;
   Context.MemoryBase64Ptr       = (EFI_PHYSICAL_ADDRESS)(UINTN)&MemoryBase64;
   Context.MemorySize64Ptr       = (EFI_PHYSICAL_ADDRESS)(UINTN)&MemorySize64;
+  Context.Page1GSupport         = Page1GSupport;
 
   //
   // Prepare data for return back
@@ -529,7 +505,7 @@ FindCapsuleCoalesceImage (
                            &AuthenticationState
                            );
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Unable to find PE32 section in CapsuleRelocate image ffs %r!\n", Status));
+        DEBUG ((EFI_D_ERROR, "Unable to find PE32 section in CapsuleX64 image ffs %r!\n", Status));
         return Status;
       }
       *CoalesceImageMachineType = PeCoffLoaderGetMachineType ((VOID *) (UINTN) CoalesceImageAddress);
@@ -542,6 +518,46 @@ FindCapsuleCoalesceImage (
   return Status;
 }
 
+/**
+  Gets the reserved long mode buffer.
+
+  @param  LongModeBuffer  Pointer to the long mode buffer for output.
+
+  @retval EFI_SUCCESS     Long mode buffer successfully retrieved.
+  @retval Others          Variable storing long mode buffer not found.
+
+**/
+EFI_STATUS
+GetLongModeContext (
+  OUT EFI_CAPSULE_LONG_MODE_BUFFER *LongModeBuffer
+  )
+{
+  EFI_STATUS   Status;
+  UINTN        Size;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI *PPIVariableServices;
+
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiReadOnlyVariable2PpiGuid,
+             0,
+             NULL,
+             (VOID **) &PPIVariableServices
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Size = sizeof (EFI_CAPSULE_LONG_MODE_BUFFER);
+  Status = PPIVariableServices->GetVariable (
+                                  PPIVariableServices,
+                                  EFI_CAPSULE_LONG_MODE_BUFFER_NAME,
+                                  &gEfiCapsuleVendorGuid,
+                                  NULL,
+                                  &Size,
+                                  LongModeBuffer
+                                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG (( EFI_D_ERROR, "Error Get LongModeBuffer variable %r!\n", Status));
+  }
+  return Status;
+}
 #endif
 
 /**
@@ -652,47 +668,6 @@ GetCapsuleDescriptors (
   }
   
   return EFI_SUCCESS;
-}
-
-/**
-  Gets the reserved long mode buffer.
-
-  @param  LongModeBuffer  Pointer to the long mode buffer for output.
-
-  @retval EFI_SUCCESS     Long mode buffer successfully retrieved.
-  @retval Others          Variable storing long mode buffer not found.
-
-**/
-EFI_STATUS
-GetLongModeContext (
-  OUT EFI_CAPSULE_LONG_MODE_BUFFER *LongModeBuffer
-  )
-{
-  EFI_STATUS   Status;
-  UINTN        Size;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI *PPIVariableServices;
-
-  Status = PeiServicesLocatePpi (
-             &gEfiPeiReadOnlyVariable2PpiGuid,
-             0,
-             NULL,
-             (VOID **) &PPIVariableServices
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  Size = sizeof (EFI_CAPSULE_LONG_MODE_BUFFER);
-  Status = PPIVariableServices->GetVariable (
-                                  PPIVariableServices,
-                                  EFI_CAPSULE_LONG_MODE_BUFFER_NAME,
-                                  &gEfiCapsuleVendorGuid,
-                                  NULL,
-                                  &Size,
-                                  LongModeBuffer
-                                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "Error Get LongModeBuffer variable %r!\n", Status));
-  }
-  return Status;
 }
 
 /**
@@ -837,7 +812,7 @@ CapsuleCoalesce (
     CoalesceImageEntryPoint = 0;
     Status = GetLongModeContext (&LongModeBuffer);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to find the variables for long mode context!\n"));
+      DEBUG ((EFI_D_ERROR, "Fail to find the variable for long mode context!\n"));
       Status = EFI_NOT_FOUND;
       goto Done;
     }
