@@ -31,7 +31,7 @@ typedef struct _ISCSI_DRIVER_DATA ISCSI_DRIVER_DATA;
 ///
 /// The ignored field StaticIpAddress's offset in old IPv6 Device Path
 ///
-#define IPv6_OLD_IPADDRESS_OFFSET      42;
+#define IPv6_OLD_IPADDRESS_OFFSET      42
 
 #pragma pack(1)
 typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
