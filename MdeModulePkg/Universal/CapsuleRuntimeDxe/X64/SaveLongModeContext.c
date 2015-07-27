@@ -2,7 +2,7 @@
   Create the variable to save the base address of page table and stack
   for transferring into long mode in IA32 capsule PEI.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,7 +30,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/HobLib.h>
+
+//
+// 8 extra pages for PF handler.
+//
+#define EXTRA_PAGE_TABLE_PAGES   8
 
 /**
   Allocate EfiReservedMemoryType below 4G memory address.
@@ -106,80 +110,60 @@ PrepareContextForCapsulePei (
   VOID
   )
 {
+  UINTN                                         ExtraPageTablePages;
   UINT32                                        RegEax;
   UINT32                                        RegEdx;
   UINTN                                         TotalPagesNum;
   UINT8                                         PhysicalAddressBits;
-  VOID                                          *Hob;
   UINT32                                        NumberOfPml4EntriesNeeded;
   UINT32                                        NumberOfPdpEntriesNeeded;
   BOOLEAN                                       Page1GSupport;
   EFI_CAPSULE_LONG_MODE_BUFFER                  LongModeBuffer;
   EFI_STATUS                                    Status;
   VOID                                          *Registration;
-  
-  LongModeBuffer.PageTableAddress = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdIdentifyMappingPageTablePtr);
 
-  if (LongModeBuffer.PageTableAddress == 0x0) {
-    //
-    // Calculate the size of page table, allocate the memory, and set PcdIdentifyMappingPageTablePtr.
-    //
-    Page1GSupport = FALSE;
-    if (PcdGetBool(PcdUse1GPageTable)) {
-      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-      if (RegEax >= 0x80000001) {
-        AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-        if ((RegEdx & BIT26) != 0) {
-          Page1GSupport = TRUE;
-        }
+  //
+  // Calculate the size of page table, allocate the memory.
+  //
+  Page1GSupport = FALSE;
+  if (PcdGetBool(PcdUse1GPageTable)) {
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000001) {
+      AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+      if ((RegEdx & BIT26) != 0) {
+        Page1GSupport = TRUE;
       }
     }
-    
-    //
-    // Get physical address bits supported.
-    //
-    Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
-    if (Hob != NULL) {
-      PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
-    } else {
-      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-      if (RegEax >= 0x80000008) {
-        AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-        PhysicalAddressBits = (UINT8) RegEax;
-      } else {
-        PhysicalAddressBits = 36;
-      }
-    }
-    
-    //
-    // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
-    //
-    ASSERT (PhysicalAddressBits <= 52);
-    if (PhysicalAddressBits > 48) {
-      PhysicalAddressBits = 48;
-    }
-    
-    //
-    // Calculate the table entries needed.
-    //
-    if (PhysicalAddressBits <= 39 ) {
-      NumberOfPml4EntriesNeeded = 1;
-      NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
-    } else {
-      NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
-      NumberOfPdpEntriesNeeded = 512;
-    }
-    
-    if (!Page1GSupport) {
-      TotalPagesNum = (NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1;
-    } else {
-      TotalPagesNum = NumberOfPml4EntriesNeeded + 1;
-    }
-    
-    LongModeBuffer.PageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedMemoryBelow4G (EFI_PAGES_TO_SIZE (TotalPagesNum));
-    ASSERT (LongModeBuffer.PageTableAddress != 0);
-    PcdSet64 (PcdIdentifyMappingPageTablePtr, LongModeBuffer.PageTableAddress); 
   }
+
+  //
+  // Create 4G page table by default,
+  // and let PF handler to handle > 4G request.
+  //
+  PhysicalAddressBits = 32;
+  ExtraPageTablePages = EXTRA_PAGE_TABLE_PAGES;
+
+  //
+  // Calculate the table entries needed.
+  //
+  if (PhysicalAddressBits <= 39 ) {
+    NumberOfPml4EntriesNeeded = 1;
+    NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
+  } else {
+    NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
+    NumberOfPdpEntriesNeeded = 512;
+  }
+
+  if (!Page1GSupport) {
+    TotalPagesNum = (NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1;
+  } else {
+    TotalPagesNum = NumberOfPml4EntriesNeeded + 1;
+  }
+  TotalPagesNum += ExtraPageTablePages;
+  DEBUG ((EFI_D_ERROR, "CapsuleRuntimeDxe X64 TotalPagesNum - 0x%x pages\n", TotalPagesNum));
+
+  LongModeBuffer.PageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedMemoryBelow4G (EFI_PAGES_TO_SIZE (TotalPagesNum));
+  ASSERT (LongModeBuffer.PageTableAddress != 0);
   
   //
   // Allocate stack
