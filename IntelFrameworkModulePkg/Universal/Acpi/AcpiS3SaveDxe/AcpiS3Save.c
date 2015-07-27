@@ -2,7 +2,7 @@
   This is an implementation of the ACPI S3 Save protocol.  This is defined in
   S3 boot path specification 0.9.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -31,6 +31,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Acpi.h>
 
 #include "AcpiS3Save.h"
+
+//
+// 8 extra pages for PF handler.
+//
+#define EXTRA_PAGE_TABLE_PAGES   8
 
 /**
   Hook point for AcpiVariableThunkPlatform for InstallAcpiS3Save.
@@ -303,21 +308,61 @@ FindAcpiFacsTable (
 }
 
 /**
-  Allocates and fills in the Page Directory and Page Table Entries to
-  establish a 1:1 Virtual to Physical mapping.
+  The function will check if long mode waking vector is supported.
+
+  @param[in] Facs   Pointer to FACS table.
+
+  @retval TRUE   Long mode waking vector is supported.
+  @retval FALSE  Long mode waking vector is not supported.
+
+**/
+BOOLEAN
+IsLongModeWakingVectorSupport (
+  IN EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *Facs
+  )
+{
+  if ((Facs == NULL) ||
+      (Facs->Signature != EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ) {
+    //
+    // Something wrong with FACS.
+    //
+    return FALSE;
+  }
+  if (Facs->XFirmwareWakingVector != 0) {
+    if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
+        ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0)) {
+      //
+      // BIOS supports 64bit waking vector.
+      //
+      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+  Allocates page table buffer.
+
+  @param[in] LongModeWakingVectorSupport    Support long mode waking vector or not.
+
   If BootScriptExector driver will run in 64-bit mode, this function will establish the 1:1 
-  virtual to physical mapping page table.
+  virtual to physical mapping page table when long mode waking vector is supported, otherwise
+  create 4G page table when long mode waking vector is not supported and let PF handler to
+  handle > 4G request.
   If BootScriptExector driver will not run in 64-bit mode, this function will do nothing. 
   
-  @return  the 1:1 Virtual to Physical identity mapping page table base address. 
+  @return Page table base address. 
 
 **/
 EFI_PHYSICAL_ADDRESS
-S3CreateIdentityMappingPageTables (
-  VOID
+S3AllocatePageTablesBuffer (
+  IN BOOLEAN    LongModeWakingVectorSupport
   )
 {  
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+    UINTN                                         ExtraPageTablePages;
     UINT32                                        RegEax;
     UINT32                                        RegEdx;
     UINT8                                         PhysicalAddressBits;
@@ -328,74 +373,80 @@ S3CreateIdentityMappingPageTables (
     VOID                                          *Hob;
     BOOLEAN                                       Page1GSupport;
 
-    S3NvsPageTableAddress = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdIdentifyMappingPageTablePtr);
-    if (S3NvsPageTableAddress != 0x0) {
-      return S3NvsPageTableAddress;
-    } else {
-      Page1GSupport = FALSE;
-      if (PcdGetBool(PcdUse1GPageTable)) {
-        AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-        if (RegEax >= 0x80000001) {
-          AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-          if ((RegEdx & BIT26) != 0) {
-            Page1GSupport = TRUE;
-          }
+    Page1GSupport = FALSE;
+    if (PcdGetBool(PcdUse1GPageTable)) {
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000001) {
+        AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+        if ((RegEdx & BIT26) != 0) {
+          Page1GSupport = TRUE;
         }
       }
-      
-      //
-      // Get physical address bits supported.
-      //
-      Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
-      if (Hob != NULL) {
-        PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
-      } else {
-        AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-        if (RegEax >= 0x80000008) {
-          AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-          PhysicalAddressBits = (UINT8) RegEax;
-        } else {
-          PhysicalAddressBits = 36;
-        }
-      }
-      
-      //
-      // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
-      //
-      ASSERT (PhysicalAddressBits <= 52);
-      if (PhysicalAddressBits > 48) {
-        PhysicalAddressBits = 48;
-      }
-      
-      //
-      // Calculate the table entries needed.
-      //
-      if (PhysicalAddressBits <= 39 ) {
-        NumberOfPml4EntriesNeeded = 1;
-        NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
-      } else {
-        NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
-        NumberOfPdpEntriesNeeded = 512;
-      }
-      
-      //
-      // We need calculate whole page size then allocate once, because S3 restore page table does not know each page in Nvs.
-      //
-      if (!Page1GSupport) {
-        TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded);
-      } else {
-        TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded);
-      }
-      DEBUG ((EFI_D_ERROR, "TotalPageTableSize - %x pages\n", TotalPageTableSize));
-      
-      //
-      // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
-      //
-      S3NvsPageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGES_TO_SIZE(TotalPageTableSize));
-      ASSERT (S3NvsPageTableAddress != 0);
-      PcdSet64 (PcdIdentifyMappingPageTablePtr, S3NvsPageTableAddress); 
-      return S3NvsPageTableAddress;
     }
+
+    //
+    // Get physical address bits supported.
+    //
+    Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+    if (Hob != NULL) {
+      PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+    } else {
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000008) {
+        AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+        PhysicalAddressBits = (UINT8) RegEax;
+      } else {
+        PhysicalAddressBits = 36;
+      }
+    }
+
+    //
+    // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
+    //
+    ASSERT (PhysicalAddressBits <= 52);
+    if (PhysicalAddressBits > 48) {
+      PhysicalAddressBits = 48;
+    }
+
+    ExtraPageTablePages = 0;
+    if (!LongModeWakingVectorSupport) {
+      //
+      // Create 4G page table when BIOS does not support long mode waking vector,
+      // and let PF handler to handle > 4G request.
+      //
+      PhysicalAddressBits = 32;
+      ExtraPageTablePages = EXTRA_PAGE_TABLE_PAGES;
+    }
+
+    //
+    // Calculate the table entries needed.
+    //
+    if (PhysicalAddressBits <= 39 ) {
+      NumberOfPml4EntriesNeeded = 1;
+      NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
+    } else {
+      NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
+      NumberOfPdpEntriesNeeded = 512;
+    }
+
+    //
+    // We need calculate whole page size then allocate once, because S3 restore page table does not know each page in Nvs.
+    //
+    if (!Page1GSupport) {
+      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded);
+    } else {
+      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded);
+    }
+
+    TotalPageTableSize += ExtraPageTablePages;
+    DEBUG ((EFI_D_ERROR, "AcpiS3Save TotalPageTableSize - 0x%x pages\n", TotalPageTableSize));
+
+    //
+    // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
+    //
+    S3NvsPageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGES_TO_SIZE(TotalPageTableSize));
+    ASSERT (S3NvsPageTableAddress != 0);
+    return S3NvsPageTableAddress;
   } else {
     //
     // If DXE is running 32-bit mode, no need to establish page table.
@@ -457,6 +508,7 @@ S3Ready (
   STATIC BOOLEAN                                AlreadyEntered;
   IA32_DESCRIPTOR                               *Idtr;
   IA32_IDT_GATE_DESCRIPTOR                      *IdtGate;
+  EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
 
   DEBUG ((EFI_D_INFO, "S3Ready!\n"));
 
@@ -476,7 +528,8 @@ S3Ready (
   //
   // Get ACPI Table because we will save its position to variable
   //
-  AcpiS3Context->AcpiFacsTable = (EFI_PHYSICAL_ADDRESS)(UINTN)FindAcpiFacsTable ();
+  Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) FindAcpiFacsTable ();
+  AcpiS3Context->AcpiFacsTable = (EFI_PHYSICAL_ADDRESS) (UINTN) Facs;
   ASSERT (AcpiS3Context->AcpiFacsTable != 0);
 
   IdtGate = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof(IA32_IDT_GATE_DESCRIPTOR) * 0x100 + sizeof(IA32_DESCRIPTOR));
@@ -498,7 +551,7 @@ S3Ready (
   //
   // Allocate page table
   //
-  AcpiS3Context->S3NvsPageTableAddress = S3CreateIdentityMappingPageTables ();
+  AcpiS3Context->S3NvsPageTableAddress = S3AllocatePageTablesBuffer (IsLongModeWakingVectorSupport (Facs));
 
   //
   // Allocate stack

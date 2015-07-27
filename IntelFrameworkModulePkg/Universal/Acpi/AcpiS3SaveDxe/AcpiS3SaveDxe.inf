@@ -1,7 +1,7 @@
 ## @file
 # AcpiS3Save module installs ACPI S3 Save protocol to prepare S3 boot data.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -77,9 +77,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize    ## SOMETIMES_CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                         ## CONSUMES
-  ## SOMETIMES_CONSUMES
-  ## SOMETIMES_PRODUCES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdIdentifyMappingPageTablePtr
 
 [Depex]
   #
