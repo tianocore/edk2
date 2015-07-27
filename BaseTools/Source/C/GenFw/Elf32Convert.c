@@ -101,7 +101,7 @@ STATIC UINT32 mCoffAlignment = 0x20;
 //
 // PE section alignment.
 //
-STATIC const UINT16 mCoffNbrSections = 5;
+STATIC const UINT16 mCoffNbrSections = 4;
 
 //
 // ELF sections to offset in Coff file.
@@ -116,6 +116,7 @@ STATIC UINT32 mTextOffset;
 STATIC UINT32 mDataOffset;
 STATIC UINT32 mHiiRsrcOffset;
 STATIC UINT32 mRelocOffset;
+STATIC UINT32 mDebugOffset;
 
 //
 // Initialization Function
@@ -354,6 +355,8 @@ ScanSections32 (
     assert (FALSE);
   }
 
+  mDebugOffset = mCoffOffset;
+
   if (mEhdr->e_machine != EM_ARM) {
     mCoffOffset = CoffAlign(mCoffOffset);
   }
@@ -398,10 +401,27 @@ ScanSections32 (
       SectionCount ++;
     }
   }
-  mCoffOffset = CoffAlign(mCoffOffset);
 
   if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
     Warning (NULL, 0, 0, NULL, "Mulitple sections in %s are merged into 1 data section. Source level debug might not work correctly.", mInImageName);
+  }
+
+  //
+  // Make room for .debug data in .data (or .text if .data is empty) instead of
+  // putting it in a section of its own. This is explicitly allowed by the
+  // PE/COFF spec, and prevents bloat in the binary when using large values for
+  // section alignment.
+  //
+  if (SectionCount > 0) {
+    mDebugOffset = mCoffOffset;
+  }
+  mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
+                sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
+                strlen(mInImageName) + 1;
+
+  mCoffOffset = CoffAlign(mCoffOffset);
+  if (SectionCount == 0) {
+    mDataOffset = mCoffOffset;
   }
 
   //
@@ -998,28 +1018,18 @@ WriteDebug32 (
   )
 {
   UINT32                              Len;
-  UINT32                              DebugOffset;
   EFI_IMAGE_OPTIONAL_HEADER_UNION     *NtHdr;
   EFI_IMAGE_DATA_DIRECTORY            *DataDir;
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY     *Dir;
   EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY *Nb10;
 
   Len = strlen(mInImageName) + 1;
-  DebugOffset = mCoffOffset;
 
-  mCoffOffset += sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY)
-    + sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY)
-    + Len;
-  mCoffOffset = CoffAlign(mCoffOffset);
-
-  mCoffFile = realloc(mCoffFile, mCoffOffset);
-  memset(mCoffFile + DebugOffset, 0, mCoffOffset - DebugOffset);
-
-  Dir = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY*)(mCoffFile + DebugOffset);
+  Dir = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY*)(mCoffFile + mDebugOffset);
   Dir->Type = EFI_IMAGE_DEBUG_TYPE_CODEVIEW;
   Dir->SizeOfData = sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) + Len;
-  Dir->RVA = DebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
-  Dir->FileOffset = DebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+  Dir->RVA = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+  Dir->FileOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
 
   Nb10 = (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY*)(Dir + 1);
   Nb10->Signature = CODEVIEW_SIGNATURE_NB10;
@@ -1028,20 +1038,8 @@ WriteDebug32 (
 
   NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)(mCoffFile + mNtHdrOffset);
   DataDir = &NtHdr->Pe32.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG];
-  DataDir->VirtualAddress = DebugOffset;
-  DataDir->Size = mCoffOffset - DebugOffset;
-  if (DataDir->Size == 0) {
-    // If no debug, null out the directory entry and don't add the .debug section
-    DataDir->VirtualAddress = 0;
-    NtHdr->Pe32.FileHeader.NumberOfSections--;
-  } else {
-    DataDir->VirtualAddress = DebugOffset;
-    CreateSectionHeader (".debug", DebugOffset, mCoffOffset - DebugOffset,
-            EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
-            | EFI_IMAGE_SCN_MEM_DISCARDABLE
-            | EFI_IMAGE_SCN_MEM_READ);
-
-  }
+  DataDir->VirtualAddress = mDebugOffset;
+  DataDir->Size = Dir->SizeOfData + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
 }
 
 STATIC
