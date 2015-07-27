@@ -24,7 +24,7 @@
   PLATFORM_GUID                       = F71608AB-D63D-4491-B744-A99998C8CD96
   PLATFORM_VERSION                    = 0.1
   DSC_SPECIFICATION                   = 0x00010005  
-  SUPPORTED_ARCHITECTURES             = IA32|X64
+  SUPPORTED_ARCHITECTURES             = IA32
   BUILD_TARGETS                       = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER                    = DEFAULT
   OUTPUT_DIRECTORY                    = Build/CorebootPayloadPkgIA32
