@@ -307,6 +307,16 @@ ScanSections32 (
   }
 
   //
+  // Move the PE/COFF header right before the first section. This will help us
+  // save space when converting to TE.
+  //
+  if (mCoffAlignment > mCoffOffset) {
+    mNtHdrOffset += mCoffAlignment - mCoffOffset;
+    mTableOffset += mCoffAlignment - mCoffOffset;
+    mCoffOffset = mCoffAlignment;
+  }
+
+  //
   // First text sections.
   //
   mCoffOffset = CoffAlign(mCoffOffset);
