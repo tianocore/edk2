@@ -441,6 +441,7 @@ InitializeVirtFdtDxe (
 
       PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
       PcdSet32 (PcdGicInterruptInterfaceBase, (UINT32)CpuBase);
+      PcdSet32 (PcdArmGicRevision, 2);
 
       DEBUG ((EFI_D_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
       break;
@@ -470,6 +471,7 @@ InitializeVirtFdtDxe (
 
       PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
       PcdSet32 (PcdGicRedistributorsBase, (UINT32)RedistBase);
+      PcdSet32 (PcdArmGicRevision, 3);
 
       DEBUG ((EFI_D_INFO, "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
         DistBase, RedistBase));

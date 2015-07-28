@@ -68,6 +68,11 @@
   gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0|UINT64|0x00000004
   gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress|0x0|UINT64|0x00000005
 
+  #
+  # Supported GIC revision (2, 3, ...)
+  #
+  gArmVirtTokenSpaceGuid.PcdArmGicRevision|0x0|UINT32|0x00000008
+
 [PcdsFeatureFlag]
   #
   # "Map PCI MMIO as Cached"

@@ -53,6 +53,7 @@
   gArmVirtTokenSpaceGuid.PcdArmPsciMethod
   gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress
   gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress
+  gArmVirtTokenSpaceGuid.PcdArmGicRevision
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
