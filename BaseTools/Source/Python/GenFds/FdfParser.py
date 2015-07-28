@@ -2068,8 +2068,11 @@ class FdfParser:
             if not (self.__GetBlockStatement(FvObj) or self.__GetFvBaseAddress(FvObj) or 
                 self.__GetFvForceRebase(FvObj) or self.__GetFvAlignment(FvObj) or 
                 self.__GetFvAttributes(FvObj) or self.__GetFvNameGuid(FvObj) or 
-                self.__GetFvExtEntryStatement(FvObj)):
+                self.__GetFvExtEntryStatement(FvObj) or self.__GetFvNameString(FvObj)):
                 break
+
+        if FvObj.FvNameString == 'TRUE' and not FvObj.FvNameGuid:
+            raise Warning("FvNameString found but FvNameGuid was not found", self.FileName, self.CurrentLineNumber)
 
         self.__GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
         self.__GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
@@ -2222,6 +2225,21 @@ class FdfParser:
             raise Warning("expected FV GUID value", self.FileName, self.CurrentLineNumber)
 
         FvObj.FvNameGuid = self.__Token
+
+        return True
+
+    def __GetFvNameString(self, FvObj):
+
+        if not self.__IsKeyword( "FvNameString"):
+            return False
+
+        if not self.__IsToken( "="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken() or self.__Token not in ('TRUE', 'FALSE'):
+            raise Warning("expected TRUE or FALSE for FvNameString", self.FileName, self.CurrentLineNumber)
+
+        FvObj.FvNameString = self.__Token
 
         return True
 

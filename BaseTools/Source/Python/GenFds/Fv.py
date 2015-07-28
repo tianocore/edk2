@@ -296,25 +296,26 @@ class FV (FvClassObject):
         if self.FvNameGuid <> None and self.FvNameGuid <> '':
             TotalSize = 16 + 4
             Buffer = ''
-            #
-            # Create EXT entry for FV UI name
-            # This GUID is used: A67DF1FA-8DE8-4E98-AF09-4BDF2EFFBC7C
-            #
-            FvUiLen = len(self.UiFvName)
-            TotalSize += (FvUiLen + 16 + 4)
-            Guid = FV_UI_EXT_ENTY_GUID.split('-')
-            #
-            # Layout:
-            #   EFI_FIRMWARE_VOLUME_EXT_ENTRY : size 4
-            #   GUID                          : size 16
-            #   FV UI name
-            #
-            Buffer += (pack('HH', (FvUiLen + 16 + 4), 0x0002)
-                       + pack('=LHHBBBBBBBB', int(Guid[0], 16), int(Guid[1], 16), int(Guid[2], 16),
-                              int(Guid[3][-4:-2], 16), int(Guid[3][-2:], 16), int(Guid[4][-12:-10], 16),
-                              int(Guid[4][-10:-8], 16), int(Guid[4][-8:-6], 16), int(Guid[4][-6:-4], 16),
-                              int(Guid[4][-4:-2], 16), int(Guid[4][-2:], 16))
-                       + self.UiFvName)
+            if self.FvNameString == 'TRUE':
+                #
+                # Create EXT entry for FV UI name
+                # This GUID is used: A67DF1FA-8DE8-4E98-AF09-4BDF2EFFBC7C
+                #
+                FvUiLen = len(self.UiFvName)
+                TotalSize += (FvUiLen + 16 + 4)
+                Guid = FV_UI_EXT_ENTY_GUID.split('-')
+                #
+                # Layout:
+                #   EFI_FIRMWARE_VOLUME_EXT_ENTRY : size 4
+                #   GUID                          : size 16
+                #   FV UI name
+                #
+                Buffer += (pack('HH', (FvUiLen + 16 + 4), 0x0002)
+                           + pack('=LHHBBBBBBBB', int(Guid[0], 16), int(Guid[1], 16), int(Guid[2], 16),
+                                  int(Guid[3][-4:-2], 16), int(Guid[3][-2:], 16), int(Guid[4][-12:-10], 16),
+                                  int(Guid[4][-10:-8], 16), int(Guid[4][-8:-6], 16), int(Guid[4][-6:-4], 16),
+                                  int(Guid[4][-4:-2], 16), int(Guid[4][-2:], 16))
+                           + self.UiFvName)
 
             for Index in range (0, len(self.FvExtEntryType)):
                 if self.FvExtEntryType[Index] == 'FILE':
