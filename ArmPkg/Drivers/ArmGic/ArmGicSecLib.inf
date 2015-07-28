@@ -27,12 +27,10 @@
   GicV2/ArmGicV2SecLib.c
 
 [Sources.ARM]
-  Arm/ArmGicArchLib.c
   GicV3/Arm/ArmGicV3.S     | GCC
   GicV3/Arm/ArmGicV3.asm   | RVCT
 
 [Sources.AARCH64]
-  AArch64/ArmGicArchLib.c
   GicV3/AArch64/ArmGicV3.S
 
 [Packages]
@@ -45,6 +43,7 @@
   ArmLib
   DebugLib
   IoLib
+  ArmGicArchLib
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdCoreCount

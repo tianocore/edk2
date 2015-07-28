@@ -15,13 +15,7 @@
 #ifndef __ARMGIC_H
 #define __ARMGIC_H
 
-//
-// GIC definitions
-//
-typedef enum {
-  ARM_GIC_ARCH_REVISION_2,
-  ARM_GIC_ARCH_REVISION_3
-} ARM_GIC_ARCH_REVISION;
+#include <Library/ArmGicArchLib.h>
 
 //
 // GIC Distributor
@@ -102,12 +96,6 @@ typedef enum {
 
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID                 0x3FF
-
-ARM_GIC_ARCH_REVISION
-EFIAPI
-ArmGicGetSupportedArchRevision (
-  VOID
-  );
 
 UINTN
 EFIAPI
