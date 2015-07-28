@@ -2,7 +2,7 @@
   The TPM definition block in ACPI table for physical presence  
   and MemoryClear.
 
-Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -41,7 +41,7 @@ DefinitionBlock (
       // Return the resource consumed by TPM device
       //
       Name (_CRS, ResourceTemplate () {
-        Memory32Fixed (ReadOnly, 0xfed40000, 0x5000)
+        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000)
       })
 
       //
