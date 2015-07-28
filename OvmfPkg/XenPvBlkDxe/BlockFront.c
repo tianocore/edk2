@@ -278,7 +278,7 @@ Again:
     //
     // This is not supported by the driver.
     //
-    DEBUG ((EFI_D_ERROR, "XenPvBlk: Unsupported sector-size value %d, "
+    DEBUG ((EFI_D_ERROR, "XenPvBlk: Unsupported sector-size value %Lu, "
             "it must be a multiple of 512\n", Value));
     goto Error2;
   }
@@ -384,7 +384,7 @@ XenPvBlockFrontShutdown (
       break;
     }
     DEBUG ((EFI_D_INFO,
-            "XenPvBlk: waiting backend state %d, current: %d\n",
+            "XenPvBlk: waiting backend state %d, current: %Lu\n",
             XenbusStateInitWait, Value));
     XenBusIo->WaitForWatch (XenBusIo, Dev->StateWatchToken);
   }
@@ -596,11 +596,11 @@ XenPvBlockAsyncIoPoll (
           if (Status != BLKIF_RSP_OKAY) {
             DEBUG ((EFI_D_ERROR,
                     "XenPvBlk: "
-                    "%a error %d on %a at sector %p, num bytes %p\n",
+                    "%a error %d on %a at sector %Lx, num bytes %Lx\n",
                     Response->operation == BLKIF_OP_READ ? "read" : "write",
                     Status, IoData->Dev->NodeName,
-                    IoData->Sector,
-                    IoData->Size));
+                    (UINT64)IoData->Sector,
+                    (UINT64)IoData->Size));
           }
 
           for (Index = 0; Index < IoData->NumRef; Index++) {

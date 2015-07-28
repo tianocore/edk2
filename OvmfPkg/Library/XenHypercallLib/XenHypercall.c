@@ -35,8 +35,8 @@ XenHypercallHvmGetParam (
                          HVMOP_get_param, (INTN) &Parameter);
   if (Error != 0) {
     DEBUG ((EFI_D_ERROR,
-            "XenHypercall: Error %d trying to get HVM parameter %d\n",
-            Error, Index));
+            "XenHypercall: Error %Ld trying to get HVM parameter %d\n",
+            (INT64)Error, Index));
     return 0;
   }
   return Parameter.value;

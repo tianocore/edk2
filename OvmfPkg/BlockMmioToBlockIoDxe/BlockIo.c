@@ -187,7 +187,8 @@ BlockIoReadBlocks (
   OUT VOID                    *Buffer
   )
 {
-  DEBUG ((EFI_D_INFO, "BlockIo (MMIO) ReadBlocks: lba=0x%lx, size=0x%x\n", Lba, BufferSize));
+  DEBUG ((EFI_D_INFO, "BlockIo (MMIO) ReadBlocks: lba=0x%Lx, size=0x%Lx\n",
+    Lba, (UINT64)BufferSize));
   return ReadOrWriteBlocks (
     This,
     TRUE,
@@ -234,7 +235,8 @@ BlockIoWriteBlocks (
   IN VOID                     *Buffer
   )
 {
-  DEBUG ((EFI_D_INFO, "BlockIo (MMIO) WriteBlocks: lba=0x%lx, size=0x%x\n", Lba, BufferSize));
+  DEBUG ((EFI_D_INFO, "BlockIo (MMIO) WriteBlocks: lba=0x%Lx, size=0x%Lx\n",
+    Lba, (UINT64)BufferSize));
   return ReadOrWriteBlocks (
     This,
     FALSE,
@@ -309,7 +311,7 @@ BlockIoInit (
     DEBUG ((EFI_D_ERROR, "BlockIoInit: OpenBlockMmioProtocol By Driver (%r)\n", Status));
     goto ON_ERROR;
   }
-  DEBUG ((EFI_D_INFO, "BlockMmio: 0x%x\n", BlockMmio));
+  DEBUG ((EFI_D_INFO, "BlockMmio: %p\n", BlockMmio));
   DEBUG ((EFI_D_INFO, "BlockMmio->Media->LastBlock: 0x%lx\n", BlockMmio->Media->LastBlock));
   
   Private->Signature            = BLOCK_MMIO_TO_BLOCK_IO_SIGNATURE;

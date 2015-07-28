@@ -836,10 +836,10 @@ TemporaryRamMigration (
   BASE_LIBRARY_JUMP_BUFFER         JumpBuffer;
   
   DEBUG ((EFI_D_INFO,
-    "TemporaryRamMigration(0x%x, 0x%x, 0x%x)\n",
-    (UINTN) TemporaryMemoryBase,
-    (UINTN) PermanentMemoryBase,
-    CopySize
+    "TemporaryRamMigration(0x%Lx, 0x%Lx, 0x%Lx)\n",
+    TemporaryMemoryBase,
+    PermanentMemoryBase,
+    (UINT64)CopySize
     ));
   
   OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;

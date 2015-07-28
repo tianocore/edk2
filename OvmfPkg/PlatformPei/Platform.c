@@ -365,7 +365,7 @@ DebugDumpCmos (
   VOID
   )
 {
-  UINTN  Loop;
+  UINT32 Loop;
 
   DEBUG ((EFI_D_INFO, "CMOS:\n"));
 

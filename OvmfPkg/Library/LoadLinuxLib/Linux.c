@@ -143,7 +143,8 @@ LoadLinuxInitializeKernelSetup (
   //
   ZeroMem (KernelSetup, 0x1f1);
   ZeroMem (((UINT8 *)KernelSetup) + SetupEnd, 4096 - SetupEnd);
-  DEBUG ((EFI_D_INFO, "Cleared kernel setup 0-0x1f1, 0x%x-0x1000\n", SetupEnd));
+  DEBUG ((EFI_D_INFO, "Cleared kernel setup 0-0x1f1, 0x%Lx-0x1000\n",
+    (UINT64)SetupEnd));
 
   return EFI_SUCCESS;
 }

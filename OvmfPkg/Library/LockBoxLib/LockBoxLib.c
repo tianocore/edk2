@@ -369,7 +369,7 @@ RestoreAllLockBoxInPlace (
       Buffer = (VOID *)(UINTN) Header->OrigAddress;
       CopyMem (Buffer, (VOID*)(UINTN)Header->CopyAddress, Header->Size);
       DEBUG ((DEBUG_VERBOSE, "%a: Guid=%g Buffer=%p\n", __FUNCTION__,
-        Header->Guid, Buffer));
+        &Header->Guid, Buffer));
     }
   }
   return RETURN_SUCCESS;

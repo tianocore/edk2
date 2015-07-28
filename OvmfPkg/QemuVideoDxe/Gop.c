@@ -70,7 +70,8 @@ QemuVideoCompleteModeData (
   Mode->FrameBufferBase = FrameBufDesc->AddrRangeMin;
   Mode->FrameBufferSize = Info->HorizontalResolution * Info->VerticalResolution;
   Mode->FrameBufferSize = Mode->FrameBufferSize * ((ModeData->ColorDepth + 7) / 8);
-  DEBUG ((EFI_D_INFO, "FrameBufferBase: 0x%x, FrameBufferSize: 0x%x\n", Mode->FrameBufferBase, Mode->FrameBufferSize));
+  DEBUG ((EFI_D_INFO, "FrameBufferBase: 0x%Lx, FrameBufferSize: 0x%Lx\n",
+    Mode->FrameBufferBase, (UINT64)Mode->FrameBufferSize));
 
   FreePool (FrameBufDesc);
   return EFI_SUCCESS;
