@@ -702,8 +702,9 @@ ShellOpenFileByName(
       }
       PathCleanUpDirectories (FileNameCopy);
       if (PathRemoveLastItem (FileNameCopy)) {
-        ShellCreateDirectory (FileNameCopy, FileHandle);
-        ShellCloseFile (FileHandle);
+        if (!EFI_ERROR(ShellCreateDirectory (FileNameCopy, FileHandle))) {
+          ShellCloseFile (FileHandle);
+        }
       }
       SHELL_FREE_NON_NULL (FileNameCopy);
     }
