@@ -15,9 +15,11 @@
 #include <Library/ArmLib.h>
 #include <Library/ArmGicLib.h>
 
-ARM_GIC_ARCH_REVISION
+STATIC ARM_GIC_ARCH_REVISION        mGicArchRevision;
+
+RETURN_STATUS
 EFIAPI
-ArmGicGetSupportedArchRevision (
+ArmGicArchLibInitialize (
   VOID
   )
 {
@@ -43,9 +45,22 @@ ArmGicGetSupportedArchRevision (
       IccSre = ArmGicV3GetControlSystemRegisterEnable ();
     }
     if (IccSre & ICC_SRE_EL2_SRE) {
-      return ARM_GIC_ARCH_REVISION_3;
+      mGicArchRevision = ARM_GIC_ARCH_REVISION_3;
+      goto Done;
     }
   }
 
-  return ARM_GIC_ARCH_REVISION_2;
+  mGicArchRevision = ARM_GIC_ARCH_REVISION_2;
+
+Done:
+  return RETURN_SUCCESS;
+}
+
+ARM_GIC_ARCH_REVISION
+EFIAPI
+ArmGicGetSupportedArchRevision (
+  VOID
+  )
+{
+  return mGicArchRevision;
 }

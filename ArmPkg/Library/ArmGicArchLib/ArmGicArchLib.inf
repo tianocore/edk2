@@ -17,7 +17,8 @@
   FILE_GUID                      = cd67f41a-26e9-4482-90c9-a9aff803382a
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmGicArchLib
+  LIBRARY_CLASS                  = ArmGicArchLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = ArmGicArchLibInitialize
 
 [Sources.ARM]
   Arm/ArmGicArchLib.c
