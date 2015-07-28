@@ -447,7 +447,7 @@ DxeTpm2MeasureBootHandler (
     // TrEE protocol is not installed. So, TPM2 is not present.
     // Don't do any measurement, and directly return EFI_SUCCESS.
     //
-    DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler - TrEE - %r\n", Status));
+    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - TrEE - %r\n", Status));
     return EFI_SUCCESS;
   }
 
