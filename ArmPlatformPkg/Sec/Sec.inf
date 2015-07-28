@@ -55,6 +55,7 @@
   ArmGicLib
   PrintLib
   SerialPortLib
+  ArmExceptionLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
