@@ -224,7 +224,7 @@ class Symbols:
         modSymbols  = {}
         fdIn        = open(mapFile, "r")
         reportLine  = fdIn.readline()
-        if reportLine.strip().find("Archive member included because of file (symbol)") != -1:
+        if reportLine.strip().find("Archive member included") != -1:
             #GCC
             #                0x0000000000001d55                IoRead8
             patchMapFileMatchString = "\s+(0x[0-9a-fA-F]{16})\s+([^\s][^0x][_a-zA-Z0-9\-]+)\s"
