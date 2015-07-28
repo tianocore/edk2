@@ -719,8 +719,8 @@ UfsExecNopCmds (
   IN  UFS_PASS_THRU_PRIVATE_DATA       *Private
   );
 
-extern GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUfsPassThruComponentName;
-extern GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUfsPassThruComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL   gUfsPassThruDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL  gUfsPassThruComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gUfsPassThruComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL  gUfsPassThruDriverBinding;
 
 #endif
