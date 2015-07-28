@@ -75,6 +75,7 @@
   # 04 = UUID-Based DHCPv6 Unique Identifier (DUID-UUID)
   # 02 = DUID Assigned by Vendor Based on Enterprise Number [DUID-EN] (not supported)
   # 03 = DUID Based on Link-layer Address [DUID-LL] (not supported)
+  # @Prompt Type Value of Dhcp6 Unique Identifier (DUID).
   gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType|4|UINT8|0x10000001
 
 [UserExtensions.TianoCore."ExtraFiles"]
