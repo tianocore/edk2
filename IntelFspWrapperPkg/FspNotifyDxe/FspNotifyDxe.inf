@@ -30,6 +30,7 @@
 
 [Sources]
   FspNotifyDxe.c
+  LoadBelow4G.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,6 +44,9 @@
   BaseMemoryLib
   UefiLib
   FspApiLib
+  PeCoffLib
+  CacheMaintenanceLib
+  DxeServicesLib
 
 [Protocols]
   gEfiPciEnumerationCompleteProtocolGuid            ## CONSUMES
