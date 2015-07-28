@@ -22,8 +22,9 @@ Abstract:
 
 --*/
 
+#include <Library/ArmGicLib.h>
+
 #include "ArmGicDxe.h"
-#include "GicV2/ArmGicV2Lib.h"
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 

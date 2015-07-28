@@ -15,8 +15,6 @@
 #include <Library/ArmLib.h>
 #include <Library/ArmGicLib.h>
 
-#include "GicV3/ArmGicV3Lib.h"
-
 ARM_GIC_ARCH_REVISION
 EFIAPI
 ArmGicGetSupportedArchRevision (

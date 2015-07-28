@@ -17,8 +17,6 @@
 #include <Library/IoLib.h>
 #include <Library/ArmGicLib.h>
 
-#include "GicV2/ArmGicV2Lib.h"
-
 /*
  * This function configures the interrupts set by the mask to be secure.
  *

@@ -19,9 +19,6 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
-#include "GicV2/ArmGicV2Lib.h"
-#include "GicV3/ArmGicV3Lib.h"
-
 /**
  * Return the base address of the GIC redistributor for the current CPU
  *
