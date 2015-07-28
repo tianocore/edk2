@@ -1293,7 +1293,7 @@ GetFullSmramRanges (
     //
     *FullSmramRangeCount = SmramRangeCount + 1;
     Size = (*FullSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR);
-    FullSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+    FullSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocateZeroPool (Size);
     ASSERT (FullSmramRanges != NULL);
 
     Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, FullSmramRanges);
@@ -1406,7 +1406,7 @@ GetFullSmramRanges (
   // Sort the entries,
   // and reserve one entry for SMM Core in the full SMRAM ranges.
   //
-  FullSmramRanges = AllocatePool ((TempSmramRangeCount + 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
+  FullSmramRanges = AllocateZeroPool ((TempSmramRangeCount + 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
   ASSERT (FullSmramRanges != NULL);
   *FullSmramRangeCount = 0;
   do {
