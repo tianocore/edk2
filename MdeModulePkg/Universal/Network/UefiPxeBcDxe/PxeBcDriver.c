@@ -1,7 +1,7 @@
 /** @file
   The driver binding for UEFI PXEBC protocol.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -371,6 +371,17 @@ PxeBcDriverBindingStart (
                   &gEfiLoadFileProtocolGuid,
                   &Private->LoadFile,
                   NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+  //
+  // Locate Ip4->Ip4Config2 and store it for set IPv4 Policy.
+  //
+  Status = gBS->HandleProtocol (
+                  ControllerHandle,
+                  &gEfiIp4Config2ProtocolGuid,
+                  (VOID **) &Private->Ip4Config2
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;

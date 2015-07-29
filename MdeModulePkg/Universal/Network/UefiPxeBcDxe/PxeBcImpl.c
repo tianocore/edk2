@@ -1,7 +1,7 @@
 /** @file
   Interface routines for PxeBc.
 
-Copyright (c) 2007 - 2013, 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -410,6 +410,18 @@ EfiPxeBcStart (
     goto ON_EXIT;
   }
 
+  //
+  //DHCP4 service allows only one of its children to be configured in  
+  //the active state, If the DHCP4 D.O.R.A started by IP4 auto  
+  //configuration and has not been completed, the Dhcp4 state machine 
+  //will not be in the right state for the PXE to start a new round D.O.R.A. 
+  //so we need to switch it's policy to static.
+  //
+  Status = PxeBcSetIp4Policy (Private);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+    
   Status = Private->Ip4->Configure (Private->Ip4, &Private->Ip4ConfigData);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;

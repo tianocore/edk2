@@ -2,7 +2,7 @@
   Support for PxeBc dhcp functions.
 
 Copyright (c) 2013, Red Hat, Inc.
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -645,6 +645,53 @@ PxeBcCacheDhcpOffer (
   // Count the accepted offers.
   //
   Private->NumOffers++;
+}
+
+/**
+  Switch the Ip4 policy to static.
+
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         The policy is already configured to static.
+  @retval     Others              Other error as indicated..
+
+**/
+EFI_STATUS
+PxeBcSetIp4Policy (   
+  IN PXEBC_PRIVATE_DATA            *Private
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_IP4_CONFIG2_PROTOCOL     *Ip4Config2;
+  EFI_IP4_CONFIG2_POLICY       Policy;
+  UINTN                        DataSize;
+
+  Ip4Config2 = Private->Ip4Config2;
+  DataSize = sizeof (EFI_IP4_CONFIG2_POLICY);
+  Status = Ip4Config2->GetData (
+                       Ip4Config2,
+                       Ip4Config2DataTypePolicy,
+                       &DataSize,
+                       &Policy
+                       );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  if (Policy != Ip4Config2PolicyStatic) {
+    Policy = Ip4Config2PolicyStatic;
+    Status= Ip4Config2->SetData (
+                          Ip4Config2,
+                          Ip4Config2DataTypePolicy,
+                          sizeof (EFI_IP4_CONFIG2_POLICY),
+                          &Policy
+                          );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    } 
+  }
+
+  return  EFI_SUCCESS;
 }
 
 

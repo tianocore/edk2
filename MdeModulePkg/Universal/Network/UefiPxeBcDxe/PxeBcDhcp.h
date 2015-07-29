@@ -2,7 +2,7 @@
   Dhcp and Discover routines for PxeBc.
 
 Copyright (c) 2013, Red Hat, Inc.
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -380,6 +380,19 @@ PxeBcDhcpCallBack (
   OUT EFI_DHCP4_PACKET                 **NewPacket OPTIONAL
   );
 
+/**
+  Switch the Ip4 policy to static.
+
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         The policy is already configured to static.
+  @retval     Others              Other error as indicated..
+
+**/
+EFI_STATUS
+PxeBcSetIp4Policy (   
+  IN PXEBC_PRIVATE_DATA            *Private
+  );
 
 /**
   Discover the boot of service and initialize the vendor option if exists.
