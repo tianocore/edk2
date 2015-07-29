@@ -1,7 +1,7 @@
 /** @file
   EFI PCI IO protocol functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1568,15 +1568,10 @@ PciIoAttributes (
   //
   // Check VGA and VGA16, they can not be set at the same time
   //
-  if (((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO) != 0         &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO_16) != 0)         ||
-      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO) != 0         &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16) != 0) ||
-      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO) != 0 &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO_16) != 0)         ||
-      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO) != 0 &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16) != 0) ) {
-    return EFI_UNSUPPORTED;
+  if ((Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO)) != 0) {
+    if ((Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_IO_16 | EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) != 0) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   //
