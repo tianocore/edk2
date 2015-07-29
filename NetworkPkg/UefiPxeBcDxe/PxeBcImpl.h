@@ -24,6 +24,7 @@
 #include <Protocol/NetworkInterfaceIdentifier.h>
 #include <Protocol/Arp.h>
 #include <Protocol/Ip4.h>
+#include <Protocol/Ip4Config2.h>
 #include <Protocol/Ip6.h>
 #include <Protocol/Ip6Config.h>
 #include <Protocol/Udp4.h>
@@ -116,6 +117,7 @@ struct _PXEBC_PRIVATE_DATA {
 
   EFI_ARP_PROTOCOL                          *Arp;
   EFI_IP4_PROTOCOL                          *Ip4;
+  EFI_IP4_CONFIG2_PROTOCOL                  *Ip4Config2;
   EFI_DHCP4_PROTOCOL                        *Dhcp4;
   EFI_MTFTP4_PROTOCOL                       *Mtftp4;
   EFI_UDP4_PROTOCOL                         *Udp4Read;

@@ -204,6 +204,18 @@ EfiPxeBcStart (
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
+
+    //
+    //DHCP4 service allows only one of its children to be configured in  
+    //the active state, If the DHCP4 D.O.R.A started by IP4 auto  
+    //configuration and has not been completed, the Dhcp4 state machine 
+    //will not be in the right state for the PXE to start a new round D.O.R.A. 
+    //so we need to switch it's policy to static.
+    //
+    Status = PxeBcSetIp4Policy (Private);
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
   //

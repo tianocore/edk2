@@ -742,6 +742,18 @@ PxeBcCreateIp4Children (
   Private->Ip4Nic->Private   = Private;
   Private->Ip4Nic->Signature = PXEBC_VIRTUAL_NIC_SIGNATURE;
 
+   //
+  // Locate Ip4->Ip4Config2 and store it for set IPv4 Policy.
+  //
+  Status = gBS->HandleProtocol (
+                  ControllerHandle,
+                  &gEfiIp4Config2ProtocolGuid,
+                  (VOID **) &Private->Ip4Config2
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
   //
   // Create a device path node for Ipv4 virtual nic, and append it.
   //

@@ -1506,6 +1506,52 @@ PxeBcDhcp4Discover (
   return Status;
 }
 
+/**
+  Switch the Ip4 policy to static.
+
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         The policy is already configured to static.
+  @retval     Others              Other error as indicated..
+
+**/
+EFI_STATUS
+PxeBcSetIp4Policy (   
+  IN PXEBC_PRIVATE_DATA            *Private
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_IP4_CONFIG2_PROTOCOL     *Ip4Config2;
+  EFI_IP4_CONFIG2_POLICY       Policy;
+  UINTN                        DataSize;
+
+  Ip4Config2 = Private->Ip4Config2;
+  DataSize = sizeof (EFI_IP4_CONFIG2_POLICY);
+  Status = Ip4Config2->GetData (
+                       Ip4Config2,
+                       Ip4Config2DataTypePolicy,
+                       &DataSize,
+                       &Policy
+                       );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  if (Policy != Ip4Config2PolicyStatic) {
+    Policy = Ip4Config2PolicyStatic;
+    Status= Ip4Config2->SetData (
+                          Ip4Config2,
+                          Ip4Config2DataTypePolicy,
+                          sizeof (EFI_IP4_CONFIG2_POLICY),
+                          &Policy
+                          );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    } 
+  }
+
+  return  EFI_SUCCESS;
+}
 
 /**
   Start the D.O.R.A DHCPv4 process to acquire the IPv4 address and other PXE boot information.

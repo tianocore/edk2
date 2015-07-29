@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -372,6 +372,20 @@ PxeBcDhcp4Discover (
   IN  EFI_IP_ADDRESS                  *DestIp,
   IN  UINT16                          IpCount,
   IN  EFI_PXE_BASE_CODE_SRVLIST       *SrvList
+  );
+
+/**
+  Switch the Ip4 policy to static.
+
+  @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
+
+  @retval     EFI_SUCCESS         The policy is already configured to static.
+  @retval     Others              Other error as indicated..
+
+**/
+EFI_STATUS
+PxeBcSetIp4Policy (   
+  IN PXEBC_PRIVATE_DATA            *Private
   );
 
 

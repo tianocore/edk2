@@ -79,6 +79,7 @@
   gEfiArpProtocolGuid                                  ## TO_START
   gEfiIp4ServiceBindingProtocolGuid                    ## TO_START
   gEfiIp4ProtocolGuid                                  ## TO_START
+  gEfiIp4Config2ProtocolGuid                           ## TO_START
   gEfiIp6ServiceBindingProtocolGuid                    ## TO_START
   gEfiIp6ProtocolGuid                                  ## TO_START
   gEfiIp6ConfigProtocolGuid                            ## TO_START
