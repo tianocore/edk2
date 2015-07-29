@@ -4103,6 +4103,7 @@ VariableCommonInitialize (
   //
   // Init non-volatile variable store.
   //
+  NvFvHeader = NULL;
   Status = InitNonVolatileVariableStore (&NvFvHeader);
   if (EFI_ERROR (Status)) {
     FreePool (mVariableModuleGlobal);
