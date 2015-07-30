@@ -140,6 +140,7 @@
   IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   IntelFrameworkModulePkg/Library/DxeCapsuleLib/DxeCapsuleLib.inf
   IntelFrameworkModulePkg/Library/LegacyBootManagerLib/LegacyBootManagerLib.inf
+  IntelFrameworkModulePkg/Library/LegacyBootMaintUiLib/LegacyBootMaintUiLib.inf
 
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
