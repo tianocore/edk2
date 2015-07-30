@@ -22,7 +22,7 @@
   LIBRARY_CLASS                  = LibSoftfloat
 
 #
-#  VALID_ARCHITECTURES           = ARM
+#  VALID_ARCHITECTURES           = ARM AARCH64
 #
 
 #  Only tested with GCC
@@ -42,6 +42,15 @@
   Arm/__aeabi_fcmplt.c
   Arm/__aeabi_dcmpun.c
   Arm/__aeabi_fcmpun.c
+
+[Sources.AARCH64]
+  bits64/softfloat.c
+  eqtf2.c
+  getf2.c
+  gttf2.c
+  letf2.c
+  lttf2.c
+  netf2.c
 
 [Sources]
   fpgetround.c

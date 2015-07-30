@@ -35,6 +35,9 @@
 [Includes.ARM]
   Include/Arm
 
+[Includes.AARCH64]
+  Include/Aarch64
+
 
 [Guids]
   gStdLibTokenSpaceGuid          = { 0x447559f0, 0xd02e, 0x4cf1, { 0x99, 0xbc, 0xca, 0x11, 0x65, 0x40, 0x54, 0xc2 }}

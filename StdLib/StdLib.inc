@@ -80,6 +80,9 @@
 [LibraryClasses.AArch64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
+  # Use the softfloat library to cover missing hardfloat operations.
+  NULL|StdLib/LibC/Softfloat/Softfloat.inf
+
   # Add support for GCC stack protector
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 

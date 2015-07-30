@@ -89,6 +89,9 @@
   Main/Arm/floatunsidf.c
   Main/Arm/flt_rounds.c
 
+[Sources.AARCH64]
+  Main/Arm/flt_rounds.c
+
 [Binaries.IA32]
   LIB|Main/Ia32/ftol2.obj|*|MSFT
 
