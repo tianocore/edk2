@@ -85,6 +85,8 @@
   Main/Ipf/FpuRmode.s
 
 [Sources.ARM]
+  Main/Arm/fixunsdfsi.c
+  Main/Arm/floatunsidf.c
   Main/Arm/flt_rounds.c
 
 [Binaries.IA32]
