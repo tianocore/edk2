@@ -77,6 +77,14 @@ formset
          help = STRING_TOKEN(STR_FORM_TIME_OUT_HELP),
          flags = INTERACTIVE,
          key = FORM_TIME_OUT_ID;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text
+         help   = STRING_TOKEN(STR_RESET),
+         text   = STRING_TOKEN(STR_RESET),
+         flags  = INTERACTIVE,
+         key    = FORM_RESET;
          
     label LABEL_BMM_PLATFORM_INFORMATION;
     //

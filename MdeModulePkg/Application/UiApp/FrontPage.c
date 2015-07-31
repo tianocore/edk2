@@ -449,14 +449,6 @@ FrontPageCallback (
       InitializeLanguage();
       break;
 
-
-    case FRONT_PAGE_KEY_RESET:
-      //
-      // Reset
-      //
-      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-      return EFI_UNSUPPORTED;
-
     default:
       break;
     }

@@ -602,6 +602,10 @@ BootMaintCallback (
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
 
       break;
+ 
+    case FORM_RESET:
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+      return EFI_UNSUPPORTED;
 
     default:
       break;
