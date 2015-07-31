@@ -238,12 +238,7 @@ BOpt_FindFileSystem (
   UINT16                    *TempStr;
   UINTN                     OptionNumber;
   VOID                      *Buffer;
-  EFI_LEGACY_BIOS_PROTOCOL  *LegacyBios;
-  UINT16                    DeviceType;
-  BBS_BBS_DEVICE_PATH       BbsDevicePathNode;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   BOOLEAN                   RemovableMedia;
-
 
   NoSimpleFsHandles = 0;
   NoLoadFileHandles = 0;
@@ -443,59 +438,6 @@ BOpt_FindFileSystem (
     FreePool (LoadFileHandle);
   }
 
-  //
-  // Add Legacy Boot Option Support Here
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiLegacyBiosProtocolGuid,
-                  NULL,
-                  (VOID **) &LegacyBios
-                  );
-  if (!EFI_ERROR (Status)) {
-
-    for (Index = BBS_TYPE_FLOPPY; Index <= BBS_TYPE_EMBEDDED_NETWORK; Index++) {
-      MenuEntry = BOpt_CreateMenuEntry (BM_FILE_CONTEXT_SELECT);
-      if (NULL == MenuEntry) {
-        return EFI_OUT_OF_RESOURCES;
-      }
-
-      FileContext                       = (BM_FILE_CONTEXT *) MenuEntry->VariableContext;
-
-      FileContext->IsRemovableMedia     = FALSE;
-      FileContext->IsLoadFile           = TRUE;
-      FileContext->IsBootLegacy         = TRUE;
-      DeviceType                        = (UINT16) Index;
-      BbsDevicePathNode.Header.Type     = BBS_DEVICE_PATH;
-      BbsDevicePathNode.Header.SubType  = BBS_BBS_DP;
-      SetDevicePathNodeLength (
-        &BbsDevicePathNode.Header,
-        sizeof (BBS_BBS_DEVICE_PATH)
-        );
-      BbsDevicePathNode.DeviceType  = DeviceType;
-      BbsDevicePathNode.StatusFlag  = 0;
-      BbsDevicePathNode.String[0]   = 0;
-      DevicePath = AppendDevicePathNode (
-                    EndDevicePath,
-                    (EFI_DEVICE_PATH_PROTOCOL *) &BbsDevicePathNode
-                    );
-
-      FileContext->DevicePath   = DevicePath;
-      MenuEntry->HelpString     = UiDevicePathToStr (FileContext->DevicePath);
-
-      TempStr                   = MenuEntry->HelpString;
-      MenuEntry->DisplayString  = AllocateZeroPool (MAX_CHAR);
-      ASSERT (MenuEntry->DisplayString != NULL);
-      UnicodeSPrint (
-        MenuEntry->DisplayString,
-        MAX_CHAR,
-        L"Boot Legacy [%s]",
-        TempStr
-        );
-      MenuEntry->OptionNumber = OptionNumber;
-      OptionNumber++;
-      InsertTailList (&FsOptionMenu.Head, &MenuEntry->Link);
-    }
-  }
   //
   // Remember how many file system options are here
   //

@@ -63,8 +63,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   DevicePathLib
@@ -112,7 +110,6 @@
   gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
   gEfiSmbiosProtocolGuid                        ## PROTOCOL CONSUMES
   gEfiGenericMemTestProtocolGuid                ## PROTOCOL CONSUMES
-  gEfiLegacyBiosProtocolGuid                    ## PROTOCOL CONSUMES
   gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport ## PROTOCOL SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid                       ## PROTOCOL CONSUMES
   gEfiGraphicsOutputProtocolGuid                ## PROTOCOL SOMETIMES_CONSUMES
@@ -133,7 +130,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn

@@ -232,35 +232,6 @@ UpdateConCOMPage (
   UpdatePageEnd (CallbackData);
 }
 
-/**
-
-  IsShellNodeDevicePath checks for the Shell device path. 
-  If it's the shell device path then return TRUE otherwise 
-  return FALSE.
-
-  @param DevicePath    The DevicePath to check
-
-  @retval  TRUE        DevicePath is Shell
-  @retval  FALSE       DevicePath is not Shell
-
-**/
-BOOLEAN
-IsShellNodeDevicePath(
-  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath
-  )
-{
-
-  EFI_DEVICE_PATH_PROTOCOL              *Node;
-
-  for (Node = FilePath; !IsDevicePathEnd(Node); Node = NextDevicePathNode(Node)) 
-  {
-    if ((DevicePathType (Node) == MEDIA_DEVICE_PATH) && (DevicePathSubType (Node) == MEDIA_PIWG_FW_FILE_DP)) {
-      if (!CompareMem(PcdGetPtr(PcdShellFile), &(((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)Node)->FvFileName), sizeof(EFI_GUID)))
-         return TRUE;
-    }
-  }
-  return FALSE;
-}
 
 /**
   Create a list of boot option from global BootOptionMenu. It

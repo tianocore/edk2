@@ -27,7 +27,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/CapsuleVendor.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/FileInfo.h>
-//#include <Guid/HiiSetupEnter.h>
 #include <Guid/HiiBootMaintenanceFormset.h>
 
 #include <Protocol/LoadFile.h>
@@ -44,7 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
 #include <Protocol/SerialIo.h>
-#include <Protocol/LegacyBios.h>
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/DriverHealth.h>
 #include <Protocol/DevicePathToText.h>
