@@ -265,7 +265,7 @@ FspApiCallingCheck (
     //
     if ((UINT32)FspData != 0xFFFFFFFF) {
       Status = EFI_UNSUPPORTED;
-    } else if ((FspRtBuffer == NULL) || ((FspRtBuffer->BootLoaderTolumSize % EFI_PAGE_SIZE) != 0)) {
+    } else if ((FspRtBuffer == NULL) || ((FspRtBuffer->BootLoaderTolumSize % EFI_PAGE_SIZE) != 0) || (EFI_ERROR(FspUpdSignatureCheck(ApiIdx, ApiParam)))) {
       Status = EFI_INVALID_PARAMETER;
     }
   } else if (ApiIdx == 2) {
@@ -285,7 +285,7 @@ FspApiCallingCheck (
     //
     if ((UINT32)FspData != 0xFFFFFFFF) {
       Status = EFI_UNSUPPORTED;
-    } else if ((FspRtBuffer == NULL) || ((FspRtBuffer->BootLoaderTolumSize % EFI_PAGE_SIZE) != 0)) {
+    } else if ((FspRtBuffer == NULL) || ((FspRtBuffer->BootLoaderTolumSize % EFI_PAGE_SIZE) != 0) || (EFI_ERROR(FspUpdSignatureCheck(ApiIdx, ApiParam)))) {
       Status = EFI_INVALID_PARAMETER;
     }
   } else if (ApiIdx == 4) {
@@ -308,6 +308,8 @@ FspApiCallingCheck (
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
         Status = EFI_UNSUPPORTED;
+      } else if (EFI_ERROR(FspUpdSignatureCheck(ApiIdx, ApiParam))) {
+        Status = EFI_INVALID_PARAMETER;
       }
     }
   } else {

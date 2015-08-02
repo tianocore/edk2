@@ -88,6 +88,48 @@ are permitted provided that the following conditions are met:
 **/
 """
 
+def UpdateMemSiUpdInitOffsetValue (DscFile):
+    DscFd        = open(DscFile, "r")
+    DscLines     = DscFd.readlines()
+    DscFd.close()
+
+    DscContent = []
+    MemUpdInitOffset = 0
+    SiUpdInitOffset = 0
+    MemUpdInitOffsetValue = 0
+    SiUpdInitOffsetValue = 0
+
+    while len(DscLines):
+        DscLine  = DscLines.pop(0)
+        DscContent.append(DscLine)
+        DscLine = DscLine.strip()
+        Match = re.match("^([_a-zA-Z0-9]+).(MemoryInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+        if Match:
+            MemUpdInitOffsetValue = int(Match.group(5), 0)
+        Match = re.match("^\s*([_a-zA-Z0-9]+).(SiliconInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+        if Match:
+            SiUpdInitOffsetValue = int(Match.group(5), 0)
+        Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(0x244450554D454D24)",DscLine)
+        if Match:
+            MemUpdInitOffset = int(Match.group(3), 0)
+        Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(0x244450555F495324)",DscLine)
+        if Match:
+            SiUpdInitOffset = int(Match.group(3), 0)
+
+    if MemUpdInitOffsetValue != MemUpdInitOffset or SiUpdInitOffsetValue != SiUpdInitOffset:
+        MemUpdInitOffsetStr = "0x%08X" % MemUpdInitOffset
+        SiUpdInitOffsetStr = "0x%08X" % SiUpdInitOffset
+        DscFd = open(DscFile,"w")
+        for DscLine in DscContent:
+            Match = re.match("^\s*([_a-zA-Z0-9]+).(MemoryInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+            if Match:
+                 DscLine = re.sub(r'(?:[^\s]+\s*$)', MemUpdInitOffsetStr + '\n', DscLine)
+            Match = re.match("^\s*([_a-zA-Z0-9]+).(SiliconInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+            if Match:
+                 DscLine = re.sub(r'(?:[^\s]+\s*$)', SiUpdInitOffsetStr + '\n', line)
+            DscFd.writelines(DscLine)
+        DscFd.close()
+
 class CLogicalExpression:
     def __init__(self):
         self.index    = 0
@@ -889,6 +931,22 @@ EndList
                 return 256
 
         TxtBody = []
+        for Item in self._CfgItemList:
+           if str(Item['cname']) == 'Signature' and Item['length'] == 8:
+               Value = int(Item['value'], 16)
+               Chars = []
+               while Value != 0x0:
+                   Chars.append(chr(Value & 0xFF))
+                   Value = Value >> 8
+               SignatureStr = ''.join(Chars)
+               if int(Item['offset']) == 0:
+                   TxtBody.append("#define FSP_UPD_SIGNATURE                %s        /* '%s' */\n" % (Item['value'], SignatureStr))
+               elif 'MEM' in SignatureStr:
+                   TxtBody.append("#define FSP_MEMORY_INIT_UPD_SIGNATURE    %s        /* '%s' */\n" % (Item['value'], SignatureStr))
+               else:
+                   TxtBody.append("#define FSP_SILICON_INIT_UPD_SIGNATURE   %s        /* '%s' */\n" % (Item['value'], SignatureStr))
+        TxtBody.append("\n")
+
         for Region in ['UPD', 'VPD']:
 
             # Write  PcdVpdRegionSign and PcdImageRevision
@@ -1175,6 +1233,8 @@ def Main():
         if not os.path.exists(DscFile):
             print "ERROR: Cannot open DSC file '%s' !" % DscFile
             return 2
+
+        UpdateMemSiUpdInitOffsetValue(DscFile)
 
         OutFile = ''
         if argc > 4:

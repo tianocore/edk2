@@ -86,7 +86,9 @@ FspMigrateTemporaryMemory (
   FSP_INIT_PARAMS           *FspInitParams;
   UINT32                    *NewStackTop;
   VOID                      *BootLoaderTempRamHob;
-  VOID                      *UpdDataRgnPtr;
+  UINT32                    UpdDataRgnPtr;
+  UINT32                    MemoryInitUpdPtr;
+  UINT32                    SiliconInitUpdPtr;
   VOID                      *PlatformDataPtr;
   UINT8                      ApiMode;
     
@@ -105,7 +107,7 @@ FspMigrateTemporaryMemory (
   if (ApiMode == 0) {
     BootLoaderTempRamHob = BuildGuidHob (&gFspBootLoaderTemporaryMemoryGuid, BootLoaderTempRamSize);
   } else {
-    BootLoaderTempRamHob = (VOID *)AllocatePool (BootLoaderTempRamSize);
+    BootLoaderTempRamHob = (VOID *)AllocatePages (EFI_SIZE_TO_PAGES (BootLoaderTempRamSize));
   }
   ASSERT(BootLoaderTempRamHob != NULL);
 
@@ -150,9 +152,20 @@ FspMigrateTemporaryMemory (
   //
   // Update UPD pointer in FSP Global Data
   //
-  UpdDataRgnPtr = ((FSP_INIT_RT_COMMON_BUFFER *)FspInitParams->RtBufferPtr)->UpdDataRgnPtr;
-  if (UpdDataRgnPtr != NULL) {
-    SetFspUpdDataPointer (UpdDataRgnPtr);
+  if (ApiMode == 0) {
+    UpdDataRgnPtr = (UINT32)((UINT32 *)GetFspUpdDataPointer ());
+    if (UpdDataRgnPtr >= BootLoaderTempRamStart && UpdDataRgnPtr < BootLoaderTempRamEnd) {
+      MemoryInitUpdPtr = (UINT32)((UINT32 *)GetFspMemoryInitUpdDataPointer ());
+      SiliconInitUpdPtr = (UINT32)((UINT32 *)GetFspSiliconInitUpdDataPointer ());
+      SetFspUpdDataPointer ((VOID *)(UpdDataRgnPtr + OffsetGap));
+      SetFspMemoryInitUpdDataPointer ((VOID *)(MemoryInitUpdPtr + OffsetGap));
+      SetFspSiliconInitUpdDataPointer ((VOID *)(SiliconInitUpdPtr + OffsetGap));
+    }
+  } else {
+    MemoryInitUpdPtr = (UINT32)((UINT32 *)GetFspMemoryInitUpdDataPointer ());
+    if (MemoryInitUpdPtr >= BootLoaderTempRamStart && MemoryInitUpdPtr < BootLoaderTempRamEnd) {
+      SetFspMemoryInitUpdDataPointer ((VOID *)(MemoryInitUpdPtr + OffsetGap));
+    }
   }
 
   //

@@ -15,14 +15,14 @@
 #define _SEC_FSPE_H_
 
 #include <PiPei.h>
+#include <FspApi.h>
 #include <Library/PcdLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/FspCommonLib.h>
-
-#include <FspApi.h>
+#include <Library/FspSecPlatformLib.h>
 
 #define FSP_MCUD_SIGNATURE  SIGNATURE_32 ('M', 'C', 'U', 'D')
 #define FSP_PER0_SIGNATURE  SIGNATURE_32 ('P', 'E', 'R', '0')
