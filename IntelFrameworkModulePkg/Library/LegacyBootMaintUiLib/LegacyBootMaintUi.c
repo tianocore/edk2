@@ -1181,6 +1181,9 @@ GetLegacyOptionsOrder (
   UINTN                       Bit;
   UINT8                       *DisMap;
 
+  LegacyDev = NULL;
+  OptionMenu = NULL;
+
   DisMap = ZeroMem (mLegacyBootOptionPrivate->MaintainMapData->DisableMap, sizeof (mLegacyBootOptionPrivate->MaintainMapData->DisableMap));
 
   //
