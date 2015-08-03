@@ -29,6 +29,13 @@ SECTIONS {
     *(.text .text.* .stub .gnu.linkonce.t.*)
     *(.rodata .rodata.* .gnu.linkonce.r.*)
     *(.got .got.*)
+
+    /*
+     * The contents of AutoGen.c files are constant from the POV of the program,
+     * but most of its contents end up in .data or .bss by default since few of
+     * the variable definitions that get emitted are declared as CONST.
+     */
+    *:AutoGen.obj(.data .data.* .bss .bss.*)
   }
 
   /*
