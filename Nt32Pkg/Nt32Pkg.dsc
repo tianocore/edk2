@@ -120,7 +120,6 @@
   #
   # Platform
   #
-  PlatformBdsLib|Nt32Pkg/Library/Nt32BdsLib/Nt32BdsLib.inf
   PlatformBootManagerLib|Nt32Pkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   #
   # Misc
