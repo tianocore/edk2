@@ -197,6 +197,8 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
+  EfiBootManagerConnectAll ();
+  EfiBootManagerRefreshAllBootOption ();
   Print (
     L"\n"
     L"F2    to enter Boot Manager Menu.\n"
