@@ -7,7 +7,7 @@ SECTIONS
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
     . = ALIGN(0x20);
-  } =0x90909090
+  }
   .data ALIGN(0x40) :
   {
     *(
