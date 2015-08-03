@@ -6,12 +6,12 @@ SECTIONS
   .text : ALIGN(0x1000)
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
+    *(.rodata .rodata.* .gnu.linkonce.r.*)
     . = ALIGN(0x20);
   }
   .data : ALIGN(0x1000)
   {
     *(
-      .rodata .rodata.* .gnu.linkonce.r.*
       .data .data.* .gnu.linkonce.d.*
       .bss .bss.*
       *COM*
