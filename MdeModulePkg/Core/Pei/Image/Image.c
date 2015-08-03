@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -117,7 +117,8 @@ GetImageReadFunction (
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
   
-  if (Private->PeiMemoryInstalled  && ((Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME) || PcdGetBool (PcdShadowPeimOnS3Boot))  &&
+  if (Private->PeiMemoryInstalled  && (((Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnBoot)) || 
+      ((Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot))) &&
       (EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_X64) || EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_IA32))) {
     // 
     // Shadow algorithm makes lots of non ANSI C assumptions and only works for IA32 and X64 
@@ -328,6 +329,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
   Loads and relocates a PE/COFF image into memory.
   If the image is not relocatable, it will not be loaded into memory and be loaded as XIP image.
 
+  @param FileHandle      - Pointer to the FFS file header of the image.
   @param Pe32Data        - The base address of the PE/COFF file that is to be loaded and relocated
   @param ImageAddress    - The base address of the relocated PE/COFF image
   @param ImageSize       - The size of the relocated PE/COFF image
@@ -342,6 +344,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
 **/
 EFI_STATUS
 LoadAndRelocatePeCoffImage (
+  IN  EFI_PEI_FILE_HANDLE                       FileHandle,
   IN  VOID                                      *Pe32Data,
   OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
   OUT UINT64                                    *ImageSize,
@@ -354,6 +357,8 @@ LoadAndRelocatePeCoffImage (
   UINT64                                AlignImageSize;
   BOOLEAN                               IsXipImage;
   EFI_STATUS                            ReturnStatus;
+  BOOLEAN                               IsS3Boot;
+  BOOLEAN                               IsRegisterForShadow;
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
@@ -371,6 +376,19 @@ LoadAndRelocatePeCoffImage (
   }
   
   //
+  // Initilize local IsS3Boot and IsRegisterForShadow variable
+  //
+  IsS3Boot = FALSE;
+  if (Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) {
+    IsS3Boot = TRUE;
+  }
+  IsRegisterForShadow = FALSE;
+  if ((Private->CurrentFileHandle == FileHandle) 
+    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] == PEIM_STATE_REGISITER_FOR_SHADOW)) {
+    IsRegisterForShadow = TRUE;
+  }
+
+  //
   // XIP image that ImageAddress is same to Image handle.
   //
   if (ImageContext.ImageAddress == (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data) {
@@ -380,7 +398,8 @@ LoadAndRelocatePeCoffImage (
   //
   // When Image has no reloc section, it can't be relocated into memory.
   //
-  if (ImageContext.RelocationsStripped && (Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
+  if (ImageContext.RelocationsStripped && (Private->PeiMemoryInstalled) && (
+      (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) || (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
     DEBUG ((EFI_D_INFO|EFI_D_LOAD, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
   }
 
@@ -390,9 +409,12 @@ LoadAndRelocatePeCoffImage (
   ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data;
 
   //
-  // Allocate Memory for the image when memory is ready, boot mode is not S3, and image is relocatable.
+  // Allocate Memory for the image when memory is ready, and image is relocatable.
+  // On normal boot, PcdShadowPeimOnBoot decides whether load PEIM or PeiCore into memory.
+  // On S3 boot, PcdShadowPeimOnS3Boot decides whether load PEIM or PeiCore into memory.
   //
-  if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
+  if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && (
+      (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) || (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
     //
     // Allocate more buffer to avoid buffer overflow.
     //
@@ -571,6 +593,7 @@ PeiLoadImageLoadImage (
   // If memory is installed, perform the shadow operations
   //
   Status = LoadAndRelocatePeCoffImage (
+    FileHandle,
     Pe32Data,
     &ImageAddress,
     &ImageSize,

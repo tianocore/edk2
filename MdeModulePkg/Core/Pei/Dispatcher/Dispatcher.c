@@ -697,6 +697,9 @@ PeiDispatcher (
       for (Index2 = 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
         if (Private->Fv[Index1].PeimState[Index2] == PEIM_STATE_REGISITER_FOR_SHADOW) {
           PeimFileHandle = Private->Fv[Index1].FvFileHandles[Index2];
+          Private->CurrentFileHandle   = PeimFileHandle;
+          Private->CurrentPeimFvCount  = Index1;
+          Private->CurrentPeimCount    = Index2;
           Status = PeiLoadImage (
                     (CONST EFI_PEI_SERVICES **) &Private->Ps,
                     PeimFileHandle,
@@ -709,9 +712,6 @@ PeiDispatcher (
             // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
             //
             Private->Fv[Index1].PeimState[Index2]++;
-            Private->CurrentFileHandle   = PeimFileHandle;
-            Private->CurrentPeimFvCount  = Index1;
-            Private->CurrentPeimCount    = Index2;
             //
             // Call the PEIM entry point
             //
@@ -1108,6 +1108,21 @@ PeiDispatcher (
               // We call the entry point a 2nd time so the module knows it's shadowed.
               //
               //PERF_START (PeiServices, L"PEIM", PeimFileHandle, 0);
+              if ((Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME) && !PcdGetBool (PcdShadowPeimOnBoot)) {
+                //
+                // Load PEIM into Memory for Register for shadow PEIM.
+                //
+                Status = PeiLoadImage (
+                           PeiServices,
+                           PeimFileHandle,
+                           PEIM_STATE_REGISITER_FOR_SHADOW,
+                           &EntryPoint,
+                           &AuthenticationState
+                           );
+                if (Status == EFI_SUCCESS) {
+                  PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
+                }
+              }
               ASSERT (PeimEntryPoint != NULL);
               PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
               //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);

@@ -114,6 +114,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot                      ## CONSUMES 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot                        ## CONSUMES 
 
 # [BootMode]
 # S3_RESUME             ## SOMETIMES_CONSUMES

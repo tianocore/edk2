@@ -259,7 +259,11 @@ PeiCore (
       // Shadow PEI Core. When permanent memory is avaiable, shadow
       // PEI Core and PEIMs to get high performance.
       //
-      OldCoreData->ShadowedPeiCore = ShadowPeiCore (OldCoreData);
+      OldCoreData->ShadowedPeiCore = (PEICORE_FUNCTION_POINTER) (UINTN) PeiCore;
+      if ((HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME && PcdGetBool (PcdShadowPeimOnS3Boot))
+          || (HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME && PcdGetBool (PcdShadowPeimOnBoot))) {
+        OldCoreData->ShadowedPeiCore = ShadowPeiCore (OldCoreData);
+      }
       
       //
       // PEI Core has now been shadowed to memory.  Restart PEI Core in memory.

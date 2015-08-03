@@ -889,6 +889,13 @@
   # @Prompt Shadow Peim On S3 Boot. 
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot|FALSE|BOOLEAN|0x30001028
 
+  ## Indicates if to shadow PEIM and PeiCore after memory is ready.<BR><BR>
+  #  This PCD is used on other boot path except for S3 boot. 
+  #   TRUE  - Shadow PEIM and PeiCore after memory is ready.<BR>
+  #   FALSE - Not shadow PEIM after memory is ready.<BR>
+  # @Prompt Shadow Peim and PeiCore on boot
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|TRUE|BOOLEAN|0x30001029
+
   ## The mask is used to control memory profile behavior.<BR><BR>
   #  BIT0 - Enable UEFI memory profile.<BR>
   #  BIT1 - Enable SMRAM profile.<BR>
