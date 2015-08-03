@@ -1849,4 +1849,17 @@ ReconnectController (
   IN EFI_HANDLE   DriverHandle
   );
 
+/**
+  Converts the unicode character of the string from uppercase to lowercase.
+  This is a internal function.
+
+  @param ConfigString  String to be converted
+
+**/
+VOID
+EFIAPI
+HiiToLower (
+  IN EFI_STRING  ConfigString
+  );
+
 #endif

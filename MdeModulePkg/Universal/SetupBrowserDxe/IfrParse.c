@@ -715,6 +715,7 @@ InitializeRequestElement (
                Question->VarStoreInfo.VarOffset,
                Question->StorageWidth
                );
+    HiiToLower(RequestElement);
     Question->BlockName = AllocateCopyPool ((StrLen + 1) * sizeof (CHAR16), RequestElement);
   } else {
     StrLen = UnicodeSPrint (RequestElement, 30 * sizeof (CHAR16), L"&%s", Question->VariableName);
