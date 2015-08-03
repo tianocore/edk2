@@ -2,14 +2,14 @@
 SECTIONS
 {
   /* . = 0 + SIZEOF_HEADERS; */
-  . = 0x280;
-  .text ALIGN(0x20) :
+  . = PECOFF_HEADER_SIZE;
+  .text ALIGN(CONSTANT(COMMONPAGESIZE)) :
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
     *(.rodata .rodata.* .gnu.linkonce.r.*)
     *(.got .got.*)
   }
-  .data ALIGN(0x40) :
+  .data ALIGN(CONSTANT(COMMONPAGESIZE)) :
   {
     *(
       .data .data.* .gnu.linkonce.d.*
@@ -17,11 +17,11 @@ SECTIONS
       *COM*
     )
   }
-  .eh_frame ALIGN(0x20) :
+  .eh_frame ALIGN(CONSTANT(COMMONPAGESIZE)) :
   {
     KEEP (*(.eh_frame))
   }
-  .rela ALIGN(0x20) :
+  .rela ALIGN(CONSTANT(COMMONPAGESIZE)) :
   {
     *(.rela .rela.*)
   }
