@@ -30,6 +30,7 @@
 #
 
 [Sources]
+  TcgMorLock.h
   TcgMorLock.c
   TcgMorLockSmm.c
 
