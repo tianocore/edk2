@@ -7,6 +7,7 @@ SECTIONS
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
     *(.rodata .rodata.* .gnu.linkonce.r.*)
+    *(.got .got.*)
   }
   .data : ALIGN(0x1000)
   {
@@ -19,10 +20,6 @@ SECTIONS
   .eh_frame : ALIGN(0x1000)
   {
     KEEP (*(.eh_frame))
-  }
-  .got : ALIGN(0x1000)
-  {
-    *(.got .got.*)
   }
   .rela : ALIGN(0x1000)
   {
