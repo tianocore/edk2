@@ -1,6 +1,7 @@
 /** @file
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1918,40 +1919,40 @@ DevPathToTextRamDisk (
     UefiDevicePathLibCatPrint (
       Str,
       L"VirtualDisk(0x%lx,0x%lx,%d)",
-      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
-      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
       RamDisk->Instance
       );
   } else if (CompareGuid (&RamDisk->TypeGuid, &gEfiVirtualCdGuid)) {
     UefiDevicePathLibCatPrint (
       Str,
       L"VirtualCD(0x%lx,0x%lx,%d)",
-      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
-      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
       RamDisk->Instance
       );
   } else if (CompareGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualDiskGuid)) {
     UefiDevicePathLibCatPrint (
       Str,
       L"PersistentVirtualDisk(0x%lx,0x%lx,%d)",
-      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
-      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
       RamDisk->Instance
       );
   } else if (CompareGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualCdGuid)) {
     UefiDevicePathLibCatPrint (
       Str,
       L"PersistentVirtualCD(0x%lx,0x%lx,%d)",
-      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
-      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
       RamDisk->Instance
       );
   } else {
     UefiDevicePathLibCatPrint (
       Str,
       L"RamDisk(0x%lx,0x%lx,%d,%g)",
-      RShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
-      RShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->StartingAddr[1], 32) | RamDisk->StartingAddr[0],
+      LShiftU64 ((UINT64)RamDisk->EndingAddr[1], 32) | RamDisk->EndingAddr[0],
       RamDisk->Instance,
       &RamDisk->TypeGuid
       );
