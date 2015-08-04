@@ -171,13 +171,9 @@ READ_LOCK_STATUS   = TRUE
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-!if $(INTEL_BDS) == TRUE
   INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-!else
-  INF ArmPlatformPkg/Bds/Bds.inf
-!endif
 
   #
   # Networking stack
@@ -234,14 +230,12 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 
-!if $(INTEL_BDS) == TRUE
   #
   # TianoCore logo (splash screen)
   #
   FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
-!endif
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
