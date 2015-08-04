@@ -1375,14 +1375,90 @@ DriverCallback (
     
   case EFI_BROWSER_ACTION_RETRIEVE:
     {
-      if (QuestionId == 0x1248) {
-        {
-          if (Type != EFI_IFR_TYPE_REF) {
-            return EFI_INVALID_PARAMETER;
-          }
-        
-          Value->ref.FormId = 0x3;
+      switch (QuestionId ) {
+      case 0x1248:
+        if (Type != EFI_IFR_TYPE_REF) {
+          return EFI_INVALID_PARAMETER;
         }
+        Value->ref.FormId = 0x3;
+        break;
+
+      case 0x5678:
+      case 0x1247:
+        //
+        // We will reach here once the Question is refreshed
+        //
+
+        //
+        // Initialize the container for dynamic opcodes
+        //
+        StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+        ASSERT (StartOpCodeHandle != NULL);
+
+        //
+        // Create Hii Extend Label OpCode as the start opcode
+        //
+        StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+        StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+        if (QuestionId == 0x5678) {
+          StartLabel->Number       = LABEL_UPDATE2;
+          FormId                   = 0x03;
+          PrivateData->Configuration.DynamicRefresh++;
+        } else if (QuestionId == 0x1247 ) {
+          StartLabel->Number       = LABEL_UPDATE3;
+          FormId                   = 0x06;
+          PrivateData->Configuration.RefreshGuidCount++;
+        }
+
+        HiiCreateActionOpCode (
+          StartOpCodeHandle,                // Container for dynamic created opcodes
+          0x1237,                           // Question ID
+          STRING_TOKEN(STR_EXIT_TEXT),      // Prompt text
+          STRING_TOKEN(STR_EXIT_TEXT),      // Help text
+          EFI_IFR_FLAG_CALLBACK,            // Question flag
+          0                                 // Action String ID
+        );
+      
+        HiiUpdateForm (
+          PrivateData->HiiHandle[0],        // HII handle
+          &gDriverSampleFormSetGuid,        // Formset GUID
+          FormId,                           // Form ID
+          StartOpCodeHandle,                // Label for where to insert opcodes
+          NULL                              // Insert data
+        );
+
+        HiiFreeOpCodeHandle (StartOpCodeHandle);
+
+        //
+        // Refresh the Question value
+        //
+        Status = gRT->SetVariable(
+                        VariableName,
+                        &gDriverSampleFormSetGuid,
+                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                        sizeof (DRIVER_SAMPLE_CONFIGURATION),
+                        &PrivateData->Configuration
+                        );
+
+        if (QuestionId == 0x5678) {
+          //
+          // Update uncommitted data of Browser
+          //
+          EfiData = AllocateZeroPool (sizeof (MY_EFI_VARSTORE_DATA));
+          ASSERT (EfiData != NULL);
+          if (HiiGetBrowserData (&gDriverSampleFormSetGuid, MyEfiVar, sizeof (MY_EFI_VARSTORE_DATA), (UINT8 *) EfiData)) {
+            EfiData->Field8 = 111;
+            HiiSetBrowserData (
+              &gDriverSampleFormSetGuid,
+              MyEfiVar,
+              sizeof (MY_EFI_VARSTORE_DATA),
+              (UINT8 *) EfiData,
+              NULL
+            );
+          }
+          FreePool (EfiData);
+        }
+        break;
       }
     }
     break;
@@ -1594,83 +1670,6 @@ DriverCallback (
       HiiFreeOpCodeHandle (StartOpCodeHandle);
       HiiFreeOpCodeHandle (OptionsOpCodeHandle);
       HiiFreeOpCodeHandle (EndOpCodeHandle);
-      break;
-
-    case 0x5678:
-    case 0x1247:
-      //
-      // We will reach here once the Question is refreshed
-      //
-
-      //
-      // Initialize the container for dynamic opcodes
-      //
-      StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-      ASSERT (StartOpCodeHandle != NULL);
-
-      //
-      // Create Hii Extend Label OpCode as the start opcode
-      //
-      StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-      StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-      if (QuestionId == 0x5678) {
-        StartLabel->Number       = LABEL_UPDATE2;
-        FormId                   = 0x03;
-        PrivateData->Configuration.DynamicRefresh++;
-      } else if (QuestionId == 0x1247 ) {
-        StartLabel->Number       = LABEL_UPDATE3;
-        FormId                   = 0x06;
-        PrivateData->Configuration.RefreshGuidCount++;
-      }
-
-      HiiCreateActionOpCode (
-        StartOpCodeHandle,                // Container for dynamic created opcodes
-        0x1237,                           // Question ID
-        STRING_TOKEN(STR_EXIT_TEXT),      // Prompt text
-        STRING_TOKEN(STR_EXIT_TEXT),      // Help text
-        EFI_IFR_FLAG_CALLBACK,            // Question flag
-        0                                 // Action String ID
-      );
-
-      HiiUpdateForm (
-        PrivateData->HiiHandle[0],  // HII handle
-        &gDriverSampleFormSetGuid,              // Formset GUID
-        FormId,                        // Form ID
-        StartOpCodeHandle,          // Label for where to insert opcodes
-        NULL                        // Insert data
-        );
-
-      HiiFreeOpCodeHandle (StartOpCodeHandle);
-
-      //
-      // Refresh the Question value
-      //
-      Status = gRT->SetVariable(
-                      VariableName,
-                      &gDriverSampleFormSetGuid,
-                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                      sizeof (DRIVER_SAMPLE_CONFIGURATION),
-                      &PrivateData->Configuration
-                      );
-
-      if (QuestionId == 0x5678) {
-        //
-        // Update uncommitted data of Browser
-        //
-        EfiData = AllocateZeroPool (sizeof (MY_EFI_VARSTORE_DATA));
-        ASSERT (EfiData != NULL);
-        if (HiiGetBrowserData (&gDriverSampleFormSetGuid, MyEfiVar, sizeof (MY_EFI_VARSTORE_DATA), (UINT8 *) EfiData)) {
-          EfiData->Field8 = 111;
-          HiiSetBrowserData (
-            &gDriverSampleFormSetGuid,
-            MyEfiVar,
-            sizeof (MY_EFI_VARSTORE_DATA),
-            (UINT8 *) EfiData,
-            NULL
-            );
-        }
-        FreePool (EfiData);
-      }
       break;
 
     case 0x2000:
