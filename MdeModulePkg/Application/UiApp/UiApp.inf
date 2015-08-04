@@ -59,6 +59,7 @@
   String.h
   Language.c
   Language.h
+  FormsetGuid.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -106,34 +107,40 @@
   gEfiIfrBootMaintenanceGuid                    ## CONSUMES ## GUID
   
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
-  gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
-  gEfiSmbiosProtocolGuid                        ## PROTOCOL CONSUMES
-  gEfiGenericMemTestProtocolGuid                ## PROTOCOL CONSUMES
-  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport ## PROTOCOL SOMETIMES_CONSUMES
-  gEfiBlockIoProtocolGuid                       ## PROTOCOL CONSUMES
-  gEfiGraphicsOutputProtocolGuid                ## PROTOCOL SOMETIMES_CONSUMES
-  gEfiSimpleTextInputExProtocolGuid             ## PROTOCOL CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               ## PROTOCOL CONSUMES
-  gEfiFormBrowser2ProtocolGuid                  ## PROTOCOL CONSUMES
-  gEfiSerialIoProtocolGuid                      ## PROTOCOL CONSUMES
-  gEfiDevicePathProtocolGuid                    ## PROTOCOL CONSUMES
-  gEfiPciIoProtocolGuid                         ## PROTOCOL CONSUMES
-  gEfiDevicePathToTextProtocolGuid              ## PROTOCOL CONSUMES
-  gEfiBootLogoProtocolGuid                      ## PROTOCOL CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+  gEfiLoadFileProtocolGuid                      ## CONSUMES
+  gEfiSmbiosProtocolGuid                        ## CONSUMES
+  gEfiGenericMemTestProtocolGuid                ## CONSUMES
+  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                       ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiSerialIoProtocolGuid                      ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiPciIoProtocolGuid                         ## CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
+  gEfiBootLogoProtocolGuid                      ## CONSUMES
 
 [FeaturePcd]
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow                       ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn                    ## PRODUCES
+  ## CONSUMES
+  ## PRODUCES
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution       ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution         ## PRODUCES
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString           ## CONSUMES

@@ -139,7 +139,7 @@ InitializeDeviceManager (
 VOID
 FreeDeviceManager(
   VOID
-);
+  );
 
 /**
   Dynamic create Hii information for Device Manager.
@@ -150,6 +150,6 @@ FreeDeviceManager(
 VOID
 CreateDeviceManagerForm(
   IN EFI_FORM_ID      NextShowFormId
-);
+  );
 
 #endif

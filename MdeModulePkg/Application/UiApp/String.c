@@ -40,6 +40,10 @@ InitializeStringSupport (
   ASSERT (gStringPackHandle != NULL);
 }
 
+/**
+  Remove the string package.
+
+**/
 VOID
 UninitializeStringSupport (
   VOID

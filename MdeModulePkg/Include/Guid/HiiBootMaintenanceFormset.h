@@ -1,4 +1,3 @@
-//
 /** @file
   Guid definition for Boot Maintainence Formset.
 

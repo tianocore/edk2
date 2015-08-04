@@ -598,6 +598,10 @@ CallFrontPage (
   return Status;
 }
 
+/**
+  Remove the installed packages from the HiiDatabase.
+
+**/
 VOID
 FreeFrontPage(
   VOID

@@ -56,6 +56,10 @@ InitializeStringSupport (
   VOID
   );
 
+/**
+  Remove the string package.
+
+**/
 VOID
 UninitializeStringSupport (
   VOID

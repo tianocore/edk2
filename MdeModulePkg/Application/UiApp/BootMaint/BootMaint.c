@@ -1360,7 +1360,6 @@ InitBootMaintenance(
   Remove the installed BootMaint and FileExplorer HiiPackages.
 
 **/
-
 VOID
 FreeBMPackage(
   VOID
