@@ -290,13 +290,6 @@ DxeMain (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Call constructor for all libraries
-  //
-  ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
-  PERF_END   (NULL,"PEI", NULL, 0) ;
-  PERF_START (NULL,"DXE", NULL, 0) ;
-
-  //
   // Report DXE Core image information to the PE/COFF Extra Action Library
   //
   ZeroMem (&ImageContext, sizeof (ImageContext));
@@ -309,6 +302,13 @@ DxeMain (
   //
   Status = CoreInitializeGcdServices (&HobStart, MemoryBaseAddress, MemoryLength);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Call constructor for all libraries
+  //
+  ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
+  PERF_END   (NULL,"PEI", NULL, 0) ;
+  PERF_START (NULL,"DXE", NULL, 0) ;
 
   //
   // Install the DXE Services Table into the EFI System Tables's Configuration Table
