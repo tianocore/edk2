@@ -123,7 +123,7 @@ SaveMemoryConfigEntryPoint (
       MemInfoProtocol->MemInfoData.memSize  = 0;
       for (Channel = 0; Channel < CH_NUM; Channel ++){
         for (Slot = 0; Slot < DIMM_NUM; Slot ++){               
-          MemInfoProtocol->MemInfoData.dimmSize[Slot + (Channel * DIMM_NUM)] = PlatformInfoHobPtr->MemData.DimmSize[Slot];
+          MemInfoProtocol->MemInfoData.dimmSize[Slot + (Channel * DIMM_NUM)] = PlatformInfoHobPtr->MemData.DimmSize[Slot + (Channel * DIMM_NUM)];
         }
       }
   	  MemInfoProtocol->MemInfoData.memSize       = PlatformInfoHobPtr->MemData.MemSize;        

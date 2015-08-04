@@ -176,7 +176,8 @@ typedef enum {
   BOARD_ID_BB_RVP   = 0x20,   // Bayley Bay Board
   BOARD_ID_BS_RVP   = 0x30,   // Bakersport Board
   BOARD_ID_CVH      = 0x90,   // Crestview Hills
-  BOARD_ID_MINNOW2  = 0xA0    // Minnow2
+  BOARD_ID_MINNOW2  = 0xA0,    // Minnow2
+  BOARD_ID_MINNOW2_COMPATIBLE  = 0xB0    // Minnow2
 
 } BOARD_ID_LIST;
 
