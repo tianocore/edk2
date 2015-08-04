@@ -237,6 +237,11 @@ READ_LOCK_STATUS   = TRUE
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
 
+!if $(ARCH) == ARM
+  INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+  INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+!endif
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1

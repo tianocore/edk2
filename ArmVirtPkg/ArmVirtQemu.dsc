@@ -354,3 +354,15 @@
   MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+
+[Components.ARM]
+  #
+  # The ARM/Linux kernel has no built in EFI boot stub (yet), so we still need
+  # an intermediate OS loader. Add the LinuxLoader UEFI application so we can
+  # invoke it from the shell.
+  #
+  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+  ArmPkg/Application/LinuxLoader/LinuxLoader.inf {
+    <LibraryClasses>
+      BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+  }
