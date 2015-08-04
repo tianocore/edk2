@@ -34,12 +34,12 @@ Abstract:
 
 typedef struct _PEI_SMBUS_POLICY_PPI PEI_SMBUS_POLICY_PPI;
 
-typedef struct _PEI_SMBUS_POLICY_PPI {
+struct _PEI_SMBUS_POLICY_PPI {
   UINTN   BaseAddress;
   UINT32  PciAddress;
   UINT8   NumRsvdAddress;
   UINT8   *RsvdAddress;
-} PEI_SMBUS_POLICY_PPI;
+};
 
 extern EFI_GUID gPeiSmbusPolicyPpiGuid;
 
