@@ -79,7 +79,6 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
-  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"XEN-UEFI"
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
 
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1
