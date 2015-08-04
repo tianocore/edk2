@@ -54,14 +54,14 @@
   BaseMemoryLib
 
 [Guids]
-  gEfiIfrTianoGuid
-  gEfiIfrBootMaintenanceGuid
-  gEfiLegacyDevOrderVariableGuid
+  gEfiIfrTianoGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED # Extended IFR Guid Opcode
+  gEfiIfrBootMaintenanceGuid        ## CONSUMES ## HII # BootMaint HII Package
+  gEfiLegacyDevOrderVariableGuid    ## PRODUCES ## Variable:L"LegacyDevOrder"
 
 [Protocols]
-  gEfiHiiConfigAccessProtocolGuid               ## PROTOCOL CONSUMES
-  gEfiLegacyBiosProtocolGuid
-  gEfiHiiConfigRoutingProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid             ## PRODUCES
+  gEfiLegacyBiosProtocolGuid                  ## CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid            ## CONSUMES
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid

@@ -216,7 +216,7 @@ OrderLegacyBootOption4SameType (
   is udpated with the new Legacy Boot order. The EFI Variable of "Boot####" and gEfiGlobalVariableGuid
   is also updated.
 
-  @param CallbackData    The context data for BMM.
+  @param NVMapData   The data for egacy BBS boot.
 
   @return EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         If L"LegacyDevOrder" and gEfiLegacyDevOrderVariableGuid EFI Variable can be found.
@@ -647,8 +647,6 @@ GetMenuEntry (
   @param HiiHandle          Hii Handle of the package to be updated.
   @param MenuOption         The Menu whose string tokens need to be created
 
-  @retval  EFI_SUCCESS      String tokens created successfully
-  @retval  others           contain some errors
 **/
 VOID
 CreateLegacyMenuStringToken (
