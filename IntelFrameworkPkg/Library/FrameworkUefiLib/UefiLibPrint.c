@@ -763,7 +763,7 @@ CatVSPrint (
   }
 
   if (String != NULL) {
-    StrCpyS(BufferToReturn, SizeRequired, String);
+    StrCpyS(BufferToReturn, SizeRequired / sizeof(CHAR16), String);
   }
 
   UnicodeVSPrint(BufferToReturn + StrLen(BufferToReturn), (CharactersRequired+1) * sizeof(CHAR16), FormatString, Marker);
