@@ -960,7 +960,16 @@
   ## The number of bytes between registers in serial device.  The default is 1 byte.
   # @Prompt Serial Port Register Stride in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1|UINT32|0x0001006d
-  
+
+  ## Indicates if to set NX for stack.<BR><BR>
+  #  For the DxeIpl and the DxeCore are both X64, set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE.<BR>
+  #  For the DxeIpl and the DxeCore are both IA32 (PcdDxeIplSwitchToLongMode is FALSE), set NX for stack feature also require
+  #  IA32 PAE is supported and Execute Disable Bit is available.<BR>
+  #   TRUE  - to set NX for stack.<BR>
+  #   FALSE - Not to set NX for stack.<BR>
+  # @Prompt Set NX for stack.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.

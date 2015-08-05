@@ -1,7 +1,7 @@
 /** @file
   Ia32-specific functionality for DxeLoad.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,6 +57,151 @@ GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR gLidtDescriptor = {
 };
 
 /**
+  Allocates and fills in the Page Directory and Page Table Entries to
+  establish a 4G page table.
+
+  @param[in] StackBase  Stack base address.
+  @param[in] StackSize  Stack size.
+
+  @return The address of page table.
+
+**/
+UINTN
+Create4GPageTablesIa32Pae (
+  IN EFI_PHYSICAL_ADDRESS   StackBase,
+  IN UINTN                  StackSize
+  )
+{  
+  UINT8                                         PhysicalAddressBits;
+  EFI_PHYSICAL_ADDRESS                          PhysicalAddress;
+  UINTN                                         IndexOfPdpEntries;
+  UINTN                                         IndexOfPageDirectoryEntries;
+  UINT32                                        NumberOfPdpEntriesNeeded;
+  PAGE_MAP_AND_DIRECTORY_POINTER                *PageMap;
+  PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
+  PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
+  UINTN                                         TotalPagesNum;
+  UINTN                                         PageAddress;
+
+  PhysicalAddressBits = 32;
+
+  //
+  // Calculate the table entries needed.
+  //
+  NumberOfPdpEntriesNeeded = (UINT32) LShiftU64 (1, (PhysicalAddressBits - 30));
+
+  TotalPagesNum = NumberOfPdpEntriesNeeded + 1;
+  PageAddress = (UINTN) AllocatePages (TotalPagesNum);
+  ASSERT (PageAddress != 0);
+
+  PageMap = (VOID *) PageAddress;
+  PageAddress += SIZE_4KB;
+
+  PageDirectoryPointerEntry = PageMap;
+  PhysicalAddress = 0;
+
+  for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+    //
+    // Each Directory Pointer entries points to a page of Page Directory entires.
+    // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+    //       
+    PageDirectoryEntry = (VOID *) PageAddress;
+    PageAddress += SIZE_4KB;
+
+    //
+    // Fill in a Page Directory Pointer Entries
+    //
+    PageDirectoryPointerEntry->Uint64 = (UINT64) (UINTN) PageDirectoryEntry;
+    PageDirectoryPointerEntry->Bits.Present = 1;
+
+    for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress += SIZE_2MB) {
+      if ((PhysicalAddress < StackBase + StackSize) && ((PhysicalAddress + SIZE_2MB) > StackBase)) {
+        //
+        // Need to split this 2M page that covers stack range.
+        //
+        Split2MPageTo4K (PhysicalAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize);
+      } else {
+        //
+        // Fill in the Page Directory entries
+        //
+        PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress;
+        PageDirectoryEntry->Bits.ReadWrite = 1;
+        PageDirectoryEntry->Bits.Present = 1;
+        PageDirectoryEntry->Bits.MustBe1 = 1;
+      }
+    }
+  }
+
+  for (; IndexOfPdpEntries < 512; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+    ZeroMem (
+      PageDirectoryPointerEntry,
+      sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
+      );
+  }
+
+  return (UINTN) PageMap;
+}
+
+/**
+  The function will check if IA32 PAE is supported.
+
+  @retval TRUE      IA32 PAE is supported.
+  @retval FALSE     IA32 PAE is not supported.
+
+**/
+BOOLEAN
+IsIa32PaeSupport (
+  VOID
+  )
+{
+  UINT32            RegEax;
+  UINT32            RegEdx;
+  BOOLEAN           Ia32PaeSupport;
+
+  Ia32PaeSupport = FALSE;
+  AsmCpuid (0x0, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x1) {
+    AsmCpuid (0x1, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT6) != 0) {
+      Ia32PaeSupport = TRUE;
+    }
+  }
+
+  return Ia32PaeSupport;
+}
+
+/**
+  The function will check if Execute Disable Bit is available.
+
+  @retval TRUE      Execute Disable Bit is available.
+  @retval FALSE     Execute Disable Bit is not available.
+
+**/
+BOOLEAN
+IsExecuteDisableBitAvailable (
+  VOID
+  )
+{
+  UINT32            RegEax;
+  UINT32            RegEdx;
+  BOOLEAN           Available;
+
+  Available = FALSE;
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x80000001) {
+    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT20) != 0) {
+      //
+      // Bit 20: Execute Disable Bit available.
+      //
+      Available = TRUE;
+    }
+  }
+
+  return Available;
+}
+
+/**
    Transfers control to DxeCore.
 
    This function performs a CPU architecture specific operations to execute
@@ -85,6 +230,7 @@ HandOffToDxeCore (
   X64_IDT_TABLE             *IdtTableForX64;
   EFI_VECTOR_HANDOFF_INFO   *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
+  BOOLEAN                   BuildPageTablesIa32Pae;
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
   ASSERT_EFI_ERROR (Status);
@@ -114,7 +260,7 @@ HandOffToDxeCore (
     //
     // Create page table and save PageMapLevel4 to CR3
     //
-    PageTables = CreateIdentityMappingPageTables ();
+    PageTables = CreateIdentityMappingPageTables (BaseOfStack, STACK_SIZE);
 
     //
     // End of PEI phase signal
@@ -215,11 +361,25 @@ HandOffToDxeCore (
     TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
+    BuildPageTablesIa32Pae = (BOOLEAN) (PcdGetBool (PcdSetNxForStack) && IsIa32PaeSupport () && IsExecuteDisableBitAvailable ());
+    if (BuildPageTablesIa32Pae) {
+      PageTables = Create4GPageTablesIa32Pae (BaseOfStack, STACK_SIZE);
+      EnableExecuteDisableBit ();
+    }
+
     //
     // End of PEI phase signal
     //
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
     ASSERT_EFI_ERROR (Status);
+
+    if (BuildPageTablesIa32Pae) {
+      AsmWriteCr3 (PageTables);
+      //
+      // Set Physical Address Extension (bit 5 of CR4).
+      //
+      AsmWriteCr4 (AsmReadCr4 () | BIT5);
+    }
 
     //
     // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
@@ -229,12 +389,21 @@ HandOffToDxeCore (
     //
     // Transfer the control to the entry point of DxeCore.
     //
-    SwitchStack (
-      (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-      HobList.Raw,
-      NULL,
-      (VOID *) (UINTN) TopOfStack
-      );
+    if (BuildPageTablesIa32Pae) {
+      AsmEnablePaging32 (
+        (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
+        HobList.Raw,
+        NULL,
+        (VOID *) (UINTN) TopOfStack
+        );
+    } else {
+      SwitchStack (
+        (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
+        HobList.Raw,
+        NULL,
+        (VOID *) (UINTN) TopOfStack
+        );
+    }
   }
 }
 

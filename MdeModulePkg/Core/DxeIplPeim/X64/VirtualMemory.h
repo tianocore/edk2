@@ -7,7 +7,7 @@
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
     4) AMD64 Architecture Programmer's Manual Volume 2: System Programming
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,6 +74,28 @@ typedef union {
 } PAGE_MAP_AND_DIRECTORY_POINTER;
 
 //
+// Page Table Entry 4KB
+//
+typedef union {
+  struct {
+    UINT64  Present:1;                // 0 = Not present in memory, 1 = Present in memory
+    UINT64  ReadWrite:1;              // 0 = Read-Only, 1= Read/Write
+    UINT64  UserSupervisor:1;         // 0 = Supervisor, 1=User
+    UINT64  WriteThrough:1;           // 0 = Write-Back caching, 1=Write-Through caching
+    UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
+    UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
+    UINT64  PAT:1;                    //
+    UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
+    UINT64  Available:3;              // Available for use by system software
+    UINT64  PageTableBaseAddress:40;  // Page Table Base Address
+    UINT64  AvabilableHigh:11;        // Available for use by system software
+    UINT64  Nx:1;                     // 0 = Execute Code, 1 = No Code Execution
+  } Bits;
+  UINT64    Uint64;
+} PAGE_TABLE_4K_ENTRY;
+
+//
 // Page Table Entry 2MB
 //
 typedef union {
@@ -123,22 +145,49 @@ typedef union {
 
 #pragma pack()
 
+#define IA32_PG_P                   BIT0
+#define IA32_PG_RW                  BIT1
+
+/**
+  Enable Execute Disable Bit.
+
+**/
+VOID
+EnableExecuteDisableBit (
+  VOID
+  );
+
+/**
+  Split 2M page to 4K.
+
+  @param[in]      PhysicalAddress       Start physical address the 2M page covered.
+  @param[in, out] PageEntry2M           Pointer to 2M page entry.
+  @param[in]      StackBase             Stack base address.
+  @param[in]      StackSize             Stack size.
+
+**/
+VOID
+Split2MPageTo4K (
+  IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
+  IN OUT UINT64                         *PageEntry2M,
+  IN EFI_PHYSICAL_ADDRESS               StackBase,
+  IN UINTN                              StackSize
+  );
 
 /**
   Allocates and fills in the Page Directory and Page Table Entries to
   establish a 1:1 Virtual to Physical mapping.
 
-  @param  NumberOfProcessorPhysicalAddressBits  Number of processor address bits 
-                                                to use. Limits the number of page 
-                                                table entries  to the physical 
-                                                address space. 
+  @param[in] StackBase  Stack base address.
+  @param[in] StackSize  Stack size.
 
   @return The address of 4 level page map.
 
 **/
 UINTN
 CreateIdentityMappingPageTables (
-  VOID
+  IN EFI_PHYSICAL_ADDRESS   StackBase,
+  IN UINTN                  StackSize
   );
 
 

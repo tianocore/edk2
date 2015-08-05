@@ -15,7 +15,7 @@
     2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,20 +30,125 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "VirtualMemory.h"
 
 /**
+  Enable Execute Disable Bit.
+
+**/
+VOID
+EnableExecuteDisableBit (
+  VOID
+  )
+{
+  UINT64           MsrRegisters;
+
+  MsrRegisters = AsmReadMsr64 (0xC0000080);
+  MsrRegisters |= BIT11;
+  AsmWriteMsr64 (0xC0000080, MsrRegisters);
+}
+
+/**
+  Split 2M page to 4K.
+
+  @param[in]      PhysicalAddress       Start physical address the 2M page covered.
+  @param[in, out] PageEntry2M           Pointer to 2M page entry.
+  @param[in]      StackBase             Stack base address.
+  @param[in]      StackSize             Stack size.
+
+**/
+VOID
+Split2MPageTo4K (
+  IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
+  IN OUT UINT64                         *PageEntry2M,
+  IN EFI_PHYSICAL_ADDRESS               StackBase,
+  IN UINTN                              StackSize
+  )
+{
+  EFI_PHYSICAL_ADDRESS                  PhysicalAddress4K;
+  UINTN                                 IndexOfPageTableEntries;
+  PAGE_TABLE_4K_ENTRY                   *PageTableEntry;
+
+  PageTableEntry = AllocatePages (1);
+  //
+  // Fill in 2M page entry.
+  //
+  *PageEntry2M = (UINT64) (UINTN) PageTableEntry | IA32_PG_P | IA32_PG_RW;
+
+  PhysicalAddress4K = PhysicalAddress;
+  for (IndexOfPageTableEntries = 0; IndexOfPageTableEntries < 512; IndexOfPageTableEntries++, PageTableEntry++, PhysicalAddress4K += SIZE_4KB) {
+    //
+    // Fill in the Page Table entries
+    //
+    PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K;
+    PageTableEntry->Bits.ReadWrite = 1;
+    PageTableEntry->Bits.Present = 1;
+    if ((PhysicalAddress4K >= StackBase) && (PhysicalAddress4K < StackBase + StackSize)) {
+      //
+      // Set Nx bit for stack.
+      //
+      PageTableEntry->Bits.Nx = 1;
+    }
+  }
+}
+
+/**
+  Split 1G page to 2M.
+
+  @param[in]      PhysicalAddress       Start physical address the 1G page covered.
+  @param[in, out] PageEntry1G           Pointer to 1G page entry.
+  @param[in]      StackBase             Stack base address.
+  @param[in]      StackSize             Stack size.
+
+**/
+VOID
+Split1GPageTo2M (
+  IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
+  IN OUT UINT64                         *PageEntry1G,
+  IN EFI_PHYSICAL_ADDRESS               StackBase,
+  IN UINTN                              StackSize
+  )
+{
+  EFI_PHYSICAL_ADDRESS                  PhysicalAddress2M;
+  UINTN                                 IndexOfPageDirectoryEntries;
+  PAGE_TABLE_ENTRY                      *PageDirectoryEntry;
+
+  PageDirectoryEntry = AllocatePages (1);
+  //
+  // Fill in 1G page entry.
+  //
+  *PageEntry1G = (UINT64) (UINTN) PageDirectoryEntry | IA32_PG_P | IA32_PG_RW;
+
+  PhysicalAddress2M = PhysicalAddress;
+  for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
+    if ((PhysicalAddress2M < StackBase + StackSize) && ((PhysicalAddress2M + SIZE_2MB) > StackBase)) {
+      //
+      // Need to split this 2M page that covers stack range.
+      //
+      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *) PageDirectoryEntry, StackBase, StackSize);
+    } else {
+      //
+      // Fill in the Page Directory entries
+      //
+      PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress2M;
+      PageDirectoryEntry->Bits.ReadWrite = 1;
+      PageDirectoryEntry->Bits.Present = 1;
+      PageDirectoryEntry->Bits.MustBe1 = 1;
+    }
+  }
+}
+
+/**
   Allocates and fills in the Page Directory and Page Table Entries to
   establish a 1:1 Virtual to Physical mapping.
 
-  @param  NumberOfProcessorPhysicalAddressBits  Number of processor address bits 
-                                                to use. Limits the number of page 
-                                                table entries  to the physical 
-                                                address space. 
+  @param[in] StackBase  Stack base address.
+  @param[in] StackSize  Stack size.
 
   @return The address of 4 level page map.
 
 **/
 UINTN
 CreateIdentityMappingPageTables (
-  VOID
+  IN EFI_PHYSICAL_ADDRESS   StackBase,
+  IN UINTN                  StackSize
   )
 {  
   UINT32                                        RegEax;
@@ -149,13 +254,17 @@ CreateIdentityMappingPageTables (
       PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
     
       for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-        //
-        // Fill in the Page Directory entries
-        //
-        PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
-        PageDirectory1GEntry->Bits.ReadWrite = 1;
-        PageDirectory1GEntry->Bits.Present = 1;
-        PageDirectory1GEntry->Bits.MustBe1 = 1;
+        if (PcdGetBool (PcdSetNxForStack) && (PageAddress < StackBase + StackSize) && ((PageAddress + SIZE_1GB) > StackBase)) {
+          Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize);
+        } else {
+          //
+          // Fill in the Page Directory entries
+          //
+          PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
+          PageDirectory1GEntry->Bits.ReadWrite = 1;
+          PageDirectory1GEntry->Bits.Present = 1;
+          PageDirectory1GEntry->Bits.MustBe1 = 1;
+        }
       }
     } else {
       for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
@@ -174,13 +283,20 @@ CreateIdentityMappingPageTables (
         PageDirectoryPointerEntry->Bits.Present = 1;
 
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-          //
-          // Fill in the Page Directory entries
-          //
-          PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
-          PageDirectoryEntry->Bits.ReadWrite = 1;
-          PageDirectoryEntry->Bits.Present = 1;
-          PageDirectoryEntry->Bits.MustBe1 = 1;
+          if (PcdGetBool (PcdSetNxForStack) && (PageAddress < StackBase + StackSize) && ((PageAddress + SIZE_2MB) > StackBase)) {
+            //
+            // Need to split this 2M page that covers stack range.
+            //
+            Split2MPageTo4K (PageAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize);
+          } else {
+            //
+            // Fill in the Page Directory entries
+            //
+            PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
+            PageDirectoryEntry->Bits.ReadWrite = 1;
+            PageDirectoryEntry->Bits.Present = 1;
+            PageDirectoryEntry->Bits.MustBe1 = 1;
+          }
         }
       }
 
@@ -201,6 +317,10 @@ CreateIdentityMappingPageTables (
       PageMapLevel4Entry,
       sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
       );
+  }
+
+  if (PcdGetBool (PcdSetNxForStack)) {
+    EnableExecuteDisableBit ();
   }
 
   return (UINTN)PageMap;
