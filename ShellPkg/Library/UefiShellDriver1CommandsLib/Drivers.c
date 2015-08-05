@@ -282,7 +282,7 @@ ShellCommandRunDrivers (
         TruncatedDriverName = NULL;
         if (!SfoFlag && (FullDriverName != NULL)) {
           TruncatedDriverName = AllocateZeroPool ((MAX_LEN_DRIVER_NAME + 1) * sizeof (CHAR16));
-          StrCpyS (TruncatedDriverName, MAX_LEN_DRIVER_NAME + 1, FullDriverName);
+          StrnCpyS (TruncatedDriverName, MAX_LEN_DRIVER_NAME + 1, FullDriverName, MAX_LEN_DRIVER_NAME);
         }
 
         ShellPrintEx(
