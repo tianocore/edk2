@@ -602,7 +602,7 @@ Mtftp6SendError (
   TftpError->OpCode          = HTONS (EFI_MTFTP6_OPCODE_ERROR);
   TftpError->Error.ErrorCode = HTONS (ErrCode);
 
-  AsciiStrCpyS ((CHAR8 *) TftpError->Error.ErrorMessage, sizeof (TftpError->Error.ErrorMessage) / sizeof (TftpError->Error.ErrorMessage[0]), (CHAR8 *) ErrInfo);
+  AsciiStrCpyS ((CHAR8 *) TftpError->Error.ErrorMessage, AsciiStrLen ((CHAR8 *) ErrInfo) + 1 , (CHAR8 *) ErrInfo);
 
   //
   // Save the packet buf for retransmit
