@@ -5,7 +5,7 @@
 ;*    Family of Customer Reference Boards.                                *;
 ;*                                                                        *;
 ;*                                                                        *;
-;*    Copyright (c)  2010  - 2014, Intel Corporation. All rights reserved   *;
+;*    Copyright (c)  2010  - 2015, Intel Corporation. All rights reserved   *;
 ;
 ; This program and the accompanying materials are licensed and made available under
 ; the terms and conditions of the BSD License that accompanies this distribution.
@@ -193,12 +193,12 @@ Device(XHC1)
             0x82, 0x00, 0x00, 0x00,
             //63:32 - Bit[47:32]=0 width: 0x0000  Bit[63:48]=0 Height:0x0000
             0x00, 0x00, 0x00, 0x00,
-            //95:64 - bit[66:64]=b'000 not visiable/no docking/no lid bit[69:67]=b'000 top bit[71:70]=b'01 Center  bit[73:72]=b'00 Left
+            //95:64 - bit[66:64]=b'011 visiable/docking/no lid bit[69:67]=b'001 bottom panel bit[71:70]=b'01 Center  bit[73:72]=b'00 Left
             //           bit[77:74]=2 Square bit[78]=0 bit[86:79]=0 bit[94:87]='0 no group info' bit[95]=0 not a bay
-            0x40, 0x08, 0x00, 0x00,
-            //127:96 -bit[96]=0 not Ejectable bit[97]=0 no OSPM Ejection required Bit[105:98]=0 no Cabinet Number
+            0x4B, 0x08, 0x00, 0x00,
+            //127:96 -bit[96]=1 Ejectable bit[97]=1 OSPM Ejection required Bit[105:98]=0 no Cabinet Number
             //            bit[113:106]=0 no Card cage Number bit[114]=0 no reference shape Bit[118:115]=0 no rotation Bit[123:119]=0 no order
-            0x00, 0x00, 0x00, 0x00,
+            0x03, 0x00, 0x00, 0x00,
             //159:128  Vert. and Horiz. Offsets not supplied
             0xFF, 0xFF, 0xFF, 0xFF
           }
