@@ -58,7 +58,6 @@
   QemuFwCfgLib
   MtrrLib
   PcdLib
-  BaseMemoryLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
@@ -82,7 +81,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
