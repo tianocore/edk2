@@ -11,9 +11,9 @@
 ; Module Name:
 ;
 ;   MpEqu.inc
-; 
+;
 ; Abstract:
-; 
+;
 ;   This is the equates file for Multiple Processor support
 ;
 ;-------------------------------------------------------------------------------
