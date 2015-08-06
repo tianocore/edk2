@@ -1822,7 +1822,7 @@ XhcCreateUsbHc (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   XhcMonitorAsyncRequests,
                   Xhc,
                   &Xhc->PollTimer

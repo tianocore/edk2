@@ -1,7 +1,7 @@
 /** @file
   USB Mass Storage Driver that manages USB Mass Storage Device and produces Block I/O Protocol.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -63,7 +63,7 @@ UsbMassReset (
   // Raise TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
 
   UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
   Status  = UsbMass->Transport->Reset (UsbMass->Context, ExtendedVerification);
@@ -117,7 +117,7 @@ UsbMassReadBlocks (
   // Raise TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
   Media   = &UsbMass->BlockIoMedia;
 
@@ -233,7 +233,7 @@ UsbMassWriteBlocks (
   // Raise TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
   Media   = &UsbMass->BlockIoMedia;
 

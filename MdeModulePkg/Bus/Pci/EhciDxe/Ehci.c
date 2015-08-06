@@ -1615,7 +1615,7 @@ EhcCreateUsb2Hc (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   EhcMonitorAsyncRequests,
                   Ehc,
                   &Ehc->PollTimer
