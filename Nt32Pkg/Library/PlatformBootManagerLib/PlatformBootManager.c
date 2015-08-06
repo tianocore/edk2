@@ -19,6 +19,93 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_GUID mUefiShellFileGuid = { 0x7C04A583, 0x9E3E, 0x4f1c, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 };
 
 /**
+  Perform the memory test base on the memory test intensive level,
+  and update the memory resource.
+
+  @param  Level         The memory test intensive level.
+
+  @retval EFI_STATUS    Success test all the system memory and update
+                        the memory resource
+
+**/
+EFI_STATUS
+PlatformBootManagerMemoryTest (
+  IN EXTENDMEM_COVERAGE_LEVEL Level
+  )
+{
+  EFI_STATUS                        Status;
+  BOOLEAN                           RequireSoftECCInit;
+  EFI_GENERIC_MEMORY_TEST_PROTOCOL  *GenMemoryTest;
+  UINT64                            TestedMemorySize;
+  UINT64                            TotalMemorySize;
+  UINTN                             TestPercent;
+  UINT64                            PreviousValue;
+  BOOLEAN                           ErrorOut;
+  UINT32                            TempData;
+
+  TestedMemorySize  = 0;
+  TotalMemorySize   = 0;
+  PreviousValue     = 0;
+
+  RequireSoftECCInit = FALSE;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiGenericMemTestProtocolGuid,
+                  NULL,
+                  (VOID **) &GenMemoryTest
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  Status = GenMemoryTest->MemoryTestInit (
+                            GenMemoryTest,
+                            Level,
+                            &RequireSoftECCInit
+                            );
+  if (Status == EFI_NO_MEDIA) {
+    //
+    // The PEI codes also have the relevant memory test code to check the memory,
+    // it can select to test some range of the memory or all of them. If PEI code
+    // checks all the memory, this BDS memory test will has no not-test memory to
+    // do the test, and then the status of EFI_NO_MEDIA will be returned by
+    // "MemoryTestInit". So it does not need to test memory again, just return.
+    //
+    return EFI_SUCCESS;
+  }
+
+  do {
+    Status = GenMemoryTest->PerformMemoryTest (
+                              GenMemoryTest,
+                              &TestedMemorySize,
+                              &TotalMemorySize,
+                              &ErrorOut,
+                              FALSE
+                              );
+    if (ErrorOut && (Status == EFI_DEVICE_ERROR)) {
+      Print (L"System encounters memory errors!");
+      CpuDeadLoop ();
+    }
+    
+    TempData = (UINT32) DivU64x32 (TotalMemorySize, 16);
+    TestPercent = (UINTN) DivU64x32 (
+                            DivU64x32 (MultU64x32 (TestedMemorySize, 100), 16),
+                            TempData
+                            );
+    if (TestPercent != PreviousValue) {
+      Print (L"Perform memory test: %d/100", TestPercent);
+      PreviousValue = TestPercent;
+    }
+  } while (Status != EFI_NOT_FOUND);
+
+  Status = GenMemoryTest->Finished (GenMemoryTest);
+
+  Print (L"\r%dM bytes of system memory tested OK\n", (UINT32) DivU64x32 (TotalMemorySize, 1024 * 1024));
+  return EFI_SUCCESS;
+}
+
+
+/**
   Return the index of the load option in the load option array.
 
   The function consider two load options are equal when the 
@@ -197,6 +284,7 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
+  PlatformBootManagerMemoryTest (QUICK);
   EfiBootManagerConnectAll ();
   EfiBootManagerRefreshAllBootOption ();
   Print (

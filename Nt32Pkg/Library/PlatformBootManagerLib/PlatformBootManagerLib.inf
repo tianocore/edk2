@@ -47,6 +47,9 @@
 [Guids]
   gEfiWinNtSystemConfigGuid
 
+[Protocols]
+  gEfiGenericMemTestProtocolGuid  ## CONSUMES
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
