@@ -177,13 +177,13 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
             EdkLogger.verbose("Found original file content starting from line %d"
                               % (LineIndexOfOriginalFile + 1))
 
+        if TrimLong:
+            Line = gLongNumberPattern.sub(r"\1", Line)
         # convert HEX number format if indicated
         if ConvertHex:
             Line = gHexNumberPattern.sub(r"0\2h", Line)
         else:
             Line = gHexNumberPattern.sub(r"\1\2", Line)
-        if TrimLong:
-            Line = gLongNumberPattern.sub(r"\1", Line)
 
         # convert Decimal number format
         Line = gDecNumberPattern.sub(r"\1", Line)

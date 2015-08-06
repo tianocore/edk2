@@ -185,7 +185,7 @@
 
     <Command.MSFT, Command.INTEL>
         "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
-        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        Trim --source-code --convert-hex --trim-long -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iii
 
     <Command.GCC, Command.RVCT>
@@ -460,7 +460,7 @@
 
     <Command.MSFT, Command.INTEL>
         "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
-        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        Trim --source-code --convert-hex --trim-long -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         cd $(OUTPUT_DIR)(+)${s_dir}
         "$(ASM16)" /nologo /c /omf $(INC) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${d_path}(+)${s_base}.iii
         "$(ASMLINK)" $(ASMLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj,${dst},,,,
