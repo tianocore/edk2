@@ -40,6 +40,15 @@ DetectSmbiosVersion (
   QEMU_SMBIOS_ANCHOR   QemuAnchor;
   UINT16               SmbiosVersion;
 
+  if (PcdGetBool (PcdQemuSmbiosValidated)) {
+    //
+    // Some other module, linked against this library, has already performed
+    // the task at hand. This should never happen, but it's easy to handle;
+    // just exit early.
+    //
+    return RETURN_SUCCESS;
+  }
+
   if (RETURN_ERROR (QemuFwCfgFindFile (
                       "etc/smbios/smbios-anchor", &Anchor, &AnchorSize)) ||
       RETURN_ERROR (QemuFwCfgFindFile (
@@ -72,5 +81,10 @@ DetectSmbiosVersion (
     SmbiosVersion));
   PcdSet16 (PcdSmbiosVersion, SmbiosVersion);
 
+  //
+  // SMBIOS platform drivers can now fetch and install
+  // "etc/smbios/smbios-tables" from QEMU.
+  //
+  PcdSetBool (PcdQemuSmbiosValidated, TRUE);
   return RETURN_SUCCESS;
 }

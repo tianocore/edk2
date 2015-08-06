@@ -15,6 +15,7 @@
 #include "SmbiosPlatformDxe.h"
 #include <Library/QemuFwCfgLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 
 /**
   Locates and extracts the QEMU SMBIOS data if present in fw_cfg
@@ -27,32 +28,19 @@ GetQemuSmbiosTables (
   VOID
   )
 {
-  SMBIOS_TABLE_ENTRY_POINT QemuAnchor;
-  FIRMWARE_CONFIG_ITEM     Anchor, Tables;
-  UINTN                    AnchorSize, TablesSize;
+  EFI_STATUS               Status;
+  FIRMWARE_CONFIG_ITEM     Tables;
+  UINTN                    TablesSize;
   UINT8                    *QemuTables;
 
-  if (EFI_ERROR (QemuFwCfgFindFile (
-                   "etc/smbios/smbios-anchor", &Anchor, &AnchorSize)) ||
-      EFI_ERROR (QemuFwCfgFindFile (
-                   "etc/smbios/smbios-tables", &Tables, &TablesSize)) ||
-      AnchorSize != sizeof (QemuAnchor) ||
-      TablesSize == 0) {
+  if (!PcdGetBool (PcdQemuSmbiosValidated)) {
     return NULL;
   }
 
-  //
-  // We copy the entry point structure to perform some additional checks,
-  // but discard it upon return.
-  //
-  QemuFwCfgSelectItem (Anchor);
-  QemuFwCfgReadBytes (AnchorSize, &QemuAnchor);
-
-  if (AsciiStrnCmp ((CHAR8 *)QemuAnchor.AnchorString, "_SM_", 4) ||
-      AsciiStrnCmp ((CHAR8 *)QemuAnchor.IntermediateAnchorString, "_DMI_", 5) ||
-      TablesSize != QemuAnchor.TableLength) {
-    return NULL;
-  }
+  Status = QemuFwCfgFindFile ("etc/smbios/smbios-tables", &Tables,
+             &TablesSize);
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (TablesSize > 0);
 
   QemuTables = AllocatePool (TablesSize);
   if (QemuTables == NULL) {

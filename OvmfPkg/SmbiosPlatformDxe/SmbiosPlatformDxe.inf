@@ -53,6 +53,10 @@
   HobLib
   QemuFwCfgLib
   MemoryAllocationLib
+  PcdLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated
 
 [Protocols]
   gEfiSmbiosProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
