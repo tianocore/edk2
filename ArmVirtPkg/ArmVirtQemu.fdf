@@ -104,12 +104,10 @@ READ_LOCK_STATUS   = TRUE
   APRIORI DXE {
     INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
     INF ArmVirtPkg/VirtFdtDxe/VirtFdtDxe.inf
-    INF ArmVirtPkg/QemuFwCfgToPcdDxe/QemuFwCfgToPcd.inf
   }
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF ArmVirtPkg/VirtFdtDxe/VirtFdtDxe.inf
-  INF ArmVirtPkg/QemuFwCfgToPcdDxe/QemuFwCfgToPcd.inf
 
   #
   # PI DXE Drivers producing Architectural Protocols (EFI Services)
