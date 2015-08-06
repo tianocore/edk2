@@ -49,4 +49,5 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated

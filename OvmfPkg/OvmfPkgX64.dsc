@@ -367,6 +367,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
 ################################################################################

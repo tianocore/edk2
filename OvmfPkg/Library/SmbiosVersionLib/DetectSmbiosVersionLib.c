@@ -27,6 +27,7 @@
 
 typedef union {
   SMBIOS_TABLE_ENTRY_POINT     V2;
+  SMBIOS_TABLE_3_0_ENTRY_POINT V3;
 } QEMU_SMBIOS_ANCHOR;
 
 RETURN_STATUS
@@ -71,6 +72,22 @@ DetectSmbiosVersion (
     }
     SmbiosVersion = (UINT16)(QemuAnchor.V2.MajorVersion << 8 |
                              QemuAnchor.V2.MinorVersion);
+    break;
+
+  case sizeof QemuAnchor.V3:
+    QemuFwCfgReadBytes (AnchorSize, &QemuAnchor);
+
+    if (QemuAnchor.V3.MajorVersion != 3 ||
+        QemuAnchor.V3.TableMaximumSize != TablesSize ||
+        CompareMem (QemuAnchor.V3.AnchorString, "_SM3_", 5) != 0) {
+      return RETURN_SUCCESS;
+    }
+    SmbiosVersion = (UINT16)(QemuAnchor.V3.MajorVersion << 8 |
+                             QemuAnchor.V3.MinorVersion);
+
+    DEBUG ((EFI_D_INFO, "%a: SMBIOS 3.x DocRev from QEMU: 0x%02x\n",
+      __FUNCTION__, QemuAnchor.V3.DocRev));
+    PcdSet8 (PcdSmbiosDocRev, QemuAnchor.V3.DocRev);
     break;
 
   default:
