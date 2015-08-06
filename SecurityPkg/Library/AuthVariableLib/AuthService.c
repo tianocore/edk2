@@ -1977,7 +1977,8 @@ InsertCertsToDb (
 EFI_STATUS
 CleanCertsFromDb (
   VOID
-  ){
+  )
+{
   UINT32                  Offset;
   AUTH_CERT_DB_DATA       *Ptr;
   UINT32                  NameSize;
