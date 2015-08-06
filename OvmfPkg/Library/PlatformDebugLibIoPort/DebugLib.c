@@ -134,7 +134,8 @@ DebugAssert (
   //
   // Generate the ASSERT() message in Ascii format
   //
-  AsciiSPrint (Buffer, sizeof (Buffer), "ASSERT %a(%d): %a\n", FileName, LineNumber, Description);
+  AsciiSPrint (Buffer, sizeof Buffer, "ASSERT %a(%Lu): %a\n", FileName,
+    (UINT64)LineNumber, Description);
 
   //
   // Send the print string to the Console Output device
