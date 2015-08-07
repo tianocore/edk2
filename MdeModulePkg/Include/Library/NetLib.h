@@ -530,13 +530,13 @@ NetPutUint32 (
   );
 
 /**
-  Initialize a random seed using current time.
+  Initialize a random seed using current time and monotonic count.
 
-  Get current time first. Then initialize a random seed based on some basic
-  mathematical operations on the hour, day, minute, second, nanosecond and year
-  of the current time.
+  Get current time and monotonic count first. Then initialize a random seed 
+  based on some basic mathematics operation on the hour, day, minute, second,
+  nanosecond and year of the current time and the monotonic count value.
 
-  @return The random seed, initialized with current time.
+  @return The random seed initialized with current time.
 
 **/
 UINT32
