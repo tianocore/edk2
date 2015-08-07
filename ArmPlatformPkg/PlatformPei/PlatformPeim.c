@@ -50,13 +50,13 @@ PlatformPeim (
 //
 // Module globals
 //
-EFI_PEI_PPI_DESCRIPTOR  mPpiListBootMode = {
+CONST EFI_PEI_PPI_DESCRIPTOR  mPpiListBootMode = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMasterBootModePpiGuid,
   NULL
 };
 
-EFI_PEI_PPI_DESCRIPTOR  mPpiListRecoveryBootMode = {
+CONST EFI_PEI_PPI_DESCRIPTOR  mPpiListRecoveryBootMode = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiBootInRecoveryModePpiGuid,
   NULL
