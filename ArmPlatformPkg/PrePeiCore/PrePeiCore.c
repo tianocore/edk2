@@ -21,19 +21,19 @@
 
 #include "PrePeiCore.h"
 
-EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
-ARM_GLOBAL_VARIABLE_PPI             mGlobalVariablePpi = { PrePeiCoreGetGlobalVariableMemory };
+CONST EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
+CONST ARM_GLOBAL_VARIABLE_PPI             mGlobalVariablePpi = { PrePeiCoreGetGlobalVariableMemory };
 
-EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
+CONST EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamSupportPpiGuid,
-    &mTemporaryRamSupportPpi
+    (VOID *) &mTemporaryRamSupportPpi
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gArmGlobalVariablePpiGuid,
-    &mGlobalVariablePpi
+    (VOID *) &mGlobalVariablePpi
   }
 };
 
