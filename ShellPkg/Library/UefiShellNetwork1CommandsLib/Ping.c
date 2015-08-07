@@ -18,7 +18,7 @@
 
 #define PING_IP4_COPY_ADDRESS(Dest, Src) (CopyMem ((Dest), (Src), sizeof (EFI_IPv4_ADDRESS)))
 
-UINT64          CurrentTick = 0;
+UINT64          mCurrentTick = 0;
 
 //
 // Function templates to match the IPv4 and IPv6 commands that we use.
@@ -235,16 +235,16 @@ ReadTime (
 
   ASSERT (gCpu != NULL);
 
-  Status = gCpu->GetTimerValue (gCpu, 0, &CurrentTick, &TimerPeriod);
+  Status = gCpu->GetTimerValue (gCpu, 0, &mCurrentTick, &TimerPeriod);
   if (EFI_ERROR (Status)) {
     //
     // The WinntGetTimerValue will return EFI_UNSUPPORTED. Set the
     // TimerPeriod by ourselves.
     //
-    CurrentTick += 1000000;
+    mCurrentTick += 1000000;
   }
   
-  return CurrentTick;
+  return mCurrentTick;
 }
 
 
