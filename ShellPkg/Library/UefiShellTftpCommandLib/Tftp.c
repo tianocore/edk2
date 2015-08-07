@@ -36,18 +36,69 @@ STATIC CONST CHAR16 mTftpProgressFrame[] = L"[                                  
 // (TFTP_PROGRESS_MESSAGE_SIZE-1) '\b'
 STATIC CONST CHAR16 mTftpProgressDelete[] = L"\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
 
-STATIC BOOLEAN StringToUint16 (
+/**
+  Check and convert the UINT16 option values of the 'tftp' command
+
+  @param[in]  ValueStr  Value as an Unicode encoded string
+  @param[out] Value     UINT16 value
+
+  @return     TRUE      The value was returned.
+  @return     FALSE     A parsing error occured.
+**/
+STATIC 
+BOOLEAN 
+StringToUint16 (
   IN   CONST CHAR16  *ValueStr,
   OUT  UINT16        *Value
   );
 
-STATIC EFI_STATUS GetNicName (
+/**
+  Get the name of the NIC.
+
+  @param[in]   ControllerHandle  The network physical device handle.
+  @param[in]   NicNumber         The network physical device number.
+  @param[out]  NicName           Address where to store the NIC name.
+                                 The memory area has to be at least
+                                 IP4_NIC_NAME_LENGTH bytes wide.
+
+  @return  EFI_SUCCESS  The name of the NIC was returned.
+  @return  Others       The creation of the child for the Managed
+                        Network Service failed or the opening of
+                        the Managed Network Protocol failed or
+                        the operational parameters for the
+                        Managed Network Protocol could not be
+                        read.
+**/
+STATIC 
+EFI_STATUS 
+GetNicName (
   IN   EFI_HANDLE  ControllerHandle,
   IN   UINTN       Index,
   OUT  CHAR16      *NicName
   );
 
-STATIC EFI_STATUS CreateServiceChildAndOpenProtocol (
+/**
+  Create a child for the service identified by its service binding protocol GUID
+  and get from the child the interface of the protocol identified by its GUID.
+
+  @param[in]   ControllerHandle            Controller handle.
+  @param[in]   ServiceBindingProtocolGuid  Service binding protocol GUID of the
+                                           service to be created.
+  @param[in]   ProtocolGuid                GUID of the protocol to be open.
+  @param[out]  ChildHandle                 Address where the handler of the
+                                           created child is returned. NULL is
+                                           returned in case of error.
+  @param[out]  Interface                   Address where a pointer to the
+                                           protocol interface is returned in
+                                           case of success.
+
+  @return  EFI_SUCCESS  The child was created and the protocol opened.
+  @return  Others       Either the creation of the child or the opening
+                        of the protocol failed.
+**/
+STATIC 
+EFI_STATUS 
+CreateServiceChildAndOpenProtocol (
   IN   EFI_HANDLE  ControllerHandle,
   IN   EFI_GUID    *ServiceBindingProtocolGuid,
   IN   EFI_GUID    *ProtocolGuid,
@@ -55,20 +106,71 @@ STATIC EFI_STATUS CreateServiceChildAndOpenProtocol (
   OUT  VOID        **Interface
   );
 
-STATIC VOID CloseProtocolAndDestroyServiceChild (
+/**
+  Close the protocol identified by its GUID on the child handle of the service
+  identified by its service binding protocol GUID, then destroy the child
+  handle.
+
+  @param[in]  ControllerHandle            Controller handle.
+  @param[in]  ServiceBindingProtocolGuid  Service binding protocol GUID of the
+                                          service to be destroyed.
+  @param[in]  ProtocolGuid                GUID of the protocol to be closed.
+  @param[in]  ChildHandle                 Handle of the child to be destroyed.
+
+**/
+STATIC 
+VOID 
+CloseProtocolAndDestroyServiceChild (
   IN  EFI_HANDLE  ControllerHandle,
   IN  EFI_GUID    *ServiceBindingProtocolGuid,
   IN  EFI_GUID    *ProtocolGuid,
   IN  EFI_HANDLE  ChildHandle
   );
 
-STATIC EFI_STATUS GetFileSize (
+/**
+  Worker function that gets the size in numbers of bytes of a file from a TFTP
+  server before to download the file.
+
+  @param[in]   Mtftp4    MTFTP4 protocol interface
+  @param[in]   FilePath  Path of the file, ASCII encoded
+  @param[out]  FileSize  Address where to store the file size in number of
+                         bytes.
+
+  @retval  EFI_SUCCESS      The size of the file was returned.
+  @retval  EFI_UNSUPPORTED  The server does not support the "tsize" option.
+  @retval  Others           Error when retrieving the information from the server
+                            (see EFI_MTFTP4_PROTOCOL.GetInfo() status codes)
+                            or error when parsing the response of the server.
+**/
+STATIC 
+EFI_STATUS 
+GetFileSize (
   IN   EFI_MTFTP4_PROTOCOL  *Mtftp4,
   IN   CONST CHAR8          *FilePath,
   OUT  UINTN                *FileSize
   );
 
-STATIC EFI_STATUS DownloadFile (
+/**
+  Worker function that download the data of a file from a TFTP server given
+  the path of the file and its size.
+
+  @param[in]   Mtftp4         MTFTP4 protocol interface
+  @param[in]   FilePath       Path of the file, Unicode encoded
+  @param[in]   AsciiFilePath  Path of the file, ASCII encoded
+  @param[in]   FileSize       Size of the file in number of bytes
+  @param[out]  Data           Address where to store the address of the buffer
+                              where the data of the file were downloaded in
+                              case of success.
+
+  @retval  EFI_SUCCESS           The file was downloaded.
+  @retval  EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval  Others                The downloading of the file from the server failed
+                                 (see EFI_MTFTP4_PROTOCOL.ReadFile() status codes).
+
+**/
+STATIC 
+EFI_STATUS 
+DownloadFile (
   IN   EFI_MTFTP4_PROTOCOL  *Mtftp4,
   IN   CONST CHAR16         *FilePath,
   IN   CONST CHAR8          *AsciiFilePath,
@@ -76,7 +178,21 @@ STATIC EFI_STATUS DownloadFile (
   OUT  VOID                 **Data
   );
 
-STATIC EFI_STATUS CheckPacket (
+/**
+  Update the progress of a file download
+  This procedure is called each time a new TFTP packet is received.
+
+  @param[in]  This       MTFTP4 protocol interface
+  @param[in]  Token      Parameters for the download of the file
+  @param[in]  PacketLen  Length of the packet
+  @param[in]  Packet     Address of the packet
+
+  @retval  EFI_SUCCESS  All packets are accepted.
+
+**/
+STATIC 
+EFI_STATUS 
+CheckPacket (
   IN EFI_MTFTP4_PROTOCOL  *This,
   IN EFI_MTFTP4_TOKEN     *Token,
   IN UINT16               PacketLen,
