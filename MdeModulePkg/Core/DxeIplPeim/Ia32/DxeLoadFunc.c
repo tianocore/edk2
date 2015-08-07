@@ -361,6 +361,7 @@ HandOffToDxeCore (
     TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT;
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
+    PageTables = 0;
     BuildPageTablesIa32Pae = (BOOLEAN) (PcdGetBool (PcdSetNxForStack) && IsIa32PaeSupport () && IsExecuteDisableBitAvailable ());
     if (BuildPageTablesIa32Pae) {
       PageTables = Create4GPageTablesIa32Pae (BaseOfStack, STACK_SIZE);
