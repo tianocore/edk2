@@ -1,7 +1,7 @@
 /** @file
   CPU DXE AP Startup
 
-  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,47 @@
 #include "CpuMp.h"
 
 #pragma pack(1)
+
+typedef struct {
+  UINT8  MoveIa32EferMsrToEcx[5];
+  UINT8  ReadIa32EferMsr[2];
+  UINT8  SetExecuteDisableBitEnableBit[4];
+  UINT8  WriteIa32EferMsr[2];
+
+#if defined (MDE_CPU_IA32)
+  UINT8  MovEaxCr3;
+  UINT32 Cr3Value;
+  UINT8  MovCr3Eax[3];
+
+  UINT8  MoveCr4ToEax[3];
+  UINT8  SetCr4Bit5[4];
+  UINT8  MoveEaxToCr4[3];
+
+  UINT8  MoveCr0ToEax[3];
+  UINT8  SetCr0PagingBit[4];
+  UINT8  MoveEaxToCr0[3];
+#endif
+} ENABLE_EXECUTE_DISABLE_CODE;
+
+ENABLE_EXECUTE_DISABLE_CODE mEnableExecuteDisableCodeTemplate = {
+  { 0xB9, 0x80, 0x00, 0x00, 0xC0 },   // mov ecx, 0xc0000080
+  { 0x0F, 0x32 },                     // rdmsr
+  { 0x0F, 0xBA, 0xE8, 0x0B },         // bts eax, 11
+  { 0x0F, 0x30 },                     // wrmsr
+
+#if defined (MDE_CPU_IA32)
+  0xB8, 0x00000000,                   // mov eax, cr3 value
+  { 0x0F, 0x22, 0xd8 },               // mov cr3, eax
+
+  { 0x0F, 0x20, 0xE0 },               // mov eax, cr4
+  { 0x0F, 0xBA, 0xE8, 0x05 },         // bts eax, 5
+  { 0x0F, 0x22, 0xE0 },               // mov cr4, eax
+
+  { 0x0F, 0x20, 0xC0 },               // mov eax, cr0
+  { 0x0F, 0xBA, 0xE8, 0x1F },         // bts eax, 31
+  { 0x0F, 0x22, 0xC0 },               // mov cr0, eax
+#endif
+};
 
 typedef struct {
   UINT8  JmpToCli[2];
@@ -51,6 +92,12 @@ typedef struct {
   UINT8  MoveFlatDataSelectorFromAxToFs[2];
   UINT8  MoveFlatDataSelectorFromAxToGs[2];
   UINT8  MoveFlatDataSelectorFromAxToSs[2];
+
+  //
+  // Code placeholder to enable PAE Execute Disable for IA32
+  // and enable Execute Disable Bit for X64
+  //
+  ENABLE_EXECUTE_DISABLE_CODE EnableExecuteDisable;
 
 #if defined (MDE_CPU_X64)
   //
@@ -207,6 +254,17 @@ STARTUP_CODE mStartupCodeTemplate = {
   { 0x8e, 0xd0 },                     // mov ss, ax
 
 #if defined (MDE_CPU_X64)
+  //
+  // Code placeholder to enable Execute Disable Bit for X64
+  // Default is all NOP - No Operation
+  //
+  {
+    { 0x90, 0x90, 0x90, 0x90, 0x90 },
+    { 0x90, 0x90 },
+    { 0x90, 0x90, 0x90, 0x90 },
+    { 0x90, 0x90 },
+  },
+
   0xB8, 0x00000000,                   // mov eax, cr3 value
   { 0x0F, 0x22, 0xd8 },               // mov cr3, eax
 
@@ -226,7 +284,29 @@ STARTUP_CODE mStartupCodeTemplate = {
   0xEA,                               // FarJmp32LongMode
         OFFSET_OF(STARTUP_CODE, MovEaxOrRaxCpuDxeEntry),
         LINEAR_CODE64_SEL,
-#endif // defined (MDE_CPU_X64)
+#else
+  //
+  // Code placeholder to enable PAE Execute Disable for IA32
+  // Default is all NOP - No Operation
+  //
+  {
+    { 0x90, 0x90, 0x90, 0x90, 0x90 },
+    { 0x90, 0x90 },
+    { 0x90, 0x90, 0x90, 0x90 },
+    { 0x90, 0x90 },
+
+    0x90, 0x90909090,
+    { 0x90, 0x90, 0x90 },
+
+    { 0x90, 0x90, 0x90 },
+    { 0x90, 0x90, 0x90, 0x90 },
+    { 0x90, 0x90, 0x90 },
+
+    { 0x90, 0x90, 0x90 },
+    { 0x90, 0x90, 0x90, 0x90 },
+    { 0x90, 0x90, 0x90 },
+  },
+#endif
 
   //0xeb, 0xfe,       // jmp $
 #if defined (MDE_CPU_X64)
@@ -239,6 +319,48 @@ STARTUP_CODE mStartupCodeTemplate = {
 };
 
 volatile STARTUP_CODE *StartupCode = NULL;
+
+/**
+  The function will check if BSP Execute Disable is enabled.
+  DxeIpl may have enabled Execute Disable for BSP,
+  APs need to get the status and sync up the settings.
+
+  @retval TRUE      BSP Execute Disable is enabled.
+  @retval FALSE     BSP Execute Disable is not enabled.
+
+**/
+BOOLEAN
+IsBspExecuteDisableEnabled (
+  VOID
+  )
+{
+  UINT32            RegEax;
+  UINT32            RegEdx;
+  UINT64            MsrRegisters;
+  BOOLEAN           Enabled;
+
+  Enabled = FALSE;
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x80000001) {
+    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+    //
+    // Cpuid 0x80000001
+    // Bit 20: Execute Disable Bit available.
+    //
+    if ((RegEdx & BIT20) != 0) {
+      MsrRegisters = AsmReadMsr64 (0xC0000080);
+      //
+      // Msr 0xC0000080
+      // Bit 11: Execute Disable Bit enable.
+      //
+      if ((MsrRegisters & BIT11) != 0) {
+        Enabled = TRUE;
+      }
+    }
+  }
+
+  return Enabled;
+}
 
 /**
   Prepares Startup Code for APs.
@@ -280,9 +402,18 @@ PrepareAPStartupCode (
 
   StartupCode->FlatJmpOffset += (UINT32) StartAddress;
 
+  if (IsBspExecuteDisableEnabled ()) {
+    CopyMem (
+      (VOID*) &StartupCode->EnableExecuteDisable,
+      &mEnableExecuteDisableCodeTemplate,
+      sizeof (ENABLE_EXECUTE_DISABLE_CODE)
+      );
+  }
 #if defined (MDE_CPU_X64)
   StartupCode->Cr3Value = (UINT32) AsmReadCr3 ();
   StartupCode->LongJmpOffset += (UINT32) StartAddress;
+#else
+  StartupCode->EnableExecuteDisable.Cr3Value = (UINT32) AsmReadCr3 ();
 #endif
 
   return EFI_SUCCESS;
