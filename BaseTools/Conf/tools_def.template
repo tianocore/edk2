@@ -344,6 +344,12 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
+#   CLANG35     -Linux,Windows-  Requires:
+#                             Clang v3.5 or later, and GNU binutils targeting aarch64-linux-gnu
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
 #   ELFGCC      -Linux-  Requires:
 #                             GCC(this tool chain uses whatever version of gcc and binutils that is installed in /usr/bin)
 #                        Optional:
@@ -4641,6 +4647,58 @@ RELEASE_GCC49_ARM_CC_FLAGS       = DEF(GCC49_ARM_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC49_AARCH64_CC_FLAGS   = DEF(GCC49_AARCH64_CC_FLAGS) -O0
 RELEASE_GCC49_AARCH64_CC_FLAGS   = DEF(GCC49_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable
+
+####################################################################################
+#
+# CLANG35   - This configuration is used to compile under Linux to produce
+#             PE/COFF binaries using the clang compiler and assembler (v3.5 and up)
+#             and GNU linker
+#
+####################################################################################
+*_CLANG35_*_*_FAMILY             = GCC
+
+*_CLANG35_*_MAKE_PATH            = make
+*_CLANG35_*_*_DLL                = ENV(CLANG35_DLL)
+*_CLANG35_*_ASL_PATH             = DEF(UNIX_IASL_BIN)
+
+*_CLANG35_*_PP_FLAGS             = DEF(GCC_PP_FLAGS)
+*_CLANG35_*_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS)
+*_CLANG35_*_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS)
+*_CLANG35_*_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS)
+*_CLANG35_*_APP_FLAGS            =
+*_CLANG35_*_ASL_FLAGS            = DEF(IASL_FLAGS)
+*_CLANG35_*_ASL_OUTFLAGS         = DEF(IASL_OUTFLAGS)
+
+*_CLANG35_*_CC_PATH              = ENV(CLANG35_BIN)clang
+*_CLANG35_*_ASM_PATH             = ENV(CLANG35_BIN)clang
+*_CLANG35_*_PP_PATH              = ENV(CLANG35_BIN)clang
+*_CLANG35_*_VFRPP_PATH           = ENV(CLANG35_BIN)clang
+*_CLANG35_*_ASLCC_PATH           = ENV(CLANG35_BIN)clang
+*_CLANG35_*_ASLPP_PATH           = ENV(CLANG35_BIN)clang
+
+DEFINE CLANG35_WARNING_OVERRIDES = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body
+DEFINE CLANG35_AARCH64_CC_FLAGS  = DEF(GCC_AARCH64_CC_FLAGS) -target aarch64 -mcmodel=small -mstrict-align DEF(CLANG35_WARNING_OVERRIDES)
+
+##################
+# CLANG35 AARCH64 definitions
+##################
+*_CLANG35_AARCH64_SLINK_PATH     = ENV(CLANG35_AARCH64_PREFIX)ar
+*_CLANG35_AARCH64_DLINK_PATH     = ENV(CLANG35_AARCH64_PREFIX)ld
+*_CLANG35_AARCH64_ASLDLINK_PATH  = ENV(CLANG35_AARCH64_PREFIX)ld
+*_CLANG35_AARCH64_RC_PATH        = ENV(CLANG35_AARCH64_PREFIX)objcopy
+
+*_CLANG35_AARCH64_ASLCC_FLAGS    = DEF(GCC_ASLCC_FLAGS)
+*_CLANG35_AARCH64_ASLDLINK_FLAGS = DEF(GCC_AARCH64_ASLDLINK_FLAGS)
+*_CLANG35_AARCH64_ASM_FLAGS      = DEF(GCC_ASM_FLAGS) $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -target aarch64 -Qunused-arguments
+*_CLANG35_AARCH64_DLINK_FLAGS    = DEF(GCC_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000
+*_CLANG35_AARCH64_DLINK2_FLAGS   = DEF(GCC_DLINK2_FLAGS_COMMON) --defsym=PECOFF_HEADER_SIZE=0x228
+*_CLANG35_AARCH64_PLATFORM_FLAGS =
+*_CLANG35_AARCH64_PP_FLAGS       = DEF(GCC_PP_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)
+*_CLANG35_AARCH64_RC_FLAGS       = DEF(GCC_AARCH64_RC_FLAGS)
+*_CLANG35_AARCH64_VFRPP_FLAGS    = DEF(GCC_VFRPP_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)
+
+  DEBUG_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -O0
+RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -Oz
 
 ####################################################################################
 #
