@@ -740,51 +740,58 @@ WriteSections64 (
           }
         } else if (mEhdr->e_machine == EM_AARCH64) {
 
-          // AARCH64 GCC uses RELA relocation, so all relocations have to be fixed up.
-          // As opposed to ARM32 using REL.
-
           switch (ELF_R_TYPE(Rel->r_info)) {
 
+          case R_AARCH64_ADR_PREL_PG_HI21:
+          case R_AARCH64_ADD_ABS_LO12_NC:
+          case R_AARCH64_LDST8_ABS_LO12_NC:
+          case R_AARCH64_LDST16_ABS_LO12_NC:
+          case R_AARCH64_LDST32_ABS_LO12_NC:
+          case R_AARCH64_LDST64_ABS_LO12_NC:
+          case R_AARCH64_LDST128_ABS_LO12_NC:
+            //
+            // AArch64 PG_H21 relocations are typically paired with ABS_LO12
+            // relocations, where a PC-relative reference with +/- 4 GB range is
+            // split into a relative high part and an absolute low part. Since
+            // the absolute low part represents the offset into a 4 KB page, we
+            // have to make sure that the 4 KB relative offsets of both the
+            // section containing the reference as well as the section to which
+            // it refers have not been changed during PE/COFF conversion (i.e.,
+            // in ScanSections64() above).
+            //
+            if (((SecShdr->sh_addr ^ SecOffset) & 0xfff) != 0 ||
+                ((SymShdr->sh_addr ^ mCoffSectionsOffset[Sym->st_shndx]) & 0xfff) != 0 ||
+                mCoffAlignment < 0x1000) {
+              Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s AARCH64 small code model requires 4 KB section alignment.",
+                mInImageName);
+              break;
+            }
+            /* fall through */
+
           case R_AARCH64_ADR_PREL_LO21:
-            if  (Rel->r_addend != 0 ) { /* TODO */
-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_ADR_PREL_LO21 Need to fixup with addend!.");
-            }
-            break;
-
           case R_AARCH64_CONDBR19:
-            if  (Rel->r_addend != 0 ) { /* TODO */
-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_CONDBR19 Need to fixup with addend!.");
-            }
-            break;
-
           case R_AARCH64_LD_PREL_LO19:
-            if  (Rel->r_addend != 0 ) { /* TODO */
-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_LD_PREL_LO19 Need to fixup with addend!.");
-            }
-            break;
-
           case R_AARCH64_CALL26:
           case R_AARCH64_JUMP26:
-            if  (Rel->r_addend != 0 ) {
-              // Some references to static functions sometime start at the base of .text + addend.
-              // It is safe to ignore these relocations because they patch a `BL` instructions that
-              // contains an offset from the instruction itself and there is only a single .text section.
-              // So we check if the symbol is a "section symbol"
-              if (ELF64_ST_TYPE (Sym->st_info) == STT_SECTION) {
-                break;
-              }
-              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_JUMP26 Need to fixup with addend!.");
+            //
+            // The GCC toolchains (i.e., binutils) may corrupt section relative
+            // relocations when emitting relocation sections into fully linked
+            // binaries. More specifically, they tend to fail to take into
+            // account the fact that a '.rodata + XXX' relocation needs to have
+            // its addend recalculated once .rodata is merged into the .text
+            // section, and the relocation emitted into the .rela.text section.
+            //
+            // We cannot really recover from this loss of information, so the
+            // only workaround is to prevent having to recalculate any relative
+            // relocations at all, by using a linker script that ensures that
+            // the offset between the Place and the Symbol is the same in both
+            // the ELF and the PE/COFF versions of the binary.
+            //
+            if ((SymShdr->sh_addr - SecShdr->sh_addr) !=
+                (mCoffSectionsOffset[Sym->st_shndx] - SecOffset)) {
+              Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s AARCH64 relative relocations require identical ELF and PE/COFF section offsets",
+                mInImageName);
             }
-            break;
-
-          case R_AARCH64_ADR_PREL_PG_HI21:
-            // TODO : AArch64 'small' memory model.
-            Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s unsupported ELF EM_AARCH64 relocation R_AARCH64_ADR_PREL_PG_HI21.", mInImageName);
-            break;
-
-          case R_AARCH64_ADD_ABS_LO12_NC:
-            // TODO : AArch64 'small' memory model.
-            Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s unsupported ELF EM_AARCH64 relocation R_AARCH64_ADD_ABS_LO12_NC.", mInImageName);
             break;
 
           // Absolute relocations.
@@ -851,7 +858,7 @@ WriteRelocations64 (
               Error (NULL, 0, 3000, "Invalid", "%s unsupported ELF EM_X86_64 relocation 0x%x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
             }
           } else if (mEhdr->e_machine == EM_AARCH64) {
-            // AArch64 GCC uses RELA relocation, so all relocations has to be fixed up. ARM32 uses REL.
+
             switch (ELF_R_TYPE(Rel->r_info)) {
             case R_AARCH64_ADR_PREL_LO21:
               break;
@@ -869,13 +876,12 @@ WriteRelocations64 (
               break;
 
             case R_AARCH64_ADR_PREL_PG_HI21:
-              // TODO : AArch64 'small' memory model.
-              Error (NULL, 0, 3000, "Invalid", "WriteRelocations64(): %s unsupported ELF EM_AARCH64 relocation R_AARCH64_ADR_PREL_PG_HI21.", mInImageName);
-              break;
-
             case R_AARCH64_ADD_ABS_LO12_NC:
-              // TODO : AArch64 'small' memory model.
-              Error (NULL, 0, 3000, "Invalid", "WriteRelocations64(): %s unsupported ELF EM_AARCH64 relocation R_AARCH64_ADD_ABS_LO12_NC.", mInImageName);
+            case R_AARCH64_LDST8_ABS_LO12_NC:
+            case R_AARCH64_LDST16_ABS_LO12_NC:
+            case R_AARCH64_LDST32_ABS_LO12_NC:
+            case R_AARCH64_LDST64_ABS_LO12_NC:
+            case R_AARCH64_LDST128_ABS_LO12_NC:
               break;
 
             case R_AARCH64_ABS64:
