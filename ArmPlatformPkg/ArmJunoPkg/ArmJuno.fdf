@@ -276,8 +276,8 @@ READ_LOCK_STATUS   = TRUE
   }
 
 [Rule.AARCH64.SEC]
-  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
-    TE  TE    Align = 4K                $(INF_OUTPUT)/$(MODULE_NAME).efi
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED FIXED {
+    TE  TE    Align = Auto              $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
 # A shim specific rule is required to ensure the alignment is 4K.
@@ -288,13 +288,13 @@ READ_LOCK_STATUS   = TRUE
   }
 
 [Rule.Common.PEI_CORE]
-  FILE PEI_CORE = $(NAMED_GUID) {
+  FILE PEI_CORE = $(NAMED_GUID) FIXED {
     TE     TE                           $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI     STRING ="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM]
-  FILE PEIM = $(NAMED_GUID) {
+  FILE PEIM = $(NAMED_GUID) FIXED {
      PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
      TE       TE                        $(INF_OUTPUT)/$(MODULE_NAME).efi
      UI       STRING="$(MODULE_NAME)" Optional
