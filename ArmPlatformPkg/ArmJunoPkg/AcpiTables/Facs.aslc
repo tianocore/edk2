@@ -55,14 +55,8 @@ EFI_ACPI_5_0_FIRMWARE_ACPI_CONTROL_STRUCTURE Facs = {
       EFI_ACPI_RESERVED_BYTE },                           // UINT8   Reserved1[23]
 };
 
-VOID*
-ReferenceAcpiTable (
-  VOID
-  )
-{
-  //
-  // Reference the table being generated to prevent the optimizer from removing the
-  // data structure from the executable
-  //
-  return (VOID*)&Facs;
-}
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Facs;

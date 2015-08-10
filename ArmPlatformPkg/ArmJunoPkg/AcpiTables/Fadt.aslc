@@ -92,14 +92,8 @@ EFI_ACPI_5_1_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
   NULL_GAS                                                                  // EFI_ACPI_5_0_GENERIC_ADDRESS_STRUCTURE  SleepStatusReg
 };
 
-VOID*
-ReferenceAcpiTable (
-  VOID
-  )
-{
-  //
-  // Reference the table being generated to prevent the optimizer from removing the
-  // data structure from the executable
-  //
-  return (VOID*)&Fadt;
-}
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Fadt;
