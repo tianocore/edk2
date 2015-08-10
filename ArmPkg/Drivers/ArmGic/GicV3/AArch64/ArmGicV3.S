@@ -13,6 +13,14 @@
 
 #include <AsmMacroIoLibV8.h>
 
+#if !defined(__clang__)
+
+//
+// Clang versions before v3.6 do not support the GNU extension that allows
+// system registers outside of the IMPLEMENTATION DEFINED range to be specified
+// using the generic notation below. However, clang knows these registers by
+// their architectural names, so it has no need for these aliases anyway.
+//
 #define ICC_SRE_EL1             S3_0_C12_C12_5
 #define ICC_SRE_EL2             S3_4_C12_C9_5
 #define ICC_SRE_EL3             S3_6_C12_C12_5
@@ -21,6 +29,8 @@
 #define ICC_IAR1_EL1            S3_0_C12_C12_0
 #define ICC_PMR_EL1             S3_0_C4_C6_0
 #define ICC_BPR1_EL1            S3_0_C12_C12_3
+
+#endif
 
 .text
 .align 2
