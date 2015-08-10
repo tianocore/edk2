@@ -111,7 +111,7 @@ WatchdogInterruptHandler (
          EfiResetCold,
          EFI_TIMEOUT,
          StrSize (ResetString),
-         &ResetString
+         (VOID *) &ResetString
          );
 
   // If we got here then the reset didn't work
