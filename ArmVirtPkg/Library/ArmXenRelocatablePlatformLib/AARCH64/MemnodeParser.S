@@ -99,8 +99,8 @@ find_memnode:
   /*
    * Check the DTB magic at offset 0
    */
-  movz  w4, #:abs_g0_nc:FDT_MAGIC
-  movk  w4, #:abs_g1:FDT_MAGIC
+  movz  w4, #(FDT_MAGIC & 0xffff)
+  movk  w4, #(FDT_MAGIC >> 16), lsl #16
   ldr  w5, [xDTP]
   cmp  w4, w5
   bne  err_invalid_magic
