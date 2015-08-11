@@ -168,7 +168,7 @@
  *   at Documentation/devicetree/bindings/arm/xen.txt.
  */
 
-#define XEN_HYPERCALL_TAG   0XEA1
+#define XEN_HYPERCALL_TAG   0xEA1
 
 #define uint64_aligned_t UINT64 __attribute__((aligned(8)))
 
