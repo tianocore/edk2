@@ -22,7 +22,7 @@ typedef struct _ISCSI_SESSION_CONFIG_DATA ISCSI_SESSION_CONFIG_DATA;
 ///
 /// IPv4 Device Path Node Length
 ///
-#define IPv4_NODE_LEN_NEW_VERSIONS    27
+#define IP4_NODE_LEN_NEW_VERSIONS    27
 
 #pragma pack(1)
 typedef struct {
