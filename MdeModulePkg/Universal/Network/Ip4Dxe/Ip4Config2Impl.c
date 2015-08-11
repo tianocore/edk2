@@ -85,22 +85,6 @@ Ip4Config2DestroyDhcp4 (
 }
 
 /**
-  Start the DHCP configuration for this IP service instance.
-  It will locates the EFI_IP4_CONFIG2_PROTOCOL, then start the
-  DHCP configuration.
-
-  @param[in]  Instance           The IP4 config2 instance to configure.
-
-  @retval EFI_SUCCESS            The auto configuration is successfull started.
-  @retval Others                 Failed to start auto configuration.
-
-**/
-EFI_STATUS
-Ip4StartAutoConfig (
-  IN IP4_CONFIG2_INSTANCE   *Instance
-  );
-
-/**
   Update the current policy to NewPolicy. During the transition
   period, the default router list
   and address list in all interfaces will be released.
@@ -992,10 +976,7 @@ Ip4Config2SetPolicy (
   }
 
   if (NewPolicy == Instance->Policy) {
-    if (NewPolicy != Ip4Config2PolicyDhcp || Instance->DhcpSuccess) {
-      return EFI_ABORTED;
-    }
-    
+     return EFI_ABORTED;
   } else {
     if (NewPolicy == Ip4Config2PolicyDhcp) {
       //

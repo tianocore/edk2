@@ -211,6 +211,22 @@ typedef struct {
 #pragma pack()
 
 /**
+  Start the DHCP configuration for this IP service instance.
+  It will locates the EFI_IP4_CONFIG2_PROTOCOL, then start the
+  DHCP configuration.
+
+  @param[in]  Instance           The IP4 config2 instance to configure.
+
+  @retval EFI_SUCCESS            The auto configuration is successfull started.
+  @retval Others                 Failed to start auto configuration.
+
+**/
+EFI_STATUS
+Ip4StartAutoConfig (
+  IN IP4_CONFIG2_INSTANCE   *Instance
+  );
+
+/**
   Initialize an IP4_CONFIG2_INSTANCE.
 
   @param[out]    Instance       The buffer of IP4_CONFIG2_INSTANCE to be initialized.
