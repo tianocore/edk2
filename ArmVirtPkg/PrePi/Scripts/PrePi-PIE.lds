@@ -14,20 +14,20 @@
 
 SECTIONS
 {
-  .text 0x0 : {
+  .text 0x0 : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     PROVIDE(__reloc_base = .);
 
     *(.text .text*)
     *(.got .got*)
     *(.rodata .rodata*)
     *(.data .data*)
+    *(.bss .bss*)
 
     . = ALIGN(0x20);
     PROVIDE(__reloc_start = .);
     *(.rela .rela*)
     PROVIDE(__reloc_end = .);
   }
-  .bss ALIGN(0x20) : { *(.bss .bss*) }
 
   /DISCARD/ : {
     *(.note.GNU-stack)
