@@ -1400,7 +1400,7 @@ IScsiGetTcpConnDevicePath (
 
         PathLen = DevicePathNodeLength (&DPathNode->Ipv4);
         
-        if (PathLen == IPv4_NODE_LEN_NEW_VERSIONS) {  
+        if (PathLen == IP4_NODE_LEN_NEW_VERSIONS) {  
             
           IP4_COPY_ADDRESS (
             &DPathNode->Ipv4.GatewayIpAddress,
@@ -1427,19 +1427,19 @@ IScsiGetTcpConnDevicePath (
 
         PathLen = DevicePathNodeLength (&DPathNode->Ipv6);
         
-        if (PathLen == IPv6_NODE_LEN_NEW_VERSIONS ) { 
+        if (PathLen == IP6_NODE_LEN_NEW_VERSIONS ) { 
 
           DPathNode->Ipv6.IpAddressOrigin = 0;
           DPathNode->Ipv6.PrefixLength    = IP6_PREFIX_LENGTH;
           ZeroMem (&DPathNode->Ipv6.GatewayIpAddress, sizeof (EFI_IPv6_ADDRESS));
         }
-        else if (PathLen == IPv6_NODE_LEN_OLD_VERSIONS) { 
+        else if (PathLen == IP6_NODE_LEN_OLD_VERSIONS) { 
 
           //
           //  StaticIPAddress is a field in old versions of IPv6_DEVICE_PATH, while ignored in new 
           //  version. Set StaticIPAddress through its' offset in old IPv6_DEVICE_PATH.
           //
-          *((UINT8 *)(&DPathNode->Ipv6) + IPv6_OLD_IPADDRESS_OFFSET) = 
+          *((UINT8 *)(&DPathNode->Ipv6) + IP6_OLD_IPADDRESS_OFFSET) = 
             (BOOLEAN) (!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
         }
         

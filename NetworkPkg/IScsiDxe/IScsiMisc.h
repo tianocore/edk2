@@ -20,18 +20,18 @@ typedef struct _ISCSI_DRIVER_DATA ISCSI_DRIVER_DATA;
 ///
 /// IPv4 Device Path Node Length
 ///
-#define IPv4_NODE_LEN_NEW_VERSIONS    27
+#define IP4_NODE_LEN_NEW_VERSIONS    27
 
 ///
 /// IPv6 Device Path Node Length
 ///
-#define IPv6_NODE_LEN_OLD_VERSIONS    43
-#define IPv6_NODE_LEN_NEW_VERSIONS    60
+#define IP6_NODE_LEN_OLD_VERSIONS    43
+#define IP6_NODE_LEN_NEW_VERSIONS    60
 
 ///
 /// The ignored field StaticIpAddress's offset in old IPv6 Device Path
 ///
-#define IPv6_OLD_IPADDRESS_OFFSET      42
+#define IP6_OLD_IPADDRESS_OFFSET      42
 
 #pragma pack(1)
 typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
