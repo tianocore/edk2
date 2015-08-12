@@ -122,7 +122,6 @@
    MSFT:*_*_IA32_CC_FLAGS   = /Od /D UEFI_C_SOURCE
     GCC:*_*_IA32_CC_FLAGS   = -O0 -DUEFI_C_SOURCE
     RVCT:*_*_*_CC_FLAGS     = --library_interface=none -DUEFI_C_SOURCE -J$(WORKSPACE)/StdLib/Include -J$(WORKSPACE)/StdLib/Include/Arm
-  ARMGCC:*_*_*_CC_FLAGS     = -O0 -DUEFI_C_SOURCE -Wno-unknown-pragmas -Wno-unused -Wno-format-zero-length
    XCODE:*_*_*_CC_FLAGS     = -O0 -DUEFI_C_SOURCE -Wno-unused-const-variable -Wno-string-compare -Wno-sometimes-uninitialized
 
 !else
@@ -132,6 +131,5 @@
     MSFT:*_*_*_CC_FLAGS     = /X /Zc:wchar_t /D UEFI_C_SOURCE
      GCC:*_*_*_CC_FLAGS     = -nostdinc -nostdlib -DUEFI_C_SOURCE
     RVCT:*_*_*_CC_FLAGS     = --library_interface=none -DUEFI_C_SOURCE -J$(WORKSPACE)/StdLib/Include -J$(WORKSPACE)/StdLib/Include/Arm
-  ARMGCC:*_*_*_CC_FLAGS     = -nostdinc -nostdlib -DUEFI_C_SOURCE -Wno-unknown-pragmas -Wno-unused -Wno-format-zero-length
    XCODE:*_*_*_CC_FLAGS     = -nostdinc -nostdlib -DUEFI_C_SOURCE -Wno-unused-const-variable -Wno-string-compare -Wno-sometimes-uninitialized
 !endif
