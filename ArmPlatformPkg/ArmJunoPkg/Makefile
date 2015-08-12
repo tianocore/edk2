@@ -10,10 +10,8 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-# Define the following variables to specify an alternative toolchain to the one located in your PATH:
+# Define the following variable to specify an alternative toolchain to the one located in your PATH:
 # - RVCT_TOOLS_PATH: for RVCT and RVCTLINUX toolchains
-# - ARMGCC_TOOLS_PATH: for ARMGCC toolchain
-# - ARMLINUXGCC_TOOLS_PATH: for ARMLINUXGCC
 
 EDK2_TOOLCHAIN ?= GCC49
 GCC49_AARCH64_PREFIX ?= aarch64-none-elf-
