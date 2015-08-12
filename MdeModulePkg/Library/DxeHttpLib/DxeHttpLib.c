@@ -818,6 +818,9 @@ typedef enum {
   BodyParserChunkDataStart,
   BodyParserChunkDataEnd,
   BodyParserChunkDataEndCR,
+  BodyParserTrailer,
+  BodyParserLastCRLF,
+  BodyParserLastCRLFEnd,
   BodyParserComplete,
   BodyParserStateMax
 } HTTP_BODY_PARSE_STATE;
@@ -1212,21 +1215,52 @@ HttpParseMessageBody (
         Parser->State = BodyParserStateMax;
         break;
       }
-      Parser->State = BodyParserChunkDataStart;
-      Parser->CurrentChunkParsedSize = 0;
       Char++;
-      break;
-
-    case BodyParserChunkDataStart:
       if (Parser->CurrentChunkSize == 0) {
         //
-        // This is the last chunk, the trailer header is unsupported.
+        // The last chunk has been parsed and now assumed the state 
+        // of HttpBodyParse is ParserLastCRLF. So it need to decide
+        // whether the rest message is trailer or last CRLF in the next round.
         //
         Parser->ContentLengthIsValid = TRUE;
-        Parser->State = BodyParserComplete;
+        Parser->State = BodyParserLastCRLF;
+        break;
+      }
+      Parser->State = BodyParserChunkDataStart;
+      Parser->CurrentChunkParsedSize = 0;
+      break;
+      
+    case BodyParserLastCRLF:
+      //
+      // Judge the byte is belong to the Last CRLF or trailer, and then 
+      // configure the state of HttpBodyParse to corresponding state.
+      //
+      if (*Char == '\r') {
+        Char++;
+        Parser->State = BodyParserLastCRLFEnd;
+        break;
+      } else {
+        Parser->State = BodyParserTrailer;
         break;
       }
       
+    case BodyParserLastCRLFEnd:
+      if (*Char == '\n') {
+        Parser->State = BodyParserComplete;
+        break;
+      } else {
+        Parser->State = BodyParserStateMax;
+        break;
+      }
+      
+    case BodyParserTrailer:
+      if (*Char == '\r') {
+        Parser->State = BodyParserChunkSizeEndCR;
+      }
+      Char++;
+      break;      
+
+    case BodyParserChunkDataStart:
       //
       // First byte of chunk-data, the chunk data also might be truncated.
       //
