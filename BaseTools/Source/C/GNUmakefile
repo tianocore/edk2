@@ -25,6 +25,12 @@ ifndef ARCH
   ifeq ($(patsubst i%86,IA32,$(uname_m)),IA32)
     ARCH=IA32
   endif
+  ifneq (,$(findstring aarch64,$(uname_m)))
+    ARCH=AARCH64
+  endif
+  ifneq (,$(findstring arm,$(uname_m)))
+    ARCH=ARM
+  endif
   ifndef ARCH
     $(info Could not detected ARCH from uname results)
     $(error ARCH is not defined!)
