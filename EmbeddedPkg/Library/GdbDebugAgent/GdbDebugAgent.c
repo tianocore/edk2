@@ -34,8 +34,8 @@ CHAR8                             gXferLibraryBuffer[2000];
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mHexToStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 
-// add-symbol-file c:/work/edk2/Build/BeagleBoard/DEBUG_ARMGCC/ARM/BeagleBoardPkg/Sec/Sec/DEBUG/BeagleBoardSec.dll 0x80008360
-CHAR8  *qXferHack = "<library name=\"c:/work/edk2/Build/BeagleBoard/DEBUG_ARMGCC/ARM/BeagleBoardPkg/Sec/Sec/DEBUG/BeagleBoardSec.dll\"><segment address=\"0x80008360\"/></library>";
+// add-symbol-file c:/work/edk2/Build/BeagleBoard/DEBUG_GCC48/ARM/BeagleBoardPkg/Sec/Sec/DEBUG/BeagleBoardSec.dll 0x80008360
+CHAR8  *qXferHack = "<library name=\"c:/work/edk2/Build/BeagleBoard/DEBUG_GCC48/ARM/BeagleBoardPkg/Sec/Sec/DEBUG/BeagleBoardSec.dll\"><segment address=\"0x80008360\"/></library>";
 
 UINTN
 gXferObjectReadResponse (
