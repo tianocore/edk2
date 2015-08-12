@@ -1,7 +1,7 @@
 ## @file
 # process Version section generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -76,7 +76,7 @@ class VerSection (VerSectionClassObject):
         else:
             StringData = ''
 
-        GenFdsGlobalVariable.GenerateSection(OutputFile, None, 'EFI_SECTION_VERSION',
+        GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_VERSION',
                                              Ver=StringData, BuildNumber=self.BuildNum)
         OutputFileList = []
         OutputFileList.append(OutputFile)
