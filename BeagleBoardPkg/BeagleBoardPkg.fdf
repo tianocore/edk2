@@ -27,7 +27,7 @@
 
 
 [FD.BeagleBoard_EFI]
-BaseAddress   = 0x80008000|gArmTokenSpaceGuid.PcdFdBaseAddress  #The base address of the FLASH Device.
+BaseAddress   = 0x80007DF8|gArmTokenSpaceGuid.PcdFdBaseAddress  #The base address of the FLASH Device.
 Size          = 0x000B0000|gArmTokenSpaceGuid.PcdFdSize         #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x1
@@ -48,7 +48,16 @@ NumBlocks     = 0xB0000
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00000000|0x000B0000
+0x00000000|0x00000200
+FILE = BeagleBoardPkg/ConfigurationHeader.bin
+
+0x00000200|0x00000008
+DATA = {
+  0xF8, 0xFD, 0x0A, 0x00,   # image size:   0xB0000 - 0x208 == 0xAFDF8
+  0x00, 0x80, 0x00, 0x80    # entry point:  0x80008000
+}
+
+0x00000208|0x000AFDF8
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
