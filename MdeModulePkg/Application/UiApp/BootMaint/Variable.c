@@ -524,6 +524,7 @@ Var_UpdateErrorOutOption (
 
   @retval EFI_OUT_OF_RESOURCES If not enought memory to complete the operation.
   @retval EFI_SUCCESS          If function completes successfully.
+  @return Others Errors        Return errors from call to gRT->GetVariable.
 
 **/
 EFI_STATUS
@@ -659,7 +660,10 @@ Var_UpdateDriverOption (
                   Buffer
                   );
   ASSERT_EFI_ERROR (Status);
-  GetEfiGlobalVariable2 (L"DriverOrder", (VOID **) &DriverOrderList, &DriverOrderListSize);
+  Status = GetEfiGlobalVariable2 (L"DriverOrder", (VOID **) &DriverOrderList, &DriverOrderListSize);
+  if (EFI_ERROR (Status) || DriverOrderList == NULL){
+    return Status;
+  }
   NewDriverOrderList = AllocateZeroPool (DriverOrderListSize + sizeof (UINT16));
   ASSERT (NewDriverOrderList != NULL);
   CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
@@ -700,6 +704,7 @@ Var_UpdateDriverOption (
 
   @retval EFI_OUT_OF_RESOURCES If not enought memory to complete the operation.
   @retval EFI_SUCCESS          If function completes successfully.
+  @return Others Errors        Return errors from call to gRT->GetVariable.
 
 **/
 EFI_STATUS
@@ -824,7 +829,10 @@ Var_UpdateBootOption (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  GetEfiGlobalVariable2 (L"BootOrder", (VOID **) &BootOrderList, &BootOrderListSize);
+  Status = GetEfiGlobalVariable2 (L"BootOrder", (VOID **) &BootOrderList, &BootOrderListSize);
+  if (EFI_ERROR (Status) || BootOrderList == NULL){
+    return Status;
+  }
   NewBootOrderList = AllocateZeroPool (BootOrderListSize + sizeof (UINT16));
   ASSERT (NewBootOrderList != NULL);
   CopyMem (NewBootOrderList, BootOrderList, BootOrderListSize);

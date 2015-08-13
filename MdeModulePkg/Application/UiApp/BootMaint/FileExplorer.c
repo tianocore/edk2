@@ -258,7 +258,6 @@ FileExplorerCallback (
 
   Status         = EFI_SUCCESS;
   Private        = FE_CALLBACK_DATA_FROM_THIS (This);
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
   //
   // Retrieve uncommitted data from Form Browser
