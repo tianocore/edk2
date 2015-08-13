@@ -144,6 +144,8 @@ OrderLegacyBootOption4SameType (
   *EnBootOptionCount  = 0;
   Index               = 0;
 
+  ASSERT (BbsIndexArray != NULL);
+  ASSERT (DeviceTypeArray != NULL);
   ASSERT (*EnBootOption != NULL);
   ASSERT (*DisBootOption != NULL);
 
@@ -175,6 +177,7 @@ OrderLegacyBootOption4SameType (
   //
   StartPosition = BootOrderSize / sizeof (UINT16);
   NewBootOption = AllocatePool (DevOrderCount * sizeof (UINT16));
+  ASSERT (NewBootOption != NULL);
   while (DevOrderCount-- != 0) {
     for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
       if (BbsIndexArray[Index] == (DevOrder[DevOrderCount] & 0xFF)) {
@@ -1178,6 +1181,7 @@ GetLegacyOptionsOrder (
   UINTN                       Pos;
   UINTN                       Bit;
   UINT8                       *DisMap;
+  UINTN                       TotalLength;
 
   LegacyDev = NULL;
   OptionMenu = NULL;
@@ -1228,9 +1232,10 @@ GetLegacyOptionsOrder (
       //
       // Create oneof tag here for FD/HD/CD #1 #2
       //
-      for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {  
-        VarDevOrder = *(UINT16 *) ((UINT8 *) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16) + Index * sizeof (UINT16));
-      
+      for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
+        TotalLength = sizeof (BBS_TYPE) + sizeof (UINT16) + Index * sizeof (UINT16);
+        VarDevOrder = *(UINT16 *) ((UINT8 *) DevOrder + TotalLength);
+
         if (0xFF00 == (VarDevOrder & 0xFF00)) {
           LegacyDev[Index]  = 0xFF;
           Pos               = (VarDevOrder & 0xFF) / 8;
@@ -1241,7 +1246,7 @@ GetLegacyOptionsOrder (
         }
       }
 
-      VarData += sizeof (BBS_TYPE);
+      VarData ++;
       VarData += *(UINT16 *) VarData;
       DevOrder = (LEGACY_DEV_ORDER_ENTRY *) VarData;
     }
