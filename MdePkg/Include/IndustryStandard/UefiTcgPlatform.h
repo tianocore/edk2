@@ -1,7 +1,7 @@
 /** @file
   TCG EFI Platform Definition in TCG_EFI_Platform_1_20_Final
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,12 +16,14 @@
 #define __UEFI_TCG_PLATFORM_H__
 
 #include <IndustryStandard/Tpm12.h>
+#include <IndustryStandard/Tpm20.h>
 #include <Uefi.h>
 
 //
 // Standard event types
 //
 #define EV_POST_CODE                ((TCG_EVENTTYPE) 0x00000001)
+#define EV_NO_ACTION                ((TCG_EVENTTYPE) 0x00000003)
 #define EV_SEPARATOR                ((TCG_EVENTTYPE) 0x00000004)
 #define EV_S_CRTM_CONTENTS          ((TCG_EVENTTYPE) 0x00000007)
 #define EV_S_CRTM_VERSION           ((TCG_EVENTTYPE) 0x00000008)
@@ -41,6 +43,7 @@
 #define EV_EFI_ACTION                       (EV_EFI_EVENT_BASE + 7)
 #define EV_EFI_PLATFORM_FIRMWARE_BLOB       (EV_EFI_EVENT_BASE + 8)
 #define EV_EFI_HANDOFF_TABLES               (EV_EFI_EVENT_BASE + 9)
+#define EV_EFI_VARIABLE_AUTHORITY           (EV_EFI_EVENT_BASE + 0xE0)
 
 #define EFI_CALLING_EFI_APPLICATION         \
   "Calling EFI Application from Boot Option"
@@ -71,6 +74,9 @@
 
 #define EV_POSTCODE_INFO_OPROM        "Embedded Option ROM"
 #define OPROM_LEN                     (sizeof(EV_POSTCODE_INFO_OPROM) - 1)
+
+#define FIRMWARE_DEBUGGER_EVENT_STRING      "UEFI Debug Mode"
+#define FIRMWARE_DEBUGGER_EVENT_STRING_LEN  (sizeof(FIRMWARE_DEBUGGER_EVENT_STRING) - 1)
 
 //
 // Set structure alignment to 1-byte
@@ -154,11 +160,113 @@ typedef struct tdEFI_VARIABLE_DATA {
   INT8                              VariableData[1];  ///< Driver or platform-specific data
 } EFI_VARIABLE_DATA;
 
+//
+// For TrEE1.0 compatibility
+//
+typedef struct {
+  EFI_GUID                          VariableName;
+  UINT64                            UnicodeNameLength;   // The TCG Definition used UINTN
+  UINT64                            VariableDataLength;  // The TCG Definition used UINTN
+  CHAR16                            UnicodeName[1];
+  INT8                              VariableData[1];
+} EFI_VARIABLE_DATA_TREE;
+
 typedef struct tdEFI_GPT_DATA {
   EFI_PARTITION_TABLE_HEADER  EfiPartitionHeader;
   UINTN                       NumberOfPartitions; 
   EFI_PARTITION_ENTRY         Partitions[1];
 } EFI_GPT_DATA;
+
+//
+// Crypto Agile Log Entry Format
+//
+typedef struct tdTCG_PCR_EVENT2 {
+  TCG_PCRINDEX        PCRIndex;
+  TCG_EVENTTYPE       EventType;
+  TPML_DIGEST_VALUES  Digest;
+  UINT32              EventSize;
+  UINT8               Event[1];
+} TCG_PCR_EVENT2;
+
+//
+// Log Header Entry Data
+//
+typedef struct {
+  //
+  // TCG defined hashing algorithm ID.
+  //
+  UINT16              algorithmId;
+  //
+  // The size of the digest for the respective hashing algorithm.
+  //
+  UINT16              digestSize;
+} TCG_EfiSpecIdEventAlgorithmSize;
+
+#define TCG_EfiSpecIDEventStruct_SIGNATURE_02 "Spec ID Event02"
+#define TCG_EfiSpecIDEventStruct_SIGNATURE_03 "Spec ID Event03"
+
+#define TCG_EfiSpecIDEventStruct_SPEC_VERSION_MAJOR_TPM12   1
+#define TCG_EfiSpecIDEventStruct_SPEC_VERSION_MINOR_TPM12   2
+#define TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM12          2
+
+#define TCG_EfiSpecIDEventStruct_SPEC_VERSION_MAJOR_TPM2   2
+#define TCG_EfiSpecIDEventStruct_SPEC_VERSION_MINOR_TPM2   0
+#define TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2          0
+
+typedef struct {
+  UINT8               signature[16];
+  //
+  // The value for the Platform Class.
+  // The enumeration is defined in the TCG ACPI Specification Client Common Header.
+  //
+  UINT32              platformClass;
+  //
+  // The TCG EFI Platform Specification minor version number this BIOS supports.
+  // Any BIOS supporting version (1.22) MUST set this value to 02h.
+  // Any BIOS supporting version (2.0) SHALL set this value to 0x00.
+  //
+  UINT8               specVersionMinor;
+  //
+  // The TCG EFI Platform Specification major version number this BIOS supports.
+  // Any BIOS supporting version (1.22) MUST set this value to 01h.
+  // Any BIOS supporting version (2.0) SHALL set this value to 0x02.
+  //
+  UINT8               specVersionMajor;
+  //
+  // The TCG EFI Platform Specification errata for this specification this BIOS supports.
+  // Any BIOS supporting version and errata (1.22) MUST set this value to 02h.
+  // Any BIOS supporting version and errata (2.0) SHALL set this value to 0x00.
+  //
+  UINT8               specErrata;
+  //
+  // Specifies the size of the UINTN fields used in various data structures used in this specification.
+  // 0x01 indicates UINT32 and 0x02 indicates UINT64.
+  //
+  UINT8               uintnSize;
+  //
+  // This field is added in "Spec ID Event03".
+  // The number of hashing algorithms used in this event log (except the first event).
+  // All events in this event log use all hashing algorithms defined here.
+  //
+//UINT32              numberOfAlgorithms;
+  //
+  // This field is added in "Spec ID Event03".
+  // An array of size numberOfAlgorithms of value pairs.
+  //
+//TCG_EfiSpecIdEventAlgorithmSize digestSize[numberOfAlgorithms];
+  //
+  // Size in bytes of the VendorInfo field.
+  // Maximum value SHALL be FFh bytes.
+  //
+//UINT8               vendorInfoSize;
+  //
+  // Provided for use by the BIOS implementer.
+  // The value might be used, for example, to provide more detailed information about the specific BIOS such as BIOS revision numbers, etc.
+  // The values within this field are not standardized and are implementer-specific.
+  // Platform-specific or -unique information SHALL NOT be provided in this field.
+  //
+//UINT8               vendorInfo[vendorInfoSize];
+} TCG_EfiSpecIDEventStruct;
 
 //
 // Restore original structure alignment
