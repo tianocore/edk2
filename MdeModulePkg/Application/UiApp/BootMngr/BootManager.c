@@ -236,6 +236,7 @@ EnumerateBootOptions  (
   BOOLEAN                       IsLegacyOption;
   BOOLEAN                       NeedEndOp;
   UINT16                        KeyInput;
+  UINTN                         DestMax;
 
   DeviceType = (UINT16) -1;
 
@@ -325,10 +326,11 @@ EnumerateBootOptions  (
 
     TempStr = UiDevicePathToStr (BootOption[Index].FilePath);
     TempSize = StrSize (TempStr);
+    DestMax = (TempSize + StrSize (L"Device Path : ")) / sizeof(CHAR16);
     HelpString = AllocateZeroPool (TempSize + StrSize (L"Device Path : "));
     ASSERT (HelpString != NULL);
-    StrCat (HelpString, L"Device Path : ");
-    StrCat (HelpString, TempStr);
+    StrCatS (HelpString, DestMax, L"Device Path : ");
+    StrCatS (HelpString, DestMax, TempStr);
 
     HelpToken = HiiSetString (HiiHandle, 0, HelpString, NULL);
 

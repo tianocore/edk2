@@ -195,7 +195,7 @@ typedef struct {
 /// This is the data structure used by File Explorer formset
 ///
 typedef struct {
-  UINT16  DescriptionData[75];
+  UINT16  DescriptionData[MAX_MENU_NUMBER];
   UINT16  OptionalData[127];
   UINT8   Active;
   UINT8   ForceReconnect;

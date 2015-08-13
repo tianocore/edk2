@@ -645,6 +645,7 @@ ConvertProcessorToString (
 {
   CHAR16  *StringBuffer;
   UINTN   Index;
+  UINTN   DestMax;
   UINT32  FreqMhz;
 
   if (Base10Exponent >= 6) {
@@ -655,13 +656,13 @@ ConvertProcessorToString (
   } else {
     FreqMhz = 0;
   }
-
+  DestMax = 0x20 / sizeof (CHAR16);
   StringBuffer = AllocateZeroPool (0x20);
   ASSERT (StringBuffer != NULL);
   Index = UnicodeValueToString (StringBuffer, LEFT_JUSTIFY, FreqMhz / 1000, 3);
-  StrCat (StringBuffer, L".");
+  StrCatS (StringBuffer, DestMax, L".");
   UnicodeValueToString (StringBuffer + Index + 1, PREFIX_ZERO, (FreqMhz % 1000) / 10, 2);
-  StrCat (StringBuffer, L" GHz");
+  StrCatS (StringBuffer, DestMax, L" GHz");
   *String = (CHAR16 *) StringBuffer;
   return ;
 }
@@ -685,7 +686,7 @@ ConvertMemorySizeToString (
   StringBuffer = AllocateZeroPool (0x24);
   ASSERT (StringBuffer != NULL);
   UnicodeValueToString (StringBuffer, LEFT_JUSTIFY, MemorySize, 10);
-  StrCat (StringBuffer, L" MB RAM");
+  StrCatS (StringBuffer, 0x24 / sizeof (CHAR16), L" MB RAM");
 
   *String = (CHAR16 *) StringBuffer;
 
@@ -1542,8 +1543,8 @@ SetupResetReminder (
       ASSERT (StringBuffer1 != NULL);
       StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer2 != NULL);
-      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now.");
-      StrCpy (StringBuffer2, L"Press ENTER to reset");
+      StrCpyS (StringBuffer1, MAX_STRING_LEN, L"Configuration changed. Reset to apply it Now.");
+      StrCpyS (StringBuffer2, MAX_STRING_LEN, L"Press ENTER to reset");
       //
       // Popup a menu to notice user
       //

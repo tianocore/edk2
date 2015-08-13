@@ -786,7 +786,7 @@ BOpt_GetBootOptions (
 
     NewLoadContext->Description = AllocateZeroPool (StrSize((UINT16*)LoadOptionPtr));
     ASSERT (NewLoadContext->Description != NULL);
-    StrCpy (NewLoadContext->Description, (UINT16*)LoadOptionPtr);
+    StrCpyS (NewLoadContext->Description, StrSize((UINT16*)LoadOptionPtr) / sizeof (UINT16), (UINT16*)LoadOptionPtr);
     
     ASSERT (NewLoadContext->Description != NULL);
     NewMenuEntry->DisplayString = NewLoadContext->Description;
@@ -862,27 +862,25 @@ BOpt_AppendFileName (
   IN  CHAR16  *Str2
   )
 {
-  UINTN   Size1;
-  UINTN   Size2;
+  UINTN   DestMax;
   CHAR16  *Str;
   CHAR16  *TmpStr;
   CHAR16  *Ptr;
   CHAR16  *LastSlash;
 
-  Size1 = StrSize (Str1);
-  Size2 = StrSize (Str2);
-  Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
+  DestMax = (StrSize (Str1) + StrSize (Str2) + sizeof (CHAR16)) / sizeof (CHAR16);
+  Str   = AllocateZeroPool (DestMax * sizeof (CHAR16));
   ASSERT (Str != NULL);
 
-  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16)); 
+  TmpStr = AllocateZeroPool (DestMax * sizeof (CHAR16)); 
   ASSERT (TmpStr != NULL);
 
-  StrCat (Str, Str1);
+  StrCatS (Str, DestMax, Str1);
   if (!((*Str == '\\') && (*(Str + 1) == 0))) {
-    StrCat (Str, L"\\");
+    StrCatS (Str, DestMax, L"\\");
   }
 
-  StrCat (Str, Str2);
+  StrCatS (Str, DestMax, Str2);
 
   Ptr       = Str;
   LastSlash = Str;
@@ -895,11 +893,11 @@ BOpt_AppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 3);
-      StrCpy (LastSlash, TmpStr);
+      StrCpyS (TmpStr, DestMax, Ptr + 3);
+      StrCpyS (LastSlash, DestMax - (UINTN) (LastSlash - Str), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
@@ -907,11 +905,11 @@ BOpt_AppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 2);
-      StrCpy (Ptr, TmpStr);
+      StrCpyS (TmpStr, DestMax, Ptr + 2);
+      StrCpyS (Ptr, DestMax - (UINTN) (Ptr - Str), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;

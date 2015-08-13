@@ -172,7 +172,7 @@ GetMacAddressString(
   }
 
   *PBuffer = String;
-  StrCpy(String, L"MAC:");
+  StrCpyS(String, BufferLen / sizeof (CHAR16), L"MAC:");
   String += 4;
   
   //
