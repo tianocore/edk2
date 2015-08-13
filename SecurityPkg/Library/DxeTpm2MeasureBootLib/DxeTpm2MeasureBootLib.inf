@@ -61,7 +61,7 @@
   gZeroGuid                             ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]
-  gEfiTrEEProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiFirmwareVolumeBlockProtocolGuid   ## SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiDiskIoProtocolGuid                ## SOMETIMES_CONSUMES

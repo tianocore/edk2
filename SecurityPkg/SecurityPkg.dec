@@ -104,6 +104,10 @@
   #  Include/Guid/TcgEventHob.h
   gTcgEventEntryHobGuid              = { 0x2b9ffb52, 0x1b13, 0x416f, { 0xa8, 0x7b, 0xbc, 0x93, 0xd, 0xef, 0x92, 0xa8 }}
 
+  ## Hob GUID used to pass a TCG_PCR_EVENT_2 from a TPM2 PEIM to a TPM2 DXE Driver.
+  ## Include/Guid/TcgEventHob.h
+  gTcgEvent2EntryHobGuid             = { 0xd26c221e, 0x2430, 0x4c8a, { 0x91, 0x70, 0x3f, 0xcb, 0x45, 0x0, 0x41, 0x3f }}
+
   ## HOB GUID used to record TPM device error.
   #  Include/Guid/TcgEventHob.h
   gTpmErrorHobGuid                   = { 0xef598499, 0xb25e, 0x473a, { 0xbf, 0xaf, 0xe7, 0xe5, 0x7d, 0xce, 0x82, 0xc4 }}
@@ -116,6 +120,10 @@
   #  Include/Guid/PhysicalPresenceData.h
   gEfiPhysicalPresenceGuid           = { 0xf6499b1, 0xe9ad, 0x493d, { 0xb9, 0xc2, 0x2f, 0x90, 0x81, 0x5c, 0x6c, 0xbc }}
   
+  ## GUID used to "Tcg2PhysicalPresence" variable and "Tcg2PhysicalPresenceFlags" variable for TPM2 request and response.
+  #  Include/Guid/Tcg2PhysicalPresenceData.h
+  gEfiTcg2PhysicalPresenceGuid = { 0xaeb9c5c1, 0x94f1, 0x4d02, { 0xbf, 0xd9, 0x46, 0x2, 0xdb, 0x2d, 0x3c, 0x54 }}
+
   ## GUID used for form browser, password credential and provider identifier.
   # Include/Guid/PwdCredentialProviderHii.h
   gPwdCredentialProviderGuid         = { 0x78b9ec8b, 0xc000, 0x46c5, { 0xac, 0x93, 0x24, 0xa0, 0xc1, 0xbb, 0x0, 0xce }}
@@ -135,6 +143,10 @@
   ## GUID used for FormSet.
   #  Include/Guid/TcgConfigHii.h
   gTcgConfigFormSetGuid              = { 0xb0f901e4, 0xc424, 0x45de, { 0x90, 0x81, 0x95, 0xe2, 0xb, 0xde, 0x6f, 0xb5 }}
+  
+  ## GUID used for FormSet and config variable.
+  #  Include/Guid/Tcg2ConfigHii.h
+  gTcg2ConfigFormSetGuid    = {0x6339d487, 0x26ba, 0x424b, { 0x9a, 0x5d, 0x68, 0x7e, 0x25, 0xd7, 0x40, 0xbc }}
   
   ## GUID used for FormSet.
   #  Include/Guid/SecureBootConfigHii.h
@@ -363,6 +375,15 @@
   # @Prompt TPM device address.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012
 
+  ## This PCD indicated final BIOS supported Hash mask.
+  #    Bios may choose to register a subset of PcdTpm2HashMask.
+  #    So this PCD is final value of how many hash algo is extended to PCR.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap|0xFFFFFFFF|UINT32|0x00010016
+
+  ## This PCR means the OEM configurated number of PCR banks.
+  #  0 means dynamic get from supported HASH algorithm
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2NumberOfPCRBanks|0x0|UINT32|0x00010015
+  
   ## Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images
   #
   # @Prompt One or more SHA 256 Hashes of RSA 2048 bit public keys used to verify Recovery and Capsule Update images

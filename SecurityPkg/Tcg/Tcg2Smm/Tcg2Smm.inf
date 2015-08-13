@@ -1,0 +1,80 @@
+## @file
+#  Provides ACPI metholds for TPM 2.0 support
+#
+#  This driver implements TPM 2.0 definition block in ACPI table and 
+#  registers SMI callback functions for Tcg2 physical presence and 
+#  MemoryClear to handle the requests from ACPI method.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable and ACPINvs data in SMM mode.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2Smm
+  MODULE_UNI_FILE                = Tcg2Smm.uni
+  FILE_GUID                      = 44A20657-10B8-4049-A148-ACD8812AF257
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeTcgSmm
+
+[Sources]
+  Tcg2Smm.h
+  Tcg2Smm.c
+  Tpm.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  SmmServicesTableLib
+  UefiBootServicesTableLib
+  DebugLib
+  DxeServicesLib
+  TpmMeasurementLib
+  Tpm2DeviceLib
+  Tcg2PhysicalPresenceLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"  
+  gEfiMemoryOverwriteControlDataGuid
+  
+  gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier
+
+[Protocols]
+  gEfiSmmSwDispatch2ProtocolGuid                                ## CONSUMES
+  gEfiSmmVariableProtocolGuid                                   ## CONSUMES
+  gEfiAcpiTableProtocolGuid                                     ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid              ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiAcpiTableProtocolGuid AND
+  gEfiSmmSwDispatch2ProtocolGuid AND
+  gEfiSmmVariableProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Tcg2SmmExtra.uni

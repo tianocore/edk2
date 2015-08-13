@@ -3,7 +3,7 @@
   hash handler registerd, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,6 +44,7 @@ HashStart (
 {
   HASH_HANDLE  *HashCtx;
   UINTN        Index;
+  UINT32       HashMask;
 
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
@@ -53,7 +54,10 @@ HashStart (
   ASSERT (HashCtx != NULL);
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    mHashInterface[Index].HashInit (&HashCtx[Index]);
+    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
+      mHashInterface[Index].HashInit (&HashCtx[Index]);
+    }
   }
 
   *HashHandle = (HASH_HANDLE)HashCtx;
@@ -80,6 +84,7 @@ HashUpdate (
 {
   HASH_HANDLE  *HashCtx;
   UINTN        Index;
+  UINT32       HashMask;
 
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
@@ -88,7 +93,10 @@ HashUpdate (
   HashCtx = (HASH_HANDLE *)HashHandle;
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
+    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
+      mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
+    }
   }
 
   return EFI_SUCCESS;
@@ -119,6 +127,7 @@ HashCompleteAndExtend (
   HASH_HANDLE        *HashCtx;
   UINTN              Index;
   EFI_STATUS         Status;
+  UINT32             HashMask;
 
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
@@ -128,9 +137,12 @@ HashCompleteAndExtend (
   ZeroMem (DigestList, sizeof(*DigestList));
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
-    mHashInterface[Index].HashFinal (HashCtx[Index], &Digest);
-    Tpm2SetHashToDigestList (DigestList, &Digest);
+    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
+      mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
+      mHashInterface[Index].HashFinal (HashCtx[Index], &Digest);
+      Tpm2SetHashToDigestList (DigestList, &Digest);
+    }
   }
 
   FreePool (HashCtx);
@@ -192,6 +204,7 @@ RegisterHashInterfaceLib (
 {
   UINTN              Index;
   UINT32             HashMask;
+  UINT32             BiosSupportedHashMask;
 
   //
   // Check allow
@@ -204,6 +217,8 @@ RegisterHashInterfaceLib (
   if (mHashInterfaceCount >= sizeof(mHashInterface)/sizeof(mHashInterface[0])) {
     return EFI_OUT_OF_RESOURCES;
   }
+  BiosSupportedHashMask = PcdGet32 (PcdTcg2HashAlgorithmBitmap);
+  PcdSet32 (PcdTcg2HashAlgorithmBitmap, BiosSupportedHashMask | HashMask);
 
   //
   // Check duplication

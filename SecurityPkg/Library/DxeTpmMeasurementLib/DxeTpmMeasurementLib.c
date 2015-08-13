@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to measure data to TPM.
 
-Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 
 #include <Protocol/TcgService.h>
-#include <Protocol/TrEEProtocol.h>
+#include <Protocol/Tcg2Protocol.h>
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -120,37 +120,37 @@ Tpm20MeasureAndLogData (
   )
 {
   EFI_STATUS                Status;
-  EFI_TREE_PROTOCOL         *TreeProtocol;
-  TrEE_EVENT                *TreeEvent;
+  EFI_TCG2_PROTOCOL         *Tcg2Protocol;
+  EFI_TCG2_EVENT            *Tcg2Event;
 
   //
-  // TrEEPresentFlag is checked in HashLogExtendEvent
+  // TPMPresentFlag is checked in HashLogExtendEvent
   //
-  Status = gBS->LocateProtocol (&gEfiTrEEProtocolGuid, NULL, (VOID **) &TreeProtocol);
+  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  TreeEvent = (TrEE_EVENT *) AllocateZeroPool (LogLen + sizeof (TrEE_EVENT));
-  if(TreeEvent == NULL) {
+  Tcg2Event = (EFI_TCG2_EVENT *) AllocateZeroPool (LogLen + sizeof (EFI_TCG2_EVENT));
+  if(Tcg2Event == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  TreeEvent->Size = (UINT32)LogLen + sizeof (TrEE_EVENT) - sizeof(TreeEvent->Event);
-  TreeEvent->Header.HeaderSize    = sizeof(TrEE_EVENT_HEADER);
-  TreeEvent->Header.HeaderVersion = TREE_EVENT_HEADER_VERSION;
-  TreeEvent->Header.PCRIndex      = PcrIndex;
-  TreeEvent->Header.EventType     = EventType;
-  CopyMem (&TreeEvent->Event[0], EventLog, LogLen);
+  Tcg2Event->Size = (UINT32)LogLen + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event);
+  Tcg2Event->Header.HeaderSize    = sizeof(EFI_TCG2_EVENT_HEADER);
+  Tcg2Event->Header.HeaderVersion = EFI_TCG2_EVENT_HEADER_VERSION;
+  Tcg2Event->Header.PCRIndex      = PcrIndex;
+  Tcg2Event->Header.EventType     = EventType;
+  CopyMem (&Tcg2Event->Event[0], EventLog, LogLen);
 
-  Status = TreeProtocol->HashLogExtendEvent (
-                           TreeProtocol,
+  Status = Tcg2Protocol->HashLogExtendEvent (
+                           Tcg2Protocol,
                            0,
                            (EFI_PHYSICAL_ADDRESS)(UINTN)HashData,
                            HashDataLen,
-                           TreeEvent
+                           Tcg2Event
                            );
-  FreePool (TreeEvent);
+  FreePool (Tcg2Event);
 
   return Status;
 }

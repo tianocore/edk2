@@ -9,10 +9,10 @@
   DxeTpm2MeasureBootLibImageRead() function will make sure the PE/COFF image content
   read is within the image buffer.
 
-  TrEEMeasurePeImage() function will accept untrusted PE/COFF image and validate its
+  Tcg2MeasurePeImage() function will accept untrusted PE/COFF image and validate its
   data structure within this image buffer before use.
 
-  TrEEMeasureGptTable() function will receive untrusted GPT partition table, and parse
+  Tcg2MeasureGptTable() function will receive untrusted GPT partition table, and parse
   partition data carefully.
 
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 
-#include <Protocol/TrEEProtocol.h>
+#include <Protocol/Tcg2Protocol.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/DevicePathToText.h>
@@ -51,15 +51,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Flag to check GPT partition. It only need be measured once.
 //
-BOOLEAN                           mTrEEMeasureGptTableFlag = FALSE;
-UINTN                             mTrEEMeasureGptCount = 0;
-VOID                              *mTrEEFileBuffer;
-UINTN                             mTrEEImageSize;
+BOOLEAN                           mTcg2MeasureGptTableFlag = FALSE;
+UINTN                             mTcg2MeasureGptCount = 0;
+VOID                              *mTcg2FileBuffer;
+UINTN                             mTcg2ImageSize;
 //
 // Measured FV handle cache
 //
-EFI_HANDLE                        mTrEECacheMeasuredHandle  = NULL;
-MEASURED_HOB_DATA                 *mTrEEMeasuredHobData     = NULL;
+EFI_HANDLE                        mTcg2CacheMeasuredHandle  = NULL;
+MEASURED_HOB_DATA                 *mTcg2MeasuredHobData     = NULL;
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
@@ -96,11 +96,11 @@ DxeTpm2MeasureBootLibImageRead (
   }
 
   EndPosition = FileOffset + *ReadSize;
-  if (EndPosition > mTrEEImageSize) {
-    *ReadSize = (UINT32)(mTrEEImageSize - FileOffset);
+  if (EndPosition > mTcg2ImageSize) {
+    *ReadSize = (UINT32)(mTcg2ImageSize - FileOffset);
   }
 
-  if (FileOffset >= mTrEEImageSize) {
+  if (FileOffset >= mTcg2ImageSize) {
     *ReadSize = 0;
   }
 
@@ -115,7 +115,7 @@ DxeTpm2MeasureBootLibImageRead (
   Caution: This function may receive untrusted input.
   The GPT partition table is external input, so this function should parse partition data carefully.
 
-  @param TreeProtocol            Pointer to the located TREE protocol instance.
+  @param Tcg2Protocol            Pointer to the located TCG2 protocol instance.
   @param GptHandle               Handle that GPT partition was installed.
 
   @retval EFI_SUCCESS            Successfully measure GPT table.
@@ -126,8 +126,8 @@ DxeTpm2MeasureBootLibImageRead (
 **/
 EFI_STATUS
 EFIAPI
-TrEEMeasureGptTable (
-  IN  EFI_TREE_PROTOCOL  *TreeProtocol,
+Tcg2MeasureGptTable (
+  IN  EFI_TCG2_PROTOCOL  *Tcg2Protocol,
   IN  EFI_HANDLE         GptHandle
   )
 {
@@ -139,11 +139,11 @@ TrEEMeasureGptTable (
   UINT8                             *EntryPtr;
   UINTN                             NumberOfPartition;
   UINT32                            Index;
-  TrEE_EVENT                        *TreeEvent;
+  EFI_TCG2_EVENT                    *Tcg2Event;
   EFI_GPT_DATA                      *GptData;
   UINT32                            EventSize;
 
-  if (mTrEEMeasureGptCount > 0) {
+  if (mTcg2MeasureGptCount > 0) {
     return EFI_SUCCESS;
   }
 
@@ -212,19 +212,19 @@ TrEEMeasureGptTable (
   // 
   EventSize = (UINT32)(sizeof (EFI_GPT_DATA) - sizeof (GptData->Partitions) 
                         + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry);
-  TreeEvent = (TrEE_EVENT *) AllocateZeroPool (EventSize + sizeof (TrEE_EVENT) - sizeof(TreeEvent->Event));
-  if (TreeEvent == NULL) {
+  Tcg2Event = (EFI_TCG2_EVENT *) AllocateZeroPool (EventSize + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event));
+  if (Tcg2Event == NULL) {
     FreePool (PrimaryHeader);
     FreePool (EntryPtr);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  TreeEvent->Size = EventSize + sizeof (TrEE_EVENT) - sizeof(TreeEvent->Event);
-  TreeEvent->Header.HeaderSize    = sizeof(TrEE_EVENT_HEADER);
-  TreeEvent->Header.HeaderVersion = TREE_EVENT_HEADER_VERSION;
-  TreeEvent->Header.PCRIndex      = 5;
-  TreeEvent->Header.EventType     = EV_EFI_GPT_EVENT;
-  GptData = (EFI_GPT_DATA *) TreeEvent->Event;  
+  Tcg2Event->Size = EventSize + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event);
+  Tcg2Event->Header.HeaderSize    = sizeof(EFI_TCG2_EVENT_HEADER);
+  Tcg2Event->Header.HeaderVersion = EFI_TCG2_EVENT_HEADER_VERSION;
+  Tcg2Event->Header.PCRIndex      = 5;
+  Tcg2Event->Header.EventType     = EV_EFI_GPT_EVENT;
+  GptData = (EFI_GPT_DATA *) Tcg2Event->Event;  
 
   //
   // Copy the EFI_PARTITION_TABLE_HEADER and NumberOfPartition
@@ -251,20 +251,20 @@ TrEEMeasureGptTable (
   //
   // Measure the GPT data
   //
-  Status = TreeProtocol->HashLogExtendEvent (
-             TreeProtocol,
+  Status = Tcg2Protocol->HashLogExtendEvent (
+             Tcg2Protocol,
              0,
              (EFI_PHYSICAL_ADDRESS) (UINTN) (VOID *) GptData,
              (UINT64) EventSize,
-             TreeEvent
+             Tcg2Event
              );
   if (!EFI_ERROR (Status)) {
-    mTrEEMeasureGptCount++;
+    mTcg2MeasureGptCount++;
   }
 
   FreePool (PrimaryHeader);
   FreePool (EntryPtr);
-  FreePool (TreeEvent);
+  FreePool (Tcg2Event);
 
   return Status;
 }
@@ -277,7 +277,7 @@ TrEEMeasureGptTable (
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
 
-  @param[in] TreeProtocol   Pointer to the located TREE protocol instance.
+  @param[in] Tcg2Protocol   Pointer to the located TCG2 protocol instance.
   @param[in] ImageAddress   Start address of image buffer.
   @param[in] ImageSize      Image size
   @param[in] LinkTimeBase   Address that the image is loaded into memory.
@@ -292,8 +292,8 @@ TrEEMeasureGptTable (
 **/
 EFI_STATUS
 EFIAPI
-TrEEMeasurePeImage (
-  IN  EFI_TREE_PROTOCOL         *TreeProtocol,
+Tcg2MeasurePeImage (
+  IN  EFI_TCG2_PROTOCOL         *Tcg2Protocol,
   IN  EFI_PHYSICAL_ADDRESS      ImageAddress,
   IN  UINTN                     ImageSize,
   IN  UINTN                     LinkTimeBase,
@@ -302,7 +302,7 @@ TrEEMeasurePeImage (
   )
 {
   EFI_STATUS                        Status;
-  TrEE_EVENT                        *TreeEvent;
+  EFI_TCG2_EVENT                    *Tcg2Event;
   EFI_IMAGE_LOAD_EVENT              *ImageLoad;
   UINT32                            FilePathSize;
   UINT32                            EventSize;
@@ -315,33 +315,33 @@ TrEEMeasurePeImage (
   // Determine destination PCR by BootPolicy
   //
   EventSize = sizeof (*ImageLoad) - sizeof (ImageLoad->DevicePath) + FilePathSize;
-  TreeEvent = AllocateZeroPool (EventSize + sizeof (TrEE_EVENT) - sizeof(TreeEvent->Event));
-  if (TreeEvent == NULL) {
+  Tcg2Event = AllocateZeroPool (EventSize + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event));
+  if (Tcg2Event == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  TreeEvent->Size = EventSize + sizeof (TrEE_EVENT) - sizeof(TreeEvent->Event);
-  TreeEvent->Header.HeaderSize    = sizeof(TrEE_EVENT_HEADER);
-  TreeEvent->Header.HeaderVersion = TREE_EVENT_HEADER_VERSION;
-  ImageLoad           = (EFI_IMAGE_LOAD_EVENT *) TreeEvent->Event;
+  Tcg2Event->Size = EventSize + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event);
+  Tcg2Event->Header.HeaderSize    = sizeof(EFI_TCG2_EVENT_HEADER);
+  Tcg2Event->Header.HeaderVersion = EFI_TCG2_EVENT_HEADER_VERSION;
+  ImageLoad           = (EFI_IMAGE_LOAD_EVENT *) Tcg2Event->Event;
 
   switch (ImageType) {
     case EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION:
-      TreeEvent->Header.EventType = EV_EFI_BOOT_SERVICES_APPLICATION;
-      TreeEvent->Header.PCRIndex  = 4;
+      Tcg2Event->Header.EventType = EV_EFI_BOOT_SERVICES_APPLICATION;
+      Tcg2Event->Header.PCRIndex  = 4;
       break;
     case EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER:
-      TreeEvent->Header.EventType = EV_EFI_BOOT_SERVICES_DRIVER;
-      TreeEvent->Header.PCRIndex  = 2;
+      Tcg2Event->Header.EventType = EV_EFI_BOOT_SERVICES_DRIVER;
+      Tcg2Event->Header.PCRIndex  = 2;
       break;
     case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
-      TreeEvent->Header.EventType = EV_EFI_RUNTIME_SERVICES_DRIVER;
-      TreeEvent->Header.PCRIndex  = 2;
+      Tcg2Event->Header.EventType = EV_EFI_RUNTIME_SERVICES_DRIVER;
+      Tcg2Event->Header.PCRIndex  = 2;
       break;
     default:
       DEBUG ((
         EFI_D_ERROR,
-        "TrEEMeasurePeImage: Unknown subsystem type %d",
+        "Tcg2MeasurePeImage: Unknown subsystem type %d",
         ImageType
         ));
       goto Finish;
@@ -358,12 +358,12 @@ TrEEMeasurePeImage (
   //
   // Log the PE data
   //
-  Status = TreeProtocol->HashLogExtendEvent (
-             TreeProtocol,
+  Status = Tcg2Protocol->HashLogExtendEvent (
+             Tcg2Protocol,
              PE_COFF_IMAGE,
              ImageAddress,
              ImageSize,
-             TreeEvent
+             Tcg2Event
              );
   if (Status == EFI_VOLUME_FULL) {
     //
@@ -375,7 +375,7 @@ TrEEMeasurePeImage (
   }
 
 Finish:
-  FreePool (TreeEvent);
+  FreePool (Tcg2Event);
 
   return Status;
 }
@@ -428,9 +428,9 @@ DxeTpm2MeasureBootHandler (
   IN  BOOLEAN                          BootPolicy
   )
 {
-  EFI_TREE_PROTOCOL                   *TreeProtocol;
+  EFI_TCG2_PROTOCOL                   *Tcg2Protocol;
   EFI_STATUS                          Status;
-  TREE_BOOT_SERVICE_CAPABILITY        ProtocolCapability;
+  EFI_TCG2_BOOT_SERVICE_CAPABILITY    ProtocolCapability;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL            *OrigDevicePathNode;
   EFI_HANDLE                          Handle;
@@ -441,26 +441,26 @@ DxeTpm2MeasureBootHandler (
   EFI_PHYSICAL_ADDRESS                FvAddress;
   UINT32                              Index;
 
-  Status = gBS->LocateProtocol (&gEfiTrEEProtocolGuid, NULL, (VOID **) &TreeProtocol);
+  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
   if (EFI_ERROR (Status)) {
     //
-    // TrEE protocol is not installed. So, TPM2 is not present.
+    // Tcg2 protocol is not installed. So, TPM2 is not present.
     // Don't do any measurement, and directly return EFI_SUCCESS.
     //
-    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - TrEE - %r\n", Status));
+    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2 - %r\n", Status));
     return EFI_SUCCESS;
   }
 
   ProtocolCapability.Size = (UINT8) sizeof (ProtocolCapability);
-  Status = TreeProtocol->GetCapability (
-                           TreeProtocol, 
+  Status = Tcg2Protocol->GetCapability (
+                           Tcg2Protocol, 
                            &ProtocolCapability
                            );
-  if (EFI_ERROR (Status) || (!ProtocolCapability.TrEEPresentFlag)) {
+  if (EFI_ERROR (Status) || (!ProtocolCapability.TPMPresentFlag)) {
     //
     // TPM device doesn't work or activate.
     //
-    DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler (%r) - TrEEPresentFlag - %x\n", Status, ProtocolCapability.TrEEPresentFlag));
+    DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler (%r) - TPMPresentFlag - %x\n", Status, ProtocolCapability.TPMPresentFlag));
     return EFI_SUCCESS;
   }
 
@@ -475,7 +475,7 @@ DxeTpm2MeasureBootHandler (
   //
   DevicePathNode = OrigDevicePathNode;
   Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &DevicePathNode, &Handle);
-  if (!EFI_ERROR (Status) && !mTrEEMeasureGptTableFlag) {
+  if (!EFI_ERROR (Status) && !mTcg2MeasureGptTableFlag) {
     //
     // Find the gpt partion on the given devicepath
     //
@@ -508,13 +508,13 @@ DxeTpm2MeasureBootHandler (
             //
             // Measure GPT disk.
             //
-            Status = TrEEMeasureGptTable (TreeProtocol, Handle);
-            DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - TrEEMeasureGptTable - %r\n", Status));
+            Status = Tcg2MeasureGptTable (Tcg2Protocol, Handle);
+            DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasureGptTable - %r\n", Status));
             if (!EFI_ERROR (Status)) {
               //
               // GPT disk check done.
               //
-              mTrEEMeasureGptTableFlag = TRUE;
+              mTcg2MeasureGptTableFlag = TRUE;
             }
           }
           FreePool (OrigDevicePathNode);
@@ -553,7 +553,7 @@ DxeTpm2MeasureBootHandler (
     //
     ApplicationRequired = TRUE;
 
-    if (mTrEECacheMeasuredHandle != Handle && mTrEEMeasuredHobData != NULL) {
+    if (mTcg2CacheMeasuredHandle != Handle && mTcg2MeasuredHobData != NULL) {
       //
       // Search for Root FV of this PE image
       //
@@ -577,12 +577,12 @@ DxeTpm2MeasureBootHandler (
 
       ApplicationRequired = FALSE;
 
-      for (Index = 0; Index < mTrEEMeasuredHobData->Num; Index++) {
-        if(mTrEEMeasuredHobData->MeasuredFvBuf[Index].BlobBase == FvAddress) {
+      for (Index = 0; Index < mTcg2MeasuredHobData->Num; Index++) {
+        if(mTcg2MeasuredHobData->MeasuredFvBuf[Index].BlobBase == FvAddress) {
           //
           // Cache measured FV for next measurement
           //
-          mTrEECacheMeasuredHandle = Handle;
+          mTcg2CacheMeasuredHandle = Handle;
           ApplicationRequired  = TRUE;
           break;
         }
@@ -598,8 +598,8 @@ DxeTpm2MeasureBootHandler (
     goto Finish;
   }
 
-  mTrEEImageSize  = FileSize;
-  mTrEEFileBuffer = FileBuffer;
+  mTcg2ImageSize  = FileSize;
+  mTcg2FileBuffer = FileBuffer;
 
   //
   // Measure PE Image
@@ -645,15 +645,15 @@ DxeTpm2MeasureBootHandler (
     //
     // Measure PE image into TPM log.
     //
-    Status = TrEEMeasurePeImage (
-               TreeProtocol,
+    Status = Tcg2MeasurePeImage (
+               Tcg2Protocol,
                (EFI_PHYSICAL_ADDRESS) (UINTN) FileBuffer, 
                FileSize, 
                (UINTN) ImageContext.ImageAddress, 
                ImageContext.ImageType, 
                DevicePathNode
                );
-    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - TrEEMeasurePeImage - %r\n", Status));
+    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasurePeImage - %r\n", Status));
   }
 
   //
@@ -692,7 +692,7 @@ DxeTpm2MeasureBootLibConstructor (
   GuidHob = GetFirstGuidHob (&gMeasuredFvHobGuid);
 
   if (GuidHob != NULL) {
-    mTrEEMeasuredHobData = GET_GUID_HOB_DATA (GuidHob);
+    mTcg2MeasuredHobData = GET_GUID_HOB_DATA (GuidHob);
   }
 
   return RegisterSecurity2Handler (

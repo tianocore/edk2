@@ -1,7 +1,7 @@
 /** @file
   Ihis library uses TPM2 device to calculation hash.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HashLib.h>
 #include <Library/PcdLib.h>
-#include <Protocol/TrEEProtocol.h>
 
 typedef struct {
   TPM_ALG_ID AlgoId;
@@ -28,10 +27,10 @@ typedef struct {
 } TPM2_HASH_MASK;
 
 TPM2_HASH_MASK mTpm2HashMask[] = {
-  {TPM_ALG_SHA1,         TREE_BOOT_HASH_ALG_SHA1},
-  {TPM_ALG_SHA256,       TREE_BOOT_HASH_ALG_SHA256},
-  {TPM_ALG_SHA384,       TREE_BOOT_HASH_ALG_SHA384},
-  {TPM_ALG_SHA512,       TREE_BOOT_HASH_ALG_SHA512},
+  {TPM_ALG_SHA1,         HASH_ALG_SHA1},
+  {TPM_ALG_SHA256,       HASH_ALG_SHA256},
+  {TPM_ALG_SHA384,       HASH_ALG_SHA384},
+  {TPM_ALG_SHA512,       HASH_ALG_SHA512},
 };
 
 /**

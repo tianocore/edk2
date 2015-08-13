@@ -1,5 +1,5 @@
 /** @file
-  Defines the HOB GUID used to pass a TCG_PCR_EVENT from a TPM PEIM to 
+  Defines the HOB GUID used to pass a TCG_PCR_EVENT or TCG_PCR_EVENT2 from a TPM PEIM to 
   a TPM DXE Driver. A GUIDed HOB is generated for each measurement 
   made in the PEI Phase.
     
@@ -26,6 +26,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   }
 
 extern EFI_GUID gTcgEventEntryHobGuid;
+
+#define EFI_TCG_EVENT2_HOB_GUID \
+  { \
+    0xd26c221e, 0x2430, 0x4c8a, { 0x91, 0x70, 0x3f, 0xcb, 0x45, 0x0, 0x41, 0x3f } \
+  }
+
+extern EFI_GUID gTcgEvent2EntryHobGuid;
 
 ///
 /// The Global ID of a GUIDed HOB used to record TPM device error.
