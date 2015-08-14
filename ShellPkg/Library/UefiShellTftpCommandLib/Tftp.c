@@ -73,7 +73,7 @@ STATIC
 EFI_STATUS 
 GetNicName (
   IN   EFI_HANDLE  ControllerHandle,
-  IN   UINTN       Index,
+  IN   UINTN       NicNumber,
   OUT  CHAR16      *NicName
   );
 
@@ -524,7 +524,7 @@ ShellCommandRunTftp (
       );
   }
 
-  if ((UserNicName != NULL) && (NicFound == FALSE)) {
+  if ((UserNicName != NULL) && (!NicFound)) {
     ShellPrintHiiEx (
       -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_NIC_NOT_FOUND),
       gShellTftpHiiHandle, UserNicName
