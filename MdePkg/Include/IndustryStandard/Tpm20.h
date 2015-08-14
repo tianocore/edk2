@@ -147,7 +147,6 @@ typedef UINT64                        CONTEXT_COUNTER;
 
 // Table 3 - Definition of Base Types
 typedef UINT8 BYTE;
-typedef UINT8 BOOL;
 
 // Table 4 - Definition of Types for Documentation Clarity
 //
