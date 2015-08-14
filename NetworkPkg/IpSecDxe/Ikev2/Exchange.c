@@ -1,7 +1,7 @@
 /** @file
   The general interfaces of the IKEv2.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -330,7 +330,7 @@ Ikev2NegotiateInfo (
     //
     // Send out the Packet
     //
-    if (UdpService != NULL) {
+    if (UdpService != NULL && UdpService->Output != NULL) {
       Status = Ikev2SendIkePacket (UdpService, (UINT8 *) SaCommon, IkePacket, 0);
 
       if (EFI_ERROR (Status)) {
@@ -357,7 +357,7 @@ Ikev2NegotiateInfo (
       //
       // Send out the Packet
       //
-      if (UdpService != NULL) {
+      if (UdpService != NULL && UdpService->Output != NULL) {
         Status = Ikev2SendIkePacket (UdpService, (UINT8 *) &ChildSaSession->SessionCommon, IkePacket, 0);
 
         if (EFI_ERROR (Status)) {

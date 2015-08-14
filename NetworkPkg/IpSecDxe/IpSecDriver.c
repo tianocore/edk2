@@ -1,7 +1,7 @@
 /** @file
   Driver Binding Protocol for IPsec Driver.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -178,6 +178,7 @@ IpSecStop (
   IKE_UDP_SERVICE     *UdpSrv;
   LIST_ENTRY          *Entry;
   LIST_ENTRY          *Next;
+  IKEV2_SA_SESSION    *Ikev2SaSession;
 
   //
   // Locate ipsec protocol to get private data.
@@ -196,7 +197,27 @@ IpSecStop (
   //
   if ((IpVersion == IP_VERSION_4 && Private->Udp6Num ==0) ||
       (IpVersion == IP_VERSION_6 && Private->Udp4Num ==0)) {
-    IkeDeleteAllSas (Private, FALSE);
+    //
+    // If IKEv2 SAs are under establishing, delete it directly.
+    //
+    if (!IsListEmpty (&Private->Ikev2SessionList)) {
+      NET_LIST_FOR_EACH_SAFE (Entry, Next, &Private->Ikev2SessionList) {
+        Ikev2SaSession = IKEV2_SA_SESSION_BY_SESSION (Entry);
+        RemoveEntryList (&Ikev2SaSession->BySessionTable);
+        Ikev2SaSessionFree (Ikev2SaSession);
+      }
+    }
+
+    //
+    // Delete established IKEv2 SAs.
+    //
+    if (!IsListEmpty (&Private->Ikev2EstablishedList)) {
+      NET_LIST_FOR_EACH_SAFE (Entry, Next, &Private->Ikev2EstablishedList) {
+        Ikev2SaSession = IKEV2_SA_SESSION_BY_SESSION (Entry); 
+        RemoveEntryList (&Ikev2SaSession->BySessionTable);
+        Ikev2SaSessionFree (Ikev2SaSession);
+      }
+    }
   }
 
   if (IpVersion == IP_VERSION_4) {

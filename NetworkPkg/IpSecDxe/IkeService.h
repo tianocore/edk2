@@ -1,7 +1,7 @@
 /** @file
   Prototypes definitions of IKE service.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 #include "Ike.h"
 #include "IpSecImpl.h"
 #include "IkeCommon.h"
+#include "Ikev2/Utility.h"
 
 #define IPSEC_CRYPTO_LIB_MEMORY 128 * 1024
 

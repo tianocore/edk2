@@ -15,7 +15,6 @@
 
 #include "IkeService.h"
 #include "IpSecConfigImpl.h"
-#include "Ikev2/Utility.h"
 
 IKE_EXCHANGE_INTERFACE  *mIkeExchange[] = {
   &mIkev1Exchange,

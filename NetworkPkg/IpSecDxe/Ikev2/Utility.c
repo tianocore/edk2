@@ -2,7 +2,7 @@
   The Common operations used by IKE Exchange Process.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -891,9 +891,7 @@ Ikev2ChildSaSilentDelete (
   RemoteSelector  = NULL;
   UdpService      = IkeSaSession->SessionCommon.UdpService;
 
-  Private  = (UdpService->IpVersion == IP_VERSION_4) ?
-             IPSEC_PRIVATE_DATA_FROM_UDP4LIST(UdpService->ListHead) :
-             IPSEC_PRIVATE_DATA_FROM_UDP6LIST(UdpService->ListHead);
+  Private = IkeSaSession->SessionCommon.Private;
 
   //
   // Remove the Established SA from ChildSaEstablishlist.
