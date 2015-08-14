@@ -524,7 +524,6 @@ Var_UpdateErrorOutOption (
 
   @retval EFI_OUT_OF_RESOURCES If not enought memory to complete the operation.
   @retval EFI_SUCCESS          If function completes successfully.
-  @return Others Errors        Return errors from call to gRT->GetVariable.
 
 **/
 EFI_STATUS
@@ -660,13 +659,12 @@ Var_UpdateDriverOption (
                   Buffer
                   );
   ASSERT_EFI_ERROR (Status);
-  Status = GetEfiGlobalVariable2 (L"DriverOrder", (VOID **) &DriverOrderList, &DriverOrderListSize);
-  if (EFI_ERROR (Status) || DriverOrderList == NULL){
-    return Status;
-  }
+  GetEfiGlobalVariable2 (L"DriverOrder", (VOID **) &DriverOrderList, &DriverOrderListSize);
   NewDriverOrderList = AllocateZeroPool (DriverOrderListSize + sizeof (UINT16));
   ASSERT (NewDriverOrderList != NULL);
-  CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
+  if (DriverOrderList != NULL){
+    CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
+  }
   NewDriverOrderList[DriverOrderListSize / sizeof (UINT16)] = Index;
   if (DriverOrderList != NULL) {
     EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
@@ -704,7 +702,6 @@ Var_UpdateDriverOption (
 
   @retval EFI_OUT_OF_RESOURCES If not enought memory to complete the operation.
   @retval EFI_SUCCESS          If function completes successfully.
-  @return Others Errors        Return errors from call to gRT->GetVariable.
 
 **/
 EFI_STATUS
@@ -829,13 +826,12 @@ Var_UpdateBootOption (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Status = GetEfiGlobalVariable2 (L"BootOrder", (VOID **) &BootOrderList, &BootOrderListSize);
-  if (EFI_ERROR (Status) || BootOrderList == NULL){
-    return Status;
-  }
+  GetEfiGlobalVariable2 (L"BootOrder", (VOID **) &BootOrderList, &BootOrderListSize);
   NewBootOrderList = AllocateZeroPool (BootOrderListSize + sizeof (UINT16));
   ASSERT (NewBootOrderList != NULL);
-  CopyMem (NewBootOrderList, BootOrderList, BootOrderListSize);
+  if (BootOrderList != NULL){
+    CopyMem (NewBootOrderList, BootOrderList, BootOrderListSize);
+  }
   NewBootOrderList[BootOrderListSize / sizeof (UINT16)] = Index;
 
   if (BootOrderList != NULL) {
