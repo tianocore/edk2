@@ -358,6 +358,7 @@ BaseCrypto2Hash (
   UINTN                    CtxSize;
   BOOLEAN                  Ret;
   EFI_STATUS               Status;
+  HASH2_INSTANCE_DATA      *Instance;
 
   Status = EFI_SUCCESS;
 
@@ -373,6 +374,13 @@ BaseCrypto2Hash (
   if (HashInfo == NULL) {
     return EFI_UNSUPPORTED;
   }
+  
+  Instance = HASH2_INSTANCE_DATA_FROM_THIS(This);
+  if (Instance->HashContext != NULL) {
+    FreePool (Instance->HashContext);
+  }
+  Instance->HashInfoContext = NULL;
+  Instance->HashContext = NULL;
 
   //
   // Start hash sequence
@@ -392,6 +400,12 @@ BaseCrypto2Hash (
     goto Done;
   }
 
+  //
+  // Setup the context
+  //
+  Instance->HashContext = HashCtx;
+  Instance->HashInfoContext = HashInfo;
+
   Ret = HashInfo->Update (HashCtx, Message, MessageSize);
   if (!Ret) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -404,7 +418,12 @@ BaseCrypto2Hash (
     goto Done;
   }
 Done:
+  //
+  // Cleanup the context
+  //
   FreePool (HashCtx);
+  Instance->HashInfoContext = NULL;
+  Instance->HashContext = NULL;
   return Status;
 }
 
