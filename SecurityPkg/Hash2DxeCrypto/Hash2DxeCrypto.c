@@ -454,7 +454,7 @@ BaseCrypto2HashInit (
   // Consistency Check
   //
   Instance = HASH2_INSTANCE_DATA_FROM_THIS(This);
-  if ((Instance->HashContext != NULL) || (Instance->HashInfoContext != HashInfo)) {
+  if ((Instance->HashContext != NULL) || (Instance->HashInfoContext != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 
