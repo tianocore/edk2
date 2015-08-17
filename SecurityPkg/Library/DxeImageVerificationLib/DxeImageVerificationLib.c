@@ -1860,7 +1860,7 @@ DxeImageVerificationHandler (
       }
       SignatureList->SignatureHeaderSize  = 0;
       SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
-      SignatureList->SignatureSize        = (UINT32) mImageDigestSize;
+      SignatureList->SignatureSize        = (UINT32) (sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize);
       CopyMem (&SignatureList->SignatureType, &mCertType, sizeof (EFI_GUID));
       Signature = (EFI_SIGNATURE_DATA *) ((UINT8 *) SignatureList + sizeof (EFI_SIGNATURE_LIST));
       CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
