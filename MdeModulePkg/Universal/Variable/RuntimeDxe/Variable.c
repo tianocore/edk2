@@ -2178,6 +2178,34 @@ UpdateVariable (
     }
   }
 
+  //
+  // Check if CacheVariable points to the variable in variable HOB.
+  // If yes, let CacheVariable points to the variable in NV variable cache.
+  //
+  if ((CacheVariable->CurrPtr != NULL) &&
+      (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) &&
+      (CacheVariable->StartPtr == GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase))
+     ) {
+    CacheVariable->StartPtr = GetStartPointer (mNvVariableCache);
+    CacheVariable->EndPtr   = GetEndPointer   (mNvVariableCache);
+    CacheVariable->Volatile = FALSE;
+    Status = FindVariableEx (VariableName, VendorGuid, FALSE, CacheVariable);
+    if (CacheVariable->CurrPtr == NULL || EFI_ERROR (Status)) {
+      //
+      // There is no matched variable in NV variable cache.
+      //
+      if ((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0)) || (Attributes == 0)) {
+        //
+        // It is to delete variable,
+        // go to delete this variable in variable HOB and
+        // try to flush other variables from HOB to flash.
+        //
+        FlushHobVariableToFlash (VariableName, VendorGuid);
+        return EFI_SUCCESS;
+      }
+    }
+  }
+
   if ((CacheVariable->CurrPtr == NULL) || CacheVariable->Volatile) {
     Variable = CacheVariable;
   } else {
@@ -3895,6 +3923,7 @@ FlushHobVariableToFlash (
   VARIABLE_STORE_HEADER         *VariableStoreHeader;
   VARIABLE_HEADER               *Variable;
   VOID                          *VariableData;
+  VARIABLE_POINTER_TRACK        VariablePtrTrack;
   BOOLEAN                       ErrorFlag;
 
   ErrorFlag = FALSE;
@@ -3923,17 +3952,22 @@ FlushHobVariableToFlash (
           !CompareGuid (VendorGuid, GetVendorGuidPtr (Variable)) ||
           StrCmp (VariableName, GetVariableNamePtr (Variable)) != 0) {
         VariableData = GetVariableDataPtr (Variable);
-        Status = VariableServiceSetVariable (
+        FindVariable (GetVariableNamePtr (Variable), GetVendorGuidPtr (Variable), &VariablePtrTrack, &mVariableModuleGlobal->VariableGlobal, FALSE);
+        Status = UpdateVariable (
                    GetVariableNamePtr (Variable),
                    GetVendorGuidPtr (Variable),
-                   Variable->Attributes,
+                   VariableData,
                    DataSizeOfVariable (Variable),
-                   VariableData
-                   );
+                   Variable->Attributes,
+                   0,
+                   0,
+                   &VariablePtrTrack,
+                   NULL
+                 );
         DEBUG ((EFI_D_INFO, "Variable driver flush the HOB variable to flash: %g %s %r\n", GetVendorGuidPtr (Variable), GetVariableNamePtr (Variable), Status));
       } else {
         //
-        // The updated or deleted variable is matched with the HOB variable.
+        // The updated or deleted variable is matched with this HOB variable.
         // Don't break here because we will try to set other HOB variables
         // since this variable could be set successfully.
         //
@@ -3988,6 +4022,8 @@ VariableWriteServiceInitialize (
   EFI_PHYSICAL_ADDRESS            NvStorageBase;
   VARIABLE_ENTRY_PROPERTY         *VariableEntry;
 
+  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
   NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
   if (NvStorageBase == 0) {
     NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
@@ -4018,6 +4054,7 @@ VariableWriteServiceInitialize (
                  0
                  );
       if (EFI_ERROR (Status)) {
+        ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
         return Status;
       }
       break;
@@ -4065,6 +4102,7 @@ VariableWriteServiceInitialize (
     }
   }
 
+  ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   return Status;
 }
 
