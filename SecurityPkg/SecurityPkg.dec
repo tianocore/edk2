@@ -6,6 +6,7 @@
 #  and libraries instances, which are used for those features.
 #
 # Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
 # The full text of the license may be found at
@@ -354,6 +355,28 @@
   # @Prompt TPM device type identifier
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid |{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x0001000F
 
+  ## This PCD indicates if BIOS auto detect TPM1.2 or dTPM2.0.<BR><BR>
+  #  FALSE - No auto detection.<BR>
+  #  TRUE  - Auto detection.<BR>
+  # @Prompt TPM type detection.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection|TRUE|BOOLEAN|0x00010011
+
+  ## This PCD indicates TPM base address.<BR><BR>
+  # @Prompt TPM device address.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012
+
+  ## This PCR means the OEM configurated number of PCR banks.
+  #  0 means dynamic get from supported HASH algorithm
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2NumberOfPCRBanks|0x0|UINT32|0x00010015
+  
+  ## Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images
+  #
+  # @Prompt One or more SHA 256 Hashes of RSA 2048 bit public keys used to verify Recovery and Capsule Update images
+  #
+  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer|{0x91, 0x29, 0xc4, 0xbd, 0xea, 0x6d, 0xda, 0xb3, 0xaa, 0x6f, 0x50, 0x16, 0xfc, 0xdb, 0x4b, 0x7e, 0x3c, 0xd6, 0xdc, 0xa4, 0x7a, 0x0e, 0xdd, 0xe6, 0x15, 0x8c, 0x73, 0x96, 0xa2, 0xd4, 0xa6, 0x4d}|VOID*|0x00010013
+
+[PcdsDynamic, PcdsDynamicEx]
+
   ## This PCD indicates Hash mask for TPM 2.0.<BR><BR>
   #  If this bit is set, that means this algorithm is needed to extend to PCR.<BR>
   #  If this bit is clear, that means this algorithm is NOT needed to extend to PCR.<BR>
@@ -365,30 +388,10 @@
   # @ValidRange 0x80000001 | 0x00000000 - 0x0000000F 
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x0000000F|UINT32|0x00010010
 
-  ## This PCD indicates if BIOS auto detect TPM1.2 or dTPM2.0.<BR><BR>
-  #  FALSE - No auto detection.<BR>
-  #  TRUE  - Auto detection.<BR>
-  # @Prompt TPM type detection.
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection|TRUE|BOOLEAN|0x00010011
-
-  ## This PCD indicates TPM base address.<BR><BR>
-  # @Prompt TPM device address.
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012
-
   ## This PCD indicated final BIOS supported Hash mask.
   #    Bios may choose to register a subset of PcdTpm2HashMask.
   #    So this PCD is final value of how many hash algo is extended to PCR.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap|0xFFFFFFFF|UINT32|0x00010016
-
-  ## This PCR means the OEM configurated number of PCR banks.
-  #  0 means dynamic get from supported HASH algorithm
-  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2NumberOfPCRBanks|0x0|UINT32|0x00010015
-  
-  ## Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images
-  #
-  # @Prompt One or more SHA 256 Hashes of RSA 2048 bit public keys used to verify Recovery and Capsule Update images
-  #
-  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer|{0x91, 0x29, 0xc4, 0xbd, 0xea, 0x6d, 0xda, 0xb3, 0xaa, 0x6f, 0x50, 0x16, 0xfc, 0xdb, 0x4b, 0x7e, 0x3c, 0xd6, 0xdc, 0xa4, 0x7a, 0x0e, 0xdd, 0xe6, 0x15, 0x8c, 0x73, 0x96, 0xa2, 0xd4, 0xa6, 0x4d}|VOID*|0x00010013
   
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni
