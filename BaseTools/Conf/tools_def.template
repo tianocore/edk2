@@ -2643,9 +2643,9 @@ NOOPT_VS2010x86xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:R
 *_VS2012_IA32_ASLDLINK_PATH       = DEF(VS2012_BIN)\link.exe
 
       *_VS2012_IA32_MAKE_FLAGS    = /nologo
-  DEBUG_VS2012_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2012_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2012_IA32_CC_FLAGS        = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2012_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2012_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2012_IA32_CC_FLAGS        = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2012_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2012_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -2761,9 +2761,9 @@ NOOPT_VS2012_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2012xASL_IA32_ASLDLINK_PATH = DEF(VS2012_BIN)\link.exe
 
       *_VS2012xASL_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2012xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2012xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2012xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2012xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2012xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2012xASL_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2012xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2012xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -2877,9 +2877,9 @@ NOOPT_VS2012xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 *_VS2012x86_IA32_ASM_PATH     = DEF(VS2012x86_BIN)\ml.exe
 
       *_VS2012x86_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2012x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2012x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2012x86_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2012x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2012x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2012x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2012x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2012x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -2992,9 +2992,9 @@ NOOPT_VS2012x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2012x86xASL_IA32_ASM_PATH     = DEF(VS2012x86_BIN)\ml.exe
 
       *_VS2012x86xASL_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2012x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2012x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2012x86xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2012x86xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2012x86xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2012x86xASL_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2012x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2012x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -3109,9 +3109,9 @@ NOOPT_VS2012x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT
 *_VS2013_IA32_ASLDLINK_PATH       = DEF(VS2013_BIN)\link.exe
 
       *_VS2013_IA32_MAKE_FLAGS    = /nologo
-  DEBUG_VS2013_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2013_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2013_IA32_CC_FLAGS        = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2013_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013_IA32_CC_FLAGS        = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2013_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2013_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -3227,9 +3227,9 @@ NOOPT_VS2013_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2013xASL_IA32_ASLDLINK_PATH = DEF(VS2013_BIN)\link.exe
 
       *_VS2013xASL_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2013xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2013xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2013xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2013xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013xASL_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2013xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2013xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -3343,9 +3343,9 @@ NOOPT_VS2013xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 *_VS2013x86_IA32_ASM_PATH     = DEF(VS2013x86_BIN)\ml.exe
 
       *_VS2013x86_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2013x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2013x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2013x86_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2013x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2013x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2013x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -3458,9 +3458,9 @@ NOOPT_VS2013x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2013x86xASL_IA32_ASM_PATH     = DEF(VS2013x86_BIN)\ml.exe
 
       *_VS2013x86xASL_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2013x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-RELEASE_VS2013x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2013x86xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+  DEBUG_VS2013x86xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013x86xASL_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013x86xASL_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
 
   DEBUG_VS2013x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2013x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
