@@ -500,6 +500,7 @@ BaseCrypto2HashInit (
   //
   Instance->HashContext = HashCtx;
   Instance->HashInfoContext = HashInfo;
+  Instance->Updated = FALSE;
 
   return EFI_SUCCESS;
 }
@@ -551,6 +552,8 @@ BaseCrypto2HashUpdate (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  Instance->Updated = TRUE;
+
   return EFI_SUCCESS;
 }
 
@@ -590,7 +593,8 @@ BaseCrypto2HashFinal (
   // Consistency Check
   //
   Instance = HASH2_INSTANCE_DATA_FROM_THIS(This);
-  if ((Instance->HashContext == NULL) || (Instance->HashInfoContext == NULL)) {
+  if ((Instance->HashContext == NULL) || (Instance->HashInfoContext == NULL) ||
+      (!Instance->Updated)) {
     return EFI_NOT_READY;
   }
   HashInfo = Instance->HashInfoContext;
@@ -604,6 +608,7 @@ BaseCrypto2HashFinal (
   FreePool (HashCtx);
   Instance->HashInfoContext = NULL;
   Instance->HashContext = NULL;
+  Instance->Updated = FALSE;
 
   if (!Ret) {
     return EFI_OUT_OF_RESOURCES;

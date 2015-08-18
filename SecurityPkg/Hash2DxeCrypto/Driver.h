@@ -57,6 +57,7 @@ typedef struct {
   EFI_HASH2_PROTOCOL               Hash2Protocol;
   VOID                             *HashContext;
   VOID                             *HashInfoContext;
+  BOOLEAN                          Updated;
 } HASH2_INSTANCE_DATA;
 
 #define HASH2_INSTANCE_DATA_FROM_THIS(a) \
