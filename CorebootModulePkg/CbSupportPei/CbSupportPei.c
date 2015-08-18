@@ -186,12 +186,16 @@ CbPeiEntryPoint (
 
   ASSERT (LowMemorySize > 0);
 
+  //
+  // Report lower 640KB of RAM. Attribute EFI_RESOURCE_ATTRIBUTE_TESTED  
+ // is intentionally omitted to prevent erasing of the coreboot header  
+ // record before it is processed by CbParseMemoryInfo.
+  //
   BuildResourceDescriptorHob (
     EFI_RESOURCE_SYSTEM_MEMORY,
     (
     EFI_RESOURCE_ATTRIBUTE_PRESENT |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-    EFI_RESOURCE_ATTRIBUTE_TESTED |
     EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
     EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
     EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
