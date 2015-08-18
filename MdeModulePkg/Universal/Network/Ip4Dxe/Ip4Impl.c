@@ -563,6 +563,54 @@ Ip4InitProtocol (
 }
 
 
+/**
+  The event handle for IP4 auto reconfiguration. The original default
+  interface and route table will be removed as the default.
+
+  @param[in]  Context                The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBackDpc (
+  IN VOID                   *Context
+  )
+{
+  IP4_SERVICE               *IpSb;
+
+  IpSb      = (IP4_SERVICE *) Context;
+  NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
+
+  if (IpSb->State > IP4_SERVICE_UNSTARTED) {
+    IpSb->State = IP4_SERVICE_UNSTARTED;
+  }
+
+  Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
+
+  return ;
+}
+
+
+/**
+  Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK.
+
+  @param Event     The event that is signalled.
+  @param Context   The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBack (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+{
+  //
+  // Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK
+  //
+  QueueDpc (TPL_CALLBACK, Ip4AutoReconfigCallBackDpc, Context);
+}
+
 
 /**
   Configure the IP4 child. If the child is already configured,
@@ -678,10 +726,27 @@ Ip4ConfigProtocol (
     // been started, start it.
     //
     if (IpSb->State == IP4_SERVICE_UNSTARTED) {
+      //
+      // Create the ReconfigEvent to start the new configuration.
+      //
+      if (IpSb->ReconfigEvent == NULL) {
+        Status = gBS->CreateEvent (
+                        EVT_NOTIFY_SIGNAL,
+                        TPL_NOTIFY,
+                        Ip4AutoReconfigCallBack,
+                        IpSb,
+                        &IpSb->ReconfigEvent
+                        );
+
+        if (EFI_ERROR (Status)) {
+          goto ON_ERROR;
+        }
+      }
+      
       Status = Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
 
       if (EFI_ERROR (Status)) {
-        goto ON_ERROR;
+        goto CLOSE_RECONFIG_EVENT;
       }
     }
 
@@ -711,7 +776,7 @@ Ip4ConfigProtocol (
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
     if (EFI_ERROR (Status)) {
-      goto ON_ERROR;
+      goto CLOSE_RECONFIG_EVENT;
     }
   }
   InsertTailList (&IpIf->IpInstances, &IpInstance->AddrLink);
@@ -729,6 +794,12 @@ Ip4ConfigProtocol (
   }
 
   return EFI_SUCCESS;
+
+CLOSE_RECONFIG_EVENT:
+  if (IpSb->ReconfigEvent != NULL) {
+    gBS->CloseEvent (IpSb->ReconfigEvent);
+    IpSb->ReconfigEvent = NULL;
+  }
 
 ON_ERROR:
   Ip4FreeRouteTable (IpInstance->RouteTable);
@@ -2295,10 +2366,16 @@ Ip4SentPacketTicking (
 
 
 /**
-  The heart beat timer of IP4 service instance. It times out
-  all of its IP4 children's received-but-not-delivered and
-  transmitted-but-not-recycle packets, and provides time input
-  for its IGMP protocol.
+  There are two steps for this the heart beat timer of IP4 service instance. 
+  First, it times out all of its IP4 children's received-but-not-delivered 
+  and transmitted-but-not-recycle packets, and provides time input for its 
+  IGMP protocol.
+  Second, a dedicated timer is used to poll underlying media status. In case 
+  of cable swap, a new round auto configuration will be initiated. The timer 
+  will signal the IP4 to run DHCP configuration again. IP4 driver will free
+  old IP address related resource, such as route table and Interface, then
+  initiate a DHCP process to acquire new IP, eventually create route table 
+  for new IP address.
 
   @param[in]  Event                  The IP4 service instance's heart beat timer.
   @param[in]  Context                The IP4 service instance.
@@ -2312,10 +2389,42 @@ Ip4TimerTicking (
   )
 {
   IP4_SERVICE               *IpSb;
+  BOOLEAN                   OldMediaPresent;
+  EFI_STATUS                Status;
+  EFI_SIMPLE_NETWORK_MODE   SnpModeData;
 
   IpSb = (IP4_SERVICE *) Context;
   NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
+  
+  OldMediaPresent = IpSb->MediaPresent;
 
   Ip4PacketTimerTicking (IpSb);
   Ip4IgmpTicking (IpSb);
+
+  //
+  // Get fresh mode data from MNP, since underlying media status may change. 
+  // Here, it needs to mention that the MediaPresent can also be checked even if 
+  // EFI_NOT_STARTED returned while this MNP child driver instance isn't configured.
+  //
+  Status = IpSb->Mnp->GetModeData (IpSb->Mnp, NULL, &SnpModeData);
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_STARTED)) {
+    return;
+  }
+
+  IpSb->MediaPresent = SnpModeData.MediaPresent;
+  //
+  // Media transimit Unpresent to Present means new link movement is detected.
+  //
+  if (!OldMediaPresent && IpSb->MediaPresent) {
+    //
+    // Signal the IP4 to run the dhcp configuration again. IP4 driver will free
+    // old IP address related resource, such as route table and Interface, then 
+    // initiate a DHCP round to acquire new IP, eventually 
+    // create route table for new IP address.
+    //
+    if (IpSb->ReconfigEvent != NULL) {
+      Status = gBS->SignalEvent (IpSb->ReconfigEvent);
+      DispatchDpc ();
+    }
+  }
 }

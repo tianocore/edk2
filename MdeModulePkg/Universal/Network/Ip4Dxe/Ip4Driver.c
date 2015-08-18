@@ -210,6 +210,10 @@ Ip4CreateService (
 
   IpSb->Timer = NULL;
 
+  IpSb->ReconfigEvent = NULL;
+  
+  IpSb->MediaPresent = TRUE;
+
   //
   // Create various resources. First create the route table, timer
   // event and MNP child. IGMP, interface's initialization depend
@@ -384,6 +388,12 @@ Ip4CleanService (
     gBS->CloseEvent (IpSb->Timer);
 
     IpSb->Timer = NULL;
+  }
+
+  if (IpSb->ReconfigEvent != NULL) {
+    gBS->CloseEvent (IpSb->ReconfigEvent);
+
+    IpSb->ReconfigEvent = NULL;
   }
 
   if (IpSb->MacString != NULL) {

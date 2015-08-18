@@ -492,6 +492,7 @@ Ip4Config2SetDefaultAddr (
   ASSERT (IpIf != NULL);
 
   if ((IpIf->Ip == StationAddress) && (IpIf->SubnetMask == SubnetMask)) {
+    IpSb->State = IP4_SERVICE_CONFIGED;
     return EFI_SUCCESS;
   }
 

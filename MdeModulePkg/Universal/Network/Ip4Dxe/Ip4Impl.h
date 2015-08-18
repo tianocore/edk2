@@ -203,6 +203,13 @@ struct _IP4_SERVICE {
 
   EFI_EVENT                       Timer;
 
+  EFI_EVENT                       ReconfigEvent;
+
+  //
+  // Underlying media present status. 
+  //
+  BOOLEAN                         MediaPresent;
+
   //
   // IPv4 Configuration II Protocol instance
   //
