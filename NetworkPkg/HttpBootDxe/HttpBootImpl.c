@@ -244,6 +244,12 @@ HttpBootStop (
   Private->SelectProxyType = HttpOfferTypeMax;
 
   if (!Private->UsingIpv6) {
+    //
+    // Stop and release the DHCP4 child.
+    //
+    Private->Dhcp4->Stop (Private->Dhcp4);
+    Private->Dhcp4->Configure (Private->Dhcp4, NULL);
+
     for (Index = 0; Index < HTTP_BOOT_OFFER_MAX_NUM; Index++) {
       if (Private->OfferBuffer[Index].Dhcp4.UriParser) {
         HttpUrlFreeParser (Private->OfferBuffer[Index].Dhcp4.UriParser);
@@ -338,6 +344,12 @@ HttpBootDxeLoadFile (
 
   if (Status != EFI_SUCCESS && Status != EFI_BUFFER_TOO_SMALL) {
     HttpBootStop (Private);
+  } else {
+    //
+    // Stop and release the DHCP4 child.
+    //
+    Private->Dhcp4->Stop (Private->Dhcp4);
+    Private->Dhcp4->Configure (Private->Dhcp4, NULL);
   }
 
   return Status;
