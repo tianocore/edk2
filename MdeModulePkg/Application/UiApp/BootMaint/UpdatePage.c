@@ -1056,7 +1056,7 @@ UpdateTerminalPage (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
-  for (Index = 0; Index < 4; Index++) {
+  for (Index = 0; Index < sizeof (TerminalType) / sizeof (TerminalType[0]); Index++) {
     CheckFlags = 0;
     if (NewTerminalContext->TerminalType == Index) {
       CheckFlags |= EFI_IFR_OPTION_DEFAULT;

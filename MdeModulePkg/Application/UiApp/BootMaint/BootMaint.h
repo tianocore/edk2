@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ui.h"
 #include "FormGuid.h"
 #include "FrontPage.h"
+#include <Guid/TtyTerm.h>
 
 //
 // Constants which are variable names used to access variables
@@ -81,7 +82,8 @@ typedef enum _TYPE_OF_TERMINAL {
   TerminalTypePcAnsi                             = 0,
   TerminalTypeVt100,
   TerminalTypeVt100Plus,
-  TerminalTypeVtUtf8
+  TerminalTypeVtUtf8,
+  TerminalTypeTtyTerm
 } TYPE_OF_TERMINAL;
 
 typedef enum _FILE_EXPLORER_STATE {
@@ -1452,12 +1454,12 @@ extern BM_MENU_OPTION             ConsoleErrMenu;
 extern BM_MENU_OPTION             DirectoryMenu;
 extern BM_MENU_OPTION             DriverMenu;
 extern BM_MENU_OPTION             TerminalMenu;
-extern UINT16                     TerminalType[];
+extern UINT16                     TerminalType[5];
 extern COM_ATTR                   BaudRateList[19];
 extern COM_ATTR                   DataBitsList[4];
 extern COM_ATTR                   ParityList[5];
 extern COM_ATTR                   StopBitsList[3];
-extern EFI_GUID                   TerminalTypeGuid[4];
+extern EFI_GUID                   TerminalTypeGuid[5];
 extern STRING_DEPOSITORY          *FileOptionStrDepository;
 extern STRING_DEPOSITORY          *ConsoleOptionStrDepository;
 extern STRING_DEPOSITORY          *BootOptionStrDepository;

@@ -564,7 +564,7 @@ LocateSerialIo (
     Vendor.Header.Type                = MESSAGING_DEVICE_PATH;
     Vendor.Header.SubType             = MSG_VENDOR_DP;
 
-    for (Index2 = 0; Index2 < 4; Index2++) {
+    for (Index2 = 0; Index2 < (sizeof (TerminalTypeGuid) / sizeof (TerminalTypeGuid[0])); Index2++) {
       CopyMem (&Vendor.Guid, &TerminalTypeGuid[Index2], sizeof (EFI_GUID));
       SetDevicePathNodeLength (&Vendor.Header, sizeof (VENDOR_DEVICE_PATH));
       NewDevicePath = AppendDevicePathNode (
@@ -940,7 +940,12 @@ IsTerminalDevicePath (
           *Termi      = TerminalTypeVtUtf8;
           IsTerminal  = TRUE;
         } else {
-          IsTerminal = FALSE;
+          if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[4])) {
+            *Termi      = TerminalTypeTtyTerm;
+            IsTerminal  = TRUE;
+          } else {
+            IsTerminal = FALSE;
+          }
         }
       }
     }

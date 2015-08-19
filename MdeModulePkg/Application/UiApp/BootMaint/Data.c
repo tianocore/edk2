@@ -35,6 +35,7 @@ UINT16              TerminalType[] = {
   STRING_TOKEN(STR_COM_TYPE_1),
   STRING_TOKEN(STR_COM_TYPE_2),
   STRING_TOKEN(STR_COM_TYPE_3),
+  STRING_TOKEN(STR_COM_TYPE_4),
 };
 
 ///
@@ -266,9 +267,10 @@ COM_ATTR            StopBitsList[3] = {
 ///
 /// Guid for messaging path, used in Serial port setting.
 ///
-EFI_GUID            TerminalTypeGuid[4] = {
+EFI_GUID            TerminalTypeGuid[] = {
   DEVICE_PATH_MESSAGING_PC_ANSI,
   DEVICE_PATH_MESSAGING_VT_100,
   DEVICE_PATH_MESSAGING_VT_100_PLUS,
-  DEVICE_PATH_MESSAGING_VT_UTF8
+  DEVICE_PATH_MESSAGING_VT_UTF8,
+  EFI_TTY_TERM_GUID
 };
