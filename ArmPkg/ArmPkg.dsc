@@ -152,10 +152,6 @@
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA15Lib/ArmCortexA15Lib.inf
 
-#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
-#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
-#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
-#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
 

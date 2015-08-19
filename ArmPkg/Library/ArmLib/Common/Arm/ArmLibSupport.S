@@ -15,12 +15,6 @@
 
 #include <AsmMacroIoLib.h>
 
-#ifdef ARM_CPU_ARMv6
-// No memory barriers for ARMv6
-#define isb
-#define dsb
-#endif
-
 .text
 .align 2
 GCC_ASM_EXPORT(ArmReadMidr)

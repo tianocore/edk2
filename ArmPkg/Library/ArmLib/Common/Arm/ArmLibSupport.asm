@@ -17,12 +17,6 @@
 
     INCLUDE AsmMacroIoLib.inc
 
-#ifdef ARM_CPU_ARMv6
-// No memory barriers for ARMv6
-#define isb
-#define dsb
-#endif
-
     EXPORT ArmReadMidr
     EXPORT ArmCacheInfo
     EXPORT ArmGetInterruptState
