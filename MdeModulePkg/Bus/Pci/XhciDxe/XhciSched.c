@@ -1215,7 +1215,7 @@ XhcExecTransfer (
 {
   EFI_STATUS              Status;
   UINTN                   Index;
-  UINTN                   Loop;
+  UINT64                  Loop;
   UINT8                   SlotId;
   UINT8                   Dci;
   BOOLEAN                 Finished;

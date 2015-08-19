@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -48,21 +48,20 @@ typedef struct _USB_DEV_CONTEXT USB_DEV_CONTEXT;
 
 //
 // XHC reset timeout experience values.
-// The unit is microsecond, setting it as 1s.
+// The unit is millisecond, setting it as 1s.
 //
-#define XHC_RESET_TIMEOUT           (1 * XHC_1_SECOND)
-//
-// XHC delay experience value for polling operation.
-// The unit is microsecond, set it as 1ms.
-//
-#define XHC_POLL_DELAY              (1 * XHC_1_MILLISECOND)
+#define XHC_RESET_TIMEOUT           (1000)
 
 //
 // Wait for root port state stable.
 //
 #define XHC_ROOT_PORT_STATE_STABLE  (200 * XHC_1_MILLISECOND)
 
-#define XHC_GENERIC_TIMEOUT         (10 * XHC_1_MILLISECOND)
+//
+// XHC generic timeout experience values.
+// The unit is millisecond, setting it as 10s.
+//
+#define XHC_GENERIC_TIMEOUT         (10 * 1000)
 
 #define XHC_LOW_32BIT(Addr64)       ((UINT32)(((UINTN)(Addr64)) & 0XFFFFFFFF))
 #define XHC_HIGH_32BIT(Addr64)      ((UINT32)(RShiftU64((UINTN)(Addr64), 32) & 0XFFFFFFFF))

@@ -2,7 +2,7 @@
 
   Provides some data structure definitions used by the XHCI host controller driver.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,24 +47,19 @@ typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
 //
 #define XHC_1_MICROSECOND            (1)
 //
-// Convert millisecond to microsecond.
+// The unit is microsecond, setting it as 1ms.
 //
 #define XHC_1_MILLISECOND            (1000)
 //
 // XHC generic timeout experience values.
-// The unit is microsecond, setting it as 10ms.
+// The unit is millisecond, setting it as 10s.
 //
 #define XHC_GENERIC_TIMEOUT          (10 * 1000)
 //
 // XHC reset timeout experience values.
-// The unit is microsecond, setting it as 1s.
+// The unit is millisecond, setting it as 1s.
 //
-#define XHC_RESET_TIMEOUT            (1000 * 1000)
-//
-// XHC delay experience value for polling operation.
-// The unit is microsecond, set it as 1ms.
-//
-#define XHC_POLL_DELAY               (1000)
+#define XHC_RESET_TIMEOUT            (1000)
 //
 // XHC async transfer timer interval, set by experience.
 // The unit is 100us, takes 1ms as interval.

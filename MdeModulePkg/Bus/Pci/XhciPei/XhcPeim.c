@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -161,7 +161,7 @@ XhcPeiClearOpRegBit (
   @param  Offset        The offset of the operational register.
   @param  Bit           The bit mask of the register to wait for.
   @param  WaitToSet     Wait the bit to set or clear.
-  @param  Timeout       The time to wait before abort (in microsecond, us).
+  @param  Timeout       The time to wait before abort (in millisecond, ms).
 
   @retval EFI_SUCCESS   The bit successfully changed by host controller.
   @retval EFI_TIMEOUT   The time out occurred.
@@ -176,14 +176,14 @@ XhcPeiWaitOpRegBit (
   IN UINT32             Timeout
   )
 {
-  UINT32                Index;
+  UINT64                Index;
 
-  for (Index = 0; Index < Timeout / XHC_POLL_DELAY + 1; Index++) {
+  for (Index = 0; Index < Timeout * XHC_1_MILLISECOND; Index++) {
     if (XHC_REG_BIT_IS_SET (Xhc, Offset, Bit) == WaitToSet) {
       return EFI_SUCCESS;
     }
 
-    MicroSecondDelay (XHC_POLL_DELAY);
+    MicroSecondDelay (XHC_1_MICROSECOND);
   }
 
   return EFI_TIMEOUT;
@@ -381,7 +381,7 @@ XhcPeiIsSysError (
   Reset the host controller.
 
   @param  Xhc           The XHCI device.
-  @param  Timeout       Time to wait before abort (in microsecond, us).
+  @param  Timeout       Time to wait before abort (in millisecond, ms).
 
   @retval EFI_TIMEOUT   The transfer failed due to time out.
   @retval Others        Failed to reset the host.
