@@ -2808,7 +2808,7 @@ EfiConfigKeywordHandlerSetData (
   EFI_STATUS                          Status;
   CHAR16                              *StringPtr;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-  CHAR16                              *NextStringPtr;  
+  CHAR16                              *NextStringPtr;
   CHAR16                              *KeywordData;
   EFI_STRING_ID                       KeywordStringId;
   UINT32                              RetVal;
@@ -2819,6 +2819,7 @@ EfiConfigKeywordHandlerSetData (
   CHAR16                              *ValueElement;
   BOOLEAN                             ReadOnly;
   EFI_STRING                          InternalProgress;
+  CHAR16                              *TempString;
 
   if (This == NULL || Progress == NULL || ProgressErr == NULL || KeywordString == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2827,7 +2828,6 @@ EfiConfigKeywordHandlerSetData (
   *Progress    = KeywordString;
   *ProgressErr = KEYWORD_HANDLER_UNDEFINED_PROCESSING_ERROR;
   Status       = EFI_SUCCESS;
-  StringPtr    = KeywordString;
   MultiConfigResp = NULL;
   NameSpace       = NULL;
   DevicePath      = NULL;
@@ -2835,6 +2835,13 @@ EfiConfigKeywordHandlerSetData (
   ValueElement    = NULL;
   ConfigResp      = NULL;
   KeywordStringId = 0;
+
+  //
+  // Use temp string to avoid changing input string buffer.
+  //
+  TempString = AllocateCopyPool (StrSize (KeywordString), KeywordString);
+  ASSERT (TempString != NULL);
+  StringPtr = TempString;
 
   while ((StringPtr != NULL) && (*StringPtr != L'\0')) {
     //
@@ -2962,6 +2969,8 @@ EfiConfigKeywordHandlerSetData (
   *ProgressErr = KEYWORD_HANDLER_NO_ERROR;
 
 Done:
+  ASSERT (TempString != NULL);
+  FreePool (TempString);
   if (NameSpace != NULL) {
     FreePool (NameSpace);
   }
@@ -3078,6 +3087,7 @@ EfiConfigKeywordHandlerGetData (
   BOOLEAN                             ReadOnly;
   CHAR16                              *KeywordResp;
   CHAR16                              *MultiKeywordResp;
+  CHAR16                              *TempString;
 
   if (This == NULL || Progress == NULL || ProgressErr == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3093,18 +3103,35 @@ EfiConfigKeywordHandlerGetData (
   ReadOnly     = FALSE;
   MultiKeywordResp = NULL;
   KeywordStringId  = 0;
+  TempString   = NULL;
 
+  //
+  // Use temp string to avoid changing input string buffer.
+  //
+  if (NameSpaceId != NULL) {
+    TempString = AllocateCopyPool (StrSize (NameSpaceId), NameSpaceId);
+    ASSERT (TempString != NULL);
+  }
   //
   // 1. Get NameSpace from NameSpaceId keyword.
   //
-  Status = ExtractNameSpace (NameSpaceId, &NameSpace, NULL);
+  Status = ExtractNameSpace (TempString, &NameSpace, NULL);
+  if (TempString != NULL) {
+    FreePool (TempString);
+    TempString = NULL;
+  }
   if (EFI_ERROR (Status)) {
     *ProgressErr = KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND;
     return Status;
   }
 
   if (KeywordString != NULL) {
-    StringPtr = KeywordString;
+    //
+    // Use temp string to avoid changing input string buffer.
+    //
+    TempString = AllocateCopyPool (StrSize (KeywordString), KeywordString);
+    ASSERT (TempString != NULL);
+    StringPtr = TempString;
 
     while (*StringPtr != L'\0') {
       //
@@ -3225,6 +3252,9 @@ EfiConfigKeywordHandlerGetData (
   *ProgressErr = KEYWORD_HANDLER_NO_ERROR;
 
 Done:
+  if (TempString != NULL) {
+    FreePool (TempString);
+  }
   if (NameSpace != NULL) {
     FreePool (NameSpace);
   }
