@@ -149,6 +149,7 @@ Ip4Config2OnPolicyChanged (
   // Start the dhcp configuration.
   //
   if (NewPolicy == Ip4Config2PolicyDhcp) {
+    IpSb->Reconfig = TRUE;
     Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
   }
 
@@ -463,7 +464,7 @@ Ip4Config2OnDhcp4SbInstalled (
 /**
   Set the station address and subnetmask for the default interface.
 
-  @param[in]  Instance           The pointer to the IP4 config2 instance data.
+  @param[in]  IpSb               The pointer to the IP4 service binding instance.
   @param[in]  StationAddress     Ip address to be set.
   @param[in]  SubnetMask         Subnet to be set.
 
@@ -473,13 +474,12 @@ Ip4Config2OnDhcp4SbInstalled (
 **/
 EFI_STATUS
 Ip4Config2SetDefaultAddr (
-  IN IP4_CONFIG2_INSTANCE   *Instance,
+  IN IP4_SERVICE            *IpSb,
   IN IP4_ADDR               StationAddress,
   IN IP4_ADDR               SubnetMask
   )
 {
   EFI_STATUS                Status;
-  IP4_SERVICE               *IpSb;
   IP4_INTERFACE             *IpIf;
   IP4_PROTOCOL              *Ip4Instance;
   EFI_ARP_PROTOCOL          *Arp;
@@ -487,7 +487,6 @@ Ip4Config2SetDefaultAddr (
   IP4_ADDR                  Subnet;
   IP4_ROUTE_TABLE           *RouteTable;
 
-  IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
   IpIf = IpSb->DefaultInterface;
   ASSERT (IpIf != NULL);
 
@@ -496,35 +495,37 @@ Ip4Config2SetDefaultAddr (
     return EFI_SUCCESS;
   }
 
-  //
-  // The default address is changed, free the previous interface first.
-  //
-  if (IpSb->DefaultRouteTable != NULL) {
-    Ip4FreeRouteTable (IpSb->DefaultRouteTable);
-    IpSb->DefaultRouteTable = NULL;    
-  }
+  if (IpSb->Reconfig) {
+    //
+    // The default address is changed, free the previous interface first.
+    //
+    if (IpSb->DefaultRouteTable != NULL) {
+      Ip4FreeRouteTable (IpSb->DefaultRouteTable);
+      IpSb->DefaultRouteTable = NULL;    
+    }
 
-  Ip4CancelReceive (IpSb->DefaultInterface);
-  Ip4FreeInterface (IpSb->DefaultInterface, NULL);
-  IpSb->DefaultInterface = NULL;
-  //
-  // Create new default interface and route table.
-  //    
-  IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
-  if (IpIf == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+    Ip4CancelReceive (IpSb->DefaultInterface);
+    Ip4FreeInterface (IpSb->DefaultInterface, NULL);
+    IpSb->DefaultInterface = NULL;
+    //
+    // Create new default interface and route table.
+    //    
+    IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
+    if (IpIf == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
-  RouteTable = Ip4CreateRouteTable ();
-  if (RouteTable == NULL) {
-    Ip4FreeInterface (IpIf, NULL);
-    return EFI_OUT_OF_RESOURCES;
+    RouteTable = Ip4CreateRouteTable ();
+    if (RouteTable == NULL) {
+      Ip4FreeInterface (IpIf, NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    
+    IpSb->DefaultInterface  = IpIf;
+    InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
+    IpSb->DefaultRouteTable = RouteTable;
+    Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
   }
-  
-  IpSb->DefaultInterface  = IpIf;
-  InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
-  IpSb->DefaultRouteTable = RouteTable;
-  Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
 
   if (IpSb->State == IP4_SERVICE_CONFIGED) {
     IpSb->State = IP4_SERVICE_UNSTARTED;
@@ -578,6 +579,8 @@ Ip4Config2SetDefaultAddr (
     );
 
   IpSb->State = IP4_SERVICE_CONFIGED;
+  IpSb->Reconfig = FALSE;
+  
   return EFI_SUCCESS;
 }
 
@@ -604,7 +607,9 @@ Ip4Config2SetDefaultIf (
   EFI_STATUS                Status;
   IP4_SERVICE               *IpSb;
 
-  Status = Ip4Config2SetDefaultAddr (Instance, StationAddress, SubnetMask);
+  IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
+
+  Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -612,7 +617,6 @@ Ip4Config2SetDefaultIf (
   //
   // Create a route if there is a default router.
   //
-  IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
   if (GatewayAddress != IP4_ALLZERO_ADDRESS) {
     Ip4AddRoute (
       IpSb->DefaultRouteTable,
@@ -1071,6 +1075,9 @@ Ip4Config2SetMaunualAddress (
   IP4_ADDR                       StationAddress;
   IP4_ADDR                       SubnetMask;
   VOID                           *Ptr;
+  IP4_SERVICE                    *IpSb;
+
+  IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
   ASSERT (Instance->DataItem[Ip4Config2DataTypeManualAddress].Status != EFI_NOT_READY);
 
@@ -1105,7 +1112,8 @@ Ip4Config2SetMaunualAddress (
   StationAddress = EFI_NTOHL (NewAddress.Address);
   SubnetMask = EFI_NTOHL (NewAddress.SubnetMask);
 
-  Status = Ip4Config2SetDefaultAddr (Instance, StationAddress, SubnetMask);
+  IpSb->Reconfig = TRUE;
+  Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }  

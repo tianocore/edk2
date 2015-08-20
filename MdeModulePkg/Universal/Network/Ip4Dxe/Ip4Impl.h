@@ -205,6 +205,8 @@ struct _IP4_SERVICE {
 
   EFI_EVENT                       ReconfigEvent;
 
+  BOOLEAN                         Reconfig;
+
   //
   // Underlying media present status. 
   //

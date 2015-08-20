@@ -211,6 +211,8 @@ Ip4CreateService (
   IpSb->Timer = NULL;
 
   IpSb->ReconfigEvent = NULL;
+
+  IpSb->Reconfig = FALSE;
   
   IpSb->MediaPresent = TRUE;
 
@@ -395,6 +397,8 @@ Ip4CleanService (
 
     IpSb->ReconfigEvent = NULL;
   }
+
+  IpSb->Reconfig = FALSE;
 
   if (IpSb->MacString != NULL) {
     FreePool (IpSb->MacString);

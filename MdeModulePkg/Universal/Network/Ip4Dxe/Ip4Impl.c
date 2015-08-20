@@ -584,6 +584,8 @@ Ip4AutoReconfigCallBackDpc (
   if (IpSb->State > IP4_SERVICE_UNSTARTED) {
     IpSb->State = IP4_SERVICE_UNSTARTED;
   }
+  
+  IpSb->Reconfig = TRUE;
 
   Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
 
