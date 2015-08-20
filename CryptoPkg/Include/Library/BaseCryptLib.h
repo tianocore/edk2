@@ -18,6 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __BASE_CRYPT_LIB_H__
 #define __BASE_CRYPT_LIB_H__
 
+#include <Uefi/UefiBaseType.h>
+
 ///
 /// MD4 digest size in bytes
 ///
