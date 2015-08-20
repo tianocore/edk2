@@ -168,8 +168,16 @@ UpdateFileExplorer (
       case FileExplorerStateAddDriverOptionState:
         if (FileExplorerStateAddBootOption == CallbackData->FeCurrentState) {
           FormId = FORM_BOOT_ADD_DESCRIPTION_ID;
+          if (!CallbackData->FeFakeNvData.BootOptionChanged) {
+            ZeroMem (CallbackData->FeFakeNvData.BootDescriptionData, sizeof (CallbackData->FeFakeNvData.BootDescriptionData));
+            ZeroMem (CallbackData->FeFakeNvData.BootOptionalData, sizeof (CallbackData->FeFakeNvData.BootOptionalData));
+          }
         } else {
           FormId = FORM_DRIVER_ADD_FILE_DESCRIPTION_ID;
+          if (!CallbackData->FeFakeNvData.DriverOptionChanged) {
+            ZeroMem (CallbackData->FeFakeNvData.DriverDescriptionData, sizeof (CallbackData->FeFakeNvData.DriverDescriptionData));
+            ZeroMem (CallbackData->FeFakeNvData.DriverOptionalData, sizeof (CallbackData->FeFakeNvData.DriverOptionalData));
+          }
         }
 
         CallbackData->MenuEntry = NewMenuEntry;
@@ -205,6 +213,129 @@ UpdateFileExplorer (
   }
   exit:
   return ExitFileExplorer;
+}
+
+/**
+  This function applies changes in a driver's configuration.
+  Input is a Configuration, which has the routing data for this
+  driver followed by name / value configuration pairs. The driver
+  must apply those pairs to its configurable storage. If the
+  driver's configuration is stored in a linear block of data
+  and the driver's name / value pairs are in <BlockConfig>
+  format, it may use the ConfigToBlock helper function (above) to
+  simplify the job. Currently not implemented.
+
+  @param[in]  This                Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param[in]  Configuration       A null-terminated Unicode string in
+                                  <ConfigString> format.   
+  @param[out] Progress            A pointer to a string filled in with the
+                                  offset of the most recent '&' before the
+                                  first failing name / value pair (or the
+                                  beginn ing of the string if the failure
+                                  is in the first name / value pair) or
+                                  the terminating NULL if all was
+                                  successful.
+
+  @retval EFI_SUCCESS             The results have been distributed or are
+                                  awaiting distribution.  
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
+                                  parts of the results that must be
+                                  stored awaiting possible future
+                                  protocols.
+  @retval EFI_INVALID_PARAMETERS  Passing in a NULL for the
+                                  Results parameter would result
+                                  in this type of error.
+  @retval EFI_NOT_FOUND           Target for the specified routing data
+                                  was not found.
+**/
+EFI_STATUS
+EFIAPI
+FileExplorerRouteConfig (
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL *This,
+  IN CONST EFI_STRING                     Configuration,
+  OUT EFI_STRING                          *Progress
+  )
+{
+  EFI_STATUS                      Status;
+  UINTN                           BufferSize;
+  EFI_HII_CONFIG_ROUTING_PROTOCOL *ConfigRouting;
+  FILE_EXPLORER_NV_DATA           *FeData;
+  BMM_CALLBACK_DATA               *Private;
+
+  if (Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *Progress = Configuration;
+
+  if (Configuration == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check routing data in <ConfigHdr>.
+  // Note: there is no name for Name/Value storage, only GUID will be checked
+  //
+  if (!HiiIsConfigHdrMatch (Configuration, &mFileExplorerGuid, mFileExplorerStorageName)) {
+    return EFI_NOT_FOUND;
+  }
+
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiConfigRoutingProtocolGuid, 
+                  NULL, 
+                  (VOID**) &ConfigRouting
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Private = FE_CALLBACK_DATA_FROM_THIS (This);
+  //
+  // Get Buffer Storage data from EFI variable
+  //
+  BufferSize = sizeof (FILE_EXPLORER_NV_DATA );
+  FeData = &Private->FeFakeNvData;
+
+  //
+  // Convert <ConfigResp> to buffer data by helper function ConfigToBlock()
+  //
+  Status = ConfigRouting->ConfigToBlock (
+                            ConfigRouting,
+                            Configuration,
+                            (UINT8 *) FeData,
+                            &BufferSize,
+                            Progress
+                            );
+  ASSERT_EFI_ERROR (Status);
+
+  if (FeData->BootDescriptionData[0] != 0x00 || FeData->BootOptionalData[0] != 0x00) {
+    Status = Var_UpdateBootOption (Private, FeData);
+    Private->FeFakeNvData.BootOptionChanged = FALSE;
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    BOpt_GetBootOptions (Private);
+    CreateMenuStringToken (Private, Private->FeHiiHandle, &BootOptionMenu);
+  }
+
+  if (FeData->DriverDescriptionData[0] != 0x00 || FeData->DriverOptionalData[0] != 0x00) {
+    Status = Var_UpdateDriverOption (
+              Private,
+              Private->FeHiiHandle,
+              FeData->DriverDescriptionData,
+              FeData->DriverOptionalData,
+              FeData->ForceReconnect
+              );
+    Private->FeFakeNvData.DriverOptionChanged = FALSE;
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    BOpt_GetDriverOptions (Private);
+    CreateMenuStringToken (Private, Private->FeHiiHandle, &DriverOptionMenu);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -269,43 +400,30 @@ FileExplorerCallback (
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
-    
-    if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
-      //
-      // Apply changes and exit formset
-      //
-      if (FileExplorerStateAddBootOption == Private->FeCurrentState) {
-        Status = Var_UpdateBootOption (Private, NvRamMap);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
 
-        BOpt_GetBootOptions (Private);
-        CreateMenuStringToken (Private, Private->FeHiiHandle, &BootOptionMenu);
-      } else if (FileExplorerStateAddDriverOptionState == Private->FeCurrentState) {
-        Status = Var_UpdateDriverOption (
-                  Private,
-                  Private->FeHiiHandle,
-                  NvRamMap->DescriptionData,
-                  NvRamMap->OptionalData,
-                  NvRamMap->ForceReconnect
-                  );
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        BOpt_GetDriverOptions (Private);
-        CreateMenuStringToken (Private, Private->FeHiiHandle, &DriverOptionMenu);
-      }
-
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER) {
+    if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT){
+      NvRamMap->BootOptionChanged = FALSE;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    } else if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER){
+      NvRamMap->DriverOptionChanged = FALSE;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_BOOT) {
       //
       // Discard changes and exit formset
       //
-      NvRamMap->OptionalData[0]     = 0x0000;
-      NvRamMap->DescriptionData[0]  = 0x0000;
+      NvRamMap->BootOptionalData[0]     = 0x0000;
+      NvRamMap->BootDescriptionData[0]  = 0x0000;
+      NvRamMap->BootOptionChanged = FALSE;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    } else if ( QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER){
+      NvRamMap->BootOptionalData[0]     = 0x0000;
+      NvRamMap->BootDescriptionData[0]  = 0x0000;
+      NvRamMap->DriverOptionChanged = FALSE;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    } else if (QuestionId == KEY_VALUE_BOOT_DESCRIPTION || QuestionId == KEY_VALUE_BOOT_OPTION){
+      NvRamMap->BootOptionChanged = TRUE;
+    } else if (QuestionId == KEY_VALUE_DRIVER_DESCRIPTION || QuestionId == KEY_VALUE_DRIVER_OPTION){
+      NvRamMap->DriverOptionChanged = TRUE;
     } else if (QuestionId < FILE_OPTION_OFFSET) {
       //
       // Exit File Explorer formset
@@ -321,6 +439,11 @@ FileExplorerCallback (
       UpdateFileExplorer (Private, QuestionId);
     }
   }
+
+  //
+  // Pass changed uncommitted data back to Form Browser
+  //
+  HiiSetBrowserData (&mFileExplorerGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA), (UINT8 *) NvRamMap, NULL);
 
   return Status;
 }

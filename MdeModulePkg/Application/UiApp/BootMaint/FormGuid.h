@@ -70,6 +70,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_VALUE_NO_SAVE_AND_EXIT           0x110C
 #define KEY_VALUE_BOOT_FROM_FILE             0x110D
 #define FORM_RESET                           0x110E
+#define KEY_VALUE_BOOT_DESCRIPTION           0x110F
+#define KEY_VALUE_BOOT_OPTION                0x1110
+#define KEY_VALUE_DRIVER_DESCRIPTION         0x1111
+#define KEY_VALUE_DRIVER_OPTION              0x1112
 
 #define MAXIMUM_NORMAL_KEY_VALUE             0x11FF
 
@@ -142,6 +146,13 @@ typedef struct {
   // At most 100 input/output/errorout device for console storage
   //
   UINT8   ConsoleCheck[MAX_MENU_NUMBER];
+  
+  //
+  // At most 100 input/output/errorout device for console storage
+  //
+  UINT8   ConsoleInCheck[MAX_MENU_NUMBER];
+  UINT8   ConsoleOutCheck[MAX_MENU_NUMBER];
+  UINT8   ConsoleErrCheck[MAX_MENU_NUMBER];
 
   //
   // Boot or Driver Option Order storage
@@ -155,15 +166,18 @@ typedef struct {
   //
   BOOLEAN BootOptionDel[MAX_MENU_NUMBER];
   BOOLEAN DriverOptionDel[MAX_MENU_NUMBER];
+  BOOLEAN BootOptionDelMark[MAX_MENU_NUMBER];
+  BOOLEAN DriverOptionDelMark[MAX_MENU_NUMBER];
 
   //
   // This is the Terminal Attributes value storage
   //
-  UINT8   COMBaudRate;
-  UINT8   COMDataRate;
-  UINT8   COMStopBits;
-  UINT8   COMParity;
-  UINT8   COMTerminalType;
+  UINT8   COMBaudRate[MAX_MENU_NUMBER];
+  UINT8   COMDataRate[MAX_MENU_NUMBER];
+  UINT8   COMStopBits[MAX_MENU_NUMBER];
+  UINT8   COMParity[MAX_MENU_NUMBER];
+  UINT8   COMTerminalType[MAX_MENU_NUMBER];
+  UINT8   COMFlowControl[MAX_MENU_NUMBER];
 
   //
   // We use DisableMap array to record the enable/disable state of each boot device
@@ -195,8 +209,12 @@ typedef struct {
 /// This is the data structure used by File Explorer formset
 ///
 typedef struct {
-  UINT16  DescriptionData[MAX_MENU_NUMBER];
-  UINT16  OptionalData[127];
+  UINT16  BootDescriptionData[MAX_MENU_NUMBER];
+  UINT16  BootOptionalData[127];
+  UINT16  DriverDescriptionData[MAX_MENU_NUMBER];
+  UINT16  DriverOptionalData[127];
+  BOOLEAN BootOptionChanged;
+  BOOLEAN DriverOptionChanged;
   UINT8   Active;
   UINT8   ForceReconnect;
 } FILE_EXPLORER_NV_DATA;

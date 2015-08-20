@@ -179,6 +179,9 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define CON_ERR_COM2_VAR_OFFSET         VAR_OFFSET (ConsoleErrorCOM2)
 #define CON_MODE_VAR_OFFSET             VAR_OFFSET (ConsoleOutMode)
 #define CON_DEVICE_VAR_OFFSET           VAR_OFFSET (ConsoleCheck)
+#define CON_IN_DEVICE_VAR_OFFSET        VAR_OFFSET (ConsoleInCheck)
+#define CON_OUT_DEVICE_VAR_OFFSET       VAR_OFFSET (ConsoleOutCheck)
+#define CON_ERR_DEVICE_VAR_OFFSET       VAR_OFFSET (ConsoleErrCheck)
 #define BOOT_OPTION_ORDER_VAR_OFFSET    VAR_OFFSET (BootOptionOrder)
 #define DRIVER_OPTION_ORDER_VAR_OFFSET  VAR_OFFSET (DriverOptionOrder)
 #define BOOT_OPTION_DEL_VAR_OFFSET      VAR_OFFSET (BootOptionDel)
@@ -189,6 +192,7 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define COM_STOP_BITS_VAR_OFFSET        VAR_OFFSET (COMStopBits)
 #define COM_PARITY_VAR_OFFSET           VAR_OFFSET (COMParity)
 #define COM_TERMINAL_VAR_OFFSET         VAR_OFFSET (COMTerminalType)
+#define COM_FLOWCONTROL_VAR_OFFSET      VAR_OFFSET (COMFlowControl)
 
 #define BOOT_TIME_OUT_QUESTION_ID       QUESTION_ID (BootTimeOut)
 #define BOOT_NEXT_QUESTION_ID           QUESTION_ID (BootNext)
@@ -213,6 +217,9 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define CON_ERR_COM2_QUESTION_ID        QUESTION_ID (ConsoleErrorCOM2)
 #define CON_MODE_QUESTION_ID            QUESTION_ID (ConsoleOutMode)
 #define CON_DEVICE_QUESTION_ID          QUESTION_ID (ConsoleCheck)
+#define CON_IN_DEVICE_QUESTION_ID       QUESTION_ID (ConsoleInCheck)
+#define CON_OUT_DEVICE_QUESTION_ID      QUESTION_ID (ConsoleOutCheck)
+#define CON_ERR_DEVICE_QUESTION_ID      QUESTION_ID (ConsoleErrCheck)
 #define BOOT_OPTION_ORDER_QUESTION_ID   QUESTION_ID (BootOptionOrder)
 #define DRIVER_OPTION_ORDER_QUESTION_ID QUESTION_ID (DriverOptionOrder)
 #define BOOT_OPTION_DEL_QUESTION_ID     QUESTION_ID (BootOptionDel)
@@ -223,6 +230,7 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define COM_STOP_BITS_QUESTION_ID       QUESTION_ID (COMStopBits)
 #define COM_PARITY_QUESTION_ID          QUESTION_ID (COMParity)
 #define COM_TERMINAL_QUESTION_ID        QUESTION_ID (COMTerminalType)
+#define COM_FLOWCONTROL_QUESTION_ID     QUESTION_ID (COMFlowControl)
 
 #define STRING_DEPOSITORY_NUMBER        8
 
@@ -246,6 +254,8 @@ typedef struct {
   UINT8                     DataBitsIndex;
   UINT8                     ParityIndex;
   UINT8                     StopBitsIndex;
+
+  UINT8                     FlowControl;
 
   UINT8                     IsConIn;
   UINT8                     IsConOut;
@@ -1310,24 +1320,6 @@ CleanUpStringDepository (
   );
 
 /**
-  Function handling request to apply changes for BMM pages.
-
-  @param Private            Pointer to callback data buffer.
-  @param CurrentFakeNVMap   Pointer to buffer holding data of various values used by BMM
-  @param FormId             ID of the form which has sent the request to apply change.
-
-  @retval  EFI_SUCCESS      Change successfully applied.
-  @retval  Other            Error occurs while trying to apply changes.
-
-**/
-EFI_STATUS
-ApplyChangeHandler (
-  IN  BMM_CALLBACK_DATA               *Private,
-  IN  BMM_FAKE_NV_DATA                *CurrentFakeNVMap,
-  IN  EFI_FORM_ID                     FormId
-  );
-
-/**
   Discard all changes done to the BMM pages such as Boot Order change,
   Driver order change.
 
@@ -1387,6 +1379,47 @@ UpdateFileExplorer (
   );
 
 /**
+  This function applies changes in a driver's configuration.
+  Input is a Configuration, which has the routing data for this
+  driver followed by name / value configuration pairs. The driver
+  must apply those pairs to its configurable storage. If the
+  driver's configuration is stored in a linear block of data
+  and the driver's name / value pairs are in <BlockConfig>
+  format, it may use the ConfigToBlock helper function (above) to
+  simplify the job. Currently not implemented.
+
+  @param[in]  This                Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param[in]  Configuration       A null-terminated Unicode string in
+                                  <ConfigString> format.   
+  @param[out] Progress            A pointer to a string filled in with the
+                                  offset of the most recent '&' before the
+                                  first failing name / value pair (or the
+                                  beginn ing of the string if the failure
+                                  is in the first name / value pair) or
+                                  the terminating NULL if all was
+                                  successful.
+
+  @retval EFI_SUCCESS             The results have been distributed or are
+                                  awaiting distribution.  
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
+                                  parts of the results that must be
+                                  stored awaiting possible future
+                                  protocols.
+  @retval EFI_INVALID_PARAMETERS  Passing in a NULL for the
+                                  Results parameter would result
+                                  in this type of error.
+  @retval EFI_NOT_FOUND           Target for the specified routing data
+                                  was not found.
+**/
+EFI_STATUS
+EFIAPI
+FileExplorerRouteConfig (
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL *This,
+  IN CONST EFI_STRING                     Configuration,
+  OUT EFI_STRING                          *Progress
+  );
+
+/**
   This function processes the results of changes in configuration.
   When user select a interactive opcode, this callback will be triggered.
   Based on the Question(QuestionId) that triggers the callback, the corresponding
@@ -1442,6 +1475,58 @@ InitBootMaintenance(
   VOID
   );
 
+/**
+
+  Initialize console input device check box to ConsoleInCheck[MAX_MENU_NUMBER]
+  in BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/  
+VOID  
+GetConsoleInCheck (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  );
+
+/**
+
+  Initialize console output device check box to ConsoleOutCheck[MAX_MENU_NUMBER]
+  in BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/      
+VOID    
+GetConsoleOutCheck (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  );
+
+/**
+
+  Initialize standard error output device check box to ConsoleErrCheck[MAX_MENU_NUMBER]
+  in BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/        
+VOID  
+GetConsoleErrCheck (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  );
+
+/**
+
+  Initialize terminal attributes (baudrate, data rate, stop bits, parity and terminal type)
+  to BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/        
+VOID  
+GetTerminalAttribute (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  );
+
 //
 // Global variable in this program (defined in data.c)
 //
@@ -1468,6 +1553,8 @@ extern STRING_DEPOSITORY          *DriverOptionStrDepository;
 extern STRING_DEPOSITORY          *DriverOptionHelpStrDepository;
 extern STRING_DEPOSITORY          *TerminalStrDepository;
 extern EFI_DEVICE_PATH_PROTOCOL   EndDevicePath[];
+extern UINT16                     mFlowControlType[2];
+extern UINT32                     mFlowControlValue[2];
 
 //
 // Shared IFR form update data

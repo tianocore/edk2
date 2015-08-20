@@ -41,18 +41,22 @@ formset
 
        subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-       string    varid    = FeData.DescriptionData,
+       string    varid    = FeData.BootDescriptionData,
+                 questionid = KEY_VALUE_BOOT_DESCRIPTION,
                  prompt   = STRING_TOKEN(STR_LOAD_OPTION_DESC),
                  help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
                  minsize  = 6,
                  maxsize  = 75,
        endstring;
 
-       string    varid    = FeData.OptionalData,
-       		prompt   = STRING_TOKEN(STR_OPTIONAL_DATA),
-       		help     = STRING_TOKEN(STR_NULL_STRING),
-       		minsize  = 0,
-       		maxsize  = 120,
+       string    varid    = FeData.BootOptionalData,
+                 questionid = KEY_VALUE_BOOT_OPTION,
+                 prompt   = STRING_TOKEN(STR_OPTIONAL_DATA),
+                 help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
+                 minsize  = 0,
+                 maxsize  = 120,
        endstring;
 
        subtitle text = STRING_TOKEN(STR_NULL_STRING);
@@ -81,16 +85,20 @@ formset
 
        subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-       string    varid    = FeData.DescriptionData,
+       string    varid    = FeData.DriverDescriptionData,
+                 questionid = KEY_VALUE_DRIVER_DESCRIPTION,
                  prompt   = STRING_TOKEN(STR_LOAD_OPTION_DESC),
                  help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
                  minsize  = 6,
                  maxsize  = 75,
        endstring;
 
-       string    varid    = FeData.OptionalData,
+       string    varid    = FeData.DriverOptionalData,
+                 questionid = KEY_VALUE_DRIVER_OPTION,
                  prompt   = STRING_TOKEN(STR_OPTIONAL_DATA),
                  help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
                  minsize  = 0,
                  maxsize  = 120,
        endstring;

@@ -728,16 +728,16 @@ Var_UpdateBootOption (
   Index = BOpt_GetBootOptionNumber () ;
   UnicodeSPrint (BootString, sizeof (BootString), L"Boot%04x", Index);
 
-  if (NvRamMap->DescriptionData[0] == 0x0000) {
-    StrCpyS (NvRamMap->DescriptionData, sizeof (NvRamMap->DescriptionData) / sizeof (NvRamMap->DescriptionData[0]), BootString);
+  if (NvRamMap->BootDescriptionData[0] == 0x0000) {
+    StrCpyS (NvRamMap->BootDescriptionData, sizeof (NvRamMap->BootDescriptionData) / sizeof (NvRamMap->BootDescriptionData[0]), BootString);
   }
 
-  BufferSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (NvRamMap->DescriptionData);
+  BufferSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (NvRamMap->BootDescriptionData);
   BufferSize += GetDevicePathSize (CallbackData->LoadContext->FilePathList);
 
-  if (NvRamMap->OptionalData[0] != 0x0000) {
+  if (NvRamMap->BootOptionalData[0] != 0x0000) {
     OptionalDataExist = TRUE;
-    BufferSize += StrSize (NvRamMap->OptionalData);
+    BufferSize += StrSize (NvRamMap->BootOptionalData);
   }
 
   Buffer = AllocateZeroPool (BufferSize);
@@ -767,21 +767,21 @@ Var_UpdateBootOption (
 
   CopyMem (
     Ptr,
-    NvRamMap->DescriptionData,
-    StrSize (NvRamMap->DescriptionData)
+    NvRamMap->BootDescriptionData,
+    StrSize (NvRamMap->BootDescriptionData)
     );
 
-  NewLoadContext->Description = AllocateZeroPool (StrSize (NvRamMap->DescriptionData));
+  NewLoadContext->Description = AllocateZeroPool (StrSize (NvRamMap->BootDescriptionData));
   ASSERT (NewLoadContext->Description != NULL);
 
   NewMenuEntry->DisplayString = NewLoadContext->Description;
   CopyMem (
     NewLoadContext->Description,
     (VOID *) Ptr,
-    StrSize (NvRamMap->DescriptionData)
+    StrSize (NvRamMap->BootDescriptionData)
     );
 
-  Ptr += StrSize (NvRamMap->DescriptionData);
+  Ptr += StrSize (NvRamMap->BootDescriptionData);
   CopyMem (
     Ptr,
     CallbackData->LoadContext->FilePathList,
@@ -814,7 +814,7 @@ Var_UpdateBootOption (
   if (OptionalDataExist) {
     Ptr += (UINT8) GetDevicePathSize (CallbackData->LoadContext->FilePathList);
 
-    CopyMem (Ptr, NvRamMap->OptionalData, StrSize (NvRamMap->OptionalData));
+    CopyMem (Ptr, NvRamMap->BootOptionalData, StrSize (NvRamMap->BootOptionalData));
   }
 
   Status = gRT->SetVariable (
@@ -852,8 +852,8 @@ Var_UpdateBootOption (
   InsertTailList (&BootOptionMenu.Head, &NewMenuEntry->Link);
   BootOptionMenu.MenuNumber++;
 
-  NvRamMap->DescriptionData[0]  = 0x0000;
-  NvRamMap->OptionalData[0]     = 0x0000;
+  NvRamMap->BootDescriptionData[0]  = 0x0000;
+  NvRamMap->BootOptionalData[0]     = 0x0000;
   return EFI_SUCCESS;
 }
 

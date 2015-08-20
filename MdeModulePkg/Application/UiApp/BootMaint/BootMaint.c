@@ -296,9 +296,12 @@ BootMaintRouteConfig (
   EFI_HII_CONFIG_ROUTING_PROTOCOL *ConfigRouting;
   BMM_FAKE_NV_DATA                *NewBmmData;
   BMM_FAKE_NV_DATA                *OldBmmData;
+  BM_CONSOLE_CONTEXT              *NewConsoleContext;
+  BM_TERMINAL_CONTEXT             *NewTerminalContext;
   BM_MENU_ENTRY                   *NewMenuEntry;
   BM_LOAD_CONTEXT                 *NewLoadContext;
-  UINT16                          Index;  
+  UINT16                          Index;
+  BOOLEAN                         TerminalAttChange;
   BMM_CALLBACK_DATA               *Private; 
 
   if (Progress == NULL) {
@@ -368,6 +371,7 @@ BootMaintRouteConfig (
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
       NewLoadContext->Deleted = NewBmmData->BootOptionDel[Index];
       NewBmmData->BootOptionDel[Index] = FALSE;
+      NewBmmData->BootOptionDelMark[Index] = FALSE;
     }
     
     Var_DelBootOption ();
@@ -375,7 +379,20 @@ BootMaintRouteConfig (
   
   if (CompareMem (NewBmmData->BootOptionOrder, OldBmmData->BootOptionOrder, sizeof (NewBmmData->BootOptionOrder)) != 0) {  
     Status = Var_UpdateBootOrder (Private);
-  } 
+  }
+
+  if (CompareMem (&NewBmmData->BootTimeOut, &OldBmmData->BootTimeOut, sizeof (NewBmmData->BootTimeOut)) != 0){
+    Status = gRT->SetVariable(
+                    L"Timeout",
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    sizeof(UINT16),
+                    &(NewBmmData->BootTimeOut)
+                    );
+    ASSERT_EFI_ERROR(Status);
+
+    Private->BmmOldFakeNVData.BootTimeOut = NewBmmData->BootTimeOut;
+  }
 
   //
   // Check data which located in Driver Options Menu and save the settings if need
@@ -388,13 +405,112 @@ BootMaintRouteConfig (
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
       NewLoadContext->Deleted = NewBmmData->DriverOptionDel[Index];
       NewBmmData->DriverOptionDel[Index] = FALSE;
+      NewBmmData->DriverOptionDelMark[Index] = FALSE;
     }
     Var_DelDriverOption ();  
   }
   
   if (CompareMem (NewBmmData->DriverOptionOrder, OldBmmData->DriverOptionOrder, sizeof (NewBmmData->DriverOptionOrder)) != 0) {  
     Status = Var_UpdateDriverOrder (Private);
-  }      
+  }
+
+  if (CompareMem (&NewBmmData->ConsoleOutMode, &OldBmmData->ConsoleOutMode, sizeof (NewBmmData->ConsoleOutMode)) != 0){
+    Var_UpdateConMode(Private);
+  }
+
+  TerminalAttChange = FALSE;
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+
+    //
+    // only need update modified items
+    //
+    if (CompareMem (&NewBmmData->COMBaudRate[Index], &OldBmmData->COMBaudRate[Index], sizeof (NewBmmData->COMBaudRate[Index])) == 0 &&
+         CompareMem (&NewBmmData->COMDataRate[Index], &OldBmmData->COMDataRate[Index], sizeof (NewBmmData->COMDataRate[Index])) == 0 &&
+         CompareMem (&NewBmmData->COMStopBits[Index], &OldBmmData->COMStopBits[Index], sizeof (NewBmmData->COMStopBits[Index])) == 0 &&
+         CompareMem (&NewBmmData->COMParity[Index], &OldBmmData->COMParity[Index], sizeof (NewBmmData->COMParity[Index])) == 0 &&
+         CompareMem (&NewBmmData->COMTerminalType[Index], &OldBmmData->COMTerminalType[Index], sizeof (NewBmmData->COMTerminalType[Index])) == 0 &&
+         CompareMem (&NewBmmData->COMFlowControl[Index], &OldBmmData->COMFlowControl[Index], sizeof (NewBmmData->COMFlowControl[Index])) == 0) {
+      continue;
+    }
+
+    NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    ASSERT (NewMenuEntry != NULL);
+    NewTerminalContext = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    NewTerminalContext->BaudRateIndex = NewBmmData->COMBaudRate[Index];
+    ASSERT (NewBmmData->COMBaudRate[Index] < (sizeof (BaudRateList) / sizeof (BaudRateList[0])));
+    NewTerminalContext->BaudRate      = BaudRateList[NewBmmData->COMBaudRate[Index]].Value;
+    NewTerminalContext->DataBitsIndex = NewBmmData->COMDataRate[Index];
+    ASSERT (NewBmmData->COMDataRate[Index] < (sizeof (DataBitsList) / sizeof (DataBitsList[0])));
+    NewTerminalContext->DataBits      = (UINT8) DataBitsList[NewBmmData->COMDataRate[Index]].Value;
+    NewTerminalContext->StopBitsIndex = NewBmmData->COMStopBits[Index];
+    ASSERT (NewBmmData->COMStopBits[Index] < (sizeof (StopBitsList) / sizeof (StopBitsList[0])));
+    NewTerminalContext->StopBits      = (UINT8) StopBitsList[NewBmmData->COMStopBits[Index]].Value;
+    NewTerminalContext->ParityIndex   = NewBmmData->COMParity[Index];
+    ASSERT (NewBmmData->COMParity[Index] < (sizeof (ParityList) / sizeof (ParityList[0])));
+    NewTerminalContext->Parity        = (UINT8) ParityList[NewBmmData->COMParity[Index]].Value;
+    NewTerminalContext->TerminalType  = NewBmmData->COMTerminalType[Index];
+    NewTerminalContext->FlowControl   = NewBmmData->COMFlowControl[Index];
+    ChangeTerminalDevicePath (
+      NewTerminalContext->DevicePath,
+      FALSE
+      );
+    TerminalAttChange = TRUE;
+  }
+  if (TerminalAttChange) {
+    Var_UpdateConsoleInpOption ();
+    Var_UpdateConsoleOutOption ();
+    Var_UpdateErrorOutOption ();
+  }
+  //
+  // Check data which located in Console Options Menu and save the settings if need
+  //
+  if (CompareMem (NewBmmData->ConsoleInCheck, OldBmmData->ConsoleInCheck, sizeof (NewBmmData->ConsoleInCheck)) != 0){
+    for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++){
+      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleInpMenu, Index);
+      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
+      ASSERT (Index < MAX_MENU_NUMBER);
+      NewConsoleContext->IsActive = NewBmmData->ConsoleInCheck[Index];
+    }
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+      ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
+      NewTerminalContext->IsConIn = NewBmmData->ConsoleInCheck[Index + ConsoleInpMenu.MenuNumber];
+    }
+    Var_UpdateConsoleInpOption();
+  }
+
+  if (CompareMem (NewBmmData->ConsoleOutCheck, OldBmmData->ConsoleOutCheck, sizeof (NewBmmData->ConsoleOutCheck)) != 0){
+    for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++){
+      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleOutMenu, Index);
+      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
+      ASSERT (Index < MAX_MENU_NUMBER);
+      NewConsoleContext->IsActive = NewBmmData->ConsoleOutCheck[Index];
+    }
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+      ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
+      NewTerminalContext->IsConOut = NewBmmData->ConsoleOutCheck[Index + ConsoleOutMenu.MenuNumber];
+    }
+    Var_UpdateConsoleOutOption();
+  }
+
+  if (CompareMem (NewBmmData->ConsoleErrCheck, OldBmmData->ConsoleErrCheck, sizeof (NewBmmData->ConsoleErrCheck)) != 0){
+    for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++){
+      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleErrMenu, Index);
+      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
+      ASSERT (Index < MAX_MENU_NUMBER);
+      NewConsoleContext->IsActive = NewBmmData->ConsoleErrCheck[Index];
+    }
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+      ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
+      NewTerminalContext->IsStdErr = NewBmmData->ConsoleErrCheck[Index + ConsoleErrMenu.MenuNumber];
+    }
+    Var_UpdateErrorOutOption();
+  }
 
   //
   // After user do the save action, need to update OldBmmData.
@@ -436,7 +552,6 @@ BootMaintCallback (
   BMM_CALLBACK_DATA *Private;
   BM_MENU_ENTRY     *NewMenuEntry;
   BMM_FAKE_NV_DATA  *CurrentFakeNVMap;
-  EFI_STATUS        Status;
   UINTN             OldValue;
   UINTN             NewValue;
   UINTN             Number;
@@ -583,32 +698,44 @@ BootMaintCallback (
       return EFI_INVALID_PARAMETER;
     }
 
-    switch (QuestionId) {
-    case KEY_VALUE_SAVE_AND_EXIT:
-    case KEY_VALUE_NO_SAVE_AND_EXIT:
-      if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
-        Status = ApplyChangeHandler (Private, CurrentFakeNVMap, Private->BmmPreviousPageId);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-      } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
-        DiscardChangeHandler (Private, CurrentFakeNVMap);
+    if ((QuestionId >= BOOT_OPTION_DEL_QUESTION_ID) && (QuestionId < BOOT_OPTION_DEL_QUESTION_ID + MAX_MENU_NUMBER)) {
+      if (Value->b){
+        //
+        // Means user try to delete this boot option but not press F10 or "Commit Changes and Exit" menu.
+        //
+        CurrentFakeNVMap->BootOptionDelMark[QuestionId - BOOT_OPTION_DEL_QUESTION_ID] = TRUE;
+      } else {
+        //
+        // Means user remove the old check status.
+        //
+        CurrentFakeNVMap->BootOptionDelMark[QuestionId - BOOT_OPTION_DEL_QUESTION_ID] = FALSE;
       }
+    } else if ((QuestionId >= DRIVER_OPTION_DEL_QUESTION_ID) && (QuestionId < DRIVER_OPTION_DEL_QUESTION_ID + MAX_MENU_NUMBER)) {
+      if (Value->b){
+        CurrentFakeNVMap->DriverOptionDelMark[QuestionId - DRIVER_OPTION_DEL_QUESTION_ID] = TRUE;
+      } else {
+        CurrentFakeNVMap->DriverOptionDelMark[QuestionId - DRIVER_OPTION_DEL_QUESTION_ID] = FALSE;
+      }
+    } else {
+      switch (QuestionId) {
+      case KEY_VALUE_SAVE_AND_EXIT:
+      case KEY_VALUE_NO_SAVE_AND_EXIT:
+        if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
+        } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
+          DiscardChangeHandler (Private, CurrentFakeNVMap);
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
+        }
 
-      //
-      // Tell browser not to ask for confirmation of changes,
-      // since we have already applied or discarded.
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
-
-      break;
+        break;
  
-    case FORM_RESET:
-      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-      return EFI_UNSUPPORTED;
+      case FORM_RESET:
+        gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+        return EFI_UNSUPPORTED;
 
-    default:
-      break;
+      default:
+        break;
+      }
     }
   }
 
@@ -618,198 +745,6 @@ BootMaintCallback (
   HiiSetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
 
   return EFI_SUCCESS;
-}
-
-/**
-  Function handling request to apply changes for BMM pages.
-
-  @param Private            Pointer to callback data buffer.
-  @param CurrentFakeNVMap   Pointer to buffer holding data of various values used by BMM
-  @param FormId             ID of the form which has sent the request to apply change.
-
-  @retval  EFI_SUCCESS       Change successfully applied.
-  @retval  Other             Error occurs while trying to apply changes.
-
-**/
-EFI_STATUS
-ApplyChangeHandler (
-  IN  BMM_CALLBACK_DATA               *Private,
-  IN  BMM_FAKE_NV_DATA                *CurrentFakeNVMap,
-  IN  EFI_FORM_ID                     FormId
-  )
-{
-  BM_CONSOLE_CONTEXT  *NewConsoleContext;
-  BM_TERMINAL_CONTEXT *NewTerminalContext;
-  BM_LOAD_CONTEXT     *NewLoadContext;
-  BM_MENU_ENTRY       *NewMenuEntry;
-  EFI_STATUS          Status;
-  UINT16              Index;
-
-  Status = EFI_SUCCESS;
-
-  switch (FormId) {
-  case FORM_BOOT_DEL_ID:
-    for (Index = 0; 
-         ((Index < BootOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->BootOptionDel) / sizeof (CurrentFakeNVMap->BootOptionDel[0])))); 
-         Index ++) {
-      NewMenuEntry            = BOpt_GetMenuEntry (&BootOptionMenu, Index);
-      NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
-      NewLoadContext->Deleted = CurrentFakeNVMap->BootOptionDel[Index];
-      CurrentFakeNVMap->BootOptionDel[Index] = FALSE;
-    }
-
-    Var_DelBootOption ();
-    break;
-
-  case FORM_DRV_DEL_ID:
-    for (Index = 0; 
-         ((Index < DriverOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->DriverOptionDel) / sizeof (CurrentFakeNVMap->DriverOptionDel[0])))); 
-         Index++) {
-      NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
-      NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
-      NewLoadContext->Deleted = CurrentFakeNVMap->DriverOptionDel[Index];
-      CurrentFakeNVMap->DriverOptionDel[Index] = FALSE;
-    }
-
-    Var_DelDriverOption ();
-    break;
-
-  case FORM_BOOT_CHG_ID:
-    Status = Var_UpdateBootOrder (Private);
-    break;
-
-  case FORM_DRV_CHG_ID:
-    Status = Var_UpdateDriverOrder (Private);
-    break;
-
-  case FORM_TIME_OUT_ID:
-    Status = gRT->SetVariable (
-                    L"Timeout",
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                    sizeof (UINT16),
-                    &(CurrentFakeNVMap->BootTimeOut)
-                    );
-    ASSERT_EFI_ERROR(Status);
-
-    Private->BmmOldFakeNVData.BootTimeOut = CurrentFakeNVMap->BootTimeOut;
-    break;
-
-  case FORM_BOOT_NEXT_ID:
-    Status = Var_UpdateBootNext (Private);
-    break;
-
-  case FORM_CON_MODE_ID:
-    Status = Var_UpdateConMode (Private);
-    break;
-
-  case FORM_CON_COM_SETUP_ID:
-    NewMenuEntry                      = BOpt_GetMenuEntry (&TerminalMenu, Private->CurrentTerminal);
-
-    ASSERT (NewMenuEntry != NULL);
-
-    NewTerminalContext                = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-
-    NewTerminalContext->BaudRateIndex = CurrentFakeNVMap->COMBaudRate;
-    ASSERT (CurrentFakeNVMap->COMBaudRate < (sizeof (BaudRateList) / sizeof (BaudRateList[0])));
-    NewTerminalContext->BaudRate      = BaudRateList[CurrentFakeNVMap->COMBaudRate].Value;
-    NewTerminalContext->DataBitsIndex = CurrentFakeNVMap->COMDataRate;
-    ASSERT (CurrentFakeNVMap->COMDataRate < (sizeof (DataBitsList) / sizeof (DataBitsList[0])));
-    NewTerminalContext->DataBits      = (UINT8) DataBitsList[CurrentFakeNVMap->COMDataRate].Value;
-    NewTerminalContext->StopBitsIndex = CurrentFakeNVMap->COMStopBits;
-    ASSERT (CurrentFakeNVMap->COMStopBits < (sizeof (StopBitsList) / sizeof (StopBitsList[0])));
-    NewTerminalContext->StopBits      = (UINT8) StopBitsList[CurrentFakeNVMap->COMStopBits].Value;
-    NewTerminalContext->ParityIndex   = CurrentFakeNVMap->COMParity;
-    ASSERT (CurrentFakeNVMap->COMParity < (sizeof (ParityList) / sizeof (ParityList[0])));
-    NewTerminalContext->Parity        = (UINT8) ParityList[CurrentFakeNVMap->COMParity].Value;
-    NewTerminalContext->TerminalType  = CurrentFakeNVMap->COMTerminalType;
-
-    ChangeTerminalDevicePath (
-      NewTerminalContext->DevicePath,
-      FALSE
-      );
-
-    Var_UpdateConsoleInpOption ();
-    Var_UpdateConsoleOutOption ();
-    Var_UpdateErrorOutOption ();
-    break;
-
-  case FORM_CON_IN_ID:
-    for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++) {
-      NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
-      NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index < MAX_MENU_NUMBER);
-      NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
-    }
-
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
-      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
-      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
-      NewTerminalContext->IsConIn = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleInpMenu.MenuNumber];
-    }
-
-    Var_UpdateConsoleInpOption ();
-    break;
-
-  case FORM_CON_OUT_ID:
-    for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++) {
-      NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
-      NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index < MAX_MENU_NUMBER);
-      NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
-    }
-
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
-      NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
-      NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
-      NewTerminalContext->IsConOut  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleOutMenu.MenuNumber];
-    }
-
-    Var_UpdateConsoleOutOption ();
-    break;
-
-  case FORM_CON_ERR_ID:
-    for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++) {
-      NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
-      NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index < MAX_MENU_NUMBER);
-      NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
-    }
-
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
-      NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
-      NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
-      NewTerminalContext->IsStdErr  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleErrMenu.MenuNumber];
-    }
-
-    Var_UpdateErrorOutOption ();
-    break;
-
-  case FORM_DRV_ADD_HANDLE_DESC_ID:
-    Status = Var_UpdateDriverOption (
-               Private,
-               Private->BmmHiiHandle,
-               CurrentFakeNVMap->DriverAddHandleDesc,
-               CurrentFakeNVMap->DriverAddHandleOptionalData,
-               CurrentFakeNVMap->DriverAddForceReconnect
-               );
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
-
-    BOpt_GetDriverOptions (Private);
-    CreateMenuStringToken (Private, Private->BmmHiiHandle, &DriverOptionMenu);
-    break;
-
-  default:
-    break;
-  }
-
-Error:
-  return Status;
 }
 
 /**
@@ -995,27 +930,65 @@ InitializeDrivers(
   FreePool (HiiHandles);
 }
 
-
 /**
-  Create dynamic code for BMM.
+   Create dynamic code for BMM and initialize all of BMM configuration data in BmmFakeNvData and
+   BmmOldFakeNVData member in BMM context data.
 
-  @param  BmmCallbackInfo        The BMM context data.
+  @param CallbackData    The BMM context data.
 
 **/
 VOID
-InitializeBmmConfig(
-  IN BMM_CALLBACK_DATA        *BmmCallbackInfo
+InitializeBmmConfig (
+  IN  BMM_CALLBACK_DATA    *CallbackData
   )
 {
-  UpdateBootDelPage (BmmCallbackInfo);
-  UpdateDrvDelPage (BmmCallbackInfo);
+  BM_MENU_ENTRY   *NewMenuEntry;
+  BM_LOAD_CONTEXT *NewLoadContext;
+  UINT16          Index;
 
-  if (TerminalMenu.MenuNumber > 0) {
-    BmmCallbackInfo->CurrentTerminal = 0;
-    UpdateTerminalPage (BmmCallbackInfo);
+  ASSERT (CallbackData != NULL);
+
+  InitializeDrivers (CallbackData);
+
+  //
+  // Initialize data which located in BMM main page
+  //
+  CallbackData->BmmFakeNvData.BootNext = (UINT16) (BootOptionMenu.MenuNumber);
+  for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
+    NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
+    NewLoadContext  = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
+
+    if (NewLoadContext->IsBootNext) {
+      CallbackData->BmmFakeNvData.BootNext = Index;
+      break;
+    }
   }
 
-  InitializeDrivers (BmmCallbackInfo);
+  CallbackData->BmmFakeNvData.BootTimeOut = PcdGet16 (PcdPlatformBootTimeOut);
+
+  //
+  // Initialize data which located in Boot Options Menu
+  //
+  GetBootOrder (CallbackData);
+
+  //
+  // Initialize data which located in Driver Options Menu
+  //
+  GetDriverOrder (CallbackData);
+
+  //
+  // Initialize data which located in Console Options Menu
+  //  
+  GetConsoleOutMode (CallbackData);
+  GetConsoleInCheck (CallbackData);
+  GetConsoleOutCheck (CallbackData);
+  GetConsoleErrCheck (CallbackData);
+  GetTerminalAttribute (CallbackData);
+
+  //
+  // Backup Initialize BMM configuartion data to BmmOldFakeNVData
+  //
+  CopyMem (&CallbackData->BmmOldFakeNVData, &CallbackData->BmmFakeNvData, sizeof (BMM_FAKE_NV_DATA));
 }
 
 /**
@@ -1273,7 +1246,7 @@ InitBootMaintenance(
   BmmCallbackInfo->BmmPreviousPageId             = FORM_MAIN_ID;
   BmmCallbackInfo->BmmCurrentPageId              = FORM_MAIN_ID;
   BmmCallbackInfo->FeConfigAccess.ExtractConfig  = FakeExtractConfig;
-  BmmCallbackInfo->FeConfigAccess.RouteConfig    = FakeRouteConfig;
+  BmmCallbackInfo->FeConfigAccess.RouteConfig    = FileExplorerRouteConfig;
   BmmCallbackInfo->FeConfigAccess.Callback       = FileExplorerCallback;
   BmmCallbackInfo->FeCurrentState                = FileExplorerStateInActive;
   BmmCallbackInfo->FeDisplayContext              = FileExplorerDisplayUnknown;
