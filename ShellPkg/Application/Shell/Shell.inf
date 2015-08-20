@@ -108,3 +108,9 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellSupplier             ## CONSUMES
 
+[BuildOptions.AARCH64]
+  # The tiny code model used by AARCH64 only supports binaries of up to 1 MB in
+  # size. Since the Shell application exceeds that when built in DEBUG mode,
+  # make sure we build it using the small code model instead.
+  GCC:DEBUG_*_*_CC_FLAGS = -mcmodel=small
+  GCC:DEBUG_*_*_DLINK_FLAGS = -z common-page-size=0x1000
