@@ -495,8 +495,10 @@ UpdateConsolePage (
   UpdatePageStart (CallbackData);
 
   ConsoleCheck       = NULL;
+  OldConsoleCheck    = NULL;
   QuestionIdBase     = 0;
   VariableOffsetBase = 0;
+  ConsoleCheckSize   = 0;
 
   switch (UpdatePageId) {
   case FORM_CON_IN_ID:
