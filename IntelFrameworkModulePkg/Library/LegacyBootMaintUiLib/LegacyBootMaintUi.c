@@ -901,6 +901,7 @@ AdjustOptionValue (
   Default = NULL;
   NewValue = 0;
   NewValuePos = 0;
+  OldValue = 0;
 
   //
   // Update Select FD/HD/CD/NET/BEV Order Form
