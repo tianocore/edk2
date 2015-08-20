@@ -2,7 +2,7 @@
 # Intel Framework Package Reference Implementations
 #
 # This package provides definitions and libraries that comply to Intel Framework Specifications.
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available
 #    under the terms and conditions of the BSD License which accompanies this distribution.
@@ -17,7 +17,7 @@
   PACKAGE_NAME                   = IntelFrameworkPkg
   PACKAGE_UNI_FILE               = IntelFrameworkPkg.uni
   PACKAGE_GUID                   = 2759ded5-bb57-4b06-af4f-c398fa552719
-  PACKAGE_VERSION                = 0.94
+  PACKAGE_VERSION                = 0.96
 
 [Includes]
   Include                        # Root include for the package
