@@ -2850,8 +2850,17 @@ EfiConfigKeywordHandlerSetData (
     Status = ExtractNameSpace (StringPtr, &NameSpace, &NextStringPtr);
     if (EFI_ERROR (Status)) {
       *ProgressErr = KEYWORD_HANDLER_MALFORMED_STRING;
-      return Status;
+      goto Done;
     }
+    //
+    // 1.1 Check whether the input namespace is valid.
+    //
+    if (AsciiStrnCmp(NameSpace, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) != 0) {
+      *ProgressErr = KEYWORD_HANDLER_UNDEFINED_PROCESSING_ERROR;
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+
     StringPtr = NextStringPtr;
 
     //
@@ -3124,7 +3133,14 @@ EfiConfigKeywordHandlerGetData (
     *ProgressErr = KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND;
     return Status;
   }
-
+  //
+  // 1.1 Check whether the input namespace is valid.
+  //
+  if (AsciiStrnCmp(NameSpace, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) != 0) {
+    *ProgressErr = KEYWORD_HANDLER_UNDEFINED_PROCESSING_ERROR;
+    return EFI_INVALID_PARAMETER;
+  }
+  
   if (KeywordString != NULL) {
     //
     // Use temp string to avoid changing input string buffer.
