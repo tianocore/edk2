@@ -31,7 +31,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 break
         else:
             self.var_check_info.append(var_check_tab)
-        
+    
     def dump(self, dest, Phase):
         
         FormatMap = {}
@@ -62,7 +62,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 itemIndex += 1
                 realLength += 5
                 for v_data in item.data:
-                    if type(v_data) == type(1):
+                    if type(v_data) in (int, long):
                         realLength += item.StorageWidth
                     else:
                         realLength += item.StorageWidth
@@ -153,9 +153,8 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 b = pack("=B", item.StorageWidth)
                 Buffer += b
                 realLength += 1
-                
                 for v_data in item.data:
-                    if type(v_data) == type(1):
+                    if type(v_data) in (int, long):
                         b = pack(FormatMap[item.StorageWidth], v_data)
                         Buffer += b
                         realLength += item.StorageWidth
