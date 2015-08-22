@@ -227,7 +227,8 @@ EfiHttpRequest (
   CHAR16                        *HostNameStr;
   HTTP_TOKEN_WRAP               *Wrap;
   HTTP_TCP_TOKEN_WRAP           *TcpWrap;
-
+  CHAR8                         *FileUrl;
+  
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -450,7 +451,25 @@ EfiHttpRequest (
   //
   // Create request message.
   //
-  RequestStr = HttpGenRequestString (HttpInstance, HttpMsg, Url);
+  FileUrl = Url;
+  if (*FileUrl != '/') {
+    //
+    // Convert the absolute-URI to the absolute-path
+    //
+    while (*FileUrl != ':') {
+      FileUrl++;
+    }
+    if ((*(FileUrl+1) == '/') && (*(FileUrl+2) == '/')) {
+      FileUrl += 3;
+      while (*FileUrl != '/') {
+        FileUrl++;
+      }
+    } else {
+      Status = EFI_INVALID_PARAMETER;
+      goto Error3;
+    }
+  }
+  RequestStr = HttpGenRequestString (HttpInstance, HttpMsg, FileUrl);
   if (RequestStr == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error3;
