@@ -1,7 +1,7 @@
 /** @file
 EFI Firmware Volume routines which work on a Fv image in buffers.
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -864,7 +864,7 @@ Returns:
     return 0;
   }
   if (Ffs->Attributes & FFS_ATTRIB_LARGE_FILE) {
-    return ((EFI_FFS_FILE_HEADER2 *)Ffs)->ExtendedSize;
+    return (UINT32) ((EFI_FFS_FILE_HEADER2 *)Ffs)->ExtendedSize;
   }
   return FvBufExpand3ByteSize(Ffs->Size);
 }
