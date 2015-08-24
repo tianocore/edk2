@@ -348,7 +348,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                               (Size),                                  \
                                               (Buffer)                                 \
                                               )
-
 /**
   Retrieves an 8-bit PCD token value based on a token name.
   
@@ -432,6 +431,63 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #define PcdGetBool(TokenName)               _PCD_GET_MODE_BOOL_##TokenName
 
+
+/**
+  Retrieves the size of a fixed PCD token based on a token name.
+
+  Returns the size of the token specified by TokenName.
+  If TokenName is not a valid token in the token space, then the module will not build.
+
+  @param[in]  TokenName  The name of the PCD token to retrieve a current value size for.
+
+  @return     Return the size
+
+**/
+#define FixedPcdGetSize(TokenName)    _PCD_SIZE_##TokenName
+
+
+/**
+  Retrieves the size of a binary patchable PCD token based on a token name.
+
+  Returns the size of the token specified by TokenName.
+  If TokenName is not a valid token in the token space, then the module will not build.
+
+  @param[in]  TokenName  The name of the PCD token to retrieve a current value size for.
+
+  @return     Return the size
+
+**/
+#define PatchPcdGetSize(TokenName)    _gPcd_BinaryPatch_Size_##TokenName
+
+
+/**
+  Retrieves the size of the PCD token based on a token name.
+  
+  Returns the size of the token specified by TokenName.
+  If TokenName is not a valid token in the token space, then the module will not build.
+  
+  @param[in]   TokenName  The name of the PCD token to retrieve a current value size for.
+
+  @return      Return the size
+
+**/
+#define PcdGetSize(TokenName)         _PCD_GET_MODE_SIZE_##TokenName
+
+
+/**
+  Retrieve the size of a given PCD token.
+  
+  Returns the size of the token specified by TokenNumber and Guid. 
+  If Guid is NULL, then ASSERT(). 
+
+  @param[in]  Guid          Pointer to a 128-bit unique value that designates 
+                            which namespace to retrieve a value from.
+  @param[in]  TokenNumber   The PCD token number to retrieve a current value size for.
+
+  @return     Return the size.
+
+**/
+#define PcdGetExSize(Guid, TokenName) LibPcdGetExSize ((Guid), PcdTokenEx(Guid,TokenName))
 
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 /**
