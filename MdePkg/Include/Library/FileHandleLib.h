@@ -379,6 +379,8 @@ FileHandleGetFileName (
 
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
+  The function will not return the \r and \n character in buffer. When an empty line is
+  read a CHAR_NULL character will be returned in buffer.
 
   @param[in]       Handle        FileHandle to read from.
   @param[in, out]  Buffer        The pointer to buffer to read into.

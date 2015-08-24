@@ -913,6 +913,8 @@ FileHandleReturnLine(
 
   If the position upon start is 0, then the Ascii Boolean will be set.  This should be
   maintained and not changed for all operations with the same file.
+  The function will not return the \r and \n character in buffer. When an empty line is
+  read a CHAR_NULL character will be returned in buffer.
 
   @param[in]       Handle        FileHandle to read from.
   @param[in, out]  Buffer        The pointer to buffer to read into.
@@ -949,6 +951,7 @@ FileHandleReadLine(
   UINT64      FileSize;
   UINTN       CharSize;
   UINTN       CountSoFar;
+  UINTN       CrCount;
   UINT64      OriginalFilePosition;
 
   if (Handle == NULL
@@ -958,14 +961,15 @@ FileHandleReadLine(
     return (EFI_INVALID_PARAMETER);
   } 
   
-  if (Buffer != NULL) {
+  if (Buffer != NULL && *Size != 0) {
     *Buffer = CHAR_NULL;
-  }
+  } 
   
   Status = FileHandleGetSize (Handle, &FileSize);
   if (EFI_ERROR (Status)) {
     return Status;
   } else if (FileSize == 0) {
+    *Ascii = TRUE;
     return EFI_SUCCESS;
   }  
   
@@ -982,6 +986,7 @@ FileHandleReadLine(
     }
   }
 
+  CrCount = 0;
   for (CountSoFar = 0;;CountSoFar++){
     CharBuffer = 0;
     if (*Ascii) {
@@ -996,31 +1001,38 @@ FileHandleReadLine(
        || (CharBuffer ==  '\n' && *Ascii)
      ){
       break;
+    } else if (
+        (CharBuffer == L'\r' && !(*Ascii)) ||
+        (CharBuffer ==  '\r' && *Ascii)
+      ) {
+      CrCount++;
+      continue;
     }
     //
     // if we have space save it...
     //
-    if ((CountSoFar+1)*sizeof(CHAR16) < *Size){
+    if ((CountSoFar+1-CrCount)*sizeof(CHAR16) < *Size){
       ASSERT(Buffer != NULL);
-      ((CHAR16*)Buffer)[CountSoFar] = CharBuffer;
-      ((CHAR16*)Buffer)[CountSoFar+1] = CHAR_NULL;
+      ((CHAR16*)Buffer)[CountSoFar-CrCount] = CharBuffer;
+      ((CHAR16*)Buffer)[CountSoFar+1-CrCount] = CHAR_NULL;
     }
   }
 
   //
   // if we ran out of space tell when...
   //
-  if ((CountSoFar+1)*sizeof(CHAR16) > *Size){
-    *Size = (CountSoFar+1)*sizeof(CHAR16);
+  if ((CountSoFar+1-CrCount)*sizeof(CHAR16) > *Size){
+    *Size = (CountSoFar+1-CrCount)*sizeof(CHAR16);
     if (!Truncate) {
+      if (Buffer != NULL && *Size != 0) {
+        ZeroMem(Buffer, *Size);
+      }
       FileHandleSetPosition(Handle, OriginalFilePosition);
+      return (EFI_BUFFER_TOO_SMALL);
     } else {
       DEBUG((DEBUG_WARN, "The line was truncated in FileHandleReadLine"));
+      return (EFI_SUCCESS);
     }
-    return (EFI_BUFFER_TOO_SMALL);
-  }
-  while(Buffer[StrLen(Buffer)-1] == L'\r') {
-    Buffer[StrLen(Buffer)-1] = CHAR_NULL;
   }
 
   return (Status);
