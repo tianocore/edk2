@@ -25,6 +25,7 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 [LibraryClasses]
+  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
@@ -102,6 +103,7 @@
   NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
   NetworkPkg/DnsDxe/DnsDxe.inf
   NetworkPkg/HttpDxe/HttpDxe.inf
+  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
   NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 
   NetworkPkg/Application/IfConfig6/IfConfig6.inf

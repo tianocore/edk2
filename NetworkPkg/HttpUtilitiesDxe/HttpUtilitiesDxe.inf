@@ -1,0 +1,51 @@
+## @file
+#  Implementation of EFI Http Utilities Protocol interfaces.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = HttpUtilitiesDxe
+  FILE_GUID                 = 22ea234f-e72a-11e4-91f9-28d2447c4829
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = HttpUtilitiesDxeDriverEntryPoint
+  UNLOAD_IMAGE              = HttpUtilitiesDxeUnload
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  HttpUtilitiesDxe.h
+  HttpUtilitiesDxe.c
+  HttpUtilitiesImpl.c
+  HttpUtilitiesProtocol.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DebugLib
+
+[Protocols]
+  gEfiHttpUtilitiesProtocolGuid               ## PRODUCES
+
+[Depex]
+  TRUE
+
+[Guids]
+
