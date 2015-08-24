@@ -1289,12 +1289,12 @@ def CheckFuncLayoutReturnType(FullFileName):
         FuncName = Result[5]
         if EccGlobalData.gException.IsException(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, FuncName):
             continue
-        Index = Result[0].find(ReturnType)
+        Result0 = Result[0]
+        if Result0.upper().startswith('STATIC'):
+            Result0 = Result0[6:].strip()
+        Index = Result0.find(ReturnType)
         if Index != 0 or Result[3] != 0:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, '[%s] Return Type should appear at the start of line' % FuncName, 'Function', Result[1])
-
-        if Result[2] == Result[4]:
-            PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, '[%s] Return Type should appear on its own line' % FuncName, 'Function', Result[1])
 
 def CheckFuncLayoutModifier(FullFileName):
     ErrorMsgList = []
@@ -1329,7 +1329,10 @@ def CheckFuncLayoutModifier(FullFileName):
         TypeStart = ReturnType.split()[0]
 #        if len(ReturnType) == 0:
 #            continue
-        Index = Result[0].find(TypeStart)
+        Result0 = Result[0]
+        if Result0.upper().startswith('STATIC'):
+            Result0 = Result0[6:].strip()
+        Index = Result0.find(TypeStart)
         if Index != 0:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_OPTIONAL_FUNCTIONAL_MODIFIER, '', 'Function', Result[1])
 
