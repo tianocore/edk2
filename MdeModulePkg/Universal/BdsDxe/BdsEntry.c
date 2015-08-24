@@ -1019,7 +1019,6 @@ BdsEntry (
   PERF_END   (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
 
   DEBUG_CODE (
-    UINTN                             Index;
     EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType;
     DEBUG ((EFI_D_INFO, "[Bds]=============Begin Load Options Dumping ...=============\n"));
     for (LoadOptionType = 0; LoadOptionType < LoadOptionTypeMax; LoadOptionType++) {
