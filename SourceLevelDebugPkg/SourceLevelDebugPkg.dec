@@ -22,7 +22,7 @@
   PACKAGE_NAME                   = SourceLevelDebugPkg
   PACKAGE_UNI_FILE               = SourceLevelDebugPkg.uni
   PACKAGE_GUID                   = DBF00C27-D8D7-443d-918B-4E85CDA1373B
-  PACKAGE_VERSION                = 0.86
+  PACKAGE_VERSION                = 0.96
 
 [Includes]
   Include
