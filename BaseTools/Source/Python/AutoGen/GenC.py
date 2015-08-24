@@ -1021,8 +1021,8 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
 
         if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE:
             if Pcd.DatumType == 'VOID*':
-                AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtr((VOID *)_gPcd_BinaryPatch_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeName, Pcd.TokenCName, Pcd.TokenCName))
-                AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtrS((VOID *)_gPcd_BinaryPatch_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeStatusName, Pcd.TokenCName, Pcd.TokenCName))
+                AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtrAndSize((VOID *)_gPcd_BinaryPatch_%s, &_gPcd_BinaryPatch_Size_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeName, Pcd.TokenCName, Pcd.TokenCName, Pcd.TokenCName))
+                AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtrAndSizeS((VOID *)_gPcd_BinaryPatch_%s, &_gPcd_BinaryPatch_Size_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeStatusName, Pcd.TokenCName, Pcd.TokenCName, Pcd.TokenCName))
             else:
                 AutoGenH.Append('#define %s(Value)  (%s = (Value))\n' % (SetModeName, PcdVariableName))
                 AutoGenH.Append('#define %s(Value)  ((%s = (Value)), RETURN_SUCCESS) \n' % (SetModeStatusName, PcdVariableName))
@@ -1144,8 +1144,8 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
         AutoGenH.Append('extern volatile %s _gPcd_BinaryPatch_%s%s;\n' %(DatumType, TokenCName, Array) )
         AutoGenH.Append('#define %s  %s_gPcd_BinaryPatch_%s\n' %(GetModeName, Type, TokenCName))
         if Pcd.DatumType == 'VOID*':
-            AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtr((VOID *)_gPcd_BinaryPatch_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeName, Pcd.TokenCName, Pcd.TokenCName))
-            AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtrS((VOID *)_gPcd_BinaryPatch_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeStatusName, Pcd.TokenCName, Pcd.TokenCName))
+            AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtrAndSize((VOID *)_gPcd_BinaryPatch_%s, &_gPcd_BinaryPatch_Size_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeName, Pcd.TokenCName, Pcd.TokenCName, Pcd.TokenCName))
+            AutoGenH.Append('#define %s(SizeOfBuffer, Buffer)  LibPatchPcdSetPtrAndSizeS((VOID *)_gPcd_BinaryPatch_%s, &_gPcd_BinaryPatch_Size_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, (SizeOfBuffer), (Buffer))\n' % (SetModeStatusName, Pcd.TokenCName, Pcd.TokenCName, Pcd.TokenCName))
         else:
             AutoGenH.Append('#define %s(Value)  (%s = (Value))\n' % (SetModeName, PcdVariableName))
             AutoGenH.Append('#define %s(Value)  ((%s = (Value)), RETURN_SUCCESS)\n' % (SetModeStatusName, PcdVariableName))
