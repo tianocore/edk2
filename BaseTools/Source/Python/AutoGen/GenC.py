@@ -717,6 +717,7 @@ def DynExPcdTokenNumberMapping(Info, AutoGenH):
                 Index = Index + 1
                 if Index == 1:
                     AutoGenH.Append('\n#define __PCD_%s_VAL_CMP(GuidPtr)  (' % (Pcd.TokenCName))
+                    AutoGenH.Append('\\\n  (GuidPtr == NULL) ? 0:')
                     AutoGenH.Append('\\\n  COMPAREGUID (GuidPtr, &%s) ? _PCD_TOKEN_%s_%s:' 
                                     % (Pcd.TokenSpaceGuidCName, Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
                 else:
