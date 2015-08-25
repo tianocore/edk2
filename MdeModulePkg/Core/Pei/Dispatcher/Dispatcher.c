@@ -627,6 +627,291 @@ PeiCoreEntry (
 }
 
 /**
+  Check SwitchStackSignal and switch stack if SwitchStackSignal is TRUE.
+
+  @param[in] SecCoreData    Points to a data structure containing information about the PEI core's operating
+                            environment, such as the size and location of temporary RAM, the stack location and
+                            the BFV location.
+  @param[in] Private        Pointer to the private data passed in from caller.
+
+**/
+VOID
+PeiCheckAndSwitchStack (
+  IN CONST EFI_SEC_PEI_HAND_OFF         *SecCoreData,
+  IN PEI_CORE_INSTANCE                  *Private
+  )
+{
+  VOID                                  *LoadFixPeiCodeBegin;
+  EFI_STATUS                            Status;
+  CONST EFI_PEI_SERVICES                **PeiServices;
+  UINT64                                NewStackSize;
+  EFI_PHYSICAL_ADDRESS                  TopOfOldStack;
+  EFI_PHYSICAL_ADDRESS                  TopOfNewStack;
+  UINTN                                 StackOffset;
+  BOOLEAN                               StackOffsetPositive;
+  EFI_PHYSICAL_ADDRESS                  TemporaryRamBase;
+  UINTN                                 TemporaryRamSize;
+  UINTN                                 TemporaryStackSize;
+  VOID                                  *TemporaryStackBase;
+  UINTN                                 PeiTemporaryRamSize;
+  VOID                                  *PeiTemporaryRamBase;
+  EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI     *TemporaryRamSupportPpi;
+  EFI_PHYSICAL_ADDRESS                  BaseOfNewHeap;
+  EFI_PHYSICAL_ADDRESS                  HoleMemBase;
+  UINTN                                 HoleMemSize;
+  UINTN                                 HeapTemporaryRamSize;
+  EFI_PHYSICAL_ADDRESS                  TempBase1;
+  UINTN                                 TempSize1;
+  EFI_PHYSICAL_ADDRESS                  TempBase2;
+  UINTN                                 TempSize2;
+  UINTN                                 Index;
+
+  PeiServices = (CONST EFI_PEI_SERVICES **) &Private->Ps;
+
+  if (Private->SwitchStackSignal) {
+    //
+    // Before switch stack from temporary memory to permenent memory, calculate the heap and stack
+    // usage in temporary memory for debuging.
+    //
+    DEBUG_CODE_BEGIN ();
+      UINT32  *StackPointer;
+
+      for (StackPointer = (UINT32*)SecCoreData->StackBase;
+           (StackPointer < (UINT32*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
+           && (*StackPointer == INIT_CAR_VALUE);
+           StackPointer ++);
+
+        DEBUG ((EFI_D_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
+        DEBUG ((EFI_D_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", Private->HobList.Raw, (UINT32)((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN) Private->HobList.Raw)));
+        DEBUG ((EFI_D_INFO, "Total temporary memory:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
+        DEBUG ((EFI_D_INFO, "  temporary memory stack ever used: %d bytes.\n",
+               (UINT32)(SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
+              ));
+        DEBUG ((EFI_D_INFO, "  temporary memory heap used:       %d bytes.\n",
+               (UINT32)((UINTN)Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN)Private->HobList.Raw)
+              ));
+    DEBUG_CODE_END ();
+
+    if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
+      //
+      // Loading Module at Fixed Address is enabled
+      //
+      PeiLoadFixAddressHook (Private);
+
+      //
+      // If Loading Module at Fixed Address is enabled, Allocating memory range for Pei code range.
+      //
+      LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)(UINTN)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
+    }
+
+    //
+    // Reserve the size of new stack at bottom of physical memory
+    //
+    // The size of new stack in permenent memory must be the same size 
+    // or larger than the size of old stack in temporary memory.
+    // But if new stack is smaller than the size of old stack, we also reserve
+    // the size of old stack at bottom of permenent memory.
+    //
+    NewStackSize = RShiftU64 (Private->PhysicalMemoryLength, 1);
+    NewStackSize = ALIGN_VALUE (NewStackSize, EFI_PAGE_SIZE);
+    NewStackSize = MIN (PcdGet32(PcdPeiCoreMaxPeiStackSize), NewStackSize);
+    DEBUG ((EFI_D_INFO, "Old Stack size %d, New stack size %d\n", (UINT32)SecCoreData->StackSize, (UINT32)NewStackSize));
+    ASSERT (NewStackSize >= SecCoreData->StackSize);
+
+    //
+    // Calculate stack offset and heap offset between temporary memory and new permement 
+    // memory seperately.
+    //
+    TopOfOldStack = (UINTN)SecCoreData->StackBase + SecCoreData->StackSize;
+    TopOfNewStack = Private->PhysicalMemoryBegin + NewStackSize;
+    if (TopOfNewStack >= TopOfOldStack) {
+      StackOffsetPositive = TRUE;
+      StackOffset = (UINTN)(TopOfNewStack - TopOfOldStack);
+    } else {
+      StackOffsetPositive = FALSE;
+      StackOffset = (UINTN)(TopOfOldStack - TopOfNewStack);
+    }
+    Private->StackOffsetPositive = StackOffsetPositive;
+    Private->StackOffset = StackOffset;
+
+    //
+    // Build Stack HOB that describes the permanent memory stack
+    //
+    DEBUG ((EFI_D_INFO, "Stack Hob: BaseAddress=0x%lX Length=0x%lX\n", TopOfNewStack - NewStackSize, NewStackSize));
+    BuildStackHob (TopOfNewStack - NewStackSize, NewStackSize);
+
+    //
+    // Cache information from SecCoreData into locals before SecCoreData is converted to a permanent memory address
+    //
+    TemporaryRamBase    = (EFI_PHYSICAL_ADDRESS)(UINTN)SecCoreData->TemporaryRamBase;
+    TemporaryRamSize    = SecCoreData->TemporaryRamSize;
+    TemporaryStackSize  = SecCoreData->StackSize;
+    TemporaryStackBase  = SecCoreData->StackBase;
+    PeiTemporaryRamSize = SecCoreData->PeiTemporaryRamSize;
+    PeiTemporaryRamBase = SecCoreData->PeiTemporaryRamBase;
+
+    //
+    // TemporaryRamSupportPpi is produced by platform's SEC
+    //
+    Status = PeiServicesLocatePpi (
+               &gEfiTemporaryRamSupportPpiGuid,
+               0,
+               NULL,
+               (VOID**)&TemporaryRamSupportPpi
+               );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Heap Offset
+      //
+      BaseOfNewHeap = TopOfNewStack;
+      if (BaseOfNewHeap >= (UINTN)SecCoreData->PeiTemporaryRamBase) {
+        Private->HeapOffsetPositive = TRUE;
+        Private->HeapOffset = (UINTN)(BaseOfNewHeap - (UINTN)SecCoreData->PeiTemporaryRamBase);
+      } else {
+        Private->HeapOffsetPositive = FALSE;
+        Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
+      }
+
+      DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
+
+      //
+      // Calculate new HandOffTable and PrivateData address in permanent memory's stack
+      //
+      if (StackOffsetPositive) {
+        SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData + StackOffset);
+        Private = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private + StackOffset);
+      } else {
+        SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData - StackOffset);
+        Private = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private - StackOffset);
+      }
+
+      //
+      // Temporary Ram Support PPI is provided by platform, it will copy 
+      // temporary memory to permenent memory and do stack switching.
+      // After invoking Temporary Ram Support PPI, the following code's 
+      // stack is in permanent memory.
+      //
+      TemporaryRamSupportPpi->TemporaryRamMigration (
+                                PeiServices,
+                                TemporaryRamBase,
+                                (EFI_PHYSICAL_ADDRESS)(UINTN)(TopOfNewStack - TemporaryStackSize),
+                                TemporaryRamSize
+                                );
+
+      //
+      // Entry PEI Phase 2
+      //
+      PeiCore (SecCoreData, NULL, Private);
+    } else {
+      //
+      // Migrate the PEI Services Table pointer from temporary RAM to permanent RAM.
+      //
+      MigratePeiServicesTablePointer ();
+                
+      //
+      // Heap Offset
+      //
+      BaseOfNewHeap = TopOfNewStack;
+      HoleMemBase   = TopOfNewStack;
+      HoleMemSize   = TemporaryRamSize - PeiTemporaryRamSize - TemporaryStackSize;
+      if (HoleMemSize != 0) {
+        //
+        // Make sure HOB List start address is 8 byte alignment.
+        //
+        BaseOfNewHeap = ALIGN_VALUE (BaseOfNewHeap + HoleMemSize, 8);
+      }
+      if (BaseOfNewHeap >= (UINTN)SecCoreData->PeiTemporaryRamBase) {
+        Private->HeapOffsetPositive = TRUE;
+        Private->HeapOffset = (UINTN)(BaseOfNewHeap - (UINTN)SecCoreData->PeiTemporaryRamBase);
+      } else {
+        Private->HeapOffsetPositive = FALSE;
+        Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
+      }
+
+      DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
+
+      //
+      // Migrate Heap
+      //
+      HeapTemporaryRamSize = (UINTN) (Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - Private->HobList.HandoffInformationTable->EfiMemoryBottom);
+      ASSERT (BaseOfNewHeap + HeapTemporaryRamSize <= Private->FreePhysicalMemoryTop);
+      CopyMem ((UINT8 *) (UINTN) BaseOfNewHeap, (UINT8 *) PeiTemporaryRamBase, HeapTemporaryRamSize);
+
+      //
+      // Migrate Stack
+      //
+      CopyMem ((UINT8 *) (UINTN) (TopOfNewStack - TemporaryStackSize), TemporaryStackBase, TemporaryStackSize);
+
+      //
+      // Copy Hole Range Data
+      // Convert PPI from Hole. 
+      //
+      if (HoleMemSize != 0) {
+        //
+        // Prepare Hole
+        //
+        if (PeiTemporaryRamBase < TemporaryStackBase) {
+          TempBase1 = (EFI_PHYSICAL_ADDRESS) (UINTN) PeiTemporaryRamBase;
+          TempSize1 = PeiTemporaryRamSize;
+          TempBase2 = (EFI_PHYSICAL_ADDRESS) (UINTN) TemporaryStackBase;
+          TempSize2 = TemporaryStackSize;
+        } else {
+          TempBase1 = (EFI_PHYSICAL_ADDRESS) (UINTN) TemporaryStackBase;
+          TempSize1 = TemporaryStackSize;
+          TempBase2 =(EFI_PHYSICAL_ADDRESS) (UINTN) PeiTemporaryRamBase;
+          TempSize2 = PeiTemporaryRamSize;
+        }
+        if (TemporaryRamBase < TempBase1) {
+          Private->HoleData[0].Base = TemporaryRamBase;
+          Private->HoleData[0].Size = (UINTN) (TempBase1 - TemporaryRamBase);
+        }
+        if (TempBase1 + TempSize1 < TempBase2) {
+          Private->HoleData[1].Base = TempBase1 + TempSize1;
+          Private->HoleData[1].Size = (UINTN) (TempBase2 - TempBase1 - TempSize1);
+        }
+        if (TempBase2 + TempSize2 < TemporaryRamBase + TemporaryRamSize) {
+          Private->HoleData[2].Base = TempBase2 + TempSize2;
+          Private->HoleData[2].Size = (UINTN) (TemporaryRamBase + TemporaryRamSize - TempBase2 - TempSize2);
+        }
+
+        //
+        // Copy Hole Range data.
+        //
+        for (Index = 0; Index < HOLE_MAX_NUMBER; Index ++) {
+          if (Private->HoleData[Index].Size > 0) {
+            if (HoleMemBase > Private->HoleData[Index].Base) {
+              Private->HoleData[Index].OffsetPositive = TRUE;
+              Private->HoleData[Index].Offset = (UINTN) (HoleMemBase - Private->HoleData[Index].Base);
+            } else {
+              Private->HoleData[Index].OffsetPositive = FALSE;
+              Private->HoleData[Index].Offset = (UINTN) (Private->HoleData[Index].Base - HoleMemBase);
+            }
+            CopyMem ((VOID *) (UINTN) HoleMemBase, (VOID *) (UINTN) Private->HoleData[Index].Base, Private->HoleData[Index].Size);
+            HoleMemBase = HoleMemBase + Private->HoleData[Index].Size;
+          }
+        }
+      }
+
+      //
+      // Switch new stack
+      //
+      SwitchStack (
+        (SWITCH_STACK_ENTRY_POINT)(UINTN)PeiCoreEntry,
+        (VOID *) SecCoreData,
+        (VOID *) Private,
+        (VOID *) (UINTN) TopOfNewStack
+        );
+    }
+
+    //
+    // Code should not come here
+    //
+    ASSERT (FALSE);
+  }
+}
+
+/**
   Conduct PEIM dispatch.
 
   @param SecCoreData     Points to a data structure containing information about the PEI core's operating
@@ -654,30 +939,8 @@ PeiDispatcher (
   UINTN                               SaveCurrentPeimCount;
   UINTN                               SaveCurrentFvCount;
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
-  EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   *TemporaryRamSupportPpi;
-  UINT64                              NewStackSize;
-  UINTN                               HeapTemporaryRamSize;
-  EFI_PHYSICAL_ADDRESS                BaseOfNewHeap;
-  EFI_PHYSICAL_ADDRESS                TopOfNewStack;
-  EFI_PHYSICAL_ADDRESS                TopOfOldStack;
-  EFI_PHYSICAL_ADDRESS                TemporaryRamBase;
-  UINTN                               TemporaryRamSize;
-  UINTN                               TemporaryStackSize;
-  VOID                                *TemporaryStackBase;
-  UINTN                               PeiTemporaryRamSize;
-  VOID                                *PeiTemporaryRamBase;
-  UINTN                               StackOffset;
-  BOOLEAN                             StackOffsetPositive;
-  EFI_PHYSICAL_ADDRESS                HoleMemBase;
-  UINTN                               HoleMemSize;
   EFI_FV_FILE_INFO                    FvFileInfo;
   PEI_CORE_FV_HANDLE                  *CoreFvHandle;
-  VOID                                *LoadFixPeiCodeBegin;
-  EFI_PHYSICAL_ADDRESS                TempBase1;
-  UINTN                               TempSize1;
-  EFI_PHYSICAL_ADDRESS                TempBase2;
-  UINTN                               TempSize2;
-  UINTN                               Index;
   
   PeiServices = (CONST EFI_PEI_SERVICES **) &Private->Ps;
   PeimEntryPoint = NULL;
@@ -853,253 +1116,20 @@ PeiDispatcher (
               }
             }
 
-            if (Private->SwitchStackSignal) {
-              //
-              // Before switch stack from temporary memory to permenent memory, calculate the heap and stack
-              // usage in temporary memory for debuging.
-              //
-              DEBUG_CODE_BEGIN ();
-                UINT32  *StackPointer;
-                
-                for (StackPointer = (UINT32*)SecCoreData->StackBase;
-                     (StackPointer < (UINT32*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
-                     && (*StackPointer == INIT_CAR_VALUE);
-                     StackPointer ++);
-                     
-                DEBUG ((EFI_D_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
-                DEBUG ((EFI_D_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", Private->HobList.Raw, (UINT32)((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN) Private->HobList.Raw)));
-                DEBUG ((EFI_D_INFO, "Total temporary memory:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
-                DEBUG ((EFI_D_INFO, "  temporary memory stack ever used: %d bytes.\n",
-                       (UINT32)(SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
-                      ));
-                DEBUG ((EFI_D_INFO, "  temporary memory heap used:       %d bytes.\n",
-                       (UINT32)((UINTN)Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN)Private->HobList.Raw)
-                      ));
-              DEBUG_CODE_END ();
-              
-              if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
-                //
-                // Loading Module at Fixed Address is enabled
-                //
-                PeiLoadFixAddressHook (Private);
-
-                //
-                // If Loading Module at Fixed Address is enabled, Allocating memory range for Pei code range.
-                //
-                LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
-                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)(UINTN)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
-              }
-              
-              //
-              // Reserve the size of new stack at bottom of physical memory
-              //
-              // The size of new stack in permenent memory must be the same size 
-              // or larger than the size of old stack in temporary memory.
-              // But if new stack is smaller than the size of old stack, we also reserve
-              // the size of old stack at bottom of permenent memory.
-              //
-              NewStackSize = RShiftU64 (Private->PhysicalMemoryLength, 1);
-              NewStackSize = ALIGN_VALUE (NewStackSize, EFI_PAGE_SIZE);
-              NewStackSize = MIN (PcdGet32(PcdPeiCoreMaxPeiStackSize), NewStackSize);
-              DEBUG ((EFI_D_INFO, "Old Stack size %d, New stack size %d\n", (UINT32)SecCoreData->StackSize, (UINT32)NewStackSize));
-              ASSERT (NewStackSize >= SecCoreData->StackSize);
-
-              //
-              // Calculate stack offset and heap offset between temporary memory and new permement 
-              // memory seperately.
-              //
-              TopOfOldStack = (UINTN)SecCoreData->StackBase + SecCoreData->StackSize;
-              TopOfNewStack = Private->PhysicalMemoryBegin + NewStackSize;
-              if (TopOfNewStack >= TopOfOldStack) {
-                StackOffsetPositive = TRUE;
-                StackOffset = (UINTN)(TopOfNewStack - TopOfOldStack);
-              } else {
-                StackOffsetPositive = FALSE;
-                StackOffset = (UINTN)(TopOfOldStack - TopOfNewStack);
-              }
-              Private->StackOffsetPositive = StackOffsetPositive;
-              Private->StackOffset = StackOffset;
-
-              //
-              // Build Stack HOB that describes the permanent memory stack
-              //
-              DEBUG ((EFI_D_INFO, "Stack Hob: BaseAddress=0x%lX Length=0x%lX\n", TopOfNewStack - NewStackSize, NewStackSize));
-              BuildStackHob (TopOfNewStack - NewStackSize, NewStackSize);
-
-              //
-              // Cache information from SecCoreData into locals before SecCoreData is converted to a permanent memory address
-              //
-              TemporaryRamBase    = (EFI_PHYSICAL_ADDRESS)(UINTN)SecCoreData->TemporaryRamBase;
-              TemporaryRamSize    = SecCoreData->TemporaryRamSize;
-              TemporaryStackSize  = SecCoreData->StackSize;
-              TemporaryStackBase  = SecCoreData->StackBase;
-              PeiTemporaryRamSize = SecCoreData->PeiTemporaryRamSize;
-              PeiTemporaryRamBase = SecCoreData->PeiTemporaryRamBase;
-              
-              //
-              // TemporaryRamSupportPpi is produced by platform's SEC
-              //
-              Status = PeiServicesLocatePpi (
-                         &gEfiTemporaryRamSupportPpiGuid,
-                         0,
-                         NULL,
-                         (VOID**)&TemporaryRamSupportPpi
-                         );
-              if (!EFI_ERROR (Status)) {
-                //
-                // Heap Offset
-                //
-                BaseOfNewHeap = TopOfNewStack;
-                if (BaseOfNewHeap >= (UINTN)SecCoreData->PeiTemporaryRamBase) {
-                  Private->HeapOffsetPositive = TRUE;
-                  Private->HeapOffset = (UINTN)(BaseOfNewHeap - (UINTN)SecCoreData->PeiTemporaryRamBase);
-                } else {
-                  Private->HeapOffsetPositive = FALSE;
-                  Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
-                }
-
-                DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
-
-                //
-                // Calculate new HandOffTable and PrivateData address in permanent memory's stack
-                //
-                if (StackOffsetPositive) {
-                  SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData + StackOffset);
-                  Private = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private + StackOffset);
-                } else {
-                  SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData - StackOffset);
-                  Private = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private - StackOffset);
-                }
-
-                //
-                // Temporary Ram Support PPI is provided by platform, it will copy 
-                // temporary memory to permenent memory and do stack switching.
-                // After invoking Temporary Ram Support PPI, the following code's 
-                // stack is in permanent memory.
-                //
-                TemporaryRamSupportPpi->TemporaryRamMigration (
-                                          PeiServices,
-                                          TemporaryRamBase,
-                                          (EFI_PHYSICAL_ADDRESS)(UINTN)(TopOfNewStack - TemporaryStackSize),
-                                          TemporaryRamSize
-                                          );
-
-                //
-                // Entry PEI Phase 2
-                //
-                PeiCore (SecCoreData, NULL, Private);
-              } else {
-                //
-                // Migrate the PEI Services Table pointer from temporary RAM to permanent RAM.
-                //
-                MigratePeiServicesTablePointer ();
-                
-                //
-                // Heap Offset
-                //
-                BaseOfNewHeap = TopOfNewStack;
-                HoleMemBase   = TopOfNewStack;
-                HoleMemSize   = TemporaryRamSize - PeiTemporaryRamSize - TemporaryStackSize;
-                if (HoleMemSize != 0) {
-                  //
-                  // Make sure HOB List start address is 8 byte alignment.
-                  //
-                  BaseOfNewHeap = ALIGN_VALUE (BaseOfNewHeap + HoleMemSize, 8);
-                }
-                if (BaseOfNewHeap >= (UINTN)SecCoreData->PeiTemporaryRamBase) {
-                  Private->HeapOffsetPositive = TRUE;
-                  Private->HeapOffset = (UINTN)(BaseOfNewHeap - (UINTN)SecCoreData->PeiTemporaryRamBase);
-                } else {
-                  Private->HeapOffsetPositive = FALSE;
-                  Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
-                }
-
-                DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
-
-                //
-                // Migrate Heap
-                //
-                HeapTemporaryRamSize = (UINTN) (Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - Private->HobList.HandoffInformationTable->EfiMemoryBottom);
-                ASSERT (BaseOfNewHeap + HeapTemporaryRamSize <= Private->FreePhysicalMemoryTop);
-                CopyMem ((UINT8 *) (UINTN) BaseOfNewHeap, (UINT8 *) PeiTemporaryRamBase, HeapTemporaryRamSize);
-                
-                //
-                // Migrate Stack
-                //
-                CopyMem ((UINT8 *) (UINTN) (TopOfNewStack - TemporaryStackSize), TemporaryStackBase, TemporaryStackSize);
-                
-                //
-                // Copy Hole Range Data
-                // Convert PPI from Hole. 
-                //
-                if (HoleMemSize != 0) {
-                  //
-                  // Prepare Hole
-                  //
-                  if (PeiTemporaryRamBase < TemporaryStackBase) {
-                    TempBase1 = (EFI_PHYSICAL_ADDRESS) (UINTN) PeiTemporaryRamBase;
-                    TempSize1 = PeiTemporaryRamSize;
-                    TempBase2 = (EFI_PHYSICAL_ADDRESS) (UINTN) TemporaryStackBase;
-                    TempSize2 = TemporaryStackSize;
-                  } else {
-                    TempBase1 = (EFI_PHYSICAL_ADDRESS) (UINTN) TemporaryStackBase;
-                    TempSize1 = TemporaryStackSize;
-                    TempBase2 =(EFI_PHYSICAL_ADDRESS) (UINTN) PeiTemporaryRamBase;
-                    TempSize2 = PeiTemporaryRamSize;
-                  }
-                  if (TemporaryRamBase < TempBase1) {
-                    Private->HoleData[0].Base = TemporaryRamBase;
-                    Private->HoleData[0].Size = (UINTN) (TempBase1 - TemporaryRamBase);
-                  }
-                  if (TempBase1 + TempSize1 < TempBase2) {
-                    Private->HoleData[1].Base = TempBase1 + TempSize1;
-                    Private->HoleData[1].Size = (UINTN) (TempBase2 - TempBase1 - TempSize1);
-                  }
-                  if (TempBase2 + TempSize2 < TemporaryRamBase + TemporaryRamSize) {
-                    Private->HoleData[2].Base = TempBase2 + TempSize2;
-                    Private->HoleData[2].Size = (UINTN) (TemporaryRamBase + TemporaryRamSize - TempBase2 - TempSize2);
-                  }
-                  
-                  //
-                  // Copy Hole Range data.
-                  //
-                  for (Index = 0; Index < HOLE_MAX_NUMBER; Index ++) {
-                    if (Private->HoleData[Index].Size > 0) {
-                      if (HoleMemBase > Private->HoleData[Index].Base) {
-                        Private->HoleData[Index].OffsetPositive = TRUE;
-                        Private->HoleData[Index].Offset = (UINTN) (HoleMemBase - Private->HoleData[Index].Base);
-                      } else {
-                        Private->HoleData[Index].OffsetPositive = FALSE;
-                        Private->HoleData[Index].Offset = (UINTN) (Private->HoleData[Index].Base - HoleMemBase);
-                      }
-                      CopyMem ((VOID *) (UINTN) HoleMemBase, (VOID *) (UINTN) Private->HoleData[Index].Base, Private->HoleData[Index].Size);
-                      HoleMemBase = HoleMemBase + Private->HoleData[Index].Size;
-                    }
-                  }
-                }
-
-                //
-                // Switch new stack
-                //
-                SwitchStack (
-                  (SWITCH_STACK_ENTRY_POINT)(UINTN)PeiCoreEntry,
-                  (VOID *) SecCoreData,
-                  (VOID *) Private,
-                  (VOID *) (UINTN) TopOfNewStack
-                  );
-              }
-
-              //
-              // Code should not come here
-              //
-              ASSERT (FALSE);
-            }
+            PeiCheckAndSwitchStack (SecCoreData, Private);
 
             //
             // Process the Notify list and dispatch any notifies for
             // newly installed PPIs.
             //
             ProcessNotifyList (Private);
+
+            //
+            // Recheck SwitchStackSignal after ProcessNotifyList()
+            // in case PeiInstallPeiMemory() is done in a callback with
+            // EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH.
+            //
+            PeiCheckAndSwitchStack (SecCoreData, Private);
 
             if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].PeimState[PeimCount] == PEIM_STATE_REGISITER_FOR_SHADOW) &&   \
                 (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
