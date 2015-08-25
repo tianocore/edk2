@@ -104,7 +104,7 @@ SecStartup (
   AsmWriteIdtr (&IdtDescriptor);
 
   //
-  // Iniitalize the global FSP data region
+  // Initialize the global FSP data region
   //
   FspGlobalDataInit (&PeiFspData, BootLoaderStack, (UINT8)ApiIdx);
 

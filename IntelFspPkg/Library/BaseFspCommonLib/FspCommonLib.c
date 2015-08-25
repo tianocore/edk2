@@ -289,6 +289,91 @@ GetFspUpdDataPointer (
   return FspData->UpdDataRgnPtr;
 }
 
+
+/**
+  This function sets the memory init UPD data pointer.
+
+  @param[in] MemoryInitUpdPtr   memory init UPD data pointer.
+**/
+VOID
+EFIAPI
+SetFspMemoryInitUpdDataPointer (
+  IN VOID    *MemoryInitUpdPtr
+  )
+{
+  FSP_GLOBAL_DATA  *FspData;
+
+  //
+  // Get the Fsp Global Data Pointer
+  //
+  FspData  = GetFspGlobalDataPointer ();
+
+  //
+  // Set the memory init UPD pointer.
+  //
+  FspData->MemoryInitUpdPtr = MemoryInitUpdPtr;
+}
+
+/**
+  This function gets the memory init UPD data pointer.
+
+  @return memory init UPD data pointer.
+**/
+VOID *
+EFIAPI
+GetFspMemoryInitUpdDataPointer (
+  VOID
+  )
+{
+  FSP_GLOBAL_DATA  *FspData;
+
+  FspData  = GetFspGlobalDataPointer ();
+  return FspData->MemoryInitUpdPtr;
+}
+
+
+/**
+  This function sets the silicon init UPD data pointer.
+
+  @param[in] SiliconInitUpdPtr   silicon init UPD data pointer.
+**/
+VOID
+EFIAPI
+SetFspSiliconInitUpdDataPointer (
+  IN VOID    *SiliconInitUpdPtr
+  )
+{
+  FSP_GLOBAL_DATA  *FspData;
+
+  //
+  // Get the Fsp Global Data Pointer
+  //
+  FspData  = GetFspGlobalDataPointer ();
+
+  //
+  // Set the silicon init UPD data pointer.
+  //
+  FspData->SiliconInitUpdPtr = SiliconInitUpdPtr;
+}
+
+/**
+  This function gets the silicon init UPD data pointer.
+
+  @return silicon init UPD data pointer.
+**/
+VOID *
+EFIAPI
+GetFspSiliconInitUpdDataPointer (
+  VOID
+  )
+{
+  FSP_GLOBAL_DATA  *FspData;
+
+  FspData  = GetFspGlobalDataPointer ();
+  return FspData->SiliconInitUpdPtr;
+}
+
+
 /**
   Set FSP measurement point timestamp.
 

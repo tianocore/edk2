@@ -148,7 +148,12 @@ DebugAssertInternal (
   //
   // Generate the ASSERT() message in Ascii format
   //
-  AsciiStrnCpy (Buffer, "-> EBP:0x00000000  EIP:0x00000000\n", sizeof(Buffer));
+  AsciiStrnCpyS (
+    Buffer,
+    sizeof(Buffer) / sizeof(CHAR8),
+    "-> EBP:0x00000000  EIP:0x00000000\n",
+    sizeof(Buffer) / sizeof(CHAR8) - 1
+    );
   SerialPortWrite ((UINT8 *)"ASSERT DUMP:\n", 13);
   while (Frame != NULL) {
     FillHex ((UINT32)Frame, Buffer + 9);

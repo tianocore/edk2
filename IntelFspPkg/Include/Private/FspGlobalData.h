@@ -34,6 +34,8 @@ typedef struct  {
    FSP_PLAT_DATA      PlatformData;
    FSP_INFO_HEADER    *FspInfoHeader;
    VOID               *UpdDataRgnPtr;
+   VOID               *MemoryInitUpdPtr;
+   VOID               *SiliconInitUpdPtr;
    UINT8              ApiMode;
    UINT8              Reserved[3];
    UINT32             PerfIdx;

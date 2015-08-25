@@ -45,7 +45,7 @@ SearchForExactMtrr (
   @param[in] MemoryCacheType  input cache type to be checked.
 
   @retval TRUE MemoryCacheType is default MTRR setting.
-  @retval TRUE MemoryCacheType is NOT default MTRR setting.
+  @retval FALSE MemoryCacheType is NOT default MTRR setting.
 **/
 BOOLEAN
 IsDefaultType (

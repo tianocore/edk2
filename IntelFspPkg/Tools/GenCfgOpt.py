@@ -88,6 +88,48 @@ are permitted provided that the following conditions are met:
 **/
 """
 
+def UpdateMemSiUpdInitOffsetValue (DscFile):
+    DscFd        = open(DscFile, "r")
+    DscLines     = DscFd.readlines()
+    DscFd.close()
+
+    DscContent = []
+    MemUpdInitOffset = 0
+    SiUpdInitOffset = 0
+    MemUpdInitOffsetValue = 0
+    SiUpdInitOffsetValue = 0
+
+    while len(DscLines):
+        DscLine  = DscLines.pop(0)
+        DscContent.append(DscLine)
+        DscLine = DscLine.strip()
+        Match = re.match("^([_a-zA-Z0-9]+).(MemoryInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+        if Match:
+            MemUpdInitOffsetValue = int(Match.group(5), 0)
+        Match = re.match("^\s*([_a-zA-Z0-9]+).(SiliconInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+        if Match:
+            SiUpdInitOffsetValue = int(Match.group(5), 0)
+        Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(0x244450554D454D24)",DscLine)
+        if Match:
+            MemUpdInitOffset = int(Match.group(3), 0)
+        Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(0x244450555F495324)",DscLine)
+        if Match:
+            SiUpdInitOffset = int(Match.group(3), 0)
+
+    if MemUpdInitOffsetValue != MemUpdInitOffset or SiUpdInitOffsetValue != SiUpdInitOffset:
+        MemUpdInitOffsetStr = "0x%08X" % MemUpdInitOffset
+        SiUpdInitOffsetStr = "0x%08X" % SiUpdInitOffset
+        DscFd = open(DscFile,"w")
+        for DscLine in DscContent:
+            Match = re.match("^\s*([_a-zA-Z0-9]+).(MemoryInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+            if Match:
+                 DscLine = re.sub(r'(?:[^\s]+\s*$)', MemUpdInitOffsetStr + '\n', DscLine)
+            Match = re.match("^\s*([_a-zA-Z0-9]+).(SiliconInitUpdOffset)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+            if Match:
+                 DscLine = re.sub(r'(?:[^\s]+\s*$)', SiUpdInitOffsetStr + '\n', line)
+            DscFd.writelines(DscLine)
+        DscFd.close()
+
 class CLogicalExpression:
     def __init__(self):
         self.index    = 0
@@ -305,7 +347,7 @@ EndList
 """
 
         self._BsfKeyList    = ['FIND','NAME','HELP','TYPE','PAGE','OPTION','ORDER']
-        self._HdrKeyList    = ['HEADER','STRUCT']
+        self._HdrKeyList    = ['HEADER','STRUCT', 'EMBED']
         self._BuidinOption  = {'$EN_DIS' : 'EN_DIS'}
 
         self._MacroDict   = {}
@@ -425,7 +467,7 @@ EndList
         DscFd.close()
 
         while len(DscLines):
-            DscLine  = DscLines.pop(0).strip()            
+            DscLine  = DscLines.pop(0).strip()
             Handle   = False
             Match    = re.match("^\[(.+)\]", DscLine)
             if Match is not None:
@@ -442,6 +484,7 @@ EndList
                     ConfigDict['name']    = ''
                     ConfigDict['find']    = ''
                     ConfigDict['struct']  = ''
+                    ConfigDict['embed']   = ''
                     ConfigDict['subreg']  = []
                     IsDefSect = False
                     IsVpdSect = True
@@ -455,6 +498,7 @@ EndList
                     ConfigDict['name']    = ''
                     ConfigDict['find']    = ''
                     ConfigDict['struct']  = ''
+                    ConfigDict['embed']   = ''
                     ConfigDict['subreg']  = []
                     IsDefSect = False
                     IsUpdSect = True
@@ -527,7 +571,6 @@ EndList
                                         if DscLine.startswith('!'):
                                             print("ERROR: Unrecoginized directive for line '%s'" % DscLine)
                                             raise SystemExit
-                                        
             if not Handle:
                 continue
 
@@ -560,7 +603,7 @@ EndList
                         for Key in self._BsfKeyList:
                             Match = re.match("(?:^|.+\s+)%s:{(.+?)}" % Key, Remaining)
                             if Match:
-                                if Key in ['HELP', 'OPTION'] and Match.group(1).startswith('+'):
+                                if Key in ['NAME', 'HELP', 'OPTION'] and Match.group(1).startswith('+'):
                                     ConfigDict[Key.lower()] += Match.group(1)[1:]
                                 else:
                                     ConfigDict[Key.lower()]  = Match.group(1)
@@ -572,7 +615,7 @@ EndList
 
                 # Check VPD/UPD
                 if IsUpdSect:
-                    Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]{4})\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+                    Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
                 else:
                     Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)(?:\s*\|\s*(.+))?",  DscLine)
                 if Match:
@@ -613,6 +656,7 @@ EndList
 
                     if ConfigDict['name']  == '':
                         # Clear BSF specific items
+                        ConfigDict['bsfname']   = ''
                         ConfigDict['help']   = ''
                         ConfigDict['type']   = ''
                         ConfigDict['option'] = ''
@@ -621,6 +665,7 @@ EndList
                     ConfigDict['name']   = ''
                     ConfigDict['find']   = ''
                     ConfigDict['struct'] = ''
+                    ConfigDict['embed']  = ''
                     ConfigDict['order']  = -1
                     ConfigDict['subreg'] = []
                 else:
@@ -774,9 +819,10 @@ EndList
         TxtFd.close()
         return 0
 
-    def CreateField (self, Item, Name, Length, Offset, Struct, Help):
+    def CreateField (self, Item, Name, Length, Offset, Struct, BsfName, Help):
         PosName    = 28
         PosComment = 30
+        NameLine=''
         HelpLine=''
 
         IsArray = False
@@ -786,7 +832,7 @@ EndList
             IsArray = True
             Type = "UINT8"
 
-        if Item['value'].startswith('{'):
+        if Item and Item['value'].startswith('{'):
             Type = "UINT8"
             IsArray = True
 
@@ -807,24 +853,63 @@ EndList
         else:
             Space1 = 1
 
-        if len(Name) < PosComment:
-            Space2 = PosComment - len(Name)
-        else:
-            Space2 = 1
+        if BsfName != '':
+            NameLine="    %s\n" % BsfName
+
         if Help != '':
-            HelpLine="   %s \n" % Help
+            HelpLine="    %s\n" % Help
 
-        return "/**Offset 0x%04X \n%s**/\n  %s%s%s;%s\n" % (Offset, HelpLine, Type, ' ' * Space1, Name, ' ' * Space2)
+        if Offset is None:
+            OffsetStr = '????'
+        else:
+            OffsetStr = '0x%04X' % Offset
 
+        return "/** Offset %s\n%s%s**/\n  %s%s%s;\n" % (OffsetStr, NameLine, HelpLine, Type, ' ' * Space1, Name,)
+
+    def PostProcessBody (self, TextBody):
+        NewTextBody = []
+        OldTextBody = []
+        IncludeLine = False
+        StructName  = ''
+        VariableName = ''
+        for Line in TextBody:
+           Match = re.match("^/\*\sEMBED_STRUCT:(\w+):(\w+):(START|END)\s\*/\s([\s\S]*)", Line)
+           if Match:
+               Line = Match.group(4)
+
+           if Match and Match.group(3) == 'START':
+               NewTextBody.append ('typedef struct {\n')
+               StructName   = Match.group(1)
+               VariableName = Match.group(2)
+               MatchOffset = re.search('/\*\*\sOffset\s0x([a-fA-F0-9]+)', Line)
+               if MatchOffset:
+                   Offset = int(MatchOffset.group(1), 16)
+               else:
+                   Offset = None
+               Line
+               IncludeLine = True
+               OldTextBody.append (self.CreateField (None, VariableName, 0, Offset, StructName, '', ''))
+           if IncludeLine:
+               NewTextBody.append (Line)
+           else:
+               OldTextBody.append (Line)
+
+           if Match and Match.group(3) == 'END':  
+               if (StructName != Match.group(1)) or (VariableName != Match.group(2)):
+                   print "Unmatched struct name '%s' and '%s' !"  % (StructName, Match.group(1))
+               else:
+                   NewTextBody.append ('} %s;\n\n' %  StructName)
+               IncludeLine = False
+        NewTextBody.extend(OldTextBody)
+        return NewTextBody
 
     def CreateHeaderFile (self, InputHeaderFile, IsInternal):
-        Error = 0
         FvDir = self._FvDir
 
         if IsInternal:
-            HeaderFile = os.path.join(FvDir, 'VpdHeader.h')
+            HeaderFile = os.path.join(FvDir, 'FspUpdVpdInternal.h')
         else:
-            HeaderFile = os.path.join(FvDir, 'fsp_vpd.h')
+            HeaderFile = os.path.join(FvDir, 'FspUpdVpd.h')
 
         # Check if header needs to be recreated
         ReCreate = False
@@ -845,36 +930,22 @@ EndList
                 self.Error = "No DSC or input header file is changed, skip the header file generating"
                 return 256
 
-        HeaderFd = open(HeaderFile, "w")
-        FileBase = os.path.basename(HeaderFile)
-        FileName = FileBase.replace(".", "_").upper()
-        HeaderFd.write("%s\n"   % (__copyright_h__ % date.today().year))
-        HeaderFd.write("#ifndef __%s__\n"   % FileName)
-        HeaderFd.write("#define __%s__\n\n" % FileName)
-        HeaderFd.write("#pragma pack(1)\n\n")
-
-        if InputHeaderFile != '':
-            if not os.path.exists(InputHeaderFile):
-                 self.Error = "Input header file '%s' does not exist" % InputHeaderFile
-                 return 2
-
-            InFd         = open(InputHeaderFile, "r")
-            IncLines     = InFd.readlines()
-            InFd.close()
-
-            Export = False
-            for Line in IncLines:
-                Match = re.search ("!EXPORT\s+EXTERNAL_BOOTLOADER_STRUCT_(BEGIN|END)\s+", Line)
-                if Match:
-                    if Match.group(1) == "BEGIN":
-                        Export = True
-                        continue
-                    else:
-                        Export = False
-                        continue
-                if Export:
-                    HeaderFd.write(Line)
-            HeaderFd.write("\n\n")
+        TxtBody = []
+        for Item in self._CfgItemList:
+           if str(Item['cname']) == 'Signature' and Item['length'] == 8:
+               Value = int(Item['value'], 16)
+               Chars = []
+               while Value != 0x0:
+                   Chars.append(chr(Value & 0xFF))
+                   Value = Value >> 8
+               SignatureStr = ''.join(Chars)
+               if int(Item['offset']) == 0:
+                   TxtBody.append("#define FSP_UPD_SIGNATURE                %s        /* '%s' */\n" % (Item['value'], SignatureStr))
+               elif 'MEM' in SignatureStr:
+                   TxtBody.append("#define FSP_MEMORY_INIT_UPD_SIGNATURE    %s        /* '%s' */\n" % (Item['value'], SignatureStr))
+               else:
+                   TxtBody.append("#define FSP_SILICON_INIT_UPD_SIGNATURE   %s        /* '%s' */\n" % (Item['value'], SignatureStr))
+        TxtBody.append("\n")
 
         for Region in ['UPD', 'VPD']:
 
@@ -882,14 +953,12 @@ EndList
             if Region[0] == 'V':
                 if 'VPD_TOOL_GUID' not in self._MacroDict:
                     self.Error = "VPD_TOOL_GUID definition is missing in DSC file"
-                    Error = 1
-                    break
+                    return 1
 
                 BinFile = os.path.join(FvDir, self._MacroDict['VPD_TOOL_GUID'] + ".bin")
                 if not os.path.exists(BinFile):
                     self.Error = "VPD binary file '%s' does not exist" % BinFile
-                    Error = 2
-                    break
+                    return 2
 
                 BinFd = open(BinFile, "rb")
                 IdStr    = BinFd.read(0x08)
@@ -897,10 +966,10 @@ EndList
                 ImageRev = struct.unpack('<I', BinFd.read(0x04))
                 BinFd.close()
 
-                HeaderFd.write("#define FSP_IMAGE_ID    0x%016X        /* '%s' */\n" % (ImageId[0], IdStr))
-                HeaderFd.write("#define FSP_IMAGE_REV   0x%08X \n\n" % ImageRev[0])
+                TxtBody.append("#define FSP_IMAGE_ID    0x%016X        /* '%s' */\n" % (ImageId[0], IdStr))
+                TxtBody.append("#define FSP_IMAGE_REV   0x%08X \n\n" % ImageRev[0])
 
-            HeaderFd.write("typedef struct _" + Region[0]  + "PD_DATA_REGION {\n")
+            TxtBody.append("typedef struct _" + Region[0]  + "PD_DATA_REGION {\n")
             NextOffset  = 0
             SpaceIdx    = 0
             Offset      = 0
@@ -922,35 +991,81 @@ EndList
                         NextVisible = True
                         Name = "Reserved" + Region[0] + "pdSpace%d" % ResvIdx
                         ResvIdx = ResvIdx + 1
-                        HeaderFd.write(self.CreateField (Item, Name, Item["offset"] - ResvOffset, ResvOffset, '', ''))
+                        TxtBody.append(self.CreateField (Item, Name, Item["offset"] - ResvOffset, ResvOffset, '', '', ''))
 
                 if  Offset < Item["offset"]:
                     if IsInternal or LastVisible:
                         Name = "Unused" + Region[0] + "pdSpace%d" % SpaceIdx
-                        LineBuffer.append(self.CreateField (Item, Name, Item["offset"] - Offset, Offset, '',''))
+                        LineBuffer.append(self.CreateField (Item, Name, Item["offset"] - Offset, Offset, '', '', ''))
                     SpaceIdx = SpaceIdx + 1
                     Offset   = Item["offset"]
 
                 if Offset != Item["offset"]:
-                    print "Unsorted offset 0x%04X\n" % Item["offset"]
-                    error = 2
-                    break;
+                    self.Error = "Unsorted offset 0x%04X\n" % Item["offset"]
+                    return 3                    
 
                 LastVisible = NextVisible
 
                 Offset = Offset + Item["length"]
                 if IsInternal or LastVisible:
                     for Each in LineBuffer:
-                        HeaderFd.write (Each)
+                        TxtBody.append (Each)
                     LineBuffer = []
-                    HeaderFd.write(self.CreateField (Item, Item["cname"], Item["length"], Item["offset"], Item['struct'], Item['help']))
+                    Embed = Item["embed"].upper()
+                    if Embed.endswith(':START') or Embed.endswith(':END'):
+                        Marker = '/* EMBED_STRUCT:%s */ ' % Item["embed"]
+                    else:
+                        if Embed == '':
+                            Marker = '';
+                        else:
+                            self.Error = "Invalid embedded structure format '%s'!\n" % Item["embed"]
+                            return 4
+                    Line = Marker + self.CreateField (Item, Item["cname"], Item["length"], Item["offset"], Item['struct'], Item['name'], Item['help'])
+                    TxtBody.append(Line)
+                    
+            TxtBody.append("} " + Region[0] + "PD_DATA_REGION;\n\n")
+        
+        # Handle the embedded data structure
+        TxtBody = self.PostProcessBody (TxtBody)
 
-            HeaderFd.write("} " + Region[0] + "PD_DATA_REGION;\n\n")
+        HeaderFd = open(HeaderFile, "w")
+        FileBase = os.path.basename(HeaderFile)
+        FileName = FileBase.replace(".", "_").upper()
+        HeaderFd.write("%s\n"   % (__copyright_h__ % date.today().year))
+        HeaderFd.write("#ifndef __%s__\n"   % FileName)
+        HeaderFd.write("#define __%s__\n\n" % FileName)
+        HeaderFd.write("#pragma pack(1)\n\n")
+
+        if InputHeaderFile != '':
+            if not os.path.exists(InputHeaderFile):
+                 self.Error = "Input header file '%s' does not exist" % InputHeaderFile
+                 return 6
+
+            InFd         = open(InputHeaderFile, "r")
+            IncLines     = InFd.readlines()
+            InFd.close()
+
+            Export = False
+            for Line in IncLines:
+                Match = re.search ("!EXPORT\s+EXTERNAL_BOOTLOADER_STRUCT_(BEGIN|END)\s+", Line)
+                if Match:
+                    if Match.group(1) == "BEGIN":
+                        Export = True
+                        continue
+                    else:
+                        Export = False
+                        continue
+                if Export:
+                    HeaderFd.write(Line)
+            HeaderFd.write("\n\n")
+            
+        for Line in TxtBody:
+            HeaderFd.write (Line)
         HeaderFd.write("#pragma pack()\n\n")
         HeaderFd.write("#endif\n")
         HeaderFd.close()
 
-        return Error
+        return 0
 
     def WriteBsfStruct  (self, BsfFd, Item):
         if Item['type'] == "None":
@@ -992,7 +1107,22 @@ EndList
         elif Item['type'].startswith("EditText"):
             BsfFd.write('    %s $%s, "%s",\n' % (Item['type'], PcdName, Item['name']));
             WriteHelp = 1
-
+        elif Item['type'] == "Table":
+            Columns = Item['option'].split(',')
+            if len(Columns) != 0:
+                BsfFd.write('    %s $%s "%s",' % (Item['type'], PcdName, Item['name']));
+                for Col in Columns:
+                    Fmt = Col.split(':')
+                    if len(Fmt) != 3:
+                        raise Exception("Column format '%s' is invalid !" % Fmt)
+                    try:
+                        Dtype = int(Fmt[1].strip())
+                    except:
+                        raise Exception("Column size '%s' is invalid !" % Fmt[1])
+                    BsfFd.write('\n        Column "%s", %d bytes, %s' % (Fmt[0].strip(), Dtype, Fmt[2].strip()))
+                BsfFd.write(',\n')
+                WriteHelp = 1
+            
         if WriteHelp  > 0:
             HelpLines = Item['help'].split('\\n\\r')
             FirstLine = True
@@ -1104,6 +1234,8 @@ def Main():
             print "ERROR: Cannot open DSC file '%s' !" % DscFile
             return 2
 
+        UpdateMemSiUpdInitOffsetValue(DscFile)
+
         OutFile = ''
         if argc > 4:
             if sys.argv[4][0] == '-':
@@ -1112,7 +1244,7 @@ def Main():
                 OutFile = sys.argv[4]
                 Start = 5
             if GenCfgOpt.ParseMacros(sys.argv[Start:]) != 0:
-                print "ERROR: %s !" % GenCfgOpt.Error
+                print "ERROR: Macro parsing failed !"
                 return 3
 
         FvDir = sys.argv[3]

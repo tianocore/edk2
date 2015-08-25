@@ -71,4 +71,18 @@ SecCarInit (
   IN FSP_TEMP_RAM_INIT_PARAMS  *TempRamInitParamPtr
   );
 
+/**
+  This function check the signture of UPD.
+
+  @param[in]  ApiIdx           Internal index of the FSP API.
+  @param[in]  ApiParam         Parameter of the FSP API.
+
+**/
+EFI_STATUS
+EFIAPI
+FspUpdSignatureCheck (
+  IN UINT32   ApiIdx,
+  IN VOID     *ApiParam
+  );
+
 #endif

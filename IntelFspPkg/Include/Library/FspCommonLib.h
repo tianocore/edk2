@@ -158,6 +158,50 @@ GetFspUpdDataPointer (
   );
 
 /**
+  This function sets the memory init UPD data pointer.
+
+  @param[in] MemoryInitUpdPtr   memory init UPD data pointer.
+**/
+VOID
+EFIAPI
+SetFspMemoryInitUpdDataPointer (
+  IN VOID    *MemoryInitUpdPtr
+  );
+
+/**
+  This function gets the memory init UPD data pointer.
+
+  @return memory init UPD data pointer.
+**/
+VOID *
+EFIAPI
+GetFspMemoryInitUpdDataPointer (
+  VOID
+  );
+
+/**
+  This function sets the silicon init UPD data pointer.
+
+  @param[in] SiliconInitUpdPtr   silicon init UPD data pointer.
+**/
+VOID
+EFIAPI
+SetFspSiliconInitUpdDataPointer (
+  IN VOID    *SiliconInitUpdPtr
+  );
+
+/**
+  This function gets the silicon init UPD data pointer.
+
+  @return silicon init UPD data pointer.
+**/
+VOID *
+EFIAPI
+GetFspSiliconInitUpdDataPointer (
+  VOID
+  );
+
+/**
   Set FSP measurement point timestamp.
 
   @param[in] Id       Measurement point ID.
