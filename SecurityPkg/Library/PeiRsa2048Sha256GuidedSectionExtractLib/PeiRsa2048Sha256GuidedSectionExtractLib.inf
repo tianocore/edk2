@@ -49,7 +49,7 @@
   PcdLib
   PerformanceLib
 
-[PcdEx]  
+[Pcd]  
   gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer      ## SOMETIMES_CONSUMES
   
 [Guids]

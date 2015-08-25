@@ -4,7 +4,7 @@
   to parse RSA 2048 SHA 256 encapsulation section and extract raw data.
   It uses the BaseCrypyLib based on OpenSSL to authenticate the signature.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -256,7 +256,7 @@ Rsa2048Sha256GuidedSectionHandler (
   DEBUG ((DEBUG_VERBOSE, "PeiPcdRsa2048Sha256: PublicKeyBuffer = %p\n", PublicKey));
   ASSERT (PublicKey != NULL);
   DEBUG ((DEBUG_VERBOSE, "PeiPcdRsa2048Sha256: PublicKeyBuffer Token = %08x\n", PcdToken (PcdRsa2048Sha256PublicKeyBuffer)));
-  PublicKeyBufferSize = LibPcdGetExSize (&gEfiSecurityPkgTokenSpaceGuid, PcdToken (PcdRsa2048Sha256PublicKeyBuffer));
+  PublicKeyBufferSize = PcdGetSize (PcdRsa2048Sha256PublicKeyBuffer);
   DEBUG ((DEBUG_VERBOSE, "PeiPcdRsa2048Sha256: PublicKeyBuffer Size = %08x\n", PublicKeyBufferSize));
   ASSERT ((PublicKeyBufferSize % SHA256_DIGEST_SIZE) == 0);
   CryptoStatus = FALSE;
