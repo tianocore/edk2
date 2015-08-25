@@ -1,0 +1,88 @@
+## @file
+#  NULL class library to register var check handler and variable property set for UEFI defined variables.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions
+#  of the BSD License which accompanies this distribution.  The
+#  full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VarCheckUefiLib
+  MODULE_UNI_FILE                = VarCheckUefiLib.uni
+  FILE_GUID                      = AC24A4C7-F845-4665-90E5-6431D6E28DC0
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  CONSTRUCTOR                    = VarCheckUefiLibNullClassConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  VarCheckUefiLibNullClass.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  VarCheckLib
+
+[Guids]
+  ## CONSUMES   ## Variable:L"LangCodes"
+  ## CONSUMES   ## Variable:L"Lang"
+  ## CONSUMES   ## Variable:L"Timeout"
+  ## CONSUMES   ## Variable:L"PlatformLangCodes"
+  ## CONSUMES   ## Variable:L"PlatformLang"
+  ## CONSUMES   ## Variable:L"ConIn"
+  ## CONSUMES   ## Variable:L"ConOut"
+  ## CONSUMES   ## Variable:L"ErrOut"
+  ## CONSUMES   ## Variable:L"ConInDev"
+  ## CONSUMES   ## Variable:L"ConOutDev"
+  ## CONSUMES   ## Variable:L"ErrOutDev"
+  ## CONSUMES   ## Variable:L"BootOrder"
+  ## CONSUMES   ## Variable:L"BootNext"
+  ## CONSUMES   ## Variable:L"BootCurrent"
+  ## CONSUMES   ## Variable:L"BootOptionSupport"
+  ## CONSUMES   ## Variable:L"DriverOrder"
+  ## CONSUMES   ## Variable:L"SysPrepOrder"
+  ## CONSUMES   ## Variable:L"HwErrRecSupport"
+  ## CONSUMES   ## Variable:L"SetupMode"
+  ## CONSUMES   ## Variable:L"PK"
+  ## CONSUMES   ## Variable:L"KEK"
+  ## CONSUMES   ## Variable:L"SignatureSupport"
+  ## CONSUMES   ## Variable:L"SecureBoot"
+  ## CONSUMES   ## Variable:L"KEKDefault"
+  ## CONSUMES   ## Variable:L"PKDefault"
+  ## CONSUMES   ## Variable:L"dbDefault"
+  ## CONSUMES   ## Variable:L"dbxDefault"
+  ## CONSUMES   ## Variable:L"dbtDefault"
+  ## CONSUMES   ## Variable:L"OsIndicationsSupported"
+  ## CONSUMES   ## Variable:L"OsIndications"
+  ## CONSUMES   ## Variable:L"VendorKeys"
+  ## CONSUMES   ## Variable:L"Boot####"
+  ## CONSUMES   ## Variable:L"Driver####"
+  ## CONSUMES   ## Variable:L"SysPrep####"
+  ## CONSUMES   ## Variable:L"Key####"
+  gEfiGlobalVariableGuid
+  ## CONSUMES   ## Variable:L"DB"
+  ## CONSUMES   ## Variable:L"DBX"
+  ## CONSUMES   ## Variable:L"DBT"
+  gEfiImageSecurityDatabaseGuid
+  gEfiHardwareErrorVariableGuid  ## CONSUMES    ## Variable:L"HwErrRec####"
