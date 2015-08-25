@@ -42,20 +42,15 @@ VARIABLE_STORE_HEADER  *mNvVariableCache      = NULL;
 VARIABLE_INFO_ENTRY    *gVariableInfo         = NULL;
 
 ///
-/// The list to store the variables which cannot be set after the EFI_END_OF_DXE_EVENT_GROUP_GUID
-/// or EVT_GROUP_READY_TO_BOOT event.
-///
-LIST_ENTRY             mLockedVariableList    = INITIALIZE_LIST_HEAD_VARIABLE (mLockedVariableList);
-
-///
 /// The flag to indicate whether the platform has left the DXE phase of execution.
 ///
 BOOLEAN                mEndOfDxe              = FALSE;
 
 ///
-/// The flag to indicate whether the variable storage locking is enabled.
+/// It indicates the var check request source.
+/// In the implementation, DXE is regarded as untrusted, and SMM is trusted.
 ///
-BOOLEAN                mEnableLocking         = TRUE;
+VAR_CHECK_REQUEST_SOURCE mRequestSource       = VarCheckFromUntrusted;
 
 //
 // It will record the current boot error flag before EndOfDxe.
@@ -76,7 +71,7 @@ VARIABLE_ENTRY_PROPERTY mVariableEntryProperty[] = {
   },
 };
 
-AUTH_VAR_LIB_CONTEXT_IN mContextIn = {
+AUTH_VAR_LIB_CONTEXT_IN mAuthContextIn = {
   AUTH_VAR_LIB_CONTEXT_IN_STRUCT_VERSION,
   //
   // StructSize, TO BE FILLED
@@ -94,7 +89,7 @@ AUTH_VAR_LIB_CONTEXT_IN mContextIn = {
   VariableExLibAtRuntime,
 };
 
-AUTH_VAR_LIB_CONTEXT_OUT mContextOut;
+AUTH_VAR_LIB_CONTEXT_OUT mAuthContextOut;
 
 /**
 
@@ -878,7 +873,7 @@ IsUserVariable (
   // then no need to check if the variable is user variable or not specially.
   //
   if (mEndOfDxe && (mVariableModuleGlobal->CommonMaxUserVariableSpace != mVariableModuleGlobal->CommonVariableSpace)) {
-    if (InternalVarCheckVariablePropertyGet (GetVariableNamePtr (Variable), GetVendorGuidPtr (Variable), &Property) == EFI_NOT_FOUND) {
+    if (VarCheckLibVariablePropertyGet (GetVariableNamePtr (Variable), GetVendorGuidPtr (Variable), &Property) == EFI_NOT_FOUND) {
       return TRUE;
     }
   }
@@ -910,7 +905,7 @@ CalculateCommonUserVariableTotalSize (
       NextVariable = GetNextVariablePtr (Variable);
       VariableSize = (UINTN) NextVariable - (UINTN) Variable;
       if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
-        if (InternalVarCheckVariablePropertyGet (GetVariableNamePtr (Variable), GetVendorGuidPtr (Variable), &Property) == EFI_NOT_FOUND) {
+        if (VarCheckLibVariablePropertyGet (GetVariableNamePtr (Variable), GetVendorGuidPtr (Variable), &Property) == EFI_NOT_FOUND) {
           //
           // No property, it is user variable.
           //
@@ -932,12 +927,9 @@ InitializeVariableQuota (
   VOID
   )
 {
-  STATIC BOOLEAN    Initialized;
-
-  if (!mEndOfDxe || Initialized) {
+  if (!mEndOfDxe) {
     return;
   }
-  Initialized = TRUE;
 
   InitializeVarErrorFlag ();
   CalculateCommonUserVariableTotalSize ();
@@ -2770,131 +2762,6 @@ Done:
 }
 
 /**
-  Check if a Unicode character is a hexadecimal character.
-
-  This function checks if a Unicode character is a
-  hexadecimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-
-  @param Char           The character to check against.
-
-  @retval TRUE          If the Char is a hexadecmial character.
-  @retval FALSE         If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-IsHexaDecimalDigitCharacter (
-  IN CHAR16             Char
-  )
-{
-  return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F') || (Char >= L'a' && Char <= L'f'));
-}
-
-/**
-
-  This code checks if variable is hardware error record variable or not.
-
-  According to UEFI spec, hardware error record variable should use the EFI_HARDWARE_ERROR_VARIABLE VendorGuid
-  and have the L"HwErrRec####" name convention, #### is a printed hex value and no 0x or h is included in the hex value.
-
-  @param VariableName   Pointer to variable name.
-  @param VendorGuid     Variable Vendor Guid.
-
-  @retval TRUE          Variable is hardware error record variable.
-  @retval FALSE         Variable is not hardware error record variable.
-
-**/
-BOOLEAN
-EFIAPI
-IsHwErrRecVariable (
-  IN CHAR16             *VariableName,
-  IN EFI_GUID           *VendorGuid
-  )
-{
-  if (!CompareGuid (VendorGuid, &gEfiHardwareErrorVariableGuid) ||
-      (StrLen (VariableName) != StrLen (L"HwErrRec####")) ||
-      (StrnCmp(VariableName, L"HwErrRec", StrLen (L"HwErrRec")) != 0) ||
-      !IsHexaDecimalDigitCharacter (VariableName[0x8]) ||
-      !IsHexaDecimalDigitCharacter (VariableName[0x9]) ||
-      !IsHexaDecimalDigitCharacter (VariableName[0xA]) ||
-      !IsHexaDecimalDigitCharacter (VariableName[0xB])) {
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
-  Mark a variable that will become read-only after leaving the DXE phase of execution.
-
-
-  @param[in] This          The VARIABLE_LOCK_PROTOCOL instance.
-  @param[in] VariableName  A pointer to the variable name that will be made read-only subsequently.
-  @param[in] VendorGuid    A pointer to the vendor GUID that will be made read-only subsequently.
-
-  @retval EFI_SUCCESS           The variable specified by the VariableName and the VendorGuid was marked
-                                as pending to be read-only.
-  @retval EFI_INVALID_PARAMETER VariableName or VendorGuid is NULL.
-                                Or VariableName is an empty string.
-  @retval EFI_ACCESS_DENIED     EFI_END_OF_DXE_EVENT_GROUP_GUID or EFI_EVENT_GROUP_READY_TO_BOOT has
-                                already been signaled.
-  @retval EFI_OUT_OF_RESOURCES  There is not enough resource to hold the lock request.
-**/
-EFI_STATUS
-EFIAPI
-VariableLockRequestToLock (
-  IN CONST EDKII_VARIABLE_LOCK_PROTOCOL *This,
-  IN       CHAR16                       *VariableName,
-  IN       EFI_GUID                     *VendorGuid
-  )
-{
-  VARIABLE_ENTRY                  *Entry;
-  CHAR16                          *Name;
-  LIST_ENTRY                      *Link;
-  VARIABLE_ENTRY                  *LockedEntry;
-
-  if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (mEndOfDxe) {
-    return EFI_ACCESS_DENIED;
-  }
-
-  Entry = AllocateRuntimeZeroPool (sizeof (*Entry) + StrSize (VariableName));
-  if (Entry == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  DEBUG ((EFI_D_INFO, "[Variable] Lock: %g:%s\n", VendorGuid, VariableName));
-
-  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
-
-  for ( Link = GetFirstNode (&mLockedVariableList)
-      ; !IsNull (&mLockedVariableList, Link)
-      ; Link = GetNextNode (&mLockedVariableList, Link)
-      ) {
-    LockedEntry = BASE_CR (Link, VARIABLE_ENTRY, Link);
-    Name = (CHAR16 *) ((UINTN) LockedEntry + sizeof (*LockedEntry));
-    if (CompareGuid (&LockedEntry->Guid, VendorGuid) && (StrCmp (Name, VariableName) == 0)) {
-      goto Done;
-    }
-  }
-
-  Name = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
-  StrCpyS (Name, StrSize (VariableName)/sizeof(CHAR16), VariableName);
-  CopyGuid (&Entry->Guid, VendorGuid);
-  InsertTailList (&mLockedVariableList, &Entry->Link);
-
-Done:
-  ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
-
-  return EFI_SUCCESS;
-}
-
-/**
 
   This code finds variable in storage blocks (Volatile or Non-Volatile).
 
@@ -3211,9 +3078,6 @@ VariableServiceSetVariable (
   VARIABLE_HEADER                     *NextVariable;
   EFI_PHYSICAL_ADDRESS                Point;
   UINTN                               PayloadSize;
-  LIST_ENTRY                          *Link;
-  VARIABLE_ENTRY                      *Entry;
-  CHAR16                              *Name;
 
   //
   // Check input parameters.
@@ -3301,9 +3165,6 @@ VariableServiceSetVariable (
     if (StrSize (VariableName) + PayloadSize > PcdGet32 (PcdMaxHardwareErrorVariableSize) - GetVariableHeaderSize ()) {
       return EFI_INVALID_PARAMETER;
     }
-    if (!IsHwErrRecVariable(VariableName, VendorGuid)) {
-      return EFI_INVALID_PARAMETER;
-    }
   } else {
     //
     //  The size of the VariableName, including the Unicode Null in bytes plus
@@ -3320,7 +3181,7 @@ VariableServiceSetVariable (
     }
   }
 
-  Status = InternalVarCheckSetVariableCheck (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *) ((UINTN) Data + DataSize - PayloadSize));
+  Status = VarCheckLibSetVariableCheck (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *) ((UINTN) Data + DataSize - PayloadSize), mRequestSource);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -3340,24 +3201,6 @@ VariableServiceSetVariable (
       NextVariable = GetNextVariablePtr (NextVariable);
     }
     mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) Point;
-  }
-
-  if (mEndOfDxe && mEnableLocking) {
-    //
-    // Treat the variables listed in the forbidden variable list as read-only after leaving DXE phase.
-    //
-    for ( Link = GetFirstNode (&mLockedVariableList)
-        ; !IsNull (&mLockedVariableList, Link)
-        ; Link = GetNextNode (&mLockedVariableList, Link)
-        ) {
-      Entry = BASE_CR (Link, VARIABLE_ENTRY, Link);
-      Name = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
-      if (CompareGuid (&Entry->Guid, VendorGuid) && (StrCmp (Name, VariableName) == 0)) {
-        Status = EFI_WRITE_PROTECTED;
-        DEBUG ((EFI_D_INFO, "[Variable]: Changing readonly variable after leaving DXE phase - %g:%s\n", VendorGuid, VariableName));
-        goto Done;
-      }
-    }
   }
 
   //
@@ -4064,21 +3907,21 @@ VariableWriteServiceInitialize (
   FlushHobVariableToFlash (NULL, NULL);
 
   Status = EFI_SUCCESS;
-  ZeroMem (&mContextOut, sizeof (mContextOut));
+  ZeroMem (&mAuthContextOut, sizeof (mAuthContextOut));
   if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
     //
     // Authenticated variable initialize.
     //
-    mContextIn.StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_IN);
-    mContextIn.MaxAuthVariableSize = mVariableModuleGlobal->MaxAuthVariableSize - GetVariableHeaderSize ();
-    Status = AuthVariableLibInitialize (&mContextIn, &mContextOut);
+    mAuthContextIn.StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_IN);
+    mAuthContextIn.MaxAuthVariableSize = mVariableModuleGlobal->MaxAuthVariableSize - GetVariableHeaderSize ();
+    Status = AuthVariableLibInitialize (&mAuthContextIn, &mAuthContextOut);
     if (!EFI_ERROR (Status)) {
       DEBUG ((EFI_D_INFO, "Variable driver will work with auth variable support!\n"));
       mVariableModuleGlobal->VariableGlobal.AuthSupport = TRUE;
-      if (mContextOut.AuthVarEntry != NULL) {
-        for (Index = 0; Index < mContextOut.AuthVarEntryCount; Index++) {
-          VariableEntry = &mContextOut.AuthVarEntry[Index];
-          Status = InternalVarCheckVariablePropertySet (
+      if (mAuthContextOut.AuthVarEntry != NULL) {
+        for (Index = 0; Index < mAuthContextOut.AuthVarEntryCount; Index++) {
+          VariableEntry = &mAuthContextOut.AuthVarEntry[Index];
+          Status = VarCheckLibVariablePropertySet (
                      VariableEntry->Name,
                      VariableEntry->Guid,
                      &VariableEntry->VariableProperty
@@ -4097,7 +3940,7 @@ VariableWriteServiceInitialize (
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < sizeof (mVariableEntryProperty) / sizeof (mVariableEntryProperty[0]); Index++) {
       VariableEntry = &mVariableEntryProperty[Index];
-      Status = InternalVarCheckVariablePropertySet (VariableEntry->Name, VariableEntry->Guid, &VariableEntry->VariableProperty);
+      Status = VarCheckLibVariablePropertySet (VariableEntry->Name, VariableEntry->Guid, &VariableEntry->VariableProperty);
       ASSERT_EFI_ERROR (Status);
     }
   }

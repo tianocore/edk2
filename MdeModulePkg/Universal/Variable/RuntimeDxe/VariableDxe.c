@@ -21,11 +21,9 @@ extern VARIABLE_INFO_ENTRY     *gVariableInfo;
 EFI_HANDLE                     mHandle                    = NULL;
 EFI_EVENT                      mVirtualAddressChangeEvent = NULL;
 EFI_EVENT                      mFtwRegistration           = NULL;
-extern LIST_ENTRY              mLockedVariableList;
-extern LIST_ENTRY              mVarCheckVariableList;
-extern UINT32                  mNumberOfHandler;
-extern VAR_CHECK_SET_VARIABLE_CHECK_HANDLER *mHandlerTable;
 extern BOOLEAN                 mEndOfDxe;
+VOID                           ***mVarCheckAddressPointer = NULL;
+UINTN                          mVarCheckAddressPointerCount = 0;
 EDKII_VARIABLE_LOCK_PROTOCOL   mVariableLock              = { VariableLockRequestToLock };
 EDKII_VAR_CHECK_PROTOCOL       mVarCheck                  = { VarCheckRegisterSetVariableCheckHandler,
                                                               VarCheckVariablePropertySet,
@@ -227,7 +225,6 @@ VariableClassAddressChangeEvent (
   IN VOID                                 *Context
   )
 {
-  EFI_STATUS     Status;
   UINTN          Index;
 
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
@@ -246,20 +243,16 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.HobVariableBase);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
   EfiConvertPointer (0x0, (VOID **) &mNvVariableCache);
-  EfiConvertPointer (0x0, (VOID **) &mHandlerTable);
-  for (Index = 0; Index < mNumberOfHandler; Index++) {
-    EfiConvertPointer (0x0, (VOID **) &mHandlerTable[Index]);
+
+  if (mAuthContextOut.AddressPointer != NULL) {
+    for (Index = 0; Index < mAuthContextOut.AddressPointerCount; Index++) {
+      EfiConvertPointer (0x0, (VOID **) mAuthContextOut.AddressPointer[Index]);
+    }
   }
 
-  Status = EfiConvertList (0x0, &mLockedVariableList);
-  ASSERT_EFI_ERROR (Status);
-
-  Status = EfiConvertList (0x0, &mVarCheckVariableList);
-  ASSERT_EFI_ERROR (Status);
-
-  if (mContextOut.AddressPointer != NULL) {
-    for (Index = 0; Index < mContextOut.AddressPointerCount; Index++) {
-      EfiConvertPointer (0x0, (VOID **) mContextOut.AddressPointer[Index]);
+  if (mVarCheckAddressPointer != NULL) {
+    for (Index = 0; Index < mVarCheckAddressPointerCount; Index++) {
+      EfiConvertPointer (0x0, (VOID **) mVarCheckAddressPointer[Index]);
     }
   }
 }
@@ -283,14 +276,17 @@ OnReadyToBoot (
   VOID                                    *Context
   )
 {
-  //
-  // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
-  //
-  mEndOfDxe = TRUE;
-  //
-  // The initialization for variable quota.
-  //
-  InitializeVariableQuota ();
+  if (!mEndOfDxe) {
+    //
+    // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
+    //
+    mEndOfDxe = TRUE;
+    mVarCheckAddressPointer = VarCheckLibInitializeAtEndOfDxe (&mVarCheckAddressPointerCount);
+    //
+    // The initialization for variable quota.
+    //
+    InitializeVariableQuota ();
+  }
   ReclaimForOS ();
   if (FeaturePcdGet (PcdVariableCollectStatistics)) {
     if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
@@ -319,7 +315,9 @@ OnEndOfDxe (
   VOID                                    *Context
   )
 {
+  DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
   mEndOfDxe = TRUE;
+  mVarCheckAddressPointer = VarCheckLibInitializeAtEndOfDxe (&mVarCheckAddressPointerCount);
   //
   // The initialization for variable quota.
   //

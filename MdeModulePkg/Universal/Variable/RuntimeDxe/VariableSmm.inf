@@ -69,9 +69,9 @@
   DxeServicesTableLib
   HobLib
   PcdLib
-  DevicePathLib
   SmmMemLib
   AuthVariableLib
+  VarCheckLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
@@ -101,23 +101,10 @@
   ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
   ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
   ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
-  ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRecSupport"
-  ## SOMETIMES_CONSUMES   ## Variable:L"SetupMode"
-  ## SOMETIMES_CONSUMES   ## Variable:L"PK"
-  ## SOMETIMES_CONSUMES   ## Variable:L"KEK"
-  ## SOMETIMES_CONSUMES   ## Variable:L"SecureBoot"
-  ## SOMETIMES_CONSUMES   ## Variable:L"SignatureSupport"
-  ## SOMETIMES_CONSUMES   ## Variable:L"VendorKeys"
   gEfiGlobalVariableGuid
-
-  ## SOMETIMES_CONSUMES   ## Variable:L"DB"
-  ## SOMETIMES_CONSUMES   ## Variable:L"DBX"
-  ## SOMETIMES_CONSUMES   ## Variable:L"DBT"
-  gEfiImageSecurityDatabaseGuid
 
   gSmmVariableWriteGuid                         ## PRODUCES             ## GUID # Install protocol
   gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
-  gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRec####"
   gEdkiiFaultTolerantWriteGuid                  ## SOMETIMES_CONSUMES   ## HOB
   gEdkiiVarErrorFlagGuid                        ## CONSUMES             ## GUID
   gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID

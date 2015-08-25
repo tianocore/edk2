@@ -45,7 +45,7 @@ BOOLEAN                                              mAtRuntime              = F
 UINT8                                                *mVariableBufferPayload = NULL;
 UINTN                                                mVariableBufferPayloadSize;
 extern BOOLEAN                                       mEndOfDxe;
-extern BOOLEAN                                       mEnableLocking;
+extern VAR_CHECK_REQUEST_SOURCE                      mRequestSource;
 
 /**
   SecureBoot Hook for SetVariable.
@@ -97,7 +97,7 @@ SmmVariableSetVariable (
   //
   // Disable write protection when the calling SetVariable() through EFI_SMM_VARIABLE_PROTOCOL.
   //
-  mEnableLocking = FALSE;
+  mRequestSource = VarCheckFromTrusted;
   Status         = VariableServiceSetVariable (
                      VariableName,
                      VendorGuid,
@@ -105,7 +105,7 @@ SmmVariableSetVariable (
                      DataSize,
                      Data
                      );
-  mEnableLocking = TRUE;
+  mRequestSource = VarCheckFromUntrusted;
   return Status;
 }
 
@@ -666,14 +666,17 @@ SmmVariableHandler (
       break;
 
     case SMM_VARIABLE_FUNCTION_READY_TO_BOOT:
-      mEndOfDxe = TRUE;
-      //
-      // The initialization for variable quota.
-      //
-      InitializeVariableQuota ();
       if (AtRuntime()) {
         Status = EFI_UNSUPPORTED;
         break;
+      }
+      if (!mEndOfDxe) {
+        mEndOfDxe = TRUE;
+        VarCheckLibInitializeAtEndOfDxe (NULL);
+        //
+        // The initialization for variable quota.
+        //
+        InitializeVariableQuota ();
       }
       ReclaimForOS ();
       Status = EFI_SUCCESS;
@@ -800,8 +803,9 @@ SmmEndOfDxeCallback (
   IN EFI_HANDLE                           Handle
   )
 {
-  DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
+  DEBUG ((EFI_D_INFO, "[Variable]SMM_END_OF_DXE is signaled\n"));
   mEndOfDxe = TRUE;
+  VarCheckLibInitializeAtEndOfDxe (NULL);
   //
   // The initialization for variable quota.
   //
@@ -809,6 +813,7 @@ SmmEndOfDxeCallback (
   if (PcdGetBool (PcdReclaimVariableSpaceAtEndOfDxe)) {
     ReclaimForOS ();
   }
+
   return EFI_SUCCESS;
 }
 
