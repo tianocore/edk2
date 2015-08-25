@@ -127,6 +127,10 @@
   #
   VarCheckLib|Include/Library/VarCheckLib.h
 
+  ## @libraryclass  Provides services to get variable error flag and do platform variable cleanup.
+  #
+  PlatformVarCleanupLib|Include/Library/PlatformVarCleanupLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
