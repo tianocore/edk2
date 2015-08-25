@@ -19,7 +19,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = UefiShellLevel3CommandsLib
   FILE_GUID                      = 71374B42-85D7-4753-AD17-AA84C3A0EB93
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = ShellLevel3CommandsLibConstructor

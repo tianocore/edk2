@@ -16,7 +16,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = UefiShellDebug1CommandsLib
   FILE_GUID                      = 90330D51-A99B-4cc8-A2EB-AE22542A3F45
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = UefiShellDebug1CommandsLibConstructor

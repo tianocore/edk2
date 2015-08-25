@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = UefiShellTftpCommandLib
   FILE_GUID                      = D2B61A25-9835-4E5D-906A-15615E1FF668
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = ShellTftpCommandLibConstructor
