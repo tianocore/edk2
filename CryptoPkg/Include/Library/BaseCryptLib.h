@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __BASE_CRYPT_LIB_H__
 #define __BASE_CRYPT_LIB_H__
+
+#include <Uefi/UefiBaseType.h>
 
 ///
 /// MD4 digest size in bytes
@@ -37,6 +39,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// SHA-256 digest size in bytes
 ///
 #define SHA256_DIGEST_SIZE  32
+
+///
+/// SHA-384 digest size in bytes
+///
+#define SHA384_DIGEST_SIZE  48
+
+///
+/// SHA-512 digest size in bytes
+///
+#define SHA512_DIGEST_SIZE  64
 
 ///
 /// TDES block size in bytes
@@ -513,6 +525,215 @@ Sha256Final (
   OUT     UINT8  *HashValue
   );
 
+/**
+  Retrieves the size, in bytes, of the context buffer required for SHA-384 hash operations.
+
+  @return  The size, in bytes, of the context buffer required for SHA-384 hash operations.
+
+**/
+UINTN
+EFIAPI
+Sha384GetContextSize (
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory pointed by Sha384Context as SHA-384 hash context for
+  subsequent use.
+
+  If Sha384Context is NULL, then return FALSE.
+
+  @param[out]  Sha384Context  Pointer to SHA-384 context being initialized.
+
+  @retval TRUE   SHA-384 context initialization succeeded.
+  @retval FALSE  SHA-384 context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha384Init (
+  OUT  VOID  *Sha384Context
+  );
+
+/**
+  Makes a copy of an existing SHA-384 context.
+
+  If Sha384Context is NULL, then return FALSE.
+  If NewSha384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Sha384Context     Pointer to SHA-384 context being copied.
+  @param[out] NewSha384Context  Pointer to new SHA-384 context.
+
+  @retval TRUE   SHA-384 context copy succeeded.
+  @retval FALSE  SHA-384 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha384Duplicate (
+  IN   CONST VOID  *Sha384Context,
+  OUT  VOID        *NewSha384Context
+  );
+
+/**
+  Digests the input data and updates SHA-384 context.
+
+  This function performs SHA-384 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHA-384 context should be already correctly intialized by Sha384Init(), and should not be finalized
+  by Sha384Final(). Behavior with invalid context is undefined.
+
+  If Sha384Context is NULL, then return FALSE.
+
+  @param[in, out]  Sha384Context  Pointer to the SHA-384 context.
+  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize       Size of Data buffer in bytes.
+
+  @retval TRUE   SHA-384 data digest succeeded.
+  @retval FALSE  SHA-384 data digest failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha384Update (
+  IN OUT  VOID        *Sha384Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the SHA-384 digest value.
+
+  This function completes SHA-384 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA-384 context cannot
+  be used again.
+  SHA-384 context should be already correctly intialized by Sha384Init(), and should not be
+  finalized by Sha384Final(). Behavior with invalid SHA-384 context is undefined.
+
+  If Sha384Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+
+  @param[in, out]  Sha384Context  Pointer to the SHA-384 context.
+  @param[out]      HashValue      Pointer to a buffer that receives the SHA-384 digest
+                                  value (48 bytes).
+
+  @retval TRUE   SHA-384 digest computation succeeded.
+  @retval FALSE  SHA-384 digest computation failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha384Final (
+  IN OUT  VOID   *Sha384Context,
+  OUT     UINT8  *HashValue
+  );
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for SHA-512 hash operations.
+
+  @return  The size, in bytes, of the context buffer required for SHA-512 hash operations.
+
+**/
+UINTN
+EFIAPI
+Sha512GetContextSize (
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory pointed by Sha512Context as SHA-512 hash context for
+  subsequent use.
+
+  If Sha512Context is NULL, then return FALSE.
+
+  @param[out]  Sha512Context  Pointer to SHA-512 context being initialized.
+
+  @retval TRUE   SHA-512 context initialization succeeded.
+  @retval FALSE  SHA-512 context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha512Init (
+  OUT  VOID  *Sha512Context
+  );
+
+/**
+  Makes a copy of an existing SHA-512 context.
+
+  If Sha512Context is NULL, then return FALSE.
+  If NewSha512Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Sha512Context     Pointer to SHA-512 context being copied.
+  @param[out] NewSha512Context  Pointer to new SHA-512 context.
+
+  @retval TRUE   SHA-512 context copy succeeded.
+  @retval FALSE  SHA-512 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha512Duplicate (
+  IN   CONST VOID  *Sha512Context,
+  OUT  VOID        *NewSha512Context
+  );
+
+/**
+  Digests the input data and updates SHA-512 context.
+
+  This function performs SHA-512 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHA-512 context should be already correctly intialized by Sha512Init(), and should not be finalized
+  by Sha512Final(). Behavior with invalid context is undefined.
+
+  If Sha512Context is NULL, then return FALSE.
+
+  @param[in, out]  Sha512Context  Pointer to the SHA-512 context.
+  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize       Size of Data buffer in bytes.
+
+  @retval TRUE   SHA-512 data digest succeeded.
+  @retval FALSE  SHA-512 data digest failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha512Update (
+  IN OUT  VOID        *Sha512Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the SHA-512 digest value.
+
+  This function completes SHA-512 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA-512 context cannot
+  be used again.
+  SHA-512 context should be already correctly intialized by Sha512Init(), and should not be
+  finalized by Sha512Final(). Behavior with invalid SHA-512 context is undefined.
+
+  If Sha512Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+
+  @param[in, out]  Sha512Context  Pointer to the SHA-512 context.
+  @param[out]      HashValue      Pointer to a buffer that receives the SHA-512 digest
+                                  value (64 bytes).
+
+  @retval TRUE   SHA-512 digest computation succeeded.
+  @retval FALSE  SHA-512 digest computation failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha512Final (
+  IN OUT  VOID   *Sha512Context,
+  OUT     UINT8  *HashValue
+  );
 
 //=====================================================================================
 //    MAC (Message Authentication Code) Primitive
@@ -753,7 +974,6 @@ HmacSha1Final (
   IN OUT  VOID   *HmacSha1Context,
   OUT     UINT8  *HmacValue
   );
-
 
 //=====================================================================================
 //    Symmetric Cryptography Primitive
@@ -1395,7 +1615,7 @@ RsaGetKey (
   @param[in, out]  RsaContext           Pointer to RSA context being set.
   @param[in]       ModulusLength        Length of RSA modulus N in bits.
   @param[in]       PublicExponent       Pointer to RSA public exponent.
-  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes. 
+  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
 
   @retval  TRUE   RSA key component was generated successfully.
   @retval  FALSE  Invalid RSA key component tag.
@@ -1413,6 +1633,8 @@ RsaGenerateKey (
 
 /**
   Validates key components of RSA context.
+  NOTE: This function performs integrity checks on all the RSA key material, so
+        the RSA key structure must contain all the private key data.
 
   This function validates key compoents of RSA context in following aspects:
   - Whether p is a prime
@@ -1519,7 +1741,6 @@ RsaPkcs1Verify (
   @retval  TRUE   RSA Private Key was retrieved successfully.
   @retval  FALSE  Invalid PEM key data or incorrect password.
   @retval  FALSE  This interface is not supported.
-  
 
 **/
 BOOLEAN
@@ -1642,13 +1863,13 @@ X509ConstructCertificate (
   If X509Stack is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
+  @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
                               On output, pointer to the X509 stack object with new
                               inserted X509 certificate.
   @param           ...        A list of DER-encoded single certificate data followed
                               by certificate size. A NULL terminates the list. The
                               pairs are the arguments to X509ConstructCertificate().
-                                 
+
   @retval     TRUE            The X509 stack construction succeeded.
   @retval     FALSE           The construction operation failed.
   @retval     FALSE           This interface is not supported.
@@ -1658,7 +1879,7 @@ BOOLEAN
 EFIAPI
 X509ConstructCertificateStack (
   IN OUT  UINT8  **X509Stack,
-  ...  
+  ...
   );
 
 /**
@@ -1687,6 +1908,32 @@ VOID
 EFIAPI
 X509StackFree (
   IN  VOID  *X509Stack
+  );
+
+/**
+  Retrieve the TBSCertificate from one given X.509 certificate.
+
+  @param[in]      Cert         Pointer to the given DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     TBSCert      DER-Encoded To-Be-Signed certificate.
+  @param[out]     TBSCertSize  Size of the TBS certificate in bytes.
+
+  If Cert is NULL, then return FALSE.
+  If TBSCert is NULL, then return FALSE.
+  If TBSCertSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @retval  TRUE   The TBSCertificate was retrieved successfully.
+  @retval  FALSE  Invalid X.509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetTBSCert (
+  IN  CONST UINT8  *Cert,
+  IN  UINTN        CertSize,
+  OUT UINT8        **TBSCert,
+  OUT UINTN        *TBSCertSize
   );
 
 /**
@@ -1811,6 +2058,35 @@ Pkcs7Verify (
   );
 
 /**
+  Extracts the attached content from a PKCS#7 signed data if existed. The input signed
+  data could be wrapped in a ContentInfo structure.
+
+  If P7Data, Content, or ContentSize is NULL, then return FALSE. If P7Length overflow,
+  then return FAlSE. If the P7Data is not correctly formatted, then return FALSE.
+
+  Caution: This function may receive untrusted input. So this function will do
+           basic check for PKCS#7 data structure.
+
+  @param[in]   P7Data       Pointer to the PKCS#7 signed data to process.
+  @param[in]   P7Length     Length of the PKCS#7 signed data in bytes.
+  @param[out]  Content      Pointer to the extracted content from the PKCS#7 signedData.
+                            It's caller's responsiblity to free the buffer.
+  @param[out]  ContentSize  The size of the extracted content in bytes.
+
+  @retval     TRUE          The P7Data was correctly formatted for processing.
+  @retval     FALSE         The P7Data was not correctly formatted for processing.
+
+*/
+BOOLEAN
+EFIAPI
+Pkcs7GetAttachedContent (
+  IN  CONST UINT8  *P7Data,
+  IN  UINTN        P7Length,
+  OUT VOID         **Content,
+  OUT UINTN        *ContentSize
+  );
+
+/**
   Verifies the validility of a PE/COFF Authenticode Signature as described in "Windows
   Authenticode Portable Executable Signature Format".
 
@@ -1843,6 +2119,36 @@ AuthenticodeVerify (
   IN  UINTN        CertSize,
   IN  CONST UINT8  *ImageHash,
   IN  UINTN        HashSize
+  );
+
+/**
+  Verifies the validility of a RFC3161 Timestamp CounterSignature embedded in PE/COFF Authenticode
+  signature.
+
+  If AuthData is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  AuthData     Pointer to the Authenticode Signature retrieved from signed
+                           PE/COFF image to be verified.
+  @param[in]  DataSize     Size of the Authenticode Signature in bytes.
+  @param[in]  TsaCert      Pointer to a trusted/root TSA certificate encoded in DER, which
+                           is used for TSA certificate chain verification.
+  @param[in]  CertSize     Size of the trusted certificate in bytes.
+  @param[out] SigningTime  Return the time of timestamp generation time if the timestamp
+                           signature is valid.
+
+  @retval  TRUE   The specified Authenticode includes a valid RFC3161 Timestamp CounterSignature.
+  @retval  FALSE  No valid RFC3161 Timestamp CounterSignature in the specified Authenticode data.
+
+**/
+BOOLEAN
+EFIAPI
+ImageTimestampVerify (
+  IN  CONST UINT8  *AuthData,
+  IN  UINTN        DataSize,
+  IN  CONST UINT8  *TsaCert,
+  IN  UINTN        CertSize,
+  OUT EFI_TIME     *SigningTime
   );
 
 //=====================================================================================
@@ -1882,7 +2188,7 @@ DhFree (
 
   Given generator g, and length of prime number p in bits, this function generates p,
   and sets DH context according to value of g and p.
-  
+
   Before this function can be invoked, pseudorandom number generator must be correctly
   initialized by RandomSeed().
 
@@ -1945,7 +2251,7 @@ DhSetParameter (
 /**
   Generates DH public key.
 
-  This function generates random secret exponent, and computes the public key, which is 
+  This function generates random secret exponent, and computes the public key, which is
   returned via parameter PublicKey and PublicKeySize. DH context is updated accordingly.
   If the PublicKey buffer is too small to hold the public key, FALSE is returned and
   PublicKeySize is set to the required buffer size to obtain the public key.

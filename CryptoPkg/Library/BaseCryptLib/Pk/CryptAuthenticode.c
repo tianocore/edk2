@@ -9,7 +9,7 @@
   AuthenticodeVerify() will get PE/COFF Authenticode and will do basic check for
   data structure.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -72,6 +72,7 @@ AuthenticodeVerify (
 {
   BOOLEAN      Status;
   PKCS7        *Pkcs7;
+  CONST UINT8  *Temp;
   CONST UINT8  *OrigAuthData;
   UINT8        *SpcIndirectDataContent;
   UINT8        Asn1Byte;
@@ -96,7 +97,8 @@ AuthenticodeVerify (
   //
   // Retrieve & Parse PKCS#7 Data (DER encoding) from Authenticode Signature
   //
-  Pkcs7 = d2i_PKCS7 (NULL, &AuthData, (int)DataSize);
+  Temp  = AuthData;
+  Pkcs7 = d2i_PKCS7 (NULL, &Temp, (int)DataSize);
   if (Pkcs7 == NULL) {
     goto _Exit;
   }
@@ -123,7 +125,7 @@ AuthenticodeVerify (
     // Un-matched SPC_INDIRECT_DATA_OBJID.
     //
     goto _Exit;
-  }  
+  }
 
 
   SpcIndirectDataContent = (UINT8 *)(Pkcs7->d.sign->contents->d.other->value.asn1_string->data);
@@ -135,16 +137,27 @@ AuthenticodeVerify (
 
   if ((Asn1Byte & 0x80) == 0) {
     //
-    // Short Form of Length Encoding
+    // Short Form of Length Encoding (Length < 128)
     //
     ContentSize = (UINTN) (Asn1Byte & 0x7F);
     //
     // Skip the SEQUENCE Tag;
     //
     SpcIndirectDataContent += 2;
+
+  } else if ((Asn1Byte & 0x81) == 0x81) {
+    //
+    // Long Form of Length Encoding (128 <= Length < 255, Single Octet)
+    //
+    ContentSize = (UINTN) (*(UINT8 *)(SpcIndirectDataContent + 2));
+    //
+    // Skip the SEQUENCE Tag;
+    //
+    SpcIndirectDataContent += 3;
+
   } else if ((Asn1Byte & 0x82) == 0x82) {
     //
-    // Long Form of Length Encoding, only support two bytes.
+    // Long Form of Length Encoding (Length > 255, Two Octet)
     //
     ContentSize = (UINTN) (*(UINT8 *)(SpcIndirectDataContent + 2));
     ContentSize = (ContentSize << 8) + (UINTN)(*(UINT8 *)(SpcIndirectDataContent + 3));
@@ -152,6 +165,7 @@ AuthenticodeVerify (
     // Skip the SEQUENCE Tag;
     //
     SpcIndirectDataContent += 4;
+
   } else {
     goto _Exit;
   }

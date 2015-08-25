@@ -1,7 +1,7 @@
 /** @file
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,8 @@ X509ConstructCertificate (
   OUT  UINT8        **SingleX509Cert
   )
 {
-  X509     *X509Cert;
+  X509         *X509Cert;
+  CONST UINT8  *Temp;
 
   //
   // Check input parameters.
@@ -50,7 +51,8 @@ X509ConstructCertificate (
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
   //
-  X509Cert = d2i_X509 (NULL, &Cert, (long) CertSize);
+  Temp     = Cert;
+  X509Cert = d2i_X509 (NULL, &Temp, (long) CertSize);
   if (X509Cert == NULL) {
     return FALSE;
   }
@@ -65,7 +67,7 @@ X509ConstructCertificate (
 
   If X509Stack is NULL, then return FALSE.
 
-  @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
+  @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
                               On output, pointer to the X509 stack object with new
                               inserted X509 certificate.
   @param           ...        A list of DER-encoded single certificate data followed
@@ -123,17 +125,23 @@ X509ConstructCertificateStack (
     }
 
     CertSize = VA_ARG (Args, UINTN);
+    if (CertSize == 0) {
+      break;
+    }
 
     //
     // Construct X509 Object from the given DER-encoded certificate data.
     //
+    X509Cert = NULL;
     Status = X509ConstructCertificate (
                (CONST UINT8 *) Cert,
                CertSize,
                (UINT8 **) &X509Cert
                );
     if (!Status) {
-      X509_free (X509Cert);
+      if (X509Cert != NULL) {
+        X509_free (X509Cert);
+      }
       break;
     }
 
@@ -483,4 +491,81 @@ _Exit:
   }
   
   return Status;
+}
+
+/**
+  Retrieve the TBSCertificate from one given X.509 certificate.
+
+  @param[in]      Cert         Pointer to the given DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     TBSCert      DER-Encoded To-Be-Signed certificate.
+  @param[out]     TBSCertSize  Size of the TBS certificate in bytes.
+
+  If Cert is NULL, then return FALSE.
+  If TBSCert is NULL, then return FALSE.
+  If TBSCertSize is NULL, then return FALSE.
+
+  @retval  TRUE   The TBSCertificate was retrieved successfully.
+  @retval  FALSE  Invalid X.509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetTBSCert (
+  IN  CONST UINT8  *Cert,
+  IN  UINTN        CertSize,
+  OUT UINT8        **TBSCert,
+  OUT UINTN        *TBSCertSize
+  )
+{
+  CONST UINT8  *Temp;
+  INTN         Asn1Tag;
+  INTN         ObjClass;
+  UINTN        Length;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (TBSCert == NULL) ||
+      (TBSCertSize == NULL) || (CertSize > INT_MAX)) {
+    return FALSE;
+  }
+
+  //
+  // An X.509 Certificate is: (defined in RFC3280)
+  //   Certificate  ::=  SEQUENCE  {
+  //     tbsCertificate       TBSCertificate,
+  //     signatureAlgorithm   AlgorithmIdentifier,
+  //     signature            BIT STRING }
+  //
+  // and
+  //
+  //  TBSCertificate  ::=  SEQUENCE  {
+  //    version         [0]  Version DEFAULT v1,
+  //    ...
+  //    }
+  //
+  // So we can just ASN1-parse the x.509 DER-encoded data. If we strip
+  // the first SEQUENCE, the second SEQUENCE is the TBSCertificate.
+  //
+  Temp = Cert;
+  ASN1_get_object (&Temp, (long *)&Length, (int *)&Asn1Tag, (int *)&ObjClass, (long)CertSize);
+
+  if (Asn1Tag != V_ASN1_SEQUENCE) {
+    return FALSE;
+  }
+
+  *TBSCert = (UINT8 *)Temp;
+
+  ASN1_get_object (&Temp, (long *)&Length, (int *)&Asn1Tag, (int *)&ObjClass, (long)Length);
+  //
+  // Verify the parsed TBSCertificate is one correct SEQUENCE data.
+  //
+  if (Asn1Tag != V_ASN1_SEQUENCE) {
+    return FALSE;
+  }
+
+  *TBSCertSize = Length + (Temp - *TBSCert);
+  
+  return TRUE;
 }
