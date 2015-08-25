@@ -267,6 +267,7 @@
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
 !endif
+  VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
 !if $(RC_BINARY_RELEASE) == TRUE
   I2cLib|Vlv2TbltDevicePkg/Library/I2CLib/I2CLibNull.inf
 !endif
