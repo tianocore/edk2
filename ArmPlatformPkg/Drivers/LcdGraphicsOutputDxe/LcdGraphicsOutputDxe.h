@@ -106,7 +106,7 @@ InitializeDisplay (
 );
 
 EFI_STATUS
-LcdIndentify (
+LcdIdentify (
   VOID
 );
 

@@ -156,6 +156,11 @@ LcdGraphicsOutputDxeInitialize (
   EFI_STATUS  Status = EFI_SUCCESS;
   LCD_INSTANCE* Instance;
 
+  Status = LcdIdentify ();
+  if (EFI_ERROR(Status)) {
+    goto EXIT;
+  }
+
   Status = LcdInstanceContructor (&Instance);
   if (EFI_ERROR(Status)) {
     goto EXIT;

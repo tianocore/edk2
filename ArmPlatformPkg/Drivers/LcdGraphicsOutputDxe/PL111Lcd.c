@@ -27,6 +27,28 @@
  **********************************************************************/
 
 EFI_STATUS
+LcdIdentify (
+  VOID
+  )
+{
+  DEBUG ((EFI_D_WARN, "Probing ID registers at 0x%lx for a PL111\n",
+    PL111_REG_CLCD_PERIPH_ID_0));
+
+  // Check if this is a PL111
+  if (MmioRead8 (PL111_REG_CLCD_PERIPH_ID_0) == PL111_CLCD_PERIPH_ID_0 &&
+      MmioRead8 (PL111_REG_CLCD_PERIPH_ID_1) == PL111_CLCD_PERIPH_ID_1 &&
+     (MmioRead8 (PL111_REG_CLCD_PERIPH_ID_2) & 0xf) == PL111_CLCD_PERIPH_ID_2 &&
+      MmioRead8 (PL111_REG_CLCD_PERIPH_ID_3) == PL111_CLCD_PERIPH_ID_3 &&
+      MmioRead8 (PL111_REG_CLCD_P_CELL_ID_0) == PL111_CLCD_P_CELL_ID_0 &&
+      MmioRead8 (PL111_REG_CLCD_P_CELL_ID_1) == PL111_CLCD_P_CELL_ID_1 &&
+      MmioRead8 (PL111_REG_CLCD_P_CELL_ID_2) == PL111_CLCD_P_CELL_ID_2 &&
+      MmioRead8 (PL111_REG_CLCD_P_CELL_ID_3) == PL111_CLCD_P_CELL_ID_3) {
+    return EFI_SUCCESS;
+  }
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
 LcdInitialize (
   IN EFI_PHYSICAL_ADDRESS   VramBaseAddress
   )

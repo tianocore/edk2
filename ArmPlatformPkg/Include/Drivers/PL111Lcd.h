@@ -47,6 +47,15 @@
 #define PL111_REG_CLCD_P_CELL_ID_2        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFF8)
 #define PL111_REG_CLCD_P_CELL_ID_3        ((UINTN)PcdGet32 (PcdPL111LcdBase) + 0xFFC)
 
+#define PL111_CLCD_PERIPH_ID_0            0x11
+#define PL111_CLCD_PERIPH_ID_1            0x11
+#define PL111_CLCD_PERIPH_ID_2            0x04
+#define PL111_CLCD_PERIPH_ID_3            0x00
+#define PL111_CLCD_P_CELL_ID_0            0x0D
+#define PL111_CLCD_P_CELL_ID_1            0xF0
+#define PL111_CLCD_P_CELL_ID_2            0x05
+#define PL111_CLCD_P_CELL_ID_3            0xB1
+
 /**********************************************************************/
 
 // Register components (register bits)
