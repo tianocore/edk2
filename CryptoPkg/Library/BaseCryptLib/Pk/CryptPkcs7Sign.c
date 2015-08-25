@@ -1,7 +1,7 @@
 /** @file
   PKCS#7 SignedData Sign Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -116,9 +116,9 @@ Pkcs7Sign (
   if (Key == NULL) {
     goto _Exit;
   }
-  Key->save_type = EVP_PKEY_RSA;
-  Key->type      = EVP_PKEY_type (EVP_PKEY_RSA);
-  Key->pkey.rsa  = (RSA *) RsaContext;
+  if (EVP_PKEY_assign_RSA (Key, (RSA *) RsaContext) == 0) {
+    goto _Exit;
+  }
 
   //
   // Convert the data to be signed to BIO format. 
@@ -175,7 +175,7 @@ Pkcs7Sign (
   }
 
   CopyMem (*SignedData, P7Data + 19, *SignedDataSize);
-  
+
   OPENSSL_free (P7Data);
 
   Status = TRUE;

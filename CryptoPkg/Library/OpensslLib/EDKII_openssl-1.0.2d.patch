@@ -1,0 +1,380 @@
+diff U3 crypto/bio/bio.h crypto/bio/bio.h
+--- crypto/bio/bio.h	Thu Jun 11 21:50:12 2015
++++ crypto/bio/bio.h	Fri Jun 12 11:00:52 2015
+@@ -646,10 +646,10 @@
+ int BIO_asn1_get_suffix(BIO *b, asn1_ps_func **psuffix,
+                         asn1_ps_func **psuffix_free);
+ 
+-# ifndef OPENSSL_NO_FP_API
+ BIO_METHOD *BIO_s_file(void);
+ BIO *BIO_new_file(const char *filename, const char *mode);
+ BIO *BIO_new_fp(FILE *stream, int close_flag);
++# ifndef OPENSSL_NO_FP_API
+ #  define BIO_s_file_internal    BIO_s_file
+ # endif
+ BIO *BIO_new(BIO_METHOD *type);
+diff U3 crypto/bio/bss_file.c crypto/bio/bss_file.c
+--- crypto/bio/bss_file.c	Thu Jun 11 21:01:06 2015
++++ crypto/bio/bss_file.c	Fri Jun 12 11:01:28 2015
+@@ -460,6 +460,23 @@
+     return (ret);
+ }
+ 
++# else
++
++BIO_METHOD *BIO_s_file(void)
++{
++    return NULL;
++}
++
++BIO *BIO_new_file(const char *filename, const char *mode)
++{
++    return NULL;
++}
++
++BIO *BIO_new_fp(FILE *stream, int close_flag)
++{
++    return NULL;
++}
++
+ # endif                         /* OPENSSL_NO_STDIO */
+ 
+ #endif                          /* HEADER_BSS_FILE_C */
+diff U3 crypto/dh/dh_pmeth.c crypto/dh/dh_pmeth.c
+--- crypto/dh/dh_pmeth.c	Thu Jun 11 21:50:12 2015
++++ crypto/dh/dh_pmeth.c	Fri Jun 12 11:08:48 2015
+@@ -449,6 +449,9 @@
+         *keylen = ret;
+         return 1;
+     } else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
++#ifdef OPENSSL_NO_CMS
++        return 0;
++#else
+         unsigned char *Z = NULL;
+         size_t Zlen = 0;
+         if (!dctx->kdf_outlen || !dctx->kdf_oid)
+@@ -478,6 +481,7 @@
+             OPENSSL_free(Z);
+         }
+         return ret;
++#endif
+     }
+     return 1;
+ }
+diff U3 crypto/pem/pem.h crypto/pem/pem.h
+--- crypto/pem/pem.h	Thu Jun 11 21:50:12 2015
++++ crypto/pem/pem.h	Fri Jun 12 10:58:18 2015
+@@ -324,6 +324,7 @@
+ 
+ #  define DECLARE_PEM_read_fp(name, type) /**/
+ #  define DECLARE_PEM_write_fp(name, type) /**/
++#  define DECLARE_PEM_write_fp_const(name, type) /**/
+ #  define DECLARE_PEM_write_cb_fp(name, type) /**/
+ # else
+ 
+diff U3 crypto/pkcs7/pk7_smime.c crypto/pkcs7/pk7_smime.c
+--- crypto/pkcs7/pk7_smime.c	Thu Jun 11 21:01:06 2015
++++ crypto/pkcs7/pk7_smime.c	Fri Jun 12 11:23:38 2015
+@@ -254,7 +254,8 @@
+     STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
+     PKCS7_SIGNER_INFO *si;
+     X509_STORE_CTX cert_ctx;
+-    char buf[4096];
++    char *buf = NULL;
++    int bufsiz;
+     int i, j = 0, k, ret = 0;
+     BIO *p7bio;
+     BIO *tmpin, *tmpout;
+@@ -365,9 +366,14 @@
+     } else
+         tmpout = out;
+ 
++    bufsiz = 4096;
++    buf = OPENSSL_malloc(bufsiz);
++    if (buf == NULL) {
++        goto err;
++    }
+     /* We now have to 'read' from p7bio to calculate digests etc. */
+     for (;;) {
+-        i = BIO_read(p7bio, buf, sizeof(buf));
++        i = BIO_read(p7bio, buf, bufsiz);
+         if (i <= 0)
+             break;
+         if (tmpout)
+@@ -406,6 +412,10 @@
+     BIO_free_all(p7bio);
+ 
+     sk_X509_free(signers);
++
++    if (buf != NULL) {
++      OPENSSL_free(buf);
++    }
+ 
+     return ret;
+ }
+diff U3 crypto/rand/rand_unix.c crypto/rand/rand_unix.c
+--- crypto/rand/rand_unix.c	Thu Jun 11 21:01:06 2015
++++ crypto/rand/rand_unix.c	Fri Jun 12 10:51:21 2015
+@@ -116,7 +116,7 @@
+ #include <openssl/rand.h>
+ #include "rand_lcl.h"
+ 
+-#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE))
++#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_UEFI))
+ 
+ # include <sys/types.h>
+ # include <sys/time.h>
+@@ -439,7 +439,7 @@
+                                  * defined(OPENSSL_SYS_VXWORKS) ||
+                                  * defined(OPENSSL_SYS_NETWARE)) */
+ 
+-#if defined(OPENSSL_SYS_VXWORKS)
++#if defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_poll(void)
+ {
+     return 0;
+diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
+--- crypto/rsa/rsa_ameth.c	Thu Jun 11 21:50:12 2015
++++ crypto/rsa/rsa_ameth.c	Fri Jun 12 10:45:38 2015
+@@ -68,10 +68,12 @@
+ #endif
+ #include "asn1_locl.h"
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_sign(CMS_SignerInfo *si);
+ static int rsa_cms_verify(CMS_SignerInfo *si);
+ static int rsa_cms_decrypt(CMS_RecipientInfo *ri);
+ static int rsa_cms_encrypt(CMS_RecipientInfo *ri);
++#endif
+ 
+ static int rsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
+ {
+@@ -665,6 +667,7 @@
+     return rv;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_verify(CMS_SignerInfo *si)
+ {
+     int nid, nid2;
+@@ -683,6 +686,7 @@
+     }
+     return 0;
+ }
++#endif
+ 
+ /*
+  * Customised RSA item verification routine. This is called when a signature
+@@ -705,6 +709,7 @@
+     return -1;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_sign(CMS_SignerInfo *si)
+ {
+     int pad_mode = RSA_PKCS1_PADDING;
+@@ -729,6 +734,7 @@
+     X509_ALGOR_set0(alg, OBJ_nid2obj(NID_rsassaPss), V_ASN1_SEQUENCE, os);
+     return 1;
+ }
++#endif
+ 
+ static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
+                          X509_ALGOR *alg1, X509_ALGOR *alg2,
+@@ -785,6 +791,7 @@
+     return pss;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+ {
+     EVP_PKEY_CTX *pkctx;
+@@ -857,7 +864,9 @@
+         X509_ALGOR_free(maskHash);
+     return rv;
+ }
++#endif
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
+ {
+     const EVP_MD *md, *mgf1md;
+@@ -920,6 +929,7 @@
+         ASN1_STRING_free(os);
+     return rv;
+ }
++#endif
+ 
+ const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
+     {
+diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
+--- crypto/x509/x509_vfy.c	Thu Jun 11 21:52:58 2015
++++ crypto/x509/x509_vfy.c	Fri Jun 12 11:29:37 2015
+@@ -1653,6 +1653,10 @@
+ 
+ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
+ {
++#ifdef OPENSSL_SYS_UEFI
++    /* Bypass Certificate Time Checking for UEFI version. */
++    return 1;
++#else
+     time_t *ptime;
+     int i;
+ 
+@@ -1692,6 +1696,7 @@
+     }
+ 
+     return 1;
++#endif
+ }
+ 
+ static int internal_verify(X509_STORE_CTX *ctx)
+diff U3 crypto/x509v3/ext_dat.h crypto/x509v3/ext_dat.h
+--- crypto/x509v3/ext_dat.h	Thu Jun 11 21:50:12 2015
++++ crypto/x509v3/ext_dat.h	Fri Jun 12 11:11:03 2015
+@@ -127,8 +127,10 @@
+     &v3_idp,
+     &v3_alt[2],
+     &v3_freshest_crl,
++#ifndef OPENSSL_SYS_UEFI
+     &v3_ct_scts[0],
+     &v3_ct_scts[1],
++#endif
+ };
+ 
+ /* Number of standard extensions */
+diff U3 crypto/crypto.h crypto/crypto.h
+--- crypto/crypto.h	Thu Jun 11 21:01:06 2015
++++ crypto/crypto.h	Fri Jun 12 11:33:27 2015
+@@ -235,15 +235,15 @@
+ # ifndef OPENSSL_NO_LOCKING
+ #  ifndef CRYPTO_w_lock
+ #   define CRYPTO_w_lock(type)     \
+-        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,NULL,0)
+ #   define CRYPTO_w_unlock(type)   \
+-        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,NULL,0)
+ #   define CRYPTO_r_lock(type)     \
+-        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,NULL,0)
+ #   define CRYPTO_r_unlock(type)   \
+-        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,NULL,0)
+ #   define CRYPTO_add(addr,amount,type)    \
+-        CRYPTO_add_lock(addr,amount,type,__FILE__,__LINE__)
++        CRYPTO_add_lock(addr,amount,type,NULL,0)
+ #  endif
+ # else
+ #  define CRYPTO_w_lock(a)
+@@ -378,19 +378,19 @@
+ # define MemCheck_off()  CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_DISABLE)
+ # define is_MemCheck_on() CRYPTO_is_mem_check_on()
+ 
+-# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,__FILE__,__LINE__)
+-# define OPENSSL_strdup(str)     CRYPTO_strdup((str),__FILE__,__LINE__)
++# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,NULL,0)
++# define OPENSSL_strdup(str)     CRYPTO_strdup((str),NULL,0)
+ # define OPENSSL_realloc(addr,num) \
+-        CRYPTO_realloc((char *)addr,(int)num,__FILE__,__LINE__)
++        CRYPTO_realloc((char *)addr,(int)num,NULL,0)
+ # define OPENSSL_realloc_clean(addr,old_num,num) \
+-        CRYPTO_realloc_clean(addr,old_num,num,__FILE__,__LINE__)
++        CRYPTO_realloc_clean(addr,old_num,num,NULL,0)
+ # define OPENSSL_remalloc(addr,num) \
+-        CRYPTO_remalloc((char **)addr,(int)num,__FILE__,__LINE__)
++        CRYPTO_remalloc((char **)addr,(int)num,NULL,0)
+ # define OPENSSL_freeFunc        CRYPTO_free
+ # define OPENSSL_free(addr)      CRYPTO_free(addr)
+ 
+ # define OPENSSL_malloc_locked(num) \
+-        CRYPTO_malloc_locked((int)num,__FILE__,__LINE__)
++        CRYPTO_malloc_locked((int)num,NULL,0)
+ # define OPENSSL_free_locked(addr) CRYPTO_free_locked(addr)
+ 
+ const char *SSLeay_version(int type);
+@@ -545,7 +545,7 @@
+ long CRYPTO_get_mem_debug_options(void);
+ 
+ # define CRYPTO_push_info(info) \
+-        CRYPTO_push_info_(info, __FILE__, __LINE__);
++        CRYPTO_push_info_(info, NULL, 0);
+ int CRYPTO_push_info_(const char *info, const char *file, int line);
+ int CRYPTO_pop_info(void);
+ int CRYPTO_remove_all_info(void);
+@@ -588,7 +588,7 @@
+ 
+ /* die if we have to */
+ void OpenSSLDie(const char *file, int line, const char *assertion);
+-# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(__FILE__, __LINE__, #e),1))
++# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(NULL, 0, #e),1))
+ 
+ unsigned long *OPENSSL_ia32cap_loc(void);
+ # define OPENSSL_ia32cap (*(OPENSSL_ia32cap_loc()))
+@@ -605,14 +605,14 @@
+ #  define fips_md_init_ctx(alg, cx) \
+         int alg##_Init(cx##_CTX *c) \
+         { \
+-        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
++        if (FIPS_mode()) OpenSSLDie(NULL, 0, \
+                 "Low level API call to digest " #alg " forbidden in FIPS mode!"); \
+         return private_##alg##_Init(c); \
+         } \
+         int private_##alg##_Init(cx##_CTX *c)
+ 
+ #  define fips_cipher_abort(alg) \
+-        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
++        if (FIPS_mode()) OpenSSLDie(NULL, 0, \
+                 "Low level API call to cipher " #alg " forbidden in FIPS mode!")
+ 
+ # else
+diff U3 crypto/opensslconf.h crypto/opensslconf.h
+--- crypto/opensslconf.h	Thu Jun 11 21:55:38 2015
++++ crypto/opensslconf.h	Fri Jun 12 10:28:27 2015
+@@ -159,9 +159,12 @@
+ /* Should we define BN_DIV2W here? */
+ 
+ /* Only one for the following should be defined */
++/* Bypass the following definitions for UEFI version. */
++#if !defined(OPENSSL_SYS_UEFI)
+ #undef SIXTY_FOUR_BIT_LONG
+ #undef SIXTY_FOUR_BIT
+ #define THIRTY_TWO_BIT
++#endif
+ #endif
+ 
+ #if defined(HEADER_RC4_LOCL_H) && !defined(CONFIG_HEADER_RC4_LOCL_H)
+diff U3 crypto/err/err.c crypto/err/err.c
+--- crypto/err/err.c
++++ crypto/err/err.c
+@@ -1072,7 +1072,12 @@ void ERR_set_error_data(char *data, int flags)
+     es->err_data_flags[i] = flags;
+ }
+ 
++/* Add EFIAPI for UEFI version. */
++#if defined(OPENSSL_SYS_UEFI)
++void EFIAPI ERR_add_error_data(int num, ...)
++#else
+ void ERR_add_error_data(int num, ...)
++#endif
+ {
+     va_list args;
+     va_start(args, num);
+diff U3 crypto/err/err.h crypto/err/err.h
+--- crypto/err/err.h
++++ crypto/err/err.h
+@@ -344,7 +344,14 @@ void ERR_print_errors_fp(FILE *fp);
+ # ifndef OPENSSL_NO_BIO
+ void ERR_print_errors(BIO *bp);
+ # endif
++
++/* Add EFIAPI for UEFI version. */
++#if defined(OPENSSL_SYS_UEFI)
++void EFIAPI ERR_add_error_data(int num, ...);
++#else
+ void ERR_add_error_data(int num, ...);
++#endif
++
+ void ERR_add_error_vdata(int num, va_list args);
+ void ERR_load_strings(int lib, ERR_STRING_DATA str[]);
+ void ERR_unload_strings(int lib, ERR_STRING_DATA str[]);

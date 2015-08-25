@@ -38,6 +38,7 @@
   RsaVerify.c
   RsaVerify2.c
   AuthenticodeVerify.c
+  TSVerify.c
   DhVerify.c
   RandVerify.c
   

@@ -3,24 +3,25 @@
 #
 #  Caution: This module requires additional review when modified.
 #  This library will have external input - signature.
-#  This external input must be validated carefully to avoid security issues such as 
+#  This external input must be validated carefully to avoid security issues such as
 #  buffer overflow or integer overflow.
 #
-#  Note: MD4 Digest functions, HMAC-MD5 functions, HMAC-SHA1 functions, AES/
-#  TDES/ARC4 functions, RSA external functions, PKCS#7 SignedData sign functions,
-#  Diffie-Hellman functions, X.509 certificate handler functions, authenticode
-#  signature verification functions, PEM handler functions, and pseudorandom number
-#  generator functions are not supported in this instance.
+#  Note: MD4 Digest functions, SHA-384 Digest functions, SHA-512 Digest functions,
+#  HMAC-MD5 functions, HMAC-SHA1 functions, AES/TDES/ARC4 functions, RSA external 
+#  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, X.509 
+#  certificate handler functions, authenticode signature verification functions, 
+#  PEM handler functions, and pseudorandom number generator functions are not 
+#  supported in this instance.
 #
 #  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]
@@ -43,6 +44,7 @@
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
+  Hash/CryptSha512Null.c
   Hmac/CryptHmacMd5Null.c
   Hmac/CryptHmacSha1Null.c
   Cipher/CryptAesNull.c
@@ -57,6 +59,7 @@
   Pk/CryptDhNull.c
   Pk/CryptX509Null.c
   Pk/CryptAuthenticodeNull.c
+  Pk/CryptTsNull.c
   Pem/CryptPemNull.c
 
   Rand/CryptRandNull.c
@@ -64,26 +67,6 @@
   SysCall/CrtWrapper.c
   SysCall/ConstantTimeClock.c
   SysCall/BaseMemAllocation.c
-
-
-[Sources.Ia32]
-  SysCall/Ia32/MathMultS64x64.c     | MSFT
-  SysCall/Ia32/MathDivU64x64.c      | MSFT
-  SysCall/Ia32/MathReminderU64x64.c | MSFT
-  SysCall/Ia32/MathLShiftS64.c      | MSFT
-  SysCall/Ia32/MathRShiftU64.c      | MSFT
-
-  SysCall/Ia32/MathMultS64x64.c     | INTEL
-  SysCall/Ia32/MathDivU64x64.c      | INTEL
-  SysCall/Ia32/MathReminderU64x64.c | INTEL
-  SysCall/Ia32/MathLShiftS64.c      | INTEL
-  SysCall/Ia32/MathRShiftU64.c      | INTEL
-
-  SysCall/Ia32/MathMultS64x64.S     | GCC
-  SysCall/Ia32/MathDivU64x64.S      | GCC
-  SysCall/Ia32/MathReminderU64x64.S | GCC
-  SysCall/Ia32/MathLShiftS64.S      | GCC
-  SysCall/Ia32/MathRShiftU64.S      | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -102,4 +85,3 @@
 #
 [BuildOptions]
   GCC:*_GCC44_IA32_CC_FLAGS = "-D__cdecl=__attribute__((cdecl))" "-D__declspec(t)=__attribute__((t))"
-  

@@ -56,7 +56,7 @@ Md5Init (
   //
   // Check input parameters.
   //
-  if ((Md5Context == NULL)) {
+  if (Md5Context == NULL) {
     return FALSE;
   }
 

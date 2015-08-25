@@ -243,7 +243,9 @@ _Exit:
 }
 
 /**
-  Validates key components of RSA context.
+  Validates key components of RSA context. 
+  NOTE: This function performs integrity checks on all the RSA key material, so
+        the RSA key structure must contain all the private key data.
 
   This function validates key compoents of RSA context in following aspects:
   - Whether p is a prime
