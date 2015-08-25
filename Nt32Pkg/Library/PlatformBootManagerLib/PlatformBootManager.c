@@ -19,91 +19,46 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_GUID mUefiShellFileGuid = { 0x7C04A583, 0x9E3E, 0x4f1c, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 };
 
 /**
-  Perform the memory test base on the memory test intensive level,
-  and update the memory resource.
+  Perform the platform diagnostic, such like test memory. OEM/IBV also
+  can customize this function to support specific platform diagnostic.
 
-  @param  Level         The memory test intensive level.
-
-  @retval EFI_STATUS    Success test all the system memory and update
-                        the memory resource
+  @param MemoryTestLevel  The memory test intensive level
+  @param QuietBoot        Indicate if need to enable the quiet boot
 
 **/
-EFI_STATUS
-PlatformBootManagerMemoryTest (
-  IN EXTENDMEM_COVERAGE_LEVEL Level
+VOID
+PlatformBootManagerDiagnostics (
+  IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
+  IN BOOLEAN                     QuietBoot
   )
 {
-  EFI_STATUS                        Status;
-  BOOLEAN                           RequireSoftECCInit;
-  EFI_GENERIC_MEMORY_TEST_PROTOCOL  *GenMemoryTest;
-  UINT64                            TestedMemorySize;
-  UINT64                            TotalMemorySize;
-  UINTN                             TestPercent;
-  UINT64                            PreviousValue;
-  BOOLEAN                           ErrorOut;
-  UINT32                            TempData;
+  EFI_STATUS                     Status;
 
-  TestedMemorySize  = 0;
-  TotalMemorySize   = 0;
-  PreviousValue     = 0;
+  //
+  // Here we can decide if we need to show
+  // the diagnostics screen
+  // Notes: this quiet boot code should be remove
+  // from the graphic lib
+  //
+  if (QuietBoot) {
+    PlatformBootManagerEnableQuietBoot (PcdGetPtr(PcdLogoFile));
 
-  RequireSoftECCInit = FALSE;
+    //
+    // Perform system diagnostic
+    //
+    Status = PlatformBootManagerMemoryTest (MemoryTestLevel);
+    if (EFI_ERROR (Status)) {
+      PlatformBootManagerDisableQuietBoot ();
+    }
 
-  Status = gBS->LocateProtocol (
-                  &gEfiGenericMemTestProtocolGuid,
-                  NULL,
-                  (VOID **) &GenMemoryTest
-                  );
-  if (EFI_ERROR (Status)) {
-    return EFI_SUCCESS;
+    return;
   }
 
-  Status = GenMemoryTest->MemoryTestInit (
-                            GenMemoryTest,
-                            Level,
-                            &RequireSoftECCInit
-                            );
-  if (Status == EFI_NO_MEDIA) {
-    //
-    // The PEI codes also have the relevant memory test code to check the memory,
-    // it can select to test some range of the memory or all of them. If PEI code
-    // checks all the memory, this BDS memory test will has no not-test memory to
-    // do the test, and then the status of EFI_NO_MEDIA will be returned by
-    // "MemoryTestInit". So it does not need to test memory again, just return.
-    //
-    return EFI_SUCCESS;
-  }
-
-  do {
-    Status = GenMemoryTest->PerformMemoryTest (
-                              GenMemoryTest,
-                              &TestedMemorySize,
-                              &TotalMemorySize,
-                              &ErrorOut,
-                              FALSE
-                              );
-    if (ErrorOut && (Status == EFI_DEVICE_ERROR)) {
-      Print (L"System encounters memory errors!");
-      CpuDeadLoop ();
-    }
-    
-    TempData = (UINT32) DivU64x32 (TotalMemorySize, 16);
-    TestPercent = (UINTN) DivU64x32 (
-                            DivU64x32 (MultU64x32 (TestedMemorySize, 100), 16),
-                            TempData
-                            );
-    if (TestPercent != PreviousValue) {
-      Print (L"Perform memory test: %d/100", TestPercent);
-      PreviousValue = TestPercent;
-    }
-  } while (Status != EFI_NOT_FOUND);
-
-  Status = GenMemoryTest->Finished (GenMemoryTest);
-
-  Print (L"\r%dM bytes of system memory tested OK\n", (UINT32) DivU64x32 (TotalMemorySize, 1024 * 1024));
-  return EFI_SUCCESS;
+  //
+  // Perform system diagnostic
+  //
+  Status = PlatformBootManagerMemoryTest (MemoryTestLevel);
 }
-
 
 /**
   Return the index of the load option in the load option array.
@@ -284,15 +239,19 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
-  PlatformBootManagerMemoryTest (QUICK);
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Black;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  White;
+
+  Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
+  White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
+
   EfiBootManagerConnectAll ();
   EfiBootManagerRefreshAllBootOption ();
-  Print (
-    L"\n"
-    L"F2    to enter Boot Manager Menu.\n"
-    L"Enter to boot directly.\n"
-    L"\n"
-    );
+
+  PlatformBootManagerDiagnostics (QUICK, TRUE);
+  
+  PrintXY (10, 10, &White, &Black, L"F2    to enter Boot Manager Menu.                                            ");
+  PrintXY (10, 30, &White, &Black, L"Enter to boot directly.");
 }
 
 /**
@@ -306,5 +265,21 @@ PlatformBootManagerWaitCallback (
   UINT16          TimeoutRemain
   )
 {
-  Print (L"\r%-2d seconds remained...", TimeoutRemain);
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Black;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL White;
+  UINT16                        Timeout;
+
+  Timeout = PcdGet16 (PcdPlatformBootTimeOut);
+
+  Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
+  White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
+
+  PlatformBootManagerShowProgress (
+    White,
+    Black,
+    L"Start boot option",
+    White,
+    (Timeout - TimeoutRemain) * 100 / Timeout,
+    0
+    );
 }
