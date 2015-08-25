@@ -160,9 +160,7 @@ FvNameGuid         = 87940482-fc81-41c3-87e6-399cf85ac8a0
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
-!ifndef ARM_FOUNDATION_FVP
   INF ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf
-!endif
   INF ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
@@ -178,13 +176,11 @@ FvNameGuid         = 87940482-fc81-41c3-87e6-399cf85ac8a0
   INF FatBinPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
-!ifndef ARM_FOUNDATION_FVP
   #
   # Multimedia Card Interface
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
-!endif
 
   #
   # Platform Driver
