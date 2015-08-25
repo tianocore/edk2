@@ -123,6 +123,10 @@
   #
   AuthVariableLib|Include/Library/AuthVariableLib.h
 
+  ## @libraryclass  Provides variable check services and database management.
+  #
+  VarCheckLib|Include/Library/VarCheckLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
