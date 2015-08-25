@@ -1,0 +1,58 @@
+## @file
+#  NULL class library to register var check HII handler.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions
+#  of the BSD License which accompanies this distribution.  The
+#  full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VarCheckHiiLib
+  MODULE_UNI_FILE                = VarCheckHiiLib.uni
+  FILE_GUID                      = A34FBDD0-05D3-4AF7-A720-560E91AC8CDF
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  CONSTRUCTOR                    = VarCheckHiiLibNullClassConstructor
+
+[Sources]
+  VarCheckHiiLibNullClass.c
+  VarCheckHii.h
+  VarCheckHiiGenFromFv.c
+  VarCheckHiiGenFromHii.c
+  VarCheckHiiGen.c
+  VarCheckHiiGen.h
+  InternalVarCheckStructure.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  PcdLib
+  VarCheckLib
+
+[Guids]
+  gZeroGuid                                 ## SOMETIMES_CONSUMES   ## GUID
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiFirmwareVolumeBlock2ProtocolGuid      ## SOMETIMES_CONSUMES
+  gEfiHiiDatabaseProtocolGuid               ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVarCheckVfrDriverGuidArray   ## SOMETIMES_CONSUMES

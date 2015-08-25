@@ -974,6 +974,12 @@
   # @Prompt Set NX for stack.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
 
+  ## This PCD to include the driver guid of VFR drivers for VarCheckHiiBin generation.<BR><BR>
+  # Default is gZeroGuid that means no VFR driver will be parsed for VarCheckHiiBin generation.<BR>
+  # If it is set to an all FFs GUID, it means all modules in all FVs will be parsed for VarCheckHiiBin generation.<BR>
+  # @Prompt Driver guid array of VFR drivers for VarCheckHiiBin generation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVarCheckVfrDriverGuidArray|{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x3000103A
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
