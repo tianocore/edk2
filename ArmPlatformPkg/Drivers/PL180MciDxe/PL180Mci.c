@@ -521,6 +521,22 @@ PL180MciDxeInitialize (
   EFI_STATUS    Status;
   EFI_HANDLE    Handle;
 
+  DEBUG ((EFI_D_WARN, "Probing ID registers at 0x%lx for a PL180\n",
+    MCI_PERIPH_ID_REG0));
+
+  // Check if this is a PL180
+  if (MmioRead8 (MCI_PERIPH_ID_REG0) != MCI_PERIPH_ID0 ||
+      MmioRead8 (MCI_PERIPH_ID_REG1) != MCI_PERIPH_ID1 ||
+      MmioRead8 (MCI_PERIPH_ID_REG2) != MCI_PERIPH_ID2 ||
+      MmioRead8 (MCI_PERIPH_ID_REG3) != MCI_PERIPH_ID3 ||
+      MmioRead8 (MCI_PCELL_ID_REG0)  != MCI_PCELL_ID0  ||
+      MmioRead8 (MCI_PCELL_ID_REG1)  != MCI_PCELL_ID1  ||
+      MmioRead8 (MCI_PCELL_ID_REG2)  != MCI_PCELL_ID2  ||
+      MmioRead8 (MCI_PCELL_ID_REG3)  != MCI_PCELL_ID3) {
+
+    return EFI_NOT_FOUND;
+  }
+
   Handle = NULL;
 
   MCI_TRACE ("PL180MciDxeInitialize()");
