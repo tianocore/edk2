@@ -281,6 +281,7 @@
   MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
+  MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
 
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
@@ -377,6 +378,7 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
+      NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
   }
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   
@@ -387,6 +389,7 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
+      NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
   MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
