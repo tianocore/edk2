@@ -239,11 +239,6 @@
   # Add support for GCC stack protector
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  # OpenSSL requires floating point for the RNG code
-  NULL|StdLib/LibC/Softfloat/Softfloat.inf
-!endif
-
 [LibraryClasses.AARCH64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
