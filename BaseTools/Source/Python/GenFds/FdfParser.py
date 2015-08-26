@@ -2,6 +2,7 @@
 # parse FDF file
 #
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -81,16 +82,31 @@ RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*\|\s*(?P<size>\w+\.\
 RegionOffsetPcdPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*$")
 ShortcutPcdPattern = re.compile("\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
 
-IncludeFileList = []
+AllIncludeFileList = []
+
+# Get the closest parent
+def GetParentAtLine (Line):
+    for Profile in AllIncludeFileList:
+        if Profile.IsLineInFile(Line):
+            return Profile
+    return None
+
+# Check include loop
+def IsValidInclude (File, Line):
+    for Profile in AllIncludeFileList:
+        if Profile.IsLineInFile(Line) and Profile.FileName == File:
+            return False
+
+    return True
 
 def GetRealFileLine (File, Line):
 
     InsertedLines = 0
-    for Profile in IncludeFileList:
-        if Line >= Profile.InsertStartLineNumber and Line < Profile.InsertStartLineNumber + Profile.InsertAdjust + len(Profile.FileLinesList):
-            return (Profile.FileName, Line - Profile.InsertStartLineNumber + 1)
-        if Line >= Profile.InsertStartLineNumber + Profile.InsertAdjust + len(Profile.FileLinesList):
-            InsertedLines += Profile.InsertAdjust + len(Profile.FileLinesList)
+    for Profile in AllIncludeFileList:
+        if Profile.IsLineInFile(Line):
+            return Profile.GetLineInFile(Line)
+        elif Line >= Profile.InsertStartLineNumber and Profile.Level == 1:
+           InsertedLines += Profile.GetTotalLines()
 
     return (File, Line - InsertedLines)
 
@@ -111,6 +127,7 @@ class Warning (Exception):
         FileLineTuple = GetRealFileLine(File, Line)
         self.FileName = FileLineTuple[0]
         self.LineNumber = FileLineTuple[1]
+        self.OriginalLineNumber = Line
         self.Message = Str
         self.ToolName = 'FdfParser'
 
@@ -157,6 +174,38 @@ class IncludeFileProfile :
 
         self.InsertStartLineNumber = None
         self.InsertAdjust = 0
+        self.IncludeFileList = []
+        self.Level = 1 # first level include file
+    
+    def GetTotalLines(self):
+        TotalLines = self.InsertAdjust + len(self.FileLinesList)
+
+        for Profile in self.IncludeFileList:
+          TotalLines += Profile.GetTotalLines()
+
+        return TotalLines
+
+    def IsLineInFile(self, Line):
+        if Line >= self.InsertStartLineNumber and Line < self.InsertStartLineNumber + self.GetTotalLines():
+            return True
+
+        return False
+
+    def GetLineInFile(self, Line):
+        if not self.IsLineInFile (Line):
+            return (self.FileName, -1)
+        
+        InsertedLines = self.InsertStartLineNumber
+
+        for Profile in self.IncludeFileList:
+            if Profile.IsLineInFile(Line):
+                return Profile.GetLineInFile(Line)
+            elif Line >= Profile.InsertStartLineNumber:
+                InsertedLines += Profile.GetTotalLines()
+
+        return (self.FileName, Line - InsertedLines + 1)
+
+
 
 ## The FDF content class that used to record file data when parsing FDF
 #
@@ -306,10 +355,12 @@ class FdfParser:
     #   Reset file data buffer to the initial state
     #
     #   @param  self        The object pointer
+    #   @param  DestLine    Optional new destination line number.
+    #   @param  DestOffset  Optional new destination offset.     
     #
-    def Rewind(self):
-        self.CurrentLineNumber = 1
-        self.CurrentOffsetWithinLine = 0
+    def Rewind(self, DestLine = 1, DestOffset = 0):  
+        self.CurrentLineNumber = DestLine           
+        self.CurrentOffsetWithinLine = DestOffset   
 
     ## __UndoOneChar() method
     #
@@ -565,10 +616,12 @@ class FdfParser:
     #   @param  self        The object pointer
     #
     def PreprocessIncludeFile(self):
-
+	    # nested include support
+        Processed = False
         while self.__GetNextToken():
 
             if self.__Token == '!include':
+                Processed = True
                 IncludeLine = self.CurrentLineNumber
                 IncludeOffset = self.CurrentOffsetWithinLine - len('!include')
                 if not self.__GetNextToken():
@@ -612,12 +665,19 @@ class FdfParser:
                             raise Warning("The include file does not exist under below directories: \n%s\n%s\n%s\n"%(os.path.dirname(self.FileName), PlatformDir, GlobalData.gWorkspace), 
                                           self.FileName, self.CurrentLineNumber)
 
+                if not IsValidInclude (IncludedFile1.Path, self.CurrentLineNumber):
+                    raise Warning("The include file {0} is causing a include loop.\n".format (IncludedFile1.Path), self.FileName, self.CurrentLineNumber)
+
                 IncFileProfile = IncludeFileProfile(IncludedFile1.Path)
 
                 CurrentLine = self.CurrentLineNumber
                 CurrentOffset = self.CurrentOffsetWithinLine
                 # list index of the insertion, note that line number is 'CurrentLine + 1'
                 InsertAtLine = CurrentLine
+                ParentProfile = GetParentAtLine (CurrentLine)
+                if ParentProfile != None:
+                    ParentProfile.IncludeFileList.insert(0, IncFileProfile)
+                    IncFileProfile.Level = ParentProfile.Level + 1
                 IncFileProfile.InsertStartLineNumber = InsertAtLine + 1
                 # deal with remaining portions after "!include filename", if exists.
                 if self.__GetNextToken():
@@ -633,13 +693,17 @@ class FdfParser:
                     self.CurrentLineNumber += 1
                     InsertAtLine += 1
 
-                IncludeFileList.append(IncFileProfile)
+                # reversely sorted to better determine error in file
+                AllIncludeFileList.insert(0, IncFileProfile)
 
                 # comment out the processed include file statement
                 TempList = list(self.Profile.FileLinesList[IncludeLine - 1])
                 TempList.insert(IncludeOffset, '#')
                 self.Profile.FileLinesList[IncludeLine - 1] = ''.join(TempList)
-
+            if Processed: # Nested and back-to-back support
+                self.Rewind(DestLine = IncFileProfile.InsertStartLineNumber - 1)
+                Processed = False
+        # Preprocess done.
         self.Rewind()
         
     def __GetIfListCurrentItemStat(self, IfList):
@@ -1322,9 +1386,15 @@ class FdfParser:
 
         except Warning, X:
             self.__UndoToken()
-            FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
             #'\n\tGot Token: \"%s\" from File %s\n' % (self.__Token, FileLineTuple[0]) + \
-            X.Message += ' near line %d, column %d: %s' \
+            # At this point, the closest parent would be the included file itself
+            Profile = GetParentAtLine(X.OriginalLineNumber)
+            if Profile != None:
+                X.Message += ' near line %d, column %d: %s' \
+                % (X.LineNumber, 0, Profile.FileLinesList[X.LineNumber-1])
+            else:
+                FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
+                X.Message += ' near line %d, column %d: %s' \
                 % (FileLineTuple[1], self.CurrentOffsetWithinLine + 1, self.Profile.FileLinesList[self.CurrentLineNumber - 1][self.CurrentOffsetWithinLine :].rstrip('\n').rstrip('\r'))
             raise
 
