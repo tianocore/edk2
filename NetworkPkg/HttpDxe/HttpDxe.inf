@@ -38,8 +38,6 @@
   HttpImpl.c
   HttpProto.h
   HttpProto.c
-  HttpUtilities.h
-  HttpUtilities.c
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -54,6 +52,7 @@
 [Protocols]
   gEfiHttpServiceBindingProtocolGuid               ## BY_START
   gEfiHttpProtocolGuid                             ## BY_START
+  gEfiHttpUtilitiesProtocolGuid                    ## CONSUMES
   gEfiTcp4ServiceBindingProtocolGuid               ## TO_START
   gEfiTcp4ProtocolGuid                             ## TO_START
   gEfiDns4ServiceBindingProtocolGuid               ## SOMETIMES_CONSUMES

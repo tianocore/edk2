@@ -41,6 +41,7 @@
 //
 // Consumed Protocols
 //
+#include <Protocol/HttpUtilities.h>
 #include <Protocol/Tcp4.h>
 #include <Protocol/Dns4.h>
 #include <Protocol/Ip4Config2.h>
@@ -62,6 +63,8 @@ extern EFI_DRIVER_BINDING_PROTOCOL  gHttpDxeDriverBinding;
 extern EFI_COMPONENT_NAME2_PROTOCOL gHttpDxeComponentName2;
 extern EFI_COMPONENT_NAME_PROTOCOL  gHttpDxeComponentName;
 
+extern EFI_HTTP_UTILITIES_PROTOCOL  *mHttpUtilities;
+
 //
 // Include files with function prototypes
 //
@@ -69,7 +72,6 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gHttpDxeComponentName;
 #include "HttpImpl.h"
 #include "HttpProto.h"
 #include "HttpDns.h"
-#include "HttpUtilities.h"
 
 typedef struct {
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

@@ -757,7 +757,8 @@ HttpBodyParserCallback (
 
   @retval EFI_SUCCESS             Allocation succeeded.
   @retval EFI_OUT_OF_RESOURCES    Failed to complete the opration due to lack of resources.
-  @retval EFI_NOT_READY           Can't find a corresponding TxToken.
+  @retval EFI_NOT_READY           Can't find a corresponding TxToken or 
+                                  the EFI_HTTP_UTILITIES_PROTOCOL is not available.
 
 **/
 EFI_STATUS
@@ -953,10 +954,25 @@ HttpResponseWorker (
     CopyMem (HeaderTmp, Tmp, SizeofHeaders);
     FreePool (HttpHeaders);
     HttpHeaders = HeaderTmp;
+
+    //
+    // Check whether the EFI_HTTP_UTILITIES_PROTOCOL is available.
+    //
+    if (mHttpUtilities == NULL) {
+      Status = EFI_NOT_READY;
+      goto Error;
+    }
+    
     //
     // Parse the HTTP header into array of key/value pairs.
     //
-    Status = HttpUtilitiesParse (HttpHeaders, SizeofHeaders, &HttpMsg->Headers, &HttpMsg->HeaderCount);
+    Status = mHttpUtilities->Parse (
+                               mHttpUtilities, 
+                               HttpHeaders, 
+                               SizeofHeaders, 
+                               &HttpMsg->Headers, 
+                               &HttpMsg->HeaderCount
+                               );
     if (EFI_ERROR (Status)) {
       goto Error;
     }

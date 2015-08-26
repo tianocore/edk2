@@ -1072,18 +1072,26 @@ HttpGenRequestString (
   }
 
   //
+  // Check whether the EFI_HTTP_UTILITIES_PROTOCOL is available.
+  //
+  if (mHttpUtilities == NULL) {
+    return NULL;
+  }
+
+  //
   // Build raw unformatted HTTP headers.
-  //  
-  Status = HttpUtilitiesBuild (
-             0,
-             NULL,
-             0,
-             NULL,
-             Message->HeaderCount,
-             AppendList,
-             &HttpHdrSize,
-             &HttpHdr
-             );
+  //
+  Status = mHttpUtilities->Build (
+                             mHttpUtilities,
+                             0,
+                             NULL,
+                             0,
+                             NULL,
+                             Message->HeaderCount,
+                             AppendList,
+                             &HttpHdrSize,
+                             &HttpHdr
+                             );
   FreePool (AppendList);
   if (EFI_ERROR (Status) || HttpHdr == NULL) {
     return NULL;

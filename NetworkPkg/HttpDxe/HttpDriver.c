@@ -15,6 +15,8 @@
 
 #include "HttpDriver.h"
 
+EFI_HTTP_UTILITIES_PROTOCOL *mHttpUtilities = NULL;
+
 ///
 /// Driver Binding Protocol instance
 ///
@@ -101,6 +103,35 @@ HttpCleanService (
 }
 
 /**
+  The event process routine when the http utilities protocol is installed
+  in the system.
+
+  @param[in]     Event         Not used.
+  @param[in]     Context       The pointer to the IP4 config2 instance data.
+
+**/
+VOID
+EFIAPI
+HttpUtilitiesInstalledCallback (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  gBS->LocateProtocol (
+         &gEfiHttpUtilitiesProtocolGuid, 
+         NULL, 
+         (VOID **) &mHttpUtilities
+         );
+		 
+  //
+  // Close the event if Http utilities protocol is loacted.
+  //
+  if (mHttpUtilities != NULL && Event != NULL) {
+     gBS->CloseEvent (Event);
+  }
+}
+
+/**
   This is the declaration of an EFI image entry point. This entry point is
   the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers including
   both device drivers and bus drivers.
@@ -118,7 +149,28 @@ HttpDxeDriverEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-{
+{ 
+  VOID           *Registration;
+
+  gBS->LocateProtocol (
+         &gEfiHttpUtilitiesProtocolGuid, 
+         NULL, 
+         (VOID **) &mHttpUtilities
+         );
+
+  if (mHttpUtilities == NULL) {
+    //
+    // No Http utilities protocol, register a notify.
+    //
+    EfiCreateProtocolNotifyEvent (
+      &gEfiHttpUtilitiesProtocolGuid,
+      TPL_CALLBACK,
+      HttpUtilitiesInstalledCallback,
+      NULL,
+      &Registration
+      );
+  }
+
   //
   // Install UEFI Driver Model protocol(s).
   //
