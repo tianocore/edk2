@@ -833,6 +833,13 @@ VerifyBuffer (
     return EFI_UNSUPPORTED;
   }
   if (AttachedData != NULL) {
+    if (InData != NULL) {
+      //
+      // The embedded content is found in SignedData but InData is not NULL
+      //
+      Status = EFI_UNSUPPORTED;
+      goto _Exit;
+    }
     //
     // PKCS7-formatted signedData with attached content; Use the embedded
     // content for verification
