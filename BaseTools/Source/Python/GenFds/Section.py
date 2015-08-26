@@ -1,7 +1,7 @@
 ## @file
 # section base class
 #
-#  Copyright (c) 2007-2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -149,11 +149,7 @@ class Section (SectionClassObject):
             Makefile = os.path.join(MakefileDir, 'Makefile')
             if not os.path.exists(Makefile):
                 Makefile = os.path.join(MakefileDir, 'GNUmakefile')
-            if not os.path.exists(Makefile):
-                SuffixMap = FfsInf.GetFinalTargetSuffixMap()
-                if Suffix in SuffixMap:
-                    FileList.extend(SuffixMap[Suffix])
-            else:
+            if os.path.exists(Makefile):
                 # Update to search files with suffix in all sub-dirs.
                 Tuple = os.walk(FfsInf.EfiOutputPath)
                 for Dirpath, Dirnames, Filenames in Tuple:
@@ -162,7 +158,11 @@ class Section (SectionClassObject):
                             FullName = os.path.join(Dirpath, F)
                             if os.path.getmtime(FullName) > os.path.getmtime(Makefile):
                                 FileList.append(FullName)
-
+            if not FileList:
+                SuffixMap = FfsInf.GetFinalTargetSuffixMap()
+                if Suffix in SuffixMap:
+                    FileList.extend(SuffixMap[Suffix])
+                
         #Process the file lists is alphabetical for a same section type
         if len (FileList) > 1:
             FileList.sort()
