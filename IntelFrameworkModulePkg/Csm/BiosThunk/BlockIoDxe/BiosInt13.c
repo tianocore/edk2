@@ -1,7 +1,7 @@
 /** @file
   Routines that use BIOS to support INT 13 devices.
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -870,7 +870,7 @@ Edd11BiosReadBlocks (
     // Otherwise when offset adding data size exceeds 0xFFFF, if OpROM does not normalize TransferBuffer,
     // INT13 function 42H will return data boundary error 09H.
     //
-    AddressPacket->SegOffset = (UINT32) ((TransferBuffer >> 4) << 16);
+    AddressPacket->SegOffset = (UINT32) LShiftU64 (RShiftU64(TransferBuffer, 4), 16);
     AddressPacket->Lba  = (UINT64) Lba;
 
     Regs.H.AH           = 0x42;
@@ -1023,7 +1023,7 @@ Edd11BiosWriteBlocks (
     // Otherwise when offset adding data size exceeds 0xFFFF, if OpROM does not normalize TransferBuffer,
     // INT13 function 42H will return data boundary error 09H.
     //
-    AddressPacket->SegOffset = (UINT32) ((TransferBuffer >> 4) << 16);
+    AddressPacket->SegOffset = (UINT32) LShiftU64 (RShiftU64(TransferBuffer, 4), 16);
     AddressPacket->Lba  = (UINT64) Lba;
 
     Regs.H.AH           = 0x43;
