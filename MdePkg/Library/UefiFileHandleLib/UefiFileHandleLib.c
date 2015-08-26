@@ -769,7 +769,9 @@ StrnCatGrowLeft (
 
 /**
   Function to get a full filename given a EFI_FILE_HANDLE somewhere lower on the
-  directory 'stack'.
+  directory 'stack'. If the file is a directory, then append the '\' char at the 
+  end of name string. If it's not a directory, then the last '\' should not be 
+  added.
 
   if Handle is NULL, return EFI_INVALID_PARAMETER
 
@@ -854,6 +856,14 @@ FileHandleGetFileName (
     Status = EFI_SUCCESS;
     ASSERT((*FullFileName == NULL && Size == 0) || (*FullFileName != NULL));
     *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
+  }
+
+  if (*FullFileName != NULL && 
+      (*FullFileName)[StrLen(*FullFileName) - 1] == L'\\' && 
+      StrLen(*FullFileName) > 1 &&
+      FileHandleIsDirectory(Handle) == EFI_NOT_FOUND
+     ) {
+    (*FullFileName)[StrLen(*FullFileName) - 1] = CHAR_NULL;
   }
 
   if (CurrentHandle != NULL) {

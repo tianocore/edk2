@@ -356,7 +356,9 @@ FileHandleSetSize (
 
 /**
   Function to get a full filename given a EFI_FILE_HANDLE somewhere lower on the
-  directory 'stack'.
+  directory 'stack'. If the file is a directory, then append the '\' char at the 
+  end of name string. If it's not a directory, then the last '\' should not be 
+  added.
 
   @param[in] Handle             Handle to the Directory or File to create path to.
   @param[out] FullFileName      Pointer to pointer to generated full file name.  It
