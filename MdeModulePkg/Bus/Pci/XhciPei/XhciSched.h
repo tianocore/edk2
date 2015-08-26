@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -939,6 +939,66 @@ XhcPeiSetConfigCmd64 (
   );
 
 /**
+  Stop endpoint through XHCI's Stop_Endpoint cmd.
+
+  @param  Xhc           The XHCI device.
+  @param  SlotId        The slot id of the target device.
+  @param  Dci           The device context index of the target slot or endpoint.
+
+  @retval EFI_SUCCESS   Stop endpoint successfully.
+  @retval Others        Failed to stop endpoint.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcPeiStopEndpoint (
+  IN PEI_XHC_DEV        *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
+  );
+
+/**
+  Reset endpoint through XHCI's Reset_Endpoint cmd.
+
+  @param  Xhc           The XHCI device.
+  @param  SlotId        The slot id of the target device.
+  @param  Dci           The device context index of the target slot or endpoint.
+
+  @retval EFI_SUCCESS   Reset endpoint successfully.
+  @retval Others        Failed to reset endpoint.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcPeiResetEndpoint (
+  IN PEI_XHC_DEV        *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
+  );
+
+/**
+  Set transfer ring dequeue pointer through XHCI's Set_Tr_Dequeue_Pointer cmd.
+
+  @param  Xhc           The XHCI device.
+  @param  SlotId        The slot id of the target device.
+  @param  Dci           The device context index of the target slot or endpoint.
+  @param  Urb           The dequeue pointer of the transfer ring specified
+                        by the urb to be updated.
+
+  @retval EFI_SUCCESS   Set transfer ring dequeue pointer succeeds.
+  @retval Others        Failed to set transfer ring dequeue pointer.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcPeiSetTrDequeuePointer (
+  IN PEI_XHC_DEV        *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci,
+  IN URB                *Urb
+  );
+
+/**
   Assign and initialize the device slot for a new device.
 
   @param  Xhc                   The XHCI device.
@@ -1062,6 +1122,25 @@ XhcPeiDisableSlotCmd64 (
 **/
 EFI_STATUS
 XhcPeiRecoverHaltedEndpoint (
+  IN PEI_XHC_DEV        *Xhc,
+  IN URB                *Urb
+  );
+
+/**
+  System software shall use a Stop Endpoint Command (section 4.6.9) and the Set TR Dequeue Pointer
+  Command (section 4.6.10) to remove the timed-out TDs from the xHC transfer ring. The next write to
+  the Doorbell of the Endpoint will transition the Endpoint Context from the Stopped to the Running
+  state.
+
+  @param  Xhc                   The XHCI device.
+  @param  Urb                   The urb which doesn't get completed in a specified timeout range.
+
+  @retval EFI_SUCCESS           The dequeuing of the TDs is successful.
+  @retval Others                Failed to stop the endpoint and dequeue the TDs.
+
+**/
+EFI_STATUS
+XhcPeiDequeueTrbFromEndpoint (
   IN PEI_XHC_DEV        *Xhc,
   IN URB                *Urb
   );

@@ -648,17 +648,28 @@ XhcPeiControlTransfer (
   *TransferResult = Urb->Result;
   *DataLength     = Urb->Completed;
 
-  if (*TransferResult == EFI_USB_NOERROR) {
-    Status = EFI_SUCCESS;
-  } else if (*TransferResult == EFI_USB_ERR_STALL) {
-    RecoveryStatus = XhcPeiRecoverHaltedEndpoint(Xhc, Urb);
-    if (EFI_ERROR (RecoveryStatus)) {
-      DEBUG ((EFI_D_ERROR, "XhcPeiControlTransfer: XhcPeiRecoverHaltedEndpoint failed\n"));
+  if (Status == EFI_TIMEOUT) {
+    //
+    // The transfer timed out. Abort the transfer by dequeueing of the TD.
+    //
+    RecoveryStatus = XhcPeiDequeueTrbFromEndpoint(Xhc, Urb);
+    if (EFI_ERROR(RecoveryStatus)) {
+      DEBUG((EFI_D_ERROR, "XhcPeiControlTransfer: XhcPeiDequeueTrbFromEndpoint failed\n"));
     }
-    Status = EFI_DEVICE_ERROR;
     goto FREE_URB;
   } else {
-    goto FREE_URB;
+    if (*TransferResult == EFI_USB_NOERROR) {
+      Status = EFI_SUCCESS;
+    } else if (*TransferResult == EFI_USB_ERR_STALL) {
+      RecoveryStatus = XhcPeiRecoverHaltedEndpoint(Xhc, Urb);
+      if (EFI_ERROR (RecoveryStatus)) {
+        DEBUG ((EFI_D_ERROR, "XhcPeiControlTransfer: XhcPeiRecoverHaltedEndpoint failed\n"));
+      }
+      Status = EFI_DEVICE_ERROR;
+      goto FREE_URB;
+    } else {
+      goto FREE_URB;
+    }
   }
 
   //
@@ -960,14 +971,24 @@ XhcPeiBulkTransfer (
   *TransferResult = Urb->Result;
   *DataLength     = Urb->Completed;
 
-  if (*TransferResult == EFI_USB_NOERROR) {
-    Status = EFI_SUCCESS;
-  } else if (*TransferResult == EFI_USB_ERR_STALL) {
-    RecoveryStatus = XhcPeiRecoverHaltedEndpoint(Xhc, Urb);
-    if (EFI_ERROR (RecoveryStatus)) {
-      DEBUG ((EFI_D_ERROR, "XhcPeiBulkTransfer: XhcPeiRecoverHaltedEndpoint failed\n"));
+  if (Status == EFI_TIMEOUT) {
+    //
+    // The transfer timed out. Abort the transfer by dequeueing of the TD.
+    //
+    RecoveryStatus = XhcPeiDequeueTrbFromEndpoint(Xhc, Urb);
+    if (EFI_ERROR(RecoveryStatus)) {
+      DEBUG((EFI_D_ERROR, "XhcPeiBulkTransfer: XhcPeiDequeueTrbFromEndpoint failed\n"));
     }
-    Status = EFI_DEVICE_ERROR;
+  } else {
+    if (*TransferResult == EFI_USB_NOERROR) {
+      Status = EFI_SUCCESS;
+    } else if (*TransferResult == EFI_USB_ERR_STALL) {
+      RecoveryStatus = XhcPeiRecoverHaltedEndpoint(Xhc, Urb);
+      if (EFI_ERROR (RecoveryStatus)) {
+        DEBUG ((EFI_D_ERROR, "XhcPeiBulkTransfer: XhcPeiRecoverHaltedEndpoint failed\n"));
+      }
+      Status = EFI_DEVICE_ERROR;
+    }
   }
 
   XhcPeiFreeUrb (Xhc, Urb);
