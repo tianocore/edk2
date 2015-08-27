@@ -1171,6 +1171,7 @@ ShellCommandRunDrvCfg (
   Status              = EFI_SUCCESS;
   Language            = NULL;
   UseHii              = TRUE;
+  ProblemParam        = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
