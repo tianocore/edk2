@@ -367,6 +367,7 @@
 
   ## This PCR means the OEM configurated number of PCR banks.
   #  0 means dynamic get from supported HASH algorithm
+  # @Prompt OEM configurated number of PCR banks.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2NumberOfPCRBanks|0x0|UINT32|0x00010015
   
   ## Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images
@@ -391,6 +392,7 @@
   ## This PCD indicated final BIOS supported Hash mask.
   #    Bios may choose to register a subset of PcdTpm2HashMask.
   #    So this PCD is final value of how many hash algo is extended to PCR.
+  # @Prompt Hash Algorithm bitmap.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap|0xFFFFFFFF|UINT32|0x00010016
   
 [UserExtensions.TianoCore."ExtraFiles"]
