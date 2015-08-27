@@ -71,6 +71,15 @@
   ##  @libraryclass  Provides support for TrEE PP >= 128 Vendor Specific PPI Operation.
   #
   TrEEPpVendorLib|Include/Library/TrEEPpVendorLib.h
+  
+  ##  @libraryclass  Provides support for TCG Physical Presence Interface (PPI) specification 
+  #   >= 128 Vendor Specific PPI Operation.
+  #
+  Tcg2PpVendorLib|Include/Library/TcgPpVendorLib.h
+  
+  ##  @libraryclass  Handle TPM 2.0 physical presence request from OS.
+  #
+  Tcg2PhysicalPresenceLib|Include/Library/Tcg2PhysicalPresenceLib.h
 
 [Guids]
   ## Security package token space guid.
