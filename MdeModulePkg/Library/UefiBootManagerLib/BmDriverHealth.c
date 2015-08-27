@@ -76,7 +76,7 @@ BmGetControllerName (
   }
 
   if (!EFI_ERROR (Status)) {
-    LanguageVariable = GetEfiGlobalVariable (Iso639Language ? L"Lang" : L"PlatformLang");
+    GetEfiGlobalVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", (VOID**)&LanguageVariable, NULL);
     BestLanguage     = GetBestLanguage(
                          ComponentName->SupportedLanguages,
                          Iso639Language,

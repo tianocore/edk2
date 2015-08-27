@@ -533,9 +533,9 @@ LocateSerialIo (
   //
   // Get L"ConOut", L"ConIn" and L"ErrOut" from the Var
   //
-  OutDevicePath = GetEfiGlobalVariable (L"ConOut");
-  InpDevicePath = GetEfiGlobalVariable (L"ConIn");
-  ErrDevicePath = GetEfiGlobalVariable (L"ErrOut");
+  GetEfiGlobalVariable2 (L"ConOut", (VOID**)&OutDevicePath, NULL);
+  GetEfiGlobalVariable2 (L"ConIn", (VOID**)&InpDevicePath, NULL);
+  GetEfiGlobalVariable2 (L"ErrOut", (VOID**)&ErrDevicePath, NULL);
   if (OutDevicePath != NULL) {
     UpdateComAttributeFromVariable (OutDevicePath);
   }
@@ -756,20 +756,20 @@ GetConsoleMenu (
   switch (ConsoleMenuType) {
   case BM_CONSOLE_IN_CONTEXT_SELECT:
     ConsoleMenu   = &ConsoleInpMenu;
-    DevicePath    = GetEfiGlobalVariable (L"ConIn");
-    AllDevicePath = GetEfiGlobalVariable (L"ConInDev");
+    GetEfiGlobalVariable2 (L"ConIn", (VOID**)&DevicePath, NULL);
+    GetEfiGlobalVariable2 (L"ConInDev", (VOID**)&AllDevicePath, NULL);
     break;
 
   case BM_CONSOLE_OUT_CONTEXT_SELECT:
     ConsoleMenu   = &ConsoleOutMenu;
-    DevicePath    = GetEfiGlobalVariable (L"ConOut");
-    AllDevicePath = GetEfiGlobalVariable (L"ConOutDev");
+    GetEfiGlobalVariable2 (L"ConOut", (VOID**)&DevicePath, NULL);
+    GetEfiGlobalVariable2 (L"ConOutDev", (VOID**)&AllDevicePath, NULL);
     break;
 
   case BM_CONSOLE_ERR_CONTEXT_SELECT:
     ConsoleMenu   = &ConsoleErrMenu;
-    DevicePath    = GetEfiGlobalVariable (L"ErrOut");
-    AllDevicePath = GetEfiGlobalVariable (L"ErrOutDev");
+    GetEfiGlobalVariable2 (L"ErrOut", (VOID**)&DevicePath, NULL);
+    GetEfiGlobalVariable2 (L"ErrOutDev", (VOID**)&AllDevicePath, NULL);
     break;
 
   default:

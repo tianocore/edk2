@@ -317,9 +317,9 @@ Var_UpdateAllConsoleOption (
   EFI_DEVICE_PATH_PROTOCOL  *ErrDevicePath;
   EFI_STATUS                Status;
 
-  OutDevicePath = GetEfiGlobalVariable (L"ConOut");
-  InpDevicePath = GetEfiGlobalVariable (L"ConIn");
-  ErrDevicePath = GetEfiGlobalVariable (L"ErrOut");
+  GetEfiGlobalVariable2 (L"ConOut", (VOID**)&OutDevicePath, NULL);
+  GetEfiGlobalVariable2 (L"ConIn", (VOID**)&InpDevicePath, NULL);
+  GetEfiGlobalVariable2 (L"ErrOut", (VOID**)&ErrDevicePath, NULL);
   if (OutDevicePath != NULL) {
     ChangeVariableDevicePath (OutDevicePath);
     Status = gRT->SetVariable (
@@ -395,7 +395,7 @@ Var_UpdateConsoleOption (
   EFI_DEVICE_PATH_PROTOCOL  *TerminalDevicePath;
   UINTN                     Index;
 
-  ConDevicePath = GetEfiGlobalVariable (ConsoleName);
+  GetEfiGlobalVariable2 (ConsoleName, (VOID**)&ConDevicePath, NULL);
   if (ConDevicePath != NULL) {
     EfiLibDeleteVariable (ConsoleName, &gEfiGlobalVariableGuid);
     FreePool (ConDevicePath);
