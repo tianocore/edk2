@@ -19,7 +19,7 @@
 
   @param[out] TimerFrequency  Local APIC timer frequency returned.
   @param[in]  DumpFlag        If TRUE, dump Local APIC timer's parameter.
- 
+
   @return   32-bit Local APIC timer init count.
 **/
 UINT32
@@ -108,8 +108,8 @@ SaveAndSetDebugTimerInterrupt (
 
 /**
   Check if the timer is time out.
-  
-  @param[in] TimerCycle             Timer total count.
+
+  @param[in] TimerCycle             Timer initial count.
   @param[in] Timer                  The start timer from the begin.
   @param[in] TimeoutTicker          Ticker number need time out.
 
@@ -138,11 +138,11 @@ IsDebugTimerTimeout (
     Delta = Timer - CurrentTimer;
   } else {
     //
-    // Handle one roll-over. 
+    // Handle one roll-over.
     //
-    Delta = TimerCycle - (CurrentTimer - Timer);
+    Delta = TimerCycle - (CurrentTimer - Timer) + 1;
   }
- 
+
   return (BOOLEAN) (Delta >= TimeoutTicker);
 }
 
