@@ -131,8 +131,10 @@ IsDebugTimerTimeout (
 
   //
   // This timer counter counts down.  Check for roll over condition.
+  // If CurrentTimer is equal to Timer, it does not mean that roll over
+  // happened.
   //
-  if (CurrentTimer < Timer) {
+  if (CurrentTimer <= Timer) {
     Delta = Timer - CurrentTimer;
   } else {
     //
