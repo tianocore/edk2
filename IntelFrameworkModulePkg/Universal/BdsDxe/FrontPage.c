@@ -395,13 +395,13 @@ InitializeFrontPage (
   //
   HiiHandle = gFrontPagePrivate.HiiHandle;
 
-  CurrentLang = GetEfiGlobalVariable (L"PlatformLang");
+  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&CurrentLang, NULL);
 
   //
   // Get Support language list from variable.
   //
   if (mLanguageString == NULL){
-    mLanguageString = GetEfiGlobalVariable (L"PlatformLangCodes");
+    GetEfiGlobalVariable2 (L"PlatformLangCodes", (VOID**)&mLanguageString, NULL);
     if (mLanguageString == NULL) {
       mLanguageString = AllocateCopyPool (
                                  AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)),
