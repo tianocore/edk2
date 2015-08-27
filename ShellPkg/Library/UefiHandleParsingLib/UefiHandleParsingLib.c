@@ -1312,7 +1312,7 @@ GetBestLanguageForDriver (
   CHAR8                         *LanguageVariable;
   CHAR8                         *BestLanguage;
 
-  LanguageVariable = GetVariable (Iso639Language ? L"Lang" : L"PlatformLang", &gEfiGlobalVariableGuid);
+  GetVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", &gEfiGlobalVariableGuid, (VOID**)&LanguageVariable, NULL);
 
   BestLanguage = GetBestLanguage(
                    SupportedLanguages,
