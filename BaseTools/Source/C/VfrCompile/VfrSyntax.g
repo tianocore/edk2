@@ -1746,6 +1746,8 @@ vfrStatementDefault :
                                                         DObj->SetLineNo(D->getLine());
                                                         if (ArrayType) {
                                                           DObj->SetType (EFI_IFR_TYPE_BUFFER);
+                                                        } else if (gIsStringOp) {
+                                                          DObj->SetType (EFI_IFR_TYPE_STRING);
                                                         } else {
                                                           DObj->SetType (_GET_CURRQEST_DATATYPE());
                                                         }
@@ -2819,7 +2821,7 @@ vfrStatementString :
      UINT8 StringMinSize;
      UINT8 StringMaxSize;
   >>
-  L:String                                             << SObj.SetLineNo(L->getLine()); >>
+  L:String                                             << SObj.SetLineNo(L->getLine()); gIsStringOp = TRUE;>>
   vfrQuestionHeader[SObj] ","
   { F:FLAGS "=" vfrStringFlagsField[SObj, F->getLine()] "," }
   {
@@ -2847,7 +2849,7 @@ vfrStatementString :
                                                           SObj.SetMaxSize (StringMaxSize);
                                                        >>
   vfrStatementQuestionOptionList
-  E:EndString                                          << CRT_END_OP (E); >>
+  E:EndString                                          << CRT_END_OP (E); gIsStringOp = FALSE;>>
   ";"
   ;
 

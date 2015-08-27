@@ -604,6 +604,7 @@ public:
 static CIfrQuestionHeader *gCurrentQuestion  = NULL;
 static CIfrMinMaxStepData *gCurrentMinMaxData = NULL;
 static BOOLEAN            gIsOrderedList = FALSE;
+static BOOLEAN            gIsStringOp = FALSE;
 
 /*
  * The definition of all of the UEFI IFR Objects
