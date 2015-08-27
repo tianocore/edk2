@@ -406,11 +406,11 @@ DumpTcgEfiSpecIdEventStruct (
   IN TCG_EfiSpecIDEventStruct   *TcgEfiSpecIdEventStruct
   )
 {
-  TCG_EfiSpecIdEventAlgorithmSize  *digestSize;
+  TCG_EfiSpecIdEventAlgorithmSize  *DigestSize;
   UINTN                            Index;
-  UINT8                            *vendorInfoSize;
-  UINT8                            *vendorInfo;
-  UINT32                           numberOfAlgorithms;
+  UINT8                            *VendorInfoSize;
+  UINT8                            *VendorInfo;
+  UINT32                           NumberOfAlgorithms;
 
   DEBUG ((EFI_D_INFO, "  TCG_EfiSpecIDEventStruct:\n"));
   DEBUG ((EFI_D_INFO, "    signature          - '"));
@@ -422,21 +422,21 @@ DumpTcgEfiSpecIdEventStruct (
   DEBUG ((EFI_D_INFO, "    specVersion        - %d.%d%d\n", TcgEfiSpecIdEventStruct->specVersionMajor, TcgEfiSpecIdEventStruct->specVersionMinor, TcgEfiSpecIdEventStruct->specErrata));
   DEBUG ((EFI_D_INFO, "    uintnSize          - 0x%02x\n", TcgEfiSpecIdEventStruct->uintnSize));
 
-  CopyMem (&numberOfAlgorithms, TcgEfiSpecIdEventStruct + 1, sizeof(numberOfAlgorithms));
-  DEBUG ((EFI_D_INFO, "    numberOfAlgorithms - 0x%08x\n", numberOfAlgorithms));
+  CopyMem (&NumberOfAlgorithms, TcgEfiSpecIdEventStruct + 1, sizeof(NumberOfAlgorithms));
+  DEBUG ((EFI_D_INFO, "    NumberOfAlgorithms - 0x%08x\n", NumberOfAlgorithms));
 
-  digestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(numberOfAlgorithms));
-  for (Index = 0; Index < numberOfAlgorithms; Index++) {
+  DigestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(NumberOfAlgorithms));
+  for (Index = 0; Index < NumberOfAlgorithms; Index++) {
     DEBUG ((EFI_D_INFO, "    digest(%d)\n", Index));
-    DEBUG ((EFI_D_INFO, "      algorithmId      - 0x%04x\n", digestSize[Index].algorithmId));
-    DEBUG ((EFI_D_INFO, "      digestSize       - 0x%04x\n", digestSize[Index].digestSize));
+    DEBUG ((EFI_D_INFO, "      algorithmId      - 0x%04x\n", DigestSize[Index].algorithmId));
+    DEBUG ((EFI_D_INFO, "      digestSize       - 0x%04x\n", DigestSize[Index].digestSize));
   }
-  vendorInfoSize = (UINT8 *)&digestSize[numberOfAlgorithms];
-  DEBUG ((EFI_D_INFO, "    vendorInfoSize     - 0x%02x\n", *vendorInfoSize));
-  vendorInfo = vendorInfoSize + 1;
-  DEBUG ((EFI_D_INFO, "    vendorInfo         - "));
-  for (Index = 0; Index < *vendorInfoSize; Index++) {
-    DEBUG ((EFI_D_INFO, "%02x ", vendorInfo[Index]));
+  VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
+  DEBUG ((EFI_D_INFO, "    VendorInfoSize     - 0x%02x\n", *VendorInfoSize));
+  VendorInfo = VendorInfoSize + 1;
+  DEBUG ((EFI_D_INFO, "    VendorInfo         - "));
+  for (Index = 0; Index < *VendorInfoSize; Index++) {
+    DEBUG ((EFI_D_INFO, "%02x ", VendorInfo[Index]));
   }
   DEBUG ((EFI_D_INFO, "\n"));
 }
@@ -451,15 +451,15 @@ GetTcgEfiSpecIdEventStructSize (
   IN TCG_EfiSpecIDEventStruct   *TcgEfiSpecIdEventStruct
   )
 {
-  TCG_EfiSpecIdEventAlgorithmSize  *digestSize;
-  UINT8                            *vendorInfoSize;
-  UINT32                           numberOfAlgorithms;
+  TCG_EfiSpecIdEventAlgorithmSize  *DigestSize;
+  UINT8                            *VendorInfoSize;
+  UINT32                           NumberOfAlgorithms;
 
-  CopyMem (&numberOfAlgorithms, TcgEfiSpecIdEventStruct + 1, sizeof(numberOfAlgorithms));
+  CopyMem (&NumberOfAlgorithms, TcgEfiSpecIdEventStruct + 1, sizeof(NumberOfAlgorithms));
 
-  digestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(numberOfAlgorithms));
-  vendorInfoSize = (UINT8 *)&digestSize[numberOfAlgorithms];
-  return sizeof(TCG_EfiSpecIDEventStruct) + sizeof(UINT32) + (numberOfAlgorithms * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8) + (*vendorInfoSize);
+  DigestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(NumberOfAlgorithms));
+  VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
+  return sizeof(TCG_EfiSpecIDEventStruct) + sizeof(UINT32) + (NumberOfAlgorithms * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8) + (*VendorInfoSize);
 }
 
 /**
@@ -1455,9 +1455,9 @@ SetupEventLog (
   TCG_EfiSpecIDEventStruct        *TcgEfiSpecIdEventStruct;
   UINT8                           TempBuf[sizeof(TCG_EfiSpecIDEventStruct) + (HASH_COUNT * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8)];
   TCG_PCR_EVENT_HDR               FirstPcrEvent;
-  TCG_EfiSpecIdEventAlgorithmSize *digestSize;
-  UINT8                           *vendorInfoSize;
-  UINT32                          numberOfAlgorithms;
+  TCG_EfiSpecIdEventAlgorithmSize *DigestSize;
+  UINT8                           *VendorInfoSize;
+  UINT32                          NumberOfAlgorithms;
 
   DEBUG ((EFI_D_INFO, "SetupEventLog\n"));
 
@@ -1498,36 +1498,36 @@ SetupEventLog (
         TcgEfiSpecIdEventStruct->specVersionMinor = TCG_EfiSpecIDEventStruct_SPEC_VERSION_MINOR_TPM2;
         TcgEfiSpecIdEventStruct->specErrata = TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2;
         TcgEfiSpecIdEventStruct->uintnSize = sizeof(UINTN)/sizeof(UINT32);
-        numberOfAlgorithms = 0;
-        digestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(numberOfAlgorithms));
+        NumberOfAlgorithms = 0;
+        DigestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(NumberOfAlgorithms));
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
-          digestSize[numberOfAlgorithms].algorithmId = TPM_ALG_SHA1;
-          digestSize[numberOfAlgorithms].digestSize = SHA1_DIGEST_SIZE;
-          numberOfAlgorithms++;
+          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA1;
+          DigestSize[NumberOfAlgorithms].digestSize = SHA1_DIGEST_SIZE;
+          NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
-          digestSize[numberOfAlgorithms].algorithmId = TPM_ALG_SHA256;
-          digestSize[numberOfAlgorithms].digestSize = SHA256_DIGEST_SIZE;
-          numberOfAlgorithms++;
+          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA256;
+          DigestSize[NumberOfAlgorithms].digestSize = SHA256_DIGEST_SIZE;
+          NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
-          digestSize[numberOfAlgorithms].algorithmId = TPM_ALG_SHA384;
-          digestSize[numberOfAlgorithms].digestSize = SHA384_DIGEST_SIZE;
-          numberOfAlgorithms++;
+          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA384;
+          DigestSize[NumberOfAlgorithms].digestSize = SHA384_DIGEST_SIZE;
+          NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
-          digestSize[numberOfAlgorithms].algorithmId = TPM_ALG_SHA512;
-          digestSize[numberOfAlgorithms].digestSize = SHA512_DIGEST_SIZE;
-          numberOfAlgorithms++;
+          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA512;
+          DigestSize[NumberOfAlgorithms].digestSize = SHA512_DIGEST_SIZE;
+          NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
-          digestSize[numberOfAlgorithms].algorithmId = TPM_ALG_SM3_256;
-          digestSize[numberOfAlgorithms].digestSize = SM3_256_DIGEST_SIZE;
-          numberOfAlgorithms++;
+          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SM3_256;
+          DigestSize[NumberOfAlgorithms].digestSize = SM3_256_DIGEST_SIZE;
+          NumberOfAlgorithms++;
         }
-        CopyMem (TcgEfiSpecIdEventStruct + 1, &numberOfAlgorithms, sizeof(numberOfAlgorithms));
-        vendorInfoSize = (UINT8 *)&digestSize[numberOfAlgorithms];
-        *vendorInfoSize = 0;
+        CopyMem (TcgEfiSpecIdEventStruct + 1, &NumberOfAlgorithms, sizeof(NumberOfAlgorithms));
+        VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
+        *VendorInfoSize = 0;
 
         //
         // FirstPcrEvent
