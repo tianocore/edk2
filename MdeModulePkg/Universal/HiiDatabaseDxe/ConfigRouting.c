@@ -2056,11 +2056,6 @@ ParseIfrData (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-
-      //
-      // No default value for string.
-      //
-      BlockData = NULL;
       break;
 
     case EFI_IFR_PASSWORD_OP:
@@ -2850,6 +2845,7 @@ GetStorageWidth (
 /**
   Generate ConfigAltResp string base on the varstore info.
 
+  @param      HiiHandle             Hii Handle for this hii package.
   @param      ConfigHdr             The config header for this varstore.
   @param      VarStorageData        The varstore info.
   @param      DefaultIdArray        The Default id array.
@@ -2860,6 +2856,7 @@ GetStorageWidth (
 **/
 EFI_STATUS
 GenerateAltConfigResp (
+  IN  EFI_HII_HANDLE               HiiHandle,
   IN  CHAR16                       *ConfigHdr,
   IN  IFR_VARSTORAGE_DATA          *VarStorageData,
   IN  IFR_DEFAULT_DATA             *DefaultIdArray,
@@ -2878,10 +2875,11 @@ GenerateAltConfigResp (
   IFR_DEFAULT_DATA      *DefaultValueData;
   UINTN                 Width;
   UINT8                 *TmpBuffer;
+  CHAR16                *DefaultString;
 
   BlockData     = NULL;
   DataExist     = FALSE;
-
+  DefaultString = NULL;
   //
   // Add length for <ConfigHdr> + '\0'
   //
@@ -2993,9 +2991,18 @@ GenerateAltConfigResp (
         // Convert Value to a hex string in "%x" format
         // NOTE: This is in the opposite byte that GUID and PATH use
         //
-        TmpBuffer = (UINT8 *) &(DefaultValueData->Value);
-        for (; Width > 0; Width--) {
+        if (BlockData->OpCode == EFI_IFR_STRING_OP){
+          DefaultString   = InternalGetString(HiiHandle, DefaultValueData->Value.string);
+          TmpBuffer = (UINT8 *) DefaultString;
+        } else {
+          TmpBuffer = (UINT8 *) &(DefaultValueData->Value);
+        }
+        for (; Width > 0 && (TmpBuffer != NULL); Width--) {
           StringPtr += UnicodeValueToString (StringPtr, PREFIX_ZERO | RADIX_HEX, TmpBuffer[Width - 1], 2);
+        }
+        if (DefaultString != NULL){
+          FreePool(DefaultString);
+          DefaultString = NULL;
         }
       }
     }
@@ -3218,7 +3225,7 @@ GetFullStringFromHiiFormPackages (
   // Go through all VarStorageData Entry and get the DefaultId array for each one
   // Then construct them all to : ConfigHdr AltConfigHdr ConfigBody AltConfigHdr ConfigBody
   //
-  Status = GenerateAltConfigResp (ConfigHdr, VarStorageData, DefaultIdArray, &DefaultAltCfgResp);
+  Status = GenerateAltConfigResp (DataBaseRecord->Handle,ConfigHdr, VarStorageData, DefaultIdArray, &DefaultAltCfgResp);
   if (EFI_ERROR (Status)) {
     goto Done;
   }

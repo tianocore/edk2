@@ -461,6 +461,7 @@ formset
               help     = STRING_TOKEN(STR_MY_STRING_HELP),
               minsize  = 6,
               maxsize  = 0x14,
+              default  = STRING_TOKEN(STR_MY_STRING_DEFAULT),
     endstring;
 
     //
