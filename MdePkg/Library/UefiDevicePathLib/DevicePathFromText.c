@@ -3519,7 +3519,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Vlan",                    DevPathFromTextVlan                    },
   {L"Uri",                     DevPathFromTextUri                     },
   {L"Bluetooth",               DevPathFromTextBluetooth               },
-  {L"WiFi",                    DevPathFromTextWiFi                    },
+  {L"Wi-Fi",                   DevPathFromTextWiFi                    },
   {L"MediaPath",               DevPathFromTextMediaPath               },
   {L"HD",                      DevPathFromTextHD                      },
   {L"CDROM",                   DevPathFromTextCDROM                   },
