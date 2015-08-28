@@ -2827,7 +2827,8 @@ DevPathFromTextWiFi (
   )
 {
   CHAR16                *SSIdStr;
-  CHAR8                 *AsciiStr;
+  CHAR8                 AsciiStr[33];
+  UINTN                 DataLen;
   WIFI_DEVICE_PATH      *WiFiDp;
 
   SSIdStr = GetNextParamStr (&TextDeviceNode);
@@ -2837,8 +2838,16 @@ DevPathFromTextWiFi (
                                    (UINT16) sizeof (WIFI_DEVICE_PATH)
                                    );
 
-  AsciiStr = (CHAR8 *) WiFiDp->SSId;
-  StrToAscii (SSIdStr, &AsciiStr);
+  if (NULL != SSIdStr) {
+    DataLen = StrLen (SSIdStr);
+    if (StrLen (SSIdStr) > 32) {
+      SSIdStr[32] = L'\0';
+      DataLen     = 32;
+    }
+
+    UnicodeStrToAsciiStr (SSIdStr, AsciiStr);
+    CopyMem (WiFiDp->SSId, AsciiStr, DataLen);
+  }
 
   return (EFI_DEVICE_PATH_PROTOCOL *) WiFiDp;
 }
