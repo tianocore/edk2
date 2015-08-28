@@ -307,33 +307,33 @@ AppendBufferWithTpmAlgHash (
   switch (TpmAlgHash) {
   case TPM_ALG_SHA1:
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA1", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA1");
     break;
   case TPM_ALG_SHA256:
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA256", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA256");
     break;
   case TPM_ALG_SHA384:
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA384", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA384");
     break;
   case TPM_ALG_SHA512:
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA512", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA512");
     break;
   case TPM_ALG_SM3_256:
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SM3_256", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SM3_256");
     break;
   }
 }
@@ -356,33 +356,33 @@ FillBufferWithBootHashAlg (
   Buffer[0] = 0;
   if ((BootHashAlg & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA1", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA1");
   }
   if ((BootHashAlg & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA256", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA256");
   }
   if ((BootHashAlg & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA384", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA384");
   }
   if ((BootHashAlg & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SHA512", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SHA512");
   }
   if ((BootHashAlg & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"SM3_256", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"SM3_256");
   }
 }
 
@@ -404,21 +404,21 @@ FillBufferWithTCG2EventLogFormat (
   Buffer[0] = 0;
   if ((TCG2EventLogFormat & EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"TCG_1_2", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"TCG_1_2");
   }
   if ((TCG2EventLogFormat & EFI_TCG2_EVENT_LOG_FORMAT_TCG_2) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"TCG_2", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"TCG_2");
   }
   if ((TCG2EventLogFormat & (~EFI_TCG2_EVENT_LOG_FORMAT_ALL)) != 0) {
     if (Buffer[0] != 0) {
-      StrnCat (Buffer, L", ", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+      StrCatS (Buffer, BufferSize / sizeof (CHAR16), L", ");
     }
-    StrnCat (Buffer, L"UNKNOWN", (BufferSize / sizeof (CHAR16)) - StrLen (Buffer) - 1);
+    StrCatS (Buffer, BufferSize / sizeof (CHAR16), L"UNKNOWN");
   }
 }
 
