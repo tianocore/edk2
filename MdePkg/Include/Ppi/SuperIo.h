@@ -142,7 +142,7 @@ EFI_STATUS
 ///
 /// Specifies the end of the information list.
 ///
-#define EFI_ACPI_PNP_HID_END       0
+#define EFI_ACPI_PNP_HID_END       EFI_PNP_ID (0x0000)
 
 typedef UINT32                     EFI_ACPI_HID;
 typedef UINT32                     EFI_ACPI_UID;
