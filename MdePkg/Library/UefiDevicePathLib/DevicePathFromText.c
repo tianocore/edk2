@@ -3458,7 +3458,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"MemoryMapped",            DevPathFromTextMemoryMapped            },
   {L"VenHw",                   DevPathFromTextVenHw                   },
   {L"Ctrl",                    DevPathFromTextCtrl                    },
-  {L"Bmc",                     DevPathFromTextBmc                     },
+  {L"BMC",                     DevPathFromTextBmc                     },
 
   {L"AcpiPath",                DevPathFromTextAcpiPath                },
   {L"Acpi",                    DevPathFromTextAcpi                    },

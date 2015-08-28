@@ -333,7 +333,7 @@ DevPathToTextBmc (
   Bmc = DevPath;
   UefiDevicePathLibCatPrint (
     Str,
-    L"Bmc(0x%x,0x%lx)",
+    L"BMC(0x%x,0x%lx)",
     Bmc->InterfaceType,
     ReadUnaligned64 ((UINT64 *) (&Bmc->BaseAddress))
     );
