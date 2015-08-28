@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UiApp
+  MODULE_UNI_FILE                = UiApp.uni
   FILE_GUID                      = 462CAA21-7614-4503-836E-8AB6F4662331
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
@@ -144,3 +145,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString           ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UiAppExtra.uni

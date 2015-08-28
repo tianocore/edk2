@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = BaseSortLib
+  MODULE_UNI_FILE                = BaseSortLib.uni
   FILE_GUID                      = 03F3331B-F12D-494f-BF37-E55A657F2497
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0

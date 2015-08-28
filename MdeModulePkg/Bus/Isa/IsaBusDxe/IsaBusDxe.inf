@@ -21,6 +21,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaBusDxe
+  MODULE_UNI_FILE                = IsaBusDxe.uni
   FILE_GUID                      = DCBE6D66-D928-4138-8041-358F35CBCF80
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -59,3 +60,6 @@
   ## PRODUCES
   gEfiIsaHcProtocolGuid                 
   gEfiIsaHcServiceBindingProtocolGuid   ## PRODUCES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IsaBusDxeExtra.uni
