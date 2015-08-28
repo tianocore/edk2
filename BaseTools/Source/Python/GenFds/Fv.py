@@ -207,6 +207,30 @@ class FV (FvClassObject):
         GenFdsGlobalVariable.LargeFileInFvFlags.pop()
         return FvOutputFile
 
+    ## _GetBlockSize()
+    #
+    #   Calculate FV's block size
+    #   Inherit block size from FD if no block size specified in FV
+    #
+    def _GetBlockSize(self):
+        if self.BlockSizeList:
+            return True
+
+        for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
+            FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
+            for RegionObj in FdObj.RegionList:
+                if RegionObj.RegionType != 'FV':
+                    continue
+                for RegionData in RegionObj.RegionDataList:
+                    #
+                    # Found the FD and region that contain this FV
+                    #
+                    if self.UiFvName.upper() == RegionData.upper():
+                        RegionObj.BlockInfoOfRegion(FdObj.BlockSizeList, self)
+                        if self.BlockSizeList:
+                            return True
+        return False
+
     ## __InitializeInf__()
     #
     #   Initilize the inf file to create FV
@@ -245,8 +269,9 @@ class FV (FvClassObject):
                                       T_CHAR_LF)
         else:
             if self.BlockSizeList == []:
-                #set default block size is 1
-                self.FvInfFile.writelines("EFI_BLOCK_SIZE  = 0x1" + T_CHAR_LF)
+                if not self._GetBlockSize():
+                    #set default block size is 1
+                    self.FvInfFile.writelines("EFI_BLOCK_SIZE  = 0x1" + T_CHAR_LF)
             
             for BlockSize in self.BlockSizeList :
                 if BlockSize[0] != None:
