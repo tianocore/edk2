@@ -326,6 +326,7 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 !endif
 !if $(HTTP_BOOT_ENABLE) == TRUE
   INF  NetworkPkg/DnsDxe/DnsDxe.inf
+  INF  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
   INF  NetworkPkg/HttpDxe/HttpDxe.inf
   INF  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 !endif
