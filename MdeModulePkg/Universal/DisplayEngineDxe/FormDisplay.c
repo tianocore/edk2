@@ -2949,7 +2949,7 @@ UiDisplayMenu (
           //
           if (HelpLine > 2 * RowCount - 2) {
             HelpPageCount = (HelpLine - RowCount + 1) / (RowCount - 2) + 1;
-            if ((HelpLine - RowCount + 1) % (RowCount - 2) > 1) {
+            if ((HelpLine - RowCount + 1) % (RowCount - 2) != 0) {
               HelpPageCount += 1;
             }
           } else {
