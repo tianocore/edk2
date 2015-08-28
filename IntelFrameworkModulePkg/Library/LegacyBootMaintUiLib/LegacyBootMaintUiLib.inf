@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LegacyBootMaintUiLib
+  MODULE_UNI_FILE                = LegacyBootMaintUiLib.uni
   FILE_GUID                      = e6f7f038-3ed9-401a-af1f-5ea7bf644d34
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

@@ -1,7 +1,5 @@
 ## @file
-#  This function deal with the legacy boot option, it create, delete
-#  and manage the legacy boot option, all legacy boot option is getting from
-#  the legacy BBS table.
+#  Legacy Boot Manager module is library for BDS phase.
 #
 #  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
@@ -17,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LegacyBootManagerLib
+  MODULE_UNI_FILE                = LegacyBootManagerLib.uni
   FILE_GUID                      = F1B87BE4-0ACC-409A-A52B-7BFFABCC96A0
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
