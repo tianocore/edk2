@@ -1,6 +1,7 @@
 /** @file
   Library functions which relates with driver health.
 
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -295,7 +296,6 @@ EfiBootManagerGetDriverHealthInfo (
   EFI_STATUS                 Status;
   UINTN                      NumHandles;
   EFI_HANDLE                 *DriverHealthHandles;
-  EFI_DRIVER_HEALTH_STATUS   HealthStatus;
   UINTN                      DriverHealthIndex;
   EFI_HANDLE                 *Handles;
   UINTN                      HandleCount;
@@ -312,8 +312,6 @@ EfiBootManagerGetDriverHealthInfo (
   DriverHealthHandles     = NULL;
   NumHandles              = 0;
   HandleCount             = 0;
-
-  HealthStatus = EfiDriverHealthStatusHealthy;
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,

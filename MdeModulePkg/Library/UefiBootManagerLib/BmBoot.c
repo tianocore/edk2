@@ -1,6 +1,7 @@
 /** @file
   Library functions which relates with booting.
 
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -956,7 +957,6 @@ BmFindUsbDevice (
   EFI_DEVICE_PATH_PROTOCOL  *UsbIoDevicePath;
   EFI_USB_IO_PROTOCOL       *UsbIo;
   UINTN                     Index;
-  UINTN                     UsbIoDevicePathSize;
   BOOLEAN                   Matched;
 
   ASSERT (UsbIoHandleCount != NULL);  
@@ -988,7 +988,6 @@ BmFindUsbDevice (
     UsbIoDevicePath = DevicePathFromHandle (UsbIoHandles[Index]);
     Matched         = FALSE;
     if (!EFI_ERROR (Status) && (UsbIoDevicePath != NULL)) {
-      UsbIoDevicePathSize = GetDevicePathSize (UsbIoDevicePath) - END_DEVICE_PATH_LENGTH;
 
       //
       // Compare starting part of UsbIoHandle's device path with ParentDevicePath.

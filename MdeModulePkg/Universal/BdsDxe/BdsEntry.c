@@ -5,6 +5,7 @@
   After DxeCore finish DXE phase, gEfiBdsArchProtocolGuid->BdsEntry will be invoked
   to enter BDS phase.
 
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -144,7 +145,6 @@ BdsEnumerateBootOptions (
 {
   EFI_STATUS                            Status;
   EFI_BOOT_MANAGER_LOAD_OPTION          *BootOptions;
-  UINT16                                NonBlockNumber;
   UINTN                                 HandleCount;
   EFI_HANDLE                            *Handles;
   EFI_BLOCK_IO_PROTOCOL                 *BlkIo;
@@ -220,7 +220,6 @@ BdsEnumerateBootOptions (
   //
   // Parse simple file system not based on block io
   //
-  NonBlockNumber = 0;
   gBS->LocateHandleBuffer (
          ByProtocol,
          &gEfiSimpleFileSystemProtocolGuid,
