@@ -1584,7 +1584,7 @@ DevPathToTextBluetooth (
   Bluetooth = DevPath;
   UefiDevicePathLibCatPrint (
     Str,
-    L"Bluetooth(%02x:%02x:%02x:%02x:%02x:%02x)",
+    L"Bluetooth(%02x%02x%02x%02x%02x%02x)",
     Bluetooth->BD_ADDR.Address[5],
     Bluetooth->BD_ADDR.Address[4],
     Bluetooth->BD_ADDR.Address[3],

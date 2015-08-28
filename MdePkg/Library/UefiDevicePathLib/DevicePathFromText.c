@@ -2795,17 +2795,18 @@ DevPathFromTextBluetooth (
                                    );
 
   Index = sizeof (BLUETOOTH_ADDRESS) - 1;
-  while (!IS_NULL(BluetoothStr) && Index >= 0) {
-    Walker = SplitStr (&BluetoothStr, L':');
-    TempBufferSize = StrSize (Walker) + StrLen (L"0x") * sizeof (CHAR16);
+  Walker = BluetoothStr;
+  while (!IS_NULL(*Walker) && Index >= 0) {
+    TempBufferSize = 2 * sizeof(CHAR16) + StrSize(L"0x");
     TempNumBuffer = AllocateZeroPool (TempBufferSize);
     if (TempNumBuffer == NULL) {
       break;
     }
     StrCpyS (TempNumBuffer, TempBufferSize / sizeof (CHAR16), L"0x");
-    StrCatS (TempNumBuffer, TempBufferSize / sizeof (CHAR16), Walker);
+    StrnCatS (TempNumBuffer, TempBufferSize / sizeof (CHAR16), Walker, 2);
     BluetoothDp->BD_ADDR.Address[Index] = (UINT8)Strtoi (TempNumBuffer);
     FreePool (TempNumBuffer);
+    Walker += 2;
     Index--;
   }
   
