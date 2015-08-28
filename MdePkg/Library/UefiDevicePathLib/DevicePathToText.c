@@ -1616,9 +1616,14 @@ DevPathToTextWiFi (
   )
 {
   WIFI_DEVICE_PATH      *WiFi;
+  UINT8                 SSId[33];
 
   WiFi = DevPath;
-  UefiDevicePathLibCatPrint (Str, L"Wi-Fi(%a)", WiFi->SSId);
+
+  SSId[32] = '\0';
+  CopyMem (SSId, WiFi->SSId, 32);
+
+  UefiDevicePathLibCatPrint (Str, L"Wi-Fi(%a)", SSId);
 }
 
 /**
