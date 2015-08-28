@@ -14,6 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = UefiFileHandleLib
+  MODULE_UNI_FILE                = UefiFileHandleLib.uni
   FILE_GUID                      = 9495D344-9D8A-41f3-8D17-E2FD238C4E71
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
