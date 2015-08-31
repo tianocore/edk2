@@ -2,6 +2,8 @@
   The driver binding and service binding protocol for IP4 driver.
 
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +24,30 @@ EFI_DRIVER_BINDING_PROTOCOL gIp4DriverBinding = {
   NULL,
   NULL
 };
+
+BOOLEAN  mIpSec2Installed = FALSE;
+
+/**
+   Callback function for IpSec2 Protocol install.
+
+   @param[in] Event           Event whose notification function is being invoked
+   @param[in] Context         Pointer to the notification function's context
+
+**/
+VOID
+EFIAPI
+IpSec2InstalledCallback (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  //
+  // Close the event so it does not get called again.
+  //
+  gBS->CloseEvent (Event);
+
+  mIpSec2Installed = TRUE;
+}
 
 /**
   This is the declaration of an EFI image entry point. This entry point is
@@ -45,6 +71,16 @@ Ip4DriverEntryPoint (
   IN EFI_SYSTEM_TABLE       *SystemTable
   )
 {
+  VOID            *Registration;
+
+  EfiCreateProtocolNotifyEvent (
+    &gEfiIpSec2ProtocolGuid,
+    TPL_CALLBACK,
+    IpSec2InstalledCallback,
+    NULL,
+    &Registration
+    );
+
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,

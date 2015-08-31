@@ -2,6 +2,7 @@
   Implementation of EFI_IP6_PROTOCOL protocol interfaces and type definitions.
 
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -89,6 +90,7 @@
 #define IP6_NO_MAPPING(IpInstance) (!(IpInstance)->Interface->Configured)
 
 extern EFI_IPSEC2_PROTOCOL *mIpSec;
+extern BOOLEAN             mIpSec2Installed;
 
 //
 // IP6_TXTOKEN_WRAP wraps the upper layer's transmit token.
