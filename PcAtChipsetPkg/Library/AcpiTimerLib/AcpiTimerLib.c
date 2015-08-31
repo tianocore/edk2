@@ -1,7 +1,7 @@
 /** @file
   ACPI Timer implements one instance of Timer Library.
 
-  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -118,11 +118,11 @@ InternalAcpiGetAcpiTimerIoPort (
 {
   UINT16  Port;
   
-  Port = PcdGet16 (PcdAcpiIoPciBarRegisterOffset);
+  Port = PcdGet16 (PcdAcpiIoPortBaseAddress);
   
   //
   // If the register offset to the BAR for the ACPI I/O Port Base Address is not 0x0000, then 
-  // read the PCI register for the APCI BAR value in case the BAR has been programmed to a 
+  // read the PCI register for the ACPI BAR value in case the BAR has been programmed to a 
   // value other than PcdAcpiIoPortBaseAddress
   //
   if (PcdGet16 (PcdAcpiIoPciBarRegisterOffset) != 0x0000) {
@@ -134,7 +134,7 @@ InternalAcpiGetAcpiTimerIoPort (
                         ));
   }
   
-  return (Port & ~BIT0) + PcdGet16 (PcdAcpiPm1TmrOffset);
+  return (Port & PcdGet16 (PcdAcpiIoPortBaseAddressMask)) + PcdGet16 (PcdAcpiPm1TmrOffset);
 }
 
 /**

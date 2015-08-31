@@ -163,5 +163,9 @@
   # @Prompt Offset to 32-bit Timer register in ACPI BAR
   gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiPm1TmrOffset              |0x0008|UINT16|0x00000017
 
+  ## Defines the bit mask to retrieve ACPI IO Port Base Address
+  # @Prompt ACPI IO Port Base Address Mask
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddressMask     |0xFFFE|UINT16|0x00000018
+
 [UserExtensions.TianoCore."ExtraFiles"]
   PcAtChipsetPkgExtra.uni
