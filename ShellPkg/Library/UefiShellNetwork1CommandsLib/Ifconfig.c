@@ -596,11 +596,14 @@ IfConfigShowInterfaceInfo (
   IN LIST_ENTRY    *IfList
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IFCONFIG_INTERFACE_CB     *IfCb;
-  EFI_IPv4_ADDRESS          Gateway;
-  UINT32                    Index;
+  LIST_ENTRY                   *Entry;
+  LIST_ENTRY                   *Next;
+  IFCONFIG_INTERFACE_CB        *IfCb;
+  BOOLEAN                       MediaPresent;
+  EFI_IPv4_ADDRESS              Gateway;
+  UINT32                        Index;
+  
+  MediaPresent = TRUE;
 
   if (IsListEmpty (IfList)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_INTERFACE), gShellNetwork1HiiHandle);
@@ -617,7 +620,17 @@ IfConfigShowInterfaceInfo (
     //
     // Print interface name.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_IF_NAME), gShellNetwork1HiiHandle, IfCb->IfInfo->Name);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_IF_NAME), gShellNetwork1HiiHandle, IfCb->IfInfo->Name); 
+
+    //
+    // Get Media State.
+    //
+    NetLibDetectMedia (IfCb->NicHandle, &MediaPresent);
+    if (!MediaPresent) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_MEDIA_STATE), gShellNetwork1HiiHandle, L"Media disconnected");
+    } else {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_MEDIA_STATE), gShellNetwork1HiiHandle, L"Media present");
+    }
 
     //
     // Print interface config policy.
