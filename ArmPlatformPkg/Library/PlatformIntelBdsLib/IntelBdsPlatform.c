@@ -311,6 +311,11 @@ PlatformBdsPolicyBehavior (
 
   Status = PlatformBdsConnectConsole ();
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Show the splash screen.
+  //
+  EnableQuietBoot (PcdGetPtr (PcdLogoFile));
 }
 
 /**
