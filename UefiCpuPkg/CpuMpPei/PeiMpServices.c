@@ -334,7 +334,7 @@ PeiGetProcessorInfo (
   if (PeiCpuMpData->CpuData[ProcessorNumber].ApicId == GetInitialApicId()) {
     ProcessorInfoBuffer->StatusFlag |= PROCESSOR_AS_BSP_BIT;
   }
-  if (PeiCpuMpData->CpuData[ProcessorNumber].Health.Uint32 == 0) {
+  if (PeiCpuMpData->CpuData[ProcessorNumber].CpuHealthy) {
     ProcessorInfoBuffer->StatusFlag |= PROCESSOR_HEALTH_STATUS_BIT;
   }
   if (PeiCpuMpData->CpuData[ProcessorNumber].State == CpuStateDisabled) {

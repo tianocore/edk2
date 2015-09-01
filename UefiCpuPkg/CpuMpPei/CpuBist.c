@@ -226,7 +226,10 @@ CollectBistDataFromPpi (
         CpuData->Health = CpuInstance[CpuIndex].InfoRecord.IA32HealthFlags;
       }
     }
-    if (CpuData->Health.Uint32 != 0) {
+    if (CpuData->Health.Uint32 == 0) {
+      CpuData->CpuHealthy = TRUE;
+    } else {
+      CpuData->CpuHealthy = FALSE;
       //
       // Report Status Code that self test is failed
       //
