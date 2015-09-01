@@ -44,7 +44,6 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  BdsLib
   DebugLib
   DevicePathLib
   MemoryAllocationLib
