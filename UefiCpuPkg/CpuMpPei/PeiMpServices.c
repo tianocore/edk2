@@ -804,6 +804,16 @@ PeiSwitchBSP (
   ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
   ApicBaseMsr.Bits.Bsp = 1;
   AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+  //
+  // Set old BSP enable state
+  //
+  if (!EnableOldBSP) {
+    PeiCpuMpData->CpuData[PeiCpuMpData->BspNumber].State = CpuStateDisabled;
+  }
+  //
+  // Save new BSP number
+  //
+  PeiCpuMpData->BspNumber = (UINT32) ProcessorNumber;
 
   return EFI_SUCCESS;
 }
