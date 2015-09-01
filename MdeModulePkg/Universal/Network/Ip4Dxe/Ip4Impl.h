@@ -2,6 +2,8 @@
   Ip4 internal functions and type defintions.
   
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -396,5 +398,6 @@ Ip4FreeTxToken (
   );
 
 extern EFI_IPSEC2_PROTOCOL   *mIpSec;
+extern BOOLEAN               mIpSec2Installed;
 
 #endif
