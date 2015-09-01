@@ -154,12 +154,12 @@ InitializeConsolePipe (
     DEBUG_CODE_BEGIN();
       if (EFI_ERROR(Status)) {
         // We convert back to the text representation of the device Path
-        EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
-        CHAR16* DevicePathTxt;
-        EFI_STATUS Status;
+        EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevicePathToTextProtocol;
+        CHAR16                            *DevicePathTxt;
 
-        Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
-        if (!EFI_ERROR(Status)) {
+        DevicePathToTextProtocol = NULL;
+        gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **) &DevicePathToTextProtocol);
+        if (DevicePathToTextProtocol != NULL) {
           DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (DevicePath, TRUE, TRUE);
 
           DEBUG((EFI_D_ERROR,"Fail to start the console with the Device Path '%s'. (Error '%r')\n", DevicePathTxt, Status));
