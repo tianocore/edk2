@@ -204,7 +204,20 @@ MemMapInitialization (
 
   if (!mXen) {
     UINT32  TopOfLowRam;
+    UINT32  PciBase;
+
     TopOfLowRam = GetSystemMemorySizeBelow4gb ();
+    if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+      //
+      // A 3GB base will always fall into Q35's 32-bit PCI host aperture,
+      // regardless of the Q35 MMCONFIG BAR. Correspondingly, QEMU never lets
+      // the RAM below 4 GB exceed it.
+      //
+      PciBase = BASE_2GB + BASE_1GB;
+      ASSERT (TopOfLowRam <= PciBase);
+    } else {
+      PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
+    }
 
     //
     // address       purpose   size
@@ -219,8 +232,7 @@ MemMapInitialization (
     // 0xFED20000    gap                          896 KB
     // 0xFEE00000    LAPIC                          1 MB
     //
-    AddIoMemoryRangeHob (TopOfLowRam < BASE_2GB ?
-                         BASE_2GB : TopOfLowRam, 0xFC000000);
+    AddIoMemoryRangeHob (PciBase, 0xFC000000);
     AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
     AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
