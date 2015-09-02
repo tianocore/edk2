@@ -322,6 +322,7 @@ BootModeInitialization (
   if (CmosRead8 (0xF) == 0xFE) {
     mBootMode = BOOT_ON_S3_RESUME;
   }
+  CmosWrite8 (0xF, 0x00);
 
   Status = PeiServicesSetBootMode (mBootMode);
   ASSERT_EFI_ERROR (Status);
