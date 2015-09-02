@@ -144,19 +144,20 @@ SetVariableCheckHandlerMor (
   }
   
   //
+  // Delete not OK
+  //
+  if ((DataSize != sizeof(UINT8)) || (Data == NULL) || (Attributes == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // check format
   //
   if (IsMorLockVariable(VariableName, VendorGuid)) {
     //
-    // Delete not OK
-    //
-    if ((DataSize == 0) || (Data == NULL) || (Attributes == 0)) {
-      return EFI_INVALID_PARAMETER;
-    }
-    //
     // set to any other value not OK
     //
-    if ((DataSize != sizeof(UINT8)) || ((*(UINT8 *)Data != 1) && (*(UINT8 *)Data != 0))) {
+    if ((*(UINT8 *)Data != 1) && (*(UINT8 *)Data != 0)) {
       return EFI_INVALID_PARAMETER;
     }
   }
