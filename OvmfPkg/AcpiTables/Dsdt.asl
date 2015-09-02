@@ -130,7 +130,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             )
       })
 
-      Method (_CRS, 0) {
+      Method (_CRS, 0, Serialized) {
         //
         // see the FIRMWARE_DATA structure in "OvmfPkg/AcpiPlatformDxe/Qemu.c"
         //
@@ -360,7 +360,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
         // _CRS method for LNKA, LNKB, LNKC, LNKD
         // Arg0[in]: value of PIRA / PIRB / PIRC / PIRD
         //
-        Method (PCRS, 1, NotSerialized) {
+        Method (PCRS, 1, Serialized) {
           //
           // create temporary buffer with an Extended Interrupt Descriptor
           // whose single vector defaults to zero
