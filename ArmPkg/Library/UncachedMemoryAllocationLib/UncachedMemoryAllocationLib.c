@@ -125,9 +125,10 @@ AllocatePagesFromList (
   }
   // Check if we have found a node that could contain our new allocation
   if (NewNode != NULL) {
-    NewNode->Allocated = TRUE;
-    Node->Allocation   = (VOID*)(UINTN)Node->Base;
-    *Allocation        = Node->Allocation;
+    NewNode->Allocated  = TRUE;
+    NewNode->Allocation = (VOID*)(UINTN)NewNode->Base;
+    *Allocation         = NewNode->Allocation;
+    mFreedBufferSize    -= NewNode->Pages * EFI_PAGE_SIZE;
     return EFI_SUCCESS;
   }
 
