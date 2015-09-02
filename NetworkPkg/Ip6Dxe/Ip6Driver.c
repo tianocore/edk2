@@ -33,7 +33,6 @@ BOOLEAN  mIpSec2Installed = FALSE;
    @param[in] Event           Event whose notification function is being invoked
    @param[in] Context         Pointer to the notification function's context
 
-   @retval  EFI_SUCCESS       Callback successful.
 **/
 VOID
 EFIAPI
