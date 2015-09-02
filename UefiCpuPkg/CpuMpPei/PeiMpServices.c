@@ -441,6 +441,10 @@ PeiStartupAllAPs (
     return EFI_NOT_FOUND;
   }
 
+  if (Procedure == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   // Check whether caller processor is BSP
   //
