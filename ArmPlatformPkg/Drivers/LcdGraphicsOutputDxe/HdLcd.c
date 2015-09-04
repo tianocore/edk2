@@ -123,3 +123,11 @@ LcdShutdown (
   // Disable the controller
   MmioWrite32 (HDLCD_REG_COMMAND, HDLCD_DISABLE);
 }
+
+EFI_STATUS
+LcdIdentify (
+  VOID
+  )
+{
+  return EFI_SUCCESS;
+}
