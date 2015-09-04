@@ -53,6 +53,7 @@
 
 [Guids]
   gArmGlobalVariableGuid
+  gEfiEndOfDxeEventGroupGuid
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths

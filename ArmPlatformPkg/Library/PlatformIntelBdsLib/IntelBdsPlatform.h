@@ -30,5 +30,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PlatformBdsLib.h>
 
 #include <Guid/GlobalVariable.h>
+#include <Guid/EventGroup.h>
 
 #endif // _INTEL_BDS_PLATFORM_H
