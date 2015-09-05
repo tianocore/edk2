@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -840,8 +840,8 @@ MtrrLibInitializeMtrrMask (
     *MtrrValidBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
     *MtrrValidAddressMask = *MtrrValidBitsMask & 0xfffffffffffff000ULL;
   } else {
-    *MtrrValidBitsMask    = MTRR_LIB_CACHE_VALID_ADDRESS;
-    *MtrrValidAddressMask = 0xFFFFFFFF;
+    *MtrrValidBitsMask    = MTRR_LIB_MSR_VALID_MASK;
+    *MtrrValidAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
   }
 }
 
