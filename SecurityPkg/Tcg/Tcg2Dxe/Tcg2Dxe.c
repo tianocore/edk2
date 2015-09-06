@@ -1456,6 +1456,7 @@ SetupEventLog (
   UINT8                           TempBuf[sizeof(TCG_EfiSpecIDEventStruct) + (HASH_COUNT * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8)];
   TCG_PCR_EVENT_HDR               FirstPcrEvent;
   TCG_EfiSpecIdEventAlgorithmSize *DigestSize;
+  TCG_EfiSpecIdEventAlgorithmSize *TempDigestSize;
   UINT8                           *VendorInfoSize;
   UINT32                          NumberOfAlgorithms;
 
@@ -1501,32 +1502,44 @@ SetupEventLog (
         NumberOfAlgorithms = 0;
         DigestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(NumberOfAlgorithms));
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
-          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA1;
-          DigestSize[NumberOfAlgorithms].digestSize = SHA1_DIGEST_SIZE;
+          TempDigestSize = DigestSize;
+          TempDigestSize += NumberOfAlgorithms;
+          TempDigestSize->algorithmId = TPM_ALG_SHA1;
+          TempDigestSize->digestSize = SHA1_DIGEST_SIZE;
           NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
-          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA256;
-          DigestSize[NumberOfAlgorithms].digestSize = SHA256_DIGEST_SIZE;
+          TempDigestSize = DigestSize;
+          TempDigestSize += NumberOfAlgorithms;
+          TempDigestSize->algorithmId = TPM_ALG_SHA256;
+          TempDigestSize->digestSize = SHA256_DIGEST_SIZE;
           NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
-          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA384;
-          DigestSize[NumberOfAlgorithms].digestSize = SHA384_DIGEST_SIZE;
+          TempDigestSize = DigestSize;
+          TempDigestSize += NumberOfAlgorithms;
+          TempDigestSize->algorithmId = TPM_ALG_SHA384;
+          TempDigestSize->digestSize = SHA384_DIGEST_SIZE;
           NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
-          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SHA512;
-          DigestSize[NumberOfAlgorithms].digestSize = SHA512_DIGEST_SIZE;
+          TempDigestSize = DigestSize;
+          TempDigestSize += NumberOfAlgorithms;
+          TempDigestSize->algorithmId = TPM_ALG_SHA512;
+          TempDigestSize->digestSize = SHA512_DIGEST_SIZE;
           NumberOfAlgorithms++;
         }
         if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
-          DigestSize[NumberOfAlgorithms].algorithmId = TPM_ALG_SM3_256;
-          DigestSize[NumberOfAlgorithms].digestSize = SM3_256_DIGEST_SIZE;
+          TempDigestSize = DigestSize;
+          TempDigestSize += NumberOfAlgorithms;
+          TempDigestSize->algorithmId = TPM_ALG_SM3_256;
+          TempDigestSize->digestSize = SM3_256_DIGEST_SIZE;
           NumberOfAlgorithms++;
         }
         CopyMem (TcgEfiSpecIdEventStruct + 1, &NumberOfAlgorithms, sizeof(NumberOfAlgorithms));
-        VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
+        TempDigestSize = DigestSize;
+        TempDigestSize += NumberOfAlgorithms;
+        VendorInfoSize = (UINT8 *)TempDigestSize;
         *VendorInfoSize = 0;
 
         //
