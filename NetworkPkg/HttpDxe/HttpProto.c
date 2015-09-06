@@ -243,10 +243,12 @@ HttpCloseTcp4ConnCloseEvent (
 
   if (NULL != HttpInstance->ConnToken.CompletionToken.Event) {
     gBS->CloseEvent (HttpInstance->ConnToken.CompletionToken.Event);
+    HttpInstance->ConnToken.CompletionToken.Event = NULL;
   }
 
   if (NULL != HttpInstance->CloseToken.CompletionToken.Event) {
     gBS->CloseEvent(HttpInstance->CloseToken.CompletionToken.Event);
+    HttpInstance->CloseToken.CompletionToken.Event = NULL;
   }  
 }
 
@@ -581,21 +583,22 @@ HttpCloseConnection (
 {
   EFI_STATUS                Status;
 
-  HttpInstance->CloseToken.AbortOnClose = TRUE;
-  HttpInstance->IsCloseDone             = FALSE;
-  
+  if (HttpInstance->State == HTTP_STATE_TCP_CONNECTED) {
+    HttpInstance->CloseToken.AbortOnClose = TRUE;
+    HttpInstance->IsCloseDone             = FALSE;
+    
+    Status = HttpInstance->Tcp4->Close (HttpInstance->Tcp4, &HttpInstance->CloseToken);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-  Status = HttpInstance->Tcp4->Close (HttpInstance->Tcp4, &HttpInstance->CloseToken);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  while (!HttpInstance->IsCloseDone) {
-    HttpInstance->Tcp4->Poll (HttpInstance->Tcp4);
+    while (!HttpInstance->IsCloseDone) {
+      HttpInstance->Tcp4->Poll (HttpInstance->Tcp4);
+    }
   }
 
   HttpInstance->State = HTTP_STATE_TCP_CLOSED;
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
