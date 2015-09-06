@@ -15,6 +15,15 @@ import os
 import re
 import sys
 
+#
+#  Read data from file
+#
+#  param [in]  binfile     Binary file
+#  param [in]  offset      Offset
+#  param [in]  len         Length
+#
+#  retval      value       Value
+#
 def readDataFromFile (binfile, offset, len=1):
     fd     = open(binfile, "r+b")
     fsize  = os.path.getsize(binfile)
@@ -31,11 +40,18 @@ def readDataFromFile (binfile, offset, len=1):
     fd.close()
     return value
 
+#
+#  Check FSP header is valid or not
+#
+#  param [in]  binfile     Binary file
+#
+#  retval      boolean     True: valid; False: invalid
+#
 def IsFspHeaderValid (binfile):
     fd     = open (binfile, "rb")
-    bindat = fd.read(0x200)
+    bindat = fd.read(0x200) # only read first 0x200 bytes
     fd.close()
-    HeaderList = ['FSPH' , 'FSPP' , 'FSPE']
+    HeaderList = ['FSPH' , 'FSPP' , 'FSPE']       # Check 'FSPH', 'FSPP', and 'FSPE' in the FSP header
     OffsetList = []
     for each in HeaderList:
         if each in bindat:
@@ -43,13 +59,26 @@ def IsFspHeaderValid (binfile):
         else:
             idx = 0
         OffsetList.append(idx)
-    if not OffsetList[0] or not OffsetList[1]:
+    if not OffsetList[0] or not OffsetList[1]:    # If 'FSPH' or 'FSPP' is missing, it will return false
         return False
     Revision = ord(bindat[OffsetList[0] + 0x0B])
+    #
+    # if revision is bigger than 1, it means it is FSP v1.1 or greater revision, which must contain 'FSPE'.
+    #
     if Revision > 1 and not OffsetList[2]:
-        return False
+        return False                              # If FSP v1.1 or greater without 'FSPE', then return false
     return True
 
+#
+#  Patch data in file
+#
+#  param [in]  binfile     Binary file
+#  param [in]  offset      Offset
+#  param [in]  value       Patch value
+#  param [in]  len         Length
+#
+#  retval      len         Length
+#
 def patchDataInFile (binfile, offset, value, len=1):
     fd     = open(binfile, "r+b")
     fsize  = os.path.getsize(binfile)
@@ -83,49 +112,98 @@ class Symbols:
         self.parenthesisOpenSet   =  '([{<'
         self.parenthesisCloseSet  =  ')]}>'
 
+    #
+    #  Get FD file
+    #
+    #  retval      self.fdFile Retrieve FD file
+    #
     def getFdFile (self):
         return self.fdFile
 
+    #
+    #  Get FD size
+    #
+    #  retval      self.fdSize Retrieve the size of FD file
+    #
     def getFdSize (self):
         return self.fdSize
 
+    #
+    #  Create dictionaries
+    #
+    #  param [in]  fvDir       FV's directory
+    #  param [in]  fvNames     All FV's names
+    #
+    #  retval      0           Created dictionaries successfully
+    #
     def createDicts (self, fvDir, fvNames):
+        #
+        # If the fvDir is not a dirctory, then raise an exception
+        #
         if not os.path.isdir(fvDir):
             raise Exception ("'%s' is not a valid directory!" % FvDir)
 
+        #
+        # If the Guid.xref is not existing in fvDir, then raise an exception
+        #
         xrefFile = os.path.join(fvDir, "Guid.xref")
         if not os.path.exists(xrefFile):
             raise Exception("Cannot open GUID Xref file '%s'!" % xrefFile)
 
+        #
+        # Add GUID reference to dictionary
+        #
         self.dictGuidNameXref  = {}
         self.parseGuidXrefFile(xrefFile)
 
+        #
+        # Split up each FV from fvNames and get the fdBase
+        #
         fvList = fvNames.split(":")
         fdBase = fvList.pop()
         if len(fvList) == 0:
             fvList.append(fdBase)
 
+        #
+        # If the FD file is not existing, then raise an exception
+        #
         fdFile =  os.path.join(fvDir, fdBase.strip() + ".fd")
         if not os.path.exists(fdFile):
             raise Exception("Cannot open FD file '%s'!" % fdFile)
 
+        #
+        # Get the size of the FD file
+        #
         self.fdFile = fdFile
         self.fdSize = os.path.getsize(fdFile)
 
+        #
+        # If the INF file, which is the first element of fvList, is not existing, then raise an exception
+        #
         infFile = os.path.join(fvDir, fvList[0].strip()) + ".inf"
         if not os.path.exists(infFile):
             raise Exception("Cannot open INF file '%s'!" % infFile)
 
+        #
+        # Parse INF file in order to get fdBase and then assign those values to dictVariable
+        #
         self.parseInfFile(infFile)
-
         self.dictVariable = {}
         self.dictVariable["FDSIZE"] =  self.fdSize
         self.dictVariable["FDBASE"] =  self.fdBase
 
+        #
+        # Collect information from FV MAP file and FV TXT file then
+        # put them into dictionaries
+        #
         self.dictSymbolAddress = {}
         self.dictFfsOffset     = {}
         for file in fvList:
 
+            #
+            # If the .Fv.map file is not existing, then raise an exception.
+            # Otherwise, parse FV MAP file
+            #
             fvFile  = os.path.join(fvDir, file.strip()) + ".Fv"
             mapFile = fvFile + ".map"
             if not os.path.exists(mapFile):
@@ -133,12 +211,19 @@ class Symbols:
 
             self.parseFvMapFile(mapFile)
 
+            #
+            # If the .Fv.txt file is not existing, then raise an exception.
+            # Otherwise, parse FV TXT file
+            #
             fvTxtFile  = fvFile + ".txt"
             if not os.path.exists(fvTxtFile):
                 raise Exception("Cannot open FV TXT file '%s'!" % fvTxtFile)
 
             self.parseFvTxtFile(fvTxtFile)
 
+        #
+        # Search all MAP files in FFS directory if it exists then parse MOD MAP file
+        #
         ffsDir = os.path.join(fvDir, "Ffs")
         if (os.path.isdir(ffsDir)):
             for item in os.listdir(ffsDir):
@@ -151,7 +236,17 @@ class Symbols:
 
         return 0
 
+    #
+    #  Get FV offset in FD file
+    #
+    #  param [in]  fvFile      FV file
+    #
+    #  retval      offset      Got FV offset successfully
+    #
     def getFvOffsetInFd(self, fvFile):
+        #
+        # Check if the first 0x70 bytes of fvFile can be found in fdFile
+        #
         fvHandle = open(fvFile, "r+b")
         fdHandle = open(self.fdFile, "r+b")
         offset = fdHandle.read().find(fvHandle.read(0x70))
@@ -161,7 +256,18 @@ class Symbols:
             raise Exception("Could not locate FV file %s in FD!" % fvFile)
         return offset
 
+    #
+    #  Parse INF file
+    #
+    #  param [in]  infFile     INF file
+    #
+    #  retval      0           Parsed INF file successfully
+    #
     def parseInfFile(self, infFile):
+        #
+        # Get FV offset and search EFI_BASE_ADDRESS in the FD file 
+        # then assign the value of EFI_BASE_ADDRESS to fdBase
+        #
         fvOffset    = self.getFvOffsetInFd(infFile[0:-4] + ".Fv")
         fdIn        = open(infFile, "r")
         rptLine     = fdIn.readline()
@@ -177,7 +283,19 @@ class Symbols:
             raise Exception("Could not find EFI_BASE_ADDRESS in INF file!" % fvFile)
         return 0
 
+    #
+    #  Parse FV TXT file
+    #
+    #  param [in]  fvTxtFile   .Fv.txt file
+    #
+    #  retval      0           Parsed FV TXT file successfully
+    #
     def parseFvTxtFile(self, fvTxtFile):
+        #
+        # Get information from .Fv.txt in order to create a dictionary
+        # For example,
+        # self.dictFfsOffset[912740BE-2284-4734-B971-84B027353F0C] = 0x000D4078
+        #
         fvOffset = self.getFvOffsetInFd(fvTxtFile[0:-4])
         fdIn     = open(fvTxtFile, "r")
         rptLine  = fdIn.readline()
@@ -189,7 +307,23 @@ class Symbols:
         fdIn.close()
         return 0
 
+    #
+    #  Parse FV MAP file
+    #
+    #  param [in]  mapFile     .Fv.map file
+    #
+    #  retval      0           Parsed FV MAP file successfully
+    #
     def parseFvMapFile(self, mapFile):
+        #
+        # Get information from .Fv.map in order to create dictionaries
+        # For example,
+        # self.dictModBase[FspSecCore:BASE]  = 4294592776 (0xfffa4908)
+        # self.dictModBase[FspSecCore:ENTRY] = 4294606552 (0xfffa7ed8)
+        # self.dictModBase[FspSecCore:TEXT]  = 4294593080 (0xfffa4a38)
+        # self.dictModBase[FspSecCore:DATA]  = 4294612280 (0xfffa9538)
+        # self.dictSymbolAddress[FspSecCore:_SecStartup] = 0x00fffa4a38
+        #
         fdIn     = open(mapFile, "r")
         rptLine  = fdIn.readline()
         modName  = ""
@@ -220,30 +354,65 @@ class Symbols:
         fdIn.close()
         return 0
 
+    #
+    #  Parse MOD MAP file
+    #
+    #  param [in]  moduleName  Module name
+    #  param [in]  mapFile     .Fv.map file
+    #
+    #  retval      0           Parsed MOD MAP file successfully
+    #  retval      1           There is no moduleEntryPoint in modSymbols
+    #
     def parseModMapFile(self, moduleName, mapFile):
+        #
+        # Get information from mapFile by moduleName in order to create a dictionary
+        # For example,
+        # self.dictSymbolAddress[FspSecCore:___guard_fids_count] = 0x00fffa4778
+        #
         modSymbols  = {}
         fdIn        = open(mapFile, "r")
-        reportLine  = fdIn.readline()
+        reportLines = fdIn.readlines()
+        fdIn.close()
+
+        moduleEntryPoint = "__ModuleEntryPoint"
+        reportLine = reportLines[0]
         if reportLine.strip().find("Archive member included") != -1:
             #GCC
             #                0x0000000000001d55                IoRead8
             patchMapFileMatchString = "\s+(0x[0-9a-fA-F]{16})\s+([^\s][^0x][_a-zA-Z0-9\-]+)\s"
             matchKeyGroupIndex = 2
             matchSymbolGroupIndex  = 1
-            moduleEntryPoint = "_ModuleEntryPoint"
+            prefix = '_'
         else:
             #MSFT
             #0003:00000190       _gComBase                  00007a50     SerialPo
             patchMapFileMatchString =  "^\s[0-9a-fA-F]{4}:[0-9a-fA-F]{8}\s+(\w+)\s+([0-9a-fA-F]{8}\s+)"
             matchKeyGroupIndex = 1
             matchSymbolGroupIndex  = 2
-            moduleEntryPoint = "__ModuleEntryPoint"
-        while (reportLine != "" ):
+            prefix = ''
+
+        for reportLine in reportLines:
             match = re.match(patchMapFileMatchString, reportLine)
             if match is not None:
-                modSymbols[match.group(matchKeyGroupIndex)] = match.group(matchSymbolGroupIndex)
-            reportLine  = fdIn.readline()
-        fdIn.close()
+                modSymbols[prefix + match.group(matchKeyGroupIndex)] = match.group(matchSymbolGroupIndex)
+
+        # Handle extra module patchable PCD variable in Linux map since it might have different format
+        # .data._gPcd_BinaryPatch_PcdVpdBaseAddress
+        #        0x0000000000003714        0x4 /tmp/ccmytayk.ltrans1.ltrans.o
+        handleNext = False
+        if matchSymbolGroupIndex == 1:
+            for reportLine in reportLines:
+                if handleNext:
+                    handleNext = False
+                    pcdName = match.group(1)
+                    match   = re.match("\s+(0x[0-9a-fA-F]{16})\s+", reportLine)
+                    if match is not None:
+                        modSymbols[prefix + pcdName] = match.group(1)
+                else:
+                    match = re.match("^\s\.data\.(_gPcd_BinaryPatch[_a-zA-Z0-9\-]+)", reportLine)
+                    if match is not None:
+                        handleNext = True
+                        continue
 
         if not moduleEntryPoint in modSymbols:
             return 1
@@ -263,7 +432,19 @@ class Symbols:
                 self.dictSymbolAddress[fullSym] = "0x00%08x" % (baseOffset+ int(modSymbols[symbol], 16))
         return 0
 
+    #
+    #  Parse Guid.xref file
+    #
+    #  param [in]  xrefFile    the full directory of Guid.xref file
+    #
+    #  retval      0           Parsed Guid.xref file successfully
+    #
     def parseGuidXrefFile(self, xrefFile):
+        #
+        # Get information from Guid.xref in order to create a GuidNameXref dictionary
+        # The dictGuidNameXref, for example, will be like
+        # dictGuidNameXref [1BA0062E-C779-4582-8566-336AE8F78F09] = FspSecCore
+        #
         fdIn     = open(xrefFile, "r")
         rptLine  = fdIn.readline()
         while (rptLine != "" ):
@@ -274,18 +455,35 @@ class Symbols:
         fdIn.close()
         return 0
 
+    #
+    #  Get current character
+    #
+    #  retval      elf.string[self.index]
+    #  retval      ''                       Exception
+    #
     def getCurr(self):
         try:
             return self.string[self.index]
         except Exception:
             return ''
 
+    #
+    #  Check to see if it is last index
+    #
+    #  retval      self.index
+    #
     def isLast(self):
         return self.index == len(self.string)
 
+    #
+    #  Move to next index
+    #
     def moveNext(self):
         self.index += 1
 
+    #
+    #  Skip space
+    #
     def skipSpace(self):
         while not self.isLast():
             if self.getCurr() in ' \t':
@@ -293,6 +491,11 @@ class Symbols:
             else:
                 return
 
+    #
+    #  Parse value
+    #
+    #  retval      value
+    #
     def parseValue(self):
         self.skipSpace()
         var = ''
@@ -325,6 +528,11 @@ class Symbols:
                 value = self.getVariable(var)
         return int(value)
 
+    #
+    #  Parse single operation
+    #
+    #  retval      ~self.parseBrace() or self.parseValue()
+    #
     def parseSingleOp(self):
         self.skipSpace()
         char = self.getCurr()
@@ -334,6 +542,11 @@ class Symbols:
         else:
             return self.parseValue()
 
+    #
+    #  Parse symbol of Brace([, {, <)
+    #
+    #  retval      value or self.parseSingleOp()
+    #
     def parseBrace(self):
         self.skipSpace()
         char = self.getCurr()
@@ -355,6 +568,11 @@ class Symbols:
         else:
             return self.parseSingleOp()
 
+    #
+    #  Parse symbol of Multiplier(*)
+    #
+    #  retval      value or self.parseSingleOp()
+    #
     def parseMul(self):
         values = [self.parseBrace()]
         while True:
@@ -370,6 +588,11 @@ class Symbols:
             value *= each
         return value
 
+    #
+    #  Parse symbol of And(&) and Or(|)
+    #
+    #  retval      value
+    #
     def parseAndOr(self):
         values = [self.parseMul()]
         op     = None
@@ -398,6 +621,11 @@ class Symbols:
 
         return value
 
+    #
+    #  Parse symbol of Add(+) and Minus(-)
+    #
+    #  retval      sum(values)
+    #
     def parseAddMinus(self):
         values = [self.parseAndOr()]
         while True:
@@ -413,9 +641,19 @@ class Symbols:
                 break
         return sum(values)
 
+    #
+    #  Parse expression
+    #
+    #  retval      self.parseAddMinus()
+    #
     def parseExpr(self):
         return self.parseAddMinus()
 
+    #
+    #  Get result
+    #
+    #  retval      value
+    #
     def getResult(self):
         value = self.parseExpr()
         self.skipSpace()
@@ -423,6 +661,11 @@ class Symbols:
             raise Exception("Unexpected character found '%s'" % self.getCurr())
         return value
 
+    #
+    #  Get module GUID
+    #
+    #  retval      value
+    #
     def getModGuid(self, var):
         guid = (guid for guid,name in self.dictGuidNameXref.items() if name==var)
         try:
@@ -431,12 +674,22 @@ class Symbols:
             raise Exception("Unknown module name %s !" % var)
         return value
 
+    #
+    #  Get variable
+    #
+    #  retval      value
+    #
     def getVariable(self, var):
         value = self.dictVariable.get(var, None)
         if value == None:
             raise Exception("Unrecognized variable '%s'" % var)
         return value
 
+    #
+    #  Get number
+    #
+    #  retval      value
+    #
     def getNumber(self, var):
         var = var.strip()
         if var.startswith('0x'):  # HEX
@@ -445,6 +698,13 @@ class Symbols:
             value = int(var, 10)
         return value
 
+    #
+    #  Get content
+    #
+    #  param [in]  value
+    #
+    #  retval      value
+    #
     def getContent(self, value):
         if (value >= self.fdBase) and (value < self.fdBase + self.fdSize):
             value = value - self.fdBase
@@ -452,16 +712,37 @@ class Symbols:
             raise Exception("Invalid file offset 0x%08x !" % value)
         return readDataFromFile (self.fdFile, value, 4)
 
+    #
+    #  Change value to address
+    #
+    #  param [in]  value
+    #
+    #  retval      value
+    #
     def toAddress(self, value):
         if value < self.fdSize:
             value = value + self.fdBase
         return value
 
+    #
+    #  Change value to offset
+    #
+    #  param [in]  value
+    #
+    #  retval      value
+    #
     def toOffset(self, value):
         if value > self.fdBase:
             value = value - self.fdBase
         return value
 
+    #
+    #  Get GUID offset
+    #
+    #  param [in]  value
+    #
+    #  retval      value
+    #
     def getGuidOff(self, value):
         # GUID:Offset
         symbolName = value.split(':')
@@ -471,6 +752,13 @@ class Symbols:
             raise Exception("Unknown GUID %s !" % value)
         return value
 
+    #
+    #  Get symbols
+    #
+    #  param [in]  value
+    #
+    #  retval      ret
+    #
     def getSymbols(self, value):
         if self.dictSymbolAddress.has_key(value):
             # Module:Function
@@ -479,6 +767,14 @@ class Symbols:
             raise Exception("Unknown symbol %s !" % value)
         return ret
 
+    #
+    #  Evaluate symbols
+    #
+    #  param [in]  expression
+    #  param [in]  isOffset
+    #
+    #  retval      value & 0xFFFFFFFF
+    #
     def evaluate(self, expression, isOffset):
         self.index     = 0
         self.synUsed   = False
@@ -498,6 +794,9 @@ class Symbols:
                 raise Exception("Invalid offset expression !")
         return value & 0xFFFFFFFF
 
+#
+#  Print out the usage
+#
 def usage():
     print "Usage: \n\tPatchFv FvBuildDir [FvFileBaseNames:]FdFileBaseNameToPatch \"Offset, Value\""
 
@@ -507,23 +806,38 @@ def main():
     #
     symTables = Symbols()
 
+    #
+    # If the arguments are less than 4, then return an error.
+    #
     if len(sys.argv) < 4:
         Usage()
         return 1
 
+    #
+    # If it fails to create dictionaries, then return an error.
+    #
     if symTables.createDicts(sys.argv[1], sys.argv[2]) != 0:
         print "ERROR: Failed to create symbol dictionary!!"
         return 2
 
+    #
+    # Get FD file and size
+    #
     fdFile = symTables.getFdFile()
     fdSize = symTables.getFdSize()
 
     try:
+        #
+        # Check to see if FSP header is valid
+        #
         ret = IsFspHeaderValid(fdFile)
         if ret == False:
           raise Exception ("The FSP header is not valid. Stop patching FD.")
         comment = ""
         for fvFile in  sys.argv[3:]:
+            #
+            # Check to see if it has enough arguments
+            #
             items = fvFile.split(",")
             if len (items) < 2:
                 raise Exception("Expect more arguments for '%s'!" % fvFile)
@@ -542,8 +856,14 @@ def main():
                         isOffset = True
                     else :
                         isOffset = False
+                    #
+                    # Parse symbols then append it to params
+                    #
                     params.append (symTables.evaluate(item, isOffset))
 
+            #
+            # Patch a new value into FD file if it is not a command
+            #
             if command == "":
                 # Patch a DWORD
                 if len (params) == 2:
@@ -560,7 +880,9 @@ def main():
                     print  "Patched offset 0x%08X:[%08X] with value 0x%08X  # %s" % (offset, oldvalue, value, comment)
 
             elif command == "COPY":
+                #
                 # Copy binary block from source to destination
+                #
                 if len (params) == 3:
                     src  = symTables.toOffset(params[0])
                     dest = symTables.toOffset(params[1])
