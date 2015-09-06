@@ -1599,6 +1599,7 @@ ParseIfrData (
   UINT16                   VarWidth;
   UINT16                   VarDefaultId;
   BOOLEAN                  FirstOneOfOption;
+  BOOLEAN                  FirstOrderedList;
   LIST_ENTRY               *LinkData;
   LIST_ENTRY               *LinkDefault;
   EFI_IFR_VARSTORE_NAME_VALUE *IfrNameValueVarStore;
@@ -1610,6 +1611,7 @@ ParseIfrData (
   DefaultDataPtr   = NULL;
   FirstOneOfOption = FALSE;
   VarStoreId       = 0;
+  FirstOrderedList = FALSE;
   ZeroMem (&DefaultData, sizeof (IFR_DEFAULT_DATA));
 
   //
@@ -1856,9 +1858,9 @@ ParseIfrData (
       //
       // offset by question header
       // width by EFI_IFR_ORDERED_LIST MaxContainers * OneofOption Type
-      // no default value and default id, how to define its default value?
       //
 
+      FirstOrderedList = TRUE;
       //
       // OrderedList question is not in IFR Form. This IFR form is not valid. 
       //
@@ -2102,6 +2104,10 @@ ParseIfrData (
 
       IfrOneOfOption = (EFI_IFR_ONE_OF_OPTION *) IfrOpHdr;
       if (BlockData->OpCode == EFI_IFR_ORDERED_LIST_OP) {
+
+        if (!FirstOrderedList){
+          break;
+        }
         //
         // Get ordered list option data type.
         //
@@ -2158,10 +2164,9 @@ ParseIfrData (
         // Add Block Data into VarStorageData BlockEntry
         //
         InsertBlockData (&VarStorageData->BlockEntry, &BlockData);
-        //
-        // No default data for OrderedList.
-        //
-        BlockData = NULL;
+
+        FirstOrderedList = FALSE;
+
         break;
       }
 
@@ -2222,12 +2227,6 @@ ParseIfrData (
         break;
       }
 
-      if (BlockData->OpCode == EFI_IFR_ORDERED_LIST_OP) {
-        //
-        // OrderedList Opcode is no default value.
-        //
-        break;
-      }
       //
       // Get the DefaultId
       //
