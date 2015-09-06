@@ -516,6 +516,7 @@ Error2:
   HttpCloseTcp4ConnCloseEvent (HttpInstance);
   if (NULL != Wrap->TcpWrap.TxToken.CompletionToken.Event) {
     gBS->CloseEvent (Wrap->TcpWrap.TxToken.CompletionToken.Event);
+    Wrap->TcpWrap.TxToken.CompletionToken.Event = NULL;
   }
 
 Error1:
