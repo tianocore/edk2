@@ -1,0 +1,321 @@
+/**
+  @file
+
+  EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
+
+  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
+
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License that accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
+
+#include "RegularExpressionDxe.h"
+
+STATIC
+EFI_REGEX_SYNTAX_TYPE * CONST mSupportedSyntaxes[] = {
+  &gEfiRegexSyntaxTypePosixExtendedGuid,
+  &gEfiRegexSyntaxTypePerlGuid
+};
+
+STATIC
+EFI_REGULAR_EXPRESSION_PROTOCOL mProtocolInstance = {
+  RegularExpressionMatch,
+  RegularExpressionGetInfo
+};
+
+
+
+#define CHAR16_ENCODING ONIG_ENCODING_UTF16_LE
+
+/**
+  Call the Oniguruma regex match API.
+
+  Same parameters as RegularExpressionMatch, except SyntaxType is required.
+
+  @retval EFI_SUCCESS       Regex compilation and match completed successfully.
+  @retval EFI_DEVICE_ERROR  Regex compilation failed.
+**/
+STATIC
+EFI_STATUS
+OnigurumaMatch (
+  IN  CHAR16                *String,
+  IN  CHAR16                *Pattern,
+  IN  EFI_REGEX_SYNTAX_TYPE *SyntaxType,
+  OUT BOOLEAN               *Result,
+  OUT EFI_REGEX_CAPTURE     **Captures,     OPTIONAL
+  OUT UINTN                 *CapturesCount
+  )
+{
+  regex_t         *OnigRegex;
+  OnigSyntaxType  *OnigSyntax;
+  OnigRegion      *Region;
+  INT32           OnigResult;
+  OnigErrorInfo   ErrorInfo;
+  CHAR8           ErrorMessage[ONIG_MAX_ERROR_MESSAGE_LEN];
+  UINT32          Index;
+  OnigUChar       *Start;
+
+  //
+  // Detemine the internal syntax type
+  //
+  OnigSyntax = ONIG_SYNTAX_DEFAULT;
+  if (CompareGuid (SyntaxType, &gEfiRegexSyntaxTypePosixExtendedGuid)) {
+    OnigSyntax = ONIG_SYNTAX_POSIX_EXTENDED;
+  } else if (CompareGuid (SyntaxType, &gEfiRegexSyntaxTypePerlGuid)) {
+    OnigSyntax = ONIG_SYNTAX_PERL;
+  } else {
+    DEBUG ((DEBUG_ERROR, "Unsupported regex syntax - using default\n"));
+    ASSERT (FALSE);
+  }
+
+  //
+  // Compile pattern
+  //
+  Start = (OnigUChar*)Pattern;
+  OnigResult = onig_new (
+                 &OnigRegex,
+                 Start,
+                 Start + onigenc_str_bytelen_null (CHAR16_ENCODING, Start),
+                 ONIG_OPTION_DEFAULT,
+                 CHAR16_ENCODING,
+                 OnigSyntax,
+                 &ErrorInfo
+                 );
+
+  if (OnigResult != ONIG_NORMAL) {
+    onig_error_code_to_str (ErrorMessage, OnigResult, &ErrorInfo);
+    DEBUG ((DEBUG_ERROR, "Regex compilation failed: %a\n", ErrorMessage));
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Try to match
+  //
+  Start = (OnigUChar*)String;
+  Region = onig_region_new ();
+  OnigResult = onig_search (
+                 OnigRegex,
+                 Start,
+                 Start + onigenc_str_bytelen_null (CHAR16_ENCODING, Start),
+                 Start,
+                 Start + onigenc_str_bytelen_null (CHAR16_ENCODING, Start),
+                 Region,
+                 ONIG_OPTION_NONE
+                 );
+  if (OnigResult >= 0) {
+    *Result = TRUE;
+  } else {
+    *Result = FALSE;
+    if (OnigResult != ONIG_MISMATCH) {
+      onig_error_code_to_str (ErrorMessage, OnigResult);
+      DEBUG ((DEBUG_ERROR, "Regex match failed: %a\n", ErrorMessage));
+    }
+  }
+
+  //
+  // If successful, copy out the region (capture) information
+  //
+  if (*Result && Captures != NULL) {
+    *CapturesCount = Region->num_regs;
+    *Captures = AllocatePool (*CapturesCount * sizeof(**Captures));
+    if (*Captures != NULL) {
+      for (Index = 0; Index < *CapturesCount; ++Index) {
+        //
+        // Region beg/end values represent bytes, not characters
+        //
+        (*Captures)[Index].CapturePtr = (CHAR16*)((UINTN)String + Region->beg[Index]);
+        (*Captures)[Index].Length = (Region->end[Index] - Region->beg[Index]) / sizeof(CHAR16);
+      }
+    }
+  }
+
+  onig_region_free (Region, 1);
+  onig_free (OnigRegex);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Returns information about the regular expression syntax types supported
+  by the implementation.
+
+  This                     A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL
+                           instance.
+
+  RegExSyntaxTypeListSize  On input, the size in bytes of RegExSyntaxTypeList.
+                           On output with a return code of EFI_SUCCESS, the
+                           size in bytes of the data returned in
+                           RegExSyntaxTypeList. On output with a return code
+                           of EFI_BUFFER_TOO_SMALL, the size of
+                           RegExSyntaxTypeList required to obtain the list.
+
+  RegExSyntaxTypeList      A caller-allocated memory buffer filled by the
+                           driver with one EFI_REGEX_SYNTAX_TYPE element
+                           for each supported Regular expression syntax
+                           type. The list must not change across multiple
+                           calls to the same driver. The first syntax
+                           type in the list is the default type for the
+                           driver.
+
+  @retval EFI_SUCCESS            The regular expression syntax types list
+                                 was returned successfully.
+  @retval EFI_UNSUPPORTED        The service is not supported by this driver.
+  @retval EFI_DEVICE_ERROR       The list of syntax types could not be
+                                 retrieved due to a hardware or firmware error.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer RegExSyntaxTypeList is too small
+                                 to hold the result.
+  @retval EFI_INVALID_PARAMETER  RegExSyntaxTypeListSize is NULL
+
+**/
+EFI_STATUS
+EFIAPI
+RegularExpressionGetInfo (
+  IN     EFI_REGULAR_EXPRESSION_PROTOCOL *This,
+  IN OUT UINTN                           *RegExSyntaxTypeListSize,
+  OUT    EFI_REGEX_SYNTAX_TYPE           *RegExSyntaxTypeList
+  )
+{
+  UINTN SyntaxSize;
+  UINTN Index;
+
+  if (This == NULL || RegExSyntaxTypeListSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*RegExSyntaxTypeListSize != 0 && RegExSyntaxTypeList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SyntaxSize = ARRAY_SIZE (mSupportedSyntaxes) * sizeof(**mSupportedSyntaxes);
+
+  if (*RegExSyntaxTypeListSize < SyntaxSize) {
+    *RegExSyntaxTypeListSize = SyntaxSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  for (Index = 0; Index < ARRAY_SIZE (mSupportedSyntaxes); ++Index) {
+    CopyMem (&RegExSyntaxTypeList[Index], mSupportedSyntaxes[Index], sizeof(**mSupportedSyntaxes));
+  }
+  *RegExSyntaxTypeListSize = SyntaxSize;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Checks if the input string matches to the regular expression pattern.
+
+  This          A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL instance.
+                Type EFI_REGULAR_EXPRESSION_PROTOCOL is defined in Section
+                XYZ.
+
+  String        A pointer to a NULL terminated string to match against the
+                regular expression string specified by Pattern.
+
+  Pattern       A pointer to a NULL terminated string that represents the
+                regular expression.
+
+  SyntaxType    A pointer to the EFI_REGEX_SYNTAX_TYPE that identifies the
+                regular expression syntax type to use. May be NULL in which
+                case the function will use its default regular expression
+                syntax type.
+
+  Result        On return, points to TRUE if String fully matches against
+                the regular expression Pattern using the regular expression
+                SyntaxType. Otherwise, points to FALSE.
+
+  Captures      A Pointer to an array of EFI_REGEX_CAPTURE objects to receive
+                the captured groups in the event of a match. The full
+                sub-string match is put in Captures[0], and the results of N
+                capturing groups are put in Captures[1:N]. If Captures is
+                NULL, then this function doesn't allocate the memory for the
+                array and does not build up the elements. It only returns the
+                number of matching patterns in CapturesCount. If Captures is
+                not NULL, this function returns a pointer to an array and
+                builds up the elements in the array. CapturesCount is also
+                updated to the number of matching patterns found. It is the
+                caller's responsibility to free the memory pool in Captures
+                and in each CapturePtr in the array elements.
+
+  CapturesCount On output, CapturesCount is the number of matching patterns
+                found in String. Zero means no matching patterns were found
+                in the string.
+
+  @retval EFI_SUCCESS            The regular expression string matching
+                                 completed successfully.
+  @retval EFI_UNSUPPORTED        The regular expression syntax specified by
+                                 SyntaxType is not supported by this driver.
+  @retval EFI_DEVICE_ERROR       The regular expression string matching
+                                 failed due to a hardware or firmware error.
+  @retval EFI_INVALID_PARAMETER  String, Pattern, Result, or CapturesCountis
+                                 NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+RegularExpressionMatch (
+  IN  EFI_REGULAR_EXPRESSION_PROTOCOL *This,
+  IN  CHAR16                          *String,
+  IN  CHAR16                          *Pattern,
+  IN  EFI_REGEX_SYNTAX_TYPE           *SyntaxType, OPTIONAL
+  OUT BOOLEAN                         *Result,
+  OUT EFI_REGEX_CAPTURE               **Captures, OPTIONAL
+  OUT UINTN                           *CapturesCount
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      Index;
+  BOOLEAN     Supported;
+
+  if (This == NULL || String == NULL || Pattern == NULL || Result == NULL || CapturesCount == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Figure out which syntax to use
+  //
+  if (SyntaxType == NULL) {
+    SyntaxType = mSupportedSyntaxes[0];
+  } else {
+    Supported = FALSE;
+    for (Index = 0; Index < ARRAY_SIZE (mSupportedSyntaxes); ++Index) {
+      if (CompareGuid (SyntaxType, mSupportedSyntaxes[Index])) {
+        Supported = TRUE;
+        break;
+      }
+    }
+    if (!Supported) {
+      return EFI_UNSUPPORTED;
+    }
+  }
+
+  Status = OnigurumaMatch (String, Pattern, SyntaxType, Result, Captures, CapturesCount);
+
+  return Status;
+}
+
+/**
+  Entry point for RegularExpressionDxe.
+**/
+EFI_STATUS
+EFIAPI
+RegularExpressionDxeEntry (
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &ImageHandle,
+                  &gEfiRegularExpressionProtocolGuid,
+                  &mProtocolInstance,
+                  NULL
+                  );
+
+  return Status;
+}
