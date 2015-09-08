@@ -307,7 +307,6 @@ HttpUtilitiesParse (
   
   Status          = EFI_SUCCESS;
   TempHttpMessage = NULL;
-  *FieldCount     = 0;
   Token           = NULL;
   NextToken       = NULL;
   FieldName       = NULL;
@@ -328,6 +327,7 @@ HttpUtilitiesParse (
   //
   // Get header number
   //
+  *FieldCount = 0;
   Token = TempHttpMessage;
   while (TRUE) {
     FieldName     = NULL;
