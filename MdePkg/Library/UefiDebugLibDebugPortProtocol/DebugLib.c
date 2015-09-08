@@ -327,3 +327,4 @@ DebugPrintLevelEnabled (
 {
   return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
 }
+
