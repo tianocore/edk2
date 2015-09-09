@@ -377,11 +377,10 @@ GetBlockEntryListFromAddress (
         }
 
         // Create a new translation table
-        TranslationTable = (UINT64*)AllocatePages (EFI_SIZE_TO_PAGES((TT_ENTRY_COUNT * sizeof(UINT64)) + TT_ALIGNMENT_DESCRIPTION_TABLE));
+        TranslationTable = (UINT64*)AllocateAlignedPages (EFI_SIZE_TO_PAGES(TT_ENTRY_COUNT * sizeof(UINT64)), TT_ALIGNMENT_DESCRIPTION_TABLE);
         if (TranslationTable == NULL) {
           return NULL;
         }
-        TranslationTable = (UINT64*)((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
 
         // Populate the newly created lower level table
         SubTableBlockEntry = TranslationTable;
@@ -405,11 +404,10 @@ GetBlockEntryListFromAddress (
         //
 
         // Create a new translation table
-        TranslationTable = (UINT64*)AllocatePages (EFI_SIZE_TO_PAGES((TT_ENTRY_COUNT * sizeof(UINT64)) + TT_ALIGNMENT_DESCRIPTION_TABLE));
+        TranslationTable = (UINT64*)AllocateAlignedPages (EFI_SIZE_TO_PAGES(TT_ENTRY_COUNT * sizeof(UINT64)), TT_ALIGNMENT_DESCRIPTION_TABLE);
         if (TranslationTable == NULL) {
           return NULL;
         }
-        TranslationTable = (UINT64*)((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
 
         ZeroMem (TranslationTable, TT_ENTRY_COUNT * sizeof(UINT64));
 
@@ -617,12 +615,11 @@ ArmConfigureMmu (
   ArmSetTCR (TCR);
 
   // Allocate pages for translation table
-  TranslationTablePageCount = EFI_SIZE_TO_PAGES((RootTableEntryCount * sizeof(UINT64)) + TT_ALIGNMENT_DESCRIPTION_TABLE);
-  TranslationTable = AllocatePages (TranslationTablePageCount);
+  TranslationTablePageCount = EFI_SIZE_TO_PAGES(RootTableEntryCount * sizeof(UINT64));
+  TranslationTable = (UINT64*)AllocateAlignedPages (TranslationTablePageCount, TT_ALIGNMENT_DESCRIPTION_TABLE);
   if (TranslationTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
-  TranslationTable = (VOID*)((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
   // We set TTBR0 just after allocating the table to retrieve its location from the subsequent
   // functions without needing to pass this value across the functions. The MMU is only enabled
   // after the translation tables are populated.
