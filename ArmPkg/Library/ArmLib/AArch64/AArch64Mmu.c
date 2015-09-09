@@ -314,7 +314,7 @@ GetBlockEntryListFromAddress (
   // If the required size is smaller than the current block size then we need to go to the page below.
   // The PageLevel was calculated on the Base Address alignment but did not take in account the alignment
   // of the allocation size
-  if (*BlockEntrySize < TT_BLOCK_ENTRY_SIZE_AT_LEVEL (PageLevel)) {
+  while (*BlockEntrySize < TT_BLOCK_ENTRY_SIZE_AT_LEVEL (PageLevel)) {
     // It does not fit so we need to go a page level above
     PageLevel++;
   }
