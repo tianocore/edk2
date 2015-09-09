@@ -244,7 +244,7 @@ GetBlockEntryListFromAddress (
   IN  UINT64        RegionStart,
   OUT UINTN        *TableLevel,
   IN OUT UINT64    *BlockEntrySize,
-  IN OUT UINT64   **LastBlockEntry
+  OUT UINT64      **LastBlockEntry
   )
 {
   UINTN   RootTableLevel;
@@ -282,14 +282,9 @@ GetBlockEntryListFromAddress (
     return NULL;
   }
 
-  //
-  // Calculate LastBlockEntry from T0SZ - this is the last block entry of the root Translation table
-  //
   T0SZ = ArmGetTCR () & TCR_T0SZ_MASK;
   // Get the Table info from T0SZ
   GetRootTranslationTableInfo (T0SZ, &RootTableLevel, &RootTableEntryCount);
-  // The last block of the root table depends on the number of entry in this table
-  *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(RootTable, RootTableEntryCount);
 
   // If the start address is 0x0 then we use the size of the region to identify the alignment
   if (RegionStart == 0) {
@@ -311,12 +306,6 @@ GetBlockEntryListFromAddress (
     PageLevel++;
   }
 
-  // Expose the found PageLevel to the caller
-  *TableLevel = PageLevel;
-
-  // Now, we have the Table Level we can get the Block Size associated to this table
-  *BlockEntrySize = TT_BLOCK_ENTRY_SIZE_AT_LEVEL (PageLevel);
-
   //
   // Get the Table Descriptor for the corresponding PageLevel. We need to decompose RegionStart to get appropriate entries
   //
@@ -329,13 +318,10 @@ GetBlockEntryListFromAddress (
       // Go to the next table
       TranslationTable = (UINT64*)(*BlockEntry & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
 
-      // If we are at the last level then update the output
+      // If we are at the last level then update the last level to next level
       if (IndexLevel == PageLevel) {
-        // And get the appropriate BlockEntry at the next level
-        BlockEntry = (UINT64*)TT_GET_ENTRY_FOR_ADDRESS (TranslationTable, IndexLevel + 1, RegionStart);
-
-        // Set the last block for this new table
-        *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
+        // Enter the next level
+        PageLevel++;
       }
     } else if ((*BlockEntry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY) {
       // If we are not at the last level then we need to split this BlockEntry
@@ -383,11 +369,6 @@ GetBlockEntryListFromAddress (
 
         // Fill the BlockEntry with the new TranslationTable
         *BlockEntry = ((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE) | TableAttributes | TT_TYPE_TABLE_ENTRY;
-        // Update the last block entry with the newly created translation table
-        *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
-
-        // Block Entry points at the beginning of the Translation Table
-        BlockEntry = TranslationTable;
       }
     } else {
       if (IndexLevel != PageLevel) {
@@ -405,16 +386,20 @@ GetBlockEntryListFromAddress (
 
         // Fill the new BlockEntry with the TranslationTable
         *BlockEntry = ((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE) | TT_TYPE_TABLE_ENTRY;
-        // Update the last block entry with the newly created translation table
-        *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
-      } else {
-        //
-        // Case when the new region is part of an existing page table
-        //
-        *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
       }
     }
   }
+
+  // Expose the found PageLevel to the caller
+  *TableLevel = PageLevel;
+
+  // Now, we have the Table Level we can get the Block Size associated to this table
+  *BlockEntrySize = TT_BLOCK_ENTRY_SIZE_AT_LEVEL (PageLevel);
+
+  // The last block of the root table depends on the number of entry in this table,
+  // otherwise it is always the (TT_ENTRY_COUNT - 1)th entry in the table.
+  *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable,
+      (PageLevel == RootTableLevel) ? RootTableEntryCount : TT_ENTRY_COUNT);
 
   return BlockEntry;
 }
