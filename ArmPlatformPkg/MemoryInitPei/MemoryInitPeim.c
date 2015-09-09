@@ -96,7 +96,7 @@ InitializeMemory (
 {
   EFI_STATUS                            Status;
   UINTN                                 SystemMemoryBase;
-  UINTN                                 SystemMemoryTop;
+  UINT64                                SystemMemoryTop;
   UINTN                                 FdBase;
   UINTN                                 FdTop;
   UINTN                                 UefiMemoryBase;
@@ -115,7 +115,10 @@ InitializeMemory (
   ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
 
   SystemMemoryBase = (UINTN)PcdGet64 (PcdSystemMemoryBase);
-  SystemMemoryTop = SystemMemoryBase + (UINTN)PcdGet64 (PcdSystemMemorySize);
+  SystemMemoryTop = SystemMemoryBase + PcdGet64 (PcdSystemMemorySize);
+  if (SystemMemoryTop - 1 > MAX_ADDRESS) {
+    SystemMemoryTop = (UINT64)MAX_ADDRESS + 1;
+  }
   FdBase = (UINTN)PcdGet64 (PcdFdBaseAddress);
   FdTop = FdBase + (UINTN)PcdGet32 (PcdFdSize);
 
