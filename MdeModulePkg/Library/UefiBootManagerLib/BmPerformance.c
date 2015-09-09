@@ -186,6 +186,11 @@ BmWriteBootToOsPerformanceData (
   PERF_END(NULL, "BDS", NULL, 0);
 
   //
+  // Reset the entry count
+  //
+  mBmPerfHeader.Count = 0;
+
+  //
   // Retrieve time stamp count as early as possible
   //
   Ticker  = GetPerformanceCounter ();
