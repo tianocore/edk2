@@ -113,6 +113,7 @@ InitializeMemory (
 
   // Ensure PcdSystemMemorySize has been set
   ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
+  ASSERT (PcdGet64 (PcdSystemMemoryBase) < (UINT64)MAX_ADDRESS);
 
   SystemMemoryBase = (UINTN)PcdGet64 (PcdSystemMemoryBase);
   SystemMemoryTop = SystemMemoryBase + PcdGet64 (PcdSystemMemorySize);
