@@ -438,6 +438,11 @@ ShellCommandRunFor (
         gEfiShellParametersProtocol->Argv[2]) == 0) {
       for (LoopVar = 0x3 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
         ASSERT((ArgSet == NULL && ArgSize == 0) || (ArgSet != NULL));
+        if (StrStr (gEfiShellParametersProtocol->Argv[LoopVar], L")") != NULL &&
+            (LoopVar + 1) < gEfiShellParametersProtocol->Argc
+           ) {
+          return (SHELL_INVALID_PARAMETER);
+        }
         if (ArgSet == NULL) {
 //        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
         } else {
