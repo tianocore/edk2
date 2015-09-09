@@ -455,6 +455,13 @@ FillTranslationTable (
       RegionStart += BlockEntrySize;
       RemainingRegionLength -= BlockEntrySize;
       BlockEntry++;
+
+      // Break the inner loop when next block is a table
+      // Rerun GetBlockEntryListFromAddress to avoid page table memory leak
+      if (TableLevel != 3 &&
+          (*BlockEntry & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY) {
+            break;
+      }
     } while ((RemainingRegionLength >= BlockEntrySize) && (BlockEntry <= LastBlockEntry));
   } while (RemainingRegionLength != 0);
 
