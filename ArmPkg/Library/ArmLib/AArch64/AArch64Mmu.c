@@ -276,8 +276,8 @@ GetBlockEntryListFromAddress (
     return NULL;
   }
 
-  // Ensure the required size is aligned on 4KB boundary
-  if ((*BlockEntrySize & (SIZE_4KB - 1)) != 0) {
+  // Ensure the required size is aligned on 4KB boundary and not 0
+  if ((*BlockEntrySize & (SIZE_4KB - 1)) != 0 || *BlockEntrySize == 0) {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
     return NULL;
   }
@@ -294,18 +294,10 @@ GetBlockEntryListFromAddress (
   // If the start address is 0x0 then we use the size of the region to identify the alignment
   if (RegionStart == 0) {
     // Identify the highest possible alignment for the Region Size
-    for (BaseAddressAlignment = 0; BaseAddressAlignment < 64; BaseAddressAlignment++) {
-      if ((1 << BaseAddressAlignment) & *BlockEntrySize) {
-        break;
-      }
-    }
+    BaseAddressAlignment = LowBitSet64 (*BlockEntrySize);
   } else {
     // Identify the highest possible alignment for the Base Address
-    for (BaseAddressAlignment = 0; BaseAddressAlignment < 64; BaseAddressAlignment++) {
-      if ((1 << BaseAddressAlignment) & RegionStart) {
-        break;
-      }
-    }
+    BaseAddressAlignment = LowBitSet64 (RegionStart);
   }
 
   // Identify the Page Level the RegionStart must belongs to
