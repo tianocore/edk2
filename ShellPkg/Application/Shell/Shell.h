@@ -360,5 +360,16 @@ FindFirstCharacter(
   IN CONST CHAR16 EscapeCharacter
   );
 
+/**
+  Cleans off leading and trailing spaces and tabs.
+
+  @param[in] String pointer to the string to trim them off.
+**/
+EFI_STATUS
+EFIAPI
+TrimSpaces(
+  IN CHAR16 **String
+  );
+
 #endif //_SHELL_INTERNAL_HEADER_
 
