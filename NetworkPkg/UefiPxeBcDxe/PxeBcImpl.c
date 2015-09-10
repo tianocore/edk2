@@ -2328,6 +2328,10 @@ EfiPxeLoadFile (
   EFI_STATUS                  Status;
   BOOLEAN                     MediaPresent;
 
+  if (FilePath == NULL || !IsDevicePathEnd (FilePath)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   VirtualNic = PXEBC_VIRTUAL_NIC_FROM_LOADFILE (This);
   Private    = VirtualNic->Private;
   PxeBc      = &Private->PxeBc;
