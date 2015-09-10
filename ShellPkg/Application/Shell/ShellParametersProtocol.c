@@ -359,6 +359,7 @@ CreatePopulateInstallShellParametersProtocol (
     //
     // Populate Argc and Argv
     //
+    TrimSpaces (&FullCommandLine);
     Status = ParseCommandLineToArgs(FullCommandLine,
                                     &(*NewShellParameters)->Argv,
                                     &(*NewShellParameters)->Argc);
