@@ -2107,7 +2107,7 @@ BackOff:
                    SectorCount
                    );
 
-  if (ReturnStatus == EFI_NOT_READY) {
+  if (ReturnStatus == EFI_NOT_READY || ReturnStatus == EFI_BAD_BUFFER_SIZE) {
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
   } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
@@ -2231,7 +2231,7 @@ BackOff:
                    StartLba,
                    SectorCount
                    );
-  if (ReturnStatus == EFI_NOT_READY) {
+  if (ReturnStatus == EFI_NOT_READY || ReturnStatus == EFI_BAD_BUFFER_SIZE) {
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
   } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
@@ -2354,7 +2354,7 @@ BackOff:
                    StartLba,
                    SectorCount
                    );
-  if (ReturnStatus == EFI_NOT_READY) {
+  if (ReturnStatus == EFI_NOT_READY || ReturnStatus == EFI_BAD_BUFFER_SIZE) {
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
   } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
@@ -2478,7 +2478,7 @@ BackOff:
                    StartLba,
                    SectorCount
                    );
-  if (ReturnStatus == EFI_NOT_READY) {
+  if (ReturnStatus == EFI_NOT_READY || ReturnStatus == EFI_BAD_BUFFER_SIZE) {
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
   } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
