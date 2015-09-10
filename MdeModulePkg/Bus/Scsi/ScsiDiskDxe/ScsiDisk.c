@@ -1789,6 +1789,7 @@ ScsiDiskReadSectors (
   UINT32              ByteCount;
   UINT32              MaxBlock;
   UINT32              SectorCount;
+  UINT32              NextSectorCount;
   UINT64              Timeout;
   EFI_STATUS          Status;
   UINT8               Index;
@@ -1889,6 +1890,25 @@ ScsiDiskReadSectors (
         return EFI_DEVICE_ERROR;
       }
 
+      //
+      // We need to retry. However, if ScsiDiskRead10() or ScsiDiskRead16() has
+      // lowered ByteCount on output, we must make sure that we lower
+      // SectorCount accordingly. SectorCount will be encoded in the CDB, and
+      // it is invalid to request more sectors in the CDB than the entire
+      // transfer (ie. ByteCount) can carry.
+      //
+      // In addition, ByteCount is only expected to go down, or stay unchaged.
+      // Therefore we don't need to update Timeout: the original timeout should
+      // accommodate shorter transfers too.
+      //
+      NextSectorCount = ByteCount / BlockSize;
+      if (NextSectorCount < SectorCount) {
+        SectorCount = NextSectorCount;
+        //
+        // Account for any rounding down.
+        //
+        ByteCount = SectorCount * BlockSize;
+      }
     }
 
     if ((Index == MaxRetry) && (Status != EFI_SUCCESS)) {
@@ -1934,6 +1954,7 @@ ScsiDiskWriteSectors (
   UINT32              ByteCount;
   UINT32              MaxBlock;
   UINT32              SectorCount;
+  UINT32              NextSectorCount;
   UINT64              Timeout;
   EFI_STATUS          Status;
   UINT8               Index;
@@ -2031,6 +2052,26 @@ ScsiDiskWriteSectors (
 
       if (!NeedRetry) {
         return EFI_DEVICE_ERROR;
+      }
+
+      //
+      // We need to retry. However, if ScsiDiskWrite10() or ScsiDiskWrite16()
+      // has lowered ByteCount on output, we must make sure that we lower
+      // SectorCount accordingly. SectorCount will be encoded in the CDB, and
+      // it is invalid to request more sectors in the CDB than the entire
+      // transfer (ie. ByteCount) can carry.
+      //
+      // In addition, ByteCount is only expected to go down, or stay unchaged.
+      // Therefore we don't need to update Timeout: the original timeout should
+      // accommodate shorter transfers too.
+      //
+      NextSectorCount = ByteCount / BlockSize;
+      if (NextSectorCount < SectorCount) {
+        SectorCount = NextSectorCount;
+        //
+        // Account for any rounding down.
+        //
+        ByteCount = SectorCount * BlockSize;
       }
     }
 
