@@ -1079,6 +1079,7 @@ FileHandleWriteLine(
   EFI_STATUS  Status;
   CHAR16      CharBuffer;
   UINTN       Size;
+  UINTN       Index;
   UINTN       CharSize;
   UINT64      FileSize;
   UINT64      OriginalFilePosition;
@@ -1136,6 +1137,12 @@ FileHandleWriteLine(
       return EFI_OUT_OF_RESOURCES;
     }
     UnicodeStrToAsciiStr (Buffer, AsciiBuffer);
+    for (Index = 0; Index < Size; Index++) {
+      if (!((AsciiBuffer[Index] >= 0) && (AsciiBuffer[Index] < 128))){
+        FreePool(AsciiBuffer);
+        return EFI_INVALID_PARAMETER;
+      }
+    }
     
     Size = AsciiStrSize(AsciiBuffer) - sizeof(CHAR8);
     Status = FileHandleWrite(Handle, &Size, AsciiBuffer);
