@@ -33,6 +33,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #include <Protocol/Ip4Config2.h>
 
 #include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiDriverEntryPoint.h>
