@@ -211,6 +211,15 @@ CoffAlign (
   return (Offset + mCoffAlignment - 1) & ~(mCoffAlignment - 1);
 }
 
+STATIC
+UINT32
+DebugRvaAlign (
+  UINT32 Offset
+  )
+{
+  return (Offset + 3) & ~3;
+}
+
 //
 // filter functions
 //
@@ -359,7 +368,7 @@ ScanSections64 (
     assert (FALSE);
   }
 
-  mDebugOffset = mCoffOffset;
+  mDebugOffset = DebugRvaAlign(mCoffOffset);
 
   if (mEhdr->e_machine != EM_ARM) {
     mCoffOffset = CoffAlign(mCoffOffset);
@@ -412,7 +421,7 @@ ScanSections64 (
   // section alignment.
   //
   if (SectionCount > 0) {
-    mDebugOffset = mCoffOffset;
+    mDebugOffset = DebugRvaAlign(mCoffOffset);
   }
   mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
                 sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
