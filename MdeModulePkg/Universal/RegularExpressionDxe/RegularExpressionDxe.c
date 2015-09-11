@@ -1,5 +1,4 @@
-/**
-  @file
+/** @file
 
   EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
 
@@ -12,6 +11,7 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
   WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
 **/
 
 #include "RegularExpressionDxe.h"
@@ -37,8 +37,40 @@ EFI_REGULAR_EXPRESSION_PROTOCOL mProtocolInstance = {
 
   Same parameters as RegularExpressionMatch, except SyntaxType is required.
 
-  @retval EFI_SUCCESS       Regex compilation and match completed successfully.
-  @retval EFI_DEVICE_ERROR  Regex compilation failed.
+  @param String         A pointer to a NULL terminated string to match against the
+                        regular expression string specified by Pattern.
+
+  @param Pattern        A pointer to a NULL terminated string that represents the
+                        regular expression.
+  @param SyntaxType     A pointer to the EFI_REGEX_SYNTAX_TYPE that identifies the
+                        regular expression syntax type to use. May be NULL in which
+                        case the function will use its default regular expression
+                        syntax type.
+
+  @param Result         On return, points to TRUE if String fully matches against
+                        the regular expression Pattern using the regular expression
+                        SyntaxType. Otherwise, points to FALSE.
+
+  @param Captures       A Pointer to an array of EFI_REGEX_CAPTURE objects to receive
+                        the captured groups in the event of a match. The full
+                        sub-string match is put in Captures[0], and the results of N
+                        capturing groups are put in Captures[1:N]. If Captures is
+                        NULL, then this function doesn't allocate the memory for the
+                        array and does not build up the elements. It only returns the
+                        number of matching patterns in CapturesCount. If Captures is
+                        not NULL, this function returns a pointer to an array and
+                        builds up the elements in the array. CapturesCount is also
+                        updated to the number of matching patterns found. It is the
+                        caller's responsibility to free the memory pool in Captures
+                        and in each CapturePtr in the array elements.
+
+  @param CapturesCount  On output, CapturesCount is the number of matching patterns
+                        found in String. Zero means no matching patterns were found
+                        in the string.
+
+  @retval  EFI_SUCCESS       Regex compilation and match completed successfully.
+  @retval  EFI_DEVICE_ERROR  Regex compilation failed.
+
 **/
 STATIC
 EFI_STATUS
@@ -144,23 +176,23 @@ OnigurumaMatch (
   Returns information about the regular expression syntax types supported
   by the implementation.
 
-  This                     A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL
-                           instance.
+  @param This                      A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL
+                                   instance.
 
-  RegExSyntaxTypeListSize  On input, the size in bytes of RegExSyntaxTypeList.
-                           On output with a return code of EFI_SUCCESS, the
-                           size in bytes of the data returned in
-                           RegExSyntaxTypeList. On output with a return code
-                           of EFI_BUFFER_TOO_SMALL, the size of
-                           RegExSyntaxTypeList required to obtain the list.
+  @param  RegExSyntaxTypeListSize  On input, the size in bytes of RegExSyntaxTypeList.
+                                   On output with a return code of EFI_SUCCESS, the
+                                   size in bytes of the data returned in
+                                   RegExSyntaxTypeList. On output with a return code
+                                   of EFI_BUFFER_TOO_SMALL, the size of
+                                   RegExSyntaxTypeList required to obtain the list.
 
-  RegExSyntaxTypeList      A caller-allocated memory buffer filled by the
-                           driver with one EFI_REGEX_SYNTAX_TYPE element
-                           for each supported Regular expression syntax
-                           type. The list must not change across multiple
-                           calls to the same driver. The first syntax
-                           type in the list is the default type for the
-                           driver.
+  @param   RegExSyntaxTypeList     A caller-allocated memory buffer filled by the
+                                   driver with one EFI_REGEX_SYNTAX_TYPE element
+                                   for each supported Regular expression syntax
+                                   type. The list must not change across multiple
+                                   calls to the same driver. The first syntax
+                                   type in the list is the default type for the
+                                   driver.
 
   @retval EFI_SUCCESS            The regular expression syntax types list
                                  was returned successfully.
@@ -209,41 +241,41 @@ RegularExpressionGetInfo (
 /**
   Checks if the input string matches to the regular expression pattern.
 
-  This          A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL instance.
-                Type EFI_REGULAR_EXPRESSION_PROTOCOL is defined in Section
-                XYZ.
+  @param This          A pointer to the EFI_REGULAR_EXPRESSION_PROTOCOL instance.
+                       Type EFI_REGULAR_EXPRESSION_PROTOCOL is defined in Section
+                       XYZ.
 
-  String        A pointer to a NULL terminated string to match against the
-                regular expression string specified by Pattern.
+  @param String        A pointer to a NULL terminated string to match against the
+                       regular expression string specified by Pattern.
 
-  Pattern       A pointer to a NULL terminated string that represents the
-                regular expression.
+  @param Pattern       A pointer to a NULL terminated string that represents the
+                       regular expression.
 
-  SyntaxType    A pointer to the EFI_REGEX_SYNTAX_TYPE that identifies the
-                regular expression syntax type to use. May be NULL in which
-                case the function will use its default regular expression
-                syntax type.
+  @param SyntaxType    A pointer to the EFI_REGEX_SYNTAX_TYPE that identifies the
+                       regular expression syntax type to use. May be NULL in which
+                       case the function will use its default regular expression
+                       syntax type.
 
-  Result        On return, points to TRUE if String fully matches against
-                the regular expression Pattern using the regular expression
-                SyntaxType. Otherwise, points to FALSE.
+  @param Result        On return, points to TRUE if String fully matches against
+                       the regular expression Pattern using the regular expression
+                       SyntaxType. Otherwise, points to FALSE.
 
-  Captures      A Pointer to an array of EFI_REGEX_CAPTURE objects to receive
-                the captured groups in the event of a match. The full
-                sub-string match is put in Captures[0], and the results of N
-                capturing groups are put in Captures[1:N]. If Captures is
-                NULL, then this function doesn't allocate the memory for the
-                array and does not build up the elements. It only returns the
-                number of matching patterns in CapturesCount. If Captures is
-                not NULL, this function returns a pointer to an array and
-                builds up the elements in the array. CapturesCount is also
-                updated to the number of matching patterns found. It is the
-                caller's responsibility to free the memory pool in Captures
-                and in each CapturePtr in the array elements.
+  @param Captures      A Pointer to an array of EFI_REGEX_CAPTURE objects to receive
+                       the captured groups in the event of a match. The full
+                       sub-string match is put in Captures[0], and the results of N
+                       capturing groups are put in Captures[1:N]. If Captures is
+                       NULL, then this function doesn't allocate the memory for the
+                       array and does not build up the elements. It only returns the
+                       number of matching patterns in CapturesCount. If Captures is
+                       not NULL, this function returns a pointer to an array and
+                       builds up the elements in the array. CapturesCount is also
+                       updated to the number of matching patterns found. It is the
+                       caller's responsibility to free the memory pool in Captures
+                       and in each CapturePtr in the array elements.
 
-  CapturesCount On output, CapturesCount is the number of matching patterns
-                found in String. Zero means no matching patterns were found
-                in the string.
+  @param CapturesCount On output, CapturesCount is the number of matching patterns
+                       found in String. Zero means no matching patterns were found
+                       in the string.
 
   @retval EFI_SUCCESS            The regular expression string matching
                                  completed successfully.
@@ -300,6 +332,12 @@ RegularExpressionMatch (
 
 /**
   Entry point for RegularExpressionDxe.
+
+  @param ImageHandle     Image handle this driver.
+  @param SystemTable     Pointer to SystemTable.
+
+  @retval Status         Whether this function complete successfully.
+
 **/
 EFI_STATUS
 EFIAPI

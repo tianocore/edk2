@@ -1,6 +1,4 @@
-##
-#  @file
-#
+## @file
 #  EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
 #
 #  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
@@ -67,11 +65,11 @@
   DebugLib
 
 [Guids]
-  gEfiRegexSyntaxTypePosixExtendedGuid
-  gEfiRegexSyntaxTypePerlGuid
+  gEfiRegexSyntaxTypePosixExtendedGuid    ## CONSUMES  ## GUID
+  gEfiRegexSyntaxTypePerlGuid             ## CONSUMES  ## GUID
 
 [Protocols]
-  gEfiRegularExpressionProtocolGuid
+  gEfiRegularExpressionProtocolGuid       ## PRODUCES  
 
 [BuildOptions]
   # Override MSFT build option to remove /Oi and /GL
