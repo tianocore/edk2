@@ -224,6 +224,7 @@ EfiHttpRequest (
   BOOLEAN                       ReConfigure;
   CHAR8                         *RequestStr;
   CHAR8                         *Url;
+  UINTN                         UrlLen;
   CHAR16                        *HostNameStr;
   HTTP_TOKEN_WRAP               *Wrap;
   HTTP_TCP_TOKEN_WRAP           *TcpWrap;
@@ -283,10 +284,15 @@ EfiHttpRequest (
   //
   // Parse the URI of the remote host.
   //
-  Url = AllocatePool (StrLen (Request->Url) + 1);
-  if (Url == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+  UrlLen = StrLen (Request->Url) + 1;
+  if (UrlLen > HTTP_URL_BUFFER_LEN) {
+    Url = AllocateZeroPool (UrlLen);
+    if (Url == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    FreePool (HttpInstance->Url);
+    HttpInstance->Url = Url;    
+  }  
 
   UnicodeStrToAsciiStr (Request->Url, Url);
   UrlParser = NULL;
@@ -347,7 +353,6 @@ EfiHttpRequest (
 
         Wrap->TcpWrap.Method = Request->Method;
 
-        FreePool (Url);
         FreePool (HostName);
         
         //
@@ -480,7 +485,6 @@ EfiHttpRequest (
     goto Error4;
   }
 
-  FreePool (Url);
   if (HostName != NULL) {
     FreePool (HostName);
   }
@@ -520,9 +524,6 @@ Error2:
   }
 
 Error1:
-  if (Url != NULL) {
-    FreePool (Url);
-  }
   if (HostName != NULL) {
     FreePool (HostName);
   }

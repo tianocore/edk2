@@ -431,6 +431,12 @@ HttpInitProtocol (
     goto ON_ERROR;
   }
 
+  HttpInstance->Url = AllocateZeroPool (HTTP_URL_BUFFER_LEN);
+  if (HttpInstance->Url == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
+  }
+
   NetMapInit (&HttpInstance->TxTokens);
   NetMapInit (&HttpInstance->RxTokens);
 
@@ -494,6 +500,11 @@ HttpCleanProtocol (
   if (HttpInstance->MsgParser != NULL) {
     HttpFreeMsgParser (HttpInstance->MsgParser);
     HttpInstance->MsgParser = NULL;
+  }
+
+  if (HttpInstance->Url != NULL) {
+    FreePool (HttpInstance->Url);
+    HttpInstance->Url = NULL;
   }
 
   NetMapClean (&HttpInstance->TxTokens);
