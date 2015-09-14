@@ -1223,7 +1223,10 @@ class Check(object):
             SqlCommand = """select ID, Name from %s where Model = %s""" % (FileTable, MODEL_IDENTIFIER_VARIABLE)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
-                if not Pattern.match(Record[1]):
+                Var = Record[1]
+                if Var.startswith('CONST'):
+                    Var = Var[5:].lstrip()
+                if not Pattern.match(Var):
                     if not EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Record[1]):
                         EccGlobalData.gDb.TblReport.Insert(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, OtherMsg="The variable name [%s] does not follow the rules" % (Record[1]), BelongsToTable=FileTable, BelongsToItem=Record[0])
 
