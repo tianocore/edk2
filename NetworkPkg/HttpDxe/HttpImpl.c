@@ -502,6 +502,8 @@ EfiHttpRequest (
     goto Error5;    
   }
 
+  DispatchDpc ();
+
   return EFI_SUCCESS;
 
 Error5:
@@ -1330,6 +1332,7 @@ EfiHttpPoll (
   )
 {
   HTTP_PROTOCOL                 *HttpInstance;
+  EFI_STATUS                    Status;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1346,5 +1349,9 @@ EfiHttpPoll (
     return EFI_NOT_STARTED;
   }
 
-  return HttpInstance->Tcp4->Poll (HttpInstance->Tcp4);
+  Status = HttpInstance->Tcp4->Poll (HttpInstance->Tcp4);
+
+  DispatchDpc ();
+
+  return Status;
 }

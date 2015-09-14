@@ -48,6 +48,7 @@
   DebugLib
   NetLib
   HttpLib
+  DpcLib
 
 [Protocols]
   gEfiHttpServiceBindingProtocolGuid               ## BY_START
