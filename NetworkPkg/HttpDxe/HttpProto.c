@@ -38,20 +38,18 @@ HttpCommonNotify (
 /**
   The notify function associated with TxToken for Tcp4->Transmit().
 
-  @param[in]  Event   The event signaled.
   @param[in]  Context The context.
 
 **/
 VOID
 EFIAPI
-HttpTcpTransmitNotify (
-  IN EFI_EVENT  Event,
+HttpTcpTransmitNotifyDpc (
   IN VOID       *Context
   )
 {
   HTTP_TOKEN_WRAP          *Wrap;
 
-  if ((Event == NULL) || (Context == NULL)) {
+  if (Context == NULL) {
     return ;
   }
 
@@ -80,16 +78,35 @@ HttpTcpTransmitNotify (
 }
 
 /**
+  Request HttpTcpTransmitNotifyDpc as a DPC at TPL_CALLBACK.
+
+  @param  Event                 The receive event delivered to TCP for transmit.
+  @param  Context               Context for the callback.
+
+**/
+VOID
+EFIAPI
+HttpTcpTransmitNotify (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  //
+  // Request HttpTcpTransmitNotifyDpc as a DPC at TPL_CALLBACK
+  //
+  QueueDpc (TPL_CALLBACK, HttpTcpTransmitNotifyDpc, Context);
+}
+
+
+/**
   The notify function associated with RxToken for Tcp4->Receive ().
 
-  @param[in]  Event   The event signaled.
   @param[in]  Context The context.
 
 **/
 VOID
 EFIAPI
-HttpTcpReceiveNotify (
-  IN EFI_EVENT  Event,
+HttpTcpReceiveNotifyDpc (
   IN VOID       *Context
   )
 {
@@ -99,7 +116,7 @@ HttpTcpReceiveNotify (
   EFI_STATUS               Status;
   HTTP_PROTOCOL            *HttpInstance;
 
-  if ((Event == NULL) || (Context == NULL)) {
+  if (Context == NULL) {
     return ;
   }
 
@@ -172,6 +189,27 @@ HttpTcpReceiveNotify (
   
   FreePool (Wrap);
 }
+
+/**
+  Request HttpTcpReceiveNotifyDpc as a DPC at TPL_CALLBACK.
+
+  @param  Event                 The receive event delivered to TCP for receive.
+  @param  Context               Context for the callback.
+
+**/
+VOID
+EFIAPI
+HttpTcpReceiveNotify (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  //
+  // Request HttpTcpTransmitNotifyDpc as a DPC at TPL_CALLBACK
+  //
+  QueueDpc (TPL_CALLBACK, HttpTcpReceiveNotifyDpc, Context);
+}
+
 
 /**
   Create events for the TCP4 connection token and TCP4 close token.
