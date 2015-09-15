@@ -51,6 +51,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HTTP_KEEP_ALIVE_TIME         7200
 #define HTTP_KEEP_ALIVE_INTERVAL     30
 
+#define HTTP_URL_BUFFER_LEN          4096
+
 typedef struct _HTTP_SERVICE {
   UINT32                        Signature;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
@@ -120,6 +122,8 @@ typedef struct _HTTP_PROTOCOL {
 
   NET_MAP                       TxTokens;
   NET_MAP                       RxTokens;
+
+  CHAR8                         *Url;
 } HTTP_PROTOCOL;
 
 typedef struct {
