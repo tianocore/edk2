@@ -104,6 +104,7 @@ HttpTcpReceiveNotify (
   }
 
   Wrap = (HTTP_TOKEN_WRAP *) Context;
+  gBS->CloseEvent (Wrap->TcpWrap.RxToken.CompletionToken.Event);
   if (EFI_ERROR (Wrap->TcpWrap.RxToken.CompletionToken.Status)) {
     return ;
   }
