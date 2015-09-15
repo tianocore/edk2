@@ -313,7 +313,6 @@
 !endif
 
 [PcdsFixedAtBuild]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
@@ -378,6 +377,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
+  # Noexec settings for DXE.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.
@@ -403,7 +405,10 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  }
 
   OvmfPkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
