@@ -969,15 +969,6 @@
   # @Prompt Serial Port Register Stride in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1|UINT32|0x0001006d
 
-  ## Indicates if to set NX for stack.<BR><BR>
-  #  For the DxeIpl and the DxeCore are both X64, set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE.<BR>
-  #  For the DxeIpl and the DxeCore are both IA32 (PcdDxeIplSwitchToLongMode is FALSE), set NX for stack feature also require
-  #  IA32 PAE is supported and Execute Disable Bit is available.<BR>
-  #   TRUE  - to set NX for stack.<BR>
-  #   FALSE - Not to set NX for stack.<BR>
-  # @Prompt Set NX for stack.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
-
   ## This PCD to include the driver guid of VFR drivers for VarCheckHiiBin generation.<BR><BR>
   # Default is gZeroGuid that means no VFR driver will be parsed for VarCheckHiiBin generation.<BR>
   # If it is set to an all FFs GUID, it means all modules in all FVs will be parsed for VarCheckHiiBin generation.<BR>
@@ -1372,6 +1363,15 @@
   ## Default Creator Revision for ACPI table creation.
   # @Prompt Default Creator Revision for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
+
+  ## Indicates if to set NX for stack.<BR><BR>
+  #  For the DxeIpl and the DxeCore are both X64, set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE.<BR>
+  #  For the DxeIpl and the DxeCore are both IA32 (PcdDxeIplSwitchToLongMode is FALSE), set NX for stack feature also require
+  #  IA32 PAE is supported and Execute Disable Bit is available.<BR>
+  #   TRUE  - to set NX for stack.<BR>
+  #   FALSE - Not to set NX for stack.<BR>
+  # @Prompt Set NX for stack.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
