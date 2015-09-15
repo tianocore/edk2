@@ -1222,10 +1222,10 @@
   # @Prompt SATA spin-up delay time in second for recovery path.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSataSpinUpDelayInSecForRecoveryPath|15|UINT16|0x0001005B
 
-  ## This PCD is used to specify memory size with page number for a pre-allocated ACPI NVS memory to hold
-  #  runtime created S3 boot script entries. The default page number is 2. When changing the value of this
-  #  PCD, the platform developer should make sure the memory size is large enough to hold the S3 boot
-  #  script node created in runtime phase.
+  ## This PCD is used to specify memory size with page number for a pre-allocated ACPI reserved memory
+  #  to hold runtime(after SmmReadyToLock) created S3 boot script entries. The default page number is 2.
+  #  When changing the value of this PCD, the platform developer should make sure the memory size is
+  #  large enough to hold the S3 boot script node created in runtime(after SmmReadyToLock) phase.
   # @Prompt Reserved page number for S3 Boot Script Runtime Table.
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptRuntimeTableReservePageNumber|0x2|UINT16|0x0001005C
 

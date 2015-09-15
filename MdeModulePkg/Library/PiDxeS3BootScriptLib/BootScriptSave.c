@@ -19,43 +19,109 @@
 
   Data structure usage:
 
-  +------------------------------+<-- PcdS3BootScriptTablePrivateDataPtr
+  +------------------------------+<------- PcdS3BootScriptTablePrivateDataPtr
+  | SCRIPT_TABLE_PRIVATE_DATA    |          (mS3BootScriptTablePtr, Before SmmReadyToLock)
+  |    TableBase                 |---      PcdS3BootScriptTablePrivateSmmDataPtr
+  |    TableLength               |--|--     (mS3BootScriptTablePtr = mS3BootScriptTableSmmPtr, After SmmReadyToLock InSmm)
+  |    TableMemoryPageNumber     |--|-|----
+  |    AtRuntime                 |  | |   |
+  |    InSmm                     |  | |   |
+  |    BootTimeScriptLength      |--|-|---|---
+  |    SmmLocked                 |  | |   |  |
+  |    BackFromS3                |  | |   |  |
+  +------------------------------+  | |   |  |
+                                    | |   |  |
+  +------------------------------+<-- |   |  |
+  | EFI_BOOT_SCRIPT_TABLE_HEADER |    |   |  |
+  |    TableLength               |----|-- |  |
+  +------------------------------+    | | |  |
+  |     ......                   |    | | |  |
+  +------------------------------+<---- | |  |
+  | EFI_BOOT_SCRIPT_TERMINATE    |      | |  |
+  +------------------------------+<------ |  |
+                                          |  |
+                                          |  |
+  mBootScriptDataBootTimeGuid LockBox:    |  |
+   Used to restore data after back from S3|  |
+   to handle potential INSERT boot script |  |
+   at runtime.                            |  |
+  +------------------------------+        |  |
+  | Boot Time Boot Script        |        |  |
+  | Before SmmReadyToLock        |        |  |
+  |                              |        |  |
+  |                              |        |  |
+  +------------------------------+        |  |
+  | Boot Time Boot Script        |        |  |
+  | After SmmReadyToLock InSmm   |        |  |
+  |                              |        |  |
+  +------------------------------+<-------|--|
+                                          |  |
+                                          |  |
+  mBootScriptDataGuid LockBox: (IN_PLACE) |  |
+   Used to restore data at S3 resume.     |  |
+  +------------------------------+        |  |
+  | Boot Time Boot Script        |        |  |
+  | Before SmmReadyToLock        |        |  |
+  |                              |        |  |
+  |                              |        |  |
+  +------------------------------+        |  |
+  | Boot Time Boot Script        |        |  |
+  | After SmmReadyToLock InSmm   |        |  |
+  |                              |        |  |
+  +------------------------------+<-------|---
+  | Runtime Boot Script          |        |
+  | After SmmReadyToLock InSmm   |        |
+  +------------------------------+        |
+  |     ......                   |        |
+  +------------------------------+<--------
+
+
+  mBootScriptTableBaseGuid LockBox: (IN_PLACE)
+  +------------------------------+
+  | mS3BootScriptTablePtr->      |
+  |  TableBase                   |
+  +------------------------------+
+
+
+  mBootScriptSmmPrivateDataGuid LockBox: (IN_PLACE)
+   SMM private data with BackFromS3 = TRUE
+   at runtime. S3 will help restore it to
+   tell the Library the system is back from S3.
+  +------------------------------+
   | SCRIPT_TABLE_PRIVATE_DATA    |
-  |    TableBase                 |---
-  |    TableLength               |--|--
-  |    AtRuntime                 |  | |
-  |    InSmm                     |  | |
-  +------------------------------+  | |
-                                    | |
-  +------------------------------+<-- |
-  | EFI_BOOT_SCRIPT_TABLE_HEADER |    |
-  |    TableLength               |----|--
-  +------------------------------+    | |
-  |     ......                   |    | |
-  +------------------------------+<---- |
-  | EFI_BOOT_SCRIPT_TERMINATE    |      |
-  +------------------------------+<------
+  |    TableBase                 |
+  |    TableLength               |
+  |    TableMemoryPageNumber     |
+  |    AtRuntime                 |
+  |    InSmm                     |
+  |    BootTimeScriptLength      |
+  |    SmmLocked                 |
+  |    BackFromS3 = TRUE         |
+  +------------------------------+
 
 **/
 
 SCRIPT_TABLE_PRIVATE_DATA        *mS3BootScriptTablePtr;
-EFI_EVENT                        mEnterRuntimeEvent;
+
 //
-// Allocate SMM copy because we can not use mS3BootScriptTablePtr when we AtRuntime in InSmm.
+// Allocate SMM copy because we can not use mS3BootScriptTablePtr after SmmReadyToLock in InSmm.
 //
 SCRIPT_TABLE_PRIVATE_DATA        *mS3BootScriptTableSmmPtr;
-UINTN                            mLockBoxLength;
 
 EFI_GUID                         mBootScriptDataGuid = {
   0xaea6b965, 0xdcf5, 0x4311, { 0xb4, 0xb8, 0xf, 0x12, 0x46, 0x44, 0x94, 0xd2 }
 };
 
-EFI_GUID                         mBootScriptDataOrgGuid = {
+EFI_GUID                         mBootScriptDataBootTimeGuid = {
   0xb5af1d7a, 0xb8cf, 0x4eb3, { 0x89, 0x25, 0xa8, 0x20, 0xe1, 0x6b, 0x68, 0x7d }
 };
 
-EFI_GUID                         mBootScriptHeaderDataGuid = {
+EFI_GUID                         mBootScriptTableBaseGuid = {
   0x1810ab4a, 0x2314, 0x4df6, { 0x81, 0xeb, 0x67, 0xc6, 0xec, 0x5, 0x85, 0x91 }
+};
+
+EFI_GUID                         mBootScriptSmmPrivateDataGuid = {
+  0x627ee2da, 0x3bf9, 0x439b, { 0x92, 0x9f, 0x2e, 0xe, 0x6e, 0x9d, 0xba, 0x62 }
 };
 
 /**
@@ -97,18 +163,15 @@ S3BootScriptInternalCloseTable (
   return S3TableBase;
   //
   // NOTE: Here we did NOT adjust the mS3BootScriptTablePtr->TableLength to 
-  // mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE). Because 
-  // maybe in runtime, we still need add entries into the table, and the runtime entry should be
-  // added start before this TERMINATE node.
+  // mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE).
+  // Because maybe after SmmReadyToLock, we still need add entries into the table,
+  // and the entry should be added start before this TERMINATE node.
   //
 }  
 
 /**
   This function save boot script data to LockBox.
-  1. BootSriptPrivate data, BootScript data - Image and DispatchContext are handled by platform.
-  2. BootScriptExecutor, BootScriptExecutor context
-  - ACPI variable - (PI version) sould be handled by SMM driver. S3 Page table is handled here.
-  - ACPI variable - framework version is already handled by Framework CPU driver.
+
 **/
 VOID
 SaveBootScriptDataToLockBox (
@@ -118,13 +181,13 @@ SaveBootScriptDataToLockBox (
   EFI_STATUS            Status;
 
   //
-  // mS3BootScriptTablePtr->TableLength does not include EFI_BOOT_SCRIPT_TERMINATE, because we need add entry at runtime.
-  // Save all info here, just in case that no one will add boot script entry in SMM.
+  // Save whole memory copy into LockBox.
+  // It will be used to restore data at S3 resume.
   //
   Status = SaveLockBox (
              &mBootScriptDataGuid,
              (VOID *)mS3BootScriptTablePtr->TableBase,
-             mS3BootScriptTablePtr->TableLength + sizeof(EFI_BOOT_SCRIPT_TERMINATE)
+             EFI_PAGES_TO_SIZE (mS3BootScriptTablePtr->TableMemoryPageNumber)
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -132,35 +195,23 @@ SaveBootScriptDataToLockBox (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // We need duplicate the original copy, because it may have INSERT boot script at runtime in SMM.
-  // If so, we should use original copy to restore data after OS rewrites the ACPINvs region.
-  // Or the data inserted may cause some original boot script data lost.
-  //
-  Status = SaveLockBox (
-             &mBootScriptDataOrgGuid,
-             (VOID *)mS3BootScriptTablePtr->TableBase,
-             mS3BootScriptTablePtr->TableLength + sizeof(EFI_BOOT_SCRIPT_TERMINATE)
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Just need save TableBase.
   // Do not update other field because they will NOT be used in S3.
   //
   Status = SaveLockBox (
-             &mBootScriptHeaderDataGuid,
+             &mBootScriptTableBaseGuid,
              (VOID *)&mS3BootScriptTablePtr->TableBase,
              sizeof(mS3BootScriptTablePtr->TableBase)
              );
   ASSERT_EFI_ERROR (Status);
 
-  Status = SetLockBoxAttributes (&mBootScriptHeaderDataGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
+  Status = SetLockBoxAttributes (&mBootScriptTableBaseGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
   ASSERT_EFI_ERROR (Status);
 }
 
 /**
   This is the Event call back function to notify the Library the system is entering
-  run time phase.
+  SmmLocked phase.
   
   @param  Event   Pointer to this event
   @param  Context Event handler private data 
@@ -189,28 +240,29 @@ S3BootScriptEventCallBack (
   }
 
   //
-  // Here we should tell the library that we are enter into runtime phase. and 
-  // the memory page number occupied by the table should not grow anymore.
+  // Here we should tell the library that we are entering SmmLocked phase.
+  // and the memory page number occupied by the table should not grow anymore.
   //
-  if (!mS3BootScriptTablePtr->AtRuntime) {
+  if (!mS3BootScriptTablePtr->SmmLocked) {
     //
-    // In boot time, we need not write the terminate node when adding a node to boot scipt table
-    // or else, that will impact the performance. However, in runtime, we should append terminate
-    // node on every add to boot script table
+    // Before SmmReadyToLock, we need not write the terminate node when adding a node to boot scipt table
+    // or else, that will impact the performance. However, after SmmReadyToLock, we should append terminate
+    // node on every add to boot script table.
     //
     S3BootScriptInternalCloseTable ();
-    mS3BootScriptTablePtr->AtRuntime = TRUE;
+    mS3BootScriptTablePtr->SmmLocked = TRUE;
 
     //
     // Save BootScript data to lockbox
     //
     SaveBootScriptDataToLockBox ();
   }
-} 
+}
+
 /**
-  This is the Event call back function is triggered in SMM to notify the Library the system is entering
-  run time phase and set InSmm flag.
-  
+  This is the Event call back function is triggered in SMM to notify the Library
+  the system is entering SmmLocked phase and set InSmm flag.
+
   @param  Protocol   Points to the protocol's unique identifier
   @param  Interface  Points to the interface instance
   @param  Handle     The handle on which the interface was installed
@@ -233,7 +285,7 @@ S3BootScriptSmmEventCallBack (
   }
 
   //
-  // Last chance to call-out, just make sure AtRuntime is set
+  // Last chance to call-out, just make sure SmmLocked is set.
   //
   S3BootScriptEventCallBack (NULL, NULL);
 
@@ -242,22 +294,117 @@ S3BootScriptSmmEventCallBack (
   //
   if (mS3BootScriptTableSmmPtr->TableBase == NULL) {
     CopyMem (mS3BootScriptTableSmmPtr, mS3BootScriptTablePtr, sizeof(*mS3BootScriptTablePtr));
+
+    //
+    // Set InSmm, we allow boot script update when InSmm, but not allow boot script outside SMM.
+    // InSmm will only be checked if SmmLocked is TRUE.
+    //
+    mS3BootScriptTableSmmPtr->InSmm = TRUE;
   }
   //
-  // We should not use ACPINvs copy, because it is not safe.
+  // We should not use ACPI Reserved copy, because it is not safe.
   //
   mS3BootScriptTablePtr = mS3BootScriptTableSmmPtr;
 
-  //
-  // Set InSmm, we allow boot script update when InSmm, but not allow boot script outside SMM.
-  // InSmm will only be checked if AtRuntime is TRUE.
-  //
-  mS3BootScriptTablePtr->InSmm = TRUE;
+  return EFI_SUCCESS;
+}
+
+/**
+  This function is to save boot time boot script data to LockBox.
+
+  Because there may be INSERT boot script at runtime in SMM.
+  The boot time copy will be used to restore data after back from S3.
+  Otherwise the data inserted may cause some boot time boot script data lost
+  if only BootScriptData used.
+
+**/
+VOID
+SaveBootTimeDataToLockBox (
+  VOID
+  )
+{
+  EFI_STATUS    Status;
 
   //
-  // Record LockBoxLength
+  // ACPI Reserved copy is not safe, restore from BootScriptData LockBox first,
+  // and then save the data to BootScriptDataBootTime LockBox.
   //
-  mLockBoxLength = mS3BootScriptTableSmmPtr->TableLength + sizeof(EFI_BOOT_SCRIPT_TERMINATE);
+  Status = RestoreLockBox (
+             &mBootScriptDataGuid,
+             NULL,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Save BootScriptDataBootTime
+  // It will be used to restore data after back from S3.
+  //
+  Status = SaveLockBox (
+             &mBootScriptDataBootTimeGuid,
+             (VOID *) mS3BootScriptTablePtr->TableBase,
+             mS3BootScriptTablePtr->BootTimeScriptLength
+             );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  This function save boot script SMM private data to LockBox with BackFromS3 = TRUE at runtime.
+  S3 resume will help restore it to tell the Library the system is back from S3.
+
+**/
+VOID
+SaveSmmPriviateDataToLockBoxAtRuntime (
+  VOID
+  )
+{
+  EFI_STATUS    Status;
+
+  //
+  // Save boot script SMM private data with BackFromS3 = TRUE.
+  //
+  mS3BootScriptTablePtr->BackFromS3 = TRUE;
+  Status = SaveLockBox (
+             &mBootScriptSmmPrivateDataGuid,
+             (VOID *) mS3BootScriptTablePtr,
+             sizeof (SCRIPT_TABLE_PRIVATE_DATA)
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SetLockBoxAttributes (&mBootScriptSmmPrivateDataGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Set BackFromS3 flag back to FALSE to indicate that now is not back from S3.
+  //
+  mS3BootScriptTablePtr->BackFromS3 = FALSE;
+}
+
+/**
+  This is the Event call back function is triggered in SMM to notify the Library
+  the system is entering runtime phase.
+
+  @param[in] Protocol   Points to the protocol's unique identifier
+  @param[in] Interface  Points to the interface instance
+  @param[in] Handle     The handle on which the interface was installed
+
+  @retval EFI_SUCCESS SmmAtRuntimeCallBack runs successfully
+ **/
+EFI_STATUS
+EFIAPI
+S3BootScriptSmmAtRuntimeCallBack (
+  IN CONST EFI_GUID     *Protocol,
+  IN VOID               *Interface,
+  IN EFI_HANDLE         Handle
+  )
+{
+  if (!mS3BootScriptTablePtr->AtRuntime) {
+    mS3BootScriptTablePtr->BootTimeScriptLength = (UINT32) (mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE));
+    SaveBootTimeDataToLockBox ();
+
+    mS3BootScriptTablePtr->AtRuntime = TRUE;
+    SaveSmmPriviateDataToLockBoxAtRuntime ();
+  }
 
   return EFI_SUCCESS;
 }
@@ -288,6 +435,7 @@ S3BootScriptLibInitialize (
   BOOLEAN                        InSmm;
   EFI_SMM_SYSTEM_TABLE2          *Smst;
   EFI_PHYSICAL_ADDRESS           Buffer;
+  EFI_EVENT                      Event;
 
   S3TablePtr = (SCRIPT_TABLE_PRIVATE_DATA*)(UINTN)PcdGet64(PcdS3BootScriptTablePrivateDataPtr);
   //
@@ -297,7 +445,7 @@ S3BootScriptLibInitialize (
     Buffer = SIZE_4GB - 1;
     Status = gBS->AllocatePages (
                     AllocateMaxAddress,
-                    EfiACPIMemoryNVS,
+                    EfiReservedMemoryType,
                     EFI_SIZE_TO_PAGES(sizeof(SCRIPT_TABLE_PRIVATE_DATA)),
                     &Buffer
                     );
@@ -309,17 +457,17 @@ S3BootScriptLibInitialize (
     PcdSet64 (PcdS3BootScriptTablePrivateDataPtr, (UINT64) (UINTN)S3TablePtr); 
     ZeroMem (S3TablePtr, sizeof(SCRIPT_TABLE_PRIVATE_DATA));  
     //
-    // create event to notify the library system enter the runtime phase
+    // Create event to notify the library system enter the SmmLocked phase.
     //
-    mEnterRuntimeEvent = EfiCreateProtocolNotifyEvent  (
-                          &gEfiDxeSmmReadyToLockProtocolGuid,
-                          TPL_CALLBACK,
-                          S3BootScriptEventCallBack,
-                          NULL,
-                          &Registration
-                          );
-    ASSERT (mEnterRuntimeEvent != NULL);
-  } 
+    Event = EfiCreateProtocolNotifyEvent  (
+              &gEfiDxeSmmReadyToLockProtocolGuid,
+              TPL_CALLBACK,
+              S3BootScriptEventCallBack,
+              NULL,
+              &Registration
+              );
+    ASSERT (Event != NULL);
+  }
   mS3BootScriptTablePtr = S3TablePtr;
 
   //
@@ -360,11 +508,30 @@ S3BootScriptLibInitialize (
 
     PcdSet64 (PcdS3BootScriptTablePrivateSmmDataPtr, (UINT64) (UINTN)S3TableSmmPtr);
     ZeroMem (S3TableSmmPtr, sizeof(SCRIPT_TABLE_PRIVATE_DATA));
+
+    //
+    // Register SmmExitBootServices and SmmLegacyBoot notification.
+    //
+    Registration = NULL;
+    Status = Smst->SmmRegisterProtocolNotify (
+                     &gEdkiiSmmExitBootServicesProtocolGuid,
+                     S3BootScriptSmmAtRuntimeCallBack,
+                     &Registration
+                     );
+    ASSERT_EFI_ERROR (Status);
+
+    Registration = NULL;
+    Status = Smst->SmmRegisterProtocolNotify (
+                     &gEdkiiSmmLegacyBootProtocolGuid,
+                     S3BootScriptSmmAtRuntimeCallBack,
+                     &Registration
+                     );
+    ASSERT_EFI_ERROR (Status);
   }
   mS3BootScriptTableSmmPtr = S3TableSmmPtr;
 
   //
-  // Then register event after lock
+  // Register SmmReadyToLock notification.
   //
   Registration = NULL;
   Status = Smst->SmmRegisterProtocolNotify (
@@ -401,14 +568,14 @@ S3BootScriptGetBootTimeEntryAddAddress (
    
    S3TableBase = (EFI_PHYSICAL_ADDRESS)(UINTN)(mS3BootScriptTablePtr->TableBase);
    if (S3TableBase == 0) {
+     //
      // The table is not exist. This is the first to add entry. 
-     // Allocate ACPI script table space under 4G memory. We need it to save
-     // some settings done by CSM, which runs after normal script table closed
+     // Allocate ACPI script table space under 4G memory.
      //
      S3TableBase = 0xffffffff;
      Status = gBS->AllocatePages (
                   AllocateMaxAddress,
-                  EfiACPIMemoryNVS,
+                  EfiReservedMemoryType,
                   2 + PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber),
                   (EFI_PHYSICAL_ADDRESS*)&S3TableBase
                   );
@@ -431,16 +598,16 @@ S3BootScriptGetBootTimeEntryAddAddress (
    }
      
    // Here we do not count the reserved memory for runtime script table.
-   PageNumber   = (UINT16)(mS3BootScriptTablePtr->TableMemoryPageNumber - PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber));   
+   PageNumber = (UINT16) (mS3BootScriptTablePtr->TableMemoryPageNumber - PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber));
    TableLength =  mS3BootScriptTablePtr->TableLength;
-   if ((UINT32)(PageNumber * EFI_PAGE_SIZE) < (TableLength + EntryLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE))) {
+   if ((UINTN) EFI_PAGES_TO_SIZE ((UINTN) PageNumber) < (UINTN) (TableLength + EntryLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE))) {
      // 
      // The buffer is too small to hold the table, Reallocate the buffer
      //
      NewS3TableBase = 0xffffffff;
      Status = gBS->AllocatePages (
                   AllocateMaxAddress,
-                  EfiACPIMemoryNVS,
+                  EfiReservedMemoryType,
                   2 + PageNumber + PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber),
                   (EFI_PHYSICAL_ADDRESS*)&NewS3TableBase
                   );
@@ -476,12 +643,12 @@ S3BootScriptGetBootTimeEntryAddAddress (
    return NewEntryPtr;    
 }
 /**
-  To get the start address from which a new runtime s3 boot script entry will write into.
+  To get the start address from which a new runtime(after SmmReadyToLock) s3 boot script entry will write into.
   In this case, it should be ensured that there is enough buffer to hold the entry.
   
   @param EntryLength      the new entry length.
   
-  @retval the address from which the a new s3 runtime script entry will write into
+  @retval the address from which the a new s3 runtime(after SmmReadyToLock) script entry will write into
  **/
 UINT8*
 S3BootScriptGetRuntimeEntryAddAddress (
@@ -494,7 +661,7 @@ S3BootScriptGetRuntimeEntryAddAddress (
    //
    // Check if the memory range reserved for S3 Boot Script table is large enough to hold the node. 
    //
-   if (mS3BootScriptTablePtr->TableLength + EntryLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE) <= EFI_PAGES_TO_SIZE((UINT32)(mS3BootScriptTablePtr->TableMemoryPageNumber))) {
+   if ((UINTN) (mS3BootScriptTablePtr->TableLength + EntryLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE)) <= (UINTN) EFI_PAGES_TO_SIZE ((UINTN) (mS3BootScriptTablePtr->TableMemoryPageNumber))) {
      NewEntryPtr = mS3BootScriptTablePtr->TableBase + mS3BootScriptTablePtr->TableLength;   
      mS3BootScriptTablePtr->TableLength = mS3BootScriptTablePtr->TableLength + EntryLength;
      //
@@ -504,12 +671,53 @@ S3BootScriptGetRuntimeEntryAddAddress (
    }
    return (UINT8*)NewEntryPtr;    
 }
+
+/**
+  This function is to restore boot time boot script data from LockBox.
+
+**/
+VOID
+RestoreBootTimeDataFromLockBox (
+  VOID
+  )
+{
+  EFI_STATUS    Status;
+  UINTN         LockBoxLength;
+
+  //
+  // Restore boot time boot script data from LockBox.
+  //
+  LockBoxLength = mS3BootScriptTablePtr->BootTimeScriptLength;
+  Status = RestoreLockBox (
+             &mBootScriptDataBootTimeGuid,
+             (VOID *) mS3BootScriptTablePtr->TableBase,
+             &LockBoxLength
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Update the data to BootScriptData LockBox.
+  //
+  Status = UpdateLockBox (
+             &mBootScriptDataGuid,
+             0,
+             (VOID *) mS3BootScriptTablePtr->TableBase,
+             LockBoxLength
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Update TableLength.
+  //
+  mS3BootScriptTablePtr->TableLength = (UINT32) (mS3BootScriptTablePtr->BootTimeScriptLength - sizeof (EFI_BOOT_SCRIPT_TERMINATE));
+}
+
 /**
   To get the start address from which a new s3 boot script entry will write into.
   
   @param EntryLength      the new entry length.
   
-  @retval the address from which the a new s3 runtime script entry will write into 
+  @retval the address from which the a new s3 boot script entry will write into 
  **/ 
 UINT8* 
 S3BootScriptGetEntryAddAddress (
@@ -517,78 +725,31 @@ S3BootScriptGetEntryAddAddress (
   )
 {
   UINT8*                         NewEntryPtr;
-  EFI_BOOT_SCRIPT_TABLE_HEADER   TableHeader;
-  EFI_STATUS                     Status;
-  UINTN                          OrgLockBoxLength;
 
-  if (mS3BootScriptTablePtr->AtRuntime) {
+  if (mS3BootScriptTablePtr->SmmLocked) {
     //
-    // We need check InSmm when AtRuntime, because after SmmReadyToLock, only SMM driver is allowed to write boot script.
+    // We need check InSmm, because after SmmReadyToLock, only SMM driver is allowed to write boot script.
     //
     if (!mS3BootScriptTablePtr->InSmm) {
       //
-      // Add DEBUG ERROR, so that we can find it at boot time.
-      // Do not use ASSERT, because we may have test invoke this interface.
+      // Add DEBUG ERROR, so that we can find it after SmmReadyToLock.
+      // Do not use ASSERT, because we may have test to invoke this interface.
       //
-      DEBUG ((EFI_D_ERROR, "FATAL ERROR: Set boot script after ReadyToLock!!!\n"));
+      DEBUG ((EFI_D_ERROR, "FATAL ERROR: Set boot script outside SMM after SmmReadyToLock!!!\n"));
       return NULL;
     }
 
-    //
-    // NOTE: OS will restore ACPINvs data. After S3, the table length in mS3BootScriptTableSmmPtr (SMM) is different with
-    // table length in BootScriptTable header (ACPINvs).
-    // So here we need sync them. We choose ACPINvs table length, because we want to override the boot script saved
-    // in SMM every time.
-    //
-    ASSERT (mS3BootScriptTablePtr == mS3BootScriptTableSmmPtr);
-    CopyMem ((VOID*)&TableHeader, (VOID*)mS3BootScriptTablePtr->TableBase, sizeof(EFI_BOOT_SCRIPT_TABLE_HEADER));
-    if (mS3BootScriptTablePtr->TableLength + sizeof(EFI_BOOT_SCRIPT_TERMINATE) != TableHeader.TableLength) {
+    if (mS3BootScriptTablePtr->BackFromS3) {
       //
-      // Restore it to use original value
+      // Back from S3, restore boot time boot script data from LockBox
+      // and set BackFromS3 flag back to FALSE.
       //
-      OrgLockBoxLength = mLockBoxLength;
-      Status = RestoreLockBox (
-                 &mBootScriptDataOrgGuid,
-                 (VOID *)mS3BootScriptTablePtr->TableBase,
-                 &OrgLockBoxLength
-                 );
-     ASSERT_EFI_ERROR (Status);
-     ASSERT (OrgLockBoxLength == mLockBoxLength);
-
-      //
-      // Update the current BootScriptData into LockBox as well
-      //
-      Status = UpdateLockBox (
-                 &mBootScriptDataGuid,
-                 0,
-                 (VOID *)mS3BootScriptTablePtr->TableBase,
-                 OrgLockBoxLength
-                 );
-      ASSERT_EFI_ERROR (Status);
-
-      //
-      // NOTE: We should NOT use TableHeader.TableLength, because it is already updated to be whole length.
-      //
-      mS3BootScriptTablePtr->TableLength = (UINT32)(mLockBoxLength - sizeof(EFI_BOOT_SCRIPT_TERMINATE));
+      RestoreBootTimeDataFromLockBox ();
+      mS3BootScriptTablePtr->BackFromS3 = FALSE;
     }
 
     NewEntryPtr  = S3BootScriptGetRuntimeEntryAddAddress (EntryLength);
-
-    if (EntryLength != 0) {
-      //
-      // Now the length field is updated, need sync to lockbox.
-      // So in S3 resume, the data can be restored correctly.
-      //
-      CopyMem ((VOID*)&TableHeader, (VOID*)mS3BootScriptTablePtr->TableBase, sizeof(EFI_BOOT_SCRIPT_TABLE_HEADER));
-      Status = UpdateLockBox (
-                 &mBootScriptDataGuid,
-                 OFFSET_OF(EFI_BOOT_SCRIPT_TABLE_HEADER, TableLength),
-                 &TableHeader.TableLength,
-                 sizeof(TableHeader.TableLength)
-                 );
-      ASSERT_EFI_ERROR (Status);
-    }
-  } else {   
+  } else {
     NewEntryPtr  = S3BootScriptGetBootTimeEntryAddAddress (EntryLength);
   }  
   return NewEntryPtr;
@@ -607,16 +768,20 @@ SyncBootScript (
   )
 {
   EFI_STATUS  Status;
-  UINTN       ScriptOffset;
+  UINT32      ScriptOffset;
+  UINT32      TotalScriptLength;
 
-  ScriptOffset = (UINTN) (Script - mS3BootScriptTablePtr->TableBase);
-
-  if (!mS3BootScriptTablePtr->AtRuntime || !mS3BootScriptTablePtr->InSmm || ScriptOffset >= mLockBoxLength) {
+  if (!mS3BootScriptTablePtr->SmmLocked || !mS3BootScriptTablePtr->InSmm) {
     //
-    // If it is not at runtime in SMM or in the range that needs to be synced in LockBox, just return.
+    // If it is not after SmmReadyToLock in SMM,
+    // just return.
     //
     return ;
   }
+
+  ScriptOffset = (UINT32) (Script - mS3BootScriptTablePtr->TableBase);
+
+  TotalScriptLength = (UINT32) (mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE));
 
   //
   // Update BootScriptData
@@ -626,7 +791,19 @@ SyncBootScript (
              &mBootScriptDataGuid,
              ScriptOffset,
              (VOID *)((UINTN)mS3BootScriptTablePtr->TableBase + ScriptOffset),
-             mLockBoxLength - ScriptOffset
+             TotalScriptLength - ScriptOffset
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Now the length field is updated, need sync to lockbox.
+  // So at S3 resume, the data can be restored correctly.
+  //
+  Status = UpdateLockBox (
+             &mBootScriptDataGuid,
+             OFFSET_OF (EFI_BOOT_SCRIPT_TABLE_HEADER, TableLength),
+             &TotalScriptLength,
+             sizeof (TotalScriptLength)
              );
   ASSERT_EFI_ERROR (Status);
 }
@@ -649,7 +826,7 @@ SyncBootScript (
   for Framework Spec compatibility.
   
   If anyone does call CloseTable() on a real platform, then the caller is responsible for figuring out 
-  how to get the script to run on an S3 resume because the boot script maintained by the lib will be 
+  how to get the script to run at S3 resume because the boot script maintained by the lib will be 
   destroyed.
  
   @return the base address of the new copy of the boot script table.   
