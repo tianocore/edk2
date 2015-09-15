@@ -242,6 +242,68 @@ MemMapInitialization (
   }
 }
 
+EFI_STATUS
+GetNamedFwCfgBoolean (
+  IN  CHAR8   *FwCfgFileName,
+  OUT BOOLEAN *Setting
+  )
+{
+  EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM FwCfgItem;
+  UINTN                FwCfgSize;
+  UINT8                Value[3];
+
+  Status = QemuFwCfgFindFile (FwCfgFileName, &FwCfgItem, &FwCfgSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  if (FwCfgSize > sizeof Value) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (FwCfgSize, Value);
+
+  if ((FwCfgSize == 1) ||
+      (FwCfgSize == 2 && Value[1] == '\n') ||
+      (FwCfgSize == 3 && Value[1] == '\r' && Value[2] == '\n')) {
+    switch (Value[0]) {
+      case '0':
+      case 'n':
+      case 'N':
+        *Setting = FALSE;
+        return EFI_SUCCESS;
+
+      case '1':
+      case 'y':
+      case 'Y':
+        *Setting = TRUE;
+        return EFI_SUCCESS;
+
+      default:
+        break;
+    }
+  }
+  return EFI_PROTOCOL_ERROR;
+}
+
+#define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
+          do {                                                      \
+            BOOLEAN Setting;                                        \
+                                                                    \
+            if (!EFI_ERROR (GetNamedFwCfgBoolean (                  \
+                              "opt/ovmf/" #TokenName, &Setting))) { \
+              PcdSetBool (TokenName, Setting);                      \
+            }                                                       \
+          } while (0)
+
+VOID
+NoexecDxeInitialization (
+  VOID
+  )
+{
+  UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdPropertiesTableEnable);
+  UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdSetNxForStack);
+}
 
 VOID
 MiscInitialization (
@@ -438,10 +500,9 @@ InitializePlatform (
 
   if (mBootMode != BOOT_ON_S3_RESUME) {
     ReserveEmuVariableNvStore ();
-
     PeiFvInitialization ();
-
     MemMapInitialization ();
+    NoexecDxeInitialization ();
   }
 
   MiscInitialization ();
