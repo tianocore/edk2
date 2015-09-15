@@ -275,7 +275,6 @@ EfiHttpRequest (
     return EFI_ACCESS_DENIED;   
   }  
 
-  Url         = NULL;
   HostName    = NULL;
   Wrap        = NULL;
   HostNameStr = NULL;
@@ -284,6 +283,7 @@ EfiHttpRequest (
   //
   // Parse the URI of the remote host.
   //
+  Url = HttpInstance->Url;
   UrlLen = StrLen (Request->Url) + 1;
   if (UrlLen > HTTP_URL_BUFFER_LEN) {
     Url = AllocateZeroPool (UrlLen);
