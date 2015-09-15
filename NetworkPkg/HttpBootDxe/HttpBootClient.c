@@ -458,22 +458,6 @@ HttpBootGetBootFileCallback (
   }
 
   CallbackData = (HTTP_BOOT_CALLBACK_DATA *) Context;
-
-  //
-  // Save the data into cache list.
-  //
-  NewEntityData = AllocatePool (sizeof (HTTP_BOOT_ENTITY_DATA));
-  if (NewEntityData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  if (CallbackData->NewBlock) {
-    NewEntityData->Block = CallbackData->Block;
-    CallbackData->Block = NULL;
-  }
-  NewEntityData->DataLength = Length;
-  NewEntityData->DataStart  = (UINT8*) Data;
-  InsertTailList (&CallbackData->Cache->EntityDataList, &NewEntityData->Link);
-
   //
   // Copy data if caller has provided a buffer.
   //
@@ -486,6 +470,22 @@ HttpBootGetBootFileCallback (
     CallbackData->CopyedSize += MIN (Length, CallbackData->BufferSize - CallbackData->CopyedSize);
   }
 
+  //
+  // The caller doesn't provide a buffer, save the block into cache list.
+  //
+  if (CallbackData->Cache != NULL) {
+    NewEntityData = AllocatePool (sizeof (HTTP_BOOT_ENTITY_DATA));
+    if (NewEntityData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    if (CallbackData->NewBlock) {
+      NewEntityData->Block = CallbackData->Block;
+      CallbackData->Block = NULL;
+    }
+    NewEntityData->DataLength = Length;
+    NewEntityData->DataStart  = (UINT8*) Data;
+    InsertTailList (&CallbackData->Cache->EntityDataList, &NewEntityData->Link);
+  }
   return EFI_SUCCESS;
 }
 
@@ -566,10 +566,10 @@ HttpBootGetBootFile (
   //
 
   //
-  // 1. Create a temp cache item for the requested URI.
+  // 1. Create a temp cache item for the requested URI if caller doesn't provide buffer.
   //
   Cache = NULL;
-  if (!HeaderOnly) {
+  if ((!HeaderOnly) && (*BufferSize == 0)) {
     Cache = AllocateZeroPool (sizeof (HTTP_BOOT_CACHE_CONTENT));
     if (Cache == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -659,7 +659,7 @@ HttpBootGetBootFile (
   //
   // 2.3 Record the request info in a temp cache item.
   //
-  if (!HeaderOnly) {
+  if (Cache != NULL) {
     Cache->RequestData = RequestData;
   }
 
@@ -703,7 +703,7 @@ HttpBootGetBootFile (
   //
   // 3.2 Cache the response header.
   //
-  if (!HeaderOnly) {
+  if (Cache != NULL) {
     Cache->ResponseData = ResponseData;
   }
   
@@ -733,17 +733,26 @@ HttpBootGetBootFile (
   //
   // 3.4 Continue to receive and parse message-body if needed.
   //
+  Block = NULL;
   if (!HeaderOnly) {
     ZeroMem (&ResponseBody, sizeof (HTTP_IO_RESOPNSE_DATA));
     while (!HttpIsMessageComplete (Parser)) {
       //
-      // Allocate a new block to hold the message-body.
+      // Allocate a block to hold the message-body, if caller doesn't provide
+      // a buffer, the block will be cached and we will allocate a new one here.
       //
-      Block = AllocatePool (HTTP_BOOT_BLOCK_SIZE);
-      if (Block == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto ERROR_6;
+      if (Block == NULL || Context.BufferSize == 0) {
+        Block = AllocatePool (HTTP_BOOT_BLOCK_SIZE);
+        if (Block == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto ERROR_6;
+        }
+        Context.NewBlock = TRUE;
+        Context.Block = Block;
+      } else {
+        Context.NewBlock = FALSE;
       }
+
       ResponseBody.Body       = (CHAR8*) Block;
       ResponseBody.BodyLength = HTTP_BOOT_BLOCK_SIZE;
       Status = HttpIoRecvResponse (
@@ -758,8 +767,6 @@ HttpBootGetBootFile (
       //
       // Parse the new received block of the message-body, the block will be saved in cache.
       //
-      Context.NewBlock = TRUE;
-      Context.Block    = Block;
       Status = HttpParseMessageBody (
                  Parser,
                  ResponseBody.BodyLength,
@@ -787,7 +794,7 @@ HttpBootGetBootFile (
   //
   // 4. Save the cache item to driver's cache list and return.
   //
-  if (!HeaderOnly) {
+  if (Cache != NULL) {
     Cache->EntityLength = ContentLength;
     InsertTailList (&Private->CacheList, &Cache->Link);
   }
