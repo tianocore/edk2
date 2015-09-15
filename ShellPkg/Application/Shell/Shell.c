@@ -1578,11 +1578,18 @@ RunSplitCommand(
     SHELL_FREE_NON_NULL(OurCommandLine);
     SHELL_FREE_NON_NULL(NextCommandLine);
     return (EFI_INVALID_PARAMETER);
-  } else if (NextCommandLine[0] != CHAR_NULL &&
-      NextCommandLine[0] == L'a' &&
-      NextCommandLine[1] == L' '
-     ){
+  } else if (NextCommandLine[0] == L'a' &&
+             (NextCommandLine[1] == L' ' || NextCommandLine[1] == CHAR_NULL)
+            ){
     CopyMem(NextCommandLine, NextCommandLine+1, StrSize(NextCommandLine) - sizeof(NextCommandLine[0]));
+    while (NextCommandLine[0] == L' ') {
+      CopyMem(NextCommandLine, NextCommandLine+1, StrSize(NextCommandLine) - sizeof(NextCommandLine[0]));
+    }
+    if (NextCommandLine[0] == CHAR_NULL) {
+      SHELL_FREE_NON_NULL(OurCommandLine);
+      SHELL_FREE_NON_NULL(NextCommandLine);
+      return (EFI_INVALID_PARAMETER);
+    }
     Unicode = FALSE;
   } else {
     Unicode = TRUE;
@@ -1884,6 +1891,13 @@ VerifySplit(
   EFI_STATUS    Status;
 
   //
+  // If this was the only item, then get out
+  //
+  if (!ContainsSplit(CmdLine)) {
+    return (EFI_SUCCESS);
+  }
+
+  //
   // Verify up to the pipe or end character
   //
   Status = IsValidSplit(CmdLine);
@@ -1892,16 +1906,16 @@ VerifySplit(
   }
 
   //
-  // If this was the only item, then get out
-  //
-  if (!ContainsSplit(CmdLine)) {
-    return (EFI_SUCCESS);
-  }
-
-  //
   // recurse to verify the next item
   //
   TempSpot = FindFirstCharacter(CmdLine, L"|", L'^') + 1;
+  if (*TempSpot == L'a' && 
+      (*(TempSpot + 1) == L' ' || *(TempSpot + 1) == CHAR_NULL)
+     ) {
+    // If it's an ASCII pipe '|a'
+    TempSpot += 1;
+  }
+  
   return (VerifySplit(TempSpot));
 }
 
