@@ -2,6 +2,7 @@
   Utility functions used by the Dp application.
 
   Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -131,7 +132,7 @@ IsPhase(
   
 **/
 VOID
-GetShortPdbFileName (
+DpGetShortPdbFileName (
   IN  CHAR8     *PdbFileName,
   OUT CHAR16    *UnicodeBuffer
   )
@@ -188,7 +189,7 @@ GetShortPdbFileName (
 
 **/
 VOID
-GetNameFromHandle (
+DpGetNameFromHandle (
   IN EFI_HANDLE   Handle
   )
 {
@@ -236,7 +237,7 @@ GetNameFromHandle (
     PdbFileName = PeCoffLoaderGetPdbPointer (Image->ImageBase);
 
     if (PdbFileName != NULL) {
-      GetShortPdbFileName (PdbFileName, mGaugeString);
+      DpGetShortPdbFileName (PdbFileName, mGaugeString);
       return;
     }
   }

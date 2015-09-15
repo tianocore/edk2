@@ -2,6 +2,7 @@
   Trace reporting for the Dp utility.
 
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -216,7 +217,7 @@ DumpAllTrace(
         // See if the Handle is in the HandleBuffer
         for (TIndex = 0; TIndex < (Size / sizeof(HandleBuffer[0])); TIndex++) {
           if (Measurement.Handle == HandleBuffer[TIndex]) {
-            GetNameFromHandle (HandleBuffer[TIndex]);
+            DpGetNameFromHandle (HandleBuffer[TIndex]);
             break;
           }
         }
@@ -582,7 +583,7 @@ ProcessHandles(
       // See if the Handle is in the HandleBuffer
       for (Index = 0; Index < (Size / sizeof(HandleBuffer[0])); Index++) {
         if (Measurement.Handle == HandleBuffer[Index]) {
-          GetNameFromHandle (HandleBuffer[Index]); // Name is put into mGaugeString
+          DpGetNameFromHandle (HandleBuffer[Index]); // Name is put into mGaugeString
           break;
         }
       }
