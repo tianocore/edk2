@@ -2,7 +2,7 @@
   Support for S3 boot script lib. This file defined some internal macro and internal 
   data structure
  
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -23,6 +23,8 @@
 #include <Protocol/SmmBase2.h>
 #include <Protocol/DxeSmmReadyToLock.h>
 #include <Protocol/SmmReadyToLock.h>
+#include <Protocol/SmmExitBootServices.h>
+#include <Protocol/SmmLegacyBoot.h>
 
 #include <Library/S3BootScriptLib.h>
 
@@ -70,11 +72,14 @@ typedef union {
 // The boot script private data.
 //
 typedef struct {
-  UINT8           *TableBase;
-  UINT32          TableLength;               // Record the actual memory length 
-  UINT16          TableMemoryPageNumber;     // Record the page number Allocated for the table 
-  BOOLEAN         AtRuntime;                 // Record if current state is after SmmReadyToLock
-  BOOLEAN         InSmm;                     // Record if this library is in SMM.
+  UINT8     *TableBase;
+  UINT32    TableLength;            // Record the actual memory length 
+  UINT16    TableMemoryPageNumber;  // Record the page number Allocated for the table 
+  BOOLEAN   InSmm;                  // Record if this library is in SMM.
+  BOOLEAN   AtRuntime;              // Record if current state is after SmmExitBootServices or SmmLegacyBoot.
+  UINT32    BootTimeScriptLength;   // Maintain boot time script length in LockBox after SmmReadyToLock in SMM.
+  BOOLEAN   SmmLocked;              // Record if current state is after SmmReadyToLock
+  BOOLEAN   BackFromS3;             // Indicate that the system is back from S3.
 } SCRIPT_TABLE_PRIVATE_DATA;
 
 typedef
