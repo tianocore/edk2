@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -273,6 +273,8 @@ SimpleNetworkDriverStart (
   PXE_STATFLAGS                             InitStatFlags;
   EFI_PCI_IO_PROTOCOL                       *PciIo;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR         *BarDesc;
+  BOOLEAN                                   FoundIoBar;
+  BOOLEAN                                   FoundMemoryBar;
   
   DEBUG ((EFI_D_NET, "\nSnpNotifyNetworkInterfaceIdentifier()  "));
 
@@ -403,7 +405,7 @@ SimpleNetworkDriverStart (
   Snp->TxRxBuffer         = NULL;
  
   if (Nii->Revision >= EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION) {
-  	Snp->IfNum = Nii->IfNum;
+    Snp->IfNum = Nii->IfNum;
 
   } else {
     Snp->IfNum = (UINT8) (Nii->IfNum & 0xFF);
@@ -463,6 +465,8 @@ SimpleNetworkDriverStart (
   //
   Snp->MemoryBarIndex = 0;
   Snp->IoBarIndex     = 1;
+  FoundMemoryBar      = FALSE;
+  FoundIoBar          = FALSE;
   for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
     Status = PciIo->GetBarAttributes (
                       PciIo,
@@ -476,13 +480,19 @@ SimpleNetworkDriverStart (
       goto Error_DeleteSNP;
     }
 
-    if (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
+    if ((!FoundMemoryBar) && (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM)) {
       Snp->MemoryBarIndex = BarIndex;
-    } else if (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_IO) {
+      FoundMemoryBar      = TRUE;
+    } else if ((!FoundIoBar) && (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_IO)) {
       Snp->IoBarIndex = BarIndex;
+      FoundIoBar      = TRUE;
     }
 
     FreePool (BarDesc);
+
+    if (FoundMemoryBar && FoundIoBar) {
+      break;
+    }
   }
 
   Status = PxeStart (Snp);
