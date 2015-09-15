@@ -173,6 +173,14 @@ LocateCapabilityRegBlock (
       return EFI_SUCCESS;
     }
 
+    //
+    // Certain PCI device may incorrectly have capability pointing to itself,
+    // break to avoid dead loop.
+    //
+    if (CapabilityPtr == (UINT8) (CapabilityEntry >> 8)) {
+      break;
+    }
+
     CapabilityPtr = (UINT8) (CapabilityEntry >> 8);
   }
 
