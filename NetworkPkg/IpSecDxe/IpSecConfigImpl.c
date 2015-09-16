@@ -1204,12 +1204,7 @@ SetSpdEntry (
           RemoveEntryList (&SadEntry->BySpd);
         }
         InsertTailList (&SpdEntry->Data->Sas, &SadEntry->BySpd);
-        SadEntry->Data->SpdEntry = SpdEntry;
-        DuplicateSpdSelector (
-          (EFI_IPSEC_CONFIG_SELECTOR *)SadEntry->Data->SpdSelector,
-          (EFI_IPSEC_CONFIG_SELECTOR *)SpdEntry->Selector,
-          NULL
-          );             
+        SadEntry->Data->SpdEntry = SpdEntry;             
       }
     }
   }
