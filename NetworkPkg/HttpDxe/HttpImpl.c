@@ -316,7 +316,7 @@ EfiHttpRequest (
   Configure   = TRUE;
   ReConfigure = TRUE;  
 
-  if (HttpInstance->RemoteHost == NULL && HttpInstance->RemotePort == 0) {
+  if (HttpInstance->RemoteHost == NULL) {
     //
     // Request() is called the first time. 
     //
@@ -373,6 +373,7 @@ EfiHttpRequest (
       if (HttpInstance->RemoteHost != NULL) {
         FreePool (HttpInstance->RemoteHost);
         HttpInstance->RemoteHost = NULL;
+        HttpInstance->RemotePort = 0;
       }
     }
   } 
