@@ -15,9 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PlatformBootManager.h"
 
-
-EFI_GUID mUefiShellFileGuid = { 0x7C04A583, 0x9E3E, 0x4f1c, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 };
-
 /**
   Perform the platform diagnostic, such like test memory. OEM/IBV also
   can customize this function to support specific platform diagnostic.
@@ -220,7 +217,7 @@ PlatformBootManagerBeforeConsole (
   //
   // Register UEFI Shell
   //
-  PlatformRegisterFvBootOption (&mUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  PlatformRegisterFvBootOption (PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE);
 }
 
 /**
