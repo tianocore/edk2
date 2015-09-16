@@ -65,9 +65,10 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
