@@ -2,6 +2,7 @@
   Ihis library uses TPM2 device to calculation hash.
 
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved. <BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -242,7 +243,7 @@ HashAndExtend (
   TPM2B_EVENT        EventData;
   TPM2B_DIGEST       Result;
 
-  DEBUG((EFI_D_INFO, "\n HashAndExtend Entry \n"));
+  DEBUG((EFI_D_VERBOSE, "\n HashAndExtend Entry \n"));
 
   SequenceHandle = 0xFFFFFFFF; // Know bad value
 
@@ -262,7 +263,7 @@ HashAndExtend (
   if (EFI_ERROR(Status)) {
     return EFI_DEVICE_ERROR;
   }
-  DEBUG((EFI_D_INFO, "\n Tpm2HashSequenceStart Success \n"));
+  DEBUG((EFI_D_VERBOSE, "\n Tpm2HashSequenceStart Success \n"));
 
   Buffer = (UINT8 *)(UINTN)DataToHash;
   for (HashLen = DataToHashLen; HashLen > sizeof(HashBuffer.buffer); HashLen -= sizeof(HashBuffer.buffer)) {
@@ -276,7 +277,7 @@ HashAndExtend (
       return EFI_DEVICE_ERROR;
     }
   }
-  DEBUG((EFI_D_INFO, "\n Tpm2SequenceUpdate Success \n"));
+  DEBUG((EFI_D_VERBOSE, "\n Tpm2SequenceUpdate Success \n"));
 
   HashBuffer.size = (UINT16)HashLen;
   CopyMem(HashBuffer.buffer, Buffer, (UINTN)HashLen);
@@ -294,7 +295,7 @@ HashAndExtend (
     if (EFI_ERROR(Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_INFO, "\n Tpm2EventSequenceComplete Success \n"));
+    DEBUG((EFI_D_VERBOSE, "\n Tpm2EventSequenceComplete Success \n"));
   } else {
     Status = Tpm2SequenceComplete (
                SequenceHandle,
@@ -304,7 +305,7 @@ HashAndExtend (
     if (EFI_ERROR(Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_INFO, "\n Tpm2SequenceComplete Success \n"));
+    DEBUG((EFI_D_VERBOSE, "\n Tpm2SequenceComplete Success \n"));
 
     DigestList->count = 1;
     DigestList->digests[0].hashAlg = AlgoId;
@@ -316,7 +317,7 @@ HashAndExtend (
     if (EFI_ERROR(Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_INFO, "\n Tpm2PcrExtend Success \n"));
+    DEBUG((EFI_D_VERBOSE, "\n Tpm2PcrExtend Success \n"));
   }
 
   return EFI_SUCCESS;

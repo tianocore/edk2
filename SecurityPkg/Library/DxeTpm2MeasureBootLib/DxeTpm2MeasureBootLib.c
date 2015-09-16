@@ -16,6 +16,7 @@
   partition data carefully.
 
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -447,7 +448,7 @@ DxeTpm2MeasureBootHandler (
     // Tcg2 protocol is not installed. So, TPM2 is not present.
     // Don't do any measurement, and directly return EFI_SUCCESS.
     //
-    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2 - %r\n", Status));
+    DEBUG ((EFI_D_VERBOSE, "DxeTpm2MeasureBootHandler - Tcg2 - %r\n", Status));
     return EFI_SUCCESS;
   }
 

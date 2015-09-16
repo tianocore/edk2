@@ -2,6 +2,7 @@
   TIS (TPM Interface Specification) functions used by TPM1.2.
   
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -381,22 +382,22 @@ Tpm12TisTpmCommand (
   DEBUG_CODE (
     UINTN  DebugSize;
 
-    DEBUG ((EFI_D_INFO, "Tpm12TisTpmCommand Send - "));
+    DEBUG ((EFI_D_VERBOSE, "Tpm12TisTpmCommand Send - "));
     if (SizeIn > 0x100) {
       DebugSize = 0x40;
     } else {
       DebugSize = SizeIn;
     }
     for (Index = 0; Index < DebugSize; Index++) {
-      DEBUG ((EFI_D_INFO, "%02x ", BufferIn[Index]));
+      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
     }
     if (DebugSize != SizeIn) {
-      DEBUG ((EFI_D_INFO, "...... "));
+      DEBUG ((EFI_D_VERBOSE, "...... "));
       for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-        DEBUG ((EFI_D_INFO, "%02x ", BufferIn[Index]));
+        DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
       }
     }
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((EFI_D_VERBOSE, "\n"));
   );
   TpmOutSize = 0;
 
@@ -467,11 +468,11 @@ Tpm12TisTpmCommand (
     }
   }
   DEBUG_CODE (
-    DEBUG ((EFI_D_INFO, "Tpm12TisTpmCommand ReceiveHeader - "));
+    DEBUG ((EFI_D_VERBOSE, "Tpm12TisTpmCommand ReceiveHeader - "));
     for (Index = 0; Index < sizeof (TPM_RSP_COMMAND_HDR); Index++) {
-      DEBUG ((EFI_D_INFO, "%02x ", BufferOut[Index]));
+      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((EFI_D_VERBOSE, "\n"));
   );
   //
   // Check the reponse data header (tag,parasize and returncode )
@@ -510,11 +511,11 @@ Tpm12TisTpmCommand (
   }
 Exit:
   DEBUG_CODE (
-    DEBUG ((EFI_D_INFO, "Tpm12TisTpmCommand Receive - "));
+    DEBUG ((EFI_D_VERBOSE, "Tpm12TisTpmCommand Receive - "));
     for (Index = 0; Index < TpmOutSize; Index++) {
-      DEBUG ((EFI_D_INFO, "%02x ", BufferOut[Index]));
+      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((EFI_D_VERBOSE, "\n"));
   );
   MmioWrite8((UINTN)&TisReg->Status, TIS_PC_STS_READY);
   return Status;
