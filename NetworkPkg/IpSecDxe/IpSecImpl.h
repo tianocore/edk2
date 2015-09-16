@@ -76,6 +76,7 @@ typedef struct _EFI_ESP_TAIL {
 struct _IPSEC_SPD_DATA {
   CHAR16                    Name[100];
   UINT32                    PackageFlag;
+  EFI_IPSEC_TRAFFIC_DIR     TrafficDirection;
   EFI_IPSEC_ACTION          Action;
   EFI_IPSEC_PROCESS_POLICY  *ProcessingPolicy;
   LIST_ENTRY                Sas;

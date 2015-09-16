@@ -1167,9 +1167,10 @@ SetSpdEntry (
     SpdData->Name,
     sizeof (SpdData->Name)
     );
-  SpdEntry->Data->PackageFlag = SpdData->PackageFlag;
-  SpdEntry->Data->Action      = SpdData->Action;
-
+  SpdEntry->Data->PackageFlag      = SpdData->PackageFlag;
+  SpdEntry->Data->TrafficDirection = SpdData->TrafficDirection;
+  SpdEntry->Data->Action           = SpdData->Action;
+  
   //
   // Fix the address of ProcessingPolicy and copy it if need, which is continous
   // memory and close to the base structure of SAD data.
@@ -1690,9 +1691,10 @@ GetSpdEntry (
       //
       CopyMem (SpdData->Name, SpdEntry->Data->Name, sizeof (SpdData->Name));
 
-      SpdData->PackageFlag  = SpdEntry->Data->PackageFlag;
-      SpdData->Action       = SpdEntry->Data->Action;
-
+      SpdData->PackageFlag      = SpdEntry->Data->PackageFlag;
+      SpdData->TrafficDirection = SpdEntry->Data->TrafficDirection;
+      SpdData->Action           = SpdEntry->Data->Action;
+      
       if (SpdData->Action != EfiIPsecActionProtect) {
         SpdData->ProcessingPolicy = NULL;
       } else {
