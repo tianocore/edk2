@@ -206,6 +206,7 @@ ParseCommandLineToArgs(
     return (EFI_SUCCESS);
   }
 
+  TrimSpaces(&(CHAR16*)CommandLine);
   Size = StrSize(CommandLine);
   TempParameter = AllocateZeroPool(Size);
   if (TempParameter == NULL) {
@@ -359,7 +360,6 @@ CreatePopulateInstallShellParametersProtocol (
     //
     // Populate Argc and Argv
     //
-    TrimSpaces (&FullCommandLine);
     Status = ParseCommandLineToArgs(FullCommandLine,
                                     &(*NewShellParameters)->Argv,
                                     &(*NewShellParameters)->Argc);
