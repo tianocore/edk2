@@ -662,7 +662,7 @@ HiiConstructConfigHdr (
   //
   // Append L"&NAME="
   //
-  StrCpyS (String, MaxLen, L"&NAME=");
+  StrCatS (ReturnString, MaxLen, L"&NAME=");
   String += StrLen (String);
 
   if (Name != NULL) {
@@ -677,7 +677,7 @@ HiiConstructConfigHdr (
   //
   // Append L"&PATH="
   //
-  StrCpyS (String, MaxLen, L"&PATH=");
+  StrCatS (ReturnString, MaxLen, L"&PATH=");
   String += StrLen (String);
 
   //
