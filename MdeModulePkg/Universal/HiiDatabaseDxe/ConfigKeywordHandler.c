@@ -2829,6 +2829,7 @@ EfiConfigKeywordHandlerSetData (
   BOOLEAN                             ReadOnly;
   EFI_STRING                          InternalProgress;
   CHAR16                              *TempString;
+  CHAR16                              *KeywordStartPos;
 
   if (This == NULL || Progress == NULL || ProgressErr == NULL || KeywordString == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2843,6 +2844,7 @@ EfiConfigKeywordHandlerSetData (
   KeywordData     = NULL;
   ValueElement    = NULL;
   ConfigResp      = NULL;
+  KeywordStartPos = NULL;
   KeywordStringId = 0;
 
   //
@@ -2886,6 +2888,7 @@ EfiConfigKeywordHandlerSetData (
     //
     // 3. Extract keyword from the KeywordRequest string.
     //
+    KeywordStartPos = StringPtr;
     Status = ExtractKeyword(StringPtr, &KeywordData, &NextStringPtr);
     if (EFI_ERROR (Status)) {
       //
@@ -2942,8 +2945,8 @@ EfiConfigKeywordHandlerSetData (
     // 8. Check the readonly flag.
     //
     if (ExtractReadOnlyFromOpCode (OpCode) != ReadOnly) {
-      *ProgressErr = KEYWORD_HANDLER_INCOMPATIBLE_VALUE_DETECTED;
-      Status = EFI_INVALID_PARAMETER;
+      *ProgressErr = KEYWORD_HANDLER_ACCESS_NOT_PERMITTED;
+      Status = EFI_ACCESS_DENIED;
       goto Done;      
     }
     
@@ -2970,6 +2973,7 @@ EfiConfigKeywordHandlerSetData (
       FreePool (ConfigResp);
       ConfigResp = NULL;
     }
+    KeywordStartPos = NULL;
   }
 
   //
@@ -2988,7 +2992,11 @@ EfiConfigKeywordHandlerSetData (
   *ProgressErr = KEYWORD_HANDLER_NO_ERROR;
 
 Done:
-  *Progress = KeywordString + (StringPtr - TempString);
+  if (KeywordStartPos != NULL) {
+    *Progress = KeywordString + (KeywordStartPos - TempString);
+  } else {
+    *Progress = KeywordString + (StringPtr - TempString);
+  }
 
   ASSERT (TempString != NULL);
   FreePool (TempString);
@@ -3010,7 +3018,7 @@ Done:
   if (MultiConfigResp != NULL && MultiConfigResp != ConfigResp) {
     FreePool (MultiConfigResp);
   }
-  
+
   return Status;
 }
 
