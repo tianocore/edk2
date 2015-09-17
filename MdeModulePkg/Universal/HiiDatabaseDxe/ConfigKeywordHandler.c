@@ -1340,8 +1340,7 @@ GetStringIdFromRecord (
     if (AsciiStrnCmp(Name, StringPackage->StringPkgHdr->Language, AsciiStrLen (Name)) == 0) {
       Status = GetStringIdFromString (StringPackage, KeywordValue, StringId); 
       if (EFI_ERROR (Status)) {
-        RetVal = KEYWORD_HANDLER_KEYWORD_NOT_FOUND;
-        continue;
+        return KEYWORD_HANDLER_KEYWORD_NOT_FOUND;
       } else {
         if (*NameSpace == NULL) {
           *NameSpace = AllocateCopyPool (AsciiStrSize (StringPackage->StringPkgHdr->Language), StringPackage->StringPkgHdr->Language);
@@ -2556,6 +2555,7 @@ MergeToMultiKeywordResp (
 
   @param  NameSpace                      The namespace used to search the string.
   @param  MultiResp                      Return the MultiKeywordResp string for the system.
+  @param  ProgressErr                    Return the error status.
 
   @retval EFI_OUT_OF_RESOURCES           The memory can't be allocated.
   @retval EFI_SUCCESS                    Generate the MultiKeywordResp string.
@@ -2565,7 +2565,8 @@ MergeToMultiKeywordResp (
 EFI_STATUS
 EnumerateAllKeywords (
   IN  CHAR8             *NameSpace,
-  OUT EFI_STRING        *MultiResp
+  OUT EFI_STRING        *MultiResp,
+  OUT UINT32            *ProgressErr
   )
 {
   LIST_ENTRY                          *Link;
@@ -2585,6 +2586,7 @@ EnumerateAllKeywords (
   CHAR16                              *MultiKeywordResp;
   CHAR16                              *KeywordData;
   BOOLEAN                             ReadOnly;
+  BOOLEAN                             FindKeywordPackages;
 
   DataBaseRecord   = NULL;
   Status           = EFI_SUCCESS;
@@ -2594,6 +2596,7 @@ EnumerateAllKeywords (
   ConfigRequest    = NULL;
   ValueElement     = NULL;
   KeywordResp      = NULL;
+  FindKeywordPackages = FALSE;
 
   if (NameSpace == NULL) {
     NameSpace = UEFI_CONFIG_LANG;
@@ -2616,6 +2619,7 @@ EnumerateAllKeywords (
       // Check whether has keyword string package.
       //
       if (AsciiStrnCmp(NameSpace, StringPackage->StringPkgHdr->Language, AsciiStrLen (NameSpace)) == 0) {
+        FindKeywordPackages = TRUE;
         //
         // Keep the NameSpace string.
         //
@@ -2718,6 +2722,11 @@ Error:
   //
   if (MultiKeywordResp == NULL) {
     Status = EFI_NOT_FOUND;
+    if (!FindKeywordPackages) {
+      *ProgressErr = KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND;
+    } else {
+      *ProgressErr = KEYWORD_HANDLER_KEYWORD_NOT_FOUND;
+    }
   } else {
     Status = EFI_SUCCESS;
   }
@@ -2857,7 +2866,7 @@ EfiConfigKeywordHandlerSetData (
     // 1.1 Check whether the input namespace is valid.
     //
     if (AsciiStrnCmp(NameSpace, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) != 0) {
-      *ProgressErr = KEYWORD_HANDLER_UNDEFINED_PROCESSING_ERROR;
+      *ProgressErr = KEYWORD_HANDLER_MALFORMED_STRING;
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }
@@ -3133,7 +3142,7 @@ EfiConfigKeywordHandlerGetData (
     TempString = NULL;
   }
   if (EFI_ERROR (Status)) {
-    *ProgressErr = KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND;
+    *ProgressErr = KEYWORD_HANDLER_MALFORMED_STRING;
     return Status;
   }
   //
@@ -3141,7 +3150,7 @@ EfiConfigKeywordHandlerGetData (
   //
   if (NameSpace != NULL){
     if (AsciiStrnCmp(NameSpace, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) != 0) {
-      *ProgressErr = KEYWORD_HANDLER_UNDEFINED_PROCESSING_ERROR;
+      *ProgressErr = KEYWORD_HANDLER_MALFORMED_STRING;
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -3263,7 +3272,7 @@ EfiConfigKeywordHandlerGetData (
     //
     // Enumerate all keyword in the system.
     //
-    Status = EnumerateAllKeywords(NameSpace, &MultiKeywordResp);
+    Status = EnumerateAllKeywords(NameSpace, &MultiKeywordResp, ProgressErr);
     if (EFI_ERROR (Status)) {
       goto Done;
     }
