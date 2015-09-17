@@ -2979,6 +2979,8 @@ EfiConfigKeywordHandlerSetData (
   *ProgressErr = KEYWORD_HANDLER_NO_ERROR;
 
 Done:
+  *Progress = KeywordString + (StringPtr - TempString);
+
   ASSERT (TempString != NULL);
   FreePool (TempString);
   if (NameSpace != NULL) {
@@ -2998,8 +3000,8 @@ Done:
   }
   if (MultiConfigResp != NULL && MultiConfigResp != ConfigResp) {
     FreePool (MultiConfigResp);
-  }  
-  *Progress = StringPtr;
+  }
+  
   return Status;
 }
 
@@ -3271,6 +3273,8 @@ EfiConfigKeywordHandlerGetData (
   *ProgressErr = KEYWORD_HANDLER_NO_ERROR;
 
 Done:
+  *Progress = KeywordString + (StringPtr - TempString);
+
   if (TempString != NULL) {
     FreePool (TempString);
   }
@@ -3283,6 +3287,6 @@ Done:
   if (KeywordData != NULL) {
     FreePool (KeywordData);
   }
-  *Progress = StringPtr;
+
   return Status;
 }
