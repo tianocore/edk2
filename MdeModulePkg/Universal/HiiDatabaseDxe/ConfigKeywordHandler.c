@@ -1758,7 +1758,7 @@ ConstructConfigHdr (
   //
   // Append L"&NAME="
   //
-  StrCpyS (String, MaxLen, L"&NAME=");
+  StrCatS (ReturnString, MaxLen, L"&NAME=");
   String += StrLen (String);
 
   if (Name != NULL) {
@@ -1773,7 +1773,7 @@ ConstructConfigHdr (
   //
   // Append L"&PATH="
   //
-  StrCpyS (String, MaxLen, L"&PATH=");
+  StrCatS (ReturnString, MaxLen, L"&PATH=");
   String += StrLen (String);
 
   //
@@ -2044,14 +2044,10 @@ ExtractConfigRequest (
       StringPtr = *ConfigRequest;
 
       StrCpyS (StringPtr, MaxLen, ConfigHdr);
-      StringPtr += StrLen (StringPtr);
 
-      *StringPtr = L'&';
-      StringPtr++;
+      StrCatS (StringPtr, MaxLen, L"&");
 
-      StrCpyS (StringPtr, MaxLen, RequestElement);
-      StringPtr += StrLen (StringPtr);
-      *StringPtr = L'\0';
+      StrCatS (StringPtr, MaxLen, RequestElement);
 
       FreePool (ConfigHdr);
       FreePool (RequestElement);
@@ -2152,23 +2148,17 @@ ExtractConfigResp (
       StringPtr = *ConfigResp;
 
       StrCpyS (StringPtr, MaxLen, ConfigHdr);
-      StringPtr += StrLen (StringPtr);
 
-      *StringPtr = L'&';
-      StringPtr++;
+      StrCatS (StringPtr, MaxLen, L"&");
 
-      StrCpyS (StringPtr, MaxLen, RequestElement);
-      StringPtr += StrLen (StringPtr);
-      
-      *StringPtr = L'&';
-      StringPtr++;
 
-      StrCpyS (StringPtr, MaxLen, L"VALUE=");
-      StringPtr += StrLen (StringPtr);
+      StrCatS (StringPtr, MaxLen, RequestElement);
 
-      StrCpyS (StringPtr, MaxLen, ValueElement);
-      StringPtr += StrLen (StringPtr);
-      *StringPtr = L'\0';
+      StrCatS (StringPtr, MaxLen, L"&");
+
+      StrCatS (StringPtr, MaxLen, L"VALUE=");
+
+      StrCatS (StringPtr, MaxLen, ValueElement);
 
       FreePool (ConfigHdr);
       FreePool (RequestElement);
@@ -2452,42 +2442,32 @@ GenerateKeywordResp (
   // 2.1 Copy NameSpaceId section.
   //
   StrCpyS (RespStr, RespStrLen, L"NAMESPACE=");
-  RespStr += StrLen (RespStr);
-  StrCpyS (RespStr, RespStrLen, UnicodeNameSpace);
-  RespStr += StrLen (RespStr);
+
+  StrCatS (RespStr, RespStrLen, UnicodeNameSpace);
 
   //
   // 2.2 Copy PathHdr section.
   //
-  StrCpyS (RespStr, RespStrLen, PathHdr);
-  RespStr += StrLen (RespStr);
+  StrCatS (RespStr, RespStrLen, PathHdr);
 
   //
   // 2.3 Copy Keyword section.
   //
-  StrCpyS (RespStr, RespStrLen, L"KEYWORD=");
-  RespStr += StrLen (RespStr);
-  StrCpyS (RespStr, RespStrLen, KeywordData);
-  RespStr += StrLen (RespStr);
+  StrCatS (RespStr, RespStrLen, L"KEYWORD=");
+
+  StrCatS (RespStr, RespStrLen, KeywordData);
 
   //
   // 2.4 Copy the Value section.
   //
-  StrCpyS (RespStr, RespStrLen, ValueStr);
-  RespStr += StrLen (RespStr);
+  StrCatS (RespStr, RespStrLen, ValueStr);
 
   //
   // 2.5 Copy ReadOnly section if exist.
   //
   if (ReadOnly) {
-    StrCpyS (RespStr, RespStrLen, L"&READONLY");
-    RespStr += StrLen (RespStr);
+    StrCatS (RespStr, RespStrLen, L"&READONLY");
   }
-
-  //
-  // 2.6 Add the end.
-  //
-  *RespStr = L'\0';
 
   if (UnicodeNameSpace != NULL) {
     FreePool (UnicodeNameSpace);
@@ -2536,12 +2516,9 @@ MergeToMultiKeywordResp (
   FreePool (*MultiKeywordResp);
   *MultiKeywordResp = StringPtr;
 
-  StringPtr += StrLen (StringPtr);
+  StrCatS (StringPtr, MultiKeywordRespLen / sizeof (CHAR16), L"&");
 
-  *StringPtr = L'&';
-  StringPtr++;
-
-  StrCpyS (StringPtr, MultiKeywordRespLen / sizeof (CHAR16), *KeywordResp);
+  StrCatS (StringPtr, MultiKeywordRespLen / sizeof (CHAR16), *KeywordResp);
 
   return EFI_SUCCESS;
 }
