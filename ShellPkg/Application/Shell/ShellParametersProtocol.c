@@ -195,7 +195,9 @@ ParseCommandLineToArgs(
   CHAR16      *TempParameter;
   CHAR16      *Walker;
   CHAR16      *NewParam;
+  CHAR16      *NewCommandLine;
   UINTN       Size;
+  EFI_STATUS  Status;
 
   ASSERT(Argc != NULL);
   ASSERT(Argv != NULL);
@@ -206,15 +208,21 @@ ParseCommandLineToArgs(
     return (EFI_SUCCESS);
   }
 
-  TrimSpaces(&(CHAR16*)CommandLine);
-  Size = StrSize(CommandLine);
+  NewCommandLine = AllocateCopyPool(StrSize(CommandLine), CommandLine);
+  if (NewCommandLine == NULL){
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
+  TrimSpaces(&NewCommandLine);
+  Size = StrSize(NewCommandLine);
   TempParameter = AllocateZeroPool(Size);
   if (TempParameter == NULL) {
+    SHELL_FREE_NON_NULL(NewCommandLine);
     return (EFI_OUT_OF_RESOURCES);
   }
 
   for ( Count = 0
-      , Walker = (CHAR16*)CommandLine
+      , Walker = (CHAR16*)NewCommandLine
       ; Walker != NULL && *Walker != CHAR_NULL
       ; Count++
       ) {
@@ -228,30 +236,34 @@ ParseCommandLineToArgs(
   //
   (*Argv) = AllocateZeroPool((Count)*sizeof(CHAR16*));
   if (*Argv == NULL) {
-    SHELL_FREE_NON_NULL(TempParameter);
-    return (EFI_OUT_OF_RESOURCES);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
   }
 
   *Argc = 0;
-  Walker = (CHAR16*)CommandLine;
+  Walker = (CHAR16*)NewCommandLine;
   while(Walker != NULL && *Walker != CHAR_NULL) {
     SetMem16(TempParameter, Size, CHAR_NULL);
     if (EFI_ERROR(GetNextParameter(&Walker, &TempParameter, Size))) {
-      SHELL_FREE_NON_NULL(TempParameter);
-      return (EFI_INVALID_PARAMETER);
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
     }
 
     NewParam = AllocateCopyPool(StrSize(TempParameter), TempParameter);
     if (NewParam == NULL){
-      SHELL_FREE_NON_NULL(TempParameter);
-      return (EFI_OUT_OF_RESOURCES);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
     }
     ((CHAR16**)(*Argv))[(*Argc)] = NewParam;
     (*Argc)++;
   }
   ASSERT(Count >= (*Argc));
+  Status = EFI_SUCCESS;
+  
+Done:
   SHELL_FREE_NON_NULL(TempParameter);
-  return (EFI_SUCCESS);
+  SHELL_FREE_NON_NULL(NewCommandLine);
+  return (Status);
 }
 
 /**
