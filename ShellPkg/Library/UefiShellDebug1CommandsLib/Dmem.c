@@ -1,8 +1,9 @@
 /** @file
   Main file for Dmem shell Debug1 function.
 
-  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>  
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>  
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -191,6 +192,10 @@ ShellCommandRunDmem (
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbiosTableGuid)) {
               SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbios3TableGuid)) {
+              SmbiosTableAddress = (UINT64) (UINTN) gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMpsTableGuid)) {
