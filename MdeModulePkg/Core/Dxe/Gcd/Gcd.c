@@ -2311,6 +2311,7 @@ CoreInitializeGcdServices (
   UINTN                              Index;
   UINT64                             Capabilities;
   EFI_HOB_CPU *                      CpuHob;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR    *MemorySpaceMapHobList;
 
   //
   // Cache the PHIT HOB for later use
@@ -2494,23 +2495,12 @@ CoreInitializeGcdServices (
   }
 
   //
-  // Relocate HOB List to an allocated pool buffer.
-  //
-  NewHobList = AllocateCopyPool (
-                 (UINTN)PhitHob->EfiFreeMemoryBottom - (UINTN)(*HobStart),
-                 *HobStart
-                 );
-  ASSERT (NewHobList != NULL);
-
-  *HobStart = NewHobList;
-  gHobList  = NewHobList;
-
-  //
   // Add and allocate the remaining unallocated system memory to the memory services.
   //
   Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
   ASSERT (Status == EFI_SUCCESS);
 
+  MemorySpaceMapHobList = NULL;
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) ||
         (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMoreReliable)) {
@@ -2518,6 +2508,16 @@ CoreInitializeGcdServices (
         BaseAddress  = PageAlignAddress (MemorySpaceMap[Index].BaseAddress);
         Length       = PageAlignLength  (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - BaseAddress);
         if (Length == 0 || MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length < BaseAddress) {
+          continue;
+        }
+        if (((UINTN) MemorySpaceMap[Index].BaseAddress <= (UINTN) (*HobStart)) &&
+            ((UINTN) (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length) >= (UINTN) PhitHob->EfiFreeMemoryBottom)) {
+          //
+          // Skip the memory space that covers HOB List, it should be processed
+          // after HOB List relocation to avoid the resources allocated by others
+          // to corrupt HOB List before its relocation.
+          //
+          MemorySpaceMapHobList = &MemorySpaceMap[Index];
           continue;
         }
         CoreAddMemoryDescriptor (
@@ -2538,6 +2538,47 @@ CoreInitializeGcdServices (
       }
     }
   }
+
+  //
+  // Relocate HOB List to an allocated pool buffer.
+  // The relocation should be at after all the tested memory resources added
+  // (except the memory space that covers HOB List) to the memory services,
+  // because the memory resource found in CoreInitializeMemoryServices()
+  // may have not enough remaining resource for HOB List.
+  //
+  NewHobList = AllocateCopyPool (
+                 (UINTN) PhitHob->EfiFreeMemoryBottom - (UINTN) (*HobStart),
+                 *HobStart
+                 );
+  ASSERT (NewHobList != NULL);
+
+  *HobStart = NewHobList;
+  gHobList  = NewHobList;
+
+  if (MemorySpaceMapHobList != NULL) {
+    //
+    // Add and allocate the memory space that covers HOB List to the memory services
+    // after HOB List relocation.
+    //
+    BaseAddress = PageAlignAddress (MemorySpaceMapHobList->BaseAddress);
+    Length      = PageAlignLength  (MemorySpaceMapHobList->BaseAddress + MemorySpaceMapHobList->Length - BaseAddress);
+    CoreAddMemoryDescriptor (
+      EfiConventionalMemory,
+      BaseAddress,
+      RShiftU64 (Length, EFI_PAGE_SHIFT),
+      MemorySpaceMapHobList->Capabilities & (~EFI_MEMORY_RUNTIME)
+      );
+    Status = CoreAllocateMemorySpace (
+               EfiGcdAllocateAddress,
+               MemorySpaceMapHobList->GcdMemoryType,
+               0,
+               Length,
+               &BaseAddress,
+               gDxeCoreImageHandle,
+               NULL
+               );
+  }
+
   CoreFreePool (MemorySpaceMap);
 
   return EFI_SUCCESS;
