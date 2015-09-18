@@ -93,9 +93,9 @@ AddSmbiosManuCallback (
   ASSERT_EFI_ERROR (Status);
 
 
-  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
-    // Detect the board is compatible board platform
-    UnicodeSPrint (PlatformNameBuffer, sizeof (PlatformNameBuffer),L"%s",L"Minnowboard Compatible ");
+  if (BOARD_ID_MINNOW2_TURBOT == mPlatformInfo->BoardId) {
+    // Detect the board is Turbot board platform
+    UnicodeSPrint (PlatformNameBuffer, sizeof (PlatformNameBuffer),L"%s",L"Minnowboard Turbot ");
   } else {
     UnicodeSPrint (PlatformNameBuffer, sizeof (PlatformNameBuffer),L"%s",L"Minnowboard Max ");
   }
@@ -165,8 +165,8 @@ AddSmbiosManuCallback (
       break;
     }
 
-  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
-    UnicodeSPrint (Buffer, sizeof (Buffer),L"Compatible Vendor");
+  if (BOARD_ID_MINNOW2_TURBOT == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"ADI");
     HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_SYSTEM_MANUFACTURER), Buffer, NULL);
   }
   TokenToGet = STRING_TOKEN (STR_MISC_SYSTEM_MANUFACTURER);
