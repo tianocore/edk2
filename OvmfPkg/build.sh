@@ -95,7 +95,7 @@ case `uname` in
       4.8.*)
         TARGET_TOOLS=GCC48
         ;;
-      4.9.*|4.1[0-9].*)
+      4.9.*|4.1[0-9].*|5.*.*)
         TARGET_TOOLS=GCC49
         ;;
       *)
