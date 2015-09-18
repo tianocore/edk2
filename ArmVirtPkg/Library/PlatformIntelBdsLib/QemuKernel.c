@@ -20,6 +20,7 @@
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/UefiLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleFileSystem.h>
@@ -1064,6 +1065,11 @@ TryRunningQemuKernel (
     DEBUG ((EFI_D_INFO, "%a: command line: \"%s\"\n", __FUNCTION__,
       (CHAR16 *)KernelLoadedImage->LoadOptions));
   }
+
+  //
+  // Signal the EFI_EVENT_GROUP_READY_TO_BOOT event.
+  //
+  EfiSignalEventReadyToBoot();
 
   //
   // Start the image.

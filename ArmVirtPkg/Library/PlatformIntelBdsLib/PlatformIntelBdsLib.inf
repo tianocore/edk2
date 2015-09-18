@@ -53,6 +53,7 @@
   QemuBootOrderLib
   QemuFwCfgLib
   UefiBootServicesTableLib
+  UefiLib
   UefiRuntimeServicesTableLib
 
 [FixedPcd]
