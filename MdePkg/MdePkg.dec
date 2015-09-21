@@ -249,6 +249,10 @@
   #
   SmmPeriodicSmiLib|Include/Library/SmmPeriodicSmiLib.h
 
+  ##  @libraryclass  Provides services to generate random number.
+  #
+  RngLib|Include/Library/RngLib.h
+
 [LibraryClasses.IPF]
   ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
   SalLib|Include/Library/SalLib.h
