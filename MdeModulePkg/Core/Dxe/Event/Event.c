@@ -2,6 +2,7 @@
   UEFI Event support functions implemented in this file.
 
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -477,7 +478,7 @@ CoreCreateEventInternal (
   IEvent->NotifyContext  = (VOID *)NotifyContext;
   if (EventGroup != NULL) {
     CopyGuid (&IEvent->EventGroup, EventGroup);
-    IEvent->ExFlag = TRUE;
+    IEvent->ExFlag |= EVT_EXFLAG_EVENT_GROUP;
   }
 
   *Event = IEvent;
@@ -554,7 +555,7 @@ CoreSignalEvent (
     // If signalling type is a notify function, queue it
     //
     if ((Event->Type & EVT_NOTIFY_SIGNAL) != 0) {
-      if (Event->ExFlag) {
+      if ((Event->ExFlag & EVT_EXFLAG_EVENT_GROUP) != 0) {
         //
         // The CreateEventEx() style requires all members of the Event Group
         //  to be signaled.
@@ -764,7 +765,9 @@ CoreCloseEvent (
   //
   // If the event is registered on a protocol notify, then remove it from the protocol database
   //
-  CoreUnregisterProtocolNotify (Event);
+  if ((Event->ExFlag & EVT_EXFLAG_EVENT_PROTOCOL_NOTIFICATION) != 0) {
+    CoreUnregisterProtocolNotify (Event);
+  }
 
   Status = CoreFreePool (Event);
   ASSERT_EFI_ERROR (Status);
