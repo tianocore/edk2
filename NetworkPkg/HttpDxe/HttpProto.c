@@ -2,6 +2,7 @@
   Miscellaneous routines for HttpDxe driver.
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -893,7 +894,7 @@ HttpMappingToStatusCode (
   case 414:
     return HTTP_STATUS_414_REQUEST_URI_TOO_LARGE;
   case 415:
-    return HTTP_STATUS_415_UNSUPPORETD_MEDIA_TYPE;
+    return HTTP_STATUS_415_UNSUPPORTED_MEDIA_TYPE;
   case 416:
     return HTTP_STATUS_416_REQUESTED_RANGE_NOT_SATISFIED;
   case 417:
@@ -901,7 +902,7 @@ HttpMappingToStatusCode (
   case 500:
     return HTTP_STATUS_500_INTERNAL_SERVER_ERROR;
   case 501:
-    return HTTP_STATUS_501_NOT_IMIPLEMENTED;
+    return HTTP_STATUS_501_NOT_IMPLEMENTED;
   case 502:
     return HTTP_STATUS_502_BAD_GATEWAY;
   case 503:
