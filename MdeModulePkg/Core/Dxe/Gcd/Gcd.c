@@ -2061,9 +2061,6 @@ CoreInitializeMemoryServices (
   UINT64                             Length;
   UINT64                             Attributes;
   UINT64                             Capabilities;
-  EFI_PHYSICAL_ADDRESS               MaxMemoryBaseAddress;
-  UINT64                             MaxMemoryLength;
-  UINT64                             MaxMemoryAttributes;
   EFI_PHYSICAL_ADDRESS               TestedMemoryBaseAddress;
   UINT64                             TestedMemoryLength;
   EFI_PHYSICAL_ADDRESS               HighAddress;
@@ -2091,9 +2088,6 @@ CoreInitializeMemoryServices (
   BaseAddress           = 0;
   Length                = 0;
   Attributes            = 0;
-  MaxMemoryBaseAddress  = 0;
-  MaxMemoryLength       = 0;
-  MaxMemoryAttributes   = 0;
 
   //
   // Cache the PHIT HOB for later use
