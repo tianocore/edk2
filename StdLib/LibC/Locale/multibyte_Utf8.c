@@ -346,14 +346,14 @@ CountMbcsChars(const char *Src)
   Count = 0;
   EChar = *Src++;
   while(EChar != 0) {
-    if(EChar < 0x80) {
+    if(EChar < '\x80') {
       ++Count;
     }
-    else if(EChar < 0xE0) {
+    else if(EChar < '\xE0') {
       Count += 2;
       ++Src;
     }
-    else if(EChar < 0xF0) {
+    else if(EChar < '\xF0') {
       Count += 3;
       Src += 2;
     }
