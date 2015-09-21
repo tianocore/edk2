@@ -7647,6 +7647,57 @@ AsmPrepareAndThunk16 (
   IN OUT  THUNK_CONTEXT             *ThunkContext
   );
 
+/**
+  Generates a 16-bit random number through RDRAND instruction.
+
+  if Rand is NULL, then ASSERT().
+
+  @param[out]  Rand     Buffer pointer to store the random result.
+
+  @retval TRUE          RDRAND call was successful.
+  @retval FALSE         Failed attempts to call RDRAND.
+
+ **/
+BOOLEAN
+EFIAPI
+AsmRdRand16 (
+  OUT     UINT16                    *Rand
+  );
+
+/**
+  Generates a 32-bit random number through RDRAND instruction.
+
+  if Rand is NULL, then ASSERT().
+
+  @param[out]  Rand     Buffer pointer to store the random result.
+
+  @retval TRUE          RDRAND call was successful.
+  @retval FALSE         Failed attempts to call RDRAND.
+
+**/
+BOOLEAN
+EFIAPI
+AsmRdRand32 (
+  OUT     UINT32                    *Rand
+  );
+
+/**
+  Generates a 64-bit random number through RDRAND instruction.
+
+  if Rand is NULL, then ASSERT().
+
+  @param[out]  Rand     Buffer pointer to store the random result.
+
+  @retval TRUE          RDRAND call was successful.
+  @retval FALSE         Failed attempts to call RDRAND.
+
+**/
+BOOLEAN
+EFIAPI
+AsmRdRand64  (
+  OUT     UINT64                    *Rand
+  );
+
 #endif
 #endif
 
