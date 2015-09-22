@@ -46,7 +46,7 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiPciIoProtocolGuid             ## BY_START
-  gEfiIdeControllerInitProtocolGuid ## TO_START
+  gEfiPciIoProtocolGuid             ## TO_START
+  gEfiIdeControllerInitProtocolGuid ## BY_START
 [UserExtensions.TianoCore."ExtraFiles"]
   IdeControllerExtra.uni
