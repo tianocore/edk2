@@ -86,6 +86,11 @@ typedef struct _EFI_SATA_CONTROLLER_PRIVATE_DATA {
   EFI_PCI_IO_PROTOCOL               *PciIo;
 
   //
+  // Original PCI attributes
+  //
+  UINT64                            OriginalPciAttributes;
+
+  //
   // The number of devices that are supported by this channel
   //
   UINT8                             DeviceCount;

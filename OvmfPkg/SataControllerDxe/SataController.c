@@ -390,6 +390,7 @@ SataControllerStart (
 {
   EFI_STATUS                        Status;
   EFI_PCI_IO_PROTOCOL               *PciIo;
+  UINT64                            OriginalPciAttributes;
   PCI_TYPE00                        PciData;
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *SataPrivateData;
   UINT32                            Data32;
@@ -415,12 +416,27 @@ SataControllerStart (
   }
 
   //
+  // Save original PCI attributes, and enable IO space access, memory space
+  // access, and Bus Master (DMA).
+  //
+  Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationGet, 0,
+                    &OriginalPciAttributes);
+  if (EFI_ERROR (Status)) {
+    goto ClosePciIo;
+  }
+  Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationEnable,
+                    EFI_PCI_DEVICE_ENABLE, NULL);
+  if (EFI_ERROR (Status)) {
+    goto ClosePciIo;
+  }
+
+  //
   // Allocate Sata Private Data structure
   //
   SataPrivateData = AllocateZeroPool (sizeof (EFI_SATA_CONTROLLER_PRIVATE_DATA));
   if (SataPrivateData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto ClosePciIo;
+    goto RestorePciAttributes;
   }
 
   //
@@ -428,6 +444,7 @@ SataControllerStart (
   //
   SataPrivateData->Signature = SATA_CONTROLLER_SIGNATURE;
   SataPrivateData->PciIo = PciIo;
+  SataPrivateData->OriginalPciAttributes = OriginalPciAttributes;
   SataPrivateData->IdeInit.GetChannelInfo = IdeInitGetChannelInfo;
   SataPrivateData->IdeInit.NotifyPhase = IdeInitNotifyPhase;
   SataPrivateData->IdeInit.SubmitData = IdeInitSubmitData;
@@ -512,6 +529,10 @@ FreeDisqualifiedModes:
 FreeSataPrivateData:
   FreePool (SataPrivateData);
 
+RestorePciAttributes:
+  PciIo->Attributes (PciIo, EfiPciIoAttributeOperationSet,
+           OriginalPciAttributes, NULL);
+
 ClosePciIo:
   gBS->CloseProtocol (
          Controller,
@@ -593,6 +614,16 @@ SataControllerStop (
     }
     FreePool (SataPrivateData);
   }
+
+  //
+  // Restore original PCI attributes
+  //
+  SataPrivateData->PciIo->Attributes (
+                            SataPrivateData->PciIo,
+                            EfiPciIoAttributeOperationSet,
+                            SataPrivateData->OriginalPciAttributes,
+                            NULL
+                            );
 
   //
   // Close protocols opened by Sata Controller driver
