@@ -600,6 +600,37 @@ SataControllerStop (
                 );
 }
 
+/**
+  Calculate the flat array subscript of a (Channel, Device) pair.
+
+  @param[in] SataPrivateData  The private data structure corresponding to the
+                              SATA controller that attaches the device for
+                              which the flat array subscript is being
+                              calculated.
+
+  @param[in] Channel          The channel (ie. port) number on the SATA
+                              controller that the device is attached to.
+
+  @param[in] Device           The device number on the channel.
+
+  @return  The flat array subscript suitable for indexing DisqualifiedModes,
+           IdentifyData, and IdentifyValid.
+**/
+STATIC
+UINTN
+FlatDeviceIndex (
+  IN CONST EFI_SATA_CONTROLLER_PRIVATE_DATA  *SataPrivateData,
+  IN UINTN                                   Channel,
+  IN UINTN                                   Device
+  )
+{
+  ASSERT (SataPrivateData != NULL);
+  ASSERT (Channel < SataPrivateData->IdeInit.ChannelCount);
+  ASSERT (Device < SataPrivateData->DeviceCount);
+
+  return Channel * SataPrivateData->DeviceCount + Device;
+}
+
 //
 // Interface functions of IDE_CONTROLLER_INIT protocol
 //
@@ -746,6 +777,8 @@ IdeInitSubmitData (
   )
 {
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *SataPrivateData;
+  UINTN                             DeviceIndex;
+
   SataPrivateData = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (This);
   ASSERT (SataPrivateData != NULL);
 
@@ -753,19 +786,21 @@ IdeInitSubmitData (
     return EFI_INVALID_PARAMETER;
   }
 
+  DeviceIndex = FlatDeviceIndex (SataPrivateData, Channel, Device);
+
   //
   // Make a local copy of device's IdentifyData and mark the valid flag
   //
   if (IdentifyData != NULL) {
     CopyMem (
-      &(SataPrivateData->IdentifyData[Channel * Device]),
+      &(SataPrivateData->IdentifyData[DeviceIndex]),
       IdentifyData,
       sizeof (EFI_IDENTIFY_DATA)
       );
 
-    SataPrivateData->IdentifyValid[Channel * Device] = TRUE;
+    SataPrivateData->IdentifyValid[DeviceIndex] = TRUE;
   } else {
-    SataPrivateData->IdentifyValid[Channel * Device] = FALSE;
+    SataPrivateData->IdentifyValid[DeviceIndex] = FALSE;
   }
 
   return EFI_SUCCESS;
@@ -821,6 +856,8 @@ IdeInitDisqualifyMode (
   )
 {
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *SataPrivateData;
+  UINTN                             DeviceIndex;
+
   SataPrivateData = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (This);
   ASSERT (SataPrivateData != NULL);
 
@@ -828,12 +865,14 @@ IdeInitDisqualifyMode (
     return EFI_INVALID_PARAMETER;
   }
 
+  DeviceIndex = FlatDeviceIndex (SataPrivateData, Channel, Device);
+
   //
   // Record the disqualified modes per channel per device. From ATA/ATAPI spec,
   // if a mode is not supported, the modes higher than it is also not supported.
   //
   CopyMem (
-    &(SataPrivateData->DisqualifiedModes[Channel * Device]),
+    &(SataPrivateData->DisqualifiedModes[DeviceIndex]),
     BadModes,
     sizeof (EFI_ATA_COLLECTIVE_MODE)
     );
@@ -910,6 +949,7 @@ IdeInitCalculateMode (
   EFI_ATA_COLLECTIVE_MODE           *DisqualifiedModes;
   UINT16                            SelectedMode;
   EFI_STATUS                        Status;
+  UINTN                             DeviceIndex;
 
   SataPrivateData = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (This);
   ASSERT (SataPrivateData != NULL);
@@ -924,9 +964,11 @@ IdeInitCalculateMode (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  IdentifyData = &(SataPrivateData->IdentifyData[Channel * Device]);
-  IdentifyValid = SataPrivateData->IdentifyValid[Channel * Device];
-  DisqualifiedModes = &(SataPrivateData->DisqualifiedModes[Channel * Device]);
+  DeviceIndex = FlatDeviceIndex (SataPrivateData, Channel, Device);
+
+  IdentifyData = &(SataPrivateData->IdentifyData[DeviceIndex]);
+  IdentifyValid = SataPrivateData->IdentifyValid[DeviceIndex];
+  DisqualifiedModes = &(SataPrivateData->DisqualifiedModes[DeviceIndex]);
 
   //
   // Make sure we've got the valid identify data of the device from SubmitData()
