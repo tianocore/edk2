@@ -251,8 +251,9 @@ INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
-INF  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
-INF  PcAtChipsetPkg/Bus/Pci/IdeControllerDxe/IdeControllerDxe.inf
+INF  OvmfPkg/SataControllerDxe/SataControllerDxe.inf
+INF  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+INF  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
