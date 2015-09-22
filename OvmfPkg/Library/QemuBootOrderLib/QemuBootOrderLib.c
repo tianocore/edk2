@@ -770,6 +770,49 @@ TranslatePciOfwNodes (
       Slave ? "Slave" : "Master"
       );
   } else if (NumNodes >= FirstNonBridge + 3 &&
+      SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "pci8086,2922") &&
+      SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "drive") &&
+      SubstringEq (OfwNode[FirstNonBridge + 2].DriverName, "disk")
+      ) {
+    //
+    // OpenFirmware device path (Q35 SATA disk and CD-ROM):
+    //
+    //   /pci@i0cf8/pci8086,2922@1f,2/drive@1/disk@0
+    //        ^                  ^  ^       ^      ^
+    //        |                  |  |       |      device number (fixed 0)
+    //        |                  |  |       channel (port) number
+    //        |                  PCI slot & function holding SATA HBA
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path:
+    //
+    //   PciRoot(0x0)/Pci(0x1F,0x2)/Sata(0x1,0x0,0x0)
+    //                                   ^   ^   ^
+    //                                   |   |   LUN (always 0 on Q35)
+    //                                   |   port multiplier port number,
+    //                                   |   always 0 on Q35
+    //                                   channel (port) number
+    //
+    UINT64 Channel;
+
+    NumEntries = 1;
+    if (RETURN_ERROR (ParseUnitAddressHexList (
+                        OfwNode[FirstNonBridge + 1].UnitAddress, &Channel,
+                        &NumEntries))) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x%x)%s/Pci(0x%Lx,0x%Lx)/Sata(0x%Lx,0x0,0x0)",
+      PciRoot,
+      Bridges,
+      PciDevFun[0],
+      PciDevFun[1],
+      Channel
+      );
+  } else if (NumNodes >= FirstNonBridge + 3 &&
              SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "isa") &&
              SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "fdc") &&
              SubstringEq (OfwNode[FirstNonBridge + 2].DriverName, "floppy")
