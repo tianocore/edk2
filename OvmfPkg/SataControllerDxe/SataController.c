@@ -411,8 +411,7 @@ SataControllerStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SataControllerStart error return status = %r\n", Status));
-    return Status;
+    goto Bail;
   }
 
   //
@@ -421,7 +420,7 @@ SataControllerStart (
   SataPrivateData = AllocateZeroPool (sizeof (EFI_SATA_CONTROLLER_PRIVATE_DATA));
   if (SataPrivateData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
+    goto ClosePciIo;
   }
 
   //
@@ -444,7 +443,9 @@ SataControllerStart (
                         sizeof (PciData.Hdr.ClassCode),
                         PciData.Hdr.ClassCode
                         );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    goto FreeSataPrivateData;
+  }
 
   if (IS_PCI_IDE (&PciData)) {
     SataPrivateData->IdeInit.ChannelCount = IDE_MAX_CHANNEL;
@@ -467,19 +468,19 @@ SataControllerStart (
   SataPrivateData->DisqualifiedModes = AllocateZeroPool ((sizeof (EFI_ATA_COLLECTIVE_MODE)) * ChannelDeviceCount);
   if (SataPrivateData->DisqualifiedModes == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
+    goto FreeSataPrivateData;
   }
 
   SataPrivateData->IdentifyData = AllocateZeroPool ((sizeof (EFI_IDENTIFY_DATA)) * ChannelDeviceCount);
   if (SataPrivateData->IdentifyData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
+    goto FreeDisqualifiedModes;
   }
 
   SataPrivateData->IdentifyValid = AllocateZeroPool ((sizeof (BOOLEAN)) * ChannelDeviceCount);
   if (SataPrivateData->IdentifyValid == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
+    goto FreeIdentifyData;
   }
 
   //
@@ -492,31 +493,35 @@ SataControllerStart (
                   NULL
                   );
 
-Done:
   if (EFI_ERROR (Status)) {
-
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiPciIoProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
-    if (SataPrivateData != NULL) {
-      if (SataPrivateData->DisqualifiedModes != NULL) {
-        FreePool (SataPrivateData->DisqualifiedModes);
-      }
-      if (SataPrivateData->IdentifyData != NULL) {
-        FreePool (SataPrivateData->IdentifyData);
-      }
-      if (SataPrivateData->IdentifyValid != NULL) {
-        FreePool (SataPrivateData->IdentifyValid);
-      }
-      FreePool (SataPrivateData);
-    }
+    goto FreeIdentifyValid;
   }
 
   DEBUG ((EFI_D_INFO, "SataControllerStart END status = %r\n", Status));
+  return Status;
 
+FreeIdentifyValid:
+  FreePool (SataPrivateData->IdentifyValid);
+
+FreeIdentifyData:
+  FreePool (SataPrivateData->IdentifyData);
+
+FreeDisqualifiedModes:
+  FreePool (SataPrivateData->DisqualifiedModes);
+
+FreeSataPrivateData:
+  FreePool (SataPrivateData);
+
+ClosePciIo:
+  gBS->CloseProtocol (
+         Controller,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
+
+Bail:
+  DEBUG ((EFI_D_ERROR, "SataControllerStart error return status = %r\n", Status));
   return Status;
 }
 
