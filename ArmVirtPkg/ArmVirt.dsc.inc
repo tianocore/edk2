@@ -349,7 +349,7 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|150
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|1000
 !endif
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|20000
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|12000
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
 
