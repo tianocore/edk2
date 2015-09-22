@@ -95,7 +95,7 @@ typedef struct _EFI_SATA_CONTROLLER_PRIVATE_DATA {
   // From ATA/ATAPI spec, if a mode is not supported,
   // the modes higher than it is also not supported
   //
-  EFI_ATA_COLLECTIVE_MODE           *DisqulifiedModes;
+  EFI_ATA_COLLECTIVE_MODE           *DisqualifiedModes;
 
   //
   // A copy of EFI_IDENTIFY_DATA data for each attached SATA device and its flag

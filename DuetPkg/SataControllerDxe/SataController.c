@@ -464,8 +464,8 @@ SataControllerStart (
   }
 
   ChannelDeviceCount = (UINTN) (SataPrivateData->IdeInit.ChannelCount) * (UINTN) (SataPrivateData->DeviceCount);
-  SataPrivateData->DisqulifiedModes = AllocateZeroPool ((sizeof (EFI_ATA_COLLECTIVE_MODE)) * ChannelDeviceCount);
-  if (SataPrivateData->DisqulifiedModes == NULL) {
+  SataPrivateData->DisqualifiedModes = AllocateZeroPool ((sizeof (EFI_ATA_COLLECTIVE_MODE)) * ChannelDeviceCount);
+  if (SataPrivateData->DisqualifiedModes == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
@@ -502,8 +502,8 @@ Done:
           Controller
           );
     if (SataPrivateData != NULL) {
-      if (SataPrivateData->DisqulifiedModes != NULL) {
-        FreePool (SataPrivateData->DisqulifiedModes);
+      if (SataPrivateData->DisqualifiedModes != NULL) {
+        FreePool (SataPrivateData->DisqualifiedModes);
       }
       if (SataPrivateData->IdentifyData != NULL) {
         FreePool (SataPrivateData->IdentifyData);
@@ -577,8 +577,8 @@ SataControllerStop (
   }
 
   if (SataPrivateData != NULL) {
-    if (SataPrivateData->DisqulifiedModes != NULL) {
-      FreePool (SataPrivateData->DisqulifiedModes);
+    if (SataPrivateData->DisqualifiedModes != NULL) {
+      FreePool (SataPrivateData->DisqualifiedModes);
     }
     if (SataPrivateData->IdentifyData != NULL) {
       FreePool (SataPrivateData->IdentifyData);
@@ -833,7 +833,7 @@ IdeInitDisqualifyMode (
   // if a mode is not supported, the modes higher than it is also not supported.
   //
   CopyMem (
-    &(SataPrivateData->DisqulifiedModes[Channel * Device]),
+    &(SataPrivateData->DisqualifiedModes[Channel * Device]),
     BadModes,
     sizeof (EFI_ATA_COLLECTIVE_MODE)
     );
@@ -907,7 +907,7 @@ IdeInitCalculateMode (
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *SataPrivateData;
   EFI_IDENTIFY_DATA                 *IdentifyData;
   BOOLEAN                           IdentifyValid;
-  EFI_ATA_COLLECTIVE_MODE           *DisqulifiedModes;
+  EFI_ATA_COLLECTIVE_MODE           *DisqualifiedModes;
   UINT16                            SelectedMode;
   EFI_STATUS                        Status;
 
@@ -926,7 +926,7 @@ IdeInitCalculateMode (
 
   IdentifyData = &(SataPrivateData->IdentifyData[Channel * Device]);
   IdentifyValid = SataPrivateData->IdentifyValid[Channel * Device];
-  DisqulifiedModes = &(SataPrivateData->DisqulifiedModes[Channel * Device]);
+  DisqualifiedModes = &(SataPrivateData->DisqualifiedModes[Channel * Device]);
 
   //
   // Make sure we've got the valid identify data of the device from SubmitData()
@@ -938,7 +938,7 @@ IdeInitCalculateMode (
 
   Status = CalculateBestPioMode (
             IdentifyData,
-            (DisqulifiedModes->PioMode.Valid ? ((UINT16 *) &(DisqulifiedModes->PioMode.Mode)) : NULL),
+            (DisqualifiedModes->PioMode.Valid ? ((UINT16 *) &(DisqualifiedModes->PioMode.Mode)) : NULL),
             &SelectedMode
             );
   if (!EFI_ERROR (Status)) {
@@ -952,7 +952,7 @@ IdeInitCalculateMode (
 
   Status = CalculateBestUdmaMode (
             IdentifyData,
-            (DisqulifiedModes->UdmaMode.Valid ? ((UINT16 *) &(DisqulifiedModes->UdmaMode.Mode)) : NULL),
+            (DisqualifiedModes->UdmaMode.Valid ? ((UINT16 *) &(DisqualifiedModes->UdmaMode.Mode)) : NULL),
             &SelectedMode
             );
 
