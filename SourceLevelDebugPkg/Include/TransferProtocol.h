@@ -24,7 +24,7 @@
 //
 #define DEBUG_AGENT_REVISION_03         ((0 << 16) | 03)
 #define DEBUG_AGENT_REVISION_04         ((0 << 16) | 04)
-#define DEBUG_AGENT_REVISION            DEBUG_AGENT_REVISION_03
+#define DEBUG_AGENT_REVISION            DEBUG_AGENT_REVISION_04
 #define DEBUG_AGENT_CAPABILITIES        0
 
 //
