@@ -1,7 +1,7 @@
 /** @file
   header file for NULL named library for 'tftp' Shell command functions.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved. <BR>
   Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -21,6 +21,7 @@
 #include <ShellBase.h>
 
 #include <Guid/ShellLibHiiGuid.h>
+#include <Guid/NicIp4ConfigNvData.h>
 
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/Mtftp4.h>
