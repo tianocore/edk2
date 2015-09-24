@@ -44,9 +44,11 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  DebugLib
   IoLib
   PcdLib
 
 [Pcd]
   gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress
   gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress
+  gArmVirtTokenSpaceGuid.PcdFwCfgDmaAddress

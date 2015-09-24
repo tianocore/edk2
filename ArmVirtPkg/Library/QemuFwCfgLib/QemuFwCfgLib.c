@@ -16,12 +16,58 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
 
 STATIC UINTN mFwCfgSelectorAddress;
 STATIC UINTN mFwCfgDataAddress;
+STATIC UINTN mFwCfgDmaAddress;
+
+/**
+  Reads firmware configuration bytes into a buffer
+
+  @param[in] Size    Size in bytes to read
+  @param[in] Buffer  Buffer to store data into  (OPTIONAL if Size is 0)
+
+**/
+typedef
+VOID (EFIAPI READ_BYTES_FUNCTION) (
+  IN UINTN Size,
+  IN VOID  *Buffer OPTIONAL
+  );
+
+//
+// Forward declaration of the two implementations we have.
+//
+STATIC READ_BYTES_FUNCTION MmioReadBytes;
+STATIC READ_BYTES_FUNCTION DmaReadBytes;
+
+//
+// This points to the one we detect at runtime.
+//
+STATIC READ_BYTES_FUNCTION *InternalQemuFwCfgReadBytes = MmioReadBytes;
+
+//
+// Communication structure for DmaReadBytes(). All fields are encoded in big
+// endian.
+//
+#pragma pack (1)
+typedef struct {
+  UINT32 Control;
+  UINT32 Length;
+  UINT64 Address;
+} FW_CFG_DMA_ACCESS;
+#pragma pack ()
+
+//
+// Macros for the FW_CFG_DMA_ACCESS.Control bitmap (in native encoding).
+//
+#define FW_CFG_DMA_CTL_ERROR  BIT0
+#define FW_CFG_DMA_CTL_READ   BIT1
+#define FW_CFG_DMA_CTL_SKIP   BIT2
+#define FW_CFG_DMA_CTL_SELECT BIT3
 
 
 /**
@@ -77,7 +123,22 @@ QemuFwCfgInitialize (
 
     QemuFwCfgSelectItem (QemuFwCfgItemSignature);
     Signature = QemuFwCfgRead32 ();
-    if (Signature != SIGNATURE_32 ('Q', 'E', 'M', 'U')) {
+    if (Signature == SIGNATURE_32 ('Q', 'E', 'M', 'U')) {
+      //
+      // For DMA support, we require the DTB to advertise the register, and the
+      // feature bitmap (which we read without DMA) to confirm the feature.
+      //
+      if (PcdGet64 (PcdFwCfgDmaAddress) != 0) {
+        UINT32 Features;
+
+        QemuFwCfgSelectItem (QemuFwCfgItemInterfaceVersion);
+        Features = QemuFwCfgRead32 ();
+        if ((Features & BIT1) != 0) {
+          mFwCfgDmaAddress = PcdGet64 (PcdFwCfgDmaAddress);
+          InternalQemuFwCfgReadBytes = DmaReadBytes;
+        }
+      }
+    } else {
       mFwCfgSelectorAddress = 0;
       mFwCfgDataAddress     = 0;
     }
@@ -108,16 +169,12 @@ QemuFwCfgSelectItem (
 
 
 /**
-  Reads firmware configuration bytes into a buffer
-
-  @param[in] Size    Size in bytes to read
-  @param[in] Buffer  Buffer to store data into  (OPTIONAL if Size is 0)
-
+  Slow READ_BYTES_FUNCTION.
 **/
 STATIC
 VOID
 EFIAPI
-InternalQemuFwCfgReadBytes (
+MmioReadBytes (
   IN UINTN Size,
   IN VOID  *Buffer OPTIONAL
   )
@@ -159,6 +216,61 @@ InternalQemuFwCfgReadBytes (
   if (Left & 1) {
     *Ptr = MmioRead8 (mFwCfgDataAddress);
   }
+}
+
+
+/**
+  Fast READ_BYTES_FUNCTION.
+**/
+STATIC
+VOID
+EFIAPI
+DmaReadBytes (
+  IN UINTN Size,
+  IN VOID  *Buffer OPTIONAL
+  )
+{
+  volatile FW_CFG_DMA_ACCESS Access;
+  UINT32                     Status;
+
+  if (Size == 0) {
+    return;
+  }
+
+  ASSERT (Size <= MAX_UINT32);
+
+  Access.Control = SwapBytes32 (FW_CFG_DMA_CTL_READ);
+  Access.Length  = SwapBytes32 ((UINT32)Size);
+  Access.Address = SwapBytes64 ((UINT64)(UINTN)Buffer);
+
+  //
+  // We shouldn't start the transfer before setting up Access.
+  //
+  MemoryFence ();
+
+  //
+  // This will fire off the transfer.
+  //
+#ifdef MDE_CPU_AARCH64
+  MmioWrite64 (mFwCfgDmaAddress, SwapBytes64 ((UINT64)&Access));
+#else
+  MmioWrite32 ((UINT32)(mFwCfgDmaAddress + 4), SwapBytes32 ((UINT32)&Access));
+#endif
+
+  //
+  // We shouldn't look at Access.Control before starting the transfer.
+  //
+  MemoryFence ();
+
+  do {
+    Status = SwapBytes32 (Access.Control);
+    ASSERT ((Status & FW_CFG_DMA_CTL_ERROR) == 0);
+  } while (Status != 0);
+
+  //
+  // The caller will want to access the transferred data.
+  //
+  MemoryFence ();
 }
 
 
