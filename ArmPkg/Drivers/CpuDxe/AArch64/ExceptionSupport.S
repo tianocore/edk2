@@ -358,6 +358,14 @@ ASM_PFX(AsmCommonExceptionEntry):
 #define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)    ldp  REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
 #define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)           ldur REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
 
+  //
+  // Disable interrupt(IRQ and FIQ) before restoring context,
+  // or else the context will be corrupted by interrupt reentrance.
+  // Interrupt mask will be restored from spsr by hardware when we call eret
+  //
+  msr   daifset, #3
+  isb
+
   // Adjust SP to pop system registers
   add     sp, sp, #(GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
   ALL_SYS_REGS
