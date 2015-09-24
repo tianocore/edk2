@@ -67,6 +67,7 @@
 
   gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0|UINT64|0x00000004
   gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress|0x0|UINT64|0x00000005
+  gArmVirtTokenSpaceGuid.PcdFwCfgDmaAddress|0x0|UINT64|0x00000009
 
   #
   # Supported GIC revision (2, 3, ...)
