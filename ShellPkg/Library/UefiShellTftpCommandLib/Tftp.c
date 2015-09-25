@@ -2,6 +2,8 @@
   The implementation for the 'tftp' Shell command.
 
   Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2015, Intel Corporation. All rights reserved. <BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -13,6 +15,8 @@
 **/
 
 #include "UefiShellTftpCommandLib.h"
+
+#define IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 32
 
 /*
    Constant strings and definitions related to the message indicating the amount of
@@ -59,7 +63,8 @@ StringToUint16 (
   @param[in]   NicNumber         The network physical device number.
   @param[out]  NicName           Address where to store the NIC name.
                                  The memory area has to be at least
-                                 IP4_NIC_NAME_LENGTH bytes wide.
+                                 IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 
+                                 double byte wide.
 
   @return  EFI_SUCCESS  The name of the NIC was returned.
   @return  Others       The creation of the child for the Managed
@@ -258,7 +263,7 @@ ShellCommandRunTftp (
   EFI_HANDLE              *Handles;
   UINTN                   HandleCount;
   UINTN                   NicNumber;
-  CHAR16                  NicName[IP4_NIC_NAME_LENGTH];
+  CHAR16                  NicName[IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH];
   EFI_HANDLE              ControllerHandle;
   EFI_HANDLE              Mtftp4ChildHandle;
   EFI_MTFTP4_PROTOCOL     *Mtftp4;
@@ -271,6 +276,7 @@ ShellCommandRunTftp (
   NicFound            = FALSE;
   AsciiRemoteFilePath = NULL;
   Handles             = NULL;
+  FileSize            = 0;
 
   //
   // Initialize the Shell library (we must be in non-auto-init...)
@@ -571,7 +577,7 @@ StringToUint16 (
     return FALSE;
   }
 
-  *Value = Val;
+  *Value = (UINT16)Val;
   return TRUE;
 }
 
@@ -582,7 +588,8 @@ StringToUint16 (
   @param[in]   NicNumber         The network physical device number.
   @param[out]  NicName           Address where to store the NIC name.
                                  The memory area has to be at least
-                                 IP4_NIC_NAME_LENGTH bytes wide.
+                                 IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 
+                                 double byte wide.
 
   @return  EFI_SUCCESS  The name of the NIC was returned.
   @return  Others       The creation of the child for the Managed
@@ -623,7 +630,7 @@ GetNicName (
 
   UnicodeSPrint (
     NicName,
-    IP4_NIC_NAME_LENGTH,
+    IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH,
     SnpMode.IfType == NET_IFTYPE_ETHERNET ?
     L"eth%d" :
     L"unk%d" ,
@@ -942,7 +949,7 @@ CheckPacket (
 {
   DOWNLOAD_CONTEXT  *Context;
   CHAR16            Progress[TFTP_PROGRESS_MESSAGE_SIZE];
-  UINT64            NbOfKb;
+  UINTN             NbOfKb;
   UINTN             Index;
   UINTN             LastStep;
   UINTN             Step;
@@ -966,10 +973,9 @@ CheckPacket (
   NbOfKb = Context->DownloadedNbOfBytes / 1024;
 
   Progress[0] = L'\0';
-  LastStep  = (Context->LastReportedNbOfBytes * TFTP_PROGRESS_SLIDER_STEPS) /
-              Context->FileSize;
-  Step      = (Context->DownloadedNbOfBytes   * TFTP_PROGRESS_SLIDER_STEPS) /
-              Context->FileSize;
+  LastStep  = (Context->LastReportedNbOfBytes * TFTP_PROGRESS_SLIDER_STEPS) / Context->FileSize;
+  Step      = (Context->DownloadedNbOfBytes * TFTP_PROGRESS_SLIDER_STEPS) / Context->FileSize;
+
   if (Step <= LastStep) {
     return EFI_SUCCESS;
   }
