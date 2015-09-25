@@ -197,6 +197,7 @@ DownloadFile (
 **/
 STATIC 
 EFI_STATUS 
+EFIAPI
 CheckPacket (
   IN EFI_MTFTP4_PROTOCOL  *This,
   IN EFI_MTFTP4_TOKEN     *Token,
@@ -940,6 +941,7 @@ Error :
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 CheckPacket (
   IN EFI_MTFTP4_PROTOCOL  *This,
   IN EFI_MTFTP4_TOKEN     *Token,
