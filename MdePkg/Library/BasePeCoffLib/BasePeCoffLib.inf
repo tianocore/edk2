@@ -40,7 +40,7 @@
   BasePeCoffLibInternals.h
   BasePeCoff.c
 
-[Sources.IA32, Sources.X64, Sources.EBC]
+[Sources.IA32, Sources.X64, Sources.EBC, Sources.AARCH64]
   PeCoffLoaderEx.c
 
 [Sources.IPF]
@@ -48,9 +48,6 @@
 
 [Sources.ARM]
   Arm/PeCoffLoaderEx.c
-
-[Sources.AARCH64]
-  AArch64/PeCoffLoaderEx.c
 
 [Packages]
   MdePkg/MdePkg.dec

@@ -57,7 +57,7 @@ PeCoffLoaderImageFormatSupported (
   )
 {
   if ((Machine == IMAGE_FILE_MACHINE_I386) || (Machine == IMAGE_FILE_MACHINE_X64) || 
-      (Machine ==  IMAGE_FILE_MACHINE_EBC)) {
+      (Machine == IMAGE_FILE_MACHINE_EBC) || (Machine == IMAGE_FILE_MACHINE_ARM64)) {
     return TRUE; 
   }
 
