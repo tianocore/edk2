@@ -1054,7 +1054,7 @@ IScsiGetConfigData (
       // Check the autoconfig path to see whether it should be retried.
       //
       if (AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG &&
-          AttemptTmp->AutoConfigureMode != IP_MODE_AUTOCONFIG_SUCCESS) {
+          !AttemptTmp->AutoConfigureSuccess) {
         if (mPrivate->Ipv6Flag &&
             AttemptTmp->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP6) {
           //
@@ -1197,6 +1197,7 @@ IScsiGetConfigData (
 
       AttemptConfigData->AutoConfigureMode =
         (UINT8) (mPrivate->Ipv6Flag ? IP_MODE_AUTOCONFIG_IP6 : IP_MODE_AUTOCONFIG_IP4);
+      AttemptConfigData->AutoConfigureSuccess = FALSE;
     }
     
     //
