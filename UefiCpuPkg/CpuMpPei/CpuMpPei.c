@@ -368,6 +368,7 @@ CountProcessorNumber (
   MicroSecondDelay (PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
   PeiCpuMpData->InitFlag  = 0;
   PeiCpuMpData->CpuCount += (UINT32) PeiCpuMpData->MpCpuExchangeInfo->NumApsExecuting;
+  ASSERT (PeiCpuMpData->CpuCount <= PcdGet32(PcdCpuMaxLogicalProcessorNumber));
   //
   // Sort BSP/Aps by CPU APIC ID in ascending order
   //
