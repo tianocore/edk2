@@ -477,7 +477,7 @@ IScsiStart (
     // Don't process the autoconfigure path if it is already established.
     //
     if (AttemptConfigData->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG &&
-        AttemptConfigData->AutoConfigureMode == IP_MODE_AUTOCONFIG_SUCCESS) {
+        AttemptConfigData->AutoConfigureSuccess) {
       continue;
     }
 
@@ -576,7 +576,7 @@ IScsiStart (
       // IScsi session success. Update the attempt state to NVR.
       //
       if (AttemptConfigData->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG) {
-        AttemptConfigData->AutoConfigureMode = IP_MODE_AUTOCONFIG_SUCCESS;
+        AttemptConfigData->AutoConfigureSuccess = TRUE;
       }
 
       gRT->SetVariable (
