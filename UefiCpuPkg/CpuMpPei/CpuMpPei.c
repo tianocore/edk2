@@ -428,7 +428,8 @@ PrepareAPStartupVector (
 
   PeiCpuMpData->CpuCount                 = 1;
   PeiCpuMpData->BspNumber                = 0;
-  PeiCpuMpData->CpuData                  = (PEI_CPU_DATA *) (PeiCpuMpData->MpCpuExchangeInfo + 1);
+  PeiCpuMpData->CpuData                  = (PEI_CPU_DATA *) (PeiCpuMpData->BackupBuffer +
+                                                             PeiCpuMpData->BackupBufferSize);
   PeiCpuMpData->CpuData[0].ApicId        = GetInitialApicId ();
   PeiCpuMpData->CpuData[0].Health.Uint32 = 0;
   PeiCpuMpData->EndOfPeiFlag             = FALSE;
