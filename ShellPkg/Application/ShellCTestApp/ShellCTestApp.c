@@ -2,7 +2,7 @@
   This is a test application that demonstrates how to use the C-style entry point
   for a shell application.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -40,10 +40,11 @@ ShellAppMain (
   )
 {
   UINTN  Index;
-
-  Print(L"ShellCTestApp.c:ShellAppMain called with %d parameters\n", Argc);
-  for (Index = 0; Index < Argc; Index++) {
-    Print(L"Argv[%d]: %s\n", Index, Argv[Index]);
+  if (Argc == 1) {
+    Print (L"Argv[1] = NULL\n");
+  }
+  for (Index = 1; Index < Argc; Index++) {
+    Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
   }
 
   return 0;
