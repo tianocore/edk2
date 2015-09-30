@@ -168,13 +168,8 @@ WriteBootToOsPerformanceData (
   UINT64                    StartValue;
   UINT64                    EndValue;
   BOOLEAN                   CountUp;
-  UINTN                     EntryIndex;
-  UINTN                     NumPerfEntries;
-  //
-  // List of flags indicating PerfEntry contains DXE handle
-  //
-  BOOLEAN                   *PerfEntriesAsDxeHandle;
   UINTN                     VarSize;
+  BOOLEAN                   Found;
 
   //
   // Record the performance data for End of BDS
@@ -202,6 +197,11 @@ WriteBootToOsPerformanceData (
     mPerfHeader.BDSRaw = StartValue - Ticker;
     CountUp            = FALSE;
   }
+
+  //
+  // Reset the entry count
+  //
+  mPerfHeader.Count = 0;
 
   if (mAcpiLowMemoryBase == 0x0FFFFFFFF) {
     VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
@@ -238,73 +238,10 @@ WriteBootToOsPerformanceData (
   Ptr        = (UINT8 *) ((UINT32) mAcpiLowMemoryBase + sizeof (PERF_HEADER));
   LimitCount = (UINT32) (PERF_DATA_MAX_LENGTH - sizeof (PERF_HEADER)) / sizeof (PERF_DATA);
 
-  NumPerfEntries = 0;
-  LogEntryKey    = 0;
-  while ((LogEntryKey = GetPerformanceMeasurement (
-                          LogEntryKey,
-                          &Handle,
-                          &Token,
-                          &Module,
-                          &StartTicker,
-                          &EndTicker)) != 0) {
-    NumPerfEntries++;
-  }
-  PerfEntriesAsDxeHandle = AllocateZeroPool (NumPerfEntries * sizeof (BOOLEAN));
-  ASSERT (PerfEntriesAsDxeHandle != NULL);
-  
   //
-  // Get DXE drivers performance
-  //
-  for (Index = 0; Index < NoHandles; Index++) {
-    Ticker = 0;
-    LogEntryKey = 0;
-    EntryIndex  = 0;
-    while ((LogEntryKey = GetPerformanceMeasurement (
-                            LogEntryKey,
-                            &Handle,
-                            &Token,
-                            &Module,
-                            &StartTicker,
-                            &EndTicker)) != 0) {
-      if (Handle == Handles[Index] && !PerfEntriesAsDxeHandle[EntryIndex]) {
-        PerfEntriesAsDxeHandle[EntryIndex] = TRUE;
-      }
-      EntryIndex++;
-      if ((Handle == Handles[Index]) && (EndTicker != 0)) {
-        if (StartTicker == 1) {
-          StartTicker = StartValue;
-        }
-        if (EndTicker == 1) {
-          EndTicker = StartValue;
-        }
-        Ticker += CountUp ? (EndTicker - StartTicker) : (StartTicker - EndTicker);
-      }
-    }
-
-    Duration = (UINT32) DivU64x32 (Ticker, (UINT32) Freq);
-
-    if (Duration > 0) {
-
-      GetNameFromHandle (Handles[Index], GaugeString);
-
-      AsciiStrCpyS (mPerfData.Token, PERF_TOKEN_SIZE, GaugeString);
-      mPerfData.Duration = Duration;
-
-      CopyMem (Ptr, &mPerfData, sizeof (PERF_DATA));
-      Ptr += sizeof (PERF_DATA);
-
-      mPerfHeader.Count++;
-      if (mPerfHeader.Count == LimitCount) {
-        goto Done;
-      }
-    }
-  }
-
-  //
-  // Get inserted performance data
+  // Get performance data
   //
   LogEntryKey = 0;
-  EntryIndex  = 0;
   while ((LogEntryKey = GetPerformanceMeasurement (
                           LogEntryKey,
                           &Handle,
@@ -312,11 +249,7 @@ WriteBootToOsPerformanceData (
                           &Module,
                           &StartTicker,
                           &EndTicker)) != 0) {
-    if (!PerfEntriesAsDxeHandle[EntryIndex] && EndTicker != 0) {
-
-      ZeroMem (&mPerfData, sizeof (PERF_DATA));
-
-      AsciiStrnCpyS (mPerfData.Token, PERF_TOKEN_SIZE, Token, PERF_TOKEN_LENGTH);
+    if (EndTicker != 0) {
       if (StartTicker == 1) {
         StartTicker = StartValue;
       }
@@ -325,7 +258,31 @@ WriteBootToOsPerformanceData (
       }
       Ticker = CountUp ? (EndTicker - StartTicker) : (StartTicker - EndTicker);
 
-      mPerfData.Duration = (UINT32) DivU64x32 (Ticker, (UINT32) Freq);
+      Duration = (UINT32) DivU64x32 (Ticker, (UINT32) Freq);
+      if (Duration == 0) {
+        continue;
+      }
+
+      ZeroMem (&mPerfData, sizeof (PERF_DATA));
+
+      mPerfData.Duration = Duration;
+
+      //
+      // See if the Handle is in the handle buffer
+      //
+      Found = FALSE;
+      for (Index = 0; Index < NoHandles; Index++) {
+        if (Handle == Handles[Index]) {
+          GetNameFromHandle (Handles[Index], GaugeString);
+          AsciiStrCpyS (mPerfData.Token, PERF_TOKEN_SIZE, GaugeString);
+          Found = TRUE;
+          break;
+        }
+      }
+
+      if (!Found) {
+        AsciiStrnCpyS (mPerfData.Token, PERF_TOKEN_SIZE, Token, PERF_TOKEN_LENGTH);
+      }
 
       CopyMem (Ptr, &mPerfData, sizeof (PERF_DATA));
       Ptr += sizeof (PERF_DATA);
@@ -335,13 +292,11 @@ WriteBootToOsPerformanceData (
         goto Done;
       }
     }
-    EntryIndex++;
   }
 
 Done:
 
   FreePool (Handles);
-  FreePool (PerfEntriesAsDxeHandle);
 
   mPerfHeader.Signiture = PERFORMANCE_SIGNATURE;
 
