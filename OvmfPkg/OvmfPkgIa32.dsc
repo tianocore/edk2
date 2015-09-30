@@ -44,6 +44,9 @@
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
   GCC:*_*_*_CC_FLAGS                   = -mno-mmx -mno-sse
 
+[BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+  GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+
 ################################################################################
 #
 # SKU Identification section - list of all SKU IDs supported by this Platform.
