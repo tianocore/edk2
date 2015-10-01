@@ -17,7 +17,8 @@
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
   DEFINE TTY_TERMINAL            = FALSE
 
-[BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
+[BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+  GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
   GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
 
 [LibraryClasses.common]
