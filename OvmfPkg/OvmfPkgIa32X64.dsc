@@ -48,6 +48,9 @@
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
   INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
 !endif
+
+[BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+  GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
   
 ################################################################################
 #

@@ -2,6 +2,7 @@
   Definitions for EFI IPv4 Configuration II Protocol implementation.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -27,7 +28,7 @@
 #define DHCP_TAG_PARA_LIST             55
 #define DHCP_TAG_NETMASK               1
 #define DHCP_TAG_ROUTER                3
-
+#define DHCP_TAG_DNS_SERVER            6
 
 #define DATA_ATTRIB_SET(Attrib, Bits)       (BOOLEAN)((Attrib) & (Bits))
 #define SET_DATA_ATTRIB(Attrib, Bits)       ((Attrib) |= (Bits))
@@ -207,6 +208,7 @@ struct _IP4_CONFIG2_INSTANCE {
 typedef struct {
   EFI_DHCP4_PACKET_OPTION Head;
   UINT8                   Route;
+  UINT8                   Dns;
 } IP4_CONFIG2_DHCP4_OPTION;
 #pragma pack()
 

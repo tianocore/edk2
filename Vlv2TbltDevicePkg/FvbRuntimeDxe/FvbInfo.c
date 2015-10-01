@@ -2,7 +2,7 @@
   Defines data structure that is the volume header found.
   These data is intent to decouple FVB driver with FV header.
 
-Copyright (c) 2006  - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006  - 2015, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -156,7 +156,7 @@ GetFvbInfo (
       //
       // Update the checksum value of FV header.
       //
-      FvHeader->Checksum = CalculateCheckSum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength / sizeof (UINT16));
+      FvHeader->Checksum = CalculateCheckSum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength);
 
       *FvbInfo = FvHeader;
 
