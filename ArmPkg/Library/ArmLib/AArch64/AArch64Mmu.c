@@ -295,8 +295,9 @@ GetBlockEntryListFromAddress (
     BaseAddressAlignment = LowBitSet64 (RegionStart);
   }
 
-  // Identify the Page Level the RegionStart must belongs to
-  PageLevel = 3 - ((BaseAddressAlignment - 12) / 9);
+  // Identify the Page Level the RegionStart must belong to. Note that PageLevel
+  // should be at least 1 since block translations are not supported at level 0
+  PageLevel = MAX (3 - ((BaseAddressAlignment - 12) / 9), 1);
 
   // If the required size is smaller than the current block size then we need to go to the page below.
   // The PageLevel was calculated on the Base Address alignment but did not take in account the alignment
