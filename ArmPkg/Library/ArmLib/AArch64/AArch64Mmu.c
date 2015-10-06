@@ -493,12 +493,6 @@ SetMemoryAttributes (
     return Status;
   }
 
-  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  // flush and invalidate pages
-  ArmCleanInvalidateDataCache ();
-
-  ArmInvalidateInstructionCache ();
-
   // Invalidate all TLB entries so changes are synced
   ArmInvalidateTlb ();
 
