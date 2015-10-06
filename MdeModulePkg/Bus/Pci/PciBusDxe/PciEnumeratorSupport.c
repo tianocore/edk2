@@ -2,6 +2,7 @@
   PCI emumeration support functions implementation for PCI Bus module.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -119,6 +120,14 @@ PciPciDeviceInfoCollector (
                  (UINT8) Device,
                  (UINT8) Func
                  );
+
+      if (EFI_ERROR (Status) && Func == 0) {
+        //
+        // go to next device if there is no Function 0
+        //
+        break;
+      }
+
       if (!EFI_ERROR (Status)) {
 
         //
@@ -2596,6 +2605,13 @@ ResetAllPpbBusNumber (
                  Device,
                  Func
                  );
+
+      if (EFI_ERROR (Status) && Func == 0) {
+        //
+        // go to next device if there is no Function 0
+        //
+        break;
+      }
 
       if (!EFI_ERROR (Status) && (IS_PCI_BRIDGE (&Pci))) {
 
