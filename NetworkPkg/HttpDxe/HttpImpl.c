@@ -2,6 +2,7 @@
   Implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -227,7 +228,6 @@ EfiHttpRequest (
   UINTN                         UrlLen;
   CHAR16                        *HostNameStr;
   HTTP_TOKEN_WRAP               *Wrap;
-  HTTP_TCP_TOKEN_WRAP           *TcpWrap;
   CHAR8                         *FileUrl;
   
   if ((This == NULL) || (Token == NULL)) {
@@ -278,7 +278,6 @@ EfiHttpRequest (
   HostName    = NULL;
   Wrap        = NULL;
   HostNameStr = NULL;
-  TcpWrap     = NULL;
 
   //
   // Parse the URI of the remote host.
