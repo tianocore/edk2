@@ -57,13 +57,13 @@ DefinitionBlock("SsdtPci.aml", "SSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_OEM
             Name(_ADR, 0xF0000000)    // Dev 0, Func 0
         }
 
-        // PCI Routing Table
-  		Name(_PRT, Package() {
-        	ROOT_PRT_ENTRY(0, 136),   // INTA
-        	ROOT_PRT_ENTRY(1, 137),   // INTB
-        	ROOT_PRT_ENTRY(2, 138),   // INTC
-        	ROOT_PRT_ENTRY(3, 139),   // INTD
-      	})
+		// PCI Routing Table
+		Name(_PRT, Package() {
+			ROOT_PRT_ENTRY(0, 168),   // INTA
+			ROOT_PRT_ENTRY(1, 169),   // INTB
+			ROOT_PRT_ENTRY(2, 170),   // INTC
+			ROOT_PRT_ENTRY(3, 171),   // INTD
+		})
         // Root complex resources
 		Method (_CRS, 0, Serialized) {
   			Name (RBUF, ResourceTemplate () {
@@ -97,6 +97,19 @@ DefinitionBlock("SsdtPci.aml", "SSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_OEM
 					0x40FFFFFFFF, 							// Max Base Address
 					0x00000000, 							// Translate
 					0x100000000								// Length
+				)
+
+				DWordIo ( // IO window
+					ResourceProducer,
+					MinFixed,
+					MaxFixed,
+					PosDecode,
+					EntireRange,
+					0x00000000, 							// Granularity
+					0x5f800000, 							// Min Base Address
+					0x5fffffff, 							// Max Base Address
+					0x5f800000, 							// Translate
+					0x00800000  							// Length
 				)
 			}) // Name(RBUF)
 			
