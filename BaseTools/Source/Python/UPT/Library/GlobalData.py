@@ -19,6 +19,7 @@ GlobalData
 # The workspace directory 
 #
 gWORKSPACE = '.'
+gPACKAGE_PATH = None
 
 #
 # INF module directory

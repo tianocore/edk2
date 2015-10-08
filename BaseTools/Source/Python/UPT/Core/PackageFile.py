@@ -37,6 +37,7 @@ from Logger import StringTable as ST
 from Library.Misc import CreateDirectory
 from Library.Misc import RemoveDirectory
 from Core.FileHook import __FileHookOpen__
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 
 class PackageFile:
@@ -203,8 +204,11 @@ class PackageFile:
     # @param Files:  the files to pack 
     #
     def PackFiles(self, Files):
-        for File1 in Files:
-            self.PackFile(File1)
+        for File in Files:
+            Cwd = os.getcwd()
+            os.chdir(mws.getWs(mws.WORKSPACE, File))
+            self.PackFile(File)
+            os.chdir(Cwd)
 
     ## Pack the file
     # 
