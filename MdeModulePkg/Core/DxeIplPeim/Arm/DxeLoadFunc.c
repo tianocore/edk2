@@ -16,6 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 
+#include <Library/ArmLib.h>
+
 /**
    Transfers control to DxeCore.
 
@@ -42,6 +44,11 @@ HandOffToDxeCore (
   //
   BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
   ASSERT (BaseOfStack != NULL);
+
+  if (PcdGetBool (PcdSetNxForStack)) {
+    Status = ArmSetMemoryRegionNoExec ((UINTN)BaseOfStack, STACK_SIZE);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Compute the top of the stack we were allocated. Pre-allocate a UINTN

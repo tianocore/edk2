@@ -61,6 +61,9 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
+[Packages.ARM, Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+
 [LibraryClasses]
   PcdLib
   MemoryAllocationLib
@@ -75,6 +78,9 @@
   DebugLib
   DebugAgentLib
   PeiServicesTablePointerLib
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  ArmLib
 
 [Ppis]
   gEfiDxeIplPpiGuid                 ## PRODUCES
@@ -104,6 +110,8 @@
 
 [Pcd.IA32,Pcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
+
+[Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
 
 [Depex]
