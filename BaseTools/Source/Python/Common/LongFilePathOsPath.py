@@ -49,3 +49,5 @@ dirname = os.path.dirname
 islink = os.path.islink
 isabs = os.path.isabs
 realpath = os.path.realpath
+relpath = os.path.relpath
+pardir = os.path.pardir

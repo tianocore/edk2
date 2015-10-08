@@ -41,6 +41,7 @@ from Common.BuildVersion import gBUILD_VERSION
 from AutoGen.AutoGen import *
 from Common.BuildToolError import *
 from Workspace.WorkspaceDatabase import *
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 from BuildReport import BuildReport
 from GenPatchPcdTable.GenPatchPcdTable import *
@@ -104,12 +105,16 @@ def CheckEnvVariable():
         EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in WORKSPACE path",
                         ExtraData=WorkspaceDir)
     os.environ["WORKSPACE"] = WorkspaceDir
+    
+    # set multiple workspace
+    PackagesPath = os.getenv("PACKAGES_PATH")
+    mws.setWs(WorkspaceDir, PackagesPath)
 
     #
     # Check EFI_SOURCE (Edk build convention). EDK_SOURCE will always point to ECP
     #
     if "ECP_SOURCE" not in os.environ:
-        os.environ["ECP_SOURCE"] = os.path.join(WorkspaceDir, GlobalData.gEdkCompatibilityPkg)
+        os.environ["ECP_SOURCE"] = mws.join(WorkspaceDir, GlobalData.gEdkCompatibilityPkg)
     if "EFI_SOURCE" not in os.environ:
         os.environ["EFI_SOURCE"] = os.environ["ECP_SOURCE"]
     if "EDK_SOURCE" not in os.environ:
@@ -182,7 +187,7 @@ def CheckEnvVariable():
     GlobalData.gGlobalDefines["EDK_SOURCE"] = EdkSourceDir
     GlobalData.gGlobalDefines["ECP_SOURCE"] = EcpSourceDir
     GlobalData.gGlobalDefines["EDK_TOOLS_PATH"] = os.environ["EDK_TOOLS_PATH"]
-
+    
 ## Get normalized file path
 #
 # Convert the path to be local format, and remove the WORKSPACE path at the
@@ -198,7 +203,8 @@ def NormFile(FilePath, Workspace):
     if os.path.isabs(FilePath):
         FileFullPath = os.path.normpath(FilePath)
     else:
-        FileFullPath = os.path.normpath(os.path.join(Workspace, FilePath))
+        FileFullPath = os.path.normpath(mws.join(Workspace, FilePath))
+        Workspace = mws.getWs(Workspace, FilePath)
 
     # check if the file path exists or not
     if not os.path.isfile(FileFullPath):
@@ -748,10 +754,10 @@ class Build():
             if not os.path.isabs(ConfDirectoryPath):
                 # Since alternate directory name is not absolute, the alternate directory is located within the WORKSPACE
                 # This also handles someone specifying the Conf directory in the workspace. Using --conf=Conf
-                ConfDirectoryPath = os.path.join(self.WorkspaceDir, ConfDirectoryPath)
+                ConfDirectoryPath = mws.join(self.WorkspaceDir, ConfDirectoryPath)
         else:
             # Get standard WORKSPACE/Conf use the absolute path to the WORKSPACE/Conf
-            ConfDirectoryPath = os.path.join(self.WorkspaceDir, 'Conf')
+            ConfDirectoryPath = mws.join(self.WorkspaceDir, 'Conf')
         GlobalData.gConfDirectory = ConfDirectoryPath
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
 
@@ -796,7 +802,7 @@ class Build():
             ToolDefinitionFile = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
             if ToolDefinitionFile == '':
                 ToolDefinitionFile = gToolsDefinition
-                ToolDefinitionFile = os.path.normpath(os.path.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
+                ToolDefinitionFile = os.path.normpath(mws.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
             if os.path.isfile(ToolDefinitionFile) == True:
                 StatusCode = self.ToolDef.LoadToolDefFile(ToolDefinitionFile)
             else:
