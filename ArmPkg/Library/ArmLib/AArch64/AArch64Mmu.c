@@ -408,35 +408,30 @@ GetBlockEntryListFromAddress (
 
 STATIC
 RETURN_STATUS
-FillTranslationTable (
-  IN  UINT64                        *RootTable,
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+UpdateRegionMapping (
+  IN  UINT64  *RootTable,
+  IN  UINT64  RegionStart,
+  IN  UINT64  RegionLength,
+  IN  UINT64  Attributes,
+  IN  UINT64  BlockEntryMask
   )
 {
-  UINT64  Attributes;
   UINT32  Type;
-  UINT64  RegionStart;
-  UINT64  RemainingRegionLength;
-  UINT64 *BlockEntry;
-  UINT64 *LastBlockEntry;
+  UINT64  *BlockEntry;
+  UINT64  *LastBlockEntry;
   UINT64  BlockEntrySize;
   UINTN   TableLevel;
 
   // Ensure the Length is aligned on 4KB boundary
-  if ((MemoryRegion->Length == 0) || ((MemoryRegion->Length & (SIZE_4KB - 1)) != 0)) {
+  if ((RegionLength == 0) || ((RegionLength & (SIZE_4KB - 1)) != 0)) {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
     return RETURN_INVALID_PARAMETER;
   }
 
-  // Variable initialization
-  Attributes = ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF;
-  RemainingRegionLength = MemoryRegion->Length;
-  RegionStart = MemoryRegion->VirtualBase;
-
   do {
     // Get the first Block Entry that matches the Virtual Address and also the information on the Table Descriptor
     // such as the the size of the Block Entry and the address of the last BlockEntry of the Table Descriptor
-    BlockEntrySize = RemainingRegionLength;
+    BlockEntrySize = RegionLength;
     BlockEntry = GetBlockEntryListFromAddress (RootTable, RegionStart, &TableLevel, &BlockEntrySize, &LastBlockEntry);
     if (BlockEntry == NULL) {
       // GetBlockEntryListFromAddress() return NULL when it fails to allocate new pages from the Translation Tables
@@ -451,11 +446,12 @@ FillTranslationTable (
 
     do {
       // Fill the Block Entry with attribute and output block address
-      *BlockEntry = (RegionStart & TT_ADDRESS_MASK_BLOCK_ENTRY) | Attributes | Type;
+      *BlockEntry &= BlockEntryMask;
+      *BlockEntry |= (RegionStart & TT_ADDRESS_MASK_BLOCK_ENTRY) | Attributes | Type;
 
       // Go to the next BlockEntry
       RegionStart += BlockEntrySize;
-      RemainingRegionLength -= BlockEntrySize;
+      RegionLength -= BlockEntrySize;
       BlockEntry++;
 
       // Break the inner loop when next block is a table
@@ -464,10 +460,26 @@ FillTranslationTable (
           (*BlockEntry & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY) {
             break;
       }
-    } while ((RemainingRegionLength >= BlockEntrySize) && (BlockEntry <= LastBlockEntry));
-  } while (RemainingRegionLength != 0);
+    } while ((RegionLength >= BlockEntrySize) && (BlockEntry <= LastBlockEntry));
+  } while (RegionLength != 0);
 
   return RETURN_SUCCESS;
+}
+
+STATIC
+RETURN_STATUS
+FillTranslationTable (
+  IN  UINT64                        *RootTable,
+  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+  )
+{
+  return UpdateRegionMapping (
+           RootTable,
+           MemoryRegion->VirtualBase,
+           MemoryRegion->Length,
+           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
+           0
+           );
 }
 
 RETURN_STATUS
