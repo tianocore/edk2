@@ -512,6 +512,96 @@ SetMemoryAttributes (
   return RETURN_SUCCESS;
 }
 
+STATIC
+RETURN_STATUS
+SetMemoryRegionAttribute (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length,
+  IN  UINT64                    Attributes,
+  IN  UINT64                    BlockEntryMask
+  )
+{
+  RETURN_STATUS                Status;
+  UINT64                       *RootTable;
+
+  RootTable = ArmGetTTBR0BaseAddress ();
+
+  Status = UpdateRegionMapping (RootTable, BaseAddress, Length, Attributes, BlockEntryMask);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  // Invalidate all TLB entries so changes are synced
+  ArmInvalidateTlb ();
+
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+ArmSetMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  UINT64    Val;
+
+  if (ArmReadCurrentEL () == AARCH64_EL1) {
+    Val = TT_PXN_MASK | TT_UXN_MASK;
+  } else {
+    Val = TT_XN_MASK;
+  }
+
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           Val,
+           ~TT_ADDRESS_MASK_BLOCK_ENTRY);
+}
+
+RETURN_STATUS
+ArmClearMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  UINT64 Mask;
+
+  // XN maps to UXN in the EL1&0 translation regime
+  Mask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_PXN_MASK | TT_XN_MASK);
+
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           0,
+           Mask);
+}
+
+RETURN_STATUS
+ArmSetMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           TT_AP_RO_RO,
+           ~TT_ADDRESS_MASK_BLOCK_ENTRY);
+}
+
+RETURN_STATUS
+ArmClearMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           TT_AP_NO_RO,
+           ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK));
+}
+
 RETURN_STATUS
 EFIAPI
 ArmConfigureMmu (

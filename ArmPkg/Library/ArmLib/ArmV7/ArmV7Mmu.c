@@ -301,3 +301,39 @@ ArmConfigureMmu (
   ArmEnableMmu();
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+ArmSetMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+RETURN_STATUS
+ArmClearMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+RETURN_STATUS
+ArmSetMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+RETURN_STATUS
+ArmClearMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
