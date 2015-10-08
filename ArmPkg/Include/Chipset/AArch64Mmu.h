@@ -75,12 +75,14 @@
 #define TT_AF                                   BIT10
 
 #define TT_PXN_MASK                             BIT53
-#define TT_UXN_MASK                             BIT54
+#define TT_UXN_MASK                             BIT54   // EL1&0
+#define TT_XN_MASK                              BIT54   // EL2 / EL3
 
 #define TT_ATTRIBUTES_MASK                      ((0xFFFULL << 52) | (0x3FFULL << 2))
 
 #define TT_TABLE_PXN                            BIT59
-#define TT_TABLE_XN                             BIT60
+#define TT_TABLE_UXN                            BIT60   // EL1&0
+#define TT_TABLE_XN                             BIT60   // EL2 / EL3
 #define TT_TABLE_NS                             BIT63
 
 #define TT_TABLE_AP_MASK                        (BIT62 | BIT61)

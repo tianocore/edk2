@@ -335,7 +335,8 @@ GetBlockEntryListFromAddress (
         if (Attributes & TT_PXN_MASK) {
           TableAttributes = TT_TABLE_PXN;
         }
-        if (Attributes & TT_UXN_MASK) {
+        // XN maps to UXN in the EL1&0 translation regime
+        if (Attributes & TT_XN_MASK) {
           TableAttributes = TT_TABLE_XN;
         }
         if (Attributes & TT_NS) {
