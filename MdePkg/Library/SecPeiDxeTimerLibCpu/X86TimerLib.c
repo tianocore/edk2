@@ -1,7 +1,7 @@
 /** @file
   Timer Library functions built upon local APIC on IA32/x64.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 
+#define APIC_SVR        0x0f0
 #define APIC_LVTERR     0x370
 #define APIC_TMICT      0x380
 #define APIC_TMCCT      0x390
@@ -39,6 +40,11 @@ CONST UINT8                           mTimerLibLocalApicDivisor[] = {
 /**
   Internal function to retrieve the base address of local APIC.
 
+  This function will ASSERT if:
+  The local APIC is not globally enabled.
+  The local APIC is not working under XAPIC mode.
+  The local APIC is not software enabled.
+
   @return The base address of local APIC
 
 **/
@@ -48,7 +54,32 @@ InternalX86GetApicBase (
   VOID
   )
 {
-  return (UINTN)AsmMsrBitFieldRead64 (27, 12, 35) << 12;
+  UINTN                             MsrValue;
+  UINTN                             ApicBase;
+
+  MsrValue = (UINTN) AsmReadMsr64 (27);
+  ApicBase = MsrValue & 0xffffff000ULL;
+
+  //
+  // Check the APIC Global Enable bit (bit 11) in IA32_APIC_BASE MSR.
+  // This bit will be 1, if local APIC is globally enabled.
+  //
+  ASSERT ((MsrValue & BIT11) != 0);
+
+  //
+  // Check the APIC Extended Mode bit (bit 10) in IA32_APIC_BASE MSR.
+  // This bit will be 0, if local APIC is under XAPIC mode.
+  //
+  ASSERT ((MsrValue & BIT10) == 0);
+
+  //
+  // Check the APIC Software Enable/Disable bit (bit 8) in Spurious-Interrupt
+  // Vector Register.
+  // This bit will be 1, if local APIC is software enabled.
+  //
+  ASSERT ((MmioRead32 (ApicBase + APIC_SVR) & BIT8) != 0);
+
+  return ApicBase;
 }
 
 /**
@@ -109,6 +140,9 @@ InternalX86GetInitTimerCount (
   Stalls the CPU for at least the given number of ticks. It's invoked by
   MicroSecondDelay() and NanoSecondDelay().
 
+  This function will ASSERT if the APIC timer intial count returned from
+  InternalX86GetInitTimerCount() is zero.
+
   @param  ApicBase  The base address of memory mapped registers of local APIC.
   @param  Delay     A period of time to delay in ticks.
 
@@ -133,6 +167,7 @@ InternalX86Delay (
   // Delay and the Init Count.
   //
   InitCount = InternalX86GetInitTimerCount (ApicBase);
+  ASSERT (InitCount != 0);
   Times     = Delay / (InitCount / 2);
   Delay     = Delay % (InitCount / 2);
 
