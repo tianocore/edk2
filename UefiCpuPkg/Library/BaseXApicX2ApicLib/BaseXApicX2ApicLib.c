@@ -4,7 +4,7 @@
   This local APIC library instance supports x2APIC capable processors
   which have xAPIC and x2APIC modes.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -849,6 +849,8 @@ InitializeApicTimer (
 /**
   Get the state of the local APIC timer.
 
+  This function will ASSERT if the local APIC is not software enabled.
+
   @param DivideValue   Return the divide value for the DCR. It is one of 1,2,4,8,16,32,64,128.
   @param PeriodicMode  Return the timer mode. If TRUE, timer mode is peridoic. Othewise, timer mode is one-shot.
   @param Vector        Return the timer interrupt vector number.
@@ -864,6 +866,13 @@ GetApicTimerState (
   UINT32 Divisor;
   LOCAL_APIC_DCR Dcr;
   LOCAL_APIC_LVT_TIMER LvtTimer;
+
+  //
+  // Check the APIC Software Enable/Disable bit (bit 8) in Spurious-Interrupt
+  // Vector Register.
+  // This bit will be 1, if local APIC is software enabled.
+  //
+  ASSERT ((ReadLocalApicReg(XAPIC_SPURIOUS_VECTOR_OFFSET) & BIT8) != 0);
 
   if (DivideValue != NULL) {
     Dcr.Uint32 = ReadLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET);
