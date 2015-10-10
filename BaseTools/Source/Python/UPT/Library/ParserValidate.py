@@ -27,7 +27,7 @@ from Library.DataType import TAB_SPACE_SPLIT
 from Library.String import GetSplitValueList
 from Library.ExpressionValidate import IsValidBareCString
 from Library.ExpressionValidate import IsValidFeatureFlagExp
-from CommonDataClass.CommonClass import MultipleWorkspace as mws
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## __HexDigit() method
 #
