@@ -454,7 +454,8 @@ S3BootScriptLibInitialize (
     }
     S3TablePtr = (VOID *) (UINTN) Buffer;
 
-    PcdSet64 (PcdS3BootScriptTablePrivateDataPtr, (UINT64) (UINTN)S3TablePtr); 
+    Status = PcdSet64S (PcdS3BootScriptTablePrivateDataPtr, (UINT64) (UINTN)S3TablePtr);
+    ASSERT_EFI_ERROR (Status);
     ZeroMem (S3TablePtr, sizeof(SCRIPT_TABLE_PRIVATE_DATA));  
     //
     // Create event to notify the library system enter the SmmLocked phase.
@@ -506,7 +507,8 @@ S3BootScriptLibInitialize (
       return RETURN_OUT_OF_RESOURCES;
     }
 
-    PcdSet64 (PcdS3BootScriptTablePrivateSmmDataPtr, (UINT64) (UINTN)S3TableSmmPtr);
+    Status = PcdSet64S (PcdS3BootScriptTablePrivateSmmDataPtr, (UINT64) (UINTN)S3TableSmmPtr);
+    ASSERT_EFI_ERROR (Status);
     ZeroMem (S3TableSmmPtr, sizeof(SCRIPT_TABLE_PRIVATE_DATA));
 
     //
