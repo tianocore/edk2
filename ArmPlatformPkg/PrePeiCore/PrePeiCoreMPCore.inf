@@ -66,6 +66,8 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
 
+  gArmPlatformTokenSpaceGuid.PcdEarlyHelloMessage
+
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   gArmTokenSpaceGuid.PcdGicSgiIntId

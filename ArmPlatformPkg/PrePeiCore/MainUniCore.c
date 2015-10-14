@@ -29,6 +29,13 @@ PrimaryMain (
   UINTN                   TemporaryRamBase;
   UINTN                   TemporaryRamSize;
 
+  if (FixedPcdGetSize (PcdEarlyHelloMessage) > 1) {
+    SerialPortWrite (
+      FixedPcdGetPtr (PcdEarlyHelloMessage),
+      FixedPcdGetSize (PcdEarlyHelloMessage) - 1
+      );
+  }
+
   CreatePpiList (&PpiListSize, &PpiList);
 
   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at

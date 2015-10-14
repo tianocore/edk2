@@ -116,6 +116,13 @@ PrimaryMain (
   UINTN                   TemporaryRamBase;
   UINTN                   TemporaryRamSize;
 
+  if (FixedPcdGetSize (PcdEarlyHelloMessage) > 1) {
+    SerialPortWrite (
+      FixedPcdGetPtr (PcdEarlyHelloMessage),
+      FixedPcdGetSize (PcdEarlyHelloMessage) - 1
+      );
+  }
+
   CreatePpiList (&PpiListSize, &PpiList);
 
   // Enable the GIC Distributor
