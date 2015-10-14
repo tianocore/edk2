@@ -611,6 +611,7 @@
   #   ($(SMM_REQUIRE) == FALSE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
 !if $(SMM_REQUIRE) == FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0

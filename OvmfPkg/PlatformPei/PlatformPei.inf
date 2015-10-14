@@ -99,6 +99,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
