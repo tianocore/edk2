@@ -40,7 +40,7 @@ from GenPatchPcdTable.GenPatchPcdTable import parsePcdInfoFromMapFile
 import Common.VpdInfoFile as VpdInfoFile
 from GenPcdDb import CreatePcdDatabaseCode
 from Workspace.MetaFileCommentParser import UsageList
-
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 import InfSectionParser
 
 ## Regular expression for splitting Dependency Expression string into tokens
@@ -953,7 +953,7 @@ class PlatformAutoGen(AutoGen):
         self._GuidValue = {}
         FdfModuleList = []
         for InfName in self._AsBuildInfList:
-            InfName = os.path.join(self.WorkspaceDir, InfName)
+            InfName = mws.join(self.WorkspaceDir, InfName)
             FdfModuleList.append(os.path.normpath(InfName))
         for F in self.Platform.Modules.keys():
             M = ModuleAutoGen(self.Workspace, F, self.BuildTarget, self.ToolChain, self.Arch, self.MetaFile)
@@ -1288,7 +1288,7 @@ class PlatformAutoGen(AutoGen):
     def _GetFdfFile(self):
         if self._FdfFile == None:
             if self.Workspace.FdfFile != "":
-                self._FdfFile= path.join(self.WorkspaceDir, self.Workspace.FdfFile)
+                self._FdfFile= mws.join(self.WorkspaceDir, self.Workspace.FdfFile)
             else:
                 self._FdfFile = ''
         return self._FdfFile
@@ -2115,8 +2115,11 @@ class PlatformAutoGen(AutoGen):
                         BuildOptions[Tool][Attr] = ""
                     # check if override is indicated
                     if Value.startswith('='):
-                        BuildOptions[Tool][Attr] = Value[1:]
+                        ToolPath = Value[1:]
+                        ToolPath = mws.handleWsMacro(ToolPath)
+                        BuildOptions[Tool][Attr] = ToolPath
                     else:
+                        Value = mws.handleWsMacro(Value)
                         BuildOptions[Tool][Attr] += " " + Value
         if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag != None:
             #
@@ -2193,8 +2196,7 @@ class ModuleAutoGen(AutoGen):
             return False
 
         self.SourceDir = self.MetaFile.SubDir
-        if self.SourceDir.upper().find(self.WorkspaceDir.upper()) == 0:
-            self.SourceDir = self.SourceDir[len(self.WorkspaceDir) + 1:]
+        self.SourceDir = mws.relpath(self.SourceDir, self.WorkspaceDir)
 
         self.SourceOverrideDir = None
         # use overrided path defined in DSC file
@@ -3042,7 +3044,7 @@ class ModuleAutoGen(AutoGen):
                 self._IncludePathList.append(self.DebugDir)
 
             for Package in self.Module.Packages:
-                PackageDir = path.join(self.WorkspaceDir, Package.MetaFile.Dir)
+                PackageDir = mws.join(self.WorkspaceDir, Package.MetaFile.Dir)
                 if PackageDir not in self._IncludePathList:
                     self._IncludePathList.append(PackageDir)
                 for Inc in Package.Includes:

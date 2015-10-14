@@ -41,6 +41,7 @@ from Common.DataType import TAB_BRG_PCD
 from Common.DataType import TAB_BRG_LIBRARY
 from Common.DataType import TAB_BACK_SLASH
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -1235,12 +1236,13 @@ class FdRegionReport(object):
                     DecDefaultValue = Package.Pcds[TokenCName, TokenSpaceGuidCName, DecType].DefaultValue
                     PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DecDefaultValue
         #
-        # Collect PCDs defined in DSC common section
+        # Collect PCDs defined in DSC file
         #
-        Platform = Wa.BuildDatabase[Wa.MetaFile, 'COMMON']
-        for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
-            DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
-            PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
+        for arch in Wa.ArchList:
+            Platform = Wa.BuildDatabase[Wa.MetaFile, arch]
+            for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
+                DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
+                PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
         #
         # Add PEI and DXE a priori files GUIDs defined in PI specification.
@@ -1255,7 +1257,7 @@ class FdRegionReport(object):
         for Pa in Wa.AutoGenObjectList:
             for ModuleKey in Pa.Platform.Modules:
                 M = Pa.Platform.Modules[ModuleKey].M
-                InfPath = os.path.join(Wa.WorkspaceDir, M.MetaFile.File)
+                InfPath = mws.join(Wa.WorkspaceDir, M.MetaFile.File)
                 self._GuidsDb[M.Guid.upper()] = "%s (%s)" % (M.Module.BaseName, InfPath)
 
         #
@@ -1277,7 +1279,7 @@ class FdRegionReport(object):
                             Guid = GuidStructureByteArrayToGuidString(GuidValue).upper()
                     for Section in Ffs.SectionList:
                         try:
-                            ModuleSectFile = os.path.join(Wa.WorkspaceDir, Section.SectFileName)
+                            ModuleSectFile = mws.join(Wa.WorkspaceDir, Section.SectFileName)
                             self._GuidsDb[Guid] = ModuleSectFile
                         except AttributeError:
                             pass

@@ -42,9 +42,11 @@ if %WORKSPACE% == %CD% (
 :SetWorkSpace
 @REM set new workspace
 @REM clear EFI_SOURCE and EDK_SOURCE for the new workspace
-set WORKSPACE=%CD%
-set EFI_SOURCE=
-set EDK_SOURCE=
+if not defined WORKSPACE (
+  set WORKSPACE=%CD%
+  set EFI_SOURCE=
+  set EDK_SOURCE=
+)
 
 :ParseArgs
 if /I "%1"=="-h" goto Usage
@@ -92,8 +94,28 @@ if not defined VCINSTALLDIR (
 shift
 
 :no_nt32
+
 if /I "%1"=="NewBuild" shift
-set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
+if exist %WORKSPACE%\BaseTools (
+  set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
+) else (
+  if defined PACKAGES_PATH (
+    for %%i IN (%PACKAGES_PATH%) DO (
+      if exist %%~fi\BaseTools (
+        set EDK_TOOLS_PATH=%%~fi\BaseTools
+        goto checkBaseTools
+      )
+    )
+  ) else (
+    echo.
+    echo !!! ERROR !!! Cannot find BaseTools !!!
+    echo. 
+    goto BadBaseTools
+  )
+)
+if exist %EDK_TOOLS_PATH%\Source set BASE_TOOLS_PATH=%EDK_TOOLS_PATH%
+
+:checkBaseTools
 IF NOT EXIST "%EDK_TOOLS_PATH%\toolsetup.bat" goto BadBaseTools
 call %EDK_TOOLS_PATH%\toolsetup.bat %*
 if /I "%1"=="Reconfig" shift

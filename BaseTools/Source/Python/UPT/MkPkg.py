@@ -50,6 +50,7 @@ from Library.ParserValidate import IsValidPath
 
 from Core.DistributionPackageClass import DistributionPackageClass
 from Core.PackageFile import PackageFile
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## CheckForExistingDp
 #
@@ -136,7 +137,7 @@ def Main(Options = None):
                 # write().
                 #
                 FromFile = os.path.normpath(FileObject.GetURI()).encode('utf_8')
-                FileFullPath = os.path.normpath(os.path.join(WorkspaceDir, FromFile))
+                FileFullPath = mws.join(WorkspaceDir, FromFile)
                 if FileFullPath in RePkgDict:
                     (DpGuid, DpVersion, DpName, Repackage) = RePkgDict[FileFullPath]
                     if not Repackage:
@@ -183,7 +184,7 @@ def Main(Options = None):
                     DistPkg.Header.RePackage = True
           
         Cwd = getcwd()
-        chdir(WorkspaceDir)        
+        chdir(WorkspaceDir)
         ContentFile.PackFiles(FileList)
         chdir(Cwd)
         
@@ -264,7 +265,7 @@ def CheckFileList(QualifiedExt, FileList, ErrorStringExt, ErrorStringFullPath):
                          ErrorStringExt % Item)
         
         Item = os.path.normpath(Item)
-        Path = os.path.normpath(os.path.join(WorkspaceDir, Item))
+        Path = mws.join(WorkspaceDir, Item)
         if not os.path.exists(Path):
             Logger.Error("\nMkPkg", FILE_NOT_FOUND, ST.ERR_NOT_FOUND % Item)
         elif Item == Path:

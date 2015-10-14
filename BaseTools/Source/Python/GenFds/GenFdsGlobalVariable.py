@@ -31,6 +31,7 @@ from AutoGen.BuildEngine import BuildRule
 import Common.DataType as DataType
 from Common.Misc import PathClass
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Global variables
 #
@@ -322,12 +323,13 @@ class GenFdsGlobalVariable:
     #   @param  String           String that may contain macro
     #
     def ReplaceWorkspaceMacro(String):
+        String = mws.handleWsMacro(String)
         Str = String.replace('$(WORKSPACE)', GenFdsGlobalVariable.WorkSpaceDir)
         if os.path.exists(Str):
             if not os.path.isabs(Str):
                 Str = os.path.abspath(Str)
         else:
-            Str = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, String)
+            Str = mws.join(GenFdsGlobalVariable.WorkSpaceDir, String)
         return os.path.normpath(Str)
 
     ## Check if the input files are newer than output files

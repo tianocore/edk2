@@ -39,6 +39,7 @@ from Logger.ToolError import FILE_TYPE_MISMATCH
 from Logger.ToolError import OPTION_CONFLICT
 from Logger.ToolError import FatalError
 from Logger.ToolError import UPT_ALREADY_INSTALLED_ERROR
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 import MkPkg
 import InstallPkg
@@ -164,7 +165,7 @@ def Main():
         setattr(Opt, Var[0], Var[1])
 
     try:
-        GlobalData.gWORKSPACE = GetWorkspace()
+        GlobalData.gWORKSPACE, GlobalData.gPACKAGE_PATH = GetWorkspace()
     except FatalError, XExcept:
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())

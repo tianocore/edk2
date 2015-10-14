@@ -62,14 +62,33 @@
 
 @if not defined ORIGINAL_PATH set "ORIGINAL_PATH=%PATH%"
 @REM Always set the WORKSPACE environment variable to the current directory
-@set "WORKSPACE=%CD%"
-@if exist "%WORKSPACE%\BaseTools" @set "BASE_TOOLS_PATH=%WORKSPACE%\BaseTools"
+@if not defined WORKSPACE (
+  @set "WORKSPACE=%CD%"
+)
+@if not exist "%BASE_TOOLS_PATH%" (
+  @if exist "%WORKSPACE%\BaseTools" (
+    set "BASE_TOOLS_PATH=%WORKSPACE%\BaseTools"
+  ) else (
+    @if defined PACKAGES_PATH (
+      @for %%i IN (%PACKAGES_PATH%) DO (
+        @if exist %%~fi\BaseTools (
+          @set BASE_TOOLS_PATH=%%~fi\BaseTools
+          @goto checkBaseTools
+        )
+      )
+    )
+  )
+)
+:checkBaseTools
+@if not defined BASE_TOOLS_PATH (
+  @echo.
+  @echo !!! ERROR !!! The BaseTools Package was not found !!!
+  @echo.
+  @goto ExitFailure
+)
 @if not exist "%WORKSPACE%\Conf" @mkdir "%WORKSPACE%\Conf"
 
-@@if not defined EDK_TOOLS_PATH @set "EDK_TOOLS_PATH=%WORKSPACE%\BaseTools"
-@rem   @set "PATH=%WORKSPACE%\BaseTools\Bin\Win32;%PATH%"
-@rem   @set WORKSPACE_TOOLS_PATH=%WORKSPACE%\BaseTools
-@rem )
+@@if not defined EDK_TOOLS_PATH @set "EDK_TOOLS_PATH=%BASE_TOOLS_PATH%"
 
 @REM Keep the existing EDK_TOOLS_PATH value, the --reset flag will set it
 @REM back to WORKSPACE\BaseTools while the --location DIRECTORY flag will
@@ -259,7 +278,7 @@
 @echo %SCRIPT_NAME% Version: %SCRIPT_VERSION%%SVN_REVISION:~11,-1%
 @echo Copyright(c) 2014, Intel Corporation. All rights reserved.
 @set HIDE_PATH=TRUE
-@call "%WORKSPACE%\BaseTools\Scripts\ShowEnvironment.bat"
+@call "%BASE_TOOLS_PATH%\Scripts\ShowEnvironment.bat"
 @set HIDE_PATH=
 @goto ExitSuccess
 
@@ -352,8 +371,8 @@
 @REM copied or replaced from the WORKSPACE\BaseTools\Conf directories' template files.
 :SetConf
 @if not exist "%EDK_TOOLS_PATH%\Conf" (
-    @if exist "%WORKSPACE%\BaseTools\Conf" (
-        @set "SRC_CONF=%WORKSPACE%\BaseTools\Conf"
+    @if exist "%BASE_TOOLS_PATH%\Conf" (
+        @set "SRC_CONF=%BASE_TOOLS_PATH%\Conf"
     )
 ) else (
     @set "SRC_CONF=%EDK_TOOLS_PATH%\Conf"
@@ -365,7 +384,7 @@
 
 @REM The script will test to see if the files exist, and also use the RESET_ENVIRONMENT flag
 @REM to overwrite the WORKSPACE\Conf *.txt files.
-@call "%WORKSPACE%\BaseTools\Scripts\ShowEnvironment.bat"
+@call "%BASE_TOOLS_PATH%\Scripts\ShowEnvironment.bat"
 @if errorlevel 1 (
     @echo Unable to copy the template files from "%SRC_CONF%" to "%WORKSPACE%\Conf"
     @goto ExitFailure
@@ -375,22 +394,34 @@
 @REM Set up Visual Studio if required to build the Nt32Pkg/Nt32Pkg.dsc emulator
 @if "%NT32PKG%"=="TRUE" (
     @if not defined VSINSTALLDIR @set "PATH=%ORIGINAL_PATH%"
-    @if not defined NT32_X64 @call "%WORKSPACE%\BaseTools\get_vsvars.bat"
-    @if defined NT32_X64 call "%WORKSPACE%\BaseTools\Scripts\SetVisualStudio.bat"
+    @if not defined NT32_X64 @call "%BASE_TOOLS_PATH%\get_vsvars.bat"
+    @if defined NT32_X64 call "%BASE_TOOLS_PATH%\Scripts\SetVisualStudio.bat"
 )
 @if "%NT32PKG%"=="TRUE" (
     @if not defined VS_PATH set "VS_PATH=%PATH%"
 )
 @if defined VS_PATH @set "PATH=%VS_PATH%"
 @if not defined VS_PATH @set "PATH=%ORIGINAL_PATH%"
-@set "PATH=%EDK_TOOLS_PATH%\Bin\Win32;%PATH%"
+@if not defined EDK_TOOLS_BIN (
+  @if exist %EDK_TOOLS_PATH%\Bin\Win32 (
+    @set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
+  ) else (
+    @echo.
+    @echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
+    @echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
+    @echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
+    @echo. 
+    @goto ExitFailure
+  )
+)
+@set "PATH=%EDK_TOOLS_BIN%;%PATH%"
 
 @if "%REBUILD_TOOLS%"=="TRUE" @goto Rebuild
 @if "%SVN_PULL%"== "TRUE" (
     if defined PYTHONHOME (
         @REM Use the python script if possible to test is the svn command is available, if it fails, the user may be
         @REM able to rebuild the Win32 binaries
-        @call "%WORKSPACE%\BaseTools\Scripts\UpdateBuildVersions.py" --svn-test -v
+        @call "%BASE_TOOLS_PATH%\Scripts\UpdateBuildVersions.py" --svn-test -v
         @if errorlevel 1 (
             @echo ERROR : The command-line svn tool is not available and the Win32 binaries do not exist
             @echo         Please re-run this script again with the --rebuild option to attempt to build 
@@ -417,7 +448,6 @@
 
 @REM The following code is used to rebuild the Win32 BaseTools binaries - check that required tools are available
 :Rebuild
-@if not defined BASE_TOOLS_PATH @set "BASE_TOOLS_PATH=%WORKSPACE%\BaseTools"
 @if not exist "%BASE_TOOLS_PATH%\Source" @goto NoBaseTools
 @endlocal
 @if not defined VCINSTALLDIR @goto NoVisualStudio
@@ -430,11 +460,11 @@
     @if not exist "%PYTHONHOME%\Scripts\cxfreeze.bat" @goto NoCxFreeze
     @set "PYTHON_FREEZER_PATH=%PYTHONHOME%\Scripts"
 )
-@call "%WORKSPACE%\BaseTools\Scripts\SetVisualStudio.bat"
+@call "%BASE_TOOLS_PATH%\Scripts\SetVisualStudio.bat"
 @if errorlevel 1 @goto ExitFailure
 
 :ShowAndExit
-@call "%WORKSPACE%\BaseTools\Scripts\ShowEnvironment.bat"
+@call "%BASE_TOOLS_PATH%\Scripts\ShowEnvironment.bat"
 
 @REM #########################################################################################
 @REM EXIT ROUTINES

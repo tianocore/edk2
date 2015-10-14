@@ -827,21 +827,23 @@ def GetPkgInfoFromDec(Path):
 def GetWorkspacePackage():
     DecFileList = []
     WorkspaceDir = GlobalData.gWORKSPACE
-    for Root, Dirs, Files in os.walk(WorkspaceDir):
-        if 'CVS' in Dirs:
-            Dirs.remove('CVS')
-        if '.svn' in Dirs:
-            Dirs.remove('.svn')
-        for Dir in Dirs:
-            if Dir.startswith('.'):
-                Dirs.remove(Dir)
-        for FileSp in Files:
-            if FileSp.startswith('.'):
-                continue
-            Ext = os.path.splitext(FileSp)[1]
-            if Ext.lower() in ['.dec']:
-                DecFileList.append\
-                (os.path.normpath(os.path.join(Root, FileSp)))
+    PackageDir = GlobalData.gPACKAGE_PATH
+    for PkgRoot in [WorkspaceDir] + PackageDir:
+        for Root, Dirs, Files in os.walk(PkgRoot):
+            if 'CVS' in Dirs:
+                Dirs.remove('CVS')
+            if '.svn' in Dirs:
+                Dirs.remove('.svn')
+            for Dir in Dirs:
+                if Dir.startswith('.'):
+                    Dirs.remove(Dir)
+            for FileSp in Files:
+                if FileSp.startswith('.'):
+                    continue
+                Ext = os.path.splitext(FileSp)[1]
+                if Ext.lower() in ['.dec']:
+                    DecFileList.append\
+                    (os.path.normpath(os.path.join(Root, FileSp)))
     #
     # abstract package guid, version info from DecFile List
     #

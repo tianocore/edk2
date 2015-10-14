@@ -39,6 +39,7 @@ from Common.Misc import SaveFileOnChange
 from Common.Misc import ClearDuplicatedInf
 from Common.Misc import GuidStructureStringToGuidString
 from Common.BuildVersion import gBUILD_VERSION
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Version and Copyright
 versionNumber = "1.0" + ' ' + gBUILD_VERSION
@@ -94,6 +95,10 @@ def main():
             if (Options.debug):
                 GenFdsGlobalVariable.VerboseLogger( "Using Workspace:" + Workspace)
         os.chdir(GenFdsGlobalVariable.WorkSpaceDir)
+        
+        # set multiple workspace
+        PackagesPath = os.getenv("PACKAGES_PATH")
+        mws.setWs(GenFdsGlobalVariable.WorkSpaceDir, PackagesPath)
 
         if (Options.filename):
             FdfFilename = Options.filename
@@ -102,7 +107,7 @@ def main():
             if FdfFilename[0:2] == '..':
                 FdfFilename = os.path.realpath(FdfFilename)
             if not os.path.isabs (FdfFilename):
-                FdfFilename = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
+                FdfFilename = mws.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
             if not os.path.exists(FdfFilename):
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=FdfFilename)
 
@@ -129,13 +134,13 @@ def main():
                 ActivePlatform = os.path.realpath(ActivePlatform)
 
             if not os.path.isabs (ActivePlatform):
-                ActivePlatform = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, ActivePlatform)
+                ActivePlatform = mws.join(GenFdsGlobalVariable.WorkSpaceDir, ActivePlatform)
 
             if not os.path.exists(ActivePlatform)  :
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist!")
 
             if os.path.normcase (ActivePlatform).find(Workspace) == 0:
-                ActivePlatform = ActivePlatform[len(Workspace):]
+                ActivePlatform = mws.relpath(ActivePlatform, Workspace)
             if len(ActivePlatform) > 0 :
                 if ActivePlatform[0] == '\\' or ActivePlatform[0] == '/':
                     ActivePlatform = ActivePlatform[1:]
@@ -159,7 +164,7 @@ def main():
                 ConfDirectoryPath = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, ConfDirectoryPath)
         else:
             # Get standard WORKSPACE/Conf, use the absolute path to the WORKSPACE/Conf
-            ConfDirectoryPath = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, 'Conf')
+            ConfDirectoryPath = mws.join(GenFdsGlobalVariable.WorkSpaceDir, 'Conf')
         GenFdsGlobalVariable.ConfDir = ConfDirectoryPath
         BuildConfigurationFile = os.path.normpath(os.path.join(ConfDirectoryPath, "target.txt"))
         if os.path.isfile(BuildConfigurationFile) == True:

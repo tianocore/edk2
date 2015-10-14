@@ -402,8 +402,8 @@ PeCoffLoaderRelocateArmImage (
     
     if (*FixupData != NULL) {
       *FixupData = ALIGN_POINTER(*FixupData, sizeof(UINT64));
-      *(UINT64 *)(*FixupData) = *Fixup16;
       CopyMem (*FixupData, Fixup16, sizeof (UINT64));
+      *FixupData = *FixupData + sizeof(UINT64);
     }
     break;
   

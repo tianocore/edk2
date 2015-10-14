@@ -35,6 +35,7 @@ from BuildToolError import *
 from CommonDataClass.DataClass import *
 from Parsing import GetSplitValueList
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE|re.UNICODE)
@@ -1728,6 +1729,7 @@ class PathClass(object):
 
         # Remove any '.' and '..' in path
         if self.Root:
+            self.Root = mws.getWs(self.Root, self.File)
             self.Path = os.path.normpath(os.path.join(self.Root, self.File))
             self.Root = os.path.normpath(CommonPath([self.Root, self.Path]))
             # eliminate the side-effect of 'C:'
@@ -1838,7 +1840,10 @@ class PathClass(object):
                 RealFile = os.path.join(self.AlterRoot, self.File)
             elif self.Root:
                 RealFile = os.path.join(self.Root, self.File)
-            return FILE_NOT_FOUND, os.path.join(self.AlterRoot, RealFile)
+            if len (mws.getPkgPath()) == 0:
+                return FILE_NOT_FOUND, os.path.join(self.AlterRoot, RealFile)
+            else:
+                return FILE_NOT_FOUND, "%s is not found in packages path:\n\t%s" % (self.File, '\n\t'.join(mws.getPkgPath()))
 
         ErrorCode = 0
         ErrorInfo = ''

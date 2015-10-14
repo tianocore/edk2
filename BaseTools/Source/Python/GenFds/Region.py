@@ -24,6 +24,7 @@ from stat import *
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## generate Region
 #
@@ -205,7 +206,7 @@ class Region(RegionClassObject):
             for RegionData in self.RegionDataList:
                 RegionData = GenFdsGlobalVariable.MacroExtend(RegionData, MacroDict)
                 if RegionData[1] != ':' :
-                    RegionData = os.path.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
+                    RegionData = mws.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
                 if not os.path.exists(RegionData):
                     EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
                 #

@@ -14,6 +14,7 @@
 import Common.LongFilePathOs as os
 from CommonDataClass.DataClass import *
 from EccToolError import *
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 import EccGlobalData
 import re
 ## Get the inlcude path list for a source file
@@ -33,8 +34,8 @@ def GetIncludeListOfFile(WorkSpace, Filepath, Db):
                 % (MODEL_META_DATA_PACKAGE, MODEL_EFI_SOURCE_FILE, '\\', Filepath)
     RecordSet = Db.TblFile.Exec(SqlCommand)
     for Record in RecordSet:
-        DecFullPath = os.path.normpath(os.path.join(WorkSpace, Record[0]))
-        InfFullPath = os.path.normpath(os.path.join(WorkSpace, Record[1]))
+        DecFullPath = os.path.normpath(mws.join(WorkSpace, Record[0]))
+        InfFullPath = os.path.normpath(mws.join(WorkSpace, Record[1]))
         (DecPath, DecName) = os.path.split(DecFullPath)
         (InfPath, InfName) = os.path.split(InfFullPath)
         SqlCommand = """select Value1 from Dec where BelongsToFile =
