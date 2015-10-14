@@ -122,6 +122,13 @@
   ## If set, this will swap settings for HDLCD RED_SELECT and BLUE_SELECT registers
   gArmPlatformTokenSpaceGuid.PcdArmHdLcdSwapBlueRedSelect|FALSE|BOOLEAN|0x00000045
 
+  #
+  # Early hello message (ASCII string), printed to the serial port.
+  # If set to the empty string, nothing is printed.
+  # Otherwise, a trailing CRLF should be specified explicitly.
+  #
+  gArmPlatformTokenSpaceGuid.PcdEarlyHelloMessage|""|VOID*|0x00000100
+
 [PcdsFixedAtBuild.common,PcdsDynamic.common]
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0|UINT32|0x00000024
