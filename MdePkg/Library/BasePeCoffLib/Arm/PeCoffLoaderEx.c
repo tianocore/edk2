@@ -234,6 +234,7 @@ PeHotRelocateImageEx (
       FixupVal = ThumbMovwMovtImmediateAddress (Fixup16) + (UINT32)Adjust;
       ThumbMovwMovtImmediatePatch (Fixup16, FixupVal);
     }
+    *FixupData = *FixupData + sizeof(UINT64);
     break;
   
   case EFI_IMAGE_REL_BASED_ARM_MOV32A:

@@ -989,8 +989,10 @@ BdsSetConsoleMode (
                   //
                   // Update text mode PCD.
                   //
-                  PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
-                  PcdSet32 (PcdConOutRow, mSetupTextModeRow);
+                  Status = PcdSet32S (PcdConOutColumn, mSetupTextModeColumn);
+                  ASSERT_EFI_ERROR (Status);
+                  Status = PcdSet32S (PcdConOutRow, mSetupTextModeRow);
+                  ASSERT_EFI_ERROR (Status);
                   FreePool (Info);
                   return EFI_SUCCESS;
                 }
@@ -1031,10 +1033,14 @@ BdsSetConsoleMode (
   // Set PCD to Inform GraphicsConsole to change video resolution.
   // Set PCD to Inform Consplitter to change text mode.
   //
-  PcdSet32 (PcdVideoHorizontalResolution, NewHorizontalResolution);
-  PcdSet32 (PcdVideoVerticalResolution, NewVerticalResolution);
-  PcdSet32 (PcdConOutColumn, NewColumns);
-  PcdSet32 (PcdConOutRow, NewRows);
+  Status = PcdSet32S (PcdVideoHorizontalResolution, NewHorizontalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdVideoVerticalResolution, NewVerticalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdConOutColumn, NewColumns);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdConOutRow, NewRows);
+  ASSERT_EFI_ERROR (Status);
   
   
   //

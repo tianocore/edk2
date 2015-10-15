@@ -5890,6 +5890,7 @@ SetScope (
   @retval EFI_INVALID_PARAMETER  KeyData is NULL or HelpString is NULL on register.
   @retval EFI_NOT_FOUND          KeyData is not found to be unregistered.
   @retval EFI_UNSUPPORTED        Key represents a printable character. It is conflicted with Browser.
+  @retval EFI_ALREADY_STARTED    Key already been registered for one hot key.
 **/
 EFI_STATUS
 EFIAPI
@@ -5935,20 +5936,19 @@ RegisterHotKey (
       return EFI_NOT_FOUND;
     }
   }
-  
-  //
-  // Register HotKey into List.
-  //
-  if (HotKey == NULL) {
-    //
-    // Create new Key, and add it into List.
-    //
-    HotKey = AllocateZeroPool (sizeof (BROWSER_HOT_KEY));
-    ASSERT (HotKey != NULL);
-    HotKey->Signature = BROWSER_HOT_KEY_SIGNATURE;
-    HotKey->KeyData   = AllocateCopyPool (sizeof (EFI_INPUT_KEY), KeyData);
-    InsertTailList (&gBrowserHotKeyList, &HotKey->Link);
+
+  if (HotKey != NULL) {
+    return EFI_ALREADY_STARTED;
   }
+
+  //
+  // Create new Key, and add it into List.
+  //
+  HotKey = AllocateZeroPool (sizeof (BROWSER_HOT_KEY));
+  ASSERT (HotKey != NULL);
+  HotKey->Signature = BROWSER_HOT_KEY_SIGNATURE;
+  HotKey->KeyData   = AllocateCopyPool (sizeof (EFI_INPUT_KEY), KeyData);
+  InsertTailList (&gBrowserHotKeyList, &HotKey->Link);
 
   //
   // Fill HotKey information.

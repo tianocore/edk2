@@ -295,8 +295,9 @@ GetBlockEntryListFromAddress (
     BaseAddressAlignment = LowBitSet64 (RegionStart);
   }
 
-  // Identify the Page Level the RegionStart must belongs to
-  PageLevel = 3 - ((BaseAddressAlignment - 12) / 9);
+  // Identify the Page Level the RegionStart must belong to. Note that PageLevel
+  // should be at least 1 since block translations are not supported at level 0
+  PageLevel = MAX (3 - ((BaseAddressAlignment - 12) / 9), 1);
 
   // If the required size is smaller than the current block size then we need to go to the page below.
   // The PageLevel was calculated on the Base Address alignment but did not take in account the alignment
@@ -334,7 +335,8 @@ GetBlockEntryListFromAddress (
         if (Attributes & TT_PXN_MASK) {
           TableAttributes = TT_TABLE_PXN;
         }
-        if (Attributes & TT_UXN_MASK) {
+        // XN maps to UXN in the EL1&0 translation regime
+        if (Attributes & TT_XN_MASK) {
           TableAttributes = TT_TABLE_XN;
         }
         if (Attributes & TT_NS) {
@@ -406,35 +408,30 @@ GetBlockEntryListFromAddress (
 
 STATIC
 RETURN_STATUS
-FillTranslationTable (
-  IN  UINT64                        *RootTable,
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+UpdateRegionMapping (
+  IN  UINT64  *RootTable,
+  IN  UINT64  RegionStart,
+  IN  UINT64  RegionLength,
+  IN  UINT64  Attributes,
+  IN  UINT64  BlockEntryMask
   )
 {
-  UINT64  Attributes;
   UINT32  Type;
-  UINT64  RegionStart;
-  UINT64  RemainingRegionLength;
-  UINT64 *BlockEntry;
-  UINT64 *LastBlockEntry;
+  UINT64  *BlockEntry;
+  UINT64  *LastBlockEntry;
   UINT64  BlockEntrySize;
   UINTN   TableLevel;
 
   // Ensure the Length is aligned on 4KB boundary
-  if ((MemoryRegion->Length == 0) || ((MemoryRegion->Length & (SIZE_4KB - 1)) != 0)) {
+  if ((RegionLength == 0) || ((RegionLength & (SIZE_4KB - 1)) != 0)) {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
     return RETURN_INVALID_PARAMETER;
   }
 
-  // Variable initialization
-  Attributes = ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF;
-  RemainingRegionLength = MemoryRegion->Length;
-  RegionStart = MemoryRegion->VirtualBase;
-
   do {
     // Get the first Block Entry that matches the Virtual Address and also the information on the Table Descriptor
     // such as the the size of the Block Entry and the address of the last BlockEntry of the Table Descriptor
-    BlockEntrySize = RemainingRegionLength;
+    BlockEntrySize = RegionLength;
     BlockEntry = GetBlockEntryListFromAddress (RootTable, RegionStart, &TableLevel, &BlockEntrySize, &LastBlockEntry);
     if (BlockEntry == NULL) {
       // GetBlockEntryListFromAddress() return NULL when it fails to allocate new pages from the Translation Tables
@@ -449,11 +446,12 @@ FillTranslationTable (
 
     do {
       // Fill the Block Entry with attribute and output block address
-      *BlockEntry = (RegionStart & TT_ADDRESS_MASK_BLOCK_ENTRY) | Attributes | Type;
+      *BlockEntry &= BlockEntryMask;
+      *BlockEntry |= (RegionStart & TT_ADDRESS_MASK_BLOCK_ENTRY) | Attributes | Type;
 
       // Go to the next BlockEntry
       RegionStart += BlockEntrySize;
-      RemainingRegionLength -= BlockEntrySize;
+      RegionLength -= BlockEntrySize;
       BlockEntry++;
 
       // Break the inner loop when next block is a table
@@ -462,10 +460,26 @@ FillTranslationTable (
           (*BlockEntry & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY) {
             break;
       }
-    } while ((RemainingRegionLength >= BlockEntrySize) && (BlockEntry <= LastBlockEntry));
-  } while (RemainingRegionLength != 0);
+    } while ((RegionLength >= BlockEntrySize) && (BlockEntry <= LastBlockEntry));
+  } while (RegionLength != 0);
 
   return RETURN_SUCCESS;
+}
+
+STATIC
+RETURN_STATUS
+FillTranslationTable (
+  IN  UINT64                        *RootTable,
+  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+  )
+{
+  return UpdateRegionMapping (
+           RootTable,
+           MemoryRegion->VirtualBase,
+           MemoryRegion->Length,
+           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
+           0
+           );
 }
 
 RETURN_STATUS
@@ -492,16 +506,100 @@ SetMemoryAttributes (
     return Status;
   }
 
-  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  // flush and invalidate pages
-  ArmCleanInvalidateDataCache ();
+  // Invalidate all TLB entries so changes are synced
+  ArmInvalidateTlb ();
 
-  ArmInvalidateInstructionCache ();
+  return RETURN_SUCCESS;
+}
+
+STATIC
+RETURN_STATUS
+SetMemoryRegionAttribute (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length,
+  IN  UINT64                    Attributes,
+  IN  UINT64                    BlockEntryMask
+  )
+{
+  RETURN_STATUS                Status;
+  UINT64                       *RootTable;
+
+  RootTable = ArmGetTTBR0BaseAddress ();
+
+  Status = UpdateRegionMapping (RootTable, BaseAddress, Length, Attributes, BlockEntryMask);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
 
   // Invalidate all TLB entries so changes are synced
   ArmInvalidateTlb ();
 
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+ArmSetMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  UINT64    Val;
+
+  if (ArmReadCurrentEL () == AARCH64_EL1) {
+    Val = TT_PXN_MASK | TT_UXN_MASK;
+  } else {
+    Val = TT_XN_MASK;
+  }
+
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           Val,
+           ~TT_ADDRESS_MASK_BLOCK_ENTRY);
+}
+
+RETURN_STATUS
+ArmClearMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  UINT64 Mask;
+
+  // XN maps to UXN in the EL1&0 translation regime
+  Mask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_PXN_MASK | TT_XN_MASK);
+
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           0,
+           Mask);
+}
+
+RETURN_STATUS
+ArmSetMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           TT_AP_RO_RO,
+           ~TT_ADDRESS_MASK_BLOCK_ENTRY);
+}
+
+RETURN_STATUS
+ArmClearMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           TT_AP_NO_RO,
+           ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK));
 }
 
 RETURN_STATUS

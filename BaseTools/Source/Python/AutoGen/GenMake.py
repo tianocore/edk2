@@ -19,7 +19,7 @@ import string
 import re
 import os.path as path
 from Common.LongFilePathSupport import OpenLongFilePath as open
-
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common.BuildToolError import *
 from Common.Misc import *
 from Common.String import *
@@ -559,7 +559,7 @@ cleanlib:
         found = False
         while not found and os.sep in package_rel_dir:
             index = package_rel_dir.index(os.sep)
-            current_dir = os.path.join(current_dir, package_rel_dir[:index])
+            current_dir = mws.join(current_dir, package_rel_dir[:index])
             for fl in os.listdir(current_dir):
                 if fl.endswith('.dec'):
                     found = True

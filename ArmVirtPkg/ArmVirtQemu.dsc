@@ -162,6 +162,9 @@
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
+[PcdsFixedAtBuild.AARCH64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
+
 [PcdsDynamicDefault.common]
   ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.

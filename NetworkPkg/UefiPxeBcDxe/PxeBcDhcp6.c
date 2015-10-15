@@ -1376,16 +1376,15 @@ PxeBcRegisterIp6Address (
   EFI_IP6_CONFIG_MANUAL_ADDRESS    CfgAddr;
   EFI_IPv6_ADDRESS                 GatewayAddr;
   UINTN                            DataSize;
-  EFI_EVENT                        TimeOutEvt;
   EFI_EVENT                        MappedEvt;
   EFI_STATUS                       Status;
-  UINT64                           DadTriggerTime;
-  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS    DadXmits;
   BOOLEAN                          NoGateway;
+  EFI_IPv6_ADDRESS                 *Ip6Addr;
+  UINTN                            Index;
 
   Status     = EFI_SUCCESS;
-  TimeOutEvt = NULL;
   MappedEvt  = NULL;
+  Ip6Addr    = NULL;
   DataSize   = sizeof (EFI_IP6_CONFIG_POLICY);
   Ip6Cfg     = Private->Ip6Cfg;
   Ip6        = Private->Ip6;
@@ -1427,34 +1426,6 @@ PxeBcRegisterIp6Address (
   }
 
   //
-  // Get Duplicate Address Detection Transmits count.
-  //
-  DataSize = sizeof (EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS);
-  Status = Ip6Cfg->GetData (
-                     Ip6Cfg,
-                     Ip6ConfigDataTypeDupAddrDetectTransmits,
-                     &DataSize,
-                     &DadXmits
-                     );
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }
-
-  //
-  // Create a timer as setting address timeout event since DAD in IP6 driver.
-  //
-  Status = gBS->CreateEvent (
-                  EVT_TIMER,
-                  TPL_CALLBACK,
-                  NULL,
-                  NULL,
-                  &TimeOutEvt
-                  );
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }
-
-  //
   // Create a notify event to set address flag when DAD if IP6 driver succeeded.
   //
   Status = gBS->CreateEvent (
@@ -1468,6 +1439,7 @@ PxeBcRegisterIp6Address (
     goto ON_EXIT;
   }
 
+  Private->IsAddressOk = FALSE;
   Status = Ip6Cfg->RegisterDataNotify (
                      Ip6Cfg,
                      Ip6ConfigDataTypeManualAddress,
@@ -1485,23 +1457,54 @@ PxeBcRegisterIp6Address (
                      );
   if (EFI_ERROR(Status) && Status != EFI_NOT_READY) {
     goto ON_EXIT;
-  }
+  } else if (Status == EFI_NOT_READY) {
+    //
+    // Poll the network until the asynchronous process is finished.
+    //
+    while (!Private->IsAddressOk) {
+      Ip6->Poll (Ip6);
+    }
+    //
+    // Check whether the IP6 address setting is successed.
+    //
+    DataSize = 0;
+    Status = Ip6Cfg->GetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeManualAddress,
+                       &DataSize,
+                       NULL
+                       );
+    if (Status != EFI_BUFFER_TOO_SMALL || DataSize == 0) {
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
 
-  //
-  // Start the 5 secondes timer to wait for setting address.
-  //
-  Status = EFI_NO_MAPPING;
-  DadTriggerTime = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + PXEBC_DAD_ADDITIONAL_DELAY;
-  gBS->SetTimer (TimeOutEvt, TimerRelative, DadTriggerTime);
+    Ip6Addr = AllocatePool (DataSize);
+    if (Ip6Addr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    Status = Ip6Cfg->GetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeManualAddress,
+                       &DataSize,
+                       (VOID*) Ip6Addr
+                       );
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
 
-  while (EFI_ERROR (gBS->CheckEvent (TimeOutEvt))) {
-    Ip6->Poll (Ip6);
-    if (Private->IsAddressOk) {
-      Status = EFI_SUCCESS;
-      break;
+    for (Index = 0; Index < DataSize / sizeof (EFI_IPv6_ADDRESS); Index++) {
+      if (CompareMem (Ip6Addr + Index, Address, sizeof (EFI_IPv6_ADDRESS)) == 0) {
+        break;
+      }
+    }
+    if (Index == DataSize / sizeof (EFI_IPv6_ADDRESS)) {
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
     }
   }
-
+  
   //
   // Set the default gateway address back if needed.
   //
@@ -1526,8 +1529,8 @@ ON_EXIT:
               );
     gBS->CloseEvent (MappedEvt);
   }
-  if (TimeOutEvt != NULL) {
-    gBS->CloseEvent (TimeOutEvt);
+  if (Ip6Addr != NULL) {
+    FreePool (Ip6Addr);
   }
   return Status;
 }

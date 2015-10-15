@@ -1308,6 +1308,7 @@ SetScope (
   @retval EFI_INVALID_PARAMETER  KeyData is NULL.
   @retval EFI_NOT_FOUND          KeyData is not found to be unregistered.
   @retval EFI_UNSUPPORTED        Key represents a printable character. It is conflicted with Browser.
+  @retval EFI_ALREADY_STARTED    Key already been registered for one hot key.
 **/
 EFI_STATUS
 EFIAPI

@@ -155,3 +155,35 @@ GetRandomNumber64 (
 
   return FALSE;
 }
+
+/**
+  Generates a 128-bit random number.
+
+  if Rand is NULL, then ASSERT().
+
+  @param[out] Rand     Buffer pointer to store the 128-bit random value.
+
+  @retval TRUE         Random number generated successfully.
+  @retval FALSE        Failed to generate the random number.
+
+**/
+BOOLEAN
+EFIAPI
+GetRandomNumber128 (
+  OUT     UINT64                    *Rand
+  )
+{
+  ASSERT (Rand != NULL);
+
+  //
+  // Read first 64 bits
+  //
+  if (!GetRandomNumber64 (Rand)) {
+    return FALSE;
+  }
+
+  //
+  // Read second 64 bits
+  //
+  return GetRandomNumber64 (++Rand);
+}

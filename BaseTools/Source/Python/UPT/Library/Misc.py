@@ -50,6 +50,7 @@ from Library.ParserValidate import IsValidHexVersion
 from Library.ParserValidate import IsValidPath
 from Object.POM.CommonObject import TextObject
 from Core.FileHook import __FileHookOpen__
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C 
 # structure style
@@ -592,7 +593,11 @@ def GetWorkspace():
 
     if WorkspaceDir[-1] == ':':
         WorkspaceDir += os.sep
-    return WorkspaceDir
+
+    PackagesPath = os.environ.get("PACKAGES_PATH")
+    mws.setWs(WorkspaceDir, PackagesPath)
+
+    return WorkspaceDir, mws.PACKAGES_PATH
 
 ## Get relative path
 #

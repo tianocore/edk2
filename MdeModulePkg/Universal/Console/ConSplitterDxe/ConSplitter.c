@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2946,8 +2946,10 @@ ConsplitterSetConsoleOutMode (
     Status = TextOut->SetMode (TextOut, BaseMode);
     ASSERT(!EFI_ERROR(Status));
 
-    PcdSet32 (PcdConOutColumn, 80);
-    PcdSet32 (PcdConOutRow, 25);
+    Status = PcdSet32S (PcdConOutColumn, 80);
+    ASSERT(!EFI_ERROR(Status));
+    Status = PcdSet32S (PcdConOutRow, 25);
+    ASSERT(!EFI_ERROR(Status));
   }
 
   return ;

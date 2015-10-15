@@ -32,6 +32,7 @@ from Logger.ToolError import EDK1_INF_ERROR
 from Object.POM.CommonObject import IdentificationObject
 from Object.POM.CommonObject import CommonHeaderObject
 from Object.POM.CommonObject import MiscFileObject
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## DistributionPackageHeaderClass
 #
@@ -110,14 +111,17 @@ class DistributionPackageClass(object):
     # @param ModuleList:    A list of all modules
     #
     def GetDistributionPackage(self, WorkspaceDir, PackageList, ModuleList):
+        # Backup WorkspaceDir
+        Root = WorkspaceDir
+
         #
         # Get Packages
         #
         if PackageList:
             for PackageFile in PackageList:
-                PackageFileFullPath = \
-                os.path.normpath(os.path.join(WorkspaceDir, PackageFile))
-                DecObj = DecPomAlignment(PackageFileFullPath, WorkspaceDir, CheckMulDec = True)
+                PackageFileFullPath = mws.join(Root, PackageFile)
+                WorkspaceDir = mws.getWs(Root, PackageFile)
+                DecObj = DecPomAlignment(PackageFileFullPath, WorkspaceDir, CheckMulDec=True)
                 PackageObj = DecObj
                 #
                 # Parser inf file one bye one
@@ -140,8 +144,7 @@ class DistributionPackageClass(object):
                     # Inf class in InfPomAlignment.
                     #
                     try:
-                        ModuleObj = InfPomAlignment(Filename, WorkspaceDir, \
-                                                PackageObj.GetPackagePath())
+                        ModuleObj = InfPomAlignment(Filename, WorkspaceDir, PackageObj.GetPackagePath())
      
                         #
                         # Add module to package
@@ -168,11 +171,11 @@ class DistributionPackageClass(object):
         #
         if ModuleList:
             for ModuleFile in ModuleList:
-                ModuleFileFullPath = \
-                os.path.normpath(os.path.join(WorkspaceDir, ModuleFile))
+                ModuleFileFullPath = mws.join(Root, ModuleFile)
+                WorkspaceDir = mws.getWs(Root, ModuleFile)
+
                 try:
-                    ModuleObj = InfPomAlignment(ModuleFileFullPath, 
-                                                WorkspaceDir)
+                    ModuleObj = InfPomAlignment(ModuleFileFullPath, WorkspaceDir)
                     ModuleKey = (ModuleObj.GetGuid(), 
                                  ModuleObj.GetVersion(), 
                                  ModuleObj.GetName(), 
@@ -185,7 +188,10 @@ class DistributionPackageClass(object):
                                      ST.WRN_EDK1_INF_FOUND%ModuleFileFullPath, 
                                      ExtraData=ST.ERR_NOT_SUPPORTED_SA_MODULE)
                     else:
-                        raise                
+                        raise
+
+        # Recover WorkspaceDir
+        WorkspaceDir = Root
 
     ## Get all files included for a distribution package, except tool/misc of 
     # distribution level

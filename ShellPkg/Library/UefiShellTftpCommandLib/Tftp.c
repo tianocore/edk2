@@ -955,6 +955,7 @@ CheckPacket (
   UINTN             Index;
   UINTN             LastStep;
   UINTN             Step;
+  EFI_STATUS        Status;
 
   if ((NTOHS (Packet->OpCode)) != EFI_MTFTP4_OPCODE_DATA) {
     return EFI_SUCCESS;
@@ -984,7 +985,10 @@ CheckPacket (
 
   ShellPrintEx (-1, -1, L"%s", mTftpProgressDelete);
 
-  StrCpy (Progress, mTftpProgressFrame);
+  Status = StrCpyS (Progress, TFTP_PROGRESS_MESSAGE_SIZE, mTftpProgressFrame);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
   for (Index = 1; Index < Step; Index++) {
     Progress[Index] = L'=';
   }
