@@ -426,7 +426,10 @@ Done:
   //
   IsFirstBoot = PcdGetBool(PcdBootState);
   if (IsFirstBoot) {
-    PcdSetBool(PcdBootState, FALSE);
+    Status = PcdSetBoolS(PcdBootState, FALSE);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Set PcdBootState to FALSE failed.\n"));
+    }
   }
 
   return ReturnStatus;
