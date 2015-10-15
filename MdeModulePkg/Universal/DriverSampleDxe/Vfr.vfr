@@ -215,7 +215,7 @@ formset
                 option text = STRING_TOKEN(STR_BOOT_OPTION3), value = 3, flags = 0;
               suppressif ideqval MyIfrNVData.BootOrderLarge == 0;
                 option text = STRING_TOKEN(STR_BOOT_OPTION4), value = 4, flags = 0;
-              endif
+              endif;
       endlist;
 
       //
@@ -263,7 +263,7 @@ formset
       option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT;
       warningif prompt = STRING_TOKEN(STR_WARNING_POPUP), timeout = 5,
         ideqval MyIfrNVData.TestLateCheck == 0
-      endif
+      endif;
 
     endoneof;
 
@@ -276,7 +276,7 @@ formset
 
       inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
         ideqid MyIfrNVData.TestLateCheck == MyIfrNVData.TestLateCheck2
-      endif
+      endif;
 
     endoneof;
 
@@ -301,7 +301,7 @@ formset
               maxsize  = 40,
               inconsistentif prompt = STRING_TOKEN(STR_STRING_CHECK_ERROR_POPUP),
                 pushthis != stringref(STRING_TOKEN(STR_STRING_CHECK))
-              endif
+              endif;
     endstring;
 
     //
@@ -334,7 +334,7 @@ formset
               ideqid  MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8
               OR
               ideqvallist MyIfrNVData.HowOldAreYouInYearsManual == 1 3 5 7
-            endif
+            endif;
 
     endnumeric;
 
@@ -539,7 +539,7 @@ formset
           ideqval Date.Day == 31
           AND
           ideqvallist Date.Month == 2 4 6 9 11
-        endif
+        endif;
 
         //
         // If the day is 30 AND month is 2
@@ -548,7 +548,7 @@ formset
           ideqval Date.Day == 30
           AND
           ideqval Date.Month == 2
-        endif
+        endif;
 
         //
         // If the day is 29 AND month is 2 AND it year is NOT a leapyear
@@ -560,7 +560,7 @@ formset
           AND
           NOT
           ideqvallist Date.Year == 2004 2008 20012 20016 2020 2024 2028 2032 2036
-        endif
+        endif;
 
       enddate;
 
