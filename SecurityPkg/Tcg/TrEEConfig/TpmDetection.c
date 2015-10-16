@@ -1,7 +1,7 @@
 /** @file
   TPM1.2/dTPM2.0 auto detection.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -124,6 +124,7 @@ DetectTpmDevice (
   }
 
   // NO initialization needed again.
-  PcdSet8 (PcdTpmInitializationPolicy, 0);
+  Status = PcdSet8S (PcdTpmInitializationPolicy, 0);
+  ASSERT_EFI_ERROR (Status);
   return TPM_DEVICE_1_2;
 }
