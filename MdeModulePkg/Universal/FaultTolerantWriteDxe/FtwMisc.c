@@ -1280,7 +1280,8 @@ InitFtwProtocol (
     //
     if (IsValidWorkSpace (FtwDevice->FtwWorkSpaceHeader)) {
       Status = FlushSpareBlockToWorkingBlock (FtwDevice);
-      DEBUG ((EFI_D_ERROR, "Ftw: Restart working block update in InitFtwProtocol() - %r\n", Status));
+      DEBUG ((EFI_D_INFO, "Ftw: Restart working block update in %a() - %r\n",
+        __FUNCTION__, Status));
       FtwAbort (&FtwDevice->FtwInstance);
       //
       // Refresh work space.
@@ -1288,7 +1289,8 @@ InitFtwProtocol (
       Status = WorkSpaceRefresh (FtwDevice);
       ASSERT_EFI_ERROR (Status);
     } else {
-      DEBUG ((EFI_D_ERROR, "Ftw: Both are invalid, init workspace\n"));
+      DEBUG ((EFI_D_INFO,
+        "Ftw: Both working and spare blocks are invalid, init workspace\n"));
       //
       // If both are invalid, then initialize work space.
       //

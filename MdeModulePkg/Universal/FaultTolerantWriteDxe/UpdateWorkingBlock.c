@@ -98,7 +98,7 @@ IsValidWorkSpace (
     return TRUE;
   }
 
-  DEBUG ((EFI_D_ERROR, "Ftw: Work block header check error\n"));
+  DEBUG ((EFI_D_INFO, "Ftw: Work block header check mismatch\n"));
   return FALSE;
 }
 
