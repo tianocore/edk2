@@ -124,6 +124,7 @@ DetectTpmDevice (
   }
 
   // NO initialization needed again.
-  PcdSet8 (PcdTpmInitializationPolicy, 0);
+  Status = PcdSet8S (PcdTpmInitializationPolicy, 0);
+  ASSERT_EFI_ERROR (Status);
   return TPM_DEVICE_1_2;
 }

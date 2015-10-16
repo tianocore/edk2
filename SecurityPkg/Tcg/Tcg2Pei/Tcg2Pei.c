@@ -410,7 +410,8 @@ SetTpm2HashMask (
       }
     }
   }
-  PcdSet32 (PcdTpm2HashMask, ActivePcrBanks);
+  Status = PcdSet32S (PcdTpm2HashMask, ActivePcrBanks);
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**

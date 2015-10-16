@@ -132,7 +132,8 @@ TrEEConfigPeimEntryPoint (
   for (Index = 0; Index < sizeof(mTpmInstanceId)/sizeof(mTpmInstanceId[0]); Index++) {
     if (TpmDevice == mTpmInstanceId[Index].TpmDevice) {
       Size = sizeof(mTpmInstanceId[Index].TpmInstanceGuid);
-      PcdSetPtr (PcdTpmInstanceGuid, &Size, &mTpmInstanceId[Index].TpmInstanceGuid);
+      Status = PcdSetPtrS (PcdTpmInstanceGuid, &Size, &mTpmInstanceId[Index].TpmInstanceGuid);
+      ASSERT_EFI_ERROR (Status);
       DEBUG ((EFI_D_INFO, "TpmDevice PCD: %g\n", &mTpmInstanceId[Index].TpmInstanceGuid));
       break;
     }

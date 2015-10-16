@@ -205,6 +205,7 @@ RegisterHashInterfaceLib (
   UINTN              Index;
   UINT32             HashMask;
   UINT32             BiosSupportedHashMask;
+  EFI_STATUS         Status;
 
   //
   // Check allow
@@ -218,7 +219,8 @@ RegisterHashInterfaceLib (
     return EFI_OUT_OF_RESOURCES;
   }
   BiosSupportedHashMask = PcdGet32 (PcdTcg2HashAlgorithmBitmap);
-  PcdSet32 (PcdTcg2HashAlgorithmBitmap, BiosSupportedHashMask | HashMask);
+  Status = PcdSet32S (PcdTcg2HashAlgorithmBitmap, BiosSupportedHashMask | HashMask);
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Check duplication
