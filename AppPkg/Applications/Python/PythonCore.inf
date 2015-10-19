@@ -1,6 +1,7 @@
 ## @file
 # PythonCore.inf
 #
+#  Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
 #  Copyright (c) 2011-2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -164,7 +165,7 @@
   Python-$(PYTHON_VERSION)/Modules/_functoolsmodule.c
   Python-$(PYTHON_VERSION)/Modules/gcmodule.c
   Python-$(PYTHON_VERSION)/Modules/getbuildinfo.c
-  Python-$(PYTHON_VERSION)/Modules/main.c
+  PyMod-$(PYTHON_VERSION)/Modules/main.c
   Python-$(PYTHON_VERSION)/Modules/python.c
 
   # Optional Modules -- See Python/Efi/config.c
