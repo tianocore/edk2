@@ -643,5 +643,18 @@ ResetApStackless (
   IN UINT32 ProcessorId
   );
 
+/**
+  A minimal wrapper function that allows MtrrSetAllMtrrs() to be passed to
+  EFI_MP_SERVICES_PROTOCOL.StartupAllAPs() as Procedure.
+
+  @param[in] Buffer  Pointer to an MTRR_SETTINGS object, to be passed to
+                     MtrrSetAllMtrrs().
+**/
+VOID
+EFIAPI
+SetMtrrsFromBuffer (
+  IN VOID *Buffer
+  );
+
 #endif // _CPU_MP_H_
 
