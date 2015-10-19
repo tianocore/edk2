@@ -15,6 +15,7 @@
 
 **/
 
+#include <Register/Cpuid.h>
 #include <Register/LocalApic.h>
 
 #include <Library/BaseLib.h>
