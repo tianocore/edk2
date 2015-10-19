@@ -68,6 +68,15 @@ DefinitionBlock("DsdtTable.aml", "DSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_O
               Memory32Fixed(ReadWrite, 0x1A000000, 0x1000)
               Interrupt(ResourceConsumer, Level, ActiveHigh, Exclusive) { 192 }
       })
+      Name(_DSD, Package() {
+                   ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
+                       Package() {
+                               Package(2) {"phy-mode", "mii"},
+                               Package(2) {"reg-io-width", 4 },
+                               Package(2) {"smsc,irq-active-high",1},
+                               Package(2) {"smsc,irq-push-pull",1}
+                      }
+      }) // _DSD()
     }
 
     // UART PL011
@@ -82,16 +91,17 @@ DefinitionBlock("DsdtTable.aml", "DSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_O
     }
 
     //
-    // USB Host Controller
+    // USB EHCI Host Controller
     //
     Device(USB0){
         Name(_HID, "ARMH0D20")
         Name(_CID, "PNP0D20")
         Name(_UID, 2)
+        Name(_CCA, 0) //EHCI on this platform is not coherent!
 
         Method(_CRS, 0x0, Serialized){
             Name(RBUF, ResourceTemplate(){
-                Memory32Fixed(ReadWrite, 0x7FFC0000, 0x000000B0)
+                Memory32Fixed(ReadWrite, 0x7FFC0000, 0x10000)
                 Interrupt(ResourceConsumer, Level, ActiveHigh, Exclusive) {149}  // INT ID=149 GIC IRQ ID=117 for Juno SoC USB EHCI Controller
             })
             Return(RBUF)

@@ -51,6 +51,7 @@ DefinitionBlock("SsdtPci.aml", "SSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_OEM
   		Name(_CID, EISAID("PNP0A03")) // Compatible PCI Root Bridge
   		Name(_SEG, Zero) // PCI Segment Group number
   		Name(_BBN, Zero) // PCI Base Bus Number
+  		Name(_CCA, 1)    // Initially mark the PCI coherent (for JunoR1)
 
         // Root Complex 0
         Device (RP0) {
