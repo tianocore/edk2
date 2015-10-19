@@ -41,11 +41,22 @@
   ##  @libraryclass  Provides platform specific initialization functions in the SEC phase.
   ##
   PlatformSecLib|Include/Library/PlatformSecLib.h
-
   
+  ##  @libraryclass  Public include file for the SMM CPU Platform Hook Library.
+  ##
+  SmmCpuPlatformHookLib|Include/Library/SmmCpuPlatformHookLib.h
+  
+  ##  @libraryclass  Provides the CPU specific programming for PiSmmCpuDxeSmm module.
+  ##
+  SmmCpuFeaturesLib|Include/Library/SmmCpuFeaturesLib.h
+
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
 
+[Protocols]
+  ## Include/Protocol/SmmCpuService.h
+  gEfiSmmCpuServiceProtocolGuid  = { 0x1d202cab, 0xc8ab, 0x4d5c, { 0x94, 0xf7, 0x3c, 0xfc, 0xc0, 0xd3, 0xd3, 0x35 }}
+  
 #
 # [Error.gUefiCpuPkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
