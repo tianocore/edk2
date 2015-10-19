@@ -357,22 +357,28 @@ CountProcessorNumber (
   // Store BSP's MTRR setting
   //
   MtrrGetAllMtrrs (&PeiCpuMpData->MtrrTable);
+
   //
-  // Send broadcast IPI to APs to wakeup APs
+  // Only perform AP detection if PcdCpuMaxLogicalProcessorNumber is greater than 1
   //
-  PeiCpuMpData->InitFlag = 1;
-  WakeUpAP (PeiCpuMpData, TRUE, 0, NULL, NULL);
-  //
-  // Wait for AP task to complete and then exit.
-  //
-  MicroSecondDelay (PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
-  PeiCpuMpData->InitFlag  = 0;
-  PeiCpuMpData->CpuCount += (UINT32) PeiCpuMpData->MpCpuExchangeInfo->NumApsExecuting;
-  ASSERT (PeiCpuMpData->CpuCount <= PcdGet32(PcdCpuMaxLogicalProcessorNumber));
-  //
-  // Sort BSP/Aps by CPU APIC ID in ascending order
-  //
-  SortApicId (PeiCpuMpData);
+  if (PcdGet32 (PcdCpuMaxLogicalProcessorNumber) > 1) {
+    //
+    // Send broadcast IPI to APs to wakeup APs
+    //
+    PeiCpuMpData->InitFlag = 1;
+    WakeUpAP (PeiCpuMpData, TRUE, 0, NULL, NULL);
+    //
+    // Wait for AP task to complete and then exit.
+    //
+    MicroSecondDelay (PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
+    PeiCpuMpData->InitFlag = 0;
+    PeiCpuMpData->CpuCount += (UINT32)PeiCpuMpData->MpCpuExchangeInfo->NumApsExecuting;
+    ASSERT (PeiCpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+    //
+    // Sort BSP/Aps by CPU APIC ID in ascending order
+    //
+    SortApicId (PeiCpuMpData);
+  }
 
   DEBUG ((EFI_D_INFO, "CpuMpPei: Find %d processors in system.\n", PeiCpuMpData->CpuCount));
   return PeiCpuMpData->CpuCount;
