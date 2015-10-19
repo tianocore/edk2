@@ -53,6 +53,8 @@
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
+  SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
+
 
 [LibraryClasses.common.PEIM]
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
@@ -72,6 +74,7 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
 
 #
 # Drivers/Libraries within this package
@@ -93,5 +96,7 @@
   UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
+  UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
+  UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 
