@@ -1143,7 +1143,8 @@ SmbiosCreateTable (
     // If new SMBIOS table size exceeds the previous allocated page, 
     // it is time to re-allocate memory (below 4GB).
     // 
-    DEBUG ((EFI_D_ERROR, "SmbiosCreateTable() re-allocate SMBIOS 32-bit table\n"));
+    DEBUG ((EFI_D_INFO, "%a() re-allocate SMBIOS 32-bit table\n",
+      __FUNCTION__));
     if (EntryPointStructure->TableAddress != 0) {
       //
       // Free the previous allocated page
@@ -1311,7 +1312,8 @@ SmbiosCreate64BitTable (
     // If new SMBIOS table size exceeds the previous allocated page, 
     // it is time to re-allocate memory at anywhere.
     //
-    DEBUG ((EFI_D_ERROR, "SmbiosCreate64BitTable() re-allocate SMBIOS 64-bit table\n"));
+    DEBUG ((EFI_D_INFO, "%a() re-allocate SMBIOS 64-bit table\n",
+      __FUNCTION__));
     if (Smbios30EntryPointStructure->TableAddress != 0) {
       //
       // Free the previous allocated page

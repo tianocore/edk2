@@ -1,7 +1,7 @@
 /** @file
   Main SEC phase code.  Transitions to PEI.
 
-  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -28,6 +28,7 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PeCoffExtraActionLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
+#include <Library/LocalApicLib.h>
 
 #include <Ppi/TemporaryRamSupport.h>
 
@@ -767,6 +768,14 @@ SecCoreStartupWithStack (
   //
   IoWrite8 (0x21, 0xff);
   IoWrite8 (0xA1, 0xff);
+
+  //
+  // Initialize Local APIC Timer hardware and disable Local APIC Timer
+  // interrupts before initializing the Debug Agent and the debug timer is
+  // enabled.
+  //
+  InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
+  DisableApicTimerInterrupt ();
   
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.

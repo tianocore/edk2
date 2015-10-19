@@ -843,6 +843,37 @@ VirtioBlkUninit (
 
 /**
 
+  Event notification function enqueued by ExitBootServices().
+
+  @param[in] Event    Event whose notification function is being invoked.
+
+  @param[in] Context  Pointer to the VBLK_DEV structure.
+
+**/
+
+STATIC
+VOID
+EFIAPI
+VirtioBlkExitBoot (
+  IN  EFI_EVENT Event,
+  IN  VOID      *Context
+  )
+{
+  VBLK_DEV *Dev;
+
+  //
+  // Reset the device. This causes the hypervisor to forget about the virtio
+  // ring.
+  //
+  // We allocated said ring in EfiBootServicesData type memory, and code
+  // executing after ExitBootServices() is permitted to overwrite it.
+  //
+  Dev = Context;
+  Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
+}
+
+/**
+
   After we've pronounced support for a specific device in
   DriverBindingSupported(), we start managing said device (passed in by the
   Driver Exeuction Environment) with the following service.
@@ -901,6 +932,12 @@ VirtioBlkDriverBindingStart (
     goto CloseVirtIo;
   }
 
+  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
+                  &VirtioBlkExitBoot, Dev, &Dev->ExitBoot);
+  if (EFI_ERROR (Status)) {
+    goto UninitDev;
+  }
+
   //
   // Setup complete, attempt to export the driver instance's BlockIo interface.
   //
@@ -909,10 +946,13 @@ VirtioBlkDriverBindingStart (
                   &gEfiBlockIoProtocolGuid, EFI_NATIVE_INTERFACE,
                   &Dev->BlockIo);
   if (EFI_ERROR (Status)) {
-    goto UninitDev;
+    goto CloseExitBoot;
   }
 
   return EFI_SUCCESS;
+
+CloseExitBoot:
+  gBS->CloseEvent (Dev->ExitBoot);
 
 UninitDev:
   VirtioBlkUninit (Dev);
@@ -986,6 +1026,8 @@ VirtioBlkDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  gBS->CloseEvent (Dev->ExitBoot);
 
   VirtioBlkUninit (Dev);
 

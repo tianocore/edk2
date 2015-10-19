@@ -720,7 +720,7 @@ FtwRestart (
     return EFI_ABORTED;
   }
 
-  DEBUG ((EFI_D_ERROR, "Ftw: Restart() success \n"));
+  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
   return EFI_SUCCESS;
 }
 
@@ -775,7 +775,7 @@ FtwAbort (
 
   FtwDevice->FtwLastWriteHeader->Complete = FTW_VALID_STATE;
 
-  DEBUG ((EFI_D_ERROR, "Ftw: Abort() success \n"));
+  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
   return EFI_SUCCESS;
 }
 
@@ -886,7 +886,7 @@ FtwGetLastWrite (
     Status = EFI_SUCCESS;
   }
 
-  DEBUG ((EFI_D_ERROR, "Ftw: GetLasetWrite() success\n"));
+  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
 
   return Status;
 }

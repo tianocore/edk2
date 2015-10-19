@@ -2902,9 +2902,14 @@ EfiPxeLoadFile (
   //
   if (Status == EFI_SUCCESS) {
     //
+    // The DHCP4 can have only one configured child instance so we need to stop
+    // reset the DHCP4 child before we return. Otherwise the other programs which 
+    // also need to use DHCP4 will be impacted.
     // The functionality of PXE Base Code protocol will not be stopped,
     // when downloading is successfully.
     //
+    Private->Dhcp4->Stop (Private->Dhcp4);
+    Private->Dhcp4->Configure (Private->Dhcp4, NULL);
     return EFI_SUCCESS;
 
   } else if (Status == EFI_BUFFER_TOO_SMALL) {
