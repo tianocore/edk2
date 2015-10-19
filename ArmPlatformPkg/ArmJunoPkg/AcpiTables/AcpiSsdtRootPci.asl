@@ -66,7 +66,7 @@ DefinitionBlock("SsdtPci.aml", "SSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_OEM
 		})
         // Root complex resources
 		Method (_CRS, 0, Serialized) {
-  			Name (RBUF, ResourceTemplate () {
+			Name (RBUF, ResourceTemplate () {
 				WordBusNumber ( // Bus numbers assigned to this root
 					ResourceProducer,
 					MinFixed, MaxFixed, PosDecode,
@@ -87,7 +87,7 @@ DefinitionBlock("SsdtPci.aml", "SSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_OEM
 					0x00000000, 							// Translate
 					0x08000000								// Length
 				)
-  		
+
 				QWordMemory ( // 64-bit BAR Windows
 					ResourceProducer, PosDecode,
 					MinFixed, MaxFixed,
@@ -112,19 +112,19 @@ DefinitionBlock("SsdtPci.aml", "SSDT", 1, "ARMLTD", "ARM-JUNO", EFI_ACPI_ARM_OEM
 					0x00800000  							// Length
 				)
 			}) // Name(RBUF)
-			
+
 			Return (RBUF)
 		} // Method(_CRS)
 
 		//
 		// OS Control Handoff
 		//
-  		Name(SUPP, Zero) // PCI _OSC Support Field value
-  		Name(CTRL, Zero) // PCI _OSC Control Field value
+		Name(SUPP, Zero) // PCI _OSC Support Field value
+		Name(CTRL, Zero) // PCI _OSC Control Field value
 
-  		/*
-     	  See [1] 6.2.10, [2] 4.5
-   		*/
+		/*
+	  See [1] 6.2.10, [2] 4.5
+		*/
 		Method(_OSC,4) {
 			// Check for proper UUID
 			If(LEqual(Arg0,ToUUID("33DB4D5B-1FF7-401C-9657-7441C03DD766"))) {
