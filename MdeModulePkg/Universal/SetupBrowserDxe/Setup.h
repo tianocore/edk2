@@ -538,7 +538,10 @@ typedef struct {
   EFI_GUID                 FormSetGuid;
   EFI_FORM_ID              FormId;
   UI_MENU_SELECTION        *Selection;
-
+  FORM_BROWSER_FORMSET     *SystemLevelFormSet;
+  EFI_QUESTION_ID          CurFakeQestId;
+  BOOLEAN                  HiiPackageListUpdated;
+  BOOLEAN                  FinishRetrieveCall;
   LIST_ENTRY           FormHistoryList;
 } BROWSER_CONTEXT;
 
@@ -586,6 +589,9 @@ extern SETUP_DRIVER_PRIVATE_DATA mPrivateData;
 extern CHAR16            *gEmptyString;
 
 extern UI_MENU_SELECTION  *gCurrentSelection;
+extern BOOLEAN            mHiiPackageListUpdated;
+extern UINT16             mCurFakeQestId;
+extern BOOLEAN            mFinishRetrieveCall;
 
 //
 // Global Procedure Defines
