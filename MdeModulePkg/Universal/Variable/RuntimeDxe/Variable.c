@@ -17,6 +17,7 @@
   integer overflow. It should also check attribute to avoid authentication bypass.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,6 +36,11 @@ VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 /// Define a memory cache that improves the search performance for a variable.
 ///
 VARIABLE_STORE_HEADER  *mNvVariableCache      = NULL;
+
+///
+/// Memory cache of Fv Header.
+///
+EFI_FIRMWARE_VOLUME_HEADER *mNvFvHeaderCache  = NULL;
 
 ///
 /// The memory entry used for variable statistics data.
@@ -333,7 +339,7 @@ UpdateVariableStore (
     return EFI_INVALID_PARAMETER;
   }
 
-  for (PtrBlockMapEntry = FwVolHeader->BlockMap; PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
+  for (PtrBlockMapEntry = mNvFvHeaderCache->BlockMap; PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
     for (BlockIndex2 = 0; BlockIndex2 < PtrBlockMapEntry->NumBlocks; BlockIndex2++) {
       //
       // Check to see if the Variable Writes are spanning through multiple
@@ -2209,7 +2215,8 @@ UpdateVariable (
     VariableStoreHeader  = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
     Variable = &NvVariable;
     Variable->StartPtr = GetStartPointer (VariableStoreHeader);
-    Variable->EndPtr   = GetEndPointer (VariableStoreHeader);
+    Variable->EndPtr   = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->EndPtr - (UINTN)CacheVariable->StartPtr));
+
     Variable->CurrPtr  = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->CurrPtr - (UINTN)CacheVariable->StartPtr));
     if (CacheVariable->InDeletedTransitionPtr != NULL) {
       Variable->InDeletedTransitionPtr = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->InDeletedTransitionPtr - (UINTN)CacheVariable->StartPtr));
@@ -2247,7 +2254,7 @@ UpdateVariable (
       //
       // Only variable that have NV attributes can be updated/deleted in Runtime.
       //
-      if ((Variable->CurrPtr->Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
+      if ((CacheVariable->CurrPtr->Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -2255,7 +2262,7 @@ UpdateVariable (
       //
       // Only variable that have RT attributes can be updated/deleted in Runtime.
       //
-      if ((Variable->CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) {
+      if ((CacheVariable->CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -2273,7 +2280,7 @@ UpdateVariable (
         // Both ADDED and IN_DELETED_TRANSITION variable are present,
         // set IN_DELETED_TRANSITION one to DELETED state first.
         //
-        State = Variable->InDeletedTransitionPtr->State;
+        State = CacheVariable->InDeletedTransitionPtr->State;
         State &= VAR_DELETED;
         Status = UpdateVariableStore (
                    &mVariableModuleGlobal->VariableGlobal,
@@ -2294,7 +2301,7 @@ UpdateVariable (
         }
       }
 
-      State = Variable->CurrPtr->State;
+      State = CacheVariable->CurrPtr->State;
       State &= VAR_DELETED;
 
       Status = UpdateVariableStore (
@@ -2319,8 +2326,8 @@ UpdateVariable (
     // If the variable is marked valid, and the same data has been passed in,
     // then return to the caller immediately.
     //
-    if (DataSizeOfVariable (Variable->CurrPtr) == DataSize &&
-        (CompareMem (Data, GetVariableDataPtr (Variable->CurrPtr), DataSize) == 0) &&
+    if (DataSizeOfVariable (CacheVariable->CurrPtr) == DataSize &&
+        (CompareMem (Data, GetVariableDataPtr (CacheVariable->CurrPtr), DataSize) == 0) &&
         ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) &&
         (TimeStamp == NULL)) {
       //
@@ -2329,8 +2336,8 @@ UpdateVariable (
       UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, TRUE, FALSE, FALSE);
       Status = EFI_SUCCESS;
       goto Done;
-    } else if ((Variable->CurrPtr->State == VAR_ADDED) ||
-               (Variable->CurrPtr->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION))) {
+    } else if ((CacheVariable->CurrPtr->State == VAR_ADDED) ||
+               (CacheVariable->CurrPtr->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION))) {
 
       //
       // EFI_VARIABLE_APPEND_WRITE attribute only effects for existing variable.
@@ -2340,9 +2347,9 @@ UpdateVariable (
         // NOTE: From 0 to DataOffset of NextVariable is reserved for Variable Header and Name.
         // From DataOffset of NextVariable is to save the existing variable data.
         //
-        DataOffset = GetVariableDataOffset (Variable->CurrPtr);
+        DataOffset = GetVariableDataOffset (CacheVariable->CurrPtr);
         BufferForMerge = (UINT8 *) ((UINTN) NextVariable + DataOffset);
-        CopyMem (BufferForMerge, (UINT8 *) ((UINTN) Variable->CurrPtr + DataOffset), DataSizeOfVariable (Variable->CurrPtr));
+        CopyMem (BufferForMerge, (UINT8 *) ((UINTN) CacheVariable->CurrPtr + DataOffset), DataSizeOfVariable (CacheVariable->CurrPtr));
 
         //
         // Set Max Common/Auth Variable Data Size as default MaxDataSize.
@@ -2361,15 +2368,15 @@ UpdateVariable (
           MaxDataSize = PcdGet32 (PcdMaxHardwareErrorVariableSize) - DataOffset;
         }
 
-        if (DataSizeOfVariable (Variable->CurrPtr) + DataSize > MaxDataSize) {
+        if (DataSizeOfVariable (CacheVariable->CurrPtr) + DataSize > MaxDataSize) {
           //
           // Existing data size + new data size exceed maximum variable size limitation.
           //
           Status = EFI_INVALID_PARAMETER;
           goto Done;
         }
-        CopyMem ((UINT8*) ((UINTN) BufferForMerge + DataSizeOfVariable (Variable->CurrPtr)), Data, DataSize);
-        MergedBufSize = DataSizeOfVariable (Variable->CurrPtr) + DataSize;
+        CopyMem ((UINT8*) ((UINTN) BufferForMerge + DataSizeOfVariable (CacheVariable->CurrPtr)), Data, DataSize);
+        MergedBufSize = DataSizeOfVariable (CacheVariable->CurrPtr) + DataSize;
 
         //
         // BufferForMerge(from DataOffset of NextVariable) has included the merged existing and new data.
@@ -2382,7 +2389,7 @@ UpdateVariable (
       //
       // Mark the old variable as in delete transition.
       //
-      State = Variable->CurrPtr->State;
+      State = CacheVariable->CurrPtr->State;
       State &= VAR_IN_DELETED_TRANSITION;
 
       Status = UpdateVariableStore (
@@ -2456,7 +2463,7 @@ UpdateVariable (
         // with the variable, we need associate the new timestamp with the updated value.
         //
         if (Variable->CurrPtr != NULL) {
-          if (VariableCompareTimeStampInternal (&(((AUTHENTICATED_VARIABLE_HEADER *) Variable->CurrPtr)->TimeStamp), TimeStamp)) {
+          if (VariableCompareTimeStampInternal (&(((AUTHENTICATED_VARIABLE_HEADER *) CacheVariable->CurrPtr)->TimeStamp), TimeStamp)) {
             CopyMem (&AuthVariable->TimeStamp, TimeStamp, sizeof (EFI_TIME));
           }
         }
@@ -2712,7 +2719,7 @@ UpdateVariable (
       // Both ADDED and IN_DELETED_TRANSITION old variable are present,
       // set IN_DELETED_TRANSITION one to DELETED state first.
       //
-      State = Variable->InDeletedTransitionPtr->State;
+      State = CacheVariable->InDeletedTransitionPtr->State;
       State &= VAR_DELETED;
       Status = UpdateVariableStore (
                  &mVariableModuleGlobal->VariableGlobal,
@@ -3679,10 +3686,13 @@ InitNonVolatileVariableStore (
   VariableStoreBase = (EFI_PHYSICAL_ADDRESS) ((UINTN) FvHeader + FvHeader->HeaderLength);
   VariableStoreLength = (UINT64) (NvStorageSize - FvHeader->HeaderLength);
 
+  mNvFvHeaderCache = FvHeader;
   mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
   mNvVariableCache = (VARIABLE_STORE_HEADER *) (UINTN) VariableStoreBase;
   if (GetVariableStoreStatus (mNvVariableCache) != EfiValid) {
     FreePool (NvStorageData);
+    mNvFvHeaderCache = NULL;
+    mNvVariableCache = NULL;
     DEBUG((EFI_D_ERROR, "Variable Store header is corrupted\n"));
     return EFI_VOLUME_CORRUPTED;
   }
@@ -3858,7 +3868,6 @@ VariableWriteServiceInitialize (
   )
 {
   EFI_STATUS                      Status;
-  VARIABLE_STORE_HEADER           *VariableStoreHeader;
   UINTN                           Index;
   UINT8                           Data;
   EFI_PHYSICAL_ADDRESS            VariableStoreBase;
@@ -3871,18 +3880,17 @@ VariableWriteServiceInitialize (
   if (NvStorageBase == 0) {
     NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
   }
-  VariableStoreBase = NvStorageBase + (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(NvStorageBase))->HeaderLength);
+  VariableStoreBase = NvStorageBase + (mNvFvHeaderCache->HeaderLength);
 
   //
   // Let NonVolatileVariableBase point to flash variable store base directly after FTW ready.
   //
   mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
-  VariableStoreHeader = (VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase;
 
   //
   // Check if the free area is really free.
   //
-  for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < VariableStoreHeader->Size; Index++) {
+  for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < mNvVariableCache->Size; Index++) {
     Data = ((UINT8 *) mNvVariableCache)[Index];
     if (Data != 0xff) {
       //
