@@ -1276,6 +1276,8 @@ ShellExecute (
   name. If the DeviceName is not NULL, it returns the current directory name
   on specified drive.
 
+  Note that the current directory string should exclude the tailing backslash character.
+
   @param DeviceName             the name of the drive to get directory on
 
   @retval NULL                  the directory does not exist
@@ -1708,13 +1710,14 @@ ShellFindFilePath (
 
   Path = ShellGetEnvironmentVariable(L"cwd");
   if (Path != NULL) {
-    Size = StrSize(Path);
+    Size = StrSize(Path) + sizeof(CHAR16);
     Size += StrSize(FileName);
     TestPath = AllocateZeroPool(Size);
     if (TestPath == NULL) {
       return (NULL);
     }
     StrCpyS(TestPath, Size/sizeof(CHAR16), Path);
+    StrCatS(TestPath, Size/sizeof(CHAR16), L"\\");
     StrCatS(TestPath, Size/sizeof(CHAR16), FileName);
     Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
     if (!EFI_ERROR(Status)){

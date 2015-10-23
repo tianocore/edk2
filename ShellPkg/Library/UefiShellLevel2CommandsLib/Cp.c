@@ -360,7 +360,7 @@ ValidateAndCopyFiles(
 
     NewSize =  StrSize(CleanFilePathStr);
     NewSize += StrSize(Node->FullName);
-    NewSize += (Cwd == NULL)? 0 : StrSize(Cwd);
+    NewSize += (Cwd == NULL)? 0 : (StrSize(Cwd) + sizeof(CHAR16));
     if (NewSize > PathSize) {
       PathSize = NewSize;
     }
@@ -428,6 +428,7 @@ ValidateAndCopyFiles(
         //
         if (Cwd != NULL) {
           StrCpyS(DestPath, PathSize / sizeof(CHAR16), Cwd);
+          StrCatS(DestPath, PathSize / sizeof(CHAR16), L"\\");
         } else {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);  
           FreePool (CleanFilePathStr);
@@ -456,6 +457,7 @@ ValidateAndCopyFiles(
          //
         if (Cwd != NULL) {
           StrCpyS(DestPath, PathSize/sizeof(CHAR16), Cwd);
+          StrCatS(DestPath, PathSize/sizeof(CHAR16), L"\\");
         } else {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp",  CleanFilePathStr); 
           FreePool(CleanFilePathStr);
@@ -467,6 +469,7 @@ ValidateAndCopyFiles(
       } else if (StrStr(CleanFilePathStr, L":") == NULL) {
         if (Cwd != NULL) {
           StrCpyS(DestPath, PathSize/sizeof(CHAR16), Cwd);
+          StrCatS(DestPath, PathSize/sizeof(CHAR16), L"\\");
         } else {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);  
           FreePool(CleanFilePathStr);
@@ -644,6 +647,7 @@ ShellCommandRunCp (
   BOOLEAN             SilentMode;
   BOOLEAN             RecursiveMode;
   CONST CHAR16        *Cwd;
+  CHAR16              *FullCwd;
 
   ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
@@ -712,7 +716,11 @@ ShellCommandRunCp (
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue(Package, 1));  
             ShellStatus = SHELL_NOT_FOUND;
           } else  {
-            ShellStatus = ProcessValidateAndCopyFiles(FileList, Cwd, SilentMode, RecursiveMode);
+            FullCwd = AllocateZeroPool(StrSize(Cwd) + sizeof(CHAR16));
+            ASSERT (FullCwd != NULL);
+            StrCpyS(FullCwd, StrSize(Cwd)/sizeof(CHAR16)+1, Cwd);
+            ShellStatus = ProcessValidateAndCopyFiles(FileList, FullCwd, SilentMode, RecursiveMode);
+            FreePool(FullCwd);
           }
         }
 
