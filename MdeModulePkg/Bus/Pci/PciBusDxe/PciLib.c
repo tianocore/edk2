@@ -188,19 +188,21 @@ DumpBridgeResource (
       BridgeResource->PciDev->PciBar[BridgeResource->Bar].BaseAddress,
       BridgeResource->Length, BridgeResource->Alignment
       ));
-    for ( Link = BridgeResource->ChildList.ForwardLink
-        ; Link != &BridgeResource->ChildList
-        ; Link = Link->ForwardLink
+    for ( Link = GetFirstNode (&BridgeResource->ChildList)
+        ; !IsNull (&BridgeResource->ChildList, Link)
+        ; Link = GetNextNode (&BridgeResource->ChildList, Link)
         ) {
       Resource = RESOURCE_NODE_FROM_LINK (Link);
       if (Resource->ResourceUsage == PciResUsageTypical) {
         Bar = Resource->Virtual ? Resource->PciDev->VfPciBar : Resource->PciDev->PciBar;
         DEBUG ((
-          EFI_D_INFO, " Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx;\tOwner = %s ",
+          EFI_D_INFO, "   Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx;\tOwner = %s [%02x|%02x|%02x:",
           Bar[Resource->Bar].BaseAddress, Resource->Length, Resource->Alignment,
           IS_PCI_BRIDGE (&Resource->PciDev->Pci)     ? L"PPB" :
           IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci) ? L"P2C" :
-                                                       L"PCI"
+                                                       L"PCI",
+          Resource->PciDev->BusNumber, Resource->PciDev->DeviceNumber,
+          Resource->PciDev->FunctionNumber
           ));
 
         if ((!IS_PCI_BRIDGE (&Resource->PciDev->Pci) && !IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci)) ||
@@ -210,24 +212,20 @@ DumpBridgeResource (
           //
           // The resource requirement comes from the device itself.
           //
-          DEBUG ((
-            EFI_D_INFO, " [%02x|%02x|%02x:%02x]\n",
-            Resource->PciDev->BusNumber, Resource->PciDev->DeviceNumber,
-            Resource->PciDev->FunctionNumber, Bar[Resource->Bar].Offset
-            ));
+          DEBUG ((EFI_D_INFO, "%02x]", Bar[Resource->Bar].Offset));
         } else {
           //
           // The resource requirement comes from the subordinate devices.
           //
-          DEBUG ((
-            EFI_D_INFO, " [%02x|%02x|%02x:**]\n",
-            Resource->PciDev->BusNumber, Resource->PciDev->DeviceNumber,
-            Resource->PciDev->FunctionNumber
-            ));
+          DEBUG ((EFI_D_INFO, "**]"));
         }
       } else {
-        DEBUG ((EFI_D_INFO, " Padding:Length = 0x%lx;\tAlignment = 0x%lx\n", Resource->Length, Resource->Alignment));
+        DEBUG ((EFI_D_INFO, "   Base = Padding;\tLength = 0x%lx;\tAlignment = 0x%lx", Resource->Length, Resource->Alignment));
       }
+      if (BridgeResource->ResType != Resource->ResType) {
+        DEBUG ((EFI_D_INFO, "; Type = %s", mBarTypeStr[MIN (Resource->ResType, PciBarTypeMaxType)]));
+      }
+      DEBUG ((EFI_D_INFO, "\n"));
     }
   }
 }
@@ -235,63 +233,61 @@ DumpBridgeResource (
 /**
   Find the corresponding resource node for the Device in child list of BridgeResource.
   
-  @param[in] Device         Pointer to PCI_IO_DEVICE.
-  @param[in] BridgeResource Pointer to PCI_RESOURCE_NODE.
+  @param[in]  Device          Pointer to PCI_IO_DEVICE.
+  @param[in]  BridgeResource  Pointer to PCI_RESOURCE_NODE.
+  @param[out] DeviceResources Pointer to a buffer to receive resources for the Device.
   
-  @return !NULL  The corresponding resource node for the Device.
-  @return NULL   No corresponding resource node for the Device.
+  @return Count of the resource descriptors returned.
 **/
-PCI_RESOURCE_NODE *
+UINTN
 FindResourceNode (
-  IN PCI_IO_DEVICE     *Device,
-  IN PCI_RESOURCE_NODE *BridgeResource
+  IN  PCI_IO_DEVICE     *Device,
+  IN  PCI_RESOURCE_NODE *BridgeResource,
+  OUT PCI_RESOURCE_NODE **DeviceResources OPTIONAL
   )
 {
   LIST_ENTRY               *Link;
   PCI_RESOURCE_NODE        *Resource;
+  UINTN                    Count;
 
+  Count = 0;
   for ( Link = BridgeResource->ChildList.ForwardLink
       ; Link != &BridgeResource->ChildList
       ; Link = Link->ForwardLink
       ) {
     Resource = RESOURCE_NODE_FROM_LINK (Link);
     if (Resource->PciDev == Device) {
-      return Resource;
+      if (DeviceResources != NULL) {
+        DeviceResources[Count] = Resource;
+      }
+      Count++;
     }
   }
 
-  return NULL;
+  return Count;
 }
 
 /**
   Dump the resource map of all the devices under Bridge.
   
-  @param[in] Bridge     Bridge device instance.
-  @param[in] IoNode     IO resource descriptor for the bridge device.
-  @param[in] Mem32Node  Mem32 resource descriptor for the bridge device.
-  @param[in] PMem32Node PMem32 resource descriptor for the bridge device.
-  @param[in] Mem64Node  Mem64 resource descriptor for the bridge device.
-  @param[in] PMem64Node PMem64 resource descriptor for the bridge device.
+  @param[in] Bridge        Bridge device instance.
+  @param[in] Resources     Resource descriptors for the bridge device.
+  @param[in] ResourceCount Count of resource descriptors.
 **/
 VOID
 DumpResourceMap (
   IN PCI_IO_DEVICE     *Bridge,
-  IN PCI_RESOURCE_NODE *IoNode,
-  IN PCI_RESOURCE_NODE *Mem32Node,
-  IN PCI_RESOURCE_NODE *PMem32Node,
-  IN PCI_RESOURCE_NODE *Mem64Node,
-  IN PCI_RESOURCE_NODE *PMem64Node
+  IN PCI_RESOURCE_NODE **Resources,
+  IN UINTN             ResourceCount
   )
 {
-  EFI_STATUS                       Status;
-  LIST_ENTRY                       *Link;
-  PCI_IO_DEVICE                    *Device;
-  PCI_RESOURCE_NODE                *ChildIoNode;
-  PCI_RESOURCE_NODE                *ChildMem32Node;
-  PCI_RESOURCE_NODE                *ChildPMem32Node;
-  PCI_RESOURCE_NODE                *ChildMem64Node;
-  PCI_RESOURCE_NODE                *ChildPMem64Node;
-  CHAR16                           *Str;
+  EFI_STATUS           Status;
+  LIST_ENTRY           *Link;
+  PCI_IO_DEVICE        *Device;
+  UINTN                Index;
+  CHAR16               *Str;
+  PCI_RESOURCE_NODE    **ChildResources;
+  UINTN                ChildResourceCount;
 
   DEBUG ((EFI_D_INFO, "PciBus: Resource Map for "));
 
@@ -320,11 +316,9 @@ DumpResourceMap (
     }
   }
 
-  DumpBridgeResource (IoNode);
-  DumpBridgeResource (Mem32Node);
-  DumpBridgeResource (PMem32Node);
-  DumpBridgeResource (Mem64Node);
-  DumpBridgeResource (PMem64Node);
+  for (Index = 0; Index < ResourceCount; Index++) {
+    DumpBridgeResource (Resources[Index]);
+  }
   DEBUG ((EFI_D_INFO, "\n"));
 
   for ( Link = Bridge->ChildList.ForwardLink
@@ -334,20 +328,19 @@ DumpResourceMap (
     Device = PCI_IO_DEVICE_FROM_LINK (Link);
     if (IS_PCI_BRIDGE (&Device->Pci)) {
 
-      ChildIoNode     = (IoNode     == NULL ? NULL : FindResourceNode (Device, IoNode));
-      ChildMem32Node  = (Mem32Node  == NULL ? NULL : FindResourceNode (Device, Mem32Node));
-      ChildPMem32Node = (PMem32Node == NULL ? NULL : FindResourceNode (Device, PMem32Node));
-      ChildMem64Node  = (Mem64Node  == NULL ? NULL : FindResourceNode (Device, Mem64Node));
-      ChildPMem64Node = (PMem64Node == NULL ? NULL : FindResourceNode (Device, PMem64Node));
+      ChildResourceCount = 0;
+      for (Index = 0; Index < ResourceCount; Index++) {
+        ChildResourceCount += FindResourceNode (Device, Resources[Index], NULL);
+      }
+      ChildResources = AllocatePool (sizeof (PCI_RESOURCE_NODE *) * ChildResourceCount);
+      ASSERT (ChildResources != NULL);
+      ChildResourceCount = 0;
+      for (Index = 0; Index < ResourceCount; Index++) {
+        ChildResourceCount += FindResourceNode (Device, Resources[Index], &ChildResources[ChildResourceCount]);
+      }
 
-      DumpResourceMap (
-        Device,
-        ChildIoNode,
-        ChildMem32Node,
-        ChildPMem32Node,
-        ChildMem64Node,
-        ChildPMem64Node
-        );
+      DumpResourceMap (Device, ChildResources, ChildResourceCount);
+      FreePool (ChildResources);
     }
   }
 }
@@ -807,11 +800,11 @@ PciHostBridgeResourceAllocator (
     // Create the entire system resource map from the information collected by
     // enumerator. Several resource tree was created
     //
-    IoBridge     = FindResourceNode (RootBridgeDev, &IoPool);
-    Mem32Bridge  = FindResourceNode (RootBridgeDev, &Mem32Pool);
-    PMem32Bridge = FindResourceNode (RootBridgeDev, &PMem32Pool);
-    Mem64Bridge  = FindResourceNode (RootBridgeDev, &Mem64Pool);
-    PMem64Bridge = FindResourceNode (RootBridgeDev, &PMem64Pool);
+    FindResourceNode (RootBridgeDev, &IoPool, &IoBridge);
+    FindResourceNode (RootBridgeDev, &Mem32Pool, &Mem32Bridge);
+    FindResourceNode (RootBridgeDev, &PMem32Pool, &PMem32Bridge);
+    FindResourceNode (RootBridgeDev, &Mem64Pool, &Mem64Bridge);
+    FindResourceNode (RootBridgeDev, &PMem64Pool, &PMem64Bridge);
 
     ASSERT (IoBridge     != NULL);
     ASSERT (Mem32Bridge  != NULL);
@@ -869,14 +862,13 @@ PciHostBridgeResourceAllocator (
     // Dump the resource map for current root bridge
     //
     DEBUG_CODE (
-      DumpResourceMap (
-        RootBridgeDev,
-        IoBridge,
-        Mem32Bridge,
-        PMem32Bridge,
-        Mem64Bridge,
-        PMem64Bridge
-        );
+      PCI_RESOURCE_NODE *Resources[5];
+      Resources[0] = IoBridge;
+      Resources[1] = Mem32Bridge;
+      Resources[2] = PMem32Bridge;
+      Resources[3] = Mem64Bridge;
+      Resources[4] = PMem64Bridge;
+      DumpResourceMap (RootBridgeDev, Resources, sizeof (Resources) / sizeof (Resources[0]));
     );
 
     FreePool (AcpiConfig);
@@ -984,7 +976,8 @@ PciScanBus (
   UINT8                             Device;
   UINT8                             Func;
   UINT64                            Address;
-  UINTN                             SecondBus;
+  UINT8                             SecondBus;
+  UINT8                             PaddedSubBus;
   UINT16                            Register;
   UINTN                             HpIndex;
   PCI_IO_DEVICE                     *PciDevice;
@@ -1218,7 +1211,7 @@ PciScanBus (
 
           Status = PciScanBus (
                     PciDevice,
-                    (UINT8) (SecondBus),
+                    SecondBus,
                     SubBusNumber,
                     PaddedBusRange
                     );
@@ -1234,12 +1227,16 @@ PciScanBus (
           if ((Attributes == EfiPaddingPciRootBridge) &&
               (State & EFI_HPC_STATE_ENABLED) != 0    &&
               (State & EFI_HPC_STATE_INITIALIZED) != 0) {
-            *PaddedBusRange = (UINT8) ((UINT8) (BusRange) +*PaddedBusRange);
+            *PaddedBusRange = (UINT8) ((UINT8) (BusRange) + *PaddedBusRange);
           } else {
-            Status = PciAllocateBusNumber (PciDevice, *SubBusNumber, (UINT8) (BusRange), SubBusNumber);
+            //
+            // Reserve the larger one between the actual occupied bus number and padded bus number
+            //
+            Status = PciAllocateBusNumber (PciDevice, StartBusNumber, (UINT8) (BusRange), &PaddedSubBus);
             if (EFI_ERROR (Status)) {
               return Status;
             }
+            *SubBusNumber = MAX (PaddedSubBus, *SubBusNumber);
           }
         }
 

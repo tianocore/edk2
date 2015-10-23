@@ -460,4 +460,17 @@ ResetAllPpbBusNumber (
   IN UINT8                              StartBusNumber
   );
 
+/**
+  Dump the PPB padding resource information.
+
+  @param PciIoDevice     PCI IO instance.
+  @param ResourceType    The desired resource type to dump.
+                         PciBarTypeUnknown means to dump all types of resources.
+**/
+VOID
+DumpPpbPaddingResource (
+  IN PCI_IO_DEVICE                    *PciIoDevice,
+  IN PCI_BAR_TYPE                     ResourceType
+  );
+
 #endif

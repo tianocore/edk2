@@ -325,6 +325,77 @@ PciSearchDevice (
 }
 
 /**
+  Dump the PPB padding resource information.
+
+  @param PciIoDevice     PCI IO instance.
+  @param ResourceType    The desired resource type to dump.
+                         PciBarTypeUnknown means to dump all types of resources.
+**/
+VOID
+DumpPpbPaddingResource (
+  IN PCI_IO_DEVICE                    *PciIoDevice,
+  IN PCI_BAR_TYPE                     ResourceType
+  )
+{
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
+  PCI_BAR_TYPE                      Type;
+
+  if (ResourceType == PciBarTypeIo16 || ResourceType == PciBarTypeIo32) {
+    ResourceType = PciBarTypeIo;
+  }
+
+  for (Descriptor = PciIoDevice->ResourcePaddingDescriptors; Descriptor->Desc != ACPI_END_TAG_DESCRIPTOR; Descriptor++) {
+
+    Type = PciBarTypeUnknown;
+    if (Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR && Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_IO) {
+      Type = PciBarTypeIo;
+    } else if (Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR && Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
+
+      if (Descriptor->AddrSpaceGranularity == 32) {
+        //
+        // prefechable
+        //
+        if (Descriptor->SpecificFlag == EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) {
+          Type = PciBarTypePMem32;
+        }
+
+        //
+        // Non-prefechable
+        //
+        if (Descriptor->SpecificFlag == 0) {
+          Type = PciBarTypeMem32;
+        }
+      }
+
+      if (Descriptor->AddrSpaceGranularity == 64) {
+        //
+        // prefechable
+        //
+        if (Descriptor->SpecificFlag == EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) {
+          Type = PciBarTypePMem64;
+        }
+
+        //
+        // Non-prefechable
+        //
+        if (Descriptor->SpecificFlag == 0) {
+          Type = PciBarTypeMem64;
+        }
+      }
+    }
+
+    if ((Type != PciBarTypeUnknown) && ((ResourceType == PciBarTypeUnknown) || (ResourceType == Type))) {
+      DEBUG ((
+        EFI_D_INFO,
+        "   Padding: Type = %s; Alignment = 0x%lx;\tLength = 0x%lx\n",
+        mBarTypeStr[Type], Descriptor->AddrRangeMax, Descriptor->AddrLen
+        ));
+    }
+  }
+
+}
+
+/**
   Dump the PCI BAR information.
 
   @param PciIoDevice     PCI IO instance.
@@ -586,7 +657,10 @@ GatherPpbInfo (
 
   GetResourcePaddingPpb (PciIoDevice);
 
-  DEBUG_CODE (DumpPciBars (PciIoDevice););
+  DEBUG_CODE (
+    DumpPpbPaddingResource (PciIoDevice, PciBarTypeUnknown);
+    DumpPciBars (PciIoDevice);
+  );
 
   return PciIoDevice;
 }
