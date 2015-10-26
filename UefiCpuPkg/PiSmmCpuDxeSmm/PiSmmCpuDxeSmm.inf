@@ -101,7 +101,6 @@
   SynchronizationLib
   BaseMemoryLib
   MtrrLib
-  SmmLib
   IoLib
   TimerLib
   SmmServicesTableLib
