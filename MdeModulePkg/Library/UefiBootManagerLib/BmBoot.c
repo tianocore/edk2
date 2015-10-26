@@ -1,8 +1,8 @@
 /** @file
   Library functions which relates with booting.
 
-(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -206,7 +206,7 @@ BmFindBootOptionInVariable (
   if (OptionNumber == LoadOptionNumberUnassigned) {
     BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
 
-    Index = BmFindLoadOption (OptionToFind, BootOptions, BootOptionCount);
+    Index = EfiBootManagerFindLoadOption (OptionToFind, BootOptions, BootOptionCount);
     if (Index != -1) {
       OptionNumber = BootOptions[Index].OptionNumber;
     }
@@ -2165,7 +2165,7 @@ EfiBootManagerRefreshAllBootOption (
       // Only check those added by BDS
       // so that the boot options added by end-user or OS installer won't be deleted
       //
-      if (BmFindLoadOption (&NvBootOptions[Index], BootOptions, BootOptionCount) == (UINTN) -1) {
+      if (EfiBootManagerFindLoadOption (&NvBootOptions[Index], BootOptions, BootOptionCount) == (UINTN) -1) {
         Status = EfiBootManagerDeleteLoadOptionVariable (NvBootOptions[Index].OptionNumber, LoadOptionTypeBoot);
         //
         // Deleting variable with current variable implementation shouldn't fail.
@@ -2179,7 +2179,7 @@ EfiBootManagerRefreshAllBootOption (
   // Add new EFI boot options to NV
   //
   for (Index = 0; Index < BootOptionCount; Index++) {
-    if (BmFindLoadOption (&BootOptions[Index], NvBootOptions, NvBootOptionCount) == (UINTN) -1) {
+    if (EfiBootManagerFindLoadOption (&BootOptions[Index], NvBootOptions, NvBootOptionCount) == (UINTN) -1) {
       EfiBootManagerAddLoadOptionVariable (&BootOptions[Index], (UINTN) -1);
       //
       // Try best to add the boot options so continue upon failure.
@@ -2260,7 +2260,7 @@ BmRegisterBootManagerMenu (
     UINTN                           BootOptionCount;
 
     BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
-    ASSERT (BmFindLoadOption (BootOption, BootOptions, BootOptionCount) == -1);
+    ASSERT (EfiBootManagerFindLoadOption (BootOption, BootOptions, BootOptionCount) == -1);
     EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
     );
 

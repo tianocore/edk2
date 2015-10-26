@@ -2,6 +2,7 @@
   Load option library functions which relate with creating and processing load options.
 
 Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -504,7 +505,8 @@ EfiBootManagerInitializeLoadOption (
   @retval 0 ~ Count-1 The index of the Key in the Array.
 **/
 INTN
-BmFindLoadOption (
+EFIAPI
+EfiBootManagerFindLoadOption (
   IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Key,
   IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Array,
   IN UINTN                              Count

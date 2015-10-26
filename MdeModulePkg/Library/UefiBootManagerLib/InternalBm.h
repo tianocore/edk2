@@ -2,6 +2,7 @@
   BDS library definition, include the file and data structure
 
 Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -405,27 +406,6 @@ EFI_DEVICE_PATH_PROTOCOL *
 BmDelPartMatchInstance (
   IN     EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN     EFI_DEVICE_PATH_PROTOCOL  *Single
-  );
-
-
-/**
-  Return the index of the load option in the load option array.
-
-  The function consider two load options are equal when the 
-  OptionType, Attributes, Description, FilePath and OptionalData are equal.
-
-  @param Key    Pointer to the load option to be found.
-  @param Array  Pointer to the array of load options to be found.
-  @param Count  Number of entries in the Array.
-
-  @retval -1          Key wasn't found in the Array.
-  @retval 0 ~ Count-1 The index of the Key in the Array.
-**/
-INTN
-BmFindLoadOption (
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Key,
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Array,
-  IN UINTN                              Count
   );
 
 /**
