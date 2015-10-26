@@ -30,7 +30,6 @@
 #define FVB_VIRTUAL   1
 
 typedef struct {
-  EFI_LOCK                    FvbDevLock;
   UINTN                       FvBase[2];
   UINTN                       NumOfBlocks;
   EFI_FIRMWARE_VOLUME_HEADER  VolumeHeader;

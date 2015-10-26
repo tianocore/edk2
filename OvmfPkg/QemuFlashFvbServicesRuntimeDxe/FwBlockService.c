@@ -1119,7 +1119,6 @@ FvbInitialize (
   CopyMem ((UINTN *) &(FwhInstance->VolumeHeader), (UINTN *) FwVolHeader,
     FwVolHeader->HeaderLength);
   FwVolHeader = &(FwhInstance->VolumeHeader);
-  EfiInitializeLock (&(FwhInstance->FvbDevLock), TPL_HIGH_LEVEL);
 
   NumOfBlocks = 0;
 
