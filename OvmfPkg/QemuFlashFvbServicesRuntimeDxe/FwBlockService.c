@@ -132,11 +132,6 @@ FvbVirtualddressChangeEvent (
     Call the passed in Child Notify event and convert the mFvbModuleGlobal
     date items to there virtual address.
 
-    mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]  - Physical copy of instance
-                                                  data
-    mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]   - Virtual pointer to common
-                                                  instance data.
-
   Arguments:
 
     (Standard EFI notify event - EFI_EVENT_NOTIFY)
@@ -150,16 +145,15 @@ FvbVirtualddressChangeEvent (
   EFI_FW_VOL_INSTANCE *FwhInstance;
   UINTN               Index;
 
-  EfiConvertPointer (0x0,
-    (VOID **) &mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]);
+  FwhInstance = mFvbModuleGlobal->FvInstance;
+  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal->FvInstance);
 
   //
   // Convert the base address of all the instances
   //
   Index       = 0;
-  FwhInstance = mFvbModuleGlobal->FvInstance[FVB_PHYSICAL];
   while (Index < mFvbModuleGlobal->NumFv) {
-    EfiConvertPointer (0x0, (VOID **) &FwhInstance->FvBase[FVB_VIRTUAL]);
+    EfiConvertPointer (0x0, (VOID **) &FwhInstance->FvBase);
     FwhInstance = (EFI_FW_VOL_INSTANCE *)
       (
         (UINTN) ((UINT8 *) FwhInstance) +
@@ -177,8 +171,7 @@ EFI_STATUS
 GetFvbInstance (
   IN  UINTN                               Instance,
   IN  ESAL_FWB_GLOBAL                     *Global,
-  OUT EFI_FW_VOL_INSTANCE                 **FwhInstance,
-  IN BOOLEAN                              Virtual
+  OUT EFI_FW_VOL_INSTANCE                 **FwhInstance
   )
 /*++
 
@@ -191,7 +184,6 @@ GetFvbInstance (
     Global                - Pointer to ESAL_FWB_GLOBAL that contains all
                             instance data
     FwhInstance           - The EFI_FW_VOL_INSTANCE fimrware instance structure
-    Virtual               - Whether CPU is in virtual or physical mode
 
   Returns:
     EFI_SUCCESS           - Successfully returns
@@ -208,7 +200,7 @@ GetFvbInstance (
   //
   // Find the right instance of the FVB private data
   //
-  FwhRecord = Global->FvInstance[Virtual];
+  FwhRecord = Global->FvInstance;
   while (Instance > 0) {
     FwhRecord = (EFI_FW_VOL_INSTANCE *)
       (
@@ -227,8 +219,7 @@ EFI_STATUS
 FvbGetPhysicalAddress (
   IN UINTN                                Instance,
   OUT EFI_PHYSICAL_ADDRESS                *Address,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   )
 /*++
 
@@ -243,7 +234,6 @@ FvbGetPhysicalAddress (
                             address of the firmware volume.
     Global                - Pointer to ESAL_FWB_GLOBAL that contains all
                             instance data
-    Virtual               - Whether CPU is in virtual or physical mode
 
   Returns:
     EFI_SUCCESS           - Successfully returns
@@ -257,9 +247,9 @@ FvbGetPhysicalAddress (
   //
   // Find the right instance of the FVB private data
   //
-  Status = GetFvbInstance (Instance, Global, &FwhInstance, Virtual);
+  Status = GetFvbInstance (Instance, Global, &FwhInstance);
   ASSERT_EFI_ERROR (Status);
-  *Address = FwhInstance->FvBase[Virtual];
+  *Address = FwhInstance->FvBase;
 
   return EFI_SUCCESS;
 }
@@ -268,8 +258,7 @@ EFI_STATUS
 FvbGetVolumeAttributes (
   IN UINTN                                Instance,
   OUT EFI_FVB_ATTRIBUTES_2                *Attributes,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   )
 /*++
 
@@ -283,7 +272,6 @@ FvbGetVolumeAttributes (
     Attributes            - Output buffer which contains attributes
     Global                - Pointer to ESAL_FWB_GLOBAL that contains all
                             instance data
-    Virtual               - Whether CPU is in virtual or physical mode
 
   Returns:
     EFI_SUCCESS           - Successfully returns
@@ -297,7 +285,7 @@ FvbGetVolumeAttributes (
   //
   // Find the right instance of the FVB private data
   //
-  Status = GetFvbInstance (Instance, Global, &FwhInstance, Virtual);
+  Status = GetFvbInstance (Instance, Global, &FwhInstance);
   ASSERT_EFI_ERROR (Status);
   *Attributes = FwhInstance->VolumeHeader.Attributes;
 
@@ -311,8 +299,7 @@ FvbGetLbaAddress (
   OUT UINTN                               *LbaAddress,
   OUT UINTN                               *LbaLength,
   OUT UINTN                               *NumOfBlocks,
-  IN  ESAL_FWB_GLOBAL                     *Global,
-  IN  BOOLEAN                             Virtual
+  IN  ESAL_FWB_GLOBAL                     *Global
   )
 /*++
 
@@ -331,7 +318,6 @@ FvbGetLbaAddress (
                             BlockSize
     Global                - Pointer to ESAL_FWB_GLOBAL that contains all
                             instance data
-    Virtual               - Whether CPU is in virtual or physical mode
 
   Returns:
     EFI_SUCCESS           - Successfully returns
@@ -351,7 +337,7 @@ FvbGetLbaAddress (
   //
   // Find the right instance of the FVB private data
   //
-  Status = GetFvbInstance (Instance, Global, &FwhInstance, Virtual);
+  Status = GetFvbInstance (Instance, Global, &FwhInstance);
   ASSERT_EFI_ERROR (Status);
 
   StartLba  = 0;
@@ -377,7 +363,7 @@ FvbGetLbaAddress (
     if (Lba >= StartLba && Lba < NextLba) {
       Offset = Offset + (UINTN) MultU64x32 ((Lba - StartLba), BlockLength);
       if (LbaAddress != NULL) {
-        *LbaAddress = FwhInstance->FvBase[Virtual] + Offset;
+        *LbaAddress = FwhInstance->FvBase + Offset;
       }
 
       if (LbaLength != NULL) {
@@ -401,8 +387,7 @@ EFI_STATUS
 FvbSetVolumeAttributes (
   IN UINTN                                  Instance,
   IN OUT EFI_FVB_ATTRIBUTES_2               *Attributes,
-  IN ESAL_FWB_GLOBAL                        *Global,
-  IN BOOLEAN                                Virtual
+  IN ESAL_FWB_GLOBAL                        *Global
   )
 /*++
 
@@ -419,7 +404,6 @@ FvbSetVolumeAttributes (
                             of the firmware volume
     Global                - Pointer to ESAL_FWB_GLOBAL that contains all
                             instance data
-    Virtual               - Whether CPU is in virtual or physical mode
 
   Returns:
     EFI_SUCCESS           - Successfully returns
@@ -442,7 +426,7 @@ FvbSetVolumeAttributes (
   //
   // Find the right instance of the FVB private data
   //
-  Status = GetFvbInstance (Instance, Global, &FwhInstance, Virtual);
+  Status = GetFvbInstance (Instance, Global, &FwhInstance);
   ASSERT_EFI_ERROR (Status);
 
   AttribPtr     =
@@ -562,7 +546,7 @@ FvbProtocolGetPhysicalAddress (
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
   return FvbGetPhysicalAddress (FvbDevice->Instance, Address,
-           mFvbModuleGlobal, EfiGoneVirtual ());
+           mFvbModuleGlobal);
 }
 
 EFI_STATUS
@@ -604,8 +588,7 @@ FvbProtocolGetBlockSize (
           NULL,
           BlockSize,
           NumOfBlocks,
-          mFvbModuleGlobal,
-          EfiGoneVirtual ()
+          mFvbModuleGlobal
           );
 }
 
@@ -634,7 +617,7 @@ FvbProtocolGetAttributes (
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
   return FvbGetVolumeAttributes (FvbDevice->Instance, Attributes,
-           mFvbModuleGlobal, EfiGoneVirtual ());
+           mFvbModuleGlobal);
 }
 
 EFI_STATUS
@@ -662,7 +645,7 @@ FvbProtocolSetAttributes (
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
   return FvbSetVolumeAttributes (FvbDevice->Instance, Attributes,
-           mFvbModuleGlobal, EfiGoneVirtual ());
+           mFvbModuleGlobal);
 }
 
 EFI_STATUS
@@ -708,7 +691,7 @@ FvbProtocolEraseBlocks (
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
   Status    = GetFvbInstance (FvbDevice->Instance, mFvbModuleGlobal,
-                &FwhInstance, EfiGoneVirtual ());
+                &FwhInstance);
   ASSERT_EFI_ERROR (Status);
 
   NumOfBlocks = FwhInstance->NumOfBlocks;
@@ -1088,21 +1071,10 @@ FvbInitialize (
                 FwVolHeader->HeaderLength -
                 sizeof (EFI_FIRMWARE_VOLUME_HEADER)
                 );
+  mFvbModuleGlobal->FvInstance = AllocateRuntimePool (BufferSize);
+  ASSERT (mFvbModuleGlobal->FvInstance != NULL);
 
-  //
-  // Only need to allocate once. There is only one copy of physical memory for
-  // the private data of each FV instance. But in virtual mode or in physical
-  // mode, the address of the the physical memory may be different.
-  //
-  mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] = AllocateRuntimePool (
-                                                 BufferSize);
-  ASSERT (mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] != NULL);
-
-  //
-  // Make a virtual copy of the FvInstance pointer.
-  //
-  FwhInstance = mFvbModuleGlobal->FvInstance[FVB_PHYSICAL];
-  mFvbModuleGlobal->FvInstance[FVB_VIRTUAL] = FwhInstance;
+  FwhInstance = mFvbModuleGlobal->FvInstance;
 
   mFvbModuleGlobal->NumFv                   = 0;
   MaxLbaSize = 0;
@@ -1111,8 +1083,7 @@ FvbInitialize (
     (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN)
       PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
 
-  FwhInstance->FvBase[FVB_PHYSICAL] = (UINTN) BaseAddress;
-  FwhInstance->FvBase[FVB_VIRTUAL]  = (UINTN) BaseAddress;
+  FwhInstance->FvBase = (UINTN) BaseAddress;
 
   CopyMem ((UINTN *) &(FwhInstance->VolumeHeader), (UINTN *) FwVolHeader,
     FwVolHeader->HeaderLength);

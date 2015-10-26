@@ -23,21 +23,15 @@
 #ifndef _FW_BLOCK_SERVICE_H
 #define _FW_BLOCK_SERVICE_H
 
-//
-// BugBug: Add documentation here for data structure!!!!
-//
-#define FVB_PHYSICAL  0
-#define FVB_VIRTUAL   1
-
 typedef struct {
-  UINTN                       FvBase[2];
+  UINTN                       FvBase;
   UINTN                       NumOfBlocks;
   EFI_FIRMWARE_VOLUME_HEADER  VolumeHeader;
 } EFI_FW_VOL_INSTANCE;
 
 typedef struct {
   UINT32              NumFv;
-  EFI_FW_VOL_INSTANCE *FvInstance[2];
+  EFI_FW_VOL_INSTANCE *FvInstance;
 } ESAL_FWB_GLOBAL;
 
 //
@@ -78,24 +72,21 @@ EFI_STATUS
 FvbSetVolumeAttributes (
   IN UINTN                                Instance,
   IN OUT EFI_FVB_ATTRIBUTES_2             *Attributes,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   );
 
 EFI_STATUS
 FvbGetVolumeAttributes (
   IN UINTN                                Instance,
   OUT EFI_FVB_ATTRIBUTES_2                *Attributes,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   );
 
 EFI_STATUS
 FvbGetPhysicalAddress (
   IN UINTN                                Instance,
   OUT EFI_PHYSICAL_ADDRESS                *Address,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   );
 
 EFI_STATUS
@@ -120,8 +111,7 @@ FvbGetLbaAddress (
   OUT UINTN                               *LbaAddress,
   OUT UINTN                               *LbaLength,
   OUT UINTN                               *NumOfBlocks,
-  IN  ESAL_FWB_GLOBAL                     *Global,
-  IN  BOOLEAN                             Virtual
+  IN  ESAL_FWB_GLOBAL                     *Global
   );
 
 //
