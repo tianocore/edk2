@@ -59,6 +59,7 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\ToolDefClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\VpdInfoFile.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\BuildVersion.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\MultipleWorkspace.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\CommonClass.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\DataClass.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\Exceptions.py \
