@@ -1,13 +1,13 @@
 /**@file
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -75,7 +75,7 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
       FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize),
       EFI_FVH_SIGNATURE,
-      EFI_FVB2_MEMORY_MAPPED |  
+      EFI_FVB2_MEMORY_MAPPED |
         EFI_FVB2_READ_ENABLED_CAP |
         EFI_FVB2_READ_STATUS |
         EFI_FVB2_WRITE_ENABLED_CAP |

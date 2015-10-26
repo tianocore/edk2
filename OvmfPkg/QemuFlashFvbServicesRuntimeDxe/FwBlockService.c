@@ -871,7 +871,7 @@ Returns:
       ) {
     return EFI_NOT_FOUND;
   }
-  
+
   //
   // Verify the header checksum
   //
@@ -944,7 +944,7 @@ InitializeVariableFvHeader (
     (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN)
       PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
 
-  Length = 
+  Length =
     (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
      FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
      FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
@@ -1139,7 +1139,7 @@ Returns:
   } else {
     FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
     CopyGuid (
-      &((FV_PIWG_DEVICE_PATH *)FvbDevice->DevicePath)->FvDevPath.FvName, 
+      &((FV_PIWG_DEVICE_PATH *)FvbDevice->DevicePath)->FvDevPath.FvName,
       (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)
       );
   }
