@@ -1,21 +1,22 @@
 /**@file
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-Module Name:
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  FWBlockService.c
+  Module Name:
 
-Abstract:
+    FWBlockService.c
 
-Revision History
+  Abstract:
+
+  Revision History
 
 **/
 
@@ -48,7 +49,8 @@ Revision History
 #include "FwBlockService.h"
 #include "QemuFlash.h"
 
-#define EFI_FVB2_STATUS (EFI_FVB2_READ_STATUS | EFI_FVB2_WRITE_STATUS | EFI_FVB2_LOCK_STATUS)
+#define EFI_FVB2_STATUS \
+          (EFI_FVB2_READ_STATUS | EFI_FVB2_WRITE_STATUS | EFI_FVB2_LOCK_STATUS)
 
 ESAL_FWB_GLOBAL         *mFvbModuleGlobal;
 
@@ -124,30 +126,32 @@ FvbVirtualddressChangeEvent (
   )
 /*++
 
-Routine Description:
+  Routine Description:
 
-  Fixup internal data so that EFI and SAL can be call in virtual mode.
-  Call the passed in Child Notify event and convert the mFvbModuleGlobal
-  date items to there virtual address.
+    Fixup internal data so that EFI and SAL can be call in virtual mode.
+    Call the passed in Child Notify event and convert the mFvbModuleGlobal
+    date items to there virtual address.
 
-  mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]  - Physical copy of instance data
-  mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]   - Virtual pointer to common
-                                                instance data.
+    mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]  - Physical copy of instance
+                                                  data
+    mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]   - Virtual pointer to common
+                                                  instance data.
 
-Arguments:
+  Arguments:
 
-  (Standard EFI notify event - EFI_EVENT_NOTIFY)
+    (Standard EFI notify event - EFI_EVENT_NOTIFY)
 
-Returns:
+  Returns:
 
-  None
+    None
 
 --*/
 {
   EFI_FW_VOL_INSTANCE *FwhInstance;
   UINTN               Index;
 
-  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]);
+  EfiConvertPointer (0x0,
+    (VOID **) &mFvbModuleGlobal->FvInstance[FVB_VIRTUAL]);
 
   //
   // Convert the base address of all the instances
@@ -158,13 +162,15 @@ Returns:
     EfiConvertPointer (0x0, (VOID **) &FwhInstance->FvBase[FVB_VIRTUAL]);
     FwhInstance = (EFI_FW_VOL_INSTANCE *)
       (
-        (UINTN) ((UINT8 *) FwhInstance) + FwhInstance->VolumeHeader.HeaderLength +
-          (sizeof (EFI_FW_VOL_INSTANCE) - sizeof (EFI_FIRMWARE_VOLUME_HEADER))
+        (UINTN) ((UINT8 *) FwhInstance) +
+        FwhInstance->VolumeHeader.HeaderLength +
+        (sizeof (EFI_FW_VOL_INSTANCE) - sizeof (EFI_FIRMWARE_VOLUME_HEADER))
       );
     Index++;
   }
 
-  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal->FvbScratchSpace[FVB_VIRTUAL]);
+  EfiConvertPointer (0x0,
+    (VOID **) &mFvbModuleGlobal->FvbScratchSpace[FVB_VIRTUAL]);
   EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal);
   QemuFlashConvertPointers ();
 }
@@ -178,20 +184,20 @@ GetFvbInstance (
   )
 /*++
 
-Routine Description:
-  Retrieves the physical address of a memory mapped FV
+  Routine Description:
+    Retrieves the physical address of a memory mapped FV
 
-Arguments:
-  Instance              - The FV instance whose base address is going to be
-                          returned
-  Global                - Pointer to ESAL_FWB_GLOBAL that contains all
-                          instance data
-  FwhInstance           - The EFI_FW_VOL_INSTANCE fimrware instance structure
-  Virtual               - Whether CPU is in virtual or physical mode
+  Arguments:
+    Instance              - The FV instance whose base address is going to be
+                            returned
+    Global                - Pointer to ESAL_FWB_GLOBAL that contains all
+                            instance data
+    FwhInstance           - The EFI_FW_VOL_INSTANCE fimrware instance structure
+    Virtual               - Whether CPU is in virtual or physical mode
 
-Returns:
-  EFI_SUCCESS           - Successfully returns
-  EFI_INVALID_PARAMETER - Instance not found
+  Returns:
+    EFI_SUCCESS           - Successfully returns
+    EFI_INVALID_PARAMETER - Instance not found
 
 --*/
 {
@@ -228,22 +234,22 @@ FvbGetPhysicalAddress (
   )
 /*++
 
-Routine Description:
-  Retrieves the physical address of a memory mapped FV
+  Routine Description:
+    Retrieves the physical address of a memory mapped FV
 
-Arguments:
-  Instance              - The FV instance whose base address is going to be
-                          returned
-  Address               - Pointer to a caller allocated EFI_PHYSICAL_ADDRESS
-                          that on successful return, contains the base address
-                          of the firmware volume.
-  Global                - Pointer to ESAL_FWB_GLOBAL that contains all
-                          instance data
-  Virtual               - Whether CPU is in virtual or physical mode
+  Arguments:
+    Instance              - The FV instance whose base address is going to be
+                            returned
+    Address               - Pointer to a caller allocated EFI_PHYSICAL_ADDRESS
+                            that on successful return, contains the base
+                            address of the firmware volume.
+    Global                - Pointer to ESAL_FWB_GLOBAL that contains all
+                            instance data
+    Virtual               - Whether CPU is in virtual or physical mode
 
-Returns:
-  EFI_SUCCESS           - Successfully returns
-  EFI_INVALID_PARAMETER - Instance not found
+  Returns:
+    EFI_SUCCESS           - Successfully returns
+    EFI_INVALID_PARAMETER - Instance not found
 
 --*/
 {
@@ -269,21 +275,21 @@ FvbGetVolumeAttributes (
   )
 /*++
 
-Routine Description:
-  Retrieves attributes, insures positive polarity of attribute bits, returns
-  resulting attributes in output parameter
+  Routine Description:
+    Retrieves attributes, insures positive polarity of attribute bits, returns
+    resulting attributes in output parameter
 
-Arguments:
-  Instance              - The FV instance whose attributes is going to be
-                          returned
-  Attributes            - Output buffer which contains attributes
-  Global                - Pointer to ESAL_FWB_GLOBAL that contains all
-                          instance data
-  Virtual               - Whether CPU is in virtual or physical mode
+  Arguments:
+    Instance              - The FV instance whose attributes is going to be
+                            returned
+    Attributes            - Output buffer which contains attributes
+    Global                - Pointer to ESAL_FWB_GLOBAL that contains all
+                            instance data
+    Virtual               - Whether CPU is in virtual or physical mode
 
-Returns:
-  EFI_SUCCESS           - Successfully returns
-  EFI_INVALID_PARAMETER - Instance not found
+  Returns:
+    EFI_SUCCESS           - Successfully returns
+    EFI_INVALID_PARAMETER - Instance not found
 
 --*/
 {
@@ -312,26 +318,26 @@ FvbGetLbaAddress (
   )
 /*++
 
-Routine Description:
-  Retrieves the starting address of an LBA in an FV
+  Routine Description:
+    Retrieves the starting address of an LBA in an FV
 
-Arguments:
-  Instance              - The FV instance which the Lba belongs to
-  Lba                   - The logical block address
-  LbaAddress            - On output, contains the physical starting address
-                          of the Lba
-  LbaLength             - On output, contains the length of the block
-  NumOfBlocks           - A pointer to a caller allocated UINTN in which the
-                          number of consecutive blocks starting with Lba is
-                          returned. All blocks in this range have a size of
-                          BlockSize
-  Global                - Pointer to ESAL_FWB_GLOBAL that contains all
-                          instance data
-  Virtual               - Whether CPU is in virtual or physical mode
+  Arguments:
+    Instance              - The FV instance which the Lba belongs to
+    Lba                   - The logical block address
+    LbaAddress            - On output, contains the physical starting address
+                            of the Lba
+    LbaLength             - On output, contains the length of the block
+    NumOfBlocks           - A pointer to a caller allocated UINTN in which the
+                            number of consecutive blocks starting with Lba is
+                            returned. All blocks in this range have a size of
+                            BlockSize
+    Global                - Pointer to ESAL_FWB_GLOBAL that contains all
+                            instance data
+    Virtual               - Whether CPU is in virtual or physical mode
 
-Returns:
-  EFI_SUCCESS           - Successfully returns
-  EFI_INVALID_PARAMETER - Instance not found
+  Returns:
+    EFI_SUCCESS           - Successfully returns
+    EFI_INVALID_PARAMETER - Instance not found
 
 --*/
 {
@@ -402,27 +408,27 @@ FvbSetVolumeAttributes (
   )
 /*++
 
-Routine Description:
-  Modifies the current settings of the firmware volume according to the
-  input parameter, and returns the new setting of the volume
+  Routine Description:
+    Modifies the current settings of the firmware volume according to the
+    input parameter, and returns the new setting of the volume
 
-Arguments:
-  Instance              - The FV instance whose attributes is going to be
-                          modified
-  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES_2
-                          containing the desired firmware volume settings.
-                          On successful return, it contains the new settings
-                          of the firmware volume
-  Global                - Pointer to ESAL_FWB_GLOBAL that contains all
-                          instance data
-  Virtual               - Whether CPU is in virtual or physical mode
+  Arguments:
+    Instance              - The FV instance whose attributes is going to be
+                            modified
+    Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES_2
+                            containing the desired firmware volume settings.
+                            On successful return, it contains the new settings
+                            of the firmware volume
+    Global                - Pointer to ESAL_FWB_GLOBAL that contains all
+                            instance data
+    Virtual               - Whether CPU is in virtual or physical mode
 
-Returns:
-  EFI_SUCCESS           - Successfully returns
-  EFI_ACCESS_DENIED     - The volume setting is locked and cannot be modified
-  EFI_INVALID_PARAMETER - Instance not found, or The attributes requested are
-                          in conflict with the capabilities as declared in the
-                          firmware volume header
+  Returns:
+    EFI_SUCCESS           - Successfully returns
+    EFI_ACCESS_DENIED     - The volume setting is locked and cannot be modified
+    EFI_INVALID_PARAMETER - Instance not found, or The attributes requested are
+                            in conflict with the capabilities as declared in
+                            the firmware volume header
 
 --*/
 {
@@ -441,7 +447,8 @@ Returns:
   Status = GetFvbInstance (Instance, Global, &FwhInstance, Virtual);
   ASSERT_EFI_ERROR (Status);
 
-  AttribPtr     = (EFI_FVB_ATTRIBUTES_2 *) &(FwhInstance->VolumeHeader.Attributes);
+  AttribPtr     =
+    (EFI_FVB_ATTRIBUTES_2 *) &(FwhInstance->VolumeHeader.Attributes);
   OldAttributes = *AttribPtr;
   Capabilities  = OldAttributes & (EFI_FVB2_READ_DISABLED_CAP | \
                                    EFI_FVB2_READ_ENABLED_CAP | \
@@ -467,7 +474,8 @@ Returns:
   //
   // Some attributes of FV is read only can *not* be set
   //
-  if ((OldAttributes & UnchangedAttributes) ^ (*Attributes & UnchangedAttributes)) {
+  if ((OldAttributes & UnchangedAttributes) ^
+      (*Attributes & UnchangedAttributes)) {
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -537,19 +545,17 @@ FvbProtocolGetPhysicalAddress (
   )
 /*++
 
-Routine Description:
+  Routine Description:
 
-  Retrieves the physical address of the device.
+    Retrieves the physical address of the device.
 
-Arguments:
+  Arguments:
 
-  This                  - Calling context
-  Address               - Output buffer containing the address.
+    This                  - Calling context
+    Address               - Output buffer containing the address.
 
-Returns:
-
-Returns:
-  EFI_SUCCESS           - Successfully returns
+  Returns:
+    EFI_SUCCESS           - Successfully returns
 
 --*/
 {
@@ -557,7 +563,8 @@ Returns:
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  return FvbGetPhysicalAddress (FvbDevice->Instance, Address, mFvbModuleGlobal, EfiGoneVirtual ());
+  return FvbGetPhysicalAddress (FvbDevice->Instance, Address,
+           mFvbModuleGlobal, EfiGoneVirtual ());
 }
 
 EFI_STATUS
@@ -570,22 +577,22 @@ FvbProtocolGetBlockSize (
   )
 /*++
 
-Routine Description:
-  Retrieve the size of a logical block
+  Routine Description:
+    Retrieve the size of a logical block
 
-Arguments:
-  This                  - Calling context
-  Lba                   - Indicates which block to return the size for.
-  BlockSize             - A pointer to a caller allocated UINTN in which
-                          the size of the block is returned
-  NumOfBlocks           - a pointer to a caller allocated UINTN in which the
-                          number of consecutive blocks starting with Lba is
-                          returned. All blocks in this range have a size of
-                          BlockSize
+  Arguments:
+    This                  - Calling context
+    Lba                   - Indicates which block to return the size for.
+    BlockSize             - A pointer to a caller allocated UINTN in which
+                            the size of the block is returned
+    NumOfBlocks           - a pointer to a caller allocated UINTN in which the
+                            number of consecutive blocks starting with Lba is
+                            returned. All blocks in this range have a size of
+                            BlockSize
 
-Returns:
-  EFI_SUCCESS           - The firmware volume was read successfully and
-                          contents are in Buffer
+  Returns:
+    EFI_SUCCESS           - The firmware volume was read successfully and
+                            contents are in Buffer
 
 --*/
 {
@@ -612,15 +619,15 @@ FvbProtocolGetAttributes (
   )
 /*++
 
-Routine Description:
-    Retrieves Volume attributes.  No polarity translations are done.
+  Routine Description:
+      Retrieves Volume attributes.  No polarity translations are done.
 
-Arguments:
-    This                - Calling context
-    Attributes          - output buffer which contains attributes
+  Arguments:
+      This                - Calling context
+      Attributes          - output buffer which contains attributes
 
-Returns:
-  EFI_SUCCESS           - Successfully returns
+  Returns:
+    EFI_SUCCESS           - Successfully returns
 
 --*/
 {
@@ -628,7 +635,8 @@ Returns:
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  return FvbGetVolumeAttributes (FvbDevice->Instance, Attributes, mFvbModuleGlobal, EfiGoneVirtual ());
+  return FvbGetVolumeAttributes (FvbDevice->Instance, Attributes,
+           mFvbModuleGlobal, EfiGoneVirtual ());
 }
 
 EFI_STATUS
@@ -639,15 +647,15 @@ FvbProtocolSetAttributes (
   )
 /*++
 
-Routine Description:
-  Sets Volume attributes. No polarity translations are done.
+  Routine Description:
+    Sets Volume attributes. No polarity translations are done.
 
-Arguments:
-  This                  - Calling context
-  Attributes            - output buffer which contains attributes
+  Arguments:
+    This                  - Calling context
+    Attributes            - output buffer which contains attributes
 
-Returns:
-  EFI_SUCCESS           - Successfully returns
+  Returns:
+    EFI_SUCCESS           - Successfully returns
 
 --*/
 {
@@ -655,7 +663,8 @@ Returns:
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  return FvbSetVolumeAttributes (FvbDevice->Instance, Attributes, mFvbModuleGlobal, EfiGoneVirtual ());
+  return FvbSetVolumeAttributes (FvbDevice->Instance, Attributes,
+           mFvbModuleGlobal, EfiGoneVirtual ());
 }
 
 EFI_STATUS
@@ -666,26 +675,27 @@ FvbProtocolEraseBlocks (
   )
 /*++
 
-Routine Description:
+  Routine Description:
 
-  The EraseBlock() function erases one or more blocks as denoted by the
-  variable argument list. The entire parameter list of blocks must be verified
-  prior to erasing any blocks.  If a block is requested that does not exist
-  within the associated firmware volume (it has a larger index than the last
-  block of the firmware volume), the EraseBlock() function must return
-  EFI_INVALID_PARAMETER without modifying the contents of the firmware volume.
+    The EraseBlock() function erases one or more blocks as denoted by the
+    variable argument list. The entire parameter list of blocks must be
+    verified prior to erasing any blocks.  If a block is requested that does
+    not exist within the associated firmware volume (it has a larger index than
+    the last block of the firmware volume), the EraseBlock() function must
+    return EFI_INVALID_PARAMETER without modifying the contents of the firmware
+    volume.
 
-Arguments:
-  This                  - Calling context
-  ...                   - Starting LBA followed by Number of Lba to erase.
-                          a -1 to terminate the list.
+  Arguments:
+    This                  - Calling context
+    ...                   - Starting LBA followed by Number of Lba to erase.
+                            a -1 to terminate the list.
 
-Returns:
-  EFI_SUCCESS           - The erase request was successfully completed
-  EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
-                          could not be written. Firmware device may have been
-                          partially erased
+  Returns:
+    EFI_SUCCESS           - The erase request was successfully completed
+    EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
+    EFI_DEVICE_ERROR      - The block device is not functioning correctly and
+                            could not be written. Firmware device may have been
+                            partially erased
 
 --*/
 {
@@ -699,7 +709,8 @@ Returns:
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  Status    = GetFvbInstance (FvbDevice->Instance, mFvbModuleGlobal, &FwhInstance, EfiGoneVirtual ());
+  Status    = GetFvbInstance (FvbDevice->Instance, mFvbModuleGlobal,
+                &FwhInstance, EfiGoneVirtual ());
   ASSERT_EFI_ERROR (Status);
 
   NumOfBlocks = FwhInstance->NumOfBlocks;
@@ -763,36 +774,38 @@ FvbProtocolWrite (
   )
 /*++
 
-Routine Description:
+  Routine Description:
 
-  Writes data beginning at Lba:Offset from FV. The write terminates either
-  when *NumBytes of data have been written, or when a block boundary is
-  reached.  *NumBytes is updated to reflect the actual number of bytes
-  written. The write opertion does not include erase. This routine will
-  attempt to write only the specified bytes. If the writes do not stick,
-  it will return an error.
+    Writes data beginning at Lba:Offset from FV. The write terminates either
+    when *NumBytes of data have been written, or when a block boundary is
+    reached.  *NumBytes is updated to reflect the actual number of bytes
+    written. The write opertion does not include erase. This routine will
+    attempt to write only the specified bytes. If the writes do not stick,
+    it will return an error.
 
-Arguments:
-  This                  - Calling context
-  Lba                   - Block in which to begin write
-  Offset                - Offset in the block at which to begin write
-  NumBytes              - On input, indicates the requested write size. On
-                          output, indicates the actual number of bytes written
-  Buffer                - Buffer containing source data for the write.
+  Arguments:
+    This                  - Calling context
+    Lba                   - Block in which to begin write
+    Offset                - Offset in the block at which to begin write
+    NumBytes              - On input, indicates the requested write size. On
+                            output, indicates the actual number of bytes
+                            written
+    Buffer                - Buffer containing source data for the write.
 
-Returns:
-  EFI_SUCCESS           - The firmware volume was written successfully
-  EFI_BAD_BUFFER_SIZE   - Write attempted across a LBA boundary. On output,
-                          NumBytes contains the total number of bytes
-                          actually written
-  EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
-                          could not be written
-  EFI_INVALID_PARAMETER - NumBytes or Buffer are NULL
+  Returns:
+    EFI_SUCCESS           - The firmware volume was written successfully
+    EFI_BAD_BUFFER_SIZE   - Write attempted across a LBA boundary. On output,
+                            NumBytes contains the total number of bytes
+                            actually written
+    EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
+    EFI_DEVICE_ERROR      - The block device is not functioning correctly and
+                            could not be written
+    EFI_INVALID_PARAMETER - NumBytes or Buffer are NULL
 
 --*/
 {
-  return QemuFlashWrite ((EFI_LBA)Lba, (UINTN)Offset, NumBytes, (UINT8 *)Buffer);
+  return QemuFlashWrite ((EFI_LBA)Lba, (UINTN)Offset, NumBytes,
+           (UINT8 *)Buffer);
 }
 
 EFI_STATUS
@@ -806,37 +819,38 @@ FvbProtocolRead (
   )
 /*++
 
-Routine Description:
+  Routine Description:
 
-  Reads data beginning at Lba:Offset from FV. The Read terminates either
-  when *NumBytes of data have been read, or when a block boundary is
-  reached.  *NumBytes is updated to reflect the actual number of bytes
-  written. The write opertion does not include erase. This routine will
-  attempt to write only the specified bytes. If the writes do not stick,
-  it will return an error.
+    Reads data beginning at Lba:Offset from FV. The Read terminates either
+    when *NumBytes of data have been read, or when a block boundary is
+    reached.  *NumBytes is updated to reflect the actual number of bytes
+    written. The write opertion does not include erase. This routine will
+    attempt to write only the specified bytes. If the writes do not stick,
+    it will return an error.
 
-Arguments:
-  This                  - Calling context
-  Lba                   - Block in which to begin Read
-  Offset                - Offset in the block at which to begin Read
-  NumBytes              - On input, indicates the requested write size. On
-                          output, indicates the actual number of bytes Read
-  Buffer                - Buffer containing source data for the Read.
+  Arguments:
+    This                  - Calling context
+    Lba                   - Block in which to begin Read
+    Offset                - Offset in the block at which to begin Read
+    NumBytes              - On input, indicates the requested write size. On
+                            output, indicates the actual number of bytes Read
+    Buffer                - Buffer containing source data for the Read.
 
-Returns:
-  EFI_SUCCESS           - The firmware volume was read successfully and
-                          contents are in Buffer
-  EFI_BAD_BUFFER_SIZE   - Read attempted across a LBA boundary. On output,
-                          NumBytes contains the total number of bytes returned
-                          in Buffer
-  EFI_ACCESS_DENIED     - The firmware volume is in the ReadDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and
-                          could not be read
-  EFI_INVALID_PARAMETER - NumBytes or Buffer are NULL
+  Returns:
+    EFI_SUCCESS           - The firmware volume was read successfully and
+                            contents are in Buffer
+    EFI_BAD_BUFFER_SIZE   - Read attempted across a LBA boundary. On output,
+                            NumBytes contains the total number of bytes
+                            returned in Buffer
+    EFI_ACCESS_DENIED     - The firmware volume is in the ReadDisabled state
+    EFI_DEVICE_ERROR      - The block device is not functioning correctly and
+                            could not be read
+    EFI_INVALID_PARAMETER - NumBytes or Buffer are NULL
 
 --*/
 {
-  return QemuFlashRead ((EFI_LBA)Lba, (UINTN)Offset, NumBytes, (UINT8 *)Buffer);
+  return QemuFlashRead ((EFI_LBA)Lba, (UINTN)Offset, NumBytes,
+           (UINT8 *)Buffer);
 }
 
 EFI_STATUS
@@ -845,15 +859,16 @@ ValidateFvHeader (
   )
 /*++
 
-Routine Description:
-  Check the integrity of firmware volume header
+  Routine Description:
+    Check the integrity of firmware volume header
 
-Arguments:
-  FwVolHeader           - A pointer to a firmware volume header
+  Arguments:
+    FwVolHeader           - A pointer to a firmware volume header
 
-Returns:
-  EFI_SUCCESS           - The firmware volume is consistent
-  EFI_NOT_FOUND         - The firmware volume has corrupted. So it is not an FV
+  Returns:
+    EFI_SUCCESS           - The firmware volume is consistent
+    EFI_NOT_FOUND         - The firmware volume has corrupted. So it is not an
+                            FV
 
 --*/
 {
@@ -876,7 +891,8 @@ Returns:
   // Verify the header checksum
   //
 
-  Checksum = CalculateSum16 ((UINT16 *) FwVolHeader, FwVolHeader->HeaderLength);
+  Checksum = CalculateSum16 ((UINT16 *) FwVolHeader,
+               FwVolHeader->HeaderLength);
   if (Checksum != 0) {
     UINT16 Expected;
 
@@ -963,7 +979,8 @@ InitializeVariableFvHeader (
     UINTN   Offset;
     UINTN   Start;
 
-    DEBUG ((EFI_D_INFO, "Variable FV header is not valid. It will be reinitialized.\n"));
+    DEBUG ((EFI_D_INFO,
+      "Variable FV header is not valid. It will be reinitialized.\n"));
 
     //
     // Get FvbInfo to provide in FwhInstance.
@@ -1007,12 +1024,12 @@ FvbInitialize (
   )
 /*++
 
-Routine Description:
-  This function does common initialization for FVB services
+  Routine Description:
+    This function does common initialization for FVB services
 
-Arguments:
+  Arguments:
 
-Returns:
+  Returns:
 
 --*/
 {
@@ -1034,7 +1051,8 @@ Returns:
     //
     // Return an error so image will be unloaded
     //
-    DEBUG ((EFI_D_INFO, "QEMU flash was not detected. Writable FVB is not being installed.\n"));
+    DEBUG ((EFI_D_INFO,
+      "QEMU flash was not detected. Writable FVB is not being installed.\n"));
     return EFI_WRITE_PROTECTED;
   }
 
@@ -1050,7 +1068,8 @@ Returns:
 
   Status = InitializeVariableFvHeader ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "QEMU Flash: Unable to initialize variable FV header\n"));
+    DEBUG ((EFI_D_INFO,
+      "QEMU Flash: Unable to initialize variable FV header\n"));
     return EFI_WRITE_PROTECTED;
   }
 
@@ -1067,14 +1086,18 @@ Returns:
     }
   }
 
-  BufferSize = (sizeof (EFI_FW_VOL_INSTANCE) + FwVolHeader->HeaderLength - sizeof (EFI_FIRMWARE_VOLUME_HEADER));
+  BufferSize = (sizeof (EFI_FW_VOL_INSTANCE) +
+                FwVolHeader->HeaderLength -
+                sizeof (EFI_FIRMWARE_VOLUME_HEADER)
+                );
 
   //
   // Only need to allocate once. There is only one copy of physical memory for
   // the private data of each FV instance. But in virtual mode or in physical
   // mode, the address of the the physical memory may be different.
   //
-  mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] = AllocateRuntimePool (BufferSize);
+  mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] = AllocateRuntimePool (
+                                                 BufferSize);
   ASSERT (mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] != NULL);
 
   //
@@ -1093,13 +1116,16 @@ Returns:
   FwhInstance->FvBase[FVB_PHYSICAL] = (UINTN) BaseAddress;
   FwhInstance->FvBase[FVB_VIRTUAL]  = (UINTN) BaseAddress;
 
-  CopyMem ((UINTN *) &(FwhInstance->VolumeHeader), (UINTN *) FwVolHeader, FwVolHeader->HeaderLength);
+  CopyMem ((UINTN *) &(FwhInstance->VolumeHeader), (UINTN *) FwVolHeader,
+    FwVolHeader->HeaderLength);
   FwVolHeader = &(FwhInstance->VolumeHeader);
   EfiInitializeLock (&(FwhInstance->FvbDevLock), TPL_HIGH_LEVEL);
 
   NumOfBlocks = 0;
 
-  for (PtrBlockMapEntry = FwVolHeader->BlockMap; PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
+  for (PtrBlockMapEntry = FwVolHeader->BlockMap;
+       PtrBlockMapEntry->NumBlocks != 0;
+       PtrBlockMapEntry++) {
     //
     // Get the maximum size of a block.
     //
@@ -1130,24 +1156,35 @@ Returns:
   // Set up the devicepath
   //
   if (FwVolHeader->ExtHeaderOffset == 0) {
+    FV_MEMMAP_DEVICE_PATH *FvMemmapDevicePath;
+
     //
     // FV does not contains extension header, then produce MEMMAP_DEVICE_PATH
     //
-    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
-    ((FV_MEMMAP_DEVICE_PATH *) FvbDevice->DevicePath)->MemMapDevPath.StartingAddress = BaseAddress;
-    ((FV_MEMMAP_DEVICE_PATH *) FvbDevice->DevicePath)->MemMapDevPath.EndingAddress   = BaseAddress + FwVolHeader->FvLength - 1;
+    FvMemmapDevicePath = AllocateCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH),
+                           &mFvMemmapDevicePathTemplate);
+    FvMemmapDevicePath->MemMapDevPath.StartingAddress = BaseAddress;
+    FvMemmapDevicePath->MemMapDevPath.EndingAddress   =
+      BaseAddress + FwVolHeader->FvLength - 1;
+    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)FvMemmapDevicePath;
   } else {
-    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
+    FV_PIWG_DEVICE_PATH *FvPiwgDevicePath;
+
+    FvPiwgDevicePath = AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH),
+                         &mFvPIWGDevicePathTemplate);
     CopyGuid (
-      &((FV_PIWG_DEVICE_PATH *)FvbDevice->DevicePath)->FvDevPath.FvName,
+      &FvPiwgDevicePath->FvDevPath.FvName,
       (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)
       );
+    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)FvPiwgDevicePath;
   }
 
   //
-  // Find a handle with a matching device path that has supports FW Block protocol
+  // Find a handle with a matching device path that has supports FW Block
+  // protocol
   //
-  Status = gBS->LocateDevicePath (&gEfiFirmwareVolumeBlockProtocolGuid, &FvbDevice->DevicePath, &FwbHandle);
+  Status = gBS->LocateDevicePath (&gEfiFirmwareVolumeBlockProtocolGuid,
+                  &FvbDevice->DevicePath, &FwbHandle);
   if (EFI_ERROR (Status)) {
     //
     // LocateDevicePath fails so install a new interface and device path

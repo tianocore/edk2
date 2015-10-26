@@ -1,22 +1,23 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-Module Name:
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  FvbInfo.c
+  Module Name:
 
-Abstract:
+    FvbInfo.c
 
-  Defines data structure that is the volume header found.These data is intent
-  to decouple FVB driver with FV header.
+  Abstract:
+
+    Defines data structure that is the volume header found.These data is intent
+    to decouple FVB driver with FV header.
 
 **/
 
@@ -94,7 +95,8 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
           (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
            FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
            FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
-           FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) / FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
+           FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) /
+          FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
           FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
         }
       } // BlockMap[1]
@@ -118,7 +120,9 @@ GetFvbInfo (
   UINTN Index;
 
   if (!Checksummed) {
-    for (Index = 0; Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO); Index += 1) {
+    for (Index = 0;
+         Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO);
+         Index += 1) {
       UINT16 Checksum;
       mPlatformFvbMediaInfo[Index].FvbInfo.Checksum = 0;
       Checksum = CalculateCheckSum16 (
@@ -130,7 +134,9 @@ GetFvbInfo (
     Checksummed = TRUE;
   }
 
-  for (Index = 0; Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO); Index += 1) {
+  for (Index = 0;
+       Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO);
+       Index += 1) {
     if (mPlatformFvbMediaInfo[Index].FvLength == FvLength) {
       *FvbInfo = &mPlatformFvbMediaInfo[Index].FvbInfo;
       return EFI_SUCCESS;

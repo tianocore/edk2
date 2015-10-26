@@ -1,21 +1,22 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-Module Name:
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  FwBlockService.h
+  Module Name:
 
-Abstract:
+    FwBlockService.h
 
-  Firmware volume block driver for Intel Firmware Hub (FWH) device
+  Abstract:
+
+    Firmware volume block driver for Intel Firmware Hub (FWH) device
 
 **/
 
@@ -44,8 +45,12 @@ typedef struct {
 //
 // Fvb Protocol instance data
 //
-#define FVB_DEVICE_FROM_THIS(a)         CR (a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
-#define FVB_EXTEND_DEVICE_FROM_THIS(a)  CR (a, EFI_FW_VOL_BLOCK_DEVICE, FvbExtension, FVB_DEVICE_SIGNATURE)
+#define FVB_DEVICE_FROM_THIS(a) CR (a, EFI_FW_VOL_BLOCK_DEVICE, \
+                                  FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
+
+#define FVB_EXTEND_DEVICE_FROM_THIS(a) CR (a, EFI_FW_VOL_BLOCK_DEVICE, \
+                                         FvbExtension, FVB_DEVICE_SIGNATURE)
+
 #define FVB_DEVICE_SIGNATURE            SIGNATURE_32 ('F', 'V', 'B', 'N')
 
 typedef struct {

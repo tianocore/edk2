@@ -1,17 +1,20 @@
 ## @file
-# Component description file for QEMU Flash Fimware Volume Block DXE driver module.
+#  Component description file for QEMU Flash Fimware Volume Block DXE driver
+#  module.
 #
-# This DXE runtime driver implements and produces the Fimware Volue Block Protocol
-# for a QEMU flash device.
+#  This DXE runtime driver implements and produces the Fimware Volue Block
+#  Protocol for a QEMU flash device.
 #
-# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
+#  IMPLIED.
 #
 ##
 
@@ -24,7 +27,8 @@
   ENTRY_POINT                    = FvbInitialize
 
 #
-# The following information is for reference only and not required by the build tools.
+# The following information is for reference only and not required by the build
+# tools.
 #
 #  VALID_ARCHITECTURES           = IA32
 #
@@ -53,7 +57,8 @@
   PcdLib
 
 [Guids]
-  gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED  Create Event: EVENT_GROUP_GUID
+  gEfiEventVirtualAddressChangeGuid   # ALWAYS_CONSUMED
+  # gEfiEventVirtualAddressChangeGuid # Create Event: EVENT_GROUP_GUID
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_PRODUCED
