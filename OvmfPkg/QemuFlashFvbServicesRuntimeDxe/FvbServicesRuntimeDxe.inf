@@ -46,17 +46,16 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
-  UefiBootServicesTableLib
-  MemoryAllocationLib
-  BaseMemoryLib
-  HobLib
-  DebugLib
-  UefiRuntimeLib
-  DxeServicesTableLib
   BaseLib
-  UefiDriverEntryPoint
-  UefiLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  MemoryAllocationLib
   PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeLib
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid   # ALWAYS_CONSUMED

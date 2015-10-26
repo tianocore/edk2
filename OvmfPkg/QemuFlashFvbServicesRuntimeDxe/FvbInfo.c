@@ -24,28 +24,16 @@
 //
 // The package level header files this module uses
 //
-#include <PiDxe.h>
+#include <Pi/PiFirmwareVolume.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Guid/EventGroup.h>
-#include <Guid/FirmwareFileSystem2.h>
 #include <Guid/SystemNvDataGuid.h>
-#include <Protocol/FirmwareVolumeBlock.h>
-#include <Protocol/DevicePath.h>
 //
 // The Library classes this module consumes
 //
-#include <Library/UefiLib.h>
-#include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/UefiRuntimeLib.h>
-#include <Library/DebugLib.h>
-#include <Library/HobLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
 
 typedef struct {

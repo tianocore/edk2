@@ -23,19 +23,19 @@
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/FirmwareVolumeBlock.h>
 
 //
 // The Library classes this module consumes
 //
 #include <Library/BaseLib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/DevicePathLib.h>
 
 #include "FwBlockService.h"
 #include "QemuFlash.h"
