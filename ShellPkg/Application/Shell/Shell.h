@@ -294,6 +294,25 @@ RunCommand(
   );
 
 /**
+  Function will process and run a command line.
+
+  This will determine if the command line represents an internal shell 
+  command or dispatch an external application.
+
+  @param[in] CmdLine      The command line to parse.
+  @param[out] CommandStatus   The status from the command line.
+
+  @retval EFI_SUCCESS     The command was completed.
+  @retval EFI_ABORTED     The command's operation was aborted.
+**/
+EFI_STATUS
+EFIAPI
+RunShellCommand(
+  IN CONST CHAR16   *CmdLine,
+  OUT EFI_STATUS    *CommandStatus
+  );
+
+/**
   Function determines if the CommandName COULD be a valid command.  It does not determine whether
   this is a valid command.  It only checks for invalid characters.
 

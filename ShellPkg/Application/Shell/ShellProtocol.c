@@ -1631,40 +1631,60 @@ EfiShellExecute(
   CHAR16                    *Temp;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   UINTN                     Size;
-
+  EFI_STATUS                CalleeStatusCode;
+  
   if ((PcdGet8(PcdShellSupportLevel) < 1)) {
     return (EFI_UNSUPPORTED);
   }
 
-  DevPath = AppendDevicePath (ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
+  if (Environment != NULL) {
+    // If Environment isn't null, load a new image of the shell with its own
+    // environment
+    DevPath = AppendDevicePath (ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
+ 
+    DEBUG_CODE_BEGIN();
+    Temp = ConvertDevicePathToText(ShellInfoObject.FileDevPath, TRUE, TRUE);
+    FreePool(Temp);
+    Temp = ConvertDevicePathToText(ShellInfoObject.ImageDevPath, TRUE, TRUE);
+    FreePool(Temp);
+    Temp = ConvertDevicePathToText(DevPath, TRUE, TRUE);
+    FreePool(Temp);
+    DEBUG_CODE_END();
 
-  DEBUG_CODE_BEGIN();
-  Temp = ConvertDevicePathToText(ShellInfoObject.FileDevPath, TRUE, TRUE);
-  FreePool(Temp);
-  Temp = ConvertDevicePathToText(ShellInfoObject.ImageDevPath, TRUE, TRUE);
-  FreePool(Temp);
-  Temp = ConvertDevicePathToText(DevPath, TRUE, TRUE);
-  FreePool(Temp);
-  DEBUG_CODE_END();
+    Temp = NULL;
+    Size = 0;
+    ASSERT((Temp == NULL && Size == 0) || (Temp != NULL));
+    StrnCatGrow(&Temp, &Size, L"Shell.efi -_exit ", 0);
+    StrnCatGrow(&Temp, &Size, CommandLine, 0);
 
-  Temp = NULL;
-  Size = 0;
-  ASSERT((Temp == NULL && Size == 0) || (Temp != NULL));
-  StrnCatGrow(&Temp, &Size, L"Shell.efi -_exit ", 0);
-  StrnCatGrow(&Temp, &Size, CommandLine, 0);
+    Status = InternalShellExecuteDevicePath(
+      ParentImageHandle,
+      DevPath,
+      Temp,
+      (CONST CHAR16**)Environment,
+      StatusCode);
 
-  Status = InternalShellExecuteDevicePath(
-    ParentImageHandle,
-    DevPath,
-    Temp,
-    (CONST CHAR16**)Environment,
-    StatusCode);
+    //
+    // de-allocate and return
+    //
+    FreePool(DevPath);
+    FreePool(Temp);
+  } else {
+    // If Environment is NULL, we are free to use and mutate the current shell
+    // environment. This is much faster as uses much less memory.
 
-  //
-  // de-allocate and return
-  //
-  FreePool(DevPath);
-  FreePool(Temp);
+    if (CommandLine == NULL) {
+      CommandLine = L"";
+    }
+
+    Status = RunShellCommand (CommandLine, &CalleeStatusCode);
+
+    // Pass up the command's exit code if the caller wants it
+    if (StatusCode != NULL) {
+      *StatusCode = (EFI_STATUS) CalleeStatusCode;
+    }
+  }
+
   return(Status);
 }
 
