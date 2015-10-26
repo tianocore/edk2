@@ -34,6 +34,8 @@ typedef struct {
   EFI_FW_VOL_INSTANCE *FvInstance;
 } ESAL_FWB_GLOBAL;
 
+extern ESAL_FWB_GLOBAL *mFvbModuleGlobal;
+
 //
 // Fvb Protocol instance data
 //
@@ -174,4 +176,17 @@ FvbProtocolEraseBlocks (
   ...
   );
 
+//
+// The following functions have different implementations dependent on the
+// module type chosen for building this driver.
+//
+VOID
+InstallProtocolInterfaces (
+  IN EFI_FW_VOL_BLOCK_DEVICE *FvbDevice
+  );
+
+VOID
+InstallVirtualAddressChangeHandler (
+  VOID
+  );
 #endif

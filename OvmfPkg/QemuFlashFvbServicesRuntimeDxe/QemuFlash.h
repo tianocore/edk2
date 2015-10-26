@@ -18,6 +18,8 @@
 
 #include <Protocol/FirmwareVolumeBlock.h>
 
+extern UINT8 *mFlashBase;
+
 /**
   Read from QEMU Flash
 

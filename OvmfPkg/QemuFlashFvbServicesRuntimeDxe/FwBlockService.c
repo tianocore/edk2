@@ -21,25 +21,16 @@
 **/
 
 //
-// The package level header files this module uses
-//
-#include <PiDxe.h>
-
-//
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Guid/EventGroup.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/DevicePath.h>
 
 //
 // The Library classes this module consumes
 //
-#include <Library/UefiLib.h>
-#include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>
 #include <Library/DxeServicesTableLib.h>
-#include <Library/UefiRuntimeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -116,56 +107,6 @@ EFI_FW_VOL_BLOCK_DEVICE mFvbDeviceTemplate = {
   }
 };
 
-
-
-VOID
-EFIAPI
-FvbVirtualddressChangeEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-/*++
-
-  Routine Description:
-
-    Fixup internal data so that EFI and SAL can be call in virtual mode.
-    Call the passed in Child Notify event and convert the mFvbModuleGlobal
-    date items to there virtual address.
-
-  Arguments:
-
-    (Standard EFI notify event - EFI_EVENT_NOTIFY)
-
-  Returns:
-
-    None
-
---*/
-{
-  EFI_FW_VOL_INSTANCE *FwhInstance;
-  UINTN               Index;
-
-  FwhInstance = mFvbModuleGlobal->FvInstance;
-  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal->FvInstance);
-
-  //
-  // Convert the base address of all the instances
-  //
-  Index       = 0;
-  while (Index < mFvbModuleGlobal->NumFv) {
-    EfiConvertPointer (0x0, (VOID **) &FwhInstance->FvBase);
-    FwhInstance = (EFI_FW_VOL_INSTANCE *)
-      (
-        (UINTN) ((UINT8 *) FwhInstance) +
-        FwhInstance->VolumeHeader.HeaderLength +
-        (sizeof (EFI_FW_VOL_INSTANCE) - sizeof (EFI_FIRMWARE_VOLUME_HEADER))
-      );
-    Index++;
-  }
-
-  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal);
-  QemuFlashConvertPointers ();
-}
 
 EFI_STATUS
 GetFvbInstance (
@@ -1019,14 +960,11 @@ FvbInitialize (
   EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
   UINT32                              BufferSize;
   EFI_FV_BLOCK_MAP_ENTRY              *PtrBlockMapEntry;
-  EFI_HANDLE                          FwbHandle;
   EFI_FW_VOL_BLOCK_DEVICE             *FvbDevice;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *OldFwbInterface;
   UINT32                              MaxLbaSize;
   EFI_PHYSICAL_ADDRESS                BaseAddress;
   UINTN                               Length;
   UINTN                               NumOfBlocks;
-  EFI_EVENT                           VirtualAddressChangeEvent;
 
   if (EFI_ERROR (QemuFlashInitialize ())) {
     //
@@ -1148,51 +1086,9 @@ FvbInitialize (
   }
 
   //
-  // Find a handle with a matching device path that has supports FW Block
-  // protocol
+  // Module type specific hook.
   //
-  Status = gBS->LocateDevicePath (&gEfiFirmwareVolumeBlockProtocolGuid,
-                  &FvbDevice->DevicePath, &FwbHandle);
-  if (EFI_ERROR (Status)) {
-    //
-    // LocateDevicePath fails so install a new interface and device path
-    //
-    FwbHandle = NULL;
-    DEBUG ((EFI_D_INFO, "Installing QEMU flash FVB\n"));
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &FwbHandle,
-                    &gEfiFirmwareVolumeBlockProtocolGuid,
-                    &FvbDevice->FwVolBlockInstance,
-                    &gEfiDevicePathProtocolGuid,
-                    FvbDevice->DevicePath,
-                    NULL
-                    );
-    ASSERT_EFI_ERROR (Status);
-  } else if (IsDevicePathEnd (FvbDevice->DevicePath)) {
-    //
-    // Device already exists, so reinstall the FVB protocol
-    //
-    Status = gBS->HandleProtocol (
-                    FwbHandle,
-                    &gEfiFirmwareVolumeBlockProtocolGuid,
-                    (VOID**)&OldFwbInterface
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    DEBUG ((EFI_D_INFO, "Reinstalling FVB for QEMU flash region\n"));
-    Status = gBS->ReinstallProtocolInterface (
-                    FwbHandle,
-                    &gEfiFirmwareVolumeBlockProtocolGuid,
-                    OldFwbInterface,
-                    &FvbDevice->FwVolBlockInstance
-                    );
-    ASSERT_EFI_ERROR (Status);
-  } else {
-    //
-    // There was a FVB protocol on an End Device Path node
-    //
-    ASSERT (FALSE);
-  }
+  InstallProtocolInterfaces (FvbDevice);
 
   MarkMemoryRangeForRuntimeAccess (BaseAddress, Length);
 
@@ -1218,16 +1114,10 @@ FvbInitialize (
       (sizeof (EFI_FW_VOL_INSTANCE) - sizeof (EFI_FIRMWARE_VOLUME_HEADER))
     );
 
-  VirtualAddressChangeEvent = NULL;
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  FvbVirtualddressChangeEvent,
-                  NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
-                  &VirtualAddressChangeEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
+  //
+  // Module type specific hook.
+  //
+  InstallVirtualAddressChangeHandler ();
 
   PcdSetBool (PcdOvmfFlashVariablesEnable, TRUE);
   return EFI_SUCCESS;

@@ -36,7 +36,9 @@
 [Sources]
   FvbInfo.c
   FwBlockService.c
+  FwBlockServiceDxe.c
   QemuFlash.c
+  QemuFlashDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
