@@ -38,7 +38,6 @@ typedef struct {
 typedef struct {
   UINT32              NumFv;
   EFI_FW_VOL_INSTANCE *FvInstance[2];
-  UINT8               *FvbScratchSpace[2];
 } ESAL_FWB_GLOBAL;
 
 //
