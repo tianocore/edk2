@@ -1140,7 +1140,8 @@ PiCpuSmmEntry (
   // Expose address of CPU Hot Plug Data structure if CPU hot plug is supported.
   //
   if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-    PcdSet64 (PcdCpuHotPlugDataAddress, (UINT64)(UINTN)&mCpuHotPlugData);
+    Status = PcdSet64S (PcdCpuHotPlugDataAddress, (UINT64)(UINTN)&mCpuHotPlugData);
+    ASSERT_EFI_ERROR (Status);
   }
 
   //
