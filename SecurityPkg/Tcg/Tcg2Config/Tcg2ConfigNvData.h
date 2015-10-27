@@ -29,6 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_TCG2_EVENT_LOG_FORMAT_ALL           (EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2 | EFI_TCG2_EVENT_LOG_FORMAT_TCG_2)
 
 #define TCG2_CONFIGURATION_VARSTORE_ID  0x0001
+#define TCG2_CONFIGURATION_INFO_VARSTORE_ID  0x0002
 #define TCG2_CONFIGURATION_FORM_ID      0x0001
 
 #define KEY_TPM_DEVICE                                 0x2000
@@ -57,6 +58,14 @@ typedef struct {
   UINT8   TpmDevice;
 } TCG2_CONFIGURATION;
 
+typedef struct {
+  UINT8  Sha1Supported;
+  UINT8  Sha256Supported;
+  UINT8  Sha384Supported;
+  UINT8  Sha512Supported;
+  UINT8  Sm3Supported;
+} TCG2_CONFIGURATION_INFO;
+
 //
 // Variable saved for S3, TPM detected, only valid in S3 path.
 // This variable is ReadOnly.
@@ -65,7 +74,8 @@ typedef struct {
   UINT8   TpmDeviceDetected;
 } TCG2_DEVICE_DETECTION;
 
-#define TCG2_STORAGE_NAME  L"TCG2_CONFIGURATION"
+#define TCG2_STORAGE_NAME           L"TCG2_CONFIGURATION"
+#define TCG2_STORAGE_INFO_NAME      L"TCG2_CONFIGURATION_INFO"
 #define TCG2_DEVICE_DETECTION_NAME  L"TCG2_DEVICE_DETECTION"
 
 #define TPM_INSTANCE_ID_LIST  { \
