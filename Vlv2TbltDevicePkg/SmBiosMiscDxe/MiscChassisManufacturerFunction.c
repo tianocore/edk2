@@ -69,8 +69,8 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscChassisManufacturer)
     return EFI_INVALID_PARAMETER;
   }
 
-  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
-    UnicodeSPrint (Buffer, sizeof (Buffer),L"Compatible Vendor");
+  if (BOARD_ID_MINNOW2_TURBOT == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"ADI");
     HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_CHASSIS_MANUFACTURER), Buffer, NULL);
   }  
   TokenToGet = STRING_TOKEN (STR_MISC_CHASSIS_MANUFACTURER);

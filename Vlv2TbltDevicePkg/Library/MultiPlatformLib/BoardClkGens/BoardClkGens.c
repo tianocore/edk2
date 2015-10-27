@@ -370,7 +370,7 @@ ConfigurePlatformClocks (
 
   switch (PlatformInfoHob->BoardId) {
     case BOARD_ID_MINNOW2:
-    case BOARD_ID_MINNOW2_COMPATIBLE:
+    case BOARD_ID_MINNOW2_TURBOT:
     default:
       switch(PlatformInfoHob->PlatformFlavor) {
       case FlavorTablet:

@@ -194,13 +194,13 @@ PeiSmbusExec (
 
 /**
 
-  Detemine compatible board 
-  @return 0: Not compatible board
-          1: Compatible board 
+  Detemine Turbot board 
+  @return 0: Not Turbot board
+          1: Turbot board 
 
 **/
 UINT32 
-DetermineCompatibleBoard (
+DetermineTurbotBoard (
   void
   )
 {
@@ -214,7 +214,7 @@ DetermineCompatibleBoard (
   UINT32 SSUSOffset = 0x2000;
   UINT32 IoBase = 0;
 
-  DEBUG ((EFI_D_ERROR, "DetermineCompatibleBoard() Entry\n"));
+  DEBUG ((EFI_D_ERROR, "DetermineTurbotBoard() Entry\n"));
   PciD31F0RegBase = MmPciAddress (0,
                       0,
                       PCI_DEVICE_NUMBER_PCH_LPC,
@@ -934,10 +934,10 @@ ReadPlatformIds (
       return Status;
     }
 
-    CompatibleBoard = DetermineCompatibleBoard();
+    CompatibleBoard = DetermineTurbotBoard();
    if (1 == CompatibleBoard) {
-     PlatformInfoHob->BoardId    = BOARD_ID_MINNOW2_COMPATIBLE;
-     DEBUG ((EFI_D_INFO,  "I'm MinnowBoard Compatible!\n"));
+     PlatformInfoHob->BoardId    = BOARD_ID_MINNOW2_TURBOT;
+     DEBUG ((EFI_D_INFO,  "I'm MinnowBoard Turbot!\n"));
    } else {       
      PlatformInfoHob->BoardId    = BOARD_ID_MINNOW2;
      DEBUG ((EFI_D_INFO,  "I'm MinnowBoard Max!\n"));

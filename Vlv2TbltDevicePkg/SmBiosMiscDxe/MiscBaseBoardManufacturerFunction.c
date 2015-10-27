@@ -80,8 +80,8 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBaseBoardManufacturer)
     return EFI_INVALID_PARAMETER;
   }
 
-  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
-    UnicodeSPrint (Buffer, sizeof (Buffer),L"Compatible Vendor");
+  if (BOARD_ID_MINNOW2_TURBOT == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"ADI");
     HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_BASE_BOARD_MANUFACTURER), Buffer, NULL);
   }
   TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER);
@@ -91,8 +91,8 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscBaseBoardManufacturer)
     return EFI_UNSUPPORTED;
   }
 
-  if (BOARD_ID_MINNOW2_COMPATIBLE == mPlatformInfo->BoardId) {
-    UnicodeSPrint (Buffer, sizeof (Buffer),L"MinnowBoard Compatible Platform");
+  if (BOARD_ID_MINNOW2_TURBOT == mPlatformInfo->BoardId) {
+    UnicodeSPrint (Buffer, sizeof (Buffer),L"MinnowBoard Turbot");
     HiiSetString(mHiiHandle,STRING_TOKEN(STR_MISC_BASE_BOARD_PRODUCT_NAME1), Buffer, NULL);
   }
   TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_PRODUCT_NAME1);

@@ -32,7 +32,7 @@ InitializeBoardSsidSvid (
     //
     switch (PlatformInfoHob->BoardId) {
       case BOARD_ID_MINNOW2:
-      case BOARD_ID_MINNOW2_COMPATIBLE:
+      case BOARD_ID_MINNOW2_TURBOT:
       default:
         SsidSvidValue = SUBSYSTEM_SVID_SSID;//SUBSYSTEM_SVID_SSID_DEFAULT;
         break;
