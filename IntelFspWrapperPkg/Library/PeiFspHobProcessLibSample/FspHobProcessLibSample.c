@@ -25,6 +25,7 @@
 
 #include <Guid/GuidHobFspEas.h>
 #include <Guid/MemoryTypeInformation.h>
+#include <Guid/PcdDataBaseHobGuid.h>
 #include <Ppi/Capsule.h>
 
 //
@@ -335,6 +336,41 @@ FspHobProcessForMemoryResource (
 }
 
 /**
+  Process FSP HOB list
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+**/
+VOID
+ProcessFspHobList (
+  IN VOID                 *FspHobList
+  )
+{
+  EFI_PEI_HOB_POINTERS  FspHob;
+
+  FspHob.Raw = FspHobList;
+
+  //
+  // Add all the HOBs from FSP binary to FSP wrapper
+  //
+  while (!END_OF_HOB_LIST (FspHob)) {
+    if (FspHob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION) {
+      //
+      // Skip FSP binary creates PcdDataBaseHobGuid
+      //
+      if (!CompareGuid(&FspHob.Guid->Name, &gPcdDataBaseHobGuid)) { 
+        BuildGuidDataHob (
+          &FspHob.Guid->Name,
+          GET_GUID_HOB_DATA(FspHob),
+          GET_GUID_HOB_DATA_SIZE(FspHob)
+        );
+      }
+    }
+    FspHob.Raw = GET_NEXT_HOB (FspHob);
+  }
+}
+
+/**
   BIOS process FspBobList for other data (not Memory Resource Descriptor).
 
   @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
@@ -347,6 +383,8 @@ FspHobProcessForOtherData (
   IN VOID                 *FspHobList
   )
 {
+  ProcessFspHobList (FspHobList);
+
   return EFI_SUCCESS;
 }
 

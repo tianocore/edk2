@@ -70,6 +70,7 @@
 [Guids]
   gFspReservedMemoryResourceHobGuid                       ## CONSUMES ## HOB
   gEfiMemoryTypeInformationGuid                           ## CONSUMES ## GUID
+  gPcdDataBaseHobGuid                                     ## CONSUMES ## HOB
 
 [Ppis]
   gEfiPeiCapsulePpiGuid                                   ## CONSUMES
