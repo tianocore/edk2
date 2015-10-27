@@ -378,6 +378,117 @@ HiiGetHiiHandles (
 }
 
 /**
+  This function allows a caller to extract the form set opcode form the Hii Handle.
+  The returned buffer is allocated using AllocatePool().The caller is responsible 
+  for freeing the allocated buffer using FreePool().
+
+  @param Handle            The HII handle.
+  @param Buffer            On return, opints to a pointer which point to the buffer that contain the formset opcode.
+  @param BufferSize        On return, points to the length of the buffer.
+
+  @retval EFI_OUT_OF_RESOURCES   No enough memory resource is allocated.
+  @retval EFI_NOT_FOUND          Can't find the package data for the input Handle.
+  @retval EFI_INVALID_PARAMETER  The input parameters are not correct.
+  @retval EFI_SUCCESS            Get the formset opcode from the hii handle sucessfully.
+
+**/
+EFI_STATUS
+EFIAPI
+HiiGetFormSetFromHiiHandle(
+  IN  EFI_HII_HANDLE     Handle,
+  OUT EFI_IFR_FORM_SET   **Buffer,
+  OUT UINTN              *BufferSize
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        PackageListSize;
+  UINTN                        TempSize;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+  UINT8                        *Package;
+  UINT8                        *OpCodeData;
+  EFI_IFR_FORM_SET             *FormSetBuffer;
+  EFI_IFR_FORM_SET             *TempBuffer;
+  UINT32                       Offset;
+  UINT32                       Offset2;
+  UINT32                       PackageListLength;
+  EFI_HII_PACKAGE_HEADER       PackageHeader;
+
+  TempSize = 0;
+  FormSetBuffer = NULL;
+  TempBuffer    = NULL;
+
+  //
+  // Get HII PackageList
+  //
+  PackageListSize = 0;
+  HiiPackageList = NULL;
+  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &PackageListSize, HiiPackageList);
+  if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+    return Status;
+  }
+
+  HiiPackageList = AllocatePool (PackageListSize);
+  if (HiiPackageList == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &PackageListSize, HiiPackageList);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Get Form package from this HII package List
+  //
+  Status = EFI_NOT_FOUND;
+  Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+  PackageListLength = ReadUnaligned32 (&HiiPackageList->PackageLength);
+
+  while (Offset < PackageListLength) {
+    Package = ((UINT8 *) HiiPackageList) + Offset;
+    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
+    Offset += PackageHeader.Length;
+
+    if (PackageHeader.Type != EFI_HII_PACKAGE_FORMS) {
+      continue;
+    }
+
+    //
+    // Search FormSet Opcode in this Form Package
+    //
+    Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
+    while (Offset2 < PackageHeader.Length) {
+      OpCodeData = Package + Offset2;
+      Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
+
+      if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode != EFI_IFR_FORM_SET_OP) {
+        continue;
+      }
+
+      if (FormSetBuffer != NULL){
+        TempBuffer = AllocateCopyPool (TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length, FormSetBuffer);
+        CopyMem (TempBuffer + TempSize,  OpCodeData, ((EFI_IFR_OP_HEADER *) OpCodeData)->Length);
+        FreePool(FormSetBuffer);
+      } else {
+        TempBuffer = AllocateCopyPool (TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length, OpCodeData);
+      }
+      TempSize += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
+      FormSetBuffer = TempBuffer;
+
+      Status = EFI_SUCCESS;
+      //
+      //One form package has one formset, exit current form package to search other form package in the packagelist.
+      //
+      break;
+    }
+  }
+  FreePool (HiiPackageList);
+
+  *BufferSize = TempSize;
+  *Buffer = FormSetBuffer;
+
+  return Status;
+}
+
+/**
   Converts all hex dtring characters in range ['A'..'F'] to ['a'..'f'] for 
   hex digits that appear between a '=' and a '&' in a config string.
 

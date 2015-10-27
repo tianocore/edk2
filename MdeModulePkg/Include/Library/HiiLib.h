@@ -225,6 +225,29 @@ HiiGetHiiHandles (
 ;
 
 /**
+  This function allows a caller to extract the form set opcode form the Hii Handle.
+  The returned buffer is allocated using AllocatePool().The caller is responsible 
+  for freeing the allocated buffer using FreePool().
+
+  @param Handle            The HII handle.
+  @param Buffer            On return, opints to a pointer which point to the buffer that contain the formset opcode.
+  @param BufferSize        On return, points to the length of the buffer.
+
+  @retval EFI_OUT_OF_RESOURCES   No enough memory resource is allocated.
+  @retval EFI_NOT_FOUND          Can't find the package data for the input Handle.
+  @retval EFI_INVALID_PARAMETER  The input parameters are not correct.
+  @retval EFI_SUCCESS            Get the formset opcode from the hii handle sucessfully.
+
+**/
+EFI_STATUS
+EFIAPI
+HiiGetFormSetFromHiiHandle(
+  IN  EFI_HII_HANDLE     Handle,
+  OUT EFI_IFR_FORM_SET   **Buffer,
+  OUT UINTN              *BufferSize
+  );
+
+/**
   Retrieves a pointer to a Null-terminated ASCII string containing the list 
   of languages that an HII handle in the HII Database supports.  The returned 
   string is allocated using AllocatePool().  The caller is responsible for freeing
