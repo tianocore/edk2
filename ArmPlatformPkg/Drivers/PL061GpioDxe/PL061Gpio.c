@@ -1,6 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2016, Linaro Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD
@@ -27,7 +28,6 @@
 #include <Protocol/EmbeddedGpio.h>
 #include <Drivers/PL061Gpio.h>
 
-BOOLEAN     mPL061Initialized = FALSE;
 
 /**
   Function implementations
@@ -78,8 +78,6 @@ PL061Initialize (
   //   // Ensure interrupts are disabled
   //}
 
-  mPL061Initialized = TRUE;
-
   EXIT:
   return Status;
 }
@@ -109,20 +107,10 @@ Get (
   OUT UINTN             *Value
   )
 {
-  EFI_STATUS    Status = EFI_SUCCESS;
-
   if (    (Value == NULL)
       ||  (Gpio > LAST_GPIO_PIN))
   {
     return EFI_INVALID_PARAMETER;
-  }
-
-  // Initialize the hardware if not already done
-  if (!mPL061Initialized) {
-    Status = PL061Initialize();
-    if (EFI_ERROR(Status)) {
-      goto EXIT;
-    }
   }
 
   if (MmioRead8 (PL061_GPIO_DATA_REG) & GPIO_PIN_MASK_HIGH_8BIT(Gpio)) {
@@ -131,8 +119,7 @@ Get (
     *Value = 0;
   }
 
-  EXIT:
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -167,14 +154,6 @@ Set (
   if (Gpio > LAST_GPIO_PIN) {
     Status = EFI_INVALID_PARAMETER;
     goto EXIT;
-  }
-
-  // Initialize the hardware if not already done
-  if (!mPL061Initialized) {
-    Status = PL061Initialize();
-    if (EFI_ERROR(Status)) {
-      goto EXIT;
-    }
   }
 
   switch (Mode)
@@ -233,20 +212,10 @@ GetMode (
   OUT EMBEDDED_GPIO_MODE  *Mode
   )
 {
-  EFI_STATUS Status;
-
   // Check for errors
   if (    (Mode == NULL)
       ||  (Gpio > LAST_GPIO_PIN)) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  // Initialize the hardware if not already done
-  if (!mPL061Initialized) {
-    Status = PL061Initialize();
-    if (EFI_ERROR(Status)) {
-      return Status;
-    }
   }
 
   // Check if it is input or output
@@ -328,6 +297,11 @@ PL061InstallProtocol (
   // Make sure the Gpio protocol has not been installed in the system yet.
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEmbeddedGpioProtocolGuid);
+
+  Status = PL061Initialize();
+  if (EFI_ERROR(Status)) {
+    return EFI_DEVICE_ERROR;
+  }
 
   // Install the Embedded GPIO Protocol onto a new handle
   Handle = NULL;
