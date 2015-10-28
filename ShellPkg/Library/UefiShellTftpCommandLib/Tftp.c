@@ -341,6 +341,7 @@ ShellCommandRunTftp (
   }
 
   RemoteFilePath = ShellCommandLineGetRawValue (CheckPackage, 2);
+  ASSERT(RemoteFilePath != NULL);
   AsciiRemoteFilePath = AllocatePool (
                           (StrLen (RemoteFilePath) + 1) * sizeof (CHAR8)
                           );
