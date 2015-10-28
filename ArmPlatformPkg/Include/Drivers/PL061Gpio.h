@@ -19,6 +19,7 @@
 #include <Protocol/EmbeddedGpio.h>
 
 // PL061 GPIO Registers
+#define PL061_GPIO_DATA_REG_OFFSET      ((UINTN) 0x000)
 #define PL061_GPIO_DATA_REG             ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x000)
 #define PL061_GPIO_DIR_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x400)
 #define PL061_GPIO_IS_REG               ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x404)
@@ -46,9 +47,5 @@
 
 // All bits low except one bit high, native bit length
 #define GPIO_PIN_MASK(Pin)              (1UL << ((UINTN)(Pin)))
-// All bits low except one bit high, restricted to 8 bits (i.e. ensures zeros above 8bits)
-#define GPIO_PIN_MASK_HIGH_8BIT(Pin)    (GPIO_PIN_MASK(Pin) && 0xFF)
-// All bits high except one bit low, restricted to 8 bits (i.e. ensures zeros above 8bits)
-#define GPIO_PIN_MASK_LOW_8BIT(Pin)     ((~GPIO_PIN_MASK(Pin)) && 0xFF)
 
 #endif  // __PL061_GPIO_H__

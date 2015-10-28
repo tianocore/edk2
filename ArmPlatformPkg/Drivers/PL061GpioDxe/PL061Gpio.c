@@ -28,6 +28,56 @@
 #include <Protocol/EmbeddedGpio.h>
 #include <Drivers/PL061Gpio.h>
 
+//
+// The PL061 is a strange beast. The 8-bit data register is aliased across a
+// region 0x400 bytes in size, with bits [9:2] of the address operating as a
+// mask for both read and write operations:
+// For reads:
+//   - All bits where their corresponding mask bit is 1 return the current
+//     value of that bit in the GPIO_DATA register.
+//   - All bits where their corresponding mask bit is 0 return 0.
+// For writes:
+//   - All bits where their corresponding mask bit is 1 set the bit in the
+//     GPIO_DATA register to the written value.
+//   - All bits where their corresponding mask bit is 0 are left untouched
+//     in the GPIO_DATA register.
+//
+// To keep this driver intelligible, PL061EffectiveAddress, PL061GetPins and
+// Pl061SetPins provide an internal abstraction from this interface.
+
+STATIC
+UINTN
+EFIAPI
+PL061EffectiveAddress (
+  IN UINTN Address,
+  IN UINTN Mask
+  )
+{
+  return ((Address + PL061_GPIO_DATA_REG_OFFSET) + (Mask << 2));
+}
+
+STATIC
+UINTN
+EFIAPI
+PL061GetPins (
+  IN UINTN Address,
+  IN UINTN Mask
+  )
+{
+  return MmioRead8 (PL061EffectiveAddress (Address, Mask));
+}
+
+STATIC
+VOID
+EFIAPI
+PL061SetPins (
+  IN UINTN Address,
+  IN UINTN Mask,
+  IN UINTN Value
+  )
+{
+  MmioWrite8 (PL061EffectiveAddress (Address, Mask), Value);
+}
 
 /**
   Function implementations
@@ -88,7 +138,7 @@ Get (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (MmioRead8 (PL061_GPIO_DATA_REG) & GPIO_PIN_MASK_HIGH_8BIT(Gpio)) {
+  if (PL061GetPins (PL061_GPIO_DATA_REG, Gpio)) {
     *Value = 1;
   } else {
     *Value = 0;
@@ -135,22 +185,22 @@ Set (
   {
     case GPIO_MODE_INPUT:
       // Set the corresponding direction bit to LOW for input
-      MmioAnd8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK_LOW_8BIT(Gpio));
+      MmioAnd8 (PL061_GPIO_DIR_REG, ~GPIO_PIN_MASK(Gpio) & 0xFF);
       break;
 
     case GPIO_MODE_OUTPUT_0:
-      // Set the corresponding data bit to LOW for 0
-      MmioAnd8 (PL061_GPIO_DATA_REG, GPIO_PIN_MASK_LOW_8BIT(Gpio));
       // Set the corresponding direction bit to HIGH for output
-      MmioOr8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio));
+      MmioOr8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK(Gpio));
+      // Set the corresponding data bit to LOW for 0
+      PL061SetPins (PL061_GPIO_DATA_REG, GPIO_PIN_MASK(Gpio), 0);
       break;
 
     case GPIO_MODE_OUTPUT_1:
-      // Set the corresponding data bit to HIGH for 1
-      MmioOr8 (PL061_GPIO_DATA_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio));
       // Set the corresponding direction bit to HIGH for output
-      MmioOr8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK_HIGH_8BIT(Gpio));
-      break;
+      MmioOr8 (PL061_GPIO_DIR_REG, GPIO_PIN_MASK(Gpio));
+      // Set the corresponding data bit to HIGH for 1
+      PL061SetPins (PL061_GPIO_DATA_REG, GPIO_PIN_MASK(Gpio), 0xff);
+    break;
 
     default:
       // Other modes are not supported
@@ -194,9 +244,9 @@ GetMode (
   }
 
   // Check if it is input or output
-  if (MmioRead8 (PL061_GPIO_DIR_REG) & GPIO_PIN_MASK_HIGH_8BIT(Gpio)) {
+  if (MmioRead8 (PL061_GPIO_DIR_REG) & GPIO_PIN_MASK(Gpio)) {
     // Pin set to output
-    if (MmioRead8 (PL061_GPIO_DATA_REG) & GPIO_PIN_MASK_HIGH_8BIT(Gpio)) {
+    if (PL061GetPins (PL061_GPIO_DATA_REG, GPIO_PIN_MASK(Gpio))) {
       *Mode = GPIO_MODE_OUTPUT_1;
     } else {
       *Mode = GPIO_MODE_OUTPUT_0;
