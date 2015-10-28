@@ -33,11 +33,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define  SMM_FEATURES_LIB_IA32_CORE_SMRR_PHYSMASK  0x0A1
 #define    EFI_MSR_SMRR_MASK                       0xFFFFF000
 #define    EFI_MSR_SMRR_PHYS_MASK_VALID            BIT11
+#define  SMM_FEATURES_LIB_SMM_FEATURE_CONTROL      0x4E0
 
 //
 // Set default value to assume SMRR is not supported
 //
 BOOLEAN  mSmrrSupported = FALSE;
+
+//
+// Set default value to assume MSR_SMM_FEATURE_CONTROL is not supported
+//
+BOOLEAN  mSmmFeatureControlSupported = FALSE;
 
 //
 // Set default value to assume IA-32 Architectural MSRs are used
@@ -122,6 +128,20 @@ SmmCpuFeaturesLibConstructor (
     if (ModelId == 0x17 || ModelId == 0x0f) {
       mSmrrPhysBaseMsr = SMM_FEATURES_LIB_IA32_CORE_SMRR_PHYSBASE;
       mSmrrPhysMaskMsr = SMM_FEATURES_LIB_IA32_CORE_SMRR_PHYSMASK;
+    }
+  }
+
+  //
+  // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+  // Volume 3C, Section 35.10.1 MSRs in 4th Generation Intel(R) Core(TM)
+  // Processor Family
+  //
+  // If CPU Family/Model is 06_3C, 06_45, or 06_46 then use 4th Generation
+  // Intel(R) Core(TM) Processor Family MSRs
+  //
+  if (FamilyId == 0x06) {
+    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46) {
+      mSmmFeatureControlSupported = TRUE;
     }
   }
 
@@ -457,6 +477,9 @@ SmmCpuFeaturesIsSmmRegisterSupported (
   IN SMM_REG_NAME  RegName
   )
 {
+  if (mSmmFeatureControlSupported && RegName == SmmRegFeatureControl) {
+    return TRUE;
+  }
   return FALSE;
 }
 
@@ -479,6 +502,9 @@ SmmCpuFeaturesGetSmmRegister (
   IN SMM_REG_NAME  RegName
   )
 {
+  if (mSmmFeatureControlSupported && RegName == SmmRegFeatureControl) {
+    return AsmReadMsr64 (SMM_FEATURES_LIB_SMM_FEATURE_CONTROL);
+  }
   return 0;
 }
 
@@ -501,6 +527,9 @@ SmmCpuFeaturesSetSmmRegister (
   IN UINT64        Value
   )
 {
+  if (mSmmFeatureControlSupported && RegName == SmmRegFeatureControl) {
+    AsmWriteMsr64 (SMM_FEATURES_LIB_SMM_FEATURE_CONTROL, Value);
+  }
 }
 
 /**
