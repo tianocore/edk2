@@ -2280,6 +2280,7 @@ UpdateVariable (
         // Both ADDED and IN_DELETED_TRANSITION variable are present,
         // set IN_DELETED_TRANSITION one to DELETED state first.
         //
+        ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
         State = CacheVariable->InDeletedTransitionPtr->State;
         State &= VAR_DELETED;
         Status = UpdateVariableStore (
@@ -2293,7 +2294,6 @@ UpdateVariable (
                    );
         if (!EFI_ERROR (Status)) {
           if (!Variable->Volatile) {
-            ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
             CacheVariable->InDeletedTransitionPtr->State = State;
           }
         } else {
@@ -2719,6 +2719,7 @@ UpdateVariable (
       // Both ADDED and IN_DELETED_TRANSITION old variable are present,
       // set IN_DELETED_TRANSITION one to DELETED state first.
       //
+      ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
       State = CacheVariable->InDeletedTransitionPtr->State;
       State &= VAR_DELETED;
       Status = UpdateVariableStore (
@@ -2732,7 +2733,6 @@ UpdateVariable (
                  );
       if (!EFI_ERROR (Status)) {
         if (!Variable->Volatile) {
-          ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
           CacheVariable->InDeletedTransitionPtr->State = State;
         }
       } else {
