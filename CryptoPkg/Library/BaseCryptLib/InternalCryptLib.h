@@ -1,7 +1,7 @@
 /** @file  
   Internal include file for BaseCryptLib.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,11 +23,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "OpenSslSupport.h"
 
-//
-// Environment Setting for OpenSSL-based UEFI Crypto Library.
-//
-#ifndef OPENSSL_SYSNAME_UWIN
-#define OPENSSL_SYSNAME_UWIN
+#include <openssl/opensslv.h>
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+#define OBJ_get0_data(o) ((o)->data)
+#define OBJ_length(o) ((o)->length)
 #endif
 
 #endif

@@ -77,7 +77,7 @@ AuthenticodeVerify (
   UINT8        *SpcIndirectDataContent;
   UINT8        Asn1Byte;
   UINTN        ContentSize;
-  UINT8        *SpcIndirectDataOid;
+  CONST UINT8  *SpcIndirectDataOid;
 
   //
   // Check input parameters.
@@ -115,8 +115,9 @@ AuthenticodeVerify (
   //       some authenticode-specific structure. Use opaque ASN.1 string to retrieve
   //       PKCS#7 ContentInfo here.
   //
-  SpcIndirectDataOid = (UINT8 *)(Pkcs7->d.sign->contents->type->data);
-  if (CompareMem (
+  SpcIndirectDataOid = OBJ_get0_data(Pkcs7->d.sign->contents->type);
+  if (OBJ_length(Pkcs7->d.sign->contents->type) != sizeof(mSpcIndirectOidValue) ||
+      CompareMem (
         SpcIndirectDataOid,
         mSpcIndirectOidValue,
         sizeof (mSpcIndirectOidValue)
