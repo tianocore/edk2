@@ -589,7 +589,7 @@ SmbiosMeasurementDriverEntryPoint (
   EFI_STATUS            Status;
   EFI_EVENT             Event;
 
-  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, &mSmbios);
+  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **) &mSmbios);
   ASSERT_EFI_ERROR (Status);
   DEBUG ((DEBUG_INFO, "The Smbios Table Version: %x.%x\n", mSmbios->MajorVersion, mSmbios->MinorVersion));
   
