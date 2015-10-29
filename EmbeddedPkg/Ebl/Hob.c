@@ -3,6 +3,7 @@
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -116,6 +117,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED char *mHobResourceType[] = {
 
 **/
 EFI_STATUS
+EFIAPI
 EblHobCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
