@@ -30,12 +30,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define OBJ_length(o) ((o)->length)
 #endif
 
-//
-// Environment Setting for OpenSSL-based UEFI Crypto Library.
-//
-#ifndef OPENSSL_SYSNAME_UWIN
-#define OPENSSL_SYSNAME_UWIN
-#endif
-
 #endif
 
