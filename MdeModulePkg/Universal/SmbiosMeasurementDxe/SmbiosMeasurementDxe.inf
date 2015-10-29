@@ -55,11 +55,11 @@
   TpmMeasurementLib
 
 [Protocols]
-  gEfiSmbiosProtocolGuid                            ## PRODUCES
+  gEfiSmbiosProtocolGuid                            ## CONSUMES
 
 [Guids]
-  gEfiSmbiosTableGuid                               ## SOMETIMES_PRODUCES ## SystemTable
-  gEfiSmbios3TableGuid                              ## SOMETIMES_PRODUCES ## SystemTable
+  gEfiSmbiosTableGuid                               ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiSmbios3TableGuid                              ## SOMETIMES_CONSUMES ## SystemTable
 
 [Depex]
   gEfiSmbiosProtocolGuid
