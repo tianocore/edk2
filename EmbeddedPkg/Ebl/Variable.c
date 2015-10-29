@@ -1,6 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +18,7 @@
 #include <Guid/GlobalVariable.h>
 
 EFI_STATUS
+EFIAPI
 EblGetCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -79,6 +81,7 @@ EblGetCmd (
 }
 
 EFI_STATUS
+EFIAPI
 EblSetCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv

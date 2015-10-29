@@ -3,6 +3,7 @@
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -256,6 +257,7 @@ CountNewLines (
 
 **/
 EFI_STATUS
+EFIAPI
 EblHelpCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -313,6 +315,7 @@ EblHelpCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblExitCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -418,6 +421,7 @@ EblPauseCallback (
 
 **/
 EFI_STATUS
+EFIAPI
 EblPauseCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -452,6 +456,7 @@ EblPauseCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblBreakPointCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -478,6 +483,7 @@ EblBreakPointCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblResetCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -518,6 +524,7 @@ EblResetCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblPageCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -542,6 +549,7 @@ EblPageCmd (
 }
 
 EFI_STATUS
+EFIAPI
 EblSleepCmd (
   IN UINTN Argc,
   IN CHAR8 **Argv
@@ -741,6 +749,7 @@ WidthFromCommandName (
 
 **/
 EFI_STATUS
+EFIAPI
 EblHexdumpCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
