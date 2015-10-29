@@ -1,14 +1,14 @@
 /** @file
   This driver measures SMBIOS table to TPM.
-  
+
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -217,7 +217,7 @@ GetSmbiosStringById (
   // look for the two consecutive zeros, check the string limit by the way.
   //
   String = NULL;
-  while (*CharInStr != 0 || *(CharInStr+1) != 0) { 
+  while (*CharInStr != 0 || *(CharInStr+1) != 0) {
     if (*CharInStr == 0) {
       Size += 1;
       CharInStr++;
@@ -306,7 +306,7 @@ FilterSmbiosEntry (
 
   @param Head                   Pointer to the beginning of SMBIOS structure.
   @param NumberOfStrings        The returned number of optional strings that follow the formatted structure.
-  
+
   @return Size                  The returned size.
 **/
 UINTN
@@ -327,7 +327,7 @@ GetSmbiosStructureSize (
   //
   // look for the two consecutive zeros, check the string limit by the way.
   //
-  while (*CharInStr != 0 || *(CharInStr+1) != 0) { 
+  while (*CharInStr != 0 || *(CharInStr+1) != 0) {
     if (*CharInStr == 0) {
       Size += 1;
       CharInStr++;
@@ -570,7 +570,7 @@ MeasureSmbiosTable (
 
 /**
 
-  Driver to produce Smbios measurement. 
+  Driver to produce Smbios measurement.
 
   @param ImageHandle     Module's image handle
   @param SystemTable     Pointer of EFI_SYSTEM_TABLE
@@ -592,7 +592,7 @@ SmbiosMeasurementDriverEntryPoint (
   Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **) &mSmbios);
   ASSERT_EFI_ERROR (Status);
   DEBUG ((DEBUG_INFO, "The Smbios Table Version: %x.%x\n", mSmbios->MajorVersion, mSmbios->MinorVersion));
-  
+
   if (mSmbios->MajorVersion < 2 || (mSmbios->MajorVersion == 2 && mSmbios->MinorVersion < 7)){
     mMaxLen = SMBIOS_STRING_MAX_LENGTH;
   } else if (mSmbios->MajorVersion < 3) {

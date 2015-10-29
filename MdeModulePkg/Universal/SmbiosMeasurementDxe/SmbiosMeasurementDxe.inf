@@ -56,7 +56,7 @@
 
 [Protocols]
   gEfiSmbiosProtocolGuid                            ## PRODUCES
-  
+
 [Guids]
   gEfiSmbiosTableGuid                               ## SOMETIMES_PRODUCES ## SystemTable
   gEfiSmbios3TableGuid                              ## SOMETIMES_PRODUCES ## SystemTable
