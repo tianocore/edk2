@@ -127,7 +127,7 @@ if /i "%~2" == "RELEASE" (
 :: Additional EDK Build Setup/Configuration
 ::**********************************************************************
 echo.
-echo Setting the Build environment for VS2008/VS2010/VS2012/VS2013...
+echo Setting the Build environment for VS2008/VS2010/VS2012/VS2013/VS2015...
 if defined VS90COMNTOOLS (
    if not defined VSINSTALLDIR call "%VS90COMNTOOLS%\vsvars32.bat"
    if /I "%VS90COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 9.0\Common7\Tools\" (
