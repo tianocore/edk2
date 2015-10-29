@@ -210,25 +210,36 @@ diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
 diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
 --- crypto/x509/x509_vfy.c	Thu Jun 11 21:52:58 2015
 +++ crypto/x509/x509_vfy.c	Fri Jun 12 11:29:37 2015
-@@ -1653,6 +1653,10 @@
+@@ -935,6 +935,8 @@
+         ctx->current_crl = crl;
+     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
+         ptime = &ctx->param->check_time;
++    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
++        return 1;
+     else
+         ptime = NULL;
  
- static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
- {
-+#ifdef OPENSSL_SYS_UEFI
-+    /* Bypass Certificate Time Checking for UEFI version. */
-+    return 1;
-+#else
-     time_t *ptime;
-     int i;
+@@ -1658,6 +1660,8 @@
  
-@@ -1692,6 +1696,7 @@
-     }
+     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
+         ptime = &ctx->param->check_time;
++    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
++        return 1;
+     else
+         ptime = NULL;
  
-     return 1;
-+#endif
- }
+diff U3 crypto/x509/x509_vfy.h crypto/x509/x509_vfy.h
+--- crypto/x509/x509_vfy.h	Thu Jul 09 19:57:16 2015
++++ crypto/x509/x509_vfy.h	Thu Oct 29 14:05:57 2015
+@@ -438,6 +438,8 @@
+  * will force the behaviour to match that of previous versions.
+  */
+ # define X509_V_FLAG_NO_ALT_CHAINS               0x100000
++/* Do not check certificate/CRL validity against current time */
++# define X509_V_FLAG_NO_CHECK_TIME               0x200000
  
- static int internal_verify(X509_STORE_CTX *ctx)
+ # define X509_VP_FLAG_DEFAULT                    0x1
+ # define X509_VP_FLAG_OVERWRITE                  0x2
 diff U3 crypto/x509v3/ext_dat.h crypto/x509v3/ext_dat.h
 --- crypto/x509v3/ext_dat.h	Thu Jun 11 21:50:12 2015
 +++ crypto/x509v3/ext_dat.h	Fri Jun 12 11:11:03 2015
