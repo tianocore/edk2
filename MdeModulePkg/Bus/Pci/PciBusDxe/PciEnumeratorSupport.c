@@ -340,6 +340,10 @@ DumpPpbPaddingResource (
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
   PCI_BAR_TYPE                      Type;
 
+  if (PciIoDevice->ResourcePaddingDescriptors == NULL) {
+    return;
+  }
+
   if (ResourceType == PciBarTypeIo16 || ResourceType == PciBarTypeIo32) {
     ResourceType = PciBarTypeIo;
   }
