@@ -280,6 +280,7 @@ InitializeDebugAgent (
     //
     // Check if CPU APIC Timer is working, otherwise initialize it.
     //
+    InitializeLocalApicSoftwareEnable (TRUE);
     GetApicTimerState (NULL, &PeriodicMode, NULL);
     TimerCycle = GetApicTimerInitCount ();
     if (!PeriodicMode || TimerCycle == 0) {
