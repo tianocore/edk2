@@ -4,7 +4,7 @@
   Local APIC library assumes local APIC is enabled. It does not
   handles cases where local APIC is disabled.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -225,6 +225,20 @@ VOID
 EFIAPI
 SendInitSipiSipiAllExcludingSelf (
   IN UINT32          StartupRoutine
+  );
+
+/**
+  Initialize the state of the SoftwareEnable bit in the Local APIC
+  Spurious Interrupt Vector register.
+
+  @param  Enable  If TRUE, then set SoftwareEnable to 1
+                  If FALSE, then set SoftwareEnable to 0.
+
+**/
+VOID
+EFIAPI
+InitializeLocalApicSoftwareEnable (
+  IN BOOLEAN  Enable
   );
 
 /**
