@@ -485,10 +485,6 @@ EfiHttpRequest (
     goto Error4;
   }
 
-  if (HostName != NULL) {
-    FreePool (HostName);
-  }
-
   //
   // Transmit the request message.
   //
@@ -503,6 +499,10 @@ EfiHttpRequest (
   }
 
   DispatchDpc ();
+
+  if (HostName != NULL) {
+    FreePool (HostName);
+  }
 
   return EFI_SUCCESS;
 
