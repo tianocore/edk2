@@ -1386,7 +1386,7 @@ ConfigSmmCodeAccessCheck (
   //
   // Check to see if the Feature Control MSR is supported on this CPU
   //
-  Index = gSmst->CurrentlyExecutingCpu;
+  Index = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
   if (!SmmCpuFeaturesIsSmmRegisterSupported (Index, SmmRegFeatureControl)) {
     mSmmCodeAccessCheckEnable = FALSE;
     return;
@@ -1428,7 +1428,7 @@ ConfigSmmCodeAccessCheck (
   // Enable SMM Code Access Check feature for the APs.
   //
   for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
-    if (Index != gSmst->CurrentlyExecutingCpu) {
+    if (Index != gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu) {
 
       //
       // Acquire Config SMM Code Access Check spin lock.  The AP will release the
