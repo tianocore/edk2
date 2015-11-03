@@ -976,7 +976,8 @@ PciScanBus (
   UINT8                             Device;
   UINT8                             Func;
   UINT64                            Address;
-  UINTN                             SecondBus;
+  UINT8                             SecondBus;
+  UINT8                             PaddedSubBus;
   UINT16                            Register;
   UINTN                             HpIndex;
   PCI_IO_DEVICE                     *PciDevice;
@@ -1210,7 +1211,7 @@ PciScanBus (
 
           Status = PciScanBus (
                     PciDevice,
-                    (UINT8) (SecondBus),
+                    SecondBus,
                     SubBusNumber,
                     PaddedBusRange
                     );
@@ -1226,12 +1227,16 @@ PciScanBus (
           if ((Attributes == EfiPaddingPciRootBridge) &&
               (State & EFI_HPC_STATE_ENABLED) != 0    &&
               (State & EFI_HPC_STATE_INITIALIZED) != 0) {
-            *PaddedBusRange = (UINT8) ((UINT8) (BusRange) +*PaddedBusRange);
+            *PaddedBusRange = (UINT8) ((UINT8) (BusRange) + *PaddedBusRange);
           } else {
-            Status = PciAllocateBusNumber (PciDevice, *SubBusNumber, (UINT8) (BusRange), SubBusNumber);
+            //
+            // Reserve the larger one between the actual occupied bus number and padded bus number
+            //
+            Status = PciAllocateBusNumber (PciDevice, StartBusNumber, (UINT8) (BusRange), &PaddedSubBus);
             if (EFI_ERROR (Status)) {
               return Status;
             }
+            *SubBusNumber = MAX (PaddedSubBus, *SubBusNumber);
           }
         }
 
