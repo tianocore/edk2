@@ -63,6 +63,7 @@
   MemoryAllocationLib
   BaseMemoryLib
   DebugLib
+  PrintLib
 
 [Guids]
   gEfiRegexSyntaxTypePosixExtendedGuid    ## CONSUMES  ## GUID
