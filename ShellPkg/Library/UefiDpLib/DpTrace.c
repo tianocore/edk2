@@ -43,11 +43,14 @@
   
   @post The SummaryData and CumData structures contain statistics for the
         current performance logs.
+
+  @param[in, out] CustomCumulativeData  A pointer to the cumtom cumulative data.
+
 **/
 VOID
 GatherStatistics(
-  VOID
-)
+  IN OUT PERF_CUM_DATA              *CustomCumulativeData OPTIONAL
+  )
 {
   MEASUREMENT_RECORD        Measurement;
   UINT64                    Duration;
@@ -97,6 +100,20 @@ GatherStatistics(
       }
       if ( Duration > CumData[TIndex].MaxDur ) {
         CumData[TIndex].MaxDur = Duration;
+      }
+    }
+
+    //
+    // Collect the data for custom cumulative data.
+    //
+    if ((CustomCumulativeData != NULL) && (AsciiStrCmp (Measurement.Token, CustomCumulativeData->Name) == 0)) {
+      CustomCumulativeData->Duration += Duration;
+      CustomCumulativeData->Count++;
+      if (Duration < CustomCumulativeData->MinDur) {
+        CustomCumulativeData->MinDur = Duration;
+      }
+      if (Duration > CustomCumulativeData->MaxDur) {
+        CustomCumulativeData->MaxDur = Duration;
       }
     }
   }
@@ -782,12 +799,14 @@ ProcessGlobal(
   For each record with a Token listed in the CumData array:<BR>
      - Update the instance count and the total, minimum, and maximum durations.
   Finally, print the gathered cumulative statistics.
-  
+
+  @param[in]    CustomCumulativeData  A pointer to the cumtom cumulative data.
+
 **/
 VOID
 ProcessCumulative(
-  VOID
-)
+  IN PERF_CUM_DATA                  *CustomCumulativeData OPTIONAL
+  )
 {
   UINT64                    AvgDur;         // the computed average duration
   UINT64                    Dur;
@@ -825,5 +844,31 @@ ProcessCumulative(
                   MaxDur
                  );
     }
+  }
+
+  //
+  // Print the custom cumulative data.
+  //
+  if (CustomCumulativeData != NULL) {
+    if (CustomCumulativeData->Count != 0) {
+      AvgDur = DivU64x32 (CustomCumulativeData->Duration, CustomCumulativeData->Count);
+      AvgDur = DurationInMicroSeconds (AvgDur);
+      Dur    = DurationInMicroSeconds (CustomCumulativeData->Duration);
+      MaxDur = DurationInMicroSeconds (CustomCumulativeData->MaxDur);
+      MinDur = DurationInMicroSeconds (CustomCumulativeData->MinDur);
+    } else {
+      AvgDur = 0;
+      Dur    = 0;
+      MaxDur = 0;
+      MinDur = 0;
+    }
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_STATS), gDpHiiHandle,
+                CustomCumulativeData->Name,
+                CustomCumulativeData->Count,
+                Dur,
+                AvgDur,
+                MinDur,
+                MaxDur
+                );
   }
 }

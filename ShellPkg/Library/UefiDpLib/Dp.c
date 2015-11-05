@@ -79,6 +79,7 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
 #endif // PROFILING_IMPLEMENTED
   {L"-x", TypeFlag},   // -x   eXclude Cumulative Items
   {L"-i", TypeFlag},   // -i   Display Identifier
+  {L"-c", TypeValue},  // -c   Display cumulative data.
   {L"-n", TypeValue},  // -n # Number of records to display for A and R
   {L"-t", TypeValue},  // -t # Threshold of interest
   {NULL, TypeMax}
@@ -164,6 +165,9 @@ ShellCommandRunDp (
   BOOLEAN                   TraceMode;
   BOOLEAN                   ProfileMode;
   BOOLEAN                   ExcludeMode;
+  BOOLEAN                   CumulativeMode;
+  CONST CHAR16              *CustomCumulativeToken;
+  PERF_CUM_DATA             *CustomCumulativeData;
 
   StringPtr   = NULL;
   SummaryMode = FALSE;
@@ -173,6 +177,8 @@ ShellCommandRunDp (
   TraceMode   = FALSE;
   ProfileMode = FALSE;
   ExcludeMode = FALSE;
+  CumulativeMode = FALSE;
+  CustomCumulativeData = NULL;
 
   // Get DP's entry time as soon as possible.
   // This is used as the Shell-Phase end time.
@@ -210,6 +216,7 @@ ShellCommandRunDp (
 #endif  // PROFILING_IMPLEMENTED
   ExcludeMode = ShellCommandLineGetFlag (ParamPackage, L"-x");
   mShowId     = ShellCommandLineGetFlag (ParamPackage, L"-i");
+  CumulativeMode = ShellCommandLineGetFlag (ParamPackage, L"-c");
 
   // Options with Values
   CmdLineArg  = ShellCommandLineGetValue (ParamPackage, L"-n");
@@ -242,6 +249,20 @@ ShellCommandRunDp (
   // Initialize the pre-defined cumulative data.
   //
   InitCumulativeData ();
+
+  //
+  // Init the custom cumulative data.
+  //
+  CustomCumulativeToken = ShellCommandLineGetValue (ParamPackage, L"-c");
+  if (CustomCumulativeToken != NULL) {
+    CustomCumulativeData = AllocateZeroPool (sizeof (PERF_CUM_DATA));
+    CustomCumulativeData->MinDur = 0;
+    CustomCumulativeData->MaxDur = 0;
+    CustomCumulativeData->Count  = 0;
+    CustomCumulativeData->Duration = 0;
+    CustomCumulativeData->Name   = AllocateZeroPool (StrLen (CustomCumulativeToken) + 1);
+    UnicodeStrToAsciiStr (CustomCumulativeToken, CustomCumulativeData->Name);
+  }
 
   //
   // Timer specific processing
@@ -302,8 +323,10 @@ ShellCommandRunDp (
 ****    !T &&  P  := (2) Only Profile records are displayed
 ****     T &&  P  := (3) Same as Default, both are displayed
 ****************************************************************************/
-  GatherStatistics();
-  if (AllMode) {
+  GatherStatistics (CustomCumulativeData);
+  if (CumulativeMode) {                       
+    ProcessCumulative (CustomCumulativeData);
+  } else if (AllMode) {
     if (TraceMode) {
       DumpAllTrace( Number2Display, ExcludeMode);
     }
@@ -326,7 +349,7 @@ ShellCommandRunDp (
         if ( ! EFI_ERROR( Status)) {
           ProcessPeims ();
           ProcessGlobal ();
-          ProcessCumulative ();
+          ProcessCumulative (NULL);
         }
       }
     }
@@ -339,6 +362,10 @@ ShellCommandRunDp (
   }
 
   SHELL_FREE_NON_NULL (StringPtr);
+  if (CustomCumulativeData != NULL) {
+    SHELL_FREE_NON_NULL (CustomCumulativeData->Name);
+  }
+  SHELL_FREE_NON_NULL (CustomCumulativeData);
 
   return SHELL_SUCCESS;
 }

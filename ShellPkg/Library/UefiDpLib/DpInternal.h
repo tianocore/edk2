@@ -172,10 +172,13 @@ GetCumulativeItem(
   
   @post The SummaryData and CumData structures contain statistics for the
         current performance logs.
+
+  @param[in, out] CustomCumulativeData  The pointer to the custom cumulative data.
+
 **/
 VOID
 GatherStatistics(
-  VOID
+  IN OUT PERF_CUM_DATA              *CustomCumulativeData OPTIONAL
   );
 
 /** 
@@ -283,11 +286,13 @@ ProcessGlobal(
   For each record with a Token listed in the CumData array:<BR>
      - Update the instance count and the total, minimum, and maximum durations.
   Finally, print the gathered cumulative statistics.
+
+  @param[in]    CustomCumulativeData  The pointer to the custom cumulative data.
   
 **/
 VOID
 ProcessCumulative(
-  VOID
+  IN PERF_CUM_DATA                  *CustomCumulativeData OPTIONAL
   );
 
 /** 
