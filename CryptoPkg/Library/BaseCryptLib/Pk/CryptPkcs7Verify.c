@@ -541,7 +541,7 @@ Pkcs7GetCertificatesList (
       goto _Error;
     }
   }
-  sk_X509_delete_ptr (CertCtx.untrusted, Signer);
+  (VOID)sk_X509_delete_ptr (CertCtx.untrusted, Signer);
 
   //
   // Build certificates stack chained from Signer's certificate.
@@ -571,7 +571,7 @@ Pkcs7GetCertificatesList (
         if (!sk_X509_push (CertCtx.chain, Issuer)) {
           goto _Error;
         }
-        sk_X509_delete_ptr (CertCtx.untrusted, Issuer);
+        (VOID)sk_X509_delete_ptr (CertCtx.untrusted, Issuer);
 
         Cert = Issuer;
         continue;
