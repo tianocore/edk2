@@ -14,6 +14,7 @@
   timer information to calculate elapsed time for each measurement.
  
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -110,7 +111,26 @@ DumpStatistics( void )
   SHELL_FREE_NON_NULL (StringPtrUnknown);
 }
 
-/** 
+/**
+  Initialize the cumulative data.
+
+**/
+VOID
+InitCumulativeData (
+  VOID
+  )
+{
+  UINTN                             Index;
+
+  for (Index = 0; Index < NumCum; ++Index) {
+    CumData[Index].Count = 0;
+    CumData[Index].MinDur = PERF_MAXDUR;
+    CumData[Index].MaxDur = 0;
+    CumData[Index].Duration = 0;
+  }
+}
+
+/**
   Dump performance data.
   
   @param[in]  ImageHandle     The image handle.
@@ -217,6 +237,11 @@ ShellCommandRunDp (
     ProfileMode = TRUE;
 #endif  // PROFILING_IMPLEMENTED
   }
+
+  //
+  // Initialize the pre-defined cumulative data.
+  //
+  InitCumulativeData ();
 
   //
   // Timer specific processing
