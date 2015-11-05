@@ -428,6 +428,294 @@ Pkcs7FreeSigners (
 }
 
 /**
+  Retrieves all embedded certificates from PKCS#7 signed data as described in "PKCS #7:
+  Cryptographic Message Syntax Standard", and outputs two certificate lists chained and
+  unchained to the signer's certificates.
+  The input signed data could be wrapped in a ContentInfo structure.
+
+  @param[in]  P7Data            Pointer to the PKCS#7 message.
+  @param[in]  P7Length          Length of the PKCS#7 message in bytes.
+  @param[out] SingerChainCerts  Pointer to the certificates list chained to signer's
+                                certificate. It's caller's responsiblity to free the buffer.
+  @param[out] ChainLength       Length of the chained certificates list buffer in bytes.
+  @param[out] UnchainCerts      Pointer to the unchained certificates lists. It's caller's
+                                responsiblity to free the buffer.
+  @param[out] UnchainLength     Length of the unchained certificates list buffer in bytes.
+
+  @retval  TRUE         The operation is finished successfully.
+  @retval  FALSE        Error occurs during the operation.
+
+**/
+BOOLEAN
+EFIAPI
+Pkcs7GetCertificatesList (
+  IN  CONST UINT8  *P7Data,
+  IN  UINTN        P7Length,
+  OUT UINT8        **SignerChainCerts,
+  OUT UINTN        *ChainLength,
+  OUT UINT8        **UnchainCerts,
+  OUT UINTN        *UnchainLength
+  )
+{
+  BOOLEAN          Status;
+  UINT8            *NewP7Data;
+  UINTN            NewP7Length;
+  BOOLEAN          Wrapped;
+  UINT8            Index;
+  PKCS7            *Pkcs7;
+  X509_STORE_CTX   CertCtx;
+  STACK_OF(X509)   *Signers;
+  X509             *Signer;
+  X509             *Cert;
+  X509             *TempCert;
+  X509             *Issuer;
+  UINT8            *CertBuf;
+  UINT8            *OldBuf;
+  UINTN            BufferSize;
+  UINTN            OldSize;
+  UINT8            *SingleCert;
+  UINTN            CertSize;
+
+  //
+  // Initializations
+  //
+  Status         = FALSE;
+  NewP7Data      = NULL;
+  Pkcs7          = NULL;
+  Cert           = NULL;
+  TempCert       = NULL;
+  SingleCert     = NULL;
+  CertBuf        = NULL;
+  OldBuf         = NULL;
+  Signers        = NULL;
+
+  //
+  // Parameter Checking
+  //
+  if ((P7Data == NULL) || (SignerChainCerts == NULL) || (ChainLength == NULL) ||
+      (UnchainCerts == NULL) || (UnchainLength == NULL) || (P7Length > INT_MAX)) {
+    return Status;
+  }
+
+  *SignerChainCerts = NULL;
+  *ChainLength      = 0;
+  *UnchainCerts     = NULL;
+  *UnchainLength    = 0;
+
+  //
+  // Construct a new PKCS#7 data wrapping with ContentInfo structure if needed.
+  //
+  Status = WrapPkcs7Data (P7Data, P7Length, &Wrapped, &NewP7Data, &NewP7Length);
+  if (!Status || (NewP7Length > INT_MAX)) {
+    goto _Error;
+  }
+
+  //
+  // Decodes PKCS#7 SignedData
+  //
+  Pkcs7 = d2i_PKCS7 (NULL, (const unsigned char **) &NewP7Data, (int) NewP7Length);
+  if ((Pkcs7 == NULL) || (!PKCS7_type_is_signed (Pkcs7))) {
+    goto _Error;
+  }
+
+  //
+  // Obtains Signer's Certificate from PKCS#7 data
+  // NOTE: Only one signer case will be handled in this function, which means SignerInfos
+  //       should include only one singer's certificate.
+  //
+  Signers = PKCS7_get0_signers (Pkcs7, NULL, PKCS7_BINARY);
+  if ((Signers == NULL) || (sk_X509_num (Signers) != 1)) {
+    goto _Error;
+  }
+  Signer = sk_X509_value (Signers, 0);
+
+  if (!X509_STORE_CTX_init (&CertCtx, NULL, Signer, Pkcs7->d.sign->cert)) {
+    goto _Error;
+  }
+  //
+  // Initialize Chained & Untrusted stack
+  //
+  if (CertCtx.chain == NULL) {
+    if (((CertCtx.chain = sk_X509_new_null ()) == NULL) ||
+        (!sk_X509_push (CertCtx.chain, CertCtx.cert))) {
+      goto _Error;
+    }
+  }
+  sk_X509_delete_ptr (CertCtx.untrusted, Signer);
+
+  //
+  // Build certificates stack chained from Signer's certificate.
+  //
+  Cert = Signer;
+  for (; ;) {
+    //
+    // Self-Issue checking
+    //
+    if (CertCtx.check_issued (&CertCtx, Cert, Cert)) {
+      break;
+    }
+
+    //
+    // Found the issuer of the current certificate
+    //
+    if (CertCtx.untrusted != NULL) {
+      Issuer = NULL;
+      for (Index = 0; Index < sk_X509_num (CertCtx.untrusted); Index++) {
+        TempCert = sk_X509_value (CertCtx.untrusted, Index);
+        if (CertCtx.check_issued (&CertCtx, Cert, TempCert)) {
+          Issuer = TempCert;
+          break;
+        }
+      }
+      if (Issuer != NULL) {
+        if (!sk_X509_push (CertCtx.chain, Issuer)) {
+          goto _Error;
+        }
+        sk_X509_delete_ptr (CertCtx.untrusted, Issuer);
+
+        Cert = Issuer;
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  //
+  // Converts Chained and Untrusted Certificate to Certificate Buffer in following format:
+  //      UINT8  CertNumber;
+  //      UINT32 Cert1Length;
+  //      UINT8  Cert1[];
+  //      UINT32 Cert2Length;
+  //      UINT8  Cert2[];
+  //      ...
+  //      UINT32 CertnLength;
+  //      UINT8  Certn[];
+  //
+
+  if (CertCtx.chain != NULL) {
+    BufferSize = sizeof (UINT8);
+    OldSize    = BufferSize;
+    CertBuf    = NULL;
+
+    for (Index = 0; ; Index++) {
+      Status = X509PopCertificate (CertCtx.chain, &SingleCert, &CertSize);
+      if (!Status) {
+        break;
+      }
+
+      OldSize    = BufferSize;
+      OldBuf     = CertBuf;
+      BufferSize = OldSize + CertSize + sizeof (UINT32);
+      CertBuf    = malloc (BufferSize);
+
+      if (CertBuf == NULL) {
+        Status = FALSE;
+        goto _Error;
+      }
+      if (OldBuf != NULL) {
+        CopyMem (CertBuf, OldBuf, OldSize);
+        free (OldBuf);
+        OldBuf = NULL;
+      }
+
+      WriteUnaligned32 ((UINT32 *) (CertBuf + OldSize), (UINT32) CertSize);
+      CopyMem (CertBuf + OldSize + sizeof (UINT32), SingleCert, CertSize);
+
+      free (SingleCert);
+      SingleCert = NULL;
+    }
+
+    if (CertBuf != NULL) {
+      //
+      // Update CertNumber.
+      //
+      CertBuf[0] = Index;
+
+      *SignerChainCerts = CertBuf;
+      *ChainLength      = BufferSize;
+    }
+  }
+
+  if (CertCtx.untrusted != NULL) {
+    BufferSize = sizeof (UINT8);
+    OldSize    = BufferSize;
+    CertBuf    = NULL;
+
+    for (Index = 0; ; Index++) {
+      Status = X509PopCertificate (CertCtx.untrusted, &SingleCert, &CertSize);
+      if (!Status) {
+        break;
+      }
+
+      OldSize    = BufferSize;
+      OldBuf     = CertBuf;
+      BufferSize = OldSize + CertSize + sizeof (UINT32);
+      CertBuf    = malloc (BufferSize);
+
+      if (CertBuf == NULL) {
+        Status = FALSE;
+        goto _Error;
+      }
+      if (OldBuf != NULL) {
+        CopyMem (CertBuf, OldBuf, OldSize);
+        free (OldBuf);
+        OldBuf = NULL;
+      }
+
+      WriteUnaligned32 ((UINT32 *) (CertBuf + OldSize), (UINT32) CertSize);
+      CopyMem (CertBuf + OldSize + sizeof (UINT32), SingleCert, CertSize);
+
+      free (SingleCert);
+      SingleCert = NULL;
+    }
+
+    if (CertBuf != NULL) {
+      //
+      // Update CertNumber.
+      //
+      CertBuf[0] = Index;
+
+      *UnchainCerts  = CertBuf;
+      *UnchainLength = BufferSize;
+    }
+  }
+
+  Status = TRUE;
+
+_Error:
+  //
+  // Release Resources.
+  //
+  if (!Wrapped && (NewP7Data != NULL)) {
+    free (NewP7Data);
+  }
+
+  if (Pkcs7 != NULL) {
+    PKCS7_free (Pkcs7);
+  }
+  sk_X509_free (Signers);
+
+  X509_STORE_CTX_cleanup (&CertCtx);
+
+  if (SingleCert != NULL) {
+    free (SingleCert);
+  }
+
+  if (OldBuf != NULL) {
+    free (OldBuf);
+  }
+
+  if (!Status && (CertBuf != NULL)) {
+    free (CertBuf);
+    *SignerChainCerts = NULL;
+    *UnchainCerts     = NULL;
+  }
+
+  return Status;
+}
+
+/**
   Verifies the validility of a PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
