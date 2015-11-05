@@ -89,7 +89,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -126,7 +125,6 @@
   gEfiSmmCpuProtocolGuid                   ## PRODUCES
   gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
   gEfiSmmCpuServiceProtocolGuid            ## PRODUCES
-  gEfiSmmCpuSaveStateProtocolGuid          ## SOMETIMES_PRODUCES
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
@@ -135,7 +133,6 @@
   gEfiAcpi10TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport  ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp            ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection             ## CONSUMES
