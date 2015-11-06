@@ -780,10 +780,16 @@ class Build():
 
         # print current build environment and configuration
         EdkLogger.quiet("%-16s = %s" % ("WORKSPACE", os.environ["WORKSPACE"]))
+        if "PACKAGES_PATH" in os.environ:
+            # WORKSPACE env has been converted before. Print the same path style with WORKSPACE env. 
+            EdkLogger.quiet("%-16s = %s" % ("PACKAGES_PATH", os.path.normcase(os.path.normpath(os.environ["PACKAGES_PATH"]))))
         EdkLogger.quiet("%-16s = %s" % ("ECP_SOURCE", os.environ["ECP_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EDK_SOURCE", os.environ["EDK_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EFI_SOURCE", os.environ["EFI_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
+        if "EDK_TOOLS_BIN" in os.environ:
+            # Print the same path style with WORKSPACE env. 
+            EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_BIN", os.path.normcase(os.path.normpath(os.environ["EDK_TOOLS_BIN"]))))
 
         EdkLogger.info("")
 
