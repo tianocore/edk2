@@ -277,7 +277,7 @@ ArmDmaLibConstructor (
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
   ASSERT_EFI_ERROR(Status);
 
-  gCacheAlignment = ArmDataCacheLineLength ();
+  gCacheAlignment = ArmCacheWritebackGranule ();
 
   return Status;
 }
