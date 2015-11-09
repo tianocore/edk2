@@ -390,7 +390,7 @@ EfiHttpRequest (
     if (!HttpInstance->LocalAddressIsIPv6) {
       Status = NetLibAsciiStrToIp4 (HostName, &HttpInstance->RemoteAddr);
     } else {
-      Status = NetLibAsciiStrToIp6 (HostName, &HttpInstance->RemoteIpv6Addr);
+      Status = HttpUrlGetIp6 (Url, UrlParser, &HttpInstance->RemoteIpv6Addr);
     }
 
     if (EFI_ERROR (Status)) {
