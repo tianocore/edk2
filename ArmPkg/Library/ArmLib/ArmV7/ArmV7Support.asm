@@ -37,7 +37,7 @@
     EXPORT  ArmV7AllDataCachesOperation
     EXPORT  ArmV7PerformPoUDataCacheOperation
     EXPORT  ArmDataMemoryBarrier
-    EXPORT  ArmDataSyncronizationBarrier
+    EXPORT  ArmDataSynchronizationBarrier
     EXPORT  ArmInstructionSynchronizationBarrier
     EXPORT  ArmReadVBar
     EXPORT  ArmWriteVBar
@@ -315,7 +315,7 @@ ArmDataMemoryBarrier
   dmb
   bx      LR
 
-ArmDataSyncronizationBarrier
+ArmDataSynchronizationBarrier
 ArmDrainWriteBuffer
   dsb
   bx      LR

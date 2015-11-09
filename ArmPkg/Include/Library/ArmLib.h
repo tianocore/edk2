@@ -483,7 +483,7 @@ ArmDataMemoryBarrier (
 
 VOID
 EFIAPI
-ArmDataSyncronizationBarrier (
+ArmDataSynchronizationBarrier (
   VOID
   );
 

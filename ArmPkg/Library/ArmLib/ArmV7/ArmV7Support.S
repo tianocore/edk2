@@ -40,7 +40,7 @@ GCC_ASM_EXPORT (ArmSetHighVectors)
 GCC_ASM_EXPORT (ArmV7AllDataCachesOperation)
 GCC_ASM_EXPORT (ArmV7PerformPoUDataCacheOperation)
 GCC_ASM_EXPORT (ArmDataMemoryBarrier)
-GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
+GCC_ASM_EXPORT (ArmDataSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmReadVBar)
 GCC_ASM_EXPORT (ArmWriteVBar)
@@ -321,7 +321,7 @@ ASM_PFX(ArmDataMemoryBarrier):
   dmb
   bx      LR
 
-ASM_PFX(ArmDataSyncronizationBarrier):
+ASM_PFX(ArmDataSynchronizationBarrier):
 ASM_PFX(ArmDrainWriteBuffer):
   dsb
   bx      LR

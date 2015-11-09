@@ -237,7 +237,7 @@ EndOfInterrupt (
   )
 {
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
-  ArmDataSyncronizationBarrier ();
+  ArmDataSynchronizationBarrier ();
   return EFI_SUCCESS;
 }
 
@@ -267,7 +267,7 @@ IrqInterruptHandler (
 
   // Needed to prevent infinite nesting when Time Driver lowers TPL
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
-  ArmDataSyncronizationBarrier ();
+  ArmDataSynchronizationBarrier ();
 
   InterruptHandler = gRegisteredInterruptHandlers[Vector];
   if (InterruptHandler != NULL) {
@@ -277,7 +277,7 @@ IrqInterruptHandler (
 
   // Needed to clear after running the handler
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
-  ArmDataSyncronizationBarrier ();
+  ArmDataSynchronizationBarrier ();
 }
 
 //

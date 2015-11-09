@@ -42,7 +42,7 @@ GCC_ASM_EXPORT (ArmDisableBranchPrediction)
 GCC_ASM_EXPORT (AArch64AllDataCachesOperation)
 GCC_ASM_EXPORT (AArch64PerformPoUDataCacheOperation)
 GCC_ASM_EXPORT (ArmDataMemoryBarrier)
-GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
+GCC_ASM_EXPORT (ArmDataSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmWriteVBar)
 GCC_ASM_EXPORT (ArmReadVBar)
@@ -389,7 +389,7 @@ ASM_PFX(ArmDataMemoryBarrier):
   ret
 
 
-ASM_PFX(ArmDataSyncronizationBarrier):
+ASM_PFX(ArmDataSynchronizationBarrier):
 ASM_PFX(ArmDrainWriteBuffer):
   dsb   sy
   ret
