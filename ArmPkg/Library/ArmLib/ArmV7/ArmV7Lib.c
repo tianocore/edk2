@@ -20,33 +20,6 @@
 #include "ArmV7Lib.h"
 #include "ArmLibPrivate.h"
 
-UINTN
-EFIAPI
-ArmDataCacheLineLength (
-  VOID
-  )
-{
-  UINT32 CCSIDR = ReadCCSIDR (0) & 7;
-
-  // * 4 converts to bytes
-  return (1 << (CCSIDR + 2)) * 4;
-}
-
-UINTN
-EFIAPI
-ArmInstructionCacheLineLength (
-  VOID
-  )
-{
-  UINT32 CCSIDR = ReadCCSIDR (1) & 7;
-
-  // * 4 converts to bytes
-  return (1 << (CCSIDR + 2)) * 4;
-
-//  return 64;
-}
-
-
 VOID
 ArmV7DataCacheOperation (
   IN  ARM_V7_CACHE_OPERATION  DataCacheOperation

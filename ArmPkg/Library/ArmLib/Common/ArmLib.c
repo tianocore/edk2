@@ -70,3 +70,21 @@ ArmUnsetCpuActlrBit (
   Value &= ~Bits;
   ArmWriteCpuActlr (Value);
 }
+
+UINTN
+EFIAPI
+ArmDataCacheLineLength (
+  VOID
+  )
+{
+  return 4 << ((ArmCacheInfo () >> 16) & 0xf); // CTR_EL0.DminLine
+}
+
+UINTN
+EFIAPI
+ArmInstructionCacheLineLength (
+  VOID
+  )
+{
+  return 4 << (ArmCacheInfo () & 0xf); // CTR_EL0.IminLine
+}
