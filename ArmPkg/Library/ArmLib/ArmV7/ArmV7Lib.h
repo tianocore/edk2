@@ -17,12 +17,6 @@
 
 typedef VOID (*ARM_V7_CACHE_OPERATION)(UINT32);
 
-
-VOID
-ArmV7PerformPoUDataCacheOperation (
-  IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
-  );
-
 VOID
 ArmV7AllDataCachesOperation (
   IN  ARM_V7_CACHE_OPERATION  DataCacheOperation

@@ -206,26 +206,6 @@ AArch64DataCacheOperation (
   }
 }
 
-
-VOID
-AArch64PoUDataCacheOperation (
-  IN  AARCH64_CACHE_OPERATION  DataCacheOperation
-  )
-{
-  UINTN     SavedInterruptState;
-
-  SavedInterruptState = ArmGetInterruptState ();
-  ArmDisableInterrupts ();
-
-  AArch64PerformPoUDataCacheOperation (DataCacheOperation);
-
-  ArmDrainWriteBuffer ();
-
-  if (SavedInterruptState) {
-    ArmEnableInterrupts ();
-  }
-}
-
 VOID
 EFIAPI
 ArmInvalidateDataCache (
@@ -254,14 +234,4 @@ ArmCleanDataCache (
 {
   ArmDrainWriteBuffer ();
   AArch64DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
-}
-
-VOID
-EFIAPI
-ArmCleanDataCacheToPoU (
-  VOID
-  )
-{
-  ArmDrainWriteBuffer ();
-  AArch64PoUDataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }

@@ -40,7 +40,6 @@ GCC_ASM_EXPORT (ArmEnableAlignmentCheck)
 GCC_ASM_EXPORT (ArmEnableBranchPrediction)
 GCC_ASM_EXPORT (ArmDisableBranchPrediction)
 GCC_ASM_EXPORT (AArch64AllDataCachesOperation)
-GCC_ASM_EXPORT (AArch64PerformPoUDataCacheOperation)
 GCC_ASM_EXPORT (ArmDataMemoryBarrier)
 GCC_ASM_EXPORT (ArmDataSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
@@ -321,19 +320,6 @@ ASM_PFX(AArch64AllDataCachesOperation):
   mrs   x6, clidr_el1           // Read EL1 CLIDR
   and   x3, x6, #0x7000000      // Mask out all but Level of Coherency (LoC)
   lsr   x3, x3, #23             // Left align cache level value - the level is shifted by 1 to the
-                                // right to ease the access to CSSELR and the Set/Way operation.
-  cbz   x3, L_Finished          // No need to clean if LoC is 0
-  mov   x10, #0                 // Start clean at cache level 0
-  b     Loop1
-
-ASM_PFX(AArch64PerformPoUDataCacheOperation):
-// We can use regs 0-7 and 9-15 without having to save/restore.
-// Save our link register on the stack. - The stack must always be quad-word aligned
-  str   x30, [sp, #-16]!
-  mov   x1, x0                  // Save Function call in x1
-  mrs   x6, clidr_el1           // Read EL1 CLIDR
-  and   x3, x6, #0x38000000     // Mask out all but Point of Unification (PoU)
-  lsr   x3, x3, #26             // Left align cache level value - the level is shifted by 1 to the
                                 // right to ease the access to CSSELR and the Set/Way operation.
   cbz   x3, L_Finished          // No need to clean if LoC is 0
   mov   x10, #0                 // Start clean at cache level 0
