@@ -23,26 +23,6 @@
 
 VOID
 EFIAPI
-ArmCacheInformation (
-  OUT ARM_CACHE_INFO  *CacheInfo
-  )
-{
-  if (CacheInfo != NULL) {
-    CacheInfo->Type                           = ArmCacheType();
-    CacheInfo->Architecture                   = ArmCacheArchitecture();
-    CacheInfo->DataCachePresent               = ArmDataCachePresent();
-    CacheInfo->DataCacheSize                  = ArmDataCacheSize();
-    CacheInfo->DataCacheAssociativity         = ArmDataCacheAssociativity();
-    CacheInfo->DataCacheLineLength            = ArmDataCacheLineLength();
-    CacheInfo->InstructionCachePresent        = ArmInstructionCachePresent();
-    CacheInfo->InstructionCacheSize           = ArmInstructionCacheSize();
-    CacheInfo->InstructionCacheAssociativity  = ArmInstructionCacheAssociativity();
-    CacheInfo->InstructionCacheLineLength     = ArmInstructionCacheLineLength();
-  }
-}
-
-VOID
-EFIAPI
 ArmSetAuxCrBit (
   IN  UINT32    Bits
   )

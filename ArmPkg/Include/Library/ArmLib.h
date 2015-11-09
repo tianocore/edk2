@@ -26,30 +26,6 @@
  #error "Unknown chipset."
 #endif
 
-typedef enum {
-  ARM_CACHE_TYPE_WRITE_BACK,
-  ARM_CACHE_TYPE_UNKNOWN
-} ARM_CACHE_TYPE;
-
-typedef enum {
-  ARM_CACHE_ARCHITECTURE_UNIFIED,
-  ARM_CACHE_ARCHITECTURE_SEPARATE,
-  ARM_CACHE_ARCHITECTURE_UNKNOWN
-} ARM_CACHE_ARCHITECTURE;
-
-typedef struct {
-  ARM_CACHE_TYPE          Type;
-  ARM_CACHE_ARCHITECTURE  Architecture;
-  BOOLEAN                 DataCachePresent;
-  UINTN                   DataCacheSize;
-  UINTN                   DataCacheAssociativity;
-  UINTN                   DataCacheLineLength;
-  BOOLEAN                 InstructionCachePresent;
-  UINTN                   InstructionCacheSize;
-  UINTN                   InstructionCacheAssociativity;
-  UINTN                   InstructionCacheLineLength;
-} ARM_CACHE_INFO;
-
 /**
  * The UEFI firmware must not use the ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_* attributes.
  *
@@ -126,63 +102,9 @@ typedef enum {
 #define GET_MPID(ClusterId, CoreId)   (((ClusterId) << 8) | (CoreId))
 #define PRIMARY_CORE_ID       (PcdGet32(PcdArmPrimaryCore) & ARM_CORE_MASK)
 
-ARM_CACHE_TYPE
-EFIAPI
-ArmCacheType (
-  VOID
-  );
-
-ARM_CACHE_ARCHITECTURE
-EFIAPI
-ArmCacheArchitecture (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmCacheInformation (
-  OUT ARM_CACHE_INFO  *CacheInfo
-  );
-
-BOOLEAN
-EFIAPI
-ArmDataCachePresent (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmDataCacheSize (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmDataCacheAssociativity (
-  VOID
-  );
-
 UINTN
 EFIAPI
 ArmDataCacheLineLength (
-  VOID
-  );
-
-BOOLEAN
-EFIAPI
-ArmInstructionCachePresent (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmInstructionCacheSize (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmInstructionCacheAssociativity (
   VOID
   );
 
