@@ -1955,7 +1955,13 @@ class InfBuildData(ModuleBuildClassObject):
             RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, self._Platform]
             for Record in RecordList:
                 if Record[1] == TAB_INF_DEFINES_INF_VERSION:
-                    self._AutoGenVersion = int(Record[2], 0)
+                    if '.' in Record[2]:
+                        ValueList = Record[2].split('.')
+                        Major = '%04o' % int(ValueList[0], 0)
+                        Minor = '%04o' % int(ValueList[1], 0)
+                        self._AutoGenVersion = int('0x' + Major + Minor, 0)
+                    else:
+                        self._AutoGenVersion = int(Record[2], 0)
                     break
             if self._AutoGenVersion == None:
                 self._AutoGenVersion = 0x00010000
