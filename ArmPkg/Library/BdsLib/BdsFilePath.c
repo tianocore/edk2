@@ -1198,7 +1198,7 @@ BdsTftpLoadImage (
   if (Mtftp4GetFileSize (Mtftp4, AsciiFilePath, &FileSize) == EFI_SUCCESS) {
     TftpBufferSize = FileSize;
   } else {
-    TftpBufferSize = SIZE_8MB;
+    TftpBufferSize = SIZE_16MB;
   }
 
   TftpContext = AllocatePool (sizeof (BDS_TFTP_CONTEXT));
@@ -1209,7 +1209,7 @@ BdsTftpLoadImage (
   TftpContext->FileSize = FileSize;
 
   for (; TftpBufferSize <= FixedPcdGet32 (PcdMaxTftpFileSize);
-         TftpBufferSize = (TftpBufferSize + SIZE_8MB) & (~(SIZE_8MB-1))) {
+         TftpBufferSize = (TftpBufferSize + SIZE_16MB) & (~(SIZE_16MB-1))) {
     //
     // Allocate a buffer to hold the whole file.
     //
