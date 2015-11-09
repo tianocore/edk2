@@ -124,14 +124,6 @@ typedef struct {
 
 extern SHELL_INFO ShellInfoObject;
 
-typedef enum {
-  Internal_Command,
-  Script_File_Name,
-  Efi_Application,
-  File_Sys_Change,
-  Unknown_Invalid
-} SHELL_OPERATION_TYPES;
-
 /**
   Converts the command line to it's post-processed form.  this replaces variables and alias' per UEFI Shell spec.
 
