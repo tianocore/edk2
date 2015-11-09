@@ -19,7 +19,9 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
-#include <Chipset/ArmCortexA15.h>
+#include <Chipset/ArmV7.h>
+
+#define A15_FEATURE_SMP     (1<<6)
 
 VOID
 ArmCpuSetup (

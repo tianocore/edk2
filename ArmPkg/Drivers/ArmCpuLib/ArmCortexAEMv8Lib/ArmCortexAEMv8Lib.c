@@ -17,7 +17,7 @@
 #include <Library/ArmGenericTimerCounterLib.h>
 #include <Library/PcdLib.h>
 
-#include <Chipset/ArmAemV8.h>
+#include <Chipset/AArch64.h>
 
 VOID
 ArmCpuSetup (

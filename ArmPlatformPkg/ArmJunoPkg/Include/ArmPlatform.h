@@ -40,8 +40,13 @@
 #define ARM_JUNO_PERIPHERALS_BASE             0x20000000
 #define ARM_JUNO_PERIPHERALS_SZ               0x0E000000
 
+// PCIe MSI address window
 #define ARM_JUNO_GIV2M_MSI_BASE               0x2c1c0000
 #define ARM_JUNO_GIV2M_MSI_SZ                 SIZE_256KB
+
+// PCIe MSI to SPI mapping range
+#define ARM_JUNO_GIV2M_MSI_SPI_BASE           224
+#define ARM_JUNO_GIV2M_MSI_SPI_COUNT          127 //TRM says last SPI is 351, 351-224=127
 
 // On-Chip non-secure SRAM
 #define ARM_JUNO_NON_SECURE_SRAM_BASE         0x2E000000

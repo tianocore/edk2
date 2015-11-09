@@ -35,9 +35,8 @@
     EXPORT  ArmSetLowVectors
     EXPORT  ArmSetHighVectors
     EXPORT  ArmV7AllDataCachesOperation
-    EXPORT  ArmV7PerformPoUDataCacheOperation
     EXPORT  ArmDataMemoryBarrier
-    EXPORT  ArmDataSyncronizationBarrier
+    EXPORT  ArmDataSynchronizationBarrier
     EXPORT  ArmInstructionSynchronizationBarrier
     EXPORT  ArmReadVBar
     EXPORT  ArmWriteVBar
@@ -63,42 +62,30 @@ CTRL_I_BIT      EQU     (1 << 12)
 
 ArmInvalidateDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c6, 1   ; invalidate single data cache line
-  dsb
-  isb
   bx      lr
 
 ArmCleanDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c10, 1  ; clean single data cache line
-  dsb
-  isb
   bx      lr
 
 
 ArmCleanInvalidateDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c14, 1  ; clean and invalidate single data cache line
-  dsb
-  isb
   bx      lr
 
 
 ArmInvalidateDataCacheEntryBySetWay
   mcr     p15, 0, r0, c7, c6, 2        ; Invalidate this line
-  dsb
-  isb
   bx      lr
 
 
 ArmCleanInvalidateDataCacheEntryBySetWay
   mcr     p15, 0, r0, c7, c14, 2       ; Clean and Invalidate this line
-  dsb
-  isb
   bx      lr
 
 
 ArmCleanDataCacheEntryBySetWay
   mcr     p15, 0, r0, c7, c10, 2       ; Clean this line
-  dsb
-  isb
   bx      lr
 
 
@@ -262,60 +249,11 @@ Finished
   ldmfd SP!, {r4-r12, lr}
   bx    LR
 
-ArmV7PerformPoUDataCacheOperation
-  stmfd SP!,{r4-r12, LR}
-  mov   R1, R0                ; Save Function call in R1
-  mrc   p15, 1, R6, c0, c0, 1 ; Read CLIDR
-  ands  R3, R6, #&38000000    ; Mask out all but Level of Unification (LoU)
-  mov   R3, R3, LSR #26       ; Cache level value (naturally aligned)
-  beq   Finished2
-  mov   R10, #0
-
-Loop4
-  add   R2, R10, R10, LSR #1    ; Work out 3xcachelevel
-  mov   R12, R6, LSR R2         ; bottom 3 bits are the Cache type for this level
-  and   R12, R12, #7            ; get those 3 bits alone
-  cmp   R12, #2
-  blt   Skip2                   ; no cache or only instruction cache at this level
-  mcr   p15, 2, R10, c0, c0, 0  ; write the Cache Size selection register (CSSELR) // OR in 1 for Instruction
-  isb                           ; isb to sync the change to the CacheSizeID reg
-  mrc   p15, 1, R12, c0, c0, 0  ; reads current Cache Size ID register (CCSIDR)
-  and   R2, R12, #&7            ; extract the line length field
-  add   R2, R2, #4              ; add 4 for the line length offset (log2 16 bytes)
-  ldr   R4, =0x3FF
-  ands  R4, R4, R12, LSR #3     ; R4 is the max number on the way size (right aligned)
-  clz   R5, R4                  ; R5 is the bit position of the way size increment
-  ldr   R7, =0x00007FFF
-  ands  R7, R7, R12, LSR #13    ; R7 is the max number of the index size (right aligned)
-
-Loop5
-  mov   R9, R4                  ; R9 working copy of the max way size (right aligned)
-
-Loop6
-  orr   R0, R10, R9, LSL R5     ; factor in the way number and cache number into R11
-  orr   R0, R0, R7, LSL R2      ; factor in the index number
-
-  blx   R1
-
-  subs  R9, R9, #1              ; decrement the way number
-  bge   Loop6
-  subs  R7, R7, #1              ; decrement the index
-  bge   Loop5
-Skip2
-  add   R10, R10, #2            ; increment the cache number
-  cmp   R3, R10
-  bgt   Loop4
-
-Finished2
-  dsb
-  ldmfd SP!, {r4-r12, lr}
-  bx    LR
-
 ArmDataMemoryBarrier
   dmb
   bx      LR
 
-ArmDataSyncronizationBarrier
+ArmDataSynchronizationBarrier
 ArmDrainWriteBuffer
   dsb
   bx      LR

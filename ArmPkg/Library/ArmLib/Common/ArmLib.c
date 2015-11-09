@@ -23,26 +23,6 @@
 
 VOID
 EFIAPI
-ArmCacheInformation (
-  OUT ARM_CACHE_INFO  *CacheInfo
-  )
-{
-  if (CacheInfo != NULL) {
-    CacheInfo->Type                           = ArmCacheType();
-    CacheInfo->Architecture                   = ArmCacheArchitecture();
-    CacheInfo->DataCachePresent               = ArmDataCachePresent();
-    CacheInfo->DataCacheSize                  = ArmDataCacheSize();
-    CacheInfo->DataCacheAssociativity         = ArmDataCacheAssociativity();
-    CacheInfo->DataCacheLineLength            = ArmDataCacheLineLength();
-    CacheInfo->InstructionCachePresent        = ArmInstructionCachePresent();
-    CacheInfo->InstructionCacheSize           = ArmInstructionCacheSize();
-    CacheInfo->InstructionCacheAssociativity  = ArmInstructionCacheAssociativity();
-    CacheInfo->InstructionCacheLineLength     = ArmInstructionCacheLineLength();
-  }
-}
-
-VOID
-EFIAPI
 ArmSetAuxCrBit (
   IN  UINT32    Bits
   )
@@ -89,4 +69,39 @@ ArmUnsetCpuActlrBit (
   Value = ArmReadCpuActlr ();
   Value &= ~Bits;
   ArmWriteCpuActlr (Value);
+}
+
+UINTN
+EFIAPI
+ArmDataCacheLineLength (
+  VOID
+  )
+{
+  return 4 << ((ArmCacheInfo () >> 16) & 0xf); // CTR_EL0.DminLine
+}
+
+UINTN
+EFIAPI
+ArmInstructionCacheLineLength (
+  VOID
+  )
+{
+  return 4 << (ArmCacheInfo () & 0xf); // CTR_EL0.IminLine
+}
+
+UINTN
+EFIAPI
+ArmCacheWritebackGranule (
+  VOID
+  )
+{
+  UINTN   CWG;
+
+  CWG = (ArmCacheInfo () >> 24) & 0xf; // CTR_EL0.CWG
+
+  if (CWG == 0) {
+    return SIZE_2KB;
+  }
+
+  return 4 << CWG;
 }

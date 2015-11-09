@@ -18,6 +18,14 @@
 
 #include "Shell.h"
 
+typedef enum {
+  Internal_Command,
+  Script_File_Name,
+  Efi_Application,
+  File_Sys_Change,
+  Unknown_Invalid
+} SHELL_OPERATION_TYPES;
+
 /**
   creates a new EFI_SHELL_PARAMETERS_PROTOCOL instance and populates it and then
   installs it on our handle and if there is an existing version of the protocol
@@ -66,6 +74,7 @@ CleanUpShellParametersProtocol (
 
   @param[in, out] ShellParameters       pointer to parameter structure to modify
   @param[in] NewCommandLine             the new command line to parse and use
+  @param[in] Type                       the type of operation.
   @param[out] OldArgv                   pointer to old list of parameters
   @param[out] OldArgc                   pointer to old number of items in Argv list
 
@@ -77,6 +86,7 @@ EFIAPI
 UpdateArgcArgv(
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
   IN CONST CHAR16                       *NewCommandLine,
+  IN SHELL_OPERATION_TYPES              Type,
   OUT CHAR16                            ***OldArgv,
   OUT UINTN                             *OldArgc
   );
@@ -162,9 +172,11 @@ RestoreStdInStdOutStdErr (
   parameters for inclusion in EFI_SHELL_PARAMETERS_PROTOCOL.  this supports space
   delimited and quote surrounded parameter definition.
 
-  @param[in] CommandLine         String of command line to parse
-  @param[in, out] Argv           pointer to array of strings; one for each parameter
-  @param[in, out] Argc           pointer to number of strings in Argv array
+  @param[in] CommandLine          String of command line to parse
+  @param[in] StripQuotation       if TRUE then strip the quotation marks surrounding
+                                  the parameters.
+  @param[in, out] Argv            pointer to array of strings; one for each parameter
+  @param[in, out] Argc            pointer to number of strings in Argv array
 
   @return EFI_SUCCESS           the operation was sucessful
   @return EFI_OUT_OF_RESOURCES  a memory allocation failed.
@@ -173,8 +185,9 @@ EFI_STATUS
 EFIAPI
 ParseCommandLineToArgs(
   IN CONST CHAR16 *CommandLine,
-  IN OUT CHAR16 ***Argv,
-  IN OUT UINTN *Argc
+  IN BOOLEAN      StripQuotation,
+  IN OUT CHAR16   ***Argv,
+  IN OUT UINTN    *Argc
   );
 
 /**
@@ -187,10 +200,12 @@ ParseCommandLineToArgs(
   Temp Parameter must be large enough to hold the parameter before calling this
   function.
 
-  @param[in, out] Walker        pointer to string of command line.  Adjusted to
-                                reminaing command line on return
-  @param[in, out] TempParameter pointer to string of command line item extracted.
-  @param[in]      Length        Length of (*TempParameter) in bytes
+  @param[in, out] Walker          pointer to string of command line.  Adjusted to
+                                  reminaing command line on return
+  @param[in, out] TempParameter   pointer to string of command line item extracted.
+  @param[in]      Length          Length of (*TempParameter) in bytes
+  @param[in]      StripQuotation  if TRUE then strip the quotation marks surrounding
+                                  the parameters.
 
   @return   EFI_INALID_PARAMETER  A required parameter was NULL or pointed to a NULL or empty string.
   @return   EFI_NOT_FOUND         A closing " could not be found on the specified string
@@ -200,7 +215,8 @@ EFIAPI
 GetNextParameter(
   IN OUT CHAR16   **Walker,
   IN OUT CHAR16   **TempParameter,
-  IN CONST UINTN  Length
+  IN CONST UINTN  Length,
+  IN BOOLEAN      StripQuotation
   );
 
 #endif //_SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_

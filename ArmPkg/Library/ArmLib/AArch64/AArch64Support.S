@@ -40,9 +40,8 @@ GCC_ASM_EXPORT (ArmEnableAlignmentCheck)
 GCC_ASM_EXPORT (ArmEnableBranchPrediction)
 GCC_ASM_EXPORT (ArmDisableBranchPrediction)
 GCC_ASM_EXPORT (AArch64AllDataCachesOperation)
-GCC_ASM_EXPORT (AArch64PerformPoUDataCacheOperation)
 GCC_ASM_EXPORT (ArmDataMemoryBarrier)
-GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
+GCC_ASM_EXPORT (ArmDataSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmWriteVBar)
 GCC_ASM_EXPORT (ArmReadVBar)
@@ -66,43 +65,31 @@ GCC_ASM_EXPORT (ArmReadCurrentEL)
 
 ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
   dc      ivac, x0    // Invalidate single data cache line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanDataCacheEntryByMVA):
   dc      cvac, x0    // Clean single data cache line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanInvalidateDataCacheEntryByMVA):
   dc      civac, x0   // Clean and invalidate single data cache line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmInvalidateDataCacheEntryBySetWay):
   dc      isw, x0     // Invalidate this line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanInvalidateDataCacheEntryBySetWay):
   dc      cisw, x0    // Clean and Invalidate this line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanDataCacheEntryBySetWay):
   dc      csw, x0     // Clean this line
-  dsb     sy
-  isb
   ret
 
 
@@ -123,18 +110,20 @@ ASM_PFX(ArmEnableMmu):
 4: orr     x0, x0, #CTRL_M_BIT // Set MMU enable bit
    EL1_OR_EL2_OR_EL3(x1)
 1: tlbi    vmalle1
+   dsb     nsh
    isb
    msr     sctlr_el1, x0       // Write back
    b       4f
 2: tlbi    alle2
+   dsb     nsh
    isb
    msr     sctlr_el2, x0       // Write back
    b       4f
 3: tlbi    alle3
+   dsb     nsh
    isb
    msr     sctlr_el3, x0       // Write back
-4: dsb     sy
-   isb
+4: isb
    ret
 
 
@@ -322,19 +311,6 @@ ASM_PFX(AArch64AllDataCachesOperation):
                                 // right to ease the access to CSSELR and the Set/Way operation.
   cbz   x3, L_Finished          // No need to clean if LoC is 0
   mov   x10, #0                 // Start clean at cache level 0
-  b     Loop1
-
-ASM_PFX(AArch64PerformPoUDataCacheOperation):
-// We can use regs 0-7 and 9-15 without having to save/restore.
-// Save our link register on the stack. - The stack must always be quad-word aligned
-  str   x30, [sp, #-16]!
-  mov   x1, x0                  // Save Function call in x1
-  mrs   x6, clidr_el1           // Read EL1 CLIDR
-  and   x3, x6, #0x38000000     // Mask out all but Point of Unification (PoU)
-  lsr   x3, x3, #26             // Left align cache level value - the level is shifted by 1 to the
-                                // right to ease the access to CSSELR and the Set/Way operation.
-  cbz   x3, L_Finished          // No need to clean if LoC is 0
-  mov   x10, #0                 // Start clean at cache level 0
 
 Loop1:
   add   x2, x10, x10, lsr #1    // Work out 3x cachelevel for cache info
@@ -387,7 +363,7 @@ ASM_PFX(ArmDataMemoryBarrier):
   ret
 
 
-ASM_PFX(ArmDataSyncronizationBarrier):
+ASM_PFX(ArmDataSynchronizationBarrier):
 ASM_PFX(ArmDrainWriteBuffer):
   dsb   sy
   ret

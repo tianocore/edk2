@@ -42,6 +42,31 @@ HttpBootGetNicByIp4Children (
   return NicHandle;
 }
 
+/**
+  Get the Nic handle using any child handle in the IPv6 stack.
+
+  @param[in]  ControllerHandle    Pointer to child handle over IPv6.
+
+  @return NicHandle               The pointer to the Nic handle.
+  @return NULL                    Can't find the Nic handle.
+
+**/
+EFI_HANDLE
+HttpBootGetNicByIp6Children (
+  IN EFI_HANDLE                 ControllerHandle
+  )
+{
+  EFI_HANDLE                    NicHandle;
+  NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiHttpProtocolGuid);
+  if (NicHandle == NULL) {
+    NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp6ProtocolGuid);
+    if (NicHandle == NULL) {
+      return NULL;
+    }
+  }
+
+  return NicHandle;
+}
 
 /**
   This function is to convert UINTN to ASCII string with the required formatting.
@@ -90,6 +115,242 @@ HttpBootShowIp4Addr (
 }
 
 /**
+  This function is to display the IPv6 address.
+
+  @param[in]  Ip        The pointer to the IPv6 address.
+
+**/
+VOID
+HttpBootShowIp6Addr (
+  IN EFI_IPv6_ADDRESS   *Ip
+  )
+{
+  UINTN                 Index;
+
+  for (Index = 0; Index < 16; Index++) {
+
+    if (Ip->Addr[Index] != 0) {
+      AsciiPrint ("%x", Ip->Addr[Index]);
+    }
+    Index++;
+    if (Index > 15) {
+      return;
+    }
+    if (((Ip->Addr[Index] & 0xf0) == 0) && (Ip->Addr[Index - 1] != 0)) {
+      AsciiPrint ("0");
+    }
+    AsciiPrint ("%x", Ip->Addr[Index]);
+    if (Index < 15) {
+      AsciiPrint (":");
+    }
+  }
+}
+
+/**
+  Notify the callback function when an event is triggered.
+
+  @param[in]  Event           The triggered event.
+  @param[in]  Context         The opaque parameter to the function.
+
+**/
+VOID
+EFIAPI
+HttpBootCommonNotify (
+  IN EFI_EVENT           Event,
+  IN VOID                *Context
+  )
+{
+  *((BOOLEAN *) Context) = TRUE;
+}
+
+/**
+  Retrieve the host address using the EFI_DNS6_PROTOCOL.
+
+  @param[in]  Private             The pointer to the driver's private data.
+  @param[in]  HostName            Pointer to buffer containing hostname.
+  @param[out] IpAddress           On output, pointer to buffer containing IPv6 address.
+
+  @retval EFI_SUCCESS             Operation succeeded.
+  @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
+  @retval Others                  Other errors as indicated.  
+**/
+EFI_STATUS
+HttpBootDns (
+  IN     HTTP_BOOT_PRIVATE_DATA   *Private,
+  IN     CHAR16                   *HostName,
+     OUT EFI_IPv6_ADDRESS         *IpAddress 
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_DNS6_PROTOCOL               *Dns6;
+  EFI_DNS6_CONFIG_DATA            Dns6ConfigData;
+  EFI_DNS6_COMPLETION_TOKEN       Token;
+  EFI_HANDLE                      Dns6Handle;
+  EFI_IP6_CONFIG_PROTOCOL         *Ip6Config;
+  EFI_IPv6_ADDRESS                *DnsServerList;
+  UINTN                           DnsServerListCount;
+  UINTN                           DataSize;
+  BOOLEAN                         IsDone;  
+  
+  DnsServerList       = NULL;
+  DnsServerListCount  = 0;
+  Dns6                = NULL;
+  Dns6Handle          = NULL;
+  ZeroMem (&Token, sizeof (EFI_DNS6_COMPLETION_TOKEN));
+  
+  //
+  // Get DNS server list from EFI IPv6 Configuration protocol.
+  //
+  Status = gBS->HandleProtocol (Private->Controller, &gEfiIp6ConfigProtocolGuid, (VOID **) &Ip6Config);
+  if (!EFI_ERROR (Status)) {
+    //
+    // Get the required size.
+    //
+    DataSize = 0;
+    Status = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, NULL);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      DnsServerList = AllocatePool (DataSize);
+      if (DnsServerList == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }  
+
+      Status = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, DnsServerList);
+      if (EFI_ERROR (Status)) {
+        FreePool (DnsServerList);
+        DnsServerList = NULL;
+      } else {
+        DnsServerListCount = DataSize / sizeof (EFI_IPv6_ADDRESS);
+      }
+    }
+  }
+  //
+  // Create a DNSv6 child instance and get the protocol.
+  //
+  Status = NetLibCreateServiceChild (
+             Private->Controller,
+             Private->Image,
+             &gEfiDns6ServiceBindingProtocolGuid,
+             &Dns6Handle
+             );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  } 
+  
+  Status = gBS->OpenProtocol (
+                  Dns6Handle,
+                  &gEfiDns6ProtocolGuid,
+                  (VOID **) &Dns6,
+                  Private->Image,
+                  Private->Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  //
+  // Configure DNS6 instance for the DNS server address and protocol.
+  //
+  ZeroMem (&Dns6ConfigData, sizeof (EFI_DNS6_CONFIG_DATA));
+  Dns6ConfigData.DnsServerCount = (UINT32)DnsServerListCount;
+  Dns6ConfigData.DnsServerList  = DnsServerList;
+  Dns6ConfigData.EnableDnsCache = TRUE;
+  Dns6ConfigData.Protocol       = EFI_IP_PROTO_UDP;
+  IP6_COPY_ADDRESS (&Dns6ConfigData.StationIp,&Private->StationIp.v6);
+  Status = Dns6->Configure (
+                    Dns6,
+                    &Dns6ConfigData
+                    );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+  
+  Token.Status = EFI_NOT_READY;
+  IsDone       = FALSE;
+  //
+  // Create event to set the  IsDone flag when name resolution is finished.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  HttpBootCommonNotify,
+                  &IsDone,
+                  &Token.Event
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  //
+  // Start asynchronous name resolution.
+  //
+  Status = Dns6->HostNameToIp (Dns6, HostName, &Token);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  while (!IsDone) {
+    Dns6->Poll (Dns6);
+  }
+  
+  //
+  // Name resolution is done, check result.
+  //
+  Status = Token.Status;  
+  if (!EFI_ERROR (Status)) {
+    if (Token.RspData.H2AData == NULL) {
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
+    if (Token.RspData.H2AData->IpCount == 0 || Token.RspData.H2AData->IpList == NULL) {
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
+    //
+    // We just return the first IPv6 address from DNS protocol.
+    //
+    IP6_COPY_ADDRESS (IpAddress, Token.RspData.H2AData->IpList);
+    Status = EFI_SUCCESS;
+  }
+Exit:
+
+  if (Token.Event != NULL) {
+    gBS->CloseEvent (Token.Event);
+  }
+  if (Token.RspData.H2AData != NULL) {
+    if (Token.RspData.H2AData->IpList != NULL) {
+      FreePool (Token.RspData.H2AData->IpList);
+    }
+    FreePool (Token.RspData.H2AData);
+  }
+
+  if (Dns6 != NULL) {
+    Dns6->Configure (Dns6, NULL);
+    
+    gBS->CloseProtocol (
+           Dns6Handle,
+           &gEfiDns6ProtocolGuid,
+           Private->Image,
+           Private->Controller
+           );
+  }
+
+  if (Dns6Handle != NULL) {
+    NetLibDestroyServiceChild (
+      Private->Controller,
+      Private->Image,
+      &gEfiDns6ServiceBindingProtocolGuid,
+      Dns6Handle
+      );
+  }
+
+  if (DnsServerList != NULL) {
+    FreePool (DnsServerList);
+  }
+  
+  return Status;  
+}
+/**
   Create a HTTP_IO_HEADER to hold the HTTP header items.
 
   @param[in]  MaxHeaderCount         The maximun number of HTTP header in this holder.
@@ -100,7 +361,7 @@ HttpBootShowIp4Addr (
 HTTP_IO_HEADER *
 HttpBootCreateHeader (
   UINTN                     MaxHeaderCount
-)
+  )
 {
   HTTP_IO_HEADER        *HttpIoHeader;
 
@@ -255,23 +516,6 @@ HttpBootSetHeader (
 }
 
 /**
-  Notify the callback function when an event is triggered.
-
-  @param[in]  Event           The triggered event.
-  @param[in]  Context         The opaque parameter to the function.
-
-**/
-VOID
-EFIAPI
-HttpIoCommonNotify (
-  IN EFI_EVENT           Event,
-  IN VOID                *Context
-  )
-{
-  *((BOOLEAN *) Context) = TRUE;
-}
-
-/**
   Create a HTTP_IO to access the HTTP service. It will create and configure
   a HTTP child handle.
 
@@ -301,6 +545,7 @@ HttpIoCreateIo (
   EFI_STATUS                Status;
   EFI_HTTP_CONFIG_DATA      HttpConfigData;
   EFI_HTTPv4_ACCESS_POINT   Http4AccessPoint;
+  EFI_HTTPv6_ACCESS_POINT   Http6AccessPoint;
   EFI_HTTP_PROTOCOL         *Http;
   EFI_EVENT                 Event;
   
@@ -359,7 +604,10 @@ HttpIoCreateIo (
     IP4_COPY_ADDRESS (&Http4AccessPoint.LocalSubnet, &ConfigData->Config4.SubnetMask);
     HttpConfigData.AccessPoint.IPv4Node = &Http4AccessPoint;   
   } else {
-    ASSERT (FALSE);
+    HttpConfigData.LocalAddressIsIPv6 = TRUE;
+    Http6AccessPoint.LocalPort        = ConfigData->Config6.LocalPort;
+    IP6_COPY_ADDRESS (&Http6AccessPoint.LocalAddress, &ConfigData->Config6.LocalIp);
+    HttpConfigData.AccessPoint.IPv6Node = &Http6AccessPoint;
   }
   
   Status = Http->Configure (Http, &HttpConfigData);
@@ -373,7 +621,7 @@ HttpIoCreateIo (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  HttpIoCommonNotify,
+                  HttpBootCommonNotify,
                   &HttpIo->IsTxDone,
                   &Event
                   );
@@ -386,7 +634,7 @@ HttpIoCreateIo (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  HttpIoCommonNotify,
+                  HttpBootCommonNotify,
                   &HttpIo->IsRxDone,
                   &Event
                   );
@@ -579,7 +827,7 @@ HttpIoRecvResponse (
   //
   // Store the received data into the wrapper.
   //
-  Status = HttpIo->ReqToken.Status;
+  Status = HttpIo->RspToken.Status;
   if (!EFI_ERROR (Status)) {
     ResponseData->HeaderCount = HttpIo->RspToken.Message->HeaderCount;
     ResponseData->Headers     = HttpIo->RspToken.Message->Headers;

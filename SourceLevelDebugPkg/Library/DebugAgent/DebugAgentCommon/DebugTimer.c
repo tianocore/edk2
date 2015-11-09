@@ -32,6 +32,7 @@ InitializeDebugTimer (
   UINT32      InitialCount;
   UINT32      ApicTimerFrequency;
 
+  InitializeLocalApicSoftwareEnable (TRUE);
   GetApicTimerState (&ApicTimerDivisor, NULL, NULL);
   ApicTimerFrequency = PcdGet32(PcdFSBClock) / (UINT32)ApicTimerDivisor;
   //

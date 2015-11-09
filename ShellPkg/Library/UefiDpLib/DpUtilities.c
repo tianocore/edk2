@@ -164,8 +164,8 @@ DpGetShortPdbFileName (
     for (IndexA = StartIndex; IndexA < EndIndex; IndexA++) {
       UnicodeBuffer[IndexU] = (CHAR16) PdbFileName[IndexA];
       IndexU++;
-      if (IndexU >= DXE_PERFORMANCE_STRING_LENGTH) {
-        UnicodeBuffer[DXE_PERFORMANCE_STRING_LENGTH] = 0;
+      if (IndexU >= DP_GAUGE_STRING_LENGTH) {
+        UnicodeBuffer[DP_GAUGE_STRING_LENGTH] = 0;
         break;
       }
     }

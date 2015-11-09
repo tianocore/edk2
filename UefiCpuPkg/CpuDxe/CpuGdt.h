@@ -2,7 +2,7 @@
   C based implemention of IA32 interrupt handling only
   requiring a minimal assembly interrupt entry point.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -42,8 +42,9 @@ struct _GDT_ENTRIES {
   GDT_ENTRY LinearCode;
   GDT_ENTRY SysData;
   GDT_ENTRY SysCode;
-  GDT_ENTRY LinearCode64;
   GDT_ENTRY Spare4;
+  GDT_ENTRY LinearData64;
+  GDT_ENTRY LinearCode64;
   GDT_ENTRY Spare5;
 } GDT_ENTRIES;
 
@@ -54,8 +55,9 @@ struct _GDT_ENTRIES {
 #define LINEAR_CODE_SEL   OFFSET_OF (GDT_ENTRIES, LinearCode)
 #define SYS_DATA_SEL      OFFSET_OF (GDT_ENTRIES, SysData)
 #define SYS_CODE_SEL      OFFSET_OF (GDT_ENTRIES, SysCode)
-#define LINEAR_CODE64_SEL OFFSET_OF (GDT_ENTRIES, LinearCode64)
 #define SPARE4_SEL        OFFSET_OF (GDT_ENTRIES, Spare4)
+#define LINEAR_DATA64_SEL OFFSET_OF (GDT_ENTRIES, LinearData64)
+#define LINEAR_CODE64_SEL OFFSET_OF (GDT_ENTRIES, LinearCode64)
 #define SPARE5_SEL        OFFSET_OF (GDT_ENTRIES, Spare5)
 
 #if defined (MDE_CPU_IA32)
@@ -63,7 +65,7 @@ struct _GDT_ENTRIES {
 #define CPU_DATA_SEL LINEAR_SEL
 #elif defined (MDE_CPU_X64)
 #define CPU_CODE_SEL LINEAR_CODE64_SEL
-#define CPU_DATA_SEL LINEAR_SEL
+#define CPU_DATA_SEL LINEAR_DATA64_SEL
 #else
 #error CPU type not supported for CPU GDT initialization!
 #endif
