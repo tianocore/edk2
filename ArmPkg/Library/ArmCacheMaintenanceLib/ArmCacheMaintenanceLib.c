@@ -14,6 +14,7 @@
 **/
 #include <Base.h>
 #include <Library/ArmLib.h>
+#include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
 VOID
@@ -44,7 +45,6 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  ArmCleanDataCache();
   ArmInvalidateInstructionCache();
 }
 
@@ -54,7 +54,7 @@ InvalidateDataCache (
   VOID
   )
 {
-  ArmInvalidateDataCache();
+  ASSERT (FALSE);
 }
 
 VOID *
@@ -75,7 +75,7 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  ArmCleanInvalidateDataCache();
+  ASSERT (FALSE);
 }
 
 VOID *
@@ -95,7 +95,7 @@ WriteBackDataCache (
   VOID
   )
 {
-  ArmCleanDataCache();
+  ASSERT (FALSE);
 }
 
 VOID *
