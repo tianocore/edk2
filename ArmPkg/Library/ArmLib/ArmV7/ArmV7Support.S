@@ -62,42 +62,30 @@ GCC_ASM_EXPORT (ArmReadIdPfr1)
 
 ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
   mcr     p15, 0, r0, c7, c6, 1   @invalidate single data cache line
-  dsb
-  isb
   bx      lr
 
 ASM_PFX(ArmCleanDataCacheEntryByMVA):
   mcr     p15, 0, r0, c7, c10, 1  @clean single data cache line
-  dsb
-  isb
   bx      lr
 
 
 ASM_PFX(ArmCleanInvalidateDataCacheEntryByMVA):
   mcr     p15, 0, r0, c7, c14, 1  @clean and invalidate single data cache line
-  dsb
-  isb
   bx      lr
 
 
 ASM_PFX(ArmInvalidateDataCacheEntryBySetWay):
   mcr     p15, 0, r0, c7, c6, 2        @ Invalidate this line
-  dsb
-  isb
   bx      lr
 
 
 ASM_PFX(ArmCleanInvalidateDataCacheEntryBySetWay):
   mcr     p15, 0, r0, c7, c14, 2       @ Clean and Invalidate this line
-  dsb
-  isb
   bx      lr
 
 
 ASM_PFX(ArmCleanDataCacheEntryBySetWay):
   mcr     p15, 0, r0, c7, c10, 2       @ Clean this line
-  dsb
-  isb
   bx      lr
 
 ASM_PFX(ArmInvalidateInstructionCache):

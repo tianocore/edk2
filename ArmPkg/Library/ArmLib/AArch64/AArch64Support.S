@@ -65,43 +65,31 @@ GCC_ASM_EXPORT (ArmReadCurrentEL)
 
 ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
   dc      ivac, x0    // Invalidate single data cache line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanDataCacheEntryByMVA):
   dc      cvac, x0    // Clean single data cache line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanInvalidateDataCacheEntryByMVA):
   dc      civac, x0   // Clean and invalidate single data cache line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmInvalidateDataCacheEntryBySetWay):
   dc      isw, x0     // Invalidate this line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanInvalidateDataCacheEntryBySetWay):
   dc      cisw, x0    // Clean and Invalidate this line
-  dsb     sy
-  isb
   ret
 
 
 ASM_PFX(ArmCleanDataCacheEntryBySetWay):
   dc      csw, x0     // Clean this line
-  dsb     sy
-  isb
   ret
 
 
