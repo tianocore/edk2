@@ -194,8 +194,6 @@ CEntryPoint (
 
   // Data Cache enabled on Primary core when MMU is enabled.
   ArmDisableDataCache ();
-  // Invalidate Data cache
-  ArmInvalidateDataCache ();
   // Invalidate instruction cache
   ArmInvalidateInstructionCache ();
   // Enable Instruction Caches on all cores.
