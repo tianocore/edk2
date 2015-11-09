@@ -116,6 +116,12 @@ ArmInstructionCacheLineLength (
 
 UINTN
 EFIAPI
+ArmCacheWritebackGranule (
+  VOID
+  );
+
+UINTN
+EFIAPI
 ArmIsArchTimerImplemented (
   VOID
   );

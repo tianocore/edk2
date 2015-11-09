@@ -88,3 +88,20 @@ ArmInstructionCacheLineLength (
 {
   return 4 << (ArmCacheInfo () & 0xf); // CTR_EL0.IminLine
 }
+
+UINTN
+EFIAPI
+ArmCacheWritebackGranule (
+  VOID
+  )
+{
+  UINTN   CWG;
+
+  CWG = (ArmCacheInfo () >> 24) & 0xf; // CTR_EL0.CWG
+
+  if (CWG == 0) {
+    return SIZE_2KB;
+  }
+
+  return 4 << CWG;
+}
