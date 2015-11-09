@@ -123,18 +123,20 @@ ASM_PFX(ArmEnableMmu):
 4: orr     x0, x0, #CTRL_M_BIT // Set MMU enable bit
    EL1_OR_EL2_OR_EL3(x1)
 1: tlbi    vmalle1
+   dsb     nsh
    isb
    msr     sctlr_el1, x0       // Write back
    b       4f
 2: tlbi    alle2
+   dsb     nsh
    isb
    msr     sctlr_el2, x0       // Write back
    b       4f
 3: tlbi    alle3
+   dsb     nsh
    isb
    msr     sctlr_el3, x0       // Write back
-4: dsb     sy
-   isb
+4: isb
    ret
 
 
