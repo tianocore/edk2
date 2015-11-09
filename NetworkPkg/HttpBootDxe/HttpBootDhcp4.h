@@ -246,6 +246,17 @@ typedef struct {
 } HTTP_BOOT_DHCP4_PACKET_CACHE;
 
 /**
+  Select an DHCPv4 or DHCP6 offer, and record SelectIndex and SelectProxyType.
+
+  @param[in]  Private             Pointer to HTTP boot driver private data.
+
+**/
+VOID
+HttpBootSelectDhcpOffer (
+  IN HTTP_BOOT_PRIVATE_DATA  *Private
+  );
+
+/**
   Start the D.O.R.A DHCPv4 process to acquire the IPv4 address and other Http boot information.
 
   @param[in]  Private           Pointer to HTTP_BOOT private data.

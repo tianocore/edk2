@@ -30,6 +30,20 @@ HttpBootGetNicByIp4Children (
   );
 
 /**
+  Get the Nic handle using any child handle in the IPv6 stack.
+
+  @param[in]  ControllerHandle    Pointer to child handle over IPv6.
+
+  @return NicHandle               The pointer to the Nic handle.
+  @return NULL                    Can't find the Nic handle.
+
+**/
+EFI_HANDLE
+HttpBootGetNicByIp6Children (
+  IN EFI_HANDLE                 ControllerHandle
+  );
+
+/**
   This function is to convert UINTN to ASCII string with the required formatting.
 
   @param[in]  Number         Numeric value to be converted.
@@ -54,6 +68,17 @@ HttpBootUintnToAscDecWithFormat (
 VOID
 HttpBootShowIp4Addr (
   IN EFI_IPv4_ADDRESS   *Ip
+  );
+
+/**
+  This function is to display the IPv6 address.
+
+  @param[in]  Ip        The pointer to the IPv6 address.
+
+**/
+VOID
+HttpBootShowIp6Addr (
+  IN EFI_IPv6_ADDRESS   *Ip
   );
 
 //
@@ -123,10 +148,23 @@ typedef struct {
 } HTTP4_IO_CONFIG_DATA;
 
 //
+// HTTP_IO configuration data for IPv6
+//
+typedef struct {
+  EFI_HTTP_VERSION          HttpVersion;
+  UINT32                    RequestTimeOut;  // In milliseconds.
+  BOOLEAN                   UseDefaultAddress;
+  EFI_IPv6_ADDRESS          LocalIp;
+  UINT16                    LocalPort;
+} HTTP6_IO_CONFIG_DATA;
+
+
+//
 // HTTP_IO configuration
 //
 typedef union {
   HTTP4_IO_CONFIG_DATA       Config4;
+  HTTP6_IO_CONFIG_DATA       Config6;
 } HTTP_IO_CONFIG_DATA;
 
 //
@@ -159,6 +197,38 @@ typedef struct {
   UINTN                       BodyLength;
   CHAR8                       *Body;
 } HTTP_IO_RESOPNSE_DATA;
+
+/**
+  Retrieve the host address using the EFI_DNS6_PROTOCOL.
+
+  @param[in]  Private             The pointer to the driver's private data.
+  @param[in]  HostName            Pointer to buffer containing hostname.
+  @param[out] IpAddress           On output, pointer to buffer containing IPv6 address.
+
+  @retval EFI_SUCCESS             Operation succeeded.
+  @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
+  @retval Others                  Other errors as indicated.  
+**/
+EFI_STATUS
+HttpBootDns (
+  IN     HTTP_BOOT_PRIVATE_DATA   *Private,
+  IN     CHAR16                   *HostName,
+     OUT EFI_IPv6_ADDRESS         *IpAddress 
+  );
+
+/**
+  Notify the callback function when an event is triggered.
+
+  @param[in]  Event           The triggered event.
+  @param[in]  Context         The opaque parameter to the function.
+
+**/
+VOID
+EFIAPI
+HttpBootCommonNotify (
+  IN EFI_EVENT           Event,
+  IN VOID                *Context
+  );
 
 /**
   Create a HTTP_IO to access the HTTP service. It will create and configure

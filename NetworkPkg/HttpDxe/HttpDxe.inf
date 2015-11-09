@@ -56,9 +56,14 @@
   gEfiHttpUtilitiesProtocolGuid                    ## CONSUMES
   gEfiTcp4ServiceBindingProtocolGuid               ## TO_START
   gEfiTcp4ProtocolGuid                             ## TO_START
+  gEfiTcp6ServiceBindingProtocolGuid               ## TO_START
+  gEfiTcp6ProtocolGuid                             ## TO_START
   gEfiDns4ServiceBindingProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiDns4ProtocolGuid                             ## SOMETIMES_CONSUMES
+  gEfiDns6ServiceBindingProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                             ## SOMETIMES_CONSUMES
   gEfiIp4Config2ProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiIp6ConfigProtocolGuid                        ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpDxeExtra.uni

@@ -151,7 +151,10 @@ HttpBootDxeComponentNameGetControllerName (
   
   NicHandle = HttpBootGetNicByIp4Children (ControllerHandle);
   if (NicHandle == NULL) {
-    return EFI_UNSUPPORTED;
+    NicHandle = HttpBootGetNicByIp6Children(ControllerHandle);
+    if (NicHandle == NULL) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   //

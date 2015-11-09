@@ -319,7 +319,7 @@ HttpBootParseDhcp4Packet (
   }
 
   //
-  // The offer with "HttpClient" is a Http offer.
+  // The offer with "HTTPClient" is a Http offer.
   //
   Option = Options[HTTP_BOOT_DHCP4_TAG_INDEX_CLASS_ID];
   if ((Option != NULL) && (Option->Length >= 9) &&
@@ -461,13 +461,13 @@ HttpBootCacheDhcp4Offer (
 }
 
 /**
-  Select an DHCPv4 offer, and record SelectIndex and SelectProxyType.
+  Select an DHCPv4 or DHCP6 offer, and record SelectIndex and SelectProxyType.
 
   @param[in]  Private             Pointer to HTTP boot driver private data.
 
 **/
 VOID
-HttpBootSelectDhcp4Offer (
+HttpBootSelectDhcpOffer (
   IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
@@ -590,7 +590,7 @@ HttpBootDhcp4CallBack (
     // Select offer according to the priority in UEFI spec, and record the SelectIndex 
     // and SelectProxyType.
     //
-    HttpBootSelectDhcp4Offer (Private);
+    HttpBootSelectDhcpOffer (Private);
 
     if (Private->SelectIndex == 0) {
       Status = EFI_ABORTED;
@@ -689,7 +689,7 @@ HttpBootRegisterIp4Dns (
 
 **/
 EFI_STATUS
-HttpBootSetIpPolicy (
+HttpBootSetIp4Policy (
   IN HTTP_BOOT_PRIVATE_DATA         *Private
   )
 {
@@ -752,7 +752,7 @@ HttpBootDhcp4Dora (
   Dhcp4 = Private->Dhcp4;
   ASSERT (Dhcp4 != NULL);
 
-  Status = HttpBootSetIpPolicy (Private);
+  Status = HttpBootSetIp4Policy (Private);
   if (EFI_ERROR (Status)) {
     return Status;
   }
