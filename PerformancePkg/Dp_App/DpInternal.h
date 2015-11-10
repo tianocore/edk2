@@ -7,6 +7,7 @@
   DpUtilities.c, DpTrace.c, and DpProfile.c are included here.
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -188,10 +189,13 @@ GetCumulativeItem(
   
   @post The SummaryData and CumData structures contain statistics for the
         current performance logs.
+
+  @param[in, out] CustomCumulativeData  The pointer to the custom cumulative data.
+
 **/
 VOID
 GatherStatistics(
-  VOID
+  IN OUT PERF_CUM_DATA              *CustomCumulativeData OPTIONAL
   );
 
 /** 
@@ -299,11 +303,13 @@ ProcessGlobal(
   For each record with a Token listed in the CumData array:<BR>
      - Update the instance count and the total, minimum, and maximum durations.
   Finally, print the gathered cumulative statistics.
+
+  @param[in]    CustomCumulativeData  The pointer to the custom cumulative data.
   
 **/
 VOID
 ProcessCumulative(
-  VOID
+  IN PERF_CUM_DATA                  *CustomCumulativeData OPTIONAL
   );
 
 /** 
