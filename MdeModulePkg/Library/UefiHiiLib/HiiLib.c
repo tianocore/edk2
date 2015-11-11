@@ -406,8 +406,8 @@ HiiGetFormSetFromHiiHandle(
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
   UINT8                        *Package;
   UINT8                        *OpCodeData;
-  EFI_IFR_FORM_SET             *FormSetBuffer;
-  EFI_IFR_FORM_SET             *TempBuffer;
+  UINT8                        *FormSetBuffer;
+  UINT8                        *TempBuffer;
   UINT32                       Offset;
   UINT32                       Offset2;
   UINT32                       PackageListLength;
@@ -483,7 +483,7 @@ HiiGetFormSetFromHiiHandle(
   FreePool (HiiPackageList);
 
   *BufferSize = TempSize;
-  *Buffer = FormSetBuffer;
+  *Buffer = (EFI_IFR_FORM_SET *)FormSetBuffer;
 
   return Status;
 }
