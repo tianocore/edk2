@@ -94,9 +94,7 @@ class EfiSectionTE:
         stripped_size = struct.unpack("<H", self.ec.getMemoryService().read(self.base_te + 0x6, 2, 32))[0]
         stripped_size -= EfiSectionTE.SIZEOF_EFI_TE_IMAGE_HEADER
 
-        base_of_code = self.ec.getMemoryService().readMemory32(self.base_te + 0xC)
-
-        return self.base_te + base_of_code - stripped_size
+        return self.base_te - stripped_size
 
 class EfiSectionPE32:
     def __init__(self, ec, base_pe32):
@@ -131,16 +129,7 @@ class EfiSectionPE32:
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):
-        # Offset from dos hdr to PE file hdr
-        pe_file_header = self.base_pe32 + self.ec.getMemoryService().readMemory32(self.base_pe32 + 0x3C)
-
-        base_of_code = self.base_pe32 + self.ec.getMemoryService().readMemory32(pe_file_header + 0x28)
-        base_of_data = self.base_pe32 + self.ec.getMemoryService().readMemory32(pe_file_header + 0x2C)
-
-        if (base_of_code < base_of_data) and (base_of_code != 0):
-            return base_of_code
-        else:
-            return base_of_data
+        return self.base_pe32
 
 class EfiSectionPE64:
     def __init__(self, ec, base_pe64):
@@ -176,16 +165,7 @@ class EfiSectionPE64:
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):
-        # Offset from dos hdr to PE file hdr
-        pe_file_header = self.base_pe64 + self.ec.getMemoryService().readMemory32(self.base_pe64 + 0x3C)
-
-        base_of_code = self.base_pe64 + self.ec.getMemoryService().readMemory32(pe_file_header + 0x28)
-        base_of_data = self.base_pe64 + self.ec.getMemoryService().readMemory32(pe_file_header + 0x2C)
-
-        if (base_of_code < base_of_data) and (base_of_code != 0):
-            return base_of_code
-        else:
-            return base_of_data
+        return self.base_pe64
 
 class FirmwareFile:
     EFI_FV_FILETYPE_RAW                   = 0x01
