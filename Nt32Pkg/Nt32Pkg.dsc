@@ -117,6 +117,8 @@
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  ImageDecoderLib|MdeModulePkg/Library/ImageDecoderLib/ImageDecoderLib.inf
+  BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   #
   # Platform
   #
@@ -440,7 +442,10 @@
   NetworkPkg/HttpDxe/HttpDxe.inf
   NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
 
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/BmpImageDecoderLib/BmpImageDecoderLib.inf
+  }
   MdeModulePkg/Application/UiApp/UiApp.inf
   MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf

@@ -5,7 +5,7 @@
 ;*    Family of Customer Reference Boards.                                *;
 ;*                                                                        *;
 ;*                                                                        *;
-;*    Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved   *;
+;*    Copyright (c)  1999  - 2015, Intel Corporation. All rights reserved   *;
 ;
 ; This program and the accompanying materials are licensed and made available under
 ; the terms and conditions of the BSD License that accompanies this distribution.
@@ -347,6 +347,7 @@ Field(GNVS,AnyAcc,Lock,Preserve)
   Offset(792),
   EDPV,     8,      //(792) Check for eDP display device
   DIDX,     32,     //(793) Device ID for eDP device
-  IOT,      8,      //(794) MinnowBoard Max JP1 is configured for MSFT IOT project.   
+  IOT,      8,      //(794) MinnowBoard Max JP1 is configured for MSFT IOT project.
+  BATT,     8,      //(795) The Flag of RTC Battery Prensent.  
 }
 

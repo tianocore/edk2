@@ -1,6 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
+Copyright (c) 2015 HP Development Company, L.P.
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -1381,22 +1382,24 @@ ProcessFvFile (
   
   //
   // Install FvInfo(2) Ppi
+  // NOTE: FvInfo2 must be installed before FvInfo so that recursive processing of encapsulated
+  // FVs inherit the proper AuthenticationStatus.
   //
+  PeiServicesInstallFvInfo2Ppi(
+    &FvHeader->FileSystemGuid,
+    (VOID**)FvHeader,
+    (UINT32)FvHeader->FvLength,
+    &ParentFvImageInfo.FvName,
+    &FileInfo.FileName,
+    AuthenticationStatus
+    );
+
   PeiServicesInstallFvInfoPpi (
     &FvHeader->FileSystemGuid,
     (VOID**) FvHeader,
     (UINT32) FvHeader->FvLength,
     &ParentFvImageInfo.FvName,
     &FileInfo.FileName
-    );
-
-  PeiServicesInstallFvInfo2Ppi (
-    &FvHeader->FileSystemGuid,
-    (VOID**) FvHeader,
-    (UINT32) FvHeader->FvLength,
-    &ParentFvImageInfo.FvName,
-    &FileInfo.FileName,
-    AuthenticationStatus
     );
 
   //

@@ -147,6 +147,149 @@ HttpBootShowIp6Addr (
 }
 
 /**
+  This function is to display the HTTP error status.
+
+  @param[in]      StatusCode      The status code value in HTTP message.
+
+**/
+VOID
+HttpBootPrintErrorMessage (
+  EFI_HTTP_STATUS_CODE            StatusCode
+  )
+{
+  AsciiPrint ("\n");
+
+  switch (StatusCode) {
+  case HTTP_STATUS_300_MULTIPLE_CHIOCES:
+    AsciiPrint ("\n  Redirection: 300 Multiple Choices");
+    break; 
+    
+  case HTTP_STATUS_301_MOVED_PERMANENTLY:
+    AsciiPrint ("\n  Redirection: 301 Moved Permanently");
+    break; 
+    
+  case HTTP_STATUS_302_FOUND:
+    AsciiPrint ("\n  Redirection: 302 Found");
+    break; 
+    
+  case HTTP_STATUS_303_SEE_OTHER:
+    AsciiPrint ("\n  Redirection: 303 See Other");
+    break; 
+
+  case HTTP_STATUS_304_NOT_MODIFIED:
+    AsciiPrint ("\n  Redirection: 304 Not Modified");
+    break; 
+
+  case HTTP_STATUS_305_USE_PROXY:
+    AsciiPrint ("\n  Redirection: 305 Use Proxy");
+    break; 
+
+  case HTTP_STATUS_307_TEMPORARY_REDIRECT:
+    AsciiPrint ("\n  Redirection: 307 Temporary Redirect");
+    break; 
+
+  case HTTP_STATUS_400_BAD_REQUEST:
+    AsciiPrint ("\n  Client Error: 400 Bad Request");
+    break;
+    
+  case HTTP_STATUS_401_UNAUTHORIZED:
+    AsciiPrint ("\n  Client Error: 401 Unauthorized");
+    break;
+    
+  case HTTP_STATUS_402_PAYMENT_REQUIRED:
+    AsciiPrint ("\n  Client Error: 402 Payment Required");
+    break;
+
+  case HTTP_STATUS_403_FORBIDDEN:
+    AsciiPrint ("\n  Client Error: 403 Forbidden");
+    break;
+
+  case HTTP_STATUS_404_NOT_FOUND:
+    AsciiPrint ("\n  Client Error: 404 Not Found");
+    break;
+
+  case HTTP_STATUS_405_METHOD_NOT_ALLOWED:
+    AsciiPrint ("\n  Client Error: 405 Method Not Allowed");
+    break;
+
+  case HTTP_STATUS_406_NOT_ACCEPTABLE:
+    AsciiPrint ("\n  Client Error: 406 Not Acceptable");
+    break;
+
+  case HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED:
+    AsciiPrint ("\n  Client Error: 407 Proxy Authentication Required");
+    break;
+
+  case HTTP_STATUS_408_REQUEST_TIME_OUT:
+    AsciiPrint ("\n  Client Error: 408 Request Timeout");
+    break;
+
+  case HTTP_STATUS_409_CONFLICT:
+    AsciiPrint ("\n  Client Error: 409 Conflict");
+    break;
+
+  case HTTP_STATUS_410_GONE:
+    AsciiPrint ("\n  Client Error: 410 Gone");
+    break;
+
+  case HTTP_STATUS_411_LENGTH_REQUIRED:
+    AsciiPrint ("\n  Client Error: 411 Length Required");
+    break;
+
+  case HTTP_STATUS_412_PRECONDITION_FAILED:
+    AsciiPrint ("\n  Client Error: 412 Precondition Failed");
+    break;
+
+  case HTTP_STATUS_413_REQUEST_ENTITY_TOO_LARGE:
+    AsciiPrint ("\n  Client Error: 413 Request Entity Too Large");
+    break;
+
+  case HTTP_STATUS_414_REQUEST_URI_TOO_LARGE:
+    AsciiPrint ("\n  Client Error: 414 Request URI Too Long");
+    break;
+
+  case HTTP_STATUS_415_UNSUPPORTED_MEDIA_TYPE:
+    AsciiPrint ("\n  Client Error: 415 Unsupported Media Type");
+    break;
+
+  case HTTP_STATUS_416_REQUESTED_RANGE_NOT_SATISFIED:
+    AsciiPrint ("\n  Client Error: 416 Requested Range Not Satisfiable");
+    break;
+
+  case HTTP_STATUS_417_EXPECTATION_FAILED:
+    AsciiPrint ("\n  Client Error: 417 Expectation Failed");
+    break;
+
+  case HTTP_STATUS_500_INTERNAL_SERVER_ERROR:
+    AsciiPrint ("\n  Server Error: 500 Internal Server Error");
+    break;
+
+  case HTTP_STATUS_501_NOT_IMPLEMENTED:
+    AsciiPrint ("\n  Server Error: 501 Not Implemented");
+    break;
+
+  case HTTP_STATUS_502_BAD_GATEWAY:
+    AsciiPrint ("\n  Server Error: 502 Bad Gateway");
+    break;
+
+  case HTTP_STATUS_503_SERVICE_UNAVAILABLE:
+    AsciiPrint ("\n  Server Error: 503 Service Unavailable");
+    break;
+
+  case HTTP_STATUS_504_GATEWAY_TIME_OUT:
+    AsciiPrint ("\n  Server Error: 504 Gateway Timeout");
+    break;
+
+  case HTTP_STATUS_505_HTTP_VERSION_NOT_SUPPORTED:
+    AsciiPrint ("\n  Server Error: 505 HTTP Version Not Supported");
+    break;
+
+  default: ;
+  
+  }
+}
+
+/**
   Notify the callback function when an event is triggered.
 
   @param[in]  Event           The triggered event.
@@ -787,6 +930,7 @@ HttpIoRecvResponse (
 {
   EFI_STATUS                 Status;
   EFI_HTTP_PROTOCOL          *Http;
+  EFI_HTTP_STATUS_CODE       StatusCode;
 
   if (HttpIo == NULL || HttpIo->Http == NULL || ResponseData == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -818,7 +962,7 @@ HttpIoRecvResponse (
   }
 
   //
-  // Poll the network until transmit finish.
+  // Poll the network until receive finish.
   //
   while (!HttpIo->IsRxDone) {
     Http->Poll (Http);
@@ -832,6 +976,11 @@ HttpIoRecvResponse (
     ResponseData->HeaderCount = HttpIo->RspToken.Message->HeaderCount;
     ResponseData->Headers     = HttpIo->RspToken.Message->Headers;
     ResponseData->BodyLength  = HttpIo->RspToken.Message->BodyLength;
+  }
+  
+  if (RecvMsgHeader) {
+    StatusCode = HttpIo->RspToken.Message->Data.Response->StatusCode;
+    HttpBootPrintErrorMessage (StatusCode);
   }
 
   return Status;

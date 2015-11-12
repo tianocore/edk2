@@ -471,6 +471,7 @@ typedef struct {
   UINT8       EDPV;                              // 792 Check for eDP display device
   UINT32      DIDX;                              // 793 Device ID for eDP device
   UINT8       MicrosoftIoT;                      // (794)JP1 pins are for Microsoft IoT project.
+  UINT8       RtcBattery;                        // (795) The Flag of RTC Battery Present.
 } EFI_GLOBAL_NVS_AREA;
 #pragma pack ()
 

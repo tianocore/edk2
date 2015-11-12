@@ -5,7 +5,7 @@
 ;*    Family of Customer Reference Boards.                                *;
 ;*                                                                        *;
 ;*                                                                        *;
-;*    Copyright (c) 2012  - 2014, Intel Corporation. All rights reserved    *;
+;*    Copyright (c) 2012  - 2015, Intel Corporation. All rights reserved    *;
 ;
 ; This program and the accompanying materials are licensed and made available under
 ; the terms and conditions of the BSD License that accompanies this distribution.
@@ -21,7 +21,6 @@
 
 Scope(\_SB)
 {
-
 //RTC
   Device(RTC)    // RTC
   {
@@ -31,6 +30,17 @@ Scope(\_SB)
     {
       IO(Decode16,0x70,0x70,0x01,0x08)
     })
+
+    Method(_STA,0,Serialized) {
+
+      //
+      // Report RTC Battery is Prensent or Not Present.
+      //
+      If (LEqual(BATT, 1)) {
+        Return (0xF)
+      }
+      Return (0x0)
+    }
   }
 //RTC
 

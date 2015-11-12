@@ -1,7 +1,7 @@
 /** @file
 Converts a pe32+ image to an FW, Te image type, or other specific image.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -168,7 +168,7 @@ Returns:
   //
   // Copyright declaration
   //
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -184,9 +184,9 @@ Returns:
                         PIC_PEIM, RELOCATABLE_PEIM, BS_DRIVER, RT_DRIVER,\n\
                         APPLICATION, SAL_RT_DRIVER to support all module types\n\
                         It can only be used together with --keepexceptiontable,\n\
-                        --keepzeropending, -r, -o option.It is a action option.\n\
-                        If it is combined with other action options, the later\n\
-                        input action option will override the previous one.\n");
+                        --keepzeropending, --keepoptionalheader, -r, -o option.\n\
+                        It is a action option. If it is combined with other action options,\n\
+                        the later input action option will override the previous one.\n");
   fprintf (stdout, "  -c, --acpi            Create Acpi table.\n\
                         It can't be combined with other action options\n\
                         except for -o, -r option. It is a action option.\n\
@@ -194,9 +194,9 @@ Returns:
                         input action option will override the previous one.\n");
   fprintf (stdout, "  -t, --terse           Create Te Image.\n\
                         It can only be used together with --keepexceptiontable,\n\
-                        --keepzeropending, -r, -o option.It is a action option.\n\
-                        If it is combined with other action options, the later\n\
-                        input action option will override the previous one.\n");
+                        --keepzeropending, --keepoptionalheader, -r, -o option.\n\
+                        It is a action option. If it is combined with other action options,\n\
+                        the later input action option will override the previous one.\n");
   fprintf (stdout, "  -u, --dump            Dump TeImage Header.\n\
                         It can't be combined with other action options\n\
                         except for -o, -r option. It is a action option.\n\
@@ -244,6 +244,9 @@ Returns:
   fprintf (stdout, "  -p NUM, --pad NUM     NUM is one HEX or DEC format padding value.\n\
                         This option is only used together with -j option.\n");
   fprintf (stdout, "  --keepexceptiontable  Don't clear exception table.\n\
+                        This option can be used together with -e or -t.\n\
+                        It doesn't work for other options.\n");
+  fprintf (stdout, "  --keepoptionalheader  Don't zero PE/COFF optional header fields.\n\
                         This option can be used together with -e or -t.\n\
                         It doesn't work for other options.\n");
   fprintf (stdout, "  --keepzeropending     Don't strip zero pending of .reloc.\n\
@@ -1079,6 +1082,7 @@ Returns:
   STATUS                           Status;
   BOOLEAN                          ReplaceFlag;
   BOOLEAN                          KeepExceptionTableFlag;
+  BOOLEAN                          KeepOptionalHeaderFlag;
   BOOLEAN                          KeepZeroPendingFlag;
   UINT64                           LogLevel;
   EFI_TE_IMAGE_HEADER              TEImageHeader;
@@ -1141,6 +1145,7 @@ Returns:
   Optional32        = NULL;
   Optional64        = NULL;
   KeepExceptionTableFlag = FALSE;
+  KeepOptionalHeaderFlag = FALSE;
   KeepZeroPendingFlag    = FALSE;
   NumberOfFormPacakge    = 0;
   HiiPackageListBuffer   = NULL;
@@ -1266,6 +1271,13 @@ Returns:
       KeepExceptionTableFlag = TRUE;
       argc --;
       argv ++;
+      continue;
+    }
+
+    if (stricmp(argv[0], "--keepoptionalheader") == 0) {
+      KeepOptionalHeaderFlag = TRUE;
+      argc--;
+      argv++;
       continue;
     }
 
@@ -2303,19 +2315,20 @@ Returns:
 
   if (PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     Optional32 = (EFI_IMAGE_OPTIONAL_HEADER32 *)&PeHdr->Pe32.OptionalHeader;
-    Optional32->MajorOperatingSystemVersion = 0;
-    Optional32->MinorOperatingSystemVersion = 0;
-    Optional32->MajorImageVersion           = 0;
-    Optional32->MinorImageVersion           = 0;
-    Optional32->MajorSubsystemVersion       = 0;
-    Optional32->MinorSubsystemVersion       = 0;
-    Optional32->Win32VersionValue           = 0;
-    Optional32->CheckSum                    = 0;
-    Optional32->SizeOfStackReserve = 0;
-    Optional32->SizeOfStackCommit  = 0;
-    Optional32->SizeOfHeapReserve  = 0;
-    Optional32->SizeOfHeapCommit   = 0;
-
+    if (!KeepOptionalHeaderFlag) {
+      Optional32->MajorOperatingSystemVersion = 0;
+      Optional32->MinorOperatingSystemVersion = 0;
+      Optional32->MajorImageVersion = 0;
+      Optional32->MinorImageVersion = 0;
+      Optional32->MajorSubsystemVersion = 0;
+      Optional32->MinorSubsystemVersion = 0;
+      Optional32->Win32VersionValue = 0;
+      Optional32->CheckSum = 0;
+      Optional32->SizeOfStackReserve = 0;
+      Optional32->SizeOfStackCommit = 0;
+      Optional32->SizeOfHeapReserve = 0;
+      Optional32->SizeOfHeapCommit = 0;
+    }
     TEImageHeader.AddressOfEntryPoint = Optional32->AddressOfEntryPoint;
     TEImageHeader.BaseOfCode          = Optional32->BaseOfCode;
     TEImageHeader.ImageBase           = (UINT64) (Optional32->ImageBase);
@@ -2395,19 +2408,20 @@ Returns:
     }
   } else if (PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
     Optional64 = (EFI_IMAGE_OPTIONAL_HEADER64 *)&PeHdr->Pe32.OptionalHeader;
-    Optional64->MajorOperatingSystemVersion = 0;
-    Optional64->MinorOperatingSystemVersion = 0;
-    Optional64->MajorImageVersion           = 0;
-    Optional64->MinorImageVersion           = 0;
-    Optional64->MajorSubsystemVersion       = 0;
-    Optional64->MinorSubsystemVersion       = 0;
-    Optional64->Win32VersionValue           = 0;
-    Optional64->CheckSum                    = 0;
-    Optional64->SizeOfStackReserve = 0;
-    Optional64->SizeOfStackCommit  = 0;
-    Optional64->SizeOfHeapReserve  = 0;
-    Optional64->SizeOfHeapCommit   = 0;
-
+    if (!KeepOptionalHeaderFlag) {
+      Optional64->MajorOperatingSystemVersion = 0;
+      Optional64->MinorOperatingSystemVersion = 0;
+      Optional64->MajorImageVersion = 0;
+      Optional64->MinorImageVersion = 0;
+      Optional64->MajorSubsystemVersion = 0;
+      Optional64->MinorSubsystemVersion = 0;
+      Optional64->Win32VersionValue = 0;
+      Optional64->CheckSum = 0;
+      Optional64->SizeOfStackReserve = 0;
+      Optional64->SizeOfStackCommit = 0;
+      Optional64->SizeOfHeapReserve = 0;
+      Optional64->SizeOfHeapCommit = 0;
+    }
     TEImageHeader.AddressOfEntryPoint = Optional64->AddressOfEntryPoint;
     TEImageHeader.BaseOfCode          = Optional64->BaseOfCode;
     TEImageHeader.ImageBase           = (UINT64) (Optional64->ImageBase);
