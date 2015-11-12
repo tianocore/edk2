@@ -131,6 +131,10 @@
   #
   PlatformVarCleanupLib|Include/Library/PlatformVarCleanupLib.h
 
+  ## @libraryclass  Provides image decoding service.
+  #
+  ImageDecoderLib|Include/Library/ImageDecoderLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
