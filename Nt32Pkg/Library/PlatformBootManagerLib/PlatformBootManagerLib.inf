@@ -52,6 +52,7 @@
   DevicePathLib
   HiiLib
   PrintLib
+  BootLogoLib
 
 [Guids]
   gEfiWinNtSystemConfigGuid
@@ -60,7 +61,6 @@
   gEfiGenericMemTestProtocolGuid  ## CONSUMES
   gEfiGraphicsOutputProtocolGuid  ## CONSUMES
   gEfiUgaDrawProtocolGuid         ## CONSUMES
-  gEfiOEMBadgingProtocolGuid      ## CONSUMES
   gEfiBootLogoProtocolGuid        ## CONSUMES
 
 [Pcd]
