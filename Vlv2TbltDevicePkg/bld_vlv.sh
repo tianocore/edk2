@@ -29,6 +29,7 @@ echo -e $(date)
 Build_Flags=
 exitCode=0
 Arch=X64
+SpiLock=0
 
 ## Clean up previous build files.
 if [ -e $(pwd)/EDK2.log ]; then
@@ -104,6 +105,9 @@ for (( i=1; i<=$#; ))
     elif [ "$(echo $1 | tr 'a-z' 'A-Z')" == "/X64" ]; then
       Arch=X64
       shift
+    elif [ "$(echo $1 | tr 'a-z' 'A-Z')" == "/YL" ]; then
+      SpiLock=1
+      shift      
     else
       break
     fi
@@ -206,6 +210,13 @@ fi
 echo "Invoking EDK2 build..."
 build
 
+if [ $SpiLock == "1" ]; then
+  IFWI_HEADER_FILE=./$PLATFORM_PACKAGE/Stitch/IFWIHeader/IFWI_HEADER_SPILOCK.bin
+else
+  IFWI_HEADER_FILE=./$PLATFORM_PACKAGE/Stitch/IFWIHeader/IFWI_HEADER.bin
+fi
+
+echo $IFWI_HEADER_FILE
 
 ##**********************************************************************
 ## Post Build processing and cleanup
@@ -223,7 +234,7 @@ BIOS_Name="$BOARD_ID"_"$Arch"_"$BUILD_TYPE"_"$VERSION_MAJOR"_"$VERSION_MINOR".RO
 BIOS_ID="$BOARD_ID"_"$Arch"_"$BUILD_TYPE"_"$VERSION_MAJOR"_"$VERSION_MINOR"_GCC.bin
 cp -f $BUILD_PATH/FV/VLV.fd  $WORKSPACE/$BIOS_Name
 SEC_VERSION=1.0.2.1060v5
-cat ./$PLATFORM_PACKAGE/Stitch/IFWIHeader/IFWI_HEADER.bin ./Vlv2MiscBinariesPkg/SEC/$SEC_VERSION/VLV_SEC_REGION.bin ./Vlv2MiscBinariesPkg/SEC/$SEC_VERSION/Vacant.bin $BIOS_Name > ./$PLATFORM_PACKAGE/Stitch/$BIOS_ID
+cat $IFWI_HEADER_FILE ./Vlv2MiscBinariesPkg/SEC/$SEC_VERSION/VLV_SEC_REGION.bin ./Vlv2MiscBinariesPkg/SEC/$SEC_VERSION/Vacant.bin $BIOS_Name > ./$PLATFORM_PACKAGE/Stitch/$BIOS_ID
 
 
 echo Skip "Running BIOS_Signing ..."
