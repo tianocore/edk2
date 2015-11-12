@@ -135,6 +135,10 @@
   #
   ImageDecoderLib|Include/Library/ImageDecoderLib.h
 
+  ## @libraryclass  Provides interfaces about logo display.
+  #
+  BootLogoLib|Include/Library/BootLogoLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

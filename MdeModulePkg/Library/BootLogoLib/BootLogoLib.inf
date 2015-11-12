@@ -1,0 +1,59 @@
+## @file
+#  This library is only intended to be used by PlatformBootManagerLib
+#  to show progress bar and logo.
+#  
+#  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials are licensed and made available under
+#  the terms and conditions of the BSD License that accompanies this distribution.
+#  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootLogoLib
+  FILE_GUID                      = F5AE5B5C-42E8-4A9B-829D-5B631CD5367A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BootLogoLib|DXE_DRIVER UEFI_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  BootLogoLib.c
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  PcdLib
+  DxeServicesLib
+  ImageDecoderLib
+
+[Guids]
+
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      # PROTOCOL SOMETIMES_CONSUMES  
+  gEfiUserManagerProtocolGuid                   # PROTOCOL CONSUMES
+  gEdkiiPlatformLogoProtocolGuid                # PROTOCOL CONSUMES
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport

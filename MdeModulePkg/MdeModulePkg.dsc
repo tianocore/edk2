@@ -278,6 +278,7 @@
   MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
   MdeModulePkg/Library/ImageDecoderLib/ImageDecoderLib.inf
+  MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   MdeModulePkg/Library/BmpImageDecoderLib/BmpImageDecoderLib.inf
   MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
