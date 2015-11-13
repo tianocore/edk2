@@ -317,7 +317,11 @@ EfiHttpRequest (
   if (EFI_ERROR (Status)) {
     RemotePort = HTTP_DEFAULT_PORT;
   }
-
+  //
+  // If Configure is TRUE, it indicates the first time to call Request();
+  // If ReConfigure is TRUE, it indicates the request URL is not same
+  // with the previous call to Request();
+  //
   Configure   = TRUE;
   ReConfigure = TRUE;  
 
@@ -427,7 +431,11 @@ EfiHttpRequest (
     //
     // The request URL is different from previous calls to Request(), close existing TCP instance.
     //
-    ASSERT (HttpInstance->Tcp4 != NULL &&HttpInstance->Tcp6 != NULL);
+    if (!HttpInstance->LocalAddressIsIPv6) {
+      ASSERT (HttpInstance->Tcp4 != NULL);
+    } else {
+      ASSERT (HttpInstance->Tcp6 != NULL);
+    }
     HttpCloseConnection (HttpInstance);
     EfiHttpCancel (This, NULL);
   }
@@ -445,13 +453,12 @@ EfiHttpRequest (
   Wrap->HttpInstance   = HttpInstance;
   Wrap->TcpWrap.Method = Request->Method;
 
-  if (Configure) {
-    Status = HttpInitTcp (HttpInstance, Wrap);
-    if (EFI_ERROR (Status)) {
-      goto Error2;
-    }
+  Status = HttpInitTcp (HttpInstance, Wrap, Configure);
+  if (EFI_ERROR (Status)) {
+    goto Error2;
+  }  
 
-  } else {
+  if (!Configure) {
     //
     // For the new HTTP token, create TX TCP token events.    
     //
@@ -460,7 +467,7 @@ EfiHttpRequest (
       goto Error1;
     }
   }
-
+  
   //
   // Create request message.
   //
