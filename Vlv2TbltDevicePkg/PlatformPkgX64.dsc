@@ -604,9 +604,9 @@
 [PcdsFixedAtBuild.common]
 !if $(MINNOW2_FSP_BUILD) == TRUE
 # $(FLASH_REGION_VLVMICROCODE_BASE)
-  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0xFFD00000
+  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0xFFC00000
 # $(FLASH_REGION_VLVMICROCODE_SIZE)
-  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x00030000
+  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x00040000
   gFspWrapperTokenSpaceGuid.PcdFlashMicroCodeOffset|0x60
 # $(FLASH_AREA_BASE_ADDRESS)
   gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheAddress|0xFF800000
