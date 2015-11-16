@@ -52,6 +52,7 @@
 
 [Protocols]
   gEfiBootLogoProtocolGuid                      ## CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid         ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow                          ## PRODUCES
