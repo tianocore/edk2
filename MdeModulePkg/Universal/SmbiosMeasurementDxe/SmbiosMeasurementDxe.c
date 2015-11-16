@@ -478,6 +478,8 @@ MeasureSmbiosTable (
       DEBUG ((EFI_D_INFO, "  TableAddress                - 0x%016lx\n", Smbios3Table->TableAddress));
     }
   }
+
+  if (Smbios3Table == NULL) {
     Status = EfiGetSystemConfigurationTable (
                &gEfiSmbiosTableGuid,
                (VOID **) &SmbiosTable
@@ -485,10 +487,10 @@ MeasureSmbiosTable (
     if (!EFI_ERROR (Status)) {
       DEBUG ((EFI_D_INFO, "SmbiosTable:\n"));
       DEBUG ((EFI_D_INFO, "  AnchorString                - '%c%c%c%c'\n",
-        Smbios3Table->AnchorString[0],
-        Smbios3Table->AnchorString[1],
-        Smbios3Table->AnchorString[2],
-        Smbios3Table->AnchorString[3]
+        SmbiosTable->AnchorString[0],
+        SmbiosTable->AnchorString[1],
+        SmbiosTable->AnchorString[2],
+        SmbiosTable->AnchorString[3]
         ));
       DEBUG ((EFI_D_INFO, "  EntryPointStructureChecksum - 0x%02x\n", SmbiosTable->EntryPointStructureChecksum));
       DEBUG ((EFI_D_INFO, "  EntryPointLength            - 0x%02x\n", SmbiosTable->EntryPointLength));
@@ -516,6 +518,7 @@ MeasureSmbiosTable (
       DEBUG ((EFI_D_INFO, "  NumberOfSmbiosStructures    - 0x%04x\n", SmbiosTable->NumberOfSmbiosStructures));
       DEBUG ((EFI_D_INFO, "  SmbiosBcdRevision           - 0x%02x\n", SmbiosTable->SmbiosBcdRevision));
     }
+  }
 
   if (Smbios3Table != NULL) {
     SmbiosTableAddress = (VOID *)(UINTN)Smbios3Table->TableAddress;
@@ -542,8 +545,13 @@ MeasureSmbiosTable (
     InternalDumpHex (TableAddress, TableLength);
 
     HandoffTables.NumberOfTables = 1;
-    HandoffTables.TableEntry[0].VendorGuid  = gEfiSmbiosTableGuid;
-    HandoffTables.TableEntry[0].VendorTable = SmbiosTable;
+    if (Smbios3Table != NULL) {
+      CopyGuid (&(HandoffTables.TableEntry[0].VendorGuid), &gEfiSmbios3TableGuid);
+      HandoffTables.TableEntry[0].VendorTable = Smbios3Table;
+    } else {
+      CopyGuid (&(HandoffTables.TableEntry[0].VendorGuid), &gEfiSmbiosTableGuid);
+      HandoffTables.TableEntry[0].VendorTable = SmbiosTable;
+    }
     Status = TpmMeasureAndLogData (
                1,                       // PCRIndex
                EV_EFI_HANDOFF_TABLES,   // EventType
