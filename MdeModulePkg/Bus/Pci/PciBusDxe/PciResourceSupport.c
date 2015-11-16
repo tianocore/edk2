@@ -1,7 +1,7 @@
 /** @file
   PCI resouces support functions implemntation for PCI Bus module.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -196,6 +196,7 @@ CalculateApertureIo16 (
   PCI_RESOURCE_NODE       *Node;
   UINT64                  Offset;
   EFI_PCI_PLATFORM_POLICY PciPolicy;
+  UINT64                  PaddingAperture;
 
   if (!mPolicyDetermined) {
     //
@@ -228,21 +229,27 @@ CalculateApertureIo16 (
     mPolicyDetermined = TRUE;
   }
 
-  Aperture = 0;
+  Aperture        = 0;
+  PaddingAperture = 0;
 
   if (Bridge == NULL) {
     return ;
   }
 
-  CurrentLink = Bridge->ChildList.ForwardLink;
-
   //
   // Assume the bridge is aligned
   //
-  while (CurrentLink != &Bridge->ChildList) {
+  for ( CurrentLink = GetFirstNode (&Bridge->ChildList)
+      ; !IsNull (&Bridge->ChildList, CurrentLink)
+      ; CurrentLink = GetNextNode (&Bridge->ChildList, CurrentLink)
+      ) {
 
     Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
-
+    if (Node->ResourceUsage == PciResUsagePadding) {
+      ASSERT (PaddingAperture == 0);
+      PaddingAperture = Node->Length;
+      continue;
+    }
     //
     // Consider the aperture alignment
     //
@@ -293,13 +300,10 @@ CalculateApertureIo16 (
     // Increment aperture by the length of node
     //
     Aperture += Node->Length;
-
-    CurrentLink = CurrentLink->ForwardLink;
   }
 
   //
-  // At last, adjust the aperture with the bridge's
-  // alignment
+  // Adjust the aperture with the bridge's alignment
   //
   Offset = Aperture & (Bridge->Alignment);
 
@@ -319,6 +323,12 @@ CalculateApertureIo16 (
       Bridge->Alignment = Node->Alignment;
     }
   }
+
+  //
+  // Hotplug controller needs padding resources.
+  // Use the larger one between the padding resource and actual occupied resource.
+  //
+  Bridge->Length = MAX (Bridge->Length, PaddingAperture);
 }
 
 /**
@@ -336,10 +346,11 @@ CalculateResourceAperture (
   UINT64            Aperture;
   LIST_ENTRY        *CurrentLink;
   PCI_RESOURCE_NODE *Node;
-
+  UINT64            PaddingAperture;
   UINT64            Offset;
 
-  Aperture = 0;
+  Aperture        = 0;
+  PaddingAperture = 0;
 
   if (Bridge == NULL) {
     return ;
@@ -351,14 +362,20 @@ CalculateResourceAperture (
     return ;
   }
 
-  CurrentLink = Bridge->ChildList.ForwardLink;
-
   //
   // Assume the bridge is aligned
   //
-  while (CurrentLink != &Bridge->ChildList) {
+  for ( CurrentLink = GetFirstNode (&Bridge->ChildList)
+      ; !IsNull (&Bridge->ChildList, CurrentLink)
+      ; CurrentLink = GetNextNode (&Bridge->ChildList, CurrentLink)
+      ) {
 
     Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
+    if (Node->ResourceUsage == PciResUsagePadding) {
+      ASSERT (PaddingAperture == 0);
+      PaddingAperture = Node->Length;
+      continue;
+    }
 
     //
     // Apply padding resource if available
@@ -381,11 +398,6 @@ CalculateResourceAperture (
     // Increment aperture by the length of node
     //
     Aperture += Node->Length;
-
-    //
-    // Consider the aperture alignment
-    //
-    CurrentLink = CurrentLink->ForwardLink;
   }
 
   //
@@ -407,7 +419,7 @@ CalculateResourceAperture (
   }
 
   //
-  // At last, adjust the bridge's alignment to the first child's alignment
+  // Adjust the bridge's alignment to the first child's alignment
   // if the bridge has at least one child
   //
   CurrentLink = Bridge->ChildList.ForwardLink;
@@ -417,6 +429,12 @@ CalculateResourceAperture (
       Bridge->Alignment = Node->Alignment;
     }
   }
+
+  //
+  // Hotplug controller needs padding resources.
+  // Use the larger one between the padding resource and actual occupied resource.
+  //
+  Bridge->Length = MAX (Bridge->Length, PaddingAperture);
 }
 
 /**
