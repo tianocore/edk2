@@ -387,6 +387,38 @@ FillBufferWithBootHashAlg (
 }
 
 /**
+  Set ConfigInfo according to TpmAlgHash.
+
+  @param[in,out] Tcg2ConfigInfo       TCG2 config info.
+  @param[in]     TpmAlgHash           TpmAlgHash.
+
+**/
+VOID
+SetConfigInfo (
+  IN OUT TCG2_CONFIGURATION_INFO         *Tcg2ConfigInfo,
+  IN UINT32                              TpmAlgHash
+  )
+{
+  switch (TpmAlgHash) {
+  case TPM_ALG_SHA1:
+    Tcg2ConfigInfo->Sha1Supported = TRUE;
+    break;
+  case TPM_ALG_SHA256:
+    Tcg2ConfigInfo->Sha256Supported = TRUE;
+    break;
+  case TPM_ALG_SHA384:
+    Tcg2ConfigInfo->Sha384Supported = TRUE;
+    break;
+  case TPM_ALG_SHA512:
+    Tcg2ConfigInfo->Sha512Supported = TRUE;
+    break;
+  case TPM_ALG_SM3_256:
+    Tcg2ConfigInfo->Sm3Supported = TRUE;
+    break;
+  }
+}
+
+/**
   Fill Buffer With TCG2EventLogFormat.
 
   @param[in] Buffer               Buffer to be filled.
@@ -471,6 +503,7 @@ InstallTcg2ConfigForm (
   UINTN                           Index;
   TPML_PCR_SELECTION              Pcrs;
   CHAR16                          TempBuffer[1024];
+  TCG2_CONFIGURATION_INFO         Tcg2ConfigInfo;
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
@@ -531,6 +564,7 @@ InstallTcg2ConfigForm (
     break;
   }
 
+  ZeroMem (&Tcg2ConfigInfo, sizeof(Tcg2ConfigInfo));
   Status = Tpm2GetCapabilityPcrs (&Pcrs);
   if (EFI_ERROR (Status)) {
     HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TPM2_ACTIVE_HASH_ALGO_CONTENT), L"[Unknown]", NULL);
@@ -547,6 +581,7 @@ InstallTcg2ConfigForm (
     TempBuffer[0] = 0;
     for (Index = 0; Index < Pcrs.count; Index++) {
       AppendBufferWithTpmAlgHash (TempBuffer, sizeof(TempBuffer), Pcrs.pcrSelections[Index].hash);
+      SetConfigInfo (&Tcg2ConfigInfo, Pcrs.pcrSelections[Index].hash);
     }
     HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TPM2_SUPPORTED_HASH_ALGO_CONTENT), TempBuffer, NULL);
   }
@@ -569,6 +604,19 @@ InstallTcg2ConfigForm (
   FillBufferWithBootHashAlg (TempBuffer, sizeof(TempBuffer), PrivateData->ProtocolCapability.ActivePcrBanks);
   HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_ACTIVE_PCR_BANKS_CONTENT), TempBuffer, NULL);
 
+  //
+  // Set ConfigInfo, to control the check box.
+  //
+  Status = gRT->SetVariable (
+                  TCG2_STORAGE_INFO_NAME,
+                  &gTcg2ConfigFormSetGuid,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                  sizeof(Tcg2ConfigInfo),
+                  &Tcg2ConfigInfo
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_INFO_NAME\n"));
+  }
   return EFI_SUCCESS;  
 }
 
