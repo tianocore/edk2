@@ -60,10 +60,6 @@
   ReportStatusCodeLib
 
 [Guids]
-  ## SOMETIMES_CONSUMES     ## SystemTable           # Smbios Table
-  ## SOMETIMES_CONSUMES     ## GUID                  # Handoff Table for measurement.
-  gEfiSmbiosTableGuid
-  
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"
   ## SOMETIMES_CONSUMES     ## Variable:L"PK"
   ## SOMETIMES_CONSUMES     ## Variable:L"KEK"
