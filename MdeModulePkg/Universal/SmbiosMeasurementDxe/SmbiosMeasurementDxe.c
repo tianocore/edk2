@@ -286,6 +286,7 @@ FilterSmbiosEntry (
           if (StringId != 0) {
             // set ' ' for string field
             String = GetSmbiosStringById (TableEntry, StringId, &StringLen);
+            ASSERT (String != NULL);
             //DEBUG ((EFI_D_INFO,"StrId(0x%x)-%a(%d)\n", StringId, String, StringLen));
             SetMem (String, StringLen, ' ');
           }
