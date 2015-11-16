@@ -2392,6 +2392,16 @@ EfiPxeLoadFile (
     //   3. unsupported.
     //
     PxeBc->Stop (PxeBc);
+  } else {
+    //
+    // The DHCP4 can have only one configured child instance so we need to stop
+    // reset the DHCP4 child before we return. Otherwise these programs which 
+    // also need to use DHCP4 will be impacted.
+    //
+    if (!PxeBc->Mode->UsingIpv6) {
+      Private->Dhcp4->Stop (Private->Dhcp4);
+      Private->Dhcp4->Configure (Private->Dhcp4, NULL);
+    }
   }
 
   return Status;
