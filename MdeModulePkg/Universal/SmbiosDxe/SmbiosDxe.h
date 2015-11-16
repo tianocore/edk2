@@ -31,18 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
 
-//
-// The length of the entire structure table (including all strings) must be reported
-// in the Structure Table Length field of the SMBIOS Structure Table Entry Point,
-// which is a WORD field limited to 65,535 bytes.
-//
-#define SMBIOS_TABLE_MAX_LENGTH 0xFFFF
-
-//
-// For SMBIOS 3.0, Structure table maximum size in Entry Point structure is DWORD field limited to 0xFFFFFFFF bytes.
-//
-#define SMBIOS_3_0_TABLE_MAX_LENGTH 0xFFFFFFFF
-
 #define SMBIOS_INSTANCE_SIGNATURE SIGNATURE_32 ('S', 'B', 'i', 's')
 typedef struct {
   UINT32                Signature;
