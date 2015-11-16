@@ -2,6 +2,7 @@
   Network library.
 
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -3254,21 +3255,26 @@ NetLibGetSystemGuid (
   OUT EFI_GUID              *SystemGuid
   )
 {
-  EFI_STATUS                Status;
-  SMBIOS_TABLE_ENTRY_POINT  *SmbiosTable;
-  SMBIOS_STRUCTURE_POINTER  Smbios;
-  SMBIOS_STRUCTURE_POINTER  SmbiosEnd;
-  CHAR8                     *String;
+  EFI_STATUS                    Status;
+  SMBIOS_TABLE_ENTRY_POINT      *SmbiosTable;
+  SMBIOS_TABLE_3_0_ENTRY_POINT  *Smbios30Table;
+  SMBIOS_STRUCTURE_POINTER      Smbios;
+  SMBIOS_STRUCTURE_POINTER      SmbiosEnd;
+  CHAR8                         *String;
 
   SmbiosTable = NULL;
-  Status      = EfiGetSystemConfigurationTable (&gEfiSmbiosTableGuid, (VOID **) &SmbiosTable);
-
-  if (EFI_ERROR (Status) || SmbiosTable == NULL) {
-    return EFI_NOT_FOUND;
+  Status = EfiGetSystemConfigurationTable (&gEfiSmbios3TableGuid, (VOID **) &Smbios30Table);
+  if (!(EFI_ERROR (Status) || Smbios30Table == NULL)) {
+    Smbios.Hdr = (SMBIOS_STRUCTURE *) (UINTN) Smbios30Table->TableAddress;
+    SmbiosEnd.Raw = (UINT8 *) (UINTN) (Smbios30Table->TableAddress + Smbios30Table->TableMaximumSize);
+  } else {
+    Status = EfiGetSystemConfigurationTable (&gEfiSmbiosTableGuid, (VOID **) &SmbiosTable);
+    if (EFI_ERROR (Status) || SmbiosTable == NULL) {
+      return EFI_NOT_FOUND;
+    }
+    Smbios.Hdr    = (SMBIOS_STRUCTURE *) (UINTN) SmbiosTable->TableAddress;
+    SmbiosEnd.Raw = (UINT8 *) (UINTN) (SmbiosTable->TableAddress + SmbiosTable->TableLength);
   }
-
-  Smbios.Hdr    = (SMBIOS_STRUCTURE *) (UINTN) SmbiosTable->TableAddress;
-  SmbiosEnd.Raw = (UINT8 *) (UINTN) (SmbiosTable->TableAddress + SmbiosTable->TableLength);
 
   do {
     if (Smbios.Hdr->Type == 1) {
