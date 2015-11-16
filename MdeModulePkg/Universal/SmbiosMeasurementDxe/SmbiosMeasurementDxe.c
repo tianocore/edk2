@@ -432,7 +432,11 @@ FilterSmbiosTable (
 }
 
 /**
-  Measure SMBIOS with EV_EFI_HANDOFF_TABLES to PCR[1]
+  Measure SMBIOS with EV_EFI_HANDOFF_TABLES to PCR[1].
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    Pointer to the notification function's context.
+
 **/
 VOID
 EFIAPI
@@ -575,8 +579,7 @@ MeasureSmbiosTable (
   @param ImageHandle     Module's image handle
   @param SystemTable     Pointer of EFI_SYSTEM_TABLE
 
-  @retval EFI_SUCCESS    Smbios protocol installed
-  @retval Other          No protocol installed, unload driver.
+  @return Status returned from EfiCreateEventReadyToBootEx().
 
 **/
 EFI_STATUS
