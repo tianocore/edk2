@@ -141,11 +141,19 @@ VariablePropertyGetWithWildcardName (
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 1]) &&
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 2]) &&
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 3])) {
-          return &mVarCheckVariableWithWildcardName[Index].VariableProperty;
+          if (mVarCheckVariableWithWildcardName[Index].VariableProperty.Revision != VAR_CHECK_VARIABLE_PROPERTY_REVISION) {
+            return NULL;
+          } else {
+            return &mVarCheckVariableWithWildcardName[Index].VariableProperty;
+          }
         }
       }
       if (StrCmp (mVarCheckVariableWithWildcardName[Index].Name, VariableName) == 0) {
-        return  &mVarCheckVariableWithWildcardName[Index].VariableProperty;
+        if (mVarCheckVariableWithWildcardName[Index].VariableProperty.Revision != VAR_CHECK_VARIABLE_PROPERTY_REVISION) {
+          return NULL;
+        } else {
+          return  &mVarCheckVariableWithWildcardName[Index].VariableProperty;
+        }
       }
     }
   }
