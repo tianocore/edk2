@@ -125,7 +125,7 @@ InternalDumpData (
 {
   UINTN  Index;
   for (Index = 0; Index < Size; Index++) {
-    DEBUG ((EFI_D_INFO, "%02x", (UINTN)Data[Index]));
+    DEBUG ((EFI_D_VERBOSE, "%02x", (UINTN)Data[Index]));
   }
 }
 
@@ -152,15 +152,15 @@ InternalDumpHex (
   Count = Size / COLUME_SIZE;
   Left  = Size % COLUME_SIZE;
   for (Index = 0; Index < Count; Index++) {
-    DEBUG ((EFI_D_INFO, "%04x: ", Index * COLUME_SIZE));
+    DEBUG ((EFI_D_VERBOSE, "%04x: ", Index * COLUME_SIZE));
     InternalDumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((EFI_D_VERBOSE, "\n"));
   }
 
   if (Left != 0) {
-    DEBUG ((EFI_D_INFO, "%04x: ", Index * COLUME_SIZE));
+    DEBUG ((EFI_D_VERBOSE, "%04x: ", Index * COLUME_SIZE));
     InternalDumpData (Data + Index * COLUME_SIZE, Left);
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((EFI_D_VERBOSE, "\n"));
   }
 }
 
@@ -271,7 +271,7 @@ FilterSmbiosEntry (
   UINTN                 StringLen;
 
   DEBUG ((EFI_D_INFO, "Smbios Table (Type - %d):\n", ((SMBIOS_STRUCTURE *)TableEntry)->Type));
-  InternalDumpHex (TableEntry, TableEntrySize);
+  DEBUG_CODE (InternalDumpHex (TableEntry, TableEntrySize););
 
   FilterStruct = GetFilterStructByType (((SMBIOS_STRUCTURE *)TableEntry)->Type);
   if (FilterStruct != NULL) {
@@ -297,7 +297,7 @@ FilterSmbiosEntry (
   }
 
   DEBUG ((EFI_D_INFO, "Filter Smbios Table (Type - %d):\n", ((SMBIOS_STRUCTURE *)TableEntry)->Type));
-  InternalDumpHex (TableEntry, TableEntrySize);
+  DEBUG_CODE (InternalDumpHex (TableEntry, TableEntrySize););
 }
 
 /**
@@ -531,7 +531,7 @@ MeasureSmbiosTable (
   if (SmbiosTableAddress != NULL) {
     DEBUG ((DEBUG_INFO, "The Smbios Table starts at: 0x%x\n", SmbiosTableAddress));
     DEBUG ((DEBUG_INFO, "The Smbios Table size: 0x%x\n", TableLength));
-    InternalDumpHex ((UINT8 *)(UINTN)SmbiosTableAddress, TableLength);
+    DEBUG_CODE (InternalDumpHex ((UINT8 *)(UINTN)SmbiosTableAddress, TableLength););
 
     TableAddress = AllocateCopyPool ((UINTN)TableLength, (VOID *)(UINTN)SmbiosTableAddress);
     if (TableAddress == NULL) {
@@ -542,7 +542,7 @@ MeasureSmbiosTable (
 
     DEBUG ((DEBUG_INFO, "The final Smbios Table starts at: 0x%x\n", TableAddress));
     DEBUG ((DEBUG_INFO, "The final Smbios Table size: 0x%x\n", TableLength));
-    InternalDumpHex (TableAddress, TableLength);
+    DEBUG_CODE (InternalDumpHex (TableAddress, TableLength););
 
     HandoffTables.NumberOfTables = 1;
     if (Smbios3Table != NULL) {
