@@ -21,6 +21,7 @@ import uuid
 
 import Common.EdkLogger as EdkLogger
 import Common.GlobalData as GlobalData
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 from Common.String import *
 from Common.DataType import *
@@ -166,7 +167,7 @@ class DscBuildData(PlatformBuildClassObject):
             ModuleFile = PathClass(NormPath(Record[0]), GlobalData.gWorkspace, Arch=self._Arch)
             RecordList = self._RawData[MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH, self._Arch, None, ModuleId]
             if RecordList != []:
-                SourceOverridePath = os.path.join(GlobalData.gWorkspace, NormPath(RecordList[0][0]))
+                SourceOverridePath = mws.join(GlobalData.gWorkspace, NormPath(RecordList[0][0]))
 
                 # Check if the source override path exists
                 if not os.path.isdir(SourceOverridePath):
@@ -1954,7 +1955,13 @@ class InfBuildData(ModuleBuildClassObject):
             RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, self._Platform]
             for Record in RecordList:
                 if Record[1] == TAB_INF_DEFINES_INF_VERSION:
-                    self._AutoGenVersion = int(Record[2], 0)
+                    if '.' in Record[2]:
+                        ValueList = Record[2].split('.')
+                        Major = '%04o' % int(ValueList[0], 0)
+                        Minor = '%04o' % int(ValueList[1], 0)
+                        self._AutoGenVersion = int('0x' + Major + Minor, 0)
+                    else:
+                        self._AutoGenVersion = int(Record[2], 0)
                     break
             if self._AutoGenVersion == None:
                 self._AutoGenVersion = 0x00010000
@@ -2179,8 +2186,11 @@ class InfBuildData(ModuleBuildClassObject):
                 if self.AutoGenVersion < 0x00010005:
                     Macros["EDK_SOURCE"] = GlobalData.gEcpSource
                     Macros['PROCESSOR'] = self._Arch
+                    SourceFile = NormPath(Record[0], Macros)
+                    if SourceFile[0] == os.path.sep:
+                        SourceFile = mws.join(GlobalData.gWorkspace, SourceFile[1:])
                     # old module source files (Edk)
-                    File = PathClass(NormPath(Record[0], Macros), self._ModuleDir, self._SourceOverridePath,
+                    File = PathClass(SourceFile, self._ModuleDir, self._SourceOverridePath,
                                      '', False, self._Arch, ToolChainFamily, '', TagName, ToolCode)
                     # check the file validation
                     ErrorCode, ErrorInfo = File.Validate(CaseSensitive=False)
@@ -2343,10 +2353,21 @@ class InfBuildData(ModuleBuildClassObject):
                     if File[0] == '.':
                         File = os.path.join(self._ModuleDir, File)
                     else:
-                        File = os.path.join(GlobalData.gWorkspace, File)
+                        File = mws.join(GlobalData.gWorkspace, File)
                     File = RealPath(os.path.normpath(File))
                     if File:
                         self._Includes.append(File)
+                    if not File and Record[0].find('EFI_SOURCE') > -1:
+                        # tricky to regard WorkSpace as EFI_SOURCE
+                        Macros['EFI_SOURCE'] = GlobalData.gWorkspace
+                        File = NormPath(Record[0], Macros)
+                        if File[0] == '.':
+                            File = os.path.join(self._ModuleDir, File)
+                        else:
+                            File = os.path.join(GlobalData.gWorkspace, File)
+                        File = RealPath(os.path.normpath(File))
+                        if File:
+                            self._Includes.append(File)
         return self._Includes
 
     ## Retrieve packages this module depends on
@@ -2797,7 +2818,7 @@ class WorkspaceDatabase(object):
     def __init__(self, DbPath, RenewDb=False):
         self._DbClosedFlag = False
         if not DbPath:
-            DbPath = os.path.normpath(os.path.join(GlobalData.gWorkspace, 'Conf', GlobalData.gDatabasePath))
+            DbPath = os.path.normpath(mws.join(GlobalData.gWorkspace, 'Conf', GlobalData.gDatabasePath))
 
         # don't create necessary path for db in memory
         if DbPath != ':memory:':

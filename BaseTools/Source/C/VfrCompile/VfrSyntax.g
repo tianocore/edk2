@@ -3258,7 +3258,7 @@ vfrStatementInconsistentIf :
   Prompt "=" "STRING_TOKEN" "\(" S:Number "\)" ","     << IIObj.SetError (_STOSID(S->getText(), S->getLine())); >>
   { FLAGS "=" flagsField ( "\|" flagsField )* "," }
   vfrStatementExpression[0]
-  E:EndIf                                              << CRT_END_OP (E); >>
+  E:EndIf {";"}                                        << CRT_END_OP (E); >>
   ;
 
 vfrStatementNoSubmitIf :
@@ -3267,7 +3267,7 @@ vfrStatementNoSubmitIf :
   Prompt "=" "STRING_TOKEN" "\(" S:Number "\)" ","     << NSIObj.SetError (_STOSID(S->getText(), S->getLine())); >>
   { FLAGS "=" flagsField ( "\|" flagsField )* "," }
   vfrStatementExpression[0]
-  E:EndIf                                              << CRT_END_OP (E); >>
+  E:EndIf {";"}                                        << CRT_END_OP (E); >>
   ;
 
 vfrStatementWarningIf :
@@ -3276,7 +3276,7 @@ vfrStatementWarningIf :
   Prompt "=" "STRING_TOKEN" "\(" S:Number "\)" ","     << WIObj.SetWarning (_STOSID(S->getText(), S->getLine())); >>
   {Timeout "=" T:Number ","                            << WIObj.SetTimeOut (_STOU8(T->getText(), T->getLine())); >>}
   vfrStatementExpression[0]
-  E:EndIf                                              << CRT_END_OP (E); >>
+  E:EndIf {";"}                                        << CRT_END_OP (E); >>
   ;
 
 vfrStatementDisableIfQuest :
@@ -3286,7 +3286,7 @@ vfrStatementDisableIfQuest :
   L:DisableIf                                          << DIObj.SetLineNo(L->getLine()); >>
   vfrStatementExpression[0] ";"
   vfrStatementQuestionOptionList
-  E:EndIf                                              << CRT_END_OP (E); >>
+  E:EndIf {";"}                                        << CRT_END_OP (E); >>
   ;
 
 vfrStatementRefresh :
@@ -3316,7 +3316,7 @@ vfrStatementSuppressIfQuest :
   { FLAGS "=" flagsField ( "\|" flagsField )* "," }
   vfrStatementExpression[0] ";"
   vfrStatementQuestionOptionList
-  E:EndIf                                              << CRT_END_OP (E); >>
+  E:EndIf {";"}                                        << CRT_END_OP (E); >>
   ;
 
 vfrStatementGrayOutIfQuest :
@@ -3325,7 +3325,7 @@ vfrStatementGrayOutIfQuest :
   { FLAGS "=" flagsField ( "\|" flagsField )* "," }
   vfrStatementExpression[0] ";"
   vfrStatementQuestionOptionList
-  E:EndIf                                              << CRT_END_OP (E); >>
+  E:EndIf {";"}                                        << CRT_END_OP (E); >>
   ;
 
 vfrStatementOptions :

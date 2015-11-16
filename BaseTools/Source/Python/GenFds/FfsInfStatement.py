@@ -28,6 +28,7 @@ import Section
 import RuleSimpleFile
 import RuleComplexFile
 from CommonDataClass.FdfClass import FfsInfStatementClassObject
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common.String import *
 from Common.Misc import PathClass
 from Common.Misc import GuidStructureByteArrayToGuidString
@@ -365,7 +366,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         #
 
         self.__InfParse__(Dict)
-        SrcFile = os.path.join( GenFdsGlobalVariable.WorkSpaceDir , self.InfFileName);
+        SrcFile = mws.join( GenFdsGlobalVariable.WorkSpaceDir , self.InfFileName);
         DestFile = os.path.join( self.OutputPath, self.ModuleGuid + '.ffs')
         
         SrcFileDir = "."
@@ -511,7 +512,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #
     def __GetPlatformArchList__(self):
 
-        InfFileKey = os.path.normpath(os.path.join(GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName))
+        InfFileKey = os.path.normpath(mws.join(GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName))
         DscArchList = []
         PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'IA32', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
         if  PlatformDataBase != None:
@@ -878,7 +879,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             
             if not HasGneratedFlag:
                 UniVfrOffsetFileSection = ""    
-                ModuleFileName = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName)
+                ModuleFileName = mws.join(GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName)
                 InfData = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(ModuleFileName), self.CurrentArch]
                 #
                 # Search the source list in InfData to find if there are .vfr file exist.

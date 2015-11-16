@@ -51,7 +51,7 @@ from PomAdapter.InfPomAlignmentMisc import GenModuleHeaderUserExt
 from PomAdapter.InfPomAlignmentMisc import GenBinaryData
 from Parser import InfParser
 from PomAdapter.DecPomAlignment import DecPomAlignment
-
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## InfPomAlignment
 #
@@ -534,8 +534,7 @@ class InfPomAlignment(ModuleObject):
             PackageDependency.SetSupArchList(ConvertArchList(PackageItemObj.GetSupArchList()))
             PackageDependency.SetFeatureFlag(PackageItemObj.GetFeatureFlagExp())
 
-            PkgInfo = GetPkgInfoFromDec(os.path.normpath(os.path.join(self.WorkSpace,
-                                                                      NormPath(PackageItemObj.GetPackageName()))))
+            PkgInfo = GetPkgInfoFromDec(mws.join(self.WorkSpace, NormPath(PackageItemObj.GetPackageName())))
             if PkgInfo[1] and PkgInfo[2]:
                 PackageDependency.SetGuid(PkgInfo[1])
                 PackageDependency.SetVersion(PkgInfo[2])

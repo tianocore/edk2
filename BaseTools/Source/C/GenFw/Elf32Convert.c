@@ -218,6 +218,15 @@ CoffAlign (
   return (Offset + mCoffAlignment - 1) & ~(mCoffAlignment - 1);
 }
 
+STATIC
+UINT32
+DebugRvaAlign (
+  UINT32 Offset
+  )
+{
+  return (Offset + 3) & ~3;
+}
+
 //
 // filter functions
 //
@@ -331,12 +340,8 @@ ScanSections32 (
         if ((shdr->sh_addr & (shdr->sh_addralign - 1)) == 0) {
           // if the section address is aligned we must align PE/COFF
           mCoffOffset = (mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
-        } else if ((shdr->sh_addr % shdr->sh_addralign) != (mCoffOffset % shdr->sh_addralign)) {
-          // ARM RVCT tools have behavior outside of the ELF specification to try
-          // and make images smaller.  If sh_addr is not aligned to sh_addralign
-          // then the section needs to preserve sh_addr MOD sh_addralign.
-          // Normally doing nothing here works great.
-          Error (NULL, 0, 3000, "Invalid", "Unsupported section alignment.");
+        } else {
+          Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
         }
       }
 
@@ -365,11 +370,8 @@ ScanSections32 (
     assert (FALSE);
   }
 
-  mDebugOffset = mCoffOffset;
-
-  if (mEhdr->e_machine != EM_ARM) {
-    mCoffOffset = CoffAlign(mCoffOffset);
-  }
+  mDebugOffset = DebugRvaAlign(mCoffOffset);
+  mCoffOffset = CoffAlign(mCoffOffset);
 
   if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
     Warning (NULL, 0, 0, NULL, "Mulitple sections in %s are merged into 1 text section. Source level debug might not work correctly.", mInImageName);
@@ -389,12 +391,8 @@ ScanSections32 (
         if ((shdr->sh_addr & (shdr->sh_addralign - 1)) == 0) {
           // if the section address is aligned we must align PE/COFF
           mCoffOffset = (mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
-        } else if ((shdr->sh_addr % shdr->sh_addralign) != (mCoffOffset % shdr->sh_addralign)) {
-          // ARM RVCT tools have behavior outside of the ELF specification to try
-          // and make images smaller.  If sh_addr is not aligned to sh_addralign
-          // then the section needs to preserve sh_addr MOD sh_addralign.
-          // Normally doing nothing here works great.
-          Error (NULL, 0, 3000, "Invalid", "Unsupported section alignment.");
+        } else {
+          Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
         }
       }
 
@@ -423,7 +421,7 @@ ScanSections32 (
   // section alignment.
   //
   if (SectionCount > 0) {
-    mDebugOffset = mCoffOffset;
+    mDebugOffset = DebugRvaAlign(mCoffOffset);
   }
   mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
                 sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
@@ -446,12 +444,8 @@ ScanSections32 (
         if ((shdr->sh_addr & (shdr->sh_addralign - 1)) == 0) {
           // if the section address is aligned we must align PE/COFF
           mCoffOffset = (mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1);
-        } else if ((shdr->sh_addr % shdr->sh_addralign) != (mCoffOffset % shdr->sh_addralign)) {
-          // ARM RVCT tools have behavior outside of the ELF specification to try
-          // and make images smaller.  If sh_addr is not aligned to sh_addralign
-          // then the section needs to preserve sh_addr MOD sh_addralign.
-          // Normally doing nothing here works great.
-          Error (NULL, 0, 3000, "Invalid", "Unsupported section alignment.");
+        } else {
+          Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
         }
       }
       if (shdr->sh_size != 0) {

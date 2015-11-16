@@ -113,30 +113,43 @@ if /I "%1"=="/?" goto Usage
 
 :set_PATH
   if defined WORKSPACE_TOOLS_PATH goto check_PATH
-  set PATH=%EDK_TOOLS_PATH%\Bin;%EDK_TOOLS_PATH%\Bin\Win32;%PATH%
+  if not defined EDK_TOOLS_BIN (
+    if exist %EDK_TOOLS_PATH%\Bin\Win32 (
+      set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
+    ) else (
+      echo.
+      echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
+      echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
+      echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
+      echo. 
+      goto end
+    )
+  )
+  set PATH=%EDK_TOOLS_BIN%;%PATH%
   set WORKSPACE_TOOLS_PATH=%EDK_TOOLS_PATH%
   goto PATH_ok
 
 :check_PATH
   if "%EDK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto PATH_ok
-  set PATH=%EDK_TOOLS_PATH%\Bin;%EDK_TOOLS_PATH%\Bin\Win32;%PATH%
+  if not defined EDK_TOOLS_BIN (
+    if exist %EDK_TOOLS_PATH%\Bin\Win32 (
+      set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
+    ) else (
+      echo.
+      echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
+      echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
+      echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
+      echo. 
+      goto end
+    )
+  )
+  set PATH=%EDK_TOOLS_BIN%;%PATH%
   set WORKSPACE_TOOLS_PATH=%EDK_TOOLS_PATH%
   echo Resetting the PATH variable to include the EDK_TOOLS_PATH for this session.
 
 :PATH_ok
-  echo           PATH      = %PATH%
-  echo.
-  if defined WORKSPACE (
-    echo      WORKSPACE      = %WORKSPACE%
-  )
-  echo EDK_TOOLS_PATH      = %EDK_TOOLS_PATH%
-  if defined BASE_TOOLS_PATH (
-    echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
-  )
-  echo.
-
 REM
-REM copy *.template to %WORKSPACE%\Conf
+REM copy *.template to %CONF_PATH%
 REM
 if not defined WORKSPACE (
    if defined RECONFIG (
@@ -147,49 +160,80 @@ if not defined WORKSPACE (
    goto skip_reconfig
 )
 
-if NOT exist %WORKSPACE%\Conf (
-  mkdir %WORKSPACE%\Conf
+set CONF_PATH=%WORKSPACE%\Conf
+if NOT exist %CONF_PATH% (
+  if defined PACKAGES_PATH (
+    for %%i IN (%PACKAGES_PATH%) DO (
+      if exist %%~fi\Conf (
+        set CONF_PATH=%%i\Conf
+        goto CopyConf
+      )
+    )
+  )
+)
+ 
+:CopyConf
+if NOT exist %CONF_PATH% (
+  mkdir %CONF_PATH%
 ) else (
   if defined RECONFIG (
     echo.
-    echo  Over-writing the files in the WORKSPACE\Conf directory
+    echo  Over-writing the files in the CONF_PATH directory
     echo  using the default template files
     echo.
   )
 )
 
-if NOT exist %WORKSPACE%\Conf\target.txt (
-  echo copying ... target.template to %WORKSPACE%\Conf\target.txt
+if NOT exist %CONF_PATH%\target.txt (
+  echo copying ... target.template to %CONF_PATH%\target.txt
   if NOT exist %EDK_TOOLS_PATH%\Conf\target.template (
     echo Error: target.template is missing at folder %EDK_TOOLS_PATH%\Conf\
   )
-  copy %EDK_TOOLS_PATH%\Conf\target.template %WORKSPACE%\Conf\target.txt > nul
+  copy %EDK_TOOLS_PATH%\Conf\target.template %CONF_PATH%\target.txt > nul
 ) else (
-  if defined RECONFIG echo over-write ... target.template to %WORKSPACE%\Conf\target.txt
-  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\target.template %WORKSPACE%\Conf\target.txt > nul
+  if defined RECONFIG echo over-write ... target.template to %CONF_PATH%\target.txt
+  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\target.template %CONF_PATH%\target.txt > nul
 )
 
-if NOT exist %WORKSPACE%\Conf\tools_def.txt (
-  echo copying ... tools_def.template to %WORKSPACE%\Conf\tools_def.txt
+if NOT exist %CONF_PATH%\tools_def.txt (
+  echo copying ... tools_def.template to %CONF_PATH%\tools_def.txt
   if NOT exist %EDK_TOOLS_PATH%\Conf\tools_def.template (
     echo Error: tools_def.template is missing at folder %EDK_TOOLS_PATH%\Conf\
   )
-  copy %EDK_TOOLS_PATH%\Conf\tools_def.template %WORKSPACE%\Conf\tools_def.txt > nul
+  copy %EDK_TOOLS_PATH%\Conf\tools_def.template %CONF_PATH%\tools_def.txt > nul
 ) else (
-  if defined RECONFIG echo over-write ... tools_def.template to %WORKSPACE%\Conf\tools_def.txt
-  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\tools_def.template %WORKSPACE%\Conf\tools_def.txt > nul
+  if defined RECONFIG echo over-write ... tools_def.template to %CONF_PATH%\tools_def.txt
+  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\tools_def.template %CONF_PATH%\tools_def.txt > nul
 )
 
-if NOT exist %WORKSPACE%\Conf\build_rule.txt (
-  echo copying ... build_rule.template to %WORKSPACE%\Conf\build_rule.txt
+if NOT exist %CONF_PATH%\build_rule.txt (
+  echo copying ... build_rule.template to %CONF_PATH%\build_rule.txt
   if NOT exist %EDK_TOOLS_PATH%\Conf\build_rule.template (
     echo Error: build_rule.template is missing at folder %EDK_TOOLS_PATH%\Conf\
   )
-  copy %EDK_TOOLS_PATH%\Conf\build_rule.template %WORKSPACE%\Conf\build_rule.txt > nul
+  copy %EDK_TOOLS_PATH%\Conf\build_rule.template %CONF_PATH%\build_rule.txt > nul
 ) else (
-  if defined RECONFIG echo over-write ... build_rule.template to %WORKSPACE%\Conf\build_rule.txt
-  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\build_rule.template %WORKSPACE%\Conf\build_rule.txt > nul
+  if defined RECONFIG echo over-write ... build_rule.template to %CONF_PATH%\build_rule.txt
+  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\build_rule.template %CONF_PATH%\build_rule.txt > nul
 )
+
+echo           PATH      = %PATH%
+echo.
+if defined WORKSPACE (
+  echo      WORKSPACE      = %WORKSPACE%
+)
+if defined PACKAGES_PATH (
+  echo  PACKAGES_PATH      = %PACKAGES_PATH%
+)
+echo EDK_TOOLS_PATH      = %EDK_TOOLS_PATH%
+if defined BASE_TOOLS_PATH (
+  echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
+)
+if defined EDK_TOOLS_BIN (
+  echo  EDK_TOOLS_BIN      = %EDK_TOOLS_BIN%
+)
+echo      CONF_PATH      = %CONF_PATH%
+echo.
 
 :skip_reconfig
 
@@ -198,28 +242,26 @@ if NOT exist %WORKSPACE%\Conf\build_rule.txt (
 @REM
 if defined FORCE_REBUILD goto check_build_environment
 if defined REBUILD goto check_build_environment
-if not exist "%EDK_TOOLS_PATH%\Bin" goto check_build_environment
+if not exist "%EDK_TOOLS_PATH%" goto check_build_environment
 
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\BootSectImage.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\build.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\EfiLdrImage.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\EfiRom.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenBootSector.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenFds.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenFfs.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenFv.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenFw.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenPage.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenSec.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\GenVtf.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\MigrationMsa2Inf.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\Split.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\TargetTool.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\TianoCompress.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\Trim.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\VfrCompile.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\Fpd2Dsc.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_PATH%\Bin\Win32\VolInfo.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\BootSectImage.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\build.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\EfiLdrImage.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\EfiRom.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenBootSector.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenFds.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenFfs.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenFv.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenFw.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenPage.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenSec.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenVtf.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\Split.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\TargetTool.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\TianoCompress.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\Trim.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\VfrCompile.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\VolInfo.exe" goto check_build_environment
 
 goto end
 

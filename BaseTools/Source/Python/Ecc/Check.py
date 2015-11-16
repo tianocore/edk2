@@ -19,6 +19,7 @@ from MetaDataParser import ParseHeaderCommentSection
 import EccGlobalData
 import c
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Check
 #
@@ -380,9 +381,7 @@ class Check(object):
             for Key in RecordDict:
                 if len(RecordDict[Key]) > 1:
                     for Item in RecordDict[Key]:
-                        Path = Item[1].replace(EccGlobalData.gWorkspace, '')
-                        if Path.startswith('\\') or Path.startswith('/'):
-                            Path = Path[1:]
+                        Path = mws.relpath(Item[1], EccGlobalData.gWorkspace)
                         if not EccGlobalData.gException.IsException(ERROR_INCLUDE_FILE_CHECK_NAME, Path):
                             EccGlobalData.gDb.TblReport.Insert(ERROR_INCLUDE_FILE_CHECK_NAME, OtherMsg="The file name for [%s] is duplicate" % Path, BelongsToTable='File', BelongsToItem=Item[0])
 
@@ -653,7 +652,7 @@ class Check(object):
                 if LibraryClass[1].upper() == 'NULL' or LibraryClass[1].startswith('!ifdef') or LibraryClass[1].startswith('!ifndef') or LibraryClass[1].endswith('!endif'):
                     continue
                 else:
-                    LibraryIns = os.path.normpath(os.path.join(EccGlobalData.gWorkspace, LibraryClass[2]))
+                    LibraryIns = os.path.normpath(mws.join(EccGlobalData.gWorkspace, LibraryClass[2]))
                     SqlCommand = """select Value3 from Inf where BelongsToFile =
                                     (select ID from File where lower(FullPath) = lower('%s'))
                                     and Value2 = '%s'""" % (LibraryIns, 'LIBRARY_CLASS')
@@ -729,7 +728,7 @@ class Check(object):
             for Record in RecordSet:
                 FdfID = Record[0]
                 FilePath = Record[1]
-                FilePath = os.path.normpath(os.path.join(EccGlobalData.gWorkspace, FilePath))
+                FilePath = os.path.normpath(mws.join(EccGlobalData.gWorkspace, FilePath))
                 SqlCommand = """select ID from Inf where Model = %s and BelongsToFile = (select ID from File where FullPath like '%s')
                                 """ % (MODEL_EFI_SOURCE_FILE, FilePath)
                 NewRecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
@@ -913,9 +912,7 @@ class Check(object):
         RecordSet = Table.Exec(SqlCommand)
         Path = ""
         for Record in RecordSet:
-            Path = Record[0].replace(EccGlobalData.gWorkspace, '')
-            if Path.startswith('\\') or Path.startswith('/'):
-                Path = Path[1:]
+            Path = mws.relpath(Record[0], EccGlobalData.gWorkspace)
         return Path
 
     # Check whether two module INFs under one workspace has the same FILE_GUID value
@@ -1223,7 +1220,10 @@ class Check(object):
             SqlCommand = """select ID, Name from %s where Model = %s""" % (FileTable, MODEL_IDENTIFIER_VARIABLE)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
-                if not Pattern.match(Record[1]):
+                Var = Record[1]
+                if Var.startswith('CONST'):
+                    Var = Var[5:].lstrip()
+                if not Pattern.match(Var):
                     if not EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Record[1]):
                         EccGlobalData.gDb.TblReport.Insert(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, OtherMsg="The variable name [%s] does not follow the rules" % (Record[1]), BelongsToTable=FileTable, BelongsToItem=Record[0])
 

@@ -27,6 +27,7 @@ from Library.DataType import TAB_SPACE_SPLIT
 from Library.String import GetSplitValueList
 from Library.ExpressionValidate import IsValidBareCString
 from Library.ExpressionValidate import IsValidFeatureFlagExp
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## __HexDigit() method
 #
@@ -236,7 +237,7 @@ def IsValidPath(Path, Root):
     
     Path = os.path.normpath(Path).replace('\\', '/')
     Root = os.path.normpath(Root).replace('\\', '/')
-    FullPath = os.path.normpath(os.path.join(Root, Path)).replace('\\', '/')
+    FullPath = mws.join(Root, Path)
     
     if not os.path.exists(FullPath):
         return False
