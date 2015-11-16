@@ -2,6 +2,7 @@
 #  Security Module Package for All Architectures.
 #
 # Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -61,6 +62,7 @@
   TcgPpVendorLib|SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
   Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
   TrEEPpVendorLib|SecurityPkg/Library/TrEEPpVendorLibNull/TrEEPpVendorLibNull.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -74,6 +76,7 @@
   Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   Tcg2PhysicalPresenceLib|SecurityPkg/Library/PeiTcg2PhysicalPresenceLib/PeiTcg2PhysicalPresenceLib.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
