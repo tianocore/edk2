@@ -219,7 +219,9 @@ EnumerateBootOptions  (
   VOID
   )
 {
+  EFI_STATUS                    Status;
   UINTN                         Index;
+  EFI_DEVICE_PATH_PROTOCOL      *ImageDevicePath;
   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption;
   UINTN                         BootOptionCount;
   EFI_STRING_ID                 Token;
@@ -239,6 +241,9 @@ EnumerateBootOptions  (
   UINTN                         DestMax;
 
   DeviceType = (UINT16) -1;
+
+  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID **) &ImageDevicePath);
+  ASSERT_EFI_ERROR (Status);
 
   //
   // for better user experience
@@ -286,6 +291,13 @@ EnumerateBootOptions  (
     // Don't display the hidden/inactive boot option
     //
     if (((BootOption[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOption[Index].Attributes & LOAD_OPTION_ACTIVE) == 0)) {
+      continue;
+    }
+
+    //
+    // Don't display myself
+    //
+    if (CompareMem (BootOption[Index].FilePath, ImageDevicePath, GetDevicePathSize (ImageDevicePath)) == 0) {
       continue;
     }
 

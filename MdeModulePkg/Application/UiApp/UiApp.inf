@@ -123,6 +123,7 @@
   gEfiPciIoProtocolGuid                         ## CONSUMES
   gEfiDevicePathToTextProtocolGuid              ## CONSUMES
   gEfiBootLogoProtocolGuid                      ## CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid         ## CONSUMES
 
 [FeaturePcd]
 

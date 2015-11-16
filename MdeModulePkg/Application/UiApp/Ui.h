@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/HiiBootMaintenanceFormset.h>
 
 #include <Protocol/LoadFile.h>
+#include <Protocol/LoadedImage.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/Smbios.h>
