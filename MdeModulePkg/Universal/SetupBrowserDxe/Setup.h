@@ -542,7 +542,8 @@ typedef struct {
   EFI_QUESTION_ID          CurFakeQestId;
   BOOLEAN                  HiiPackageListUpdated;
   BOOLEAN                  FinishRetrieveCall;
-  LIST_ENTRY           FormHistoryList;
+  LIST_ENTRY               FormHistoryList;
+  LIST_ENTRY               FormSetList;
 } BROWSER_CONTEXT;
 
 #define BROWSER_CONTEXT_FROM_LINK(a)  CR (a, BROWSER_CONTEXT, Link, BROWSER_CONTEXT_SIGNATURE)
