@@ -141,19 +141,11 @@ VariablePropertyGetWithWildcardName (
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 1]) &&
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 2]) &&
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 3])) {
-          if (mVarCheckVariableWithWildcardName[Index].VariableProperty.Revision != VAR_CHECK_VARIABLE_PROPERTY_REVISION) {
-            return NULL;
-          } else {
-            return &mVarCheckVariableWithWildcardName[Index].VariableProperty;
-          }
+          return &mVarCheckVariableWithWildcardName[Index].VariableProperty;
         }
       }
       if (StrCmp (mVarCheckVariableWithWildcardName[Index].Name, VariableName) == 0) {
-        if (mVarCheckVariableWithWildcardName[Index].VariableProperty.Revision != VAR_CHECK_VARIABLE_PROPERTY_REVISION) {
-          return NULL;
-        } else {
-          return  &mVarCheckVariableWithWildcardName[Index].VariableProperty;
-        }
+        return  &mVarCheckVariableWithWildcardName[Index].VariableProperty;
       }
     }
   }
@@ -512,6 +504,9 @@ VarCheckLibVariablePropertySet (
 
   Status = EFI_SUCCESS;
 
+  //
+  // Get the pointer of property data for set.
+  //
   Property = VariablePropertyGetFunction (Name, Guid, FALSE);
   if (Property != NULL) {
     CopyMem (Property, VariableProperty, sizeof (*VariableProperty));
@@ -571,7 +566,12 @@ VarCheckLibVariablePropertyGet (
   }
 
   Property = VariablePropertyGetFunction (Name, Guid, TRUE);
-  if (Property != NULL) {
+  //
+  // Also check the property revision before using the property data.
+  // There is no property set to this variable(wildcard name)
+  // if the revision is not VAR_CHECK_VARIABLE_PROPERTY_REVISION.
+  //
+  if ((Property != NULL) && (Property->Revision == VAR_CHECK_VARIABLE_PROPERTY_REVISION)) {
     CopyMem (VariableProperty, Property, sizeof (*VariableProperty));
     return EFI_SUCCESS;
   }
@@ -619,7 +619,12 @@ VarCheckLibSetVariableCheck (
   }
 
   Property = VariablePropertyGetFunction (VariableName, VendorGuid, TRUE);
-  if (Property != NULL) {
+  //
+  // Also check the property revision before using the property data.
+  // There is no property set to this variable(wildcard name)
+  // if the revision is not VAR_CHECK_VARIABLE_PROPERTY_REVISION.
+  //
+  if ((Property != NULL) && (Property->Revision == VAR_CHECK_VARIABLE_PROPERTY_REVISION)) {
     if ((RequestSource != VarCheckFromTrusted) && ((Property->Property & VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY) != 0)) {
       DEBUG ((EFI_D_INFO, "Variable Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
       return EFI_WRITE_PROTECTED;
