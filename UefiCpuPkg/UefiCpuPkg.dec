@@ -37,6 +37,11 @@
   ##  @libraryclass  Provides functions to manage the Local APIC on IA32 and X64 CPUs.
   ##
   LocalApicLib|Include/Library/LocalApicLib.h
+
+  ##  @libraryclass  Provides platform specific initialization functions in the SEC phase.
+  ##
+  PlatformSecLib|Include/Library/PlatformSecLib.h
+
   
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
@@ -61,6 +66,10 @@
   ## aligns the address on a 4-KByte boundary.
   # @Prompt Configure stack size for Application Processor (AP)
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize|0x8000|UINT32|0x00000003
+
+  ## Specifies stack size in the temporary RAM. 0 means half of TemporaryRamSize.
+  # @Prompt Stack size in the temporary RAM.
+  gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize|0|UINT32|0x10001003
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies timeout value in microseconds for the BSP to detect all APs for the first time.
