@@ -45,7 +45,7 @@ BmIsKeyOptionValid (
   IN EFI_BOOT_MANAGER_KEY_OPTION     *KeyOption
 )
 {
-  UINT16   OptionName[sizeof (L"Boot####")];
+  UINT16   OptionName[BM_OPTION_NAME_LEN];
   UINT8    *BootOption;
   UINTN    BootOptionSize;
   UINT32   Crc;
@@ -349,7 +349,7 @@ BmHotkeyCallback (
 {
   LIST_ENTRY                    *Link;
   BM_HOTKEY                     *Hotkey;
-  CHAR16                        OptionName[sizeof ("Boot####")];
+  CHAR16                        OptionName[BM_OPTION_NAME_LEN];
   EFI_STATUS                    Status;
   EFI_KEY_DATA                  *HotkeyData;
 
@@ -905,13 +905,13 @@ EfiBootManagerAddKeyOptionVariable (
   VA_LIST                        Args;
   VOID                           *BootOption;
   UINTN                          BootOptionSize;
-  CHAR16                         BootOptionName[sizeof (L"Boot####")];
+  CHAR16                         BootOptionName[BM_OPTION_NAME_LEN];
   EFI_BOOT_MANAGER_KEY_OPTION    KeyOption;
   EFI_BOOT_MANAGER_KEY_OPTION    *KeyOptions;
   UINTN                          KeyOptionCount;
   UINTN                          Index;
   UINTN                          KeyOptionNumber;
-  CHAR16                         KeyOptionName[sizeof (L"Key####")];
+  CHAR16                         KeyOptionName[sizeof ("Key####")];
 
   UnicodeSPrint (BootOptionName, sizeof (BootOptionName), L"Boot%04x", BootOptionNumber);
   GetEfiGlobalVariable2 (BootOptionName, &BootOption, &BootOptionSize);
@@ -1018,7 +1018,7 @@ EfiBootManagerDeleteKeyOptionVariable (
   BM_HOTKEY                      *Hotkey;
   UINT32                         ShiftState;
   BOOLEAN                        Match;
-  CHAR16                         KeyOptionName[sizeof (L"Key####")];
+  CHAR16                         KeyOptionName[sizeof ("Key####")];
 
   ZeroMem (&KeyOption, sizeof (EFI_BOOT_MANAGER_KEY_OPTION));
   VA_START (Args, Modifier);
