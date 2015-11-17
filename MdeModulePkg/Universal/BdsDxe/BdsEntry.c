@@ -823,11 +823,12 @@ BdsEntry (
   UINT16                          BootTimeOut;
   EDKII_VARIABLE_LOCK_PROTOCOL    *VariableLock;
   UINTN                           Index;
-  EFI_BOOT_MANAGER_LOAD_OPTION    BootOption;
+  EFI_BOOT_MANAGER_LOAD_OPTION    LoadOption;
   UINT16                          *BootNext;
   CHAR16                          BootNextVariableName[sizeof ("Boot####")];
   EFI_BOOT_MANAGER_LOAD_OPTION    BootManagerMenu;
   BOOLEAN                         BootFwUi;
+  EFI_DEVICE_PATH_PROTOCOL        *FilePath;
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
@@ -941,6 +942,27 @@ BdsEntry (
   // Initialize the platform language variables
   //
   InitializeLanguage (TRUE);
+
+  //
+  // System firmware must include a PlatformRecovery#### variable specifying
+  // a short-form File Path Media Device Path containing the platform default
+  // file path for removable media
+  //
+  FilePath = FileDevicePath (NULL, EFI_REMOVABLE_MEDIA_FILE_NAME);
+  Status = EfiBootManagerInitializeLoadOption (
+             &LoadOption,
+             0,
+             LoadOptionTypePlatformRecovery,
+             LOAD_OPTION_ACTIVE,
+             L"Default PlatformRecovery",
+             FilePath,
+             NULL,
+             0
+             );
+  ASSERT_EFI_ERROR (Status);
+  EfiBootManagerLoadOptionToVariable (&LoadOption);
+  EfiBootManagerFreeLoadOption (&LoadOption);
+  FreePool (FilePath);
 
   //
   // Report Status Code to indicate connecting drivers will happen
@@ -1120,17 +1142,17 @@ BdsEntry (
   //
   if (BootNext != NULL) {
     UnicodeSPrint (BootNextVariableName, sizeof (BootNextVariableName), L"Boot%04x", *BootNext);
-    Status = EfiBootManagerVariableToLoadOption (BootNextVariableName, &BootOption);
+    Status = EfiBootManagerVariableToLoadOption (BootNextVariableName, &LoadOption);
     if (!EFI_ERROR (Status)) {
-      EfiBootManagerBoot (&BootOption);
-      EfiBootManagerFreeLoadOption (&BootOption);
-      if (BootOption.Status == EFI_SUCCESS) {
+      EfiBootManagerBoot (&LoadOption);
+      EfiBootManagerFreeLoadOption (&LoadOption);
+      if (LoadOption.Status == EFI_SUCCESS) {
         //
         // Boot to Boot Manager Menu upon EFI_SUCCESS
         //
-        EfiBootManagerGetBootManagerMenu (&BootOption);
-        EfiBootManagerBoot (&BootOption);
-        EfiBootManagerFreeLoadOption (&BootOption);
+        EfiBootManagerGetBootManagerMenu (&LoadOption);
+        EfiBootManagerBoot (&LoadOption);
+        EfiBootManagerFreeLoadOption (&LoadOption);
       }
     }
   }
