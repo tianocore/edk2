@@ -84,8 +84,9 @@
   gEfiSecPlatformInformationPpiGuid             ## UNDEFINED # HOB
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber   ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                 ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds  ## CONSUMES
 
 [Depex]
   TRUE
