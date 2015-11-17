@@ -350,6 +350,9 @@ CpuSetMemoryAttributes (
 {
   RETURN_STATUS             Status;
   MTRR_MEMORY_CACHE_TYPE    CacheType;
+  EFI_STATUS                MpStatus;
+  EFI_MP_SERVICES_PROTOCOL  *MpService;
+  MTRR_SETTINGS             MtrrSettings;
 
   if (!IsMtrrSupported ()) {
     return EFI_UNSUPPORTED;
@@ -405,6 +408,29 @@ CpuSetMemoryAttributes (
              CacheType
              );
 
+  if (!RETURN_ERROR (Status)) {
+    MpStatus = gBS->LocateProtocol (
+                      &gEfiMpServiceProtocolGuid,
+                      NULL,
+                      (VOID **)&MpService
+                      );
+    //
+    // Synchronize the update with all APs
+    //
+    if (!EFI_ERROR (MpStatus)) {
+      MtrrGetAllMtrrs (&MtrrSettings);
+      MpStatus = MpService->StartupAllAPs (
+                              MpService,          // This
+                              SetMtrrsFromBuffer, // Procedure
+                              TRUE,               // SingleThread
+                              NULL,               // WaitEvent
+                              0,                  // TimeoutInMicrosecsond
+                              &MtrrSettings,      // ProcedureArgument
+                              NULL                // FailedCpuList
+                              );
+      ASSERT (MpStatus == EFI_SUCCESS || MpStatus == EFI_NOT_STARTED);
+    }
+  }
   return (EFI_STATUS) Status;
 }
 

@@ -1667,6 +1667,22 @@ ExitBootServicesCallback (
 }
 
 /**
+  A minimal wrapper function that allows MtrrSetAllMtrrs() to be passed to
+  EFI_MP_SERVICES_PROTOCOL.StartupAllAPs() as Procedure.
+
+  @param[in] Buffer  Pointer to an MTRR_SETTINGS object, to be passed to
+                     MtrrSetAllMtrrs().
+**/
+VOID
+EFIAPI
+SetMtrrsFromBuffer (
+  IN VOID *Buffer
+  )
+{
+  MtrrSetAllMtrrs (Buffer);
+}
+
+/**
   Initialize Multi-processor support.
 
 **/
@@ -1676,6 +1692,7 @@ InitializeMpSupport (
   )
 {
   EFI_STATUS     Status;
+  MTRR_SETTINGS  MtrrSettings;
   UINTN          Timeout;
 
   gMaxLogicalProcessorNumber = (UINTN) PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
@@ -1747,6 +1764,21 @@ InitializeMpSupport (
   // Update CPU healthy information from Guided HOB
   //
   CollectBistDataFromHob ();
+
+  //
+  // Synchronize MTRR settings to APs.
+  //
+  MtrrGetAllMtrrs (&MtrrSettings);
+  Status = mMpServicesTemplate.StartupAllAPs (
+                                 &mMpServicesTemplate, // This
+                                 SetMtrrsFromBuffer,   // Procedure
+                                 TRUE,                 // SingleThread
+                                 NULL,                 // WaitEvent
+                                 0,                    // TimeoutInMicrosecsond
+                                 &MtrrSettings,        // ProcedureArgument
+                                 NULL                  // FailedCpuList
+                                 );
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_STARTED);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mMpServiceHandle,
