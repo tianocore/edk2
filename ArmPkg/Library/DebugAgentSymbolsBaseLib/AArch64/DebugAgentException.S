@@ -16,12 +16,12 @@ GCC_ASM_EXPORT(DebugAgentVectorTable)
 GCC_ASM_IMPORT(DefaultExceptionHandler)
 
 .text
+.align 11
 ASM_PFX(DebugAgentVectorTable):
 
 //
 // Current EL with SP0 : 0x0 - 0x180
 //
-.align 11
 ASM_PFX(SynchronousExceptionSP0):
   b   ASM_PFX(SynchronousExceptionSP0)
 
