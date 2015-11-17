@@ -31,6 +31,7 @@ typedef enum {
   LoadOptionTypeDriver,
   LoadOptionTypeSysPrep,
   LoadOptionTypeBoot,
+  LoadOptionTypePlatformRecovery,
   LoadOptionTypeMax
 } EFI_BOOT_MANAGER_LOAD_OPTION_TYPE;
 

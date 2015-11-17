@@ -42,6 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/BootLogo.h>
 #include <Protocol/DriverHealth.h>
 #include <Protocol/FormBrowser2.h>
+#include <Protocol/VariableLock.h>
 
 #include <Guid/ZeroGuid.h>
 #include <Guid/MemoryTypeInformation.h>
@@ -102,7 +103,10 @@ CHAR16 *
   IN EFI_HANDLE          Handle
   );
 
-#define BM_OPTION_NAME_LEN                          sizeof ("SysPrep####")
+//
+// PlatformRecovery#### is the load option with the longest name
+//
+#define BM_OPTION_NAME_LEN                          sizeof ("PlatformRecovery####")
 extern CHAR16  *mBmLoadOptionName[];
 
 /**
