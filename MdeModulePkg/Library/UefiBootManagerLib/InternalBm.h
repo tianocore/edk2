@@ -105,9 +105,17 @@ CHAR16 *
 #define BM_OPTION_NAME_LEN                          sizeof ("SysPrep####")
 extern CHAR16  *mBmLoadOptionName[];
 
+/**
+  Visitor function to be called by BmForEachVariable for each variable
+  in variable storage.
+
+  @param Name    Variable name.
+  @param Guid    Variable GUID.
+  @param Context The same context passed to BmForEachVariable.
+**/
 typedef
 VOID
-(*VARIABLE_VISITOR) (
+(*BM_VARIABLE_VISITOR) (
   CHAR16                *Name,
   EFI_GUID              *Guid,
   VOID                  *Context
@@ -120,8 +128,8 @@ VOID
   @param Context   The context passed to Visitor function.
 **/
 VOID
-ForEachVariable (
-  VARIABLE_VISITOR            Visitor,
+BmForEachVariable (
+  BM_VARIABLE_VISITOR         Visitor,
   VOID                        *Context
   );
 

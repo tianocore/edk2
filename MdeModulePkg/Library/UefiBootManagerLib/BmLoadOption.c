@@ -37,7 +37,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED
 **/
 VOID
 BmForEachVariable (
-  VARIABLE_VISITOR            Visitor,
+  BM_VARIABLE_VISITOR         Visitor,
   VOID                        *Context
   )
 {
