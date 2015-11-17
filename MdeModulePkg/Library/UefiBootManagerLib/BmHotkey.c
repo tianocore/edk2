@@ -31,18 +31,37 @@ EFI_BOOT_MANAGER_LOAD_OPTION mBmHotkeyBootOption      = { LoadOptionNumberUnassi
 EFI_BOOT_MANAGER_KEY_OPTION  *mBmContinueKeyOption    = NULL;
 VOID                         *mBmTxtInExRegistration  = NULL;
 
+
+/**
+  Return the buffer size of the EFI_BOOT_MANAGER_KEY_OPTION data.
+
+  @param   KeyOption            The input key option info.
+
+  @retval  The buffer size of the key option data.
+**/
+UINTN
+BmSizeOfKeyOption (
+  EFI_BOOT_MANAGER_KEY_OPTION  *KeyOption
+  )
+{
+  return OFFSET_OF (EFI_BOOT_MANAGER_KEY_OPTION, Keys)
+    + KeyOption->KeyData.Options.InputKeyCount * sizeof (EFI_INPUT_KEY);
+}
+
 /**
 
   Check whether the input key option is valid.
 
-  @param   KeyOption               Input key option info.
+  @param   KeyOption          Key option.
+  @param   KeyOptionSize      Size of the key option.
 
   @retval  TRUE               Input key option is valid.
   @retval  FALSE              Input key option is not valid.
 **/
 BOOLEAN
 BmIsKeyOptionValid (
-  IN EFI_BOOT_MANAGER_KEY_OPTION     *KeyOption
+  IN EFI_BOOT_MANAGER_KEY_OPTION     *KeyOption,
+  IN UINTN                           KeyOptionSize
 )
 {
   UINT16   OptionName[BM_OPTION_NAME_LEN];
@@ -50,10 +69,17 @@ BmIsKeyOptionValid (
   UINTN    BootOptionSize;
   UINT32   Crc;
 
+  if (BmSizeOfKeyOption (KeyOption) != KeyOptionSize) {
+    return FALSE;
+  }
+
   //
   // Check whether corresponding Boot Option exist
   //
-  UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", KeyOption->BootOption);
+  UnicodeSPrint (
+    OptionName, sizeof (OptionName), L"%s%04x",
+    mBmLoadOptionName[LoadOptionTypeBoot], KeyOption->BootOption
+    );
   GetEfiGlobalVariable2 (OptionName, (VOID **) &BootOption, &BootOptionSize);
 
   if (BootOption == NULL) {
@@ -110,20 +136,58 @@ BmIsKeyOptionVariable (
   return TRUE;
 }
 
+typedef struct {
+  EFI_BOOT_MANAGER_KEY_OPTION *KeyOptions;
+  UINTN                       KeyOptionCount;
+} BM_COLLECT_KEY_OPTIONS_PARAM;
+
 /**
-  Return the buffer size of the EFI_BOOT_MANAGER_KEY_OPTION data.
+  Visitor function to collect the key options from NV storage.
 
-  @param   KeyOption            The input key option info.
-
-  @retval  The buffer size of the key option data.
+  @param Name    Variable name.
+  @param Guid    Variable GUID.
+  @param Context The same context passed to BmForEachVariable.
 **/
-UINTN
-BmSizeOfKeyOption (
-  EFI_BOOT_MANAGER_KEY_OPTION  *KeyOption
+VOID
+BmCollectKeyOptions (
+  CHAR16               *Name,
+  EFI_GUID             *Guid,
+  VOID                 *Context
   )
 {
-  return OFFSET_OF (EFI_BOOT_MANAGER_KEY_OPTION, Keys)
-    + KeyOption->KeyData.Options.InputKeyCount * sizeof (EFI_INPUT_KEY);
+  UINTN                        Index;
+  BM_COLLECT_KEY_OPTIONS_PARAM *Param;
+  EFI_BOOT_MANAGER_KEY_OPTION  *KeyOption;
+  UINT16                       OptionNumber;
+  UINTN                        KeyOptionSize;
+
+  Param = (BM_COLLECT_KEY_OPTIONS_PARAM *) Context;
+
+  if (BmIsKeyOptionVariable (Name, Guid, &OptionNumber)) {
+    GetEfiGlobalVariable2 (Name, (VOID**) &KeyOption, &KeyOptionSize);
+    ASSERT (KeyOption != NULL);
+    KeyOption->OptionNumber = OptionNumber;
+    if (BmIsKeyOptionValid (KeyOption, KeyOptionSize)) {
+      Param->KeyOptions = ReallocatePool (
+                            Param->KeyOptionCount * sizeof (EFI_BOOT_MANAGER_KEY_OPTION),
+                            (Param->KeyOptionCount + 1) * sizeof (EFI_BOOT_MANAGER_KEY_OPTION),
+                            Param->KeyOptions
+                            );
+      ASSERT (Param->KeyOptions != NULL);
+      //
+      // Insert the key option in order
+      //
+      for (Index = 0; Index < Param->KeyOptionCount; Index++) {
+        if (KeyOption->OptionNumber < Param->KeyOptions[Index].OptionNumber) {
+          break;
+        }
+      }
+      CopyMem (&Param->KeyOptions[Index + 1], &Param->KeyOptions[Index], (Param->KeyOptionCount - Index) * sizeof (EFI_BOOT_MANAGER_KEY_OPTION));
+      CopyMem (&Param->KeyOptions[Index], KeyOption, BmSizeOfKeyOption (KeyOption));
+      Param->KeyOptionCount++;
+    }
+    FreePool (KeyOption);
+  }
 }
 
 /**
@@ -139,71 +203,20 @@ BmGetKeyOptions (
   OUT UINTN     *Count
   )
 {
-  EFI_STATUS                  Status;
-  UINTN                       Index;
-  CHAR16                      *Name;
-  EFI_GUID                    Guid;
-  UINTN                       NameSize;
-  UINTN                       NewNameSize;
-  EFI_BOOT_MANAGER_KEY_OPTION *KeyOptions;
-  EFI_BOOT_MANAGER_KEY_OPTION *KeyOption;
-  UINT16                      OptionNumber;
+  BM_COLLECT_KEY_OPTIONS_PARAM Param;
 
   if (Count == NULL) {
     return NULL;
   }
 
-  *Count     = 0;
-  KeyOptions = NULL;
+  Param.KeyOptions = NULL;
+  Param.KeyOptionCount = 0;
 
-  NameSize = sizeof (CHAR16);
-  Name     = AllocateZeroPool (NameSize);
-  ASSERT (Name != NULL);
-  while (TRUE) {
-    NewNameSize = NameSize;
-    Status = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      Name = ReallocatePool (NameSize, NewNameSize, Name);
-      ASSERT (Name != NULL);
-      Status = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
-      NameSize = NewNameSize;
-    }
+  BmForEachVariable (BmCollectKeyOptions, (VOID *) &Param);
 
-    if (Status == EFI_NOT_FOUND) {
-      break;
-    }
-    ASSERT_EFI_ERROR (Status);
+  *Count = Param.KeyOptionCount;
 
-    if (BmIsKeyOptionVariable (Name ,&Guid, &OptionNumber)) {
-      GetEfiGlobalVariable2 (Name, (VOID**) &KeyOption, NULL);
-      ASSERT (KeyOption != NULL);
-      if (BmIsKeyOptionValid (KeyOption)) {
-        KeyOptions = ReallocatePool (
-                       *Count * sizeof (EFI_BOOT_MANAGER_KEY_OPTION),
-                       (*Count + 1) * sizeof (EFI_BOOT_MANAGER_KEY_OPTION),
-                       KeyOptions
-                       );
-        ASSERT (KeyOptions != NULL);
-        //
-        // Insert the key option in order
-        //
-        for (Index = 0; Index < *Count; Index++) {
-          if (OptionNumber < KeyOptions[Index].OptionNumber) {
-            break;
-          }
-        }
-        CopyMem (&KeyOptions[Index + 1], &KeyOptions[Index], (*Count - Index) * sizeof (EFI_BOOT_MANAGER_KEY_OPTION));
-        CopyMem (&KeyOptions[Index], KeyOption, BmSizeOfKeyOption (KeyOption));
-        KeyOptions[Index].OptionNumber = OptionNumber;
-        (*Count)++;
-      }
-      FreePool (KeyOption);
-    }
-  }
-
-  FreePool (Name);
-
-  return KeyOptions;
+  return Param.KeyOptions;
 }
 
 /**
@@ -401,7 +414,10 @@ BmHotkeyCallback (
           //
           // Launch its BootOption
           //
-          UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", Hotkey->BootOption);
+          UnicodeSPrint (
+            OptionName, sizeof (OptionName), L"%s%04x",
+            mBmLoadOptionName[LoadOptionTypeBoot], Hotkey->BootOption
+            );
           Status = EfiBootManagerVariableToLoadOption (OptionName, &mBmHotkeyBootOption);
           DEBUG ((EFI_D_INFO, "[Bds]Hotkey for %s pressed - %r\n", OptionName, Status));
           if (EFI_ERROR (Status)) {
@@ -913,7 +929,10 @@ EfiBootManagerAddKeyOptionVariable (
   UINTN                          KeyOptionNumber;
   CHAR16                         KeyOptionName[sizeof ("Key####")];
 
-  UnicodeSPrint (BootOptionName, sizeof (BootOptionName), L"Boot%04x", BootOptionNumber);
+  UnicodeSPrint (
+    BootOptionName, sizeof (BootOptionName), L"%s%04x",
+    mBmLoadOptionName[LoadOptionTypeBoot], BootOptionNumber
+    );
   GetEfiGlobalVariable2 (BootOptionName, &BootOption, &BootOptionSize);
 
   if (BootOption == NULL) {
