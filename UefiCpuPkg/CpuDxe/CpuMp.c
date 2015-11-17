@@ -1642,35 +1642,40 @@ InitializeMpSupport (
     return;
   }
 
-  if (gMaxLogicalProcessorNumber == 1) {
-    return;
-  }
 
-  gApStackSize = (UINTN) PcdGet32 (PcdCpuApStackSize);
-  ASSERT ((gApStackSize & (SIZE_4KB - 1)) == 0);
-
-  mApStackStart = AllocatePages (EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
-  ASSERT (mApStackStart != NULL);
-
-  //
-  // the first buffer of stack size used for common stack, when the amount of AP
-  // more than 1, we should never free the common stack which maybe used for AP reset.
-  //
-  mCommonStack = mApStackStart;
-  mTopOfApCommonStack = (UINT8*) mApStackStart + gApStackSize;
-  mApStackStart = mTopOfApCommonStack;
 
   InitMpSystemData ();
 
-  PrepareAPStartupCode ();
+  //
+  // Only perform AP detection if PcdCpuMaxLogicalProcessorNumber is greater than 1
+  //
+  if (gMaxLogicalProcessorNumber > 1) {
 
-  StartApsStackless ();
+    gApStackSize = (UINTN) PcdGet32 (PcdCpuApStackSize);
+    ASSERT ((gApStackSize & (SIZE_4KB - 1)) == 0);
+
+    mApStackStart = AllocatePages (EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
+    ASSERT (mApStackStart != NULL);
+
+    //
+    // the first buffer of stack size used for common stack, when the amount of AP
+    // more than 1, we should never free the common stack which maybe used for AP reset.
+    //
+    mCommonStack = mApStackStart;
+    mTopOfApCommonStack = (UINT8*) mApStackStart + gApStackSize;
+    mApStackStart = mTopOfApCommonStack;
+
+    PrepareAPStartupCode ();
+
+    StartApsStackless ();
+  }
 
   DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mMpSystemData.NumberOfProcessors));
   if (mMpSystemData.NumberOfProcessors == 1) {
     FreeApStartupCode ();
-    FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
-    return;
+    if (mCommonStack != NULL) {
+      FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
+    }
   }
 
   mMpSystemData.CpuDatas = ReallocatePool (
@@ -1692,10 +1697,12 @@ InitializeMpSupport (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  if (mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
-    FreePages (mApStackStart, EFI_SIZE_TO_PAGES (
-                                (gMaxLogicalProcessorNumber - mMpSystemData.NumberOfProcessors) *
-                                gApStackSize));
+  if (mMpSystemData.NumberOfProcessors > 1 && mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
+    if (mApStackStart != NULL) {
+      FreePages (mApStackStart, EFI_SIZE_TO_PAGES (
+                                  (gMaxLogicalProcessorNumber - mMpSystemData.NumberOfProcessors) *
+                                  gApStackSize));
+    }
   }
 
   Status = gBS->CreateEvent (
