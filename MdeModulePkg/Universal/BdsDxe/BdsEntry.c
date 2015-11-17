@@ -672,7 +672,7 @@ BdsFormalizeOSIndicationVariable (
   //
   OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
   Status = gRT->SetVariable (
-                  L"OsIndicationsSupported",
+                  EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME,
                   &gEfiGlobalVariableGuid,
                   EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                   sizeof(UINT64),
@@ -694,7 +694,7 @@ BdsFormalizeOSIndicationVariable (
   Attributes = 0;
   DataSize = sizeof(UINT64);
   Status = gRT->GetVariable (
-                  L"OsIndications",
+                  EFI_OS_INDICATIONS_VARIABLE_NAME,
                   &gEfiGlobalVariableGuid,
                   &Attributes,
                   &DataSize,
@@ -711,7 +711,7 @@ BdsFormalizeOSIndicationVariable (
 
     DEBUG ((EFI_D_ERROR, "[Bds] Unformalized OsIndications variable exists. Delete it\n"));
     Status = gRT->SetVariable (
-                    L"OsIndications",
+                    EFI_OS_INDICATIONS_VARIABLE_NAME,
                     &gEfiGlobalVariableGuid,
                     0,
                     0,
@@ -737,9 +737,9 @@ BdsFormalizeEfiGlobalVariable (
   //
   // Validate Console variable.
   //
-  BdsFormalizeConsoleVariable (L"ConIn");
-  BdsFormalizeConsoleVariable (L"ConOut");
-  BdsFormalizeConsoleVariable (L"ErrOut");
+  BdsFormalizeConsoleVariable (EFI_CON_IN_VARIABLE_NAME);
+  BdsFormalizeConsoleVariable (EFI_CON_OUT_VARIABLE_NAME);
+  BdsFormalizeConsoleVariable (EFI_ERR_OUT_VARIABLE_NAME);
 
   //
   // Validate OSIndication related variable.
@@ -1045,7 +1045,7 @@ BdsEntry (
   //
   DataSize = sizeof (UINT64);
   Status = gRT->GetVariable (
-                  L"OsIndications",
+                  EFI_OS_INDICATIONS_VARIABLE_NAME,
                   &gEfiGlobalVariableGuid,
                   NULL,
                   &DataSize,
@@ -1062,7 +1062,7 @@ BdsEntry (
   if (BootFwUi) {
     OsIndication &= ~((UINT64) EFI_OS_INDICATIONS_BOOT_TO_FW_UI);
     Status = gRT->SetVariable (
-               L"OsIndications",
+               EFI_OS_INDICATIONS_VARIABLE_NAME,
                &gEfiGlobalVariableGuid,
                EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                sizeof(UINT64),
