@@ -659,6 +659,39 @@ SendInitSipiSipiAllExcludingSelf (
 }
 
 /**
+  Initialize the state of the SoftwareEnable bit in the Local APIC
+  Spurious Interrupt Vector register.
+
+  @param  Enable  If TRUE, then set SoftwareEnable to 1
+                  If FALSE, then set SoftwareEnable to 0.
+
+**/
+VOID
+EFIAPI
+InitializeLocalApicSoftwareEnable (
+  IN BOOLEAN  Enable
+  )
+{
+  LOCAL_APIC_SVR  Svr;
+
+  //
+  // Set local APIC software-enabled bit.
+  //
+  Svr.Uint32 = ReadLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET);
+  if (Enable) {
+    if (Svr.Bits.SoftwareEnable == 0) {
+      Svr.Bits.SoftwareEnable = 1;
+      WriteLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET, Svr.Uint32);
+    }
+  } else {
+    if (Svr.Bits.SoftwareEnable == 1) {
+      Svr.Bits.SoftwareEnable = 0;
+      WriteLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET, Svr.Uint32);
+    }
+  }
+}
+
+/**
   Programming Virtual Wire Mode.
 
   This function programs the local APIC for virtual wire mode following
@@ -774,7 +807,6 @@ InitializeApicTimer (
   IN UINT8   Vector
   )
 {
-  LOCAL_APIC_SVR       Svr;
   LOCAL_APIC_DCR       Dcr;
   LOCAL_APIC_LVT_TIMER LvtTimer;
   UINT32               Divisor;
@@ -782,9 +814,7 @@ InitializeApicTimer (
   //
   // Ensure local APIC is in software-enabled state.
   //
-  Svr.Uint32 = ReadLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET);
-  Svr.Bits.SoftwareEnable = 1;
-  WriteLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET, Svr.Uint32);
+  InitializeLocalApicSoftwareEnable (TRUE);
 
   //
   // Program init-count register.
