@@ -76,13 +76,6 @@ EFI_SMM_CPU_PROTOCOL  mSmmCpu  = {
 
 EFI_CPU_INTERRUPT_HANDLER   mExternalVectorTable[EXCEPTION_VECTOR_NUMBER];
 
-///
-/// SMM CPU Save State Protocol instance
-///
-EFI_SMM_CPU_SAVE_STATE_PROTOCOL  mSmmCpuSaveState = {
-  NULL
-};
-
 //
 // SMM stack information
 //
@@ -530,18 +523,13 @@ SmmRestoreCpu (
   }
 
   //
-  // Do below CPU things for native platform only
+  // Skip initialization if mAcpiCpuData is not valid
   //
-  if (!FeaturePcdGet(PcdFrameworkCompatibilitySupport)) {
+  if (mAcpiCpuData.NumberOfCpus > 0) {
     //
-    // Skip initialization if mAcpiCpuData is not valid
+    // First time microcode load and restore MTRRs
     //
-    if (mAcpiCpuData.NumberOfCpus > 0) {
-      //
-      // First time microcode load and restore MTRRs
-      //
-      EarlyInitializeCpu ();
-    }
+    EarlyInitializeCpu ();
   }
 
   //
@@ -550,18 +538,13 @@ SmmRestoreCpu (
   SmmRelocateBases ();
 
   //
-  // Do below CPU things for native platform only
+  // Skip initialization if mAcpiCpuData is not valid
   //
-  if (!FeaturePcdGet(PcdFrameworkCompatibilitySupport)) {
+  if (mAcpiCpuData.NumberOfCpus > 0) {
     //
-    // Skip initialization if mAcpiCpuData is not valid
+    // Restore MSRs for BSP and all APs
     //
-    if (mAcpiCpuData.NumberOfCpus > 0) {
-      //
-      // Restore MSRs for BSP and all APs
-      //
-      InitializeCpu ();
-    }
+    InitializeCpu ();
   }
 
   //
@@ -685,13 +668,6 @@ SmmReadyToLockEventNotify (
   // Prevent use of mAcpiCpuData by initialize NumberOfCpus to 0
   //
   mAcpiCpuData.NumberOfCpus = 0;
-
-  //
-  // If FrameworkCompatibilitySspport is enabled, then do not copy CPU S3 Data into SMRAM
-  //
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    goto Done;
-  }
 
   //
   // If PcdCpuS3DataAddress was never set, then do not copy CPU S3 Data into SMRAM
@@ -1009,7 +985,6 @@ PiCpuSmmEntry (
 
   mSmmCpuPrivateData.SmmCoreEntryContext.CpuSaveStateSize = gSmmCpuPrivate->CpuSaveStateSize;
   mSmmCpuPrivateData.SmmCoreEntryContext.CpuSaveState     = gSmmCpuPrivate->CpuSaveState;
-  mSmmCpuSaveState.CpuSaveState = (EFI_SMM_CPU_STATE **)gSmmCpuPrivate->CpuSaveState;
 
   //
   // Allocate buffer for pointers to array in CPU_HOT_PLUG_DATA.
@@ -1149,25 +1124,6 @@ PiCpuSmmEntry (
   //
   Status = InitializeSmmCpuServices (mSmmCpuHandle);
   ASSERT_EFI_ERROR (Status);
-
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    //
-    // Install Framework SMM Save State Protocol into UEFI protocol database for backward compatibility
-    //
-    Status = SystemTable->BootServices->InstallMultipleProtocolInterfaces (
-                                          &gSmmCpuPrivate->SmmCpuHandle,
-                                          &gEfiSmmCpuSaveStateProtocolGuid,
-                                          &mSmmCpuSaveState,
-                                          NULL
-                                          );
-    ASSERT_EFI_ERROR (Status);
-    //
-    // The SmmStartupThisAp service in Framework SMST should always be non-null.
-    // Update SmmStartupThisAp pointer in PI SMST here so that PI/Framework SMM thunk
-    // can have it ready when constructing Framework SMST.
-    //
-    gSmst->SmmStartupThisAp = SmmStartupThisAp;
-  }
 
   //
   // register SMM Ready To Lock Protocol notification

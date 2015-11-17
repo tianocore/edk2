@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmConfiguration.h>
 #include <Protocol/SmmCpu.h>
 #include <Protocol/SmmAccess2.h>
-#include <Protocol/SmmCpuSaveState.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCpuService.h>
 
