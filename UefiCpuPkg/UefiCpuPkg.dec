@@ -41,11 +41,11 @@
   ##  @libraryclass  Provides platform specific initialization functions in the SEC phase.
   ##
   PlatformSecLib|Include/Library/PlatformSecLib.h
-  
+
   ##  @libraryclass  Public include file for the SMM CPU Platform Hook Library.
   ##
   SmmCpuPlatformHookLib|Include/Library/SmmCpuPlatformHookLib.h
-  
+
   ##  @libraryclass  Provides the CPU specific programming for PiSmmCpuDxeSmm module.
   ##
   SmmCpuFeaturesLib|Include/Library/SmmCpuFeaturesLib.h
@@ -56,23 +56,82 @@
 [Protocols]
   ## Include/Protocol/SmmCpuService.h
   gEfiSmmCpuServiceProtocolGuid  = { 0x1d202cab, 0xc8ab, 0x4d5c, { 0x94, 0xf7, 0x3c, 0xfc, 0xc0, 0xd3, 0xd3, 0x35 }}
-  
+
 #
 # [Error.gUefiCpuPkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
 #
 
+[PcdsFeatureFlag]
+  ## Indicates if SMM Profile will be enabled.
+  #  If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.
+  #  This PCD is only for validation purpose. It should be set to false in production.<BR><BR>
+  #   TRUE  - SMM Profile will be enabled.<BR>
+  #   FALSE - SMM Profile will be disabled.<BR>
+  # @Prompt Enable SMM Profile.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable|FALSE|BOOLEAN|0x32132109
+
+  ## Indicates if the SMM profile log buffer is a ring buffer.
+  #  If disabled, no additional log can be done when the buffer is full.<BR><BR>
+  #   TRUE  - the SMM profile log buffer is a ring buffer.<BR>
+  #   FALSE - the SMM profile log buffer is a normal buffer.<BR>
+  # @Prompt The SMM profile log buffer is a ring buffer.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileRingBuffer|FALSE|BOOLEAN|0x3213210a
+
+  ## Indicates if SMM Startup AP in a blocking fashion.
+  #   TRUE  - SMM Startup AP in a blocking fashion.<BR>
+  #   FALSE - SMM Startup AP in a non-blocking fashion.<BR>
+  # @Prompt SMM Startup AP in a blocking fashion.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp|FALSE|BOOLEAN|0x32132108
+
+  ## Indicates if SMM Stack Guard will be enabled.
+  #  If enabled, stack overflow in SMM can be caught which eases debugging.<BR><BR>
+  #   TRUE  - SMM Stack Guard will be enabled.<BR>
+  #   FALSE - SMM Stack Guard will be disabled.<BR>
+  # @Prompt Enable SMM Stack Guard.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard|FALSE|BOOLEAN|0x1000001C
+
+  ## Indicates if BSP election in SMM will be enabled.
+  #  If enabled, a BSP will be dynamically elected among all processors in each SMI.
+  #  Otherwise, processor 0 is always as BSP in each SMI.<BR><BR>
+  #   TRUE  - BSP election in SMM will be enabled.<BR>
+  #   FALSE - BSP election in SMM will be disabled.<BR>
+  # @Prompt Enable BSP election in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|TRUE|BOOLEAN|0x32132106
+
+  ## Indicates if CPU SMM hot-plug will be enabled.<BR><BR>
+  #   TRUE  - SMM CPU hot-plug will be enabled.<BR>
+  #   FALSE - SMM CPU hot-plug will be disabled.<BR>
+  # @Prompt SMM CPU hot-plug.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE|BOOLEAN|0x3213210C
+
+  ## Indicates if SMM Debug will be enabled.
+  #  If enabled, hardware breakpoints in SMRAM can be set outside of SMM mode and take effect in SMM.<BR><BR>
+  #   TRUE  - SMM Debug will be enabled.<BR>
+  #   FALSE - SMM Debug will be disabled.<BR>
+  # @Prompt Enable SMM Debug.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug|FALSE|BOOLEAN|0x1000001B
+
+  ## Indicates if lock SMM Feature Control MSR.<BR><BR>
+  #   TRUE  - SMM Feature Control MSR will be locked.<BR>
+  #   FALSE - SMM Feature Control MSR will not be locked.<BR>
+  # @Prompt Lock SMM Feature Control MSR.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
-  ## This value is the CPU Local Apic base address, which aligns the address on a 4-KByte boundary.
-  # @Prompt Configure base address of CPU Local Apic
+  ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
+  # @Prompt Configure base address of CPU Local APIC
   # @Expression  0x80000001 | (gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress & 0xfff) == 0
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress|0xfee00000|UINT32|0x00000001
+
   ## Specifies delay value in microseconds after sending out an INIT IPI.
   # @Prompt Configure delay value after send an INIT IPI
   gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds|10000|UINT32|0x30000002
+
   ## Specifies max supported number of Logical Processors.
-  # @Prompt Configure max supported number of Logical Processorss
+  # @Prompt Configure max supported number of Logical Processors
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|64|UINT32|0x00000002
+
   ## This value specifies the Application Processor (AP) stack size, used for Mp Service, which must
   ## aligns the address on a 4-KByte boundary.
   # @Prompt Configure stack size for Application Processor (AP)
@@ -81,6 +140,32 @@
   ## Specifies stack size in the temporary RAM. 0 means half of TemporaryRamSize.
   # @Prompt Stack size in the temporary RAM.
   gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize|0|UINT32|0x10001003
+
+  ## Specifies buffer size in bytes to save SMM profile data. The value should be a multiple of 4KB.
+  # @Prompt SMM profile data buffer size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize|0x200000|UINT32|0x32132107
+
+  ## Specifies stack size in bytes for each processor in SMM.
+  # @Prompt Processor stack size in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x2000|UINT32|0x32132105
+
+  ## Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM.
+  # @Prompt AP synchronization timeout value in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000|UINT64|0x32132104
+
+  ## Indicates if SMM Code Access Check is enabled.
+  #  If enabled, the SMM handler cannot execute the code outside SMM regions.
+  #  This PCD is suggested to TRUE in production image.<BR><BR>
+  #   TRUE  - SMM Code Access Check will be enabled.<BR>
+  #   FALSE - SMM Code Access Check will be disabled.<BR>
+  # @Prompt SMM Code Access Check.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable|TRUE|BOOLEAN|0x60000013
+
+  ## Indicates the CPU synchronization method used when processing an SMI.
+  #   0x00  - Traditional CPU synchronization method.<BR>
+  #   0x01  - Relaxed CPU synchronization method.<BR>
+  # @Prompt SMM CPU Synchronization Method.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00|UINT8|0x60000014
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies timeout value in microseconds for the BSP to detect all APs for the first time.
@@ -92,6 +177,17 @@
   ## Specifies the size of the microcode Region.
   # @Prompt Microcode Region size.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x00000006
+
+[PcdsDynamic, PcdsDynamicEx]
+  ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
+  # @Prompt The pointer to a CPU S3 data buffer.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress|0x0|UINT64|0x60000010
+
+  ## Contains the pointer to a CPU Hot Plug Data structure if CPU hot-plug is supported.
+  # @Prompt The pointer to CPU Hot Plug Data.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress|0x0|UINT64|0x60000011
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
