@@ -21,19 +21,6 @@
 #define MSR_IA32_APIC_BASE_ADDRESS              0x1B
 
 //
-// Definitions for CPUID instruction
-//
-#define CPUID_SIGNATURE                         0x0
-#define CPUID_VERSION_INFO                      0x1
-#define CPUID_CACHE_PARAMS                      0x4
-#define CPUID_EXTENDED_TOPOLOGY                 0xB
-#define   CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_INVALID 0x0
-#define   CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT     0x1
-#define   CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE    0x2
-#define CPUID_EXTENDED_FUNCTION                 0x80000000
-#define CPUID_VIR_PHY_ADDRESS_SIZE              0x80000008
-
-//
 // Definition for Local APIC registers and related values
 //
 #define XAPIC_ID_OFFSET                         0x20
