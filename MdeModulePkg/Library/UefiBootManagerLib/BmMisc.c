@@ -384,3 +384,29 @@ BmPrintDp (
     FreePool (Str);
   }
 }
+
+/**
+  Convert a single character to number.
+  It assumes the input Char is in the scope of L'0' ~ L'9' and L'A' ~ L'F'
+
+  @param    Char   The input char which need to convert to int.
+
+  @return  The converted 8-bit number or (UINTN) -1 if conversion failed.
+**/
+UINTN
+BmCharToUint (
+  IN CHAR16                           Char
+  )
+{
+  if ((Char >= L'0') && (Char <= L'9')) {
+    return (UINTN) (Char - L'0');
+  }
+
+  if ((Char >= L'A') && (Char <= L'F')) {
+    return (UINTN) (Char - L'A' + 0xA);
+  }
+
+  ASSERT (FALSE);
+  return (UINTN) -1;
+}
+
