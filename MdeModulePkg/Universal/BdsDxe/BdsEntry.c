@@ -51,10 +51,10 @@ CHAR16  *mReadOnlyVariables[] = {
 CHAR16 *mBdsLoadOptionName[] = {
   L"Driver",
   L"SysPrep",
-  L"Boot"
+  L"Boot",
+  L"PlatformRecovery"
 };
 
-CHAR16  mRecoveryBoot[] = L"Recovery Boot";
 /**
   Event to Connect ConIn.
 
@@ -119,187 +119,6 @@ BdsInitialize (
   ASSERT_EFI_ERROR (Status);
 
   return Status;
-}
-
-/**
-  Emuerate all possible bootable medias in the following order:
-  1. Removable BlockIo            - The boot option only points to the removable media
-                                    device, like USB key, DVD, Floppy etc.
-  2. Fixed BlockIo                - The boot option only points to a Fixed blockIo device,
-                                    like HardDisk.
-  3. Non-BlockIo SimpleFileSystem - The boot option points to a device supporting
-                                    SimpleFileSystem Protocol, but not supporting BlockIo
-                                    protocol.
-  4. LoadFile                     - The boot option points to the media supporting 
-                                    LoadFile protocol.
-  Reference: UEFI Spec chapter 3.3 Boot Option Variables Default Boot Behavior
-
-  @param BootOptionCount   Return the boot option count which has been found.
-
-  @retval   Pointer to the boot option array.
-**/
-EFI_BOOT_MANAGER_LOAD_OPTION *
-BdsEnumerateBootOptions (
-  UINTN                                 *BootOptionCount
-  )
-{
-  EFI_STATUS                            Status;
-  EFI_BOOT_MANAGER_LOAD_OPTION          *BootOptions;
-  UINTN                                 HandleCount;
-  EFI_HANDLE                            *Handles;
-  EFI_BLOCK_IO_PROTOCOL                 *BlkIo;
-  UINTN                                 Removable;
-  UINTN                                 Index;
-
-  ASSERT (BootOptionCount != NULL);
-
-  *BootOptionCount = 0;
-  BootOptions      = NULL;
-
-  //
-  // Parse removable block io followed by fixed block io
-  //
-  gBS->LocateHandleBuffer (
-         ByProtocol,
-         &gEfiBlockIoProtocolGuid,
-         NULL,
-         &HandleCount,
-         &Handles
-         );
-
-  for (Removable = 0; Removable < 2; Removable++) {
-    for (Index = 0; Index < HandleCount; Index++) {
-      Status = gBS->HandleProtocol (
-                      Handles[Index],
-                      &gEfiBlockIoProtocolGuid,
-                      (VOID **) &BlkIo
-                      );
-      if (EFI_ERROR (Status)) {
-        continue;
-      }
-
-      //
-      // Skip the logical partitions
-      //
-      if (BlkIo->Media->LogicalPartition) {
-        continue;
-      }
-
-      //
-      // Skip the fixed block io then the removable block io
-      //
-      if (BlkIo->Media->RemovableMedia == ((Removable == 0) ? FALSE : TRUE)) {
-        continue;
-      }
-
-      BootOptions = ReallocatePool (
-                      sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (*BootOptionCount),
-                      sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (*BootOptionCount + 1),
-                      BootOptions
-                      );
-      ASSERT (BootOptions != NULL);
-
-      Status = EfiBootManagerInitializeLoadOption (
-                 &BootOptions[(*BootOptionCount)++],
-                 LoadOptionNumberUnassigned,
-                 LoadOptionTypeBoot,
-                 LOAD_OPTION_ACTIVE,
-                 mRecoveryBoot,
-                 DevicePathFromHandle (Handles[Index]),
-                 NULL,
-                 0
-                 );
-      ASSERT_EFI_ERROR (Status);
-    }
-  }
-
-  if (HandleCount != 0) {
-    FreePool (Handles);
-  }
-
-  //
-  // Parse simple file system not based on block io
-  //
-  gBS->LocateHandleBuffer (
-         ByProtocol,
-         &gEfiSimpleFileSystemProtocolGuid,
-         NULL,
-         &HandleCount,
-         &Handles
-         );
-  for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (
-                    Handles[Index],
-                    &gEfiBlockIoProtocolGuid,
-                    (VOID **) &BlkIo
-                    );
-     if (!EFI_ERROR (Status)) {
-      //
-      //  Skip if the file system handle supports a BlkIo protocol, which we've handled in above
-      //
-      continue;
-    }
-    BootOptions = ReallocatePool (
-                    sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (*BootOptionCount),
-                    sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (*BootOptionCount + 1),
-                    BootOptions
-                    );
-    ASSERT (BootOptions != NULL);
-
-    Status = EfiBootManagerInitializeLoadOption (
-               &BootOptions[(*BootOptionCount)++],
-               LoadOptionNumberUnassigned,
-               LoadOptionTypeBoot,
-               LOAD_OPTION_ACTIVE,
-               mRecoveryBoot,
-               DevicePathFromHandle (Handles[Index]),
-               NULL,
-               0
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  if (HandleCount != 0) {
-    FreePool (Handles);
-  }
-
-  //
-  // Parse load file, assuming UEFI Network boot option
-  //
-  gBS->LocateHandleBuffer (
-         ByProtocol,
-         &gEfiLoadFileProtocolGuid,
-         NULL,
-         &HandleCount,
-         &Handles
-         );
-  for (Index = 0; Index < HandleCount; Index++) {
-
-    BootOptions = ReallocatePool (
-                    sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (*BootOptionCount),
-                    sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (*BootOptionCount + 1),
-                    BootOptions
-                    );
-    ASSERT (BootOptions != NULL);
-
-    Status = EfiBootManagerInitializeLoadOption (
-               &BootOptions[(*BootOptionCount)++],
-               LoadOptionNumberUnassigned,
-               LoadOptionTypeBoot,
-               LOAD_OPTION_ACTIVE,
-               mRecoveryBoot,
-               DevicePathFromHandle (Handles[Index]),
-               NULL,
-               0
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  if (HandleCount != 0) {
-    FreePool (Handles);
-  }
-
-  return BootOptions;
 }
 
 /**
@@ -445,14 +264,16 @@ BdsWait (
 
   @param BootOptions       Input boot option array.
   @param BootOptionCount   Input boot option count.
+  @param BootManagerMenu   Input boot manager menu.
 
   @retval TRUE  Successfully boot one of the boot options.
   @retval FALSE Failed boot any of the boot options.
 **/
 BOOLEAN
-BootAllBootOptions (
+BootBootOptions (
   IN EFI_BOOT_MANAGER_LOAD_OPTION    *BootOptions,
-  IN UINTN                           BootOptionCount
+  IN UINTN                           BootOptionCount,
+  IN EFI_BOOT_MANAGER_LOAD_OPTION    *BootManagerMenu
   )
 {
   UINTN                              Index;
@@ -486,9 +307,10 @@ BootAllBootOptions (
     EfiBootManagerBoot (&BootOptions[Index]);
 
     //
-    // Successful boot breaks the loop, otherwise tries next boot option
+    // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware    // supports boot manager menu, and if firmware is configured to boot in an    // interactive mode, the boot manager will stop processing the BootOrder variable and    // present a boot manager menu to the user.
     //
     if (BootOptions[Index].Status == EFI_SUCCESS) {
+      EfiBootManagerBoot (BootManagerMenu);
       break;
     }
   }
@@ -497,72 +319,10 @@ BootAllBootOptions (
 }
 
 /**
-  This function attempts to boot per the boot order specified by platform policy.
-
-  If the boot via Boot#### returns with a status of EFI_SUCCESS the boot manager will stop 
-  processing the BootOrder variable and present a boot manager menu to the user. If a boot via 
-  Boot#### returns a status other than EFI_SUCCESS, the boot has failed and the next Boot####
-  in the BootOrder variable will be tried until all possibilities are exhausted.
-                                  -- Chapter 3.1.1 Boot Manager Programming, the 4th paragraph
-**/
-VOID
-DefaultBootBehavior (
-  VOID
-  )
-{
-  UINTN                        BootOptionCount;
-  EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions;
-  EFI_BOOT_MANAGER_LOAD_OPTION BootManagerMenu;
-
-  EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
-  //
-  // BootManagerMenu always contains the correct information even the above function returns failure.
-  //
-
-  BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
-
-  if (BootAllBootOptions (BootOptions, BootOptionCount)) {
-    //
-    // Follow generic rule, Call BdsDxeOnConnectConInCallBack to connect ConIn before enter UI
-    //
-    if (PcdGetBool (PcdConInConnectOnDemand)) {
-      BdsDxeOnConnectConInCallBack (NULL, NULL);
-    }
-
-    //
-    // Show the Boot Manager Menu after successful boot
-    //
-    EfiBootManagerBoot (&BootManagerMenu);
-  } else {
-    EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
-    //
-    // Re-scan all EFI boot options in case all the boot#### are deleted or failed to boot
-    //
-    // If no valid boot options exist, the boot manager will enumerate all removable media
-    // devices followed by all fixed media devices. The order within each group is undefined.
-    // These new default boot options are not saved to non volatile storage.The boot manger
-    // will then attempt toboot from each boot option.
-    //                            -- Chapter 3.3 Boot Manager Programming, the 2nd paragraph
-    //
-    EfiBootManagerConnectAll ();
-    BootOptions = BdsEnumerateBootOptions (&BootOptionCount);
-
-    if (!BootAllBootOptions (BootOptions, BootOptionCount)) {
-      DEBUG ((EFI_D_ERROR, "[Bds]No bootable device!\n"));
-      EfiBootManagerBoot (&BootManagerMenu);
-    }
-  }
-
-  EfiBootManagerFreeLoadOption (&BootManagerMenu);
-  EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
-}
-
-/**
-  The function will load and start every Driver####/SysPrep####.
+  The function will load and start every Driver####, SysPrep#### or PlatformRecovery####.
 
   @param  LoadOptions        Load option array.
   @param  LoadOptionCount    Load option count.
-
 **/
 VOID
 ProcessLoadOptions (
@@ -575,7 +335,7 @@ ProcessLoadOptions (
   BOOLEAN                           ReconnectAll;
   EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType;
 
-  ReconnectAll = FALSE;
+  ReconnectAll   = FALSE;
   LoadOptionType = LoadOptionTypeMax;
 
   //
@@ -585,16 +345,23 @@ ProcessLoadOptions (
     //
     // All the load options in the array should be of the same type.
     //
-    if (LoadOptionType == LoadOptionTypeMax) {
+    if (Index == 0) {
       LoadOptionType = LoadOptions[Index].OptionType;
     }
     ASSERT (LoadOptionType == LoadOptions[Index].OptionType);
-    ASSERT (LoadOptionType == LoadOptionTypeDriver || LoadOptionType == LoadOptionTypeSysPrep);
 
     Status = EfiBootManagerProcessLoadOption (&LoadOptions[Index]);
 
-    if (!EFI_ERROR (Status) && ((LoadOptions[Index].Attributes & LOAD_OPTION_FORCE_RECONNECT) != 0)) {
-      ReconnectAll = TRUE;
+    if (!EFI_ERROR (Status)) {
+      if (LoadOptionType == LoadOptionTypePlatformRecovery) {
+        //
+        // Stop processing if any entry is successful
+        //
+        break;
+      }
+      if ((LoadOptions[Index].Attributes & LOAD_OPTION_FORCE_RECONNECT) != 0) {
+        ReconnectAll = TRUE;
+      }
     }
   }
 
@@ -670,7 +437,7 @@ BdsFormalizeOSIndicationVariable (
   //
   // OS indicater support variable
   //
-  OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+  OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
   Status = gRT->SetVariable (
                   EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME,
                   &gEfiGlobalVariableGuid,
@@ -828,10 +595,13 @@ BdsEntry (
   CHAR16                          BootNextVariableName[sizeof ("Boot####")];
   EFI_BOOT_MANAGER_LOAD_OPTION    BootManagerMenu;
   BOOLEAN                         BootFwUi;
+  BOOLEAN                         PlatformRecovery;
+  BOOLEAN                         BootSuccess;
   EFI_DEVICE_PATH_PROTOCOL        *FilePath;
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
+  BootSuccess     = FALSE;
 
   //
   // Insert the performance probe
@@ -1038,9 +808,24 @@ BdsEntry (
   PERF_START (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
   PlatformBootManagerAfterConsole ();
   PERF_END   (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+  //
+  // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
+  //
+  DataSize = sizeof (UINT64);
+  Status = gRT->GetVariable (
+                  EFI_OS_INDICATIONS_VARIABLE_NAME,
+                  &gEfiGlobalVariableGuid,
+                  NULL,
+                  &DataSize,
+                  &OsIndication
+                  );
+  if (EFI_ERROR (Status)) {
+    OsIndication = 0;
+  }
 
   DEBUG_CODE (
     EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType;
+    DEBUG ((EFI_D_INFO, "[Bds]OsIndication: %016x\n", OsIndication));
     DEBUG ((EFI_D_INFO, "[Bds]=============Begin Load Options Dumping ...=============\n"));
     for (LoadOptionType = 0; LoadOptionType < LoadOptionTypeMax; LoadOptionType++) {
       DEBUG ((
@@ -1063,26 +848,17 @@ BdsEntry (
   );
 
   //
-  // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
+  // BootManagerMenu always contains the correct information even call fails.
   //
-  DataSize = sizeof (UINT64);
-  Status = gRT->GetVariable (
-                  EFI_OS_INDICATIONS_VARIABLE_NAME,
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &DataSize,
-                  &OsIndication
-                  );
-  if (EFI_ERROR (Status)) {
-    OsIndication = 0;
-  }
+  EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
 
-  BootFwUi = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0);
+  BootFwUi         = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0);
+  PlatformRecovery = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY) != 0);
   //
   // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
   // 
-  if (BootFwUi) {
-    OsIndication &= ~((UINT64) EFI_OS_INDICATIONS_BOOT_TO_FW_UI);
+  if (BootFwUi || PlatformRecovery) {
+    OsIndication &= ~((UINT64) (EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY));
     Status = gRT->SetVariable (
                EFI_OS_INDICATIONS_VARIABLE_NAME,
                &gEfiGlobalVariableGuid,
@@ -1109,62 +885,70 @@ BdsEntry (
 
     //
     // Directly enter the setup page.
-    // BootManagerMenu always contains the correct information even call fails.
     //
-    EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
     EfiBootManagerBoot (&BootManagerMenu);
-    EfiBootManagerFreeLoadOption (&BootManagerMenu);
   }
 
-  //
-  // Execute SysPrep####
-  //
-  LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeSysPrep);
-  ProcessLoadOptions (LoadOptions, LoadOptionCount);
-  EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+  if (!PlatformRecovery) {
+    //
+    // Execute SysPrep####
+    //
+    LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeSysPrep);
+    ProcessLoadOptions (LoadOptions, LoadOptionCount);
+    EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
 
-  //
-  // Execute Key####
-  //
-  PERF_START (NULL, "BdsWait", "BDS", 0);
-  BdsWait (HotkeyTriggered);
-  PERF_END   (NULL, "BdsWait", "BDS", 0);
+    //
+    // Execute Key####
+    //
+    PERF_START (NULL, "BdsWait", "BDS", 0);
+    BdsWait (HotkeyTriggered);
+    PERF_END   (NULL, "BdsWait", "BDS", 0);
 
-  //
-  // BdsReadKeys() be removed after all keyboard drivers invoke callback in timer callback.
-  //
-  BdsReadKeys ();
+    //
+    // BdsReadKeys() can be removed after all keyboard drivers invoke callback in timer callback.
+    //
+    BdsReadKeys ();
 
-  EfiBootManagerHotkeyBoot ();
+    EfiBootManagerHotkeyBoot ();
 
-  //
-  // Boot to "BootNext"
-  //
-  if (BootNext != NULL) {
-    UnicodeSPrint (BootNextVariableName, sizeof (BootNextVariableName), L"Boot%04x", *BootNext);
-    Status = EfiBootManagerVariableToLoadOption (BootNextVariableName, &LoadOption);
-    if (!EFI_ERROR (Status)) {
-      EfiBootManagerBoot (&LoadOption);
-      EfiBootManagerFreeLoadOption (&LoadOption);
-      if (LoadOption.Status == EFI_SUCCESS) {
-        //
-        // Boot to Boot Manager Menu upon EFI_SUCCESS
-        //
-        EfiBootManagerGetBootManagerMenu (&LoadOption);
+    //
+    // Boot to "BootNext"
+    //
+    if (BootNext != NULL) {
+      UnicodeSPrint (BootNextVariableName, sizeof (BootNextVariableName), L"Boot%04x", *BootNext);
+      Status = EfiBootManagerVariableToLoadOption (BootNextVariableName, &LoadOption);
+      if (!EFI_ERROR (Status)) {
         EfiBootManagerBoot (&LoadOption);
         EfiBootManagerFreeLoadOption (&LoadOption);
+        if (LoadOption.Status == EFI_SUCCESS) {
+          //
+          // Boot to Boot Manager Menu upon EFI_SUCCESS
+          //
+          EfiBootManagerBoot (&BootManagerMenu);
+        }
       }
     }
+
+    do {
+      //
+      // Retry to boot if any of the boot succeeds
+      //
+      LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeBoot);
+      BootSuccess = BootBootOptions (LoadOptions, LoadOptionCount, &BootManagerMenu);
+      EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+    } while (BootSuccess);
   }
 
-  while (TRUE) {
-    //
-    // BDS select the boot device to load OS
-    // Try next upon boot failure
-    // Show Boot Manager Menu upon boot success
-    //
-    DefaultBootBehavior ();
+  EfiBootManagerFreeLoadOption (&BootManagerMenu);
+
+  if (!BootSuccess) {
+    LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
+    ProcessLoadOptions (LoadOptions, LoadOptionCount);
+    EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
   }
+
+  DEBUG ((EFI_D_ERROR, "[Bds] Unable to boot!\n"));
+  CpuDeadLoop ();
 }
 
 /**

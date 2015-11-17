@@ -24,9 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Bds.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/VariableLock.h>
-#include <Protocol/BlockIo.h>
-#include <Protocol/LoadFile.h>
-#include <Protocol/SimpleFileSystem.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
