@@ -48,6 +48,7 @@
     EXPORT  ArmWriteTpidrurw
     EXPORT  ArmIsArchTimerImplemented
     EXPORT  ArmReadIdPfr1
+    EXPORT  ArmReadIdMmfr0
 
     AREA    ArmV7Support, CODE, READONLY
     PRESERVE8
@@ -318,6 +319,10 @@ ArmIsArchTimerImplemented
 
 ArmReadIdPfr1
   mrc    p15, 0, r0, c0, c1, 1     ; Read ID_PFR1 Register
+  bx     lr
+
+ArmReadIdMmfr0
+  mrc    p15, 0, r0, c0, c1, 4     ; Read ID_MMFR0 Register
   bx     lr
 
  END

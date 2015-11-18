@@ -51,6 +51,7 @@ GCC_ASM_EXPORT (ArmReadTpidrurw)
 GCC_ASM_EXPORT (ArmWriteTpidrurw)
 GCC_ASM_EXPORT (ArmIsArchTimerImplemented)
 GCC_ASM_EXPORT (ArmReadIdPfr1)
+GCC_ASM_EXPORT (ArmReadIdMmfr0)
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
@@ -324,6 +325,10 @@ ASM_PFX(ArmIsArchTimerImplemented):
 
 ASM_PFX(ArmReadIdPfr1):
   mrc    p15, 0, r0, c0, c1, 1     @ Read ID_PFR1 Register
+  bx     lr
+
+ASM_PFX(ArmReadIdMmfr0):
+  mrc    p15, 0, r0, c0, c1, 4     @ Read ID_MMFR0 Register
   bx     lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
