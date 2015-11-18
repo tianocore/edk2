@@ -22,7 +22,7 @@
 #include <ArmPlatform.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          4
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          5
 
 // DDR attributes
 #define DDR_ATTRIBUTES_CACHED    ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
@@ -100,8 +100,14 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[2].Length       = ArmGetPhysAddrTop () - VirtualMemoryTable[2].PhysicalBase;
   VirtualMemoryTable[2].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
+  // Remap the FD region as normal executable memory
+  VirtualMemoryTable[3].PhysicalBase = FixedPcdGet64 (PcdFdBaseAddress);
+  VirtualMemoryTable[3].VirtualBase  = VirtualMemoryTable[3].PhysicalBase;
+  VirtualMemoryTable[3].Length       = FixedPcdGet32 (PcdFdSize);
+  VirtualMemoryTable[3].Attributes   = CacheAttributes;
+
   // End of Table
-  ZeroMem (&VirtualMemoryTable[3], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
+  ZeroMem (&VirtualMemoryTable[4], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
 
   *VirtualMemoryMap = VirtualMemoryTable;
 }
