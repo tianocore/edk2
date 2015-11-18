@@ -147,10 +147,17 @@ FillTranslationTable (
 {
   UINT32  *SectionEntry;
   UINT32  Attributes;
-  UINT32  PhysicalBase = MemoryRegion->PhysicalBase;
-  UINT32  RemainLength = MemoryRegion->Length;
+  UINT32  PhysicalBase;
+  UINT32  RemainLength;
 
   ASSERT(MemoryRegion->Length > 0);
+
+  if (MemoryRegion->PhysicalBase >= SIZE_4GB) {
+    return;
+  }
+
+  PhysicalBase = MemoryRegion->PhysicalBase;
+  RemainLength = MIN(MemoryRegion->Length, SIZE_4GB - PhysicalBase);
 
   switch (MemoryRegion->Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
