@@ -261,13 +261,13 @@ ArmConfigureMmu (
   // Translate the Memory Attributes into Translation Table Register Attributes
   if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED)) {
-    TTBRAttributes = TTBR_NON_CACHEABLE;
+    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_NON_CACHEABLE : TTBR_NON_CACHEABLE;
   } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK)) {
-    TTBRAttributes = TTBR_WRITE_BACK_ALLOC;
+    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_BACK_ALLOC : TTBR_WRITE_BACK_ALLOC;
   } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH)) {
-    TTBRAttributes = TTBR_WRITE_THROUGH;
+    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_THROUGH : TTBR_WRITE_THROUGH;
   } else {
     ASSERT (0); // No support has been found for the attributes of the memory region that the translation table belongs to.
     return RETURN_UNSUPPORTED;
