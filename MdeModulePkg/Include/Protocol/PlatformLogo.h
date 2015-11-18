@@ -55,8 +55,8 @@ typedef enum {
                            supports the .bmp file format. 
   @param ImageSize         The size of the image returned.
   @param Attribute         The display attributes of the image returned.
-  @param CoordinateX       The X coordinate of the image.
-  @param CoordinateY       The Y coordinate of the image.
+  @param OffsetX           The X offset of the image regarding the Attribute.
+  @param OffsetY           The Y offset of the image regarding the Attribute.
 
   @retval EFI_SUCCESS      The image was fetched successfully.
   @retval EFI_NOT_FOUND    The specified image could not be found.
@@ -71,8 +71,8 @@ EFI_STATUS
      OUT UINT8                                 **ImageData,
      OUT UINTN                                 *ImageSize,
      OUT EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE *Attribute,
-     OUT UINTN                                 *CoordinateX,
-     OUT UINTN                                 *CoordinateY
+     OUT INTN                                  *OffsetX,
+     OUT INTN                                  *OffsetY
 );
 
 
