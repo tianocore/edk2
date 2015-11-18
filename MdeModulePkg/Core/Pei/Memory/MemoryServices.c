@@ -96,7 +96,7 @@ PeiInstallPeiMemory (
   // 
   if (PrivateData->PeiMemoryInstalled) {
     DEBUG ((EFI_D_ERROR, "ERROR: PeiInstallPeiMemory is called more than once!\n"));
-    ASSERT (PrivateData->PeiMemoryInstalled);
+    ASSERT (FALSE);
     return EFI_SUCCESS;
   }
   
