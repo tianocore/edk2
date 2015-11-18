@@ -192,6 +192,7 @@
                                                             TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
                                                             TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
                                                             TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
+                                                            TT_DESCRIPTOR_SECTION_XN_MASK                           | \
                                                             TT_DESCRIPTOR_SECTION_CACHE_POLICY_SHAREABLE_DEVICE)
 #define TT_DESCRIPTOR_SECTION_UNCACHED(NonSecure)          (TT_DESCRIPTOR_SECTION_TYPE_SECTION                                                           | \
                                                            ((NonSecure) ?  TT_DESCRIPTOR_SECTION_NS : 0)    | \
@@ -215,6 +216,7 @@
                                                         TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
                                                         TT_DESCRIPTOR_PAGE_S_NOT_SHARED                                                   | \
                                                         TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
+                                                        TT_DESCRIPTOR_PAGE_XN_MASK                                                        | \
                                                         TT_DESCRIPTOR_PAGE_CACHE_POLICY_SHAREABLE_DEVICE)
 #define TT_DESCRIPTOR_PAGE_UNCACHED                (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           | \
                                                         TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \

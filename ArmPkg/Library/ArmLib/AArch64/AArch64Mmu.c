@@ -50,7 +50,10 @@ ArmMemoryAttributeToPageAttribute (
     ASSERT(0);
   case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
   case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
-    return TT_ATTR_INDX_DEVICE_MEMORY;
+    if (ArmReadCurrentEL () == AARCH64_EL2)
+      return TT_ATTR_INDX_DEVICE_MEMORY | TT_TABLE_XN;
+    else
+      return TT_ATTR_INDX_DEVICE_MEMORY | TT_TABLE_UXN | TT_TABLE_PXN;
   }
 }
 

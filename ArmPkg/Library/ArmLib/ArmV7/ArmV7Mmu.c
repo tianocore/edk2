@@ -294,7 +294,7 @@ ArmConfigureMmu (
                              DOMAIN_ACCESS_CONTROL_NONE( 3) |
                              DOMAIN_ACCESS_CONTROL_NONE( 2) |
                              DOMAIN_ACCESS_CONTROL_NONE( 1) |
-                             DOMAIN_ACCESS_CONTROL_MANAGER(0));
+                             DOMAIN_ACCESS_CONTROL_CLIENT(0));
 
   ArmEnableInstructionCache();
   ArmEnableDataCache();
