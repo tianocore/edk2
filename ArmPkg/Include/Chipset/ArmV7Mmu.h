@@ -23,7 +23,7 @@
 #define TTBR_SHAREABLE                       BIT1
 #define TTBR_NON_SHAREABLE                   0
 #define TTBR_INNER_CACHEABLE                 BIT0
-#define TTBR_NON_INNER_CACHEABLE             BIT0
+#define TTBR_INNER_NON_CACHEABLE             0
 #define TTBR_RGN_INNER_NON_CACHEABLE         0
 #define TTBR_RGN_INNER_WRITE_BACK_ALLOC      BIT6
 #define TTBR_RGN_INNER_WRITE_THROUGH         BIT0
