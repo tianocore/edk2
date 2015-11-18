@@ -259,7 +259,7 @@ ArmConfigureMmu (
     TTBRAttributes = TTBR_WRITE_BACK_ALLOC;
   } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH)) {
-    TTBRAttributes = TTBR_WRITE_THROUGH_NO_ALLOC;
+    TTBRAttributes = TTBR_WRITE_THROUGH;
   } else {
     ASSERT (0); // No support has been found for the attributes of the memory region that the translation table belongs to.
     return RETURN_UNSUPPORTED;
