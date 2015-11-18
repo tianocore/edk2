@@ -35,8 +35,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]  ImageFormat Format of the image file.
   @param[in]  LogoFile    The file name of logo to display.
   @param[in]  Attribute   The display attributes of the image returned.
-  @param[in]  CoordinateX The X coordinate of the image.
-  @param[in]  CoordinateY The Y coordinate of the image.
+  @param[in]  OffsetX     The X offset of the image regarding the Attribute.
+  @param[in]  OffsetY     The Y offset of the image regarding the Attribute.
 
   @retval EFI_SUCCESS     Logo was displayed.
   @retval EFI_UNSUPPORTED Logo was not found or cannot be displayed.
@@ -47,8 +47,8 @@ BootLogoEnableLogo (
   IN  IMAGE_FORMAT                          ImageFormat,
   IN  EFI_GUID                              *Logo,
   IN  EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE Attribute,
-  IN  UINTN                                 CoordinateX,
-  IN  UINTN                                 CoordinateY
+  IN  INTN                                  OffsetX,
+  IN  INTN                                  OffsetY
   )
 {
   EFI_STATUS                    Status;
@@ -160,8 +160,8 @@ BootLogoEnableLogo (
                                &ImageData,
                                &ImageSize,
                                &Attribute,
-                               &CoordinateX,
-                               &CoordinateY
+                               &OffsetX,
+                               &OffsetY
                                );
       if (EFI_ERROR (Status)) {
         break;
@@ -199,54 +199,51 @@ BootLogoEnableLogo (
     //
     switch (Attribute) {
     case EdkiiPlatformLogoDisplayAttributeLeftTop:
-      DestX = CoordinateX;
-      DestY = CoordinateY;
+      DestX = 0;
+      DestY = 0;
       break;
-
     case EdkiiPlatformLogoDisplayAttributeCenterTop:
       DestX = (SizeOfX - Width) / 2;
-      DestY = CoordinateY;
+      DestY = 0;
       break;
-
     case EdkiiPlatformLogoDisplayAttributeRightTop:
-      DestX = (SizeOfX - Width - CoordinateX);
-      DestY = CoordinateY;;
-      break;
-
-    case EdkiiPlatformLogoDisplayAttributeCenterRight:
-      DestX = (SizeOfX - Width - CoordinateX);
-      DestY = (SizeOfY - Height) / 2;
-      break;
-
-    case EdkiiPlatformLogoDisplayAttributeRightBottom:
-      DestX = (SizeOfX - Width - CoordinateX);
-      DestY = (SizeOfY - Height - CoordinateY);
-      break;
-
-    case EdkiiPlatformLogoDisplayAttributeCenterBottom:
-      DestX = (SizeOfX - Width) / 2;
-      DestY = (SizeOfY - Height - CoordinateY);
-      break;
-
-    case EdkiiPlatformLogoDisplayAttributeLeftBottom:
-      DestX = CoordinateX;
-      DestY = (SizeOfY - Height - CoordinateY);
+      DestX = SizeOfX - Width;
+      DestY = 0;
       break;
 
     case EdkiiPlatformLogoDisplayAttributeCenterLeft:
-      DestX = CoordinateX;
+      DestX = 0;
       DestY = (SizeOfY - Height) / 2;
       break;
-
     case EdkiiPlatformLogoDisplayAttributeCenter:
       DestX = (SizeOfX - Width) / 2;
       DestY = (SizeOfY - Height) / 2;
+      break;
+    case EdkiiPlatformLogoDisplayAttributeCenterRight:
+      DestX = SizeOfX - Width;
+      DestY = (SizeOfY - Height) / 2;
+      break;
+
+    case EdkiiPlatformLogoDisplayAttributeLeftBottom:
+      DestX = 0;
+      DestY = SizeOfY - Height;
+      break;
+    case EdkiiPlatformLogoDisplayAttributeCenterBottom:
+      DestX = (SizeOfX - Width) / 2;
+      DestY = SizeOfY - Height;
+      break;
+    case EdkiiPlatformLogoDisplayAttributeRightBottom:
+      DestX = SizeOfX - Width;
+      DestY = SizeOfY - Height;
       break;
 
     default:
       ASSERT (FALSE);
       break;
     }
+
+    DestX += OffsetX;
+    DestY += OffsetY;
 
     if ((DestX >= 0) && (DestY >= 0)) {
       if (GraphicsOutput != NULL) {
