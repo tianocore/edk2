@@ -70,6 +70,7 @@ typedef enum {
   UrlParserUserInfo,
   UrlParserHostStart,     // "@"
   UrlParserHost,
+  UrlParserHostIpv6,      // "["(Ipv6 address) "]"
   UrlParserPortStart,     // ":"
   UrlParserPort,
   UrlParserStateMax
@@ -138,13 +139,16 @@ UriPercentDecode (
 
   @param[in]       Char           Next character.
   @param[in]       State          Current value of the parser state machine.
+  @param[in]       IsRightBracket TRUE if there is an sign ']' in the authority component and 
+                                  indicates the next part is ':' before Port.                                
 
   @return          Updated state value.
 **/
 HTTP_URL_PARSE_STATE
 NetHttpParseAuthorityChar (
   IN  CHAR8                  Char,
-  IN  HTTP_URL_PARSE_STATE   State
+  IN  HTTP_URL_PARSE_STATE   State,
+  IN  BOOLEAN                *IsRightBracket
   )
 {
 
@@ -169,12 +173,27 @@ NetHttpParseAuthorityChar (
     break;
 
   case UrlParserHost:
-  case UrlParserHostStart:
+  case UrlParserHostStart:  
+    if (Char == '[') {
+      return UrlParserHostIpv6;
+    }
+    
     if (Char == ':') {
       return UrlParserPortStart;
     }
+    
     return UrlParserHost;
-
+    
+  case UrlParserHostIpv6:  
+    if (Char == ']') {
+      *IsRightBracket = TRUE;
+    }
+    
+    if (Char == ':' && *IsRightBracket == TRUE) {
+      return UrlParserPortStart;
+    }
+    return UrlParserHostIpv6;
+    
   case UrlParserPort:
   case UrlParserPortStart:
     return UrlParserPort;
@@ -210,6 +229,7 @@ NetHttpParseAuthority (
   HTTP_URL_PARSE_STATE  State;
   UINT32                Field;
   UINT32                OldField;
+  BOOLEAN               IsrightBracket;
   
   ASSERT ((UrlParser->FieldBitMap & BIT (HTTP_URI_FIELD_AUTHORITY)) != 0);
 
@@ -222,12 +242,13 @@ NetHttpParseAuthority (
     State = UrlParserHost;
   }
 
+  IsrightBracket = FALSE;
   Field = HTTP_URI_FIELD_MAX;
   OldField = Field;
   Authority = Url + UrlParser->FieldData[HTTP_URI_FIELD_AUTHORITY].Offset;
   Length = UrlParser->FieldData[HTTP_URI_FIELD_AUTHORITY].Length;
   for (Char = Authority; Char < Authority + Length; Char++) {
-    State = NetHttpParseAuthorityChar (*Char, State);
+    State = NetHttpParseAuthorityChar (*Char, State, &IsrightBracket);
     switch (State) {
     case UrlParserStateMax:
       return EFI_INVALID_PARAMETER;
@@ -241,6 +262,10 @@ NetHttpParseAuthority (
       break;
       
     case UrlParserHost:
+      Field = HTTP_URI_FIELD_HOST;
+      break;
+
+    case UrlParserHostIpv6:
       Field = HTTP_URI_FIELD_HOST;
       break;
       
