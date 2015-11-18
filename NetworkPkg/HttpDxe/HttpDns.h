@@ -35,4 +35,24 @@ HttpDns4 (
      OUT EFI_IPv4_ADDRESS         *IpAddress                
   );
 
+/**
+  Retrieve the host address using the EFI_DNS6_PROTOCOL.
+
+  @param[in]  HttpInstance        Pointer to HTTP_PROTOCOL instance.
+  @param[in]  HostName            Pointer to buffer containing hostname.
+  @param[out] IpAddress           On output, pointer to buffer containing IPv6 address.
+
+  @retval EFI_SUCCESS             Operation succeeded.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate needed resources.
+  @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
+  @retval Others                  Other errors as indicated.
+  
+**/
+EFI_STATUS
+HttpDns6 (
+  IN     HTTP_PROTOCOL            *HttpInstance,
+  IN     CHAR16                   *HostName,
+     OUT EFI_IPv6_ADDRESS         *IpAddress                
+  );
+
 #endif

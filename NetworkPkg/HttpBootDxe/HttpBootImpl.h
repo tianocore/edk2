@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __EFI_HTTP_BOOT_IMPL_H__
 
 /**
-  Attempt to complete a DHCPv4 D.O.R.A sequence to retrieve the boot resource information.
+  Attempt to complete a DHCPv4 D.O.R.A or DHCPv6 S.R.A.A sequence to retrieve the boot resource information.
 
   @param[in]    Private            The pointer to the driver's private data.
 

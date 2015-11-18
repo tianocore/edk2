@@ -54,14 +54,27 @@ HttpBootUpdateDevicePath (
     Node->Ipv4.StaticIpAddress = FALSE;
     CopyMem (&Node->Ipv4.GatewayIpAddress, &Private->GatewayIp, sizeof (EFI_IPv4_ADDRESS));
     CopyMem (&Node->Ipv4.SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-    
-    TmpDevicePath = AppendDevicePathNode (Private->ParentDevicePath, (EFI_DEVICE_PATH_PROTOCOL*) Node);
-    FreePool (Node);
-    if (TmpDevicePath == NULL) {
+  } else {
+    Node = AllocateZeroPool (sizeof (IPv6_DEVICE_PATH));
+    if (Node == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-  } else {
-    ASSERT (FALSE);
+    Node->Ipv6.Header.Type     = MESSAGING_DEVICE_PATH;
+    Node->Ipv6.Header.SubType  = MSG_IPv6_DP;
+    SetDevicePathNodeLength (Node, sizeof (IPv6_DEVICE_PATH));
+    Node->Ipv6.PrefixLength    = IP6_PREFIX_LENGTH;
+    Node->Ipv6.RemotePort      = Private->Port;
+    Node->Ipv6.Protocol        = EFI_IP_PROTO_TCP; 
+    Node->Ipv6.IpAddressOrigin = 0;
+    CopyMem (&Node->Ipv6.LocalIpAddress, &Private->StationIp.v6, sizeof (EFI_IPv6_ADDRESS));
+    CopyMem (&Node->Ipv6.RemoteIpAddress, &Private->ServerIp.v6, sizeof (EFI_IPv6_ADDRESS));
+    CopyMem (&Node->Ipv6.GatewayIpAddress, &Private->GatewayIp.v6, sizeof (EFI_IPv6_ADDRESS));
+  }
+  
+  TmpDevicePath = AppendDevicePathNode (Private->ParentDevicePath, (EFI_DEVICE_PATH_PROTOCOL*) Node);
+  FreePool (Node);
+  if (TmpDevicePath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   //
@@ -85,21 +98,39 @@ HttpBootUpdateDevicePath (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // Reinstall the device path protocol of the child handle.
-  //
-  Status = gBS->ReinstallProtocolInterface (
-                  Private->ChildHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  Private->DevicePath,
-                  NewDevicePath
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (!Private->UsingIpv6) {
+    //
+    // Reinstall the device path protocol of the child handle.
+    //
+    Status = gBS->ReinstallProtocolInterface (
+                    Private->Ip4Nic->Controller,
+                    &gEfiDevicePathProtocolGuid,
+                    Private->Ip4Nic->DevicePath,
+                    NewDevicePath
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    
+    FreePool (Private->Ip4Nic->DevicePath);
+    Private->Ip4Nic->DevicePath = NewDevicePath;
+  } else {
+    //
+    // Reinstall the device path protocol of the child handle.
+    //
+    Status = gBS->ReinstallProtocolInterface (
+                    Private->Ip6Nic->Controller,
+                    &gEfiDevicePathProtocolGuid,
+                    Private->Ip6Nic->DevicePath,
+                    NewDevicePath
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    FreePool (Private->Ip6Nic->DevicePath);
+    Private->Ip6Nic->DevicePath = NewDevicePath;
   }
   
-  FreePool (Private->DevicePath);
-  Private->DevicePath = NewDevicePath;
   return EFI_SUCCESS;
 }
 
@@ -113,7 +144,7 @@ HttpBootUpdateDevicePath (
 
 **/
 EFI_STATUS
-HttpBootExtractUriInfo (
+HttpBootDhcp4ExtractUriInfo (
   IN     HTTP_BOOT_PRIVATE_DATA   *Private
   )
 {
@@ -193,6 +224,159 @@ HttpBootExtractUriInfo (
 }
 
 /**
+  Parse the boot file URI information from the selected Dhcp6 offer packet.
+
+  @param[in]    Private        The pointer to the driver's private data.
+
+  @retval EFI_SUCCESS          Successfully parsed out all the boot information.
+  @retval Others               Failed to parse out the boot information.
+
+**/
+EFI_STATUS
+HttpBootDhcp6ExtractUriInfo (
+  IN     HTTP_BOOT_PRIVATE_DATA   *Private
+  )
+{
+  HTTP_BOOT_DHCP6_PACKET_CACHE    *SelectOffer;
+  HTTP_BOOT_DHCP6_PACKET_CACHE    *HttpOffer;
+  UINT32                          SelectIndex;
+  UINT32                          ProxyIndex;
+  EFI_DHCP6_PACKET_OPTION         *Option;
+  EFI_IPv6_ADDRESS                IpAddr;
+  CHAR8                           *HostName;
+  CHAR16                          *HostNameStr;
+  EFI_STATUS                      Status;
+
+  ASSERT (Private != NULL);
+  ASSERT (Private->SelectIndex != 0);
+  SelectIndex = Private->SelectIndex - 1;
+  ASSERT (SelectIndex < HTTP_BOOT_OFFER_MAX_NUM);
+
+  Status   = EFI_SUCCESS;
+  HostName = NULL;
+  //
+  // SelectOffer contains the IP address configuration and name server configuration.
+  // HttpOffer contains the boot file URL.
+  //
+  SelectOffer = &Private->OfferBuffer[SelectIndex].Dhcp6;
+  if ((SelectOffer->OfferType == HttpOfferTypeDhcpIpUri) || (SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns)) {
+    HttpOffer = SelectOffer;
+  } else {
+    ASSERT (Private->SelectProxyType != HttpOfferTypeMax);
+    ProxyIndex = Private->OfferIndex[Private->SelectProxyType][0];
+    HttpOffer = &Private->OfferBuffer[ProxyIndex].Dhcp6;
+  }
+
+  //
+  //  Set the Local station address to IP layer.
+  //
+  Status = HttpBootSetIp6Address (Private);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
+  // Configure the default DNS server if server assigned.
+  //
+  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || (SelectOffer->OfferType == HttpOfferTypeDhcpDns)) {
+    Option = SelectOffer->OptList[HTTP_BOOT_DHCP6_IDX_DNS_SERVER];
+    ASSERT (Option != NULL);
+    Status = HttpBootSetIp6Dns (
+               Private,
+               HTONS (Option->OpLen),
+               Option->Data
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+  
+  //
+  // Extract the HTTP server Ip frome URL. This is used to Check route table 
+  // whether can send message to HTTP Server Ip through the GateWay.
+  //
+  Status = HttpUrlGetIp6 (
+             (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
+             HttpOffer->UriParser,
+             &IpAddr
+             );
+  
+  if (EFI_ERROR (Status)) {
+    //
+    // The Http server address is expressed by Name Ip, so perform DNS resolution
+    //
+    Status = HttpUrlGetHostName (
+               (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
+               HttpOffer->UriParser,
+               &HostName
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    
+    HostNameStr = AllocateZeroPool ((AsciiStrLen (HostName) + 1) * sizeof (CHAR16));
+    if (HostNameStr == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Error;
+    }
+    
+    AsciiStrToUnicodeStr (HostName, HostNameStr);
+    Status = HttpBootDns (Private, HostNameStr, &IpAddr);
+    FreePool (HostNameStr);
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }  
+  } 
+  
+  CopyMem (&Private->ServerIp.v6, &IpAddr, sizeof (EFI_IPv6_ADDRESS));  
+    
+  //
+  // register the IPv6 gateway address to the network device.
+  //
+  Status = HttpBootSetIp6Gateway (Private);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
+  // Extract the port from URL, and use default HTTP port 80 if not provided.
+  //
+  Status = HttpUrlGetPort (
+             (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
+             HttpOffer->UriParser,
+             &Private->Port
+             );
+  if (EFI_ERROR (Status) || Private->Port == 0) {
+    Private->Port = 80;
+  }
+  
+  //
+  // Record the URI of boot file from the selected HTTP offer.
+  //
+  Private->BootFileUriParser = HttpOffer->UriParser;
+  Private->BootFileUri = (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data;
+
+  
+  //
+  // All boot informations are valid here.
+  //
+  AsciiPrint ("\n  URI: %a", Private->BootFileUri);
+  //
+  // Update the device path to include the IP and boot URI information.
+  //
+  Status = HttpBootUpdateDevicePath (Private);
+
+Error:
+  
+  if (HostName != NULL) {
+    FreePool (HostName);
+  }
+    
+  return Status;
+}
+
+
+/**
   Discover all the boot information for boot file.
 
   @param[in, out]    Private        The pointer to the driver's private data.
@@ -218,9 +402,9 @@ HttpBootDiscoverBootInfo (
   }
 
   if (!Private->UsingIpv6) {
-    Status = HttpBootExtractUriInfo (Private);
+    Status = HttpBootDhcp4ExtractUriInfo (Private);
   } else {
-    ASSERT (FALSE);
+    Status = HttpBootDhcp6ExtractUriInfo (Private);
   }
 
   return Status;
@@ -247,12 +431,14 @@ HttpBootCreateHttpIo (
 
   ZeroMem (&ConfigData, sizeof (HTTP_IO_CONFIG_DATA));
   if (!Private->UsingIpv6) {
-    ConfigData.Config4.HttpVersion = HttpVersion11;
+    ConfigData.Config4.HttpVersion    = HttpVersion11;
     ConfigData.Config4.RequestTimeOut = HTTP_BOOT_REQUEST_TIMEOUT;
     IP4_COPY_ADDRESS (&ConfigData.Config4.LocalIp, &Private->StationIp.v4);
     IP4_COPY_ADDRESS (&ConfigData.Config4.SubnetMask, &Private->SubnetMask.v4);
   } else {
-    ASSERT (FALSE);
+    ConfigData.Config6.HttpVersion    = HttpVersion11;
+    ConfigData.Config6.RequestTimeOut = HTTP_BOOT_REQUEST_TIMEOUT;
+    IP6_COPY_ADDRESS (&ConfigData.Config6.LocalIp, &Private->StationIp.v6);
   }
 
   Status = HttpIoCreateIo (

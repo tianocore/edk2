@@ -35,6 +35,8 @@
   HttpBootImpl.c
   HttpBootDhcp4.h
   HttpBootDhcp4.c
+  HttpBootDhcp6.h
+  HttpBootDhcp6.c
   HttpBootSupport.h
   HttpBootSupport.c
   HttpBootClient.h
@@ -62,6 +64,13 @@
   gEfiDhcp4ServiceBindingProtocolGuid             ## TO_START
   gEfiDhcp4ProtocolGuid                           ## TO_START
   gEfiIp4Config2ProtocolGuid                      ## TO_START
+  gEfiDhcp6ServiceBindingProtocolGuid             ## TO_START
+  gEfiDhcp6ProtocolGuid                           ## TO_START
+  gEfiDns6ServiceBindingProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                            ## SOMETIMES_CONSUMES
+  gEfiIp6ServiceBindingProtocolGuid               ## TO_START
+  gEfiIp6ProtocolGuid                             ## TO_START
+  gEfiIp6ConfigProtocolGuid                       ## TO_START
   gEfiNetworkInterfaceIdentifierProtocolGuid_31   ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
