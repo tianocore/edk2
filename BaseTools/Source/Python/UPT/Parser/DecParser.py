@@ -29,6 +29,7 @@ from Library.ParserValidate import IsValidIdString
 from Library.ParserValidate import IsValidUserId
 from Library.ParserValidate import IsValidArch
 from Library.ParserValidate import IsValidWord
+from Library.ParserValidate import IsValidDecVersionVal
 from Parser.DecParserMisc import TOOL_NAME
 from Parser.DecParserMisc import CleanString
 from Parser.DecParserMisc import IsValidPcdDatum
@@ -452,7 +453,8 @@ class _DecDefine(_DecBase):
         if self.ItemObject.GetPackageSpecification():
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_DEFINED % DT.TAB_DEC_DEFINES_DEC_SPECIFICATION)
         if not IsValidToken('0[xX][0-9a-fA-F]{8}', Token):
-            self._LoggerError(ST.ERR_DECPARSE_DEFINE_SPEC)
+            if not IsValidDecVersionVal(Token):
+                self._LoggerError(ST.ERR_DECPARSE_DEFINE_SPEC)
         self.ItemObject.SetPackageSpecification(Token)
     
     def _SetPackageName(self, Token):

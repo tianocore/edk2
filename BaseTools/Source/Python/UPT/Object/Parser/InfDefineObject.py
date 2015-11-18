@@ -340,15 +340,20 @@ class InfDefSection(InfDefSectionOptionRomInfo):
                 ErrorInInf(ST.ERR_INF_PARSER_NOT_SUPPORT_EDKI_INF,
                            ErrorCode=ToolError.EDK1_INF_ERROR,
                            LineInfo=self.CurrentLine)
-                
-            self.InfVersion = InfDefMember()
-            self.InfVersion.SetValue(InfVersion)
-            self.InfVersion.Comments = Comments          
-            return True
+        elif IsValidDecVersionVal(InfVersion):
+            if (InfVersion < 65541):
+                ErrorInInf(ST.ERR_INF_PARSER_NOT_SUPPORT_EDKI_INF,
+                           ErrorCode=ToolError.EDK1_INF_ERROR,
+                           LineInfo=self.CurrentLine)
         else:
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(InfVersion),
                        LineInfo=self.CurrentLine)
             return False
+
+        self.InfVersion = InfDefMember()
+        self.InfVersion.SetValue(InfVersion)
+        self.InfVersion.Comments = Comments
+        return True
 
     ## GetInfVersion
     #                     
