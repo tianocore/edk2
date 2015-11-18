@@ -65,7 +65,7 @@ BmpImageDecoderLibConvertBmpToGopBlt (
 
   ASSERT ((GopBlt != NULL) && (GopBltSize != NULL));
 
-  if (ImageFormat != ImageFormatBmp) {
+  if ((ImageFormat != ImageFormatBmp) && (ImageFormat != ImageFormatUnknown)) {
     return EFI_UNSUPPORTED;
   }
 
