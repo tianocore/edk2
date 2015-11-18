@@ -265,6 +265,19 @@ ArmConfigureMmu (
     return RETURN_UNSUPPORTED;
   }
 
+  if (TTBRAttributes & TTBR_SHAREABLE) {
+    //
+    // Unlike the S bit in the short descriptors, which implies inner shareable
+    // on an implementation that supports two levels, the meaning of the S bit
+    // in the TTBR depends on the NOS bit, which defaults to Outer Shareable.
+    // However, we should only set this bit after we have confirmed that the
+    // implementation supports multiple levels, or else the NOS bit is UNK/SBZP
+    //
+    if (((ArmReadIdMmfr0 () >> 12) & 0xf) != 0) {
+      TTBRAttributes |= TTBR_NOT_OUTER_SHAREABLE;
+    }
+  }
+
   ArmCleanInvalidateDataCache ();
   ArmInvalidateInstructionCache ();
 
