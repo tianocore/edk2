@@ -24,8 +24,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]  ImageFormat Format of the image file.
   @param[in]  LogoFile    The file name of logo to display.
   @param[in]  Attribute   The display attributes of the image returned.
-  @param[in]  CoordinateX The X coordinate of the image.
-  @param[in]  CoordinateY The Y coordinate of the image.
+  @param[in]  OffsetX     The X offset of the image regarding the Attribute.
+  @param[in]  OffsetY     The Y offset of the image regarding the Attribute.
 
   @retval EFI_SUCCESS     Logo was displayed.
   @retval EFI_UNSUPPORTED Logo was not found or cannot be displayed.
@@ -36,8 +36,8 @@ BootLogoEnableLogo (
   IN  IMAGE_FORMAT                          ImageFormat,
   IN  EFI_GUID                              *Logo,
   IN  EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE Attribute,
-  IN  UINTN                                 CoordinateX,
-  IN  UINTN                                 CoordinateY
+  IN  INTN                                  OffsetX,
+  IN  INTN                                  OffsetY
   );
 
 
