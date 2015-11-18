@@ -1131,6 +1131,18 @@ Exit:
   }
   Token->Status = Status;
   gBS->SignalEvent (Token->Event);
+
+  if (Wrap != NULL) {
+    if (Wrap->TcpWrap.RxToken.CompletionToken.Event != NULL) {
+      gBS->CloseEvent (Wrap->TcpWrap.RxToken.CompletionToken.Event);
+    }
+  }
+  
+  if (HttpInstance->RxToken.CompletionToken.Event != NULL) {
+    gBS->CloseEvent (HttpInstance->RxToken.CompletionToken.Event);
+    HttpInstance->RxToken.CompletionToken.Event = NULL;
+  }  
+  
   FreePool (Wrap);
   return Status;
 
