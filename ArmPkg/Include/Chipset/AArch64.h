@@ -178,11 +178,6 @@ PageAttributeToGcdAttribute (
   IN UINT64 PageAttributes
   );
 
-UINT64
-GcdAttributeToPageAttribute (
-  IN UINT64 GcdAttributes
-  );
-
 UINTN
 ArmWriteCptr (
   IN  UINT64 Cptr
