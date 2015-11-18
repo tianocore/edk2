@@ -828,6 +828,33 @@ PeimEntryMP (
 }
 
 /**
+  Measure and log Separator event with error, and extend the measurement result into a specific PCR.
+
+  @param[in] PCRIndex         PCR index.  
+
+  @retval EFI_SUCCESS         Operation completed successfully.
+  @retval EFI_DEVICE_ERROR    The operation was unsuccessful.
+
+**/
+EFI_STATUS
+MeasureSeparatorEventWithError (
+  IN      TPM_PCRINDEX              PCRIndex
+  )
+{
+  TCG_PCR_EVENT_HDR                 TcgEvent;
+  UINT32                            EventData;
+
+  //
+  // Use EventData 0x1 to indicate there is error.
+  //
+  EventData = 0x1;
+  TcgEvent.PCRIndex  = PCRIndex;
+  TcgEvent.EventType = EV_SEPARATOR;
+  TcgEvent.EventSize = (UINT32)sizeof (EventData);
+  return HashLogExtendEvent(0,(UINT8 *)&EventData, TcgEvent.EventSize, &TcgEvent,(UINT8 *)&EventData);
+}
+
+/**
   Entry point of this module.
 
   @param[in] FileHandle   Handle of the file being invoked.
@@ -846,6 +873,8 @@ PeimEntryMA (
   EFI_STATUS                        Status;
   EFI_STATUS                        Status2;
   EFI_BOOT_MODE                     BootMode;
+  TPM_PCRINDEX                      PcrIndex;
+  BOOLEAN                           S3ErrorReport;
 
   if (CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceNoneGuid) ||
       CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
@@ -884,11 +913,15 @@ PeimEntryMA (
       goto Done;
     }
 
+    S3ErrorReport = FALSE;
     if (PcdGet8 (PcdTpm2InitializationPolicy) == 1) {
       if (BootMode == BOOT_ON_S3_RESUME) {
         Status = Tpm2Startup (TPM_SU_STATE);
         if (EFI_ERROR (Status) ) {
           Status = Tpm2Startup (TPM_SU_CLEAR);
+          if (!EFI_ERROR(Status)) {
+            S3ErrorReport = TRUE;
+          }
         }
       } else {
         Status = Tpm2Startup (TPM_SU_CLEAR);
@@ -902,6 +935,23 @@ PeimEntryMA (
     // Update Tpm2HashMask according to PCR bank.
     //
     SetTpm2HashMask ();
+
+    if (S3ErrorReport) {
+      //
+      // The system firmware that resumes from S3 MUST deal with a
+      // TPM2_Startup error appropriately.
+      // For example, issue a TPM2_Startup(TPM_SU_CLEAR) command and
+      // configuring the device securely by taking actions like extending a
+      // separator with an error digest (0x01) into PCRs 0 through 7.
+      //
+      for (PcrIndex = 0; PcrIndex < 8; PcrIndex++) {
+        Status = MeasureSeparatorEventWithError (PcrIndex);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((EFI_D_ERROR, "Separator Event with Error not Measured. Error!\n"));
+        }
+      }
+    }
+
     //
     // TpmSelfTest is optional on S3 path, skip it to save S3 time
     //
