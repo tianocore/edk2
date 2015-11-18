@@ -28,5 +28,11 @@ ArmReadIdMmfr0 (
   VOID
   );
 
+BOOLEAN
+EFIAPI
+ArmHasMpExtensions (
+  VOID
+  );
+
 #endif // __ARM_V7_LIB_H__
 
