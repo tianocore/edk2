@@ -1181,7 +1181,7 @@ HttpConnectTcp4 (
   EFI_TCP4_CONNECTION_STATE Tcp4State;
 
 
-  if (HttpInstance->State != HTTP_STATE_TCP_CONFIGED || HttpInstance->Tcp4 == NULL) {
+  if (HttpInstance->State < HTTP_STATE_TCP_CONFIGED || HttpInstance->Tcp4 == NULL) {
     return EFI_NOT_READY;
   }
 
@@ -1198,9 +1198,11 @@ HttpConnectTcp4 (
     return Status;
   }
 
-  if (Tcp4State > Tcp4StateEstablished) {
+  if (Tcp4State == Tcp4StateEstablished) {
+    return EFI_SUCCESS;
+  } else if (Tcp4State > Tcp4StateEstablished ) {
     HttpCloseConnection(HttpInstance);
-  }  
+  }
 
   return HttpCreateConnection (HttpInstance);
 }
@@ -1223,7 +1225,7 @@ HttpConnectTcp6 (
   EFI_STATUS                Status;
   EFI_TCP6_CONNECTION_STATE Tcp6State;
 
-  if (HttpInstance->State != HTTP_STATE_TCP_CONFIGED || HttpInstance->Tcp6 == NULL) {
+  if (HttpInstance->State < HTTP_STATE_TCP_CONFIGED || HttpInstance->Tcp6 == NULL) {
     return EFI_NOT_READY;
   }
 
@@ -1241,8 +1243,10 @@ HttpConnectTcp6 (
      return Status;
   }
 
-  if (Tcp6State > Tcp6StateEstablished) {
-    HttpCloseConnection (HttpInstance);
+  if (Tcp6State == Tcp6StateEstablished) {
+    return EFI_SUCCESS;
+  } else if (Tcp6State > Tcp6StateEstablished ) {
+    HttpCloseConnection(HttpInstance);
   }
 
   return HttpCreateConnection (HttpInstance);
@@ -1253,6 +1257,7 @@ HttpConnectTcp6 (
 
   @param[in]  HttpInstance       The HTTP instance private data.
   @param[in]  Wrap               The HTTP token's wrap data.
+  @param[in]  Configure          The Flag indicates whether the first time to initialize Tcp.
 
   @retval EFI_SUCCESS            The initialization of TCP instance is done. 
   @retval Others                 Other error as indicated.
@@ -1261,7 +1266,8 @@ HttpConnectTcp6 (
 EFI_STATUS
 HttpInitTcp (
   IN  HTTP_PROTOCOL    *HttpInstance,
-  IN  HTTP_TOKEN_WRAP  *Wrap
+  IN  HTTP_TOKEN_WRAP  *Wrap,
+  IN  BOOLEAN          Configure
   )
 {
   EFI_STATUS           Status;
@@ -1271,10 +1277,13 @@ HttpInitTcp (
     //
     // Configure TCP instance.
     //
-    Status = HttpConfigureTcp4 (HttpInstance, Wrap);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    if (Configure) {
+      Status = HttpConfigureTcp4 (HttpInstance, Wrap);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
+
     //
     // Connect TCP.
     //
@@ -1286,10 +1295,13 @@ HttpInitTcp (
     //
     // Configure TCP instance.
     //
-    Status = HttpConfigureTcp6 (HttpInstance, Wrap);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    if (Configure) {
+      Status = HttpConfigureTcp6 (HttpInstance, Wrap);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
+
     //
     // Connect TCP.
     //

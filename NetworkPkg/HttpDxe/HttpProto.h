@@ -456,6 +456,7 @@ HttpTcpNotReady (
 
   @param[in]  HttpInstance       The HTTP instance private data.
   @param[in]  Wrap               The HTTP token's wrap data.
+  @param[in]  Configure          The Flag indicates whether the first time to initialize Tcp.
 
   @retval EFI_SUCCESS            The initialization of TCP instance is done. 
   @retval Others                 Other error as indicated.
@@ -464,7 +465,8 @@ HttpTcpNotReady (
 EFI_STATUS
 HttpInitTcp (
   IN  HTTP_PROTOCOL    *HttpInstance,
-  IN  HTTP_TOKEN_WRAP  *Wrap
+  IN  HTTP_TOKEN_WRAP  *Wrap,
+  IN  BOOLEAN          Configure
   );
 
 /**
