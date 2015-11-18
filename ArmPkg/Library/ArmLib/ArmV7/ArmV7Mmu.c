@@ -80,6 +80,10 @@ PopulateLevel2PageTable (
       break;
   }
 
+  if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+    PageAttributes &= ~TT_DESCRIPTOR_PAGE_S_SHARED;
+  }
+
   // Check if the Section Entry has already been populated. Otherwise attach a
   // Level 2 Translation Table to it
   if (*SectionEntry != 0) {
@@ -178,6 +182,10 @@ FillTranslationTable (
       break;
   }
 
+  if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+    Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
+  }
+
   // Get the first section entry for this mapping
   SectionEntry    = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS(TranslationTable, MemoryRegion->VirtualBase);
 
@@ -266,15 +274,19 @@ ArmConfigureMmu (
   }
 
   if (TTBRAttributes & TTBR_SHAREABLE) {
-    //
-    // Unlike the S bit in the short descriptors, which implies inner shareable
-    // on an implementation that supports two levels, the meaning of the S bit
-    // in the TTBR depends on the NOS bit, which defaults to Outer Shareable.
-    // However, we should only set this bit after we have confirmed that the
-    // implementation supports multiple levels, or else the NOS bit is UNK/SBZP
-    //
-    if (((ArmReadIdMmfr0 () >> 12) & 0xf) != 0) {
-      TTBRAttributes |= TTBR_NOT_OUTER_SHAREABLE;
+    if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+      TTBRAttributes ^= TTBR_SHAREABLE;
+    } else {
+      //
+      // Unlike the S bit in the short descriptors, which implies inner shareable
+      // on an implementation that supports two levels, the meaning of the S bit
+      // in the TTBR depends on the NOS bit, which defaults to Outer Shareable.
+      // However, we should only set this bit after we have confirmed that the
+      // implementation supports multiple levels, or else the NOS bit is UNK/SBZP
+      //
+      if (((ArmReadIdMmfr0 () >> 12) & 0xf) != 0) {
+        TTBRAttributes |= TTBR_NOT_OUTER_SHAREABLE;
+      }
     }
   }
 
