@@ -357,12 +357,6 @@ Done:
     FreePool (HashContext);
   }
 
-  //
-  // Temp solution until PeiCore checks AUTH Status.
-  //
-  if ((*AuthenticationStatus & (EFI_AUTH_STATUS_TEST_FAILED | EFI_AUTH_STATUS_NOT_TESTED)) != 0) {
-    Status = EFI_ACCESS_DENIED;
-  }
   DEBUG ((DEBUG_VERBOSE, "PeiRsa2048Sha256: Status = %r  AuthenticationStatus = %08x\n", Status, *AuthenticationStatus));
 
   return Status;
