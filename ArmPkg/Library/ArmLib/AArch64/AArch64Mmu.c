@@ -628,7 +628,8 @@ ArmConfigureMmu (
       return RETURN_UNSUPPORTED;
     }
   } else if (ArmReadCurrentEL () == AARCH64_EL1) {
-    TCR = T0SZ | TCR_TG0_4KB;
+    // Due to Cortex-A57 erratum #822227 we must set TG1[1] == 1, regardless of EPD1.
+    TCR = T0SZ | TCR_TG0_4KB | TCR_TG1_4KB | TCR_EPD1;
 
     // Set the Physical Address Size using MaxAddress
     if (MaxAddress < SIZE_4GB) {

@@ -108,6 +108,7 @@
 #define TCR_PS_256TB                            (5 << 16)
 
 #define TCR_TG0_4KB                             (0 << 14)
+#define TCR_TG1_4KB                             (2 << 30)
 
 #define TCR_IPS_4GB                             (0ULL << 32)
 #define TCR_IPS_64GB                            (1ULL << 32)
@@ -116,6 +117,7 @@
 #define TCR_IPS_16TB                            (4ULL << 32)
 #define TCR_IPS_256TB                           (5ULL << 32)
 
+#define TCR_EPD1                                (1 << 23)
 
 #define TTBR_ASID_FIELD                      (48)
 #define TTBR_ASID_MASK                       (0xFF << TTBR_ASID_FIELD)
