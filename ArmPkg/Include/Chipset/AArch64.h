@@ -97,6 +97,38 @@
 
 #define ARM_VECTOR_TABLE_ALIGNMENT ((1 << 11)-1)
 
+// Vector table offset definitions
+#define ARM_VECTOR_CUR_SP0_SYNC 0x000
+#define ARM_VECTOR_CUR_SP0_IRQ  0x080
+#define ARM_VECTOR_CUR_SP0_FIQ  0x100
+#define ARM_VECTOR_CUR_SP0_SERR 0x180
+
+#define ARM_VECTOR_CUR_SPx_SYNC 0x200
+#define ARM_VECTOR_CUR_SPx_IRQ  0x280
+#define ARM_VECTOR_CUR_SPx_FIQ  0x300
+#define ARM_VECTOR_CUR_SPx_SERR 0x380
+
+#define ARM_VECTOR_LOW_A64_SYNC 0x400
+#define ARM_VECTOR_LOW_A64_IRQ  0x480
+#define ARM_VECTOR_LOW_A64_FIQ  0x500
+#define ARM_VECTOR_LOW_A64_SERR 0x580
+
+#define ARM_VECTOR_LOW_A32_SYNC 0x600
+#define ARM_VECTOR_LOW_A32_IRQ  0x680
+#define ARM_VECTOR_LOW_A32_FIQ  0x700
+#define ARM_VECTOR_LOW_A32_SERR 0x780
+
+#define VECTOR_BASE(tbl)          \
+  .align 11;                      \
+  GCC_ASM_EXPORT(tbl);            \
+  ASM_PFX(tbl):                   \
+
+#define VECTOR_ENTRY(tbl, off)    \
+  .org ASM_PFX(tbl) + off
+
+#define VECTOR_END(tbl)           \
+  .org ASM_PFX(tbl) + 0x800
+
 VOID
 EFIAPI
 ArmEnableSWPInstruction (

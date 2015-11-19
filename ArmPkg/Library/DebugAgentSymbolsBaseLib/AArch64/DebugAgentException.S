@@ -12,82 +12,85 @@
 #
 #------------------------------------------------------------------------------
 
-GCC_ASM_EXPORT(DebugAgentVectorTable)
+#include <Chipset/AArch64.h>
+
 GCC_ASM_IMPORT(DefaultExceptionHandler)
 
 .text
-.align 11
-ASM_PFX(DebugAgentVectorTable):
+VECTOR_BASE(DebugAgentVectorTable)
 
 //
 // Current EL with SP0 : 0x0 - 0x180
 //
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SP0_SYNC)
 ASM_PFX(SynchronousExceptionSP0):
   b   ASM_PFX(SynchronousExceptionSP0)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SP0_IRQ)
 ASM_PFX(IrqSP0):
   b   ASM_PFX(IrqSP0)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SP0_FIQ)
 ASM_PFX(FiqSP0):
   b   ASM_PFX(FiqSP0)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SP0_SERR)
 ASM_PFX(SErrorSP0):
   b   ASM_PFX(SErrorSP0)
 
 //
 // Current EL with SPx: 0x200 - 0x380
 //
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SPx_SYNC)
 ASM_PFX(SynchronousExceptionSPx):
   b   ASM_PFX(SynchronousExceptionSPx)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SPx_IRQ)
 ASM_PFX(IrqSPx):
   b   ASM_PFX(IrqSPx)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SPx_FIQ)
 ASM_PFX(FiqSPx):
   b   ASM_PFX(FiqSPx)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_CUR_SPx_SERR)
 ASM_PFX(SErrorSPx):
   b   ASM_PFX(SErrorSPx)
 
 /* Lower EL using AArch64 : 0x400 - 0x580 */
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A64_SYNC)
 ASM_PFX(SynchronousExceptionA64):
   b   ASM_PFX(SynchronousExceptionA64)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A64_IRQ)
 ASM_PFX(IrqA64):
   b   ASM_PFX(IrqA64)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A64_FIQ)
 ASM_PFX(FiqA64):
   b   ASM_PFX(FiqA64)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A64_SERR)
 ASM_PFX(SErrorA64):
   b   ASM_PFX(SErrorA64)
 
 //
-// Lower EL using AArch32 : 0x0 - 0x180
+// Lower EL using AArch32 : 0x600 - 0x780
 //
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A32_SYNC)
 ASM_PFX(SynchronousExceptionA32):
   b   ASM_PFX(SynchronousExceptionA32)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A32_IRQ)
 ASM_PFX(IrqA32):
   b   ASM_PFX(IrqA32)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A32_FIQ)
 ASM_PFX(FiqA32):
   b   ASM_PFX(FiqA32)
 
-.align 7
+VECTOR_ENTRY(DebugAgentVectorTable, ARM_VECTOR_LOW_A32_SERR)
 ASM_PFX(SErrorA32):
   b   ASM_PFX(SErrorA32)
+
+VECTOR_END(DebugAgentVectorTable)

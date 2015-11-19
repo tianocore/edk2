@@ -12,6 +12,7 @@
 //
 //------------------------------------------------------------------------------
 
+#include <Chipset/AArch64.h>
 #include <Library/PcdLib.h>
 #include <AsmMacroIoLibV8.h>
 
@@ -95,14 +96,12 @@
   UINT64  Padding;0x328   // Required for stack alignment
 */
 
-GCC_ASM_EXPORT(ExceptionHandlersStart)
 GCC_ASM_EXPORT(ExceptionHandlersEnd)
 GCC_ASM_EXPORT(CommonExceptionEntry)
 GCC_ASM_EXPORT(AsmCommonExceptionEntry)
 GCC_ASM_EXPORT(CommonCExceptionHandler)
 
 .text
-.align 11
 
 #define GP_CONTEXT_SIZE    (32 *  8)
 #define FP_CONTEXT_SIZE    (32 * 16)
@@ -160,84 +159,85 @@ GCC_ASM_EXPORT(CommonCExceptionHandler)
 // This code gets copied to the ARM vector table
 // VectorTableStart - VectorTableEnd gets copied
 //
-ASM_PFX(ExceptionHandlersStart):
+VECTOR_BASE(ExceptionHandlersStart)
 
 //
 // Current EL with SP0 : 0x0 - 0x180
 //
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SP0_SYNC)
 ASM_PFX(SynchronousExceptionSP0):
   b   ASM_PFX(SynchronousExceptionEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SP0_IRQ)
 ASM_PFX(IrqSP0):
   b   ASM_PFX(IrqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SP0_FIQ)
 ASM_PFX(FiqSP0):
   b   ASM_PFX(FiqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SP0_SERR)
 ASM_PFX(SErrorSP0):
   b   ASM_PFX(SErrorEntry)
 
 //
 // Current EL with SPx: 0x200 - 0x380
 //
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SPx_SYNC)
 ASM_PFX(SynchronousExceptionSPx):
   b   ASM_PFX(SynchronousExceptionEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SPx_IRQ)
 ASM_PFX(IrqSPx):
   b   ASM_PFX(IrqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SPx_FIQ)
 ASM_PFX(FiqSPx):
   b   ASM_PFX(FiqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SPx_SERR)
 ASM_PFX(SErrorSPx):
   b   ASM_PFX(SErrorEntry)
 
 //
 // Lower EL using AArch64 : 0x400 - 0x580
 //
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A64_SYNC)
 ASM_PFX(SynchronousExceptionA64):
   b   ASM_PFX(SynchronousExceptionEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A64_IRQ)
 ASM_PFX(IrqA64):
   b   ASM_PFX(IrqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A64_FIQ)
 ASM_PFX(FiqA64):
   b   ASM_PFX(FiqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A64_SERR)
 ASM_PFX(SErrorA64):
   b   ASM_PFX(SErrorEntry)
 
 //
-// Lower EL using AArch32 : 0x0 - 0x180
+// Lower EL using AArch32 : 0x600 - 0x780
 //
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A32_SYNC)
 ASM_PFX(SynchronousExceptionA32):
   b   ASM_PFX(SynchronousExceptionEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A32_IRQ)
 ASM_PFX(IrqA32):
   b   ASM_PFX(IrqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A32_FIQ)
 ASM_PFX(FiqA32):
   b   ASM_PFX(FiqEntry)
 
-.align 7
+VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_LOW_A32_SERR)
 ASM_PFX(SErrorA32):
   b   ASM_PFX(SErrorEntry)
 
+VECTOR_END(ExceptionHandlersStart)
 
 #undef  REG_PAIR
 #undef  REG_ONE
