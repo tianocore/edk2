@@ -1309,9 +1309,9 @@ ConfigSmmCodeAccessCheckOnCurrentProcessor (
   NewSmmFeatureControlMsr = SmmFeatureControlMsr;
   if (mSmmCodeAccessCheckEnable) {
     NewSmmFeatureControlMsr |= SMM_CODE_CHK_EN_BIT;
-  }
-  if (FeaturePcdGet (PcdCpuSmmFeatureControlMsrLock)) {
-    NewSmmFeatureControlMsr |= SMM_FEATURE_CONTROL_LOCK_BIT;
+    if (FeaturePcdGet (PcdCpuSmmFeatureControlMsrLock)) {
+      NewSmmFeatureControlMsr |= SMM_FEATURE_CONTROL_LOCK_BIT;
+    }
   }
 
   //
@@ -1354,13 +1354,6 @@ ConfigSmmCodeAccessCheck (
   //
   if ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0) {
     mSmmCodeAccessCheckEnable = FALSE;
-  }
-
-  //
-  // If the SMM Code Access Check feature is disabled and the Feature Control MSR
-  // is not being locked, then no additional work is required
-  //
-  if (!mSmmCodeAccessCheckEnable && !FeaturePcdGet (PcdCpuSmmFeatureControlMsrLock)) {
     return;
   }
 
