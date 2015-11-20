@@ -36,6 +36,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define  SMM_FEATURES_LIB_SMM_FEATURE_CONTROL      0x4E0
 
 //
+// MSRs required for configuration of SMM Code Access Check
+//
+#define SMM_FEATURES_LIB_IA32_MCA_CAP              0x17D
+#define   SMM_CODE_ACCESS_CHK_BIT                  BIT58
+
+//
 // Set default value to assume SMRR is not supported
 //
 BOOLEAN  mSmrrSupported = FALSE;
@@ -133,20 +139,6 @@ SmmCpuFeaturesLibConstructor (
 
   //
   // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
-  // Volume 3C, Section 35.10.1 MSRs in 4th Generation Intel(R) Core(TM)
-  // Processor Family
-  //
-  // If CPU Family/Model is 06_3C, 06_45, or 06_46 then use 4th Generation
-  // Intel(R) Core(TM) Processor Family MSRs
-  //
-  if (FamilyId == 0x06) {
-    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46) {
-      mSmmFeatureControlSupported = TRUE;
-    }
-  }
-
-  //
-  // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
   // Volume 3C, Section 34.4.2 SMRAM Caching
   //   An IA-32 processor does not automatically write back and invalidate its
   //   caches before entering SMM or before exiting SMM. Because of this behavior,
@@ -214,6 +206,10 @@ SmmCpuFeaturesInitializeProcessor (
 {
   SMRAM_SAVE_STATE_MAP  *CpuState;
   UINT64                FeatureControl;
+  UINT32                RegEax;
+  UINT32                RegEdx;
+  UINTN                 FamilyId;
+  UINTN                 ModelId;
 
   //
   // Configure SMBASE.
@@ -252,6 +248,36 @@ SmmCpuFeaturesInitializeProcessor (
     AsmWriteMsr64 (mSmrrPhysBaseMsr, CpuHotPlugData->SmrrBase | MTRR_CACHE_WRITE_BACK);
     AsmWriteMsr64 (mSmrrPhysMaskMsr, (~(CpuHotPlugData->SmrrSize - 1) & EFI_MSR_SMRR_MASK));
     mSmrrEnabled[CpuIndex] = FALSE;
+  }
+
+  //
+  // Retrieve CPU Family and Model
+  //
+  AsmCpuid (CPUID_VERSION_INFO, &RegEax, NULL, NULL, &RegEdx);
+  FamilyId = (RegEax >> 8) & 0xf;
+  ModelId  = (RegEax >> 4) & 0xf;
+  if (FamilyId == 0x06 || FamilyId == 0x0f) {
+    ModelId = ModelId | ((RegEax >> 12) & 0xf0);
+  }
+
+  //
+  // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+  // Volume 3C, Section 35.10.1 MSRs in 4th Generation Intel(R) Core(TM)
+  // Processor Family.
+  //
+  // If CPU Family/Model is 06_3C, 06_45, or 06_46 then use 4th Generation
+  // Intel(R) Core(TM) Processor Family MSRs.
+  //
+  if (FamilyId == 0x06) {
+    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46) {
+      //
+      // Check to see if the CPU supports the SMM Code Access Check feature
+      // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
+      //
+      if ((AsmReadMsr64 (SMM_FEATURES_LIB_IA32_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) != 0) {
+        mSmmFeatureControlSupported = TRUE;
+      }
+    }
   }
 }
 
