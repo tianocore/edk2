@@ -801,7 +801,7 @@ StartupAllAPs (
       goto Done;
     }
 
-    gBS->Stall (gPollInterval);
+    MicroSecondDelay (gPollInterval);
     mMpSystemData.Timeout -= gPollInterval;
   }
 
@@ -987,7 +987,7 @@ StartupThisAP (
       return EFI_TIMEOUT;
     }
 
-    gBS->Stall (gPollInterval);
+    MicroSecondDelay (gPollInterval);
     CpuData->Timeout -= gPollInterval;
   }
 
@@ -1755,7 +1755,7 @@ InitializeMpSupport (
     if (CheckAllAPsSleeping ()) {
       break;
     }
-    gBS->Stall (gPollInterval);
+    MicroSecondDelay (gPollInterval);
     Timeout += gPollInterval;
   } while (Timeout <= PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
   ASSERT (Timeout <= PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
