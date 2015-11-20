@@ -32,7 +32,7 @@ ArmV7DataCacheOperation (
 
   ArmV7AllDataCachesOperation (DataCacheOperation);
 
-  ArmDrainWriteBuffer ();
+  ArmDataSynchronizationBarrier ();
 
   if (SavedInterruptState) {
     ArmEnableInterrupts ();
@@ -45,7 +45,7 @@ ArmInvalidateDataCache (
   VOID
   )
 {
-  ArmDrainWriteBuffer ();
+  ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmInvalidateDataCacheEntryBySetWay);
 }
 
@@ -55,7 +55,7 @@ ArmCleanInvalidateDataCache (
   VOID
   )
 {
-  ArmDrainWriteBuffer ();
+  ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmCleanInvalidateDataCacheEntryBySetWay);
 }
 
@@ -65,6 +65,6 @@ ArmCleanDataCache (
   VOID
   )
 {
-  ArmDrainWriteBuffer ();
+  ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }

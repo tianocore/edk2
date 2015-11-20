@@ -393,12 +393,6 @@ ArmSetHighVectors (
 
 VOID
 EFIAPI
-ArmDrainWriteBuffer (
-  VOID
-  );
-
-VOID
-EFIAPI
 ArmDataMemoryBarrier (
   VOID
   );

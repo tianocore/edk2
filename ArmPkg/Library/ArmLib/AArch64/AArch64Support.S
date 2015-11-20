@@ -26,7 +26,6 @@ GCC_ASM_EXPORT (ArmCleanInvalidateDataCacheEntryByMVA)
 GCC_ASM_EXPORT (ArmInvalidateDataCacheEntryBySetWay)
 GCC_ASM_EXPORT (ArmCleanDataCacheEntryBySetWay)
 GCC_ASM_EXPORT (ArmCleanInvalidateDataCacheEntryBySetWay)
-GCC_ASM_EXPORT (ArmDrainWriteBuffer)
 GCC_ASM_EXPORT (ArmEnableMmu)
 GCC_ASM_EXPORT (ArmDisableMmu)
 GCC_ASM_EXPORT (ArmDisableCachesAndMmu)
@@ -364,7 +363,6 @@ ASM_PFX(ArmDataMemoryBarrier):
 
 
 ASM_PFX(ArmDataSynchronizationBarrier):
-ASM_PFX(ArmDrainWriteBuffer):
   dsb   sy
   ret
 

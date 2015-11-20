@@ -20,7 +20,6 @@
     EXPORT  ArmInvalidateDataCacheEntryBySetWay
     EXPORT  ArmCleanDataCacheEntryBySetWay
     EXPORT  ArmCleanInvalidateDataCacheEntryBySetWay
-    EXPORT  ArmDrainWriteBuffer
     EXPORT  ArmEnableMmu
     EXPORT  ArmDisableMmu
     EXPORT  ArmDisableCachesAndMmu
@@ -255,7 +254,6 @@ ArmDataMemoryBarrier
   bx      LR
 
 ArmDataSynchronizationBarrier
-ArmDrainWriteBuffer
   dsb
   bx      LR
 
