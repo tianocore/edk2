@@ -1,7 +1,7 @@
 /** @file
   This library class provides common serial I/O port functions.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -46,7 +46,7 @@ SerialPortInitialize (
 
   @retval 0                NumberOfBytes is 0.
   @retval >0               The number of bytes written to the serial device.  
-                           If this value is less than NumberOfBytes, then the read operation failed.
+                           If this value is less than NumberOfBytes, then the write operation failed.
 
 **/
 UINTN
