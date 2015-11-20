@@ -131,14 +131,6 @@
   #
   PlatformVarCleanupLib|Include/Library/PlatformVarCleanupLib.h
 
-  ## @libraryclass  Provides image decoding service.
-  #
-  ImageDecoderLib|Include/Library/ImageDecoderLib.h
-
-  ## @libraryclass  Provides interfaces about logo display.
-  #
-  BootLogoLib|Include/Library/BootLogoLib.h
-
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -456,9 +448,6 @@
 
   ## Include/Protocol/SmmReadyToBoot.h
   gEdkiiSmmReadyToBootProtocolGuid = { 0x6e057ecf, 0xfa99, 0x4f39, { 0x95, 0xbc, 0x59, 0xf9, 0x92, 0x1d, 0x17, 0xe4 } }
-
-  ## Include/Protocol/PlatformLogo.h
-  gEdkiiPlatformLogoProtocolGuid = { 0x9b517978, 0xeba1, 0x44e7, { 0xba, 0x65, 0x7c, 0x2c, 0xd0, 0x8b, 0xf8, 0xe9 } }
 
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]

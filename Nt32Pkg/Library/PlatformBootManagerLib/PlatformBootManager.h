@@ -15,11 +15,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _PLATFORM_BOOT_MANAGER_H
 
 #include <PiDxe.h>
+#include <IndustryStandard/Bmp.h>
 #include <Guid/WinNtSystemConfig.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/WinNtThunk.h>
 #include <Protocol/WinNtIo.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/GraphicsOutput.h>
+#include <Protocol/OEMBadging.h>
+#include <Protocol/BootLogo.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -35,7 +40,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DxeServicesLib.h>
-#include <Library/BootLogoLib.h>
 
 
 typedef struct {
