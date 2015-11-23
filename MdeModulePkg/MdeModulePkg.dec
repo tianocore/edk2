@@ -130,6 +130,10 @@
   ## @libraryclass  Provides services to get variable error flag and do platform variable cleanup.
   #
   PlatformVarCleanupLib|Include/Library/PlatformVarCleanupLib.h
+  
+  ## @libraryclass  Provides services to get do the file explorer.
+  #
+  FileExplorerLib|Include/Library/FileExplorerLib.h
 
   ## @libraryclass  Provides image decoding service.
   #
