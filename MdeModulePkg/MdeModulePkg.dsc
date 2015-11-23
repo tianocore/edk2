@@ -289,6 +289,7 @@
   MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
   MdeModulePkg/Library/PlatformVarCleanupLib/PlatformVarCleanupLib.inf
   MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  MdeModulePkg/Library/DxeFileExplorerProtocol/DxeFileExplorerProtocol.inf
 
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
