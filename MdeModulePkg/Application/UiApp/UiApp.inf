@@ -29,38 +29,14 @@
 
 [Sources]
   FrontPage.h
+  Language.h
+  String.h
   Ui.h
-  BootMngr/BootManager.h
-  BootMaint/BootMaint.h
-  BootMaint/FormGuid.h
-
-  DeviceMngr/DeviceManager.h
-  DeviceMngr/DeviceManagerVfr.Vfr
-  DeviceMngr/DeviceManagerStrings.uni
-  DeviceMngr/DeviceManager.c
-  BootMngr/BootManagerVfr.Vfr
-  BootMngr/BootManagerStrings.uni
-  BootMngr/BootManager.c
-  BootMaint/FE.vfr
-  BootMaint/FileExplorer.c
-  BootMaint/BootMaint.c
-  BootMaint/UpdatePage.c
-  BootMaint/Variable.c
-  BootMaint/Data.c
-  BootMaint/ConsoleOption.c
-  BootMaint/BootOption.c
-  BootMaint/BmLib.c
-  BootMaint/Bm.vfr
-  BootMaint/Bmstring.uni
   FrontPageVfr.Vfr
   FrontPageStrings.uni
-  Strings.uni
   FrontPage.c
   String.c
-  String.h
   Language.c
-  Language.h
-  FormsetGuid.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -69,7 +45,6 @@
 [LibraryClasses]
   DevicePathLib
   BaseLib
-  HobLib
   UefiRuntimeServicesTableLib
   ReportStatusCodeLib
   MemoryAllocationLib
@@ -85,67 +60,26 @@
   UefiBootManagerLib
   
 [Guids]
-  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"PlatformLang" (Platform supported languange in Rfc4646 format)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"Lang" (Platform supported languange in Iso639 format)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"KeyXX" (Hotkey option variable)
-                                                ## PRODUCES           ## Variable:L"HwErrRecSupport" (The level of platform supported hardware Error Record Persistence)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOptionSupport" (The feature supported in boot option menu, value could be: EFI_BOOT_OPTION_SUPPORT_KEY, EFI_BOOT_OPTION_SUPPORT_APP
-                                                ## SOMETIMES_PRODUCES (not PcdUefiVariableDefaultLangDeprecate)## Variable:L"LangCodes" (Value of PcdUefiVariableDefaultLangCodes)
-                                                ## PRODUCES           ## Variable:L"PlatformLangCodes" (Value of PcdUefiVariableDefaultPlatformLangCodes)
-                                                ## PRODUCES           ## Variable:L"Timeout" (The time out value in second of showing progress bar)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOrder" (The boot option array)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"DriverOrder" (The driver order list)
-                                                ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
-                                                ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
-                                                ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
-  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
-  gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
-  gEfiHiiPlatformSetupFormsetGuid               ## CONSUMES ## GUID (Indicate the formset class guid to be displayed)
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
-  gEfiHiiDriverHealthFormsetGuid                ## CONSUMES ## GUID (Indicate the Driver Health formset class guid to be displayed)
-  gEfiIfrBootMaintenanceGuid                    ## CONSUMES ## GUID
-  
+  gEfiIfrFrontPageGuid                          ## CONSUMES ## GUID
+
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
-  gEfiLoadFileProtocolGuid                      ## CONSUMES
   gEfiSmbiosProtocolGuid                        ## CONSUMES
-  gEfiGenericMemTestProtocolGuid                ## CONSUMES
-  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport ## SOMETIMES_CONSUMES
-  gEfiBlockIoProtocolGuid                       ## CONSUMES
-  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
-  gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
   gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
-  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
-  gEfiSerialIoProtocolGuid                      ## CONSUMES
-  gEfiDevicePathProtocolGuid                    ## CONSUMES
-  gEfiPciIoProtocolGuid                         ## CONSUMES
-  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
-  gEfiBootLogoProtocolGuid                      ## CONSUMES
-  gEfiLoadedImageDevicePathProtocolGuid         ## CONSUMES
 
 [FeaturePcd]
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes  ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow                       ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn                    ## PRODUCES
-  ## CONSUMES
-  ## PRODUCES
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution       ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution         ## PRODUCES
-  ## CONSUMES
-  ## SOMETIMES_PRODUCES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn
-  ## CONSUMES
-  ## SOMETIMES_PRODUCES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn               ## CONSUMES ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow                  ## CONSUMES ## SOMETIMES_PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString           ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
-  UiAppExtra.uni
+  UiFrontPageAppExtra.uni

@@ -65,16 +65,4 @@ UninitializeStringSupport (
   VOID
   );
 
-/**
-  Call the browser and display the front page
-
-  @return   Status code that will be returned by
-            EFI_FORM_BROWSER2_PROTOCOL.SendForm ().
-
-**/
-EFI_STATUS
-CallFrontPage (
-  VOID
-  );
-
 #endif // _STRING_H_

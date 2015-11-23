@@ -16,12 +16,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Language.h"
 #define MAX_STRING_LEN        200
 
-EFI_GUID  mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
+EFI_GUID   mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
 
 BOOLEAN   gConnectAllHappened = FALSE;
 BOOLEAN   mFeaturerSwitch = TRUE;
 BOOLEAN   mResetRequired  = FALSE;
-BOOLEAN   mEnterBmm       = FALSE;
 
 EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
 CHAR8     *mLanguageString;
@@ -153,14 +152,7 @@ FakeRouteConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Progress = Configuration;
-  if (!HiiIsConfigHdrMatch (Configuration, &mBootMaintGuid, mBootMaintStorageName)
-      && !HiiIsConfigHdrMatch (Configuration, &mFileExplorerGuid, mFileExplorerStorageName)) {
-    return EFI_NOT_FOUND;
-  }
-
-  *Progress = Configuration + StrLen (Configuration);
-  return EFI_SUCCESS;
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -381,17 +373,7 @@ FrontPageCallback (
   UINTN                         Index;
   EFI_STATUS                    Status;
 
-  //
-  //Chech whether exit from BMM and reenter frontpage,if yes,reclaim string depositories
-  //
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN){
-    if (mEnterBmm){
-      ReclaimStringDepository();
-      mEnterBmm = FALSE;
-    }
-  }
-
-  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
+  if (Action != EFI_BROWSER_ACTION_CHANGED) {
     //
     // Do nothing for other UEFI Action. Only do call back when data is changed.
     //
@@ -452,45 +434,160 @@ FrontPageCallback (
     default:
       break;
     }
-  } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    if (Value == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // The first 4 entries in the Front Page are to be GUARANTEED to remain constant so IHV's can
-    // describe to their customers in documentation how to find their setup information (namely
-    // under the device manager and specific buckets)
-    //
-    switch (QuestionId) {
-    case FRONT_PAGE_KEY_BOOT_MANAGER:
-      //
-      // Boot Manager
-      //
-      EnumerateBootOptions ();
-      break;
-
-    case FRONT_PAGE_KEY_DEVICE_MANAGER:
-      //
-      // Device Manager
-      //
-      CreateDeviceManagerForm(DEVICE_MANAGER_FORM_ID);
-      break;
-
-    case FRONT_PAGE_KEY_BOOT_MAINTAIN:
-      //
-      // Boot Maintenance Manager
-      //
-      InitializeBM ();
-      mEnterBmm  = TRUE;
-      break;
-
-    default:
-      break;
-    }
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+Update front page form base on the ClassGuid in the formset in other modules.
+
+**/
+VOID
+UpdateFrontPageForm (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HII_HANDLE              HiiHandle;
+  VOID                        *StartOpCodeHandle;
+  VOID                        *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL          *StartLabel;
+  EFI_IFR_GUID_LABEL          *EndLabel;
+  UINTN                       Index;
+  EFI_STRING                  String;
+  EFI_STRING_ID               Token;
+  EFI_STRING_ID               TokenHelp;
+  EFI_HII_HANDLE              *HiiHandles;
+  EFI_GUID                    FormSetGuid;
+  CHAR16                      *DevicePathStr;
+  EFI_STRING_ID               DevicePathId;
+  EFI_IFR_FORM_SET            *Buffer;
+  UINTN                       BufferSize;
+  UINT8                       ClassGuidNum;
+  EFI_GUID                    *ClassGuid;
+  UINTN                       TempSize;
+  UINT8                       *Ptr;
+
+  TempSize =0;
+  BufferSize = 0;
+  Buffer = NULL;
+
+  HiiHandle = gFrontPagePrivate.HiiHandle;
+
+  //
+  // Allocate space for creation of UpdateData Buffer
+  //
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
+
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number       = LABEL_PLATFORM_INFORMATION;
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = LABEL_END;
+
+  //
+  // Get all the Hii handles
+  //
+  HiiHandles = HiiGetHiiHandles (NULL);
+  ASSERT (HiiHandles != NULL);
+  //
+  // Search for formset of each class type
+  //
+  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+    Status = HiiGetFormSetFromHiiHandle(HiiHandles[Index], &Buffer,&BufferSize);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    Ptr = (UINT8 *)Buffer;
+    while(TempSize < BufferSize)  {
+      TempSize += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
+
+      if (((EFI_IFR_OP_HEADER *) Ptr)->Length <= OFFSET_OF (EFI_IFR_FORM_SET, Flags)){
+        Ptr += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
+        continue;
+      }
+
+      //
+      // Find Class Guid
+      //
+      ClassGuidNum = (UINT8) (((EFI_IFR_FORM_SET *)Ptr)->Flags & 0x3);
+      ClassGuid = (EFI_GUID *) (VOID *)(Ptr + sizeof (EFI_IFR_FORM_SET));
+      while (ClassGuidNum-- > 0) {
+        if (CompareGuid (&gEfiIfrFrontPageGuid, ClassGuid) == 0){
+          ClassGuid ++;
+          continue;
+        }
+
+        String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->FormSetTitle, NULL);
+        if (String == NULL) {
+          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+          ASSERT (String != NULL);
+        }
+        Token = HiiSetString (HiiHandle, 0, String, NULL);
+        FreePool (String);
+
+        String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->Help, NULL);
+
+        if (String == NULL) {
+          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+          ASSERT (String != NULL);
+        }
+        TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
+        FreePool (String);
+
+        FormSetGuid = ((EFI_IFR_FORM_SET *)Ptr)->Guid;
+
+        DevicePathStr = ExtractDevicePathFromHiiHandle(HiiHandles[Index]);
+        DevicePathId  = 0;
+        if (DevicePathStr != NULL){
+          DevicePathId = HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
+          FreePool (DevicePathStr);
+        }
+        HiiCreateGotoExOpCode (
+          StartOpCodeHandle,
+          0,
+          Token,
+          TokenHelp,
+          0,
+          (EFI_QUESTION_ID) (Index + FRONT_PAGE_KEY_OFFSET),
+          0,
+          &FormSetGuid,
+          DevicePathId
+        );
+        break;
+      }
+      Ptr += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
+    }
+
+    FreePool(Buffer);
+    Buffer = NULL;
+    TempSize = 0;
+    BufferSize = 0;
+  }
+
+  HiiUpdateForm (
+    HiiHandle,
+    &mFrontPageGuid,
+    FRONT_PAGE_FORM_ID,
+    StartOpCodeHandle,
+    EndOpCodeHandle
+    );
+
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
+  FreePool (HiiHandles);
 }
 
 /**
@@ -507,7 +604,6 @@ InitializeFrontPage (
   )
 {
   EFI_STATUS                  Status;
-
   //
   // Locate Hii relative protocols
   //
@@ -551,6 +647,11 @@ InitializeFrontPage (
   // Initialize laguage options
   //
   InitializeLanguage ();
+
+  //
+  //Updata Front Page form
+  //
+  UpdateFrontPageForm();
 
   return Status;
 }
@@ -1208,15 +1309,9 @@ UiEntry (
   }
 
   InitializeFrontPage ();
-  InitializeDeviceManager ();
-  InitializeBootManager ();
-  InitBootMaintenance();
 
   CallFrontPage ();
 
-  FreeBMPackage ();
-  FreeBootManager ();
-  FreeDeviceManager ();
   FreeFrontPage ();
 
   if (mLanguageString != NULL) {
@@ -1246,10 +1341,7 @@ ExtractDevicePathFromHiiHandle (
 {
   EFI_STATUS                       Status;
   EFI_HANDLE                       DriverHandle;
-  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;  
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *PathToText;
-  CHAR16                           *NewString;
-
+  
   ASSERT (Handle != NULL);
 
   if (Handle == NULL) {
@@ -1257,174 +1349,12 @@ ExtractDevicePathFromHiiHandle (
   }
 
   Status = gHiiDatabase->GetPackageListHandle (gHiiDatabase, Handle, &DriverHandle);
- if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  //
-  // Get the device path by the got Driver handle .
-  //
-  Status = gBS->HandleProtocol (DriverHandle, &gEfiDevicePathProtocolGuid, (VOID **) &DevicePath);
-  if (EFI_ERROR (Status)) {
-    return NULL;
- }
-
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &PathToText
-                  );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  //
-  // Get device path string.
-  //
-  NewString = PathToText->ConvertDevicePathToText(DevicePath, FALSE, FALSE);
+ return ConvertDevicePathToText(DevicePathFromHandle (DriverHandle), FALSE, FALSE);
 
-  return NewString;
-}
-
-/**
-  Extract the displayed formset for given HII handle and class guid.
-
-  @param Handle          The HII handle.
-  @param SetupClassGuid  The class guid specifies which form set will be displayed.
-  @param SkipCount       Skip some formsets which has processed before.
-  @param FormSetTitle    Formset title string.
-  @param FormSetHelp     Formset help string.
-  @param FormSetGuid     Formset Guid.
-
-  @retval  TRUE          The formset for given HII handle will be displayed.
-  @return  FALSE         The formset for given HII handle will not be displayed.
-
-**/
-BOOLEAN
-ExtractDisplayedHiiFormFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle,
-  IN      EFI_GUID            *SetupClassGuid,
-  IN      UINTN               SkipCount,
-  OUT     EFI_STRING_ID       *FormSetTitle,
-  OUT     EFI_STRING_ID       *FormSetHelp,
-  OUT     EFI_GUID            *FormSetGuid
-  )
-{
-  EFI_STATUS                   Status;
-  UINTN                        BufferSize;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINT8                        *Package;
-  UINT8                        *OpCodeData;
-  UINT32                       Offset;
-  UINT32                       Offset2;
-  UINT32                       PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PackageHeader;
-  EFI_GUID                     *ClassGuid;
-  UINT8                        ClassGuidNum;
-  BOOLEAN                      FoundAndSkip;
-
-  ASSERT (Handle != NULL);
-  ASSERT (SetupClassGuid != NULL && FormSetTitle != NULL && FormSetHelp != NULL && FormSetGuid != NULL);
-
-  *FormSetTitle = 0;
-  *FormSetHelp  = 0;
-  ClassGuidNum  = 0;
-  ClassGuid     = NULL;
-  FoundAndSkip  = FALSE;
-
-  //
-  // Get HII PackageList
-  //
-  BufferSize = 0;
-  HiiPackageList = NULL;
-  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  //
-  // Handle is a invalid handle. Check if Handle is corrupted.
-  //
-  ASSERT (Status != EFI_NOT_FOUND);
-  //
-  // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
-  //
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-  
-  HiiPackageList = AllocatePool (BufferSize);
-  ASSERT (HiiPackageList != NULL);
-
-  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  //
-  // Get Form package from this HII package List
-  //
-  Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  PackageListLength = ReadUnaligned32 (&HiiPackageList->PackageLength);
-
-  while (Offset < PackageListLength) {
-    Package = ((UINT8 *) HiiPackageList) + Offset;
-    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-    Offset += PackageHeader.Length;
-
-    if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
-      //
-      // Search FormSet Opcode in this Form Package
-      //
-      Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
-      while (Offset2 < PackageHeader.Length) {
-        OpCodeData = Package + Offset2;
-        Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-
-        if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
-          if (((EFI_IFR_OP_HEADER *) OpCodeData)->Length > OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
-            //
-            // Find FormSet OpCode
-            //
-            ClassGuidNum = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
-            ClassGuid = (EFI_GUID *) (VOID *)(OpCodeData + sizeof (EFI_IFR_FORM_SET));
-            while (ClassGuidNum-- > 0) {
-              if (CompareGuid (SetupClassGuid, ClassGuid)) {
-                //
-                // Check whether need to skip the formset.
-                //
-                if (SkipCount != 0) {
-                  SkipCount--;
-                  FoundAndSkip = TRUE;
-                  break;
-                }
-                CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
-                CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
-                CopyGuid (FormSetGuid, (CONST EFI_GUID *)(&((EFI_IFR_FORM_SET *) OpCodeData)->Guid));
-                FreePool (HiiPackageList);
-                return TRUE;
-              }
-              ClassGuid ++;
-            }
-            if (FoundAndSkip) {
-              break;
-            }
-           } else if (CompareGuid (SetupClassGuid, &gEfiHiiPlatformSetupFormsetGuid)) {
-             //
-             //  Check whether need to skip the formset.
-             //
-             if (SkipCount != 0) {
-               SkipCount--;
-               break;
-             }
-             CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
-             CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
-             CopyGuid (FormSetGuid, (CONST EFI_GUID *)(&((EFI_IFR_FORM_SET *) OpCodeData)->Guid));
-             FreePool (HiiPackageList);
-             return TRUE;
-          }
-        }
-      }
-    }
-  }
-
-  FreePool (HiiPackageList);
-
-  return FALSE;
 }
 
 //
@@ -1566,39 +1496,3 @@ SetupResetReminder (
   }
 }
 
-
-/**
-  This function converts an input device structure to a Unicode string.
-
-  @param DevPath                  A pointer to the device path structure.
-
-  @return A new allocated Unicode string that represents the device path.
-
-**/
-CHAR16 *
-UiDevicePathToStr (
-  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
-  )
-{
-  EFI_STATUS                       Status;
-  CHAR16                           *ToText;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
-
-  if (DevPath == NULL) {
-    return NULL;
-  }
-
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &DevPathToText
-                  );
-  ASSERT_EFI_ERROR (Status);
-  ToText = DevPathToText->ConvertDevicePathToText (
-                            DevPath,
-                            FALSE,
-                            TRUE
-                            );
-  ASSERT (ToText != NULL);
-  return ToText;
-}
