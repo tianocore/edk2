@@ -145,6 +145,8 @@ BootLogoEnableLogo (
   NewHeight = 0;
   NewWidth = 0;
   Instance = 0;
+  DestX = 0;
+  DestY = 0;
   while (TRUE) {
     ImageData = NULL;
     ImageSize = 0;
