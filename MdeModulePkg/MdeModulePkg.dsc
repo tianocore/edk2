@@ -375,6 +375,10 @@
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
   
   MdeModulePkg/Universal/PropertiesTableAttributesDxe/PropertiesTableAttributesDxe.inf
+  MdeModulePkg/Universal/FileExplorerDxe/FileExplorerDxe.inf  {
+    <LibraryClasses>
+      FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  }
 
 [Components.IA32, Components.X64, Components.IPF]  
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
