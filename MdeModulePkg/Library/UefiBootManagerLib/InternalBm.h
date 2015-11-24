@@ -245,11 +245,16 @@ BmGetImageHeader (
 
 /**
   This routine adjust the memory information for different memory type and 
-  save them into the variables for next boot.
+  save them into the variables for next boot. It resets the system when
+  memory information is updated and the current boot option belongs to
+  boot category instead of application category.
+
+  @param Boot  TRUE if current boot option belongs to boot category instead of
+               application category.
 **/
 VOID
 BmSetMemoryTypeInformationVariable (
-  VOID
+  IN BOOLEAN                    Boot
   );
 
 /**
