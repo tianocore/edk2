@@ -148,7 +148,7 @@ FillTranslationTable (
   UINT32  *SectionEntry;
   UINT32  Attributes;
   UINT32  PhysicalBase;
-  UINT32  RemainLength;
+  UINT64  RemainLength;
 
   ASSERT(MemoryRegion->Length > 0);
 
