@@ -716,6 +716,7 @@ WriteSections32 (
             // break skipped
 
           case R_ARM_PC24:
+          case R_ARM_REL32:
           case R_ARM_XPC25:
           case R_ARM_THM_PC22:
           case R_ARM_THM_JUMP19:
@@ -844,6 +845,7 @@ WriteRelocations32 (
               // break skipped
 
             case R_ARM_PC24:
+            case R_ARM_REL32:
             case R_ARM_XPC25:
             case R_ARM_THM_PC22:
             case R_ARM_THM_JUMP19:
