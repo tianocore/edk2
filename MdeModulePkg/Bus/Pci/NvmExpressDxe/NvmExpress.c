@@ -847,6 +847,10 @@ Exit:
     PciIo->FreeBuffer (PciIo, 4, Private->Buffer);
   }
 
+  if ((Private != NULL) && (Private->ControllerData != NULL)) {
+    FreePool (Private->ControllerData);
+  }
+
   if (Private != NULL) {
     FreePool (Private);
   }
