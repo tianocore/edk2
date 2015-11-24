@@ -770,7 +770,6 @@ NvmExpressDriverBindingStart (
     }
 
     Private->BufferPciAddr = (UINT8 *)(UINTN)MappedAddr;
-    ZeroMem (Private->Buffer, EFI_PAGES_TO_SIZE (4));
 
     Private->Signature = NVME_CONTROLLER_PRIVATE_DATA_SIGNATURE;
     Private->ControllerHandle          = Controller;

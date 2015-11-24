@@ -844,6 +844,12 @@ NvmeControllerInit (
 
   Private->Cid[0] = 0;
   Private->Cid[1] = 0;
+  Private->Pt[0]  = 0;
+  Private->Pt[1]  = 0;
+  Private->SqTdbl[0].Sqt = 0;
+  Private->SqTdbl[1].Sqt = 0;
+  Private->CqHdbl[0].Cqh = 0;
+  Private->CqHdbl[1].Cqh = 0;
 
   Status = NvmeDisableController (Private);
 
@@ -872,6 +878,7 @@ NvmeControllerInit (
   //
   // Address of I/O submission & completion queue.
   //
+  ZeroMem (Private->Buffer, EFI_PAGES_TO_SIZE (4));
   Private->SqBuffer[0]        = (NVME_SQ *)(UINTN)(Private->Buffer);
   Private->SqBufferPciAddr[0] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr);
   Private->CqBuffer[0]        = (NVME_CQ *)(UINTN)(Private->Buffer + 1 * EFI_PAGE_SIZE);
@@ -924,10 +931,12 @@ NvmeControllerInit (
   //
   // Allocate buffer for Identify Controller data
   //
-  Private->ControllerData = (NVME_ADMIN_CONTROLLER_DATA *)AllocateZeroPool (sizeof(NVME_ADMIN_CONTROLLER_DATA));
-
   if (Private->ControllerData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Private->ControllerData = (NVME_ADMIN_CONTROLLER_DATA *)AllocateZeroPool (sizeof(NVME_ADMIN_CONTROLLER_DATA));
+    
+    if (Private->ControllerData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   //
