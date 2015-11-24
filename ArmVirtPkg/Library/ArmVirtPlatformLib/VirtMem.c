@@ -97,7 +97,9 @@ ArmPlatformGetVirtualMemoryMap (
   // Peripheral space after DRAM
   VirtualMemoryTable[2].PhysicalBase = VirtualMemoryTable[0].Length + VirtualMemoryTable[1].Length;
   VirtualMemoryTable[2].VirtualBase  = VirtualMemoryTable[2].PhysicalBase;
-  VirtualMemoryTable[2].Length       = ArmGetPhysAddrTop () - VirtualMemoryTable[2].PhysicalBase;
+  VirtualMemoryTable[2].Length       = MIN (1ULL << FixedPcdGet8 (PcdPrePiCpuMemorySize),
+                                         ArmGetPhysAddrTop ()) -
+                                       VirtualMemoryTable[2].PhysicalBase;
   VirtualMemoryTable[2].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // Remap the FD region as normal executable memory
