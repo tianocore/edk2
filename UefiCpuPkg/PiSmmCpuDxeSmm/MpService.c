@@ -412,15 +412,9 @@ BSPHandler (
   AcquireSpinLockOrFail (&mSmmMpSyncData->CpuData[CpuIndex].Busy);
 
   //
-  // Restore SMM Configuration in S3 boot path.
+  // Perform the pre tasks
   //
-  if (mRestoreSmmConfigurationInS3) {
-    //
-    // Configure SMM Code Access Check feature if available.
-    //
-    ConfigSmmCodeAccessCheck ();
-    mRestoreSmmConfigurationInS3 = FALSE;
-  }
+  PerformPreTasks ();
 
   //
   // Invoke SMM Foundation EntryPoint with the processor information context.
