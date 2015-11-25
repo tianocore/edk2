@@ -24,7 +24,6 @@ ASM_GLOBAL  ASM_PFX(gcSmiHandlerSize)
 ASM_GLOBAL  ASM_PFX(gSmiCr3)
 ASM_GLOBAL  ASM_PFX(gSmiStack)
 ASM_GLOBAL  ASM_PFX(gSmbase)
-ASM_GLOBAL  ASM_PFX(FeaturePcdGet (PcdCpuSmmDebug))
 ASM_GLOBAL  ASM_PFX(gSmiHandlerIdtr)
 
 #
@@ -163,20 +162,7 @@ LongMode:                               # long mode (64-bit code) starts here
 #   jmp     _SmiHandler                 ; instruction is not needed
 
 _SmiHandler:
-    movabsq $ASM_PFX(FeaturePcdGet (PcdCpuSmmDebug)), %rax
-    cmpb    $0, (%rax)
-    jz      L1
-
-    .byte   0x48, 0x8b, 0x0d            # mov rcx, [rip + disp32]
-    .long   SSM_DR6 - (. + 4 - _SmiEntryPoint + 0x8000)
-    .byte   0x48, 0x8b, 0x15            # mov rdx, [rip + disp32]
-    .long   SSM_DR7 - (. + 4 - _SmiEntryPoint + 0x8000)
-    movq    %rcx, %dr6
-    movq    %rdx, %dr7
-L1:
-
-    movabsq $ASM_PFX(SmiRendezvous), %rax
-    movq    (%rsp), %rcx
+    movq    (%rsp), %rbx
     # Save FP registers
 
     subq    $0x208, %rsp
@@ -184,7 +170,19 @@ L1:
     fxsave  (%rsp)
 
     addq    $-0x20, %rsp
+
+    movq    %rbx, %rcx
+    movabsq $ASM_PFX(CpuSmmDebugEntry), %rax
     call    *%rax
+
+    movq    %rbx, %rcx
+    movabsq $ASM_PFX(SmiRendezvous), %rax
+    call    *%rax
+
+    movq    %rbx, %rcx
+    movabsq $ASM_PFX(CpuSmmDebugExit), %rax
+    call    *%rax
+
     addq    $0x20, %rsp
 
     #
@@ -193,17 +191,6 @@ L1:
     .byte   0x48                        # FXRSTOR64
     fxrstor (%rsp)
 
-    movabsq $ASM_PFX(FeaturePcdGet (PcdCpuSmmDebug)), %rax
-    cmpb    $0, (%rax)
-    jz      L2
-
-    movq    %dr7, %rdx
-    movq    %dr6, %rcx
-    .byte   0x48, 0x89, 0x15            # mov [rip + disp32], rdx
-    .long   SSM_DR7 - (. + 4 - _SmiEntryPoint + 0x8000)
-    .byte   0x48, 0x89, 0x0d            # mov [rip + disp32], rcx
-    .long   SSM_DR6 - (. + 4 - _SmiEntryPoint + 0x8000)
-L2:
     rsm
 
 ASM_PFX(gcSmiHandlerSize):    .word      . - _SmiEntryPoint

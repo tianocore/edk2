@@ -22,12 +22,13 @@
 ; Variables referenced by C code
 ;
 EXTERNDEF   SmiRendezvous:PROC
+EXTERNDEF   CpuSmmDebugEntry:PROC
+EXTERNDEF   CpuSmmDebugExit:PROC
 EXTERNDEF   gcSmiHandlerTemplate:BYTE
 EXTERNDEF   gcSmiHandlerSize:WORD
 EXTERNDEF   gSmiCr3:DWORD
 EXTERNDEF   gSmiStack:DWORD
 EXTERNDEF   gSmbase:DWORD
-EXTERNDEF   FeaturePcdGet (PcdCpuSmmDebug):BYTE
 EXTERNDEF   gSmiHandlerIdtr:FWORD
 
 
@@ -157,26 +158,7 @@ Base:
 ;   jmp     _SmiHandler                 ; instruction is not needed
 
 _SmiHandler:
-;
-; The following lines restore DR6 & DR7 before running C code. They are useful
-; when you want to enable hardware breakpoints in SMM.
-;
-; NOTE: These lines might not be appreciated in runtime since they might
-;       conflict with OS debugging facilities. Turn them off in RELEASE.
-;
-    mov     rax, offset FeaturePcdGet (PcdCpuSmmDebug) ;Get absolute address. Avoid RIP relative addressing
-    cmp     byte ptr [rax], 0
-    jz      @1
-
-    DB      48h, 8bh, 0dh               ; mov rcx, [rip + disp32]
-    DD      SSM_DR6 - ($ + 4 - _SmiEntryPoint + 8000h)
-    DB      48h, 8bh, 15h               ; mov rdx, [rip + disp32]
-    DD      SSM_DR7 - ($ + 4 - _SmiEntryPoint + 8000h)
-    mov     dr6, rcx
-    mov     dr7, rdx
-@1:
-    mov     rcx, [rsp]                  ; rcx <- CpuIndex
-    mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
+    mov     rbx, [rsp]                  ; rbx <- CpuIndex
 
     ;
     ; Save FP registers
@@ -186,7 +168,19 @@ _SmiHandler:
     fxsave  [rsp]
 
     add     rsp, -20h
+
+    mov     rcx, rbx
+    mov     rax, CpuSmmDebugEntry
     call    rax
+    
+    mov     rcx, rbx
+    mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
+    call    rax
+    
+    mov     rcx, rbx
+    mov     rax, CpuSmmDebugExit
+    call    rax
+    
     add     rsp, 20h
 
     ;
@@ -195,17 +189,6 @@ _SmiHandler:
     DB      48h                         ; FXRSTOR64
     fxrstor [rsp]
 
-    mov     rax, offset FeaturePcdGet (PcdCpuSmmDebug) ;Get absolute address. Avoid RIP relative addressing
-    cmp     byte ptr [rax], 0
-    jz      @2
-
-    mov     rdx, dr7
-    mov     rcx, dr6
-    DB      48h, 89h, 15h               ; mov [rip + disp32], rdx
-    DD      SSM_DR7 - ($ + 4 - _SmiEntryPoint + 8000h)
-    DB      48h, 89h, 0dh               ; mov [rip + disp32], rcx
-    DD      SSM_DR6 - ($ + 4 - _SmiEntryPoint + 8000h)
-@2:
     rsm
 
 gcSmiHandlerSize    DW      $ - _SmiEntryPoint
