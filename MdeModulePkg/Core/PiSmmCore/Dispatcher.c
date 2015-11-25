@@ -103,7 +103,8 @@ BOOLEAN  gRequestDispatch = FALSE;
 //
 EFI_FV_FILETYPE mSmmFileTypes[] = {
   EFI_FV_FILETYPE_SMM,
-  EFI_FV_FILETYPE_COMBINED_SMM_DXE
+  EFI_FV_FILETYPE_COMBINED_SMM_DXE,
+  EFI_FV_FILETYPE_SMM_CORE,
   //
   // Note: DXE core will process the FV image file, so skip it in SMM core
   // EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
@@ -1283,6 +1284,7 @@ SmmDriverDispatchHandler (
     //
     // Discover Drivers in FV and add them to the Discovered Driver List.
     // Process EFI_FV_FILETYPE_SMM type and then EFI_FV_FILETYPE_COMBINED_SMM_DXE
+    //  EFI_FV_FILETYPE_SMM_CORE is processed to produce a Loaded Image protocol for the core
     //
     for (SmmTypeIndex = 0; SmmTypeIndex < sizeof (mSmmFileTypes)/sizeof (EFI_FV_FILETYPE); SmmTypeIndex++) {
       //
@@ -1300,7 +1302,34 @@ SmmDriverDispatchHandler (
                                   &Size
                                   );
         if (!EFI_ERROR (GetNextFileStatus)) {
-          SmmAddToDriverList (Fv, FvHandle, &NameGuid);
+          if (Type == EFI_FV_FILETYPE_SMM_CORE) {
+            //
+            // If this is the SMM core fill in it's DevicePath & DeviceHandle
+            //
+            if (mSmmCoreLoadedImage->FilePath == NULL) {
+              //
+              // Maybe one special FV contains only one SMM_CORE module, so its device path must
+              // be initialized completely.
+              //
+              EfiInitializeFwVolDevicepathNode (&mFvDevicePath.File, &NameGuid);
+              SetDevicePathEndNode (&mFvDevicePath.End);
+
+              //
+              // Make an EfiBootServicesData buffer copy of FilePath
+              //
+              Status = gBS->AllocatePool (
+                              EfiBootServicesData,
+                              GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath),
+                              (VOID **)&mSmmCoreLoadedImage->FilePath
+                              );
+              ASSERT_EFI_ERROR (Status);
+              CopyMem (mSmmCoreLoadedImage->FilePath, &mFvDevicePath, GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath));
+
+              mSmmCoreLoadedImage->DeviceHandle = FvHandle;
+            }
+          } else {
+            SmmAddToDriverList (Fv, FvHandle, &NameGuid);
+          }
         }
       } while (!EFI_ERROR (GetNextFileStatus));
     }

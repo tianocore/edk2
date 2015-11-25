@@ -959,6 +959,8 @@ SmramProfileReadyToLock (
 extern UINTN                    mFullSmramRangeCount;
 extern EFI_SMRAM_DESCRIPTOR     *mFullSmramRanges;
 
+extern EFI_LOADED_IMAGE_PROTOCOL  *mSmmCoreLoadedImage;
+
 //
 // Page management
 //
