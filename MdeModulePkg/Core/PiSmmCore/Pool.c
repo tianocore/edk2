@@ -1,7 +1,7 @@
 /** @file
   SMM Memory pool management functions.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -120,6 +120,7 @@ InternalAllocPoolByIndex (
 
   ASSERT (PoolIndex <= MAX_POOL_INDEX);
   Status = EFI_SUCCESS;
+  Hdr = NULL;
   if (PoolIndex == MAX_POOL_INDEX) {
     Status = SmmInternalAllocatePages (AllocateAnyPages, EfiRuntimeServicesData, EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1), &Address);
     if (EFI_ERROR (Status)) {
@@ -228,7 +229,9 @@ SmmInternalAllocatePool (
   }
 
   Status = InternalAllocPoolByIndex (PoolIndex, &FreePoolHdr);
-  *Buffer = &FreePoolHdr->Header + 1;
+  if (!EFI_ERROR(Status)) {
+    *Buffer = &FreePoolHdr->Header + 1;
+  }
   return Status;
 }
 
