@@ -124,6 +124,7 @@ typedef struct {
 // PEI CPU MP Data save in memory
 //
 struct _PEI_CPU_MP_DATA {
+  SPIN_LOCK                      MpLock;
   UINT32                         CpuCount;
   UINT32                         BspNumber;
   UINTN                          Buffer;
@@ -137,6 +138,7 @@ struct _PEI_CPU_MP_DATA {
   volatile UINT32                FinishedCount;
   BOOLEAN                        EndOfPeiFlag;
   BOOLEAN                        InitFlag;
+  BOOLEAN                        X2ApicEnable;
   CPU_EXCHANGE_ROLE_INFO         BSPInfo;
   CPU_EXCHANGE_ROLE_INFO         APInfo;
   MTRR_SETTINGS                  MtrrTable;
