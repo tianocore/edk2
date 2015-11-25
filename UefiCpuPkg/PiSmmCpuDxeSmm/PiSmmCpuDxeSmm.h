@@ -428,6 +428,21 @@ InitializeIDTSmmStackGuard (
   );
 
 /**
+  Initialize Gdt for all processors.
+  
+  @param[in]   Cr3          CR3 value.
+  @param[out]  GdtStepSize  The step size for GDT table.
+
+  @return GdtBase for processor 0.
+          GdtBase for processor X is: GdtBase + (GdtStepSize * X)
+**/
+VOID *
+InitGdt (
+  IN  UINTN  Cr3,
+  OUT UINTN  *GdtStepSize
+  );
+
+/**
 
   Register the SMM Foundation entry point.
 

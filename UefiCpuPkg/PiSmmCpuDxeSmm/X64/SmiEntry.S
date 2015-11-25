@@ -128,14 +128,6 @@ ASM_PFX(gSmiCr3):    .space  4
     sgdt    (%rsp)
     movl    2(%rsp), %eax               # eax = GDT base
     addl    $8, %esp
-    movl    %eax, %edx
-    addl    $GDT_SIZE, %edx
-    movb    %dl, (TSS_SEGMENT + 2)(%rax)
-    movb    %dh, (TSS_SEGMENT + 3)(%rax)
-    .byte   0xc1, 0xea, 0x10             # shr     edx, 16
-    movb    %dl, (TSS_SEGMENT + 4)(%rax)
-    movb    %dh, (TSS_SEGMENT + 7)(%rax)
-    movl    %eax, %edx
     movb    $0x89, %dl
     movb    %dl, (TSS_SEGMENT + 5)(%rax) # clear busy flag
     movl    $TSS_SEGMENT, %eax
