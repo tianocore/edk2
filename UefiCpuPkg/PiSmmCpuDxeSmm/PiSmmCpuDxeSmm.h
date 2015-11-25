@@ -587,6 +587,15 @@ PerformRemainingTasks (
   );
 
 /**
+  Perform the pre tasks.
+
+**/
+VOID
+PerformPreTasks (
+  VOID
+  );
+
+/**
   Initialize MSR spin lock by MSR index.
 
   @param  MsrIndex       MSR index value.
