@@ -1689,11 +1689,9 @@ EfiBootManagerBoot (
   // 6. Adjust the different type memory page number just before booting
   //    and save the updated info into the variable for next boot to use
   //
-  if ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_BOOT) {
-    if (PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
-      BmSetMemoryTypeInformationVariable ();
-    }
-  }
+  BmSetMemoryTypeInformationVariable (
+    (BOOLEAN) ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_BOOT)
+    );
 
   DEBUG_CODE_BEGIN();
     if (BootOption->Description == NULL) {
