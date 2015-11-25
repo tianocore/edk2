@@ -352,6 +352,13 @@ PlatformBdsPolicyBehavior (
   // Show the splash screen.
   //
   EnableQuietBoot (PcdGetPtr (PcdLogoFile));
+
+  //
+  // Connect _all_ devices, to pick up plug-in and removable devices
+  // TODO: do this more cleanly, permitting faster boot times when boot config
+  //       is known
+  //
+  BdsLibConnectAll ();
 }
 
 /**
