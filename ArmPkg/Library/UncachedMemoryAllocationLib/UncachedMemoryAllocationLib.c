@@ -97,6 +97,7 @@ AllocatePagesFromList (
   //
   // Look in our list for the smallest page that could satisfy the new allocation
   //
+  Node = NULL;
   NewNode = NULL;
   for (Link = mPageList.ForwardLink; Link != &mPageList; Link = Link->ForwardLink) {
     Node = BASE_CR (Link, FREE_PAGE_NODE, Link);
