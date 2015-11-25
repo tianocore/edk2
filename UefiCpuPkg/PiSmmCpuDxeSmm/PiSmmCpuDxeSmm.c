@@ -1437,3 +1437,25 @@ PerformRemainingTasks (
     mSmmReadyToLock = FALSE;
   }
 }
+
+/**
+  Perform the pre tasks.
+
+**/
+VOID
+PerformPreTasks (
+  VOID
+  )
+{
+  //
+  // Restore SMM Configuration in S3 boot path.
+  //
+  if (mRestoreSmmConfigurationInS3) {
+    //
+    // Configure SMM Code Access Check feature if available.
+    //
+    ConfigSmmCodeAccessCheck ();
+
+    mRestoreSmmConfigurationInS3 = FALSE;
+  }
+}

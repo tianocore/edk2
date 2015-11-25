@@ -435,7 +435,7 @@ Pkcs7FreeSigners (
 
   @param[in]  P7Data            Pointer to the PKCS#7 message.
   @param[in]  P7Length          Length of the PKCS#7 message in bytes.
-  @param[out] SingerChainCerts  Pointer to the certificates list chained to signer's
+  @param[out] SignerChainCerts  Pointer to the certificates list chained to signer's
                                 certificate. It's caller's responsiblity to free the buffer.
   @param[out] ChainLength       Length of the chained certificates list buffer in bytes.
   @param[out] UnchainCerts      Pointer to the unchained certificates lists. It's caller's
@@ -521,7 +521,7 @@ Pkcs7GetCertificatesList (
   //
   // Obtains Signer's Certificate from PKCS#7 data
   // NOTE: Only one signer case will be handled in this function, which means SignerInfos
-  //       should include only one singer's certificate.
+  //       should include only one signer's certificate.
   //
   Signers = PKCS7_get0_signers (Pkcs7, NULL, PKCS7_BINARY);
   if ((Signers == NULL) || (sk_X509_num (Signers) != 1)) {

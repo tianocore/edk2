@@ -102,6 +102,20 @@ SortApicId (
 }
 
 /**
+  Enable x2APIC mode on APs.
+
+  @param Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+ApFuncEnableX2Apic (
+  IN OUT VOID  *Buffer
+  )
+{
+  SetApicMode (LOCAL_APIC_MODE_X2APIC);
+}
+
+/**
   Get CPU MP Data pointer from the Guided HOB.
 
   @return  Pointer to Pointer to PEI CPU MP Data
@@ -146,11 +160,20 @@ ApCFunction (
   PeiCpuMpData = ExchangeInfo->PeiCpuMpData;
   if (PeiCpuMpData->InitFlag) {
     //
-    // This is first time AP wakeup, get BIST inforamtion from AP stack
+    // This is first time AP wakeup, get BIST information from AP stack
     //
     BistData = *(UINTN *) (PeiCpuMpData->Buffer + NumApsExecuting * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
-    PeiCpuMpData->CpuData[NumApsExecuting].ApicId        = GetInitialApicId ();
     PeiCpuMpData->CpuData[NumApsExecuting].Health.Uint32 = (UINT32) BistData;
+    PeiCpuMpData->CpuData[NumApsExecuting].ApicId = GetInitialApicId ();
+    if (PeiCpuMpData->CpuData[NumApsExecuting].ApicId >= 0xFF) {
+      //
+      // Set x2APIC mode if there are any logical processor reporting
+      // an APIC ID of 255 or greater.
+      //
+      AcquireSpinLock(&PeiCpuMpData->MpLock);
+      PeiCpuMpData->X2ApicEnable = TRUE;
+      ReleaseSpinLock(&PeiCpuMpData->MpLock);
+    }
     //
     // Sync BSP's Mtrr table to all wakeup APs and load microcode on APs.
     //
@@ -363,17 +386,43 @@ CountProcessorNumber (
   //
   if (PcdGet32 (PcdCpuMaxLogicalProcessorNumber) > 1) {
     //
-    // Send broadcast IPI to APs to wakeup APs
+    // Send 1st broadcast IPI to APs to wakeup APs
     //
-    PeiCpuMpData->InitFlag = 1;
+    PeiCpuMpData->InitFlag     = TRUE;
+    PeiCpuMpData->X2ApicEnable = FALSE;
     WakeUpAP (PeiCpuMpData, TRUE, 0, NULL, NULL);
     //
     // Wait for AP task to complete and then exit.
     //
     MicroSecondDelay (PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
-    PeiCpuMpData->InitFlag = 0;
+    PeiCpuMpData->InitFlag  = FALSE;
     PeiCpuMpData->CpuCount += (UINT32)PeiCpuMpData->MpCpuExchangeInfo->NumApsExecuting;
     ASSERT (PeiCpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+    //
+    // Wait for all APs finished the initialization
+    //
+    while (PeiCpuMpData->FinishedCount < (PeiCpuMpData->CpuCount - 1)) {
+      CpuPause ();
+    }
+
+    if (PeiCpuMpData->X2ApicEnable) {
+      DEBUG ((EFI_D_INFO, "Force x2APIC mode!\n"));
+      //
+      // Send 2nd broadcast IPI to all APs to enable x2APIC mode
+      //
+      WakeUpAP (PeiCpuMpData, TRUE, 0, ApFuncEnableX2Apic, NULL);
+      //
+      // Wait for all known APs finished
+      //
+      while (PeiCpuMpData->FinishedCount < (PeiCpuMpData->CpuCount - 1)) {
+        CpuPause ();
+      }
+      //
+      // Enable x2APIC on BSP
+      //
+      SetApicMode (LOCAL_APIC_MODE_X2APIC);
+    }
+    DEBUG ((EFI_D_INFO, "APIC MODE is %d\n", GetApicMode ()));
     //
     // Sort BSP/Aps by CPU APIC ID in ascending order
     //
@@ -439,6 +488,7 @@ PrepareAPStartupVector (
   PeiCpuMpData->CpuData[0].ApicId        = GetInitialApicId ();
   PeiCpuMpData->CpuData[0].Health.Uint32 = 0;
   PeiCpuMpData->EndOfPeiFlag             = FALSE;
+  InitializeSpinLock(&PeiCpuMpData->MpLock);
   CopyMem (&PeiCpuMpData->AddressMap, &AddressMap, sizeof (MP_ASSEMBLY_ADDRESS_MAP));
 
   //

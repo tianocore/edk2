@@ -48,6 +48,7 @@
 [Sources.Ia32]
   Ia32/Semaphore.c
   Ia32/PageTbl.c
+  Ia32/SmmFuncsArch.c
   Ia32/SmmProfileArch.c
   Ia32/SmmProfileArch.h
   Ia32/SmmInit.asm      | MSFT
@@ -68,6 +69,7 @@
 [Sources.X64]
   X64/Semaphore.c
   X64/PageTbl.c
+  X64/SmmFuncsArch.c
   X64/SmmProfileArch.c
   X64/SmmProfileArch.h
   X64/SmmInit.asm      | MSFT
