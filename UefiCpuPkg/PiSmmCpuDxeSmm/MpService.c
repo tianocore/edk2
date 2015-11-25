@@ -1163,10 +1163,7 @@ InitializeMpServiceData (
   UINTN                     Index;
   MTRR_SETTINGS             *Mtrr;
   PROCESSOR_SMM_DESCRIPTOR  *Psd;
-  UINTN                     GdtTssTableSize;
   UINT8                     *GdtTssTables;
-  IA32_SEGMENT_DESCRIPTOR   *GdtDescriptor;
-  UINTN                     TssBase;
   UINTN                     GdtTableStepSize;
 
   //
@@ -1182,71 +1179,7 @@ InitializeMpServiceData (
   //
   Cr3 = SmmInitPageTable ();
 
-  GdtTssTables    = NULL;
-  GdtTssTableSize = 0;
-  GdtTableStepSize = 0;
-  //
-  // For X64 SMM, we allocate separate GDT/TSS for each CPUs to avoid TSS load contention
-  // on each SMI entry.
-  //
-  if (EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_X64)) {
-    GdtTssTableSize = (gcSmiGdtr.Limit + 1 + TSS_SIZE + 7) & ~7; // 8 bytes aligned
-    GdtTssTables = (UINT8*)AllocatePages (EFI_SIZE_TO_PAGES (GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus));
-    ASSERT (GdtTssTables != NULL);
-    GdtTableStepSize = GdtTssTableSize;
-
-    for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
-      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID*)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1 + TSS_SIZE);
-      if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-        //
-        // Setup top of known good stack as IST1 for each processor.
-        //
-        *(UINTN *)(GdtTssTables + GdtTableStepSize * Index + gcSmiGdtr.Limit + 1 + TSS_X64_IST1_OFFSET) = (mSmmStackArrayBase + EFI_PAGE_SIZE + Index * mSmmStackSize);
-      }
-    }
-  } else if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-
-    //
-    // For IA32 SMM, if SMM Stack Guard feature is enabled, we use 2 TSS.
-    // in this case, we allocate separate GDT/TSS for each CPUs to avoid TSS load contention
-    // on each SMI entry.
-    //
-
-    //
-    // Enlarge GDT to contain 2 TSS descriptors
-    //
-    gcSmiGdtr.Limit += (UINT16)(2 * sizeof (IA32_SEGMENT_DESCRIPTOR));
-
-    GdtTssTableSize = (gcSmiGdtr.Limit + 1 + TSS_SIZE * 2 + 7) & ~7; // 8 bytes aligned
-    GdtTssTables = (UINT8*)AllocatePages (EFI_SIZE_TO_PAGES (GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus));
-    ASSERT (GdtTssTables != NULL);
-    GdtTableStepSize = GdtTssTableSize;
-
-    for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
-      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID*)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1 + TSS_SIZE * 2);
-      //
-      // Fixup TSS descriptors
-      //
-      TssBase = (UINTN)(GdtTssTables + GdtTableStepSize * Index + gcSmiGdtr.Limit + 1);
-      GdtDescriptor = (IA32_SEGMENT_DESCRIPTOR *)(TssBase) - 2;
-      GdtDescriptor->Bits.BaseLow = (UINT16)TssBase;
-      GdtDescriptor->Bits.BaseMid = (UINT8)(TssBase >> 16);
-      GdtDescriptor->Bits.BaseHigh = (UINT8)(TssBase >> 24);
-
-      TssBase += TSS_SIZE;
-      GdtDescriptor++;
-      GdtDescriptor->Bits.BaseLow = (UINT16)TssBase;
-      GdtDescriptor->Bits.BaseMid = (UINT8)(TssBase >> 16);
-      GdtDescriptor->Bits.BaseHigh = (UINT8)(TssBase >> 24);
-      //
-      // Fixup TSS segments
-      //
-      // ESP as known good stack
-      //
-      *(UINTN *)(TssBase + TSS_IA32_ESP_OFFSET) =  mSmmStackArrayBase + EFI_PAGE_SIZE + Index * mSmmStackSize;
-      *(UINT32 *)(TssBase + TSS_IA32_CR3_OFFSET) = Cr3;
-    }
-  }
+  GdtTssTables = InitGdt (Cr3, &GdtTableStepSize);
 
   //
   // Initialize PROCESSOR_SMM_DESCRIPTOR for each CPU
@@ -1254,18 +1187,8 @@ InitializeMpServiceData (
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     Psd = (PROCESSOR_SMM_DESCRIPTOR *)(VOID *)(UINTN)(mCpuHotPlugData.SmBase[Index] + SMM_PSD_OFFSET);
     CopyMem (Psd, &gcPsd, sizeof (gcPsd));
-    if (EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EFI_IMAGE_MACHINE_X64)) {
-      //
-      // For X64 SMM, set GDT to the copy allocated above.
-      //
-      Psd->SmmGdtPtr = (UINT64)(UINTN)(GdtTssTables + GdtTableStepSize * Index);
-    } else if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-      //
-      // For IA32 SMM, if SMM Stack Guard feature is enabled, set GDT to the copy allocated above.
-      //
-      Psd->SmmGdtPtr = (UINT64)(UINTN)(GdtTssTables + GdtTableStepSize * Index);
-      Psd->SmmGdtSize = gcSmiGdtr.Limit + 1;
-    }
+    Psd->SmmGdtPtr = (UINT64)(UINTN)(GdtTssTables + GdtTableStepSize * Index);
+    Psd->SmmGdtSize = gcSmiGdtr.Limit + 1;
 
     //
     // Install SMI handler

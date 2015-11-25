@@ -124,14 +124,6 @@ gSmiCr3     DD      ?
     sgdt    fword ptr [rsp]
     mov     eax, [rsp + 2]              ; eax = GDT base
     add     esp, 8
-    mov     edx, eax
-    add     edx, GDT_SIZE
-    mov     [rax + TSS_SEGMENT + 2], dl
-    mov     [rax + TSS_SEGMENT + 3], dh
-    DB      0c1h, 0eah, 10h             ; shr     edx, 16
-    mov     [rax + TSS_SEGMENT + 4], dl
-    mov     [rax + TSS_SEGMENT + 7], dh
-    mov     edx, eax
     mov     dl, 89h
     mov     [rax + TSS_SEGMENT + 5], dl ; clear busy flag
     mov     eax, TSS_SEGMENT
