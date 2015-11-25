@@ -34,14 +34,15 @@ PROTECT_MODE_CS EQU   08h
 PROTECT_MODE_DS EQU   20h
 TSS_SEGMENT     EQU   40h
 
-SmiRendezvous   PROTO   C
+SmiRendezvous      PROTO   C
+CpuSmmDebugEntry   PROTO   C
+CpuSmmDebugExit    PROTO   C
 
 EXTERNDEF   gcSmiHandlerTemplate:BYTE
 EXTERNDEF   gcSmiHandlerSize:WORD
 EXTERNDEF   gSmiCr3:DWORD
 EXTERNDEF   gSmiStack:DWORD
 EXTERNDEF   gSmbase:DWORD
-EXTERNDEF   FeaturePcdGet (PcdCpuSmmDebug):BYTE
 EXTERNDEF   FeaturePcdGet (PcdCpuSmmStackGuard):BYTE
 EXTERNDEF   gSmiHandlerIdtr:FWORD
 
@@ -151,40 +152,23 @@ gSmiCr3     DD      ?
 ;   jmp     _SmiHandler                 ; instruction is not needed
 
 _SmiHandler PROC
-    cmp     FeaturePcdGet (PcdCpuSmmDebug), 0
-    jz      @3
-    call    @1
-@1:
-    pop     ebp
-    mov     eax, 80000001h
-    cpuid
-    bt      edx, 29                     ; check cpuid to identify X64 or IA32
-    lea     edi, [ebp - (@1 - _SmiEntryPoint) + 7fc8h]
-    lea     esi, [edi + 4]
-    jnc     @2
-    add     esi, 4
-@2:
-    mov     ecx, [esi]
-    mov     edx, [edi]
-@5:
-    mov     dr6, ecx
-    mov     dr7, edx                    ; restore DR6 & DR7 before running C code
-@3:
-    mov     ecx, [esp]                  ; CPU Index
+    mov     ebx, [esp]                  ; CPU Index
 
-    push    ecx
-    mov     eax, SmiRendezvous
+    push    ebx
+    mov     eax, CpuSmmDebugEntry
     call    eax
     pop     ecx
 
-    cmp     FeaturePcdGet (PcdCpuSmmDebug), 0
-    jz      @4
+    push    ebx
+    mov     eax, SmiRendezvous
+    call    eax
+    pop     ecx
+    
+    push    ebx
+    mov     eax, CpuSmmDebugExit
+    call    eax
+    pop     ecx
 
-    mov     ecx, dr6
-    mov     edx, dr7
-    mov     [esi], ecx
-    mov     [edi], edx
-@4:
     rsm
 _SmiHandler ENDP
 

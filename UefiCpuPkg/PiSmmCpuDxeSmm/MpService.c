@@ -941,6 +941,65 @@ SmmStartupThisAp (
 }
 
 /**
+  This funciton sets DR6 & DR7 according to SMM save state, before running SMM C code.
+  They are useful when you want to enable hardware breakpoints in SMM without entry SMM mode.
+
+  NOTE: It might not be appreciated in runtime since it might
+        conflict with OS debugging facilities. Turn them off in RELEASE.
+
+  @param    CpuIndex              CPU Index
+
+**/
+VOID
+EFIAPI
+CpuSmmDebugEntry (
+  IN UINTN  CpuIndex
+  )
+{
+  SMRAM_SAVE_STATE_MAP *CpuSaveState;
+  
+  if (FeaturePcdGet (PcdCpuSmmDebug)) {
+    CpuSaveState = (SMRAM_SAVE_STATE_MAP *)gSmst->CpuSaveState[CpuIndex];
+    if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
+      AsmWriteDr6 (CpuSaveState->x86._DR6);
+      AsmWriteDr7 (CpuSaveState->x86._DR7);
+    } else {
+      AsmWriteDr6 ((UINTN)CpuSaveState->x64._DR6);
+      AsmWriteDr7 ((UINTN)CpuSaveState->x64._DR7);
+    }
+  }
+}
+
+/**
+  This funciton restores DR6 & DR7 to SMM save state.
+
+  NOTE: It might not be appreciated in runtime since it might
+        conflict with OS debugging facilities. Turn them off in RELEASE.
+
+  @param    CpuIndex              CPU Index
+
+**/
+VOID
+EFIAPI
+CpuSmmDebugExit (
+  IN UINTN  CpuIndex
+  )
+{
+  SMRAM_SAVE_STATE_MAP *CpuSaveState;
+
+  if (FeaturePcdGet (PcdCpuSmmDebug)) {
+    CpuSaveState = (SMRAM_SAVE_STATE_MAP *)gSmst->CpuSaveState[CpuIndex];
+    if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
+      CpuSaveState->x86._DR7 = (UINT32)AsmReadDr7 ();
+      CpuSaveState->x86._DR6 = (UINT32)AsmReadDr6 ();
+    } else {
+      CpuSaveState->x64._DR7 = AsmReadDr7 ();
+      CpuSaveState->x64._DR6 = AsmReadDr6 ();
+    }
+  }
+}
+
+/**
   C function for SMI entry, each processor comes here upon SMI trigger.
 
   @param    CpuIndex              CPU Index
