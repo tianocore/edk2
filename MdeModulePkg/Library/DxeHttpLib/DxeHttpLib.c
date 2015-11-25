@@ -189,7 +189,7 @@ NetHttpParseAuthorityChar (
       *IsRightBracket = TRUE;
     }
     
-    if (Char == ':' && *IsRightBracket == TRUE) {
+    if (Char == ':' && *IsRightBracket) {
       return UrlParserPortStart;
     }
     return UrlParserHostIpv6;
