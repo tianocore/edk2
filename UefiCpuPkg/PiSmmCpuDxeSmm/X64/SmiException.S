@@ -79,11 +79,11 @@ CodeSeg64:
             .byte 0                     # BaseHigh
 # TSS Segment for X64 specially
 TssSeg:
-            .word TSS_DESC_SIZE         # LimitLow
+            .word TSS_DESC_SIZE - 1     # LimitLow
             .word 0                     # BaseLow
             .byte 0                     # BaseMid
             .byte 0x89
-            .byte 0xDB                  # LimitHigh
+            .byte 0x00                  # LimitHigh
             .byte 0                     # BaseHigh
             .long 0                     # BaseUpper
             .long 0                     # Reserved

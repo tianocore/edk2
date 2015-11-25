@@ -85,18 +85,18 @@ CodeSeg64   LABEL   QWORD
 GDT_SIZE = $ - offset NullSeg
 
 TssSeg      LABEL   QWORD
-            DW      TSS_DESC_SIZE       ; LimitLow
+            DW      TSS_DESC_SIZE - 1   ; LimitLow
             DW      0                   ; BaseLow
             DB      0                   ; BaseMid
             DB      89h
-            DB      080h                ; LimitHigh
+            DB      00h                 ; LimitHigh
             DB      0                   ; BaseHigh
 ExceptionTssSeg     LABEL   QWORD
-            DW      TSS_DESC_SIZE       ; LimitLow
+            DW      TSS_DESC_SIZE - 1   ; LimitLow
             DW      0                   ; BaseLow
             DB      0                   ; BaseMid
             DB      89h
-            DB      080h                ; LimitHigh
+            DB      00h                 ; LimitHigh
             DB      0                   ; BaseHigh
 
 CODE_SEL          = offset CodeSeg32 - offset NullSeg

@@ -78,11 +78,11 @@ CodeSeg64   LABEL   QWORD
             DB      0                   ; BaseHigh
 ; TSS Segment for X64 specially
 TssSeg      LABEL   QWORD
-            DW      TSS_DESC_SIZE       ; LimitLow
+            DW      TSS_DESC_SIZE - 1   ; LimitLow
             DW      0                   ; BaseLow
             DB      0                   ; BaseMid
             DB      89h
-            DB      080h                ; LimitHigh
+            DB      00h                 ; LimitHigh
             DB      0                   ; BaseHigh
             DD      0                   ; BaseUpper
             DD      0                   ; Reserved

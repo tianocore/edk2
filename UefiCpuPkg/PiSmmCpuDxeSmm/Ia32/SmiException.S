@@ -82,18 +82,18 @@ CodeSeg64:
 .equ  GDT_SIZE, .- NullSeg
 
 TssSeg:
-            .word      TSS_DESC_SIZE       # LimitLow
+            .word      TSS_DESC_SIZE -1    # LimitLow
             .word      0                   # BaseLow
             .byte      0                   # BaseMid
             .byte      0x89
-            .byte      0x80                # LimitHigh
+            .byte      0x00                # LimitHigh
             .byte      0                   # BaseHigh
 ExceptionTssSeg:
-            .word      TSS_DESC_SIZE       # LimitLow
+            .word      TSS_DESC_SIZE - 1   # LimitLow
             .word      0                   # BaseLow
             .byte      0                   # BaseMid
             .byte      0x89
-            .byte      0x80                # LimitHigh
+            .byte      0x00                # LimitHigh
             .byte      0                   # BaseHigh
 
 .equ  CODE_SEL,          CodeSeg32 - NullSeg
