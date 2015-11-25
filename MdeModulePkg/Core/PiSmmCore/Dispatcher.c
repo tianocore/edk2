@@ -881,6 +881,20 @@ SmmDispatcher (
       if (EFI_ERROR(Status)){
         UnregisterSmramProfileImage (DriverEntry, TRUE);
         SmmFreePages(DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
+        //
+        // Uninstall LoadedImage
+        //
+        Status = gBS->UninstallProtocolInterface (
+                        DriverEntry->ImageHandle,
+                        &gEfiLoadedImageProtocolGuid,
+                        DriverEntry->LoadedImage
+                        );
+        if (!EFI_ERROR (Status)) {
+          if (DriverEntry->LoadedImage->FilePath != NULL) {
+            gBS->FreePool (DriverEntry->LoadedImage->FilePath);
+          }
+          gBS->FreePool (DriverEntry->LoadedImage);
+        }
       }
 
       REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
