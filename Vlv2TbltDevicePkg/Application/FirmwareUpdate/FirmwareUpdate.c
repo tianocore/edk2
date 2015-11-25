@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007  - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007  - 2015, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -25,8 +25,8 @@ EFI_HII_HANDLE  HiiHandle;
 //00000000	007FFFFF	00800000	Flash Image
 //
 //00000000	00000FFF	00001000	Descriptor Region
-//00001000	004FFFFF	004FF000	TXE Region
-//00500000	007FFFFF	00300000	BIOS Region
+//00001000	003FFFFF	003FF000	TXE Region
+//00500000	007FFFFF	00400000	BIOS Region
 //
 FV_REGION_INFO mRegionInfo[] = {
   {FixedPcdGet32 (PcdFlashDescriptorBase), FixedPcdGet32 (PcdFlashDescriptorSize), TRUE},

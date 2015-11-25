@@ -6,9 +6,10 @@ function Usage ( ) {
   echo
   echo "Script to build BIOS firmware and stitch the entire IFWI."
   echo
-  echo "Usage: Build_IFWI.bat   PlatformType  BuildTarget  "
+  echo "Usage: Build_IFWI.bat [options]  PlatformType  BuildTarget  "
   echo
   echo 
+  echo "       /yL [option]  :   Enable SPI lock"
   echo "       Platform Types:   MNW2"
   echo "       Build Targets:    Release, Debug"
   echo
@@ -59,6 +60,9 @@ for (( i=1; i<=$#; ))
       shift
     elif [ "$1" == "/nV" ]; then
       Stitch_Flags="$Stitch_Flags /nV"
+      shift
+    elif [ "$1" == "/yL" ]; then
+      Build_Flags="$Build_Flags /yL"
       shift
     else
       break

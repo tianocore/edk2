@@ -48,3 +48,6 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid
+
+[FeaturePcd.ARM]
+  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride

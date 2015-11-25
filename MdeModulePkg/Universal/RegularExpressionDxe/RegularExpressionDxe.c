@@ -2,7 +2,7 @@
 
   EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
 
-  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License that accompanies this

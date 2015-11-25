@@ -257,6 +257,7 @@
 
   Ia32/GccInline.c | GCC
   Ia32/Thunk16.nasm | GCC 
+  Ia32/Thunk16.S | XCODE 
   Ia32/EnableDisableInterrupts.S | GCC 
   Ia32/EnablePaging64.S | GCC 
   Ia32/DisablePaging32.S | GCC 
@@ -413,6 +414,7 @@
   X86DisablePaging32.c
   X64/GccInline.c | GCC
   X64/Thunk16.nasm | GCC 
+  X64/Thunk16.S | XCODE 
   X64/SwitchStack.S | GCC 
   X64/SetJump.S | GCC 
   X64/LongJump.S | GCC 

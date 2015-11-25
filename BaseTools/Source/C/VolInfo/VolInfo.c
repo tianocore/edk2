@@ -1,7 +1,7 @@
 /** @file
 The tool dumps the contents of a firmware volume
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#ifdef __GNUC__
+#include <unistd.h>
+#endif
 
 #include <FvLib.h>
 #include <Common/UefiBaseTypes.h>
@@ -1422,9 +1425,21 @@ Returns:
           );
 
       if (ExtractionTool != NULL) {
-
+       #ifndef __GNUC__
         ToolInputFile = CloneString (tmpnam (NULL));
         ToolOutputFile = CloneString (tmpnam (NULL));
+       #else
+        char tmp1[] = "/tmp/fileXXXXXX";
+        char tmp2[] = "/tmp/fileXXXXXX";
+        int fd1;
+        int fd2;
+        fd1 = mkstemp(tmp1);
+        fd2 = mkstemp(tmp2);
+        ToolInputFile = CloneString(tmp1);
+        ToolOutputFile = CloneString(tmp2);
+        close(fd1);
+        close(fd2);
+       #endif
 
         //
         // Construction 'system' command string

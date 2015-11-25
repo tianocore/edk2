@@ -38,6 +38,7 @@
   MemoryAllocationLib
   PcdLib
   DxeServicesTableLib
+  CacheMaintenanceLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdArmFreeUncachedMemorySizeThreshold

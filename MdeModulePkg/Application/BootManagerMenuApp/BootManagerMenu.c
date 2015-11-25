@@ -262,13 +262,18 @@ InitializeBootMenuData (
   OUT  BOOT_MENU_POPUP_DATA          *BootMenuData
   )
 {
+  EFI_STATUS                    Status;
   UINTN                         Index;
   UINTN                         StrIndex;
+  EFI_DEVICE_PATH_PROTOCOL      *ImageDevicePath;
       
   if (BootOption == NULL || BootMenuData == NULL) {
     return EFI_INVALID_PARAMETER;
-  } 
-  
+  }
+
+  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID **) &ImageDevicePath);
+  ASSERT_EFI_ERROR (Status);
+
   BootMenuData->TitleToken[0] = STRING_TOKEN (STR_BOOT_POPUP_MENU_TITLE_STRING);
   BootMenuData->PtrTokens     = AllocateZeroPool (BootOptionCount * sizeof (EFI_STRING_ID));
   ASSERT (BootMenuData->PtrTokens != NULL);
@@ -284,6 +289,14 @@ InitializeBootMenuData (
         !IsBootManagerMenu (&BootOption[Index])) {      
       continue;
     }
+
+    //
+    // Don't display myself
+    //
+    if (CompareMem (BootOption[Index].FilePath, ImageDevicePath, GetDevicePathSize (ImageDevicePath)) == 0) {
+      continue;
+    }
+
     ASSERT (BootOption[Index].Description != NULL);
     BootMenuData->PtrTokens[StrIndex++] = HiiSetString (
                                             gStringPackHandle, 

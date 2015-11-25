@@ -2,6 +2,7 @@
   EBL commands for Network Devices
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -33,6 +34,7 @@ ParseIp (
 }
 
 EFI_STATUS
+EFIAPI
 EblIpCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv

@@ -34,24 +34,26 @@ ArmMemoryAttributeToPageAttribute (
 {
   switch (Attributes) {
   case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-    return TT_ATTR_INDX_MEMORY_WRITE_BACK;
-  case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
-    return TT_ATTR_INDX_MEMORY_WRITE_THROUGH;
-  case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-    return TT_ATTR_INDX_DEVICE_MEMORY;
-  case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-    return TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
   case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK:
-    return TT_ATTR_INDX_MEMORY_WRITE_BACK;
+    return TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE;
+
+  case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
   case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH:
-    return TT_ATTR_INDX_MEMORY_WRITE_THROUGH;
-  case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
-    return TT_ATTR_INDX_DEVICE_MEMORY;
+    return TT_ATTR_INDX_MEMORY_WRITE_THROUGH | TT_SH_INNER_SHAREABLE;
+
+  // Uncached and device mappings are treated as outer shareable by default,
+  case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
   case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED:
     return TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
+
   default:
     ASSERT(0);
-    return TT_ATTR_INDX_DEVICE_MEMORY;
+  case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
+  case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
+    if (ArmReadCurrentEL () == AARCH64_EL2)
+      return TT_ATTR_INDX_DEVICE_MEMORY | TT_TABLE_XN;
+    else
+      return TT_ATTR_INDX_DEVICE_MEMORY | TT_TABLE_UXN | TT_TABLE_PXN;
   }
 }
 
@@ -95,48 +97,6 @@ PageAttributeToGcdAttribute (
   }
 
   return GcdAttributes;
-}
-
-UINT64
-GcdAttributeToPageAttribute (
-  IN UINT64 GcdAttributes
-  )
-{
-  UINT64  PageAttributes;
-
-  switch (GcdAttributes & 0xFF) {
-  case EFI_MEMORY_UC:
-    PageAttributes = TT_ATTR_INDX_DEVICE_MEMORY;
-    break;
-  case EFI_MEMORY_WC:
-    PageAttributes = TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
-    break;
-  case EFI_MEMORY_WT:
-    PageAttributes = TT_ATTR_INDX_MEMORY_WRITE_THROUGH;
-    break;
-  case EFI_MEMORY_WB:
-    PageAttributes = TT_ATTR_INDX_MEMORY_WRITE_BACK;
-    break;
-  default:
-    DEBUG ((EFI_D_ERROR, "GcdAttributeToPageAttribute: 0x%X attributes is not supported.\n", GcdAttributes));
-    ASSERT (0);
-    // If no match has been found then we mark the memory as device memory.
-    // The only side effect of using device memory should be a slow down in the performance.
-    PageAttributes = TT_ATTR_INDX_DEVICE_MEMORY;
-  }
-
-  // Determine protection attributes
-  if (GcdAttributes & EFI_MEMORY_WP) {
-    // Read only cases map to write-protect
-    PageAttributes |= TT_AP_RO_RO;
-  }
-
-  // Process eXecute Never attribute
-  if (GcdAttributes & EFI_MEMORY_XP) {
-    PageAttributes |= (TT_PXN_MASK | TT_UXN_MASK);
-  }
-
-  return PageAttributes;
 }
 
 ARM_MEMORY_REGION_ATTRIBUTES
@@ -668,7 +628,8 @@ ArmConfigureMmu (
       return RETURN_UNSUPPORTED;
     }
   } else if (ArmReadCurrentEL () == AARCH64_EL1) {
-    TCR = T0SZ | TCR_TG0_4KB;
+    // Due to Cortex-A57 erratum #822227 we must set TG1[1] == 1, regardless of EPD1.
+    TCR = T0SZ | TCR_TG0_4KB | TCR_TG1_4KB | TCR_EPD1;
 
     // Set the Physical Address Size using MaxAddress
     if (MaxAddress < SIZE_4GB) {

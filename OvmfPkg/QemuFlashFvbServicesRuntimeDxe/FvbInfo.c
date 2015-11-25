@@ -1,50 +1,39 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 
-Module Name:
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  FvbInfo.c
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Abstract:
+  Module Name:
 
-  Defines data structure that is the volume header found.These data is intent
-  to decouple FVB driver with FV header.
+    FvbInfo.c
+
+  Abstract:
+
+    Defines data structure that is the volume header found.These data is intent
+    to decouple FVB driver with FV header.
 
 **/
 
 //
 // The package level header files this module uses
 //
-#include <PiDxe.h>
+#include <Pi/PiFirmwareVolume.h>
+
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Guid/EventGroup.h>
-#include <Guid/FirmwareFileSystem2.h>
 #include <Guid/SystemNvDataGuid.h>
-#include <Protocol/FirmwareVolumeBlock.h>
-#include <Protocol/DevicePath.h>
 //
 // The Library classes this module consumes
 //
-#include <Library/UefiLib.h>
-#include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/UefiRuntimeLib.h>
-#include <Library/DebugLib.h>
-#include <Library/HobLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
 
 typedef struct {
@@ -75,7 +64,7 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
       FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize),
       EFI_FVH_SIGNATURE,
-      EFI_FVB2_MEMORY_MAPPED |  
+      EFI_FVB2_MEMORY_MAPPED |
         EFI_FVB2_READ_ENABLED_CAP |
         EFI_FVB2_READ_STATUS |
         EFI_FVB2_WRITE_ENABLED_CAP |
@@ -94,7 +83,8 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
           (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
            FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
            FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
-           FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) / FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
+           FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) /
+          FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
           FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
         }
       } // BlockMap[1]
@@ -118,7 +108,9 @@ GetFvbInfo (
   UINTN Index;
 
   if (!Checksummed) {
-    for (Index = 0; Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO); Index += 1) {
+    for (Index = 0;
+         Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO);
+         Index += 1) {
       UINT16 Checksum;
       mPlatformFvbMediaInfo[Index].FvbInfo.Checksum = 0;
       Checksum = CalculateCheckSum16 (
@@ -130,7 +122,9 @@ GetFvbInfo (
     Checksummed = TRUE;
   }
 
-  for (Index = 0; Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO); Index += 1) {
+  for (Index = 0;
+       Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO);
+       Index += 1) {
     if (mPlatformFvbMediaInfo[Index].FvLength == FvLength) {
       *FvbInfo = &mPlatformFvbMediaInfo[Index].FvbInfo;
       return EFI_SUCCESS;

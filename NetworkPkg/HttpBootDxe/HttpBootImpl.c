@@ -18,6 +18,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Enable the use of UEFI HTTP boot function.
 
   @param[in]    Private            The pointer to the driver's private data.
+  @param[in]    UsingIpv6          Specifies the type of IP addresses that are to be
+                                   used during the session that is being started.
+                                   Set to TRUE for IPv6, and FALSE for IPv4.
 
   @retval EFI_SUCCESS              HTTP boot was successfully enabled.
   @retval EFI_INVALID_PARAMETER    Private is NULL.
@@ -26,10 +29,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 HttpBootStart (
-  IN HTTP_BOOT_PRIVATE_DATA           *Private
+  IN HTTP_BOOT_PRIVATE_DATA           *Private,
+  IN BOOLEAN                          UsingIpv6
   )
 {
-  UINTN          Index;
+  UINTN                Index;
+  EFI_STATUS           Status;
 
   if (Private == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -39,25 +44,47 @@ HttpBootStart (
     return EFI_ALREADY_STARTED;
   }
 
+  //
+  // Detect whether using ipv6 or not, and set it to the private data.
+  //
+  if (UsingIpv6 && Private->Ip6Nic != NULL) {
+    Private->UsingIpv6 = TRUE;
+  } else if (!UsingIpv6 && Private->Ip4Nic != NULL) {
+    Private->UsingIpv6 = FALSE;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+  
+  //
+  // Init the content of cached DHCP offer list.
+  //
+  ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
   if (!Private->UsingIpv6) {
-    //
-    // Init the content of cached DHCP offer list.
-    //
-    ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
     for (Index = 0; Index < HTTP_BOOT_OFFER_MAX_NUM; Index++) {
       Private->OfferBuffer[Index].Dhcp4.Packet.Offer.Size = HTTP_BOOT_DHCP4_PACKET_MAX_SIZE;
     }
   } else {
-    ASSERT (FALSE);
+    for (Index = 0; Index < HTTP_BOOT_OFFER_MAX_NUM; Index++) {
+      Private->OfferBuffer[Index].Dhcp6.Packet.Offer.Size = HTTP_BOOT_DHCP6_PACKET_MAX_SIZE;
+    }
   }
 
+  if (Private->UsingIpv6) {
+    //
+    // Set Ip6 policy to Automatic to start the Ip6 router discovery.
+    //
+    Status = HttpBootSetIp6Policy (Private);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
   Private->Started = TRUE;
 
   return EFI_SUCCESS;
 }
 
 /**
-  Attempt to complete a DHCPv4 D.O.R.A sequence to retrieve the boot resource information.
+  Attempt to complete a DHCPv4 D.O.R.A or DHCPv6 S.R.A.A sequence to retrieve the boot resource information.
 
   @param[in]    Private            The pointer to the driver's private data.
 
@@ -86,9 +113,15 @@ HttpBootDhcp (
   Status = EFI_DEVICE_ERROR;
 
   if (!Private->UsingIpv6) {
+    //
+    // Start D.O.R.A process to get a IPv4 address and other boot information.
+    //
     Status = HttpBootDhcp4Dora (Private);
   } else {
-    ASSERT (FALSE);
+     //
+    // Start S.A.R.R process to get a IPv6 address and other boot information.
+    //
+    Status = HttpBootDhcp6Sarr (Private);
   }
 
   return Status;
@@ -241,7 +274,7 @@ HttpBootStop (
   Private->BootFileUriParser = NULL;
   Private->BootFileSize = 0;
   Private->SelectIndex = 0;
-  Private->SelectProxyType = HttpOfferTypeMax;
+  Private->SelectProxyType = HttpOfferTypeMax; 
 
   if (!Private->UsingIpv6) {
     //
@@ -256,7 +289,17 @@ HttpBootStop (
       }
     }
   } else {
-    ASSERT (FALSE);
+    //
+    // Stop and release the DHCP6 child.
+    //
+    Private->Dhcp6->Stop (Private->Dhcp6);
+    Private->Dhcp6->Configure (Private->Dhcp6, NULL);
+    
+    for (Index = 0; Index < HTTP_BOOT_OFFER_MAX_NUM; Index++) {
+      if (Private->OfferBuffer[Index].Dhcp6.UriParser) {
+        HttpUrlFreeParser (Private->OfferBuffer[Index].Dhcp6.UriParser);
+      }
+    }
   }
   
   ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
@@ -309,7 +352,9 @@ HttpBootDxeLoadFile (
   )
 {
   HTTP_BOOT_PRIVATE_DATA        *Private;
+  HTTP_BOOT_VIRTUAL_NIC         *VirtualNic;
   BOOLEAN                       MediaPresent;
+  BOOLEAN                       UsingIpv6;
   EFI_STATUS                    Status;
 
   if (This == NULL || BufferSize == NULL) {
@@ -323,8 +368,10 @@ HttpBootDxeLoadFile (
     return EFI_UNSUPPORTED;
   }
 
-  Private = HTTP_BOOT_PRIVATE_DATA_FROM_LOADFILE (This);
-
+  VirtualNic = HTTP_BOOT_VIRTUAL_NIC_FROM_LOADFILE (This);
+  Private = VirtualNic->Private;
+  UsingIpv6 = FALSE;
+  
   //
   // Check media status before HTTP boot start
   //
@@ -335,9 +382,25 @@ HttpBootDxeLoadFile (
   }
 
   //
+  // Check whether the virtual nic is using IPv6 or not.
+  //
+  if (VirtualNic == Private->Ip6Nic) {
+    UsingIpv6 = TRUE;
+  }
+  
+  //
   // Initialize HTTP boot and load the boot file.
   //
-  Status = HttpBootStart (Private);
+  Status = HttpBootStart (Private, UsingIpv6);
+  if (Status == EFI_ALREADY_STARTED && UsingIpv6 != Private->UsingIpv6) {
+    //
+    // Http boot Driver has already been started but not on the required IP version, restart it.
+    //
+    Status = HttpBootStop (Private);
+    if (!EFI_ERROR (Status)) {
+      Status = HttpBootStart (Private, UsingIpv6);
+    }
+  }
   if (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED) {
     Status = HttpBootLoadFile (Private, BufferSize, Buffer);
   }
@@ -345,11 +408,19 @@ HttpBootDxeLoadFile (
   if (Status != EFI_SUCCESS && Status != EFI_BUFFER_TOO_SMALL) {
     HttpBootStop (Private);
   } else {
-    //
-    // Stop and release the DHCP4 child.
-    //
-    Private->Dhcp4->Stop (Private->Dhcp4);
-    Private->Dhcp4->Configure (Private->Dhcp4, NULL);
+    if (!Private->UsingIpv6) {
+      //
+      // Stop and release the DHCP4 child.
+      //
+      Private->Dhcp4->Stop (Private->Dhcp4);
+      Private->Dhcp4->Configure (Private->Dhcp4, NULL);
+    } else {
+      //
+      // Stop and release the DHCP6 child.
+      //
+      Private->Dhcp6->Stop (Private->Dhcp6);
+      Private->Dhcp6->Configure (Private->Dhcp6, NULL);
+    }
   }
 
   return Status;

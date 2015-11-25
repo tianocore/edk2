@@ -432,9 +432,13 @@ SmmEntryPoint (
   PERF_START (NULL, "SMM", NULL, 0) ;
 
   //
-  // Update SMST using the context
+  // Update SMST with contents of the SmmEntryContext structure
   //
-  CopyMem (&gSmmCoreSmst.SmmStartupThisAp, SmmEntryContext, sizeof (EFI_SMM_ENTRY_CONTEXT));
+  gSmmCoreSmst.SmmStartupThisAp      = SmmEntryContext->SmmStartupThisAp;
+  gSmmCoreSmst.CurrentlyExecutingCpu = SmmEntryContext->CurrentlyExecutingCpu;
+  gSmmCoreSmst.NumberOfCpus          = SmmEntryContext->NumberOfCpus;
+  gSmmCoreSmst.CpuSaveStateSize      = SmmEntryContext->CpuSaveStateSize;
+  gSmmCoreSmst.CpuSaveState          = SmmEntryContext->CpuSaveState;
 
   //
   // Call platform hook before Smm Dispatch

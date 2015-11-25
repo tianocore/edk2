@@ -322,13 +322,24 @@ goto end
       echo !!! WARNING !!! Will not be able to compile Python programs to .exe
       echo Will setup environment to run Python scripts directly.
       echo.
-      set PATH=%BASETOOLS_PYTHON_SOURCE%\Trim;%PATH%
-      set PATH=%BASETOOLS_PYTHON_SOURCE%\GenFds;%PATH%
-      set PATH=%BASETOOLS_PYTHON_SOURCE%\build;%PATH%
-      set PATHEXT=%PATHEXT%;.py
+      goto UpdatePATH
+    )
+    else (
+      goto UpdateEnv
     )
   )
-  
+  else (
+    goto UpdateEnv
+  )
+ 
+:UpdatePATH
+  set PATH=%BASETOOLS_PYTHON_SOURCE%\Trim;%PATH%
+  set PATH=%BASETOOLS_PYTHON_SOURCE%\GenFds;%PATH%
+  set PATH=%BASETOOLS_PYTHON_SOURCE%\build;%PATH%
+  set PATHEXT=%PATHEXT%;.py
+  goto UpdateEnv
+ 
+:UpdateEnv
   echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
   echo     PYTHON_PATH     = %PYTHON_PATH%
   echo PYTHON_FREEZER_PATH = %PYTHON_FREEZER_PATH%

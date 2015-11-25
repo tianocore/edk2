@@ -101,6 +101,7 @@
   gEfiDevicePathProtocolGuid                    ## CONSUMES
   gEfiBootLogoProtocolGuid                      ## CONSUMES
   gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## CONSUMES
   gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiUsbIoProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiDiskInfoProtocolGuid                      ## SOMETIMES_CONSUMES

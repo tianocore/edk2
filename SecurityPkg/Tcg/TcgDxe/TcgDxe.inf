@@ -54,10 +54,6 @@
   ReportStatusCodeLib
 
 [Guids]
-  ## SOMETIMES_CONSUMES     ## SystemTable           # Smbios Table
-  ## SOMETIMES_CONSUMES     ## GUID                  # Handoff Table for measurement.
-  gEfiSmbiosTableGuid
-  
   gEfiGlobalVariableGuid                             ## SOMETIMES_CONSUMES  ## Variable:L"BootXXXX"
   gTcgEventEntryHobGuid                              ## SOMETIMES_CONSUMES  ## HOB
   gTpmErrorHobGuid                                   ## SOMETIMES_CONSUMES  ## HOB

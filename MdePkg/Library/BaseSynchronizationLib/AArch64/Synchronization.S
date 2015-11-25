@@ -171,6 +171,7 @@ TryInternalSyncIncrement:
   add     w1, w1, #1
   stxr    w2, w1, [x0]
   cbnz    w2, TryInternalSyncIncrement
+  mov     w0, w1
   dmb     sy
   ret
 
@@ -199,5 +200,6 @@ TryInternalSyncDecrement:
   sub     w1, w1, #1
   stxr    w2, w1, [x0]
   cbnz    w2, TryInternalSyncDecrement
+  mov     w0, w1
   dmb     sy
   ret

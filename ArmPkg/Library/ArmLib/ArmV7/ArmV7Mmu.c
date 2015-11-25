@@ -80,6 +80,10 @@ PopulateLevel2PageTable (
       break;
   }
 
+  if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+    PageAttributes &= ~TT_DESCRIPTOR_PAGE_S_SHARED;
+  }
+
   // Check if the Section Entry has already been populated. Otherwise attach a
   // Level 2 Translation Table to it
   if (*SectionEntry != 0) {
@@ -143,10 +147,17 @@ FillTranslationTable (
 {
   UINT32  *SectionEntry;
   UINT32  Attributes;
-  UINT32  PhysicalBase = MemoryRegion->PhysicalBase;
-  UINT32  RemainLength = MemoryRegion->Length;
+  UINT32  PhysicalBase;
+  UINT64  RemainLength;
 
   ASSERT(MemoryRegion->Length > 0);
+
+  if (MemoryRegion->PhysicalBase >= SIZE_4GB) {
+    return;
+  }
+
+  PhysicalBase = MemoryRegion->PhysicalBase;
+  RemainLength = MIN(MemoryRegion->Length, SIZE_4GB - PhysicalBase);
 
   switch (MemoryRegion->Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
@@ -176,6 +187,10 @@ FillTranslationTable (
     default:
       Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(0);
       break;
+  }
+
+  if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+    Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
   }
 
   // Get the first section entry for this mapping
@@ -253,16 +268,33 @@ ArmConfigureMmu (
   // Translate the Memory Attributes into Translation Table Register Attributes
   if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED)) {
-    TTBRAttributes = TTBR_NON_CACHEABLE;
+    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_NON_CACHEABLE : TTBR_NON_CACHEABLE;
   } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK)) {
-    TTBRAttributes = TTBR_WRITE_BACK_ALLOC;
+    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_BACK_ALLOC : TTBR_WRITE_BACK_ALLOC;
   } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH)) {
-    TTBRAttributes = TTBR_WRITE_THROUGH_NO_ALLOC;
+    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_THROUGH : TTBR_WRITE_THROUGH;
   } else {
     ASSERT (0); // No support has been found for the attributes of the memory region that the translation table belongs to.
     return RETURN_UNSUPPORTED;
+  }
+
+  if (TTBRAttributes & TTBR_SHAREABLE) {
+    if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+      TTBRAttributes ^= TTBR_SHAREABLE;
+    } else {
+      //
+      // Unlike the S bit in the short descriptors, which implies inner shareable
+      // on an implementation that supports two levels, the meaning of the S bit
+      // in the TTBR depends on the NOS bit, which defaults to Outer Shareable.
+      // However, we should only set this bit after we have confirmed that the
+      // implementation supports multiple levels, or else the NOS bit is UNK/SBZP
+      //
+      if (((ArmReadIdMmfr0 () >> 12) & 0xf) != 0) {
+        TTBRAttributes |= TTBR_NOT_OUTER_SHAREABLE;
+      }
+    }
   }
 
   ArmCleanInvalidateDataCache ();
@@ -294,7 +326,7 @@ ArmConfigureMmu (
                              DOMAIN_ACCESS_CONTROL_NONE( 3) |
                              DOMAIN_ACCESS_CONTROL_NONE( 2) |
                              DOMAIN_ACCESS_CONTROL_NONE( 1) |
-                             DOMAIN_ACCESS_CONTROL_MANAGER(0));
+                             DOMAIN_ACCESS_CONTROL_CLIENT(0));
 
   ArmEnableInstructionCache();
   ArmEnableDataCache();

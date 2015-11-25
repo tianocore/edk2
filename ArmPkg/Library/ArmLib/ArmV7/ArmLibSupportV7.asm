@@ -15,6 +15,7 @@
 
 
     EXPORT  ArmIsMpCore
+    EXPORT  ArmHasMpExtensions
     EXPORT  ArmEnableAsynchronousAbort
     EXPORT  ArmDisableAsynchronousAbort
     EXPORT  ArmEnableIrq
@@ -41,6 +42,12 @@ ArmIsMpCore
   cmp     R0, #0x80000000
   moveq   R0, #1
   movne   R0, #0
+  bx      LR
+
+ArmHasMpExtensions
+  mrc     p15,0,R0,c0,c0,5
+  // Get Multiprocessing extension (bit31)
+  lsr     R0, R0, #31
   bx      LR
 
 ArmEnableAsynchronousAbort

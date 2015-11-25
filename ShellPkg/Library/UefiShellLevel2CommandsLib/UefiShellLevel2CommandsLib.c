@@ -22,7 +22,7 @@
   * functions are non-interactive only
 
   Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -188,6 +188,7 @@ GetFullyQualifiedPath(
   if (StrStr(Path, L":") == NULL) {
     CurDir = gEfiShellProtocol->GetCurDir(NULL);
     StrnCatGrow(&PathToReturn, &Size, CurDir, 0);
+    StrnCatGrow(&PathToReturn, &Size, L"\\", 0);
     if (*Path == L'\\') {
       Path++;
     }

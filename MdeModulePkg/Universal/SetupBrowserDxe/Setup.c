@@ -5541,8 +5541,9 @@ SaveBrowserContext (
   VOID
   )
 {
-  BROWSER_CONTEXT  *Context;
-  FORM_ENTRY_INFO     *MenuList;
+  BROWSER_CONTEXT      *Context;
+  FORM_ENTRY_INFO      *MenuList;
+  FORM_BROWSER_FORMSET *FormSet;
 
   gBrowserContextCount++;
   if (gBrowserContextCount == 1) {
@@ -5568,6 +5569,10 @@ SaveBrowserContext (
   Context->HiiHandle            = mCurrentHiiHandle;
   Context->FormId               = mCurrentFormId;
   CopyGuid (&Context->FormSetGuid, &mCurrentFormSetGuid);
+  Context->SystemLevelFormSet   = mSystemLevelFormSet;
+  Context->CurFakeQestId        = mCurFakeQestId;
+  Context->HiiPackageListUpdated = mHiiPackageListUpdated;
+  Context->FinishRetrieveCall   = mFinishRetrieveCall;
 
   //
   // Save the menu history data.
@@ -5578,6 +5583,17 @@ SaveBrowserContext (
     RemoveEntryList (&MenuList->Link);
 
     InsertTailList(&Context->FormHistoryList, &MenuList->Link);
+  }
+
+  //
+  // Save formset list.
+  //
+  InitializeListHead(&Context->FormSetList);
+  while (!IsListEmpty (&gBrowserFormSetList)) {
+    FormSet = FORM_BROWSER_FORMSET_FROM_LINK (gBrowserFormSetList.ForwardLink);
+    RemoveEntryList (&FormSet->Link);
+
+    InsertTailList(&Context->FormSetList, &FormSet->Link);
   }
 
   //
@@ -5598,7 +5614,8 @@ RestoreBrowserContext (
 {
   LIST_ENTRY       *Link;
   BROWSER_CONTEXT  *Context;
-  FORM_ENTRY_INFO     *MenuList;
+  FORM_ENTRY_INFO      *MenuList;
+  FORM_BROWSER_FORMSET *FormSet;
 
   ASSERT (gBrowserContextCount != 0);
   gBrowserContextCount--;
@@ -5625,6 +5642,10 @@ RestoreBrowserContext (
   mCurrentHiiHandle     = Context->HiiHandle;
   mCurrentFormId        = Context->FormId;
   CopyGuid (&mCurrentFormSetGuid, &Context->FormSetGuid);
+  mSystemLevelFormSet   = Context->SystemLevelFormSet;
+  mCurFakeQestId        = Context->CurFakeQestId;
+  mHiiPackageListUpdated = Context->HiiPackageListUpdated;
+  mFinishRetrieveCall   = Context->FinishRetrieveCall;
 
   //
   // Restore the menu history data.
@@ -5634,6 +5655,16 @@ RestoreBrowserContext (
     RemoveEntryList (&MenuList->Link);
 
     InsertTailList(&mPrivateData.FormBrowserEx2.FormViewHistoryHead, &MenuList->Link);
+  }
+
+  //
+  // Restore the Formset data.
+  //
+  while (!IsListEmpty (&Context->FormSetList)) {
+    FormSet = FORM_BROWSER_FORMSET_FROM_LINK (Context->FormSetList.ForwardLink);
+    RemoveEntryList (&FormSet->Link);
+
+    InsertTailList(&gBrowserFormSetList, &FormSet->Link);
   }
 
   //

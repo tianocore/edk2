@@ -14,6 +14,7 @@
   timer information to calculate elapsed time for each measurement.
  
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -78,6 +79,7 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
 #endif // PROFILING_IMPLEMENTED
   {L"-x", TypeFlag},   // -x   eXclude Cumulative Items
   {L"-i", TypeFlag},   // -i   Display Identifier
+  {L"-c", TypeValue},  // -c   Display cumulative data.
   {L"-n", TypeValue},  // -n # Number of records to display for A and R
   {L"-t", TypeValue},  // -t # Threshold of interest
   {NULL, TypeMax}
@@ -110,7 +112,26 @@ DumpStatistics( void )
   SHELL_FREE_NON_NULL (StringPtrUnknown);
 }
 
-/** 
+/**
+  Initialize the cumulative data.
+
+**/
+VOID
+InitCumulativeData (
+  VOID
+  )
+{
+  UINTN                             Index;
+
+  for (Index = 0; Index < NumCum; ++Index) {
+    CumData[Index].Count = 0;
+    CumData[Index].MinDur = PERF_MAXDUR;
+    CumData[Index].MaxDur = 0;
+    CumData[Index].Duration = 0;
+  }
+}
+
+/**
   Dump performance data.
   
   @param[in]  ImageHandle     The image handle.
@@ -144,6 +165,9 @@ ShellCommandRunDp (
   BOOLEAN                   TraceMode;
   BOOLEAN                   ProfileMode;
   BOOLEAN                   ExcludeMode;
+  BOOLEAN                   CumulativeMode;
+  CONST CHAR16              *CustomCumulativeToken;
+  PERF_CUM_DATA             *CustomCumulativeData;
 
   StringPtr   = NULL;
   SummaryMode = FALSE;
@@ -153,6 +177,8 @@ ShellCommandRunDp (
   TraceMode   = FALSE;
   ProfileMode = FALSE;
   ExcludeMode = FALSE;
+  CumulativeMode = FALSE;
+  CustomCumulativeData = NULL;
 
   // Get DP's entry time as soon as possible.
   // This is used as the Shell-Phase end time.
@@ -190,6 +216,7 @@ ShellCommandRunDp (
 #endif  // PROFILING_IMPLEMENTED
   ExcludeMode = ShellCommandLineGetFlag (ParamPackage, L"-x");
   mShowId     = ShellCommandLineGetFlag (ParamPackage, L"-i");
+  CumulativeMode = ShellCommandLineGetFlag (ParamPackage, L"-c");
 
   // Options with Values
   CmdLineArg  = ShellCommandLineGetValue (ParamPackage, L"-n");
@@ -216,6 +243,25 @@ ShellCommandRunDp (
 #if PROFILING_IMPLEMENTED
     ProfileMode = TRUE;
 #endif  // PROFILING_IMPLEMENTED
+  }
+
+  //
+  // Initialize the pre-defined cumulative data.
+  //
+  InitCumulativeData ();
+
+  //
+  // Init the custom cumulative data.
+  //
+  CustomCumulativeToken = ShellCommandLineGetValue (ParamPackage, L"-c");
+  if (CustomCumulativeToken != NULL) {
+    CustomCumulativeData = AllocateZeroPool (sizeof (PERF_CUM_DATA));
+    CustomCumulativeData->MinDur = 0;
+    CustomCumulativeData->MaxDur = 0;
+    CustomCumulativeData->Count  = 0;
+    CustomCumulativeData->Duration = 0;
+    CustomCumulativeData->Name   = AllocateZeroPool (StrLen (CustomCumulativeToken) + 1);
+    UnicodeStrToAsciiStr (CustomCumulativeToken, CustomCumulativeData->Name);
   }
 
   //
@@ -277,8 +323,10 @@ ShellCommandRunDp (
 ****    !T &&  P  := (2) Only Profile records are displayed
 ****     T &&  P  := (3) Same as Default, both are displayed
 ****************************************************************************/
-  GatherStatistics();
-  if (AllMode) {
+  GatherStatistics (CustomCumulativeData);
+  if (CumulativeMode) {                       
+    ProcessCumulative (CustomCumulativeData);
+  } else if (AllMode) {
     if (TraceMode) {
       DumpAllTrace( Number2Display, ExcludeMode);
     }
@@ -301,7 +349,7 @@ ShellCommandRunDp (
         if ( ! EFI_ERROR( Status)) {
           ProcessPeims ();
           ProcessGlobal ();
-          ProcessCumulative ();
+          ProcessCumulative (NULL);
         }
       }
     }
@@ -314,6 +362,10 @@ ShellCommandRunDp (
   }
 
   SHELL_FREE_NON_NULL (StringPtr);
+  if (CustomCumulativeData != NULL) {
+    SHELL_FREE_NON_NULL (CustomCumulativeData->Name);
+  }
+  SHELL_FREE_NON_NULL (CustomCumulativeData);
 
   return SHELL_SUCCESS;
 }

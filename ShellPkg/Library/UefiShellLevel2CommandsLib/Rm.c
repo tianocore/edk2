@@ -231,7 +231,9 @@ IsValidDeleteTarget(
   Pattern       = NULL;
   SearchString  = NULL;
   Size          = 0;
-  Pattern       = StrnCatGrow(&Pattern     , NULL, TempLocation  , 0);
+  Pattern       = StrnCatGrow(&Pattern, &Size, TempLocation  , 0);
+  Pattern       = StrnCatGrow(&Pattern, &Size, L"\\"  , 0);
+  Size = 0;
   SearchString  = StrnCatGrow(&SearchString, &Size, Node->FullName, 0);
   if (!EFI_ERROR(ShellIsDirectory(SearchString))) {
     SearchString  = StrnCatGrow(&SearchString, &Size, L"\\", 0);

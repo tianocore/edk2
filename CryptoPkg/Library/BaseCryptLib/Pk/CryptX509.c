@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalCryptLib.h"
 #include <openssl/x509.h>
-
+#include <openssl/rsa.h>
 
 /**
   Construct a X509 object from DER-encoded certificate data.
@@ -245,6 +245,7 @@ X509GetSubjectName (
   BOOLEAN    Status;
   X509       *X509Cert;
   X509_NAME  *X509Name;
+  UINTN      X509NameSize;
 
   //
   // Check input parameters.
@@ -274,13 +275,14 @@ X509GetSubjectName (
     goto _Exit;
   }
 
-  if (*SubjectSize < (UINTN) X509Name->bytes->length) {
-    *SubjectSize = (UINTN) X509Name->bytes->length;
+  X509NameSize = i2d_X509_NAME(X509Name, NULL);
+  if (*SubjectSize < X509NameSize) {
+    *SubjectSize = X509NameSize;
     goto _Exit;
   }
-  *SubjectSize = (UINTN) X509Name->bytes->length;
+  *SubjectSize = X509NameSize;
   if (CertSubject != NULL) {
-    CopyMem (CertSubject, (UINT8 *) X509Name->bytes->data, *SubjectSize);
+    i2d_X509_NAME(X509Name, &CertSubject);
     Status = TRUE;
   }
 
@@ -460,6 +462,13 @@ X509VerifyCert (
   if (!(X509_STORE_add_cert (CertStore, X509CACert))) {
     goto _Exit;
   }
+
+  //
+  // Allow partial certificate chains, terminated by a non-self-signed but
+  // still trusted intermediate certificate. Also disable time checks.
+  //
+  X509_STORE_set_flags (CertStore,
+                        X509_V_FLAG_PARTIAL_CHAIN | X509_V_FLAG_NO_CHECK_TIME);
 
   //
   // Set up X509_STORE_CTX for the subsequent verification operation.

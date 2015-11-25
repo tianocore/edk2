@@ -19,6 +19,7 @@ SetLocal EnableDelayedExpansion EnableExtensions
 set exitCode=0
 set BackupRom=1
 set UpdateVBios=1
+set SpiLock=0
 set Stitch_Config=Stitch_Config.txt
 copy /y nul Stitching.log >nul
 
@@ -47,6 +48,12 @@ if /i "%~1"=="/nB" (
     shift
     goto OptLoop
 )
+if /i "%~1"=="/yL" (
+    set SpiLock=1
+    shift
+    goto OptLoop
+)
+
 if /i "%~1"=="/B" (
     if "%~2"==""  goto Usage
     if not exist %~2 echo BIOS not found. & goto Usage
@@ -103,6 +110,11 @@ for /f "delims== tokens=1,2" %%i in (%Stitch_Config%) do (
     )
 )
 
+if %SpiLock% EQU 1 (
+  set IFWI_HEADER_FILE=IFWIHeader\!IFWI_HEADER!_SPILOCK.bin
+) else (
+  set IFWI_HEADER_FILE=IFWIHeader\!IFWI_HEADER!.bin
+)
 
 :: **********************************************************************
 :: The Main Stitching Loop
@@ -168,7 +180,7 @@ for %%i in (%BIOS_Names%) do (
     echo.
     echo Stitching IFWI for !BIOS_Rom! ...
     echo ---------------------------------------------------------------------------
-    echo IFWI  Header: !IFWI_HEADER!.bin,   SEC version: !SEC_VERSION!,   
+    echo IFWI  Header: !IFWI_HEADER_FILE!,   SEC version: !SEC_VERSION!,   
     echo BIOS Version: !BIOS_Version!
 
     echo Platform Type: !Platform_Type!,     IFWI Prefix: %BIOS_ID%
@@ -178,7 +190,8 @@ for %%i in (%BIOS_Names%) do (
     echo.
     echo Generating IFWI... %BIOS_ID%.bin
     echo.
-    copy /b/y IFWIHeader\!IFWI_HEADER!.bin + ..\..\Vlv2MiscBinariesPkg\SEC\!SEC_VERSION!\VLV_SEC_REGION.bin + IFWIHeader\Vacant.bin + !BIOS_Rom! %BIOS_ID%.bin
+    
+    copy /b/y !IFWI_HEADER_FILE! + ..\..\Vlv2MiscBinariesPkg\SEC\!SEC_VERSION!\VLV_SEC_REGION.bin + ..\..\Vlv2MiscBinariesPkg\SEC\!SEC_VERSION!\Vacant.bin + !BIOS_Rom! %BIOS_ID%.bin
     echo.
     echo ===========================================================================
 )

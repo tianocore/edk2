@@ -339,9 +339,10 @@ SetEnvironmentVariables(
     //
     // Copy the string into the Key, leaving the last character allocated as NULL to terminate
     //
-    StrCpyS( Node->Key, 
+    StrnCpyS( Node->Key, 
               StrStr(CurrentString, L"=") - CurrentString + 1, 
-              CurrentString
+              CurrentString,
+              StrStr(CurrentString, L"=") - CurrentString
               );
 
     //

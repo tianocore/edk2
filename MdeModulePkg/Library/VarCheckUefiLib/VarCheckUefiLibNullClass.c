@@ -604,6 +604,17 @@ UEFI_DEFINED_VARIABLE_ENTRY mGlobalVariableList2[] = {
     },
     InternalVarCheckKeyOption
   },
+  {
+    L"PlatformRecovery####",
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_BS_RT,
+      sizeof (UINT32) + sizeof (UINT16),
+      MAX_UINTN
+    },
+    InternalVarCheckLoadOption
+  },
 };
 
 //

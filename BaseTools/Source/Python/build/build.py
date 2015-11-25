@@ -156,16 +156,18 @@ def CheckEnvVariable():
         EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in EFI_SOURCE path",
                         ExtraData=EfiSourceDir)
 
-    # change absolute path to relative path to WORKSPACE
-    if EfiSourceDir.upper().find(WorkspaceDir.upper()) != 0:
-        EdkLogger.error("build", PARAMETER_INVALID, "EFI_SOURCE is not under WORKSPACE",
-                        ExtraData="WORKSPACE = %s\n    EFI_SOURCE = %s" % (WorkspaceDir, EfiSourceDir))
-    if EdkSourceDir.upper().find(WorkspaceDir.upper()) != 0:
-        EdkLogger.error("build", PARAMETER_INVALID, "EDK_SOURCE is not under WORKSPACE",
-                        ExtraData="WORKSPACE = %s\n    EDK_SOURCE = %s" % (WorkspaceDir, EdkSourceDir))
-    if EcpSourceDir.upper().find(WorkspaceDir.upper()) != 0:
-        EdkLogger.error("build", PARAMETER_INVALID, "ECP_SOURCE is not under WORKSPACE",
-                        ExtraData="WORKSPACE = %s\n    ECP_SOURCE = %s" % (WorkspaceDir, EcpSourceDir))
+    # check those variables on single workspace case
+    if not PackagesPath:
+        # change absolute path to relative path to WORKSPACE
+        if EfiSourceDir.upper().find(WorkspaceDir.upper()) != 0:
+            EdkLogger.error("build", PARAMETER_INVALID, "EFI_SOURCE is not under WORKSPACE",
+                            ExtraData="WORKSPACE = %s\n    EFI_SOURCE = %s" % (WorkspaceDir, EfiSourceDir))
+        if EdkSourceDir.upper().find(WorkspaceDir.upper()) != 0:
+            EdkLogger.error("build", PARAMETER_INVALID, "EDK_SOURCE is not under WORKSPACE",
+                            ExtraData="WORKSPACE = %s\n    EDK_SOURCE = %s" % (WorkspaceDir, EdkSourceDir))
+        if EcpSourceDir.upper().find(WorkspaceDir.upper()) != 0:
+            EdkLogger.error("build", PARAMETER_INVALID, "ECP_SOURCE is not under WORKSPACE",
+                            ExtraData="WORKSPACE = %s\n    ECP_SOURCE = %s" % (WorkspaceDir, EcpSourceDir))
 
     # check EDK_TOOLS_PATH
     if "EDK_TOOLS_PATH" not in os.environ:
@@ -778,10 +780,16 @@ class Build():
 
         # print current build environment and configuration
         EdkLogger.quiet("%-16s = %s" % ("WORKSPACE", os.environ["WORKSPACE"]))
+        if "PACKAGES_PATH" in os.environ:
+            # WORKSPACE env has been converted before. Print the same path style with WORKSPACE env. 
+            EdkLogger.quiet("%-16s = %s" % ("PACKAGES_PATH", os.path.normcase(os.path.normpath(os.environ["PACKAGES_PATH"]))))
         EdkLogger.quiet("%-16s = %s" % ("ECP_SOURCE", os.environ["ECP_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EDK_SOURCE", os.environ["EDK_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EFI_SOURCE", os.environ["EFI_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
+        if "EDK_TOOLS_BIN" in os.environ:
+            # Print the same path style with WORKSPACE env. 
+            EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_BIN", os.path.normcase(os.path.normpath(os.environ["EDK_TOOLS_BIN"]))))
 
         EdkLogger.info("")
 

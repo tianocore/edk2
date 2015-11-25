@@ -19,6 +19,12 @@ formset
   title     = STRING_TOKEN(STR_TCG2_TITLE),
   help      = STRING_TOKEN(STR_TCG2_HELP),
   classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+  
+  efivarstore TCG2_CONFIGURATION_INFO,
+    varid = TCG2_CONFIGURATION_INFO_VARSTORE_ID,
+    attribute = 0x02,  // EFI variable attribures  EFI_VARIABLE_BOOTSERVICE_ACCESS
+    name  = TCG2_CONFIGURATION_INFO,
+    guid  = TCG2_CONFIG_FORM_SET_GUID;
 
   efivarstore TCG2_CONFIGURATION,
     varid = TCG2_CONFIGURATION_VARSTORE_ID,
@@ -120,6 +126,7 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
+  suppressif ideqval TCG2_CONFIGURATION_INFO.Sha1Supported == 0;
     checkbox name = TCG2ActivatePCRBank0,
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_0,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA1),
@@ -127,7 +134,9 @@ formset
             flags      = INTERACTIVE,
             default    = 1,
     endcheckbox;
+  endif;
 
+  suppressif ideqval TCG2_CONFIGURATION_INFO.Sha256Supported == 0;
     checkbox name = TCG2ActivatePCRBank1,
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_1,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA256),
@@ -135,7 +144,9 @@ formset
             flags      = INTERACTIVE,
             default    = 0,
     endcheckbox;
+  endif;
 
+  suppressif ideqval TCG2_CONFIGURATION_INFO.Sha384Supported == 0;
     checkbox name = TCG2ActivatePCRBank2,
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_2,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA384),
@@ -143,7 +154,9 @@ formset
             flags      = INTERACTIVE,
             default    = 0,
     endcheckbox;
+  endif;
 
+  suppressif ideqval TCG2_CONFIGURATION_INFO.Sha512Supported == 0;
     checkbox name = TCG2ActivatePCRBank3,
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_3,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA512),
@@ -151,7 +164,9 @@ formset
             flags      = INTERACTIVE,
             default    = 0,
     endcheckbox;
+  endif;
 
+  suppressif ideqval TCG2_CONFIGURATION_INFO.Sm3Supported == 0;
     checkbox name = TCG2ActivatePCRBank4,
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_4,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SM3_256),
@@ -159,6 +174,7 @@ formset
             flags      = INTERACTIVE,
             default    = 0,
     endcheckbox;
+  endif;
 
     endif;
 

@@ -74,6 +74,11 @@
 #define TT_NS                                   BIT5
 #define TT_AF                                   BIT10
 
+#define TT_SH_NON_SHAREABLE                     (0x0 << 8)
+#define TT_SH_OUTER_SHAREABLE                   (0x2 << 8)
+#define TT_SH_INNER_SHAREABLE                   (0x3 << 8)
+#define TT_SH_MASK                              (0x3 << 8)
+
 #define TT_PXN_MASK                             BIT53
 #define TT_UXN_MASK                             BIT54   // EL1&0
 #define TT_XN_MASK                              BIT54   // EL2 / EL3
@@ -103,6 +108,7 @@
 #define TCR_PS_256TB                            (5 << 16)
 
 #define TCR_TG0_4KB                             (0 << 14)
+#define TCR_TG1_4KB                             (2 << 30)
 
 #define TCR_IPS_4GB                             (0ULL << 32)
 #define TCR_IPS_64GB                            (1ULL << 32)
@@ -111,6 +117,7 @@
 #define TCR_IPS_16TB                            (4ULL << 32)
 #define TCR_IPS_256TB                           (5ULL << 32)
 
+#define TCR_EPD1                                (1 << 23)
 
 #define TTBR_ASID_FIELD                      (48)
 #define TTBR_ASID_MASK                       (0xFF << TTBR_ASID_FIELD)

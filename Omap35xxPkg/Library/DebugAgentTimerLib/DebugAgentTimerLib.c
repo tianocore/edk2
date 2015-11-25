@@ -159,7 +159,7 @@ DebugAgentTimerEndOfInterrupt (
   while ((MmioRead32 (gTISR) & TISR_ALL_INTERRUPT_MASK) != TISR_NO_INTERRUPTS_PENDING);
 
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWFIQAGR);
-  ArmDataSyncronizationBarrier ();
+  ArmDataSynchronizationBarrier ();
 
 }
 

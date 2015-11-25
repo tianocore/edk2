@@ -122,11 +122,16 @@ BmMatchDevicePaths (
 
 /**
   This routine adjust the memory information for different memory type and 
-  save them into the variables for next boot.
+  save them into the variables for next boot. It resets the system when
+  memory information is updated and the current boot option belongs to
+  boot category instead of application category.
+
+  @param Boot  TRUE if current boot option belongs to boot category instead of
+               application category.
 **/
 VOID
 BmSetMemoryTypeInformationVariable (
-  VOID
+  IN BOOLEAN                    Boot
   )
 {
   EFI_STATUS                   Status;
@@ -267,11 +272,11 @@ BmSetMemoryTypeInformationVariable (
 
     if (!EFI_ERROR (Status)) {
       //
-      // If the Memory Type Information settings have been modified, then reset the platform
-      // so the new Memory Type Information setting will be used to guarantee that an S4
+      // If the Memory Type Information settings have been modified and the boot option belongs to boot category,
+      // then reset the platform so the new Memory Type Information setting will be used to guarantee that an S4
       // entry/resume cycle will not fail.
       //
-      if (MemoryTypeInformationModified) {
+      if (MemoryTypeInformationModified && Boot && PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
         DEBUG ((EFI_D_INFO, "Memory Type Information settings change. Warm Reset!!!\n"));
         gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
       }
@@ -384,3 +389,29 @@ BmPrintDp (
     FreePool (Str);
   }
 }
+
+/**
+  Convert a single character to number.
+  It assumes the input Char is in the scope of L'0' ~ L'9' and L'A' ~ L'F'
+
+  @param    Char   The input char which need to convert to int.
+
+  @return  The converted 8-bit number or (UINTN) -1 if conversion failed.
+**/
+UINTN
+BmCharToUint (
+  IN CHAR16                           Char
+  )
+{
+  if ((Char >= L'0') && (Char <= L'9')) {
+    return (UINTN) (Char - L'0');
+  }
+
+  if ((Char >= L'A') && (Char <= L'F')) {
+    return (UINTN) (Char - L'A' + 0xA);
+  }
+
+  ASSERT (FALSE);
+  return (UINTN) -1;
+}
+

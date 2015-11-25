@@ -169,6 +169,7 @@ XenPvBlockFrontInitialization (
   XEN_BLOCK_FRONT_DEVICE *Dev;
   XenbusState State;
   UINT64 Value;
+  CHAR8 *Params;
 
   ASSERT (NodeName != NULL);
 
@@ -185,6 +186,20 @@ XenPvBlockFrontInitialization (
     Dev->MediaInfo.CdRom = FALSE;
   }
   FreePool (DeviceType);
+
+  if (Dev->MediaInfo.CdRom) {
+    Status = XenBusIo->XsBackendRead (XenBusIo, XST_NIL, "params", (VOID**)&Params);
+    if (Status != XENSTORE_STATUS_SUCCESS) {
+      DEBUG ((EFI_D_ERROR, "%a: Failed to read params (%d)\n", __FUNCTION__, Status));
+      goto Error;
+    }
+    if (AsciiStrLen (Params) == 0 || AsciiStrCmp (Params, "aio:") == 0) {
+      FreePool (Params);
+      DEBUG ((EFI_D_INFO, "%a: Empty cdrom\n", __FUNCTION__));
+      goto Error;
+    }
+    FreePool (Params);
+  }
 
   Status = XenBusReadUint64 (XenBusIo, "backend-id", FALSE, &Value);
   if (Status != XENSTORE_STATUS_SUCCESS || Value > MAX_UINT16) {

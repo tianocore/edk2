@@ -124,14 +124,6 @@ typedef struct {
 
 extern SHELL_INFO ShellInfoObject;
 
-typedef enum {
-  Internal_Command,
-  Script_File_Name,
-  Efi_Application,
-  File_Sys_Change,
-  Unknown_Invalid
-} SHELL_OPERATION_TYPES;
-
 /**
   Converts the command line to it's post-processed form.  this replaces variables and alias' per UEFI Shell spec.
 
@@ -291,6 +283,25 @@ EFI_STATUS
 EFIAPI
 RunCommand(
   IN CONST CHAR16   *CmdLine
+  );
+
+/**
+  Function will process and run a command line.
+
+  This will determine if the command line represents an internal shell 
+  command or dispatch an external application.
+
+  @param[in] CmdLine      The command line to parse.
+  @param[out] CommandStatus   The status from the command line.
+
+  @retval EFI_SUCCESS     The command was completed.
+  @retval EFI_ABORTED     The command's operation was aborted.
+**/
+EFI_STATUS
+EFIAPI
+RunShellCommand(
+  IN CONST CHAR16   *CmdLine,
+  OUT EFI_STATUS    *CommandStatus
   );
 
 /**

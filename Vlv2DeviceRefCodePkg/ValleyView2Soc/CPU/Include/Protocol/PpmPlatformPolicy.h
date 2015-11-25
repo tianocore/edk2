@@ -110,7 +110,7 @@ typedef struct _PPM_TURBO_SETTINGS {
 //
 // Platform Policy
 //
-typedef struct _PPM_PLATFORM_POLICY_PROTOCOL {
+struct _PPM_PLATFORM_POLICY_PROTOCOL {
   UINT8                                 Revision;
   PPM_FUNCTION_ENABLES                  FunctionEnables;
   PPM_CUSTOM_VID_TABLE                  CustomVidTable;
@@ -133,6 +133,6 @@ typedef struct _PPM_PLATFORM_POLICY_PROTOCOL {
   //
   UINT16                                Reserve10;
   UINT8                                 Reserve11;
-} PPM_PLATFORM_POLICY_PROTOCOL;
+};
 
 #endif

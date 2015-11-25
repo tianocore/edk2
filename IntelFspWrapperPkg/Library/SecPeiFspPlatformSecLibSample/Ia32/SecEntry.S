@@ -210,12 +210,22 @@ FspHeaderFound:
   jmp  *%eax
 
 TempRamInitDone:
+  cmp  $0x8000000E, %eax   #Check if EFI_NOT_FOUND returned. Error code for Microcode Update not found.
+  je   CallSecFspInit      #If microcode not found, don't hang, but continue.
+
   cmp  $0x0, %eax
   jnz  FspApiFailed
 
   #   ECX: start of range
   #   EDX: end of range
+CallSecFspInit:
+  xorl    %eax, %eax
   movl    %edx, %esp
+
+  # Align the stack at DWORD
+  addl  $3, %esp
+  andl  $0xFFFFFFFC, %esp
+
   pushl   %edx
   pushl   %ecx
   pushl   %eax # zero - no hob list yet

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
                                                                                    
 
   This program and the accompanying materials are licensed and made available under
@@ -968,6 +968,7 @@ AcpiPlatformEntryPoint (
   mGlobalNvsArea.Area->UartSelection = mSystemConfiguration.UartInterface;
   mGlobalNvsArea.Area->PcuUart1Enable = mSystemConfiguration.PcuUart1;
   mGlobalNvsArea.Area->NativePCIESupport = 1;
+  mGlobalNvsArea.Area->RtcBattery = mSystemConfiguration.RtcBattery;
 
 
 

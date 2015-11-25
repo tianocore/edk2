@@ -3,6 +3,7 @@
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -40,6 +41,7 @@
 
 **/
 EFI_STATUS
+EFIAPI
 EblMdCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -89,6 +91,7 @@ EblMdCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblMfillCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -169,6 +172,7 @@ CHAR8 *gPciSerialClassCodes[] = {
 
 **/
 EFI_STATUS
+EFIAPI
 EblPciCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv

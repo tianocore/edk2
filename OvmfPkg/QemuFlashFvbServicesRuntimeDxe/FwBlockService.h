@@ -1,51 +1,50 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 
-Module Name:
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  FwBlockService.h
-  
-Abstract:
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Firmware volume block driver for Intel Firmware Hub (FWH) device
+  Module Name:
+
+    FwBlockService.h
+
+  Abstract:
+
+    Firmware volume block driver for Intel Firmware Hub (FWH) device
 
 **/
 
 #ifndef _FW_BLOCK_SERVICE_H
 #define _FW_BLOCK_SERVICE_H
 
-//
-// BugBug: Add documentation here for data structure!!!!
-//
-#define FVB_PHYSICAL  0
-#define FVB_VIRTUAL   1
-
 typedef struct {
-  EFI_LOCK                    FvbDevLock;
-  UINTN                       FvBase[2];
+  UINTN                       FvBase;
   UINTN                       NumOfBlocks;
   EFI_FIRMWARE_VOLUME_HEADER  VolumeHeader;
 } EFI_FW_VOL_INSTANCE;
 
 typedef struct {
   UINT32              NumFv;
-  EFI_FW_VOL_INSTANCE *FvInstance[2];
-  UINT8               *FvbScratchSpace[2];
+  EFI_FW_VOL_INSTANCE *FvInstance;
 } ESAL_FWB_GLOBAL;
+
+extern ESAL_FWB_GLOBAL *mFvbModuleGlobal;
 
 //
 // Fvb Protocol instance data
 //
-#define FVB_DEVICE_FROM_THIS(a)         CR (a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
-#define FVB_EXTEND_DEVICE_FROM_THIS(a)  CR (a, EFI_FW_VOL_BLOCK_DEVICE, FvbExtension, FVB_DEVICE_SIGNATURE)
+#define FVB_DEVICE_FROM_THIS(a) CR (a, EFI_FW_VOL_BLOCK_DEVICE, \
+                                  FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
+
+#define FVB_EXTEND_DEVICE_FROM_THIS(a) CR (a, EFI_FW_VOL_BLOCK_DEVICE, \
+                                         FvbExtension, FVB_DEVICE_SIGNATURE)
+
 #define FVB_DEVICE_SIGNATURE            SIGNATURE_32 ('F', 'V', 'B', 'N')
 
 typedef struct {
@@ -75,24 +74,21 @@ EFI_STATUS
 FvbSetVolumeAttributes (
   IN UINTN                                Instance,
   IN OUT EFI_FVB_ATTRIBUTES_2             *Attributes,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   );
 
 EFI_STATUS
 FvbGetVolumeAttributes (
   IN UINTN                                Instance,
   OUT EFI_FVB_ATTRIBUTES_2                *Attributes,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   );
 
 EFI_STATUS
 FvbGetPhysicalAddress (
   IN UINTN                                Instance,
   OUT EFI_PHYSICAL_ADDRESS                *Address,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
+  IN ESAL_FWB_GLOBAL                      *Global
   );
 
 EFI_STATUS
@@ -117,8 +113,7 @@ FvbGetLbaAddress (
   OUT UINTN                               *LbaAddress,
   OUT UINTN                               *LbaLength,
   OUT UINTN                               *NumOfBlocks,
-  IN  ESAL_FWB_GLOBAL                     *Global,
-  IN  BOOLEAN                             Virtual
+  IN  ESAL_FWB_GLOBAL                     *Global
   );
 
 //
@@ -181,4 +176,17 @@ FvbProtocolEraseBlocks (
   ...
   );
 
+//
+// The following functions have different implementations dependent on the
+// module type chosen for building this driver.
+//
+VOID
+InstallProtocolInterfaces (
+  IN EFI_FW_VOL_BLOCK_DEVICE *FvbDevice
+  );
+
+VOID
+InstallVirtualAddressChangeHandler (
+  VOID
+  );
 #endif

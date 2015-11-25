@@ -313,6 +313,47 @@ CheckAndUpdateAllAPsToIdleState (
 }
 
 /**
+  Check if all APs are in state CpuStateSleeping.
+
+  Return TRUE if all APs are in the CpuStateSleeping state.  Do not
+  check the state of the BSP or any disabled APs.
+
+  @retval TRUE   All APs are in CpuStateSleeping state.
+  @retval FALSE  One or more APs are not in CpuStateSleeping state.
+
+**/
+BOOLEAN
+CheckAllAPsSleeping (
+  VOID
+  )
+{
+  UINTN           ProcessorNumber;
+  CPU_DATA_BLOCK  *CpuData;
+
+  for (ProcessorNumber = 0; ProcessorNumber < mMpSystemData.NumberOfProcessors; ProcessorNumber++) {
+    CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
+    if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
+      //
+      // Skip BSP
+      //
+      continue;
+    }
+
+    if (!TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
+      //
+      // Skip Disabled processors
+      //
+      continue;
+    }
+
+    if (GetApState (CpuData) != CpuStateSleeping) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+/**
   If the timeout expires before all APs returns from Procedure,
   we should forcibly terminate the executing AP and fill FailedList back
   by StartupAllAPs().
@@ -760,7 +801,7 @@ StartupAllAPs (
       goto Done;
     }
 
-    gBS->Stall (gPollInterval);
+    MicroSecondDelay (gPollInterval);
     mMpSystemData.Timeout -= gPollInterval;
   }
 
@@ -946,7 +987,7 @@ StartupThisAP (
       return EFI_TIMEOUT;
     }
 
-    gBS->Stall (gPollInterval);
+    MicroSecondDelay (gPollInterval);
     CpuData->Timeout -= gPollInterval;
   }
 
@@ -1626,6 +1667,22 @@ ExitBootServicesCallback (
 }
 
 /**
+  A minimal wrapper function that allows MtrrSetAllMtrrs() to be passed to
+  EFI_MP_SERVICES_PROTOCOL.StartupAllAPs() as Procedure.
+
+  @param[in] Buffer  Pointer to an MTRR_SETTINGS object, to be passed to
+                     MtrrSetAllMtrrs().
+**/
+VOID
+EFIAPI
+SetMtrrsFromBuffer (
+  IN VOID *Buffer
+  )
+{
+  MtrrSetAllMtrrs (Buffer);
+}
+
+/**
   Initialize Multi-processor support.
 
 **/
@@ -1634,7 +1691,9 @@ InitializeMpSupport (
   VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS     Status;
+  MTRR_SETTINGS  MtrrSettings;
+  UINTN          Timeout;
 
   gMaxLogicalProcessorNumber = (UINTN) PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
   if (gMaxLogicalProcessorNumber < 1) {
@@ -1642,35 +1701,40 @@ InitializeMpSupport (
     return;
   }
 
-  if (gMaxLogicalProcessorNumber == 1) {
-    return;
-  }
 
-  gApStackSize = (UINTN) PcdGet32 (PcdCpuApStackSize);
-  ASSERT ((gApStackSize & (SIZE_4KB - 1)) == 0);
-
-  mApStackStart = AllocatePages (EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
-  ASSERT (mApStackStart != NULL);
-
-  //
-  // the first buffer of stack size used for common stack, when the amount of AP
-  // more than 1, we should never free the common stack which maybe used for AP reset.
-  //
-  mCommonStack = mApStackStart;
-  mTopOfApCommonStack = (UINT8*) mApStackStart + gApStackSize;
-  mApStackStart = mTopOfApCommonStack;
 
   InitMpSystemData ();
 
-  PrepareAPStartupCode ();
+  //
+  // Only perform AP detection if PcdCpuMaxLogicalProcessorNumber is greater than 1
+  //
+  if (gMaxLogicalProcessorNumber > 1) {
 
-  StartApsStackless ();
+    gApStackSize = (UINTN) PcdGet32 (PcdCpuApStackSize);
+    ASSERT ((gApStackSize & (SIZE_4KB - 1)) == 0);
+
+    mApStackStart = AllocatePages (EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
+    ASSERT (mApStackStart != NULL);
+
+    //
+    // the first buffer of stack size used for common stack, when the amount of AP
+    // more than 1, we should never free the common stack which maybe used for AP reset.
+    //
+    mCommonStack = mApStackStart;
+    mTopOfApCommonStack = (UINT8*) mApStackStart + gApStackSize;
+    mApStackStart = mTopOfApCommonStack;
+
+    PrepareAPStartupCode ();
+
+    StartApsStackless ();
+  }
 
   DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mMpSystemData.NumberOfProcessors));
   if (mMpSystemData.NumberOfProcessors == 1) {
     FreeApStartupCode ();
-    FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
-    return;
+    if (mCommonStack != NULL) {
+      FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
+    }
   }
 
   mMpSystemData.CpuDatas = ReallocatePool (
@@ -1678,12 +1742,43 @@ InitializeMpSupport (
                              sizeof (CPU_DATA_BLOCK) * mMpSystemData.NumberOfProcessors,
                              mMpSystemData.CpuDatas);
 
+  //
+  // Release all APs to complete initialization and enter idle loop
+  //
   mAPsAlreadyInitFinished = TRUE;
+
+  //
+  // Wait for all APs to enter idle loop.
+  //
+  Timeout = 0;
+  do {
+    if (CheckAllAPsSleeping ()) {
+      break;
+    }
+    MicroSecondDelay (gPollInterval);
+    Timeout += gPollInterval;
+  } while (Timeout <= PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
+  ASSERT (Timeout <= PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
 
   //
   // Update CPU healthy information from Guided HOB
   //
   CollectBistDataFromHob ();
+
+  //
+  // Synchronize MTRR settings to APs.
+  //
+  MtrrGetAllMtrrs (&MtrrSettings);
+  Status = mMpServicesTemplate.StartupAllAPs (
+                                 &mMpServicesTemplate, // This
+                                 SetMtrrsFromBuffer,   // Procedure
+                                 TRUE,                 // SingleThread
+                                 NULL,                 // WaitEvent
+                                 0,                    // TimeoutInMicrosecsond
+                                 &MtrrSettings,        // ProcedureArgument
+                                 NULL                  // FailedCpuList
+                                 );
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_STARTED);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mMpServiceHandle,
@@ -1692,10 +1787,12 @@ InitializeMpSupport (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  if (mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
-    FreePages (mApStackStart, EFI_SIZE_TO_PAGES (
-                                (gMaxLogicalProcessorNumber - mMpSystemData.NumberOfProcessors) *
-                                gApStackSize));
+  if (mMpSystemData.NumberOfProcessors > 1 && mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
+    if (mApStackStart != NULL) {
+      FreePages (mApStackStart, EFI_SIZE_TO_PAGES (
+                                  (gMaxLogicalProcessorNumber - mMpSystemData.NumberOfProcessors) *
+                                  gApStackSize));
+    }
   }
 
   Status = gBS->CreateEvent (

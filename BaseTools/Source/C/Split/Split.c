@@ -2,7 +2,7 @@
 
   Split a file into two pieces at the request offset.
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
@@ -58,7 +58,7 @@ Returns:
 --*/
 {
   printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 1999-2014 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 1999-2015 Intel Corporation. All rights reserved.\n");
   printf ("\n  SplitFile creates two Binary files either in the same directory as the current working\n");
   printf ("  directory or in the specified directory.\n");
 }
@@ -176,20 +176,25 @@ CreateDir (
 {
   CHAR8* temp = *FullFileName;
   CHAR8* start = temp;
+  CHAR8  tempchar;
   UINT64 index = 0;
 
   for (;index < strlen(temp); ++index) {
     if (temp[index] == '\\' || temp[index] == '/') {
-      temp[index] = 0;
-      if (chdir(start)) {
-        if (mkdir(start, S_IRWXU | S_IRWXG | S_IRWXO) != 0) {
-          return EFI_ABORTED;
+      if (temp[index + 1] != '\0') {
+        tempchar = temp[index + 1];
+        temp[index + 1] = 0;
+        if (chdir(start)) {
+          if (mkdir(start, S_IRWXU | S_IRWXG | S_IRWXO) != 0) {
+            return EFI_ABORTED;
+          }
+          chdir(start);
         }
-        chdir(start);
+        start = temp + index + 1;
+        temp[index] = '/';
+        temp[index + 1] = tempchar;
+      }
     }
-      start = temp + index + 1;
-      temp[index] = '/';
-  }
   }
 
   return EFI_SUCCESS;

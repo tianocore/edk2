@@ -86,6 +86,12 @@ if /i "%~1"=="/nB" (
     shift
     goto OptLoop
 )
+if /i "%~1"=="/yL" (
+    set Stitch_Flags=%Stitch_Flags% /yL
+    shift
+    goto OptLoop
+)
+
 
 :: Require 2 input parameters
 if "%~2"=="" goto Usage
@@ -93,6 +99,7 @@ if "%~2"=="" goto Usage
 :: Assign required arguments
 set Platform_Type=%~1
 set Build_Target=%~2
+
 if "%~3"=="" (
     set "IFWI_Suffix= "
 ) else set "IFWI_Suffix=/S %~3"
@@ -151,16 +158,10 @@ echo Script to build BIOS firmware and stitch the entire IFWI.
 echo.
 echo Usage: Build_IFWI.bat [options]  PlatformType  BuildTarget  [IFWI Suffix]
 echo.
-echo        /q     Quiet mode. Only display Fatal Errors (slightly faster)
-echo        /l     Log a copy of the build output to EDK2.log
 echo        /c     CleanAll before building
-echo        /ecp   ECP build enable
-echo        /src   Build silicon source code (default binary)
 echo        /x64   Set Arch to X64  (default: X64)
 echo        /IA32  Set Arch to IA32 (default: X64)
-echo        /nG    Do NOT update the GOP driver when stitching (ie keep src version)
-echo        /nM    Do NOT update the Microcode when stitching  (ie keep src version)
-echo        /nB    Do NOT create a backup of BIOS.ROM before modifying it for Stitch
+echo        /yL    Enable SPI lock
 echo. 
 echo        Platform Types:   MNW2
 echo        Build Targets:    Release, Debug

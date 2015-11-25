@@ -119,7 +119,8 @@
           0x2C06F000, 0x2C04F000, 25, 0 /* GicRBase */),
     },
     EFI_ACPI_5_0_GIC_DISTRIBUTOR_INIT(0, FixedPcdGet32 (PcdGicDistributorBase), 0),
-    EFI_ACPI_6_0_GIC_MSI_FRAME_INIT(0, ARM_JUNO_GIV2M_MSI_BASE, 0, 0, 0)
+    // Format: EFI_ACPI_6_0_GIC_MSI_FRAME_INIT(GicMsiFrameId, PhysicalBaseAddress, Flags, SPICount, SPIBase)
+    EFI_ACPI_6_0_GIC_MSI_FRAME_INIT(0, ARM_JUNO_GIV2M_MSI_BASE, 0, ARM_JUNO_GIV2M_MSI_SPI_COUNT, ARM_JUNO_GIV2M_MSI_SPI_BASE)
   };
 #endif
 

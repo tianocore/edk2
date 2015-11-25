@@ -1,5 +1,5 @@
 /** @file
-  FrontPage routines to handle the callbacks and browser calls
+Head file for front page.
 
 Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -15,14 +15,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _FRONT_PAGE_H_
 #define _FRONT_PAGE_H_
 
-#include "DeviceMngr/DeviceManager.h"
-#include "BootMaint/BootMaint.h"
-#include "BootMngr/BootManager.h"
 #include "String.h"
+#include "Ui.h"
 
 #include <Protocol/BootLogo.h>
 //
-// These are the VFR compiler generated data representing our VFR data.
+// These is  the VFR compiler generated data representing our VFR data.
 //
 extern UINT8  FrontPageVfrBin[];
 
@@ -31,11 +29,6 @@ extern EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
 extern BOOLEAN  gConnectAllHappened;
 
 #define SMBIOS_TYPE4_CPU_SOCKET_POPULATED BIT6
-
-///
-/// The size of a 3 character ISO639 language code.
-///
-#define ISO_639_2_ENTRY_SIZE   3
 
 //
 // This is the VFR compiler generated header file which defines the
@@ -47,15 +40,10 @@ extern BOOLEAN  gConnectAllHappened;
 // These are defined as the same with vfr file
 //
 #define FRONT_PAGE_FORM_ID             0x1000
-#define INVALID_FORM_ID                0x0FFF
 
-#define FRONT_PAGE_KEY_SECTION         0x1000
 #define FRONT_PAGE_KEY_OFFSET          0x4000
 #define FRONT_PAGE_KEY_CONTINUE        0x1000
 #define FRONT_PAGE_KEY_LANGUAGE        0x1234
-#define FRONT_PAGE_KEY_BOOT_MANAGER    0x1064
-#define FRONT_PAGE_KEY_DEVICE_MANAGER  0x8567
-#define FRONT_PAGE_KEY_BOOT_MAINTAIN   0x9876
 
 #define LABEL_SELECT_LANGUAGE          0x1000
 #define LABEL_PLATFORM_INFORMATION     0x1001
@@ -220,30 +208,6 @@ UiEntry (
   );
 
 /**
-  Extract the displayed formset for given HII handle and class guid.
-
-  @param Handle          The HII handle.
-  @param SetupClassGuid  The class guid specifies which form set will be displayed.
-  @param SkipCount       Skip some formsets which has processed before.
-  @param FormSetTitle    Formset title string.
-  @param FormSetHelp     Formset help string.
-  @param FormSetGuid     Formset Guid.
-
-  @retval  TRUE          The formset for given HII handle will be displayed.
-  @return  FALSE         The formset for given HII handle will not be displayed.
-
-**/
-BOOLEAN
-ExtractDisplayedHiiFormFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle,
-  IN      EFI_GUID            *SetupClassGuid,
-  IN      UINTN               SkipCount,
-  OUT     EFI_STRING_ID       *FormSetTitle,
-  OUT     EFI_STRING_ID       *FormSetHelp,
-  OUT     EFI_GUID            *FormSetGuid
-  );
-
-/**
   Extract device path for given HII handle and class guid.
 
   @param Handle          The HII handle.
@@ -255,22 +219,6 @@ ExtractDisplayedHiiFormFromHiiHandle (
 CHAR16 *
 ExtractDevicePathFromHiiHandle (
   IN      EFI_HII_HANDLE      Handle
-  );
-
-/**
-  This function will change video resolution and text mode
-  according to defined setup mode or defined boot mode  
-
-  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
-
-  @retval  EFI_SUCCESS  Mode is changed successfully.
-  @retval  Others             Mode failed to be changed.
-
-**/
-EFI_STATUS
-EFIAPI
-BdsSetConsoleMode (
-  BOOLEAN  IsSetupMode
   );
 
 #endif // _FRONT_PAGE_H_

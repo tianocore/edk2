@@ -18,12 +18,6 @@
 
 typedef VOID (*AARCH64_CACHE_OPERATION)(UINTN);
 
-
-VOID
-AArch64PerformPoUDataCacheOperation (
-  IN  AARCH64_CACHE_OPERATION  DataCacheOperation
-  );
-
 VOID
 AArch64AllDataCachesOperation (
   IN  AARCH64_CACHE_OPERATION  DataCacheOperation

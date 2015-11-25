@@ -1,0 +1,60 @@
+## @file
+#  library defines a set of interfaces for how to do file explorer.
+#  
+#  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+#  This software and associated documentation (if any) is furnished
+#  under a license and may only be used or copied in accordance
+#  with the terms of the license. Except as permitted by such
+#  license, no part of this software or documentation may be
+#  reproduced, stored in a retrieval system, or transmitted in any
+#  form or by any means without the express written consent of
+#  Intel Corporation.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FileExplorerLib
+  FILE_GUID                      = 4FC9C630-0F90-4053-8F13-264CBD22FC58
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FileExplorerLib|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = FileExplorerLibConstructor
+  DESTRUCTOR                     = FileExplorerLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  FileExplorer.h
+  FileExplorerVfr.vfr
+  FileExplorerString.uni
+  FileExplorer.c
+  FormGuid.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+
+[Guids]
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
+  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
+ 
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
+  gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PROTOCOL CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## PROTOCOL CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## PROTOCOL CONSUMES

@@ -16,57 +16,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _BDS_MODULE_H_
 #define _BDS_MODULE_H_
 
-#include <PiDxe.h>
-#include <IndustryStandard/PeImage.h>
 #include <IndustryStandard/SmBios.h>
 
 #include <Guid/MdeModuleHii.h>
-#include <Guid/FileSystemVolumeLabelInfo.h>
-#include <Guid/HiiPlatformSetupFormset.h>
-#include <Guid/GlobalVariable.h>
-#include <Guid/CapsuleVendor.h>
 #include <Guid/StatusCodeDataTypeId.h>
-#include <Guid/FileInfo.h>
-#include <Guid/HiiBootMaintenanceFormset.h>
 
-#include <Protocol/LoadFile.h>
-#include <Protocol/DevicePath.h>
-#include <Protocol/HiiConfigRouting.h>
 #include <Protocol/Smbios.h>
-#include <Protocol/UgaDraw.h>
-#include <Protocol/BlockIo.h>
-#include <Protocol/GenericMemoryTest.h>
-#include <Protocol/FormBrowser2.h>
 #include <Protocol/HiiConfigAccess.h>
-#include <Protocol/GraphicsOutput.h>
-#include <Protocol/SimpleFileSystem.h>
-#include <Protocol/HiiDatabase.h>
-#include <Protocol/HiiString.h>
-#include <Protocol/SerialIo.h>
-#include <Protocol/SimpleTextInEx.h>
-#include <Protocol/DriverHealth.h>
-#include <Protocol/DevicePathToText.h>
 
-#include <Library/UefiDriverEntryPoint.h>
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PerformanceLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/HobLib.h>
-#include <Library/BaseLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/PcdLib.h>
-#include <Library/CapsuleLib.h>
 #include <Library/HiiLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/PcdLib.h>
 #include <Library/UefiHiiServicesLib.h>
-
 #include <Library/UefiBootManagerLib.h>
 
 #pragma pack(1)
@@ -162,16 +130,4 @@ SetupResetReminder (
   VOID
   );
 
-/**
-  This function converts an input device structure to a Unicode string.
-
-  @param DevPath                  A pointer to the device path structure.
-
-  @return A new allocated Unicode string that represents the device path.
-
-**/
-CHAR16 *
-UiDevicePathToStr (
-  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
-  );
 #endif

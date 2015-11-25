@@ -3,6 +3,7 @@
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -202,6 +203,7 @@ EblPrintLoadFileInfo (
 
 **/
 EFI_STATUS
+EFIAPI
 EblDeviceCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -285,6 +287,7 @@ EblDeviceCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblStartCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -370,6 +373,7 @@ EblStartCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblLoadFvCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -426,6 +430,7 @@ EblLoadFvCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblConnectCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -548,6 +553,7 @@ CHAR8 *gMemMapType[] = {
 
 **/
 EFI_STATUS
+EFIAPI
 EblMemMapCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -657,6 +663,7 @@ EblMemMapCmd (
 
 **/
 EFI_STATUS
+EFIAPI
 EblGoCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -721,6 +728,7 @@ EblGoCmd (
 #define FILE_COPY_CHUNK 0x20000
 
 EFI_STATUS
+EFIAPI
 EblFileCopyCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv
@@ -863,6 +871,7 @@ Exit:
 }
 
 EFI_STATUS
+EFIAPI
 EblFileDiffCmd (
   IN UINTN  Argc,
   IN CHAR8  **Argv

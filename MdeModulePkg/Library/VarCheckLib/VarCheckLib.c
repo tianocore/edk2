@@ -80,6 +80,13 @@ VARIABLE_ENTRY_PROPERTY mVarCheckVariableWithWildcardName[] = {
     },
   },
   {
+    &gEfiGlobalVariableGuid,
+    L"PlatformRecovery####",
+    {
+      0
+    },
+  },
+  {
     &gEfiHardwareErrorVariableGuid,
     L"HwErrRec####",
     {

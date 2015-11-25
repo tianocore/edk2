@@ -1056,7 +1056,7 @@ PeiDispatcher (
             ASSERT_EFI_ERROR (Status);
             if (FvFileInfo.FileType == EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) {
               //
-              // For Fv type file, Produce new FV PPI and FV hob
+              // For Fv type file, Produce new FvInfo PPI and FV hob
               //
               Status = ProcessFvFile (Private, &Private->Fv[FvCount], PeimFileHandle);
               if (Status == EFI_SUCCESS) {
@@ -1065,6 +1065,13 @@ PeiDispatcher (
                 //
                 Private->Fv[FvCount].PeimState[PeimCount]++;
                 Private->PeimDispatchOnThisPass = TRUE;
+              } else {
+                //
+                // The related GuidedSectionExtraction/Decompress PPI for the
+                // encapsulated FV image section may be installed in the rest
+                // of this do-while loop, so need to make another pass.
+                //
+                Private->PeimNeedingDispatch = TRUE;
               }
             } else {
               //
@@ -1192,11 +1199,11 @@ PeiDispatcher (
     Private->CurrentPeimFvCount = 0;
 
     //
-    // PeimNeedingDispatch being TRUE means we found a PEIM that did not get
+    // PeimNeedingDispatch being TRUE means we found a PEIM/FV that did not get
     //  dispatched. So we need to make another pass
     //
-    // PeimDispatchOnThisPass being TRUE means we dispatched a PEIM on this
-    //  pass. If we did not dispatch a PEIM there is no point in trying again
+    // PeimDispatchOnThisPass being TRUE means we dispatched a PEIM/FV on this
+    //  pass. If we did not dispatch a PEIM/FV there is no point in trying again
     //  as it will fail the next time too (nothing has changed).
     //
   } while (Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass);

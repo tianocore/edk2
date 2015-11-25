@@ -563,7 +563,10 @@ RestoreLockBox (
              (VOID **)&SmmCommunicationPpi
              );
   if (EFI_ERROR (Status)) {
-    return EFI_NOT_STARTED;
+    DEBUG ((EFI_D_INFO, "SmmLockBoxPeiLib LocatePpi - (%r)\n", Status));
+    Status = InternalRestoreLockBoxFromSmram (Guid, Buffer, Length);
+    DEBUG ((EFI_D_INFO, "SmmLockBoxPeiLib RestoreLockBox - Exit (%r)\n", Status));
+    return Status;
   }
 
   //
@@ -682,7 +685,10 @@ RestoreAllLockBoxInPlace (
              (VOID **)&SmmCommunicationPpi
              );
   if (EFI_ERROR (Status)) {
-    return EFI_NOT_STARTED;
+    DEBUG ((EFI_D_INFO, "SmmLockBoxPeiLib LocatePpi - (%r)\n", Status));
+    Status = InternalRestoreAllLockBoxInPlaceFromSmram ();
+    DEBUG ((EFI_D_INFO, "SmmLockBoxPeiLib RestoreAllLockBoxInPlace - Exit (%r)\n", Status));
+    return Status;
   }
 
   //

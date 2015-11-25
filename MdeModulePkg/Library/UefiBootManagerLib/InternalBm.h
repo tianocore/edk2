@@ -2,6 +2,7 @@
   BDS library definition, include the file and data structure
 
 Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,6 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/BootLogo.h>
 #include <Protocol/DriverHealth.h>
 #include <Protocol/FormBrowser2.h>
+#include <Protocol/VariableLock.h>
 
 #include <Guid/ZeroGuid.h>
 #include <Guid/MemoryTypeInformation.h>
@@ -101,12 +103,23 @@ CHAR16 *
   IN EFI_HANDLE          Handle
   );
 
-#define BM_OPTION_NAME_LEN                          sizeof ("SysPrep####")
+//
+// PlatformRecovery#### is the load option with the longest name
+//
+#define BM_OPTION_NAME_LEN                          sizeof ("PlatformRecovery####")
 extern CHAR16  *mBmLoadOptionName[];
 
+/**
+  Visitor function to be called by BmForEachVariable for each variable
+  in variable storage.
+
+  @param Name    Variable name.
+  @param Guid    Variable GUID.
+  @param Context The same context passed to BmForEachVariable.
+**/
 typedef
 VOID
-(*VARIABLE_VISITOR) (
+(*BM_VARIABLE_VISITOR) (
   CHAR16                *Name,
   EFI_GUID              *Guid,
   VOID                  *Context
@@ -119,8 +132,8 @@ VOID
   @param Context   The context passed to Visitor function.
 **/
 VOID
-ForEachVariable (
-  VARIABLE_VISITOR            Visitor,
+BmForEachVariable (
+  BM_VARIABLE_VISITOR         Visitor,
   VOID                        *Context
   );
 
@@ -232,11 +245,16 @@ BmGetImageHeader (
 
 /**
   This routine adjust the memory information for different memory type and 
-  save them into the variables for next boot.
+  save them into the variables for next boot. It resets the system when
+  memory information is updated and the current boot option belongs to
+  boot category instead of application category.
+
+  @param Boot  TRUE if current boot option belongs to boot category instead of
+               application category.
 **/
 VOID
 BmSetMemoryTypeInformationVariable (
-  VOID
+  IN BOOLEAN                    Boot
   );
 
 /**
@@ -407,27 +425,6 @@ BmDelPartMatchInstance (
   IN     EFI_DEVICE_PATH_PROTOCOL  *Single
   );
 
-
-/**
-  Return the index of the load option in the load option array.
-
-  The function consider two load options are equal when the 
-  OptionType, Attributes, Description, FilePath and OptionalData are equal.
-
-  @param Key    Pointer to the load option to be found.
-  @param Array  Pointer to the array of load options to be found.
-  @param Count  Number of entries in the Array.
-
-  @retval -1          Key wasn't found in the Array.
-  @retval 0 ~ Count-1 The index of the Key in the Array.
-**/
-INTN
-BmFindLoadOption (
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Key,
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Array,
-  IN UINTN                              Count
-  );
-
 /**
   Repair all the controllers according to the Driver Health status queried.
 **/
@@ -444,6 +441,19 @@ BmRepairAllControllers (
 VOID
 BmPrintDp (
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath
+  );
+
+/**
+  Convert a single character to number.
+  It assumes the input Char is in the scope of L'0' ~ L'9' and L'A' ~ L'F'
+
+  @param    Char   The input char which need to convert to int.
+
+  @return  The converted 8-bit number or (UINTN) -1 if conversion failed.
+**/
+UINTN
+BmCharToUint (
+  IN CHAR16                           Char
   );
 
 #endif // _INTERNAL_BM_H_

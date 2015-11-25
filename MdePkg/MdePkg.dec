@@ -1938,6 +1938,11 @@
   # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask & 0xFC) == 0
   gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
 
+  ## The bit width of data to be written to Port80. The default value is 8.
+  # @Prompt Port80 Data Width
+  # @ValidList  0x80000001 | 8, 16, 32
+  gEfiMdePkgTokenSpaceGuid.PcdPort80DataWidth|8|UINT8|0x0000002d
+
   ## This value is used to configure X86 Processor FSB clock.
   # @Prompt FSB Clock.
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c

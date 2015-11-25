@@ -38,14 +38,14 @@ PlatformBootManagerDiagnostics (
   // from the graphic lib
   //
   if (QuietBoot) {
-    PlatformBootManagerEnableQuietBoot (PcdGetPtr(PcdLogoFile));
+    BootLogoEnableLogo (ImageFormatBmp, PcdGetPtr(PcdLogoFile), EdkiiPlatformLogoDisplayAttributeCenter, 0, 0);
 
     //
     // Perform system diagnostic
     //
     Status = PlatformBootManagerMemoryTest (MemoryTestLevel);
     if (EFI_ERROR (Status)) {
-      PlatformBootManagerDisableQuietBoot ();
+      BootLogoDisableLogo ();
     }
 
     return;
@@ -271,7 +271,7 @@ PlatformBootManagerWaitCallback (
   Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
   White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
 
-  PlatformBootManagerShowProgress (
+  BootLogoUpdateProgress (
     White,
     Black,
     L"Start boot option",

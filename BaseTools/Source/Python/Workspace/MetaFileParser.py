@@ -343,9 +343,14 @@ class MetaFileParser(object):
         Name, Value = self._ValueList[1], self._ValueList[2]
         # Sometimes, we need to make differences between EDK and EDK2 modules 
         if Name == 'INF_VERSION':
-            try:
-                self._Version = int(Value, 0)
-            except:
+            if re.match(r'0[xX][\da-f-A-F]{5,8}', Value):
+                self._Version = int(Value, 0)   
+            elif re.match(r'\d+\.\d+', Value):
+                ValueList = Value.split('.')
+                Major = '%04o' % int(ValueList[0], 0)
+                Minor = '%04o' % int(ValueList[1], 0)
+                self._Version = int('0x' + Major + Minor, 0)
+            else:
                 EdkLogger.error('Parser', FORMAT_INVALID, "Invalid version number",
                                 ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
 

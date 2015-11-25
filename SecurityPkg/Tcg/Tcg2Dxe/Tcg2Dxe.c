@@ -15,11 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/PeImage.h>
-#include <IndustryStandard/SmBios.h>
 #include <IndustryStandard/TcpaAcpi.h>
 
 #include <Guid/GlobalVariable.h>
-#include <Guid/SmBios.h>
 #include <Guid/HobList.h>
 #include <Guid/TcgEventHob.h>
 #include <Guid/EventGroup.h>
@@ -1690,42 +1688,13 @@ MeasureHandoffTables (
   )
 {
   EFI_STATUS                        Status;
-  SMBIOS_TABLE_ENTRY_POINT          *SmbiosTable;
   TCG_PCR_EVENT_HDR                 TcgEvent;
   EFI_HANDOFF_TABLE_POINTERS        HandoffTables;
   UINTN                             ProcessorNum;
   EFI_CPU_PHYSICAL_LOCATION         *ProcessorLocBuf;
 
   ProcessorLocBuf = NULL;
-
-  //
-  // Measure SMBIOS with EV_EFI_HANDOFF_TABLES to PCR[1]
-  //
-  Status = EfiGetSystemConfigurationTable (
-             &gEfiSmbiosTableGuid,
-             (VOID **) &SmbiosTable
-             );
-
-  if (!EFI_ERROR (Status) && SmbiosTable != NULL) {
-    TcgEvent.PCRIndex  = 1;
-    TcgEvent.EventType = EV_EFI_HANDOFF_TABLES;
-    TcgEvent.EventSize = sizeof (HandoffTables);
-
-    HandoffTables.NumberOfTables = 1;
-    HandoffTables.TableEntry[0].VendorGuid  = gEfiSmbiosTableGuid;
-    HandoffTables.TableEntry[0].VendorTable = SmbiosTable;
-
-    DEBUG ((DEBUG_INFO, "The Smbios Table starts at: 0x%x\n", SmbiosTable->TableAddress));
-    DEBUG ((DEBUG_INFO, "The Smbios Table size: 0x%x\n", SmbiosTable->TableLength));
-
-    Status = TcgDxeHashLogExtendEvent (
-               0,
-               (UINT8*)(UINTN)SmbiosTable->TableAddress,
-               SmbiosTable->TableLength,
-               &TcgEvent,
-               (UINT8*)&HandoffTables
-               );
-  }
+  Status = EFI_SUCCESS;
 
   if (PcdGet8 (PcdTpmPlatformClass) == TCG_PLATFORM_TYPE_SERVER) {
     //

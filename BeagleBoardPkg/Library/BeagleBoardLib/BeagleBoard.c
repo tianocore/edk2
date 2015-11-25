@@ -92,11 +92,11 @@ ArmPlatformInitialize (
 
   // Turn off the functional clock for Timer 3
   MmioAnd32 (CM_FCLKEN_PER, 0xFFFFFFFF ^ CM_ICLKEN_PER_EN_GPT3_ENABLE );
-  ArmDataSyncronizationBarrier ();
+  ArmDataSynchronizationBarrier ();
 
   // Clear IRQs
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
-  ArmDataSyncronizationBarrier ();
+  ArmDataSynchronizationBarrier ();
 
   return RETURN_SUCCESS;
 }
