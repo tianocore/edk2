@@ -82,4 +82,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString           ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
-  UiFrontPageAppExtra.uni
+  UiAppExtra.uni
