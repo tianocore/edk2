@@ -1,7 +1,7 @@
 /** @file
   Head file for BDS Platform specific code
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,7 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 
 #include <Protocol/PciIo.h>
-#include <Protocol/SerialIo.h>
 
 #include <Guid/GlobalVariable.h>
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
@@ -94,7 +93,7 @@ extern VENDOR_DEVICE_PATH         gUartDeviceVenderNode;
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8) \
       } \
     }, \
-    EFI_SERIAL_IO_PROTOCOL_GUID \
+    {0xD3987D4B, 0x971A, 0x435F, {0x8C, 0xAF, 0x49, 0x67, 0xEB, 0x62, 0x72, 0x41}} \
   }
     
 #define gUart \

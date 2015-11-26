@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for coreboot. 
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -116,7 +116,8 @@
   #
   TimerLib|CorebootPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   ResetSystemLib|CorebootPayloadPkg/Library/ResetSystemLib/ResetSystemLib.inf
-  SerialPortLib|CorebootPayloadPkg/Library/SerialPortLib/SerialPortLib.inf
+  SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+  PlatformHookLib|CorebootPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
   PlatformBdsLib|CorebootPayloadPkg/Library/PlatformBdsLib/PlatformBdsLib.inf
   
   #
@@ -215,6 +216,10 @@
 !if $(SOURCE_DEBUG_ENABLE)
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
+
+[PcdsPatchableInModule.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8
 
 ################################################################################
 #
@@ -342,7 +347,7 @@
   #
   # ISA Support
   #
-  CorebootPayloadPkg/SerialDxe/SerialDxe.inf
+  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
   
   #
   # Console Support
