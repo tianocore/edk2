@@ -71,14 +71,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 #define IA32_PG_P                   BIT0
 #define IA32_PG_RW                  BIT1
+#define IA32_PG_U                   BIT2
 #define IA32_PG_WT                  BIT3
 #define IA32_PG_CD                  BIT4
 #define IA32_PG_A                   BIT5
+#define IA32_PG_D                   BIT6
 #define IA32_PG_PS                  BIT7
 #define IA32_PG_PAT_2M              BIT12
 #define IA32_PG_PAT_4K              IA32_PG_PS
 #define IA32_PG_PMNT                BIT62
 #define IA32_PG_NX                  BIT63
+
+#define PAGE_ATTRIBUTE_BITS         (IA32_PG_RW | IA32_PG_P)
 
 //
 // Size of Task-State Segment defined in IA32 Manual
