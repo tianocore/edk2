@@ -760,6 +760,9 @@ PiCpuSmmEntry (
   UINTN                      NumberOfEnabledProcessors;
   UINTN                      Index;
   VOID                       *Buffer;
+  UINTN                      BufferPages;
+  UINTN                      TileCodeSize;
+  UINTN                      TileDataSize;
   UINTN                      TileSize;
   VOID                       *GuidHob;
   EFI_SMRAM_DESCRIPTOR       *SmramDescriptor;
@@ -942,9 +945,13 @@ PiCpuSmmEntry (
   // specific context in a PROCESSOR_SMM_DESCRIPTOR, and the SMI entry point.  This size
   // is rounded up to nearest power of 2.
   //
-  TileSize = sizeof (SMRAM_SAVE_STATE_MAP) + sizeof (PROCESSOR_SMM_DESCRIPTOR) + GetSmiHandlerSize () - 1;
+  TileCodeSize = GetSmiHandlerSize ();
+  TileCodeSize = ALIGN_VALUE(TileCodeSize, SIZE_4KB);
+  TileDataSize = sizeof (SMRAM_SAVE_STATE_MAP) + sizeof (PROCESSOR_SMM_DESCRIPTOR);
+  TileDataSize = ALIGN_VALUE(TileDataSize, SIZE_4KB);
+  TileSize = TileDataSize + TileCodeSize - 1;
   TileSize = 2 * GetPowerOfTwo32 ((UINT32)TileSize);
-  DEBUG ((EFI_D_INFO, "SMRAM TileSize = %08x\n", TileSize));
+  DEBUG ((EFI_D_INFO, "SMRAM TileSize = 0x%08x (0x%08x, 0x%08x)\n", TileSize, TileCodeSize, TileDataSize));
 
   //
   // If the TileSize is larger than space available for the SMI Handler of CPU[i],
@@ -966,12 +973,14 @@ PiCpuSmmEntry (
   // Intel486 processors: FamilyId is 4
   // Pentium processors : FamilyId is 5
   //
+  BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
   if ((FamilyId == 4) || (FamilyId == 5)) {
-    Buffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1)), SIZE_32KB);
+    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
   } else {
-    Buffer = AllocatePages (EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1)));
+    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
   }
   ASSERT (Buffer != NULL);
+  DEBUG ((EFI_D_INFO, "SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE(BufferPages)));
 
   //
   // Allocate buffer for pointers to array in  SMM_CPU_PRIVATE_DATA.
