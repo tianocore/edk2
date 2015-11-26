@@ -2,7 +2,7 @@
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -562,10 +562,11 @@ TerminalConInTimerHandler (
   }
   //
   // Check whether serial buffer is empty.
+  // Skip the key transfer loop only if the SerialIo protocol instance
+  // successfully reports EFI_SERIAL_INPUT_BUFFER_EMPTY.
   //
   Status = SerialIo->GetControl (SerialIo, &Control);
-
-  if ((Control & EFI_SERIAL_INPUT_BUFFER_EMPTY) == 0) {
+  if (EFI_ERROR (Status) || ((Control & EFI_SERIAL_INPUT_BUFFER_EMPTY) == 0)) {
     //
     // Fetch all the keys in the serial buffer,
     // and insert the byte stream into RawFIFO.
