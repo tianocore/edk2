@@ -44,6 +44,7 @@
                                   This is NULL.
                                   HttpConfigData is NULL.
                                   HttpConfigData->AccessPoint is NULL.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate enough system resources.
   @retval EFI_NOT_STARTED         The HTTP instance is not configured.
 
 **/

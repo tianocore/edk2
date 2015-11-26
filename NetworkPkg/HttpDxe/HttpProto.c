@@ -565,15 +565,14 @@ HttpCloseTcpRxEvent (
   EFI_TCP4_IO_TOKEN        *Rx4Token;
   EFI_TCP6_IO_TOKEN        *Rx6Token;
 
+  ASSERT (Wrap != NULL);
   HttpInstance   = Wrap->HttpInstance;
   Rx4Token       = NULL;
   Rx6Token       = NULL;
   
   if (HttpInstance->LocalAddressIsIPv6) {
-    if (Wrap != NULL) {
-      if (Wrap->TcpWrap.Rx6Token.CompletionToken.Event != NULL) {
-        gBS->CloseEvent (Wrap->TcpWrap.Rx6Token.CompletionToken.Event);
-      } 
+    if (Wrap->TcpWrap.Rx6Token.CompletionToken.Event != NULL) {
+      gBS->CloseEvent (Wrap->TcpWrap.Rx6Token.CompletionToken.Event);
     }
 
     if (HttpInstance->Rx6Token.CompletionToken.Event != NULL) {
@@ -581,10 +580,8 @@ HttpCloseTcpRxEvent (
       HttpInstance->Rx6Token.CompletionToken.Event = NULL;
     }
   } else {
-    if (Wrap != NULL) {
-      if (Wrap->TcpWrap.Rx4Token.CompletionToken.Event != NULL) {
-        gBS->CloseEvent (Wrap->TcpWrap.Rx4Token.CompletionToken.Event);
-      }
+    if (Wrap->TcpWrap.Rx4Token.CompletionToken.Event != NULL) {
+      gBS->CloseEvent (Wrap->TcpWrap.Rx4Token.CompletionToken.Event);
     }
     
     if (HttpInstance->Rx4Token.CompletionToken.Event != NULL) {
@@ -1891,23 +1888,22 @@ HttpTcpTokenCleanup (
   EFI_TCP4_IO_TOKEN        *Rx4Token;
   EFI_TCP6_IO_TOKEN        *Rx6Token;
 
+  ASSERT (Wrap != NULL);
   HttpInstance   = Wrap->HttpInstance;
   Rx4Token       = NULL;
   Rx6Token       = NULL;
   
   if (HttpInstance->LocalAddressIsIPv6) {
-    if (Wrap != NULL) {
-      if (Wrap->TcpWrap.Rx6Token.CompletionToken.Event != NULL) {
-        gBS->CloseEvent (Wrap->TcpWrap.Rx6Token.CompletionToken.Event);
-      }
-
-      Rx6Token = &Wrap->TcpWrap.Rx6Token;
-      if (Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer != NULL) {
-        FreePool (Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer);
-        Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer = NULL;
-      }
-      FreePool (Wrap); 
+    if (Wrap->TcpWrap.Rx6Token.CompletionToken.Event != NULL) {
+      gBS->CloseEvent (Wrap->TcpWrap.Rx6Token.CompletionToken.Event);
     }
+
+    Rx6Token = &Wrap->TcpWrap.Rx6Token;
+    if (Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer != NULL) {
+      FreePool (Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer);
+      Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer = NULL;
+    }
+    FreePool (Wrap);
 
     if (HttpInstance->Rx6Token.CompletionToken.Event != NULL) {
       gBS->CloseEvent (HttpInstance->Rx6Token.CompletionToken.Event);
@@ -1921,18 +1917,16 @@ HttpTcpTokenCleanup (
     }
     
   } else {
-    if (Wrap != NULL) {
-      if (Wrap->TcpWrap.Rx4Token.CompletionToken.Event != NULL) {
-        gBS->CloseEvent (Wrap->TcpWrap.Rx4Token.CompletionToken.Event);
-      }
-      Rx4Token = &Wrap->TcpWrap.Rx4Token;
-      if (Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer != NULL) {
-        FreePool (Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer);
-        Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer = NULL;
-      }
-      FreePool (Wrap);
+    if (Wrap->TcpWrap.Rx4Token.CompletionToken.Event != NULL) {
+      gBS->CloseEvent (Wrap->TcpWrap.Rx4Token.CompletionToken.Event);
     }
-    
+    Rx4Token = &Wrap->TcpWrap.Rx4Token;
+    if (Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer != NULL) {
+      FreePool (Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer);
+      Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer = NULL;
+    }
+    FreePool (Wrap);
+
     if (HttpInstance->Rx4Token.CompletionToken.Event != NULL) {
       gBS->CloseEvent (HttpInstance->Rx4Token.CompletionToken.Event);
       HttpInstance->Rx4Token.CompletionToken.Event = NULL;
