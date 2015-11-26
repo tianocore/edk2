@@ -53,8 +53,8 @@
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
  
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
-  gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               ## PROTOCOL CONSUMES
-  gEfiFormBrowser2ProtocolGuid                  ## PROTOCOL CONSUMES
-  gEfiDevicePathToTextProtocolGuid              ## PROTOCOL CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+  gEfiLoadFileProtocolGuid                      ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## CONSUMES

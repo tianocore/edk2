@@ -91,10 +91,10 @@
 [FeaturePcd]
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn               ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut              ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow             ## CONSUMES
