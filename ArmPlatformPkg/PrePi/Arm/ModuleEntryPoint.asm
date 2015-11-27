@@ -143,16 +143,10 @@ _GetStackBase
   cmp   r0, #1
   bne   _PrepareArguments
 
-_ReserveGlobalVariable
-  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r0)
-  // InitializePrimaryStack($GlobalVariableSize, $Tmp1)
-  InitializePrimaryStack r0, r1
-
 _PrepareArguments
   mov   r0, r8
   mov   r1, r9
   mov   r2, r10
-  mov   r3, sp
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
@@ -162,7 +156,6 @@ _PrepareArguments
   //    r0 = MpId
   //    r1 = UefiMemoryBase
   //    r2 = StacksBase
-  //    r3 = GlobalVariableBase
   blx   r4
 
 _NeverReturn

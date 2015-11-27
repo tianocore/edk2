@@ -22,7 +22,6 @@ VOID
 PrimaryMain (
   IN  UINTN                     UefiMemoryBase,
   IN  UINTN                     StacksBase,
-  IN  UINTN                     GlobalVariableBase,
   IN  UINT64                    StartTimeStamp
   )
 {
@@ -35,7 +34,7 @@ PrimaryMain (
     ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
   }
 
-  PrePiMain (UefiMemoryBase, StacksBase, GlobalVariableBase, StartTimeStamp);
+  PrePiMain (UefiMemoryBase, StacksBase, StartTimeStamp);
 
   // We must never return
   ASSERT(FALSE);

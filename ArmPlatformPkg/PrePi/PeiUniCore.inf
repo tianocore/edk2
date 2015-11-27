@@ -66,7 +66,6 @@
   gArmMpCoreInfoPpiGuid
 
 [Guids]
-  gArmGlobalVariableGuid
   gArmMpCoreInfoGuid
 
 [FeaturePcd]
@@ -87,8 +86,6 @@
 
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
-
-  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
 
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
 

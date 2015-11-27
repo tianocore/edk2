@@ -67,7 +67,6 @@
   gArmMpCoreInfoPpiGuid
 
 [Guids]
-  gArmGlobalVariableGuid
   gArmMpCoreInfoGuid
 
 [FeaturePcd]
@@ -88,8 +87,6 @@
 
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
-
-  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
 
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
