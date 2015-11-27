@@ -26,7 +26,6 @@
 
 #include <Protocol/DevicePathFromText.h>
 
-#include <Guid/ArmGlobalVariableHob.h>
 #include <Guid/Fdt.h>
 
 #include <libfdt.h>
