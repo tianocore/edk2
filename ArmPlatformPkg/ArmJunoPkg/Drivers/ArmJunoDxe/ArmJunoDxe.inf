@@ -52,7 +52,6 @@
   UefiDriverEntryPoint
 
 [Guids]
-  gArmGlobalVariableGuid
   gEfiEndOfDxeEventGroupGuid
   gEfiFileInfoGuid
 
