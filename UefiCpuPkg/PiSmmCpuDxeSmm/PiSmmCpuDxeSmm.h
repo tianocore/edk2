@@ -718,25 +718,4 @@ VOID
 DumpModuleInfoByIp (
   IN  UINTN              CallerIpAddress
   );
-
-/**
-  This API provides a way to allocate memory for page table.
-
-  This API can be called more once to allocate memory for page tables.
-
-  Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the
-  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
-  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
-  returned.
-
-  @param  Pages                 The number of 4 KB pages to allocate.
-
-  @return A pointer to the allocated buffer or NULL if allocation fails.
-
-**/
-VOID *
-AllocatePageTableMemory (
-  IN UINTN           Pages
-  );
-
 #endif

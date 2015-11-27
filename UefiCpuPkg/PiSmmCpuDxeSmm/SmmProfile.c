@@ -552,7 +552,7 @@ InitPaging (
           //
           ASSERT (Address == (*Pte & PHYSICAL_ADDRESS_MASK));
 
-          Pt = AllocatePageTableMemory (1);
+          Pt = AllocatePages (1);
           ASSERT (Pt != NULL);
 
           // Split it

@@ -770,7 +770,7 @@ Gen4GPageTable (
   //
   // Allocate the page table
   //
-  PageTable = AllocatePageTableMemory (ExtraPages + 5 + PagesNeeded);
+  PageTable = AllocatePages (ExtraPages + 5 + PagesNeeded);
   ASSERT (PageTable != NULL);
 
   PageTable = (VOID *)((UINTN)PageTable + EFI_PAGES_TO_SIZE (ExtraPages));
@@ -872,7 +872,7 @@ SetCacheability (
     //
     // Allocate a page from SMRAM
     //
-    NewPageTableAddress = AllocatePageTableMemory (1);
+    NewPageTableAddress = AllocatePages (1);
     ASSERT (NewPageTableAddress != NULL);
 
     NewPageTable = (UINT64 *)NewPageTableAddress;
