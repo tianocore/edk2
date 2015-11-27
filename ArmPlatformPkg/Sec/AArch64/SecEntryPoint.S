@@ -99,11 +99,7 @@ _SetupPrimaryCoreStack:
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecPrimaryStackSize), x2)
   add   x1, x1, x2
 
-  LoadConstantToReg (FixedPcdGet32(PcdSecGlobalVariableSize), x2)
-
-  // The reserved space for global variable must be 8-bytes aligned for pushing
-  // 64-bit variable on the stack
-  SetPrimaryStack (x1, x2, x3, x4)
+  mov   sp, x1
   b     _PrepareArguments
 
 _SetupSecondaryCoreStack:

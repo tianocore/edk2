@@ -81,7 +81,5 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
 
-  gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize
-
 [FixedPcd.ARM]
   gArmTokenSpaceGuid.PcdArmNsacr
