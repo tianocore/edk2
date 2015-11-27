@@ -52,7 +52,6 @@
   GenericBdsLib
 
 [Guids]
-  gArmGlobalVariableGuid
   gEfiEndOfDxeEventGroupGuid
 
 [Pcd]
