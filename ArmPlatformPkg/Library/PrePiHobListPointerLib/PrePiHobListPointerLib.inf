@@ -25,11 +25,8 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
-  ArmPlatformGlobalVariableLib
-
-[FixedPcd.common]
-  gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset
+  ArmLib
