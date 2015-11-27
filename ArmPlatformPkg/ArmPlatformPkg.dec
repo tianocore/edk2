@@ -38,14 +38,7 @@
   #
   gVariableRuntimeDxeFileGuid = { 0xcbd2e4d5, 0x7068, 0x4ff5, { 0xb4, 0x62, 0x98, 0x22, 0xb4, 0xad, 0x8d, 0x60 } }
 
-  ## Include/Guid/ArmGlobalVariableHob.h
-  gArmGlobalVariableGuid      = { 0xc3253c90, 0xa24f, 0x4599, { 0xa6, 0x64, 0x1f, 0x88, 0x13, 0x77, 0x8f, 0xc9} }
-
   gArmBootMonFsFileInfoGuid   = { 0x41e26b9c, 0xada6, 0x45b3, { 0x80, 0x8e, 0x23, 0x57, 0xa3, 0x5b, 0x60, 0xd6 } }
-
-[Ppis]
-  ## Include/Ppi/ArmGlobalVariable.h
-  gArmGlobalVariablePpiGuid = { 0xab1c1816, 0xd542, 0x4e6f, {0x9b, 0x1e, 0x8e, 0xcd, 0x92, 0x53, 0xe2, 0xe7} }
 
 [PcdsFeatureFlag.common]
   # Set this PCD to TRUE to map NORFlash at 0x0. FALSE means the DRAM is mapped at 0x0.
@@ -80,19 +73,6 @@
 
   # Size of the region used by UEFI in permanent memory (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x08000000|UINT32|0x00000015
-
-  # Size to reserve in the primary core stack for PEI Global Variables
-  #  = sizeof(UINTN) /* PcdPeiServicePtr or HobListPtr */
-  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize|0x4|UINT32|0x00000016
-  # PeiServicePtr and HobListPtr shares the same location in the PEI Global Variable list
-  # PeiServicePtr is only valid with PEI Core and HobListPtr only when the PEI Core is skipped.
-  ## TO BE REMOVED
-  ## ArmPlatformTokenSpaceGuid.PcdPeiServicePtrGlobalOffset|0x0|UINT32|0x00000017
-  ## TO BE REMOVED
-  ## gArmPlatformTokenSpaceGuid.PcdHobListPtrGlobalOffset|0x0|UINT32|0x00000018
-
-  # Size to reserve in the primary core stack for SEC Global Variables
-  gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize|0x0|UINT32|0x00000031
 
   # Boot Monitor FileSystem
   gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L""|VOID*|0x0000003A
