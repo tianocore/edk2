@@ -80,42 +80,4 @@
   ldr  $Reg, =($Data)
   MEND
 
-  ; The reserved place must be 8-bytes aligned for pushing 64-bit variable on the stack
-  ; Note: Global Size will be modified
-  MACRO
-  SetPrimaryStack $StackTop, $GlobalSize, $Tmp
-  and     $Tmp, $GlobalSize, #7
-  rsbne   $Tmp, $Tmp, #8
-  add     $GlobalSize, $GlobalSize, $Tmp
-  sub     sp, $StackTop, $GlobalSize
-
-  ; Set all the global variables to 0
-  mov     $Tmp, sp
-  mov     $GlobalSize, #0x0
-_SetPrimaryStackInitGlobals
-  cmp     $Tmp, $StackTop
-  beq     _SetPrimaryStackEnd
-  str     $GlobalSize, [$Tmp], #4
-  b       _SetPrimaryStackInitGlobals
-_SetPrimaryStackEnd
-  MEND
-
-  MACRO
-  InitializePrimaryStack $GlobalSize, $Tmp1
-  and     $Tmp1, $GlobalSize, #7
-  rsbne   $Tmp1, $Tmp1, #8
-  add     $GlobalSize, $GlobalSize, $Tmp1
-
-  mov     $Tmp1, sp
-  sub     sp, $GlobalSize
-  ; Set all the global variables to 0
-  mov     $GlobalSize, #0x0
-_InitializePrimaryStackLoop
-  cmp     $Tmp1, sp
-  bls     _InitializePrimaryStackEnd
-  str     $GlobalSize, [$Tmp1, #-4]!
-  b       _InitializePrimaryStackLoop
-_InitializePrimaryStackEnd
-  MEND
-
   END

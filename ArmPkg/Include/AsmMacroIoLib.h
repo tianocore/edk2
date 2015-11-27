@@ -201,37 +201,6 @@ _InitializePrimaryStackEnd:
 #define LoadConstantToReg(Data, Reg) \
   ldr  Reg, =Data
 
-#define SetPrimaryStack(StackTop, GlobalSize, Tmp)  \
-  and     Tmp, GlobalSize, #7         ;             \
-  rsbne   Tmp, Tmp, #8                ;             \
-  add     GlobalSize, GlobalSize, Tmp ;             \
-  sub     sp, StackTop, GlobalSize    ;             \
-                                      ;             \
-  mov     Tmp, sp                     ;             \
-  mov     GlobalSize, #0x0            ;             \
-_SetPrimaryStackInitGlobals:          ;             \
-  cmp     Tmp, StackTop               ;             \
-  beq     _SetPrimaryStackEnd         ;             \
-  str     GlobalSize, [Tmp], #4       ;             \
-  b       _SetPrimaryStackInitGlobals ;             \
-_SetPrimaryStackEnd:
-
-// Initialize the Global Variable with '0'
-#define InitializePrimaryStack(GlobalSize, Tmp1)    \
-  and     Tmp1, GlobalSize, #7        ;             \
-  rsbne   Tmp1, Tmp1, #8              ;             \
-  add     GlobalSize, GlobalSize, Tmp1 ;            \
-                                      ;             \
-  mov     Tmp1, sp                    ;             \
-  sub     sp, GlobalSize              ;             \
-  mov     GlobalSize, #0x0            ;             \
-_InitializePrimaryStackLoop:          ;             \
-  cmp     Tmp1, sp                    ;             \
-  bls     _InitializePrimaryStackEnd  ;             \
-  str     GlobalSize, [Tmp1, #-4]!    ;             \
-  b       _InitializePrimaryStackLoop ;             \
-_InitializePrimaryStackEnd:
-
 #else
 
 //
@@ -292,11 +261,6 @@ _InitializePrimaryStackEnd:
 
 // conditional load testing eq flag
 #define LoadConstantToRegIfEq(Data, Reg)  LoadConstantToRegIfEqMacro Data, Reg
-
-#define SetPrimaryStack(StackTop,GlobalSize,Tmp) SetPrimaryStack StackTop, GlobalSize, Tmp
-
-// Initialize the Global Variable with '0'
-#define InitializePrimaryStack(GlobalSize, Tmp1) InitializePrimaryStack GlobalSize, Tmp1
 
 #endif
 

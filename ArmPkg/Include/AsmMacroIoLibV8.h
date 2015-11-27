@@ -18,41 +18,6 @@
 #ifndef __MACRO_IO_LIBV8_H__
 #define __MACRO_IO_LIBV8_H__
 
-#define SetPrimaryStack(StackTop, GlobalSize, Tmp, Tmp1)  \
-  ands    Tmp, GlobalSize, #15        ;                   \
-  mov     Tmp1, #16                   ;                   \
-  sub     Tmp1, Tmp1, Tmp             ;                   \
-  csel    Tmp, Tmp1, Tmp, ne          ;                   \
-  add     GlobalSize, GlobalSize, Tmp ;                   \
-  sub     sp, StackTop, GlobalSize    ;                   \
-                                      ;                   \
-  mov     Tmp, sp                     ;                   \
-  mov     GlobalSize, #0x0            ;                   \
-_SetPrimaryStackInitGlobals:          ;                   \
-  cmp     Tmp, StackTop               ;                   \
-  b.eq    _SetPrimaryStackEnd         ;                   \
-  str     GlobalSize, [Tmp], #8       ;                   \
-  b       _SetPrimaryStackInitGlobals ;                   \
-_SetPrimaryStackEnd:
-
-// Initialize the Global Variable with '0'
-#define InitializePrimaryStack(GlobalSize, Tmp1, Tmp2) \
-  and     Tmp1, GlobalSize, #15       ;             \
-  mov     Tmp2, #16                   ;             \
-  sub     Tmp2, Tmp2, Tmp1            ;             \
-  add     GlobalSize, GlobalSize, Tmp2 ;            \
-                                      ;             \
-  mov     Tmp1, sp                    ;             \
-  sub     sp, sp, GlobalSize          ;             \
-  mov     GlobalSize, #0x0            ;             \
-_InitializePrimaryStackLoop:          ;             \
-  mov     Tmp2, sp                    ;             \
-  cmp     Tmp1, Tmp2                  ;             \
-  bls     _InitializePrimaryStackEnd  ;             \
-  str     GlobalSize, [Tmp1, #-8]!    ;             \
-  b       _InitializePrimaryStackLoop ;             \
-_InitializePrimaryStackEnd:
-
 // CurrentEL : 0xC = EL3; 8 = EL2; 4 = EL1
 // This only selects between EL1 and EL2, else we die.
 // Provide the Macro with a safe temp xreg to use.
