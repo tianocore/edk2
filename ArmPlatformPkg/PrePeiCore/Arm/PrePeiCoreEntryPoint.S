@@ -82,12 +82,7 @@ _PrepareArguments:
   blx   r3
 
 _SetupPrimaryCoreStack:
-  // r1 contains the top of the primary stack
-  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r2)
-
-  // The reserved space for global variable must be 8-bytes aligned for pushing
-  // 64-bit variable on the stack
-  SetPrimaryStack (r1, r2, r3)
+  mov   sp, r1
   b     _PrepareArguments
 
 _NeverReturn:

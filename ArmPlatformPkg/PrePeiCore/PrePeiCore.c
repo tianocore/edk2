@@ -17,23 +17,15 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/ArmLib.h>
 
-#include <Ppi/ArmGlobalVariable.h>
-
 #include "PrePeiCore.h"
 
 CONST EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
-CONST ARM_GLOBAL_VARIABLE_PPI             mGlobalVariablePpi = { PrePeiCoreGetGlobalVariableMemory };
 
 CONST EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamSupportPpiGuid,
     (VOID *) &mTemporaryRamSupportPpi
-  },
-  {
-    EFI_PEI_PPI_DESCRIPTOR_PPI,
-    &gArmGlobalVariablePpiGuid,
-    (VOID *) &mGlobalVariablePpi
   }
 };
 
@@ -146,18 +138,3 @@ PrePeiCoreTemporaryRamSupport (
 
   return EFI_SUCCESS;
 }
-
-EFI_STATUS
-PrePeiCoreGetGlobalVariableMemory (
-  OUT EFI_PHYSICAL_ADDRESS    *GlobalVariableBase
-  )
-{
-  ASSERT (GlobalVariableBase != NULL);
-
-  *GlobalVariableBase = (UINTN)PcdGet64 (PcdCPUCoresStackBase) +
-                        (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) -
-                        (UINTN)PcdGet32 (PcdPeiGlobalVariableSize);
-
-  return EFI_SUCCESS;
-}
-

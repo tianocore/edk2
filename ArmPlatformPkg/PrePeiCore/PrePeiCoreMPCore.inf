@@ -59,7 +59,6 @@
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
-  gArmGlobalVariablePpiGuid
   gArmMpCoreInfoPpiGuid
 
 [FeaturePcd]
@@ -72,8 +71,6 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
-
-  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize
 
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase

@@ -58,7 +58,6 @@
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
-  gArmGlobalVariablePpiGuid
 
 [FeaturePcd]
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
@@ -70,5 +69,3 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
-
-  gArmPlatformTokenSpaceGuid.PcdPeiGlobalVariableSize

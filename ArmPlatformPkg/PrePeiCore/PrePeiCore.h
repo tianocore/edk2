@@ -40,11 +40,6 @@ PrePeiCoreTemporaryRamSupport (
   IN UINTN                    CopySize
   );
 
-EFI_STATUS
-PrePeiCoreGetGlobalVariableMemory (
-  OUT EFI_PHYSICAL_ADDRESS    *GlobalVariableBase
-  );
-
 VOID
 SecSwitchStack (
   INTN    StackDelta
