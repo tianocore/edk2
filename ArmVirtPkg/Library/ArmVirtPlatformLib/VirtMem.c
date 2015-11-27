@@ -18,7 +18,6 @@
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/ArmPlatformGlobalVariableLib.h>
 #include <ArmPlatform.h>
 
 // Number of Virtual Memory Map Descriptors

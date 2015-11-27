@@ -169,7 +169,6 @@
       PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
       ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64LibPrePi.inf
       MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
-      ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
       SerialPortLib|OvmfPkg/Library/XenConsoleSerialPortLib/XenConsoleSerialPortLib.inf
   }
 
