@@ -46,9 +46,6 @@
   ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
   ArmPkg/ArmPkg.dec
 
-[Guids]
-  gArmGlobalVariableGuid
-
 [Pcd]
   gArmVExpressTokenSpaceGuid.PcdAndroidFastbootNvmDevicePath
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor
