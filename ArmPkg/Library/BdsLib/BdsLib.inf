@@ -44,7 +44,6 @@
 
 [Guids]
   gEfiFileInfoGuid
-  gArmGlobalVariableGuid
 
 [Protocols]
   gEfiBdsArchProtocolGuid
