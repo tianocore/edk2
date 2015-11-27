@@ -785,7 +785,7 @@ Gen4GPageTable (
   // Set Page Directory Pointers
   //
   for (Index = 0; Index < 4; Index++) {
-    Pte[Index] = (UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1) + PAGE_ATTRIBUTE_BITS;
+    Pte[Index] = (UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1) + IA32_PG_P;
   }
   Pte += EFI_PAGE_SIZE / sizeof (*Pte);
 
@@ -793,7 +793,7 @@ Gen4GPageTable (
   // Fill in Page Directory Entries
   //
   for (Index = 0; Index < EFI_PAGE_SIZE * 4 / sizeof (*Pte); Index++) {
-    Pte[Index] = (Index << 21) | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+    Pte[Index] = (Index << 21) + IA32_PG_PS + IA32_PG_RW + IA32_PG_P;
   }
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
@@ -802,7 +802,7 @@ Gen4GPageTable (
     Pdpte = (UINT64*)PageTable;
     for (PageIndex = Low2MBoundary; PageIndex <= High2MBoundary; PageIndex += SIZE_2MB) {
       Pte = (UINT64*)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~(EFI_PAGE_SIZE - 1));
-      Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages | PAGE_ATTRIBUTE_BITS;
+      Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages + IA32_PG_RW + IA32_PG_P;
       //
       // Fill in Page Table Entries
       //
@@ -819,7 +819,7 @@ Gen4GPageTable (
             GuardPage = 0;
           }
         } else {
-          Pte[Index] = PageAddress | PAGE_ATTRIBUTE_BITS;
+          Pte[Index] = PageAddress + IA32_PG_RW + IA32_PG_P;
         }
         PageAddress+= EFI_PAGE_SIZE;
       }
@@ -886,7 +886,7 @@ SetCacheability (
       NewPageTable[Index] |= (UINT64)(Index << EFI_PAGE_SHIFT);
     }
 
-    PageTable[PTIndex] = ((UINTN)NewPageTableAddress & gPhyMask) | PAGE_ATTRIBUTE_BITS;
+    PageTable[PTIndex] = ((UINTN)NewPageTableAddress & gPhyMask) | IA32_PG_P;
   }
 
   ASSERT (PageTable[PTIndex] & IA32_PG_P);

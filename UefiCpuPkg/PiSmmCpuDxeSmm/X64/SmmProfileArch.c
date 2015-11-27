@@ -51,7 +51,7 @@ InitSmmS3Cr3 (
   // Fill Page-Table-Level4 (PML4) entry
   //
   PTEntry = (UINT64*)(UINTN)(Pages - EFI_PAGES_TO_SIZE (1));
-  *PTEntry = Pages | PAGE_ATTRIBUTE_BITS;
+  *PTEntry = Pages + IA32_PG_P;
   ZeroMem (PTEntry + 1, EFI_PAGE_SIZE - sizeof (*PTEntry));
 
   //
@@ -117,7 +117,7 @@ AcquirePage (
   //
   // Link & Record the current uplink
   //
-  *Uplink = Address | PAGE_ATTRIBUTE_BITS;
+  *Uplink = Address | IA32_PG_P | IA32_PG_RW;
   mPFPageUplink[mPFPageIndex] = Uplink;
 
   mPFPageIndex = (mPFPageIndex + 1) % MAX_PF_PAGE_COUNT;
@@ -242,9 +242,9 @@ RestorePageTableAbove4G (
       // PTE
       PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
       for (Index = 0; Index < 512; Index++) {
-        PageTable[Index] = Address | PAGE_ATTRIBUTE_BITS;
+        PageTable[Index] = Address | IA32_PG_RW | IA32_PG_P;
         if (!IsAddressValid (Address, &Nx)) {
-          PageTable[Index] = PageTable[Index] & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
+          PageTable[Index] = PageTable[Index] & (INTN)(INT32)(~(IA32_PG_RW | IA32_PG_P));
         }
         if (Nx && mXdSupported) {
           PageTable[Index] = PageTable[Index] | IA32_PG_NX;
@@ -262,7 +262,7 @@ RestorePageTableAbove4G (
         //
         // Patch to remove present flag and rw flag.
         //
-        PageTable[PTIndex] = PageTable[PTIndex] & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
+        PageTable[PTIndex] = PageTable[PTIndex] & (INTN)(INT32)(~(IA32_PG_RW | IA32_PG_P));
       }
       //
       // Set XD bit to 1
@@ -289,7 +289,7 @@ RestorePageTableAbove4G (
   //
   // Add present flag or clear XD flag to make page fault handler succeed.
   //
-  PageTable[PTIndex] |= (UINT64)(PAGE_ATTRIBUTE_BITS);
+  PageTable[PTIndex] |= (UINT64)(IA32_PG_RW | IA32_PG_P);
   if ((ErrorCode & IA32_PF_EC_ID) != 0) {
     //
     // If page fault is caused by instruction fetch, clear XD bit in the entry.

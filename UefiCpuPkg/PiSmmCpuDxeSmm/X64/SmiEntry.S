@@ -144,7 +144,7 @@ Base:
     orb     $1,%ah
     wrmsr
     movq    %cr0, %rbx
-    orl     $0x080010000, %ebx          # enable paging + WP
+    btsl    $31, %ebx
     movq    %rbx, %cr0
     retf
 LongMode:                               # long mode (64-bit code) starts here

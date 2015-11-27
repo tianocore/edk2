@@ -129,7 +129,7 @@ gSmiCr3     DD      ?
 @@:                                     ; as cr4.PGE is not set here, refresh cr3
     mov     cr4, eax                    ; in PreModifyMtrrs() to flush TLB.
     mov     ebx, cr0
-    or      ebx, 080010000h             ; enable paging + WP
+    or      ebx, 080000000h             ; enable paging
     mov     cr0, ebx
     lea     ebx, [edi + DSC_OFFSET]
     mov     ax, [ebx + DSC_DS]

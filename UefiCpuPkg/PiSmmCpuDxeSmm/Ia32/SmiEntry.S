@@ -123,7 +123,7 @@ L11:
 L12:                                       # as cr4.PGE is not set here, refresh cr3
     movl    %eax, %cr4                     # in PreModifyMtrrs() to flush TLB.
     movl    %cr0, %ebx
-    orl     $0x080010000, %ebx             # enable paging + WP
+    orl     $0x080000000, %ebx             # enable paging
     movl    %ebx, %cr0
     leal    DSC_OFFSET(%edi),%ebx
     movw    DSC_DS(%ebx),%ax
