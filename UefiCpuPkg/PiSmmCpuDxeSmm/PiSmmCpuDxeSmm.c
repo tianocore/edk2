@@ -975,9 +975,9 @@ PiCpuSmmEntry (
   //
   BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
   if ((FamilyId == 4) || (FamilyId == 5)) {
-    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
+    Buffer = AllocateAlignedPages (BufferPages, SIZE_32KB);
   } else {
-    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+    Buffer = AllocateAlignedPages (BufferPages, SIZE_4KB);
   }
   ASSERT (Buffer != NULL);
   DEBUG ((EFI_D_INFO, "SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE(BufferPages)));
@@ -1421,6 +1421,35 @@ ConfigSmmCodeAccessCheck (
 }
 
 /**
+  This API provides a way to allocate memory for page table.
+
+  This API can be called more once to allocate memory for page tables.
+
+  Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
+  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
+
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+AllocatePageTableMemory (
+  IN UINTN           Pages
+  )
+{
+  VOID  *Buffer;
+
+  Buffer = SmmCpuFeaturesAllocatePageTableMemory (Pages);
+  if (Buffer != NULL) {
+    return Buffer;
+  }
+  return AllocatePages (Pages);
+}
+
+/**
   Perform the remaining tasks.
 
 **/
@@ -1444,6 +1473,8 @@ PerformRemainingTasks (
     // Configure SMM Code Access Check feature if available.
     //
     ConfigSmmCodeAccessCheck ();
+
+    SmmCpuFeaturesCompleteSmmReadyToLock ();
 
     //
     // Clean SMM ready to lock flag
@@ -1469,6 +1500,8 @@ PerformPreTasks (
     // Configure SMM Code Access Check feature if available.
     //
     ConfigSmmCodeAccessCheck ();
+
+    SmmCpuFeaturesCompleteSmmReadyToLock ();
 
     mRestoreSmmConfigurationInS3 = FALSE;
   }
