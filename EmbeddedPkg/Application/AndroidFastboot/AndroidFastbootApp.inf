@@ -56,6 +56,3 @@
 [Packages.ARM, Packages.AARCH64]
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-
-[Guids.ARM, Guids.AARCH64]
-  gArmGlobalVariableGuid

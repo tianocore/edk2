@@ -21,8 +21,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
-#include <Guid/ArmGlobalVariableHob.h>
-
 #define LINUX_LOADER_COMMAND_LINE       L"%s -f %s -c %s"
 
 // This GUID is defined in the INGF file of ArmPkg/Application/LinuxLoader
