@@ -189,10 +189,7 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePi/PeiMPCore.inf {
-    <LibraryClasses>
-      ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
-  }
+  ArmPlatformPkg/PrePi/PeiMPCore.inf
 
   #
   # DXE
