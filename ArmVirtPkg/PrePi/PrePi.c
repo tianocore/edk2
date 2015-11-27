@@ -25,13 +25,9 @@
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/ArmMpCoreInfo.h>
 #include <Guid/LzmaDecompress.h>
-#include <Guid/ArmGlobalVariableHob.h>
 
 #include "PrePi.h"
 #include "LzmaDecompress.h"
-
-// Not used when PrePi in run in XIP mode
-UINTN mGlobalVariableBase = 0;
 
 EFI_STATUS
 EFIAPI
@@ -44,23 +40,6 @@ EFIAPI
 LzmaDecompressLibConstructor (
   VOID
   );
-
-VOID
-EFIAPI
-BuildGlobalVariableHob (
-  IN EFI_PHYSICAL_ADDRESS         GlobalVariableBase,
-  IN UINT32                       GlobalVariableSize
-  )
-{
-  ARM_HOB_GLOBAL_VARIABLE  *Hob;
-
-  Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, sizeof (ARM_HOB_GLOBAL_VARIABLE));
-  ASSERT(Hob != NULL);
-
-  CopyGuid (&(Hob->Header.Name), &gArmGlobalVariableGuid);
-  Hob->GlobalVariableBase = GlobalVariableBase;
-  Hob->GlobalVariableSize = GlobalVariableSize;
-}
 
 EFI_STATUS
 GetPlatformPpi (
@@ -90,7 +69,6 @@ VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,
   IN  UINTN                     StacksBase,
-  IN  UINTN                     GlobalVariableBase,
   IN  UINT64                    StartTimeStamp
   )
 {
@@ -133,9 +111,6 @@ PrePiMain (
   StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize);
   BuildStackHob (StacksBase, StacksSize);
 
-  // Declare the Global Variable HOB
-  BuildGlobalVariableHob (GlobalVariableBase, FixedPcdGet32 (PcdPeiGlobalVariableSize));
-
   //TODO: Call CpuPei as a library
   BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
 
@@ -174,8 +149,7 @@ VOID
 CEntryPoint (
   IN  UINTN                     MpId,
   IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StacksBase,
-  IN  UINTN                     GlobalVariableBase
+  IN  UINTN                     StacksBase
   )
 {
   UINT64   StartTimeStamp;
@@ -199,10 +173,7 @@ CEntryPoint (
   // Enable Instruction Caches on all cores.
   ArmEnableInstructionCache ();
 
-  // Define the Global Variable region
-  mGlobalVariableBase = GlobalVariableBase;
-
-  PrePiMain (UefiMemoryBase, StacksBase, GlobalVariableBase, StartTimeStamp);
+  PrePiMain (UefiMemoryBase, StacksBase, StartTimeStamp);
 
   // DXE Core should always load and never return
   ASSERT (FALSE);
