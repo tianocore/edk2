@@ -58,7 +58,6 @@
 [Guids]
   gEfiEndOfDxeEventGroupGuid
   gEfiFileSystemInfoGuid
-  gArmGlobalVariableGuid
   gFdtVariableGuid
 
 [Protocols]

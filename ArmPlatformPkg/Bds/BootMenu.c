@@ -14,8 +14,6 @@
 
 #include "BdsInternal.h"
 
-#include <Guid/ArmGlobalVariableHob.h>
-
 #include <libfdt.h>
 
 /**

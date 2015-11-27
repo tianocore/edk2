@@ -12,7 +12,6 @@
 *
 **/
 
-#include <Guid/ArmGlobalVariableHob.h>
 #include "BdsInternal.h"
 
 EFI_STATUS
