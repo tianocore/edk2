@@ -17,7 +17,6 @@
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Ppi/ArmGlobalVariable.h>
 #include <Ppi/MasterBootMode.h>
 #include <Ppi/BootInRecoveryMode.h>
 #include <Ppi/GuidedSectionExtraction.h>
@@ -31,8 +30,6 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
-
-#include <Guid/ArmGlobalVariableHob.h>
 
 EFI_STATUS
 EFIAPI
@@ -62,24 +59,6 @@ CONST EFI_PEI_PPI_DESCRIPTOR  mPpiListRecoveryBootMode = {
   NULL
 };
 
-VOID
-EFIAPI
-BuildGlobalVariableHob (
-  IN EFI_PHYSICAL_ADDRESS         GlobalVariableBase,
-  IN UINT32                       GlobalVariableSize
-  )
-{
-  EFI_STATUS                Status;
-  ARM_HOB_GLOBAL_VARIABLE   *Hob;
-
-  Status = PeiServicesCreateHob (EFI_HOB_TYPE_GUID_EXTENSION, sizeof (ARM_HOB_GLOBAL_VARIABLE), (VOID**)&Hob);
-  if (!EFI_ERROR(Status)) {
-    CopyGuid (&(Hob->Header.Name), &gArmGlobalVariableGuid);
-    Hob->GlobalVariableBase = GlobalVariableBase;
-    Hob->GlobalVariableSize = GlobalVariableSize;
-  }
-}
-
 /*++
 
 Routine Description:
@@ -105,22 +84,10 @@ InitializePlatformPeim (
 {
   EFI_STATUS                    Status;
   UINTN                         BootMode;
-  ARM_GLOBAL_VARIABLE_PPI       *ArmGlobalVariablePpi;
-  EFI_PHYSICAL_ADDRESS          GlobalVariableBase;
 
   DEBUG ((EFI_D_LOAD | EFI_D_INFO, "Platform PEIM Loaded\n"));
 
   PlatformPeim ();
-
-  Status = PeiServicesLocatePpi (&gArmGlobalVariablePpiGuid, 0, NULL, (VOID**)&ArmGlobalVariablePpi);
-  if (!EFI_ERROR(Status)) {
-    Status = ArmGlobalVariablePpi->GetGlobalVariableMemory (&GlobalVariableBase);
-
-    if (!EFI_ERROR(Status)) {
-      // Declare the Global Variable HOB
-      BuildGlobalVariableHob (GlobalVariableBase, FixedPcdGet32 (PcdPeiGlobalVariableSize));
-    }
-  }
 
   BootMode  = ArmPlatformGetBootMode ();
   Status    = (**PeiServices).SetBootMode (PeiServices, (UINT8) BootMode);
