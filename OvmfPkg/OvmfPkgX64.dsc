@@ -296,6 +296,12 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+  SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
+!ifdef $(DEBUG_ON_SERIAL_PORT)
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!else
+  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+!endif
 
 [LibraryClasses.common.SMM_CORE]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -672,4 +678,9 @@
   # SMM_CORE
   #
   MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
+
+  #
+  # Privileged drivers (DXE_SMM_DRIVER modules)
+  #
+  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
 !endif
