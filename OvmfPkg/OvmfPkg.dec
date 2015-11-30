@@ -117,3 +117,13 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable|FALSE|BOOLEAN|3
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d
+
+  ## This feature flag enables SMM/SMRAM support. Note that it also requires
+  #  such support from the underlying QEMU instance; if that support is not
+  #  present, the firmware will reject continuing after a certain point.
+  #
+  #  The flag also acts as a general "security switch"; when TRUE, many
+  #  components will change behavior, with the goal of preventing a malicious
+  #  runtime OS from tampering with firmware structures (special memory ranges
+  #  used by OVMF, the varstore pflash chip, LockBox etc).
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire|FALSE|BOOLEAN|0x1e
