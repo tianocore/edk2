@@ -557,9 +557,9 @@ InitPaging (
 
           // Split it
           for (Level4 = 0; Level4 < SIZE_4KB / sizeof(*Pt); Level4++) {
-            Pt[Level4] = Address + ((Level4 << 12) | IA32_PG_RW | IA32_PG_P);
+            Pt[Level4] = Address + ((Level4 << 12) | PAGE_ATTRIBUTE_BITS);
           } // end for PT
-          *Pte = (UINTN)Pt | IA32_PG_RW | IA32_PG_P;
+          *Pte = (UINTN)Pt | PAGE_ATTRIBUTE_BITS;
         } // end if IsAddressSplit
       } // end for PTE
     } // end for PDE
@@ -608,7 +608,7 @@ InitPaging (
             //
             // Patch to remove Present flag and RW flag
             //
-            *Pte = *Pte & (INTN)(INT32)(~(IA32_PG_RW | IA32_PG_P));
+            *Pte = *Pte & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
           }
           if (Nx && mXdSupported) {
             *Pte = *Pte | IA32_PG_NX;
@@ -621,7 +621,7 @@ InitPaging (
           }
           for (Level4 = 0; Level4 < SIZE_4KB / sizeof(*Pt); Level4++, Pt++) {
             if (!IsAddressValid (Address, &Nx)) {
-              *Pt = *Pt & (INTN)(INT32)(~(IA32_PG_RW | IA32_PG_P));
+              *Pt = *Pt & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
             }
             if (Nx && mXdSupported) {
               *Pt = *Pt | IA32_PG_NX;
@@ -1244,7 +1244,7 @@ RestorePageTableBelow4G (
     //
     PageTable[PTIndex] = (PFAddress & ~((1ull << 21) - 1));
     PageTable[PTIndex] |= (UINT64)IA32_PG_PS;
-    PageTable[PTIndex] |= (UINT64)(IA32_PG_RW | IA32_PG_P);
+    PageTable[PTIndex] |= (UINT64)PAGE_ATTRIBUTE_BITS;
     if ((ErrorCode & IA32_PF_EC_ID) != 0) {
       PageTable[PTIndex] &= ~IA32_PG_NX;
     }
@@ -1277,7 +1277,7 @@ RestorePageTableBelow4G (
     // Set new entry
     //
     PageTable[PTIndex] = (PFAddress & ~((1ull << 12) - 1));
-    PageTable[PTIndex] |= (UINT64)(IA32_PG_RW | IA32_PG_P);
+    PageTable[PTIndex] |= (UINT64)PAGE_ATTRIBUTE_BITS;
     if ((ErrorCode & IA32_PF_EC_ID) != 0) {
       PageTable[PTIndex] &= ~IA32_PG_NX;
     }

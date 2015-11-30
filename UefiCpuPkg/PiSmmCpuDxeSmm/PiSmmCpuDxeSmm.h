@@ -71,14 +71,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 #define IA32_PG_P                   BIT0
 #define IA32_PG_RW                  BIT1
+#define IA32_PG_U                   BIT2
 #define IA32_PG_WT                  BIT3
 #define IA32_PG_CD                  BIT4
 #define IA32_PG_A                   BIT5
+#define IA32_PG_D                   BIT6
 #define IA32_PG_PS                  BIT7
 #define IA32_PG_PAT_2M              BIT12
 #define IA32_PG_PAT_4K              IA32_PG_PS
 #define IA32_PG_PMNT                BIT62
 #define IA32_PG_NX                  BIT63
+
+#define PAGE_ATTRIBUTE_BITS         (IA32_PG_RW | IA32_PG_P)
+//
+// Bits 1, 2, 5, 6 are reserved in the IA32 PAE PDPTE
+// X64 PAE PDPTE does not have such restriction
+//
+#define IA32_PAE_PDPTE_ATTRIBUTE_BITS    (IA32_PG_P)
 
 //
 // Size of Task-State Segment defined in IA32 Manual
@@ -364,12 +373,14 @@ extern IA32_DESCRIPTOR                     gcSmiInitGdtr;
   Create 4G PageTable in SMRAM.
 
   @param          ExtraPages       Additional page numbers besides for 4G memory
+  @param          Is32BitPageTable Whether the page table is 32-bit PAE
   @return         PageTable Address
 
 **/
 UINT32
 Gen4GPageTable (
-  IN      UINTN                     ExtraPages
+  IN      UINTN                     ExtraPages,
+  IN      BOOLEAN                   Is32BitPageTable
   );
 
 
