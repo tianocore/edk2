@@ -2,6 +2,7 @@
   Xen console SerialPortLib instance
 
   Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -205,3 +206,97 @@ SerialPortPoll (
   return mXenConsoleInterface &&
     mXenConsoleInterface->in_cons != mXenConsoleInterface->in_prod;
 }
+
+/**
+  Sets the control bits on a serial device.
+
+  @param Control                Sets the bits of Control that are settable.
+
+  @retval RETURN_SUCCESS        The new control bits were set on the serial device.
+  @retval RETURN_UNSUPPORTED    The serial device does not support this operation.
+  @retval RETURN_DEVICE_ERROR   The serial device is not functioning correctly.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortSetControl (
+  IN UINT32 Control
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Retrieve the status of the control bits on a serial device.
+
+  @param Control                A pointer to return the current control signals from the serial device.
+
+  @retval RETURN_SUCCESS        The control bits were read from the serial device.
+  @retval RETURN_UNSUPPORTED    The serial device does not support this operation.
+  @retval RETURN_DEVICE_ERROR   The serial device is not functioning correctly.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortGetControl (
+  OUT UINT32 *Control
+  )
+{
+  if (!mXenConsoleInterface) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  *Control = 0;
+  if (!SerialPortPoll ()) {
+    *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
+  data bits, and stop bits on a serial device.
+
+  @param BaudRate           The requested baud rate. A BaudRate value of 0 will use the
+                            device's default interface speed.
+                            On output, the value actually set.
+  @param ReveiveFifoDepth   The requested depth of the FIFO on the receive side of the
+                            serial interface. A ReceiveFifoDepth value of 0 will use
+                            the device's default FIFO depth.
+                            On output, the value actually set.
+  @param Timeout            The requested time out for a single character in microseconds.
+                            This timeout applies to both the transmit and receive side of the
+                            interface. A Timeout value of 0 will use the device's default time
+                            out value.
+                            On output, the value actually set.
+  @param Parity             The type of parity to use on this serial device. A Parity value of
+                            DefaultParity will use the device's default parity value.
+                            On output, the value actually set.
+  @param DataBits           The number of data bits to use on the serial device. A DataBits
+                            vaule of 0 will use the device's default data bit setting.
+                            On output, the value actually set.
+  @param StopBits           The number of stop bits to use on this serial device. A StopBits
+                            value of DefaultStopBits will use the device's default number of
+                            stop bits.
+                            On output, the value actually set.
+
+  @retval RETURN_SUCCESS            The new attributes were set on the serial device.
+  @retval RETURN_UNSUPPORTED        The serial device does not support this operation.
+  @retval RETURN_INVALID_PARAMETER  One or more of the attributes has an unsupported value.
+  @retval RETURN_DEVICE_ERROR       The serial device is not functioning correctly.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortSetAttributes (
+  IN OUT UINT64             *BaudRate,
+  IN OUT UINT32             *ReceiveFifoDepth,
+  IN OUT UINT32             *Timeout,
+  IN OUT EFI_PARITY_TYPE    *Parity,
+  IN OUT UINT8              *DataBits,
+  IN OUT EFI_STOP_BITS_TYPE *StopBits
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
