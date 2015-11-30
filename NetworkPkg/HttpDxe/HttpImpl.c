@@ -39,6 +39,7 @@ EFI_HTTP_PROTOCOL  mEfiHttpTemplate = {
                                   This is NULL.
                                   HttpConfigData is NULL.
                                   HttpConfigData->AccessPoint is NULL.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate enough system resources.
   @retval EFI_NOT_STARTED         The HTTP instance is not configured.
 
 **/
@@ -70,6 +71,9 @@ EfiHttpGetModeData (
 
   if (HttpInstance->LocalAddressIsIPv6) {
     Http6AccessPoint = AllocateZeroPool (sizeof (EFI_HTTPv6_ACCESS_POINT));
+    if (Http6AccessPoint == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     CopyMem (
       Http6AccessPoint,
       &HttpInstance->Ipv6Node,
@@ -78,6 +82,9 @@ EfiHttpGetModeData (
     HttpConfigData->AccessPoint.IPv6Node = Http6AccessPoint;
   } else {
     Http4AccessPoint = AllocateZeroPool (sizeof (EFI_HTTPv4_ACCESS_POINT));
+    if (Http4AccessPoint == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     CopyMem (
       Http4AccessPoint,
       &HttpInstance->IPv4Node,
@@ -886,6 +893,8 @@ HttpResponseWorker (
       goto Error;
     }
 
+    ASSERT (HttpHeaders != NULL);
+
     //
     // Cache the part of body.
     //
@@ -1288,14 +1297,19 @@ EfiHttpPoll (
   HttpInstance = HTTP_INSTANCE_FROM_PROTOCOL (This);
   ASSERT (HttpInstance != NULL);
 
-  if (HttpInstance->State != HTTP_STATE_TCP_CONNECTED || (HttpInstance->Tcp4 == NULL && 
-                                                          HttpInstance->Tcp6 == NULL)) {
+  if (HttpInstance->State != HTTP_STATE_TCP_CONNECTED) {
     return EFI_NOT_STARTED;
   }
   
   if (HttpInstance->LocalAddressIsIPv6) {
+    if (HttpInstance->Tcp6 == NULL) {
+      return EFI_NOT_STARTED;
+    }
     Status = HttpInstance->Tcp6->Poll (HttpInstance->Tcp6);
   } else {
+    if (HttpInstance->Tcp4 == NULL) {
+      return EFI_NOT_STARTED;
+    }
     Status = HttpInstance->Tcp4->Poll (HttpInstance->Tcp4);
   }
   
