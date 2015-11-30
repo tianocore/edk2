@@ -223,7 +223,7 @@ InitializeXen (
   // Reserve away HVMLOADER reserved memory [0xFC000000,0xFD000000).
   // This needs to match HVMLOADER RESERVED_MEMBASE/RESERVED_MEMSIZE.
   //
-  AddReservedMemoryBaseSizeHob (0xFC000000, 0x1000000);
+  AddReservedMemoryBaseSizeHob (0xFC000000, 0x1000000, FALSE);
 
   PcdSetBool (PcdPciDisableBusEnumeration, TRUE);
 

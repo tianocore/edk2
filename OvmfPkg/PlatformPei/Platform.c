@@ -88,7 +88,8 @@ AddIoMemoryBaseSizeHob (
 VOID
 AddReservedMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  UINT64                      MemorySize,
+  BOOLEAN                     Cacheable
   )
 {
   BuildResourceDescriptorHob (
@@ -96,6 +97,12 @@ AddReservedMemoryBaseSizeHob (
       EFI_RESOURCE_ATTRIBUTE_PRESENT     |
       EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
       EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      (Cacheable ?
+       EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+       EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+       EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE :
+       0
+       ) |
       EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
     MemorySize

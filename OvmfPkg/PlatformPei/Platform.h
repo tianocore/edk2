@@ -50,7 +50,8 @@ AddUntestedMemoryBaseSizeHob (
 VOID
 AddReservedMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  UINT64                      MemorySize,
+  BOOLEAN                     Cacheable
   );
 
 VOID
