@@ -355,6 +355,10 @@ INF  RuleOverride=CSM OvmfPkg/Csm/Csm16/Csm16.inf
 INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf
 
+!if $(SMM_REQUIRE) == TRUE
+INF  OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
+!endif
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]

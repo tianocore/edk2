@@ -1,0 +1,58 @@
+## @file
+# A DXE_DRIVER providing SMRAM access by producing EFI_SMM_ACCESS2_PROTOCOL.
+#
+# Q35 TSEG is expected to have been verified and set up by the SmmAccessPei
+# driver.
+#
+# Copyright (C) 2013, 2015, Red Hat, Inc.
+#
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmAccess2Dxe
+  FILE_GUID                      = AC95AD3D-4366-44BF-9A62-E4B29D7A2206
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010400
+  ENTRY_POINT                    = SmmAccess2DxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmAccess2Dxe.c
+  SmramInternal.c
+  SmramInternal.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  PciLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiSmmAccess2ProtocolGuid   ## PRODUCES
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[Depex]
+  TRUE
