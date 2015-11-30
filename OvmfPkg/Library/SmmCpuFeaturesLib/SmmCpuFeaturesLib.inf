@@ -32,8 +32,4 @@
 [LibraryClasses]
   BaseLib
   PcdLib
-  MemoryAllocationLib
   DebugLib
-
-[Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES
