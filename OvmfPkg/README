@@ -118,6 +118,63 @@ $ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
 To build a 32-bit OVMF without debug messages using GCC 4.5:
 $ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC45
 
+=== SMM support ===
+
+Requirements:
+* SMM support requires QEMU 2.5.
+* The minimum required QEMU machine type is "pc-q35-2.5".
+* SMM with KVM requires Linux 4.4 (host).
+
+OVMF is capable of utilizing SMM if the underlying QEMU or KVM hypervisor
+emulates SMM. SMM is put to use in the S3 suspend and resume infrastructure,
+and in the UEFI variable driver stack. The purpose is (virtual) hardware
+separation between the runtime guest OS and the firmware (OVMF), with the
+intent to make Secure Boot actually secure, by preventing the runtime guest OS
+from tampering with the variable store and S3 areas.
+
+For SMM support, OVMF must be built with the "-D SMM_REQUIRE" option. The
+resultant firmware binary will check if QEMU actually provides SMM emulation;
+if it doesn't, then OVMF will log an error and trigger an assertion failure
+during boot (even in RELEASE builds). Both the naming of the flag (SMM_REQUIRE,
+instead of SMM_ENABLE), and this behavior are consistent with the goal
+described above: this is supposed to be a security feature, and fallbacks are
+not allowed. Similarly, a pflash-backed variable store is a requirement.
+
+QEMU should be started with the options listed below (in addition to any other
+guest-specific flags). The command line should be gradually composed from the
+hints below. '\' is used to extend the command line to multiple lines, and '^'
+can be used on Windows.
+
+* QEMU binary and options specific to 32-bit guests:
+
+  $ qemu-system-i386 -cpu coreduo,-nx \
+
+  or
+
+  $ qemu-system-x86_64 -cpu <MODEL>,-lm,-nx \
+
+* QEMU binary for running 64-bit guests (no particular options):
+
+  $ qemu-system-x86_64 \
+
+* Flags common to all SMM scenarios (only the Q35 machine type is supported):
+
+  -machine q35,smm=on,accel=(tcg|kvm) \
+  -m ... \
+  -smp ... \
+  -global driver=cfi.pflash01,property=secure,value=on \
+  -drive if=pflash,format=raw,unit=0,file=OVMF_CODE.fd,readonly=on \
+  -drive if=pflash,format=raw,unit=1,file=copy_of_OVMF_VARS.fd \
+
+* In order to disable S3, add:
+
+  -global ICH9-LPC.disable_s3=1 \
+
+Dependent on the development status of the
+"UefiCpuPkg/Universal/Acpi/S3Resume2Pei" module, S3 resume may not work in
+OvmfPkg/OvmfPkgX64.dsc builds. In such cases, OvmfPkg/OvmfPkgIa32X64.dsc is
+recommended for running X64 guests.
+
 === Network Support ===
 
 OVMF provides a UEFI network stack by default. Its lowest level driver is the
