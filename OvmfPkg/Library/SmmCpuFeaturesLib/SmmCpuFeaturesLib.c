@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/DebugLib.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/QemuSmramSaveStateMap.h>
 
 //
 // EFER register LMA bit
@@ -82,13 +82,17 @@ SmmCpuFeaturesInitializeProcessor (
   IN CPU_HOT_PLUG_DATA          *CpuHotPlugData
   )
 {
-  SMRAM_SAVE_STATE_MAP  *CpuState;
+  QEMU_SMRAM_SAVE_STATE_MAP  *CpuState;
 
   //
   // Configure SMBASE.
   //
-  CpuState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-  CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  CpuState = (QEMU_SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+  if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
+    CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  } else {
+    CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  }
 
   //
   // No need to program SMRRs on our virtual platform.
@@ -135,8 +139,8 @@ SmmCpuFeaturesHookReturnFromSmm (
   IN UINT64                NewInstructionPointer
   )
 {
-  UINT64                 OriginalInstructionPointer;
-  SMRAM_SAVE_STATE_MAP  *CpuSaveState = (SMRAM_SAVE_STATE_MAP *)CpuState;
+  UINT64                      OriginalInstructionPointer;
+  QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState = (QEMU_SMRAM_SAVE_STATE_MAP *)CpuState;
 
   if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
     OriginalInstructionPointer = (UINT64)CpuSaveState->x86._EIP;
@@ -397,7 +401,7 @@ SmmCpuFeaturesSetSmmRegister (
 ///
 /// Macro used to simplify the lookup table entries of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
 ///
-#define SMM_CPU_OFFSET(Field) OFFSET_OF (SMRAM_SAVE_STATE_MAP, Field)
+#define SMM_CPU_OFFSET(Field) OFFSET_OF (QEMU_SMRAM_SAVE_STATE_MAP, Field)
 
 ///
 /// Macro used to simplify the lookup table entries of type CPU_SMM_SAVE_STATE_REGISTER_RANGE
@@ -450,13 +454,13 @@ static CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY mSmmCpuWidthOffset[] = {
   //
   // CPU Save State registers defined in PI SMM CPU Protocol.
   //
-  {0, 8, 0                            , SMM_CPU_OFFSET (x64.GdtBaseLoDword) , SMM_CPU_OFFSET (x64.GdtBaseHiDword), FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_GDTBASE  = 4
-  {0, 8, 0                            , SMM_CPU_OFFSET (x64.IdtBaseLoDword) , SMM_CPU_OFFSET (x64.IdtBaseHiDword), FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_IDTBASE  = 5
-  {0, 8, 0                            , SMM_CPU_OFFSET (x64.LdtBaseLoDword) , SMM_CPU_OFFSET (x64.LdtBaseHiDword), FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTBASE  = 6
-  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_GDTLIMIT = 7
-  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_IDTLIMIT = 8
-  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTLIMIT = 9
-  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTINFO  = 10
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._GDTRBase) , SMM_CPU_OFFSET (x64._GDTRBase)  + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_GDTBASE  = 4
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._IDTRBase) , SMM_CPU_OFFSET (x64._IDTRBase)  + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_IDTBASE  = 5
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._LDTRBase) , SMM_CPU_OFFSET (x64._LDTRBase)  + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTBASE  = 6
+  {0, 0, 0                            , SMM_CPU_OFFSET (x64._GDTRLimit), SMM_CPU_OFFSET (x64._GDTRLimit) + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_GDTLIMIT = 7
+  {0, 0, 0                            , SMM_CPU_OFFSET (x64._IDTRLimit), SMM_CPU_OFFSET (x64._IDTRLimit) + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_IDTLIMIT = 8
+  {0, 0, 0                            , SMM_CPU_OFFSET (x64._LDTRLimit), SMM_CPU_OFFSET (x64._LDTRLimit) + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTLIMIT = 9
+  {0, 0, 0                            , 0                              , 0                               + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTINFO  = 10
 
   {4, 4, SMM_CPU_OFFSET (x86._ES)     , SMM_CPU_OFFSET (x64._ES)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_ES       = 20
   {4, 4, SMM_CPU_OFFSET (x86._CS)     , SMM_CPU_OFFSET (x64._CS)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CS       = 21
@@ -489,7 +493,7 @@ static CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY mSmmCpuWidthOffset[] = {
   {4, 8, SMM_CPU_OFFSET (x86._EFLAGS) , SMM_CPU_OFFSET (x64._RFLAGS) , SMM_CPU_OFFSET (x64._RFLAGS) + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RFLAGS   = 51
   {4, 8, SMM_CPU_OFFSET (x86._CR0)    , SMM_CPU_OFFSET (x64._CR0)    , SMM_CPU_OFFSET (x64._CR0)    + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CR0      = 52
   {4, 8, SMM_CPU_OFFSET (x86._CR3)    , SMM_CPU_OFFSET (x64._CR3)    , SMM_CPU_OFFSET (x64._CR3)    + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CR3      = 53
-  {0, 4, 0                            , SMM_CPU_OFFSET (x64._CR4)    , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CR4      = 54
+  {0, 4, 0                            , SMM_CPU_OFFSET (x64._CR4)    , SMM_CPU_OFFSET (x64._CR4)    + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CR4      = 54
 };
 
 //
@@ -548,9 +552,9 @@ ReadSaveStateRegisterByIndex (
   OUT VOID   *Buffer
   )
 {
-  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+  QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
-  CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+  CpuSaveState = (QEMU_SMRAM_SAVE_STATE_MAP *)gSmst->CpuSaveState[CpuIndex];
 
   if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
     //
@@ -628,8 +632,8 @@ SmmCpuFeaturesReadSaveStateRegister (
   OUT VOID                         *Buffer
   )
 {
-  UINTN                  RegisterIndex;
-  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+  UINTN                       RegisterIndex;
+  QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   //
   // Check for special EFI_SMM_SAVE_STATE_REGISTER_LMA
@@ -642,7 +646,7 @@ SmmCpuFeaturesReadSaveStateRegister (
       return EFI_INVALID_PARAMETER;
     }
 
-    CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+    CpuSaveState = (QEMU_SMRAM_SAVE_STATE_MAP *)gSmst->CpuSaveState[CpuIndex];
 
     //
     // Check CPU mode
@@ -701,8 +705,8 @@ SmmCpuFeaturesWriteSaveStateRegister (
   IN CONST VOID                   *Buffer
   )
 {
-  UINTN                 RegisterIndex;
-  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+  UINTN                       RegisterIndex;
+  QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   //
   // Writes to EFI_SMM_SAVE_STATE_REGISTER_LMA are ignored
@@ -728,7 +732,7 @@ SmmCpuFeaturesWriteSaveStateRegister (
     return Register < EFI_SMM_SAVE_STATE_REGISTER_IO ? EFI_NOT_FOUND : EFI_UNSUPPORTED;
   }
 
-  CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+  CpuSaveState = (QEMU_SMRAM_SAVE_STATE_MAP *)gSmst->CpuSaveState[CpuIndex];
 
   //
   // Do not write non-writable SaveState, because it will cause exception.
