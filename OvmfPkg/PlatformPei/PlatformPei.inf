@@ -47,6 +47,7 @@
   gEfiXenInfoGuid
 
 [LibraryClasses]
+  BaseLib
   DebugLib
   HobLib
   IoLib

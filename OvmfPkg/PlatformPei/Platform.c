@@ -22,6 +22,7 @@
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
@@ -461,6 +462,27 @@ DebugDumpCmos (
 }
 
 
+VOID
+S3Verification (
+  VOID
+  )
+{
+#if defined (MDE_CPU_X64)
+  if (FeaturePcdGet (PcdSmmSmramRequire) && mS3Supported) {
+    DEBUG ((EFI_D_ERROR,
+      "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n", __FUNCTION__));
+    DEBUG ((EFI_D_ERROR,
+      "%a: Please disable S3 on the QEMU command line (see the README),\n",
+      __FUNCTION__));
+    DEBUG ((EFI_D_ERROR,
+      "%a: or build OVMF with \"OvmfPkgIa32X64.dsc\".\n", __FUNCTION__));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+#endif
+}
+
+
 /**
   Perform Platform PEI initialization.
 
@@ -488,6 +510,7 @@ InitializePlatform (
     mS3Supported = TRUE;
   }
 
+  S3Verification ();
   BootModeInitialization ();
   AddressWidthInitialization ();
 

@@ -170,11 +170,6 @@ can be used on Windows.
 
   -global ICH9-LPC.disable_s3=1 \
 
-Dependent on the development status of the
-"UefiCpuPkg/Universal/Acpi/S3Resume2Pei" module, S3 resume may not work in
-OvmfPkg/OvmfPkgX64.dsc builds. In such cases, OvmfPkg/OvmfPkgIa32X64.dsc is
-recommended for running X64 guests.
-
 === Network Support ===
 
 OVMF provides a UEFI network stack by default. Its lowest level driver is the
