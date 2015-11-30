@@ -381,6 +381,10 @@
 !endif
 
 [PcdsFixedAtBuild.X64]
+!if $(SMM_REQUIRE) == TRUE
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x01
+!endif
+
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
