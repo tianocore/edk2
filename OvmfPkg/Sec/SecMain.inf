@@ -68,3 +68,5 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
+  gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize

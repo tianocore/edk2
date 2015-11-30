@@ -698,6 +698,19 @@ SecCoreStartupWithStack (
   SEC_IDT_TABLE               IdtTableInStack;
   IA32_DESCRIPTOR             IdtDescriptor;
   UINT32                      Index;
+  volatile UINT8              *Table;
+
+  //
+  // To ensure SMM can't be compromised on S3 resume, we must force re-init of
+  // the BaseExtractGuidedSectionLib. Since this is before library contructors
+  // are called, we must use a loop rather than SetMem.
+  //
+  Table = (UINT8*)(UINTN)FixedPcdGet64 (PcdGuidedExtractHandlerTableAddress);
+  for (Index = 0;
+       Index < FixedPcdGet32 (PcdGuidedExtractHandlerTableSize);
+       ++Index) {
+    Table[Index] = 0;
+  }
 
   ProcessLibraryConstructorList (NULL, NULL);
 
