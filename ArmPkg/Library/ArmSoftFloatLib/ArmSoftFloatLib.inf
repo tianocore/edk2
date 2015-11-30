@@ -1,0 +1,48 @@
+## @file
+#  ARM Software floating point Library.
+#
+#  Copyright (c) 2014, ARM Ltd. All rights reserved.
+#  Copyright (c) 2015, Linaro Ltd. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmSoftFloatLib
+  FILE_GUID                      = a485f921-749e-41a0-9f91-62f09a38721c
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmSoftFloatLib
+
+#
+#  VALID_ARCHITECTURES           = ARM
+#
+
+[Sources]
+  bits32/softfloat.c
+  Arm/__aeabi_dcmpeq.c
+  Arm/__aeabi_fcmpeq.c
+  Arm/__aeabi_dcmpge.c
+  Arm/__aeabi_fcmpge.c
+  Arm/__aeabi_dcmpgt.c
+  Arm/__aeabi_fcmpgt.c
+  Arm/__aeabi_dcmple.c
+  Arm/__aeabi_fcmple.c
+  Arm/__aeabi_dcmplt.c
+  Arm/__aeabi_fcmplt.c
+  Arm/__aeabi_dcmpun.c
+  Arm/__aeabi_fcmpun.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -DSOFTFLOAT_FOR_GCC -Wno-enum-compare -fno-tree-vrp
