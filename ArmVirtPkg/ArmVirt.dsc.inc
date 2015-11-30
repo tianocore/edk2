@@ -91,7 +91,6 @@
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
   SerialPortLib|ArmVirtPkg/Library/FdtPL011SerialPortLib/FdtPL011SerialPortLib.inf
-  SerialPortExtLib|EmbeddedPkg/Library/SerialPortExtLibNull/SerialPortExtLibNull.inf
 
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
