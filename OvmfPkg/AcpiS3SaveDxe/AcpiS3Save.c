@@ -538,12 +538,14 @@ InstallEndOfDxeCallback (
     return EFI_LOAD_ERROR;
   }
 
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle,
-                  &gEfiLockBoxProtocolGuid, NULL,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
+  if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &ImageHandle,
+                    &gEfiLockBoxProtocolGuid, NULL,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
