@@ -32,10 +32,6 @@ this code that are retained.
 ===============================================================================
 */
 
-#include <signal.h>
-#include <string.h>
-#include <unistd.h>
-
 /*
 -------------------------------------------------------------------------------
 Underflow tininess-detection mode, statically initialized to default value.

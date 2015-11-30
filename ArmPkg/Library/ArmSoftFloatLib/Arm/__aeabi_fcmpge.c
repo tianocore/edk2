@@ -22,7 +22,6 @@
 #include "milieu.h"
 #include "softfloat.h"
 
-#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 __RCSID("$NetBSD: __aeabi_fcmpge.c,v 1.2 2013/04/16 13:38:34 matt Exp $");
 #endif /* LIBC_SCCS and not lint */

@@ -46,3 +46,4 @@
 
 [BuildOptions]
   GCC:*_*_*_CC_FLAGS = -DSOFTFLOAT_FOR_GCC -Wno-enum-compare -fno-tree-vrp
+  RVCT:*_*_*_CC_FLAGS = -DSOFTFLOAT_FOR_GCC

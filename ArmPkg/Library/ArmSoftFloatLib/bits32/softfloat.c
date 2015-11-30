@@ -51,7 +51,6 @@ this code that are retained.
 ===============================================================================
 */
 
-#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 __RCSID("$NetBSD: softfloat.c,v 1.3 2013/01/10 08:16:11 matt Exp $");
 #endif /* LIBC_SCCS and not lint */
