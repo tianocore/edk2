@@ -539,13 +539,25 @@ FindPeiCoreImageBase (
      OUT  EFI_PHYSICAL_ADDRESS             *PeiCoreImageBase
   )
 {
+  BOOLEAN S3Resume;
+
   *PeiCoreImageBase = 0;
 
-  if (IsS3Resume ()) {
+  S3Resume = IsS3Resume ();
+  if (S3Resume && !FeaturePcdGet (PcdSmmSmramRequire)) {
+    //
+    // A malicious runtime OS may have injected something into our previously
+    // decoded PEI FV, but we don't care about that unless SMM/SMRAM is required.
+    //
     DEBUG ((EFI_D_VERBOSE, "SEC: S3 resume\n"));
     GetS3ResumePeiFv (BootFv);
   } else {
-    DEBUG ((EFI_D_VERBOSE, "SEC: Normal boot\n"));
+    //
+    // We're either not resuming, or resuming "securely" -- we'll decompress
+    // both PEI FV and DXE FV from pristine flash.
+    //
+    DEBUG ((EFI_D_VERBOSE, "SEC: %a\n",
+      S3Resume ? "S3 resume (with PEI decompression)" : "Normal boot"));
     FindMainFv (BootFv);
 
     DecompressMemFvs (BootFv);

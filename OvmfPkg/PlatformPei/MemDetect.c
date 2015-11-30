@@ -222,7 +222,16 @@ PublishPeiMemory (
     //
     // Determine the range of memory to use during PEI
     //
-    MemoryBase = PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
+    // Technically we could lay the permanent PEI RAM over SEC's temporary
+    // decompression and scratch buffer even if "secure S3" is needed, since
+    // their lifetimes don't overlap. However, PeiFvInitialization() will cover
+    // RAM up to PcdOvmfDecompressionScratchEnd with an EfiACPIMemoryNVS memory
+    // allocation HOB, and other allocations served from the permanent PEI RAM
+    // shouldn't overlap with that HOB.
+    //
+    MemoryBase = mS3Supported && FeaturePcdGet (PcdSmmSmramRequire) ?
+      PcdGet32 (PcdOvmfDecompressionScratchEnd) :
+      PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
     MemorySize = LowerMemorySize - MemoryBase;
     if (MemorySize > PeiMemoryCap) {
       MemoryBase = LowerMemorySize - PeiMemoryCap;
