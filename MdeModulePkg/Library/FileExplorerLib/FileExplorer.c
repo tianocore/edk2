@@ -1,7 +1,7 @@
 /** @file
   File explorer related functions.
 
-  Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
   This software and associated documentation (if any) is furnished
   under a license and may only be used or copied in accordance
   with the terms of the license. Except as permitted by such
@@ -608,6 +608,7 @@ LibAppendFileName (
 {
   UINTN   Size1;
   UINTN   Size2;
+  UINTN   MaxLen;
   CHAR16  *Str;
   CHAR16  *TmpStr;
   CHAR16  *Ptr;
@@ -615,18 +616,19 @@ LibAppendFileName (
 
   Size1 = StrSize (Str1);
   Size2 = StrSize (Str2);
+  MaxLen = (Size1 + Size2 + sizeof (CHAR16))/ sizeof (CHAR16);
   Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
   ASSERT (Str != NULL);
 
   TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16)); 
   ASSERT (TmpStr != NULL);
 
-  StrCat (Str, Str1);
+  StrCpyS (Str, MaxLen, Str1);
   if (!((*Str == '\\') && (*(Str + 1) == 0))) {
-    StrCat (Str, L"\\");
+    StrCatS (Str, MaxLen, L"\\");
   }
 
-  StrCat (Str, Str2);
+  StrCatS (Str, MaxLen, Str2);
 
   Ptr       = Str;
   LastSlash = Str;
@@ -639,11 +641,11 @@ LibAppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 3);
-      StrCpy (LastSlash, TmpStr);
+      StrCpyS (TmpStr, MaxLen, Ptr + 3);
+      StrCpyS (LastSlash, MaxLen - (UINTN) (LastSlash - Str), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
@@ -651,11 +653,11 @@ LibAppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
       // that overlap.
       //
-      StrCpy (TmpStr, Ptr + 2);
-      StrCpy (Ptr, TmpStr);
+      StrCpyS (TmpStr, MaxLen, Ptr + 2);
+      StrCpyS (Ptr, MaxLen - (UINTN) (Ptr - Str), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;
