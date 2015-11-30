@@ -574,7 +574,7 @@ SerialPortInitialize (
 
   @retval 0                NumberOfBytes is 0.
   @retval >0               The number of bytes written to the serial device.  
-                           If this value is less than NumberOfBytes, then the read operation failed.
+                           If this value is less than NumberOfBytes, then the write operation failed.
 
 **/
 UINTN
