@@ -732,12 +732,14 @@ APHandler (
   Create 4G PageTable in SMRAM.
 
   @param          ExtraPages       Additional page numbers besides for 4G memory
+  @param          Is32BitPageTable Whether the page table is 32-bit PAE
   @return         PageTable Address
 
 **/
 UINT32
 Gen4GPageTable (
-  IN      UINTN                     ExtraPages
+  IN      UINTN                     ExtraPages,
+  IN      BOOLEAN                   Is32BitPageTable
   )
 {
   VOID    *PageTable;
@@ -785,7 +787,7 @@ Gen4GPageTable (
   // Set Page Directory Pointers
   //
   for (Index = 0; Index < 4; Index++) {
-    Pte[Index] = (UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1) + IA32_PG_P;
+    Pte[Index] = (UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1) + (Is32BitPageTable ? IA32_PAE_PDPTE_ATTRIBUTE_BITS : PAGE_ATTRIBUTE_BITS);
   }
   Pte += EFI_PAGE_SIZE / sizeof (*Pte);
 
@@ -793,7 +795,7 @@ Gen4GPageTable (
   // Fill in Page Directory Entries
   //
   for (Index = 0; Index < EFI_PAGE_SIZE * 4 / sizeof (*Pte); Index++) {
-    Pte[Index] = (Index << 21) + IA32_PG_PS + IA32_PG_RW + IA32_PG_P;
+    Pte[Index] = (Index << 21) | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
   }
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
@@ -802,7 +804,7 @@ Gen4GPageTable (
     Pdpte = (UINT64*)PageTable;
     for (PageIndex = Low2MBoundary; PageIndex <= High2MBoundary; PageIndex += SIZE_2MB) {
       Pte = (UINT64*)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~(EFI_PAGE_SIZE - 1));
-      Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages + IA32_PG_RW + IA32_PG_P;
+      Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages | PAGE_ATTRIBUTE_BITS;
       //
       // Fill in Page Table Entries
       //
@@ -819,7 +821,7 @@ Gen4GPageTable (
             GuardPage = 0;
           }
         } else {
-          Pte[Index] = PageAddress + IA32_PG_RW + IA32_PG_P;
+          Pte[Index] = PageAddress | PAGE_ATTRIBUTE_BITS;
         }
         PageAddress+= EFI_PAGE_SIZE;
       }
@@ -886,7 +888,7 @@ SetCacheability (
       NewPageTable[Index] |= (UINT64)(Index << EFI_PAGE_SHIFT);
     }
 
-    PageTable[PTIndex] = ((UINTN)NewPageTableAddress & gPhyMask) | IA32_PG_P;
+    PageTable[PTIndex] = ((UINTN)NewPageTableAddress & gPhyMask) | PAGE_ATTRIBUTE_BITS;
   }
 
   ASSERT (PageTable[PTIndex] & IA32_PG_P);

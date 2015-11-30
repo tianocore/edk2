@@ -113,7 +113,7 @@ SmmInitPageTable (
   //
   // Generate PAE page table for the first 4GB memory space
   //
-  Pages = Gen4GPageTable (PAGE_TABLE_PAGES + 1);
+  Pages = Gen4GPageTable (PAGE_TABLE_PAGES + 1, FALSE);
 
   //
   // Set IA32_PG_PMNT bit to mask this entry
@@ -127,7 +127,7 @@ SmmInitPageTable (
   // Fill Page-Table-Level4 (PML4) entry
   //
   PTEntry = (UINT64*)(UINTN)(Pages - EFI_PAGES_TO_SIZE (PAGE_TABLE_PAGES + 1));
-  *PTEntry = Pages + IA32_PG_P;
+  *PTEntry = Pages + PAGE_ATTRIBUTE_BITS;
   ZeroMem (PTEntry + 1, EFI_PAGE_SIZE - sizeof (*PTEntry));
   //
   // Set sub-entries number
@@ -591,7 +591,7 @@ SmiDefaultPFHandler (
         //
         // If the entry is not present, allocate one page from page pool for it
         //
-        PageTable[PTIndex] = AllocPage () | IA32_PG_RW | IA32_PG_P;
+        PageTable[PTIndex] = AllocPage () | PAGE_ATTRIBUTE_BITS;
       } else {
         //
         // Save the upper entry address
@@ -621,7 +621,7 @@ SmiDefaultPFHandler (
     // Fill the new entry
     //
     PageTable[PTIndex] = (PFAddress & gPhyMask & ~((1ull << EndBit) - 1)) |
-                         PageAttribute | IA32_PG_A | IA32_PG_RW | IA32_PG_P;
+                         PageAttribute | IA32_PG_A | PAGE_ATTRIBUTE_BITS;
     if (UpperEntry != NULL) {
       SetSubEntriesNum (UpperEntry, GetSubEntriesNum (UpperEntry) + 1);
     }

@@ -24,7 +24,7 @@ InitSmmS3Cr3 (
   VOID
   )
 {
-  mSmmS3ResumeState->SmmS3Cr3 = Gen4GPageTable (0);
+  mSmmS3ResumeState->SmmS3Cr3 = Gen4GPageTable (0, TRUE);
 
   return ;
 }

@@ -60,7 +60,7 @@ SmmInitPageTable (
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     InitializeIDTSmmStackGuard ();
   }
-  return Gen4GPageTable (0);
+  return Gen4GPageTable (0, TRUE);
 }
 
 /**
