@@ -15,6 +15,7 @@
 **/
 
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SmmFirmwareVolumeBlock.h>
@@ -28,6 +29,8 @@ InstallProtocolInterfaces (
 {
   EFI_HANDLE FvbHandle;
   EFI_STATUS Status;
+
+  ASSERT (FeaturePcdGet (PcdSmmSmramRequire));
 
   //
   // There is no SMM service that can install multiple protocols in the SMM

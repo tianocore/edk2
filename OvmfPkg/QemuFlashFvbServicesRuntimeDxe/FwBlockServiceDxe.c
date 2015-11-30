@@ -17,6 +17,7 @@
 #include <Guid/EventGroup.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 #include <Protocol/DevicePath.h>
@@ -33,6 +34,8 @@ InstallProtocolInterfaces (
   EFI_STATUS                         Status;
   EFI_HANDLE                         FwbHandle;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *OldFwbInterface;
+
+  ASSERT (!FeaturePcdGet (PcdSmmSmramRequire));
 
   //
   // Find a handle with a matching device path that has supports FW Block

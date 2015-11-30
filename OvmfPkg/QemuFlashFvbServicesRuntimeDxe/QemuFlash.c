@@ -245,6 +245,7 @@ QemuFlashInitialize (
   mFdBlockCount = PcdGet32 (PcdOvmfFirmwareFdSize) / mFdBlockSize;
 
   if (!QemuFlashDetected ()) {
+    ASSERT (!FeaturePcdGet (PcdSmmSmramRequire));
     return EFI_WRITE_PROTECTED;
   }
 

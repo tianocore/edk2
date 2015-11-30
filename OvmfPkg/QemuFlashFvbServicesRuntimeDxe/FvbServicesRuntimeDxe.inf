@@ -85,6 +85,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
 
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Depex]
   TRUE
