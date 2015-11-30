@@ -45,11 +45,17 @@ PlatformHookSerialPortInitialize (
   }
 
   if (SerialRegAccessType == 2) { //MMIO
-    PcdSetBoolS (PcdSerialUseMmio, TRUE);
+    Status = PcdSetBoolS (PcdSerialUseMmio, TRUE);
   } else { //IO
-    PcdSetBoolS (PcdSerialUseMmio, FALSE);
+    Status = PcdSetBoolS (PcdSerialUseMmio, FALSE);
   }
-  PcdSet64S (PcdSerialRegisterBase, (UINT64) SerialRegBase);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+  Status = PcdSet64S (PcdSerialRegisterBase, (UINT64) SerialRegBase);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
 
   return RETURN_SUCCESS;
 }
