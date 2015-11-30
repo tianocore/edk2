@@ -362,6 +362,14 @@ DecompressMemFvs (
 
   OutputBuffer = (VOID*) ((UINT8*)(UINTN) PcdGet32 (PcdOvmfDxeMemFvBase) + SIZE_1MB);
   ScratchBuffer = ALIGN_POINTER ((UINT8*) OutputBuffer + OutputBufferSize, SIZE_1MB);
+
+  DEBUG ((EFI_D_VERBOSE, "%a: OutputBuffer@%p+0x%x ScratchBuffer@%p+0x%x "
+    "PcdOvmfDecompressionScratchEnd=0x%x\n", __FUNCTION__, OutputBuffer,
+    OutputBufferSize, ScratchBuffer, ScratchBufferSize,
+    PcdGet32 (PcdOvmfDecompressionScratchEnd)));
+  ASSERT ((UINTN)ScratchBuffer + ScratchBufferSize ==
+    PcdGet32 (PcdOvmfDecompressionScratchEnd));
+
   Status = ExtractGuidedSectionDecode (
              Section,
              &OutputBuffer,

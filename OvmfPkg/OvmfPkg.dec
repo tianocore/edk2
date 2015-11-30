@@ -106,6 +106,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|0x0|UINT32|0x18
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize|0x0|UINT32|0x19
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize|0x0|UINT32|0x1a
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd|0x0|UINT32|0x1f
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2

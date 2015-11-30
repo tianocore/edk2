@@ -70,3 +70,4 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd

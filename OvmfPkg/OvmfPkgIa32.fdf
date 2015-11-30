@@ -78,7 +78,7 @@ FV = SECFV
 ################################################################################
 
 [FD.MEMFD]
-BaseAddress   = 0x800000
+BaseAddress   = $(MEMFD_BASE_ADDRESS)
 Size          = 0xA00000
 ErasePolarity = 1
 BlockSize     = 0x10000
@@ -383,6 +383,8 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
      SECTION FV_IMAGE = DXEFV
    }
  }
+
+!include DecomprScratchEnd.fdf.inc
 
 ################################################################################
 
