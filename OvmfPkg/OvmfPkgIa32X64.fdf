@@ -199,7 +199,9 @@ READ_LOCK_STATUS   = TRUE
 APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+!if $(SMM_REQUIRE) == FALSE
   INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+!endif
 }
 
 #
@@ -360,15 +362,25 @@ INF  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
 INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
 INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
-!endif
 
 #
-# Variable driver stack
+# Variable driver stack (SMM)
+#
+INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesSmm.inf
+INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+
+!else
+
+#
+# Variable driver stack (non-SMM)
 #
 INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
 
 ################################################################################
 
