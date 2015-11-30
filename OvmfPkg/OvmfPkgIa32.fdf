@@ -361,6 +361,7 @@ INF  OvmfPkg/SmmControl2Dxe/SmmControl2Dxe.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
+INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
 !endif
 
 ################################################################################

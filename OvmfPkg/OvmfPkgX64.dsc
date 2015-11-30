@@ -110,7 +110,9 @@
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   LoadLinuxLib|OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
+!if $(SMM_REQUIRE) == FALSE
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
+!endif
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
 
 !ifdef $(SOURCE_DEBUG_ENABLE)
@@ -276,7 +278,11 @@
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   PlatformBdsLib|OvmfPkg/Library/PlatformBdsLib/PlatformBdsLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+!if $(SMM_REQUIRE) == TRUE
+  LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
+!else
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxDxeLib.inf
+!endif
 !ifdef $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
@@ -296,6 +302,9 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+  MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
@@ -442,6 +451,9 @@
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+!if $(SMM_REQUIRE) == TRUE
+      LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
+!endif
   }
 !if $(SMM_REQUIRE) == TRUE
   OvmfPkg/SmmAccess/SmmAccessPei.inf {
@@ -683,4 +695,8 @@
   # Privileged drivers (DXE_SMM_DRIVER modules)
   #
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
+  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf {
+    <LibraryClasses>
+      LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
+  }
 !endif
