@@ -426,6 +426,12 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   }
+!if $(SMM_REQUIRE) == TRUE
+  OvmfPkg/SmmAccess/SmmAccessPei.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  }
+!endif
 
   #
   # DXE Phase modules

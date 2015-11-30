@@ -1,0 +1,69 @@
+## @file
+# A PEIM with the following responsibilities:
+#
+# - provide SMRAM access by producing PEI_SMM_ACCESS_PPI,
+# - verify & configure the Q35 TSEG in the entry point,
+# - set aside the SMM_S3_RESUME_STATE object at the bottom of TSEG, and expose
+#   it via the gEfiAcpiVariableGuid GUIDed HOB.
+#
+# Copyright (C) 2013, 2015, Red Hat, Inc.
+#
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmAccessPei
+  FILE_GUID                      = 6C0E75B4-B0B9-44D1-8210-3377D7B4E066
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmmAccessPeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmAccessPei.c
+  SmramInternal.c
+  SmramInternal.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Guids]
+  gEfiAcpiVariableGuid
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  IoLib
+  PcdLib
+  PciLib
+  PeiServicesLib
+  PeimEntryPoint
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes
+
+[Ppis]
+  gPeiSmmAccessPpiGuid           ## PRODUCES
+
+[Depex]
+  TRUE
