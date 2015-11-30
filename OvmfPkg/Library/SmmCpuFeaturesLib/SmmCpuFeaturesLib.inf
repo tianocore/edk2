@@ -31,5 +31,7 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
   PcdLib
   DebugLib
+  SmmServicesTableLib

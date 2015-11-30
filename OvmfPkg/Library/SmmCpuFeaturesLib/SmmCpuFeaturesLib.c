@@ -15,10 +15,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiSmm.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/SmmServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Register/SmramSaveStateMap.h>
+
+//
+// EFER register LMA bit
+//
+#define LMA BIT10
 
 /**
   The constructor function
@@ -128,7 +135,35 @@ SmmCpuFeaturesHookReturnFromSmm (
   IN UINT64                NewInstructionPointer
   )
 {
-  return 0;
+  UINT64                 OriginalInstructionPointer;
+  SMRAM_SAVE_STATE_MAP  *CpuSaveState = (SMRAM_SAVE_STATE_MAP *)CpuState;
+
+  if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
+    OriginalInstructionPointer = (UINT64)CpuSaveState->x86._EIP;
+    CpuSaveState->x86._EIP = (UINT32)NewInstructionPointer;
+    //
+    // Clear the auto HALT restart flag so the RSM instruction returns
+    // program control to the instruction following the HLT instruction.
+    //
+    if ((CpuSaveState->x86.AutoHALTRestart & BIT0) != 0) {
+      CpuSaveState->x86.AutoHALTRestart &= ~BIT0;
+    }
+  } else {
+    OriginalInstructionPointer = CpuSaveState->x64._RIP;
+    if ((CpuSaveState->x64.IA32_EFER & LMA) == 0) {
+      CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer32;
+    } else {
+      CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer;
+    }
+    //
+    // Clear the auto HALT restart flag so the RSM instruction returns
+    // program control to the instruction following the HLT instruction.
+    //
+    if ((CpuSaveState->x64.AutoHALTRestart & BIT0) != 0) {
+      CpuSaveState->x64.AutoHALTRestart &= ~BIT0;
+    }
+  }
+  return OriginalInstructionPointer;
 }
 
 /**
@@ -359,6 +394,213 @@ SmmCpuFeaturesSetSmmRegister (
   ASSERT (FALSE);
 }
 
+///
+/// Macro used to simplify the lookup table entries of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
+///
+#define SMM_CPU_OFFSET(Field) OFFSET_OF (SMRAM_SAVE_STATE_MAP, Field)
+
+///
+/// Macro used to simplify the lookup table entries of type CPU_SMM_SAVE_STATE_REGISTER_RANGE
+///
+#define SMM_REGISTER_RANGE(Start, End) { Start, End, End - Start + 1 }
+
+///
+/// Structure used to describe a range of registers
+///
+typedef struct {
+  EFI_SMM_SAVE_STATE_REGISTER  Start;
+  EFI_SMM_SAVE_STATE_REGISTER  End;
+  UINTN                        Length;
+} CPU_SMM_SAVE_STATE_REGISTER_RANGE;
+
+///
+/// Structure used to build a lookup table to retrieve the widths and offsets
+/// associated with each supported EFI_SMM_SAVE_STATE_REGISTER value
+///
+
+#define SMM_SAVE_STATE_REGISTER_FIRST_INDEX             1
+
+typedef struct {
+  UINT8   Width32;
+  UINT8   Width64;
+  UINT16  Offset32;
+  UINT16  Offset64Lo;
+  UINT16  Offset64Hi;
+  BOOLEAN Writeable;
+} CPU_SMM_SAVE_STATE_LOOKUP_ENTRY;
+
+///
+/// Table used by GetRegisterIndex() to convert an EFI_SMM_SAVE_STATE_REGISTER 
+/// value to an index into a table of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
+///
+static CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE mSmmCpuRegisterRanges[] = {
+  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_GDTBASE, EFI_SMM_SAVE_STATE_REGISTER_LDTINFO),
+  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_ES,      EFI_SMM_SAVE_STATE_REGISTER_RIP),
+  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_RFLAGS,  EFI_SMM_SAVE_STATE_REGISTER_CR4),
+  { (EFI_SMM_SAVE_STATE_REGISTER)0, (EFI_SMM_SAVE_STATE_REGISTER)0, 0 }
+};
+
+///
+/// Lookup table used to retrieve the widths and offsets associated with each 
+/// supported EFI_SMM_SAVE_STATE_REGISTER value 
+///
+static CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY mSmmCpuWidthOffset[] = {
+  {0, 0, 0, 0, 0, FALSE},                                                                                                     //  Reserved
+
+  //
+  // CPU Save State registers defined in PI SMM CPU Protocol.
+  //
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64.GdtBaseLoDword) , SMM_CPU_OFFSET (x64.GdtBaseHiDword), FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_GDTBASE  = 4
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64.IdtBaseLoDword) , SMM_CPU_OFFSET (x64.IdtBaseHiDword), FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_IDTBASE  = 5
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64.LdtBaseLoDword) , SMM_CPU_OFFSET (x64.LdtBaseHiDword), FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTBASE  = 6
+  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_GDTLIMIT = 7
+  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_IDTLIMIT = 8
+  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTLIMIT = 9
+  {0, 0, 0                            , 0                                   , 0                                  , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTINFO  = 10
+
+  {4, 4, SMM_CPU_OFFSET (x86._ES)     , SMM_CPU_OFFSET (x64._ES)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_ES       = 20
+  {4, 4, SMM_CPU_OFFSET (x86._CS)     , SMM_CPU_OFFSET (x64._CS)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CS       = 21
+  {4, 4, SMM_CPU_OFFSET (x86._SS)     , SMM_CPU_OFFSET (x64._SS)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_SS       = 22
+  {4, 4, SMM_CPU_OFFSET (x86._DS)     , SMM_CPU_OFFSET (x64._DS)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_DS       = 23
+  {4, 4, SMM_CPU_OFFSET (x86._FS)     , SMM_CPU_OFFSET (x64._FS)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_FS       = 24
+  {4, 4, SMM_CPU_OFFSET (x86._GS)     , SMM_CPU_OFFSET (x64._GS)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_GS       = 25
+  {0, 4, 0                            , SMM_CPU_OFFSET (x64._LDTR)   , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_LDTR_SEL = 26
+  {4, 4, SMM_CPU_OFFSET (x86._TR)     , SMM_CPU_OFFSET (x64._TR)     , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_TR_SEL   = 27
+  {4, 8, SMM_CPU_OFFSET (x86._DR7)    , SMM_CPU_OFFSET (x64._DR7)    , SMM_CPU_OFFSET (x64._DR7)    + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_DR7      = 28
+  {4, 8, SMM_CPU_OFFSET (x86._DR6)    , SMM_CPU_OFFSET (x64._DR6)    , SMM_CPU_OFFSET (x64._DR6)    + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_DR6      = 29
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R8)     , SMM_CPU_OFFSET (x64._R8)     + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R8       = 30
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R9)     , SMM_CPU_OFFSET (x64._R9)     + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R9       = 31
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R10)    , SMM_CPU_OFFSET (x64._R10)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R10      = 32
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R11)    , SMM_CPU_OFFSET (x64._R11)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R11      = 33
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R12)    , SMM_CPU_OFFSET (x64._R12)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R12      = 34
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R13)    , SMM_CPU_OFFSET (x64._R13)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R13      = 35
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R14)    , SMM_CPU_OFFSET (x64._R14)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R14      = 36
+  {0, 8, 0                            , SMM_CPU_OFFSET (x64._R15)    , SMM_CPU_OFFSET (x64._R15)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_R15      = 37
+  {4, 8, SMM_CPU_OFFSET (x86._EAX)    , SMM_CPU_OFFSET (x64._RAX)    , SMM_CPU_OFFSET (x64._RAX)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RAX      = 38
+  {4, 8, SMM_CPU_OFFSET (x86._EBX)    , SMM_CPU_OFFSET (x64._RBX)    , SMM_CPU_OFFSET (x64._RBX)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RBX      = 39
+  {4, 8, SMM_CPU_OFFSET (x86._ECX)    , SMM_CPU_OFFSET (x64._RCX)    , SMM_CPU_OFFSET (x64._RCX)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RCX      = 40
+  {4, 8, SMM_CPU_OFFSET (x86._EDX)    , SMM_CPU_OFFSET (x64._RDX)    , SMM_CPU_OFFSET (x64._RDX)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RDX      = 41
+  {4, 8, SMM_CPU_OFFSET (x86._ESP)    , SMM_CPU_OFFSET (x64._RSP)    , SMM_CPU_OFFSET (x64._RSP)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RSP      = 42
+  {4, 8, SMM_CPU_OFFSET (x86._EBP)    , SMM_CPU_OFFSET (x64._RBP)    , SMM_CPU_OFFSET (x64._RBP)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RBP      = 43
+  {4, 8, SMM_CPU_OFFSET (x86._ESI)    , SMM_CPU_OFFSET (x64._RSI)    , SMM_CPU_OFFSET (x64._RSI)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RSI      = 44
+  {4, 8, SMM_CPU_OFFSET (x86._EDI)    , SMM_CPU_OFFSET (x64._RDI)    , SMM_CPU_OFFSET (x64._RDI)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RDI      = 45
+  {4, 8, SMM_CPU_OFFSET (x86._EIP)    , SMM_CPU_OFFSET (x64._RIP)    , SMM_CPU_OFFSET (x64._RIP)    + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RIP      = 46
+
+  {4, 8, SMM_CPU_OFFSET (x86._EFLAGS) , SMM_CPU_OFFSET (x64._RFLAGS) , SMM_CPU_OFFSET (x64._RFLAGS) + 4, TRUE },  //  EFI_SMM_SAVE_STATE_REGISTER_RFLAGS   = 51
+  {4, 8, SMM_CPU_OFFSET (x86._CR0)    , SMM_CPU_OFFSET (x64._CR0)    , SMM_CPU_OFFSET (x64._CR0)    + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CR0      = 52
+  {4, 8, SMM_CPU_OFFSET (x86._CR3)    , SMM_CPU_OFFSET (x64._CR3)    , SMM_CPU_OFFSET (x64._CR3)    + 4, FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CR3      = 53
+  {0, 4, 0                            , SMM_CPU_OFFSET (x64._CR4)    , 0                               , FALSE},  //  EFI_SMM_SAVE_STATE_REGISTER_CR4      = 54
+};
+
+//
+// No support for I/O restart
+//
+
+/**
+  Read information from the CPU save state.
+
+  @param  Register  Specifies the CPU register to read form the save state.
+
+  @retval 0   Register is not valid
+  @retval >0  Index into mSmmCpuWidthOffset[] associated with Register
+
+**/
+static UINTN
+GetRegisterIndex (
+  IN EFI_SMM_SAVE_STATE_REGISTER  Register
+  )
+{
+  UINTN  Index;
+  UINTN  Offset;
+
+  for (Index = 0, Offset = SMM_SAVE_STATE_REGISTER_FIRST_INDEX; mSmmCpuRegisterRanges[Index].Length != 0; Index++) {
+    if (Register >= mSmmCpuRegisterRanges[Index].Start && Register <= mSmmCpuRegisterRanges[Index].End) {
+      return Register - mSmmCpuRegisterRanges[Index].Start + Offset;
+    }
+    Offset += mSmmCpuRegisterRanges[Index].Length;
+  }
+  return 0;
+}
+
+/**
+  Read a CPU Save State register on the target processor.
+
+  This function abstracts the differences that whether the CPU Save State register is in the 
+  IA32 CPU Save State Map or X64 CPU Save State Map.
+
+  This function supports reading a CPU Save State register in SMBase relocation handler.
+
+  @param[in]  CpuIndex       Specifies the zero-based index of the CPU save state.
+  @param[in]  RegisterIndex  Index into mSmmCpuWidthOffset[] look up table.
+  @param[in]  Width          The number of bytes to read from the CPU save state.
+  @param[out] Buffer         Upon return, this holds the CPU register value read from the save state.
+
+  @retval EFI_SUCCESS           The register was read from Save State.
+  @retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
+  @retval EFI_INVALID_PARAMTER  This or Buffer is NULL.
+
+**/
+static EFI_STATUS
+ReadSaveStateRegisterByIndex (
+  IN UINTN   CpuIndex,
+  IN UINTN   RegisterIndex,
+  IN UINTN   Width,
+  OUT VOID   *Buffer
+  )
+{
+  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+
+  CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+
+  if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
+    //
+    // If 32-bit mode width is zero, then the specified register can not be accessed
+    //
+    if (mSmmCpuWidthOffset[RegisterIndex].Width32 == 0) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // If Width is bigger than the 32-bit mode width, then the specified register can not be accessed
+    //
+    if (Width > mSmmCpuWidthOffset[RegisterIndex].Width32) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Write return buffer
+    //
+    ASSERT(CpuSaveState != NULL);
+    CopyMem(Buffer, (UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset32, Width);
+  } else {
+    //
+    // If 64-bit mode width is zero, then the specified register can not be accessed
+    //
+    if (mSmmCpuWidthOffset[RegisterIndex].Width64 == 0) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // If Width is bigger than the 64-bit mode width, then the specified register can not be accessed
+    //
+    if (Width > mSmmCpuWidthOffset[RegisterIndex].Width64) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Write lower 32-bits of return buffer
+    //
+    CopyMem(Buffer, (UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Lo, MIN(4, Width));
+    if (Width >= 4) {
+      //
+      // Write upper 32-bits of return buffer
+      //
+      CopyMem((UINT8 *)Buffer + 4, (UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Hi, Width - 4);
+    }
+  }
+  return EFI_SUCCESS;
+}
+
 /**
   Read an SMM Save State register on the target processor.  If this function
   returns EFI_UNSUPPORTED, then the caller is responsible for reading the
@@ -386,7 +628,52 @@ SmmCpuFeaturesReadSaveStateRegister (
   OUT VOID                         *Buffer
   )
 {
-  return EFI_UNSUPPORTED;
+  UINTN                  RegisterIndex;
+  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+
+  //
+  // Check for special EFI_SMM_SAVE_STATE_REGISTER_LMA
+  //
+  if (Register == EFI_SMM_SAVE_STATE_REGISTER_LMA) {
+    //
+    // Only byte access is supported for this register
+    //
+    if (Width != 1) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+
+    //
+    // Check CPU mode
+    //
+    if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
+      *(UINT8 *)Buffer = 32;
+    } else {
+      *(UINT8 *)Buffer = 64;
+    }
+
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Check for special EFI_SMM_SAVE_STATE_REGISTER_IO
+  //
+  if (Register == EFI_SMM_SAVE_STATE_REGISTER_IO) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Convert Register to a register lookup table index.  Let
+  // PiSmmCpuDxeSmm implement other special registers (currently
+  // there is only EFI_SMM_SAVE_STATE_REGISTER_PROCESSOR_ID).
+  //
+  RegisterIndex = GetRegisterIndex (Register);
+  if (RegisterIndex == 0) {
+    return Register < EFI_SMM_SAVE_STATE_REGISTER_IO ? EFI_NOT_FOUND : EFI_UNSUPPORTED;
+  }
+
+  return ReadSaveStateRegisterByIndex (CpuIndex, RegisterIndex, Width, Buffer);
 }
 
 /**
@@ -414,7 +701,91 @@ SmmCpuFeaturesWriteSaveStateRegister (
   IN CONST VOID                   *Buffer
   )
 {
-  return EFI_UNSUPPORTED;
+  UINTN                 RegisterIndex;
+  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+
+  //
+  // Writes to EFI_SMM_SAVE_STATE_REGISTER_LMA are ignored
+  //
+  if (Register == EFI_SMM_SAVE_STATE_REGISTER_LMA) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Writes to EFI_SMM_SAVE_STATE_REGISTER_IO are not supported
+  //
+  if (Register == EFI_SMM_SAVE_STATE_REGISTER_IO) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Convert Register to a register lookup table index.  Let
+  // PiSmmCpuDxeSmm implement other special registers (currently
+  // there is only EFI_SMM_SAVE_STATE_REGISTER_PROCESSOR_ID).
+  //
+  RegisterIndex = GetRegisterIndex (Register);
+  if (RegisterIndex == 0) {
+    return Register < EFI_SMM_SAVE_STATE_REGISTER_IO ? EFI_NOT_FOUND : EFI_UNSUPPORTED;
+  }
+
+  CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+
+  //
+  // Do not write non-writable SaveState, because it will cause exception.
+  // 
+  if (!mSmmCpuWidthOffset[RegisterIndex].Writeable) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check CPU mode
+  //
+  if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
+    //
+    // If 32-bit mode width is zero, then the specified register can not be accessed
+    //
+    if (mSmmCpuWidthOffset[RegisterIndex].Width32 == 0) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // If Width is bigger than the 32-bit mode width, then the specified register can not be accessed
+    //
+    if (Width > mSmmCpuWidthOffset[RegisterIndex].Width32) {
+      return EFI_INVALID_PARAMETER;
+    }
+    //
+    // Write SMM State register
+    //
+    ASSERT (CpuSaveState != NULL);
+    CopyMem((UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset32, Buffer, Width);
+  } else {
+    //
+    // If 64-bit mode width is zero, then the specified register can not be accessed
+    //
+    if (mSmmCpuWidthOffset[RegisterIndex].Width64 == 0) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // If Width is bigger than the 64-bit mode width, then the specified register can not be accessed
+    //
+    if (Width > mSmmCpuWidthOffset[RegisterIndex].Width64) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Write lower 32-bits of SMM State register
+    //
+    CopyMem((UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Lo, Buffer, MIN (4, Width));
+    if (Width >= 4) {
+      //
+      // Write upper 32-bits of SMM State register
+      //
+      CopyMem((UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Hi, (UINT8 *)Buffer + 4, Width - 4);
+    }
+  }
+  return EFI_SUCCESS;
 }
 
 /**
