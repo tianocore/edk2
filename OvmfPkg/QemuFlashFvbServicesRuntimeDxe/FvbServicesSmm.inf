@@ -1,0 +1,89 @@
+## @file
+#  Component description file for QEMU Flash Fimware Volume Block SMM driver
+#  module.
+#
+#  This SMM driver implements and produces the SMM Fimware Volue Block Protocol
+#  for a QEMU flash device.
+#
+#  Copyright (C) 2015, Red Hat, Inc.
+#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
+#  IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FvbServicesSmm
+  FILE_GUID                      = 2E7DB7A7-608E-4041-B45F-00359E0766C6
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = FvbInitialize
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FvbInfo.c
+  FwBlockService.c
+  FwBlockServiceSmm.c
+  QemuFlash.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  PcdLib
+  SmmServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+
+[Protocols]
+  gEfiSmmFirmwareVolumeBlockProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwWorkingBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwSpareBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
+
+
+[Depex]
+  TRUE
