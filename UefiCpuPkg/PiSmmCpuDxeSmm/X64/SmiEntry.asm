@@ -140,7 +140,7 @@ Base:
     or      ah, 1
     wrmsr
     mov     rbx, cr0
-    bts     ebx, 31
+    or      ebx, 080010000h            ; enable paging + WP
     mov     cr0, rbx
     retf
 @LongMode:                              ; long mode (64-bit code) starts here
