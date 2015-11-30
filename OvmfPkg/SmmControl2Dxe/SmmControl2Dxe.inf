@@ -1,0 +1,66 @@
+## @file
+# A DXE_RUNTIME_DRIVER providing synchronous SMI activations via the
+# EFI_SMM_CONTROL2_PROTOCOL.
+#
+# We expect the PEI phase to have covered the following:
+# - ensure that the underlying QEMU machine type be Q35
+#   (responsible: OvmfPkg/SmmAccess/SmmAccessPei.inf)
+# - ensure that the ACPI PM IO space be configured
+#   (responsible: OvmfPkg/PlatformPei/PlatformPei.inf)
+#
+# Our own entry point is responsible for confirming the SMI feature and for
+# configuring it.
+#
+# Copyright (C) 2013, 2015, Red Hat, Inc.
+#
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmControl2Dxe
+  FILE_GUID                      = 1206F7CA-A475-4624-A83E-E6FC9BB38E49
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010400
+  ENTRY_POINT                    = SmmControl2DxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmControl2Dxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  PciLib
+  QemuFwCfgLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiS3SaveStateProtocolGuid   ## SOMETIMES_CONSUMES
+  gEfiSmmControl2ProtocolGuid   ## PRODUCES
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[Depex]
+  TRUE

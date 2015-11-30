@@ -357,6 +357,7 @@ INF  OvmfPkg/PlatformDxe/Platform.inf
 
 !if $(SMM_REQUIRE) == TRUE
 INF  OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
+INF  OvmfPkg/SmmControl2Dxe/SmmControl2Dxe.inf
 !endif
 
 ################################################################################
