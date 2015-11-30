@@ -850,6 +850,9 @@
 [LibraryClasses]
   DebugLib
 
+[LibraryClasses.ARM]
+  ArmSoftFloatLib
+
 [BuildOptions]
   #
   # Disables the following Visual Studio compiler warnings brought by openssl source, so we do not break the build with /WX option:
@@ -889,6 +892,6 @@
   #  513: a value of type <type> cannot be assigned to an entity of type <type>
   #  188: enumerated type mixed with another type (i.e. passing an integer as an enum without a cast)
   # 1296: Extended constant initialiser used
-  RVCT:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 --diag_suppress=1296,1295,550,1293,111,68,177,223,144,513,188
+  RVCT:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS) --library_interface=aeabi_clib99 --diag_suppress=1296,1295,550,1293,111,68,177,223,144,513,188
   XCODE:*_*_IA32_CC_FLAGS   = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w
   XCODE:*_*_X64_CC_FLAGS    = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w
