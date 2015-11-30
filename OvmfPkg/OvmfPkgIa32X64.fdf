@@ -358,6 +358,7 @@ INF  OvmfPkg/PlatformDxe/Platform.inf
 !if $(SMM_REQUIRE) == TRUE
 INF  OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
 INF  OvmfPkg/SmmControl2Dxe/SmmControl2Dxe.inf
+INF  UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
