@@ -42,3 +42,6 @@
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

@@ -44,6 +44,8 @@ LockBoxLibInitialize (
 {
   UINTN NumEntries;
 
+  ASSERT (!FeaturePcdGet (PcdSmmSmramRequire));
+
   if (PcdGet32 (PcdOvmfLockBoxStorageSize) < sizeof (LOCK_BOX_GLOBAL)) {
     return RETURN_UNSUPPORTED;
   }
