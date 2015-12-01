@@ -68,7 +68,8 @@ M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 BaseTools
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
-M: Yingke D Liu <yingke.d.liu@intel.com>
+M: Yonghong Zhu <yonghong.zhu@intel.com>
+M: Liming Gao <liming.gao@intel.com>
 
 BeagleBoardPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/BeagleBoardPkg
