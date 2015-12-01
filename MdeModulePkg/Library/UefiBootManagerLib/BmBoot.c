@@ -53,6 +53,28 @@ EfiBootManagerRegisterLegacyBootSupport (
 }
 
 /**
+  Return TRUE when the boot option is auto-created instead of manually added.
+
+  @param BootOption Pointer to the boot option to check.
+
+  @retval TRUE  The boot option is auto-created.
+  @retval FALSE The boot option is manually added.
+**/
+BOOLEAN
+BmIsAutoCreateBootOption (
+  EFI_BOOT_MANAGER_LOAD_OPTION    *BootOption
+  )
+{
+  if ((BootOption->OptionalDataSize == sizeof (EFI_GUID)) &&
+      CompareGuid ((EFI_GUID *) BootOption->OptionalData, &mBmAutoCreateBootOptionGuid)
+      ) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+/**
   For a bootable Device path, return its boot type.
 
   @param  DevicePath                   The bootable device Path to check
@@ -1738,8 +1760,10 @@ EfiBootManagerBoot (
   Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &ImageInfo);
   ASSERT_EFI_ERROR (Status);
 
-  ImageInfo->LoadOptionsSize  = BootOption->OptionalDataSize;
-  ImageInfo->LoadOptions      = BootOption->OptionalData;
+  if (!BmIsAutoCreateBootOption (BootOption)) {
+    ImageInfo->LoadOptionsSize = BootOption->OptionalDataSize;
+    ImageInfo->LoadOptions     = BootOption->OptionalData;
+  }
 
   //
   // Clean to NULL because the image is loaded directly from the firmwares boot manager.
@@ -2155,9 +2179,7 @@ EfiBootManagerRefreshAllBootOption (
   for (Index = 0; Index < NvBootOptionCount; Index++) {
     if (((DevicePathType (NvBootOptions[Index].FilePath) != BBS_DEVICE_PATH) || 
          (DevicePathSubType (NvBootOptions[Index].FilePath) != BBS_BBS_DP)
-        ) &&
-        (NvBootOptions[Index].OptionalDataSize == sizeof (EFI_GUID)) &&
-        CompareGuid ((EFI_GUID *) NvBootOptions[Index].OptionalData, &mBmAutoCreateBootOptionGuid)
+        ) && BmIsAutoCreateBootOption (&NvBootOptions[Index])
        ) {
       //
       // Only check those added by BDS
