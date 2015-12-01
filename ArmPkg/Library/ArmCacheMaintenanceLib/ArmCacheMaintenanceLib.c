@@ -45,7 +45,7 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  ArmInvalidateInstructionCache();
+  ASSERT (FALSE);
 }
 
 VOID
