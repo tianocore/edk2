@@ -1385,6 +1385,32 @@ class FdReport(object):
         self.BaseAddress = Fd.BaseAddress
         self.Size = Fd.Size
         self.FdRegionList = [FdRegionReport(FdRegion, Wa) for FdRegion in Fd.RegionList]
+        self.FvPath = os.path.join(Wa.BuildDir, "FV")
+        self.VpdFilePath = os.path.join(self.FvPath, "%s.map" % Wa.Platform.VpdToolGuid)
+        VpdPcdToken = 'gEfiMdeModulePkgTokenSpaceGuid'
+        VpdPcdName = 'PcdVpdBaseAddress'
+        self.VPDInfoList = []
+        for index, FdRegion in enumerate(Fd.RegionList):
+            if (VpdPcdName, VpdPcdToken) == FdRegion.PcdOffset:
+                self.VPDBaseAddress = self.FdRegionList[index].BaseAddress
+                self.VPDSize = self.FdRegionList[index].Size
+                break
+
+        if os.path.isfile(self.VpdFilePath):
+            fd = open(self.VpdFilePath, "r")
+            Lines = fd.readlines()
+            for Line in Lines:
+                Line = Line.strip()
+                if len(Line) == 0 or Line.startswith("#"):
+                    continue
+                try:
+                    PcdName, SkuId, Offset, Size, Value = Line.split("#")[0].split("|")
+                    PcdName, SkuId, Offset, Size, Value = PcdName.strip(), SkuId.strip(), Offset.strip(), Size.strip(), Value.strip()
+                    Offset = '0x%08X' % (int(Offset, 16) + self.VPDBaseAddress)
+                    self.VPDInfoList.append("%s | %s | %s | %s | %s" % (PcdName, SkuId, Offset, Size, Value))
+                except:
+                    EdkLogger.error("BuildReport", CODE_ERROR, "Fail to parse VPD information file %s" % self.VpdFilePath)
+            fd.close()
 
     ##
     # Generate report for the firmware device.
@@ -1405,6 +1431,15 @@ class FdReport(object):
             for FdRegionItem in self.FdRegionList:
                 FdRegionItem.GenerateReport(File)
 
+        if len(self.VPDInfoList) > 0:
+            FileWrite(File, gSubSectionStart)
+            FileWrite(File, "FD VPD Region")
+            FileWrite(File, "Base Address:       0x%X" % self.VPDBaseAddress)
+            FileWrite(File, "Size:               0x%X (%.0fK)" % (self.VPDSize, self.VPDSize / 1024.0))
+            FileWrite(File, gSubSectionSep)
+            for item in self.VPDInfoList:
+                FileWrite(File, item)
+            FileWrite(File, gSubSectionEnd)
         FileWrite(File, gSectionEnd)
 
 
