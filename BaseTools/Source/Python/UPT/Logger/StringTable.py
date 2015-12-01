@@ -656,7 +656,7 @@ _("Wrong define section format, must be KEY = Value.")
 ERR_DECPARSE_DEFINE_UNKNOWKEY       = \
 _("Unknown key [%s] in define section.")
 ERR_DECPARSE_DEFINE_SPEC            = \
-_("Specification value must be HEX numbers.")
+_("Specification value must be HEX numbers or decimal numbers.")
 ERR_DECPARSE_DEFINE_PKGNAME         = \
 _("Package name must be AlphaNumeric characters.")
 ERR_DECPARSE_DEFINE_PKGGUID         = \
