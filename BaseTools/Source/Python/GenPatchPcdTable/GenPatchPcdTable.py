@@ -112,11 +112,11 @@ def _parseGeneral(lines, efifilepath):
     @param lines    line array for map file
     
     @return a list which element hold (PcdName, Offset, SectionName)
-    """    
+    """
     status = 0    #0 - beginning of file; 1 - PE section definition; 2 - symbol table
-    secs  = []    # key = section name
+    secs = []    # key = section name
     bPcds = []
-    
+
 
     for line in lines:
         line = line.strip()
@@ -128,9 +128,9 @@ def _parseGeneral(lines, efifilepath):
             continue
         if re.match("^entry point at", line):
             status = 3
-            continue        
+            continue
         if status == 1 and len(line) != 0:
-            m =  secRe.match(line)
+            m = secRe.match(line)
             assert m != None, "Fail to parse the section in map file , line is %s" % line
             sec_no, sec_start, sec_length, sec_name, sec_class = m.groups(0)
             secs.append([int(sec_no, 16), int(sec_start, 16), int(sec_length, 16), sec_name, sec_class])
@@ -138,9 +138,9 @@ def _parseGeneral(lines, efifilepath):
             m = symRe.match(line)
             assert m != None, "Fail to parse the symbol in map file, line is %s" % line
             sec_no, sym_offset, sym_name, vir_addr = m.groups(0)
-            sec_no     = int(sec_no,     16)
+            sec_no = int(sec_no, 16)
             sym_offset = int(sym_offset, 16)
-            vir_addr   = int(vir_addr,   16)
+            vir_addr = int(vir_addr, 16)
             m2 = re.match('^[_]+gPcd_BinaryPatch_([\w]+)', sym_name)
             if m2 != None:
                 # fond a binary pcd entry in map file
@@ -179,7 +179,7 @@ def generatePcdTable(list, pcdpath):
     f.close()
 
     #print 'Success to generate Binary Patch PCD table at %s!' % pcdpath 
-    
+
 if __name__ == '__main__':
     UsageString = "%prog -m <MapFile> -e <EfiFile> -o <OutFile>"
     AdditionalNotes = "\nPCD table is generated in file name with .BinaryPcdTable.txt postfix"
@@ -196,12 +196,12 @@ if __name__ == '__main__':
     if options.mapfile == None or options.efifile == None:
         print parser.get_usage()
     elif os.path.exists(options.mapfile) and os.path.exists(options.efifile):
-        list = parsePcdInfoFromMapFile(options.mapfile, options.efifile) 
+        list = parsePcdInfoFromMapFile(options.mapfile, options.efifile)
         if list != None:
             if options.outfile != None:
                 generatePcdTable(list, options.outfile)
             else:
-                generatePcdTable(list, options.mapfile.replace('.map', '.BinaryPcdTable.txt')) 
+                generatePcdTable(list, options.mapfile.replace('.map', '.BinaryPcdTable.txt'))
         else:
             print 'Fail to generate Patch PCD Table based on map file and efi file'
     else:

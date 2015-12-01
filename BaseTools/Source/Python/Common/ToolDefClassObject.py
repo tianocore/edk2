@@ -42,7 +42,7 @@ gDefaultToolsDefFile = "tools_def.txt"
 # @var MacroDictionary:        To store keys and values defined in DEFINE statement
 #
 class ToolDefClassObject(object):
-    def __init__(self, FileName = None):
+    def __init__(self, FileName=None):
         self.ToolsDefTxtDictionary = {}
         self.MacroDictionary = {}
         for Env in os.environ:
@@ -61,7 +61,7 @@ class ToolDefClassObject(object):
         FileContent = []
         if os.path.isfile(FileName):
             try:
-                F = open(FileName,'r')
+                F = open(FileName, 'r')
                 FileContent = F.readlines()
             except:
                 EdkLogger.error("tools_def.txt parser", FILE_OPEN_FAILURE, ExtraData=FileName)
@@ -155,7 +155,7 @@ class ToolDefClassObject(object):
         self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE].sort()
 
         KeyList = [TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG, TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE]
-        for Index in range(3,-1,-1):
+        for Index in range(3, -1, -1):
             for Key in dict(self.ToolsDefTxtDictionary):
                 List = Key.split('_')
                 if List[Index] == '*':

@@ -248,7 +248,7 @@ class UniFileClassObject(object):
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File);
             LineNo = GetLineNo(FileIn, Line, False)
             EdkLogger.error("Unicode File Parser", PARSER_ERROR, "Wrong language definition",
-                            ExtraData="""%s\n\t*Correct format is like '#langdef en-US "English"'""" % Line, File = File, Line = LineNo)
+                            ExtraData="""%s\n\t*Correct format is like '#langdef en-US "English"'""" % Line, File=File, Line=LineNo)
         else:
             LangName = GetLanguageCode(Lang[1], self.IsCompatibleMode, self.File)
             LangPrintName = Lang[2]
@@ -352,7 +352,7 @@ class UniFileClassObject(object):
         if Name != '':
             MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
             if MatchString == None or MatchString.end(0) != len(Name):
-                EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' %(Name, self.File))
+                EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' % (Name, self.File))
         LanguageList = Item.split(u'#language ')
         for IndexI in range(len(LanguageList)):
             if IndexI == 0:
@@ -512,7 +512,7 @@ class UniFileClassObject(object):
                 if not self.IsCompatibleMode and Name != '':
                     MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
                     if MatchString == None or MatchString.end(0) != len(Name):
-                        EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' %(Name, self.File))
+                        EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' % (Name, self.File))
                 self.AddStringToList(Name, Language, Value)
                 continue
 
@@ -571,7 +571,7 @@ class UniFileClassObject(object):
                 ItemIndexInList = self.OrderedStringDict[Language][Name]
                 Item = self.OrderedStringList[Language][ItemIndexInList]
                 Item.UpdateValue(Value)
-                Item.UseOtherLangDef = ''   
+                Item.UseOtherLangDef = ''
 
         if IsAdded:
             Token = len(self.OrderedStringList[Language])

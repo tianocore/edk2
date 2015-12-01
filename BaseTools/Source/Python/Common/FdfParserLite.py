@@ -69,8 +69,8 @@ class Warning (Exception):
     #   @param  File        The FDF name
     #   @param  Line        The Line number that error occurs
     #
-    def __init__(self, Str, File = None, Line = None):
-        
+    def __init__(self, Str, File=None, Line=None):
+
         FileLineTuple = GetRealFileLine(File, Line)
         self.FileName = FileLineTuple[0]
         self.LineNumber = FileLineTuple[1]
@@ -359,8 +359,8 @@ class FdfParser(object):
             else:
                 raise Warning("Macro not complete At Line ", self.FileName, self.CurrentLineNumber)
         return Str
-    
-    def __ReplaceFragment(self, StartPos, EndPos, Value = ' '):
+
+    def __ReplaceFragment(self, StartPos, EndPos, Value=' '):
         if StartPos[0] == EndPos[0]:
             Offset = StartPos[1]
             while Offset <= EndPos[1]:

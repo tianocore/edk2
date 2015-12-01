@@ -53,7 +53,7 @@ class GuidSection(GuidSectionClassObject) :
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict={}):
         #
         # Generate all section
         #
@@ -65,7 +65,7 @@ class GuidSection(GuidSectionClassObject) :
             self.SectionType = FfsInf.__ExtendMacro__(self.SectionType)
             self.CurrentArchList = [FfsInf.CurrentArch]
 
-        SectFile  = tuple()
+        SectFile = tuple()
         SectAlign = []
         Index = 0
         MaxAlign = None
@@ -84,7 +84,7 @@ class GuidSection(GuidSectionClassObject) :
 
         for Sect in self.SectionList:
             Index = Index + 1
-            SecIndex = '%s.%d' %(SecNum,Index)
+            SecIndex = '%s.%d' % (SecNum, Index)
             # set base address for inside FvImage
             if isinstance(Sect, FvImageSection):
                 if self.FvAddr != []:
@@ -93,7 +93,7 @@ class GuidSection(GuidSectionClassObject) :
             elif isinstance(Sect, GuidSection):
                 Sect.FvAddr = self.FvAddr
                 Sect.FvParentAddr = self.FvParentAddr
-            ReturnSectList, align = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList,FfsInf, Dict)
+            ReturnSectList, align = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList, FfsInf, Dict)
             if isinstance(Sect, GuidSection):
                 if Sect.IncludeFvSection:
                     self.IncludeFvSection = Sect.IncludeFvSection
@@ -118,10 +118,10 @@ class GuidSection(GuidSectionClassObject) :
                     self.Alignment = MaxAlign
 
         OutputFile = OutputPath + \
-                     os.sep     + \
+                     os.sep + \
                      ModuleName + \
-                     'SEC'      + \
-                     SecNum     + \
+                     'SEC' + \
+                     SecNum + \
                      Ffs.SectionSuffix['GUIDED']
         OutputFile = os.path.normpath(OutputFile)
 
@@ -135,7 +135,7 @@ class GuidSection(GuidSectionClassObject) :
         # GENCRC32 section
         #
         if self.NameGuid == None :
-            GenFdsGlobalVariable.VerboseLogger( "Use GenSection function Generate CRC32 Section")
+            GenFdsGlobalVariable.VerboseLogger("Use GenSection function Generate CRC32 Section")
             GenFdsGlobalVariable.GenerateSection(OutputFile, SectFile, Section.Section.SectionType[self.SectionType], InputAlign=SectAlign)
             OutputFileList = []
             OutputFileList.append(OutputFile)
@@ -144,7 +144,7 @@ class GuidSection(GuidSectionClassObject) :
         elif ExternalTool == None:
             EdkLogger.error("GenFds", GENFDS_ERROR, "No tool found with GUID %s" % self.NameGuid)
         else:
-            DummyFile = OutputFile+".dummy"
+            DummyFile = OutputFile + ".dummy"
             #
             # Call GenSection with DUMMY section type.
             #
@@ -153,10 +153,10 @@ class GuidSection(GuidSectionClassObject) :
             # Use external tool process the Output
             #
             TempFile = OutputPath + \
-                       os.sep     + \
+                       os.sep + \
                        ModuleName + \
-                       'SEC'      + \
-                       SecNum     + \
+                       'SEC' + \
+                       SecNum + \
                        '.tmp'
             TempFile = os.path.normpath(TempFile)
             #
@@ -197,12 +197,12 @@ class GuidSection(GuidSectionClassObject) :
             if not os.path.exists(TempFile):
                 EdkLogger.error("GenFds", COMMAND_FAILURE, 'Fail to call %s, no output file was generated' % ExternalTool)
 
-            FileHandleIn = open(DummyFile,'rb')
-            FileHandleIn.seek(0,2)
+            FileHandleIn = open(DummyFile, 'rb')
+            FileHandleIn.seek(0, 2)
             InputFileSize = FileHandleIn.tell()
-            
-            FileHandleOut = open(TempFile,'rb')
-            FileHandleOut.seek(0,2)
+
+            FileHandleOut = open(TempFile, 'rb')
+            FileHandleOut.seek(0, 2)
             TempFileSize = FileHandleOut.tell()
 
             Attribute = []
@@ -213,7 +213,7 @@ class GuidSection(GuidSectionClassObject) :
             if self.ProcessRequired == "NONE" and HeaderLength == None:
                 if TempFileSize > InputFileSize:
                     FileHandleIn.seek(0)
-                    BufferIn  = FileHandleIn.read()
+                    BufferIn = FileHandleIn.read()
                     FileHandleOut.seek(0)
                     BufferOut = FileHandleOut.read()
                     if BufferIn == BufferOut[TempFileSize - InputFileSize:]:
@@ -224,18 +224,18 @@ class GuidSection(GuidSectionClassObject) :
 
             FileHandleIn.close()
             FileHandleOut.close()
-            
+
             if FirstCall and 'PROCESSING_REQUIRED' in Attribute:
                 # Guided data by -z option on first call is the process required data. Call the guided tool with the real option.
                 GenFdsGlobalVariable.GuidTool(TempFile, [DummyFile], ExternalTool, CmdOption)
-            
+
             #
             # Call Gensection Add Section Header
             #
             if self.ProcessRequired in ("TRUE", "1"):
                 if 'PROCESSING_REQUIRED' not in Attribute:
                     Attribute.append('PROCESSING_REQUIRED')
-  
+
             if self.AuthStatusValid in ("TRUE", "1"):
                 Attribute.append('AUTH_STATUS_VALID')
             GenFdsGlobalVariable.GenerateSection(OutputFile, [TempFile], Section.Section.SectionType['GUIDED'],
@@ -263,7 +263,7 @@ class GuidSection(GuidSectionClassObject) :
             ToolDb = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDatabase
             if ToolChain not in ToolDb['TOOL_CHAIN_TAG']:
                 EdkLogger.error("GenFds", GENFDS_ERROR, "Can not find external tool because tool tag %s is not defined in tools_def.txt!" % ToolChain)
-            self.KeyStringList = [Target+'_'+ToolChain+'_'+self.CurrentArchList[0]]
+            self.KeyStringList = [Target + '_' + ToolChain + '_' + self.CurrentArchList[0]]
             for Arch in self.CurrentArchList:
                 if Target + '_' + ToolChain + '_' + Arch not in self.KeyStringList:
                     self.KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
@@ -275,30 +275,30 @@ class GuidSection(GuidSectionClassObject) :
             if self.NameGuid == ToolDef[1]:
                 KeyList = ToolDef[0].split('_')
                 Key = KeyList[0] + \
-                      '_'        + \
+                      '_' + \
                       KeyList[1] + \
-                      '_'        + \
+                      '_' + \
                       KeyList[2]
                 if Key in self.KeyStringList and KeyList[4] == 'GUID':
 
-                    ToolPath = ToolDefinition.get( Key        + \
-                                                   '_'        + \
+                    ToolPath = ToolDefinition.get(Key + \
+                                                   '_' + \
                                                    KeyList[3] + \
-                                                   '_'        + \
+                                                   '_' + \
                                                    'PATH')
 
-                    ToolOption = ToolDefinition.get( Key        + \
-                                                    '_'        + \
+                    ToolOption = ToolDefinition.get(Key + \
+                                                    '_' + \
                                                     KeyList[3] + \
-                                                    '_'        + \
+                                                    '_' + \
                                                     'FLAGS')
                     if ToolPathTmp == None:
                         ToolPathTmp = ToolPath
                     else:
                         if ToolPathTmp != ToolPath:
                             EdkLogger.error("GenFds", GENFDS_ERROR, "Don't know which tool to use, %s or %s ?" % (ToolPathTmp, ToolPath))
-                            
-                    
+
+
         return ToolPathTmp, ToolOption
 
 

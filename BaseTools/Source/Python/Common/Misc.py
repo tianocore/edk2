@@ -38,7 +38,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Regular expression used to find out place holders in string template
-gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE|re.UNICODE)
+gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
 
 ## Dictionary used to store file time stamp for quick re-access
 gFileTimeStampCache = {}    # {file path : file time stamp}
@@ -293,11 +293,11 @@ def ProcessVariableArgument(Option, OptionString, Value, Parser):
 def GuidStringToGuidStructureString(Guid):
     GuidList = Guid.split('-')
     Result = '{'
-    for Index in range(0,3,1):
+    for Index in range(0, 3, 1):
         Result = Result + '0x' + GuidList[Index] + ', '
     Result = Result + '{0x' + GuidList[3][0:2] + ', 0x' + GuidList[3][2:4]
-    for Index in range(0,12,2):
-        Result = Result + ', 0x' + GuidList[4][Index:Index+2]
+    for Index in range(0, 12, 2):
+        Result = Result + ', 0x' + GuidList[4][Index:Index + 2]
     Result += '}}'
     return Result
 
@@ -494,7 +494,7 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
             Fd.write(Content)
             Fd.close()
     except IOError, X:
-        EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s'%X)
+        EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
 
     return True
 
@@ -613,7 +613,7 @@ class DirCache:
 #
 # @retval  A list of all files
 #
-def GetFiles(Root, SkipList=None, FullPath = True):
+def GetFiles(Root, SkipList=None, FullPath=True):
     OriPath = Root
     FileList = []
     for Root, Dirs, Files in os.walk(Root):
@@ -663,7 +663,7 @@ def RealPath2(File, Dir='', OverrideDir=''):
             if OverrideDir[-1] == os.path.sep:
                 return NewFile[len(OverrideDir):], NewFile[0:len(OverrideDir)]
             else:
-                return NewFile[len(OverrideDir)+1:], NewFile[0:len(OverrideDir)]
+                return NewFile[len(OverrideDir) + 1:], NewFile[0:len(OverrideDir)]
     if GlobalData.gAllFiles:
         NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
     if not NewFile:
@@ -675,7 +675,7 @@ def RealPath2(File, Dir='', OverrideDir=''):
             if Dir[-1] == os.path.sep:
                 return NewFile[len(Dir):], NewFile[0:len(Dir)]
             else:
-                return NewFile[len(Dir)+1:], NewFile[0:len(Dir)]
+                return NewFile[len(Dir) + 1:], NewFile[0:len(Dir)]
         else:
             return NewFile, ''
 
@@ -701,7 +701,7 @@ def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='
     # Replace the default dir to current dir
     if Dir == '.':
         Dir = os.getcwd()
-        Dir = Dir[len(Workspace)+1:]
+        Dir = Dir[len(Workspace) + 1:]
 
     # First check if File has Edk definition itself
     if File.find('$(EFI_SOURCE)') > -1 or File.find('$(EDK_SOURCE)') > -1:
@@ -740,7 +740,7 @@ def ValidFile3(AllFiles, File, Workspace='', EfiSource='', EdkSource='', Dir='.'
     # Dir is current module dir related to workspace
     if Dir == '.':
         Dir = os.getcwd()
-        Dir = Dir[len(Workspace)+1:]
+        Dir = Dir[len(Workspace) + 1:]
 
     NewFile = File
     RelaPath = AllFiles[os.path.normpath(Dir)]
@@ -865,7 +865,7 @@ class TemplateString(object):
                 #
                 #   PlaceHolderName, PlaceHolderStartPoint, PlaceHolderEndPoint
                 #
-                for PlaceHolder,Start,End in PlaceHolderList:
+                for PlaceHolder, Start, End in PlaceHolderList:
                     self._SubSectionList.append(TemplateSection[SubSectionStart:Start])
                     self._SubSectionList.append(TemplateSection[Start:End])
                     self._PlaceHolderList.append(PlaceHolder)
@@ -1251,11 +1251,11 @@ class tdict:
             if len(key) > 1:
                 RestKeys = key[1:]
             elif self._Level_ > 1:
-                RestKeys = [self._Wildcard for i in range(0, self._Level_-1)]
+                RestKeys = [self._Wildcard for i in range(0, self._Level_ - 1)]
         else:
             FirstKey = key
             if self._Level_ > 1:
-                RestKeys = [self._Wildcard for i in range(0, self._Level_-1)]
+                RestKeys = [self._Wildcard for i in range(0, self._Level_ - 1)]
 
         if FirstKey == None or str(FirstKey).upper() in self._ValidWildcardList:
             FirstKey = self._Wildcard
@@ -1328,11 +1328,11 @@ class tdict:
             if len(key) > 1:
                 RestKeys = key[1:]
             else:
-                RestKeys = [self._Wildcard for i in range(0, self._Level_-1)]
+                RestKeys = [self._Wildcard for i in range(0, self._Level_ - 1)]
         else:
             FirstKey = key
             if self._Level_ > 1:
-                RestKeys = [self._Wildcard for i in range(0, self._Level_-1)]
+                RestKeys = [self._Wildcard for i in range(0, self._Level_ - 1)]
 
         if FirstKey in self._ValidWildcardList:
             FirstKey = self._Wildcard
@@ -1437,7 +1437,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             Pair += 1
         elif ch == ')' and not InStr:
             Pair -= 1
-        
+
         if (Pair > 0 or InStr) and ch == TAB_VALUE_SPLIT:
             NewStr += '-'
         else:
@@ -1491,7 +1491,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             IsValid = (len(FieldList) <= 3)
         else:
             IsValid = (len(FieldList) <= 1)
-        return [Value, Type, Size], IsValid, 0 
+        return [Value, Type, Size], IsValid, 0
     elif PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
         VpdOffset = FieldList[0]
         Value = Size = ''
@@ -1532,17 +1532,17 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
 #  
 #  @retval   ValueList: A List contain value, datum type and toke number. 
 #
-def AnalyzePcdData(Setting):   
-    ValueList = ['', '', '']    
-    
-    ValueRe  = re.compile(r'^\s*L?\".*\|.*\"')
+def AnalyzePcdData(Setting):
+    ValueList = ['', '', '']
+
+    ValueRe = re.compile(r'^\s*L?\".*\|.*\"')
     PtrValue = ValueRe.findall(Setting)
     
     ValueUpdateFlag = False
     
     if len(PtrValue) >= 1:
         Setting = re.sub(ValueRe, '', Setting)
-        ValueUpdateFlag = True   
+        ValueUpdateFlag = True
 
     TokenList = Setting.split(TAB_VALUE_SPLIT)
     ValueList[0:len(TokenList)] = TokenList
@@ -1578,17 +1578,17 @@ def AnalyzeHiiPcdData(Setting):
 #  
 #  @retval   ValueList: A List contain VpdOffset, MaxDatumSize and InitialValue. 
 #
-def AnalyzeVpdPcdData(Setting):   
-    ValueList = ['', '', '']    
-    
-    ValueRe  = re.compile(r'\s*L?\".*\|.*\"\s*$')
+def AnalyzeVpdPcdData(Setting):
+    ValueList = ['', '', '']
+
+    ValueRe = re.compile(r'\s*L?\".*\|.*\"\s*$')
     PtrValue = ValueRe.findall(Setting)
     
     ValueUpdateFlag = False
     
     if len(PtrValue) >= 1:
         Setting = re.sub(ValueRe, '', Setting)
-        ValueUpdateFlag = True   
+        ValueUpdateFlag = True
 
     TokenList = Setting.split(TAB_VALUE_SPLIT)
     ValueList[0:len(TokenList)] = TokenList
@@ -1604,12 +1604,12 @@ def AnalyzeVpdPcdData(Setting):
 #
 def CheckPcdDatum(Type, Value):
     if Type == "VOID*":
-        ValueRe  = re.compile(r'\s*L?\".*\"\s*$')
+        ValueRe = re.compile(r'\s*L?\".*\"\s*$')
         if not (((Value.startswith('L"') or Value.startswith('"')) and Value.endswith('"'))
                 or (Value.startswith('{') and Value.endswith('}'))
                ):
             return False, "Invalid value [%s] of type [%s]; must be in the form of {...} for array"\
-                          ", or \"...\" for string, or L\"...\" for unicode string" % (Value, Type)        
+                          ", or \"...\" for string, or L\"...\" for unicode string" % (Value, Type)
         elif ValueRe.match(Value):
             # Check the chars in UnicodeString or CString is printable
             if Value.startswith("L"):
@@ -1662,7 +1662,7 @@ def SplitOption(OptionString):
 
         if CurrentChar in ["/", "-"] and LastChar in [" ", "\t", "\r", "\n"]:
             if Index > OptionStart:
-                OptionList.append(OptionString[OptionStart:Index-1])
+                OptionList.append(OptionString[OptionStart:Index - 1])
             OptionStart = Index
         LastChar = CurrentChar
     OptionList.append(OptionString[OptionStart:])
@@ -1739,7 +1739,7 @@ class PathClass(object):
             if self.Root[-1] == os.path.sep:
                 self.File = self.Path[len(self.Root):]
             else:
-                self.File = self.Path[len(self.Root)+1:]
+                self.File = self.Path[len(self.Root) + 1:]
         else:
             self.Path = os.path.normpath(self.File)
 

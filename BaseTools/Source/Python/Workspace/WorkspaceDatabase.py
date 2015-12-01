@@ -1863,11 +1863,11 @@ class InfBuildData(ModuleBuildClassObject):
                         LineNo = Record[6]
                         break
                 EdkLogger.error("build", FORMAT_NOT_SUPPORTED,
-                                "MODULE_TYPE %s is not supported for EDK II, valid values are:\n %s" % (self._ModuleType,' '.join(l for l in SUP_MODULE_LIST)), 
+                                "MODULE_TYPE %s is not supported for EDK II, valid values are:\n %s" % (self._ModuleType, ' '.join(l for l in SUP_MODULE_LIST)),
                                 File=self.MetaFile, Line=LineNo)
             if (self._Specification == None) or (not 'PI_SPECIFICATION_VERSION' in self._Specification) or (int(self._Specification['PI_SPECIFICATION_VERSION'], 16) < 0x0001000A):
                 if self._ModuleType == SUP_MODULE_SMM_CORE:
-                    EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.MetaFile)                
+                    EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.MetaFile)
             if self._Defs and 'PCI_DEVICE_ID' in self._Defs and 'PCI_VENDOR_ID' in self._Defs \
                and 'PCI_CLASS_CODE' in self._Defs:
                 self._BuildType = 'UEFI_OPTIONROM'
@@ -1876,7 +1876,7 @@ class InfBuildData(ModuleBuildClassObject):
                 self._BuildType = 'UEFI_HII'
             else:
                 self._BuildType = self._ModuleType.upper()
-            
+
             if self._DxsFile:
                 File = PathClass(NormPath(self._DxsFile), self._ModuleDir, Arch=self._Arch)
                 # check the file validation
@@ -1891,7 +1891,7 @@ class InfBuildData(ModuleBuildClassObject):
             if not self._ComponentType:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE,
                                 "COMPONENT_TYPE is not given", File=self.MetaFile)
-            self._BuildType = self._ComponentType.upper()                
+            self._BuildType = self._ComponentType.upper()
             if self._ComponentType in self._MODULE_TYPE_:
                 self._ModuleType = self._MODULE_TYPE_[self._ComponentType]
             if self._ComponentType == 'LIBRARY':
@@ -1901,7 +1901,7 @@ class InfBuildData(ModuleBuildClassObject):
             Macros["EDK_SOURCE"] = GlobalData.gEcpSource
             Macros['PROCESSOR'] = self._Arch
             RecordList = self._RawData[MODEL_META_DATA_NMAKE, self._Arch, self._Platform]
-            for Name,Value,Dummy,Arch,Platform,ID,LineNo in RecordList:
+            for Name, Value, Dummy, Arch, Platform, ID, LineNo in RecordList:
                 Value = ReplaceMacro(Value, Macros, True)
                 if Name == "IMAGE_ENTRY_POINT":
                     if self._ModuleEntryPointList == None:
@@ -2584,7 +2584,7 @@ class InfBuildData(ModuleBuildClassObject):
                                 'build',
                                 FORMAT_INVALID,
                                 "No TokenValue for PCD [%s.%s] in [%s]!" % (TokenSpaceGuid, PcdCName, str(Package)),
-                                File =self.MetaFile, Line=LineNo,
+                                File=self.MetaFile, Line=LineNo,
                                 ExtraData=None
                                 )                        
                     #
@@ -2597,7 +2597,7 @@ class InfBuildData(ModuleBuildClassObject):
                                     'build',
                                     FORMAT_INVALID,
                                     "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid:" % (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
-                                    File =self.MetaFile, Line=LineNo,
+                                    File=self.MetaFile, Line=LineNo,
                                     ExtraData=None
                                     )
                             
@@ -2611,19 +2611,19 @@ class InfBuildData(ModuleBuildClassObject):
                                 EdkLogger.error(
                                             'build',
                                             FORMAT_INVALID,
-                                            "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, as a decimal it should between: 0 - 4294967295!"% (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
-                                            File =self.MetaFile, Line=LineNo,
+                                            "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, as a decimal it should between: 0 - 4294967295!" % (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
+                                            File=self.MetaFile, Line=LineNo,
                                             ExtraData=None
-                                            )                                
+                                            )
                         except:
                             EdkLogger.error(
                                         'build',
                                         FORMAT_INVALID,
-                                        "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, it should be hexadecimal or decimal!"% (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
-                                        File =self.MetaFile, Line=LineNo,
+                                        "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, it should be hexadecimal or decimal!" % (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
+                                        File=self.MetaFile, Line=LineNo,
                                         ExtraData=None
                                         )
-                    
+
                     Pcd.DatumType = PcdInPackage.DatumType
                     Pcd.MaxDatumSize = PcdInPackage.MaxDatumSize
                     Pcd.InfDefaultValue = Pcd.DefaultValue
@@ -2635,7 +2635,7 @@ class InfBuildData(ModuleBuildClassObject):
                             'build',
                             FORMAT_INVALID,
                             "PCD [%s.%s] in [%s] is not found in dependent packages:" % (TokenSpaceGuid, PcdCName, self.MetaFile),
-                            File =self.MetaFile, Line=LineNo,
+                            File=self.MetaFile, Line=LineNo,
                             ExtraData="\t%s" % '\n\t'.join([str(P) for P in self.Packages])
                             )
             Pcds[PcdCName, TokenSpaceGuid] = Pcd
@@ -2946,7 +2946,7 @@ determine whether database file is out of date!\n")
     ## Summarize all packages in the database
     def GetPackageList(self, Platform, Arch, TargetName, ToolChainTag):
         self.Platform = Platform
-        PackageList =[]
+        PackageList = []
         Pa = self.BuildObject[self.Platform, 'COMMON']
         #
         # Get Package related to Modules
@@ -2963,8 +2963,8 @@ determine whether database file is out of date!\n")
             LibObj = self.BuildObject[Lib, Arch, TargetName, ToolChainTag]
             for Package in LibObj.Packages:
                 if Package not in PackageList:
-                    PackageList.append(Package)            
-        
+                    PackageList.append(Package)
+
         return PackageList
 
     ## Summarize all platforms in the database
