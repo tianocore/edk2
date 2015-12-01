@@ -280,7 +280,7 @@ CVfrErrorHandle::HandleWarning (
   GetFileNameLineNum (LineNum, &FileName, &FileLine);
 
   if (mWarningAsError) {
-    Error (FileName, FileLine, 0x2220, "warning treated as error", NULL);
+    Error (FileName, FileLine, 0x2220, (CHAR8 *) "warning treated as error", NULL);
   }
 
   for (Index = 0; mVfrWarningHandleTable[Index].mWarningCode != VFR_WARNING_CODEUNDEFINED; Index++) {
