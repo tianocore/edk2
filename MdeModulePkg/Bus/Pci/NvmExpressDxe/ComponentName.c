@@ -199,7 +199,7 @@ NvmExpressComponentNameGetControllerName (
     Status = EfiTestChildHandle (
                ControllerHandle,
                ChildHandle,
-               &gEfiPciIoProtocolGuid
+               &gEfiNvmExpressPassThruProtocolGuid
                );
     if (EFI_ERROR (Status)) {
       return Status;
