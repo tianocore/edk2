@@ -49,11 +49,11 @@
 [Guids]
 
 [Protocols]
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
-  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
-  gEfiBootLogoProtocolGuid                      # PROTOCOL SOMETIMES_CONSUMES  
-  gEfiUserManagerProtocolGuid                   # PROTOCOL CONSUMES
-  gEdkiiPlatformLogoProtocolGuid                # PROTOCOL CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport ## SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES  
+  gEfiUserManagerProtocolGuid                   ## CONSUMES
+  gEdkiiPlatformLogoProtocolGuid                ## CONSUMES
 
 [FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## CONSUMES
