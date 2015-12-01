@@ -24,12 +24,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Convert a *.BMP graphics image to a callee allocated GOP blt buffer.
 
   @param  ImageFormat   Format of the image file.
-  @param  BmpImage      Pointer to BMP file
-  @param  BmpImageSize  Number of bytes in BmpImage
+  @param  BmpImage      Pointer to BMP file.
+  @param  BmpImageSize  Number of bytes in BmpImage.
   @param  GopBlt        Buffer containing GOP version of BmpImage.
   @param  GopBltSize    Size of GopBlt in bytes.
-  @param  PixelHeight   Height of GopBlt/BmpImage in pixels
-  @param  PixelWidth    Width of GopBlt/BmpImage in pixels
+  @param  PixelWidth    Width of GopBlt/BmpImage in pixels.
+  @param  PixelHeight   Height of GopBlt/BmpImage in pixels.
 
   @retval EFI_SUCCESS           GopBlt and GopBltSize are returned.
   @retval EFI_INVALID_PARAMETER GopBlt or GopBltSize is NULL.
