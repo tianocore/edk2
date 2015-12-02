@@ -61,7 +61,7 @@ SortApicId (
   UINTN             Index2;
   UINTN             Index3;
   UINT32            ApicId;
-  EFI_HEALTH_FLAGS  Health;
+  PEI_CPU_DATA      CpuData;
   UINT32            ApCount;
 
   ApCount = PeiCpuMpData->CpuCount - 1;
@@ -80,11 +80,13 @@ SortApicId (
         }
       }
       if (Index3 != Index1) {
-        PeiCpuMpData->CpuData[Index3].ApicId = PeiCpuMpData->CpuData[Index1].ApicId;
-        PeiCpuMpData->CpuData[Index1].ApicId = ApicId;
-        Health = PeiCpuMpData->CpuData[Index3].Health;
-        PeiCpuMpData->CpuData[Index3].Health = PeiCpuMpData->CpuData[Index1].Health;
-        PeiCpuMpData->CpuData[Index1].Health = Health;
+        CopyMem (&CpuData, &PeiCpuMpData->CpuData[Index3], sizeof (PEI_CPU_DATA));
+        CopyMem (
+          &PeiCpuMpData->CpuData[Index3],
+          &PeiCpuMpData->CpuData[Index1],
+          sizeof (PEI_CPU_DATA)
+          );
+        CopyMem (&PeiCpuMpData->CpuData[Index1], &CpuData, sizeof (PEI_CPU_DATA));
       }
     }
 
