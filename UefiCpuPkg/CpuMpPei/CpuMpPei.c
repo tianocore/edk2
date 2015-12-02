@@ -212,7 +212,7 @@ RestoreVolatileRegisters (
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param ExchangeInfo     Pointer to the MP exchange info buffer
-  @param NumApsExecuting  Number of curret executing AP
+  @param NumApsExecuting  Number of current executing AP
 **/
 VOID
 EFIAPI
@@ -268,6 +268,9 @@ ApCFunction (
         (PeiCpuMpData->ApFunction != 0)) {
       PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateBusy;
       Procedure = (EFI_AP_PROCEDURE)(UINTN)PeiCpuMpData->ApFunction;
+      //
+      // Invoke AP function here
+      //
       Procedure ((VOID *)(UINTN)PeiCpuMpData->ApFunctionArgument);
       PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
     }
@@ -612,7 +615,7 @@ CpuMpEndOfPeiCallback (
   EFI_PEI_HOB_POINTERS      Hob;
   EFI_HOB_MEMORY_ALLOCATION *MemoryHob;
 
-  DEBUG ((EFI_D_INFO, "CpuMpPei: CpuMpEndOfPeiCallback () invokded\n"));
+  DEBUG ((EFI_D_INFO, "CpuMpPei: CpuMpEndOfPeiCallback () invoked\n"));
 
   Status = PeiServicesGetBootMode (&BootMode);
   ASSERT_EFI_ERROR (Status);
