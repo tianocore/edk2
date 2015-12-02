@@ -259,6 +259,11 @@ ApCFunction (
     // Execute AP function if AP is not disabled
     //
     GetProcessorNumber (PeiCpuMpData, &ProcessorNumber);
+    //
+    // Restore AP's volatile registers saved
+    //
+    RestoreVolatileRegisters (&PeiCpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+
     if ((PeiCpuMpData->CpuData[ProcessorNumber].State != CpuStateDisabled) &&
         (PeiCpuMpData->ApFunction != 0)) {
       PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateBusy;
@@ -272,6 +277,11 @@ ApCFunction (
   // AP finished executing C code
   //
   InterlockedIncrement ((UINT32 *)&PeiCpuMpData->FinishedCount);
+
+  //
+  // Save AP volatile registers
+  //
+  SaveVolatileRegisters (&PeiCpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
 
   AsmCliHltLoop ();
 }
