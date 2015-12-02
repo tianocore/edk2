@@ -230,6 +230,10 @@ ApCFunction (
   if (PeiCpuMpData->InitFlag) {
     ProcessorNumber = NumApsExecuting;
     //
+    // Sync BSP's Control registers to APs
+    //
+    RestoreVolatileRegisters (&PeiCpuMpData->CpuData[0].VolatileRegisters, FALSE);
+    //
     // This is first time AP wakeup, get BIST information from AP stack
     //
     BistData = *(UINTN *) (PeiCpuMpData->Buffer + ProcessorNumber * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
@@ -560,6 +564,7 @@ PrepareAPStartupVector (
   PeiCpuMpData->CpuData[0].Health.Uint32 = 0;
   PeiCpuMpData->EndOfPeiFlag             = FALSE;
   InitializeSpinLock(&PeiCpuMpData->MpLock);
+  SaveVolatileRegisters (&PeiCpuMpData->CpuData[0].VolatileRegisters);
   CopyMem (&PeiCpuMpData->AddressMap, &AddressMap, sizeof (MP_ASSEMBLY_ADDRESS_MAP));
 
   //
