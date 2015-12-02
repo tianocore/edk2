@@ -73,23 +73,47 @@ rem clearup the temp file
 @REM @del Conf\tools_def.txt
 @call edksetup.bat
 
-
 @echo.
-@echo Set the VS2008 environment.
-@echo.
+@echo Setting the Build environment for VS2008/VS2010/VS2012/VS2013/VS2015...
 @if defined VS90COMNTOOLS (
-  if not defined VSINSTALLDIR call "%VS90COMNTOOLS%\vsvars32.bat"
-  if /I "%VS90COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 9.0\Common7\Tools\" (
-    set TOOL_CHAIN_TAG=VS2008
+   if not defined VSINSTALLDIR call "%VS90COMNTOOLS%\vsvars32.bat"
+   if /I "%VS90COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 9.0\Common7\Tools\" (
+      set TOOL_CHAIN_TAG=VS2008
+   ) else (
+      set TOOL_CHAIN_TAG=VS2008x86
+   )
+ ) else if defined VS100COMNTOOLS (
+  if not defined VSINSTALLDIR call "%VS100COMNTOOLS%\vsvars32.bat"
+  if /I "%VS100COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 10.0\Common7\Tools\" (
+    set TOOL_CHAIN_TAG=VS2010
   ) else (
-    set TOOL_CHAIN_TAG=VS2008x86
+    set TOOL_CHAIN_TAG=VS2010x86
+  )
+) else if defined VS110COMNTOOLS (
+  if not defined VSINSTALLDIR call "%VS110COMNTOOLS%\vsvars32.bat"
+  if /I "%VS110COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 11.0\Common7\Tools\" (
+    set TOOL_CHAIN_TAG=VS2012
+  ) else (
+    set TOOL_CHAIN_TAG=VS2012x86
+  )
+) else if defined VS120COMNTOOLS (
+  if not defined VSINSTALLDIR call "%VS120COMNTOOLS%\vsvars32.bat"
+  if /I "%VS120COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 12.0\Common7\Tools\" (
+    set TOOL_CHAIN_TAG=VS2013
+  ) else (
+    set TOOL_CHAIN_TAG=VS2013x86
+  )
+) else if defined VS140COMNTOOLS (
+  if not defined VSINSTALLDIR call "%VS140COMNTOOLS%\vsvars32.bat"
+  if /I "%VS140COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 14.0\Common7\Tools\" (
+    set TOOL_CHAIN_TAG=VS2015
+  ) else (
+    set TOOL_CHAIN_TAG=VS2015x86
   )
 ) else (
+  echo  --ERROR: VS2008/VS2010/VS2012/VS2013/VS2015 not installed correctly. VS90COMNTOOLS/VS100COMNTOOLS/VS110COMNTOOLS/VS120COMNTOOLS/VS140COMNTOOLS not defined ^^!
   echo.
-  echo !!! ERROR !!! VS2008 not installed correctly. VS90COMNTOOLS not defined. !!!
-  echo.
-  set SCRIPT_ERROR=1
-  goto :BldEnd
+  goto :BldFail
 )
 
 @echo.

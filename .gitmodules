@@ -1,0 +1,3 @@
+[submodule "BaseTools/Bin/Win32"]
+	path = BaseTools/Bin/Win32
+	url = https://github.com/tianocore/edk2-BaseTools-win32

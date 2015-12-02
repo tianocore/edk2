@@ -127,7 +127,7 @@ if /i "%~2" == "RELEASE" (
 :: Additional EDK Build Setup/Configuration
 ::**********************************************************************
 echo.
-echo Setting the Build environment for VS2008/VS2010/VS2012/VS2013...
+echo Setting the Build environment for VS2008/VS2010/VS2012/VS2013/VS2015...
 if defined VS90COMNTOOLS (
    if not defined VSINSTALLDIR call "%VS90COMNTOOLS%\vsvars32.bat"
    if /I "%VS90COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 9.0\Common7\Tools\" (
@@ -156,8 +156,15 @@ if defined VS90COMNTOOLS (
   ) else (
     set TOOL_CHAIN_TAG=VS2013x86
   )
+) else if defined VS140COMNTOOLS (
+  if not defined VSINSTALLDIR call "%VS140COMNTOOLS%\vsvars32.bat"
+  if /I "%VS140COMNTOOLS%" == "C:\Program Files\Microsoft Visual Studio 14.0\Common7\Tools\" (
+    set TOOL_CHAIN_TAG=VS2015
+  ) else (
+    set TOOL_CHAIN_TAG=VS2015x86
+  )
 ) else (
-  echo  --ERROR: VS2008/VS2010/VS2012/VS2013 not installed correctly. VS90COMNTOOLS/VS100COMNTOOLS/VS110COMNTOOLS/VS120COMNTOOLS not defined ^^!
+  echo  --ERROR: VS2008/VS2010/VS2012/VS2013/VS2015 not installed correctly. VS90COMNTOOLS/VS100COMNTOOLS/VS110COMNTOOLS/VS120COMNTOOLS/VS140COMNTOOLS not defined ^^!
   echo.
   goto :BldFail
 )
