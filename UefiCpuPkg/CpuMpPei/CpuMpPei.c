@@ -228,13 +228,14 @@ ApCFunction (
 
   PeiCpuMpData = ExchangeInfo->PeiCpuMpData;
   if (PeiCpuMpData->InitFlag) {
+    ProcessorNumber = NumApsExecuting;
     //
     // This is first time AP wakeup, get BIST information from AP stack
     //
-    BistData = *(UINTN *) (PeiCpuMpData->Buffer + NumApsExecuting * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
-    PeiCpuMpData->CpuData[NumApsExecuting].Health.Uint32 = (UINT32) BistData;
-    PeiCpuMpData->CpuData[NumApsExecuting].ApicId = GetInitialApicId ();
-    if (PeiCpuMpData->CpuData[NumApsExecuting].ApicId >= 0xFF) {
+    BistData = *(UINTN *) (PeiCpuMpData->Buffer + ProcessorNumber * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
+    PeiCpuMpData->CpuData[ProcessorNumber].Health.Uint32 = (UINT32) BistData;
+    PeiCpuMpData->CpuData[ProcessorNumber].ApicId = GetInitialApicId ();
+    if (PeiCpuMpData->CpuData[ProcessorNumber].ApicId >= 0xFF) {
       //
       // Set x2APIC mode if there are any logical processor reporting
       // an APIC ID of 255 or greater.
@@ -248,6 +249,7 @@ ApCFunction (
     //
     MtrrSetAllMtrrs (&PeiCpuMpData->MtrrTable);
     MicrocodeDetect ();
+    PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
   } else {
     //
     // Execute AP function if AP is not disabled
