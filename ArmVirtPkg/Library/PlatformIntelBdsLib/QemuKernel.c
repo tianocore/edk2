@@ -413,7 +413,9 @@ StubFileRead (
       return EFI_SUCCESS;
     }
 
-    Status = ConvertKernelBlobTypeToFileInfo (StubFile->Position, BufferSize,
+    Status = ConvertKernelBlobTypeToFileInfo (
+               (KERNEL_BLOB_TYPE)StubFile->Position,
+               BufferSize,
                Buffer);
     if (EFI_ERROR (Status)) {
       return Status;
