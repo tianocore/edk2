@@ -229,7 +229,6 @@ ReadString (
         return EFI_DEVICE_ERROR;
       }
 
-      break;
 
     case CHAR_BACKSPACE:
       if (StringPtr[0] != CHAR_NULL && CurrentCursor != 0) {
@@ -881,7 +880,6 @@ TheKey2:
         }
 
         goto EnterCarriageReturn;
-        break;
 
       case SCAN_UP:
       case SCAN_DOWN:
@@ -982,7 +980,6 @@ EnterCarriageReturn:
       }
 
       return EFI_SUCCESS;
-      break;
 
     case CHAR_BACKSPACE:
       if (ManualInput) {

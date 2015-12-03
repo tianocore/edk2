@@ -3170,7 +3170,6 @@ EvaluateExpression (
           //
           Status = EFI_UNSUPPORTED;
           goto Done;
-          break;
         }
       } else {
         //

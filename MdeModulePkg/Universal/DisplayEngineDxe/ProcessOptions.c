@@ -568,7 +568,6 @@ PrintFormattedNumber (
 
   default:
     return EFI_UNSUPPORTED;
-    break;
   }
 
   UnicodeSPrint (FormattedNumber, BufferSize, Format, Value);
