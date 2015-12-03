@@ -51,7 +51,7 @@
   MtrrLib
 
 [Guids]
-  gEfiEndOfDxeEventGroupGuid         ## CONSUMES
+  gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
 
 [Protocols]
   gEfiMpServiceProtocolGuid          ## CONSUMES
