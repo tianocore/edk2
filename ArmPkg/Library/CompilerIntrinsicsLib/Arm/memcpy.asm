@@ -13,9 +13,8 @@
 //------------------------------------------------------------------------------
 
 
-    EXPORT  __aeabi_memcpy
 
-    AREA    Memcpy, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;VOID
@@ -26,7 +25,7 @@
 ; IN  UINT32  Size
 ; );
 ;
-__aeabi_memcpy
+ RVCT_ASM_EXPORT __aeabi_memcpy
   cmp     r2, #0
   bxeq    lr
   push    {lr}

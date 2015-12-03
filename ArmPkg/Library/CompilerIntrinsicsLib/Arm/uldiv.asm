@@ -14,9 +14,8 @@
 
 
 
-    EXPORT  __aeabi_uldivmod
 
-    AREA  Uldivmod, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;UINT64
@@ -26,7 +25,7 @@
 ;  IN  UINT64   Divisor
 ;  )
 ;
-__aeabi_uldivmod
+ RVCT_ASM_EXPORT __aeabi_uldivmod
   stmdb   sp!, {r4, r5, r6, lr}
   mov     r4, r1
   mov     r5, r0

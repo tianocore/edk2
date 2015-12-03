@@ -11,11 +11,10 @@
 //
 //
 
-    EXPORT ArmCallSmc
 
-    AREA   ArmSmc, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
-ArmCallSmc
+ RVCT_ASM_EXPORT ArmCallSmc
   bx     lr
 
   END

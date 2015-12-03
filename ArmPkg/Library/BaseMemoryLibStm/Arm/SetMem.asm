@@ -34,11 +34,10 @@ InternalMemSetMem (
   )
 **/
 
-  EXPORT InternalMemSetMem
 
-  AREA AsmMemStuff, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
-InternalMemSetMem
+ RVCT_ASM_EXPORT InternalMemSetMem
   stmfd  sp!, {r4-r11, lr}
   tst    r0, #3
   movne  r3, #0

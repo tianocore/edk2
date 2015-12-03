@@ -17,62 +17,36 @@
 
     INCLUDE AsmMacroIoLib.inc
 
-    EXPORT ArmReadMidr
-    EXPORT ArmCacheInfo
-    EXPORT ArmGetInterruptState
-    EXPORT ArmGetFiqState
-    EXPORT ArmGetTTBR0BaseAddress
-    EXPORT ArmSetTTBR0
-    EXPORT ArmSetDomainAccessControl
-    EXPORT CPSRMaskInsert
-    EXPORT CPSRRead
-    EXPORT ArmReadCpacr
-    EXPORT ArmWriteCpacr
-    EXPORT ArmWriteAuxCr
-    EXPORT ArmReadAuxCr
-    EXPORT ArmInvalidateTlb
-    EXPORT ArmUpdateTranslationTableEntry
-    EXPORT ArmReadScr
-    EXPORT ArmWriteScr
-    EXPORT ArmReadMVBar
-    EXPORT ArmWriteMVBar
-    EXPORT ArmReadHVBar
-    EXPORT ArmWriteHVBar
-    EXPORT ArmCallWFE
-    EXPORT ArmCallSEV
-    EXPORT ArmReadSctlr
-    EXPORT ArmReadCpuActlr
-    EXPORT ArmWriteCpuActlr
 
-    AREA ArmLibSupport, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
-ArmReadMidr
+ RVCT_ASM_EXPORT ArmReadMidr
   mrc     p15,0,R0,c0,c0,0
   bx      LR
 
-ArmCacheInfo
+ RVCT_ASM_EXPORT ArmCacheInfo
   mrc     p15,0,R0,c0,c0,1
   bx      LR
 
-ArmGetInterruptState
+ RVCT_ASM_EXPORT ArmGetInterruptState
   mrs     R0,CPSR
   tst     R0,#0x80      // Check if IRQ is enabled.
   moveq   R0,#1
   movne   R0,#0
   bx      LR
 
-ArmGetFiqState
+ RVCT_ASM_EXPORT ArmGetFiqState
   mrs     R0,CPSR
   tst     R0,#0x40      // Check if FIQ is enabled.
   moveq   R0,#1
   movne   R0,#0
   bx      LR
 
-ArmSetDomainAccessControl
+ RVCT_ASM_EXPORT ArmSetDomainAccessControl
   mcr     p15,0,r0,c3,c0,0
   bx      lr
 
-CPSRMaskInsert    // on entry, r0 is the mask and r1 is the field to insert
+ RVCT_ASM_EXPORT CPSRMaskInsert
   stmfd   sp!, {r4-r12, lr} // save all the banked registers
   mov     r3, sp            // copy the stack pointer into a non-banked register
   mrs     r2, cpsr          // read the cpsr
@@ -85,33 +59,33 @@ CPSRMaskInsert    // on entry, r0 is the mask and r1 is the field to insert
   ldmfd   sp!, {r4-r12, lr} // restore registers
   bx      lr                // return (hopefully thumb-safe!)             // return (hopefully thumb-safe!)
 
-CPSRRead
+ RVCT_ASM_EXPORT CPSRRead
   mrs     r0, cpsr
   bx      lr
 
-ArmReadCpacr
+ RVCT_ASM_EXPORT ArmReadCpacr
   mrc     p15, 0, r0, c1, c0, 2
   bx      lr
 
-ArmWriteCpacr
+ RVCT_ASM_EXPORT ArmWriteCpacr
   mcr     p15, 0, r0, c1, c0, 2
   isb
   bx      lr
 
-ArmWriteAuxCr
+ RVCT_ASM_EXPORT ArmWriteAuxCr
   mcr     p15, 0, r0, c1, c0, 1
   bx      lr
 
-ArmReadAuxCr
+ RVCT_ASM_EXPORT ArmReadAuxCr
   mrc     p15, 0, r0, c1, c0, 1
   bx      lr
 
-ArmSetTTBR0
+ RVCT_ASM_EXPORT ArmSetTTBR0
   mcr     p15,0,r0,c2,c0,0
   isb
   bx      lr
 
-ArmGetTTBR0BaseAddress
+ RVCT_ASM_EXPORT ArmGetTTBR0BaseAddress
   mrc     p15,0,r0,c2,c0,0
   LoadConstantToReg(0xFFFFC000, r1)
   and     r0, r0, r1
@@ -124,7 +98,7 @@ ArmGetTTBR0BaseAddress
 //  IN VOID  *TranslationTableEntry  // R0
 //  IN VOID  *MVA                    // R1
 //  );
-ArmUpdateTranslationTableEntry
+ RVCT_ASM_EXPORT ArmUpdateTranslationTableEntry
   mcr     p15,0,R0,c7,c14,1     // DCCIMVAC Clean data cache by MVA
   dsb
   mcr     p15,0,R1,c8,c7,1      // TLBIMVA TLB Invalidate MVA
@@ -133,7 +107,7 @@ ArmUpdateTranslationTableEntry
   isb
   bx      lr
 
-ArmInvalidateTlb
+ RVCT_ASM_EXPORT ArmInvalidateTlb
   mov     r0,#0
   mcr     p15,0,r0,c8,c7,0
   mcr     p15,0,R9,c7,c5,6      // BPIALL Invalidate Branch predictor array. R9 == NoOp
@@ -141,48 +115,48 @@ ArmInvalidateTlb
   isb
   bx      lr
 
-ArmReadScr
+ RVCT_ASM_EXPORT ArmReadScr
   mrc     p15, 0, r0, c1, c1, 0
   bx      lr
 
-ArmWriteScr
+ RVCT_ASM_EXPORT ArmWriteScr
   mcr     p15, 0, r0, c1, c1, 0
   bx      lr
 
-ArmReadHVBar
+ RVCT_ASM_EXPORT ArmReadHVBar
   mrc     p15, 4, r0, c12, c0, 0
   bx      lr
 
-ArmWriteHVBar
+ RVCT_ASM_EXPORT ArmWriteHVBar
   mcr     p15, 4, r0, c12, c0, 0
   bx      lr
 
-ArmReadMVBar
+ RVCT_ASM_EXPORT ArmReadMVBar
   mrc     p15, 0, r0, c12, c0, 1
   bx      lr
 
-ArmWriteMVBar
+ RVCT_ASM_EXPORT ArmWriteMVBar
   mcr     p15, 0, r0, c12, c0, 1
   bx      lr
 
-ArmCallWFE
+ RVCT_ASM_EXPORT ArmCallWFE
   wfe
   bx      lr
 
-ArmCallSEV
+ RVCT_ASM_EXPORT ArmCallSEV
   sev
   bx      lr
 
-ArmReadSctlr
+ RVCT_ASM_EXPORT ArmReadSctlr
   mrc     p15, 0, r0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
   bx      lr
 
 
-ArmReadCpuActlr
+ RVCT_ASM_EXPORT ArmReadCpuActlr
   mrc     p15, 0, r0, c1, c0, 1
   bx      lr
 
-ArmWriteCpuActlr
+ RVCT_ASM_EXPORT ArmWriteCpuActlr
   mcr     p15, 0, r0, c1, c0, 1
   dsb
   isb

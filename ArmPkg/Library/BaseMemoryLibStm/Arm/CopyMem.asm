@@ -37,11 +37,10 @@ InternalMemCopyMem (
   IN      UINTN                     Length
   )
 **/
-  EXPORT InternalMemCopyMem
 
-  AREA AsmMemStuff, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
-InternalMemCopyMem
+ RVCT_ASM_EXPORT InternalMemCopyMem
   stmfd  sp!, {r4-r11, lr}
   // Save the input parameters in extra registers (r11 = destination, r14 = source, r12 = length)
   mov  r11, r0

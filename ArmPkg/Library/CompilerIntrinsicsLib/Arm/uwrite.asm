@@ -13,10 +13,8 @@
 //------------------------------------------------------------------------------
 
 
-    EXPORT  __aeabi_uwrite4
-    EXPORT  __aeabi_uwrite8
 
-    AREA  Uwrite4, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;UINT32
@@ -27,7 +25,7 @@
 ;  );
 ;
 ;
-__aeabi_uwrite4
+ RVCT_ASM_EXPORT __aeabi_uwrite4
     mov     r2, r0, lsr #8
     strb    r0, [r1]
     strb    r2, [r1, #1]
@@ -46,7 +44,7 @@ __aeabi_uwrite4
 ;  );
 ;
 ;
-__aeabi_uwrite8
+ RVCT_ASM_EXPORT __aeabi_uwrite8
     mov     r3, r0, lsr #8
     strb    r0, [r2]
     strb    r3, [r2, #1]

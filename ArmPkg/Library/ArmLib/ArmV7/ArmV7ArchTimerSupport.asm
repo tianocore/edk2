@@ -12,107 +12,87 @@
 //
 //------------------------------------------------------------------------------
 
-    EXPORT  ArmReadCntFrq
-    EXPORT  ArmWriteCntFrq
-    EXPORT  ArmReadCntPct
-    EXPORT  ArmReadCntkCtl
-    EXPORT  ArmWriteCntkCtl
-    EXPORT  ArmReadCntpTval
-    EXPORT  ArmWriteCntpTval
-    EXPORT  ArmReadCntpCtl
-    EXPORT  ArmWriteCntpCtl
-    EXPORT  ArmReadCntvTval
-    EXPORT  ArmWriteCntvTval
-    EXPORT  ArmReadCntvCtl
-    EXPORT  ArmWriteCntvCtl
-    EXPORT  ArmReadCntvCt
-    EXPORT  ArmReadCntpCval
-    EXPORT  ArmWriteCntpCval
-    EXPORT  ArmReadCntvCval
-    EXPORT  ArmWriteCntvCval
-    EXPORT  ArmReadCntvOff
-    EXPORT  ArmWriteCntvOff
 
-    AREA    ArmV7ArchTimerSupport, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
     PRESERVE8
 
-ArmReadCntFrq
+ RVCT_ASM_EXPORT ArmReadCntFrq
   mrc    p15, 0, r0, c14, c0, 0    ; Read CNTFRQ
   bx     lr
 
-ArmWriteCntFrq
+ RVCT_ASM_EXPORT ArmWriteCntFrq
   mcr    p15, 0, r0, c14, c0, 0    ; Write to CNTFRQ
   bx     lr
 
-ArmReadCntPct
+ RVCT_ASM_EXPORT ArmReadCntPct
   mrrc   p15, 0, r0, r1, c14       ; Read CNTPT (Physical counter register)
   bx     lr
 
-ArmReadCntkCtl
+ RVCT_ASM_EXPORT ArmReadCntkCtl
   mrc    p15, 0, r0, c14, c1, 0    ; Read CNTK_CTL (Timer PL1 Control Register)
   bx     lr
 
-ArmWriteCntkCtl
+ RVCT_ASM_EXPORT ArmWriteCntkCtl
   mcr    p15, 0, r0, c14, c1, 0    ; Write to CNTK_CTL (Timer PL1 Control Register)
   bx     lr
 
-ArmReadCntpTval
+ RVCT_ASM_EXPORT ArmReadCntpTval
   mrc    p15, 0, r0, c14, c2, 0    ; Read CNTP_TVAL (PL1 physical timer value register)
   bx     lr
 
-ArmWriteCntpTval
+ RVCT_ASM_EXPORT ArmWriteCntpTval
   mcr    p15, 0, r0, c14, c2, 0    ; Write to CNTP_TVAL (PL1 physical timer value register)
   bx     lr
 
-ArmReadCntpCtl
+ RVCT_ASM_EXPORT ArmReadCntpCtl
   mrc    p15, 0, r0, c14, c2, 1    ; Read CNTP_CTL (PL1 Physical Timer Control Register)
   bx     lr
 
-ArmWriteCntpCtl
+ RVCT_ASM_EXPORT ArmWriteCntpCtl
   mcr    p15, 0, r0, c14, c2, 1    ; Write to  CNTP_CTL (PL1 Physical Timer Control Register)
   bx     lr
 
-ArmReadCntvTval
+ RVCT_ASM_EXPORT ArmReadCntvTval
   mrc    p15, 0, r0, c14, c3, 0    ; Read CNTV_TVAL (Virtual Timer Value register)
   bx     lr
 
-ArmWriteCntvTval
+ RVCT_ASM_EXPORT ArmWriteCntvTval
   mcr    p15, 0, r0, c14, c3, 0    ; Write to CNTV_TVAL (Virtual Timer Value register)
   bx     lr
 
-ArmReadCntvCtl
+ RVCT_ASM_EXPORT ArmReadCntvCtl
   mrc    p15, 0, r0, c14, c3, 1    ; Read CNTV_CTL (Virtual Timer Control Register)
   bx     lr
 
-ArmWriteCntvCtl
+ RVCT_ASM_EXPORT ArmWriteCntvCtl
   mcr    p15, 0, r0, c14, c3, 1    ; Write to CNTV_CTL (Virtual Timer Control Register)
   bx     lr
 
-ArmReadCntvCt
+ RVCT_ASM_EXPORT ArmReadCntvCt
   mrrc   p15, 1, r0, r1, c14       ; Read CNTVCT  (Virtual Count Register)
   bx     lr
 
-ArmReadCntpCval
+ RVCT_ASM_EXPORT ArmReadCntpCval
   mrrc   p15, 2, r0, r1, c14       ; Read CNTP_CTVAL (Physical Timer Compare Value Register)
   bx     lr
 
-ArmWriteCntpCval
+ RVCT_ASM_EXPORT ArmWriteCntpCval
   mcrr   p15, 2, r0, r1, c14       ; Write to CNTP_CTVAL (Physical Timer Compare Value Register)
   bx     lr
 
-ArmReadCntvCval
+ RVCT_ASM_EXPORT ArmReadCntvCval
   mrrc   p15, 3, r0, r1, c14       ; Read CNTV_CTVAL (Virtual Timer Compare Value Register)
   bx     lr
 
-ArmWriteCntvCval
+ RVCT_ASM_EXPORT ArmWriteCntvCval
   mcrr   p15, 3, r0, r1, c14       ; write to  CNTV_CTVAL (Virtual Timer Compare Value Register)
   bx     lr
 
-ArmReadCntvOff
+ RVCT_ASM_EXPORT ArmReadCntvOff
   mrrc   p15, 4, r0, r1, c14       ; Read CNTVOFF (virtual Offset register)
   bx     lr
 
-ArmWriteCntvOff
+ RVCT_ASM_EXPORT ArmWriteCntvOff
   mcrr   p15, 4, r0, r1, c14       ; Write to CNTVOFF (Virtual Offset register)
   bx     lr
 

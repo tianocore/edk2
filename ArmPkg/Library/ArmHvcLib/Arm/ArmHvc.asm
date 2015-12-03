@@ -12,11 +12,10 @@
 //
 //
 
-    EXPORT ArmCallHvc
 
-    AREA   ArmHvc, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
-ArmCallHvc
+ RVCT_ASM_EXPORT ArmCallHvc
     push    {r4-r8}
     // r0 will be popped just after the HVC call
     push     {r0}

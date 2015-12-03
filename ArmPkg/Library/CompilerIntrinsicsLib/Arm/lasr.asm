@@ -13,9 +13,8 @@
 //------------------------------------------------------------------------------
 
 
-    EXPORT  __aeabi_lasr
 
-    AREA    Math, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;UINT32
@@ -25,7 +24,7 @@
 ;  IN UINT32  Divisor
 ;  );
 ;
-__aeabi_lasr
+ RVCT_ASM_EXPORT __aeabi_lasr
     SUBS     r3,r2,#0x20
     BPL      {pc} + 0x18  ; 0x1c
     RSB      r3,r2,#0x20

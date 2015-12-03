@@ -13,10 +13,9 @@
 //------------------------------------------------------------------------------
 
 
-    EXPORT  __aeabi_ldivmod
     EXTERN  __aeabi_uldivmod
 
-    AREA    Math, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;UINT32
@@ -27,7 +26,7 @@
 ;  );
 ;
 
-__aeabi_ldivmod
+ RVCT_ASM_EXPORT __aeabi_ldivmod
     PUSH     {r4,lr}
     ASRS     r4,r1,#1
     EOR      r4,r4,r3,LSR #1

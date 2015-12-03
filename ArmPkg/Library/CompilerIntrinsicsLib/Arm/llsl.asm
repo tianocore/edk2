@@ -13,9 +13,8 @@
 //------------------------------------------------------------------------------
 
 
-    EXPORT  __aeabi_llsl
 
-    AREA    Math, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;VOID
@@ -27,7 +26,7 @@
 ; );
 ;
 
-__aeabi_llsl
+ RVCT_ASM_EXPORT __aeabi_llsl
     SUBS     r3,r2,#0x20
     BPL      {pc} + 0x18  ; 0x1c
     RSB      r3,r2,#0x20

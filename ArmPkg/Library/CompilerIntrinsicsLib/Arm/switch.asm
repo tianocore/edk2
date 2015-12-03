@@ -14,11 +14,10 @@
 
 
 
-    EXPORT  __ARM_switch8
 
-    AREA  ArmSwitch, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
-__ARM_switch8
+ RVCT_ASM_EXPORT __ARM_switch8
   LDRB    r12,[lr,#-1]
   CMP      r3,r12
   LDRBCC  r3,[lr,r3]

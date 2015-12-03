@@ -13,9 +13,8 @@
 //------------------------------------------------------------------------------
 
 
-    EXPORT  __aeabi_memcpy4
 
-    AREA    Memcpy4, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;VOID
@@ -26,7 +25,7 @@
 ; IN  UINT32  Size
 ; );
 ;
-__aeabi_memcpy4
+ RVCT_ASM_EXPORT __aeabi_memcpy4
     stmdb   sp!, {r4, lr}
     subs    r2, r2, #32     ; 0x20
     bcc     memcpy4_label2

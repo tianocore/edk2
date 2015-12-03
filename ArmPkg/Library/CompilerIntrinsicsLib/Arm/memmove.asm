@@ -13,9 +13,8 @@
 //------------------------------------------------------------------------------
 
 
-    EXPORT  __aeabi_memmove
 
-    AREA    Memmove, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;VOID
@@ -26,7 +25,7 @@
 ; IN  UINT32        Size
 ; );
 ;
-__aeabi_memmove
+ RVCT_ASM_EXPORT __aeabi_memmove
   CMP     r2, #0
   BXEQ    lr
   CMP     r0, r1

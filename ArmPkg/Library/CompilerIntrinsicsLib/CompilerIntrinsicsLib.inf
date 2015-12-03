@@ -102,6 +102,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
 

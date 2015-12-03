@@ -37,11 +37,10 @@ InternalMemCopyMem (
   IN      UINTN                     Length
   )
 **/
-  EXPORT InternalMemCopyMem
 
-  AREA AsmMemStuff, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
-InternalMemCopyMem
+ RVCT_ASM_EXPORT InternalMemCopyMem
   stmfd  sp!, {r4, r9, lr}
   tst  r0, #3
   mov  r4, r0

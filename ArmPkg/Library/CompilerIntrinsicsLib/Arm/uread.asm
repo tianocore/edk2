@@ -14,10 +14,8 @@
 
 
 
-    EXPORT  __aeabi_uread4
-    EXPORT  __aeabi_uread8
 
-    AREA  Uread4, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 ;
 ;UINT32
@@ -26,7 +24,7 @@
 ;  IN VOID   *Pointer
 ;  );
 ;
-__aeabi_uread4
+ RVCT_ASM_EXPORT __aeabi_uread4
     ldrb    r1, [r0]
     ldrb    r2, [r0, #1]
     ldrb    r3, [r0, #2]
@@ -43,7 +41,7 @@ __aeabi_uread4
 ;  IN VOID   *Pointer
 ;  );
 ;
-__aeabi_uread8
+ RVCT_ASM_EXPORT __aeabi_uread8
     mov     r3, r0
 
     ldrb    r1, [r3]

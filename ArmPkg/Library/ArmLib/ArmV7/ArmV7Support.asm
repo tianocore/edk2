@@ -13,43 +13,8 @@
 //
 //------------------------------------------------------------------------------
 
-    EXPORT  ArmInvalidateInstructionCache
-    EXPORT  ArmInvalidateDataCacheEntryByMVA
-    EXPORT  ArmCleanDataCacheEntryByMVA
-    EXPORT  ArmCleanInvalidateDataCacheEntryByMVA
-    EXPORT  ArmInvalidateDataCacheEntryBySetWay
-    EXPORT  ArmCleanDataCacheEntryBySetWay
-    EXPORT  ArmCleanInvalidateDataCacheEntryBySetWay
-    EXPORT  ArmEnableMmu
-    EXPORT  ArmDisableMmu
-    EXPORT  ArmDisableCachesAndMmu
-    EXPORT  ArmMmuEnabled
-    EXPORT  ArmEnableDataCache
-    EXPORT  ArmDisableDataCache
-    EXPORT  ArmEnableInstructionCache
-    EXPORT  ArmDisableInstructionCache
-    EXPORT  ArmEnableSWPInstruction
-    EXPORT  ArmEnableBranchPrediction
-    EXPORT  ArmDisableBranchPrediction
-    EXPORT  ArmSetLowVectors
-    EXPORT  ArmSetHighVectors
-    EXPORT  ArmV7AllDataCachesOperation
-    EXPORT  ArmDataMemoryBarrier
-    EXPORT  ArmDataSynchronizationBarrier
-    EXPORT  ArmInstructionSynchronizationBarrier
-    EXPORT  ArmReadVBar
-    EXPORT  ArmWriteVBar
-    EXPORT  ArmEnableVFP
-    EXPORT  ArmCallWFI
-    EXPORT  ArmReadCbar
-    EXPORT  ArmReadMpidr
-    EXPORT  ArmReadTpidrurw
-    EXPORT  ArmWriteTpidrurw
-    EXPORT  ArmIsArchTimerImplemented
-    EXPORT  ArmReadIdPfr1
-    EXPORT  ArmReadIdMmfr0
 
-    AREA    ArmV7Support, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
     PRESERVE8
 
 DC_ON           EQU     ( 0x1:SHL:2 )
@@ -60,41 +25,41 @@ CTRL_B_BIT      EQU     (1 << 7)
 CTRL_I_BIT      EQU     (1 << 12)
 
 
-ArmInvalidateDataCacheEntryByMVA
+ RVCT_ASM_EXPORT ArmInvalidateDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c6, 1   ; invalidate single data cache line
   bx      lr
 
-ArmCleanDataCacheEntryByMVA
+ RVCT_ASM_EXPORT ArmCleanDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c10, 1  ; clean single data cache line
   bx      lr
 
 
-ArmCleanInvalidateDataCacheEntryByMVA
+ RVCT_ASM_EXPORT ArmCleanInvalidateDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c14, 1  ; clean and invalidate single data cache line
   bx      lr
 
 
-ArmInvalidateDataCacheEntryBySetWay
+ RVCT_ASM_EXPORT ArmInvalidateDataCacheEntryBySetWay
   mcr     p15, 0, r0, c7, c6, 2        ; Invalidate this line
   bx      lr
 
 
-ArmCleanInvalidateDataCacheEntryBySetWay
+ RVCT_ASM_EXPORT ArmCleanInvalidateDataCacheEntryBySetWay
   mcr     p15, 0, r0, c7, c14, 2       ; Clean and Invalidate this line
   bx      lr
 
 
-ArmCleanDataCacheEntryBySetWay
+ RVCT_ASM_EXPORT ArmCleanDataCacheEntryBySetWay
   mcr     p15, 0, r0, c7, c10, 2       ; Clean this line
   bx      lr
 
 
-ArmInvalidateInstructionCache
+ RVCT_ASM_EXPORT ArmInvalidateInstructionCache
   mcr     p15,0,R0,c7,c5,0      ;Invalidate entire instruction cache
   isb
   bx      LR
 
-ArmEnableMmu
+ RVCT_ASM_EXPORT ArmEnableMmu
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   orr     R0,R0,#1              ; Set SCTLR.M bit : Enable MMU
   mcr     p15,0,R0,c1,c0,0      ; Write R0 into SCTLR (Write control register configuration data)
@@ -102,7 +67,7 @@ ArmEnableMmu
   isb
   bx      LR
 
-ArmDisableMmu
+ RVCT_ASM_EXPORT ArmDisableMmu
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   bic     R0,R0,#1              ; Clear SCTLR.M bit : Disable MMU
   mcr     p15,0,R0,c1,c0,0      ; Write R0 into SCTLR (Write control register configuration data)
@@ -113,7 +78,7 @@ ArmDisableMmu
   isb
   bx      LR
 
-ArmDisableCachesAndMmu
+ RVCT_ASM_EXPORT ArmDisableCachesAndMmu
   mrc   p15, 0, r0, c1, c0, 0           ; Get control register
   bic   r0, r0, #CTRL_M_BIT             ; Disable MMU
   bic   r0, r0, #CTRL_C_BIT             ; Disable D Cache
@@ -123,12 +88,12 @@ ArmDisableCachesAndMmu
   isb
   bx      LR
 
-ArmMmuEnabled
+ RVCT_ASM_EXPORT ArmMmuEnabled
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   and     R0,R0,#1
   bx      LR
 
-ArmEnableDataCache
+ RVCT_ASM_EXPORT ArmEnableDataCache
   ldr     R1,=DC_ON             ; Specify SCTLR.C bit : (Data) Cache enable bit
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   orr     R0,R0,R1              ; Set SCTLR.C bit : Data and unified caches enabled
@@ -137,7 +102,7 @@ ArmEnableDataCache
   isb
   bx      LR
 
-ArmDisableDataCache
+ RVCT_ASM_EXPORT ArmDisableDataCache
   ldr     R1,=DC_ON             ; Specify SCTLR.C bit : (Data) Cache enable bit
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   bic     R0,R0,R1              ; Clear SCTLR.C bit : Data and unified caches disabled
@@ -146,7 +111,7 @@ ArmDisableDataCache
   isb
   bx      LR
 
-ArmEnableInstructionCache
+ RVCT_ASM_EXPORT ArmEnableInstructionCache
   ldr     R1,=IC_ON             ; Specify SCTLR.I bit : Instruction cache enable bit
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   orr     R0,R0,R1              ; Set SCTLR.I bit : Instruction caches enabled
@@ -155,7 +120,7 @@ ArmEnableInstructionCache
   isb
   bx      LR
 
-ArmDisableInstructionCache
+ RVCT_ASM_EXPORT ArmDisableInstructionCache
   ldr     R1,=IC_ON             ; Specify SCTLR.I bit : Instruction cache enable bit
   mrc     p15,0,R0,c1,c0,0      ; Read SCTLR into R0 (Read control register configuration data)
   BIC     R0,R0,R1              ; Clear SCTLR.I bit : Instruction caches disabled
@@ -163,14 +128,14 @@ ArmDisableInstructionCache
   isb
   bx      LR
 
-ArmEnableSWPInstruction
+ RVCT_ASM_EXPORT ArmEnableSWPInstruction
   mrc     p15, 0, r0, c1, c0, 0
   orr     r0, r0, #0x00000400
   mcr     p15, 0, r0, c1, c0, 0
   isb
   bx      LR
 
-ArmEnableBranchPrediction
+ RVCT_ASM_EXPORT ArmEnableBranchPrediction
   mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
   orr     r0, r0, #0x00000800   ;
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
@@ -178,7 +143,7 @@ ArmEnableBranchPrediction
   isb
   bx      LR
 
-ArmDisableBranchPrediction
+ RVCT_ASM_EXPORT ArmDisableBranchPrediction
   mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
   bic     r0, r0, #0x00000800   ;
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
@@ -186,21 +151,21 @@ ArmDisableBranchPrediction
   isb
   bx      LR
 
-ArmSetLowVectors
+ RVCT_ASM_EXPORT ArmSetLowVectors
   mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
   bic     r0, r0, #0x00002000   ; clear V bit
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
   isb
   bx      LR
 
-ArmSetHighVectors
+ RVCT_ASM_EXPORT ArmSetHighVectors
   mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
   orr     r0, r0, #0x00002000   ; Set V bit
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
   isb
   bx      LR
 
-ArmV7AllDataCachesOperation
+ RVCT_ASM_EXPORT ArmV7AllDataCachesOperation
   stmfd SP!,{r4-r12, LR}
   mov   R1, R0                ; Save Function call in R1
   mrc   p15, 1, R6, c0, c0, 1 ; Read CLIDR
@@ -249,24 +214,24 @@ Finished
   ldmfd SP!, {r4-r12, lr}
   bx    LR
 
-ArmDataMemoryBarrier
+ RVCT_ASM_EXPORT ArmDataMemoryBarrier
   dmb
   bx      LR
 
-ArmDataSynchronizationBarrier
+ RVCT_ASM_EXPORT ArmDataSynchronizationBarrier
   dsb
   bx      LR
 
-ArmInstructionSynchronizationBarrier
+ RVCT_ASM_EXPORT ArmInstructionSynchronizationBarrier
   isb
   bx      LR
 
-ArmReadVBar
+ RVCT_ASM_EXPORT ArmReadVBar
   // Set the Address of the Vector Table in the VBAR register
   mrc     p15, 0, r0, c12, c0, 0
   bx      lr
 
-ArmWriteVBar
+ RVCT_ASM_EXPORT ArmWriteVBar
   // Set the Address of the Vector Table in the VBAR register
   mcr     p15, 0, r0, c12, c0, 0
   // Ensure the SCTLR.V bit is clear
@@ -276,7 +241,7 @@ ArmWriteVBar
   isb
   bx      lr
 
-ArmEnableVFP
+ RVCT_ASM_EXPORT ArmEnableVFP
   // Read CPACR (Coprocessor Access Control Register)
   mrc     p15, 0, r0, c1, c0, 2
   // Enable VPF access (Full Access to CP10, CP11) (V* instructions)
@@ -289,37 +254,37 @@ ArmEnableVFP
   mcr     p10,#0x7,r0,c8,c0,#0
   bx      lr
 
-ArmCallWFI
+ RVCT_ASM_EXPORT ArmCallWFI
   wfi
   bx      lr
 
 //Note: Return 0 in Uniprocessor implementation
-ArmReadCbar
+ RVCT_ASM_EXPORT ArmReadCbar
   mrc     p15, 4, r0, c15, c0, 0  //Read Configuration Base Address Register
   bx      lr
 
-ArmReadMpidr
+ RVCT_ASM_EXPORT ArmReadMpidr
   mrc     p15, 0, r0, c0, c0, 5     ; read MPIDR
   bx      lr
 
-ArmReadTpidrurw
+ RVCT_ASM_EXPORT ArmReadTpidrurw
   mrc     p15, 0, r0, c13, c0, 2    ; read TPIDRURW
   bx      lr
 
-ArmWriteTpidrurw
+ RVCT_ASM_EXPORT ArmWriteTpidrurw
   mcr     p15, 0, r0, c13, c0, 2   ; write TPIDRURW
   bx      lr
 
-ArmIsArchTimerImplemented
+ RVCT_ASM_EXPORT ArmIsArchTimerImplemented
   mrc    p15, 0, r0, c0, c1, 1     ; Read ID_PFR1
   and    r0, r0, #0x000F0000
   bx     lr
 
-ArmReadIdPfr1
+ RVCT_ASM_EXPORT ArmReadIdPfr1
   mrc    p15, 0, r0, c0, c1, 1     ; Read ID_PFR1 Register
   bx     lr
 
-ArmReadIdMmfr0
+ RVCT_ASM_EXPORT ArmReadIdMmfr0
   mrc    p15, 0, r0, c0, c1, 4     ; Read ID_MMFR0 Register
   bx     lr
 

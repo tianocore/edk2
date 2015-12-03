@@ -13,23 +13,15 @@
 
 // For the moment we assume this will run in SVC mode on ARMv7
 
-    EXPORT  ArmGicV3GetControlSystemRegisterEnable
-    EXPORT  ArmGicV3SetControlSystemRegisterEnable
-    EXPORT  ArmGicV3EnableInterruptInterface
-    EXPORT  ArmGicV3DisableInterruptInterface
-    EXPORT  ArmGicV3EndOfInterrupt
-    EXPORT  ArmGicV3AcknowledgeInterrupt
-    EXPORT  ArmGicV3SetPriorityMask
-    EXPORT  ArmGicV3SetBinaryPointer
 
-    AREA ArmGicV3, CODE, READONLY
+    INCLUDE AsmMacroExport.inc
 
 //UINT32
 //EFIAPI
 //ArmGicGetControlSystemRegisterEnable (
 //  VOID
 //  );
-ArmGicV3GetControlSystemRegisterEnable
+ RVCT_ASM_EXPORT ArmGicV3GetControlSystemRegisterEnable
         mrc     p15, 0, r0, c12, c12, 5 // ICC_SRE
         bx      lr
 
@@ -38,7 +30,7 @@ ArmGicV3GetControlSystemRegisterEnable
 //ArmGicSetControlSystemRegisterEnable (
 //  IN UINT32         ControlSystemRegisterEnable
 //  );
-ArmGicV3SetControlSystemRegisterEnable
+ RVCT_ASM_EXPORT ArmGicV3SetControlSystemRegisterEnable
         mcr     p15, 0, r0, c12, c12, 5 // ICC_SRE
         isb
         bx      lr
@@ -47,7 +39,7 @@ ArmGicV3SetControlSystemRegisterEnable
 //ArmGicV3EnableInterruptInterface (
 //  VOID
 //  );
-ArmGicV3EnableInterruptInterface
+ RVCT_ASM_EXPORT ArmGicV3EnableInterruptInterface
         mov     r0, #1
         mcr     p15, 0, r0, c12, c12, 7 // ICC_IGRPEN1
         bx      lr
@@ -56,7 +48,7 @@ ArmGicV3EnableInterruptInterface
 //ArmGicV3DisableInterruptInterface (
 //  VOID
 //  );
-ArmGicV3DisableInterruptInterface
+ RVCT_ASM_EXPORT ArmGicV3DisableInterruptInterface
         mov     r0, #0
         mcr     p15, 0, r0, c12, c12, 7 // ICC_IGRPEN1
         bx      lr
@@ -65,7 +57,7 @@ ArmGicV3DisableInterruptInterface
 //ArmGicV3EndOfInterrupt (
 //  IN UINTN InterruptId
 //  );
-ArmGicV3EndOfInterrupt
+ RVCT_ASM_EXPORT ArmGicV3EndOfInterrupt
         mcr     p15, 0, r0, c12, c12, 1 //ICC_EOIR1
         bx      lr
 
@@ -73,7 +65,7 @@ ArmGicV3EndOfInterrupt
 //ArmGicV3AcknowledgeInterrupt (
 //  VOID
 //  );
-ArmGicV3AcknowledgeInterrupt
+ RVCT_ASM_EXPORT ArmGicV3AcknowledgeInterrupt
         mrc     p15, 0, r0, c12, c8, 0 //ICC_IAR1
         bx      lr
 
@@ -81,7 +73,7 @@ ArmGicV3AcknowledgeInterrupt
 //ArmGicV3SetPriorityMask (
 //  IN UINTN                  Priority
 //  );
-ArmGicV3SetPriorityMask
+ RVCT_ASM_EXPORT ArmGicV3SetPriorityMask
         mcr     p15, 0, r0, c4, c6, 0 //ICC_PMR
         bx      lr
 
@@ -89,7 +81,7 @@ ArmGicV3SetPriorityMask
 //ArmGicV3SetBinaryPointer (
 //  IN UINTN                  BinaryPoint
 //  );
-ArmGicV3SetBinaryPointer
+ RVCT_ASM_EXPORT ArmGicV3SetBinaryPointer
         mcr     p15, 0, r0, c12, c12, 3 //ICC_BPR1
         bx      lr
 
