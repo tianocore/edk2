@@ -869,7 +869,6 @@ ConvertBmpToGopBlt (
           *GopBlt = NULL;
         }
         return EFI_UNSUPPORTED;
-        break;
       };
 
     }
