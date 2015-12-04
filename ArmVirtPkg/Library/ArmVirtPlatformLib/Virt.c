@@ -72,8 +72,8 @@ ArmPlatformInitializeSystemMemory (
 {
   VOID         *DeviceTreeBase;
   INT32        Node, Prev;
-  UINT64       NewBase;
-  UINT64       NewSize;
+  UINT64       NewBase, CurBase;
+  UINT64       NewSize, CurSize;
   CONST CHAR8  *Type;
   INT32        Len;
   CONST UINT64 *RegProp;
@@ -90,7 +90,7 @@ ArmPlatformInitializeSystemMemory (
   ASSERT (fdt_check_header (DeviceTreeBase) == 0);
 
   //
-  // Look for a memory node
+  // Look for the lowest memory node
   //
   for (Prev = 0;; Prev = Node) {
     Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
@@ -110,24 +110,28 @@ ArmPlatformInitializeSystemMemory (
       RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
       if (RegProp != 0 && Len == (2 * sizeof (UINT64))) {
 
-        NewBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-        NewSize = fdt64_to_cpu (ReadUnaligned64 (RegProp + 1));
-
-        //
-        // Make sure the start of DRAM matches our expectation
-        //
-        ASSERT (FixedPcdGet64 (PcdSystemMemoryBase) == NewBase);
-        PcdSet64 (PcdSystemMemorySize, NewSize);
+        CurBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
+        CurSize = fdt64_to_cpu (ReadUnaligned64 (RegProp + 1));
 
         DEBUG ((EFI_D_INFO, "%a: System RAM @ 0x%lx - 0x%lx\n",
-               __FUNCTION__, NewBase, NewBase + NewSize - 1));
+               __FUNCTION__, CurBase, CurBase + CurSize - 1));
+
+        if (NewBase > CurBase || NewBase == 0) {
+          NewBase = CurBase;
+          NewSize = CurSize;
+        }
       } else {
         DEBUG ((EFI_D_ERROR, "%a: Failed to parse FDT memory node\n",
                __FUNCTION__));
       }
-      break;
     }
   }
+
+  //
+  // Make sure the start of DRAM matches our expectation
+  //
+  ASSERT (FixedPcdGet64 (PcdSystemMemoryBase) == NewBase);
+  PcdSet64 (PcdSystemMemorySize, NewSize);
 
   //
   // We need to make sure that the machine we are running on has at least
