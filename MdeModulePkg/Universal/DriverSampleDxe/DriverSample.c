@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 CHAR16     VariableName[] = L"MyIfrNVData";
 CHAR16     MyEfiVar[] = L"MyEfiVar";
 EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
-DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData = NULL;
+DRIVER_SAMPLE_PRIVATE_DATA      *mPrivateData = NULL;
 EFI_EVENT                       mEvent;
 
 HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath0 = {
@@ -1895,17 +1895,17 @@ DriverSampleInit (
   //
   // Initialize driver private data
   //
-  PrivateData = AllocateZeroPool (sizeof (DRIVER_SAMPLE_PRIVATE_DATA));
-  if (PrivateData == NULL) {
+  mPrivateData = AllocateZeroPool (sizeof (DRIVER_SAMPLE_PRIVATE_DATA));
+  if (mPrivateData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  PrivateData->Signature = DRIVER_SAMPLE_PRIVATE_SIGNATURE;
+  mPrivateData->Signature = DRIVER_SAMPLE_PRIVATE_SIGNATURE;
 
-  PrivateData->ConfigAccess.ExtractConfig = ExtractConfig;
-  PrivateData->ConfigAccess.RouteConfig = RouteConfig;
-  PrivateData->ConfigAccess.Callback = DriverCallback;
-  PrivateData->PasswordState = BROWSER_STATE_VALIDATE_PASSWORD;
+  mPrivateData->ConfigAccess.ExtractConfig = ExtractConfig;
+  mPrivateData->ConfigAccess.RouteConfig = RouteConfig;
+  mPrivateData->ConfigAccess.Callback = DriverCallback;
+  mPrivateData->PasswordState = BROWSER_STATE_VALIDATE_PASSWORD;
 
   //
   // Locate Hii Database protocol
@@ -1914,7 +1914,7 @@ DriverSampleInit (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  PrivateData->HiiDatabase = HiiDatabase;
+  mPrivateData->HiiDatabase = HiiDatabase;
 
   //
   // Locate HiiString protocol
@@ -1923,7 +1923,7 @@ DriverSampleInit (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  PrivateData->HiiString = HiiString;
+  mPrivateData->HiiString = HiiString;
 
   //
   // Locate Formbrowser2 protocol
@@ -1932,7 +1932,7 @@ DriverSampleInit (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  PrivateData->FormBrowser2 = FormBrowser2;
+  mPrivateData->FormBrowser2 = FormBrowser2;
 
   //
   // Locate ConfigRouting protocol
@@ -1941,7 +1941,7 @@ DriverSampleInit (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  PrivateData->HiiConfigRouting = HiiConfigRouting;
+  mPrivateData->HiiConfigRouting = HiiConfigRouting;
 
   //
   // Locate keyword handler protocol
@@ -1950,19 +1950,19 @@ DriverSampleInit (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  PrivateData->HiiKeywordHandler = HiiKeywordHandler;
+  mPrivateData->HiiKeywordHandler = HiiKeywordHandler;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &DriverHandle[0],
                   &gEfiDevicePathProtocolGuid,
                   &mHiiVendorDevicePath0,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  &PrivateData->ConfigAccess,
+                  &mPrivateData->ConfigAccess,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
-  PrivateData->DriverHandle[0] = DriverHandle[0];
+  mPrivateData->DriverHandle[0] = DriverHandle[0];
 
   //
   // Publish our HII data
@@ -1978,7 +1978,7 @@ DriverSampleInit (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  PrivateData->HiiHandle[0] = HiiHandle[0];
+  mPrivateData->HiiHandle[0] = HiiHandle[0];
 
   //
   // Publish another Fromset
@@ -1988,12 +1988,12 @@ DriverSampleInit (
                   &gEfiDevicePathProtocolGuid,
                   &mHiiVendorDevicePath1,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  &PrivateData->ConfigAccess,
+                  &mPrivateData->ConfigAccess,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
-  PrivateData->DriverHandle[1] = DriverHandle[1];
+  mPrivateData->DriverHandle[1] = DriverHandle[1];
 
   HiiHandle[1] = HiiAddPackages (
                    &gDriverSampleInventoryGuid,
@@ -2007,7 +2007,7 @@ DriverSampleInit (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  PrivateData->HiiHandle[1] = HiiHandle[1];
+  mPrivateData->HiiHandle[1] = HiiHandle[1];
 
   //
   // Update the device path string.
@@ -2037,14 +2037,14 @@ DriverSampleInit (
   //
   // Initialize Name/Value name String ID
   //
-  PrivateData->NameStringId[0] = STR_NAME_VALUE_VAR_NAME0;
-  PrivateData->NameStringId[1] = STR_NAME_VALUE_VAR_NAME1;
-  PrivateData->NameStringId[2] = STR_NAME_VALUE_VAR_NAME2;
+  mPrivateData->NameStringId[0] = STR_NAME_VALUE_VAR_NAME0;
+  mPrivateData->NameStringId[1] = STR_NAME_VALUE_VAR_NAME1;
+  mPrivateData->NameStringId[2] = STR_NAME_VALUE_VAR_NAME2;
 
   //
   // Initialize configuration data
   //
-  Configuration = &PrivateData->Configuration;
+  Configuration = &mPrivateData->Configuration;
   ZeroMem (Configuration, sizeof (DRIVER_SAMPLE_CONFIGURATION));
 
   //
@@ -2109,7 +2109,7 @@ DriverSampleInit (
   //
   // Initialize efi varstore configuration data
   //
-  VarStoreConfig = &PrivateData->VarStoreConfig;
+  VarStoreConfig = &mPrivateData->VarStoreConfig;
   ZeroMem (VarStoreConfig, sizeof (MY_EFI_VARSTORE_DATA));
 
   ConfigRequestHdr = HiiConstructConfigHdr (&gDriverSampleFormSetGuid, MyEfiVar, DriverHandle[0]);
@@ -2181,11 +2181,11 @@ DriverSampleInit (
     // Register the default HotKey F9 and F10 again.
     //
     HotKey.ScanCode   = SCAN_F10;
-    NewString         = HiiGetString (PrivateData->HiiHandle[0], STRING_TOKEN (FUNCTION_TEN_STRING), NULL);
+    NewString         = HiiGetString (mPrivateData->HiiHandle[0], STRING_TOKEN (FUNCTION_TEN_STRING), NULL);
     ASSERT (NewString != NULL);
     FormBrowserEx->RegisterHotKey (&HotKey, BROWSER_ACTION_SUBMIT, 0, NewString);
     HotKey.ScanCode   = SCAN_F9;
-    NewString         = HiiGetString (PrivateData->HiiHandle[0], STRING_TOKEN (FUNCTION_NINE_STRING), NULL);
+    NewString         = HiiGetString (mPrivateData->HiiHandle[0], STRING_TOKEN (FUNCTION_NINE_STRING), NULL);
     ASSERT (NewString != NULL);
     FormBrowserEx->RegisterHotKey (&HotKey, BROWSER_ACTION_DEFAULT, EFI_HII_DEFAULT_CLASS_STANDARD, NewString);
   }
@@ -2237,7 +2237,7 @@ DriverSampleUnload (
 {
   UINTN Index;
 
-  ASSERT (PrivateData != NULL);
+  ASSERT (mPrivateData != NULL);
 
   if (DriverHandle[0] != NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
@@ -2245,7 +2245,7 @@ DriverSampleUnload (
             &gEfiDevicePathProtocolGuid,
             &mHiiVendorDevicePath0,
             &gEfiHiiConfigAccessProtocolGuid,
-            &PrivateData->ConfigAccess,
+            &mPrivateData->ConfigAccess,
             NULL
            );
     DriverHandle[0] = NULL;
@@ -2261,21 +2261,21 @@ DriverSampleUnload (
     DriverHandle[1] = NULL;
   }
 
-  if (PrivateData->HiiHandle[0] != NULL) {
-    HiiRemovePackages (PrivateData->HiiHandle[0]);
+  if (mPrivateData->HiiHandle[0] != NULL) {
+    HiiRemovePackages (mPrivateData->HiiHandle[0]);
   }
 
-  if (PrivateData->HiiHandle[1] != NULL) {
-    HiiRemovePackages (PrivateData->HiiHandle[1]);
+  if (mPrivateData->HiiHandle[1] != NULL) {
+    HiiRemovePackages (mPrivateData->HiiHandle[1]);
   }
 
   for (Index = 0; Index < NAME_VALUE_NAME_NUMBER; Index++) {
-    if (PrivateData->NameValueName[Index] != NULL) {
-      FreePool (PrivateData->NameValueName[Index]);
+    if (mPrivateData->NameValueName[Index] != NULL) {
+      FreePool (mPrivateData->NameValueName[Index]);
     }
   }
-  FreePool (PrivateData);
-  PrivateData = NULL;
+  FreePool (mPrivateData);
+  mPrivateData = NULL;
 
   gBS->CloseEvent (mEvent);
 
