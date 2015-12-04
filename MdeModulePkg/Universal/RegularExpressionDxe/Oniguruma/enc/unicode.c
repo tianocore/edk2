@@ -10920,12 +10920,12 @@ static int init_case_fold_table(void)
   if (ONIG_IS_NULL(FoldTable)) return ONIGERR_MEMORY;
   for (i = 0; i < (int )(sizeof(CaseFold)/sizeof(CaseFold_11_Type)); i++) {
     p = &CaseFold[i];
-    st_add_direct(FoldTable, (st_data_t )p->from, (st_data_t )&(p->to));
+    st_add_direct(FoldTable, (st_data_t )p->from, (st_data_t )(UINTN)&(p->to));
   }
   for (i = 0; i < (int )(sizeof(CaseFold_Locale)/sizeof(CaseFold_11_Type));
        i++) {
     p = &CaseFold_Locale[i];
-    st_add_direct(FoldTable, (st_data_t )p->from, (st_data_t )&(p->to));
+    st_add_direct(FoldTable, (st_data_t )p->from, (st_data_t )(UINTN)&(p->to));
   }
 
   Unfold1Table = st_init_numtable_with_size(1000);
@@ -10934,13 +10934,13 @@ static int init_case_fold_table(void)
   for (i = 0; i < (int )(sizeof(CaseUnfold_11)/sizeof(CaseUnfold_11_Type));
        i++) {
     p1 = &CaseUnfold_11[i];
-    st_add_direct(Unfold1Table, (st_data_t )p1->from, (st_data_t )&(p1->to));
+    st_add_direct(Unfold1Table, (st_data_t )p1->from, (st_data_t )(UINTN)&(p1->to));
   }
   for (i = 0;
        i < (int )(sizeof(CaseUnfold_11_Locale)/sizeof(CaseUnfold_11_Type));
        i++) {
     p1 = &CaseUnfold_11_Locale[i];
-    st_add_direct(Unfold1Table, (st_data_t )p1->from, (st_data_t )&(p1->to));
+    st_add_direct(Unfold1Table, (st_data_t )p1->from, (st_data_t )(UINTN)&(p1->to));
   }
 
   Unfold2Table = st_init_table_with_size(&type_code2_hash, 200);
@@ -10949,13 +10949,13 @@ static int init_case_fold_table(void)
   for (i = 0; i < (int )(sizeof(CaseUnfold_12)/sizeof(CaseUnfold_12_Type));
        i++) {
     p2 = &CaseUnfold_12[i];
-    st_add_direct(Unfold2Table, (st_data_t )p2->from, (st_data_t )(&p2->to));
+    st_add_direct(Unfold2Table, (st_data_t )(UINTN)p2->from, (st_data_t )(UINTN)(&p2->to));
   }
   for (i = 0;
        i < (int )(sizeof(CaseUnfold_12_Locale)/sizeof(CaseUnfold_12_Type));
        i++) {
     p2 = &CaseUnfold_12_Locale[i];
-    st_add_direct(Unfold2Table, (st_data_t )p2->from, (st_data_t )(&p2->to));
+    st_add_direct(Unfold2Table, (st_data_t )(UINTN)p2->from, (st_data_t )(UINTN)(&p2->to));
   }
 
   Unfold3Table = st_init_table_with_size(&type_code3_hash, 30);
@@ -10964,7 +10964,7 @@ static int init_case_fold_table(void)
   for (i = 0; i < (int )(sizeof(CaseUnfold_13)/sizeof(CaseUnfold_13_Type));
        i++) {
     p3 = &CaseUnfold_13[i];
-    st_add_direct(Unfold3Table, (st_data_t )p3->from, (st_data_t )(&p3->to));
+    st_add_direct(Unfold3Table, (st_data_t )(UINTN)p3->from, (st_data_t )(UINTN)(&p3->to));
   }
 
 
@@ -11265,7 +11265,7 @@ onigenc_unicode_get_case_fold_codes_by_str(OnigEncoding enc,
 	  }
 	}
 
-	if (onig_st_lookup(Unfold2Table, (st_data_t )to->code,
+	if (onig_st_lookup(Unfold2Table, (st_data_t )(UINTN)to->code,
 			   (void* )&z2) != 0) {
 	  for (i = 0; i < z2->n; i++) {
 	    if (z2->code[i] == code) continue;
@@ -11291,7 +11291,7 @@ onigenc_unicode_get_case_fold_codes_by_str(OnigEncoding enc,
 	  }
 	}
 
-	if (onig_st_lookup(Unfold3Table, (st_data_t )to->code,
+	if (onig_st_lookup(Unfold3Table, (st_data_t )(UINTN)to->code,
 			   (void* )&z2) != 0) {
 	  for (i = 0; i < z2->n; i++) {
 	    if (z2->code[i] == code) continue;
@@ -11336,7 +11336,7 @@ onigenc_unicode_get_case_fold_codes_by_str(OnigEncoding enc,
 
       clen = enclen(enc, p);
       len += clen;
-      if (onig_st_lookup(Unfold2Table, (st_data_t )codes, (void* )&z2) != 0) {
+      if (onig_st_lookup(Unfold2Table, (st_data_t )(UINTN)codes, (void* )&z2) != 0) {
 	for (i = 0; i < z2->n; i++) {
 	  items[n].byte_len = len;
 	  items[n].code_len = 1;
@@ -11357,7 +11357,7 @@ onigenc_unicode_get_case_fold_codes_by_str(OnigEncoding enc,
 
 	clen = enclen(enc, p);
 	len += clen;
-	if (onig_st_lookup(Unfold3Table, (st_data_t )codes,
+	if (onig_st_lookup(Unfold3Table, (st_data_t )(UINTN)codes,
 			   (void* )&z2) != 0) {
 	  for (i = 0; i < z2->n; i++) {
 	    items[n].byte_len = len;

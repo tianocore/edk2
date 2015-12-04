@@ -369,7 +369,7 @@ onig_st_lookup_strend(hash_table_type* table, const UChar* str_key,
   key.s   = (UChar* )str_key;
   key.end = (UChar* )end_key;
 
-  return onig_st_lookup(table, (st_data_t )(&key), value);
+  return onig_st_lookup(table, (st_data_t )(UINTN)(&key), value);
 }
 
 extern int
@@ -382,7 +382,7 @@ onig_st_insert_strend(hash_table_type* table, const UChar* str_key,
   key = (st_str_end_key* )xmalloc(sizeof(st_str_end_key));
   key->s   = (UChar* )str_key;
   key->end = (UChar* )end_key;
-  result = onig_st_insert(table, (st_data_t )key, value);
+  result = onig_st_insert(table, (st_data_t )(UINTN)key, value);
   if (result) {
     xfree(key);
   }
@@ -534,7 +534,7 @@ onig_foreach_name(regex_t* reg,
     narg.reg  = reg;
     narg.arg  = arg;
     narg.enc  = reg->enc; /* should be pattern encoding. */
-    onig_st_foreach(t, i_names, (HashDataType )&narg);
+    onig_st_foreach(t, i_names, (HashDataType )(UINTN)&narg);
   }
   return narg.ret;
 }
@@ -562,7 +562,7 @@ onig_renumber_name_table(regex_t* reg, GroupNumRemap* map)
   NameTable* t = (NameTable* )reg->name_table;
 
   if (IS_NOT_NULL(t)) {
-    onig_st_foreach(t, i_renumber_name, (HashDataType )map);
+    onig_st_foreach(t, i_renumber_name, (HashDataType )(UINTN)map);
   }
   return 0;
 }
@@ -742,7 +742,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
       xfree(e);  return ONIGERR_MEMORY;
     }
     onig_st_insert_strend(t, e->name, (e->name + (name_end - name)),
-                          (HashDataType )e);
+                          (HashDataType )(UINTN)e);
 
     e->name_len   = (int)(name_end - name);
     e->back_num   = 0;
@@ -5217,7 +5217,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
               }
             }
             else {
-              if (onig_st_lookup(OnigTypeCClassTable, (st_data_t )&key,
+              if (onig_st_lookup(OnigTypeCClassTable, (st_data_t )(UINTN)&key,
                                  (st_data_t* )np)) {
                 THREAD_ATOMIC_END;
                 break;
@@ -5235,8 +5235,8 @@ parse_exp(Node** np, OnigToken* tok, int term,
             NCCLASS_SET_SHARE(cc);
             new_key = (type_cclass_key* )xmalloc(sizeof(type_cclass_key));
 	    xmemcpy(new_key, &key, sizeof(type_cclass_key));
-            onig_st_add_direct(OnigTypeCClassTable, (st_data_t )new_key,
-                               (st_data_t )*np);
+            onig_st_add_direct(OnigTypeCClassTable, (st_data_t )(UINTN)new_key,
+                               (st_data_t )(UINTN)*np);
             
             THREAD_ATOMIC_END;
           }
