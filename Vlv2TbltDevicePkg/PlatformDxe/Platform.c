@@ -50,6 +50,7 @@ Abstract:
 #include <Protocol/IgdOpRegion.h>
 #include <Library/PcdLib.h>
 #include <Protocol/VariableLock.h>
+#include <Library/PchPlatformLib.h>
 
 
 //
@@ -201,6 +202,10 @@ InitRC6Policy(
   VOID
   );
 
+EFI_STATUS
+DxeDetectGpioPinToResetSetup(
+  VOID
+  );
 
 EFI_STATUS
 EFIAPI
@@ -594,6 +599,40 @@ InitThermalZone (
 
 #endif
 
+EFI_STATUS
+DxeDetectGpioPinToResetSetup (
+  VOID
+  )
+{
+  EFI_STATUS       Status;
+  UINTN            VarSize;
+  UINT32           DxeGpioValue;
+
+  DxeGpioValue = DetectGpioPinValue();
+
+  if (DxeGpioValue == 0) {
+    VarSize = sizeof(SYSTEM_CONFIGURATION);
+
+      Status = gRT->GetVariable(
+                      L"SetupRecovery",
+                      &gEfiNormalSetupGuid,
+                      NULL,
+                      &VarSize,
+                      &mSystemConfiguration
+                      );
+      ASSERT_EFI_ERROR (Status);
+
+      Status = gRT->SetVariable (
+                      NORMAL_SETUP_NAME,
+                      &gEfiNormalSetupGuid,
+                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                      sizeof(SYSTEM_CONFIGURATION),
+                      &mSystemConfiguration
+                      );
+  }
+
+  return   EFI_SUCCESS;  
+}
 
 EFI_STATUS
 EFIAPI
@@ -816,6 +855,11 @@ InitializePlatform (
                     &mSystemConfiguration
                     );    
   }
+  
+  //
+  // Detect GPIO_S5_17 Pin to reset setup to default in Dxe Phase.
+  //
+  DxeDetectGpioPinToResetSetup();
     
   Status = EfiCreateEventReadyToBootEx (
              TPL_CALLBACK,
@@ -1688,6 +1732,9 @@ UpdateDVMTSetup(
   SYSTEM_CONFIGURATION        SystemConfiguration;
   UINTN                       VarSize;
   EFI_STATUS                  Status;
+  UINT32                      DxeGpioValue;
+  
+  DxeGpioValue = DetectGpioPinValue();
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
@@ -1698,8 +1745,8 @@ UpdateDVMTSetup(
                   &SystemConfiguration
                   );
 
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

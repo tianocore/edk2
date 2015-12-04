@@ -648,6 +648,7 @@ OnReadyToBoot (
   EFI_PLATFORM_CPU_INFO       *PlatformCpuInfoPtr = NULL;
   EFI_PLATFORM_CPU_INFO       PlatformCpuInfo;
   EFI_PEI_HOB_POINTERS          GuidHob;
+  UINT32                      DxeGpioValue;
 
   if (mFirstNotify) {
     return;
@@ -686,6 +687,8 @@ OnReadyToBoot (
     CopyMem(&PlatformCpuInfo, PlatformCpuInfoPtr, sizeof(EFI_PLATFORM_CPU_INFO));
   }
 
+  DxeGpioValue = DetectGpioPinValue();
+
   //
   // Update the ACPI parameter blocks finally.
   //
@@ -697,8 +700,8 @@ OnReadyToBoot (
                   &VariableSize,
                   &SetupVarBuffer
                   );
-  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VariableSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",
@@ -796,6 +799,7 @@ AcpiPlatformEntryPoint (
   UINTN                         NumberOfEnabledCPUs;
   UINT32                        Data32;
   PCH_STEPPING                  pchStepping;
+  UINT32                        DxeGpioValue;
 
   mFirstNotify      = FALSE;
 
@@ -815,7 +819,8 @@ AcpiPlatformEntryPoint (
       mPlatformInfo = GET_GUID_HOB_DATA (GuidHob.Guid);
     }
   }
-
+  
+  DxeGpioValue = DetectGpioPinValue();
   //
   // Search for the Memory Configuration GUID HOB.  If it is not present, then
   // there's nothing we can do. It may not exist on the update path.
@@ -828,8 +833,8 @@ AcpiPlatformEntryPoint (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",
@@ -864,8 +869,8 @@ AcpiPlatformEntryPoint (
                   &SysCfgSize,
                   &mSystemConfig
                   );
-  if (EFI_ERROR (Status) || SysCfgSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || SysCfgSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     SysCfgSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

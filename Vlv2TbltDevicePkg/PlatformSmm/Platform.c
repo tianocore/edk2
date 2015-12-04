@@ -24,7 +24,7 @@ Abstract:
 
 #include "SmmPlatform.h"
 #include <Protocol/CpuIo2.h>
-
+#include <Library/PchPlatformLib.h>
 
 //
 // Local variables
@@ -142,6 +142,9 @@ InitializePlatformSmm (
   EFI_SMM_SW_DISPATCH_CONTEXT               SwContext;
   UINTN                                     VarSize;
   EFI_BOOT_MODE                             BootMode;
+  UINT32                                    SmmGpioValue;
+
+  SmmGpioValue = DetectGpioPinValue();
 
   Handle = NULL;
 
@@ -170,8 +173,8 @@ InitializePlatformSmm (
                           &VarSize,
                           &mSystemConfiguration
                           );
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || SmmGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = SystemTable->RuntimeServices->GetVariable(
               L"SetupRecovery",
@@ -840,6 +843,7 @@ EnableS5WakeOnRtc()
   UINTN             i;
   EFI_STATUS        Status;
   UINTN             VarSize;
+  UINT32            SmmGpioValue;
 
   //
   // make sure EFI_SMM_VARIABLE_PROTOCOL is available
@@ -847,6 +851,7 @@ EnableS5WakeOnRtc()
   if (!mSmmVariable) {
     return;
   }
+  SmmGpioValue = DetectGpioPinValue();
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
 
@@ -860,8 +865,8 @@ EnableS5WakeOnRtc()
                            &VarSize,
                            &mSystemConfiguration
                            );
-  if (EFI_ERROR(Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR(Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || SmmGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = mSmmVariable->SmmGetVariable(
               L"SetupRecovery",

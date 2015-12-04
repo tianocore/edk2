@@ -21,6 +21,8 @@ Abstract:
 --*/
 
 #include "PlatformInfoDxe.h"
+#include "PchAccess.h"
+#include <Library/PchPlatformLib.h>
 
 /**
   Entry point for the driver.
@@ -53,6 +55,9 @@ PlatformInfoInit (
   UINT8                       *LpssDataHobPtr;
   UINT8                       *LpssDataVarPtr;
   UINTN                       i;
+  UINT32                      DxeGpioValue;
+  
+  DxeGpioValue = DetectGpioPinValue();
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
@@ -63,8 +68,8 @@ PlatformInfoInit (
                   &SystemConfiguration
                   );
   
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

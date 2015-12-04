@@ -24,6 +24,8 @@ Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
 #include <Guid/SetupVariable.h>
 #include <SetupMode.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include "PchAccess.h"
+#include <Library/PchPlatformLib.h>
 
 EFI_BOOT_SERVICES   *gBS;
 
@@ -156,6 +158,7 @@ PlatformGOPPolicyEntryPoint (
   EFI_STATUS  Status = EFI_SUCCESS;
   SYSTEM_CONFIGURATION          SystemConfiguration;
   UINTN       VarSize;
+  UINT32      DxeGpioValue;
 
 
   gBS = SystemTable->BootServices;
@@ -170,6 +173,8 @@ PlatformGOPPolicyEntryPoint (
   mPlatformGOPPolicy.GetPlatformLidStatus    = GetPlatformLidStatus;
   mPlatformGOPPolicy.GetVbtData              = GetVbtData;
 
+  DxeGpioValue = DetectGpioPinValue();
+
   //
   // Install protocol to allow access to this Policy.
   //
@@ -181,8 +186,8 @@ PlatformGOPPolicyEntryPoint (
                   &VarSize,
                   &SystemConfiguration
                   );
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

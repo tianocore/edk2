@@ -39,6 +39,7 @@ Abstract:
 #include <Protocol/FirmwareVolume.h>
 #include <Library/HobLib.h>
 #include <IndustryStandard/Pci22.h>
+#include <Library/PchPlatformLib.h>
 
 extern  PCI_OPTION_ROM_TABLE  mPciOptionRomTable[];
 extern  UINTN                 mSizeOptionRomTable;
@@ -334,6 +335,9 @@ PciPlatformDriverEntry (
 {
   EFI_STATUS  Status;
   UINTN       VarSize;
+  UINT32      DxeGpioValue;
+
+  DxeGpioValue = DetectGpioPinValue();
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
@@ -343,8 +347,8 @@ PciPlatformDriverEntry (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

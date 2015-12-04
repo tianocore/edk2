@@ -52,6 +52,7 @@
   UefiRuntimeServicesTableLib
   UefiDriverEntryPoint
   BaseMemoryLib
+  PchPlatformLib
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

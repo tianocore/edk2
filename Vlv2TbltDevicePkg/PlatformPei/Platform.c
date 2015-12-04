@@ -29,6 +29,7 @@ Module Name:
 #include <Guid/SetupVariable.h>
 #include <Guid/Vlv2Variable.h>
 #include <Ppi/fTPMPolicy.h>
+#include <Library/PchPlatformLib.h>
 
 //
 // Start::Alpine Valley platform
@@ -699,6 +700,7 @@ PeiInitPlatform (
 
   EFI_PEI_PPI_DESCRIPTOR          *mVlvMmioPolicyPpiDesc;
   VLV_MMIO_POLICY_PPI             *mVlvMmioPolicyPpi;
+  UINT32                           PeiGpioValue;
 
   ZeroMem (&PlatformInfo, sizeof(PlatformInfo));
 
@@ -744,6 +746,7 @@ PeiInitPlatform (
 
 
   PchMmPci32( 0, 0, 2, 0, 0x50) = 0x210;
+  PeiGpioValue = DetectGpioPinValue();
 
   VariableSize = sizeof (SYSTEM_CONFIGURATION);
   ZeroMem (&SystemConfiguration, VariableSize);
@@ -767,8 +770,8 @@ PeiInitPlatform (
                        &VariableSize,
                        &SystemConfiguration
 					   );
-  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION) || PeiGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VariableSize = sizeof(SYSTEM_CONFIGURATION);
     Status = Variable->GetVariable(
               Variable,

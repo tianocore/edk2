@@ -30,6 +30,7 @@ Abstract:
 #include <Guid/SetupVariable.h>
 
 #include <Guid/BootState.h>
+#include <Library/PchPlatformLib.h>
 
 //
 // Priority of our boot modes, highest priority first
@@ -318,6 +319,9 @@ IsFastBootEnabled (
   UINTN                           VarSize;
   SYSTEM_CONFIGURATION            SystemConfiguration;
   BOOLEAN                         FastBootEnabledStatus;
+  UINT32                          PeiGpioValue;
+
+  PeiGpioValue = DetectGpioPinValue();
 
   FastBootEnabledStatus = FALSE;
   Status = (**PeiServices).LocatePpi (
@@ -337,6 +341,18 @@ IsFastBootEnabled (
                                   &VarSize,
                                   &SystemConfiguration
                                   );
+  if (PeiGpioValue == 0) {
+      VarSize = sizeof(SYSTEM_CONFIGURATION);
+      Status = PeiReadOnlyVarPpi->GetVariable (
+                                    PeiReadOnlyVarPpi,
+                                    L"SetupRecovery",
+                                    &gEfiSetupVariableGuid,
+                                    NULL,
+                                    &VarSize,
+                                    &SystemConfiguration
+                                    );
+      ASSERT_EFI_ERROR (Status);
+    }
     if (Status == EFI_SUCCESS) {
       if (SystemConfiguration.FastBoot != 0) {
         FastBootEnabledStatus = TRUE;

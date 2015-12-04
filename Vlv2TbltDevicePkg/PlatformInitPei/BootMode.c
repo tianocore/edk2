@@ -148,6 +148,7 @@ UpdateBootMode (
   volatile UINT32                   GpioValue;
   BOOLEAN                           IsFirstBoot;
   UINT32                            Data32;
+  UINT32                            PeiGpioValue;
 
   Status = (*PeiServices)->GetBootMode(
                              PeiServices,
@@ -168,6 +169,7 @@ UpdateBootMode (
   // When this boot is WDT reset, the system needs booting with CrashDump function eanbled.
   //
   Data32 = IoRead32 (ACPI_BASE_ADDRESS + R_PCH_TCO_STS);
+  PeiGpioValue = DetectGpioPinValue();
 
   //
   // Check Power Button, click the power button, the system will boot in fast boot mode,
@@ -202,8 +204,8 @@ UpdateBootMode (
                            &VarSize,
                            &SystemConfiguration
                            );
-      if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-        //The setup variable is corrupted
+      if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || PeiGpioValue == 0) {
+        //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
         VarSize = sizeof(SYSTEM_CONFIGURATION);
         Status = Variable->GetVariable(
                   Variable,

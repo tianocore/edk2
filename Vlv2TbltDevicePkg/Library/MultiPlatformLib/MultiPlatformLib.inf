@@ -71,6 +71,7 @@
   DebugLib
   HobLib
   IoLib
+  PchPlatformLib
 #  PeiKscLib
 
 [Ppis]

@@ -19,6 +19,7 @@
 #define _BOARD_CLK_GEN_H_
 
 #include <PiPei.h>
+#include "PchAccess.h"
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
@@ -26,6 +27,7 @@
 #include <Ppi/Smbus.h>
 #include <IndustryStandard/SmBus.h>
 #include <Guid/PlatformInfo.h>
+#include <Library/PchPlatformLib.h>
 
 
 #define CLOCK_GENERATOR_ADDRESS  0xd2

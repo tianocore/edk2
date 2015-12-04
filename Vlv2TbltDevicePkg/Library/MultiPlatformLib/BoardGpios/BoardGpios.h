@@ -28,6 +28,7 @@
 #include <Ppi/Smbus.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Guid/SetupVariable.h>
+#include <Library/PchPlatformLib.h>
 
 
 GPIO_CONF_PAD_INIT mNB_BB_FAB3_GpioInitData_SC_TRI[] =

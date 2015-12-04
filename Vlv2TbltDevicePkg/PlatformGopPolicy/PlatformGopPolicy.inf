@@ -36,11 +36,14 @@
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   Vlv2TbltDevicePkg/PlatformPkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+
 [LibraryClasses]
   BaseLib
   DebugLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
+  PchPlatformLib
 #  DxeKscLib
 
 [Guids]

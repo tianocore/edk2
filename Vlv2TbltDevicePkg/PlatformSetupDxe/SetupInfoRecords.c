@@ -45,6 +45,7 @@ Revision History:
 #include "SetupMode.h"
 #include "PchCommonDefinitions.h"
 #include <PlatformBaseAddresses.h>
+#include <Library/PchPlatformLib.h>
 
 
 typedef struct {
@@ -1736,10 +1737,12 @@ SetupInfo (void)
   EFI_STATUS                  Status;
   UINTN                       VarSize;
   EFI_PEI_HOB_POINTERS        GuidHob;
+  UINT32                      DxeGpioValue;
 
   if (mSetupInfoDone) {
       return;
   }
+  DxeGpioValue = DetectGpioPinValue();
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
@@ -1750,8 +1753,8 @@ SetupInfo (void)
                   &mSystemConfiguration
 				  );
 
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)|| DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

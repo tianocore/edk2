@@ -44,6 +44,7 @@ Abstract:
 #include <Library/GenericBdsLib/InternalBdsLib.h>
 #include <Library/GenericBdsLib/String.h>
 #include <Library/NetLib.h>
+#include <Library/PchPlatformLib.h>
 
 EFI_GUID *ConnectDriverTable[] = {
   &gEfiMmioDeviceProtocolGuid,
@@ -284,6 +285,7 @@ GetGopDevicePath (
 
   UINTN                                 VarSize;
   SYSTEM_CONFIGURATION  mSystemConfiguration;
+  UINT32                          DxeGpioValue;
 
   if (PciDevicePath == NULL || GopDevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -304,6 +306,7 @@ GetGopDevicePath (
     return Status;
   }
 
+  DxeGpioValue = DetectGpioPinValue();
   //
   // Try to connect this handle, so that GOP dirver could start on this
   // device and create child handles with GraphicsOutput Protocol installed
@@ -322,8 +325,8 @@ GetGopDevicePath (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",
@@ -613,6 +616,7 @@ PlatformBdsForceActiveVga (
   EFI_DEVICE_PATH_PROTOCOL  *GopDevicePath;
   UINTN                VarSize;
   SYSTEM_CONFIGURATION  mSystemConfiguration;
+  UINT32                    DxeGpioValue;
 
   Status = EFI_SUCCESS;
   PlugInPciVgaDevicePath = NULL;
@@ -627,6 +631,8 @@ PlatformBdsForceActiveVga (
     return EFI_UNSUPPORTED;
   }
 
+  DxeGpioValue = DetectGpioPinValue();
+
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
                   L"Setup",
@@ -635,8 +641,8 @@ PlatformBdsForceActiveVga (
                   &VarSize,
                   &mSystemConfiguration
                   );
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",
@@ -689,10 +695,12 @@ UpdateConsoleResolution(
   SYSTEM_CONFIGURATION   SystemConfiguration;
   UINTN                  VarSize;
   EFI_STATUS             Status;
+  UINT32                 DxeGpioValue;
 
 
   HorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
   VerticalResolution = PcdGet32 (PcdSetupVideoVerticalResolution);
+  DxeGpioValue = DetectGpioPinValue();
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
@@ -702,8 +710,8 @@ UpdateConsoleResolution(
                   &VarSize,
                   &SystemConfiguration
                   );
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",
@@ -1607,13 +1615,16 @@ PlatformBdsPolicyBehavior (
   BOOLEAN                            IsFirstBoot;
   UINT16                             *BootOrder;
   UINTN                              BootOrderSize;
+  UINT32                             DxeGpioValue;
 
   Timeout = PcdGet16 (PcdPlatformBootTimeOut);
   if (Timeout > 10 ) {
     //we think the Timeout variable is corrupted
     Timeout = 10;
   }
-  	
+
+  DxeGpioValue = DetectGpioPinValue();
+
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
                   NORMAL_SETUP_NAME,
@@ -1623,8 +1634,8 @@ PlatformBdsPolicyBehavior (
                   &SystemConfiguration
                   );
 
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

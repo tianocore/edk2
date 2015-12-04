@@ -141,6 +141,9 @@ MultiPlatformGpioTableInit (
   EFI_PEI_READ_ONLY_VARIABLE2_PPI *PeiReadOnlyVarPpi;
   UINTN                           VarSize;
   SYSTEM_CONFIGURATION            SystemConfiguration;
+  UINT32                          PeiGpioValue;
+
+  PeiGpioValue = DetectGpioPinValue();
 
   DEBUG ((EFI_D_INFO, "MultiPlatformGpioTableInit()...\n"));
 
@@ -169,6 +172,18 @@ MultiPlatformGpioTableInit (
                                   &VarSize,
                                   &SystemConfiguration
                                   );
+    if (PeiGpioValue == 0) {
+      VarSize = sizeof(SYSTEM_CONFIGURATION);
+      Status = PeiReadOnlyVarPpi->GetVariable (
+                                    PeiReadOnlyVarPpi,
+                                    L"SetupRecovery",
+                                    &gEfiSetupVariableGuid,
+                                    NULL,
+                                    &VarSize,
+                                    &SystemConfiguration
+                                    );
+      ASSERT_EFI_ERROR (Status);
+    }
                                                                        
      if (SystemConfiguration.GpioWakeCapability == 1) {
       PlatformInfoHob->PlatformCfioData     = (EFI_PHYSICAL_ADDRESS)(UINTN) &mMinnow2CfioInitData2;

@@ -25,6 +25,7 @@ Abstract:
 
 
 #include "PlatformDxe.h"
+#include <Library/PchPlatformLib.h>
 
 #define PchLpcPciCfg32(Register)  MmioRead32 (MmPciAddress (0, DEFAULT_PCI_BUS_NUMBER_PCH, PCI_DEVICE_NUMBER_PCH_LPC, 0, Register))
 
@@ -62,6 +63,9 @@ InitExI (
 
   SYSTEM_CONFIGURATION          SystemConfiguration;
   UINTN       VarSize;
+  UINT32      DxeGpioValue;
+
+  DxeGpioValue = DetectGpioPinValue();
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
 
@@ -73,8 +77,8 @@ InitExI (
                   &SystemConfiguration
                   );
 
-  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VarSize != sizeof(SYSTEM_CONFIGURATION) || DxeGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VarSize = sizeof(SYSTEM_CONFIGURATION);
     Status = gRT->GetVariable(
               L"SetupRecovery",

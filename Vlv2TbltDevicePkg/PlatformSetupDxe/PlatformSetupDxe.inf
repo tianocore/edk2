@@ -89,6 +89,7 @@
   BiosIdLib
   CpuIA32Lib
   IoLib
+  PchPlatformLib
 
 [Guids]
   ##  This GUID C Name is not required for build since it is from UefiLib and not directly used by this module source.

@@ -87,6 +87,7 @@
   MonoStatusCodeLib
   BaseCryptLib
   PciLib
+  PchPlatformLib
 
 [Ppis]
   gEfiPeiStallPpiGuid

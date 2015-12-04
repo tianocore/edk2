@@ -282,7 +282,9 @@ ConfigurePlatformClocks (
   UINT8                         ClockAddress = CLOCK_GENERATOR_ADDRESS;
   UINTN                         VariableSize;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI   *Variable;
+  UINT32                            PeiGpioValue;
 
+  PeiGpioValue = DetectGpioPinValue();
   //
   // Obtain Platform Info from HOB.
   //
@@ -346,8 +348,8 @@ ConfigurePlatformClocks (
                                    NULL,
                                    &VariableSize,
                                    &SystemConfiguration);
-  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION) || PeiGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VariableSize = sizeof(SYSTEM_CONFIGURATION);
     Status = Variable->GetVariable(Variable,
               L"SetupRecovery",

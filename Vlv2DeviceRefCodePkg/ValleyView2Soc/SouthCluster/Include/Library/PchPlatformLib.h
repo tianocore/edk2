@@ -117,5 +117,14 @@ PchAlternateAccessMode (
 
 **/
 ;
+UINT32
+DetectTurbotBoard (
+VOID
+  );
+
+UINT32
+DetectGpioPinValue (
+VOID
+  );
 
 #endif

@@ -62,6 +62,7 @@
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
   DxeServicesTableLib
+  PchPlatformLib
 
 [BuildOptions]
 

@@ -170,6 +170,9 @@ GetSetupVariable (
   UINTN                        VariableSize;
   EFI_STATUS                   Status;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI   *Variable;
+  UINT32                            PeiGpioValue;
+
+  PeiGpioValue = DetectGpioPinValue();
 
   VariableSize = sizeof (SYSTEM_CONFIGURATION);
   ZeroMem (SystemConfiguration, sizeof (SYSTEM_CONFIGURATION));
@@ -196,8 +199,8 @@ GetSetupVariable (
                        &VariableSize,
                        SystemConfiguration
                        );
-  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION)) {
-    //The setup variable is corrupted
+  if (EFI_ERROR (Status) || VariableSize != sizeof(SYSTEM_CONFIGURATION) || PeiGpioValue == 0) {
+    //The setup variable is corrupted or detect GPIO_S5_17 Pin is low
     VariableSize = sizeof(SYSTEM_CONFIGURATION);
     Status = Variable->GetVariable(
               Variable,
