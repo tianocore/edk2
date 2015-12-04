@@ -1442,7 +1442,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_EXACT1_IC:  MOP_IN(OP_EXACT1_IC);
       {
 	int len;
-	UChar *q, lowbuf[ONIGENC_MBC_CASE_FOLD_MAXLEN];
+	UChar *q1, lowbuf[ONIGENC_MBC_CASE_FOLD_MAXLEN];
 
 	DATA_ENSURE(1);
 	len = ONIGENC_MBC_CASE_FOLD(encode,
@@ -1450,12 +1450,12 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 		    case_fold_flag,
 		    &s, end, lowbuf);
 	DATA_ENSURE(0);
-	q = lowbuf;
+	q1 = lowbuf;
 	while (len-- > 0) {
-	  if (*p != *q) {
+	  if (*p != *q1) {
             goto fail;
           }
-	  p++; q++;
+	  p++; q1++;
 	}
       }
       MOP_OUT;
@@ -1531,7 +1531,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_EXACTN_IC:  MOP_IN(OP_EXACTN_IC);
       {
 	int len;
-	UChar *q, *endp, lowbuf[ONIGENC_MBC_CASE_FOLD_MAXLEN];
+	UChar *qn, *endp, lowbuf[ONIGENC_MBC_CASE_FOLD_MAXLEN];
 
 	GET_LENGTH_INC(tlen, p);
 	endp = p + tlen;
@@ -1544,10 +1544,10 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 		      case_fold_flag,
 		      &s, end, lowbuf);
 	  DATA_ENSURE(0);
-	  q = lowbuf;
+	  qn = lowbuf;
 	  while (len-- > 0) {
-	    if (*p != *q) goto fail;
-	    p++; q++;
+	    if (*p != *qn) goto fail;
+	    p++; qn++;
 	  }
 	}
       }
