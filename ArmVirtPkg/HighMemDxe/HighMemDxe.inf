@@ -1,0 +1,52 @@
+## @file
+#  High memory node enumeration DXE driver for ARM Virtual Machines
+#
+#  Copyright (c) 2015, Linaro Ltd. All rights reserved.
+#
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
+#  IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HighMemDxe
+  FILE_GUID                      = 63EA1463-FBFA-428A-B97F-E222755852D7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeHighMemDxe
+
+[Sources]
+  HighMemDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  UefiDriverEntryPoint
+  FdtLib
+  HobLib
+  DxeServicesTableLib
+
+[Guids]
+  gFdtHobGuid
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+
+[Depex]
+  gEfiCpuArchProtocolGuid
