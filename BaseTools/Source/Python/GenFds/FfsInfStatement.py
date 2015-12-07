@@ -174,6 +174,10 @@ class FfsInfStatement(FfsInfStatementClassObject):
         if ErrorCode != 0:
             EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
 
+        #
+        # Cache lower case version of INF path before processing FILE_GUID override
+        #
+        InfLowerPath = str(PathClassObj).lower()
         if self.OverrideGuid:
             PathClassObj = ProcessDuplicatedInf(PathClassObj, self.OverrideGuid, GenFdsGlobalVariable.WorkSpaceDir)
         if self.CurrentArch != None:
@@ -241,7 +245,6 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 continue
             # Override Patchable PCD value by the value from DSC
             PatchPcd = None
-            InfLowerPath = str(PathClassObj).lower()
             if InfLowerPath in DscModules and PcdKey in DscModules[InfLowerPath].Pcds:
                 PatchPcd = DscModules[InfLowerPath].Pcds[PcdKey]
             elif PcdKey in Platform.Pcds:
