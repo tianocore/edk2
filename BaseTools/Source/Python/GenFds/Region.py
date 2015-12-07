@@ -1,7 +1,7 @@
 ## @file
 # process FD Region generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -202,13 +202,20 @@ class Region(RegionClassObject):
                 for i in range(0, Size):
                     Buffer.write(pack('B', PadData))
 
-        if self.RegionType == 'FILE':
+        if self.RegionType in ('FILE', 'INF'):
             for RegionData in self.RegionDataList:
-                RegionData = GenFdsGlobalVariable.MacroExtend(RegionData, MacroDict)
-                if RegionData[1] != ':' :
-                    RegionData = mws.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
-                if not os.path.exists(RegionData):
-                    EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
+                if self.RegionType == 'INF':
+                    RegionData.__InfParse__(None)
+                    if len(RegionData.BinFileList) != 1:
+                        EdkLogger.error('GenFds', GENFDS_ERROR, 'INF in FD region can only contain one binary: %s' % RegionData)
+                    File = RegionData.BinFileList[0]
+                    RegionData = RegionData.PatchEfiFile(File.Path, File.Type)
+                else:
+                    RegionData = GenFdsGlobalVariable.MacroExtend(RegionData, MacroDict)
+                    if RegionData[1] != ':' :
+                        RegionData = os.path.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
+                    if not os.path.exists(RegionData):
+                        EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
                 #
                 # Add the file image into FD buffer
                 #

@@ -331,25 +331,63 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #           If passed in file does not end with efi, return as is
     #
     def PatchEfiFile(self, EfiFile, FileType):
+        #
+        # If the module does not have any patches, then return path to input file
+        #  
         if not self.PatchPcds:
             return EfiFile
+
+        #
+        # Only patch file if FileType is PE32 or ModuleType is USER_DEFINED
+        #  
         if FileType != 'PE32' and self.ModuleType != "USER_DEFINED":
             return EfiFile
+
+        #
+        # Generate path to patched output file
+        #
+        Basename = os.path.basename(EfiFile)
+        Output = os.path.normpath (os.path.join(self.OutputPath, Basename))
+
+        #
+        # If this file has already been patched, then return the path to the patched file
+        #
+        if self.PatchedBinFile == Output:
+          return Output
+
+        #
+        # If a different file from the same module has already been patched, then generate an error
+        #  
         if self.PatchedBinFile:
             EdkLogger.error("GenFds", GENFDS_ERROR,
                             'Only one binary file can be patched:\n'
                             '  a binary file has been patched: %s\n'
                             '  current file: %s' % (self.PatchedBinFile, EfiFile),
                             File=self.InfFileName)
-        Basename = os.path.basename(EfiFile)
-        Output = os.path.join(self.OutputPath, Basename)
+
+        #
+        # Copy unpatched file contents to output file location to perform patching
+        #  
         CopyLongFilePath(EfiFile, Output)
+
+        #
+        # Apply patches to patched output file
+        #  
         for Pcd, Value in self.PatchPcds:
             RetVal, RetStr = PatchBinaryFile(Output, int(Pcd.Offset, 0), Pcd.DatumType, Value, Pcd.MaxDatumSize)
             if RetVal:
                 EdkLogger.error("GenFds", GENFDS_ERROR, RetStr, File=self.InfFileName)
-        self.PatchedBinFile = os.path.normpath(EfiFile)
+
+        #
+        # Save the path of the patched output file
+        #  
+        self.PatchedBinFile = Output
+
+        #
+        # Return path to patched output file
+        #  
         return Output
+
     ## GenFfs() method
     #
     #   Generate FFS

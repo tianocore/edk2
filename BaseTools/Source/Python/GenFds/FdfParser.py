@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  This program and the accompanying materials
@@ -1846,7 +1846,7 @@ class FdfParser:
         if not self.__GetNextWord():
             return True
 
-        if not self.__Token in ("SET", "FV", "FILE", "DATA", "CAPSULE"):
+        if not self.__Token in ("SET", "FV", "FILE", "DATA", "CAPSULE", "INF"):
             #
             # If next token is a word which is not a valid FV type, it might be part of [PcdOffset[|PcdSize]]
             # Or it might be next region's offset described by an expression which starts with a PCD.
@@ -1887,17 +1887,27 @@ class FdfParser:
 
         elif self.__Token == "FILE":
             self.__UndoToken()
-            self.__GetRegionFileType( RegionObj)
+            self.__GetRegionFileType(RegionObj)
+
+        elif self.__Token == "INF":
+            self.__UndoToken()
+            RegionObj.RegionType = "INF"
+            while self.__IsKeyword("INF"):
+                self.__UndoToken()
+                ffsInf = self.__ParseInfStatement()
+                if not ffsInf:
+                    break
+                RegionObj.RegionDataList.append(ffsInf)
 
         elif self.__Token == "DATA":
             self.__UndoToken()
-            self.__GetRegionDataType( RegionObj)
+            self.__GetRegionDataType(RegionObj)
         else:
             self.__UndoToken()
             if self.__GetRegionLayout(Fd):
                 return True
             raise Warning("A valid region type was not found. "
-                          "Valid types are [SET, FV, CAPSULE, FILE, DATA]. This error occurred",
+                          "Valid types are [SET, FV, CAPSULE, FILE, DATA, INF]. This error occurred",
                           self.FileName, self.CurrentLineNumber)
 
         return True
@@ -2426,23 +2436,12 @@ class FdfParser:
         FvObj.AprioriSectionList.append(AprSectionObj)
         return True
 
-    ## __GetInfStatement() method
-    #
-    #   Get INF statements
-    #
-    #   @param  self        The object pointer
-    #   @param  Obj         for whom inf statement is got
-    #   @param  MacroDict   dictionary used to replace macro
-    #   @retval True        Successfully find inf statement
-    #   @retval False       Not able to find inf statement
-    #
-    def __GetInfStatement(self, Obj, ForCapsule = False, MacroDict = {}):
-
-        if not self.__IsKeyword( "INF"):
-            return False
+    def __ParseInfStatement(self):
+        if not self.__IsKeyword("INF"):
+            return None
 
         ffsInf = FfsInfStatement.FfsInfStatement()
-        self.__GetInfOptions( ffsInf)
+        self.__GetInfOptions(ffsInf)
 
         if not self.__GetNextToken():
             raise Warning("expected INF file path", self.FileName, self.CurrentLineNumber)
@@ -2472,7 +2471,23 @@ class FdfParser:
                 ffsInf.KeepReloc = True
             else:
                 raise Warning("Unknown reloc strip flag '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-        
+        return ffsInf
+
+    ## __GetInfStatement() method
+    #
+    #   Get INF statements
+    #
+    #   @param  self        The object pointer
+    #   @param  Obj         for whom inf statement is got
+    #   @param  MacroDict   dictionary used to replace macro
+    #   @retval True        Successfully find inf statement
+    #   @retval False       Not able to find inf statement
+    #
+    def __GetInfStatement(self, Obj, ForCapsule=False, MacroDict={}):
+        ffsInf = self.__ParseInfStatement()
+        if not ffsInf:
+            return False
+
         if ForCapsule:
             capsuleFfs = CapsuleData.CapsuleFfs()
             capsuleFfs.Ffs = ffsInf
