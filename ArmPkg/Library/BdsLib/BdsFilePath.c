@@ -752,14 +752,14 @@ BdsPxeLoadImage (
     return Status;
   }
 
-  Status = LoadFileProtocol->LoadFile (LoadFileProtocol, *DevicePath, TRUE, &BufferSize, NULL);
+  Status = LoadFileProtocol->LoadFile (LoadFileProtocol, RemainingDevicePath, TRUE, &BufferSize, NULL);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Status = gBS->AllocatePages (Type, EfiBootServicesCode, EFI_SIZE_TO_PAGES(BufferSize), Image);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    Status = LoadFileProtocol->LoadFile (LoadFileProtocol, *DevicePath, TRUE, &BufferSize, (VOID*)(UINTN)(*Image));
+    Status = LoadFileProtocol->LoadFile (LoadFileProtocol, RemainingDevicePath, TRUE, &BufferSize, (VOID*)(UINTN)(*Image));
     if (!EFI_ERROR (Status) && (ImageSize != NULL)) {
       *ImageSize = BufferSize;
     }
