@@ -555,10 +555,10 @@ TransitionFromAuditMode(
   )
 {
   EFI_STATUS  Status;
-  UINT8       *AuditVarData;
-  UINT8       *DeployedVarData;
-  UINT8       *SetupVarData;
-  UINT8       *SecureBootVarData;
+  VOID        *AuditVarData;
+  VOID        *DeployedVarData;
+  VOID        *SetupVarData;
+  VOID        *SecureBootVarData;
   UINT8       SecureBootEnable;
   UINTN       DataSize;
 
@@ -693,9 +693,9 @@ TransitionFromDeployedMode(
   )
 {
   EFI_STATUS  Status;
-  UINT8       *DeployedVarData;
-  UINT8       *SetupVarData;
-  UINT8       *SecureBootVarData;
+  VOID        *DeployedVarData;
+  VOID        *SetupVarData;
+  VOID        *SecureBootVarData;
   UINT8       SecureBootEnable;
   UINTN       DataSize;
 
@@ -835,11 +835,11 @@ TransitionFromUserMode(
   )
 {
   EFI_STATUS   Status;
-  UINT8        *AuditVarData;
-  UINT8        *DeployedVarData;
-  UINT8        *SetupVarData;
-  UINT8        *PkVarData;
-  UINT8        *SecureBootVarData;
+  VOID         *AuditVarData;
+  VOID         *DeployedVarData;
+  VOID         *SetupVarData;
+  VOID         *PkVarData;
+  VOID         *SecureBootVarData;
   UINT8        SecureBootEnable;
   UINTN        DataSize;
   VARIABLE_ENTRY_CONSISTENCY  VariableEntry;
@@ -1034,9 +1034,9 @@ TransitionFromSetupMode(
   )
 {
   EFI_STATUS   Status;
-  UINT8        *AuditVarData;
-  UINT8        *SetupVarData;
-  UINT8        *SecureBootVarData;
+  VOID         *AuditVarData;
+  VOID         *SetupVarData;
+  VOID         *SecureBootVarData;
   UINT8        SecureBootEnable;
   UINTN        DataSize;
 
@@ -1746,7 +1746,7 @@ ProcessSecureBootModeVar (
   )
 {
   EFI_STATUS    Status;
-  UINT8         *VarData;
+  VOID          *VarData;
   UINTN         VarDataSize;
 
   //
@@ -1801,7 +1801,7 @@ ProcessSecureBootModeVar (
   //
   // If AuditMode/DeployedMode is assigned same value. Simply return EFI_SUCCESS
   //
-  if (*VarData == *(UINT8 *)Data) {
+  if (*(UINT8 *)VarData == *(UINT8 *)Data) {
     return EFI_SUCCESS;
   }
 
