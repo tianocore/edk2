@@ -133,7 +133,7 @@ DebugAssert (
   //
   // Generate the ASSERT() message in Ascii format
   //
-  AsciiSPrint (Buffer, sizeof (Buffer), "ASSERT %a(%d): %a\n", FileName, LineNumber, Description);
+  AsciiSPrint (Buffer, sizeof (Buffer), "ASSERT [%a] %a(%d): %a\n", gEfiCallerBaseName, FileName, LineNumber, Description);
 
   //
   // Send the print string to the Console Output device

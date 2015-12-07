@@ -122,7 +122,8 @@ DebugAssert (
   UnicodeSPrintAsciiFormat (
     Buffer, 
     sizeof (Buffer),
-    "ASSERT %a(%d): %a\n", 
+    "ASSERT [%a] %a(%d): %a\n",
+    gEfiCallerBaseName,
     FileName, 
     LineNumber, 
     Description
