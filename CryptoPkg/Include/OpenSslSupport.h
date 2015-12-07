@@ -139,7 +139,7 @@ struct tm {
 struct timeval {
   long tv_sec;      /* time value, in seconds */
   long tv_usec;     /* time value, in microseconds */
-} timeval;
+};
 
 struct dirent {
   UINT32  d_fileno;         /* file number of entry */
