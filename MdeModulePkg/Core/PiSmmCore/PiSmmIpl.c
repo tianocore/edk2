@@ -246,6 +246,8 @@ BOOLEAN                    mSmmLocked = FALSE;
 EFI_PHYSICAL_ADDRESS       mSmramCacheBase;
 UINT64                     mSmramCacheSize;
 
+EFI_SMM_COMMUNICATE_HEADER mCommunicateHeader;
+
 //
 // Table of Protocol notification and GUIDed Event notifications that the SMM IPL requires
 //
@@ -538,21 +540,20 @@ SmmIplGuidedEventNotify (
   IN VOID       *Context
   )
 {
-  EFI_SMM_COMMUNICATE_HEADER  CommunicateHeader;
   UINTN                       Size;
 
   //
   // Use Guid to initialize EFI_SMM_COMMUNICATE_HEADER structure 
   //
-  CopyGuid (&CommunicateHeader.HeaderGuid, (EFI_GUID *)Context);
-  CommunicateHeader.MessageLength = 1;
-  CommunicateHeader.Data[0] = 0;
+  CopyGuid (&mCommunicateHeader.HeaderGuid, (EFI_GUID *)Context);
+  mCommunicateHeader.MessageLength = 1;
+  mCommunicateHeader.Data[0] = 0;
 
   //
   // Generate the Software SMI and return the result
   //
-  Size = sizeof (CommunicateHeader);
-  SmmCommunicationCommunicate (&mSmmCommunication, &CommunicateHeader, &Size);
+  Size = sizeof (mCommunicateHeader);
+  SmmCommunicationCommunicate (&mSmmCommunication, &mCommunicateHeader, &Size);
 }
 
 /**
@@ -569,7 +570,6 @@ SmmIplDxeDispatchEventNotify (
   IN VOID       *Context
   )
 {
-  EFI_SMM_COMMUNICATE_HEADER  CommunicateHeader;
   UINTN                       Size;
   EFI_STATUS                  Status;
 
@@ -582,20 +582,20 @@ SmmIplDxeDispatchEventNotify (
     // Clear the buffer passed into the Software SMI.  This buffer will return
     // the status of the SMM Core Dispatcher.
     //
-    CopyGuid (&CommunicateHeader.HeaderGuid, (EFI_GUID *)Context);
-    CommunicateHeader.MessageLength = 1;
-    CommunicateHeader.Data[0] = 0;
+    CopyGuid (&mCommunicateHeader.HeaderGuid, (EFI_GUID *)Context);
+    mCommunicateHeader.MessageLength = 1;
+    mCommunicateHeader.Data[0] = 0;
 
     //
     // Generate the Software SMI and return the result
     //
-    Size = sizeof (CommunicateHeader);
-    SmmCommunicationCommunicate (&mSmmCommunication, &CommunicateHeader, &Size);
+    Size = sizeof (mCommunicateHeader);
+    SmmCommunicationCommunicate (&mSmmCommunication, &mCommunicateHeader, &Size);
     
     //
     // Return if there is no request to restart the SMM Core Dispatcher
     //
-    if (CommunicateHeader.Data[0] != COMM_BUFFER_SMM_DISPATCH_RESTART) {
+    if (mCommunicateHeader.Data[0] != COMM_BUFFER_SMM_DISPATCH_RESTART) {
       return;
     }
       
