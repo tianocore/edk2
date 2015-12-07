@@ -28,6 +28,7 @@ extern EFI_GUID gEfiSecureBootEnableDisableGuid;
 extern EFI_GUID gEfiCertDbGuid;
 extern EFI_GUID gEfiCustomModeEnableGuid;
 extern EFI_GUID gEfiVendorKeysNvGuid;
+extern EFI_GUID gEdkiiSecureBootModeGuid;
 
 ///
 /// "SecureBootEnable" variable for the Secure Boot feature enable/disable.
