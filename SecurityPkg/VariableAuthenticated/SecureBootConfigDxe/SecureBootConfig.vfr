@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the SecureBoot configuration component.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,6 +32,14 @@ formset
     title = STRING_TOKEN(STR_SECUREBOOT_TITLE);
 
     subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Display current secure boot mode(one of SetupMode/AuditMode/UserMode/DeployedMode)
+    //
+    text
+      help   = STRING_TOKEN(STR_CUR_SECURE_BOOT_MODE_HELP),
+      text   = STRING_TOKEN(STR_CUR_SECURE_BOOT_MODE_PROMPT),
+        text   = STRING_TOKEN(STR_CUR_SECURE_BOOT_MODE_CONTENT);
 
     text
       help   = STRING_TOKEN(STR_SECURE_BOOT_STATE_HELP),
@@ -84,18 +92,18 @@ formset
       endoneof;
 
     //
-    //
-    // Display of 'Current Secure Boot Mode'
+    // Display PK include page
     //
     suppressif questionref(SecureBootMode) == SECURE_BOOT_MODE_STANDARD;
-      grayoutif NOT ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 1;
-      goto FORMID_SECURE_BOOT_OPTION_FORM,
-           prompt = STRING_TOKEN(STR_SECURE_BOOT_OPTION),
-           help   = STRING_TOKEN(STR_SECURE_BOOT_OPTION_HELP),
-           flags  = INTERACTIVE,
-           key    = KEY_SECURE_BOOT_OPTION;
-      endif;
+    grayoutif NOT ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 1;
+    goto FORMID_SECURE_BOOT_OPTION_FORM,
+         prompt = STRING_TOKEN(STR_SECURE_BOOT_OPTION),
+         help   = STRING_TOKEN(STR_SECURE_BOOT_OPTION_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_SECURE_BOOT_OPTION;
     endif;
+    endif;
+
   endform;
 
   //
@@ -103,6 +111,55 @@ formset
   //
   form formid = FORMID_SECURE_BOOT_OPTION_FORM,
     title  = STRING_TOKEN(STR_SECURE_BOOT_OPTION_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Display of SetupMode/UserMode/AuditMode/DeployedMode transition
+    //
+    disableif TRUE;
+      oneof varid  = SECUREBOOT_CONFIGURATION.TransSecureBootMode,
+            prompt = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_PROMPT),
+            help   = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_HELP),
+            flags  = INTERACTIVE,
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE
+              OR (ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE AND
+                  ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 0);
+            option text = STRING_TOKEN(STR_USER_MODE),     value = SECURE_BOOT_MODE_USER_MODE,   flags = 0;
+      endif
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE;
+            option text = STRING_TOKEN(STR_SETUP_MODE),    value = SECURE_BOOT_MODE_SETUP_MODE,  flags = 0;
+      endif
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE;
+            option text = STRING_TOKEN(STR_AUDIT_MODE),    value = SECURE_BOOT_MODE_AUDIT_MODE,  flags = 0;
+      endif
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE;
+            option text = STRING_TOKEN(STR_DEPLOYED_MODE), value = SECURE_BOOT_MODE_DEPLOYED_MODE,  flags = 0;
+      endif
+            option text = STRING_TOKEN(STR_DEPLOYED_MODE), value = 4,  flags = 0;
+      endoneof;
+    endif;
+      oneof name   = TransSecureBootMode,
+            questionid = KEY_TRANS_SECURE_BOOT_MODE,
+            prompt = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_PROMPT),
+            help   = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_HELP),
+            flags  = INTERACTIVE | NUMERIC_SIZE_1,
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE 
+              OR (ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE AND
+                  ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 0);
+            option text = STRING_TOKEN(STR_USER_MODE),     value = SECURE_BOOT_MODE_USER_MODE,   flags = 0;
+      endif
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE;
+            option text = STRING_TOKEN(STR_SETUP_MODE),    value = SECURE_BOOT_MODE_SETUP_MODE,  flags = 0;
+      endif
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE;
+            option text = STRING_TOKEN(STR_AUDIT_MODE),    value = SECURE_BOOT_MODE_AUDIT_MODE,  flags = 0;
+      endif
+      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE;
+            option text = STRING_TOKEN(STR_DEPLOYED_MODE), value = SECURE_BOOT_MODE_DEPLOYED_MODE,  flags = 0;
+      endif
+
+      endoneof;
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
