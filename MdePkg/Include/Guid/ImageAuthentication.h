@@ -43,9 +43,12 @@
 
 #define SECURE_BOOT_MODE_ENABLE           1
 #define SECURE_BOOT_MODE_DISABLE          0
-#define SETUP_MODE                        1
-#define USER_MODE                         0
-
+#define SETUP_MODE_ENABLE                 1
+#define SETUP_MODE_DISABLE                0
+#define DEPLOYED_MODE_ENABLE              1
+#define DEPLOYED_MODE_DISABLE             0
+#define AUDIT_MODE_ENABLE                 1
+#define AUDIT_MODE_DISABLE                0
 
 //***********************************************************************
 // Signature Database
