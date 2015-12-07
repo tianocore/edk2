@@ -1389,11 +1389,11 @@ class FdReport(object):
         self.FdRegionList = [FdRegionReport(FdRegion, Wa) for FdRegion in Fd.RegionList]
         self.FvPath = os.path.join(Wa.BuildDir, "FV")
         self.VpdFilePath = os.path.join(self.FvPath, "%s.map" % Wa.Platform.VpdToolGuid)
-        VpdPcdToken = 'gEfiMdeModulePkgTokenSpaceGuid'
-        VpdPcdName = 'PcdVpdBaseAddress'
+        self.VPDBaseAddress = 0
+        self.VPDSize = 0
         self.VPDInfoList = []
         for index, FdRegion in enumerate(Fd.RegionList):
-            if (VpdPcdName, VpdPcdToken) == FdRegion.PcdOffset:
+            if str(FdRegion.RegionType) is 'FILE' and Wa.Platform.VpdToolGuid in str(FdRegion.RegionDataList):
                 self.VPDBaseAddress = self.FdRegionList[index].BaseAddress
                 self.VPDSize = self.FdRegionList[index].Size
                 break
