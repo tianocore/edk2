@@ -1756,6 +1756,8 @@ MtrrSetVariableMtrr (
   PreMtrrChange (&MtrrContext);
   MtrrSetVariableMtrrWorker (VariableSettings);
   PostMtrrChange (&MtrrContext);
+  MtrrDebugPrintAllMtrrs ();
+
   return  VariableSettings;
 }
 
@@ -1804,6 +1806,7 @@ MtrrSetFixedMtrr (
   PreMtrrChange (&MtrrContext);
   MtrrSetFixedMtrrWorker (FixedSettings);
   PostMtrrChange (&MtrrContext);
+  MtrrDebugPrintAllMtrrs ();
 
   return FixedSettings;
 }
@@ -1888,8 +1891,11 @@ MtrrSetAllMtrrs (
 
   PostMtrrChangeEnableCache (&MtrrContext);
 
+  MtrrDebugPrintAllMtrrs ();
+
   return MtrrSetting;
 }
+
 
 /**
   Checks if MTRR is supported.
