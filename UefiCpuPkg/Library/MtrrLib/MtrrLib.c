@@ -311,6 +311,103 @@ PostMtrrChange (
   PostMtrrChangeEnableCache (MtrrContext);
 }
 
+/**
+  Worker function gets the content in fixed MTRRs
+
+  @param[out]  FixedSettings  A buffer to hold fixed MTRRs content.
+
+  @retval The pointer of FixedSettings
+
+**/
+MTRR_FIXED_SETTINGS*
+MtrrGetFixedMtrrWorker (
+  OUT MTRR_FIXED_SETTINGS         *FixedSettings
+  )
+{
+  UINT32  Index;
+
+  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+      FixedSettings->Mtrr[Index] =
+        AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
+  }
+
+  return FixedSettings;
+}
+
+
+/**
+  This function gets the content in fixed MTRRs
+
+  @param[out]  FixedSettings  A buffer to hold fixed MTRRs content.
+
+  @retval The pointer of FixedSettings
+
+**/
+MTRR_FIXED_SETTINGS*
+EFIAPI
+MtrrGetFixedMtrr (
+  OUT MTRR_FIXED_SETTINGS         *FixedSettings
+  )
+{
+  if (!IsMtrrSupported ()) {
+    return FixedSettings;
+  }
+
+  return MtrrGetFixedMtrrWorker (FixedSettings);
+}
+
+
+/**
+  Worker function will get the raw value in variable MTRRs
+
+  @param[out] VariableSettings   A buffer to hold variable MTRRs content.
+
+  @return The VariableSettings input pointer
+
+**/
+MTRR_VARIABLE_SETTINGS*
+MtrrGetVariableMtrrWorker (
+  OUT MTRR_VARIABLE_SETTINGS  *VariableSettings
+  )
+{
+  UINT32  Index;
+  UINT32  VariableMtrrCount;
+
+  VariableMtrrCount = GetVariableMtrrCount ();
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+
+  for (Index = 0; Index < VariableMtrrCount; Index++) {
+    VariableSettings->Mtrr[Index].Base =
+      AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1));
+    VariableSettings->Mtrr[Index].Mask =
+      AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1);
+  }
+
+  return  VariableSettings;
+}
+
+/**
+  This function will get the raw value in variable MTRRs
+
+  @param[out]  VariableSettings   A buffer to hold variable MTRRs content.
+
+  @return The VariableSettings input pointer
+
+**/
+MTRR_VARIABLE_SETTINGS*
+EFIAPI
+MtrrGetVariableMtrr (
+  OUT MTRR_VARIABLE_SETTINGS         *VariableSettings
+  )
+{
+  if (!IsMtrrSupported ()) {
+    return VariableSettings;
+  }
+
+  return MtrrGetVariableMtrrWorker (
+           VariableSettings
+           );
+}
 
 /**
   Programs fixed MTRRs registers.
@@ -965,6 +1062,248 @@ MtrrPrecedence (
 }
 
 
+
+/**
+  This function will get the memory cache type of the specific address.
+
+  This function is mainly for debug purpose.
+
+  @param[in]  Address            The specific address
+
+  @return Memory cache type of the specific address
+
+**/
+MTRR_MEMORY_CACHE_TYPE
+EFIAPI
+MtrrGetMemoryAttribute (
+  IN PHYSICAL_ADDRESS   Address
+  )
+{
+  UINT64                  TempQword;
+  UINTN                   Index;
+  UINTN                   SubIndex;
+  UINT64                  MtrrType;
+  UINT64                  TempMtrrType;
+  MTRR_MEMORY_CACHE_TYPE  CacheType;
+  VARIABLE_MTRR           VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
+  UINT64                  MtrrValidBitsMask;
+  UINT64                  MtrrValidAddressMask;
+  UINTN                   VariableMtrrCount;
+
+  if (!IsMtrrSupported ()) {
+    return CacheUncacheable;
+  }
+
+  //
+  // Check if MTRR is enabled, if not, return UC as attribute
+  //
+  TempQword = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
+  MtrrType = MTRR_CACHE_INVALID_TYPE;
+
+  if ((TempQword & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+    return CacheUncacheable;
+  }
+
+  //
+  // If address is less than 1M, then try to go through the fixed MTRR
+  //
+  if (Address < BASE_1MB) {
+    if ((TempQword & MTRR_LIB_CACHE_FIXED_MTRR_ENABLED) != 0) {
+      //
+      // Go through the fixed MTRR
+      //
+      for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+         if (Address >= mMtrrLibFixedMtrrTable[Index].BaseAddress &&
+             Address  < (
+                          mMtrrLibFixedMtrrTable[Index].BaseAddress +
+                          (mMtrrLibFixedMtrrTable[Index].Length * 8)
+                        )
+            ) {
+           SubIndex =
+             ((UINTN)Address - mMtrrLibFixedMtrrTable[Index].BaseAddress) /
+               mMtrrLibFixedMtrrTable[Index].Length;
+           TempQword = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
+           MtrrType =  RShiftU64 (TempQword, SubIndex * 8) & 0xFF;
+           return GetMemoryCacheTypeFromMtrrType (MtrrType);
+         }
+      }
+    }
+  }
+  MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
+  MtrrGetMemoryAttributeInVariableMtrr(
+    MtrrValidBitsMask,
+    MtrrValidAddressMask,
+    VariableMtrr
+    );
+
+  //
+  // Go through the variable MTRR
+  //
+  VariableMtrrCount = GetVariableMtrrCount ();
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+
+  for (Index = 0; Index < VariableMtrrCount; Index++) {
+    if (VariableMtrr[Index].Valid) {
+      if (Address >= VariableMtrr[Index].BaseAddress &&
+          Address < VariableMtrr[Index].BaseAddress+VariableMtrr[Index].Length) {
+        TempMtrrType = VariableMtrr[Index].Type;
+        MtrrType = MtrrPrecedence (MtrrType, TempMtrrType);
+      }
+    }
+  }
+  CacheType = GetMemoryCacheTypeFromMtrrType (MtrrType);
+
+  return CacheType;
+}
+
+
+
+/**
+  This function prints all MTRRs for debugging.
+**/
+VOID
+EFIAPI
+MtrrDebugPrintAllMtrrs (
+  VOID
+  )
+{
+  DEBUG_CODE (
+    MTRR_SETTINGS  MtrrSettings;
+    UINTN          Index;
+    UINTN          Index1;
+    UINTN          VariableMtrrCount;
+    UINT64         Base;
+    UINT64         Limit;
+    UINT64         MtrrBase;
+    UINT64         MtrrLimit;
+    UINT64         RangeBase;
+    UINT64         RangeLimit;
+    UINT64         NoRangeBase;
+    UINT64         NoRangeLimit;
+    UINT32         RegEax;
+    UINTN          MemoryType;
+    UINTN          PreviousMemoryType;
+    BOOLEAN        Found;
+
+    if (!IsMtrrSupported ()) {
+      return;
+    }
+
+    DEBUG((DEBUG_CACHE, "MTRR Settings\n"));
+    DEBUG((DEBUG_CACHE, "=============\n"));
+
+    MtrrGetAllMtrrs (&MtrrSettings);
+    DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", MtrrSettings.MtrrDefType));
+    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+      DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, MtrrSettings.Fixed.Mtrr[Index]));
+    }
+
+    VariableMtrrCount = GetVariableMtrrCount ();
+    for (Index = 0; Index < VariableMtrrCount; Index++) {
+      DEBUG((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
+        Index,
+        MtrrSettings.Variables.Mtrr[Index].Base,
+        MtrrSettings.Variables.Mtrr[Index].Mask
+        ));
+    }
+    DEBUG((DEBUG_CACHE, "\n"));
+    DEBUG((DEBUG_CACHE, "MTRR Ranges\n"));
+    DEBUG((DEBUG_CACHE, "====================================\n"));
+
+    Base = 0;
+    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
+    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+      Base = mMtrrLibFixedMtrrTable[Index].BaseAddress;
+      for (Index1 = 0; Index1 < 8; Index1++) {
+      MemoryType = (UINTN)(RShiftU64 (MtrrSettings.Fixed.Mtrr[Index], Index1 * 8) & 0xff);
+        if (MemoryType > CacheWriteBack) {
+          MemoryType = MTRR_CACHE_INVALID_TYPE;
+        }
+        if (MemoryType != PreviousMemoryType) {
+          if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
+            DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
+          }
+          PreviousMemoryType = MemoryType;
+          DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
+        }
+        Base += mMtrrLibFixedMtrrTable[Index].Length;
+      }
+    }
+    DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
+
+    VariableMtrrCount = GetVariableMtrrCount ();
+
+    Limit        = BIT36 - 1;
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000008) {
+      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+      Limit = LShiftU64 (1, RegEax & 0xff) - 1;
+    }
+    Base = BASE_1MB;
+    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
+    do {
+      MemoryType = MtrrGetMemoryAttribute (Base);
+      if (MemoryType > CacheWriteBack) {
+        MemoryType = MTRR_CACHE_INVALID_TYPE;
+      }
+
+      if (MemoryType != PreviousMemoryType) {
+        if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
+          DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
+        }
+        PreviousMemoryType = MemoryType;
+        DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
+      }
+
+      RangeBase    = BASE_1MB;
+      NoRangeBase  = BASE_1MB;
+      RangeLimit   = Limit;
+      NoRangeLimit = Limit;
+
+      for (Index = 0, Found = FALSE; Index < VariableMtrrCount; Index++) {
+        if ((MtrrSettings.Variables.Mtrr[Index].Mask & BIT11) == 0) {
+          //
+          // If mask is not valid, then do not display range
+          //
+          continue;
+        }
+        MtrrBase  = (MtrrSettings.Variables.Mtrr[Index].Base & (~(SIZE_4KB - 1)));
+        MtrrLimit = MtrrBase + ((~(MtrrSettings.Variables.Mtrr[Index].Mask & (~(SIZE_4KB - 1)))) & Limit);
+
+        if (Base >= MtrrBase && Base < MtrrLimit) {
+          Found = TRUE;
+        }
+
+        if (Base >= MtrrBase && MtrrBase > RangeBase) {
+          RangeBase = MtrrBase;
+        }
+        if (Base > MtrrLimit && MtrrLimit > RangeBase) {
+          RangeBase = MtrrLimit + 1;
+        }
+        if (Base < MtrrBase && MtrrBase < RangeLimit) {
+          RangeLimit = MtrrBase - 1;
+        }
+        if (Base < MtrrLimit && MtrrLimit <= RangeLimit) {
+          RangeLimit = MtrrLimit;
+        }
+
+        if (Base > MtrrLimit && NoRangeBase < MtrrLimit) {
+          NoRangeBase = MtrrLimit + 1;
+        }
+        if (Base < MtrrBase && NoRangeLimit > MtrrBase) {
+          NoRangeLimit = MtrrBase - 1;
+        }
+      }
+
+      if (Found) {
+        Base = RangeLimit + 1;
+      } else {
+        Base = NoRangeLimit + 1;
+      }
+    } while (Base < Limit);
+    DEBUG((DEBUG_CACHE, "%016lx\n\n", Base - 1));
+  );
+}
 /**
   This function attempts to set the attributes for a memory range.
 
@@ -1236,155 +1575,6 @@ Done:
 
   return Status;
 }
-
-
-/**
-  This function will get the memory cache type of the specific address.
-
-  This function is mainly for debug purpose.
-
-  @param[in]  Address            The specific address
-
-  @return Memory cache type of the specific address
-
-**/
-MTRR_MEMORY_CACHE_TYPE
-EFIAPI
-MtrrGetMemoryAttribute (
-  IN PHYSICAL_ADDRESS   Address
-  )
-{
-  UINT64                  TempQword;
-  UINTN                   Index;
-  UINTN                   SubIndex;
-  UINT64                  MtrrType;
-  UINT64                  TempMtrrType;
-  MTRR_MEMORY_CACHE_TYPE  CacheType;
-  VARIABLE_MTRR           VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
-  UINT64                  MtrrValidBitsMask;
-  UINT64                  MtrrValidAddressMask;
-  UINTN                   VariableMtrrCount;
-
-  if (!IsMtrrSupported ()) {
-    return CacheUncacheable;
-  }
-
-  //
-  // Check if MTRR is enabled, if not, return UC as attribute
-  //
-  TempQword = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
-  MtrrType = MTRR_CACHE_INVALID_TYPE;
-
-  if ((TempQword & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
-    return CacheUncacheable;
-  }
-
-  //
-  // If address is less than 1M, then try to go through the fixed MTRR
-  //
-  if (Address < BASE_1MB) {
-    if ((TempQword & MTRR_LIB_CACHE_FIXED_MTRR_ENABLED) != 0) {
-      //
-      // Go through the fixed MTRR
-      //
-      for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-         if (Address >= mMtrrLibFixedMtrrTable[Index].BaseAddress &&
-             Address  < (
-                          mMtrrLibFixedMtrrTable[Index].BaseAddress +
-                          (mMtrrLibFixedMtrrTable[Index].Length * 8)
-                        )
-            ) {
-           SubIndex =
-             ((UINTN)Address - mMtrrLibFixedMtrrTable[Index].BaseAddress) /
-               mMtrrLibFixedMtrrTable[Index].Length;
-           TempQword = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
-           MtrrType =  RShiftU64 (TempQword, SubIndex * 8) & 0xFF;
-           return GetMemoryCacheTypeFromMtrrType (MtrrType);
-         }
-      }
-    }
-  }
-  MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
-  MtrrGetMemoryAttributeInVariableMtrr(
-    MtrrValidBitsMask,
-    MtrrValidAddressMask,
-    VariableMtrr
-    );
-
-  //
-  // Go through the variable MTRR
-  //
-  VariableMtrrCount = GetVariableMtrrCount ();
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
-
-  for (Index = 0; Index < VariableMtrrCount; Index++) {
-    if (VariableMtrr[Index].Valid) {
-      if (Address >= VariableMtrr[Index].BaseAddress &&
-          Address < VariableMtrr[Index].BaseAddress+VariableMtrr[Index].Length) {
-        TempMtrrType = VariableMtrr[Index].Type;
-        MtrrType = MtrrPrecedence (MtrrType, TempMtrrType);
-      }
-    }
-  }
-  CacheType = GetMemoryCacheTypeFromMtrrType (MtrrType);
-
-  return CacheType;
-}
-
-
-/**
-  Worker function will get the raw value in variable MTRRs
-
-  @param[out] VariableSettings   A buffer to hold variable MTRRs content.
-
-  @return The VariableSettings input pointer
-
-**/
-MTRR_VARIABLE_SETTINGS*
-MtrrGetVariableMtrrWorker (
-  OUT MTRR_VARIABLE_SETTINGS  *VariableSettings
-  )
-{
-  UINT32  Index;
-  UINT32  VariableMtrrCount;
-
-  VariableMtrrCount = GetVariableMtrrCount ();
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
-
-  for (Index = 0; Index < VariableMtrrCount; Index++) {
-    VariableSettings->Mtrr[Index].Base =
-      AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1));
-    VariableSettings->Mtrr[Index].Mask =
-      AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1);
-  }
-
-  return  VariableSettings;
-}
-
-/**
-  This function will get the raw value in variable MTRRs
-
-  @param[out]  VariableSettings   A buffer to hold variable MTRRs content.
-
-  @return The VariableSettings input pointer
-
-**/
-MTRR_VARIABLE_SETTINGS*
-EFIAPI
-MtrrGetVariableMtrr (
-  OUT MTRR_VARIABLE_SETTINGS         *VariableSettings
-  )
-{
-  if (!IsMtrrSupported ()) {
-    return VariableSettings;
-  }
-
-  return MtrrGetVariableMtrrWorker (
-           VariableSettings
-           );
-}
-
-
 /**
   Worker function setting variable MTRRs
 
@@ -1439,51 +1629,6 @@ MtrrSetVariableMtrr (
   MtrrSetVariableMtrrWorker (VariableSettings);
   PostMtrrChange (&MtrrContext);
   return  VariableSettings;
-}
-
-/**
-  Worker function gets the content in fixed MTRRs
-
-  @param[out]  FixedSettings  A buffer to hold fixed MTRRs content.
-
-  @retval The pointer of FixedSettings
-
-**/
-MTRR_FIXED_SETTINGS*
-MtrrGetFixedMtrrWorker (
-  OUT MTRR_FIXED_SETTINGS         *FixedSettings
-  )
-{
-  UINT32  Index;
-
-  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-      FixedSettings->Mtrr[Index] =
-        AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
-  }
-
-  return FixedSettings;
-}
-
-
-/**
-  This function gets the content in fixed MTRRs
-
-  @param[out]  FixedSettings  A buffer to hold fixed MTRRs content.
-
-  @retval The pointer of FixedSettings
-
-**/
-MTRR_FIXED_SETTINGS*
-EFIAPI
-MtrrGetFixedMtrr (
-  OUT MTRR_FIXED_SETTINGS         *FixedSettings
-  )
-{
-  if (!IsMtrrSupported ()) {
-    return FixedSettings;
-  }
-
-  return MtrrGetFixedMtrrWorker (FixedSettings);
 }
 
 /**
@@ -1613,153 +1758,6 @@ MtrrSetAllMtrrs (
   PostMtrrChangeEnableCache (&MtrrContext);
 
   return MtrrSetting;
-}
-
-/**
-  This function prints all MTRRs for debugging.
-**/
-VOID
-EFIAPI
-MtrrDebugPrintAllMtrrs (
-  VOID
-  )
-{
-  DEBUG_CODE (
-    MTRR_SETTINGS  MtrrSettings;
-    UINTN          Index;
-    UINTN          Index1;
-    UINTN          VariableMtrrCount;
-    UINT64         Base;
-    UINT64         Limit;
-    UINT64         MtrrBase;
-    UINT64         MtrrLimit;
-    UINT64         RangeBase;
-    UINT64         RangeLimit;
-    UINT64         NoRangeBase;
-    UINT64         NoRangeLimit;
-    UINT32         RegEax;
-    UINTN          MemoryType;
-    UINTN          PreviousMemoryType;
-    BOOLEAN        Found;
-
-    if (!IsMtrrSupported ()) {
-      return;
-    }
-
-    DEBUG((DEBUG_CACHE, "MTRR Settings\n"));
-    DEBUG((DEBUG_CACHE, "=============\n"));
-
-    MtrrGetAllMtrrs (&MtrrSettings);
-    DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", MtrrSettings.MtrrDefType));
-    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-      DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, MtrrSettings.Fixed.Mtrr[Index]));
-    }
-
-    VariableMtrrCount = GetVariableMtrrCount ();
-    for (Index = 0; Index < VariableMtrrCount; Index++) {
-      DEBUG((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
-        Index,
-        MtrrSettings.Variables.Mtrr[Index].Base,
-        MtrrSettings.Variables.Mtrr[Index].Mask
-        ));
-    }
-    DEBUG((DEBUG_CACHE, "\n"));
-    DEBUG((DEBUG_CACHE, "MTRR Ranges\n"));
-    DEBUG((DEBUG_CACHE, "====================================\n"));
-
-    Base = 0;
-    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
-    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-      Base = mMtrrLibFixedMtrrTable[Index].BaseAddress;
-      for (Index1 = 0; Index1 < 8; Index1++) {
-      MemoryType = (UINTN)(RShiftU64 (MtrrSettings.Fixed.Mtrr[Index], Index1 * 8) & 0xff);
-        if (MemoryType > CacheWriteBack) {
-          MemoryType = MTRR_CACHE_INVALID_TYPE;
-        }
-        if (MemoryType != PreviousMemoryType) {
-          if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
-            DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-          }
-          PreviousMemoryType = MemoryType;
-          DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
-        }
-        Base += mMtrrLibFixedMtrrTable[Index].Length;
-      }
-    }
-    DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-
-    VariableMtrrCount = GetVariableMtrrCount ();
-
-    Limit        = BIT36 - 1;
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      Limit = LShiftU64 (1, RegEax & 0xff) - 1;
-    }
-    Base = BASE_1MB;
-    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
-    do {
-      MemoryType = MtrrGetMemoryAttribute (Base);
-      if (MemoryType > CacheWriteBack) {
-        MemoryType = MTRR_CACHE_INVALID_TYPE;
-      }
-
-      if (MemoryType != PreviousMemoryType) {
-        if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
-          DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-        }
-        PreviousMemoryType = MemoryType;
-        DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
-      }
-
-      RangeBase    = BASE_1MB;
-      NoRangeBase  = BASE_1MB;
-      RangeLimit   = Limit;
-      NoRangeLimit = Limit;
-
-      for (Index = 0, Found = FALSE; Index < VariableMtrrCount; Index++) {
-        if ((MtrrSettings.Variables.Mtrr[Index].Mask & BIT11) == 0) {
-          //
-          // If mask is not valid, then do not display range
-          //
-          continue;
-        }
-        MtrrBase  = (MtrrSettings.Variables.Mtrr[Index].Base & (~(SIZE_4KB - 1)));
-        MtrrLimit = MtrrBase + ((~(MtrrSettings.Variables.Mtrr[Index].Mask & (~(SIZE_4KB - 1)))) & Limit);
-
-        if (Base >= MtrrBase && Base < MtrrLimit) {
-          Found = TRUE;
-        }
-
-        if (Base >= MtrrBase && MtrrBase > RangeBase) {
-          RangeBase = MtrrBase;
-        }
-        if (Base > MtrrLimit && MtrrLimit > RangeBase) {
-          RangeBase = MtrrLimit + 1;
-        }
-        if (Base < MtrrBase && MtrrBase < RangeLimit) {
-          RangeLimit = MtrrBase - 1;
-        }
-        if (Base < MtrrLimit && MtrrLimit <= RangeLimit) {
-          RangeLimit = MtrrLimit;
-        }
-
-        if (Base > MtrrLimit && NoRangeBase < MtrrLimit) {
-          NoRangeBase = MtrrLimit + 1;
-        }
-        if (Base < MtrrBase && NoRangeLimit > MtrrBase) {
-          NoRangeLimit = MtrrBase - 1;
-        }
-      }
-
-      if (Found) {
-        Base = RangeLimit + 1;
-      } else {
-        Base = NoRangeLimit + 1;
-      }
-    } while (Base < Limit);
-    DEBUG((DEBUG_CACHE, "%016lx\n\n", Base - 1));
-  );
 }
 
 /**
