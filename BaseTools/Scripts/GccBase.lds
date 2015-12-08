@@ -46,7 +46,7 @@ SECTIONS {
    */
   .data ALIGN(ALIGNOF(.text)) : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     *(.data .data.* .gnu.linkonce.d.*)
-    *(.bss .bss.* *COM*)
+    *(.bss .bss.*)
   }
 
   .eh_frame ALIGN(CONSTANT(COMMONPAGESIZE)) : {
@@ -66,5 +66,6 @@ SECTIONS {
     *(.dynamic)
     *(.hash)
     *(.comment)
+    *(COMMON)
   }
 }
