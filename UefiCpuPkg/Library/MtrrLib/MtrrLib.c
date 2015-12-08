@@ -883,30 +883,27 @@ GetMtrrNumberAndDirection (
   This function programs MTRRs according to the values specified
   in the shadow array.
 
+  @param[in, out]  VariableSettings   Variable MTRR settings
   @param[in]       VariableMtrrCount  Number of variable MTRRs
   @param[in, out]  VariableMtrr       Shadow of variable MTRR contents
 
 **/
 VOID
 InvalidateMtrr (
+  IN OUT MTRR_VARIABLE_SETTINGS  *VariableSettings,
   IN     UINTN                   VariableMtrrCount,
   IN OUT VARIABLE_MTRR           *VariableMtrr
   )
 {
   UINTN         Index;
-  MTRR_CONTEXT  MtrrContext;
 
-  PreMtrrChange (&MtrrContext);
-  Index = 0;
-  while (Index < VariableMtrrCount) {
+  for (Index = 0; Index < VariableMtrrCount; Index++) {
     if (!VariableMtrr[Index].Valid && VariableMtrr[Index].Used) {
-       AsmWriteMsr64 (VariableMtrr[Index].Msr, 0);
-       AsmWriteMsr64 (VariableMtrr[Index].Msr + 1, 0);
+       VariableSettings->Mtrr[Index].Base = 0;
+       VariableSettings->Mtrr[Index].Mask = 0;
        VariableMtrr[Index].Used = FALSE;
     }
-    Index ++;
   }
-  PostMtrrChange (&MtrrContext);
 }
 
 
@@ -915,6 +912,7 @@ InvalidateMtrr (
 
   This function programs variable MTRRs
 
+  @param[in, out]  VariableSettings      Variable MTRR settings.
   @param[in]       MtrrNumber            Index of MTRR to program.
   @param[in]       BaseAddress           Base address of memory region.
   @param[in]       Length                Length of memory region.
@@ -924,34 +922,27 @@ InvalidateMtrr (
 **/
 VOID
 ProgramVariableMtrr (
-  IN UINTN                    MtrrNumber,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINT64                   Length,
-  IN UINT64                   MemoryCacheType,
-  IN UINT64                   MtrrValidAddressMask
+  IN OUT MTRR_VARIABLE_SETTINGS  *VariableSettings,
+  IN     UINTN                   MtrrNumber,
+  IN     PHYSICAL_ADDRESS        BaseAddress,
+  IN     UINT64                  Length,
+  IN     UINT64                  MemoryCacheType,
+  IN     UINT64                  MtrrValidAddressMask
   )
 {
   UINT64        TempQword;
-  MTRR_CONTEXT  MtrrContext;
-
-  PreMtrrChange (&MtrrContext);
 
   //
   // MTRR Physical Base
   //
   TempQword = (BaseAddress & MtrrValidAddressMask) | MemoryCacheType;
-  AsmWriteMsr64 ((UINT32) MtrrNumber, TempQword);
+  VariableSettings->Mtrr[MtrrNumber].Base = TempQword;
 
   //
   // MTRR Physical Mask
   //
   TempQword = ~(Length - 1);
-  AsmWriteMsr64 (
-    (UINT32) (MtrrNumber + 1),
-    (TempQword & MtrrValidAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED
-    );
-
-  PostMtrrChange (&MtrrContext);
+  VariableSettings->Mtrr[MtrrNumber].Mask = (TempQword & MtrrValidAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED;
 }
 
 
@@ -1393,7 +1384,6 @@ MtrrSetMemoryAttribute (
   UINT64                    MtrrValidAddressMask;
   BOOLEAN                   OverwriteExistingMtrr;
   UINT32                    FirmwareVariableMtrrCount;
-  UINT32                    VariableMtrrEnd;
   MTRR_CONTEXT              MtrrContext;
   BOOLEAN                   MtrrContextValid;
   BOOLEAN                   FixedSettingsValid[MTRR_NUMBER_OF_FIXED_MTRR];
@@ -1401,6 +1391,7 @@ MtrrSetMemoryAttribute (
   MTRR_FIXED_SETTINGS       WorkingFixedSettings;
   UINT32                    VariableMtrrCount;
   MTRR_VARIABLE_SETTINGS    OriginalVariableSettings;
+  BOOLEAN                   ProgramVariableSettings;
   MTRR_VARIABLE_SETTINGS    WorkingVariableSettings;
   UINT32                    Index;
   UINT64                    ClearMask;
@@ -1414,16 +1405,14 @@ MtrrSetMemoryAttribute (
     FixedSettingsValid[Index]    = FALSE;
     FixedSettingsModified[Index] = FALSE;
   }
+  ProgramVariableSettings = FALSE;
 
   if (!IsMtrrSupported ()) {
     Status = RETURN_UNSUPPORTED;
     goto Done;
   }
 
-  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
-  VariableMtrrEnd = MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (2 * GetVariableMtrrCount ()) - 1;
-
-  MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
+  MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
 
   TempQword = 0;
   MemoryType = (UINT64)Attribute;
@@ -1489,8 +1478,10 @@ MtrrSetMemoryAttribute (
   // Read all variable MTRRs
   //
   VariableMtrrCount = GetVariableMtrrCountWorker ();
+  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
   MtrrGetVariableMtrrWorker (VariableMtrrCount, &OriginalVariableSettings);
   CopyMem (&WorkingVariableSettings, &OriginalVariableSettings, sizeof (WorkingVariableSettings));
+  ProgramVariableSettings = TRUE;
   VariableSettings = &WorkingVariableSettings;
 
   //
@@ -1509,7 +1500,6 @@ MtrrSetMemoryAttribute (
               BaseAddress + Length - 1,
               VariableMtrr
               );
-
   if (OverLap) {
     Status = CombineMemoryAttribute (
                FirmwareVariableMtrrCount,
@@ -1528,7 +1518,7 @@ MtrrSetMemoryAttribute (
       //
       // Combined successfully, invalidate the now-unused MTRRs
       //
-      InvalidateMtrr(VariableMtrrCount, VariableMtrr);
+      InvalidateMtrr (VariableSettings, VariableMtrrCount, VariableMtrr);
       Status = RETURN_SUCCESS;
       goto Done;
     }
@@ -1542,7 +1532,7 @@ MtrrSetMemoryAttribute (
     //
     // Invalidate the now-unused MTRRs
     //
-    InvalidateMtrr(VariableMtrrCount, VariableMtrr);
+    InvalidateMtrr (VariableSettings, VariableMtrrCount, VariableMtrr);
     goto Done;
   }
 
@@ -1556,16 +1546,13 @@ MtrrSetMemoryAttribute (
   //
   // Invalidate the now-unused MTRRs
   //
-  InvalidateMtrr(VariableMtrrCount, VariableMtrr);
+  InvalidateMtrr (VariableSettings, VariableMtrrCount, VariableMtrr);
 
   //
   // Find first unused MTRR
   //
-  for (MsrNum = MTRR_LIB_IA32_VARIABLE_MTRR_BASE;
-       MsrNum < VariableMtrrEnd;
-       MsrNum += 2
-      ) {
-    if ((AsmReadMsr64 (MsrNum + 1) & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+  for (MsrNum = 0; MsrNum < VariableMtrrCount; MsrNum++) {
+    if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
       break;
     }
   }
@@ -1584,13 +1571,14 @@ MtrrSetMemoryAttribute (
       //
       // Find unused MTRR
       //
-      for (; MsrNum < VariableMtrrEnd; MsrNum += 2) {
-        if ((AsmReadMsr64 (MsrNum + 1) & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+      for (; MsrNum < VariableMtrrCount; MsrNum++) {
+        if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
           break;
         }
       }
 
       ProgramVariableMtrr (
+        VariableSettings,
         MsrNum,
         BaseAddress,
         Alignment,
@@ -1614,13 +1602,14 @@ MtrrSetMemoryAttribute (
     //
     // Find unused MTRR
     //
-    for (; MsrNum < VariableMtrrEnd; MsrNum += 2) {
-      if ((AsmReadMsr64 (MsrNum + 1) & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+    for (; MsrNum < VariableMtrrCount; MsrNum++) {
+      if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
         break;
       }
     }
 
     ProgramVariableMtrr (
+      VariableSettings,
       MsrNum,
       BaseAddress,
       Length,
@@ -1636,8 +1625,8 @@ MtrrSetMemoryAttribute (
     //
     // Find unused MTRR
     //
-    for (; MsrNum < VariableMtrrEnd; MsrNum += 2) {
-      if ((AsmReadMsr64 (MsrNum + 1) & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+    for (; MsrNum < VariableMtrrCount; MsrNum++) {
+      if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
         break;
       }
     }
@@ -1648,6 +1637,7 @@ MtrrSetMemoryAttribute (
     }
 
     ProgramVariableMtrr (
+      VariableSettings,
       MsrNum,
       BaseAddress,
       Length,
@@ -1680,6 +1670,28 @@ Done:
     }
   }
 
+  //
+  // Write variable MTRRs
+  //
+  if (ProgramVariableSettings) {
+    for (Index = 0; Index < VariableMtrrCount; Index++) {
+      if (WorkingVariableSettings.Mtrr[Index].Base != OriginalVariableSettings.Mtrr[Index].Base ||
+          WorkingVariableSettings.Mtrr[Index].Mask != OriginalVariableSettings.Mtrr[Index].Mask    ) {
+        if (!MtrrContextValid) {
+          PreMtrrChange (&MtrrContext);
+          MtrrContextValid = TRUE;
+        }
+        AsmWriteMsr64 (
+          MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1),
+          WorkingVariableSettings.Mtrr[Index].Base
+          );
+        AsmWriteMsr64 (
+          MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1,
+          WorkingVariableSettings.Mtrr[Index].Mask
+          );
+      }
+    }
+  }
   if (MtrrContextValid) {
     PostMtrrChange (&MtrrContext);
   }
