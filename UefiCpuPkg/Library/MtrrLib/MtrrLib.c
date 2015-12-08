@@ -496,6 +496,50 @@ ProgramFixedMtrr (
 
 
 /**
+  Worker function gets the attribute of variable MTRRs.
+
+  This function shadows the content of variable MTRRs into an
+  internal array: VariableMtrr.
+
+  @param[in]   VariableSettings           The variable MTRR values to shadow
+  @param[in]   FirmwareVariableMtrrCount  The number of variable MTRRs available to firmware
+  @param[in]   MtrrValidBitsMask          The mask for the valid bit of the MTRR
+  @param[in]   MtrrValidAddressMask       The valid address mask for MTRR
+  @param[out]  VariableMtrr               The array to shadow variable MTRRs content
+
+  @return                       The return value of this parameter indicates the
+                                number of MTRRs which has been used.
+
+**/
+UINT32
+MtrrGetMemoryAttributeInVariableMtrrWorker (
+  IN  MTRR_VARIABLE_SETTINGS  *VariableSettings,
+  IN  UINTN                   FirmwareVariableMtrrCount,
+  IN  UINT64                  MtrrValidBitsMask,
+  IN  UINT64                  MtrrValidAddressMask,
+  OUT VARIABLE_MTRR           *VariableMtrr
+  )
+{
+  UINTN   Index;
+  UINT32  UsedMtrr;
+
+  ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
+  for (Index = 0, UsedMtrr = 0; Index < FirmwareVariableMtrrCount; Index++) {
+    if ((VariableSettings->Mtrr[Index].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) != 0) {
+      VariableMtrr[Index].Msr         = (UINT32)Index;
+      VariableMtrr[Index].BaseAddress = (VariableSettings->Mtrr[Index].Base & MtrrValidAddressMask);
+      VariableMtrr[Index].Length      = ((~(VariableSettings->Mtrr[Index].Mask & MtrrValidAddressMask)) & MtrrValidBitsMask) + 1;
+      VariableMtrr[Index].Type        = (VariableSettings->Mtrr[Index].Base & 0x0ff);
+      VariableMtrr[Index].Valid       = TRUE;
+      VariableMtrr[Index].Used        = TRUE;
+      UsedMtrr++;
+    }
+  }
+  return UsedMtrr;
+}
+
+
+/**
   Gets the attribute of variable MTRRs.
 
   This function shadows the content of variable MTRRs into an
@@ -517,46 +561,24 @@ MtrrGetMemoryAttributeInVariableMtrr (
   OUT VARIABLE_MTRR             *VariableMtrr
   )
 {
-  UINTN   Index;
-  UINT32  MsrNum;
-  UINT32  UsedMtrr;
-  UINT32  FirmwareVariableMtrrCount;
-  UINT32  VariableMtrrEnd;
+  MTRR_VARIABLE_SETTINGS  VariableSettings;
 
   if (!IsMtrrSupported ()) {
     return 0;
   }
 
-  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
-  VariableMtrrEnd = MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (2 * GetVariableMtrrCount ()) - 1;
+  MtrrGetVariableMtrrWorker (
+    GetVariableMtrrCountWorker (),
+    &VariableSettings
+    );
 
-  ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
-  UsedMtrr = 0;
-
-  for (MsrNum = MTRR_LIB_IA32_VARIABLE_MTRR_BASE, Index = 0;
-       (
-         (MsrNum < VariableMtrrEnd) &&
-         (Index < FirmwareVariableMtrrCount)
-       );
-       MsrNum += 2
-      ) {
-    if ((AsmReadMsr64 (MsrNum + 1) & MTRR_LIB_CACHE_MTRR_ENABLED) != 0) {
-      VariableMtrr[Index].Msr          = MsrNum;
-      VariableMtrr[Index].BaseAddress  = (AsmReadMsr64 (MsrNum) &
-                                          MtrrValidAddressMask);
-      VariableMtrr[Index].Length       = ((~(AsmReadMsr64 (MsrNum + 1) &
-                                             MtrrValidAddressMask)
-                                          ) &
-                                          MtrrValidBitsMask
-                                         ) + 1;
-      VariableMtrr[Index].Type         = (AsmReadMsr64 (MsrNum) & 0x0ff);
-      VariableMtrr[Index].Valid        = TRUE;
-      VariableMtrr[Index].Used         = TRUE;
-      UsedMtrr = UsedMtrr  + 1;
-      Index++;
-    }
-  }
-  return UsedMtrr;
+  return MtrrGetMemoryAttributeInVariableMtrrWorker (
+           &VariableSettings,
+           GetFirmwareVariableMtrrCountWorker (),
+           MtrrValidBitsMask,
+           MtrrValidAddressMask,
+           VariableMtrr
+           );
 }
 
 
@@ -1092,6 +1114,7 @@ MtrrGetMemoryAttribute (
   UINT64                  MtrrValidBitsMask;
   UINT64                  MtrrValidAddressMask;
   UINTN                   VariableMtrrCount;
+  MTRR_VARIABLE_SETTINGS  VariableSettings;
 
   if (!IsMtrrSupported ()) {
     return CacheUncacheable;
@@ -1133,11 +1156,19 @@ MtrrGetMemoryAttribute (
     }
   }
   MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
-  MtrrGetMemoryAttributeInVariableMtrr(
-    MtrrValidBitsMask,
-    MtrrValidAddressMask,
-    VariableMtrr
+
+  MtrrGetVariableMtrrWorker (
+    GetVariableMtrrCountWorker (),
+    &VariableSettings
     );
+
+  MtrrGetMemoryAttributeInVariableMtrrWorker (
+           &VariableSettings,
+           GetFirmwareVariableMtrrCountWorker (),
+           MtrrValidBitsMask,
+           MtrrValidAddressMask,
+           VariableMtrr
+           );
 
   //
   // Go through the variable MTRR
@@ -1358,6 +1389,9 @@ MtrrSetMemoryAttribute (
   UINT32                    VariableMtrrEnd;
   MTRR_CONTEXT              MtrrContext;
   UINT32                    VariableMtrrCount;
+  MTRR_VARIABLE_SETTINGS    OriginalVariableSettings;
+  MTRR_VARIABLE_SETTINGS    WorkingVariableSettings;
+  MTRR_VARIABLE_SETTINGS    *VariableSettings;
 
   DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttribute() %a:%016lx-%016lx\n", mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
 
@@ -1426,11 +1460,20 @@ MtrrSetMemoryAttribute (
   // Read all variable MTRRs
   //
   VariableMtrrCount = GetVariableMtrrCountWorker ();
+  MtrrGetVariableMtrrWorker (VariableMtrrCount, &OriginalVariableSettings);
+  CopyMem (&WorkingVariableSettings, &OriginalVariableSettings, sizeof (WorkingVariableSettings));
+  VariableSettings = &WorkingVariableSettings;
 
   //
   // Check for overlap
   //
-  UsedMtrr = MtrrGetMemoryAttributeInVariableMtrr (MtrrValidBitsMask, MtrrValidAddressMask, VariableMtrr);
+  UsedMtrr = MtrrGetMemoryAttributeInVariableMtrrWorker (
+               VariableSettings,
+               FirmwareVariableMtrrCount,
+               MtrrValidBitsMask,
+               MtrrValidAddressMask,
+               VariableMtrr
+               );
   OverLap = CheckMemoryAttributeOverlap (
               FirmwareVariableMtrrCount,
               BaseAddress,
