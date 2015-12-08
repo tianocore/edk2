@@ -125,16 +125,6 @@
 !endif
 
   #
-  # SEC Phase Global Variables :
-  # - 0x00-0x04: Debugger Exception Handler Pointer address
-  # - 0x04-0x08: Normal Exception Handler Pointer
-  # - 0x0C-0x10: MpSafe Serial Console SpinLock
-  # - 0x10-0x20: KfScb 8 Bakery Locks of 2Bytes each
-  # - 0x20-0x30: CCI 8 Bakery Locks of 2Bytes each
-  # - 0x30-0x48: ARM SMC Events (8 cores * 3 max_event * sizeof(UINT8))
-  gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize|0x48
-
-  #
   # ARM PrimeCell
   #
 
