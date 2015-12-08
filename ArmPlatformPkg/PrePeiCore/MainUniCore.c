@@ -55,7 +55,7 @@ PrimaryMain (
   SecCoreData.TemporaryRamSize       = TemporaryRamSize;
   SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
   SecCoreData.PeiTemporaryRamSize    = ALIGN_VALUE (SecCoreData.TemporaryRamSize / 2, CPU_STACK_ALIGNMENT);
-  SecCoreData.StackBase              = SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize;
+  SecCoreData.StackBase              = (VOID *)((UINTN)SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize);
   SecCoreData.StackSize              = (TemporaryRamBase + TemporaryRamSize) - (UINTN)SecCoreData.StackBase;
 
   // Jump to PEI core entry point
