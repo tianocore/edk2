@@ -39,13 +39,9 @@ PrimaryMain (
 
   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at
   // the base of the primary core stack
-  PpiListSize = ALIGN_VALUE(PpiListSize, 0x4);
+  PpiListSize = ALIGN_VALUE(PpiListSize, CPU_STACK_ALIGNMENT);
   TemporaryRamBase = (UINTN)PcdGet64 (PcdCPUCoresStackBase) + PpiListSize;
   TemporaryRamSize = (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) - PpiListSize;
-
-  // Make sure the size is 8-byte aligned. Once divided by 2, the size should be 4-byte aligned
-  // to ensure the stack pointer is 4-byte aligned.
-  TemporaryRamSize = TemporaryRamSize - (TemporaryRamSize & (0x8-1));
 
   //
   // Bind this information into the SEC hand-off state
@@ -58,8 +54,8 @@ PrimaryMain (
   SecCoreData.TemporaryRamBase       = (VOID *)TemporaryRamBase; // We run on the primary core (and so we use the first stack)
   SecCoreData.TemporaryRamSize       = TemporaryRamSize;
   SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
-  SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize / 2;
-  SecCoreData.StackBase              = (VOID *)ALIGN_VALUE((UINTN)(SecCoreData.TemporaryRamBase) + SecCoreData.PeiTemporaryRamSize, 0x4);
+  SecCoreData.PeiTemporaryRamSize    = ALIGN_VALUE (SecCoreData.TemporaryRamSize / 2, CPU_STACK_ALIGNMENT);
+  SecCoreData.StackBase              = SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize;
   SecCoreData.StackSize              = (TemporaryRamBase + TemporaryRamSize) - (UINTN)SecCoreData.StackBase;
 
   // Jump to PEI core entry point
