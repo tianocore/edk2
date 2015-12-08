@@ -183,9 +183,15 @@ ArmInvalidateDataCacheEntryByMVA (
 
 VOID
 EFIAPI
-ArmCleanDataCacheEntryByMVA (
+ArmCleanDataCacheEntryToPoUByMVA(
   IN  UINTN   Address
   );
+
+VOID
+EFIAPI
+ArmCleanDataCacheEntryByMVA(
+IN  UINTN   Address
+);
 
 VOID
 EFIAPI

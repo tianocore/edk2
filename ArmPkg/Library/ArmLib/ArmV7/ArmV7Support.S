@@ -19,6 +19,7 @@
 GCC_ASM_EXPORT (ArmInvalidateInstructionCache)
 GCC_ASM_EXPORT (ArmInvalidateDataCacheEntryByMVA)
 GCC_ASM_EXPORT (ArmCleanDataCacheEntryByMVA)
+GCC_ASM_EXPORT (ArmCleanDataCacheEntryToPoUByMVA)
 GCC_ASM_EXPORT (ArmCleanInvalidateDataCacheEntryByMVA)
 GCC_ASM_EXPORT (ArmInvalidateDataCacheEntryBySetWay)
 GCC_ASM_EXPORT (ArmCleanDataCacheEntryBySetWay)
@@ -66,6 +67,11 @@ ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
 
 ASM_PFX(ArmCleanDataCacheEntryByMVA):
   mcr     p15, 0, r0, c7, c10, 1  @clean single data cache line
+  bx      lr
+
+
+ASM_PFX(ArmCleanDataCacheEntryToPoUByMVA):
+  mcr     p15, 0, r0, c7, c11, 1  @clean single data cache line to PoU
   bx      lr
 
 

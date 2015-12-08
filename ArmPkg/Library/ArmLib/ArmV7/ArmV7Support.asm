@@ -34,6 +34,11 @@ CTRL_I_BIT      EQU     (1 << 12)
   bx      lr
 
 
+ RVCT_ASM_EXPORT ArmCleanDataCacheEntryToPoUByMVA
+  mcr     p15, 0, r0, c7, c11, 1  ; clean single data cache line to PoU
+  bx      lr
+
+
  RVCT_ASM_EXPORT ArmCleanInvalidateDataCacheEntryByMVA
   mcr     p15, 0, r0, c7, c14, 1  ; clean and invalidate single data cache line
   bx      lr
