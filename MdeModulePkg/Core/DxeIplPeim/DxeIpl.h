@@ -2,7 +2,7 @@
   Master header file for DxeIpl PEIM. All source files in this module should
   include this file for common definitions.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -58,6 +58,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 extern CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi;
 
+/**
+   This function installs the PPIs that require permanent memory.
+
+   @param  PeiServices      Indirect reference to the PEI Services Table.
+   @param  NotifyDescriptor Address of the notification descriptor data structure.
+   @param  Ppi              Address of the PPI that was installed.
+
+   @return EFI_SUCCESS      The PPIs were installed successfully.
+   @return Others           Some error occurs during the execution of this function.
+
+**/
+EFI_STATUS
+EFIAPI
+InstallIplPermanentMemoryPpis (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  );
 
 /**
    Searches DxeCore in all firmware Volumes and loads the first

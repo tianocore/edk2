@@ -2,7 +2,8 @@
   Last PEIM.
   Responsibility of this module is to load the DXE Core from a Firmware Volume.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 HP Development Company, L.P.
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,6 +25,12 @@ CONST EFI_DXE_IPL_PPI mDxeIplPpi = {
   DxeLoadCore
 };
 
+CONST EFI_PEI_PPI_DESCRIPTOR mDxeIplPpiList = {
+  EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  &gEfiDxeIplPpiGuid,
+  (VOID *) &mDxeIplPpi
+};
+
 CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
   CustomGuidedSectionExtract
 };
@@ -32,17 +39,10 @@ CONST EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
   Decompress
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR mPpiList[] = {
-  {
-    EFI_PEI_PPI_DESCRIPTOR_PPI,
-    &gEfiDxeIplPpiGuid,
-    (VOID *) &mDxeIplPpi
-  },
-  {
-    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-    &gEfiPeiDecompressPpiGuid,
-    (VOID *) &mDecompressPpi
-  }
+CONST EFI_PEI_PPI_DESCRIPTOR mDecompressPpiList = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiDecompressPpiGuid,
+  (VOID *) &mDecompressPpi
 };
 
 CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi = {
@@ -51,10 +51,16 @@ CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi = {
   NULL
 };
 
+CONST EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiMemoryDiscoveredPpiGuid,
+  InstallIplPermanentMemoryPpis
+};
+
 /**
   Entry point of DXE IPL PEIM.
-  
-  This function installs DXE IPL PPI and Decompress PPI.  It also reloads
+
+  This function installs DXE IPL PPI.  It also reloads
   itself to memory on non-S3 resume boot path.
 
   @param  FileHandle  Handle of the file being invoked.
@@ -73,10 +79,8 @@ PeimInitializeDxeIpl (
 {
   EFI_STATUS                                Status;
   EFI_BOOT_MODE                             BootMode;
-  EFI_GUID                                  *ExtractHandlerGuidTable;
-  UINTN                                     ExtractHandlerNumber;
-  EFI_PEI_PPI_DESCRIPTOR                    *GuidPpi;
-  
+  VOID                                      *Dummy;
+
   BootMode = GetBootModeHob ();
 
   if (BootMode != BOOT_ON_S3_RESUME) {
@@ -87,20 +91,81 @@ PeimInitializeDxeIpl (
       // 
       return Status;
     }
-    
+
     //
     // Ensure that DXE IPL is shadowed to permanent memory.
     //
     ASSERT (Status == EFI_ALREADY_STARTED);
+
+    //
+    // DXE core load requires permanent memory.
+    //
+    Status = PeiServicesLocatePpi (
+               &gEfiPeiMemoryDiscoveredPpiGuid,
+               0,
+               NULL,
+               (VOID **) &Dummy
+               );
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Now the permanent memory exists, install the PPIs for decompression
+    // and section extraction.
+    //
+    Status = InstallIplPermanentMemoryPpis (NULL, NULL, NULL);
+    ASSERT_EFI_ERROR (Status);    
+  } else {
+    //
+    // Install memory discovered PPI notification to install PPIs for
+    // decompression and section extraction.
+    //
+    Status = PeiServicesNotifyPpi (&mMemoryDiscoveredNotifyList);
+    ASSERT_EFI_ERROR (Status);
   }
-     
+
+  //
+  // Install DxeIpl PPI.
+  //
+  Status = PeiServicesInstallPpi (&mDxeIplPpiList);
+  ASSERT_EFI_ERROR(Status);
+
+  return Status;
+}
+
+/**
+   This function installs the PPIs that require permanent memory.
+
+   @param  PeiServices      Indirect reference to the PEI Services Table.
+   @param  NotifyDescriptor Address of the notification descriptor data structure.
+   @param  Ppi              Address of the PPI that was installed.
+
+   @return EFI_SUCCESS      The PPIs were installed successfully.
+   @return Others           Some error occurs during the execution of this function.
+
+**/
+EFI_STATUS
+EFIAPI
+InstallIplPermanentMemoryPpis (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_GUID                      *ExtractHandlerGuidTable;
+  UINTN                         ExtractHandlerNumber;
+  EFI_PEI_PPI_DESCRIPTOR        *GuidPpi;
+
   //
   // Get custom extract guided section method guid list 
   //
   ExtractHandlerNumber = ExtractGuidedSectionGetGuidList (&ExtractHandlerGuidTable);
-  
+
   //
-  // Install custom extraction guid PPI
+  // Install custom guided section extraction PPI
   //
   if (ExtractHandlerNumber > 0) {
     GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
@@ -113,11 +178,11 @@ PeimInitializeDxeIpl (
       ASSERT_EFI_ERROR(Status);
     }
   }
-  
+
   //
-  // Install DxeIpl and Decompress PPIs.
+  // Install Decompress PPI.
   //
-  Status = PeiServicesInstallPpi (mPpiList);
+  Status = PeiServicesInstallPpi (&mDecompressPpiList);
   ASSERT_EFI_ERROR(Status);
 
   return Status;

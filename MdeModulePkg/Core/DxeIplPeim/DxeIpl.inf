@@ -5,7 +5,7 @@
 #  PPI to discover and dispatch the DXE Foundation and components that are
 #  needed to run the DXE Foundation.
 #
-#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -93,6 +93,7 @@
   ## SOMETIMES_CONSUMES
   ## UNDEFINED # HOB
   gEfiVectorHandoffInfoPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid    ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
@@ -115,7 +116,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
+  gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
 
 #
 # [BootMode]
