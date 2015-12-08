@@ -183,15 +183,25 @@ GetFirmwareVariableMtrrCount (
 /**
   Worker function returns the default MTRR cache type for the system.
 
+  If MtrrSetting is not NULL, returns the default MTRR cache type from input
+  MTRR settings buffer.
+  If MtrrSetting is NULL, returns the default MTRR cache type from MSR.
+
+  @param[in]  MtrrSetting    A buffer holding all MTRRs content.
+
   @return  The default MTRR cache type.
 
 **/
 MTRR_MEMORY_CACHE_TYPE
 MtrrGetDefaultMemoryTypeWorker (
-  VOID
+  IN MTRR_SETTINGS      *MtrrSetting
   )
 {
-  return (MTRR_MEMORY_CACHE_TYPE) (AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE) & 0x7);
+  if (MtrrSetting == NULL) {
+    return (MTRR_MEMORY_CACHE_TYPE) (AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE) & 0x7);
+  } else {
+    return (MTRR_MEMORY_CACHE_TYPE) (MtrrSetting->MtrrDefType & 0x7);
+  }
 }
 
 
@@ -210,7 +220,7 @@ MtrrGetDefaultMemoryType (
   if (!IsMtrrSupported ()) {
     return CacheUncacheable;
   }
-  return MtrrGetDefaultMemoryTypeWorker ();
+  return MtrrGetDefaultMemoryTypeWorker (NULL);
 }
 
 /**
@@ -360,6 +370,12 @@ MtrrGetFixedMtrr (
 /**
   Worker function will get the raw value in variable MTRRs
 
+  If MtrrSetting is not NULL, gets the variable MTRRs raw value from input
+  MTRR settings buffer.
+  If MtrrSetting is NULL, gets the variable MTRRs raw value from MTRRs.
+
+  @param[in]  MtrrSetting        A buffer holding all MTRRs content.
+  @param[in]  VariableMtrrCount  Number of variable MTRRs.
   @param[out] VariableSettings   A buffer to hold variable MTRRs content.
 
   @return The VariableSettings input pointer
@@ -367,6 +383,7 @@ MtrrGetFixedMtrr (
 **/
 MTRR_VARIABLE_SETTINGS*
 MtrrGetVariableMtrrWorker (
+  IN  MTRR_SETTINGS           *MtrrSetting,
   IN  UINT32                  VariableMtrrCount,
   OUT MTRR_VARIABLE_SETTINGS  *VariableSettings
   )
@@ -376,10 +393,15 @@ MtrrGetVariableMtrrWorker (
   ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
-    VariableSettings->Mtrr[Index].Base =
-      AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1));
-    VariableSettings->Mtrr[Index].Mask =
-      AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1);
+    if (MtrrSetting == NULL) {
+      VariableSettings->Mtrr[Index].Base =
+        AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1));
+      VariableSettings->Mtrr[Index].Mask =
+        AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1);
+    } else {
+      VariableSettings->Mtrr[Index].Base = MtrrSetting->Variables.Mtrr[Index].Base;
+      VariableSettings->Mtrr[Index].Mask = MtrrSetting->Variables.Mtrr[Index].Mask;
+    }
   }
 
   return  VariableSettings;
@@ -404,6 +426,7 @@ MtrrGetVariableMtrr (
   }
 
   return MtrrGetVariableMtrrWorker (
+           NULL,
            GetVariableMtrrCountWorker (),
            VariableSettings
            );
@@ -575,6 +598,7 @@ MtrrGetMemoryAttributeInVariableMtrr (
   }
 
   MtrrGetVariableMtrrWorker (
+    NULL,
     GetVariableMtrrCountWorker (),
     &VariableSettings
     );
@@ -949,6 +973,11 @@ ProgramVariableMtrr (
 /**
   Converts the Memory attribute value to MTRR_MEMORY_CACHE_TYPE.
 
+  If MtrrSetting is not NULL, gets the default memory attribute from input
+  MTRR settings buffer.
+  If MtrrSetting is NULL, gets the default memory attribute from MSR.
+
+  @param[in]  MtrrSetting        A buffer holding all MTRRs content.
   @param[in]  MtrrType           MTRR memory type
 
   @return The enum item in MTRR_MEMORY_CACHE_TYPE
@@ -956,6 +985,7 @@ ProgramVariableMtrr (
 **/
 MTRR_MEMORY_CACHE_TYPE
 GetMemoryCacheTypeFromMtrrType (
+  IN MTRR_SETTINGS         *MtrrSetting,
   IN UINT64                MtrrType
   )
 {
@@ -975,7 +1005,7 @@ GetMemoryCacheTypeFromMtrrType (
     // MtrrType is MTRR_CACHE_INVALID_TYPE, that means
     // no MTRR covers the range
     //
-    return MtrrGetDefaultMemoryType ();
+    return MtrrGetDefaultMemoryTypeWorker (MtrrSetting);
   }
 }
 
@@ -1084,21 +1114,22 @@ MtrrPrecedence (
   return MtrrType;
 }
 
-
-
 /**
-  This function will get the memory cache type of the specific address.
+  Worker function will get the memory cache type of the specific address.
 
-  This function is mainly for debug purpose.
+  If MtrrSetting is not NULL, gets the memory cache type from input
+  MTRR settings buffer.
+  If MtrrSetting is NULL, gets the memory cache type from MTRRs.
 
+  @param[in]  MtrrSetting        A buffer holding all MTRRs content.
   @param[in]  Address            The specific address
 
   @return Memory cache type of the specific address
 
 **/
 MTRR_MEMORY_CACHE_TYPE
-EFIAPI
-MtrrGetMemoryAttribute (
+MtrrGetMemoryAttributeByAddressWorker (
+  IN MTRR_SETTINGS      *MtrrSetting,
   IN PHYSICAL_ADDRESS   Address
   )
 {
@@ -1114,14 +1145,14 @@ MtrrGetMemoryAttribute (
   UINTN                   VariableMtrrCount;
   MTRR_VARIABLE_SETTINGS  VariableSettings;
 
-  if (!IsMtrrSupported ()) {
-    return CacheUncacheable;
-  }
-
   //
   // Check if MTRR is enabled, if not, return UC as attribute
   //
-  TempQword = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
+  if (MtrrSetting == NULL) {
+    TempQword = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
+  } else {
+    TempQword = MtrrSetting->MtrrDefType;
+  }
   MtrrType = MTRR_CACHE_INVALID_TYPE;
 
   if ((TempQword & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
@@ -1146,9 +1177,13 @@ MtrrGetMemoryAttribute (
            SubIndex =
              ((UINTN)Address - mMtrrLibFixedMtrrTable[Index].BaseAddress) /
                mMtrrLibFixedMtrrTable[Index].Length;
-           TempQword = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
+           if (MtrrSetting == NULL) {
+             TempQword = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
+           } else {
+             TempQword = MtrrSetting->Fixed.Mtrr[Index];
+           }
            MtrrType =  RShiftU64 (TempQword, SubIndex * 8) & 0xFF;
-           return GetMemoryCacheTypeFromMtrrType (MtrrType);
+           return GetMemoryCacheTypeFromMtrrType (MtrrSetting, MtrrType);
          }
       }
     }
@@ -1156,6 +1191,7 @@ MtrrGetMemoryAttribute (
   MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
 
   MtrrGetVariableMtrrWorker (
+    MtrrSetting,
     GetVariableMtrrCountWorker (),
     &VariableSettings
     );
@@ -1183,11 +1219,34 @@ MtrrGetMemoryAttribute (
       }
     }
   }
-  CacheType = GetMemoryCacheTypeFromMtrrType (MtrrType);
+  CacheType = GetMemoryCacheTypeFromMtrrType (MtrrSetting, MtrrType);
 
   return CacheType;
 }
 
+
+/**
+  This function will get the memory cache type of the specific address.
+
+  This function is mainly for debug purpose.
+
+  @param[in]  Address   The specific address
+
+  @return Memory cache type of the specific address
+
+**/
+MTRR_MEMORY_CACHE_TYPE
+EFIAPI
+MtrrGetMemoryAttribute (
+  IN PHYSICAL_ADDRESS   Address
+  )
+{
+  if (!IsMtrrSupported ()) {
+    return CacheUncacheable;
+  }
+
+  return MtrrGetMemoryAttributeByAddressWorker (NULL, Address);
+}
 
 
 /**
@@ -1479,7 +1538,7 @@ MtrrSetMemoryAttribute (
   //
   VariableMtrrCount = GetVariableMtrrCountWorker ();
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
-  MtrrGetVariableMtrrWorker (VariableMtrrCount, &OriginalVariableSettings);
+  MtrrGetVariableMtrrWorker (NULL, VariableMtrrCount, &OriginalVariableSettings);
   CopyMem (&WorkingVariableSettings, &OriginalVariableSettings, sizeof (WorkingVariableSettings));
   ProgramVariableSettings = TRUE;
   VariableSettings = &WorkingVariableSettings;
@@ -1839,6 +1898,7 @@ MtrrGetAllMtrrs (
   // Get variable MTRRs
   //
   MtrrGetVariableMtrrWorker (
+    NULL,
     GetVariableMtrrCountWorker (),
     &MtrrSetting->Variables
     );
