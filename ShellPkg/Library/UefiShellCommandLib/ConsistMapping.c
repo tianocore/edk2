@@ -16,6 +16,10 @@
 #include <Library/SortLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/UsbIo.h>
+#include <Protocol/BlockIo.h>
+#include <Protocol/SimpleFileSystem.h>
+
+
 
 typedef enum {
   MTDTypeUnknown,
@@ -1349,20 +1353,22 @@ ShellCommandConsistMappingInitialize (
   OUT EFI_DEVICE_PATH_PROTOCOL           ***Table
   )
 {
-  EFI_HANDLE                *HandleBuffer;
-  UINTN                     HandleNum;
-  UINTN                     HandleLoop;
-  EFI_DEVICE_PATH_PROTOCOL  **TempTable;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *HIDevicePath;
-  UINTN                     Index;
-  EFI_STATUS                Status;
+  EFI_HANDLE                      *HandleBuffer;
+  UINTN                           HandleNum;
+  UINTN                           HandleLoop;
+  EFI_DEVICE_PATH_PROTOCOL        **TempTable;
+  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL        *HIDevicePath;
+  EFI_BLOCK_IO_PROTOCOL           *BlockIo;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *SimpleFileSystem;
+  UINTN                           Index;
+  EFI_STATUS                      Status;
 
   HandleBuffer              = NULL;
 
   Status = gBS->LocateHandleBuffer (
-              AllHandles,
-              NULL,
+              ByProtocol,
+              &gEfiDevicePathProtocolGuid,
               NULL,
               &HandleNum,
               &HandleBuffer
@@ -1383,6 +1389,20 @@ ShellCommandConsistMappingInitialize (
     HIDevicePath = GetHIDevicePath (DevicePath);
     if (HIDevicePath == NULL) {
       continue;
+    }
+
+    Status = gBS->HandleProtocol( HandleBuffer[HandleLoop], 
+                                  &gEfiBlockIoProtocolGuid, 
+                                  (VOID **)&BlockIo
+                                  );
+    if (EFI_ERROR(Status)) {
+      Status = gBS->HandleProtocol( HandleBuffer[HandleLoop], 
+                                    &gEfiSimpleFileSystemProtocolGuid, 
+                                    (VOID **)&SimpleFileSystem
+                                    );
+      if (EFI_ERROR(Status)) {
+        continue;
+      }
     }
 
     for (Index = 0; TempTable[Index] != NULL; Index++) {
