@@ -415,6 +415,9 @@ MtrrGetVariableMtrr (
   @param[in]      MemoryCacheType  The memory type to set.
   @param[in, out] Base             The base address of memory range.
   @param[in, out] Length           The length of memory range.
+  @param[out]     ReturnMsrNum     The index of the fixed MTRR MSR to program.
+  @param[out]     ReturnClearMask  The bits to clear in the fixed MTRR MSR.
+  @param[out]     ReturnOrMask     The bits to set in the fixed MTRR MSR.
 
   @retval RETURN_SUCCESS      The cache type was updated successfully
   @retval RETURN_UNSUPPORTED  The requested range or cache type was invalid
@@ -423,9 +426,12 @@ MtrrGetVariableMtrr (
 **/
 RETURN_STATUS
 ProgramFixedMtrr (
-  IN     UINT64     MemoryCacheType,
-  IN OUT UINT64     *Base,
-  IN OUT UINT64     *Length
+  IN     UINT64               MemoryCacheType,
+  IN OUT UINT64               *Base,
+  IN OUT UINT64               *Length,
+  OUT    UINT32               *ReturnMsrNum,
+  OUT    UINT64               *ReturnClearMask,
+  OUT    UINT64               *ReturnOrMask
   )
 {
   UINT32  MsrNum;
@@ -488,9 +494,10 @@ ProgramFixedMtrr (
     return RETURN_UNSUPPORTED;
   }
 
-  TempQword =
-    (AsmReadMsr64 (mMtrrLibFixedMtrrTable[MsrNum].Msr) & ~ClearMask) | OrMask;
-  AsmWriteMsr64 (mMtrrLibFixedMtrrTable[MsrNum].Msr, TempQword);
+  *ReturnMsrNum    = MsrNum;
+  *ReturnClearMask = ClearMask;
+  *ReturnOrMask    = OrMask;
+
   return RETURN_SUCCESS;
 }
 
@@ -1388,12 +1395,25 @@ MtrrSetMemoryAttribute (
   UINT32                    FirmwareVariableMtrrCount;
   UINT32                    VariableMtrrEnd;
   MTRR_CONTEXT              MtrrContext;
+  BOOLEAN                   MtrrContextValid;
+  BOOLEAN                   FixedSettingsValid[MTRR_NUMBER_OF_FIXED_MTRR];
+  BOOLEAN                   FixedSettingsModified[MTRR_NUMBER_OF_FIXED_MTRR];
+  MTRR_FIXED_SETTINGS       WorkingFixedSettings;
   UINT32                    VariableMtrrCount;
   MTRR_VARIABLE_SETTINGS    OriginalVariableSettings;
   MTRR_VARIABLE_SETTINGS    WorkingVariableSettings;
+  UINT32                    Index;
+  UINT64                    ClearMask;
+  UINT64                    OrMask;
+  UINT64                    NewValue;
   MTRR_VARIABLE_SETTINGS    *VariableSettings;
 
   DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttribute() %a:%016lx-%016lx\n", mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
+  MtrrContextValid = FALSE;
+  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+    FixedSettingsValid[Index]    = FALSE;
+    FixedSettingsModified[Index] = FALSE;
+  }
 
   if (!IsMtrrSupported ()) {
     Status = RETURN_UNSUPPORTED;
@@ -1429,22 +1449,31 @@ MtrrSetMemoryAttribute (
   // Check if Fixed MTRR
   //
   Status = RETURN_SUCCESS;
-  while ((BaseAddress < BASE_1MB) && (Length > 0) && Status == RETURN_SUCCESS) {
-    PreMtrrChange (&MtrrContext);
-    Status = ProgramFixedMtrr (MemoryType, &BaseAddress, &Length);
-    PostMtrrChange (&MtrrContext);
-    if (RETURN_ERROR (Status)) {
+  if (BaseAddress < BASE_1MB) {
+    while ((BaseAddress < BASE_1MB) && (Length > 0) && Status == RETURN_SUCCESS) {
+      Status = ProgramFixedMtrr (MemoryType, &BaseAddress, &Length, &MsrNum, &ClearMask, &OrMask);
+      if (RETURN_ERROR (Status)) {
+        goto Done;
+      }
+      if (!FixedSettingsValid[MsrNum]) {
+        WorkingFixedSettings.Mtrr[MsrNum] = AsmReadMsr64 (mMtrrLibFixedMtrrTable[MsrNum].Msr);
+        FixedSettingsValid[MsrNum] = TRUE;
+      }
+      NewValue = (WorkingFixedSettings.Mtrr[MsrNum] & ~ClearMask) | OrMask;
+      if (WorkingFixedSettings.Mtrr[MsrNum] != NewValue) {
+        WorkingFixedSettings.Mtrr[MsrNum] = NewValue;
+        FixedSettingsModified[MsrNum] = TRUE;
+      }
+    }
+
+    if (Length == 0) {
+      //
+      // A Length of 0 can only make sense for fixed MTTR ranges.
+      // Since we just handled the fixed MTRRs, we can skip the
+      // variable MTRR section.
+      //
       goto Done;
     }
-  }
-
-  if (Length == 0) {
-    //
-    // A Length of 0 can only make sense for fixed MTTR ranges.
-    // Since we just handled the fixed MTRRs, we can skip the
-    // variable MTRR section.
-    //
-    goto Done;
   }
 
   //
@@ -1634,6 +1663,27 @@ MtrrSetMemoryAttribute (
   } while (TempQword > 0);
 
 Done:
+
+  //
+  // Write fixed MTRRs that have been modified
+  //
+  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+    if (FixedSettingsModified[Index]) {
+      if (!MtrrContextValid) {
+        PreMtrrChange (&MtrrContext);
+        MtrrContextValid = TRUE;
+      }
+      AsmWriteMsr64 (
+        mMtrrLibFixedMtrrTable[Index].Msr,
+        WorkingFixedSettings.Mtrr[Index]
+        );
+    }
+  }
+
+  if (MtrrContextValid) {
+    PostMtrrChange (&MtrrContext);
+  }
+
   DEBUG((DEBUG_CACHE, "  Status = %r\n", Status));
   if (!RETURN_ERROR (Status)) {
     MtrrDebugPrintAllMtrrs ();
