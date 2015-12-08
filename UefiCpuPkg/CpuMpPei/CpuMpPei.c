@@ -142,7 +142,7 @@ GetMpHobData (
 }
 
 /**
-  Save the volatile registers required to be restored following INIT IPI
+  Save the volatile registers required to be restored following INIT IPI.
   
   @param  VolatileRegisters    Returns buffer saved the volatile resisters
 **/
@@ -173,7 +173,7 @@ SaveVolatileRegisters (
 }
 
 /**
-  Restore the volatile registers following INIT IPI
+  Restore the volatile registers following INIT IPI.
   
   @param  VolatileRegisters   Pointer to volatile resisters
   @param  IsRestoreDr         TRUE:  Restore DRx if supported
