@@ -1424,6 +1424,11 @@ MtrrDebugPrintAllMtrrs (
 /**
   Worker function attempts to set the attributes for a memory range.
 
+  If MtrrSettings is not NULL, set the attributes into the input MTRR
+  settings buffer.
+  If MtrrSettings is NULL, set the attributes into MTRRs registers.
+
+  @param[in, out]  MtrrSetting       A buffer holding all MTRRs content.
   @param[in]       BaseAddress       The physical address that is the start
                                      address of a memory region.
   @param[in]       Length            The size in bytes of the memory region.
@@ -1448,11 +1453,11 @@ MtrrDebugPrintAllMtrrs (
 
 **/
 RETURN_STATUS
-EFIAPI
-MtrrSetMemoryAttribute (
-  IN PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                  Length,
-  IN MTRR_MEMORY_CACHE_TYPE  Attribute
+MtrrSetMemoryAttributeWorker (
+  IN OUT MTRR_SETTINGS           *MtrrSetting,
+  IN PHYSICAL_ADDRESS            BaseAddress,
+  IN UINT64                      Length,
+  IN MTRR_MEMORY_CACHE_TYPE      Attribute
   )
 {
   UINT64                    TempQword;
@@ -1484,7 +1489,6 @@ MtrrSetMemoryAttribute (
   UINT64                    NewValue;
   MTRR_VARIABLE_SETTINGS    *VariableSettings;
 
-  DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttribute() %a:%016lx-%016lx\n", mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
   MtrrContextValid = FALSE;
   for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
     FixedSettingsValid[Index]    = FALSE;
@@ -1529,14 +1533,19 @@ MtrrSetMemoryAttribute (
       if (RETURN_ERROR (Status)) {
         goto Done;
       }
-      if (!FixedSettingsValid[MsrNum]) {
-        WorkingFixedSettings.Mtrr[MsrNum] = AsmReadMsr64 (mMtrrLibFixedMtrrTable[MsrNum].Msr);
-        FixedSettingsValid[MsrNum] = TRUE;
-      }
-      NewValue = (WorkingFixedSettings.Mtrr[MsrNum] & ~ClearMask) | OrMask;
-      if (WorkingFixedSettings.Mtrr[MsrNum] != NewValue) {
-        WorkingFixedSettings.Mtrr[MsrNum] = NewValue;
-        FixedSettingsModified[MsrNum] = TRUE;
+      if (MtrrSetting != NULL) {
+        MtrrSetting->Fixed.Mtrr[MsrNum] = (MtrrSetting->Fixed.Mtrr[MsrNum] & ~ClearMask) | OrMask;
+        MtrrSetting->MtrrDefType |= MTRR_LIB_CACHE_FIXED_MTRR_ENABLED;
+      } else {
+        if (!FixedSettingsValid[MsrNum]) {
+          WorkingFixedSettings.Mtrr[MsrNum] = AsmReadMsr64 (mMtrrLibFixedMtrrTable[MsrNum].Msr);
+          FixedSettingsValid[MsrNum] = TRUE;
+        }
+        NewValue = (WorkingFixedSettings.Mtrr[MsrNum] & ~ClearMask) | OrMask;
+        if (WorkingFixedSettings.Mtrr[MsrNum] != NewValue) {
+          WorkingFixedSettings.Mtrr[MsrNum] = NewValue;
+          FixedSettingsModified[MsrNum] = TRUE;
+        }
       }
     }
 
@@ -1564,10 +1573,14 @@ MtrrSetMemoryAttribute (
   //
   VariableMtrrCount = GetVariableMtrrCountWorker ();
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
-  MtrrGetVariableMtrrWorker (NULL, VariableMtrrCount, &OriginalVariableSettings);
-  CopyMem (&WorkingVariableSettings, &OriginalVariableSettings, sizeof (WorkingVariableSettings));
-  ProgramVariableSettings = TRUE;
-  VariableSettings = &WorkingVariableSettings;
+  if (MtrrSetting != NULL) {
+    VariableSettings = &MtrrSetting->Variables;
+  } else {
+    MtrrGetVariableMtrrWorker (NULL, VariableMtrrCount, &OriginalVariableSettings);
+    CopyMem (&WorkingVariableSettings, &OriginalVariableSettings, sizeof (WorkingVariableSettings));
+    ProgramVariableSettings = TRUE;
+    VariableSettings = &WorkingVariableSettings;
+  }
 
   //
   // Check for overlap
@@ -1613,7 +1626,7 @@ MtrrSetMemoryAttribute (
   // The memory type is the same with the type specified by
   // MTRR_LIB_IA32_MTRR_DEF_TYPE.
   //
-  if ((!OverwriteExistingMtrr) && (Attribute == MtrrGetDefaultMemoryType ())) {
+  if ((!OverwriteExistingMtrr) && (Attribute == MtrrGetDefaultMemoryTypeWorker (MtrrSetting))) {
     //
     // Invalidate the now-unused MTRRs
     //
@@ -1783,11 +1796,98 @@ Done:
 
   DEBUG((DEBUG_CACHE, "  Status = %r\n", Status));
   if (!RETURN_ERROR (Status)) {
-    MtrrDebugPrintAllMtrrs ();
+    if (MtrrSetting != NULL) {
+      MtrrSetting->MtrrDefType |= MTRR_LIB_CACHE_MTRR_ENABLED;
+    }
+    MtrrDebugPrintAllMtrrsWorker (MtrrSetting);
   }
 
   return Status;
 }
+
+/**
+  This function attempts to set the attributes for a memory range.
+
+  @param[in]  BaseAddress        The physical address that is the start
+                                 address of a memory region.
+  @param[in]  Length             The size in bytes of the memory region.
+  @param[in]  Attributes         The bit mask of attributes to set for the
+                                 memory region.
+
+  @retval RETURN_SUCCESS            The attributes were set for the memory
+                                    region.
+  @retval RETURN_INVALID_PARAMETER  Length is zero.
+  @retval RETURN_UNSUPPORTED        The processor does not support one or
+                                    more bytes of the memory resource range
+                                    specified by BaseAddress and Length.
+  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support
+                                    for the memory resource range specified
+                                    by BaseAddress and Length.
+  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource
+                                    range specified by BaseAddress and Length
+                                    cannot be modified.
+  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to
+                                    modify the attributes of the memory
+                                    resource range.
+
+**/
+RETURN_STATUS
+EFIAPI
+MtrrSetMemoryAttribute (
+  IN PHYSICAL_ADDRESS        BaseAddress,
+  IN UINT64                  Length,
+  IN MTRR_MEMORY_CACHE_TYPE  Attribute
+  )
+{
+  DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttribute() %a:%016lx-%016lx\n", mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
+  return MtrrSetMemoryAttributeWorker (
+           NULL,
+           BaseAddress,
+           Length,
+           Attribute
+           );
+}
+
+/**
+  This function attempts to set the attributes into MTRR setting buffer for a memory range.
+
+  @param[in, out]  MtrrSetting  MTRR setting buffer to be set.
+  @param[in]       BaseAddress  The physical address that is the start address
+                                of a memory region.
+  @param[in]       Length       The size in bytes of the memory region.
+  @param[in]       Attribute    The bit mask of attributes to set for the
+                                memory region.
+
+  @retval RETURN_SUCCESS            The attributes were set for the memory region.
+  @retval RETURN_INVALID_PARAMETER  Length is zero.
+  @retval RETURN_UNSUPPORTED        The processor does not support one or more bytes of the
+                                    memory resource range specified by BaseAddress and Length.
+  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support for the memory resource
+                                    range specified by BaseAddress and Length.
+  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource range specified by
+                                    BaseAddress and Length cannot be modified.
+  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify the attributes of
+                                    the memory resource range.
+
+**/
+RETURN_STATUS
+EFIAPI
+MtrrSetMemoryAttributeInMtrrSettings (
+  IN OUT MTRR_SETTINGS       *MtrrSetting,
+  IN PHYSICAL_ADDRESS        BaseAddress,
+  IN UINT64                  Length,
+  IN MTRR_MEMORY_CACHE_TYPE  Attribute
+  )
+{
+  DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttributeMtrrSettings(%p) %a:%016lx-%016lx\n", MtrrSetting, mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
+  return MtrrSetMemoryAttributeWorker (
+           MtrrSetting,
+           BaseAddress,
+           Length,
+           Attribute
+           );
+}
+
 /**
   Worker function setting variable MTRRs
 

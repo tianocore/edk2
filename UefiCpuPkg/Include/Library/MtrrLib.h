@@ -352,4 +352,35 @@ MtrrGetDefaultMemoryType (
   VOID
   );
 
+/**
+  This function attempts to set the attributes into MTRR setting buffer for a memory range.
+
+  @param[in, out]  MtrrSetting  MTRR setting buffer to be set.
+  @param[in]       BaseAddress  The physical address that is the start address
+                                of a memory region.
+  @param[in]       Length       The size in bytes of the memory region.
+  @param[in]       Attribute    The bit mask of attributes to set for the
+                                memory region.
+
+  @retval RETURN_SUCCESS            The attributes were set for the memory region.
+  @retval RETURN_INVALID_PARAMETER  Length is zero.
+  @retval RETURN_UNSUPPORTED        The processor does not support one or more bytes of the
+                                    memory resource range specified by BaseAddress and Length.
+  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support for the memory resource
+                                    range specified by BaseAddress and Length.
+  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource range specified by
+                                    BaseAddress and Length cannot be modified.
+  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify the attributes of
+                                    the memory resource range.
+
+**/
+RETURN_STATUS
+EFIAPI
+MtrrSetMemoryAttributeInMtrrSettings (
+  IN OUT MTRR_SETTINGS       *MtrrSetting,
+  IN PHYSICAL_ADDRESS        BaseAddress,
+  IN UINT64                  Length,
+  IN MTRR_MEMORY_CACHE_TYPE  Attribute
+  );
+
 #endif // _MTRR_LIB_H_
