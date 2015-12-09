@@ -43,6 +43,14 @@
 
 #define SECURE_BOOT_MODE_ENABLE           1
 #define SECURE_BOOT_MODE_DISABLE          0
+///
+/// Depricated value definition for SetupMode variable 
+///
+#define SETUP_MODE                        1
+#define USER_MODE                         0
+///
+/// Value definition for SetupMode/DeployedMode/AuditMode variable
+///
 #define SETUP_MODE_ENABLE                 1
 #define SETUP_MODE_DISABLE                0
 #define DEPLOYED_MODE_ENABLE              1
