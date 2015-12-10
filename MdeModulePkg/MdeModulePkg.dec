@@ -686,6 +686,12 @@
   # @Prompt Enable S3 performance data support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support|TRUE|BOOLEAN|0x00010064
 
+  ## Indicates if Serial device uses half hand shake.<BR><BR>
+  #   TRUE  - Serial device uses half hand shake.<BR>
+  #   FALSE - Serial device doesn't use half hand shake.<BR>
+  # @Prompt Enable Serial device Half Hand Shake
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010073
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ## Indicates if DxeIpl should switch to long mode to enter DXE phase.
   #  It is assumed that 64-bit DxeCore is built in firmware if it is true; otherwise 32-bit DxeCore
@@ -970,6 +976,38 @@
   #  non-PCI fixed address serial device, such as an ISA serial device, the value is 0xFF.
   # @Prompt Pci Serial Device Info
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo|{0xFF}|VOID*|0x00010067
+
+  ## PCI Serial Parameters. It is an array of VendorID, DeviceID, ClockRate, Offset,
+  #  BarIndex, RegisterStride, ReceiveFifoDepth, TransmitFifoDepth information that 
+  #  describes the parameters of special PCI serial devices.
+  #  Each array entry is 24-byte in length. The array is terminated
+  #  by an array entry with a PCI Vendor ID of 0xFFFF. If a platform only contains a
+  #  standard 16550 PCI serial device whose class code is 7/0/2, the value is 0xFFFF.
+  #  The C style structure is defined as below:
+  #  typedef struct {
+  #    UINT16  VendorId;          ///< Vendor ID to match the PCI device.  The value 0xFFFF terminates the list of entries.
+  #    UINT16  DeviceId;          ///< Device ID to match the PCI device
+  #    UINT32  ClockRate;         ///< UART clock rate.  Set to 0 for default clock rate of 1843200 Hz
+  #    UINT64  Offset;            ///< The byte offset into to the BAR
+  #    UINT8   BarIndex;          ///< Which BAR to get the UART base address
+  #    UINT8   RegisterStride;    ///< UART register stride in bytes.  Set to 0 for default register stride of 1 byte.
+  #    UINT16  ReceiveFifoDepth;  ///< UART receive FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
+  #    UINT16  TransmitFifoDepth; ///< UART transmit FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
+  #    UINT8   Reserved[2];
+  #  } PCI_SERIAL_PARAMETER;
+  #  It contains zero or more instances of the above structure.
+  #  For example, if a PCI device contains two UARTs, PcdPciSerialParameters needs
+  #  to contain  two instances of the above structure, with the VendorId and DeviceId
+  #  equals to the Device ID and Vendor ID of the device; If the PCI device uses the
+  #  first two BARs to support two UARTs, BarIndex of first instance equals to 0 and
+  #  BarIndex of second one equals to 1; If the PCI device uses the first BAR to
+  #  support both UARTs, BarIndex of both instance equals to 0, Offset of first
+  #  instance equals to 0 and Offset of second one equals to a value bigger than or
+  #  equal to 8.
+  #  For certain UART whose register needs to be accessed in DWORD aligned address,
+  #  RegisterStride equals to 4.
+  # @Prompt Pci Serial Parameters
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|{0xFF, 0xFF}|VOID*|0x00010071
 
   ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
   # @Prompt Serial Port Extended Transmit FIFO Size in Bytes
