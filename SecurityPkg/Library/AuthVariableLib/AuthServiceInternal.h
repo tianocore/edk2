@@ -117,6 +117,54 @@ typedef struct {
 } AUTH_CERT_DB_DATA;
 #pragma pack()
 
+///
+/// "SecureBootMode" variable stores current secure boot mode.
+/// The value type is SECURE_BOOT_MODE_TYPE.
+///
+#define EDKII_SECURE_BOOT_MODE_NAME    L"SecureBootMode"
+
+typedef enum { 
+  SecureBootModeTypeUserMode,
+  SecureBootModeTypeSetupMode,
+  SecureBootModeTypeAuditMode,
+  SecureBootModeTypeDeployedMode,
+  SecureBootModeTypeMax
+} SECURE_BOOT_MODE_TYPE;
+
+//
+// Record status info of Customized Secure Boot Mode.
+//
+typedef struct {
+  ///
+  /// AuditMode variable value
+  ///
+  UINT8   AuditMode;
+  ///
+  /// AuditMode variable RW
+  ///
+  BOOLEAN IsAuditModeRO;
+  ///
+  /// DeployedMode variable value
+  ///
+  UINT8   DeployedMode;
+  ///
+  /// AuditMode variable RW
+  ///
+  BOOLEAN IsDeployedModeRO;
+  ///
+  /// SetupMode variable value
+  ///
+  UINT8   SetupMode;
+  /// 
+  /// SetupMode is always RO. Skip IsSetupModeRO;              
+  ///
+
+  ///
+  /// SecureBoot variable value
+  ///
+  UINT8   SecureBoot;
+} SECURE_BOOT_MODE;
+
 extern UINT8    *mPubKeyStore;
 extern UINT32   mPubKeyNumber;
 extern UINT32   mMaxKeyNumber;
@@ -129,6 +177,18 @@ extern UINT8    mVendorKeyState;
 extern VOID     *mHashCtx;
 
 extern AUTH_VAR_LIB_CONTEXT_IN *mAuthVarLibContextIn;
+
+/**
+  Initialize Secure Boot variables.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+
+**/
+EFI_STATUS 
+InitSecureBootVariables (
+  VOID
+  );
 
 /**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
@@ -217,6 +277,39 @@ FilterSignatureList (
   IN     UINTN      DataSize,
   IN OUT VOID       *NewData,
   IN OUT UINTN      *NewDataSize
+  );
+
+/**
+  Process Secure Boot Mode variable.
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
+
+  @param[in]  VariableName                Name of Variable to be found.
+  @param[in]  VendorGuid                  Variable vendor GUID.
+  @param[in]  Data                        Data pointer.
+  @param[in]  DataSize                    Size of Data found. If size is less than the
+                                          data, this value contains the required size.
+  @param[in]  Attributes                  Attribute value of the variable
+
+  @return EFI_INVALID_PARAMETER           Invalid parameter
+  @return EFI_SECURITY_VIOLATION          The variable does NOT pass the validation
+                                          check carried out by the firmware.
+  @return EFI_WRITE_PROTECTED             Variable is Read-Only.
+  @return EFI_SUCCESS                     Variable passed validation successfully.
+
+**/
+EFI_STATUS
+ProcessSecureBootModeVar (
+  IN  CHAR16         *VariableName,
+  IN  EFI_GUID       *VendorGuid,
+  IN  VOID           *Data,
+  IN  UINTN          DataSize,
+  IN  UINT32         Attributes OPTIONAL
   );
 
 /**

@@ -56,6 +56,54 @@ EFI_SIGNATURE_ITEM mSupportSigItem[] = {
   {EFI_CERT_X509_SHA512_GUID,     0,               80           }
 };
 
+//
+// Secure Boot Mode state machine
+//
+SECURE_BOOT_MODE mSecureBootState[SecureBootModeTypeMax] = {
+  // USER MODE
+  {
+      AUDIT_MODE_DISABLE,                        // AuditMode
+      FALSE,                                     // IsAuditModeRO, AuditMode is RW
+      DEPLOYED_MODE_DISABLE,                     // DeployedMode
+      FALSE,                                     // IsDeployedModeRO, DeployedMode is RW
+      SETUP_MODE_DISABLE,                        // SetupMode
+                                                 // SetupMode is always RO
+      SECURE_BOOT_MODE_ENABLE                    // SecureBoot
+  },
+  // SETUP MODE
+  {
+      AUDIT_MODE_DISABLE,                        // AuditMode
+      FALSE,                                     // IsAuditModeRO, AuditMode is RW
+      DEPLOYED_MODE_DISABLE,                     // DeployedMode
+      TRUE,                                      // IsDeployedModeRO, DeployedMode is RO
+      SETUP_MODE_ENABLE,                         // SetupMode
+                                                 // SetupMode is always RO
+      SECURE_BOOT_MODE_DISABLE                   // SecureBoot
+  },
+  // AUDIT MODE
+  {
+      AUDIT_MODE_ENABLE,                         // AuditMode
+      TRUE,                                      // AuditModeValAttr RO, AuditMode is RO
+      DEPLOYED_MODE_DISABLE,                     // DeployedMode
+      TRUE,                                      // DeployedModeValAttr RO, DeployedMode is RO
+      SETUP_MODE_ENABLE,                         // SetupMode
+                                                 // SetupMode is always RO
+      SECURE_BOOT_MODE_DISABLE                   // SecureBoot
+  },
+  // DEPLOYED MODE
+  {
+      AUDIT_MODE_DISABLE,                        // AuditMode, AuditMode is RO
+      TRUE,                                      // AuditModeValAttr RO
+      DEPLOYED_MODE_ENABLE,                      // DeployedMode
+      TRUE,                                      // DeployedModeValAttr RO, DeployedMode is RO
+      SETUP_MODE_DISABLE,                        // SetupMode
+                                                 // SetupMode is always RO
+      SECURE_BOOT_MODE_ENABLE                    // SecureBoot
+  }
+};
+
+SECURE_BOOT_MODE_TYPE  mSecureBootMode;
+
 /**
   Finds variable in storage blocks of volatile and non-volatile storage areas.
 
@@ -247,6 +295,914 @@ AuthServiceInternalUpdateVariableWithTimeStamp (
   return mAuthVarLibContextIn->UpdateVariable (
            &AuthVariableInfo
            );
+}
+
+/**
+  Initialize Secure Boot variables.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+
+**/
+EFI_STATUS
+InitSecureBootVariables (
+  VOID
+  )
+{
+  EFI_STATUS             Status;
+  UINT8                  *Data;
+  UINTN                  DataSize;
+  UINT32                 SecureBoot;
+  UINT8                  SecureBootEnable;
+  SECURE_BOOT_MODE_TYPE  SecureBootMode;
+  BOOLEAN                IsPkPresent;
+
+  //
+  // Find "PK" variable
+  //
+  Status = AuthServiceInternalFindVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
+  if (EFI_ERROR (Status)) {
+    IsPkPresent = FALSE;
+    DEBUG ((EFI_D_INFO, "Variable %s does not exist.\n", EFI_PLATFORM_KEY_NAME));
+  } else {
+    IsPkPresent = TRUE;
+    DEBUG ((EFI_D_INFO, "Variable %s exists.\n", EFI_PLATFORM_KEY_NAME));
+  }
+
+  //
+  // Init "SecureBootMode" variable.
+  // Initial case
+  //   SecureBootMode doesn't exist. Init it with PK state
+  // 3 inconsistency cases need to sync
+  //   1.1 Add PK     -> system break -> update SecureBootMode Var
+  //   1.2 Delete PK  -> system break -> update SecureBootMode Var
+  //   1.3 Set AuditMode ->Delete PK  -> system break -> Update SecureBootMode Var
+  //
+  Status = AuthServiceInternalFindVariable (EDKII_SECURE_BOOT_MODE_NAME, &gEdkiiSecureBootModeGuid, (VOID **)&Data, &DataSize);
+  if (EFI_ERROR(Status)) {
+    //
+    // Variable driver Initial Case
+    //
+    if (IsPkPresent) {
+      SecureBootMode = SecureBootModeTypeUserMode;
+    } else {
+      SecureBootMode = SecureBootModeTypeSetupMode;
+    }
+  } else {
+    //
+    // 3 inconsistency cases need to sync
+    //
+    SecureBootMode = (SECURE_BOOT_MODE_TYPE)*Data;
+    ASSERT(SecureBootMode < SecureBootModeTypeMax);
+
+    if (IsPkPresent) {
+      //
+      // 3.1 Add PK     -> system break -> update SecureBootMode Var
+      //
+      if (SecureBootMode == SecureBootModeTypeSetupMode) {
+        SecureBootMode = SecureBootModeTypeUserMode;
+      } else if (SecureBootMode == SecureBootModeTypeAuditMode) {
+        SecureBootMode = SecureBootModeTypeDeployedMode;
+      }
+    } else {
+      //
+      // 3.2 Delete PK -> system break -> update SecureBootMode Var
+      // 3.3 Set AuditMode ->Delete PK  -> system break -> Update SecureBootMode Var. Reinit to be SetupMode
+      //
+      if ((SecureBootMode == SecureBootModeTypeUserMode) || (SecureBootMode == SecureBootModeTypeDeployedMode)) {
+        SecureBootMode = SecureBootModeTypeSetupMode;
+      }
+    }
+  }
+
+  if (EFI_ERROR(Status) || (SecureBootMode != (SECURE_BOOT_MODE_TYPE)*Data)) {
+    //
+    // Update SecureBootMode Var
+    //
+    Status = AuthServiceInternalUpdateVariable (
+               EDKII_SECURE_BOOT_MODE_NAME,
+               &gEdkiiSecureBootModeGuid,
+               &SecureBootMode,
+               sizeof (UINT8),
+               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
+               );
+    if (EFI_ERROR(Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Init "AuditMode"
+  //
+  Status = AuthServiceInternalUpdateVariable (
+             EFI_AUDIT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &mSecureBootState[SecureBootMode].AuditMode,
+             sizeof(UINT8),
+             EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
+             );
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  //
+  // Init "DeployedMode"
+  //
+  Status = AuthServiceInternalUpdateVariable (
+             EFI_DEPLOYED_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &mSecureBootState[SecureBootMode].DeployedMode,
+             sizeof(UINT8),
+             EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
+             );
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  //
+  // Init "SetupMode"
+  //
+  Status = AuthServiceInternalUpdateVariable (
+             EFI_SETUP_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &mSecureBootState[SecureBootMode].SetupMode,
+             sizeof(UINT8),
+             EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
+             );
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  //
+  // If "SecureBootEnable" variable exists, then update "SecureBoot" variable.
+  // If "SecureBootEnable" variable is SECURE_BOOT_ENABLE and in User Mode or Deployed Mode, Set "SecureBoot" variable to SECURE_BOOT_MODE_ENABLE.
+  // If "SecureBootEnable" variable is SECURE_BOOT_DISABLE, Set "SecureBoot" variable to SECURE_BOOT_MODE_DISABLE.
+  //
+  SecureBootEnable = SECURE_BOOT_DISABLE;
+  Status = AuthServiceInternalFindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID **)&Data, &DataSize);
+  if (!EFI_ERROR(Status)) {
+    if (!IsPkPresent) {
+      //
+      // PK is cleared in runtime. "SecureBootMode" is not updated before reboot
+      // Delete "SecureBootMode"
+      //
+      Status = AuthServiceInternalUpdateVariable (
+                 EFI_SECURE_BOOT_ENABLE_NAME,
+                 &gEfiSecureBootEnableDisableGuid,
+                 &SecureBootEnable,
+                 0,
+                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+                 );
+    } else {
+      SecureBootEnable = *Data;
+    }
+  } else if ((SecureBootMode == SecureBootModeTypeUserMode) || (SecureBootMode == SecureBootModeTypeDeployedMode)) {
+    //
+    // "SecureBootEnable" not exist, initialize it in User Mode or Deployed Mode.
+    //
+    SecureBootEnable = SECURE_BOOT_ENABLE;
+    Status = AuthServiceInternalUpdateVariable (
+               EFI_SECURE_BOOT_ENABLE_NAME,
+               &gEfiSecureBootEnableDisableGuid,
+               &SecureBootEnable,
+               sizeof (UINT8),
+               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Create "SecureBoot" variable with BS+RT attribute set.
+  //
+  if ((SecureBootEnable == SECURE_BOOT_ENABLE) 
+  && ((SecureBootMode == SecureBootModeTypeUserMode) || (SecureBootMode == SecureBootModeTypeDeployedMode))) {
+    SecureBoot = SECURE_BOOT_MODE_ENABLE;
+  } else {
+    SecureBoot = SECURE_BOOT_MODE_DISABLE;
+  }
+  Status = AuthServiceInternalUpdateVariable (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SecureBoot,
+             sizeof (UINT8),
+             EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS
+             );
+
+  DEBUG ((EFI_D_INFO, "SecureBootMode is %x\n", SecureBootMode));
+  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_MODE_NAME, SecureBoot));
+  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_ENABLE_NAME, SecureBootEnable));
+
+  //
+  // Save SecureBootMode in global space
+  //
+  mSecureBootMode = SecureBootMode;
+
+  return Status;
+}
+
+/**
+  Update SecureBootMode variable.
+
+  @param[in] NewMode                New Secure Boot Mode.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+
+**/
+EFI_STATUS
+UpdateSecureBootMode(
+  IN  SECURE_BOOT_MODE_TYPE  NewMode
+  )
+{
+  EFI_STATUS              Status;
+
+  //
+  // Update "SecureBootMode" variable to new Secure Boot Mode
+  //
+  Status = AuthServiceInternalUpdateVariable (
+             EDKII_SECURE_BOOT_MODE_NAME,
+             &gEdkiiSecureBootModeGuid,
+             &NewMode,
+             sizeof (UINT8),
+             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
+             );
+
+  if (!EFI_ERROR(Status)) {
+    DEBUG((EFI_D_INFO, "SecureBootMode Update to %x\n", NewMode));
+    mSecureBootMode = NewMode;
+  } else {
+    DEBUG((EFI_D_ERROR, "SecureBootMode Update failure %x\n", Status));
+  }
+
+  return Status;
+}
+
+/**
+  Current secure boot mode is AuditMode. This function performs secure boot mode transition
+  to a new mode.
+
+  @param[in] NewMode                New Secure Boot Mode.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+
+**/
+EFI_STATUS
+TransitionFromAuditMode(
+  IN  SECURE_BOOT_MODE_TYPE               NewMode
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       *AuditVarData;
+  UINT8       *DeployedVarData;
+  UINT8       *SetupVarData;
+  UINT8       *SecureBootVarData;
+  UINT8       SecureBootEnable;
+  UINTN       DataSize;
+
+  //
+  // AuditMode/DeployedMode/SetupMode/SecureBoot are all NON_NV variable maintained by Variable driver
+  // they can be RW. but can't be deleted. so they can always be found.
+  //
+  Status = AuthServiceInternalFindVariable (
+             EFI_AUDIT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &AuditVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_DEPLOYED_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &DeployedVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SETUP_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SetupVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SecureBootVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  //
+  // Make Secure Boot Mode transition ATOMIC
+  // Update Private NV SecureBootMode Variable first, because it may fail due to NV range overflow.
+  // other tranisition logic are all memory operations.
+  //
+  Status = UpdateSecureBootMode(NewMode);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "Update SecureBootMode Variable fail %x\n", Status));
+  }
+
+  if (NewMode == SecureBootModeTypeDeployedMode) {
+    //
+    // Since PK is enrolled, can't rollback, always update SecureBootMode in memory
+    //
+    mSecureBootMode = NewMode;
+    Status          = EFI_SUCCESS;
+
+    //
+    // AuditMode ----> DeployedMode
+    // Side Effects
+    //   AuditMode =: 0 / DeployedMode := 1 / SetupMode := 0
+    //
+    // Update the value of AuditMode variable by a simple mem copy, this could avoid possible
+    // variable storage reclaim at runtime.
+    //
+    CopyMem (AuditVarData, &mSecureBootState[NewMode].AuditMode, sizeof(UINT8));
+    //
+    // Update the value of DeployedMode variable by a simple mem copy, this could avoid possible
+    // variable storage reclaim at runtime.
+    //
+    CopyMem (DeployedVarData, &mSecureBootState[NewMode].DeployedMode, sizeof(UINT8));
+    //
+    // Update the value of SetupMode variable by a simple mem copy, this could avoid possible
+    // variable storage reclaim at runtime.
+    //
+    CopyMem (SetupVarData, &mSecureBootState[NewMode].SetupMode, sizeof(UINT8));
+
+    if (mAuthVarLibContextIn->AtRuntime ()) {
+      //
+      // SecureBoot Variable indicates whether the platform firmware is operating
+      // in Secure boot mode (1) or not (0), so we should not change SecureBoot
+      // Variable in runtime.
+      //
+      return Status;
+    }
+
+    //
+    // Update the value of SecureBoot variable by a simple mem copy, this could avoid possible
+    // variable storage reclaim at runtime.
+    //
+    CopyMem (SecureBootVarData, &mSecureBootState[NewMode].SecureBoot, sizeof(UINT8));
+
+    //
+    // Create "SecureBootEnable" variable  as secure boot is enabled.
+    //
+    SecureBootEnable = SECURE_BOOT_ENABLE;
+    AuthServiceInternalUpdateVariable (
+      EFI_SECURE_BOOT_ENABLE_NAME,
+      &gEfiSecureBootEnableDisableGuid,
+      &SecureBootEnable,
+      sizeof (SecureBootEnable),
+      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+      );
+  } else {
+    DEBUG((EFI_D_ERROR, "Invalid state tranition from %x to %x\n", SecureBootModeTypeAuditMode, NewMode));
+    ASSERT(FALSE);
+  }
+
+  return Status;
+}
+
+/**
+  Current secure boot mode is DeployedMode. This function performs secure boot mode transition
+  to a new mode.
+
+  @param[in] NewMode                New Secure Boot Mode.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+
+**/
+EFI_STATUS
+TransitionFromDeployedMode(
+  IN  SECURE_BOOT_MODE_TYPE               NewMode
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       *DeployedVarData;
+  UINT8       *SetupVarData;
+  UINT8       *SecureBootVarData;
+  UINT8       SecureBootEnable;
+  UINTN       DataSize;
+
+  //
+  // AuditMode/DeployedMode/SetupMode/SecureBoot are all NON_NV variable maintained by Variable driver
+  // they can be RW. but can't be deleted. so they can always be found.
+  //
+  Status = AuthServiceInternalFindVariable (
+             EFI_DEPLOYED_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &DeployedVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SETUP_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SetupVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SecureBootVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  //
+  // Make Secure Boot Mode transition ATOMIC
+  // Update Private NV SecureBootMode Variable first, because it may fail due to NV range overflow.
+  // other tranisition logic are all memory operations.
+  //
+  Status = UpdateSecureBootMode(NewMode);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "Update SecureBootMode Variable fail %x\n", Status));
+  }
+
+  switch(NewMode) {
+    case SecureBootModeTypeUserMode:
+      //
+      // DeployedMode ----> UserMode
+      // Side Effects
+      //   DeployedMode := 0
+      //
+      // Platform Specific DeployedMode clear. UpdateSecureBootMode fails and no other variables are updated before. rollback this transition
+      //
+      if (EFI_ERROR(Status)) {
+        return Status;
+      }
+      CopyMem (DeployedVarData, &mSecureBootState[NewMode].DeployedMode, sizeof(UINT8));
+
+      break;
+
+    case SecureBootModeTypeSetupMode:
+      //
+      // Since PK is processed before, can't rollback, still update SecureBootMode in memory
+      //
+      mSecureBootMode = NewMode;
+      Status          = EFI_SUCCESS;
+
+      //
+      // DeployedMode ----> SetupMode
+      //
+      // Platform Specific PKpub clear or Delete Pkpub
+      // Side Effects
+      //   DeployedMode := 0 / SetupMode := 1 / SecureBoot := 0
+      //
+      // Update the value of DeployedMode variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (DeployedVarData, &mSecureBootState[NewMode].DeployedMode, sizeof(UINT8));
+      //
+      // Update the value of SetupMode variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (SetupVarData, &mSecureBootState[NewMode].SetupMode, sizeof(UINT8));
+
+      if (mAuthVarLibContextIn->AtRuntime ()) {
+        //
+        // SecureBoot Variable indicates whether the platform firmware is operating
+        // in Secure boot mode (1) or not (0), so we should not change SecureBoot
+        // Variable in runtime.
+        //
+        return Status;
+      }
+
+      //
+      // Update the value of SecureBoot variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (SecureBootVarData, &mSecureBootState[NewMode].SecureBoot, sizeof(UINT8));
+
+      //
+      // Delete the "SecureBootEnable" variable as secure boot is Disabled.
+      //
+      SecureBootEnable = SECURE_BOOT_DISABLE;
+      AuthServiceInternalUpdateVariable (
+        EFI_SECURE_BOOT_ENABLE_NAME,
+        &gEfiSecureBootEnableDisableGuid,
+        &SecureBootEnable,
+        0,
+        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+        );
+      break;
+
+    default:
+      DEBUG((EFI_D_ERROR, "Invalid state tranition from %x to %x\n", SecureBootModeTypeDeployedMode, NewMode));
+      ASSERT(FALSE);
+  }
+
+  return Status;
+}
+
+/**
+  Current secure boot mode is UserMode. This function performs secure boot mode transition
+  to a new mode.
+
+  @param[in] NewMode                New Secure Boot Mode.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+
+**/
+EFI_STATUS
+TransitionFromUserMode(
+  IN  SECURE_BOOT_MODE_TYPE               NewMode
+  )
+{
+  EFI_STATUS   Status;
+  UINT8        *AuditVarData;
+  UINT8        *DeployedVarData;
+  UINT8        *SetupVarData;
+  UINT8        *PkVarData;
+  UINT8        *SecureBootVarData;
+  UINT8        SecureBootEnable;
+  UINTN        DataSize;
+  VARIABLE_ENTRY_CONSISTENCY  VariableEntry;
+
+  //
+  // AuditMode/DeployedMode/SetupMode/SecureBoot are all NON_NV variable maintained by Variable driver
+  // they can be RW. but can't be deleted. so they can always be found.
+  //
+  Status = AuthServiceInternalFindVariable (
+             EFI_AUDIT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &AuditVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_DEPLOYED_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &DeployedVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SETUP_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SetupVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SecureBootVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  //
+  // Make Secure Boot Mode transition ATOMIC
+  // Update Private NV SecureBootMode Variable first, because it may fail due to NV range overflow. 
+  // Other tranisition logic are all memory operations and PK delete is assumed to be always successful.
+  //
+  if (NewMode != SecureBootModeTypeAuditMode) {
+    Status = UpdateSecureBootMode(NewMode);
+    if (EFI_ERROR(Status)) {
+      DEBUG((EFI_D_ERROR, "Update SecureBootMode Variable fail %x\n", Status));
+    }
+  } else {
+    //
+    // UserMode -----> AuditMode. Check RemainingSpace for SecureBootMode var first.
+    // Will update SecureBootMode after DeletePK logic
+    //
+    VariableEntry.VariableSize = sizeof(UINT8);
+    VariableEntry.Guid         = &gEdkiiSecureBootModeGuid;
+    VariableEntry.Name         = EDKII_SECURE_BOOT_MODE_NAME;
+    if (!mAuthVarLibContextIn->CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry, NULL)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+  switch(NewMode) {
+    case SecureBootModeTypeDeployedMode:
+      //
+      // UpdateSecureBootMode fails and no other variables are updated before. rollback this transition
+      //
+      if (EFI_ERROR(Status)) {
+        return Status;
+      }
+
+      //
+      // UserMode ----> DeployedMode
+      // Side Effects
+      //   DeployedMode := 1
+      //
+      CopyMem (DeployedVarData, &mSecureBootState[NewMode].DeployedMode, sizeof(UINT8));
+      break;
+
+    case SecureBootModeTypeAuditMode:
+      //
+      // UserMode ----> AuditMode
+      // Side Effects
+      //   Delete PKpub / SetupMode := 1 / SecureBoot := 0
+      //
+      // Delete PKpub without verification. Should always succeed.
+      //
+      PkVarData = NULL;
+      Status = AuthServiceInternalUpdateVariable (
+                 EFI_PLATFORM_KEY_NAME,
+                 &gEfiGlobalVariableGuid,
+                 PkVarData,
+                 0,
+                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS
+                 );
+      if (EFI_ERROR(Status)) {
+        DEBUG((EFI_D_ERROR, "UserMode -> AuditMode. Delete PK fail %x\n", Status));
+        ASSERT(FALSE);
+      }
+
+      //
+      // Update Private NV SecureBootMode Variable
+      //
+      Status = UpdateSecureBootMode(NewMode);
+      if (EFI_ERROR(Status)) {
+        //
+        // Since PK is deleted successfully, Doesn't break, continue to update other variable.
+        //
+        DEBUG((EFI_D_ERROR, "Update SecureBootMode Variable fail %x\n", Status));
+      }
+      CopyMem (AuditVarData, &mSecureBootState[NewMode].AuditMode, sizeof(UINT8));
+
+      //
+      // Fall into SetupMode logic
+      //
+    case SecureBootModeTypeSetupMode:
+      //
+      // Since PK is deleted before , can't rollback, still update SecureBootMode in memory
+      //
+      mSecureBootMode = NewMode;
+      Status          = EFI_SUCCESS;
+
+      //
+      // UserMode ----> SetupMode
+      //  Side Effects
+      //    DeployedMode :=0 / SetupMode :=1 / SecureBoot :=0
+      //
+      // Update the value of SetupMode variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (SetupVarData, &mSecureBootState[NewMode].SetupMode, sizeof(UINT8));
+
+      if (mAuthVarLibContextIn->AtRuntime ()) {
+        //
+        // SecureBoot Variable indicates whether the platform firmware is operating
+        // in Secure boot mode (1) or not (0), so we should not change SecureBoot
+        // Variable in runtime.
+        //
+        return Status;
+      }
+
+      //
+      // Update the value of SecureBoot variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (SecureBootVarData, &mSecureBootState[NewMode].SecureBoot, sizeof(UINT8));
+
+      //
+      // Delete the "SecureBootEnable" variable as secure boot is Disabled.
+      //
+      SecureBootEnable = SECURE_BOOT_DISABLE;
+      AuthServiceInternalUpdateVariable (
+        EFI_SECURE_BOOT_ENABLE_NAME,
+        &gEfiSecureBootEnableDisableGuid,
+        &SecureBootEnable,
+        0,
+        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+        );
+
+      break;
+
+    default:
+      DEBUG((EFI_D_ERROR, "Invalid state tranition from %x to %x\n", SecureBootModeTypeUserMode, NewMode));
+      ASSERT(FALSE);
+  }
+
+  return Status;
+}
+
+/**
+  Current secure boot mode is SetupMode. This function performs secure boot mode transition
+  to a new mode.
+
+  @param[in] NewMode                New Secure Boot Mode.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+
+**/
+EFI_STATUS
+TransitionFromSetupMode(
+  IN  SECURE_BOOT_MODE_TYPE              NewMode
+  )
+{
+  EFI_STATUS   Status;
+  UINT8        *AuditVarData;
+  UINT8        *SetupVarData;
+  UINT8        *SecureBootVarData;
+  UINT8        SecureBootEnable;
+  UINTN        DataSize;
+
+  //
+  // AuditMode/DeployedMode/SetupMode/SecureBoot are all NON_NV variable maintained by Variable driver
+  // they can be RW. but can't be deleted. so they can always be found.
+  //
+  Status = AuthServiceInternalFindVariable (
+             EFI_AUDIT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &AuditVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SETUP_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SetupVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  Status = AuthServiceInternalFindVariable (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &SecureBootVarData,
+             &DataSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT(FALSE);
+  }
+
+  //
+  // Make Secure Boot Mode transition ATOMIC
+  // Update Private NV SecureBootMode Variable first, because it may fail due to NV range overflow.
+  // Other tranisition logic are all memory operations and PK delete is assumed to be always successful.
+  //
+  Status = UpdateSecureBootMode(NewMode);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "Update SecureBootMode Variable fail %x\n", Status));
+  }
+
+  switch(NewMode) {
+    case SecureBootModeTypeAuditMode:
+      //
+      // UpdateSecureBootMode fails and no other variables are updated before. rollback this transition
+      //
+      if (EFI_ERROR(Status)) {
+        return Status;
+      }
+
+      //
+      // SetupMode ----> AuditMode
+      // Side Effects
+      //   AuditMode := 1
+      //
+      // Update the value of AuditMode variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (AuditVarData, &mSecureBootState[NewMode].AuditMode, sizeof(UINT8));
+      break;
+
+    case SecureBootModeTypeUserMode:
+      //
+      // Since PK is enrolled before, can't rollback, still update SecureBootMode in memory
+      //
+      mSecureBootMode = NewMode;
+      Status          = EFI_SUCCESS;
+
+      //
+      // SetupMode ----> UserMode
+      // Side Effects
+      //   SetupMode := 0 / SecureBoot := 1
+      //
+      // Update the value of AuditMode variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (SetupVarData, &mSecureBootState[NewMode].SetupMode, sizeof(UINT8));
+
+      if (mAuthVarLibContextIn->AtRuntime ()) {
+        //
+        // SecureBoot Variable indicates whether the platform firmware is operating
+        // in Secure boot mode (1) or not (0), so we should not change SecureBoot
+        // Variable in runtime.
+        //
+        return Status;
+      }
+
+      //
+      // Update the value of SecureBoot variable by a simple mem copy, this could avoid possible
+      // variable storage reclaim at runtime.
+      //
+      CopyMem (SecureBootVarData, &mSecureBootState[NewMode].SecureBoot, sizeof(UINT8));
+
+      //
+      // Create the "SecureBootEnable" variable as secure boot is enabled.
+      //
+      SecureBootEnable = SECURE_BOOT_ENABLE;
+      AuthServiceInternalUpdateVariable (
+        EFI_SECURE_BOOT_ENABLE_NAME,
+        &gEfiSecureBootEnableDisableGuid,
+        &SecureBootEnable,
+        sizeof (SecureBootEnable),
+        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+        );
+      break;
+
+    default:
+      DEBUG((EFI_D_ERROR, "Invalid state tranition from %x to %x\n", SecureBootModeTypeSetupMode, NewMode));
+      ASSERT(FALSE);
+  }
+
+  return Status;
+}
+
+/**
+  This function performs main secure boot mode transition logic.
+
+  @param[in] CurMode                Current Secure Boot Mode.
+  @param[in] NewMode                New Secure Boot Mode.
+
+  @retval EFI_SUCCESS               The initialization operation is successful.
+  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
+  @retval EFI_INVALID_PARAMETER     The Current Secure Boot Mode is wrong.
+
+**/
+EFI_STATUS
+SecureBootModeTransition(
+  IN  SECURE_BOOT_MODE_TYPE  CurMode,
+  IN  SECURE_BOOT_MODE_TYPE  NewMode
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // SecureBootMode transition
+  //
+  switch (CurMode) {
+    case SecureBootModeTypeUserMode:
+      Status = TransitionFromUserMode(NewMode);
+      break;
+
+    case SecureBootModeTypeSetupMode:
+      Status = TransitionFromSetupMode(NewMode);
+      break;
+
+    case SecureBootModeTypeAuditMode:
+      Status = TransitionFromAuditMode(NewMode);
+      break;
+
+    case SecureBootModeTypeDeployedMode:
+      Status = TransitionFromDeployedMode(NewMode);
+      break;
+
+    default:
+      Status = EFI_INVALID_PARAMETER;
+      ASSERT(FALSE);
+  }
+
+  return Status;
+
 }
 
 /**
@@ -597,129 +1553,6 @@ Done:
   }
 }
 
-/**
-  Update platform mode.
-
-  @param[in]      Mode                    SETUP_MODE or USER_MODE.
-
-  @return EFI_INVALID_PARAMETER           Invalid parameter.
-  @return EFI_SUCCESS                     Update platform mode successfully.
-
-**/
-EFI_STATUS
-UpdatePlatformMode (
-  IN  UINT32                    Mode
-  )
-{
-  EFI_STATUS              Status;
-  VOID                    *Data;
-  UINTN                   DataSize;
-  UINT8                   SecureBootMode;
-  UINT8                   SecureBootEnable;
-  UINTN                   VariableDataSize;
-
-  Status = AuthServiceInternalFindVariable (
-             EFI_SETUP_MODE_NAME,
-             &gEfiGlobalVariableGuid,
-             &Data,
-             &DataSize
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Update the value of SetupMode variable by a simple mem copy, this could avoid possible
-  // variable storage reclaim at runtime.
-  //
-  mPlatformMode = (UINT8) Mode;
-  CopyMem (Data, &mPlatformMode, sizeof(UINT8));
-
-  if (mAuthVarLibContextIn->AtRuntime ()) {
-    //
-    // SecureBoot Variable indicates whether the platform firmware is operating
-    // in Secure boot mode (1) or not (0), so we should not change SecureBoot
-    // Variable in runtime.
-    //
-    return Status;
-  }
-
-  //
-  // Check "SecureBoot" variable's existence.
-  // If it doesn't exist, firmware has no capability to perform driver signing verification,
-  // then set "SecureBoot" to 0.
-  //
-  Status = AuthServiceInternalFindVariable (
-             EFI_SECURE_BOOT_MODE_NAME,
-             &gEfiGlobalVariableGuid,
-             &Data,
-             &DataSize
-             );
-  //
-  // If "SecureBoot" variable exists, then check "SetupMode" variable update.
-  // If "SetupMode" variable is USER_MODE, "SecureBoot" variable is set to 1.
-  // If "SetupMode" variable is SETUP_MODE, "SecureBoot" variable is set to 0.
-  //
-  if (EFI_ERROR (Status)) {
-    SecureBootMode = SECURE_BOOT_MODE_DISABLE;
-  } else {
-    if (mPlatformMode == USER_MODE) {
-      SecureBootMode = SECURE_BOOT_MODE_ENABLE;
-    } else if (mPlatformMode == SETUP_MODE) {
-      SecureBootMode = SECURE_BOOT_MODE_DISABLE;
-    } else {
-      return EFI_NOT_FOUND;
-    }
-  }
-
-  Status  = AuthServiceInternalUpdateVariable (
-              EFI_SECURE_BOOT_MODE_NAME,
-              &gEfiGlobalVariableGuid,
-              &SecureBootMode,
-              sizeof(UINT8),
-              EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS
-              );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Check "SecureBootEnable" variable's existence. It can enable/disable secure boot feature.
-  //
-  Status = AuthServiceInternalFindVariable (
-             EFI_SECURE_BOOT_ENABLE_NAME,
-             &gEfiSecureBootEnableDisableGuid,
-             &Data,
-             &DataSize
-             );
-
-  if (SecureBootMode == SECURE_BOOT_MODE_ENABLE) {
-    //
-    // Create the "SecureBootEnable" variable as secure boot is enabled.
-    //
-    SecureBootEnable = SECURE_BOOT_ENABLE;
-    VariableDataSize = sizeof (SecureBootEnable);
-  } else {
-    //
-    // Delete the "SecureBootEnable" variable if this variable exist as "SecureBoot"
-    // variable is not in secure boot state.
-    //
-    if (EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
-    }
-    SecureBootEnable = SECURE_BOOT_DISABLE;
-    VariableDataSize = 0;
-  }
-
-  Status = AuthServiceInternalUpdateVariable (
-             EFI_SECURE_BOOT_ENABLE_NAME,
-             &gEfiSecureBootEnableDisableGuid,
-             &SecureBootEnable,
-             VariableDataSize,
-             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
-             );
-  return Status;
-}
 
 /**
   Check input data form to make sure it is a valid EFI_SIGNATURE_LIST for PK/KEK/db/dbx/dbt variable.
@@ -880,6 +1713,121 @@ VendorKeyIsModified (
 }
 
 /**
+  Process Secure Boot Mode variable.
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
+
+  @param[in]  VariableName                Name of Variable to be found.
+  @param[in]  VendorGuid                  Variable vendor GUID.
+  @param[in]  Data                        Data pointer.
+  @param[in]  DataSize                    Size of Data found. If size is less than the
+                                          data, this value contains the required size.
+  @param[in]  Attributes                  Attribute value of the variable
+
+  @return EFI_INVALID_PARAMETER           Invalid parameter
+  @return EFI_SECURITY_VIOLATION          The variable does NOT pass the validation
+                                          check carried out by the firmware.
+  @return EFI_WRITE_PROTECTED             Variable is Read-Only.
+  @return EFI_SUCCESS                     Variable passed validation successfully.
+
+**/
+EFI_STATUS
+ProcessSecureBootModeVar (
+  IN  CHAR16         *VariableName,
+  IN  EFI_GUID       *VendorGuid,
+  IN  VOID           *Data,
+  IN  UINTN          DataSize,
+  IN  UINT32         Attributes OPTIONAL
+  )
+{
+  EFI_STATUS    Status;
+  UINT8         *VarData;
+  UINTN         VarDataSize;
+
+  //
+  // Check "AuditMode", "DeployedMode" Variable ReadWrite Attributes
+  //  if in Runtime,  Always RO
+  //  if in Boottime, Depends on current Secure Boot Mode
+  //
+  if (mAuthVarLibContextIn->AtRuntime()) {
+    return EFI_WRITE_PROTECTED;
+  }
+
+  //
+  // Delete not OK
+  //
+  if ((DataSize != sizeof(UINT8)) || (Attributes == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (StrCmp (VariableName, EFI_AUDIT_MODE_NAME) == 0) {
+    if(mSecureBootState[mSecureBootMode].IsAuditModeRO) {
+      return EFI_WRITE_PROTECTED;
+    }
+  } else {
+    //
+    // Platform specific deployedMode clear. Set DeployedMode = RW
+    //
+    if (!InCustomMode() || !UserPhysicalPresent() || mSecureBootMode != SecureBootModeTypeDeployedMode) {
+      if(mSecureBootState[mSecureBootMode].IsDeployedModeRO) {
+        return EFI_WRITE_PROTECTED;
+      }
+    }
+  }
+
+  if (*(UINT8 *)Data != 0 && *(UINT8 *)Data != 1) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // AuditMode/DeployedMode/SetupMode/SecureBoot are all NON_NV variable maintained by Variable driver
+  // they can be RW. but can't be deleted. so they can always be found.
+  //
+  Status = AuthServiceInternalFindVariable (
+             VariableName,
+             VendorGuid,
+             &VarData,
+             &VarDataSize
+             );
+  if (EFI_ERROR(Status)) {
+    ASSERT(FALSE);
+  }
+
+  //
+  // If AuditMode/DeployedMode is assigned same value. Simply return EFI_SUCCESS
+  //
+  if (*VarData == *(UINT8 *)Data) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Perform SecureBootMode transition
+  //
+  if (StrCmp (VariableName, EFI_AUDIT_MODE_NAME) == 0) {
+    DEBUG((EFI_D_INFO, "Current SecureBootMode %x Transfer to SecureBootMode %x\n", mSecureBootMode, SecureBootModeTypeAuditMode));
+    return SecureBootModeTransition(mSecureBootMode, SecureBootModeTypeAuditMode);
+  } else if (StrCmp (VariableName, EFI_DEPLOYED_MODE_NAME) == 0) {
+    if (mSecureBootMode == SecureBootModeTypeDeployedMode) {
+      //
+      // Platform specific DeployedMode clear. InCustomMode() && UserPhysicalPresent() is checked before
+      //
+      DEBUG((EFI_D_INFO, "Current SecureBootMode %x. Transfer to SecureBootMode %x\n", mSecureBootMode, SecureBootModeTypeUserMode));
+      return SecureBootModeTransition(mSecureBootMode, SecureBootModeTypeUserMode);
+    } else {
+      DEBUG((EFI_D_INFO, "Current SecureBootMode %x. Transfer to SecureBootMode %x\n", mSecureBootMode, SecureBootModeTypeDeployedMode));
+      return SecureBootModeTransition(mSecureBootMode, SecureBootModeTypeDeployedMode);
+    }
+  }
+
+  return EFI_INVALID_PARAMETER;
+}
+
+/**
   Process variable with platform key for verification.
 
   Caution: This function may receive untrusted input.
@@ -917,6 +1865,7 @@ ProcessVarWithPk (
   BOOLEAN                     Del;
   UINT8                       *Payload;
   UINTN                       PayloadSize;
+  VARIABLE_ENTRY_CONSISTENCY  VariableEntry[2];
 
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0 ||
       (Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0) {
@@ -927,17 +1876,53 @@ ProcessVarWithPk (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Init state of Del. State may change due to secure check
+  //
   Del = FALSE;
-  if ((InCustomMode() && UserPhysicalPresent()) || (mPlatformMode == SETUP_MODE && !IsPk)) {
-    Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
-    PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
-    if (PayloadSize == 0) {
-      Del = TRUE;
-    }
+  Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
+  PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
+  if (PayloadSize == 0) {
+    Del = TRUE;
+  }
+
+  //
+  // Check the variable space for both PKpub and SecureBootMode variable.
+  //
+  VariableEntry[0].VariableSize = PayloadSize;
+  VariableEntry[0].Guid         = &gEfiGlobalVariableGuid;
+  VariableEntry[0].Name         = EFI_PLATFORM_KEY_NAME;
+
+  VariableEntry[1].VariableSize = sizeof(UINT8);
+  VariableEntry[1].Guid         = &gEdkiiSecureBootModeGuid;
+  VariableEntry[1].Name         = EDKII_SECURE_BOOT_MODE_NAME;
+
+  if ((InCustomMode() && UserPhysicalPresent()) || 
+      (((mSecureBootMode == SecureBootModeTypeSetupMode) || (mSecureBootMode == SecureBootModeTypeAuditMode)) && !IsPk)) {
 
     Status = CheckSignatureListFormat(VariableName, VendorGuid, Payload, PayloadSize);
     if (EFI_ERROR (Status)) {
       return Status;
+    }
+
+    //
+    // If delete PKpub, only check for "SecureBootMode" only
+    // if update / add PKpub, check both NewPKpub & "SecureBootMode"
+    //
+    if (IsPk) {
+      //
+      // Delete PKpub
+      //
+      if (Del && ((mSecureBootMode == SecureBootModeTypeUserMode) || (mSecureBootMode == SecureBootModeTypeDeployedMode)) 
+          && !mAuthVarLibContextIn->CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[1], NULL)){
+        return EFI_OUT_OF_RESOURCES;
+      //
+      // Add PKpub
+      //
+      } else if (!Del && ((mSecureBootMode == SecureBootModeTypeSetupMode) || (mSecureBootMode == SecureBootModeTypeAuditMode))
+                 && !mAuthVarLibContextIn->CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
+        return EFI_OUT_OF_RESOURCES;
+      }
     }
 
     Status = AuthServiceInternalUpdateVariableWithTimeStamp (
@@ -952,10 +1937,17 @@ ProcessVarWithPk (
       return Status;
     }
 
-    if ((mPlatformMode != SETUP_MODE) || IsPk) {
+    if (((mSecureBootMode != SecureBootModeTypeSetupMode) && (mSecureBootMode != SecureBootModeTypeAuditMode)) || IsPk) {
       Status = VendorKeyIsModified ();
     }
-  } else if (mPlatformMode == USER_MODE) {
+  } else if (mSecureBootMode == SecureBootModeTypeUserMode || mSecureBootMode == SecureBootModeTypeDeployedMode) {
+    //
+    // If delete PKpub, check "SecureBootMode" only
+    //
+    if (IsPk && Del && !mAuthVarLibContextIn->CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[1], NULL)){
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     //
     // Verify against X509 Cert in PK database.
     //
@@ -970,8 +1962,19 @@ ProcessVarWithPk (
                );
   } else {
     //
+    // SetupMode or  AuditMode to add PK
     // Verify against the certificate in data payload.
     //
+    //
+    // Check PKpub & SecureBootMode variable space consistency
+    //
+    if (!mAuthVarLibContextIn->CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
+      //
+      // No enough variable space to set PK successfully.
+      //
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     Status = VerifyTimeBasedPayloadAndUpdate (
                VariableName,
                VendorGuid,
@@ -984,16 +1987,30 @@ ProcessVarWithPk (
   }
 
   if (!EFI_ERROR(Status) && IsPk) {
-    if (mPlatformMode == SETUP_MODE && !Del) {
-      //
-      // If enroll PK in setup mode, need change to user mode.
-      //
-      Status = UpdatePlatformMode (USER_MODE);
-    } else if (mPlatformMode == USER_MODE && Del){
-      //
-      // If delete PK in user mode, need change to setup mode.
-      //
-      Status = UpdatePlatformMode (SETUP_MODE);
+    //
+    // Delete or Enroll PK causes SecureBootMode change
+    //
+    if (!Del) {
+      if (mSecureBootMode == SecureBootModeTypeSetupMode) {
+        //
+        // If enroll PK in setup mode,  change to user mode.
+        //
+        Status = SecureBootModeTransition (mSecureBootMode, SecureBootModeTypeUserMode);
+      } else if (mSecureBootMode == SecureBootModeTypeAuditMode) {
+        //
+        // If enroll PK in Audit mode,  change to Deployed mode.
+        //
+        Status = SecureBootModeTransition (mSecureBootMode, SecureBootModeTypeDeployedMode);
+      } else {
+        DEBUG((EFI_D_INFO, "PK is updated in %x mode. No SecureBootMode change.\n", mSecureBootMode));
+      }
+    } else {
+      if ((mSecureBootMode == SecureBootModeTypeUserMode) || (mSecureBootMode == SecureBootModeTypeDeployedMode)) {
+        //
+        // If delete PK in User Mode or DeployedMode,  change to Setup Mode.
+        //
+        Status = SecureBootModeTransition (mSecureBootMode, SecureBootModeTypeSetupMode);
+      }
     }
   }
 
@@ -1046,7 +2063,8 @@ ProcessVarWithKek (
   }
 
   Status = EFI_SUCCESS;
-  if (mPlatformMode == USER_MODE && !(InCustomMode() && UserPhysicalPresent())) {
+  if ((mSecureBootMode == SecureBootModeTypeUserMode || mSecureBootMode == SecureBootModeTypeDeployedMode)
+   && !(InCustomMode() && UserPhysicalPresent())) {
     //
     // Time-based, verify against X509 Cert KEK.
     //
@@ -1083,7 +2101,7 @@ ProcessVarWithKek (
       return Status;
     }
 
-    if (mPlatformMode != SETUP_MODE) {
+    if ((mSecureBootMode != SecureBootModeTypeSetupMode) && (mSecureBootMode != SecureBootModeTypeAuditMode)) {
       Status = VendorKeyIsModified ();
     }
   }
