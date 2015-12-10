@@ -117,22 +117,25 @@ PrePeiCoreTemporaryRamSupport (
   VOID                             *NewHeap;
   VOID                             *OldStack;
   VOID                             *NewStack;
+  UINTN                            HeapSize;
+
+  HeapSize = ALIGN_VALUE (CopySize / 2, CPU_STACK_ALIGNMENT);
 
   OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
-  NewHeap = (VOID*)((UINTN)PermanentMemoryBase + (CopySize >> 1));
+  NewHeap = (VOID*)((UINTN)PermanentMemoryBase + (CopySize - HeapSize));
 
-  OldStack = (VOID*)((UINTN)TemporaryMemoryBase + (CopySize >> 1));
+  OldStack = (VOID*)((UINTN)TemporaryMemoryBase + HeapSize);
   NewStack = (VOID*)(UINTN)PermanentMemoryBase;
 
   //
   // Migrate the temporary memory stack to permanent memory stack.
   //
-  CopyMem (NewStack, OldStack, CopySize >> 1);
+  CopyMem (NewStack, OldStack, CopySize - HeapSize);
 
   //
   // Migrate the temporary memory heap to permanent memory heap.
   //
-  CopyMem (NewHeap, OldHeap, CopySize >> 1);
+  CopyMem (NewHeap, OldHeap, HeapSize);
 
   SecSwitchStack ((UINTN)NewStack - (UINTN)OldStack);
 
