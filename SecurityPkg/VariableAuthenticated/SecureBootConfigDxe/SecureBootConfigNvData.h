@@ -1,7 +1,7 @@
 /** @file
   Header file for NV data structure definition.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -84,6 +84,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define LABEL_DBT_DELETE                      0x1203
 #define LABEL_END                             0xffff
 
+#define KEY_TRANS_SECURE_BOOT_MODE            0x2000
+
 #define SECURE_BOOT_MAX_ATTEMPTS_NUM          255
 
 #define CONFIG_OPTION_OFFSET                  0x2000
@@ -116,6 +118,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SECURE_BOOT_GUID_SIZE                 36
 #define SECURE_BOOT_GUID_STORAGE_SIZE         37
 
+#define SECURE_BOOT_MODE_USER_MODE            0
+#define SECURE_BOOT_MODE_SETUP_MODE           1
+#define SECURE_BOOT_MODE_AUDIT_MODE           2
+#define SECURE_BOOT_MODE_DEPLOYED_MODE        3
+
 //
 // Nv Data structure referenced by IFR
 //
@@ -125,6 +132,8 @@ typedef struct {
   CHAR16  SignatureGuid[SECURE_BOOT_GUID_STORAGE_SIZE];
   BOOLEAN PhysicalPresent;     // If a Physical Present User
   UINT8   SecureBootMode;      // Secure Boot Mode: Standard Or Custom
+  UINT8   CurSecureBootMode;   // Current SecureBoot Mode SetupMode/UserMode/AuditMode/DeployedMode
+  UINT8   TransSecureBootMode; // Trans Next SecureBoot Mode
   BOOLEAN DeletePk;
   BOOLEAN HasPk;               // If Pk is existed it is true
   BOOLEAN AlwaysRevocation;    // If the certificate is always revoked. Revocation time is hidden
