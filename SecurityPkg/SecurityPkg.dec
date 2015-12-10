@@ -109,7 +109,11 @@
   ## GUID used to "certdb" variable to store the signer's certificates for common variables with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute.
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiCertDbGuid                     = { 0xd9bee56e, 0x75dc, 0x49d9, { 0xb4, 0xd7, 0xb5, 0x34, 0x21, 0xf, 0x63, 0x7a } }
-  
+
+  ## GUID used to "SecureBootMode" variable to save platform secure boot mode
+  #  Include/Guid/AuthenticatedVariableFormat.h
+  gEdkiiSecureBootModeGuid           = { 0xc573b77, 0xeb93, 0x4d3d, { 0xaf, 0xfc, 0x5f, 0xeb, 0xca, 0xfb, 0x65, 0xb0 } }
+
   ## Hob GUID used to pass a TCG_PCR_EVENT from a TPM PEIM to a TPM DXE Driver.
   #  Include/Guid/TcgEventHob.h
   gTcgEventEntryHobGuid              = { 0x2b9ffb52, 0x1b13, 0x416f, { 0xa8, 0x7b, 0xbc, 0x93, 0xd, 0xef, 0x92, 0xa8 }}
