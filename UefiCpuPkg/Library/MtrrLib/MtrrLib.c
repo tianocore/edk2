@@ -104,6 +104,24 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mMtrrMemoryCacheTypeShortName[] = {
 };
 
 /**
+  Worker function returns the variable MTRR count for the CPU.
+
+  @return Variable MTRR count
+
+**/
+UINT32
+GetVariableMtrrCountWorker (
+  VOID
+  )
+{
+  UINT32  VariableMtrrCount;
+
+  VariableMtrrCount = (UINT32)(AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+  return VariableMtrrCount;
+}
+
+/**
   Returns the variable MTRR count for the CPU.
 
   @return Variable MTRR count
@@ -115,16 +133,33 @@ GetVariableMtrrCount (
   VOID
   )
 {
-  UINT32  VariableMtrrCount;
-
   if (!IsMtrrSupported ()) {
     return 0;
   }
+  return GetVariableMtrrCountWorker ();
+}
 
-  VariableMtrrCount = (UINT32)(AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+/**
+  Worker function returns the firmware usable variable MTRR count for the CPU.
 
-  return VariableMtrrCount;
+  @return Firmware usable variable MTRR count
+
+**/
+UINT32
+GetFirmwareVariableMtrrCountWorker (
+  VOID
+  )
+{
+  UINT32  VariableMtrrCount;
+  UINT32  ReservedMtrrNumber;
+
+  VariableMtrrCount = GetVariableMtrrCountWorker ();
+  ReservedMtrrNumber = PcdGet32 (PcdCpuNumberOfReservedVariableMtrrs);
+  if (VariableMtrrCount < ReservedMtrrNumber) {
+    return 0;
+  }
+
+  return VariableMtrrCount - ReservedMtrrNumber;
 }
 
 /**
@@ -139,17 +174,26 @@ GetFirmwareVariableMtrrCount (
   VOID
   )
 {
-  UINT32  VariableMtrrCount;
-  UINT32  ReservedMtrrNumber;
-
-  VariableMtrrCount = GetVariableMtrrCount ();
-  ReservedMtrrNumber = PcdGet32 (PcdCpuNumberOfReservedVariableMtrrs);
-  if (VariableMtrrCount < ReservedMtrrNumber) {
+  if (!IsMtrrSupported ()) {
     return 0;
   }
-
-  return VariableMtrrCount - ReservedMtrrNumber;
+  return GetFirmwareVariableMtrrCountWorker ();
 }
+
+/**
+  Worker function returns the default MTRR cache type for the system.
+
+  @return  The default MTRR cache type.
+
+**/
+MTRR_MEMORY_CACHE_TYPE
+MtrrGetDefaultMemoryTypeWorker (
+  VOID
+  )
+{
+  return (MTRR_MEMORY_CACHE_TYPE) (AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE) & 0x7);
+}
+
 
 /**
   Returns the default MTRR cache type for the system.
@@ -166,8 +210,7 @@ MtrrGetDefaultMemoryType (
   if (!IsMtrrSupported ()) {
     return CacheUncacheable;
   }
-
-  return (MTRR_MEMORY_CACHE_TYPE) (AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE) & 0x7);
+  return MtrrGetDefaultMemoryTypeWorker ();
 }
 
 /**
@@ -1290,25 +1333,20 @@ MtrrGetMemoryAttribute (
 
 
 /**
-  This function will get the raw value in variable MTRRs
+  Worker function will get the raw value in variable MTRRs
 
-  @param[out]  FixedSettings  A buffer to hold fixed MTRRs content.
+  @param[out] VariableSettings   A buffer to hold variable MTRRs content.
 
   @return The VariableSettings input pointer
 
 **/
 MTRR_VARIABLE_SETTINGS*
-EFIAPI
-MtrrGetVariableMtrr (
-  OUT MTRR_VARIABLE_SETTINGS         *VariableSettings
+MtrrGetVariableMtrrWorker (
+  OUT MTRR_VARIABLE_SETTINGS  *VariableSettings
   )
 {
   UINT32  Index;
   UINT32  VariableMtrrCount;
-
-  if (!IsMtrrSupported ()) {
-    return VariableSettings;
-  }
 
   VariableMtrrCount = GetVariableMtrrCount ();
   ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
@@ -1321,6 +1359,29 @@ MtrrGetVariableMtrr (
   }
 
   return  VariableSettings;
+}
+
+/**
+  This function will get the raw value in variable MTRRs
+
+  @param[out]  VariableSettings   A buffer to hold variable MTRRs content.
+
+  @return The VariableSettings input pointer
+
+**/
+MTRR_VARIABLE_SETTINGS*
+EFIAPI
+MtrrGetVariableMtrr (
+  OUT MTRR_VARIABLE_SETTINGS         *VariableSettings
+  )
+{
+  if (!IsMtrrSupported ()) {
+    return VariableSettings;
+  }
+
+  return MtrrGetVariableMtrrWorker (
+           VariableSettings
+           );
 }
 
 
@@ -1380,11 +1441,34 @@ MtrrSetVariableMtrr (
   return  VariableSettings;
 }
 
+/**
+  Worker function gets the content in fixed MTRRs
+
+  @param[out]  FixedSettings  A buffer to hold fixed MTRRs content.
+
+  @retval The pointer of FixedSettings
+
+**/
+MTRR_FIXED_SETTINGS*
+MtrrGetFixedMtrrWorker (
+  OUT MTRR_FIXED_SETTINGS         *FixedSettings
+  )
+{
+  UINT32  Index;
+
+  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
+      FixedSettings->Mtrr[Index] =
+        AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
+  }
+
+  return FixedSettings;
+}
+
 
 /**
   This function gets the content in fixed MTRRs
 
-  @param[out]  FixedSettings  A buffer to hold fixed Mtrrs content.
+  @param[out]  FixedSettings  A buffer to hold fixed MTRRs content.
 
   @retval The pointer of FixedSettings
 
@@ -1395,18 +1479,11 @@ MtrrGetFixedMtrr (
   OUT MTRR_FIXED_SETTINGS         *FixedSettings
   )
 {
-  UINT32  Index;
-
   if (!IsMtrrSupported ()) {
     return FixedSettings;
   }
 
-  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-      FixedSettings->Mtrr[Index] =
-        AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
-  };
-
-  return FixedSettings;
+  return MtrrGetFixedMtrrWorker (FixedSettings);
 }
 
 /**
