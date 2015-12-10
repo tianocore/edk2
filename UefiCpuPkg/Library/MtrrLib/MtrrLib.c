@@ -140,13 +140,15 @@ GetFirmwareVariableMtrrCount (
   )
 {
   UINT32  VariableMtrrCount;
+  UINT32  ReservedMtrrNumber;
 
   VariableMtrrCount = GetVariableMtrrCount ();
-  if (VariableMtrrCount < RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER) {
+  ReservedMtrrNumber = PcdGet32 (PcdCpuNumberOfReservedVariableMtrrs);
+  if (VariableMtrrCount < ReservedMtrrNumber) {
     return 0;
   }
 
-  return VariableMtrrCount - RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER;
+  return VariableMtrrCount - ReservedMtrrNumber;
 }
 
 /**

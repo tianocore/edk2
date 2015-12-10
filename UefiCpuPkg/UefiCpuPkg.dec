@@ -167,6 +167,11 @@
   # @Prompt SMM CPU Synchronization Method.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00|UINT8|0x60000014
 
+  ## Specifies the number of variable MTRRs reserved for OS use. The default number of
+  #  MTRRs reserved for OS use is 2.
+  # @Prompt Number of reserved variable MTRRs.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0x2|UINT32|0x00000015
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies timeout value in microseconds for the BSP to detect all APs for the first time.
   # @Prompt Timeout for the BSP to detect all APs for the first time.

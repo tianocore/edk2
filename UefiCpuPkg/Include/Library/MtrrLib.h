@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,7 @@
 #define  MTRR_NUMBER_OF_VARIABLE_MTRR  32
 //
 // Firmware need reserve 2 MTRR for OS
+// Note: It is replaced by PCD PcdCpuNumberOfReservedVariableMtrrs
 //
 #define  RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER  2
 
