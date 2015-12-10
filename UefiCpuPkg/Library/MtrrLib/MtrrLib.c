@@ -1248,18 +1248,23 @@ MtrrGetMemoryAttribute (
   return MtrrGetMemoryAttributeByAddressWorker (NULL, Address);
 }
 
-
 /**
-  This function prints all MTRRs for debugging.
+  Worker function prints all MTRRs for debugging.
+
+  If MtrrSetting is not NULL, print MTRR settings from from input MTRR
+  settings buffer.
+  If MtrrSetting is NULL, print MTRR settings from MTRRs.
+
+  @param  MtrrSetting    A buffer holding all MTRRs content.
 **/
 VOID
-EFIAPI
-MtrrDebugPrintAllMtrrs (
-  VOID
+MtrrDebugPrintAllMtrrsWorker (
+  IN MTRR_SETTINGS    *MtrrSetting
   )
 {
   DEBUG_CODE (
-    MTRR_SETTINGS  MtrrSettings;
+    MTRR_SETTINGS  LocalMtrrs;
+    MTRR_SETTINGS  *Mtrrs;
     UINTN          Index;
     UINTN          Index1;
     UINTN          VariableMtrrCount;
@@ -1283,18 +1288,24 @@ MtrrDebugPrintAllMtrrs (
     DEBUG((DEBUG_CACHE, "MTRR Settings\n"));
     DEBUG((DEBUG_CACHE, "=============\n"));
 
-    MtrrGetAllMtrrs (&MtrrSettings);
-    DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", MtrrSettings.MtrrDefType));
+    if (MtrrSetting != NULL) {
+      Mtrrs = MtrrSetting;
+    } else {
+      MtrrGetAllMtrrs (&LocalMtrrs);
+      Mtrrs = &LocalMtrrs;
+    }
+
+    DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", Mtrrs->MtrrDefType));
     for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-      DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, MtrrSettings.Fixed.Mtrr[Index]));
+      DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, Mtrrs->Fixed.Mtrr[Index]));
     }
 
     VariableMtrrCount = GetVariableMtrrCount ();
     for (Index = 0; Index < VariableMtrrCount; Index++) {
       DEBUG((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
         Index,
-        MtrrSettings.Variables.Mtrr[Index].Base,
-        MtrrSettings.Variables.Mtrr[Index].Mask
+        Mtrrs->Variables.Mtrr[Index].Base,
+        Mtrrs->Variables.Mtrr[Index].Mask
         ));
     }
     DEBUG((DEBUG_CACHE, "\n"));
@@ -1306,7 +1317,7 @@ MtrrDebugPrintAllMtrrs (
     for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
       Base = mMtrrLibFixedMtrrTable[Index].BaseAddress;
       for (Index1 = 0; Index1 < 8; Index1++) {
-      MemoryType = (UINTN)(RShiftU64 (MtrrSettings.Fixed.Mtrr[Index], Index1 * 8) & 0xff);
+      MemoryType = (UINTN)(RShiftU64 (Mtrrs->Fixed.Mtrr[Index], Index1 * 8) & 0xff);
         if (MemoryType > CacheWriteBack) {
           MemoryType = MTRR_CACHE_INVALID_TYPE;
         }
@@ -1333,7 +1344,7 @@ MtrrDebugPrintAllMtrrs (
     Base = BASE_1MB;
     PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
     do {
-      MemoryType = MtrrGetMemoryAttribute (Base);
+      MemoryType = MtrrGetMemoryAttributeByAddressWorker (Mtrrs, Base);
       if (MemoryType > CacheWriteBack) {
         MemoryType = MTRR_CACHE_INVALID_TYPE;
       }
@@ -1352,14 +1363,14 @@ MtrrDebugPrintAllMtrrs (
       NoRangeLimit = Limit;
 
       for (Index = 0, Found = FALSE; Index < VariableMtrrCount; Index++) {
-        if ((MtrrSettings.Variables.Mtrr[Index].Mask & BIT11) == 0) {
+        if ((Mtrrs->Variables.Mtrr[Index].Mask & BIT11) == 0) {
           //
           // If mask is not valid, then do not display range
           //
           continue;
         }
-        MtrrBase  = (MtrrSettings.Variables.Mtrr[Index].Base & (~(SIZE_4KB - 1)));
-        MtrrLimit = MtrrBase + ((~(MtrrSettings.Variables.Mtrr[Index].Mask & (~(SIZE_4KB - 1)))) & Limit);
+        MtrrBase  = (Mtrrs->Variables.Mtrr[Index].Base & (~(SIZE_4KB - 1)));
+        MtrrLimit = MtrrBase + ((~(Mtrrs->Variables.Mtrr[Index].Mask & (~(SIZE_4KB - 1)))) & Limit);
 
         if (Base >= MtrrBase && Base < MtrrLimit) {
           Found = TRUE;
@@ -1395,8 +1406,23 @@ MtrrDebugPrintAllMtrrs (
     DEBUG((DEBUG_CACHE, "%016lx\n\n", Base - 1));
   );
 }
+
+
 /**
-  This function attempts to set the attributes for a memory range.
+  This function prints all MTRRs for debugging.
+**/
+VOID
+EFIAPI
+MtrrDebugPrintAllMtrrs (
+  VOID
+  )
+{
+  MtrrDebugPrintAllMtrrsWorker (NULL);
+}
+
+
+/**
+  Worker function attempts to set the attributes for a memory range.
 
   @param[in]       BaseAddress       The physical address that is the start
                                      address of a memory region.
