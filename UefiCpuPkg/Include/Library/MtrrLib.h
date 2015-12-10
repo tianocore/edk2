@@ -84,8 +84,8 @@ typedef struct {
 // Structure to hold base and mask pair for variable MTRR register
 //
 typedef struct _MTRR_VARIABLE_SETTING_ {
-	UINT64    Base;
-	UINT64    Mask;
+  UINT64    Base;
+  UINT64    Mask;
 } MTRR_VARIABLE_SETTING;
 
 //
@@ -115,11 +115,11 @@ typedef struct _MTRR_SETTINGS_ {
 // Memory cache types
 //
 typedef enum {
-	CacheUncacheable    = 0,
-	CacheWriteCombining = 1,
-	CacheWriteThrough   = 4,
-	CacheWriteProtected = 5,
-	CacheWriteBack      = 6
+  CacheUncacheable    = 0,
+  CacheWriteCombining = 1,
+  CacheWriteThrough   = 4,
+  CacheWriteProtected = 5,
+  CacheWriteBack      = 6
 } MTRR_MEMORY_CACHE_TYPE;
 
 #define  MTRR_CACHE_UNCACHEABLE      0
@@ -156,20 +156,27 @@ GetFirmwareVariableMtrrCount (
 /**
   This function attempts to set the attributes for a memory range.
 
-  @param  BaseAddress            The physical address that is the start address of a memory region.
-  @param  Length                 The size in bytes of the memory region.
-  @param  Attributes             The bit mask of attributes to set for the memory region.
+  @param[in]       BaseAddress       The physical address that is the start
+                                     address of a memory region.
+  @param[in]       Length            The size in bytes of the memory region.
+  @param[in]       Attribute         The bit mask of attributes to set for the
+                                     memory region.
 
-  @retval RETURN_SUCCESS            The attributes were set for the memory region.
+  @retval RETURN_SUCCESS            The attributes were set for the memory
+                                    region.
   @retval RETURN_INVALID_PARAMETER  Length is zero.
-  @retval RETURN_UNSUPPORTED        The processor does not support one or more bytes of the
-                                 memory resource range specified by BaseAddress and Length.
-  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support for the memory resource
-                                 range specified by BaseAddress and Length.
-  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource range specified by
-                                 BaseAddress and Length cannot be modified.
-  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify the attributes of
-                                 the memory resource range.
+  @retval RETURN_UNSUPPORTED        The processor does not support one or
+                                    more bytes of the memory resource range
+                                    specified by BaseAddress and Length.
+  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support
+                                    for the memory resource range specified
+                                    by BaseAddress and Length.
+  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource
+                                    range specified by BaseAddress and Length
+                                    cannot be modified.
+  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to
+                                    modify the attributes of the memory
+                                    resource range.
 
 **/
 RETURN_STATUS
@@ -185,7 +192,7 @@ MtrrSetMemoryAttribute (
   This function will get the memory cache type of the specific address.
   This function is mainly for debugging purposes.
 
-  @param  Address            The specific address
+  @param[in]  Address            The specific address
 
   @return The memory cache type of the specific address
 
@@ -200,7 +207,7 @@ MtrrGetMemoryAttribute (
 /**
   This function will get the raw value in variable MTRRs
 
-  @param  VariableSettings   A buffer to hold variable MTRRs content.
+  @param[out]  VariableSettings   A buffer to hold variable MTRRs content.
 
   @return The buffer point to MTRR_VARIABLE_SETTINGS in which holds the content of the variable mtrr
 
@@ -215,7 +222,7 @@ MtrrGetVariableMtrr (
 /**
   This function sets fixed MTRRs
 
-  @param  VariableSettings   A buffer to hold variable MTRRs content.
+  @param[in]  VariableSettings   A buffer to hold variable MTRRs content.
 
   @return The pointer of VariableSettings
 
@@ -230,7 +237,7 @@ MtrrSetVariableMtrr (
 /**
   This function gets the content in fixed MTRRs
 
-  @param  FixedSettings      A buffer to hold fixed MTRRs content.
+  @param[out]  FixedSettings      A buffer to hold fixed MTRRs content.
 
   @return The pointer of FixedSettings
 
@@ -245,7 +252,7 @@ MtrrGetFixedMtrr (
 /**
   This function sets fixed MTRRs
 
-  @param   FixedSettings      A buffer holding fixed MTRRs content.
+  @param[in]   FixedSettings      A buffer holding fixed MTRRs content.
 
   @return  The pointer of FixedSettings
 
@@ -260,7 +267,7 @@ MtrrSetFixedMtrr (
 /**
   This function gets the content in all MTRRs (variable and fixed)
 
-  @param  MtrrSetting   A buffer to hold all MTRRs content.
+  @param[out]  MtrrSetting   A buffer to hold all MTRRs content.
 
   @return The pointer of MtrrSetting
 
@@ -275,7 +282,7 @@ MtrrGetAllMtrrs (
 /**
   This function sets all MTRRs (variable and fixed)
 
-  @param  MtrrSetting   A buffer to hold all MTRRs content.
+  @param[in]  MtrrSetting   A buffer to hold all MTRRs content.
 
   @return The pointer of MtrrSetting
 
@@ -293,11 +300,12 @@ MtrrSetAllMtrrs (
   This function shadows the content of variable MTRRs into
   an internal array: VariableMtrr
 
-  @param  MtrrValidBitsMask     The mask for the valid bit of the MTRR
-  @param  MtrrValidAddressMask  The valid address mask for MTRR since the base address in
-                                MTRR must align to 4K, so valid address mask equal to
-                                MtrrValidBitsMask & 0xfffffffffffff000ULL
-  @param  VariableMtrr          The array to shadow variable MTRRs content
+  @param[in]   MtrrValidBitsMask    The mask for the valid bit of the MTRR
+  @param[in]   MtrrValidAddressMask The valid address mask for MTRR since the base address in
+                                    MTRR must align to 4K, so valid address mask equal to
+                                    MtrrValidBitsMask & 0xfffffffffffff000ULL
+  @param[out]  VariableMtrr         The array to shadow variable MTRRs content
+
   @return                       The ruturn value of this paramter indicates the number of
                                 MTRRs which has been used.
 **/
