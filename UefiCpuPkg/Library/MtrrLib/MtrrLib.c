@@ -1489,7 +1489,9 @@ MtrrSetMemoryAttributeWorker (
   UINT64                    NewValue;
   MTRR_VARIABLE_SETTINGS    *VariableSettings;
 
-  MtrrContextValid = FALSE;
+  MtrrContextValid  = FALSE;
+  VariableMtrrCount = 0;
+  ZeroMem (&WorkingFixedSettings, sizeof (WorkingFixedSettings));
   for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
     FixedSettingsValid[Index]    = FALSE;
     FixedSettingsModified[Index] = FALSE;
