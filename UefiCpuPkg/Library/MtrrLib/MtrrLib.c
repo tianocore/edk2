@@ -367,13 +367,12 @@ MtrrGetFixedMtrr (
 **/
 MTRR_VARIABLE_SETTINGS*
 MtrrGetVariableMtrrWorker (
+  IN  UINT32                  VariableMtrrCount,
   OUT MTRR_VARIABLE_SETTINGS  *VariableSettings
   )
 {
   UINT32  Index;
-  UINT32  VariableMtrrCount;
 
-  VariableMtrrCount = GetVariableMtrrCount ();
   ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
@@ -405,6 +404,7 @@ MtrrGetVariableMtrr (
   }
 
   return MtrrGetVariableMtrrWorker (
+           GetVariableMtrrCountWorker (),
            VariableSettings
            );
 }
@@ -527,7 +527,7 @@ MtrrGetMemoryAttributeInVariableMtrr (
     return 0;
   }
 
-  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
+  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
   VariableMtrrEnd = MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (2 * GetVariableMtrrCount ()) - 1;
 
   ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
@@ -563,6 +563,8 @@ MtrrGetMemoryAttributeInVariableMtrr (
 /**
   Checks overlap between given memory range and MTRRs.
 
+  @param[in]  FirmwareVariableMtrrCount  The number of variable MTRRs available
+                                         to firmware.
   @param[in]  Start                      The start address of memory range.
   @param[in]  End                        The end address of memory range.
   @param[in]  VariableMtrr               The array to shadow variable MTRRs content
@@ -573,14 +575,15 @@ MtrrGetMemoryAttributeInVariableMtrr (
 **/
 BOOLEAN
 CheckMemoryAttributeOverlap (
-  IN PHYSICAL_ADDRESS     Start,
-  IN PHYSICAL_ADDRESS     End,
-  IN VARIABLE_MTRR      *VariableMtrr
+  IN UINTN             FirmwareVariableMtrrCount,
+  IN PHYSICAL_ADDRESS  Start,
+  IN PHYSICAL_ADDRESS  End,
+  IN VARIABLE_MTRR     *VariableMtrr
   )
 {
   UINT32  Index;
 
-  for (Index = 0; Index < 6; Index++) {
+  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
     if (
          VariableMtrr[Index].Valid &&
          !(
@@ -623,6 +626,8 @@ InvalidateShadowMtrr (
 
   If overlap exists between given memory range and MTRRs, try to combine them.
 
+  @param[in]       FirmwareVariableMtrrCount  The number of variable MTRRs
+                                              available to firmware.
   @param[in]       Attributes                 The memory type to set.
   @param[in, out]  Base                       The base address of memory range.
   @param[in, out]  Length                     The length of memory range.
@@ -636,6 +641,7 @@ InvalidateShadowMtrr (
 **/
 RETURN_STATUS
 CombineMemoryAttribute (
+  IN     UINT32             FirmwareVariableMtrrCount,
   IN     UINT64             Attributes,
   IN OUT UINT64             *Base,
   IN OUT UINT64             *Length,
@@ -649,10 +655,7 @@ CombineMemoryAttribute (
   UINT64  CombineEnd;
   UINT64  MtrrEnd;
   UINT64  EndAddress;
-  UINT32  FirmwareVariableMtrrCount;
   BOOLEAN CoveredByExistingMtrr;
-
-  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
 
   *OverwriteExistingMtrr = FALSE;
   CoveredByExistingMtrr = FALSE;
@@ -851,21 +854,21 @@ GetMtrrNumberAndDirection (
   This function programs MTRRs according to the values specified
   in the shadow array.
 
+  @param[in]       VariableMtrrCount  Number of variable MTRRs
   @param[in, out]  VariableMtrr       Shadow of variable MTRR contents
 
 **/
 VOID
 InvalidateMtrr (
+  IN     UINTN                   VariableMtrrCount,
   IN OUT VARIABLE_MTRR           *VariableMtrr
   )
 {
   UINTN         Index;
-  UINTN         VariableMtrrCount;
   MTRR_CONTEXT  MtrrContext;
 
   PreMtrrChange (&MtrrContext);
   Index = 0;
-  VariableMtrrCount = GetVariableMtrrCount ();
   while (Index < VariableMtrrCount) {
     if (!VariableMtrr[Index].Valid && VariableMtrr[Index].Used) {
        AsmWriteMsr64 (VariableMtrr[Index].Msr, 0);
@@ -1139,7 +1142,7 @@ MtrrGetMemoryAttribute (
   //
   // Go through the variable MTRR
   //
-  VariableMtrrCount = GetVariableMtrrCount ();
+  VariableMtrrCount = GetVariableMtrrCountWorker ();
   ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
@@ -1354,6 +1357,7 @@ MtrrSetMemoryAttribute (
   UINT32                    FirmwareVariableMtrrCount;
   UINT32                    VariableMtrrEnd;
   MTRR_CONTEXT              MtrrContext;
+  UINT32                    VariableMtrrCount;
 
   DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttribute() %a:%016lx-%016lx\n", mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
 
@@ -1362,7 +1366,7 @@ MtrrSetMemoryAttribute (
     goto Done;
   }
 
-  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
+  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
   VariableMtrrEnd = MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (2 * GetVariableMtrrCount ()) - 1;
 
   MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
@@ -1419,12 +1423,31 @@ MtrrSetMemoryAttribute (
   }
 
   //
+  // Read all variable MTRRs
+  //
+  VariableMtrrCount = GetVariableMtrrCountWorker ();
+
+  //
   // Check for overlap
   //
   UsedMtrr = MtrrGetMemoryAttributeInVariableMtrr (MtrrValidBitsMask, MtrrValidAddressMask, VariableMtrr);
-  OverLap = CheckMemoryAttributeOverlap (BaseAddress, BaseAddress + Length - 1, VariableMtrr);
+  OverLap = CheckMemoryAttributeOverlap (
+              FirmwareVariableMtrrCount,
+              BaseAddress,
+              BaseAddress + Length - 1,
+              VariableMtrr
+              );
+
   if (OverLap) {
-    Status = CombineMemoryAttribute (MemoryType, &BaseAddress, &Length, VariableMtrr, &UsedMtrr, &OverwriteExistingMtrr);
+    Status = CombineMemoryAttribute (
+               FirmwareVariableMtrrCount,
+               MemoryType,
+               &BaseAddress,
+               &Length,
+               VariableMtrr,
+               &UsedMtrr,
+               &OverwriteExistingMtrr
+               );
     if (RETURN_ERROR (Status)) {
       goto Done;
     }
@@ -1433,7 +1456,7 @@ MtrrSetMemoryAttribute (
       //
       // Combined successfully, invalidate the now-unused MTRRs
       //
-      InvalidateMtrr(VariableMtrr);
+      InvalidateMtrr(VariableMtrrCount, VariableMtrr);
       Status = RETURN_SUCCESS;
       goto Done;
     }
@@ -1447,7 +1470,7 @@ MtrrSetMemoryAttribute (
     //
     // Invalidate the now-unused MTRRs
     //
-    InvalidateMtrr(VariableMtrr);
+    InvalidateMtrr(VariableMtrrCount, VariableMtrr);
     goto Done;
   }
 
@@ -1461,7 +1484,7 @@ MtrrSetMemoryAttribute (
   //
   // Invalidate the now-unused MTRRs
   //
-  InvalidateMtrr(VariableMtrr);
+  InvalidateMtrr(VariableMtrrCount, VariableMtrr);
 
   //
   // Find first unused MTRR
@@ -1589,7 +1612,7 @@ MtrrSetVariableMtrrWorker (
   UINT32  Index;
   UINT32  VariableMtrrCount;
 
-  VariableMtrrCount = GetVariableMtrrCount ();
+  VariableMtrrCount = GetVariableMtrrCountWorker ();
   ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
@@ -1634,7 +1657,7 @@ MtrrSetVariableMtrr (
 /**
   Worker function setting fixed MTRRs
 
-  @param[in]  FixedSettings  A buffer to hold fixed Mtrrs content.
+  @param[in]  FixedSettings  A buffer to hold fixed MTRRs content.
 
 **/
 VOID
@@ -1656,7 +1679,7 @@ MtrrSetFixedMtrrWorker (
 /**
   This function sets fixed MTRRs
 
-  @param[in]  FixedSettings  A buffer to hold fixed Mtrrs content.
+  @param[in]  FixedSettings  A buffer to hold fixed MTRRs content.
 
   @retval The pointer of FixedSettings
 
@@ -1684,7 +1707,7 @@ MtrrSetFixedMtrr (
 /**
   This function gets the content in all MTRRs (variable and fixed)
 
-  @param[out]  MtrrSetting  A buffer to hold all Mtrrs content.
+  @param[out]  MtrrSetting  A buffer to hold all MTRRs content.
 
   @retval the pointer of MtrrSetting
 
@@ -1702,12 +1725,15 @@ MtrrGetAllMtrrs (
   //
   // Get fixed MTRRs
   //
-  MtrrGetFixedMtrr (&MtrrSetting->Fixed);
+  MtrrGetFixedMtrrWorker (&MtrrSetting->Fixed);
 
   //
   // Get variable MTRRs
   //
-  MtrrGetVariableMtrr (&MtrrSetting->Variables);
+  MtrrGetVariableMtrrWorker (
+    GetVariableMtrrCountWorker (),
+    &MtrrSetting->Variables
+    );
 
   //
   // Get MTRR_DEF_TYPE value
