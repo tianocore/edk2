@@ -17,7 +17,7 @@
   BASE_NAME                      = UefiShellDebug1CommandsLib
   FILE_GUID                      = 90330D51-A99B-4cc8-A2EB-AE22542A3F45
   MODULE_TYPE                    = UEFI_APPLICATION
-  VERSION_STRING                 = 1.0
+  VERSION_STRING                 = 1.1
   LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = UefiShellDebug1CommandsLibConstructor
   DESTRUCTOR                     = UefiShellDebug1CommandsLibDestructor
@@ -106,6 +106,7 @@
   MemoryAllocationLib
   BaseLib
   BaseMemoryLib
+  IoLib
   DebugLib
   ShellCommandLib
   ShellLib
@@ -125,6 +126,7 @@
   gEfiPciRootBridgeIoProtocolGuid             ## CONSUMES
   gEfiBlockIoProtocolGuid                     ## CONSUMES
   gEfiSimplePointerProtocolGuid               ## CONSUMES
+  gEfiCpuIo2ProtocolGuid                      ## CONSUMES
 
 [Guids]
   gEfiGlobalVariableGuid          ## SOMETIMES_CONSUMES ## GUID
