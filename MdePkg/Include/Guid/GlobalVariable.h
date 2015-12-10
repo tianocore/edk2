@@ -126,6 +126,20 @@ extern EFI_GUID gEfiGlobalVariableGuid;
 ///
 #define EFI_SETUP_MODE_NAME                         L"SetupMode"
 ///
+/// Whether the system is operating in audit mode (1) or not (0).
+/// All other values are reserved. Should be treated as read-only except when DeployedMode is 0.
+/// Always becomes read-only after ExitBootServices() is called.
+/// Its attribute is BS+RT.
+///
+#define EFI_AUDIT_MODE_NAME                         L"AuditMode"
+///
+/// Whether the system is operating in deployed mode (1) or not (0).
+/// All other values are reserved. Should be treated as read-only when its value is 1.
+/// Always becomes read-only after ExitBootServices() is called.
+/// Its attribute is BS+RT.
+///
+#define EFI_DEPLOYED_MODE_NAME                      L"DeployedMode"
+///
 /// The Key Exchange Key Signature Database.
 /// Its attribute is NV+BS+RT+AT.
 ///
