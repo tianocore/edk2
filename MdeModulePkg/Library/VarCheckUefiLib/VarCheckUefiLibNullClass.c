@@ -426,6 +426,28 @@ UEFI_DEFINED_VARIABLE_ENTRY mGlobalVariableList[] = {
     NULL
   },
   {
+    EFI_AUDIT_MODE_NAME,
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_BS_RT,
+      sizeof (UINT8),
+      sizeof (UINT8)
+    },
+    NULL
+  },
+  {
+    EFI_DEPLOYED_MODE_NAME,
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_BS_RT,
+      sizeof (UINT8),
+      sizeof (UINT8)
+    },
+    NULL
+  },
+  {
     EFI_KEY_EXCHANGE_KEY_NAME,
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
