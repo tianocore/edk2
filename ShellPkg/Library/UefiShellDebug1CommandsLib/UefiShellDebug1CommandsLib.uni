@@ -1,7 +1,7 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -628,10 +628,11 @@
 "Displays or modifies MEM/MMIO/IO/PCI/PCIE address space.\r\n"
 ".SH SYNOPSIS\r\n"
 " \r\n"
-"MM Address [Value] [-w 1|2|4|8] [-MEM | -MMIO [[Seg] Bus] | -IO [[Seg] Bus] |\r\n"
-"                                 -PCI | -PCIE] [-n]\r\n"
+"MM Address [Value] [-w 1|2|4|8] [-MEM | -MMIO | -IO | -PCI | -PCIE] [-n]\r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
+"  Address - Specifies a starting address.\r\n"
+"  Value   - Specifies the value to write.\r\n"
 "  -MEM    - Memory Address type\r\n"
 "  -MMIO   - Memory Mapped IO Address type\r\n"
 "  -IO     - IO Address type\r\n"
@@ -655,10 +656,6 @@
 "              4    - 4 bytes\r\n"
 "              8    - 8 bytes\r\n"
 "  -n      - Non-interactive mode\r\n"
-"  Address - Specifies a starting address.\r\n"
-"  Value   - Specifies the value to write.\r\n"
-"  Seg     - Specifies the segment number of the PCI root bridge for -MMIO and -IO address types.\r\n"
-"  Bus     - Specifies the bus number of the PCI root bridge for -MMIO and -IO address types.\r\n"
 ".SH DESCRIPTION\r\n"
 " \r\n"
 "NOTES:\r\n"
@@ -686,9 +683,6 @@
 "      specified width.\r\n"
 "  10. Not all addresses are safe to access. Access to any improper address\r\n"
 "      can bring unexpected results.\r\n"
-"  11. If no Bus or Segment is specified, the first root bridge found is used.\r\n"
-"  12. If only one parameter is specified after -MMIO or -IO, the Bus parameter is assumed\r\n"
-"      and Segment defaults to 0.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
 "EXAMPLES:\r\n"
