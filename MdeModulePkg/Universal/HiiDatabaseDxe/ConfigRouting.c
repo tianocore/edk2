@@ -3873,7 +3873,9 @@ HiiConfigRoutingExtractConfig (
                       &gEfiHiiConfigAccessProtocolGuid,
                       (VOID **) &ConfigAccess
                       );
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
 
       Status = ConfigAccess->ExtractConfig (
                                ConfigAccess,
