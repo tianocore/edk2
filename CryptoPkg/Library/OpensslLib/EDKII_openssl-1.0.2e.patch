@@ -1,0 +1,707 @@
+diff U3 crypto/bio/bio.h crypto/bio/bio.h
+--- crypto/bio/bio.h	Thu Jun 11 21:50:12 2015
++++ crypto/bio/bio.h	Fri Jun 12 11:00:52 2015
+@@ -646,10 +646,10 @@
+ int BIO_asn1_get_suffix(BIO *b, asn1_ps_func **psuffix,
+                         asn1_ps_func **psuffix_free);
+ 
+-# ifndef OPENSSL_NO_FP_API
+ BIO_METHOD *BIO_s_file(void);
+ BIO *BIO_new_file(const char *filename, const char *mode);
+ BIO *BIO_new_fp(FILE *stream, int close_flag);
++# ifndef OPENSSL_NO_FP_API
+ #  define BIO_s_file_internal    BIO_s_file
+ # endif
+ BIO *BIO_new(BIO_METHOD *type);
+diff U3 crypto/bio/bss_file.c crypto/bio/bss_file.c
+--- crypto/bio/bss_file.c	Thu Jun 11 21:01:06 2015
++++ crypto/bio/bss_file.c	Fri Jun 12 11:01:28 2015
+@@ -467,6 +467,23 @@
+     return (ret);
+ }
+ 
++# else
++
++BIO_METHOD *BIO_s_file(void)
++{
++    return NULL;
++}
++
++BIO *BIO_new_file(const char *filename, const char *mode)
++{
++    return NULL;
++}
++
++BIO *BIO_new_fp(FILE *stream, int close_flag)
++{
++    return NULL;
++}
++
+ # endif                         /* OPENSSL_NO_STDIO */
+ 
+ #endif                          /* HEADER_BSS_FILE_C */
+diff U3 crypto/dh/dh_pmeth.c crypto/dh/dh_pmeth.c
+--- crypto/dh/dh_pmeth.c	Thu Jun 11 21:50:12 2015
++++ crypto/dh/dh_pmeth.c	Fri Jun 12 11:08:48 2015
+@@ -449,6 +449,9 @@
+         *keylen = ret;
+         return 1;
+     } else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
++#ifdef OPENSSL_NO_CMS
++        return 0;
++#else
+         unsigned char *Z = NULL;
+         size_t Zlen = 0;
+         if (!dctx->kdf_outlen || !dctx->kdf_oid)
+@@ -478,6 +481,7 @@
+             OPENSSL_free(Z);
+         }
+         return ret;
++#endif
+     }
+     return 1;
+ }
+diff U3 crypto/pem/pem.h crypto/pem/pem.h
+--- crypto/pem/pem.h	Thu Jun 11 21:50:12 2015
++++ crypto/pem/pem.h	Fri Jun 12 10:58:18 2015
+@@ -324,6 +324,7 @@
+ 
+ #  define DECLARE_PEM_read_fp(name, type) /**/
+ #  define DECLARE_PEM_write_fp(name, type) /**/
++#  define DECLARE_PEM_write_fp_const(name, type) /**/
+ #  define DECLARE_PEM_write_cb_fp(name, type) /**/
+ # else
+ 
+diff U3 crypto/pkcs7/pk7_smime.c crypto/pkcs7/pk7_smime.c
+--- crypto/pkcs7/pk7_smime.c	Thu Jun 11 21:01:06 2015
++++ crypto/pkcs7/pk7_smime.c	Fri Jun 12 11:23:38 2015
+@@ -254,7 +254,8 @@
+     STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
+     PKCS7_SIGNER_INFO *si;
+     X509_STORE_CTX cert_ctx;
+-    char buf[4096];
++    char *buf = NULL;
++    int bufsiz;
+     int i, j = 0, k, ret = 0;
+     BIO *p7bio = NULL;
+     BIO *tmpin = NULL, *tmpout = NULL;
+@@ -275,12 +276,6 @@
+         return 0;
+     }
+ 
+-    /* Check for data and content: two sets of data */
+-    if (!PKCS7_get_detached(p7) && indata) {
+-        PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_CONTENT_AND_DATA_PRESENT);
+-        return 0;
+-    }
+-
+     sinfos = PKCS7_get_signer_info(p7);
+ 
+     if (!sinfos || !sk_PKCS7_SIGNER_INFO_num(sinfos)) {
+@@ -355,9 +350,14 @@
+     } else
+         tmpout = out;
+ 
++    bufsiz = 4096;
++    buf = OPENSSL_malloc(bufsiz);
++    if (buf == NULL) {
++        goto err;
++    }
+     /* We now have to 'read' from p7bio to calculate digests etc. */
+     for (;;) {
+-        i = BIO_read(p7bio, buf, sizeof(buf));
++        i = BIO_read(p7bio, buf, bufsiz);
+         if (i <= 0)
+             break;
+         if (tmpout)
+@@ -394,6 +394,10 @@
+     }
+     BIO_free_all(p7bio);
+     sk_X509_free(signers);
++
++    if (buf != NULL) {
++      OPENSSL_free(buf);
++    }
+     return ret;
+ }
+ 
+diff U3 crypto/rand/rand_unix.c crypto/rand/rand_unix.c
+--- crypto/rand/rand_unix.c	Thu Jun 11 21:01:06 2015
++++ crypto/rand/rand_unix.c	Fri Jun 12 10:51:21 2015
+@@ -116,7 +116,7 @@
+ #include <openssl/rand.h>
+ #include "rand_lcl.h"
+ 
+-#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE))
++#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_UEFI))
+ 
+ # include <sys/types.h>
+ # include <sys/time.h>
+@@ -439,7 +439,7 @@
+                                  * defined(OPENSSL_SYS_VXWORKS) ||
+                                  * defined(OPENSSL_SYS_NETWARE)) */
+ 
+-#if defined(OPENSSL_SYS_VXWORKS)
++#if defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_poll(void)
+ {
+     return 0;
+diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
+--- crypto/rsa/rsa_ameth.c	Thu Jun 11 21:50:12 2015
++++ crypto/rsa/rsa_ameth.c	Fri Jun 12 10:45:38 2015
+@@ -68,10 +68,12 @@
+ #endif
+ #include "asn1_locl.h"
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_sign(CMS_SignerInfo *si);
+ static int rsa_cms_verify(CMS_SignerInfo *si);
+ static int rsa_cms_decrypt(CMS_RecipientInfo *ri);
+ static int rsa_cms_encrypt(CMS_RecipientInfo *ri);
++#endif
+ 
+ static int rsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
+ {
+@@ -665,6 +667,7 @@
+     return rv;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_verify(CMS_SignerInfo *si)
+ {
+     int nid, nid2;
+@@ -683,6 +686,7 @@
+     }
+     return 0;
+ }
++#endif
+ 
+ /*
+  * Customised RSA item verification routine. This is called when a signature
+@@ -705,6 +709,7 @@
+     return -1;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_sign(CMS_SignerInfo *si)
+ {
+     int pad_mode = RSA_PKCS1_PADDING;
+@@ -729,6 +734,7 @@
+     X509_ALGOR_set0(alg, OBJ_nid2obj(NID_rsassaPss), V_ASN1_SEQUENCE, os);
+     return 1;
+ }
++#endif
+ 
+ static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
+                          X509_ALGOR *alg1, X509_ALGOR *alg2,
+@@ -785,6 +791,7 @@
+     return pss;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+ {
+     EVP_PKEY_CTX *pkctx;
+@@ -857,7 +864,9 @@
+         X509_ALGOR_free(maskHash);
+     return rv;
+ }
++#endif
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
+ {
+     const EVP_MD *md, *mgf1md;
+@@ -920,6 +929,7 @@
+         ASN1_STRING_free(os);
+     return rv;
+ }
++#endif
+ 
+ const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
+     {
+diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
+--- crypto/x509/x509_vfy.c	Thu Jun 11 21:52:58 2015
++++ crypto/x509/x509_vfy.c	Fri Jun 12 11:29:37 2015
+@@ -940,6 +940,8 @@
+         ctx->current_crl = crl;
+     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
+         ptime = &ctx->param->check_time;
++    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
++        return 1;
+     else
+         ptime = NULL;
+ 
+@@ -1663,6 +1665,8 @@
+ 
+     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
+         ptime = &ctx->param->check_time;
++    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
++        return 1;
+     else
+         ptime = NULL;
+ 
+diff U3 crypto/x509/x509_vfy.h crypto/x509/x509_vfy.h
+--- crypto/x509/x509_vfy.h	Thu Jul 09 19:57:16 2015
++++ crypto/x509/x509_vfy.h	Thu Oct 29 14:05:57 2015
+@@ -438,6 +438,8 @@
+  * will force the behaviour to match that of previous versions.
+  */
+ # define X509_V_FLAG_NO_ALT_CHAINS               0x100000
++/* Do not check certificate/CRL validity against current time */
++# define X509_V_FLAG_NO_CHECK_TIME               0x200000
+ 
+ # define X509_VP_FLAG_DEFAULT                    0x1
+ # define X509_VP_FLAG_OVERWRITE                  0x2
+diff U3 crypto/x509v3/ext_dat.h crypto/x509v3/ext_dat.h
+--- crypto/x509v3/ext_dat.h	Thu Jun 11 21:50:12 2015
++++ crypto/x509v3/ext_dat.h	Fri Jun 12 11:11:03 2015
+@@ -127,8 +127,10 @@
+     &v3_idp,
+     &v3_alt[2],
+     &v3_freshest_crl,
++#ifndef OPENSSL_SYS_UEFI
+     &v3_ct_scts[0],
+     &v3_ct_scts[1],
++#endif
+ };
+ 
+ /* Number of standard extensions */
+diff U3 crypto/crypto.h crypto/crypto.h
+--- crypto/crypto.h	Thu Jun 11 21:01:06 2015
++++ crypto/crypto.h	Fri Jun 12 11:33:27 2015
+@@ -235,15 +235,15 @@
+ # ifndef OPENSSL_NO_LOCKING
+ #  ifndef CRYPTO_w_lock
+ #   define CRYPTO_w_lock(type)     \
+-        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,NULL,0)
+ #   define CRYPTO_w_unlock(type)   \
+-        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,NULL,0)
+ #   define CRYPTO_r_lock(type)     \
+-        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,NULL,0)
+ #   define CRYPTO_r_unlock(type)   \
+-        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,NULL,0)
+ #   define CRYPTO_add(addr,amount,type)    \
+-        CRYPTO_add_lock(addr,amount,type,__FILE__,__LINE__)
++        CRYPTO_add_lock(addr,amount,type,NULL,0)
+ #  endif
+ # else
+ #  define CRYPTO_w_lock(a)
+@@ -378,19 +378,19 @@
+ # define MemCheck_off()  CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_DISABLE)
+ # define is_MemCheck_on() CRYPTO_is_mem_check_on()
+ 
+-# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,__FILE__,__LINE__)
+-# define OPENSSL_strdup(str)     CRYPTO_strdup((str),__FILE__,__LINE__)
++# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,NULL,0)
++# define OPENSSL_strdup(str)     CRYPTO_strdup((str),NULL,0)
+ # define OPENSSL_realloc(addr,num) \
+-        CRYPTO_realloc((char *)addr,(int)num,__FILE__,__LINE__)
++        CRYPTO_realloc((char *)addr,(int)num,NULL,0)
+ # define OPENSSL_realloc_clean(addr,old_num,num) \
+-        CRYPTO_realloc_clean(addr,old_num,num,__FILE__,__LINE__)
++        CRYPTO_realloc_clean(addr,old_num,num,NULL,0)
+ # define OPENSSL_remalloc(addr,num) \
+-        CRYPTO_remalloc((char **)addr,(int)num,__FILE__,__LINE__)
++        CRYPTO_remalloc((char **)addr,(int)num,NULL,0)
+ # define OPENSSL_freeFunc        CRYPTO_free
+ # define OPENSSL_free(addr)      CRYPTO_free(addr)
+ 
+ # define OPENSSL_malloc_locked(num) \
+-        CRYPTO_malloc_locked((int)num,__FILE__,__LINE__)
++        CRYPTO_malloc_locked((int)num,NULL,0)
+ # define OPENSSL_free_locked(addr) CRYPTO_free_locked(addr)
+ 
+ const char *SSLeay_version(int type);
+@@ -545,7 +545,7 @@
+ long CRYPTO_get_mem_debug_options(void);
+ 
+ # define CRYPTO_push_info(info) \
+-        CRYPTO_push_info_(info, __FILE__, __LINE__);
++        CRYPTO_push_info_(info, NULL, 0);
+ int CRYPTO_push_info_(const char *info, const char *file, int line);
+ int CRYPTO_pop_info(void);
+ int CRYPTO_remove_all_info(void);
+@@ -588,7 +588,7 @@
+ 
+ /* die if we have to */
+ void OpenSSLDie(const char *file, int line, const char *assertion);
+-# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(__FILE__, __LINE__, #e),1))
++# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(NULL, 0, #e),1))
+ 
+ unsigned long *OPENSSL_ia32cap_loc(void);
+ # define OPENSSL_ia32cap (*(OPENSSL_ia32cap_loc()))
+@@ -605,14 +605,14 @@
+ #  define fips_md_init_ctx(alg, cx) \
+         int alg##_Init(cx##_CTX *c) \
+         { \
+-        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
++        if (FIPS_mode()) OpenSSLDie(NULL, 0, \
+                 "Low level API call to digest " #alg " forbidden in FIPS mode!"); \
+         return private_##alg##_Init(c); \
+         } \
+         int private_##alg##_Init(cx##_CTX *c)
+ 
+ #  define fips_cipher_abort(alg) \
+-        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
++        if (FIPS_mode()) OpenSSLDie(NULL, 0, \
+                 "Low level API call to cipher " #alg " forbidden in FIPS mode!")
+ 
+ # else
+diff U3 crypto/opensslconf.h crypto/opensslconf.h
+--- crypto/opensslconf.h	Thu Jun 11 21:55:38 2015
++++ crypto/opensslconf.h	Fri Jun 12 10:28:27 2015
+@@ -5,15 +5,72 @@
+ extern "C" {
+ #endif
+ /* OpenSSL was configured with the following options: */
++#ifndef OPENSSL_SYSNAME_UEFI
++# define OPENSSL_SYSNAME_UEFI
++#endif
+ #ifndef OPENSSL_DOING_MAKEDEPEND
+ 
+ 
++#ifndef OPENSSL_NO_BF
++# define OPENSSL_NO_BF
++#endif
++#ifndef OPENSSL_NO_CAMELLIA
++# define OPENSSL_NO_CAMELLIA
++#endif
++#ifndef OPENSSL_NO_CAPIENG
++# define OPENSSL_NO_CAPIENG
++#endif
++#ifndef OPENSSL_NO_CAST
++# define OPENSSL_NO_CAST
++#endif
++#ifndef OPENSSL_NO_CMS
++# define OPENSSL_NO_CMS
++#endif
++#ifndef OPENSSL_NO_DEPRECATED
++# define OPENSSL_NO_DEPRECATED
++#endif
++#ifndef OPENSSL_NO_DGRAM
++# define OPENSSL_NO_DGRAM
++#endif
++#ifndef OPENSSL_NO_DSA
++# define OPENSSL_NO_DSA
++#endif
++#ifndef OPENSSL_NO_DYNAMIC_ENGINE
++# define OPENSSL_NO_DYNAMIC_ENGINE
++#endif
++#ifndef OPENSSL_NO_EC
++# define OPENSSL_NO_EC
++#endif
+ #ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
+ # define OPENSSL_NO_EC_NISTP_64_GCC_128
+ #endif
++#ifndef OPENSSL_NO_ECDH
++# define OPENSSL_NO_ECDH
++#endif
++#ifndef OPENSSL_NO_ECDSA
++# define OPENSSL_NO_ECDSA
++#endif
++#ifndef OPENSSL_NO_ENGINE
++# define OPENSSL_NO_ENGINE
++#endif
++#ifndef OPENSSL_NO_ENGINES
++# define OPENSSL_NO_ENGINES
++#endif
++#ifndef OPENSSL_NO_FILENAMES
++# define OPENSSL_NO_FILENAMES
++#endif
++#ifndef OPENSSL_NO_FP_API
++# define OPENSSL_NO_FP_API
++#endif
+ #ifndef OPENSSL_NO_GMP
+ # define OPENSSL_NO_GMP
+ #endif
++#ifndef OPENSSL_NO_GOST
++# define OPENSSL_NO_GOST
++#endif
++#ifndef OPENSSL_NO_IDEA
++# define OPENSSL_NO_IDEA
++#endif
+ #ifndef OPENSSL_NO_JPAKE
+ # define OPENSSL_NO_JPAKE
+ #endif
+@@ -23,30 +80,90 @@
+ #ifndef OPENSSL_NO_LIBUNBOUND
+ # define OPENSSL_NO_LIBUNBOUND
+ #endif
++#ifndef OPENSSL_NO_LOCKING
++# define OPENSSL_NO_LOCKING
++#endif
+ #ifndef OPENSSL_NO_MD2
+ # define OPENSSL_NO_MD2
+ #endif
++#ifndef OPENSSL_NO_MDC2
++# define OPENSSL_NO_MDC2
++#endif
++#ifndef OPENSSL_NO_POSIX_IO
++# define OPENSSL_NO_POSIX_IO
++#endif
++#ifndef OPENSSL_NO_RC2
++# define OPENSSL_NO_RC2
++#endif
+ #ifndef OPENSSL_NO_RC5
+ # define OPENSSL_NO_RC5
+ #endif
++#ifndef OPENSSL_NO_RCS
++# define OPENSSL_NO_RCS
++#endif
+ #ifndef OPENSSL_NO_RFC3779
+ # define OPENSSL_NO_RFC3779
+ #endif
++#ifndef OPENSSL_NO_RIPEMD
++# define OPENSSL_NO_RIPEMD
++#endif
++#ifndef OPENSSL_NO_SCRYPT
++# define OPENSSL_NO_SCRYPT
++#endif
++#ifndef OPENSSL_NO_SCT
++# define OPENSSL_NO_SCT
++#endif
+ #ifndef OPENSSL_NO_SCTP
+ # define OPENSSL_NO_SCTP
+ #endif
++#ifndef OPENSSL_NO_SEED
++# define OPENSSL_NO_SEED
++#endif
++#ifndef OPENSSL_NO_SHA0
++# define OPENSSL_NO_SHA0
++#endif
++#ifndef OPENSSL_NO_SOCK
++# define OPENSSL_NO_SOCK
++#endif
++#ifndef OPENSSL_NO_SRP
++# define OPENSSL_NO_SRP
++#endif
+ #ifndef OPENSSL_NO_SSL_TRACE
+ # define OPENSSL_NO_SSL_TRACE
+ #endif
++#ifndef OPENSSL_NO_SSL2
++# define OPENSSL_NO_SSL2
++#endif
++#ifndef OPENSSL_NO_SSL3
++# define OPENSSL_NO_SSL3
++#endif
++#ifndef OPENSSL_NO_STDIO
++# define OPENSSL_NO_STDIO
++#endif
+ #ifndef OPENSSL_NO_STORE
+ # define OPENSSL_NO_STORE
+ #endif
++#ifndef OPENSSL_NO_UI
++# define OPENSSL_NO_UI
++#endif
+ #ifndef OPENSSL_NO_UNIT_TEST
+ # define OPENSSL_NO_UNIT_TEST
+ #endif
++#ifndef OPENSSL_NO_WHIRLPOOL
++# define OPENSSL_NO_WHIRLPOOL
++#endif
+ 
+ #endif /* OPENSSL_DOING_MAKEDEPEND */
+ 
++#ifndef OPENSSL_NO_ASM
++# define OPENSSL_NO_ASM
++#endif
++#ifndef OPENSSL_NO_ERR
++# define OPENSSL_NO_ERR
++#endif
++#ifndef OPENSSL_NO_HW
++# define OPENSSL_NO_HW
++#endif
+ #ifndef OPENSSL_NO_DYNAMIC_ENGINE
+ # define OPENSSL_NO_DYNAMIC_ENGINE
+ #endif
+@@ -56,12 +173,66 @@
+    who haven't had the time to do the appropriate changes in their
+    applications.  */
+ #ifdef OPENSSL_ALGORITHM_DEFINES
++# if defined(OPENSSL_NO_BF) && !defined(NO_BF)
++#  define NO_BF
++# endif
++# if defined(OPENSSL_NO_CAMELLIA) && !defined(NO_CAMELLIA)
++#  define NO_CAMELLIA
++# endif
++# if defined(OPENSSL_NO_CAPIENG) && !defined(NO_CAPIENG)
++#  define NO_CAPIENG
++# endif
++# if defined(OPENSSL_NO_CAST) && !defined(NO_CAST)
++#  define NO_CAST
++# endif
++# if defined(OPENSSL_NO_CMS) && !defined(NO_CMS)
++#  define NO_CMS
++# endif
++# if defined(OPENSSL_NO_DEPRECATED) && !defined(NO_DEPRECATED)
++#  define NO_DEPRECATED
++# endif
++# if defined(OPENSSL_NO_DGRAM) && !defined(NO_DGRAM)
++#  define NO_DGRAM
++# endif
++# if defined(OPENSSL_NO_DSA) && !defined(NO_DSA)
++#  define NO_DSA
++# endif
++# if defined(OPENSSL_NO_DYNAMIC_ENGINE) && !defined(NO_DYNAMIC_ENGINE)
++#  define NO_DYNAMIC_ENGINE
++# endif
++# if defined(OPENSSL_NO_EC) && !defined(NO_EC)
++#  define NO_EC
++# endif
+ # if defined(OPENSSL_NO_EC_NISTP_64_GCC_128) && !defined(NO_EC_NISTP_64_GCC_128)
+ #  define NO_EC_NISTP_64_GCC_128
+ # endif
++# if defined(OPENSSL_NO_ECDH) && !defined(NO_ECDH)
++#  define NO_ECDH
++# endif
++# if defined(OPENSSL_NO_ECDSA) && !defined(NO_ECDSA)
++#  define NO_ECDSA
++# endif
++# if defined(OPENSSL_NO_ENGINE) && !defined(NO_ENGINE)
++#  define NO_ENGINE
++# endif
++# if defined(OPENSSL_NO_ENGINES) && !defined(NO_ENGINES)
++#  define NO_ENGINES
++# endif
++# if defined(OPENSSL_NO_FILENAMES) && !defined(NO_FILENAMES)
++#  define NO_FILENAMES
++# endif
++# if defined(OPENSSL_NO_FP_API) && !defined(NO_FP_API)
++#  define NO_FP_API
++# endif
+ # if defined(OPENSSL_NO_GMP) && !defined(NO_GMP)
+ #  define NO_GMP
+ # endif
++# if defined(OPENSSL_NO_GOST) && !defined(NO_GOST)
++#  define NO_GOST
++# endif
++# if defined(OPENSSL_NO_IDEA) && !defined(NO_IDEA)
++#  define NO_IDEA
++# endif
+ # if defined(OPENSSL_NO_JPAKE) && !defined(NO_JPAKE)
+ #  define NO_JPAKE
+ # endif
+@@ -71,27 +242,78 @@
+ # if defined(OPENSSL_NO_LIBUNBOUND) && !defined(NO_LIBUNBOUND)
+ #  define NO_LIBUNBOUND
+ # endif
++# if defined(OPENSSL_NO_LOCKING) && !defined(NO_LOCKING)
++#  define NO_LOCKING
++# endif
+ # if defined(OPENSSL_NO_MD2) && !defined(NO_MD2)
+ #  define NO_MD2
+ # endif
++# if defined(OPENSSL_NO_MDC2) && !defined(NO_MDC2)
++#  define NO_MDC2
++# endif
++# if defined(OPENSSL_NO_POSIX_IO) && !defined(NO_POSIX_IO)
++#  define NO_POSIX_IO
++# endif
++# if defined(OPENSSL_NO_RC2) && !defined(NO_RC2)
++#  define NO_RC2
++# endif
+ # if defined(OPENSSL_NO_RC5) && !defined(NO_RC5)
+ #  define NO_RC5
+ # endif
++# if defined(OPENSSL_NO_RCS) && !defined(NO_RCS)
++#  define NO_RCS
++# endif
+ # if defined(OPENSSL_NO_RFC3779) && !defined(NO_RFC3779)
+ #  define NO_RFC3779
+ # endif
++# if defined(OPENSSL_NO_RIPEMD) && !defined(NO_RIPEMD)
++#  define NO_RIPEMD
++# endif
++# if defined(OPENSSL_NO_SCRYPT) && !defined(NO_SCRYPT)
++#  define NO_SCRYPT
++# endif
++# if defined(OPENSSL_NO_SCT) && !defined(NO_SCT)
++#  define NO_SCT
++# endif
+ # if defined(OPENSSL_NO_SCTP) && !defined(NO_SCTP)
+ #  define NO_SCTP
+ # endif
++# if defined(OPENSSL_NO_SEED) && !defined(NO_SEED)
++#  define NO_SEED
++# endif
++# if defined(OPENSSL_NO_SHA0) && !defined(NO_SHA0)
++#  define NO_SHA0
++# endif
++# if defined(OPENSSL_NO_SOCK) && !defined(NO_SOCK)
++#  define NO_SOCK
++# endif
++# if defined(OPENSSL_NO_SRP) && !defined(NO_SRP)
++#  define NO_SRP
++# endif
+ # if defined(OPENSSL_NO_SSL_TRACE) && !defined(NO_SSL_TRACE)
+ #  define NO_SSL_TRACE
+ # endif
++# if defined(OPENSSL_NO_SSL2) && !defined(NO_SSL2)
++#  define NO_SSL2
++# endif
++# if defined(OPENSSL_NO_SSL3) && !defined(NO_SSL3)
++#  define NO_SSL3
++# endif
++# if defined(OPENSSL_NO_STDIO) && !defined(NO_STDIO)
++#  define NO_STDIO
++# endif
+ # if defined(OPENSSL_NO_STORE) && !defined(NO_STORE)
+ #  define NO_STORE
+ # endif
++# if defined(OPENSSL_NO_UI) && !defined(NO_UI)
++#  define NO_UI
++# endif
+ # if defined(OPENSSL_NO_UNIT_TEST) && !defined(NO_UNIT_TEST)
+ #  define NO_UNIT_TEST
+ # endif
++# if defined(OPENSSL_NO_WHIRLPOOL) && !defined(NO_WHIRLPOOL)
++#  define NO_WHIRLPOOL
++# endif
+ #endif
+ 
+ /* crypto/opensslconf.h.in */
+@@ -152,7 +374,7 @@
+ #endif
+ #endif
+ 
+-#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H)
++#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H) && !defined(OPENSSL_SYSNAME_UEFI)
+ #define CONFIG_HEADER_BN_H
+ #undef BN_LLONG
+ 
+diff U3 e_os.h e_os.h
+--- e_os.h	Thu Jul 09 19:57:16 2015
++++ e_os.h	Thu Oct 29 16:54:10 2015
+@@ -136,7 +136,7 @@
+ #  define MSDOS
+ # endif
+ 
+-# if defined(MSDOS) && !defined(GETPID_IS_MEANINGLESS)
++# if (defined(MSDOS) || defined(OPENSSL_SYS_UEFI)) && !defined(GETPID_IS_MEANINGLESS)
+ #  define GETPID_IS_MEANINGLESS
+ # endif
+ 
+diff U3 e_os2.h e_os2.h
+--- e_os2.h	Thu Jul 09 19:57:16 2015
++++ e_os2.h	Thu Oct 29 15:08:19 2015
+@@ -97,7 +97,14 @@
+  * For 32 bit environment, there seems to be the CygWin environment and then
+  * all the others that try to do the same thing Microsoft does...
+  */
+-# if defined(OPENSSL_SYSNAME_UWIN)
++/*
++ * UEFI lives here because it might be built with a Microsoft toolchain and
++ * we need to avoid the false positive match on Windows.
++ */
++# if defined(OPENSSL_SYSNAME_UEFI)
++#  undef OPENSSL_SYS_UNIX
++#  define OPENSSL_SYS_UEFI
++# elif defined(OPENSSL_SYSNAME_UWIN)
+ #  undef OPENSSL_SYS_UNIX
+ #  define OPENSSL_SYS_WIN32_UWIN
+ # else
