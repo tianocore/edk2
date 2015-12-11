@@ -1199,19 +1199,28 @@ ParseDnsResponse (
   //
   // Check the Query type, do some buffer allocations.
   //
-  if (QuerySection->Type == DNS_TYPE_A) {
-    Dns4TokenEntry->Token->RspData.H2AData = AllocatePool (sizeof (DNS_HOST_TO_ADDR_DATA));
-    ASSERT (Dns4TokenEntry->Token->RspData.H2AData != NULL);
-    Dns4TokenEntry->Token->RspData.H2AData->IpList = AllocatePool (DnsHeader->AnswersNum * sizeof (EFI_IPv4_ADDRESS));
-    ASSERT (Dns4TokenEntry->Token->RspData.H2AData->IpList != NULL);
-  } else if (QuerySection->Type == DNS_TYPE_AAAA) {
-    Dns6TokenEntry->Token->RspData.H2AData = AllocatePool (sizeof (DNS6_HOST_TO_ADDR_DATA));
-    ASSERT (Dns6TokenEntry->Token->RspData.H2AData != NULL);
-    Dns6TokenEntry->Token->RspData.H2AData->IpList = AllocatePool (DnsHeader->AnswersNum * sizeof (EFI_IPv6_ADDRESS));
-    ASSERT (Dns6TokenEntry->Token->RspData.H2AData->IpList != NULL);
+  if (Instance->Service->IpVersion == IP_VERSION_4) {
+    ASSERT (Dns4TokenEntry != NULL);
+    if (QuerySection->Type == DNS_TYPE_A) {
+      Dns4TokenEntry->Token->RspData.H2AData = AllocatePool (sizeof (DNS_HOST_TO_ADDR_DATA));
+      ASSERT (Dns4TokenEntry->Token->RspData.H2AData != NULL);
+      Dns4TokenEntry->Token->RspData.H2AData->IpList = AllocatePool (DnsHeader->AnswersNum * sizeof (EFI_IPv4_ADDRESS));
+      ASSERT (Dns4TokenEntry->Token->RspData.H2AData->IpList != NULL);
+    } else {
+      Status = EFI_UNSUPPORTED;
+      goto ON_EXIT;
+    }
   } else {
-    Status = EFI_UNSUPPORTED;
-    goto ON_EXIT;
+    ASSERT (Dns6TokenEntry != NULL);
+    if (QuerySection->Type == DNS_TYPE_AAAA) {
+      Dns6TokenEntry->Token->RspData.H2AData = AllocatePool (sizeof (DNS6_HOST_TO_ADDR_DATA));
+      ASSERT (Dns6TokenEntry->Token->RspData.H2AData != NULL);
+      Dns6TokenEntry->Token->RspData.H2AData->IpList = AllocatePool (DnsHeader->AnswersNum * sizeof (EFI_IPv6_ADDRESS));
+      ASSERT (Dns6TokenEntry->Token->RspData.H2AData->IpList != NULL);
+    } else {
+      Status = EFI_UNSUPPORTED;
+      goto ON_EXIT;
+    }
   }
 
   //
@@ -1240,7 +1249,7 @@ ParseDnsResponse (
         //
         // This is address entry, get Data.
         //
-        ASSERT (AnswerSection->DataLength == 4);
+        ASSERT (Dns4TokenEntry != NULL && AnswerSection->DataLength == 4);
         
         HostAddr4 = Dns4TokenEntry->Token->RspData.H2AData->IpList;
         AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
@@ -1282,7 +1291,7 @@ ParseDnsResponse (
         //
         // This is address entry, get Data.
         //
-        ASSERT (AnswerSection->DataLength == 16);
+        ASSERT (Dns6TokenEntry != NULL && AnswerSection->DataLength == 16);
         
         HostAddr6 = Dns6TokenEntry->Token->RspData.H2AData->IpList;
         AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
@@ -1333,16 +1342,29 @@ ParseDnsResponse (
     AnswerSectionNum ++;
   }
 
-  if (QuerySection->Type == DNS_TYPE_A) {
-    Dns4TokenEntry->Token->RspData.H2AData->IpCount = IpCount;
-  } else if (QuerySection->Type == DNS_TYPE_AAAA) {
-    Dns6TokenEntry->Token->RspData.H2AData->IpCount = IpCount;
+  if (Instance->Service->IpVersion == IP_VERSION_4) {
+    ASSERT (Dns4TokenEntry != NULL);
+    if (QuerySection->Type == DNS_TYPE_A) {
+      Dns4TokenEntry->Token->RspData.H2AData->IpCount = IpCount;
+    } else {
+      Status = EFI_UNSUPPORTED;
+      goto ON_EXIT;
+    }
+  } else {
+    ASSERT (Dns6TokenEntry != NULL);
+    if (QuerySection->Type == DNS_TYPE_AAAA) {
+      Dns6TokenEntry->Token->RspData.H2AData->IpCount = IpCount;
+    } else {
+      Status = EFI_UNSUPPORTED;
+      goto ON_EXIT;
+    }
   }
 
   //
   // Parsing is complete, SignalEvent here.
   //
   if (Instance->Service->IpVersion == IP_VERSION_4) {
+    ASSERT (Dns4TokenEntry != NULL);
     Dns4RemoveTokenEntry (&Instance->Dns4TxTokens, Dns4TokenEntry);
     Dns4TokenEntry->Token->Status = EFI_SUCCESS;
     if (Dns4TokenEntry->Token->Event != NULL) {
@@ -1350,6 +1372,7 @@ ParseDnsResponse (
       DispatchDpc ();
     }
   } else {
+    ASSERT (Dns6TokenEntry != NULL);
     Dns6RemoveTokenEntry (&Instance->Dns6TxTokens, Dns6TokenEntry);
     Dns6TokenEntry->Token->Status = EFI_SUCCESS;
     if (Dns6TokenEntry->Token->Event != NULL) {
