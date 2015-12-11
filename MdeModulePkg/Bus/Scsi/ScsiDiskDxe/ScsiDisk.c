@@ -239,7 +239,13 @@ ScsiDiskDriverBindingStart (
   ScsiDiskDevice->BlkIo.ReadBlocks     = ScsiDiskReadBlocks;
   ScsiDiskDevice->BlkIo.WriteBlocks    = ScsiDiskWriteBlocks;
   ScsiDiskDevice->BlkIo.FlushBlocks    = ScsiDiskFlushBlocks;
+  ScsiDiskDevice->BlkIo2.Media         = &ScsiDiskDevice->BlkIoMedia;
+  ScsiDiskDevice->BlkIo2.Reset         = ScsiDiskResetEx;
+  ScsiDiskDevice->BlkIo2.ReadBlocksEx  = ScsiDiskReadBlocksEx;
+  ScsiDiskDevice->BlkIo2.WriteBlocksEx = ScsiDiskWriteBlocksEx;
+  ScsiDiskDevice->BlkIo2.FlushBlocksEx = ScsiDiskFlushBlocksEx;
   ScsiDiskDevice->Handle               = Controller;
+  InitializeListHead (&ScsiDiskDevice->BlkIo2Queue);
 
   ScsiIo->GetDeviceType (ScsiIo, &(ScsiDiskDevice->DeviceType));
   switch (ScsiDiskDevice->DeviceType) {
@@ -300,7 +306,8 @@ ScsiDiskDriverBindingStart (
   Status = ScsiDiskDetectMedia (ScsiDiskDevice, MustReadCapacity, &Temp);
   if (!EFI_ERROR (Status)) {
     //
-    // Determine if Block IO should be produced on this controller handle
+    // Determine if Block IO & Block IO2 should be produced on this controller
+    // handle
     //
     if (DetermineInstallBlockIo(Controller)) {
       InitializeInstallDiskInfo(ScsiDiskDevice, Controller);
@@ -308,6 +315,8 @@ ScsiDiskDriverBindingStart (
                       &Controller,
                       &gEfiBlockIoProtocolGuid,
                       &ScsiDiskDevice->BlkIo,
+                      &gEfiBlockIo2ProtocolGuid,
+                      &ScsiDiskDevice->BlkIo2,
                       &gEfiDiskInfoProtocolGuid,
                       &ScsiDiskDevice->DiskInfo,
                       NULL
@@ -390,11 +399,19 @@ ScsiDiskDriverBindingStop (
     return Status;
   }
 
-  ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (BlkIo);
+  ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO (BlkIo);
+
+  //
+  // Wait for the BlockIo2 requests queue to become empty
+  //
+  while (!IsListEmpty (&ScsiDiskDevice->BlkIo2Queue));
+
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   Controller,
                   &gEfiBlockIoProtocolGuid,
                   &ScsiDiskDevice->BlkIo,
+                  &gEfiBlockIo2ProtocolGuid,
+                  &ScsiDiskDevice->BlkIo2,
                   &gEfiDiskInfoProtocolGuid,
                   &ScsiDiskDevice->DiskInfo,
                   NULL
@@ -443,7 +460,7 @@ ScsiDiskReset (
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  ScsiDiskDevice  = SCSI_DISK_DEV_FROM_THIS (This);
+  ScsiDiskDevice  = SCSI_DISK_DEV_FROM_BLKIO (This);
 
   Status          = ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
 
@@ -505,7 +522,7 @@ ScsiDiskReadBlocks (
 
   MediaChange    = FALSE;
   OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
-  ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
+  ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO (This);
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
@@ -522,6 +539,12 @@ ScsiDiskReadBlocks (
             &ScsiDiskDevice->BlkIo,
             &ScsiDiskDevice->BlkIo
             );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
       Status = EFI_MEDIA_CHANGED;
       goto Done;
     }
@@ -623,7 +646,7 @@ ScsiDiskWriteBlocks (
 
   MediaChange    = FALSE;
   OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
-  ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
+  ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO (This);
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
@@ -640,6 +663,12 @@ ScsiDiskWriteBlocks (
             &ScsiDiskDevice->BlkIo,
             &ScsiDiskDevice->BlkIo
             );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
       Status = EFI_MEDIA_CHANGED;
       goto Done;
     }
@@ -721,6 +750,392 @@ ScsiDiskFlushBlocks (
   //
   // return directly
   //
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Reset SCSI Disk.
+
+  @param  This                 The pointer of EFI_BLOCK_IO2_PROTOCOL.
+  @param  ExtendedVerification The flag about if extend verificate.
+
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+                               not be reset.
+  @return EFI_STATUS is returned from EFI_SCSI_IO_PROTOCOL.ResetDevice().
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskResetEx (
+  IN  EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN  BOOLEAN                 ExtendedVerification
+  )
+{
+  EFI_TPL       OldTpl;
+  SCSI_DISK_DEV *ScsiDiskDevice;
+  EFI_STATUS    Status;
+
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+  ScsiDiskDevice  = SCSI_DISK_DEV_FROM_BLKIO2 (This);
+
+  Status          = ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
+
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  if (!ExtendedVerification) {
+    goto Done;
+  }
+
+  Status = ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
+
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+}
+
+/**
+  The function is to Read Block from SCSI Disk.
+
+  @param  This       The pointer of EFI_BLOCK_IO_PROTOCOL.
+  @param  MediaId    The Id of Media detected.
+  @param  Lba        The logic block address.
+  @param  Token      A pointer to the token associated with the transaction.
+  @param  BufferSize The size of Buffer.
+  @param  Buffer     The buffer to fill the read out data.
+
+  @retval EFI_SUCCESS           The read request was queued if Token-> Event is
+                                not NULL. The data was read correctly from the
+                                device if theToken-> Event is NULL.
+  @retval EFI_DEVICE_ERROR      The device reported an error while attempting
+                                to perform the read operation.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
+  @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of
+                                the intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not
+                                valid, or the buffer is not on proper
+                                alignment.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a
+                                lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskReadBlocksEx (
+  IN     EFI_BLOCK_IO2_PROTOCOL   *This,
+  IN     UINT32                   MediaId,
+  IN     EFI_LBA                  Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN      *Token,
+  IN     UINTN                    BufferSize,
+  OUT    VOID                     *Buffer
+  )
+{
+  SCSI_DISK_DEV       *ScsiDiskDevice;
+  EFI_BLOCK_IO_MEDIA  *Media;
+  EFI_STATUS          Status;
+  UINTN               BlockSize;
+  UINTN               NumberOfBlocks;
+  BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
+
+  MediaChange    = FALSE;
+  OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
+  ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO2 (This);
+
+  if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
+
+    Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+
+    if (MediaChange) {
+      gBS->ReinstallProtocolInterface (
+            ScsiDiskDevice->Handle,
+            &gEfiBlockIoProtocolGuid,
+            &ScsiDiskDevice->BlkIo,
+            &ScsiDiskDevice->BlkIo
+            );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
+      Status = EFI_MEDIA_CHANGED;
+      goto Done;
+    }
+  }
+  //
+  // Get the intrinsic block size
+  //
+  Media           = ScsiDiskDevice->BlkIo2.Media;
+  BlockSize       = Media->BlockSize;
+
+  NumberOfBlocks  = BufferSize / BlockSize;
+
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto Done;
+  }
+
+  if (MediaId != Media->MediaId) {
+    Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if (BufferSize == 0) {
+    if ((Token != NULL) && (Token->Event != NULL)) {
+      Token->TransactionStatus = EFI_SUCCESS;
+      gBS->SignalEvent (Token->Event);
+    }
+
+    Status = EFI_SUCCESS;
+    goto Done;
+  }
+
+  if (BufferSize % BlockSize != 0) {
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto Done;
+  }
+
+  if (Lba > Media->LastBlock) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if ((Media->IoAlign > 1) && (((UINTN) Buffer & (Media->IoAlign - 1)) != 0)) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  //
+  // If all the parameters are valid, then perform read sectors command
+  // to transfer data from device to host.
+  //
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Token->TransactionStatus = EFI_SUCCESS;
+    Status = ScsiDiskAsyncReadSectors (
+               ScsiDiskDevice,
+               Buffer,
+               Lba,
+               NumberOfBlocks,
+               Token
+               );
+  } else {
+    Status = ScsiDiskReadSectors (
+               ScsiDiskDevice,
+               Buffer,
+               Lba,
+               NumberOfBlocks
+               );
+  }
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+}
+
+/**
+  The function is to Write Block to SCSI Disk.
+
+  @param  This       The pointer of EFI_BLOCK_IO_PROTOCOL.
+  @param  MediaId    The Id of Media detected.
+  @param  Lba        The logic block address.
+  @param  Token      A pointer to the token associated with the transaction.
+  @param  BufferSize The size of Buffer.
+  @param  Buffer     The buffer to fill the read out data.
+
+  @retval EFI_SUCCESS           The data were written correctly to the device.
+  @retval EFI_WRITE_PROTECTED   The device cannot be written to.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
+  @retval EFI_DEVICE_ERROR      The device reported an error while attempting
+                                to perform the write operation.
+  @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of
+                                the intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not
+                                valid, or the buffer is not on proper
+                                alignment.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskWriteBlocksEx (
+  IN     EFI_BLOCK_IO2_PROTOCOL *This,
+  IN     UINT32                 MediaId,
+  IN     EFI_LBA                Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
+  IN     UINTN                  BufferSize,
+  IN     VOID                   *Buffer
+  )
+{
+  SCSI_DISK_DEV       *ScsiDiskDevice;
+  EFI_BLOCK_IO_MEDIA  *Media;
+  EFI_STATUS          Status;
+  UINTN               BlockSize;
+  UINTN               NumberOfBlocks;
+  BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
+
+  MediaChange    = FALSE;
+  OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
+  ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO2 (This);
+
+  if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
+
+    Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+
+    if (MediaChange) {
+      gBS->ReinstallProtocolInterface (
+            ScsiDiskDevice->Handle,
+            &gEfiBlockIoProtocolGuid,
+            &ScsiDiskDevice->BlkIo,
+            &ScsiDiskDevice->BlkIo
+            );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
+      Status = EFI_MEDIA_CHANGED;
+      goto Done;
+    }
+  }
+  //
+  // Get the intrinsic block size
+  //
+  Media           = ScsiDiskDevice->BlkIo2.Media;
+  BlockSize       = Media->BlockSize;
+
+  NumberOfBlocks  = BufferSize / BlockSize;
+
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto Done;
+  }
+
+  if (MediaId != Media->MediaId) {
+    Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (BufferSize == 0) {
+    if ((Token != NULL) && (Token->Event != NULL)) {
+      Token->TransactionStatus = EFI_SUCCESS;
+      gBS->SignalEvent (Token->Event);
+    }
+
+    Status = EFI_SUCCESS;
+    goto Done;
+  }
+
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if (BufferSize % BlockSize != 0) {
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto Done;
+  }
+
+  if (Lba > Media->LastBlock) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if ((Media->IoAlign > 1) && (((UINTN) Buffer & (Media->IoAlign - 1)) != 0)) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  //
+  // if all the parameters are valid, then perform write sectors command
+  // to transfer data from device to host.
+  //
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Token->TransactionStatus = EFI_SUCCESS;
+    Status = ScsiDiskAsyncWriteSectors (
+               ScsiDiskDevice,
+               Buffer,
+               Lba,
+               NumberOfBlocks,
+               Token
+               );
+  } else {
+    Status = ScsiDiskWriteSectors (
+               ScsiDiskDevice,
+               Buffer,
+               Lba,
+               NumberOfBlocks
+               );
+  }
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+}
+
+/**
+  Flush the Block Device.
+
+  @param  This       Indicates a pointer to the calling context.
+  @param  Token      A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS       All outstanding data was written to the device.
+  @retval EFI_DEVICE_ERROR  The device reported an error while writing back the
+                            data.
+  @retval EFI_NO_MEDIA      There is no media in the device.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskFlushBlocksEx (
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token
+  )
+{
+  //
+  // Signal event and return directly.
+  //
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Token->TransactionStatus = EFI_SUCCESS;
+    gBS->SignalEvent (Token->Event);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -2091,6 +2506,328 @@ ScsiDiskWriteSectors (
   return EFI_SUCCESS;
 }
 
+/**
+  Asynchronously read sector from SCSI Disk.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV.
+  @param  Buffer          The buffer to fill in the read out data.
+  @param  Lba             Logic block address.
+  @param  NumberOfBlocks  The number of blocks to read.
+  @param  Token           A pointer to the token associated with the
+                          non-blocking read request.
+
+  @retval EFI_INVALID_PARAMETER  Token is NULL or Token->Event is NULL.
+  @retval EFI_DEVICE_ERROR       Indicates a device error.
+  @retval EFI_SUCCESS            Operation is successful.
+
+**/
+EFI_STATUS
+ScsiDiskAsyncReadSectors (
+  IN   SCSI_DISK_DEV         *ScsiDiskDevice,
+  OUT  VOID                  *Buffer,
+  IN   EFI_LBA               Lba,
+  IN   UINTN                 NumberOfBlocks,
+  IN   EFI_BLOCK_IO2_TOKEN   *Token
+  )
+{
+  UINTN                 BlocksRemaining;
+  UINT8                 *PtrBuffer;
+  UINT32                BlockSize;
+  UINT32                ByteCount;
+  UINT32                MaxBlock;
+  UINT32                SectorCount;
+  UINT64                Timeout;
+  SCSI_BLKIO2_REQUEST   *BlkIo2Req;
+  EFI_STATUS            Status;
+
+  if ((Token == NULL) || (Token->Event == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  BlkIo2Req = AllocateZeroPool (sizeof (SCSI_BLKIO2_REQUEST));
+  if (BlkIo2Req == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  BlkIo2Req->Token  = Token;
+  InsertTailList (&ScsiDiskDevice->BlkIo2Queue, &BlkIo2Req->Link);
+  InitializeListHead (&BlkIo2Req->ScsiRWQueue);
+
+  Status            = EFI_SUCCESS;
+
+  BlocksRemaining   = NumberOfBlocks;
+  BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
+
+  //
+  // Limit the data bytes that can be transferred by one Read(10) or Read(16)
+  // Command
+  //
+  if (!ScsiDiskDevice->Cdb16Byte) {
+    MaxBlock         = 0xFFFF;
+  } else {
+    MaxBlock         = 0xFFFFFFFF;
+  }
+
+  PtrBuffer = Buffer;
+
+  while (BlocksRemaining > 0) {
+
+    if (BlocksRemaining <= MaxBlock) {
+      if (!ScsiDiskDevice->Cdb16Byte) {
+        SectorCount = (UINT16) BlocksRemaining;
+      } else {
+        SectorCount = (UINT32) BlocksRemaining;
+      }
+    } else {
+      SectorCount = MaxBlock;
+    }
+
+    ByteCount = SectorCount * BlockSize;
+    //
+    // |------------------------|-----------------|------------------|-----------------|
+    // |   ATA Transfer Mode    |  Transfer Rate  |  SCSI Interface  |  Transfer Rate  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 0       |  3.3Mbytes/sec  |     SCSI-1       |    5Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 1       |  5.2Mbytes/sec  |    Fast SCSI     |   10Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 2       |  8.3Mbytes/sec  |  Fast-Wide SCSI  |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 3       | 11.1Mbytes/sec  |    Ultra SCSI    |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 4       | 16.6Mbytes/sec  |  Ultra Wide SCSI |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 0 |  2.1Mbytes/sec  |    Ultra2 SCSI   |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 1 |  4.2Mbytes/sec  | Ultra2 Wide SCSI |   80Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 2 |  8.4Mbytes/sec  |    Ultra3 SCSI   |  160Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 0  |  4.2Mbytes/sec  |  Ultra-320 SCSI  |  320Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 1  | 13.3Mbytes/sec  |  Ultra-640 SCSI  |  640Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    //
+    // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices,
+    // we have to use the lowest transfer rate to calculate the possible
+    // maximum timeout value for each operation.
+    // From the above table, we could know 2.1Mbytes per second is lowest one.
+    // The timout value is rounded up to nearest integar and here an additional
+    // 30s is added to follow ATA spec in which it mentioned that the device
+    // may take up to 30s to respond commands in the Standby/Idle mode.
+    //
+    Timeout   = EFI_TIMER_PERIOD_SECONDS (ByteCount / 2100000 + 31);
+
+    if (!ScsiDiskDevice->Cdb16Byte) {
+      Status = ScsiDiskAsyncRead10 (
+                 ScsiDiskDevice,
+                 Timeout,
+                 PtrBuffer,
+                 ByteCount,
+                 (UINT32) Lba,
+                 SectorCount,
+                 BlkIo2Req,
+                 Token
+                 );
+    } else {
+      Status = ScsiDiskAsyncRead16 (
+                 ScsiDiskDevice,
+                 Timeout,
+                 PtrBuffer,
+                 ByteCount,
+                 Lba,
+                 SectorCount,
+                 BlkIo2Req,
+                 Token
+                 );
+    }
+    if (EFI_ERROR (Status)) {
+      //
+      // Free the SCSI_BLKIO2_REQUEST structure only when the first SCSI
+      // command fails. Otherwise, it will be freed in the callback function
+      // ScsiDiskNotify().
+      //
+      if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
+        RemoveEntryList (&BlkIo2Req->Link);
+        FreePool (BlkIo2Req);
+      }
+      return EFI_DEVICE_ERROR;
+    }
+
+    //
+    // Sectors submitted for transfer
+    //
+    SectorCount = ByteCount / BlockSize;
+
+    Lba += SectorCount;
+    PtrBuffer = PtrBuffer + SectorCount * BlockSize;
+    BlocksRemaining -= SectorCount;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Asynchronously write sector to SCSI Disk.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV.
+  @param  Buffer          The buffer of data to be written into SCSI Disk.
+  @param  Lba             Logic block address.
+  @param  NumberOfBlocks  The number of blocks to read.
+  @param  Token           A pointer to the token associated with the
+                          non-blocking read request.
+
+  @retval EFI_INVALID_PARAMETER  Token is NULL or Token->Event is NULL
+  @retval EFI_DEVICE_ERROR  Indicates a device error.
+  @retval EFI_SUCCESS       Operation is successful.
+
+**/
+EFI_STATUS
+ScsiDiskAsyncWriteSectors (
+  IN  SCSI_DISK_DEV          *ScsiDiskDevice,
+  IN  VOID                   *Buffer,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  NumberOfBlocks,
+  IN  EFI_BLOCK_IO2_TOKEN    *Token
+  )
+{
+  UINTN                 BlocksRemaining;
+  UINT8                 *PtrBuffer;
+  UINT32                BlockSize;
+  UINT32                ByteCount;
+  UINT32                MaxBlock;
+  UINT32                SectorCount;
+  UINT64                Timeout;
+  SCSI_BLKIO2_REQUEST   *BlkIo2Req;
+  EFI_STATUS            Status;
+
+  if ((Token == NULL) || (Token->Event == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  BlkIo2Req = AllocateZeroPool (sizeof (SCSI_BLKIO2_REQUEST));
+  if (BlkIo2Req == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  BlkIo2Req->Token  = Token;
+  InsertTailList (&ScsiDiskDevice->BlkIo2Queue, &BlkIo2Req->Link);
+  InitializeListHead (&BlkIo2Req->ScsiRWQueue);
+
+  Status            = EFI_SUCCESS;
+
+  BlocksRemaining   = NumberOfBlocks;
+  BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
+
+  //
+  // Limit the data bytes that can be transferred by one Read(10) or Read(16)
+  // Command
+  //
+  if (!ScsiDiskDevice->Cdb16Byte) {
+    MaxBlock         = 0xFFFF;
+  } else {
+    MaxBlock         = 0xFFFFFFFF;
+  }
+
+  PtrBuffer = Buffer;
+
+  while (BlocksRemaining > 0) {
+
+    if (BlocksRemaining <= MaxBlock) {
+      if (!ScsiDiskDevice->Cdb16Byte) {
+        SectorCount = (UINT16) BlocksRemaining;
+      } else {
+        SectorCount = (UINT32) BlocksRemaining;
+      }
+    } else {
+      SectorCount = MaxBlock;
+    }
+
+    ByteCount = SectorCount * BlockSize;
+    //
+    // |------------------------|-----------------|------------------|-----------------|
+    // |   ATA Transfer Mode    |  Transfer Rate  |  SCSI Interface  |  Transfer Rate  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 0       |  3.3Mbytes/sec  |     SCSI-1       |    5Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 1       |  5.2Mbytes/sec  |    Fast SCSI     |   10Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 2       |  8.3Mbytes/sec  |  Fast-Wide SCSI  |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 3       | 11.1Mbytes/sec  |    Ultra SCSI    |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 4       | 16.6Mbytes/sec  |  Ultra Wide SCSI |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 0 |  2.1Mbytes/sec  |    Ultra2 SCSI   |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 1 |  4.2Mbytes/sec  | Ultra2 Wide SCSI |   80Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 2 |  8.4Mbytes/sec  |    Ultra3 SCSI   |  160Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 0  |  4.2Mbytes/sec  |  Ultra-320 SCSI  |  320Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 1  | 13.3Mbytes/sec  |  Ultra-640 SCSI  |  640Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    //
+    // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices,
+    // we have to use the lowest transfer rate to calculate the possible
+    // maximum timeout value for each operation.
+    // From the above table, we could know 2.1Mbytes per second is lowest one.
+    // The timout value is rounded up to nearest integar and here an additional
+    // 30s is added to follow ATA spec in which it mentioned that the device
+    // may take up to 30s to respond commands in the Standby/Idle mode.
+    //
+    Timeout   = EFI_TIMER_PERIOD_SECONDS (ByteCount / 2100000 + 31);
+
+    if (!ScsiDiskDevice->Cdb16Byte) {
+      Status = ScsiDiskAsyncWrite10 (
+                 ScsiDiskDevice,
+                 Timeout,
+                 PtrBuffer,
+                 ByteCount,
+                 (UINT32) Lba,
+                 SectorCount,
+                 BlkIo2Req,
+                 Token
+                 );
+    } else {
+      Status = ScsiDiskAsyncWrite16 (
+                 ScsiDiskDevice,
+                 Timeout,
+                 PtrBuffer,
+                 ByteCount,
+                 Lba,
+                 SectorCount,
+                 BlkIo2Req,
+                 Token
+                 );
+    }
+    if (EFI_ERROR (Status)) {
+      //
+      // Free the SCSI_BLKIO2_REQUEST structure only when the first SCSI
+      // command fails. Otherwise, it will be freed in the callback function
+      // ScsiDiskNotify().
+      //
+      if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
+        RemoveEntryList (&BlkIo2Req->Link);
+        FreePool (BlkIo2Req);
+      }
+      return EFI_DEVICE_ERROR;
+    }
+
+    //
+    // Sectors submitted for transfer
+    //
+    SectorCount = ByteCount / BlockSize;
+
+    Lba += SectorCount;
+    PtrBuffer = PtrBuffer + SectorCount * BlockSize;
+    BlocksRemaining -= SectorCount;
+  }
+
+  return EFI_SUCCESS;
+}
+
 
 /**
   Submit Read(10) command.
@@ -2588,6 +3325,689 @@ BackOff:
 
 
 /**
+  Internal helper notify function in which determine whether retry of a SCSI
+  Read/Write command is needed and signal the event passed from Block I/O(2) if
+  the SCSI I/O operation completes.
+
+  @param  Event    The instance of EFI_EVENT.
+  @param  Context  The parameter passed in.
+
+**/
+VOID
+EFIAPI
+ScsiDiskNotify (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  EFI_STATUS                       Status;
+  SCSI_ASYNC_RW_REQUEST            *Request;
+  SCSI_DISK_DEV                    *ScsiDiskDevice;
+  EFI_BLOCK_IO2_TOKEN              *Token;
+  UINTN                            Action;
+  UINT32                           OldDataLength;
+  UINT32                           OldSectorCount;
+  UINT8                            MaxRetry;
+
+  gBS->CloseEvent (Event);
+
+  Request         = (SCSI_ASYNC_RW_REQUEST *) Context;
+  ScsiDiskDevice  = Request->ScsiDiskDevice;
+  Token           = Request->BlkIo2Req->Token;
+  OldDataLength   = Request->DataLength;
+  OldSectorCount  = Request->SectorCount;
+  MaxRetry        = 2;
+
+  //
+  // If previous sub-tasks already fails, no need to process this sub-task.
+  //
+  if (Token->TransactionStatus != EFI_SUCCESS) {
+    goto Exit;
+  }
+
+  //
+  // Check HostAdapterStatus and TargetStatus
+  // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
+  //
+  Status = CheckHostAdapterStatus (Request->HostAdapterStatus);
+  if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+    if (++Request->TimesRetry > MaxRetry) {
+      Token->TransactionStatus = EFI_DEVICE_ERROR;
+      goto Exit;
+    } else {
+      goto Retry;
+    }
+  } else if (Status == EFI_DEVICE_ERROR) {
+    //
+    // reset the scsi channel
+    //
+    ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
+    Token->TransactionStatus = EFI_DEVICE_ERROR;
+    goto Exit;
+  }
+
+  Status = CheckTargetStatus (Request->TargetStatus);
+  if (Status == EFI_NOT_READY) {
+    //
+    // reset the scsi device
+    //
+    ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
+    if (++Request->TimesRetry > MaxRetry) {
+      Token->TransactionStatus = EFI_DEVICE_ERROR;
+      goto Exit;
+    } else {
+      goto Retry;
+    }
+  } else if (Status == EFI_DEVICE_ERROR) {
+    Token->TransactionStatus = EFI_DEVICE_ERROR;
+    goto Exit;
+  }
+
+  if (Request->TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
+    DEBUG ((EFI_D_ERROR, "ScsiDiskNotify: Check Condition happened!\n"));
+
+    Status = DetectMediaParsingSenseKeys (
+               ScsiDiskDevice,
+               Request->SenseData,
+               Request->SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA),
+               &Action
+               );
+    if (Action == ACTION_RETRY_COMMAND_LATER) {
+      if (++Request->TimesRetry > MaxRetry) {
+        Token->TransactionStatus = EFI_DEVICE_ERROR;
+        goto Exit;
+      } else {
+        goto Retry;
+      }
+    } else if (Action == ACTION_RETRY_WITH_BACKOFF_ALGO) {
+      if (Request->SectorCount <= 1) {
+        //
+        // Jump out if the operation still fails with one sector transfer
+        // length.
+        //
+        Token->TransactionStatus = EFI_DEVICE_ERROR;
+        goto Exit;
+      }
+      //
+      // Try again with two half length request if the sense data shows we need
+      // to retry.
+      //
+      Request->SectorCount >>= 1;
+      Request->DataLength = Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize;
+      Request->TimesRetry  = 0;
+
+      goto Retry;
+    } else {
+      Token->TransactionStatus = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
+  }
+
+  //
+  // This sub-task succeeds, no need to retry.
+  //
+  goto Exit;
+
+Retry:
+  if (Request->InBuffer != NULL) {
+    //
+    // SCSI read command
+    //
+    if (!ScsiDiskDevice->Cdb16Byte) {
+      Status = ScsiDiskAsyncRead10 (
+                 ScsiDiskDevice,
+                 Request->Timeout,
+                 Request->InBuffer,
+                 Request->DataLength,
+                 (UINT32) Request->StartLba,
+                 Request->SectorCount,
+                 Request->BlkIo2Req,
+                 Token
+                 );
+    } else {
+      Status = ScsiDiskAsyncRead16 (
+                 ScsiDiskDevice,
+                 Request->Timeout,
+                 Request->InBuffer,
+                 Request->DataLength,
+                 Request->StartLba,
+                 Request->SectorCount,
+                 Request->BlkIo2Req,
+                 Token
+                 );
+    }
+
+    if (EFI_ERROR (Status)) {
+      Token->TransactionStatus = EFI_DEVICE_ERROR;
+      goto Exit;
+    } else if (OldSectorCount != Request->SectorCount) {
+      //
+      // Original sub-task will be split into two new sub-tasks with smaller
+      // DataLength
+      //
+      if (!ScsiDiskDevice->Cdb16Byte) {
+        Status = ScsiDiskAsyncRead10 (
+                   ScsiDiskDevice,
+                   Request->Timeout,
+                   Request->InBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
+                   OldDataLength - Request->DataLength,
+                   (UINT32) Request->StartLba + Request->SectorCount,
+                   OldSectorCount - Request->SectorCount,
+                   Request->BlkIo2Req,
+                   Token
+                   );
+      } else {
+        Status = ScsiDiskAsyncRead16 (
+                   ScsiDiskDevice,
+                   Request->Timeout,
+                   Request->InBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
+                   OldDataLength - Request->DataLength,
+                   Request->StartLba + Request->SectorCount,
+                   OldSectorCount - Request->SectorCount,
+                   Request->BlkIo2Req,
+                   Token
+                   );
+      }
+      if (EFI_ERROR (Status)) {
+        Token->TransactionStatus = EFI_DEVICE_ERROR;
+        goto Exit;
+      }
+    }
+  } else {
+    //
+    // SCSI write command
+    //
+    if (!ScsiDiskDevice->Cdb16Byte) {
+      Status = ScsiDiskAsyncWrite10 (
+                 ScsiDiskDevice,
+                 Request->Timeout,
+                 Request->OutBuffer,
+                 Request->DataLength,
+                 (UINT32) Request->StartLba,
+                 Request->SectorCount,
+                 Request->BlkIo2Req,
+                 Token
+                 );
+    } else {
+      Status = ScsiDiskAsyncWrite16 (
+                 ScsiDiskDevice,
+                 Request->Timeout,
+                 Request->OutBuffer,
+                 Request->DataLength,
+                 Request->StartLba,
+                 Request->SectorCount,
+                 Request->BlkIo2Req,
+                 Token
+                 );
+    }
+
+    if (EFI_ERROR (Status)) {
+      Token->TransactionStatus = EFI_DEVICE_ERROR;
+      goto Exit;
+    } else if (OldSectorCount != Request->SectorCount) {
+      //
+      // Original sub-task will be split into two new sub-tasks with smaller
+      // DataLength
+      //
+      if (!ScsiDiskDevice->Cdb16Byte) {
+        Status = ScsiDiskAsyncWrite10 (
+                   ScsiDiskDevice,
+                   Request->Timeout,
+                   Request->OutBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
+                   OldDataLength - Request->DataLength,
+                   (UINT32) Request->StartLba + Request->SectorCount,
+                   OldSectorCount - Request->SectorCount,
+                   Request->BlkIo2Req,
+                   Token
+                   );
+      } else {
+        Status = ScsiDiskAsyncWrite16 (
+                   ScsiDiskDevice,
+                   Request->Timeout,
+                   Request->OutBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
+                   OldDataLength - Request->DataLength,
+                   Request->StartLba + Request->SectorCount,
+                   OldSectorCount - Request->SectorCount,
+                   Request->BlkIo2Req,
+                   Token
+                   );
+      }
+      if (EFI_ERROR (Status)) {
+        Token->TransactionStatus = EFI_DEVICE_ERROR;
+        goto Exit;
+      }
+    }
+  }
+
+Exit:
+  RemoveEntryList (&Request->Link);
+  if (IsListEmpty (&Request->BlkIo2Req->ScsiRWQueue)) {
+    //
+    // The last SCSI R/W command of a BlockIo2 request completes
+    //
+    RemoveEntryList (&Request->BlkIo2Req->Link);
+    FreePool (Request->BlkIo2Req);  // Should be freed only once
+    gBS->SignalEvent (Token->Event);
+  }
+
+  FreePool (Request->SenseData);
+  FreePool (Request);
+}
+
+
+/**
+  Submit Async Read(10) command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
+  @param  Timeout            The time to complete the command.
+  @param  DataBuffer         The buffer to fill with the read out data.
+  @param  DataLength         The length of buffer.
+  @param  StartLba           The start logic block address.
+  @param  SectorCount        The number of blocks to read.
+  @param  BlkIo2Req          The upstream BlockIo2 request.
+  @param  Token              The pointer to the token associated with the
+                             non-blocking read request.
+
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a
+                                lack of resources.
+  @return others                Status returned by calling
+                                ScsiRead10CommandEx().
+
+**/
+EFI_STATUS
+ScsiDiskAsyncRead10 (
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+  IN     UINT64                Timeout,
+     OUT UINT8                 *DataBuffer,
+  IN     UINT32                DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorCount,
+  IN OUT SCSI_BLKIO2_REQUEST   *BlkIo2Req,
+  IN     EFI_BLOCK_IO2_TOKEN   *Token
+  )
+{
+  EFI_STATUS                   Status;
+  SCSI_ASYNC_RW_REQUEST        *Request;
+  EFI_EVENT                    AsyncIoEvent;
+
+  Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
+  if (Request == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+
+  Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
+  Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
+  if (Request->SenseData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Request->ScsiDiskDevice  = ScsiDiskDevice;
+  Request->Timeout         = Timeout;
+  Request->InBuffer        = DataBuffer;
+  Request->DataLength      = DataLength;
+  Request->StartLba        = StartLba;
+  Request->SectorCount     = SectorCount;
+  Request->BlkIo2Req       = BlkIo2Req;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiDiskNotify,
+                  Request,
+                  &AsyncIoEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  Status = ScsiRead10CommandEx (
+             ScsiDiskDevice->ScsiIo,
+             Request->Timeout,
+             Request->SenseData,
+             &Request->SenseDataLength,
+             &Request->HostAdapterStatus,
+             &Request->TargetStatus,
+             Request->InBuffer,
+             &Request->DataLength,
+             (UINT32) Request->StartLba,
+             Request->SectorCount,
+             AsyncIoEvent
+             );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return EFI_SUCCESS;
+
+ErrorExit:
+  if (Request != NULL) {
+    if (Request->SenseData != NULL) {
+      FreePool (Request->SenseData);
+    }
+
+    RemoveEntryList (&Request->Link);
+    FreePool (Request);
+  }
+
+  return Status;
+}
+
+
+/**
+  Submit Async Write(10) command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
+  @param  Timeout            The time to complete the command.
+  @param  DataBuffer         The buffer contains the data to write.
+  @param  DataLength         The length of buffer.
+  @param  StartLba           The start logic block address.
+  @param  SectorCount        The number of blocks to write.
+  @param  BlkIo2Req          The upstream BlockIo2 request.
+  @param  Token              The pointer to the token associated with the
+                             non-blocking read request.
+
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a
+                                lack of resources.
+  @return others                Status returned by calling
+                                ScsiWrite10CommandEx().
+
+**/
+EFI_STATUS
+ScsiDiskAsyncWrite10 (
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+  IN     UINT64                Timeout,
+  IN     UINT8                 *DataBuffer,
+  IN     UINT32                DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorCount,
+  IN OUT SCSI_BLKIO2_REQUEST   *BlkIo2Req,
+  IN     EFI_BLOCK_IO2_TOKEN   *Token
+  )
+{
+  EFI_STATUS                   Status;
+  SCSI_ASYNC_RW_REQUEST        *Request;
+  EFI_EVENT                    AsyncIoEvent;
+
+  Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
+  if (Request == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+
+  Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
+  Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
+  if (Request->SenseData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Request->ScsiDiskDevice  = ScsiDiskDevice;
+  Request->Timeout         = Timeout;
+  Request->OutBuffer       = DataBuffer;
+  Request->DataLength      = DataLength;
+  Request->StartLba        = StartLba;
+  Request->SectorCount     = SectorCount;
+  Request->BlkIo2Req       = BlkIo2Req;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiDiskNotify,
+                  Request,
+                  &AsyncIoEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  Status = ScsiWrite10CommandEx (
+             ScsiDiskDevice->ScsiIo,
+             Request->Timeout,
+             Request->SenseData,
+             &Request->SenseDataLength,
+             &Request->HostAdapterStatus,
+             &Request->TargetStatus,
+             Request->OutBuffer,
+             &Request->DataLength,
+             (UINT32) Request->StartLba,
+             Request->SectorCount,
+             AsyncIoEvent
+             );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return EFI_SUCCESS;
+
+ErrorExit:
+  if (Request != NULL) {
+    if (Request->SenseData != NULL) {
+      FreePool (Request->SenseData);
+    }
+
+    RemoveEntryList (&Request->Link);
+    FreePool (Request);
+  }
+
+  return Status;
+}
+
+
+/**
+  Submit Async Read(16) command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
+  @param  Timeout            The time to complete the command.
+  @param  DataBuffer         The buffer to fill with the read out data.
+  @param  DataLength         The length of buffer.
+  @param  StartLba           The start logic block address.
+  @param  SectorCount        The number of blocks to read.
+  @param  BlkIo2Req          The upstream BlockIo2 request.
+  @param  Token              The pointer to the token associated with the
+                             non-blocking read request.
+
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a
+                                lack of resources.
+  @return others                Status returned by calling
+                                ScsiRead16CommandEx().
+
+**/
+EFI_STATUS
+ScsiDiskAsyncRead16 (
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+  IN     UINT64                Timeout,
+     OUT UINT8                 *DataBuffer,
+  IN     UINT32                DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorCount,
+  IN OUT SCSI_BLKIO2_REQUEST   *BlkIo2Req,
+  IN     EFI_BLOCK_IO2_TOKEN   *Token
+  )
+{
+  EFI_STATUS                   Status;
+  SCSI_ASYNC_RW_REQUEST        *Request;
+  EFI_EVENT                    AsyncIoEvent;
+
+  Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
+  if (Request == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+
+  Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
+  Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
+  if (Request->SenseData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Request->ScsiDiskDevice  = ScsiDiskDevice;
+  Request->Timeout         = Timeout;
+  Request->InBuffer        = DataBuffer;
+  Request->DataLength      = DataLength;
+  Request->StartLba        = StartLba;
+  Request->SectorCount     = SectorCount;
+  Request->BlkIo2Req       = BlkIo2Req;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiDiskNotify,
+                  Request,
+                  &AsyncIoEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  Status = ScsiRead16CommandEx (
+             ScsiDiskDevice->ScsiIo,
+             Request->Timeout,
+             Request->SenseData,
+             &Request->SenseDataLength,
+             &Request->HostAdapterStatus,
+             &Request->TargetStatus,
+             Request->InBuffer,
+             &Request->DataLength,
+             Request->StartLba,
+             Request->SectorCount,
+             AsyncIoEvent
+             );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return EFI_SUCCESS;
+
+ErrorExit:
+  if (Request != NULL) {
+    if (Request->SenseData != NULL) {
+      FreePool (Request->SenseData);
+    }
+
+    RemoveEntryList (&Request->Link);
+    FreePool (Request);
+  }
+
+  return Status;
+}
+
+
+/**
+  Submit Async Write(16) command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
+  @param  Timeout            The time to complete the command.
+  @param  DataBuffer         The buffer contains the data to write.
+  @param  DataLength         The length of buffer.
+  @param  StartLba           The start logic block address.
+  @param  SectorCount        The number of blocks to write.
+  @param  BlkIo2Req          The upstream BlockIo2 request.
+  @param  Token              The pointer to the token associated with the
+                             non-blocking read request.
+
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a
+                                lack of resources.
+  @return others                Status returned by calling
+                                ScsiWrite16CommandEx().
+
+**/
+EFI_STATUS
+ScsiDiskAsyncWrite16 (
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+  IN     UINT64                Timeout,
+  IN     UINT8                 *DataBuffer,
+  IN     UINT32                DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorCount,
+  IN OUT SCSI_BLKIO2_REQUEST   *BlkIo2Req,
+  IN     EFI_BLOCK_IO2_TOKEN   *Token
+  )
+{
+  EFI_STATUS                   Status;
+  SCSI_ASYNC_RW_REQUEST        *Request;
+  EFI_EVENT                    AsyncIoEvent;
+
+  Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
+  if (Request == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+
+  Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
+  Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
+  if (Request->SenseData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Request->ScsiDiskDevice  = ScsiDiskDevice;
+  Request->Timeout         = Timeout;
+  Request->OutBuffer       = DataBuffer;
+  Request->DataLength      = DataLength;
+  Request->StartLba        = StartLba;
+  Request->SectorCount     = SectorCount;
+  Request->BlkIo2Req       = BlkIo2Req;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiDiskNotify,
+                  Request,
+                  &AsyncIoEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  Status = ScsiWrite16CommandEx (
+             ScsiDiskDevice->ScsiIo,
+             Request->Timeout,
+             Request->SenseData,
+             &Request->SenseDataLength,
+             &Request->HostAdapterStatus,
+             &Request->TargetStatus,
+             Request->OutBuffer,
+             &Request->DataLength,
+             Request->StartLba,
+             Request->SectorCount,
+             AsyncIoEvent
+             );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return EFI_SUCCESS;
+
+ErrorExit:
+  if (Request != NULL) {
+    if (Request->SenseData != NULL) {
+      FreePool (Request->SenseData);
+    }
+
+    RemoveEntryList (&Request->Link);
+    FreePool (Request);
+  }
+
+  return Status;
+}
+
+
+/**
   Check sense key to find if media presents.
 
   @param  SenseData   The pointer of EFI_SCSI_SENSE_DATA
@@ -2973,13 +4393,13 @@ ReleaseScsiDiskDeviceResources (
 }
 
 /**
-  Determine if Block Io should be produced.
+  Determine if Block Io & Block Io2 should be produced.
   
 
   @param  ChildHandle  Child Handle to retrieve Parent information.
   
-  @retval  TRUE    Should produce Block Io.
-  @retval  FALSE   Should not produce Block Io.
+  @retval  TRUE    Should produce Block Io & Block Io2.
+  @retval  FALSE   Should not produce Block Io & Block Io2.
 
 **/  
 BOOLEAN
