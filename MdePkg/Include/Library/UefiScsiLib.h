@@ -818,4 +818,364 @@ ScsiWrite16Command (
   IN     UINT32                SectorSize
   );
 
+
+/**
+  Execute blocking/non-blocking Read(10) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Read(10) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               A pointer to SCSI IO protocol.
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           Read 16 command data.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Read(10) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiRead10CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  );
+
+
+/**
+  Execute blocking/non-blocking Write(10) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Write(10) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               SCSI IO Protocol to use
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           A pointer to a data buffer.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Write(10) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiWrite10CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  );
+
+
+/**
+  Execute blocking/non-blocking Read(16) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Read(16) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               A pointer to SCSI IO protocol.
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           Read 16 command data.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Read(16) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiRead16CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  );
+
+
+/**
+  Execute blocking/non-blocking Write(16) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Write(16) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               SCSI IO Protocol to use
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           A pointer to a data buffer.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Write(16) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiWrite16CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  );
+
 #endif
