@@ -729,6 +729,7 @@ UfsCreateNopCommandDesc (
   @param[out] Slot          The available slot.
 
   @retval EFI_SUCCESS       The available slot was found successfully.
+  @retval EFI_NOT_READY     No slot is available at this moment.
 
 **/
 EFI_STATUS
@@ -737,15 +738,28 @@ UfsFindAvailableSlotInTrl (
      OUT UINT8                        *Slot
   )
 {
+  UINT8            Nutrs;
+  UINT8            Index;
+  UINT32           Data;
+  EFI_STATUS       Status;
+
   ASSERT ((Private != NULL) && (Slot != NULL));
 
-  //
-  // The simplest algo to always use slot 0.
-  // TODO: enhance it to support async transfer with multiple slot.
-  //
-  *Slot = 0;
+  Status  = UfsMmioRead32 (Private, UFS_HC_UTRLDBR_OFFSET, &Data);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  return EFI_SUCCESS;
+  Nutrs   = (UINT8)((Private->Capabilities & UFS_HC_CAP_NUTRS) + 1);
+
+  for (Index = 0; Index < Nutrs; Index++) {
+    if ((Data & (BIT0 << Index)) == 0) {
+      *Slot = Index;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_READY;
 }
 
 /**
@@ -1382,6 +1396,11 @@ Exit:
   @param[in]      Lun           The LUN of the UFS device to send the SCSI Request Packet.
   @param[in, out] Packet        A pointer to the SCSI Request Packet to send to a specified Lun of the
                                 UFS device.
+  @param[in]      Event         If nonblocking I/O is not supported then Event is ignored, and blocking
+                                I/O is performed. If Event is NULL, then blocking I/O is performed. If
+                                Event is not NULL and non blocking I/O is supported, then
+                                nonblocking I/O is performed, and Event will be signaled when the
+                                SCSI Request Packet completes.
 
   @retval EFI_SUCCESS           The SCSI Request Packet was sent by the host. For bi-directional
                                 commands, InTransferLength bytes were transferred from
@@ -1398,19 +1417,14 @@ EFI_STATUS
 UfsExecScsiCmds (
   IN     UFS_PASS_THRU_PRIVATE_DATA                  *Private,
   IN     UINT8                                       Lun,
-  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet,
+  IN     EFI_EVENT                                   Event    OPTIONAL
   )
 {
   EFI_STATUS                           Status;
-  UINT8                                Slot;
-  UTP_TRD                              *Trd;
-  UINT32                               CmdDescSize;
   UTP_RESPONSE_UPIU                    *Response;
   UINT16                               SenseDataLen;
   UINT32                               ResTranCount;
-  VOID                                 *CmdDescHost;
-  VOID                                 *CmdDescMapping;
-  VOID                                 *DataBufMapping;
   VOID                                 *DataBuf;
   EFI_PHYSICAL_ADDRESS                 DataBufPhyAddr;
   UINT32                               DataLen;
@@ -1419,32 +1433,44 @@ UfsExecScsiCmds (
   EDKII_UFS_HOST_CONTROLLER_OPERATION  Flag;
   UFS_DATA_DIRECTION                   DataDirection;
   UTP_TR_PRD                           *PrdtBase;
+  EFI_TPL                              OldTpl;
+  UFS_PASS_THRU_TRANS_REQ              *TransReq;
 
-  Trd            = NULL;
-  CmdDescHost    = NULL;
-  CmdDescMapping = NULL;
-  DataBufMapping = NULL;
+  TransReq       = AllocateZeroPool (sizeof (UFS_PASS_THRU_TRANS_REQ));
+  if (TransReq == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  TransReq->Signature     = UFS_PASS_THRU_TRANS_REQ_SIG;
+  TransReq->TimeoutRemain = Packet->Timeout;
   DataBufPhyAddr = 0;
   UfsHc          = Private->UfsHostController;
   //
   // Find out which slot of transfer request list is available.
   //
-  Status = UfsFindAvailableSlotInTrl (Private, &Slot);
+  Status = UfsFindAvailableSlotInTrl (Private, &TransReq->Slot);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Trd = ((UTP_TRD*)Private->UtpTrlBase) + Slot;
+  TransReq->Trd = ((UTP_TRD*)Private->UtpTrlBase) + TransReq->Slot;
 
   //
   // Fill transfer request descriptor to this slot.
   //
-  Status = UfsCreateScsiCommandDesc (Private, Lun, Packet, Trd, &CmdDescHost, &CmdDescMapping);
+  Status = UfsCreateScsiCommandDesc (
+             Private,
+             Lun,
+             Packet,
+             TransReq->Trd,
+             &TransReq->CmdDescHost,
+             &TransReq->CmdDescMapping
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  CmdDescSize = Trd->PrdtO * sizeof (UINT32) + Trd->PrdtL * sizeof (UTP_TR_PRD);
+  TransReq->CmdDescSize = TransReq->Trd->PrdtO * sizeof (UINT32) + TransReq->Trd->PrdtL * sizeof (UTP_TR_PRD);
 
   if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
     DataBuf       = Packet->InDataBuffer;
@@ -1468,7 +1494,7 @@ UfsExecScsiCmds (
                          DataBuf,
                          &MapLength,
                          &DataBufPhyAddr,
-                         &DataBufMapping
+                         &TransReq->DataBufMapping
                          );
 
     if (EFI_ERROR (Status) || (DataLen != MapLength)) {
@@ -1478,14 +1504,32 @@ UfsExecScsiCmds (
   //
   // Fill PRDT table of Command UPIU for executed SCSI cmd.
   //
-  PrdtBase = (UTP_TR_PRD*)((UINT8*)CmdDescHost + ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)));
+  PrdtBase = (UTP_TR_PRD*)((UINT8*)TransReq->CmdDescHost + ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)));
   ASSERT (PrdtBase != NULL);
   UfsInitUtpPrdt (PrdtBase, (VOID*)(UINTN)DataBufPhyAddr, DataLen);
 
   //
+  // Insert the async SCSI cmd to the Async I/O list
+  //
+  if (Event != NULL) {
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+    TransReq->Packet      = Packet;
+    TransReq->CallerEvent = Event;
+    InsertTailList (&Private->Queue, &TransReq->TransferList);
+    gBS->RestoreTPL (OldTpl);
+  }
+
+  //
   // Start to execute the transfer request.
   //
-  UfsStartExecCmd (Private, Slot);
+  UfsStartExecCmd (Private, TransReq->Slot);
+
+  //
+  // Immediately return for async I/O.
+  //
+  if (Event != NULL) {
+    return EFI_SUCCESS;
+  }
 
   //
   // Wait for the completion of the transfer request.
@@ -1498,7 +1542,7 @@ UfsExecScsiCmds (
   //
   // Get sense data if exists
   //
-  Response     = (UTP_RESPONSE_UPIU*)((UINT8*)CmdDescHost + Trd->RuO * sizeof (UINT32));
+  Response     = (UTP_RESPONSE_UPIU*)((UINT8*)TransReq->CmdDescHost + TransReq->Trd->RuO * sizeof (UINT32));
   ASSERT (Response != NULL);
   SenseDataLen = Response->SenseDataLen;
   SwapLittleEndianToBigEndian ((UINT8*)&SenseDataLen, sizeof (UINT16));
@@ -1518,7 +1562,7 @@ UfsExecScsiCmds (
     goto Exit;
   }
 
-  if (Trd->Ocs == 0) {
+  if (TransReq->Trd->Ocs == 0) {
     if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
       if ((Response->Flags & BIT5) == BIT5) {
         ResTranCount = Response->ResTranCount;
@@ -1539,18 +1583,21 @@ UfsExecScsiCmds (
 Exit:
   UfsHc->Flush (UfsHc);
 
-  UfsStopExecCmd (Private, Slot);
+  UfsStopExecCmd (Private, TransReq->Slot);
 
-  if (DataBufMapping != NULL) {
-    UfsHc->Unmap (UfsHc, DataBufMapping);
+  if (TransReq->DataBufMapping != NULL) {
+    UfsHc->Unmap (UfsHc, TransReq->DataBufMapping);
   }
 
 Exit1:
-  if (CmdDescMapping != NULL) {
-    UfsHc->Unmap (UfsHc, CmdDescMapping);
+  if (TransReq->CmdDescMapping != NULL) {
+    UfsHc->Unmap (UfsHc, TransReq->CmdDescMapping);
   }
-  if (CmdDescHost != NULL) {
-    UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (CmdDescSize), CmdDescHost);
+  if (TransReq->CmdDescHost != NULL) {
+    UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (TransReq->CmdDescSize), TransReq->CmdDescHost);
+  }
+  if (TransReq != NULL) {
+    FreePool (TransReq);
   }
   return Status;
 }
@@ -2121,5 +2168,180 @@ UfsControllerStop (
   DEBUG ((EFI_D_INFO, "UfsController is stopped\n"));
 
   return EFI_SUCCESS;
+}
+
+
+/**
+  Internal helper function which will signal the caller event and clean up
+  resources.
+
+  @param[in] Private   The pointer to the UFS_PASS_THRU_PRIVATE_DATA data
+                       structure.
+  @param[in] TransReq  The pointer to the UFS_PASS_THRU_TRANS_REQ data
+                       structure.
+
+**/
+VOID
+EFIAPI
+SignalCallerEvent (
+  IN UFS_PASS_THRU_PRIVATE_DATA      *Private,
+  IN UFS_PASS_THRU_TRANS_REQ         *TransReq
+  )
+{
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL *UfsHc;
+  EFI_EVENT                          CallerEvent;
+
+  UfsHc        = Private->UfsHostController;
+  CallerEvent  = TransReq->CallerEvent;
+
+  RemoveEntryList (&TransReq->TransferList);
+
+  UfsHc->Flush (UfsHc);
+
+  UfsStopExecCmd (Private, TransReq->Slot);
+
+  if (TransReq->DataBufMapping != NULL) {
+    UfsHc->Unmap (UfsHc, TransReq->DataBufMapping);
+  }
+
+  if (TransReq->CmdDescMapping != NULL) {
+    UfsHc->Unmap (UfsHc, TransReq->CmdDescMapping);
+  }
+  if (TransReq->CmdDescHost != NULL) {
+    UfsHc->FreeBuffer (
+             UfsHc,
+             EFI_SIZE_TO_PAGES (TransReq->CmdDescSize),
+             TransReq->CmdDescHost
+             );
+  }
+  if (TransReq != NULL) {
+    FreePool (TransReq);
+  }
+
+  gBS->SignalEvent (CallerEvent);
+  return;
+}
+
+/**
+  Call back function when the timer event is signaled.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the Event.
+
+**/
+VOID
+EFIAPI
+ProcessAsyncTaskList (
+  IN EFI_EVENT          Event,
+  IN VOID               *Context
+  )
+{
+  UFS_PASS_THRU_PRIVATE_DATA                    *Private;
+  LIST_ENTRY                                    *Entry;
+  LIST_ENTRY                                    *NextEntry;
+  UFS_PASS_THRU_TRANS_REQ                       *TransReq;
+  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet;
+  UTP_RESPONSE_UPIU                             *Response;
+  UINT16                                        SenseDataLen;
+  UINT32                                        ResTranCount;
+  UINT32                                        SlotsMap;
+  UINT32                                        Value;
+  EFI_STATUS                                    Status;
+
+  Private   = (UFS_PASS_THRU_PRIVATE_DATA*) Context;
+  SlotsMap  = 0;
+
+  //
+  // Check the entries in the async I/O queue are done or not.
+  //
+  if (!IsListEmpty(&Private->Queue)) {
+    EFI_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Private->Queue) {
+      TransReq  = UFS_PASS_THRU_TRANS_REQ_FROM_THIS (Entry);
+      Packet    = TransReq->Packet;
+
+      if ((SlotsMap & (BIT0 << TransReq->Slot)) != 0) {
+        return;
+      }
+      SlotsMap |= BIT0 << TransReq->Slot;
+
+      Status = UfsMmioRead32 (Private, UFS_HC_UTRLDBR_OFFSET, &Value);
+      if (EFI_ERROR (Status)) {
+        //
+        // TODO: Should find/add a proper host adapter return status for this
+        // case.
+        //
+        Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PHASE_ERROR;
+        DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p UfsMmioRead32() Error.\n", TransReq->CallerEvent));
+        SignalCallerEvent (Private, TransReq);
+        continue;
+      }
+
+      if ((Value & (BIT0 << TransReq->Slot)) != 0) {
+        //
+        // Scsi cmd not finished yet.
+        //
+        if (TransReq->TimeoutRemain > UFS_HC_ASYNC_TIMER) {
+          TransReq->TimeoutRemain -= UFS_HC_ASYNC_TIMER;
+          continue;
+        } else {
+          //
+          // Timeout occurs.
+          //
+          Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT_COMMAND;
+          DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p EFI_TIMEOUT.\n", TransReq->CallerEvent));
+          SignalCallerEvent (Private, TransReq);
+          continue;
+        }
+      } else {
+        //
+        // Scsi cmd finished.
+        //
+        // Get sense data if exists
+        //
+        Response = (UTP_RESPONSE_UPIU*)((UINT8*)TransReq->CmdDescHost + TransReq->Trd->RuO * sizeof (UINT32));
+        ASSERT (Response != NULL);
+        SenseDataLen = Response->SenseDataLen;
+        SwapLittleEndianToBigEndian ((UINT8*)&SenseDataLen, sizeof (UINT16));
+
+        if ((Packet->SenseDataLength != 0) && (Packet->SenseData != NULL)) {
+          CopyMem (Packet->SenseData, Response->SenseData, SenseDataLen);
+          Packet->SenseDataLength = (UINT8)SenseDataLen;
+        }
+
+        //
+        // Check the transfer request result.
+        //
+        Packet->TargetStatus = Response->Status;
+        if (Response->Response != 0) {
+          DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Target Failure.\n", TransReq->CallerEvent));
+          SignalCallerEvent (Private, TransReq);
+          continue;
+        }
+
+        if (TransReq->Trd->Ocs == 0) {
+          if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
+            if ((Response->Flags & BIT5) == BIT5) {
+              ResTranCount = Response->ResTranCount;
+              SwapLittleEndianToBigEndian ((UINT8*)&ResTranCount, sizeof (UINT32));
+              Packet->InTransferLength -= ResTranCount;
+            }
+          } else {
+            if ((Response->Flags & BIT5) == BIT5) {
+              ResTranCount = Response->ResTranCount;
+              SwapLittleEndianToBigEndian ((UINT8*)&ResTranCount, sizeof (UINT32));
+              Packet->OutTransferLength -= ResTranCount;
+            }
+          }
+        } else {
+          DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Target Device Error.\n", TransReq->CallerEvent));
+          SignalCallerEvent (Private, TransReq);
+          continue;
+        }
+
+        DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Success.\n", TransReq->CallerEvent));
+        SignalCallerEvent (Private, TransReq);
+      }
+    }
+  }
 }
 
