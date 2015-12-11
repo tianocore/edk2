@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,10 +21,7 @@ UFS_PASS_THRU_PRIVATE_DATA gUfsPassThruTemplate = {
   NULL,                           // Handle  
   {                               // ExtScsiPassThruMode
     0xFFFFFFFF,
-    //
-    // Note that the driver doesn't support ExtScsiPassThru non blocking I/O.
-    //
-    EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL | EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL,
+    EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL | EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL | EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_NONBLOCKIO,
     sizeof (UINTN)
   },
   {                               // ExtScsiPassThru
@@ -64,6 +61,11 @@ UFS_PASS_THRU_PRIVATE_DATA gUfsPassThruTemplate = {
     },
     0x0000,                           // By default don't expose any Luns.
     0x0
+  },
+  NULL,                           // TimerEvent
+  {                               // Queue
+    NULL,
+    NULL
   }
 };
 
@@ -212,7 +214,7 @@ UfsPassThruPassThru (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = UfsExecScsiCmds (Private, UfsLun, Packet);
+  Status = UfsExecScsiCmds (Private, UfsLun, Packet, Event);
 
   return Status;
 }
@@ -816,6 +818,7 @@ UfsPassThruDriverBindingStart (
   //
   Private = AllocateCopyPool (sizeof (UFS_PASS_THRU_PRIVATE_DATA), &gUfsPassThruTemplate);
   if (Private == NULL) {
+    DEBUG ((EFI_D_ERROR, "Unable to allocate Ufs Pass Thru private data\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
   }
@@ -823,6 +826,7 @@ UfsPassThruDriverBindingStart (
   Private->ExtScsiPassThru.Mode = &Private->ExtScsiPassThruMode;
   Private->UfsHostController    = UfsHc;
   Private->UfsHcBase            = UfsHcBase;
+  InitializeListHead (&Private->Queue);
 
   //
   // Initialize UFS Host Controller H/W.
@@ -873,6 +877,31 @@ UfsPassThruDriverBindingStart (
     }
   }
 
+  //
+  // Start the asynchronous interrupt monitor
+  //
+  Status = gBS->CreateEvent (
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ProcessAsyncTaskList,
+                  Private,
+                  &Private->TimerEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Ufs Create Async Tasks Event Error, Status = %r\n", Status));
+    goto Error;
+  }
+
+  Status = gBS->SetTimer (
+                  Private->TimerEvent,
+                  TimerPeriodic,
+                  UFS_HC_ASYNC_TIMER
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Ufs Set Periodic Timer Error, Status = %r\n", Status));
+    goto Error;
+  }
+
   Status = gBS->InstallProtocolInterface (
                   &Controller,
                   &gEfiExtScsiPassThruProtocolGuid,
@@ -897,6 +926,10 @@ Error:
     }
     if (Private->UtpTrlBase != NULL) {
       UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (Private->Nutrs * sizeof (UTP_TMRD)), Private->UtpTrlBase);
+    }
+
+    if (Private->TimerEvent != NULL) {
+      gBS->CloseEvent (Private->TimerEvent);
     }
 
     FreePool (Private);
@@ -953,6 +986,9 @@ UfsPassThruDriverBindingStop (
   UFS_PASS_THRU_PRIVATE_DATA            *Private;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiPassThru;
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL    *UfsHc;
+  UFS_PASS_THRU_TRANS_REQ               *TransReq;
+  LIST_ENTRY                            *Entry;
+  LIST_ENTRY                            *NextEntry;
 
   DEBUG ((EFI_D_INFO, "==UfsPassThru Stop== Controller Controller = %x\n", Controller));
 
@@ -971,6 +1007,24 @@ UfsPassThruDriverBindingStop (
 
   Private = UFS_PASS_THRU_PRIVATE_DATA_FROM_THIS (ExtScsiPassThru);
   UfsHc   = Private->UfsHostController;
+
+  //
+  // Cleanup the resources of I/O requests in the async I/O queue
+  //
+  if (!IsListEmpty(&Private->Queue)) {
+    EFI_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Private->Queue) {
+      TransReq  = UFS_PASS_THRU_TRANS_REQ_FROM_THIS (Entry);
+
+      //
+      // TODO: Should find/add a proper host adapter return status for this
+      // case.
+      //
+      TransReq->Packet->HostAdapterStatus =
+        EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PHASE_ERROR;
+
+      SignalCallerEvent (Private, TransReq);
+    }
+  }
 
   Status = gBS->UninstallProtocolInterface (
                   Controller,
@@ -1000,6 +1054,10 @@ UfsPassThruDriverBindingStop (
   }
   if (Private->UtpTrlBase != NULL) {
     UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (Private->Nutrs * sizeof (UTP_TMRD)), Private->UtpTrlBase);
+  }
+
+  if (Private->TimerEvent != NULL) {
+    gBS->CloseEvent (Private->TimerEvent);
   }
 
   FreePool (Private);

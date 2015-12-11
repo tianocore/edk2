@@ -50,6 +50,14 @@ typedef struct {
   UINT16   Rsvd:4;
 } UFS_EXPOSED_LUNS;
 
+//
+// Iterate through the doule linked list. This is delete-safe.
+// Do not touch NextEntry
+//
+#define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \
+  for(Entry = (ListHead)->ForwardLink, NextEntry = Entry->ForwardLink;\
+      Entry != (ListHead); Entry = NextEntry, NextEntry = Entry->ForwardLink)
+
 typedef struct _UFS_PASS_THRU_PRIVATE_DATA {  
   UINT32                              Signature;
   EFI_HANDLE                          Handle;
@@ -69,9 +77,37 @@ typedef struct _UFS_PASS_THRU_PRIVATE_DATA {
   VOID                                *TmrlMapping;
 
   UFS_EXPOSED_LUNS                    Luns;
+
+  //
+  // For Non-blocking operation.
+  //
+  EFI_EVENT                           TimerEvent;
+  LIST_ENTRY                          Queue;
 } UFS_PASS_THRU_PRIVATE_DATA;
 
+#define UFS_PASS_THRU_TRANS_REQ_SIG   SIGNATURE_32 ('U', 'F', 'S', 'T')
+
+typedef struct {
+  UINT32                                        Signature;
+  LIST_ENTRY                                    TransferList;
+
+  UINT8                                         Slot;
+  UTP_TRD                                       *Trd;
+  UINT32                                        CmdDescSize;
+  VOID                                          *CmdDescHost;
+  VOID                                          *CmdDescMapping;
+  VOID                                          *DataBufMapping;
+
+  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet;
+  UINT64                                        TimeoutRemain;
+  EFI_EVENT                                     CallerEvent;
+} UFS_PASS_THRU_TRANS_REQ;
+
+#define UFS_PASS_THRU_TRANS_REQ_FROM_THIS(a) \
+    CR(a, UFS_PASS_THRU_TRANS_REQ, TransferList, UFS_PASS_THRU_TRANS_REQ_SIG)
+
 #define UFS_TIMEOUT                   EFI_TIMER_PERIOD_SECONDS(3)
+#define UFS_HC_ASYNC_TIMER            EFI_TIMER_PERIOD_MILLISECONDS(1)
 
 #define ROUNDUP8(x) (((x) % 8 == 0) ? (x) : ((x) / 8 + 1) * 8)
 
@@ -587,6 +623,11 @@ UfsPassThruGetNextTarget (
   @param[in]      Lun           The LUN of the UFS device to send the SCSI Request Packet.
   @param[in, out] Packet        A pointer to the SCSI Request Packet to send to a specified Lun of the
                                 UFS device.
+  @param[in]      Event         If nonblocking I/O is not supported then Event is ignored, and blocking
+                                I/O is performed. If Event is NULL, then blocking I/O is performed. If
+                                Event is not NULL and non blocking I/O is supported, then
+                                nonblocking I/O is performed, and Event will be signaled when the
+                                SCSI Request Packet completes.
 
   @retval EFI_SUCCESS           The SCSI Request Packet was sent by the host. For bi-directional
                                 commands, InTransferLength bytes were transferred from
@@ -603,7 +644,8 @@ EFI_STATUS
 UfsExecScsiCmds (
   IN     UFS_PASS_THRU_PRIVATE_DATA                  *Private,
   IN     UINT8                                       Lun,
-  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet,
+  IN     EFI_EVENT                                   Event    OPTIONAL
   );
 
 /**
@@ -717,6 +759,37 @@ UfsRwDeviceDesc (
 EFI_STATUS
 UfsExecNopCmds (
   IN  UFS_PASS_THRU_PRIVATE_DATA       *Private
+  );
+
+/**
+  Call back function when the timer event is signaled.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the Event.
+
+**/
+VOID
+EFIAPI
+ProcessAsyncTaskList (
+  IN EFI_EVENT          Event,
+  IN VOID               *Context
+  );
+
+/**
+  Internal helper function which will signal the caller event and clean up
+  resources.
+
+  @param[in] Private   The pointer to the UFS_PASS_THRU_PRIVATE_DATA data
+                       structure.
+  @param[in] TransReq  The pointer to the UFS_PASS_THRU_TRANS_REQ data
+                       structure.
+
+**/
+VOID
+EFIAPI
+SignalCallerEvent (
+  IN UFS_PASS_THRU_PRIVATE_DATA      *Private,
+  IN UFS_PASS_THRU_TRANS_REQ         *TransReq
   );
 
 extern EFI_COMPONENT_NAME_PROTOCOL  gUfsPassThruComponentName;
