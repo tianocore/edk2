@@ -16,7 +16,7 @@ diff U3 crypto/bio/bio.h crypto/bio/bio.h
 diff U3 crypto/bio/bss_file.c crypto/bio/bss_file.c
 --- crypto/bio/bss_file.c	Thu Jun 11 21:01:06 2015
 +++ crypto/bio/bss_file.c	Fri Jun 12 11:01:28 2015
-@@ -460,6 +460,23 @@
+@@ -467,6 +467,23 @@
      return (ret);
  }
  
@@ -83,9 +83,22 @@ diff U3 crypto/pkcs7/pk7_smime.c crypto/pkcs7/pk7_smime.c
 +    char *buf = NULL;
 +    int bufsiz;
      int i, j = 0, k, ret = 0;
-     BIO *p7bio;
-     BIO *tmpin, *tmpout;
-@@ -365,9 +366,14 @@
+     BIO *p7bio = NULL;
+     BIO *tmpin = NULL, *tmpout = NULL;
+@@ -275,12 +276,6 @@
+         return 0;
+     }
+ 
+-    /* Check for data and content: two sets of data */
+-    if (!PKCS7_get_detached(p7) && indata) {
+-        PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_CONTENT_AND_DATA_PRESENT);
+-        return 0;
+-    }
+-
+     sinfos = PKCS7_get_signer_info(p7);
+ 
+     if (!sinfos || !sk_PKCS7_SIGNER_INFO_num(sinfos)) {
+@@ -355,9 +350,14 @@
      } else
          tmpout = out;
  
@@ -101,17 +114,17 @@ diff U3 crypto/pkcs7/pk7_smime.c crypto/pkcs7/pk7_smime.c
          if (i <= 0)
              break;
          if (tmpout)
-@@ -406,6 +412,10 @@
+@@ -394,6 +394,10 @@
+     }
      BIO_free_all(p7bio);
- 
      sk_X509_free(signers);
 +
 +    if (buf != NULL) {
 +      OPENSSL_free(buf);
 +    }
- 
      return ret;
  }
+ 
 diff U3 crypto/rand/rand_unix.c crypto/rand/rand_unix.c
 --- crypto/rand/rand_unix.c	Thu Jun 11 21:01:06 2015
 +++ crypto/rand/rand_unix.c	Fri Jun 12 10:51:21 2015
@@ -210,7 +223,7 @@ diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
 diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
 --- crypto/x509/x509_vfy.c	Thu Jun 11 21:52:58 2015
 +++ crypto/x509/x509_vfy.c	Fri Jun 12 11:29:37 2015
-@@ -935,6 +935,8 @@
+@@ -940,6 +940,8 @@
          ctx->current_crl = crl;
      if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
          ptime = &ctx->param->check_time;
@@ -219,7 +232,7 @@ diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
      else
          ptime = NULL;
  
-@@ -1658,6 +1660,8 @@
+@@ -1663,6 +1665,8 @@
  
      if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
          ptime = &ctx->param->check_time;
