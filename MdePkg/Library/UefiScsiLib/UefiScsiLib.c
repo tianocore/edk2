@@ -18,6 +18,8 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiScsiLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
   
 #include <IndustryStandard/Scsi.h>
   
@@ -28,6 +30,39 @@
 #define EFI_SCSI_OP_LENGTH_SIX      0x6
 #define EFI_SCSI_OP_LENGTH_TEN      0xa
 #define EFI_SCSI_OP_LENGTH_SIXTEEN  0x10
+
+//
+// The context structure used when non-blocking SCSI read/write operation
+// completes.
+//
+typedef struct {
+  ///
+  /// The SCSI request packet to send to the SCSI controller specified by
+  /// the device handle.
+  ///
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET      CommandPacket;
+  ///
+  /// The length of the output sense data.
+  ///
+  UINT8                                *SenseDataLength;
+  ///
+  /// The status of the SCSI host adapter.
+  ///
+  UINT8                                *HostAdapterStatus;
+  ///
+  /// The status of the target SCSI device.
+  ///
+  UINT8                                *TargetStatus;
+  ///
+  /// The length of the data buffer for the SCSI read/write command.
+  ///
+  UINT32                               *DataLength;
+  ///
+  /// The caller event to be signaled when the SCSI read/write command
+  /// completes.
+  ///
+  EFI_EVENT                            CallerEvent;
+} EFI_SCSI_LIB_ASYNC_CONTEXT;
 
 
 
@@ -1246,6 +1281,747 @@ ScsiWrite16Command (
   *TargetStatus                 = CommandPacket.TargetStatus;
   *SenseDataLength              = CommandPacket.SenseDataLength;
   *DataLength                   = CommandPacket.OutTransferLength;
+
+  return Status;
+}
+
+
+/**
+  Internal helper notify function in which update the result of the
+  non-blocking SCSI Read/Write commands and signal caller event.
+
+  @param  Event    The instance of EFI_EVENT.
+  @param  Context  The parameter passed in.
+
+**/
+VOID
+EFIAPI
+ScsiLibNotify (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  EFI_SCSI_LIB_ASYNC_CONTEXT      *LibContext;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET *CommandPacket;
+  EFI_EVENT                       CallerEvent;
+
+  LibContext    = (EFI_SCSI_LIB_ASYNC_CONTEXT *) Context;
+  CommandPacket = &LibContext->CommandPacket;
+  CallerEvent  = LibContext->CallerEvent;
+
+  //
+  // Update SCSI Read/Write operation results
+  //
+  *LibContext->SenseDataLength    = CommandPacket->SenseDataLength;
+  *LibContext->HostAdapterStatus  = CommandPacket->HostAdapterStatus;
+  *LibContext->TargetStatus       = CommandPacket->TargetStatus;
+  if (CommandPacket->InDataBuffer != NULL) {
+    *LibContext->DataLength       = CommandPacket->InTransferLength;
+  } else {
+    *LibContext->DataLength       = CommandPacket->OutTransferLength;
+  }
+
+  if (CommandPacket->Cdb != NULL) {
+    FreePool (CommandPacket->Cdb);
+  }
+  FreePool (Context);
+
+  gBS->CloseEvent (Event);
+  gBS->SignalEvent (CallerEvent);
+}
+
+
+/**
+  Execute blocking/non-blocking Read(10) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Read(10) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               A pointer to SCSI IO protocol.
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           Read 16 command data.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Read(10) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiRead10CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  )
+{
+  EFI_SCSI_LIB_ASYNC_CONTEXT      *Context;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET *CommandPacket;
+  EFI_STATUS                      Status;
+  UINT8                           *Cdb;
+  EFI_EVENT                       SelfEvent;
+
+  if (Event == NULL) {
+    return ScsiRead10Command (
+             ScsiIo,
+             Timeout,
+             SenseData,
+             SenseDataLength,
+             HostAdapterStatus,
+             TargetStatus,
+             DataBuffer,
+             DataLength,
+             StartLba,
+             SectorSize
+             );
+  }
+
+  ASSERT (SenseDataLength != NULL);
+  ASSERT (HostAdapterStatus != NULL);
+  ASSERT (TargetStatus != NULL);
+  ASSERT (DataLength != NULL);
+  ASSERT (ScsiIo != NULL);
+
+  Context = AllocateZeroPool (sizeof (EFI_SCSI_LIB_ASYNC_CONTEXT));
+  if (Context == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Cdb = AllocateZeroPool (EFI_SCSI_OP_LENGTH_TEN);
+  if (Cdb == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Context->SenseDataLength        = SenseDataLength;
+  Context->HostAdapterStatus      = HostAdapterStatus;
+  Context->TargetStatus           = TargetStatus;
+  Context->CallerEvent            = Event;
+
+  CommandPacket                   = &Context->CommandPacket;
+  CommandPacket->Timeout          = Timeout;
+  CommandPacket->InDataBuffer     = DataBuffer;
+  CommandPacket->SenseData        = SenseData;
+  CommandPacket->InTransferLength = *DataLength;
+  CommandPacket->Cdb              = Cdb;
+  //
+  // Fill Cdb for Read (10) Command
+  //
+  Cdb[0]                          = EFI_SCSI_OP_READ10;
+  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
+  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
+
+  CommandPacket->CdbLength        = EFI_SCSI_OP_LENGTH_TEN;
+  CommandPacket->DataDirection    = EFI_SCSI_DATA_IN;
+  CommandPacket->SenseDataLength  = *SenseDataLength;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiLibNotify,
+                  Context,
+                  &SelfEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, SelfEvent);
+
+ErrorExit:
+  if (Context != NULL) {
+    FreePool (Context);
+  }
+
+  return Status;
+}
+
+
+/**
+  Execute blocking/non-blocking Write(10) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Write(10) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               SCSI IO Protocol to use
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           A pointer to a data buffer.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Write(10) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiWrite10CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  )
+{
+  EFI_SCSI_LIB_ASYNC_CONTEXT      *Context;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET *CommandPacket;
+  EFI_STATUS                      Status;
+  UINT8                           *Cdb;
+  EFI_EVENT                       SelfEvent;
+
+  if (Event == NULL) {
+    return ScsiWrite10Command (
+             ScsiIo,
+             Timeout,
+             SenseData,
+             SenseDataLength,
+             HostAdapterStatus,
+             TargetStatus,
+             DataBuffer,
+             DataLength,
+             StartLba,
+             SectorSize
+             );
+  }
+
+  ASSERT (SenseDataLength != NULL);
+  ASSERT (HostAdapterStatus != NULL);
+  ASSERT (TargetStatus != NULL);
+  ASSERT (DataLength != NULL);
+  ASSERT (ScsiIo != NULL);
+
+  Context = AllocateZeroPool (sizeof (EFI_SCSI_LIB_ASYNC_CONTEXT));
+  if (Context == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Cdb = AllocateZeroPool (EFI_SCSI_OP_LENGTH_TEN);
+  if (Cdb == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Context->SenseDataLength         = SenseDataLength;
+  Context->HostAdapterStatus       = HostAdapterStatus;
+  Context->TargetStatus            = TargetStatus;
+  Context->CallerEvent             = Event;
+
+  CommandPacket                    = &Context->CommandPacket;
+  CommandPacket->Timeout           = Timeout;
+  CommandPacket->OutDataBuffer     = DataBuffer;
+  CommandPacket->SenseData         = SenseData;
+  CommandPacket->OutTransferLength = *DataLength;
+  CommandPacket->Cdb               = Cdb;
+  //
+  // Fill Cdb for Write (10) Command
+  //
+  Cdb[0]                           = EFI_SCSI_OP_WRITE10;
+  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
+  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
+
+  CommandPacket->CdbLength         = EFI_SCSI_OP_LENGTH_TEN;
+  CommandPacket->DataDirection     = EFI_SCSI_DATA_OUT;
+  CommandPacket->SenseDataLength   = *SenseDataLength;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiLibNotify,
+                  Context,
+                  &SelfEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, Event);
+
+ErrorExit:
+  if (Context != NULL) {
+    FreePool (Context);
+  }
+
+  return Status;
+}
+
+
+/**
+  Execute blocking/non-blocking Read(16) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Read(16) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               A pointer to SCSI IO protocol.
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           Read 16 command data.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Read(16) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiRead16CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  )
+{
+  EFI_SCSI_LIB_ASYNC_CONTEXT      *Context;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET *CommandPacket;
+  EFI_STATUS                      Status;
+  UINT8                           *Cdb;
+  EFI_EVENT                       SelfEvent;
+
+  if (Event == NULL) {
+    return ScsiRead16Command (
+             ScsiIo,
+             Timeout,
+             SenseData,
+             SenseDataLength,
+             HostAdapterStatus,
+             TargetStatus,
+             DataBuffer,
+             DataLength,
+             StartLba,
+             SectorSize
+             );
+  }
+
+  ASSERT (SenseDataLength != NULL);
+  ASSERT (HostAdapterStatus != NULL);
+  ASSERT (TargetStatus != NULL);
+  ASSERT (DataLength != NULL);
+  ASSERT (ScsiIo != NULL);
+
+  Context = AllocateZeroPool (sizeof (EFI_SCSI_LIB_ASYNC_CONTEXT));
+  if (Context == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Cdb = AllocateZeroPool (EFI_SCSI_OP_LENGTH_SIXTEEN);
+  if (Cdb == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Context->SenseDataLength        = SenseDataLength;
+  Context->HostAdapterStatus      = HostAdapterStatus;
+  Context->TargetStatus           = TargetStatus;
+  Context->CallerEvent            = Event;
+
+  CommandPacket                   = &Context->CommandPacket;
+  CommandPacket->Timeout          = Timeout;
+  CommandPacket->InDataBuffer     = DataBuffer;
+  CommandPacket->SenseData        = SenseData;
+  CommandPacket->InTransferLength = *DataLength;
+  CommandPacket->Cdb              = Cdb;
+  //
+  // Fill Cdb for Read (16) Command
+  //
+  Cdb[0]                          = EFI_SCSI_OP_READ16;
+  WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
+  WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
+
+  CommandPacket->CdbLength        = EFI_SCSI_OP_LENGTH_SIXTEEN;
+  CommandPacket->DataDirection    = EFI_SCSI_DATA_IN;
+  CommandPacket->SenseDataLength  = *SenseDataLength;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiLibNotify,
+                  Context,
+                  &SelfEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, Event);
+
+ErrorExit:
+  if (Context != NULL) {
+    FreePool (Context);
+  }
+
+  return Status;
+}
+
+
+/**
+  Execute blocking/non-blocking Write(16) SCSI command on a specific SCSI
+  target.
+
+  Executes the SCSI Write(16) command on the SCSI target specified by ScsiIo.
+  When Event is NULL, blocking command will be executed. Otherwise non-blocking
+  command will be executed.
+  For blocking I/O, if Timeout is zero, this function will wait indefinitely
+  for the command to complete. If Timeout is greater than zero, then the
+  command is executed and will timeout after Timeout 100 ns units.
+  For non-blocking I/O, if Timeout is zero, Event will be signaled only after
+  the command to completes. If Timeout is greater than zero, Event will also be
+  signaled after Timeout 100 ns units.
+  The StartLba and SectorSize parameters are used to construct the CDB for this
+  SCSI command.
+
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
+
+  If SenseDataLength is non-zero and SenseData is not NULL, SenseData must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  If DataLength is non-zero and DataBuffer is not NULL, DataBuffer must meet
+  buffer alignment requirement defined in EFI_SCSI_IO_PROTOCOL. Otherwise
+  EFI_INVALID_PARAMETER gets returned.
+
+  @param[in]      ScsiIo               SCSI IO Protocol to use
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           A pointer to a data buffer.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      StartLba             The start address of LBA.
+  @param[in]      SectorSize           The number of contiguous logical blocks
+                                       of data that shall be transferred.
+  @param[in]      Event                If the SCSI target does not support
+                                       non-blocking I/O, then Event is ignored,
+                                       and blocking I/O is performed. If Event
+                                       is NULL, then blocking I/O is performed.
+                                       If Event is not NULL and non-blocking
+                                       I/O is supported, then non-blocking I/O
+                                       is performed, and Event will be signaled
+                                       when the SCSI Write(16) command
+                                       completes.
+
+  @retval  EFI_SUCCESS                 Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed,
+                                       but the entire DataBuffer could not be
+                                       transferred. The actual number of bytes
+                                       transferred is returned in DataLength.
+  @retval  EFI_NOT_READY               The SCSI Request Packet could not be
+                                       sent because there are too many SCSI
+                                       Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR            A device error occurred while attempting
+                                       to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED             The command described by the SCSI
+                                       Request Packet is not supported by the
+                                       SCSI initiator(i.e., SCSI  Host
+                                       Controller)
+  @retval  EFI_TIMEOUT                 A timeout occurred while waiting for the
+                                       SCSI Request Packet to execute.
+  @retval  EFI_INVALID_PARAMETER       The contents of the SCSI Request Packet
+                                       are invalid.
+  @retval  EFI_OUT_OF_RESOURCES        The request could not be completed due
+                                       to a lack of resources.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiWrite16CommandEx (
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     UINT64                StartLba,
+  IN     UINT32                SectorSize,
+  IN     EFI_EVENT             Event         OPTIONAL
+  )
+{
+  EFI_SCSI_LIB_ASYNC_CONTEXT      *Context;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET *CommandPacket;
+  EFI_STATUS                      Status;
+  UINT8                           *Cdb;
+  EFI_EVENT                       SelfEvent;
+
+  if (Event == NULL) {
+    return ScsiWrite16Command (
+             ScsiIo,
+             Timeout,
+             SenseData,
+             SenseDataLength,
+             HostAdapterStatus,
+             TargetStatus,
+             DataBuffer,
+             DataLength,
+             StartLba,
+             SectorSize
+             );
+  }
+
+  ASSERT (SenseDataLength != NULL);
+  ASSERT (HostAdapterStatus != NULL);
+  ASSERT (TargetStatus != NULL);
+  ASSERT (DataLength != NULL);
+  ASSERT (ScsiIo != NULL);
+
+  Context = AllocateZeroPool (sizeof (EFI_SCSI_LIB_ASYNC_CONTEXT));
+  if (Context == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Cdb = AllocateZeroPool (EFI_SCSI_OP_LENGTH_SIXTEEN);
+  if (Cdb == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  Context->SenseDataLength         = SenseDataLength;
+  Context->HostAdapterStatus       = HostAdapterStatus;
+  Context->TargetStatus            = TargetStatus;
+  Context->CallerEvent             = Event;
+
+  CommandPacket                    = &Context->CommandPacket;
+  CommandPacket->Timeout           = Timeout;
+  CommandPacket->OutDataBuffer     = DataBuffer;
+  CommandPacket->SenseData         = SenseData;
+  CommandPacket->OutTransferLength = *DataLength;
+  CommandPacket->Cdb               = Cdb;
+  //
+  // Fill Cdb for Write (16) Command
+  //
+  Cdb[0]                           = EFI_SCSI_OP_WRITE16;
+  WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
+  WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
+
+  CommandPacket->CdbLength         = EFI_SCSI_OP_LENGTH_SIXTEEN;
+  CommandPacket->DataDirection     = EFI_SCSI_DATA_OUT;
+  CommandPacket->SenseDataLength   = *SenseDataLength;
+
+  //
+  // Create Event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ScsiLibNotify,
+                  Context,
+                  &SelfEvent
+                  );
+  if (EFI_ERROR(Status)) {
+    goto ErrorExit;
+  }
+
+  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, Event);
+
+ErrorExit:
+  if (Context != NULL) {
+    FreePool (Context);
+  }
 
   return Status;
 }
