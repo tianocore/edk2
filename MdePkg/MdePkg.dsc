@@ -172,6 +172,7 @@
   MdePkg/Library/DxeTimerLibEsal/DxeTimerLibEsal.inf  
   
 [Components.EBC]
+  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 [Components.ARM, Components.AARCH64]
