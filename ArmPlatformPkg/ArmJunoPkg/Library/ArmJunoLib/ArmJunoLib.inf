@@ -62,3 +62,6 @@
   gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
   gArmPlatformTokenSpaceGuid.PcdPciMmio64Base
   gArmPlatformTokenSpaceGuid.PcdPciMmio64Size
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
