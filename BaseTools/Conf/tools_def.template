@@ -7128,7 +7128,7 @@ RELEASE_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c    -Os       -W
 
 DEFINE RVCT_ALL_ASM_FLAGS   = --diag_suppress=1786 --diag_error=warning --apcs /interwork
 DEFINE RVCT_ALL_CC_FLAGS    = --c90 -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_suppress=186 --diag_warning 167 --diag_error=warning --diag_style=ide --protect_stack
-DEFINE RVCT_ALL_DLINK_FLAGS = --ro-base 0 --no_scanlib --reloc --no_exceptions --datacompressor off --strict --symbols --diag_style=ide --no_legacyalign
+DEFINE RVCT_ALL_DLINK_FLAGS = --no_scanlib --no_exceptions --datacompressor off --strict --symbols --diag_style=ide --no_legacyalign --scatter $(EDK_TOOLS_PATH)/Scripts/Rvct-Align32.sct
 
 ####################################################################################
 #
