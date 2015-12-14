@@ -48,3 +48,6 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmTokenSpaceGuid.PcdFvBaseAddress
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
