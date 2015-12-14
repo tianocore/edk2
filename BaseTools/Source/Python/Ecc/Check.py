@@ -653,6 +653,10 @@ class Check(object):
                     continue
                 else:
                     LibraryIns = os.path.normpath(mws.join(EccGlobalData.gWorkspace, LibraryClass[2]))
+                    SkipDirString = '|'.join(EccGlobalData.gConfig.SkipDirList)
+                    p = re.compile(r'.*[\\/](?:%s^\S)[\\/]?.*' % SkipDirString)
+                    if p.match(os.path.split(LibraryIns)[0].upper()):
+                        continue
                     SqlCommand = """select Value3 from Inf where BelongsToFile =
                                     (select ID from File where lower(FullPath) = lower('%s'))
                                     and Value2 = '%s'""" % (LibraryIns, 'LIBRARY_CLASS')
