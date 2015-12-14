@@ -46,3 +46,6 @@
 
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
