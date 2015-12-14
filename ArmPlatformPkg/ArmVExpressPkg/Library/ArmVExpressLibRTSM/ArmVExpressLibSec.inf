@@ -54,3 +54,6 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCore
 
   gArmPlatformTokenSpaceGuid.PcdCoreCount
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid

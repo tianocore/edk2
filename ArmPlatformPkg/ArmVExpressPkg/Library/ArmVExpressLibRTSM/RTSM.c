@@ -175,14 +175,12 @@ PrePeiCoreGetMpCoreInfo (
   }
 }
 
-// Needs to be declared in the file. Otherwise gArmMpCoreInfoPpiGuid is undefined in the contect of PrePeiCore
-EFI_GUID mArmMpCoreInfoPpiGuid = ARM_MP_CORE_INFO_PPI_GUID;
 ARM_MP_CORE_INFO_PPI mMpCoreInfoPpi = { PrePeiCoreGetMpCoreInfo };
 
 EFI_PEI_PPI_DESCRIPTOR      gPlatformPpiTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
-    &mArmMpCoreInfoPpiGuid,
+    &gArmMpCoreInfoPpiGuid,
     &mMpCoreInfoPpi
   }
 };
