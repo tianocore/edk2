@@ -46,20 +46,11 @@ ASM_PFX(enter_monitor_mode):
 
     bx      r4
 
-# We cannot use the instruction 'movs pc, lr' because the caller can be written either in ARM or Thumb2 assembler.
-# When we will jump into this function, we will set the CPSR flag to ARM assembler. By copying directly 'lr' into
-# 'pc'; we will not change the CPSR flag and it will crash.
-# The way to fix this limitation is to do the movs into the ARM assmbler code and then do a 'bx'.
+# Return-from-exception is not an interworking return, so we must do it
+# in two steps, in case r0 has the Thumb bit set.
 ASM_PFX(return_from_exception):
-    ldr     lr, returned_exception
-
-    #The following instruction breaks the code.
-    #movs    pc, lr
-    mrs     r2, cpsr
-    bic     r2, r2, #0x1f
-    orr     r2, r2, #0x13
-    msr     cpsr_c, r2
-
+    adr     lr, returned_exception
+    movs    pc, lr
 returned_exception:                           @ We are now in non-secure state
     bx      r0
 

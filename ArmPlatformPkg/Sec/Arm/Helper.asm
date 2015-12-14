@@ -45,10 +45,8 @@ enter_monitor_mode FUNCTION
     bx      r4
     ENDFUNC
 
-// We cannot use the instruction 'movs pc, lr' because the caller can be written either in ARM or Thumb2 assembler.
-// When we will jump into this function, we will set the CPSR flag to ARM assembler. By copying directly 'lr' into
-// 'pc'; we will not change the CPSR flag and it will crash.
-// The way to fix this limitation is to do the movs into the ARM assmbler code and then do a 'bx'.
+// Return-from-exception is not an interworking return, so we must do it
+// in two steps, in case r0 has the Thumb bit set.
 return_from_exception
     adr     lr, returned_exception
     movs    pc, lr
