@@ -329,6 +329,8 @@ ShellMmLocateIoProtocol (
     return FALSE;
   }
 
+  Segment = 0;
+  Bus     = 0;
   if ((AccessType == ShellMmPci) || (AccessType == ShellMmPciExpress)) {
     ShellMmDecodePciAddress ((BOOLEAN) (AccessType == ShellMmPci), Address, &Segment, &Bus, NULL, NULL, NULL);
   }
@@ -615,18 +617,18 @@ ShellCommandRunMm (
         // skip space characters
         //
         for (Index = 0; InputStr[Index] == ' '; Index++);
-      }
 
-      if ((InputStr != NULL) && (InputStr[Index] != CHAR_NULL)) {
-        if ((InputStr[Index] == '.') || (InputStr[Index] == 'q') || (InputStr[Index] == 'Q')) {
-          Complete = TRUE;
-        } else if (!EFI_ERROR (ShellConvertStringToUint64 (InputStr + Index, &Buffer, TRUE, TRUE)) &&
-                   (Buffer <= mShellMmMaxNumber[Size])
-                   ) {
-          ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, FALSE, Address, Size, &Buffer);
-        } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle, L"mm");
-          continue;
+        if (InputStr[Index] != CHAR_NULL) {
+          if ((InputStr[Index] == '.') || (InputStr[Index] == 'q') || (InputStr[Index] == 'Q')) {
+            Complete = TRUE;
+          } else if (!EFI_ERROR (ShellConvertStringToUint64 (InputStr + Index, &Buffer, TRUE, TRUE)) &&
+                     (Buffer <= mShellMmMaxNumber[Size])
+                     ) {
+            ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, FALSE, Address, Size, &Buffer);
+          } else {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle, L"mm");
+            continue;
+          }
         }
       }
 
