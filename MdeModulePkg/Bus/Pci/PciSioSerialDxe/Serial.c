@@ -31,8 +31,10 @@ CONTROLLER_DEVICE_PATH mControllerDevicePathTemplate = {
   {
     HARDWARE_DEVICE_PATH,
     HW_CONTROLLER_DP,
-    sizeof (CONTROLLER_DEVICE_PATH),
-    0
+    {
+      (UINT8) (sizeof (CONTROLLER_DEVICE_PATH)),
+      (UINT8) ((sizeof (CONTROLLER_DEVICE_PATH)) >> 8)
+    }
   },
   0
 };
@@ -858,7 +860,8 @@ SerialControllerDriverStart (
     return EFI_SUCCESS;
   }
 
-
+  ControllerNumber = 0;
+  ContainsControllerNode = FALSE;
   SerialDevices = GetChildSerialDevices (Controller, IoProtocolGuid, &SerialDeviceCount);
   //
   // If the SerialIo instance specified by RemainingDevicePath is already created,
@@ -870,6 +873,7 @@ SerialControllerDriverStart (
       if ((!SerialDevices[Index]->ContainsControllerNode && !ContainsControllerNode) ||
           (SerialDevices[Index]->ContainsControllerNode && ContainsControllerNode && SerialDevices[Index]->Instance == ControllerNumber)
           ) {
+        SerialIo = &SerialDevices[Index]->SerialIo;
         Status = EFI_INVALID_PARAMETER;
         //
         // Pass NULL ActualBaudRate to VerifyUartParameters to disallow baudrate degrade.
@@ -877,7 +881,6 @@ SerialControllerDriverStart (
         //
         if (VerifyUartParameters (SerialDevices[Index]->ClockRate, Uart->BaudRate, Uart->DataBits,
                                   (EFI_PARITY_TYPE) Uart->Parity, (EFI_STOP_BITS_TYPE) Uart->StopBits, NULL, NULL)) {
-          SerialIo = &SerialDevices[Index]->SerialIo;
           Status = SerialIo->SetAttributes (
                                SerialIo,
                                Uart->BaudRate,
