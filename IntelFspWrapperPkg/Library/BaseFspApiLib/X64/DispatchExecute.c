@@ -89,6 +89,18 @@ Execute32BitCode (
   IN UINT64      Param1
   )
 {
-  return AsmExecute32BitCode (Function, Param1, 0, &mGdt);
+  EFI_STATUS       Status;
+  IA32_DESCRIPTOR  Idtr;
+
+  //
+  // Idtr might be changed inside of FSP. 32bit FSP only knows the <4G address.
+  // If IDTR.Base is >4G, FSP can not handle. So we need save/restore IDTR here for X64 only.
+  // Interrupt is already disabled here, so it is safety to update IDTR.
+  //
+  AsmReadIdtr (&Idtr);
+  Status = AsmExecute32BitCode (Function, Param1, 0, &mGdt);
+  AsmWriteIdtr (&Idtr);
+
+  return Status;
 }
 
