@@ -308,6 +308,10 @@ onig_error_code_to_str(s, code, va_alist)
 
   default:
     q = onig_error_code_to_format(code);
+    if (q == NULL) {
+      len = 0;
+      break;
+    }
     len = onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, q);
     xmemcpy(s, q, len);
     s[len] = '\0';

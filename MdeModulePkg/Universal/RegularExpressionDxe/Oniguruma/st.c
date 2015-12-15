@@ -156,6 +156,7 @@ st_init_table_with_size(type, size)
     size = new_size(size);	/* round up to prime number */
 
     tbl = alloc(st_table);
+    CHECK_NULL_RETURN(tbl);
     tbl->type = type;
     tbl->num_entries = 0;
     tbl->num_bins = size;
@@ -267,6 +268,9 @@ do {\
     }\
     \
     entry = alloc(st_table_entry);\
+    if (entry == NULL) {\
+      break;\
+    }\
     \
     entry->hash = hash_val;\
     entry->key = key;\
@@ -321,6 +325,9 @@ rehash(table)
 
     new_num_bins = new_size(old_num_bins+1);
     new_bins = (st_table_entry**)Calloc(new_num_bins, sizeof(st_table_entry*));
+    if (new_bins == NULL) {
+      return;
+    }
 
     for(i = 0; i < old_num_bins; i++) {
 	ptr = table->bins[i];

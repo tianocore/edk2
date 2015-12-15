@@ -11239,7 +11239,7 @@ onigenc_unicode_get_case_fold_codes_by_str(OnigEncoding enc,
     }
     else if ((flag & INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR) != 0) {
       OnigCodePoint cs[3][4];
-      int fn, ncs[3];
+      int fn, ncs[3]={0, 0, 0};
 
       for (fn = 0; fn < to->n; fn++) {
 	cs[fn][0] = to->code[fn];

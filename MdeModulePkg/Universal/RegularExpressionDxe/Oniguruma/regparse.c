@@ -380,6 +380,7 @@ onig_st_insert_strend(hash_table_type* table, const UChar* str_key,
   int result;
 
   key = (st_str_end_key* )xmalloc(sizeof(st_str_end_key));
+  CHECK_NULL_RETURN_MEMERR(key);
   key->s   = (UChar* )str_key;
   key->end = (UChar* )end_key;
   result = onig_st_insert(table, (st_data_t )(UINTN)key, value);
@@ -732,6 +733,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
 #ifdef USE_ST_LIBRARY
     if (IS_NULL(t)) {
       t = onig_st_init_strend_table_with_size(5);
+      CHECK_NULL_RETURN_MEMERR(t);
       reg->name_table = (void* )t;
     }
     e = (NameEntry* )xmalloc(sizeof(NameEntry));
@@ -964,6 +966,8 @@ scan_env_add_mem_entry(ScanEnv* env)
       if (IS_NULL(env->mem_nodes_dynamic)) {
 	alloc = INIT_SCANENV_MEMNODES_ALLOC_SIZE;
 	p = (Node** )xmalloc(sizeof(Node*) * alloc);
+    CHECK_NULL_RETURN_MEMERR(p);
+  
 	xmemcpy(p, env->mem_nodes_static,
 		sizeof(Node*) * SCANENV_MEMNODES_SIZE);
       }
@@ -1522,6 +1526,7 @@ static Node*
 node_new_str_raw(UChar* s, UChar* end)
 {
   Node* node = node_new_str(s, end);
+  CHECK_NULL_RETURN(node);
   NSTRING_SET_RAW(node);
   return node;
 }
@@ -1551,6 +1556,7 @@ str_node_split_last_char(StrNode* sn, OnigEncoding enc)
     p = onigenc_get_prev_char_head(enc, sn->s, sn->end);
     if (p && p > sn->s) { /* can be splitted. */
       n = node_new_str(p, sn->end);
+      CHECK_NULL_RETURN(n);
       if ((sn->flag & NSTR_RAW) != 0)
 	NSTRING_SET_RAW(n);
       sn->end = (UChar* )p;
@@ -4785,6 +4791,9 @@ set_quantifier(Node* qnode, Node* target, int group, ScanEnv* env)
       QtfrNode* qnt   = NQTFR(target);
       int nestq_num   = popular_quantifier_num(qn);
       int targetq_num = popular_quantifier_num(qnt);
+      if (nestq_num < 0 || targetq_num < 0) {
+        return ONIGERR_TYPE_BUG;
+      }
 
 #ifdef USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
       if (!IS_QUANTIFIER_BY_NUMBER(qn) && !IS_QUANTIFIER_BY_NUMBER(qnt) &&
@@ -5234,6 +5243,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
             cc = NCCLASS(*np);
             NCCLASS_SET_SHARE(cc);
             new_key = (type_cclass_key* )xmalloc(sizeof(type_cclass_key));
+            CHECK_NULL_RETURN_MEMERR(new_key);
 	    xmemcpy(new_key, &key, sizeof(type_cclass_key));
             onig_st_add_direct(OnigTypeCClassTable, (st_data_t )(UINTN)new_key,
                                (st_data_t )(UINTN)*np);
@@ -5345,6 +5355,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
   case TK_ANCHOR:
     *np = onig_node_new_anchor(tok->u.anchor);
+    CHECK_NULL_RETURN_MEMERR(*np);
     break;
 
   case TK_OP_REPEAT:
@@ -5354,6 +5365,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
 	return ONIGERR_TARGET_OF_REPEAT_OPERATOR_NOT_SPECIFIED;
       else
 	*np = node_new_empty();
+  CHECK_NULL_RETURN_MEMERR(*np);
     }
     else {
       goto tk_byte;
@@ -5442,9 +5454,11 @@ parse_branch(Node** top, OnigToken* tok, int term,
   }
   else {
     *top  = node_new_list(node, NULL);
+    CHECK_NULL_RETURN_MEMERR(*top);
     headp = &(NCDR(*top));
     while (r != TK_EOT && r != term && r != TK_ALT) {
       r = parse_exp(&node, tok, term, src, end, env);
+      CHECK_NULL_RETURN_MEMERR(node);
       if (r < 0) return r;
 
       if (NTYPE(node) == NT_LIST) {
@@ -5482,6 +5496,7 @@ parse_subexp(Node** top, OnigToken* tok, int term,
   }
   else if (r == TK_ALT) {
     *top  = onig_node_new_alt(node, NULL);
+    CHECK_NULL_RETURN_MEMERR(*top);
     headp = &(NCDR(*top));
     while (r == TK_ALT) {
       r = fetch_token(tok, src, end, env);

@@ -130,6 +130,10 @@ OnigurumaMatch (
   //
   Start = (OnigUChar*)String;
   Region = onig_region_new ();
+  if (Region == NULL) {
+    onig_free (OnigRegex);
+    return EFI_OUT_OF_RESOURCES;
+  }
   OnigResult = onig_search (
                  OnigRegex,
                  Start,

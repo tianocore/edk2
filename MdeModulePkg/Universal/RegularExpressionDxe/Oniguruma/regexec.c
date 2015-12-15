@@ -243,7 +243,9 @@ onig_region_new(void)
   OnigRegion* r;
 
   r = (OnigRegion* )xmalloc(sizeof(OnigRegion));
-  onig_region_init(r);
+  if (r != NULL) {
+    onig_region_init(r);
+  }
   return r;
 }
 
@@ -282,6 +284,10 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
     to->beg = (int* )xrealloc(to->beg, RREGC_SIZE, sizeof(int) * to->allocated);
     to->end = (int* )xrealloc(to->end, RREGC_SIZE, sizeof(int) * to->allocated);
     to->allocated = from->num_regs;
+  }
+
+  if (to->beg == NULL || to->end == NULL) {
+    return;
   }
 
   for (i = 0; i < from->num_regs; i++) {
