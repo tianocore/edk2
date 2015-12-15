@@ -30,21 +30,11 @@
   CpuMpCore.c
   CpuMmuCommon.c
 
-#
-# Prior to ARMv6 we have multiple stacks, one per mode
-#
-#  ArmV4/ExceptionSupport.asm | RVCT
-#  ArmV4/ExceptionSupport.S   | GCC
-
-#
-# ARMv6 or later uses a single stack via srs/stm instructions
-#
-
 [Sources.ARM]
-  ArmV6/Mmu.c
-  ArmV6/Exception.c
-  ArmV6/ExceptionSupport.asm | RVCT
-  ArmV6/ExceptionSupport.S   | GCC
+  Arm/Mmu.c
+  Arm/Exception.c
+  Arm/ExceptionSupport.asm | RVCT
+  Arm/ExceptionSupport.S   | GCC
 
 [Sources.AARCH64]
   AArch64/Mmu.c
