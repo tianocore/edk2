@@ -1,0 +1,24 @@
+// /** @file
+// Miscellaneous Onboard Device
+//
+// Copyright (c) 2013-2015 Intel Corporation.
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+//
+//   MiscOnboardDevice.Vfr
+//
+// **/
+
+
+/=#
+
+#string STR_MISC_ONBOARD_DEVICE_VIDEO   #language en-US  "Intel(R) Extreme Graphics 3 Controller"
+#string STR_MISC_ONBOARD_DEVICE_NETWORK #language en-US  "Gigabit Ethernet"
+#string STR_MISC_ONBOARD_DEVICE_AUDIO   #language en-US  "Intel(R) High Definition Audio Device"

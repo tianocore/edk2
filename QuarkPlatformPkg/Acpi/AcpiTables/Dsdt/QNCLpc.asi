@@ -1,0 +1,29 @@
+/** @file
+Lpc devices and control methods
+
+Copyright (c) 2013-2015 Intel Corporation.
+
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+
+#ifndef QNC_LPC_ASI
+#define QNC_LPC_ASI
+
+Device(LPC)
+{
+    Name(_ADR,0x001f0000)        // Device (HI WORD)=31, Func (LO WORD)=0
+
+    Include ("PciIrq.asi")       // PCI routing control methods
+    Include ("LpcDev.asi")       // Static Lpc device resource declaration
+}
+
+
+#endif

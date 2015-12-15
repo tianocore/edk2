@@ -1,0 +1,35 @@
+// /** @file
+// String definitions for Smbios Memory SubClass data.
+//
+// Copyright (c) 2013-2015 Intel Corporation.
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+//
+// **/
+
+
+/=#
+
+#langdef en-US "English"
+
+//
+// Begin English Language Strings
+//
+#string STR_MEMORY_SUBCLASS_UNKNOWN          #language en-US  "Unknown"
+#string STR_MEMORY_SUBCLASS_DEVICE_LOCATOR_0 #language en-US  "SOLDER DOWN"
+#string STR_MEMORY_SUBCLASS_MANUFACTURER     #language en-US  "Manufacturer: "
+#string STR_MEMORY_SUBCLASS_SERIAL_NUMBER    #language en-US  "Serial Number: "
+#string STR_MEMORY_SUBCLASS_ASSET_TAG        #language en-US  "Asset Tag: "
+#string STR_MEMORY_SUBCLASS_PART_NUMBER      #language en-US  "PartNumber: "
+//
+// End English Language Strings
+//
+
+

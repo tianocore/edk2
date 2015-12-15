@@ -1,0 +1,84 @@
+## @file
+# Component description file for ACPI SMM Platform handler module
+#
+# This is QNC Smm platform driver .
+# Copyright (c) 2013-2015 Intel Corporation.
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+
+[Defines]
+  INF_VERSION                 = 0x00010005
+  BASE_NAME                   = AcpiSmmPlatform
+  FILE_GUID                   = F5AC7057-5650-466e-B692-76A47223EFB0
+  MODULE_TYPE                 = DXE_SMM_DRIVER
+  VERSION_STRING              = 1.0
+  PI_SPECIFICATION_VERSION    = 0x0001000A
+  ENTRY_POINT                 = InitAcpiSmmPlatform
+
+[Sources]
+  AcpiSmmPlatform.c
+  AcpiSmmPlatform.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  QuarkSocPkg/QuarkSocPkg.dec
+  QuarkPlatformPkg/QuarkPlatformPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  ReportStatusCodeLib
+  UefiDriverEntryPoint
+  DebugLib
+  IoLib
+  PciLib
+  BaseMemoryLib
+  BaseLib
+  SmmServicesTableLib
+  PcdLib
+  HobLib
+  S3BootScriptLib
+  LockBoxLib
+  PlatformHelperLib
+  IntelQNCLib
+  PlatformPcieHelperLib
+
+[Protocols]
+  gEfiSmmSxDispatch2ProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiVariableArchProtocolGuid
+  gEfiVariableWriteArchProtocolGuid
+  gEfiGlobalNvsAreaProtocolGuid
+  gEfiSmmSwDispatch2ProtocolGuid
+
+[Guids]
+  gEfiSmmPeiSmramMemoryReserveGuid
+  gQncS3CodeInLockBoxGuid
+  gQncS3ContextInLockBoxGuid
+
+[Pcd]
+  gQuarkPlatformTokenSpaceGuid.PcdPlatformType
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendStart
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize
+  gEfiQuarkNcSocIdTokenSpaceGuid.PcdGpe0blkIoBaseAddress
+  gEfiQuarkNcSocIdTokenSpaceGuid.PcdPm1blkIoBaseAddress
+
+[Depex]
+  gEfiSmmSxDispatch2ProtocolGuid AND
+  gEfiPciRootBridgeIoProtocolGuid AND
+  gEfiVariableArchProtocolGuid AND
+  gEfiVariableWriteArchProtocolGuid AND
+  gEfiGlobalNvsAreaProtocolGuid AND
+  gEfiQncS3SupportProtocolGuid

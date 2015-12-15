@@ -1,0 +1,32 @@
+// /** @file
+// SmbiosMisc formset.
+//
+// Copyright (c) 2013-2015 Intel Corporation.
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+//
+// **/
+
+/=#
+
+#langdef en-US "English"
+
+#string STR_MISC_SUBCLASS_DRIVER_TITLE #language en-US  "SMBIOS Misc subclass driver"
+
+
+#include "MiscBiosVendor.uni"
+#include "MiscChassisManufacturer.uni"
+#include "MiscPortInternalConnectorDesignator.uni"
+#include "MiscSystemManufacturer.uni"
+#include "MiscBaseBoardManufacturer.uni"
+#include "MiscSystemOptionString.uni"
+#include "MiscSystemSlotDesignation.uni"
+#include "MiscOnboardDevice.uni"
+#include "MiscOemString.uni"

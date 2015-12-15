@@ -1,0 +1,314 @@
+## @file
+# Component description file for Smbios Misc module.
+#
+# This driver parses the mSmbiosMiscDataTable structure
+# and reports any generated data using SMBIOS protocol.
+#  SmBios To Misc.Subclass Map Table.
+#  SMBIOS Type |SMBIOS Name   |Misc Subclass Record |Misc Subclass Name
+#  0  | BIOS Information  | 0x2   | BiosVendor
+#  3  | System/Chassis Enclosure | 0x5   | ChassisManufacturer
+#  8  | Port Connector Information | 0x6   | PortInternalConnectorDesignator
+#  9  | System Slot Information | 0x7   | SystemSlotDesignator
+#  10  | On Board Device Information | 0x8   | OnboardDevice
+#  12  | System Configuration Options| 0xA   | SystemOptionString
+#  13  | BIOS Language Information | 0xB   | NumberOfInstallableLanguages
+#  32  | Boot Information  | 0x1A   | BootInformationStatus
+#  The uni files tagged with "ToolCode="DUMMY"" are included by SmbiosMiscStrings.uni file which is input
+#  file for StrGather tool.
+# Copyright (c) 2013-2015 Intel Corporation.
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmbiosMisc
+  FILE_GUID                      = EF0C99B6-B1D3-4025-9405-BF6A560FE0E0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmbiosMiscEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  MiscOemStringFunction.c
+  MiscOemStringData.c
+  SmbiosMiscEntryPoint.c
+  SmbiosMiscDataTable.c
+  MiscSystemManufacturerData.c
+  MiscSystemManufacturerFunction.c
+  MiscBaseBoardManufacturerData.c
+  MiscBaseBoardManufacturerFunction.c
+  MiscOnboardDeviceFunction.c
+  MiscOnboardDeviceData.c
+  MiscSystemSlotDesignationFunction.c
+  MiscSystemSlotDesignationData.c
+  MiscNumberOfInstallableLanguagesFunction.c
+  MiscNumberOfInstallableLanguagesData.c
+  MiscChassisManufacturerFunction.c
+  MiscChassisManufacturerData.c
+  MiscBootInformationFunction.c
+  MiscBootInformationData.c
+  MiscBiosVendorFunction.c
+  MiscBiosVendorData.c
+  MiscSystemOptionStringFunction.c
+  MiscSystemOptionStringData.c
+  MiscPortInternalConnectorDesignatorFunction.c
+  MiscPortInternalConnectorDesignatorData.c
+  SmbiosMisc.h
+  MiscDevicePath.h
+  SmbiosMiscStrings.uni
+  CommonHeader.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  QuarkPlatformPkg/QuarkPlatformPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  HiiLib
+  MemoryAllocationLib
+  DevicePathLib
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
+  gQuarkPlatformTokenSpaceGuid.PcdPlatformTypeName
+  gQuarkPlatformTokenSpaceGuid.PcdFlashAreaSize
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBiosVendor
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBiosReleaseDate
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBiosStartAddress
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBiosChar
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBiosCharEx1
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBiosCharEx2
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemManufacturer
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemProductName
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemVersion
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSerialNumber
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemUuid
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSKUNumber
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemFamily
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBoardManufacturer
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBoardProductName
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBoardVersion
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSBoardSerialNumber
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisManufacturer
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisVersion
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisSerialNumber
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisAssetTag
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisBootupState
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisPowerSupplyState
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisSecurityState
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisOemDefined
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisHeight
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisNumberPowerCords
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisElementCount
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSChassisElementRecordLength
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSConnectorNumber
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort1InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort1ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort1InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort1ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort1Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort2InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort2ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort2InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort2ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort2Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort3InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort3ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort3InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort3ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort3Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort4InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort4ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort4InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort4ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort4Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort5InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort5ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort5InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort5ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort5Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort6InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort6ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort6InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort6ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort6Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort7InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort7ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort7InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort7ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort7Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort8InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort8ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort8InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort8ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort8Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort9InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort9ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort9InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort9ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort9Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort10InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort10ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort10InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort10ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort10Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort11InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort11ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort11InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort11ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort11Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort12InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort12ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort12InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort12ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort12Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort13InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort13ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort13InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort13ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort13Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort14InternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort14ExternalConnectorDesignator
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort14InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort14ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort14Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort15InternalConnectorDesignator
+
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort15InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort15ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort15Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort16InternalConnectorDesignator
+
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort16InternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort16ExternalConnectorType
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSPort16Type
+
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlotNumber
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot1Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot1Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot1DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot1Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot1Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot1Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot1Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot2Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot2Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot2DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot2Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot2Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot2Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot2Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot3Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot3Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot3DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot3Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot3Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot3Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot3Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot4Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot4Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot4DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot4Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot4Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot4Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot4Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot5Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot5Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot5DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot5Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot5Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot5Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot5Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot6Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot6Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot6DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot6Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot6Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot6Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot6Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot7Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot7Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot7DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot7Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot7Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot7Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot7Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot8Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot8Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot8DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot8Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot8Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot8Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot8Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot9Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot9Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot9DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot9Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot9Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot9Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot9Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot10Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot10Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot10DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot10Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot10Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot10Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot10Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot11Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot11Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot11DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot11Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot11Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot11Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot11Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot12Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot12Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot12DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot12Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot12Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot12Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot12Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot13Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot13Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot13DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot13Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot13Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot13Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot13Characteristics
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot14Designation
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot14Type
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot14DataBusWidth
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot14Usage
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot14Length
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot14Id
+  gQuarkPlatformTokenSpaceGuid.PcdSMBIOSSystemSlot14Characteristics
+
+[Depex]
+  gEfiSmbiosProtocolGuid
