@@ -54,6 +54,7 @@ GCC_ASM_EXPORT(DebugAgentVectorTable)
 GCC_ASM_IMPORT(DefaultExceptionHandler)
 
 .text
+.syntax unified
 #if !defined(__APPLE__)
 .fpu neon    @ makes vpush/vpop assemble
 #endif
@@ -202,9 +203,9 @@ ASM_PFX(AsmCommonExceptionEntry):
   and       R3, R1, #0x1f           @ Check CPSR to see if User or System Mode
   cmp       R3, #0x1f               @ if ((CPSR == 0x10) || (CPSR == 0x1df))
   cmpne     R3, #0x10               @
-  stmeqed   R2, {lr}^               @   save unbanked lr
+  stmdaeq   R2, {lr}^               @   save unbanked lr
                                     @ else
-  stmneed   R2, {lr}                @   save SVC lr
+  stmdane   R2, {lr}                @   save SVC lr
 
 
   ldr       R5, [SP, #0x58]         @ PC is the LR pushed by srsfd
@@ -263,9 +264,9 @@ DefaultExceptionHandler (
   and       R1, R1, #0x1f           @ Check to see if User or System Mode
   cmp       R1, #0x1f               @ if ((CPSR == 0x10) || (CPSR == 0x1f))
   cmpne     R1, #0x10               @
-  ldmeqed   R2, {lr}^               @   restore unbanked lr
+  ldmibeq   R2, {lr}^               @   restore unbanked lr
                                     @ else
-  ldmneed   R3, {lr}                @   restore SVC lr, via ldmfd SP!, {LR}
+  ldmibne   R3, {lr}                @   restore SVC lr, via ldmfd SP!, {LR}
 
   ldmfd     SP!,{R0-R12}            @ Restore general purpose registers
                                     @ Exception handler can not change SP

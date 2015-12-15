@@ -14,6 +14,7 @@
 #
 
 .text
+.syntax unified
 .p2align 2
 
 GCC_ASM_EXPORT(__switchu8)
@@ -22,8 +23,8 @@ GCC_ASM_EXPORT(__switchu8)
 ASM_PFX(__switchu8):
     ldrb      ip,[lr,#-1]
     cmp       r0,ip
-    ldrccb    r0,[lr,r0]
-    ldrcsb    r0,[lr,ip]
+    ldrbcc    r0,[lr,r0]
+    ldrbcs    r0,[lr,ip]
     add       ip,lr,r0,LSL #1
     bx        ip
 

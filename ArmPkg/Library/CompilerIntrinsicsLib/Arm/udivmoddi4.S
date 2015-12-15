@@ -13,6 +13,7 @@
 #------------------------------------------------------------------------------
 
   .text
+  .syntax unified
   .align 2
   GCC_ASM_EXPORT(__udivmoddi4)
 
@@ -44,7 +45,7 @@ L8:
 L6:
   cmp  r6, #0
   movne  r1, #0
-  stmneia  r6, {r0-r1}
+  stmiane  r6, {r0-r1}
   b  L2
 L4:
   ldr  r1, [sp, #0]
@@ -88,7 +89,7 @@ L18:
   cmp  r6, #0
   movne  r4, r0
   andne  r5, ip, r3
-  stmneia  r6, {r4-r5}
+  stmiane  r6, {r4-r5}
 L24:
   rsb  r3, r2, #0
   and  r3, r2, r3
@@ -123,7 +124,7 @@ L12:
   andne  r3, r3, r0
   movne  r2, r3
   movne  r3, #0
-  stmneia  r6, {r2-r3}
+  stmiane  r6, {r2-r3}
 L34:
   cmp  r1, #1
   beq  L10
@@ -175,7 +176,7 @@ L30:
   bls  L37
 L48:
   cmp  r6, #0
-  stmneia  r6, {r10-r11}
+  stmiane  r6, {r10-r11}
   b  L2
 L37:
   rsb  r1, r3, #31
@@ -229,7 +230,7 @@ L40:
   cmp  r6, #0
   orr  r10, r0, ip
   mov  r11, r1
-  stmneia  r6, {r4-r5}
+  stmiane  r6, {r4-r5}
   b  L10
 L2:
   mov  r10, #0

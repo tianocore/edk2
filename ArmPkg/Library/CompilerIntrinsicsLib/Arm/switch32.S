@@ -14,6 +14,7 @@
 #
 
 .text
+.syntax unified
 .p2align 2
 
 GCC_ASM_EXPORT(__switch32)
