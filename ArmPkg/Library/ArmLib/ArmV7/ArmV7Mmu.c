@@ -42,6 +42,42 @@ ConvertSectionAttributesToPageAttributes (
 }
 
 STATIC
+BOOLEAN
+PreferNonshareableMemory (
+  VOID
+  )
+{
+  UINTN   Mmfr;
+  UINTN   Val;
+
+  if (FeaturePcdGet (PcdNormalMemoryNonshareableOverride)) {
+    return TRUE;
+  }
+
+  //
+  // Check whether the innermost level of shareability (the level we will use
+  // by default to map normal memory) is implemented with hardware coherency
+  // support. Otherwise, revert to mapping as non-shareable.
+  //
+  Mmfr = ArmReadIdMmfr0 ();
+  switch ((Mmfr >> ID_MMFR0_SHARELVL_SHIFT) & ID_MMFR0_SHARELVL_MASK) {
+  case ID_MMFR0_SHARELVL_ONE:
+    // one level of shareability
+    Val = (Mmfr >> ID_MMFR0_OUTERSHR_SHIFT) & ID_MMFR0_OUTERSHR_MASK;
+    break;
+  case ID_MMFR0_SHARELVL_TWO:
+    // two levels of shareability
+    Val = (Mmfr >> ID_MMFR0_INNERSHR_SHIFT) & ID_MMFR0_INNERSHR_MASK;
+    break;
+  default:
+    // unexpected value -> shareable is the safe option
+    ASSERT (FALSE);
+    return FALSE;
+  }
+  return Val != ID_MMFR0_SHR_IMP_HW_COHERENT;
+}
+
+STATIC
 VOID
 PopulateLevel2PageTable (
   IN UINT32                         *SectionEntry,
@@ -80,7 +116,7 @@ PopulateLevel2PageTable (
       break;
   }
 
-  if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+  if (PreferNonshareableMemory ()) {
     PageAttributes &= ~TT_DESCRIPTOR_PAGE_S_SHARED;
   }
 
@@ -189,7 +225,7 @@ FillTranslationTable (
       break;
   }
 
-  if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+  if (PreferNonshareableMemory ()) {
     Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
   }
 
@@ -281,7 +317,7 @@ ArmConfigureMmu (
   }
 
   if (TTBRAttributes & TTBR_SHAREABLE) {
-    if (FeaturePcdGet(PcdNormalMemoryNonshareableOverride)) {
+    if (PreferNonshareableMemory ()) {
       TTBRAttributes ^= TTBR_SHAREABLE;
     } else {
       //
