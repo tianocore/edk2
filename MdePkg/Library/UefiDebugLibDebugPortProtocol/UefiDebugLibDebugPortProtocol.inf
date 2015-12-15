@@ -48,7 +48,7 @@
   DebugPrintErrorLevelLib
 
 [Protocols]
-  gEfiDebugPortProtocolGuid                     ## UNDEFINED
+  gEfiDebugPortProtocolGuid                     ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## SOMETIMES_CONSUMES
