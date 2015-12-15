@@ -2191,6 +2191,8 @@ SignalCallerEvent (
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL *UfsHc;
   EFI_EVENT                          CallerEvent;
 
+  ASSERT ((Private != NULL) && (TransReq != NULL));
+
   UfsHc        = Private->UfsHostController;
   CallerEvent  = TransReq->CallerEvent;
 
@@ -2214,9 +2216,8 @@ SignalCallerEvent (
              TransReq->CmdDescHost
              );
   }
-  if (TransReq != NULL) {
-    FreePool (TransReq);
-  }
+
+  FreePool (TransReq);
 
   gBS->SignalEvent (CallerEvent);
   return;
