@@ -298,7 +298,11 @@ ASM_PFX(ArmEnableVFP):
   isb
   # Set EN bit in FPEXC. The Advanced SIMD and VFP extensions are enabled and operate normally.
   mov     r0, #0x40000000
+#ifndef __clang__
   mcr     p10,#0x7,r0,c8,c0,#0
+#else
+  vmsr    fpexc, r0
+#endif
   bx      lr
 
 ASM_PFX(ArmCallWFI):
