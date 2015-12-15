@@ -33,9 +33,9 @@ ArmGicEnableDistributor (
     MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
   } else {
     if (MmioRead32 (GicDistributorBase + ARM_GIC_ICDDCR) & ARM_GIC_ICDDCR_ARE) {
-      MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x2);
+      MmioOr32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x2);
     } else {
-      MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
+      MmioOr32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
     }
   }
 }
