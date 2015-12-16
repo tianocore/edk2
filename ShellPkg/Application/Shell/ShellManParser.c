@@ -564,6 +564,8 @@ IsTitleHeader(
         Line++;
       break;
 
+      default:
+       break;
     }
 
   } while (State < Final);
