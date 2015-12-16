@@ -2,6 +2,7 @@
   Industry Standard Definitions of SMBIOS Table Specification v3.0.0.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -1077,6 +1078,8 @@ typedef enum {
   PortTypeAudioPort                 = 0x1D,
   PortTypeModemPort                 = 0x1E,
   PortTypeNetworkPort               = 0x1F,
+  PortTypeSata                      = 0x20,
+  PortTypeSas                       = 0x21,
   PortType8251Compatible            = 0xA0,
   PortType8251FifoCompatible        = 0xA1,
   PortTypeOther                     = 0xFF
