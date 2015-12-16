@@ -184,8 +184,6 @@ LibCallback (
     return EFI_UNSUPPORTED;
   }
 
-  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-
   if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
