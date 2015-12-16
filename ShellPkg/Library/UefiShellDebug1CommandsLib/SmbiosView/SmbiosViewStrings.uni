@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
+// (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -78,7 +79,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_DOCREV                         #language en-US "SMBIOS Docrev:        0x%x\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_NUMBER_STRUCT                  #language en-US "Number of Structures: %d\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_MAX_STRUCT_SIZE                #language en-US "Max Struct size:      %d\r\n"
-#string STR_SMBIOSVIEW_PRINTINFO_TABLE_ADDR                     #language en-US "Table Address:        0x%x\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TABLE_ADDR                     #language en-US "Table Address:        0x%p\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_TABLE_LENGTH                   #language en-US "Table Length:         %d\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_TABLE_MAX_SIZE                 #language en-US "Table Max Size:       %d\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_ANCHOR_STR                     #language en-US "Anchor String:        %a\r\n"
@@ -452,7 +453,7 @@
 #string STR_SMBIOSVIEW_SMBIOSVIEW_SHOWTYPE                      #language en-US "ShowType    = "
 #string STR_SMBIOSVIEW_SMBIOSVIEW_TYPE_HANDLE_DUMP_STRUCT       #language en-US "Type=%d, Handle=0x%x\r\nDump Structure as:\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_INDEX_LENGTH                  #language en-US "Index=%d,Length=0x%x,"
-#string STR_SMBIOSVIEW_SMBIOSVIEW_ADDR                          #language en-US "Addr=0x%x\r\n"
+#string STR_SMBIOSVIEW_SMBIOSVIEW_ADDR                          #language en-US "Addr=0x%p\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_ENTRYLEN                      #language en-US "Entry Length: 0x%x\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_REFERENCEDHANDLE              #language en-US "Referenced Handle: 0x%x\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_REFERENCEDOFFSET              #language en-US "Referenced Offset: 0x%x\r\n"
