@@ -70,7 +70,9 @@ static void
 swap_node(Node* a, Node* b)
 {
   Node c;
-  c = *a; *a = *b; *b = c;
+  CopyMem (&c, a, sizeof (Node));
+  CopyMem (a, b, sizeof (Node));
+  CopyMem (b, &c, sizeof (Node));
 
   if (NTYPE(a) == NT_STR) {
     StrNode* sn = NSTR(a);
@@ -4113,7 +4115,7 @@ alt_merge_mml(MinMaxLen* to, MinMaxLen* from)
 static void
 copy_opt_env(OptEnv* to, OptEnv* from)
 {
-  *to = *from;
+  CopyMem (to, from, sizeof (OptEnv));
 }
 
 static void
@@ -4126,7 +4128,7 @@ clear_opt_anc_info(OptAncInfo* anc)
 static void
 copy_opt_anc_info(OptAncInfo* to, OptAncInfo* from)
 {
-  *to = *from;
+  CopyMem (to, from, sizeof (OptAncInfo));
 }
 
 static void
@@ -4210,7 +4212,7 @@ clear_opt_exact_info(OptExactInfo* ex)
 static void
 copy_opt_exact_info(OptExactInfo* to, OptExactInfo* from)
 {
-  *to = *from;
+  CopyMem (to, from, sizeof (OptExactInfo));
 }
 
 static void
@@ -4358,7 +4360,7 @@ clear_opt_map_info(OptMapInfo* map)
 static void
 copy_opt_map_info(OptMapInfo* to, OptMapInfo* from)
 {
-  *to = *from;
+  CopyMem (to, from, sizeof (OptMapInfo));
 }
 
 static void
@@ -4473,7 +4475,7 @@ clear_node_opt_info(NodeOptInfo* opt)
 static void
 copy_node_opt_info(NodeOptInfo* to, NodeOptInfo* from)
 {
-  *to = *from;
+  CopyMem (to, from, sizeof (NodeOptInfo));
 }
 
 static void

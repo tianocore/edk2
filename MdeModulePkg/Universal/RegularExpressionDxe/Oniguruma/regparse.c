@@ -2217,7 +2217,7 @@ onig_reduce_nested_quantifier(Node* pnode, Node* cnode)
 
   switch(ReduceTypeTable[cnum][pnum]) {
   case RQ_DEL:
-    *pnode = *cnode;
+    CopyMem (pnode, cnode, sizeof (Node));
     break;
   case RQ_A:
     p->target = c->target;
