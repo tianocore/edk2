@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2013 Intel Corporation.
+# Copyright (c) 2013 - 2015 Intel Corporation.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -302,34 +302,9 @@ PushBist:
   loop    PushBist
 
   #
-  # Pass entry point of the PEI core
-  #
-  movl $0xFFFFFFE0, %edi
-  pushl %ds:(%edi)
-
-  #
-  # Pass BFV into the PEI Core
-  #
-  movl $0xFFFFFFFC, %edi
-  pushl %ds:(%edi)
-
-  #
-  # Pass Temp Ram Base into the PEI Core
-  #
-  movl    ASM_PFX(PcdGet32(PcdEsramStage1Base)), %eax
-  addl    $(QUARK_ESRAM_MEM_SIZE_BYTES - QUARK_STACK_SIZE_BYTES), %eax
-  pushl   %eax
-
-
-  #
-  # Pass stack size into the PEI Core
-  #
-  pushl   $QUARK_STACK_SIZE_BYTES
-
-  #
   # Pass Control into the PEI Core
   #
-  call SecStartup
+  call PlatformSecLibStartup
 
   #
   # PEI Core should never return to here, this is just to capture an invalid return.
