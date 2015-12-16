@@ -3,6 +3,7 @@
 
   Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -529,8 +530,17 @@ typedef struct {
   UINT32  GicId;
   UINT64  PhysicalBaseAddress;
   UINT32  SystemVectorBase;
-  UINT32  Reserved2;
+  UINT8   GicVersion;
+  UINT8   Reserved2[3];
 } EFI_ACPI_5_1_GIC_DISTRIBUTOR_STRUCTURE;
+
+///
+/// GIC Version
+///
+#define EFI_ACPI_5_1_GIC_V2                                   0x01
+#define EFI_ACPI_5_1_GIC_V2m                                  0x02
+#define EFI_ACPI_5_1_GIC_V3                                   0x03
+#define EFI_ACPI_5_1_GIC_V4                                   0x04
 
 ///
 /// GIC MSI Frame Structure
