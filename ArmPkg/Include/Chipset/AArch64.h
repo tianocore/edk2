@@ -119,15 +119,18 @@
 #define ARM_VECTOR_LOW_A32_SERR 0x780
 
 #define VECTOR_BASE(tbl)          \
+  .section .text.##tbl##,"ax";    \
   .align 11;                      \
+  .org 0x0;                       \
   GCC_ASM_EXPORT(tbl);            \
   ASM_PFX(tbl):                   \
 
 #define VECTOR_ENTRY(tbl, off)    \
-  .org ASM_PFX(tbl) + off
+  .org off
 
 #define VECTOR_END(tbl)           \
-  .org ASM_PFX(tbl) + 0x800
+  .org 0x800;                     \
+  .previous
 
 VOID
 EFIAPI
