@@ -16,8 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "FwBlockService.h"
 
 ESAL_FWB_GLOBAL         *mFvbModuleGlobal;
-EFI_GUID gEfiFirmwareVolumeBlockProtocolGuid;
-EFI_GUID gEfiSmmFirmwareVolumeBlockProtocolGuid;
 
 EFI_FW_VOL_BLOCK_DEVICE mFvbDeviceTemplate = {
   FVB_DEVICE_SIGNATURE,  // Signature
