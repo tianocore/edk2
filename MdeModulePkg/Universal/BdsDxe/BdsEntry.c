@@ -307,7 +307,10 @@ BootBootOptions (
     EfiBootManagerBoot (&BootOptions[Index]);
 
     //
-    // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware    // supports boot manager menu, and if firmware is configured to boot in an    // interactive mode, the boot manager will stop processing the BootOrder variable and    // present a boot manager menu to the user.
+    // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware
+    // supports boot manager menu, and if firmware is configured to boot in an
+    // interactive mode, the boot manager will stop processing the BootOrder variable and
+    // present a boot manager menu to the user.
     //
     if (BootOptions[Index].Status == EFI_SUCCESS) {
       EfiBootManagerBoot (BootManagerMenu);
