@@ -2,6 +2,7 @@
   Provides interface to shell MAN file parser.
 
   Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright 2015 Dell Inc.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +14,8 @@
 **/
 
 #include "Shell.h"
+
+CHAR16 EFIAPI InternalShellCharToUpper (IN CHAR16  Char);
 
 /**
   Verifies that the filename has .MAN on the end.
@@ -445,22 +448,149 @@ ManBufferFindTitleSection(
 }
 
 /**
+  Parses a line from a MAN file to see if it is the Title Header. If it is, then
+  if the "Brief Description" is desired, allocate a buffer for it and return a
+  copy. Upon a sucessful return the caller is responsible to free the memory in
+  *BriefDesc
+
+  Uses a simple state machine that allows "unlimited" whitespace before and after the
+  ".TH", compares Command and the MAN file commnd name without respect to case, and
+  allows "unlimited" whitespace and '0' and '1' characters before the Short Description.
+  The PCRE regex describing this functionality is: ^\s*\.TH\s+(\S)\s[\s01]*(.*)$
+  where group 1 is the Command Name and group 2 is the Short Description.
+
+  @param[in] Command             name of command whose MAN file we think Line came from
+  @param[in] Line                Pointer to a line from the MAN file
+  @param[out] BriefDesc          pointer to pointer to string where description goes.
+  @param[out] BriefSize          pointer to size of allocated BriefDesc
+  @param[out] Found              TRUE if the Title Header was found and it belongs to Command
+
+  @retval TRUE   Line contained the Title Header
+  @retval FALSE  Line did not contain the Title Header
+**/
+BOOLEAN
+IsTitleHeader(
+  IN CONST CHAR16       *Command,
+  IN CHAR16             *Line,
+  OUT CHAR16            **BriefDesc OPTIONAL,
+  OUT UINTN             *BriefSize OPTIONAL,
+  OUT BOOLEAN           *Found
+  )
+{
+  // The states of a simple state machine used to recognize a title header line
+  // and to extract the Short Description, if desired.
+  typedef enum {
+    LookForThMacro, LookForCommandName, CompareCommands, GetBriefDescription, Final
+  } STATEVALUES;
+
+  STATEVALUES  State;
+  UINTN        CommandIndex; // Indexes Command as we compare its chars to the MAN file.
+  BOOLEAN      ReturnValue;  // TRUE if this the Title Header line of *some* MAN file.
+  BOOLEAN      ReturnFound;  // TRUE if this the Title Header line of *the desired* MAN file.
+
+  ReturnValue = FALSE;
+  ReturnFound = FALSE;
+  CommandIndex = 0;
+  State = LookForThMacro;
+
+  do {
+
+    if (*Line == L'\0') {
+      break;
+    }
+
+    switch (State) {
+
+      // Handle "^\s*.TH\s"
+      // Go to state LookForCommandName if the title header macro is present; otherwise,
+      // eat white space. If we see something other than white space, this is not a
+      // title header line.
+      case LookForThMacro:
+        if (StrnCmp (L".TH ", Line, 4) == 0 || StrnCmp (L".TH\t", Line, 4) == 0) {
+          Line += 4;
+          State = LookForCommandName;
+        }
+        else if (*Line == L' ' || *Line == L'\t') {
+          Line++;
+        }
+        else {
+          State = Final;
+        }
+      break;
+
+      // Handle "\s*"
+      // Eat any "extra" whitespace after the title header macro (we have already seen
+      // at least one white space character). Go to state CompareCommands when a
+      // non-white space is seen.
+      case LookForCommandName:
+        if (*Line == L' ' || *Line == L'\t') {
+          Line++;
+        }
+        else {
+          ReturnValue = TRUE;  // This is *some* command's title header line.
+          State = CompareCommands;
+          // Do not increment Line; it points to the first character of the command
+          // name on the title header line.
+        }
+      break;
+
+      // Handle "(\S)\s"
+      // Compare Command to the title header command name, ignoring case. When we
+      // reach the end of the command (i.e. we see white space), the next state
+      // depends on whether the caller wants a copy of the Brief Description.
+      case CompareCommands:
+        if (*Line == L' ' || *Line == L'\t') {
+          ReturnFound = TRUE;  // This is the desired command's title header line.
+          State = (BriefDesc == NULL) ? Final : GetBriefDescription;
+        }
+        else if (InternalShellCharToUpper (*Line) != InternalShellCharToUpper (*(Command + CommandIndex++))) {
+          State = Final;
+        }
+        Line++;
+      break;
+
+      // Handle "[\s01]*(.*)$"
+      // Skip whitespace, '0', and '1' characters, if any, prior to the brief description.
+      // Return the description to the caller.
+      case GetBriefDescription:
+        if (*Line != L' ' && *Line != L'\t' && *Line != L'0' && *Line != L'1') {
+          *BriefSize = StrSize(Line);
+          *BriefDesc = AllocateZeroPool(*BriefSize);
+          if (*BriefDesc != NULL) {
+            StrCpyS(*BriefDesc, (*BriefSize)/sizeof(CHAR16), Line);
+          }
+          State = Final;
+        }
+        Line++;
+      break;
+
+    }
+
+  } while (State < Final);
+
+  *Found = ReturnFound;
+  return ReturnValue;
+}
+
+/**
   parses through the MAN file specified by SHELL_FILE_HANDLE and returns the
-  "Brief Description" for the .TH section as specified by Command.  if the
+  "Brief Description" for the .TH section as specified by Command.  If the
   command section is not found return EFI_NOT_FOUND.
 
   Upon a sucessful return the caller is responsible to free the memory in *BriefDesc
 
   @param[in] Handle              FileHandle to read from
-  @param[in] Command             name of command's section to find
+  @param[in] Command             name of command's section to find as entered on the
+                                 command line (may be a relative or absolute path or
+                                 be in any case: upper, lower, or mixed in numerous ways!).
   @param[out] BriefDesc          pointer to pointer to string where description goes.
   @param[out] BriefSize          pointer to size of allocated BriefDesc
   @param[in, out] Ascii          TRUE if the file is ASCII, FALSE otherwise, will be
                                  set if the file handle is at the 0 position.
 
   @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
-  @retval EFI_SUCCESS           the section was found and its description sotred in
-                                an alloceted buffer.
+  @retval EFI_SUCCESS           the section was found and its description stored in
+                                an allocated buffer if requested.
 **/
 EFI_STATUS
 EFIAPI
@@ -473,13 +603,10 @@ ManFileFindTitleSection(
   )
 {
   EFI_STATUS  Status;
-  CHAR16      *TitleString;
   CHAR16      *ReadLine;
   UINTN       Size;
-  CHAR16      *TitleEnd;
-  UINTN       TitleLen;
   BOOLEAN     Found;
-  UINTN       TitleSize;
+  UINTN       Start;
 
   if ( Handle     == NULL
     || Command    == NULL
@@ -497,59 +624,34 @@ ManFileFindTitleSection(
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  TitleSize = (4*sizeof(CHAR16)) + StrSize(Command);
-  TitleString = AllocateZeroPool(TitleSize);
-  if (TitleString == NULL) {
-    FreePool(ReadLine);
-    return (EFI_OUT_OF_RESOURCES);
+  //
+  // Do not pass any leading path information that may be present to IsTitleHeader().
+  //
+  Start = StrLen(Command);
+  while (Start
+         && (*(Command + Start - 1) != L'\\')
+         && (*(Command + Start - 1) != L'/')
+         && (*(Command + Start - 1) != L':')) {
+    --Start;
   }
-  StrCpyS(TitleString, TitleSize/sizeof(CHAR16), L".TH ");
-  StrCatS(TitleString, TitleSize/sizeof(CHAR16), Command);
 
-  TitleLen = StrLen(TitleString);
   for (;!ShellFileHandleEof(Handle);Size = 1024) {
    Status = ShellFileHandleReadLine(Handle, ReadLine, &Size, TRUE, Ascii);
-    if (ReadLine[0] == L'#') {
-      //
-      // Skip comment lines
-      //
-      continue;
-    }
     //
     // ignore too small of buffer...
     //
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      Status = EFI_SUCCESS;
-    }
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR(Status) && Status != EFI_BUFFER_TOO_SMALL) {
       break;
     }
-    if (StrnCmp(ReadLine, TitleString, TitleLen) == 0) {
-      Found = TRUE;
-      //
-      // we found it so copy out the rest of the line into BriefDesc
-      // After skipping any spaces or zeroes
-      //
-      for ( TitleEnd = ReadLine+TitleLen
-          ; *TitleEnd == L' ' || *TitleEnd == L'0' || *TitleEnd == L'1'
-          ; TitleEnd++);
-      if (BriefDesc != NULL) {
-        *BriefSize = StrSize(TitleEnd);
-        *BriefDesc = AllocateZeroPool(*BriefSize);
-        if (*BriefDesc == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          break;
-        }
-        StrCpyS(*BriefDesc, (*BriefSize)/sizeof(CHAR16), TitleEnd);
-      }
+
+    Status = EFI_NOT_FOUND;
+    if (IsTitleHeader (Command+Start, ReadLine, BriefDesc, BriefSize, &Found)) {
+      Status = Found ? EFI_SUCCESS : EFI_NOT_FOUND;
       break;
     }
   }
+
   FreePool(ReadLine);
-  FreePool(TitleString);
-  if (!Found && !EFI_ERROR(Status)) {
-    return (EFI_NOT_FOUND);
-  }
   return (Status);
 }
 
