@@ -42,6 +42,9 @@
 [Sources.AARCH64]
   AARCH64/RelocatableVirtHelper.S
 
+[Sources.ARM]
+  ARM/RelocatableVirtHelper.S
+
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
