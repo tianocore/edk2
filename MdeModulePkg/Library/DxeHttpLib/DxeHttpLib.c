@@ -1161,21 +1161,7 @@ HttpParseMessageBody (
     switch (Parser->State) {
     case BodyParserStateMax:
       return EFI_ABORTED;
-
-    case BodyParserComplete:
-      if (Parser->Callback != NULL) {
-        Status = Parser->Callback (
-                   BodyParseEventOnComplete,
-                   Char,
-                   0,
-                   Parser->Context
-                   );
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-      }
-      return EFI_SUCCESS;
-    
+ 
     case BodyParserBodyIdentity:
       //
       // Identity transfer-coding, just notify user to save the body data.
@@ -1195,6 +1181,17 @@ HttpParseMessageBody (
       Parser->ParsedBodyLength += MIN (BodyLength, Parser->ContentLength - Parser->ParsedBodyLength);
       if (Parser->ParsedBodyLength == Parser->ContentLength) {
         Parser->State = BodyParserComplete;
+        if (Parser->Callback != NULL) {
+          Status = Parser->Callback (
+                     BodyParseEventOnComplete,
+                     Char,
+                     0,
+                     Parser->Context
+                     );
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        }
       }
       break;
 
@@ -1272,6 +1269,18 @@ HttpParseMessageBody (
     case BodyParserLastCRLFEnd:
       if (*Char == '\n') {
         Parser->State = BodyParserComplete;
+        Char++;
+        if (Parser->Callback != NULL) {
+          Status = Parser->Callback (
+                     BodyParseEventOnComplete,
+                     Char,
+                     0,
+                     Parser->Context
+                     );
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        }
         break;
       } else {
         Parser->State = BodyParserStateMax;
