@@ -1408,18 +1408,32 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"INTEL "|VOID*|0x30001034
 
   ## Default OEM Table ID for ACPI table creation, it is "EDK2    ".
+  #  Accroding to ACPI specification, this field is particularly useful when
+  #  defining a definition block to distinguish definition block functions.
+  #  The OEM assigns each dissimilar table a new OEM Table ID.
+  #  This PCD is ignored for definition block.
   # @Prompt Default OEM Table ID for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId|0x20202020324B4445|UINT64|0x30001035
 
   ## Default OEM Revision for ACPI table creation.
+  #  Accroding to ACPI specification, for LoadTable() opcode, the OS can also
+  #  check the OEM Table ID and Revision ID against a database for a newer
+  #  revision Definition Block of the same OEM Table ID and load it instead.
+  #  This PCD is ignored for definition block.
   # @Prompt Default OEM Revision for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision|0x00000002|UINT32|0x30001036
 
   ## Default Creator ID for ACPI table creation.
+  #  Accroding to ACPI specification, for tables containing Definition Blocks,
+  #  this is the ID for the ASL Compiler.
+  #  This PCD is ignored for definition block.
   # @Prompt Default Creator ID for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId|0x20202020|UINT32|0x30001037
 
   ## Default Creator Revision for ACPI table creation.
+  #  Accroding to ACPI specification, for tables containing Definition Blocks,
+  #  this is the revision for the ASL Compiler.
+  #  This PCD is ignored for definition block.
   # @Prompt Default Creator Revision for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
 
