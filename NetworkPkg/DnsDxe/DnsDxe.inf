@@ -57,7 +57,7 @@
   gEfiDns4ServiceBindingProtocolGuid              ## BY_START
   gEfiDns4ProtocolGuid                            ## BY_START
   gEfiUdp4ServiceBindingProtocolGuid              ## TO_START
-  gEfiUdp4ProtocolGuid                            ## BY_START
+  gEfiUdp4ProtocolGuid                            ## TO_START
   gEfiDhcp4ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiDhcp4ProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiIp4Config2ProtocolGuid                      ## SOMETIMES_CONSUMES
