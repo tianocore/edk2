@@ -49,5 +49,7 @@
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask             ## CONSUMES
-  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap  ## CONSUMES
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap
 
