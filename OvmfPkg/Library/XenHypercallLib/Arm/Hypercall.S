@@ -16,7 +16,8 @@
 #include <IndustryStandard/Xen/arch-arm/xen.h>
 
   .text
-  .global   ASM_PFX(XenHypercall2)
+GCC_ASM_EXPORT(XenHypercall2)
+
 ASM_PFX(XenHypercall2):
   mov     r12, r0
   mov     r0, r1
