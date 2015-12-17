@@ -87,24 +87,6 @@
 [LibraryClasses.common.UEFI_APPLICATION]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
 
-###############################################################################
-#
-# BuildOptions Section - Define the module specific tool chain flags that
-#                        should be used as the default flags for a module.
-#                        These flags are appended to any standard flags that
-#                        are defined by the build process.
-#
-# -JCryptoPkg/Include : To disable the use of the system includes provided by
-#                       the RVCT toolchain.
-# --diag_remark=1     : To make the warning "#1-D: last line of file ends
-#                       without a newline" just a remark such that the
-#                       build doesn't stop as warnings are considered as
-#                       errors.
-#
-################################################################################
-[BuildOptions]
-RVCT:*_*_ARM_CC_FLAGS = -JCryptoPkg/Include --diag_remark=1
-
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform

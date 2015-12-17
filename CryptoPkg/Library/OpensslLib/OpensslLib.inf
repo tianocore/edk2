@@ -893,6 +893,11 @@
   #  513: a value of type <type> cannot be assigned to an entity of type <type>
   #  188: enumerated type mixed with another type (i.e. passing an integer as an enum without a cast)
   # 1296: Extended constant initialiser used
-  RVCT:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS) --library_interface=aeabi_clib99 --diag_suppress=1296,1295,550,1293,111,68,177,223,144,513,188
+  #  128: loop is not reachable - may be emitted inappropriately if code follows a conditional return
+  #       from the function that evaluates to true at compile time
+  #  546: transfer of control bypasses initialization - may be emitted inappropriately if the uninitialized
+  #       variable is never referenced after the jump
+  #    1: ignore "#1-D: last line of file ends without a newline"
+  RVCT:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS) --library_interface=aeabi_clib99 --diag_suppress=1296,1295,550,1293,111,68,177,223,144,513,188,128,546,1 -JCryptoPkg/Include
   XCODE:*_*_IA32_CC_FLAGS   = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w
   XCODE:*_*_X64_CC_FLAGS    = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w
