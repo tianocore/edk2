@@ -870,6 +870,7 @@ SerialControllerDriverStart (
   if ((SerialDeviceCount != 0) && (RemainingDevicePath != NULL)) {
     Uart = (UART_DEVICE_PATH *) SkipControllerDevicePathNode (RemainingDevicePath, &ContainsControllerNode, &ControllerNumber);
     for (Index = 0; Index < SerialDeviceCount; Index++) {
+      ASSERT ((SerialDevices != NULL) && (SerialDevices[Index] != NULL));
       if ((!SerialDevices[Index]->ContainsControllerNode && !ContainsControllerNode) ||
           (SerialDevices[Index]->ContainsControllerNode && ContainsControllerNode && SerialDevices[Index]->Instance == ControllerNumber)
           ) {
@@ -963,6 +964,7 @@ SerialControllerDriverStart (
         // Restore the PCI attributes when all children is destroyed (PciDeviceInfo->ChildCount == 0).
         //
         PciDeviceInfo = AllocatePool (sizeof (PCI_DEVICE_INFO));
+        ASSERT (PciDeviceInfo != NULL);
         PciDeviceInfo->ChildCount = 0;
         PciDeviceInfo->PciIo = ParentIo.PciIo;
         Status = ParentIo.PciIo->Attributes (
@@ -993,6 +995,7 @@ SerialControllerDriverStart (
         //
         // Re-use the PciDeviceInfo stored in existing children.
         //
+        ASSERT ((SerialDevices != NULL) && (SerialDevices[0] != NULL));
         PciDeviceInfo = SerialDevices[0]->PciDeviceInfo;
         ASSERT (PciDeviceInfo != NULL);
       }
