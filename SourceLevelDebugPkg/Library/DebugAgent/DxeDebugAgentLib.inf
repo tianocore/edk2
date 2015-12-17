@@ -81,7 +81,7 @@
   MemoryAllocationLib
 
 [Guids]
-  ## SOMETIMES_PRODUCES ## SystemTable
+  ## PRODUCES ## SystemTable
   ## CONSUMES ## HOB
   gEfiDebugAgentGuid
   ## SOMETIMES_CONSUMES ## SystemTable
