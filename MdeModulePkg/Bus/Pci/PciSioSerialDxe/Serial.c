@@ -982,7 +982,7 @@ SerialControllerDriverStart (
             &Supports
             );
           if (!EFI_ERROR (Status)) {
-            Supports &= EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY;
+            Supports &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
             Status = ParentIo.PciIo->Attributes (
               ParentIo.PciIo,
               EfiPciIoAttributeOperationEnable,
