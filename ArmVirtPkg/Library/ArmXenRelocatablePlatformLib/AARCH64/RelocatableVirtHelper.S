@@ -30,9 +30,6 @@ GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdCoreCount)
 
-.LFdtMagic:
-  .byte   0xd0, 0x0d, 0xfe, 0xed
-
 .LArm64LinuxMagic:
   .byte   0x41, 0x52, 0x4d, 0x64
 
@@ -43,17 +40,15 @@ GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdCoreCount)
 //   );
 ASM_PFX(ArmPlatformPeiBootAction):
   mov   x29, x30            // preserve LR
+  mov   x28, x0             // preserve DTB pointer
+  mov   x27, x1             // preserve base of image pointer
 
   //
   // If we are booting from RAM using the Linux kernel boot protocol, x0 will
   // point to the DTB image in memory. Otherwise, we are just coming out of
-  // reset, and x0 will be 0. Check also the FDT magic.
+  // reset, and x0 will be 0.
   //
   cbz   x0, .Lout
-  ldr   w8, .LFdtMagic
-  ldr   w9, [x0]
-  cmp   w8, w9
-  bne   .Lout
 
   //
   // The base of the runtime image has been preserved in x1. Check whether
@@ -81,35 +76,29 @@ ASM_PFX(ArmPlatformPeiBootAction):
   str   x7, [x9]
 
   //
+  // Discover the memory size and offset from the DTB, and record in the
+  // respective PCDs. This will also return false if a corrupt DTB is
+  // encountered. Since we are calling a C function, use the window at the
+  // beginning of the FD image as a temp stack.
+  //
+  adr   x1, PcdGet64 (PcdSystemMemorySize)
+  adr   x2, PcdGet64 (PcdSystemMemoryBase)
+  mov   sp, x7
+  bl    FindMemnode
+  cbz   x0, .Lout
+
+  //
   // Copy the DTB to the slack space right after the 64 byte arm64/Linux style
   // image header at the base of this image (defined in the FDF), and record the
   // pointer in PcdDeviceTreeInitialBaseAddress.
   //
   adr   x8, PcdGet64 (PcdDeviceTreeInitialBaseAddress)
-  add   x1, x1, #0x40
-  str   x1, [x8]
+  add   x27, x27, #0x40
+  str   x27, [x8]
 
-  ldr   w8, [x0, #4]          // get DTB size (BE)
-  mov   x9, x1
-  rev   w8, w8
-  add   x8, x8, x0
-0:ldp   x6, x7, [x0], #16
-  stp   x6, x7, [x9], #16
-  cmp   x0, x8
-  blt   0b
-
-  //
-  // Discover the memory size and offset from the DTB, and record in the
-  // respective PCDs
-  //
-  mov   x0, x1
-  bl    find_memnode    // returns (size, base) size in (x0, x1)
-  cbz   x0, .Lout
-
-  adr   x8, PcdGet64 (PcdSystemMemorySize)
-  adr   x9, PcdGet64 (PcdSystemMemoryBase)
-  str   x0, [x8]
-  str   x1, [x9]
+  mov   x0, x27
+  mov   x1, x28
+  bl    CopyFdt
 
 .Lout:
   ret    x29
