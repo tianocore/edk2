@@ -196,7 +196,7 @@
 #define float128_gt         __gttf2
 #endif
 
-#ifdef __ARM_EABI__
+#if defined (__ARM_EABI__) || defined (__CC_ARM)
 #ifdef __ARM_PCS_VFP
 #include <arm/aeabi.h>
 #endif

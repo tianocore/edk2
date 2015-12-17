@@ -41,6 +41,9 @@
   Arm/__aeabi_dcmpun.c
   Arm/__aeabi_fcmpun.c
 
+  Arm/__aeabi_cdcmp.asm   | RVCT
+  Arm/__aeabi_cfcmp.asm   | RVCT
+
 [Packages]
   MdePkg/MdePkg.dec
 
