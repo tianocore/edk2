@@ -1087,7 +1087,7 @@ DoStartupScript(
     }
     Status = RunShellCommand(FileStringPath, &CalleeStatus);
     if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit == TRUE) {
-      ShellCommandRegisterExit(gEfiShellProtocol->BatchIsActive(), (CONST UINT64)CalleeStatus);
+      ShellCommandRegisterExit(gEfiShellProtocol->BatchIsActive(), (UINT64)CalleeStatus);
     }
     FreePool(FileStringPath);
     return (Status);
