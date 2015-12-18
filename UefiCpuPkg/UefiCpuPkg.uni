@@ -143,3 +143,7 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApLoopMode_HELP  #language en-US "Specifies the AP wait loop state during POST phase."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApTargetCstate_PROMPT  #language en-US "The specified AP target C-state for Mwait"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApTargetCstate_HELP  #language en-US "Specifies the AP target C-state for Mwait during POST phase."
+
