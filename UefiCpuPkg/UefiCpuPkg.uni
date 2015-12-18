@@ -139,3 +139,7 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuNumberOfReservedVariableMtrrs_HELP  #language en-US "Specifies the number of variable MTRRs reserved for OS use."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApLoopMode_PROMPT  #language en-US "The AP wait loop state"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApLoopMode_HELP  #language en-US "Specifies the AP wait loop state during POST phase."
+
