@@ -1501,7 +1501,7 @@ InternalShellExecuteDevicePath(
     ShellParamsProtocol.StdIn   = ShellInfoObject.NewShellParametersProtocol->StdIn;
     ShellParamsProtocol.StdOut  = ShellInfoObject.NewShellParametersProtocol->StdOut;
     ShellParamsProtocol.StdErr  = ShellInfoObject.NewShellParametersProtocol->StdErr;
-    Status = UpdateArgcArgv(&ShellParamsProtocol, NewCmdLine, NULL, NULL);
+    Status = UpdateArgcArgv(&ShellParamsProtocol, NewCmdLine, Efi_Application, NULL, NULL);
     ASSERT_EFI_ERROR(Status);
     //
     // Replace Argv[0] with the full path of the binary we're executing:
