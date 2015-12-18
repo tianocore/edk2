@@ -1053,6 +1053,7 @@ DoStartupScript(
   )
 {
   EFI_STATUS                    Status;
+  EFI_STATUS                    CalleeStatus;
   UINTN                         Delay;
   EFI_INPUT_KEY                 Key;
   SHELL_FILE_HANDLE             FileHandle;
@@ -1084,7 +1085,10 @@ DoStartupScript(
       StrnCatS(FileStringPath, NewSize/sizeof(CHAR16), L" ", NewSize/sizeof(CHAR16) - StrLen(FileStringPath) -1);
       StrnCatS(FileStringPath, NewSize/sizeof(CHAR16), ShellInfoObject.ShellInitSettings.FileOptions, NewSize/sizeof(CHAR16) - StrLen(FileStringPath) -1);
     }
-    Status = RunCommand(FileStringPath);
+    Status = RunShellCommand(FileStringPath, &CalleeStatus);
+    if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit == TRUE) {
+      ShellCommandRegisterExit(gEfiShellProtocol->BatchIsActive(), (CONST UINT64)CalleeStatus);
+    }
     FreePool(FileStringPath);
     return (Status);
 
@@ -2133,6 +2137,7 @@ ProcessCommandLineToFinal(
   @param[in] CmdLine          the command line to run.
   @param[in] FirstParameter   the first parameter on the command line
   @param[in] ParamProtocol    the shell parameters protocol pointer
+  @param[out] CommandStatus   the status from the command line.
 
   @retval EFI_SUCCESS     The command was completed.
   @retval EFI_ABORTED     The command's operation was aborted.
@@ -2142,7 +2147,8 @@ EFIAPI
 RunInternalCommand(
   IN CONST CHAR16                   *CmdLine,
   IN       CHAR16                   *FirstParameter,
-  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
+  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol,
+  OUT EFI_STATUS                    *CommandStatus
 )
 {
   EFI_STATUS                Status;
@@ -2175,6 +2181,14 @@ RunInternalCommand(
     Status = ShellCommandRunCommandHandler(FirstParameter, &CommandReturnedStatus, &LastError);
 
     if (!EFI_ERROR(Status)) {
+      if (CommandStatus != NULL) {
+        if (CommandReturnedStatus != SHELL_SUCCESS) {
+          *CommandStatus = (EFI_STATUS)(CommandReturnedStatus | MAX_BIT);
+        } else {
+          *CommandStatus = EFI_SUCCESS;
+        }
+      }
+
       //
       // Update last error status.
       // some commands do not update last error.
@@ -2236,6 +2250,7 @@ RunInternalCommand(
   @param[in] CmdLine          the command line to run.
   @param[in] FirstParameter   the first parameter on the command line
   @param[in] ParamProtocol    the shell parameters protocol pointer
+  @param[out] CommandStatus   the status from the command line.
 
   @retval EFI_SUCCESS     The command was completed.
   @retval EFI_ABORTED     The command's operation was aborted.
@@ -2246,7 +2261,8 @@ RunCommandOrFile(
   IN       SHELL_OPERATION_TYPES    Type,
   IN CONST CHAR16                   *CmdLine,
   IN       CHAR16                   *FirstParameter,
-  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
+  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol,
+  OUT EFI_STATUS                    *CommandStatus
 )
 {
   EFI_STATUS                Status;
@@ -2262,7 +2278,7 @@ RunCommandOrFile(
 
   switch (Type) {
     case   Internal_Command:
-      Status = RunInternalCommand(CmdLine, FirstParameter, ParamProtocol);
+      Status = RunInternalCommand(CmdLine, FirstParameter, ParamProtocol, CommandStatus);
       break;
     case   Script_File_Name:
     case   Efi_Application:
@@ -2328,6 +2344,10 @@ RunCommandOrFile(
             CalleeExitStatus = (SHELL_STATUS) StartStatus;
           }
 
+          if (CommandStatus != NULL) {
+            *CommandStatus = CalleeExitStatus;
+          }
+
           //
           // Update last error status.
           //
@@ -2360,6 +2380,7 @@ RunCommandOrFile(
   @param[in] CmdLine          the command line to run.
   @param[in] FirstParameter   the first parameter on the command line.
   @param[in] ParamProtocol    the shell parameters protocol pointer
+  @param[out] CommandStatus   the status from the command line.
 
   @retval EFI_SUCCESS     The command was completed.
   @retval EFI_ABORTED     The command's operation was aborted.
@@ -2367,10 +2388,11 @@ RunCommandOrFile(
 EFI_STATUS
 EFIAPI
 SetupAndRunCommandOrFile(
-  IN SHELL_OPERATION_TYPES          Type,
-  IN CHAR16                         *CmdLine,
-  IN CHAR16                         *FirstParameter,
-  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
+  IN   SHELL_OPERATION_TYPES          Type,
+  IN   CHAR16                         *CmdLine,
+  IN   CHAR16                         *FirstParameter,
+  IN   EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol,
+  OUT EFI_STATUS                    *CommandStatus
 )
 {
   EFI_STATUS                Status;
@@ -2390,7 +2412,7 @@ SetupAndRunCommandOrFile(
   //
   if (!EFI_ERROR(Status)) {
     TrimSpaces(&CmdLine);
-    Status = RunCommandOrFile(Type, CmdLine, FirstParameter, ParamProtocol);
+    Status = RunCommandOrFile(Type, CmdLine, FirstParameter, ParamProtocol, CommandStatus);
   }
 
   //
@@ -2415,14 +2437,16 @@ SetupAndRunCommandOrFile(
   command or dispatch an external application.
 
   @param[in] CmdLine      The command line to parse.
+  @param[out] CommandStatus   The status from the command line.
 
   @retval EFI_SUCCESS     The command was completed.
   @retval EFI_ABORTED     The command's operation was aborted.
 **/
 EFI_STATUS
 EFIAPI
-RunCommand(
-  IN CONST CHAR16   *CmdLine
+RunShellCommand(
+  IN CONST CHAR16   *CmdLine,
+  OUT EFI_STATUS    *CommandStatus
   )
 {
   EFI_STATUS                Status;
@@ -2507,7 +2531,7 @@ RunCommand(
       case   Internal_Command:
       case   Script_File_Name:
       case   Efi_Application:
-        Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol);
+        Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol, CommandStatus);
         break;
       default:
         //
@@ -2527,6 +2551,27 @@ RunCommand(
 
   return (Status);
 }
+
+/**
+  Function will process and run a command line.
+
+  This will determine if the command line represents an internal shell 
+  command or dispatch an external application.
+
+  @param[in] CmdLine      The command line to parse.
+
+  @retval EFI_SUCCESS     The command was completed.
+  @retval EFI_ABORTED     The command's operation was aborted.
+**/
+EFI_STATUS
+EFIAPI
+RunCommand(
+  IN CONST CHAR16   *CmdLine
+  )
+{
+  return (RunShellCommand(CmdLine, NULL));
+}
+
 
 STATIC CONST UINT16 InvalidChars[] = {L'*', L'?', L'<', L'>', L'\\', L'/', L'\"', 0x0001, 0x0002};
 /**
