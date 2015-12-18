@@ -3100,7 +3100,7 @@ DisplaySPSCharacteristics (
   // Bits 13:10 - DMTF Power Supply Type
   //
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TYPE), gShellDebug1HiiHandle);
-  Temp = (Characteristics & 0x1C00) << 10;
+  Temp = (Characteristics & 0x1C00) >> 10;
   switch (Temp) {
   case 1:
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_OTHER_SPACE), gShellDebug1HiiHandle);
@@ -3141,7 +3141,7 @@ DisplaySPSCharacteristics (
   // Bits 9:7 - Status
   //
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_STATUS_DASH), gShellDebug1HiiHandle);
-  Temp = (Characteristics & 0x380) << 7;
+  Temp = (Characteristics & 0x380) >> 7;
   switch (Temp) {
   case 1:
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_OTHER_SPACE), gShellDebug1HiiHandle);
@@ -3170,7 +3170,7 @@ DisplaySPSCharacteristics (
   // Bits 6:3 - DMTF Input Voltage Range Switching
   //
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_INPUT_VOLTAGE_RANGE), gShellDebug1HiiHandle);
-  Temp = (Characteristics & 0x78) << 3;
+  Temp = (Characteristics & 0x78) >> 3;
   switch (Temp) {
   case 1:
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_OTHER_SPACE), gShellDebug1HiiHandle);
