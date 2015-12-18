@@ -199,16 +199,6 @@ AsmInitializeGdt (
   );
 
 /**
-  Assembly code to do CLI-HALT loop.
-
-**/
-VOID
-EFIAPI
-AsmCliHltLoop (
-  VOID
-  );
-
-/**
   Get available system memory below 1MB by specified size.
 
   @param PeiCpuMpData        Pointer to PEI CPU MP Data
