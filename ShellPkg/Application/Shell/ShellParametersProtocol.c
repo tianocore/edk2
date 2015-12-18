@@ -17,6 +17,8 @@
 
 #include "Shell.h"
 
+BOOLEAN AsciiRedirection = FALSE;
+
 /**
   Return the next parameter's end from a command line string.
 
@@ -726,6 +728,7 @@ UpdateStdInStdOutStdErr(
 
   OutUnicode      = TRUE;
   InUnicode       = TRUE;
+  AsciiRedirection = FALSE;
   ErrUnicode      = TRUE;
   StdInVarName    = NULL;
   StdOutVarName   = NULL;
@@ -1004,6 +1007,7 @@ UpdateStdInStdOutStdErr(
     } else {
       StdInFileName   = CommandLineWalker += 4;
       InUnicode       = FALSE;
+      AsciiRedirection = TRUE;
     }
     if (StrStr(CommandLineWalker, L" <a ") != NULL) {
       Status = EFI_NOT_FOUND;
