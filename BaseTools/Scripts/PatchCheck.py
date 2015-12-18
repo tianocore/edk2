@@ -285,6 +285,10 @@ class GitDiffCheck:
                 self.set_filename(line[6:].rstrip())
             if line.startswith('@@ '):
                 self.state = PATCH
+                self.binary = False
+            elif line.startswith('GIT binary patch'):
+                self.state = PATCH
+                self.binary = True
             else:
                 ok = False
                 for pfx in self.pre_patch_prefixes:
@@ -294,6 +298,8 @@ class GitDiffCheck:
                     self.format_error("didn't find diff hunk marker (@@)")
             self.line_num += 1
         elif self.state == PATCH:
+            if self.binary:
+                pass
             if line.startswith('-'):
                 pass
             elif line.startswith('+'):
