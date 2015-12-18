@@ -1716,7 +1716,7 @@ CheckRemainingSpaceForConsistencyInternal (
   ASSERT_EFI_ERROR (Status);
 
   TotalNeededSize = 0;
-  Args = Marker;
+  VA_COPY (Args, Marker);
   VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   while (VariableEntry != NULL) {
     //
@@ -1745,7 +1745,7 @@ CheckRemainingSpaceForConsistencyInternal (
     return FALSE;
   }
 
-  Args = Marker;
+  VA_COPY (Args, Marker);
   VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   while (VariableEntry != NULL) {
     //
