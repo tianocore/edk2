@@ -53,7 +53,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 BOOLEAN                           mMeasureGptTableFlag = FALSE;
 UINTN                             mMeasureGptCount = 0;
 VOID                              *mFileBuffer;
-UINTN                             mImageSize;
+UINTN                             mTpmImageSize;
 //
 // Measured FV handle cache
 //
@@ -95,11 +95,11 @@ DxeTpmMeasureBootLibImageRead (
   }
 
   EndPosition = FileOffset + *ReadSize;
-  if (EndPosition > mImageSize) {
-    *ReadSize = (UINT32)(mImageSize - FileOffset);
+  if (EndPosition > mTpmImageSize) {
+    *ReadSize = (UINT32)(mTpmImageSize - FileOffset);
   }
 
-  if (FileOffset >= mImageSize) {
+  if (FileOffset >= mTpmImageSize) {
     *ReadSize = 0;
   }
 
@@ -908,7 +908,7 @@ DxeTpmMeasureBootHandler (
     goto Finish;
   }
 
-  mImageSize  = FileSize;
+  mTpmImageSize  = FileSize;
   mFileBuffer = FileBuffer;
 
   //
