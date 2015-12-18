@@ -78,5 +78,17 @@
   # @Prompt Type Value of Dhcp6 Unique Identifier (DUID).
   gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType|4|UINT8|0x10000001
 
+  ## Network boot policy to stop UEFI iSCSI if applicable.
+  # 0x00 = Always use UEFI iSCSI and ignore AIP.
+  # 0x01 = Stop UEFI iSCSI if iSCSI HBA adapter produces AIP protocol with Network Boot.
+  # 0x02 = Stop UEFI iSCSI if iSCSI HBA adapter supports booting from iSCSI IPv4 targets.
+  # 0x04 = Stop UEFI iSCSI if iSCSI HBA adapter supports booting from iSCSI IPv6 targets.
+  # 0x08 = Stop UEFI iSCSI if iSCSI HBA adapter supports an offload engine for iSCSI boot.
+  # 0x10 = Stop UEFI iSCSI if iSCSI HBA adapter supports multipath I/O for iSCSI boot.
+  # 0x20 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv4 targets.
+  # 0x40 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv6 targets.
+  # @Prompt Type Value of network boot policy used in iSCSI.
+  gEfiNetworkPkgTokenSpaceGuid.PcdIScsiAIPNetworkBootPolicy|0x08|UINT8|0x10000007
+
 [UserExtensions.TianoCore."ExtraFiles"]
   NetworkPkgExtra.uni

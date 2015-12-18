@@ -74,6 +74,142 @@ IScsiIsDevicePathSupported (
   return EFI_SUCCESS;
 }
 
+/**
+  Check whether an iSCSI HBA adapter already installs an AIP instance with
+  network boot policy matching the value specified in PcdIScsiAIPNetworkBootPolicy.
+  If yes, return EFI_SUCCESS.
+
+  @retval EFI_SUCCESS              Found an AIP with matching network boot policy.
+  @retval EFI_NOT_FOUND            AIP is unavailable or the network boot policy
+                                   not matched.
+**/
+EFI_STATUS
+IScsiCheckAip (
+  )
+{
+  UINTN                            AipHandleCount;
+  EFI_HANDLE                       *AipHandleBuffer;
+  UINTN                            AipIndex;
+  EFI_ADAPTER_INFORMATION_PROTOCOL *Aip;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *ExtScsiPassThru;
+  EFI_GUID                         *InfoTypesBuffer;
+  UINTN                            InfoTypeBufferCount;
+  UINTN                            TypeIndex;
+  VOID                             *InfoBlock;
+  UINTN                            InfoBlockSize;
+  BOOLEAN                          Supported;
+  EFI_ADAPTER_INFO_NETWORK_BOOT    *NetworkBoot;
+  EFI_STATUS                       Status;
+  UINT8                            NetworkBootPolicy;
+
+  //
+  // Check any AIP instances exist in system.
+  //
+  AipHandleCount = 0;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiAdapterInformationProtocolGuid,
+                  NULL,
+                  &AipHandleCount,
+                  &AipHandleBuffer
+                  );
+  if (EFI_ERROR (Status) || AipHandleCount == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  InfoBlock = NULL;
+
+  for (AipIndex = 0; AipIndex < AipHandleCount; AipIndex++) {
+    Status = gBS->HandleProtocol (
+                    AipHandleBuffer[AipIndex],
+                    &gEfiAdapterInformationProtocolGuid,
+                    (VOID *) &Aip
+                    );
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (Aip != NULL);
+
+    Status = gBS->HandleProtocol (
+                    AipHandleBuffer[AipIndex],
+                    &gEfiExtScsiPassThruProtocolGuid,
+                    (VOID *) &ExtScsiPassThru
+                    );
+    if (EFI_ERROR (Status) || ExtScsiPassThru == NULL) {
+      continue;
+    }
+
+    InfoTypesBuffer     = NULL;
+    InfoTypeBufferCount = 0;
+    Status = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
+    if (EFI_ERROR (Status) || InfoTypesBuffer == NULL) {
+      continue;
+    }
+    //
+    // Check whether the AIP instance has Network boot information block.
+    //
+    Supported = FALSE;
+    for (TypeIndex = 0; TypeIndex < InfoTypeBufferCount; TypeIndex++) {
+      if (CompareGuid (&InfoTypesBuffer[TypeIndex], &gEfiAdapterInfoNetworkBootGuid)) {
+        Supported = TRUE;
+        break;
+      }
+    }
+
+    FreePool (InfoTypesBuffer);
+    if (!Supported) {
+      continue;
+    }
+
+    //
+    // We now have network boot information block.
+    //
+    InfoBlock     = NULL;
+    InfoBlockSize = 0;
+    Status = Aip->GetInformation (Aip, &gEfiAdapterInfoNetworkBootGuid, &InfoBlock, &InfoBlockSize);
+    if (EFI_ERROR (Status) || InfoBlock == NULL) {
+      continue;
+    }
+
+    //
+    // Check whether the network boot policy matches.
+    //
+    NetworkBoot = (EFI_ADAPTER_INFO_NETWORK_BOOT *) InfoBlock;
+    NetworkBootPolicy = PcdGet8 (PcdIScsiAIPNetworkBootPolicy);
+
+    if (NetworkBootPolicy == STOP_UEFI_ISCSI_IF_HBA_INSTALL_AIP) {
+      Status = EFI_SUCCESS;
+      goto Exit;
+    }
+    if (((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP4) != 0 &&
+         !NetworkBoot->iScsiIpv4BootCapablity) ||
+         ((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP6) != 0 &&
+         !NetworkBoot->iScsiIpv6BootCapablity) ||
+         ((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_OFFLOAD) != 0 &&
+         !NetworkBoot->OffloadCapability) ||
+         ((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_MPIO) != 0 &&
+         !NetworkBoot->iScsiMpioCapability) ||
+         ((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_CONFIGURED_IP4) != 0 &&
+         !NetworkBoot->iScsiIpv4Boot) ||
+         ((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_CONFIGURED_IP6) != 0 &&
+         !NetworkBoot->iScsiIpv6Boot)) {
+      FreePool (InfoBlock);
+      continue;
+    }
+
+    Status = EFI_SUCCESS;
+    goto Exit;
+  }
+
+  Status = EFI_NOT_FOUND;
+
+Exit:
+  if (InfoBlock != NULL) {
+    FreePool (InfoBlock);
+  }
+  if (AipHandleBuffer != NULL) {
+    FreePool (AipHandleBuffer);
+  }
+  return Status;
+}
 
 /**
   Tests to see if this driver supports a given controller. This is the worker function for
@@ -215,6 +351,7 @@ IScsiStart (
   BOOLEAN                         NeedUpdate;
   VOID                            *Interface;
   EFI_GUID                        *ProtocolGuid;
+  UINT8                           NetworkBootPolicy;
 
   //
   // Test to see if iSCSI driver supports the given controller.
@@ -256,6 +393,20 @@ IScsiStart (
     return EFI_UNSUPPORTED;
   }
 
+  NetworkBootPolicy = PcdGet8 (PcdIScsiAIPNetworkBootPolicy);
+  if (NetworkBootPolicy != ALWAYS_USE_UEFI_ISCSI_AND_IGNORE_AIP) {
+    //
+    // Check existing iSCSI AIP.
+    //
+    Status = IScsiCheckAip ();
+    if (!EFI_ERROR (Status)) {
+      //
+      // Find iSCSI AIP with specified network boot policy. return EFI_ABORTED.
+      //
+      return EFI_ABORTED;
+    }
+  }
+  
   //
   // Record the incoming NIC info.
   //
