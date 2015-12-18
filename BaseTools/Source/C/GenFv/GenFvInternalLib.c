@@ -2854,17 +2854,18 @@ Returns:
     fclose (fpin);
     
     if (FvInfoPtr->IsPiFvImage) {
-	    //
-	    // Check whether this ffs file is vtf file
-	    //
-	    if (IsVtfFile (&FfsHeader)) {
-	      if (VtfFileFlag) {
-	        //
-	        // One Fv image can't have two vtf files.
-	        //
-	        return EFI_ABORTED;
-	      }
-	      VtfFileFlag = TRUE;
+        //
+        // Check whether this ffs file is vtf file
+        //
+        if (IsVtfFile (&FfsHeader)) {
+          if (VtfFileFlag) {
+            //
+            // One Fv image can't have two vtf files.
+            //
+            Error (NULL, 0, 3000,"Invalid", "One Fv image can't have two vtf files.");
+            return EFI_ABORTED;
+          }
+          VtfFileFlag = TRUE;
         VtfFileSize = FfsFileSize;
         continue;
       }
