@@ -399,7 +399,7 @@ ApCFunction (
   @param PeiCpuMpData       Pointer to PEI CPU MP Data
   @param Broadcast          TRUE:  Send broadcast IPI to all APs
                             FALSE: Send IPI to AP by ApicId
-  @param ApicId             Apic ID for the processor to be waked
+  @param ProcessorNumber    The handle number of specified processor
   @param Procedure          The function to be invoked by AP
   @param ProcedureArgument  The argument to be passed into AP function
 **/
@@ -407,12 +407,13 @@ VOID
 WakeUpAP (
   IN PEI_CPU_MP_DATA           *PeiCpuMpData,
   IN BOOLEAN                   Broadcast,
-  IN UINT32                    ApicId,
+  IN UINTN                     ProcessorNumber,
   IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
   IN VOID                      *ProcedureArgument      OPTIONAL
   )
 {
   volatile MP_CPU_EXCHANGE_INFO    *ExchangeInfo;
+  UINTN                            Index;
 
   PeiCpuMpData->ApFunction         = (UINTN) Procedure;
   PeiCpuMpData->ApFunctionArgument = (UINTN) ProcedureArgument;
@@ -436,12 +437,40 @@ WakeUpAP (
   CopyMem ((VOID *)&ExchangeInfo->GdtrProfile, &mGdt, sizeof(mGdt));
   AsmReadIdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->IdtrProfile);
 
-  if (Broadcast) {
-    SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
-  } else {
-    SendInitSipiSipi (ApicId, (UINT32) ExchangeInfo->BufferStart);
+  if (PeiCpuMpData->ApLoopMode == ApInMwaitLoop) {
+    //
+    // Get AP target C-state each time when waking up AP,
+    // for it maybe updated by platform again
+    //
+    PeiCpuMpData->ApTargetCState = PcdGet8 (PcdCpuApTargetCstate);
   }
 
+  //
+  // Wakeup APs per AP loop state
+  //
+  if (PeiCpuMpData->ApLoopMode == ApInHltLoop || PeiCpuMpData->InitFlag) {
+    if (Broadcast) {
+      SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
+    } else {
+      SendInitSipiSipi (
+        PeiCpuMpData->CpuData[ProcessorNumber].ApicId,
+        (UINT32) ExchangeInfo->BufferStart
+        );
+    }
+  } else if ((PeiCpuMpData->ApLoopMode == ApInMwaitLoop) ||
+             (PeiCpuMpData->ApLoopMode == ApInRunLoop)) {
+    if (Broadcast) {
+      for (Index = 0; Index < PeiCpuMpData->CpuCount; Index++) {
+        if (Index != PeiCpuMpData->BspNumber) {
+          *(PeiCpuMpData->CpuData[Index].StartupApSignal) = WAKEUP_AP_SIGNAL;
+        }
+      }
+    } else {
+      *(PeiCpuMpData->CpuData[ProcessorNumber].StartupApSignal) = WAKEUP_AP_SIGNAL;
+    }
+  } else {
+    ASSERT (FALSE);
+  }
   return ;
 }
 
@@ -600,7 +629,7 @@ CountProcessorNumber (
     if (PeiCpuMpData->X2ApicEnable) {
       DEBUG ((EFI_D_INFO, "Force x2APIC mode!\n"));
       //
-      // Send 2nd broadcast IPI to all APs to enable x2APIC mode
+      // Wakeup all APs to enable x2APIC mode
       //
       WakeUpAP (PeiCpuMpData, TRUE, 0, ApFuncEnableX2Apic, NULL);
       //

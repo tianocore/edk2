@@ -255,7 +255,7 @@ CpuMpEndOfPeiCallback (
   @param PeiCpuMpData       Pointer to PEI CPU MP Data
   @param Broadcast          TRUE:  Send broadcast IPI to all APs
                             FALSE: Send IPI to AP by ApicId
-  @param ApicId             Apic ID for the processor to be waked
+  @param ProcessorNumber    The handle number of specified processor
   @param Procedure          The function to be invoked by AP
   @param ProcedureArgument  The argument to be passed into AP function
 **/
@@ -263,7 +263,7 @@ VOID
 WakeUpAP (
   IN PEI_CPU_MP_DATA           *PeiCpuMpData,
   IN BOOLEAN                   Broadcast,
-  IN UINT32                    ApicId,
+  IN UINTN                     ProcessorNumber,
   IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
   IN VOID                      *ProcedureArgument      OPTIONAL
   );
