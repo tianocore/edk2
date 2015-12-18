@@ -118,6 +118,54 @@ ApFuncEnableX2Apic (
 }
 
 /**
+  Get AP loop mode.
+
+  @param MonitorFilterSize  Returns the largest monitor-line size in bytes.
+
+  @return The AP loop mode.
+**/
+UINT8
+GetApLoopMode (
+  OUT UINT16     *MonitorFilterSize
+  )
+{
+  UINT8          ApLoopMode;
+  UINT32         RegEbx;
+  UINT32         RegEcx;
+  UINT32         RegEdx;
+
+  ASSERT (MonitorFilterSize != NULL);
+
+  ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
+  ASSERT (ApLoopMode >= ApInHltLoop && ApLoopMode <= ApInRunLoop);
+  if (ApLoopMode == ApInMwaitLoop) {
+    AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, &RegEcx, NULL);
+    if ((RegEcx & BIT3) == 0) {
+      //
+      // If processor does not support MONITOR/MWAIT feature
+      // by CPUID.[EAX=01H]:ECX.BIT3, force AP in Hlt-loop mode
+      //
+      ApLoopMode = ApInHltLoop;
+    }
+  }
+
+  if (ApLoopMode == ApInHltLoop) {
+    *MonitorFilterSize = 0;
+  } else if (ApLoopMode == ApInRunLoop) {
+    *MonitorFilterSize = sizeof (UINT32);
+  } else if (ApLoopMode == ApInMwaitLoop) {
+    //
+    // CPUID.[EAX=05H]:EBX.BIT0-15: Largest monitor-line size in bytes
+    // CPUID.[EAX=05H].EDX: C-states supported using MWAIT
+    //
+    AsmCpuid (CPUID_MONITOR_MWAIT, NULL, &RegEbx, NULL, &RegEdx);
+    *MonitorFilterSize = RegEbx & 0xFFFF;
+  }
+
+  return ApLoopMode;
+}
+
+/**
   Get CPU MP Data pointer from the Guided HOB.
 
   @return  Pointer to Pointer to PEI CPU MP Data
