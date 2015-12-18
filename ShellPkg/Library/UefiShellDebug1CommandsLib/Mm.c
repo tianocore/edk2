@@ -317,6 +317,7 @@ ShellMmLocateIoProtocol (
   }
 
   *PciRootBridgeIo = NULL;
+  HandleBuffer     = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
                   &gEfiPciRootBridgeIoProtocolGuid,
@@ -324,7 +325,7 @@ ShellMmLocateIoProtocol (
                   &HandleCount,
                   &HandleBuffer
                   );
-  if (EFI_ERROR (Status) || (HandleCount == 0)) {
+  if (EFI_ERROR (Status) || (HandleCount == 0) || (HandleBuffer == NULL)) {
     return FALSE;
   }
 
