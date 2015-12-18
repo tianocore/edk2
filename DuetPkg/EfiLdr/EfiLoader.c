@@ -24,6 +24,9 @@ Revision History:
 #include "PeLoader.h"
 #include "LzmaDecompress.h"
 
+EFILDR_LOADED_IMAGE    DxeCoreImage;
+EFILDR_LOADED_IMAGE    DxeIplImage;
+
 VOID
 SystemHang (
   CHAR8        *Message
