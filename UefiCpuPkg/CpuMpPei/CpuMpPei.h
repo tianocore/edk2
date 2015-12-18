@@ -72,7 +72,7 @@ typedef struct {
 
 typedef struct _PEI_CPU_MP_DATA  PEI_CPU_MP_DATA;
 
-#pragma pack()
+#pragma pack(1)
 
 typedef union {
   struct {
@@ -95,6 +95,8 @@ typedef union {
 
 //
 // MP CPU exchange information for AP reset code
+// This structure is required to be packed because fixed field offsets
+// into this structure are used in assembly code in this module
 //
 typedef struct {
   UINTN                 Lock;
