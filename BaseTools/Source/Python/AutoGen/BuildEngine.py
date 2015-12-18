@@ -388,7 +388,7 @@ class BuildRule:
             
             # find the build_rule_version
             if Line and Line[0] == "#" and Line.find(TAB_BUILD_RULE_VERSION) <> -1:
-                if Line.find("=") <> -1 and Line.find("=") < (len(Line)-1) and (Line[(Line.find("=") + 1):]).split():
+                if Line.find("=") <> -1 and Line.find("=") < (len(Line) - 1) and (Line[(Line.find("=") + 1):]).split():
                     self._FileVersion = (Line[(Line.find("=") + 1):]).split()[0]
             # skip empty or comment line
             if Line == "" or Line[0] == "#":
@@ -470,16 +470,16 @@ class BuildRule:
             if TokenList[0] == "BUILD":
                 if len(TokenList) == 1:
                     EdkLogger.error("build", FORMAT_INVALID, "Invalid rule section",
-                                    File=self.RuleFile, Line=LineIndex+1,
+                                    File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData=self.RuleContent[LineIndex])
 
                 FileType = TokenList[1]
                 if FileType == '':
                     EdkLogger.error("build", FORMAT_INVALID, "No file type given",
-                                    File=self.RuleFile, Line=LineIndex+1,
+                                    File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData=self.RuleContent[LineIndex])
                 if self._FileTypePattern.match(FileType) == None:
-                    EdkLogger.error("build", FORMAT_INVALID, File=self.RuleFile, Line=LineIndex+1,
+                    EdkLogger.error("build", FORMAT_INVALID, File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData="Only character, number (non-first character), '_' and '-' are allowed in file type")
             # new format: File-Type.Build-Type.Arch
             else:
@@ -488,7 +488,7 @@ class BuildRule:
                 elif FileType != TokenList[0]:
                     EdkLogger.error("build", FORMAT_INVALID,
                                     "Different file types are not allowed in the same rule section",
-                                    File=self.RuleFile, Line=LineIndex+1,
+                                    File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData=self.RuleContent[LineIndex])
                 if len(TokenList) > 1:
                     BuildType = TokenList[1]
@@ -502,12 +502,12 @@ class BuildRule:
         if 'COMMON' in self._BuildTypeList and len(self._BuildTypeList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific build types must not be mixed with common one",
-                            File=self.RuleFile, Line=LineIndex+1,
+                            File=self.RuleFile, Line=LineIndex + 1,
                             ExtraData=self.RuleContent[LineIndex])
         if 'COMMON' in self._ArchList and len(self._ArchList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific ARCH must not be mixed with common one",
-                            File=self.RuleFile, Line=LineIndex+1,
+                            File=self.RuleFile, Line=LineIndex + 1,
                             ExtraData=self.RuleContent[LineIndex])
 
         self._FileType = FileType
@@ -531,7 +531,7 @@ class BuildRule:
             elif SectionType != Type:
                 EdkLogger.error("build", FORMAT_INVALID,
                                 "Two different section types are not allowed in the same sub-section",
-                                File=self.RuleFile, Line=LineIndex+1,
+                                File=self.RuleFile, Line=LineIndex + 1,
                                 ExtraData=self.RuleContent[LineIndex])
 
             if len(TokenList) > 1:
@@ -548,10 +548,10 @@ class BuildRule:
         if 'COMMON' in FamilyList and len(FamilyList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific tool chain family should not be mixed with general one",
-                            File=self.RuleFile, Line=LineIndex+1,
+                            File=self.RuleFile, Line=LineIndex + 1,
                             ExtraData=self.RuleContent[LineIndex])
         if self._State not in self._StateHandler:
-            EdkLogger.error("build", FORMAT_INVALID, File=self.RuleFile, Line=LineIndex+1,
+            EdkLogger.error("build", FORMAT_INVALID, File=self.RuleFile, Line=LineIndex + 1,
                             ExtraData="Unknown subsection: %s" % self.RuleContent[LineIndex])
     ## Parse <InputFile> sub-section
     #

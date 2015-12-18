@@ -34,7 +34,7 @@ import Common.DataType
 import Common.GlobalData as GlobalData
 from Common import EdkLogger
 from Common.String import *
-from Common.Misc import DirCache,PathClass
+from Common.Misc import DirCache, PathClass
 from Common.Misc import SaveFileOnChange
 from Common.Misc import ClearDuplicatedInf
 from Common.Misc import GuidStructureStringToGuidString
@@ -93,7 +93,7 @@ def main():
             if 'EDK_SOURCE' in os.environ.keys():
                 GenFdsGlobalVariable.EdkSourceDir = os.path.normcase(os.environ['EDK_SOURCE'])
             if (Options.debug):
-                GenFdsGlobalVariable.VerboseLogger( "Using Workspace:" + Workspace)
+                GenFdsGlobalVariable.VerboseLogger("Using Workspace:" + Workspace)
         os.chdir(GenFdsGlobalVariable.WorkSpaceDir)
         
         # set multiple workspace
@@ -106,7 +106,7 @@ def main():
 
             if FdfFilename[0:2] == '..':
                 FdfFilename = os.path.realpath(FdfFilename)
-            if not os.path.isabs (FdfFilename):
+            if not os.path.isabs(FdfFilename):
                 FdfFilename = mws.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
             if not os.path.exists(FdfFilename):
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=FdfFilename)
@@ -287,7 +287,7 @@ def main():
         GenFds.DisplayFvSpaceInfo(FdfParserObj)
 
     except FdfParser.Warning, X:
-        EdkLogger.error(X.ToolName, FORMAT_INVALID, File=X.FileName, Line=X.LineNumber, ExtraData=X.Message, RaiseError = False)
+        EdkLogger.error(X.ToolName, FORMAT_INVALID, File=X.FileName, Line=X.LineNumber, ExtraData=X.Message, RaiseError=False)
         ReturnCode = FORMAT_INVALID
     except FatalError, X:
         if Options.debug != None:
@@ -326,7 +326,7 @@ def SingleCheckCallback(option, opt_str, value, parser):
 #
 def myOptionParser():
     usage = "%prog [options] -f input_file -a arch_list -b build_target -p active_platform -t tool_chain_tag -D \"MacroName [= MacroValue]\""
-    Parser = OptionParser(usage=usage,description=__copyright__,version="%prog " + str(versionNumber))
+    Parser = OptionParser(usage=usage, description=__copyright__, version="%prog " + str(versionNumber))
     Parser.add_option("-f", "--file", dest="filename", type="string", help="Name of FDF file to convert", action="callback", callback=SingleCheckCallback)
     Parser.add_option("-a", "--arch", dest="archList", help="comma separated list containing one or more of: IA32, X64, IPF, ARM, AARCH64 or EBC which should be built, overrides target.txt?s TARGET_ARCH")
     Parser.add_option("-q", "--quiet", action="store_true", type=None, help="Disable all messages except FATAL ERRORS.")
@@ -503,8 +503,8 @@ class GenFds :
             if UsedSizeValue == TotalSizeValue:
                 Percentage = '100'
             else:
-                Percentage = str((UsedSizeValue+0.0)/TotalSizeValue)[0:4].lstrip('0.') 
-            
+                Percentage = str((UsedSizeValue + 0.0) / TotalSizeValue)[0:4].lstrip('0.')
+
             GenFdsGlobalVariable.InfLogger(Name + ' ' + '[' + Percentage + '%Full] ' + str(TotalSizeValue) + ' total, ' + str(UsedSizeValue) + ' used, ' + str(FreeSizeValue) + ' free')
 
     ## PreprocessImage()

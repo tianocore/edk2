@@ -27,19 +27,19 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 #
 def ConvertTextFileToDictionary(FileName, Dictionary, CommentCharacter, KeySplitCharacter, ValueSplitFlag, ValueSplitCharacter):
     try:
-        F = open(FileName,'r')
+        F = open(FileName, 'r')
         Keys = []
         for Line in F:
             if Line.startswith(CommentCharacter):
                 continue
-            LineList = Line.split(KeySplitCharacter,1)
+            LineList = Line.split(KeySplitCharacter, 1)
             if len(LineList) >= 2:
                 Key = LineList[0].split()
             if len(Key) == 1 and Key[0][0] != CommentCharacter and Key[0] not in Keys:
                 if ValueSplitFlag:
-                    Dictionary[Key[0]] = LineList[1].replace('\\','/').split(ValueSplitCharacter)
+                    Dictionary[Key[0]] = LineList[1].replace('\\', '/').split(ValueSplitCharacter)
                 else:
-                    Dictionary[Key[0]] = LineList[1].strip().replace('\\','/')
+                    Dictionary[Key[0]] = LineList[1].strip().replace('\\', '/')
                 Keys += [Key[0]]
         F.close()
         return 0

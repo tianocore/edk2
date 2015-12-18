@@ -68,14 +68,14 @@ class TableReport(Table):
     # @param Enabled:        If this error enabled
     # @param Corrected:      if this error corrected
     #
-    def Insert(self, ErrorID, OtherMsg = '', BelongsToTable = '', BelongsToItem = -1, Enabled = 0, Corrected = -1):
+    def Insert(self, ErrorID, OtherMsg='', BelongsToTable='', BelongsToItem= -1, Enabled=0, Corrected= -1):
         self.ID = self.ID + 1
         SqlCommand = """insert into %s values(%s, %s, '%s', '%s', %s, %s, %s)""" \
                      % (self.Table, self.ID, ErrorID, ConvertToSqlString2(OtherMsg), BelongsToTable, BelongsToItem, Enabled, Corrected)
         Table.Insert(self, SqlCommand)
-        
+
         return self.ID
-    
+
     ## Query table
     #
     # @retval:       A recordSet of all found records 
@@ -98,7 +98,7 @@ class TableReport(Table):
     #
     # @param Filename:  To filename to save the report content
     #
-    def ToCSV(self, Filename = 'Report.csv'):
+    def ToCSV(self, Filename='Report.csv'):
         try:
             File = open(Filename, 'w+')
             File.write("""No, Error Code, Error Message, File, LineNo, Other Error Message\n""")
@@ -123,7 +123,7 @@ class TableReport(Table):
                 if NewRecord != []:
                     File.write("""%s,%s,"%s",%s,%s,"%s"\n""" % (Index, ErrorID, EccToolError.gEccErrorMessage[ErrorID], NewRecord[0][1], NewRecord[0][0], OtherMsg))
                     EdkLogger.quiet("%s(%s): [%s]%s %s" % (NewRecord[0][1], NewRecord[0][0], ErrorID, EccToolError.gEccErrorMessage[ErrorID], OtherMsg))
-                    
+
             File.close()
         except IOError:
             NewFilename = 'Report_' + time.strftime("%Y%m%d_%H%M%S.csv", time.localtime())

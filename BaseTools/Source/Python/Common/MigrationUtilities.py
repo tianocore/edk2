@@ -423,7 +423,7 @@ def StoreHeader(TextFile, CommonHeader):
     Description = CommonHeader.Description
     License = CommonHeader.License
 
-    Header =  "#/** @file\n#\n"
+    Header = "#/** @file\n#\n"
     Header += "# " + Abstract + "\n#\n"
     Header += "# " + Description.strip().replace("\n", "\n# ") + "\n"
     Header += "# " + CopyRight + "\n#\n"
@@ -519,7 +519,7 @@ def GetXmlFileInfo(FileName, TagTuple):
 # @retval Options            A optparse object containing the parsed options.
 # @retval InputFile          Path of an source file to be migrated.
 #
-def MigrationOptionParser(Source, Destinate, ToolName, VersionNumber = 1.0):
+def MigrationOptionParser(Source, Destinate, ToolName, VersionNumber=1.0):
     # use clearer usage to override default usage message
     UsageString = "%s [-a] [-v|-q] [-o <output_file>] <input_file>" % ToolName
     Version = "%s Version %.2f" % (ToolName, VersionNumber)

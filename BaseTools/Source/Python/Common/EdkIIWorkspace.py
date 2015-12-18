@@ -59,7 +59,7 @@ class EdkIIWorkspace:
             #
             # Load TianoCoreOrgLogo, used for GUI tool
             #
-            self.Icon = wx.Icon(self.WorkspaceFile('tools/Python/TianoCoreOrgLogo.gif'),wx.BITMAP_TYPE_GIF)
+            self.Icon = wx.Icon(self.WorkspaceFile('tools/Python/TianoCoreOrgLogo.gif'), wx.BITMAP_TYPE_GIF)
         except:
             self.Icon = None
             
@@ -151,7 +151,7 @@ class EdkIIWorkspace:
     def XmlParseFileSection (self, FileName, SectionTag):
         if self.Verbose:
             print FileName
-        return XmlParseFileSection (self.WorkspaceFile(FileName), SectionTag)        
+        return XmlParseFileSection (self.WorkspaceFile(FileName), SectionTag)
 
     ## Save a XML file
     #
@@ -219,19 +219,19 @@ class EdkIIWorkspace:
 #
 def ConvertTextFileToDictionary(FileName, Dictionary, CommentCharacter, KeySplitCharacter, ValueSplitFlag, ValueSplitCharacter):
     try:
-        F = open(FileName,'r')
+        F = open(FileName, 'r')
     except:
         return False
     Keys = []
     for Line in F:
-        LineList = Line.split(KeySplitCharacter,1)
+        LineList = Line.split(KeySplitCharacter, 1)
         if len(LineList) >= 2:
             Key = LineList[0].split()
-            if len(Key) == 1 and Key[0][0] != CommentCharacter and Key[0] not in Keys: 
+            if len(Key) == 1 and Key[0][0] != CommentCharacter and Key[0] not in Keys:
                 if ValueSplitFlag:
-                    Dictionary[Key[0]] = LineList[1].replace('\\','/').split(ValueSplitCharacter)
+                    Dictionary[Key[0]] = LineList[1].replace('\\', '/').split(ValueSplitCharacter)
                 else:
-                    Dictionary[Key[0]] = LineList[1].strip().replace('\\','/')
+                    Dictionary[Key[0]] = LineList[1].strip().replace('\\', '/')
                 Keys += [Key[0]]
     F.close()
     return True
@@ -252,7 +252,7 @@ def ConvertTextFileToDictionary(FileName, Dictionary, CommentCharacter, KeySplit
 #
 def ConvertDictionaryToTextFile(FileName, Dictionary, CommentCharacter, KeySplitCharacter, ValueSplitFlag, ValueSplitCharacter):
     try:
-        F = open(FileName,'r')
+        F = open(FileName, 'r')
         Lines = []
         Lines = F.readlines()
         F.close()
@@ -265,7 +265,7 @@ def ConvertDictionaryToTextFile(FileName, Dictionary, CommentCharacter, KeySplit
             MaxLength = len(Key)
     Index = 0
     for Line in Lines:
-        LineList = Line.split(KeySplitCharacter,1)
+        LineList = Line.split(KeySplitCharacter, 1)
         if len(LineList) >= 2:
             Key = LineList[0].split()
             if len(Key) == 1 and Key[0][0] != CommentCharacter and Key[0] in Dictionary:
@@ -275,17 +275,17 @@ def ConvertDictionaryToTextFile(FileName, Dictionary, CommentCharacter, KeySplit
                     Line = '%-*s %c %s\n' % (MaxLength, Key[0], KeySplitCharacter, Dictionary[Key[0]])
                 Lines.pop(Index)
                 if Key[0] in Keys:
-                    Lines.insert(Index,Line)
+                    Lines.insert(Index, Line)
                     Keys.remove(Key[0])
         Index += 1
     for RemainingKey in Keys:
         if ValueSplitFlag:
-            Line = '%-*s %c %s\n' % (MaxLength, RemainingKey, KeySplitCharacter,' '.join(Dictionary[RemainingKey])) 
+            Line = '%-*s %c %s\n' % (MaxLength, RemainingKey, KeySplitCharacter, ' '.join(Dictionary[RemainingKey]))
         else:
             Line = '%-*s %c %s\n' % (MaxLength, RemainingKey, KeySplitCharacter, Dictionary[RemainingKey])
         Lines.append(Line)
     try:
-        F = open(FileName,'w')
+        F = open(FileName, 'w')
     except:
         return False
     F.writelines(Lines)

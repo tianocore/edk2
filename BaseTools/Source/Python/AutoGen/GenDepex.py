@@ -286,7 +286,7 @@ class DependencyExpression:
         # don't generate depex if only TRUE operand left
         if self.ModuleType == 'PEIM' and len(NewOperand) == 1 and NewOperand[0] == 'TRUE':
             self.PostfixNotation = []
-            return            
+            return
 
         # don't generate depex if all operands are architecture protocols
         if self.ModuleType in ['UEFI_DRIVER', 'DXE_DRIVER', 'DXE_RUNTIME_DRIVER', 'DXE_SAL_DRIVER', 'DXE_SMM_DRIVER'] and \
@@ -424,7 +424,7 @@ def Main():
         Dpx = DependencyExpression(DxsString, Option.ModuleType, Option.Optimize)
         if Option.OutputFile != None:
             FileChangeFlag = Dpx.Generate(Option.OutputFile)
-            if not FileChangeFlag and DxsFile: 
+            if not FileChangeFlag and DxsFile:
                 #
                 # Touch the output file if its time stamp is older than the original
                 # DXS file to avoid re-invoke this tool for the dependency check in build rule.

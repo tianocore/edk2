@@ -113,7 +113,7 @@ def DecToHexStr(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def DecToHexList(Dec, Digit = 8):
-    Hex = eval("'%0" + str(Digit) + "X' % int(Dec)" )
+    Hex = eval("'%0" + str(Digit) + "X' % int(Dec)")
     List = []
     for Bit in range(Digit - 2, -1, -2):
         List.append(HexHeader + Hex[Bit:Bit + 2])
@@ -192,7 +192,7 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
                 UnusedStr = WriteLine(UnusedStr, Line)
 
-    Str = ''.join([Str,UnusedStr])
+    Str = ''.join([Str, UnusedStr])
 
     Str = WriteLine(Str, '')
     if IsCompatibleMode or UniGenCFlag:
@@ -235,7 +235,7 @@ def CreateCFileHeader():
 #
 def CreateBinBuffer(BinBuffer, Array):
     for Item in Array:
-        BinBuffer.write(pack("B", int(Item,16)))
+        BinBuffer.write(pack("B", int(Item, 16)))
 
 ## Create a formatted string all items in an array
 #
@@ -258,7 +258,7 @@ def CreateArrayItem(Array, Width = 16):
             Index = Index + 1
         else:
             ArrayItem = WriteLine(ArrayItem, Line)
-            Line = '  ' + Item +  ',  '
+            Line = '  ' + Item + ',  '
             Index = 1
     ArrayItem = Write(ArrayItem, Line.rstrip())
 
@@ -320,7 +320,7 @@ def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
 
                 if PrimaryTag == UniLanguagePrimaryTag:
                     if UniLanguage not in UniLanguageListFiltered:
-                        UniLanguageListFiltered += [UniLanguage]    
+                        UniLanguageListFiltered += [UniLanguage]
                     break
             else:
                 # Here is rule 3 for "get best language"
@@ -368,7 +368,7 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
     
     UniLanguageList = []
     for IndexI in range(len(UniObjectClass.LanguageDef)):
-        UniLanguageList += [UniObjectClass.LanguageDef[IndexI][0]]           
+        UniLanguageList += [UniObjectClass.LanguageDef[IndexI][0]]
 
     UniLanguageListFiltered = GetFilteredLanguage(UniLanguageList, LanguageFilterList)
  
@@ -450,14 +450,14 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
         if UniBinBuffer:
             CreateBinBuffer (UniBinBuffer, List)
             UniBinBuffer.write (StringBuffer.getvalue())
-            UniBinBuffer.write (pack("B", int(EFI_HII_SIBT_END,16)))
+            UniBinBuffer.write (pack("B", int(EFI_HII_SIBT_END, 16)))
         StringBuffer.close()
 
     #
     # Create line for string variable name
     # "unsigned char $(BaseName)Strings[] = {"
     #
-    AllStr = WriteLine('', CHAR_ARRAY_DEFIN + ' ' + BaseName + COMMON_FILE_NAME + '[] = {\n' )
+    AllStr = WriteLine('', CHAR_ARRAY_DEFIN + ' ' + BaseName + COMMON_FILE_NAME + '[] = {\n')
 
     if IsCompatibleMode:
         #
@@ -618,13 +618,13 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
 # Write an item
 #
 def Write(Target, Item):
-    return ''.join([Target,Item])
+    return ''.join([Target, Item])
 
 #
 # Write an item with a break line
 #
 def WriteLine(Target, Item):
-    return ''.join([Target,Item,'\n'])
+    return ''.join([Target, Item, '\n'])
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
 # script.

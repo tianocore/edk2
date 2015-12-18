@@ -78,13 +78,13 @@ gLineMaxLength = 120
 gEndOfLine = "\r\n"
 
 ## Tags for section start, end and separator
-gSectionStart = ">" + "=" * (gLineMaxLength-2) + "<"
-gSectionEnd = "<" + "=" * (gLineMaxLength-2) + ">" + "\n"
+gSectionStart = ">" + "=" * (gLineMaxLength - 2) + "<"
+gSectionEnd = "<" + "=" * (gLineMaxLength - 2) + ">" + "\n"
 gSectionSep = "=" * gLineMaxLength
 
 ## Tags for subsection start, end and separator
-gSubSectionStart = ">" + "-" * (gLineMaxLength-2) + "<"
-gSubSectionEnd = "<" + "-" * (gLineMaxLength-2) + ">"
+gSubSectionStart = ">" + "-" * (gLineMaxLength - 2) + "<"
+gSubSectionEnd = "<" + "-" * (gLineMaxLength - 2) + ">"
 gSubSectionSep = "-" * gLineMaxLength
 
 
@@ -233,7 +233,7 @@ class DepexParser(object):
     def __init__(self, Wa):
         self._GuidDb = {}
         for Pa in Wa.AutoGenObjectList:
-            for Package in Pa.PackageList:        
+            for Package in Pa.PackageList:
                 for Protocol in Package.Protocols:
                     GuidValue = GuidStructureStringToGuidString(Package.Protocols[Protocol])
                     self._GuidDb[GuidValue.upper()] = Protocol
@@ -265,8 +265,8 @@ class DepexParser(object):
                 GuidString = self._GuidDb.get(GuidValue, GuidValue)
                 Statement = "%s %s" % (Statement, GuidString)
             DepexStatement.append(Statement)
-            OpCode = DepexFile.read(1)     
-        
+            OpCode = DepexFile.read(1)
+
         return DepexStatement
     
 ##
@@ -361,7 +361,7 @@ class DepexReport(object):
     #
     def __init__(self, M):
         self.Depex = ""
-        self._DepexFileName = os.path.join(M.BuildDir, "OUTPUT", M.Module.BaseName + ".depex") 
+        self._DepexFileName = os.path.join(M.BuildDir, "OUTPUT", M.Module.BaseName + ".depex")
         ModuleType = M.ModuleType
         if not ModuleType:
             ModuleType = gComponentType2ModuleType.get(M.ComponentType, "")
@@ -536,7 +536,7 @@ class ModuleReport(object):
             # If a module complies to PI 1.1, promote Module type to "SMM_DRIVER"
             #
             if ModuleType == "DXE_SMM_DRIVER":
-                PiSpec =  M.Module.Specification.get("PI_SPECIFICATION_VERSION", "0x00010000")
+                PiSpec = M.Module.Specification.get("PI_SPECIFICATION_VERSION", "0x00010000")
                 if int(PiSpec, 0) >= 0x0001000A:
                     ModuleType = "SMM_DRIVER"
             self.DriverType = gDriverTypeMap.get(ModuleType, "0x2 (FREE_FORM)")
@@ -813,20 +813,20 @@ class PcdReport(object):
                     # Report PCD item according to their override relationship
                     #
                     if DecMatch and InfMatch:
-                        FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
+                        FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                     else:
                         if DscMatch:
                             if (Pcd.TokenCName, Key) in self.FdfPcdSet:
-                                FileWrite(File, ' *F %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
+                                FileWrite(File, ' *F %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                             else:
-                                FileWrite(File, ' *P %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
+                                FileWrite(File, ' *P %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                         else:
-                            FileWrite(File, ' *M %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
-                    
+                            FileWrite(File, ' *M %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+
                     if TypeName in ('DYNHII', 'DEXHII', 'DYNVPD', 'DEXVPD'):
                         for SkuInfo in Pcd.SkuInfoList.values():
                             if TypeName in ('DYNHII', 'DEXHII'):
-                                FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))        
+                                FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))
                             else:
                                 FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
                                

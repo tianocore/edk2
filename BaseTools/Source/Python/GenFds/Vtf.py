@@ -67,80 +67,80 @@ class Vtf (VtfClassObject):
     def GenBsfInf (self):
         FvList = self.GetFvList()
         self.BsfInfName = os.path.join(GenFdsGlobalVariable.FvDir, self.UiName + '.inf')
-        BsfInf = open (self.BsfInfName, 'w+')
+        BsfInf = open(self.BsfInfName, 'w+')
         if self.ResetBin != None:
             BsfInf.writelines ("[OPTIONS]" + T_CHAR_LF)
-            BsfInf.writelines ("IA32_RST_BIN"     + \
-                               " = "              + \
+            BsfInf.writelines ("IA32_RST_BIN" + \
+                               " = " + \
                                GenFdsGlobalVariable.MacroExtend(GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.ResetBin)) + \
-                               T_CHAR_LF )
-            BsfInf.writelines (T_CHAR_LF )
-        
+                               T_CHAR_LF)
+            BsfInf.writelines (T_CHAR_LF)
+
         BsfInf.writelines ("[COMPONENTS]" + T_CHAR_LF)
 
         for ComponentObj in self.ComponentStatementList :
-            BsfInf.writelines ("COMP_NAME"        + \
-                               " = "              + \
+            BsfInf.writelines ("COMP_NAME" + \
+                               " = " + \
                                ComponentObj.CompName + \
-                               T_CHAR_LF )
+                               T_CHAR_LF)
             if ComponentObj.CompLoc.upper() == 'NONE':
-                BsfInf.writelines ("COMP_LOC"        + \
-                                   " = "             + \
-                                   'N'               + \
-                                   T_CHAR_LF )
-            
+                BsfInf.writelines ("COMP_LOC" + \
+                                   " = " + \
+                                   'N' + \
+                                   T_CHAR_LF)
+
             elif ComponentObj.FilePos != None:
-                BsfInf.writelines ("COMP_LOC"        + \
-                                   " = "             + \
+                BsfInf.writelines ("COMP_LOC" + \
+                                   " = " + \
                                    ComponentObj.FilePos + \
-                                   T_CHAR_LF )
+                                   T_CHAR_LF)
             else:
                 Index = FvList.index(ComponentObj.CompLoc.upper())
                 if Index == 0:
-                    BsfInf.writelines ("COMP_LOC"        + \
-                                       " = "             + \
-                                       'F'               + \
-                                       T_CHAR_LF )
+                    BsfInf.writelines ("COMP_LOC" + \
+                                       " = " + \
+                                       'F' + \
+                                       T_CHAR_LF)
                 elif Index == 1:
-                    BsfInf.writelines ("COMP_LOC"        + \
-                                       " = "             + \
-                                       'S'                 + \
-                                       T_CHAR_LF )
-                
-            BsfInf.writelines ("COMP_TYPE"        + \
-                               " = "              + \
+                    BsfInf.writelines ("COMP_LOC" + \
+                                       " = " + \
+                                       'S' + \
+                                       T_CHAR_LF)
+
+            BsfInf.writelines ("COMP_TYPE" + \
+                               " = " + \
                                ComponentObj.CompType + \
-                               T_CHAR_LF )
-            BsfInf.writelines ("COMP_VER"        + \
-                               " = "             + \
+                               T_CHAR_LF)
+            BsfInf.writelines ("COMP_VER" + \
+                               " = " + \
                                ComponentObj.CompVer + \
-                               T_CHAR_LF )
-            BsfInf.writelines ("COMP_CS"        + \
-                               " = "            + \
+                               T_CHAR_LF)
+            BsfInf.writelines ("COMP_CS" + \
+                               " = " + \
                                ComponentObj.CompCs + \
-                               T_CHAR_LF )
-            
+                               T_CHAR_LF)
+
             BinPath = ComponentObj.CompBin
             if BinPath != '-':
                 BinPath = GenFdsGlobalVariable.MacroExtend(GenFdsGlobalVariable.ReplaceWorkspaceMacro(BinPath))
-            BsfInf.writelines ("COMP_BIN"        + \
-                               " = "             + \
+            BsfInf.writelines ("COMP_BIN" + \
+                               " = " + \
                                BinPath + \
-                               T_CHAR_LF )
-            
+                               T_CHAR_LF)
+
             SymPath = ComponentObj.CompSym
             if SymPath != '-':
                 SymPath = GenFdsGlobalVariable.MacroExtend(GenFdsGlobalVariable.ReplaceWorkspaceMacro(SymPath))
-            BsfInf.writelines ("COMP_SYM"        + \
-                               " = "             + \
+            BsfInf.writelines ("COMP_SYM" + \
+                               " = " + \
                                SymPath + \
-                               T_CHAR_LF )
-            BsfInf.writelines ("COMP_SIZE"        + \
-                               " = "              + \
+                               T_CHAR_LF)
+            BsfInf.writelines ("COMP_SIZE" + \
+                               " = " + \
                                ComponentObj.CompSize + \
-                               T_CHAR_LF )
-            BsfInf.writelines (T_CHAR_LF )
-            
+                               T_CHAR_LF)
+            BsfInf.writelines (T_CHAR_LF)
+
         BsfInf.close()
 
     ## GenFvList() method
@@ -170,7 +170,7 @@ class Vtf (VtfClassObject):
             (BaseAddress, Size) = FdAddressDict.get(i)
             CmdStr += (
                 '-r', '0x%x' % BaseAddress,
-                '-s', '0x%x' %Size,
+                '-s', '0x%x' % Size,
                 )
         return CmdStr
     
