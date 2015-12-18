@@ -2713,8 +2713,35 @@ class ModuleAutoGen(AutoGen):
                 if F.Dir not in self.IncludePathList and self.AutoGenVersion >= 0x00010005:
                     self.IncludePathList.insert(0, F.Dir)
                 self._SourceFileList.append(F)
+
+            self._MatchBuildRuleOrder(self._SourceFileList)
+
+            for F in self._SourceFileList:
                 self._ApplyBuildRule(F, TAB_UNKNOWN_FILE)
         return self._SourceFileList
+
+    def _MatchBuildRuleOrder(self, FileList):
+        Order_Dict = {}
+        self._GetModuleBuildOption()
+        for SingleFile in FileList:
+            if self.BuildRuleOrder and SingleFile.Ext in self.BuildRuleOrder:
+                key = SingleFile.Path.split(SingleFile.Ext)[0]
+                if key in Order_Dict:
+                    Order_Dict[key].append(SingleFile.Ext)
+                else:
+                    Order_Dict[key] = [SingleFile.Ext]
+
+        RemoveList = []
+        for F in Order_Dict:
+            if len(Order_Dict[F]) > 1:
+                Order_Dict[F].sort(key=lambda i: self.BuildRuleOrder.index(i))
+                for Ext in Order_Dict[F][1:]:
+                    RemoveList.append(F + Ext)
+                   
+        for item in RemoveList:
+            FileList.remove(item)
+
+        return FileList
 
     ## Return the list of unicode files
     def _GetUnicodeFileList(self):
