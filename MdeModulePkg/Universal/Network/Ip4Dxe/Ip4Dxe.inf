@@ -95,7 +95,7 @@
   gEfiManagedNetworkServiceBindingProtocolGuid  ## TO_START
   gEfiManagedNetworkProtocolGuid                ## TO_START
   gEfiArpServiceBindingProtocolGuid             ## TO_START
-  gEfiIp4Config2ProtocolGuid                    ## TO_START
+  gEfiIp4Config2ProtocolGuid                    ## BY_START
   gEfiArpProtocolGuid                           ## TO_START
   gEfiDhcp4ServiceBindingProtocolGuid           ## TO_START
   gEfiDhcp4ProtocolGuid                         ## TO_START
