@@ -41,6 +41,7 @@
   UefiDriverEntryPoint
   BaseLib
   HiiLib
+  UefiHiiServicesLib
   
 [Sources]
   SmbiosGen.c
