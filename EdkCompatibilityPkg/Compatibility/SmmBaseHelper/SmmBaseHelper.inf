@@ -60,6 +60,7 @@
   SynchronizationLib
   CpuLib
   PcdLib
+  SmmMemLib
 
 [Guids]
   gEfiSmmBaseThunkCommunicationGuid
@@ -75,7 +76,6 @@
   gEfiSmmCpuIo2ProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadPeImageProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmReadyToLockProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
-  gEfiSmmAccess2ProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmCommunicationProtocolGuid
 
 [Pcd]
