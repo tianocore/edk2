@@ -828,6 +828,7 @@ IfConfigClearInterfaceInfo (
                             &Policy
                             );
     if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
       ShellStatus = SHELL_ACCESS_DENIED;
       break;
     }
@@ -904,6 +905,7 @@ IfConfigSetInterfaceInfo (
                   &TimeOutEvt
                   );
   if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
     ShellStatus = SHELL_ACCESS_DENIED;
     goto ON_EXIT;
   }
@@ -916,6 +918,7 @@ IfConfigSetInterfaceInfo (
                   &MappedEvt
                   );
   if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
     ShellStatus = SHELL_ACCESS_DENIED;
     goto ON_EXIT;
   }
@@ -974,6 +977,7 @@ IfConfigSetInterfaceInfo (
       if (IfCb->Policy == Ip4Config2PolicyDhcp) {
         Status = IfConfigStartIp4 (IfCb->NicHandle, gImageHandle);
         if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
           ShellStatus = SHELL_ACCESS_DENIED;
           goto ON_EXIT;
         }
@@ -989,6 +993,7 @@ IfConfigSetInterfaceInfo (
                                 &Policy
                                 );
         if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
           ShellStatus = SHELL_ACCESS_DENIED;
           goto ON_EXIT;
         }
@@ -997,6 +1002,59 @@ IfConfigSetInterfaceInfo (
       VarArg= VarArg->Next;    
 
     } else if (StrCmp (VarArg->Arg, L"static") == 0) {
+      VarArg= VarArg->Next;
+      if (VarArg == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_LACK_COMMAND), gShellNetwork1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto ON_EXIT;
+      }
+
+      ZeroMem (&ManualAddress, sizeof (ManualAddress));
+    
+      //
+      // Get manual IP address.
+      //
+      Status = NetLibStrToIp4 (VarArg->Arg, &ManualAddress.Address);
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto ON_EXIT;
+      }
+
+      //
+      // Get subnetmask.
+      //    
+      VarArg = VarArg->Next;
+      if (VarArg == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_LACK_COMMAND), gShellNetwork1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto ON_EXIT;
+      }
+      
+      Status = NetLibStrToIp4 (VarArg->Arg, &ManualAddress.SubnetMask);
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto ON_EXIT;
+      }
+
+      //
+      // Get gateway.
+      //
+      VarArg = VarArg->Next;
+      if (VarArg == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_LACK_COMMAND), gShellNetwork1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto ON_EXIT;
+      }
+      
+      Status = NetLibStrToIp4 (VarArg->Arg, &Gateway);
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto ON_EXIT;
+      }
+
       //
       // Set manual config policy.
       //
@@ -1008,43 +1066,14 @@ IfConfigSetInterfaceInfo (
                               &Policy
                               );
       if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
-
-      VarArg= VarArg->Next;   
-
-      ZeroMem (&ManualAddress, sizeof (ManualAddress));
-    
-      //
-      // Get manual IP address.
-      //
-      Status = NetLibStrToIp4 (VarArg->Arg, &ManualAddress.Address);
-      if (EFI_ERROR(Status)) {
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
-      }
-
-      //
-      // Get subnetmask.
-      //    
-      VarArg = VarArg->Next;
-      Status = NetLibStrToIp4 (VarArg->Arg, &ManualAddress.SubnetMask);
-      if (EFI_ERROR(Status)) {
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
-      }
-
-      //
-      // Get gateway.
-      //
-      VarArg = VarArg->Next;
-      Status = NetLibStrToIp4 (VarArg->Arg, &Gateway);
-      if (EFI_ERROR(Status)) {
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
-      }
       
+      //
+      // Set Manual Address.
+      //
       IsAddressOk = FALSE;
 
       Status = IfCb->IfCfg->RegisterDataNotify (
@@ -1053,6 +1082,7 @@ IfConfigSetInterfaceInfo (
                               MappedEvt
                               );
       if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_SET_ADDR_FAILED), gShellNetwork1HiiHandle, Status);
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
@@ -1101,6 +1131,7 @@ IfConfigSetInterfaceInfo (
                               &Gateway
                               );
       if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_SET_ADDR_FAILED), gShellNetwork1HiiHandle, Status);
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
@@ -1126,6 +1157,7 @@ IfConfigSetInterfaceInfo (
       while (Tmp != NULL) {
         Status = NetLibStrToIp4 (Tmp->Arg, Dns + Index);
         if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, Tmp->Arg);
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto ON_EXIT;
         }
@@ -1147,6 +1179,7 @@ IfConfigSetInterfaceInfo (
                               Dns
                               );
       if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
