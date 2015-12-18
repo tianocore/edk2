@@ -1583,6 +1583,8 @@ GetWidth (
     return (UINT16) sizeof (BOOLEAN);
     
   case EFI_IFR_PASSWORD_OP:
+    return (UINT16)((UINTN) ((EFI_IFR_PASSWORD *) OpCodeData)->MaxSize * sizeof (CHAR16));
+
   case EFI_IFR_STRING_OP:
     return (UINT16)((UINTN) ((EFI_IFR_STRING *) OpCodeData)->MaxSize * sizeof (CHAR16));
 
