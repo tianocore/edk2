@@ -144,12 +144,6 @@ CProcedureInvoke:
 RendezvousFunnelProc   ENDP
 RendezvousFunnelProcEnd::
 
-AsmCliHltLoop PROC near C PUBLIC
-    cli
-    hlt
-    jmp        $-2
-AsmCliHltLoop ENDP
-
 ;-------------------------------------------------------------------------------------
 ;  AsmGetAddressMap (&AddressMap);
 ;-------------------------------------------------------------------------------------
