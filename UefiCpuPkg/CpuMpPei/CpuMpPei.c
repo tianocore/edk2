@@ -273,68 +273,124 @@ ApCFunction (
   UINTN                      ProcessorNumber;
   EFI_AP_PROCEDURE           Procedure;
   UINTN                      BistData;
+  volatile UINT32            *ApStartupSignalBuffer;
 
   PeiCpuMpData = ExchangeInfo->PeiCpuMpData;
-  if (PeiCpuMpData->InitFlag) {
-    ProcessorNumber = NumApsExecuting;
-    //
-    // Sync BSP's Control registers to APs
-    //
-    RestoreVolatileRegisters (&PeiCpuMpData->CpuData[0].VolatileRegisters, FALSE);
-    //
-    // This is first time AP wakeup, get BIST information from AP stack
-    //
-    BistData = *(UINTN *) (PeiCpuMpData->Buffer + ProcessorNumber * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
-    PeiCpuMpData->CpuData[ProcessorNumber].Health.Uint32 = (UINT32) BistData;
-    PeiCpuMpData->CpuData[ProcessorNumber].ApicId = GetInitialApicId ();
-    if (PeiCpuMpData->CpuData[ProcessorNumber].ApicId >= 0xFF) {
+  while (TRUE) {
+    if (PeiCpuMpData->InitFlag) {
+      ProcessorNumber = NumApsExecuting;
       //
-      // Set x2APIC mode if there are any logical processor reporting
-      // an APIC ID of 255 or greater.
+      // Sync BSP's Control registers to APs
       //
-      AcquireSpinLock(&PeiCpuMpData->MpLock);
-      PeiCpuMpData->X2ApicEnable = TRUE;
-      ReleaseSpinLock(&PeiCpuMpData->MpLock);
-    }
-    //
-    // Sync BSP's Mtrr table to all wakeup APs and load microcode on APs.
-    //
-    MtrrSetAllMtrrs (&PeiCpuMpData->MtrrTable);
-    MicrocodeDetect ();
-    PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
-  } else {
-    //
-    // Execute AP function if AP is not disabled
-    //
-    GetProcessorNumber (PeiCpuMpData, &ProcessorNumber);
-    //
-    // Restore AP's volatile registers saved
-    //
-    RestoreVolatileRegisters (&PeiCpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
-
-    if ((PeiCpuMpData->CpuData[ProcessorNumber].State != CpuStateDisabled) &&
-        (PeiCpuMpData->ApFunction != 0)) {
-      PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateBusy;
-      Procedure = (EFI_AP_PROCEDURE)(UINTN)PeiCpuMpData->ApFunction;
+      RestoreVolatileRegisters (&PeiCpuMpData->CpuData[0].VolatileRegisters, FALSE);
       //
-      // Invoke AP function here
+      // This is first time AP wakeup, get BIST information from AP stack
       //
-      Procedure ((VOID *)(UINTN)PeiCpuMpData->ApFunctionArgument);
+      BistData = *(UINTN *) (PeiCpuMpData->Buffer + ProcessorNumber * PeiCpuMpData->CpuApStackSize - sizeof (UINTN));
+      PeiCpuMpData->CpuData[ProcessorNumber].Health.Uint32 = (UINT32) BistData;
+      PeiCpuMpData->CpuData[ProcessorNumber].ApicId = GetInitialApicId ();
+      if (PeiCpuMpData->CpuData[ProcessorNumber].ApicId >= 0xFF) {
+        //
+        // Set x2APIC mode if there are any logical processor reporting
+        // an APIC ID of 255 or greater.
+        //
+        AcquireSpinLock(&PeiCpuMpData->MpLock);
+        PeiCpuMpData->X2ApicEnable = TRUE;
+        ReleaseSpinLock(&PeiCpuMpData->MpLock);
+      }
+      //
+      // Sync BSP's Mtrr table to all wakeup APs and load microcode on APs.
+      //
+      MtrrSetAllMtrrs (&PeiCpuMpData->MtrrTable);
+      MicrocodeDetect ();
       PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
+    } else {
+      //
+      // Execute AP function if AP is not disabled
+      //
+      GetProcessorNumber (PeiCpuMpData, &ProcessorNumber);
+      if (PeiCpuMpData->ApLoopMode == ApInHltLoop) {
+        //
+        // Restore AP's volatile registers saved
+        //
+        RestoreVolatileRegisters (&PeiCpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+      }
+
+      if ((PeiCpuMpData->CpuData[ProcessorNumber].State != CpuStateDisabled) &&
+          (PeiCpuMpData->ApFunction != 0)) {
+        PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateBusy;
+        Procedure = (EFI_AP_PROCEDURE)(UINTN)PeiCpuMpData->ApFunction;
+        //
+        // Invoke AP function here
+        //
+        Procedure ((VOID *)(UINTN)PeiCpuMpData->ApFunctionArgument);
+        //
+        // Re-get the processor number due to BSP/AP maybe exchange in AP function
+        //
+        GetProcessorNumber (PeiCpuMpData, &ProcessorNumber);
+        PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
+      }
+    }
+
+    //
+    // AP finished executing C code
+    //
+    InterlockedIncrement ((UINT32 *)&PeiCpuMpData->FinishedCount);
+
+    //
+    // Place AP is specified loop mode
+    //
+    if (PeiCpuMpData->ApLoopMode == ApInHltLoop) {
+      //
+      // Save AP volatile registers
+      //
+      SaveVolatileRegisters (&PeiCpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
+      //
+      // Place AP in Hlt-loop
+      //
+      while (TRUE) {
+        DisableInterrupts ();
+        CpuSleep ();
+        CpuPause ();
+      }
+    }
+    ApStartupSignalBuffer = PeiCpuMpData->CpuData[ProcessorNumber].StartupApSignal;
+    //
+    // Clear AP start-up signal
+    //
+    *ApStartupSignalBuffer = 0;
+    while (TRUE) {
+      DisableInterrupts ();
+      if (PeiCpuMpData->ApLoopMode == ApInMwaitLoop) {
+        //
+        // Place AP in Mwait-loop
+        //
+        AsmMonitor ((UINTN)ApStartupSignalBuffer, 0, 0);
+        if (*ApStartupSignalBuffer != WAKEUP_AP_SIGNAL) {
+          //
+          // If AP start-up signal is not set, place AP into
+          // the maximum C-state
+          //
+          AsmMwait (PeiCpuMpData->ApTargetCState << 4, 0);
+        }
+      } else if (PeiCpuMpData->ApLoopMode == ApInRunLoop) {
+        //
+        // Place AP in Run-loop
+        //
+        CpuPause ();
+      } else {
+        ASSERT (FALSE);
+      }
+
+      //
+      // If AP start-up signal is written, AP is waken up
+      // otherwise place AP in loop again
+      //
+      if (*ApStartupSignalBuffer == WAKEUP_AP_SIGNAL) {
+        break;
+      }
     }
   }
-
-  //
-  // AP finished executing C code
-  //
-  InterlockedIncrement ((UINT32 *)&PeiCpuMpData->FinishedCount);
-
-  //
-  // Save AP volatile registers
-  //
-  SaveVolatileRegisters (&PeiCpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
-
-  AsmCliHltLoop ();
 }
 
 /**

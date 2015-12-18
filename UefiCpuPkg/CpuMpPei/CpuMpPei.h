@@ -38,6 +38,7 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/TimerLib.h>
 #include <Library/UefiCpuLib.h>
+#include <Library/CpuLib.h>
 
 #include "Microcode.h"
 
@@ -49,6 +50,8 @@ typedef enum {
   CpuStateBusy,
   CpuStateDisabled
 } CPU_STATE;
+
+#define WAKEUP_AP_SIGNAL SIGNATURE_32 ('S', 'T', 'A', 'P')
 
 typedef enum {
   ApInHltLoop   = 1,
