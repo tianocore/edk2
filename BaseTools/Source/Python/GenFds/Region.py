@@ -73,7 +73,7 @@ class Region(RegionClassObject):
                     RegionData = GenFdsGlobalVariable.MacroExtend(RegionData, MacroDict)
                     GenFdsGlobalVariable.InfLogger('   Region FV File Name = .fv : %s' % RegionData)
                     if RegionData[1] != ':' :
-                        RegionData = os.path.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
+                        RegionData = mws.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
                     if not os.path.exists(RegionData):
                         EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
 
@@ -152,7 +152,7 @@ class Region(RegionClassObject):
                     RegionData = GenFdsGlobalVariable.MacroExtend(RegionData, MacroDict)
                     GenFdsGlobalVariable.InfLogger('   Region CAPSULE Image Name = .cap : %s' % RegionData)
                     if RegionData[1] != ':' :
-                        RegionData = os.path.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
+                        RegionData = mws.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
                     if not os.path.exists(RegionData):
                         EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
 
@@ -213,7 +213,7 @@ class Region(RegionClassObject):
                 else:
                     RegionData = GenFdsGlobalVariable.MacroExtend(RegionData, MacroDict)
                     if RegionData[1] != ':' :
-                        RegionData = os.path.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
+                        RegionData = mws.join (GenFdsGlobalVariable.WorkSpaceDir, RegionData)
                     if not os.path.exists(RegionData):
                         EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
                 #
