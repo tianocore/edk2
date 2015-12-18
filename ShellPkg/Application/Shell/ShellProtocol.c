@@ -532,12 +532,13 @@ EfiShellGetDevicePathFromFilePath(
     if (Cwd == NULL) {
       return (NULL);
     }
-    Size = StrSize(Cwd) + StrSize(Path) - sizeof(CHAR16);
+    Size = StrSize(Cwd) + StrSize(Path);
     NewPath = AllocateZeroPool(Size);
     if (NewPath == NULL) {
       return (NULL);
     }
     StrCpyS(NewPath, Size/sizeof(CHAR16), Cwd);
+    StrCatS(NewPath, Size/sizeof(CHAR16), L"\\");
     if (*Path == L'\\') {
       Path++;
       while (PathRemoveLastItem(NewPath)) ;
@@ -2495,6 +2496,7 @@ EfiShellOpenFileList(
     CurDir = EfiShellGetCurDir(NULL);
     ASSERT((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
     StrnCatGrow(&Path2, &Path2Size, CurDir, 0);
+    StrnCatGrow(&Path2, &Path2Size, L"\\", 0);
     if (*Path == L'\\') {
       Path++;
       while (PathRemoveLastItem(Path2)) ;
@@ -2796,6 +2798,8 @@ EfiShellSetEnv(
   FileSystemMapping is not NULL, it returns the current directory associated with the
   FileSystemMapping. In both cases, the returned name includes the file system
   mapping (i.e. fs0:\current-dir).
+  
+  Note that the current directory string should exclude the tailing backslash character.
 
   @param FileSystemMapping      A pointer to the file system mapping. If NULL,
                                 then the current working directory is returned.
@@ -2851,6 +2855,8 @@ EfiShellGetCurDir(
 
   If the current working directory or the current working file system is changed then the
   %cwd% environment variable will be updated
+
+  Note that the current directory string should exclude the tailing backslash character.
 
   @param FileSystem             A pointer to the file system's mapped name. If NULL, then the current working
                                 directory is changed.
@@ -2939,9 +2945,11 @@ EfiShellSetCurDir(
       ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
       MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, DirectoryName, 0);
     }
-    if ((MapListItem->CurrentDirectoryPath != NULL && MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] != L'\\') || (MapListItem->CurrentDirectoryPath == NULL)) {
+    if ((MapListItem->CurrentDirectoryPath != NULL && MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] == L'\\') || (MapListItem->CurrentDirectoryPath == NULL)) {
       ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-      MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, L"\\", 0);
+      if (MapListItem->CurrentDirectoryPath != NULL) {
+        MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] = CHAR_NULL;
+      }
     }
   } else {
     //
@@ -2973,9 +2981,9 @@ EfiShellSetCurDir(
       MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, L"\\", 0);
       ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
       MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, DirectoryName, 0);
-      if (MapListItem->CurrentDirectoryPath != NULL && MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] != L'\\') {
+      if (MapListItem->CurrentDirectoryPath != NULL && MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] == L'\\') {
         ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-        MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, L"\\", 0);
+        MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] = CHAR_NULL;
       }
     }
   }

@@ -2,7 +2,7 @@
   EFI Shell protocol as defined in the UEFI Shell 2.0 specification including errata.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -293,6 +293,8 @@ EFI_STATUS
   FileSystemMapping is not NULL, it returns the current directory associated with the
   FileSystemMapping. In both cases, the returned name includes the file system
   mapping (i.e. fs0:\current-dir).
+
+  Note that the current directory string should exclude the tailing backslash character.
 
   @param[in] FileSystemMapping  A pointer to the file system mapping. If NULL,
                                 then the current working directory is returned.
