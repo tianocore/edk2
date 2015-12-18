@@ -81,6 +81,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress            ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                       ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid
