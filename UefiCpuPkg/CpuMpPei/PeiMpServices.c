@@ -520,7 +520,7 @@ PeiStartupAllAPs (
       if (Index == CallerNumber) {
         continue;
       }
-      WakeUpAP (PeiCpuMpData, FALSE, PeiCpuMpData->CpuData[Index].ApicId, Procedure, ProcedureArgument);
+      WakeUpAP (PeiCpuMpData, FALSE, Index, Procedure, ProcedureArgument);
       //
       // Wait to finish
       //
@@ -655,7 +655,7 @@ PeiStartupThisAP (
   WaitCountIndex = 0;
   FinishedCount = &PeiCpuMpData->FinishedCount;
 
-  WakeUpAP (PeiCpuMpData, FALSE, PeiCpuMpData->CpuData[ProcessorNumber].ApicId, Procedure, ProcedureArgument);
+  WakeUpAP (PeiCpuMpData, FALSE, ProcessorNumber, Procedure, ProcedureArgument);
 
   //
   // Wait to finish
@@ -791,7 +791,7 @@ PeiSwitchBSP (
   //
   // Need to wakeUp AP (future BSP).
   //
-  WakeUpAP (PeiCpuMpData, FALSE, PeiCpuMpData->CpuData[ProcessorNumber].ApicId, FutureBSPProc, PeiCpuMpData);
+  WakeUpAP (PeiCpuMpData, FALSE, ProcessorNumber, FutureBSPProc, PeiCpuMpData);
 
   AsmExchangeRole (&PeiCpuMpData->BSPInfo, &PeiCpuMpData->APInfo);
 
