@@ -681,15 +681,15 @@ PeiCheckAndSwitchStack (
            && (*StackPointer == INIT_CAR_VALUE);
            StackPointer ++);
 
-        DEBUG ((EFI_D_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
-        DEBUG ((EFI_D_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", Private->HobList.Raw, (UINT32)((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN) Private->HobList.Raw)));
-        DEBUG ((EFI_D_INFO, "Total temporary memory:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
-        DEBUG ((EFI_D_INFO, "  temporary memory stack ever used: %d bytes.\n",
-               (UINT32)(SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
-              ));
-        DEBUG ((EFI_D_INFO, "  temporary memory heap used:       %d bytes.\n",
-               (UINT32)((UINTN)Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN)Private->HobList.Raw)
-              ));
+      DEBUG ((EFI_D_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
+      DEBUG ((EFI_D_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", Private->HobList.Raw, (UINT32)((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN) Private->HobList.Raw)));
+      DEBUG ((EFI_D_INFO, "Total temporary memory:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
+      DEBUG ((EFI_D_INFO, "  temporary memory stack ever used: %d bytes.\n",
+             (UINT32)(SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
+            ));
+      DEBUG ((EFI_D_INFO, "  temporary memory heap used:       %d bytes.\n",
+             (UINT32)((UINTN)Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN)Private->HobList.Raw)
+            ));
     DEBUG_CODE_END ();
 
     if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
