@@ -804,9 +804,7 @@ WriteRelocations32 (
   UINTN                            RelSize;
   UINTN                            RelOffset;
   UINTN                            K;
-  UINT8                            *Targ;
   Elf32_Phdr                       *DynamicSegment;
-  Elf32_Phdr                       *TargetSegment;
 
   for (Index = 0, FoundRelocations = FALSE; Index < mEhdr->e_shnum; Index++) {
     Elf_Shdr *RelShdr = GetShdrByIndex(Index);
@@ -957,6 +955,31 @@ WriteRelocations32 (
           Error (NULL, 0, 3000, "Invalid", "%s bad ARM dynamic relocations.", mInImageName);
         }
 
+        for (Index = 0; Index < mEhdr->e_shnum; Index++) {
+          Elf_Shdr *shdr = GetShdrByIndex(Index);
+
+          //
+          // The PT_DYNAMIC section contains DT_REL relocations whose r_offset
+          // field is relative to the base of a segment (or the entire image),
+          // and not to the base of an ELF input section as is the case for
+          // SHT_REL sections. This means that we cannot fix up such relocations
+          // unless we cross-reference ELF sections and segments, considering
+          // that the output placement recorded in mCoffSectionsOffset[] is
+          // section based, not segment based.
+          //
+          // Fortunately, there is a simple way around this: we require that the
+          // in-memory layout of the ELF and PE/COFF versions of the binary is
+          // identical. That way, r_offset will retain its validity as a PE/COFF
+          // image offset, and we can record it in the COFF fixup table
+          // unmodified.
+          //
+          if (shdr->sh_addr != mCoffSectionsOffset[Index]) {
+            Error (NULL, 0, 3000,
+              "Invalid", "%s: PT_DYNAMIC relocations require identical ELF and PE/COFF section offsets.",
+              mInImageName);
+          }
+        }
+
         for (K = 0; K < RelSize; K += RelElementSize) {
 
           if (DynamicSegment->p_paddr == 0) {
@@ -973,14 +996,7 @@ WriteRelocations32 (
             break;
 
           case  R_ARM_RABS32:
-            TargetSegment = GetPhdrByIndex (ELF32_R_SYM (Rel->r_info) - 1);
-
-            // Note: r_offset in a memory address.  Convert it to a pointer in the coff file.
-            Targ = mCoffFile + mCoffSectionsOffset[ ELF32_R_SYM( Rel->r_info ) ] + Rel->r_offset - TargetSegment->p_vaddr;
-
-            *(UINT32 *)Targ = *(UINT32 *)Targ + mCoffSectionsOffset [ELF32_R_SYM( Rel->r_info )];
-
-            CoffAddFixup (mCoffSectionsOffset[ELF32_R_SYM (Rel->r_info)] + (Rel->r_offset - TargetSegment->p_vaddr), EFI_IMAGE_REL_BASED_HIGHLOW);
+            CoffAddFixup (Rel->r_offset, EFI_IMAGE_REL_BASED_HIGHLOW);
             break;
           
           default:
