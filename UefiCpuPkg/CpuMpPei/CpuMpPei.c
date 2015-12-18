@@ -589,6 +589,10 @@ PrepareAPStartupVector (
   UINTN                         WakeupBuffer;
   UINTN                         WakeupBufferSize;
   MP_ASSEMBLY_ADDRESS_MAP       AddressMap;
+  UINT8                         ApLoopMode;
+  UINT16                        MonitorFilterSize;
+  UINT8                         *MonitorBuffer;
+  UINTN                         Index;
 
   AsmGetAddressMap (&AddressMap);
   WakeupBufferSize = AddressMap.RendezvousFunnelSize + sizeof (MP_CPU_EXCHANGE_INFO);
@@ -597,11 +601,14 @@ PrepareAPStartupVector (
   DEBUG ((EFI_D_INFO, "CpuMpPei: WakeupBuffer = 0x%x\n", WakeupBuffer));
 
   //
-  // Allocate Pages for APs stack, CPU MP Data and backup buffer for wakeup buffer
+  // Allocate Pages for APs stack, CPU MP Data, backup buffer for wakeup buffer,
+  // and monitor buffer if required.
   //
   MaxCpuCount = PcdGet32(PcdCpuMaxLogicalProcessorNumber);
   BufferSize  = PcdGet32 (PcdCpuApStackSize) * MaxCpuCount + sizeof (PEI_CPU_MP_DATA)
                   + WakeupBufferSize + sizeof (PEI_CPU_DATA) * MaxCpuCount;
+  ApLoopMode = GetApLoopMode (&MonitorFilterSize);
+  BufferSize += MonitorFilterSize * MaxCpuCount;
   Status = PeiServicesAllocatePages (
              EfiBootServicesData,
              EFI_SIZE_TO_PAGES (BufferSize),
@@ -627,7 +634,21 @@ PrepareAPStartupVector (
   InitializeSpinLock(&PeiCpuMpData->MpLock);
   SaveVolatileRegisters (&PeiCpuMpData->CpuData[0].VolatileRegisters);
   CopyMem (&PeiCpuMpData->AddressMap, &AddressMap, sizeof (MP_ASSEMBLY_ADDRESS_MAP));
-
+  //
+  // Initialize AP loop mode
+  //
+  PeiCpuMpData->ApLoopMode = ApLoopMode;
+  DEBUG ((EFI_D_INFO, "AP Loop Mode is %d\n", PeiCpuMpData->ApLoopMode));
+  MonitorBuffer = (UINT8 *)(PeiCpuMpData->CpuData + MaxCpuCount);
+  if (PeiCpuMpData->ApLoopMode != ApInHltLoop) {
+    //
+    // Set up APs wakeup signal buffer
+    //
+    for (Index = 0; Index < MaxCpuCount; Index++) {
+      PeiCpuMpData->CpuData[Index].StartupApSignal = 
+        (UINT32 *)(MonitorBuffer + MonitorFilterSize * Index);
+    }
+  }
   //
   // Backup original data and copy AP reset code in it
   //

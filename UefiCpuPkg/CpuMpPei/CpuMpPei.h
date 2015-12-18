@@ -134,6 +134,7 @@ typedef struct {
 } CPU_VOLATILE_REGISTERS;
 
 typedef struct {
+  volatile UINT32                *StartupApSignal;
   UINT32                         ApicId;
   EFI_HEALTH_FLAGS               Health;
   CPU_STATE                      State;
@@ -163,6 +164,8 @@ struct _PEI_CPU_MP_DATA {
   CPU_EXCHANGE_ROLE_INFO         BSPInfo;
   CPU_EXCHANGE_ROLE_INFO         APInfo;
   MTRR_SETTINGS                  MtrrTable;
+  UINT8                          ApLoopMode;
+  UINT8                          ApTargetCState;
   PEI_CPU_DATA                   *CpuData;
   volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
 };
