@@ -1211,6 +1211,9 @@ compile_length_enclose_node(EncloseNode* node, regex_t* reg)
 {
   int len;
   int tlen;
+  QtfrNode* qn;
+
+  qn = NULL;
 
   if (node->type == ENCLOSE_OPTION)
     return compile_length_option_node(node, reg);
@@ -1253,7 +1256,7 @@ compile_length_enclose_node(EncloseNode* node, regex_t* reg)
       if (node->target == NULL) {
         CHECK_NULL_RETURN_MEMERR(node->target);
       }
-      QtfrNode* qn = NQTFR(node->target);
+      qn = NQTFR(node->target);
       tlen = compile_length_tree(qn->target, reg);
       if (tlen < 0) return tlen;
 
