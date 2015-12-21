@@ -50,7 +50,6 @@ HttpBootDestroyIp4Children (
 {
   ASSERT (This != NULL);
   ASSERT (Private != NULL);
-  ASSERT (Private->UsingIpv6 == FALSE);
 
   if (Private->Dhcp4Child != NULL) {
     gBS->CloseProtocol (
@@ -111,7 +110,6 @@ HttpBootDestroyIp6Children (
 {
   ASSERT (This != NULL);
   ASSERT (Private != NULL);
-  ASSERT (Private->UsingIpv6 == TRUE);
   
   if (Private->Ip6Child != NULL) {
     gBS->CloseProtocol (
