@@ -778,6 +778,8 @@ HttpBodyParserCallback (
   )
 {
   HTTP_TOKEN_WRAP               *Wrap;
+  UINTN                         BodyLength;
+  CHAR8                         *Body;
 
   if (EventType != BodyParseEventOnComplete) {
     return EFI_SUCCESS;
@@ -788,7 +790,14 @@ HttpBodyParserCallback (
   }
 
   Wrap = (HTTP_TOKEN_WRAP *) Context;
-  Wrap->HttpInstance->NextMsg = Data;
+  Body = Wrap->HttpToken->Message->Body;
+  BodyLength = Wrap->HttpToken->Message->BodyLength;
+  if (Data < Body + BodyLength) {
+    Wrap->HttpInstance->NextMsg = Data;
+  } else {
+    Wrap->HttpInstance->NextMsg = NULL;
+  }
+  
 
   //
   // Free Tx4Token or Tx6Token since already received corrsponding HTTP response.
