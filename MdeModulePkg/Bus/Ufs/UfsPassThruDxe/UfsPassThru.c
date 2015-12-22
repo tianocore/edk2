@@ -882,7 +882,7 @@ UfsPassThruDriverBindingStart (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ProcessAsyncTaskList,
                   Private,
                   &Private->TimerEvent

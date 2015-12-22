@@ -1512,7 +1512,7 @@ UfsExecScsiCmds (
   // Insert the async SCSI cmd to the Async I/O list
   //
   if (Event != NULL) {
-    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     TransReq->Packet      = Packet;
     TransReq->CallerEvent = Event;
     InsertTailList (&Private->Queue, &TransReq->TransferList);
