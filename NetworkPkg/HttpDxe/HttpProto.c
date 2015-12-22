@@ -568,13 +568,9 @@ HttpCloseTcpRxEvent (
   )
 {
   HTTP_PROTOCOL            *HttpInstance;
-  EFI_TCP4_IO_TOKEN        *Rx4Token;
-  EFI_TCP6_IO_TOKEN        *Rx6Token;
 
   ASSERT (Wrap != NULL);
   HttpInstance   = Wrap->HttpInstance;
-  Rx4Token       = NULL;
-  Rx6Token       = NULL;
   
   if (HttpInstance->LocalAddressIsIPv6) {
     if (Wrap->TcpWrap.Rx6Token.CompletionToken.Event != NULL) {
