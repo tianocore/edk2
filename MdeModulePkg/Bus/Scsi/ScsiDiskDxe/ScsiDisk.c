@@ -256,6 +256,7 @@ ScsiDiskDriverBindingStart (
 
   case EFI_SCSI_TYPE_CDROM:
     ScsiDiskDevice->BlkIo.Media->BlockSize = 0x800;
+    ScsiDiskDevice->BlkIo.Media->ReadOnly  = TRUE;
     MustReadCapacity = FALSE;
     break;
   }
