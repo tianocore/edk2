@@ -2715,15 +2715,40 @@ ScsiDiskAsyncReadSectors (
     }
     if (EFI_ERROR (Status)) {
       //
-      // Free the SCSI_BLKIO2_REQUEST structure only when the first SCSI
-      // command fails. Otherwise, it will be freed in the callback function
-      // ScsiDiskNotify().
+      // Some devices will return EFI_DEVICE_ERROR or EFI_TIMEOUT when the data
+      // length of a SCSI I/O command is too large.
+      // In this case, we retry sending the SCSI command with a data length
+      // half of its previous value.
       //
+      if ((Status == EFI_DEVICE_ERROR) || (Status == EFI_TIMEOUT)) {
+        if ((MaxBlock > 1) && (SectorCount > 1)) {
+          MaxBlock = MIN (MaxBlock, SectorCount) >> 1;
+          continue;
+        }
+      }
+
       if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
+        //
+        // Free the SCSI_BLKIO2_REQUEST structure only when there is no other
+        // SCSI sub-task running. Otherwise, it will be freed in the callback
+        // function ScsiDiskNotify().
+        //
         RemoveEntryList (&BlkIo2Req->Link);
         FreePool (BlkIo2Req);
+
+        //
+        // It is safe to return error status to the caller, since there is no
+        // previous SCSI sub-task executing.
+        //
+        return EFI_DEVICE_ERROR;
+      } else {
+        //
+        // There are previous SCSI commands still running, EFI_SUCCESS should
+        // be returned to make sure that the caller does not free resources
+        // still using by these SCSI commands.
+        //
+        return EFI_SUCCESS;
       }
-      return EFI_DEVICE_ERROR;
     }
 
     //
@@ -2878,15 +2903,40 @@ ScsiDiskAsyncWriteSectors (
     }
     if (EFI_ERROR (Status)) {
       //
-      // Free the SCSI_BLKIO2_REQUEST structure only when the first SCSI
-      // command fails. Otherwise, it will be freed in the callback function
-      // ScsiDiskNotify().
+      // Some devices will return EFI_DEVICE_ERROR or EFI_TIMEOUT when the data
+      // length of a SCSI I/O command is too large.
+      // In this case, we retry sending the SCSI command with a data length
+      // half of its previous value.
       //
+      if ((Status == EFI_DEVICE_ERROR) || (Status == EFI_TIMEOUT)) {
+        if ((MaxBlock > 1) && (SectorCount > 1)) {
+          MaxBlock = MIN (MaxBlock, SectorCount) >> 1;
+          continue;
+        }
+      }
+
       if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
+        //
+        // Free the SCSI_BLKIO2_REQUEST structure only when there is no other
+        // SCSI sub-task running. Otherwise, it will be freed in the callback
+        // function ScsiDiskNotify().
+        //
         RemoveEntryList (&BlkIo2Req->Link);
         FreePool (BlkIo2Req);
+
+        //
+        // It is safe to return error status to the caller, since there is no
+        // previous SCSI sub-task executing.
+        //
+        return EFI_DEVICE_ERROR;
+      } else {
+        //
+        // There are previous SCSI commands still running, EFI_SUCCESS should
+        // be returned to make sure that the caller does not free resources
+        // still using by these SCSI commands.
+        //
+        return EFI_SUCCESS;
       }
-      return EFI_DEVICE_ERROR;
     }
 
     //
