@@ -1,23 +1,24 @@
                                 EDK II Python
-                                    ReadMe
-                                 Release 1.02
-                                 18 Jan. 2013
+                                   ReadMe
+                                Version 2.7.10
+                                 Release 1.00
+                                  3 Nov. 2015
 
 
 1. OVERVIEW
 ===========
 This document is devoted to general information on building and setup of the
-Python environment for UEFI 2.3, the invocation of the interpreter, and things
+Python environment for UEFI, the invocation of the interpreter, and things
 that make working with Python easier.
 
-It is assumed that you already have either UDK2010 or a current snapshot of
+It is assumed that you already have UDK2010 or later, or a current snapshot of
 the EDK II sources from www.tianocore.org, and that you can successfully build
 packages within that distribution.
 
 2. Release Notes
 ================
   1)  All C extension modules must be statically linked (built in)
-  2)  The site and os modules must exist as discrete files in ...\lib\python.27
+  2)  The site and os modules must exist as discrete files in ...\lib\python27.10
   3)  User-specific configurations are not supported.
   4)  Environment variables are not supported.
 
@@ -25,23 +26,39 @@ packages within that distribution.
 ======================================================
   3.1 Getting Python
   ==================
-  Currently only version 2.7.2 of the CPython distribution is supported.  For development
-  ease, a subset of the Python 2.7.2 distribution has been included in the AppPkg source
-  tree.  If a full distribution is desired, the Python-2.7.2 directory can be removed or
-  renamed and the full source code downloaded from http://www.python.org/ftp/python/2.7.2/.
+  This file describes the UEFI port of version 2.7.10 of the CPython distribution.
+  For development ease, a subset of the Python 2.7.10 distribution has been
+  included as part of the AppPkg/Applications/Python/Python-2.7.10 source tree.
+  If this is sufficient, you may skip to section 3.2, Building Python.
+
+  If a full distribution is desired, it can be merged into the Python-2.7.10
+  source tree.  Directory AppPkg/Applications/Python/Python-2.7.10 corresponds
+  to the root directory of the CPython 2.7.10 distribution.  The full
+  CPython 2.7.10 source code may be downloaded from
+  http://www.python.org/ftp/python/2.7.10/.
 
   A.  Within your EDK II development tree, extract the Python distribution into
-    AppPkg/Applications/Python.  This should create the
-    AppPkg/Applications/Python/Python-2.7.2 directory.
+    AppPkg/Applications/Python/Python-2.7.10.  This should merge the additional
+    files into the source tree.  It will also create the following directories:
+        Demo      Doc         Grammar     Mac       Misc
+        PC        PCbuild     RISCOS      Tools
 
-  B.  Copy the files from PyMod-2.7.2 into the corresponding directories within
-    the Python-2.7.2 tree.  This will overwrite existing files with files
-    modified for UEFI usage.
+    The greatest change will be within the Python-2.7.10/Lib directory where
+    many more packages and modules will be added.  These additional components
+    may not have been ported to EDK II yet.
 
   3.2 Building Python
   ===================
-  A.  Edit Efi/config.c to enable the built-in modules you need.
-        Mandatory Built-in Modules:
+  B.  From the AppPkg/Applications/Python/Python-2.7.10 directory, execute the
+    srcprep.bat (srcprep.sh) script to copy the header files from within the
+    PyMod-2.7.10 sub-tree into their corresponding directories within the
+    distribution.  This step only needs to be performed prior to the first
+    build of Python, or if one of the header files within the PyMod tree has been
+    modified.
+
+  A.  Edit PyMod-2.7.10\Modules\config.c to enable the built-in modules you need.
+    By default, it is configured for the minimally required set of modules.
+      Mandatory Built-in Modules:
         edk2      errno       imp         marshal
 
       Additional built-in modules which are required to use the help()
@@ -51,10 +68,10 @@ packages within that distribution.
         cStringIO   gc              itertools     math
         operator    time
 
-  B.  Edit AppPkg/AppPkg.dsc to enable (uncomment) the PythonCore.inf line
+  B.  Edit AppPkg/AppPkg.dsc to enable (uncomment) the Python2710.inf line
     within the [Components] section.
 
-  C.  Build AppPkg, which includes Python, using the standard "build" command:
+  C.  Build AppPkg using the standard "build" command:
     For example, to build Python for an X64 CPU architecture:
                     build -a X64 -p AppPkg\AppPkg.dsc
 
@@ -70,25 +87,28 @@ target system.
        |- \etc                      Configuration files used by libraries.
        |- \tmp                      Temporary files created by tmpfile(), etc.
        |- \lib                      Root of the libraries tree.
-           |- \python.27            Directory containing the Python library modules.
+           |- \python27.10          Directory containing the Python library modules.
                |- \lib-dynload      Dynamically loadable Python extensions.
                |- \site-packages    Site-specific packages and modules.
 
+  NOTE: The name of the directory containing the Python library modules has
+        changed in order to distinguish it from the library modules for
+        version 2.7.2.
 
 5. Installing Python
 ====================
 These directories, on the target system, are populated from the development
 system as follows:
 
-  * \Efi\Tools receives a copy of Build/AppPkg/DEBUG_VS2005/X64/Python.efi.
-                                               ^^^^^ ^^^^^^
-    Modify the host path to match the your build type and compiler.
+  * \Efi\Tools receives a copy of Build/AppPkg/DEBUG_VS2015/X64/Python.efi.
+                                               ^^^^^^^^^^^^
+    Modify the host path to match your build type and compiler.
 
   * The \Efi\StdLib\etc directory is populated from the StdLib/Efi/StdLib/etc
     source directory.
 
-  * Directory \Efi\StdLib\lib\python.27 is populated with packages and modules
-    from the AppPkg/Applications/Python/Python-2.7.2/Lib directory.
+  * Directory \Efi\StdLib\lib\python27.10 is populated with packages and modules
+    from the AppPkg/Applications/Python/Python-2.7.10/Lib directory.
     The recommended minimum set of modules (.py, .pyc, and/or .pyo):
         os      stat      ntpath      warnings      traceback
         site    types     copy_reg    linecache     genericpath
@@ -97,21 +117,53 @@ system as follows:
     the \Efi\StdLib\lib\python.27\lib-dynload directory.  This functionality is not
     yet implemented.
 
+  A script, libprep.bat (libprep.sh), is provided which facilitates the population
+  of the target Lib directory.  Execute this script from within the
+  AppPkg/Applications/Python/Python-2.7.10 directory, providing a single argument
+  which is the path to the destination directory.  The appropriate contents of the
+  AppPkg/Applications/Python/Python-2.7.10/Lib and
+  AppPkg/Applications/Python/Python-2.7.10/PyMod-2.7.10/Lib directories will be
+  recursively copied into the specified destination directory.
 
 6. Example: Enabling socket support
 ===================================
   1.  enable {"_socket", init_socket}, in Efi\config.c
-  2.  enable Python-2.7.2/Modules/socketmodule.c in PythonCore.inf.
-  3.  copy socket.py over to /Efi/StdLib/lib/python.27 on your target system.
-  4.  Make sure dependent modules are present(.py) or built in(.c):
-        functools, types, os, sys, warnings, cStringIO, StringIO, errno
+  2.  enable LibraryClasses BsdSocketLib and EfiSocketLib in PythonCore.inf.
+  3.  Build Python2710
+          build -a X64 -p AppPkg\AppPkg.dsc
+  6.  copy Build\AppPkg\DEBUG_VS2005\X64\Python2710.efi to \Efi\Tools on your target system.
+                        ^^^^^^^^^^^^ Modify as needed
 
-  5.  build -a X64 -p AppPkg\AppPkg.dsc
-  6.  copy Build\AppPkg\DEBUG_VS2005\X64\Python.efi to \Efi\Tools on your target system.
-                                ^^^^ Modify as needed
+7. Running Python
+=================
+  Python must currently be run from an EFI FAT-32 partition, or volume, under
+  the UEFI Shell.  At the Shell prompt enter the desired volume name, followed
+  by a colon ':', then press Enter.  Python can then be executed by typing its
+  name, followed by any desired options and arguments.
 
+  EXAMPLE:
+      2.0 Shell> fs0:
+      2.0 FS0:\> python2710
+      Python 2.7.10 (default, Oct 13 2015, 16:21:53) [C] on uefi
+      Type "help", "copyright", "credits" or "license" for more information.
+      >>> exit()
+      2.0 FS0:\>
 
-7. Supported C Modules
+  NOTE:
+      Python, as distributed, sends its interactive prompts to stderr.  If
+      STDERR isn't enabled in UEFI Setup so that it's output goes to the console,
+      it may appear that Python hangs on startup.  If this happens, one may
+      be able to rectify the condition by typing "exit()" followed by <enter>
+      to exit out of Python.  Then, type "exit" at the Shell prompt which should
+      enter Setup.
+
+  NOTE:
+      Some platforms don't include the Setup utility, or don't allow STDERR to
+      be modified.  In these cases, Python may be started with the '-#' option
+      which will cause stderr to be the same as stdout and should allow
+      Python to be used interactively on those platforms.
+
+8. Supported C Modules
 ======================
     Module Name               C File(s)
   ===============       =============================================
@@ -166,7 +218,7 @@ system as follows:
   zlib                  Modules/zlibmodule.c          Modules/zlib/*
 
 
-8. Tested Python Library Modules
+9. Tested Python Library Modules
 ================================
 This is a partial list of the packages and modules of the Python Standard
 Library that have been tested or used in some manner.

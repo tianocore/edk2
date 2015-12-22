@@ -1,5 +1,5 @@
 ## @file
-# PythonCore.inf
+# Python2710.inf
 #
 #  Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
 #  Copyright (c) 2011-2012, Intel Corporation. All rights reserved.<BR>
@@ -15,16 +15,16 @@
 
 [Defines]
   INF_VERSION                 = 0x00010016
-  BASE_NAME                   = Python
-  FILE_GUID                   = ca5627c4-51ba-4dcb-ac62-c076ebd37ddb
+  BASE_NAME                   = Python2710
+  FILE_GUID                   = F78285FD-121E-49f4-9716-44E307656586
   MODULE_TYPE                 = UEFI_APPLICATION
-  VERSION_STRING              = 0.8
+  VERSION_STRING              = 0.1
   ENTRY_POINT                 = ShellCEntryLib
 
-  DEFINE PYTHON_VERSION       = 2.7.2
+  DEFINE PYTHON_VERSION       = 2.7.10
 
 #
-#  VALID_ARCHITECTURES        = IA32 X64 IPF
+#  VALID_ARCHITECTURES        = IA32 X64
 #
 
 [Packages]
@@ -44,8 +44,8 @@
   LibNetUtil
   DevMedia
   #
-  # Comment out the following two library classes if socket support is
-  # NOT being built in to Python.
+# Comment out the following two library classes if socket support is
+# NOT being built in to Python.
   #BsdSocketLib
   #EfiSocketLib
 
@@ -54,202 +54,205 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000040
 
 [Sources]
-#EFI -- EFI specific code
-  Efi/config.c
-  Efi/edk2module.c
-  Efi/getpath.c
-
 #Parser
-  Python-$(PYTHON_VERSION)/Parser/acceler.c
-  Python-$(PYTHON_VERSION)/Parser/bitset.c
-  Python-$(PYTHON_VERSION)/Parser/firstsets.c
-  Python-$(PYTHON_VERSION)/Parser/grammar.c
-  Python-$(PYTHON_VERSION)/Parser/grammar1.c
-  Python-$(PYTHON_VERSION)/Parser/listnode.c
-  Python-$(PYTHON_VERSION)/Parser/metagrammar.c
-  Python-$(PYTHON_VERSION)/Parser/myreadline.c
-  Python-$(PYTHON_VERSION)/Parser/node.c
-  Python-$(PYTHON_VERSION)/Parser/parser.c
-  Python-$(PYTHON_VERSION)/Parser/parsetok.c
-  Python-$(PYTHON_VERSION)/Parser/tokenizer.c
+  Parser/acceler.c
+  Parser/bitset.c
+  Parser/firstsets.c
+  Parser/grammar.c
+  Parser/grammar1.c
+  Parser/listnode.c
+  Parser/metagrammar.c
+  Parser/myreadline.c
+  Parser/node.c
+  Parser/parser.c
+  Parser/parsetok.c
+  Parser/tokenizer.c
 
 #Python
   PyMod-$(PYTHON_VERSION)/Python/getcopyright.c
   PyMod-$(PYTHON_VERSION)/Python/marshal.c
-  PyMod-$(PYTHON_VERSION)/Python/import.c
+  PyMod-$(PYTHON_VERSION)/Python/random.c
 
-  Python-$(PYTHON_VERSION)/Python/_warnings.c
-  Python-$(PYTHON_VERSION)/Python/Python-ast.c
-  Python-$(PYTHON_VERSION)/Python/asdl.c
-  Python-$(PYTHON_VERSION)/Python/ast.c
-  Python-$(PYTHON_VERSION)/Python/bltinmodule.c
-  Python-$(PYTHON_VERSION)/Python/ceval.c
-  Python-$(PYTHON_VERSION)/Python/codecs.c
-  Python-$(PYTHON_VERSION)/Python/compile.c
-  Python-$(PYTHON_VERSION)/Python/dtoa.c
-  Python-$(PYTHON_VERSION)/Python/dynload_stub.c
-  Python-$(PYTHON_VERSION)/Python/errors.c
-  Python-$(PYTHON_VERSION)/Python/formatter_string.c
-  Python-$(PYTHON_VERSION)/Python/formatter_unicode.c
-  Python-$(PYTHON_VERSION)/Python/frozen.c
-  Python-$(PYTHON_VERSION)/Python/future.c
-  Python-$(PYTHON_VERSION)/Python/getargs.c
-  Python-$(PYTHON_VERSION)/Python/getcompiler.c
-  Python-$(PYTHON_VERSION)/Python/getopt.c
-  Python-$(PYTHON_VERSION)/Python/getplatform.c
-  Python-$(PYTHON_VERSION)/Python/getversion.c
-  Python-$(PYTHON_VERSION)/Python/graminit.c
-  Python-$(PYTHON_VERSION)/Python/importdl.c
-  Python-$(PYTHON_VERSION)/Python/modsupport.c
-  Python-$(PYTHON_VERSION)/Python/mysnprintf.c
-  Python-$(PYTHON_VERSION)/Python/mystrtoul.c
-  Python-$(PYTHON_VERSION)/Python/peephole.c
-  Python-$(PYTHON_VERSION)/Python/pyarena.c
-  Python-$(PYTHON_VERSION)/Python/pyctype.c
-  Python-$(PYTHON_VERSION)/Python/pyfpe.c
-  Python-$(PYTHON_VERSION)/Python/pymath.c
-  Python-$(PYTHON_VERSION)/Python/pystate.c
-  Python-$(PYTHON_VERSION)/Python/pystrcmp.c
-  Python-$(PYTHON_VERSION)/Python/pystrtod.c
-  Python-$(PYTHON_VERSION)/Python/pythonrun.c
-  Python-$(PYTHON_VERSION)/Python/structmember.c
-  Python-$(PYTHON_VERSION)/Python/symtable.c
-  Python-$(PYTHON_VERSION)/Python/sysmodule.c
-  Python-$(PYTHON_VERSION)/Python/traceback.c
+  Python/_warnings.c
+  Python/asdl.c
+  Python/ast.c
+  Python/bltinmodule.c
+  Python/ceval.c
+  Python/codecs.c
+  Python/compile.c
+  Python/dtoa.c
+  Python/dynload_stub.c
+  Python/errors.c
+  Python/formatter_string.c
+  Python/formatter_unicode.c
+  Python/frozen.c
+  Python/future.c
+  Python/getargs.c
+  Python/getcompiler.c
+  Python/getopt.c
+  Python/getplatform.c
+  Python/getversion.c
+  Python/graminit.c
+  Python/import.c
+  Python/importdl.c
+  Python/modsupport.c
+  Python/mysnprintf.c
+  Python/mystrtoul.c
+  Python/peephole.c
+  Python/pyarena.c
+  Python/pyctype.c
+  Python/pyfpe.c
+  Python/pymath.c
+  Python/pystate.c
+  Python/pystrcmp.c
+  Python/pystrtod.c
+  Python/Python-ast.c
+  Python/pythonrun.c
+  Python/structmember.c
+  Python/symtable.c
+  Python/sysmodule.c
+  Python/traceback.c
 
 #Objects
   PyMod-$(PYTHON_VERSION)/Objects/longobject.c
 
-  Python-$(PYTHON_VERSION)/Objects/abstract.c
-  Python-$(PYTHON_VERSION)/Objects/boolobject.c
-  Python-$(PYTHON_VERSION)/Objects/bufferobject.c
-  Python-$(PYTHON_VERSION)/Objects/bytearrayobject.c
-  Python-$(PYTHON_VERSION)/Objects/bytes_methods.c
-  Python-$(PYTHON_VERSION)/Objects/capsule.c
-  Python-$(PYTHON_VERSION)/Objects/cellobject.c
-  Python-$(PYTHON_VERSION)/Objects/classobject.c
-  Python-$(PYTHON_VERSION)/Objects/cobject.c
-  Python-$(PYTHON_VERSION)/Objects/codeobject.c
-  Python-$(PYTHON_VERSION)/Objects/complexobject.c
-  Python-$(PYTHON_VERSION)/Objects/descrobject.c
-  Python-$(PYTHON_VERSION)/Objects/dictobject.c
-  Python-$(PYTHON_VERSION)/Objects/enumobject.c
-  Python-$(PYTHON_VERSION)/Objects/exceptions.c
-  Python-$(PYTHON_VERSION)/Objects/fileobject.c
-  Python-$(PYTHON_VERSION)/Objects/floatobject.c
-  Python-$(PYTHON_VERSION)/Objects/frameobject.c
-  Python-$(PYTHON_VERSION)/Objects/funcobject.c
-  Python-$(PYTHON_VERSION)/Objects/genobject.c
-  Python-$(PYTHON_VERSION)/Objects/intobject.c
-  Python-$(PYTHON_VERSION)/Objects/iterobject.c
-  Python-$(PYTHON_VERSION)/Objects/listobject.c
-  Python-$(PYTHON_VERSION)/Objects/memoryobject.c
-  Python-$(PYTHON_VERSION)/Objects/methodobject.c
-  Python-$(PYTHON_VERSION)/Objects/moduleobject.c
-  Python-$(PYTHON_VERSION)/Objects/object.c
-  Python-$(PYTHON_VERSION)/Objects/obmalloc.c
-  Python-$(PYTHON_VERSION)/Objects/rangeobject.c
-  Python-$(PYTHON_VERSION)/Objects/setobject.c
-  Python-$(PYTHON_VERSION)/Objects/sliceobject.c
-  Python-$(PYTHON_VERSION)/Objects/stringobject.c
-  Python-$(PYTHON_VERSION)/Objects/structseq.c
-  Python-$(PYTHON_VERSION)/Objects/tupleobject.c
-  Python-$(PYTHON_VERSION)/Objects/typeobject.c
-  Python-$(PYTHON_VERSION)/Objects/unicodectype.c
-  Python-$(PYTHON_VERSION)/Objects/unicodeobject.c
-  Python-$(PYTHON_VERSION)/Objects/weakrefobject.c
+  Objects/abstract.c
+  Objects/boolobject.c
+  Objects/bufferobject.c
+  Objects/bytearrayobject.c
+  Objects/bytes_methods.c
+  Objects/capsule.c
+  Objects/cellobject.c
+  Objects/classobject.c
+  Objects/cobject.c
+  Objects/codeobject.c
+  Objects/complexobject.c
+  Objects/descrobject.c
+  Objects/dictobject.c
+  Objects/enumobject.c
+  Objects/exceptions.c
+  Objects/fileobject.c
+  Objects/floatobject.c
+  Objects/frameobject.c
+  Objects/funcobject.c
+  Objects/genobject.c
+  Objects/intobject.c
+  Objects/iterobject.c
+  Objects/listobject.c
+  Objects/memoryobject.c
+  Objects/methodobject.c
+  Objects/moduleobject.c
+  Objects/object.c
+  Objects/obmalloc.c
+  Objects/rangeobject.c
+  Objects/setobject.c
+  Objects/sliceobject.c
+  Objects/stringobject.c
+  Objects/structseq.c
+  Objects/tupleobject.c
+  Objects/typeobject.c
+  Objects/unicodectype.c
+  Objects/unicodeobject.c
+  Objects/weakrefobject.c
 
-#Modules -- See Efi/config.c
+#Modules -- See config.c
   # Mandatory Modules -- These must always be built in.
+  PyMod-$(PYTHON_VERSION)/Modules/config.c
+  PyMod-$(PYTHON_VERSION)/Modules/edk2module.c
   PyMod-$(PYTHON_VERSION)/Modules/errnomodule.c
-  Python-$(PYTHON_VERSION)/Modules/_functoolsmodule.c
-  Python-$(PYTHON_VERSION)/Modules/gcmodule.c
-  Python-$(PYTHON_VERSION)/Modules/getbuildinfo.c
+  PyMod-$(PYTHON_VERSION)/Modules/getpath.c
   PyMod-$(PYTHON_VERSION)/Modules/main.c
-  Python-$(PYTHON_VERSION)/Modules/python.c
+
+  Modules/_functoolsmodule.c
+  Modules/gcmodule.c
+  Modules/getbuildinfo.c
+  Modules/python.c
 
   # Optional Modules -- See Python/Efi/config.c
-  PyMod-$(PYTHON_VERSION)/Modules/_sre.c                        #
-  PyMod-$(PYTHON_VERSION)/Modules/selectmodule.c                #
+  PyMod-$(PYTHON_VERSION)/Modules/_sre.c
+  PyMod-$(PYTHON_VERSION)/Modules/selectmodule.c
   #
-  Python-$(PYTHON_VERSION)/Modules/_bisectmodule.c              #
-  Python-$(PYTHON_VERSION)/Modules/_codecsmodule.c              #
-  Python-$(PYTHON_VERSION)/Modules/_collectionsmodule.c         #
-  Python-$(PYTHON_VERSION)/Modules/_csv.c                       #
-  Python-$(PYTHON_VERSION)/Modules/_heapqmodule.c               #
-  Python-$(PYTHON_VERSION)/Modules/_json.c                      #
-  Python-$(PYTHON_VERSION)/Modules/_localemodule.c              #
-  Python-$(PYTHON_VERSION)/Modules/_math.c                      #
-  Python-$(PYTHON_VERSION)/Modules/_randommodule.c              #
-  Python-$(PYTHON_VERSION)/Modules/_struct.c                    #
-  Python-$(PYTHON_VERSION)/Modules/_weakref.c                   #
-  Python-$(PYTHON_VERSION)/Modules/arraymodule.c                #
-  Python-$(PYTHON_VERSION)/Modules/binascii.c                   #
-  Python-$(PYTHON_VERSION)/Modules/cmathmodule.c                #
-  Python-$(PYTHON_VERSION)/Modules/cPickle.c                    #
-  Python-$(PYTHON_VERSION)/Modules/cStringIO.c                  #
-  Python-$(PYTHON_VERSION)/Modules/datetimemodule.c             #
-  Python-$(PYTHON_VERSION)/Modules/future_builtins.c            #
-  Python-$(PYTHON_VERSION)/Modules/itertoolsmodule.c            #
-  Python-$(PYTHON_VERSION)/Modules/mathmodule.c                 #
-  Python-$(PYTHON_VERSION)/Modules/md5.c                        #
-  Python-$(PYTHON_VERSION)/Modules/md5module.c                  #
-  Python-$(PYTHON_VERSION)/Modules/operator.c                   #
-  Python-$(PYTHON_VERSION)/Modules/parsermodule.c               #
-  Python-$(PYTHON_VERSION)/Modules/sha256module.c               #
-  Python-$(PYTHON_VERSION)/Modules/sha512module.c               #
-  Python-$(PYTHON_VERSION)/Modules/shamodule.c                  #
-  Python-$(PYTHON_VERSION)/Modules/signalmodule.c               #
-  Python-$(PYTHON_VERSION)/Modules/socketmodule.c               #
-  Python-$(PYTHON_VERSION)/Modules/stropmodule.c                #
-  Python-$(PYTHON_VERSION)/Modules/symtablemodule.c             #
-  Python-$(PYTHON_VERSION)/Modules/timemodule.c                 #
-  Python-$(PYTHON_VERSION)/Modules/unicodedata.c                #
-  Python-$(PYTHON_VERSION)/Modules/xxsubtype.c                  #
-  Python-$(PYTHON_VERSION)/Modules/zipimport.c                  #
-  Python-$(PYTHON_VERSION)/Modules/zlibmodule.c                 #
+  Modules/_bisectmodule.c              #
+  Modules/_codecsmodule.c              #
+  Modules/_collectionsmodule.c         #
+  Modules/_csv.c                       #
+  Modules/_heapqmodule.c               #
+  Modules/_json.c                      #
+  Modules/_localemodule.c              #
+  Modules/_math.c                      #
+  Modules/_randommodule.c              #
+  Modules/_struct.c                    #
+  Modules/_weakref.c                   #
+  Modules/arraymodule.c                #
+  Modules/binascii.c                   #
+  Modules/cmathmodule.c                #
+  Modules/cPickle.c                    #
+  Modules/cStringIO.c                  #
+  Modules/datetimemodule.c             #
+  Modules/future_builtins.c            #
+  Modules/itertoolsmodule.c            #
+  Modules/mathmodule.c                 #
+  Modules/md5.c                        #
+  Modules/md5module.c                  #
+  Modules/operator.c                   #
+  Modules/parsermodule.c               #
+  Modules/sha256module.c               #
+  Modules/sha512module.c               #
+  Modules/shamodule.c                  #
+  Modules/signalmodule.c               #
+  Modules/socketmodule.c               #
+  Modules/stropmodule.c                #
+  Modules/symtablemodule.c             #
+  Modules/timemodule.c                 #
+  Modules/unicodedata.c                #
+  Modules/xxsubtype.c                  #
+  Modules/zipimport.c                  #
+  Modules/zlibmodule.c                 #
 
 #Modules/_io
-  Python-$(PYTHON_VERSION)/Modules/_io/_iomodule.c              #
-  Python-$(PYTHON_VERSION)/Modules/_io/bufferedio.c             #
-  Python-$(PYTHON_VERSION)/Modules/_io/bytesio.c                #
-  Python-$(PYTHON_VERSION)/Modules/_io/fileio.c                 #
-  Python-$(PYTHON_VERSION)/Modules/_io/iobase.c                 #
-  Python-$(PYTHON_VERSION)/Modules/_io/stringio.c               #
-  Python-$(PYTHON_VERSION)/Modules/_io/textio.c                 #
+  Modules/_io/_iomodule.c              #
+  Modules/_io/bufferedio.c             #
+  Modules/_io/bytesio.c                #
+  Modules/_io/fileio.c                 #
+  Modules/_io/iobase.c                 #
+  Modules/_io/stringio.c               #
+  Modules/_io/textio.c                 #
 
 #Modules/cjkcodecs
-  Python-$(PYTHON_VERSION)/Modules/cjkcodecs/multibytecodec.c   #
-  Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_cn.c       #
-  Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_hk.c       #
-  Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_iso2022.c  #
-  Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_jp.c       #
-  Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_kr.c       #
-  Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_tw.c       #
+  Modules/cjkcodecs/multibytecodec.c   #
+  Modules/cjkcodecs/_codecs_cn.c       #
+  Modules/cjkcodecs/_codecs_hk.c       #
+  Modules/cjkcodecs/_codecs_iso2022.c  #
+  Modules/cjkcodecs/_codecs_jp.c       #
+  Modules/cjkcodecs/_codecs_kr.c       #
+  Modules/cjkcodecs/_codecs_tw.c       #
 
 #Modules/expat
-  Python-$(PYTHON_VERSION)/Modules/pyexpat.c                    #
-  PyMod-$(PYTHON_VERSION)/Modules/expat/xmlparse.c              #
-  Python-$(PYTHON_VERSION)/Modules/expat/xmlrole.c              #
-  Python-$(PYTHON_VERSION)/Modules/expat/xmltok.c               #
+  Modules/pyexpat.c                    #
+  Modules/expat/xmlrole.c              #
+  Modules/expat/xmltok.c               #
+  Modules/expat/xmlparse.c             #
 
 #Modules/zlib
-  Python-$(PYTHON_VERSION)/Modules/zlib/adler32.c               #
-  Python-$(PYTHON_VERSION)/Modules/zlib/compress.c              #
-  Python-$(PYTHON_VERSION)/Modules/zlib/crc32.c                 #
-  Python-$(PYTHON_VERSION)/Modules/zlib/deflate.c               #
-  Python-$(PYTHON_VERSION)/Modules/zlib/gzio.c                  #
-  Python-$(PYTHON_VERSION)/Modules/zlib/infback.c               #
-  Python-$(PYTHON_VERSION)/Modules/zlib/inffast.c               #
-  Python-$(PYTHON_VERSION)/Modules/zlib/inflate.c               #
-  Python-$(PYTHON_VERSION)/Modules/zlib/inftrees.c              #
-  Python-$(PYTHON_VERSION)/Modules/zlib/trees.c                 #
-  Python-$(PYTHON_VERSION)/Modules/zlib/uncompr.c               #
-  Python-$(PYTHON_VERSION)/Modules/zlib/zutil.c                 #
+  Modules/zlib/adler32.c               #
+  Modules/zlib/compress.c              #
+  Modules/zlib/crc32.c                 #
+  Modules/zlib/deflate.c               #
+  Modules/zlib/gzclose.c               #
+  Modules/zlib/gzlib.c                 #
+  Modules/zlib/gzread.c                #
+  Modules/zlib/gzwrite.c               #
+
+  Modules/zlib/infback.c               #
+  Modules/zlib/inffast.c               #
+  Modules/zlib/inflate.c               #
+  Modules/zlib/inftrees.c              #
+  Modules/zlib/trees.c                 #
+  Modules/zlib/uncompr.c               #
+  Modules/zlib/zutil.c                 #
 
 [BuildOptions]
-   MSFT:*_*_IA32_CC_FLAGS         = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\Ia32 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include /DHAVE_MEMMOVE /DUSE_PYEXPAT_CAPI /DXML_STATIC
-   MSFT:*_*_X64_CC_FLAGS          = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\X64 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include /DHAVE_MEMMOVE /DUSE_PYEXPAT_CAPI /DXML_STATIC
-    GCC:*_*_IA32_CC_FLAGS         = -fno-builtin -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/Ia32 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include -DHAVE_MEMMOVE -DUSE_PYEXPAT_CAPI -DXML_STATIC
-    GCC:*_*_X64_CC_FLAGS          = -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/X64 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include -DHAVE_MEMMOVE -DUSE_PYEXPAT_CAPI -DXML_STATIC
-    GCC:*_*_IPF_SYMRENAME_FLAGS   = --redefine-syms=$(WORKSPACE)/StdLib/GccSymRename.txt
+   MSFT:*_*_IA32_CC_FLAGS         = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\Python-2.7.10\Ia32 /I$(WORKSPACE)\AppPkg\Applications\Python\Python-2.7.10\Include /DHAVE_MEMMOVE /DUSE_PYEXPAT_CAPI /DXML_STATIC
+   MSFT:*_*_X64_CC_FLAGS          = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\Python-2.7.10\X64 /I$(WORKSPACE)\AppPkg\Applications\Python\Python-2.7.10\Include /DHAVE_MEMMOVE /DUSE_PYEXPAT_CAPI /DXML_STATIC
+    GCC:*_*_IA32_CC_FLAGS         = -fno-builtin -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/Python-2.7.10/Ia32 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-2.7.10/PyMod-2.7.10/Include -I$(WORKSPACE)/AppPkg/Applications/Python/Python-2.7.10/Include -DHAVE_MEMMOVE -DUSE_PYEXPAT_CAPI -DXML_STATIC
+    GCC:*_*_X64_CC_FLAGS          = -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/Python-2.7.10/X64 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-2.7.10/PyMod-2.7.10/Include -I$(WORKSPACE)/AppPkg/Applications/Python/Python-2.7.10/Include -DHAVE_MEMMOVE -DUSE_PYEXPAT_CAPI -DXML_STATIC
