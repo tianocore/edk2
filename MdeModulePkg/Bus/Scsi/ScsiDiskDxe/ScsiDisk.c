@@ -2609,6 +2609,7 @@ ScsiDiskAsyncReadSectors (
   UINT64                Timeout;
   SCSI_BLKIO2_REQUEST   *BlkIo2Req;
   EFI_STATUS            Status;
+  EFI_TPL               OldTpl;
 
   if ((Token == NULL) || (Token->Event == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -2620,7 +2621,11 @@ ScsiDiskAsyncReadSectors (
   }
 
   BlkIo2Req->Token  = Token;
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&ScsiDiskDevice->BlkIo2Queue, &BlkIo2Req->Link);
+  gBS->RestoreTPL (OldTpl);
+
   InitializeListHead (&BlkIo2Req->ScsiRWQueue);
 
   Status            = EFI_SUCCESS;
@@ -2727,6 +2732,7 @@ ScsiDiskAsyncReadSectors (
         }
       }
 
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
         //
         // Free the SCSI_BLKIO2_REQUEST structure only when there is no other
@@ -2735,19 +2741,25 @@ ScsiDiskAsyncReadSectors (
         //
         RemoveEntryList (&BlkIo2Req->Link);
         FreePool (BlkIo2Req);
+        BlkIo2Req = NULL;
+        gBS->RestoreTPL (OldTpl);
 
         //
         // It is safe to return error status to the caller, since there is no
         // previous SCSI sub-task executing.
         //
-        return EFI_DEVICE_ERROR;
+        Status = EFI_DEVICE_ERROR;
+        goto Done;
       } else {
+        gBS->RestoreTPL (OldTpl);
+
         //
         // There are previous SCSI commands still running, EFI_SUCCESS should
         // be returned to make sure that the caller does not free resources
         // still using by these SCSI commands.
         //
-        return EFI_SUCCESS;
+        Status = EFI_SUCCESS;
+        goto Done;
       }
     }
 
@@ -2761,7 +2773,24 @@ ScsiDiskAsyncReadSectors (
     BlocksRemaining -= SectorCount;
   }
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  if (BlkIo2Req != NULL) {
+    BlkIo2Req->LastScsiRW = TRUE;
+
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
+      RemoveEntryList (&BlkIo2Req->Link);
+      FreePool (BlkIo2Req);
+      BlkIo2Req = NULL;
+
+      gBS->SignalEvent (Token->Event);
+    }
+    gBS->RestoreTPL (OldTpl);
+  }
+
+  return Status;
 }
 
 /**
@@ -2797,6 +2826,7 @@ ScsiDiskAsyncWriteSectors (
   UINT64                Timeout;
   SCSI_BLKIO2_REQUEST   *BlkIo2Req;
   EFI_STATUS            Status;
+  EFI_TPL               OldTpl;
 
   if ((Token == NULL) || (Token->Event == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -2808,7 +2838,11 @@ ScsiDiskAsyncWriteSectors (
   }
 
   BlkIo2Req->Token  = Token;
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&ScsiDiskDevice->BlkIo2Queue, &BlkIo2Req->Link);
+  gBS->RestoreTPL (OldTpl);
+
   InitializeListHead (&BlkIo2Req->ScsiRWQueue);
 
   Status            = EFI_SUCCESS;
@@ -2915,6 +2949,7 @@ ScsiDiskAsyncWriteSectors (
         }
       }
 
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
         //
         // Free the SCSI_BLKIO2_REQUEST structure only when there is no other
@@ -2923,19 +2958,25 @@ ScsiDiskAsyncWriteSectors (
         //
         RemoveEntryList (&BlkIo2Req->Link);
         FreePool (BlkIo2Req);
+        BlkIo2Req = NULL;
+        gBS->RestoreTPL (OldTpl);
 
         //
         // It is safe to return error status to the caller, since there is no
         // previous SCSI sub-task executing.
         //
-        return EFI_DEVICE_ERROR;
+        Status = EFI_DEVICE_ERROR;
+        goto Done;
       } else {
+        gBS->RestoreTPL (OldTpl);
+
         //
         // There are previous SCSI commands still running, EFI_SUCCESS should
         // be returned to make sure that the caller does not free resources
         // still using by these SCSI commands.
         //
-        return EFI_SUCCESS;
+        Status = EFI_SUCCESS;
+        goto Done;
       }
     }
 
@@ -2949,7 +2990,24 @@ ScsiDiskAsyncWriteSectors (
     BlocksRemaining -= SectorCount;
   }
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  if (BlkIo2Req != NULL) {
+    BlkIo2Req->LastScsiRW = TRUE;
+
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    if (IsListEmpty (&BlkIo2Req->ScsiRWQueue)) {
+      RemoveEntryList (&BlkIo2Req->Link);
+      FreePool (BlkIo2Req);
+      BlkIo2Req = NULL;
+
+      gBS->SignalEvent (Token->Event);
+    }
+    gBS->RestoreTPL (OldTpl);
+  }
+
+  return Status;
 }
 
 
@@ -3713,7 +3771,8 @@ Retry:
 
 Exit:
   RemoveEntryList (&Request->Link);
-  if (IsListEmpty (&Request->BlkIo2Req->ScsiRWQueue)) {
+  if ((IsListEmpty (&Request->BlkIo2Req->ScsiRWQueue)) &&
+      (Request->BlkIo2Req->LastScsiRW)) {
     //
     // The last SCSI R/W command of a BlockIo2 request completes
     //
@@ -3763,6 +3822,7 @@ ScsiDiskAsyncRead10 (
   EFI_STATUS                   Status;
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
+  EFI_TPL                      OldTpl;
 
   AsyncIoEvent = NULL;
 
@@ -3770,7 +3830,10 @@ ScsiDiskAsyncRead10 (
   if (Request == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+  gBS->RestoreTPL (OldTpl);
 
   Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
   Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
@@ -3793,7 +3856,7 @@ ScsiDiskAsyncRead10 (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiDiskNotify,
                   Request,
                   &AsyncIoEvent
@@ -3831,7 +3894,10 @@ ErrorExit:
       FreePool (Request->SenseData);
     }
 
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     RemoveEntryList (&Request->Link);
+    gBS->RestoreTPL (OldTpl);
+
     FreePool (Request);
   }
 
@@ -3875,6 +3941,7 @@ ScsiDiskAsyncWrite10 (
   EFI_STATUS                   Status;
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
+  EFI_TPL                      OldTpl;
 
   AsyncIoEvent = NULL;
 
@@ -3882,7 +3949,10 @@ ScsiDiskAsyncWrite10 (
   if (Request == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+  gBS->RestoreTPL (OldTpl);
 
   Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
   Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
@@ -3905,7 +3975,7 @@ ScsiDiskAsyncWrite10 (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiDiskNotify,
                   Request,
                   &AsyncIoEvent
@@ -3943,7 +4013,10 @@ ErrorExit:
       FreePool (Request->SenseData);
     }
 
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     RemoveEntryList (&Request->Link);
+    gBS->RestoreTPL (OldTpl);
+
     FreePool (Request);
   }
 
@@ -3987,6 +4060,7 @@ ScsiDiskAsyncRead16 (
   EFI_STATUS                   Status;
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
+  EFI_TPL                      OldTpl;
 
   AsyncIoEvent = NULL;
 
@@ -3994,7 +4068,10 @@ ScsiDiskAsyncRead16 (
   if (Request == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+  gBS->RestoreTPL (OldTpl);
 
   Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
   Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
@@ -4017,7 +4094,7 @@ ScsiDiskAsyncRead16 (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiDiskNotify,
                   Request,
                   &AsyncIoEvent
@@ -4055,7 +4132,10 @@ ErrorExit:
       FreePool (Request->SenseData);
     }
 
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     RemoveEntryList (&Request->Link);
+    gBS->RestoreTPL (OldTpl);
+
     FreePool (Request);
   }
 
@@ -4099,6 +4179,7 @@ ScsiDiskAsyncWrite16 (
   EFI_STATUS                   Status;
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
+  EFI_TPL                      OldTpl;
 
   AsyncIoEvent = NULL;
 
@@ -4106,7 +4187,10 @@ ScsiDiskAsyncWrite16 (
   if (Request == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&BlkIo2Req->ScsiRWQueue, &Request->Link);
+  gBS->RestoreTPL (OldTpl);
 
   Request->SenseDataLength = (UINT8) (6 * sizeof (EFI_SCSI_SENSE_DATA));
   Request->SenseData       = AllocateZeroPool (Request->SenseDataLength);
@@ -4129,7 +4213,7 @@ ScsiDiskAsyncWrite16 (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiDiskNotify,
                   Request,
                   &AsyncIoEvent
@@ -4167,7 +4251,10 @@ ErrorExit:
       FreePool (Request->SenseData);
     }
 
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     RemoveEntryList (&Request->Link);
+    gBS->RestoreTPL (OldTpl);
+
     FreePool (Request);
   }
 

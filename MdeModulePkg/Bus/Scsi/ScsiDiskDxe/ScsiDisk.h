@@ -98,7 +98,13 @@ typedef struct {
 typedef struct {
   EFI_BLOCK_IO2_TOKEN                  *Token;
   //
-  // The queue for Scsi Read/Write requests of a BlockIo2
+  // The flag indicates if the last Scsi Read/Write sub-task for a BlockIo2
+  // request is sent to device
+  //
+  BOOLEAN                              LastScsiRW;
+
+  //
+  // The queue for Scsi Read/Write sub-tasks of a BlockIo2 request
   //
   LIST_ENTRY                           ScsiRWQueue;
 
