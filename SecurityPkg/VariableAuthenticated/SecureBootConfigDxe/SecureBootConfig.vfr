@@ -47,18 +47,6 @@ formset
         text   = STRING_TOKEN(STR_SECURE_BOOT_STATE_CONTENT);
 
     //
-    // Define of Check Box: Attempt Secure Boot
-    //
-    suppressif TRUE;
-      checkbox varid   = SECUREBOOT_CONFIGURATION.HideSecureBoot,
-              questionid = KEY_HIDE_SECURE_BOOT,
-              prompt   = STRING_TOKEN(STR_NULL),
-              help     = STRING_TOKEN(STR_NULL),
-              flags    = INTERACTIVE,
-      endcheckbox;
-    endif;
-
-    //
     // Display of Check Box: Attempt Secure Boot
     //
     grayoutif ideqval SECUREBOOT_CONFIGURATION.HideSecureBoot == 1;
@@ -73,23 +61,14 @@ formset
     //
     // Display of Oneof: 'Secure Boot Mode'
     //
-    disableif TRUE;
-      oneof varid  = SECUREBOOT_CONFIGURATION.SecureBootMode,
-            prompt = STRING_TOKEN(STR_SECURE_BOOT_MODE_PROMPT),
-            help   = STRING_TOKEN(STR_SECURE_BOOT_MODE_HELP),
-            flags  = INTERACTIVE,
-            option text = STRING_TOKEN(STR_STANDARD_MODE),    value = SECURE_BOOT_MODE_STANDARD, flags = 0;
-            option text = STRING_TOKEN(STR_CUSTOM_MODE),      value = SECURE_BOOT_MODE_CUSTOM,   flags = 0;
-      endoneof;
-    endif;
-      oneof name = SecureBootMode,
-            questionid = KEY_SECURE_BOOT_MODE,
-            prompt = STRING_TOKEN(STR_SECURE_BOOT_MODE_PROMPT),
-            help   = STRING_TOKEN(STR_SECURE_BOOT_MODE_HELP),
-            flags  = INTERACTIVE | NUMERIC_SIZE_1,
-            option text = STRING_TOKEN(STR_STANDARD_MODE),    value = SECURE_BOOT_MODE_STANDARD, flags = DEFAULT;
-            option text = STRING_TOKEN(STR_CUSTOM_MODE),      value = SECURE_BOOT_MODE_CUSTOM,   flags = 0;
-      endoneof;
+    oneof name = SecureBootMode,
+          questionid = KEY_SECURE_BOOT_MODE,
+          prompt = STRING_TOKEN(STR_SECURE_BOOT_MODE_PROMPT),
+          help   = STRING_TOKEN(STR_SECURE_BOOT_MODE_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_STANDARD_MODE),    value = SECURE_BOOT_MODE_STANDARD, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_CUSTOM_MODE),      value = SECURE_BOOT_MODE_CUSTOM,   flags = 0;
+    endoneof;
 
     //
     // Display PK include page
@@ -117,29 +96,7 @@ formset
     //
     // Display of SetupMode/UserMode/AuditMode/DeployedMode transition
     //
-    disableif TRUE;
-      oneof varid  = SECUREBOOT_CONFIGURATION.TransSecureBootMode,
-            prompt = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_PROMPT),
-            help   = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_HELP),
-            flags  = INTERACTIVE,
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE
-              OR (ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE AND
-                  ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 0);
-            option text = STRING_TOKEN(STR_USER_MODE),     value = SECURE_BOOT_MODE_USER_MODE,   flags = 0;
-      endif
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE;
-            option text = STRING_TOKEN(STR_SETUP_MODE),    value = SECURE_BOOT_MODE_SETUP_MODE,  flags = 0;
-      endif
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE;
-            option text = STRING_TOKEN(STR_AUDIT_MODE),    value = SECURE_BOOT_MODE_AUDIT_MODE,  flags = 0;
-      endif
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE;
-            option text = STRING_TOKEN(STR_DEPLOYED_MODE), value = SECURE_BOOT_MODE_DEPLOYED_MODE,  flags = 0;
-      endif
-            option text = STRING_TOKEN(STR_DEPLOYED_MODE), value = 4,  flags = 0;
-      endoneof;
-    endif;
-      oneof name   = TransSecureBootMode,
+    oneof name   = TransSecureBootMode,
             questionid = KEY_TRANS_SECURE_BOOT_MODE,
             prompt = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_PROMPT),
             help   = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_HELP),
@@ -159,7 +116,7 @@ formset
             option text = STRING_TOKEN(STR_DEPLOYED_MODE), value = SECURE_BOOT_MODE_DEPLOYED_MODE,  flags = 0;
       endif
 
-      endoneof;
+    endoneof;
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
@@ -212,15 +169,8 @@ formset
     subtitle text = STRING_TOKEN(STR_NULL);
 
     //
-    // Define of Check Box: 'Delete PK'
+    // Display of 'Enroll PK'
     //
-    suppressif TRUE;
-      checkbox varid   = SECUREBOOT_CONFIGURATION.DeletePk,
-               prompt   = STRING_TOKEN(STR_NULL),
-               help     = STRING_TOKEN(STR_NULL),
-      endcheckbox;
-    endif;
-
     grayoutif ideqval SECUREBOOT_CONFIGURATION.HasPk == 1;
     goto FORMID_ENROLL_PK_FORM,
          prompt = STRING_TOKEN(STR_ENROLL_PK),
