@@ -1040,7 +1040,7 @@ ScsiExecuteSCSICommand (
       //
       Status = gBS->CreateEvent (
                        EVT_NOTIFY_SIGNAL,
-                       TPL_CALLBACK,
+                       TPL_NOTIFY,
                        NotifyFunction,
                        &EventData,
                        &PacketEvent
