@@ -33,6 +33,17 @@ formset
     subtitle text = STRING_TOKEN(STR_LAST_STRING);
 
     //
+    //Add this invisable text in order to indicate enter Boot Manager form.
+    //
+    suppressif TRUE;
+          text
+              help  = STRING_TOKEN(STR_LAST_STRING ),
+              text  = STRING_TOKEN(STR_LAST_STRING ),
+              flags = INTERACTIVE,
+              key   = 0x1212;
+     endif;
+
+    //
     // This is where we will dynamically add choices for the Boot Manager
     //
     label LABEL_BOOT_OPTION;
