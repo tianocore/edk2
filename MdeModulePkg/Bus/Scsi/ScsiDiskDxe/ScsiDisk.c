@@ -2692,6 +2692,7 @@ ScsiDiskAsyncReadSectors (
       Status = ScsiDiskAsyncRead10 (
                  ScsiDiskDevice,
                  Timeout,
+                 0,
                  PtrBuffer,
                  ByteCount,
                  (UINT32) Lba,
@@ -2703,6 +2704,7 @@ ScsiDiskAsyncReadSectors (
       Status = ScsiDiskAsyncRead16 (
                  ScsiDiskDevice,
                  Timeout,
+                 0,
                  PtrBuffer,
                  ByteCount,
                  Lba,
@@ -2853,6 +2855,7 @@ ScsiDiskAsyncWriteSectors (
       Status = ScsiDiskAsyncWrite10 (
                  ScsiDiskDevice,
                  Timeout,
+                 0,
                  PtrBuffer,
                  ByteCount,
                  (UINT32) Lba,
@@ -2864,6 +2867,7 @@ ScsiDiskAsyncWriteSectors (
       Status = ScsiDiskAsyncWrite16 (
                  ScsiDiskDevice,
                  Timeout,
+                 0,
                  PtrBuffer,
                  ByteCount,
                  Lba,
@@ -3527,6 +3531,7 @@ Retry:
       Status = ScsiDiskAsyncRead10 (
                  ScsiDiskDevice,
                  Request->Timeout,
+                 Request->TimesRetry,
                  Request->InBuffer,
                  Request->DataLength,
                  (UINT32) Request->StartLba,
@@ -3538,6 +3543,7 @@ Retry:
       Status = ScsiDiskAsyncRead16 (
                  ScsiDiskDevice,
                  Request->Timeout,
+                 Request->TimesRetry,
                  Request->InBuffer,
                  Request->DataLength,
                  Request->StartLba,
@@ -3559,6 +3565,7 @@ Retry:
         Status = ScsiDiskAsyncRead10 (
                    ScsiDiskDevice,
                    Request->Timeout,
+                   0,
                    Request->InBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
                    OldDataLength - Request->DataLength,
                    (UINT32) Request->StartLba + Request->SectorCount,
@@ -3570,6 +3577,7 @@ Retry:
         Status = ScsiDiskAsyncRead16 (
                    ScsiDiskDevice,
                    Request->Timeout,
+                   0,
                    Request->InBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
                    OldDataLength - Request->DataLength,
                    Request->StartLba + Request->SectorCount,
@@ -3591,6 +3599,7 @@ Retry:
       Status = ScsiDiskAsyncWrite10 (
                  ScsiDiskDevice,
                  Request->Timeout,
+                 Request->TimesRetry,
                  Request->OutBuffer,
                  Request->DataLength,
                  (UINT32) Request->StartLba,
@@ -3602,6 +3611,7 @@ Retry:
       Status = ScsiDiskAsyncWrite16 (
                  ScsiDiskDevice,
                  Request->Timeout,
+                 Request->TimesRetry,
                  Request->OutBuffer,
                  Request->DataLength,
                  Request->StartLba,
@@ -3623,6 +3633,7 @@ Retry:
         Status = ScsiDiskAsyncWrite10 (
                    ScsiDiskDevice,
                    Request->Timeout,
+                   0,
                    Request->OutBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
                    OldDataLength - Request->DataLength,
                    (UINT32) Request->StartLba + Request->SectorCount,
@@ -3634,6 +3645,7 @@ Retry:
         Status = ScsiDiskAsyncWrite16 (
                    ScsiDiskDevice,
                    Request->Timeout,
+                   0,
                    Request->OutBuffer + Request->SectorCount * ScsiDiskDevice->BlkIo.Media->BlockSize,
                    OldDataLength - Request->DataLength,
                    Request->StartLba + Request->SectorCount,
@@ -3670,6 +3682,7 @@ Exit:
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer to fill with the read out data.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -3688,6 +3701,7 @@ EFI_STATUS
 ScsiDiskAsyncRead10 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
      OUT UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT32                StartLba,
@@ -3717,6 +3731,7 @@ ScsiDiskAsyncRead10 (
 
   Request->ScsiDiskDevice  = ScsiDiskDevice;
   Request->Timeout         = Timeout;
+  Request->TimesRetry      = TimesRetry;
   Request->InBuffer        = DataBuffer;
   Request->DataLength      = DataLength;
   Request->StartLba        = StartLba;
@@ -3779,6 +3794,7 @@ ErrorExit:
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer contains the data to write.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -3797,6 +3813,7 @@ EFI_STATUS
 ScsiDiskAsyncWrite10 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
   IN     UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT32                StartLba,
@@ -3826,6 +3843,7 @@ ScsiDiskAsyncWrite10 (
 
   Request->ScsiDiskDevice  = ScsiDiskDevice;
   Request->Timeout         = Timeout;
+  Request->TimesRetry      = TimesRetry;
   Request->OutBuffer       = DataBuffer;
   Request->DataLength      = DataLength;
   Request->StartLba        = StartLba;
@@ -3888,6 +3906,7 @@ ErrorExit:
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer to fill with the read out data.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -3906,6 +3925,7 @@ EFI_STATUS
 ScsiDiskAsyncRead16 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
      OUT UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT64                StartLba,
@@ -3935,6 +3955,7 @@ ScsiDiskAsyncRead16 (
 
   Request->ScsiDiskDevice  = ScsiDiskDevice;
   Request->Timeout         = Timeout;
+  Request->TimesRetry      = TimesRetry;
   Request->InBuffer        = DataBuffer;
   Request->DataLength      = DataLength;
   Request->StartLba        = StartLba;
@@ -3997,6 +4018,7 @@ ErrorExit:
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer contains the data to write.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -4015,6 +4037,7 @@ EFI_STATUS
 ScsiDiskAsyncWrite16 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
   IN     UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT64                StartLba,
@@ -4044,6 +4067,7 @@ ScsiDiskAsyncWrite16 (
 
   Request->ScsiDiskDevice  = ScsiDiskDevice;
   Request->Timeout         = Timeout;
+  Request->TimesRetry      = TimesRetry;
   Request->OutBuffer       = DataBuffer;
   Request->DataLength      = DataLength;
   Request->StartLba        = StartLba;

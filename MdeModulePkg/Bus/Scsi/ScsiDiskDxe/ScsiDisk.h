@@ -1029,6 +1029,7 @@ ScsiDiskWrite16 (
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer to fill with the read out data.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -1047,6 +1048,7 @@ EFI_STATUS
 ScsiDiskAsyncRead10 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
      OUT UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT32                StartLba,
@@ -1060,6 +1062,7 @@ ScsiDiskAsyncRead10 (
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer contains the data to write.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -1078,6 +1081,7 @@ EFI_STATUS
 ScsiDiskAsyncWrite10 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
   IN     UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT32                StartLba,
@@ -1091,6 +1095,7 @@ ScsiDiskAsyncWrite10 (
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer to fill with the read out data.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -1109,6 +1114,7 @@ EFI_STATUS
 ScsiDiskAsyncRead16 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
      OUT UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT64                StartLba,
@@ -1122,6 +1128,7 @@ ScsiDiskAsyncRead16 (
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice.
   @param  Timeout            The time to complete the command.
+  @param  TimesRetry         The number of times the command has been retried.
   @param  DataBuffer         The buffer contains the data to write.
   @param  DataLength         The length of buffer.
   @param  StartLba           The start logic block address.
@@ -1140,6 +1147,7 @@ EFI_STATUS
 ScsiDiskAsyncWrite16 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
+  IN     UINT8                 TimesRetry,
   IN     UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT64                StartLba,
