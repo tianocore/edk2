@@ -692,6 +692,11 @@ ScsiDiskWriteBlocks (
     goto Done;
   }
 
+  if (Media->ReadOnly) {
+    Status = EFI_WRITE_PROTECTED;
+    goto Done;
+  }
+
   if (BufferSize == 0) {
     Status = EFI_SUCCESS;
     goto Done;
@@ -1045,6 +1050,11 @@ ScsiDiskWriteBlocksEx (
 
   if (MediaId != Media->MediaId) {
     Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (Media->ReadOnly) {
+    Status = EFI_WRITE_PROTECTED;
     goto Done;
   }
 
