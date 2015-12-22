@@ -1,7 +1,8 @@
 // /**
 //
-// (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
 // Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+// (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
+// (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -395,5 +396,6 @@
                                                           "    iScsiIpv6Boot          : %%H%d%%N\r\n"
                                                           "    FCoeBoot               : %%H%d%%N\r\n"
 #string STR_SAN_MAC_ADDRESS_INFO          #language en-US "    SanMacAddress: %%H%02x-%02x-%02x-%02x-%02x-%02x%%N \r\n"
+#string STR_UNDI_IPV6_INFO                #language en-US "    UNDI IPv6 Supported: %%H%d%%N \r\n"
 #string STR_UNKNOWN_INFO_TYPE             #language en-US "    The 'InformationType' - %%H%g%%N can't be recongnized\r\n"
 
