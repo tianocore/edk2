@@ -3,6 +3,7 @@
   http://www.microsoft.com/whdc/system/platform/server/spcr.mspx
     
   Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -35,7 +36,7 @@ typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER             Header;
   UINT8                                   InterfaceType;
   UINT8                                   Reserved1[3];
-  EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  BaseAddress;
+  EFI_ACPI_5_0_GENERIC_ADDRESS_STRUCTURE  BaseAddress;
   UINT8                                   InterruptType;
   UINT8                                   Irq;
   UINT32                                  GlobalSystemInterrupt;
