@@ -705,6 +705,13 @@ BootManagerCallback (
   }
 
   BootOption = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
+
+  //
+  // Clear  the  screen  before.
+  //
+  gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
+  gST->ConOut->ClearScreen (gST->ConOut);
+
   //
   // parse the selected option
   //
