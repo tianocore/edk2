@@ -983,19 +983,19 @@
   #  Each array entry is 24-byte in length. The array is terminated
   #  by an array entry with a PCI Vendor ID of 0xFFFF. If a platform only contains a
   #  standard 16550 PCI serial device whose class code is 7/0/2, the value is 0xFFFF.
-  #  The C style structure is defined as below:
-  #  typedef struct {
-  #    UINT16  VendorId;          ///< Vendor ID to match the PCI device.  The value 0xFFFF terminates the list of entries.
-  #    UINT16  DeviceId;          ///< Device ID to match the PCI device
-  #    UINT32  ClockRate;         ///< UART clock rate.  Set to 0 for default clock rate of 1843200 Hz
-  #    UINT64  Offset;            ///< The byte offset into to the BAR
-  #    UINT8   BarIndex;          ///< Which BAR to get the UART base address
-  #    UINT8   RegisterStride;    ///< UART register stride in bytes.  Set to 0 for default register stride of 1 byte.
-  #    UINT16  ReceiveFifoDepth;  ///< UART receive FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
-  #    UINT16  TransmitFifoDepth; ///< UART transmit FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
-  #    UINT8   Reserved[2];
-  #  } PCI_SERIAL_PARAMETER;
-  #  It contains zero or more instances of the above structure.
+  #  The C style structure is defined as below:<BR>
+  #  typedef struct {<BR>
+  #    UINT16  VendorId;          ///< Vendor ID to match the PCI device. The value 0xFFFF terminates the list of entries.<BR>
+  #    UINT16  DeviceId;          ///< Device ID to match the PCI device.<BR>
+  #    UINT32  ClockRate;         ///< UART clock rate. Set to 0 for default clock rate of 1843200 Hz.<BR>
+  #    UINT64  Offset;            ///< The byte offset into to the BAR.<BR>
+  #    UINT8   BarIndex;          ///< Which BAR to get the UART base address.<BR>
+  #    UINT8   RegisterStride;    ///< UART register stride in bytes. Set to 0 for default register stride of 1 byte.<BR>
+  #    UINT16  ReceiveFifoDepth;  ///< UART receive FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.<BR>
+  #    UINT16  TransmitFifoDepth; ///< UART transmit FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.<BR>
+  #    UINT8   Reserved[2];<BR>
+  #  } PCI_SERIAL_PARAMETER;<BR>
+  #  It contains zero or more instances of the above structure.<BR>
   #  For example, if a PCI device contains two UARTs, PcdPciSerialParameters needs
   #  to contain  two instances of the above structure, with the VendorId and DeviceId
   #  equals to the Device ID and Vendor ID of the device; If the PCI device uses the
@@ -1003,7 +1003,7 @@
   #  BarIndex of second one equals to 1; If the PCI device uses the first BAR to
   #  support both UARTs, BarIndex of both instance equals to 0, Offset of first
   #  instance equals to 0 and Offset of second one equals to a value bigger than or
-  #  equal to 8.
+  #  equal to 8.<BR>
   #  For certain UART whose register needs to be accessed in DWORD aligned address,
   #  RegisterStride equals to 4.
   # @Prompt Pci Serial Parameters
