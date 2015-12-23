@@ -1116,10 +1116,12 @@ Done:
   @param  This       Indicates a pointer to the calling context.
   @param  Token      A pointer to the token associated with the transaction.
 
-  @retval EFI_SUCCESS       All outstanding data was written to the device.
-  @retval EFI_DEVICE_ERROR  The device reported an error while writing back the
-                            data.
-  @retval EFI_NO_MEDIA      There is no media in the device.
+  @retval EFI_SUCCESS         All outstanding data was written to the device.
+  @retval EFI_DEVICE_ERROR    The device reported an error while attempting to
+                              write data.
+  @retval EFI_WRITE_PROTECTED The device cannot be written to.
+  @retval EFI_NO_MEDIA        There is no media in the device.
+  @retval EFI_MEDIA_CHANGED   The MediaId is not for the current media.
 
 **/
 EFI_STATUS
@@ -1129,15 +1131,72 @@ ScsiDiskFlushBlocksEx (
   IN OUT EFI_BLOCK_IO2_TOKEN     *Token
   )
 {
+  SCSI_DISK_DEV       *ScsiDiskDevice;
+  EFI_BLOCK_IO_MEDIA  *Media;
+  EFI_STATUS          Status;
+  BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
+
+  MediaChange    = FALSE;
+  OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
+  ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO2 (This);
+
+  if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
+
+    Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+
+    if (MediaChange) {
+      gBS->ReinstallProtocolInterface (
+            ScsiDiskDevice->Handle,
+            &gEfiBlockIoProtocolGuid,
+            &ScsiDiskDevice->BlkIo,
+            &ScsiDiskDevice->BlkIo
+            );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
+      Status = EFI_MEDIA_CHANGED;
+      goto Done;
+    }
+  }
+
+  Media = ScsiDiskDevice->BlkIo2.Media;
+
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto Done;
+  }
+
+  if (Media->ReadOnly) {
+    Status = EFI_WRITE_PROTECTED;
+    goto Done;
+  }
+
   //
-  // Signal event and return directly.
+  // Wait for the BlockIo2 requests queue to become empty
+  //
+  while (!IsListEmpty (&ScsiDiskDevice->BlkIo2Queue));
+
+  Status = EFI_SUCCESS;
+
+  //
+  // Signal caller event
   //
   if ((Token != NULL) && (Token->Event != NULL)) {
     Token->TransactionStatus = EFI_SUCCESS;
     gBS->SignalEvent (Token->Event);
   }
 
-  return EFI_SUCCESS;
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 

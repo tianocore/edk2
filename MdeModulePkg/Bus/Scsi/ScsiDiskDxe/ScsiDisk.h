@@ -555,10 +555,12 @@ ScsiDiskWriteBlocksEx (
   @param  This       Indicates a pointer to the calling context.
   @param  Token      A pointer to the token associated with the transaction.
 
-  @retval EFI_SUCCESS       All outstanding data was written to the device.
-  @retval EFI_DEVICE_ERROR  The device reported an error while writing back the
-                            data.
-  @retval EFI_NO_MEDIA      There is no media in the device.
+  @retval EFI_SUCCESS         All outstanding data was written to the device.
+  @retval EFI_DEVICE_ERROR    The device reported an error while attempting to
+                              write data.
+  @retval EFI_WRITE_PROTECTED The device cannot be written to.
+  @retval EFI_NO_MEDIA        There is no media in the device.
+  @retval EFI_MEDIA_CHANGED   The MediaId is not for the current media.
 
 **/
 EFI_STATUS
