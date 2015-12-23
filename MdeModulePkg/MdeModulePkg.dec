@@ -131,6 +131,10 @@
   #
   PlatformVarCleanupLib|Include/Library/PlatformVarCleanupLib.h
 
+  ## @libraryclass  Provides interfaces about Ipmi submit generic commond.
+  #
+  IpmiLib|Include/Library/IpmiLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -357,6 +361,9 @@
   ## Include/Ppi/UfsHostController.h
   gEdkiiPeiUfsHostControllerPpiGuid  =  { 0xdc54b283, 0x1a77, 0x4cd6, { 0x83, 0xbb, 0xfd, 0xda, 0x46, 0x9a, 0x2e, 0xc6 }}
 
+  ## Include/Ppi/IpmiPpi.h
+  gPeiIpmiPpiGuid               =  { 0xa9731431, 0xd968, 0x4277, { 0xb7, 0x52, 0xa3, 0xa9, 0xa6, 0xae, 0x18, 0x98 }}
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
@@ -448,6 +455,10 @@
 
   ## Include/Protocol/SmmReadyToBoot.h
   gEdkiiSmmReadyToBootProtocolGuid = { 0x6e057ecf, 0xfa99, 0x4f39, { 0x95, 0xbc, 0x59, 0xf9, 0x92, 0x1d, 0x17, 0xe4 } }
+
+  ## Include/Protocol/IpmiProtocol.h
+  gIpmiProtocolGuid    = { 0xdbc6381f, 0x5554, 0x4d14, { 0x8f, 0xfd, 0x76, 0xd7, 0x87, 0xb8, 0xac, 0xbf } }
+  gSmmIpmiProtocolGuid = { 0x5169af60, 0x8c5a, 0x4243, { 0xb3, 0xe9, 0x56, 0xc5, 0x6d, 0x18, 0xee, 0x26 } }
 
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
