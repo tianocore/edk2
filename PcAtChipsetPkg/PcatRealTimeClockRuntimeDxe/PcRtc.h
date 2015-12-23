@@ -19,6 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
+#include <Guid/Acpi.h>
+
 #include <Protocol/RealTimeClock.h>
 
 #include <Library/BaseLib.h>
@@ -34,12 +36,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/ReportStatusCodeLib.h>
 
-
 typedef struct {
   EFI_LOCK  RtcLock;
   INT16     SavedTimeZone;
   UINT8     Daylight;
+  UINT8     CenturyRtcAddress;
 } PC_RTC_MODULE_GLOBALS;
+
+extern PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 
 #define PCAT_RTC_ADDRESS_REGISTER 0x70
 #define PCAT_RTC_DATA_REGISTER    0x71
@@ -355,4 +359,20 @@ IsLeapYear (
   IN EFI_TIME   *Time
   );
 
+/**
+  Notification function of ACPI Table change.
+
+  This is a notification function registered on ACPI Table change event.
+  It saves the Century address stored in ACPI FADT table.
+
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context.
+
+**/
+VOID
+EFIAPI
+PcRtcAcpiTableChangeCallback (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  );
 #endif

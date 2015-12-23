@@ -500,6 +500,13 @@ PcRtcSetTime (
   RegisterB.Bits.Set  = 1;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
+  //
+  // Store the century value to RTC before converting to BCD format.
+  //
+  if (Global->CenturyRtcAddress != 0) {
+    RtcWrite (Global->CenturyRtcAddress, DecimalToBcd8 ((UINT8) (RtcTime.Year / 100)));
+  }
+
   ConvertEfiTimeToRtcTime (&RtcTime, RegisterB);
 
   RtcWrite (RTC_ADDRESS_SECONDS, RtcTime.Second);
@@ -1198,3 +1205,106 @@ IsWithinOneDay (
   return Adjacent;
 }
 
+/**
+  This function find ACPI table with the specified signature in RSDT or XSDT.
+
+  @param Sdt              ACPI RSDT or XSDT.
+  @param Signature        ACPI table signature.
+  @param TablePointerSize Size of table pointer: 4 or 8.
+
+  @return ACPI table or NULL if not found.
+**/
+VOID *
+ScanTableInSDT (
+  IN EFI_ACPI_DESCRIPTION_HEADER    *Sdt,
+  IN UINT32                         Signature,
+  IN UINTN                          TablePointerSize
+  )
+{
+  UINTN                          Index;
+  UINTN                          EntryCount;
+  UINTN                          EntryBase;
+  EFI_ACPI_DESCRIPTION_HEADER    *Table;
+
+  EntryCount = (Sdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / TablePointerSize;
+
+  EntryBase = (UINTN) (Sdt + 1);
+  for (Index = 0; Index < EntryCount; Index++) {
+    //
+    // When TablePointerSize is 4 while sizeof (VOID *) is 8, make sure the upper 4 bytes are zero.
+    //
+    Table = 0;
+    CopyMem (&Table, (VOID *) (EntryBase + Index * TablePointerSize), TablePointerSize);
+    if (Table->Signature == Signature) {
+      return Table;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Notification function of ACPI Table change.
+
+  This is a notification function registered on ACPI Table change event.
+  It saves the Century address stored in ACPI FADT table.
+
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context.
+
+**/
+VOID
+EFIAPI
+PcRtcAcpiTableChangeCallback (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  EFI_STATUS                                    Status;
+  EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
+  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
+  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
+  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
+  EFI_TIME                                      Time;
+  UINT8                                         Century;
+
+  Status = EfiGetSystemConfigurationTable (&gEfiAcpiTableGuid, (VOID **) &Rsdp);
+  if (EFI_ERROR (Status)) {
+    Status = EfiGetSystemConfigurationTable (&gEfiAcpi10TableGuid, (VOID **) &Rsdp);
+  }
+
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Find FADT in XSDT
+  //
+  Fadt = NULL;
+  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
+    Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->XsdtAddress;
+    Fadt = ScanTableInSDT (Xsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE, sizeof (UINT64));
+  }
+
+  if (Fadt == NULL) {
+    //
+    // Find FADT in RSDT
+    //
+    Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->RsdtAddress;
+    Fadt = ScanTableInSDT (Rsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE, sizeof (UINT32));
+  }
+
+  if ((Fadt != NULL) &&
+      (Fadt->Century > RTC_ADDRESS_REGISTER_D) && (Fadt->Century < 0x80) &&
+      (mModuleGlobal.CenturyRtcAddress != Fadt->Century)
+      ) {
+    mModuleGlobal.CenturyRtcAddress = Fadt->Century;
+    Status = PcRtcGetTime (&Time, NULL, &mModuleGlobal);
+    if (!EFI_ERROR (Status)) {
+      Century = (UINT8) (Time.Year / 100);
+      Century = DecimalToBcd8 (Century);
+      DEBUG ((EFI_D_INFO, "PcRtc: Write 0x%x to CMOS location 0x%x\n", Century, mModuleGlobal.CenturyRtcAddress));
+      RtcWrite (mModuleGlobal.CenturyRtcAddress, Century);
+    }
+  }
+}
