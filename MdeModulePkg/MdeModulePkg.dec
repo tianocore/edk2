@@ -4,13 +4,13 @@
 # and libraries instances, which are used for those modules.
 #
 # Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials are licensed and made available under 
-# the terms and conditions of the BSD License that accompanies this distribution.  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php.                                                                          
-# 
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+# http://opensource.org/licenses/bsd-license.php.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
@@ -97,11 +97,11 @@
   ##  @libraryclass  Provide capability to maintain the data integrity cross S3 phase.
   #
   LockBoxLib|Include/Library/LockBoxLib.h
-  
+
   ##  @libraryclass  Provide the CPU exception handler.
   #
   CpuExceptionHandlerLib|Include/Library/CpuExceptionHandlerLib.h
-  
+
   ##  @libraryclass    Provides platform specific display interface.
   #
   CustomizedDisplayLib|Include/Library/CustomizedDisplayLib.h
@@ -130,7 +130,7 @@
   ## @libraryclass  Provides services to get variable error flag and do platform variable cleanup.
   #
   PlatformVarCleanupLib|Include/Library/PlatformVarCleanupLib.h
-  
+
   ## @libraryclass  Provides services to get do the file explorer.
   #
   FileExplorerLib|Include/Library/FileExplorerLib.h
@@ -214,7 +214,7 @@
   ## Guid is defined for SMM variable module to notify SMM variable wrapper module when variable write service was ready.
   #  Include/Guid/SmmVariableCommon.h
   gSmmVariableWriteGuid  = { 0x93ba1826, 0xdffb, 0x45dd, { 0x82, 0xa7, 0xe7, 0xdc, 0xaa, 0x3b, 0xbd, 0xf3 }}
-  
+
   ## Performance protocol guid that also acts as the performance HOB guid and performance variable GUID
   #  Include/Guid/Performance.h
   gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 } }
@@ -237,14 +237,14 @@
   #  Include/Guid/StatusCodeDataTypeDebug.h
   gEfiStatusCodeDataTypeDebugGuid  = { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 }}
 
-  ##  A configuration Table Guid for Load module at fixed address 
+  ##  A configuration Table Guid for Load module at fixed address
   #  Include/Guid/LoadModuleAtFixedAddress.h
   gLoadFixedAddressConfigurationTableGuid  = { 0x2CA88B53,0xD296,0x4080, { 0xA4,0xA5,0xCA,0xD9,0xBA,0xE2,0x4B,0x9 } }
 
   ## GUID used to store the global debug mask value into an EFI Variable
-  # Include/Guid/DebugMask.h  
+  # Include/Guid/DebugMask.h
   gEfiGenericVariableGuid = { 0x59d1c24f, 0x50f1, 0x401a, {0xb1, 0x01, 0xf3, 0x3e, 0x0d, 0xae, 0xd4, 0x43} }
-  
+
   ##  Event for the DXE Core to signal idle events
   #  Include/Guid/EventIdle.h
   gIdleLoopEventGuid  = { 0x3c8d294c, 0x5fc3, 0x4451, { 0xbb, 0x31, 0xc4, 0xc0, 0x32, 0x29, 0x5e, 0x6c } }
@@ -277,7 +277,7 @@
   ## Include/Guid/UsbKeyBoardLayout.h
   gUsbKeyboardLayoutPackageGuid      = { 0xc0f3b43, 0x44de, 0x4907, { 0xb4, 0x78, 0x22, 0x5f, 0x6f, 0x62, 0x89, 0xdc }}
   gUsbKeyboardLayoutKeyGuid          = { 0x3a4d7a7c, 0x18a, 0x4b42, { 0x81, 0xb3, 0xdc, 0x10, 0xe3, 0xb5, 0x91, 0xbd }}
-  
+
   ## Include/Guid/HiiResourceSampleHii.h
   gHiiResourceSamleFormSetGuid       = { 0x4f4ef7f0, 0xaa29, 0x4ce9, { 0xba, 0x41, 0x64, 0x3e, 0x1, 0x23, 0xa9, 0x9f }}
 
@@ -301,7 +301,7 @@
 
   ## Include/Guid/ZeroGuid.h
   gZeroGuid                          = { 0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
-  
+
   ## Include/Guid/MtcVendor.h
   gMtcVendorGuid                     = { 0xeb704011, 0x1402, 0x11d3, { 0x8e, 0x77, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }}
 
@@ -318,7 +318,7 @@
 
   ## Include/Guid/StatusCodeDataTypeVariable.h
   gEdkiiStatusCodeDataTypeVariableGuid = { 0xf6ee6dbb, 0xd67f, 0x4ea0, { 0x8b, 0x96, 0x6a, 0x71, 0xb1, 0x9d, 0x84, 0xad }}
-  
+
   ## Include/Guid/MemoryProfile.h
   gEdkiiMemoryProfileGuid              = { 0x821c9a09, 0x541a, 0x40f6, { 0x9f, 0x43, 0xa, 0xd1, 0x93, 0xa1, 0x2c, 0xfe }}
 
@@ -338,7 +338,7 @@
 
   gEfiIfrFrontPageGuid        = { 0xe58809f8, 0xfbc1, 0x48e2, { 0x88, 0x3a, 0xa3, 0x0f, 0xdc, 0x4b, 0x44, 0x1e } }
 
-  
+
 [Ppis]
   ## Include/Ppi/AtaController.h
   gPeiAtaControllerPpiGuid       = { 0xa45e60d1, 0xc719, 0x44aa, { 0xb0, 0x7a, 0xaa, 0x77, 0x7f, 0x85, 0x90, 0x6d }}
@@ -404,15 +404,15 @@
   ## This protocol provides boot-time service to do fault tolerant write capability for block devices in SMM environment.
   #  Include/Protocol/SmmFaultTolerantWrite.h
   gEfiSmmFaultTolerantWriteProtocolGuid = { 0x3868fc3b, 0x7e45, 0x43a7, { 0x90, 0x6c, 0x4b, 0xa4, 0x7d, 0xe1, 0x75, 0x4d }}
-  
+
   ## This protocol is used to abstract the swap operation of boot block and backup block of boot FV.
   #  Include/Protocol/SwapAddressRange.h
   gEfiSwapAddressRangeProtocolGuid = { 0x1259F60D, 0xB754, 0x468E, { 0xA7, 0x89, 0x4D, 0xB8, 0x5D, 0x55, 0xE8, 0x7E }}
-  
+
   ## This protocol is used to abstract the swap operation of boot block and backup block of boot FV in SMM environment.
   #  Include/Protocol/SmmSwapAddressRange.h
   gEfiSmmSwapAddressRangeProtocolGuid = { 0x67c4f112, 0x3385, 0x4e55, { 0x9c, 0x5b, 0xc0, 0x5b, 0x71, 0x7c, 0x42, 0x28 }}
-  
+
   ## This protocol is intended for use as a means to store data in the EFI SMM environment.
   #  Include/Protocol/SmmVariableProtocol.h
   gEfiSmmVariableProtocolGuid = { 0xed32d533, 0x99e6, 0x4209, { 0x9c, 0xc0, 0x2d, 0x72, 0xcd, 0xd9, 0x98, 0xa7 }}
@@ -432,12 +432,12 @@
   gEfiSmmFirmwareVolumeBlockProtocolGuid = { 0xd326d041, 0xbd31, 0x4c01, { 0xb5, 0xa8, 0x62, 0x8b, 0xe8, 0x7f, 0x6, 0x53 }}
 
   ## This protocol allows the error level mask for DEBUG() macros to be adjusted for DXE Phase modules
-  # Include/Guid/DebugMask.h  
+  # Include/Guid/DebugMask.h
   gEfiDebugMaskProtocolGuid = { 0x4c8a2451, 0xc207, 0x405b, {0x96, 0x94, 0x99, 0xea, 0x13, 0x25, 0x13, 0x41} }
 
   ## Include/Protocol/LockBox.h
   gEfiLockBoxProtocolGuid        = { 0xbd445d79, 0xb7ad, 0x4f04, { 0x9a, 0xd8, 0x29, 0xbd, 0x20, 0x40, 0xeb, 0x3c }}
-  
+
   ## Include/Protocol/FormBrowserEx.h
   gEfiFormBrowserExProtocolGuid = { 0x1f73b18d, 0x4630, 0x43c1, { 0xa1, 0xde, 0x6f, 0x80, 0x85, 0x5d, 0x7d, 0xa4 } }
 
@@ -458,7 +458,7 @@
 
   ## Include/Protocol/UfsHostController.h
   gEdkiiUfsHostControllerProtocolGuid = { 0xebc01af5, 0x7a9, 0x489e, { 0xb7, 0xce, 0xdc, 0x8, 0x9e, 0x45, 0x9b, 0x2f } }
-  
+
   ## Include/Protocol/EsrtManagement.h
   gEsrtManagementProtocolGuid         = { 0xa340c064, 0x723c, 0x4a9c, { 0xa4, 0xdd, 0xd5, 0xb4, 0x7a, 0x26, 0xfb, 0xb0 }}
 
@@ -568,7 +568,7 @@
   #   FALSE - Does not turn off usb legacy support.<BR>
   # @Prompt Turn off USB legacy support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
-  
+
   ## Indicates if HiiImageProtocol will be installed.
   #  FALSE is for size reduction.<BR><BR>
   #   TRUE  - Installs HiiImageProtocol.<BR>
@@ -878,7 +878,7 @@
   #   FALSE - 16550 serial Tx operations will not be blocked if DSR is not asserted.<BR>
   # @Prompt Enable serial port cable detetion.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable|FALSE|BOOLEAN|0x00020006
-    
+
   ## Base address of 16550 serial port registers in MMIO or I/O space. Default is 0x3F8.
   # @Prompt Base address of serial port registers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8|UINT64|0x00020002
@@ -921,7 +921,7 @@
   ## Maximum address that the DXE Core will allocate the EFI_SYSTEM_TABLE_POINTER
   #  structure. The default value for this PCD is 0, which means that the DXE Core
   #  will allocate the buffer from the EFI_SYSTEM_TABLE_POINTER structure on a 4MB
-  #  boundary as close to the top of memory as feasible.  If this PCD is set to a 
+  #  boundary as close to the top of memory as feasible.  If this PCD is set to a
   #  value other than 0, then the DXE Core will first attempt to allocate the
   #  EFI_SYSTEM_TABLE_POINTER structure on a 4MB boundary below the address specified
   #  by this PCD, and if that allocation fails, retry the allocation on a 4MB
@@ -932,11 +932,11 @@
   ## Indicates if to shadow PEIM on S3 boot path after memory is ready.<BR><BR>
   #   TRUE  - Shadow PEIM on S3 boot path after memory is ready.<BR>
   #   FALSE - Not shadow PEIM on S3 boot path after memory is ready.<BR>
-  # @Prompt Shadow Peim On S3 Boot. 
+  # @Prompt Shadow Peim On S3 Boot.
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot|FALSE|BOOLEAN|0x30001028
 
   ## Indicates if to shadow PEIM and PeiCore after memory is ready.<BR><BR>
-  #  This PCD is used on other boot path except for S3 boot. 
+  #  This PCD is used on other boot path except for S3 boot.
   #   TRUE  - Shadow PEIM and PeiCore after memory is ready.<BR>
   #   FALSE - Not shadow PEIM after memory is ready.<BR>
   # @Prompt Shadow Peim and PeiCore on boot
@@ -977,19 +977,19 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType|0x0|UINT64|0x30001042
 
   ## PCI Serial Device Info. It is an array of Device, Function, and Power Management
-  #  information that describes the path that contains zero or more PCI to PCI briges 
-  #  followed by a PCI serial device.  Each array entry is 4-bytes in length.  The 
-  #  first byte is the PCI Device Number, then second byte is the PCI Function Number, 
-  #  and the last two bytes are the offset to the PCI power management capabilities 
-  #  register used to manage the D0-D3 states.  If a PCI power management capabilities 
-  #  register is not present, then the last two bytes in the offset is set to 0.  The 
-  #  array is terminated by an array entry with a PCI Device Number of 0xFF.  For a 
+  #  information that describes the path that contains zero or more PCI to PCI briges
+  #  followed by a PCI serial device.  Each array entry is 4-bytes in length.  The
+  #  first byte is the PCI Device Number, then second byte is the PCI Function Number,
+  #  and the last two bytes are the offset to the PCI power management capabilities
+  #  register used to manage the D0-D3 states.  If a PCI power management capabilities
+  #  register is not present, then the last two bytes in the offset is set to 0.  The
+  #  array is terminated by an array entry with a PCI Device Number of 0xFF.  For a
   #  non-PCI fixed address serial device, such as an ISA serial device, the value is 0xFF.
   # @Prompt Pci Serial Device Info
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo|{0xFF}|VOID*|0x00010067
 
   ## PCI Serial Parameters. It is an array of VendorID, DeviceID, ClockRate, Offset,
-  #  BarIndex, RegisterStride, ReceiveFifoDepth, TransmitFifoDepth information that 
+  #  BarIndex, RegisterStride, ReceiveFifoDepth, TransmitFifoDepth information that
   #  describes the parameters of special PCI serial devices.
   #  Each array entry is 24-byte in length. The array is terminated
   #  by an array entry with a PCI Vendor ID of 0xFFFF. If a platform only contains a
@@ -1020,10 +1020,10 @@
   # @Prompt Pci Serial Parameters
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|{0xFF, 0xFF}|VOID*|0x00010071
 
-  ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
+  ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes.
   # @Prompt Serial Port Extended Transmit FIFO Size in Bytes
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|64|UINT32|0x00010068
-  
+
   ## This PCD points to the file name GUID of the BootManagerMenuApp
   #  Platform can customize the PCD to point to different application for Boot Manager Menu
   # @Prompt Boot Manager Menu File
@@ -1220,7 +1220,7 @@
   # @Prompt Foreground color for browser subtile.
   # @ValidRange 0x80000004 | 0x00 - 0x0F
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserSubtitleTextColor|0x01|UINT8|0x00010057
-  
+
   ## Specify the foreground color for prompt and Question value text in HII Form Browser. The default value is EFI_BLACK.
   #  Only following values defined in UEFI specification are valid:<BR><BR>
   #  0x00 (EFI_BLACK)<BR>
@@ -1242,7 +1242,7 @@
   # @Prompt Foreground color for browser field.
   # @ValidRange 0x80000004 | 0x00 - 0x0F
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextColor|0x00|UINT8|0x00010058
-  
+
   ## Specify the foreground color for highlighted prompt and Question value text in HII Form Browser.
   #  The default value is EFI_LIGHTGRAY. Only following values defined in UEFI specification are valid:<BR><BR>
   #  0x00 (EFI_BLACK)<BR>
@@ -1264,7 +1264,7 @@
   # @Prompt Foreground color for highlighted browser field.
   # @ValidRange 0x80000004 | 0x00 - 0x0F
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextHighlightColor|0x07|UINT8|0x00010059
-  
+
   ## Specify the background color for highlighted prompt and Question value text in HII Form Browser.
   #  The default value is EFI_BACKGROUND_BLACK. Only following values defined in UEFI specification are valid:<BR><BR>
   #  0x00 (EFI_BACKGROUND_BLACK)<BR>
@@ -1464,21 +1464,21 @@
   # @Prompt LMFA PEI code page number.
   # @ValidList  0x80000001 | 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressPeiCodePageNumber|0|UINT32|0x00000029
-  
+
   ## Specify memory size with page number for DXE boot time code when
   #  Loading Module at Fixed Address feature is enabled.
   #  The value will be set by the build tool.
   # @Prompt LMFA DXE boot code page number.
   # @ValidList  0x80000001 | 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber|0|UINT32|0x0000002a
-  
+
   ## Specify memory size with page number for DXE runtime code when
   #  Loading Module at Fixed Address feature is enabled.
   #  The value will be set by the build tool.
   # @Prompt LMFA DXE runtime code page number.
   # @ValidList  0x80000001 | 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber|0|UINT32|0x0000002b
- 
+
   ## Specify memory size with page number for SMM code when
   #  Loading Module at Fixed Address feature is enabled.
   #  The value will be set by the build tool.
@@ -1503,7 +1503,7 @@
   # @ValidList  0x80000001 | 0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr|0x0|UINT64|0x00030001
 
-  ## This dynamic PCD hold an address to point to the memory of page table. The page table establishes a 1:1 
+  ## This dynamic PCD hold an address to point to the memory of page table. The page table establishes a 1:1
   #  Virtual to Physical mapping according to the processor physical address bits.
   # @Prompt Identify Mapping Page Table pointer.
   # @ValidList  0x80000001 | 0x0
