@@ -3659,6 +3659,8 @@ ScsiDiskAsyncRead10 (
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
 
+  AsyncIoEvent = NULL;
+
   Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
   if (Request == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -3714,6 +3716,10 @@ ScsiDiskAsyncRead10 (
   return EFI_SUCCESS;
 
 ErrorExit:
+  if (AsyncIoEvent != NULL) {
+    gBS->CloseEvent (AsyncIoEvent);
+  }
+
   if (Request != NULL) {
     if (Request->SenseData != NULL) {
       FreePool (Request->SenseData);
@@ -3761,6 +3767,8 @@ ScsiDiskAsyncWrite10 (
   EFI_STATUS                   Status;
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
+
+  AsyncIoEvent = NULL;
 
   Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
   if (Request == NULL) {
@@ -3817,6 +3825,10 @@ ScsiDiskAsyncWrite10 (
   return EFI_SUCCESS;
 
 ErrorExit:
+  if (AsyncIoEvent != NULL) {
+    gBS->CloseEvent (AsyncIoEvent);
+  }
+
   if (Request != NULL) {
     if (Request->SenseData != NULL) {
       FreePool (Request->SenseData);
@@ -3864,6 +3876,8 @@ ScsiDiskAsyncRead16 (
   EFI_STATUS                   Status;
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
+
+  AsyncIoEvent = NULL;
 
   Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
   if (Request == NULL) {
@@ -3920,6 +3934,10 @@ ScsiDiskAsyncRead16 (
   return EFI_SUCCESS;
 
 ErrorExit:
+  if (AsyncIoEvent != NULL) {
+    gBS->CloseEvent (AsyncIoEvent);
+  }
+
   if (Request != NULL) {
     if (Request->SenseData != NULL) {
       FreePool (Request->SenseData);
@@ -3967,6 +3985,8 @@ ScsiDiskAsyncWrite16 (
   EFI_STATUS                   Status;
   SCSI_ASYNC_RW_REQUEST        *Request;
   EFI_EVENT                    AsyncIoEvent;
+
+  AsyncIoEvent = NULL;
 
   Request = AllocateZeroPool (sizeof (SCSI_ASYNC_RW_REQUEST));
   if (Request == NULL) {
@@ -4023,6 +4043,10 @@ ScsiDiskAsyncWrite16 (
   return EFI_SUCCESS;
 
 ErrorExit:
+  if (AsyncIoEvent != NULL) {
+    gBS->CloseEvent (AsyncIoEvent);
+  }
+
   if (Request != NULL) {
     if (Request->SenseData != NULL) {
       FreePool (Request->SenseData);
