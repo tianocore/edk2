@@ -439,7 +439,7 @@ typedef struct {
   UINT8 Reserved1 : 4;
   UINT8 MuxSetting : 4;
   UINT8 Reserved2 : 4;
-} IPMI_SET_MUX_COMMAND;
+} IPMI_SET_SERIAL_MODEM_MUX_COMMAND_REQUEST;
 
 typedef struct {
   UINT8 MuxSetToBmc : 1;
@@ -449,7 +449,7 @@ typedef struct {
   UINT8 Reserved2 : 2;
   UINT8 MuxToBmcAllowed : 1;
   UINT8 MuxToSystemBlocked : 1;
-} IPMI_MUX_CONFIG;
+} IPMI_SET_SERIAL_MODEM_MUX_COMMAND_RESPONSE;
 
 //
 //  Definitions for Get TAP Response Code command

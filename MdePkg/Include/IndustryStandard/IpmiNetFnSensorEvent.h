@@ -46,7 +46,7 @@ typedef struct {
   UINT8   OEMEvData1;
   UINT8   OEMEvData2;
   UINT8   OEMEvData3;
-} IPMI_PLATFORM_EVENT_MESSAGE_DATA;
+} IPMI_PLATFORM_EVENT_MESSAGE_DATA_REQUEST;
 
 #pragma pack()
 #endif

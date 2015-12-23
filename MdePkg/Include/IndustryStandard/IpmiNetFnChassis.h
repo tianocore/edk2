@@ -117,10 +117,11 @@ typedef enum {
 } IPMI_SYSTEM_RESTART_CAUSE;
 
 typedef struct {
-  UINT8   Cause:4;
-  UINT8   Reserved:4;
-  UINT8   ChannelNumber;
-} GET_SYSTEM_RESTART_CAUSE_RESPONSE;
+  UINT8  CompletionCode;
+  UINT8  Cause:4;
+  UINT8  Reserved:4;
+  UINT8  ChannelNumber;
+} IPMI_GET_SYSTEM_RESTART_CAUSE_RESPONSE;
 
 //
 //  Definitions for Set System BOOT options command
@@ -136,10 +137,6 @@ typedef struct {
   UINT8    ParameterData[1];
 } IPMI_SET_BOOT_OPTIONS_REQUEST;
 
-typedef struct {
-  UINT8   CompletionCode:8;
-} IPMI_SET_BOOT_OPTIONS_RESPONSE;
-
 //
 //  Definitions for Get System BOOT options command
 //
@@ -148,6 +145,13 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get System boot options" command to follow here
 //
+typedef struct {
+  UINT8    ParameterSelector:7;
+  UINT8    Reserved:1;
+  UINT8    SetSelector;
+  UINT8    BlockSelector;
+} IPMI_GET_BOOT_OPTIONS_REQUEST;
+
 typedef struct {
   UINT8 Parameter;
   UINT8 Valid;
@@ -166,12 +170,6 @@ typedef struct {
   UINT32  TimeStamp;
   UINT8   Reserved[3];
 } IPMI_BOOT_INITIATOR;
-
-typedef struct {
-  UINT8    ParameterSelector;
-  UINT8    SetSelector;
-  UINT8    BlockSelector;
-} IPMI_GET_BOOT_OPTIONS_REQUEST;
 
 //
 // Response Parameters for IPMI Get Boot Options
@@ -259,6 +257,7 @@ typedef union {
 } IPMI_BOOT_OPTIONS_PARAMETERS;
 
 typedef struct {
+  UINT8    CompletionCode;
   UINT8    ParameterVersion:4;
   UINT8    Reserved:4;
   UINT8    ParameterSelector:7;
@@ -269,7 +268,7 @@ typedef struct {
 //
 //  Definitions for Set front panel button enables command
 //
-#define IPMI_CHASSIS_SET_FP_BUTTON_ENABLES 0x0A
+#define IPMI_CHASSIS_SET_FRONT_PANEL_BUTTON_ENABLES 0x0A
 
 typedef struct {
   UINT8    DisablePoweroffButton:1;
@@ -277,7 +276,7 @@ typedef struct {
   UINT8    DisableDiagnosticInterruptButton:1;
   UINT8    DisableStandbyButton:1;
   UINT8    Reserved:4;
-} IPMI_SET_FRONT_PANEL_BUTTON_ENABLES_REQUEST;
+} IPMI_CHASSIS_SET_FRONT_PANEL_BUTTON_ENABLES_REQUEST;
 
 //
 //  Constants and Structure definitions for "Set front panel button enables" command to follow here
