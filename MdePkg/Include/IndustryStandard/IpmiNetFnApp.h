@@ -43,6 +43,7 @@
 //  Constants and Structure definitions for "Get Device ID" command to follow here
 //
 typedef struct {
+  UINT8   CompletionCode;
   UINT8   DeviceId;
   UINT8   DeviceRevision : 4;
   UINT8   Reserved : 3;
@@ -62,7 +63,7 @@ typedef struct {
   UINT8   ManufacturerId[3];
   UINT16  ProductId;
   UINT32  AuxFirmwareRevInfo;
-} IPMI_MSG_GET_DEVICE_ID_RSP;
+} IPMI_GET_DEVICE_ID_RESPONSE;
 
 
 //
@@ -89,12 +90,13 @@ typedef struct {
 #define IPMI_APP_GET_SELFTEST_RESULTS  0x4
 
 //
-//  Constants and Structure definitions for "Get Self Results" command to follow here
+//  Constants and Structure definitions for "Get Self Test Results" command to follow here
 //
 typedef struct {
+  UINT8  CompletionCode;
   UINT8  Result;
   UINT8  Param;
-} IPMI_MSG_SELFTEST_RESULT_RSP;
+} IPMI_SELF_TEST_RESULT_RESPONSE;
 
 #define IPMI_APP_SELFTEST_NO_ERROR             0x55
 #define IPMI_APP_SELFTEST_NOT_IMPLEMENTED      0x56
@@ -127,11 +129,11 @@ typedef struct {
 //  Constants and Structure definitions for "Set ACPI Power State" command to follow here
 //
 typedef struct {
-  UINT8 SystemPowerState : 7;
-  UINT8 SystemStateChange : 1;
-  UINT8 DevicePowerState : 7;
-  UINT8 DeviceStateChange : 1;
-} IPMI_ACPI_POWER_STATE;
+  UINT8  AcpiSystemPowerState  : 7;
+  UINT8  AcpiSystemStateChange : 1;
+  UINT8  AcpiDevicePowerState  : 7;
+  UINT8  AcpiDeviceStateChange : 1;
+} IPMI_SET_ACPI_POWER_STATE_REQUEST;
 
 //
 //  Definitions for Get ACPI Power State command
@@ -154,8 +156,9 @@ typedef struct {
 //  Message structure definition for "Get Device Guid" IPMI command
 //
 typedef struct {
-  UINT8 Guid[16];
-} IPMI_MSG_GET_DEVICE_GUID_RSP;
+  UINT8  CompletionCode;
+  UINT8  Guid[16];
+} IPMI_GET_DEVICE_GUID_RESPONSE;
 
 //
 //  Below is Definitions for BMC Watchdog Timer Commands (Chapter 27)
@@ -190,7 +193,7 @@ typedef struct {
   UINT8                           PretimeoutInterval;
   UINT8                           TimerUseExpirationFlagsClear;
   UINT16                          InitialCountdownValue;
-} IPMI_SET_WATCHDOG_TIMER;
+} IPMI_SET_WATCHDOG_TIMER_REQUEST;
 
 //
 //  Definitions for Get WatchDog Timer command
@@ -201,13 +204,14 @@ typedef struct {
 //  Constants and Structure definitions for "Get WatchDog Timer" command to follow here
 //
 typedef struct {
+  UINT8                           CompletionCode;
   IPMI_WATCHDOG_TIMER_USE         TimerUse;
   UINT8                           TimerActions;
   UINT8                           PretimeoutInterval;
   UINT8                           TimerUseExpirationFlagsClear;
   UINT16                          InitialCountdownValue;
   UINT16                          PresentCountdownValue;
-} IPMI_GET_WATCHDOG_TIMER;
+} IPMI_GET_WATCHDOG_TIMER_RESPONSE;
 
 //
 //  Below is Definitions for IPMI Messaging Support Commands (Chapter 22)
@@ -384,20 +388,21 @@ typedef struct {
 //  Constants and Structure definitions for "Get Channel Access" command to follow here
 //
 typedef struct {
-  UINT8 ChannelNo : 4;
-  UINT8 Reserve1 : 4;
-  UINT8 Reserve2 : 6;
-  UINT8 MemoryType : 2;
-} IPMI_GET_CHANNEL_ACCESS_COMMAND;
+  UINT8  ChannelNo : 4;
+  UINT8  Reserve1 : 4;
+  UINT8  Reserve2 : 6;
+  UINT8  MemoryType : 2;
+} IPMI_GET_CHANNEL_ACCESS_REQUEST;
 
 typedef struct {
-  UINT8 AccessMode : 3;
-  UINT8 UserLevelAuthEnabled : 1;
-  UINT8 MessageAuthEnable : 1;
-  UINT8 Alert : 1;
-  UINT8 Reserve1 : 2;
-  UINT8 ChannelPriviledgeLimit : 4;
-  UINT8 Reserve2 : 4;
+  UINT8  CompletionCode;
+  UINT8  AccessMode : 3;
+  UINT8  UserLevelAuthEnabled : 1;
+  UINT8  MessageAuthEnable : 1;
+  UINT8  Alert : 1;
+  UINT8  Reserve1 : 2;
+  UINT8  ChannelPriviledgeLimit : 4;
+  UINT8  Reserve2 : 4;
 } IPMI_GET_CHANNEL_ACCESS_RESPONSE;
 
 //
@@ -409,6 +414,7 @@ typedef struct {
 //  Constants and Structure definitions for "Get Channel Info" command to follow here
 //
 typedef struct {
+  UINT8   CompletionCode;
   UINT8   ChannelNo : 4;
   UINT8   Reserve1 : 4;
   UINT8   ChannelMediumType : 7;
@@ -417,10 +423,9 @@ typedef struct {
   UINT8   Reserve3 : 3;
   UINT8   ActiveSessionCount : 6;
   UINT8   SessionSupport : 2;
-  UINT32  VendorId : 24;
-  UINT16  AuxChannelInfo : 16;
-  UINT8   Dummy;
-} IPMI_CHANNEL_INFO;
+  UINT8   VendorId[3];
+  UINT16  AuxChannelInfo;
+} IPMI_GET_CHANNEL_INFO_RESPONSE;
 
 //
 //  Definitions for Get Channel Info command

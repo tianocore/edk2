@@ -5,6 +5,7 @@
     FRU Inventory Commands (Chapter 34)
     SDR Repository (Chapter 33)
     System Event Log(SEL) Commands (Chapter 31)
+    SEL Record Formats (Chapter 32)
 
   See IPMI specification, Appendix G, Command Assignments
   and Appendix H, Sub-function Assignments.
@@ -89,6 +90,7 @@ typedef struct {
 //  Constants and Structure definitions for "Get SDR Repository Info" command to follow here
 //
 typedef struct {
+  UINT8   CompletionCode;
   UINT8   Version;
   UINT16  RecordCount;
   UINT16  FreeSpace;
@@ -101,7 +103,7 @@ typedef struct {
   UINT8   Reserved : 1;
   UINT8   SdrRepUpdateOp : 2;
   UINT8   Overflow : 1;
-} IPMI_SDR_REPOSITORY_INFO;
+} IPMI_GET_SDR_REPOSITORY_INFO;
 
 //
 //  Definitions for Get SDR Repository Allocateion Info command
@@ -281,7 +283,7 @@ typedef struct {
   UINT16      RecordId;
   UINT8       RecordOffset;
   UINT8       BytesToRead;
-} IPMI_GET_SDR;
+} IPMI_GET_SDR_REQUEST;
 
 //
 //  Definitions for Add SDR command
@@ -377,13 +379,14 @@ typedef struct {
 //  Constants and Structure definitions for "Get SEL Info" command to follow here
 //
 typedef struct {
+  UINT8   CompletionCode;
   UINT8   Version;              // Version of SEL
   UINT16  NoOfEntries;          // No of Entries in the SEL
   UINT16  FreeSpace;            // Free space in Bytes
   UINT32  RecentAddTimeStamp;   // Most Recent Addition of Time Stamp
   UINT32  RecentEraseTimeStamp; // Most Recent Erasure of Time Stamp
   UINT8   OperationSupport;     // Operation Support
-} IPMI_SEL_INFO;
+} IPMI_GET_SEL_INFO_RESPONSE;
 
 //
 //  Definitions for Get SEL Allocation Info command
@@ -411,14 +414,12 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SEL Entry" command to follow here
 //
-#define IPMI_COMPLETE_SEL_RECORD 0xFF
-
 typedef struct {
   UINT8 ReserveId[2]; // Reservation ID, LS Byte First
   UINT8 SelRecID[2];  // Sel Record ID, LS Byte First
   UINT8 Offset;       // Offset Into Record
   UINT8 BytesToRead;  // Bytes to be Read, 0xFF for entire record
-} IPMI_GET_SEL_ENTRY;
+} IPMI_GET_SEL_ENTRY_REQUEST;
 
 //
 //  Definitions for Add SEL Entry command
@@ -428,34 +429,6 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Add SEL Entry" command to follow here
 //
-typedef struct {
-  UINT16  RecordId;
-  UINT8   RecordType;
-  UINT32  TimeStamp;
-  UINT16  GeneratorId;
-  UINT8   EvMRevision;
-  UINT8   SensorType;
-  UINT8   SensorNumber;
-  UINT8   EventDirType;
-  UINT8   OEMEvData1;
-  UINT8   OEMEvData2;
-  UINT8   OEMEvData3;
-} IPMI_SEL_RECORD_DATA;
-
-#define IPMI_SEL_SYSTEM_RECORD                     0x02
-
-#define IPMI_EVM_REVISION                          0x04
-#define IPMI_BIOS_ID                               0x18
-#define IPMI_FORMAT_REV                            0x00
-#define IPMI_FORMAT_REV1                           0x01
-#define IPMI_SOFTWARE_ID                           0x01
-#define IPMI_PLATFORM_VAL_ID                       0x01
-#define IPMI_GENERATOR_ID(i,f)                     ((i << 1) | (f << 1) | IPMI_SOFTWARE_ID)
-
-#define IPMI_SENSOR_TYPE_EVENT_CODE_DISCRETE       0x6F
-
-#define IPMI_OEM_SPECIFIC_DATA                     0x02
-#define IPMI_SENSOR_SPECIFIC_DATA                  0x03
 
 //
 //  Definitions for Partial Add SEL Entry command
@@ -477,7 +450,7 @@ typedef struct {
 typedef struct {
   UINT8 ReserveId[2];       // Reservation ID, LS byte first
   UINT8 RecordToDelete[2];  // Record to Delete, LS Byte First
-} IPMI_DELETE_SEL;
+} IPMI_DELETE_SEL_REQUEST;
 
 //
 //  Definitions for Clear SEL command
@@ -493,7 +466,7 @@ typedef struct {
   UINT8 AscL;       // Ascii for 'L' (0x4c)
   UINT8 AscR;       // Ascii for 'R' (0x52)
   UINT8 Erase;      // 0xAA, Initiate Erase, 0x00 Get Erase Status
-} IPMI_CLEAR_SEL;
+} IPMI_CLEAR_SEL_REQUEST;
 
 //
 //  Definitions for Get SEL Time command
@@ -530,5 +503,40 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Set Auxillary Log Status" command to follow here
 //
+
+#define IPMI_COMPLETE_SEL_RECORD 0xFF
+
+//
+//  Below is Definitions for SEL Record Formats (Chapter 32)
+//
+typedef struct {
+  UINT16  RecordId;
+  UINT8   RecordType;
+  UINT32  TimeStamp;
+  UINT16  GeneratorId;
+  UINT8   EvMRevision;
+  UINT8   SensorType;
+  UINT8   SensorNumber;
+  UINT8   EventDirType;
+  UINT8   OEMEvData1;
+  UINT8   OEMEvData2;
+  UINT8   OEMEvData3;
+} IPMI_SEL_EVENT_RECORD_DATA;
+
+#define IPMI_SEL_SYSTEM_RECORD                     0x02
+
+#define IPMI_EVM_REVISION                          0x04
+#define IPMI_BIOS_ID                               0x18
+#define IPMI_FORMAT_REV                            0x00
+#define IPMI_FORMAT_REV1                           0x01
+#define IPMI_SOFTWARE_ID                           0x01
+#define IPMI_PLATFORM_VAL_ID                       0x01
+#define IPMI_GENERATOR_ID(i,f)                     ((i << 1) | (f << 1) | IPMI_SOFTWARE_ID)
+
+#define IPMI_SENSOR_TYPE_EVENT_CODE_DISCRETE       0x6F
+
+#define IPMI_OEM_SPECIFIC_DATA                     0x02
+#define IPMI_SENSOR_SPECIFIC_DATA                  0x03
+
 #pragma pack()
 #endif
