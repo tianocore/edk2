@@ -1494,7 +1494,17 @@ ScsiRead10CommandEx (
     goto ErrorExit;
   }
 
-  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, SelfEvent);
+  Status = ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, SelfEvent);
+  if (EFI_ERROR(Status)) {
+    //
+    // Since ScsiLibNotify() will not be signaled if ExecuteScsiCommand()
+    // returns with error, close the event here.
+    //
+    gBS->CloseEvent (SelfEvent);
+    goto ErrorExit;
+  } else {
+    return EFI_SUCCESS;
+  }
 
 ErrorExit:
   if (Context != NULL) {
@@ -1668,7 +1678,17 @@ ScsiWrite10CommandEx (
     goto ErrorExit;
   }
 
-  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, Event);
+  Status = ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, SelfEvent);
+  if (EFI_ERROR(Status)) {
+    //
+    // Since ScsiLibNotify() will not be signaled if ExecuteScsiCommand()
+    // returns with error, close the event here.
+    //
+    gBS->CloseEvent (SelfEvent);
+    goto ErrorExit;
+  } else {
+    return EFI_SUCCESS;
+  }
 
 ErrorExit:
   if (Context != NULL) {
@@ -1842,7 +1862,17 @@ ScsiRead16CommandEx (
     goto ErrorExit;
   }
 
-  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, Event);
+  Status = ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, SelfEvent);
+  if (EFI_ERROR(Status)) {
+    //
+    // Since ScsiLibNotify() will not be signaled if ExecuteScsiCommand()
+    // returns with error, close the event here.
+    //
+    gBS->CloseEvent (SelfEvent);
+    goto ErrorExit;
+  } else {
+    return EFI_SUCCESS;
+  }
 
 ErrorExit:
   if (Context != NULL) {
@@ -2016,7 +2046,17 @@ ScsiWrite16CommandEx (
     goto ErrorExit;
   }
 
-  return ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, Event);
+  Status = ScsiIo->ExecuteScsiCommand (ScsiIo, CommandPacket, SelfEvent);
+  if (EFI_ERROR(Status)) {
+    //
+    // Since ScsiLibNotify() will not be signaled if ExecuteScsiCommand()
+    // returns with error, close the event here.
+    //
+    gBS->CloseEvent (SelfEvent);
+    goto ErrorExit;
+  } else {
+    return EFI_SUCCESS;
+  }
 
 ErrorExit:
   if (Context != NULL) {
