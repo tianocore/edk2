@@ -833,6 +833,10 @@ DiskIo2ReadWriteDisk (
   Status    = EFI_SUCCESS;
   Blocking  = (BOOLEAN) ((Token == NULL) || (Token->Event == NULL));
 
+  if (!(Media->MediaPresent)) {
+    return EFI_NO_MEDIA;
+  }
+
   if (Media->MediaId != MediaId) {
     return EFI_MEDIA_CHANGED;
   }
