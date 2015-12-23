@@ -291,6 +291,10 @@
   MdeModulePkg/Library/PlatformVarCleanupLib/PlatformVarCleanupLib.inf
   MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   MdeModulePkg/Library/DxeFileExplorerProtocol/DxeFileExplorerProtocol.inf
+  MdeModulePkg/Library/BaseIpmiLibNull/BaseIpmiLibNull.inf
+  MdeModulePkg/Library/DxeIpmiLibIpmiProtocol/DxeIpmiLibIpmiProtocol.inf
+  MdeModulePkg/Library/PeiIpmiLibIpmiPpi/PeiIpmiLibIpmiPpi.inf
+  MdeModulePkg/Library/SmmIpmiLibSmmIpmiProtocol/SmmIpmiLibSmmIpmiProtocol.inf
 
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
