@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PcRtc.h"
 
-PC_RTC_MODULE_GLOBALS  mModuleGlobal = { 0 };
+PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 
 EFI_HANDLE             mHandle = NULL;
 
@@ -135,6 +135,7 @@ InitializePcRtc (
   EFI_EVENT   Event;
 
   EfiInitializeLock (&mModuleGlobal.RtcLock, TPL_CALLBACK);
+  mModuleGlobal.CenturyRtcAddress = 0;
 
   Status = PcRtcInit (&mModuleGlobal);
   ASSERT_EFI_ERROR (Status);
