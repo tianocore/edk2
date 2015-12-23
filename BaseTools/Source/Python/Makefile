@@ -242,43 +242,49 @@ SetPythonPath:
   set PYTHONPATH=$(BASE_TOOLS_PATH)\Source\Python
 
 $(BIN_DIR)\build.exe: $(BASE_TOOLS_PATH)\Source\Python\build\build.py $(COMMON_PYTHON) $(CMD_BUILD) $(CMD_GENFDS)
-  @pushd . & @cd build & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) build.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) build\build.py
 
 $(BIN_DIR)\GenFds.exe: $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFds.py $(COMMON_PYTHON) $(CMD_GENFDS)
-  @pushd . & @cd GenFds & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenFds.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenFds\GenFds.py
 
 $(BIN_DIR)\Trim.exe: $(BASE_TOOLS_PATH)\Source\Python\Trim\Trim.py $(COMMON_PYTHON)
-  @pushd . & @cd Trim & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Trim.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Trim\Trim.py
 
 $(BIN_DIR)\GenDepex.exe: $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenDepex.py $(COMMON_PYTHON)
-  @pushd . & @cd AutoGen & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenDepex.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) AutoGen\GenDepex.py
 
 $(BIN_DIR)\TargetTool.exe: $(BASE_TOOLS_PATH)\Source\Python\TargetTool\TargetTool.py $(COMMON_PYTHON)
-  @pushd . & @cd TargetTool & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) TargetTool.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) TargetTool\TargetTool.py
 
 $(BIN_DIR)\GenPatchPcdTable.exe: $(BASE_TOOLS_PATH)\Source\Python\GenPatchPcdTable\GenPatchPcdTable.py $(COMMON_PYTHON)
-  @pushd . & @cd GenPatchPcdTable & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenPatchPcdTable.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenPatchPcdTable\GenPatchPcdTable.py
 
 $(BIN_DIR)\PatchPcdValue.exe: $(BASE_TOOLS_PATH)\Source\Python\PatchPcdValue\PatchPcdValue.py $(COMMON_PYTHON)
-  @pushd . & @cd PatchPcdValue & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) PatchPcdValue.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) PatchPcdValue\PatchPcdValue.py
 
 $(BIN_DIR)\BPDG.exe: $(BASE_TOOLS_PATH)\Source\Python\BPDG\BPDG.py $(COMMON_PYTHON) $(CMD_BPDG)
-  @pushd . & @cd BPDG & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) BPDG.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) BPDG\BPDG.py
 
 $(BIN_DIR)\UPT.exe: $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py $(CMD_UPT)
-  @pushd . & @cd UPT & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) UPT.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) UPT\UPT.py
 
-$(BIN_DIR)\Rsa2048Sha256Sign.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256Sign.py
-  @pushd . & @cd Rsa2048Sha256Sign & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256Sign.py & @popd
-  @pushd . & @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\TestSigningPrivateKey.pem $(BIN_DIR)\TestSigningPrivateKey.pem & @popd
+$(BIN_DIR)\Rsa2048Sha256Sign.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256Sign.py $(BIN_DIR)\TestSigningPrivateKey.pem
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256Sign\Rsa2048Sha256Sign.py
+
+$(BIN_DIR)\TestSigningPrivateKey.pem: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\TestSigningPrivateKey.pem
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\TestSigningPrivateKey.pem $(BIN_DIR)\TestSigningPrivateKey.pem
   
 $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256GenerateKeys.py
-  @pushd . & @cd Rsa2048Sha256Sign & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256GenerateKeys.py & @popd
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256Sign\Rsa2048Sha256GenerateKeys.py
 
-$(BIN_DIR)\Ecc.exe: $(BASE_TOOLS_PATH)\Source\Python\Ecc\Ecc.py $(CMD_ECC)
-  @pushd . & @cd Ecc & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Ecc.py & @popd
-  @pushd . & @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\config.ini $(BIN_DIR)\config.ini & @popd
-  @pushd . & @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\exception.xml $(BIN_DIR)\exception.xml & @popd
+$(BIN_DIR)\Ecc.exe: $(BASE_TOOLS_PATH)\Source\Python\Ecc\Ecc.py $(CMD_ECC) $(BIN_DIR)\config.ini $(BIN_DIR)\exception.xml
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Ecc\Ecc.py
+
+$(BIN_DIR)\config.ini: $(BASE_TOOLS_PATH)\Source\Python\Ecc\config.ini
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\config.ini $(BIN_DIR)\config.ini
+
+$(BIN_DIR)\exception.xml: $(BASE_TOOLS_PATH)\Source\Python\Ecc\exception.xml
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\exception.xml $(BIN_DIR)\exception.xml
   
 clean:
 cleanall:  
