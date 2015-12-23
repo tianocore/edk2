@@ -1,4 +1,5 @@
 /* gzguts.h -- zlib internal header definitions for gz* operations
+ * Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
  * Copyright (C) 2004, 2005, 2010, 2011, 2012, 2013 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
@@ -31,7 +32,7 @@
 #  include <stddef.h>
 #endif
 
-#if defined(__TURBOC__) || defined(_MSC_VER) || defined(_WIN32)
+#if (defined(__TURBOC__) || defined(_MSC_VER) || defined(_WIN32)) && !defined(UEFI_C_SOURCE)
 #  include <io.h>
 #endif
 
@@ -40,6 +41,11 @@
 #  define read _read
 #  define write _write
 #  define close _close
+#endif
+
+// Needed to get the declarations for open, read, write, close
+#ifdef  UEFI_C_SOURCE
+# include <unistd.h>
 #endif
 
 #ifdef NO_DEFLATE       /* for compatibility with old definition */
@@ -99,7 +105,7 @@
    Microsoft more than a decade later!), _snprintf does not guarantee null
    termination of the result -- however this is only used in gzlib.c where
    the result is assured to fit in the space provided */
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(UEFI_C_SOURCE)
 #  define snprintf _snprintf
 #endif
 

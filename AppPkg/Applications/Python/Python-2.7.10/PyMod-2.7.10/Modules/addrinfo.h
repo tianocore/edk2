@@ -1,4 +1,13 @@
-/*
+/** @file
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (C) 1995, 1996, 1997, 1998, and 1999 WIDE Project.
  * All rights reserved.
  *
@@ -25,7 +34,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
+**/
 
 #ifndef HAVE_GETADDRINFO
 
@@ -123,49 +132,51 @@
 
 #endif /* !HAVE_GETNAMEINFO */
 
-#ifndef HAVE_ADDRINFO
-struct addrinfo {
-    int         ai_flags;       /* AI_PASSIVE, AI_CANONNAME */
-    int         ai_family;      /* PF_xxx */
-    int         ai_socktype;    /* SOCK_xxx */
-    int         ai_protocol;    /* 0 or IPPROTO_xxx for IPv4 and IPv6 */
-    size_t      ai_addrlen;     /* length of ai_addr */
-    char        *ai_canonname;  /* canonical name for hostname */
-    struct sockaddr *ai_addr;           /* binary address */
-    struct addrinfo *ai_next;           /* next structure in linked list */
-};
-#endif /* !HAVE_ADDRINFO */
+#ifndef _SYS_SOCKET_H_
+  #ifndef HAVE_ADDRINFO
+    struct addrinfo {
+        int         ai_flags;       /* AI_PASSIVE, AI_CANONNAME */
+        int         ai_family;      /* PF_xxx */
+        int         ai_socktype;    /* SOCK_xxx */
+        int         ai_protocol;    /* 0 or IPPROTO_xxx for IPv4 and IPv6 */
+        size_t      ai_addrlen;     /* length of ai_addr */
+        char        *ai_canonname;  /* canonical name for hostname */
+        struct sockaddr *ai_addr;           /* binary address */
+        struct addrinfo *ai_next;           /* next structure in linked list */
+    };
+  #endif /* !HAVE_ADDRINFO */
 
-#ifndef HAVE_SOCKADDR_STORAGE
-/*
- * RFC 2553: protocol-independent placeholder for socket addresses
- */
-#define _SS_MAXSIZE     128
-#ifdef HAVE_LONG_LONG
-#define _SS_ALIGNSIZE   (sizeof(PY_LONG_LONG))
-#else
-#define _SS_ALIGNSIZE   (sizeof(double))
-#endif /* HAVE_LONG_LONG */
-#define _SS_PAD1SIZE    (_SS_ALIGNSIZE - sizeof(u_char) * 2)
-#define _SS_PAD2SIZE    (_SS_MAXSIZE - sizeof(u_char) * 2 - \
-                _SS_PAD1SIZE - _SS_ALIGNSIZE)
+  #ifndef HAVE_SOCKADDR_STORAGE
+    /*
+     * RFC 2553: protocol-independent placeholder for socket addresses
+     */
+    #define _SS_MAXSIZE     128
+    #ifdef HAVE_LONG_LONG
+      #define _SS_ALIGNSIZE   (sizeof(PY_LONG_LONG))
+    #else
+      #define _SS_ALIGNSIZE   (sizeof(double))
+    #endif /* HAVE_LONG_LONG */
+    #define _SS_PAD1SIZE    (_SS_ALIGNSIZE - sizeof(u_char) * 2)
+    #define _SS_PAD2SIZE    (_SS_MAXSIZE - sizeof(u_char) * 2 - \
+                    _SS_PAD1SIZE - _SS_ALIGNSIZE)
 
-struct sockaddr_storage {
-#ifdef HAVE_SOCKADDR_SA_LEN
-    unsigned char ss_len;               /* address length */
-    unsigned char ss_family;            /* address family */
-#else
-    unsigned short ss_family;           /* address family */
-#endif /* HAVE_SOCKADDR_SA_LEN */
-    char        __ss_pad1[_SS_PAD1SIZE];
-#ifdef HAVE_LONG_LONG
-    PY_LONG_LONG __ss_align;            /* force desired structure storage alignment */
-#else
-    double __ss_align;          /* force desired structure storage alignment */
-#endif /* HAVE_LONG_LONG */
-    char        __ss_pad2[_SS_PAD2SIZE];
-};
-#endif /* !HAVE_SOCKADDR_STORAGE */
+    struct sockaddr_storage {
+    #ifdef HAVE_SOCKADDR_SA_LEN
+        unsigned char ss_len;               /* address length */
+        unsigned char ss_family;            /* address family */
+    #else
+        unsigned short ss_family;           /* address family */
+    #endif /* HAVE_SOCKADDR_SA_LEN */
+        char        __ss_pad1[_SS_PAD1SIZE];
+    #ifdef HAVE_LONG_LONG
+        PY_LONG_LONG __ss_align;            /* force desired structure storage alignment */
+    #else
+        double __ss_align;          /* force desired structure storage alignment */
+    #endif /* HAVE_LONG_LONG */
+        char        __ss_pad2[_SS_PAD2SIZE];
+    };
+  #endif  /* !HAVE_SOCKADDR_STORAGE */
+#endif  /* _SYS_SOCKET_H_ */
 
 #ifdef __cplusplus
 extern "C" {

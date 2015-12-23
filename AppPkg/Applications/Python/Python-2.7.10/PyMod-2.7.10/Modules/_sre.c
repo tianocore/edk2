@@ -2,6 +2,16 @@
  * Secret Labs' Regular Expression Engine
  *
  * regular expression matching engine
+
+  Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
  *
  * partial history:
  * 1999-10-24 fl  created (based on existing template matcher code)
@@ -33,6 +43,10 @@
  * CNRI.  Hewlett-Packard provided funding for 1.6 integration and
  * other compatibility work.
  */
+
+/* Get rid of these macros to prevent collisions between EFI and Python in this file. */
+#undef  RETURN_ERROR
+#undef  RETURN_SUCCESS
 
 #ifndef SRE_RECURSIVE
 
@@ -84,7 +98,7 @@ static char copyright[] =
 /* -------------------------------------------------------------------- */
 
 #if defined(_MSC_VER)
-#pragma optimize("agtw", on) /* doesn't seem to make much difference... */
+#pragma optimize("gt", on) /* doesn't seem to make much difference... */
 #pragma warning(disable: 4710) /* who cares if functions are not inlined ;-) */
 /* fastest possible local call under MSVC */
 #define LOCAL(type) static __inline type __fastcall
@@ -2147,8 +2161,8 @@ pattern_findall(PatternObject* self, PyObject* args, PyObject* kw)
 #endif
         }
 
-	if (PyErr_Occurred())
-	    goto error;
+  if (PyErr_Occurred())
+      goto error;
 
         if (status <= 0) {
             if (status == 0)
@@ -2284,8 +2298,8 @@ pattern_split(PatternObject* self, PyObject* args, PyObject* kw)
 #endif
         }
 
-	if (PyErr_Occurred())
-	    goto error;
+  if (PyErr_Occurred())
+      goto error;
 
         if (status <= 0) {
             if (status == 0)
@@ -2381,10 +2395,10 @@ pattern_subx(PatternObject* self, PyObject* ptemplate, PyObject* string,
         b = bint;
         if (ptr) {
             if (b == 1) {
-		    literal = sre_literal_template((unsigned char *)ptr, n);
+        literal = sre_literal_template((unsigned char *)ptr, n);
             } else {
 #if defined(HAVE_UNICODE)
-		    literal = sre_uliteral_template((Py_UNICODE *)ptr, n);
+        literal = sre_uliteral_template((Py_UNICODE *)ptr, n);
 #endif
             }
         } else {
@@ -2436,8 +2450,8 @@ pattern_subx(PatternObject* self, PyObject* ptemplate, PyObject* string,
 #endif
         }
 
-	if (PyErr_Occurred())
-	    goto error;
+  if (PyErr_Occurred())
+      goto error;
 
         if (status <= 0) {
             if (status == 0)
@@ -2655,20 +2669,20 @@ PyDoc_STRVAR(pattern_doc, "Compiled regular expression objects");
 
 static PyMethodDef pattern_methods[] = {
     {"match", (PyCFunction) pattern_match, METH_VARARGS|METH_KEYWORDS,
-	pattern_match_doc},
+  pattern_match_doc},
     {"search", (PyCFunction) pattern_search, METH_VARARGS|METH_KEYWORDS,
-	pattern_search_doc},
+  pattern_search_doc},
     {"sub", (PyCFunction) pattern_sub, METH_VARARGS|METH_KEYWORDS,
-	pattern_sub_doc},
+  pattern_sub_doc},
     {"subn", (PyCFunction) pattern_subn, METH_VARARGS|METH_KEYWORDS,
-	pattern_subn_doc},
+  pattern_subn_doc},
     {"split", (PyCFunction) pattern_split, METH_VARARGS|METH_KEYWORDS,
-	pattern_split_doc},
+  pattern_split_doc},
     {"findall", (PyCFunction) pattern_findall, METH_VARARGS|METH_KEYWORDS,
-	pattern_findall_doc},
+  pattern_findall_doc},
 #if PY_VERSION_HEX >= 0x02020000
     {"finditer", (PyCFunction) pattern_finditer, METH_VARARGS,
-	pattern_finditer_doc},
+  pattern_finditer_doc},
 #endif
     {"scanner", (PyCFunction) pattern_scanner, METH_VARARGS},
     {"__copy__", (PyCFunction) pattern_copy, METH_NOARGS},
@@ -2692,28 +2706,28 @@ statichere PyTypeObject Pattern_Type = {
     (destructor)pattern_dealloc, /*tp_dealloc*/
     0,                                  /* tp_print */
     0,                                  /* tp_getattrn */
-    0,					/* tp_setattr */
-    0,					/* tp_compare */
-    0,					/* tp_repr */
-    0,					/* tp_as_number */
-    0,					/* tp_as_sequence */
-    0,					/* tp_as_mapping */
-    0,					/* tp_hash */
-    0,					/* tp_call */
-    0,					/* tp_str */
-    0,					/* tp_getattro */
-    0,					/* tp_setattro */
-    0,					/* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,		        /* tp_flags */
-    pattern_doc,			/* tp_doc */
-    0,					/* tp_traverse */
-    0,					/* tp_clear */
-    0,					/* tp_richcompare */
-    offsetof(PatternObject, weakreflist),	/* tp_weaklistoffset */
-    0,					/* tp_iter */
-    0,					/* tp_iternext */
-    pattern_methods,			/* tp_methods */
-    pattern_members,			/* tp_members */
+    0,          /* tp_setattr */
+    0,          /* tp_compare */
+    0,          /* tp_repr */
+    0,          /* tp_as_number */
+    0,          /* tp_as_sequence */
+    0,          /* tp_as_mapping */
+    0,          /* tp_hash */
+    0,          /* tp_call */
+    0,          /* tp_str */
+    0,          /* tp_getattro */
+    0,          /* tp_setattro */
+    0,          /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,           /* tp_flags */
+    pattern_doc,      /* tp_doc */
+    0,          /* tp_traverse */
+    0,          /* tp_clear */
+    0,          /* tp_richcompare */
+    offsetof(PatternObject, weakreflist), /* tp_weaklistoffset */
+    0,          /* tp_iter */
+    0,          /* tp_iternext */
+    pattern_methods,      /* tp_methods */
+    pattern_members,      /* tp_members */
 };
 
 static int _validate(PatternObject *self); /* Forward */
@@ -3756,9 +3770,9 @@ static PyTypeObject Match_Type = {
     0,                          /* tp_weaklistoffset */
     0,                          /* tp_iter */
     0,                          /* tp_iternext */
-    match_methods,		/* tp_methods */
-    match_members,		/* tp_members */
-    match_getset,  	        /* tp_getset */
+    match_methods,    /* tp_methods */
+    match_members,    /* tp_members */
+    match_getset,           /* tp_getset */
 };
 
 static PyObject*
@@ -3909,7 +3923,7 @@ static PyMethodDef scanner_methods[] = {
 
 #define SCAN_OFF(x) offsetof(ScannerObject, x)
 static PyMemberDef scanner_members[] = {
-    {"pattern",	T_OBJECT,	SCAN_OFF(pattern),	READONLY},
+    {"pattern", T_OBJECT, SCAN_OFF(pattern),  READONLY},
     {NULL}  /* Sentinel */
 };
 
@@ -3918,31 +3932,31 @@ statichere PyTypeObject Scanner_Type = {
     0, "_" SRE_MODULE ".SRE_Scanner",
     sizeof(ScannerObject), 0,
     (destructor)scanner_dealloc, /*tp_dealloc*/
-    0,				/* tp_print */
-    0,				/* tp_getattr */
-    0,				/* tp_setattr */
-    0,				/* tp_reserved */
-    0,				/* tp_repr */
-    0,				/* tp_as_number */
-    0,				/* tp_as_sequence */
-    0,				/* tp_as_mapping */
-    0,				/* tp_hash */
-    0,				/* tp_call */
-    0,				/* tp_str */
-    0,				/* tp_getattro */
-    0,				/* tp_setattro */
-    0,				/* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,		/* tp_flags */
-    0,				/* tp_doc */
-    0,				/* tp_traverse */
-    0,				/* tp_clear */
-    0,				/* tp_richcompare */
-    0,				/* tp_weaklistoffset */
-    0,				/* tp_iter */
-    0,				/* tp_iternext */
-    scanner_methods,		/* tp_methods */
-    scanner_members,		/* tp_members */
-    0,				/* tp_getset */
+    0,        /* tp_print */
+    0,        /* tp_getattr */
+    0,        /* tp_setattr */
+    0,        /* tp_reserved */
+    0,        /* tp_repr */
+    0,        /* tp_as_number */
+    0,        /* tp_as_sequence */
+    0,        /* tp_as_mapping */
+    0,        /* tp_hash */
+    0,        /* tp_call */
+    0,        /* tp_str */
+    0,        /* tp_getattro */
+    0,        /* tp_setattro */
+    0,        /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,   /* tp_flags */
+    0,        /* tp_doc */
+    0,        /* tp_traverse */
+    0,        /* tp_clear */
+    0,        /* tp_richcompare */
+    0,        /* tp_weaklistoffset */
+    0,        /* tp_iter */
+    0,        /* tp_iternext */
+    scanner_methods,    /* tp_methods */
+    scanner_members,    /* tp_members */
+    0,        /* tp_getset */
 };
 
 static PyObject*
@@ -4000,7 +4014,7 @@ PyMODINIT_FUNC init_sre(void)
 
     m = Py_InitModule("_" SRE_MODULE, _functions);
     if (m == NULL)
-    	return;
+      return;
     d = PyModule_GetDict(m);
 
     x = PyInt_FromLong(SRE_MAGIC);

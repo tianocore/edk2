@@ -1,5 +1,14 @@
+/* Errno module
 
-/* Errno module */
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*/
 
 #include "Python.h"
 
@@ -783,8 +792,52 @@ initerrno(void)
 #ifdef WSAN
     inscode(d, ds, de, "WSAN", WSAN, "Error WSAN");
 #endif
+
+/* These symbols are added for EDK II support.  */
+#ifdef EMINERRORVAL
+  inscode(d, ds, de, "EMINERRORVAL", EMINERRORVAL, "Lowest valid error value");
+#endif
 #ifdef ENOTSUP
-    inscode(d, ds, de, "ENOTSUP", ENOTSUP, "Operation not supported");
+  inscode(d, ds, de, "ENOTSUP", ENOTSUP, "Operation not supported");
+#endif
+#ifdef EBADRPC
+  inscode(d, ds, de, "EBADRPC", EBADRPC, "RPC struct is bad");
+#endif
+#ifdef ERPCMISMATCH
+  inscode(d, ds, de, "ERPCMISMATCH", ERPCMISMATCH, "RPC version wrong");
+#endif
+#ifdef EPROGUNAVAIL
+  inscode(d, ds, de, "EPROGUNAVAIL", EPROGUNAVAIL, "RPC prog. not avail");
+#endif
+#ifdef EPROGMISMATCH
+  inscode(d, ds, de, "EPROGMISMATCH", EPROGMISMATCH, "Program version wrong");
+#endif
+#ifdef EPROCUNAVAIL
+  inscode(d, ds, de, "EPROCUNAVAIL", EPROCUNAVAIL, "Bad procedure for program");
+#endif
+#ifdef EFTYPE
+  inscode(d, ds, de, "EFTYPE", EFTYPE, "Inappropriate file type or format");
+#endif
+#ifdef EAUTH
+  inscode(d, ds, de, "EAUTH", EAUTH, "Authentication error");
+#endif
+#ifdef ENEEDAUTH
+  inscode(d, ds, de, "ENEEDAUTH", ENEEDAUTH, "Need authenticator");
+#endif
+#ifdef ECANCELED
+  inscode(d, ds, de, "ECANCELED", ECANCELED, "Operation canceled");
+#endif
+#ifdef ENOATTR
+  inscode(d, ds, de, "ENOATTR", ENOATTR, "Attribute not found");
+#endif
+#ifdef EDOOFUS
+  inscode(d, ds, de, "EDOOFUS", EDOOFUS, "Programming Error");
+#endif
+#ifdef EBUFSIZE
+  inscode(d, ds, de, "EBUFSIZE", EBUFSIZE, "Buffer too small to hold result");
+#endif
+#ifdef EMAXERRORVAL
+  inscode(d, ds, de, "EMAXERRORVAL", EMAXERRORVAL, "One more than the highest defined error value");
 #endif
 
     Py_DECREF(de);

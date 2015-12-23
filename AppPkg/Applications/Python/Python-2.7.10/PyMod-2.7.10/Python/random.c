@@ -1,3 +1,15 @@
+/** @file
+
+  Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
+
 #include "Python.h"
 #ifdef MS_WINDOWS
 #include <windows.h>
@@ -153,8 +165,12 @@ vms_urandom(unsigned char *buffer, Py_ssize_t size, int raise)
 
 static struct {
     int fd;
+#ifdef HAVE_STRUCT_STAT_ST_DEV
     dev_t st_dev;
+#endif
+#ifdef HAVE_STRUCT_STAT_ST_INO
     ino_t st_ino;
+#endif
 } urandom_cache = { -1 };
 
 /* Read size bytes from /dev/urandom into buffer.
@@ -167,7 +183,7 @@ dev_urandom_noraise(unsigned char *buffer, Py_ssize_t size)
 
     assert (0 < size);
 
-    fd = open("/dev/urandom", O_RDONLY);
+    fd = open("/dev/urandom", O_RDONLY, 0);
     if (fd < 0)
         Py_FatalError("Failed to open /dev/urandom");
 
@@ -204,8 +220,14 @@ dev_urandom_python(char *buffer, Py_ssize_t size)
     if (urandom_cache.fd >= 0) {
         /* Does the fd point to the same thing as before? (issue #21207) */
         if (fstat(urandom_cache.fd, &st)
+#ifdef HAVE_STRUCT_STAT_ST_DEV
             || st.st_dev != urandom_cache.st_dev
-            || st.st_ino != urandom_cache.st_ino) {
+#endif
+#ifdef  HAVE_STRUCT_STAT_ST_INO
+            || st.st_ino != urandom_cache.st_ino
+#endif
+           )
+        {
             /* Something changed: forget the cached fd (but don't close it,
                since it probably points to something important for some
                third-party code). */
@@ -216,7 +238,7 @@ dev_urandom_python(char *buffer, Py_ssize_t size)
         fd = urandom_cache.fd;
     else {
         Py_BEGIN_ALLOW_THREADS
-        fd = open("/dev/urandom", O_RDONLY);
+        fd = open("/dev/urandom", O_RDONLY, 0);
         Py_END_ALLOW_THREADS
         if (fd < 0)
         {
@@ -250,8 +272,12 @@ dev_urandom_python(char *buffer, Py_ssize_t size)
             }
             else {
                 urandom_cache.fd = fd;
+#ifdef HAVE_STRUCT_STAT_ST_DEV
                 urandom_cache.st_dev = st.st_dev;
+#endif
+#ifdef HAVE_STRUCT_STAT_ST_INO
                 urandom_cache.st_ino = st.st_ino;
+#endif
             }
         }
     }

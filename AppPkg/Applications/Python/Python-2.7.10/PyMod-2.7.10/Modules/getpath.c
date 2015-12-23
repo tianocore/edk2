@@ -1,7 +1,18 @@
 /** @file
     Return the initial module search path.
 
+    This file is based upon the Modules/getpath.c file from the Python distribution
+    but has had everything not exactly necessary for operation on EDK II stripped
+    out.
+
     Search in specified locations for the associated Python libraries.
+
+    For the EDK II, UEFI, implementation of Python, PREFIX and EXEC_PREFIX
+    are set as follows:
+      PREFIX      = /Efi/StdLib
+      EXEC_PREFIX = PREFIX
+
+    The volume is assumed to be the current volume when Python was started.
 
     Py_GetPath returns module_search_path.
     Py_GetPrefix returns PREFIX
@@ -11,16 +22,13 @@
     These are built dynamically so that the proper volume name can be prefixed
     to the paths.
 
-    For the EDK II, UEFI, implementation of Python, PREFIX and EXEC_PREFIX
-    are set as follows:
-      PREFIX      = /Efi/StdLib
-      EXEC_PREFIX = PREFIX
-
-    The following final paths are assumed:
+    The following final paths (for Python 2.7.10) are assumed:
       /Efi/Tools/Python.efi                     The Python executable.
-      /Efi/StdLib/lib/python.VERSION            The platform independent Python modules.
-      /Efi/StdLib/lib/python.VERSION/dynalib    Dynamically loadable Python extension modules.
+      /Efi/StdLib/lib/python27.10               The version dependent Python modules.
+      /Efi/StdLib/lib/python.27                 The version independent Python modules.
+      /Efi/StdLib/lib/python27.10/lib-dynload   Dynamically loadable Python extension modules.
 
+    Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
     Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
@@ -34,13 +42,12 @@
 #include <osdefs.h>
 #include  <ctype.h>
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+#define SIFY_I( x ) #x
+#define SIFY( y )   SIFY_I( y )
 
 /* VERSION must be at least two characters long. */
 #ifndef VERSION
-  #define VERSION     "27"
+  #define VERSION     SIFY(PY_MAJOR_VERSION) SIFY(PY_MINOR_VERSION)
 #endif
 
 #ifndef VPATH
@@ -61,20 +68,19 @@
 #endif
 
 #ifndef   LIBPYTHON
-  #define   LIBPYTHON     "lib/python." VERSION
+  #define   LIBPYTHON     "lib/python" VERSION "." SIFY(PY_MICRO_VERSION)
 #endif
 
 #ifndef PYTHONPATH
-  #ifdef HAVE_ENVIRONMENT_OPS
-    #define PYTHONPATH  PREFIX LIBPYTHON sDELIM \
-                        EXEC_PREFIX LIBPYTHON "/lib-dynload"
-  #else
-    #define PYTHONPATH  LIBPYTHON
-  #endif
+  #define PYTHONPATH  LIBPYTHON
 #endif
 
 #ifndef LANDMARK
-#define LANDMARK    "os.py"
+  #define LANDMARK    "os.py"
+#endif
+
+#ifdef __cplusplus
+ extern "C" {
 #endif
 
 static char   prefix[MAXPATHLEN+1];
@@ -94,11 +100,7 @@ static char   volume_name[32]             = { 0 };
 static int
 is_sep(char ch)
 {
-#ifdef ALTSEP
   return ch == SEP || ch == ALTSEP;
-#else
-  return ch == SEP;
-#endif
 }
 
 /** Reduce a path by its last element.
@@ -116,77 +118,6 @@ reduce(char *dir)
         --i;
     dir[i] = '\0';
 }
-
-#ifndef UEFI_C_SOURCE
-/** Does filename point to a file and not directory?
-
-    @param[in]    filename    The fully qualified path to the object to test.
-
-    @retval       0     Filename was not found, or is a directory.
-    @retval       1     Filename refers to a regular file.
-**/
-static int
-isfile(char *filename)
-{
-    struct stat buf;
-    if (stat(filename, &buf) != 0) {
-      return 0;
-    }
-    //if (!S_ISREG(buf.st_mode))
-    if (S_ISDIR(buf.st_mode)) {
-      return 0;
-    }
-    return 1;
-}
-
-/** Determine if filename refers to a Python module.
-
-    A Python module is indicated if the file exists, or if the file with
-    'o' or 'c' appended exists.
-
-    @param[in]    filename    The fully qualified path to the object to test.
-
-    @retval       0
-**/
-static int
-ismodule(char *filename)
-{
-  if (isfile(filename)) {
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: file = \"%s\"\n", __func__, __LINE__, filename);
-    return 1;
-  }
-
-    /* Check for the compiled version of prefix. */
-    if (strlen(filename) < MAXPATHLEN) {
-        strcat(filename, Py_OptimizeFlag ? "o" : "c");
-        if (isfile(filename)) {
-          return 1;
-        }
-    }
-    return 0;
-}
-
-/** Does filename point to a directory?
-
-    @param[in]    filename    The fully qualified path to the object to test.
-
-    @retval       0     Filename was not found, or is not a regular file.
-    @retval       1     Filename refers to a directory.
-**/
-static int
-isdir(char *filename)
-{
-    struct stat buf;
-
-    if (stat(filename, &buf) != 0)
-        return 0;
-
-    if (!S_ISDIR(buf.st_mode))
-        return 0;
-
-    return 1;
-}
-#endif  /* UEFI_C_SOURCE */
 
 /** Determine if a path is absolute, or not.
     An absolute path consists of a volume name, "VOL:", followed by a rooted path,
@@ -466,7 +397,7 @@ calculate_path(void)
     char *pythonpath = PYTHONPATH;
     char *rtpypath = Py_GETENV("PYTHONPATH");
     //char *home = Py_GetPythonHome();
-    char *path = getenv("PATH");
+    char *path = getenv("path");
     char *prog = Py_GetProgramName();
     char argv0_path[MAXPATHLEN+1];
     char zip_path[MAXPATHLEN+1];
@@ -531,9 +462,9 @@ calculate_path(void)
       This is the full path to the platform independent libraries.
 ########################################################################### */
 
-        strncpy(prefix, volume_name, MAXPATHLEN);
-        joinpath(prefix, PREFIX);
-        joinpath(prefix, lib_python);
+    strncpy(prefix, volume_name, MAXPATHLEN);
+    joinpath(prefix, PREFIX);
+    joinpath(prefix, lib_python);
 
 /* ###########################################################################
       Build the FULL path to the zipped-up Python library.
@@ -551,10 +482,10 @@ calculate_path(void)
       Build the FULL path to dynamically loadable libraries.
 ########################################################################### */
 
-        strncpy(exec_prefix, volume_name, MAXPATHLEN);
-        joinpath(exec_prefix, EXEC_PREFIX);
-        joinpath(exec_prefix, lib_python);
-        joinpath(exec_prefix, "lib-dynload");
+    strncpy(exec_prefix, volume_name, MAXPATHLEN);    // "fs0:"
+    joinpath(exec_prefix, EXEC_PREFIX);               // "fs0:/Efi/StdLib"
+    joinpath(exec_prefix, lib_python);                // "fs0:/Efi/StdLib/lib/python.27"
+    joinpath(exec_prefix, "lib-dynload");             // "fs0:/Efi/StdLib/lib/python.27/lib-dynload"
 
 /* ###########################################################################
       Build the module search path.
@@ -573,9 +504,9 @@ calculate_path(void)
       strcpy(prefix, volume_name);
     }
     bufsz = strlen(prefix);
-    if(prefix[bufsz-1] == ':') {
-      prefix[bufsz] = SEP;
-      prefix[bufsz+1] = 0;
+    if(prefix[bufsz-1] == ':') {    // if prefix consists solely of a volume_name
+      prefix[bufsz] = SEP;          //    then append SEP indicating the root directory
+      prefix[bufsz+1] = 0;          //    and ensure the new string is terminated
     }
 
     /* Calculate size of return buffer.

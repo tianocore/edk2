@@ -4,18 +4,18 @@
 * This module is automatically imported during initialization. *
 ****************************************************************
 
+This is a UEFI-specific version of site.py.
+
 In earlier versions of Python (up to 1.5a3), scripts or modules that
 needed to use site-specific modules would place ``import site''
 somewhere near the top of their code.  Because of the automatic
 import, this is no longer necessary (but code that does it still
 works).
 
-This will append site-specific paths to the module search path.  On
-Unix (including Mac OSX), it starts with sys.prefix and
+This will append site-specific paths to the module search path.  It starts with sys.prefix and
 sys.exec_prefix (if different) and appends
 lib/python<version>/site-packages as well as lib/site-python.
-On other platforms (such as Windows), it tries each of the
-prefixes directly, as well as with lib/site-packages appended.  The
+The
 resulting directories, if they exist, are appended to sys.path, and
 also inspected for path configuration files.
 
@@ -27,7 +27,7 @@ sys.path more than once.  Blank lines and lines beginning with
 '#' are skipped. Lines starting with 'import' are executed.
 
 For example, suppose sys.prefix and sys.exec_prefix are set to
-/usr/local and there is a directory /usr/local/lib/python2.5/site-packages
+/Efi/StdLib and there is a directory /Efi/StdLib/lib/python27.10/site-packages
 with three subdirectories, foo, bar and spam, and two path
 configuration files, foo.pth and bar.pth.  Assume foo.pth contains the
 following:
@@ -44,8 +44,8 @@ and bar.pth contains:
 
 Then the following directories are added to sys.path, in this order:
 
-  /usr/local/lib/python2.5/site-packages/bar
-  /usr/local/lib/python2.5/site-packages/foo
+  /Efi/StdLib/lib/python27.10/site-packages/bar
+  /Efi/StdLib/lib/python27.10/site-packages/foo
 
 Note that bletch is omitted because it doesn't exist; bar precedes foo
 because bar.pth comes alphabetically before foo.pth; and spam is
@@ -56,6 +56,15 @@ named sitecustomize, which can perform arbitrary additional
 site-specific customizations.  If this import fails with an
 ImportError exception, it is silently ignored.
 
+Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 """
 
 import sys
@@ -67,7 +76,7 @@ import traceback
 PREFIXES = [sys.prefix, sys.exec_prefix]
 # Enable per user site-packages directory
 # set it to False to disable the feature or True to force the feature
-ENABLE_USER_SITE = None
+ENABLE_USER_SITE = False
 
 # for distutils.commands.install
 # These values are initialized by the getuserbase() and getusersitepackages()
@@ -246,12 +255,6 @@ def getusersitepackages():
     from sysconfig import get_path
     import os
 
-    if sys.platform == 'darwin':
-        from sysconfig import get_config_var
-        if get_config_var('PYTHONFRAMEWORK'):
-            USER_SITE = get_path('purelib', 'osx_framework_user')
-            return USER_SITE
-
     USER_SITE = get_path('purelib', '%s_user' % os.name)
     return USER_SITE
 
@@ -261,11 +264,11 @@ def addusersitepackages(known_paths):
     Each user has its own python directory with site-packages in the
     home directory.
     """
-    # get the per user site-package path
-    # this call will also make sure USER_BASE and USER_SITE are set
-    user_site = getusersitepackages()
-
     if ENABLE_USER_SITE and os.path.isdir(user_site):
+        # get the per user site-package path
+        # this call will also make sure USER_BASE and USER_SITE are set
+        user_site = getusersitepackages()
+
         addsitedir(user_site, known_paths)
     return known_paths
 
@@ -285,25 +288,16 @@ def getsitepackages():
             continue
         seen.add(prefix)
 
-        if sys.platform in ('os2emx', 'riscos'):
-            sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
-        elif os.sep == '/':
-            sitepackages.append(os.path.join(prefix, "lib",
-                                        "python" + sys.version[:3],
-                                        "site-packages"))
-            sitepackages.append(os.path.join(prefix, "lib", "site-python"))
+        ix = sys.version.find(' ')
+        if ix != -1:
+            micro = sys.version[4:ix]
         else:
-            sitepackages.append(prefix)
-            sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
-        if sys.platform == "darwin":
-            # for framework builds *only* we add the standard Apple
-            # locations.
-            from sysconfig import get_config_var
-            framework = get_config_var("PYTHONFRAMEWORK")
-            if framework:
-                sitepackages.append(
-                        os.path.join("/Library", framework,
-                            sys.version[:3], "site-packages"))
+            micro = '0'
+
+        sitepackages.append(os.path.join(prefix, "lib",
+                                    "python" + sys.version[0] + sys.version[2] + '.' + micro,
+                                    "site-packages"))
+        sitepackages.append(os.path.join(prefix, "lib", "site-python"))
     return sitepackages
 
 def addsitepackages(known_paths):
@@ -315,20 +309,20 @@ def addsitepackages(known_paths):
     return known_paths
 
 def setBEGINLIBPATH():
-    """The OS/2 EMX port has optional extension modules that do double duty
-    as DLLs (and must use the .DLL file extension) for other extensions.
+    """The UEFI port has optional extension modules that do double duty
+    as DLLs (even though they have .efi file extensions) for other extensions.
     The library search path needs to be amended so these will be found
     during module import.  Use BEGINLIBPATH so that these are at the start
     of the library search path.
 
     """
     dllpath = os.path.join(sys.prefix, "Lib", "lib-dynload")
-    libpath = os.environ['BEGINLIBPATH'].split(';')
+    libpath = os.environ['BEGINLIBPATH'].split(os.path.pathsep)
     if libpath[-1]:
         libpath.append(dllpath)
     else:
         libpath[-1] = dllpath
-    os.environ['BEGINLIBPATH'] = ';'.join(libpath)
+    os.environ['BEGINLIBPATH'] = os.path.pathsep.join(libpath)
 
 
 def setquit():
@@ -338,12 +332,7 @@ def setquit():
     The repr of each object contains a hint at how it works.
 
     """
-    if os.sep == ':':
-        eof = 'Cmd-Q'
-    elif os.sep == '\\':
-        eof = 'Ctrl-Z plus Return'
-    else:
-        eof = 'Ctrl-D (i.e. EOF)'
+    eof = 'Ctrl-D (i.e. EOF)'
 
     class Quitter(object):
         def __init__(self, name):
@@ -426,12 +415,7 @@ class _Printer(object):
 def setcopyright():
     """Set 'copyright' and 'credits' in __builtin__"""
     __builtin__.copyright = _Printer("copyright", sys.copyright)
-    if sys.platform[:4] == 'java':
-        __builtin__.credits = _Printer(
-            "credits",
-            "Jython is maintained by the Jython developers (www.jython.org).")
-    else:
-        __builtin__.credits = _Printer("credits", """\
+    __builtin__.credits = _Printer("credits", """\
     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
     for supporting Python development.  See www.python.org for more information.""")
     here = os.path.dirname(os.__file__)
@@ -456,21 +440,6 @@ class _Helper(object):
 
 def sethelper():
     __builtin__.help = _Helper()
-
-def aliasmbcs():
-    """On Windows, some default encodings are not provided by Python,
-    while they are always available as "mbcs" in each locale. Make
-    them usable by aliasing to "mbcs" in such a case."""
-    if sys.platform == 'win32':
-        import locale, codecs
-        enc = locale.getdefaultlocale()[1]
-        if enc.startswith('cp'):            # "cp***" ?
-            try:
-                codecs.lookup(enc)
-            except LookupError:
-                import encodings
-                encodings._cache[enc] = encodings._unknown
-                encodings.aliases.aliases[enc] = 'mbcs'
 
 def setencoding():
     """Set the string encoding used by the Unicode implementation.  The
@@ -529,16 +498,11 @@ def main():
         ENABLE_USER_SITE = check_enableusersite()
     known_paths = addusersitepackages(known_paths)
     known_paths = addsitepackages(known_paths)
-    if sys.platform == 'os2emx':
-        setBEGINLIBPATH()
     setquit()
     setcopyright()
     sethelper()
-    aliasmbcs()
     setencoding()
     execsitecustomize()
-    if ENABLE_USER_SITE:
-        execusercustomize()
     # Remove sys.setdefaultencoding() so that users cannot change the
     # encoding after initialization.  The test for presence is needed when
     # this module is run as a script, because this code is executed twice.
@@ -549,52 +513,19 @@ main()
 
 def _script():
     help = """\
-    %s [--user-base] [--user-site]
+    %s
 
-    Without arguments print some useful information
-    With arguments print the value of USER_BASE and/or USER_SITE separated
-    by '%s'.
-
-    Exit codes with --user-base or --user-site:
-      0 - user site directory is enabled
-      1 - user site directory is disabled by user
-      2 - uses site directory is disabled by super user
-          or for security reasons
-     >2 - unknown error
+    Path elements are normally separated by '%s'.
     """
-    args = sys.argv[1:]
-    if not args:
-        print "sys.path = ["
-        for dir in sys.path:
-            print "    %r," % (dir,)
-        print "]"
-        print "USER_BASE: %r (%s)" % (USER_BASE,
-            "exists" if os.path.isdir(USER_BASE) else "doesn't exist")
-        print "USER_SITE: %r (%s)" % (USER_SITE,
-            "exists" if os.path.isdir(USER_SITE) else "doesn't exist")
-        print "ENABLE_USER_SITE: %r" %  ENABLE_USER_SITE
-        sys.exit(0)
 
-    buffer = []
-    if '--user-base' in args:
-        buffer.append(USER_BASE)
-    if '--user-site' in args:
-        buffer.append(USER_SITE)
+    print "sys.path = ["
+    for dir in sys.path:
+        print "    %r," % (dir,)
+    print "]"
 
-    if buffer:
-        print os.pathsep.join(buffer)
-        if ENABLE_USER_SITE:
-            sys.exit(0)
-        elif ENABLE_USER_SITE is False:
-            sys.exit(1)
-        elif ENABLE_USER_SITE is None:
-            sys.exit(2)
-        else:
-            sys.exit(3)
-    else:
-        import textwrap
-        print textwrap.dedent(help % (sys.argv[0], os.pathsep))
-        sys.exit(10)
+    import textwrap
+    print textwrap.dedent(help % (sys.argv[0], os.pathsep))
+    sys.exit(0)
 
 if __name__ == '__main__':
     _script()

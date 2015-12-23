@@ -1,4 +1,15 @@
-/* Long (arbitrary precision) integer object implementation */
+/** @file
+  Long (arbitrary precision) integer object implementation.
+
+  Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 
 /* XXX The functional organization of this file is terrible */
 
@@ -24,6 +35,7 @@
  */
 #define FIVEARY_CUTOFF 8
 
+#undef ABS
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
 #undef MIN

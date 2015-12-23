@@ -1,5 +1,18 @@
-# Module 'ntpath' -- common operations on WinNT/Win95 pathnames
-"""Common pathname manipulations, WindowsNT/95 version.
+
+# Module 'ntpath' -- common operations on WinNT/Win95 and UEFI pathnames.
+#
+# Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
+# Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+
+"""Common pathname manipulations, WindowsNT/95 and UEFI version.
 
 Instead of importing this module directly, import os and refer to this
 module as os.path.
@@ -93,6 +106,9 @@ def join(path, *paths):
 # Split a path in a drive specification (a drive letter followed by a
 # colon) and the path specification.
 # It is always true that drivespec + pathspec == p
+# NOTE: for UEFI (and even Windows) you can have multiple characters to the left
+# of the ':' for the device or drive spec.  This is reflected in the modifications
+# to splitdrive() and splitunc().
 def splitdrive(p):
     """Split a pathname into drive/UNC sharepoint and relative path specifiers.
     Returns a 2-tuple (drive_or_unc, path); either part may be empty.
@@ -130,8 +146,10 @@ def splitdrive(p):
             if index2 == -1:
                 index2 = len(p)
             return p[:index2], p[index2:]
-        if normp[1] == ':':
-            return p[:2], p[2:]
+        index = p.find(':')
+        if index != -1:
+            index = index + 1
+            return p[:index], p[index:]
     return '', p
 
 # Parse UNC paths
@@ -143,8 +161,8 @@ def splitunc(p):
     using backslashes).  unc+rest is always the input path.
     Paths containing drive letters never have an UNC part.
     """
-    if p[1:2] == ':':
-        return '', p # Drive letter present
+    if ':' in p:
+        return '', p # Drive letter or device name present
     firstTwo = p[0:2]
     if firstTwo == '//' or firstTwo == '\\\\':
         # is a UNC path:

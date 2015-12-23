@@ -1,9 +1,20 @@
-/* select - Module containing unix select(2) call.
-   Under Unix, the file descriptors are small integers.
-   Under Win32, select only exists for sockets, and sockets may
-   have any value except INVALID_SOCKET.
-   Under BeOS, we suffer the same dichotomy as Win32; sockets can be anything
-   >= 0.
+/*  @file
+  select - Module containing unix select(2) call.
+  Under Unix, the file descriptors are small integers.
+  Under Win32, select only exists for sockets, and sockets may
+  have any value except INVALID_SOCKET.
+  Under BeOS, we suffer the same dichotomy as Win32; sockets can be anything
+  >= 0.
+
+  Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 */
 
 #include "Python.h"
@@ -107,7 +118,7 @@ seq2set(PyObject *seq, fd_set *set, pylist fd2obj[FD_SETSIZE + 1])
         v = PyObject_AsFileDescriptor( o );
         if (v == -1) goto finally;
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(UEFI_C_SOURCE)
         max = 0;                             /* not used for Win32 */
 #else  /* !_MSC_VER */
         if (!_PyIsSelectable_fd(v)) {
@@ -1236,17 +1247,17 @@ static PyTypeObject kqueue_queue_Type;
  * kevent is not standard and its members vary across BSDs.
  */
 #if !defined(__OpenBSD__)
-#   define IDENT_TYPE	T_UINTPTRT
-#   define IDENT_CAST	Py_intptr_t
-#   define DATA_TYPE	T_INTPTRT
+#   define IDENT_TYPE T_UINTPTRT
+#   define IDENT_CAST Py_intptr_t
+#   define DATA_TYPE  T_INTPTRT
 #   define DATA_FMT_UNIT INTPTRT_FMT_UNIT
-#   define IDENT_AsType	PyLong_AsUintptr_t
+#   define IDENT_AsType PyLong_AsUintptr_t
 #else
-#   define IDENT_TYPE	T_UINT
-#   define IDENT_CAST	int
-#   define DATA_TYPE	T_INT
+#   define IDENT_TYPE T_UINT
+#   define IDENT_CAST int
+#   define DATA_TYPE  T_INT
 #   define DATA_FMT_UNIT "i"
-#   define IDENT_AsType	PyLong_AsUnsignedLong
+#   define IDENT_AsType PyLong_AsUnsignedLong
 #endif
 
 /* Unfortunately, we can't store python objects in udata, because
@@ -1298,7 +1309,7 @@ kqueue_event_init(kqueue_event_Object *self, PyObject *args, PyObject *kwds)
 
     if (PyLong_Check(pfd)
 #if IDENT_TYPE == T_UINT
-	&& PyLong_AsUnsignedLong(pfd) <= UINT_MAX
+  && PyLong_AsUnsignedLong(pfd) <= UINT_MAX
 #endif
     ) {
         self->e.ident = IDENT_AsType(pfd);

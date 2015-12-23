@@ -1,9 +1,27 @@
-/* Return the copyright string.  This is updated manually. */
+/** @file
+  Return the copyright string.  This is updated manually.
+
+  Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 
 #include "Python.h"
 
-static char cprt[] = 
+static char cprt[] =
 "\
+Copyright (c) 2015 Daryl McDaniel.\n\
+All Rights Reserved.\n\
+\n\
+Copyright (c) 2010-2014 Intel Corporation.\n\
+All Rights Reserved.\n\
+\n\
 Copyright (c) 2001-2015 Python Software Foundation.\n\
 All Rights Reserved.\n\
 \n\
@@ -19,5 +37,5 @@ All Rights Reserved.";
 const char *
 Py_GetCopyright(void)
 {
-	return cprt;
+  return cprt;
 }

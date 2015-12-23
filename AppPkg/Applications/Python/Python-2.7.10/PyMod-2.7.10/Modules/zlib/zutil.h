@@ -1,7 +1,10 @@
-/* zutil.h -- internal interface and configuration of the compression library
+/** @file
+  zutil.h -- internal interface and configuration of the compression library
+
+   Copyright (C) 2015, Daryl McDaniel.<BR>
  * Copyright (C) 1995-2013 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
- */
+**/
 
 /* WARNING: this file should *not* be used by applications. It is
    part of the implementation of the compression library and is
@@ -21,7 +24,7 @@
 
 #include "zlib.h"
 
-#if defined(STDC) && !defined(Z_SOLO)
+#if defined(UEFI_C_SOURCE) || (defined(STDC) && !defined(Z_SOLO))
 #  if !(defined(_WIN32_WCE) && defined(_MSC_VER))
 #    include <stddef.h>
 #  endif
@@ -149,7 +152,7 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  define fdopen(fd,mode) NULL /* No fdopen() */
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined __INTERIX
+#if !defined(UEFI_C_SOURCE) && (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined(__INTERIX)
 #  if defined(_WIN32_WCE)
 #    define fdopen(fd,mode) NULL /* No fdopen() */
 #    ifndef _PTRDIFF_T_DEFINED
