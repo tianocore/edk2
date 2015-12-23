@@ -457,81 +457,6 @@ HttpBootCreateHttpIo (
 }
 
 /**
-  Get the file content from cached data.
-
-  @param[in]          Private         The pointer to the driver's private data.
-  @param[in]          Uri             Uri of the file to be retrieved from cache.
-  @param[in, out]     BufferSize      On input the size of Buffer in bytes. On output with a return
-                                      code of EFI_SUCCESS, the amount of data transferred to
-                                      Buffer. On output with a return code of EFI_BUFFER_TOO_SMALL,
-                                      the size of Buffer required to retrieve the requested file.
-  @param[out]         Buffer          The memory buffer to transfer the file to. IF Buffer is NULL,
-                                      then the size of the requested file is returned in
-                                      BufferSize.
-
-  @retval EFI_SUCCESS          Successfully created.
-  @retval Others               Failed to create HttpIo.
-
-**/
-EFI_STATUS
-HttpBootGetFileFromCache (
-  IN     HTTP_BOOT_PRIVATE_DATA   *Private,
-  IN     CHAR16                   *Uri,
-  IN OUT UINTN                    *BufferSize,
-     OUT UINT8                    *Buffer
-  )
-{
-  LIST_ENTRY                  *Entry;
-  LIST_ENTRY                  *Entry2;
-  HTTP_BOOT_CACHE_CONTENT     *Cache;
-  HTTP_BOOT_ENTITY_DATA       *EntityData;
-  UINTN                       CopyedSize;
-  
-  if (Uri == NULL || BufferSize == 0 || Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  NET_LIST_FOR_EACH (Entry, &Private->CacheList) {
-    Cache = NET_LIST_USER_STRUCT (Entry, HTTP_BOOT_CACHE_CONTENT, Link);
-    //
-    // Compare the URI to see whether we already have a cache for this file.
-    //
-    if ((Cache->RequestData != NULL) &&
-        (Cache->RequestData->Url != NULL) &&
-        (StrCmp (Uri, Cache->RequestData->Url) == 0)) 
-    {
-      //
-      // Hit cache, check buffer size.
-      //
-      if (*BufferSize < Cache->EntityLength) {
-        *BufferSize = Cache->EntityLength;
-        return EFI_BUFFER_TOO_SMALL;
-      }
-
-      //
-      // Fill data to buffer.
-      //
-      CopyedSize = 0;
-      NET_LIST_FOR_EACH (Entry2, &Cache->EntityDataList) {
-        EntityData = NET_LIST_USER_STRUCT (Entry2, HTTP_BOOT_ENTITY_DATA, Link);
-        if (*BufferSize > CopyedSize) {
-          CopyMem (
-            Buffer + CopyedSize,
-            EntityData->DataStart,
-            MIN (EntityData->DataLength, *BufferSize - CopyedSize)
-            );
-          CopyedSize += MIN (EntityData->DataLength, *BufferSize - CopyedSize);
-        }
-      }
-      *BufferSize = CopyedSize;
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-/**
   Release all the resource of a cache item.
 
   @param[in]          Cache         The pointer to the cache item.
@@ -607,6 +532,91 @@ HttpBootFreeCacheList (
     RemoveEntryList (&Cache->Link);
     HttpBootFreeCache (Cache);
   }
+}
+
+/**
+  Get the file content from cached data.
+
+  @param[in]          Private         The pointer to the driver's private data.
+  @param[in]          Uri             Uri of the file to be retrieved from cache.
+  @param[in, out]     BufferSize      On input the size of Buffer in bytes. On output with a return
+                                      code of EFI_SUCCESS, the amount of data transferred to
+                                      Buffer. On output with a return code of EFI_BUFFER_TOO_SMALL,
+                                      the size of Buffer required to retrieve the requested file.
+  @param[out]         Buffer          The memory buffer to transfer the file to. IF Buffer is NULL,
+                                      then the size of the requested file is returned in
+                                      BufferSize.
+
+  @retval EFI_SUCCESS          Successfully created.
+  @retval Others               Failed to create HttpIo.
+
+**/
+EFI_STATUS
+HttpBootGetFileFromCache (
+  IN     HTTP_BOOT_PRIVATE_DATA   *Private,
+  IN     CHAR16                   *Uri,
+  IN OUT UINTN                    *BufferSize,
+     OUT UINT8                    *Buffer
+  )
+{
+  LIST_ENTRY                  *Entry;
+  LIST_ENTRY                  *Entry2;
+  HTTP_BOOT_CACHE_CONTENT     *Cache;
+  HTTP_BOOT_ENTITY_DATA       *EntityData;
+  UINTN                       CopyedSize;
+  
+  if (Uri == NULL || BufferSize == 0 || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Search file in the cache list, the cache entry will be released upon a successful
+  // match.
+  //
+  NET_LIST_FOR_EACH (Entry, &Private->CacheList) {
+    Cache = NET_LIST_USER_STRUCT (Entry, HTTP_BOOT_CACHE_CONTENT, Link);
+    //
+    // Compare the URI to see whether we already have a cache for this file.
+    //
+    if ((Cache->RequestData != NULL) &&
+        (Cache->RequestData->Url != NULL) &&
+        (StrCmp (Uri, Cache->RequestData->Url) == 0)) 
+    {
+      //
+      // Hit cache, check buffer size.
+      //
+      if (*BufferSize < Cache->EntityLength) {
+        *BufferSize = Cache->EntityLength;
+        return EFI_BUFFER_TOO_SMALL;
+      }
+
+      //
+      // Fill data to buffer.
+      //
+      CopyedSize = 0;
+      NET_LIST_FOR_EACH (Entry2, &Cache->EntityDataList) {
+        EntityData = NET_LIST_USER_STRUCT (Entry2, HTTP_BOOT_ENTITY_DATA, Link);
+        if (*BufferSize > CopyedSize) {
+          CopyMem (
+            Buffer + CopyedSize,
+            EntityData->DataStart,
+            MIN (EntityData->DataLength, *BufferSize - CopyedSize)
+            );
+          CopyedSize += MIN (EntityData->DataLength, *BufferSize - CopyedSize);
+        }
+      }
+      *BufferSize = CopyedSize;
+
+      //
+      // On success, free the cached data to release the memory resource.
+      //
+      RemoveEntryList (&Cache->Link);
+      HttpBootFreeCache (Cache);
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -719,6 +729,8 @@ HttpBootGetBootFile (
   HTTP_BOOT_CACHE_CONTENT    *Cache;
   UINT8                      *Block;
   CHAR16                     *Url;
+  BOOLEAN                    IdentityMode;
+  UINTN                      ReceivedSize;
   
   ASSERT (Private != NULL);
   ASSERT (Private->HttpCreated);
@@ -921,51 +933,94 @@ HttpBootGetBootFile (
   //
   Block = NULL;
   if (!HeaderOnly) {
+    //
+    // 3.4.1, check whether we are in identity transfer-coding.
+    //
+    ContentLength = 0;
+    Status = HttpGetEntityLength (Parser, &ContentLength);
+    if (!EFI_ERROR (Status)) {
+      IdentityMode = TRUE;
+    } else {
+      IdentityMode = FALSE;
+    }
+
+    //
+    // 3.4.2, start the message-body download, the identity and chunked transfer-coding
+    // is handled in different path here.
+    //
     ZeroMem (&ResponseBody, sizeof (HTTP_IO_RESOPNSE_DATA));
-    while (!HttpIsMessageComplete (Parser)) {
+    if (IdentityMode) {
       //
-      // Allocate a block to hold the message-body, if caller doesn't provide
-      // a buffer, the block will be cached and we will allocate a new one here.
+      // In identity transfer-coding there is no need to parse the message body,
+      // just download the message body to the user provided buffer directly.
       //
-      if (Block == NULL || Context.BufferSize == 0) {
-        Block = AllocatePool (HTTP_BOOT_BLOCK_SIZE);
-        if (Block == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
+      ReceivedSize = 0;
+      while (ReceivedSize < ContentLength) {
+        ResponseBody.Body       = (CHAR8*) Buffer + ReceivedSize;
+        ResponseBody.BodyLength = *BufferSize - ReceivedSize;
+        Status = HttpIoRecvResponse (
+                   &Private->HttpIo,
+                   FALSE,
+                   &ResponseBody
+                   );
+        if (EFI_ERROR (Status)) {
           goto ERROR_6;
         }
-        Context.NewBlock = TRUE;
-        Context.Block = Block;
-      } else {
-        Context.NewBlock = FALSE;
+        ReceivedSize += ResponseBody.BodyLength;
       }
-
-      ResponseBody.Body       = (CHAR8*) Block;
-      ResponseBody.BodyLength = HTTP_BOOT_BLOCK_SIZE;
-      Status = HttpIoRecvResponse (
-                 &Private->HttpIo,
-                 FALSE,
-                 &ResponseBody
-                 );
-      if (EFI_ERROR (Status)) {
-        goto ERROR_6;
-      }
-
+    } else {
       //
-      // Parse the new received block of the message-body, the block will be saved in cache.
+      // In "chunked" transfer-coding mode, so we need to parse the received
+      // data to get the real entity content.
       //
-      Status = HttpParseMessageBody (
-                 Parser,
-                 ResponseBody.BodyLength,
-                 ResponseBody.Body
-                 );
-      if (EFI_ERROR (Status)) {
-        goto ERROR_6;
+      Block = NULL;
+      while (!HttpIsMessageComplete (Parser)) {
+        //
+        // Allocate a buffer in Block to hold the message-body.
+        // If caller provides a buffer, this Block will be reused in every HttpIoRecvResponse().
+        // Otherwise a buffer, the buffer in Block will be cached and we should allocate a new before
+        // every HttpIoRecvResponse().
+        //
+        if (Block == NULL || Context.BufferSize == 0) {
+          Block = AllocatePool (HTTP_BOOT_BLOCK_SIZE);
+          if (Block == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ERROR_6;
+          }
+          Context.NewBlock = TRUE;
+          Context.Block = Block;
+        } else {
+          Context.NewBlock = FALSE;
+        }
+
+        ResponseBody.Body       = (CHAR8*) Block;
+        ResponseBody.BodyLength = HTTP_BOOT_BLOCK_SIZE;
+        Status = HttpIoRecvResponse (
+                   &Private->HttpIo,
+                   FALSE,
+                   &ResponseBody
+                   );
+        if (EFI_ERROR (Status)) {
+          goto ERROR_6;
+        }
+
+        //
+        // Parse the new received block of the message-body, the block will be saved in cache.
+        //
+        Status = HttpParseMessageBody (
+                   Parser,
+                   ResponseBody.BodyLength,
+                   ResponseBody.Body
+                   );
+        if (EFI_ERROR (Status)) {
+          goto ERROR_6;
+        }
       }
     }
   }
-  
+
   //
-  // 3.5 Message-body receive & parse is completed, get the file size.
+  // 3.5 Message-body receive & parse is completed, we should be able to get the file size now.
   //
   Status = HttpGetEntityLength (Parser, &ContentLength);
   if (EFI_ERROR (Status)) {
