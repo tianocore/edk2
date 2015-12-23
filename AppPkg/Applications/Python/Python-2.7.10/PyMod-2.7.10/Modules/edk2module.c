@@ -2,6 +2,7 @@
     OS-specific module implementation for EDK II and UEFI.
     Derived from posixmodule.c in Python 2.7.2.
 
+    Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
     Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
@@ -2248,6 +2249,7 @@ edk2_getpid(PyObject *self, PyObject *noargs)
     return PyLong_FromPid(getpid());
 }
 
+
 #ifdef HAVE_GETLOGIN
 PyDoc_STRVAR(edk2_getlogin__doc__,
 "getlogin() -> string\n\n\
@@ -2340,7 +2342,6 @@ PyDoc_STRVAR(edk2_popen__doc__,
 "popen(command [, mode='r' [, bufsize]]) -> pipe\n\n\
 Open a pipe to/from a command returning a file object.");
 
-/* standard posix version of popen() support */
 static PyObject *
 edk2_popen(PyObject *self, PyObject *args)
 {
@@ -2368,6 +2369,7 @@ edk2_popen(PyObject *self, PyObject *args)
 }
 
 #endif /* HAVE_POPEN */
+
 
 #if defined(HAVE_WAIT3) || defined(HAVE_WAIT4)
 static PyObject *
@@ -4185,9 +4187,6 @@ INITFUNC(void)
 #endif  /* UEFI_C_SOURCE */
 
     if (all_ins(m))
-        return;
-
-    if (setup_confname_tables(m))
         return;
 
     Py_INCREF(PyExc_OSError);
