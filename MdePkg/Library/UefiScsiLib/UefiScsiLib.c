@@ -1485,7 +1485,7 @@ ScsiRead10CommandEx (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiLibNotify,
                   Context,
                   &SelfEvent
@@ -1669,7 +1669,7 @@ ScsiWrite10CommandEx (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiLibNotify,
                   Context,
                   &SelfEvent
@@ -1853,7 +1853,7 @@ ScsiRead16CommandEx (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiLibNotify,
                   Context,
                   &SelfEvent
@@ -2037,7 +2037,7 @@ ScsiWrite16CommandEx (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ScsiLibNotify,
                   Context,
                   &SelfEvent
