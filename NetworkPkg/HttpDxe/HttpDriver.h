@@ -391,7 +391,4 @@ HttpServiceBindingDestroyChild (
   IN EFI_HANDLE                    ChildHandle
   );
 
-
-extern EFI_HTTP_PROTOCOL  mEfiHttpProtocolTemplete;
-
 #endif
