@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BootLogoLib
+  MODULE_UNI_FILE                = BootLogoLib.uni
   FILE_GUID                      = F5AE5B5C-42E8-4A9B-829D-5B631CD5367A
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

@@ -15,6 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BmpImageDecoderLib
+  MODULE_UNI_FILE                = BmpImageDecoderLib.uni
   FILE_GUID                      = DF414223-F17C-4022-A1F4-4062612AB00D
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
