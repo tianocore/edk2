@@ -95,18 +95,19 @@
   gEfiDevicePathProtocolGuid                              ## CONSUMES
 
 [Pcd]
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols  ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform   ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii  ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault     ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize    ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault    ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount       ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier             ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel           ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols    ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform     ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii    ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault       ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize      ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault      ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount         ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength          ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize        ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole           ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier               ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellMaxHistoryCommandCount ## CONSUMES
 
 [BuildOptions.AARCH64]
   # The tiny code model used by AARCH64 only supports binaries of up to 1 MB in
