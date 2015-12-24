@@ -1497,6 +1497,15 @@ PerformPreTasks (
   //
   if (mRestoreSmmConfigurationInS3) {
     //
+    // Need make sure gSmst is correct because below function may use them.
+    //
+    gSmst->SmmStartupThisAp      = gSmmCpuPrivate->SmmCoreEntryContext.SmmStartupThisAp;
+    gSmst->CurrentlyExecutingCpu = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
+    gSmst->NumberOfCpus          = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+    gSmst->CpuSaveStateSize      = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveStateSize;
+    gSmst->CpuSaveState          = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveState;
+
+    //
     // Configure SMM Code Access Check feature if available.
     //
     ConfigSmmCodeAccessCheck ();
