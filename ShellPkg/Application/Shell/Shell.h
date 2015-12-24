@@ -382,5 +382,28 @@ TrimSpaces(
   IN CHAR16 **String
   );
 
+/**
+  
+  Create a new buffer list and stores the old one to OldBufferList  
+
+  @param OldBufferList   The temporary list head used to store the nodes in BufferToFreeList.
+**/
+VOID
+SaveBufferList (
+  OUT LIST_ENTRY     *OldBufferList
+  );
+
+/**
+  Restore previous nodes into BufferToFreeList .
+
+  @param OldBufferList   The temporary list head used to store the nodes in BufferToFreeList.
+**/
+VOID
+RestoreBufferList (
+  IN OUT LIST_ENTRY     *OldBufferList
+  );
+
+
+
 #endif //_SHELL_INTERNAL_HEADER_
 
