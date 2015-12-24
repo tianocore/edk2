@@ -10,7 +10,7 @@
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
 // http://opensource.org/licenses/bsd-license.php
-// 
+//
 // THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
@@ -102,22 +102,6 @@
                                                                                                 "TRUE  - Use the optimized timing for best PS2 detection performance.<BR>\n"
                                                                                                 "FALSE - Use the normal timing to detect PS2.<BR>"
 
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupVideoHorizontalResolution_PROMPT  #language en-US "Video Horizontal Resolution of Text Setup"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupVideoHorizontalResolution_HELP  #language en-US "Specify the video horizontal resolution of text setup."
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupVideoVerticalResolution_PROMPT  #language en-US "Video Vertical Resolution of Text Setup"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupVideoVerticalResolution_HELP  #language en-US "Specify the video vertical resolution of text setup."
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupConOutColumn_PROMPT  #language en-US "Console Output Column of Text Setup"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupConOutColumn_HELP  #language en-US "Specify the console output column of text setup."
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupConOutRow_PROMPT  #language en-US "Console Output Row of Text Setup"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdSetupConOutRow_HELP  #language en-US "Specify the console output row of text setup."
-
 #string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdStatusCodeUseOEM_PROMPT  #language en-US "Report StatusCode via OEM Device"
 
 #string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdStatusCodeUseOEM_HELP  #language en-US "Indicates if OEM device is enabled as StatusCode report device. It is only used in Framework StatusCode implementation. <BR><BR>\n"
@@ -171,14 +155,6 @@
 #string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdBootState_HELP  #language en-US "Indicates if the machine has completed one boot cycle before. After the complete boot, BootState will be set to FALSE.<BR><BR>\n"
                                                                                          "TRUE  - The complete boot cycle has not happened before.<BR>\n"
                                                                                          "FALSE - The complete boot cycle has happened before.<BR>"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdPlatformBootTimeOut_PROMPT  #language en-US "Boot Timeout (s)"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdPlatformBootTimeOut_HELP  #language en-US "The number of seconds that the firmware will wait before initiating the original default boot selection. A value of 0 indicates that the default boot selection is to be initiated immediately on boot. The value of 0xFFFF then firmware will wait for user input before booting."
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdHardwareErrorRecordLevel_PROMPT  #language en-US "Error Level For Hardware Recorder"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdHardwareErrorRecordLevel_HELP  #language en-US "Error level for hardware recorder. If value 0, platform does not support feature of hardware error record."
 
 #string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdOpromReservedMemoryBase_PROMPT  #language en-US "Reserved Memory Base Address for OPROM"
 
