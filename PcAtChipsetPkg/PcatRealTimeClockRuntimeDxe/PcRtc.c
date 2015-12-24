@@ -1277,6 +1277,8 @@ PcRtcAcpiTableChangeCallback (
     return;
   }
 
+  ASSERT (Rsdp != NULL);
+
   //
   // Find FADT in XSDT
   //
