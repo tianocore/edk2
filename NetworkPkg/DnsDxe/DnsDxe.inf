@@ -22,6 +22,7 @@
   VERSION_STRING            = 1.0
   ENTRY_POINT               = DnsDriverEntryPoint
   UNLOAD_IMAGE              = DnsUnload
+  MODULE_UNI_FILE           = DnsDxe.uni
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -73,6 +74,6 @@
   gEfiDhcp6ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiDhcp6ProtocolGuid                           ## SOMETIMES_CONSUMES
 
-
-[Guids]
+[UserExtensions.TianoCore."ExtraFiles"]
+  DnsDxeExtra.uni
 

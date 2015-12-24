@@ -21,6 +21,7 @@
   VERSION_STRING            = 1.0
   ENTRY_POINT               = HttpUtilitiesDxeDriverEntryPoint
   UNLOAD_IMAGE              = HttpUtilitiesDxeUnload
+  MODULE_UNI_FILE           = HttpUtilitiesDxe.uni
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -47,5 +48,5 @@
 [Depex]
   TRUE
 
-[Guids]
-
+[UserExtensions.TianoCore."ExtraFiles"]
+  HttpUtilitiesDxeExtra.uni
