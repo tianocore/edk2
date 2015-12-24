@@ -14,6 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FileExplorerLib
+  MODULE_UNI_FILE                = FileExplorerLib.uni
   FILE_GUID                      = 4FC9C630-0F90-4053-8F13-264CBD22FC58
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

@@ -14,6 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DeviceManagerLib
+  MODULE_UNI_FILE                = DeviceManagerLib.uni
   FILE_GUID                      = 75EBDC2E-5323-4F31-A41D-FD1A7A9FC65E
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

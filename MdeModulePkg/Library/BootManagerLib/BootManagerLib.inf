@@ -14,6 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BootManagerLib
+  MODULE_UNI_FILE                = BootManagerLib.uni
   FILE_GUID                      = CCB2DCE1-4FC8-41CB-88C5-D349E134C9FC
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
