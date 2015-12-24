@@ -25,6 +25,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = CpuS3DataDxe
+  MODULE_UNI_FILE                = CpuS3DataDxe.uni
   FILE_GUID                      = 4D2E57EE-0E3F-44DD-93C4-D3B57E96945D
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -62,3 +63,6 @@
 
 [Depex]
   gEfiMpServiceProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuS3DataDxeExtra.uni
