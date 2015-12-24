@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                   = 0x00010005
   BASE_NAME                     = BaseIpmiLibNull
+  MODULE_UNI_FILE               = BaseIpmiLibNull.uni
   FILE_GUID                     = 46805D61-0BB8-4680-A9BE-C96C751AB5A4
   MODULE_TYPE                   = BASE
   VERSION_STRING                = 1.0

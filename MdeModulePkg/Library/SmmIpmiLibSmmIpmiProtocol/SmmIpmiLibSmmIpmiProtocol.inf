@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmIpmiLibSmmIpmiProtocol
+  MODULE_UNI_FILE                = SmmIpmiLibSmmIpmiProtocol.uni
   FILE_GUID                      = B422FB70-E835-448D-A921-EBA460E105B6
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0

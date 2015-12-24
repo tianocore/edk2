@@ -16,6 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeIpmiLibIpmiProtocol
+  MODULE_UNI_FILE                = DxeIpmiLibIpmiProtocol.uni
   FILE_GUID                      = 62408AD5-4EAC-432B-AB9B-C4B85BFAED02
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
