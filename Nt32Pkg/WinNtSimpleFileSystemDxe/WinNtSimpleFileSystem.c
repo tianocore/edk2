@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -628,6 +628,7 @@ Returns:
   StrCat (TempFileName, L"\\*");
 
   PrivateFile->LHandle = PrivateFile->WinNtThunk->FindFirstFile (TempFileName, &PrivateFile->FindBuf);
+  FreePool (TempFileName);
 
   if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {
     PrivateFile->IsValidFindBuf = FALSE;
@@ -1188,6 +1189,7 @@ Returns:
         Status = EFI_NOT_FOUND;
       }
 
+      FreePool (TempFileName);
       goto Done;
     }
 
@@ -1196,6 +1198,7 @@ Returns:
     //
     StrCat (TempFileName, L"\\*");
     NewPrivateFile->LHandle = NewPrivateFile->WinNtThunk->FindFirstFile (TempFileName, &NewPrivateFile->FindBuf);
+    FreePool (TempFileName);
 
     if (NewPrivateFile->LHandle == INVALID_HANDLE_VALUE) {
       NewPrivateFile->IsValidFindBuf = FALSE;
@@ -1276,12 +1279,14 @@ Returns:
     Status = WinNtSimpleFileSystemGetInfo (&NewPrivateFile->EfiFile, &gEfiFileInfoGuid, &InfoSize, Info);
 
     if (EFI_ERROR (Status)) {
+      FreePool (Info);
       goto Done;
     }
 
     Info->Attribute = Attributes;
 
     WinNtSimpleFileSystemSetInfo (&NewPrivateFile->EfiFile, &gEfiFileInfoGuid, InfoSize, Info);
+    FreePool (Info);
   }
 
 Done:
@@ -1361,6 +1366,10 @@ Returns:
     FreePool (PrivateFile->FileName);
   }
 
+  if (PrivateFile->FilePath) {
+    FreePool (PrivateFile->FilePath);
+  }
+
   FreePool (PrivateFile);
 
   gBS->RestoreTPL (OldTpl);
@@ -1431,6 +1440,7 @@ Returns:
   }
 
   FreePool (PrivateFile->FileName);
+  FreePool (PrivateFile->FilePath);
   FreePool (PrivateFile);
 
   gBS->RestoreTPL (OldTpl);
