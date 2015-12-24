@@ -910,13 +910,18 @@ PiCpuSmmEntry (
   //
   // Retrieve CPU Family
   //
-  AsmCpuid (CPUID_VERSION_INFO, &RegEax, NULL, NULL, &RegEdx);
+  AsmCpuid (CPUID_VERSION_INFO, &RegEax, NULL, NULL, NULL);
   FamilyId = (RegEax >> 8) & 0xf;
   ModelId = (RegEax >> 4) & 0xf;
   if (FamilyId == 0x06 || FamilyId == 0x0f) {
     ModelId = ModelId | ((RegEax >> 12) & 0xf0);
   }
 
+  RegEdx = 0;
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+    AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
+  }
   //
   // Determine the mode of the CPU at the time an SMI occurs
   //   Intel(R) 64 and IA-32 Architectures Software Developer's Manual
