@@ -215,6 +215,7 @@ ManBufferFindSections(
         SectionLen = StrLen(SectionName);
         SectionName = StrStr(Sections, SectionName);
         if (SectionName == NULL) {
+          SHELL_FREE_NON_NULL(TempString);
           continue;
         }
         if (*(SectionName + SectionLen) == CHAR_NULL || *(SectionName + SectionLen) == L',') {
@@ -250,6 +251,7 @@ ManBufferFindSections(
     }
     SHELL_FREE_NON_NULL(TempString);
   }
+  SHELL_FREE_NON_NULL(TempString);
   if (!Found && !EFI_ERROR(Status)) {
     return (EFI_NOT_FOUND);
   }
