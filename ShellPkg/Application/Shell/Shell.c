@@ -1205,6 +1205,7 @@ DoShellPrompt (
   CONST CHAR16  *CurDir;
   UINTN         BufferSize;
   EFI_STATUS    Status;
+  LIST_ENTRY    OldBufferList;
 
   CurDir  = NULL;
 
@@ -1218,6 +1219,7 @@ DoShellPrompt (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  SaveBufferList(&OldBufferList);
   CurDir = ShellInfoObject.NewEfiShellProtocol->GetEnv(L"cwd");
 
   //
@@ -1247,6 +1249,7 @@ DoShellPrompt (
   //
   // Done with this command
   //
+  RestoreBufferList(&OldBufferList);
   FreePool (CmdLine);
   return Status;
 }
