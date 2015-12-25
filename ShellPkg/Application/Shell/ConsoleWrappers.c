@@ -484,7 +484,8 @@ CreateSimpleTextOutOnFile(
     *HandleLocation = ProtocolToReturn->TheHandle;
     return ((EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*)ProtocolToReturn);
   } else {
-    FreePool(ProtocolToReturn);
+    SHELL_FREE_NON_NULL(ProtocolToReturn->SimpleTextOut.Mode);
+    SHELL_FREE_NON_NULL(ProtocolToReturn);
     return (NULL);
   }
 }
@@ -511,6 +512,7 @@ CloseSimpleTextOutOnFile(
     ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*)SimpleTextOut)->TheHandle, 
     &gEfiSimpleTextOutProtocolGuid, 
     &(((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*)SimpleTextOut)->SimpleTextOut));
+  FreePool(SimpleTextOut->Mode);
   FreePool(SimpleTextOut);
   return (Status);
 }
