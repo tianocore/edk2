@@ -673,6 +673,7 @@ ShellOpenFileByName(
   EFI_STATUS                    Status;
   EFI_FILE_INFO                 *FileInfo;
   CHAR16                        *FileNameCopy;
+  EFI_STATUS                    Status2;
 
   //
   // ASSERT if FileName is NULL
@@ -719,8 +720,12 @@ ShellOpenFileByName(
       FileInfo = FileFunctionMap.GetFileInfo(*FileHandle);
       ASSERT(FileInfo != NULL);
       FileInfo->Attribute = Attributes;
-      Status = FileFunctionMap.SetFileInfo(*FileHandle, FileInfo);
+      Status2 = FileFunctionMap.SetFileInfo(*FileHandle, FileInfo);
       FreePool(FileInfo);
+      if (EFI_ERROR (Status2)) {
+        gEfiShellProtocol->CloseFile(*FileHandle);
+      }
+      Status = Status2;
     }
     return (Status);
   }
