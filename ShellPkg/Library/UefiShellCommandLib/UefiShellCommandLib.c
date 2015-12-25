@@ -1261,6 +1261,9 @@ ShellCommandCreateInitialMappingsAndPaths(
         ; MapListNode = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
        ){
           RemoveEntryList(&MapListNode->Link);
+          SHELL_FREE_NON_NULL(MapListNode->DevicePath);
+          SHELL_FREE_NON_NULL(MapListNode->MapName);
+          SHELL_FREE_NON_NULL(MapListNode->CurrentDirectoryPath);
           FreePool(MapListNode);
     } // for loop
   }
