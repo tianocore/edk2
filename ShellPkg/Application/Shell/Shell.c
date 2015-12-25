@@ -1276,6 +1276,36 @@ AddBufferToFreeList(
   return (Buffer);
 }
 
+
+/**
+  Create a new buffer list and stores the old one to OldBufferList 
+
+  @param OldBufferList   The temporary list head used to store the nodes in BufferToFreeList.
+**/
+VOID
+SaveBufferList (
+  OUT LIST_ENTRY     *OldBufferList
+  )
+{
+  CopyMem (OldBufferList, &ShellInfoObject.BufferToFreeList.Link, sizeof (LIST_ENTRY));
+  InitializeListHead (&ShellInfoObject.BufferToFreeList.Link);
+}
+
+/**
+  Restore previous nodes into BufferToFreeList .
+
+  @param OldBufferList   The temporary list head used to store the nodes in BufferToFreeList.
+**/
+VOID
+RestoreBufferList (
+  IN OUT LIST_ENTRY     *OldBufferList
+  )
+{
+  FreeBufferList (&ShellInfoObject.BufferToFreeList);
+  CopyMem (&ShellInfoObject.BufferToFreeList.Link, OldBufferList, sizeof (LIST_ENTRY));
+}
+
+
 /**
   Add a buffer to the Line History List
 
@@ -2661,6 +2691,7 @@ RunScriptFileHandle (
   CONST CHAR16        *CurDir;
   UINTN               LineCount;
   CHAR16              LeString[50];
+  LIST_ENTRY          OldBufferList;
 
   ASSERT(!ShellCommandGetScriptExit());
 
@@ -2762,6 +2793,8 @@ RunScriptFileHandle (
               NewScriptFile->CurrentCommand->Cl,
               PrintBuffSize/sizeof(CHAR16) - 1
               );
+
+    SaveBufferList(&OldBufferList);
 
     //
     // NULL out comments
@@ -2897,15 +2930,19 @@ RunScriptFileHandle (
 
           ShellCommandRegisterExit(FALSE, 0);
           Status = EFI_SUCCESS;
+          RestoreBufferList(&OldBufferList);
           break;
         }
         if (ShellGetExecutionBreakFlag()) {
+          RestoreBufferList(&OldBufferList);
           break;
         }
         if (EFI_ERROR(Status)) {
+          RestoreBufferList(&OldBufferList);
           break;
         }
         if (ShellCommandGetExit()) {
+          RestoreBufferList(&OldBufferList);
           break;
         }
       }
@@ -2924,6 +2961,7 @@ RunScriptFileHandle (
         NewScriptFile->CurrentCommand->Reset = TRUE;
       }
     }
+    RestoreBufferList(&OldBufferList);
   }
 
 
