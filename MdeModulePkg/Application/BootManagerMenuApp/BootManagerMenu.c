@@ -242,7 +242,48 @@ IsBootManagerMenu (
 
   return (BOOLEAN) (!EFI_ERROR (Status) && (BootOption->OptionNumber == BootManagerMenu.OptionNumber));
 }
- 
+
+/**
+  Return whether to ignore the boot option.
+
+  @param BootOption  Pointer to EFI_BOOT_MANAGER_LOAD_OPTION to check.
+
+  @retval TRUE  Ignore the boot optin.
+  @retval FALSE Do not ignore the boot option.
+**/
+BOOLEAN
+IgnoreBootOption (
+  IN   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_DEVICE_PATH_PROTOCOL      *ImageDevicePath;
+
+  //
+  // Ignore myself.
+  //
+  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID **) &ImageDevicePath);
+  ASSERT_EFI_ERROR (Status);
+  if (CompareMem (BootOption->FilePath, ImageDevicePath, GetDevicePathSize (ImageDevicePath)) == 0) {
+    return TRUE;
+  }
+
+  //
+  // Do not ignore Boot Manager Menu.
+  //
+  if (IsBootManagerMenu (BootOption)) {
+    return FALSE;
+  }
+
+  //
+  // Ignore the hidden/inactive boot option.
+  //
+  if (((BootOption->Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOption->Attributes & LOAD_OPTION_ACTIVE) == 0)) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
 
 /**
   This funciton uses to initialize boot menu data
@@ -262,17 +303,12 @@ InitializeBootMenuData (
   OUT  BOOT_MENU_POPUP_DATA          *BootMenuData
   )
 {
-  EFI_STATUS                    Status;
   UINTN                         Index;
   UINTN                         StrIndex;
-  EFI_DEVICE_PATH_PROTOCOL      *ImageDevicePath;
       
   if (BootOption == NULL || BootMenuData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID **) &ImageDevicePath);
-  ASSERT_EFI_ERROR (Status);
 
   BootMenuData->TitleToken[0] = STRING_TOKEN (STR_BOOT_POPUP_MENU_TITLE_STRING);
   BootMenuData->PtrTokens     = AllocateZeroPool (BootOptionCount * sizeof (EFI_STRING_ID));
@@ -282,18 +318,7 @@ InitializeBootMenuData (
   // Skip boot option which created by BootNext Variable
   //
   for (StrIndex = 0, Index = 0; Index < BootOptionCount; Index++) {
-    //
-    // Don't display the hidden/inactive boot option except setup application.
-    //
-    if ((((BootOption[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOption[Index].Attributes & LOAD_OPTION_ACTIVE) == 0)) &&
-        !IsBootManagerMenu (&BootOption[Index])) {      
-      continue;
-    }
-
-    //
-    // Don't display myself
-    //
-    if (CompareMem (BootOption[Index].FilePath, ImageDevicePath, GetDevicePathSize (ImageDevicePath)) == 0) {
+    if (IgnoreBootOption (&BootOption[Index])) {
       continue;
     }
 
@@ -640,13 +665,10 @@ BootFromSelectOption (
   ASSERT (BootOptions != NULL);
 
   for (ItemNum = 0, Index = 0; Index < BootOptionCount; Index++) {
-    //
-    // Don't display the hidden/inactive boot option except setup application.
-    //
-    if ((((BootOptions[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOptions[Index].Attributes & LOAD_OPTION_ACTIVE) == 0)) &&
-        !IsBootManagerMenu (&BootOptions[Index])) {      
+    if (IgnoreBootOption (&BootOptions[Index])) {
       continue;
     }
+
     if (ItemNum++ == SelectItem) {
       EfiBootManagerBoot (&BootOptions[Index]);
       break;
