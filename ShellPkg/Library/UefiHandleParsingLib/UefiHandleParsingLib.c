@@ -1,9 +1,9 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -690,6 +690,10 @@ AdapterInformationDumpInformation (
         TempRetVal = CatSPrint (RetVal, TempStr, L"gEfiAdapterInfoSanMacAddressGuid");
         SHELL_FREE_NON_NULL (RetVal);
         RetVal = TempRetVal;
+      } else if (CompareGuid (&InfoTypesBuffer[GuidIndex], &gEfiAdapterInfoUndiIpv6SupportGuid)) {
+        TempRetVal = CatSPrint (RetVal, TempStr, L"gEfiAdapterInfoUndiIpv6SupportGuid");
+        SHELL_FREE_NON_NULL (RetVal);
+        RetVal = TempRetVal;
       } else {
 
         GuidStr = GetStringNameFromGuid (&InfoTypesBuffer[GuidIndex], NULL);
@@ -780,6 +784,19 @@ AdapterInformationDumpInformation (
                          ((EFI_ADAPTER_INFO_SAN_MAC_ADDRESS *)InformationBlock)->SanMacAddress.Addr[4],
                          ((EFI_ADAPTER_INFO_SAN_MAC_ADDRESS *)InformationBlock)->SanMacAddress.Addr[5]
                          );
+          SHELL_FREE_NON_NULL (RetVal);
+          RetVal = TempRetVal;
+        } else if (CompareGuid (&InfoTypesBuffer[GuidIndex], &gEfiAdapterInfoUndiIpv6SupportGuid) == TRUE) {
+          TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_UNDI_IPV6_INFO), NULL);
+          if (TempStr == NULL) {
+            goto ERROR_EXIT;
+          }
+
+          TempRetVal = CatSPrint (
+                         RetVal,
+                         TempStr,
+                         ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *)InformationBlock)->Ipv6Support
+                         );   
           SHELL_FREE_NON_NULL (RetVal);
           RetVal = TempRetVal;
         } else {
