@@ -1361,6 +1361,7 @@ EfiShellDeleteFileByName(
   //
   // now delete the file
   //
+  ShellFileHandleRemove(FileHandle);
   return (ShellInfoObject.NewEfiShellProtocol->DeleteFile(FileHandle));
 }
 
@@ -2338,6 +2339,8 @@ ShellSearchHandle(
               // recurse with the next part of the pattern
               //
               Status = ShellSearchHandle(NextFilePatternStart, UnicodeCollation, ShellInfoNode->Handle, FileList, ShellInfoNode, MapName);
+              EfiShellClose(ShellInfoNode->Handle);
+              ShellInfoNode->Handle = NULL;
             }
           } else if (!EFI_ERROR(Status)) {
             //
@@ -2456,6 +2459,7 @@ EfiShellFindFiles(
             ; PatternCurrentLocation++);
         PatternCurrentLocation++;
         Status = ShellSearchHandle(PatternCurrentLocation, gUnicodeCollation, RootFileHandle, FileList, NULL, MapName);
+        EfiShellClose(RootFileHandle);
       }
       FreePool(RootDevicePath);
     }
@@ -3260,6 +3264,7 @@ EfiShellGetAlias(
 
     if (Volatile == NULL) {
       GetVariable2 (AliasLower, &gShellAliasGuid, (VOID **)&AliasVal, NULL);
+      FreePool(AliasLower);
       return (AddBufferToFreeList(AliasVal));
     }
     RetSize = 0;
@@ -3273,6 +3278,7 @@ EfiShellGetAlias(
       if (RetVal != NULL) {
         FreePool(RetVal);
       }
+      FreePool(AliasLower);
       return (NULL);
     }
     if ((EFI_VARIABLE_NON_VOLATILE & Attribs) == EFI_VARIABLE_NON_VOLATILE) {
