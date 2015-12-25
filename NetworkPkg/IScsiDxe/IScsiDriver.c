@@ -105,7 +105,8 @@ IScsiCheckAip (
   //
   // Check any AIP instances exist in system.
   //
-  AipHandleCount = 0;
+  AipHandleCount  = 0;
+  AipHandleBuffer = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
                   &gEfiAdapterInformationProtocolGuid,
@@ -116,6 +117,8 @@ IScsiCheckAip (
   if (EFI_ERROR (Status) || AipHandleCount == 0) {
     return EFI_NOT_FOUND;
   }
+
+  ASSERT (AipHandleBuffer != NULL);
 
   InfoBlock = NULL;
 
