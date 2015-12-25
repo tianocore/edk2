@@ -1468,6 +1468,7 @@ InternalShellExecuteDevicePath(
     if (NewHandle != NULL) {
       gBS->UnloadImage(NewHandle);
     }
+    FreePool (NewCmdLine);
     return (Status);
   }
   Status = gBS->OpenProtocol(
