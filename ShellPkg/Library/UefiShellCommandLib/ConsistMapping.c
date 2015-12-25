@@ -1401,6 +1401,7 @@ ShellCommandConsistMappingInitialize (
                                     (VOID **)&SimpleFileSystem
                                     );
       if (EFI_ERROR(Status)) {
+        FreePool (HIDevicePath);
         continue;
       }
     }
