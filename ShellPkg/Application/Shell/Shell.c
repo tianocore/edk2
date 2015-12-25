@@ -1288,13 +1288,40 @@ AddLineToCommandHistory(
   )
 {
   BUFFER_LIST *Node;
+  BUFFER_LIST *Walker;
+  UINT16       MaxHistoryCmdCount;
+  UINT16       Count;
+  
+  Count = 0;
+  MaxHistoryCmdCount = PcdGet16(PcdShellMaxHistoryCommandCount);
+  
+  if (MaxHistoryCmdCount == 0) {
+    return ;
+  }
+
 
   Node = AllocateZeroPool(sizeof(BUFFER_LIST));
   ASSERT(Node != NULL);
   Node->Buffer = AllocateCopyPool(StrSize(Buffer), Buffer);
   ASSERT(Node->Buffer != NULL);
 
-  InsertTailList(&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Node->Link);
+  for ( Walker = (BUFFER_LIST*)GetFirstNode(&ShellInfoObject.ViewingSettings.CommandHistory.Link)
+      ; !IsNull(&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Walker->Link)
+      ; Walker = (BUFFER_LIST*)GetNextNode(&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Walker->Link)
+   ){
+    Count++;
+  }
+  if (Count < MaxHistoryCmdCount){
+    InsertTailList(&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Node->Link);
+  } else {
+    Walker = (BUFFER_LIST*)GetFirstNode(&ShellInfoObject.ViewingSettings.CommandHistory.Link);
+    RemoveEntryList(&Walker->Link);
+    if (Walker->Buffer != NULL) {
+      FreePool(Walker->Buffer);
+    }
+    FreePool(Walker);
+    InsertTailList(&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Node->Link);
+  }
 }
 
 /**
