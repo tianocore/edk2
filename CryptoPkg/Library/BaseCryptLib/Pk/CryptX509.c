@@ -464,6 +464,12 @@ X509VerifyCert (
   }
 
   //
+  // Allow partial certificate chains, terminated by a non-self-signed but
+  // still trusted intermediate certificate.
+  //
+  X509_STORE_set_flags (CertStore, X509_V_FLAG_PARTIAL_CHAIN);
+
+  //
   // Set up X509_STORE_CTX for the subsequent verification operation.
   //
   if (!X509_STORE_CTX_init (&CertCtx, CertStore, X509Cert, NULL)) {
