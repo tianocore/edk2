@@ -342,16 +342,41 @@ diff U3 crypto/crypto.h crypto/crypto.h
 diff U3 crypto/opensslconf.h crypto/opensslconf.h
 --- crypto/opensslconf.h	Thu Jun 11 21:55:38 2015
 +++ crypto/opensslconf.h	Fri Jun 12 10:28:27 2015
-@@ -159,9 +159,12 @@
- /* Should we define BN_DIV2W here? */
- 
- /* Only one for the following should be defined */
-+/* Bypass the following definitions for UEFI version. */
-+#if !defined(OPENSSL_SYS_UEFI)
- #undef SIXTY_FOUR_BIT_LONG
- #undef SIXTY_FOUR_BIT
- #define THIRTY_TWO_BIT
+@@ -5,6 +5,9 @@
+ extern "C" {
+ #endif
+ /* OpenSSL was configured with the following options: */
++#ifndef OPENSSL_SYSNAME_UEFI
++# define OPENSSL_SYSNAME_UEFI
 +#endif
+ #ifndef OPENSSL_DOING_MAKEDEPEND
+ 
+ 
+@@ -152,7 +155,7 @@
+ #endif
  #endif
  
- #if defined(HEADER_RC4_LOCL_H) && !defined(CONFIG_HEADER_RC4_LOCL_H)
+-#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H)
++#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H) && !defined(OPENSSL_SYSNAME_UEFI)
+ #define CONFIG_HEADER_BN_H
+ #undef BN_LLONG
+ 
+diff U3 e_os2.h e_os2.h
+--- e_os2.h	Thu Jul 09 19:57:16 2015
++++ e_os2.h	Thu Oct 29 15:08:19 2015
+@@ -97,7 +97,14 @@
+  * For 32 bit environment, there seems to be the CygWin environment and then
+  * all the others that try to do the same thing Microsoft does...
+  */
+-# if defined(OPENSSL_SYSNAME_UWIN)
++/*
++ * UEFI lives here because it might be built with a Microsoft toolchain and
++ * we need to avoid the false positive match on Windows.
++ */
++# if defined(OPENSSL_SYSNAME_UEFI)
++#  undef OPENSSL_SYS_UNIX
++#  define OPENSSL_SYS_UEFI
++# elif defined(OPENSSL_SYSNAME_UWIN)
+ #  undef OPENSSL_SYS_UNIX
+ #  define OPENSSL_SYS_WIN32_UWIN
+ # else

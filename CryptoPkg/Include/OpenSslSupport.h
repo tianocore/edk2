@@ -24,6 +24,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAX_STRING_SIZE  0x1000
 
 //
+// OpenSSL relies on explicit configuration for word size in crypto/bn,
+// but we want it to be automatically inferred from the target. So we
+// bypass what's in <openssl/opensslconf.h> for OPENSSL_SYS_UEFI, and
+// define our own here.
+//
+#ifdef CONFIG_HEADER_BN_H
+#error CONFIG_HEADER_BN_H already defined
+#endif
+
+#define CONFIG_HEADER_BN_H
+
+#if defined(MDE_CPU_X64) || defined(MDE_CPU_AARCH64) || defined(MDE_CPU_IA64)
+//
+// With GCC we would normally use SIXTY_FOUR_BIT_LONG, but MSVC needs
+// SIXTY_FOUR_BIT, because 'long' is 32-bit and only 'long long' is
+// 64-bit. Since using 'long long' works fine on GCC too, just do that.
+//
+#define SIXTY_FOUR_BIT
+#elif defined(MDE_CPU_IA32) || defined(MDE_CPU_ARM) || defined(MDE_CPU_EBC)
+#define THIRTY_TWO_BIT
+#else
+#error Unknown target architecture
+#endif
+
+//
 // File operations are not required for building Open SSL, 
 // so FILE is mapped to VOID * to pass build
 //
