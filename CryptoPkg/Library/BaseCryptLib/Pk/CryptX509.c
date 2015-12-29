@@ -245,6 +245,7 @@ X509GetSubjectName (
   BOOLEAN    Status;
   X509       *X509Cert;
   X509_NAME  *X509Name;
+  UINTN      X509NameSize;
 
   //
   // Check input parameters.
@@ -274,13 +275,14 @@ X509GetSubjectName (
     goto _Exit;
   }
 
-  if (*SubjectSize < (UINTN) X509Name->bytes->length) {
-    *SubjectSize = (UINTN) X509Name->bytes->length;
+  X509NameSize = i2d_X509_NAME(X509Name, NULL);
+  if (*SubjectSize < X509NameSize) {
+    *SubjectSize = X509NameSize;
     goto _Exit;
   }
-  *SubjectSize = (UINTN) X509Name->bytes->length;
+  *SubjectSize = X509NameSize;
   if (CertSubject != NULL) {
-    CopyMem (CertSubject, (UINT8 *) X509Name->bytes->data, *SubjectSize);
+    i2d_X509_NAME(X509Name, &CertSubject);
     Status = TRUE;
   }
 
