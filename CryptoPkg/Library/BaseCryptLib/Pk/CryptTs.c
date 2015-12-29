@@ -700,8 +700,8 @@ ImageTimestampVerify (
     if (XaObj == NULL) {
       continue;
     }
-    if ((XaObj->length != sizeof (mSpcRFC3161OidValue)) ||
-        (CompareMem (XaObj->data, mSpcRFC3161OidValue, sizeof (mSpcRFC3161OidValue)) != 0)) {
+    if ((OBJ_length(XaObj) != sizeof (mSpcRFC3161OidValue)) ||
+        (CompareMem (OBJ_get0_data(XaObj), mSpcRFC3161OidValue, sizeof (mSpcRFC3161OidValue)) != 0)) {
       continue;
     }
     Asn1Type = X509_ATTRIBUTE_get0_type(Xa, 0);
