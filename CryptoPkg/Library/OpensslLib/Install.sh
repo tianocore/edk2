@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd openssl-1.0.2d
+cd openssl-1.0.2e
 cp e_os2.h                    ../../../Include/openssl
 cp crypto/crypto.h            ../../../Include/openssl
 cp crypto/opensslv.h          ../../../Include/openssl
