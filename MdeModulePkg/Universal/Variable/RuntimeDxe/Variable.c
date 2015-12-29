@@ -1191,6 +1191,9 @@ Reclaim (
       mVariableModuleGlobal->CommonVariableTotalSize = CommonVariableTotalSize;
       mVariableModuleGlobal->CommonUserVariableTotalSize = CommonUserVariableTotalSize;
     } else {
+      mVariableModuleGlobal->HwErrVariableTotalSize = 0;
+      mVariableModuleGlobal->CommonVariableTotalSize = 0;
+      mVariableModuleGlobal->CommonUserVariableTotalSize = 0;
       Variable = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase);
       while (IsValidVariableHeader (Variable, GetEndPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase))) {
         NextVariable = GetNextVariablePtr (Variable);
