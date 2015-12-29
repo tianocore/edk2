@@ -613,6 +613,7 @@ ImageTimestampVerify (
   UINTN                        Index;
   STACK_OF(X509_ATTRIBUTE)     *Sk;
   X509_ATTRIBUTE               *Xa;
+  ASN1_OBJECT                  *XaObj;
   ASN1_TYPE                    *Asn1Type;
   ASN1_OCTET_STRING            *EncDigest;
   UINT8                        *TSToken;
@@ -692,11 +693,18 @@ ImageTimestampVerify (
     // Search valid RFC3161 timestamp counterSignature based on OBJID.
     //
     Xa = sk_X509_ATTRIBUTE_value (Sk, (int)Index);
-    if ((Xa->object->length != sizeof (mSpcRFC3161OidValue)) ||
-        (CompareMem (Xa->object->data, mSpcRFC3161OidValue, sizeof (mSpcRFC3161OidValue)) != 0)) {
+    if (Xa == NULL) {
       continue;
     }
-    Asn1Type = sk_ASN1_TYPE_value (Xa->value.set, 0);
+    XaObj = X509_ATTRIBUTE_get0_object(Xa);
+    if (XaObj == NULL) {
+      continue;
+    }
+    if ((XaObj->length != sizeof (mSpcRFC3161OidValue)) ||
+        (CompareMem (XaObj->data, mSpcRFC3161OidValue, sizeof (mSpcRFC3161OidValue)) != 0)) {
+      continue;
+    }
+    Asn1Type = X509_ATTRIBUTE_get0_type(Xa, 0);
   }
 
   if (Asn1Type == NULL) {
