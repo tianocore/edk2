@@ -64,7 +64,7 @@ RT_MEMORY_PAGE_TABLE  *mRTPageTable = NULL;
 //
 // Event for Runtime Address Conversion.
 //
-EFI_EVENT             mVirtualAddressChangeEvent;
+STATIC EFI_EVENT      mVirtualAddressChangeEvent;
 
 
 /**
