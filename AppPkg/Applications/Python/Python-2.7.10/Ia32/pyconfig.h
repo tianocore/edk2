@@ -289,7 +289,8 @@
 #endif
 
 /* Define if you have the getaddrinfo function. */
-#undef HAVE_GETADDRINFO
+//#undef HAVE_GETADDRINFO
+#define HAVE_GETADDRINFO  1
 
 /* Define to 1 if you have the 'getcwd' function. */
 #define HAVE_GETCWD   1
@@ -304,7 +305,8 @@
 #undef HAVE_GETGROUPS
 
 /* Define to 1 if you have the 'gethostbyname' function. */
-#undef HAVE_GETHOSTBYNAME
+//#undef HAVE_GETHOSTBYNAME
+#define HAVE_GETHOSTBYNAME  1
 
 /* Define this if you have some version of gethostbyname_r() */
 #undef HAVE_GETHOSTBYNAME_R
@@ -328,7 +330,8 @@
 #undef HAVE_GETLOGIN
 
 /* Define to 1 if you have the 'getnameinfo' function. */
-#undef HAVE_GETNAMEINFO
+//#undef HAVE_GETNAMEINFO
+#define HAVE_GETNAMEINFO 1
 
 /* Define if you have the 'getpagesize' function. */
 #undef HAVE_GETPAGESIZE
