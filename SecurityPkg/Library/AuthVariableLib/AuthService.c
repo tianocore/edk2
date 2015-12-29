@@ -2984,12 +2984,13 @@ InsertCertsToDb (
 /**
   Clean up signer's certificates for common authenticated variable
   by corresponding VariableName and VendorGuid from "certdb".
-  Sytem may break down during Timebased Variable update & certdb update,
-  make them inconsistent,  this function is called in AuthVariable Init to ensure 
-  consistency
-  
-  @retval  EFI_NOT_FOUND         Fail to find matching certs.
-  @retval  EFI_SUCCESS           Find matching certs and output parameters.
+  System may break down during Timebased Variable update & certdb update,
+  make them inconsistent,  this function is called in AuthVariable Init
+  to ensure consistency.
+
+  @retval  EFI_NOT_FOUND         Fail to find variable "certdb".
+  @retval  EFI_OUT_OF_RESOURCES  The operation is failed due to lack of resources.
+  @retval  EFI_SUCCESS           The operation is completed successfully.
 
 **/
 EFI_STATUS
@@ -3040,9 +3041,6 @@ CleanCertsFromDb (
 
     while (Offset < (UINT32) DataSize) {
       Ptr = (AUTH_CERT_DB_DATA *) (Data + Offset);
-      //
-      // Check whether VendorGuid matches.
-      //
       NodeSize = ReadUnaligned32 (&Ptr->CertNodeSize);
       NameSize = ReadUnaligned32 (&Ptr->NameSize);
 

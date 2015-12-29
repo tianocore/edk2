@@ -283,7 +283,7 @@ AuthVariableLibInitialize (
     //
     Status = CleanCertsFromDb();
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "Clean up CertDB fail! Status %x\n", Status));
+      DEBUG ((EFI_D_ERROR, "Clean up CertDB fail! Status %x\n", Status));
       return Status;
     }
   }
