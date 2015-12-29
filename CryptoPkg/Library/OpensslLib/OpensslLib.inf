@@ -813,22 +813,22 @@
   #
   # PQUEUE
   #
-  $(OPENSSL_PATH)/crypto/pqueue/pqueue.c
+  #$(OPENSSL_PATH)/crypto/pqueue/pqueue.c
 
   #
   # TS
   #
-  $(OPENSSL_PATH)/crypto/ts/ts_err.c
-  $(OPENSSL_PATH)/crypto/ts/ts_req_utils.c
-  $(OPENSSL_PATH)/crypto/ts/ts_req_print.c
-  $(OPENSSL_PATH)/crypto/ts/ts_rsp_utils.c
-  $(OPENSSL_PATH)/crypto/ts/ts_rsp_print.c
-  $(OPENSSL_PATH)/crypto/ts/ts_rsp_sign.c
-  $(OPENSSL_PATH)/crypto/ts/ts_rsp_verify.c
-  $(OPENSSL_PATH)/crypto/ts/ts_verify_ctx.c
-  $(OPENSSL_PATH)/crypto/ts/ts_lib.c
-  $(OPENSSL_PATH)/crypto/ts/ts_conf.c
-  $(OPENSSL_PATH)/crypto/ts/ts_asn1.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_err.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_req_utils.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_req_print.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_rsp_utils.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_rsp_print.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_rsp_sign.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_rsp_verify.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_verify_ctx.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_lib.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_conf.c
+  #$(OPENSSL_PATH)/crypto/ts/ts_asn1.c
 
   #
   # SRP - Disabled by OPENSSL_NO_SRP
