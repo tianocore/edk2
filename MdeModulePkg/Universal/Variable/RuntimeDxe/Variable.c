@@ -799,7 +799,7 @@ RecordVarErrorFlag (
       //
       // Update the data in NV cache.
       //
-      *VarErrFlag = Flag;
+      *VarErrFlag = TempFlag;
     }
   }
 }
