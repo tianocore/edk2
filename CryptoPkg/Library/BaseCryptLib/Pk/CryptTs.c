@@ -426,9 +426,10 @@ TimestampTokenVerify (
 
   //
   // Allow partial certificate chains, terminated by a non-self-signed but
-  // still trusted intermediate certificate.
+  // still trusted intermediate certificate. Also disable time checks.
   //
-  X509_STORE_set_flags (CertStore, X509_V_FLAG_PARTIAL_CHAIN);
+  X509_STORE_set_flags (CertStore,
+                        X509_V_FLAG_PARTIAL_CHAIN | X509_V_FLAG_NO_CHECK_TIME);
 
   X509_STORE_set_purpose (CertStore, X509_PURPOSE_ANY);
 
