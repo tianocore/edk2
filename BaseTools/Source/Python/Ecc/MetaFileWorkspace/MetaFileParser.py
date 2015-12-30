@@ -2000,9 +2000,11 @@ class UniParser(object):
     
     def __read(self):
         try:
-            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode = 'rb', Encoding = 'utf_16').read()
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode='rb', Encoding='utf_8').read()
         except UnicodeError:
-            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode = 'rb', Encoding = 'utf_16_le').read()
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode='rb', Encoding='utf_16').read()
+        except UnicodeError:
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode='rb', Encoding='utf_16_le').read()
         except IOError:
             self.FileIn = ""
     
