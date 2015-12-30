@@ -329,6 +329,8 @@ Dns4HostNameToIp (
   LIST_ENTRY            *Entry;
   LIST_ENTRY            *Next;
   
+  CHAR8                 *QueryName;
+  
   DNS4_TOKEN_ENTRY      *TokenEntry;
   NET_BUF               *Packet;
   
@@ -336,6 +338,7 @@ Dns4HostNameToIp (
   
   Status     = EFI_SUCCESS;
   Item       = NULL;
+  QueryName  = NULL;
   TokenEntry = NULL;
   Packet     = NULL;
   
@@ -439,9 +442,18 @@ Dns4HostNameToIp (
   TokenEntry->Token = Token;
 
   //
+  // Construct QName.
+  //
+  QueryName = DnsFillinQNameForQueryIp (TokenEntry->QueryHostName);
+  if (QueryName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+  
+  //
   // Construct DNS Query Packet.
   //
-  Status = ConstructDNSQueryIp (Instance, TokenEntry->QueryHostName, DNS_TYPE_A, &Packet);
+  Status = ConstructDNSQuery (Instance, QueryName, DNS_TYPE_A, DNS_CLASS_INET, &Packet);
   if (EFI_ERROR (Status)) {
     if (TokenEntry != NULL) {
       FreePool (TokenEntry);
@@ -477,6 +489,10 @@ Dns4HostNameToIp (
   }
   
 ON_EXIT:
+  if (QueryName != NULL) {
+    FreePool (QueryName);
+  }
+  
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
@@ -544,7 +560,110 @@ Dns4GeneralLookUp (
   IN  EFI_DNS4_COMPLETION_TOKEN        *Token
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS            Status;
+  
+  DNS_INSTANCE          *Instance;
+  
+  EFI_DNS4_CONFIG_DATA  *ConfigData;
+  
+  DNS4_TOKEN_ENTRY      *TokenEntry;
+  NET_BUF               *Packet;
+  
+  EFI_TPL               OldTpl;
+  
+  Status     = EFI_SUCCESS;
+  TokenEntry = NULL;
+  Packet     = NULL;
+  
+  //
+  // Validate the parameters
+  //
+  if ((This == NULL) || (QName == NULL) || Token == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  
+  Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL4 (This);
+  
+  ConfigData = &(Instance->Dns4CfgData);
+  
+  Instance->MaxRetry = ConfigData->RetryCount;
+  
+  Token->Status = EFI_NOT_READY;
+  Token->RetryCount = 0;
+  Token->RetryInterval = ConfigData->RetryInterval;
+
+  if (Instance->State != DNS_STATE_CONFIGED) {
+    Status = EFI_NOT_STARTED;
+    goto ON_EXIT;
+  }
+
+  //
+  // Check the MaxRetry and RetryInterval values.
+  //
+  if (Instance->MaxRetry == 0) {
+    Instance->MaxRetry = DNS_DEFAULT_RETRY;
+  }
+
+  if (Token->RetryInterval < DNS_DEFAULT_TIMEOUT) {
+    Token->RetryInterval = DNS_DEFAULT_TIMEOUT;
+  }
+
+  //
+  // Construct DNS TokenEntry.
+  //
+  TokenEntry = AllocateZeroPool (sizeof(DNS4_TOKEN_ENTRY));
+  if (TokenEntry == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+  
+  TokenEntry->PacketToLive = Token->RetryInterval;
+  TokenEntry->GeneralLookUp = TRUE;
+  TokenEntry->Token = Token;
+
+  //
+  // Construct DNS Query Packet.
+  //
+  Status = ConstructDNSQuery (Instance, QName, QType, QClass, &Packet);
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      FreePool (TokenEntry);
+    }
+    
+    goto ON_EXIT;
+  }
+
+  //
+  // Save the token into the Dns4TxTokens map.
+  //
+  Status = NetMapInsertTail (&Instance->Dns4TxTokens, TokenEntry, Packet);
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      FreePool (TokenEntry);
+    }
+    
+    NetbufFree (Packet);
+    
+    goto ON_EXIT;
+  }
+  
+  //
+  // Dns Query Ip
+  //
+  Status = DoDnsQuery (Instance, Packet);
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      FreePool (TokenEntry);
+    }
+    
+    NetbufFree (Packet);
+  }
+  
+ON_EXIT:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 /**
@@ -978,6 +1097,8 @@ Dns6HostNameToIp (
   LIST_ENTRY            *Entry;
   LIST_ENTRY            *Next;
   
+  CHAR8                 *QueryName;
+  
   DNS6_TOKEN_ENTRY      *TokenEntry;
   NET_BUF               *Packet;
   
@@ -985,6 +1106,7 @@ Dns6HostNameToIp (
   
   Status     = EFI_SUCCESS;
   Item       = NULL;
+  QueryName  = NULL;
   TokenEntry = NULL;
   Packet     = NULL;
 
@@ -1087,10 +1209,20 @@ Dns6HostNameToIp (
   TokenEntry->QueryHostName = HostName;
   TokenEntry->Token = Token;
 
+
+  //
+  // Construct QName.
+  //
+  QueryName = DnsFillinQNameForQueryIp (TokenEntry->QueryHostName);
+  if (QueryName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+  
   //
   // Construct DNS Query Packet.
   //
-  Status = ConstructDNSQueryIp (Instance, TokenEntry->QueryHostName, DNS_TYPE_AAAA, &Packet);
+  Status = ConstructDNSQuery (Instance, QueryName, DNS_TYPE_AAAA, DNS_CLASS_INET, &Packet);
   if (EFI_ERROR (Status)) {
     if (TokenEntry != NULL) {
       FreePool (TokenEntry);
@@ -1126,6 +1258,10 @@ Dns6HostNameToIp (
   }
   
 ON_EXIT:
+  if (QueryName != NULL) {
+    FreePool (QueryName);
+  }
+  
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
@@ -1193,7 +1329,110 @@ Dns6GeneralLookUp (
   IN  EFI_DNS6_COMPLETION_TOKEN         *Token
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS            Status;
+  
+  DNS_INSTANCE          *Instance;
+  
+  EFI_DNS6_CONFIG_DATA  *ConfigData;
+  
+  DNS6_TOKEN_ENTRY      *TokenEntry;
+  NET_BUF               *Packet;
+  
+  EFI_TPL               OldTpl;
+  
+  Status     = EFI_SUCCESS;
+  TokenEntry = NULL;
+  Packet     = NULL;
+  
+  //
+  // Validate the parameters
+  //
+  if ((This == NULL) || (QName == NULL) || Token == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  
+  Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL6 (This);
+  
+  ConfigData = &(Instance->Dns6CfgData);
+  
+  Instance->MaxRetry = ConfigData->RetryCount;
+  
+  Token->Status = EFI_NOT_READY;
+  Token->RetryCount = 0;
+  Token->RetryInterval = ConfigData->RetryInterval;
+
+  if (Instance->State != DNS_STATE_CONFIGED) {
+    Status = EFI_NOT_STARTED;
+    goto ON_EXIT;
+  }
+
+  //
+  // Check the MaxRetry and RetryInterval values.
+  //
+  if (Instance->MaxRetry == 0) {
+    Instance->MaxRetry = DNS_DEFAULT_RETRY;
+  }
+
+  if (Token->RetryInterval < DNS_DEFAULT_TIMEOUT) {
+    Token->RetryInterval = DNS_DEFAULT_TIMEOUT;
+  }
+
+  //
+  // Construct DNS TokenEntry.
+  //
+  TokenEntry = AllocateZeroPool (sizeof(DNS6_TOKEN_ENTRY));
+  if (TokenEntry == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+  
+  TokenEntry->PacketToLive = Token->RetryInterval;
+  TokenEntry->GeneralLookUp = TRUE;
+  TokenEntry->Token = Token;
+
+  //
+  // Construct DNS Query Packet.
+  //
+  Status = ConstructDNSQuery (Instance, QName, QType, QClass, &Packet);
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      FreePool (TokenEntry);
+    }
+    
+    goto ON_EXIT;
+  }
+
+  //
+  // Save the token into the Dns6TxTokens map.
+  //
+  Status = NetMapInsertTail (&Instance->Dns6TxTokens, TokenEntry, Packet);
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      FreePool (TokenEntry);
+    }
+    
+    NetbufFree (Packet);
+    
+    goto ON_EXIT;
+  }
+  
+  //
+  // Dns Query Ip
+  //
+  Status = DoDnsQuery (Instance, Packet);
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      FreePool (TokenEntry);
+    }
+    
+    NetbufFree (Packet);
+  }
+  
+ON_EXIT:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
 
 /**

@@ -119,6 +119,7 @@ typedef struct {
   UINT32                     PacketToLive;
   CHAR16                     *QueryHostName;
   EFI_IPv4_ADDRESS           QueryIpAddress;
+  BOOLEAN                    GeneralLookUp;
   EFI_DNS4_COMPLETION_TOKEN  *Token;
 } DNS4_TOKEN_ENTRY;
 
@@ -126,6 +127,7 @@ typedef struct {
   UINT32                     PacketToLive;
   CHAR16                     *QueryHostName;
   EFI_IPv6_ADDRESS           QueryIpAddress;
+  BOOLEAN                    GeneralLookUp;
   EFI_DNS6_COMPLETION_TOKEN  *Token;
 } DNS6_TOKEN_ENTRY;
 
@@ -568,6 +570,24 @@ AddDns6ServerIp (
   );
 
 /**
+  Fill QName for IP querying. QName is a domain name represented as 
+  a sequence of labels, where each label consists of a length octet 
+  followed by that number of octets. The domain name terminates with 
+  the zero length octet for the null label of the root.
+
+  @param  HostName          Queried HostName    
+
+  @retval NULL      Failed to fill QName.
+  @return           QName filled successfully.
+  
+**/ 
+UINT8 *
+EFIAPI
+DnsFillinQNameForQueryIp (
+  IN  CHAR16              *HostName
+  );
+
+/**
   Find out whether the response is valid or invalid.
 
   @param  TokensMap       All DNS transmittal Tokens entry.  
@@ -658,22 +678,24 @@ DoDnsQuery (
   );
 
 /**
-  Construct the Packet to query Ip.
+  Construct the Packet according query section.
 
   @param  Instance              The DNS instance
-  @param  HostName              Queried HostName  
-  @param  Type                  DNS query Type
-  @param  Packet                The packet for querying Ip
+  @param  QueryName             Queried Name  
+  @param  Type                  Queried Type 
+  @param  Class                 Queried Class 
+  @param  Packet                The packet for query
 
   @retval EFI_SUCCESS           The packet is constructed.
   @retval Others                Failed to construct the Packet.
 
 **/
 EFI_STATUS
-ConstructDNSQueryIp (
+ConstructDNSQuery (
   IN  DNS_INSTANCE              *Instance,
-  IN  CHAR16                    *HostName,
+  IN  CHAR8                     *QueryName,
   IN  UINT16                    Type,
+  IN  UINT16                    Class,
   OUT NET_BUF                   **Packet
   );
 
