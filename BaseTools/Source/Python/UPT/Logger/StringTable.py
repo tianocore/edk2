@@ -45,7 +45,7 @@ MSG_VERSION = _("UEFI Packaging Tool (UEFIPT) - Revision " + \
 MSG_COPYRIGHT = _("Copyright (c) 2011 - 2015 Intel Corporation All Rights Reserved.")
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
 MSG_USAGE = _("%s [options]\n%s" % ("UPT", MSG_VERSION_COPYRIGHT))
-MSG_DESCRIPTION = _("The UEFIUPT is used to create, " + \
+MSG_DESCRIPTION = _("The UEFIPT is used to create, " + \
                     "install or remove a UEFI Distribution Package. " + \
                     "If WORKSPACE environment variable is present, " + \
                     "then UPT will install packages to the location specified by WORKSPACE, " + \
