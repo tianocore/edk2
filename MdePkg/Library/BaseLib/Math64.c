@@ -86,7 +86,7 @@ InternalMathARShiftU64 (
   //
   // Test if this compiler supports arithmetic shift
   //
-  TestValue = (((-1) << (sizeof (-1) * 8 - 1)) >> (sizeof (-1) * 8 - 1));
+  TestValue = (INTN)((INT64)(1ULL << 63) >> 63);
   if (TestValue == -1) {
     //
     // Arithmetic shift is supported
