@@ -186,8 +186,7 @@
 /* Define to 1 if you have the <direct.h> header file. */
 #undef HAVE_DIRECT_H
 
-/* Define to 1 if you have the <dirent.h> header file, and it defines 'DIR'.
-   */
+/* Define to 1 if you have the <dirent.h> header file, and it defines 'DIR'. */
 #define HAVE_DIRENT_H   1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
@@ -280,16 +279,16 @@
 /* Define to 1 if you have the 'gamma' function. */
 #undef HAVE_GAMMA
 
-/* Define if we can use gcc inline assembler to get and set x87 control word
-   */
+/* Define if we can use gcc inline assembler to get and set x87 control word */
 #if defined(__GNUC__)
   #define HAVE_GCC_ASM_FOR_X87  1
 #else
-#undef HAVE_GCC_ASM_FOR_X87
+  #undef HAVE_GCC_ASM_FOR_X87
 #endif
 
 /* Define if you have the getaddrinfo function. */
-#undef HAVE_GETADDRINFO
+//#undef HAVE_GETADDRINFO
+#define HAVE_GETADDRINFO  1
 
 /* Define to 1 if you have the 'getcwd' function. */
 #define HAVE_GETCWD   1
@@ -304,7 +303,8 @@
 #undef HAVE_GETGROUPS
 
 /* Define to 1 if you have the 'gethostbyname' function. */
-#undef HAVE_GETHOSTBYNAME
+//#undef HAVE_GETHOSTBYNAME
+#define HAVE_GETHOSTBYNAME  1
 
 /* Define this if you have some version of gethostbyname_r() */
 #undef HAVE_GETHOSTBYNAME_R
@@ -328,7 +328,8 @@
 #undef HAVE_GETLOGIN
 
 /* Define to 1 if you have the 'getnameinfo' function. */
-#undef HAVE_GETNAMEINFO
+//#undef HAVE_GETNAMEINFO
+#define HAVE_GETNAMEINFO 1
 
 /* Define if you have the 'getpagesize' function. */
 #undef HAVE_GETPAGESIZE
@@ -1302,4 +1303,3 @@
 //#undef volatile
 
 #endif /*Py_PYCONFIG_H*/
-

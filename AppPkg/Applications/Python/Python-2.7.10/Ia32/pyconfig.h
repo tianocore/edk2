@@ -280,12 +280,11 @@
 /* Define to 1 if you have the 'gamma' function. */
 #undef HAVE_GAMMA
 
-/* Define if we can use gcc inline assembler to get and set x87 control word
-   */
+/* Define if we can use gcc inline assembler to get and set x87 control word */
 #if defined(__GNUC__)
   #define HAVE_GCC_ASM_FOR_X87  1
 #else
-#undef HAVE_GCC_ASM_FOR_X87
+  #undef HAVE_GCC_ASM_FOR_X87
 #endif
 
 /* Define if you have the getaddrinfo function. */
@@ -803,13 +802,13 @@
 #undef HAVE_SYS_NDIR_H
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-#define HAVE_SYS_PARAM_H    1
+#define HAVE_SYS_PARAM_H                1
 
 /* Define to 1 if you have the <sys/poll.h> header file. */
 #define HAVE_SYS_POLL_H                 1
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
-#define HAVE_SYS_RESOURCE_H   1
+#define HAVE_SYS_RESOURCE_H             1
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 #define HAVE_SYS_SELECT_H               1
@@ -904,7 +903,7 @@
 #undef HAVE_UINT64_T
 
 /* Define to 1 if the system has the type 'uintptr_t'. */
-#define HAVE_UINTPTR_T    1
+#define HAVE_UINTPTR_T                  1
 
 /* Define to 1 if you have the 'uname' function. */
 #undef HAVE_UNAME
@@ -927,7 +926,7 @@
 #undef HAVE_UTIMES
 
 /* Define to 1 if you have the <utime.h> header file. */
-#define HAVE_UTIME_H    1
+#define HAVE_UTIME_H                    1
 
 /* Define to 1 if you have the 'wait3' function. */
 #undef HAVE_WAIT3
@@ -1083,7 +1082,7 @@
 #define SIZEOF__BOOL      1
 
 /* Define to 1 if you have the ANSI C header files. */
-#define STDC_HEADERS    1
+#define STDC_HEADERS      1
 
 /* Define if you can safely include both <sys/select.h> and <sys/time.h>
    (which you can't on SCO ODT 3.0). */
@@ -1301,4 +1300,3 @@
 //#undef volatile
 
 #endif /*Py_PYCONFIG_H*/
-
