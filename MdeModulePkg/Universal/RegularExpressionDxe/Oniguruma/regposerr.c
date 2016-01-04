@@ -88,7 +88,7 @@ regerror(int posix_ecode, const regex_t* reg ARG_UNUSED, char* buf,
     s = "";
   }
   else {
-    sprintf(tbuf, "undefined error code (%d)", posix_ecode);
+    sprintf_s(tbuf, sizeof(tbuf), "undefined error code (%d)", posix_ecode);
     s = tbuf;
   }
 

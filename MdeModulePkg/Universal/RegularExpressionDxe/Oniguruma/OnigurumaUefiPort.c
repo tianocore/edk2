@@ -14,13 +14,13 @@
 **/
 #include "OnigurumaUefiPort.h"
 
-int sprintf(char *str, char const *fmt, ...)
+int sprintf_s(char *str, size_t sizeOfBuffer, char const *fmt, ...)
 {
   VA_LIST Marker;
   int   NumberOfPrinted;
 
   VA_START (Marker, fmt);
-  NumberOfPrinted = (int)AsciiVSPrint (str, 1000000, fmt, Marker);
+  NumberOfPrinted = (int)AsciiVSPrint (str, sizeOfBuffer, fmt, Marker);
   VA_END (Marker);
 
   return NumberOfPrinted;

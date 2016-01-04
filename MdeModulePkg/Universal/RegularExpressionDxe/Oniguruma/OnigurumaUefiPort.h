@@ -59,7 +59,7 @@ typedef UINTN size_t;
 
 int OnigStrCmp (char* Str1, char* Str2);
 
-int sprintf (char *str, char const *fmt, ...);
+int sprintf_s (char *str, size_t sizeOfBuffer, char const *fmt, ...);
 
 #define exit(n) ASSERT(FALSE);
 
