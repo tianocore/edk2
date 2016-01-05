@@ -50,7 +50,7 @@
 #string STR_DRIVER_CN             #language en-US "ComponentName"
 #string STR_DRIVER_CN2            #language en-US "ComponentName2"
 #string STR_PLAT_DRV_CFG          #language en-US "PlatformtoDriverConfiguration"
-#string STR_DRIVER_VERSION        #language en-US "DriverVersion"
+#string STR_DRIVER_SUPPORTED_EFI_SPEC_VERSION        #language en-US "SupportedEfiSpecVersion"
 
 // Console
 #string STR_TXT_IN                #language en-US "SimpleTextIn"
