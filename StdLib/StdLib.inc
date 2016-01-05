@@ -5,6 +5,7 @@
 # The including DSC file must DEFINE the EMULATE macro if
 # the application is to be run in an emulation environment.
 #
+#  Copyright (c) 2016, Daryl McDaniel. All rights reserved.<BR>
 #  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -133,3 +134,12 @@
     RVCT:*_*_*_CC_FLAGS     = --library_interface=none -DUEFI_C_SOURCE -J$(WORKSPACE)/StdLib/Include -J$(WORKSPACE)/StdLib/Include/Arm
    XCODE:*_*_*_CC_FLAGS     = -nostdinc -nostdlib -DUEFI_C_SOURCE -Wno-unused-const-variable -Wno-string-compare -Wno-sometimes-uninitialized
 !endif
+
+  # Temporarily restrict compiler warnings to those produced by VS2012.
+  # Code that fails when these flags are removed will have to be rewritten
+  # in order to pass.  This may be as simple as renaming an object, but may
+  # require more significant changes.
+    MSFT:*_VS2015_*_CC_FLAGS          = /Wv:11
+    MSFT:*_VS2015x86_*_CC_FLAGS       = /Wv:11
+    MSFT:*_VS2015xASL_*_CC_FLAGS      = /Wv:11
+    MSFT:*_VS2015x86xASL_*_CC_FLAGS   = /Wv:11
