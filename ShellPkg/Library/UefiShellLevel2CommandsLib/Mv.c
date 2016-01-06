@@ -2,7 +2,7 @@
   Main file for mv shell level 2 function.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -731,7 +731,7 @@ ShellCommandRunMv (
             //
             // ValidateAndMoveFiles will report errors to the screen itself
             //
-            CwdSize = StrSize(ShellGetCurrentDir(NULL)) + 1;
+            CwdSize = StrSize(ShellGetCurrentDir(NULL)) + sizeof(CHAR16);
             Cwd = AllocateZeroPool(CwdSize);
             ASSERT (Cwd != NULL);
             StrCpyS(Cwd, CwdSize/sizeof(CHAR16), ShellGetCurrentDir(NULL));
