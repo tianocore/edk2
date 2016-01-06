@@ -2,6 +2,7 @@
   The file for AHCI mode of ATA host controller.
 
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1407,6 +1408,7 @@ AhciPortReset (
              );
 
   if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Port %d COMRESET failed: %r\n", Port, Status));
     return Status;
   }
 
@@ -2401,6 +2403,7 @@ AhciModeInitialization (
       } while (PhyDetectDelay > 0);
 
       if (PhyDetectDelay == 0) {
+        DEBUG ((EFI_D_ERROR, "Port %d Device presence detected but phy not ready (TFD=0x%X)\n", Port, Data));
         continue;
       }
 
