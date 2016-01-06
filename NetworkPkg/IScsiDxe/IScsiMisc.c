@@ -683,7 +683,7 @@ IScsiGetNicInfoByIndex (
 
 
 /**
-  Get the NIC's PCI location and return it accroding to the composited
+  Get the NIC's PCI location and return it according to the composited
   format defined in iSCSI Boot Firmware Table.
 
   @param[in]   Controller        The handle of the controller.
