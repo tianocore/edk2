@@ -358,7 +358,7 @@ CopyDigestListToBuffer (
 }
 
 /**
-  Set Tpm2HashMask PCD value accroding to TPM2 PCR bank.
+  Set Tpm2HashMask PCD value according to TPM2 PCR bank.
 **/
 VOID
 SetTpm2HashMask (
