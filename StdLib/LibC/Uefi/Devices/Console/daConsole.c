@@ -10,6 +10,7 @@
   The devices status as a wide device is indicatd by _S_IWTTY being set in
   f_iflags.
 
+  Copyright (c) 2016, Daryl McDaniel. All rights reserved.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
@@ -37,6 +38,7 @@
 #include  <sys/fcntl.h>
 #include  <unistd.h>
 #include  <sys/termios.h>
+#include  <Efi/SysEfi.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
 #include  <Device/IIO.h>
@@ -104,6 +106,65 @@ WideTtyCvt( CHAR16 *dest, const char *buf, ssize_t n, mbstate_t *Cs)
   return i;
 }
 
+/** Flush the console's IIO buffers.
+
+    Flush the IIO Input or Output buffers depending upon the mode
+    of the specified file.
+
+    If the console is open for output, write any unwritten data in the output
+    buffer to the console.
+
+    If the console is open for input or output, discard any remaining data
+    in the associated buffers.
+
+    @param[in]    filp    Pointer to the target file's descriptor structure.
+
+    @retval     0     Always succeeds
+**/
+static
+int
+EFIAPI
+da_ConFlush(
+  struct __filedes *filp
+)
+{
+  cIIO       *This;
+  char       *MbcsPtr;
+  ssize_t     NumProc;
+  void       *OutPtr;
+
+  This = filp->devdata;
+
+  if (filp->f_iflags & S_ACC_READ)  {     // Readable so flush the input buffer
+    This->InBuf->Flush(This->InBuf, UNICODE_STRING_MAX);
+  }
+  if (filp->f_iflags & S_ACC_WRITE)  {    // Writable so flush the output buffer
+    // At this point, the characters to write are in OutBuf
+    // First, linearize and consume the buffer
+    NumProc = OutBuf->Read(OutBuf, gMD->UString, UNICODE_STRING_MAX-1);
+    if (NumProc > 0) {  // Optimization -- Nothing to do if no characters
+      gMD->UString[NumProc] = 0;   // Ensure that the buffer is terminated
+
+      if(filp->f_iflags & _S_IWTTY) {
+        // Output device expects wide characters, Output what we have
+        OutPtr = gMD->UString;
+      }
+      else {
+        // Output device expects narrow characters, convert to MBCS
+        OutPtr = gMD->UString2;
+        // Translate the wide buffer, gMD->UString into MBCS
+        // in the buffer pointed to by OutPtr.
+        // The returned value, NumProc, is the resulting number of bytes.
+        NumProc = wcstombs((char *)OutPtr, (const wchar_t *)gMD->UString, NumProc);
+        ((char *)OutPtr)[NumProc] = 0;   // Ensure the buffer is terminated
+      }
+      // Do the actual write of the data
+      (void) filp->f_ops->fo_write(filp, NULL, NumProc, OutPtr);
+    }
+  }
+  return 0;
+}
+
 /** Close an open file.
 
     @param[in]  filp    Pointer to the file descriptor structure for this file.
@@ -127,6 +188,13 @@ da_ConClose(
     EFIerrno = RETURN_INVALID_PARAMETER;
     return -1;    // Looks like a bad File Descriptor pointer
   }
+  // Stream and filp look OK, so continue.
+  // Flush the I/O buffers
+  (void) da_ConFlush(filp);
+
+  // Break the connection to IIO
+  filp->devdata = NULL;
+
   gMD->StdIo[Stream->InstanceNum] = NULL;   // Mark the stream as closed
   return 0;
 }
@@ -188,10 +256,10 @@ da_ConSeek(
         by da_ConWrite are WIDE characters.  It is the responsibility of the
         higher-level function(s) to perform any necessary conversions.
 
-    @param[in,out]  BufferSize  Number of characters in Buffer.
+  @param[in,out]  BufferSize  Number of characters in Buffer.
   @param[in]      Buffer      The WCS string to be displayed
 
-    @return   The number of Characters written.
+  @return   The number of Characters written.
 */
 static
 ssize_t
@@ -525,7 +593,7 @@ da_ConOpen(
   wchar_t            *MPath           // Not used for console devices
   )
 {
-  ConInstance                      *Stream;
+  ConInstance    *Stream;
   UINT32          Instance;
   int             RetVal = -1;
 
@@ -646,68 +714,68 @@ __Cons_construct(
     IIO = New_cIIO();
     if(IIO == NULL) {
       FreePool(ConInstanceList);
-  }
+    }
     else {
       Status = RETURN_SUCCESS;
-  for( i = 0; i < NUM_SPECIAL; ++i) {
-    // Get pointer to instance.
-    Stream = &ConInstanceList[i];
+      for( i = 0; i < NUM_SPECIAL; ++i) {
+        // Get pointer to instance.
+        Stream = &ConInstanceList[i];
 
-    Stream->Cookie      = CON_COOKIE;
-    Stream->InstanceNum = i;
-    Stream->CharState.A = 0;    // Start in the initial state
+        Stream->Cookie      = CON_COOKIE;
+        Stream->InstanceNum = i;
+        Stream->CharState.A = 0;    // Start in the initial state
 
-    switch(i) {
-      case STDIN_FILENO:
-        Stream->Dev = SystemTable->ConIn;
-        break;
-      case STDOUT_FILENO:
-        Stream->Dev = SystemTable->ConOut;
-        break;
-      case STDERR_FILENO:
-        if(SystemTable->StdErr == NULL) {
-          Stream->Dev = SystemTable->ConOut;
+        switch(i) {
+          case STDIN_FILENO:
+            Stream->Dev = SystemTable->ConIn;
+            break;
+          case STDOUT_FILENO:
+            Stream->Dev = SystemTable->ConOut;
+            break;
+          case STDERR_FILENO:
+            if(SystemTable->StdErr == NULL) {
+              Stream->Dev = SystemTable->ConOut;
+            }
+            else {
+              Stream->Dev = SystemTable->StdErr;
+            }
+            break;
+          default:
+            return RETURN_VOLUME_CORRUPTED;     // This is a "should never happen" case.
         }
-        else {
-          Stream->Dev = SystemTable->StdErr;
+
+        Stream->Abstraction.fo_close    = &da_ConClose;
+        Stream->Abstraction.fo_read     = &da_ConRead;
+        Stream->Abstraction.fo_write    = &da_ConWrite;
+        Stream->Abstraction.fo_stat     = &da_ConStat;
+        Stream->Abstraction.fo_lseek    = &da_ConSeek;
+        Stream->Abstraction.fo_fcntl    = &fnullop_fcntl;
+        Stream->Abstraction.fo_ioctl    = &da_ConIoctl;
+        Stream->Abstraction.fo_poll     = &da_ConPoll;
+        Stream->Abstraction.fo_flush    = &da_ConFlush;
+        Stream->Abstraction.fo_delete   = &fbadop_delete;
+        Stream->Abstraction.fo_mkdir    = &fbadop_mkdir;
+        Stream->Abstraction.fo_rmdir    = &fbadop_rmdir;
+        Stream->Abstraction.fo_rename   = &fbadop_rename;
+
+        Stream->NumRead     = 0;
+        Stream->NumWritten  = 0;
+        Stream->UnGetKey    = CHAR_NULL;
+
+        if(Stream->Dev == NULL) {
+          continue;                 // No device for this stream.
         }
-        break;
-      default:
-        return RETURN_VOLUME_CORRUPTED;     // This is a "should never happen" case.
-    }
-
-    Stream->Abstraction.fo_close    = &da_ConClose;
-    Stream->Abstraction.fo_read     = &da_ConRead;
-    Stream->Abstraction.fo_write    = &da_ConWrite;
-    Stream->Abstraction.fo_stat     = &da_ConStat;
-    Stream->Abstraction.fo_lseek    = &da_ConSeek;
-    Stream->Abstraction.fo_fcntl    = &fnullop_fcntl;
-    Stream->Abstraction.fo_ioctl    = &da_ConIoctl;
-    Stream->Abstraction.fo_poll     = &da_ConPoll;
-    Stream->Abstraction.fo_flush    = &fnullop_flush;
-    Stream->Abstraction.fo_delete   = &fbadop_delete;
-    Stream->Abstraction.fo_mkdir    = &fbadop_mkdir;
-    Stream->Abstraction.fo_rmdir    = &fbadop_rmdir;
-    Stream->Abstraction.fo_rename   = &fbadop_rename;
-
-    Stream->NumRead     = 0;
-    Stream->NumWritten  = 0;
-    Stream->UnGetKey    = CHAR_NULL;
-
-    if(Stream->Dev == NULL) {
-      continue;                 // No device for this stream.
-    }
-        ConNode[i] = __DevRegister(stdioNames[i], NULL, &da_ConOpen, Stream,
-                                   1, sizeof(ConInstance), stdioFlags[i]);
-    if(ConNode[i] == NULL) {
-          Status = EFIerrno;    // Grab error code that DevRegister produced.
-      break;
-    }
-    Stream->Parent = ConNode[i];
-  }
-  /* Initialize Ioctl flags until Ioctl is really implemented. */
-  TtyCooked = TRUE;
-  TtyEcho   = TRUE;
+            ConNode[i] = __DevRegister(stdioNames[i], NULL, &da_ConOpen, Stream,
+                                       1, sizeof(ConInstance), stdioFlags[i]);
+        if(ConNode[i] == NULL) {
+              Status = EFIerrno;    // Grab error code that DevRegister produced.
+          break;
+        }
+        Stream->Parent = ConNode[i];
+      }
+      /* Initialize Ioctl flags until Ioctl is really implemented. */
+      TtyCooked = TRUE;
+      TtyEcho   = TRUE;
     }
   }
   return  Status;
@@ -751,15 +819,5 @@ da_ConCntl(
   void *
   )
 {
-}
-
-static
-int
-EFIAPI
-da_ConFlush(
-  struct __filedes *filp
-  )
-{
-  return 0;
 }
 #endif  /* Not implemented for Console */
