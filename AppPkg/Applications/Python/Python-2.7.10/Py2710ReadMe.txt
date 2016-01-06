@@ -49,14 +49,14 @@ packages within that distribution.
 
   3.2 Building Python
   ===================
-  B.  From the AppPkg/Applications/Python/Python-2.7.10 directory, execute the
+  A.  From the AppPkg/Applications/Python/Python-2.7.10 directory, execute the
     srcprep.bat (srcprep.sh) script to copy the header files from within the
     PyMod-2.7.10 sub-tree into their corresponding directories within the
     distribution.  This step only needs to be performed prior to the first
     build of Python, or if one of the header files within the PyMod tree has been
     modified.
 
-  A.  Edit PyMod-2.7.10\Modules\config.c to enable the built-in modules you need.
+  B.  Edit PyMod-2.7.10\Modules\config.c to enable the built-in modules you need.
     By default, it is configured for the minimally required set of modules.
       Mandatory Built-in Modules:
         edk2      errno       imp         marshal
@@ -68,10 +68,10 @@ packages within that distribution.
         cStringIO   gc              itertools     math
         operator    time
 
-  B.  Edit AppPkg/AppPkg.dsc to enable (uncomment) the Python2710.inf line
+  C.  Edit AppPkg/AppPkg.dsc to enable (uncomment) the Python2710.inf line
     within the [Components] section.
 
-  C.  Build AppPkg using the standard "build" command:
+  D.  Build AppPkg using the standard "build" command:
     For example, to build Python for an X64 CPU architecture:
                     build -a X64 -p AppPkg\AppPkg.dsc
 
@@ -87,7 +87,8 @@ target system.
        |- \etc                      Configuration files used by libraries.
        |- \tmp                      Temporary files created by tmpfile(), etc.
        |- \lib                      Root of the libraries tree.
-           |- \python27.10          Directory containing the Python library modules.
+           |- \python27.10          Directory containing the Python library
+               |                    modules.
                |- \lib-dynload      Dynamically loadable Python extensions.
                |- \site-packages    Site-specific packages and modules.
 
@@ -100,8 +101,8 @@ target system.
 These directories, on the target system, are populated from the development
 system as follows:
 
-  * \Efi\Tools receives a copy of Build/AppPkg/DEBUG_VS2015/X64/Python.efi.
-                                               ^^^^^^^^^^^^
+  * \Efi\Tools receives a copy of Build/AppPkg/DEBUG_VS2015/X64/Python2710.efi.
+                                               ^^^^^^^^^^^^^^^^
     Modify the host path to match your build type and compiler.
 
   * The \Efi\StdLib\etc directory is populated from the StdLib/Efi/StdLib/etc
@@ -131,8 +132,9 @@ system as follows:
   2.  enable LibraryClasses BsdSocketLib and EfiSocketLib in PythonCore.inf.
   3.  Build Python2710
           build -a X64 -p AppPkg\AppPkg.dsc
-  6.  copy Build\AppPkg\DEBUG_VS2005\X64\Python2710.efi to \Efi\Tools on your target system.
-                        ^^^^^^^^^^^^ Modify as needed
+  6.  copy Build\AppPkg\DEBUG_VS2005\X64\Python2710.efi to \Efi\Tools on your
+      target system. Replace "DEBUG_VS2005\X64", in the source path, with
+      values appropriate for your tool chain and processor architecture.
 
 7. Running Python
 =================
@@ -151,17 +153,24 @@ system as follows:
 
   NOTE:
       Python, as distributed, sends its interactive prompts to stderr.  If
-      STDERR isn't enabled in UEFI Setup so that it's output goes to the console,
-      it may appear that Python hangs on startup.  If this happens, one may
-      be able to rectify the condition by typing "exit()" followed by <enter>
-      to exit out of Python.  Then, type "exit" at the Shell prompt which should
-      enter Setup.
+      STDERR isn't enabled in UEFI Setup so that it's output goes to the
+      console, it may appear that Python hangs on startup.  If this happens,
+      one may be able to rectify the condition by typing "exit()" followed
+      by <enter> to exit out of Python.  Then, type "exit" at the Shell prompt
+      which should enter Setup where you can use the Boot Maintenance
+      Manager to modify your Console settings.
 
   NOTE:
       Some platforms don't include the Setup utility, or don't allow STDERR to
       be modified.  In these cases, Python may be started with the '-#' option
       which will cause stderr to be the same as stdout and should allow
       Python to be used interactively on those platforms.
+
+      Depending upon the version of Shell you are using, it may be necessary
+      to escape the '#' character so that the Shell doesn't interpret it as
+      the start of a comment.  The escape character is '^'.
+      Example:
+          python -^# -V
 
 8. Supported C Modules
 ======================

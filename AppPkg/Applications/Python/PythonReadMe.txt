@@ -1,7 +1,8 @@
                                 EDK II Python
-                                    ReadMe
-                                 Release 1.02
-                                 18 Jan. 2013
+                                   ReadMe
+                                Version 2.7.2
+                                Release 1.02
+                                18 Jan. 2013
 
 
 1. OVERVIEW
@@ -25,10 +26,10 @@ packages within that distribution.
 ======================================================
   3.1 Getting Python
   ==================
-  Currently only version 2.7.2 of the CPython distribution is supported.  For development
-  ease, a subset of the Python 2.7.2 distribution has been included in the AppPkg source
-  tree.  If a full distribution is desired, the Python-2.7.2 directory can be removed or
-  renamed and the full source code downloaded from http://www.python.org/ftp/python/2.7.2/.
+  For development ease, a subset of the Python 2.7.2 distribution has been
+  included in the AppPkg source tree.  If a full distribution is desired, the
+  Python-2.7.2 directory can be removed or renamed and the full source code
+  downloaded from http://www.python.org/ftp/python/2.7.2/.
 
   A.  Within your EDK II development tree, extract the Python distribution into
     AppPkg/Applications/Python.  This should create the
@@ -70,7 +71,8 @@ target system.
        |- \etc                      Configuration files used by libraries.
        |- \tmp                      Temporary files created by tmpfile(), etc.
        |- \lib                      Root of the libraries tree.
-           |- \python.27            Directory containing the Python library modules.
+           |- \python.27            Directory containing the Python library
+               |                    modules.
                |- \lib-dynload      Dynamically loadable Python extensions.
                |- \site-packages    Site-specific packages and modules.
 
@@ -81,7 +83,7 @@ These directories, on the target system, are populated from the development
 system as follows:
 
   * \Efi\Tools receives a copy of Build/AppPkg/DEBUG_VS2005/X64/Python.efi.
-                                               ^^^^^ ^^^^^^
+                                               ^^^^^ ^^^^^^^^^^
     Modify the host path to match the your build type and compiler.
 
   * The \Efi\StdLib\etc directory is populated from the StdLib/Efi/StdLib/etc
@@ -94,8 +96,8 @@ system as follows:
         site    types     copy_reg    linecache     genericpath
 
   * Python C Extension Modules built as dynamically loadable extensions go into
-    the \Efi\StdLib\lib\python.27\lib-dynload directory.  This functionality is not
-    yet implemented.
+    the \Efi\StdLib\lib\python.27\lib-dynload directory.  This functionality is
+    not yet implemented.
 
 
 6. Example: Enabling socket support
@@ -107,11 +109,48 @@ system as follows:
         functools, types, os, sys, warnings, cStringIO, StringIO, errno
 
   5.  build -a X64 -p AppPkg\AppPkg.dsc
-  6.  copy Build\AppPkg\DEBUG_VS2005\X64\Python.efi to \Efi\Tools on your target system.
-                                ^^^^ Modify as needed
+  6.  copy Build\AppPkg\DEBUG_VS2005\X64\Python.efi to \Efi\Tools on your
+      target system. Replace "DEBUG_VS2005\X64", in the source path, with
+      values appropriate for your tool chain and processor architecture.
 
 
-7. Supported C Modules
+7. Running Python
+=================
+  Python must currently be run from an EFI FAT-32 partition, or volume, under
+  the UEFI Shell.  At the Shell prompt enter the desired volume name, followed
+  by a colon ':', then press Enter.  Python can then be executed by typing its
+  name, followed by any desired options and arguments.
+
+  EXAMPLE:
+      2.0 Shell> fs0:
+      2.0 FS0:\> python
+      Python 2.7.2 (default, Oct 13 2015, 16:21:53) [C] on uefi
+      Type "help", "copyright", "credits" or "license" for more information.
+      >>> exit()
+      2.0 FS0:\>
+
+  NOTE:
+      Python, as distributed, sends its interactive prompts to stderr.  If
+      STDERR isn't enabled in UEFI Setup so that it's output goes to the
+      console, it may appear that Python hangs on startup.  If this happens,
+      one may be able to rectify the condition by typing "exit()" followed
+      by <enter> to exit out of Python.  Then, type "exit" at the Shell prompt
+      which should enter Setup where you can use the Boot Maintenance
+      Manager to modify your Console settings.
+
+  NOTE:
+      Some platforms don't include the Setup utility, or don't allow STDERR to
+      be modified.  In these cases, Python may be started with the '-#' option
+      which will cause stderr to be the same as stdout and should allow
+      Python to be used interactively on those platforms.
+
+      Depending upon the version of Shell you are using, it may be necessary
+      to escape the '#' character so that the Shell doesn't interpret it as
+      the start of a comment.  The escape character is '^'.
+      Example:
+          python -^# -V
+
+8. Supported C Modules
 ======================
     Module Name               C File(s)
   ===============       =============================================
@@ -166,7 +205,7 @@ system as follows:
   zlib                  Modules/zlibmodule.c          Modules/zlib/*
 
 
-8. Tested Python Library Modules
+9. Tested Python Library Modules
 ================================
 This is a partial list of the packages and modules of the Python Standard
 Library that have been tested or used in some manner.
