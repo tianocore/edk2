@@ -462,6 +462,8 @@ Dns4HostNameToIp (
     goto ON_EXIT;
   }
 
+  ASSERT (Packet != NULL);
+
   //
   // Save the token into the Dns4TxTokens map.
   //
@@ -634,6 +636,8 @@ Dns4GeneralLookUp (
     
     goto ON_EXIT;
   }
+
+  ASSERT (Packet != NULL);
 
   //
   // Save the token into the Dns4TxTokens map.
@@ -1231,6 +1235,8 @@ Dns6HostNameToIp (
     goto ON_EXIT;
   }
 
+  ASSERT (Packet != NULL);
+
   //
   // Save the token into the Dns6TxTokens map.
   //
@@ -1403,6 +1409,8 @@ Dns6GeneralLookUp (
     
     goto ON_EXIT;
   }
+
+  ASSERT (Packet != NULL);
 
   //
   // Save the token into the Dns6TxTokens map.

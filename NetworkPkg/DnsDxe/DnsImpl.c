@@ -1360,8 +1360,6 @@ ParseDnsResponse (
     // Check whether it's the GeneralLookUp querying.
     //
     if (Instance->Service->IpVersion == IP_VERSION_4 && Dns4TokenEntry->GeneralLookUp) {
-      ASSERT (Dns4TokenEntry != NULL);
-      
       Dns4RR = Dns4TokenEntry->Token->RspData.GLookupData->RRList;
       AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
 
@@ -1387,8 +1385,6 @@ ParseDnsResponse (
       
       RRCount ++;
     } else if (Instance->Service->IpVersion == IP_VERSION_6 && Dns6TokenEntry->GeneralLookUp) {
-      ASSERT (Dns6TokenEntry != NULL);
-      
       Dns6RR = Dns6TokenEntry->Token->RspData.GLookupData->RRList;
       AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
 
