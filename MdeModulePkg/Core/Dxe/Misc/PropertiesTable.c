@@ -775,7 +775,7 @@ CoreGetMemoryMapPropertiesTable (
 //
 
 /**
-  Set PropertiesTable accroding to PE/COFF image section alignment.
+  Set PropertiesTable according to PE/COFF image section alignment.
 
   @param  SectionAlignment    PE/COFF section alignment
 **/
@@ -1219,7 +1219,7 @@ Finish:
 }
 
 /**
-  Find image record accroding to image base and size.
+  Find image record according to image base and size.
 
   @param  ImageBase    Base of PE image
   @param  ImageSize    Size of PE image
