@@ -226,7 +226,7 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultOemTableId_PROMPT  #language en-US "Default OEM Table ID for ACPI table creation"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultOemTableId_HELP  #language en-US "Default OEM Table ID for ACPI table creation.<BR><BR>\n"
-                                                                                          "Accroding to ACPI specification, this field is particularly useful when\n"
+                                                                                          "According to ACPI specification, this field is particularly useful when\n"
                                                                                           "defining a definition block to distinguish definition block functions.<BR>\n"
                                                                                           "The OEM assigns each dissimilar table a new OEM Table ID.<BR>\n"
                                                                                           "This PCD is ignored for definition block.<BR>"
@@ -234,7 +234,7 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultOemRevision_PROMPT  #language en-US "Default OEM Revision for ACPI table creation"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultOemRevision_HELP  #language en-US "Default OEM Revision for ACPI table creation.<BR><BR>\n"
-                                                                                           "Accroding to ACPI specification, for LoadTable() opcode, the OS can also\n"
+                                                                                           "According to ACPI specification, for LoadTable() opcode, the OS can also\n"
                                                                                            "check the OEM Table ID and Revision ID against a database for a newer\n"
                                                                                            "revision Definition Block of the same OEM Table ID and load it instead.<BR>\n"
                                                                                            "This PCD is ignored for definition block.<BR>"
@@ -242,14 +242,14 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultCreatorId_PROMPT  #language en-US "Default Creator ID for ACPI table creation"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultCreatorId_HELP  #language en-US "Default Creator ID for ACPI table creation.<BR><BR>\n"
-                                                                                         "Accroding to ACPI specification, for tables containing Definition Blocks,\n"
+                                                                                         "According to ACPI specification, for tables containing Definition Blocks,\n"
                                                                                          "this is the ID for the ASL Compiler.<BR>\n"
                                                                                          "This PCD is ignored for definition block.<BR>"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultCreatorRevision_PROMPT  #language en-US "Default Creator Revision for ACPI table creation"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultCreatorRevision_HELP  #language en-US "Default Creator Revision for ACPI table creation.<BR><BR>\n"
-                                                                                               "Accroding to ACPI specification, for tables containing Definition Blocks,\n"
+                                                                                               "According to ACPI specification, for tables containing Definition Blocks,\n"
                                                                                                "this is the revision for the ASL Compiler.<BR>\n"
                                                                                                "This PCD is ignored for definition block.<BR>"
 
