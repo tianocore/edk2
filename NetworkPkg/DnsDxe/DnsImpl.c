@@ -1026,7 +1026,7 @@ AddDns6ServerIp (
   @return           QName filled successfully.
   
 **/ 
-UINT8 *
+CHAR8 *
 EFIAPI
 DnsFillinQNameForQueryIp (
   IN  CHAR16              *HostName
