@@ -1771,7 +1771,7 @@ IpSecEspOutboundPacket (
   }
 
   //
-  // Calculate the plain payload size accroding to the fragment table.
+  // Calculate the plain payload size according to the fragment table.
   //
   PlainPayloadSize = 0;
   for (Index = 0; Index < *FragmentCount; Index++) {
