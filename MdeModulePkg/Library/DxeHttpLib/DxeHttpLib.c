@@ -134,7 +134,7 @@ UriPercentDecode (
 }
 
 /**
-  This function return the updated state accroding to the input state and next character of
+  This function return the updated state according to the input state and next character of
   the authority.
 
   @param[in]       Char           Next character.
@@ -299,7 +299,7 @@ NetHttpParseAuthority (
 }
 
 /**
-  This function return the updated state accroding to the input state and next character of a URL.
+  This function return the updated state according to the input state and next character of a URL.
 
   @param[in]       Char           Next character.
   @param[in]       State          Current value of the parser state machine.
@@ -1056,7 +1056,7 @@ HttpInitMsgParser (
   Parser->State = BodyParserBodyStart;
   
   //
-  // Determine the message length accroding to RFC 2616.
+  // Determine the message length according to RFC 2616.
   // 1. Check whether the message "MUST NOT" have a message-body.
   //
   Parser->IgnoreBody = HttpIoNoMessageBody (Method, StatusCode);
