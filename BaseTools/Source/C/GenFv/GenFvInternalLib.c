@@ -2787,7 +2787,7 @@ Returns:
   }
   
   //
-  // Caculate the required sizes for all FFS files.
+  // Calculate the required sizes for all FFS files.
   //
   CurrentOffset = sizeof (EFI_FIRMWARE_VOLUME_HEADER);
   
@@ -2904,7 +2904,7 @@ Returns:
     }
   }
   CurrentOffset += VtfFileSize;
-  DebugMsg (NULL, 0, 9, "FvImage size", "The caculated fv image size is 0x%x and the current set fv image size is 0x%x", (unsigned) CurrentOffset, (unsigned) FvInfoPtr->Size);
+  DebugMsg (NULL, 0, 9, "FvImage size", "The calculated fv image size is 0x%x and the current set fv image size is 0x%x", (unsigned) CurrentOffset, (unsigned) FvInfoPtr->Size);
   
   if (FvInfoPtr->Size == 0) { 
     //

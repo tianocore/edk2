@@ -278,7 +278,7 @@ GetBootSectorOffset (
 Description:
   Get the offset of boot sector.
   For non-MBR disk, offset is just 0
-  for disk with MBR, offset needs to be caculated by parsing MBR
+  for disk with MBR, offset needs to be calculated by parsing MBR
 
   NOTE: if no one is active, we will patch MBR to select first partition as active.
 
