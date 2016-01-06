@@ -102,7 +102,13 @@ struct __filedes {
 
 struct fileops {
   /* These functions must always be implemented. */
+
+  /** Perform device specific operations for closing the device.
+      It is the responsibility of this function to flush or discard
+      buffer contents.
+  **/
   int     (EFIAPI *fo_close)    (struct __filedes *filp);
+
   ssize_t (EFIAPI *fo_read)     (struct __filedes *filp, off_t *Offset, size_t Len, void *Buf);
   ssize_t (EFIAPI *fo_write)    (struct __filedes *filp, off_t *Offset, size_t Len, const void *Buf);
 
@@ -123,7 +129,7 @@ struct fileops {
   off_t   (EFIAPI *fo_lseek)    (struct __filedes *filp, off_t, int);
 };
 
-/*  A generic instance structure which is valid for
+/*  A generic instance structure which is valid
     for all device instance structures.
 
     All device instance structures MUST be a multiple of 8-bytes in length.

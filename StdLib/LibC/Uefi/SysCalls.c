@@ -1,6 +1,7 @@
 /** @file
   EFI versions of NetBSD system calls.
 
+  Copyright (c) 2016, Daryl McDaniel. All rights reserved.<BR>
   Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
@@ -192,18 +193,18 @@ _closeX  (int fd, int NewState)
     Fp = &gMD->fdarray[fd];
     // Check if there are other users of this FileHandle
     if(Fp->RefCount == 1) { // There should be no other users
-    if(! IsDupFd(fd)) {
-      // Only do the close if no one else is using the FileHandle
-      if(Fp->f_iflags & FIF_DELCLOSE) {
-        /* Handle files marked "Delete on Close". */
-        if(Fp->f_ops->fo_delete != NULL) {
-          retval = Fp->f_ops->fo_delete(Fp);
+      if(! IsDupFd(fd)) {
+        // Only do the close if no one else is using the FileHandle
+        if(Fp->f_iflags & FIF_DELCLOSE) {
+          /* Handle files marked "Delete on Close". */
+          if(Fp->f_ops->fo_delete != NULL) {
+            retval = Fp->f_ops->fo_delete(Fp);
+          }
+        }
+        else {
+          retval = Fp->f_ops->fo_close( Fp);
         }
       }
-      else {
-          retval = Fp->f_ops->fo_close( Fp);
-      }
-    }
       Fp->f_iflags = NewState;    // Close this FD or reserve it
       Fp->RefCount = 0;           // No one using this FD
     }
@@ -671,58 +672,58 @@ open(
 
   Status = ParsePath(path, &NewPath, &Node, &Instance, &MPath);
   if(Status == RETURN_SUCCESS) {
-    if((Node == NULL)               ||
-       (Node->InstanceList == NULL))
+    if ((Node == NULL)               ||
+        (Node->InstanceList == NULL))
     {
       errno   = EPERM;
     }
     else {
-  // Could add a test to see if the file name begins with a period.
-  // If it does, then add the HIDDEN flag to Attributes.
+      // Could add a test to see if the file name begins with a period.
+      // If it does, then add the HIDDEN flag to Attributes.
 
-  // Get an available fd
+      // Get an available fd
       fd = FindFreeFD( VALID_CLOSED );
 
-  if( fd < 0 ) {
-    // All available FDs are in use
-    errno = EMFILE;
-  }
+      if( fd < 0 ) {
+        // All available FDs are in use
+        errno = EMFILE;
+      }
       else {
-      filp = &gMD->fdarray[fd];
-      // Save the flags and mode in the File Descriptor
-      filp->Oflags = oflags;
-      filp->Omode = mode;
+        filp = &gMD->fdarray[fd];
+        // Save the flags and mode in the File Descriptor
+        filp->Oflags = oflags;
+        filp->Omode = mode;
 
         doresult = Node->OpenFunc(Node, filp, Instance, NewPath, MPath);
-      if(doresult < 0) {
-        filp->f_iflags = 0;   // Release this FD
-        fd = -1;              // Indicate an error
-      }
-      else {
-        // Build our final f_iflags value
-        OpenMode  = ( mode & S_ACC_READ )  ? S_ACC_READ : 0;
-        OpenMode |= ( mode & S_ACC_WRITE ) ? S_ACC_WRITE : 0;
-
-        filp->f_iflags |= OpenMode;
-
-        if((oflags & O_TTY_INIT) && (filp->f_iflags & _S_ITTY) && (filp->devdata != NULL)) {
-          // Initialize the device's termios flags to a "sane" value
-          Termio = &((cIIO *)filp->devdata)->Termio;
-          Termio->c_iflag = ICRNL | IGNSPEC;
-          Termio->c_oflag = OPOST | ONLCR | OXTABS | ONOEOT | ONOCR | ONLRET | OCTRL;
-          Termio->c_lflag = ECHO | ECHOE | ECHONL | ICANON;
-          Termio->c_cc[VERASE]  = 0x08;   // ^H Backspace
-          Termio->c_cc[VKILL]   = 0x15;   // ^U
-          Termio->c_cc[VINTR]   = 0x03;   // ^C Interrupt character
+        if(doresult < 0) {
+          filp->f_iflags = 0;   // Release this FD
+          fd = -1;              // Indicate an error
         }
-        ++filp->RefCount;
-        FILE_SET_MATURE(filp);
-      }
+        else {
+          // Build our final f_iflags value
+          OpenMode  = ( mode & S_ACC_READ )  ? S_ACC_READ : 0;
+          OpenMode |= ( mode & S_ACC_WRITE ) ? S_ACC_WRITE : 0;
+
+          filp->f_iflags |= OpenMode;
+
+          if((oflags & O_TTY_INIT) && (filp->f_iflags & _S_ITTY) && (filp->devdata != NULL)) {
+            // Initialize the device's termios flags to a "sane" value
+            Termio = &((cIIO *)filp->devdata)->Termio;
+            Termio->c_iflag = ICRNL | IGNSPEC;
+            Termio->c_oflag = OPOST | ONLCR | OXTABS | ONOEOT | ONOCR | ONLRET | OCTRL;
+            Termio->c_lflag = ECHO | ECHOE | ECHONL | ICANON;
+            Termio->c_cc[VERASE]  = 0x08;   // ^H Backspace
+            Termio->c_cc[VKILL]   = 0x15;   // ^U
+            Termio->c_cc[VINTR]   = 0x03;   // ^C Interrupt character
           }
+          ++filp->RefCount;
+          FILE_SET_MATURE(filp);
+        }
+      }
     }
     free(NewPath);
-        }
-    free(MPath);    // We don't need this any more.
+  }
+  free(MPath);    // We don't need this any more.
 
   // return the fd of our now open file
   return fd;
@@ -1211,21 +1212,30 @@ read   (int fildes, void *buf, size_t nbyte)
 
     This function writes the specified number of bytes to the file at the current
     file position. The current file position is advanced the actual number of bytes
-    written, which is returned in BufferSize. Partial writes only occur when there
-    has been a data error during the write attempt (such as "volume space full").
-    The file is automatically grown to hold the data if required. Direct writes to
-    opened directories are not supported.
+    written. Partial writes only occur when there has been a data error during
+    the write attempt (such as "volume space full").  The file is automatically
+    grown to hold the data if required.
+
+    Direct writes to opened directories are not supported.
 
     If fildes refers to a terminal device, isatty() returns TRUE, a partial write
     will occur if a NULL or EOF character is encountered before n characters have
-    been written.  Characters inserted due to line-end translations will not be
-    counted.  Unconvertable characters are translated into the UEFI character
-    BLOCKELEMENT_LIGHT_SHADE.
+    been written.  Characters inserted due to line-end translations or TAB
+    expansion will not be counted.  Unconvertable characters are translated into
+    the UEFI character BLOCKELEMENT_LIGHT_SHADE.
 
     Since the UEFI console device works on wide characters, the buffer is assumed
-    to contain a single-byte character stream which is then translated to wide
-    characters using the mbtowc() functions.  The resulting wide character stream
-    is what is actually sent to the UEFI console.
+    to contain a byte-oriented multi-byte character stream which is then
+    translated to wide characters using the mbtowc() functions.  The resulting
+    wide character stream is what is actually sent to the UEFI console.
+
+    Although both text and binary wide-oriented streams are conceptually
+    sequences of wide characters, the external file associated with a
+    wide-oriented stream is a sequence of multibyte characters,
+    generalized as follows:
+      - Multibyte encodings within files may contain embedded null bytes
+        (unlike multibyte encodings valid for use internal to the program).
+      - A file need not begin nor end in the initial shift state.
 
     @param[in]  fd      Descriptor of file to be written to.
     @param[in]  buf     Pointer to data to write to the file.
@@ -1250,10 +1260,11 @@ write  (int fd, const void *buf, size_t nbyte)
       IIO = filp->devdata;
       if(isatty(fd) && (IIO != NULL)) {
         // Output to an Interactive I/O device
+        // (Terminal device or the slave side of a pseudo-tty)
         BufSize = IIO->Write(filp, buf, nbyte);
       }
       else {
-        // Output to a file, socket, pipe, etc.
+        // Output to a regular file, socket, pipe, etc.
         BufSize = filp->f_ops->fo_write(filp, &filp->f_offset, nbyte, buf);
       }
     }

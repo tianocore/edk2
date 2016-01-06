@@ -2,6 +2,7 @@
     Macros and declarations for terminal oriented ioctls and
     I/O discipline.
 
+    Copyright (c) 2016, Daryl McDaniel. All rights reserved.<BR>
     Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
@@ -288,7 +289,7 @@ int     cfsetospeed (struct termios *, speed_t);
                     * EBADF - The fd argument is not a valid file descriptor.
                     * ENOTTY - The file associated with fd is not an interactive IO device.
 **/
-int     tcgetattr   (int, struct termios *);
+int     tcgetattr   (int fd, struct termios *pTermios);
 
 /** Set the parameters associated with an interactive IO device.
 
@@ -314,7 +315,7 @@ int     tcgetattr   (int, struct termios *);
                     * EBADF - The fd argument is not a valid file descriptor.
                     * ENOTTY - The file associated with fd is not an interactive IO device.
 **/
-int     tcsetattr   (int, int, const struct termios *);
+int     tcsetattr   (int fd, int OptAct, const struct termios *pTermios);
 
 /** Transmit pending output.
 
@@ -328,7 +329,7 @@ int     tcsetattr   (int, int, const struct termios *);
                     * EINTR - A signal interrupted tcdrain().
                     * ENOTSUP - This function is not supported.
 **/
-int     tcdrain     (int);
+int     tcdrain     (int fd);
 
 /** Suspend or restart the transmission or reception of data.
 
@@ -353,7 +354,7 @@ int     tcdrain     (int);
                     * EINVAL - The Action argument is not a supported value.
                     * ENOTSUP - This function is not supported.
 **/
-int     tcflow      (int, int);
+int     tcflow      (int fd, int Action);
 
 /** Discard non-transmitted output data, non-read input data, or both.
 
@@ -375,7 +376,7 @@ int     tcflow      (int, int);
                     * EINVAL - The QueueSelector argument is not a supported value.
                     * ENOTSUP - This function is not supported.
 **/
-int     tcflush     (int, int);
+int     tcflush     (int fd, int QueueSelector);
 
 //int     tcsendbreak (int, int);
 //pid_t   tcgetsid    (int);

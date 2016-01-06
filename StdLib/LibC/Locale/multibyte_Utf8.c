@@ -1,4 +1,5 @@
 /** @file
+  Copyright (c) 2016, Daryl McDaniel. All rights reserved.<BR>
   Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +17,7 @@
 #include  <sys/types.h>
 #include  <limits.h>
 
-typedef      int      ch_UCS4;
+typedef int      ch_UCS4;
 
 static  mbstate_t     LocalConvState = {0};
 
@@ -79,7 +80,7 @@ ProcessOneByte(unsigned char ch, mbstate_t *ps)
     // We are in an invalid state
     ps->A = 0;    // Initial State
   }
-  ps->C[ps->A] = ch;  // Save the current character
+  ps->C[ps->A] = ch;  // Save the current byte
   Mask = utf8_code_length[ch];
 
   if(ps->A == 0) {    // Initial State.  First byte of sequence.
@@ -89,7 +90,7 @@ ProcessOneByte(unsigned char ch, mbstate_t *ps)
       case 0:                       // State 0, Code 0
         errno = EILSEQ;
         RetVal = -1;
-        ps->E = 1;        // Consume this character
+        ps->E = 1;        // Consume this byte
         break;
       case 1:                       // State 0, Code 1
         // ASCII-7 Character
@@ -116,7 +117,7 @@ ProcessOneByte(unsigned char ch, mbstate_t *ps)
             ps->A = 0;      // Next state is State-0
             RetVal = 2;
           }
-          else {    // This isn't the last character, get more.  State 1, Code 3 or 4
+          else {    // This isn't the last byte, get more.  State 1, Code 3 or 4
             ps->A = 2;
             RetVal = -2;
           }
@@ -158,12 +159,12 @@ ProcessOneByte(unsigned char ch, mbstate_t *ps)
             errno = EILSEQ;
             ps->A = 0;
             RetVal = -1;
-            ps->E = 4;      // Can't happen, but consume this character anyway
+            ps->E = 4;      // Can't happen, but consume this byte anyway
           }
           break;
       }
     }
-    else {                // Invalid surrogate character
+    else {                // Invalid surrogate byte
       errno = EILSEQ;
       ps->A = 0;          // Next is State-0
       RetVal = -1;
@@ -287,7 +288,8 @@ OneWcToMcLen(const wchar_t InCh)
 
     @param[in]    Src       Pointer to a wide character string.
     @param[in]    Limit     Maximum number of bytes the converted string may occupy.
-    @param[out]   NumChar   Pointer to where to store the number of wide characters, or NULL.
+    @param[out]   NumChar   Pointer to where to store the number of wide characters
+                            consumed, or NULL.
 
     @return     The number of bytes required to convert Src to MBCS,
                 not including the terminating NUL.  If NumChar is not NULL, the number
@@ -961,8 +963,8 @@ wcsrtombs(
     @return   If a wide character is encountered that does not correspond to a
               valid multibyte character, the wcstombs function returns
               (size_t)(-1). Otherwise, the wcstombs function returns the number
-              of bytes modified, not including a terminating null character,
-              if any.
+              of bytes in the resulting multibyte character sequence,
+              not including the terminating null character (if any).
 
     Declared in: stdlib.h
 **/
