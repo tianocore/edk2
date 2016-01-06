@@ -233,6 +233,8 @@ typedef enum _TYPE_OF_TERMINAL {
 
 #define STRING_DEPOSITORY_NUMBER        8
 
+#define NONE_BOOTNEXT_VALUE             (0xFFFF + 1)
+
 ///
 /// Serial Ports attributes, first one is the value for
 /// return from callback function, stringtoken is used to

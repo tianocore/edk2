@@ -1295,7 +1295,7 @@ InitializeBmmConfig (
   //
   // Initialize data which located in BMM main page
   //
-  CallbackData->BmmFakeNvData.BootNext = (UINT16) (BootOptionMenu.MenuNumber);
+  CallbackData->BmmFakeNvData.BootNext = NONE_BOOTNEXT_VALUE;
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
     NewLoadContext  = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;

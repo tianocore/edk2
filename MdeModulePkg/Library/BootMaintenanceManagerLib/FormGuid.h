@@ -103,7 +103,7 @@ typedef struct {
   // for Timeout, BootNext, Variables respectively
   //
   UINT16  BootTimeOut;
-  UINT16  BootNext;
+  UINT32  BootNext;
 
   //
   // This is the COM1 Attributes value storage

@@ -868,7 +868,7 @@ Var_UpdateBootNext (
     NewLoadContext->IsBootNext  = FALSE;
   }
 
-  if (CurrentFakeNVMap->BootNext == BootOptionMenu.MenuNumber) {
+  if (CurrentFakeNVMap->BootNext == NONE_BOOTNEXT_VALUE) {
     EfiLibDeleteVariable (L"BootNext", &gEfiGlobalVariableGuid);
     return EFI_SUCCESS;
   }

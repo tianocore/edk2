@@ -686,7 +686,7 @@ UpdateBootNextPage (
     OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
     ASSERT (OptionsOpCodeHandle != NULL);
 
-    CallbackData->BmmFakeNvData.BootNext = (UINT16) (BootOptionMenu.MenuNumber);
+    CallbackData->BmmFakeNvData.BootNext = NONE_BOOTNEXT_VALUE;
 
     for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
       NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
@@ -697,7 +697,7 @@ UpdateBootNextPage (
           OptionsOpCodeHandle,
           NewMenuEntry->DisplayStringToken,
           EFI_IFR_OPTION_DEFAULT,
-          EFI_IFR_TYPE_NUM_SIZE_16,
+          EFI_IFR_TYPE_NUM_SIZE_32,
           Index
           );
         CallbackData->BmmFakeNvData.BootNext = Index;
@@ -706,27 +706,27 @@ UpdateBootNextPage (
           OptionsOpCodeHandle,
           NewMenuEntry->DisplayStringToken,
           0,
-          EFI_IFR_TYPE_NUM_SIZE_16,
+          EFI_IFR_TYPE_NUM_SIZE_32,
           Index
           );
       }
     }
 
-    if (CallbackData->BmmFakeNvData.BootNext == Index) {
+    if (CallbackData->BmmFakeNvData.BootNext == NONE_BOOTNEXT_VALUE) {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
         STRING_TOKEN (STR_NONE),
         EFI_IFR_OPTION_DEFAULT,
-        EFI_IFR_TYPE_NUM_SIZE_16,
-        Index
+        EFI_IFR_TYPE_NUM_SIZE_32,
+        NONE_BOOTNEXT_VALUE
         );
     } else {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
         STRING_TOKEN (STR_NONE),
         0,
-        EFI_IFR_TYPE_NUM_SIZE_16,
-        Index
+        EFI_IFR_TYPE_NUM_SIZE_32,
+        NONE_BOOTNEXT_VALUE
         );
     }      
 
@@ -738,7 +738,7 @@ UpdateBootNextPage (
       STRING_TOKEN (STR_BOOT_NEXT),
       STRING_TOKEN (STR_BOOT_NEXT_HELP),
       0,
-      EFI_IFR_NUMERIC_SIZE_2,
+      EFI_IFR_NUMERIC_SIZE_4,
       OptionsOpCodeHandle,
       NULL
       );
