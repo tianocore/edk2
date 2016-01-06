@@ -343,7 +343,7 @@ AmlGetObjectName (
   ASSERT ((AmlByteEncoding->Attribute & AML_IN_NAMESPACE) != 0);
 
   //
-  // Find out Last Name index, accroding to OpCode table.
+  // Find out Last Name index, according to OpCode table.
   // The last name will be the node name by design.
   //
   TermIndex = AmlByteEncoding->MaxIndex;
