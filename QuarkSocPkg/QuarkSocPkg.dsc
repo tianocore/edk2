@@ -4,7 +4,7 @@
 # This DSC file is used for Package Level build.
 #
 # This Module provides FRAMEWORK reference implementation for INTEL Quark SoC.
-#   Copyright (c) 2013-2015 Intel Corporation.
+#   Copyright (c) 2013-2016 Intel Corporation.
 #
 #   This program and the accompanying materials
 #   are licensed and made available under the terms and conditions of the BSD License
@@ -27,7 +27,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/QuarkSocPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64
+  SUPPORTED_ARCHITECTURES        = IA32
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -245,8 +245,8 @@
   QuarkSocPkg/QuarkNorthCluster/Spi/PchSpiSmm.inf
   QuarkSocPkg/QuarkNorthCluster/S3Support/Dxe/QncS3Support.inf {
     <LibraryClasses>
-    DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-    PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
   QuarkSocPkg/QuarkNorthCluster/Smm/Dxe/SmmControlDxe/SmmControlDxe.inf
   QuarkSocPkg/QuarkNorthCluster/Smm/DxeSmm/QncSmmDispatcher/QNCSmmDispatcher.inf
