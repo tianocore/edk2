@@ -157,7 +157,11 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 //
 // SCSI Disk Timeout Experience Value
 //
-#define SCSI_DISK_TIMEOUT           EFI_TIMER_PERIOD_SECONDS (3)
+// As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, the timout
+// value is updated to 30s to follow ATA/ATAPI spec in which the device may take up to 30s
+// to respond command.
+//
+#define SCSI_DISK_TIMEOUT           EFI_TIMER_PERIOD_SECONDS (30)
 
 /**
   Test to see if this driver supports ControllerHandle.
