@@ -1,7 +1,7 @@
 /** @file
 Provides a secure platform-specific method to detect physically present user.
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013 - 2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -39,25 +39,8 @@ CheckResetButtonState (
   UINTN                   ReadLength;
   UINT8                   Buffer[2];
 
-  DEBUG ((EFI_D_ERROR, "CheckResetButtonState(): mPlatformType == %d\n", mPlatformType));
+  DEBUG ((EFI_D_INFO, "CheckResetButtonState(): mPlatformType == %d\n", mPlatformType));
   if (mPlatformType == GalileoGen2) {
-    //
-    //  Reset Button - EXP2.P1_7 should be configured as an input.
-    //
-    PlatformPcal9555GpioSetDir (
-      GALILEO_GEN2_IOEXP2_7BIT_SLAVE_ADDR,  // IO Expander 2.
-      15,                                   // P1-7.
-      FALSE
-      );
-
-    //
-    // Reset Button - EXP2.P1_7 pullup should be disabled.
-    //
-    PlatformPcal9555GpioDisablePull (
-      GALILEO_GEN2_IOEXP2_7BIT_SLAVE_ADDR,  // IO Expander 2.
-      15                                    // P1-7.
-      );
-
     //
     // Read state of Reset Button - EXP2.P1_7
     // This GPIO is pulled high when the button is not pressed
@@ -77,58 +60,14 @@ CheckResetButtonState (
     } else {
       I2CSlaveAddress.I2CDeviceAddress = GALILEO_IOEXP_J2LO_7BIT_SLAVE_ADDR;
     }
+    DEBUG ((EFI_D_INFO, "Galileo GPIO Expender Slave Address = %02x\n", I2CSlaveAddress.I2CDeviceAddress));
 
     //
-    // Select Port 5
-    //
-    Length = 2;
-    Buffer[0] = 0x18;
-    Buffer[1] = 0x05;
-    Status = I2cWriteMultipleByte (
-               I2CSlaveAddress,
-               EfiI2CSevenBitAddrMode,
-               &Length,
-               &Buffer
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Read "Pin Direction" of Port 5
-    //
-    Length = 1;
-    ReadLength = 1;
-    Buffer[1] = 0x1C;
-    Status = I2cReadMultipleByte (
-               I2CSlaveAddress,
-               EfiI2CSevenBitAddrMode,
-               &Length,
-               &ReadLength,
-               &Buffer[1]
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Set "Pin Direction" of Port 5, Bit 0 as input
-    //
-    Length = 2;
-    Buffer[0] = 0x1C;
-    Buffer[1] = Buffer[1] | BIT0;
-
-    Status = I2cWriteMultipleByte (
-               I2CSlaveAddress,
-               EfiI2CSevenBitAddrMode,
-               &Length,
-               &Buffer
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Read Port 5
+    // Read state of RESET_N_SHLD (GPORT5_BIT0)
     //
     Buffer[1] = 5;
     Length = 1;
     ReadLength = 1;
-
     Status = I2cReadMultipleByte (
                I2CSlaveAddress,
                EfiI2CSevenBitAddrMode,
@@ -139,7 +78,7 @@ CheckResetButtonState (
     ASSERT_EFI_ERROR (Status);
 
     //
-    // Return the state of Port 5, Bit 0
+    // Return the state of GPORT5_BIT0
     //
     return ((Buffer[1] & BIT0) != 0);
   }
