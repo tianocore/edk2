@@ -1949,7 +1949,7 @@ AtaPacketReadWrite (
     //
     Status = DRQReady2 (PciIo, IdeRegisters, Timeout);
     if (EFI_ERROR (Status)) {
-      return CheckStatusRegister (PciIo, IdeRegisters);
+      return Status;
     }
 
     //
