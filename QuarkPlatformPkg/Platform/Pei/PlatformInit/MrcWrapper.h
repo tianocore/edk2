@@ -1,7 +1,7 @@
 /** @file
 Framework PEIM to initialize memory on an DDR2 SDRAM Memory Controller.
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013 - 2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -22,11 +22,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Define the default memory areas required
 //
-#define EDKII_RESERVED_SIZE_PAGES         0x40
-#define ACPI_NVS_SIZE_PAGES               0x40
+#define EDKII_RESERVED_SIZE_PAGES         0x20
+#define ACPI_NVS_SIZE_PAGES               0x60
 #define RUNTIME_SERVICES_DATA_SIZE_PAGES  0x20
-#define RUNTIME_SERVICES_CODE_SIZE_PAGES  0x60
-#define ACPI_RECLAIM_SIZE_PAGES           0x10
+#define RUNTIME_SERVICES_CODE_SIZE_PAGES  0x80
+#define ACPI_RECLAIM_SIZE_PAGES           0x20
 #define EDKII_DXE_MEM_SIZE_PAGES          0x20
 
 #define AP_STARTUP_VECTOR                 0x00097000
