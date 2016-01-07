@@ -3,7 +3,7 @@ Common header file shared by all source files.
 
 This file includes package header files, library classes and protocol, PPI & GUID definitions.
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013 - 2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -78,6 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/QNCAccessLib.h>
 #include <Library/PlatformHelperLib.h>
 #include <Library/PlatformPcieHelperLib.h>
+#include <Library/I2cLib.h>
 
 #include <Register/Cpuid.h>
 
