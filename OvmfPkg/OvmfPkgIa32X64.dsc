@@ -387,6 +387,10 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
 !endif
 
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
+!endif
+
   # IRQs 5, 9, 10, 11 are level-triggered
   gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0E20
 
