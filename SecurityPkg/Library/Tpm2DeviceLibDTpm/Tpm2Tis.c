@@ -2,6 +2,7 @@
   TIS (TPM Interface Specification) functions used by dTPM2.0 library.
   
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -369,7 +370,7 @@ TisPcRequestUseTpm (
 
 **/
 EFI_STATUS
-TisTpmCommand (
+Tpm2TisTpmCommand (
   IN     TIS_PC_REGISTERS_PTR       TisReg,
   IN     UINT8                      *BufferIn,
   IN     UINT32                     SizeIn,
@@ -477,7 +478,7 @@ TisTpmCommand (
     }
   }
   DEBUG_CODE (
-    DEBUG ((EFI_D_INFO, "TisTpmCommand ReceiveHeader - "));
+    DEBUG ((EFI_D_INFO, "Tpm2TisTpmCommand ReceiveHeader - "));
     for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
       DEBUG ((EFI_D_INFO, "%02x ", BufferOut[Index]));
     }
@@ -552,7 +553,7 @@ DTpm2SubmitCommand (
   IN UINT8             *OutputParameterBlock
   )
 {
-  return TisTpmCommand (
+  return Tpm2TisTpmCommand (
            (TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
            InputParameterBlock,
            InputParameterBlockSize,
