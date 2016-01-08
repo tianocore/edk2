@@ -1,7 +1,7 @@
 /** @file
     Declaration of strctures and functions for SnpDxe driver.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -48,6 +48,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PCI_BAR_MEM_MASK      0x0000000F
 #define PCI_BAR_MEM_MODE      0x00000000
 #define PCI_BAR_MEM_64BIT     0x00000004
+
+#define SNP_TX_BUFFER_INCREASEMENT    MAX_XMIT_BUFFERS
+#define SNP_MAX_TX_BUFFER_NUM         65536
 
 typedef
 EFI_STATUS
@@ -130,6 +133,19 @@ typedef struct {
   // i.e. PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED
   //
   BOOLEAN                MediaStatusSupported;
+
+  //
+  // Array of the recycled transmit buffer address from UNDI.
+  //
+  UINT64                 *RecycledTxBuf;
+  //
+  // The maximum number of recycled buffer pointers in RecycledTxBuf.
+  //
+  UINT32                 MaxRecycledTxBuf;
+  //
+  // Current number of recycled buffer pointers in RecycledTxBuf.
+  //
+  UINT32                 RecycledTxBufCount;
 } SNP_DRIVER;
 
 #define EFI_SIMPLE_NETWORK_DEV_FROM_THIS(a) CR (a, SNP_DRIVER, Snp, SNP_DRIVER_SIGNATURE)

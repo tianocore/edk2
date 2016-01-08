@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -403,6 +403,14 @@ SimpleNetworkDriverStart (
 
   Snp->TxRxBufferSize     = 0;
   Snp->TxRxBuffer         = NULL;
+
+  Snp->RecycledTxBuf = AllocatePool (sizeof (UINT64) * SNP_TX_BUFFER_INCREASEMENT);
+  if (Snp->RecycledTxBuf == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error_DeleteSNP;
+  }
+  Snp->MaxRecycledTxBuf    = SNP_TX_BUFFER_INCREASEMENT;
+  Snp->RecycledTxBufCount  = 0;
  
   if (Nii->Revision >= EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION) {
     Snp->IfNum = Nii->IfNum;
@@ -678,6 +686,10 @@ SimpleNetworkDriverStart (
 
 Error_DeleteSNP:
 
+  if (Snp->RecycledTxBuf != NULL) {
+    FreePool (Snp->RecycledTxBuf);
+  }
+
   PciIo->FreeBuffer (
            PciIo,
            SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
@@ -789,6 +801,8 @@ SimpleNetworkDriverStop (
 
   PxeShutdown (Snp);
   PxeStop (Snp);
+
+  FreePool (Snp->RecycledTxBuf);
 
   PciIo = Snp->PciIo;
   PciIo->FreeBuffer (
