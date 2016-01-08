@@ -370,7 +370,7 @@ TisPcRequestUseTpm (
 
 **/
 EFI_STATUS
-TisTpmCommand (
+Tpm2TisTpmCommand (
   IN     TIS_PC_REGISTERS_PTR       TisReg,
   IN     UINT8                      *BufferIn,
   IN     UINT32                     SizeIn,
@@ -478,7 +478,7 @@ TisTpmCommand (
     }
   }
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "TisTpmCommand ReceiveHeader - "));
+    DEBUG ((EFI_D_VERBOSE, "Tpm2TisTpmCommand ReceiveHeader - "));
     for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
       DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
     }
@@ -553,7 +553,7 @@ DTpm2SubmitCommand (
   IN UINT8             *OutputParameterBlock
   )
 {
-  return TisTpmCommand (
+  return Tpm2TisTpmCommand (
            (TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
            InputParameterBlock,
            InputParameterBlockSize,
