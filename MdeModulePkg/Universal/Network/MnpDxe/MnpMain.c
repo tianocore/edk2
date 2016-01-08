@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol public services.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -552,7 +552,10 @@ MnpTransmit (
   //
   // Build the tx packet
   //
-  MnpBuildTxPacket (MnpServiceData, Token->Packet.TxData, &PktBuf, &PktLen);
+  Status = MnpBuildTxPacket (MnpServiceData, Token->Packet.TxData, &PktBuf, &PktLen);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
 
   //
   //  OK, send the packet synchronously.

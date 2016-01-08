@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol private services.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -209,6 +209,208 @@ MnpFreeNbuf (
   gBS->RestoreTPL (OldTpl);
 }
 
+/**
+  Add Count of TX buffers to MnpDeviceData->AllTxBufList and MnpDeviceData->FreeTxBufList.
+  The length of the buffer is specified by MnpDeviceData->BufferLength.
+
+  @param[in, out]  MnpDeviceData         Pointer to the MNP_DEVICE_DATA.
+  @param[in]       Count                 Number of TX buffers to add.
+
+  @retval EFI_SUCCESS           The specified amount of TX buffers are allocated.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate a TX buffer.
+
+**/
+EFI_STATUS
+MnpAddFreeTxBuf (
+  IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
+  IN     UINTN             Count
+  )
+{
+  EFI_STATUS        Status;
+  UINT32            Index;
+  MNP_TX_BUF_WRAP   *TxBufWrap;
+
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
+  ASSERT ((Count > 0) && (MnpDeviceData->BufferLength > 0));
+
+  Status = EFI_SUCCESS;
+  for (Index = 0; Index < Count; Index++) {
+    TxBufWrap = (MNP_TX_BUF_WRAP*) AllocatePool (sizeof (MNP_TX_BUF_WRAP) + MnpDeviceData->BufferLength - 1);
+    if (TxBufWrap == NULL) {
+      DEBUG ((EFI_D_ERROR, "MnpAddFreeTxBuf: TxBuf Alloc failed.\n"));
+
+      Status = EFI_OUT_OF_RESOURCES;
+      break;
+    }
+    DEBUG ((EFI_D_INFO, "MnpAddFreeTxBuf: Add TxBufWrap %p, TxBuf %p\n", TxBufWrap, TxBufWrap->TxBuf));
+    TxBufWrap->Signature = MNP_TX_BUF_WRAP_SIGNATURE;
+    TxBufWrap->InUse     = FALSE;
+    InsertTailList (&MnpDeviceData->FreeTxBufList, &TxBufWrap->WrapEntry);
+    InsertTailList (&MnpDeviceData->AllTxBufList, &TxBufWrap->AllEntry);
+  }
+
+  MnpDeviceData->TxBufCount += Index;
+  return Status;
+}
+
+/**
+  Allocate a free TX buffer from MnpDeviceData->FreeTxBufList. If there is none
+  in the queue, first try to recycle some from SNP, then try to allocate some and add 
+  them into the queue, then fetch the NET_BUF from the updated FreeTxBufList.
+
+  @param[in, out]  MnpDeviceData        Pointer to the MNP_DEVICE_DATA.
+
+  @return     Pointer to the allocated free NET_BUF structure, if NULL the
+              operation is failed.
+
+**/
+UINT8 *
+MnpAllocTxBuf (
+  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
+  )
+{
+  EFI_TPL           OldTpl;
+  UINT8             *TxBuf;
+  EFI_STATUS        Status;
+  LIST_ENTRY        *Entry;
+  MNP_TX_BUF_WRAP   *TxBufWrap;
+  
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
+
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+  if (IsListEmpty (&MnpDeviceData->FreeTxBufList)) {
+    //
+    // First try to recycle some TX buffer from SNP
+    //
+    Status = MnpRecycleTxBuf (MnpDeviceData);
+    if (EFI_ERROR (Status)) {
+      TxBuf = NULL;
+      goto ON_EXIT;
+    }
+
+    //
+    // If still no free TX buffer, allocate more.
+    //
+    if (IsListEmpty (&MnpDeviceData->FreeTxBufList)) {
+      if ((MnpDeviceData->TxBufCount + MNP_TX_BUFFER_INCREASEMENT) > MNP_MAX_TX_BUFFER_NUM) {
+        DEBUG (
+          (EFI_D_ERROR,
+          "MnpAllocTxBuf: The maximum TxBuf size is reached for MNP driver instance %p.\n",
+          MnpDeviceData)
+          );
+
+        TxBuf = NULL;
+        goto ON_EXIT;
+      }
+
+      Status = MnpAddFreeTxBuf (MnpDeviceData, MNP_TX_BUFFER_INCREASEMENT);
+      if (IsListEmpty (&MnpDeviceData->FreeTxBufList)) {
+        DEBUG (
+          (EFI_D_ERROR,
+          "MnpAllocNbuf: Failed to add TxBuf into the FreeTxBufList, %r.\n",
+          Status)
+          );
+
+        TxBuf = NULL;
+        goto ON_EXIT;
+      }
+    }
+  }
+
+  ASSERT (!IsListEmpty (&MnpDeviceData->FreeTxBufList));
+  Entry = MnpDeviceData->FreeTxBufList.ForwardLink;
+  RemoveEntryList (MnpDeviceData->FreeTxBufList.ForwardLink);
+  TxBufWrap = NET_LIST_USER_STRUCT_S (Entry, MNP_TX_BUF_WRAP, WrapEntry, MNP_TX_BUF_WRAP_SIGNATURE);
+  TxBufWrap->InUse = TRUE;
+  TxBuf = TxBufWrap->TxBuf;
+
+ON_EXIT:
+  gBS->RestoreTPL (OldTpl);
+
+  return TxBuf;
+}
+
+/**
+  Try to reclaim the TX buffer into the buffer pool.
+
+  @param[in, out]  MnpDeviceData         Pointer to the mnp device context data.
+  @param[in, out]  TxBuf                 Pointer to the TX buffer to free.
+
+**/
+VOID
+MnpFreeTxBuf (
+  IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
+  IN OUT UINT8             *TxBuf
+  )
+{
+  MNP_TX_BUF_WRAP   *TxBufWrap;
+  EFI_TPL           OldTpl;
+
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
+
+  if (TxBuf == NULL) {
+    return;
+  }
+
+  TxBufWrap = NET_LIST_USER_STRUCT (TxBuf, MNP_TX_BUF_WRAP, TxBuf);
+  if (TxBufWrap->Signature != MNP_TX_BUF_WRAP_SIGNATURE) {
+    DEBUG (
+      (EFI_D_ERROR,
+      "MnpFreeTxBuf: Signature check failed in MnpFreeTxBuf.\n")
+      );
+    return;
+  }
+
+  if (!TxBufWrap->InUse) {
+    DEBUG (
+      (EFI_D_WARN,
+      "MnpFreeTxBuf: Duplicated recycle report from SNP.\n")
+      );
+    return;
+  }
+  
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  InsertTailList (&MnpDeviceData->FreeTxBufList, &TxBufWrap->WrapEntry);
+  TxBufWrap->InUse = FALSE;
+  gBS->RestoreTPL (OldTpl);
+}
+
+/**
+  Try to recycle all the transmitted buffer address from SNP.
+
+  @param[in, out]  MnpDeviceData     Pointer to the mnp device context data.
+
+  @retval EFI_SUCCESS             Successed to recyclethe transmitted buffer address.
+  @retval Others                  Failed to recyclethe transmitted buffer address.
+
+**/
+EFI_STATUS
+MnpRecycleTxBuf (
+  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
+  )
+{
+  UINT8                         *TxBuf;
+  EFI_SIMPLE_NETWORK_PROTOCOL   *Snp;
+  EFI_STATUS                    Status;
+
+  Snp = MnpDeviceData->Snp;
+  ASSERT (Snp != NULL);
+
+  do {
+    TxBuf = NULL;
+    Status = Snp->GetStatus (Snp, NULL, (VOID **) &TxBuf);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (TxBuf != NULL) {
+      MnpFreeTxBuf (MnpDeviceData, TxBuf);
+    }
+  } while (TxBuf != NULL);
+
+  return EFI_SUCCESS;
+}
 
 /**
   Initialize the mnp device context data.
@@ -314,13 +516,9 @@ MnpInitializeDeviceData (
   //
   // Allocate buffer pool for tx.
   //
-  MnpDeviceData->TxBuf = AllocatePool (MnpDeviceData->BufferLength);
-  if (MnpDeviceData->TxBuf == NULL) {
-    DEBUG ((EFI_D_ERROR, "MnpInitializeDeviceData: AllocatePool failed.\n"));
-
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ERROR;
-  }
+  InitializeListHead (&MnpDeviceData->FreeTxBufList);
+  InitializeListHead (&MnpDeviceData->AllTxBufList);
+  MnpDeviceData->TxBufCount = 0;
 
   //
   // Create the system poll timer.
@@ -370,20 +568,6 @@ MnpInitializeDeviceData (
     goto ERROR;
   }
 
-  //
-  // Create the timer for tx timeout check.
-  //
-  Status = gBS->CreateEvent (
-                  EVT_TIMER,
-                  TPL_CALLBACK,
-                  NULL,
-                  NULL,
-                  &MnpDeviceData->TxTimeoutEvent
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MnpInitializeDeviceData: CreateEvent for tx timeout event failed.\n"));
-  }
-
 ERROR:
   if (EFI_ERROR (Status)) {
     //
@@ -403,10 +587,6 @@ ERROR:
 
     if (MnpDeviceData->PollTimer != NULL) {
       gBS->CloseEvent (MnpDeviceData->PollTimer);
-    }
-
-    if (MnpDeviceData->TxBuf != NULL) {
-      FreePool (MnpDeviceData->TxBuf);
     }
 
     if (MnpDeviceData->RxNbufCache != NULL) {
@@ -445,6 +625,10 @@ MnpDestroyDeviceData (
   IN     EFI_HANDLE        ImageHandle
   )
 {
+  LIST_ENTRY         *Entry;
+  LIST_ENTRY         *NextEntry;
+  MNP_TX_BUF_WRAP    *TxBufWrap;
+
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
   //
@@ -462,15 +646,21 @@ MnpDestroyDeviceData (
   //
   // Close the event.
   //
-  gBS->CloseEvent (MnpDeviceData->TxTimeoutEvent);
   gBS->CloseEvent (MnpDeviceData->TimeoutCheckTimer);
   gBS->CloseEvent (MnpDeviceData->MediaDetectTimer);
   gBS->CloseEvent (MnpDeviceData->PollTimer);
 
   //
-  // Free the tx buffer.
+  // Free the Tx buffer pool.
   //
-  FreePool (MnpDeviceData->TxBuf);
+  NET_LIST_FOR_EACH_SAFE(Entry, NextEntry, &MnpDeviceData->AllTxBufList) {
+    TxBufWrap = NET_LIST_USER_STRUCT (Entry, MNP_TX_BUF_WRAP, AllEntry);
+    RemoveEntryList (Entry);
+    FreePool (TxBufWrap);
+    MnpDeviceData->TxBufCount--;
+  }
+  ASSERT (IsListEmpty (&MnpDeviceData->AllTxBufList));
+  ASSERT (MnpDeviceData->TxBufCount == 0);
 
   //
   // Free the RxNbufCache.
@@ -957,7 +1147,7 @@ MnpStartSnp (
 /**
   Stop the simple network.
 
-  @param[in]  Snp               Pointer to the simple network protocol.
+  @param[in]  MnpDeviceData     Pointer to the MNP_DEVICE_DATA.
 
   @retval EFI_SUCCESS           The simple network is stopped.
   @retval Others                Other errors as indicated.
@@ -965,12 +1155,22 @@ MnpStartSnp (
 **/
 EFI_STATUS
 MnpStopSnp (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL     *Snp
+  IN  MNP_DEVICE_DATA   *MnpDeviceData
   )
 {
   EFI_STATUS  Status;
-
+  EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
+  
+  Snp = MnpDeviceData->Snp;
   ASSERT (Snp != NULL);
+
+  //
+  // Recycle all the transmit buffer from SNP.
+  //
+  Status = MnpRecycleTxBuf (MnpDeviceData);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Shut down the simple network.
@@ -1162,7 +1362,7 @@ MnpStop (
   //
   // Stop the simple network.
   //
-  Status = MnpStopSnp (MnpDeviceData->Snp);
+  Status = MnpStopSnp (MnpDeviceData);
   return Status;
 }
 

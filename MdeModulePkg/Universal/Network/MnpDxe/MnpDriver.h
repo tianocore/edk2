@@ -1,7 +1,7 @@
 /** @file
   Declaration of strctures and functions for MnpDxe driver.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -67,7 +67,9 @@ typedef struct {
   LIST_ENTRY                    GroupAddressList;
   UINT32                        GroupAddressCount;
 
-  EFI_EVENT                     TxTimeoutEvent;
+  LIST_ENTRY                    FreeTxBufList;
+  LIST_ENTRY                    AllTxBufList;
+  UINT32                        TxBufCount;
 
   NET_BUF_QUEUE                 FreeNbufQue;
   INTN                          NbufCnt;
@@ -90,7 +92,6 @@ typedef struct {
   UINT32                        BufferLength;
   UINT32                        PaddingSize;
   NET_BUF                       *RxNbufCache;
-  UINT8                         *TxBuf;
 } MNP_DEVICE_DATA;
 
 #define MNP_DEVICE_DATA_FROM_THIS(a) \
