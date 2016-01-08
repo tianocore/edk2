@@ -1,7 +1,7 @@
 /** @file
 File explorer related functions.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -1442,7 +1442,12 @@ FileExplorerLibConstructor (
                   &gFileExplorerPrivate.FeConfigAccess,
                   NULL
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Post our File Explorer VFR binary to the HII database.
@@ -1486,17 +1491,19 @@ FileExplorerLibDestructor (
 
   ASSERT (gHiiVendorDevicePath != NULL);
 
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-                  gFileExplorerPrivate.FeDriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  gHiiVendorDevicePath,
-                  &gEfiHiiConfigAccessProtocolGuid,
-                  &gFileExplorerPrivate.FeConfigAccess,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-  
-  HiiRemovePackages (gFileExplorerPrivate.FeHiiHandle);
+  if (gFileExplorerPrivate.FeDriverHandle != NULL) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+                    gFileExplorerPrivate.FeDriverHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    gHiiVendorDevicePath,
+                    &gEfiHiiConfigAccessProtocolGuid,
+                    &gFileExplorerPrivate.FeConfigAccess,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+    
+    HiiRemovePackages (gFileExplorerPrivate.FeHiiHandle);
+  }
 
   FreePool (gHiiVendorDevicePath);
 
