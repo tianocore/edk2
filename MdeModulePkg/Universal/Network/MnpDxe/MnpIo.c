@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol I/O functions.
 
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -102,7 +102,6 @@ MnpIsValidTxToken (
   return TRUE;
 }
 
-
 /**
   Build the packet to transmit from the TxData passed in.
 
@@ -113,8 +112,11 @@ MnpIsValidTxToken (
   @param[out]  PktLen              Pointer to a UINT32 variable used to record the packet's
                                    length.
 
+  @retval EFI_SUCCESS           TxPackage is built.
+  @retval EFI_OUT_OF_RESOURCES  The deliver fails due to lack of memory resource.
+
 **/
-VOID
+EFI_STATUS
 MnpBuildTxPacket (
   IN     MNP_SERVICE_DATA                    *MnpServiceData,
   IN     EFI_MANAGED_NETWORK_TRANSMIT_DATA   *TxData,
@@ -125,14 +127,24 @@ MnpBuildTxPacket (
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
   UINT8                   *DstPos;
   UINT16                  Index;
-  MNP_DEVICE_DATA         *MnpDerviceData;
-
-  MnpDerviceData = MnpServiceData->MnpDeviceData;
-
+  MNP_DEVICE_DATA         *MnpDeviceData;
+  UINT8                   *TxBuf;
+  
+  MnpDeviceData = MnpServiceData->MnpDeviceData;
+  
+  TxBuf = MnpAllocTxBuf (MnpDeviceData);
+  if (TxBuf == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
   //
-  // Reserve space for vlan tag.
+  // Reserve space for vlan tag if needed.
   //
-  *PktBuf = MnpDerviceData->TxBuf + NET_VLAN_TAG_LEN;
+  if (MnpServiceData->VlanId != 0) {
+    *PktBuf = TxBuf + NET_VLAN_TAG_LEN;
+  } else {
+    *PktBuf = TxBuf;
+  }
   
   if ((TxData->DestinationAddress == NULL) && (TxData->FragmentCount == 1)) {
     CopyMem (
@@ -148,7 +160,7 @@ MnpBuildTxPacket (
     // one fragment, copy the data into the packet buffer. Reserve the
     // media header space if necessary.
     //
-    SnpMode = MnpDerviceData->Snp->Mode; 
+    SnpMode = MnpDeviceData->Snp->Mode; 
     DstPos  = *PktBuf;
     *PktLen = 0;
     if (TxData->DestinationAddress != NULL) {
@@ -177,11 +189,17 @@ MnpBuildTxPacket (
     //
     *PktLen += TxData->DataLength + TxData->HeaderLength;
   }
+
+  return EFI_SUCCESS;
 }
 
 
 /**
-  Synchronously send out the packet.
+  Synchronously send out the packet. 
+
+  This functon places the packet buffer to SNP driver's tansmit queue. The packet
+  can be considered successfully sent out once SNP acccetp the packet, while the
+  packet buffer recycle is deferred for better performance.
 
   @param[in]       MnpServiceData      Pointer to the mnp service context data.
   @param[in]       Packet              Pointer to the pakcet buffer.
@@ -205,14 +223,13 @@ MnpSyncSendPacket (
   EFI_SIMPLE_NETWORK_PROTOCOL       *Snp;
   EFI_MANAGED_NETWORK_TRANSMIT_DATA *TxData;
   UINT32                            HeaderSize;
-  UINT8                             *TxBuf;
   MNP_DEVICE_DATA                   *MnpDeviceData;
   UINT16                            ProtocolType;
 
   MnpDeviceData = MnpServiceData->MnpDeviceData;
   Snp           = MnpDeviceData->Snp;
   TxData        = Token->Packet.TxData;
-
+  Token->Status = EFI_SUCCESS;
   HeaderSize    = Snp->Mode->MediaHeaderSize - TxData->HeaderLength;
 
   //
@@ -224,19 +241,7 @@ MnpSyncSendPacket (
     // Media not present, skip packet transmit and report EFI_NO_MEDIA
     //
     DEBUG ((EFI_D_WARN, "MnpSyncSendPacket: No network cable detected.\n"));
-    Status = EFI_NO_MEDIA;
-    goto SIGNAL_TOKEN;
-  }
-
-  //
-  // Start the timeout event.
-  //
-  Status = gBS->SetTimer (
-                  MnpDeviceData->TxTimeoutEvent,
-                  TimerRelative,
-                  MNP_TX_TIMEOUT_TIME
-                  );
-  if (EFI_ERROR (Status)) {
+    Token->Status = EFI_NO_MEDIA;
     goto SIGNAL_TOKEN;
   }
 
@@ -250,10 +255,25 @@ MnpSyncSendPacket (
     ProtocolType = TxData->ProtocolType;
   }
 
-  for (;;) {
-    //
-    // Transmit the packet through SNP.
-    //
+  //
+  // Transmit the packet through SNP.
+  //
+  Status = Snp->Transmit (
+                  Snp,
+                  HeaderSize,
+                  Length,
+                  Packet,
+                  TxData->SourceAddress,
+                  TxData->DestinationAddress,
+                  &ProtocolType
+                  );
+  if (Status == EFI_NOT_READY) {
+    Status = MnpRecycleTxBuf (MnpDeviceData);
+    if (EFI_ERROR (Status)) {
+      Token->Status = EFI_DEVICE_ERROR;
+      goto SIGNAL_TOKEN;
+    }
+
     Status = Snp->Transmit (
                     Snp,
                     HeaderSize,
@@ -262,52 +282,15 @@ MnpSyncSendPacket (
                     TxData->SourceAddress,
                     TxData->DestinationAddress,
                     &ProtocolType
-                    );
-    if ((Status != EFI_SUCCESS) && (Status != EFI_NOT_READY)) {
-      Status = EFI_DEVICE_ERROR;
-      break;
-    }
-
-    //
-    // If Status is EFI_SUCCESS, the packet is put in the transmit queue.
-    // if Status is EFI_NOT_READY, the transmit engine of the network interface is busy.
-    // Both need to sync SNP.
-    //
-    TxBuf = NULL;
-    do {
-      //
-      // Get the recycled transmit buffer status.
-      //
-      Snp->GetStatus (Snp, NULL, (VOID **) &TxBuf);
-
-      if (!EFI_ERROR (gBS->CheckEvent (MnpDeviceData->TxTimeoutEvent))) {
-        Status = EFI_TIMEOUT;
-        break;
-      }
-    } while (TxBuf == NULL);
-
-    if ((Status == EFI_SUCCESS) || (Status == EFI_TIMEOUT)) {
-      break;
-    } else {
-      //
-      // Status is EFI_NOT_READY. Restart the timer event and call Snp->Transmit again.
-      //
-      gBS->SetTimer (
-            MnpDeviceData->TxTimeoutEvent,
-            TimerRelative,
-            MNP_TX_TIMEOUT_TIME
-            );
-    }
+                    ); 
   }
-
-  //
-  // Cancel the timer event.
-  //
-  gBS->SetTimer (MnpDeviceData->TxTimeoutEvent, TimerCancel, 0);
+  
+  if (EFI_ERROR (Status)) {
+    Token->Status = EFI_DEVICE_ERROR;
+  }
 
 SIGNAL_TOKEN:
 
-  Token->Status = Status;
   gBS->SignalEvent (Token->Event);
 
   //

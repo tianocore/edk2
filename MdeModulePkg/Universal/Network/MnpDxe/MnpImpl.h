@@ -1,7 +1,7 @@
 /** @file
   Declaration of structures and functions of MnpDxe driver.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -27,6 +27,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MNP_INIT_NET_BUFFER_NUM       512
 #define MNP_NET_BUFFER_INCREASEMENT   64
 #define MNP_MAX_NET_BUFFER_NUM        65536
+#define MNP_TX_BUFFER_INCREASEMENT    64
+#define MNP_MAX_TX_BUFFER_NUM         65536
 
 #define MNP_MAX_RCVD_PACKET_QUE_SIZE  256
 
@@ -92,6 +94,15 @@ typedef struct {
   UINT64                            TimeoutTick;
 } MNP_RXDATA_WRAP;
 
+#define MNP_TX_BUF_WRAP_SIGNATURE   SIGNATURE_32 ('M', 'T', 'B', 'W')
+
+typedef struct {
+  UINT32                  Signature;
+  LIST_ENTRY              WrapEntry;  // Link to FreeTxBufList
+  LIST_ENTRY              AllEntry;   // Link to AllTxBufList
+  BOOLEAN                 InUse;
+  UINT8                   TxBuf[1];
+} MNP_TX_BUF_WRAP;
 
 /**
   Initialize the mnp device context data.
@@ -342,8 +353,11 @@ MnpIsValidTxToken (
   @param[out]  PktLen              Pointer to a UINT32 variable used to record the packet's
                                    length.
 
+  @retval EFI_SUCCESS           TxPackage is built.
+  @retval EFI_OUT_OF_RESOURCES  The deliver fails due to lack of memory resource.
+
 **/
-VOID
+EFI_STATUS
 MnpBuildTxPacket (
   IN     MNP_SERVICE_DATA                    *MnpServiceData,
   IN     EFI_MANAGED_NETWORK_TRANSMIT_DATA   *TxData,
@@ -352,7 +366,11 @@ MnpBuildTxPacket (
   );
 
 /**
-  Synchronously send out the packet.
+  Synchronously send out the packet. 
+
+  This functon places the packet buffer to SNP driver's tansmit queue. The packet
+  can be considered successfully sent out once SNP acccetp the packet, while the
+  packet buffer recycle is deferred for better performance.
 
   @param[in]       MnpServiceData      Pointer to the mnp service context data.
   @param[in]       Packet              Pointer to the pakcet buffer.
@@ -446,6 +464,36 @@ VOID
 MnpFreeNbuf (
   IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
   IN OUT NET_BUF           *Nbuf
+  );
+
+/**
+  Allocate a free TX buffer from MnpDeviceData->FreeTxBufList. If there is none
+  in the queue, first try to recycle some from SNP, then try to allocate some and add 
+  them into the queue, then fetch the NET_BUF from the updated FreeTxBufList.
+
+  @param[in, out]  MnpDeviceData        Pointer to the MNP_DEVICE_DATA.
+
+  @return     Pointer to the allocated free NET_BUF structure, if NULL the
+              operation is failed.
+
+**/
+UINT8 *
+MnpAllocTxBuf (
+  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
+  );
+
+/**
+  Try to recycle all the transmitted buffer address from SNP.
+
+  @param[in, out]  MnpDeviceData     Pointer to the mnp device context data.
+
+  @retval EFI_SUCCESS             Successed to recyclethe transmitted buffer address.
+  @retval Others                  Failed to recyclethe transmitted buffer address.
+
+**/
+EFI_STATUS
+MnpRecycleTxBuf (
+  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
   );
 
 /**
