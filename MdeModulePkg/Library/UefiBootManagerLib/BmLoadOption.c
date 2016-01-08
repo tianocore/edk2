@@ -1,7 +1,7 @@
 /** @file
   Load option library functions which relate with creating and processing load options.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -564,7 +564,6 @@ EfiBootManagerDeleteLoadOptionVariable (
 {
   UINT16                            *OptionOrder;
   UINTN                             OptionOrderSize;
-  EFI_STATUS                        Status;
   UINTN                             Index;
   CHAR16                            OptionName[BM_OPTION_NAME_LEN];
 
@@ -572,11 +571,10 @@ EfiBootManagerDeleteLoadOptionVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = EFI_NOT_FOUND;
-
   if (OptionType == LoadOptionTypeDriver || OptionType == LoadOptionTypeSysPrep || OptionType == LoadOptionTypeBoot) {
     //
-    // If the associated *Order exists, just remove the reference in *Order.
+    // If the associated *Order exists, firstly remove the reference in *Order for
+    //  Driver####, SysPrep#### and Boot####.
     //
     GetEfiGlobalVariable2 (mBmLoadOptionOrderName[OptionType], (VOID **) &OptionOrder, &OptionOrderSize);
     ASSERT ((OptionOrder != NULL && OptionOrderSize != 0) || (OptionOrder == NULL && OptionOrderSize == 0));
@@ -585,34 +583,32 @@ EfiBootManagerDeleteLoadOptionVariable (
       if (OptionOrder[Index] == OptionNumber) {
         OptionOrderSize -= sizeof (UINT16);
         CopyMem (&OptionOrder[Index], &OptionOrder[Index + 1], OptionOrderSize - Index * sizeof (UINT16));
-        Status = gRT->SetVariable (
-          mBmLoadOptionOrderName[OptionType],
-          &gEfiGlobalVariableGuid,
-          EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-          OptionOrderSize,
-          OptionOrder
-          );
+        gRT->SetVariable (
+               mBmLoadOptionOrderName[OptionType],
+               &gEfiGlobalVariableGuid,
+               EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+               OptionOrderSize,
+               OptionOrder
+               );
         break;
       }
     }
     if (OptionOrder != NULL) {
       FreePool (OptionOrder);
     }
-  } else if (OptionType == LoadOptionTypePlatformRecovery) {
-    //
-    // PlatformRecovery#### doesn't have assiciated PlatformRecoveryOrder, remove the PlatformRecovery#### itself.
-    //
-    UnicodeSPrint (OptionName, sizeof (OptionName), L"%s%04x", mBmLoadOptionName[OptionType], OptionNumber);
-    Status = gRT->SetVariable (
-                    OptionName,
-                    &gEfiGlobalVariableGuid,
-                    0,
-                    0,
-                    NULL
-                    );
   }
 
-  return Status;
+  //
+  // Remove the Driver####, SysPrep####, Boot#### or PlatformRecovery#### itself.
+  //
+  UnicodeSPrint (OptionName, sizeof (OptionName), L"%s%04x", mBmLoadOptionName[OptionType], OptionNumber);
+  return gRT->SetVariable (
+                OptionName,
+                &gEfiGlobalVariableGuid,
+                0,
+                0,
+                NULL
+                );
 }
 
 /**
