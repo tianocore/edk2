@@ -106,99 +106,6 @@ WideTtyCvt( CHAR16 *dest, const char *buf, ssize_t n, mbstate_t *Cs)
   return i;
 }
 
-/** Flush the console's IIO buffers.
-
-    Flush the IIO Input or Output buffers depending upon the mode
-    of the specified file.
-
-    If the console is open for output, write any unwritten data in the output
-    buffer to the console.
-
-    If the console is open for input or output, discard any remaining data
-    in the associated buffers.
-
-    @param[in]    filp    Pointer to the target file's descriptor structure.
-
-    @retval     0     Always succeeds
-**/
-static
-int
-EFIAPI
-da_ConFlush(
-  struct __filedes *filp
-)
-{
-  cIIO       *This;
-  char       *MbcsPtr;
-  ssize_t     NumProc;
-  void       *OutPtr;
-
-  This = filp->devdata;
-
-  if (filp->f_iflags & S_ACC_READ)  {     // Readable so flush the input buffer
-    This->InBuf->Flush(This->InBuf, UNICODE_STRING_MAX);
-  }
-  if (filp->f_iflags & S_ACC_WRITE)  {    // Writable so flush the output buffer
-    // At this point, the characters to write are in OutBuf
-    // First, linearize and consume the buffer
-    NumProc = OutBuf->Read(OutBuf, gMD->UString, UNICODE_STRING_MAX-1);
-    if (NumProc > 0) {  // Optimization -- Nothing to do if no characters
-      gMD->UString[NumProc] = 0;   // Ensure that the buffer is terminated
-
-      if(filp->f_iflags & _S_IWTTY) {
-        // Output device expects wide characters, Output what we have
-        OutPtr = gMD->UString;
-      }
-      else {
-        // Output device expects narrow characters, convert to MBCS
-        OutPtr = gMD->UString2;
-        // Translate the wide buffer, gMD->UString into MBCS
-        // in the buffer pointed to by OutPtr.
-        // The returned value, NumProc, is the resulting number of bytes.
-        NumProc = wcstombs((char *)OutPtr, (const wchar_t *)gMD->UString, NumProc);
-        ((char *)OutPtr)[NumProc] = 0;   // Ensure the buffer is terminated
-      }
-      // Do the actual write of the data
-      (void) filp->f_ops->fo_write(filp, NULL, NumProc, OutPtr);
-    }
-  }
-  return 0;
-}
-
-/** Close an open file.
-
-    @param[in]  filp    Pointer to the file descriptor structure for this file.
-
-    @retval   0     The file has been successfully closed.
-    @retval   -1    filp does not point to a valid console descriptor.
-**/
-static
-int
-EFIAPI
-da_ConClose(
-  IN      struct __filedes   *filp
-)
-{
-  ConInstance    *Stream;
-
-  Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
-  // Quick check to see if Stream looks reasonable
-  if(Stream->Cookie != CON_COOKIE) {    // Cookie == 'IoAb'
-    errno     = EINVAL;
-    EFIerrno = RETURN_INVALID_PARAMETER;
-    return -1;    // Looks like a bad File Descriptor pointer
-  }
-  // Stream and filp look OK, so continue.
-  // Flush the I/O buffers
-  (void) da_ConFlush(filp);
-
-  // Break the connection to IIO
-  filp->devdata = NULL;
-
-  gMD->StdIo[Stream->InstanceNum] = NULL;   // Mark the stream as closed
-  return 0;
-}
-
 /** Position the console cursor to the coordinates specified by Position.
 
     @param[in]  filp      Pointer to the file descriptor structure for this file.
@@ -621,6 +528,101 @@ da_ConOpen(
   }
   return RetVal;
 
+}
+
+/** Flush a console device's IIO buffers.
+
+    Flush the IIO Input or Output buffers associated with the specified file.
+
+    If the console is open for output, write any unwritten data in the associated
+    output buffer (stdout or stderr) to the console.
+
+    If the console is open for input, discard any remaining data
+    in the input buffer.
+
+    @param[in]    filp    Pointer to the target file's descriptor structure.
+
+    @retval     0     Always succeeds
+**/
+static
+int
+EFIAPI
+da_ConFlush(
+  struct __filedes *filp
+)
+{
+  cFIFO      *OutBuf;
+  ssize_t     NumProc;
+  int         Flags;
+
+
+    if(filp->MyFD == STDERR_FILENO) {
+      OutBuf = IIO->ErrBuf;
+    }
+    else {
+      OutBuf = IIO->OutBuf;
+    }
+
+    Flags = filp->Oflags & O_ACCMODE;   // Get the device's open mode
+    if (Flags != O_WRONLY)  {   // (Flags == O_RDONLY) || (Flags == O_RDWR)
+      // Readable so discard the contents of the input buffer
+      IIO->InBuf->Flush(IIO->InBuf, UNICODE_STRING_MAX);
+    }
+    if (Flags != O_RDONLY)  {   // (Flags == O_WRONLY) || (Flags == O_RDWR)
+      // Writable so flush the output buffer
+      // At this point, the characters to write are in OutBuf
+      // First, linearize and consume the buffer
+      NumProc = OutBuf->Read(OutBuf, gMD->UString, UNICODE_STRING_MAX-1);
+      if (NumProc > 0) {  // Optimization -- Nothing to do if no characters
+        gMD->UString[NumProc] = 0;   // Ensure that the buffer is terminated
+
+        /*  OutBuf always contains wide characters.
+            The UEFI Console (this device) always expects wide characters.
+            There is no need to handle devices that expect narrow characters
+            like the device-independent functions do.
+        */
+        // Do the actual write of the data to the console
+        (void) da_ConWrite(filp, NULL, NumProc, gMD->UString);
+        // Paranoia -- Make absolutely sure that OutBuf is empty in case fo_write
+        // wasn't able to consume everything.
+        OutBuf->Flush(OutBuf, UNICODE_STRING_MAX);
+      }
+    }
+  return 0;
+}
+
+/** Close an open file.
+
+    @param[in]  filp    Pointer to the file descriptor structure for this file.
+
+    @retval   0     The file has been successfully closed.
+    @retval   -1    filp does not point to a valid console descriptor.
+**/
+static
+int
+EFIAPI
+da_ConClose(
+  IN      struct __filedes   *filp
+)
+{
+  ConInstance    *Stream;
+
+  Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
+  // Quick check to see if Stream looks reasonable
+  if(Stream->Cookie != CON_COOKIE) {    // Cookie == 'IoAb'
+    errno     = EINVAL;
+    EFIerrno = RETURN_INVALID_PARAMETER;
+    return -1;    // Looks like a bad File Descriptor pointer
+  }
+  // Stream and filp look OK, so continue.
+  // Flush the I/O buffers
+  (void) da_ConFlush(filp);
+
+  // Break the connection to IIO
+  filp->devdata = NULL;
+
+  gMD->StdIo[Stream->InstanceNum] = NULL;   // Mark the stream as closed
+  return 0;
 }
 
 #include  <sys/poll.h>
