@@ -114,7 +114,7 @@ PCCTS_H=../h
 #
 #   UNIX
 #
-CC=cc
+CC?=cc
 COPT=-O
 ANTLR=${BIN_DIR}/antlr
 DLG=${BIN_DIR}/dlg
