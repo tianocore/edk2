@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 NVStorage related command.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -347,12 +347,13 @@ Tpm2NvDefineSpace (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2NvDefineSpace - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
@@ -365,24 +366,37 @@ Tpm2NvDefineSpace (
     break;
   case TPM_RC_SIZE + RC_NV_DefineSpace_publicInfo:
   case TPM_RC_SIZE + RC_NV_DefineSpace_auth:
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    break;
   case TPM_RC_ATTRIBUTES:
   case TPM_RC_ATTRIBUTES + RC_NV_DefineSpace_publicInfo:
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    break;
   case TPM_RC_ATTRIBUTES + RC_NV_DefineSpace_authHandle:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_NV_DEFINED:
-    return EFI_ALREADY_STARTED;
+    Status = EFI_ALREADY_STARTED;
+    break;
   case TPM_RC_VALUE + RC_NV_DefineSpace_publicInfo:
   case TPM_RC_VALUE + RC_NV_DefineSpace_authHandle:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_NV_SPACE:
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    break;
   default:
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    break;
   }
-  
-  return EFI_SUCCESS;
+
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }
 
 /**
@@ -441,12 +455,13 @@ Tpm2NvUndefineSpace (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2NvUndefineSpace - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
@@ -459,21 +474,33 @@ Tpm2NvUndefineSpace (
     break;
   case TPM_RC_ATTRIBUTES:
   case TPM_RC_ATTRIBUTES + RC_NV_UndefineSpace_nvIndex:
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    break;
   case TPM_RC_NV_AUTHORIZATION:
-    return EFI_SECURITY_VIOLATION;
+    Status = EFI_SECURITY_VIOLATION;
+    break;
   case TPM_RC_HANDLE + RC_NV_UndefineSpace_nvIndex: // TPM_RC_NV_DEFINED:
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    break;
   case TPM_RC_HANDLE + RC_NV_UndefineSpace_authHandle: // TPM_RC_NV_DEFINED:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_VALUE + RC_NV_UndefineSpace_authHandle:
   case TPM_RC_VALUE + RC_NV_UndefineSpace_nvIndex:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   default:
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    break;
   }
 
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }
 
 /**
@@ -543,12 +570,13 @@ Tpm2NvRead (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2NvRead - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
@@ -559,30 +587,45 @@ Tpm2NvRead (
     // return data
     break;
   case TPM_RC_NV_AUTHORIZATION:
-    return EFI_SECURITY_VIOLATION;
+    Status = EFI_SECURITY_VIOLATION;
+    break;
   case TPM_RC_NV_LOCKED:
-    return EFI_ACCESS_DENIED;
+    Status = EFI_ACCESS_DENIED;
+    break;
   case TPM_RC_NV_RANGE:
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    break;
   case TPM_RC_NV_UNINITIALIZED:
-    return EFI_NOT_READY;
+    Status = EFI_NOT_READY;
+    break;
   case TPM_RC_HANDLE + RC_NV_Read_nvIndex: // TPM_RC_NV_DEFINED:
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    break;
   case TPM_RC_HANDLE + RC_NV_Read_authHandle: // TPM_RC_NV_DEFINED:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_VALUE + RC_NV_Read_nvIndex:
   case TPM_RC_VALUE + RC_NV_Read_authHandle:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_BAD_AUTH + RC_NV_Read_authHandle + TPM_RC_S:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_AUTH_UNAVAILABLE:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_AUTH_FAIL + RC_NV_Read_authHandle + TPM_RC_S:
-    return EFI_INVALID_PARAMETER;
-  default:
-    return EFI_DEVICE_ERROR;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_ATTRIBUTES + RC_NV_Read_authHandle + TPM_RC_S:
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    break;
+  default:
+    Status = EFI_DEVICE_ERROR;
+    break;
+  }
+  if (Status != EFI_SUCCESS) {
+    goto Done;
   }
 
   //
@@ -591,7 +634,13 @@ Tpm2NvRead (
   OutData->size = SwapBytes16 (RecvBuffer.Data.size);
   CopyMem (OutData->buffer, &RecvBuffer.Data.buffer, OutData->size);
   
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }
 
 /**
@@ -661,12 +710,13 @@ Tpm2NvWrite (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2NvWrite - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
@@ -674,33 +724,54 @@ Tpm2NvWrite (
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
-    return EFI_SUCCESS;
+    // return data
+    break;
   case TPM_RC_ATTRIBUTES:
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    break;
   case TPM_RC_NV_AUTHORIZATION:
-    return EFI_SECURITY_VIOLATION;
+    Status = EFI_SECURITY_VIOLATION;
+    break;
   case TPM_RC_NV_LOCKED:
-    return EFI_ACCESS_DENIED;
+    Status = EFI_ACCESS_DENIED;
+    break;
   case TPM_RC_NV_RANGE:
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+    break;
   case TPM_RC_HANDLE + RC_NV_Write_nvIndex: // TPM_RC_NV_DEFINED:
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    break;
   case TPM_RC_HANDLE + RC_NV_Write_authHandle: // TPM_RC_NV_DEFINED:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_VALUE + RC_NV_Write_nvIndex:
   case TPM_RC_VALUE + RC_NV_Write_authHandle:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_BAD_AUTH + RC_NV_Write_authHandle + TPM_RC_S:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_AUTH_UNAVAILABLE:
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_AUTH_FAIL + RC_NV_Write_authHandle + TPM_RC_S:
-    return EFI_INVALID_PARAMETER;
-  default:
-    return EFI_DEVICE_ERROR;
+    Status = EFI_INVALID_PARAMETER;
+    break;
   case TPM_RC_ATTRIBUTES + RC_NV_Write_authHandle + TPM_RC_S:
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    break;
+  default:
+    Status = EFI_DEVICE_ERROR;
+    break;
   }
+
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }
 
 /**
@@ -759,12 +830,13 @@ Tpm2NvReadLock (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2NvReadLock - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
@@ -776,10 +848,17 @@ Tpm2NvReadLock (
     // return data
     break;
   default:
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    break;
   }
 
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }
 
 /**
@@ -838,12 +917,13 @@ Tpm2NvWriteLock (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2NvWriteLock - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
@@ -855,10 +935,17 @@ Tpm2NvWriteLock (
     // return data
     break;
   default:
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    break;
   }
 
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }
 
 /**
@@ -914,12 +1001,13 @@ Tpm2NvGlobalWriteLock (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2NvGlobalWriteLock - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
@@ -931,8 +1019,15 @@ Tpm2NvGlobalWriteLock (
     // return data
     break;
   default:
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    break;
   }
 
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }

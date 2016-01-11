@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 DictionaryAttack related command.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -104,19 +104,27 @@ Tpm2DictionaryAttackLockReset (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2DictionaryAttackLockReset - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
   if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "Tpm2DictionaryAttackLockReset - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }
 
 /**
@@ -187,17 +195,25 @@ Tpm2DictionaryAttackParameters (
   RecvBufferSize = sizeof (RecvBuffer);
   Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
     DEBUG ((EFI_D_ERROR, "Tpm2DictionaryAttackParameters - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
   if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "Tpm2DictionaryAttackParameters - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBufferSize, sizeof(SendBufferSize));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
 }

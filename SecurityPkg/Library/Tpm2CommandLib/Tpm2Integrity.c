@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Integrity related command.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -490,10 +490,14 @@ Tpm2PcrAllocate (
              &ResultBufSize,
              ResultBuf
              );
+  if (EFI_ERROR(Status)) {
+    goto Done;
+  }
 
   if (ResultBufSize > sizeof(Res)) {
     DEBUG ((EFI_D_ERROR, "Tpm2PcrAllocate: Failed ExecuteCommand: Buffer Too Small\r\n"));
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
+    goto Done;
   }
 
   //
@@ -502,7 +506,8 @@ Tpm2PcrAllocate (
   RespSize = SwapBytes32(Res.Header.paramSize);
   if (RespSize > sizeof(Res)) {
     DEBUG ((EFI_D_ERROR, "Tpm2PcrAllocate: Response size too large! %d\r\n", RespSize));
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
+    goto Done;
   }
 
   //
@@ -510,7 +515,8 @@ Tpm2PcrAllocate (
   //
   if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
     DEBUG((EFI_D_ERROR,"Tpm2PcrAllocate: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
   }
 
   //
@@ -521,5 +527,11 @@ Tpm2PcrAllocate (
   *SizeNeeded = SwapBytes32(Res.SizeNeeded);
   *SizeAvailable = SwapBytes32(Res.SizeAvailable);
 
-  return EFI_SUCCESS;
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&Cmd, sizeof(Cmd));
+  ZeroMem (&Res, sizeof(Res));
+  return Status;
 }
