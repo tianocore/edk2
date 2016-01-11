@@ -2,7 +2,7 @@
   16550 UART Serial Port library functions
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1006,9 +1006,6 @@ SerialPortSetAttributes (
         break;
     }
   } else {
-    if ((*Parity < NoParity) || (*Parity > SpaceParity)) {
-      return RETURN_INVALID_PARAMETER;
-    }
     switch (*Parity) {
       case NoParity:
         LcrParity = 0;
@@ -1031,7 +1028,7 @@ SerialPortSetAttributes (
         break;
 
       default:
-        break;
+        return RETURN_INVALID_PARAMETER;
     }
   }
 
@@ -1054,9 +1051,6 @@ SerialPortSetAttributes (
         break;
     }
   } else {
-    if ((*StopBits < OneStopBit) || (*StopBits > TwoStopBits)) {
-      return RETURN_INVALID_PARAMETER;
-    }
     switch (*StopBits) {
       case OneStopBit:
         LcrStop = 0;
@@ -1068,7 +1062,7 @@ SerialPortSetAttributes (
         break;
 
       default:
-        break;
+        return RETURN_INVALID_PARAMETER;
     }
   }
 
