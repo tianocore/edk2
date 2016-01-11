@@ -1,7 +1,7 @@
 /** @file
   Library functions which relates with booting.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -244,15 +244,15 @@ BmFindBootOptionInVariable (
 
   FV address may change across reboot. This routine promises the FV file device path is right.
 
-  @param  DevicePath   The Memory Mapped Device Path to get the file buffer.
+  @param  FilePath     The Memory Mapped Device Path to get the file buffer.
   @param  FullPath     Receive the updated FV Device Path pointint to the file.
   @param  FileSize     Receive the file buffer size.
 
   @return  The file buffer.
 **/
 VOID *
-BmGetFileBufferByMemmapFv (
-  IN EFI_DEVICE_PATH_PROTOCOL      *DevicePath,
+BmGetFileBufferByFvFilePath (
+  IN EFI_DEVICE_PATH_PROTOCOL      *FilePath,
   OUT EFI_DEVICE_PATH_PROTOCOL     **FullPath,
   OUT UINTN                        *FileSize
   )
@@ -267,18 +267,28 @@ BmGetFileBufferByMemmapFv (
   EFI_HANDLE                    *FvHandles;
   EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
   VOID                          *FileBuffer;
-  
-  FvFileNode = DevicePath;
+
+  //
+  // Get the file buffer by using the exactly FilePath.
+  //
+  FvFileNode = FilePath;
   Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &FvFileNode, &FvHandle);
   if (!EFI_ERROR (Status)) {
-    FileBuffer = GetFileBufferByFilePath (TRUE, DevicePath, FileSize, &AuthenticationStatus);
+    FileBuffer = GetFileBufferByFilePath (TRUE, FilePath, FileSize, &AuthenticationStatus);
     if (FileBuffer != NULL) {
-      *FullPath = DuplicateDevicePath (DevicePath);
+      *FullPath = DuplicateDevicePath (FilePath);
     }
     return FileBuffer;
   }
 
-  FvFileNode = NextDevicePathNode (DevicePath);
+  //
+  // Only wide match other FVs if it's a memory mapped FV file path.
+  //
+  if ((DevicePathType (FilePath) != HARDWARE_DEVICE_PATH) || (DevicePathSubType (FilePath) != HW_MEMMAP_DP)) {
+    return NULL;
+  }
+
+  FvFileNode = NextDevicePathNode (FilePath);
 
   //
   // Firstly find the FV file in current FV
@@ -289,7 +299,7 @@ BmGetFileBufferByMemmapFv (
          (VOID **) &LoadedImage
          );
   NewDevicePath = AppendDevicePathNode (DevicePathFromHandle (LoadedImage->DeviceHandle), FvFileNode);
-  FileBuffer = BmGetFileBufferByMemmapFv (NewDevicePath, FullPath, FileSize);
+  FileBuffer = BmGetFileBufferByFvFilePath (NewDevicePath, FullPath, FileSize);
   FreePool (NewDevicePath);
 
   if (FileBuffer != NULL) {
@@ -314,7 +324,7 @@ BmGetFileBufferByMemmapFv (
       continue;
     }
     NewDevicePath = AppendDevicePathNode (DevicePathFromHandle (FvHandles[Index]), FvFileNode);
-    FileBuffer = BmGetFileBufferByMemmapFv (NewDevicePath, FullPath, FileSize);
+    FileBuffer = BmGetFileBufferByFvFilePath (NewDevicePath, FullPath, FileSize);
     FreePool (NewDevicePath);
   }
   
@@ -325,29 +335,36 @@ BmGetFileBufferByMemmapFv (
 }
 
 /**
-  Check if it's a Memory Mapped FV Device Path.
+  Check if it's a Device Path pointing to FV file.
   
   The function doesn't garentee the device path points to existing FV file.
 
   @param  DevicePath     Input device path.
 
-  @retval TRUE   The device path is a Memory Mapped FV Device Path.
-  @retval FALSE  The device path is NOT a Memory Mapped FV Device Path.
+  @retval TRUE   The device path is a FV File Device Path.
+  @retval FALSE  The device path is NOT a FV File Device Path.
 **/
 BOOLEAN
-BmIsMemmapFvFilePath (
+BmIsFvFilePath (
   IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL   *FileNode;
+  EFI_STATUS                     Status;
+  EFI_HANDLE                     Handle;
+  EFI_DEVICE_PATH_PROTOCOL       *Node;
 
-  if ((DevicePathType (DevicePath) == HARDWARE_DEVICE_PATH) && (DevicePathSubType (DevicePath) == HW_MEMMAP_DP)) {
-    FileNode = NextDevicePathNode (DevicePath);
-    if ((DevicePathType (FileNode) == MEDIA_DEVICE_PATH) && (DevicePathSubType (FileNode) == MEDIA_PIWG_FW_FILE_DP)) {
-      return IsDevicePathEnd (NextDevicePathNode (FileNode));
-    }
+  Node = DevicePath;
+  Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &Node, &Handle);
+  if (!EFI_ERROR (Status)) {
+    return TRUE;
   }
 
+  if ((DevicePathType (DevicePath) == HARDWARE_DEVICE_PATH) && (DevicePathSubType (DevicePath) == HW_MEMMAP_DP)) {
+    DevicePath = NextDevicePathNode (DevicePath);
+    if ((DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) && (DevicePathSubType (DevicePath) == MEDIA_PIWG_FW_FILE_DP)) {
+      return IsDevicePathEnd (NextDevicePathNode (DevicePath));
+    }
+  }
   return FALSE;
 }
 
@@ -1598,10 +1615,10 @@ BmGetLoadOptionBuffer (
   }
 
   //
-  // Fix up the boot option path if it points to a FV in memory map style of device path
+  // Get file buffer from FV file path.
   //
-  if (BmIsMemmapFvFilePath (FilePath)) {
-    return BmGetFileBufferByMemmapFv (FilePath, FullPath, FileSize);
+  if (BmIsFvFilePath (FilePath)) {
+    return BmGetFileBufferByFvFilePath (FilePath, FullPath, FileSize);
   }
 
   //
