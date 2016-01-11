@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -480,10 +480,12 @@ GraphicsConsoleControllerDriverStart (
         //
         // if not supporting current mode, try 800x600 which is required by UEFI/EFI spec
         //
+        HorizontalResolution = 800;
+        VerticalResolution   = 600;
         Status = CheckModeSupported (
                      Private->GraphicsOutput,
-                     800,
-                     600,
+                     HorizontalResolution,
+                     VerticalResolution,
                      &ModeNumber
                      );
         Mode = Private->GraphicsOutput->Mode;
