@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Startup related command.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,6 +59,7 @@ Tpm2Startup (
   TPM2_STARTUP_COMMAND              Cmd;
   TPM2_STARTUP_RESPONSE             Res;
   UINT32                            ResultBufSize;
+  TPM_RC                            ResponseCode;
 
   Cmd.Header.tag         = SwapBytes16(TPM_ST_NO_SESSIONS);
   Cmd.Header.paramSize   = SwapBytes32(sizeof(Cmd));
@@ -67,8 +68,20 @@ Tpm2Startup (
 
   ResultBufSize = sizeof(Res);
   Status = Tpm2SubmitCommand (sizeof(Cmd), (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
 
-  return Status;
+  ResponseCode = SwapBytes32(Res.Header.responseCode);
+  switch (ResponseCode)  {
+  case TPM_RC_SUCCESS:
+  case TPM_RC_INITIALIZE:
+    // TPM_RC_INITIALIZE can be returned if Tpm2Startup is not required.
+    return EFI_SUCCESS;
+  default:
+    DEBUG ((EFI_D_ERROR, "Tpm2Startup: Response Code error! 0x%08x\r\n", ResponseCode));
+    return EFI_DEVICE_ERROR;
+  }
 }
 
 /**
@@ -97,6 +110,14 @@ Tpm2Shutdown (
 
   ResultBufSize = sizeof(Res);
   Status = Tpm2SubmitCommand (sizeof(Cmd), (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
 
-  return Status;
+  if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "Tpm2Shutdown: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
 }
