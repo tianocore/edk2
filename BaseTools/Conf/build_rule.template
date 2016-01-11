@@ -161,6 +161,19 @@
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
         "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
+[C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64]
+    <InputFile>
+        ?.c
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.GCC>
+        "$(CC)" $(CC_FLAGS) $(CC_XIPFLAGS) -o ${dst} $(INC) ${src}
+
 [C-Header-File]
     <InputFile>
         *.h, *.H
