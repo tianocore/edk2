@@ -109,18 +109,11 @@ typedef struct {
 //
 // 3.1.9 Offset 28h: ASQ - Admin Submission Queue Base Address
 //
-typedef struct {
-  UINT64 Rsvd1:12;
-  UINT64 Asqb:52;    // Admin Submission Queue Base Address
-} NVME_ASQ;
-
+#define NVME_ASQ      UINT64
 //
 // 3.1.10 Offset 30h: ACQ - Admin Completion Queue Base Address
 //
-typedef struct {
-  UINT64 Rsvd1:12;
-  UINT64 Acqb:52;    // Admin Completion Queue Base Address
-} NVME_ACQ;
+#define NVME_ACQ      UINT64
 
 //
 // 3.1.11 Offset (1000h + ((2y) * (4 << CAP.DSTRD))): SQyTDBL - Submission Queue y Tail Doorbell

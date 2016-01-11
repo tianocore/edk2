@@ -2,7 +2,7 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
-  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -328,7 +328,7 @@ WriteNvmeAdminSubmissionQueueBaseAddress (
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "Asq.Asqb: %lx\n", Asq->Asqb));
+  DEBUG ((EFI_D_INFO, "Asq: %lx\n", *Asq));
 
   return EFI_SUCCESS;
 }
@@ -408,7 +408,7 @@ WriteNvmeAdminCompletionQueueBaseAddress (
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "Acq.Acqb: %lxh\n", Acq->Acqb));
+  DEBUG ((EFI_D_INFO, "Acq: %lxh\n", *Acq));
 
   return EFI_SUCCESS;
 }
@@ -861,14 +861,12 @@ NvmeControllerInit (
   //
   // Address of admin submission queue.
   //
-  Asq.Rsvd1 = 0;
-  Asq.Asqb  = (UINT64)(UINTN)(Private->BufferPciAddr) >> 12;
+  Asq = (UINT64)(UINTN)(Private->BufferPciAddr) & ~0xFFF;
 
   //
   // Address of admin completion queue.
   //
-  Acq.Rsvd1 = 0;
-  Acq.Acqb  = (UINT64)(UINTN)(Private->BufferPciAddr + EFI_PAGE_SIZE) >> 12;
+  Acq = (UINT64)(UINTN)(Private->BufferPciAddr + EFI_PAGE_SIZE) & ~0xFFF;
 
   //
   // Address of I/O submission & completion queue.
