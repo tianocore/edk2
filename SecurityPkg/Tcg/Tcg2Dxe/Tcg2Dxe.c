@@ -56,9 +56,6 @@ typedef struct {
   EFI_GUID                               *VendorGuid;
 } VARIABLE_TYPE;
 
-#define  EFI_TCG_LOG_AREA_SIZE        0x10000
-#define  EFI_TCG_FINAL_LOG_AREA_SIZE  0x1000
-
 #define  TCG2_DEFAULT_MAX_COMMAND_SIZE        0x1000
 #define  TCG2_DEFAULT_MAX_RESPONSE_SIZE       0x1000
 
@@ -1470,19 +1467,19 @@ SetupEventLog (
       Status = gBS->AllocatePages (
                       AllocateMaxAddress,
                       EfiACPIMemoryNVS,
-                      EFI_SIZE_TO_PAGES (EFI_TCG_LOG_AREA_SIZE),
+                      EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
                       &Lasa
                       );
       if (EFI_ERROR (Status)) {
         return Status;
       }
       mTcgDxeData.EventLogAreaStruct[Index].Lasa = Lasa;
-      mTcgDxeData.EventLogAreaStruct[Index].Laml = EFI_TCG_LOG_AREA_SIZE;
+      mTcgDxeData.EventLogAreaStruct[Index].Laml = PcdGet32 (PcdTcgLogAreaMinLen);
       //
       // To initialize them as 0xFF is recommended 
       // because the OS can know the last entry for that.
       //
-      SetMem ((VOID *)(UINTN)Lasa, EFI_TCG_LOG_AREA_SIZE, 0xFF);
+      SetMem ((VOID *)(UINTN)Lasa, PcdGet32 (PcdTcgLogAreaMinLen), 0xFF);
       //
       // Create first entry for Log Header Entry Data
       //
@@ -1571,13 +1568,13 @@ SetupEventLog (
       Status = gBS->AllocatePages (
                       AllocateMaxAddress,
                       EfiACPIMemoryNVS,
-                      EFI_SIZE_TO_PAGES (EFI_TCG_FINAL_LOG_AREA_SIZE),
+                      EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcg2FinalLogAreaLen)),
                       &Lasa
                       );
       if (EFI_ERROR (Status)) {
         return Status;
       }
-      SetMem ((VOID *)(UINTN)Lasa, EFI_TCG_FINAL_LOG_AREA_SIZE, 0xFF);
+      SetMem ((VOID *)(UINTN)Lasa, PcdGet32 (PcdTcg2FinalLogAreaLen), 0xFF);
 
       //
       // Initialize
@@ -1588,7 +1585,7 @@ SetupEventLog (
 
       mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogFormat = mTcg2EventInfo[Index].LogFormat;
       mTcgDxeData.FinalEventLogAreaStruct[Index].Lasa = Lasa + sizeof(EFI_TCG2_FINAL_EVENTS_TABLE);
-      mTcgDxeData.FinalEventLogAreaStruct[Index].Laml = EFI_TCG_FINAL_LOG_AREA_SIZE - sizeof(EFI_TCG2_FINAL_EVENTS_TABLE);
+      mTcgDxeData.FinalEventLogAreaStruct[Index].Laml = PcdGet32 (PcdTcg2FinalLogAreaLen) - sizeof(EFI_TCG2_FINAL_EVENTS_TABLE);
       mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogSize = 0;
       mTcgDxeData.FinalEventLogAreaStruct[Index].LastEvent = (VOID *)(UINTN)mTcgDxeData.FinalEventLogAreaStruct[Index].Lasa;
       mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogStarted = FALSE;

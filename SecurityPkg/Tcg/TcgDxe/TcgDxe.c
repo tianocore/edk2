@@ -53,8 +53,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "TpmComm.h"
 
-#define  EFI_TCG_LOG_AREA_SIZE        0x10000
-
 #define TCG_DXE_DATA_FROM_THIS(this)  \
   BASE_CR (this, TCG_DXE_DATA, TcgProtocol)
 
@@ -653,7 +651,7 @@ SetupEventLog (
     Status = gBS->AllocatePages (
                     AllocateMaxAddress,
                     EfiACPIMemoryNVS,
-                    EFI_SIZE_TO_PAGES (EFI_TCG_LOG_AREA_SIZE),
+                    EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
                     &Lasa
                     );
     if (EFI_ERROR (Status)) {
@@ -664,8 +662,8 @@ SetupEventLog (
     // To initialize them as 0xFF is recommended 
     // because the OS can know the last entry for that.
     //
-    SetMem ((VOID *)(UINTN)mTcgClientAcpiTemplate.Lasa, EFI_TCG_LOG_AREA_SIZE, 0xFF);
-    mTcgClientAcpiTemplate.Laml = EFI_TCG_LOG_AREA_SIZE;
+    SetMem ((VOID *)(UINTN)mTcgClientAcpiTemplate.Lasa, PcdGet32 (PcdTcgLogAreaMinLen), 0xFF);
+    mTcgClientAcpiTemplate.Laml = PcdGet32 (PcdTcgLogAreaMinLen);
   
   } else {
     Lasa = mTcgServerAcpiTemplate.Lasa;
@@ -673,7 +671,7 @@ SetupEventLog (
     Status = gBS->AllocatePages (
                     AllocateMaxAddress,
                     EfiACPIMemoryNVS,
-                    EFI_SIZE_TO_PAGES (EFI_TCG_LOG_AREA_SIZE),
+                    EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
                     &Lasa
                     );
     if (EFI_ERROR (Status)) {
@@ -684,8 +682,8 @@ SetupEventLog (
     // To initialize them as 0xFF is recommended 
     // because the OS can know the last entry for that.
     //
-    SetMem ((VOID *)(UINTN)mTcgServerAcpiTemplate.Lasa, EFI_TCG_LOG_AREA_SIZE, 0xFF);
-    mTcgServerAcpiTemplate.Laml = EFI_TCG_LOG_AREA_SIZE;
+    SetMem ((VOID *)(UINTN)mTcgServerAcpiTemplate.Lasa, PcdGet32 (PcdTcgLogAreaMinLen), 0xFF);
+    mTcgServerAcpiTemplate.Laml = PcdGet32 (PcdTcgLogAreaMinLen);
   }
 
   GuidHob.Raw = GetHobList ();
