@@ -719,8 +719,8 @@ HttpBootGetBootFile (
   EFI_STATUS                 Status;
   CHAR8                      *HostName;
   EFI_HTTP_REQUEST_DATA      *RequestData;
-  HTTP_IO_RESOPNSE_DATA      *ResponseData;
-  HTTP_IO_RESOPNSE_DATA      ResponseBody;
+  HTTP_IO_RESPONSE_DATA      *ResponseData;
+  HTTP_IO_RESPONSE_DATA      ResponseBody;
   HTTP_IO                    *HttpIo;
   HTTP_IO_HEADER             *HttpIoHeader;
   VOID                       *Parser;
@@ -884,7 +884,7 @@ HttpBootGetBootFile (
   //
   // 3.1 First step, use zero BodyLength to only receive the response headers.
   //
-  ResponseData = AllocateZeroPool (sizeof(HTTP_IO_RESOPNSE_DATA));
+  ResponseData = AllocateZeroPool (sizeof(HTTP_IO_RESPONSE_DATA));
   if (ResponseData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ERROR_4;
@@ -948,7 +948,7 @@ HttpBootGetBootFile (
     // 3.4.2, start the message-body download, the identity and chunked transfer-coding
     // is handled in different path here.
     //
-    ZeroMem (&ResponseBody, sizeof (HTTP_IO_RESOPNSE_DATA));
+    ZeroMem (&ResponseBody, sizeof (HTTP_IO_RESPONSE_DATA));
     if (IdentityMode) {
       //
       // In identity transfer-coding there is no need to parse the message body,
