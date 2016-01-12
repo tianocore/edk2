@@ -5,7 +5,7 @@
 // It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 // and libraries instances, which are used for those features.
 //
-// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License which accompanies this distribution.
@@ -191,4 +191,13 @@
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2HashAlgorithmBitmap_HELP  #language en-US "This PCD indicated final BIOS supported Hash mask.\n"
                                                                                            "Bios may choose to register a subset of PcdTpm2HashMask.\n"
                                                                                            "So this PCD is final value of how many hash algo is extended to PCR."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgLogAreaMinLen_PROMPT  #language en-US "Minimum length(in bytes) of the system preboot TCG event log area(LAML)."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgLogAreaMinLen_HELP  #language en-US "This PCD defines minimum length(in bytes) of the system preboot TCG event log area(LAML).\n"
+                                                                                    "For PC Client Implementation spec up to and including 1.2 the minimum log size is 64KB."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2FinalLogAreaLen_PROMPT  #language en-US "Length(in bytes) of the TCG2 Final event log area."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2FinalLogAreaLen_HELP  #language en-US "This PCD defines length(in bytes) of the TCG2 Final event log area."
 
