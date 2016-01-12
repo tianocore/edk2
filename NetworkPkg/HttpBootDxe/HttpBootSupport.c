@@ -914,7 +914,7 @@ HttpIoSendRequest (
                                 FALSE to continue receive the previous response message.
   @param[out]  ResponseData     Point to a wrapper of the received response data.
   
-  @retval EFI_SUCCESS            The HTTP resopnse is received.
+  @retval EFI_SUCCESS            The HTTP response is received.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
   @retval EFI_DEVICE_ERROR       An unexpected network or system error occurred.
@@ -925,7 +925,7 @@ EFI_STATUS
 HttpIoRecvResponse (
   IN      HTTP_IO                  *HttpIo,
   IN      BOOLEAN                  RecvMsgHeader,
-     OUT  HTTP_IO_RESOPNSE_DATA    *ResponseData
+     OUT  HTTP_IO_RESPONSE_DATA    *ResponseData
   )
 {
   EFI_STATUS                 Status;

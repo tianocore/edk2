@@ -41,7 +41,7 @@ typedef struct {
 typedef struct {
   LIST_ENTRY                 Link;            // Link to the CacheList in driver's private data.
   EFI_HTTP_REQUEST_DATA      *RequestData;
-  HTTP_IO_RESOPNSE_DATA      *ResponseData;   // Not include any message-body data.
+  HTTP_IO_RESPONSE_DATA      *ResponseData;   // Not include any message-body data.
   UINTN                      EntityLength;
   LIST_ENTRY                 EntityDataList;  // Entity data (message-body)
 } HTTP_BOOT_CACHE_CONTENT;
