@@ -1,7 +1,7 @@
 /** @file
 DnsDxe support functions implementation.
    
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -175,19 +175,6 @@ typedef struct {
   UINT32      Ttl;
   UINT16      DataLength;
 } DNS_ANSWER_SECTION;
-
-#define DNS_TYPE_A      1
-#define DNS_TYPE_NS     2
-#define DNS_TYPE_CNAME  5
-#define DNS_TYPE_PTR    12
-#define DNS_TYPE_HINFO  13
-#define DNS_TYPE_MX     15
-#define DNS_TYPE_AAAA   28
-#define DNS_TYPE_SRV_RR 33
-#define DNS_TYPE_AXFR   252
-#define DNS_TYPE_ANY    255
-
-#define DNS_CLASS_INET  1
 
 #define DNS4_DOMAIN  L"in-addr.arpa"
 #define DNS6_DOMAIN  L"IP6.ARPA"
