@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+// (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -50,7 +50,7 @@
 #string STR_DRIVER_CN             #language en-US "ComponentName"
 #string STR_DRIVER_CN2            #language en-US "ComponentName2"
 #string STR_PLAT_DRV_CFG          #language en-US "PlatformtoDriverConfiguration"
-#string STR_DRIVER_VERSION        #language en-US "DriverVersion"
+#string STR_DRIVER_VERSION        #language en-US "SupportedEfiSpecVersion"
 
 // Console
 #string STR_TXT_IN                #language en-US "SimpleTextIn"
