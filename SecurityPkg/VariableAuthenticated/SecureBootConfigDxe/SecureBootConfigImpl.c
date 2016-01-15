@@ -3463,7 +3463,7 @@ SecureBootCallback (
       mIsEnterSecureBootForm = TRUE;
     } else if (QuestionId == KEY_TRANS_SECURE_BOOT_MODE){
       //
-      // Secure Boot Policy variable changes after tranistion. Re-sync CurSecureBootMode
+      // Secure Boot Policy variable changes after transition. Re-sync CurSecureBootMode
       //
       ExtractSecureBootModeFromVariable(&IfrNvData->CurSecureBootMode);
       mIsSelectedSecureBootModeForm = TRUE;
@@ -3752,7 +3752,7 @@ SecureBootCallback (
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
-          L"Secure boot mode tranistion requires PK change",
+          L"Secure boot mode transition requires PK change",
           L"Please go to link below to update PK",
           NULL
           );
@@ -3763,7 +3763,7 @@ SecureBootCallback (
 
       Status = SecureBootModeTransition(IfrNvData->CurSecureBootMode, Value->u8);
       //
-      // Secure Boot Policy variable may change after tranistion. Re-sync CurSecureBootMode
+      // Secure Boot Policy variable may change after transition. Re-sync CurSecureBootMode
       //
       ExtractSecureBootModeFromVariable(&CurSecureBootMode);
       if (IfrNvData->CurSecureBootMode != CurSecureBootMode) {
