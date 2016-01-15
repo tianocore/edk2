@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of SecureBoot configuration module.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -3061,6 +3061,58 @@ ExtractSecureBootModeFromVariable(
 }
 
 /**
+
+  Update SecureBoot strings based on new Secure Boot Mode State. String includes STR_SECURE_BOOT_STATE_CONTENT
+ and STR_CUR_SECURE_BOOT_MODE_CONTENT.
+
+  @param[in]    PrivateData         Module's private data.
+
+  @return EFI_SUCCESS              Update secure boot strings successfully.
+  @return other                          Fail to update secure boot strings.
+
+**/
+EFI_STATUS
+UpdateSecureBootString(
+  IN SECUREBOOT_CONFIG_PRIVATE_DATA  *Private
+  ) {
+  EFI_STATUS  Status;
+  UINT8       CurSecureBootMode;
+  UINT8       *SecureBoot;
+
+  //
+  // Get current secure boot state.
+  //
+  Status = GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SecureBoot, NULL);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  if (*SecureBoot == SECURE_BOOT_MODE_ENABLE) {
+    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Enabled", NULL);
+  } else {
+    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Disabled", NULL);
+  }
+  //
+  // Get current secure boot mode.
+  //
+  ExtractSecureBootModeFromVariable(&CurSecureBootMode);
+  
+  if (CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE) {
+    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"UserMode", NULL);
+  } else if (CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE) {
+    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"SetupMode", NULL);
+  } else if (CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE) {
+    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"AuditMode", NULL);
+  } else if (CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE) {
+    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"DeployedMode", NULL);
+  }
+
+  FreePool(SecureBoot);
+
+  return EFI_SUCCESS;
+}
+
+/**
   This function extracts configuration from variable.
 
   @param[in, out]  ConfigData   Point to SecureBoot configuration private data.
@@ -3191,7 +3243,6 @@ SecureBootExtractConfig (
   EFI_STRING                        ConfigRequestHdr;
   SECUREBOOT_CONFIG_PRIVATE_DATA    *PrivateData;
   BOOLEAN                           AllocatedRequest;
-  UINT8                             *SecureBoot;
 
   if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3201,7 +3252,6 @@ SecureBootExtractConfig (
   ConfigRequestHdr = NULL;
   ConfigRequest    = NULL;
   Size             = 0;
-  SecureBoot       = NULL;
 
   ZeroMem (&Configuration, sizeof (Configuration));
   PrivateData      = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
@@ -3215,31 +3265,6 @@ SecureBootExtractConfig (
   // Get Configuration from Variable.
   //
   SecureBootExtractConfigFromVariable (&Configuration);
-
-  //
-  // Get current secure boot state.
-  //
-  GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SecureBoot, NULL);
-
-  if (SecureBoot != NULL && *SecureBoot == SECURE_BOOT_MODE_ENABLE) {
-    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Enabled", NULL);
-  } else {
-    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Disabled", NULL);
-  }
-
-  //
-  // Get current secure boot mode
-  //
-  DEBUG((EFI_D_INFO, "Configuration.CurSecureBootMode %d\n", Configuration.CurSecureBootMode));
-  if (Configuration.CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE) {
-    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"UserMode", NULL);
-  } else if (Configuration.CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE) {
-    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"SetupMode", NULL);
-  } else if (Configuration.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE) {
-    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"AuditMode", NULL);
-  } else if (Configuration.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE) {
-    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"DeployedMode", NULL);
-  }
 
   BufferSize = sizeof (SECUREBOOT_CONFIGURATION);
   ConfigRequest = Request;
@@ -3283,10 +3308,6 @@ SecureBootExtractConfig (
     *Progress = NULL;
   } else if (StrStr (Request, L"OFFSET") == NULL) {
     *Progress = Request + StrLen (Request);
-  }
-
-  if (SecureBoot != NULL) {
-    FreePool (SecureBoot);
   }
 
   return Status;
@@ -3435,6 +3456,10 @@ SecureBootCallback (
 
   if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
     if (QuestionId == KEY_SECURE_BOOT_MODE) {
+      //
+      // Update secure boot strings when opening this form
+      //
+      Status = UpdateSecureBootString(Private);
       mIsEnterSecureBootForm = TRUE;
     } else if (QuestionId == KEY_TRANS_SECURE_BOOT_MODE){
       //
@@ -3744,16 +3769,6 @@ SecureBootCallback (
       if (IfrNvData->CurSecureBootMode != CurSecureBootMode) {
         IfrNvData->CurSecureBootMode = CurSecureBootMode;
         mIsSecureBootModeChanged = TRUE;
-
-        if (IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE) {
-          HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"UserMode", NULL);
-        } else if (IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE) {
-          HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"SetupMode", NULL);
-        } else if (IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE) {
-          HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"AuditMode", NULL);
-        } else if (IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE) {
-          HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"DeployedMode", NULL);
-        }
       }
       break;
 
