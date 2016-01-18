@@ -2412,11 +2412,9 @@ DriverEntry (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Tpm2GetCapabilityPcrs fail!\n"));
     TpmHashAlgorithmBitmap = EFI_TCG2_BOOT_HASH_ALG_SHA1;
-    NumberOfPCRBanks = 1;
     ActivePCRBanks = EFI_TCG2_BOOT_HASH_ALG_SHA1;
   } else {
     DEBUG ((EFI_D_INFO, "Tpm2GetCapabilityPcrs Count - %08x\n", Pcrs.count));
-    NumberOfPCRBanks = 0;
     TpmHashAlgorithmBitmap = 0;
     ActivePCRBanks = 0;
     for (Index = 0; Index < Pcrs.count; Index++) {
@@ -2424,35 +2422,30 @@ DriverEntry (
       switch (Pcrs.pcrSelections[Index].hash) {
       case TPM_ALG_SHA1:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
-        NumberOfPCRBanks ++;
         if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
         }        
         break;
       case TPM_ALG_SHA256:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
-        NumberOfPCRBanks ++;
         if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
         }
         break;
       case TPM_ALG_SHA384:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
-        NumberOfPCRBanks ++;
         if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
         }
         break;
       case TPM_ALG_SHA512:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
-        NumberOfPCRBanks ++;
         if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
         }
         break;
       case TPM_ALG_SM3_256:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
-        NumberOfPCRBanks ++;
         if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
         }
@@ -2462,6 +2455,16 @@ DriverEntry (
   }
   mTcgDxeData.BsCap.HashAlgorithmBitmap = TpmHashAlgorithmBitmap & PcdGet32 (PcdTcg2HashAlgorithmBitmap);
   mTcgDxeData.BsCap.ActivePcrBanks = ActivePCRBanks & PcdGet32 (PcdTcg2HashAlgorithmBitmap);
+
+  //
+  // Need calculate NumberOfPCRBanks here, because HashAlgorithmBitmap might be removed by PCD.
+  //
+  NumberOfPCRBanks = 0;
+  for (Index = 0; Index < 32; Index++) {
+    if ((mTcgDxeData.BsCap.HashAlgorithmBitmap & (1u << Index)) != 0) {
+      NumberOfPCRBanks++;
+    }
+  }
 
   if (PcdGet32 (PcdTcg2NumberOfPCRBanks) == 0) {
     mTcgDxeData.BsCap.NumberOfPCRBanks = NumberOfPCRBanks;
