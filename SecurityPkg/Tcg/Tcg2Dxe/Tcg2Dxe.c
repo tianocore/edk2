@@ -2474,11 +2474,11 @@ DriverEntry (
   }
 
   mTcgDxeData.BsCap.SupportedEventLogs = EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2 | EFI_TCG2_EVENT_LOG_FORMAT_TCG_2;
-  if ((mTcgDxeData.BsCap.ActivePcrBanks & TREE_BOOT_HASH_ALG_SHA1) == 0) {
+  if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) == 0) {
     //
     // No need to expose TCG1.2 event log if SHA1 bank does not exist.
     //
-    mTcgDxeData.BsCap.SupportedEventLogs &= ~TREE_EVENT_LOG_FORMAT_TCG_1_2;
+    mTcgDxeData.BsCap.SupportedEventLogs &= ~EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2;
   }
 
   DEBUG ((EFI_D_INFO, "Tcg2.SupportedEventLogs - 0x%08x\n", mTcgDxeData.BsCap.SupportedEventLogs));
