@@ -817,11 +817,10 @@ TcgDxeLogEvent (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!mTcgDxeData.GetEventLogCalled[Index]) {
-    EventLogAreaStruct = &mTcgDxeData.EventLogAreaStruct[Index];
-  } else {
-    EventLogAreaStruct = &mTcgDxeData.FinalEventLogAreaStruct[Index];
-  }
+  //
+  // Record to normal event log
+  //
+  EventLogAreaStruct = &mTcgDxeData.EventLogAreaStruct[Index];
 
   if (EventLogAreaStruct->EventLogTruncated) {
     return EFI_VOLUME_FULL;
@@ -838,15 +837,50 @@ TcgDxeLogEvent (
              NewEventSize
              );
   
-  if (Status == EFI_DEVICE_ERROR) {
-    return EFI_DEVICE_ERROR;
-  } else if (Status == EFI_OUT_OF_RESOURCES) {
+  if (Status == EFI_OUT_OF_RESOURCES) {
     EventLogAreaStruct->EventLogTruncated = TRUE;
     return EFI_VOLUME_FULL;
   } else if (Status == EFI_SUCCESS) {
     EventLogAreaStruct->EventLogStarted = TRUE;
-    if (mTcgDxeData.GetEventLogCalled[Index]) {
+  }
+
+  //
+  // If GetEventLog is called, record to FinalEventsTable, too.
+  //
+  if (mTcgDxeData.GetEventLogCalled[Index]) {
+    if (mTcgDxeData.FinalEventsTable[Index] == NULL) {
+      //
+      // no need for FinalEventsTable
+      //
+      return EFI_SUCCESS;
+    }
+    EventLogAreaStruct = &mTcgDxeData.FinalEventLogAreaStruct[Index];
+
+    if (EventLogAreaStruct->EventLogTruncated) {
+      return EFI_VOLUME_FULL;
+    }
+
+    EventLogAreaStruct->LastEvent = (UINT8*)(UINTN)EventLogAreaStruct->Lasa;
+    Status = TcgCommLogEvent (
+               &EventLogAreaStruct->LastEvent,
+               &EventLogAreaStruct->EventLogSize,
+               (UINTN)EventLogAreaStruct->Laml,
+               NewEventHdr,
+               NewEventHdrSize,
+               NewEventData,
+               NewEventSize
+               );
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      EventLogAreaStruct->EventLogTruncated = TRUE;
+      return EFI_VOLUME_FULL;
+    } else if (Status == EFI_SUCCESS) {
+      EventLogAreaStruct->EventLogStarted = TRUE;
+      //
+      // Increase the NumberOfEvents in FinalEventsTable
+      //
       (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents ++;
+      DEBUG ((EFI_D_INFO, "FinalEventsTable->NumberOfEvents - 0x%x\n", (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents));
+      DEBUG ((EFI_D_INFO, "  Size - 0x%x\n", (UINTN)EventLogAreaStruct->LastEvent - (UINTN)mTcgDxeData.FinalEventsTable[Index]));
     }
   }
 
@@ -1466,7 +1500,7 @@ SetupEventLog (
       Lasa = (EFI_PHYSICAL_ADDRESS) (SIZE_4GB - 1);
       Status = gBS->AllocatePages (
                       AllocateMaxAddress,
-                      EfiACPIMemoryNVS,
+                      EfiBootServicesData,
                       EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
                       &Lasa
                       );
@@ -1564,41 +1598,53 @@ SetupEventLog (
   //
   for (Index = 0; Index < sizeof(mTcg2EventInfo)/sizeof(mTcg2EventInfo[0]); Index++) {
     if ((mTcgDxeData.BsCap.SupportedEventLogs & mTcg2EventInfo[Index].LogFormat) != 0) {
-      Lasa = (EFI_PHYSICAL_ADDRESS) (SIZE_4GB - 1);
-      Status = gBS->AllocatePages (
-                      AllocateMaxAddress,
-                      EfiACPIMemoryNVS,
-                      EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcg2FinalLogAreaLen)),
-                      &Lasa
-                      );
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-      SetMem ((VOID *)(UINTN)Lasa, PcdGet32 (PcdTcg2FinalLogAreaLen), 0xFF);
-
-      //
-      // Initialize
-      //
-      mTcgDxeData.FinalEventsTable[Index] = (VOID *)(UINTN)Lasa;
-      (mTcgDxeData.FinalEventsTable[Index])->Version = EFI_TCG2_FINAL_EVENTS_TABLE_VERSION;
-      (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents = 0;
-
-      mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogFormat = mTcg2EventInfo[Index].LogFormat;
-      mTcgDxeData.FinalEventLogAreaStruct[Index].Lasa = Lasa + sizeof(EFI_TCG2_FINAL_EVENTS_TABLE);
-      mTcgDxeData.FinalEventLogAreaStruct[Index].Laml = PcdGet32 (PcdTcg2FinalLogAreaLen) - sizeof(EFI_TCG2_FINAL_EVENTS_TABLE);
-      mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogSize = 0;
-      mTcgDxeData.FinalEventLogAreaStruct[Index].LastEvent = (VOID *)(UINTN)mTcgDxeData.FinalEventLogAreaStruct[Index].Lasa;
-      mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogStarted = FALSE;
-      mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogTruncated = FALSE;
-
       if (mTcg2EventInfo[Index].LogFormat == EFI_TCG2_EVENT_LOG_FORMAT_TCG_2) {
-        //
-        // Install to configuration table
-        //
-        Status = gBS->InstallConfigurationTable (&gEfiTcg2FinalEventsTableGuid, (VOID *)mTcgDxeData.FinalEventsTable[1]);
+        Lasa = (EFI_PHYSICAL_ADDRESS) (SIZE_4GB - 1);
+        Status = gBS->AllocatePages (
+                        AllocateMaxAddress,
+                        EfiACPIMemoryNVS,
+                        EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcg2FinalLogAreaLen)),
+                        &Lasa
+                        );
         if (EFI_ERROR (Status)) {
           return Status;
         }
+        SetMem ((VOID *)(UINTN)Lasa, PcdGet32 (PcdTcg2FinalLogAreaLen), 0xFF);
+
+        //
+        // Initialize
+        //
+        mTcgDxeData.FinalEventsTable[Index] = (VOID *)(UINTN)Lasa;
+        (mTcgDxeData.FinalEventsTable[Index])->Version = EFI_TCG2_FINAL_EVENTS_TABLE_VERSION;
+        (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents = 0;
+
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogFormat = mTcg2EventInfo[Index].LogFormat;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].Lasa = Lasa + sizeof(EFI_TCG2_FINAL_EVENTS_TABLE);
+        mTcgDxeData.FinalEventLogAreaStruct[Index].Laml = PcdGet32 (PcdTcg2FinalLogAreaLen) - sizeof(EFI_TCG2_FINAL_EVENTS_TABLE);
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogSize = 0;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].LastEvent = (VOID *)(UINTN)mTcgDxeData.FinalEventLogAreaStruct[Index].Lasa;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogStarted = FALSE;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogTruncated = FALSE;
+
+        //
+        // Install to configuration table for EFI_TCG2_EVENT_LOG_FORMAT_TCG_2 
+        //
+        Status = gBS->InstallConfigurationTable (&gEfiTcg2FinalEventsTableGuid, (VOID *)mTcgDxeData.FinalEventsTable[Index]);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      } else {
+        //
+        // No need to handle EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2
+        //
+        mTcgDxeData.FinalEventsTable[Index] = NULL;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogFormat = mTcg2EventInfo[Index].LogFormat;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].Lasa = 0;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].Laml = 0;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogSize = 0;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].LastEvent = 0;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogStarted = FALSE;
+        mTcgDxeData.FinalEventLogAreaStruct[Index].EventLogTruncated = FALSE;
       }
     }
   }
