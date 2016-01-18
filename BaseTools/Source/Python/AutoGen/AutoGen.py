@@ -317,6 +317,11 @@ class WorkspaceAutoGen(AutoGen):
             GlobalData.gFdfParser = Fdf
             GlobalData.gAutoGenPhase = False
             PcdSet = Fdf.Profile.PcdDict
+            FdDict = Fdf.Profile.FdDict[Fdf.CurrentFdName]
+            for FdRegion in FdDict.RegionList:
+                if str(FdRegion.RegionType) is 'FILE' and self.Platform.VpdToolGuid in str(FdRegion.RegionDataList):
+                    if int(FdRegion.Offset) % 8 != 0:
+                        EdkLogger.error("build", FORMAT_INVALID, 'The VPD Base Address %s must be 8-byte aligned.' % (FdRegion.Offset))
             ModuleList = Fdf.Profile.InfList
             self.FdfProfile = Fdf.Profile
             for fvname in self.FvTargetList:
@@ -1138,6 +1143,18 @@ class PlatformAutoGen(AutoGen):
                     Pcd = VpdPcdDict[PcdKey]
                     for (SkuName,Sku) in Pcd.SkuInfoList.items():
                         Sku.VpdOffset = Sku.VpdOffset.strip()
+                        PcdValue = Sku.DefaultValue
+                        if PcdValue == "":
+                            PcdValue  = Pcd.DefaultValue
+                        if Sku.VpdOffset != '*':
+                            if PcdValue.startswith("{"):
+                                Alignment = 8
+                            elif PcdValue.startswith("L"):
+                                Alignment = 2
+                            else:
+                                Alignment = 1
+                            if int(Sku.VpdOffset) % Alignment != 0:
+                                EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Alignment))
                         VpdFile.Add(Pcd, Sku.VpdOffset)
                         # if the offset of a VPD is *, then it need to be fixed up by third party tool.
                         if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
@@ -1193,6 +1210,17 @@ class PlatformAutoGen(AutoGen):
 #                                Sku = DscPcdEntry.SkuInfoList[DscPcdEntry.SkuInfoList.keys()[0]]
                                 Sku.VpdOffset = Sku.VpdOffset.strip()
                                 PcdValue = Sku.DefaultValue
+                                if PcdValue == "":
+                                    PcdValue  = DscPcdEntry.DefaultValue
+                                if Sku.VpdOffset != '*':
+                                    if PcdValue.startswith("{"):
+                                        Alignment = 8
+                                    elif PcdValue.startswith("L"):
+                                        Alignment = 2
+                                    else:
+                                        Alignment = 1
+                                    if int(Sku.VpdOffset) % Alignment != 0:
+                                        EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (DscPcdEntry.TokenSpaceGuidCName, DscPcdEntry.TokenCName, Alignment))
                                 VpdFile.Add(DscPcdEntry, Sku.VpdOffset)
                                 if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                                     NeedProcessVpdMapFile = True 
