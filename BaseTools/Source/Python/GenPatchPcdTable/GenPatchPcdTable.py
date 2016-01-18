@@ -37,7 +37,7 @@ __copyright__ = "Copyright (c) 2008 - 2010, Intel Corporation. All rights reserv
 
 #============================================== Code ===============================================
 secRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.\w\$]+) +(\w+)', re.UNICODE)
-symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.:\\\\\w\?@\$]+) +([\da-fA-F]+)', re.UNICODE)
+symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.\-:\\\\\w\?@\$]+) +([\da-fA-F]+)', re.UNICODE)
 
 def parsePcdInfoFromMapFile(mapfilepath, efifilepath):
     """ Parse map file to get binary patch pcd information 
