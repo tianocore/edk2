@@ -1,7 +1,7 @@
 ## @file
 #  Security Module Package for All Architectures.
 #
-# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -20,7 +20,7 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/SecurityPkg
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
-  BUILD_TARGETS                  = DEBUG|RELEASE
+  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
 [LibraryClasses]
