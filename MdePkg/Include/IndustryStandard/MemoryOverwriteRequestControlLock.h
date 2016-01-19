@@ -3,7 +3,7 @@
   Microsoft Secure MOR implementation.
   https://msdn.microsoft.com/en-us/library/windows/hardware/mt270973(v=vs.85).aspx
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,14 +28,14 @@
 // VendorGuid: {BB983CCF-151D-40E1-A07B-4A17BE168292}
 // Name:       MemoryOverwriteRequestControlLock
 // Attributes: NV+BS+RT
-// Size:       0x1 byte
+// GetVariable value in Data parameter: 0x0 (unlocked); 0x1 (locked without key); 0x2 (locked with key)
+// SetVariable value in Data parameter: 0x0 (unlocked); 0x1 (locked);
+//                                      Revision 2 additionally accepts an 8-byte value that represents a shared secret key.
 //
-// The BIOS initializes MemoryOverwriteRequestControlLock to a value of 0x00
-// before BDS (BOOT#### processing). When the OS loader calls SetVariable by
-// specifying 0x01, the access mode for both MemoryOverwriteRequestControlLock
-// and MemoryOverwriteRequestControl is changed to read-only. If any other
-// value is specified in the SetVariable call, it fails with the 
-// EFI_INVALID_PARAMETER error code.
+
+//
+// Note: Setting MemoryOverwriteRequestControlLock does not commit to flash (just changes the internal lock state).
+// Getting the variable returns the internal state and never exposes the key.
 //
 
 extern EFI_GUID gEfiMemoryOverwriteRequestControlLockGuid;
