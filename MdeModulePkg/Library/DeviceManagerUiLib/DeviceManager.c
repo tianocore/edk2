@@ -853,7 +853,7 @@ DeviceManagerCallback (
 **/
 EFI_STATUS
 EFIAPI
-DeviceManagerLibConstructor (
+DeviceManagerUiLibConstructor (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
 )
@@ -878,7 +878,7 @@ DeviceManagerLibConstructor (
                   &mDeviceManagerGuid,
                   gDeviceManagerPrivate.DriverHandle,
                   DeviceManagerVfrBin,
-                  DeviceManagerLibStrings,
+                  DeviceManagerUiLibStrings,
                   NULL
                   );
   ASSERT (gDeviceManagerPrivate.HiiHandle != NULL);
@@ -901,7 +901,7 @@ DeviceManagerLibConstructor (
 **/
 EFI_STATUS
 EFIAPI
-DeviceManagerLibDestructor(
+DeviceManagerUiLibDestructor(
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
 )
