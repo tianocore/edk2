@@ -3,7 +3,7 @@
 #
 # This file is used to build all modules in IntelFrameworkModulePkg.
 #
-#Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #This program and the accompanying materials are licensed and made available under 
 #the terms and conditions of the BSD License that accompanies this distribution.  
 #The full text of the license may be found at
@@ -26,7 +26,7 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/IntelFrameworkModuleAll
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM
-  BUILD_TARGETS                  = DEBUG|RELEASE
+  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
 ################################################################################
