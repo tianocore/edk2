@@ -1,7 +1,7 @@
 /** @file
   Utility functions used by the Dp application.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -221,6 +221,9 @@ GetNameFromHandle (
   CHAR8                       *BestLanguage;
   EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
 
+  Image = NULL;
+  LoadedImageDevicePath = NULL;
+  DevicePath = NULL;
   BestLanguage     = NULL;
   PlatformLanguage = NULL;
 
@@ -307,9 +310,13 @@ GetNameFromHandle (
                   );
   if (!EFI_ERROR (Status) && (LoadedImageDevicePath != NULL)) {
     DevicePath = LoadedImageDevicePath;
+  } else if (Image != NULL) {
+    DevicePath = Image->FilePath;
+  }
 
+  if (DevicePath != NULL) {
     //
-    // Try to get image GUID from LoadedImageDevicePath protocol
+    // Try to get image GUID from image DevicePath
     //
     NameGuid = NULL;
     while (!IsDevicePathEndType (DevicePath)) {
@@ -356,7 +363,7 @@ GetNameFromHandle (
       //
       // Method 5: Get the name string from image DevicePath
       //
-      NameString = ConvertDevicePathToText (LoadedImageDevicePath, TRUE, FALSE);
+      NameString = ConvertDevicePathToText (DevicePath, TRUE, FALSE);
       if (NameString != NULL) {
         StrnCpyS (
           mGaugeString,
