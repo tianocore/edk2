@@ -1392,7 +1392,7 @@ FreeAllMenu (
 **/
 EFI_STATUS
 EFIAPI
-BootMaintenanceManagerLibConstructor (
+BootMaintenanceManagerUiLibConstructor (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
@@ -1423,7 +1423,7 @@ BootMaintenanceManagerLibConstructor (
                                     &mBootMaintGuid,
                                     mBmmCallbackInfo->BmmDriverHandle,
                                     BootMaintenanceManagerBin,
-                                    BootMaintenanceManagerLibStrings,
+                                    BootMaintenanceManagerUiLibStrings,
                                     NULL
                                     );
   ASSERT (mBmmCallbackInfo->BmmHiiHandle != NULL);
@@ -1481,7 +1481,7 @@ BootMaintenanceManagerLibConstructor (
 **/
 EFI_STATUS
 EFIAPI
-BootMaintenanceManagerLibDestructor (
+BootMaintenanceManagerUiLibDestructor (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
