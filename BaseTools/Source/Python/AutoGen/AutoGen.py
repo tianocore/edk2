@@ -1,7 +1,7 @@
 ## @file
 # Generate AutoGen.h, AutoGen.c and *.depex files
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -2741,8 +2741,35 @@ class ModuleAutoGen(AutoGen):
                 if F.Dir not in self.IncludePathList and self.AutoGenVersion >= 0x00010005:
                     self.IncludePathList.insert(0, F.Dir)
                 self._SourceFileList.append(F)
+
+            self._MatchBuildRuleOrder(self._SourceFileList)
+
+            for F in self._SourceFileList:
                 self._ApplyBuildRule(F, TAB_UNKNOWN_FILE)
         return self._SourceFileList
+
+    def _MatchBuildRuleOrder(self, FileList):
+        Order_Dict = {}
+        self._GetModuleBuildOption()
+        for SingleFile in FileList:
+            if self.BuildRuleOrder and SingleFile.Ext in self.BuildRuleOrder and SingleFile.Ext in self.BuildRules:
+                key = SingleFile.Path.split(SingleFile.Ext)[0]
+                if key in Order_Dict:
+                    Order_Dict[key].append(SingleFile.Ext)
+                else:
+                    Order_Dict[key] = [SingleFile.Ext]
+
+        RemoveList = []
+        for F in Order_Dict:
+            if len(Order_Dict[F]) > 1:
+                Order_Dict[F].sort(key=lambda i: self.BuildRuleOrder.index(i))
+                for Ext in Order_Dict[F][1:]:
+                    RemoveList.append(F + Ext)
+                   
+        for item in RemoveList:
+            FileList.remove(item)
+
+        return FileList
 
     ## Return the list of unicode files
     def _GetUnicodeFileList(self):
