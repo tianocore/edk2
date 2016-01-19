@@ -16,7 +16,7 @@
   VariableServiceSetVariable() should also check authenticate data to avoid buffer overflow,
   integer overflow. It should also check attribute to avoid authentication bypass.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -103,6 +103,43 @@ EFIAPI
 SecureBootHook (
   IN CHAR16                                 *VariableName,
   IN EFI_GUID                               *VendorGuid
+  );
+
+/**
+  Initialization for MOR Lock Control.
+
+  @retval EFI_SUCEESS     MorLock initialization success.
+  @return Others          Some error occurs.
+**/
+EFI_STATUS
+MorLockInit (
+  VOID
+  );
+
+/**
+  This service is an MOR/MorLock checker handler for the SetVariable().
+
+  @param  VariableName the name of the vendor's variable, as a
+                       Null-Terminated Unicode String
+  @param  VendorGuid   Unify identifier for vendor.
+  @param  Attributes   Point to memory location to return the attributes of variable. If the point
+                       is NULL, the parameter would be ignored.
+  @param  DataSize     The size in bytes of Data-Buffer.
+  @param  Data         Point to the content of the variable.
+
+  @retval  EFI_SUCCESS            The MOR/MorLock check pass, and Variable driver can store the variable data.
+  @retval  EFI_INVALID_PARAMETER  The MOR/MorLock data or data size or attributes is not allowed for MOR variable.
+  @retval  EFI_ACCESS_DENIED      The MOR/MorLock is locked.
+  @retval  EFI_ALREADY_STARTED    The MorLock variable is handled inside this function.
+                                  Variable driver can just return EFI_SUCCESS.
+**/
+EFI_STATUS
+SetVariableCheckHandlerMor (
+  IN CHAR16     *VariableName,
+  IN EFI_GUID   *VendorGuid,
+  IN UINT32     Attributes,
+  IN UINTN      DataSize,
+  IN VOID       *Data
   );
 
 /**
@@ -3181,6 +3218,21 @@ VariableServiceSetVariable (
     }
   }
 
+  //
+  // Special Handling for MOR Lock variable.
+  //
+  Status = SetVariableCheckHandlerMor (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *) ((UINTN) Data + DataSize - PayloadSize));
+  if (Status == EFI_ALREADY_STARTED) {
+    //
+    // EFI_ALREADY_STARTED means the SetVariable() action is handled inside of SetVariableCheckHandlerMor().
+    // Variable driver can just return SUCCESS.
+    //
+    return EFI_SUCCESS;
+  }
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = VarCheckLibSetVariableCheck (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *) ((UINTN) Data + DataSize - PayloadSize), mRequestSource);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -3946,6 +3998,12 @@ VariableWriteServiceInitialize (
   }
 
   ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
+  //
+  // Initialize MOR Lock variable.
+  //
+  MorLockInit ();
+
   return Status;
 }
 
