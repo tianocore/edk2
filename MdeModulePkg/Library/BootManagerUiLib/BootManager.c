@@ -745,7 +745,7 @@ BootManagerCallback (
 **/
 EFI_STATUS
 EFIAPI
-BootManagerLibConstructor (
+BootManagerUiLibConstructor (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
@@ -773,7 +773,7 @@ BootManagerLibConstructor (
                                     &mBootManagerGuid,
                                     gBootManagerPrivate.DriverHandle,
                                     BootManagerVfrBin,
-                                    BootManagerLibStrings,
+                                    BootManagerUiLibStrings,
                                     NULL
                                     );
   ASSERT (gBootManagerPrivate.HiiHandle != NULL);
@@ -792,7 +792,7 @@ BootManagerLibConstructor (
 **/
 EFI_STATUS
 EFIAPI
-BootManagerLibDestructor (
+BootManagerUiLibDestructor (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
