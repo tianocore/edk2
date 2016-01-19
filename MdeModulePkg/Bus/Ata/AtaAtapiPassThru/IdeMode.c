@@ -1967,6 +1967,12 @@ AtaPacketReadWrite (
     // to see whether indicates device is ready to transfer data.
     //
     Status = DRQReady2 (PciIo, IdeRegisters, Timeout);
+    if ((Status == EFI_NOT_READY) && Read) {
+      //
+      // Device provided less data than we intended to read -- exit early.
+      //
+      return CheckStatusRegister (PciIo, IdeRegisters);
+    }
     if (EFI_ERROR (Status)) {
       return Status;
     }
