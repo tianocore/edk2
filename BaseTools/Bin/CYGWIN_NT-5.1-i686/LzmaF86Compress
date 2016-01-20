@@ -12,11 +12,12 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-for arg in $*; do
-  if [ "arg" = "-e" -o "arg" = "-d" ]; then
-    FLAG=--f86
-    break;
-  fi
-done
+for arg; do
+  case $arg in
+    -e|-d)
+      set -- "$@" --f86
+      break
+    ;;
+esac
 
-LzmaCompress $* $FLAG
+exec LzmaCompress "$@"
