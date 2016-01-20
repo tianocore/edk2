@@ -43,7 +43,7 @@
 "\r\n"
 " -f  Path to the RAM root file system.\r\n"
 " -a  Indicate a Linux kernel with ATAG support.\r\n"
-" -b  Path to the Flat Device Tree.\r\n"
+" -d  Path to the Flat Device Tree.\r\n"
 " -c  Linux Kernel command line.\r\n"
 "\r\n"
 "The 'LinuxLoader.efi' UEFI application is intended to boot Linux Kernel\r\n"
@@ -71,7 +71,7 @@
 "    Shell> LinuxLoader fs2:Image -d fs2:fdt.dtb -f fs2:ramdisk.img \\\r\n"
 "           -c "console=ttyAMA0,115200 earlycon=pl011,0x7ff80000"\r\n"
 "    or
-"    fs2:\> LinuxLoader Image -b fdt.dtb -f ramdisk.img             \\\r\n"
+"    fs2:\> LinuxLoader Image -d fdt.dtb -f ramdisk.img             \\\r\n"
 "           -c "console=ttyAMA0,115200 earlycon=pl011,0x7ff80000"\r\n"
 "  * Arguments to pass to the application for the same boot but from\r\n"
 "    the boot manager, the device path to the 'fs2:' volume being \r\n"
