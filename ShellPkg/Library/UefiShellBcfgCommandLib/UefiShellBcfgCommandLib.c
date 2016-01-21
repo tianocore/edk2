@@ -1055,6 +1055,7 @@ BcfgDisplayDump(
   EFI_LOAD_OPTION *LoadOption;
   CHAR16          *Description;
   UINTN           DescriptionSize;
+  UINTN           OptionalDataOffset;
 
   if (OrderCount == 0) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_BCFG_NONE), gShellBcfgHiiHandle, L"bcfg");  
@@ -1118,6 +1119,10 @@ BcfgDisplayDump(
       FilePathList = (UINT8 *)Description + DescriptionSize;
       DevPathString = ConvertDevicePathToText(FilePathList, TRUE, FALSE);
     }
+
+    OptionalDataOffset = sizeof *LoadOption + DescriptionSize +
+                         LoadOption->FilePathListLength;
+
     ShellPrintHiiEx(
       -1,
       -1,
@@ -1128,9 +1133,10 @@ BcfgDisplayDump(
       VariableName,
       Description,
       DevPathString,
-      (DescriptionSize + LoadOption->FilePathListLength + 6) <= BufferSize?L'N':L'Y');
+      OptionalDataOffset <= BufferSize ? L'N' : L'Y'
+      );
     if (VerboseOutput) {
-      for (LoopVar2 = (DescriptionSize + LoadOption->FilePathListLength + 6);LoopVar2<BufferSize;LoopVar2++){
+      for (LoopVar2 = OptionalDataOffset; LoopVar2 < BufferSize; LoopVar2++){
         ShellPrintEx(
           -1,
           -1,
