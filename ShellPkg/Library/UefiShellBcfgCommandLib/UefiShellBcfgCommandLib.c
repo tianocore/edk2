@@ -1140,7 +1140,6 @@ BcfgDisplayDump(
         ShellPrintEx(
           -1,
           -1,
-          NULL,
           L"%02x",
           Buffer[LoopVar2]);
       }
