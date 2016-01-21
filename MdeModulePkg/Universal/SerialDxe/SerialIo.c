@@ -185,7 +185,7 @@ EFI_SERIAL_IO_MODE mSerialIoMode = {
   //    value  field                set in SerialDxeInitialize()?
   //---------  -------------------  -----------------------------
             0, // ControlMask
-            0, // Timeout
+  1000 * 1000, // Timeout
             0, // BaudRate          yes
             1, // ReceiveFifoDepth
             0, // DataBits          yes
@@ -237,7 +237,7 @@ SerialReset (
   // Set the Serial I/O mode
   //
   This->Mode->ReceiveFifoDepth  = 1;
-  This->Mode->Timeout           = 0;
+  This->Mode->Timeout           = 1000 * 1000;
   This->Mode->BaudRate          = PcdGet64 (PcdUartDefaultBaudRate);
   This->Mode->DataBits          = (UINT32) PcdGet8 (PcdUartDefaultDataBits);
   This->Mode->Parity            = (UINT32) PcdGet8 (PcdUartDefaultParity);
