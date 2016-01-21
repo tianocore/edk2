@@ -17,7 +17,7 @@
   BASE_NAME                      = UefiShellBcfgCommandLib
   FILE_GUID                      = F6A3BF5D-4095-4E4F-9670-408770C2DBDF
   MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.0
+  VERSION_STRING                 = 1.1
   LIBRARY_CLASS                  = BcfgCommandLib|UEFI_APPLICATION UEFI_DRIVER
 
 [Sources.common]
