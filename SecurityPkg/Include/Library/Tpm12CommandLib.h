@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to send TPM12 command.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -138,4 +138,88 @@ Tpm12NvWriteValue (
   IN UINT8          *Data
   );
 
+/**
+Extend a TPM PCR.
+
+@param[in]  DigestToExtend    The 160 bit value representing the event to be recorded.
+@param[in]  PcrIndex          The PCR to be updated.
+@param[out] NewPcrValue       New PCR value after extend.
+
+@retval EFI_SUCCESS           Operation completed successfully.
+@retval EFI_TIMEOUT           The register can't run into the expected status in time.
+@retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
+@retval EFI_DEVICE_ERROR      Unexpected device behavior.
+
+**/
+EFI_STATUS
+EFIAPI
+Tpm12Extend (
+  IN  TPM_DIGEST    *DigestToExtend,
+  IN  TPM_PCRINDEX  PcrIndex,
+  OUT TPM_DIGEST    *NewPcrValue
+  );
+
+/**
+Send TSC_PhysicalPresence command to TPM.
+
+@param[in] PhysicalPresence   The state to set the TPMs Physical Presence flags.
+
+@retval EFI_SUCCESS           Operation completed successfully.
+@retval EFI_TIMEOUT           The register can't run into the expected status in time.
+@retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
+@retval EFI_DEVICE_ERROR      Unexpected device behavior.
+
+**/
+EFI_STATUS
+EFIAPI
+Tpm12PhysicalPresence (
+  IN      TPM_PHYSICAL_PRESENCE     PhysicalPresence
+  );
+
+/**
+Send TPM_ContinueSelfTest command to TPM.
+
+@retval EFI_SUCCESS           Operation completed successfully.
+@retval EFI_TIMEOUT           The register can't run into the expected status in time.
+@retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
+@retval EFI_DEVICE_ERROR      Unexpected device behavior.
+
+**/
+EFI_STATUS
+EFIAPI
+Tpm12ContinueSelfTest (
+  VOID
+  );
+
+/**
+Get TPM capability permanent flags.
+
+@param[out] TpmPermanentFlags   Pointer to the buffer for returned flag structure.
+
+@retval EFI_SUCCESS           Operation completed successfully.
+@retval EFI_TIMEOUT           The register can't run into the expected status in time.
+@retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
+@retval EFI_DEVICE_ERROR      Unexpected device behavior.
+
+**/
+EFI_STATUS
+EFIAPI
+Tpm12GetCapabilityFlagPermanent (
+  OUT TPM_PERMANENT_FLAGS  *TpmPermanentFlags
+  );
+
+/**
+Get TPM capability volatile flags.
+
+@param[out] VolatileFlags   Pointer to the buffer for returned flag structure.
+
+@retval EFI_SUCCESS      Operation completed successfully.
+@retval EFI_DEVICE_ERROR The command was unsuccessful.
+
+**/
+EFI_STATUS
+EFIAPI
+Tpm12GetCapabilityFlagVolatile (
+  OUT TPM_STCLEAR_FLAGS                 *VolatileFlags
+  );
 #endif
