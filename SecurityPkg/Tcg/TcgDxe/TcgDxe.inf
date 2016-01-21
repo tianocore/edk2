@@ -29,9 +29,6 @@
 
 [Sources]
   TcgDxe.c
-  TisDxe.c
-  TpmComm.c
-  TpmComm.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -54,6 +51,7 @@
   UefiLib
   PcdLib
   ReportStatusCodeLib
+  Tpm12CommandLib
 
 [Guids]
   gEfiGlobalVariableGuid                             ## SOMETIMES_CONSUMES  ## Variable:L"BootXXXX"

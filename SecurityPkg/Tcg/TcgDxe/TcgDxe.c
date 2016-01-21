@@ -50,8 +50,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
 #include <Library/ReportStatusCodeLib.h>
-
-#include "TpmComm.h"
+#include <Library/Tpm12CommandLib.h>
+#include <Library/BaseCryptLib.h>
 
 #define TCG_DXE_DATA_FROM_THIS(this)  \
   BASE_CR (this, TCG_DXE_DATA, TcgProtocol)
@@ -271,6 +271,40 @@ TcgDxeStatusCheck (
 }
 
 /**
+Single function calculates SHA1 digest value for all raw data. It
+combines Sha1Init(), Sha1Update() and Sha1Final().
+
+@param[in]  Data          Raw data to be digested.
+@param[in]  DataLen       Size of the raw data.
+@param[out] Digest        Pointer to a buffer that stores the final digest.
+
+@retval     EFI_SUCCESS   Always successfully calculate the final digest.
+**/
+EFI_STATUS
+EFIAPI
+TpmCommHashAll (
+  IN  CONST UINT8       *Data,
+  IN        UINTN       DataLen,
+  OUT       TPM_DIGEST  *Digest
+  )
+{
+  VOID   *Sha1Ctx;
+  UINTN  CtxSize;
+
+  CtxSize = Sha1GetContextSize ();
+  Sha1Ctx = AllocatePool (CtxSize);
+  ASSERT (Sha1Ctx != NULL);
+
+  Sha1Init (Sha1Ctx);
+  Sha1Update (Sha1Ctx, Data, DataLen);
+  Sha1Final (Sha1Ctx, (UINT8 *)Digest);
+
+  FreePool (Sha1Ctx);
+
+  return EFI_SUCCESS;
+}
+
+/**
   This service abstracts the capability to do a hash operation on a data buffer.
   
   @param[in]      This             Indicates the calling context
@@ -331,6 +365,53 @@ TcgDxeHashAll (
     default:
       return EFI_UNSUPPORTED;
   }
+}
+
+/**
+Add a new entry to the Event Log.
+
+@param[in, out] EventLogPtr   Pointer to the Event Log data.
+@param[in, out] LogSize       Size of the Event Log.
+@param[in]      MaxSize       Maximum size of the Event Log.
+@param[in]      NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.
+@param[in]      NewEventData  Pointer to the new event data.
+
+@retval EFI_SUCCESS           The new event log entry was added.
+@retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
+
+**/
+EFI_STATUS
+TpmCommLogEvent (
+  IN OUT  UINT8                     **EventLogPtr,
+  IN OUT  UINTN                     *LogSize,
+  IN      UINTN                     MaxSize,
+  IN      TCG_PCR_EVENT_HDR         *NewEventHdr,
+  IN      UINT8                     *NewEventData
+  )
+{
+  UINTN                            NewLogSize;
+
+  //
+  // Prevent Event Overflow
+  //
+  if (NewEventHdr->EventSize > (UINTN)(~0) - sizeof (*NewEventHdr)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  NewLogSize = sizeof (*NewEventHdr) + NewEventHdr->EventSize;
+  if (NewLogSize > MaxSize - *LogSize) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  *EventLogPtr += *LogSize;
+  *LogSize += NewLogSize;
+  CopyMem (*EventLogPtr, NewEventHdr, sizeof (*NewEventHdr));
+  CopyMem (
+    *EventLogPtr + sizeof (*NewEventHdr),
+    NewEventData,
+    NewEventHdr->EventSize
+    );
+  return EFI_SUCCESS;
 }
 
 /**
@@ -442,8 +523,6 @@ TcgDxePassThroughToTpm (
   IN      UINT8                     *TpmOutputParameterBlock
   )
 {
-  TCG_DXE_DATA                      *TcgData;
-
   if (TpmInputParameterBlock == NULL || 
       TpmOutputParameterBlock == NULL || 
       TpmInputParameterBlockSize == 0 ||
@@ -451,14 +530,11 @@ TcgDxePassThroughToTpm (
     return EFI_INVALID_PARAMETER;
   }
 
-  TcgData = TCG_DXE_DATA_FROM_THIS (This);
-
-  return TisPcExecute (
-           "%r%/%r",
+  return Tpm12SubmitCommand (
+           TpmInputParameterBlockSize,
            TpmInputParameterBlock,
-           (UINTN) TpmInputParameterBlockSize,
-           TpmOutputParameterBlock,
-           (UINTN) TpmOutputParameterBlockSize
+           &TpmOutputParameterBlockSize,
+           TpmOutputParameterBlock
            );
 }
 
@@ -506,7 +582,7 @@ TcgDxeHashLogExtendEventI (
     }
   }
 
-  Status = TpmCommExtend (
+  Status = Tpm12Extend (
              &NewEventHdr->Digest,
              NewEventHdr->PCRIndex,
              NULL
@@ -1272,19 +1348,15 @@ OnExitBootServicesFailed (
 **/
 EFI_STATUS
 GetTpmStatus (
-     OUT  BOOLEAN                   *TPMDeactivatedFlag
+  OUT BOOLEAN  *TPMDeactivatedFlag
   )
 {
-  EFI_STATUS                        Status;
-  TPM_STCLEAR_FLAGS                 VFlags;
+  EFI_STATUS         Status;
+  TPM_STCLEAR_FLAGS  VolatileFlags;
 
-  Status = TpmCommGetFlags (
-             TPM_CAP_FLAG_VOLATILE,
-             &VFlags,
-             sizeof (VFlags)
-             );
+  Status = Tpm12GetCapabilityFlagVolatile (&VolatileFlags);
   if (!EFI_ERROR (Status)) {
-    *TPMDeactivatedFlag = VFlags.deactivated;
+    *TPMDeactivatedFlag = VolatileFlags.deactivated;
   }
 
   return Status;
