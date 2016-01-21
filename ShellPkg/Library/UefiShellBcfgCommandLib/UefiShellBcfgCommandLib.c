@@ -1043,14 +1043,14 @@ BcfgDisplayDump(
   IN CONST BOOLEAN  VerboseOutput
   )
 {
-  EFI_STATUS  Status;
-  UINT8       *Buffer;
-  UINTN       BufferSize;
-  CHAR16      VariableName[12];
-  UINTN       LoopVar;
-  UINTN       LoopVar2;
-  CHAR16      *DevPathString;
-  VOID        *DevPath;
+  EFI_STATUS      Status;
+  UINT8           *Buffer;
+  UINTN           BufferSize;
+  CHAR16          VariableName[12];
+  UINTN           LoopVar;
+  UINTN           LoopVar2;
+  CHAR16          *DevPathString;
+  VOID            *DevPath;
 
   if (OrderCount == 0) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_BCFG_NONE), gShellBcfgHiiHandle, L"bcfg");  
@@ -1058,8 +1058,8 @@ BcfgDisplayDump(
   }
 
   for (LoopVar = 0 ; LoopVar < OrderCount ; LoopVar++) {
-    Buffer      = NULL;
-    BufferSize  = 0;
+    Buffer        = NULL;
+    BufferSize    = 0;
     UnicodeSPrint(VariableName, sizeof(VariableName), L"%s%04x", Op, CurrentOrder[LoopVar]);
 
     Status = gRT->GetVariable(
