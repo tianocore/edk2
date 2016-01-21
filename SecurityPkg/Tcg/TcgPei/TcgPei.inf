@@ -34,8 +34,6 @@
 
 [Sources]
   TcgPei.c
-  TpmComm.c
-  TpmComm.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -57,6 +55,7 @@
   PcdLib
   MemoryAllocationLib
   ReportStatusCodeLib
+  Tpm12CommandLib
 
 [Guids]
   gTcgEventEntryHobGuid                                               ## PRODUCES               ## HOB

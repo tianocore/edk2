@@ -38,8 +38,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ReportStatusCodeLib.h>
-
-#include "TpmComm.h"
+#include <Library/Tpm12DeviceLib.h>
+#include <Library/Tpm12CommandLib.h>
+#include <Library/BaseCryptLib.h>
 
 BOOLEAN                 mImageInMemory  = FALSE;
 
@@ -198,6 +199,40 @@ EndofPeiSignalNotifyCallBack (
 }
 
 /**
+Single function calculates SHA1 digest value for all raw data. It
+combines Sha1Init(), Sha1Update() and Sha1Final().
+
+@param[in]  Data          Raw data to be digested.
+@param[in]  DataLen       Size of the raw data.
+@param[out] Digest        Pointer to a buffer that stores the final digest.
+
+@retval     EFI_SUCCESS   Always successfully calculate the final digest.
+**/
+EFI_STATUS
+EFIAPI
+TpmCommHashAll (
+  IN  CONST UINT8       *Data,
+  IN        UINTN       DataLen,
+  OUT       TPM_DIGEST  *Digest
+  )
+{
+  VOID   *Sha1Ctx;
+  UINTN  CtxSize;
+
+  CtxSize = Sha1GetContextSize ();
+  Sha1Ctx = AllocatePool (CtxSize);
+  ASSERT (Sha1Ctx != NULL);
+
+  Sha1Init (Sha1Ctx);
+  Sha1Update (Sha1Ctx, Data, DataLen);
+  Sha1Final (Sha1Ctx, (UINT8 *)Digest);
+
+  FreePool (Sha1Ctx);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Do a hash operation on a data buffer, extend a specific TPM PCR with the hash result,
   and build a GUIDed HOB recording the event which will be passed to the DXE phase and
   added into the Event Log.
@@ -242,8 +277,7 @@ HashLogExtendEvent (
     }
   }
 
-  Status = TpmCommExtend (
-             PeiServices,
+  Status = Tpm12Extend (
              &NewEventHdr->Digest,
              NewEventHdr->PCRIndex,
              NULL
@@ -540,12 +574,11 @@ PhysicalPresencePpiNotifyCallback (
   )
 {
   EFI_STATUS                        Status;
+  TPM_PERMANENT_FLAGS               TpmPermanentFlags;
   PEI_LOCK_PHYSICAL_PRESENCE_PPI    *LockPhysicalPresencePpi;
-  BOOLEAN                           LifetimeLock;
-  BOOLEAN                           CmdEnable;
   TPM_PHYSICAL_PRESENCE             PhysicalPresenceValue;
 
-  Status = TpmCommGetCapability (PeiServices, NULL, &LifetimeLock, &CmdEnable);
+  Status = Tpm12GetCapabilityFlagPermanent (&TpmPermanentFlags);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -553,7 +586,7 @@ PhysicalPresencePpiNotifyCallback (
   //
   // 1. Set physicalPresenceLifetimeLock, physicalPresenceHWEnable and physicalPresenceCMDEnable bit by PCDs.
   //
-  if (PcdGetBool (PcdPhysicalPresenceLifetimeLock) && !LifetimeLock) {
+  if (PcdGetBool (PcdPhysicalPresenceLifetimeLock) && !TpmPermanentFlags.physicalPresenceLifetimeLock) {
     //
     // Lock TPM LifetimeLock is required, and LifetimeLock is not locked yet. 
     //
@@ -561,10 +594,10 @@ PhysicalPresencePpiNotifyCallback (
 
     if (PcdGetBool (PcdPhysicalPresenceCmdEnable)) {
       PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_CMD_ENABLE;
-      CmdEnable = TRUE;
+      TpmPermanentFlags.physicalPresenceCMDEnable = TRUE;
     } else {
       PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_CMD_DISABLE;
-      CmdEnable = FALSE;
+      TpmPermanentFlags.physicalPresenceCMDEnable = FALSE;
     }
 
     if (PcdGetBool (PcdPhysicalPresenceHwEnable)) {
@@ -573,8 +606,7 @@ PhysicalPresencePpiNotifyCallback (
       PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_HW_DISABLE;
     }      
      
-    Status = TpmCommPhysicalPresence (
-               PeiServices,
+    Status = Tpm12PhysicalPresence (
                PhysicalPresenceValue
                );
     if (EFI_ERROR (Status)) {
@@ -590,8 +622,8 @@ PhysicalPresencePpiNotifyCallback (
     return EFI_SUCCESS;
   }
 
-  if (!CmdEnable) {
-    if (LifetimeLock) {
+  if (!TpmPermanentFlags.physicalPresenceCMDEnable) {
+    if (TpmPermanentFlags.physicalPresenceLifetimeLock) {
       //
       // physicalPresenceCMDEnable is locked, can't change.
       //
@@ -602,8 +634,7 @@ PhysicalPresencePpiNotifyCallback (
     // Enable physical presence command
     // It is necessary in order to lock physical presence
     //
-    Status = TpmCommPhysicalPresence (
-               PeiServices,
+    Status = Tpm12PhysicalPresence (
                TPM_PHYSICAL_PRESENCE_CMD_ENABLE
                );
     if (EFI_ERROR (Status)) {
@@ -614,8 +645,7 @@ PhysicalPresencePpiNotifyCallback (
   //
   // Lock physical presence
   // 
-  Status = TpmCommPhysicalPresence (
-              PeiServices,
+  Status = Tpm12PhysicalPresence (
               TPM_PHYSICAL_PRESENCE_LOCK
               );
   return Status;
@@ -631,19 +661,18 @@ PhysicalPresencePpiNotifyCallback (
 
 **/
 BOOLEAN
-EFIAPI
 IsTpmUsable (
-  IN      EFI_PEI_SERVICES          **PeiServices
+  VOID
   )
 {
-  EFI_STATUS                        Status;
-  BOOLEAN                           Deactivated;
+  EFI_STATUS           Status;
+  TPM_PERMANENT_FLAGS  TpmPermanentFlags;
 
-  Status = TpmCommGetCapability (PeiServices, &Deactivated, NULL, NULL);
+  Status = Tpm12GetCapabilityFlagPermanent (&TpmPermanentFlags);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
-  return (BOOLEAN)(!Deactivated); 
+  return (BOOLEAN)(!TpmPermanentFlags.deactivated);
 }
 
 /**
@@ -682,7 +711,7 @@ PeimEntryMP (
     return Status;
   }
 
-  if (IsTpmUsable (PeiServices)) {
+  if (IsTpmUsable ()) {
     if (PcdGet8 (PcdTpmScrtmPolicy) == 1) {
       Status = MeasureCRTMVersion (PeiServices);
     }
@@ -759,7 +788,11 @@ PeimEntryMA (
     }
 
     if (PcdGet8 (PcdTpmInitializationPolicy) == 1) {
-      Status = TpmCommStartup ((EFI_PEI_SERVICES**)PeiServices, BootMode);
+      if (BootMode == BOOT_ON_S3_RESUME) {
+        Status = Tpm12Startup (TPM_ST_STATE);
+      } else {
+        Status = Tpm12Startup (TPM_ST_CLEAR);
+      }
       if (EFI_ERROR (Status) ) {
         goto Done;
       }
@@ -769,7 +802,7 @@ PeimEntryMA (
     // TpmSelfTest is optional on S3 path, skip it to save S3 time
     //
     if (BootMode != BOOT_ON_S3_RESUME) {
-      Status = TpmCommContinueSelfTest ((EFI_PEI_SERVICES**)PeiServices);
+      Status = Tpm12ContinueSelfTest ();
       if (EFI_ERROR (Status)) {
         goto Done;
       }
