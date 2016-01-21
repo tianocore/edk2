@@ -1,7 +1,7 @@
 /** @file
   Network library.
 
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -3325,4 +3325,71 @@ NetLibGetSystemGuid (
     } while (TRUE);
   } while (Smbios.Raw < SmbiosEnd.Raw);
   return EFI_NOT_FOUND;
+}
+
+/**
+  Create Dns QName according the queried domain name. 
+  QName is a domain name represented as a sequence of labels, 
+  where each label consists of a length octet followed by that 
+  number of octets. The QName terminates with the zero 
+  length octet for the null label of the root. Caller should 
+  take responsibility to free the buffer in returned pointer.
+
+  @param  DomainName    The pointer to the queried domain name string.  
+
+  @retval NULL          Failed to fill QName.
+  @return               QName filled successfully.
+  
+**/ 
+CHAR8 *
+EFIAPI
+NetLibCreateDnsQName (
+  IN  CHAR16              *DomainName
+  )
+{
+  CHAR8                 *QueryName;
+  UINTN                 QueryNameSize;
+  CHAR8                 *Header;
+  CHAR8                 *Tail;
+  UINTN                 Len;
+  UINTN                 Index;
+
+  QueryName     = NULL;
+  QueryNameSize = 0;
+  Header        = NULL;
+  Tail          = NULL;
+
+  //
+  // One byte for first label length, one byte for terminated length zero. 
+  //
+  QueryNameSize = StrLen (DomainName) + 2;
+  
+  if (QueryNameSize > DNS_MAX_NAME_SIZE) {
+    return NULL;
+  }
+
+  QueryName = AllocateZeroPool (QueryNameSize);
+  if (QueryName == NULL) {
+    return NULL;
+  }
+  
+  Header = QueryName;
+  Tail = Header + 1;
+  Len = 0;
+  for (Index = 0; DomainName[Index] != 0; Index++) {
+    *Tail = (CHAR8) DomainName[Index];
+    if (*Tail == '.') {
+      *Header = (CHAR8) Len;
+      Header = Tail;
+      Tail ++;
+      Len = 0;
+    } else {
+      Tail++;
+      Len++;
+    }
+  }
+  *Header = (CHAR8) Len;
+  *Tail = 0;
+
+  return QueryName;
 }

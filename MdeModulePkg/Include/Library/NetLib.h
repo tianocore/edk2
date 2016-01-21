@@ -37,6 +37,8 @@ typedef UINT16          TCP_PORTNO;
 #define  EFI_IP_PROTO_ICMP     0x01
 #define  IP4_PROTO_IGMP        0x02
 #define  IP6_ICMP              58
+#define  DNS_MAX_NAME_SIZE     255
+#define  DNS_MAX_MESSAGE_SIZE  512
 
 //
 // The address classification
@@ -2154,6 +2156,26 @@ EFI_STATUS
 EFIAPI
 NetLibGetSystemGuid (
   OUT EFI_GUID              *SystemGuid
+  );
+
+/**
+  Create Dns QName according the queried domain name. 
+  QName is a domain name represented as a sequence of labels, 
+  where each label consists of a length octet followed by that 
+  number of octets. The QName terminates with the zero 
+  length octet for the null label of the root. Caller should 
+  take responsibility to free the buffer in returned pointer.
+
+  @param  DomainName    The pointer to the queried domain name string.  
+
+  @retval NULL          Failed to fill QName.
+  @return               QName filled successfully.
+  
+**/ 
+CHAR8 *
+EFIAPI
+NetLibCreateDnsQName (
+  IN  CHAR16              *DomainName
   );
 
 #endif
