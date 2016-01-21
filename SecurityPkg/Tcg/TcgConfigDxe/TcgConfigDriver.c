@@ -1,7 +1,7 @@
 /** @file
   The module entry point for Tcg configuration module.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -43,7 +43,7 @@ TcgConfigDriverEntryPoint (
     return EFI_UNSUPPORTED;
   }
 
-  Status = TisPcRequestUseTpm ((TIS_TPM_HANDLE) (UINTN) TPM_BASE_ADDRESS);
+  Status = Tpm12RequestUseTpm ();
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TPM not detected!\n"));
     return Status;
