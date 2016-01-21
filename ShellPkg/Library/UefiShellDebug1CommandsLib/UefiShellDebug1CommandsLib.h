@@ -62,22 +62,6 @@
 extern        EFI_HANDLE                        gShellDebug1HiiHandle;
 
 /**
-  Function printing hex output to the console.
-
-  @param[in] Indent       Number of spaces to indent.
-  @param[in] Offset       Offset to start with.
-  @param[in] DataSize     Length of data.
-  @param[in] UserData     Pointer to some data.
-**/
-VOID
-DumpHex (
-  IN UINTN        Indent,
-  IN UINTN        Offset,
-  IN UINTN        DataSize,
-  IN VOID         *UserData
-  );
-
-/**
   Function returns a system configuration table that is stored in the
   EFI System Table based on the provided GUID.
 

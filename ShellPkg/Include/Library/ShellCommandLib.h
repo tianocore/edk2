@@ -685,4 +685,20 @@ FreeBufferList (
   IN BUFFER_LIST *List
   );
 
+/**
+  Function printing hex output to the console.
+
+  @param[in] Indent       Number of spaces to indent.
+  @param[in] Offset       Offset to start with.
+  @param[in] DataSize     Length of data.
+  @param[in] UserData     Pointer to some data.
+**/
+VOID
+DumpHex (
+  IN UINTN        Indent,
+  IN UINTN        Offset,
+  IN UINTN        DataSize,
+  IN VOID         *UserData
+  );
+
 #endif //_SHELL_COMMAND_LIB_
