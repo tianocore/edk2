@@ -1,7 +1,7 @@
 /** @file
   The header file for TPM PEI driver.
   
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -17,7 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Tpm12.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
-#include <Library/TpmCommLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/BaseCryptLib.h>
+#include <Library/Tpm12DeviceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -57,9 +59,8 @@ typedef struct {
   Send TPM_Startup command to TPM.
 
   @param[in] PeiServices        Describes the list of possible PEI Services.
-  @param[in] TpmHandle          TPM handle.  
   @param[in] BootMode           Boot mode.  
- 
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_TIMEOUT           The register can't run into the expected status in time.
   @retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
@@ -69,7 +70,6 @@ typedef struct {
 EFI_STATUS
 TpmCommStartup (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      EFI_BOOT_MODE             BootMode
   );
 
@@ -77,8 +77,7 @@ TpmCommStartup (
   Send TPM_ContinueSelfTest command to TPM.
 
   @param[in] PeiServices        Describes the list of possible PEI Services.
-  @param[in] TpmHandle          TPM handle.  
- 
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_TIMEOUT           The register can't run into the expected status in time.
   @retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
@@ -87,8 +86,7 @@ TpmCommStartup (
 **/
 EFI_STATUS
 TpmCommContinueSelfTest (
-  IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle
+  IN      EFI_PEI_SERVICES          **PeiServices
   );
 
 /**
@@ -109,7 +107,6 @@ TpmCommContinueSelfTest (
 EFI_STATUS
 TpmCommGetCapability (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
      OUT  BOOLEAN                   *Deactivated, OPTIONAL
      OUT  BOOLEAN                   *LifetimeLock, OPTIONAL
      OUT  BOOLEAN                   *CmdEnable OPTIONAL
@@ -133,7 +130,6 @@ TpmCommGetCapability (
 EFI_STATUS
 TpmCommExtend (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      TPM_DIGEST                *DigestToExtend,
   IN      TPM_PCRINDEX              PcrIndex,
      OUT  TPM_DIGEST                *NewPcrValue
@@ -156,8 +152,25 @@ TpmCommExtend (
 EFI_STATUS
 TpmCommPhysicalPresence (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      TPM_PHYSICAL_PRESENCE     PhysicalPresence
+  );
+
+/**
+  Single function calculates SHA1 digest value for all raw data. It
+  combines Sha1Init(), Sha1Update() and Sha1Final().
+
+  @param[in]  Data          Raw data to be digested.
+  @param[in]  DataLen       Size of the raw data.
+  @param[out] Digest        Pointer to a buffer that stores the final digest.
+
+  @retval     EFI_SUCCESS   Always successfully calculate the final digest.
+**/
+EFI_STATUS
+EFIAPI
+TpmCommHashAll (
+  IN  CONST UINT8                   *Data,
+  IN        UINTN                   DataLen,
+  OUT       TPM_DIGEST              *Digest
   );
 
 #endif  // _TPM_COMM_H_

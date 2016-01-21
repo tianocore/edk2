@@ -1,7 +1,7 @@
 /** @file
   Utility functions used by TPM PEI driver.
   
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -15,37 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "TpmComm.h"
 
 /**
-  Send a command to TPM for execution and return response data.
-
-  @param[in]      PeiServices   Describes the list of possible PEI Services.
-  @param[in]      TisReg        TPM register space base address.  
-  @param[in]      BufferIn      Buffer for command data.  
-  @param[in]      SizeIn        Size of command data.  
-  @param[in, out] BufferOut     Buffer for response data.  
-  @param[in, out] SizeOut       size of response data.  
- 
-  @retval EFI_SUCCESS           Operation completed successfully.
-  @retval EFI_TIMEOUT           The register can't run into the expected status in time.
-  @retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
-  @retval EFI_DEVICE_ERROR      Unexpected device behavior.
-
-**/
-EFI_STATUS
-TisTpmCommand (
-  IN     EFI_PEI_SERVICES           **PeiServices,
-  IN     TIS_PC_REGISTERS_PTR       TisReg,
-  IN     UINT8                      *BufferIn,
-  IN     UINT32                     SizeIn,
-  IN OUT UINT8                      *BufferOut,
-  IN OUT UINT32                     *SizeOut
-  );
-
-/**
   Send TPM_Startup command to TPM.
 
   @param[in] PeiServices        Describes the list of possible PEI Services.
-  @param[in] TpmHandle          TPM handle.  
-  @param[in] BootMode           Boot mode.  
+  @param[in] BootMode           Boot mode.
  
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_TIMEOUT           The register can't run into the expected status in time.
@@ -56,7 +29,6 @@ TisTpmCommand (
 EFI_STATUS
 TpmCommStartup (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      EFI_BOOT_MODE             BootMode
   )
 {
@@ -80,7 +52,7 @@ TpmCommStartup (
   SendBuffer.Hdr.paramSize  = SwapBytes32 (TpmSendSize);
   SendBuffer.Hdr.ordinal    = SwapBytes32 (TPM_ORD_Startup);
   SendBuffer.TpmSt          = SwapBytes16 (TpmSt);
-  Status = TisTpmCommand (PeiServices, TpmHandle, (UINT8 *)&SendBuffer, TpmSendSize, RecvBuffer, &TpmRecvSize);
+  Status = Tpm12SubmitCommand (TpmSendSize, (UINT8 *)&SendBuffer, &TpmRecvSize, RecvBuffer);
   return Status;
 }
 
@@ -88,8 +60,7 @@ TpmCommStartup (
   Send TPM_ContinueSelfTest command to TPM.
 
   @param[in] PeiServices        Describes the list of possible PEI Services.
-  @param[in] TpmHandle          TPM handle.  
- 
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_TIMEOUT           The register can't run into the expected status in time.
   @retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
@@ -98,8 +69,7 @@ TpmCommStartup (
 **/
 EFI_STATUS
 TpmCommContinueSelfTest (
-  IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle
+  IN      EFI_PEI_SERVICES          **PeiServices
   )
 {
   EFI_STATUS                        Status;
@@ -116,7 +86,7 @@ TpmCommContinueSelfTest (
   SendBuffer.Hdr.tag        = SwapBytes16 (TPM_TAG_RQU_COMMAND);
   SendBuffer.Hdr.paramSize  = SwapBytes32 (TpmSendSize);  
   SendBuffer.Hdr.ordinal    = SwapBytes32 (TPM_ORD_ContinueSelfTest);
-  Status = TisTpmCommand (PeiServices, TpmHandle, (UINT8 *)&SendBuffer, TpmSendSize, RecvBuffer, &TpmRecvSize);
+  Status = Tpm12SubmitCommand (TpmSendSize, (UINT8 *)&SendBuffer, &TpmRecvSize, RecvBuffer);
   return Status;
 }
 
@@ -124,11 +94,10 @@ TpmCommContinueSelfTest (
   Get TPM capability flags.
 
   @param[in]  PeiServices       Describes the list of possible PEI Services.
-  @param[in]  TpmHandle         TPM handle.  
   @param[out] Deactivated       Returns deactivated flag.
   @param[out] LifetimeLock      Returns physicalPresenceLifetimeLock permanent flag.  
   @param[out] CmdEnable         Returns physicalPresenceCMDEnable permanent flag.
- 
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_TIMEOUT           The register can't run into the expected status in time.
   @retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
@@ -138,7 +107,6 @@ TpmCommContinueSelfTest (
 EFI_STATUS
 TpmCommGetCapability (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
      OUT  BOOLEAN                   *Deactivated, OPTIONAL
      OUT  BOOLEAN                   *LifetimeLock, OPTIONAL
      OUT  BOOLEAN                   *CmdEnable OPTIONAL
@@ -162,7 +130,7 @@ TpmCommGetCapability (
   SendBuffer.Capability         = SwapBytes32 (TPM_CAP_FLAG);
   SendBuffer.CapabilityFlagSize = SwapBytes32 (sizeof (TPM_CAP_FLAG_PERMANENT));
   SendBuffer.CapabilityFlag     = SwapBytes32 (TPM_CAP_FLAG_PERMANENT);
-  Status = TisTpmCommand (PeiServices, TpmHandle, (UINT8 *)&SendBuffer, TpmSendSize, RecvBuffer, &TpmRecvSize);
+  Status = Tpm12SubmitCommand (TpmSendSize, (UINT8 *)&SendBuffer, &TpmRecvSize, RecvBuffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -185,11 +153,10 @@ TpmCommGetCapability (
   Extend a TPM PCR.
 
   @param[in]  PeiServices       Describes the list of possible PEI Services.
-  @param[in]  TpmHandle         TPM handle.  
   @param[in]  DigestToExtend    The 160 bit value representing the event to be recorded.  
   @param[in]  PcrIndex          The PCR to be updated.
   @param[out] NewPcrValue       New PCR value after extend.  
- 
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_TIMEOUT           The register can't run into the expected status in time.
   @retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
@@ -199,7 +166,6 @@ TpmCommGetCapability (
 EFI_STATUS
 TpmCommExtend (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      TPM_DIGEST                *DigestToExtend,
   IN      TPM_PCRINDEX              PcrIndex,
      OUT  TPM_DIGEST                *NewPcrValue
@@ -221,7 +187,7 @@ TpmCommExtend (
   SendBuffer.Hdr.ordinal    = SwapBytes32 (TPM_ORD_Extend);
   SendBuffer.PcrIndex       = SwapBytes32 (PcrIndex);
   CopyMem (&SendBuffer.TpmDigest, (UINT8 *)DigestToExtend, sizeof (TPM_DIGEST));
-  Status = TisTpmCommand (PeiServices, TpmHandle, (UINT8 *)&SendBuffer, TpmSendSize, RecvBuffer, &TpmRecvSize);
+  Status = Tpm12SubmitCommand (TpmSendSize, (UINT8 *)&SendBuffer, &TpmRecvSize, RecvBuffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -238,9 +204,8 @@ TpmCommExtend (
   Send TSC_PhysicalPresence command to TPM.
 
   @param[in] PeiServices        Describes the list of possible PEI Services.
-  @param[in] TpmHandle          TPM handle.  
   @param[in] PhysicalPresence   The state to set the TPMs Physical Presence flags.  
- 
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_TIMEOUT           The register can't run into the expected status in time.
   @retval EFI_BUFFER_TOO_SMALL  Response data buffer is too small.
@@ -250,7 +215,6 @@ TpmCommExtend (
 EFI_STATUS
 TpmCommPhysicalPresence (
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      TPM_PHYSICAL_PRESENCE     PhysicalPresence
   )
 {
@@ -269,6 +233,40 @@ TpmCommPhysicalPresence (
   SendBuffer.Hdr.paramSize    = SwapBytes32 (TpmSendSize);
   SendBuffer.Hdr.ordinal      = SwapBytes32 (TSC_ORD_PhysicalPresence);
   SendBuffer.PhysicalPresence = SwapBytes16 (PhysicalPresence);
-  Status = TisTpmCommand (PeiServices, TpmHandle, (UINT8 *)&SendBuffer, TpmSendSize, RecvBuffer, &TpmRecvSize);
+  Status = Tpm12SubmitCommand (TpmSendSize, (UINT8 *)&SendBuffer, &TpmRecvSize, RecvBuffer);
   return Status;
+}
+
+/**
+  Single function calculates SHA1 digest value for all raw data. It
+  combines Sha1Init(), Sha1Update() and Sha1Final().
+
+  @param[in]  Data          Raw data to be digested.
+  @param[in]  DataLen       Size of the raw data.
+  @param[out] Digest        Pointer to a buffer that stores the final digest.
+
+  @retval     EFI_SUCCESS   Always successfully calculate the final digest.
+**/
+EFI_STATUS
+EFIAPI
+TpmCommHashAll (
+  IN  CONST UINT8                   *Data,
+  IN        UINTN                   DataLen,
+  OUT       TPM_DIGEST              *Digest
+  )
+{
+  VOID     *Sha1Ctx;
+  UINTN    CtxSize;
+
+  CtxSize = Sha1GetContextSize ();
+  Sha1Ctx = AllocatePool (CtxSize);
+  ASSERT (Sha1Ctx != NULL);
+
+  Sha1Init (Sha1Ctx);
+  Sha1Update (Sha1Ctx, Data, DataLen);
+  Sha1Final (Sha1Ctx, (UINT8 *)Digest);
+
+  FreePool (Sha1Ctx);
+
+  return EFI_SUCCESS;
 }

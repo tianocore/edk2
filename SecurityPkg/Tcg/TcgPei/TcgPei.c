@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -32,7 +32,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeimEntryPoint.h>
-#include <Library/TpmCommLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
@@ -207,7 +206,6 @@ EndofPeiSignalNotifyCallBack (
   @param[in]      HashData      Physical address of the start of the data buffer 
                                 to be hashed, extended, and logged.
   @param[in]      HashDataLen   The length, in bytes, of the buffer referenced by HashData.
-  @param[in]      TpmHandle     TPM handle.
   @param[in]      NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.  
   @param[in]      NewEventData  Pointer to the new event data.  
 
@@ -221,7 +219,6 @@ HashLogExtendEvent (
   IN      EFI_PEI_SERVICES          **PeiServices,
   IN      UINT8                     *HashData,
   IN      UINTN                     HashDataLen,
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      TCG_PCR_EVENT_HDR         *NewEventHdr,
   IN      UINT8                     *NewEventData
   )
@@ -247,7 +244,6 @@ HashLogExtendEvent (
 
   Status = TpmCommExtend (
              PeiServices,
-             TpmHandle,
              &NewEventHdr->Digest,
              NewEventHdr->PCRIndex,
              NULL
@@ -286,7 +282,6 @@ Done:
   Measure CRTM version.
 
   @param[in]      PeiServices   Describes the list of possible PEI Services.
-  @param[in]      TpmHandle     TPM handle.
 
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
@@ -296,8 +291,7 @@ Done:
 EFI_STATUS
 EFIAPI
 MeasureCRTMVersion (
-  IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle
+  IN      EFI_PEI_SERVICES          **PeiServices
   )
 {
   TCG_PCR_EVENT_HDR                 TcgEventHdr;
@@ -315,7 +309,6 @@ MeasureCRTMVersion (
            PeiServices,
            (UINT8*)PcdGetPtr (PcdFirmwareVersionString),
            TcgEventHdr.EventSize,
-           TpmHandle,
            &TcgEventHdr,
            (UINT8*)PcdGetPtr (PcdFirmwareVersionString)
            );
@@ -345,9 +338,6 @@ MeasureFvImage (
   EFI_STATUS                        Status;
   EFI_PLATFORM_FIRMWARE_BLOB        FvBlob;
   TCG_PCR_EVENT_HDR                 TcgEventHdr;
-  TIS_TPM_HANDLE                    TpmHandle;
-
-  TpmHandle = (TIS_TPM_HANDLE) (UINTN) TPM_BASE_ADDRESS;
 
   //
   // Check if it is in Excluded FV list
@@ -388,7 +378,6 @@ MeasureFvImage (
              (EFI_PEI_SERVICES **) GetPeiServicesTablePointer(),
              (UINT8*) (UINTN) FvBlob.BlobBase,
              (UINTN) FvBlob.BlobLength,
-             TpmHandle,
              &TcgEventHdr,
              (UINT8*) &FvBlob
              );
@@ -410,7 +399,6 @@ MeasureFvImage (
   Measure main BIOS.
 
   @param[in]      PeiServices   Describes the list of possible PEI Services.
-  @param[in]      TpmHandle     TPM handle.
 
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
@@ -420,8 +408,7 @@ MeasureFvImage (
 EFI_STATUS
 EFIAPI
 MeasureMainBios (
-  IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle
+  IN      EFI_PEI_SERVICES          **PeiServices
   )
 {
   EFI_STATUS                        Status;
@@ -556,12 +543,9 @@ PhysicalPresencePpiNotifyCallback (
   PEI_LOCK_PHYSICAL_PRESENCE_PPI    *LockPhysicalPresencePpi;
   BOOLEAN                           LifetimeLock;
   BOOLEAN                           CmdEnable;
-  TIS_TPM_HANDLE                    TpmHandle;
   TPM_PHYSICAL_PRESENCE             PhysicalPresenceValue;
 
-  TpmHandle        = (TIS_TPM_HANDLE) (UINTN) TPM_BASE_ADDRESS;
-
-  Status = TpmCommGetCapability (PeiServices, TpmHandle, NULL, &LifetimeLock, &CmdEnable);
+  Status = TpmCommGetCapability (PeiServices, NULL, &LifetimeLock, &CmdEnable);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -591,7 +575,6 @@ PhysicalPresencePpiNotifyCallback (
      
     Status = TpmCommPhysicalPresence (
                PeiServices,
-               TpmHandle,
                PhysicalPresenceValue
                );
     if (EFI_ERROR (Status)) {
@@ -621,7 +604,6 @@ PhysicalPresencePpiNotifyCallback (
     //
     Status = TpmCommPhysicalPresence (
                PeiServices,
-               TpmHandle,
                TPM_PHYSICAL_PRESENCE_CMD_ENABLE
                );
     if (EFI_ERROR (Status)) {
@@ -634,7 +616,6 @@ PhysicalPresencePpiNotifyCallback (
   // 
   Status = TpmCommPhysicalPresence (
               PeiServices,
-              TpmHandle,
               TPM_PHYSICAL_PRESENCE_LOCK
               );
   return Status;
@@ -644,7 +625,6 @@ PhysicalPresencePpiNotifyCallback (
   Check if TPM chip is activeated or not.
 
   @param[in]      PeiServices   Describes the list of possible PEI Services.
-  @param[in]      TpmHandle     TPM handle.
 
   @retval TRUE    TPM is activated.
   @retval FALSE   TPM is deactivated.
@@ -653,14 +633,13 @@ PhysicalPresencePpiNotifyCallback (
 BOOLEAN
 EFIAPI
 IsTpmUsable (
-  IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      TIS_TPM_HANDLE            TpmHandle
+  IN      EFI_PEI_SERVICES          **PeiServices
   )
 {
   EFI_STATUS                        Status;
   BOOLEAN                           Deactivated;
 
-  Status = TpmCommGetCapability (PeiServices, TpmHandle, &Deactivated, NULL, NULL);
+  Status = TpmCommGetCapability (PeiServices, &Deactivated, NULL, NULL);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
@@ -684,7 +663,6 @@ PeimEntryMP (
   )
 {
   EFI_STATUS                        Status;
-  TIS_TPM_HANDLE                    TpmHandle;
 
   Status = PeiServicesLocatePpi (
                &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid, 
@@ -699,18 +677,17 @@ PeimEntryMP (
   mMeasuredChildFvInfo = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
   ASSERT (mMeasuredChildFvInfo != NULL);
 
-  TpmHandle = (TIS_TPM_HANDLE)(UINTN)TPM_BASE_ADDRESS;
-  Status = TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR)TpmHandle);
+  Status = Tpm12RequestUseTpm ();
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (IsTpmUsable (PeiServices, TpmHandle)) {
+  if (IsTpmUsable (PeiServices)) {
     if (PcdGet8 (PcdTpmScrtmPolicy) == 1) {
-      Status = MeasureCRTMVersion (PeiServices, TpmHandle);
+      Status = MeasureCRTMVersion (PeiServices);
     }
 
-    Status = MeasureMainBios (PeiServices, TpmHandle);
+    Status = MeasureMainBios (PeiServices);
   }  
 
   //
@@ -745,7 +722,6 @@ PeimEntryMA (
   EFI_STATUS                        Status;
   EFI_STATUS                        Status2;
   EFI_BOOT_MODE                     BootMode;
-  TIS_TPM_HANDLE                    TpmHandle;
 
   if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
     DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
@@ -776,15 +752,14 @@ PeimEntryMA (
   }
 
   if (!mImageInMemory) {
-    TpmHandle = (TIS_TPM_HANDLE)(UINTN)TPM_BASE_ADDRESS;
-    Status = TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR)TpmHandle);
+    Status = Tpm12RequestUseTpm ();
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "TPM not detected!\n"));
       goto Done;
     }
 
     if (PcdGet8 (PcdTpmInitializationPolicy) == 1) {
-      Status = TpmCommStartup ((EFI_PEI_SERVICES**)PeiServices, TpmHandle, BootMode);
+      Status = TpmCommStartup ((EFI_PEI_SERVICES**)PeiServices, BootMode);
       if (EFI_ERROR (Status) ) {
         goto Done;
       }
@@ -794,7 +769,7 @@ PeimEntryMA (
     // TpmSelfTest is optional on S3 path, skip it to save S3 time
     //
     if (BootMode != BOOT_ON_S3_RESUME) {
-      Status = TpmCommContinueSelfTest ((EFI_PEI_SERVICES**)PeiServices, TpmHandle);
+      Status = TpmCommContinueSelfTest ((EFI_PEI_SERVICES**)PeiServices);
       if (EFI_ERROR (Status)) {
         goto Done;
       }
