@@ -547,7 +547,7 @@ TerminalConInTimerHandler (
     Status = SerialIo->SetAttributes (
                         SerialIo,
                         Mode->BaudRate,
-                        Mode->ReceiveFifoDepth,
+                        0, // the device's default FIFO depth
                         (UINT32) SerialInTimeOut,
                         (EFI_PARITY_TYPE) (Mode->Parity),
                         (UINT8) Mode->DataBits,
