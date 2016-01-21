@@ -1133,7 +1133,7 @@ BcfgDisplayDump(
       VariableName,
       Description,
       DevPathString,
-      OptionalDataOffset <= BufferSize ? L'N' : L'Y'
+      OptionalDataOffset >= BufferSize ? L'N' : L'Y'
       );
     if (VerboseOutput) {
       for (LoopVar2 = OptionalDataOffset; LoopVar2 < BufferSize; LoopVar2++){
