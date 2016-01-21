@@ -1052,6 +1052,7 @@ BcfgDisplayDump(
   CHAR16          *DevPathString;
   VOID            *DevPath;
   UINTN           Errors;
+  EFI_LOAD_OPTION *LoadOption;
 
   if (OrderCount == 0) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_BCFG_NONE), gShellBcfgHiiHandle, L"bcfg");  
@@ -1086,6 +1087,24 @@ BcfgDisplayDump(
 
     if (EFI_ERROR(Status) || Buffer == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_READ_FAIL), gShellBcfgHiiHandle, L"bcfg", VariableName);  
+      ++Errors;
+      goto Cleanup;
+    }
+
+    //
+    // We expect the Attributes, FilePathListLength, and L'\0'-terminated
+    // Description fields to be present.
+    //
+    if (BufferSize < sizeof *LoadOption + sizeof (CHAR16)) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_BCFG_VAR_CORRUPT),
+        gShellBcfgHiiHandle,
+        L"bcfg",
+        VariableName
+        );
       ++Errors;
       goto Cleanup;
     }
