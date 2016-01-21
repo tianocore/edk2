@@ -87,7 +87,6 @@ extern EFI_DNS6_PROTOCOL             mDns6Protocol;
 
 #define DNS_DEFAULT_TIMEOUT      2
 #define DNS_DEFAULT_RETRY        3
-#define DNS_DEFAULT_BLKSIZE      512
 
 #define DNS_TIME_TO_GETMAP       5
 
@@ -554,24 +553,6 @@ EFIAPI
 AddDns6ServerIp (
   IN LIST_ENTRY                *Dns6ServerList,
   IN EFI_IPv6_ADDRESS           ServerIp
-  );
-
-/**
-  Fill QName for IP querying. QName is a domain name represented as 
-  a sequence of labels, where each label consists of a length octet 
-  followed by that number of octets. The domain name terminates with 
-  the zero length octet for the null label of the root.
-
-  @param  HostName          Queried HostName    
-
-  @retval NULL      Failed to fill QName.
-  @return           QName filled successfully.
-  
-**/ 
-CHAR8 *
-EFIAPI
-DnsFillinQNameForQueryIp (
-  IN  CHAR16              *HostName
   );
 
 /**

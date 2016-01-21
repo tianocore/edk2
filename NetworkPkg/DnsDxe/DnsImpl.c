@@ -1038,61 +1038,6 @@ AddDns6ServerIp (
 }
 
 /**
-  Fill QName for IP querying. QName is a domain name represented as 
-  a sequence of labels, where each label consists of a length octet 
-  followed by that number of octets. The domain name terminates with 
-  the zero length octet for the null label of the root. Caller should 
-  take responsibility to the buffer in QName.
-
-  @param  HostName          Queried HostName    
-
-  @retval NULL      Failed to fill QName.
-  @return           QName filled successfully.
-  
-**/ 
-CHAR8 *
-EFIAPI
-DnsFillinQNameForQueryIp (
-  IN  CHAR16              *HostName
-  )
-{
-  CHAR8                 *QueryName;
-  CHAR8                 *Header;
-  CHAR8                 *Tail;
-  UINTN                 Len;
-  UINTN                 Index;
-
-  QueryName  = NULL;
-  Header     = NULL;
-  Tail       = NULL;
-
-  QueryName = AllocateZeroPool (DNS_DEFAULT_BLKSIZE);
-  if (QueryName == NULL) {
-    return NULL;
-  }
-  
-  Header = QueryName;
-  Tail = Header + 1;
-  Len = 0;
-  for (Index = 0; HostName[Index] != 0; Index++) {
-    *Tail = (CHAR8) HostName[Index];
-    if (*Tail == '.') {
-      *Header = (CHAR8) Len;
-      Header = Tail;
-      Tail ++;
-      Len = 0;
-    } else {
-      Tail++;
-      Len++;
-    }
-  }
-  *Header = (CHAR8) Len;
-  *Tail = 0;
-
-  return QueryName;
-}
-
-/**
   Find out whether the response is valid or invalid.
 
   @param  TokensMap       All DNS transmittal Tokens entry.  
@@ -1806,8 +1751,12 @@ ConstructDNSQuery (
   NET_FRAGMENT        Frag;
   DNS_HEADER          *DnsHeader;
   DNS_QUERY_SECTION   *DnsQuery;
-  
-  Frag.Bulk = AllocatePool (DNS_DEFAULT_BLKSIZE * sizeof (UINT8));
+
+  //
+  // Messages carried by UDP are restricted to 512 bytes (not counting the IP
+  // or UDP headers).
+  //
+  Frag.Bulk = AllocatePool (DNS_MAX_MESSAGE_SIZE * sizeof (UINT8));
   if (Frag.Bulk == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }

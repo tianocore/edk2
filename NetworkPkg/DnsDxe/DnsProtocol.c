@@ -454,7 +454,7 @@ Dns4HostNameToIp (
   //
   // Construct QName.
   //
-  QueryName = DnsFillinQNameForQueryIp (TokenEntry->QueryHostName);
+  QueryName = NetLibCreateDnsQName (TokenEntry->QueryHostName);
   if (QueryName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -1264,7 +1264,7 @@ Dns6HostNameToIp (
   //
   // Construct QName.
   //
-  QueryName = DnsFillinQNameForQueryIp (TokenEntry->QueryHostName);
+  QueryName = NetLibCreateDnsQName (TokenEntry->QueryHostName);
   if (QueryName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
