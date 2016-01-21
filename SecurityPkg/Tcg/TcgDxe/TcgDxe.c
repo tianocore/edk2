@@ -46,7 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
-#include <Library/TpmCommLib.h>
+#include <Library/Tpm12DeviceLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
 #include <Library/ReportStatusCodeLib.h>
@@ -63,7 +63,6 @@ typedef struct _TCG_DXE_DATA {
   EFI_TCG_SERVER_ACPI_TABLE         *TcgServerAcpiTable;
   UINTN                             EventLogSize;
   UINT8                             *LastEvent;
-  TIS_TPM_HANDLE                    TpmHandle;
 } TCG_DXE_DATA;
 
 
@@ -114,7 +113,7 @@ EFI_TCG_SERVER_ACPI_TABLE           mTcgServerAcpiTemplate = {
     0,
     0,
     EFI_ACPI_3_0_BYTE,
-    TPM_BASE_ADDRESS          // Base Address
+    0                         // Base Address
   },
   0,                          // Reserved
   {0},                        // Configuration Address
@@ -455,7 +454,6 @@ TcgDxePassThroughToTpm (
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
 
   return TisPcExecute (
-           TcgData->TpmHandle,
            "%r%/%r",
            TpmInputParameterBlock,
            (UINTN) TpmInputParameterBlockSize,
@@ -509,7 +507,6 @@ TcgDxeHashLogExtendEventI (
   }
 
   Status = TpmCommExtend (
-             TcgData->TpmHandle,
              &NewEventHdr->Digest,
              NewEventHdr->PCRIndex,
              NULL
@@ -623,7 +620,6 @@ TCG_DXE_DATA                 mTcgDxeData = {
   &mTcgClientAcpiTemplate,
   &mTcgServerAcpiTemplate,
   0,
-  NULL,
   NULL
 };
 
@@ -1183,6 +1179,7 @@ InstallAcpiTable (
     Checksum = CalculateCheckSum8 ((UINT8 *)&mTcgServerAcpiTemplate, sizeof (mTcgServerAcpiTemplate));
     mTcgServerAcpiTemplate.Header.Checksum = Checksum;
 
+    mTcgServerAcpiTemplate.BaseAddress.Address = PcdGet64 (PcdTpmBaseAddress);
     Status = AcpiTable->InstallAcpiTable (
                             AcpiTable,
                             &mTcgServerAcpiTemplate,
@@ -1282,7 +1279,6 @@ GetTpmStatus (
   TPM_STCLEAR_FLAGS                 VFlags;
 
   Status = TpmCommGetFlags (
-             mTcgDxeData.TpmHandle,
              TPM_CAP_FLAG_VOLATILE,
              &VFlags,
              sizeof (VFlags)
@@ -1327,8 +1323,7 @@ DriverEntry (
     return EFI_DEVICE_ERROR;
   }
 
-  mTcgDxeData.TpmHandle = (TIS_TPM_HANDLE)(UINTN)TPM_BASE_ADDRESS;
-  Status = TisPcRequestUseTpm (mTcgDxeData.TpmHandle);
+  Status = Tpm12RequestUseTpm ();
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TPM not detected!\n"));
     return Status;

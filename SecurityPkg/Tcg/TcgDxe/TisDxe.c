@@ -1,7 +1,7 @@
 /** @file  
   TIS (TPM Interface Specification) functions used by TPM Dxe driver.
   
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -14,152 +14,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Tpm12.h>
 #include <Library/TimerLib.h>
-#include <Library/TpmCommLib.h>
+#include <Library/Tpm12DeviceLib.h>
 #include <Library/DebugLib.h>
-#include <Library/IoLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 
+//
+// Max TPM command/reponse length
+//
+#define TPMCMDBUFLENGTH             SIZE_1KB
+
 STATIC UINT8                        TpmCommandBuf[TPMCMDBUFLENGTH];
-
-/**
-  Send command to TPM for execution.
-
-  @param[in] TisReg     TPM register space base address.  
-  @param[in] TpmBuffer  Buffer for TPM command data.  
-  @param[in] DataLength TPM command data length.  
- 
-  @retval EFI_SUCCESS   Operation completed successfully.
-  @retval EFI_TIMEOUT   The register can't run into the expected status in time.
-
-**/
-EFI_STATUS
-TisPcSend (
-  IN     TIS_PC_REGISTERS_PTR       TisReg,
-  IN     UINT8                      *TpmBuffer,
-  IN     UINT32                     DataLength
-  )
-{
-  UINT16                            BurstCount;
-  UINT32                            Index;
-  EFI_STATUS                        Status;
-
-  Status = TisPcPrepareCommand (TisReg);
-  if (EFI_ERROR (Status)){
-    DEBUG ((DEBUG_ERROR, "The Tpm not ready!\n"));
-    return Status;
-  }
-  Index = 0;
-  while (Index < DataLength) {
-    Status = TisPcReadBurstCount (TisReg, &BurstCount);
-    if (EFI_ERROR (Status)) {
-      return EFI_TIMEOUT;
-    }
-    for (; BurstCount > 0 && Index < DataLength; BurstCount--) {
-      MmioWrite8 ((UINTN) &TisReg->DataFifo, *(TpmBuffer + Index));
-      Index++;
-    }
-  }
-  //
-  // Ensure the Tpm status STS_EXPECT change from 1 to 0
-  //
-  Status = TisPcWaitRegisterBits (
-             &TisReg->Status,
-             (UINT8) TIS_PC_VALID,
-             TIS_PC_STS_EXPECT,
-             TIS_TIMEOUT_C
-             );
-  return Status;
-}
-
-/**
-  Receive response data of last command from TPM.
-
-  @param[in]  TisReg            TPM register space base address.  
-  @param[out] TpmBuffer         Buffer for response data.  
-  @param[out] RespSize          Response data length.  
- 
-  @retval EFI_SUCCESS           Operation completed successfully.
-  @retval EFI_TIMEOUT           The register can't run into the expected status in time.
-  @retval EFI_DEVICE_ERROR      Unexpected device status.
-  @retval EFI_BUFFER_TOO_SMALL  Response data is too long.
-
-**/
-EFI_STATUS
-TisPcReceive (
-  IN      TIS_PC_REGISTERS_PTR      TisReg,
-     OUT  UINT8                     *TpmBuffer,
-     OUT  UINT32                    *RespSize
-  )
-{
-  EFI_STATUS                        Status;
-  UINT16                            BurstCount;
-  UINT32                            Index;
-  UINT32                            ResponseSize;
-  UINT32                            Data32;
-
-  //
-  // Wait for the command completion
-  //
-  Status = TisPcWaitRegisterBits (
-             &TisReg->Status,
-             (UINT8) (TIS_PC_VALID | TIS_PC_STS_DATA),
-             0,
-             TIS_TIMEOUT_B
-             );
-  if (EFI_ERROR (Status)) {
-    return EFI_TIMEOUT;
-  }
-  //
-  // Read the response data header and check it
-  //
-  Index = 0;
-  BurstCount = 0;
-  while (Index < sizeof (TPM_RSP_COMMAND_HDR)) {
-    Status = TisPcReadBurstCount (TisReg, &BurstCount);
-    if (EFI_ERROR (Status)) {
-      return EFI_TIMEOUT;
-    }
-    for (; BurstCount > 0 ; BurstCount--) {
-      *(TpmBuffer + Index) = MmioRead8 ((UINTN) &TisReg->DataFifo);
-      Index++;
-      if (Index == sizeof (TPM_RSP_COMMAND_HDR))
-        break;
-    }
-  }
-  //
-  // Check the reponse data header (tag,parasize and returncode )
-  //
-  CopyMem (&Data32, (TpmBuffer + 2), sizeof (UINT32));
-  ResponseSize = SwapBytes32 (Data32);
-  *RespSize =  ResponseSize;
-  if (ResponseSize == sizeof (TPM_RSP_COMMAND_HDR)) {
-    return EFI_SUCCESS;
-  }
-  if (ResponseSize < sizeof (TPM_RSP_COMMAND_HDR)) {
-    return EFI_DEVICE_ERROR;
-  }
-  if (ResponseSize > TPMCMDBUFLENGTH) {
-    return EFI_BUFFER_TOO_SMALL;
-  }
-  //
-  // Continue reading the remaining data
-  //
-  while (Index < ResponseSize) {
-    for (; BurstCount > 0 ; BurstCount--) {
-      *(TpmBuffer + Index) = MmioRead8 ((UINTN) &TisReg->DataFifo);
-      Index++;
-      if (Index == ResponseSize) {
-        return EFI_SUCCESS;
-      }
-    }
-    Status = TisPcReadBurstCount (TisReg, &BurstCount);
-    if (EFI_ERROR (Status) && (Index < ResponseSize)) {
-      return EFI_DEVICE_ERROR;
-    }
-  }
-  return EFI_SUCCESS;
-}
+STATIC UINT8                        TpmResponseBuf[TPMCMDBUFLENGTH];
 
 /**
   Format TPM command data according to the format control character.
@@ -368,7 +234,6 @@ TisPcReceiveV (
 EFI_STATUS
 EFIAPI
 TisPcExecute (
-  IN      TIS_TPM_HANDLE            TisReg,
   IN      CONST CHAR8               *Fmt,
   ...
   )
@@ -394,35 +259,20 @@ TisPcExecute (
     }
     Fmt++;
   }
+
   //
   // Send the command to TPM
   //
-  Status = TisPcSend (TisReg, TpmCommandBuf, BufSize);
-  if (EFI_ERROR (Status))  {
-    //
-    // Ensure the TPM state change from "Reception" to "Idle/Ready"
-    //
-    MmioWrite8 ((UINTN) &(((TIS_PC_REGISTERS_PTR) TisReg)->Status), TIS_PC_STS_READY);
-    goto Error;
-  }
-
-  MmioWrite8 ((UINTN) &(((TIS_PC_REGISTERS_PTR) TisReg)->Status), TIS_PC_STS_GO);
-  Fmt++;
-  //
-  // Receive the response data from TPM
-  //
-  ZeroMem (TpmCommandBuf, TPMCMDBUFLENGTH);
-  Status = TisPcReceive (TisReg, TpmCommandBuf, &ResponseSize);
-  //
-  // Ensure the TPM state change from "Execution" or "Completion" to "Idle/Ready"
-  //
-  MmioWrite8 ((UINTN) &(((TIS_PC_REGISTERS_PTR) TisReg)->Status), TIS_PC_STS_READY);
+  ZeroMem (TpmResponseBuf, sizeof (TpmResponseBuf));
+  ResponseSize = sizeof (TpmResponseBuf);
+  Status = Tpm12SubmitCommand (BufSize, TpmCommandBuf, &ResponseSize, TpmResponseBuf);
   if (EFI_ERROR (Status)) {
     goto Error;
   }
-  
+  Fmt++;
+
   //
-  // Get the formatted data from the TpmCommandBuf.
+  // Get the formatted data from the TpmResponseBuf.
   //
   BufSize =0;
   DataFinished = FALSE;
@@ -430,7 +280,7 @@ TisPcExecute (
     if (*Fmt == '%') {
       Fmt++;
     }
-    Status = TisPcReceiveV (*Fmt, &Ap, TpmCommandBuf, &BufSize, ResponseSize, &DataFinished);
+    Status = TisPcReceiveV (*Fmt, &Ap, TpmResponseBuf, &BufSize, ResponseSize, &DataFinished);
     if (EFI_ERROR (Status)) {
       goto Error;
     }

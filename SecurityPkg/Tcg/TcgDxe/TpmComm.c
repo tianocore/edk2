@@ -1,7 +1,7 @@
 /** @file  
   Utility functions used by TPM Dxe driver.
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -14,15 +14,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Tpm12.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
-#include <Library/TpmCommLib.h>
+#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/BaseCryptLib.h>
 
 #include "TpmComm.h"
 
 /**
   Extend a TPM PCR.
 
-  @param[in]  TpmHandle       TPM handle.  
   @param[in]  DigestToExtend  The 160 bit value representing the event to be recorded.  
   @param[in]  PcrIndex        The PCR to be updated.
   @param[out] NewPcrValue     New PCR value after extend.  
@@ -33,7 +34,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 TpmCommExtend (
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      TPM_DIGEST                *DigestToExtend,
   IN      TPM_PCRINDEX              PcrIndex,
      OUT  TPM_DIGEST                *NewPcrValue
@@ -53,7 +53,6 @@ TpmCommExtend (
     sizeof (CmdHdr) + sizeof (PcrIndex) + sizeof (*DigestToExtend);
   CmdHdr.ordinal = TPM_ORD_Extend;
   Status = TisPcExecute (
-             TpmHandle,
              "%h%d%r%/%h%r",
              &CmdHdr,
              PcrIndex,
@@ -75,7 +74,6 @@ TpmCommExtend (
 /**
   Get TPM capability flags.
 
-  @param[in]  TpmHandle    TPM handle.  
   @param[in]  FlagSubcap   Flag subcap.  
   @param[out] FlagBuffer   Pointer to the buffer for returned flag structure.
   @param[in]  FlagSize     Size of the buffer.  
@@ -86,7 +84,6 @@ TpmCommExtend (
 **/
 EFI_STATUS
 TpmCommGetFlags (
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      UINT32                    FlagSubcap,
      OUT  VOID                      *FlagBuffer,
   IN      UINTN                     FlagSize
@@ -102,7 +99,6 @@ TpmCommGetFlags (
   CmdHdr.ordinal = TPM_ORD_GetCapability;
 
   Status = TisPcExecute (
-             TpmHandle,
              "%h%d%d%d%/%h%d%r",
              &CmdHdr,
              TPM_CAP_FLAG,
@@ -166,5 +162,39 @@ TpmCommLogEvent (
     NewEventData,
     NewEventHdr->EventSize
     );
+  return EFI_SUCCESS;
+}
+
+/**
+  Single function calculates SHA1 digest value for all raw data. It
+  combines Sha1Init(), Sha1Update() and Sha1Final().
+
+  @param[in]  Data          Raw data to be digested.
+  @param[in]  DataLen       Size of the raw data.
+  @param[out] Digest        Pointer to a buffer that stores the final digest.
+
+  @retval     EFI_SUCCESS   Always successfully calculate the final digest.
+**/
+EFI_STATUS
+EFIAPI
+TpmCommHashAll (
+  IN  CONST UINT8                   *Data,
+  IN        UINTN                   DataLen,
+  OUT       TPM_DIGEST              *Digest
+  )
+{
+  VOID     *Sha1Ctx;
+  UINTN    CtxSize;
+
+  CtxSize = Sha1GetContextSize ();
+  Sha1Ctx = AllocatePool (CtxSize);
+  ASSERT (Sha1Ctx != NULL);
+
+  Sha1Init (Sha1Ctx);
+  Sha1Update (Sha1Ctx, Data, DataLen);
+  Sha1Final (Sha1Ctx, (UINT8 *)Digest);
+
+  FreePool (Sha1Ctx);
+
   return EFI_SUCCESS;
 }

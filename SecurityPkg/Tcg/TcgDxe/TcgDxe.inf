@@ -36,6 +36,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
   SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
@@ -47,7 +48,8 @@
   UefiRuntimeServicesTableLib
   BaseMemoryLib
   DebugLib
-  TpmCommLib
+  Tpm12DeviceLib
+  BaseCryptLib
   PrintLib
   UefiLib
   PcdLib
@@ -69,6 +71,7 @@
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass              ## SOMETIMES_CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid               ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress                ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId             ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId        ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision       ## SOMETIMES_CONSUMES

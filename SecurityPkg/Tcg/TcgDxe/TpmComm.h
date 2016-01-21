@@ -1,7 +1,7 @@
 /** @file  
   Definitions and function prototypes used by TPM DXE driver.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -40,7 +40,6 @@ TpmCommLogEvent (
 /**
   Extend a TPM PCR.
 
-  @param[in]  TpmHandle       TPM handle.  
   @param[in]  DigestToExtend  The 160 bit value representing the event to be recorded.  
   @param[in]  PcrIndex        The PCR to be updated.
   @param[out] NewPcrValue     New PCR value after extend.  
@@ -51,7 +50,6 @@ TpmCommLogEvent (
 **/
 EFI_STATUS
 TpmCommExtend (
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      TPM_DIGEST                *DigestToExtend,
   IN      TPM_PCRINDEX              PcrIndex,
      OUT  TPM_DIGEST                *NewPcrValue
@@ -60,7 +58,6 @@ TpmCommExtend (
 /**
   Get TPM capability flags.
 
-  @param[in]  TpmHandle    TPM handle.  
   @param[in]  FlagSubcap   Flag subcap.  
   @param[out] FlagBuffer   Pointer to the buffer for returned flag structure.
   @param[in]  FlagSize     Size of the buffer.  
@@ -71,7 +68,6 @@ TpmCommExtend (
 **/
 EFI_STATUS
 TpmCommGetFlags (
-  IN      TIS_TPM_HANDLE            TpmHandle,
   IN      UINT32                    FlagSubcap,
      OUT  VOID                      *Buffer,
   IN      UINTN                     Size
@@ -83,7 +79,7 @@ TpmCommGetFlags (
   @param[in] TisReg    TPM Handle.  
   @param[in] Fmt       Format control string.  
   @param[in] ...       The variable argument list.
- 
+
   @retval EFI_SUCCESS  Operation completed successfully.
   @retval EFI_TIMEOUT  The register can't run into the expected status in time.
 
@@ -91,9 +87,26 @@ TpmCommGetFlags (
 EFI_STATUS
 EFIAPI
 TisPcExecute (
-  IN      TIS_TPM_HANDLE            TisReg,
   IN      CONST CHAR8               *Fmt,
   ...
+  );
+
+/**
+  Single function calculates SHA1 digest value for all raw data. It
+  combines Sha1Init(), Sha1Update() and Sha1Final().
+
+  @param[in]  Data          Raw data to be digested.
+  @param[in]  DataLen       Size of the raw data.
+  @param[out] Digest        Pointer to a buffer that stores the final digest.
+
+  @retval     EFI_SUCCESS   Always successfully calculate the final digest.
+**/
+EFI_STATUS
+EFIAPI
+TpmCommHashAll (
+  IN  CONST UINT8                   *Data,
+  IN        UINTN                   DataLen,
+  OUT       TPM_DIGEST              *Digest
   );
 
 #endif  // _TPM_COMM_H_
