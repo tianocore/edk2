@@ -1108,11 +1108,12 @@ BcfgDisplayDump(
       ++Errors;
       goto Cleanup;
     }
+    LoadOption = (EFI_LOAD_OPTION *)Buffer;
 
-    if ((*(UINT16*)(Buffer+4)) != 0) {
-      DevPath = AllocateZeroPool(*(UINT16*)(Buffer+4));
+    if (LoadOption->FilePathListLength != 0) {
+      DevPath = AllocateZeroPool(LoadOption->FilePathListLength);
       if (DevPath != NULL) {
-        CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
+        CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), LoadOption->FilePathListLength);
         DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
       }
     }
@@ -1126,9 +1127,9 @@ BcfgDisplayDump(
       VariableName,
       (CHAR16*)(Buffer+6),
       DevPathString,
-      (StrSize((CHAR16*)(Buffer+6)) + *(UINT16*)(Buffer+4) + 6) <= BufferSize?L'N':L'Y');
+      (StrSize((CHAR16*)(Buffer+6)) + LoadOption->FilePathListLength + 6) <= BufferSize?L'N':L'Y');
     if (VerboseOutput) {
-      for (LoopVar2 = (StrSize((CHAR16*)(Buffer+6)) + *(UINT16*)(Buffer+4) + 6);LoopVar2<BufferSize;LoopVar2++){
+      for (LoopVar2 = (StrSize((CHAR16*)(Buffer+6)) + LoadOption->FilePathListLength + 6);LoopVar2<BufferSize;LoopVar2++){
         ShellPrintEx(
           -1,
           -1,
