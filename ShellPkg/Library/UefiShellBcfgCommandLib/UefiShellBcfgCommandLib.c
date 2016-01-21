@@ -1048,7 +1048,6 @@ BcfgDisplayDump(
   UINTN           BufferSize;
   CHAR16          VariableName[12];
   UINTN           LoopVar;
-  UINTN           LoopVar2;
   CHAR16          *DevPathString;
   VOID            *FilePathList;
   UINTN           Errors;
@@ -1135,19 +1134,13 @@ BcfgDisplayDump(
       DevPathString,
       OptionalDataOffset >= BufferSize ? L'N' : L'Y'
       );
-    if (VerboseOutput) {
-      for (LoopVar2 = OptionalDataOffset; LoopVar2 < BufferSize; LoopVar2++){
-        ShellPrintEx(
-          -1,
-          -1,
-          L"%02x",
-          Buffer[LoopVar2]);
-      }
-      ShellPrintEx(
-        -1,
-        -1,
-        NULL,
-        L"\r\n");
+    if (VerboseOutput && (OptionalDataOffset < BufferSize)) {
+      DumpHex (
+        2,                               // Indent
+        0,                               // Offset (displayed)
+        BufferSize - OptionalDataOffset, // DataSize
+        Buffer + OptionalDataOffset      // UserData
+        );
     }
 
 Cleanup:
