@@ -37,6 +37,7 @@
 #string STR_GEN_OUT_MEM           #language en-US "%H%s%N: Memory allocation was not successful.\r\n"
 #string STR_BCFG_WRITE_FAIL       #language en-US "%H%s%N: Unable to write to '%H%s%N'\r\n"
 #string STR_BCFG_READ_FAIL        #language en-US "%H%s%N: Unable to read from '%H%s%N'\r\n"
+#string STR_BCFG_VAR_CORRUPT      #language en-US "%H%s%N: Variable '%H%s%N' corrupt.\r\n"
 #string STR_BCFG_HANDLE           #language en-US "%H%s%N: The handle [%H%02x%N] does not have DevicePath.\r\n"
 #string STR_BCFG_FILE             #language en-US "%H%s%N: The file '%H%s%N' matches multiple files.\r\n"
 #string STR_BCFG_FILE_OPEN        #language en-US "%H%s%N: The file '%H%s%N' did not open.\r\n"
