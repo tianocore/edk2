@@ -181,13 +181,16 @@ SERIAL_DEVICE_PATH mSerialDevicePath = {
 // Template used to initialize the Serial IO protocols.
 //
 EFI_SERIAL_IO_MODE mSerialIoMode = {
-  0, // ControlMask
-  0, // Timeout
-  0, // BaudRate
-  1, // ReceiveFifoDepth
-  0, // DataBits
-  0, // Parity
-  0  // StopBits
+  //
+  //    value  field                set in SerialDxeInitialize()?
+  //---------  -------------------  -----------------------------
+            0, // ControlMask
+            0, // Timeout
+            0, // BaudRate          yes
+            1, // ReceiveFifoDepth
+            0, // DataBits          yes
+            0, // Parity            yes
+            0  // StopBits          yes
 };
 
 EFI_SERIAL_IO_PROTOCOL mSerialIoTemplate = {
