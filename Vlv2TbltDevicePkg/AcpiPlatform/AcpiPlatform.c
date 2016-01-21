@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
                                                                                    
 
   This program and the accompanying materials are licensed and made available under
@@ -1056,6 +1056,7 @@ AcpiPlatformEntryPoint (
   mGlobalNvsArea.Area->BatteryChargingSolution          = GLOBAL_NVS_DEVICE_DISABLE;
   mGlobalNvsArea.Area->ISPDevSel                        = mSystemConfiguration.ISPDevSel;
   mGlobalNvsArea.Area->LpeEnable                        = mSystemConfiguration.Lpe;
+  mGlobalNvsArea.Area->LpeAudioReportedByDSDT           = mSystemConfiguration.LpeAudioReportedByDSDT;
 
   if (mSystemConfiguration.ISPEn == 0) {
     mGlobalNvsArea.Area->ISPDevSel                      = GLOBAL_NVS_DEVICE_DISABLE;

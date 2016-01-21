@@ -5,7 +5,7 @@
 ;*    Family of Customer Reference Boards.                                *;
 ;*                                                                        *;
 ;*                                                                        *;
-;*    Copyright (c) 2012  - 2014, Intel Corporation. All rights reserved    *;
+;*    Copyright (c) 2012  - 2016, Intel Corporation. All rights reserved    *;
 ;
 ; This program and the accompanying materials are licensed and made available under
 ; the terms and conditions of the BSD License that accompanies this distribution.
@@ -605,7 +605,10 @@ Device(I2C2)
     {
 
       If (LEqual(LPEE, 2)) { // LPE enable/disable
-        Return(0xF)
+        If (LEqual(LPAD, 1)) 
+        {
+          Return(0xF)
+        }
       }
       Return(0)
     }

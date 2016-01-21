@@ -1,6 +1,6 @@
 /*++
 
-  Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
                                                                                    
 
   This program and the accompanying materials are licensed and made available under
@@ -1309,6 +1309,7 @@ typedef struct {
   UINT8   SdCardRemovable; // ACPI reporting MMC/SD media as: removable/non-removable
   UINT8   GpioWakeCapability;
   UINT8   RtcBattery;
+  UINT8   LpeAudioReportedByDSDT;
 
 } SYSTEM_CONFIGURATION;
 #pragma pack()

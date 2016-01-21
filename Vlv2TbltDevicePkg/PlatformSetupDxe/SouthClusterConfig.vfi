@@ -1,6 +1,6 @@
 //
 //
-// Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
 //                                                                                  
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License that accompanies this distribution.  
@@ -780,6 +780,15 @@ form formid = AZALIA_OPTIONS_FORM_ID,
       option text = STRING_TOKEN(STR_LPE_PCI_MODE), value=1, flags=0 | RESET_REQUIRED;
       option text = STRING_TOKEN(STR_LPE_ACPI_MODE), value=2, flags=0 | RESET_REQUIRED;
   endoneof;
+
+  grayoutif NOT ideqval Setup.Lpe == 0x2;
+  oneof varid   = Setup.LpeAudioReportedByDSDT,
+      prompt      = STRING_TOKEN(STR_LPE_REPORTED_BY_DSDT_PROMPT),
+      help        = STRING_TOKEN(STR_LPE_REPORTED_BY_DSDT_HELP),
+      option text = STRING_TOKEN(STR_DISABLE), value=0, flags=DEFAULT | MANUFACTURING | RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_ENABLE), value=1, flags=RESET_REQUIRED;
+  endoneof;
+  endif;
 
   subtitle text = STRING_TOKEN(STR_NULL_STRING);
   suppressif ideqval Setup.AzaliaDs == 0x1;

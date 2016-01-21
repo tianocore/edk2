@@ -5,7 +5,7 @@
 ;*    Family of Customer Reference Boards.                                *;
 ;*                                                                        *;
 ;*                                                                        *;
-;*    Copyright (c) 2012  - 2014, Intel Corporation. All rights reserved    *;
+;*    Copyright (c) 2012  - 2016, Intel Corporation. All rights reserved    *;
 ;
 ; This program and the accompanying materials are licensed and made available under
 ; the terms and conditions of the BSD License that accompanies this distribution.
@@ -139,7 +139,10 @@ scope (\_SB)
     {
       If (LAnd(LAnd(LEqual(LPEE, 2), LEqual(LPED, 0)), LEqual(OSEL, 0)))
       {
-        Return (0xF)
+        If(LEqual(LPAD, 1))
+        {
+          Return (0xF)
+        }
       }
       Return (0x0)
     }
@@ -218,7 +221,10 @@ scope (\_SB)
     {
       If (LAnd(LAnd(LEqual(LPEE, 2), LEqual(LPED, 0)), LEqual(OSEL, 1)))
       {
-        Return (0xF)
+        If(LEqual(LPAD, 1))
+        {
+          Return (0xF)
+        }
       }
       Return (0x0)
     }

@@ -1,6 +1,6 @@
 /*++
 
-  Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
                                                                                    
 
   This program and the accompanying materials are licensed and made available under
@@ -472,6 +472,7 @@ typedef struct {
   UINT32      DIDX;                              // 793 Device ID for eDP device
   UINT8       MicrosoftIoT;                      // (794)JP1 pins are for Microsoft IoT project.
   UINT8       RtcBattery;                        // (795) The Flag of RTC Battery Present.
+  UINT8       LpeAudioReportedByDSDT;            // (796)
 } EFI_GLOBAL_NVS_AREA;
 #pragma pack ()
 
