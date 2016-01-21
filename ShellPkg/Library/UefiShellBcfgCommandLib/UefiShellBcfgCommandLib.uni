@@ -27,13 +27,11 @@
 
 #string STR_GEN_NO_MEM            #language en-US "%H%s%N: Memory is not available.\r\n"
 #string STR_GEN_PROBLEM           #language en-US "%H%s%N: Unknown flag - '%H%s%N'\r\n"
-#string STR_GEN_PROBLEM_VAL       #language en-US "%H%s%N: Bad value - '%H%s%N' for flag - '%H%s%N'\r\n"
 #string STR_GEN_NO_VALUE          #language en-US "%H%s%N: Missing argument for flag - '%H%s%N'\r\n"
 #string STR_GEN_PARAM_INV         #language en-US "%H%s%N: Invalid argument - '%H%s%N'\r\n"
 #string STR_GEN_NO_DRIVER_BOOT    #language en-US "%H%s%N: Driver or Boot must be selected.\r\n"
 #string STR_GEN_BOOT_ONLY         #language en-US "%H%s%N: Boot must be selected for hot key options.\r\n"
 #string STR_GEN_TOO_FEW           #language en-US "%H%s%N: Too few arguments.\r\n"
-#string STR_GEN_TOO_MANY          #language en-US "%H%s%N: Too many arguments.\r\n"
 #string STR_GEN_FILE_OPEN_FAIL    #language en-US "%H%s%N: Cannot open file - '%H%s%N'\r\n"
 #string STR_GEN_FIND_FAIL         #language en-US "%H%s%N: File not found - '%H%s%N'\r\n"
 #string STR_GEN_OUT_MEM           #language en-US "%H%s%N: Memory allocation was not successful.\r\n"
@@ -50,7 +48,6 @@
 #string STR_BCFG_NUMB_RANGE       #language en-US "%H%s%N: Numbers must be under %d.\r\n"
 #string STR_BCFG_NONE             #language en-US "No options found.\r\n"
 
-#string STR_BCFG_LOCATION_RANGE   #language en-US "target location must be <= %d.\r\n"
 #string STR_BCFG_LOAD_OPTIONS     #language en-US "Option: %B%02x%N. Variable: %B%-11s%N\r\n"
                                                   "  Desc    - %s\r\n"
                                                   "  DevPath - %s\r\n"
