@@ -1051,11 +1051,14 @@ BcfgDisplayDump(
   UINTN           LoopVar2;
   CHAR16          *DevPathString;
   VOID            *DevPath;
+  UINTN           Errors;
 
   if (OrderCount == 0) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_BCFG_NONE), gShellBcfgHiiHandle, L"bcfg");  
     return (SHELL_SUCCESS);
   }
+
+  Errors = 0;
 
   for (LoopVar = 0 ; LoopVar < OrderCount ; LoopVar++) {
     Buffer        = NULL;
@@ -1083,7 +1086,8 @@ BcfgDisplayDump(
 
     if (EFI_ERROR(Status) || Buffer == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_READ_FAIL), gShellBcfgHiiHandle, L"bcfg", VariableName);  
-      return (SHELL_INVALID_PARAMETER);
+      ++Errors;
+      goto Cleanup;
     }
 
     if ((*(UINT16*)(Buffer+4)) != 0) {
@@ -1120,6 +1124,7 @@ BcfgDisplayDump(
         L"\r\n");
     }
 
+Cleanup:
     if (Buffer != NULL) {
       FreePool(Buffer);
     }
@@ -1130,7 +1135,7 @@ BcfgDisplayDump(
       FreePool(DevPathString);
     }
   }
-  return (SHELL_SUCCESS);
+  return (Errors > 0) ? SHELL_INVALID_PARAMETER : SHELL_SUCCESS;
 }
 
 /**
