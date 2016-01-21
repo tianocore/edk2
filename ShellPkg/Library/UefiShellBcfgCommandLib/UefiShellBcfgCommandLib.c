@@ -1060,6 +1060,9 @@ BcfgDisplayDump(
   for (LoopVar = 0 ; LoopVar < OrderCount ; LoopVar++) {
     Buffer        = NULL;
     BufferSize    = 0;
+    DevPath       = NULL;
+    DevPathString = NULL;
+
     UnicodeSPrint(VariableName, sizeof(VariableName), L"%s%04x", Op, CurrentOrder[LoopVar]);
 
     Status = gRT->GetVariable(
@@ -1085,15 +1088,10 @@ BcfgDisplayDump(
 
     if ((*(UINT16*)(Buffer+4)) != 0) {
       DevPath = AllocateZeroPool(*(UINT16*)(Buffer+4));
-      if (DevPath == NULL) {
-        DevPathString = NULL;
-      } else {
+      if (DevPath != NULL) {
         CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
         DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
       }
-    } else {
-      DevPath       = NULL;
-      DevPathString = NULL;
     }
     ShellPrintHiiEx(
       -1,
