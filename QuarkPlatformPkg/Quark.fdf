@@ -2,7 +2,7 @@
 # FDF file of Clanton Peak CRB platform with 32-bit DXE
 #
 # This package provides QuarkNcSocId platform specific modules.
-# Copyright (c) 2013 - 2015 Intel Corporation.
+# Copyright (c) 2013 - 2016 Intel Corporation.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -342,6 +342,10 @@ INF  MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/PcatSingleSegmentPciCfg2
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
 INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
+!if $(MEASURED_BOOT_ENABLE)
+INF  SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf
+INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
+!endif
 
 FILE FV_IMAGE = 1E9D7604-EF45-46a0-BD8A-71AC78C17AC1 {
   SECTION PEI_DEPEX_EXP = {gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid}
@@ -564,6 +568,13 @@ INF  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF  FatPkg/EnhancedFatDxe/Fat.inf
+!endif
+
+#
+# Trusted Platform Module
+#
+!if $(MEASURED_BOOT_ENABLE)
+INF  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
 !endif
 
 ################################################################################
