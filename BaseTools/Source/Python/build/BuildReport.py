@@ -4,7 +4,7 @@
 # This module contains the functionality to generate build report after
 # build all target completes successfully.
 #
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1175,18 +1175,20 @@ class FdRegionReport(object):
     # @param Wa              Workspace context information
     #
     def _DiscoverNestedFvList(self, FvName, Wa):
-        for Ffs in Wa.FdfProfile.FvDict[FvName.upper()].FfsList:
-            for Section in Ffs.SectionList:
-                try:
-                    for FvSection in Section.SectionList:
-                        if FvSection.FvName in self.FvList:
-                            continue
-                        self._GuidsDb[Ffs.NameGuid.upper()] = FvSection.FvName
-                        self.FvList.append(FvSection.FvName)
-                        self.FvInfo[FvSection.FvName] = ("Nested FV", 0, 0)
-                        self._DiscoverNestedFvList(FvSection.FvName, Wa)
-                except AttributeError:
-                    pass
+        FvDictKey=FvName.upper()
+        if FvDictKey in Wa.FdfProfile.FvDict:
+            for Ffs in Wa.FdfProfile.FvDict[FvName.upper()].FfsList:
+                for Section in Ffs.SectionList:
+                    try:
+                        for FvSection in Section.SectionList:
+                            if FvSection.FvName in self.FvList:
+                                continue
+                            self._GuidsDb[Ffs.NameGuid.upper()] = FvSection.FvName
+                            self.FvList.append(FvSection.FvName)
+                            self.FvInfo[FvSection.FvName] = ("Nested FV", 0, 0)
+                            self._DiscoverNestedFvList(FvSection.FvName, Wa)
+                    except AttributeError:
+                        pass
 
     ##
     # Constructor function for class FdRegionReport
@@ -1264,27 +1266,29 @@ class FdRegionReport(object):
         # Collect the GUID map in the FV firmware volume
         #
         for FvName in self.FvList:
-            for Ffs in Wa.FdfProfile.FvDict[FvName.upper()].FfsList:
-                try:
-                    #
-                    # collect GUID map for binary EFI file in FDF file.
-                    #
-                    Guid = Ffs.NameGuid.upper()
-                    Match = gPcdGuidPattern.match(Ffs.NameGuid)
-                    if Match:
-                        PcdTokenspace = Match.group(1)
-                        PcdToken = Match.group(2)
-                        if (PcdToken, PcdTokenspace) in PlatformPcds:
-                            GuidValue = PlatformPcds[(PcdToken, PcdTokenspace)]
-                            Guid = GuidStructureByteArrayToGuidString(GuidValue).upper()
-                    for Section in Ffs.SectionList:
-                        try:
-                            ModuleSectFile = mws.join(Wa.WorkspaceDir, Section.SectFileName)
-                            self._GuidsDb[Guid] = ModuleSectFile
-                        except AttributeError:
-                            pass
-                except AttributeError:
-                    pass
+            FvDictKey=FvName.upper()
+            if FvDictKey in Wa.FdfProfile.FvDict:
+                for Ffs in Wa.FdfProfile.FvDict[FvName.upper()].FfsList:
+                    try:
+                        #
+                        # collect GUID map for binary EFI file in FDF file.
+                        #
+                        Guid = Ffs.NameGuid.upper()
+                        Match = gPcdGuidPattern.match(Ffs.NameGuid)
+                        if Match:
+                            PcdTokenspace = Match.group(1)
+                            PcdToken = Match.group(2)
+                            if (PcdToken, PcdTokenspace) in PlatformPcds:
+                                GuidValue = PlatformPcds[(PcdToken, PcdTokenspace)]
+                                Guid = GuidStructureByteArrayToGuidString(GuidValue).upper()
+                        for Section in Ffs.SectionList:
+                            try:
+                                ModuleSectFile = mws.join(Wa.WorkspaceDir, Section.SectFileName)
+                                self._GuidsDb[Guid] = ModuleSectFile
+                            except AttributeError:
+                                pass
+                    except AttributeError:
+                        pass
 
 
     ##
