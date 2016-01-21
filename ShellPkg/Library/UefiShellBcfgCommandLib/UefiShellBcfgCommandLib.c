@@ -1050,7 +1050,7 @@ BcfgDisplayDump(
   UINTN           LoopVar;
   UINTN           LoopVar2;
   CHAR16          *DevPathString;
-  VOID            *DevPath;
+  VOID            *FilePathList;
   UINTN           Errors;
   EFI_LOAD_OPTION *LoadOption;
   CHAR16          *Description;
@@ -1066,7 +1066,6 @@ BcfgDisplayDump(
   for (LoopVar = 0 ; LoopVar < OrderCount ; LoopVar++) {
     Buffer        = NULL;
     BufferSize    = 0;
-    DevPath       = NULL;
     DevPathString = NULL;
 
     UnicodeSPrint(VariableName, sizeof(VariableName), L"%s%04x", Op, CurrentOrder[LoopVar]);
@@ -1116,11 +1115,8 @@ BcfgDisplayDump(
     DescriptionSize = StrSize (Description);
 
     if (LoadOption->FilePathListLength != 0) {
-      DevPath = AllocateZeroPool(LoadOption->FilePathListLength);
-      if (DevPath != NULL) {
-        CopyMem(DevPath, Buffer+6+DescriptionSize, LoadOption->FilePathListLength);
-        DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
-      }
+      FilePathList = (UINT8 *)Description + DescriptionSize;
+      DevPathString = ConvertDevicePathToText(FilePathList, TRUE, FALSE);
     }
     ShellPrintHiiEx(
       -1,
@@ -1152,9 +1148,6 @@ BcfgDisplayDump(
 Cleanup:
     if (Buffer != NULL) {
       FreePool(Buffer);
-    }
-    if (DevPath != NULL) {
-      FreePool(DevPath);
     }
     if (DevPathString != NULL) {
       FreePool(DevPathString);
