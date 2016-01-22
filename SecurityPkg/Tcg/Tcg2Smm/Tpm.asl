@@ -2,7 +2,7 @@
   The TPM2 definition block in ACPI table for TCG2 physical presence  
   and MemoryClear.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -187,7 +187,7 @@ DefinitionBlock (
             //
             // a) Get Physical Presence Interface Version
             //
-            Return ("1.2")
+            Return ("1.3")
           }
           Case (2)
           {
