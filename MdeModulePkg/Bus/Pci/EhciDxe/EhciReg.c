@@ -624,9 +624,16 @@ EhcInitHC (
   //
   // 3. Power up all ports if EHCI has Port Power Control (PPC) support
   //
+  // DO NOT CLEAR THE PORT CHANGE BITS BY WRITING ONES TO THEM
+  // OR YOU WILL NOT SEE PORT CHANGE STATUS WHEN DRIVER STARTS
+  // AND YOU WILL HAVE TO MANUALLY ENUMERATE
+  //
   if (Ehc->HcStructParams & HCSP_PPC) {
     for (Index = 0; Index < (UINT8) (Ehc->HcStructParams & HCSP_NPORTS); Index++) {
-      EhcSetOpRegBit (Ehc, (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index)), PORTSC_POWER);
+      RegVal = EhcReadOpReg(Ehc, (UINT32)(EHC_PORT_STAT_OFFSET + (4 * Index)));
+      RegVal &= ~PORTSC_CHANGE_MASK;
+      RegVal |= PORTSC_POWER;
+      EhcWriteOpReg (Ehc, (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index)), RegVal);
     }
   }
 
