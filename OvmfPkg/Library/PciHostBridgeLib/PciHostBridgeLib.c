@@ -17,6 +17,8 @@
 
 #include <IndustryStandard/Pci.h>
 
+#include <Protocol/PciRootBridgeIo.h>
+
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -70,6 +72,15 @@ InitRootBridge (
   ZeroMem (RootBus, sizeof *RootBus);
 
   RootBus->Segment = 0;
+
+  RootBus->Supports   = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
+                        EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
+                        EFI_PCI_ATTRIBUTE_ISA_IO_16 |
+                        EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
+                        EFI_PCI_ATTRIBUTE_VGA_MEMORY |
+                        EFI_PCI_ATTRIBUTE_VGA_IO_16  |
+                        EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
+  RootBus->Attributes = RootBus->Supports;
 
   return EFI_OUT_OF_RESOURCES;
 }
