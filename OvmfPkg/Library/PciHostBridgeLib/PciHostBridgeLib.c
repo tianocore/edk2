@@ -17,6 +17,7 @@
 
 #include <IndustryStandard/Pci.h>
 
+#include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciRootBridgeIo.h>
 
 #include <Library/BaseMemoryLib.h>
@@ -83,6 +84,14 @@ InitRootBridge (
   RootBus->Attributes = RootBus->Supports;
 
   RootBus->DmaAbove4G = FALSE;
+
+  RootBus->AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
+  RootBus->PMem.Base            = 0;
+  RootBus->PMem.Limit           = 0;
+  RootBus->PMemAbove4G.Base     = 0;
+  RootBus->PMemAbove4G.Limit    = 0;
+  RootBus->MemAbove4G.Base      = 0;
+  RootBus->MemAbove4G.Limit     = 0;
 
   return EFI_OUT_OF_RESOURCES;
 }
