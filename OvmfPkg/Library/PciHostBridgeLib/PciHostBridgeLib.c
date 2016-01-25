@@ -82,6 +82,8 @@ InitRootBridge (
                         EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
   RootBus->Attributes = RootBus->Supports;
 
+  RootBus->DmaAbove4G = FALSE;
+
   return EFI_OUT_OF_RESOURCES;
 }
 
