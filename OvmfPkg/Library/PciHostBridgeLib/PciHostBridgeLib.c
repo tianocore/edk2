@@ -17,6 +17,7 @@
 
 #include <IndustryStandard/Pci.h>
 
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciHostBridgeLib.h>
@@ -63,6 +64,13 @@ InitRootBridge (
   OUT PCI_ROOT_BRIDGE *RootBus
   )
 {
+  //
+  // Be safe if other fields are added to PCI_ROOT_BRIDGE later.
+  //
+  ZeroMem (RootBus, sizeof *RootBus);
+
+  RootBus->Segment = 0;
+
   return EFI_OUT_OF_RESOURCES;
 }
 

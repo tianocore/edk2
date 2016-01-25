@@ -39,6 +39,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
   DebugLib
   MemoryAllocationLib
   PciLib
