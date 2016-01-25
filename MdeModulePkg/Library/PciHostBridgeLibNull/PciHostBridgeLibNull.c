@@ -2,21 +2,22 @@
   Null instance of PCI Host Bridge Library with empty functions.
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are
-  licensed and made available under the terms and conditions of
-  the BSD License which accompanies this distribution.  The full
-  text of the license may be found at
+
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #include <PiDxe.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/DebugLib.h>
 
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mPciHostBridgeLibAcpiAddressSpaceTypeStr[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED
+CHAR16 *mPciHostBridgeLibAcpiAddressSpaceTypeStr[] = {
   L"Mem", L"I/O", L"Bus"
 };
 
@@ -40,7 +41,8 @@ PciHostBridgeGetRootBridges (
 }
 
 /**
-  Free the root bridge instances array returned from PciHostBridgeGetRootBridges().
+  Free the root bridge instances array returned from
+  PciHostBridgeGetRootBridges().
 
   @param  The root bridge instances array.
   @param  The count of the array.
@@ -59,13 +61,15 @@ PciHostBridgeFreeRootBridges (
   Inform the platform that the resource conflict happens.
 
   @param HostBridgeHandle Handle of the Host Bridge.
-  @param Configuration    Pointer to PCI I/O and PCI memory resource descriptors.
-                          The Configuration contains the resources for all the
-                          root bridges. The resource for each root bridge is
-                          terminated with END descriptor and an additional END
-                          is appended indicating the end of the entire resources.
-                          The resource descriptor field values follow the description
-                          in EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.SubmitResources().
+  @param Configuration    Pointer to PCI I/O and PCI memory resource
+                          descriptors. The Configuration contains the resources
+                          for all the root bridges. The resource for each root
+                          bridge is terminated with END descriptor and an
+                          additional END is appended indicating the end of the
+                          entire resources. The resource descriptor field
+                          values follow the description in
+                          EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+                          .SubmitResources().
 **/
 VOID
 EFIAPI
@@ -84,14 +88,20 @@ PciHostBridgeResourceConflict (
     DEBUG ((EFI_D_ERROR, "RootBridge[%d]:\n", RootBridgeIndex++));
     for (; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
       ASSERT (Descriptor->ResType <
-              sizeof (mPciHostBridgeLibAcpiAddressSpaceTypeStr) / sizeof (mPciHostBridgeLibAcpiAddressSpaceTypeStr[0])
+              (sizeof (mPciHostBridgeLibAcpiAddressSpaceTypeStr) /
+               sizeof (mPciHostBridgeLibAcpiAddressSpaceTypeStr[0])
+               )
               );
       DEBUG ((EFI_D_ERROR, " %s: Length/Alignment = 0x%lx / 0x%lx\n",
-              mPciHostBridgeLibAcpiAddressSpaceTypeStr[Descriptor->ResType], Descriptor->AddrLen, Descriptor->AddrRangeMax));
+              mPciHostBridgeLibAcpiAddressSpaceTypeStr[Descriptor->ResType],
+              Descriptor->AddrLen, Descriptor->AddrRangeMax
+              ));
       if (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
         DEBUG ((EFI_D_ERROR, "     Granularity/SpecificFlag = %ld / %02x%s\n",
                 Descriptor->AddrSpaceGranularity, Descriptor->SpecificFlag,
-                ((Descriptor->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0) ? L" (Prefetchable)" : L""
+                ((Descriptor->SpecificFlag &
+                  EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE
+                  ) != 0) ? L" (Prefetchable)" : L""
                 ));
       }
     }
@@ -99,6 +109,8 @@ PciHostBridgeResourceConflict (
     // Skip the END descriptor for root bridge
     //
     ASSERT (Descriptor->Desc == ACPI_END_TAG_DESCRIPTOR);
-    Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((EFI_ACPI_END_TAG_DESCRIPTOR *) Descriptor + 1);
+    Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)(
+                   (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor + 1
+                   );
   }
 }
