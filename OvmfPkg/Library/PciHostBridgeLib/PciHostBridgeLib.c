@@ -22,15 +22,51 @@
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
 
 
+#pragma pack(1)
+typedef struct {
+  ACPI_HID_DEVICE_PATH     AcpiDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL EndDevicePath;
+} OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH;
+#pragma pack ()
+
+
 GLOBAL_REMOVE_IF_UNREFERENCED
 CHAR16 *mPciHostBridgeLibAcpiAddressSpaceTypeStr[] = {
   L"Mem", L"I/O", L"Bus"
+};
+
+
+STATIC
+CONST
+OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
+  {
+    {
+      ACPI_DEVICE_PATH,
+      ACPI_DP,
+      {
+        (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
+        (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8)
+      }
+    },
+    EISA_PNP_ID(0x0A03), // HID
+    0                    // UID
+  },
+
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
+  }
 };
 
 
@@ -67,6 +103,8 @@ InitRootBridge (
   OUT PCI_ROOT_BRIDGE *RootBus
   )
 {
+  OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH *DevicePath;
+
   //
   // Be safe if other fields are added to PCI_ROOT_BRIDGE later.
   //
@@ -103,7 +141,19 @@ InitRootBridge (
 
   RootBus->NoExtendedConfigSpace = TRUE;
 
-  return EFI_OUT_OF_RESOURCES;
+  DevicePath = AllocateCopyPool (sizeof mRootBridgeDevicePathTemplate,
+                 &mRootBridgeDevicePathTemplate);
+  if (DevicePath == NULL) {
+    DEBUG ((EFI_D_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
+    return EFI_OUT_OF_RESOURCES;
+  }
+  DevicePath->AcpiDevicePath.UID = RootBusNumber;
+  RootBus->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
+
+  DEBUG ((EFI_D_INFO,
+    "%a: populated root bus %d, with room for %d subordinate bus(es)\n",
+    __FUNCTION__, RootBusNumber, MaxSubBusNumber - RootBusNumber));
+  return EFI_SUCCESS;
 }
 
 
@@ -120,6 +170,7 @@ UninitRootBridge (
   IN PCI_ROOT_BRIDGE *RootBus
   )
 {
+  FreePool (RootBus->DevicePath);
 }
 
 

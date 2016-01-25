@@ -41,6 +41,7 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  DevicePathLib
   MemoryAllocationLib
   PciLib
   QemuFwCfgLib
