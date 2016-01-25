@@ -34,5 +34,12 @@
   PciHostBridgeLib.c
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  PciLib
+  QemuFwCfgLib
