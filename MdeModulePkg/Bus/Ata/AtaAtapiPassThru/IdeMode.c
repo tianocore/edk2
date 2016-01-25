@@ -1936,7 +1936,7 @@ AtaPacketReadWrite (
   IN     EFI_PCI_IO_PROTOCOL       *PciIo,
   IN     EFI_IDE_REGISTERS         *IdeRegisters,
   IN OUT VOID                      *Buffer,
-  IN     UINT64                    ByteCount,
+  IN OUT UINT32                    *ByteCount,
   IN     BOOLEAN                   Read,
   IN     UINT64                    Timeout
   )
@@ -1947,17 +1947,18 @@ AtaPacketReadWrite (
   EFI_STATUS  Status;
   UINT16      *PtrBuffer;
 
+  PtrBuffer         = Buffer;
+  RequiredWordCount = *ByteCount >> 1;
+
   //
   // No data transfer is premitted.
   //
-  if (ByteCount == 0) {
+  if (RequiredWordCount == 0) {
     return EFI_SUCCESS;
   }
 
-  PtrBuffer         = Buffer;
-  RequiredWordCount = (UINT32)RShiftU64(ByteCount, 1);
   //
-  // ActuralWordCount means the word count of data really transferred.
+  // ActualWordCount means the word count of data really transferred.
   //
   ActualWordCount = 0;
 
@@ -1967,14 +1968,16 @@ AtaPacketReadWrite (
     // to see whether indicates device is ready to transfer data.
     //
     Status = DRQReady2 (PciIo, IdeRegisters, Timeout);
-    if ((Status == EFI_NOT_READY) && Read) {
-      //
-      // Device provided less data than we intended to read -- exit early.
-      //
-      return CheckStatusRegister (PciIo, IdeRegisters);
-    }
     if (EFI_ERROR (Status)) {
-      return Status;
+      if (Status == EFI_NOT_READY) {
+        //
+        // Device provided less data than we intended to read, or wanted less
+        // data than we intended to write, but it may still be successful.
+        //
+        break;
+      } else {
+        return Status;
+      }
     }
 
     //
@@ -2040,6 +2043,7 @@ AtaPacketReadWrite (
     return EFI_DEVICE_ERROR;
   }
 
+  *ByteCount = ActualWordCount << 1;
   return Status;
 }
 
@@ -2138,7 +2142,7 @@ AtaPacketCommandExecute (
                PciIo,
                IdeRegisters,
                Packet->InDataBuffer,
-               Packet->InTransferLength,
+               &Packet->InTransferLength,
                TRUE,
                Packet->Timeout
                );
@@ -2147,7 +2151,7 @@ AtaPacketCommandExecute (
                PciIo,
                IdeRegisters,
                Packet->OutDataBuffer,
-               Packet->OutTransferLength,
+               &Packet->OutTransferLength,
                FALSE,
                Packet->Timeout
                );
