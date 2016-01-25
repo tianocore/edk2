@@ -44,3 +44,9 @@
   MemoryAllocationLib
   PciLib
   QemuFwCfgLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size
