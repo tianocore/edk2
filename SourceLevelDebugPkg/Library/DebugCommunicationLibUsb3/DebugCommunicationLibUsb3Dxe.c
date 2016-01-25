@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,18 +30,23 @@ AllocateAlignBuffer (
   IN UINTN                    BufferSize
   )
 {
-  VOID      *Buf;
+  EFI_PHYSICAL_ADDRESS    TmpAddr;
+  EFI_STATUS              Status;
+  VOID                    *Buf;
   
   Buf = NULL;
   
   if (gBS != NULL) {
-    Buf = (VOID *)(UINTN)0xFFFFFFFF;
-    gBS->AllocatePages (
-           AllocateMaxAddress,
-           EfiACPIMemoryNVS,
-           EFI_SIZE_TO_PAGES (BufferSize),
-           (EFI_PHYSICAL_ADDRESS *) &Buf
-           );
+    TmpAddr = 0xFFFFFFFF;
+    Status = gBS->AllocatePages (
+               AllocateMaxAddress,
+               EfiACPIMemoryNVS,
+               EFI_SIZE_TO_PAGES (BufferSize),
+               &TmpAddr
+               );
+    if (!EFI_ERROR (Status)) {
+      Buf = (VOID *) (UINTN) TmpAddr;
+    }
   }
 
   return Buf;
