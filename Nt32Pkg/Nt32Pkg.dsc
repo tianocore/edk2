@@ -6,6 +6,7 @@
 #
 # Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
 # Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -276,6 +277,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
 
 [PcdsDynamicDefault.Ia32]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFileSystem|L".!..\..\..\..\EdkShellBinPkg\Bin\Ia32\Apps"|VOID*|106

@@ -1,6 +1,7 @@
 /**@file
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -176,9 +177,9 @@ Returns:
   } while (!EFI_ERROR (Status));
 
   //
-  // Build the CPU hob with 36-bit addressing and 16-bits of IO space.
+  // Build the CPU hob with 52-bit addressing and 16-bits of IO space.
   //
-  BuildCpuHob (36, 16);
+  BuildCpuHob (52, 16);
 
   //
   // Build GUIDed Hob that contains the Memory Type Information array

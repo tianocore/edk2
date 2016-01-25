@@ -1,6 +1,7 @@
 /**@file
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -85,9 +86,15 @@ Returns:
   //
   // Relocate the base of FV region 
   // 
-  PcdSet32 (PcdFlashNvStorageVariableBase, PcdGet32 (PcdWinNtFlashNvStorageVariableBase) + (UINT32) FdBase);
-  PcdSet32 (PcdFlashNvStorageFtwWorkingBase, PcdGet32 (PcdWinNtFlashNvStorageFtwWorkingBase) + (UINT32) FdBase);
-  PcdSet32 (PcdFlashNvStorageFtwSpareBase, PcdGet32 (PcdWinNtFlashNvStorageFtwSpareBase) + (UINT32) FdBase);
+  if (FdBase >= BASE_4GB) {
+    PcdSet64 (PcdFlashNvStorageVariableBase64, PcdGet32 (PcdWinNtFlashNvStorageVariableBase) + (UINT64) FdBase);
+    PcdSet64 (PcdFlashNvStorageFtwWorkingBase64, PcdGet32 (PcdWinNtFlashNvStorageFtwWorkingBase) + (UINT64) FdBase);
+    PcdSet64 (PcdFlashNvStorageFtwSpareBase64, PcdGet32 (PcdWinNtFlashNvStorageFtwSpareBase) + (UINT64) FdBase);
+  } else {
+    PcdSet32 (PcdFlashNvStorageVariableBase, PcdGet32 (PcdWinNtFlashNvStorageVariableBase) + (UINT32) FdBase);
+    PcdSet32 (PcdFlashNvStorageFtwWorkingBase, PcdGet32 (PcdWinNtFlashNvStorageFtwWorkingBase) + (UINT32) FdBase);
+    PcdSet32 (PcdFlashNvStorageFtwSpareBase, PcdGet32 (PcdWinNtFlashNvStorageFtwSpareBase) + (UINT32) FdBase);
+  }
 
   return EFI_SUCCESS;
 }
