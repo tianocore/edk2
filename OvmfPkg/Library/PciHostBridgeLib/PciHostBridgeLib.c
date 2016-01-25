@@ -215,7 +215,17 @@ PciHostBridgeFreeRootBridges (
   UINTN           Count
   )
 {
-  return;
+  if (Bridges == NULL && Count == 0) {
+    return;
+  }
+  ASSERT (Bridges != NULL && Count > 0);
+
+  do {
+    --Count;
+    UninitRootBridge (&Bridges[Count]);
+  } while (Count > 0);
+
+  FreePool (Bridges);
 }
 
 
