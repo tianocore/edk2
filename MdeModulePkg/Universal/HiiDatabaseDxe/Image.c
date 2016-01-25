@@ -2,7 +2,7 @@
 Implementation for EFI_HII_IMAGE_PROTOCOL.
 
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -266,7 +266,7 @@ Output1bitPixel (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BitMapPtr;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      PaletteValue[2];
   EFI_HII_IMAGE_PALETTE_INFO         *Palette;
-  UINT16                             PaletteSize;
+  UINTN                              PaletteSize;
   UINT8                              Byte;
 
   ASSERT (Image != NULL && Data != NULL && PaletteInfo != NULL);
@@ -276,10 +276,14 @@ Output1bitPixel (
   //
   // First entry corresponds to color 0 and second entry corresponds to color 1.
   //
+  PaletteSize = 0;
   CopyMem (&PaletteSize, PaletteInfo, sizeof (UINT16));
   PaletteSize += sizeof (UINT16);
   Palette = AllocateZeroPool (PaletteSize);
   ASSERT (Palette != NULL);
+  if (Palette == NULL) {
+    return;
+  }
   CopyMem (Palette, PaletteInfo, PaletteSize);
 
   ZeroMem (PaletteValue, sizeof (PaletteValue));
@@ -350,7 +354,7 @@ Output4bitPixel (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BitMapPtr;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      PaletteValue[16];
   EFI_HII_IMAGE_PALETTE_INFO         *Palette;
-  UINT16                             PaletteSize;
+  UINTN                              PaletteSize;
   UINT16                             PaletteNum;
   UINT8                              Byte;
 
@@ -361,10 +365,14 @@ Output4bitPixel (
   //
   // The bitmap should allocate each color index starting from 0.
   //
+  PaletteSize = 0;
   CopyMem (&PaletteSize, PaletteInfo, sizeof (UINT16));
   PaletteSize += sizeof (UINT16);
   Palette = AllocateZeroPool (PaletteSize);
   ASSERT (Palette != NULL);
+  if (Palette == NULL) {
+    return;
+  }
   CopyMem (Palette, PaletteInfo, PaletteSize);
   PaletteNum = (UINT16)(Palette->PaletteSize / sizeof (EFI_HII_RGB_PIXEL));
 
@@ -424,7 +432,7 @@ Output8bitPixel (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BitMapPtr;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL      PaletteValue[256];
   EFI_HII_IMAGE_PALETTE_INFO         *Palette;
-  UINT16                             PaletteSize;
+  UINTN                              PaletteSize;
   UINT16                             PaletteNum;
   UINT8                              Byte;
 
@@ -435,10 +443,14 @@ Output8bitPixel (
   //
   // The bitmap should allocate each color index starting from 0.
   //
+  PaletteSize = 0;
   CopyMem (&PaletteSize, PaletteInfo, sizeof (UINT16));
   PaletteSize += sizeof (UINT16);
   Palette = AllocateZeroPool (PaletteSize);
   ASSERT (Palette != NULL);
+  if (Palette == NULL) {
+    return;
+  }
   CopyMem (Palette, PaletteInfo, PaletteSize);
   PaletteNum = (UINT16)(Palette->PaletteSize / sizeof (EFI_HII_RGB_PIXEL));
   ZeroMem (PaletteValue, sizeof (PaletteValue));
