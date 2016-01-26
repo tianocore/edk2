@@ -207,7 +207,11 @@ INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF  PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
+!if $(USE_OLD_PCI_HOST) == TRUE
 INF  OvmfPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
+!else
+INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+!endif
 INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 INF  PcAtChipsetPkg/KbcResetDxe/Reset.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
