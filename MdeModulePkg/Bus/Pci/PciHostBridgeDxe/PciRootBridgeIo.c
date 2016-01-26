@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciRootBridge.h"
 #include "PciHostResource.h"
 
-#define NO_MAPPING  (VOID *) -1
+#define NO_MAPPING  (VOID *) (UINTN) -1
 
 //
 // Lookup table for increment values based on transfer widths
