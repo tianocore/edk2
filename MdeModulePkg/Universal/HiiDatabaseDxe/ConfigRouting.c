@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1466,7 +1466,8 @@ Done:
   @param  ReturnData             The data block added for this opcode.
 
   @retval  EFI_SUCCESS           This opcode is required.
-  @retval  Others                This opcode is not required or error occur.
+  @retval  EFI_NOT_FOUND         This opcode is not required.
+  @retval  Others                Contain some error.
                                  
 **/
 EFI_STATUS
@@ -1498,7 +1499,7 @@ IsThisOpcodeRequired (
       //
       // This question is not in the requested string. Skip it.
       //
-      return EFI_SUCCESS;
+      return EFI_NOT_FOUND;
     }
   } else {
     VarOffset = IfrQuestionHdr->VarStoreInfo.VarOffset;
@@ -1510,7 +1511,7 @@ IsThisOpcodeRequired (
       //
       // This question is not in the requested string. Skip it.
       //
-      return EFI_SUCCESS;
+      return EFI_NOT_FOUND;
     }
 
     //
@@ -1772,8 +1773,21 @@ ParseIfrData (
       }
       VarWidth  = (UINT16) (sizeof (EFI_HII_REF));
 
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
       break;
@@ -1800,17 +1814,28 @@ ParseIfrData (
       }
       VarWidth  = (UINT16) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
 
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
 
-      if (BlockData == NULL) {
-        //
-        // BlockData == NULL means this opcode is not in the requst array.
-        //
-        break;
-      }
+      //
+      //when go to there,BlockData can't be NULLL.
+      //
+      ASSERT (BlockData != NULL);
 
       if (IfrOpHdr->OpCode == EFI_IFR_ONE_OF_OP) {
         //
@@ -1877,8 +1902,22 @@ ParseIfrData (
         break;
       }
       VarWidth  = IfrOrderedList->MaxContainers;
+
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
       break;
@@ -1908,17 +1947,29 @@ ParseIfrData (
         break;
       }
       VarWidth  = (UINT16) sizeof (BOOLEAN);
+
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
 
-      if (BlockData == NULL) {
-        //
-        // BlockData == NULL means this opcode is not in the requst array.
-        //
-        break;
-      }
+      //
+      //when go to there,BlockData can't be NULLL.
+      //
+      ASSERT (BlockData != NULL);
 
       //
       // Add default value for standard ID by CheckBox Flag
@@ -1995,9 +2046,22 @@ ParseIfrData (
         break;
       }
 
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       VarWidth  = (UINT16) sizeof (EFI_HII_DATE);
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
       break;
@@ -2024,9 +2088,22 @@ ParseIfrData (
         break;
       }
 
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       VarWidth  = (UINT16) sizeof (EFI_HII_TIME);
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
       break;
@@ -2053,9 +2130,22 @@ ParseIfrData (
         break;
       }
 
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       VarWidth  = (UINT16) (IfrString->MaxSize * sizeof (UINT16));
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
       break;
@@ -2082,9 +2172,22 @@ ParseIfrData (
         break;
       }
 
+      //
+      // The BlockData may allocate by other opcode,need to clean.
+      //
+      if (BlockData != NULL){
+        BlockData = NULL;
+      }
+
       VarWidth  = (UINT16) (IfrPassword->MaxSize * sizeof (UINT16));
       Status = IsThisOpcodeRequired(RequestBlockArray, HiiHandle, VarStorageData, IfrOpHdr, VarWidth, &BlockData);
       if (EFI_ERROR (Status)) {
+        if (Status == EFI_NOT_FOUND){
+          //
+          //The opcode is not required,exit and parse other opcode.
+          //
+          break;
+        }
         goto Done;
       }
 
@@ -2286,6 +2389,14 @@ ParseIfrData (
 
     IfrOffset     += IfrOpHdr->Length;
     PackageOffset += IfrOpHdr->Length;
+  }
+
+  //
+  //if Status == EFI_NOT_FOUND, just means the opcode is not required,not contain any error,
+  //so set the Status to EFI_SUCCESS.
+  //
+  if (Status == EFI_NOT_FOUND){
+    Status = EFI_SUCCESS;
   }
 
 Done:
