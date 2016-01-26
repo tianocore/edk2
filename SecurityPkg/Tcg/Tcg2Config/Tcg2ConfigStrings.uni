@@ -1,7 +1,7 @@
 /** @file
   String definitions for TCG configuration form.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -25,6 +25,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_TCG2_DEVICE_HELP                #language en-US "Attempt TPM Device: Disable, TPM1.2, or TPM2.0"
 #string STR_TCG2_DEVICE_CONTENT             #language en-US ""
 
+#string STR_TCG2_DEVICE_INTERFACE_STATE_PROMPT         #language en-US "Current TPM Device Interface"
+#string STR_TCG2_DEVICE_INTERFACE_STATE_HELP           #language en-US "Current TPM Device Interface: TIS, PTP FIFO, PTP CRB"
+#string STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT        #language en-US ""
+
+#string STR_TCG2_DEVICE_INTERFACE_CAPABILITY_PROMPT    #language en-US "PTP TPM Device Interface Capability"
+#string STR_TCG2_DEVICE_INTERFACE_CAPABILITY_HELP      #language en-US "PTP TPM Device Interface Capability: PTP FIFO, PTP CRB"
+#string STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT   #language en-US ""
+
+#string STR_TCG2_DEVICE_INTERFACE_PROMPT               #language en-US "Attempt PTP TPM Device Interface"
+#string STR_TCG2_DEVICE_INTERFACE_HELP                 #language en-US "Attempt PTP TPM Device Interface: PTP FIFO, PTP CRB"
+#string STR_TCG2_DEVICE_INTERFACE_CONTENT              #language en-US ""
+
+#string STR_TCG2_DEVICE_INTERFACE_TIS                  #language en-US "TIS"
+#string STR_TCG2_DEVICE_INTERFACE_PTP_FIFO             #language en-US "PTP FIFO"
+#string STR_TCG2_DEVICE_INTERFACE_PTP_CRB              #language en-US "PTP CRB"
+
 #string STR_TCG2_PP_OPERATION              #language en-US "TPM2 Physical Presence Operation"
 
 #string STR_TCG2_OPERATION                 #language en-US "TPM2 Operation"
@@ -47,7 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #string STR_TCG2_TPM_DISABLE               #language en-US "Disable"
 #string STR_TCG2_TPM_1_2                   #language en-US "TPM 1.2"
-#string STR_TCG2_TPM_2_0_DTPM              #language en-US "TPM 2.0 (DTPM)"
+#string STR_TCG2_TPM_2_0_DTPM              #language en-US "TPM 2.0"
 
 #string STR_TPM2_ACTIVE_HASH_ALGO                 #language en-US "TPM2 Active PCR Hash Algorithm"
 #string STR_TPM2_ACTIVE_HASH_ALGO_HELP            #language en-US "TPM2 Active PCR Hash Algorithm: SHA1, SHA256, SHA384, SHA512, SM3_256"

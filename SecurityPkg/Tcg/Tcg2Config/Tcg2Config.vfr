@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the TCG2 configuration component.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -50,6 +50,32 @@ formset
             option text = STRING_TOKEN(STR_TCG2_TPM_1_2),          value = TPM_DEVICE_1_2,          flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
             option text = STRING_TOKEN(STR_TCG2_TPM_2_0_DTPM),     value = TPM_DEVICE_2_0_DTPM,     flags = RESET_REQUIRED;
     endoneof;
+
+    suppressif ideqvallist TCG2_CONFIGURATION.TpmDevice == TPM_DEVICE_NULL TPM_DEVICE_1_2;
+    text
+      help   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_STATE_HELP),
+      text   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_STATE_PROMPT),
+        text   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT);
+
+    text
+      help   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_CAPABILITY_HELP),
+      text   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_CAPABILITY_PROMPT),
+        text   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT);
+
+    suppressif ideqval TCG2_CONFIGURATION_INFO.TpmDeviceInterfacePtpFifoSupported == 0
+            OR ideqval TCG2_CONFIGURATION_INFO.TpmDeviceInterfacePtpCrbSupported == 0;
+    oneof varid  = TCG2_CONFIGURATION_INFO.TpmDeviceInterfaceAttempt,
+          questionid = KEY_TPM_DEVICE_INTERFACE,
+          prompt = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_PROMPT),
+          help   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_HELP),
+          flags  = INTERACTIVE,
+            option text = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_TIS),          value = TPM_DEVICE_INTERFACE_TIS,          flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_PTP_FIFO),     value = TPM_DEVICE_INTERFACE_PTP_FIFO,     flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_PTP_CRB),      value = TPM_DEVICE_INTERFACE_PTP_CRB,      flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+    endoneof;
+    endif;
+
+    endif;
 
     subtitle text = STRING_TOKEN(STR_NULL);
 

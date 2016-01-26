@@ -1,7 +1,7 @@
 /** @file
   The module entry point for Tcg2 configuration module.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -159,20 +159,6 @@ Tcg2ConfigDriverEntryPoint (
   UpdateDefaultPCRBanks (Tcg2ConfigBin + sizeof(UINT32), ReadUnaligned32((UINT32 *)Tcg2ConfigBin) - sizeof(UINT32), CurrentActivePCRBanks);
 
   //
-  // Save to variable so platform driver can get it.
-  //
-  Status = gRT->SetVariable (
-                  TCG2_STORAGE_NAME,
-                  &gTcg2ConfigFormSetGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  sizeof(Tcg2Configuration),
-                  &Tcg2Configuration
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_NAME\n"));
-  }
-
-  //
   // Sync data from PCD to variable, so that we do not need detect again in S3 phase.
   //
   Tcg2DeviceDetection.TpmDeviceDetected = TPM_DEVICE_NULL;
@@ -184,6 +170,7 @@ Tcg2ConfigDriverEntryPoint (
   }
 
   PrivateData->TpmDeviceDetected = Tcg2DeviceDetection.TpmDeviceDetected;
+  Tcg2Configuration.TpmDevice = Tcg2DeviceDetection.TpmDeviceDetected;
 
   //
   // Save to variable so platform driver can get it.
@@ -205,6 +192,20 @@ Tcg2ConfigDriverEntryPoint (
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Save to variable so platform driver can get it.
+  //
+  Status = gRT->SetVariable (
+                  TCG2_STORAGE_NAME,
+                  &gTcg2ConfigFormSetGuid,
+                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                  sizeof(Tcg2Configuration),
+                  &Tcg2Configuration
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_NAME\n"));
   }
 
   //

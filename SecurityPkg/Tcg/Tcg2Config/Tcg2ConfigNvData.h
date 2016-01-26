@@ -1,7 +1,7 @@
 /** @file
   Header file for NV data structure definition.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_TPM2_PCR_BANKS_REQUEST_2            0x2005
 #define KEY_TPM2_PCR_BANKS_REQUEST_3            0x2006
 #define KEY_TPM2_PCR_BANKS_REQUEST_4            0x2007
+#define KEY_TPM_DEVICE_INTERFACE                       0x2008
 
 #define TPM_DEVICE_NULL           0
 #define TPM_DEVICE_1_2            1
@@ -47,6 +48,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TPM_DEVICE_MIN            TPM_DEVICE_1_2
 #define TPM_DEVICE_MAX            TPM_DEVICE_2_0_DTPM
 #define TPM_DEVICE_DEFAULT        TPM_DEVICE_1_2
+
+#define TPM_DEVICE_INTERFACE_TIS       0
+#define TPM_DEVICE_INTERFACE_PTP_FIFO  1
+#define TPM_DEVICE_INTERFACE_PTP_CRB   2
+#define TPM_DEVICE_INTERFACE_MAX       TPM_DEVICE_INTERFACE_PTP_FIFO
+#define TPM_DEVICE_INTERFACE_DEFAULT   TPM_DEVICE_INTERFACE_PTP_CRB
 
 #define TCG2_PROTOCOL_VERSION_DEFAULT        0x0001
 #define EFI_TCG2_EVENT_LOG_FORMAT_DEFAULT    EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2
@@ -59,11 +66,14 @@ typedef struct {
 } TCG2_CONFIGURATION;
 
 typedef struct {
-  UINT8  Sha1Supported;
-  UINT8  Sha256Supported;
-  UINT8  Sha384Supported;
-  UINT8  Sha512Supported;
-  UINT8  Sm3Supported;
+  BOOLEAN  Sha1Supported;
+  BOOLEAN  Sha256Supported;
+  BOOLEAN  Sha384Supported;
+  BOOLEAN  Sha512Supported;
+  BOOLEAN  Sm3Supported;
+  UINT8    TpmDeviceInterfaceAttempt;
+  BOOLEAN  TpmDeviceInterfacePtpFifoSupported;
+  BOOLEAN  TpmDeviceInterfacePtpCrbSupported;
 } TCG2_CONFIGURATION_INFO;
 
 //

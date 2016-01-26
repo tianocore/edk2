@@ -2,7 +2,7 @@
   HII Config Access protocol implementation of TCG2 configuration module.
   NOTE: This module is only for reference only, each platform should have its own setup page.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -16,7 +16,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Tcg2ConfigImpl.h"
 #include <Library/PcdLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/IoLib.h>
 #include <Guid/TpmInstance.h>
+
+#include <IndustryStandard/TpmPtp.h>
 
 #define EFI_TCG2_EVENT_LOG_FORMAT_ALL   (EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2 | EFI_TCG2_EVENT_LOG_FORMAT_TCG_2)
 
@@ -55,6 +58,147 @@ HII_VENDOR_DEVICE_PATH          mTcg2HiiVendorDevicePath = {
 };
 
 UINT8  mCurrentPpRequest;
+
+/**
+  Return PTP interface type.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP interface type.
+**/
+UINT8
+GetPtpInterface (
+  IN VOID *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
+
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
+
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
+      (InterfaceId.Bits.CapCRB != 0)) {
+    return TPM_DEVICE_INTERFACE_PTP_CRB;
+  }
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
+      (InterfaceId.Bits.CapFIFO != 0) &&
+      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
+    return TPM_DEVICE_INTERFACE_PTP_FIFO;
+  }
+  return TPM_DEVICE_INTERFACE_TIS;
+}
+
+/**
+  Return if PTP CRB is supported.
+
+  @param[in] Register                Pointer to PTP register.
+  
+  @retval TRUE  PTP CRB is supported.
+  @retval FALSE PTP CRB is unsupported.
+**/
+BOOLEAN
+IsPtpCrbSupported (
+  IN VOID                 *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+
+  if (((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) ||
+       (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO)) &&
+      (InterfaceId.Bits.CapCRB != 0)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+  Return if PTP FIFO is supported.
+
+  @param[in] Register                Pointer to PTP register.
+  
+  @retval TRUE  PTP FIFO is supported.
+  @retval FALSE PTP FIFO is unsupported.
+**/
+BOOLEAN
+IsPtpFifoSupported (
+  IN VOID                 *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+
+  if (((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) ||
+       (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO)) &&
+      (InterfaceId.Bits.CapFIFO != 0)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+  Set PTP interface type.
+
+  @param[in] Register                Pointer to PTP register.
+  @param[in] PtpInterface            PTP interface type.
+  
+  @retval EFI_SUCCESS                PTP interface type is set.
+  @retval EFI_INVALID_PARAMETER      PTP interface type is invalid.
+  @retval EFI_UNSUPPORTED            PTP interface type is unsupported.
+  @retval EFI_WRITE_PROTECTED        PTP interface is locked.
+**/
+EFI_STATUS
+SetPtpInterface (
+  IN VOID                 *Register,
+  IN UINT8                PtpInterface
+  )
+{
+  UINT8                         PtpInterfaceCurrent;
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+
+  PtpInterfaceCurrent = GetPtpInterface (Register);
+  if ((PtpInterfaceCurrent != TPM_DEVICE_INTERFACE_PTP_FIFO) && 
+      (PtpInterfaceCurrent != TPM_DEVICE_INTERFACE_PTP_CRB)) {
+    return EFI_UNSUPPORTED;
+  }
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+  if (InterfaceId.Bits.IntfSelLock != 0) {
+    return EFI_WRITE_PROTECTED;
+  }
+
+  switch (PtpInterface) {
+  case TPM_DEVICE_INTERFACE_PTP_FIFO:
+    if (InterfaceId.Bits.CapFIFO == 0) {
+      return EFI_UNSUPPORTED;
+    }
+    InterfaceId.Bits.InterfaceSelector = PTP_INTERFACE_IDENTIFIER_INTERFACE_SELECTOR_FIFO;
+    MmioWrite32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId, InterfaceId.Uint32);
+    return EFI_SUCCESS;
+  case TPM_DEVICE_INTERFACE_PTP_CRB:
+    if (InterfaceId.Bits.CapCRB == 0) {
+      return EFI_UNSUPPORTED;
+    }
+    InterfaceId.Bits.InterfaceSelector = PTP_INTERFACE_IDENTIFIER_INTERFACE_SELECTOR_CRB;
+    MmioWrite32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId, InterfaceId.Uint32);
+    return EFI_SUCCESS;
+  default:
+    return EFI_INVALID_PARAMETER;
+  }
+}
 
 /**
   This function allows a caller to extract the current configuration for one
@@ -267,8 +411,26 @@ Tcg2Callback (
      OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
+  EFI_INPUT_KEY               Key;
+
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if (QuestionId == KEY_TPM_DEVICE_INTERFACE) {
+      EFI_STATUS  Status;
+      Status = SetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress), Value->u8);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Error: Fail to set PTP interface!",
+          NULL
+          );
+        return EFI_DEVICE_ERROR;
+      }
+    }
   }
   
   if (Action == EFI_BROWSER_ACTION_CHANGED) {
@@ -504,6 +666,7 @@ InstallTcg2ConfigForm (
   TPML_PCR_SELECTION              Pcrs;
   CHAR16                          TempBuffer[1024];
   TCG2_CONFIGURATION_INFO         Tcg2ConfigInfo;
+  UINT8                           TpmDeviceInterfaceDetected;
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
@@ -557,7 +720,7 @@ InstallTcg2ConfigForm (
     HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_STATE_CONTENT), L"TPM 1.2", NULL);
     break;
   case TPM_DEVICE_2_0_DTPM:
-    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_STATE_CONTENT), L"TPM 2.0 (DTPM)", NULL);
+    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_STATE_CONTENT), L"TPM 2.0", NULL);
     break;
   default:
     HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_STATE_CONTENT), L"Unknown", NULL);
@@ -603,6 +766,60 @@ InstallTcg2ConfigForm (
 
   FillBufferWithBootHashAlg (TempBuffer, sizeof(TempBuffer), PrivateData->ProtocolCapability.ActivePcrBanks);
   HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_ACTIVE_PCR_BANKS_CONTENT), TempBuffer, NULL);
+
+  //
+  // Update TPM device interface type
+  //
+  if (PrivateData->TpmDeviceDetected == TPM_DEVICE_2_0_DTPM) {
+    TpmDeviceInterfaceDetected = GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+    switch (TpmDeviceInterfaceDetected) {
+    case TPM_DEVICE_INTERFACE_TIS:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"TIS", NULL);
+      break;
+    case TPM_DEVICE_INTERFACE_PTP_FIFO:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"PTP FIFO", NULL);
+      break;
+    case TPM_DEVICE_INTERFACE_PTP_CRB:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"PTP CRB", NULL);
+      break;
+     default:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"Unknown", NULL);
+      break;
+    }
+
+    Tcg2ConfigInfo.TpmDeviceInterfaceAttempt = TpmDeviceInterfaceDetected;
+    switch (TpmDeviceInterfaceDetected) {
+    case TPM_DEVICE_INTERFACE_TIS:
+      Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported = FALSE;
+      Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported  = FALSE;
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT), L"TIS", NULL);
+      break;
+    case TPM_DEVICE_INTERFACE_PTP_FIFO:
+    case TPM_DEVICE_INTERFACE_PTP_CRB:
+      Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported = IsPtpFifoSupported((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+      Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported  = IsPtpCrbSupported((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+      TempBuffer[0] = 0;
+      if (Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported) {
+        if (TempBuffer[0] != 0) {
+          StrCatS (TempBuffer, sizeof(TempBuffer) / sizeof (CHAR16), L", ");
+        }
+        StrCatS (TempBuffer, sizeof(TempBuffer) / sizeof (CHAR16), L"PTP FIFO");
+      }
+      if (Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported) {
+        if (TempBuffer[0] != 0) {
+          StrCatS (TempBuffer, sizeof(TempBuffer) / sizeof (CHAR16), L", ");
+        }
+        StrCatS (TempBuffer, sizeof(TempBuffer) / sizeof (CHAR16), L"PTP CRB");
+      }
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT), TempBuffer, NULL);
+      break;
+    default:
+      Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported = FALSE;
+      Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported  = FALSE;
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT), L"Unknown", NULL);
+      break;
+    }
+  }
 
   //
   // Set ConfigInfo, to control the check box.

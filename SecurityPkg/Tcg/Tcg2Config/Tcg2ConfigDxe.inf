@@ -4,7 +4,7 @@
 #  By this module, user may select TPM device, clear TPM state, etc.
 #  NOTE: This module is only for reference only, each platform should have its own setup page.
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2106, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -57,6 +57,7 @@
   Tpm2DeviceLib
   Tpm2CommandLib
   Tcg2PhysicalPresenceLib
+  IoLib
 
 [Guids]
   ## PRODUCES           ## HII
@@ -75,6 +76,7 @@
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid            ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap    ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress             ## CONSUMES
 
 [Depex]
   gEfiTcg2ProtocolGuid              AND
