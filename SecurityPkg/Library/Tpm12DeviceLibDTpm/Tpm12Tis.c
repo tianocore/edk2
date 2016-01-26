@@ -1,7 +1,7 @@
 /** @file
   TIS (TPM Interface Specification) functions used by TPM1.2.
   
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -22,164 +22,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/Tpm12CommandLib.h>
 #include <Library/PcdLib.h>
 
-//
-// Set structure alignment to 1-byte
-//
-#pragma pack (1)
+#include <IndustryStandard/TpmPtp.h>
+#include <IndustryStandard/TpmTis.h>
 
-//
-// Register set map as specified in TIS specification Chapter 10
-//
-typedef struct {
-  ///
-  /// Used to gain ownership for this particular port.
-  ///
-  UINT8                             Access;             // 0
-  UINT8                             Reserved1[7];       // 1
-  ///
-  /// Controls interrupts.
-  ///
-  UINT32                            IntEnable;          // 8
-  ///
-  /// SIRQ vector to be used by the TPM.
-  ///
-  UINT8                             IntVector;          // 0ch
-  UINT8                             Reserved2[3];       // 0dh
-  ///
-  /// What caused interrupt.
-  ///
-  UINT32                            IntSts;             // 10h
-  ///
-  /// Shows which interrupts are supported by that particular TPM.
-  ///
-  UINT32                            IntfCapability;     // 14h
-  ///
-  /// Status Register. Provides status of the TPM.
-  ///
-  UINT8                             Status;             // 18h
-  ///
-  /// Number of consecutive writes that can be done to the TPM.
-  ///
-  UINT16                            BurstCount;         // 19h
-  UINT8                             Reserved3[9];
-  ///
-  /// Read or write FIFO, depending on transaction.
-  ///
-  UINT32                            DataFifo;           // 24h
-  UINT8                             Reserved4[0xed8];   // 28h
-  ///
-  /// Vendor ID
-  ///
-  UINT16                            Vid;                // 0f00h
-  ///
-  /// Device ID
-  ///
-  UINT16                            Did;                // 0f02h
-  ///
-  /// Revision ID
-  ///
-  UINT8                             Rid;                // 0f04h
-  ///
-  /// TCG defined configuration registers.
-  ///
-  UINT8                             TcgDefined[0x7b];   // 0f05h
-  ///
-  /// Alias to I/O legacy space.
-  ///
-  UINT32                            LegacyAddress1;     // 0f80h
-  ///
-  /// Additional 8 bits for I/O legacy space extension.
-  ///
-  UINT32                            LegacyAddress1Ex;   // 0f84h
-  ///
-  /// Alias to second I/O legacy space.
-  ///
-  UINT32                            LegacyAddress2;     // 0f88h
-  ///
-  /// Additional 8 bits for second I/O legacy space extension.
-  ///
-  UINT32                            LegacyAddress2Ex;   // 0f8ch
-  ///
-  /// Vendor-defined configuration registers.
-  ///
-  UINT8                             VendorDefined[0x70];// 0f90h
-} TIS_PC_REGISTERS;
-
-//
-// Restore original structure alignment
-//
-#pragma pack ()
-
-//
-// Define pointer types used to access TIS registers on PC
-//
-typedef TIS_PC_REGISTERS  *TIS_PC_REGISTERS_PTR;
-
-//
-// Define bits of ACCESS and STATUS registers
-//
-
-///
-/// This bit is a 1 to indicate that the other bits in this register are valid.
-///
-#define TIS_PC_VALID                BIT7
-///
-/// Indicate that this locality is active.
-///
-#define TIS_PC_ACC_ACTIVE           BIT5
-///
-/// Set to 1 to indicate that this locality had the TPM taken away while
-/// this locality had the TIS_PC_ACC_ACTIVE bit set.
-///
-#define TIS_PC_ACC_SEIZED           BIT4
-///
-/// Set to 1 to indicate that TPM MUST reset the
-/// TIS_PC_ACC_ACTIVE bit and remove ownership for localities less than the
-/// locality that is writing this bit.
-///
-#define TIS_PC_ACC_SEIZE            BIT3
-///
-/// When this bit is 1, another locality is requesting usage of the TPM.
-///
-#define TIS_PC_ACC_PENDIND          BIT2
-///
-/// Set to 1 to indicate that this locality is requesting to use TPM.
-///
-#define TIS_PC_ACC_RQUUSE           BIT1
-///
-/// A value of 1 indicates that a T/OS has not been established on the platform
-///
-#define TIS_PC_ACC_ESTABLISH        BIT0
-
-///
-/// When this bit is 1, TPM is in the Ready state, 
-/// indicating it is ready to receive a new command.
-///
-#define TIS_PC_STS_READY            BIT6
-///
-/// Write a 1 to this bit to cause the TPM to execute that command.
-///
-#define TIS_PC_STS_GO               BIT5
-///
-/// This bit indicates that the TPM has data available as a response.
-///
-#define TIS_PC_STS_DATA             BIT4
-///
-/// The TPM sets this bit to a value of 1 when it expects another byte of data for a command.
-///
-#define TIS_PC_STS_EXPECT           BIT3
-///
-/// Writes a 1 to this bit to force the TPM to re-send the response.
-///
-#define TIS_PC_STS_RETRY            BIT1
-
-//
-// Default TimeOut value
-//
-#define TIS_TIMEOUT_A               (750  * 1000)  // 750ms
-#define TIS_TIMEOUT_B               (2000 * 1000)  // 2s
-#define TIS_TIMEOUT_C               (750  * 1000)  // 750ms
-#define TIS_TIMEOUT_D               (750  * 1000)  // 750ms
+typedef enum {
+  PtpInterfaceTis,
+  PtpInterfaceFifo,
+  PtpInterfaceCrb,
+  PtpInterfaceMax,
+} PTP_INTERFACE_TYPE;
 
 //
 // Max TPM command/reponse length
@@ -551,6 +402,103 @@ Tpm12SubmitCommand (
 }
 
 /**
+  Return PTP interface type.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP interface type.
+**/
+PTP_INTERFACE_TYPE
+Tpm12GetPtpInterface (
+  IN VOID *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
+
+  if (!Tpm12TisPcPresenceCheck (Register)) {
+    return PtpInterfaceMax;
+  }
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
+
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
+      (InterfaceId.Bits.CapCRB != 0)) {
+    return PtpInterfaceCrb;
+  }
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
+      (InterfaceId.Bits.CapFIFO != 0) &&
+      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
+    return PtpInterfaceFifo;
+  }
+  return PtpInterfaceTis;
+}
+
+/**
+  Check whether the value of a TPM chip register satisfies the input BIT setting.
+
+  @param[in]  Register     Address port of register to be checked.
+  @param[in]  BitSet       Check these data bits are set.
+  @param[in]  BitClear     Check these data bits are clear.
+  @param[in]  TimeOut      The max wait time (unit MicroSecond) when checking register.
+
+  @retval     EFI_SUCCESS  The register satisfies the check bit.
+  @retval     EFI_TIMEOUT  The register can't run into the expected status in time.
+**/
+EFI_STATUS
+Tpm12PtpCrbWaitRegisterBits (
+  IN      UINT32                    *Register,
+  IN      UINT32                    BitSet,
+  IN      UINT32                    BitClear,
+  IN      UINT32                    TimeOut
+  )
+{
+  UINT32                            RegRead;
+  UINT32                            WaitTime;
+
+  for (WaitTime = 0; WaitTime < TimeOut; WaitTime += 30){
+    RegRead = MmioRead32 ((UINTN)Register);
+    if ((RegRead & BitSet) == BitSet && (RegRead & BitClear) == 0) {
+      return EFI_SUCCESS;
+    }
+    MicroSecondDelay (30);
+  }
+  return EFI_TIMEOUT;
+}
+
+/**
+  Get the control of TPM chip.
+
+  @param[in] CrbReg                Pointer to CRB register.
+
+  @retval    EFI_SUCCESS           Get the control of TPM chip.
+  @retval    EFI_INVALID_PARAMETER CrbReg is NULL.
+  @retval    EFI_NOT_FOUND         TPM chip doesn't exit.
+  @retval    EFI_TIMEOUT           Can't get the TPM control in time.
+**/
+EFI_STATUS
+Tpm12PtpCrbRequestUseTpm (
+  IN      PTP_CRB_REGISTERS_PTR      CrbReg
+  )
+{
+  EFI_STATUS                        Status;
+
+  MmioWrite32((UINTN)&CrbReg->LocalityControl, PTP_CRB_LOCALITY_CONTROL_REQUEST_ACCESS);
+  Status = Tpm12PtpCrbWaitRegisterBits (
+             &CrbReg->LocalityStatus,
+             PTP_CRB_LOCALITY_STATUS_GRANTED,
+             0,
+             PTP_TIMEOUT_A
+             );
+  return Status;
+}
+
+/**
   This service requests use TPM12.
 
   @retval EFI_SUCCESS      Get the control of TPM12 chip.
@@ -563,5 +511,20 @@ Tpm12RequestUseTpm (
   VOID
   )
 {
-  return Tpm12TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  PTP_INTERFACE_TYPE  PtpInterface;
+
+  //
+  // Special handle for TPM1.2 to check PTP too, because PTP/TIS share same register address.
+  // Some other program might leverage this function to check the existence of TPM chip.
+  //
+  PtpInterface = Tpm12GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  switch (PtpInterface) {
+  case PtpInterfaceCrb:
+    return Tpm12PtpCrbRequestUseTpm ((PTP_CRB_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  case PtpInterfaceFifo:
+  case PtpInterfaceTis:
+    return Tpm12TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  default:
+    return EFI_NOT_FOUND;
+  }
 }
