@@ -5,7 +5,7 @@
 
   Boot option manipulation
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -116,7 +116,6 @@ BOpt_DestroyMenuEntry (
   case BM_LOAD_CONTEXT_SELECT:
     LoadContext = (BM_LOAD_CONTEXT *) MenuEntry->VariableContext;
     FreePool (LoadContext->FilePathList);
-    FreePool (LoadContext->LoadOption);
     if (LoadContext->OptionalData != NULL) {
       FreePool (LoadContext->OptionalData);
     }
@@ -336,7 +335,6 @@ BOpt_GetBootOptions (
     LoadOptionEnd                       = LoadOption + BootOptionSize;
 
     NewMenuEntry->OptionNumber          = BootOrderList[Index];
-    NewLoadContext->LoadOptionModified  = FALSE;
     NewLoadContext->Deleted             = FALSE;
     NewLoadContext->IsBootNext          = BootNextFlag;
 
@@ -374,13 +372,8 @@ BOpt_GetBootOptions (
     // for easy use with following LOAD_OPTION
     // embedded in this struct
     //
-    NewLoadContext->LoadOption      = LoadOption;
-    NewLoadContext->LoadOptionSize  = BootOptionSize;
 
     NewLoadContext->Attributes      = *(UINT32 *) LoadOptionPtr;
-    NewLoadContext->IsActive        = (BOOLEAN) (NewLoadContext->Attributes & LOAD_OPTION_ACTIVE);
-
-    NewLoadContext->ForceReconnect  = (BOOLEAN) (NewLoadContext->Attributes & LOAD_OPTION_FORCE_RECONNECT);
 
     LoadOptionPtr += sizeof (UINT32);
 
@@ -426,8 +419,6 @@ BOpt_GetBootOptions (
         LoadOptionPtr,
         OptionalDataSize
         );
-
-      NewLoadContext->OptionalDataSize = OptionalDataSize;
     }
 
     InsertTailList (&BootOptionMenu.Head, &NewMenuEntry->Link);
@@ -441,6 +432,8 @@ BOpt_GetBootOptions (
   if (BootOrderList != NULL) {
     FreePool (BootOrderList);
   }
+
+  FreePool(LoadOption);
   BootOptionMenu.MenuNumber = MenuCount;
   return EFI_SUCCESS;
 }
@@ -708,7 +701,6 @@ BOpt_GetDriverOptions (
     LoadOptionPtr                       = LoadOption;
     LoadOptionEnd                       = LoadOption + DriverOptionSize;
     NewMenuEntry->OptionNumber          = DriverOrderList[Index];
-    NewLoadContext->LoadOptionModified  = FALSE;
     NewLoadContext->Deleted             = FALSE;
     NewLoadContext->IsLegacy            = FALSE;
 
@@ -717,13 +709,8 @@ BOpt_GetDriverOptions (
     // for easy use with following LOAD_OPTION
     // embedded in this struct
     //
-    NewLoadContext->LoadOption      = LoadOption;
-    NewLoadContext->LoadOptionSize  = DriverOptionSize;
 
     NewLoadContext->Attributes      = *(UINT32 *) LoadOptionPtr;
-    NewLoadContext->IsActive        = (BOOLEAN) (NewLoadContext->Attributes & LOAD_OPTION_ACTIVE);
-
-    NewLoadContext->ForceReconnect  = (BOOLEAN) (NewLoadContext->Attributes & LOAD_OPTION_FORCE_RECONNECT);
 
     LoadOptionPtr += sizeof (UINT32);
 
@@ -771,7 +758,6 @@ BOpt_GetDriverOptions (
         OptionalDataSize
         );
 
-      NewLoadContext->OptionalDataSize = OptionalDataSize;
     }
 
     InsertTailList (&DriverOptionMenu.Head, &NewMenuEntry->Link);
@@ -781,6 +767,7 @@ BOpt_GetDriverOptions (
   if (DriverOrderList != NULL) {
     FreePool (DriverOrderList);
   }
+  FreePool(LoadOption);
   DriverOptionMenu.MenuNumber = Index;
   return EFI_SUCCESS;
 
