@@ -1,11 +1,12 @@
 // /** @file
-// Provides TPM 2.0 TIS functions for DTPM
+// Provides TPM 2.0 TIS/PTP functions for DTPM
 //
-// This library implements TIS (TPM Interface Specification) functions which is
+// This library implements TIS (TPM Interface Specification) and
+// PTP (Platform TPM Profile) functions which is
 // used for every TPM 2.0 command. Choosing this library means platform uses and
 // only uses TPM 2.0 DTPM device.
 //
-// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -17,7 +18,7 @@
 // **/
 
 
-#string STR_MODULE_ABSTRACT             #language en-US "Provides TPM 2.0 TIS functions for DTPM"
+#string STR_MODULE_ABSTRACT             #language en-US "Provides TPM 2.0 TIS/PTP functions for DTPM"
 
-#string STR_MODULE_DESCRIPTION          #language en-US "This library implements TIS (TPM Interface Specification) functions which is used for every TPM 2.0 command. Choosing this library means platform uses and only uses TPM 2.0 DTPM device."
+#string STR_MODULE_DESCRIPTION          #language en-US "This library implements TIS (TPM Interface Specification) and PTP (Platform TPM Profile) functions which is used for every TPM 2.0 command. Choosing this library means platform uses and only uses TPM 2.0 DTPM device."
 
