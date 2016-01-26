@@ -317,11 +317,12 @@ class WorkspaceAutoGen(AutoGen):
             GlobalData.gFdfParser = Fdf
             GlobalData.gAutoGenPhase = False
             PcdSet = Fdf.Profile.PcdDict
-            FdDict = Fdf.Profile.FdDict[Fdf.CurrentFdName]
-            for FdRegion in FdDict.RegionList:
-                if str(FdRegion.RegionType) is 'FILE' and self.Platform.VpdToolGuid in str(FdRegion.RegionDataList):
-                    if int(FdRegion.Offset) % 8 != 0:
-                        EdkLogger.error("build", FORMAT_INVALID, 'The VPD Base Address %s must be 8-byte aligned.' % (FdRegion.Offset))
+            if Fdf.CurrentFdName and Fdf.CurrentFdName in Fdf.Profile.FdDict:
+                FdDict = Fdf.Profile.FdDict[Fdf.CurrentFdName]
+                for FdRegion in FdDict.RegionList:
+                    if str(FdRegion.RegionType) is 'FILE' and self.Platform.VpdToolGuid in str(FdRegion.RegionDataList):
+                        if int(FdRegion.Offset) % 8 != 0:
+                            EdkLogger.error("build", FORMAT_INVALID, 'The VPD Base Address %s must be 8-byte aligned.' % (FdRegion.Offset))
             ModuleList = Fdf.Profile.InfList
             self.FdfProfile = Fdf.Profile
             for fvname in self.FvTargetList:
