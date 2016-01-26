@@ -1,7 +1,7 @@
 /** @file
   The header file for Tcg2 SMM driver.
   
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -37,6 +37,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/TpmMeasurementLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+#include <Library/IoLib.h>
+
+#include <IndustryStandard/TpmPtp.h>
 
 #pragma pack(1)
 typedef struct {

@@ -9,7 +9,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -21,6 +21,48 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Tcg2Smm.h"
+
+typedef enum {
+  PtpInterfaceTis,
+  PtpInterfaceFifo,
+  PtpInterfaceCrb,
+  PtpInterfaceMax,
+} PTP_INTERFACE_TYPE;
+
+/**
+  Return PTP interface type.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP interface type.
+**/
+PTP_INTERFACE_TYPE
+GetPtpInterface (
+  IN VOID *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
+
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
+
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
+      (InterfaceId.Bits.CapCRB != 0)) {
+    return PtpInterfaceCrb;
+  }
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
+      (InterfaceId.Bits.CapFIFO != 0) &&
+      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
+    return PtpInterfaceFifo;
+  }
+  return PtpInterfaceTis;
+}
 
 EFI_TPM2_ACPI_TABLE  mTpm2AcpiTemplate = {
   {
@@ -288,6 +330,8 @@ PublishTpm2 (
   EFI_ACPI_TABLE_PROTOCOL        *AcpiTable;
   UINTN                          TableKey;
   UINT64                         OemTableId;
+  EFI_TPM2_ACPI_CONTROL_AREA     *ControlArea;
+  PTP_INTERFACE_TYPE             InterfaceType;
 
   //
   // Measure to PCR[0] with event EV_POST_CODE ACPI DATA
@@ -300,6 +344,24 @@ PublishTpm2 (
     &mTpm2AcpiTemplate,
     sizeof(mTpm2AcpiTemplate)
     );
+
+  InterfaceType = GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  switch (InterfaceType) {
+  case PtpInterfaceCrb:
+    mTpm2AcpiTemplate.StartMethod = EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE;
+    mTpm2AcpiTemplate.AddressOfControlArea = PcdGet64 (PcdTpmBaseAddress) + 0x40;
+    ControlArea = (EFI_TPM2_ACPI_CONTROL_AREA *)(UINTN)mTpm2AcpiTemplate.AddressOfControlArea;
+    ControlArea->CommandSize  = 0xF80;
+    ControlArea->ResponseSize = 0xF80;
+    ControlArea->Command      = PcdGet64 (PcdTpmBaseAddress) + 0x80;
+    ControlArea->Response     = PcdGet64 (PcdTpmBaseAddress) + 0x80;
+    break;
+  case PtpInterfaceFifo:
+  case PtpInterfaceTis:
+    break;
+  default:
+    break;
+  }
 
   CopyMem (mTpm2AcpiTemplate.Header.OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (mTpm2AcpiTemplate.Header.OemId));
   OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
