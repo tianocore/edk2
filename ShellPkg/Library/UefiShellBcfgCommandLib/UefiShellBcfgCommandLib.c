@@ -1111,7 +1111,7 @@ BcfgDisplayDump(
     }
 
     LoadOption      = (EFI_LOAD_OPTION *)Buffer;
-    Description     = (CHAR16 *)(&LoadOption->FilePathListLength + 1);
+    Description     = (CHAR16*)(Buffer + sizeof (EFI_LOAD_OPTION));
     DescriptionSize = StrSize (Description);
 
     if (LoadOption->FilePathListLength != 0) {
