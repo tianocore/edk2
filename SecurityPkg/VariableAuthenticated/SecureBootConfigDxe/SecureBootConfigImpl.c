@@ -3075,16 +3075,17 @@ EFI_STATUS
 UpdateSecureBootString(
   IN SECUREBOOT_CONFIG_PRIVATE_DATA  *Private
   ) {
-  EFI_STATUS  Status;
   UINT8       CurSecureBootMode;
   UINT8       *SecureBoot;
+
+  SecureBoot = NULL;
 
   //
   // Get current secure boot state.
   //
-  Status = GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SecureBoot, NULL);
-  if (EFI_ERROR(Status)) {
-    return Status;
+  GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SecureBoot, NULL);
+  if (SecureBoot == NULL) {
+    return EFI_NOT_FOUND;
   }
 
   if (*SecureBoot == SECURE_BOOT_MODE_ENABLE) {
