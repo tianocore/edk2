@@ -1,7 +1,7 @@
 /** @file
   UEFI Event support functions implemented in this file.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -769,6 +769,11 @@ CoreCloseEvent (
     CoreUnregisterProtocolNotify (Event);
   }
 
+  //
+  // To avoid the Event to be signalled wrongly after closed,
+  // clear the Signature of Event before free pool.
+  //
+  Event->Signature = 0;
   Status = CoreFreePool (Event);
   ASSERT_EFI_ERROR (Status);
 
