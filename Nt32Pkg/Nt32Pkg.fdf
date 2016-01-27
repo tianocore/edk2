@@ -2,6 +2,7 @@
 # This is NT32 FDF file with UEFI HII features enabled
 #
 # Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -26,11 +27,11 @@
 #
 ################################################################################
 [FD.Nt32]
-BaseAddress   = 0x0|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress  #The base address of the FLASH Device.
-Size          = 0x002a0000                                           #The size in bytes of the FLASH Device
+BaseAddress   = 0x0|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress          #The base address of the FLASH Device.
+Size          = 0x00380000|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize  #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
-NumBlocks     = 0x2a
+NumBlocks     = 0x38
 
 ################################################################################
 #
@@ -47,11 +48,11 @@ NumBlocks     = 0x2a
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00000000|0x00280000
+0x00000000|0x00360000
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize
 FV = FvRecovery
 
-0x00280000|0x0000c000
+0x00360000|0x0000c000
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
 DATA = {
@@ -92,11 +93,11 @@ DATA = {
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x0028c000|0x00002000
+0x0036c000|0x00002000
 #NV_EVENT_LOG
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize
 
-0x0028e000|0x00002000
+0x0036e000|0x00002000
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #NV_FTW_WORKING
 DATA = {
@@ -110,7 +111,7 @@ DATA = {
   0xE0, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x00290000|0x00010000
+0x00370000|0x00010000
 #NV_FTW_SPARE
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
