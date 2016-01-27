@@ -58,6 +58,44 @@ Tpm12TisPcPresenceCheck (
 }
 
 /**
+  Return PTP interface type.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP interface type.
+**/
+PTP_INTERFACE_TYPE
+Tpm12GetPtpInterface (
+  IN VOID *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
+
+  if (!Tpm12TisPcPresenceCheck (Register)) {
+    return PtpInterfaceMax;
+  }
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
+
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
+      (InterfaceId.Bits.CapCRB != 0)) {
+    return PtpInterfaceCrb;
+  }
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
+      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
+      (InterfaceId.Bits.CapFIFO != 0) &&
+      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
+    return PtpInterfaceFifo;
+  }
+  return PtpInterfaceTis;
+}
+
+/**
   Check whether the value of a TPM chip register satisfies the input BIT setting.
 
   @param[in]  Register     Address port of register to be checked.
@@ -393,51 +431,30 @@ Tpm12SubmitCommand (
   IN UINT8             *OutputParameterBlock
   )
 {
-  return Tpm12TisTpmCommand (
-           (TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
-           InputParameterBlock,
-           InputParameterBlockSize,
-           OutputParameterBlock,
-           OutputParameterBlockSize
-           );
-}
+  PTP_INTERFACE_TYPE  PtpInterface;
 
-/**
-  Return PTP interface type.
-
-  @param[in] Register                Pointer to PTP register.
-
-  @return PTP interface type.
-**/
-PTP_INTERFACE_TYPE
-Tpm12GetPtpInterface (
-  IN VOID *Register
-  )
-{
-  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
-  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
-
-  if (!Tpm12TisPcPresenceCheck (Register)) {
-    return PtpInterfaceMax;
-  }
   //
-  // Check interface id
+  // Special handle for TPM1.2 to check PTP too, because PTP/TIS share same register address.
   //
-  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
-  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
+  PtpInterface = Tpm12GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  switch (PtpInterface) {
+  case PtpInterfaceFifo:
+  case PtpInterfaceTis:
+    return Tpm12TisTpmCommand (
+             (TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
+             InputParameterBlock,
+             InputParameterBlockSize,
+             OutputParameterBlock,
+             OutputParameterBlockSize
+             );
+  case PtpInterfaceCrb:
+    //
+    // No need to support CRB because it is only accept TPM2 command.
+    //
+  default:
+    return EFI_DEVICE_ERROR;
+  }
 
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
-      (InterfaceId.Bits.CapCRB != 0)) {
-    return PtpInterfaceCrb;
-  }
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
-      (InterfaceId.Bits.CapFIFO != 0) &&
-      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
-    return PtpInterfaceFifo;
-  }
-  return PtpInterfaceTis;
 }
 
 /**
