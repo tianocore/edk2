@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2425,6 +2425,10 @@ SendDiscardInfoToDriver (
     // Restore the question value before call the CHANGED callback type.
     //
     GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
+
+    if (Question->Operand == EFI_IFR_STRING_OP){
+      HiiSetString (FormSet->HiiHandle, Question->HiiValue.Value.string, (CHAR16*)Question->BufferValue, NULL);
+    }
 
     if (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
       TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
