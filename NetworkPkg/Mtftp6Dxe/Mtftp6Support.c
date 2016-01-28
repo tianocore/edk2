@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 support functions implementation.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -319,6 +319,29 @@ Mtftp6GetMapping (
     Status = Udp6->GetModeData (Udp6, NULL, &Ip6Mode, NULL, NULL);
 
     if (!EFI_ERROR (Status)) {
+      if (Ip6Mode.AddressList != NULL) {
+        FreePool (Ip6Mode.AddressList);
+      }
+
+      if (Ip6Mode.GroupTable != NULL) {
+        FreePool (Ip6Mode.GroupTable);
+      }
+
+      if (Ip6Mode.RouteTable != NULL) {
+        FreePool (Ip6Mode.RouteTable);
+      }
+
+      if (Ip6Mode.NeighborCache != NULL) {
+        FreePool (Ip6Mode.NeighborCache);
+      }
+
+      if (Ip6Mode.PrefixTable != NULL) {
+        FreePool (Ip6Mode.PrefixTable);
+      }
+
+      if (Ip6Mode.IcmpTypeList != NULL) {
+        FreePool (Ip6Mode.IcmpTypeList);
+      }
 
       if  (Ip6Mode.IsConfigured) {
         //

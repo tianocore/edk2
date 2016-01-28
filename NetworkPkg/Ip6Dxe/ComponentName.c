@@ -2,7 +2,7 @@
   Implementation of EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL protocol.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -263,6 +263,32 @@ UpdateName (
   //
   Offset = 0;
   Status = Ip6->GetModeData (Ip6, &Ip6ModeData, NULL, NULL);
+  if (!EFI_ERROR (Status)) {
+    if (Ip6ModeData.AddressList != NULL) {
+      FreePool (Ip6ModeData.AddressList);
+    }
+
+    if (Ip6ModeData.GroupTable != NULL) {
+      FreePool (Ip6ModeData.GroupTable);
+    }
+
+    if (Ip6ModeData.RouteTable != NULL) {
+      FreePool (Ip6ModeData.RouteTable);
+    }
+
+    if (Ip6ModeData.NeighborCache != NULL) {
+      FreePool (Ip6ModeData.NeighborCache);
+    }
+
+    if (Ip6ModeData.PrefixTable != NULL) {
+      FreePool (Ip6ModeData.PrefixTable);
+    }
+
+    if (Ip6ModeData.IcmpTypeList != NULL) {
+      FreePool (Ip6ModeData.IcmpTypeList);
+    }
+  }
+
   if (!EFI_ERROR (Status) && Ip6ModeData.IsStarted) {
     Status = NetLibIp6ToStr (&Ip6ModeData.ConfigData.StationAddress, Address, sizeof(Address));
     if (EFI_ERROR (Status)) {

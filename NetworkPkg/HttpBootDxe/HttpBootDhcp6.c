@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv6 for HTTP boot driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -974,8 +974,13 @@ ON_EXIT:
     Dhcp6->Configure (Dhcp6, NULL);
   } else {
     ZeroMem (&Config, sizeof (EFI_DHCP6_CONFIG_DATA));
-    ZeroMem (&Mode, sizeof (EFI_DHCP6_MODE_DATA));
     Dhcp6->Configure (Dhcp6, &Config);
+    if (Mode.ClientId != NULL) {
+      FreePool (Mode.ClientId);
+    }
+    if (Mode.Ia != NULL) {
+      FreePool (Mode.Ia);
+    }
   }
 
   return Status; 

@@ -1,7 +1,7 @@
 /** @file
   Provide IPsec Key Exchange (IKE) service general interfaces.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -328,6 +328,31 @@ IkeOpenOutputUdp (
       UdpIoFreeIo (UdpService->Output);
       goto ON_EXIT;
     }
+
+    if (Ip6ModeData.AddressList != NULL) {
+      FreePool (Ip6ModeData.AddressList);
+    }
+
+    if (Ip6ModeData.GroupTable != NULL) {
+      FreePool (Ip6ModeData.GroupTable);
+    }
+
+    if (Ip6ModeData.RouteTable != NULL) {
+      FreePool (Ip6ModeData.RouteTable);
+    }
+
+    if (Ip6ModeData.NeighborCache != NULL) {
+      FreePool (Ip6ModeData.NeighborCache);
+    }
+
+    if (Ip6ModeData.PrefixTable != NULL) {
+      FreePool (Ip6ModeData.PrefixTable);
+    }
+
+    if (Ip6ModeData.IcmpTypeList != NULL) {
+      FreePool (Ip6ModeData.IcmpTypeList);
+    }
+
     //
     // Reconfigure udp6 io without remote address.
     //

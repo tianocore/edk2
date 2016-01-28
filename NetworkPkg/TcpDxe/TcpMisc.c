@@ -2,7 +2,7 @@
   Misc support routines for TCP driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -566,7 +566,31 @@ TcpGetRcvMss (
   } else {
     Ip6 = TcpProto->TcpService->IpIo->Ip.Ip6;
     ASSERT (Ip6 != NULL);
-    Ip6->GetModeData (Ip6, &Ip6Mode, NULL, NULL);
+    if (!EFI_ERROR (Ip6->GetModeData (Ip6, &Ip6Mode, NULL, NULL))) {
+      if (Ip6Mode.AddressList != NULL) {
+        FreePool (Ip6Mode.AddressList);
+      }
+
+      if (Ip6Mode.GroupTable != NULL) {
+        FreePool (Ip6Mode.GroupTable);
+      }
+
+      if (Ip6Mode.RouteTable != NULL) {
+        FreePool (Ip6Mode.RouteTable);
+      }
+
+      if (Ip6Mode.NeighborCache != NULL) {
+        FreePool (Ip6Mode.NeighborCache);
+      }
+
+      if (Ip6Mode.PrefixTable != NULL) {
+        FreePool (Ip6Mode.PrefixTable);
+      }
+
+      if (Ip6Mode.IcmpTypeList != NULL) {
+        FreePool (Ip6Mode.IcmpTypeList);
+      }
+    }
 
     return (UINT16) (Ip6Mode.MaxPacketSize - sizeof (TCP_HEAD));
   }

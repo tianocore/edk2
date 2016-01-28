@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Dhcp6 driver.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -286,7 +286,14 @@ UpdateName (
     }
     HandleName = mDhcp6ControllerName[Dhcp6ModeData.Ia->State];
   }
-  
+
+  if (Dhcp6ModeData.Ia != NULL) {
+    FreePool (Dhcp6ModeData.Ia);
+  }
+  if (Dhcp6ModeData.ClientId != NULL) {
+    FreePool (Dhcp6ModeData.ClientId);
+  }
+
   Status = AddUnicodeString2 (
              "eng",
              gDhcp6ComponentName.SupportedLanguages,

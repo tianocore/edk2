@@ -1,7 +1,7 @@
 /** @file
 DnsDxe support functions implementation.
   
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -618,11 +618,35 @@ Dns6GetMapping (
   while (!EFI_ERROR (gBS->CheckEvent (Service->TimerToGetMap))) {
     Udp->Poll (Udp);
 
-    if (!EFI_ERROR (Udp->GetModeData (Udp, NULL, &Ip6Mode, NULL, NULL)) &&
-        Ip6Mode.IsConfigured) {
+    if (!EFI_ERROR (Udp->GetModeData (Udp, NULL, &Ip6Mode, NULL, NULL))) {
+      if (Ip6Mode.AddressList != NULL) {
+        FreePool (Ip6Mode.AddressList);
+      }
 
-      Udp->Configure (Udp, NULL);
-      return (BOOLEAN) (Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS);
+      if (Ip6Mode.GroupTable != NULL) {
+        FreePool (Ip6Mode.GroupTable);
+      }
+
+      if (Ip6Mode.RouteTable != NULL) {
+        FreePool (Ip6Mode.RouteTable);
+      }
+
+      if (Ip6Mode.NeighborCache != NULL) {
+        FreePool (Ip6Mode.NeighborCache);
+      }
+
+      if (Ip6Mode.PrefixTable != NULL) {
+        FreePool (Ip6Mode.PrefixTable);
+      }
+
+      if (Ip6Mode.IcmpTypeList != NULL) {
+        FreePool (Ip6Mode.IcmpTypeList);
+      }
+
+      if (Ip6Mode.IsConfigured) {
+        Udp->Configure (Udp, NULL);
+        return (BOOLEAN) (Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS);
+      }
     }
   }
 

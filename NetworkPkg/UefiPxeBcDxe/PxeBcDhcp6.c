@@ -2,7 +2,7 @@
   Functions implementation related with DHCPv6 for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2082,7 +2082,12 @@ PxeBcDhcp6Sarr (
   // to find a valid router address.
   //
   CopyMem (&Private->TmpStationIp.v6, &Mode.Ia->IaAddress[0].IpAddress, sizeof (EFI_IPv6_ADDRESS));
-
+  if (Mode.ClientId != NULL) {
+    FreePool (Mode.ClientId);
+  }
+  if (Mode.Ia != NULL) {
+    FreePool (Mode.Ia);
+  }
   //
   // Check the selected offer whether BINL retry is needed.
   //
