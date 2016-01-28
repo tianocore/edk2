@@ -1,7 +1,7 @@
 /** @file
   The header files of implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -43,9 +43,11 @@
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
                                   HttpConfigData is NULL.
-                                  HttpConfigData->AccessPoint is NULL.
-  @retval EFI_OUT_OF_RESOURCES    Could not allocate enough system resources.
-  @retval EFI_NOT_STARTED         The HTTP instance is not configured.
+                                  HttpInstance->LocalAddressIsIPv6 is FALSE and
+                                  HttpConfigData->IPv4Node is NULL.
+                                  HttpInstance->LocalAddressIsIPv6 is TRUE and
+                                  HttpConfigData->IPv6Node is NULL.
+  @retval EFI_NOT_STARTED         This EFI HTTP Protocol instance has not been started.
 
 **/
 EFI_STATUS
@@ -65,8 +67,8 @@ EfiHttpGetModeData (
   connections with remote hosts, canceling all asynchronous tokens, and flush request
   and response buffers without informing the appropriate hosts.
 
-  Except for GetModeData() and Configure(), No other EFI HTTP function can be executed
-  by this instance until the Configure() function is executed and returns successfully.
+  No other EFI HTTP function can be executed by this instance until the Configure() 
+  function is executed and returns successfully.
 
   @param[in]  This                Pointer to EFI_HTTP_PROTOCOL instance.
   @param[in]  HttpConfigData      Pointer to the configure data to configure the instance.
@@ -74,6 +76,7 @@ EfiHttpGetModeData (
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
+                                  HttpConfigData is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is FALSE and
                                   HttpConfigData->IPv4Node is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is TRUE and
@@ -112,6 +115,7 @@ EfiHttpConfigure (
                                   implementation.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
+                                  Token is NULL.
                                   Token->Message is NULL.
                                   Token->Message->Body is not NULL,
                                   Token->Message->BodyLength is non-zero, and
@@ -142,8 +146,6 @@ EfiHttpRequest (
   @retval EFI_SUCCESS             Request and Response queues are successfully flushed.
   @retval EFI_INVALID_PARAMETER   This is NULL.
   @retval EFI_NOT_STARTED         This instance hasn't been configured.
-  @retval EFI_NO_MAPPING          When using the default address, configuration (DHCP,
-                                  BOOTP, RARP, etc.) hasn't finished yet.
   @retval EFI_NOT_FOUND           The asynchronous request or response token is not
                                   found.
   @retval EFI_UNSUPPORTED         The implementation does not support this function.
@@ -157,7 +159,7 @@ EfiHttpCancel (
 
 /**
   The Response() function queues an HTTP response to this HTTP instance, similar to
-  Receive() function in the EFI TCP driver. When the HTTP request is sent successfully,
+  Receive() function in the EFI TCP driver. When the HTTP response is received successfully,
   or if there is an error, Status in token will be updated and Event will be signaled.
 
   The HTTP driver will queue a receive token to the underlying TCP instance. When data
