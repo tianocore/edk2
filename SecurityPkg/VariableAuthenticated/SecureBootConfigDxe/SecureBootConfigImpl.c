@@ -97,6 +97,8 @@ CHAR16* mDerEncodedSuffix[] = {
 };
 CHAR16* mSupportX509Suffix = L"*.cer/der/crt";
 
+SECUREBOOT_CONFIG_PRIVATE_DATA  *gSecureBootPrivateData = NULL;
+
 /**
   This code checks if the FileSuffix is one of the possible DER-encoded certificate suffix.
 
@@ -657,7 +659,11 @@ ON_EXIT:
 
   CloseFile (Private->FileContext->FHandle);
   Private->FileContext->FHandle = NULL;
-  Private->FileContext->FileName = NULL;
+
+  if (Private->FileContext->FileName != NULL){
+    FreePool(Private->FileContext->FileName);
+    Private->FileContext->FileName = NULL;
+  }
 
   if (Private->SignatureGUID != NULL) {
     FreePool (Private->SignatureGUID);
@@ -779,7 +785,11 @@ EnrollX509ToKek (
 ON_EXIT:
 
   CloseFile (Private->FileContext->FHandle);
-  Private->FileContext->FileName = NULL;
+  if (Private->FileContext->FileName != NULL){
+    FreePool(Private->FileContext->FileName);
+    Private->FileContext->FileName = NULL;
+  }
+
   Private->FileContext->FHandle = NULL;
 
   if (Private->SignatureGUID != NULL) {
@@ -949,7 +959,11 @@ EnrollX509toSigDB (
 ON_EXIT:
 
   CloseFile (Private->FileContext->FHandle);
-  Private->FileContext->FileName = NULL;
+  if (Private->FileContext->FileName != NULL){
+    FreePool(Private->FileContext->FileName);
+    Private->FileContext->FileName = NULL;
+  }
+
   Private->FileContext->FHandle = NULL;
 
   if (Private->SignatureGUID != NULL) {
@@ -1509,7 +1523,11 @@ EnrollX509HashtoSigDB (
 
 ON_EXIT:
   CloseFile (Private->FileContext->FHandle);
-  Private->FileContext->FileName = NULL;
+  if (Private->FileContext->FileName != NULL){
+    FreePool(Private->FileContext->FileName);
+    Private->FileContext->FileName = NULL;
+  }
+
   Private->FileContext->FHandle = NULL;
 
   if (Private->SignatureGUID != NULL) {
@@ -2157,7 +2175,11 @@ ON_EXIT:
 
   CloseFile (Private->FileContext->FHandle);
   Private->FileContext->FHandle = NULL;
-  Private->FileContext->FileName = NULL;
+
+  if (Private->FileContext->FileName != NULL){
+    FreePool(Private->FileContext->FileName);
+    Private->FileContext->FileName = NULL;
+  }
 
   if (Private->SignatureGUID != NULL) {
     FreePool (Private->SignatureGUID);
@@ -3434,15 +3456,19 @@ SecureBootCallback (
   UINT8                           *SecureBootMode;
   CHAR16                          PromptString[100];
   UINT8                           CurSecureBootMode;
+  EFI_DEVICE_PATH_PROTOCOL        *File;
 
   Status           = EFI_SUCCESS;
   SecureBootEnable = NULL;
   SecureBootMode   = NULL;
+  File             = NULL;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
   Private = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
+
+  gSecureBootPrivateData = Private;
 
   //
   // Retrieve uncommitted data from Browser
@@ -3461,6 +3487,7 @@ SecureBootCallback (
       // Update secure boot strings when opening this form
       //
       Status = UpdateSecureBootString(Private);
+      SecureBootExtractConfigFromVariable (IfrNvData);
       mIsEnterSecureBootForm = TRUE;
     } else if (QuestionId == KEY_TRANS_SECURE_BOOT_MODE){
       //
@@ -3523,11 +3550,6 @@ SecureBootCallback (
       }
       break;
 
-    case KEY_SECURE_BOOT_OPTION:
-      FreeMenu (&DirectoryMenu);
-      FreeMenu (&FsOptionMenu);
-      break;
-
     case KEY_SECURE_BOOT_KEK_OPTION:
     case KEY_SECURE_BOOT_DB_OPTION:
     case KEY_SECURE_BOOT_DBX_OPTION:
@@ -3558,28 +3580,32 @@ SecureBootCallback (
       //
       CleanUpPage (LabelId, Private);
       break;
+    case KEY_SECURE_BOOT_PK_OPTION:
+      LabelId = FORMID_ENROLL_PK_FORM;
+      //
+      // Refresh selected file.
+      //
+      CleanUpPage (LabelId, Private);
+      break;
 
-    case SECUREBOOT_ADD_PK_FILE_FORM_ID:
+    case FORMID_ENROLL_PK_FORM:
+      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdatePKFromFile, &File);
+      break;
+
     case FORMID_ENROLL_KEK_FORM:
-    case SECUREBOOT_ENROLL_SIGNATURE_TO_DB:
-    case SECUREBOOT_ENROLL_SIGNATURE_TO_DBX:
-    case SECUREBOOT_ENROLL_SIGNATURE_TO_DBT:
-      if (QuestionId == SECUREBOOT_ADD_PK_FILE_FORM_ID) {
-        Private->FeCurrentState = FileExplorerStateEnrollPkFile;
-      } else if (QuestionId == FORMID_ENROLL_KEK_FORM) {
-        Private->FeCurrentState = FileExplorerStateEnrollKekFile;
-      } else if (QuestionId == SECUREBOOT_ENROLL_SIGNATURE_TO_DB) {
-        Private->FeCurrentState = FileExplorerStateEnrollSignatureFileToDb;
-      } else if (QuestionId == SECUREBOOT_ENROLL_SIGNATURE_TO_DBX) {
-        Private->FeCurrentState = FileExplorerStateEnrollSignatureFileToDbx;
-        IfrNvData->CertificateFormat = HASHALG_SHA256;
-      } else {
-        Private->FeCurrentState = FileExplorerStateEnrollSignatureFileToDbt;
-      }
+      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateKEKFromFile, &File);
+      break;
 
-      Private->FeDisplayContext = FileExplorerDisplayUnknown;
-      CleanUpPage (FORM_FILE_EXPLORER_ID, Private);
-      UpdateFileExplorer (Private, 0);
+    case SECUREBOOT_ENROLL_SIGNATURE_TO_DB:
+      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateDBFromFile, &File);
+      break;
+
+    case SECUREBOOT_ENROLL_SIGNATURE_TO_DBX:
+      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateDBXFromFile, &File);
+      break;
+
+    case SECUREBOOT_ENROLL_SIGNATURE_TO_DBT:
+      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateDBTFromFile, &File);
       break;
 
     case KEY_SECURE_BOOT_DELETE_PK:
@@ -3722,6 +3748,24 @@ SecureBootCallback (
           );
       }
       break;
+    case KEY_VALUE_SAVE_AND_EXIT_PK:
+      Status = EnrollPlatformKey (Private);
+      if (EFI_ERROR (Status)) {
+        UnicodeSPrint (
+          PromptString,
+          sizeof (PromptString),
+          L"Only DER encoded certificate file (%s) is supported.",
+          mSupportX509Suffix
+          );
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"ERROR: Unsupported file type!",
+          PromptString,
+          NULL
+          );
+      }
+      break;
     case KEY_TRANS_SECURE_BOOT_MODE:
       //
       // Pop up to alert user want to change secure boot mode 
@@ -3774,9 +3818,7 @@ SecureBootCallback (
       break;
 
     default:
-      if (QuestionId >= FILE_OPTION_GOTO_OFFSET) {
-        UpdateFileExplorer (Private, QuestionId);
-      } else if ((QuestionId >= OPTION_DEL_KEK_QUESTION_ID) &&
+      if ((QuestionId >= OPTION_DEL_KEK_QUESTION_ID) &&
                  (QuestionId < (OPTION_DEL_KEK_QUESTION_ID + OPTION_CONFIG_RANGE))) {
         DeleteKeyExchangeKey (Private, QuestionId);
       } else if ((QuestionId >= OPTION_DEL_DB_QUESTION_ID) &&
@@ -3814,32 +3856,6 @@ SecureBootCallback (
           );
       }
       break;
-    }
-  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
-    switch (QuestionId) {
-    case KEY_SECURE_BOOT_ENABLE:
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-      break;
-    case KEY_VALUE_SAVE_AND_EXIT_PK:
-      Status = EnrollPlatformKey (Private);
-      if (EFI_ERROR (Status)) {
-        UnicodeSPrint (
-          PromptString,
-          sizeof (PromptString),
-          L"Only DER encoded certificate file (%s) is supported.",
-          mSupportX509Suffix
-          );
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"ERROR: Unsupported file type!",
-          PromptString,
-          NULL
-          );
-      } else {
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_RESET;
-      }
-      break;
 
     case KEY_VALUE_NO_SAVE_AND_EXIT_PK:
     case KEY_VALUE_NO_SAVE_AND_EXIT_KEK:
@@ -3849,16 +3865,23 @@ SecureBootCallback (
       if (Private->FileContext->FHandle != NULL) {
         CloseFile (Private->FileContext->FHandle);
         Private->FileContext->FHandle = NULL;
-        Private->FileContext->FileName = NULL;
+        if (Private->FileContext->FileName!= NULL){
+          FreePool(Private->FileContext->FileName);
+          Private->FileContext->FileName = NULL;
+        }
       }
 
       if (Private->SignatureGUID != NULL) {
         FreePool (Private->SignatureGUID);
         Private->SignatureGUID = NULL;
       }
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
       break;
-
+    }
+  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
+    switch (QuestionId) {
+    case KEY_SECURE_BOOT_ENABLE:
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+      break;
     case KEY_SECURE_BOOT_MODE:
       mIsEnterSecureBootForm = FALSE;
       break;
@@ -3898,11 +3921,6 @@ SecureBootCallback (
       }
       break;
     default:
-      if (QuestionId >= FILE_OPTION_OFFSET && QuestionId < FILE_OPTION_GOTO_OFFSET) {
-        if (UpdateFileExplorer (Private, QuestionId)) {
-          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-        }
-      }
       break;
     }
   } else if (Action == EFI_BROWSER_ACTION_DEFAULT_STANDARD) {
@@ -3938,6 +3956,11 @@ EXIT:
   }
 
   FreePool (IfrNvData);
+
+  if (File != NULL){
+    FreePool(File);
+    File = NULL;
+  }
 
   return EFI_SUCCESS;
 }
@@ -4003,18 +4026,11 @@ InstallSecureBootConfigForm (
   PrivateData->HiiHandle = HiiHandle;
 
   PrivateData->FileContext = AllocateZeroPool (sizeof (SECUREBOOT_FILE_CONTEXT));
-  PrivateData->MenuEntry   = AllocateZeroPool (sizeof (SECUREBOOT_MENU_ENTRY));
 
-  if (PrivateData->FileContext == NULL || PrivateData->MenuEntry == NULL) {
+  if (PrivateData->FileContext == NULL) {
     UninstallSecureBootConfigForm (PrivateData);
     return EFI_OUT_OF_RESOURCES;
   }
-
-  PrivateData->FeCurrentState = FileExplorerStateInActive;
-  PrivateData->FeDisplayContext = FileExplorerDisplayUnknown;
-
-  InitializeListHead (&FsOptionMenu.Head);
-  InitializeListHead (&DirectoryMenu.Head);
 
   //
   // Init OpCode Handle and Allocate space for creation of Buffer
@@ -4095,18 +4111,11 @@ UninstallSecureBootConfigForm (
     FreePool (PrivateData->SignatureGUID);
   }
 
-  if (PrivateData->MenuEntry != NULL) {
-    FreePool (PrivateData->MenuEntry);
-  }
-
   if (PrivateData->FileContext != NULL) {
     FreePool (PrivateData->FileContext);
   }
 
   FreePool (PrivateData);
-
-  FreeMenu (&DirectoryMenu);
-  FreeMenu (&FsOptionMenu);
 
   if (mStartOpCodeHandle != NULL) {
     HiiFreeOpCodeHandle (mStartOpCodeHandle);

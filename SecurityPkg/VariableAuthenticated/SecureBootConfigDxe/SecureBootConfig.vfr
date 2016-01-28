@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the SecureBoot configuration component.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -202,11 +202,29 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto FORM_FILE_EXPLORER_ID_PK,
+    goto FORMID_ENROLL_PK_FORM,
          prompt = STRING_TOKEN(STR_SECURE_BOOT_ENROLL_PK_FILE),
          help = STRING_TOKEN(STR_SECURE_BOOT_ENROLL_PK_FILE),
          flags = INTERACTIVE,
-         key = SECUREBOOT_ADD_PK_FILE_FORM_ID;
+         key = FORMID_ENROLL_PK_FORM;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+    label FORMID_ENROLL_PK_FORM;
+    label LABEL_END;
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    goto FORMID_SECURE_BOOT_OPTION_FORM,
+      prompt = STRING_TOKEN(STR_SAVE_AND_EXIT),
+      help   = STRING_TOKEN(STR_SAVE_AND_EXIT),
+      flags  = INTERACTIVE| RESET_REQUIRED,
+      key    = KEY_VALUE_SAVE_AND_EXIT_PK;
+
+    goto FORMID_SECURE_BOOT_OPTION_FORM,
+      prompt = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
+      help   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_VALUE_NO_SAVE_AND_EXIT_PK;
+
   endform;
 
   //
@@ -245,7 +263,7 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto FORM_FILE_EXPLORER_ID_KEK,
+    goto FORMID_ENROLL_KEK_FORM,
          prompt = STRING_TOKEN(STR_FORM_ENROLL_KEK_FROM_FILE_TITLE),
          help   = STRING_TOKEN(STR_FORM_ENROLL_KEK_FROM_FILE_TITLE_HELP),
          flags  = INTERACTIVE,
@@ -408,7 +426,7 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto FORM_FILE_EXPLORER_ID_DB,
+    goto SECUREBOOT_ENROLL_SIGNATURE_TO_DB,
          prompt = STRING_TOKEN(STR_SECURE_BOOT_ADD_SIGNATURE_FILE),
          help = STRING_TOKEN(STR_SECURE_BOOT_ADD_SIGNATURE_FILE),
          flags = INTERACTIVE,
@@ -453,7 +471,7 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto FORM_FILE_EXPLORER_ID_DBX,
+    goto SECUREBOOT_ENROLL_SIGNATURE_TO_DBX,
          prompt = STRING_TOKEN(STR_SECURE_BOOT_ADD_SIGNATURE_FILE),
          help = STRING_TOKEN(STR_SECURE_BOOT_ADD_SIGNATURE_FILE),
          flags = INTERACTIVE,
@@ -529,7 +547,7 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto FORM_FILE_EXPLORER_ID_DBT,
+    goto SECUREBOOT_ENROLL_SIGNATURE_TO_DBT,
          prompt = STRING_TOKEN(STR_SECURE_BOOT_ADD_SIGNATURE_FILE),
          help = STRING_TOKEN(STR_SECURE_BOOT_ADD_SIGNATURE_FILE),
          flags = INTERACTIVE,
@@ -563,83 +581,6 @@ formset
          help   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
          flags  = INTERACTIVE,
          key    = KEY_VALUE_NO_SAVE_AND_EXIT_DBT;
-
-  endform;
-
-  //
-  // File Explorer for PK
-  //
-  form formid = FORM_FILE_EXPLORER_ID_PK,
-       title = STRING_TOKEN(STR_FILE_EXPLORER_TITLE);
-
-       label FORM_FILE_EXPLORER_ID;
-       label LABEL_END;
-  endform;
-
-  //
-  // File Explorer for KEK
-  //
-  form formid = FORM_FILE_EXPLORER_ID_KEK,
-       title = STRING_TOKEN(STR_FILE_EXPLORER_TITLE);
-
-       label FORM_FILE_EXPLORER_ID;
-       label LABEL_END;
-  endform;
-
-  //
-  // File Explorer for DB
-  //
-  form formid = FORM_FILE_EXPLORER_ID_DB,
-       title = STRING_TOKEN(STR_FILE_EXPLORER_TITLE);
-
-       label FORM_FILE_EXPLORER_ID;
-       label LABEL_END;
-  endform;
-
-  //
-  // File Explorer for DBX
-  //
-  form formid = FORM_FILE_EXPLORER_ID_DBX,
-       title = STRING_TOKEN(STR_FILE_EXPLORER_TITLE);
-
-       label FORM_FILE_EXPLORER_ID;
-       label LABEL_END;
-  endform;
-
-  //
-  // File Explorer for DBT
-  //
-  form formid = FORM_FILE_EXPLORER_ID_DBT,
-       title = STRING_TOKEN(STR_FILE_EXPLORER_TITLE);
-
-       label FORM_FILE_EXPLORER_ID;
-       label LABEL_END;
-  endform;
-
-  //
-  // Enroll Pk from File Commit Form
-  //
-  form formid = SECUREBOOT_ADD_PK_FILE_FORM_ID,
-    title = STRING_TOKEN(STR_SAVE_PK_FILE);
-
-    label SECUREBOOT_ADD_PK_FILE_FORM_ID;
-    label LABEL_END;
-
-    subtitle text = STRING_TOKEN(STR_NULL);
-
-     text
-       help   = STRING_TOKEN(STR_SAVE_AND_EXIT),
-       text   = STRING_TOKEN(STR_SAVE_AND_EXIT),
-       text   = STRING_TOKEN(STR_NULL),
-       flags  = INTERACTIVE,
-       key    = KEY_VALUE_SAVE_AND_EXIT_PK;
-
-     text
-       help   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
-       text   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
-       text   = STRING_TOKEN(STR_NULL),
-       flags  = INTERACTIVE,
-       key    = KEY_VALUE_NO_SAVE_AND_EXIT_PK;
 
   endform;
 

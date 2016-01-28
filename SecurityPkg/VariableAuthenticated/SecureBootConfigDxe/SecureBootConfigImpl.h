@@ -2,7 +2,7 @@
   The header file of HII Config Access protocol implementation of SecureBoot
   configuration module.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 #include <Library/PlatformSecureLib.h>
 #include <Library/BaseCryptLib.h>
+#include <Library/FileExplorerLib.h>
+
 #include <Guid/MdeModuleHii.h>
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
@@ -118,22 +120,6 @@ typedef struct {
   CHAR16                    TargetName[1];
 } ISCSI_DEVICE_PATH_WITH_NAME;
 
-typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
-  FileExplorerDisplayFileSystem,
-  FileExplorerDisplayDirectory,
-  FileExplorerDisplayUnknown
-} FILE_EXPLORER_DISPLAY_CONTEXT;
-
-typedef enum _FILE_EXPLORER_STATE {
-  FileExplorerStateInActive                      = 0,
-  FileExplorerStateEnrollPkFile,
-  FileExplorerStateEnrollKekFile,
-  FileExplorerStateEnrollSignatureFileToDb,
-  FileExplorerStateEnrollSignatureFileToDbx,
-  FileExplorerStateEnrollSignatureFileToDbt,
-  FileExplorerStateUnknown
-} FILE_EXPLORER_STATE;
-
 typedef struct {
   CHAR16  *Str;
   UINTN   Len;
@@ -159,32 +145,9 @@ typedef struct {
   UINTN             MenuNumber;
 } SECUREBOOT_MENU_OPTION;
 
-extern  SECUREBOOT_MENU_OPTION     FsOptionMenu;
-extern  SECUREBOOT_MENU_OPTION     DirectoryMenu;
-
 typedef struct {
-  UINTN             Signature;
-  LIST_ENTRY        Link;
-  UINTN             OptionNumber;
-  UINT16            *DisplayString;
-  UINT16            *HelpString;
-  EFI_STRING_ID     DisplayStringToken;
-  EFI_STRING_ID     HelpStringToken;
-  VOID              *FileContext;
-} SECUREBOOT_MENU_ENTRY;
-
-typedef struct {
-  EFI_HANDLE                        Handle;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
   EFI_FILE_HANDLE                   FHandle;
   UINT16                            *FileName;
-  EFI_FILE_SYSTEM_VOLUME_LABEL      *Info;
-
-  BOOLEAN                           IsRoot;
-  BOOLEAN                           IsDir;
-  BOOLEAN                           IsRemovableMedia;
-  BOOLEAN                           IsLoadFile;
-  BOOLEAN                           IsBootLegacy;
 } SECUREBOOT_FILE_CONTEXT;
 
 
@@ -216,16 +179,13 @@ typedef struct {
   EFI_HII_HANDLE                    HiiHandle;
   EFI_HANDLE                        DriverHandle;
 
-  FILE_EXPLORER_STATE               FeCurrentState;
-  FILE_EXPLORER_DISPLAY_CONTEXT     FeDisplayContext;
-
-  SECUREBOOT_MENU_ENTRY             *MenuEntry;
   SECUREBOOT_FILE_CONTEXT           *FileContext;
 
   EFI_GUID                          *SignatureGUID;
 } SECUREBOOT_CONFIG_PRIVATE_DATA;
 
 extern SECUREBOOT_CONFIG_PRIVATE_DATA      mSecureBootConfigPrivateDateTemplate;
+extern SECUREBOOT_CONFIG_PRIVATE_DATA      *gSecureBootPrivateData;
 
 #define SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('S', 'E', 'C', 'B')
 #define SECUREBOOT_CONFIG_PRIVATE_FROM_THIS(a)  CR (a, SECUREBOOT_CONFIG_PRIVATE_DATA, ConfigAccess, SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE)
@@ -496,35 +456,6 @@ CleanUpPage (
 
 
 /**
-  Update the file explorer page with the refreshed file system.
-
-  @param[in] PrivateData     Module private data.
-  @param[in] KeyValue        Key value to identify the type of data to expect.
-
-  @retval  TRUE           Inform the caller to create a callback packet to exit file explorer.
-  @retval  FALSE          Indicate that there is no need to exit file explorer.
-
-**/
-BOOLEAN
-UpdateFileExplorer (
-  IN SECUREBOOT_CONFIG_PRIVATE_DATA   *PrivateData,
-  IN UINT16                           KeyValue
-  );
-
-
-/**
-  Free resources allocated in Allocate Rountine.
-
-  @param[in, out]  MenuOption        Menu to be freed
-
-**/
-VOID
-FreeMenu (
-  IN OUT SECUREBOOT_MENU_OPTION        *MenuOption
-  );
-
-
-/**
   Read file content into BufferPtr, the size of the allocate buffer
   is *FileSize plus AddtionAllocateSize.
 
@@ -619,6 +550,71 @@ GuidToString (
   IN  EFI_GUID  *Guid,
   IN  CHAR16    *Buffer,
   IN  UINTN     BufferSize
+  );
+
+/**
+  Update the PK form base on the input file path info.
+
+  @param FilePath    Point to the file path.
+
+  @retval TRUE   Exit caller function.
+  @retval FALSE  Not exit caller function.
+**/
+BOOLEAN
+UpdatePKFromFile (
+  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  );
+
+/**
+  Update the KEK form base on the input file path info.
+
+  @param FilePath    Point to the file path.
+
+  @retval TRUE   Exit caller function.
+  @retval FALSE  Not exit caller function.
+**/
+BOOLEAN
+UpdateKEKFromFile (
+  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  );
+
+/**
+  Update the DB form base on the input file path info.
+
+  @param FilePath    Point to the file path.
+
+  @retval TRUE   Exit caller function.
+  @retval FALSE  Not exit caller function.
+**/
+BOOLEAN
+UpdateDBFromFile (
+  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  );
+
+/**
+  Update the DBX form base on the input file path info.
+
+  @param FilePath    Point to the file path.
+
+  @retval TRUE   Exit caller function.
+  @retval FALSE  Not exit caller function.
+**/
+BOOLEAN
+UpdateDBXFromFile (
+  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  );
+
+/**
+  Update the DBT form base on the input file path info.
+
+  @param FilePath    Point to the file path.
+
+  @retval TRUE   Exit caller function.
+  @retval FALSE  Not exit caller function.
+**/
+BOOLEAN
+UpdateDBTFromFile (
+  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
 
 #endif
