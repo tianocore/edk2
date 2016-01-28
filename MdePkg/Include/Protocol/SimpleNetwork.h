@@ -9,7 +9,7 @@
   MCast - MultiCast
   ...
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -121,6 +121,25 @@ typedef struct {
   ///
   UINT64  UnsupportedProtocol;
 
+  ///
+  /// Number of valid frames received that were duplicated.
+  ///
+  UINT64  RxDuplicatedFrames;
+
+  ///
+  /// Number of encrypted frames received that failed to decrypt.
+  ///
+  UINT64  RxDecryptErrorFrames;
+
+  ///
+  /// Number of frames that failed to transmit after exceeding the retry limit.
+  ///
+  UINT64  TxErrorFrames;
+
+  ///
+  /// Number of frames transmitted successfully after more than one attempt.
+  ///
+  UINT64  TxRetryFrames;
 } EFI_NETWORK_STATISTICS;
 
 ///
