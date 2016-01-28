@@ -4,7 +4,7 @@
   HTTP Service Binding Protocol (HTTPSB)
   HTTP Protocol (HTTP)
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -113,7 +113,7 @@ typedef struct {
   ///
   /// Set to TRUE to instruct the EFI HTTP instance to use the default address
   /// information in every TCP connection made by this instance. In addition, when set
-  /// to TRUE, LocalAddress, LocalSubnet, and LocalPort are ignored.
+  /// to TRUE, LocalAddress and LocalSubnet are ignored.
   ///
   BOOLEAN                       UseDefaultAddress;
   ///
@@ -127,7 +127,7 @@ typedef struct {
   ///
   EFI_IPv4_ADDRESS              LocalSubnet;
   ///
-  /// If UseDefaultAddress is set to FALSE, this defines the local port to be used in
+  /// This defines the local port to be used in
   /// every TCP connection opened by this instance.
   ///
   UINT16                        LocalPort;
@@ -306,6 +306,12 @@ typedef struct {
 
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_INVALID_PARAMETER   This is NULL.
+                                  HttpConfigData is NULL.
+                                  HttpInstance->LocalAddressIsIPv6 is FALSE and
+                                  HttpConfigData->IPv4Node is NULL.
+                                  HttpInstance->LocalAddressIsIPv6 is TRUE and
+                                  HttpConfigData->IPv6Node is NULL.
+  @retval EFI_NOT_STARTED         This EFI HTTP Protocol instance has not been started.
 **/
 typedef
 EFI_STATUS
@@ -324,8 +330,8 @@ EFI_STATUS
   connections with remote hosts, canceling all asynchronous tokens, and flush request
   and response buffers without informing the appropriate hosts.
 
-  Except for GetModeData() and Configure(), No other EFI HTTP function can be executed
-  by this instance until the Configure() function is executed and returns successfully.
+  No other EFI HTTP function can be executed by this instance until the Configure()
+  function is executed and returns successfully.
 
   @param[in]  This                Pointer to EFI_HTTP_PROTOCOL instance.
   @param[in]  HttpConfigData      Pointer to the configure data to configure the instance.
@@ -333,6 +339,7 @@ EFI_STATUS
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
+                                  HttpConfigData is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is FALSE and
                                   HttpConfigData->IPv4Node is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is TRUE and
@@ -367,11 +374,14 @@ EFI_STATUS
   @retval EFI_TIMEOUT             Data was dropped out of the transmit or receive queue.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
+                                  Token is NULL.
                                   Token->Message is NULL.
                                   Token->Message->Body is not NULL,
                                   Token->Message->BodyLength is non-zero, and
                                   Token->Message->Data is NULL, but a previous call to
                                   Request()has not been completed successfully.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate enough system resources.
+  @retval EFI_UNSUPPORTED         The HTTP method is not supported in current implementation.
 **/
 typedef
 EFI_STATUS
@@ -397,8 +407,6 @@ EFI_STATUS
   @retval EFI_SUCCESS             Request and Response queues are successfully flushed.
   @retval EFI_INVALID_PARAMETER   This is NULL.
   @retval EFI_NOT_STARTED         This instance hasn't been configured.
-  @retval EFI_NO_MAPPING          When using the default address, configuration (DHCP,
-                                  BOOTP, RARP, etc.) hasn't finished yet.
   @retval EFI_NOT_FOUND           The asynchronous request or response token is not
                                   found.
   @retval EFI_UNSUPPORTED         The implementation does not support this function.
@@ -412,7 +420,7 @@ EFI_STATUS
 
 /**
   The Response() function queues an HTTP response to this HTTP instance, similar to
-  Receive() function in the EFI TCP driver. When the HTTP request is sent successfully,
+  Receive() function in the EFI TCP driver. When the HTTP Response is received successfully,
   or if there is an error, Status in token will be updated and Event will be signaled.
 
   The HTTP driver will queue a receive token to the underlying TCP instance. When data
@@ -446,12 +454,14 @@ EFI_STATUS
                                   initialized.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
+                                  Token is NULL.
                                   Token->Message->Headers is NULL.
                                   Token->Message is NULL.
                                   Token->Message->Body is not NULL,
                                   Token->Message->BodyLength is non-zero, and
                                   Token->Message->Data is NULL, but a previous call to
                                   Response() has not been completed successfully.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate enough system resources.
   @retval EFI_ACCESS_DENIED       An open TCP connection is not present with the host
                                   specified by response URL.
 **/
@@ -479,6 +489,7 @@ EFI_STATUS
   @retval EFI_DEVICE_ERROR        An unexpected system or network error occurred
   @retval EFI_INVALID_PARAMETER   This is NULL.
   @retval EFI_NOT_READY           No incoming or outgoing data is processed.
+  @retval EFI_NOT_STARTED         This EFI HTTP Protocol instance has not been started.
 **/
 typedef
 EFI_STATUS
