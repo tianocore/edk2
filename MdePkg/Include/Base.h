@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -939,6 +939,11 @@ typedef UINTN RETURN_STATUS;
 /// security status.
 ///
 #define RETURN_COMPROMISED_DATA      ENCODE_ERROR (33)
+
+///
+/// A HTTP error occurred during the network operation.
+///
+#define RETURN_HTTP_ERROR            ENCODE_ERROR (35)
 
 ///
 /// The string contained one or more characters that

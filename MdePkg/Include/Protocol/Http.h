@@ -282,6 +282,8 @@ typedef struct {
   /// Status will be set to one of the following value if the HTTP request is
   /// successfully sent or if an unexpected error occurs:
   ///   EFI_SUCCESS:      The HTTP request was successfully sent to the remote host.
+  ///   EFI_HTTP_ERROR:   The response message was successfully received but contains a
+  ///                     HTTP error. The response status code is returned in token.
   ///   EFI_ABORTED:      The HTTP request was cancelled by the caller and removed from
   ///                     the transmit queue.
   ///   EFI_TIMEOUT:      The HTTP request timed out before reaching the remote host.
