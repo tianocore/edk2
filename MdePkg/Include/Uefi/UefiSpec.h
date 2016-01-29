@@ -136,8 +136,7 @@ typedef struct {
                                 MemoryType values in the range 0x70000000..0x7FFFFFFF
                                 are reserved for OEM use. MemoryType values in the range
                                 0x80000000..0xFFFFFFFF are reserved for use by UEFI OS loaders
-                                that are provided by operating system vendors. The only illegal
-                                memory type values are those in the range EfiMaxMemoryType..0x6FFFFFFF.
+                                that are provided by operating system vendors.
   @param[in]       Pages        The number of contiguous 4 KB pages to allocate.
   @param[in, out]  Memory       The pointer to a physical address. On input, the way in which the address is
                                 used depends on the value of Type.
@@ -148,7 +147,7 @@ typedef struct {
                                 2) MemoryType is in the range
                                 EfiMaxMemoryType..0x6FFFFFFF.
                                 3) Memory is NULL.
-                                4) MemoryType was EfiPersistentMemory.
+                                4) MemoryType is EfiPersistentMemory.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
   @retval EFI_NOT_FOUND         The requested pages could not be found.
 
@@ -223,16 +222,16 @@ EFI_STATUS
                                 MemoryType values in the range 0x70000000..0x7FFFFFFF
                                 are reserved for OEM use. MemoryType values in the range
                                 0x80000000..0xFFFFFFFF are reserved for use by UEFI OS loaders
-                                that are provided by operating system vendors. The only illegal
-                                memory type values are those in the range EfiMaxMemoryType..0x6FFFFFFF.
+                                that are provided by operating system vendors.
   @param[in]   Size             The number of bytes to allocate from the pool.
   @param[out]  Buffer           A pointer to a pointer to the allocated buffer if the call succeeds;
                                 undefined otherwise.
 
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
-  @retval EFI_INVALID_PARAMETER PoolType was invalid or Buffer is NULL.
-                                PoolType was EfiPersistentMemory.
+  @retval EFI_INVALID_PARAMETER Buffer is NULL.
+                                PoolType is in the range EfiMaxMemoryType..0x6FFFFFFF.
+                                PoolType is EfiPersistentMemory.
 
 **/
 typedef
