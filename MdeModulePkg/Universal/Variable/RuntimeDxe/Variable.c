@@ -2822,7 +2822,8 @@ Done:
   @param Attributes                 Attribute value of the variable found.
   @param DataSize                   Size of Data found. If size is less than the
                                     data, this value contains the required size.
-  @param Data                       Data pointer.
+  @param Data                       The buffer to return the contents of the variable. May be NULL
+                                    with a zero DataSize in order to determine the size buffer needed.
 
   @return EFI_INVALID_PARAMETER     Invalid parameter.
   @return EFI_SUCCESS               Find the specified variable.
@@ -2837,7 +2838,7 @@ VariableServiceGetVariable (
   IN      EFI_GUID          *VendorGuid,
   OUT     UINT32            *Attributes OPTIONAL,
   IN OUT  UINTN             *DataSize,
-  OUT     VOID              *Data
+  OUT     VOID              *Data OPTIONAL
   )
 {
   EFI_STATUS              Status;
