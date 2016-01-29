@@ -1256,7 +1256,6 @@ class PlatformAutoGen(AutoGen):
                                 "Fail to get FLASH_DEFINITION definition in DSC file %s which is required when DSC contains VPD PCD." % str(self.Platform.MetaFile))
 
             if VpdFile.GetCount() != 0:
-                DscTimeStamp = self.Platform.MetaFile.TimeStamp
                 FvPath = os.path.join(self.BuildDir, "FV")
                 if not os.path.exists(FvPath):
                     try:
@@ -1264,13 +1263,9 @@ class PlatformAutoGen(AutoGen):
                     except:
                         EdkLogger.error("build", FILE_WRITE_FAILURE, "Fail to create FV folder under %s" % self.BuildDir)
 
-
                 VpdFilePath = os.path.join(FvPath, "%s.txt" % self.Platform.VpdToolGuid)
 
-
-                if not os.path.exists(VpdFilePath) or os.path.getmtime(VpdFilePath) < DscTimeStamp:
-                    VpdFile.Write(VpdFilePath)
-
+                if VpdFile.Write(VpdFilePath):
                     # retrieve BPDG tool's path from tool_def.txt according to VPD_TOOL_GUID defined in DSC file.
                     BPDGToolName = None
                     for ToolDef in self.ToolDefinition.values():

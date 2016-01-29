@@ -6,7 +6,7 @@
 # is pointed by *_*_*_VPD_TOOL_GUID in conf/tools_def.txt 
 #
 #
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@ import Common.EdkLogger as EdkLogger
 import Common.BuildToolError as BuildToolError
 import subprocess
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.Misc import SaveFileOnChange
 
 FILE_COMMENT_TEMPLATE = \
 """
@@ -124,34 +125,21 @@ class VpdInfoFile:
         if not (FilePath != None or len(FilePath) != 0):
             EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,  
                             "Invalid parameter FilePath: %s." % FilePath)        
-        try:
-            fd = open(FilePath, "w")
-        except:
-            EdkLogger.error("VpdInfoFile", 
-                            BuildToolError.FILE_OPEN_FAILURE, 
-                            "Fail to open file %s for written." % FilePath)
-        
-        try:
-            # write file header
-            fd.write(FILE_COMMENT_TEMPLATE)
 
-            # write each of PCD in VPD type
-            Pcds = self._VpdArray.keys()
-            Pcds.sort()
-            for Pcd in Pcds:
-                i = 0
-                for Offset in self._VpdArray[Pcd]:
-                    PcdValue = str(Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[i]].DefaultValue).strip()
-                    if PcdValue == "" :
-                        PcdValue  = Pcd.DefaultValue
-                        
-                    fd.write("%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, str(Pcd.SkuInfoList.keys()[i]),str(Offset).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue))
-                    i += 1
-        except:
-            EdkLogger.error("VpdInfoFile",
-                            BuildToolError.FILE_WRITE_FAILURE,
-                            "Fail to write file %s" % FilePath) 
-        fd.close()
+        Content = FILE_COMMENT_TEMPLATE
+        Pcds = self._VpdArray.keys()
+        Pcds.sort()
+        for Pcd in Pcds:
+            i = 0
+            for Offset in self._VpdArray[Pcd]:
+                PcdValue = str(Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[i]].DefaultValue).strip()
+                if PcdValue == "" :
+                    PcdValue  = Pcd.DefaultValue
+
+                Content += "%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, str(Pcd.SkuInfoList.keys()[i]),str(Offset).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue)
+                i += 1
+
+        return SaveFileOnChange(FilePath, Content, False)
 
     ## Read an existing VPD PCD info file.
     #
