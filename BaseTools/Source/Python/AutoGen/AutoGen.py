@@ -1154,7 +1154,14 @@ class PlatformAutoGen(AutoGen):
                                 Alignment = 2
                             else:
                                 Alignment = 1
-                            if int(Sku.VpdOffset) % Alignment != 0:
+                            try:
+                                VpdOffset = int(Sku.VpdOffset)
+                            except:
+                                try:
+                                    VpdOffset = int(Sku.VpdOffset, 16)
+                                except:
+                                    EdkLogger.error("build", FORMAT_INVALID, "Invalid offset value %s for PCD %s.%s." % (Sku.VpdOffset, Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
+                            if VpdOffset % Alignment != 0:
                                 EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Alignment))
                         VpdFile.Add(Pcd, Sku.VpdOffset)
                         # if the offset of a VPD is *, then it need to be fixed up by third party tool.
@@ -1220,7 +1227,14 @@ class PlatformAutoGen(AutoGen):
                                         Alignment = 2
                                     else:
                                         Alignment = 1
-                                    if int(Sku.VpdOffset) % Alignment != 0:
+                                    try:
+                                        VpdOffset = int(Sku.VpdOffset)
+                                    except:
+                                        try:
+                                            VpdOffset = int(Sku.VpdOffset, 16)
+                                        except:
+                                            EdkLogger.error("build", FORMAT_INVALID, "Invalid offset value %s for PCD %s.%s." % (Sku.VpdOffset, DscPcdEntry.TokenSpaceGuidCName, DscPcdEntry.TokenCName))
+                                    if VpdOffset % Alignment != 0:
                                         EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (DscPcdEntry.TokenSpaceGuidCName, DscPcdEntry.TokenCName, Alignment))
                                 VpdFile.Add(DscPcdEntry, Sku.VpdOffset)
                                 if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
