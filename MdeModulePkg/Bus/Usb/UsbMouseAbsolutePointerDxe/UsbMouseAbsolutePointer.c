@@ -1,7 +1,7 @@
 /** @file
   USB Mouse Driver that manages USB mouse and produces Absolute Pointer Protocol.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -673,7 +673,15 @@ InitializeUsbMouseDevice (
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinY = 0;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinZ = 0;
   UsbMouseAbsolutePointerDev->Mode.Attributes   = 0x3;
-  
+
+  //
+  // Let the cursor's starting position is in the center of the screen.
+  //
+  UsbMouseAbsolutePointerDev->State.CurrentX =
+    (UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxX + UsbMouseAbsolutePointerDev->Mode.AbsoluteMinX) / 2;
+  UsbMouseAbsolutePointerDev->State.CurrentY =
+    (UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxY + UsbMouseAbsolutePointerDev->Mode.AbsoluteMinY) / 2;
+
   //
   // Set boot protocol for the USB mouse.
   // This driver only supports boot protocol.
@@ -819,13 +827,28 @@ OnMouseInterruptComplete (
   // 2       0 to 7  Y displacement
   // 3 to n  0 to 7  Device specific (optional)
   //
-  UsbMouseAbsolutePointerDevice->State.CurrentX += *((INT8 *) Data + 1);
-  UsbMouseAbsolutePointerDevice->State.CurrentY += *((INT8 *) Data + 2);
-  
+  UsbMouseAbsolutePointerDevice->State.ActiveButtons = *(UINT8 *) Data & (BIT0 | BIT1 | BIT2);
+
+  UsbMouseAbsolutePointerDevice->State.CurrentX =
+    MIN (
+      MAX ((INT64) UsbMouseAbsolutePointerDevice->State.CurrentX + *((INT8 *) Data + 1),
+           (INT64) UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinX),
+      (INT64) UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxX
+      );
+  UsbMouseAbsolutePointerDevice->State.CurrentY =
+    MIN (
+      MAX ((INT64) UsbMouseAbsolutePointerDevice->State.CurrentY + *((INT8 *) Data + 2),
+           (INT64) UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinY),
+      (INT64) UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxY
+      );
   if (DataLength > 3) {
-    UsbMouseAbsolutePointerDevice->State.CurrentZ += *((INT8 *) Data + 3);
+    UsbMouseAbsolutePointerDevice->State.CurrentZ =
+      MIN (
+        MAX ((INT64) UsbMouseAbsolutePointerDevice->State.CurrentZ + *((INT8 *) Data + 1),
+             (INT64) UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinZ),
+        (INT64) UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxZ
+        );
   }
-  UsbMouseAbsolutePointerDevice->State.ActiveButtons = *(UINT8 *) Data & (BIT0 | BIT1);
 
   return EFI_SUCCESS;
 }
@@ -873,14 +896,6 @@ GetMouseAbsolutePointerState (
     sizeof (EFI_ABSOLUTE_POINTER_STATE)
     );
 
-  //
-  // Clear previous move state
-  //
-  MouseAbsolutePointerDev->State.CurrentX      = 0;
-  MouseAbsolutePointerDev->State.CurrentY      = 0;
-  MouseAbsolutePointerDev->State.CurrentZ      = 0;
-  MouseAbsolutePointerDev->State.ActiveButtons = 0;
-
   MouseAbsolutePointerDev->StateChanged = FALSE;
 
   return EFI_SUCCESS;
@@ -922,6 +937,15 @@ UsbMouseAbsolutePointerReset (
     &UsbMouseAbsolutePointerDevice->State,
     sizeof (EFI_ABSOLUTE_POINTER_STATE)
     );
+
+  //
+  // Let the cursor's starting position is in the center of the screen.
+  //
+  UsbMouseAbsolutePointerDevice->State.CurrentX =
+    (UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxX + UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinX) / 2;
+  UsbMouseAbsolutePointerDevice->State.CurrentY =
+    (UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxY + UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinY) / 2;
+
   UsbMouseAbsolutePointerDevice->StateChanged = FALSE;
 
   return EFI_SUCCESS;
