@@ -3,7 +3,7 @@
 #
 #  It provides an implementation of DXE Core that is compliant with DXE CIS.
 #  
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -41,6 +41,7 @@
   Misc/SetWatchdogTimer.c
   Misc/InstallConfigurationTable.c
   Misc/PropertiesTable.c
+  Misc/MemoryAttributesTable.c
   Library/Library.c
   Hand/DriverSupport.c
   Hand/Notify.c
@@ -125,6 +126,7 @@
   gEdkiiMemoryProfileGuid                       ## SOMETIMES_PRODUCES   ## GUID # Install protocol
   gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
   gEfiPropertiesTableGuid                       ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiMemoryAttributesTableGuid                 ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiEndOfDxeEventGroupGuid                    ## SOMETIMES_CONSUMES   ## Event
 
 [Ppis]
