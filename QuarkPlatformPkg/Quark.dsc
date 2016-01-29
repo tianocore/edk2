@@ -184,6 +184,7 @@
 !if $(TPM_12_HARDWARE) == INFINEON_I2C
   Tpm12DeviceLib|QuarkPlatformPkg/Library/Tpm12DeviceLibInfineonI2c/Tpm12DeviceLibInfineonI2c.inf
 !endif
+  TcgPpVendorLib|SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
 !else
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 !endif
@@ -843,7 +844,9 @@
   # Trusted Platform Module
   #
 !if $(MEASURED_BOOT_ENABLE)
+  SecurityPkg/Tcg/MemoryOverwriteControl/TcgMor.inf
   SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
+  SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
 !endif
 
   #
