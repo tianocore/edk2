@@ -1027,7 +1027,7 @@ typedef UINTN RETURN_STATUS;
 #define SIGNATURE_64(A, B, C, D, E, F, G, H) \
     (SIGNATURE_32 (A, B, C, D) | ((UINT64) (SIGNATURE_32 (E, F, G, H)) << 32))
 
-#if defined(_MSC_EXTENSIONS) && !defined (MDE_CPU_EBC)
+#if defined(_MSC_EXTENSIONS) && !defined (__INTEL_COMPILER) && !defined (MDE_CPU_EBC)
   #pragma intrinsic(_ReturnAddress)
   /**
     Get the return address of the calling funcation.
