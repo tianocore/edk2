@@ -258,6 +258,53 @@ IsDataShdr (
   return (BOOLEAN) (Shdr->sh_flags & (SHF_WRITE | SHF_ALLOC)) == (SHF_ALLOC | SHF_WRITE);
 }
 
+STATIC
+BOOLEAN
+IsStrtabShdr (
+  Elf_Shdr *Shdr
+  )
+{
+  Elf_Shdr *Namedr = GetShdrByIndex(mEhdr->e_shstrndx);
+
+  return (BOOLEAN) (strcmp((CHAR8*)mEhdr + Namedr->sh_offset + Shdr->sh_name, ELF_STRTAB_SECTION_NAME) == 0);
+}
+
+STATIC
+Elf_Shdr *
+FindStrtabShdr (
+  VOID
+  )
+{
+  UINT32 i;
+  for (i = 0; i < mEhdr->e_shnum; i++) {
+    Elf_Shdr *shdr = GetShdrByIndex(i);
+    if (IsStrtabShdr(shdr)) {
+      return shdr;
+    }
+  }
+  return NULL;
+}
+
+STATIC
+const UINT8 *
+GetSymName (
+  Elf_Sym *Sym
+  )
+{
+  if (Sym->st_name == 0) {
+    return NULL;
+  }
+
+  Elf_Shdr *StrtabShdr = FindStrtabShdr();
+  if (StrtabShdr == NULL) {
+    return NULL;
+  }
+
+  assert(Sym->st_name < StrtabShdr->sh_size);
+
+  return (UINT8*)mEhdr + StrtabShdr->sh_offset + Sym->st_name;
+}
+
 //
 // Elf functions interface implementation
 //
@@ -667,9 +714,18 @@ WriteSections64 (
         // header location.
         //
         if (Sym->st_shndx == SHN_UNDEF
-            || Sym->st_shndx == SHN_ABS
-            || Sym->st_shndx > mEhdr->e_shnum) {
-          Error (NULL, 0, 3000, "Invalid", "%s bad symbol definition.", mInImageName);
+            || Sym->st_shndx >= mEhdr->e_shnum) {
+          const UINT8 *SymName = GetSymName(Sym);
+          if (SymName == NULL) {
+            SymName = (const UINT8 *)"<unknown>";
+          }
+
+          Error (NULL, 0, 3000, "Invalid",
+                 "%s: Bad definition for symbol '%s'@%p or unsupported symbol type.  "
+                 "For example, absolute and undefined symbols are not supported.",
+                 mInImageName, SymName, Sym->st_value);
+
+          exit(EXIT_FAILURE);
         }
         SymShdr = GetShdrByIndex(Sym->st_shndx);
 

@@ -34,6 +34,7 @@ extern UINT32 mOutImageType;
 // Common EFI specific data.
 //
 #define ELF_HII_SECTION_NAME ".hii"
+#define ELF_STRTAB_SECTION_NAME ".strtab"
 #define MAX_COFF_ALIGNMENT 0x10000
 
 //
