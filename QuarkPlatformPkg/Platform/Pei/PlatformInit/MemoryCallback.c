@@ -7,7 +7,7 @@ following action is performed in this file,
   4. Set MTRR for PEI
   5. Create FV HOB and Flash HOB
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013 - 2016, Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -108,6 +108,9 @@ MemoryDiscoveredPpiNotifyCallback (
   UINT8                                 CpuAddressWidth;
   UINT32                                RegEax;
   MTRR_SETTINGS                         MtrrSettings;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI       *VariableServices;
+  UINT8                                 MorControl;
+  UINTN                                 DataSize;
 
   DEBUG ((EFI_D_INFO, "Platform PEIM Memory Callback\n"));
 
@@ -150,6 +153,52 @@ MemoryDiscoveredPpiNotifyCallback (
   MtrrSetAllMtrrs (&MtrrSettings);
 
   PERF_END (NULL, "SetCache", NULL, 0);
+
+  //
+  // Get necessary PPI
+  //
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiReadOnlyVariable2PpiGuid,           // GUID
+             0,                                          // INSTANCE
+             NULL,                                       // EFI_PEI_PPI_DESCRIPTOR
+             (VOID **)&VariableServices                  // PPI
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Detect MOR request by the OS.
+  //
+  MorControl = 0;
+  DataSize = sizeof (MorControl);
+  Status = VariableServices->GetVariable (
+                               VariableServices,
+                               MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+                               &gEfiMemoryOverwriteControlDataGuid,
+                               NULL,
+                               &DataSize,
+                               &MorControl
+                               );
+  //
+  // If OS requested a memory overwrite perform it now for Embedded SRAM
+  //
+  if (MOR_CLEAR_MEMORY_VALUE (MorControl)) {
+    DEBUG ((EFI_D_INFO, "Clear Embedded SRAM per MOR request.\n"));
+    if (PcdGet32 (PcdESramMemorySize) > 0) {
+      if (PcdGet32 (PcdEsramStage1Base) == 0) {
+        //
+        // ZeroMem() generates an ASSERT() if Buffer parameter is NULL.
+        // Clear byte at 0 and start clear operation at address 1.
+        //
+        *(UINT8 *)(0) = 0;
+        ZeroMem ((VOID *)1, (UINTN)PcdGet32 (PcdESramMemorySize) - 1);
+      } else {
+        ZeroMem (
+          (VOID *)(UINTN)PcdGet32 (PcdEsramStage1Base),
+          (UINTN)PcdGet32 (PcdESramMemorySize)
+          );
+      }
+    }
+  }
 
   //
   // Install PeiReset for PeiResetSystem service

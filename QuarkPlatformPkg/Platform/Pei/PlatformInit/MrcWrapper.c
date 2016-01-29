@@ -1,7 +1,7 @@
 /** @file
 Framework PEIM to initialize memory on a Quark Memory Controller.
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013 - 2016, Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -563,6 +563,8 @@ InstallEfiMemory (
   PEI_CAPSULE_PPI                       *Capsule;
   VOID                                  *LargeMemRangeBuf;
   UINTN                                 LargeMemRangeBufLen;
+  UINT8                                 MorControl;
+  UINTN                                 DataSize;
 
   //
   // Test the memory from 1M->TOM
@@ -617,12 +619,49 @@ InstallEfiMemory (
   RequiredMemSize = 0;
   RetriveRequiredMemorySize (PeiServices, &RequiredMemSize);
 
+  //
+  // Detect MOR request by the OS.
+  //
+  MorControl = 0;
+  DataSize = sizeof (MorControl);
+  Status = VariableServices->GetVariable (
+                               VariableServices,
+                               MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+                               &gEfiMemoryOverwriteControlDataGuid,
+                               NULL,
+                               &DataSize,
+                               &MorControl
+                               );
+
   PeiMemoryIndex = 0;
 
   for (Index = 0; Index < NumRanges; Index++)
   {
     DEBUG ((EFI_D_INFO, "Found 0x%x bytes at ", MemoryMap[Index].RangeLength));
     DEBUG ((EFI_D_INFO, "0x%x.\n", MemoryMap[Index].PhysicalAddress));
+
+    //
+    // If OS requested a memory overwrite perform it now.  Only do it for memory
+    // used by the OS.
+    //
+    if (MOR_CLEAR_MEMORY_VALUE (MorControl) && MemoryMap[Index].Type == DualChannelDdrMainMemory) {
+      DEBUG ((EFI_D_INFO, "Clear memory per MOR request.\n"));
+      if ((UINTN)MemoryMap[Index].RangeLength > 0) {
+        if ((UINTN)MemoryMap[Index].PhysicalAddress == 0) {
+          //
+          // ZeroMem() generates an ASSERT() if Buffer parameter is NULL.
+          // Clear byte at 0 and start clear operation at address 1.
+          //
+          *(UINT8 *)(0) = 0;
+          ZeroMem ((VOID *)1, (UINTN)MemoryMap[Index].RangeLength - 1);
+        } else {
+          ZeroMem (
+            (VOID *)(UINTN)MemoryMap[Index].PhysicalAddress,
+            (UINTN)MemoryMap[Index].RangeLength
+            );
+        }
+      }
+    }
 
     if ((MemoryMap[Index].Type == DualChannelDdrMainMemory) &&
         (MemoryMap[Index].PhysicalAddress + MemoryMap[Index].RangeLength < MAX_ADDRESS) &&
