@@ -197,8 +197,11 @@ GetShdrByIndex (
   UINT32 Num
   )
 {
-  if (Num >= mEhdr->e_shnum)
-    return NULL;
+  if (Num >= mEhdr->e_shnum) {
+    Error (NULL, 0, 3000, "Invalid", "GetShdrByIndex: Index %u is too high.", Num);
+    exit(EXIT_FAILURE);
+  }
+
   return (Elf_Shdr*)((UINT8*)mShdrBase + Num * mEhdr->e_shentsize);
 }
 
