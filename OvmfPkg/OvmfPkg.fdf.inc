@@ -15,6 +15,12 @@
 #
 ##
 
+#
+# Default flash size is 2MB.
+#
+# Defining FD_SIZE_1MB on the build command line can override this.
+#
+
 DEFINE BLOCK_SIZE        = 0x1000
 DEFINE VARS_SIZE         = 0x20000
 DEFINE VARS_BLOCKS       = 0x20

@@ -231,8 +231,8 @@ longer.)
     - Install the drivers into a directory called Intel3.5 in your WORKSPACE.
 
   - Include the driver in OVMF during the build:
-    - Add "-D E1000_ENABLE -D FD_SIZE_2MB" to your build command,
-    - For example: "build -D E1000_ENABLE -D FD_SIZE_2MB".
+    - Add "-D E1000_ENABLE" to your build command,
+    - For example: "build -D E1000_ENABLE".
 
 * When a matching iPXE driver is configured for a NIC as described above, it
   takes priority over other drivers that could possibly drive the card too:
