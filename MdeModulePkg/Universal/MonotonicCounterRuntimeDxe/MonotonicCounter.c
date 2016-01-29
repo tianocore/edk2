@@ -2,7 +2,7 @@
   Produce the UEFI boot service GetNextMonotonicCount() and runtime service
   GetNextHighMonotonicCount().
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -107,8 +107,9 @@ MonotonicCounterDriverGetNextMonotonicCount (
   comprised of two 32 bit quantities:  the high 32 bits and the low 32 bits.
   During boot service time the low 32 bit value is volatile:  it is reset to
   zero on every system reset and is increased by 1 on every call to GetNextMonotonicCount().
-  The high 32 bit value is non-volatile and is increased by 1 whenever the system resets
-  or whenever the low 32 bit count [returned by GetNextMonoticCount()] overflows.
+  The high 32 bit value is non-volatile and is increased by 1 whenever the system resets,
+  whenever GetNextHighMonotonicCount() is called, or whenever the low 32 bit count
+  (returned by GetNextMonoticCount()) overflows.
   The GetNextMonotonicCount() function is only available at boot services time.
   If the operating system wishes to extend the platform monotonic counter to runtime,
   it may do so by utilizing GetNextHighMonotonicCount().  To do this, before calling
