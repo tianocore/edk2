@@ -2,7 +2,7 @@
   This file provides a definition of the EFI IPv4 Configuration II
   Protocol.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -76,13 +76,18 @@ typedef enum {
 } EFI_IP4_CONFIG2_DATA_TYPE;
 
 ///
+/// EFI_IP4_CONFIG2_INTERFACE_INFO related definitions
+///
+#define EFI_IP4_CONFIG2_INTERFACE_INFO_NAME_SIZE 32
+
+///
 /// EFI_IP4_CONFIG2_INTERFACE_INFO
 ///
 typedef struct {
   ///
   /// The name of the interface. It is a NULL-terminated Unicode string.
   ///
-  CHAR16                Name[32];
+  CHAR16                Name[EFI_IP4_CONFIG2_INTERFACE_INFO_NAME_SIZE];
   ///
   /// The interface type of the network interface. See RFC 1700, 
   /// section "Number Hardware Type".
