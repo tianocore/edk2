@@ -1,7 +1,7 @@
 /** @file
 Elf32 Convert solution
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
@@ -815,7 +815,7 @@ WriteRelocations32 (
 
         FoundRelocations = TRUE;
         for (RelIdx = 0; RelIdx < RelShdr->sh_size; RelIdx += RelShdr->sh_entsize) {
-          Elf_Rel  *Rel = (Elf_Rel *)((UINT8*)mEhdr + RelShdr->sh_offset + RelIdx);
+          Rel = (Elf_Rel *)((UINT8*)mEhdr + RelShdr->sh_offset + RelIdx);
 
           if (mEhdr->e_machine == EM_386) { 
             switch (ELF_R_TYPE(Rel->r_info)) {

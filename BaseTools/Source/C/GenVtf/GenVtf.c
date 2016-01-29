@@ -2,7 +2,7 @@
 This file contains functions required to generate a boot strap file (BSF) also 
 known as the Volume Top File (VTF)
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -2652,20 +2652,20 @@ Returns:
     SymFileName = VTF_SYM_FILE;
   } else {
     INTN OutFileNameLen = strlen(OutFileName1);
-    INTN Index;
+    INTN NewIndex;
 
-    for (Index = OutFileNameLen; Index > 0; --Index) {
-      if (OutFileName1[Index] == '/' || OutFileName1[Index] == '\\') {
+    for (NewIndex = OutFileNameLen; NewIndex > 0; --NewIndex) {
+      if (OutFileName1[NewIndex] == '/' || OutFileName1[NewIndex] == '\\') {
         break;
       }
     }
-    if (Index == 0) {
+    if (NewIndex == 0) {
       SymFileName = VTF_SYM_FILE;
     } else {
-      INTN SymFileNameLen = Index + 1 + strlen(VTF_SYM_FILE);
+      INTN SymFileNameLen = NewIndex + 1 + strlen(VTF_SYM_FILE);
       SymFileName = malloc(SymFileNameLen + 1);
-      memcpy(SymFileName, OutFileName1, Index + 1);
-      memcpy(SymFileName + Index + 1, VTF_SYM_FILE, strlen(VTF_SYM_FILE));
+      memcpy(SymFileName, OutFileName1, NewIndex + 1);
+      memcpy(SymFileName + NewIndex + 1, VTF_SYM_FILE, strlen(VTF_SYM_FILE));
       SymFileName[SymFileNameLen] = '\0';
     }
     if (DebugMode) {

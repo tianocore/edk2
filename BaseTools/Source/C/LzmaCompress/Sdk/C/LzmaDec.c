@@ -266,7 +266,7 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
         prob = probs + RepLenCoder;
       }
       {
-        unsigned limit, offset;
+        unsigned offset;
         CLzmaProb *probLen = prob + LenChoice;
         IF_BIT_0(probLen)
         {
