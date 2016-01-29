@@ -5,7 +5,7 @@
   If a code construct is defined in the UEFI 2.5 specification it must be included
   by this include file.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -628,7 +628,8 @@ VOID
                                  attributes bitmask for the variable.
   @param[in, out]  DataSize      On input, the size in bytes of the return Data buffer.
                                  On output the size of data returned in Data.
-  @param[out]      Data          The buffer to return the contents of the variable.
+  @param[out]      Data          The buffer to return the contents of the variable. May be NULL
+                                 with a zero DataSize in order to determine the size buffer needed.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The variable was not found.
@@ -648,7 +649,7 @@ EFI_STATUS
   IN     EFI_GUID                    *VendorGuid,
   OUT    UINT32                      *Attributes,    OPTIONAL
   IN OUT UINTN                       *DataSize,
-  OUT    VOID                        *Data
+  OUT    VOID                        *Data           OPTIONAL
   );
 
 /**
