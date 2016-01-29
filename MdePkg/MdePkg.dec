@@ -2,9 +2,9 @@
 # This Package provides all definitions, library classes and libraries instances.
 #
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
-# EFI1.10/UEFI2.5/PI1.4 and some Industry Standards.
+# EFI1.10/UEFI2.6/PI1.4 and some Industry Standards.
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -1586,6 +1586,12 @@
 
   ## Include/Protocol/Rest.h
   gEfiRestProtocolGuid                 =  { 0x0db48a36, 0x4e54, 0xea9c, {0x9b, 0x09, 0x1e, 0xa5, 0xbe, 0x3a, 0x66, 0x0b }}
+
+  #
+  # Protocols defined in UEFI2.6
+  #
+  ## Include/Protocol/WiFi2.h
+  gEfiWiFi2ProtocolGuid                = { 0x1b0fb9bf, 0x699d, 0x4fdd, {0xa7, 0xc3, 0x25, 0x46, 0x68, 0x1b, 0xf6, 0x3b }}
 
 #
 # [Error.gEfiMdePkgTokenSpaceGuid]
