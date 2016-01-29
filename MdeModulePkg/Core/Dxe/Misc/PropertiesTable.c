@@ -81,6 +81,15 @@ EFI_PROPERTIES_TABLE  mPropertiesTable = {
 EFI_LOCK           mPropertiesTableLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
 //
+// Temporary save for original memory map.
+// This is for MemoryAttributesTable only.
+//
+extern BOOLEAN         mIsConstructingMemoryAttributesTable;
+EFI_MEMORY_DESCRIPTOR  *mMemoryMapOrg;
+UINTN                  mMemoryMapOrgSize;
+UINTN                  mDescriptorSize;
+
+//
 // Below functions are for MemoryMap
 //
 
@@ -190,6 +199,42 @@ SortMemoryMap (
 }
 
 /**
+  Check if this memory entry spans across original memory map boundary.
+
+  @param PhysicalStart   The PhysicalStart of memory
+  @param NumberOfPages   The NumberOfPages of memory
+
+  @retval TRUE  This memory entry spans across original memory map boundary.
+  @retval FALSE This memory entry does not span cross original memory map boundary.
+**/
+STATIC
+BOOLEAN
+DoesEntrySpanAcrossBoundary (
+  IN UINT64                      PhysicalStart,
+  IN UINT64                      NumberOfPages
+  )
+{
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEnd;
+  UINT64                      MemoryBlockLength;
+
+  MemoryMapEntry = mMemoryMapOrg;
+  MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) mMemoryMapOrg + mMemoryMapOrgSize);
+  while (MemoryMapEntry < MemoryMapEnd) {
+    MemoryBlockLength = (UINT64) (EfiPagesToSize (MemoryMapEntry->NumberOfPages));
+
+    if ((MemoryMapEntry->PhysicalStart <= PhysicalStart) &&
+        (MemoryMapEntry->PhysicalStart + MemoryBlockLength > PhysicalStart) &&
+        (MemoryMapEntry->PhysicalStart + MemoryBlockLength < PhysicalStart + EfiPagesToSize (NumberOfPages))) {
+      return TRUE;
+    }
+
+    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, mDescriptorSize);
+  }
+  return FALSE;
+}
+
+/**
   Merge continous memory map entries whose have same attributes.
 
   @param  MemoryMap              A pointer to the buffer in which firmware places
@@ -221,14 +266,25 @@ MergeMemoryMap (
     CopyMem (NewMemoryMapEntry, MemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
     NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
 
-    MemoryBlockLength = (UINT64) (EfiPagesToSize (MemoryMapEntry->NumberOfPages));
-    if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
-        (MemoryMapEntry->Type == NextMemoryMapEntry->Type) &&
-        (MemoryMapEntry->Attribute == NextMemoryMapEntry->Attribute) &&
-        ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart)) {
-      NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
-      MemoryMapEntry = NextMemoryMapEntry;
-    }
+    do {
+      MemoryBlockLength = (UINT64) (EfiPagesToSize (MemoryMapEntry->NumberOfPages));
+      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
+          (MemoryMapEntry->Type == NextMemoryMapEntry->Type) &&
+          (MemoryMapEntry->Attribute == NextMemoryMapEntry->Attribute) &&
+          ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart) &&
+          (!DoesEntrySpanAcrossBoundary (MemoryMapEntry->PhysicalStart, MemoryMapEntry->NumberOfPages + NextMemoryMapEntry->NumberOfPages))) {
+        MemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        if (NewMemoryMapEntry != MemoryMapEntry) {
+          NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        }
+
+        NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        continue;
+      } else {
+        MemoryMapEntry = PREVIOUS_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        break;
+      }
+    } while (TRUE);
 
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
     NewMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NewMemoryMapEntry, DescriptorSize);
@@ -686,7 +742,7 @@ SplitTable (
 }
 
 /**
-  This function for GetMemoryMap() with properties table.
+  This function for GetMemoryMap() with properties table capability.
 
   It calls original GetMemoryMap() to get the original memory map information. Then
   plus the additional memory map entries for PE Code/Data seperation.
@@ -717,7 +773,6 @@ SplitTable (
   @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 CoreGetMemoryMapPropertiesTable (
@@ -759,13 +814,38 @@ CoreGetMemoryMapPropertiesTable (
       //
       Status = EFI_BUFFER_TOO_SMALL;
     } else {
+      if (mIsConstructingMemoryAttributesTable) {
+        //
+        // If the memory map is constructed for memory attributes table,
+        // save original memory map, because they will be checked later
+        // to make sure the memory attributes table entry does not cross
+        // the original memory map entry boundary.
+        // This work must NOT be done in normal GetMemoryMap() because
+        // allocating memory is not allowed due to MapKey update.
+        //
+        mDescriptorSize = *DescriptorSize;
+        mMemoryMapOrgSize = *MemoryMapSize;
+        mMemoryMapOrg = AllocateCopyPool (*MemoryMapSize, MemoryMap);
+        if (mMemoryMapOrg == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Exit;
+        }
+      }
+
       //
       // Split PE code/data
       //
       SplitTable (MemoryMapSize, MemoryMap, *DescriptorSize);
+
+      if (mIsConstructingMemoryAttributesTable) {
+        FreePool (mMemoryMapOrg);
+        mMemoryMapOrg = NULL;
+        mMemoryMapOrgSize = 0;
+      }
     }
   }
 
+Exit:
   CoreReleasePropertiesTableLock ();
   return Status;
 }
