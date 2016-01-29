@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -388,6 +388,7 @@ DxeMain (
   MemoryProfileInstallProtocol ();
 
   CoreInitializePropertiesTable ();
+  CoreInitializeMemoryAttributesTable ();
 
   //
   // Get persisted vector hand-off info from GUIDeed HOB again due to HobStart may be updated,
