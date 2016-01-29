@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <io.h>
 #endif
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -310,7 +311,15 @@ GetSymName (
 
   assert(Sym->st_name < StrtabShdr->sh_size);
 
-  return (UINT8*)mEhdr + StrtabShdr->sh_offset + Sym->st_name;
+  UINT8* StrtabContents = (UINT8*)mEhdr + StrtabShdr->sh_offset;
+
+  bool foundEnd = false;
+  for (UINT32 i = Sym->st_name; (i < StrtabShdr->sh_size) && !foundEnd; i++) {
+    foundEnd = StrtabContents[i] == 0;
+  }
+  assert(foundEnd);
+
+  return StrtabContents + Sym->st_name;
 }
 
 //
@@ -539,7 +548,7 @@ ScanSections32 (
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
     break;
   default:
-    VerboseMsg ("%s unknown e_machine type. Assume IA-32", (UINTN)mEhdr->e_machine);
+    VerboseMsg ("%s unknown e_machine type %hu. Assume IA-32", mInImageName, mEhdr->e_machine);
     NtHdr->Pe32.FileHeader.Machine = EFI_IMAGE_MACHINE_IA32;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
   }
@@ -725,7 +734,7 @@ WriteSections32 (
           }
 
           Error (NULL, 0, 3000, "Invalid",
-                 "%s: Bad definition for symbol '%s'@%p or unsupported symbol type.  "
+                 "%s: Bad definition for symbol '%s'@%#x or unsupported symbol type.  "
                  "For example, absolute and undefined symbols are not supported.",
                  mInImageName, SymName, Sym->st_value);
 
