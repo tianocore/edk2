@@ -3,7 +3,7 @@
     LzmaEnc.c -- LZMA Encoder
     2009-02-02 : Igor Pavlov : Public domain
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -132,9 +132,9 @@ void LzmaEnc_FastPosInit(Byte *g_FastPos)
   }
 }
 
-#define BSR2_RET(pos, res) { UInt32 i = 6 + ((kNumLogBits - 1) & \
+#define BSR2_RET(pos, res) { UInt32 ij = 6 + ((kNumLogBits - 1) & \
   (0 - (((((UInt32)1 << (kNumLogBits + 6)) - 1) - pos) >> 31))); \
-  res = p->g_FastPos[pos >> i] + (i * 2); }
+  res = p->g_FastPos[pos >> ij] + (ij * 2); }
 /*
 #define BSR2_RET(pos, res) { res = (pos < (1 << (kNumLogBits + 6))) ? \
   p->g_FastPos[pos >> 6] + 12 : \
@@ -1148,20 +1148,18 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
     #ifdef SHOW_STAT2
     if (position >= 0)
     {
-      unsigned i;
+      unsigned ii;
       printf("\n pos = %4X", position);
-      for (i = cur; i <= lenEnd; i++)
-      printf("\nprice[%4X] = %d", position - cur + i, p->opt[i].price);
+      for (ii = cur; ii <= lenEnd; ii++)
+      printf("\nprice[%4X] = %d", position - cur + ii, p->opt[ii].price);
     }
     #endif
 
   for (;;)
   {
-    UInt32 numAvailFull, newLen, numPairs, posPrev, state, posState, startLen;
-    UInt32 curPrice, curAnd1Price, matchPrice, repMatchPrice;
+    UInt32 numAvailFull, newLen, posPrev, state, startLen;
+    UInt32 curPrice, curAnd1Price;
     Bool nextIsChar;
-    Byte curByte, matchByte;
-    const Byte *data;
     COptimal *curOpt;
     COptimal *nextOpt;
 
@@ -1224,7 +1222,6 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
       prevOpt = &p->opt[posPrev];
       if (pos < LZMA_NUM_REPS)
       {
-        UInt32 i;
         reps[0] = prevOpt->backs[pos];
         for (i = 1; i <= pos; i++)
           reps[i] = prevOpt->backs[i - 1];
@@ -1233,7 +1230,6 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
       }
       else
       {
-        UInt32 i;
         reps[0] = (pos - LZMA_NUM_REPS);
         for (i = 1; i < LZMA_NUM_REPS; i++)
           reps[i] = prevOpt->backs[i - 1];
@@ -1319,12 +1315,11 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
             GET_PRICE_1(p->isRep[state2]);
         /* for (; lenTest2 >= 2; lenTest2--) */
         {
-          UInt32 curAndLenPrice;
           COptimal *opt;
           UInt32 offset = cur + 1 + lenTest2;
           while (lenEnd < offset)
             p->opt[++lenEnd].price = kInfinityPrice;
-          curAndLenPrice = nextRepMatchPrice + GetRepPrice(p, 0, lenTest2, state2, posStateNext);
+          UInt32 curAndLenPrice = nextRepMatchPrice + GetRepPrice(p, 0, lenTest2, state2, posStateNext);
           opt = &p->opt[offset];
           if (curAndLenPrice < opt->price)
           {
@@ -1430,7 +1425,7 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
     }
     if (newLen >= startLen)
     {
-      UInt32 normalMatchPrice = matchPrice + GET_PRICE_0(p->isRep[state]);
+      normalMatchPrice = matchPrice + GET_PRICE_0(p->isRep[state]);
       UInt32 offs, curBack, posSlot;
       UInt32 lenTest;
       while (lenEnd < cur + newLen)
@@ -1443,7 +1438,8 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
       GetPosSlot2(curBack, posSlot);
       for (lenTest = /*2*/ startLen; ; lenTest++)
       {
-        UInt32 curAndLenPrice = normalMatchPrice + p->lenEnc.prices[posState][lenTest - LZMA_MATCH_LEN_MIN];
+        UInt32 curAndLenPrice;
+        curAndLenPrice = normalMatchPrice + p->lenEnc.prices[posState][lenTest - LZMA_MATCH_LEN_MIN];
         UInt32 lenToPosState = GetLenToPosState(lenTest);
         COptimal *opt;
         if (curBack < kNumFullDistances)
@@ -1488,8 +1484,7 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
             /* for (; lenTest2 >= 2; lenTest2--) */
             {
               UInt32 offset = cur + lenTest + 1 + lenTest2;
-              UInt32 curAndLenPrice;
-              COptimal *opt;
+
               while (lenEnd < offset)
                 p->opt[++lenEnd].price = kInfinityPrice;
               curAndLenPrice = nextRepMatchPrice + GetRepPrice(p, 0, lenTest2, state2, posStateNext);
@@ -1697,7 +1692,7 @@ static void FillDistancesPrices(CLzmaEnc *p)
 
     {
       UInt32 *distancesPrices = p->distancesPrices[lenToPosState];
-      UInt32 i;
+
       for (i = 0; i < kStartPosModelIndex; i++)
         distancesPrices[i] = posSlotPrices[i];
       for (; i < kNumFullDistances; i++)
