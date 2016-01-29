@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by DxeCore module.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2889,6 +2889,15 @@ CoreUpdateMemoryAttributes (
 VOID
 EFIAPI
 CoreInitializePropertiesTable (
+  VOID
+  );
+
+/**
+  Initialize MemoryAttrubutesTable support.
+**/
+VOID
+EFIAPI
+CoreInitializeMemoryAttributesTable (
   VOID
   );
 
