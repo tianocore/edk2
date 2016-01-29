@@ -138,6 +138,7 @@ M: Jiewen Yao <jiewen.yao@intel.com>
 MdeModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
 M: Feng Tian <feng.tian@intel.com>
+M: Star Zeng <star.zeng@intel.com>
 
 MdePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
