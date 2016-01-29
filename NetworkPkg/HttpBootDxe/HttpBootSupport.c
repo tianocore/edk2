@@ -1,7 +1,7 @@
 /** @file
   Support functions implementation for UEFI HTTP boot driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -930,7 +930,6 @@ HttpIoRecvResponse (
 {
   EFI_STATUS                 Status;
   EFI_HTTP_PROTOCOL          *Http;
-  EFI_HTTP_STATUS_CODE       StatusCode;
 
   if (HttpIo == NULL || HttpIo->Http == NULL || ResponseData == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -971,17 +970,10 @@ HttpIoRecvResponse (
   //
   // Store the received data into the wrapper.
   //
-  Status = HttpIo->RspToken.Status;
-  if (!EFI_ERROR (Status)) {
-    ResponseData->HeaderCount = HttpIo->RspToken.Message->HeaderCount;
-    ResponseData->Headers     = HttpIo->RspToken.Message->Headers;
-    ResponseData->BodyLength  = HttpIo->RspToken.Message->BodyLength;
-  }
-  
-  if (RecvMsgHeader) {
-    StatusCode = HttpIo->RspToken.Message->Data.Response->StatusCode;
-    HttpBootPrintErrorMessage (StatusCode);
-  }
+  ResponseData->Status = HttpIo->RspToken.Status;
+  ResponseData->HeaderCount = HttpIo->RspToken.Message->HeaderCount;
+  ResponseData->Headers     = HttpIo->RspToken.Message->Headers;
+  ResponseData->BodyLength  = HttpIo->RspToken.Message->BodyLength;
 
   return Status;
 }

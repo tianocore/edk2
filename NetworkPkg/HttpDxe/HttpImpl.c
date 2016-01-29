@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -976,7 +976,7 @@ HttpResponseWorker (
     HttpHeaders = NULL;
     
     HttpMsg->Data.Response->StatusCode = HttpMappingToStatusCode (StatusCode);
-
+    HttpInstance->StatusCode = StatusCode;
     //
     // Init message-body parser by header information.  
     //
@@ -1111,7 +1111,13 @@ Exit:
   if (Item != NULL) {
     NetMapRemoveItem (&Wrap->HttpInstance->RxTokens, Item, NULL);
   }
-  Token->Status = Status;
+
+  if (HttpInstance->StatusCode >= HTTP_ERROR_OR_NOT_SUPPORT_STATUS_CODE) {
+    Token->Status = EFI_HTTP_ERROR;
+  } else {
+    Token->Status = Status;
+  }
+
   gBS->SignalEvent (Token->Event);
   HttpCloseTcpRxEvent (Wrap);
   FreePool (Wrap);
@@ -1136,7 +1142,12 @@ Error:
     HttpInstance->CacheBody = NULL;
   }
 
-  Token->Status = Status;
+  if (HttpInstance->StatusCode >= HTTP_ERROR_OR_NOT_SUPPORT_STATUS_CODE) {
+    Token->Status = EFI_HTTP_ERROR;
+  } else {
+    Token->Status = Status;
+  }
+
   gBS->SignalEvent (Token->Event);
 
   return Status;  

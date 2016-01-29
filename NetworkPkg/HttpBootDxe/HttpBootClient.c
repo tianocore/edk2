@@ -1,7 +1,7 @@
 /** @file
   Implementation of the boot file download function.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -717,6 +717,7 @@ HttpBootGetBootFile (
   )
 {
   EFI_STATUS                 Status;
+  EFI_HTTP_STATUS_CODE       StatusCode;
   CHAR8                      *HostName;
   EFI_HTTP_REQUEST_DATA      *RequestData;
   HTTP_IO_RESPONSE_DATA      *ResponseData;
@@ -894,7 +895,12 @@ HttpBootGetBootFile (
              TRUE,
              ResponseData
              );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || EFI_ERROR (ResponseData->Status)) {
+    if (EFI_ERROR (ResponseData->Status)) {
+      StatusCode = HttpIo->RspToken.Message->Data.Response->StatusCode;
+      HttpBootPrintErrorMessage (StatusCode);
+      Status = ResponseData->Status;
+    }
     goto ERROR_5;
   }
 

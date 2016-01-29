@@ -1,7 +1,7 @@
 /** @file
   Support functions declaration for UEFI HTTP boot driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -79,6 +79,17 @@ HttpBootShowIp4Addr (
 VOID
 HttpBootShowIp6Addr (
   IN EFI_IPv6_ADDRESS   *Ip
+  );
+
+/**
+  This function is to display the HTTP error status.
+
+  @param[in]      StatusCode      The status code value in HTTP message.
+
+**/
+VOID
+HttpBootPrintErrorMessage (
+  EFI_HTTP_STATUS_CODE            StatusCode
   );
 
 //
@@ -196,6 +207,7 @@ typedef struct {
   EFI_HTTP_HEADER             *Headers;
   UINTN                       BodyLength;
   CHAR8                       *Body;
+  EFI_STATUS                  Status;
 } HTTP_IO_RESPONSE_DATA;
 
 /**

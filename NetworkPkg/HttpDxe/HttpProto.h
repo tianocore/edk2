@@ -1,7 +1,7 @@
 /** @file
   The header files of miscellaneous routines for HttpDxe driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -89,6 +89,8 @@ typedef struct _HTTP_PROTOCOL {
   LIST_ENTRY                    Link;   // Link to all HTTP instance from the service.
   BOOLEAN                       InDestroy;
   INTN                          State;
+
+  UINTN                         StatusCode;
 
   EFI_HANDLE                    Tcp4ChildHandle;
   EFI_TCP4_PROTOCOL             *Tcp4;
