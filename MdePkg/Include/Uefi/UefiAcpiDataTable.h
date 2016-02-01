@@ -1,7 +1,7 @@
 /** @file
   UEFI ACPI Data Table Definition.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -29,6 +29,11 @@ typedef struct {
   UINT32               SwSmiNumber;
   UINT64               BufferPtrAddress;
 } EFI_SMM_COMMUNICATION_ACPI_TABLE;
+
+typedef struct {
+  EFI_SMM_COMMUNICATION_ACPI_TABLE        UefiSmmCommunicationAcpiTable;
+  EFI_ACPI_6_0_GENERIC_ADDRESS_STRUCTURE  InvocationRegister;
+} EFI_SMM_COMMUNICATION_ACPI_TABLE_2;
 
 ///
 /// To avoid confusion in interpreting frames, the communication buffer should always 
