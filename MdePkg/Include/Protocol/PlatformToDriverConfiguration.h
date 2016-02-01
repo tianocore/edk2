@@ -5,7 +5,7 @@
   by a UEFI Driver in its Start() function. This protocol allows the driver to receive 
   configuration information as part of being started.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -44,7 +44,15 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
   returned by the platform, and calls Response passing in the
   arguments returned from Query. The Instance value passed into
   Response must be the same value passed into the corresponding
-  call to Query.
+  call to Query. The UEFI driver must continuously call Query and
+  Response until EFI_NOT_FOUND is returned by Query.
+  If the UEFI driver does not recognize the ParameterTypeGuid, it
+  calls Response with a ConfigurationAction of
+  EfiPlatformConfigurationActionUnsupportedGuid. The UEFI driver
+  must then continue calling Query and Response until EFI_NOT_FOUND
+  is returned by Query. This gives the platform an opportunity to
+  pass additional configuration settings using a different
+  ParameterTypeGuid that may be supported by the driver.
   An Instance value of zero means return the first ParameterBlock
   in the set of unprocessed parameter blocks. The driver should
   increment the Instance value by one for each successive call to Query.
@@ -183,6 +191,20 @@ typedef enum {
   ///  after ControllerHandle is stopped. 
   /// 
   EfiPlatformConfigurationActionNvramFailed       = 4,
+
+  ///
+  /// The controller specified by ControllerHandle is still
+  /// in a usable state; its configuration has not been updated
+  /// via parsing the ParameterBlock. The driver did not support
+  /// the ParameterBlock format identified by ParameterTypeGuid.
+  /// No actions are required before this controller can be used
+  /// again. On additional Query calls from this ControllerHandle,
+  /// the platform should stop returning a ParameterBlock
+  /// qualified by this same ParameterTypeGuid. If no other
+  /// ParameterTypeGuid is supported by the platform, Query
+  /// should return EFI_NOT_FOUND.
+  ///
+  EfiPlatformConfigurationActionUnsupportedGuid   = 5,
   EfiPlatformConfigurationActionMaximum
 } EFI_PLATFORM_CONFIGURATION_ACTION;
 
