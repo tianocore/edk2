@@ -149,8 +149,6 @@ NetworkPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
 M: Siyuan Fu <siyuan.fu@intel.com>
 M: Jiaxin Wu <jiaxin.wu@intel.com>
-M: Lubo Zhang <lubo.zhang@intel.com>
-M: Fan Wang <fan.wang@intel.com>
 
 Nt32Pkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Nt32Pkg
