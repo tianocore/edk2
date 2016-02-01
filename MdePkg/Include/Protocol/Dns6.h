@@ -4,7 +4,7 @@
   DNSv6 Service Binding Protocol (DNSv6SB)
   DNSv6 Protocol (DNSv6)
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -301,7 +301,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS             The operation completed successfully.
   @retval EFI_INVALID_PARAMTER    This is NULL.
-                                  The StationIp address provided in DnsConfigData is not a valid unicast.
+                                  The StationIp address provided in DnsConfigData is not zero and not a valid unicast.
                                   DnsServerList is NULL while DnsServerList Count is not ZERO.
                                   DnsServerList Count is ZERO while DnsServerList is not NULL.
   @retval EFI_OUT_OF_RESOURCES    The DNS instance data or required space could not be allocated.
@@ -323,10 +323,10 @@ EFI_STATUS
   Host name to host address translation.
 
   The HostNameToIp () function is used to translate the host name to host IP address. A
-  type A query is used to get the one or more IPv6 addresses for this host.
+  type AAAA query is used to get the one or more IPv6 addresses for this host.
 
   @param[in]  This                Pointer to EFI_DNS6_PROTOCOL instance.
-  @param[in]  Hostname            Host name.
+  @param[in]  HostName            Host name.
   @param[in]  Token               Point to the completion token to translate host name
                                   to host address.
 

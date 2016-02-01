@@ -4,7 +4,7 @@
   DNSv4 Service Binding Protocol (DNSv4SB)
   DNSv4 Protocol (DNSv4)
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -339,7 +339,7 @@ EFI_STATUS
   type A query is used to get the one or more IP addresses for this host.
 
   @param[in]  This                Pointer to EFI_DNS4_PROTOCOL instance.
-  @param[in]  Hostname            Host name.
+  @param[in]  HostName            Host name.
   @param[in]  Token               Point to the completion token to translate host name
                                   to host address.
 
@@ -380,7 +380,6 @@ EFI_STATUS
                                   IpAddress is not valid IP address .
   @retval EFI_NO_MAPPING          There's no source address is available for use.
   @retval EFI_ALREADY_STARTED     This Token is being used in another DNS session.
-  @retval EFI_NOT_STARTED         This instance has not been started.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate needed resources.
 **/
 typedef
