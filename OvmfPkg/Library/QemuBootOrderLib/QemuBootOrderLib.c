@@ -931,6 +931,61 @@ TranslatePciOfwNodes (
       TargetLun[0],
       TargetLun[1]
       );
+  } else if (NumNodes >= FirstNonBridge + 2 &&
+      SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "pci8086,5845") &&
+      SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "namespace")
+      ) {
+    //
+    // OpenFirmware device path (NVMe device):
+    //
+    //   /pci@i0cf8/pci8086,5845@6[,1]/namespace@1,0
+    //        ^                  ^  ^            ^ ^
+    //        |                  |  |            | Extended Unique Identifier
+    //        |                  |  |            | (EUI-64), big endian interp.
+    //        |                  |  |            namespace ID
+    //        |                  PCI slot & function holding NVMe controller
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path:
+    //
+    //   PciRoot(0x0)/Pci(0x6,0x1)/NVMe(0x1,00-00-00-00-00-00-00-00)
+    //                                  ^   ^
+    //                                  |   octets of the EUI-64
+    //                                  |   in address order
+    //                                  namespace ID
+    //
+    UINT64 Namespace[2];
+    UINTN  RequiredEntries;
+    UINT8  *Eui64;
+
+    RequiredEntries = sizeof (Namespace) / sizeof (Namespace[0]);
+    NumEntries = RequiredEntries;
+    if (ParseUnitAddressHexList (
+          OfwNode[FirstNonBridge + 1].UnitAddress,
+          Namespace,
+          &NumEntries
+          ) != RETURN_SUCCESS ||
+        NumEntries != RequiredEntries ||
+        Namespace[0] == 0 ||
+        Namespace[0] >= MAX_UINT32
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Eui64 = (UINT8 *)&Namespace[1];
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x%x)%s/Pci(0x%Lx,0x%Lx)/"
+      "NVMe(0x%Lx,%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x)",
+      PciRoot,
+      Bridges,
+      PciDevFun[0],
+      PciDevFun[1],
+      Namespace[0],
+      Eui64[7], Eui64[6], Eui64[5], Eui64[4],
+      Eui64[3], Eui64[2], Eui64[1], Eui64[0]
+      );
   } else {
     //
     // Generic OpenFirmware device path for PCI devices:
