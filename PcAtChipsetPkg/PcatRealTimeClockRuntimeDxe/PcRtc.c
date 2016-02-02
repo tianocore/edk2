@@ -487,7 +487,7 @@ PcRtcSetTime (
   //
   // Write timezone and daylight to RTC variable
   //
-  if (Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
+  if ((Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE) && (Time->Daylight == 0)) {
     Status = EfiSetVariable (
                mTimeZoneVariableName,
                &gEfiCallerIdGuid,
