@@ -1,7 +1,7 @@
 ## @file
 #  Provides authenticated variable services.
 #
-#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions
@@ -74,7 +74,9 @@
   gEfiCustomModeEnableGuid
 
   ## CONSUMES            ## Variable:L"certdb"
+  ## CONSUMES            ## Variable:L"certdbv"
   ## PRODUCES            ## Variable:L"certdb"
+  ## PRODUCES            ## Variable:L"certdbv"
   gEfiCertDbGuid
 
   ## CONSUMES            ## Variable:L"VendorKeysNv"

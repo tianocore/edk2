@@ -11,7 +11,7 @@
   may not be modified without authorization. If platform fails to protect these resources,
   the authentication service provided in this driver will be broken, and the behavior is undefined.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -99,6 +99,17 @@ VARIABLE_ENTRY_PROPERTY mAuthVarEntry[] = {
     }
   },
   {
+    &gEfiCertDbGuid,
+    EFI_CERT_DB_VOLATILE_NAME,
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
+      VARIABLE_ATTRIBUTE_BS_RT_AT,
+      sizeof (UINT32),
+      MAX_UINTN
+    }
+  },
+  {
     &gEdkiiSecureBootModeGuid,
     L"SecureBootMode",
     {
@@ -172,8 +183,9 @@ AuthVariableLibInitialize (
 
   //
   // Reserve runtime buffer for certificate database. The size excludes variable header and name size.
+  // Use EFI_CERT_DB_VOLATILE_NAME size since it is longer.
   //
-  mMaxCertDbSize = (UINT32) (mAuthVarLibContextIn->MaxAuthVariableSize - sizeof (EFI_CERT_DB_NAME));
+  mMaxCertDbSize = (UINT32) (mAuthVarLibContextIn->MaxAuthVariableSize - sizeof (EFI_CERT_DB_VOLATILE_NAME));
   mCertDbStore   = AllocateRuntimePool (mMaxCertDbSize);
   if (mCertDbStore == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -286,6 +298,22 @@ AuthVariableLibInitialize (
       DEBUG ((EFI_D_ERROR, "Clean up CertDB fail! Status %x\n", Status));
       return Status;
     }
+  }
+
+  //
+  // Create "certdbv" variable with RT+BS+AT set.
+  //
+  VarAttr  = EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+  ListSize = sizeof (UINT32);
+  Status   = AuthServiceInternalUpdateVariable (
+               EFI_CERT_DB_VOLATILE_NAME,
+               &gEfiCertDbGuid,
+               &ListSize,
+               sizeof (UINT32),
+               VarAttr
+               );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //
