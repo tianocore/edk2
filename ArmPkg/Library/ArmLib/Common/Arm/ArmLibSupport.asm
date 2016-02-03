@@ -121,6 +121,7 @@
 
  RVCT_ASM_EXPORT ArmWriteScr
   mcr     p15, 0, r0, c1, c1, 0
+  isb
   bx      lr
 
  RVCT_ASM_EXPORT ArmReadHVBar

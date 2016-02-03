@@ -184,6 +184,7 @@ ASM_PFX(ArmWriteCptr):
 
 ASM_PFX(ArmWriteScr):
   msr     scr_el3, x0            // Secure configuration register EL3
+  isb
   ret
 
 ASM_PFX(ArmWriteMVBar):

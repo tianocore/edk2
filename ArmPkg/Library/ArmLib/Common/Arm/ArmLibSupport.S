@@ -147,6 +147,7 @@ ASM_PFX(ArmReadScr):
 
 ASM_PFX(ArmWriteScr):
   mcr     p15, 0, r0, c1, c1, 0
+  isb
   bx      lr
 
 ASM_PFX(ArmReadHVBar):
