@@ -65,11 +65,7 @@ PxeGetStatus (
   Snp->Cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
   Snp->Cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
 
-  //
-  // size DB for return of one buffer
-  //
-  Snp->Cdb.DBsize     = (UINT16) ((sizeof (PXE_DB_GET_STATUS) - sizeof (Db->TxBuffer)) + sizeof (Db->TxBuffer[0]));
-
+  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_GET_STATUS);
   Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
   Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
