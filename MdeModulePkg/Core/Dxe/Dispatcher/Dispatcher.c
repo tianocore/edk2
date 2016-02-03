@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1249,29 +1249,6 @@ CoreFwVolEventProtocolNotify (
             }
 
             //
-            // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has PEI depex section.
-            //
-            DepexBuffer  = NULL;
-            SizeOfBuffer = 0;
-            Status = Fv->ReadSection (
-                           Fv,
-                           &NameGuid,
-                           EFI_SECTION_PEI_DEPEX,
-                           0,
-                           &DepexBuffer,
-                           &SizeOfBuffer,
-                           &AuthenticationStatus
-                           );
-            if (!EFI_ERROR (Status)) {
-              //
-              // If PEI depex section is found, this FV image will be ignored in DXE phase.
-              // Now, DxeCore doesn't support FV image with more one type DEPEX section.
-              //
-              FreePool (DepexBuffer);
-              continue;
-            }
-
-            //
             // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has SMM depex section.
             //
             DepexBuffer  = NULL;
@@ -1287,11 +1264,11 @@ CoreFwVolEventProtocolNotify (
                            );
             if (!EFI_ERROR (Status)) {
               //
-              // If SMM depex section is found, this FV image will be ignored in DXE phase.
-              // Now, DxeCore doesn't support FV image with more one type DEPEX section.
+              // If SMM depex section is found, this FV image is invalid to be supported.
+              // ASSERT FALSE to report this FV image.  
               //
               FreePool (DepexBuffer);
-              continue;
+              ASSERT (FALSE);
             }
 
             //
