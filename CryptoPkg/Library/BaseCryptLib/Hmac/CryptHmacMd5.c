@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalCryptLib.h"
 #include <openssl/hmac.h>
-
+#include <../hmac/hmac_lcl.h>
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-MD5 operations.
 
@@ -65,7 +65,8 @@ HmacMd5Init (
   //
   // OpenSSL HMAC-MD5 Context Initialization
   //
-  HMAC_CTX_init (HmacMd5Context);
+  memset(HmacMd5Context, 0, sizeof(HMAC_CTX));
+  HMAC_CTX_reset (HmacMd5Context);
   HMAC_Init_ex (HmacMd5Context, Key, (UINT32) KeySize, EVP_md5(), NULL);
 
   return TRUE;
@@ -191,7 +192,7 @@ HmacMd5Final (
   // OpenSSL HMAC-MD5 digest finalization
   //
   HMAC_Final (HmacMd5Context, HmacValue, &Length);
-  HMAC_CTX_cleanup (HmacMd5Context);
+  HMAC_CTX_reset (HmacMd5Context);
 
   return TRUE;
 }
