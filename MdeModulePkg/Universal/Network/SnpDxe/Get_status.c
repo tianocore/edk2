@@ -85,7 +85,7 @@ PxeGetStatus (
       (EFI_D_NET,
       "\nSnp->undi.get_status()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
-      Snp->Cdb.StatFlags)
+      Snp->Cdb.StatCode)
       );
 
     return EFI_DEVICE_ERROR;
