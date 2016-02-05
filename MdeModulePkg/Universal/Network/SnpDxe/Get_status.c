@@ -80,7 +80,7 @@ PxeGetStatus (
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
       (EFI_D_NET,
       "\nSnp->undi.get_status()  %xh:%xh\n",
