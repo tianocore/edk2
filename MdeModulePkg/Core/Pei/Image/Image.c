@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -358,7 +358,9 @@ LoadAndRelocatePeCoffImage (
   BOOLEAN                               IsXipImage;
   EFI_STATUS                            ReturnStatus;
   BOOLEAN                               IsS3Boot;
+  BOOLEAN                               IsPeiModule;
   BOOLEAN                               IsRegisterForShadow;
+  EFI_FV_FILE_INFO                      FileInfo;
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
@@ -396,9 +398,25 @@ LoadAndRelocatePeCoffImage (
   }
 
   //
+  // Get file type first
+  //
+  Status = PeiServicesFfsGetFileInfo (FileHandle, &FileInfo);
+  ASSERT_EFI_ERROR (Status);
+  
+  //
+  // Check whether the file type is PEI module.
+  //
+  IsPeiModule = FALSE;
+  if (FileInfo.FileType == EFI_FV_FILETYPE_PEI_CORE || 
+      FileInfo.FileType == EFI_FV_FILETYPE_PEIM || 
+      FileInfo.FileType == EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER) {
+    IsPeiModule = TRUE;
+  }
+
+  //
   // When Image has no reloc section, it can't be relocated into memory.
   //
-  if (ImageContext.RelocationsStripped && (Private->PeiMemoryInstalled) && (
+  if (ImageContext.RelocationsStripped && (Private->PeiMemoryInstalled) && ((!IsPeiModule) ||
       (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) || (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
     DEBUG ((EFI_D_INFO|EFI_D_LOAD, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
   }
@@ -413,7 +431,7 @@ LoadAndRelocatePeCoffImage (
   // On normal boot, PcdShadowPeimOnBoot decides whether load PEIM or PeiCore into memory.
   // On S3 boot, PcdShadowPeimOnS3Boot decides whether load PEIM or PeiCore into memory.
   //
-  if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && (
+  if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && ((!IsPeiModule) ||
       (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) || (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
     //
     // Allocate more buffer to avoid buffer overflow.
