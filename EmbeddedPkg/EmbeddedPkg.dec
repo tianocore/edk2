@@ -145,6 +145,7 @@
   # LAN9118 Ethernet Driver PCDs
   gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x0|UINT32|0x00000025
   gEmbeddedTokenSpaceGuid.PcdLan9118DefaultMacAddress|0x0|UINT64|0x00000026
+  gEmbeddedTokenSpaceGuid.PcdLan9118DefaultNegotiationTimeout|4000|UINT32|0x00000027
 
   #
   # Android FastBoot

@@ -586,7 +586,7 @@ AutoNegotiate (
   // Check that link is up first
   if ((PhyStatus & PHYSTS_LINK_STS) == 0) {
     // Wait until it is up or until Time Out
-    TimeOut = 2000;
+    TimeOut = FixedPcdGet32 (PcdLan9118DefaultNegotiationTimeout) / LAN9118_STALL;
     while ((IndirectPHYRead32 (PHY_INDEX_BASIC_STATUS) & PHYSTS_LINK_STS) == 0) {
       MemoryFence();
       gBS->Stall (LAN9118_STALL);
