@@ -1333,6 +1333,7 @@ ShellFileHandleReturnLine(
 
   @retval EFI_SUCCESS           The operation was successful.  The line is stored in
                                 Buffer.
+  @retval EFI_END_OF_FILE       There are no more lines in the file.
   @retval EFI_INVALID_PARAMETER Handle was NULL.
   @retval EFI_INVALID_PARAMETER Size was NULL.
   @retval EFI_BUFFER_TOO_SMALL  Size was not large enough to store the line.

@@ -1,6 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
+  Copyright 2016 Dell Inc.
   Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -4097,6 +4098,7 @@ ShellFileHandleReturnLine(
 
   @retval EFI_SUCCESS           The operation was successful.  The line is stored in
                                 Buffer.
+  @retval EFI_END_OF_FILE       There are no more lines in the file.
   @retval EFI_INVALID_PARAMETER Handle was NULL.
   @retval EFI_INVALID_PARAMETER Size was NULL.
   @retval EFI_BUFFER_TOO_SMALL  Size was not large enough to store the line.
@@ -4142,45 +4144,64 @@ ShellFileHandleReadLine(
     }
   }
 
+  if (*Ascii) {
+    CharSize = sizeof(CHAR8);
+  } else {
+    CharSize = sizeof(CHAR16);
+  }
   for (CountSoFar = 0;;CountSoFar++){
     CharBuffer = 0;
-    if (*Ascii) {
-      CharSize = sizeof(CHAR8);
-    } else {
-      CharSize = sizeof(CHAR16);
-    }
     Status = gEfiShellProtocol->ReadFile(Handle, &CharSize, &CharBuffer);
     if (  EFI_ERROR(Status)
        || CharSize == 0
        || (CharBuffer == L'\n' && !(*Ascii))
        || (CharBuffer ==  '\n' && *Ascii)
      ){
+      if (CharSize == 0) {
+        Status = EFI_END_OF_FILE;
+      }
       break;
     }
     //
     // if we have space save it...
     //
-    if ((CountSoFar+1)*sizeof(CHAR16) < *Size){
+    if ((CountSoFar + 1) * CharSize < *Size){
       ASSERT(Buffer != NULL);
-      ((CHAR16*)Buffer)[CountSoFar] = CharBuffer;
-      ((CHAR16*)Buffer)[CountSoFar+1] = CHAR_NULL;
+      if (*Ascii) {
+        ((CHAR8*)Buffer)[CountSoFar] = (CHAR8) CharBuffer;
+        ((CHAR8*)Buffer)[CountSoFar+1] = '\0';
+      }
+      else {
+        ((CHAR16*)Buffer)[CountSoFar] = CharBuffer;
+        ((CHAR16*)Buffer)[CountSoFar+1] = CHAR_NULL;
+      }
     }
   }
 
   //
   // if we ran out of space tell when...
   //
-  if ((CountSoFar+1)*sizeof(CHAR16) > *Size){
-    *Size = (CountSoFar+1)*sizeof(CHAR16);
-    if (!Truncate) {
-      gEfiShellProtocol->SetFilePosition(Handle, OriginalFilePosition);
-    } else {
-      DEBUG((DEBUG_WARN, "The line was truncated in ShellFileHandleReadLine"));
+  if (Status != EFI_END_OF_FILE){
+    if ((CountSoFar + 1) * CharSize > *Size){
+      *Size = (CountSoFar + 1) * CharSize;
+      if (!Truncate) {
+        gEfiShellProtocol->SetFilePosition(Handle, OriginalFilePosition);
+      } else {
+        DEBUG((DEBUG_WARN, "The line was truncated in ShellFileHandleReadLine"));
+      }
+      return (EFI_BUFFER_TOO_SMALL);
     }
-    return (EFI_BUFFER_TOO_SMALL);
-  }
-  while(Buffer[StrLen(Buffer)-1] == L'\r') {
-    Buffer[StrLen(Buffer)-1] = CHAR_NULL;
+
+    if (*Ascii) {
+      if (CountSoFar && ((CHAR8*)Buffer)[CountSoFar - 1] == '\r') {
+        ((CHAR8*)Buffer)[CountSoFar - 1] = '\0';
+      }
+    }
+    else {
+      if (CountSoFar && Buffer[CountSoFar - 1] == L'\r') {
+        Buffer[CountSoFar - 1] = CHAR_NULL;
+      }
+    }
   }
 
   return (Status);
