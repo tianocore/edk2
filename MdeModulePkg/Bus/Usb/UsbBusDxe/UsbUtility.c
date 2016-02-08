@@ -1372,6 +1372,8 @@ UsbBusRecursivelyConnectWantedUsbIo (
     }
   }
 
+  FreePool (UsbIoBuffer);
+
   return EFI_SUCCESS;
 }
 
