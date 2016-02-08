@@ -479,6 +479,9 @@ BdsEntry (
   Status = gBS->CalculateCrc32 ((VOID*)gST, gST->Hdr.HeaderSize, &gST->Hdr.CRC32);
   ASSERT_EFI_ERROR (Status);
 
+  // Now we need to setup the EFI System Table with information about the console devices.
+  InitializeConsole ();
+
   // If BootNext environment variable is defined then we just load it !
   BootNextSize = sizeof(UINT16);
   Status = GetGlobalEnvironmentVariable (L"BootNext", NULL, &BootNextSize, (VOID**)&BootNext);
@@ -517,9 +520,6 @@ BdsEntry (
 
   // If Boot Order does not exist then create a default entry
   DefineDefaultBootEntries ();
-
-  // Now we need to setup the EFI System Table with information about the console devices.
-  InitializeConsole ();
 
   //
   // Update the CRC32 in the EFI System Table header
