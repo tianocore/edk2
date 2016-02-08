@@ -2,6 +2,7 @@
   EFI_FILE_PROTOCOL wrappers for other items (Like Environment Variables,
   StdIn, StdOut, StdErr, etc...).
 
+  Copyright 2016 Dell Inc.
   Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
@@ -1385,17 +1386,20 @@ FileInterfaceMemWrite(
   IN VOID *Buffer
   )
 {
-  CHAR8 *AsciiBuffer;
-  if (((EFI_FILE_PROTOCOL_MEM*)This)->Unicode) {
+  CHAR8                  *AsciiBuffer;
+  EFI_FILE_PROTOCOL_MEM  *MemFile;
+
+  MemFile = (EFI_FILE_PROTOCOL_MEM *) This;
+  if (MemFile->Unicode) {
     //
     // Unicode
     //
-    if ((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->Position + (*BufferSize)) > (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize)) {
-      ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer = ReallocatePool((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize), (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize) + (*BufferSize) + 10, ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer);
-      ((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize += (*BufferSize) + 10;
+    if ((UINTN)(MemFile->Position + (*BufferSize)) > (UINTN)(MemFile->BufferSize)) {
+      MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + (*BufferSize) + 10, MemFile->Buffer);
+      MemFile->BufferSize += (*BufferSize) + 10;
     }
-    CopyMem(((UINT8*)((EFI_FILE_PROTOCOL_MEM*)This)->Buffer) + ((EFI_FILE_PROTOCOL_MEM*)This)->Position, Buffer, *BufferSize);
-    ((EFI_FILE_PROTOCOL_MEM*)This)->Position += (*BufferSize);
+    CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, Buffer, *BufferSize);
+    MemFile->Position += (*BufferSize);
     return (EFI_SUCCESS);
   } else {
     //
@@ -1406,12 +1410,12 @@ FileInterfaceMemWrite(
       return (EFI_OUT_OF_RESOURCES);
     }
     AsciiSPrint(AsciiBuffer, *BufferSize, "%S", Buffer);
-    if ((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->Position + AsciiStrSize(AsciiBuffer)) > (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize)) {
-      ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer = ReallocatePool((UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize), (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize) + AsciiStrSize(AsciiBuffer) + 10, ((EFI_FILE_PROTOCOL_MEM*)This)->Buffer);
-      ((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize += AsciiStrSize(AsciiBuffer) + 10;
+    if ((UINTN)(MemFile->Position + AsciiStrSize(AsciiBuffer)) > (UINTN)(MemFile->BufferSize)) {
+      MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + AsciiStrSize(AsciiBuffer) + 10, MemFile->Buffer);
+      MemFile->BufferSize += AsciiStrSize(AsciiBuffer) + 10;
     }
-    CopyMem(((UINT8*)((EFI_FILE_PROTOCOL_MEM*)This)->Buffer) + ((EFI_FILE_PROTOCOL_MEM*)This)->Position, AsciiBuffer, AsciiStrSize(AsciiBuffer));
-    ((EFI_FILE_PROTOCOL_MEM*)This)->Position += AsciiStrSize(AsciiBuffer);
+    CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, AsciiBuffer, AsciiStrSize(AsciiBuffer));
+    MemFile->Position += (*BufferSize / sizeof(CHAR16));
     FreePool(AsciiBuffer);
     return (EFI_SUCCESS);
   }
@@ -1434,11 +1438,14 @@ FileInterfaceMemRead(
   IN VOID *Buffer
   )
 {
-  if (*BufferSize > (UINTN)((((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize) - (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->Position))) {
-    (*BufferSize) = (UINTN)((((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize) - (UINTN)(((EFI_FILE_PROTOCOL_MEM*)This)->Position));
+  EFI_FILE_PROTOCOL_MEM  *MemFile;
+
+  MemFile = (EFI_FILE_PROTOCOL_MEM *) This;
+  if (*BufferSize > (UINTN)((MemFile->BufferSize) - (UINTN)(MemFile->Position))) {
+    (*BufferSize) = (UINTN)((MemFile->BufferSize) - (UINTN)(MemFile->Position));
   }
-  CopyMem(Buffer, ((UINT8*)((EFI_FILE_PROTOCOL_MEM*)This)->Buffer) + ((EFI_FILE_PROTOCOL_MEM*)This)->Position, (*BufferSize));
-  ((EFI_FILE_PROTOCOL_MEM*)This)->Position = ((EFI_FILE_PROTOCOL_MEM*)This)->Position + (*BufferSize);
+  CopyMem(Buffer, ((UINT8*)MemFile->Buffer) + MemFile->Position, (*BufferSize));
+  MemFile->Position = MemFile->Position + (*BufferSize);
   return (EFI_SUCCESS);
 }
 
@@ -1506,6 +1513,13 @@ CreateFileInterfaceMem(
   ASSERT(FileInterface->Buffer      == NULL);
   ASSERT(FileInterface->BufferSize  == 0);
   ASSERT(FileInterface->Position    == 0);
+
+  if (Unicode) {
+    FileInterface->Buffer = AllocateZeroPool(sizeof(gUnicodeFileTag));
+    *((CHAR16 *) (FileInterface->Buffer)) = EFI_UNICODE_BYTE_ORDER_MARK;
+    FileInterface->BufferSize = 2;
+    FileInterface->Position = 2;
+  }
 
   return ((EFI_FILE_PROTOCOL *)FileInterface);
 }
