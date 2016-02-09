@@ -142,7 +142,7 @@ Lan9118DxeEntry (
   // Power up the device so we can find the MAC address
   Status = Lan9118Initialize (Snp);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Lan9118: Error initialising hardware\n"));
+    DEBUG ((EFI_D_ERROR, "LAN9118: Error initialising hardware\n"));
     return EFI_DEVICE_ERROR;
   }
 
@@ -342,7 +342,7 @@ SnpInitialize (
   // Do auto-negotiation if supported
   Status = AutoNegotiate (AUTO_NEGOTIATE_ADVERTISE_ALL, Snp);
   if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_WARN, "Lan9118: Auto Negociation not supported.\n"));
+    DEBUG ((EFI_D_WARN, "LAN9118: Auto Negotiation failed.\n"));
   }
 
   // Configure flow control depending on speed capabilities
@@ -767,7 +767,7 @@ SnpStationAddress (
       New = (EFI_MAC_ADDRESS *) PermAddr;
       Lan9118SetMacAddress ((EFI_MAC_ADDRESS *) PermAddr, Snp);
     } else {
-      DEBUG ((EFI_D_ERROR, "Lan9118: Warning: No valid MAC address in EEPROM, using fallback\n"));
+      DEBUG ((EFI_D_ERROR, "LAN9118: Warning: No valid MAC address in EEPROM, using fallback\n"));
       New = (EFI_MAC_ADDRESS*) (FixedPcdGet64 (PcdLan9118DefaultMacAddress));
     }
   } else {
