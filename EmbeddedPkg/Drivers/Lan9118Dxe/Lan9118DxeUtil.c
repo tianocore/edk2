@@ -355,7 +355,7 @@ Lan9118Initialize (
   IN  EFI_SIMPLE_NETWORK_PROTOCOL *Snp
   )
 {
-  UINTN  Timeout;
+  UINTN  Retries;
   UINT64 DefaultMacAddress;
 
   // Attempt to wake-up the device if it is in a lower power state
@@ -366,22 +366,22 @@ Lan9118Initialize (
   }
 
   // Check that device is active
-  Timeout = 20;
-  while ((MmioRead32 (LAN9118_PMT_CTRL) & MPTCTRL_READY) == 0 && --Timeout) {
+  Retries = 20;
+  while ((MmioRead32 (LAN9118_PMT_CTRL) & MPTCTRL_READY) == 0 && --Retries) {
     gBS->Stall (LAN9118_STALL);
     MemoryFence();
   }
-  if (!Timeout) {
+  if (!Retries) {
     return EFI_TIMEOUT;
   }
 
   // Check that EEPROM isn't active
-  Timeout = 20;
-  while ((MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_BUSY) && --Timeout){
+  Retries = 20;
+  while ((MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_BUSY) && --Retries){
     gBS->Stall (LAN9118_STALL);
     MemoryFence();
   }
-  if (!Timeout) {
+  if (!Retries) {
     return EFI_TIMEOUT;
   }
 
@@ -574,7 +574,7 @@ AutoNegotiate (
   UINT32 PhyControl;
   UINT32 PhyStatus;
   UINT32 Features;
-  UINT32 TimeOut;
+  UINT32 Retries;
 
   // First check that auto-negotiation is supported
   PhyStatus = IndirectPHYRead32 (PHY_INDEX_BASIC_STATUS);
@@ -586,12 +586,12 @@ AutoNegotiate (
   // Check that link is up first
   if ((PhyStatus & PHYSTS_LINK_STS) == 0) {
     // Wait until it is up or until Time Out
-    TimeOut = FixedPcdGet32 (PcdLan9118DefaultNegotiationTimeout) / LAN9118_STALL;
+    Retries = FixedPcdGet32 (PcdLan9118DefaultNegotiationTimeout) / LAN9118_STALL;
     while ((IndirectPHYRead32 (PHY_INDEX_BASIC_STATUS) & PHYSTS_LINK_STS) == 0) {
       MemoryFence();
       gBS->Stall (LAN9118_STALL);
-      TimeOut--;
-      if (!TimeOut) {
+      Retries--;
+      if (!Retries) {
         DEBUG ((EFI_D_ERROR, "Link timeout in auto-negotiation.\n"));
         return EFI_TIMEOUT;
       }
