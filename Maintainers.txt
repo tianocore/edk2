@@ -182,7 +182,14 @@ SecurityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
 M: Chao Zhang <chao.b.zhang@intel.com>
 
-ShellPkg, ShellBinPkg
+ShellBinPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
+M: Jaben Carsey <jaben.carsey@intel.com>      (Ia32/X64)
+M: Shumin Qiu <shumin.qiu@intel.com>          (Ia32/X64)
+M: Leif Lindholm <leif.lindholm@linaro.org>   (ARM/AArch64)
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
+
+ShellPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
 M: Jaben Carsey <jaben.carsey@intel.com>
 M: Shumin Qiu <shumin.qiu@intel.com>
