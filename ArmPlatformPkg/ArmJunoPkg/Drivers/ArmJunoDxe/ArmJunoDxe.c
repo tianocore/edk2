@@ -274,19 +274,7 @@ ArmJunoEntryPoint (
   //
   // Set up the device path to the FDT.
   //
-  switch (JunoRevision) {
-  case JUNO_R0:
-    TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR0FdtDevicePath);
-    break;
-
-  case JUNO_R1:
-    TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoR1A57x2FdtDevicePath);
-    break;
-
-  default:
-    TextDevicePath = NULL;
-  }
-
+  TextDevicePath = (CHAR16*)FixedPcdGetPtr (PcdJunoFdtDevicePath);
   if (TextDevicePath != NULL) {
     TextDevicePathSize = StrSize (TextDevicePath);
     Buffer = PcdSetPtr (PcdFdtDevicePaths, &TextDevicePathSize, TextDevicePath);

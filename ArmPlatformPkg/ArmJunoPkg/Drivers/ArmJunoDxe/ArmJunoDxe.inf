@@ -73,9 +73,7 @@
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbEhciBaseAddress
   gArmJunoTokenSpaceGuid.PcdSynopsysUsbOhciBaseAddress
 
-  gArmJunoTokenSpaceGuid.PcdJunoR0FdtDevicePath
-  gArmJunoTokenSpaceGuid.PcdJunoR1A57x2FdtDevicePath
-  gArmJunoTokenSpaceGuid.PcdJunoR1A57x2A53x4FdtDevicePath
+  gArmJunoTokenSpaceGuid.PcdJunoFdtDevicePath
 
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument
