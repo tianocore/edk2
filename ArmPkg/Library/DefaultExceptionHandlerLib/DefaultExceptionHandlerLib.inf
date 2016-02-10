@@ -20,7 +20,6 @@
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DefaultExceptionHandlerLib
-  CONSTRUCTOR                    = DefaultExceptionHandlerConstructor
 
 [Sources.common]
   DefaultExceptionHandlerUefi.c

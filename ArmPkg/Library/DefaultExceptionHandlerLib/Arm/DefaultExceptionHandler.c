@@ -27,8 +27,6 @@
 #include <Protocol/DebugSupport.h>
 #include <Library/DefaultExceptionHandlerLib.h>
 
-EFI_DEBUG_IMAGE_INFO_TABLE_HEADER *gDebugImageTableHeader = NULL;
-
 typedef struct {
   UINT32  BIT;
   CHAR8   Char;

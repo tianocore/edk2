@@ -27,8 +27,6 @@
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 
-EFI_DEBUG_IMAGE_INFO_TABLE_HEADER *gDebugImageTableHeader = NULL;
-
 STATIC CHAR8 *gExceptionTypeString[] = {
   "Synchronous",
   "IRQ",
