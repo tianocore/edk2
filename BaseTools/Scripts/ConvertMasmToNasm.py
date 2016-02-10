@@ -1,7 +1,7 @@
 # @file ConvertMasmToNasm.py
 # This script assists with conversion of MASM assembly syntax to NASM
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -127,6 +127,7 @@ class CommonUtils:
         while True:
             path = os.path.split(lastpath)[0]
             if path == lastpath:
+                self.gitemail = None
                 return
             candidate = os.path.join(path, '.git')
             if os.path.isdir(candidate):
@@ -197,6 +198,7 @@ class CommonUtils:
         message += '%s to %s\n' % (src, dst)
         message += '\n'
         message += 'Contributed-under: TianoCore Contribution Agreement 1.0\n'
+        assert(self.gitemail is not None)
         message += 'Signed-off-by: %s\n' % self.gitemail
 
         cmd = ('git', 'commit', '-F', '-')
