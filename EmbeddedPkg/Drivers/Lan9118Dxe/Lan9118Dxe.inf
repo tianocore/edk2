@@ -51,6 +51,7 @@
 [FixedPcd]
   gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress
   gEmbeddedTokenSpaceGuid.PcdLan9118DefaultMacAddress
+  gEmbeddedTokenSpaceGuid.PcdLan9118DefaultNegotiationTimeout
 
 [Depex]
   TRUE

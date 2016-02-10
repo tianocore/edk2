@@ -142,7 +142,7 @@ Lan9118DxeEntry (
   // Power up the device so we can find the MAC address
   Status = Lan9118Initialize (Snp);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Lan9118: Error initialising hardware\n"));
+    DEBUG ((EFI_D_ERROR, "LAN9118: Error initialising hardware\n"));
     return EFI_DEVICE_ERROR;
   }
 
@@ -307,8 +307,7 @@ SnpInitialize (
 
   // Write the current configuration to the register
   MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
-  gBS->Stall (LAN9118_STALL);
-  gBS->Stall (LAN9118_STALL);
+  MemoryFence();
 
   // Configure GPIO and HW
   Status = ConfigureHardware (HW_CONF_USE_LEDS, Snp);
@@ -343,7 +342,7 @@ SnpInitialize (
   // Do auto-negotiation if supported
   Status = AutoNegotiate (AUTO_NEGOTIATE_ADVERTISE_ALL, Snp);
   if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_WARN, "Lan9118: Auto Negociation not supported.\n"));
+    DEBUG ((EFI_D_WARN, "LAN9118: Auto Negotiation failed.\n"));
   }
 
   // Configure flow control depending on speed capabilities
@@ -431,7 +430,7 @@ SnpReset (
 
   // Write the current configuration to the register
   MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
-  gBS->Stall (LAN9118_STALL);
+  MemoryFence();
 
   // Reactivate the LEDs
   Status = ConfigureHardware (HW_CONF_USE_LEDS, Snp);
@@ -446,7 +445,7 @@ SnpReset (
     HwConf |= HW_CFG_TX_FIFO_SIZE(gTxBuffer);    // assign size chosen in SnpInitialize
 
     MmioWrite32 (LAN9118_HW_CFG, HwConf);        // Write the conf
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
 
   // Enable the receiver and transmitter and clear their contents
@@ -701,7 +700,7 @@ SnpReceiveFilters (
   // Write the options to the MAC_CSR
   //
   IndirectMACWrite32 (INDIRECT_MAC_INDEX_CR, MacCSRValue);
-  gBS->Stall (LAN9118_STALL);
+  MemoryFence();
 
   //
   // If we have to retrieve something, start packet reception.
@@ -768,7 +767,7 @@ SnpStationAddress (
       New = (EFI_MAC_ADDRESS *) PermAddr;
       Lan9118SetMacAddress ((EFI_MAC_ADDRESS *) PermAddr, Snp);
     } else {
-      DEBUG ((EFI_D_ERROR, "Lan9118: Warning: No valid MAC address in EEPROM, using fallback\n"));
+      DEBUG ((EFI_D_ERROR, "LAN9118: Warning: No valid MAC address in EEPROM, using fallback\n"));
       New = (EFI_MAC_ADDRESS*) (FixedPcdGet64 (PcdLan9118DefaultMacAddress));
     }
   } else {

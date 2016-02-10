@@ -236,7 +236,7 @@ IndirectEEPROMRead32 (
 
   // Write to Eeprom command register
   MmioWrite32 (LAN9118_E2P_CMD, EepromCmd);
-  gBS->Stall (LAN9118_STALL);
+  MemoryFence();
 
   // Wait until operation has completed
   while (MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_BUSY);
@@ -284,7 +284,7 @@ IndirectEEPROMWrite32 (
 
   // Write to Eeprom command register
   MmioWrite32 (LAN9118_E2P_CMD, EepromCmd);
-  gBS->Stall (LAN9118_STALL);
+  MemoryFence();
 
   // Wait until operation has completed
   while (MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_BUSY);
@@ -355,31 +355,33 @@ Lan9118Initialize (
   IN  EFI_SIMPLE_NETWORK_PROTOCOL *Snp
   )
 {
-  UINTN  Timeout;
+  UINTN  Retries;
   UINT64 DefaultMacAddress;
 
   // Attempt to wake-up the device if it is in a lower power state
   if (((MmioRead32 (LAN9118_PMT_CTRL) & MPTCTRL_PM_MODE_MASK) >> 12) != 0) {
     DEBUG ((DEBUG_NET, "Waking from reduced power state.\n"));
     MmioWrite32 (LAN9118_BYTE_TEST, 0xFFFFFFFF);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
 
   // Check that device is active
-  Timeout = 20;
-  while ((MmioRead32 (LAN9118_PMT_CTRL) & MPTCTRL_READY) == 0 && --Timeout) {
+  Retries = 20;
+  while ((MmioRead32 (LAN9118_PMT_CTRL) & MPTCTRL_READY) == 0 && --Retries) {
     gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
-  if (!Timeout) {
+  if (!Retries) {
     return EFI_TIMEOUT;
   }
 
   // Check that EEPROM isn't active
-  Timeout = 20;
-  while ((MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_BUSY) && --Timeout){
+  Retries = 20;
+  while ((MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_BUSY) && --Retries){
     gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
-  if (!Timeout) {
+  if (!Retries) {
     return EFI_TIMEOUT;
   }
 
@@ -447,11 +449,12 @@ SoftReset (
 
   // Write the configuration
   MmioWrite32 (LAN9118_HW_CFG, HwConf);
-  gBS->Stall (LAN9118_STALL);
+  MemoryFence();
 
   // Wait for reset to complete
   while (MmioRead32 (LAN9118_HW_CFG) & HWCFG_SRST) {
 
+    MemoryFence();
     gBS->Stall (LAN9118_STALL);
     ResetTime += 1;
 
@@ -500,7 +503,7 @@ PhySoftReset (
 
     // Wait for completion
     while (MmioRead32 (LAN9118_PMT_CTRL) & MPTCTRL_PHY_RST) {
-      gBS->Stall (LAN9118_STALL);
+      MemoryFence();
     }
   // PHY Basic Control Register reset
   } else if (Flags & PHY_RESET_BCR) {
@@ -508,7 +511,7 @@ PhySoftReset (
 
     // Wait for completion
     while (IndirectPHYRead32 (PHY_INDEX_BASIC_CTRL) & PHYCR_RESET) {
-      gBS->Stall (LAN9118_STALL);
+      MemoryFence();
     }
   }
 
@@ -542,7 +545,7 @@ ConfigureHardware (
 
     // Write the configuration
     MmioWrite32 (LAN9118_GPIO_CFG, GpioConf);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
 
   return EFI_SUCCESS;
@@ -571,7 +574,7 @@ AutoNegotiate (
   UINT32 PhyControl;
   UINT32 PhyStatus;
   UINT32 Features;
-  UINT32 TimeOut;
+  UINT32 Retries;
 
   // First check that auto-negotiation is supported
   PhyStatus = IndirectPHYRead32 (PHY_INDEX_BASIC_STATUS);
@@ -583,11 +586,12 @@ AutoNegotiate (
   // Check that link is up first
   if ((PhyStatus & PHYSTS_LINK_STS) == 0) {
     // Wait until it is up or until Time Out
-    TimeOut = 2000;
+    Retries = FixedPcdGet32 (PcdLan9118DefaultNegotiationTimeout) / LAN9118_STALL;
     while ((IndirectPHYRead32 (PHY_INDEX_BASIC_STATUS) & PHYSTS_LINK_STS) == 0) {
+      MemoryFence();
       gBS->Stall (LAN9118_STALL);
-      TimeOut--;
-      if (!TimeOut) {
+      Retries--;
+      if (!Retries) {
         DEBUG ((EFI_D_ERROR, "Link timeout in auto-negotiation.\n"));
         return EFI_TIMEOUT;
       }
@@ -671,7 +675,7 @@ StopTx (
     TxCfg = MmioRead32 (LAN9118_TX_CFG);
     TxCfg |= TXCFG_TXS_DUMP | TXCFG_TXD_DUMP;
     MmioWrite32 (LAN9118_TX_CFG, TxCfg);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
 
   // Check if already stopped
@@ -690,7 +694,7 @@ StopTx (
     if (TxCfg & TXCFG_TX_ON) {
       TxCfg |= TXCFG_STOP_TX;
       MmioWrite32 (LAN9118_TX_CFG, TxCfg);
-      gBS->Stall (LAN9118_STALL);
+      MemoryFence();
 
       // Wait for Tx to finish transmitting
       while (MmioRead32 (LAN9118_TX_CFG) & TXCFG_STOP_TX);
@@ -725,7 +729,7 @@ StopRx (
     RxCfg = MmioRead32 (LAN9118_RX_CFG);
     RxCfg |= RXCFG_RX_DUMP;
     MmioWrite32 (LAN9118_RX_CFG, RxCfg);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
 
     while (MmioRead32 (LAN9118_RX_CFG) & RXCFG_RX_DUMP);
   }
@@ -751,28 +755,28 @@ StartTx (
     TxCfg = MmioRead32 (LAN9118_TX_CFG);
     TxCfg |= TXCFG_TXS_DUMP | TXCFG_TXD_DUMP;
     MmioWrite32 (LAN9118_TX_CFG, TxCfg);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
 
   // Check if tx was started from MAC and enable if not
   if (Flags & START_TX_MAC) {
     MacCsr = IndirectMACRead32 (INDIRECT_MAC_INDEX_CR);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
     if ((MacCsr & MACCR_TX_EN) == 0) {
       MacCsr |= MACCR_TX_EN;
       IndirectMACWrite32 (INDIRECT_MAC_INDEX_CR, MacCsr);
-      gBS->Stall (LAN9118_STALL);
+      MemoryFence();
     }
   }
 
   // Check if tx was started from TX_CFG and enable if not
   if (Flags & START_TX_CFG) {
     TxCfg = MmioRead32 (LAN9118_TX_CFG);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
     if ((TxCfg & TXCFG_TX_ON) == 0) {
       TxCfg |= TXCFG_TX_ON;
       MmioWrite32 (LAN9118_TX_CFG, TxCfg);
-      gBS->Stall (LAN9118_STALL);
+      MemoryFence();
     }
   }
 
@@ -802,14 +806,14 @@ StartRx (
       RxCfg = MmioRead32 (LAN9118_RX_CFG);
       RxCfg |= RXCFG_RX_DUMP;
       MmioWrite32 (LAN9118_RX_CFG, RxCfg);
-      gBS->Stall (LAN9118_STALL);
+      MemoryFence();
 
       while (MmioRead32 (LAN9118_RX_CFG) & RXCFG_RX_DUMP);
     }
 
     MacCsr |= MACCR_RX_EN;
     IndirectMACWrite32 (INDIRECT_MAC_INDEX_CR, MacCsr);
-    gBS->Stall (LAN9118_STALL);
+    MemoryFence();
   }
 
   return EFI_SUCCESS;
@@ -999,7 +1003,7 @@ ChangeFifoAllocation (
   HwConf &= ~(0xF0000);
   HwConf |= ((TxFifoOption & 0xF) << 16);
   MmioWrite32 (LAN9118_HW_CFG, HwConf);
-  gBS->Stall (LAN9118_STALL);
+  MemoryFence();
 
   return EFI_SUCCESS;
 }
