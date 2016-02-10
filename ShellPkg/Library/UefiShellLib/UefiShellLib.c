@@ -4176,43 +4176,27 @@ ShellFileHandleReadLine(
     //
     // if we have space save it...
     //
-    if ((CountSoFar + 1) * CharSize < *Size){
+    if ((CountSoFar+1)*sizeof(CHAR16) < *Size){
       ASSERT(Buffer != NULL);
-      if (*Ascii) {
-        ((CHAR8*)Buffer)[CountSoFar] = (CHAR8) CharBuffer;
-        ((CHAR8*)Buffer)[CountSoFar+1] = '\0';
-      }
-      else {
-        ((CHAR16*)Buffer)[CountSoFar] = CharBuffer;
-        ((CHAR16*)Buffer)[CountSoFar+1] = CHAR_NULL;
-      }
+      ((CHAR16*)Buffer)[CountSoFar] = CharBuffer;
+      ((CHAR16*)Buffer)[CountSoFar+1] = CHAR_NULL;
     }
   }
 
   //
   // if we ran out of space tell when...
   //
-  if (Status != EFI_END_OF_FILE){
-    if ((CountSoFar + 1) * CharSize > *Size){
-      *Size = (CountSoFar + 1) * CharSize;
-      if (!Truncate) {
-        gEfiShellProtocol->SetFilePosition(Handle, OriginalFilePosition);
-      } else {
-        DEBUG((DEBUG_WARN, "The line was truncated in ShellFileHandleReadLine"));
-      }
-      return (EFI_BUFFER_TOO_SMALL);
+  if ((CountSoFar+1)*sizeof(CHAR16) > *Size){
+    *Size = (CountSoFar+1)*sizeof(CHAR16);
+    if (!Truncate) {
+      gEfiShellProtocol->SetFilePosition(Handle, OriginalFilePosition);
+    } else {
+      DEBUG((DEBUG_WARN, "The line was truncated in ShellFileHandleReadLine"));
     }
-
-    if (*Ascii) {
-      if (CountSoFar && ((CHAR8*)Buffer)[CountSoFar - 1] == '\r') {
-        ((CHAR8*)Buffer)[CountSoFar - 1] = '\0';
-      }
-    }
-    else {
-      if (CountSoFar && Buffer[CountSoFar - 1] == L'\r') {
-        Buffer[CountSoFar - 1] = CHAR_NULL;
-      }
-    }
+    return (EFI_BUFFER_TOO_SMALL);
+  }
+  while(Buffer[StrLen(Buffer)-1] == L'\r') {
+    Buffer[StrLen(Buffer)-1] = CHAR_NULL;
   }
 
   return (Status);
