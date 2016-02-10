@@ -57,31 +57,6 @@ PL061Identify (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-PL061Initialize (
-  VOID
-  )
-{
-  EFI_STATUS  Status;
-
-  // Check if the PL061 GPIO module exists on board
-  Status = PL061Identify();
-  if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto EXIT;
-  }
-
-  // Do other hardware initialisation things here as required
-
-  // Disable Interrupts
-  //if (MmioRead8 (PL061_GPIO_IE_REG) != 0) {
-  //   // Ensure interrupts are disabled
-  //}
-
-  EXIT:
-  return Status;
-}
-
 /**
 
 Routine Description:
@@ -298,7 +273,7 @@ PL061InstallProtocol (
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEmbeddedGpioProtocolGuid);
 
-  Status = PL061Initialize();
+  Status = PL061Identify();
   if (EFI_ERROR(Status)) {
     return EFI_DEVICE_ERROR;
   }
