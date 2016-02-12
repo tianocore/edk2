@@ -2,6 +2,7 @@
   Boot functions implementation for UefiPxeBc Driver.
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1228,7 +1229,7 @@ ON_EXIT:
   PxeBcUninstallCallback(Private, NewMakeCallback);
 
   if (Status == EFI_SUCCESS) {
-    AsciiPrint ("\n  Succeed to download NBP file.\n");
+    AsciiPrint ("\n  NBP file downloaded successfully.\n");
     return EFI_SUCCESS;
   } else if (Status == EFI_BUFFER_TOO_SMALL && Buffer != NULL) {
     AsciiPrint ("\n  PXE-E05: Buffer size is smaller than the requested file.\n");
