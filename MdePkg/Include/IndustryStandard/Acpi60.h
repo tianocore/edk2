@@ -1,7 +1,7 @@
 /** @file   
   ACPI 6.0 definitions from the ACPI Specification Revision 6.0 April, 2015.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>  
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -1666,6 +1666,9 @@ typedef struct {
 #define EFI_ACPI_6_0_HARDWARE_ERROR_NOTIFICATION_LOCAL_INTERRUPT       0x02
 #define EFI_ACPI_6_0_HARDWARE_ERROR_NOTIFICATION_SCI                   0x03
 #define EFI_ACPI_6_0_HARDWARE_ERROR_NOTIFICATION_NMI                   0x04
+#define EFI_ACPI_6_0_HARDWARE_ERROR_NOTIFICATION_CMCI                  0x05
+#define EFI_ACPI_6_0_HARDWARE_ERROR_NOTIFICATION_MCE                   0x06
+#define EFI_ACPI_6_0_HARDWARE_ERROR_NOTIFICATION_GPIO_SIGNAL           0x07
 
 ///
 /// Hardware Error Notification Configuration Write Enable Structure Definition
