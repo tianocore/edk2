@@ -2,7 +2,7 @@
   Trace reporting for the Dp utility.
 
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -153,8 +153,7 @@ DumpAllTrace(
   UINTN                     TIndex;
 
   EFI_HANDLE                *HandleBuffer;
-  UINTN                     Size;
-  EFI_HANDLE                TempHandle;
+  UINTN                     HandleCount;
   EFI_STATUS                Status;
   EFI_STRING                StringPtrUnknown;
 
@@ -166,17 +165,7 @@ DumpAllTrace(
 
   // Get Handle information
   //
-  Size = 0;
-  HandleBuffer = &TempHandle;
-  Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, &TempHandle);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    HandleBuffer = AllocatePool (Size);
-    ASSERT (HandleBuffer != NULL);
-    if (HandleBuffer == NULL) {
-      return;
-    }
-    Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleBuffer);
-  }
+  Status  = gBS->LocateHandleBuffer (AllHandles, NULL, NULL, &HandleCount, &HandleBuffer);
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLES_ERROR), gDpHiiHandle, Status);
   }
@@ -232,7 +221,7 @@ DumpAllTrace(
       AsciiStrToUnicodeStr (Measurement.Token, mUnicodeToken);
       if (Measurement.Handle != NULL) {
         // See if the Handle is in the HandleBuffer
-        for (TIndex = 0; TIndex < (Size / sizeof(HandleBuffer[0])); TIndex++) {
+        for (TIndex = 0; TIndex < HandleCount; TIndex++) {
           if (Measurement.Handle == HandleBuffer[TIndex]) {
             DpGetNameFromHandle (HandleBuffer[TIndex]);
             break;
@@ -270,7 +259,7 @@ DumpAllTrace(
       }
     }
   }
-  if (HandleBuffer != &TempHandle) {
+  if (HandleBuffer != NULL) {
     FreePool (HandleBuffer);
   }
   SHELL_FREE_NON_NULL (IncFlag);
@@ -536,8 +525,7 @@ ProcessHandles(
   UINTN                     Index;
   UINTN                     LogEntryKey;
   UINTN                     Count;
-  UINTN                     Size;
-  EFI_HANDLE                TempHandle;
+  UINTN                     HandleCount;
   EFI_STATUS                Status;
   EFI_STRING                StringPtrUnknown;
 
@@ -548,17 +536,7 @@ ProcessHandles(
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
-  Size = 0;
-  HandleBuffer = &TempHandle;
-  Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, &TempHandle);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    HandleBuffer = AllocatePool (Size);
-    ASSERT (HandleBuffer != NULL);
-    if (HandleBuffer == NULL) {
-      return Status;
-    }
-    Status  = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleBuffer);
-  }
+  Status = gBS->LocateHandleBuffer (AllHandles, NULL, NULL, &HandleCount, &HandleBuffer);
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLES_ERROR), gDpHiiHandle, Status);
   }
@@ -598,7 +576,7 @@ ProcessHandles(
       mGaugeString[0] = 0;    // Empty driver name by default
       AsciiStrToUnicodeStr (Measurement.Token, mUnicodeToken);
       // See if the Handle is in the HandleBuffer
-      for (Index = 0; Index < (Size / sizeof(HandleBuffer[0])); Index++) {
+      for (Index = 0; Index < HandleCount; Index++) {
         if (Measurement.Handle == HandleBuffer[Index]) {
           DpGetNameFromHandle (HandleBuffer[Index]); // Name is put into mGaugeString
           break;
@@ -630,7 +608,7 @@ ProcessHandles(
       }
     }
   }
-  if (HandleBuffer != &TempHandle) {
+  if (HandleBuffer != NULL) {
     FreePool (HandleBuffer);
   }
   return Status;
