@@ -977,3 +977,66 @@ HttpIoRecvResponse (
 
   return Status;
 }
+
+/**
+  Get the URI address string from the input device path.
+
+  Caller need to free the buffer in the UriAddress pointer.
+  
+  @param[in]   FilePath         Pointer to the device path which contains a URI device path node.
+  @param[in]   UriAddress       The URI address string extract from the device path.
+  
+  @retval EFI_SUCCESS            The URI string is returned.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+
+**/
+EFI_STATUS
+HttpBootParseFilePath (
+  IN     EFI_DEVICE_PATH_PROTOCOL     *FilePath,
+     OUT CHAR8                        **UriAddress
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  URI_DEVICE_PATH           *UriDevicePath;
+  CHAR8                     *Uri;
+  UINTN                     UriStrLength;
+
+  if (FilePath == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *UriAddress = NULL;
+
+  //
+  // Extract the URI address from the FilePath
+  //
+  TempDevicePath = FilePath;
+  while (!IsDevicePathEnd (TempDevicePath)) {
+    if ((DevicePathType (TempDevicePath) == MESSAGING_DEVICE_PATH) &&
+        (DevicePathSubType (TempDevicePath) == MSG_URI_DP)) {
+      UriDevicePath = (URI_DEVICE_PATH*) TempDevicePath;
+      //
+      // UEFI Spec doesn't require the URI to be a NULL-terminated string
+      // So we allocate a new buffer and always append a '\0' to it.
+      //
+      UriStrLength = DevicePathNodeLength (UriDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
+      if (UriStrLength == 0) {
+        //
+        // return a NULL UriAddress if it's a empty URI device path node.
+        //
+        break;
+      }
+      Uri = AllocatePool (UriStrLength + 1);
+      if (Uri == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      CopyMem (Uri, UriDevicePath->Uri, DevicePathNodeLength (UriDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL));
+      Uri[DevicePathNodeLength (UriDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL)] = '\0';
+
+      *UriAddress = Uri;
+    }
+    TempDevicePath = NextDevicePathNode (TempDevicePath);
+  }
+
+  return EFI_SUCCESS;
+}

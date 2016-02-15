@@ -4,7 +4,7 @@
 # This package provides network modules that conform to UEFI 2.4 specification.
 #
 # (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -36,6 +36,9 @@
 
   # Include/Guid/IscsiConfigHii.h
   gIScsiConfigGuid              = { 0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9}}
+
+  # Include/Guid/HttpBootConfigHii.h
+  gHttpBootConfigGuid           = { 0x4d20583a, 0x7765, 0x4e7a, { 0x8a, 0x67, 0xdc, 0xde, 0x74, 0xee, 0x3e, 0xc5 }}
 
 [PcdsFeatureFlag]
   ## Indicates if the IPsec IKEv2 Certificate Authentication feature is enabled or not.<BR><BR>

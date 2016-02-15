@@ -329,4 +329,22 @@ HttpIoRecvResponse (
      OUT  HTTP_IO_RESPONSE_DATA    *ResponseData
   );
 
+/**
+  Get the URI address string from the input device path.
+
+  Caller need to free the buffer in the UriAddress pointer.
+  
+  @param[in]   FilePath         Pointer to the device path which contains a URI device path node.
+  @param[in]   UriAddress       The URI address string extract from the device path.
+  
+  @retval EFI_SUCCESS            The URI string is returned.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+
+**/
+EFI_STATUS
+HttpBootParseFilePath (
+  IN     EFI_DEVICE_PATH_PROTOCOL     *FilePath,
+     OUT CHAR8                        **UriAddress
+  );
+
 #endif

@@ -168,18 +168,35 @@ HttpBootDhcp4ExtractUriInfo (
   // HttpOffer contains the boot file URL.
   //
   SelectOffer = &Private->OfferBuffer[SelectIndex].Dhcp4;
-  if ((SelectOffer->OfferType == HttpOfferTypeDhcpIpUri) || (SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns)) {
-    HttpOffer = SelectOffer;
+  if (Private->FilePathUri == NULL) {
+    //
+    // In Corporate environment, we need a HttpOffer.
+    //
+    if ((SelectOffer->OfferType == HttpOfferTypeDhcpIpUri) || 
+        (SelectOffer->OfferType == HttpOfferTypeDhcpIpUriDns) ||
+        (SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns)) {
+      HttpOffer = SelectOffer;
+    } else {
+      ASSERT (Private->SelectProxyType != HttpOfferTypeMax);
+      ProxyIndex = Private->OfferIndex[Private->SelectProxyType][0];
+      HttpOffer = &Private->OfferBuffer[ProxyIndex].Dhcp4;
+    }
+    Private->BootFileUriParser = HttpOffer->UriParser;
+    Private->BootFileUri = (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP4_TAG_INDEX_BOOTFILE]->Data;
   } else {
-    ASSERT (Private->SelectProxyType != HttpOfferTypeMax);
-    ProxyIndex = Private->OfferIndex[Private->SelectProxyType][0];
-    HttpOffer = &Private->OfferBuffer[ProxyIndex].Dhcp4;
+    //
+    // In Home environment the BootFileUri comes from the FilePath.
+    //
+    Private->BootFileUriParser = Private->FilePathUriParser;
+    Private->BootFileUri = Private->FilePathUri;
   }
 
   //
   // Configure the default DNS server if server assigned.
   //
-  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || (SelectOffer->OfferType == HttpOfferTypeDhcpDns)) {
+  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || 
+      (SelectOffer->OfferType == HttpOfferTypeDhcpDns) ||
+      (SelectOffer->OfferType == HttpOfferTypeDhcpIpUriDns)) {
     Option = SelectOffer->OptList[HTTP_BOOT_DHCP4_TAG_INDEX_DNS_SERVER];
     ASSERT (Option != NULL);
     Status = HttpBootRegisterIp4Dns (
@@ -196,20 +213,13 @@ HttpBootDhcp4ExtractUriInfo (
   // Extract the port from URL, and use default HTTP port 80 if not provided.
   //
   Status = HttpUrlGetPort (
-             (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP4_TAG_INDEX_BOOTFILE]->Data,
-             HttpOffer->UriParser,
+             Private->BootFileUri,
+             Private->BootFileUriParser,
              &Private->Port
              );
   if (EFI_ERROR (Status) || Private->Port == 0) {
     Private->Port = 80;
   }
-  
-  //
-  // Record the URI of boot file from the selected HTTP offer.
-  //
-  Private->BootFileUriParser = HttpOffer->UriParser;
-  Private->BootFileUri = (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP4_TAG_INDEX_BOOTFILE]->Data;
-
   
   //
   // All boot informations are valid here.
@@ -260,12 +270,27 @@ HttpBootDhcp6ExtractUriInfo (
   // HttpOffer contains the boot file URL.
   //
   SelectOffer = &Private->OfferBuffer[SelectIndex].Dhcp6;
-  if ((SelectOffer->OfferType == HttpOfferTypeDhcpIpUri) || (SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns)) {
-    HttpOffer = SelectOffer;
+  if (Private->FilePathUri == NULL) {
+    //
+    // In Corporate environment, we need a HttpOffer.
+    //
+    if ((SelectOffer->OfferType == HttpOfferTypeDhcpIpUri) ||
+        (SelectOffer->OfferType == HttpOfferTypeDhcpIpUriDns) ||
+        (SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns)) {
+      HttpOffer = SelectOffer;
+    } else {
+      ASSERT (Private->SelectProxyType != HttpOfferTypeMax);
+      ProxyIndex = Private->OfferIndex[Private->SelectProxyType][0];
+      HttpOffer = &Private->OfferBuffer[ProxyIndex].Dhcp6;
+    }
+    Private->BootFileUriParser = HttpOffer->UriParser;
+    Private->BootFileUri = (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data;
   } else {
-    ASSERT (Private->SelectProxyType != HttpOfferTypeMax);
-    ProxyIndex = Private->OfferIndex[Private->SelectProxyType][0];
-    HttpOffer = &Private->OfferBuffer[ProxyIndex].Dhcp6;
+    //
+    // In Home environment the BootFileUri comes from the FilePath.
+    //
+    Private->BootFileUriParser = Private->FilePathUriParser;
+    Private->BootFileUri = Private->FilePathUri;
   }
 
   //
@@ -279,7 +304,9 @@ HttpBootDhcp6ExtractUriInfo (
   //
   // Configure the default DNS server if server assigned.
   //
-  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || (SelectOffer->OfferType == HttpOfferTypeDhcpDns)) {
+  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || 
+      (SelectOffer->OfferType == HttpOfferTypeDhcpDns) ||
+      (SelectOffer->OfferType == HttpOfferTypeDhcpIpUriDns)) {
     Option = SelectOffer->OptList[HTTP_BOOT_DHCP6_IDX_DNS_SERVER];
     ASSERT (Option != NULL);
     Status = HttpBootSetIp6Dns (
@@ -297,8 +324,8 @@ HttpBootDhcp6ExtractUriInfo (
   // whether can send message to HTTP Server Ip through the GateWay.
   //
   Status = HttpUrlGetIp6 (
-             (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
-             HttpOffer->UriParser,
+             Private->BootFileUri,
+             Private->BootFileUriParser,
              &IpAddr
              );
   
@@ -307,8 +334,8 @@ HttpBootDhcp6ExtractUriInfo (
     // The Http server address is expressed by Name Ip, so perform DNS resolution
     //
     Status = HttpUrlGetHostName (
-               (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
-               HttpOffer->UriParser,
+               Private->BootFileUri,
+               Private->BootFileUriParser,
                &HostName
                );
     if (EFI_ERROR (Status)) {
@@ -343,20 +370,13 @@ HttpBootDhcp6ExtractUriInfo (
   // Extract the port from URL, and use default HTTP port 80 if not provided.
   //
   Status = HttpUrlGetPort (
-             (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
-             HttpOffer->UriParser,
+             Private->BootFileUri,
+             Private->BootFileUriParser,
              &Private->Port
              );
   if (EFI_ERROR (Status) || Private->Port == 0) {
     Private->Port = 80;
   }
-  
-  //
-  // Record the URI of boot file from the selected HTTP offer.
-  //
-  Private->BootFileUriParser = HttpOffer->UriParser;
-  Private->BootFileUri = (CHAR8*) HttpOffer->OptList[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data;
-
   
   //
   // All boot informations are valid here.
@@ -570,10 +590,6 @@ HttpBootGetFileFromCache (
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Search file in the cache list, the cache entry will be released upon a successful
-  // match.
-  //
   NET_LIST_FOR_EACH (Entry, &Private->CacheList) {
     Cache = NET_LIST_USER_STRUCT (Entry, HTTP_BOOT_CACHE_CONTENT, Link);
     //
@@ -607,12 +623,6 @@ HttpBootGetFileFromCache (
         }
       }
       *BufferSize = CopyedSize;
-
-      //
-      // On success, free the cached data to release the memory resource.
-      //
-      RemoveEntryList (&Cache->Link);
-      HttpBootFreeCache (Cache);
       return EFI_SUCCESS;
     }
   }
@@ -1083,3 +1093,4 @@ ERROR_1:
 
   return Status;
 }
+

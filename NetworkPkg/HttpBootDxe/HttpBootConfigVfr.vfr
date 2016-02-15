@@ -1,0 +1,53 @@
+/** @file
+  VFR file used by the HTTP Boot configuration component.
+
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include "HttpBootConfigNVDataStruc.h"
+
+
+formset
+  guid   = HTTP_BOOT_CONFIG_GUID,
+  title  = STRING_TOKEN(STR_HTTP_BOOT_CONFIG_FORM_TITLE),
+  help   = STRING_TOKEN(STR_HTTP_BOOT_CONFIG_FORM_HELP),
+
+  varstore HTTP_BOOT_CONFIG_IFR_NVDATA,
+    name = HTTP_BOOT_CONFIG_IFR_NVDATA,
+    guid = HTTP_BOOT_CONFIG_GUID;
+  
+  form formid = FORMID_MAIN_FORM,
+    title  = STRING_TOKEN(STR_HTTP_BOOT_CONFIG_FORM_TITLE);
+
+    string  varid   = HTTP_BOOT_CONFIG_IFR_NVDATA.Description,
+            prompt  = STRING_TOKEN(STR_BOOT_DESCRIPTION_PROMPT),
+            help    = STRING_TOKEN(STR_NULL_STRING),
+            minsize = 6,
+            maxsize = 75,
+    endstring;
+
+    oneof varid  = HTTP_BOOT_CONFIG_IFR_NVDATA.IpVersion,
+          prompt = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_PROMPT),
+          help   = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_HELP),
+          option text = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_4),   value = HTTP_BOOT_IP_VERSION_4,   flags = DEFAULT;
+          option text = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_6),   value = HTTP_BOOT_IP_VERSION_6,   flags = 0;
+    endoneof;
+
+    string  varid   = HTTP_BOOT_CONFIG_IFR_NVDATA.Uri,
+            prompt  = STRING_TOKEN(STR_BOOT_URI_PROMPT),
+            help    = STRING_TOKEN(STR_BOOT_URI_HELP),
+            minsize = URI_STR_MIN_SIZE,
+            maxsize = URI_STR_MAX_SIZE,
+    endstring;
+  endform;
+
+endformset;

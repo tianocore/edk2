@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv4 for HTTP boot driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -395,7 +395,11 @@ HttpBootParseDhcp4Packet (
   //
   if (IsHttpOffer) {
     if (IpExpressedUri) {
-      OfferType = IsProxyOffer ? HttpOfferTypeProxyIpUri : HttpOfferTypeDhcpIpUri;
+      if (IsProxyOffer) {
+        OfferType = HttpOfferTypeProxyIpUri;
+      } else {
+        OfferType = IsDnsOffer ? HttpOfferTypeDhcpIpUriDns : HttpOfferTypeDhcpIpUri;
+      }
     } else {
       if (!IsProxyOffer) {
         OfferType = IsDnsOffer ? HttpOfferTypeDhcpNameUriDns : HttpOfferTypeDhcpNameUri;
@@ -473,46 +477,81 @@ HttpBootSelectDhcpOffer (
 {
   Private->SelectIndex = 0;
   Private->SelectProxyType = HttpOfferTypeMax;
-  
-  //
-  // Priority1: HttpOfferTypeDhcpIpUri                           
-  // Priority2: HttpOfferTypeDhcpNameUriDns                      
-  // Priority3: HttpOfferTypeDhcpOnly + HttpOfferTypeProxyIpUri  
-  // Priority4: HttpOfferTypeDhcpDns  + HttpOfferTypeProxyIpUri  
-  // Priority5: HttpOfferTypeDhcpDns  + HttpOfferTypeProxyNameUri
-  // Priority6: HttpOfferTypeDhcpDns  + HttpOfferTypeDhcpNameUri 
-  //    
-  if (Private->OfferCount[HttpOfferTypeDhcpIpUri] > 0) {
+
+  if (Private->FilePathUri != NULL) {
+    //
+    // We are in home environment, the URI is already specified.
+    // Just need to choose a DHCP offer.
+    // The offer with DNS server address takes priority here.
+    //
+    if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0) {
+      
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
+      
+    } else if (Private->OfferCount[HttpOfferTypeDhcpIpUriDns] > 0) {
     
-    Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUri][0] + 1;
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUriDns][0] + 1;
+      
+    } else if (Private->OfferCount[HttpOfferTypeDhcpNameUriDns] > 0) {
     
-  } else if (Private->OfferCount[HttpOfferTypeDhcpNameUriDns] > 0) {
-  
-    Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpNameUriDns][0] + 1;
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpNameUriDns][0] + 1;
+      
+    }  else if (Private->OfferCount[HttpOfferTypeDhcpOnly] > 0) {
     
-  } else if (Private->OfferCount[HttpOfferTypeDhcpOnly] > 0 &&
-             Private->OfferCount[HttpOfferTypeProxyIpUri] > 0) {
-             
-    Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpOnly][0] + 1;
-    Private->SelectProxyType = HttpOfferTypeProxyIpUri;
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpOnly][0] + 1;
+      
+    }  else if (Private->OfferCount[HttpOfferTypeDhcpIpUri] > 0) {
     
-  } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
-             Private->OfferCount[HttpOfferTypeProxyIpUri] > 0) {
-             
-    Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
-    Private->SelectProxyType = HttpOfferTypeProxyIpUri;
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUri][0] + 1;
+    }
     
-  } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
-             Private->OfferCount[HttpOfferTypeProxyNameUri] > 0) {
-             
-    Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
-    Private->SelectProxyType = HttpOfferTypeProxyNameUri;
+  } else {
+    //
+    // We are in corporate environment.
+    //
+    // Priority1: HttpOfferTypeDhcpIpUri or HttpOfferTypeDhcpIpUriDns
+    // Priority2: HttpOfferTypeDhcpNameUriDns                      
+    // Priority3: HttpOfferTypeDhcpOnly + HttpOfferTypeProxyIpUri  
+    // Priority4: HttpOfferTypeDhcpDns  + HttpOfferTypeProxyIpUri  
+    // Priority5: HttpOfferTypeDhcpDns  + HttpOfferTypeProxyNameUri
+    // Priority6: HttpOfferTypeDhcpDns  + HttpOfferTypeDhcpNameUri 
+    //    
+    if (Private->OfferCount[HttpOfferTypeDhcpIpUri] > 0) {
+      
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUri][0] + 1;
+      
+    } else if (Private->OfferCount[HttpOfferTypeDhcpIpUriDns] > 0) {
+      
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUriDns][0] + 1;
+      
+    }else if (Private->OfferCount[HttpOfferTypeDhcpNameUriDns] > 0) {
     
-  } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
-             Private->OfferCount[HttpOfferTypeDhcpNameUri] > 0) {
-             
-    Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
-    Private->SelectProxyType = HttpOfferTypeDhcpNameUri;
+      Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpNameUriDns][0] + 1;
+      
+    } else if (Private->OfferCount[HttpOfferTypeDhcpOnly] > 0 &&
+               Private->OfferCount[HttpOfferTypeProxyIpUri] > 0) {
+               
+      Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpOnly][0] + 1;
+      Private->SelectProxyType = HttpOfferTypeProxyIpUri;
+      
+    } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
+               Private->OfferCount[HttpOfferTypeProxyIpUri] > 0) {
+               
+      Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
+      Private->SelectProxyType = HttpOfferTypeProxyIpUri;
+      
+    } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
+               Private->OfferCount[HttpOfferTypeProxyNameUri] > 0) {
+               
+      Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
+      Private->SelectProxyType = HttpOfferTypeProxyNameUri;
+      
+    } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
+               Private->OfferCount[HttpOfferTypeDhcpNameUri] > 0) {
+               
+      Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
+      Private->SelectProxyType = HttpOfferTypeDhcpNameUri;
+    }
   }
 }
 

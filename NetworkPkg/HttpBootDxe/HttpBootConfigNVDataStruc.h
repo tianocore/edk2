@@ -1,0 +1,43 @@
+/** @file
+  Define NVData structures used by the HTTP Boot configuration component.
+
+Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#ifndef _HTTP_BOOT_NVDATA_STRUC_H_
+#define _HTTP_BOOT_NVDATA_STRUC_H_
+
+#include <Guid/HttpBootConfigHii.h>
+
+#define HTTP_BOOT_IP_VERSION_4         0
+#define HTTP_BOOT_IP_VERSION_6         1
+
+//
+// Macros used for an IPv4 or an IPv6 address.
+//
+#define URI_STR_MIN_SIZE           8
+#define URI_STR_MAX_SIZE           255
+
+#define CONFIGURATION_VARSTORE_ID    0x1234
+
+#define FORMID_MAIN_FORM    1
+
+#pragma pack(1)
+typedef struct _HTTP_BOOT_CONFIG_IFR_NVDATA {
+  UINT8     IpVersion;
+  UINT8     Padding;
+  CHAR16    Description[URI_STR_MAX_SIZE];
+  CHAR16    Uri[URI_STR_MAX_SIZE];
+} HTTP_BOOT_CONFIG_IFR_NVDATA;
+#pragma pack()
+
+
+#endif

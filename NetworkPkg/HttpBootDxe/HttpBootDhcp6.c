@@ -298,7 +298,11 @@ HttpBootParseDhcp6Packet (
   //
   if (IsHttpOffer) {
     if (IpExpressedUri) {
-      OfferType = IsProxyOffer ? HttpOfferTypeProxyIpUri : HttpOfferTypeDhcpIpUri;
+      if (IsProxyOffer) {
+        OfferType = HttpOfferTypeProxyIpUri;
+      } else {
+        OfferType = IsDnsOffer ? HttpOfferTypeDhcpIpUriDns : HttpOfferTypeDhcpIpUri;
+      }
     } else {
       if (!IsProxyOffer) {
         OfferType = IsDnsOffer ? HttpOfferTypeDhcpNameUriDns : HttpOfferTypeDhcpNameUri;

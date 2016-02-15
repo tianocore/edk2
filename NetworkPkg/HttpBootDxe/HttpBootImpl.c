@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI_LOAD_FILE_PROTOCOL for UEFI HTTP boot.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -21,22 +21,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]    UsingIpv6          Specifies the type of IP addresses that are to be
                                    used during the session that is being started.
                                    Set to TRUE for IPv6, and FALSE for IPv4.
+  @param[in]    FilePath           The device specific path of the file to load.
 
   @retval EFI_SUCCESS              HTTP boot was successfully enabled.
   @retval EFI_INVALID_PARAMETER    Private is NULL.
   @retval EFI_ALREADY_STARTED      The driver is already in started state.
+  @retval EFI_OUT_OF_RESOURCES     There are not enough resources.
   
 **/
 EFI_STATUS
 HttpBootStart (
   IN HTTP_BOOT_PRIVATE_DATA           *Private,
-  IN BOOLEAN                          UsingIpv6
+  IN BOOLEAN                          UsingIpv6,
+  IN EFI_DEVICE_PATH_PROTOCOL         *FilePath
   )
 {
   UINTN                Index;
   EFI_STATUS           Status;
 
-  if (Private == NULL) {
+  if (Private == NULL || FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -53,6 +56,26 @@ HttpBootStart (
     Private->UsingIpv6 = FALSE;
   } else {
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check whether the URI address is specified.
+  //
+  Status = HttpBootParseFilePath (FilePath, &Private->FilePathUri);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Private->FilePathUri != NULL) {
+    Status = HttpParseUrl (
+               Private->FilePathUri,
+               (UINT32) AsciiStrLen (Private->FilePathUri),
+               FALSE,
+               &Private->FilePathUriParser
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
   
   //
@@ -301,12 +324,21 @@ HttpBootStop (
       }
     }
   }
+
+  if (Private->FilePathUri!= NULL) {
+    FreePool (Private->FilePathUri);
+    HttpUrlFreeParser (Private->FilePathUriParser);
+    Private->FilePathUri = NULL;
+    Private->FilePathUriParser = NULL;
+  }
   
   ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
   Private->OfferNum = 0;
   ZeroMem (Private->OfferCount, sizeof (Private->OfferCount));
   ZeroMem (Private->OfferIndex, sizeof (Private->OfferIndex));
-
+  
+  HttpBootFreeCacheList (Private);
+  
   return EFI_SUCCESS;
 }
 
@@ -357,7 +389,7 @@ HttpBootDxeLoadFile (
   BOOLEAN                       UsingIpv6;
   EFI_STATUS                    Status;
 
-  if (This == NULL || BufferSize == NULL) {
+  if (This == NULL || BufferSize == NULL || FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -370,7 +402,6 @@ HttpBootDxeLoadFile (
 
   VirtualNic = HTTP_BOOT_VIRTUAL_NIC_FROM_LOADFILE (This);
   Private = VirtualNic->Private;
-  UsingIpv6 = FALSE;
   
   //
   // Check media status before HTTP boot start
@@ -380,27 +411,37 @@ HttpBootDxeLoadFile (
   if (!MediaPresent) {
     return EFI_NO_MEDIA;
   }
-
+  
   //
   // Check whether the virtual nic is using IPv6 or not.
   //
+  UsingIpv6 = FALSE;
   if (VirtualNic == Private->Ip6Nic) {
     UsingIpv6 = TRUE;
   }
-  
+
   //
-  // Initialize HTTP boot and load the boot file.
+  // Initialize HTTP boot.
   //
-  Status = HttpBootStart (Private, UsingIpv6);
-  if (Status == EFI_ALREADY_STARTED && UsingIpv6 != Private->UsingIpv6) {
+  Status = HttpBootStart (Private, UsingIpv6, FilePath);
+  if (Status == EFI_ALREADY_STARTED) {
     //
-    // Http boot Driver has already been started but not on the required IP version, restart it.
+    // Restart the HTTP boot driver in 2 cases:
+    // 1. Http boot Driver has already been started but not on the required IP version.
+    // 2. The required boot FilePath is different with the one we produced in the device path
+    // protocol.
     //
-    Status = HttpBootStop (Private);
-    if (!EFI_ERROR (Status)) {
-      Status = HttpBootStart (Private, UsingIpv6);
+    if ((UsingIpv6 != Private->UsingIpv6) || !IsDevicePathEnd(FilePath)) {
+      Status = HttpBootStop (Private);
+      if (!EFI_ERROR (Status)) {
+        Status = HttpBootStart (Private, UsingIpv6, FilePath);
+      }
     }
   }
+
+  //
+  // Load the boot file.
+  //
   if (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED) {
     Status = HttpBootLoadFile (Private, BufferSize, Buffer);
   }

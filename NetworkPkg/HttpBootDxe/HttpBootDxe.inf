@@ -1,7 +1,7 @@
 ## @file
 #  This modules produce the Load File Protocol for UEFI HTTP boot.
 # 
-#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -25,10 +25,12 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [Sources]
   HttpBootDxe.h
   HttpBootDxe.c
+  HttpBootConfig.c
   HttpBootComponentName.h
   HttpBootComponentName.c
   HttpBootImpl.h
@@ -41,6 +43,8 @@
   HttpBootSupport.c
   HttpBootClient.h
   HttpBootClient.c
+  HttpBootConfigVfr.vfr
+  HttpBootConfigStrings.uni
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -52,6 +56,9 @@
   DebugLib
   NetLib
   HttpLib
+  HiiLib
+  PrintLib
+  UefiHiiServicesLib
 
 [Protocols]
   ## TO_START
@@ -72,6 +79,14 @@
   gEfiIp6ProtocolGuid                             ## TO_START
   gEfiIp6ConfigProtocolGuid                       ## TO_START
   gEfiNetworkInterfaceIdentifierProtocolGuid_31   ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid                 ## BY_START
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   mHttpBootConfigStorageName
+  ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr mHttpBootConfigStorageName
+  ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData     mHttpBootConfigStorageName
+  ## SOMETIMES_CONSUMES ## HII
+  gHttpBootConfigGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpBootDxeExtra.uni
