@@ -1,7 +1,7 @@
 /** @file
   Defines data types and constants introduced in UEFI.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available under 
@@ -158,6 +158,7 @@ typedef union {
 #define EFI_WARN_WRITE_FAILURE    RETURN_WARN_WRITE_FAILURE   
 #define EFI_WARN_BUFFER_TOO_SMALL RETURN_WARN_BUFFER_TOO_SMALL
 #define EFI_WARN_STALE_DATA       RETURN_WARN_STALE_DATA
+#define EFI_WARN_FILE_SYSTEM      RETURN_WARN_FILE_SYSTEM
 ///@}
 
 ///

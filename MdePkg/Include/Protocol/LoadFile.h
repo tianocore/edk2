@@ -7,7 +7,7 @@
 
   UEFI 2.0 can boot from any device that produces a LoadFile protocol.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -64,7 +64,7 @@ typedef EFI_LOAD_FILE_PROTOCOL  EFI_LOAD_FILE_INTERFACE;
   @retval EFI_NO_RESPONSE       The remote system did not respond.
   @retval EFI_NOT_FOUND         The file was not found.
   @retval EFI_ABORTED           The file load process was manually cancelled.
-
+  @retval EFI_WARN_FILE_SYSTEM  The resulting Buffer contains UEFI-compliant file system.
 **/
 typedef
 EFI_STATUS

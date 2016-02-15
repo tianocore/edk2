@@ -974,6 +974,12 @@ typedef UINTN RETURN_STATUS;
 ///
 #define RETURN_WARN_STALE_DATA       ENCODE_WARNING (5)
 
+///
+/// The resulting buffer contains UEFI-compliant file system.
+///
+#define RETURN_WARN_FILE_SYSTEM      ENCODE_WARNING (6)
+
+
 /**
   Returns a 16-bit signature built from 2 ASCII characters.
 
