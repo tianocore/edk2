@@ -1,7 +1,7 @@
 /** @file
   EFI PCI IO protocol functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1774,9 +1774,8 @@ PciIoGetBarAttributes (
   OUT VOID                           **Resources OPTIONAL
   )
 {
-  UINT8                             *Configuration;
   PCI_IO_DEVICE                     *PciIoDevice;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *AddressSpace;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
   EFI_ACPI_END_TAG_DESCRIPTOR       *End;
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
@@ -1798,19 +1797,18 @@ PciIoGetBarAttributes (
   }
 
   if (Resources != NULL) {
-    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
-    if (Configuration == NULL) {
+    Descriptor = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
+    if (Descriptor == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    AddressSpace = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
+    *Resources   = Descriptor;
 
-    AddressSpace->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-    AddressSpace->Len          = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
-
-    AddressSpace->AddrRangeMin = PciIoDevice->PciBar[BarIndex].BaseAddress;
-    AddressSpace->AddrLen      = PciIoDevice->PciBar[BarIndex].Length;
-    AddressSpace->AddrRangeMax = PciIoDevice->PciBar[BarIndex].Alignment;
+    Descriptor->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
+    Descriptor->Len          = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
+    Descriptor->AddrRangeMin = PciIoDevice->PciBar[BarIndex].BaseAddress;
+    Descriptor->AddrLen      = PciIoDevice->PciBar[BarIndex].Length;
+    Descriptor->AddrRangeMax = PciIoDevice->PciBar[BarIndex].Alignment;
 
     switch (PciIoDevice->PciBar[BarIndex].BarType) {
     case PciBarTypeIo16:
@@ -1818,59 +1816,59 @@ PciIoGetBarAttributes (
       //
       // Io
       //
-      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
+      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
       break;
 
     case PciBarTypeMem32:
       //
       // Mem
       //
-      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
       //
       // 32 bit
       //
-      AddressSpace->AddrSpaceGranularity = 32;
+      Descriptor->AddrSpaceGranularity = 32;
       break;
 
     case PciBarTypePMem32:
       //
       // Mem
       //
-      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
       //
       // prefechable
       //
-      AddressSpace->SpecificFlag = 0x6;
+      Descriptor->SpecificFlag = 0x6;
       //
       // 32 bit
       //
-      AddressSpace->AddrSpaceGranularity = 32;
+      Descriptor->AddrSpaceGranularity = 32;
       break;
 
     case PciBarTypeMem64:
       //
       // Mem
       //
-      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
       //
       // 64 bit
       //
-      AddressSpace->AddrSpaceGranularity = 64;
+      Descriptor->AddrSpaceGranularity = 64;
       break;
 
     case PciBarTypePMem64:
       //
       // Mem
       //
-      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
       //
       // prefechable
       //
-      AddressSpace->SpecificFlag = 0x6;
+      Descriptor->SpecificFlag = 0x6;
       //
       // 64 bit
       //
-      AddressSpace->AddrSpaceGranularity = 64;
+      Descriptor->AddrSpaceGranularity = 64;
       break;
 
     default:
@@ -1880,11 +1878,9 @@ PciIoGetBarAttributes (
     //
     // put the checksum
     //
-    End           = (EFI_ACPI_END_TAG_DESCRIPTOR *) (AddressSpace + 1);
+    End           = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Descriptor + 1);
     End->Desc     = ACPI_END_TAG_DESCRIPTOR;
     End->Checksum = 0;
-
-    *Resources    = Configuration;
   }
 
   return EFI_SUCCESS;
