@@ -2,7 +2,7 @@
   
   VfrCompiler main class and main function.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -412,8 +412,8 @@ CVfrCompiler::Usage (
   UINT32 Index;
   CONST  CHAR8 *Help[] = {
     " ", 
-    "VfrCompile version " VFR_COMPILER_VERSION __BUILD_VERSION,
-    "Copyright (c) 2004-2014 Intel Corporation. All rights reserved.",
+    "VfrCompile version " VFR_COMPILER_VERSION "Build " __BUILD_VERSION,
+    "Copyright (c) 2004-2016 Intel Corporation. All rights reserved.",
     " ",
     "Usage: VfrCompile [options] VfrFile",
     " ",
@@ -451,7 +451,7 @@ CVfrCompiler::Version (
 {
   UINT32 Index;
   CONST  CHAR8 *Help[] = {
-    "VfrCompile version " VFR_COMPILER_VERSION __BUILD_VERSION,
+    "VfrCompile version " VFR_COMPILER_VERSION "Build " __BUILD_VERSION,
     NULL
     };
   for (Index = 0; Help[Index] != NULL; Index++) {
