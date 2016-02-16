@@ -2,7 +2,7 @@
 #
 # This file is the main entry for UPT 
 #
-# Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -99,7 +99,7 @@ def SetLogLevel(Opt):
 def Main():
     Logger.Initialize()
 
-    Parser = OptionParser(version=(MSG_VERSION + ' ' + gBUILD_VERSION), description=MSG_DESCRIPTION,
+    Parser = OptionParser(version=(MSG_VERSION + ' Build ' + gBUILD_VERSION), description=MSG_DESCRIPTION,
                           prog="UPT.exe", usage=MSG_USAGE)
 
     Parser.add_option("-d", "--debug", action="store", type="int", dest="debug_level", help=ST.HLP_PRINT_DEBUG_INFO)

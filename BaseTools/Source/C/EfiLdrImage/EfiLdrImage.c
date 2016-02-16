@@ -6,7 +6,7 @@ FILE := EFILDR_HEADER
         <PeImageFileContent> +
 The order of EFILDR_IMAGE is same as the order of placing PeImageFileContent.
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -51,8 +51,8 @@ typedef struct {
 //
 // Utility version information
 //
-#define UTILITY_MAJOR_VERSION 0
-#define UTILITY_MINOR_VERSION 1
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 0
 
 void
 Version (
@@ -74,9 +74,8 @@ Returns:
 
 --*/
 {
-  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 1999-2014 Intel Corporation. All rights reserved.\n");
-  printf ("\n  The EfiLdrImage tool is used to combine PE files into EFILDR image with Efi loader header.\n");
+  printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  exit (0);
 }
 
 VOID
@@ -85,7 +84,9 @@ Usage (
   )
 {
   printf ("Usage: EfiLdrImage -o OutImage LoaderImage PeImage1 PeImage2 ... PeImageN\n");
-  exit (1);
+  printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
+  printf ("Copyright (c) 1999-2016 Intel Corporation. All rights reserved.\n");
+  printf ("\n  The EfiLdrImage tool is used to combine PE files into EFILDR image with Efi loader header.\n");
 }
 
 EFI_STATUS
@@ -180,7 +181,7 @@ Returns:
   SetUtilityName (UTILITY_NAME);
 
   if (argc == 1) {
-    Usage();
+    printf ("Usage: EfiLdrImage -o OutImage LoaderImage PeImage1 PeImage2 ... PeImageN\n");
     return STATUS_ERROR;
   }
   

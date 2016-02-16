@@ -1,7 +1,7 @@
 /** @file
 The tool dumps the contents of a firmware volume
 
-Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -46,8 +46,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_GUID  gEfiCrc32GuidedSectionExtractionProtocolGuid = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
 
-#define UTILITY_MAJOR_VERSION      0
-#define UTILITY_MINOR_VERSION      83
+#define UTILITY_MAJOR_VERSION      1
+#define UTILITY_MINOR_VERSION      0
 
 #define UTILITY_NAME         "VolInfo"
 
@@ -168,12 +168,11 @@ Returns:
   //
   // Print utility header
   //
-  printf ("%s Version %d.%d %s, %s\n",
+  printf ("%s Version %d.%d Build %s\n",
     UTILITY_NAME,
     UTILITY_MAJOR_VERSION,
     UTILITY_MINOR_VERSION,
-    __BUILD_VERSION,
-    __DATE__
+    __BUILD_VERSION
     );
 
   //
@@ -231,7 +230,7 @@ Returns:
   //
   if (argc != 1) {
     Usage ();
-    return -1;
+    return STATUS_ERROR;
   }
   //
   // Look for help options
@@ -239,9 +238,14 @@ Returns:
   if ((strcmp(argv[0], "-h") == 0) || (strcmp(argv[0], "--help") == 0) || 
       (strcmp(argv[0], "-?") == 0) || (strcmp(argv[0], "/?") == 0)) {
     Usage();
-    return STATUS_ERROR;
+    return STATUS_SUCCESS;
   }
-
+  //
+  // Version has already been printed, return success.
+  //
+  if (strcmp(argv[0], "--version") == 0) {
+    return STATUS_SUCCESS;
+  }
   //
   // Open the file containing the FV
   //
@@ -1846,7 +1850,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.\n\n");
   fprintf (stdout, "  Display Tiano Firmware Volume FFS image information\n\n");
 
   //
@@ -1857,6 +1861,8 @@ Returns:
             Parse basename to file-guid cross reference file(s).\n");
   fprintf (stdout, "  --offset offset\n\
             Offset of file to start processing FV at.\n");
+  fprintf (stdout, "  --version\n\
+            Display version of this tool and exit.\n");
   fprintf (stdout, "  -h, --help\n\
             Show this help message and exit.\n");
 

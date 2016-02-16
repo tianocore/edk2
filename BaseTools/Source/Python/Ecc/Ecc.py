@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the main entrance of ECC tool
 #
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -49,9 +49,9 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 class Ecc(object):
     def __init__(self):
         # Version and Copyright
-        self.VersionNumber = ("0.01" + " " + gBUILD_VERSION)
+        self.VersionNumber = ("1.0" + " Build " + gBUILD_VERSION)
         self.Version = "%prog Version " + self.VersionNumber
-        self.Copyright = "Copyright (c) 2009 - 2010, Intel Corporation  All rights reserved."
+        self.Copyright = "Copyright (c) 2009 - 2016, Intel Corporation  All rights reserved."
 
         self.InitDefaultConfigIni()
         self.OutputFile = 'output.txt'
@@ -65,6 +65,7 @@ class Ecc(object):
 
         # Parse the options and args
         self.ParseOption()
+        EdkLogger.info(time.strftime("%H:%M:%S, %b.%d %Y ", time.localtime()) + "[00:00]" + "\n")
         
         #
         # Check EFI_SOURCE (Edk build convention). EDK_SOURCE will always point to ECP
@@ -104,7 +105,7 @@ class Ecc(object):
         GlobalData.gGlobalDefines["EDK_SOURCE"] = EdkSourceDir
         GlobalData.gGlobalDefines["ECP_SOURCE"] = EcpSourceDir
         
-        
+        EdkLogger.info("Loading ECC configuration ... done")
         # Generate checkpoints list
         EccGlobalData.gConfig = Configuration(self.ConfigFile)
 
@@ -327,7 +328,6 @@ class Ecc(object):
     # Parse options
     #
     def ParseOption(self):
-        EdkLogger.quiet("Loading ECC configuration ... done")
         (Options, Target) = self.EccOptionParser()
 
         if Options.Workspace:
@@ -437,7 +437,6 @@ if __name__ == '__main__':
     # Initialize log system
     EdkLogger.Initialize()
     EdkLogger.IsRaiseError = False
-    EdkLogger.quiet(time.strftime("%H:%M:%S, %b.%d %Y ", time.localtime()) + "[00:00]" + "\n")
 
     StartTime = time.clock()
     Ecc = Ecc()

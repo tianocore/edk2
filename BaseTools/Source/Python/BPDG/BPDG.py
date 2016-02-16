@@ -6,7 +6,7 @@
 #  file of PCD layout for use during the build when the platform integrator selects to use 
 #  automatic offset calculation.
 #
-#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -33,7 +33,7 @@ import StringTable as st
 import GenVpd
 
 PROJECT_NAME       = st.LBL_BPDG_LONG_UNI
-VERSION            = (st.LBL_BPDG_VERSION + " " + gBUILD_VERSION)
+VERSION            = (st.LBL_BPDG_VERSION + " Build " + gBUILD_VERSION)
 
 ## Tool entrance method
 #
@@ -91,7 +91,7 @@ def MyOptionParser():
     #
     # Process command line firstly.
     #
-    parser = OptionParser(version="%s - Version %s\n" % (PROJECT_NAME, VERSION),
+    parser = OptionParser(version="%s - Version %s" % (PROJECT_NAME, VERSION),
                           description='',
                           prog='BPDG',
                           usage=st.LBL_BPDG_USAGE

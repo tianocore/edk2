@@ -4,7 +4,7 @@ Abstract:
   Patch the BPB information in boot sector image file.
   Patch the MBR code in MBR image file.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -33,8 +33,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Utility version information
 //
-#define UTILITY_MAJOR_VERSION 0
-#define UTILITY_MINOR_VERSION 1
+#define UTILITY_MAJOR_VERSION 1
+#define UTILITY_MINOR_VERSION 0
 
 void
 Version (
@@ -56,10 +56,7 @@ Returns:
 
 --*/
 {
-  printf ("%s Version %d.%d %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 1999-2014 Intel Corporation. All rights reserved.\n");
-  printf ("\n  The BootSectImage tool prints information or patch destination file by source\n");
-  printf ("  file for BIOS Parameter Block (BPB) or Master Boot Record (MBR).\n");
+  printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 void
@@ -82,6 +79,9 @@ Returns:
 --*/
 {
   Version();
+  printf ("Copyright (c) 1999-2016 Intel Corporation. All rights reserved.\n");
+  printf ("\n  The BootSectImage tool prints information or patch destination file by source\n");
+  printf ("  file for BIOS Parameter Block (BPB) or Master Boot Record (MBR).\n");
   printf ("\nUsage: \n\
    BootSectImage\n\
      [-f, --force force patch even if the FAT type of SrcImage and DstImage mismatch]\n\
