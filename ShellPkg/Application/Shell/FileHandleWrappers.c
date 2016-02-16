@@ -3,7 +3,7 @@
   StdIn, StdOut, StdErr, etc...).
 
   Copyright 2016 Dell Inc.
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1516,6 +1516,10 @@ CreateFileInterfaceMem(
 
   if (Unicode) {
     FileInterface->Buffer = AllocateZeroPool(sizeof(gUnicodeFileTag));
+    if (FileInterface->Buffer == NULL) {
+      FreePool (FileInterface);
+      return NULL;
+    }
     *((CHAR16 *) (FileInterface->Buffer)) = EFI_UNICODE_BYTE_ORDER_MARK;
     FileInterface->BufferSize = 2;
     FileInterface->Position = 2;
