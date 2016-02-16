@@ -438,8 +438,10 @@ res_mkupdrec(int section, const char *dname,
          u_int class, u_int type, u_long ttl) {
     ns_updrec *rrecp = (ns_updrec *)calloc(1, sizeof(ns_updrec));
 
-    if (!rrecp || !(rrecp->r_dname = strdup(dname)))
+    if (!rrecp || !(rrecp->r_dname = strdup(dname))) {
+        free(rrecp);
         return (NULL);
+    }
     rrecp->r_class = (u_int16_t)class;
     rrecp->r_type = (u_int16_t)type;
     rrecp->r_ttl = (u_int32_t)ttl;
