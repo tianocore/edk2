@@ -5,6 +5,7 @@
 #  platform and processor-independent mechanisms for loading and executing EFI
 #  device drivers.
 #
+#  Copyright (c) 2015, The Linux Foundation. All rights reserved.
 #  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,7 +29,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64 IPF AARCH64
 #
 
 [Sources]
@@ -54,6 +55,9 @@
   Ipf/EbcSupport.c
   Ipf/EbcLowLevel.s
 
+[Sources.AARCH64]
+  AArch64/EbcSupport.c
+  AArch64/EbcLowLevel.S
 
 [Packages]
   MdePkg/MdePkg.dec
