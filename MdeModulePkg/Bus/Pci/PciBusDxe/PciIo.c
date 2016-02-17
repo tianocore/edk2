@@ -1744,6 +1744,53 @@ PciIoAttributes (
 }
 
 /**
+  Retrieve the AddrTranslationOffset from RootBridgeIo for the
+  specified range.
+
+  @param RootBridgeIo    Root Bridge IO instance.
+  @param AddrRangeMin    The base address of the MMIO.
+  @param AddrLen         The length of the MMIO.
+
+  @retval The AddrTranslationOffset from RootBridgeIo for the 
+          specified range, or (UINT64) -1 if the range is not
+          found in RootBridgeIo.
+**/
+UINT64
+GetMmioAddressTranslationOffset (
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   *RootBridgeIo,
+  UINT64                            AddrRangeMin,
+  UINT64                            AddrLen
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Configuration;
+
+  Status = RootBridgeIo->Configuration (
+                           RootBridgeIo,
+                           (VOID **) &Configuration
+                           );
+  if (EFI_ERROR (Status)) {
+    return (UINT64) -1;
+  }
+
+  while (Configuration->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
+    if ((Configuration->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) &&
+        (Configuration->AddrRangeMin <= AddrRangeMin) &&
+        (Configuration->AddrRangeMin + Configuration->AddrLen >= AddrRangeMin + AddrLen)
+        ) {
+      return Configuration->AddrTranslationOffset;
+    }
+    Configuration++;
+  }
+
+  //
+  // The resource occupied by BAR should be in the range reported by RootBridge.
+  //
+  ASSERT (FALSE);
+  return (UINT64) -1;
+}
+
+/**
   Gets the attributes that this PCI controller supports setting on a BAR using
   SetBarAttributes(), and retrieves the list of resource descriptors for a BAR.
 
@@ -1867,6 +1914,21 @@ PciIoGetBarAttributes (
     End           = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Descriptor + 1);
     End->Desc     = ACPI_END_TAG_DESCRIPTOR;
     End->Checksum = 0;
+
+    //
+    // Get the Address Translation Offset
+    //
+    if (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
+      Descriptor->AddrTranslationOffset = GetMmioAddressTranslationOffset (
+                                            PciIoDevice->PciRootBridgeIo,
+                                            Descriptor->AddrRangeMin,
+                                            Descriptor->AddrLen
+                                            );
+      if (Descriptor->AddrTranslationOffset == (UINT64) -1) {
+        FreePool (Descriptor);
+        return EFI_UNSUPPORTED;
+      }
+    }
   }
 
   return EFI_SUCCESS;
