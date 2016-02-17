@@ -2,7 +2,7 @@
 # build a platform or a module
 #
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -287,6 +287,7 @@ def LaunchCommand(Command, WorkingDir):
         Proc.wait()
     except: # in case of aborting
         # terminate the threads redirecting the program output
+        EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
         if EndOfProcedure != None:
             EndOfProcedure.set()
         if Proc == None:
