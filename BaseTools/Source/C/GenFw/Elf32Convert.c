@@ -314,7 +314,8 @@ GetSymName (
   UINT8* StrtabContents = (UINT8*)mEhdr + StrtabShdr->sh_offset;
 
   bool foundEnd = false;
-  for (UINT32 i = Sym->st_name; (i < StrtabShdr->sh_size) && !foundEnd; i++) {
+  UINT32 i;
+  for (i = Sym->st_name; (i < StrtabShdr->sh_size) && !foundEnd; i++) {
     foundEnd = StrtabContents[i] == 0;
   }
   assert(foundEnd);
