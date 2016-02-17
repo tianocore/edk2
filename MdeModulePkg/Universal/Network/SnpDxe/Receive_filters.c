@@ -2,7 +2,7 @@
     Implementation of managing the multicast receive filters of a network
     interface.
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under the 
 terms and conditions of the BSD License which accompanies this distribution. The 
 full text of the license may be found at 
@@ -83,7 +83,7 @@ PxeRecvFilterEnable (
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
@@ -171,7 +171,7 @@ PxeRecvFilterDisable (
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
@@ -223,7 +223,7 @@ PxeRecvFilterRead (
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
