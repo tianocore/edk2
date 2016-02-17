@@ -71,6 +71,7 @@
   gEfiHiiConfigAccessProtocolGuid                ## PRODUCES
   gEfiDevicePathProtocolGuid                     ## PRODUCES
   gEfiBlockIoProtocolGuid                        ## PRODUCES
+  gEfiBlockIo2ProtocolGuid                       ## PRODUCES
   gEfiSimpleFileSystemProtocolGuid               ## SOMETIMES_CONSUMES
 
 [Depex]

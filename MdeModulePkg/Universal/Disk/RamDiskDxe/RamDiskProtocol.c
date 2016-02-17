@@ -192,13 +192,15 @@ RamDiskRegister (
   RamDiskInitBlockIo (PrivateData);
 
   //
-  // Install EFI_DEVICE_PATH_PROTOCOL & EFI_BLOCK_IO_PROTOCOL on a new
+  // Install EFI_DEVICE_PATH_PROTOCOL & EFI_BLOCK_IO(2)_PROTOCOL on a new
   // handle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &PrivateData->Handle,
                   &gEfiBlockIoProtocolGuid,
                   &PrivateData->BlockIo,
+                  &gEfiBlockIo2ProtocolGuid,
+                  &PrivateData->BlockIo2,
                   &gEfiDevicePathProtocolGuid,
                   PrivateData->DevicePath,
                   NULL
@@ -313,12 +315,14 @@ RamDiskUnregister (
           (EndingAddr == PrivateData->StartingAddr + PrivateData->Size) &&
           (CompareGuid (&RamDiskDevNode->TypeGuid, &PrivateData->TypeGuid))) {
         //
-        // Uninstall the EFI_DEVICE_PATH_PROTOCOL & EFI_BLOCK_IO_PROTOCOL
+        // Uninstall the EFI_DEVICE_PATH_PROTOCOL & EFI_BLOCK_IO(2)_PROTOCOL
         //
         gBS->UninstallMultipleProtocolInterfaces (
                PrivateData->Handle,
                &gEfiBlockIoProtocolGuid,
                &PrivateData->BlockIo,
+               &gEfiBlockIo2ProtocolGuid,
+               &PrivateData->BlockIo2,
                &gEfiDevicePathProtocolGuid,
                DevicePath,
                NULL

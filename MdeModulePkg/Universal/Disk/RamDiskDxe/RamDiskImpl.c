@@ -173,6 +173,8 @@ UnregisterAllRamDisks (
              PrivateData->Handle,
              &gEfiBlockIoProtocolGuid,
              &PrivateData->BlockIo,
+             &gEfiBlockIo2ProtocolGuid,
+             &PrivateData->BlockIo2,
              &gEfiDevicePathProtocolGuid,
              (EFI_DEVICE_PATH_PROTOCOL *) PrivateData->DevicePath,
              NULL
