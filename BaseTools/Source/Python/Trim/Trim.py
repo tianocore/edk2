@@ -1,7 +1,7 @@
 ## @file
 # Trim files preprocessed by compiler
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -29,7 +29,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 # Version and Copyright
 __version_number__ = ("0.10" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + __version_number__
-__copyright__ = "Copyright (c) 2007-2010, Intel Corporation. All rights reserved."
+__copyright__ = "Copyright (c) 2007-2016, Intel Corporation. All rights reserved."
 
 ## Regular expression for matching Line Control directive like "#line xxx"
 gLineControlDirective = re.compile('^\s*#(?:line)?\s+([0-9]+)\s+"*([^"]*)"')
@@ -37,6 +37,10 @@ gLineControlDirective = re.compile('^\s*#(?:line)?\s+([0-9]+)\s+"*([^"]*)"')
 gTypedefPattern = re.compile("^\s*typedef\s+struct(\s+\w+)?\s*[{]*$", re.MULTILINE)
 ## Regular expression for matching "#pragma pack"
 gPragmaPattern = re.compile("^\s*#pragma\s+pack", re.MULTILINE)
+## Regular expression for matching "typedef"
+gTypedef_SinglePattern = re.compile("^\s*typedef", re.MULTILINE)
+## Regular expression for matching "typedef struct, typedef union, struct, union"
+gTypedef_MulPattern = re.compile("^\s*(typedef)?\s+(struct|union)(\s+\w+)?\s*[{]*$", re.MULTILINE)
 
 #
 # The following number pattern match will only match if following criteria is met:
@@ -206,7 +210,34 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
 
     # in case there's no line directive or linemarker found
     if (not LineControlDirectiveFound) and NewLines == []:
-        NewLines = Lines
+        MulPatternFlag = False
+        SinglePatternFlag = False
+        Brace = 0
+        for Index in range(len(Lines)):
+            Line = Lines[Index]
+            if MulPatternFlag == False and gTypedef_MulPattern.search(Line) == None:
+                if SinglePatternFlag == False and gTypedef_SinglePattern.search(Line) == None:
+                    # remove "#pragram pack" directive
+                    if gPragmaPattern.search(Line) == None:
+                        NewLines.append(Line)
+                    continue
+                elif SinglePatternFlag == False:
+                    SinglePatternFlag = True
+                if Line.find(";") >= 0:
+                    SinglePatternFlag = False
+            elif MulPatternFlag == False:
+                # found "typedef struct, typedef union, union, struct", keep its position and set a flag
+                MulPatternFlag = True
+
+            # match { and } to find the end of typedef definition
+            if Line.find("{") >= 0:
+                Brace += 1
+            elif Line.find("}") >= 0:
+                Brace -= 1
+
+            # "typedef struct, typedef union, union, struct" must end with a ";"
+            if Brace == 0 and Line.find(";") >= 0:
+                MulPatternFlag = False
 
     # save to file
     try:
