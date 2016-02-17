@@ -19,7 +19,7 @@
 
 GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_ACPI_SDT_PROTOCOL  mAcpiSdtProtocolTemplate = {
-  EFI_ACPI_TABLE_VERSION_NONE | EFI_ACPI_TABLE_VERSION_1_0B | ACPI_TABLE_VERSION_GTE_2_0,
+  EFI_ACPI_TABLE_VERSION_NONE,
   GetAcpiTable2,
   RegisterNotify,
   Open,
@@ -1102,6 +1102,7 @@ SdtAcpiTableAcpiSdtConstructor (
 
   InitializeListHead (&AcpiTableInstance->NotifyList);
   CopyMem (&AcpiTableInstance->AcpiSdtProtocol, &mAcpiSdtProtocolTemplate, sizeof(mAcpiSdtProtocolTemplate));
+  AcpiTableInstance->AcpiSdtProtocol.AcpiVersion = (EFI_ACPI_TABLE_VERSION)PcdGet32 (PcdAcpiExposedTableVersions);
 
   //
   // Register event for ExitPmAuth, so that we can uninstall ACPI SDT protocol after ExitPmAuth.
