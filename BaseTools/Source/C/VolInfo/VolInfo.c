@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "OsPath.h"
 #include "ParseGuidedSectionTools.h"
 #include "StringFuncs.h"
+#include "ParseInf.h"
 
 //
 // Utility global variables
@@ -163,6 +164,7 @@ Returns:
   EFI_STATUS                  Status;
   int                         Offset;
   BOOLEAN                     ErasePolarity;
+  UINT64                      LogLevel;
 
   SetUtilityName (UTILITY_NAME);
   //
@@ -175,14 +177,30 @@ Returns:
     __BUILD_VERSION
     );
 
-  //
-  // Save, and then skip filename arg
-  //
-  mUtilityFilename = argv[0];
+  if (argc == 1) {
+    Usage ();
+    return -1;
+  }
+
   argc--;
   argv++;
-
+  LogLevel = 0;
   Offset = 0;
+
+  //
+  // Look for help options
+  //
+  if ((strcmp(argv[0], "-h") == 0) || (strcmp(argv[0], "--help") == 0) ||
+      (strcmp(argv[0], "-?") == 0) || (strcmp(argv[0], "/?") == 0)) {
+    Usage();
+    return  STATUS_SUCCESS;
+  }
+  //
+  // Version has already be printed, so just return success
+  //
+  if (strcmp(argv[0], "--version") == 0) {
+    return  STATUS_SUCCESS;
+  }
 
   //
   // If they specified -x xref guid/basename cross-reference files, process it.
@@ -190,13 +208,15 @@ Returns:
   // -x xref_filename to processdsc, then use xref_filename as a parameter
   // here.
   //
-  while (argc > 2) {
+  while (argc > 0) {
     if ((strcmp(argv[0], "-x") == 0) || (strcmp(argv[0], "--xref") == 0)) {
       ParseGuidBaseNameFile (argv[1]);
       printf("ParseGuidBaseNameFile: %s\n", argv[1]);
       argc -= 2;
       argv += 2;
-    } else if (strcmp(argv[0], "--offset") == 0) {
+      continue;
+    }
+    if (strcmp(argv[0], "--offset") == 0) {
       //
       // Hex or decimal?
       //
@@ -220,38 +240,55 @@ Returns:
 
       argc -= 2;
       argv += 2;
-    } else {
-      Usage ();
-      return -1;
+      continue;
     }
+
+    if ((stricmp (argv[0], "-v") == 0) || (stricmp (argv[0], "--verbose") == 0)) {
+      SetPrintLevel (VERBOSE_LOG_LEVEL);
+      argc --;
+      argv ++;
+      continue;
+    }
+
+    if ((stricmp (argv[0], "-q") == 0) || (stricmp (argv[0], "--quiet") == 0)) {
+      SetPrintLevel (KEY_LOG_LEVEL);
+      argc --;
+      argv ++;
+      continue;
+    }
+
+    if ((stricmp (argv[0], "-d") == 0) || (stricmp (argv[0], "--debug") == 0)) {
+      Status = AsciiStringToUint64 (argv[1], FALSE, &LogLevel);
+      if (EFI_ERROR (Status)) {
+        Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
+        return -1;
+      }
+      if (LogLevel > 9) {
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, current input level is %d", (int) LogLevel);
+        return -1;
+      }
+      SetPrintLevel (LogLevel);
+      DebugMsg (NULL, 0, 9, "Debug Mode Set", "Debug Output Mode Level %s is set!", argv[1]);
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+
+    mUtilityFilename = argv[0];
+    argc --;
+    argv ++;
   }
-  //
-  // Check for proper number of arguments
-  //
-  if (argc != 1) {
-    Usage ();
-    return STATUS_ERROR;
-  }
-  //
-  // Look for help options
-  //
-  if ((strcmp(argv[0], "-h") == 0) || (strcmp(argv[0], "--help") == 0) || 
-      (strcmp(argv[0], "-?") == 0) || (strcmp(argv[0], "/?") == 0)) {
-    Usage();
-    return STATUS_SUCCESS;
-  }
-  //
-  // Version has already been printed, return success.
-  //
-  if (strcmp(argv[0], "--version") == 0) {
-    return STATUS_SUCCESS;
-  }
+
   //
   // Open the file containing the FV
   //
-  InputFile = fopen (LongFilePath (argv[0]), "rb");
+  if (mUtilityFilename == NULL) {
+    Error (NULL, 0, 1001, "Missing option", "Input files are not specified");
+    return GetUtilityStatus ();
+  }
+  InputFile = fopen (LongFilePath (mUtilityFilename), "rb");
   if (InputFile == NULL) {
-    Error (NULL, 0, 0001, "Error opening the input file", argv[0]);
+    Error (NULL, 0, 0001, "Error opening the input file", mUtilityFilename);
     return GetUtilityStatus ();
   }
   //
@@ -266,7 +303,7 @@ Returns:
   //
   Status = ReadHeader (InputFile, &FvSize, &ErasePolarity);
   if (EFI_ERROR (Status)) {
-    Error (NULL, 0, 0003, "error parsing FV image", "%s Header is invalid", argv[0]);
+    Error (NULL, 0, 0003, "error parsing FV image", "%s Header is invalid", mUtilityFilename);
     fclose (InputFile);
     return GetUtilityStatus ();
   }
@@ -286,12 +323,12 @@ Returns:
   BytesRead = fread (FvImage, 1, FvSize, InputFile);
   fclose (InputFile);
   if ((unsigned int) BytesRead != FvSize) {
-    Error (NULL, 0, 0004, "error reading FvImage from", argv[0]);
+    Error (NULL, 0, 0004, "error reading FvImage from", mUtilityFilename);
     free (FvImage);
     return GetUtilityStatus ();
   }
 
-  LoadGuidedSectionToolsTxt (argv[0]);
+  LoadGuidedSectionToolsTxt (mUtilityFilename);
 
   PrintFvInfo (FvImage, FALSE);
 
@@ -1291,8 +1328,7 @@ Returns:
       break;
 
     case EFI_SECTION_USER_INTERFACE:
-      // name = &((EFI_USER_INTERFACE_SECTION *) Ptr)->FileNameString;
-      // printf ("  String: %s\n", &name);
+      printf ("  String: %ls\n", (CHAR16 *) &((EFI_USER_INTERFACE_SECTION *) Ptr)->FileNameString);
       break;
 
     case EFI_SECTION_FIRMWARE_VOLUME_IMAGE:
@@ -1856,15 +1892,26 @@ Returns:
   //
   // Details Option
   //
-  fprintf (stdout, "Options:\n");
-  fprintf (stdout, "  -x xref, --xref xref\n\
-            Parse basename to file-guid cross reference file(s).\n");
-  fprintf (stdout, "  --offset offset\n\
-            Offset of file to start processing FV at.\n");
-  fprintf (stdout, "  --version\n\
-            Display version of this tool and exit.\n");
+  fprintf (stdout, "optional arguments:\n");
   fprintf (stdout, "  -h, --help\n\
-            Show this help message and exit.\n");
-
+            Show this help message and exit\n");
+  fprintf (stdout, "  --version\n\
+           Show program's version number and exit\n");
+  fprintf (stdout, "  -d [DEBUG], --debug [DEBUG]\n\
+            Output DEBUG statements, where DEBUG_LEVEL is 0 (min) - 9 (max)\n");
+  fprintf (stdout, "  -v, --verbose\n\
+            Print informational statements\n");
+  fprintf (stdout, "  -q, --quiet\n\
+            Returns the exit code, error messages will be displayed\n");
+  fprintf (stdout, "  -s, --silent\n\
+            Returns only the exit code; informational and error\n\
+            messages are not displayed\n");
+  fprintf (stdout, "  -x XREF_FILENAME, --xref XREF_FILENAME\n\
+            Parse the basename to file-guid cross reference file(s)\n");
+  fprintf (stdout, "  -f OFFSET, --offset OFFSET\n\
+            The offset from the start of the input file to start \n\
+            processing an FV\n");
+  fprintf (stdout, "  --sfo\n\
+            Reserved for future use\n");
 }
 
