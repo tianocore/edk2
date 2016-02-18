@@ -2,7 +2,7 @@
   Provides interface to shell functionality for shell commands and applications.
 
   Copyright 2016 Dell Inc.
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -4070,6 +4070,9 @@ ShellFileHandleReturnLine(
     }
     Status = ShellFileHandleReadLine(Handle, RetVal, &Size, FALSE, Ascii);
 
+  }
+  if (Status == EFI_END_OF_FILE && *RetVal != CHAR_NULL) {
+    Status = EFI_SUCCESS;
   }
   if (EFI_ERROR(Status) && (RetVal != NULL)) {
     FreePool(RetVal);
