@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1019,6 +1019,7 @@ SmiRendezvous (
   BOOLEAN           BspInProgress;
   UINTN             Index;
   UINTN             Cr2;
+  BOOLEAN           XdDisableFlag;
 
   //
   // Save Cr2 because Page Fault exception in SMM may override its value
@@ -1078,9 +1079,14 @@ SmiRendezvous (
     }
 
     //
-    // Try to enable NX
+    // Try to enable XD
     //
+    XdDisableFlag = FALSE;
     if (mXdSupported) {
+      if ((AsmReadMsr64 (MSR_IA32_MISC_ENABLE) & B_XD_DISABLE_BIT) != 0) {
+        XdDisableFlag = TRUE;
+        AsmMsrAnd64 (MSR_IA32_MISC_ENABLE, ~B_XD_DISABLE_BIT);
+      }
       ActivateXd ();
     }
 
@@ -1152,7 +1158,6 @@ SmiRendezvous (
         // BSP Handler is always called with a ValidSmi == TRUE
         //
         BSPHandler (CpuIndex, mSmmMpSyncData->EffectiveSyncMode);
-
       } else {
         APHandler (CpuIndex, ValidSmi, mSmmMpSyncData->EffectiveSyncMode);
       }
@@ -1165,6 +1170,13 @@ SmiRendezvous (
     //
     while (mSmmMpSyncData->AllCpusInSync) {
       CpuPause ();
+     }
+
+    //
+    // Restore XD
+    //
+    if (XdDisableFlag) {
+      AsmMsrOr64 (MSR_IA32_MISC_ENABLE, B_XD_DISABLE_BIT);
     }
   }
 
