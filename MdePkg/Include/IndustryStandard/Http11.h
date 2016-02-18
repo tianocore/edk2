@@ -3,7 +3,7 @@
 
   This file contains common HTTP 1.1 definitions from RFC 2616 
    
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,6 @@
 ///
 #define HTTP_VERSION        "HTTP/1.1"
 
-
 ///
 /// HTTP Request Method definitions
 /// 
@@ -43,7 +42,11 @@
 #define HTTP_METHOD_CONNECT "CONNECT"
 #define HTTP_METHOD_PATCH   "PATCH"
 
-#define HTTP_METHOD_MAXIMUM_LEN  sizeof ("CONNECT")
+///
+/// Connect method has maximum length according to EFI_HTTP_METHOD defined in
+/// UEFI2.5 spec so use this.
+///
+#define HTTP_METHOD_MAXIMUM_LEN  sizeof (HTTP_METHOD_CONNECT)
 
 ///
 /// Accept Request Header
@@ -106,7 +109,7 @@
 #define HTTP_CONTENT_ENCODING_GZIP     "gzip"      /// Content-Encoding: GNU zip format (described in RFC 1952).
 #define HTTP_CONTENT_ENCODING_COMPRESS "compress"  /// encoding format produced by the common UNIX file compression program "compress". 
 #define HTTP_CONTENT_ENCODING_DEFLATE  "deflate"   /// The "zlib" format defined in RFC 1950 in combination with the "deflate" 
-                                                    /// compression mechanism described in RFC 1951.
+                                                   /// compression mechanism described in RFC 1951.
 
 
 ///
@@ -152,13 +155,37 @@
 
 
 ///
+/// User Agent Request Header
+/// 
+/// The User-Agent request-header field contains information about the user agent originating 
+/// the request. This is for statistical purposes, the tracing of protocol violations, and 
+/// automated recognition of user agents for the sake of tailoring responses to avoid 
+/// particular user agent limitations. User agents SHOULD include this field with requests. 
+/// The field can contain multiple product tokens and comments identifying the agent and any 
+/// subproducts which form a significant part of the user agent. 
+/// By convention, the product tokens are listed in order of their significance for 
+/// identifying the application.
+///
+#define HTTP_HEADER_USER_AGENT         "User-Agent"
+
+///
 /// Host Request Header
 ///
 /// The Host request-header field specifies the Internet host and port number of the resource 
 /// being requested, as obtained from the original URI given by the user or referring resource 
 ///
-#define  HTTP_HEADER_HOST              "Host"
+#define HTTP_HEADER_HOST              "Host"
 
+///
+/// Location Response Header
+/// 
+/// The Location response-header field is used to redirect the recipient to a location other than 
+/// the Request-URI for completion of the request or identification of a new resource. 
+/// For 201 (Created) responses, the Location is that of the new resource which was created by 
+/// the request. For 3xx responses, the location SHOULD indicate the server's preferred URI for 
+/// automatic redirection to the resource. The field value consists of a single absolute URI.
+///
+#define HTTP_HEADER_LOCATION           "Location"
 
 ///
 /// The If-Match request-header field is used with a method to make it conditional.
@@ -170,7 +197,7 @@
 /// to prevent inadvertent modification of the wrong version of a resource. 
 /// As a special case, the value "*" matches any current entity of the resource.
 ///
-#define  HTTP_HEADER_IF_MATCH          "If-Match"
+#define HTTP_HEADER_IF_MATCH          "If-Match"
 
 
 ///
@@ -182,7 +209,7 @@
 /// to prevent a method (e.g. PUT) from inadvertently modifying an existing resource when the 
 /// client believes that the resource does not exist.
 ///
-#define  HTTP_HEADER_IF_NONE_MATCH     "If-None-Match"
+#define HTTP_HEADER_IF_NONE_MATCH     "If-None-Match"
 
 
 
@@ -192,17 +219,22 @@
 /// containing the authentication information of the user agent for
 /// the realm of the resource being requested.
 ///
-#define  HTTP_HEADER_AUTHORIZATION     "Authorization"
+#define HTTP_HEADER_AUTHORIZATION     "Authorization"
 
 ///
 /// ETAG Response Header
 /// The ETag response-header field provides the current value of the entity tag 
 /// for the requested variant. 
 ///
-#define  HTTP_HEADER_ETAG              "ETag"
+#define HTTP_HEADER_ETAG              "ETag"
 
-
-
+///
+/// Custom header field checked by the iLO web server to
+/// specify a client session key.
+/// Example:     X-Auth-Token: 24de6b1f8fa147ad59f6452def628798
+///
+#define  HTTP_HEADER_X_AUTH_TOKEN      "X-Auth-Token"
 
 #pragma pack()
+
 #endif
