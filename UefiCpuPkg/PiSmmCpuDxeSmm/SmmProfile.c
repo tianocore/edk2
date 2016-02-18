@@ -1,7 +1,7 @@
 /** @file
 Enable SMM profile.
 
-Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -928,10 +928,13 @@ InitSmmProfileInternal (
 /**
   Check if XD feature is supported by a processor.
 
+  @param[in,out] Buffer  The pointer to private data buffer.
+
 **/
 VOID
+EFIAPI
 CheckFeatureSupported (
-  VOID
+  IN OUT VOID   *Buffer
   )
 {
   UINT32                 RegEax;
@@ -1001,7 +1004,7 @@ CheckProcessorFeature (
   //
   // Check if XD and BTS are supported on all processors.
   //
-  CheckFeatureSupported ();
+  CheckFeatureSupported (NULL);
 
   //
   //Check on other processors if BSP supports this
@@ -1009,7 +1012,7 @@ CheckProcessorFeature (
   if (mXdSupported || mBtsSupported) {
     MpServices->StartupAllAPs (
                   MpServices,
-                  (EFI_AP_PROCEDURE) CheckFeatureSupported,
+                  CheckFeatureSupported,
                   TRUE,
                   NULL,
                   0,
