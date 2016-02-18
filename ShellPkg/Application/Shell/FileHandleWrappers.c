@@ -160,9 +160,11 @@ FileInterfaceStdOutWrite(
 {
   if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleOut) {
     return (EFI_UNSUPPORTED);
-  } else {
-    return (gST->ConOut->OutputString(gST->ConOut, Buffer));
   }
+  if (*((CHAR16 *)Buffer) == gUnicodeFileTag) {
+    return (gST->ConOut->OutputString(gST->ConOut, (CHAR16 *)Buffer + 1));
+  }
+  return (gST->ConOut->OutputString(gST->ConOut, Buffer));
 }
 
 /**
