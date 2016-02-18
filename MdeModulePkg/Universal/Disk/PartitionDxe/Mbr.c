@@ -12,7 +12,7 @@
         the legacy boot strap code.
 
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -136,7 +136,6 @@ PartitionInstallMbrChildHandles (
   HARDDRIVE_DEVICE_PATH     HdDev;
   HARDDRIVE_DEVICE_PATH     ParentHdDev;
   EFI_STATUS                Found;
-  UINT32                    PartitionNumber;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL  *LastDevicePathNode;
   UINT32                    BlockSize;
@@ -192,8 +191,6 @@ PartitionInstallMbrChildHandles (
     }
   }
 
-  PartitionNumber = 1;
-
   ZeroMem (&HdDev, sizeof (HdDev));
   HdDev.Header.Type     = MEDIA_DEVICE_PATH;
   HdDev.Header.SubType  = MEDIA_HARDDRIVE_DP;
@@ -223,7 +220,7 @@ PartitionInstallMbrChildHandles (
         continue;
       }
 
-      HdDev.PartitionNumber = PartitionNumber ++;
+      HdDev.PartitionNumber = Index + 1;
       HdDev.PartitionStart  = UNPACK_UINT32 (Mbr->Partition[Index].StartingLBA);
       HdDev.PartitionSize   = UNPACK_UINT32 (Mbr->Partition[Index].SizeInLBA);
       CopyMem (HdDev.Signature, &(Mbr->UniqueMbrSignature[0]), sizeof (Mbr->UniqueMbrSignature));
@@ -252,6 +249,7 @@ PartitionInstallMbrChildHandles (
     // It's an extended partition. Follow the extended partition
     // chain to get all the logical drives
     //
+    Index             = 0;
     ExtMbrStartingLba = 0;
 
     do {
@@ -277,7 +275,7 @@ PartitionInstallMbrChildHandles (
         ExtMbrStartingLba = UNPACK_UINT32 (Mbr->Partition[0].StartingLBA);
         continue;
       }
-      HdDev.PartitionNumber = PartitionNumber ++;
+      HdDev.PartitionNumber = ++Index;
       HdDev.PartitionStart  = UNPACK_UINT32 (Mbr->Partition[0].StartingLBA) + ExtMbrStartingLba + ParentHdDev.PartitionStart;
       HdDev.PartitionSize   = UNPACK_UINT32 (Mbr->Partition[0].SizeInLBA);
       if ((HdDev.PartitionStart + HdDev.PartitionSize - 1 >= ParentHdDev.PartitionStart + ParentHdDev.PartitionSize) ||
