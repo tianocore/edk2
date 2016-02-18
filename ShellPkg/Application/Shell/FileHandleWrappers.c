@@ -18,6 +18,8 @@
 #include "Shell.h"
 #include "FileHandleInternal.h"
 
+#define MEM_WRITE_REALLOC_OVERHEAD 1024
+
 /**
   File style interface for console (Open).  
   
@@ -1398,8 +1400,8 @@ FileInterfaceMemWrite(
     // Unicode
     //
     if ((UINTN)(MemFile->Position + (*BufferSize)) > (UINTN)(MemFile->BufferSize)) {
-      MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + (*BufferSize) + 10, MemFile->Buffer);
-      MemFile->BufferSize += (*BufferSize) + 10;
+      MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + (*BufferSize) + MEM_WRITE_REALLOC_OVERHEAD, MemFile->Buffer);
+      MemFile->BufferSize += (*BufferSize) + MEM_WRITE_REALLOC_OVERHEAD;
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, Buffer, *BufferSize);
     MemFile->Position += (*BufferSize);
@@ -1415,8 +1417,8 @@ FileInterfaceMemWrite(
     }
     AsciiSPrint(AsciiBuffer, *BufferSize, "%S", Buffer);
     if ((UINTN)(MemFile->Position + AsciiStrSize(AsciiBuffer)) > (UINTN)(MemFile->BufferSize)) {
-      MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + AsciiStrSize(AsciiBuffer) + 10, MemFile->Buffer);
-      MemFile->BufferSize += AsciiStrSize(AsciiBuffer) + 10;
+      MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + AsciiStrSize(AsciiBuffer) + MEM_WRITE_REALLOC_OVERHEAD, MemFile->Buffer);
+      MemFile->BufferSize += AsciiStrSize(AsciiBuffer) + MEM_WRITE_REALLOC_OVERHEAD;
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, AsciiBuffer, AsciiStrSize(AsciiBuffer));
     MemFile->Position += (*BufferSize / sizeof(CHAR16));
