@@ -2,6 +2,7 @@
   The header files of implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
   Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>  
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,17 +20,10 @@
 #define HTTP_DEFAULT_PORT        80
 #define HTTP_END_OF_HDR_STR      "\r\n\r\n"
 #define HTTP_CRLF_STR            "\r\n"
-#define HTTP_VERSION_STR         "HTTP/1.1"
+#define HTTP_VERSION_STR         HTTP_VERSION
 #define HTTP_VERSION_CRLF_STR    " HTTP/1.1\r\n"
-#define HTTP_GET_STR             "GET "
-#define HTTP_HEAD_STR            "HEAD "
 #define HTTP_ERROR_OR_NOT_SUPPORT_STATUS_CODE         300
 
-//
-// Connect method has maximum length according to EFI_HTTP_METHOD defined in
-// UEFI2.5 spec so use this.
-//
-#define HTTP_MAXIMUM_METHOD_LEN  sizeof ("CONNECT")
 
 /**
   Returns the operational parameters for the current HTTP child instance.

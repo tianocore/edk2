@@ -2,6 +2,7 @@
   Implementation of the boot file download function.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -807,7 +808,7 @@ HttpBootGetBootFile (
   }
   Status = HttpBootSetHeader (
              HttpIoHeader,
-             HTTP_FIELD_NAME_HOST,
+             HTTP_HEADER_HOST,
              HostName
              );
   FreePool (HostName);
@@ -820,7 +821,7 @@ HttpBootGetBootFile (
   //
   Status = HttpBootSetHeader (
              HttpIoHeader,
-             HTTP_FIELD_NAME_ACCEPT,
+             HTTP_HEADER_ACCEPT,
              "*/*"
              );
   if (EFI_ERROR (Status)) {
@@ -832,7 +833,7 @@ HttpBootGetBootFile (
   //
   Status = HttpBootSetHeader (
              HttpIoHeader,
-             HTTP_FIELD_NAME_USER_AGENT,
+             HTTP_HEADER_USER_AGENT,
              HTTP_USER_AGENT_EFI_HTTP_BOOT
              );
   if (EFI_ERROR (Status)) {

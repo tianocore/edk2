@@ -2,6 +2,7 @@
   The header files of the driver binding and service binding protocol for HttpDxe driver.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +18,7 @@
 #define __EFI_HTTP_DRIVER_H__
 
 #include <Uefi.h>
+#include <IndustryStandard/Http11.h>
 
 //
 // Libraries

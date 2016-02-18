@@ -2,7 +2,7 @@
   Miscellaneous routines for HttpDxe driver.
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2023,7 +2023,7 @@ HttpGenRequestString (
   //
   // Calculate HTTP message length.
   //
-  MsgSize = Message->BodyLength + HTTP_MAXIMUM_METHOD_LEN + AsciiStrLen (Url) + 
+  MsgSize = Message->BodyLength + HTTP_METHOD_MAXIMUM_LEN + AsciiStrLen (Url) +
             AsciiStrLen (HTTP_VERSION_CRLF_STR) + HttpHdrSize;
   Request = AllocateZeroPool (MsgSize);
   if (Request == NULL) {
@@ -2036,19 +2036,23 @@ HttpGenRequestString (
   //
   switch (Message->Data.Request->Method) {
   case HttpMethodGet:
-    StrLength = sizeof (HTTP_GET_STR) - 1;
-    CopyMem (RequestPtr, HTTP_GET_STR, StrLength);
+    StrLength = sizeof (HTTP_METHOD_GET) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_GET, StrLength);
     RequestPtr += StrLength;
     break;
   case HttpMethodHead:
-    StrLength = sizeof (HTTP_HEAD_STR) - 1;
-    CopyMem (RequestPtr, HTTP_HEAD_STR, StrLength);
+    StrLength = sizeof (HTTP_METHOD_HEAD) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_HEAD, StrLength);
     RequestPtr += StrLength;
     break;
   default:
     ASSERT (FALSE);
     goto Exit;
   }
+
+  StrLength = AsciiStrLen(" ");
+  CopyMem (RequestPtr, " ", StrLength);
+  RequestPtr += StrLength;
 
   StrLength = AsciiStrLen (Url);
   CopyMem (RequestPtr, Url, StrLength);
