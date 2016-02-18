@@ -1323,6 +1323,7 @@ typedef struct {
   UINT64                Position;
   UINT64                BufferSize;
   BOOLEAN               Unicode;
+  UINT64                FileSize;
 } EFI_FILE_PROTOCOL_MEM;
 
 /**
@@ -1341,7 +1342,7 @@ FileInterfaceMemSetPosition(
   OUT UINT64 Position
   )
 {
-  if (Position <= ((EFI_FILE_PROTOCOL_MEM*)This)->BufferSize) {
+  if (Position <= ((EFI_FILE_PROTOCOL_MEM*)This)->FileSize) {
     ((EFI_FILE_PROTOCOL_MEM*)This)->Position = Position;
     return (EFI_SUCCESS);
   } else {
@@ -1400,6 +1401,7 @@ FileInterfaceMemWrite(
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, Buffer, *BufferSize);
     MemFile->Position += (*BufferSize);
+    MemFile->FileSize = MemFile->Position;
     return (EFI_SUCCESS);
   } else {
     //
@@ -1416,6 +1418,7 @@ FileInterfaceMemWrite(
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, AsciiBuffer, AsciiStrSize(AsciiBuffer));
     MemFile->Position += (*BufferSize / sizeof(CHAR16));
+    MemFile->FileSize = MemFile->Position;
     FreePool(AsciiBuffer);
     return (EFI_SUCCESS);
   }
@@ -1441,8 +1444,8 @@ FileInterfaceMemRead(
   EFI_FILE_PROTOCOL_MEM  *MemFile;
 
   MemFile = (EFI_FILE_PROTOCOL_MEM *) This;
-  if (*BufferSize > (UINTN)((MemFile->BufferSize) - (UINTN)(MemFile->Position))) {
-    (*BufferSize) = (UINTN)((MemFile->BufferSize) - (UINTN)(MemFile->Position));
+  if (*BufferSize > (UINTN)((MemFile->FileSize) - (UINTN)(MemFile->Position))) {
+    (*BufferSize) = (UINTN)((MemFile->FileSize) - (UINTN)(MemFile->Position));
   }
   CopyMem(Buffer, ((UINT8*)MemFile->Buffer) + MemFile->Position, (*BufferSize));
   MemFile->Position = MemFile->Position + (*BufferSize);
