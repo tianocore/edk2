@@ -169,6 +169,14 @@
   # support anything bigger, even if the host hardware does
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
 
+  # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
+  # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
+  # presence of the 32-bit entry point anyway (because many AARCH64 systems
+  # don't have 32-bit addressable physical RAM), and the additional allocations
+  # below 4 GB needlessly fragment the memory map. So expose the 64-bit entry
+  # point only, for entry point versions >= 3.0.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosEntryPointProvideMethod|0x2
+
 [PcdsDynamicDefault.common]
   ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.
