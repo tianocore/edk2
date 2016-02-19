@@ -2,7 +2,7 @@
 Implementation for EFI_HII_FONT_PROTOCOL.
 
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2156,9 +2156,8 @@ HiiStringToImage (
 
 NextLine:
     //
-    // Recalculate the start point of X/Y axis to draw multi-lines with the order of top-to-down
+    // Recalculate the start point of Y axis to draw multi-lines with the order of top-to-down
     //
-    BltX = 0;
     BltY += RowInfo[RowIndex].LineHeight;
 
     RowIndex++;
