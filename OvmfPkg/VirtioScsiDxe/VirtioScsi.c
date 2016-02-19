@@ -470,7 +470,7 @@ VirtioScsiPassThru (
   // caller retry.
   //
   if (VirtioFlush (Dev->VirtIo, VIRTIO_SCSI_REQUEST_QUEUE, &Dev->Ring,
-        &Indices) != EFI_SUCCESS) {
+        &Indices, NULL) != EFI_SUCCESS) {
     Packet->InTransferLength  = 0;
     Packet->OutTransferLength = 0;
     Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OTHER;

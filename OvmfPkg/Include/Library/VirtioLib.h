@@ -2,7 +2,7 @@
 
   Declarations of utility functions used by virtio device drivers.
 
-  Copyright (C) 2012, Red Hat, Inc.
+  Copyright (C) 2012-2016, Red Hat, Inc.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -167,6 +167,12 @@ VirtioAppendDesc (
                           Indices->HeadDescIdx identifies the head descriptor
                           of the descriptor chain.
 
+  @param[out] UsedLen     On success, the total number of bytes, consecutively
+                          across the buffers linked by the descriptor chain,
+                          that the host wrote. May be NULL if the caller
+                          doesn't care, or can compute the same information
+                          from device-specific request structures linked by the
+                          descriptor chain.
 
   @return              Error code from VirtIo->SetQueueNotify() if it fails.
 
@@ -179,7 +185,8 @@ VirtioFlush (
   IN     VIRTIO_DEVICE_PROTOCOL *VirtIo,
   IN     UINT16                 VirtQueueId,
   IN OUT VRING                  *Ring,
-  IN     DESC_INDICES           *Indices
+  IN     DESC_INDICES           *Indices,
+  OUT    UINT32                 *UsedLen    OPTIONAL
   );
 
 #endif // _VIRTIO_LIB_H_

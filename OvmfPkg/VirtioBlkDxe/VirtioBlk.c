@@ -324,7 +324,8 @@ SynchronousRequest (
   //
   // virtio-blk's only virtqueue is #0, called "requestq" (see Appendix D).
   //
-  if (VirtioFlush (Dev->VirtIo, 0, &Dev->Ring, &Indices) == EFI_SUCCESS &&
+  if (VirtioFlush (Dev->VirtIo, 0, &Dev->Ring, &Indices,
+        NULL) == EFI_SUCCESS &&
       HostStatus == VIRTIO_BLK_S_OK) {
     return EFI_SUCCESS;
   }

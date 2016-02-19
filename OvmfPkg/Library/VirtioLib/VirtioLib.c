@@ -2,7 +2,7 @@
 
   Utility functions used by virtio device drivers.
 
-  Copyright (C) 2012, Red Hat, Inc.
+  Copyright (C) 2012-2016, Red Hat, Inc.
   Portion of Copyright (C) 2013, ARM Ltd.
 
   This program and the accompanying materials are licensed and made available
@@ -249,6 +249,12 @@ VirtioAppendDesc (
                           Indices->HeadDescIdx identifies the head descriptor
                           of the descriptor chain.
 
+  @param[out] UsedLen     On success, the total number of bytes, consecutively
+                          across the buffers linked by the descriptor chain,
+                          that the host wrote. May be NULL if the caller
+                          doesn't care, or can compute the same information
+                          from device-specific request structures linked by the
+                          descriptor chain.
 
   @return              Error code from VirtIo->SetQueueNotify() if it fails.
 
@@ -261,10 +267,12 @@ VirtioFlush (
   IN     VIRTIO_DEVICE_PROTOCOL *VirtIo,
   IN     UINT16                 VirtQueueId,
   IN OUT VRING                  *Ring,
-  IN     DESC_INDICES           *Indices
+  IN     DESC_INDICES           *Indices,
+  OUT    UINT32                 *UsedLen    OPTIONAL
   )
 {
   UINT16     NextAvailIdx;
+  UINT16     LastUsedIdx;
   EFI_STATUS Status;
   UINTN      PollPeriodUsecs;
 
@@ -276,6 +284,11 @@ VirtioFlush (
   // head descriptor of any given descriptor chain.
   //
   NextAvailIdx = *Ring->Avail.Idx;
+  //
+  // (Due to our lock-step progress, this is where the host will produce the
+  // used element with the head descriptor's index in it.)
+  //
+  LastUsedIdx = NextAvailIdx;
   Ring->Avail.Ring[NextAvailIdx++ % Ring->QueueSize] =
     Indices->HeadDescIdx % Ring->QueueSize;
 
@@ -315,5 +328,14 @@ VirtioFlush (
   }
 
   MemoryFence();
+
+  if (UsedLen != NULL) {
+    volatile CONST VRING_USED_ELEM *UsedElem;
+
+    UsedElem = &Ring->Used.UsedElem[LastUsedIdx % Ring->QueueSize];
+    ASSERT (UsedElem->Id == Indices->HeadDescIdx);
+    *UsedLen = UsedElem->Len;
+  }
+
   return EFI_SUCCESS;
 }
