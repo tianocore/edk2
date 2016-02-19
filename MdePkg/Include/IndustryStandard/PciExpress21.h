@@ -2,6 +2,7 @@
   Support for the latest PCI standard.
 
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>  
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -90,7 +91,7 @@ typedef struct {
   UINT32                                    CorrectableErrorStatus;
   UINT32                                    CorrectableErrorMask;
   UINT32                                    AdvancedErrorCapabilitiesAndControl;
-  UINT32                                    HeaderLog;
+  UINT32                                    HeaderLog[4];
   UINT32                                    RootErrorCommand;
   UINT32                                    RootErrorStatus;
   UINT16                                    ErrorSourceIdentification;
