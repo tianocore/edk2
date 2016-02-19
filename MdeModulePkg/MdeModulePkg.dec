@@ -1415,8 +1415,10 @@
   # this PCD to be TURE if and only if all runtime driver has seperated Code/Data
   # section. If PE code/data sections are merged, the result is unpredictable.
   #
+  # UEFI 2.6 specification does not recommend to use this BIT0 attribute.
+  #
   # @Prompt Publish UEFI PropertiesTable.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable|TRUE|BOOLEAN|0x0000006e
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable|FALSE|BOOLEAN|0x0000006e
 
   ## Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification.
   # @Prompt Default OEM ID for ACPI table creation.
