@@ -249,7 +249,7 @@ MODULE_FILE_BASE_NAME = ${module_file_base_name}
 BASE_NAME = $(MODULE_NAME)
 MODULE_RELATIVE_DIR = ${module_relative_directory}
 PACKAGE_RELATIVE_DIR = ${package_relative_directory}
-MODULE_DIR = $(WORKSPACE)${separator}${module_relative_directory}
+MODULE_DIR = ${module_dir}
 
 MODULE_ENTRY_POINT = ${module_entry_point}
 ARCH_ENTRY_POINT = ${arch_entry_point}
@@ -584,6 +584,7 @@ cleanlib:
             "module_file"               : self._AutoGenObject.MetaFile.Name,
             "module_file_base_name"     : self._AutoGenObject.MetaFile.BaseName,
             "module_relative_directory" : self._AutoGenObject.SourceDir,
+            "module_dir"                : mws.join (self.Macros["WORKSPACE"], self._AutoGenObject.SourceDir),
             "package_relative_directory": package_rel_dir,
             "module_extra_defines"      : ["%s = %s" % (k, v) for k, v in self._AutoGenObject.Module.Defines.iteritems()],
 
@@ -863,7 +864,7 @@ MODULE_FILE = ${module_file}
 MODULE_FILE_BASE_NAME = ${module_file_base_name}
 BASE_NAME = $(MODULE_NAME)
 MODULE_RELATIVE_DIR = ${module_relative_directory}
-MODULE_DIR = $(WORKSPACE)${separator}${module_relative_directory}
+MODULE_DIR = ${module_dir}
 
 #
 # Build Configuration Macro Definition
@@ -944,7 +945,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
         if self._FileType not in self._AutoGenObject.CustomMakefile:
             EdkLogger.error('build', OPTION_NOT_SUPPORTED, "No custom makefile for %s" % self._FileType,
                             ExtraData="[%s]" % str(self._AutoGenObject))
-        MakefilePath = os.path.join(
+        MakefilePath = mws.join(
                                 self._AutoGenObject.WorkspaceDir,
                                 self._AutoGenObject.CustomMakefile[self._FileType]
                                 )
@@ -987,6 +988,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
             "module_file"               : self._AutoGenObject.MetaFile,
             "module_file_base_name"     : self._AutoGenObject.MetaFile.BaseName,
             "module_relative_directory" : self._AutoGenObject.SourceDir,
+            "module_dir"                : mws.join (self._AutoGenObject.WorkspaceDir, self._AutoGenObject.SourceDir),
 
             "architecture"              : self._AutoGenObject.Arch,
             "toolchain_tag"             : self._AutoGenObject.ToolChain,
