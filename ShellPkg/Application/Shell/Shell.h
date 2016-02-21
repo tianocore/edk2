@@ -2,7 +2,7 @@
   function definitions for internal to shell functions.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,6 +29,7 @@
 #include <Protocol/EfiShellEnvironment2.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/BlockIo.h>
+#include <Protocol/HiiPackageList.h>
 
 #include <Library/BaseLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
@@ -47,6 +48,7 @@
 #include <Library/PrintLib.h>
 #include <Library/HandleParsingLib.h>
 #include <Library/FileHandleLib.h>
+#include <Library/UefiHiiServicesLib.h>
 
 #include "ShellParametersProtocol.h"
 #include "ShellProtocol.h"
@@ -121,6 +123,16 @@ typedef struct {
   VOID                          *CtrlSNotifyHandle4;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
   BOOLEAN                       HaltOutput;           ///< TRUE to start a CTRL-S halt.
 } SHELL_INFO;
+
+#pragma pack(1)
+///
+/// HII specific Vendor Device Path definition.
+///
+typedef struct {
+  VENDOR_DEVICE_PATH             VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL       End;
+} SHELL_MAN_HII_VENDOR_DEVICE_PATH;
+#pragma pack()
 
 extern SHELL_INFO ShellInfoObject;
 
