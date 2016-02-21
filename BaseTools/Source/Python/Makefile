@@ -17,7 +17,7 @@
 
 !IF EXIST ($(PYTHON_FREEZER_PATH)\cxfreeze)
 # Using cx_Freeze 4.2.3 with Python 2.7.2
-FREEZE=$(PYTHON_FREEZER_PATH)\cxfreeze
+FREEZE=$(PYTHON_HOME)\python $(PYTHON_FREEZER_PATH)\cxfreeze
 !ELSE
 # Using cx_Freeze 3.0.3 with Python 2.5.4
 FREEZE=$(PYTHON_FREEZER_PATH)\FreezePython.exe
