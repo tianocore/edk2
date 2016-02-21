@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell MAN file parser.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright 2015 Dell Inc.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,6 +14,38 @@
 **/
 
 #include "Shell.h"
+
+#define SHELL_MAN_HII_GUID \
+{ \
+  0xf62ccd0c, 0x2449, 0x453c, { 0x8a, 0xcb, 0x8c, 0xc5, 0x7c, 0xf0, 0x2a, 0x97 } \
+}
+
+EFI_HII_HANDLE  mShellManHiiHandle    = NULL;
+EFI_HANDLE      mShellManDriverHandle = NULL;
+
+
+SHELL_MAN_HII_VENDOR_DEVICE_PATH  mShellManHiiDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    SHELL_MAN_HII_GUID
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 
 /**
   Convert a Unicode character to upper case only if
@@ -35,6 +67,58 @@ EFIAPI
 InternalShellCharToUpper (
   IN CHAR16  Char
   );
+
+/**
+  Verifies that the filename has .EFI on the end.
+
+  allocates a new buffer and copies the name (appending .EFI if necessary).
+  Caller to free the buffer.
+
+  @param[in] NameString            original name string
+
+  @return                          the new filename with .efi as the extension.
+**/
+CHAR16 *
+EFIAPI
+GetExecuatableFileName (
+  IN CONST CHAR16    *NameString
+  )
+{
+  CHAR16  *Buffer;
+  CHAR16  *SuffixStr;
+  if (NameString == NULL) {
+    return (NULL);
+  }
+
+  //
+  // Fix the file name
+  //
+  if (StrnCmp(NameString+StrLen(NameString)-StrLen(L".efi"), L".efi", StrLen(L".efi"))==0) {
+    Buffer = AllocateCopyPool(StrSize(NameString), NameString);
+  } else if (StrnCmp(NameString+StrLen(NameString)-StrLen(L".man"), L".man", StrLen(L".man"))==0) {
+    Buffer = AllocateCopyPool(StrSize(NameString), NameString);
+    if (Buffer != NULL) {
+      SuffixStr = Buffer+StrLen(Buffer)-StrLen(L".man");
+      StrnCpyS (SuffixStr, StrSize(L".man")/sizeof(CHAR16), L".efi", StrLen(L".efi"));
+    }
+  } else {
+    Buffer = AllocateZeroPool(StrSize(NameString) + StrLen(L".efi")*sizeof(CHAR16));
+    if (Buffer != NULL) {
+      StrnCpyS( Buffer,
+                (StrSize(NameString) + StrLen(L".efi")*sizeof(CHAR16))/sizeof(CHAR16),
+                NameString,
+                StrLen(NameString)
+                );
+      StrnCatS( Buffer,
+                (StrSize(NameString) + StrLen(L".efi")*sizeof(CHAR16))/sizeof(CHAR16),
+                L".efi",
+                StrLen(L".efi")
+                );
+    }
+  }
+  return (Buffer);
+
+}
 
 /**
   Verifies that the filename has .MAN on the end.
@@ -381,7 +465,7 @@ ManFileFindSections(
 
   Upon a sucessful return the caller is responsible to free the memory in *BriefDesc
 
-  @param[in] Handle             Buffer to read from
+  @param[in] Buffer             Buffer to read from
   @param[in] Command            name of command's section to find
   @param[in] BriefDesc          pointer to pointer to string where description goes.
   @param[in] BriefSize          pointer to size of allocated BriefDesc
@@ -404,6 +488,7 @@ ManBufferFindTitleSection(
   CHAR16        *TitleEnd;
   CHAR16        *CurrentLocation;
   UINTN         TitleLength;
+  UINTN         Start;
   CONST CHAR16  StartString[] = L".TH ";
   CONST CHAR16  EndString[]   = L" 0 ";
 
@@ -417,15 +502,26 @@ ManBufferFindTitleSection(
   Status    = EFI_SUCCESS;
 
   //
+  // Do not pass any leading path information that may be present to IsTitleHeader().
+  //
+  Start = StrLen(Command);
+  while ((Start != 0)
+         && (*(Command + Start - 1) != L'\\')
+         && (*(Command + Start - 1) != L'/')
+         && (*(Command + Start - 1) != L':')) {
+    --Start;
+  }
+
+  //
   // more characters for StartString and EndString
   //
-  TitleLength = StrSize(Command) + (StrLen(StartString) + StrLen(EndString)) * sizeof(CHAR16);
+  TitleLength = StrSize(Command + Start) + (StrLen(StartString) + StrLen(EndString)) * sizeof(CHAR16);
   TitleString = AllocateZeroPool(TitleLength);
   if (TitleString == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
   StrCpyS(TitleString, TitleLength/sizeof(CHAR16), StartString);
-  StrCatS(TitleString, TitleLength/sizeof(CHAR16), Command);
+  StrCatS(TitleString, TitleLength/sizeof(CHAR16), Command + Start);
   StrCatS(TitleString, TitleLength/sizeof(CHAR16), EndString);
 
   CurrentLocation = StrStr(*Buffer, TitleString);
@@ -720,13 +816,19 @@ ProcessManFile(
 {
   CHAR16            *TempString;
   SHELL_FILE_HANDLE FileHandle;
+  EFI_HANDLE        CmdFileImgHandle;
   EFI_STATUS        Status;
   UINTN             HelpSize;
   UINTN             BriefSize;
+  UINTN             StringIdWalker;
   BOOLEAN           Ascii;
   CHAR16            *TempString2;
-  EFI_DEVICE_PATH_PROTOCOL  *FileDevPath;
-  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
+  CHAR16            *CmdFileName;
+  CHAR16            *CmdFilePathName;
+  CHAR16            *StringBuff;
+  EFI_DEVICE_PATH_PROTOCOL      *FileDevPath;
+  EFI_DEVICE_PATH_PROTOCOL      *DevPath;
+  EFI_HII_PACKAGE_LIST_HEADER   *PackageListHeader;
 
   if ( ManFileName == NULL
     || Command     == NULL
@@ -735,10 +837,19 @@ ProcessManFile(
     return (EFI_INVALID_PARAMETER);
   }
 
-  HelpSize    = 0;
-  BriefSize   = 0;
-  TempString  = NULL;
-  Ascii       = FALSE;
+  HelpSize          = 0;
+  BriefSize         = 0;
+  StringIdWalker    = 0;
+  TempString        = NULL;
+  Ascii             = FALSE;
+  CmdFileName       = NULL;
+  CmdFilePathName   = NULL;
+  CmdFileImgHandle  = NULL;
+  StringBuff        = NULL;
+  PackageListHeader = NULL;
+  FileDevPath       = NULL;
+  DevPath           = NULL;
+
   //
   // See if it's in HII first
   //
@@ -750,6 +861,9 @@ ProcessManFile(
       Status = ManBufferFindSections(TempString2, Sections, HelpText, &HelpSize);
     }
   } else {
+    //
+    // If the image is a external app, check .MAN file first.
+    //
     FileHandle    = NULL;
     TempString  = GetManFileName(ManFileName);
     if (TempString == NULL) {
@@ -761,8 +875,8 @@ ProcessManFile(
       FileDevPath = FileDevicePath(NULL, TempString);
       DevPath = AppendDevicePath (ShellInfoObject.ImageDevPath, FileDevPath);
       Status = InternalOpenFileDevicePath(DevPath, &FileHandle, EFI_FILE_MODE_READ, 0);
-      FreePool(FileDevPath);
-      FreePool(DevPath);
+      SHELL_FREE_NON_NULL(FileDevPath);
+      SHELL_FREE_NON_NULL(DevPath);
     }
 
     if (!EFI_ERROR(Status)) {
@@ -773,13 +887,127 @@ ProcessManFile(
         Status = ManFileFindSections(FileHandle, Sections, HelpText, &HelpSize, Ascii);
       }
       ShellInfoObject.NewEfiShellProtocol->CloseFile(FileHandle);
-    } else {
-      *HelpText = NULL;
+      if (!EFI_ERROR(Status)) {
+        //
+        // Get help text from .MAN file success.
+        //
+        goto Done;
+      }
     }
+
+    //
+    // Load the app image to check  EFI_HII_PACKAGE_LIST_PROTOCOL.
+    //
+    CmdFileName     = GetExecuatableFileName(TempString);
+    if (CmdFileName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+    //
+    // If the file in CWD then use the file name, else use the full
+    // path name.
+    //
+    CmdFilePathName = ShellFindFilePath(CmdFileName);
+    if (CmdFilePathName == NULL) {
+      Status = EFI_NOT_FOUND;
+      goto Done;
+    }
+    DevPath = ShellInfoObject.NewEfiShellProtocol->GetDevicePathFromFilePath(CmdFilePathName);
+    Status      = gBS->LoadImage(FALSE, gImageHandle, DevPath, NULL, 0, &CmdFileImgHandle);
+    if(EFI_ERROR(Status)) {
+      *HelpText = NULL;
+      goto Done;
+    }
+    Status = gBS->OpenProtocol(
+                    CmdFileImgHandle,
+                    &gEfiHiiPackageListProtocolGuid,
+                    (VOID**)&PackageListHeader,
+                    gImageHandle,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if(EFI_ERROR(Status)) {
+      *HelpText = NULL;
+      goto Done;
+    }
+
+    //
+    // If get package list on image handle, install it on HiiDatabase.
+    //
+    Status = gBS->InstallProtocolInterface (
+                    &mShellManDriverHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mShellManHiiDevicePath
+                    );
+    if (EFI_ERROR(Status)) {
+      goto Done;
+    }
+
+    Status = gHiiDatabase->NewPackageList (
+                            gHiiDatabase,
+                            PackageListHeader,
+                            mShellManDriverHandle,
+                            &mShellManHiiHandle
+                            );
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    StringIdWalker = 1;
+    do {
+        SHELL_FREE_NON_NULL(StringBuff);
+        if (BriefDesc != NULL) {
+          SHELL_FREE_NON_NULL(*BriefDesc);
+        }
+        StringBuff = HiiGetString (mShellManHiiHandle, (EFI_STRING_ID)StringIdWalker, NULL);
+        if (StringBuff == NULL) {
+          Status = EFI_NOT_FOUND;
+          goto Done;
+        }
+        TempString2 = StringBuff;
+        Status = ManBufferFindTitleSection(&TempString2, Command, BriefDesc, &BriefSize);
+        if (!EFI_ERROR(Status) && HelpText != NULL){
+          Status = ManBufferFindSections(TempString2, Sections, HelpText, &HelpSize);
+        }
+        if (!EFI_ERROR(Status)){
+          //
+          // Found what we need and return
+          //
+          goto Done;
+        }
+
+        StringIdWalker += 1;
+    } while (StringIdWalker < 0xFFFF && StringBuff != NULL);
+
   }
-  if (TempString != NULL) {
-    FreePool(TempString);
+
+Done:
+  if (mShellManDriverHandle != NULL) {
+    gBS->UninstallProtocolInterface (
+            mShellManDriverHandle,
+            &gEfiDevicePathProtocolGuid,
+            &mShellManHiiDevicePath
+           );
+    mShellManDriverHandle = NULL;
   }
+
+  if (mShellManHiiHandle != NULL) {
+    HiiRemovePackages (mShellManHiiHandle);
+    mShellManHiiHandle = NULL;
+  }
+
+  if (CmdFileImgHandle != NULL) {
+    Status = gBS->UnloadImage (CmdFileImgHandle);
+  }
+
+  SHELL_FREE_NON_NULL(StringBuff);
+  SHELL_FREE_NON_NULL(TempString);
+  SHELL_FREE_NON_NULL(CmdFileName);
+  SHELL_FREE_NON_NULL(CmdFilePathName);
+  SHELL_FREE_NON_NULL(FileDevPath);
+  SHELL_FREE_NON_NULL(DevPath);
 
   return (Status);
 }
+
