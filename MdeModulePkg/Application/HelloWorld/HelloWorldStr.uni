@@ -1,0 +1,27 @@
+// /** @file
+// Sample UEFI Application Reference EDKII Module.
+//
+// This is a sample shell application that will print "UEFI Hello World!" to the
+// UEFI Console based on PCD setting.
+//
+// It demos how to use EDKII PCD mechanism to make code more flexible.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution. The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// **/
+
+/=#
+
+#langdef en-US "English"
+
+#string STR_HELLO_WORLD_HELP_INFORMATION        #language en-US ""
+".TH HelloWorld 0 "Displays a \"UEFI Hello World!\" string."\r\n"
+".SH NAME\r\n"
+"HelloWorld application.\r\n"

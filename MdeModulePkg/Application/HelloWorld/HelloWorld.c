@@ -2,7 +2,7 @@
   This sample application bases on HelloWorld PCD setting 
   to print "UEFI Hello World!" to the UEFI Console.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,6 +18,15 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
 
+//
+// String token ID of help message text.
+// Shell supports to find help message in the resource section of an application image if
+// .MAN file is not found. This global variable is added to make build tool recognizes
+// that the help string is consumed by user and then build tool will add the string into
+// the resource section. Thus the application can use '-?' option to show help message in
+// Shell.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringHelpTokenId = STRING_TOKEN (STR_HELLO_WORLD_HELP_INFORMATION);
 
 /**
   The user Entry Point for Application. The user code starts with this function
