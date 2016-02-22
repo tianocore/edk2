@@ -42,8 +42,8 @@ GCC_ASM_EXPORT (ArmWriteCpuActlr)
 
 #------------------------------------------------------------------------------
 
-.set DAIF_FIQ_BIT,   (1 << 0)
-.set DAIF_IRQ_BIT,   (1 << 1)
+.set DAIF_RD_FIQ_BIT,   (1 << 6)
+.set DAIF_RD_IRQ_BIT,   (1 << 7)
 
 ASM_PFX(ArmReadMidr):
   mrs     x0, midr_el1        // Read from Main ID Register (MIDR)
@@ -55,18 +55,14 @@ ASM_PFX(ArmCacheInfo):
 
 ASM_PFX(ArmGetInterruptState):
   mrs     x0, daif
-  tst     w0, #DAIF_IRQ_BIT   // Check if IRQ is enabled. Enabled if 0.
-  mov     w0, #0
-  mov     w1, #1
-  csel    w0, w1, w0, ne
+  tst     w0, #DAIF_RD_IRQ_BIT  // Check if IRQ is enabled. Enabled if 0 (Z=1)
+  cset    w0, eq                // if Z=1 return 1, else 0
   ret
 
 ASM_PFX(ArmGetFiqState):
   mrs     x0, daif
-  tst     w0, #DAIF_FIQ_BIT   // Check if FIQ is enabled. Enabled if 0.
-  mov     w0, #0
-  mov     w1, #1
-  csel    w0, w1, w0, ne
+  tst     w0, #DAIF_RD_FIQ_BIT  // Check if FIQ is enabled. Enabled if 0 (Z=1)
+  cset    w0, eq                // if Z=1 return 1, else 0
   ret
 
 ASM_PFX(ArmWriteCpacr):

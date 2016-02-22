@@ -35,12 +35,14 @@ GCC_ASM_EXPORT (ReadCLIDR)
 
 .set MPIDR_U_BIT,    (30)
 .set MPIDR_U_MASK,   (1 << MPIDR_U_BIT)
-.set DAIF_FIQ_BIT,   (1 << 0)
-.set DAIF_IRQ_BIT,   (1 << 1)
-.set DAIF_ABORT_BIT, (1 << 2)
-.set DAIF_DEBUG_BIT, (1 << 3)
-.set DAIF_INT_BITS,  (DAIF_FIQ_BIT | DAIF_IRQ_BIT)
-.set DAIF_ALL,       (DAIF_DEBUG_BIT | DAIF_ABORT_BIT | DAIF_INT_BITS)
+
+// DAIF bit definitions for writing through msr daifclr/sr daifset
+.set DAIF_WR_FIQ_BIT,   (1 << 0)
+.set DAIF_WR_IRQ_BIT,   (1 << 1)
+.set DAIF_WR_ABORT_BIT, (1 << 2)
+.set DAIF_WR_DEBUG_BIT, (1 << 3)
+.set DAIF_WR_INT_BITS,  (DAIF_WR_FIQ_BIT | DAIF_WR_IRQ_BIT)
+.set DAIF_WR_ALL,       (DAIF_WR_DEBUG_BIT | DAIF_WR_ABORT_BIT | DAIF_WR_INT_BITS)
 
 
 ASM_PFX(ArmIsMpCore):
@@ -52,55 +54,55 @@ ASM_PFX(ArmIsMpCore):
 
 
 ASM_PFX(ArmEnableAsynchronousAbort):
-  msr   daifclr, #DAIF_ABORT_BIT
+  msr   daifclr, #DAIF_WR_ABORT_BIT
   isb
   ret
 
 
 ASM_PFX(ArmDisableAsynchronousAbort):
-  msr   daifset, #DAIF_ABORT_BIT
+  msr   daifset, #DAIF_WR_ABORT_BIT
   isb
   ret
 
 
 ASM_PFX(ArmEnableIrq):
-  msr   daifclr, #DAIF_IRQ_BIT
+  msr   daifclr, #DAIF_WR_IRQ_BIT
   isb
   ret
 
 
 ASM_PFX(ArmDisableIrq):
-  msr   daifset, #DAIF_IRQ_BIT
+  msr   daifset, #DAIF_WR_IRQ_BIT
   isb
   ret
 
 
 ASM_PFX(ArmEnableFiq):
-  msr   daifclr, #DAIF_FIQ_BIT
+  msr   daifclr, #DAIF_WR_FIQ_BIT
   isb
   ret
 
 
 ASM_PFX(ArmDisableFiq):
-  msr   daifset, #DAIF_FIQ_BIT
+  msr   daifset, #DAIF_WR_FIQ_BIT
   isb
   ret
 
 
 ASM_PFX(ArmEnableInterrupts):
-  msr   daifclr, #DAIF_INT_BITS
+  msr   daifclr, #DAIF_WR_INT_BITS
   isb
   ret
 
 
 ASM_PFX(ArmDisableInterrupts):
-  msr   daifset, #DAIF_INT_BITS
+  msr   daifset, #DAIF_WR_INT_BITS
   isb
   ret
 
 
 ASM_PFX(ArmDisableAllExceptions):
-  msr   daifset, #DAIF_ALL
+  msr   daifset, #DAIF_WR_ALL
   isb
   ret
 
