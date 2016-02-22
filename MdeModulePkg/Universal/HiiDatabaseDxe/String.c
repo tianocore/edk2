@@ -3,6 +3,7 @@ Implementation for EFI_HII_STRING_PROTOCOL.
 
 
 Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -295,6 +296,7 @@ FindStringBlock (
   ASSERT (StringPackage->Signature == HII_STRING_PACKAGE_SIGNATURE);
 
   CurrentStringId = 1;
+  StringSize = 0;
 
   if (StringId != (EFI_STRING_ID) (-1) && StringId != 0) {
     ASSERT (BlockType != NULL && StringBlockAddr != NULL && StringTextOffset != NULL);
