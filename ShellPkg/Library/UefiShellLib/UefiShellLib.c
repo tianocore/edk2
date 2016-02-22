@@ -4071,7 +4071,7 @@ ShellFileHandleReturnLine(
     Status = ShellFileHandleReadLine(Handle, RetVal, &Size, FALSE, Ascii);
 
   }
-  if (Status == EFI_END_OF_FILE && *RetVal != CHAR_NULL) {
+  if (Status == EFI_END_OF_FILE && RetVal != NULL && *RetVal != CHAR_NULL) {
     Status = EFI_SUCCESS;
   }
   if (EFI_ERROR(Status) && (RetVal != NULL)) {
