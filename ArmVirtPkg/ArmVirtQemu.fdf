@@ -160,6 +160,7 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   INF OvmfPkg/VirtioNetDxe/VirtioNet.inf
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader)

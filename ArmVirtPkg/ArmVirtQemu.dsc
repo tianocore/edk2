@@ -318,6 +318,7 @@
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
