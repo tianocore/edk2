@@ -346,12 +346,6 @@
   OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
-  # ACPI Support
-  #
-  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-
-  #
   # PCI support
   #
   ArmVirtPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
@@ -375,6 +369,13 @@
   MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+
+[Components.AARCH64]
+  #
+  # ACPI Support
+  #
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
 
 [Components.ARM]
   #
