@@ -19,6 +19,7 @@
 .p2align 2
 GCC_ASM_EXPORT(EnableInterrupts)
 
+.set DAIF_WR_IRQ_BIT,   (1 << 1)
 
 #/**
 #  Enables CPU interrupts.
@@ -31,5 +32,5 @@ GCC_ASM_EXPORT(EnableInterrupts)
 #  );
 #
 ASM_PFX(EnableInterrupts):
-    msr  daifclr, #2
+    msr  daifclr, #DAIF_WR_IRQ_BIT
     ret

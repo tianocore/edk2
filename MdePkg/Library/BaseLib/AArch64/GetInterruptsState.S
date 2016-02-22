@@ -19,6 +19,8 @@
 .p2align 2
 GCC_ASM_EXPORT(GetInterruptState)
 
+.set DAIF_RD_IRQ_BIT,   (1 << 7)
+
 #/**
 #  Retrieves the current CPU interrupt state.
 #
@@ -38,8 +40,6 @@ GCC_ASM_EXPORT(GetInterruptState)
 #
 ASM_PFX(GetInterruptState):
     mrs    x0, daif
-    tst    x0, #2            // Check if IRQ is enabled. Enabled if 0.
-    mov    w0, #0
-    mov    w1, #1
-    csel   w0, w1, w0, ne
+    tst    x0, #DAIF_RD_IRQ_BIT   // Check IRQ mask; set Z=1 if clear/unmasked
+    cset   w0, eq                 // if Z=1 (eq) return 1, else 0
     ret
