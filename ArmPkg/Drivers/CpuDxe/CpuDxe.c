@@ -17,8 +17,6 @@
 
 #include <Guid/IdleLoopEvent.h>
 
-BOOLEAN mInterruptState   = FALSE;
-
 
 /**
   This function flushes the range of addresses from Start to Start+Length
@@ -92,7 +90,6 @@ CpuEnableInterrupt (
 {
   ArmEnableInterrupts ();
 
-  mInterruptState  = TRUE;
   return EFI_SUCCESS;
 }
 
@@ -114,7 +111,6 @@ CpuDisableInterrupt (
 {
   ArmDisableInterrupts ();
 
-  mInterruptState = FALSE;
   return EFI_SUCCESS;
 }
 
@@ -143,7 +139,7 @@ CpuGetInterruptState (
     return EFI_INVALID_PARAMETER;
   }
 
-  *State = mInterruptState;
+  *State = ArmGetInterruptState();
   return EFI_SUCCESS;
 }
 
