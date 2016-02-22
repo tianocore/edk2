@@ -73,9 +73,15 @@ TcgConfigDriverEntryPoint (
   if (PrivateData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
+  PrivateData->Configuration = AllocatePool (sizeof (TCG_CONFIGURATION));
+  if (PrivateData->Configuration == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
   PrivateData->TcgProtocol = TcgProtocol;
-  
+
   //
   // Install TCG configuration form
   //

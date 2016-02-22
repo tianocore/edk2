@@ -61,6 +61,7 @@ typedef struct {
   EFI_HII_HANDLE                    HiiHandle;
   EFI_HANDLE                        DriverHandle;  
 
+  TCG_CONFIGURATION                 *Configuration;
   EFI_TCG_PROTOCOL                  *TcgProtocol;
 } TCG_CONFIG_PRIVATE_DATA;
 
