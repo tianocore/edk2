@@ -2449,6 +2449,94 @@ SendDiscardInfoToDriver (
 }
 
 /**
+  When submit the question value, call the callback function with Submitted type
+  to inform the hii driver.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+**/
+VOID
+SubmitCallbackForForm (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form
+  )
+{
+  LIST_ENTRY                  *Link;
+  FORM_BROWSER_STATEMENT      *Question;
+  EFI_IFR_TYPE_VALUE          *TypeValue;
+  EFI_BROWSER_ACTION_REQUEST  ActionRequest;
+
+  if (FormSet->ConfigAccess == NULL) {
+    return;
+  }
+
+  Link = GetFirstNode (&Form->StatementListHead);
+  while (!IsNull (&Form->StatementListHead, Link)) {
+    Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+    Link = GetNextNode (&Form->StatementListHead, Link);
+
+    if (Question->Storage == NULL || Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
+      continue;
+    }
+
+    if ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+       continue;
+    }
+
+    if (Question->Operand == EFI_IFR_PASSWORD_OP) {
+       continue;
+    }
+
+    if (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
+      TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
+    } else {
+      TypeValue = &Question->HiiValue.Value;
+    }
+
+    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    FormSet->ConfigAccess->Callback (
+                             FormSet->ConfigAccess,
+                             EFI_BROWSER_ACTION_SUBMITTED,
+                             Question->QuestionId,
+                             Question->HiiValue.Type,
+                             TypeValue,
+                             &ActionRequest
+                             );
+  }
+}
+
+/**
+  When value set Success, call the submit callback function.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+**/
+VOID
+SubmitCallback (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form
+  )
+{
+  FORM_BROWSER_FORM       *CurrentForm;
+  LIST_ENTRY              *Link;
+
+  if (Form != NULL) {
+    SubmitCallbackForForm(FormSet, Form);
+    return;
+  }
+
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    CurrentForm = FORM_BROWSER_FORM_FROM_LINK (Link);
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+
+    SubmitCallbackForForm(FormSet, CurrentForm);
+  }
+}
+
+/**
   Validate the HiiHandle.
 
   @param  HiiHandle              The input HiiHandle which need to validate.
@@ -3081,6 +3169,11 @@ SubmitForForm (
   //
   ValueChangeResetFlagUpdate(TRUE, FormSet, Form);
 
+  //
+  // 6 Call callback with Submitted type to inform the driver.
+  //
+  SubmitCallback (FormSet, Form);
+
   return Status;
 }
 
@@ -3254,6 +3347,11 @@ SubmitForFormSet (
   // 5. Update the NV flag.
   // 
   ValueChangeResetFlagUpdate(TRUE, FormSet, NULL);
+
+  //
+  // 6. Call callback with Submitted type to inform the driver.
+  //
+  SubmitCallback (FormSet, NULL);
 
   return Status;
 }
