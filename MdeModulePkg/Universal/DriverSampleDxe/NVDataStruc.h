@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -78,6 +78,7 @@ typedef struct {
   UINT8         Field8;
   UINT16        Field16;
   UINT8         OrderedList[3];
+  UINT16        SubmittedCallback;
 } MY_EFI_VARSTORE_DATA;
 
 //

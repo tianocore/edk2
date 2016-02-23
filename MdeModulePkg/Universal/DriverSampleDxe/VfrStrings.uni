@@ -1,6 +1,6 @@
 // *++
 	//
-// Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials                          
 // are licensed and made available under the terms and conditions of the BSD License         
 // which accompanies this distribution.  The full text of the license may be found at        
@@ -271,6 +271,10 @@
                                                      #language fr-FR "When select this option, browser will go to another formset."
 #string STR_DEVICE_PATH                              #language en-US ""
                                                      #language fr-FR ""                                                                                                           
+#string STR_SUBMITTED_CALLBACK_TEST_PROMPT           #language en-US "Submitted callback test"
+                                                     #language fr-FR "Submitted callback test"
+#string STR_SUBMITTED_CALLBACK_TEST_HELP             #language en-US "Change the value and press F10 to submmit will pop up a dialogue to show SUBMITTED Callback has been triggered"
+                                                     #language fr-FR "Change the value and press F10 to submmit will pop up a dialogue to show SUBMITTED Callback has been triggered"
 // Boot Order
 #string STR_BOOT_TITLE                 #language en-US "Boot"
 #string STR_BOOT_OPTIONS               #language en-US "Boot Order"

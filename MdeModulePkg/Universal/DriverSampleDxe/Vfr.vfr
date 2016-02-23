@@ -485,6 +485,16 @@ formset
         help = STRING_TOKEN(STR_TEXT_SECRUITY_TEST_HELP),
         text = STRING_TOKEN(STR_TEXT_SECRUITY_TEST_TEXT);
     endif;
+
+    numeric varid   = MyEfiVar.SubmittedCallback,
+            questionid = 0x1250,
+            prompt  = STRING_TOKEN(STR_SUBMITTED_CALLBACK_TEST_PROMPT),
+            help    = STRING_TOKEN(STR_SUBMITTED_CALLBACK_TEST_HELP),
+            flags   = INTERACTIVE,
+            minimum = 0,
+            maximum = 255,
+            default = 18,
+    endnumeric;
     
     goto 2,
       prompt = STRING_TOKEN(STR_GOTO_FORM2), //SecondSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
