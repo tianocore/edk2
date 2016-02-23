@@ -1,4 +1,4 @@
-cd openssl-1.0.2e
+cd openssl-1.0.2f
 copy e_os2.h                    ..\..\..\Include\openssl
 copy crypto\crypto.h            ..\..\..\Include\openssl
 copy crypto\opensslv.h          ..\..\..\Include\openssl
