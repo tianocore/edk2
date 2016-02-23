@@ -72,8 +72,6 @@ CoreGetMemoryMapPropertiesTable (
 
 extern EFI_PROPERTIES_TABLE  mPropertiesTable;
 
-BOOLEAN         mIsConstructingMemoryAttributesTable = FALSE;
-
 /**
   Install MemoryAttributesTable.
 
@@ -104,8 +102,6 @@ InstallMemoryAttributesTable (
     DEBUG ((EFI_D_VERBOSE, "because Runtime Driver Section Alignment is not %dK.\n", EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT >> 10));
     return ;
   }
-
-  mIsConstructingMemoryAttributesTable = TRUE;
 
   MemoryMapSize = 0;
   MemoryMap = NULL;
@@ -181,8 +177,6 @@ InstallMemoryAttributesTable (
 
   Status = gBS->InstallConfigurationTable (&gEfiMemoryAttributesTableGuid, MemoryAttributesTable);
   ASSERT_EFI_ERROR (Status);
-
-  mIsConstructingMemoryAttributesTable = FALSE;
 }
 
 /**
