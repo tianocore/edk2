@@ -1,7 +1,7 @@
 diff U3 crypto/bio/bio.h crypto/bio/bio.h
---- crypto/bio/bio.h	Thu Jun 11 21:50:12 2015
-+++ crypto/bio/bio.h	Fri Jun 12 11:00:52 2015
-@@ -646,10 +646,10 @@
+--- crypto/bio/bio.h	Thu Jan 28 21:56:08 2016
++++ crypto/bio/bio.h	Wed Feb 17 16:43:40 2016
+@@ -650,10 +650,10 @@
  int BIO_asn1_get_suffix(BIO *b, asn1_ps_func **psuffix,
                          asn1_ps_func **psuffix_free);
  
@@ -14,8 +14,8 @@ diff U3 crypto/bio/bio.h crypto/bio/bio.h
  # endif
  BIO *BIO_new(BIO_METHOD *type);
 diff U3 crypto/bio/bss_file.c crypto/bio/bss_file.c
---- crypto/bio/bss_file.c	Thu Jun 11 21:01:06 2015
-+++ crypto/bio/bss_file.c	Fri Jun 12 11:01:28 2015
+--- crypto/bio/bss_file.c	Thu Jan 28 21:38:30 2016
++++ crypto/bio/bss_file.c	Wed Feb 17 16:01:02 2016
 @@ -467,6 +467,23 @@
      return (ret);
  }
@@ -41,8 +41,8 @@ diff U3 crypto/bio/bss_file.c crypto/bio/bss_file.c
  
  #endif                          /* HEADER_BSS_FILE_C */
 diff U3 crypto/dh/dh_pmeth.c crypto/dh/dh_pmeth.c
---- crypto/dh/dh_pmeth.c	Thu Jun 11 21:50:12 2015
-+++ crypto/dh/dh_pmeth.c	Fri Jun 12 11:08:48 2015
+--- crypto/dh/dh_pmeth.c	Thu Jan 28 21:56:08 2016
++++ crypto/dh/dh_pmeth.c	Wed Feb 17 16:15:58 2016
 @@ -449,6 +449,9 @@
          *keylen = ret;
          return 1;
@@ -62,8 +62,8 @@ diff U3 crypto/dh/dh_pmeth.c crypto/dh/dh_pmeth.c
      return 1;
  }
 diff U3 crypto/pem/pem.h crypto/pem/pem.h
---- crypto/pem/pem.h	Thu Jun 11 21:50:12 2015
-+++ crypto/pem/pem.h	Fri Jun 12 10:58:18 2015
+--- crypto/pem/pem.h	Thu Jan 28 21:56:08 2016
++++ crypto/pem/pem.h	Wed Feb 17 15:56:26 2016
 @@ -324,6 +324,7 @@
  
  #  define DECLARE_PEM_read_fp(name, type) /**/
@@ -73,8 +73,8 @@ diff U3 crypto/pem/pem.h crypto/pem/pem.h
  # else
  
 diff U3 crypto/pkcs7/pk7_smime.c crypto/pkcs7/pk7_smime.c
---- crypto/pkcs7/pk7_smime.c	Thu Jun 11 21:01:06 2015
-+++ crypto/pkcs7/pk7_smime.c	Fri Jun 12 11:23:38 2015
+--- crypto/pkcs7/pk7_smime.c	Thu Jan 28 21:56:08 2016
++++ crypto/pkcs7/pk7_smime.c	Wed Feb 17 16:22:45 2016
 @@ -254,7 +254,8 @@
      STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
      PKCS7_SIGNER_INFO *si;
@@ -114,20 +114,19 @@ diff U3 crypto/pkcs7/pk7_smime.c crypto/pkcs7/pk7_smime.c
          if (i <= 0)
              break;
          if (tmpout)
-@@ -394,6 +394,10 @@
+@@ -394,6 +394,9 @@
      }
      BIO_free_all(p7bio);
      sk_X509_free(signers);
-+
 +    if (buf != NULL) {
-+      OPENSSL_free(buf);
++        OPENSSL_free(buf);
 +    }
      return ret;
  }
  
 diff U3 crypto/rand/rand_unix.c crypto/rand/rand_unix.c
---- crypto/rand/rand_unix.c	Thu Jun 11 21:01:06 2015
-+++ crypto/rand/rand_unix.c	Fri Jun 12 10:51:21 2015
+--- crypto/rand/rand_unix.c	Thu Jan 28 21:38:32 2016
++++ crypto/rand/rand_unix.c	Wed Feb 17 15:40:02 2016
 @@ -116,7 +116,7 @@
  #include <openssl/rand.h>
  #include "rand_lcl.h"
@@ -147,8 +146,8 @@ diff U3 crypto/rand/rand_unix.c crypto/rand/rand_unix.c
  {
      return 0;
 diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
---- crypto/rsa/rsa_ameth.c	Thu Jun 11 21:50:12 2015
-+++ crypto/rsa/rsa_ameth.c	Fri Jun 12 10:45:38 2015
+--- crypto/rsa/rsa_ameth.c	Thu Jan 28 21:56:08 2016
++++ crypto/rsa/rsa_ameth.c	Wed Feb 17 15:09:46 2016
 @@ -68,10 +68,12 @@
  #endif
  #include "asn1_locl.h"
@@ -221,8 +220,8 @@ diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
  const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
      {
 diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
---- crypto/x509/x509_vfy.c	Thu Jun 11 21:52:58 2015
-+++ crypto/x509/x509_vfy.c	Fri Jun 12 11:29:37 2015
+--- crypto/x509/x509_vfy.c	Thu Jan 28 21:56:08 2016
++++ crypto/x509/x509_vfy.c	Wed Feb 17 16:09:58 2016
 @@ -940,6 +940,8 @@
          ctx->current_crl = crl;
      if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
@@ -242,8 +241,8 @@ diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
          ptime = NULL;
  
 diff U3 crypto/x509/x509_vfy.h crypto/x509/x509_vfy.h
---- crypto/x509/x509_vfy.h	Thu Jul 09 19:57:16 2015
-+++ crypto/x509/x509_vfy.h	Thu Oct 29 14:05:57 2015
+--- crypto/x509/x509_vfy.h	Thu Jan 28 21:56:08 2016
++++ crypto/x509/x509_vfy.h	Wed Feb 17 16:08:18 2016
 @@ -438,6 +438,8 @@
   * will force the behaviour to match that of previous versions.
   */
@@ -254,8 +253,8 @@ diff U3 crypto/x509/x509_vfy.h crypto/x509/x509_vfy.h
  # define X509_VP_FLAG_DEFAULT                    0x1
  # define X509_VP_FLAG_OVERWRITE                  0x2
 diff U3 crypto/x509v3/ext_dat.h crypto/x509v3/ext_dat.h
---- crypto/x509v3/ext_dat.h	Thu Jun 11 21:50:12 2015
-+++ crypto/x509v3/ext_dat.h	Fri Jun 12 11:11:03 2015
+--- crypto/x509v3/ext_dat.h	Thu Jan 28 21:56:08 2016
++++ crypto/x509v3/ext_dat.h	Wed Feb 17 16:13:30 2016
 @@ -127,8 +127,10 @@
      &v3_idp,
      &v3_alt[2],
@@ -268,8 +267,8 @@ diff U3 crypto/x509v3/ext_dat.h crypto/x509v3/ext_dat.h
  
  /* Number of standard extensions */
 diff U3 crypto/crypto.h crypto/crypto.h
---- crypto/crypto.h	Thu Jun 11 21:01:06 2015
-+++ crypto/crypto.h	Fri Jun 12 11:33:27 2015
+--- crypto/crypto.h	Thu Jan 28 21:38:30 2016
++++ crypto/crypto.h	Wed Feb 17 16:33:00 2016
 @@ -235,15 +235,15 @@
  # ifndef OPENSSL_NO_LOCKING
  #  ifndef CRYPTO_w_lock
@@ -353,8 +352,8 @@ diff U3 crypto/crypto.h crypto/crypto.h
  
  # else
 diff U3 crypto/opensslconf.h crypto/opensslconf.h
---- crypto/opensslconf.h	Thu Jun 11 21:55:38 2015
-+++ crypto/opensslconf.h	Fri Jun 12 10:28:27 2015
+--- crypto/opensslconf.h	Thu Jan 28 21:57:22 2016
++++ crypto/opensslconf.h	Wed Feb 17 14:58:26 2016
 @@ -5,15 +5,72 @@
  extern "C" {
  #endif
@@ -675,8 +674,8 @@ diff U3 crypto/opensslconf.h crypto/opensslconf.h
  #undef BN_LLONG
  
 diff U3 e_os.h e_os.h
---- e_os.h	Thu Jul 09 19:57:16 2015
-+++ e_os.h	Thu Oct 29 16:54:10 2015
+--- e_os.h	Thu Jan 28 21:56:08 2016
++++ e_os.h	Wed Feb 17 15:52:08 2016
 @@ -136,7 +136,7 @@
  #  define MSDOS
  # endif
@@ -687,8 +686,8 @@ diff U3 e_os.h e_os.h
  # endif
  
 diff U3 e_os2.h e_os2.h
---- e_os2.h	Thu Jul 09 19:57:16 2015
-+++ e_os2.h	Thu Oct 29 15:08:19 2015
+--- e_os2.h	Thu Jan 28 21:56:08 2016
++++ e_os2.h	Wed Feb 17 15:53:08 2016
 @@ -97,7 +97,14 @@
   * For 32 bit environment, there seems to be the CygWin environment and then
   * all the others that try to do the same thing Microsoft does...
