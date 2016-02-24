@@ -217,6 +217,7 @@ INF  OvmfPkg/BlockMmioToBlockIoDxe/BlockIo.inf
 INF  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
 INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 INF  OvmfPkg/XenIoPciDxe/XenIoPciDxe.inf
 INF  OvmfPkg/XenBusDxe/XenBusDxe.inf
 INF  OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
