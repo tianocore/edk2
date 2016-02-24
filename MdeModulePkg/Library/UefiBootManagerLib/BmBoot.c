@@ -1528,6 +1528,136 @@ BmExpandMediaDevicePath (
 }
 
 /**
+  Check whether Left and Right are the same without matching the specific
+  device path data in IP device path and URI device path node.
+
+  @retval TRUE  Left and Right are the same.
+  @retval FALSE Left and Right are the different.
+**/
+BOOLEAN
+BmMatchHttpBootDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL *Left,
+  IN EFI_DEVICE_PATH_PROTOCOL *Right
+  )
+{
+  for (;  !IsDevicePathEnd (Left) && !IsDevicePathEnd (Right)
+       ;  Left = NextDevicePathNode (Left), Right = NextDevicePathNode (Right)
+       ) {
+    if (CompareMem (Left, Right, DevicePathNodeLength (Left)) != 0) {
+      if ((DevicePathType (Left) != MESSAGING_DEVICE_PATH) || (DevicePathType (Right) != MESSAGING_DEVICE_PATH)) {
+        return FALSE;
+      }
+
+      if (((DevicePathSubType (Left) != MSG_IPv4_DP) || (DevicePathSubType (Right) != MSG_IPv4_DP)) &&
+          ((DevicePathSubType (Left) != MSG_IPv6_DP) || (DevicePathSubType (Right) != MSG_IPv6_DP)) &&
+          ((DevicePathSubType (Left) != MSG_URI_DP)  || (DevicePathSubType (Right) != MSG_URI_DP))
+          ) {
+        return FALSE;
+      }
+    }
+  }
+  return (BOOLEAN) (IsDevicePathEnd (Left) && IsDevicePathEnd (Right));
+}
+
+/**
+  Get the file buffer from Load File instance.
+
+  @param FilePath    The media device path pointing to a LoadFile instance.
+  @param FullPath    Return the full device path pointing to the load option.
+  @param FileSize    Return the size of the load option.
+
+  @return  The load option buffer.
+**/
+VOID *
+BmGetFileBufferFromLoadFile (
+  IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
+  OUT UINTN                           *FileSize
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      Handle;
+  VOID                            *FileBuffer;
+  EFI_HANDLE                      *Handles;
+  UINTN                           HandleCount;
+  UINTN                           Index;
+  EFI_DEVICE_PATH_PROTOCOL        *Node;
+  EFI_LOAD_FILE_PROTOCOL          *LoadFile;
+  UINTN                           BufferSize;
+
+  //
+  // Get file buffer from load file instance.
+  //
+  Node = FilePath;
+  Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);
+  if (!EFI_ERROR (Status) && IsDevicePathEnd (Node)) {
+    //
+    // When wide match happens, pass full device path to LoadFile (),
+    // otherwise, pass remaining device path to LoadFile ().
+    //
+    FilePath = Node;
+  } else {
+    Handle = NULL;
+    //
+    // Use wide match algorithm to find one when
+    //  cannot find a LoadFile instance to exactly match the FilePath
+    //
+    Status = gBS->LocateHandleBuffer (
+                    ByProtocol,
+                    &gEfiLoadFileProtocolGuid,
+                    NULL,
+                    &HandleCount,
+                    &Handles
+                    );
+    if (EFI_ERROR (Status)) {
+      Handles = NULL;
+      HandleCount = 0;
+    }
+    for (Index = 0; Index < HandleCount; Index++) {
+      if (BmMatchHttpBootDevicePath (DevicePathFromHandle (Handles[Index]), FilePath)) {
+        Handle = Handles[Index];
+        break;
+      }
+    }
+    if (Handles != NULL) {
+      FreePool (Handles);
+    }
+  }
+
+  if (Handle == NULL) {
+    return NULL;
+  }
+
+  Status = gBS->HandleProtocol (Handle, &gEfiLoadFileProtocolGuid, (VOID **) &LoadFile);
+  ASSERT_EFI_ERROR (Status);
+
+  BufferSize = 0;
+  FileBuffer = NULL;
+  Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    FileBuffer = AllocatePool (BufferSize);
+    if (FileBuffer != NULL) {
+      Status = EFI_SUCCESS;
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
+    Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // LoadFile () may cause the device path of the Handle be updated.
+    //
+    *FullPath = DuplicateDevicePath (DevicePathFromHandle (Handle));
+    *FileSize = BufferSize;
+    return FileBuffer;
+  } else {
+    return NULL;
+  }
+}
+
+/**
   Get the load option by its device path.
 
   @param FilePath  The device path pointing to a load option.
@@ -1622,24 +1752,19 @@ BmGetLoadOptionBuffer (
   }
 
   //
-  // Directly reads the load option when it doesn't reside in simple file system instance (LoadFile/LoadFile2),
-  //   or it directly points to a file in simple file system instance.
+  // Get file buffer from simple file system.
   //
   Node   = FilePath;
-  Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);
-  FileBuffer = GetFileBufferByFilePath (TRUE, FilePath, FileSize, &AuthenticationStatus);
-  if (FileBuffer != NULL) {
-    if (EFI_ERROR (Status)) {
+  Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &Node, &Handle);
+  if (!EFI_ERROR (Status)) {
+    FileBuffer = GetFileBufferByFilePath (TRUE, FilePath, FileSize, &AuthenticationStatus);
+    if (FileBuffer != NULL) {
       *FullPath = DuplicateDevicePath (FilePath);
-    } else {
-      //
-      // LoadFile () may cause the device path of the Handle be updated.
-      //
-      *FullPath = AppendDevicePath (DevicePathFromHandle (Handle), Node);
     }
+    return FileBuffer;
   }
 
-  return FileBuffer;
+  return BmGetFileBufferFromLoadFile (FilePath, FullPath, FileSize);
 }
 
 /**
