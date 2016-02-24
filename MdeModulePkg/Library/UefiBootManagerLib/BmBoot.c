@@ -1231,6 +1231,14 @@ BmExpandUriDevicePath (
     }
 
     if (!EFI_ERROR (Status)) {
+      //
+      // LoadFile() returns a file buffer mapping to a file system.
+      //
+      if (Status == EFI_WARN_FILE_SYSTEM) {
+        return BmGetFileBufferFromLoadFileFileSystem (Handles[Index], FullPath, FileSize);
+      }
+
+      ASSERT (Status == EFI_SUCCESS);
       *FullPath = DuplicateDevicePath (DevicePathFromHandle (Handles[Index]));
       break;
     }
@@ -1626,6 +1634,62 @@ BmMatchHttpBootDevicePath (
 }
 
 /**
+  Get the file buffer from the file system produced by Load File instance.
+
+  @param LoadFileHandle The handle of LoadFile instance.
+  @param FullPath       Return the full device path pointing to the load option.
+  @param FileSize       Return the size of the load option.
+
+  @return  The load option buffer.
+**/
+VOID *
+BmGetFileBufferFromLoadFileFileSystem (
+  IN  EFI_HANDLE                      LoadFileHandle,
+  OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
+  OUT UINTN                           *FileSize
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      Handle;
+  EFI_HANDLE                      *Handles;
+  UINTN                           HandleCount;
+  UINTN                           Index;
+  EFI_DEVICE_PATH_PROTOCOL        *Node;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiBlockIoProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &Handles
+                  );
+  if (EFI_ERROR (Status)) {
+    Handles = NULL;
+    HandleCount = 0;
+  }
+  for (Index = 0; Index < HandleCount; Index++) {
+    Node = DevicePathFromHandle (Handles[Index]);
+    Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);
+    if (!EFI_ERROR (Status) &&
+        (Handle == LoadFileHandle) &&
+        (DevicePathType (Node) == MEDIA_DEVICE_PATH) && (DevicePathSubType (Node) == MEDIA_RAM_DISK_DP)) {
+      Handle = Handles[Index];
+      break;
+    }
+  }
+
+  if (Handles != NULL) {
+    FreePool (Handles);
+  }
+
+  if (Index != HandleCount) {
+    return BmExpandMediaDevicePath (DevicePathFromHandle (Handle), FullPath, FileSize);
+  } else {
+    return NULL;
+  }
+}
+
+/**
   Get the file buffer from Load File instance.
 
   @param FilePath    The media device path pointing to a LoadFile instance.
@@ -1712,6 +1776,14 @@ BmGetFileBufferFromLoadFile (
   }
 
   if (!EFI_ERROR (Status)) {
+    //
+    // LoadFile() returns a file buffer mapping to a file system.
+    //
+    if (Status == EFI_WARN_FILE_SYSTEM) {
+      return BmGetFileBufferFromLoadFileFileSystem (Handle, FullPath, FileSize);
+    }
+
+    ASSERT (Status == EFI_SUCCESS);
     //
     // LoadFile () may cause the device path of the Handle be updated.
     //

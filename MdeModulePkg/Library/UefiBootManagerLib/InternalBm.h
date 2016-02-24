@@ -1,7 +1,7 @@
 /** @file
   BDS library definition, include the file and data structure
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -456,4 +456,20 @@ BmCharToUint (
   IN CHAR16                           Char
   );
 
+
+/**
+  Get the file buffer from the file system produced by Load File instance.
+
+  @param LoadFileHandle The handle of LoadFile instance.
+  @param FullPath       Return the full device path pointing to the load option.
+  @param FileSize       Return the size of the load option.
+
+  @return  The load option buffer.
+**/
+VOID *
+BmGetFileBufferFromLoadFileFileSystem (
+  IN  EFI_HANDLE                      LoadFileHandle,
+  OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
+  OUT UINTN                           *FileSize
+  );
 #endif // _INTERNAL_BM_H_
