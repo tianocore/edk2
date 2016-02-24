@@ -1182,6 +1182,72 @@ BmExpandFileDevicePath (
 }
 
 /**
+  Expand URI device path node to be full device path in platform.
+
+  @param FilePath      The device path pointing to a load option.
+                       It could be a short-form device path.
+  @param FullPath      Return the full device path of the load option after
+                       short-form device path expanding.
+                       Caller is responsible to free it.
+  @param FileSize      Return the load option size.
+
+  @return The load option buffer. Caller is responsible to free the memory.
+**/
+VOID *
+BmExpandUriDevicePath (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL    **FullPath,
+  OUT UINTN                       *FileSize
+  )
+{
+  EFI_STATUS                      Status;
+  UINTN                           Index;
+  UINTN                           HandleCount;
+  EFI_HANDLE                      *Handles;
+  EFI_LOAD_FILE_PROTOCOL          *LoadFile;
+  VOID                            *FileBuffer;
+
+  EfiBootManagerConnectAll ();
+  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiLoadFileProtocolGuid, NULL, &HandleCount, &Handles);
+  if (EFI_ERROR (Status)) {
+    HandleCount = 0;
+    Handles = NULL;
+  }
+
+  FileBuffer = NULL;
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (Handles[Index], &gEfiLoadFileProtocolGuid, (VOID *) &LoadFile);
+    ASSERT_EFI_ERROR (Status);
+
+    FileBuffer = NULL;
+    Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, FileSize, FileBuffer);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      FileBuffer = AllocatePool (*FileSize);
+      if (FileBuffer == NULL) {
+        break;
+      }
+      Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, FileSize, FileBuffer);
+    }
+
+    if (!EFI_ERROR (Status)) {
+      *FullPath = DuplicateDevicePath (DevicePathFromHandle (Handles[Index]));
+      break;
+    }
+
+    if (FileBuffer != NULL) {
+      FreePool (FileBuffer);
+    }
+  }
+
+  if (Handles != NULL) {
+    FreePool (Handles);
+  }
+
+  return FileBuffer;
+}
+
+/**
   Save the partition DevicePath to the CachedDevicePath as the first instance.
 
   @param CachedDevicePath  The device path cache.
@@ -1718,6 +1784,12 @@ BmGetLoadOptionBuffer (
     // Expand the File-path device path
     //
     return BmExpandFileDevicePath (FilePath, FullPath, FileSize);
+  } else if ((DevicePathType (FilePath) == MESSAGING_DEVICE_PATH) &&
+             (DevicePathSubType (FilePath) == MSG_URI_DP)) {
+    //
+    // Expand the URI device path
+    //
+    return BmExpandUriDevicePath (FilePath, FullPath, FileSize);
   } else {
     for (Node = FilePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
       if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) &&
