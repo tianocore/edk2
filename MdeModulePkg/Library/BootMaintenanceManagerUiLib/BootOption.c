@@ -248,7 +248,6 @@ BOpt_GetBootOptions (
   UINTN                         Index;
   UINT16                        BootString[10];
   UINT8                         *LoadOptionFromVar;
-  UINT8                         *LoadOption;
   UINTN                         BootOptionSize;
   BOOLEAN                       BootNextFlag;
   UINT16                        *BootOrderList;
@@ -312,14 +311,6 @@ BOpt_GetBootOptions (
       continue;
     }
 
-    LoadOption = AllocateZeroPool (BootOptionSize);
-    if (LoadOption == NULL) {
-      continue;
-    }
-
-    CopyMem (LoadOption, LoadOptionFromVar, BootOptionSize);
-    FreePool (LoadOptionFromVar);
-
     if (BootNext != NULL) {
       BootNextFlag = (BOOLEAN) (*BootNext == BootOrderList[Index]);
     } else {
@@ -331,8 +322,8 @@ BOpt_GetBootOptions (
 
     NewLoadContext                      = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
 
-    LoadOptionPtr                       = LoadOption;
-    LoadOptionEnd                       = LoadOption + BootOptionSize;
+    LoadOptionPtr                       = LoadOptionFromVar;
+    LoadOptionEnd                       = LoadOptionFromVar + BootOptionSize;
 
     NewMenuEntry->OptionNumber          = BootOrderList[Index];
     NewLoadContext->Deleted             = FALSE;
@@ -341,7 +332,7 @@ BOpt_GetBootOptions (
     //
     // Is a Legacy Device?
     //
-    Ptr = (UINT8 *) LoadOption;
+    Ptr = (UINT8 *) LoadOptionFromVar;
 
     //
     // Attribute = *(UINT32 *)Ptr;
@@ -423,6 +414,7 @@ BOpt_GetBootOptions (
 
     InsertTailList (&BootOptionMenu.Head, &NewMenuEntry->Link);
     MenuCount++;
+    FreePool (LoadOptionFromVar);
   }
   EfiBootManagerFreeLoadOptions (BootOption, BootOptionCount);
 
@@ -433,7 +425,6 @@ BOpt_GetBootOptions (
     FreePool (BootOrderList);
   }
 
-  FreePool(LoadOption);
   BootOptionMenu.MenuNumber = MenuCount;
   return EFI_SUCCESS;
 }
@@ -643,7 +634,6 @@ BOpt_GetDriverOptions (
   UINTN           Index;
   UINT16          DriverString[12];
   UINT8           *LoadOptionFromVar;
-  UINT8           *LoadOption;
   UINTN           DriverOptionSize;
 
   UINT16          *DriverOrderList;
@@ -684,13 +674,6 @@ BOpt_GetDriverOptions (
       continue;
     }
 
-    LoadOption = AllocateZeroPool (DriverOptionSize);
-    if (LoadOption == NULL) {
-      continue;
-    }
-
-    CopyMem (LoadOption, LoadOptionFromVar, DriverOptionSize);
-    FreePool (LoadOptionFromVar);
 
     NewMenuEntry = BOpt_CreateMenuEntry (BM_LOAD_CONTEXT_SELECT);
     if (NULL == NewMenuEntry) {
@@ -698,8 +681,8 @@ BOpt_GetDriverOptions (
     }
 
     NewLoadContext                      = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
-    LoadOptionPtr                       = LoadOption;
-    LoadOptionEnd                       = LoadOption + DriverOptionSize;
+    LoadOptionPtr                       = LoadOptionFromVar;
+    LoadOptionEnd                       = LoadOptionFromVar + DriverOptionSize;
     NewMenuEntry->OptionNumber          = DriverOrderList[Index];
     NewLoadContext->Deleted             = FALSE;
     NewLoadContext->IsLegacy            = FALSE;
@@ -761,13 +744,14 @@ BOpt_GetDriverOptions (
     }
 
     InsertTailList (&DriverOptionMenu.Head, &NewMenuEntry->Link);
+    FreePool (LoadOptionFromVar);
 
   }
 
   if (DriverOrderList != NULL) {
     FreePool (DriverOrderList);
   }
-  FreePool(LoadOption);
+
   DriverOptionMenu.MenuNumber = Index;
   return EFI_SUCCESS;
 
