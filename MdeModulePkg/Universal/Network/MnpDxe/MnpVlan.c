@@ -1,7 +1,7 @@
 /** @file
   VLAN Config Protocol implementation and VLAN packet process routine.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -230,6 +230,59 @@ MnpInsertVlanTag (
   VlanTci->Uint16        = HTONS (VlanTci->Uint16);
 }
 
+/**
+  Check VLAN configuration variable and delete the duplicative content if has identical Vlan ID.
+
+  @param[in]      MnpDeviceData      Pointer to the MNP device context data.
+  @param[in]      Buffer             Pointer to the buffer contains the array of VLAN_TCI.
+  @param[in]      NumberOfVlan       Pointer to number of VLAN.
+  @param[out]     NewNumberOfVlan    Pointer to number of unique VLAN.
+  
+  @retval EFI_SUCCESS            The VLAN variable is successfully checked.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough resource to set the configuration.
+
+**/
+EFI_STATUS
+MnpCheckVlanVariable (
+  IN     MNP_DEVICE_DATA   *MnpDeviceData,
+  IN     VLAN_TCI          *Buffer,
+  IN     UINTN             NumberOfVlan,
+     OUT UINTN             *NewNumberOfVlan
+  )
+{
+  UINTN             Index;
+  UINTN             Index2;
+  UINTN             Count;
+  BOOLEAN           FoundDuplicateItem;
+  EFI_STATUS        Status;
+
+  Count = 0;
+  FoundDuplicateItem  = FALSE;
+  Status = EFI_SUCCESS;
+  
+  for (Index = 0; Index < NumberOfVlan; Index++) {
+   for (Index2 = Index + 1; Index2 < NumberOfVlan; Index2++) {
+     if (Buffer[Index].Bits.Vid == Buffer[Index2].Bits.Vid) {
+       FoundDuplicateItem = TRUE;
+       Count++;
+       break;
+     }
+   }
+   if (FoundDuplicateItem) {
+    for (Index2 = Index +1; Index2 < NumberOfVlan; Index++, Index2++) {
+      CopyMem (Buffer + Index, Buffer + Index2, sizeof (VLAN_TCI));
+    }
+   }
+   FoundDuplicateItem = FALSE;
+  }
+
+  *NewNumberOfVlan = NumberOfVlan - Count;
+  if (Count != 0) {
+    Status = MnpSetVlanVariable (MnpDeviceData, *NewNumberOfVlan, Buffer);
+  }
+  
+  return Status;
+}
 
 /**
   Get VLAN configuration variable.
@@ -255,6 +308,7 @@ MnpGetVlanVariable (
   UINTN       BufferSize;
   EFI_STATUS  Status;
   VLAN_TCI    *Buffer;
+  UINTN       NewNumberOfVlan;
 
   //
   // Get VLAN configuration from EFI Variable
@@ -292,12 +346,14 @@ MnpGetVlanVariable (
     return Status;
   }
 
-  *NumberOfVlan = BufferSize / sizeof (VLAN_TCI);
-  *VlanVariable = Buffer;
+  Status = MnpCheckVlanVariable (MnpDeviceData, Buffer, BufferSize / sizeof (VLAN_TCI), &NewNumberOfVlan);
+  if (!EFI_ERROR (Status)) {
+    *NumberOfVlan = NewNumberOfVlan;
+    *VlanVariable = Buffer;
+  }
 
   return Status;
 }
-
 
 /**
   Set VLAN configuration variable.
