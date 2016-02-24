@@ -30,7 +30,17 @@ typedef UINTN size_t;
 
 #define malloc(n) AllocatePool(n)
 #define calloc(n,s) AllocateZeroPool((n)*(s))
-#define free(p) FreePool(p)
+
+#define free(p)             \
+  do {                      \
+    VOID *EvalOnce;         \
+                            \
+    EvalOnce = (p);         \
+    if (EvalOnce != NULL) { \
+      FreePool (EvalOnce);  \
+    }                       \
+  } while (FALSE)
+
 #define realloc(OldPtr,NewSize,OldSize) ReallocatePool(OldSize,NewSize,OldPtr)
 #define xmemmove(Dest,Src,Length) CopyMem(Dest,Src,Length)
 #define xmemcpy(Dest,Src,Length) CopyMem(Dest,Src,Length)
