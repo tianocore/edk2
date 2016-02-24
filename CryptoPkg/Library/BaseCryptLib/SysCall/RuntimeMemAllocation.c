@@ -434,5 +434,11 @@ void *realloc (void *ptr, size_t size)
 /* Deallocates or frees a memory block */
 void free (void *ptr)
 {
-  RuntimeFreeMem (ptr);
+  //
+  // In Standard C, free() handles a null pointer argument transparently. This
+  // is not true of RuntimeFreeMem() below, so protect it.
+  //
+  if (ptr != NULL) {
+    RuntimeFreeMem (ptr);
+  }
 }
