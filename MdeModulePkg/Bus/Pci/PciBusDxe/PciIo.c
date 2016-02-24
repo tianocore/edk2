@@ -1819,6 +1819,14 @@ PciIoGetBarAttributes (
       Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
       break;
 
+    case PciBarTypePMem32:
+      //
+      // prefechable
+      //
+      Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
+      //
+      // Fall through
+      //
     case PciBarTypeMem32:
       //
       // Mem
@@ -1830,41 +1838,19 @@ PciIoGetBarAttributes (
       Descriptor->AddrSpaceGranularity = 32;
       break;
 
-    case PciBarTypePMem32:
-      //
-      // Mem
-      //
-      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+    case PciBarTypePMem64:
       //
       // prefechable
       //
-      Descriptor->SpecificFlag = 0x6;
+      Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
       //
-      // 32 bit
+      // Fall through
       //
-      Descriptor->AddrSpaceGranularity = 32;
-      break;
-
     case PciBarTypeMem64:
       //
       // Mem
       //
       Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-      //
-      // 64 bit
-      //
-      Descriptor->AddrSpaceGranularity = 64;
-      break;
-
-    case PciBarTypePMem64:
-      //
-      // Mem
-      //
-      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-      //
-      // prefechable
-      //
-      Descriptor->SpecificFlag = 0x6;
       //
       // 64 bit
       //
