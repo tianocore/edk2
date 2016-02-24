@@ -38,5 +38,11 @@ void *realloc (void *ptr, size_t size)
 /* De-allocates or frees a memory block */
 void free (void *ptr)
 {
-  FreePool (ptr);
+  //
+  // In Standard C, free() handles a null pointer argument transparently. This
+  // is not true of FreePool() below, so protect it.
+  //
+  if (ptr != NULL) {
+    FreePool (ptr);
+  }
 }
