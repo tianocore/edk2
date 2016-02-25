@@ -766,6 +766,13 @@ def GetPcdSize(Pcd):
 def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
     TokenSpaceGuidValue = Pcd.TokenSpaceGuidValue   #Info.GuidList[Pcd.TokenSpaceGuidCName]
     PcdTokenNumber = Info.PlatformInfo.PcdTokenNumber
+
+    if GlobalData.BuildOptionPcd:
+        for PcdItem in GlobalData.BuildOptionPcd:
+            if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (PcdItem[0], PcdItem[1]):
+                Pcd.DefaultValue = PcdItem[2]
+                break
+
     #
     # Write PCDs
     #
@@ -1054,7 +1061,13 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
     FixPcdSizeTokenName = '_PCD_SIZE_' + Pcd.TokenCName
     PatchPcdSizeTokenName = '_PCD_PATCHABLE_' + Pcd.TokenCName +'_SIZE'
     PatchPcdSizeVariableName = '_gPcd_BinaryPatch_Size_' + Pcd.TokenCName
-    
+
+    if GlobalData.BuildOptionPcd:
+        for PcdItem in GlobalData.BuildOptionPcd:
+            if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (PcdItem[0], PcdItem[1]):
+                Pcd.DefaultValue = PcdItem[2]
+                break
+
     #
     # Write PCDs
     #

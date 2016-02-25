@@ -42,6 +42,7 @@ from Common.DataType import TAB_BRG_LIBRARY
 from Common.DataType import TAB_BACK_SLASH
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+import Common.GlobalData as GlobalData
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -727,6 +728,7 @@ class PcdReport(object):
             #
             FileWrite(File, gSectionStart)
             FileWrite(File, "Platform Configuration Database Report")
+            FileWrite(File, "  *B  - PCD override in the build option")
             FileWrite(File, "  *P  - Platform scoped PCD override in DSC file")
             FileWrite(File, "  *F  - Platform scoped PCD override in FDF file")
             FileWrite(File, "  *M  - Module scoped PCD override")
@@ -767,6 +769,15 @@ class PcdReport(object):
                         InfDefault, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
                         if InfDefault == "":
                             InfDefault = None
+
+                    BuildOptionMatch = False
+                    if GlobalData.BuildOptionPcd:
+                        for pcd in GlobalData.BuildOptionPcd:
+                            if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (pcd[0], pcd[1]):
+                                PcdValue = pcd[2]
+                                BuildOptionMatch = True
+                                break
+
                     if First:
                         if ModulePcdSet == None:
                             FileWrite(File, "")
@@ -812,7 +823,9 @@ class PcdReport(object):
                     #
                     # Report PCD item according to their override relationship
                     #
-                    if DecMatch and InfMatch:
+                    if BuildOptionMatch:
+                        FileWrite(File, ' *B %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                    elif DecMatch and InfMatch:
                         FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                     else:
                         if DscMatch:
@@ -840,17 +853,18 @@ class PcdReport(object):
                         FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', DecDefaultValue.strip()))
 
                     if ModulePcdSet == None:
-                        ModuleOverride = self.ModulePcdOverride.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName), {})
-                        for ModulePath in ModuleOverride:
-                            ModuleDefault = ModuleOverride[ModulePath]
-                            if Pcd.DatumType in ('UINT8', 'UINT16', 'UINT32', 'UINT64'):
-                                ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
-                                Match = (ModulePcdDefaultValueNumber == PcdValueNumber)
-                            else:
-                                Match = (ModuleDefault.strip() == PcdValue.strip())
-                            if Match:
-                                continue
-                            FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, ModuleDefault.strip()))
+                        if not BuildOptionMatch:
+                            ModuleOverride = self.ModulePcdOverride.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName), {})
+                            for ModulePath in ModuleOverride:
+                                ModuleDefault = ModuleOverride[ModulePath]
+                                if Pcd.DatumType in ('UINT8', 'UINT16', 'UINT32', 'UINT64'):
+                                    ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
+                                    Match = (ModulePcdDefaultValueNumber == PcdValueNumber)
+                                else:
+                                    Match = (ModuleDefault.strip() == PcdValue.strip())
+                                if Match:
+                                    continue
+                                FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, ModuleDefault.strip()))
 
         if ModulePcdSet == None:
             FileWrite(File, gSectionEnd)

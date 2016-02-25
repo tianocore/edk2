@@ -350,6 +350,67 @@ class WorkspaceAutoGen(AutoGen):
             DecPcds = {}
             DecPcdsKey = set()
             PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
+            if GlobalData.BuildOptionPcd:
+                for i, pcd in enumerate(GlobalData.BuildOptionPcd):
+                    (pcdname, pcdvalue) = pcd.split('=')
+                    if not pcdvalue:
+                        EdkLogger.error('build', AUTOGEN_ERROR, "No Value specified for the PCD %s." % (pcdname))
+                    if '.' in pcdname:
+                        (TokenSpaceGuidCName, TokenCName) = pcdname.split('.')
+                        HasTokenSpace = True
+                    else:
+                        TokenCName = pcdname
+                        TokenSpaceGuidCName = ''
+                        HasTokenSpace = False
+                    TokenSpaceGuidCNameList = []
+                    FoundFlag = False
+                    PcdDatumType = ''
+                    NewValue = ''
+                    for package in PGen.PackageList:
+                        for key in package.Pcds:
+                            PcdItem = package.Pcds[key]
+                            if HasTokenSpace:
+                                if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
+                                    PcdDatumType = PcdItem.DatumType
+                                    NewValue = self._BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                                    FoundFlag = True
+                            else:
+                                if PcdItem.TokenCName == TokenCName:
+                                    if not PcdItem.TokenSpaceGuidCName in TokenSpaceGuidCNameList:
+                                        if len (TokenSpaceGuidCNameList) < 1:
+                                            TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
+                                            PcdDatumType = PcdItem.DatumType
+                                            TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
+                                            NewValue = self._BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                                            FoundFlag = True
+                                        else:
+                                            EdkLogger.error(
+                                                    'build',
+                                                     AUTOGEN_ERROR,
+                                                    "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, PcdItem.TokenSpaceGuidCName, TokenSpaceGuidCNameList[0])
+                                                    )
+
+                    GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, NewValue)
+
+                    if not FoundFlag:
+                        if HasTokenSpace:
+                            EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s.%s is not found in the DEC file." % (TokenSpaceGuidCName, TokenCName))
+                        else:
+                            EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s is not found in the DEC file." % (TokenCName))
+
+                    for BuildData in PGen.BuildDatabase._CACHE_.values():
+                        if BuildData.Arch != Arch:
+                            continue
+                        if BuildData.MetaFile.Ext == '.dec':
+                            continue
+                        for key in BuildData.Pcds:
+                            PcdItem = BuildData.Pcds[key]
+                            if (TokenSpaceGuidCName, TokenCName) == (PcdItem.TokenSpaceGuidCName, PcdItem.TokenCName):
+                                PcdItem.DefaultValue = NewValue
+
+                    if (TokenCName, TokenSpaceGuidCName) in PcdSet:
+                        PcdSet[(TokenCName, TokenSpaceGuidCName)] = NewValue
+
             #Collect package set information from INF of FDF
             PkgSet = set()
             for Inf in ModuleList:
@@ -417,6 +478,32 @@ class WorkspaceAutoGen(AutoGen):
         self._BuildCommand = None
 
         return True
+
+    def _BuildOptionPcdValueFormat(self, TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
+        if PcdDatumType == 'VOID*':
+            if Value.startswith('L'):
+                if not Value[1]:
+                    EdkLogger.error('build', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
+                Value = Value[0] + '"' + Value[1:] + '"'
+            elif Value.startswith('B'):
+                if not Value[1]:
+                    EdkLogger.error('build', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
+                Value = Value[1:]
+            else:
+                if not Value[0]:
+                    EdkLogger.error('build', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
+                Value = '"' + Value + '"'
+
+        IsValid, Cause = CheckPcdDatum(PcdDatumType, Value)
+        if not IsValid:
+            EdkLogger.error('build', FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
+        if PcdDatumType == 'BOOLEAN':
+            Value = Value.upper()
+            if Value == 'TRUE' or Value == '1':
+                Value = '1'
+            elif Value == 'FALSE' or Value == '0':
+                Value = '0'
+        return  Value
 
     ## _CheckDuplicateInFV() method
     #
@@ -953,6 +1040,18 @@ class PlatformAutoGen(AutoGen):
     #  This interface should be invoked explicitly when platform action is created.
     #
     def CollectPlatformDynamicPcds(self):
+        # Override the platform Pcd's value by build option
+        if GlobalData.BuildOptionPcd:
+            for key in self.Platform.Pcds:
+                PlatformPcd = self.Platform.Pcds[key]
+                for PcdItem in GlobalData.BuildOptionPcd:
+                    if (PlatformPcd.TokenSpaceGuidCName, PlatformPcd.TokenCName) == (PcdItem[0], PcdItem[1]):
+                        PlatformPcd.DefaultValue = PcdItem[2]
+                        if PlatformPcd.SkuInfoList:
+                            Sku = PlatformPcd.SkuInfoList[PlatformPcd.SkuInfoList.keys()[0]]
+                            Sku.DefaultValue = PcdItem[2]
+                        break
+
         # for gathering error information
         NoDatumTypePcdList = set()
         PcdNotInDb = []
