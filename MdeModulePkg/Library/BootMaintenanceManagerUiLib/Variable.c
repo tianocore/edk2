@@ -614,6 +614,7 @@ Var_UpdateDriverOption (
 
   if (OptionalDataExist) {
     NewLoadContext->OptionalData = AllocateZeroPool (LoadOption.OptionalDataSize);
+    ASSERT (NewLoadContext->OptionalData != NULL);
     CopyMem (
       NewLoadContext->OptionalData,
       LoadOption.OptionalData,
@@ -725,6 +726,7 @@ Var_UpdateBootOption (
 
   if (OptionalDataExist) {
     NewLoadContext->OptionalData = AllocateZeroPool (LoadOption.OptionalDataSize);
+    ASSERT (NewLoadContext->OptionalData != NULL);
     CopyMem (
       NewLoadContext->OptionalData,
       LoadOption.OptionalData,
