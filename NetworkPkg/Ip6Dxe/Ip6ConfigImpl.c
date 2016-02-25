@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv6 Configuration Protocol.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2209,7 +2209,7 @@ Ip6ConfigInitInstance (
   DataItem->SetData  = Ip6ConfigSetPolicy;
   DataItem->Data.Ptr = &Instance->Policy;
   DataItem->DataSize = sizeof (Instance->Policy);
-  Instance->Policy   = Ip6ConfigPolicyAutomatic;
+  Instance->Policy   = Ip6ConfigPolicyManual;
   SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED);
 
   DataItem           = &Instance->DataItem[Ip6ConfigDataTypeDupAddrDetectTransmits];

@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP6 driver.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
@@ -262,7 +262,6 @@ Ip6CreateService (
   EFI_STATUS                            Status;
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *MnpToken;
   EFI_MANAGED_NETWORK_CONFIG_DATA       *Config;
-  IP6_CONFIG_DATA_ITEM                  *DataItem;
 
   ASSERT (Service != NULL);
 
@@ -476,30 +475,6 @@ Ip6CreateService (
     goto ON_ERROR;
   }
 
-  //
-  // If there is any manual address, set it.
-  //
-  DataItem = &IpSb->Ip6ConfigInstance.DataItem[Ip6ConfigDataTypeManualAddress];
-  if (DataItem->Data.Ptr != NULL) {
-    DataItem->SetData (
-                &IpSb->Ip6ConfigInstance,
-                DataItem->DataSize,
-                DataItem->Data.Ptr
-                );
-  }
-
-  //
-  // If there is any gateway address, set it.
-  //
-  DataItem = &IpSb->Ip6ConfigInstance.DataItem[Ip6ConfigDataTypeGateway];
-  if (DataItem->Data.Ptr != NULL) {
-    DataItem->SetData (
-                &IpSb->Ip6ConfigInstance,
-                DataItem->DataSize,
-                DataItem->Data.Ptr
-                );
-  }
-
   InsertHeadList (&IpSb->Interfaces, &IpSb->DefaultInterface->Link);
 
   *Service = IpSb;
@@ -535,6 +510,12 @@ Ip6DriverBindingStart (
 {
   IP6_SERVICE               *IpSb;
   EFI_STATUS                Status;
+  EFI_IP6_CONFIG_PROTOCOL   *Ip6Cfg;
+  IP6_CONFIG_DATA_ITEM      *DataItem;
+
+  IpSb     = NULL;
+  Ip6Cfg   = NULL;
+  DataItem = NULL;
 
   //
   // Test for the Ip6 service binding protocol
@@ -560,6 +541,8 @@ Ip6DriverBindingStart (
 
   ASSERT (IpSb != NULL);
 
+  Ip6Cfg  = &IpSb->Ip6ConfigInstance.Ip6Config;
+
   //
   // Install the Ip6ServiceBinding Protocol onto ControlerHandle
   //
@@ -568,9 +551,53 @@ Ip6DriverBindingStart (
                   &gEfiIp6ServiceBindingProtocolGuid,
                   &IpSb->ServiceBinding,
                   &gEfiIp6ConfigProtocolGuid,
-                  &IpSb->Ip6ConfigInstance.Ip6Config,
+                  Ip6Cfg,
                   NULL
                   );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  //
+  // Read the config data from NV variable again. 
+  // The default data can be changed by other drivers.
+  //
+  Status = Ip6ConfigReadConfigData (IpSb->MacString, &IpSb->Ip6ConfigInstance);
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+  
+  //
+  // If there is any default manual address, set it.
+  //
+  DataItem = &IpSb->Ip6ConfigInstance.DataItem[Ip6ConfigDataTypeManualAddress];
+  if (DataItem->Data.Ptr != NULL) {
+    Status = Ip6Cfg->SetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeManualAddress,
+                       DataItem->DataSize,
+                       DataItem->Data.Ptr
+                       );
+    if (EFI_ERROR(Status)) {
+      goto ON_ERROR;
+    }
+  }
+
+  //
+  // If there is any default gateway address, set it.
+  //
+  DataItem = &IpSb->Ip6ConfigInstance.DataItem[Ip6ConfigDataTypeGateway];
+  if (DataItem->Data.Ptr != NULL) {
+    Status = Ip6Cfg->SetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeGateway,
+                       DataItem->DataSize,
+                       DataItem->Data.Ptr
+                       );
+    if (EFI_ERROR(Status)) {
+      goto ON_ERROR;
+    }
+  }
 
   if (!EFI_ERROR (Status)) {
     //

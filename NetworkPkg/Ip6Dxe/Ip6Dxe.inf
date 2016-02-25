@@ -7,7 +7,7 @@
 #  also provides the mechanism to set and get various types of configurations for
 #  the EFI IPv6 network stack.
 #
-#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
