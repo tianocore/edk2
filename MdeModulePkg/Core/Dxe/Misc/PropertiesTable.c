@@ -790,6 +790,7 @@ CoreGetMemoryMapPropertiesTable (
   if (Status == EFI_BUFFER_TOO_SMALL) {
     *MemoryMapSize = *MemoryMapSize + (*DescriptorSize) * AdditionalRecordCount;
   } else if (Status == EFI_SUCCESS) {
+    ASSERT (MemoryMap != NULL);
     if (OldMemoryMapSize - *MemoryMapSize < (*DescriptorSize) * AdditionalRecordCount) {
       *MemoryMapSize = *MemoryMapSize + (*DescriptorSize) * AdditionalRecordCount;
       //
