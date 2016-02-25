@@ -1,7 +1,7 @@
 ## @file
 # Routines for generating Pcd Database
 #
-# Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1141,6 +1141,12 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         CName = Pcd.TokenCName
         TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
 
+        if GlobalData.BuildOptionPcd:
+            for PcdItem in GlobalData.BuildOptionPcd:
+                if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (PcdItem[0], PcdItem[1]):
+                    Pcd.DefaultValue = PcdItem[2]
+                    break
+
         EdkLogger.debug(EdkLogger.DEBUG_3, "PCD: %s %s (%s : %s)" % (CName, TokenSpaceGuidCName, Pcd.Phase, Phase))
 
         if Pcd.Phase == 'PEI':
@@ -1455,6 +1461,11 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
         if Pcd.Phase != Phase:
             continue
+        if GlobalData.BuildOptionPcd:
+            for PcdItem in GlobalData.BuildOptionPcd:
+                if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (PcdItem[0], PcdItem[1]):
+                    Pcd.DefaultValue = PcdItem[2]
+                    break
 
         TokenSpaceGuid = GuidStructureStringToGuidValueName(Pcd.TokenSpaceGuidValue) #(Platform.PackageList, TokenSpaceGuidCName))
         GeneratedTokenNumber = Platform.PcdTokenNumber[CName, TokenSpaceGuidCName] - 1
