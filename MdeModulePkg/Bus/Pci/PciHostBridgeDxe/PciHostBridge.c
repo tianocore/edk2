@@ -258,6 +258,19 @@ ResourceConflict (
   FreePool (Resources);
 }
 
+/**
+  Allocate Length of MMIO or IO resource with alignment BitsOfAlignment
+  from GCD range [BaseAddress, Limit).
+
+  @param Mmio            TRUE for MMIO and FALSE for IO.
+  @param Length          Length of the resource to allocate.
+  @param BitsOfAlignment Alignment of the resource to allocate.
+  @param BaseAddress     The starting address the allocation is from.
+  @param Limit           The ending address the allocation is to.
+
+  @retval  The base address of the allocated resource or MAX_UINT64 if allocation
+           fails.
+**/
 UINT64
 AllocateResource (
   BOOLEAN Mmio,
@@ -306,6 +319,7 @@ AllocateResource (
   }
   return MAX_UINT64;
 }
+
 /**
 
   Enter a certain phase of the PCI enumeration process.

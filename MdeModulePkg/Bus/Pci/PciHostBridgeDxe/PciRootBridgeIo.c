@@ -399,7 +399,6 @@ RootBridgeIoCheckParameter (
   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a
                                  lack of resources.
 **/
-
 EFI_STATUS
 EFIAPI
 RootBridgeIoPollMem (
@@ -987,7 +986,6 @@ RootBridgeIoPciWrite (
 }
 
 /**
-
   Provides the PCI controller-specific address needed to access
   system memory for DMA.
 
@@ -1007,7 +1005,6 @@ RootBridgeIoPciWrite (
   @retval EFI_UNSUPPORTED        The HostAddress cannot be mapped as a common buffer.
   @retval EFI_DEVICE_ERROR       The System hardware could not map the requested address.
   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to lack of resources.
-
 **/
 EFI_STATUS
 EFIAPI

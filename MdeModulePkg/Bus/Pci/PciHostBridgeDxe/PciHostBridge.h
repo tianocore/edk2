@@ -65,12 +65,12 @@ InitializePciHostBridge (
 
   Enter a certain phase of the PCI enumeration process.
 
-  @param This   -  The EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL instance.
-  @param Phase  -  The phase during enumeration.
+  @param This   The EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL instance.
+  @param Phase  The phase during enumeration.
 
-  @retval EFI_SUCCESS            -  Succeed.
-  @retval EFI_INVALID_PARAMETER  -  Wrong phase parameter passed in.
-  @retval EFI_NOT_READY          -  Resources have not been submitted yet.
+  @retval EFI_SUCCESS            Succeed.
+  @retval EFI_INVALID_PARAMETER  Wrong phase parameter passed in.
+  @retval EFI_NOT_READY          Resources have not been submitted yet.
 
 **/
 EFI_STATUS
@@ -85,15 +85,15 @@ NotifyPhase (
   Return the device handle of the next PCI root bridge that is associated with
   this Host Bridge.
 
-  @param This              - The EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_ PROTOCOL instance.
-  RootBridgeHandle  -  Returns the device handle of the next PCI Root Bridge.
-                       On input, it holds the RootBridgeHandle returned by the most
-                       recent call to GetNextRootBridge().The handle for the first
-                       PCI Root Bridge is returned if RootBridgeHandle is NULL on input.
+  @param This              The EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_ PROTOCOL instance.
+  @param RootBridgeHandle  Returns the device handle of the next PCI Root Bridge.
+                           On input, it holds the RootBridgeHandle returned by the most
+                           recent call to GetNextRootBridge().The handle for the first
+                           PCI Root Bridge is returned if RootBridgeHandle is NULL on input.
 
-  @retval EFI_SUCCESS            -  Succeed.
-  @retval EFI_NOT_FOUND          -  Next PCI root bridge not found.
-  @retval EFI_INVALID_PARAMETER  -  Wrong parameter passed in.
+  @retval EFI_SUCCESS            Succeed.
+  @retval EFI_NOT_FOUND          Next PCI root bridge not found.
+  @retval EFI_INVALID_PARAMETER  Wrong parameter passed in.
 
 **/
 EFI_STATUS

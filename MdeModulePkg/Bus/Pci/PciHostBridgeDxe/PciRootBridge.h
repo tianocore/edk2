@@ -86,15 +86,13 @@ typedef struct {
 #define ROOT_BRIDGE_FROM_LINK(a) CR (a, PCI_ROOT_BRIDGE_INSTANCE, Link, PCI_ROOT_BRIDGE_SIGNATURE)
 
 /**
+  Construct the Pci Root Bridge instance.
 
-  Construct the Pci Root Bridge Io protocol.
+  @param Bridge            The root bridge instance.
+  @param HostBridgeHandle  Handle to the HostBridge.
 
-  @param Protocol          -  Protocol to initialize.
-  @param HostBridgeHandle  -  Handle to the HostBridge.
-
-  @retval EFI_SUCCESS  -  Success.
-  @retval Others       -  Fail.
-
+  @return The pointer to PCI_ROOT_BRIDGE_INSTANCE just created
+          or NULL if creation fails.
 **/
 PCI_ROOT_BRIDGE_INSTANCE *
 CreateRootBridge (
@@ -359,30 +357,25 @@ RootBridgeIoPciWrite (
 ;
 
 /**
-
   Provides the PCI controller-specific address needed to access
   system memory for DMA.
 
-  @param This           -  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param Operation      -  Indicate if the bus master is going to read or write
-                           to system memory.
-  @param HostAddress    -  The system memory address to map on the PCI controller.
-  @param NumberOfBytes  -  On input the number of bytes to map.
-                           On output the number of bytes that were mapped.
-  @param DeviceAddress  -  The resulting map address for the bus master PCI
-                           controller to use to access the system memory's HostAddress.
-  @param Mapping        -  The value to pass to Unmap() when the bus master DMA
-                           operation is complete.
+  @param This           A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param Operation      Indicate if the bus master is going to read or write
+                        to system memory.
+  @param HostAddress    The system memory address to map on the PCI controller.
+  @param NumberOfBytes  On input the number of bytes to map.
+                        On output the number of bytes that were mapped.
+  @param DeviceAddress  The resulting map address for the bus master PCI
+                        controller to use to access the system memory's HostAddress.
+  @param Mapping        The value to pass to Unmap() when the bus master DMA
+                        operation is complete.
 
-  @retval EFI_SUCCESS            -  Success.
-  @retval EFI_INVALID_PARAMETER  -  Invalid parameters found.
-  @retval EFI_UNSUPPORTED        -  The HostAddress cannot be mapped as a common
-                            @retval buffer.
-  @retval EFI_DEVICE_ERROR       -  The System hardware could not map the requested
-                            @retval address.
-  @retval EFI_OUT_OF_RESOURCES   -  The request could not be completed due to
-                            @retval lack of resources.
-
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  Invalid parameters found.
+  @retval EFI_UNSUPPORTED        The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_DEVICE_ERROR       The System hardware could not map the requested address.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to lack of resources.
 **/
 EFI_STATUS
 EFIAPI
@@ -397,18 +390,21 @@ RootBridgeIoMap (
 ;
 
 /**
-
   Completes the Map() operation and releases any corresponding resources.
 
-  @param This     -  Pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL instance.
-  Mapping  -  The value returned from Map() operation.
+  The Unmap() function completes the Map() operation and releases any
+  corresponding resources.
+  If the operation was an EfiPciOperationBusMasterWrite or
+  EfiPciOperationBusMasterWrite64, the data is committed to the target system
+  memory.
+  Any resources used for the mapping are freed.
 
-  @retval EFI_SUCCESS            -  The range was unmapped successfully.
-  @retval EFI_INVALID_PARAMETER  -  Mapping is not a value that was returned
-                            @retval by Map operation.
-  @retval EFI_DEVICE_ERROR       -  The data was not committed to the target
-                            @retval system memory.
+  @param[in] This      A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param[in] Mapping   The mapping value returned from Map().
 
+  @retval EFI_SUCCESS            The range was unmapped.
+  @retval EFI_INVALID_PARAMETER  Mapping is not a value that was returned by Map().
+  @retval EFI_DEVICE_ERROR       The data was not committed to the target system memory.
 **/
 EFI_STATUS
 EFIAPI
@@ -419,22 +415,30 @@ RootBridgeIoUnmap (
 ;
 
 /**
+  Allocates pages that are suitable for an EfiPciOperationBusMasterCommonBuffer
+  or EfiPciOperationBusMasterCommonBuffer64 mapping.
 
-  Allocates pages that are suitable for a common buffer mapping.
+  @param This        A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param Type        This parameter is not used and must be ignored.
+  @param MemoryType  The type of memory to allocate, EfiBootServicesData or
+                     EfiRuntimeServicesData.
+  @param Pages       The number of pages to allocate.
+  @param HostAddress A pointer to store the base system memory address of the
+                     allocated range.
+  @param Attributes  The requested bit mask of attributes for the allocated
+                     range. Only the attributes
+                     EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE,
+                     EFI_PCI_ATTRIBUTE_MEMORY_CACHED, and
+                     EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE may be used with this
+                     function.
 
-  @param This         -  Pointer to EFI_ROOT_BRIDGE_IO_PROTOCOL instance.
-  @param Type         -  Not used and can be ignored.
-  @param MemoryType   -  Type of memory to allocate.
-  @param Pages        -  Number of pages to allocate.
-  @param HostAddress  -  Pointer to store the base system memory address
-                         of the allocated range.
-  @param Attributes   -  Requested bit mask of attributes of the allocated
-                         range.
-
-  @retval EFI_SUCCESS            -  The requested memory range were allocated.
-  @retval EFI_INVALID_PARAMETER  -  Invalid parameter found.
-  @retval EFI_UNSUPPORTED        -  Attributes is unsupported.
-
+  @retval EFI_SUCCESS            The requested memory pages were allocated.
+  @retval EFI_INVALID_PARAMETER  MemoryType is invalid.
+  @retval EFI_INVALID_PARAMETER  HostAddress is NULL.
+  @retval EFI_UNSUPPORTED        Attributes is unsupported. The only legal
+                                 attribute bits are MEMORY_WRITE_COMBINE,
+                                 MEMORY_CACHED, and DUAL_ADDRESS_CYCLE.
+  @retval EFI_OUT_OF_RESOURCES   The memory pages could not be allocated.
 **/
 EFI_STATUS
 EFIAPI
@@ -491,19 +495,26 @@ RootBridgeIoFlush (
 ;
 
 /**
+  Gets the attributes that a PCI root bridge supports setting with
+  SetAttributes(), and the attributes that a PCI root bridge is currently
+  using.
 
-  Get the attributes that a PCI root bridge supports and
-  the attributes the PCI root bridge is currently using.
+  The GetAttributes() function returns the mask of attributes that this PCI
+  root bridge supports and the mask of attributes that the PCI root bridge is
+  currently using.
 
-  @param This        -  Pointer to EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL
-                        instance.
-  @param Supports    -  A pointer to the mask of attributes that
-                        this PCI root bridge supports.
-  @param Attributes  -  A pointer to the mask of attributes that
-                        this PCI root bridge is currently using.
-  @retval EFI_SUCCESS            -  Success.
-  @retval EFI_INVALID_PARAMETER  -  Invalid parameter found.
+  @param This        A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param Supported   A pointer to the mask of attributes that this PCI root
+                     bridge supports setting with SetAttributes().
+  @param Attributes  A pointer to the mask of attributes that this PCI root
+                     bridge is currently using.
 
+  @retval  EFI_SUCCESS           If Supports is not NULL, then the attributes
+                                 that the PCI root bridge supports is returned
+                                 in Supports. If Attributes is not NULL, then
+                                 the attributes that the PCI root bridge is
+                                 currently using is returned in Attributes.
+  @retval  EFI_INVALID_PARAMETER Both Supports and Attributes are NULL.
 **/
 EFI_STATUS
 EFIAPI
