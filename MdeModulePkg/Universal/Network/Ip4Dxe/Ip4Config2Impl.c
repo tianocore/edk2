@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv4 Configuration II Protocol.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -1144,7 +1144,9 @@ Ip4Config2SetPolicy (
   }
 
   if (NewPolicy == Instance->Policy) {
-     return EFI_ABORTED;
+    if (NewPolicy != Ip4Config2PolicyDhcp || Instance->DhcpSuccess) {
+      return EFI_ABORTED;
+    }
   } else {
     if (NewPolicy == Ip4Config2PolicyDhcp) {
       //
@@ -1908,7 +1910,7 @@ Ip4Config2InitInstance (
   DataItem->SetData  = Ip4Config2SetPolicy;
   DataItem->Data.Ptr = &Instance->Policy;
   DataItem->DataSize = sizeof (Instance->Policy);
-  Instance->Policy   = Ip4Config2PolicyDhcp;
+  Instance->Policy   = Ip4Config2PolicyStatic;
   SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED);
 
   DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
@@ -1939,6 +1941,8 @@ Ip4Config2InitInstance (
 
   //
   // Try to read the config data from NV variable.
+  // If not found, write initialized config data into NV variable 
+  // as a default config data.
   //
   Status = Ip4Config2ReadConfigData (IpSb->MacString, Instance);
   if (Status == EFI_NOT_FOUND) {
@@ -1948,21 +1952,7 @@ Ip4Config2InitInstance (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  //
-  // Try to set the configured parameter.
-  //
-  for (Index = Ip4Config2DataTypePolicy; Index < Ip4Config2DataTypeMaximum; Index++) {
-    DataItem = &IpSb->Ip4Config2Instance.DataItem[Index];
-    if (DataItem->Data.Ptr != NULL) {
-      DataItem->SetData (
-                  &IpSb->Ip4Config2Instance,
-                  DataItem->DataSize,
-                  DataItem->Data.Ptr
-                  );
-    }
-  }
-
+  
   Instance->Ip4Config2.SetData              = EfiIp4Config2SetData;
   Instance->Ip4Config2.GetData              = EfiIp4Config2GetData;
   Instance->Ip4Config2.RegisterDataNotify   = EfiIp4Config2RegisterDataNotify;
@@ -2027,5 +2017,55 @@ Ip4Config2CleanInstance (
   Ip4Config2FormUnload (Instance);
 
   RemoveEntryList (&Instance->Link);
+}
+
+/**
+  The event handle for IP4 auto reconfiguration. The original default
+  interface and route table will be removed as the default.
+
+  @param[in]  Context                The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBackDpc (
+  IN VOID                   *Context
+  )
+{
+  IP4_SERVICE               *IpSb;
+
+  IpSb      = (IP4_SERVICE *) Context;
+  NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
+
+  if (IpSb->State > IP4_SERVICE_UNSTARTED) {
+    IpSb->State = IP4_SERVICE_UNSTARTED;
+  }
+  
+  IpSb->Reconfig = TRUE;
+
+  Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
+
+  return ;
+}
+
+
+/**
+  Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK.
+
+  @param Event     The event that is signalled.
+  @param Context   The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBack (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+{
+  //
+  // Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK
+  //
+  QueueDpc (TPL_CALLBACK, Ip4AutoReconfigCallBackDpc, Context);
 }
 

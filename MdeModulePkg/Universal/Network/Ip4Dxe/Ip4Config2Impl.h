@@ -1,7 +1,7 @@
 /** @file
   Definitions for EFI IPv4 Configuration II Protocol implementation.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -213,6 +213,26 @@ typedef struct {
 #pragma pack()
 
 /**
+  Read the configuration data from variable storage according to the VarName and
+  gEfiIp4Config2ProtocolGuid. It checks the integrity of variable data. If the
+  data is corrupted, it clears the variable data to ZERO. Othewise, it outputs the
+  configuration data to IP4_CONFIG2_INSTANCE.
+
+  @param[in]      VarName       The pointer to the variable name
+  @param[in, out] Instance      The pointer to the IP4 config2 instance data.
+
+  @retval EFI_NOT_FOUND         The variable can not be found or already corrupted.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate resource to complete the operation.
+  @retval EFI_SUCCESS           The configuration data was retrieved successfully.
+
+**/
+EFI_STATUS
+Ip4Config2ReadConfigData (
+  IN     CHAR16               *VarName,
+  IN OUT IP4_CONFIG2_INSTANCE *Instance
+  );
+
+/**
   Start the DHCP configuration for this IP service instance.
   It will locates the EFI_IP4_CONFIG2_PROTOCOL, then start the
   DHCP configuration.
@@ -251,6 +271,20 @@ Ip4Config2InitInstance (
 VOID
 Ip4Config2CleanInstance (
   IN OUT IP4_CONFIG2_INSTANCE  *Instance
+  );
+
+/**
+  Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK.
+
+  @param Event     The event that is signalled.
+  @param Context   The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBack (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
   );
 
 /**
