@@ -273,86 +273,6 @@ IfConfigManualAddressNotify (
   *((BOOLEAN *) Context) = TRUE;
 }
 
-
-/**
-  Create an IP child, use it to start the auto configuration, then destroy it.
-
-  @param[in] Controller       The controller which has the service installed.
-  @param[in] Image            The image handle used to open service.
-
-  @retval EFI_SUCCESS         The configuration is done.
-**/
-EFI_STATUS
-EFIAPI
-IfConfigStartIp4(
-  IN  EFI_HANDLE            Controller,
-  IN  EFI_HANDLE            Image
-  )
-{
-  EFI_IP4_PROTOCOL              *Ip4;
-  EFI_HANDLE                    Ip4Handle;
-  EFI_IP4_CONFIG_DATA           Ip4ConfigData;
-  EFI_STATUS                    Status;
-
-  //
-  // Get the Ip4ServiceBinding Protocol
-  //
-  Ip4Handle     = NULL;
-  Ip4           = NULL;
-
-  Status = NetLibCreateServiceChild (
-             Controller,
-             Image,
-             &gEfiIp4ServiceBindingProtocolGuid,
-             &Ip4Handle
-             );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->OpenProtocol (
-                 Ip4Handle,
-                 &gEfiIp4ProtocolGuid,
-                 (VOID **) &Ip4,
-                 Controller,
-                 Image,
-                 EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                 );
-
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }
-
-  Ip4ConfigData.DefaultProtocol          = EFI_IP_PROTO_ICMP;
-  Ip4ConfigData.AcceptAnyProtocol        = FALSE;
-  Ip4ConfigData.AcceptIcmpErrors         = FALSE;
-  Ip4ConfigData.AcceptBroadcast          = FALSE;
-  Ip4ConfigData.AcceptPromiscuous        = FALSE;
-  Ip4ConfigData.UseDefaultAddress        = TRUE;
-  ZeroMem (&Ip4ConfigData.StationAddress, sizeof (EFI_IPv4_ADDRESS));
-  ZeroMem (&Ip4ConfigData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-  Ip4ConfigData.TypeOfService            = 0;
-  Ip4ConfigData.TimeToLive               = 1;
-  Ip4ConfigData.DoNotFragment            = FALSE;
-  Ip4ConfigData.RawData                  = FALSE;
-  Ip4ConfigData.ReceiveTimeout           = 0;
-  Ip4ConfigData.TransmitTimeout          = 0;
-
-  Ip4->Configure (Ip4, &Ip4ConfigData);
-  
-ON_EXIT: 
-  NetLibDestroyServiceChild (
-    Controller,
-    Image,
-    &gEfiIp4ServiceBindingProtocolGuid,
-    Ip4Handle
-    );
-  
-  return Status;
-}
-
-
 /**
   Print MAC address.
 
@@ -974,29 +894,20 @@ IfConfigSetInterfaceInfo (
     // Process valid variables.
     //
     if (StrCmp(VarArg->Arg, L"dhcp") == 0) {
-      if (IfCb->Policy == Ip4Config2PolicyDhcp) {
-        Status = IfConfigStartIp4 (IfCb->NicHandle, gImageHandle);
-        if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
-          ShellStatus = SHELL_ACCESS_DENIED;
-          goto ON_EXIT;
-        }
-      } else {
-        //
-        // Set dhcp config policy
-        //
-        Policy = Ip4Config2PolicyDhcp;
-        Status = IfCb->IfCfg->SetData (
-                                IfCb->IfCfg,
-                                Ip4Config2DataTypePolicy,
-                                sizeof (EFI_IP4_CONFIG2_POLICY),
-                                &Policy
-                                );
-        if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
-          ShellStatus = SHELL_ACCESS_DENIED;
-          goto ON_EXIT;
-        }
+      //
+      // Set dhcp config policy
+      //
+      Policy = Ip4Config2PolicyDhcp;
+      Status = IfCb->IfCfg->SetData (
+                              IfCb->IfCfg,
+                              Ip4Config2DataTypePolicy,
+                              sizeof (EFI_IP4_CONFIG2_POLICY),
+                              &Policy
+                              );
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
+        ShellStatus = SHELL_ACCESS_DENIED;
+        goto ON_EXIT;
       }
       
       VarArg= VarArg->Next;    
