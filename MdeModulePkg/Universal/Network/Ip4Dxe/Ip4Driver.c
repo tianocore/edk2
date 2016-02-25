@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP4 driver.
 
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 This program and the accompanying materials
@@ -254,7 +254,7 @@ Ip4CreateService (
 
   //
   // Create various resources. First create the route table, timer
-  // event and MNP child. IGMP, interface's initialization depend
+  // event, ReconfigEvent and MNP child. IGMP, interface's initialization depend
   // on the MNP child.
   //
   IpSb->DefaultRouteTable = Ip4CreateRouteTable ();
@@ -272,6 +272,17 @@ Ip4CreateService (
                   &IpSb->Timer
                   );
 
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  Ip4AutoReconfigCallBack,
+                  IpSb,
+                  &IpSb->ReconfigEvent
+                  );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
@@ -511,6 +522,13 @@ Ip4DriverBindingStart (
 { 
   EFI_STATUS                    Status;
   IP4_SERVICE                   *IpSb;
+  EFI_IP4_CONFIG2_PROTOCOL      *Ip4Cfg2;
+  UINTN                         Index;
+  IP4_CONFIG2_DATA_ITEM         *DataItem;
+
+  IpSb     = NULL;
+  Ip4Cfg2  = NULL;
+  DataItem = NULL;
 
   //
   // Test for the Ip4 service binding protocol
@@ -536,6 +554,8 @@ Ip4DriverBindingStart (
   
   ASSERT (IpSb != NULL);
 
+  Ip4Cfg2  = &IpSb->Ip4Config2Instance.Ip4Config2;
+
   //
   // Install the Ip4ServiceBinding Protocol onto ControlerHandle
   //
@@ -544,12 +564,39 @@ Ip4DriverBindingStart (
                   &gEfiIp4ServiceBindingProtocolGuid,
                   &IpSb->ServiceBinding,
                   &gEfiIp4Config2ProtocolGuid,
-                  &IpSb->Ip4Config2Instance.Ip4Config2,
+                  Ip4Cfg2,
                   NULL
                   );
 
   if (EFI_ERROR (Status)) {
     goto FREE_SERVICE;
+  }
+
+  //
+  // Read the config data from NV variable again. 
+  // The default data can be changed by other drivers.
+  //
+  Status = Ip4Config2ReadConfigData (IpSb->MacString, &IpSb->Ip4Config2Instance);
+  if (EFI_ERROR (Status)) {
+    goto UNINSTALL_PROTOCOL;
+  }
+  
+  //
+  // Consume the installed EFI_IP4_CONFIG2_PROTOCOL to set the default data items. 
+  //
+  for (Index = Ip4Config2DataTypePolicy; Index < Ip4Config2DataTypeMaximum; Index++) {
+    DataItem = &IpSb->Ip4Config2Instance.DataItem[Index];
+    if (DataItem->Data.Ptr != NULL) {
+      Status = Ip4Cfg2->SetData (
+                          Ip4Cfg2,
+                          Index,
+                          DataItem->DataSize,
+                          DataItem->Data.Ptr
+                          );
+      if (EFI_ERROR(Status)) {
+        goto UNINSTALL_PROTOCOL;
+      }
+    }
   }
  
   //
