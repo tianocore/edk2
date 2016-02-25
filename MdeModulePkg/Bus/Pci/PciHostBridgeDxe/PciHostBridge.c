@@ -29,6 +29,290 @@ GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mPciResourceTypeStr[] = {
 };
 
 /**
+  Ensure the compatibility of an IO space descriptor with the IO aperture.
+
+  The IO space descriptor can come from the GCD IO space map, or it can
+  represent a gap between two neighboring IO space descriptors. In the latter
+  case, the GcdIoType field is expected to be EfiGcdIoTypeNonExistent.
+
+  If the IO space descriptor already has type EfiGcdIoTypeIo, then no action is
+  taken -- it is by definition compatible with the aperture.
+
+  Otherwise, the intersection of the IO space descriptor is calculated with the
+  aperture. If the intersection is the empty set (no overlap), no action is
+  taken; the IO space descriptor is compatible with the aperture.
+
+  Otherwise, the type of the descriptor is investigated again. If the type is
+  EfiGcdIoTypeNonExistent (representing a gap, or a genuine descriptor with
+  such a type), then an attempt is made to add the intersection as IO space to
+  the GCD IO space map. This ensures continuity for the aperture, and the
+  descriptor is deemed compatible with the aperture.
+
+  Otherwise, the IO space descriptor is incompatible with the IO aperture.
+
+  @param[in] Base        Base address of the aperture.
+  @param[in] Length      Length of the aperture.
+  @param[in] Descriptor  The descriptor to ensure compatibility with the
+                         aperture for.
+
+  @retval EFI_SUCCESS            The descriptor is compatible. The GCD IO space
+                                 map may have been updated, for continuity
+                                 within the aperture.
+  @retval EFI_INVALID_PARAMETER  The descriptor is incompatible.
+  @return                        Error codes from gDS->AddIoSpace().
+**/
+EFI_STATUS
+IntersectIoDescriptor (
+  IN  UINT64                            Base,
+  IN  UINT64                            Length,
+  IN  CONST EFI_GCD_IO_SPACE_DESCRIPTOR *Descriptor
+  )
+{
+  UINT64                                IntersectionBase;
+  UINT64                                IntersectionEnd;
+  EFI_STATUS                            Status;
+
+  if (Descriptor->GcdIoType == EfiGcdIoTypeIo) {
+    return EFI_SUCCESS;
+  }
+
+  IntersectionBase = MAX (Base, Descriptor->BaseAddress);
+  IntersectionEnd = MIN (Base + Length,
+                      Descriptor->BaseAddress + Descriptor->Length);
+  if (IntersectionBase >= IntersectionEnd) {
+    //
+    // The descriptor and the aperture don't overlap.
+    //
+    return EFI_SUCCESS;
+  }
+
+  if (Descriptor->GcdIoType == EfiGcdIoTypeNonExistent) {
+    Status = gDS->AddIoSpace (EfiGcdIoTypeIo, IntersectionBase,
+                    IntersectionEnd - IntersectionBase);
+
+    DEBUG ((EFI_ERROR (Status) ? EFI_D_ERROR : EFI_D_VERBOSE,
+      "%a: %a: add [%Lx, %Lx): %r\n", gEfiCallerBaseName, __FUNCTION__,
+      IntersectionBase, IntersectionEnd, Status));
+    return Status;
+  }
+
+  DEBUG ((EFI_D_ERROR, "%a: %a: desc [%Lx, %Lx) type %u conflicts with "
+    "aperture [%Lx, %Lx)\n", gEfiCallerBaseName, __FUNCTION__,
+    Descriptor->BaseAddress, Descriptor->BaseAddress + Descriptor->Length,
+    (UINT32)Descriptor->GcdIoType, Base, Base + Length));
+  return EFI_INVALID_PARAMETER;
+}
+
+/**
+  Add IO space to GCD.
+  The routine checks the GCD database and only adds those which are
+  not added in the specified range to GCD.
+
+  @param Base   Base address of the IO space.
+  @param Length Length of the IO space.
+
+  @retval EFI_SUCCES The IO space was added successfully.
+**/
+EFI_STATUS
+AddIoSpace (
+  IN  UINT64                        Base,
+  IN  UINT64                        Length
+  )
+{
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  UINTN                             NumberOfDescriptors;
+  EFI_GCD_IO_SPACE_DESCRIPTOR       *IoSpaceMap;
+
+  Status = gDS->GetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a: %a: GetIoSpaceMap(): %r\n",
+      gEfiCallerBaseName, __FUNCTION__, Status));
+    return Status;
+  }
+
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    Status = IntersectIoDescriptor (Base, Length, &IoSpaceMap[Index]);
+    if (EFI_ERROR (Status)) {
+      goto FreeIoSpaceMap;
+    }
+  }
+
+  DEBUG_CODE (
+    //
+    // Make sure there are adjacent descriptors covering [Base, Base + Length).
+    // It is possible that they have not been merged; merging can be prevented
+    // by allocation.
+    //
+    UINT64                      CheckBase;
+    EFI_STATUS                  CheckStatus;
+    EFI_GCD_IO_SPACE_DESCRIPTOR Descriptor;
+
+    for (CheckBase = Base;
+         CheckBase < Base + Length;
+         CheckBase = Descriptor.BaseAddress + Descriptor.Length) {
+      CheckStatus = gDS->GetIoSpaceDescriptor (CheckBase, &Descriptor);
+      ASSERT_EFI_ERROR (CheckStatus);
+      ASSERT (Descriptor.GcdIoType == EfiGcdIoTypeIo);
+    }
+    );
+
+FreeIoSpaceMap:
+  FreePool (IoSpaceMap);
+
+  return Status;
+}
+
+/**
+  Ensure the compatibility of a memory space descriptor with the MMIO aperture.
+
+  The memory space descriptor can come from the GCD memory space map, or it can
+  represent a gap between two neighboring memory space descriptors. In the
+  latter case, the GcdMemoryType field is expected to be
+  EfiGcdMemoryTypeNonExistent.
+
+  If the memory space descriptor already has type
+  EfiGcdMemoryTypeMemoryMappedIo, and its capabilities are a superset of the
+  required capabilities, then no action is taken -- it is by definition
+  compatible with the aperture.
+
+  Otherwise, the intersection of the memory space descriptor is calculated with
+  the aperture. If the intersection is the empty set (no overlap), no action is
+  taken; the memory space descriptor is compatible with the aperture.
+
+  Otherwise, the type of the descriptor is investigated again. If the type is
+  EfiGcdMemoryTypeNonExistent (representing a gap, or a genuine descriptor with
+  such a type), then an attempt is made to add the intersection as MMIO space
+  to the GCD memory space map, with the specified capabilities. This ensures
+  continuity for the aperture, and the descriptor is deemed compatible with the
+  aperture.
+
+  Otherwise, the memory space descriptor is incompatible with the MMIO
+  aperture.
+
+  @param[in] Base         Base address of the aperture.
+  @param[in] Length       Length of the aperture.
+  @param[in] Capabilities Capabilities required by the aperture.
+  @param[in] Descriptor   The descriptor to ensure compatibility with the
+                          aperture for.
+
+  @retval EFI_SUCCESS            The descriptor is compatible. The GCD memory
+                                 space map may have been updated, for
+                                 continuity within the aperture.
+  @retval EFI_INVALID_PARAMETER  The descriptor is incompatible.
+  @return                        Error codes from gDS->AddMemorySpace().
+**/
+EFI_STATUS
+IntersectMemoryDescriptor (
+  IN  UINT64                                Base,
+  IN  UINT64                                Length,
+  IN  UINT64                                Capabilities,
+  IN  CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Descriptor
+  )
+{
+  UINT64                                    IntersectionBase;
+  UINT64                                    IntersectionEnd;
+  EFI_STATUS                                Status;
+
+  if (Descriptor->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo &&
+      (Descriptor->Capabilities & Capabilities) == Capabilities) {
+    return EFI_SUCCESS;
+  }
+
+  IntersectionBase = MAX (Base, Descriptor->BaseAddress);
+  IntersectionEnd = MIN (Base + Length,
+                      Descriptor->BaseAddress + Descriptor->Length);
+  if (IntersectionBase >= IntersectionEnd) {
+    //
+    // The descriptor and the aperture don't overlap.
+    //
+    return EFI_SUCCESS;
+  }
+
+  if (Descriptor->GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
+    Status = gDS->AddMemorySpace (EfiGcdMemoryTypeMemoryMappedIo,
+                    IntersectionBase, IntersectionEnd - IntersectionBase,
+                    Capabilities);
+
+    DEBUG ((EFI_ERROR (Status) ? EFI_D_ERROR : EFI_D_VERBOSE,
+      "%a: %a: add [%Lx, %Lx): %r\n", gEfiCallerBaseName, __FUNCTION__,
+      IntersectionBase, IntersectionEnd, Status));
+    return Status;
+  }
+
+  DEBUG ((EFI_D_ERROR, "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
+    "with aperture [%Lx, %Lx) cap %Lx\n", gEfiCallerBaseName, __FUNCTION__,
+    Descriptor->BaseAddress, Descriptor->BaseAddress + Descriptor->Length,
+    (UINT32)Descriptor->GcdMemoryType, Descriptor->Capabilities,
+    Base, Base + Length, Capabilities));
+  return EFI_INVALID_PARAMETER;
+}
+
+/**
+  Add MMIO space to GCD.
+  The routine checks the GCD database and only adds those which are
+  not added in the specified range to GCD.
+
+  @param Base         Base address of the MMIO space.
+  @param Length       Length of the MMIO space.
+  @param Capabilities Capabilities of the MMIO space.
+
+  @retval EFI_SUCCES The MMIO space was added successfully.
+**/
+EFI_STATUS
+AddMemoryMappedIoSpace (
+  IN  UINT64                            Base,
+  IN  UINT64                            Length,
+  IN  UINT64                            Capabilities
+  )
+{
+  EFI_STATUS                            Status;
+  UINTN                                 Index;
+  UINTN                                 NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR       *MemorySpaceMap;
+
+  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a: %a: GetMemorySpaceMap(): %r\n",
+      gEfiCallerBaseName, __FUNCTION__, Status));
+    return Status;
+  }
+
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    Status = IntersectMemoryDescriptor (Base, Length, Capabilities,
+               &MemorySpaceMap[Index]);
+    if (EFI_ERROR (Status)) {
+      goto FreeMemorySpaceMap;
+    }
+  }
+
+  DEBUG_CODE (
+    //
+    // Make sure there are adjacent descriptors covering [Base, Base + Length).
+    // It is possible that they have not been merged; merging can be prevented
+    // by allocation and different capabilities.
+    //
+    UINT64                          CheckBase;
+    EFI_STATUS                      CheckStatus;
+    EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
+
+    for (CheckBase = Base;
+         CheckBase < Base + Length;
+         CheckBase = Descriptor.BaseAddress + Descriptor.Length) {
+      CheckStatus = gDS->GetMemorySpaceDescriptor (CheckBase, &Descriptor);
+      ASSERT_EFI_ERROR (CheckStatus);
+      ASSERT (Descriptor.GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo);
+      ASSERT ((Descriptor.Capabilities & Capabilities) == Capabilities);
+    }
+    );
+
+FreeMemorySpaceMap:
+  FreePool (MemorySpaceMap);
+
+  return Status;
+}
+
+/**
 
   Entry point of this driver.
 
@@ -89,6 +373,7 @@ InitializePciHostBridge (
                   &gEfiPciHostBridgeResourceAllocationProtocolGuid, &HostBridge->ResAlloc,
                   NULL
                   );
+  ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     FreePool (HostBridge);
     PciHostBridgeFreeRootBridges (RootBridges, RootBridgeCount);
@@ -109,11 +394,10 @@ InitializePciHostBridge (
     }
 
     if (RootBridges[Index].Io.Limit > RootBridges[Index].Io.Base) {
-      Status = gDS->AddIoSpace (
-                      EfiGcdIoTypeIo,
-                      RootBridges[Index].Io.Base,
-                      RootBridges[Index].Io.Limit - RootBridges[Index].Io.Base + 1
-                      );
+      Status = AddIoSpace (
+                 RootBridges[Index].Io.Base,
+                 RootBridges[Index].Io.Limit - RootBridges[Index].Io.Base + 1
+                 );
       ASSERT_EFI_ERROR (Status);
     }
 
@@ -130,12 +414,11 @@ InitializePciHostBridge (
 
     for (MemApertureIndex = 0; MemApertureIndex < sizeof (MemApertures) / sizeof (MemApertures[0]); MemApertureIndex++) {
       if (MemApertures[MemApertureIndex]->Limit > MemApertures[MemApertureIndex]->Base) {
-        Status = gDS->AddMemorySpace (
-                        EfiGcdMemoryTypeMemoryMappedIo,
-                        MemApertures[MemApertureIndex]->Base,
-                        MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                        EFI_MEMORY_UC
-                        );
+        Status = AddMemoryMappedIoSpace (
+                   MemApertures[MemApertureIndex]->Base,
+                   MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
+                   EFI_MEMORY_UC
+                   );
         ASSERT_EFI_ERROR (Status);
         Status = gDS->SetMemorySpaceAttributes (
                         MemApertures[MemApertureIndex]->Base,
