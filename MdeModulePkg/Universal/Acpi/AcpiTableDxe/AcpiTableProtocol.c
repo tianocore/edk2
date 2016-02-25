@@ -963,6 +963,16 @@ AddTableToList (
            AcpiTableInstance->NumberOfTableEntries3 *
            sizeof (UINT32)
          );
+
+        //
+        // Add entry to the RSDT
+        //
+        *CurrentRsdtEntry = (UINT32) (UINTN) CurrentTableList->Table;
+
+        //
+        // Update RSDT length
+        //
+        AcpiTableInstance->Rsdt3->Length = AcpiTableInstance->Rsdt3->Length + sizeof (UINT32);
       }
 
       //
@@ -976,18 +986,6 @@ AddTableToList (
           AcpiTableInstance->NumberOfTableEntries3 *
           sizeof (UINT64)
         );
-
-      if ((PcdGet32 (PcdAcpiExposedTableVersions) & EFI_ACPI_TABLE_VERSION_1_0B) != 0) {
-        //
-        // Add entry to the RSDT
-        //
-        *CurrentRsdtEntry = (UINT32) (UINTN) CurrentTableList->Table;
-
-        //
-        // Update RSDT length
-        //
-        AcpiTableInstance->Rsdt3->Length = AcpiTableInstance->Rsdt3->Length + sizeof (UINT32);
-      }
 
       //
       // Add entry to XSDT, XSDT expects 64 bit pointers, but
