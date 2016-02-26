@@ -101,6 +101,8 @@ InitRootBridge (
   RootBus->Mem.Limit = PcdGet64 (PcdPciMmio32Base) +
                        (PcdGet64 (PcdPciMmio32Size) - 1);
 
+  RootBus->NoExtendedConfigSpace = TRUE;
+
   return EFI_OUT_OF_RESOURCES;
 }
 
