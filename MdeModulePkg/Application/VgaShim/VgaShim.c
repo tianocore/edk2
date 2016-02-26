@@ -3,8 +3,10 @@
 
 **/
 
-#define VBIOS_START         0xc0000
-#define VBIOS_SIZE          0x10000
+#define VROM_ADDRESS	0xc0000
+#define VROM_SIZE		0x10000
+#define FIXED_MTRR_SIZE	0x20000
+#define IVT_ADDRESS		0x00000
 
 #include <Uefi.h>
 
@@ -26,6 +28,17 @@
 #include "LegacyVgaBios.h"
 #include "VgaShim.h"
 
+typedef enum
+{
+	MEM_LOCK,
+	MEM_UNLOCK
+} MEMORY_LOCK_OPERATION;
+
+BOOLEAN CanWriteAtAddress(EFI_PHYSICAL_ADDRESS address);
+EFI_STATUS EnsureMemoryLock(EFI_PHYSICAL_ADDRESS Address, UINT32 Length, MEMORY_LOCK_OPERATION Operation);
+BOOLEAN IsInt10HandlerDefined();
+VBE_MODE_INFO* FillVesaInformation(EFI_PHYSICAL_ADDRESS Address);
+
 // ensure correct alignment
 #pragma pack (1)
 typedef struct {
@@ -38,261 +51,353 @@ typedef struct {
 // This string is displayed by Windows 2008 R2 SP1 in the Screen Resolution,
 // Advanced Settings dialog. It should be short.
 //
+STATIC CONST CHAR8 VENDOR_NAME[] = "OVMF";
+STATIC CONST CHAR8 PRODUCT_NAME[] = "DummyCard";
+STATIC CONST CHAR8 PRODUCT_REVISION[] = "OVMF Int10h (fake)";
 STATIC CONST CHAR8 mProductRevision[] = "OVMF Int10h (fake)";
 
 EFI_STATUS
 EFIAPI
 UefiMain (
-	IN EFI_HANDLE				ImageHandle,
+	IN EFI_HANDLE		ImageHandle,
 	IN EFI_SYSTEM_TABLE	*SystemTable)
 {
-	EFI_PHYSICAL_ADDRESS Segment0, SegmentC, SegmentF, FrameBufferBase;
-	UINTN Segment0Pages;
-	IVT_ENTRY *Int0x10;
-	EFI_STATUS Status;
-	UINTN Pam1Address;
-	UINT8 Int8temp;
-	UINTN SegmentCPages;
-	VBE_INFO *VbeInfoFull;
-	VBE_INFO_BASE *VbeInfo;
-	UINT8 *Ptr;
-	UINTN Printed;
-	VBE_MODE_INFO *VbeModeInfo;
-	UINT32 MyTempU;
-	INT32 MyTemp;
-
-	UINT32            Granularity;
-	UINT8             *TstPtr;
-	UINT8             TstVar;
-
-	EFI_LEGACY_REGION_PROTOCOL    *mLegacyRegion = NULL;
-	EFI_LEGACY_REGION2_PROTOCOL   *mLegacyRegion2 = NULL;
-
+	EFI_PHYSICAL_ADDRESS	TempAddress;
+	IVT_ENTRY				*Int0x10;
+	EFI_STATUS				Status;
+	VBE_MODE_INFO			*VbeModeInfo;
+	
 	Print(L"VGA Shim v0.1\n");
 
-	Segment0 = 0x00000;
-	SegmentC = 0xC0000;
-	SegmentF = 0xF0000;
-	FrameBufferBase = 0xA0000;
+	//
+	// If an Int10h handler exists there either is a real
+	// VGA ROM in operation or we installed the shim before.
+	//
+	if (IsInt10HandlerDefined()) {
+		Print(L"%a: Int10h already has a handler, you should be all set\n", __FUNCTION__);
+		goto Exit;
+	}
 
-	Status = gBS->LocateProtocol(&gEfiLegacyRegionProtocolGuid, NULL, (VOID **)&mLegacyRegion);
-	Print(L"LegacyRegion = %r\n", Status);
+	//
+	// Sanity checks.
+	//
+	ASSERT(sizeof mVgaShim <= VROM_SIZE);
+
+	//
+	// Unlock VGA ROM memory for writing first.
+	//
+	Status = EnsureMemoryLock(VROM_ADDRESS, VROM_SIZE, MEM_UNLOCK);
 	if (EFI_ERROR(Status)) {
-		mLegacyRegion = NULL;
-		Status = gBS->LocateProtocol(&gEfiLegacyRegion2ProtocolGuid, NULL, (VOID **)&mLegacyRegion2);
-		Print(L"LegacyRegion2 = %r\n", Status);
-		if (EFI_ERROR(Status)) {
-			mLegacyRegion2 = NULL;
-		}
+		Print(L"%a: Unable to unlock VGA ROM memory at %x for shim insertion\n", 
+			__FUNCTION__, VROM_ADDRESS);
+		goto Exit;
 	}
 
-	Status = mLegacyRegion->UnLock(mLegacyRegion, VBIOS_START, VBIOS_SIZE, &Granularity);
-	Print(L"Unlock = %r\n", Status);
-
 	//
-	// Test some vbios address for writing
+	// Claim real mode IVT memory area. This can be done as the IDT
+	// has already been initialized so we can overwrite the IVT.
 	//
-	TstPtr = (UINT8*)(UINTN)(VBIOS_START + 0xA110);
-	TstVar = *TstPtr;
-	*TstPtr = *TstPtr + 1;
-	if (TstVar == *TstPtr) {
-		Print(L"Test unlock: Error, not unlocked!\n");
-	} else {
-		Print(L"Test unlock: Yeah!\n");
-	}
-	*TstPtr = TstVar;
-
-	//
-	// Attempt to cover the real mode IVT with an allocation. This is a UEFI
-	// driver, hence the arch protocols have been installed previously. Among
-	// those, the CPU arch protocol has configured the IDT, so we can overwrite
-	// the IVT used in real mode.
-	//
-	// The allocation request may fail, eg. if LegacyBiosDxe has already run.
-	//
-	Segment0Pages = 1;
-	Int0x10 = (IVT_ENTRY *)(UINTN)Segment0 + 0x10;
-	Status = gBS->AllocatePages(AllocateAddress, EfiBootServicesCode, Segment0Pages, &Segment0);
-
+	Int0x10 = (IVT_ENTRY *)(UINTN)IVT_ADDRESS + 0x10;
+	Print(L"%a: Claiming IVT area ... ", __FUNCTION__);
+	TempAddress = IVT_ADDRESS;
+	Status = gBS->AllocatePages(AllocateAddress, EfiBootServicesCode, 1, &TempAddress);
 	if (EFI_ERROR(Status)) {
-		Print(L"Whoops, unable to allocate pages! Status=%r\n", Status);
-		EFI_PHYSICAL_ADDRESS Handler;
-
-		//
-		// Check if a video BIOS handler has been installed previously -- we
-		// shouldn't override a real video BIOS with our shim, nor our own shim if
-		// it's already present.
-		//
-		Handler = (Int0x10->Segment << 4) + Int0x10->Offset;
-		if (Handler >= SegmentC && Handler < SegmentF) {
-			Print(L"%a: Video BIOS handler found at %04x:%04x\n",
-				__FUNCTION__, Int0x10->Segment, Int0x10->Offset);
-			return EFI_SUCCESS;
-		}
-
-		//
-		// Otherwise we'll overwrite the Int10h vector, even though we may not own
-		// the page at zero.
-		//
-		Print(L"%a: failed to allocate page at zero: %r\n",
-			__FUNCTION__, Status);
+		Print(L"failure: %r\n", Status);
 	} else {
-		Print(L"Managed to allocate the page at zero\n");
-		//
-		// We managed to allocate the page at zero. SVN r14218 guarantees that it
-		// is NUL-filled.
-		//
-		ASSERT(Int0x10->Segment == 0x0000);
-		ASSERT(Int0x10->Offset == 0x0000);
+		Print(L"success\n");
+		ASSERT(Int0x10->Segment == IVT_ADDRESS);
+		ASSERT(Int0x10->Offset == 0x0);
 	}
 
-	// check if area is protected
-	//MyTemp = MtrrGetMemoryAttribute(SegmentC);
-	//Print(L"MtrrGetMemoryAttribute = %d\n", MyTemp);
-	//if (MyTemp == CacheWriteProtected) {}
-	MtrrDebugPrintAllMtrrs();
-	//Print(L"IsMttrSupported = %d\n", IsMtrrSupported());
-
-	// 
-	// Enable writes to C0000-DFFFF memory area
-	// We only need C0000-C7FFF but a lot more is protected
-	// 
-	//MtrrSetMemoryAttribute(SegmentC, 131072 /*DFFFF-C0000+1*/, CacheUncacheable);
-	MtrrSetMemoryAttribute(SegmentC, 131072 /*DFFFF-C0000+1*/, CacheUncacheable);
-	
-	SegmentCPages = 4;
-	ASSERT(sizeof mVgaShim <= VBIOS_SIZE);
+	//
+	// Copy ROM stub in place and fill in the missing information.
+	//
+	SetMem((VOID *)(UINTN)VROM_ADDRESS, VROM_SIZE, 0);
+	CopyMem((VOID *)(UINTN)VROM_ADDRESS, mVgaShim, sizeof mVgaShim);
+	VbeModeInfo = FillVesaInformation(VROM_ADDRESS);
 	
 	//
-	// Put the shim in place!
+	// Point the Int10h vector at the entry point in shim.
 	//
-	SetMem((VOID *)(UINTN)VBIOS_START, VBIOS_SIZE, 0);
-	CopyMem((VOID *)(UINTN)SegmentC, mVgaShim, sizeof mVgaShim);
+	// convert from real 32bit physical address to real mode segment address
+	Int0x10->Segment = (UINT16)((UINT32)VROM_ADDRESS >> 4);
+	Int0x10->Offset = (UINT16)((UINTN)(VbeModeInfo + 1) - VROM_ADDRESS);
+	Print(L"%a: Int10h handler installed at %04x:%04x\n",
+		__FUNCTION__, Int0x10->Segment, Int0x10->Offset);
+
+Exit:
+	Print(L"%a: All done, exiting\n", __FUNCTION__);
+	return EFI_SUCCESS;
+}
 
 
+VBE_MODE_INFO*
+FillVesaInformation(
+	EFI_PHYSICAL_ADDRESS	Address)
+{
+	// (Page 26 in VESA BIOS EXTENSION Core Functions Standard v3.0.)
+	// (Page 30 in VESA BIOS EXTENSION Core Functions Standard v3.0.)
+
+	VBE_INFO		*VbeInfoFull;
+	VBE_INFO_BASE	*VbeInfo;
+	VBE_MODE_INFO	*VbeModeInfo;
+	UINT8			*BufferPtr;
 
 	//
-	// Fill in the VESA BIOS Extensions INFO structure.
+	// VESA general information.
 	//
-	// point VbeInfoFull at 0xC0000
-	VbeInfoFull = (VBE_INFO *)(UINTN)SegmentC;
-	// point VbeInfo at 0xC0000
+	VbeInfoFull = (VBE_INFO *)(UINTN)Address;
 	VbeInfo = &VbeInfoFull->Base;
-	// point Ptr at 0xC0022, ie. start of an array of size 256-sizeof(VBE_INFO_BASE)
-	Ptr = VbeInfoFull->Buffer;
-	// set offset 00h: signature
+	BufferPtr = VbeInfoFull->Buffer;
+
 	CopyMem(VbeInfo->Signature, "VESA", 4);
-	// set offset 04h: VESA version number
+	
 	VbeInfo->VesaVersion = 0x0300;
-	// set offset 06h: pointer to OEM name
-	VbeInfo->OemNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
-	CopyMem(Ptr, "QEMU", 5);		// copy name to buffer
-	Ptr += 5;						// advance buffer by 5 (name+zero-terminator)
-	// set offset 0Ah: capabilities
-	VbeInfo->Capabilities = BIT0;	// DAC can be switched into 8-bit mode
-	// set offset 0Eh: pointer to available video modes terminated with 0FFFFh
-	VbeInfo->ModeListAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
-	*(UINT16*)Ptr = 0x00f1;			// mode number
-	Ptr += 2;						// advance buffer by 2 bytes
-	*(UINT16*)Ptr = 0xFFFF;			// mode list terminator
-	Ptr += 2;						// advance buffer by 2 bytes
-	// set offset 12h: amount of video memory in 64k blocks
-	VbeInfo->VideoMem64K = (UINT16)((1024 * 768 * 4 + 65535) / 65536);
-	// set offset 14h: OEM software version
+	
+	VbeInfo->OemNameAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
+	CopyMem(BufferPtr, VENDOR_NAME, sizeof VENDOR_NAME);
+	BufferPtr += sizeof VENDOR_NAME;
+	
+	VbeInfo->Capabilities = BIT0;			// =DAC width is switchable to 8-bit per primary
+	
+	VbeInfo->ModeListAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
+	*(UINT16*)BufferPtr = 0x00f1;			// mode number
+	BufferPtr += 2;
+	*(UINT16*)BufferPtr = 0xFFFF;			// mode list terminator
+	BufferPtr += 2;
+	
+	VbeInfo->VideoMem64K = (UINT16)((1024 * 768 * 4 + 65535) / 65536); // 64KB units available to fb
+	
 	VbeInfo->OemSoftwareVersion = 0x0000;
-	// set offset 16h: Pointer to vendor name
-	VbeInfo->VendorNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
-	CopyMem(Ptr, "OVMF", 5);		// copy name to buffer
-	Ptr += 5;						// advance buffer by 5 (name+zero-terminator)
-	// set offset 1Ah: Pointer to product name
-	VbeInfo->ProductNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
-	CopyMem(Ptr, "DummyCard", 10);	// copy name to buffer
-	Ptr += 10;						// advance buffer by 10 (name+zero-terminator)
-	// set offset 1Eh: Pointer to product revision string
-	VbeInfo->ProductRevAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
-	CopyMem(Ptr, mProductRevision, sizeof mProductRevision);
-	Ptr += sizeof mProductRevision;
-	// make sure we did not fill more data than we had space for
-	ASSERT(sizeof VbeInfoFull->Buffer >= Ptr - VbeInfoFull->Buffer);
-	// zero remaining memory... but this should not be necessary
-	ZeroMem(Ptr, sizeof VbeInfoFull->Buffer - (Ptr - VbeInfoFull->Buffer));
+	
+	VbeInfo->VendorNameAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
+	CopyMem(BufferPtr, VENDOR_NAME, sizeof VENDOR_NAME);
+	BufferPtr += sizeof VENDOR_NAME;
+	
+	VbeInfo->ProductNameAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
+	CopyMem(BufferPtr, PRODUCT_NAME, sizeof PRODUCT_NAME);
+	BufferPtr += sizeof PRODUCT_NAME;
+
+	VbeInfo->ProductRevAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
+	CopyMem(BufferPtr, PRODUCT_REVISION, sizeof PRODUCT_REVISION);
+	BufferPtr += sizeof PRODUCT_REVISION;
+	
+	// make sure we did not use more buffer than we had space for
+	ASSERT(sizeof VbeInfoFull->Buffer >= BufferPtr - VbeInfoFull->Buffer);
 	
 	//
-	// Fil in the VBE MODE INFO structure.
+	// Basic VESA mode information
 	//
 	VbeModeInfo = (VBE_MODE_INFO *)(VbeInfoFull + 1);
 	// bit0: mode supported by present hardware configuration
-	// bit1: optional information available (must be =1 for VBE v1.2+)
-	// bit3: set if color, clear if monochrome
-	// bit4: set if graphics mode, clear if text mode
-	// bit5: mode is not VGA-compatible
-	// bit7: linear framebuffer mode supported
+	// bit1: must be set for VBE v1.2+
+	// bit3: color mode
+	// bit4: graphics mode
+	// bit5: mode not VGA-compatible (do not access VGA I/O ports and registers)
+	// bit6: disable windowed memory mode = linear framebuffer only (!!!)
+	// bit7: linear framebuffer supported
 	VbeModeInfo->ModeAttr = BIT7 | BIT5 | BIT4 | BIT3 | BIT1 | BIT0;
-	// bit0: exists
-	// bit1: bit1: readable
-	// bit2: writeable
-	VbeModeInfo->WindowAAttr = BIT2 | BIT1 | BIT0;
+	VbeModeInfo->BytesPerScanLineLinear = 1024 * 4;	// logical bytes in linear modes
+	VbeModeInfo->LfbAddress = (UINT32)0xA0000;		// 32-bit physical address
 
-	VbeModeInfo->WindowBAttr = 0x00;
-	VbeModeInfo->WindowGranularityKB = 0x0040;
-	VbeModeInfo->WindowSizeKB = 0x0040;
-	VbeModeInfo->WindowAStartSegment = 0xA000;
-	VbeModeInfo->WindowBStartSegment = 0x0000;
-	VbeModeInfo->WindowPositioningAddress = 0x0000;
-	VbeModeInfo->BytesPerScanLine = 1024 * 4;
-
-	// MBA 1440x900
+	//
+	// Resolution
+	//
 	VbeModeInfo->Width = 1024;
 	VbeModeInfo->Height = 768;
-	VbeModeInfo->CharCellWidth = 8;
-	VbeModeInfo->CharCellHeight = 16;
-	VbeModeInfo->NumPlanes = 1;
-	VbeModeInfo->BitsPerPixel = 32;
-	VbeModeInfo->NumBanks = 1;
-	VbeModeInfo->MemoryModel = 6; // direct color
-	VbeModeInfo->BankSizeKB = 0;
-	VbeModeInfo->NumImagePagesLessOne = 0;
-	VbeModeInfo->Vbe3 = 0x01;
-
-	VbeModeInfo->RedMaskSize = 8;
-	VbeModeInfo->RedMaskPos = 16;
-	VbeModeInfo->GreenMaskSize = 8;
-	VbeModeInfo->GreenMaskPos = 8;
-	VbeModeInfo->BlueMaskSize = 8;
-	VbeModeInfo->BlueMaskPos = 0;
-	VbeModeInfo->ReservedMaskSize = 8;
-	VbeModeInfo->ReservedMaskPos = 24;
+	VbeModeInfo->CharCellWidth = 8;					// used to calculate resolution in text modes
+	VbeModeInfo->CharCellHeight = 16;				// used to calculate resolution in text modes
 	
-	VbeModeInfo->DirectColorModeInfo = BIT1; // bit1: bytes in reserved field may be used by application
-	VbeModeInfo->LfbAddress = (UINT32)FrameBufferBase;
-	VbeModeInfo->OffScreenAddress = 0;
-	VbeModeInfo->OffScreenSizeKB = 0;
+	//
+	// Banking, paging, windowing
+	//
+	VbeModeInfo->NumBanks = 1;						// disable memory banking
+	VbeModeInfo->BankSizeKB = 0;					// disable memory banking
+	VbeModeInfo->BytesPerScanLine = 1024 * 4;		// logical bytes in banked modes
+	VbeModeInfo->NumImagePagesLessOne = 0;			// disable image paging
+	VbeModeInfo->NumImagesLessOneBanked = 0;		// disable image paging
+	VbeModeInfo->NumImagesLessOneLinear = 0;		// disable image paging
+	VbeModeInfo->WindowPositioningAddress = 0x0000;	// force windowing to Function 5h
+	VbeModeInfo->WindowAAttr = BIT2 | BIT1 | BIT0;	// writable, readable, relocatable (?)
+	VbeModeInfo->WindowBAttr = 0x0;					// window disabled
+	VbeModeInfo->WindowGranularityKB = 0x0040;		// 64KB
+	VbeModeInfo->WindowSizeKB = 0x0040;				// 64KB
+	VbeModeInfo->WindowAStartSegment = 0xA000;		// real mode address (!), 0=lfb-only
+	VbeModeInfo->WindowBStartSegment = 0x0000;
 
-	VbeModeInfo->BytesPerScanLineLinear = 1024 * 4;
-	VbeModeInfo->NumImagesLessOneBanked = 0;
-	VbeModeInfo->NumImagesLessOneLinear = 0;
-	VbeModeInfo->RedMaskSizeLinear = 8;
-	VbeModeInfo->RedMaskPosLinear = 16;
-	VbeModeInfo->GreenMaskSizeLinear = 8;
-	VbeModeInfo->GreenMaskPosLinear = 8;
+	//
+	// Color mode
+	// 
+	VbeModeInfo->NumPlanes = 1;						// packed pixel mode
+	VbeModeInfo->MemoryModel = 6;					// Direct Color
+	VbeModeInfo->DirectColorModeInfo = BIT1;		// alpha bytes may be used by application
+	VbeModeInfo->BitsPerPixel = 32;					// 8+8+8+8
+	VbeModeInfo->BlueMaskSize = 8;					// 8 bits for blue
 	VbeModeInfo->BlueMaskSizeLinear = 8;
-	VbeModeInfo->BlueMaskPosLinear = 0;
+	VbeModeInfo->GreenMaskSize = 8;					// 8 bits for greem
+	VbeModeInfo->GreenMaskSizeLinear = 8;
+	VbeModeInfo->RedMaskSize = 8;					// 8 bits for red
+	VbeModeInfo->RedMaskSizeLinear = 8;
+	VbeModeInfo->ReservedMaskSize = 8;				// 8 bits for alpha
 	VbeModeInfo->ReservedMaskSizeLinear = 8;
+	VbeModeInfo->BlueMaskPos = 0;					// blue offset
+	VbeModeInfo->BlueMaskPosLinear = 0;
+	VbeModeInfo->GreenMaskPos = 8;					// green offset
+	VbeModeInfo->GreenMaskPosLinear = 8;
+	VbeModeInfo->RedMaskPos = 16;					// red offset
+	VbeModeInfo->RedMaskPosLinear = 16;
+	VbeModeInfo->ReservedMaskPos = 24;				// alpha offset
 	VbeModeInfo->ReservedMaskPosLinear = 24;
-	VbeModeInfo->MaxPixelClockHz = 0;
-	
-	// zero remaining memory
-	ZeroMem(VbeModeInfo->Reserved, sizeof VbeModeInfo->Reserved);
 
 	//
-	// Point the Int10h vector at the shim.
+	// Other
 	//
-	Int0x10->Segment = (UINT16)((UINT32)SegmentC >> 4);
-	Int0x10->Offset = (UINT16)((UINTN)(VbeModeInfo + 1) - SegmentC);
-	Print(L"%a: Video BIOS handler installed at %04x:%04x\n",
-		__FUNCTION__, Int0x10->Segment, Int0x10->Offset);
+	VbeModeInfo->OffScreenAddress = 0;				// reserved, always set to 0
+	VbeModeInfo->OffScreenSizeKB = 0;				// reserved, always set to 0
+	VbeModeInfo->MaxPixelClockHz = 0;				// maximum available refresh rate
+	VbeModeInfo->Vbe3 = 0x01;						// reserved, always set to 1
 
-	Print(L"Done!\n");
+	return VbeModeInfo;
+}
+
+
+BOOLEAN
+IsInt10HandlerDefined()
+{
+	IVT_ENTRY				*Int10Entry;
+	EFI_PHYSICAL_ADDRESS	Int10Handler;
 	
-	return EFI_SUCCESS;
+	// convert from real mode segment address to 32bit physical address
+	Int10Entry = (IVT_ENTRY *)(UINTN)IVT_ADDRESS + 0x10;
+	Int10Handler = (Int10Entry->Segment << 4) + Int10Entry->Offset;
+
+	Print(L"%a: Checking for an existing Int10h handler ... ", __FUNCTION__);
+
+	if (Int10Handler >= VROM_ADDRESS && Int10Handler < (VROM_ADDRESS+VROM_SIZE)) {
+		Print(L"found at %04x:%04x\n", Int10Entry->Segment, Int10Entry->Offset);
+		return TRUE;
+	} else {
+		Print(L"not found\n");
+		return FALSE;
+	}
+}
+
+
+EFI_STATUS
+EnsureMemoryLock(
+	EFI_PHYSICAL_ADDRESS	Address,
+	UINT32					Length,
+	MEMORY_LOCK_OPERATION	Operation)
+{
+	EFI_STATUS					Status = EFI_NOT_READY;
+	UINT32						Granularity;
+	EFI_LEGACY_REGION_PROTOCOL	*mLegacyRegion = NULL;
+	EFI_LEGACY_REGION2_PROTOCOL	*mLegacyRegion2 = NULL;
+
+	//
+	// Check if we need to perform any operation
+	// 
+	if (Operation == MEM_UNLOCK && CanWriteAtAddress(Address)) {
+		Print(L"%a: Memory at %x already unlocked\n", __FUNCTION__, Address);
+		Status = EFI_SUCCESS;
+	} else if (Operation == MEM_LOCK && !CanWriteAtAddress(Address)) {
+		Print(L"%a: Memory at %x already locked\n", __FUNCTION__, Address);
+		Status = EFI_SUCCESS;
+	}
+
+	//
+	// Try to lock/unlock with EfiLegacyRegionProtocol
+	// 
+	if (EFI_ERROR(Status)) {
+		Status = gBS->LocateProtocol(&gEfiLegacyRegionProtocolGuid, NULL, (VOID **)&mLegacyRegion);
+		if (!EFI_ERROR(Status)) {
+			if (Operation == MEM_UNLOCK) {
+				Status = mLegacyRegion->UnLock(mLegacyRegion, (UINT32)Address, Length, &Granularity);
+				Status = CanWriteAtAddress(Address) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+			} else {
+				Status = mLegacyRegion->Lock(mLegacyRegion, (UINT32)Address, Length, &Granularity);
+				Status = CanWriteAtAddress(Address) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+			}
+
+			Print(L"%a: %s %s memory at %x using EfiLegacyRegionProtocol\n", 
+				__FUNCTION__, 
+				EFI_ERROR(Status) ? "Failure" : "Success",
+				Operation == MEM_UNLOCK ? "unlocking" : "locking", 
+				Address);
+		}
+	}
+	
+	//
+	// Try to lock/unlock with EfiLegacyRegion2Protocol
+	//
+	if (EFI_ERROR(Status)) {
+		Status = gBS->LocateProtocol(&gEfiLegacyRegion2ProtocolGuid, NULL, (VOID **)&mLegacyRegion2);
+		if (!EFI_ERROR(Status)) {
+			if (Operation == MEM_UNLOCK) {
+				Status = mLegacyRegion2->UnLock(mLegacyRegion2, (UINT32)Address, Length, &Granularity);
+				Status = CanWriteAtAddress(Address);
+			} else {
+				Status = mLegacyRegion2->Lock(mLegacyRegion2, (UINT32)Address, Length, &Granularity);
+				Status = CanWriteAtAddress(Address) == EFI_WRITE_PROTECTED ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+			}
+
+			Print(L"%a: %s %s memory at %x using EfiLegacyRegion2Protocol\n", 
+				__FUNCTION__, 
+				EFI_ERROR(Status) ? "Failure" : "Success",
+				Operation == MEM_UNLOCK ? "unlocking" : "locking", 
+				Address);
+		}
+	}
+	
+	//
+	// Try to lock/unlock via an MTRR
+	//
+	if (EFI_ERROR(Status) && IsMtrrSupported()) {
+		if (Operation == MEM_UNLOCK) {
+			MtrrSetMemoryAttribute(Address, FIXED_MTRR_SIZE, CacheUncacheable);
+			Status = CanWriteAtAddress(Address);
+		} else {
+			MtrrSetMemoryAttribute(Address, FIXED_MTRR_SIZE, CacheWriteProtected);
+			Status = CanWriteAtAddress(Address) == EFI_WRITE_PROTECTED ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+		}
+
+		Print(L"%a: %s %s memory at %x using MTRR\n", 
+			__FUNCTION__, 
+			EFI_ERROR(Status) ? "Failure" : "Success",
+			Operation == MEM_UNLOCK ? "unlocking" : "locking", 
+			Address);
+	}
+	
+	//
+	// None of the methods worked?
+	// 
+	if (EFI_ERROR(Status)) {
+		Print(L"%a: Unable to find a way to %s memory at %x\n", 
+			__FUNCTION__, Operation == MEM_UNLOCK ? "unlock" : "lock", Address);
+	}
+		
+	return Status;
+}
+
+
+BOOLEAN
+CanWriteAtAddress(
+	EFI_PHYSICAL_ADDRESS	Address)
+{
+	BOOLEAN	CanWrite;
+	UINT8	*TestPtr;
+	UINT8	OldValue;
+
+	TestPtr = (UINT8*)(Address);
+	OldValue = *TestPtr;
+
+	Print(L"%a: Attempting memory write at %x ... ", __FUNCTION__, TestPtr);
+	
+	*TestPtr = *TestPtr + 1;
+	CanWrite = OldValue != *TestPtr;
+	
+	Print(L"%s\n", CanWrite ? "successful" : "unsuccessful");
+	
+	*TestPtr = OldValue;
+	return CanWrite;
 }
