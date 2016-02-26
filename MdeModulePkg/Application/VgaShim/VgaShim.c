@@ -6,7 +6,6 @@
 #define VBIOS_START         0xc0000
 #define VBIOS_SIZE          0x10000
 
-#include <LegacyVgaBios.h>
 #include <Uefi.h>
 
 #include <Library/DebugLib.h>
@@ -24,6 +23,7 @@
 #include <Protocol/LegacyRegion.h>
 #include <Protocol/LegacyRegion2.h>
 
+#include "LegacyVgaBios.h"
 #include "VgaShim.h"
 
 // ensure correct alignment
