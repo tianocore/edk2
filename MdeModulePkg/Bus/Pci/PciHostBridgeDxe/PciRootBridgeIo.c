@@ -80,6 +80,7 @@ CreateRootBridge (
   DEBUG ((EFI_D_INFO, "%s\n", DevicePathStr = ConvertDevicePathToText (Bridge->DevicePath, FALSE, FALSE)));
   DEBUG ((EFI_D_INFO, "  Support/Attr: %lx / %lx\n", Bridge->Supports, Bridge->Attributes));
   DEBUG ((EFI_D_INFO, "    DmaAbove4G: %s\n", Bridge->DmaAbove4G ? L"Yes" : L"No"));
+  DEBUG ((EFI_D_INFO, "NoExtConfSpace: %s\n", Bridge->NoExtendedConfigSpace ? L"Yes" : L"No"));
   DEBUG ((EFI_D_INFO, "     AllocAttr: %lx (%s%s)\n", Bridge->AllocationAttributes,
           (Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0 ? L"CombineMemPMem " : L"",
           (Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_MEM64_DECODE) != 0 ? L"Mem64Decode" : L""
@@ -155,6 +156,7 @@ CreateRootBridge (
   RootBridge->Supports = Bridge->Supports;
   RootBridge->Attributes = Bridge->Attributes;
   RootBridge->DmaAbove4G = Bridge->DmaAbove4G;
+  RootBridge->NoExtendedConfigSpace = Bridge->NoExtendedConfigSpace;
   RootBridge->AllocationAttributes = Bridge->AllocationAttributes;
   RootBridge->DevicePath = DuplicateDevicePath (Bridge->DevicePath);
   RootBridge->DevicePathStr = DevicePathStr;
@@ -351,7 +353,7 @@ RootBridgeIoCheckParameter (
       Address = PciRbAddr->Register;
     }
     Base = 0;
-    Limit = 0xFFF;
+    Limit = RootBridge->NoExtendedConfigSpace ? 0xFF : 0xFFF;
   }
 
   if (Address < Base) {
