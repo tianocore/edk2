@@ -21,7 +21,7 @@
 /// Macro used to display the value of a bit field in a register returned by CPUID.
 ///
 #define PRINT_BIT_FIELD(Variable, FieldName) \
-  Print (L"%5a%42a: %x\n", #Variable, #FieldName, ##Variable.Bits.##FieldName);
+  Print (L"%5a%42a: %x\n", #Variable, #FieldName, Variable.Bits.FieldName);
 
 ///
 /// Macro used to display the value of a register returned by CPUID.
