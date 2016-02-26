@@ -201,8 +201,8 @@ MemMapInitialization (
     EFI_RESOURCE_IO,
     EFI_RESOURCE_ATTRIBUTE_PRESENT     |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
-    0xC000,
-    0x4000
+    PcdGet64 (PcdPciIoBase),
+    PcdGet64 (PcdPciIoSize)
     );
 
   //

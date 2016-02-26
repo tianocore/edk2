@@ -114,6 +114,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize|0x0|UINT32|0x1a
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd|0x0|UINT32|0x1f
 
+  ## The IO port aperture shared by all PCI root bridges.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase|0xC000|UINT64|0x22
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize|0x4000|UINT64|0x23
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
