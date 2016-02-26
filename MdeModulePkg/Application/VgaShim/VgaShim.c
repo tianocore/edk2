@@ -23,7 +23,7 @@
 #include <Protocol/GraphicsOutput.h>
 
 #include "LegacyVgaBios.h"
-#include "VgaShim.h"
+#include "Int10hHandler.h"
 
 typedef enum
 {
@@ -44,7 +44,7 @@ BOOLEAN CanWriteAtAddress(EFI_PHYSICAL_ADDRESS address);
 EFI_STATUS EnsureMemoryLock(EFI_PHYSICAL_ADDRESS Address, UINT32 Length, MEMORY_LOCK_OPERATION Operation);
 BOOLEAN IsInt10HandlerDefined();
 EFI_STATUS FillVesaInformation(IN EFI_PHYSICAL_ADDRESS StartAddress, OUT EFI_PHYSICAL_ADDRESS *EndAddress);
-VOID ShowVideoInfo();
+VOID PrintVideoInfo();
 EFI_STATUS GetVideoInfo(VIDEO_INFO *Info);
 
 // ensure correct alignment
@@ -70,14 +70,13 @@ UefiMain (
 	IN EFI_HANDLE		ImageHandle,
 	IN EFI_SYSTEM_TABLE	*SystemTable)
 {
-	EFI_PHYSICAL_ADDRESS	Int10HandlerAddress;
+	EFI_PHYSICAL_ADDRESS	Int10hHandlerAddress;
+	IVT_ENTRY				*Int10hHandlerEntry;
 	EFI_PHYSICAL_ADDRESS	TempAddress;
-	IVT_ENTRY				*Int0x10;
 	EFI_STATUS				Status;
-	VBE_MODE_INFO			*VbeModeInfo;
 	
 	Print(L"VGA Shim v0.5\n");
-	ShowVideoInfo();
+	PrintVideoInfo();
 
 	//
 	// If an Int10h handler exists there either is a real
@@ -107,7 +106,7 @@ UefiMain (
 	// Claim real mode IVT memory area. This can be done as the IDT
 	// has already been initialized so we can overwrite the IVT.
 	//
-	Int0x10 = (IVT_ENTRY *)(UINTN)IVT_ADDRESS + 0x10;
+	Int10hHandlerEntry = (IVT_ENTRY *)IVT_ADDRESS + 0x10;
 	Print(L"%a: Claiming IVT area ... ", __FUNCTION__);
 	TempAddress = IVT_ADDRESS;
 	Status = gBS->AllocatePages(AllocateAddress, EfiBootServicesCode, 1, &TempAddress);
@@ -116,22 +115,20 @@ UefiMain (
 		return EFI_ABORTED;
 	} else {
 		Print(L"success\n");
-		ASSERT(Int0x10->Segment == IVT_ADDRESS);
-		ASSERT(Int0x10->Offset == 0x0);
 	}
 
 	//
 	// Copy ROM stub in place and fill in the missing information.
 	//
-	SetMem((VOID *)(UINTN)VROM_ADDRESS, VROM_SIZE, 0);
-	CopyMem((VOID *)(UINTN)VROM_ADDRESS, mVgaShim, sizeof mVgaShim);
-	Status = FillVesaInformation(VROM_ADDRESS, &Int10HandlerAddress);
+	SetMem((VOID *)VROM_ADDRESS, VROM_SIZE, 0);
+	CopyMem((VOID *)VROM_ADDRESS, mVgaShim, sizeof mVgaShim);
+	Status = FillVesaInformation(VROM_ADDRESS, &Int10hHandlerAddress);
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Cannot complete shim installation, aborting\n", __FUNCTION__);
 		return EFI_ABORTED;
 	} else {
 		Print(L"%a: VESA information filled in, Int10h handler address = %x\n", 
-			__FUNCTION__, Int10HandlerAddress);
+			__FUNCTION__, Int10hHandlerAddress);
 	}
 	
 	//
@@ -146,11 +143,11 @@ UefiMain (
 	//
 	// Point the Int10h vector at the entry point in shim.
 	//
-	// convert from real 32bit physical address to real mode segment address
-	Int0x10->Segment = (UINT16)((UINT32)VROM_ADDRESS >> 4);
-	Int0x10->Offset = (UINT16)(Int10HandlerAddress - VROM_ADDRESS);
+	// Convert from real 32bit physical address to real mode segment address
+	Int10hHandlerEntry->Segment = (UINT16)((UINT32)VROM_ADDRESS >> 4);
+	Int10hHandlerEntry->Offset = (UINT16)(Int10hHandlerAddress - VROM_ADDRESS);
 	Print(L"%a: Int10h handler installed at %04x:%04x\n",
-		__FUNCTION__, Int0x10->Segment, Int0x10->Offset);
+		__FUNCTION__, Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
 
 Exit:
 	Print(L"%a: Done!\n", __FUNCTION__);
@@ -159,7 +156,7 @@ Exit:
 
 
 VOID
-ShowVideoInfo()
+PrintVideoInfo()
 {
 	VIDEO_INFO	Info;
 
@@ -257,7 +254,7 @@ FillVesaInformation(
 	//
 	Status = GetVideoInfo(&VideoInfo);
 	if (EFI_ERROR(Status)) {
-		Print(L"%a: Unable to fill in VESA information as no adapters were found\n", __FUNCTION__);
+		Print(L"%a: No adapters were found, unable to fill in VESA information\n", __FUNCTION__);
 		return EFI_NOT_FOUND;
 	}
 	
@@ -510,13 +507,9 @@ CanWriteAtAddress(
 
 	TestPtr = (UINT8*)(Address);
 	OldValue = *TestPtr;
-
-	//Print(L"%a: Attempting memory write at %x ... ", __FUNCTION__, TestPtr);
 	
 	*TestPtr = *TestPtr + 1;
 	CanWrite = OldValue != *TestPtr;
-	
-	//Print(L"%s\n", CanWrite ? L"successful" : L"unsuccessful");
 	
 	*TestPtr = OldValue;
 	return CanWrite;
