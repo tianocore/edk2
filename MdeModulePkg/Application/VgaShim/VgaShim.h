@@ -1,0 +1,48 @@
+#pragma pack(1)
+typedef struct {
+  UINT16 Offset;
+  UINT16 Segment;
+} IVT_ENTRY;
+#pragma pack()
+
+typedef enum
+{
+	MEM_LOCK,
+	MEM_UNLOCK
+} MEMORY_LOCK_OPERATION;
+
+typedef struct {
+	UINT32						HorizontalResolution;
+	UINT32						VerticalResolution;
+	EFI_GRAPHICS_PIXEL_FORMAT	PixelFormat;
+	UINT32						PixelsPerScanLine;
+	EFI_PHYSICAL_ADDRESS		FrameBufferBase;
+	UINTN						FrameBufferSize;
+} VIDEO_INFO;
+
+BOOLEAN CanWriteAtAddress(
+	IN		EFI_PHYSICAL_ADDRESS address);
+
+EFI_STATUS EnsureMemoryLock(
+	IN		EFI_PHYSICAL_ADDRESS Address, 
+	IN		UINT32 Length, 
+	IN		MEMORY_LOCK_OPERATION Operation);
+
+BOOLEAN IsInt10HandlerDefined();
+
+EFI_STATUS FillVesaInformation(
+	IN		EFI_PHYSICAL_ADDRESS StartAddress, 
+	OUT		EFI_PHYSICAL_ADDRESS *EndAddress);
+
+VOID PrintVideoInfo(VOID);
+
+EFI_STATUS GetVideoInfo(
+	IN OUT	VIDEO_INFO *Info);
+
+STATIC CONST CHAR8 VENDOR_NAME[] = "Apple";
+STATIC CONST CHAR8 PRODUCT_NAME[] = "Emulated VGA";
+STATIC CONST CHAR8 PRODUCT_REVISION[] = "OVMF Int10h (fake)";
+STATIC CONST EFI_PHYSICAL_ADDRESS VGA_ROM_ADDRESS = 0xc0000;
+STATIC CONST EFI_PHYSICAL_ADDRESS IVT_ADDRESS = 0x00000;
+STATIC CONST UINTN VGA_ROM_SIZE = 0x10000;
+STATIC CONST UINTN FIXED_MTRR_SIZE = 0x20000;

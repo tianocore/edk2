@@ -10,7 +10,6 @@
 #include <Library/PciLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
-#include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/IoLib.h>
 #include <Library/DevicePathLib.h>
@@ -24,46 +23,20 @@
 
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
-
-typedef enum
-{
-	MEM_LOCK,
-	MEM_UNLOCK
-} MEMORY_LOCK_OPERATION;
-
-typedef struct {
-	UINT32						HorizontalResolution;
-	UINT32						VerticalResolution;
-	EFI_GRAPHICS_PIXEL_FORMAT	PixelFormat;
-	UINT32						PixelsPerScanLine;
-	EFI_PHYSICAL_ADDRESS		FrameBufferBase;
-	UINTN						FrameBufferSize;
-} VIDEO_INFO;
-
-BOOLEAN CanWriteAtAddress(EFI_PHYSICAL_ADDRESS address);
-EFI_STATUS EnsureMemoryLock(EFI_PHYSICAL_ADDRESS Address, UINT32 Length, MEMORY_LOCK_OPERATION Operation);
-BOOLEAN IsInt10HandlerDefined();
-EFI_STATUS FillVesaInformation(IN EFI_PHYSICAL_ADDRESS StartAddress, OUT EFI_PHYSICAL_ADDRESS *EndAddress);
-VOID PrintVideoInfo();
-EFI_STATUS GetVideoInfo(VIDEO_INFO *Info);
-
-// ensure correct alignment
-#pragma pack (1)
-typedef struct {
-  UINT16 Offset;
-  UINT16 Segment;
-} IVT_ENTRY;
-#pragma pack ()
-
-STATIC CONST CHAR8 VENDOR_NAME[] = "OVMF";
-STATIC CONST CHAR8 PRODUCT_NAME[] = "DummyCard";
-STATIC CONST CHAR8 PRODUCT_REVISION[] = "OVMF Int10h (fake)";
-STATIC CONST EFI_PHYSICAL_ADDRESS VROM_ADDRESS = 0xc0000;
-STATIC CONST EFI_PHYSICAL_ADDRESS IVT_ADDRESS = 0x00000;
-STATIC CONST UINTN VROM_SIZE = 0x10000;
-STATIC CONST UINTN FIXED_MTRR_SIZE = 0x20000;
+#include "VgaShim.h"
 
 
+/**
+  The entry point for the application.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
+  @param[in] SystemTable    A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS       VGA ROM shim has been installed successfully
+                            or it was found not to be required.
+  @retval other             Some error occured during execution.
+
+**/
 EFI_STATUS
 EFIAPI
 UefiMain (
@@ -75,7 +48,7 @@ UefiMain (
 	EFI_PHYSICAL_ADDRESS	TempAddress;
 	EFI_STATUS				Status;
 	
-	Print(L"VGA Shim v0.5\n");
+	Print(L"VGA Shim v0.6\n");
 	PrintVideoInfo();
 
 	//
@@ -90,15 +63,15 @@ UefiMain (
 	//
 	// Sanity checks.
 	//
-	ASSERT(sizeof mVgaShim <= VROM_SIZE);
+	ASSERT(sizeof INT10H_HANDLER <= VGA_ROM_SIZE);
 
 	//
 	// Unlock VGA ROM memory for writing first.
 	//
-	Status = EnsureMemoryLock(VROM_ADDRESS, VROM_SIZE, MEM_UNLOCK);
+	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, MEM_UNLOCK);
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Unable to unlock VGA ROM memory at %x for shim insertion\n", 
-			__FUNCTION__, VROM_ADDRESS);
+			__FUNCTION__, VGA_ROM_ADDRESS);
 		goto Exit;
 	}
 
@@ -120,9 +93,9 @@ UefiMain (
 	//
 	// Copy ROM stub in place and fill in the missing information.
 	//
-	SetMem((VOID *)VROM_ADDRESS, VROM_SIZE, 0);
-	CopyMem((VOID *)VROM_ADDRESS, mVgaShim, sizeof mVgaShim);
-	Status = FillVesaInformation(VROM_ADDRESS, &Int10hHandlerAddress);
+	SetMem((VOID *)VGA_ROM_ADDRESS, VGA_ROM_SIZE, 0);
+	CopyMem((VOID *)VGA_ROM_ADDRESS, INT10H_HANDLER, sizeof INT10H_HANDLER);
+	Status = FillVesaInformation(VGA_ROM_ADDRESS, &Int10hHandlerAddress);
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Cannot complete shim installation, aborting\n", __FUNCTION__);
 		return EFI_ABORTED;
@@ -134,18 +107,18 @@ UefiMain (
 	//
 	// Lock the VGA ROM memory to prevent further writes.
 	//
-	Status = EnsureMemoryLock(VROM_ADDRESS, VROM_SIZE, MEM_LOCK);
+	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, MEM_LOCK);
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Unable to lock VGA ROM memory at %x but this is not essential\n", 
-			__FUNCTION__, VROM_ADDRESS);
+			__FUNCTION__, VGA_ROM_ADDRESS);
 	}
 
 	//
 	// Point the Int10h vector at the entry point in shim.
 	//
 	// Convert from real 32bit physical address to real mode segment address
-	Int10hHandlerEntry->Segment = (UINT16)((UINT32)VROM_ADDRESS >> 4);
-	Int10hHandlerEntry->Offset = (UINT16)(Int10hHandlerAddress - VROM_ADDRESS);
+	Int10hHandlerEntry->Segment = (UINT16)((UINT32)VGA_ROM_ADDRESS >> 4);
+	Int10hHandlerEntry->Offset = (UINT16)(Int10hHandlerAddress - VGA_ROM_ADDRESS);
 	Print(L"%a: Int10h handler installed at %04x:%04x\n",
 		__FUNCTION__, Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
 
@@ -173,9 +146,22 @@ PrintVideoInfo()
 }
 
 
+/**
+  Scans the system for Graphics Output Protocol (GOP) and
+  Universal Graphic Adapter (UGA) compatible adapters/GPUs
+  and retrieves vital information about them if found.
+
+  @param[in] Info         Where to store information.
+
+  @retval EFI_SUCCESS     An adapter was found and its
+                          configuration was retrieved.
+  @return other           No compatible adapters were found or
+                          information about them was not retrieved.
+  
+**/
 EFI_STATUS
 GetVideoInfo(
-	VIDEO_INFO	*Info)
+	IN OUT	VIDEO_INFO	*Info)
 {
 	EFI_STATUS						Status;
 	EFI_UGA_DRAW_PROTOCOL			*UgaDraw;
@@ -231,6 +217,19 @@ GetVideoInfo(
 }
 
 
+/**
+  Fills in VESA-compatible information about supported video modes
+  in the space left for this purpose at the beginning of the 
+  generated VGA ROM assembly code.
+
+  @param[in] StartAddress Where to begin writing VESA information.
+  @param[in] EndAddress   Pointer to the next byte after the end
+                          of all video mode information data.
+
+  @retval EFI_SUCCESS     The operation was successful
+  @return other           The operation failed.
+
+**/
 EFI_STATUS
 FillVesaInformation(
 	IN	EFI_PHYSICAL_ADDRESS	StartAddress,
@@ -378,11 +377,19 @@ FillVesaInformation(
 }
 
 
+/**
+  Checkes if an Int10h handler is already defined in the
+  Interrupt Vector Table (IVT).
+
+  @retval TRUE            An Int10h handler was found in IVT.
+  @retval FALSE           An Int10h handler was not found in IVT.
+
+**/
 BOOLEAN
 IsInt10HandlerDefined()
 {
-	IVT_ENTRY				*Int10Entry;
-	EFI_PHYSICAL_ADDRESS	Int10Handler;
+	IN	IVT_ENTRY				*Int10Entry;
+	IN	EFI_PHYSICAL_ADDRESS	Int10Handler;
 	
 	// convert from real mode segment address to 32bit physical address
 	Int10Entry = (IVT_ENTRY *)(UINTN)IVT_ADDRESS + 0x10;
@@ -390,7 +397,7 @@ IsInt10HandlerDefined()
 
 	Print(L"%a: Checking for an existing Int10h handler ... ", __FUNCTION__);
 
-	if (Int10Handler >= VROM_ADDRESS && Int10Handler < (VROM_ADDRESS+VROM_SIZE)) {
+	if (Int10Handler >= VGA_ROM_ADDRESS && Int10Handler < (VGA_ROM_ADDRESS+VGA_ROM_SIZE)) {
 		Print(L"found at %04x:%04x\n", Int10Entry->Segment, Int10Entry->Offset);
 		return TRUE;
 	} else {
@@ -400,11 +407,25 @@ IsInt10HandlerDefined()
 }
 
 
+/**
+  Attempts to either unlock a memory area for writing or
+  lock it to prevent writes. Makes use of a number of approaches
+  to achieve the desired result.
+
+  @param[in] StartAddress Where the desired memory area begins.
+  @param[in] Length       Number of bytes from StartAddress that
+                          need to be locked or unlocked.
+  @param[in] Operation    Whether the area is to be locked or unlocked. 
+
+  @retval TRUE            An Int10h handler was found in IVT.
+  @retval FALSE           An Int10h handler was not found in IVT.
+
+**/
 EFI_STATUS
 EnsureMemoryLock(
-	EFI_PHYSICAL_ADDRESS	Address,
-	UINT32					Length,
-	MEMORY_LOCK_OPERATION	Operation)
+	IN	EFI_PHYSICAL_ADDRESS	StartAddress,
+	IN	UINT32					Length,
+	IN	MEMORY_LOCK_OPERATION	Operation)
 {
 	EFI_STATUS					Status = EFI_NOT_READY;
 	UINT32						Granularity;
@@ -414,11 +435,11 @@ EnsureMemoryLock(
 	//
 	// Check if we need to perform any operation
 	// 
-	if (Operation == MEM_UNLOCK && CanWriteAtAddress(Address)) {
-		Print(L"%a: Memory at %x already unlocked\n", __FUNCTION__, Address);
+	if (Operation == MEM_UNLOCK && CanWriteAtAddress(StartAddress)) {
+		Print(L"%a: Memory at %x already unlocked\n", __FUNCTION__, StartAddress);
 		Status = EFI_SUCCESS;
-	} else if (Operation == MEM_LOCK && !CanWriteAtAddress(Address)) {
-		Print(L"%a: Memory at %x already locked\n", __FUNCTION__, Address);
+	} else if (Operation == MEM_LOCK && !CanWriteAtAddress(StartAddress)) {
+		Print(L"%a: Memory at %x already locked\n", __FUNCTION__, StartAddress);
 		Status = EFI_SUCCESS;
 	}
 
@@ -429,18 +450,18 @@ EnsureMemoryLock(
 		Status = gBS->LocateProtocol(&gEfiLegacyRegionProtocolGuid, NULL, (VOID **)&mLegacyRegion);
 		if (!EFI_ERROR(Status)) {
 			if (Operation == MEM_UNLOCK) {
-				Status = mLegacyRegion->UnLock(mLegacyRegion, (UINT32)Address, Length, &Granularity);
-				Status = CanWriteAtAddress(Address) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+				Status = mLegacyRegion->UnLock(mLegacyRegion, (UINT32)StartAddress, Length, &Granularity);
+				Status = CanWriteAtAddress(StartAddress) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 			} else {
-				Status = mLegacyRegion->Lock(mLegacyRegion, (UINT32)Address, Length, &Granularity);
-				Status = CanWriteAtAddress(Address) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+				Status = mLegacyRegion->Lock(mLegacyRegion, (UINT32)StartAddress, Length, &Granularity);
+				Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 			}
 
 			Print(L"%a: %s %s memory at %x using EfiLegacyRegionProtocol\n", 
 				__FUNCTION__, 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
 				Operation == MEM_UNLOCK ? L"unlocking" : L"locking", 
-				Address);
+				StartAddress);
 		}
 	}
 	
@@ -451,18 +472,18 @@ EnsureMemoryLock(
 		Status = gBS->LocateProtocol(&gEfiLegacyRegion2ProtocolGuid, NULL, (VOID **)&mLegacyRegion2);
 		if (!EFI_ERROR(Status)) {
 			if (Operation == MEM_UNLOCK) {
-				Status = mLegacyRegion2->UnLock(mLegacyRegion2, (UINT32)Address, Length, &Granularity);
-				Status = CanWriteAtAddress(Address) ? EFI_SUCCESS : EFI_DEVICE_ERROR;;
+				Status = mLegacyRegion2->UnLock(mLegacyRegion2, (UINT32)StartAddress, Length, &Granularity);
+				Status = CanWriteAtAddress(StartAddress) ? EFI_SUCCESS : EFI_DEVICE_ERROR;;
 			} else {
-				Status = mLegacyRegion2->Lock(mLegacyRegion2, (UINT32)Address, Length, &Granularity);
-				Status = CanWriteAtAddress(Address) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+				Status = mLegacyRegion2->Lock(mLegacyRegion2, (UINT32)StartAddress, Length, &Granularity);
+				Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 			}
 
 			Print(L"%a: %s %s memory at %x using EfiLegacyRegion2Protocol\n", 
 				__FUNCTION__, 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
 				Operation == MEM_UNLOCK ? L"unlocking" : L"locking", 
-				Address);
+				StartAddress);
 		}
 	}
 	
@@ -470,19 +491,20 @@ EnsureMemoryLock(
 	// Try to lock/unlock via an MTRR
 	//
 	if (EFI_ERROR(Status) && IsMtrrSupported()) {
+		ASSERT(FIXED_MTRR_SIZE >= Length);
 		if (Operation == MEM_UNLOCK) {
-			MtrrSetMemoryAttribute(Address, FIXED_MTRR_SIZE, CacheUncacheable);
-			Status = CanWriteAtAddress(Address) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+			MtrrSetMemoryAttribute(StartAddress, FIXED_MTRR_SIZE, CacheUncacheable);
+			Status = CanWriteAtAddress(StartAddress) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 		} else {
-			MtrrSetMemoryAttribute(Address, FIXED_MTRR_SIZE, CacheWriteProtected);
-			Status = CanWriteAtAddress(Address) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+			MtrrSetMemoryAttribute(StartAddress, FIXED_MTRR_SIZE, CacheWriteProtected);
+			Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 		}
 
 		Print(L"%a: %s %s memory at %x using MTRR\n", 
 			__FUNCTION__, 
 			EFI_ERROR(Status) ? "Failure" : "Success",
 			Operation == MEM_UNLOCK ? "unlocking" : "locking", 
-			Address);
+			StartAddress);
 	}
 	
 	//
@@ -490,16 +512,27 @@ EnsureMemoryLock(
 	// 
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Unable to find a way to %s memory at %x\n", 
-			__FUNCTION__, Operation == MEM_UNLOCK ? "unlock" : "lock", Address);
+			__FUNCTION__, Operation == MEM_UNLOCK ? "unlock" : "lock", StartAddress);
 	}
 		
 	return Status;
 }
 
 
+/**
+  Checks if writes are possible in a particular memory area.
+
+  @param[in] Address      The memory location to be checked.
+
+  @retval TRUE            Writes to the specified location are
+                          allowed changes are persisted.
+  @retval FALSE           Writes to the specified location are
+                          not allowed or have no effect.
+  
+**/
 BOOLEAN
 CanWriteAtAddress(
-	EFI_PHYSICAL_ADDRESS	Address)
+	IN	EFI_PHYSICAL_ADDRESS	Address)
 {
 	BOOLEAN	CanWrite;
 	UINT8	*TestPtr;
