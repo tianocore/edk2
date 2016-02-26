@@ -24,6 +24,8 @@
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Protocol/LegacyRegion.h>
 #include <Protocol/LegacyRegion2.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/GraphicsOutput.h>
 
 #include "LegacyVgaBios.h"
 #include "VgaShim.h"
@@ -38,6 +40,7 @@ BOOLEAN CanWriteAtAddress(EFI_PHYSICAL_ADDRESS address);
 EFI_STATUS EnsureMemoryLock(EFI_PHYSICAL_ADDRESS Address, UINT32 Length, MEMORY_LOCK_OPERATION Operation);
 BOOLEAN IsInt10HandlerDefined();
 VBE_MODE_INFO* FillVesaInformation(EFI_PHYSICAL_ADDRESS Address);
+VOID ShowVideoInfo();
 
 // ensure correct alignment
 #pragma pack (1)
@@ -67,7 +70,8 @@ UefiMain (
 	EFI_STATUS				Status;
 	VBE_MODE_INFO			*VbeModeInfo;
 	
-	Print(L"VGA Shim v0.1\n");
+	Print(L"VGA Shim v0.5\n");
+	ShowVideoInfo();
 
 	//
 	// If an Int10h handler exists there either is a real
@@ -117,6 +121,15 @@ UefiMain (
 	VbeModeInfo = FillVesaInformation(VROM_ADDRESS);
 	
 	//
+	// Lock the VGA ROM memory to prevent further writes.
+	//
+	Status = EnsureMemoryLock(VROM_ADDRESS, VROM_SIZE, MEM_LOCK);
+	if (EFI_ERROR(Status)) {
+		Print(L"%a: Unable to lock VGA ROM memory at %x but continuing anyway\n", 
+			__FUNCTION__, VROM_ADDRESS);
+	}
+
+	//
 	// Point the Int10h vector at the entry point in shim.
 	//
 	// convert from real 32bit physical address to real mode segment address
@@ -128,6 +141,64 @@ UefiMain (
 Exit:
 	Print(L"%a: All done, exiting\n", __FUNCTION__);
 	return EFI_SUCCESS;
+}
+
+
+VOID
+ShowVideoInfo()
+{
+	EFI_STATUS						Status;
+	EFI_UGA_DRAW_PROTOCOL			*UgaDraw;
+	EFI_GRAPHICS_OUTPUT_PROTOCOL	*GraphicsOutput;
+
+	//
+	// Enumerate GOP adapters first.
+	//
+	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&GraphicsOutput);
+	if (!EFI_ERROR(Status)) {
+		Print(L"%a: Found a GOP protocol provider\n", __FUNCTION__);
+
+		Print(L"%a: HorizontalResolution = %u\n", __FUNCTION__, 
+			GraphicsOutput->Mode->Info->HorizontalResolution);
+		
+		Print(L"%a: VerticalResolution = %u\n", __FUNCTION__, 
+			GraphicsOutput->Mode->Info->VerticalResolution);
+
+		Print(L"%a: PixelFormat = %u\n", __FUNCTION__, 
+			GraphicsOutput->Mode->Info->PixelFormat);
+		
+		Print(L"%a: Pixel masks: red = %u green = %u blue = %u reserved = %u\n", __FUNCTION__, 
+			GraphicsOutput->Mode->Info->PixelInformation.RedMask,
+			GraphicsOutput->Mode->Info->PixelInformation.GreenMask,
+			GraphicsOutput->Mode->Info->PixelInformation.BlueMask,
+			GraphicsOutput->Mode->Info->PixelInformation.ReservedMask);
+		
+		Print(L"%a: PixelsPerScanLine = %u\n", __FUNCTION__, 
+			GraphicsOutput->Mode->Info->PixelsPerScanLine);
+
+		Print(L"%a: FrameBufferBase = %x\n", __FUNCTION__, 
+			GraphicsOutput->Mode->FrameBufferBase);
+
+		// PixelsPerScanLine * VerticalResolution * BytesPerPixel
+		// In this case 1536*900*4 = 5,529,600
+		Print(L"%a: FrameBufferSize = %u\n", __FUNCTION__, 
+			GraphicsOutput->Mode->FrameBufferSize);
+	} else {
+		Print(L"%a: GOP protocol provider not found\n", __FUNCTION__);
+	}
+
+	//
+	// Enumerate UGA adapters
+	//
+	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&UgaDraw);
+	if (!EFI_ERROR(Status)) {
+		Print(L"%a: Found an UGA protocol provider\n", __FUNCTION__);
+		//Status = UgaDraw->GetMode(UgaDraw, &SizeOfX, &SizeOfY, &ColorDepth, &RefreshRate);
+		// pixel format is BGRA8
+		// need to find scanline length
+		// need to find framebuffer base
+		// https://github.com/coreos/grub/blob/master/grub-core%2Fvideo%2Fefi_uga.c
+	}
 }
 
 
@@ -149,35 +220,25 @@ FillVesaInformation(
 	VbeInfoFull = (VBE_INFO *)(UINTN)Address;
 	VbeInfo = &VbeInfoFull->Base;
 	BufferPtr = VbeInfoFull->Buffer;
-
 	CopyMem(VbeInfo->Signature, "VESA", 4);
-	
 	VbeInfo->VesaVersion = 0x0300;
-	
 	VbeInfo->OemNameAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
 	CopyMem(BufferPtr, VENDOR_NAME, sizeof VENDOR_NAME);
 	BufferPtr += sizeof VENDOR_NAME;
-	
-	VbeInfo->Capabilities = BIT0;			// =DAC width is switchable to 8-bit per primary
-	
+	VbeInfo->Capabilities = BIT0;			// DAC width supports 8-bit color mode
 	VbeInfo->ModeListAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
 	*(UINT16*)BufferPtr = 0x00f1;			// mode number
 	BufferPtr += 2;
 	*(UINT16*)BufferPtr = 0xFFFF;			// mode list terminator
 	BufferPtr += 2;
-	
 	VbeInfo->VideoMem64K = (UINT16)((1024 * 768 * 4 + 65535) / 65536); // 64KB units available to fb
-	
 	VbeInfo->OemSoftwareVersion = 0x0000;
-	
 	VbeInfo->VendorNameAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
 	CopyMem(BufferPtr, VENDOR_NAME, sizeof VENDOR_NAME);
 	BufferPtr += sizeof VENDOR_NAME;
-	
 	VbeInfo->ProductNameAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
 	CopyMem(BufferPtr, PRODUCT_NAME, sizeof PRODUCT_NAME);
 	BufferPtr += sizeof PRODUCT_NAME;
-
 	VbeInfo->ProductRevAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
 	CopyMem(BufferPtr, PRODUCT_REVISION, sizeof PRODUCT_REVISION);
 	BufferPtr += sizeof PRODUCT_REVISION;
@@ -234,7 +295,7 @@ FillVesaInformation(
 	VbeModeInfo->BitsPerPixel = 32;					// 8+8+8+8
 	VbeModeInfo->BlueMaskSize = 8;					// 8 bits for blue
 	VbeModeInfo->BlueMaskSizeLinear = 8;
-	VbeModeInfo->GreenMaskSize = 8;					// 8 bits for greem
+	VbeModeInfo->GreenMaskSize = 8;					// 8 bits for green
 	VbeModeInfo->GreenMaskSizeLinear = 8;
 	VbeModeInfo->RedMaskSize = 8;					// 8 bits for red
 	VbeModeInfo->RedMaskSizeLinear = 8;
@@ -321,8 +382,8 @@ EnsureMemoryLock(
 
 			Print(L"%a: %s %s memory at %x using EfiLegacyRegionProtocol\n", 
 				__FUNCTION__, 
-				EFI_ERROR(Status) ? "Failure" : "Success",
-				Operation == MEM_UNLOCK ? "unlocking" : "locking", 
+				EFI_ERROR(Status) ? L"Failure" : L"Success",
+				Operation == MEM_UNLOCK ? L"unlocking" : L"locking", 
 				Address);
 		}
 	}
@@ -343,8 +404,8 @@ EnsureMemoryLock(
 
 			Print(L"%a: %s %s memory at %x using EfiLegacyRegion2Protocol\n", 
 				__FUNCTION__, 
-				EFI_ERROR(Status) ? "Failure" : "Success",
-				Operation == MEM_UNLOCK ? "unlocking" : "locking", 
+				EFI_ERROR(Status) ? L"Failure" : L"Success",
+				Operation == MEM_UNLOCK ? L"unlocking" : L"locking", 
 				Address);
 		}
 	}
@@ -396,7 +457,7 @@ CanWriteAtAddress(
 	*TestPtr = *TestPtr + 1;
 	CanWrite = OldValue != *TestPtr;
 	
-	Print(L"%s\n", CanWrite ? "successful" : "unsuccessful");
+	Print(L"%s\n", CanWrite ? L"successful" : L"unsuccessful");
 	
 	*TestPtr = OldValue;
 	return CanWrite;
