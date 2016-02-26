@@ -1,7 +1,7 @@
 /** @file
   Implements editor interface functions.
 
-  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1617,8 +1617,8 @@ MainEditorRefresh (
 
     MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row, 0, 0);
     FileBufferRestorePosition ();
-    FileBufferRefresh ();
   }
+
   if (EditorFirst
     || FileBufferBackupVar.FilePosition.Row != FileBuffer.FilePosition.Row 
     || FileBufferBackupVar.FilePosition.Column != FileBuffer.FilePosition.Column 
@@ -1627,12 +1627,13 @@ MainEditorRefresh (
 
     StatusBarRefresh (EditorFirst, MainEditor.ScreenSize.Row, MainEditor.ScreenSize.Column, MainEditor.FileBuffer->FilePosition.Row, MainEditor.FileBuffer->FilePosition.Column, MainEditor.FileBuffer->ModeInsert);
     FileBufferRestorePosition ();
-    FileBufferRefresh ();
   }
 
   if (EditorFirst) {
     FileBufferRestorePosition ();
   }
+
+  FileBufferRefresh ();
 
   //
   // EditorFirst is now set to FALSE
