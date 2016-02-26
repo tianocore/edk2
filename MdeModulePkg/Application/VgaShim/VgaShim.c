@@ -176,6 +176,7 @@ ShowVideoInfo()
 		Print(L"%a: PixelsPerScanLine = %u\n", __FUNCTION__, 
 			GraphicsOutput->Mode->Info->PixelsPerScanLine);
 
+		// B000 0000
 		Print(L"%a: FrameBufferBase = %x\n", __FUNCTION__, 
 			GraphicsOutput->Mode->FrameBufferBase);
 
@@ -213,6 +214,8 @@ FillVesaInformation(
 	VBE_INFO_BASE	*VbeInfo;
 	VBE_MODE_INFO	*VbeModeInfo;
 	UINT8			*BufferPtr;
+	EFI_GRAPHICS_OUTPUT_PROTOCOL	*GraphicsOutput;
+	gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&GraphicsOutput);
 
 	//
 	// VESA general information.
@@ -231,7 +234,7 @@ FillVesaInformation(
 	BufferPtr += 2;
 	*(UINT16*)BufferPtr = 0xFFFF;			// mode list terminator
 	BufferPtr += 2;
-	VbeInfo->VideoMem64K = (UINT16)((1024 * 768 * 4 + 65535) / 65536); // 64KB units available to fb
+	VbeInfo->VideoMem64K = (UINT16)((GraphicsOutput->Mode->FrameBufferSize + 65535) / 65536); // 64KB units available to fb
 	VbeInfo->OemSoftwareVersion = 0x0000;
 	VbeInfo->VendorNameAddress = (UINT32)Address << 12 | (UINT16)(UINTN)BufferPtr;
 	CopyMem(BufferPtr, VENDOR_NAME, sizeof VENDOR_NAME);
@@ -255,12 +258,10 @@ FillVesaInformation(
 	// bit3: color mode
 	// bit4: graphics mode
 	// bit5: mode not VGA-compatible (do not access VGA I/O ports and registers)
-	// bit6: disable windowed memory mode = linear framebuffer only (!!!)
+	// bit6: disable windowed memory mode = linear framebuffer only
 	// bit7: linear framebuffer supported
-	VbeModeInfo->ModeAttr = BIT7 | BIT5 | BIT4 | BIT3 | BIT1 | BIT0;
-	VbeModeInfo->BytesPerScanLineLinear = 1024 * 4;	// logical bytes in linear modes
-	VbeModeInfo->LfbAddress = (UINT32)0xA0000;		// 32-bit physical address
-
+	VbeModeInfo->ModeAttr = BIT7 | BIT6 | BIT5 | BIT4 | BIT3 | BIT1 | BIT0;
+	
 	//
 	// Resolution
 	//
@@ -270,21 +271,23 @@ FillVesaInformation(
 	VbeModeInfo->CharCellHeight = 16;				// used to calculate resolution in text modes
 	
 	//
-	// Banking, paging, windowing
+	// Memory access (banking, windowing, paging)
 	//
 	VbeModeInfo->NumBanks = 1;						// disable memory banking
 	VbeModeInfo->BankSizeKB = 0;					// disable memory banking
-	VbeModeInfo->BytesPerScanLine = 1024 * 4;		// logical bytes in banked modes
+	VbeModeInfo->BytesPerScanLine = 1536 * 4;		// logical bytes in banked modes
+	VbeModeInfo->LfbAddress = (UINT32)GraphicsOutput->Mode->FrameBufferBase;	// 32-bit physical address
+	VbeModeInfo->BytesPerScanLineLinear = 1536 * 4;	// logical bytes in linear modes
 	VbeModeInfo->NumImagePagesLessOne = 0;			// disable image paging
 	VbeModeInfo->NumImagesLessOneBanked = 0;		// disable image paging
 	VbeModeInfo->NumImagesLessOneLinear = 0;		// disable image paging
-	VbeModeInfo->WindowPositioningAddress = 0x0000;	// force windowing to Function 5h
-	VbeModeInfo->WindowAAttr = BIT2 | BIT1 | BIT0;	// writable, readable, relocatable (?)
+	VbeModeInfo->WindowPositioningAddress = 0x0;	// force windowing to Function 5h
+	VbeModeInfo->WindowAAttr = 0x0;					// window disabled
 	VbeModeInfo->WindowBAttr = 0x0;					// window disabled
-	VbeModeInfo->WindowGranularityKB = 0x0040;		// 64KB
-	VbeModeInfo->WindowSizeKB = 0x0040;				// 64KB
-	VbeModeInfo->WindowAStartSegment = 0xA000;		// real mode address (!), 0=lfb-only
-	VbeModeInfo->WindowBStartSegment = 0x0000;
+	VbeModeInfo->WindowGranularityKB = 0x0;			// window disabled and not relocatable
+	VbeModeInfo->WindowSizeKB = 0x0040;				// set to 64KB even thou window is disabled
+	VbeModeInfo->WindowAStartSegment = 0x0;			// linear framebuffer only
+	VbeModeInfo->WindowBStartSegment = 0x0;			// linear framebuffer only
 
 	//
 	// Color mode
@@ -452,12 +455,12 @@ CanWriteAtAddress(
 	TestPtr = (UINT8*)(Address);
 	OldValue = *TestPtr;
 
-	Print(L"%a: Attempting memory write at %x ... ", __FUNCTION__, TestPtr);
+	//Print(L"%a: Attempting memory write at %x ... ", __FUNCTION__, TestPtr);
 	
 	*TestPtr = *TestPtr + 1;
 	CanWrite = OldValue != *TestPtr;
 	
-	Print(L"%s\n", CanWrite ? L"successful" : L"unsuccessful");
+	//Print(L"%s\n", CanWrite ? L"successful" : L"unsuccessful");
 	
 	*TestPtr = OldValue;
 	return CanWrite;
