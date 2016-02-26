@@ -455,10 +455,10 @@ EnsureMemoryLock(
 		if (!EFI_ERROR(Status)) {
 			if (Operation == MEM_UNLOCK) {
 				Status = mLegacyRegion2->UnLock(mLegacyRegion2, (UINT32)Address, Length, &Granularity);
-				Status = CanWriteAtAddress(Address);
+				Status = CanWriteAtAddress(Address) ? EFI_SUCCESS : EFI_DEVICE_ERROR;;
 			} else {
 				Status = mLegacyRegion2->Lock(mLegacyRegion2, (UINT32)Address, Length, &Granularity);
-				Status = CanWriteAtAddress(Address) == EFI_WRITE_PROTECTED ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+				Status = CanWriteAtAddress(Address) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 			}
 
 			Print(L"%a: %s %s memory at %x using EfiLegacyRegion2Protocol\n", 
@@ -475,10 +475,10 @@ EnsureMemoryLock(
 	if (EFI_ERROR(Status) && IsMtrrSupported()) {
 		if (Operation == MEM_UNLOCK) {
 			MtrrSetMemoryAttribute(Address, FIXED_MTRR_SIZE, CacheUncacheable);
-			Status = CanWriteAtAddress(Address);
+			Status = CanWriteAtAddress(Address) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 		} else {
 			MtrrSetMemoryAttribute(Address, FIXED_MTRR_SIZE, CacheWriteProtected);
-			Status = CanWriteAtAddress(Address) == EFI_WRITE_PROTECTED ? EFI_SUCCESS : EFI_DEVICE_ERROR;
+			Status = CanWriteAtAddress(Address) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 		}
 
 		Print(L"%a: %s %s memory at %x using MTRR\n", 
