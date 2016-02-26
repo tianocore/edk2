@@ -72,6 +72,7 @@ typedef struct {
   PCI_ROOT_BRIDGE_APERTURE          MemAbove4G;
   PCI_ROOT_BRIDGE_APERTURE          PMemAbove4G;
   BOOLEAN                           DmaAbove4G;
+  BOOLEAN                           NoExtendedConfigSpace;
   VOID                              *ConfigBuffer;
   EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
   CHAR16                            *DevicePathStr;

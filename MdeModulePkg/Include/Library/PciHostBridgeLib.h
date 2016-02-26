@@ -34,6 +34,10 @@ typedef struct {
                                                   ///< and SetAttributes() in EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   BOOLEAN                  DmaAbove4G;            ///< DMA above 4GB memory.
                                                   ///< Set to TRUE when root bridge supports DMA above 4GB memory.
+  BOOLEAN                  NoExtendedConfigSpace; ///< When FALSE, the root bridge supports
+                                                  ///< Extended (4096-byte) Configuration Space.
+                                                  ///< When TRUE, the root bridge supports
+                                                  ///< 256-byte Configuration Space only.
   UINT64                   AllocationAttributes;  ///< Allocation attributes.
                                                   ///< Refer to EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM and
                                                   ///< EFI_PCI_HOST_BRIDGE_MEM64_DECODE used by GetAllocAttributes()
