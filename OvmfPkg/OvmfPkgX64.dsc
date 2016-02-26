@@ -433,6 +433,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 

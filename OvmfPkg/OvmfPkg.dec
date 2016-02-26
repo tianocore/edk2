@@ -125,6 +125,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0|UINT16|0x1b
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE|BOOLEAN|0x21
 
+  ## The 32-bit MMIO aperture shared by all PCI root bridges.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT64|0x24
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT64|0x25
+
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable|FALSE|BOOLEAN|3
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
