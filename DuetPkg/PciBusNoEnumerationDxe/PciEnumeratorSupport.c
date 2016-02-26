@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -257,13 +257,14 @@ Returns:
           }
               
           //
-          // Deep enumerate the next level bus
+          // If the PCI bridge is initialized then enumerate the next level bus
           //
-          Status = PciPciDeviceInfoCollector (
-                    PciIoDevice,
-                    (UINT8) (SecBus)
-                    );
-
+          if (SecBus != 0) {
+            Status = PciPciDeviceInfoCollector (
+                      PciIoDevice,
+                      (UINT8) (SecBus)
+                      );
+          }
         }
 
         if (Func == 0 && !IS_PCI_MULTI_FUNC (&Pci)) {
