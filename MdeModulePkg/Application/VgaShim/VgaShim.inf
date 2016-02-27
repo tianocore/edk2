@@ -9,7 +9,7 @@
   MODULE_UNI_FILE                = VgaShim.uni
   FILE_GUID                      = 0a5a9015-d948-40d4-b6a7-61c380599f38
   MODULE_TYPE                    = UEFI_APPLICATION
-  VERSION_STRING                 = 0.1
+  VERSION_STRING                 = 0.6
   ENTRY_POINT                    = UefiMain
 
 [Sources]
@@ -33,6 +33,7 @@
   MtrrLib
   PcdLib
   IoLib
+  DevicePathLib
 
 [UserExtensions.TianoCore."ExtraFiles"]
   VgaShimExtra.uni
@@ -41,7 +42,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel  ## CONSUMES
 
 [Protocols]
-  ## Include/Protocol/LegacyRegion.h
   gEfiLegacyRegionProtocolGuid          ## CONSUMES
-  ## Include/Protocol/LegacyRegion2.h
   gEfiLegacyRegion2ProtocolGuid         ## CONSUMES
+  gEfiLoadedImageProtocolGuid           ## CONSUMES
