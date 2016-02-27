@@ -41,31 +41,39 @@ UefiMain (
 	EFI_INPUT_KEY			Key;
 	IMAGE					*WindowsFlag;
 	UINTN					index;
+	EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
+
+	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
+	Print(L"Locating console control %x %r\n", &gEfiConsoleControlProtocolGuid, Status);
+	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
 
 	//Print(L"VGA Shim v0.7\n");
 	//PrintVideoInfo();
 
-	Status = gST->ConOut->Reset(gST->ConOut, FALSE);
+	//Status = gST->ConOut->Reset(gST->ConOut, FALSE);
 	//Status = gST->ConIn->Reset(gST->ConIn, FALSE);
 	//Print(L"Waiting for key stroke but you should not be seeing this message\n");
 	
 	ClearScreen();
 	WindowsFlag = BmpFileToImage(bootflag, sizeof bootflag);
-	DrawImage(WindowsFlag, 600, 600);
+	DrawImageCentered(WindowsFlag);
+	gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &index);
+	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
+	
+	//gST->ConOut->
+	//do {
+	//	gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &index);
+	//	gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
 
-	do {
-		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &index);
-		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
+	//	if (Key.ScanCode != SCAN_NULL) {
+	//		//ClearScreen();
+	//		DrawImage(WindowsFlag, 600, 600);
+	//	}
 
-		if (Key.ScanCode != SCAN_NULL) {
-			//ClearScreen();
-			DrawImage(WindowsFlag, 600, 600);
-		}
-
-	} while (Key.ScanCode != SCAN_ESC);
+	//} while (Key.ScanCode != SCAN_ESC);
 
 
-	Print(L"End of waiting\n");
+	//Print(L"End of waiting\n");
 
 	//
 	// If an Int10h handler exists there either is a real
@@ -577,17 +585,15 @@ VOID
 ClearScreen()
 {
     EFI_UGA_PIXEL	FillColor;
-	//EFI_CONSOLE_CONTROL_SCREEN_MODE Mode;
-	FillColor.Red		= 0xff;
-	FillColor.Green		= 0xf;
-	FillColor.Blue		= 0xf;
-	FillColor.Reserved	= 0xf;
+	
+	FillColor.Red		= 0;
+	FillColor.Green		= 0;
+	FillColor.Blue		= 0;
+	FillColor.Reserved	= 0;
 
 	if (!GraphicsInitialized) {
 		InitializeGraphics();
 	}
-
-	//ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
 
     if (GraphicsOutput != NULL) {
 		GraphicsOutput->Blt(
@@ -646,14 +652,12 @@ CreateImage(
 }
 
 
-VOID 
-DrawImage(
-	IN	IMAGE	*Image,
-	IN	UINTN	PosX,
-	IN	UINTN	PosY)
+VOID
+DrawImageCentered(
+	IN	IMAGE	*Image)
 {
-	EFI_STATUS Status;
-	EFI_GRAPHICS_OUTPUT_BLT_PIXEL *Random;
+	UINTN	PosX;
+	UINTN	PosY;
 
 	if (!GraphicsInitialized) {
 		InitializeGraphics();
@@ -666,24 +670,58 @@ DrawImage(
 		Print(L"%a: No image specified\n", __FUNCTION__);
 		return;
 	}
+	if ((Image->Width) > VideoInfo.HorizontalResolution
+		|| (Image->Height) > VideoInfo.VerticalResolution) {
+		Print(L"%a: Image too big to draw on screen\n", __FUNCTION__);
+		return;
+	}
 
+	PosX = (VideoInfo.HorizontalResolution / 2) - (Image->Width / 2);
+	PosY = (VideoInfo.VerticalResolution / 2) - (Image->Height / 2);
+
+	if (PosX < 0)
+		PosX = 0;
+	if (PosY < 0)
+		PosY = 0;
+	if (PosX + Image->Width > VideoInfo.HorizontalResolution)
+		PosX = VideoInfo.HorizontalResolution - Image->Width;
+	if (PosY + Image->Height > VideoInfo.VerticalResolution)
+		PosY = VideoInfo.VerticalResolution - Image->Height;
+
+	DrawImage(Image, PosX, PosY);
+}
+
+
+VOID 
+DrawImage(
+	IN	IMAGE	*Image,
+	IN	UINTN	PosX,
+	IN	UINTN	PosY)
+{
+	if (!GraphicsInitialized) {
+		InitializeGraphics();
+	}
+	if (!GraphicsFound) {
+		Print(L"%a: No graphics device found, unable to draw image\n", __FUNCTION__);
+		return;
+	}
+	if (Image == NULL || Image->Width == 0 || Image->Height == 0) {
+		Print(L"%a: No image specified\n", __FUNCTION__);
+		return;
+	}
 	if ((PosX + Image->Width) > VideoInfo.HorizontalResolution 
 		|| (PosY + Image->Height) > VideoInfo.VerticalResolution) {
 		Print(L"%a: Image too big to draw on screen\n", __FUNCTION__);
 		return;
 	}
 
-	Random = AllocatePool(600 * 600 * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-	SetMem(Random, 600 * 600 * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 6);
-
 	if (GraphicsOutput != NULL) {
-		Print(L"%a: Outputting image to a GOP device\n", __FUNCTION__);
-		Status = GraphicsOutput->Blt(
-			GraphicsOutput, Random, EfiBltBufferToVideo, 
-			0, 0, 300, 300, 600, 600, 600 * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-		Print(L"%a: Status = %r\n", __FUNCTION__, Status);
+		GraphicsOutput->Blt(GraphicsOutput, 
+			(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)Image->PixelData, 
+			EfiBltBufferToVideo, 
+			0, 0, PosX, PosY, 
+			Image->Width, Image->Height, 0);
 	} else if (UgaDraw != NULL) {
-		Print(L"%a: Outputting image to a UGA device\n", __FUNCTION__);
 		UgaDraw->Blt(UgaDraw, 
 			(EFI_UGA_PIXEL *)Image->PixelData, 
 			EfiUgaBltBufferToVideo,
@@ -786,10 +824,9 @@ BmpFileToImage(
 		// ...but thankfully left-to-right
 		for (x = 0; x < BmpHeader->Width; x++) {
 			TargetPixel->Blue		= *BmpCurrentPixel++;
-			TargetPixel->Blue		= 128;
 			TargetPixel->Green		= *BmpCurrentPixel++;
 			TargetPixel->Red		= *BmpCurrentPixel++;
-			TargetPixel->Reserved	= 128;
+			TargetPixel->Reserved	= 0;
 			TargetPixel++;
 		}
 	}

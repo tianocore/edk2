@@ -20,6 +20,7 @@
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
+  EdkCompatibilityPkg/EdkCompatibilityPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -34,6 +35,7 @@
   PcdLib
   IoLib
   DevicePathLib
+  EdkProtocolLib
 
 [UserExtensions.TianoCore."ExtraFiles"]
   VgaShimExtra.uni
@@ -45,3 +47,4 @@
   gEfiLegacyRegionProtocolGuid          ## CONSUMES
   gEfiLegacyRegion2ProtocolGuid         ## CONSUMES
   gEfiLoadedImageProtocolGuid           ## CONSUMES
+  #gEfiConsoleControlProtocolGuid        ## CONSUMES

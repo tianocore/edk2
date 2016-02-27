@@ -21,6 +21,7 @@
 #include <Protocol/LegacyRegion2.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/GraphicsOutput.h>
+#include "ConsoleControl.h"
 
 #pragma pack(1)
 typedef struct {
@@ -113,6 +114,10 @@ DrawImage(
 	IN		IMAGE	*Image,
 	IN		UINTN	X,
 	IN		UINTN	Y);
+
+VOID
+DrawImageCentered(
+	IN		IMAGE	*Image);
 
 STATIC CONST CHAR8 VENDOR_NAME[] = "Apple";
 STATIC CONST CHAR8 PRODUCT_NAME[] = "Emulated VGA";
