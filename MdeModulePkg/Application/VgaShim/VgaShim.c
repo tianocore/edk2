@@ -87,7 +87,7 @@ UefiMain (
 	//
 	// Unlock VGA ROM memory for writing first.
 	//
-	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, MEM_UNLOCK);
+	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, UNLOCK);
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Unable to unlock VGA ROM memory at %x for shim insertion\n", 
 			__FUNCTION__, VGA_ROM_ADDRESS);
@@ -126,7 +126,7 @@ UefiMain (
 	//
 	// Lock the VGA ROM memory to prevent further writes.
 	//
-	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, MEM_LOCK);
+	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, LOCK);
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Unable to lock VGA ROM memory at %x but this is not essential\n", 
 			__FUNCTION__, VGA_ROM_ADDRESS);
@@ -364,10 +364,10 @@ EnsureMemoryLock(
 	//
 	// Check if we need to perform any operation.
 	// 
-	if (Operation == MEM_UNLOCK && CanWriteAtAddress(StartAddress)) {
+	if (Operation == UNLOCK && CanWriteAtAddress(StartAddress)) {
 		Print(L"%a: Memory at %x already unlocked\n", __FUNCTION__, StartAddress);
 		Status = EFI_SUCCESS;
-	} else if (Operation == MEM_LOCK && !CanWriteAtAddress(StartAddress)) {
+	} else if (Operation == LOCK && !CanWriteAtAddress(StartAddress)) {
 		Print(L"%a: Memory at %x already locked\n", __FUNCTION__, StartAddress);
 		Status = EFI_SUCCESS;
 	}
@@ -378,7 +378,7 @@ EnsureMemoryLock(
 	if (EFI_ERROR(Status)) {
 		Status = gBS->LocateProtocol(&gEfiLegacyRegionProtocolGuid, NULL, (VOID **)&mLegacyRegion);
 		if (!EFI_ERROR(Status)) {
-			if (Operation == MEM_UNLOCK) {
+			if (Operation == UNLOCK) {
 				Status = mLegacyRegion->UnLock(mLegacyRegion, (UINT32)StartAddress, Length, &Granularity);
 				Status = CanWriteAtAddress(StartAddress) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 			} else {
@@ -389,7 +389,7 @@ EnsureMemoryLock(
 			Print(L"%a: %s %s memory at %x using EfiLegacyRegionProtocol\n", 
 				__FUNCTION__, 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
-				Operation == MEM_UNLOCK ? L"unlocking" : L"locking", 
+				Operation == UNLOCK ? L"unlocking" : L"locking", 
 				StartAddress);
 		}
 	}
@@ -400,7 +400,7 @@ EnsureMemoryLock(
 	if (EFI_ERROR(Status)) {
 		Status = gBS->LocateProtocol(&gEfiLegacyRegion2ProtocolGuid, NULL, (VOID **)&mLegacyRegion2);
 		if (!EFI_ERROR(Status)) {
-			if (Operation == MEM_UNLOCK) {
+			if (Operation == UNLOCK) {
 				Status = mLegacyRegion2->UnLock(mLegacyRegion2, (UINT32)StartAddress, Length, &Granularity);
 				Status = CanWriteAtAddress(StartAddress) ? EFI_SUCCESS : EFI_DEVICE_ERROR;;
 			} else {
@@ -411,7 +411,7 @@ EnsureMemoryLock(
 			Print(L"%a: %s %s memory at %x using EfiLegacyRegion2Protocol\n", 
 				__FUNCTION__, 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
-				Operation == MEM_UNLOCK ? L"unlocking" : L"locking", 
+				Operation == UNLOCK ? L"unlocking" : L"locking", 
 				StartAddress);
 		}
 	}
@@ -421,7 +421,7 @@ EnsureMemoryLock(
 	//
 	if (EFI_ERROR(Status) && IsMtrrSupported()) {
 		ASSERT(FIXED_MTRR_SIZE >= Length);
-		if (Operation == MEM_UNLOCK) {
+		if (Operation == UNLOCK) {
 			MtrrSetMemoryAttribute(StartAddress, FIXED_MTRR_SIZE, CacheUncacheable);
 			Status = CanWriteAtAddress(StartAddress) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 		} else {
@@ -432,7 +432,7 @@ EnsureMemoryLock(
 		Print(L"%a: %s %s memory at %x using MTRR\n", 
 			__FUNCTION__, 
 			EFI_ERROR(Status) ? "Failure" : "Success",
-			Operation == MEM_UNLOCK ? "unlocking" : "locking", 
+			Operation == UNLOCK ? "unlocking" : "locking", 
 			StartAddress);
 	}
 	
@@ -441,7 +441,7 @@ EnsureMemoryLock(
 	// 
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Unable to find a way to %s memory at %x\n", 
-			__FUNCTION__, Operation == MEM_UNLOCK ? "unlock" : "lock", StartAddress);
+			__FUNCTION__, Operation == UNLOCK ? "unlock" : "lock", StartAddress);
 	}
 	
 	return Status;

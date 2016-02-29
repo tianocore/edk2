@@ -1,8 +1,13 @@
 #ifndef __VGA_SHIM_H__
 #define __VGA_SHIM_H__
 
-#include <Uefi.h>
+/**
+  -----------------------------------------------------------------------------
+  Project-wide includes.
+  -----------------------------------------------------------------------------
+**/
 
+#include <Uefi.h>
 #include <Library/DebugLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/PciLib.h>
@@ -24,6 +29,13 @@
 // replace with #include <../../EdkCompatibilityPkg/Foundation/Protocol/ConsoleControl/ConsoleControl.h>
 #include "ConsoleControl.h"
 
+
+/**
+  -----------------------------------------------------------------------------
+  Type definitions and enums.
+  -----------------------------------------------------------------------------
+**/
+
 #pragma pack(1)
 typedef struct {
   UINT16 Offset;
@@ -39,8 +51,8 @@ typedef struct {
 
 typedef enum
 {
-	MEM_LOCK,
-	MEM_UNLOCK
+	LOCK,
+	UNLOCK
 } MEMORY_LOCK_OPERATION;
 
 typedef enum
@@ -77,9 +89,9 @@ typedef struct {
 	UINT32		DibHeaderSize;
 	UINT32		Width;
 	UINT32		Height;
-	UINT16		Planes;				// always 1
-	UINT16		BitPerPixel;		// 1, 4, 8, 24
-	UINT32		CompressionType;	// BMP_COMPRESSION_TYPE
+	UINT16		Planes;				// expect '1'
+	UINT16		BitPerPixel;		// expect '24' for 24bpp
+	UINT32		CompressionType;	// expect '0' for no compression
 	UINT32		ImageSize;			// size of the raw bitmap data
 	UINT32		XPixelsPerMeter;
 	UINT32		YPixelsPerMeter;
@@ -87,6 +99,13 @@ typedef struct {
 	UINT32		ImportantColors;	// ignored
 } BMP_HEADER;
 #pragma pack()
+
+
+/**
+  -----------------------------------------------------------------------------
+  Method signatures.
+  -----------------------------------------------------------------------------
+**/
 
 EFI_STATUS InitializeDisplay(
 	VOID);
@@ -138,14 +157,21 @@ EFI_STATUS
 EnsureDisplayAvailable(
 	VOID);
 
-STATIC CONST CHAR8 VENDOR_NAME[] = "Apple";
-STATIC CONST CHAR8 PRODUCT_NAME[] = "Emulated VGA";
-STATIC CONST CHAR8 PRODUCT_REVISION[] = "OVMF Int10h (fake)";
-STATIC CONST EFI_PHYSICAL_ADDRESS VGA_ROM_ADDRESS = 0xc0000;
-STATIC CONST EFI_PHYSICAL_ADDRESS IVT_ADDRESS = 0x00000;
-STATIC CONST UINTN VGA_ROM_SIZE = 0x10000;
-STATIC CONST UINTN FIXED_MTRR_SIZE = 0x20000;
 
-extern DISPLAY_INFO	DisplayInfo;
+/**
+  -----------------------------------------------------------------------------
+  Constants and project-wide variables.
+  -----------------------------------------------------------------------------
+**/
+
+STATIC CONST	CHAR8					VENDOR_NAME[]		= "Apple";
+STATIC CONST	CHAR8					PRODUCT_NAME[]		= "Emulated VGA";
+STATIC CONST	CHAR8					PRODUCT_REVISION[]	= "OVMF Int10h (fake)";
+STATIC CONST	EFI_PHYSICAL_ADDRESS	VGA_ROM_ADDRESS		= 0xc0000;
+STATIC CONST	EFI_PHYSICAL_ADDRESS	IVT_ADDRESS			= 0x00000;
+STATIC CONST	UINTN					VGA_ROM_SIZE		= 0x10000;
+STATIC CONST	UINTN					FIXED_MTRR_SIZE		= 0x20000;
+
+extern			DISPLAY_INFO			DisplayInfo;
 
 #endif
