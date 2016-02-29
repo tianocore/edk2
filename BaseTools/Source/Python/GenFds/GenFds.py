@@ -1,7 +1,7 @@
 ## @file
 # generate flash image
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -300,7 +300,7 @@ def main():
                     "\nPython",
                     CODE_ERROR,
                     "Tools code failure",
-                    ExtraData="Please send email to edk2-devel@lists.sourceforge.net for help, attaching following call stack trace!\n",
+                    ExtraData="Please send email to edk2-devel@lists.01.org for help, attaching following call stack trace!\n",
                     RaiseError=False
                     )
         EdkLogger.quiet(traceback.format_exc())
