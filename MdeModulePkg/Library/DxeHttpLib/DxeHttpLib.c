@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to parse the HTTP message byte stream.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -782,6 +782,65 @@ HttpUrlGetPort (
   *Port = (UINT16) AsciiStrDecimalToUintn (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset);
 
   return  EFI_SUCCESS;
+}
+
+/**
+  Get the Path from a HTTP URL.
+
+  This function will return the Path according to the Url and previous parse result,and
+  it is the caller's responsibility to free the buffer returned in *Path.
+
+  @param[in]    Url                The pointer to a HTTP URL string.
+  @param[in]    UrlParser          URL Parse result returned by NetHttpParseUrl().
+  @param[out]   Path               Pointer to a buffer to store the Path.
+
+  @retval EFI_SUCCESS              Successfully get the required component.
+  @retval EFI_INVALID_PARAMETER    Uri is NULL or HostName is NULL or UrlParser is invalid.
+  @retval EFI_NOT_FOUND            No hostName component in the URL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpUrlGetPath (
+  IN      CHAR8              *Url,
+  IN      VOID               *UrlParser,
+     OUT  CHAR8              **Path
+  )
+{
+  CHAR8                *PathStr;
+  EFI_STATUS           Status;
+  UINT32               ResultLength;
+  HTTP_URL_PARSER      *Parser;
+
+  if (Url == NULL || UrlParser == NULL || Path == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Parser = (HTTP_URL_PARSER*) UrlParser;
+
+  if ((Parser->FieldBitMap & BIT (HTTP_URI_FIELD_PATH)) == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  PathStr = AllocatePool (Parser->FieldData[HTTP_URI_FIELD_PATH].Length + 1);
+  if (PathStr == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  Status = UriPercentDecode (
+             Url + Parser->FieldData[HTTP_URI_FIELD_PATH].Offset,
+             Parser->FieldData[HTTP_URI_FIELD_PATH].Length,
+             PathStr,
+             &ResultLength
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  PathStr[ResultLength] = '\0';
+  *Path = PathStr;
+  return EFI_SUCCESS;
 }
 
 /**
