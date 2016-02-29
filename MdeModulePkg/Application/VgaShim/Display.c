@@ -1,4 +1,4 @@
-#include "VgaShim.h"
+#include "Display.h"
 
 
 /**
@@ -14,16 +14,16 @@ CalculatePositionForCenter(
 	OUT		UINTN		*PositionX,
 	OUT		UINTN		*PositionY);
 
-
 EFI_STATUS
-EnsureDisplayAvailable()
-{
-	if (!DisplayInfo.Initialized) {
-		InitializeDisplay();
-	}
-	return DisplayInfo.AdapterFound && DisplayInfo.Protocol != NONE ? EFI_SUCCESS : EFI_NOT_FOUND;
-}
+InitializeDisplay(
+	VOID);
 
+
+/**
+  -----------------------------------------------------------------------------
+  Local method implementations.
+  -----------------------------------------------------------------------------
+**/
 
 /**
   Scans the system for Graphics Output Protocol (GOP) and
@@ -46,6 +46,7 @@ InitializeDisplay()
 	UINT32		Temp1;
 	UINT32		Temp2;
 
+	// Sets AdapterFound = FALSE and Protocol = NONE
 	SetMem(&DisplayInfo, sizeof(DISPLAY_INFO), 0);
 
 	//
@@ -96,6 +97,91 @@ Exit:
 
 
 /**
+  Calculates the x and y coordinates so that the given image
+  would be displayed in screen center at the current resolution.
+  Image width and height are given explicitly to allow for arbitrary
+  calculations useful for sprites.
+
+  @param[in] ImageWidth   Image width.
+  @param[in] ImageHeight  Image height.
+  @param[out] PositionX   Screen X coordinate of the top left corner
+                          of the centered image.
+  @param[out] PositionX   Screen Y coordinate of the top left corner
+                          of the centered image.
+
+  @retval EFI_SUCCESS     Screen center values were successfully
+                          calculated for the current resolution
+						  and specified image.
+  @retval other           Either no graphics adapter was found,
+                          the image was too big to fit on the
+						  screen at current resolution or some
+						  other problem was encountered.
+  
+**/
+EFI_STATUS
+CalculatePositionForCenter(
+	IN	UINTN	ImageWidth,
+	IN	UINTN	ImageHeight,
+	OUT	UINTN	*PositionX,
+	OUT	UINTN	*PositionY)
+{
+	if (EFI_ERROR(EnsureDisplayAvailable())) {
+		Print(L"%a: No graphics device found, unable to calculate position\n", __FUNCTION__);
+		return EFI_DEVICE_ERROR;
+	}
+
+	if (ImageWidth == 0 || ImageHeight == 0 
+		|| ImageWidth > DisplayInfo.HorizontalResolution
+		|| ImageHeight > DisplayInfo.VerticalResolution) {
+		Print(L"%a: Wrong image size (%ux%u) for this screen resolution (%ux%u)\n", 
+			__FUNCTION__, ImageWidth, ImageHeight, 
+			DisplayInfo.HorizontalResolution, DisplayInfo.VerticalResolution);
+		return EFI_INVALID_PARAMETER;
+	}
+
+	*PositionX = (DisplayInfo.HorizontalResolution / 2) - (ImageWidth / 2);
+	*PositionY = (DisplayInfo.VerticalResolution / 2) - (ImageHeight / 2);
+
+	if (*PositionX + ImageWidth > DisplayInfo.HorizontalResolution)
+		*PositionX = DisplayInfo.HorizontalResolution - ImageWidth;
+	if (*PositionY + ImageHeight > DisplayInfo.VerticalResolution)
+		*PositionY = DisplayInfo.VerticalResolution - ImageHeight;
+
+	return EFI_SUCCESS;
+}
+
+
+/**
+  -----------------------------------------------------------------------------
+  Exported method implementations.
+  -----------------------------------------------------------------------------
+**/
+
+/**
+  Performs the initial scan for graphics adapters if one
+  has not been performed yet and returns a simple TRUE/FALSE
+  information if one has been found and information about
+  it is ready for use in the global DisplayInfo variable.
+
+  @retval TRUE            An adapter has been found and its current
+                          mode parameters stored in DisplayInfo
+						  global variable.
+  @retval other           No compatible adapters were found or
+                          their mode parameters could not be
+						  retrieved.
+  
+**/
+EFI_STATUS
+EnsureDisplayAvailable()
+{
+	if (!DisplayInfo.Initialized) {
+		InitializeDisplay();
+	}
+	return DisplayInfo.AdapterFound && DisplayInfo.Protocol != NONE ? EFI_SUCCESS : EFI_NOT_FOUND;
+}
+
+
+/**
   Prints important information about the currently running video
   mode. Initializes adapters if they have not yet been detected.
 
@@ -116,6 +202,18 @@ PrintVideoInfo()
 }
 
 
+/**
+  Allocates resources for a new in-memory image of the specified
+  width and height.
+
+  @param[in] Width        Desired image width.
+  @param[in] Height       Desired image height.
+
+  @retval IMAGE*          Pointer to a zero-initialized memory 
+                          location ready to receive pixel data
+						  up to the width and height specified.
+
+**/
 IMAGE*
 CreateImage(
 	IN	UINTN	Width,
@@ -141,6 +239,13 @@ CreateImage(
 }
 
 
+/**
+  Releases all resouces held by the specified image.
+
+  @param[in] Image        Image whose memory resources are to
+                          be released.
+
+**/
 VOID
 DestroyImage(
 	IN	IMAGE	*Image)
@@ -153,6 +258,24 @@ DestroyImage(
 }
 
 
+/**
+  Converts bytes of a bitmap file into a memory representation
+  useful for other graphics in-memory operations.
+
+  @param[in] FileData      Pointer to the first byte of file contents.
+  @param[in] FileSizeBytes Total number of bytes available at the
+                           specified location.
+  @param[out] Result       Pointer to a mermory location holding
+                           the address of the image structure
+						   and data representing the specified bmp file.
+
+  @retval EFI_SUCCESS      File data was interpreted successfully.
+  @retval other            Either the file contained no valid or 
+                           supported image, no memory could be
+						   allocated to hold pixel data or some other
+						   problem was encountered.
+
+**/
 EFI_STATUS
 BmpFileToImage(
 	IN	UINT8	*FileData,
@@ -219,12 +342,16 @@ BmpFileToImage(
 		}
 	}
 
-	Print(L"%a: Done creating image size %u x %u from bmp\n", 
+	Print(L"%a: Successfully imported image size %ux%u from bmp file\n", 
 		__FUNCTION__, ((IMAGE *)*Result)->Width, ((IMAGE *)*Result)->Height);
 	return EFI_SUCCESS;
 }
 
 
+/**
+  Clears screen in both text and graphics modes.
+
+**/
 VOID
 ClearScreen()
 {
@@ -298,39 +425,6 @@ DrawImage(
 }
 
 
-EFI_STATUS
-CalculatePositionForCenter(
-	IN	UINTN	ImageWidth,
-	IN	UINTN	ImageHeight,
-	OUT	UINTN	*PositionX,
-	OUT	UINTN	*PositionY)
-{
-	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		Print(L"%a: No graphics device found, unable to calculate position\n", __FUNCTION__);
-		return EFI_DEVICE_ERROR;
-	}
-
-	if (ImageWidth == 0 || ImageHeight == 0 
-		|| ImageWidth > DisplayInfo.HorizontalResolution
-		|| ImageHeight > DisplayInfo.VerticalResolution) {
-		Print(L"%a: Wrong image size (%ux%u) for this screen resolution (%ux%u)\n", 
-			__FUNCTION__, ImageWidth, ImageHeight, 
-			DisplayInfo.HorizontalResolution, DisplayInfo.VerticalResolution);
-		return EFI_INVALID_PARAMETER;
-	}
-
-	*PositionX = (DisplayInfo.HorizontalResolution / 2) - (ImageWidth / 2);
-	*PositionY = (DisplayInfo.VerticalResolution / 2) - (ImageHeight / 2);
-
-	if (*PositionX + ImageWidth > DisplayInfo.HorizontalResolution)
-		*PositionX = DisplayInfo.HorizontalResolution - ImageWidth;
-	if (*PositionY + ImageHeight > DisplayInfo.VerticalResolution)
-		*PositionY = DisplayInfo.VerticalResolution - ImageHeight;
-
-	return EFI_SUCCESS;
-}
-
-
 VOID
 DrawImageCentered(
 	IN	IMAGE	*Image)
@@ -359,7 +453,7 @@ AnimateImage(
 	EFI_STATUS	Status;
 	UINTN		NumFrames;
 	UINTN		Frame;
-	UINTN		MsPerFrame = 10;
+	UINTN		MsPerFrame = 40;
 	UINTN		PositionX;
 	UINTN		PositionY;
 

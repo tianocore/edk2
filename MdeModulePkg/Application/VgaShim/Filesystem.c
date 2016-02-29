@@ -1,5 +1,11 @@
-#include "VgaShim.h"
+#include "Filesystem.h"
 
+
+/**
+  -----------------------------------------------------------------------------
+  Exported method implementations.
+  -----------------------------------------------------------------------------
+**/
 
 /**
   Creates a new string representing path to a file identical

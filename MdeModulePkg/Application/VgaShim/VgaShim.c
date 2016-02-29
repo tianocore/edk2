@@ -1,32 +1,19 @@
-/** @file
- VgaShim Code
-
-**/
-
-
 #include "VgaShim.h"
+#include "Display.h"
+#include "Filesystem.h"
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
 #include "BootflagSimple.h"
 
 
-DISPLAY_INFO				DisplayInfo;
-EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
-
-
 /**
   -----------------------------------------------------------------------------
-  Method signatures.
+  Global variables.
   -----------------------------------------------------------------------------
 **/
 
-BOOLEAN
-ShowStaticLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl);
-
-BOOLEAN
-ShowAnimatedLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl);
+DISPLAY_INFO				DisplayInfo;
+EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
 
 
 /**
@@ -46,17 +33,13 @@ UefiMain (
 	IN EFI_HANDLE		ImageHandle,
 	IN EFI_SYSTEM_TABLE	*SystemTable)
 {
-	EFI_PHYSICAL_ADDRESS	Int10hHandlerAddress;
-	IVT_ENTRY				*Int10hHandlerEntry;
-	EFI_PHYSICAL_ADDRESS	TempAddress;
-	EFI_STATUS				Status;
-	EFI_INPUT_KEY			Key;
-	IMAGE					*WindowsFlag;
-	UINTN					EventIndex;
-	EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
-	CHAR16					*BmpFilePath = NULL;
-	UINT8					*BmpFileContents;
-	UINTN					BmpFileBytes;
+	EFI_PHYSICAL_ADDRESS			Int10hHandlerAddress;
+	IVT_ENTRY						*Int10hHandlerEntry;
+	EFI_PHYSICAL_ADDRESS			TempAddress;
+	EFI_STATUS						Status;
+	EFI_INPUT_KEY					Key;
+	UINTN							EventIndex;
+	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
 
 	Status = gBS->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimImage);
 	if (EFI_ERROR(Status)) {
@@ -571,7 +554,7 @@ ShowAnimatedLogo(
 	Status = ChangeExtension(
 		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImage->FilePath, FALSE, FALSE)), 
 		L"bmp", 
-		&BmpFilePath);
+		(VOID **)&BmpFilePath);
 	if (EFI_ERROR(Status) || !FileExists(BmpFilePath)) {
 		return FALSE;
 	}
