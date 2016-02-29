@@ -247,6 +247,7 @@ DxeMain (
   EFI_HOB_GUID_TYPE             *GuidHob;
   EFI_VECTOR_HANDOFF_INFO       *VectorInfoList;
   EFI_VECTOR_HANDOFF_INFO       *VectorInfo;
+  VOID                          *EntryPoint;
 
   //
   // Setup the default exception handlers
@@ -293,8 +294,13 @@ DxeMain (
   // Report DXE Core image information to the PE/COFF Extra Action Library
   //
   ZeroMem (&ImageContext, sizeof (ImageContext));
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)gDxeCoreLoadedImage->ImageBase;
-  ImageContext.PdbPointer   = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
+  ImageContext.ImageAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)gDxeCoreLoadedImage->ImageBase;
+  ImageContext.PdbPointer     = PeCoffLoaderGetPdbPointer ((VOID*)(UINTN)ImageContext.ImageAddress);
+  ImageContext.SizeOfHeaders  = PeCoffGetSizeOfHeaders ((VOID*)(UINTN)ImageContext.ImageAddress);
+  Status = PeCoffLoaderGetEntryPoint ((VOID*)(UINTN)ImageContext.ImageAddress, &EntryPoint);
+  if (Status == EFI_SUCCESS) {
+    ImageContext.EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)EntryPoint;
+  }
   PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 
   //
