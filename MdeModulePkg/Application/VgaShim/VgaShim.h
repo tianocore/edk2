@@ -17,6 +17,7 @@
 **/
 
 #include <Uefi.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/PciLib.h>
@@ -29,8 +30,10 @@
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
+#include <Protocol/SimpleFileSystem.h>
 #include <Protocol/LegacyRegion.h>
 #include <Protocol/LoadedImage.h>
+#include <Guid/FileInfo.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LegacyRegion2.h>
 #include <Protocol/UgaDraw.h>
@@ -120,18 +123,18 @@ EFI_STATUS InitializeDisplay(
 	VOID);
 
 BOOLEAN CanWriteAtAddress(
-	IN		EFI_PHYSICAL_ADDRESS Address);
+	IN		EFI_PHYSICAL_ADDRESS	Address);
 
 EFI_STATUS EnsureMemoryLock(
-	IN		EFI_PHYSICAL_ADDRESS Address, 
-	IN		UINT32 Length, 
-	IN		MEMORY_LOCK_OPERATION Operation);
+	IN		EFI_PHYSICAL_ADDRESS	Address, 
+	IN		UINT32					Length, 
+	IN		MEMORY_LOCK_OPERATION	Operation);
 
 BOOLEAN IsInt10HandlerDefined();
 
 EFI_STATUS ShimVesaInformation(
-	IN		EFI_PHYSICAL_ADDRESS StartAddress, 
-	OUT		EFI_PHYSICAL_ADDRESS *EndAddress);
+	IN		EFI_PHYSICAL_ADDRESS	StartAddress, 
+	OUT		EFI_PHYSICAL_ADDRESS	*EndAddress);
 
 VOID PrintVideoInfo(
 	VOID);
@@ -140,43 +143,68 @@ VOID ClearScreen(
 	VOID);
 
 VOID DestroyImage(
-	IN		IMAGE	*Image);
+	IN		IMAGE		*Image);
 
 IMAGE*
 CreateImage(
-	IN		UINTN	Width,
-	IN		UINTN	Height);
+	IN		UINTN		Width,
+	IN		UINTN		Height);
 
-IMAGE*
+EFI_STATUS
 BmpFileToImage(
-	IN		UINT8	*FileData,
-	IN		UINTN	FileSizeBytes);
+	IN		UINT8		*FileData,
+	IN		UINTN		FileSizeBytes,
+	OUT		VOID		**Result);
+
+EFI_STATUS
+CalculatePositionForCenter(
+	IN		UINTN		ImageWidth,
+	IN		UINTN		ImageHeight,
+	OUT		UINTN		*PositionX,
+	OUT		UINTN		*PositionY);
+
 
 VOID
 DrawImage(
-	IN		IMAGE	*Image,
-	IN		UINTN	Width,
-	IN		UINTN	Height,
-	IN		UINTN	ScreenX,
-	IN		UINTN	ScreenY,
-	IN		UINTN	ImageX,
-	IN		UINTN	ImageY);
+	IN		IMAGE		*Image,
+	IN		UINTN		Width,
+	IN		UINTN		Height,
+	IN		UINTN		ScreenX,
+	IN		UINTN		ScreenY,
+	IN		UINTN		ImageX,
+	IN		UINTN		ImageY);
 
 VOID
 DrawImageCentered(
-	IN		IMAGE	*Image,
-	IN		UINTN	Width,
-	IN		UINTN	Height,
-	IN		UINTN	ImageWindowX,
-	IN		UINTN	ImageWindowY);
+	IN		IMAGE		*Image);
 
 VOID
 AnimateImage(
-	IN		IMAGE	*Image);
+	IN		IMAGE		*Image);
 
 EFI_STATUS
 EnsureDisplayAvailable(
 	VOID);
+
+VOID
+ShowFiles(
+	IN		EFI_HANDLE	ImageHandle);
+
+BOOLEAN
+FileExists(
+	IN		CHAR16		*FilePath);
+
+EFI_STATUS
+ChangeExtension(
+	IN		CHAR16		*FilePath,
+	IN		CHAR16		*NewExtension,
+	OUT		CHAR16		**NewFilePath);
+
+EFI_STATUS
+FileRead(
+	IN		CHAR16		*FilePath,
+	OUT		VOID		**FileContents,
+	OUT		UINTN		*FileBytes);
 
 
 /**
@@ -185,14 +213,15 @@ EnsureDisplayAvailable(
   -----------------------------------------------------------------------------
 **/
 
-STATIC CONST	CHAR8					VENDOR_NAME[]		= "Apple";
-STATIC CONST	CHAR8					PRODUCT_NAME[]		= "Emulated VGA";
-STATIC CONST	CHAR8					PRODUCT_REVISION[]	= "OVMF Int10h (fake)";
-STATIC CONST	EFI_PHYSICAL_ADDRESS	VGA_ROM_ADDRESS		= 0xc0000;
-STATIC CONST	EFI_PHYSICAL_ADDRESS	IVT_ADDRESS			= 0x00000;
-STATIC CONST	UINTN					VGA_ROM_SIZE		= 0x10000;
-STATIC CONST	UINTN					FIXED_MTRR_SIZE		= 0x20000;
+STATIC CONST	CHAR8						VENDOR_NAME[]		= "Apple";
+STATIC CONST	CHAR8						PRODUCT_NAME[]		= "Emulated VGA";
+STATIC CONST	CHAR8						PRODUCT_REVISION[]	= "OVMF Int10h (fake)";
+STATIC CONST	EFI_PHYSICAL_ADDRESS		VGA_ROM_ADDRESS		= 0xc0000;
+STATIC CONST	EFI_PHYSICAL_ADDRESS		IVT_ADDRESS			= 0x00000;
+STATIC CONST	UINTN						VGA_ROM_SIZE		= 0x10000;
+STATIC CONST	UINTN						FIXED_MTRR_SIZE		= 0x20000;
 
-extern			DISPLAY_INFO			DisplayInfo;
+extern			DISPLAY_INFO				DisplayInfo;
+extern			EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
 
 #endif

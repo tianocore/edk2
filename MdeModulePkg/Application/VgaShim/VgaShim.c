@@ -9,10 +9,83 @@
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
 //#include "bootflag_animated.h"
-#include "bootflag.h"
+#include "bootflag_static.h"
 
 
-DISPLAY_INFO	DisplayInfo;
+DISPLAY_INFO				DisplayInfo;
+EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
+
+
+BOOLEAN
+ShowAnimatedLogo(
+	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
+{
+	EFI_STATUS	Status;
+	CHAR16		*BmpFilePath;
+	UINT8		*BmpFileContents;
+	UINTN		BmpFileBytes;
+	IMAGE		*WindowsFlag;
+
+	// Check if *.bmp exists
+	Status = ChangeExtension(
+		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImage->FilePath, FALSE, FALSE)), 
+		L"bmp", 
+		&BmpFilePath);
+	if (EFI_ERROR(Status) || !FileExists(BmpFilePath)) {
+		return FALSE;
+	}
+
+	// Read file contents.
+	Status = FileRead(BmpFilePath, (VOID **)&BmpFileContents, &BmpFileBytes);
+	if (EFI_ERROR(Status)) {
+		FreePool(BmpFilePath);
+		return FALSE;
+	}
+		
+	Status = BmpFileToImage(BmpFileContents, BmpFileBytes, (VOID **)&WindowsFlag);
+	if (EFI_ERROR(Status)) {
+		FreePool(BmpFilePath);
+		FreePool(BmpFileContents);
+		return FALSE;
+	}
+
+	FreePool(BmpFilePath);
+	FreePool(BmpFileContents);
+	BmpFileContents = NULL;
+
+	// All fine, let's do some drawing.
+	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
+	ClearScreen();
+	AnimateImage(WindowsFlag);
+
+	// Cleanup & return.
+	DestroyImage(WindowsFlag);
+	return TRUE;
+}
+
+
+BOOLEAN
+ShowStaticLogo(
+	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
+{
+	EFI_STATUS	Status;
+	CHAR16		*BmpFilePath;
+	UINT8		*BmpFileContents;
+	UINTN		BmpFileBytes;
+	IMAGE		*WindowsFlag;
+
+	Status = BmpFileToImage(bootflag_static, sizeof bootflag_static, (VOID **)&WindowsFlag);
+	if (EFI_ERROR(Status)) {
+		return FALSE;
+	}
+	
+	// All fine, let's do some drawing.
+	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
+	ClearScreen();
+	DrawImageCentered(WindowsFlag);
+
+	return TRUE;
+}
 
 
 
@@ -41,18 +114,30 @@ UefiMain (
 	IMAGE					*WindowsFlag;
 	UINTN					EventIndex;
 	EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
+	CHAR16					*BmpFilePath = NULL;
+	UINT8					*BmpFileContents;
+	UINTN					BmpFileBytes;
 
-	// Show pretty graphics
-	
+	Status = gBS->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimImage);
+	if (EFI_ERROR(Status)) {
+		Print(L"%a: Unable to locate EFI_LOADED_IMAGE_PROTOCOL, halting\n", __FUNCTION__);
+		return EFI_LOAD_ERROR;
+	}
+
+
+	// 
+	// Show pretty graphics.
+	//
 	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
-	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
-	ClearScreen();
-	WindowsFlag = BmpFileToImage(bootflag, sizeof bootflag);
-	AnimateImage(WindowsFlag);
-	//DrawImageCentered(WindowsFlag);
-	gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
-	ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
-	
+	if (!EFI_ERROR(Status)) {
+		if (!ShowAnimatedLogo(ConsoleControl)) {
+			ShowStaticLogo(ConsoleControl);
+		}
+		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
+	}
+
+	return EFI_SUCCESS;
 
 	//
 	// If an Int10h handler exists there either is a real
@@ -126,7 +211,7 @@ UefiMain (
 		__FUNCTION__, Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
 
 Exit:
-	Print(L"%a: Done! Press Enter to continue loading Windows\n", __FUNCTION__);
+	Print(L"%a: Press Enter to continue loading Windows\n", __FUNCTION__);
 	gST->ConIn->Reset(gST->ConIn, FALSE);
 	do {
 		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
@@ -465,24 +550,193 @@ CanWriteAtAddress(
 }
 
 
+EFI_STATUS
+ChangeExtension(
+	IN	CHAR16	*FilePath,
+	IN	CHAR16	*NewExtension,
+	OUT	CHAR16	**NewFilePath)
+{
+	UINTN	DotIndex;
+	UINTN	NewExtensionLen = StrLen(NewExtension);
+
+	*NewFilePath = 0;
+	DotIndex = StrLen(FilePath) - 1;
+	while ((FilePath[DotIndex] != L'.') && (DotIndex != 0)) {
+		DotIndex--;
+	}
+
+	if (DotIndex == 0)
+		return EFI_INVALID_PARAMETER;
+
+	// Move index as we want to copy the '.' too.
+	DotIndex++;
+
+	// Allocate enough to hold the new extension and null terminator.
+	*NewFilePath = (CHAR16*)AllocatePool( (DotIndex + NewExtensionLen + 1) * sizeof(CHAR16) );
+	if (*NewFilePath == NULL)
+		return EFI_OUT_OF_RESOURCES;
+	
+	// Copy the relevant strings and add the null terminator.
+	CopyMem(*NewFilePath, FilePath, (DotIndex) * sizeof(CHAR16));
+	CopyMem(*NewFilePath + DotIndex, NewExtension, NewExtensionLen * sizeof(CHAR16));
+	((CHAR16*)(*NewFilePath))[DotIndex + NewExtensionLen] = CHAR_NULL;
+	
+	return EFI_SUCCESS;
+}
+
+
+BOOLEAN
+FileExists(
+	IN	CHAR16*	FilePath)
+{
+	EFI_STATUS				Status;
+	EFI_FILE_IO_INTERFACE	*Volume;
+	EFI_FILE_HANDLE			VolumeRoot;
+	EFI_FILE_HANDLE			RequestedFile;
+	BOOLEAN					Exists;
+
+	// Open volume where VgaShim lives.
+	Status = gBS->HandleProtocol(VgaShimImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
+	if (EFI_ERROR(Status))
+		return FALSE;
+	Status = Volume->OpenVolume(Volume, &VolumeRoot);
+	if (EFI_ERROR(Status))
+		return FALSE;
+
+	// Try to open file for reading.
+	Status = VolumeRoot->Open(VolumeRoot, &RequestedFile, FilePath, EFI_FILE_MODE_READ, 0);
+	if (EFI_ERROR(Status)) {
+		VolumeRoot->Close(VolumeRoot);
+		return FALSE;
+	} else {
+		RequestedFile->Close(RequestedFile);
+		VolumeRoot->Close(VolumeRoot);
+		return TRUE;
+	}
+}
+
+
+EFI_STATUS
+FileRead(
+	IN	CHAR16	*FilePath,
+	OUT	VOID	**FileContents,
+	OUT	UINTN	*FileBytes)
+{
+	EFI_STATUS				Status;
+	EFI_FILE_IO_INTERFACE	*Volume;
+	EFI_FILE_HANDLE			VolumeRoot;
+	EFI_FILE_HANDLE			File;
+	EFI_FILE_INFO			*FileInfo;
+	UINTN					Size;
+
+	// Open volume where VgaShim lives.
+	Status = gBS->HandleProtocol(VgaShimImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
+	if (EFI_ERROR(Status))
+		return Status;
+	Status = Volume->OpenVolume(Volume, &VolumeRoot);
+	if (EFI_ERROR(Status))
+		return Status;
+
+	// Try to open file for reading.
+	Status = VolumeRoot->Open(VolumeRoot, &File, FilePath, EFI_FILE_MODE_READ, 0);
+	if (EFI_ERROR(Status)) {
+		VolumeRoot->Close(VolumeRoot);
+		return Status;
+	}
+
+	// First gather information on total file size.
+	File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
+	FileInfo = AllocatePool(Size);
+	if (FileInfo == NULL)
+		return EFI_OUT_OF_RESOURCES;
+	File->GetInfo(File, &gEfiFileInfoGuid, &Size, FileInfo);
+	Size = FileInfo->FileSize;
+	FreePool(FileInfo);
+
+	// Allocate a buffer and read the entire file into it.
+	*FileContents = AllocatePool(Size);
+	Print(L"Reading %u bytes of %s ... ", Size, FilePath);
+	Status = File->Read(File, &Size, *FileContents);
+	if (EFI_ERROR(Status)) {
+		Print(L"unsuccessful (error: %r)\n", Status);
+		FreePool(*FileContents);
+	} else {
+		Print(L"successful\n");
+		*FileBytes = Size;
+	}
+	
+	// Cleanup.
+	File->Close(File);
+	VolumeRoot->Close(VolumeRoot);
+	return Status;
+}
+
+
 VOID
-LoadFile(
+ShowFiles(
 	IN	EFI_HANDLE		ImageHandle)
 {
 	EFI_STATUS					Status;
-	EFI_LOADED_IMAGE_PROTOCOL	*ImageInfo;
-	Status = gBS->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&ImageInfo);
+	EFI_LOADED_IMAGE_PROTOCOL	*Image;
+	EFI_FILE_IO_INTERFACE * Volume;
+	EFI_DEVICE_PATH_PROTOCOL *Test2;
+	EFI_FILE_HANDLE Root;
+	EFI_FILE_HANDLE File;
+	UINTN Size;
+	EFI_FILE_INFO * FileInfo;
+	UINT8 * Buffer;
+
+
+	// Get information on the current executable.
+	Status = gBS->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&Image);
 	if (!EFI_ERROR(Status)) {
-		Print(L"FilePath=%x\n", ImageInfo->FilePath);
-		Print(L"ImageSize=%u\n", ImageInfo->ImageSize);
-		Print(L"LoadOptionsSize=%u\n", ImageInfo->LoadOptionsSize);
-		Print(L"Revision=%u\n", ImageInfo->Revision);
-		Print(L"Image base: %lx\n", ImageInfo->ImageBase);
-		Print(L"Image file: %s\n", ConvertDevicePathToText(ImageInfo->FilePath, TRUE, FALSE));
-		Print(L"DevicePathType: %u\n", DevicePathType(ImageInfo->FilePath));
-		Print(L"DevicePathSubType: %u\n", DevicePathSubType(ImageInfo->FilePath));
-		Print(L"NextDevicePathNode: %s\n", ConvertDevicePathToText(NextDevicePathNode(ImageInfo->FilePath), TRUE, FALSE));
+		Print(L"FilePath=%x\n", Image->FilePath);
+		Print(L"ImageSize=%u\n", Image->ImageSize);
+		Print(L"LoadOptionsSize=%u\n", Image->LoadOptionsSize);
+		Print(L"LoadOptions=%S\n", Image->LoadOptions); // in bytes!
+		Print(L"ConvertDevicePathToText: %s\n", ConvertDevicePathToText(Image->FilePath, TRUE, FALSE));
+		//Test2 = FileDevicePath(Image->DeviceHandle, Image->FilePath);
+		Print(L"DevicePathType: %u\n", DevicePathType(Image->FilePath));
+		Print(L"DevicePathSubType: %u\n", DevicePathSubType(Image->FilePath));
+		Print(L"DevicePathSubType: %d\n", IsDevicePathEnd(Image->FilePath));
+		Print(L"NextDevicePathNode: %s\n", ConvertDevicePathToText(NextDevicePathNode(Image->FilePath), TRUE, FALSE));
 		//ImageInfo->DeviceHandle ROOT of device
 	}
+
+	// Get information on the filesystem of the currect executable.
+	gBS->HandleProtocol(Image->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
+	Volume->OpenVolume(Volume, &Root);
+	
+	// Check some file
+	Status = Root->Open(Root, &File, L"license1.txt", EFI_FILE_MODE_READ, 0);
+	Print(L"FileName=%r\n", Status);
+	if (!EFI_ERROR(Status)) {
+		File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
+		FileInfo = AllocatePool(Size);
+		File->GetInfo(File, &gEfiFileInfoGuid, &Size, FileInfo);
+		Print(L"FileSize=%u\n", FileInfo->FileSize);
+		Print(L"FileName=%s\n", FileInfo->FileName);
+		Print(L"Attribute=%u\n", FileInfo->Attribute);
+		Print(L"ConvertDevicePathToText File=%s\n", ConvertDevicePathToText(Image->FilePath, TRUE, FALSE));
+		FreePool(FileInfo);
+	}
+	/*File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
+	FileInfo = AllocatePool(Size);
+	File->GetInfo(File, &gEfiFileInfoGuid, &Size, FileInfo);
+	Print(L"FileSize=%u\n", FileInfo->FileSize);
+	Print(L"FileName=%s\n", FileInfo->FileName);
+	Print(L"Attribute=%u\n", FileInfo->Attribute);
+	Print(L"ConvertDevicePathToText: %s\n", ConvertDevicePathToText(Image->FilePath, TRUE, FALSE));
+    Buffer = AllocatePool(FileInfo->FileSize);
+    File->Read(File, &FileInfo->FileSize, Buffer);
+	FreePool(FileInfo);*/
+
+	//Test2 = FileDevicePath(Image->DeviceHandle, L"license.txt");
+	//Print(L"ConvertDevicePathToText Test2=%s\n", ConvertDevicePathToText(Test2, TRUE, FALSE));
+	// DevicePath eg. PciRoot(0)/Pci(14)/USB/HD(1,GPT,9ECAA-7832-4213-AE421)/license.txt
+	
+
+	//ImageInfo->DeviceHandle
+	
 	return;
 }

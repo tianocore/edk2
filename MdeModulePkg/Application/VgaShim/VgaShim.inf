@@ -44,8 +44,12 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel  ## CONSUMES
 
+[Guids]
+  gEfiFileInfoGuid
+
 [Protocols]
   gEfiLegacyRegionProtocolGuid          ## CONSUMES
   gEfiLegacyRegion2ProtocolGuid         ## CONSUMES
   gEfiLoadedImageProtocolGuid           ## CONSUMES
   #gEfiConsoleControlProtocolGuid        ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid
