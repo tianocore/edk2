@@ -5,88 +5,28 @@
 
 
 #include "VgaShim.h"
-
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
-//#include "bootflag_animated.h"
-#include "bootflag_static.h"
+#include "BootflagSimple.h"
 
 
 DISPLAY_INFO				DisplayInfo;
 EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
 
 
-BOOLEAN
-ShowAnimatedLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
-{
-	EFI_STATUS	Status;
-	CHAR16		*BmpFilePath;
-	UINT8		*BmpFileContents;
-	UINTN		BmpFileBytes;
-	IMAGE		*WindowsFlag;
-
-	// Check if *.bmp exists
-	Status = ChangeExtension(
-		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImage->FilePath, FALSE, FALSE)), 
-		L"bmp", 
-		&BmpFilePath);
-	if (EFI_ERROR(Status) || !FileExists(BmpFilePath)) {
-		return FALSE;
-	}
-
-	// Read file contents.
-	Status = FileRead(BmpFilePath, (VOID **)&BmpFileContents, &BmpFileBytes);
-	if (EFI_ERROR(Status)) {
-		FreePool(BmpFilePath);
-		return FALSE;
-	}
-		
-	Status = BmpFileToImage(BmpFileContents, BmpFileBytes, (VOID **)&WindowsFlag);
-	if (EFI_ERROR(Status)) {
-		FreePool(BmpFilePath);
-		FreePool(BmpFileContents);
-		return FALSE;
-	}
-
-	FreePool(BmpFilePath);
-	FreePool(BmpFileContents);
-	BmpFileContents = NULL;
-
-	// All fine, let's do some drawing.
-	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
-	ClearScreen();
-	AnimateImage(WindowsFlag);
-
-	// Cleanup & return.
-	DestroyImage(WindowsFlag);
-	return TRUE;
-}
-
+/**
+  -----------------------------------------------------------------------------
+  Method signatures.
+  -----------------------------------------------------------------------------
+**/
 
 BOOLEAN
 ShowStaticLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
-{
-	EFI_STATUS	Status;
-	CHAR16		*BmpFilePath;
-	UINT8		*BmpFileContents;
-	UINTN		BmpFileBytes;
-	IMAGE		*WindowsFlag;
+	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl);
 
-	Status = BmpFileToImage(bootflag_static, sizeof bootflag_static, (VOID **)&WindowsFlag);
-	if (EFI_ERROR(Status)) {
-		return FALSE;
-	}
-	
-	// All fine, let's do some drawing.
-	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
-	ClearScreen();
-	DrawImageCentered(WindowsFlag);
-
-	return TRUE;
-}
-
+BOOLEAN
+ShowAnimatedLogo(
+	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl);
 
 
 /**
@@ -739,4 +679,77 @@ ShowFiles(
 	//ImageInfo->DeviceHandle
 	
 	return;
+}
+
+
+
+BOOLEAN
+ShowStaticLogo(
+	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
+{
+	EFI_STATUS	Status;
+	CHAR16		*BmpFilePath;
+	UINT8		*BmpFileContents;
+	UINTN		BmpFileBytes;
+	IMAGE		*WindowsFlag;
+
+	Status = BmpFileToImage(BootflagSimple, sizeof BootflagSimple, (VOID **)&WindowsFlag);
+	if (EFI_ERROR(Status)) {
+		return FALSE;
+	}
+	
+	// All fine, let's do some drawing.
+	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
+	ClearScreen();
+	DrawImageCentered(WindowsFlag);
+
+	return TRUE;
+}
+
+
+BOOLEAN
+ShowAnimatedLogo(
+	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
+{
+	EFI_STATUS	Status;
+	CHAR16		*BmpFilePath;
+	UINT8		*BmpFileContents;
+	UINTN		BmpFileBytes;
+	IMAGE		*WindowsFlag;
+
+	// Check if *.bmp exists
+	Status = ChangeExtension(
+		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImage->FilePath, FALSE, FALSE)), 
+		L"bmp", 
+		&BmpFilePath);
+	if (EFI_ERROR(Status) || !FileExists(BmpFilePath)) {
+		return FALSE;
+	}
+
+	// Read file contents.
+	Status = FileRead(BmpFilePath, (VOID **)&BmpFileContents, &BmpFileBytes);
+	if (EFI_ERROR(Status)) {
+		FreePool(BmpFilePath);
+		return FALSE;
+	}
+		
+	Status = BmpFileToImage(BmpFileContents, BmpFileBytes, (VOID **)&WindowsFlag);
+	if (EFI_ERROR(Status)) {
+		FreePool(BmpFilePath);
+		FreePool(BmpFileContents);
+		return FALSE;
+	}
+
+	FreePool(BmpFilePath);
+	FreePool(BmpFileContents);
+	BmpFileContents = NULL;
+
+	// All fine, let's do some drawing.
+	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
+	ClearScreen();
+	AnimateImage(WindowsFlag);
+
+	// Cleanup & return.
+	DestroyImage(WindowsFlag);
+	return TRUE;
 }
