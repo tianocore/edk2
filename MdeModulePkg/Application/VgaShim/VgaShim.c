@@ -490,199 +490,21 @@ CanWriteAtAddress(
 }
 
 
-EFI_STATUS
-ChangeExtension(
-	IN	CHAR16	*FilePath,
-	IN	CHAR16	*NewExtension,
-	OUT	CHAR16	**NewFilePath)
-{
-	UINTN	DotIndex;
-	UINTN	NewExtensionLen = StrLen(NewExtension);
+/**
+  Displays a static built-in Windows flag (last frame in
+  animation shown when starting Windows 7).
 
-	*NewFilePath = 0;
-	DotIndex = StrLen(FilePath) - 1;
-	while ((FilePath[DotIndex] != L'.') && (DotIndex != 0)) {
-		DotIndex--;
-	}
+  @param[in] ConsoleControl Protocol for sharing the display
+                            between console and graphical output.
+							Considered legacy but still used
+							by Apple devices.
 
-	if (DotIndex == 0)
-		return EFI_INVALID_PARAMETER;
-
-	// Move index as we want to copy the '.' too.
-	DotIndex++;
-
-	// Allocate enough to hold the new extension and null terminator.
-	*NewFilePath = (CHAR16*)AllocatePool( (DotIndex + NewExtensionLen + 1) * sizeof(CHAR16) );
-	if (*NewFilePath == NULL)
-		return EFI_OUT_OF_RESOURCES;
-	
-	// Copy the relevant strings and add the null terminator.
-	CopyMem(*NewFilePath, FilePath, (DotIndex) * sizeof(CHAR16));
-	CopyMem(*NewFilePath + DotIndex, NewExtension, NewExtensionLen * sizeof(CHAR16));
-	((CHAR16*)(*NewFilePath))[DotIndex + NewExtensionLen] = CHAR_NULL;
-	
-	return EFI_SUCCESS;
-}
-
-
-BOOLEAN
-FileExists(
-	IN	CHAR16*	FilePath)
-{
-	EFI_STATUS				Status;
-	EFI_FILE_IO_INTERFACE	*Volume;
-	EFI_FILE_HANDLE			VolumeRoot;
-	EFI_FILE_HANDLE			RequestedFile;
-	BOOLEAN					Exists;
-
-	// Open volume where VgaShim lives.
-	Status = gBS->HandleProtocol(VgaShimImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
-	if (EFI_ERROR(Status))
-		return FALSE;
-	Status = Volume->OpenVolume(Volume, &VolumeRoot);
-	if (EFI_ERROR(Status))
-		return FALSE;
-
-	// Try to open file for reading.
-	Status = VolumeRoot->Open(VolumeRoot, &RequestedFile, FilePath, EFI_FILE_MODE_READ, 0);
-	if (EFI_ERROR(Status)) {
-		VolumeRoot->Close(VolumeRoot);
-		return FALSE;
-	} else {
-		RequestedFile->Close(RequestedFile);
-		VolumeRoot->Close(VolumeRoot);
-		return TRUE;
-	}
-}
-
-
-EFI_STATUS
-FileRead(
-	IN	CHAR16	*FilePath,
-	OUT	VOID	**FileContents,
-	OUT	UINTN	*FileBytes)
-{
-	EFI_STATUS				Status;
-	EFI_FILE_IO_INTERFACE	*Volume;
-	EFI_FILE_HANDLE			VolumeRoot;
-	EFI_FILE_HANDLE			File;
-	EFI_FILE_INFO			*FileInfo;
-	UINTN					Size;
-
-	// Open volume where VgaShim lives.
-	Status = gBS->HandleProtocol(VgaShimImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
-	if (EFI_ERROR(Status))
-		return Status;
-	Status = Volume->OpenVolume(Volume, &VolumeRoot);
-	if (EFI_ERROR(Status))
-		return Status;
-
-	// Try to open file for reading.
-	Status = VolumeRoot->Open(VolumeRoot, &File, FilePath, EFI_FILE_MODE_READ, 0);
-	if (EFI_ERROR(Status)) {
-		VolumeRoot->Close(VolumeRoot);
-		return Status;
-	}
-
-	// First gather information on total file size.
-	File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
-	FileInfo = AllocatePool(Size);
-	if (FileInfo == NULL)
-		return EFI_OUT_OF_RESOURCES;
-	File->GetInfo(File, &gEfiFileInfoGuid, &Size, FileInfo);
-	Size = FileInfo->FileSize;
-	FreePool(FileInfo);
-
-	// Allocate a buffer and read the entire file into it.
-	*FileContents = AllocatePool(Size);
-	Print(L"Reading %u bytes of %s ... ", Size, FilePath);
-	Status = File->Read(File, &Size, *FileContents);
-	if (EFI_ERROR(Status)) {
-		Print(L"unsuccessful (error: %r)\n", Status);
-		FreePool(*FileContents);
-	} else {
-		Print(L"successful\n");
-		*FileBytes = Size;
-	}
-	
-	// Cleanup.
-	File->Close(File);
-	VolumeRoot->Close(VolumeRoot);
-	return Status;
-}
-
-
-VOID
-ShowFiles(
-	IN	EFI_HANDLE		ImageHandle)
-{
-	EFI_STATUS					Status;
-	EFI_LOADED_IMAGE_PROTOCOL	*Image;
-	EFI_FILE_IO_INTERFACE * Volume;
-	EFI_DEVICE_PATH_PROTOCOL *Test2;
-	EFI_FILE_HANDLE Root;
-	EFI_FILE_HANDLE File;
-	UINTN Size;
-	EFI_FILE_INFO * FileInfo;
-	UINT8 * Buffer;
-
-
-	// Get information on the current executable.
-	Status = gBS->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&Image);
-	if (!EFI_ERROR(Status)) {
-		Print(L"FilePath=%x\n", Image->FilePath);
-		Print(L"ImageSize=%u\n", Image->ImageSize);
-		Print(L"LoadOptionsSize=%u\n", Image->LoadOptionsSize);
-		Print(L"LoadOptions=%S\n", Image->LoadOptions); // in bytes!
-		Print(L"ConvertDevicePathToText: %s\n", ConvertDevicePathToText(Image->FilePath, TRUE, FALSE));
-		//Test2 = FileDevicePath(Image->DeviceHandle, Image->FilePath);
-		Print(L"DevicePathType: %u\n", DevicePathType(Image->FilePath));
-		Print(L"DevicePathSubType: %u\n", DevicePathSubType(Image->FilePath));
-		Print(L"DevicePathSubType: %d\n", IsDevicePathEnd(Image->FilePath));
-		Print(L"NextDevicePathNode: %s\n", ConvertDevicePathToText(NextDevicePathNode(Image->FilePath), TRUE, FALSE));
-		//ImageInfo->DeviceHandle ROOT of device
-	}
-
-	// Get information on the filesystem of the currect executable.
-	gBS->HandleProtocol(Image->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
-	Volume->OpenVolume(Volume, &Root);
-	
-	// Check some file
-	Status = Root->Open(Root, &File, L"license1.txt", EFI_FILE_MODE_READ, 0);
-	Print(L"FileName=%r\n", Status);
-	if (!EFI_ERROR(Status)) {
-		File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
-		FileInfo = AllocatePool(Size);
-		File->GetInfo(File, &gEfiFileInfoGuid, &Size, FileInfo);
-		Print(L"FileSize=%u\n", FileInfo->FileSize);
-		Print(L"FileName=%s\n", FileInfo->FileName);
-		Print(L"Attribute=%u\n", FileInfo->Attribute);
-		Print(L"ConvertDevicePathToText File=%s\n", ConvertDevicePathToText(Image->FilePath, TRUE, FALSE));
-		FreePool(FileInfo);
-	}
-	/*File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
-	FileInfo = AllocatePool(Size);
-	File->GetInfo(File, &gEfiFileInfoGuid, &Size, FileInfo);
-	Print(L"FileSize=%u\n", FileInfo->FileSize);
-	Print(L"FileName=%s\n", FileInfo->FileName);
-	Print(L"Attribute=%u\n", FileInfo->Attribute);
-	Print(L"ConvertDevicePathToText: %s\n", ConvertDevicePathToText(Image->FilePath, TRUE, FALSE));
-    Buffer = AllocatePool(FileInfo->FileSize);
-    File->Read(File, &FileInfo->FileSize, Buffer);
-	FreePool(FileInfo);*/
-
-	//Test2 = FileDevicePath(Image->DeviceHandle, L"license.txt");
-	//Print(L"ConvertDevicePathToText Test2=%s\n", ConvertDevicePathToText(Test2, TRUE, FALSE));
-	// DevicePath eg. PciRoot(0)/Pci(14)/USB/HD(1,GPT,9ECAA-7832-4213-AE421)/license.txt
-	
-
-	//ImageInfo->DeviceHandle
-	
-	return;
-}
-
-
-
+  @retval TRUE              Static logo was successfully retrieved
+                            and displayed on screen.
+  @retval FALSE             Either the required resource was not found
+                            or was unable to switch to graphical output.
+  
+**/
 BOOLEAN
 ShowStaticLogo(
 	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
@@ -693,20 +515,48 @@ ShowStaticLogo(
 	UINTN		BmpFileBytes;
 	IMAGE		*WindowsFlag;
 
+	// Sanity checks.
 	Status = BmpFileToImage(BootflagSimple, sizeof BootflagSimple, (VOID **)&WindowsFlag);
 	if (EFI_ERROR(Status)) {
 		return FALSE;
 	}
-	
+	Status = ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
+	if (EFI_ERROR(Status)) {
+		return FALSE;
+	}
+
 	// All fine, let's do some drawing.
-	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
 	ClearScreen();
 	DrawImageCentered(WindowsFlag);
 
+	// Cleanup & return.
+	DestroyImage(WindowsFlag);
 	return TRUE;
 }
 
 
+/**
+  Displays an animated logo. It has to be stored in a .bmp file
+  whose filename (sans extension) has to match the runtime filename
+  of VgaShim. It must also reside in the same folder as VgaShim.
+  The image will be split into rectangular frames whose side
+  is assumed to be equal to the shorter side of the image.
+
+  Eg. if you run VgaShim.efi and have VgaShim.bmp in the same
+  folder, and VgaShim.bmp is a valid, 24bpp bmp image file of
+  of size 200x10000, 50 frames will be shown (top to bottom).
+
+  @param[in] ConsoleControl Protocol for sharing the display
+                            between console and graphical output.
+							Considered legacy but still used
+							by Apple devices.
+
+  @retval TRUE              Static logo was successfully retrieved
+                            and displayed on screen.
+  @retval FALSE             Either the required resource was not found
+                            or was unable to switch to graphical output.
+  
+**/
 BOOLEAN
 ShowAnimatedLogo(
 	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)

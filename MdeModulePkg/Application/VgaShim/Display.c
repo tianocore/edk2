@@ -1,6 +1,20 @@
 #include "VgaShim.h"
 
 
+/**
+  -----------------------------------------------------------------------------
+  Local method signatures.
+  -----------------------------------------------------------------------------
+**/
+
+EFI_STATUS
+CalculatePositionForCenter(
+	IN		UINTN		ImageWidth,
+	IN		UINTN		ImageHeight,
+	OUT		UINTN		*PositionX,
+	OUT		UINTN		*PositionY);
+
+
 EFI_STATUS
 EnsureDisplayAvailable()
 {

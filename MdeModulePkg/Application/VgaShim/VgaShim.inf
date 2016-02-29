@@ -15,6 +15,7 @@
 [Sources]
   VgaShim.c
   Display.c
+  Filesystem.c
 
 [Packages]
   MdePkg/MdePkg.dec

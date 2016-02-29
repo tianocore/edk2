@@ -12,7 +12,7 @@
 
 /**
   -----------------------------------------------------------------------------
-  Project-wide includes.
+  Global includes.
   -----------------------------------------------------------------------------
 **/
 
@@ -115,7 +115,7 @@ typedef struct {
 
 /**
   -----------------------------------------------------------------------------
-  Method signatures.
+  Global method signatures.
   -----------------------------------------------------------------------------
 **/
 
@@ -156,14 +156,6 @@ BmpFileToImage(
 	IN		UINTN		FileSizeBytes,
 	OUT		VOID		**Result);
 
-EFI_STATUS
-CalculatePositionForCenter(
-	IN		UINTN		ImageWidth,
-	IN		UINTN		ImageHeight,
-	OUT		UINTN		*PositionX,
-	OUT		UINTN		*PositionY);
-
-
 VOID
 DrawImage(
 	IN		IMAGE		*Image,
@@ -186,10 +178,6 @@ EFI_STATUS
 EnsureDisplayAvailable(
 	VOID);
 
-VOID
-ShowFiles(
-	IN		EFI_HANDLE	ImageHandle);
-
 BOOLEAN
 FileExists(
 	IN		CHAR16		*FilePath);
@@ -198,7 +186,7 @@ EFI_STATUS
 ChangeExtension(
 	IN		CHAR16		*FilePath,
 	IN		CHAR16		*NewExtension,
-	OUT		CHAR16		**NewFilePath);
+	OUT		VOID		**NewFilePath);
 
 EFI_STATUS
 FileRead(
@@ -209,7 +197,7 @@ FileRead(
 
 /**
   -----------------------------------------------------------------------------
-  Constants and project-wide variables.
+  Constants and other global variables.
   -----------------------------------------------------------------------------
 **/
 
