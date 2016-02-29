@@ -4,17 +4,15 @@
 **/
 
 
+#include "VgaShim.h"
+
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
-#include "VgaShim.h"
 #include "bootflag.h"
 
 
-BOOLEAN							GraphicsInitialized = FALSE;
-BOOLEAN							GraphicsFound = FALSE;
-EFI_UGA_DRAW_PROTOCOL			*UgaDraw;
-EFI_GRAPHICS_OUTPUT_PROTOCOL	*GraphicsOutput;
-VIDEO_INFO						VideoInfo;
+DISPLAY_INFO	DisplayInfo;
+
 
 
 /**
@@ -46,9 +44,6 @@ UefiMain (
 	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
 	Print(L"Locating console control %x %r\n", &gEfiConsoleControlProtocolGuid, Status);
 	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
-
-	//Print(L"VGA Shim v0.7\n");
-	//PrintVideoInfo();
 
 	//Status = gST->ConOut->Reset(gST->ConOut, FALSE);
 	//Status = gST->ConIn->Reset(gST->ConIn, FALSE);
@@ -162,16 +157,26 @@ Exit:
 VOID
 PrintVideoInfo()
 {
-	if (!GraphicsInitialized) {
-		InitializeGraphics();
+	if (EFI_ERROR(EnsureDisplayAvailable())) {
+		return;
 	}
 
-	Print(L"%a: HorizontalResolution = %u\n", __FUNCTION__, VideoInfo.HorizontalResolution);
-	Print(L"%a: VerticalResolution = %u\n", __FUNCTION__, VideoInfo.VerticalResolution);
-	Print(L"%a: PixelFormat = %u\n", __FUNCTION__, VideoInfo.PixelFormat);
-	Print(L"%a: PixelsPerScanLine = %u\n", __FUNCTION__, VideoInfo.PixelsPerScanLine);
-	Print(L"%a: FrameBufferBase = %x\n", __FUNCTION__, VideoInfo.FrameBufferBase);
-	Print(L"%a: FrameBufferSize = %u\n", __FUNCTION__, VideoInfo.FrameBufferSize);
+	Print(L"%a: HorizontalResolution = %u\n", __FUNCTION__, DisplayInfo.HorizontalResolution);
+	Print(L"%a: VerticalResolution = %u\n", __FUNCTION__, DisplayInfo.VerticalResolution);
+	Print(L"%a: PixelFormat = %u\n", __FUNCTION__, DisplayInfo.PixelFormat);
+	Print(L"%a: PixelsPerScanLine = %u\n", __FUNCTION__, DisplayInfo.PixelsPerScanLine);
+	Print(L"%a: FrameBufferBase = %x\n", __FUNCTION__, DisplayInfo.FrameBufferBase);
+	Print(L"%a: FrameBufferSize = %u\n", __FUNCTION__, DisplayInfo.FrameBufferSize);
+}
+
+
+EFI_STATUS
+EnsureDisplayAvailable()
+{
+	if (!DisplayInfo.Initialized) {
+		InitializeDisplay();
+	}
+	return DisplayInfo.AdapterFound ? EFI_SUCCESS : EFI_NOT_FOUND;
 }
 
 
@@ -182,7 +187,7 @@ PrintVideoInfo()
   retrieved and stored for later use.
 
   @retval EFI_SUCCESS     An adapter was found and its current
-                          mode parameters stored in VideoInfo
+                          mode parameters stored in DisplayInfo
 						  global variable.
   @retval other           No compatible adapters were found or
                           their mode parameters could not be
@@ -190,61 +195,55 @@ PrintVideoInfo()
   
 **/
 EFI_STATUS
-InitializeGraphics()
+InitializeDisplay()
 {
 	EFI_STATUS	Status;
 	UINT32		Temp1;
 	UINT32		Temp2;
 
-	if (GraphicsInitialized) {
-		return EFI_SUCCESS;
-	}
-
-	UgaDraw			= NULL;
-	GraphicsOutput	= NULL;
-
-	SetMem(&VideoInfo, sizeof(VIDEO_INFO), 0);
+	SetMem(&DisplayInfo, sizeof(DISPLAY_INFO), 0);
 
 	//
 	// Try a GOP adapter first.
 	//
-	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&GraphicsOutput);
+	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&DisplayInfo.GOP);
 	if (!EFI_ERROR(Status)) {
 		Print(L"%a: Found a GOP protocol provider\n", __FUNCTION__);
-		VideoInfo.HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
-		VideoInfo.VerticalResolution = GraphicsOutput->Mode->Info->VerticalResolution;
-		VideoInfo.PixelFormat = GraphicsOutput->Mode->Info->PixelFormat;
-		VideoInfo.PixelsPerScanLine = GraphicsOutput->Mode->Info->PixelsPerScanLine;
-		VideoInfo.FrameBufferBase = GraphicsOutput->Mode->FrameBufferBase;
+		DisplayInfo.HorizontalResolution = DisplayInfo.GOP->Mode->Info->HorizontalResolution;
+		DisplayInfo.VerticalResolution = DisplayInfo.GOP->Mode->Info->VerticalResolution;
+		DisplayInfo.PixelFormat = DisplayInfo.GOP->Mode->Info->PixelFormat;
+		DisplayInfo.PixelsPerScanLine = DisplayInfo.GOP->Mode->Info->PixelsPerScanLine;
+		DisplayInfo.FrameBufferBase = DisplayInfo.GOP->Mode->FrameBufferBase;
 		// usually = PixelsPerScanLine * VerticalResolution * BytesPerPixel
 		// for MacBookAir7,2: 1536 * 900 * 4 = 5,529,600 bytes
-		VideoInfo.FrameBufferSize = GraphicsOutput->Mode->FrameBufferSize;
+		DisplayInfo.FrameBufferSize = DisplayInfo.GOP->Mode->FrameBufferSize;
 		
+		DisplayInfo.AdapterFound = TRUE;
 		goto Exit;
 	}
 
 	//
 	// Try a UGA adapter.
 	//
-	GraphicsOutput = NULL;
-	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&UgaDraw);
+	DisplayInfo.GOP = NULL;
+	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&DisplayInfo.UGA);
 	if (!EFI_ERROR(Status)) {
 		Print(L"%a: Found a UGA protocol provider\n", __FUNCTION__);
-		Status = UgaDraw->GetMode(UgaDraw, &VideoInfo.HorizontalResolution, &VideoInfo.VerticalResolution, &Temp1, &Temp2);
+		Status = DisplayInfo.UGA->GetMode(DisplayInfo.UGA, &DisplayInfo.HorizontalResolution, &DisplayInfo.VerticalResolution, &Temp1, &Temp2);
 		if (EFI_ERROR(Status)) {
 			Print(L"%a: Unable to get current UGA mode\n", __FUNCTION__);
+			DisplayInfo.UGA = NULL;
 			goto Exit;
 		}
-
-		VideoInfo.PixelFormat = PixelBlueGreenRedReserved8BitPerColor; // default for UGA
+		DisplayInfo.PixelFormat = PixelBlueGreenRedReserved8BitPerColor; // default for UGA
 		// TODO: find framebuffer base
 		// TODO: find scanline length
 		// https://github.com/coreos/grub/blob/master/grub-core%2Fvideo%2Fefi_uga.c
+		DisplayInfo.AdapterFound = TRUE;
 	}
 
 Exit:
-	GraphicsFound = !EFI_ERROR(Status);
-	GraphicsInitialized = TRUE;
+	DisplayInfo.Initialized = TRUE;
 	return Status;
 }
 
@@ -281,10 +280,7 @@ FillVesaInformation(
 	//
 	// Get basic video hardware information first.
 	//
-	if (!GraphicsInitialized) {
-		InitializeGraphics();
-	}
-	if (!GraphicsFound) {
+	if (EFI_ERROR(EnsureDisplayAvailable())) {
 		Print(L"%a: No adapters were found, unable to fill in VESA information\n", __FUNCTION__);
 		return EFI_NOT_FOUND;
 	}
@@ -306,7 +302,7 @@ FillVesaInformation(
 	BufferPtr += 2;
 	*(UINT16*)BufferPtr = 0xFFFF;			// mode list terminator
 	BufferPtr += 2;
-	VbeInfo->VideoMem64K = (UINT16)((VideoInfo.FrameBufferSize + 65535) / 65536);
+	VbeInfo->VideoMem64K = (UINT16)((DisplayInfo.FrameBufferSize + 65535) / 65536);
 	VbeInfo->OemSoftwareVersion = 0x0000;
 	VbeInfo->VendorNameAddress = (UINT32)StartAddress << 12 | (UINT16)(UINTN)BufferPtr;
 	CopyMem(BufferPtr, VENDOR_NAME, sizeof VENDOR_NAME);
@@ -343,9 +339,9 @@ FillVesaInformation(
 	VbeModeInfo->CharCellHeight = 16;				// used to calculate resolution in text modes
 	
 	// Calculate offsets so that the smaller image appears centered on the screen
-	HorizontalOffsetPx = (VideoInfo.HorizontalResolution - 1024) / 2;
-	VerticalOffsetPx = (VideoInfo.VerticalResolution - 768) / 2 * VideoInfo.PixelsPerScanLine;
-	FrameBufferBaseWithOffset = VideoInfo.FrameBufferBase 
+	HorizontalOffsetPx = (DisplayInfo.HorizontalResolution - 1024) / 2;
+	VerticalOffsetPx = (DisplayInfo.VerticalResolution - 768) / 2 * DisplayInfo.PixelsPerScanLine;
+	FrameBufferBaseWithOffset = DisplayInfo.FrameBufferBase 
 		+ VerticalOffsetPx * 4
 		+ HorizontalOffsetPx * 4;
 
@@ -357,7 +353,7 @@ FillVesaInformation(
 	VbeModeInfo->LfbAddress = 
 		(UINT32)FrameBufferBaseWithOffset;			// 32-bit physical address
 	VbeModeInfo->BytesPerScanLineLinear = 
-		VideoInfo.PixelsPerScanLine * 4;			// logical bytes in linear modes
+		DisplayInfo.PixelsPerScanLine * 4;			// logical bytes in linear modes
 	VbeModeInfo->NumImagePagesLessOne = 0;			// disable image paging
 	VbeModeInfo->NumImagesLessOneLinear = 0;		// disable image paging
 	VbeModeInfo->WindowPositioningAddress = 0x0;	// force windowing to Function 5h
@@ -380,19 +376,19 @@ FillVesaInformation(
 	VbeModeInfo->RedMaskSizeLinear = 8;
 	VbeModeInfo->ReservedMaskSizeLinear = 8;
 
-	if (VideoInfo.PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
+	if (DisplayInfo.PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
 		VbeModeInfo->BlueMaskPosLinear = 0;			// blue offset
 		VbeModeInfo->GreenMaskPosLinear = 8;		// green offset
 		VbeModeInfo->RedMaskPosLinear = 16;			// green offset
 		VbeModeInfo->ReservedMaskPosLinear = 24;	// reserved offset
-	} else if (VideoInfo.PixelFormat == PixelRedGreenBlueReserved8BitPerColor) {
+	} else if (DisplayInfo.PixelFormat == PixelRedGreenBlueReserved8BitPerColor) {
 		VbeModeInfo->RedMaskPosLinear = 0;			// red offset
 		VbeModeInfo->GreenMaskPosLinear = 8;		// green offset
 		VbeModeInfo->BlueMaskPosLinear = 16;		// blue offset
 		VbeModeInfo->ReservedMaskPosLinear = 24;	// alpha offset
 	} else {
 		Print(L"%a: Unsupported value of PixelFormat (%d), aborting\n", 
-			__FUNCTION__, VideoInfo.PixelFormat);
+			__FUNCTION__, DisplayInfo.PixelFormat);
 		return EFI_UNSUPPORTED;
 	}
 	
@@ -582,160 +578,6 @@ CanWriteAtAddress(
 
 
 VOID
-ClearScreen()
-{
-    EFI_UGA_PIXEL	FillColor;
-	
-	FillColor.Red		= 0;
-	FillColor.Green		= 0;
-	FillColor.Blue		= 0;
-	FillColor.Reserved	= 0;
-
-	if (!GraphicsInitialized) {
-		InitializeGraphics();
-	}
-
-    if (GraphicsOutput != NULL) {
-		GraphicsOutput->Blt(
-			GraphicsOutput, 
-			(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)&FillColor,
-			EfiBltVideoFill,
-			0, 0, 0, 0,
-			VideoInfo.HorizontalResolution, VideoInfo.VerticalResolution, 0);
-    } else if (UgaDraw != NULL) {
-        UgaDraw->Blt(
-			UgaDraw, 
-			&FillColor, 
-			EfiUgaVideoFill, 
-			0, 0, 0, 0, 
-			VideoInfo.HorizontalResolution, VideoInfo.VerticalResolution, 0);
-    } else {
-	    Print(L"%a: No graphics device found, unable to clear screen\n", __FUNCTION__);
-    }
-}
-
-
-VOID
-DestroyImage(
-	IN	IMAGE	*Image)
-{
-	if (Image != NULL) {
-        if (Image->PixelData != NULL)
-            FreePool(Image->PixelData);
-        FreePool(Image);
-    }
-}
-
-
-IMAGE*
-CreateImage(
-	IN	UINTN	Width,
-	IN	UINTN	Height)
-{
-	IMAGE	*Image;
-
-	Image = (IMAGE *)AllocatePool(sizeof(IMAGE));
-	if (Image == NULL) {
-		return NULL;
-	}
-		
-	Image->Width = Width;
-	Image->Height = Height;
-	Image->PixelData = (EFI_UGA_PIXEL *)AllocatePool(Width * Height * sizeof(EFI_UGA_PIXEL));
-	if (Image->PixelData == NULL) {
-		DestroyImage(Image);
-		return NULL;
-	}
-	
-	SetMem(Image->PixelData, sizeof Image->PixelData, 0);
-	return Image;
-}
-
-
-VOID
-DrawImageCentered(
-	IN	IMAGE	*Image)
-{
-	UINTN	PosX;
-	UINTN	PosY;
-
-	if (!GraphicsInitialized) {
-		InitializeGraphics();
-	}
-	if (!GraphicsFound) {
-		Print(L"%a: No graphics device found, unable to draw image\n", __FUNCTION__);
-		return;
-	}
-	if (Image == NULL || Image->Width == 0 || Image->Height == 0) {
-		Print(L"%a: No image specified\n", __FUNCTION__);
-		return;
-	}
-	if ((Image->Width) > VideoInfo.HorizontalResolution
-		|| (Image->Height) > VideoInfo.VerticalResolution) {
-		Print(L"%a: Image too big to draw on screen\n", __FUNCTION__);
-		return;
-	}
-
-	PosX = (VideoInfo.HorizontalResolution / 2) - (Image->Width / 2);
-	PosY = (VideoInfo.VerticalResolution / 2) - (Image->Height / 2);
-
-	if (PosX < 0)
-		PosX = 0;
-	if (PosY < 0)
-		PosY = 0;
-	if (PosX + Image->Width > VideoInfo.HorizontalResolution)
-		PosX = VideoInfo.HorizontalResolution - Image->Width;
-	if (PosY + Image->Height > VideoInfo.VerticalResolution)
-		PosY = VideoInfo.VerticalResolution - Image->Height;
-
-	DrawImage(Image, PosX, PosY);
-}
-
-
-VOID 
-DrawImage(
-	IN	IMAGE	*Image,
-	IN	UINTN	PosX,
-	IN	UINTN	PosY)
-{
-	if (!GraphicsInitialized) {
-		InitializeGraphics();
-	}
-	if (!GraphicsFound) {
-		Print(L"%a: No graphics device found, unable to draw image\n", __FUNCTION__);
-		return;
-	}
-	if (Image == NULL || Image->Width == 0 || Image->Height == 0) {
-		Print(L"%a: No image specified\n", __FUNCTION__);
-		return;
-	}
-	if ((PosX + Image->Width) > VideoInfo.HorizontalResolution 
-		|| (PosY + Image->Height) > VideoInfo.VerticalResolution) {
-		Print(L"%a: Image too big to draw on screen\n", __FUNCTION__);
-		return;
-	}
-
-	if (GraphicsOutput != NULL) {
-		GraphicsOutput->Blt(GraphicsOutput, 
-			(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)Image->PixelData, 
-			EfiBltBufferToVideo, 
-			0, 0, PosX, PosY, 
-			Image->Width, Image->Height, 0);
-	} else if (UgaDraw != NULL) {
-		UgaDraw->Blt(UgaDraw, 
-			(EFI_UGA_PIXEL *)Image->PixelData, 
-			EfiUgaBltBufferToVideo,
-			0, 0, PosX, PosY, 
-			Image->Width, Image->Height, 0);
-	} else {
-		Print(L"%a: No graphics device found, unable to draw image\n", __FUNCTION__);
-	}
-	
-	//DestroyImage(Image);
-}
-
-
-VOID
 LoadFile(
 	IN	EFI_HANDLE		ImageHandle)
 {
@@ -755,82 +597,4 @@ LoadFile(
 		//ImageInfo->DeviceHandle ROOT of device
 	}
 	return;
-}
-
-
-
-
-
-
-
-
-
-IMAGE*
-BmpFileToImage(
-	IN	UINT8	*FileData,
-	IN	UINTN	FileSizeBytes)
-{
-	IMAGE			*Image;
-	BMP_HEADER		*BmpHeader;
-	UINT8			*BmpCurrentPixel;
-	UINT8			*BmpCurrentLine;
-	UINTN			LineSizeBytes;
-	EFI_UGA_PIXEL	*TargetPixel;
-	UINTN			x, y;
-
-	// Sanity checks.
-	if (FileData == NULL || FileSizeBytes < sizeof(BMP_HEADER)) {
-		Print(L"%a: File too small or does not exist, aborting\n", __FUNCTION__);
-		return NULL;
-	}
-
-	BmpHeader = (BMP_HEADER *)FileData;
-	if (BmpHeader->Signature[0] != 'B' 
-		|| BmpHeader->Signature[1] != 'M'
-		|| BmpHeader->CompressionType != 0	// only support uncompressed...
-		|| BmpHeader->BitPerPixel != 24		// ...24 bits per pixel images
-		|| BmpHeader->Width < 1
-		|| BmpHeader->Height < 1) {
-		return NULL;
-	}
-		
-	Image = CreateImage(BmpHeader->Width, BmpHeader->Height);
-	if (Image == NULL) {
-		Print(L"%a: Unable to create image, aborting\n", __FUNCTION__);
-		return NULL;
-	}
-	
-	// Calculate line size and adjust with padding to multiple of 4 bytes.
-	LineSizeBytes = BmpHeader->Width * 3; // 24 bits = 3 bytes
-	LineSizeBytes += (LineSizeBytes % 4) != 0
-		? (4 - (LineSizeBytes % 4))
-		: 0;
-	
-	// Check if we have enough pixel data.
-	if (BmpHeader->PixelDataOffset + BmpHeader->Height * LineSizeBytes > FileSizeBytes) {
-		Print(L"%a: Not enough pixel data, aborting\n", __FUNCTION__);
-		DestroyImage(Image);
-		return NULL;
-	}
-		
-
-	// Fill in pixel values.
-	BmpCurrentLine = FileData + BmpHeader->PixelDataOffset;
-	for (y = 0; y < BmpHeader->Height; y++) {
-		BmpCurrentPixel = BmpCurrentLine;
-		BmpCurrentLine += LineSizeBytes;
-		// jump to the right pixel line; BMP PixelArray is bottom-to-top...
-		TargetPixel = Image->PixelData + BmpHeader->Width * (BmpHeader->Height - y - 1);
-		// ...but thankfully left-to-right
-		for (x = 0; x < BmpHeader->Width; x++) {
-			TargetPixel->Blue		= *BmpCurrentPixel++;
-			TargetPixel->Green		= *BmpCurrentPixel++;
-			TargetPixel->Red		= *BmpCurrentPixel++;
-			TargetPixel->Reserved	= 0;
-			TargetPixel++;
-		}
-	}
-
-	Print(L"%a: Done creating image size %u x %u from bmp\n", __FUNCTION__, Image->Width, Image->Height);
-	return Image;
 }

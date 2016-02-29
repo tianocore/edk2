@@ -21,6 +21,7 @@
 #include <Protocol/LegacyRegion2.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/GraphicsOutput.h>
+// replace with #include <../../EdkCompatibilityPkg/Foundation/Protocol/ConsoleControl/ConsoleControl.h>
 #include "ConsoleControl.h"
 
 #pragma pack(1)
@@ -42,14 +43,28 @@ typedef enum
 	MEM_UNLOCK
 } MEMORY_LOCK_OPERATION;
 
+typedef enum
+{
+	NONE,
+	GOP,
+	UGA
+} GRAPHICS_PROTOCOL;
+
 typedef struct {
-	UINT32						HorizontalResolution;
-	UINT32						VerticalResolution;
-	EFI_GRAPHICS_PIXEL_FORMAT	PixelFormat;
-	UINT32						PixelsPerScanLine;
-	EFI_PHYSICAL_ADDRESS		FrameBufferBase;
-	UINTN						FrameBufferSize;
-} VIDEO_INFO;
+	BOOLEAN							Initialized;
+	BOOLEAN							AdapterFound;
+
+	GRAPHICS_PROTOCOL				Protocol;
+	EFI_UGA_DRAW_PROTOCOL			*UGA;
+	EFI_GRAPHICS_OUTPUT_PROTOCOL	*GOP;
+
+	UINT32							HorizontalResolution;
+	UINT32							VerticalResolution;
+	EFI_GRAPHICS_PIXEL_FORMAT		PixelFormat;
+	UINT32							PixelsPerScanLine;
+	EFI_PHYSICAL_ADDRESS			FrameBufferBase;
+	UINTN							FrameBufferSize;
+} DISPLAY_INFO;
 
 #pragma pack(1)
 typedef struct {
@@ -73,7 +88,7 @@ typedef struct {
 } BMP_HEADER;
 #pragma pack()
 
-EFI_STATUS InitializeGraphics(
+EFI_STATUS InitializeDisplay(
 	VOID);
 
 BOOLEAN CanWriteAtAddress(
@@ -119,6 +134,10 @@ VOID
 DrawImageCentered(
 	IN		IMAGE	*Image);
 
+EFI_STATUS
+EnsureDisplayAvailable(
+	VOID);
+
 STATIC CONST CHAR8 VENDOR_NAME[] = "Apple";
 STATIC CONST CHAR8 PRODUCT_NAME[] = "Emulated VGA";
 STATIC CONST CHAR8 PRODUCT_REVISION[] = "OVMF Int10h (fake)";
@@ -126,5 +145,7 @@ STATIC CONST EFI_PHYSICAL_ADDRESS VGA_ROM_ADDRESS = 0xc0000;
 STATIC CONST EFI_PHYSICAL_ADDRESS IVT_ADDRESS = 0x00000;
 STATIC CONST UINTN VGA_ROM_SIZE = 0x10000;
 STATIC CONST UINTN FIXED_MTRR_SIZE = 0x20000;
+
+extern DISPLAY_INFO	DisplayInfo;
 
 #endif
