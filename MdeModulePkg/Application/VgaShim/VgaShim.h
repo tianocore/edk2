@@ -101,7 +101,7 @@ EFI_STATUS EnsureMemoryLock(
 
 BOOLEAN IsInt10HandlerDefined();
 
-EFI_STATUS FillVesaInformation(
+EFI_STATUS ShimVesaInformation(
 	IN		EFI_PHYSICAL_ADDRESS StartAddress, 
 	OUT		EFI_PHYSICAL_ADDRESS *EndAddress);
 
