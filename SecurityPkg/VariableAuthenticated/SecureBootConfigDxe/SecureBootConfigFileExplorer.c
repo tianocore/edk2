@@ -222,11 +222,13 @@ OpenFileByDevicePath(
 
 /**
   Extract filename from device path. The returned buffer is allocated using AllocateCopyPool.
-  The caller is responsible for freeing the allocated buffer using FreePool().
+  The caller is responsible for freeing the allocated buffer using FreePool(). If return NULL
+  means not enough memory resource.
 
   @param DevicePath       Device path.
 
-  @return                 A new allocated string that represents the file name.
+  @retval NULL            Not enough memory resourece for AllocateCopyPool.
+  @retval Other           A new allocated string that represents the file name.
 
 **/
 CHAR16 *
@@ -245,6 +247,7 @@ ExtractFileNameFromDevicePath (
   String = DevicePathToStr(DevicePath);
   MatchString = String;
   LastMatch   = String;
+  FileName    = NULL;
 
   while(MatchString != NULL){
     LastMatch   = MatchString + 1;
@@ -253,7 +256,9 @@ ExtractFileNameFromDevicePath (
 
   Length = StrLen(LastMatch);
   FileName = AllocateCopyPool ((Length + 1) * sizeof(CHAR16), LastMatch);
-  *(FileName + Length) = 0;
+  if (FileName != NULL) {
+    *(FileName + Length) = 0;
+  }
 
   FreePool(String);
 
@@ -280,14 +285,21 @@ UpdatePage(
   CHAR16                *FileName;
   EFI_STRING_ID         StringToken;
 
-  if (FilePath != NULL){
+  FileName = NULL;
+
+  if (FilePath != NULL) {
     FileName = ExtractFileNameFromDevicePath(FilePath);
-    StringToken = HiiSetString (gSecureBootPrivateData->HiiHandle, 0, FileName, NULL);
-  } else {
-    FileName = HiiGetString (gSecureBootPrivateData->HiiHandle, STRING_TOKEN (STR_NULL), NULL);
-    ASSERT (FileName != NULL);
-    StringToken =  HiiSetString (gSecureBootPrivateData->HiiHandle, 0, FileName, NULL);
   }
+  if (FileName == NULL) {
+    //
+    // FileName = NULL has two case:
+    // 1. FilePath == NULL, not select file.
+    // 2. FilePath != NULL, but ExtractFileNameFromDevicePath return NULL not enough memory resource.
+    // In these two case, no need to update the form, and exit the caller function.
+    //
+    return TRUE;
+  }
+  StringToken =  HiiSetString (gSecureBootPrivateData->HiiHandle, 0, FileName, NULL);
 
   gSecureBootPrivateData->FileContext->FileName = FileName;
 
