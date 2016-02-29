@@ -1,6 +1,107 @@
 #include "VgaShim.h"
 
 
+EFI_STATUS
+EnsureDisplayAvailable()
+{
+	if (!DisplayInfo.Initialized) {
+		InitializeDisplay();
+	}
+	return DisplayInfo.AdapterFound && DisplayInfo.Protocol != NONE ? EFI_SUCCESS : EFI_NOT_FOUND;
+}
+
+
+/**
+  Scans the system for Graphics Output Protocol (GOP) and
+  Universal Graphic Adapter (UGA) compatible adapters/GPUs.
+  If one is found, vital information about its video mode is
+  retrieved and stored for later use.
+
+  @retval EFI_SUCCESS     An adapter was found and its current
+                          mode parameters stored in DisplayInfo
+						  global variable.
+  @retval other           No compatible adapters were found or
+                          their mode parameters could not be
+						  retrieved.
+  
+**/
+EFI_STATUS
+InitializeDisplay()
+{
+	EFI_STATUS	Status;
+	UINT32		Temp1;
+	UINT32		Temp2;
+
+	SetMem(&DisplayInfo, sizeof(DISPLAY_INFO), 0);
+
+	//
+	// Try a GOP adapter first.
+	//
+	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&DisplayInfo.GOP);
+	if (!EFI_ERROR(Status)) {
+		Print(L"%a: Found a GOP protocol provider\n", __FUNCTION__);
+		DisplayInfo.HorizontalResolution = DisplayInfo.GOP->Mode->Info->HorizontalResolution;
+		DisplayInfo.VerticalResolution = DisplayInfo.GOP->Mode->Info->VerticalResolution;
+		DisplayInfo.PixelFormat = DisplayInfo.GOP->Mode->Info->PixelFormat;
+		DisplayInfo.PixelsPerScanLine = DisplayInfo.GOP->Mode->Info->PixelsPerScanLine;
+		DisplayInfo.FrameBufferBase = DisplayInfo.GOP->Mode->FrameBufferBase;
+		// usually = PixelsPerScanLine * VerticalResolution * BytesPerPixel
+		// for MacBookAir7,2: 1536 * 900 * 4 = 5,529,600 bytes
+		DisplayInfo.FrameBufferSize = DisplayInfo.GOP->Mode->FrameBufferSize;
+		
+		DisplayInfo.Protocol = GOP;
+		DisplayInfo.AdapterFound = TRUE;
+		goto Exit;
+	}
+
+	//
+	// Try a UGA adapter.
+	//
+	DisplayInfo.GOP = NULL;
+	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&DisplayInfo.UGA);
+	if (!EFI_ERROR(Status)) {
+		Print(L"%a: Found a UGA protocol provider\n", __FUNCTION__);
+		Status = DisplayInfo.UGA->GetMode(DisplayInfo.UGA, &DisplayInfo.HorizontalResolution, &DisplayInfo.VerticalResolution, &Temp1, &Temp2);
+		if (EFI_ERROR(Status)) {
+			Print(L"%a: Unable to get current UGA mode\n", __FUNCTION__);
+			DisplayInfo.UGA = NULL;
+			goto Exit;
+		}
+		DisplayInfo.PixelFormat = PixelBlueGreenRedReserved8BitPerColor; // default for UGA
+		// TODO: find framebuffer base
+		// TODO: find scanline length
+		// https://github.com/coreos/grub/blob/master/grub-core%2Fvideo%2Fefi_uga.c
+		DisplayInfo.Protocol = UGA;
+		DisplayInfo.AdapterFound = TRUE;
+	}
+
+Exit:
+	DisplayInfo.Initialized = TRUE;
+	return Status;
+}
+
+
+/**
+  Prints important information about the currently running video
+  mode. Initializes adapters if they have not yet been detected.
+
+**/
+VOID
+PrintVideoInfo()
+{
+	if (EFI_ERROR(EnsureDisplayAvailable())) {
+		return;
+	}
+
+	Print(L"%a: HorizontalResolution = %u\n", __FUNCTION__, DisplayInfo.HorizontalResolution);
+	Print(L"%a: VerticalResolution = %u\n", __FUNCTION__, DisplayInfo.VerticalResolution);
+	Print(L"%a: PixelFormat = %u\n", __FUNCTION__, DisplayInfo.PixelFormat);
+	Print(L"%a: PixelsPerScanLine = %u\n", __FUNCTION__, DisplayInfo.PixelsPerScanLine);
+	Print(L"%a: FrameBufferBase = %x\n", __FUNCTION__, DisplayInfo.FrameBufferBase);
+	Print(L"%a: FrameBufferSize = %u\n", __FUNCTION__, DisplayInfo.FrameBufferSize);
+}
+
+
 IMAGE*
 CreateImage(
 	IN	UINTN	Width,
@@ -86,7 +187,6 @@ BmpFileToImage(
 		return NULL;
 	}
 		
-
 	// Fill in pixel values.
 	BmpCurrentLine = FileData + BmpHeader->PixelDataOffset;
 	for (y = 0; y < BmpHeader->Height; y++) {
