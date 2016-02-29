@@ -584,6 +584,7 @@ LibIsSupportedFileType (
   }
 
   TmpStr = AllocateCopyPool (StrSize (InputFileType), InputFileType);
+  ASSERT(TmpStr != NULL);
   LibToLowerString(TmpStr);
 
   IsSupported = (StrStr (gFileExplorerPrivate.FileType, TmpStr) == NULL ? FALSE : TRUE);
@@ -1361,6 +1362,7 @@ ChooseFile (
   gFileExplorerPrivate.ChooseHandler = ChooseHandler;
   if (FileType != NULL) {
     gFileExplorerPrivate.FileType = AllocateCopyPool (StrSize (FileType), FileType);
+    ASSERT(gFileExplorerPrivate.FileType != NULL);
     LibToLowerString(gFileExplorerPrivate.FileType);
   } else {
     gFileExplorerPrivate.FileType = NULL;
