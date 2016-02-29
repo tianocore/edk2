@@ -1,7 +1,7 @@
 /** @file
   The implementation for Shell application IfConfig6.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiHiiServicesLib.h>
 #include <Library/HiiLib.h>
 #include <Library/NetLib.h>
 
@@ -45,10 +46,6 @@ SHELL_PARAM_ITEM    mIfConfig6CheckList[] = {
   {
     L"-r",
     TypeValue
-  },
-  {
-    L"-?",
-    TypeFlag
   },
   {
     NULL,
@@ -1648,20 +1645,45 @@ IfConfig6Initialize (
   IN  EFI_SYSTEM_TABLE    *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  IFCONFIG6_PRIVATE_DATA    *Private;
-  LIST_ENTRY                *ParamPackage;
-  CONST CHAR16              *ValueStr;
-  ARG_LIST                  *ArgList;
-  CHAR16                    *ProblemParam;
-  CHAR16                    *Str;
+  EFI_STATUS                    Status;
+  IFCONFIG6_PRIVATE_DATA        *Private;
+  EFI_HII_PACKAGE_LIST_HEADER   *PackageList;
+  LIST_ENTRY                    *ParamPackage;
+  CONST CHAR16                  *ValueStr;
+  ARG_LIST                      *ArgList;
+  CHAR16                        *ProblemParam;
+  CHAR16                        *Str;
 
   Private = NULL;
 
   //
-  // Register our string package with HII and return the handle to it.
+  // Retrieve HII package list from ImageHandle
   //
-  mHiiHandle = HiiAddPackages (&gEfiCallerIdGuid, ImageHandle, IfConfig6Strings, NULL);
+  Status = gBS->OpenProtocol (
+                  ImageHandle,
+                  &gEfiHiiPackageListProtocolGuid,
+                  (VOID **) &PackageList,
+                  ImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Publish HII package list to HII Database.
+  //
+  Status = gHiiDatabase->NewPackageList (
+                          gHiiDatabase,
+                          PackageList,
+                          NULL,
+                          &mHiiHandle
+                          );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   ASSERT (mHiiHandle != NULL);
 
   Status = ShellCommandLineParseEx (mIfConfig6CheckList, &ParamPackage, &ProblemParam, TRUE, FALSE);
@@ -1674,7 +1696,7 @@ IfConfig6Initialize (
   // To handle no option.
   //
   if (!ShellCommandLineGetFlag (ParamPackage, L"-r") && !ShellCommandLineGetFlag (ParamPackage, L"-s") &&
-      !ShellCommandLineGetFlag (ParamPackage, L"-?") && !ShellCommandLineGetFlag (ParamPackage, L"-l")) {
+      !ShellCommandLineGetFlag (ParamPackage, L"-l")) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_LACK_OPTION), mHiiHandle);
     goto ON_EXIT;
   }
@@ -1683,18 +1705,8 @@ IfConfig6Initialize (
   //
   if (((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-s"))) ||
       ((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-l")) && (ShellCommandLineGetFlag (ParamPackage, L"-?")))) {
+      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-l")))) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_CONFLICT_OPTIONS), mHiiHandle);
-    goto ON_EXIT;
-  }
-  //
-  // To show the help information of ifconfig6 command.
-  //
-  if (ShellCommandLineGetFlag (ParamPackage, L"-?")) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_HELP), mHiiHandle);
     goto ON_EXIT;
   }
 

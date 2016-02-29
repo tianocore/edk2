@@ -1,7 +1,7 @@
 /** @file
   The interface function declaration of shell application Ping6 (Ping for v6 series).
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,11 @@
 #define PING6_MAX_SEND_NUMBER      10000
 #define PING6_MAX_BUFFER_SIZE      32768
 #define PING6_ONE_SECOND           10000000
+
+//
+// String token ID of Ping6 command help message text.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringPing6HelpToken = STRING_TOKEN (STR_PING6_HELP);
 
 //
 // A similar amount of time that passes in femtoseconds

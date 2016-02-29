@@ -1,7 +1,7 @@
 /** @file
   The interface function declaration of shell application IfConfig6.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,11 @@
 
 #ifndef _IFCONFIG6_H_
 #define _IFCONFIG6_H_
+
+//
+// String token ID of ifconfig6 command help message text.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringIfconfig6HelpTokenId = STRING_TOKEN (STR_IFCONFIG6_HELP);
 
 enum {
   IfConfig6OpList     = 1,

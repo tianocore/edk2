@@ -1,7 +1,7 @@
 /** @file
   String definitions for the Shell Ping6 application.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -32,17 +32,22 @@
 #string STR_PING6_STAT                     #language en-US  "\n%d packets transmitted, %d received, %d%% packet loss, time %dms\n"
 #string STR_PING6_RTT                      #language en-US  "\nRtt(round trip time) min=%dms max=%dms avg=%dms\n"
 #string STR_PING6_LINE_HELP                #language en-US  "Ping a target machine with UEFI IPv6 network stack"
-#string STR_PING6_HELP                     #language en-US  "Ping a target machine with UEFI IPv6 network stack.\n\n"
-                                                            "Usage: Ping6 [-l size] [-n count] [-s SourceIp] TargetIp\n"
-                                                            "       Use ESC and Ctrl+C to interrupt Ping6 process.\n"
-                                                            "\n"
-                                                            "Options:\n"
-                                                            "  -l size     Send buffer size, in bytes(default=16, min=16, max=32768).\n"
-                                                            "  -n count    Send request count, (default=10, min=1, max=10000).\n"
-                                                            "  -s SourceIp Source IPv6 address.\n"
-                                                            "  TargetIp    Target IPv6 address.\n"
-                                                            "  -?          Help document.\n"
-                                                            "\n"
-                                                            "Examples:\n"
-                                                            "  Ping6 -s 2002::1 2002::2 -l 1000 -n 5\n"
-                                                            "  Ping6 2002::2 -l 1000\n"
+
+#string STR_PING6_HELP                     #language en-US ""
+".TH Ping6 0 "Ping a target machine with UEFI IPv6 network stack."\r\n"
+".SH NAME\r\n"
+"Ping a target machine with UEFI IPv6 network stack.\r\n"
+".SH SYNOPSIS\r\n"
+" \r\n"
+"Ping6 [-l size] [-n count] [-s SourceIp] TargetIp\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  -l size     Send buffer size, in bytes(default=16, min=16, max=32768).\r\n"
+"  -n count    Send request count, (default=10, min=1, max=10000).\r\n"
+"  -s SourceIp Source IPv6 address.\r\n"
+"  TargetIp    Target IPv6 address.\r\n"
+".SH EXAMPLES\r\n"
+" \r\n"
+"Examples:\r\n"
+"  Ping6 -s 2002::1 2002::2 -l 1000 -n 5\r\n"
+"  Ping6 2002::2 -l 1000\r\n"

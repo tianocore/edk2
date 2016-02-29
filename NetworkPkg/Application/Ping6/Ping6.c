@@ -1,7 +1,7 @@
 /** @file
   The implementation for Ping6 application.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiHiiServicesLib.h>
 #include <Library/HiiLib.h>
 #include <Library/NetLib.h>
 
@@ -41,10 +42,6 @@ SHELL_PARAM_ITEM    Ping6ParamList[] = {
   {
     L"-s",
     TypeValue
-  },
-  {
-    L"-?",
-    TypeFlag
   },
   {
     NULL,
@@ -1059,21 +1056,41 @@ InitializePing6 (
   CONST CHAR16        *ValueStr;
   CONST CHAR16        *ValueStrPtr;
   UINTN               NonOptionCount;
+  EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
 
   //
-  // Register our string package with HII and return the handle to it.
+  // Retrieve HII package list from ImageHandle
   //
-  mHiiHandle = HiiAddPackages (&gEfiCallerIdGuid, ImageHandle, Ping6Strings, NULL);
+  Status = gBS->OpenProtocol (
+                  ImageHandle,
+                  &gEfiHiiPackageListProtocolGuid,
+                  (VOID **) &PackageList,
+                  ImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Publish HII package list to HII Database.
+  //
+  Status = gHiiDatabase->NewPackageList (
+                          gHiiDatabase,
+                          PackageList,
+                          NULL,
+                          &mHiiHandle
+                          );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   ASSERT (mHiiHandle != NULL);
 
   Status = ShellCommandLineParseEx (Ping6ParamList, &ParamPackage, NULL, TRUE, FALSE);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_INVALID_INPUT), mHiiHandle);
-    goto ON_EXIT;
-  }
-
-  if (ShellCommandLineGetFlag (ParamPackage, L"-?")) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_HELP), mHiiHandle);
     goto ON_EXIT;
   }
 

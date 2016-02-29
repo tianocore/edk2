@@ -1,7 +1,7 @@
 /** @file
   Shell application for VLAN configuration.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,13 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HiiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiHiiServicesLib.h>
 #include <Library/NetLib.h>
+
+//
+// String token ID of VConfig command help message text.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringVConfigHelpTokenId = STRING_TOKEN (STR_VCONFIG_HELP);
 
 #define INVALID_NIC_INDEX   0xffff
 #define INVALID_VLAN_ID     0xffff
@@ -608,13 +614,39 @@ VlanConfigMain (
 {
   LIST_ENTRY    *List;
   CONST CHAR16  *Str;
+  EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
+  EFI_STATUS    Status;
 
   mImageHandle = ImageHandle;
+  
+  //
+  // Retrieve HII package list from ImageHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ImageHandle,
+                  &gEfiHiiPackageListProtocolGuid,
+                  (VOID **) &PackageList,
+                  ImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
-  // Register our string package to HII database.
+  // Publish HII package list to HII Database.
   //
-  mHiiHandle = HiiAddPackages (&gEfiCallerIdGuid, ImageHandle, VConfigStrings, NULL);
+  Status = gHiiDatabase->NewPackageList (
+                          gHiiDatabase,
+                          PackageList,
+                          NULL,
+                          &mHiiHandle
+                          );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   if (mHiiHandle == NULL) {
     return EFI_SUCCESS;
   }
@@ -623,11 +655,6 @@ VlanConfigMain (
   ShellCommandLineParseEx (mParamList, &List, NULL, FALSE, FALSE);
   if (List == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NO_ARG), mHiiHandle);
-    goto Exit;
-  }
-
-  if (ShellCommandLineGetFlag (List, L"-?")) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_HELP), mHiiHandle);
     goto Exit;
   }
 

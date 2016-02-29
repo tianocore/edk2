@@ -22,9 +22,15 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiHiiServicesLib.h>
 #include <Library/NetLib.h>
 
 #include <Protocol/IpSecConfig.h>
+
+//
+// String token ID of VConfig command help message text.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringIpSecHelpTokenId = STRING_TOKEN (STR_IPSEC_CONFIG_HELP);
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 

@@ -25,6 +25,12 @@
   ENTRY_POINT                    = InitializeIpSecConfig
   MODULE_UNI_FILE                = IpSecConfig.uni
 
+#
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
 [Sources]
   IpSecConfigStrings.uni
   IpSecConfig.c
@@ -52,6 +58,7 @@
 [LibraryClasses]
   UefiBootServicesTableLib
   UefiApplicationEntryPoint
+  UefiHiiServicesLib
   BaseMemoryLib
   ShellLib
   MemoryAllocationLib
@@ -63,6 +70,7 @@
 [Protocols]
   gEfiIpSec2ProtocolGuid                        ##CONSUMES
   gEfiIpSecConfigProtocolGuid                   ##CONSUMES
+  gEfiHiiPackageListProtocolGuid                ##CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   IpSecConfigExtra.uni
