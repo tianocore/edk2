@@ -245,20 +245,24 @@ ClearScreen()
 VOID 
 DrawImage(
 	IN	IMAGE	*Image,
-	IN	UINTN	PosX,
-	IN	UINTN	PosY)
+	IN	UINTN	Width,
+	IN	UINTN	Height,
+	IN	UINTN	ScreenX,
+	IN	UINTN	ScreenY,
+	IN	UINTN	ImageWindowX,
+	IN	UINTN	ImageWindowY)
 {
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
 		Print(L"%a: No graphics device found, unable to draw image\n", __FUNCTION__);
 		return;
 	}
 
-	if (Image == NULL || Image->Width == 0 || Image->Height == 0) {
+	if (Image == NULL || Width == 0 || Height == 0) {
 		Print(L"%a: No image specified\n", __FUNCTION__);
 		return;
 	}
-	if ((PosX + Image->Width) > DisplayInfo.HorizontalResolution 
-		|| (PosY + Image->Height) > DisplayInfo.VerticalResolution) {
+	if ((ScreenX + Width) > DisplayInfo.HorizontalResolution 
+		|| (ScreenY + Height) > DisplayInfo.VerticalResolution) {
 		Print(L"%a: Image too big to draw on screen\n", __FUNCTION__);
 		return;
 	}
@@ -267,51 +271,84 @@ DrawImage(
 		DisplayInfo.GOP->Blt(DisplayInfo.GOP, 
 			(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)Image->PixelData, 
 			EfiBltBufferToVideo, 
-			0, 0, PosX, PosY, 
-			Image->Width, Image->Height, 0);
+			ImageWindowX, ImageWindowY, ScreenX, ScreenY, 
+			Width, Height, 0);
 	} else if (DisplayInfo.Protocol == UGA) {
 		DisplayInfo.UGA->Blt(DisplayInfo.UGA, 
 			(EFI_UGA_PIXEL *)Image->PixelData, 
 			EfiUgaBltBufferToVideo,
-			0, 0, PosX, PosY, 
-			Image->Width, Image->Height, 0);
+			ImageWindowX, ImageWindowY, ScreenX, ScreenY, 
+			Width, Height, 0);
 	}
 }
 
 
 VOID
 DrawImageCentered(
-	IN	IMAGE	*Image)
+	IN	IMAGE	*Image,
+	IN	UINTN	Width,
+	IN	UINTN	Height,
+	IN	UINTN	ImageWindowX,
+	IN	UINTN	ImageWindowY)
 {
-	UINTN	PosX;
-	UINTN	PosY;
+	UINTN	ScreenX;
+	UINTN	ScreenY;
 
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
 		Print(L"%a: No graphics device found, unable to draw centered image\n", __FUNCTION__);
 		return;
 	}
 
-	if (Image == NULL || Image->Width == 0 || Image->Height == 0) {
+	if (Image == NULL || Width == 0 || Height == 0) {
 		Print(L"%a: No image specified\n", __FUNCTION__);
 		return;
 	}
-	if ((Image->Width) > DisplayInfo.HorizontalResolution
-		|| (Image->Height) > DisplayInfo.VerticalResolution) {
+	if ((Width) > DisplayInfo.HorizontalResolution
+		|| (Height) > DisplayInfo.VerticalResolution) {
 		Print(L"%a: Image too big to draw on screen\n", __FUNCTION__);
 		return;
 	}
 
-	PosX = (DisplayInfo.HorizontalResolution / 2) - (Image->Width / 2);
-	PosY = (DisplayInfo.VerticalResolution / 2) - (Image->Height / 2);
+	ScreenX = (DisplayInfo.HorizontalResolution / 2) - (Width / 2);
+	ScreenY = (DisplayInfo.VerticalResolution / 2) - (Height / 2);
 
-	if (PosX < 0)
-		PosX = 0;
-	if (PosY < 0)
-		PosY = 0;
-	if (PosX + Image->Width > DisplayInfo.HorizontalResolution)
-		PosX = DisplayInfo.HorizontalResolution - Image->Width;
-	if (PosY + Image->Height > DisplayInfo.VerticalResolution)
-		PosY = DisplayInfo.VerticalResolution - Image->Height;
+	if (ScreenX < 0)
+		ScreenX = 0;
+	if (ScreenY < 0)
+		ScreenY = 0;
+	if (ScreenX + Width > DisplayInfo.HorizontalResolution)
+		ScreenX = DisplayInfo.HorizontalResolution - Width;
+	if (ScreenY + Height > DisplayInfo.VerticalResolution)
+		ScreenY = DisplayInfo.VerticalResolution - Height;
 
-	DrawImage(Image, PosX, PosY);
+	DrawImage(Image, Width, Height, ScreenX, ScreenY, 0, 0);
+}
+
+
+VOID
+AnimateImage(
+	IN	IMAGE	*Image)
+{
+	UINTN	NumFrames;
+	UINTN	Frame;
+	UINTN	MsPerFrame = 20;
+
+	if (Image->Width == Image->Height) {
+		// animation called by mistake, just show on screen
+		DrawImageCentered(Image, Image->Width, Image->Height, 0, 0);
+	} else if (Image->Width > Image->Height) {
+		// frames are stacked left-to-right
+		NumFrames = Image->Width / Image->Height;
+		for (Frame = 0; Frame < NumFrames; Frame++) {
+			DrawImageCentered(Image, Image->Height, Image->Height, 0, Frame * Image->Height);
+			gBS->Stall(MsPerFrame * 1000);
+		}
+	} else {
+		// frames are stacked top-to-bottom
+		NumFrames = Image->Height / Image->Width;
+		for (Frame = 0; Frame < NumFrames; Frame++) {
+			DrawImageCentered(Image, Image->Width, Image->Width, 0, Frame * Image->Width);
+			gBS->Stall(MsPerFrame * 1000);
+		}
+	}
 }

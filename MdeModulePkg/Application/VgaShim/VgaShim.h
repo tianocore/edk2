@@ -1,6 +1,15 @@
 #ifndef __VGA_SHIM_H__
 #define __VGA_SHIM_H__
 
+
+/**
+  -----------------------------------------------------------------------------
+  Defines.
+  -----------------------------------------------------------------------------
+**/
+
+#define SCAN_ENTER	0x001C
+
 /**
   -----------------------------------------------------------------------------
   Project-wide includes.
@@ -146,11 +155,23 @@ BmpFileToImage(
 VOID
 DrawImage(
 	IN		IMAGE	*Image,
-	IN		UINTN	X,
-	IN		UINTN	Y);
+	IN		UINTN	Width,
+	IN		UINTN	Height,
+	IN		UINTN	ScreenX,
+	IN		UINTN	ScreenY,
+	IN		UINTN	ImageX,
+	IN		UINTN	ImageY);
 
 VOID
 DrawImageCentered(
+	IN		IMAGE	*Image,
+	IN		UINTN	Width,
+	IN		UINTN	Height,
+	IN		UINTN	ImageWindowX,
+	IN		UINTN	ImageWindowY);
+
+VOID
+AnimateImage(
 	IN		IMAGE	*Image);
 
 EFI_STATUS

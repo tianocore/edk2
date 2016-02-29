@@ -8,6 +8,7 @@
 
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
+//#include "bootflag_animated.h"
 #include "bootflag.h"
 
 
@@ -38,37 +39,20 @@ UefiMain (
 	EFI_STATUS				Status;
 	EFI_INPUT_KEY			Key;
 	IMAGE					*WindowsFlag;
-	UINTN					index;
+	UINTN					EventIndex;
 	EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
 
-	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
-	Print(L"Locating console control %x %r\n", &gEfiConsoleControlProtocolGuid, Status);
-	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
-
-	//Status = gST->ConOut->Reset(gST->ConOut, FALSE);
-	//Status = gST->ConIn->Reset(gST->ConIn, FALSE);
-	//Print(L"Waiting for key stroke but you should not be seeing this message\n");
+	// Show pretty graphics
 	
+	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
+	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
 	ClearScreen();
 	WindowsFlag = BmpFileToImage(bootflag, sizeof bootflag);
-	DrawImageCentered(WindowsFlag);
-	gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &index);
-	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
+	AnimateImage(WindowsFlag);
+	//DrawImageCentered(WindowsFlag);
+	gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+	ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
 	
-	//gST->ConOut->
-	//do {
-	//	gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &index);
-	//	gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
-
-	//	if (Key.ScanCode != SCAN_NULL) {
-	//		//ClearScreen();
-	//		DrawImage(WindowsFlag, 600, 600);
-	//	}
-
-	//} while (Key.ScanCode != SCAN_ESC);
-
-
-	//Print(L"End of waiting\n");
 
 	//
 	// If an Int10h handler exists there either is a real
@@ -142,9 +126,12 @@ UefiMain (
 		__FUNCTION__, Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
 
 Exit:
-	Print(L"%a: Done!\n", __FUNCTION__);
-	// clear screen
-	// show image
+	Print(L"%a: Done! Press Enter to continue loading Windows\n", __FUNCTION__);
+	gST->ConIn->Reset(gST->ConIn, FALSE);
+	do {
+		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
+	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 	return EFI_SUCCESS;
 }
 
@@ -153,6 +140,7 @@ Exit:
   Fills in VESA-compatible information about supported video modes
   in the space left for this purpose at the beginning of the 
   generated VGA ROM assembly code.
+  (See VESA BIOS EXTENSION Core Functions Standard v3.0, p26+.)
 
   @param[in] StartAddress Where to begin writing VESA information.
   @param[in] EndAddress   Pointer to the next byte after the end
@@ -167,9 +155,6 @@ ShimVesaInformation(
 	IN	EFI_PHYSICAL_ADDRESS	StartAddress,
 	OUT	EFI_PHYSICAL_ADDRESS	*EndAddress)
 {
-	// (Page 26 in VESA BIOS EXTENSION Core Functions Standard v3.0.)
-	// (Page 30 in VESA BIOS EXTENSION Core Functions Standard v3.0.)
-
 	VBE_INFO				*VbeInfoFull;
 	VBE_INFO_BASE			*VbeInfo;
 	VBE_MODE_INFO			*VbeModeInfo;
@@ -221,7 +206,7 @@ ShimVesaInformation(
 	//
 	// Basic VESA mode information.
 	//
-	VbeModeInfo = (VBE_MODE_INFO *)(VbeInfoFull + 1); // jump ahead by sizeof(VBE_INFO) ie. 256
+	VbeModeInfo = (VBE_MODE_INFO *)(VbeInfoFull + 1); // jump ahead by sizeof(VBE_INFO) ie. 256 bytes
 	// bit0: mode supported by present hardware configuration
 	// bit1: must be set for VBE v1.2+
 	// bit3: color mode
@@ -239,12 +224,14 @@ ShimVesaInformation(
 	VbeModeInfo->CharCellWidth = 8;					// used to calculate resolution in text modes
 	VbeModeInfo->CharCellHeight = 16;				// used to calculate resolution in text modes
 	
-	// Calculate offsets so that the smaller image appears centered on the screen
+	//
+	// Center visible image on screen using framebuffer offset.
+	//
 	HorizontalOffsetPx = (DisplayInfo.HorizontalResolution - 1024) / 2;
 	VerticalOffsetPx = (DisplayInfo.VerticalResolution - 768) / 2 * DisplayInfo.PixelsPerScanLine;
 	FrameBufferBaseWithOffset = DisplayInfo.FrameBufferBase 
-		+ VerticalOffsetPx * 4
-		+ HorizontalOffsetPx * 4;
+		+ VerticalOffsetPx * 4		// 4 bytes per pixel
+		+ HorizontalOffsetPx * 4;	// 4 bytes per pixel
 
 	//
 	// Memory access (banking, windowing, paging).
@@ -260,8 +247,8 @@ ShimVesaInformation(
 	VbeModeInfo->WindowPositioningAddress = 0x0;	// force windowing to Function 5h
 	VbeModeInfo->WindowAAttr = 0x0;					// window disabled
 	VbeModeInfo->WindowBAttr = 0x0;					// window disabled
-	VbeModeInfo->WindowGranularityKB = 0x0;			// window disabled and not relocatable
-	VbeModeInfo->WindowSizeKB = 0x0;				// set to 64KB even thou window is disabled
+	VbeModeInfo->WindowGranularityKB = 0x0;			// window disabled ie. not relocatable
+	VbeModeInfo->WindowSizeKB = 0x0;				// window disabled
 	VbeModeInfo->WindowAStartSegment = 0x0;			// linear framebuffer only
 	VbeModeInfo->WindowBStartSegment = 0x0;			// linear framebuffer only
 
@@ -280,7 +267,7 @@ ShimVesaInformation(
 	if (DisplayInfo.PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
 		VbeModeInfo->BlueMaskPosLinear = 0;			// blue offset
 		VbeModeInfo->GreenMaskPosLinear = 8;		// green offset
-		VbeModeInfo->RedMaskPosLinear = 16;			// green offset
+		VbeModeInfo->RedMaskPosLinear = 16;			// red offset
 		VbeModeInfo->ReservedMaskPosLinear = 24;	// reserved offset
 	} else if (DisplayInfo.PixelFormat == PixelRedGreenBlueReserved8BitPerColor) {
 		VbeModeInfo->RedMaskPosLinear = 0;			// red offset
@@ -294,14 +281,14 @@ ShimVesaInformation(
 	}
 	
 	//
-	// Other
+	// Other.
 	//
 	VbeModeInfo->OffScreenAddress = 0;				// reserved, always set to 0
 	VbeModeInfo->OffScreenSizeKB = 0;				// reserved, always set to 0
 	VbeModeInfo->MaxPixelClockHz = 0;				// maximum available refresh rate
 	VbeModeInfo->Vbe3 = 0x01;						// reserved, always set to 1
 
-	*EndAddress = (UINTN)(VbeModeInfo + 1);			// jump ahead by sizeof(VBE_MODE_INFO) ie. 256
+	*EndAddress = (UINTN)(VbeModeInfo + 1);			// jump ahead by sizeof(VBE_MODE_INFO) ie. 256 bytes
 	return EFI_SUCCESS;
 }
 
