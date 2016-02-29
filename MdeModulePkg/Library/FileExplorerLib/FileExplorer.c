@@ -302,7 +302,9 @@ LibDestroyMenuEntry (
   FileContext = (FILE_CONTEXT *) MenuEntry->VariableContext;
 
   if (!FileContext->IsRoot) {
-    FreePool (FileContext->DevicePath);
+    if (FileContext->DevicePath != NULL) {
+      FreePool (FileContext->DevicePath);
+    }
   } else {
     if (FileContext->FileHandle != NULL) {
       FileContext->FileHandle->Close (FileContext->FileHandle);
@@ -315,7 +317,9 @@ LibDestroyMenuEntry (
 
   FreePool (FileContext);
 
-  FreePool (MenuEntry->DisplayString);
+  if (MenuEntry->DisplayString != NULL) {
+    FreePool (MenuEntry->DisplayString);
+  }
   if (MenuEntry->HelpString != NULL) {
     FreePool (MenuEntry->HelpString);
   }
