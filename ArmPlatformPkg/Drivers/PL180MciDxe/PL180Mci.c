@@ -528,7 +528,6 @@ PL180MciDxeInitialize (
   if (MmioRead8 (MCI_PERIPH_ID_REG0) != MCI_PERIPH_ID0 ||
       MmioRead8 (MCI_PERIPH_ID_REG1) != MCI_PERIPH_ID1 ||
       MmioRead8 (MCI_PERIPH_ID_REG2) != MCI_PERIPH_ID2 ||
-      MmioRead8 (MCI_PERIPH_ID_REG3) != MCI_PERIPH_ID3 ||
       MmioRead8 (MCI_PCELL_ID_REG0)  != MCI_PCELL_ID0  ||
       MmioRead8 (MCI_PCELL_ID_REG1)  != MCI_PCELL_ID1  ||
       MmioRead8 (MCI_PCELL_ID_REG2)  != MCI_PCELL_ID2  ||
