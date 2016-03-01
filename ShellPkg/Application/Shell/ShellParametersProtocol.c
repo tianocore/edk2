@@ -1265,18 +1265,13 @@ UpdateStdInStdOutStdErr(
           &TempHandle,
           EFI_FILE_MODE_READ,
           0);
-        if (InUnicode) {
-          //
-          // Chop off the 0xFEFF if it's there...
-          //
-          RemoveFileTag(&TempHandle);
-        } else if (!EFI_ERROR(Status)) {
-          //
-          // Create the ASCII->Unicode conversion layer
-          //
-          TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
-        }
         if (!EFI_ERROR(Status)) {
+          if (!InUnicode) {
+            //
+            // Create the ASCII->Unicode conversion layer
+            //
+            TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
+          }
           ShellParameters->StdIn = TempHandle;
           gST->ConIn = CreateSimpleTextInOnFile(TempHandle, &gST->ConsoleInHandle);
         }
