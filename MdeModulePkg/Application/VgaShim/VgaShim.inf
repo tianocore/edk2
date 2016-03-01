@@ -16,6 +16,7 @@
   VgaShim.c
   Display.c
   Filesystem.c
+  Util.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -54,3 +55,4 @@
   gEfiLoadedImageProtocolGuid           ## CONSUMES
   #gEfiConsoleControlProtocolGuid        ## CONSUMES
   gEfiSimpleFileSystemProtocolGuid
+  gEfiBlockIoProtocolGuid

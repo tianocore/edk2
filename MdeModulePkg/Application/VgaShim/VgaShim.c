@@ -1,5 +1,6 @@
 #include "VgaShim.h"
 #include "Display.h"
+#include "Util.h"
 #include "Filesystem.h"
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
@@ -13,7 +14,8 @@
 **/
 
 DISPLAY_INFO				DisplayInfo;
-EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
+EFI_HANDLE					VgaShimImage;
+EFI_LOADED_IMAGE_PROTOCOL	*VgaShimLoadedImage;
 
 
 /**
@@ -41,26 +43,26 @@ UefiMain (
 	UINTN							EventIndex;
 	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
 
-	Status = gBS->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimImage);
+	BOOLEAN							SetupMode;
+
+	VgaShimImage = ImageHandle;
+	Status = gBS->HandleProtocol(VgaShimImage, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimLoadedImage);
 	if (EFI_ERROR(Status)) {
 		Print(L"%a: Unable to locate EFI_LOADED_IMAGE_PROTOCOL, halting\n", __FUNCTION__);
 		return EFI_LOAD_ERROR;
 	}
 
-
 	// 
 	// Show pretty graphics.
 	//
-	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
+	/*Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
 	if (!EFI_ERROR(Status)) {
 		if (!ShowAnimatedLogo(ConsoleControl)) {
 			ShowStaticLogo(ConsoleControl);
 		}
 		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
 		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
-	}
-
-	return EFI_SUCCESS;
+	}*/
 
 	//
 	// If an Int10h handler exists there either is a real
@@ -134,13 +136,54 @@ UefiMain (
 		__FUNCTION__, Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
 
 Exit:
+	//
+	// Check if we are running setup.
+	//
+	SetupMode = IsSetupMode();
+	if (SetupMode) {
+		FileLoad(L"\\efi\\boot\\bootmgfw.efi");
+		return EFI_SUCCESS;
+	}
+
 	Print(L"%a: Press Enter to continue loading Windows\n", __FUNCTION__);
 	gST->ConIn->Reset(gST->ConIn, FALSE);
 	do {
 		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
 		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
 	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
 	return EFI_SUCCESS;
+}
+
+
+/**
+  Performs various checks to establish if we're running off of
+  Windows 7 installation media:
+  (1) makes sure the running image's path is \efi\boot\bootx64.efi
+  (2) makes sure \setup.exe exists
+  (3) makes sure \efi\boot\bootmgfw.efi is available so that
+      setup can be launched once the shim is installed
+
+  @retval TRUE            In all likelyhood we are running off
+                          of Windows 7 installation media.
+  @retval FALSE           This is most likely not Windows 7
+                          installation media.
+
+**/
+BOOLEAN
+IsSetupMode()
+{
+	EFI_STATUS	Status;
+	CHAR16*		MyPath;
+
+	MyPath = PathCleanUpDirectories(
+		ConvertDevicePathToText(VgaShimLoadedImage->FilePath, FALSE, FALSE));
+	StrToLowercase(MyPath);
+	if (StrCmp(MyPath, L"\\efi\\boot\\bootx64.efi") != 0) {
+		return FALSE;
+	}
+	
+	return FileExists(L"\\setup.exe") && FileExists(L"\\efi\\boot\\bootmgfw.efi");
 }
 
 
@@ -552,7 +595,7 @@ ShowAnimatedLogo(
 
 	// Check if *.bmp exists
 	Status = ChangeExtension(
-		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImage->FilePath, FALSE, FALSE)), 
+		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimLoadedImage->FilePath, FALSE, FALSE)), 
 		L"bmp", 
 		(VOID **)&BmpFilePath);
 	if (EFI_ERROR(Status) || !FileExists(BmpFilePath)) {

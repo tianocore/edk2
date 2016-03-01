@@ -134,6 +134,5 @@ EnsureDisplayAvailable(
 **/
 
 extern	DISPLAY_INFO				DisplayInfo;
-extern	EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
 
 #endif

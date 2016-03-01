@@ -1,4 +1,5 @@
 #include "Filesystem.h"
+#include "Util.h"
 
 
 /**
@@ -52,16 +53,50 @@ ChangeExtension(
 	DotIndex++;
 
 	// Allocate enough to hold the new extension and null terminator.
-	*NewFilePath = (CHAR16*)AllocatePool( (DotIndex + NewExtensionLen + 1) * sizeof(CHAR16) );
+	*NewFilePath = (CHAR16*)AllocateZeroPool((DotIndex + NewExtensionLen + 1) * sizeof(CHAR16));
 	if (*NewFilePath == NULL)
 		return EFI_OUT_OF_RESOURCES;
 	
 	// Copy the relevant strings and add the null terminator.
 	CopyMem((CHAR16 *)*NewFilePath, FilePath, (DotIndex) * sizeof(CHAR16));
 	CopyMem(((CHAR16 *)*NewFilePath) + DotIndex, NewExtension, NewExtensionLen * sizeof(CHAR16));
-	((CHAR16*)(*NewFilePath))[DotIndex + NewExtensionLen] = CHAR_NULL;
 	
 	return EFI_SUCCESS;
+}
+
+
+CHAR16*
+GetFileName(
+	IN	CHAR16	*FilePath)
+{
+	UINTN	SlashIndex;
+	UINTN	FileNameLength;
+	CHAR16	*FileName;
+
+	PathCleanUpDirectories(FilePath);
+
+	// Find position of the last '\'.
+	SlashIndex = StrLen(FilePath) - 1;
+	while ((FilePath[SlashIndex] != L'\\') && (SlashIndex != 0)) {
+		SlashIndex--;
+	}
+	
+	if (SlashIndex == 0)
+		return NULL;
+	
+	// Move index as we do not want the '\'.
+	SlashIndex++;
+	FileNameLength = StrLen(FilePath) - SlashIndex;
+
+	// Allocate memory for file name and null terminator.
+	FileName = (CHAR16*)AllocateZeroPool((FileNameLength + 1) * sizeof(CHAR16));
+	if (FileName == NULL)
+		return NULL;
+	
+	// Copy the relevant strings and add the null terminator.
+	CopyMem(FileName, FilePath + SlashIndex, FileNameLength * sizeof(CHAR16));
+
+	return FileName;
 }
 
 
@@ -88,7 +123,7 @@ FileExists(
 	BOOLEAN					Exists;
 
 	// Open volume where VgaShim lives.
-	Status = gBS->HandleProtocol(VgaShimImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
+	Status = gBS->HandleProtocol(VgaShimLoadedImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
 	if (EFI_ERROR(Status))
 		return FALSE;
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
@@ -144,7 +179,7 @@ FileRead(
 	UINTN					Size;
 
 	// Open volume where VgaShim lives.
-	Status = gBS->HandleProtocol(VgaShimImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
+	Status = gBS->HandleProtocol(VgaShimLoadedImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
 	if (EFI_ERROR(Status))
 		return Status;
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
@@ -169,7 +204,7 @@ FileRead(
 
 	// Allocate a buffer and read the entire file into it.
 	*FileContents = AllocatePool(Size);
-	Print(L"Reading %u bytes of %s ... ", Size, FilePath);
+	Print(L"%a: Reading %u bytes of %s ... ", __FUNCTION__, Size, FilePath);
 	Status = File->Read(File, &Size, *FileContents);
 	if (EFI_ERROR(Status)) {
 		Print(L"unsuccessful (error: %r)\n", Status);
@@ -183,4 +218,100 @@ FileRead(
 	File->Close(File);
 	VolumeRoot->Close(VolumeRoot);
 	return Status;
+}
+
+
+CHAR16*
+GetMyLoadOptions()
+{
+	UINTN	SkipCharacters;
+	UINTN	LoadOptionsLength;
+	UINTN	LoadOptionsFullLength;
+	CHAR16	*LoadOptions;
+	CHAR16	*ExtensionLocation;
+
+	//
+	// Allocate memory for load options buffer.
+	//
+	LoadOptionsFullLength = StrLen(VgaShimLoadedImage->LoadOptions);
+	LoadOptions = (CHAR16*)AllocateZeroPool((LoadOptionsFullLength + 1) * sizeof(CHAR16));
+	if (LoadOptions == NULL)
+		return NULL;
+	
+	//
+	// Find out how many characters of path + file name to skip.
+	//
+	CopyMem(LoadOptions, VgaShimLoadedImage->LoadOptions, LoadOptionsFullLength * sizeof(CHAR16));
+	StrToLowercase(LoadOptions);
+	ExtensionLocation = StrStr(LoadOptions, L".efi");
+	if (ExtensionLocation == NULL) {
+		FreePool(LoadOptions);
+		return NULL;
+	}
+	*(ExtensionLocation + StrLen(L".efi")) = CHAR_NULL;
+	SkipCharacters = StrLen(LoadOptions);
+
+	// Copy load options in the buffer skipping the file name and null-terminate.
+	LoadOptionsLength = StrLen(VgaShimLoadedImage->LoadOptions) - SkipCharacters;
+	CopyMem(
+		LoadOptions, 
+		((CHAR16 *)VgaShimLoadedImage->LoadOptions) + SkipCharacters, 
+		LoadOptionsLength * sizeof(CHAR16));
+	LoadOptions[LoadOptionsLength] = CHAR_NULL;
+
+	return LoadOptions;
+}
+
+
+EFI_STATUS
+FileLoad(
+	IN	CHAR16	*FilePath)
+{
+	EFI_STATUS					Status;
+	EFI_DEVICE_PATH_PROTOCOL	*FilePathOnDevice;
+	EFI_HANDLE					FileImageHandle;
+	EFI_LOADED_IMAGE_PROTOCOL	*FileImageInfo;
+	CHAR16						*FileName;
+	CHAR16						*LoadOptions;
+	CHAR16						*LoadOptionsWithPath;
+
+	//
+	// Try to load the image first.
+	//
+	FileName = GetFileName(FilePath);
+	FilePathOnDevice = FileDevicePath(VgaShimLoadedImage->DeviceHandle, FilePath);
+	Print(L"%a: Loading '%s' ... ", __FUNCTION__, ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
+	Status = gBS->LoadImage(FALSE, VgaShimImage, FilePathOnDevice, NULL, 0, &FileImageHandle);
+	if (EFI_ERROR(Status)) {
+		Print(L"unsuccessful (error: %r)\n", Status);
+	} else {
+		Print(L"successful\n");
+	}
+	
+	// 
+	// Make sure this is a valid EFI loader.
+	//
+	gBS->HandleProtocol(FileImageHandle, &gEfiLoadedImageProtocolGuid, (VOID *)&FileImageInfo);
+	if (EFI_ERROR(Status) || FileImageInfo->ImageCodeType != EfiLoaderCode) {
+		gBS->UnloadImage(FileImageHandle);
+		return EFI_UNSUPPORTED;
+	}
+
+	//
+	// Construct load options based on mine.
+	//
+	LoadOptions = GetMyLoadOptions();
+	if (LoadOptions == NULL) {
+		return EFI_DEVICE_ERROR;
+	}
+	LoadOptionsWithPath = (CHAR16 *)AllocateZeroPool((StrLen(FilePath) + 1 + StrLen(LoadOptions)) * sizeof(CHAR16));
+	LoadOptionsWithPath = StrCpy(LoadOptionsWithPath, FilePath);
+	LoadOptionsWithPath = StrCat(LoadOptionsWithPath, L" ");
+	LoadOptionsWithPath = StrCat(LoadOptionsWithPath, LoadOptions);
+	
+	Print(L"FileName='%s' %u\n", FileName, StrLen(FileName));
+	Print(L"LoadOptionsWithPath='%s'\n", LoadOptionsWithPath);
+	//gBS->Exit(FileImageHandle, EFI_INVALID_PARAMETER, 0, NULL);
+	//StrCpy (Destination + StrLen (Destination), Source);
+	return EFI_SUCCESS;
 }

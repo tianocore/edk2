@@ -16,6 +16,7 @@
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Protocol/BlockIo.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleFileSystem.h>
@@ -43,6 +44,10 @@ FileRead(
 	OUT	VOID	**FileContents,
 	OUT	UINTN	*FileBytes);
 
+EFI_STATUS
+FileLoad(
+	IN	CHAR16		*FilePath);
+
 
 /**
   -----------------------------------------------------------------------------
@@ -50,6 +55,7 @@ FileRead(
   -----------------------------------------------------------------------------
 **/
 
-extern	EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImage;
+extern	EFI_HANDLE					VgaShimImage;
+extern	EFI_LOADED_IMAGE_PROTOCOL	*VgaShimLoadedImage;
 
 #endif
