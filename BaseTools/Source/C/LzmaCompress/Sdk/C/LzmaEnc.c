@@ -1366,9 +1366,10 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
       
       if (repIndex == 0)
         startLen = lenTest + 1;
-      #ifndef _MSC_VER
+
+#ifndef _MSC_VER
       if (1 /* _maxMode */)
-      #endif
+#endif
         {
           UInt32 lenTest2 = lenTest + 1;
           UInt32 limit = lenTest2 + p->numFastBytes;
