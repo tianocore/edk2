@@ -42,34 +42,34 @@ UefiMain (
 	EFI_INPUT_KEY					Key;
 	UINTN							EventIndex;
 	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
-
-	BOOLEAN							SetupMode;
+	CHAR16							*LaunchPath = NULL;
 
 	VgaShimImage = ImageHandle;
 	Status = gBS->HandleProtocol(VgaShimImage, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimLoadedImage);
 	if (EFI_ERROR(Status)) {
-		Print(L"%a: Unable to locate EFI_LOADED_IMAGE_PROTOCOL, halting\n", __FUNCTION__);
+		Print(L"Unable to locate EFI_LOADED_IMAGE_PROTOCOL, halting\n");
 		return EFI_LOAD_ERROR;
 	}
 
 	// 
 	// Show pretty graphics.
 	//
-	/*Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
+	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
 	if (!EFI_ERROR(Status)) {
-		if (!ShowAnimatedLogo(ConsoleControl)) {
+		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
+		/*if (!ShowAnimatedLogo(ConsoleControl)) {
 			ShowStaticLogo(ConsoleControl);
 		}
 		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
-		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
-	}*/
+		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);*/
+	}
 
 	//
 	// If an Int10h handler exists there either is a real
 	// VGA ROM in operation or we installed the shim before.
 	//
 	if (IsInt10HandlerDefined()) {
-		Print(L"%a: Int10h already has a handler, you should be all set\n", __FUNCTION__);
+		Print(L"Int10h already has a handler, you should be all set\n");
 		goto Exit;
 	}
 
@@ -83,8 +83,8 @@ UefiMain (
 	//
 	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, UNLOCK);
 	if (EFI_ERROR(Status)) {
-		Print(L"%a: Unable to unlock VGA ROM memory at %x for shim insertion\n", 
-			__FUNCTION__, VGA_ROM_ADDRESS);
+		Print(L"Unable to unlock VGA ROM memory at %04x, aborting shim insertion\n", 
+			VGA_ROM_ADDRESS);
 		goto Exit;
 	}
 
@@ -93,7 +93,7 @@ UefiMain (
 	// has already been initialized so we can overwrite the IVT.
 	//
 	Int10hHandlerEntry = (IVT_ENTRY *)IVT_ADDRESS + 0x10;
-	Print(L"%a: Claiming IVT area ... ", __FUNCTION__);
+	Print(L"Claiming IVT area ... ");
 	TempAddress = IVT_ADDRESS;
 	Status = gBS->AllocatePages(AllocateAddress, EfiBootServicesCode, 1, &TempAddress);
 	if (EFI_ERROR(Status)) {
@@ -110,11 +110,11 @@ UefiMain (
 	CopyMem((VOID *)VGA_ROM_ADDRESS, INT10H_HANDLER, sizeof INT10H_HANDLER);
 	Status = ShimVesaInformation(VGA_ROM_ADDRESS, &Int10hHandlerAddress);
 	if (EFI_ERROR(Status)) {
-		Print(L"%a: Cannot complete shim installation, aborting\n", __FUNCTION__);
+		Print(L"VESA information could not be filled in, aborting shim insertion\n");
 		return EFI_ABORTED;
 	} else {
-		Print(L"%a: VESA information filled in, Int10h handler address = %x\n", 
-			__FUNCTION__, Int10hHandlerAddress);
+		Print(L"VESA information filled in, Int10h handler address = %x\n", 
+			Int10hHandlerAddress);
 	}
 	
 	//
@@ -122,8 +122,8 @@ UefiMain (
 	//
 	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, LOCK);
 	if (EFI_ERROR(Status)) {
-		Print(L"%a: Unable to lock VGA ROM memory at %x but this is not essential\n", 
-			__FUNCTION__, VGA_ROM_ADDRESS);
+		Print(L"Unable to lock VGA ROM memory at %x but this is not essential\n", 
+			VGA_ROM_ADDRESS);
 	}
 
 	//
@@ -132,25 +132,32 @@ UefiMain (
 	// Convert from real 32bit physical address to real mode segment address
 	Int10hHandlerEntry->Segment = (UINT16)((UINT32)VGA_ROM_ADDRESS >> 4);
 	Int10hHandlerEntry->Offset = (UINT16)(Int10hHandlerAddress - VGA_ROM_ADDRESS);
-	Print(L"%a: Int10h handler installed at %04x:%04x\n",
-		__FUNCTION__, Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
+	Print(L"Int10h handler installed at %04x:%04x\n",
+		Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
 
 Exit:
 	//
 	// Check if we are running setup.
 	//
-	SetupMode = IsSetupMode();
-	if (SetupMode) {
-		FileLoad(L"\\efi\\boot\\bootmgfw.efi");
-		return EFI_SUCCESS;
+	if (IsSetupMode()) {
+		LaunchPath = L"\\efi\\boot\\bootmgfw.efi";
+		Print(L"Press Enter to continue loading Windows setup\n");
+	} else if (IsResidentMode()) {
+		LaunchPath = L"\\Windows\\System32\\winload.efi";
+		Print(L"Press Enter to continue loading Windows\n");
+	} else {
+		Print(L"Not no Windows installation or setup found, press Enter to exit\n");
 	}
 
-	Print(L"%a: Press Enter to continue loading Windows\n", __FUNCTION__);
 	gST->ConIn->Reset(gST->ConIn, FALSE);
 	do {
 		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
 		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
 	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+	if (LaunchPath != NULL) {
+		//Launch(LaunchPath);
+	}
 
 	return EFI_SUCCESS;
 }
@@ -175,15 +182,27 @@ IsSetupMode()
 {
 	EFI_STATUS	Status;
 	CHAR16*		MyPath;
+	BOOLEAN		Result = TRUE;
 
 	MyPath = PathCleanUpDirectories(
 		ConvertDevicePathToText(VgaShimLoadedImage->FilePath, FALSE, FALSE));
 	StrToLowercase(MyPath);
-	if (StrCmp(MyPath, L"\\efi\\boot\\bootx64.efi") != 0) {
-		return FALSE;
+
+	if (StrCmp(MyPath, L"\\efi\\boot\\bootx64.efi") != 0
+		|| !FileExists(L"\\setup.exe") 
+		|| !FileExists(L"\\efi\\boot\\bootmgfw.efi")) {
+		Result = FALSE;
 	}
-	
-	return FileExists(L"\\setup.exe") && FileExists(L"\\efi\\boot\\bootmgfw.efi");
+
+	FreePool(MyPath);
+	return Result;
+}
+
+
+BOOLEAN
+IsResidentMode()
+{
+	return FileExists(L"\\Windows\\System32\\winload.efi");
 }
 
 
@@ -304,7 +323,7 @@ ShimVesaInformation(
 	VbeModeInfo->WindowBStartSegment = 0x0;			// linear framebuffer only
 
 	//
-	// Color mode
+	// Color mode.
 	// 
 	VbeModeInfo->NumPlanes = 1;						// packed pixel mode
 	VbeModeInfo->MemoryModel = 6;					// Direct Color

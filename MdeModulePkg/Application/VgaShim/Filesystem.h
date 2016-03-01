@@ -45,7 +45,7 @@ FileRead(
 	OUT	UINTN	*FileBytes);
 
 EFI_STATUS
-FileLoad(
+Launch(
 	IN	CHAR16		*FilePath);
 
 

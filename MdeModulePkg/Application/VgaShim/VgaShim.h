@@ -58,23 +58,31 @@ BOOLEAN
 ShowAnimatedLogo(
 	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl);
 
-BOOLEAN CanWriteAtAddress(
+BOOLEAN
+CanWriteAtAddress(
 	IN	EFI_PHYSICAL_ADDRESS	Address);
 
-EFI_STATUS EnsureMemoryLock(
+EFI_STATUS
+EnsureMemoryLock(
 	IN	EFI_PHYSICAL_ADDRESS	Address, 
 	IN	UINT32					Length, 
 	IN	MEMORY_LOCK_OPERATION	Operation);
 
-BOOLEAN IsInt10HandlerDefined();
+BOOLEAN
+IsInt10HandlerDefined();
 
-EFI_STATUS ShimVesaInformation(
+EFI_STATUS
+ShimVesaInformation(
 	IN	EFI_PHYSICAL_ADDRESS	StartAddress, 
 	OUT	EFI_PHYSICAL_ADDRESS	*EndAddress);
 
-BOOLEAN IsSetupMode(
+BOOLEAN
+IsSetupMode(
 	VOID);
 
+BOOLEAN
+IsResidentMode(
+	VOID);
 
 /**
   -----------------------------------------------------------------------------

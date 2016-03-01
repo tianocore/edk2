@@ -73,8 +73,6 @@ GetFileName(
 	UINTN	FileNameLength;
 	CHAR16	*FileName;
 
-	PathCleanUpDirectories(FilePath);
-
 	// Find position of the last '\'.
 	SlashIndex = StrLen(FilePath) - 1;
 	while ((FilePath[SlashIndex] != L'\\') && (SlashIndex != 0)) {
@@ -94,8 +92,8 @@ GetFileName(
 		return NULL;
 	
 	// Copy the relevant strings and add the null terminator.
-	CopyMem(FileName, FilePath + SlashIndex, FileNameLength * sizeof(CHAR16));
-
+	StrCpy(FileName, FilePath + SlashIndex);
+	
 	return FileName;
 }
 
@@ -241,7 +239,7 @@ GetMyLoadOptions()
 	//
 	// Find out how many characters of path + file name to skip.
 	//
-	CopyMem(LoadOptions, VgaShimLoadedImage->LoadOptions, LoadOptionsFullLength * sizeof(CHAR16));
+	StrCpy(LoadOptions, VgaShimLoadedImage->LoadOptions);
 	StrToLowercase(LoadOptions);
 	ExtensionLocation = StrStr(LoadOptions, L".efi");
 	if (ExtensionLocation == NULL) {
@@ -251,34 +249,45 @@ GetMyLoadOptions()
 	*(ExtensionLocation + StrLen(L".efi")) = CHAR_NULL;
 	SkipCharacters = StrLen(LoadOptions);
 
+	//
 	// Copy load options in the buffer skipping the file name and null-terminate.
+	//
 	LoadOptionsLength = StrLen(VgaShimLoadedImage->LoadOptions) - SkipCharacters;
-	CopyMem(
-		LoadOptions, 
-		((CHAR16 *)VgaShimLoadedImage->LoadOptions) + SkipCharacters, 
-		LoadOptionsLength * sizeof(CHAR16));
-	LoadOptions[LoadOptionsLength] = CHAR_NULL;
+	StrCpy(LoadOptions, ((CHAR16 *)VgaShimLoadedImage->LoadOptions) + SkipCharacters);
 
 	return LoadOptions;
 }
 
 
 EFI_STATUS
-FileLoad(
+Launch(
 	IN	CHAR16	*FilePath)
 {
 	EFI_STATUS					Status;
 	EFI_DEVICE_PATH_PROTOCOL	*FilePathOnDevice;
 	EFI_HANDLE					FileImageHandle;
 	EFI_LOADED_IMAGE_PROTOCOL	*FileImageInfo;
-	CHAR16						*FileName;
 	CHAR16						*LoadOptions;
 	CHAR16						*LoadOptionsWithPath;
 
 	//
+	// Construct load options based on mine.
+	//
+	LoadOptions = GetMyLoadOptions();
+	if (LoadOptions == NULL) {
+		return EFI_DEVICE_ERROR;
+	}
+	LoadOptionsWithPath = (CHAR16 *)AllocateZeroPool((StrLen(FilePath) + 1 + StrLen(LoadOptions)) * sizeof(CHAR16));
+	LoadOptionsWithPath = StrCpy(LoadOptionsWithPath, FilePath);
+	LoadOptionsWithPath = StrCat(LoadOptionsWithPath, L" ");
+	LoadOptionsWithPath = StrCat(LoadOptionsWithPath, LoadOptions);
+	Print(L"LoadOptions='%s'\n", LoadOptions);
+	Print(L"LoadOptionsWithPath='%s'\n", LoadOptionsWithPath);
+	FreePool(LoadOptions);
+
+	//
 	// Try to load the image first.
 	//
-	FileName = GetFileName(FilePath);
 	FilePathOnDevice = FileDevicePath(VgaShimLoadedImage->DeviceHandle, FilePath);
 	Print(L"%a: Loading '%s' ... ", __FUNCTION__, ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
 	Status = gBS->LoadImage(FALSE, VgaShimImage, FilePathOnDevice, NULL, 0, &FileImageHandle);
@@ -297,20 +306,8 @@ FileLoad(
 		return EFI_UNSUPPORTED;
 	}
 
-	//
-	// Construct load options based on mine.
-	//
-	LoadOptions = GetMyLoadOptions();
-	if (LoadOptions == NULL) {
-		return EFI_DEVICE_ERROR;
-	}
-	LoadOptionsWithPath = (CHAR16 *)AllocateZeroPool((StrLen(FilePath) + 1 + StrLen(LoadOptions)) * sizeof(CHAR16));
-	LoadOptionsWithPath = StrCpy(LoadOptionsWithPath, FilePath);
-	LoadOptionsWithPath = StrCat(LoadOptionsWithPath, L" ");
-	LoadOptionsWithPath = StrCat(LoadOptionsWithPath, LoadOptions);
-	
-	Print(L"FileName='%s' %u\n", FileName, StrLen(FileName));
-	Print(L"LoadOptionsWithPath='%s'\n", LoadOptionsWithPath);
+	//Print(L"FileName='%s' %u\n", FileName, StrLen(FileName));
+	//Print(L"LoadOptionsWithPath='%s'\n", LoadOptionsWithPath);
 	//gBS->Exit(FileImageHandle, EFI_INVALID_PARAMETER, 0, NULL);
 	//StrCpy (Destination + StrLen (Destination), Source);
 	return EFI_SUCCESS;
