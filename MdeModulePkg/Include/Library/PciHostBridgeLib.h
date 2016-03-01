@@ -25,26 +25,26 @@ typedef struct {
 } PCI_ROOT_BRIDGE_APERTURE;
 
 typedef struct {
-  UINT32                   Segment;              ///< Segment number.
-  UINT64                   Supports;             ///< Supported attributes.
-                                                 ///< Refer to EFI_PCI_ATTRIBUTE_xxx used by GetAttributes()
-                                                 ///< and SetAttributes() in EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  UINT64                   Attributes;           ///< Initial attributes.
-                                                 ///< Refer to EFI_PCI_ATTRIBUTE_xxx used by GetAttributes()
-                                                 ///< and SetAttributes() in EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  BOOLEAN                  DmaAbove4G;           ///< DMA above 4GB memory.
-                                                 ///< Set to TRUE when root bridge supports DMA above 4GB memory.
-  UINT64                   AllocationAttributes; ///< Allocation attributes.
-                                                 ///< Refer to EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM and
-                                                 ///< EFI_PCI_HOST_BRIDGE_MEM64_DECODE used by GetAllocAttributes()
-                                                 ///< in EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
-  PCI_ROOT_BRIDGE_APERTURE Bus;                  ///< Bus aperture which can be used by the root bridge.
-  PCI_ROOT_BRIDGE_APERTURE Io;                   ///< IO aperture which can be used by the root bridge.
-  PCI_ROOT_BRIDGE_APERTURE Mem;                  ///< MMIO aperture below 4GB which can be used by the root bridge.
-  PCI_ROOT_BRIDGE_APERTURE MemAbove4G;           ///< MMIO aperture above 4GB which can be used by the root bridge.
-  PCI_ROOT_BRIDGE_APERTURE PMem;                 ///< Prefetchable MMIO aperture below 4GB which can be used by the root bridge.
-  PCI_ROOT_BRIDGE_APERTURE PMemAbove4G;          ///< Prefetchable MMIO aperture above 4GB which can be used by the root bridge.
-  EFI_DEVICE_PATH_PROTOCOL *DevicePath;          ///< Device path.
+  UINT32                   Segment;               ///< Segment number.
+  UINT64                   Supports;              ///< Supported attributes.
+                                                  ///< Refer to EFI_PCI_ATTRIBUTE_xxx used by GetAttributes()
+                                                  ///< and SetAttributes() in EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  UINT64                   Attributes;            ///< Initial attributes.
+                                                  ///< Refer to EFI_PCI_ATTRIBUTE_xxx used by GetAttributes()
+                                                  ///< and SetAttributes() in EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  BOOLEAN                  DmaAbove4G;            ///< DMA above 4GB memory.
+                                                  ///< Set to TRUE when root bridge supports DMA above 4GB memory.
+  UINT64                   AllocationAttributes;  ///< Allocation attributes.
+                                                  ///< Refer to EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM and
+                                                  ///< EFI_PCI_HOST_BRIDGE_MEM64_DECODE used by GetAllocAttributes()
+                                                  ///< in EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
+  PCI_ROOT_BRIDGE_APERTURE Bus;                   ///< Bus aperture which can be used by the root bridge.
+  PCI_ROOT_BRIDGE_APERTURE Io;                    ///< IO aperture which can be used by the root bridge.
+  PCI_ROOT_BRIDGE_APERTURE Mem;                   ///< MMIO aperture below 4GB which can be used by the root bridge.
+  PCI_ROOT_BRIDGE_APERTURE MemAbove4G;            ///< MMIO aperture above 4GB which can be used by the root bridge.
+  PCI_ROOT_BRIDGE_APERTURE PMem;                  ///< Prefetchable MMIO aperture below 4GB which can be used by the root bridge.
+  PCI_ROOT_BRIDGE_APERTURE PMemAbove4G;           ///< Prefetchable MMIO aperture above 4GB which can be used by the root bridge.
+  EFI_DEVICE_PATH_PROTOCOL *DevicePath;           ///< Device path.
 } PCI_ROOT_BRIDGE;
 
 /**
