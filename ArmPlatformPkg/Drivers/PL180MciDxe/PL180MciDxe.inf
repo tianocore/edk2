@@ -49,4 +49,4 @@
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress
 
 [Depex]
-  TRUE
+  gEfiCpuArchProtocolGuid
