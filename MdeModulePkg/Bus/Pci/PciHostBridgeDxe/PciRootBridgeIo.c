@@ -78,18 +78,18 @@ CreateRootBridge (
 
   DEBUG ((EFI_D_INFO, "RootBridge: "));
   DEBUG ((EFI_D_INFO, "%s\n", DevicePathStr = ConvertDevicePathToText (Bridge->DevicePath, FALSE, FALSE)));
-  DEBUG ((EFI_D_INFO, "Support/Attr: %lx / %lx\n", Bridge->Supports, Bridge->Attributes));
-  DEBUG ((EFI_D_INFO, "  DmaAbove4G: %s\n", Bridge->DmaAbove4G ? L"Yes" : L"No"));
-  DEBUG ((EFI_D_INFO, "   AllocAttr: %lx (%s%s)\n", Bridge->AllocationAttributes,
+  DEBUG ((EFI_D_INFO, "  Support/Attr: %lx / %lx\n", Bridge->Supports, Bridge->Attributes));
+  DEBUG ((EFI_D_INFO, "    DmaAbove4G: %s\n", Bridge->DmaAbove4G ? L"Yes" : L"No"));
+  DEBUG ((EFI_D_INFO, "     AllocAttr: %lx (%s%s)\n", Bridge->AllocationAttributes,
           (Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0 ? L"CombineMemPMem " : L"",
           (Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_MEM64_DECODE) != 0 ? L"Mem64Decode" : L""
           ));
-  DEBUG ((EFI_D_INFO, "         Bus: %lx - %lx\n", Bridge->Bus.Base, Bridge->Bus.Limit));
-  DEBUG ((EFI_D_INFO, "          Io: %lx - %lx\n", Bridge->Io.Base, Bridge->Io.Limit));
-  DEBUG ((EFI_D_INFO, "         Mem: %lx - %lx\n", Bridge->Mem.Base, Bridge->Mem.Limit));
-  DEBUG ((EFI_D_INFO, "  MemAbove4G: %lx - %lx\n", Bridge->MemAbove4G.Base, Bridge->MemAbove4G.Limit));
-  DEBUG ((EFI_D_INFO, "        PMem: %lx - %lx\n", Bridge->PMem.Base, Bridge->PMem.Limit));
-  DEBUG ((EFI_D_INFO, " PMemAbove4G: %lx - %lx\n", Bridge->PMemAbove4G.Base, Bridge->PMemAbove4G.Limit));
+  DEBUG ((EFI_D_INFO, "           Bus: %lx - %lx\n", Bridge->Bus.Base, Bridge->Bus.Limit));
+  DEBUG ((EFI_D_INFO, "            Io: %lx - %lx\n", Bridge->Io.Base, Bridge->Io.Limit));
+  DEBUG ((EFI_D_INFO, "           Mem: %lx - %lx\n", Bridge->Mem.Base, Bridge->Mem.Limit));
+  DEBUG ((EFI_D_INFO, "    MemAbove4G: %lx - %lx\n", Bridge->MemAbove4G.Base, Bridge->MemAbove4G.Limit));
+  DEBUG ((EFI_D_INFO, "          PMem: %lx - %lx\n", Bridge->PMem.Base, Bridge->PMem.Limit));
+  DEBUG ((EFI_D_INFO, "   PMemAbove4G: %lx - %lx\n", Bridge->PMemAbove4G.Base, Bridge->PMemAbove4G.Limit));
 
   //
   // Make sure Mem and MemAbove4G apertures are valid
