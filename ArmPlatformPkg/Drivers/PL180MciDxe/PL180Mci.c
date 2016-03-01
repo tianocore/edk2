@@ -534,6 +534,8 @@ PL180MciDxeInitialize (
       MmioRead8 (MCI_PCELL_ID_REG2)  != MCI_PCELL_ID2  ||
       MmioRead8 (MCI_PCELL_ID_REG3)  != MCI_PCELL_ID3) {
 
+    DEBUG ((EFI_D_WARN, "Probing ID registers at 0x%lx for a PL180"
+      " failed\n", MCI_PERIPH_ID_REG0));
     return EFI_NOT_FOUND;
   }
 
