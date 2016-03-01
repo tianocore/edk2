@@ -453,7 +453,7 @@ AnimateImage(
 	EFI_STATUS	Status;
 	UINTN		NumFrames;
 	UINTN		Frame;
-	UINTN		MsPerFrame = 40;
+	UINTN		MsPerFrame = 30;
 	UINTN		PositionX;
 	UINTN		PositionY;
 

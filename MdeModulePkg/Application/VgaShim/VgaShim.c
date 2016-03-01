@@ -57,11 +57,11 @@ UefiMain (
 	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
 	if (!EFI_ERROR(Status)) {
 		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
-		/*if (!ShowAnimatedLogo(ConsoleControl)) {
+		if (!ShowAnimatedLogo(ConsoleControl)) {
 			ShowStaticLogo(ConsoleControl);
 		}
-		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
-		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);*/
+		//gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+		//ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
 	}
 
 	//
@@ -137,72 +137,26 @@ UefiMain (
 
 Exit:
 	//
-	// Check if we are running setup.
+	// Check if we can chainload the Windows Boot Manager.
 	//
-	if (IsSetupMode()) {
-		LaunchPath = L"\\efi\\boot\\bootmgfw.efi";
-		Print(L"Press Enter to continue loading Windows setup\n");
-	} else if (IsResidentMode()) {
-		LaunchPath = L"\\Windows\\System32\\winload.efi";
-		Print(L"Press Enter to continue loading Windows\n");
+	if (FileExists(L"\\efi\\microsoft\\boot\\bootmgfw.efi")) {
+		LaunchPath = L"\\efi\\microsoft\\boot\\bootmgfw.efi";
+		Print(L"Press Enter to continue loading Windows ('%s')\n", LaunchPath);
 	} else {
-		Print(L"Not no Windows installation or setup found, press Enter to exit\n");
+		Print(L"No Windows installation or setup found, press Enter to exit\n");
 	}
 
-	gST->ConIn->Reset(gST->ConIn, FALSE);
+	/*gST->ConIn->Reset(gST->ConIn, FALSE);
 	do {
 		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
 		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
-	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);*/
 
 	if (LaunchPath != NULL) {
-		//Launch(LaunchPath);
+		Launch(LaunchPath);
 	}
 
 	return EFI_SUCCESS;
-}
-
-
-/**
-  Performs various checks to establish if we're running off of
-  Windows 7 installation media:
-  (1) makes sure the running image's path is \efi\boot\bootx64.efi
-  (2) makes sure \setup.exe exists
-  (3) makes sure \efi\boot\bootmgfw.efi is available so that
-      setup can be launched once the shim is installed
-
-  @retval TRUE            In all likelyhood we are running off
-                          of Windows 7 installation media.
-  @retval FALSE           This is most likely not Windows 7
-                          installation media.
-
-**/
-BOOLEAN
-IsSetupMode()
-{
-	EFI_STATUS	Status;
-	CHAR16*		MyPath;
-	BOOLEAN		Result = TRUE;
-
-	MyPath = PathCleanUpDirectories(
-		ConvertDevicePathToText(VgaShimLoadedImage->FilePath, FALSE, FALSE));
-	StrToLowercase(MyPath);
-
-	if (StrCmp(MyPath, L"\\efi\\boot\\bootx64.efi") != 0
-		|| !FileExists(L"\\setup.exe") 
-		|| !FileExists(L"\\efi\\boot\\bootmgfw.efi")) {
-		Result = FALSE;
-	}
-
-	FreePool(MyPath);
-	return Result;
-}
-
-
-BOOLEAN
-IsResidentMode()
-{
-	return FileExists(L"\\Windows\\System32\\winload.efi");
 }
 
 
