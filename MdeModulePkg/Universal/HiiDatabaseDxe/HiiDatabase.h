@@ -2017,8 +2017,38 @@ GetSupportedLanguages (
   IN EFI_HII_HANDLE           HiiHandle
   );
 
+/**
+This function mainly use to get HiiDatabase information.
+
+@param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
+
+@retval EFI_SUCCESS            Get the information successfully.
+@retval EFI_OUT_OF_RESOURCES   Not enough memory to store the Hiidatabase data.
+
+**/
+EFI_STATUS
+HiiGetDatabaseInfo(
+  IN CONST EFI_HII_DATABASE_PROTOCOL        *This
+  );
+
+/**
+This is an internal function,mainly use to get and update configuration settings information.
+
+@param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
+
+@retval EFI_SUCCESS            Get the information successfully.
+@retval EFI_OUT_OF_RESOURCES   Not enough memory to store the Configuration Setting data.
+
+**/
+EFI_STATUS
+HiiGetConfigurationSetting(
+  IN CONST EFI_HII_DATABASE_PROTOCOL        *This
+  );
+
 //
 // Global variables
 //
 extern EFI_EVENT gHiiKeyboardLayoutChanged;
+extern BOOLEAN   gExportAfterReadyToBoot;
+
 #endif

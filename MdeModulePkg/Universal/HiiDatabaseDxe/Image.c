@@ -790,6 +790,14 @@ HiiNewImage (
   ImageBlock += NewBlockSize;
   ((EFI_HII_IIBT_END_BLOCK *) (ImageBlock))->Header.BlockType = EFI_HII_IIBT_END;
 
+  //
+  // Check whether need to get the contents of HiiDataBase.
+  // Only after ReadyToBoot to do the export.
+  //
+  if (gExportAfterReadyToBoot) {
+    HiiGetDatabaseInfo(&Private->HiiDatabase);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -1177,6 +1185,14 @@ HiiSetImage (
   ImagePackage->ImageBlockSize = BlockSize;
   ImagePackage->ImagePkgHdr.Header.Length += NewBlockSize - OldBlockSize;
   PackageListNode->PackageListHdr.PackageLength += NewBlockSize - OldBlockSize;
+
+  //
+  // Check whether need to get the contents of HiiDataBase.
+  // Only after ReadyToBoot to do the export.
+  //
+  if (gExportAfterReadyToBoot) {
+    HiiGetDatabaseInfo(&Private->HiiDatabase);
+  }
 
   return EFI_SUCCESS;
 

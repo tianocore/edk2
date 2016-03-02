@@ -711,6 +711,14 @@
   # @Prompt Enable Serial device Half Hand Shake
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010073
 
+  ## Indicates if HII data and configuration has been exported.<BR><BR>
+  #  Add this PCD mainly consider the use case of simulator. This PCD maybe set to FALSE for
+  #  simulator platform because the performance cost for this feature.
+  #   TRUE  - Export HII data and configuration data.<BR>
+  #   FALSE - Does not export HII data and configuration.<BR>
+  # @Prompt Enable export HII data and configuration to be used in OS runtime.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|TRUE|BOOLEAN|0x00010074
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ## Indicates if DxeIpl should switch to long mode to enter DXE phase.
   #  It is assumed that 64-bit DxeCore is built in firmware if it is true; otherwise 32-bit DxeCore

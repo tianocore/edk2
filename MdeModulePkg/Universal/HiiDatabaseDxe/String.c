@@ -2,7 +2,7 @@
 Implementation for EFI_HII_STRING_PROTOCOL.
 
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1560,6 +1560,18 @@ Done:
     FreePool (StringPackage->StringPkgHdr);
     FreePool (StringPackage);
   }
+  //
+  // The contents of HiiDataBase may updated,need to check.
+  //
+  //
+  // Check whether need to get the contents of HiiDataBase.
+  // Only after ReadyToBoot to do the export.
+  //
+  if (gExportAfterReadyToBoot) {
+    if (!EFI_ERROR (Status)) {
+      HiiGetDatabaseInfo(&Private->HiiDatabase);
+    }
+  }
 
   return Status;
 }
@@ -1755,6 +1767,13 @@ HiiSetString (
           return Status;
         }
         PackageListNode->PackageListHdr.PackageLength += StringPackage->StringPkgHdr->Header.Length - OldPackageLen;
+        //
+        // Check whether need to get the contents of HiiDataBase.
+        // Only after ReadyToBoot to do the export.
+        //
+        if (gExportAfterReadyToBoot) {
+          HiiGetDatabaseInfo(&Private->HiiDatabase);
+        }
         return EFI_SUCCESS;
       }
     }

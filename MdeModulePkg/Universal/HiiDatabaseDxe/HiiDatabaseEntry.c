@@ -2,7 +2,7 @@
 This file contains the entry code to the HII database, which is defined by
 UEFI 2.1 specification.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Global variables
 //
 EFI_EVENT gHiiKeyboardLayoutChanged;
+BOOLEAN   gExportAfterReadyToBoot = FALSE;
 
 HII_DATABASE_PRIVATE_DATA mPrivate = {
   HII_DATABASE_PRIVATE_DATA_SIGNATURE,
@@ -124,6 +125,30 @@ KeyboardLayoutChangeNullEvent (
 }
 
 /**
+  On Ready To Boot Services Event notification handler.
+
+  To trigger the function that to export the Hii Configuration setting.
+
+  @param[in]  Event     Event whose notification function is being invoked
+  @param[in]  Context   Pointer to the notification function's context
+
+**/
+VOID
+EFIAPI
+OnReadyToBoot (
+  IN      EFI_EVENT                         Event,
+  IN      VOID                              *Context
+  )
+{
+  //
+  // When ready to boot, we begin to export the HiiDatabase date.
+  // And hook all the possible HiiDatabase change actions to export data.
+  //
+  HiiGetConfigurationSetting(&mPrivate.HiiDatabase);
+  gExportAfterReadyToBoot = TRUE;
+}
+
+/**
   Initialize HII Database.
 
 
@@ -135,6 +160,8 @@ KeyboardLayoutChangeNullEvent (
           gHiiKeyboardLayoutChanged. Check gBS->CreateEventEx for
           details. Or failed to insatll the protocols.
           Check gBS->InstallMultipleProtocolInterfaces for details.
+          Or failed to create Ready To Boot Event.
+          Check EfiCreateEventReadyToBootEx for details.
 
 **/
 EFI_STATUS
@@ -146,6 +173,7 @@ InitializeHiiDatabase (
 {
   EFI_STATUS                             Status;
   EFI_HANDLE                             Handle;
+  EFI_EVENT                              ReadyToBootEvent;
 
   //
   // There will be only one HII Database in the system
@@ -209,6 +237,18 @@ InitializeHiiDatabase (
                     NULL
                     );
 
+  }
+
+  if (FeaturePcdGet(PcdHiiOsRuntimeSupport)) {
+    Status = EfiCreateEventReadyToBootEx (
+               TPL_CALLBACK,
+               OnReadyToBoot,
+               NULL,
+               &ReadyToBootEvent
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   return Status;

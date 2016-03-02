@@ -1,7 +1,7 @@
 /** @file
 Implementation for EFI_HII_DATABASE_PROTOCOL.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "HiiDatabase.h"
+
+EFI_HII_PACKAGE_LIST_HEADER    *gRTDatabaseInfoBuffer = NULL;
+EFI_STRING                     gRTConfigRespBuffer    = NULL;
+UINTN                          gDatabaseInfoSize = 0;
+UINTN                          gConfigRespSize = 0;
 
 /**
   This function generates a HII_DATABASE_RECORD node and adds into hii database.
@@ -2775,6 +2780,113 @@ ExportPackageList (
   return EFI_SUCCESS;
 }
 
+/**
+This is an internal function,mainly use to get and update configuration settings information.
+
+@param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
+
+@retval EFI_SUCCESS            Get the information successfully.
+@retval EFI_OUT_OF_RESOURCES   Not enough memory to store the Configuration Setting data.
+
+**/
+EFI_STATUS
+HiiGetConfigurationSetting(
+  IN CONST EFI_HII_DATABASE_PROTOCOL        *This
+  )
+{
+  EFI_STATUS                          Status;
+  HII_DATABASE_PRIVATE_DATA           *Private;
+  EFI_STRING                          ConfigAltResp;
+  UINTN                               ConfigSize;
+
+  ConfigAltResp        = NULL;
+  ConfigSize           = 0;
+
+  Private = HII_DATABASE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
+
+  //
+  // Get the HiiDatabase info.
+  //
+  HiiGetDatabaseInfo(This);
+
+  //
+  // Get ConfigResp string
+  //
+  Status = HiiConfigRoutingExportConfig(&Private->ConfigRouting,&ConfigAltResp);
+
+  if (!EFI_ERROR (Status)){
+    ConfigSize = StrSize(ConfigAltResp);
+    if (ConfigSize > gConfigRespSize){
+      gConfigRespSize = ConfigSize;
+      if (gRTConfigRespBuffer != NULL){
+        FreePool(gRTConfigRespBuffer);
+      }
+      gRTConfigRespBuffer = (EFI_STRING)AllocateRuntimeZeroPool(ConfigSize);
+      if (gRTConfigRespBuffer == NULL){
+        FreePool(ConfigAltResp);
+        DEBUG ((DEBUG_ERROR, "Not enough memory resource to get the ConfigResp string.\n"));
+        return EFI_OUT_OF_RESOURCES;
+      }
+    } else {
+      ZeroMem(gRTConfigRespBuffer,gConfigRespSize);
+    }
+    CopyMem(gRTConfigRespBuffer,ConfigAltResp,ConfigSize);
+    gBS->InstallConfigurationTable (&gEfiHiiConfigRoutingProtocolGuid, gRTConfigRespBuffer);
+    FreePool(ConfigAltResp);
+  }
+
+  return EFI_SUCCESS;
+
+}
+
+/**
+This is an internal function,mainly use to get HiiDatabase information.
+
+@param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
+
+@retval EFI_SUCCESS            Get the information successfully.
+@retval EFI_OUT_OF_RESOURCES   Not enough memory to store the Hiidatabase data.
+
+**/
+EFI_STATUS
+HiiGetDatabaseInfo(
+  IN CONST EFI_HII_DATABASE_PROTOCOL        *This
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_HII_PACKAGE_LIST_HEADER         *DatabaseInfo;
+  UINTN                               DatabaseInfoSize;
+
+  DatabaseInfo         = NULL;
+  DatabaseInfoSize     = 0;
+
+  //
+  // Get HiiDatabase information.
+  //
+  Status = HiiExportPackageLists(This, NULL, &DatabaseInfoSize, DatabaseInfo);
+
+  ASSERT(Status == EFI_BUFFER_TOO_SMALL);
+
+  if(DatabaseInfoSize > gDatabaseInfoSize ) {
+    gDatabaseInfoSize = DatabaseInfoSize;
+    if (gRTDatabaseInfoBuffer != NULL){
+      FreePool(gRTDatabaseInfoBuffer);
+    }
+    gRTDatabaseInfoBuffer = AllocateRuntimeZeroPool(DatabaseInfoSize);
+    if (gRTDatabaseInfoBuffer == NULL){
+      DEBUG ((DEBUG_ERROR, "Not enough memory resource to get the HiiDatabase info.\n"));
+      return EFI_OUT_OF_RESOURCES;
+    }
+  } else {
+    ZeroMem(gRTDatabaseInfoBuffer,gDatabaseInfoSize);
+  }
+  Status = HiiExportPackageLists(This, NULL, &DatabaseInfoSize, gRTDatabaseInfoBuffer);
+  ASSERT_EFI_ERROR (Status);
+  gBS->InstallConfigurationTable (&gEfiHiiDatabaseProtocolGuid, gRTDatabaseInfoBuffer);
+
+  return EFI_SUCCESS;
+
+}
 
 /**
   This function adds the packages in the package list to the database and returns a handle. If there is a
@@ -2867,6 +2979,15 @@ HiiNewPackageList (
   }
 
   *Handle = DatabaseRecord->Handle;
+
+  //
+  // Check whether need to get the Database and configuration setting info.
+  // Only after ReadyToBoot, need to do the export.
+  //
+  if (gExportAfterReadyToBoot) {
+    HiiGetConfigurationSetting(This);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -2972,6 +3093,13 @@ HiiRemovePackageList (
       FreePool (Node->PackageList);
       FreePool (Node);
 
+      //
+      // Check whether need to get the Database and configuration setting info.
+      // Only after ReadyToBoot, need to do the export.
+      //
+      if (gExportAfterReadyToBoot) {
+        HiiGetConfigurationSetting(This);
+      }
       return EFI_SUCCESS;
     }
   }
@@ -3079,7 +3207,19 @@ HiiUpdatePackageList (
       //
       // Add all of the packages within the new package list
       //
-      return AddPackages (Private, EFI_HII_DATABASE_NOTIFY_ADD_PACK, PackageList, Node);
+      Status = AddPackages (Private, EFI_HII_DATABASE_NOTIFY_ADD_PACK, PackageList, Node);
+
+      //
+      // Check whether need to get the Database and configuration setting info.
+      // Only after ReadyToBoot, need to do the export.
+      //
+      if (gExportAfterReadyToBoot) {
+        if (Status == EFI_SUCCESS){
+          HiiGetConfigurationSetting(This);
+        }
+      }
+
+      return Status;
     }
   }
 
