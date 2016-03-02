@@ -1,7 +1,7 @@
 /** @file
 *  File managing the MMU for ARMv7 architecture
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2016, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -346,6 +346,17 @@ ArmConfigureMmu (
   ArmInvalidateInstructionCache ();
 
   ArmSetTTBR0 ((VOID *)(UINTN)(((UINTN)TranslationTable & ~TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK) | (TTBRAttributes & 0x7F)));
+
+  //
+  // The TTBCR register value is undefined at reset in the Non-Secure world.
+  // Writing 0 has the effect of:
+  //   Clearing EAE: Use short descriptors, as mandated by specification.
+  //   Clearing PD0 and PD1: Translation Table Walk Disable is off.
+  //   Clearing N: Perform all translation table walks through TTBR0.
+  //               (0 is the default reset value in systems not implementing
+  //               the Security Extensions.)
+  //
+  ArmSetTTBCR (0);
 
   ArmSetDomainAccessControl (DOMAIN_ACCESS_CONTROL_NONE(15) |
                              DOMAIN_ACCESS_CONTROL_NONE(14) |

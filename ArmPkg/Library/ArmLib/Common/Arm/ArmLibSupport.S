@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2016, ARM Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -23,6 +23,7 @@ GCC_ASM_EXPORT(ArmGetInterruptState)
 GCC_ASM_EXPORT(ArmGetFiqState)
 GCC_ASM_EXPORT(ArmGetTTBR0BaseAddress)
 GCC_ASM_EXPORT(ArmSetTTBR0)
+GCC_ASM_EXPORT(ArmSetTTBCR)
 GCC_ASM_EXPORT(ArmSetDomainAccessControl)
 GCC_ASM_EXPORT(CPSRMaskInsert)
 GCC_ASM_EXPORT(CPSRRead)
@@ -108,6 +109,11 @@ ASM_PFX(ArmReadAuxCr):
 
 ASM_PFX(ArmSetTTBR0):
   mcr     p15,0,r0,c2,c0,0
+  isb
+  bx      lr
+
+ASM_PFX(ArmSetTTBCR):
+  mcr     p15, 0, r0, c2, c0, 2
   isb
   bx      lr
 
