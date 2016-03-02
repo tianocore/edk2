@@ -88,7 +88,7 @@ FileExists(
 	BOOLEAN					Exists;
 
 	// Open volume where VgaShim lives.
-	Status = gBS->HandleProtocol(VgaShimLoadedImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
+	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
 	if (EFI_ERROR(Status))
 		return FALSE;
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
@@ -144,7 +144,7 @@ FileRead(
 	UINTN					Size;
 
 	// Open volume where VgaShim lives.
-	Status = gBS->HandleProtocol(VgaShimLoadedImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
+	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
 	if (EFI_ERROR(Status))
 		return Status;
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
@@ -198,7 +198,7 @@ Launch(
 	//
 	// Try to load the image first.
 	//
-	FilePathOnDevice = FileDevicePath(VgaShimLoadedImage->DeviceHandle, FilePath);
+	FilePathOnDevice = FileDevicePath(VgaShimImageInfo->DeviceHandle, FilePath);
 	Print(L"%a: Loading '%s' ... ", __FUNCTION__, ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
 	Status = gBS->LoadImage(FALSE, VgaShimImage, FilePathOnDevice, NULL, 0, &FileImageHandle);
 	if (EFI_ERROR(Status)) {

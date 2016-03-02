@@ -5,6 +5,7 @@
 #include "LegacyVgaBios.h"
 #include "Int10hHandler.h"
 #include "BootflagSimple.h"
+#include "Version.h"
 
 
 /**
@@ -13,9 +14,11 @@
   -----------------------------------------------------------------------------
 **/
 
-DISPLAY_INFO				DisplayInfo;
-EFI_HANDLE					VgaShimImage;
-EFI_LOADED_IMAGE_PROTOCOL	*VgaShimLoadedImage;
+DISPLAY_INFO					DisplayInfo;
+EFI_HANDLE						VgaShimImage;
+EFI_LOADED_IMAGE_PROTOCOL		*VgaShimImageInfo;
+DEBUG_LEVEL						DebugLevel;
+EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
 
 
 /**
@@ -41,25 +44,60 @@ UefiMain (
 	EFI_STATUS						Status;
 	EFI_INPUT_KEY					Key;
 	UINTN							EventIndex;
-	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
 	CHAR16							*LaunchPath = NULL;
+	EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleText;
+	EFI_SIMPLE_TEXT_INPUT_PROTOCOL *SimpleText1;
 
+	//
+	// Initialization.
+	//
+	DebugLevel = DEBUG_VERBOSE;
 	VgaShimImage = ImageHandle;
-	Status = gBS->HandleProtocol(VgaShimImage, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimLoadedImage);
+	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
 	if (EFI_ERROR(Status)) {
-		Print(L"Unable to locate EFI_LOADED_IMAGE_PROTOCOL, halting\n");
-		return EFI_LOAD_ERROR;
+		ConsoleControl = NULL;
+	}
+	Status = gBS->HandleProtocol(VgaShimImage, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimImageInfo);
+	if (EFI_ERROR(Status)) {
+		PrintMessage(DEBUG_ERROR, L"Unable to locate EFI_LOADED_IMAGE_PROTOCOL, aborting\n");
+		goto Exit;
 	}
 
+	
+	
+	//
+	// Check if we should run in debug mode (ctrl key pressed)
+	//
+	PrintMessage(DEBUG_VERBOSE, L"VGA Shim v%s\n", VERSION);
+	Status = gBS->LocateProtocol(&gEfiSimpleTextInputExProtocolGuid, NULL, (VOID **)&SimpleText);
+	Print(L"Looking for gEfiSimpleTextInputExProtocolGuid status=%r\n", Status);
+	Status = gBS->LocateProtocol(&gEfiSimpleTextInProtocolGuid, NULL, (VOID **)&SimpleText1);
+	//SimpleText1->ReadKeyStroke
+	Print(L"Looking for gEfiSimpleTextInProtocolGuid status=%r\n", Status);
+
+	Status = gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
+	Print(L"Status=%r, key=%u char='%c'\n", Status, Key.ScanCode, Key.UnicodeChar);
+	//Key.ScanCode == 
+	//gST->ConIn->WaitForKey
+	//gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+
+	Print(L"Entering key test loop, press Enter to exit\n");
+	gST->ConIn->Reset(gST->ConIn, FALSE);
+	do {
+		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
+		Print(L"key=%04x char=%04x\n", Key.ScanCode, Key.UnicodeChar);
+	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+	
 	// 
 	// Show pretty graphics.
 	//
 	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
 	if (!EFI_ERROR(Status)) {
-		ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
+		/*ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
 		if (!ShowAnimatedLogo(ConsoleControl)) {
 			ShowStaticLogo(ConsoleControl);
-		}
+		}*/
 		//gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
 		//ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
 	}
@@ -74,9 +112,12 @@ UefiMain (
 	}
 
 	//
-	// Sanity checks; this should never creep into production.
+	// Sanity checks.
 	//
-	ASSERT(sizeof INT10H_HANDLER <= VGA_ROM_SIZE);
+	if (sizeof INT10H_HANDLER > VGA_ROM_SIZE) {
+		PrintMessage(DEBUG_ERROR, L"Shim size (%u) bigger than allowed (%u), aborting\n", sizeof INT10H_HANDLER, VGA_ROM_SIZE);
+		goto Exit;
+	}
 
 	//
 	// Unlock VGA ROM memory for writing first.
@@ -223,9 +264,6 @@ ShimVesaInformation(
 	VbeInfo->ProductRevAddress = (UINT32)StartAddress << 12 | (UINT16)(UINTN)BufferPtr;
 	CopyMem(BufferPtr, PRODUCT_REVISION, sizeof PRODUCT_REVISION);
 	BufferPtr += sizeof PRODUCT_REVISION;
-	
-	// make sure we did not use more buffer than we had space for
-	ASSERT(sizeof VbeInfoFull->Buffer >= BufferPtr - VbeInfoFull->Buffer);
 	
 	//
 	// Basic VESA mode information.
@@ -430,8 +468,7 @@ EnsureMemoryLock(
 	//
 	// Try to lock/unlock via an MTRR.
 	//
-	if (EFI_ERROR(Status) && IsMtrrSupported()) {
-		ASSERT(FIXED_MTRR_SIZE >= Length);
+	if (EFI_ERROR(Status) && IsMtrrSupported() && FIXED_MTRR_SIZE >= Length) {
 		if (Operation == UNLOCK) {
 			MtrrSetMemoryAttribute(StartAddress, FIXED_MTRR_SIZE, CacheUncacheable);
 			Status = CanWriteAtAddress(StartAddress) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
@@ -568,7 +605,7 @@ ShowAnimatedLogo(
 
 	// Check if *.bmp exists
 	Status = ChangeExtension(
-		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimLoadedImage->FilePath, FALSE, FALSE)), 
+		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImageInfo->FilePath, FALSE, FALSE)), 
 		L"bmp", 
 		(VOID **)&BmpFilePath);
 	if (EFI_ERROR(Status) || !FileExists(BmpFilePath)) {
@@ -601,4 +638,40 @@ ShowAnimatedLogo(
 	// Cleanup & return.
 	DestroyImage(WindowsFlag);
 	return TRUE;
+}
+
+
+VOID
+PrintMessage(
+	IN	DEBUG_LEVEL	MessageLevel,
+	IN	CHAR16		*FormatString,
+	IN	...)
+{
+	EFI_STATUS						Status;
+	VA_LIST							Marker;
+	CHAR16							Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+	EFI_CONSOLE_CONTROL_SCREEN_MODE	CurrentMode;
+
+	if (MessageLevel < DebugLevel) {
+		return;
+	}
+
+	// Switch to text mode if possible, otherwise assume it is already set.
+	if (ConsoleControl != NULL) {
+		Status = ConsoleControl->GetMode(ConsoleControl, &CurrentMode, NULL, NULL);
+		if (!EFI_ERROR(Status) && CurrentMode != EfiConsoleControlScreenText) {
+			ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
+		}
+	}
+	
+	// Prepare print arguments.
+	VA_START(Marker, FormatString);
+	UnicodeVSPrint(Buffer, MAX_DEBUG_MESSAGE_LENGTH, FormatString, Marker);
+	VA_END(Marker);
+
+	// Output message.
+	if ((gST != NULL) && (gST->StdErr != NULL)) {
+		gST->StdErr->OutputString(gST->StdErr, Buffer);
+		gBS->Stall(DEBUG_MESSAGE_DELAY_MS * 1000);
+	}
 }

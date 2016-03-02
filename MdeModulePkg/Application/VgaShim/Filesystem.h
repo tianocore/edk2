@@ -1,6 +1,7 @@
 #ifndef __FILESYSTEM_H__
 #define __FILESYSTEM_H__
 
+
 /**
   -----------------------------------------------------------------------------
   Includes.
@@ -46,7 +47,7 @@ FileRead(
 
 EFI_STATUS
 Launch(
-	IN	CHAR16		*FilePath);
+	IN	CHAR16	*FilePath);
 
 
 /**
@@ -56,6 +57,7 @@ Launch(
 **/
 
 extern	EFI_HANDLE					VgaShimImage;
-extern	EFI_LOADED_IMAGE_PROTOCOL	*VgaShimLoadedImage;
+extern	EFI_LOADED_IMAGE_PROTOCOL	*VgaShimImageInfo;
+
 
 #endif

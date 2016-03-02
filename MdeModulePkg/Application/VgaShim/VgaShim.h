@@ -21,6 +21,7 @@
 #include <Protocol/LegacyRegion.h>
 #include <Protocol/LegacyRegion2.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/SimpleTextInEx.h>
 #include "ConsoleControl.h"
 
 
@@ -90,12 +91,13 @@ IsResidentMode(
   -----------------------------------------------------------------------------
 **/
 
-STATIC CONST	CHAR8						VENDOR_NAME[]		= "Apple";
-STATIC CONST	CHAR8						PRODUCT_NAME[]		= "Emulated VGA";
-STATIC CONST	CHAR8						PRODUCT_REVISION[]	= "OVMF Int10h (fake)";
-STATIC CONST	EFI_PHYSICAL_ADDRESS		VGA_ROM_ADDRESS		= 0xc0000;
-STATIC CONST	EFI_PHYSICAL_ADDRESS		IVT_ADDRESS			= 0x00000;
-STATIC CONST	UINTN						VGA_ROM_SIZE		= 0x10000;
-STATIC CONST	UINTN						FIXED_MTRR_SIZE		= 0x20000;
+STATIC CONST	CHAR8					VENDOR_NAME[]		= "Apple";
+STATIC CONST	CHAR8					PRODUCT_NAME[]		= "Emulated VGA";
+STATIC CONST	CHAR8					PRODUCT_REVISION[]	= "OVMF Int10h (fake)";
+STATIC CONST	EFI_PHYSICAL_ADDRESS	VGA_ROM_ADDRESS		= 0xc0000;
+STATIC CONST	EFI_PHYSICAL_ADDRESS	IVT_ADDRESS			= 0x00000;
+STATIC CONST	UINTN					VGA_ROM_SIZE		= 0x10000;
+STATIC CONST	UINTN					FIXED_MTRR_SIZE		= 0x20000;
+
 
 #endif
