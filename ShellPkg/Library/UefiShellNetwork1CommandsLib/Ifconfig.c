@@ -2,7 +2,7 @@
   The implementation for Shell command ifconfig based on IP4Config2 protocol.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -710,6 +710,7 @@ IfConfigShowInterfaceInfo (
   The clean process of the ifconfig command to clear interface info.
 
   @param[in]   IfList    The pointer of IfList(interface list).
+  @param[in]   IfName    The pointer of interface name.
 
   @retval SHELL_SUCCESS  The ifconfig command clean processed successfully.
   @retval others         The ifconfig command clean process failed.
@@ -717,7 +718,8 @@ IfConfigShowInterfaceInfo (
 **/
 SHELL_STATUS
 IfConfigClearInterfaceInfo (
-  IN LIST_ENTRY    *IfList
+  IN LIST_ENTRY    *IfList,
+  IN CHAR16        *IfName
   )
 {
   EFI_STATUS                Status;  
@@ -726,8 +728,7 @@ IfConfigClearInterfaceInfo (
   LIST_ENTRY                *Next;
   IFCONFIG_INTERFACE_CB     *IfCb;
   EFI_IP4_CONFIG2_POLICY    Policy;
-
-  Policy = Ip4Config2PolicyDhcp;
+  
   Status = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
@@ -737,9 +738,29 @@ IfConfigClearInterfaceInfo (
 
   //
   // Go through the interface list.
+  // If the interface name is specified, DHCP DORA process will be 
+  // triggered by the policy transition (static -> dhcp).
   //
   NET_LIST_FOR_EACH_SAFE (Entry, Next, IfList) {
     IfCb = NET_LIST_USER_STRUCT (Entry, IFCONFIG_INTERFACE_CB, Link);
+
+    if ((IfName != NULL) && (StrCmp (IfName, IfCb->IfInfo->Name) == 0)) {
+      Policy = Ip4Config2PolicyStatic;
+      
+      Status = IfCb->IfCfg->SetData (
+                              IfCb->IfCfg,
+                              Ip4Config2DataTypePolicy,
+                              sizeof (EFI_IP4_CONFIG2_POLICY),
+                              &Policy
+                              );
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
+        ShellStatus = SHELL_ACCESS_DENIED;
+        break;
+      }  
+    }
+
+    Policy = Ip4Config2PolicyDhcp;
     
     Status = IfCb->IfCfg->SetData (
                             IfCb->IfCfg,
@@ -1143,7 +1164,7 @@ IfConfig (
     break;
 
   case IfConfigOpClear:
-    ShellStatus = IfConfigClearInterfaceInfo (&Private->IfList);
+    ShellStatus = IfConfigClearInterfaceInfo (&Private->IfList, Private->IfName);
     break;
 
   case IfConfigOpSet:
