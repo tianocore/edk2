@@ -17,7 +17,7 @@
 DISPLAY_INFO					DisplayInfo;
 EFI_HANDLE						VgaShimImage;
 EFI_LOADED_IMAGE_PROTOCOL		*VgaShimImageInfo;
-DEBUG_LEVEL						DebugLevel;
+BOOLEAN							DebugMode = TRUE;
 EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
 
 
@@ -38,20 +38,19 @@ UefiMain (
 	IN EFI_HANDLE		ImageHandle,
 	IN EFI_SYSTEM_TABLE	*SystemTable)
 {
-	EFI_PHYSICAL_ADDRESS			Int10hHandlerAddress;
-	IVT_ENTRY						*Int10hHandlerEntry;
-	EFI_PHYSICAL_ADDRESS			TempAddress;
-	EFI_STATUS						Status;
-	EFI_INPUT_KEY					Key;
-	UINTN							EventIndex;
-	CHAR16							*LaunchPath = NULL;
-	EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleText;
-	EFI_SIMPLE_TEXT_INPUT_PROTOCOL *SimpleText1;
+	EFI_PHYSICAL_ADDRESS	Int10hHandlerAddress;
+	IVT_ENTRY				*Int10hHandlerEntry;
+	EFI_PHYSICAL_ADDRESS	TempAddress;
+	EFI_STATUS				Status;
+	EFI_INPUT_KEY			Key;
+	CHAR16					*LaunchPath = NULL;
+
+	// Give user time to press 'v'.
+	//gBS->Stall(1000 * 500);
 
 	//
 	// Initialization.
 	//
-	DebugLevel = DEBUG_VERBOSE;
 	VgaShimImage = ImageHandle;
 	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
 	if (EFI_ERROR(Status)) {
@@ -59,47 +58,32 @@ UefiMain (
 	}
 	Status = gBS->HandleProtocol(VgaShimImage, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimImageInfo);
 	if (EFI_ERROR(Status)) {
-		PrintMessage(DEBUG_ERROR, L"Unable to locate EFI_LOADED_IMAGE_PROTOCOL, aborting\n");
+		PrintError(L"Unable to locate EFI_LOADED_IMAGE_PROTOCOL, aborting\n");
 		goto Exit;
 	}
 
-	
-	
 	//
-	// Check if we should run in debug mode (ctrl key pressed)
+	// Check if we should run in debug mode ('v' pressed).
 	//
-	PrintMessage(DEBUG_VERBOSE, L"VGA Shim v%s\n", VERSION);
-	Status = gBS->LocateProtocol(&gEfiSimpleTextInputExProtocolGuid, NULL, (VOID **)&SimpleText);
-	Print(L"Looking for gEfiSimpleTextInputExProtocolGuid status=%r\n", Status);
-	Status = gBS->LocateProtocol(&gEfiSimpleTextInProtocolGuid, NULL, (VOID **)&SimpleText1);
-	//SimpleText1->ReadKeyStroke
-	Print(L"Looking for gEfiSimpleTextInProtocolGuid status=%r\n", Status);
-
 	Status = gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
-	Print(L"Status=%r, key=%u char='%c'\n", Status, Key.ScanCode, Key.UnicodeChar);
-	//Key.ScanCode == 
-	//gST->ConIn->WaitForKey
-	//gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+	if (!EFI_ERROR(Status) && Key.UnicodeChar == L'v') {
+		DebugMode = TRUE;
+	}
+	if (DebugMode) {
+		Print(L"Attempting PrintDebug...\n");
+		Print(L"VGA Shim v%s\n", L"0.9");
+		PrintDebug(L"VGA Shim v%s\n", L"0.9");
+		PrintDebug(L"You are running in debug mode, press Enter to continue\n");
+		WaitForEnter();
+	}
 
-	Print(L"Entering key test loop, press Enter to exit\n");
-	gST->ConIn->Reset(gST->ConIn, FALSE);
-	do {
-		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
-		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
-		Print(L"key=%04x char=%04x\n", Key.ScanCode, Key.UnicodeChar);
-	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-	
 	// 
 	// Show pretty graphics.
 	//
-	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
-	if (!EFI_ERROR(Status)) {
-		/*ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
-		if (!ShowAnimatedLogo(ConsoleControl)) {
-			ShowStaticLogo(ConsoleControl);
-		}*/
-		//gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
-		//ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
+	if (!DebugMode && ConsoleControl != NULL) {
+		if (!ShowAnimatedLogo()) {
+			ShowStaticLogo();
+		}
 	}
 
 	//
@@ -107,7 +91,7 @@ UefiMain (
 	// VGA ROM in operation or we installed the shim before.
 	//
 	if (IsInt10HandlerDefined()) {
-		Print(L"Int10h already has a handler, you should be all set\n");
+		PrintDebug(L"Int10h already has a handler, you should be all set\n");
 		goto Exit;
 	}
 
@@ -115,7 +99,7 @@ UefiMain (
 	// Sanity checks.
 	//
 	if (sizeof INT10H_HANDLER > VGA_ROM_SIZE) {
-		PrintMessage(DEBUG_ERROR, L"Shim size (%u) bigger than allowed (%u), aborting\n", sizeof INT10H_HANDLER, VGA_ROM_SIZE);
+		PrintError(L"Shim size (%u) bigger than allowed (%u), aborting\n", sizeof INT10H_HANDLER, VGA_ROM_SIZE);
 		goto Exit;
 	}
 
@@ -124,8 +108,7 @@ UefiMain (
 	//
 	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, UNLOCK);
 	if (EFI_ERROR(Status)) {
-		Print(L"Unable to unlock VGA ROM memory at %04x, aborting shim insertion\n", 
-			VGA_ROM_ADDRESS);
+		PrintError(L"Unable to unlock VGA ROM memory at %04x, aborting\n", VGA_ROM_ADDRESS);
 		goto Exit;
 	}
 
@@ -134,14 +117,13 @@ UefiMain (
 	// has already been initialized so we can overwrite the IVT.
 	//
 	Int10hHandlerEntry = (IVT_ENTRY *)IVT_ADDRESS + 0x10;
-	Print(L"Claiming IVT area ... ");
 	TempAddress = IVT_ADDRESS;
 	Status = gBS->AllocatePages(AllocateAddress, EfiBootServicesCode, 1, &TempAddress);
 	if (EFI_ERROR(Status)) {
-		Print(L"failure: %r\n", Status);
-		return EFI_ABORTED;
+		PrintError(L"Unable to claim IVT area at %04x (error: %r), aborting\n", IVT_ADDRESS, Status);
+		goto Exit;
 	} else {
-		Print(L"success\n");
+		PrintDebug(L"IVT area at %04x claimed\n", IVT_ADDRESS);
 	}
 
 	//
@@ -151,10 +133,10 @@ UefiMain (
 	CopyMem((VOID *)VGA_ROM_ADDRESS, INT10H_HANDLER, sizeof INT10H_HANDLER);
 	Status = ShimVesaInformation(VGA_ROM_ADDRESS, &Int10hHandlerAddress);
 	if (EFI_ERROR(Status)) {
-		Print(L"VESA information could not be filled in, aborting shim insertion\n");
-		return EFI_ABORTED;
+		PrintError(L"VESA information could not be filled in, aborting\n");
+		goto Exit;
 	} else {
-		Print(L"VESA information filled in, Int10h handler address = %x\n", 
+		PrintDebug(L"VESA information filled in, Int10h handler address = %x\n", 
 			Int10hHandlerAddress);
 	}
 	
@@ -163,7 +145,7 @@ UefiMain (
 	//
 	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, LOCK);
 	if (EFI_ERROR(Status)) {
-		Print(L"Unable to lock VGA ROM memory at %x but this is not essential\n", 
+		PrintDebug(L"Unable to lock VGA ROM memory at %x but this is not essential\n", 
 			VGA_ROM_ADDRESS);
 	}
 
@@ -171,9 +153,10 @@ UefiMain (
 	// Point the Int10h vector at the entry point in shim.
 	//
 	// Convert from real 32bit physical address to real mode segment address
+	//Int10hHandlerEntry = (IVT_ENTRY *)IVT_ADDRESS + 0x10;
 	Int10hHandlerEntry->Segment = (UINT16)((UINT32)VGA_ROM_ADDRESS >> 4);
 	Int10hHandlerEntry->Offset = (UINT16)(Int10hHandlerAddress - VGA_ROM_ADDRESS);
-	Print(L"Int10h handler installed at %04x:%04x\n",
+	PrintDebug(L"Int10h handler installed at %04x:%04x\n",
 		Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
 
 Exit:
@@ -182,16 +165,14 @@ Exit:
 	//
 	if (FileExists(L"\\efi\\microsoft\\boot\\bootmgfw.efi")) {
 		LaunchPath = L"\\efi\\microsoft\\boot\\bootmgfw.efi";
-		Print(L"Press Enter to continue loading Windows ('%s')\n", LaunchPath);
+		PrintDebug(L"Found Windows Boot Manager at '%s'\n", LaunchPath);
+		PrintDebug(L"Press Enter to continue loading Windows\n");
+		if (DebugMode)
+			WaitForEnter();
 	} else {
-		Print(L"No Windows installation or setup found, press Enter to exit\n");
+		PrintError(L"Could not find Windows Boot Manager, press Enter to exit\n");
+		WaitForEnter();
 	}
-
-	/*gST->ConIn->Reset(gST->ConIn, FALSE);
-	do {
-		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
-		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
-	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);*/
 
 	if (LaunchPath != NULL) {
 		Launch(LaunchPath);
@@ -373,13 +354,12 @@ IsInt10HandlerDefined()
 	Int10Entry = (IVT_ENTRY *)(UINTN)IVT_ADDRESS + 0x10;
 	Int10Handler = (Int10Entry->Segment << 4) + Int10Entry->Offset;
 
-	Print(L"%a: Checking for an existing Int10h handler ... ", __FUNCTION__);
-
 	if (Int10Handler >= VGA_ROM_ADDRESS && Int10Handler < (VGA_ROM_ADDRESS+VGA_ROM_SIZE)) {
-		Print(L"found at %04x:%04x\n", Int10Entry->Segment, Int10Entry->Offset);
+		PrintDebug(L"%a: Int10h handler found at %04x:%04x\n", 
+			__FUNCTION__, Int10Entry->Segment, Int10Entry->Offset);
 		return TRUE;
 	} else {
-		Print(L"not found\n");
+		PrintDebug(L"%a: No existing Int10h handler found\n", __FUNCTION__);
 		return FALSE;
 	}
 }
@@ -435,7 +415,7 @@ EnsureMemoryLock(
 				Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 			}
 
-			Print(L"%a: %s %s memory at %x using EfiLegacyRegionProtocol\n", 
+			Print(L"%a: %s %s memory at %x with EfiLegacyRegionProtocol\n", 
 				__FUNCTION__, 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
 				Operation == UNLOCK ? L"unlocking" : L"locking", 
@@ -457,7 +437,7 @@ EnsureMemoryLock(
 				Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 			}
 
-			Print(L"%a: %s %s memory at %x using EfiLegacyRegion2Protocol\n", 
+			Print(L"%a: %s %s memory at %x with EfiLegacyRegion2Protocol\n", 
 				__FUNCTION__, 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
 				Operation == UNLOCK ? L"unlocking" : L"locking", 
@@ -477,7 +457,7 @@ EnsureMemoryLock(
 			Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 		}
 
-		Print(L"%a: %s %s memory at %x using MTRR\n", 
+		Print(L"%a: %s %s memory at %x with MTRRs\n", 
 			__FUNCTION__, 
 			EFI_ERROR(Status) ? "Failure" : "Success",
 			Operation == UNLOCK ? "unlocking" : "locking", 
@@ -542,13 +522,9 @@ CanWriteAtAddress(
   
 **/
 BOOLEAN
-ShowStaticLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
+ShowStaticLogo()
 {
 	EFI_STATUS	Status;
-	CHAR16		*BmpFilePath;
-	UINT8		*BmpFileContents;
-	UINTN		BmpFileBytes;
 	IMAGE		*WindowsFlag;
 
 	// Sanity checks.
@@ -556,12 +532,9 @@ ShowStaticLogo(
 	if (EFI_ERROR(Status)) {
 		return FALSE;
 	}
-	Status = ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
-	if (EFI_ERROR(Status)) {
-		return FALSE;
-	}
-
+	
 	// All fine, let's do some drawing.
+	ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
 	ClearScreen();
 	DrawImageCentered(WindowsFlag);
 
@@ -582,11 +555,6 @@ ShowStaticLogo(
   folder, and VgaShim.bmp is a valid, 24bpp bmp image file of
   of size 200x10000, 50 frames will be shown (top to bottom).
 
-  @param[in] ConsoleControl Protocol for sharing the display
-                            between console and graphical output.
-							Considered legacy but still used
-							by Apple devices.
-
   @retval TRUE              Static logo was successfully retrieved
                             and displayed on screen.
   @retval FALSE             Either the required resource was not found
@@ -594,8 +562,7 @@ ShowStaticLogo(
   
 **/
 BOOLEAN
-ShowAnimatedLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl)
+ShowAnimatedLogo()
 {
 	EFI_STATUS	Status;
 	CHAR16		*BmpFilePath;
@@ -603,7 +570,7 @@ ShowAnimatedLogo(
 	UINTN		BmpFileBytes;
 	IMAGE		*WindowsFlag;
 
-	// Check if *.bmp exists
+	// Check if <MyName>.bmp exists
 	Status = ChangeExtension(
 		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImageInfo->FilePath, FALSE, FALSE)), 
 		L"bmp", 
@@ -618,7 +585,6 @@ ShowAnimatedLogo(
 		FreePool(BmpFilePath);
 		return FALSE;
 	}
-		
 	Status = BmpFileToImage(BmpFileContents, BmpFileBytes, (VOID **)&WindowsFlag);
 	if (EFI_ERROR(Status)) {
 		FreePool(BmpFilePath);
@@ -631,7 +597,7 @@ ShowAnimatedLogo(
 	BmpFileContents = NULL;
 
 	// All fine, let's do some drawing.
-	ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
+	ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
 	ClearScreen();
 	AnimateImage(WindowsFlag);
 
@@ -642,19 +608,45 @@ ShowAnimatedLogo(
 
 
 VOID
-PrintMessage(
-	IN	DEBUG_LEVEL	MessageLevel,
-	IN	CHAR16		*FormatString,
-	IN	...)
+PrintDebug(
+	IN CONST	CHAR16	*FormatString,
+	...)
+{
+	VA_LIST							Marker;
+	//CHAR16							Buffer[DEBUG_MESSAGE_LENGTH];
+	CHAR16 *Buffer;
+
+	if (!DebugMode) {
+		return;
+	}
+
+	//gST->ConOut->SetAttribute(gST->ConOut, EFI_LIGHTMAGENTA);
+
+	Buffer = (CHAR16 *)AllocatePool(DEBUG_MESSAGE_LENGTH * sizeof(CHAR16));
+
+	// Prepare print arguments.
+	VA_START(Marker, FormatString);
+	UnicodeVSPrint(Buffer, DEBUG_MESSAGE_LENGTH, FormatString, Marker);
+	VA_END(Marker);
+
+	// Output message and pause for a little while.
+	if ((gST != NULL) && (gST->ConOut != NULL)) {
+		gST->ConOut->OutputString(gST->ConOut, Buffer);
+	}
+
+	FreePool(Buffer);
+}
+
+
+VOID
+PrintError(
+	IN CONST	CHAR16	*FormatString,
+	...)
 {
 	EFI_STATUS						Status;
 	VA_LIST							Marker;
-	CHAR16							Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+	CHAR16							Buffer[DEBUG_MESSAGE_LENGTH];
 	EFI_CONSOLE_CONTROL_SCREEN_MODE	CurrentMode;
-
-	if (MessageLevel < DebugLevel) {
-		return;
-	}
 
 	// Switch to text mode if possible, otherwise assume it is already set.
 	if (ConsoleControl != NULL) {
@@ -666,12 +658,25 @@ PrintMessage(
 	
 	// Prepare print arguments.
 	VA_START(Marker, FormatString);
-	UnicodeVSPrint(Buffer, MAX_DEBUG_MESSAGE_LENGTH, FormatString, Marker);
+	UnicodeVSPrint(Buffer, DEBUG_MESSAGE_LENGTH, FormatString, Marker);
 	VA_END(Marker);
 
 	// Output message.
-	if ((gST != NULL) && (gST->StdErr != NULL)) {
-		gST->StdErr->OutputString(gST->StdErr, Buffer);
-		gBS->Stall(DEBUG_MESSAGE_DELAY_MS * 1000);
+	if ((gST != NULL) && (gST->ConOut != NULL)) {
+		gST->ConOut->OutputString(gST->ConOut, Buffer);
 	}
+}
+
+
+VOID
+WaitForEnter()
+{
+	EFI_INPUT_KEY	Key;
+	UINTN			EventIndex;
+
+	gST->ConIn->Reset(gST->ConIn, FALSE);
+	do {
+		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
+		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
+	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);	
 }

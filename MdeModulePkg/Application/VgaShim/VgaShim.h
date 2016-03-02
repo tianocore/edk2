@@ -53,11 +53,11 @@ typedef enum
 
 BOOLEAN
 ShowStaticLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl);
+	VOID);
 
 BOOLEAN
 ShowAnimatedLogo(
-	IN	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl);
+	VOID);
 
 BOOLEAN
 CanWriteAtAddress(
@@ -77,12 +77,8 @@ ShimVesaInformation(
 	IN	EFI_PHYSICAL_ADDRESS	StartAddress, 
 	OUT	EFI_PHYSICAL_ADDRESS	*EndAddress);
 
-BOOLEAN
-IsSetupMode(
-	VOID);
-
-BOOLEAN
-IsResidentMode(
+VOID
+WaitForEnter(
 	VOID);
 
 /**
