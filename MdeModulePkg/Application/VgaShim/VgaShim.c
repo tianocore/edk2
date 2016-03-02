@@ -2,7 +2,7 @@
 #include "Display.h"
 #include "Util.h"
 #include "Filesystem.h"
-#include "LegacyVgaBios.h"
+#include "External/LegacyVgaBios.h"
 #include "Int10hHandler.h"
 #include "BootflagSimple.h"
 #include "Version.h"

@@ -16,7 +16,7 @@
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/UgaDraw.h>
-#include "ConsoleControl.h"
+#include "External/ConsoleControl.h"
 
 
 /**

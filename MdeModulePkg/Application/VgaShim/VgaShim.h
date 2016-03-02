@@ -22,7 +22,7 @@
 #include <Protocol/LegacyRegion2.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleTextInEx.h>
-#include "ConsoleControl.h"
+#include "External/ConsoleControl.h"
 
 
 /**
