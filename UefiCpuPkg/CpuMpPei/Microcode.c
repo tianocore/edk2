@@ -1,7 +1,7 @@
 /** @file
   Implementation of loading microcode on processors.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -57,7 +57,6 @@ MicrocodeDetect (
   UINTN                                   TotalSize;
   UINT32                                  CheckSum32;
   BOOLEAN                                 CorrectMicrocode;
-  INT32                                   CurrentSignature;
   MICROCODE_INFO                          MicrocodeInfo;
 
   ZeroMem (&MicrocodeInfo, sizeof (MICROCODE_INFO));
@@ -181,17 +180,20 @@ MicrocodeDetect (
 
   if (LatestRevision > 0) {
     //
-    // Get microcode update signature of currently loaded microcode update
+    // BIOS only authenticate updates that contain a numerically larger revision
+    // than the currently loaded revision, where Current Signature < New Update
+    // Revision. A processor with no loaded update is considered to have a
+    // revision equal to zero.
     //
-    CurrentSignature = GetCurrentMicrocodeSignature ();
-    //
-    // If no microcode update has been loaded, then trigger microcode load.
-    //
-    if (CurrentSignature == 0) {
+    if (LatestRevision > GetCurrentMicrocodeSignature ()) {
       AsmWriteMsr64 (
         EFI_MSR_IA32_BIOS_UPDT_TRIG,
         (UINT64) (UINTN) MicrocodeInfo.MicrocodeData
         );
+      //
+      // Get and verify new microcode signature
+      //
+      ASSERT (LatestRevision == GetCurrentMicrocodeSignature ());
       MicrocodeInfo.Load = TRUE;
     } else {
       MicrocodeInfo.Load = FALSE;
