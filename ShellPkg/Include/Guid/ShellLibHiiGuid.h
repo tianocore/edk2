@@ -1,7 +1,7 @@
 /** @file
   GUIDs for HII package list installed by Shell libraries.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,6 +54,12 @@
   { \
     0xf3d301bb, 0xf4a5, 0x45a8, { 0xb0, 0xb7, 0xfa, 0x99, 0x9c, 0x62, 0x37, 0xae } \
   }
+
+#define SHELL_NETWORK2_HII_GUID \
+  { \
+    0x174b2b5, 0xf505, 0x4b12, { 0xaa, 0x60, 0x59, 0xdf, 0xf8, 0xd6, 0xea, 0x37 } \
+  }
+
 #define SHELL_TFTP_HII_GUID \
   { \
     0x738a9314, 0x82c1, 0x4592, { 0x8f, 0xf7, 0xc1, 0xbd, 0xf1, 0xb2, 0x0e, 0xd4 } \
@@ -73,6 +79,7 @@ extern EFI_GUID gShellLevel1HiiGuid;
 extern EFI_GUID gShellLevel2HiiGuid;
 extern EFI_GUID gShellLevel3HiiGuid;
 extern EFI_GUID gShellNetwork1HiiGuid;
+extern EFI_GUID gShellNetwork2HiiGuid;
 extern EFI_GUID gShellTftpHiiGuid;
 extern EFI_GUID gShellBcfgHiiGuid;
 
