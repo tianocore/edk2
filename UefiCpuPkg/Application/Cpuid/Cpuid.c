@@ -210,8 +210,8 @@ CpuidVersionInfo (
   CPUID_VERSION_INFO_EBX  Ebx;
   CPUID_VERSION_INFO_ECX  Ecx;
   CPUID_VERSION_INFO_EDX  Edx;
-  UINTN                   DisplayFamily;
-  UINTN                   DisplayModel;
+  UINT32                  DisplayFamily;
+  UINT32                  DisplayModel;
 
   AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, &Ebx.Uint32, &Ecx.Uint32, &Edx.Uint32);
 
