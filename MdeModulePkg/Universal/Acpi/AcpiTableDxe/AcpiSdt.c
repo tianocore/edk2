@@ -1,7 +1,7 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1041,54 +1041,6 @@ FindPath (
 }
 
 /**
-  ExitPmAuth Protocol notification event handler.
-
-  @param[in] Event    Event whose notification function is being invoked.
-  @param[in] Context  Pointer to the notification function's context.
-**/
-VOID
-EFIAPI
-ExitPmAuthNotification (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  EFI_STATUS Status;
-  VOID       *DxeSmmReadyToLock;
-
-  //
-  // Add more check to locate protocol after got event, because
-  // the library will signal this event immediately once it is register
-  // just in case it is already installed.
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiDxeSmmReadyToLockProtocolGuid,
-                  NULL,
-                  &DxeSmmReadyToLock
-                  );
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-
-  //
-  // Uninstall ACPI SDT protocol, so that we can make sure no one update ACPI table from API level.
-  //
-  Status = gBS->UninstallProtocolInterface (
-                  mHandle,
-                  &gEfiAcpiSdtProtocolGuid,
-                  &mPrivateData->AcpiSdtProtocol
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Close event, so it will not be invoked again.
-  //
-  gBS->CloseEvent (Event);
-
-  return ;
-}
-
-/**
   This function initializes AcpiSdt protocol in ACPI table instance.
 
   @param[in]  AcpiTableInstance       Instance to construct
@@ -1098,22 +1050,10 @@ SdtAcpiTableAcpiSdtConstructor (
   IN EFI_ACPI_TABLE_INSTANCE   *AcpiTableInstance
   )
 {
-  VOID *Registration;
 
   InitializeListHead (&AcpiTableInstance->NotifyList);
   CopyMem (&AcpiTableInstance->AcpiSdtProtocol, &mAcpiSdtProtocolTemplate, sizeof(mAcpiSdtProtocolTemplate));
   AcpiTableInstance->AcpiSdtProtocol.AcpiVersion = (EFI_ACPI_TABLE_VERSION)PcdGet32 (PcdAcpiExposedTableVersions);
-
-  //
-  // Register event for ExitPmAuth, so that we can uninstall ACPI SDT protocol after ExitPmAuth.
-  //
-  EfiCreateProtocolNotifyEvent (
-    &gEfiDxeSmmReadyToLockProtocolGuid,
-    TPL_CALLBACK,
-    ExitPmAuthNotification,
-    NULL,
-    &Registration
-    );
 
   return ;
 }

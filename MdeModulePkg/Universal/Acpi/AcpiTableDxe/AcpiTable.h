@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Driver
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,7 +21,6 @@
 #include <Protocol/AcpiTable.h>
 #include <Guid/Acpi.h>
 #include <Protocol/AcpiSystemDescriptionTable.h>
-#include <Protocol/DxeSmmReadyToLock.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
