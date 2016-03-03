@@ -50,7 +50,7 @@ TimerConstructor (
     if (PcdGet32 (PcdArmArchTimerFreqInHz) != 0) {
       //
       // Check if ticks/uS is not 0. The Architectural timer runs at constant
-      // frequency, irrespective of CPU frequency. According to General Timer
+      // frequency, irrespective of CPU frequency. According to Generic Timer
       // Ref manual, lower bound of the frequency is in the range of 1-10MHz.
       //
       ASSERT (TICKS_PER_MICRO_SEC);
@@ -69,14 +69,14 @@ TimerConstructor (
     }
 
     //
-    // Architectural Timer Frequency must be set in the Secure privileged
+    // Architectural Timer Frequency must be set in Secure privileged
     // mode (if secure extension is supported).
     // If the reset value (0) is returned, just ASSERT.
     //
     ASSERT (ArmGenericTimerGetTimerFreq () != 0);
 
   } else {
-    DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library can not be used.\n"));
+    DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library cannot be used.\n"));
     ASSERT (0);
   }
 
@@ -111,7 +111,7 @@ GetPlatformTimerFreq (
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
-  @return The value of MicroSeconds inputted.
+  @return The value of MicroSeconds input.
 
 **/
 UINTN
@@ -123,7 +123,7 @@ MicroSecondDelay (
   UINT64 TimerTicks64;
   UINT64 SystemCounterVal;
 
-  // Calculate counter ticks that can represent requested delay:
+  // Calculate counter ticks that represent requested delay:
   //  = MicroSeconds x TICKS_PER_MICRO_SEC
   //  = MicroSeconds x Frequency.10^-6
   TimerTicks64 = DivU64x32 (
@@ -139,7 +139,7 @@ MicroSecondDelay (
 
   TimerTicks64 += SystemCounterVal;
 
-  // Wait until delay count is expired.
+  // Wait until delay count expires.
   while (SystemCounterVal < TimerTicks64) {
     SystemCounterVal = ArmGenericTimerGetSystemCount ();
   }
@@ -230,12 +230,12 @@ GetPerformanceCounterProperties (
   )
 {
   if (StartValue != NULL) {
-    // Timer starts with the reload value
+    // Timer starts at 0
     *StartValue = (UINT64)0ULL ;
   }
 
   if (EndValue != NULL) {
-    // Timer counts down to 0x0
+    // Timer counts up.
     *EndValue = 0xFFFFFFFFFFFFFFFFUL;
   }
 
