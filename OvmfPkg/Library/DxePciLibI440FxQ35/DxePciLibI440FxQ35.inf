@@ -1,0 +1,47 @@
+## @file
+#  An instance of the PCI Library that is based on both the PCI CF8 Library and
+#  the PCI Express Library.
+#
+#  This PciLib instance caches the OVMF platform type (I440FX vs. Q35) in
+#  its entry point function, then delegates function calls to one of the
+#  PciCf8Lib or PciExpressLib "backends" as appropriate.
+#
+#  Copyright (C) 2016, Red Hat, Inc.
+#
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials are licensed and made available
+#  under the terms and conditions of the BSD License which accompanies this
+#  distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
+#  IMPLIED.
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxePciLibI440FxQ35
+  FILE_GUID                      = 5360bff6-3911-4495-ae3c-b02ff004b585
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = InitializeConfigAccessMethod
+
+#  VALID_ARCHITECTURES           = IA32 X64
+
+[Sources]
+  PciLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  PciCf8Lib
+  PciExpressLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
