@@ -1,4 +1,5 @@
 #include "Display.h"
+#include "Util.h"
 
 
 /**
@@ -54,7 +55,7 @@ InitializeDisplay()
 	//
 	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&DisplayInfo.GOP);
 	if (!EFI_ERROR(Status)) {
-		Print(L"%a: Found a GOP protocol provider\n", __FUNCTION__);
+		PrintDebug(L"Found a GOP protocol provider\n");
 		DisplayInfo.HorizontalResolution = DisplayInfo.GOP->Mode->Info->HorizontalResolution;
 		DisplayInfo.VerticalResolution = DisplayInfo.GOP->Mode->Info->VerticalResolution;
 		DisplayInfo.PixelFormat = DisplayInfo.GOP->Mode->Info->PixelFormat;
@@ -75,10 +76,10 @@ InitializeDisplay()
 	DisplayInfo.GOP = NULL;
 	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&DisplayInfo.UGA);
 	if (!EFI_ERROR(Status)) {
-		Print(L"%a: Found a UGA protocol provider\n", __FUNCTION__);
+		PrintDebug(L"Found a UGA protocol provider\n");
 		Status = DisplayInfo.UGA->GetMode(DisplayInfo.UGA, &DisplayInfo.HorizontalResolution, &DisplayInfo.VerticalResolution, &Temp1, &Temp2);
 		if (EFI_ERROR(Status)) {
-			Print(L"%a: Unable to get current UGA mode\n", __FUNCTION__);
+			PrintDebug(L"Unable to get current UGA mode\n");
 			DisplayInfo.UGA = NULL;
 			goto Exit;
 		}
@@ -126,16 +127,15 @@ CalculatePositionForCenter(
 	OUT	UINTN	*PositionY)
 {
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		Print(L"%a: No graphics device found, unable to calculate position\n", __FUNCTION__);
+		PrintDebug(L"No graphics device found, unable to calculate position\n");
 		return EFI_DEVICE_ERROR;
 	}
 
 	if (ImageWidth == 0 || ImageHeight == 0 
 		|| ImageWidth > DisplayInfo.HorizontalResolution
 		|| ImageHeight > DisplayInfo.VerticalResolution) {
-		Print(L"%a: Wrong image size (%ux%u) for this screen resolution (%ux%u)\n", 
-			__FUNCTION__, ImageWidth, ImageHeight, 
-			DisplayInfo.HorizontalResolution, DisplayInfo.VerticalResolution);
+		PrintDebug(L"Wrong image size (%ux%u) for this screen resolution (%ux%u)\n", 
+			ImageWidth, ImageHeight, DisplayInfo.HorizontalResolution, DisplayInfo.VerticalResolution);
 		return EFI_INVALID_PARAMETER;
 	}
 
@@ -146,6 +146,8 @@ CalculatePositionForCenter(
 		*PositionX = DisplayInfo.HorizontalResolution - ImageWidth;
 	if (*PositionY + ImageHeight > DisplayInfo.VerticalResolution)
 		*PositionY = DisplayInfo.VerticalResolution - ImageHeight;
+
+	PrintDebug(L"Top left corner position for centered image: %u,%u\n", PositionX, PositionY);
 
 	return EFI_SUCCESS;
 }
@@ -193,12 +195,12 @@ PrintVideoInfo()
 		return;
 	}
 
-	Print(L"%a: HorizontalResolution = %u\n", __FUNCTION__, DisplayInfo.HorizontalResolution);
-	Print(L"%a: VerticalResolution = %u\n", __FUNCTION__, DisplayInfo.VerticalResolution);
-	Print(L"%a: PixelFormat = %u\n", __FUNCTION__, DisplayInfo.PixelFormat);
-	Print(L"%a: PixelsPerScanLine = %u\n", __FUNCTION__, DisplayInfo.PixelsPerScanLine);
-	Print(L"%a: FrameBufferBase = %x\n", __FUNCTION__, DisplayInfo.FrameBufferBase);
-	Print(L"%a: FrameBufferSize = %u\n", __FUNCTION__, DisplayInfo.FrameBufferSize);
+	PrintDebug(L"HorizontalResolution = %u\n", DisplayInfo.HorizontalResolution);
+	PrintDebug(L"VerticalResolution = %u\n", DisplayInfo.VerticalResolution);
+	PrintDebug(L"PixelFormat = %u\n", DisplayInfo.PixelFormat);
+	PrintDebug(L"PixelsPerScanLine = %u\n", DisplayInfo.PixelsPerScanLine);
+	PrintDebug(L"FrameBufferBase = %x\n", DisplayInfo.FrameBufferBase);
+	PrintDebug(L"FrameBufferSize = %u\n", DisplayInfo.FrameBufferSize);
 }
 
 
@@ -262,6 +264,9 @@ DestroyImage(
   Converts bytes of a bitmap file into a memory representation
   useful for other graphics in-memory operations.
 
+  Any error messages will only be printed on the debug console
+  and only the error code returned to caller.
+
   @param[in] FileData      Pointer to the first byte of file contents.
   @param[in] FileSizeBytes Total number of bytes available at the
                            specified location.
@@ -292,7 +297,7 @@ BmpFileToImage(
 
 	// Sanity checks.
 	if (FileData == NULL || FileSizeBytes < sizeof(BMP_HEADER)) {
-		Print(L"%a: File too small or does not exist, aborting\n", __FUNCTION__);
+		PrintDebug(L"File too small or does not exist\n");
 		return EFI_INVALID_PARAMETER;
 	}
 
@@ -308,7 +313,7 @@ BmpFileToImage(
 		
 	*Result = CreateImage(BmpHeader->Width, BmpHeader->Height);
 	if (*Result == NULL) {
-		Print(L"%a: Unable to create image, aborting\n", __FUNCTION__);
+		PrintDebug(L"Unable to allocate enough memory for image\n");
 		return EFI_OUT_OF_RESOURCES;
 	}
 	
@@ -320,7 +325,8 @@ BmpFileToImage(
 	
 	// Check if we have enough pixel data.
 	if (BmpHeader->PixelDataOffset + BmpHeader->Height * LineSizeBytes > FileSizeBytes) {
-		Print(L"%a: Not enough pixel data, aborting\n", __FUNCTION__);
+		PrintDebug(L"Not enough pixel data (%u bytes, expected %u)\n", 
+			FileSizeBytes, BmpHeader->PixelDataOffset + BmpHeader->Height * LineSizeBytes);
 		DestroyImage((IMAGE *)*Result);
 		return EFI_INVALID_PARAMETER;
 	}
@@ -342,8 +348,8 @@ BmpFileToImage(
 		}
 	}
 
-	Print(L"%a: Successfully imported image size %ux%u from bmp file\n", 
-		__FUNCTION__, ((IMAGE *)*Result)->Width, ((IMAGE *)*Result)->Height);
+	PrintDebug(L"Successfully imported image size %ux%u from bmp file\n", 
+		((IMAGE *)*Result)->Width, ((IMAGE *)*Result)->Height);
 	return EFI_SUCCESS;
 }
 
@@ -363,7 +369,7 @@ ClearScreen()
 	FillColor.Reserved	= 0;
 
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		Print(L"%a: No graphics device found, unable to clear screen\n", __FUNCTION__);
+		PrintDebug(L"No graphics device found, unable to clear screen\n");
 		return;
 	}
 
@@ -396,16 +402,17 @@ DrawImage(
 	IN	UINTN	SpriteY)
 {
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		Print(L"%a: No graphics device found, unable to draw image\n", __FUNCTION__);
+		PrintDebug(L"No graphics device found, unable to draw image\n");
 		return;
 	}
 
 	if (Image == NULL || DrawWidth == 0 || DrawHeight == 0) {
+		PrintDebug(L"No image to draw\n");
 		return;
 	}
 	if ((ScreenX + DrawWidth) > DisplayInfo.HorizontalResolution 
 		|| (ScreenY + DrawHeight) > DisplayInfo.VerticalResolution) {
-		Print(L"%a: Image too big to draw on screen\n", __FUNCTION__);
+		PrintDebug(L"Image too big to draw on screen\n");
 		return;
 	}
 
@@ -434,7 +441,7 @@ DrawImageCentered(
 	UINTN		PositionY;
 
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		Print(L"%a: No graphics device found, unable to draw centered image\n", __FUNCTION__);
+		PrintDebug(L"No graphics device found, unable to draw centered image\n");
 		return;
 	}
 	Status = CalculatePositionForCenter(Image->Width, Image->Height, &PositionX, &PositionY);

@@ -69,6 +69,9 @@ ChangeExtension(
   Checks whether a file located at a specified path exists on the 
   filesystem where the VgaShim executable is located.
 
+  Any error messages will only be printed on the debug console
+  and only the error code returned to caller.
+
   @param[in] FilePath     Pointer to a string representing a file
                           path whose existence will be checked.
 
@@ -89,18 +92,28 @@ FileExists(
 
 	// Open volume where VgaShim lives.
 	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
-	if (EFI_ERROR(Status))
-		return FALSE;
+	if (EFI_ERROR(Status)) {
+		PrintDebug(L"Unable to open simple file system protocol (error: %r)\n", Status);
+		return Status;
+	} else {
+		PrintDebug(L"Opened simple file system protocol\n");
+	}
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
-	if (EFI_ERROR(Status))
-		return FALSE;
+	if (EFI_ERROR(Status)) {
+		PrintDebug(L"Unable to open volume (error: %r)\n", Status);
+		return Status;
+	} else {
+		PrintDebug(L"Opened volume\n");
+	}
 
 	// Try to open file for reading.
 	Status = VolumeRoot->Open(VolumeRoot, &RequestedFile, FilePath, EFI_FILE_MODE_READ, 0);
 	if (EFI_ERROR(Status)) {
+		PrintDebug(L"Unable to open file '%s' for reading (error: %r)\n", FilePath, Status);
 		VolumeRoot->Close(VolumeRoot);
 		return FALSE;
 	} else {
+		PrintDebug(L"Opened file '%s' for reading\n", FilePath);
 		RequestedFile->Close(RequestedFile);
 		VolumeRoot->Close(VolumeRoot);
 		return TRUE;
@@ -111,6 +124,9 @@ FileExists(
 /**
   Reads a file located at a specified path on the filesystem 
   where the VgaShim executable is located into a buffer.
+
+  Any error messages will only be printed on the debug console
+  and only the error code returned to caller.
 
   @param[in] FilePath      Pointer to a string representing a file
                            path that will be the base for the
@@ -145,37 +161,59 @@ FileRead(
 
 	// Open volume where VgaShim lives.
 	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
-	if (EFI_ERROR(Status))
+	if (EFI_ERROR(Status)) {
+		PrintDebug(L"Unable to open simple file system protocol (error: %r)\n", Status);
 		return Status;
+	} else {
+		PrintDebug(L"Opened simple file system protocol\n");
+	}
+		
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
-	if (EFI_ERROR(Status))
+	if (EFI_ERROR(Status)) {
+		PrintDebug(L"Unable to open volume (error: %r)\n", Status);
 		return Status;
-
+	} else {
+		PrintDebug(L"Opened volume\n");
+	}
+	
 	// Try to open file for reading.
 	Status = VolumeRoot->Open(VolumeRoot, &File, FilePath, EFI_FILE_MODE_READ, 0);
 	if (EFI_ERROR(Status)) {
+		PrintDebug(L"Unable to open file '%s' for reading (error: %r)\n", FilePath, Status);
 		VolumeRoot->Close(VolumeRoot);
 		return Status;
+	} else {
+		PrintDebug(L"Opened file '%s' for reading\n", FilePath);
 	}
 
 	// First gather information on total file size.
 	File->GetInfo(File, &gEfiFileInfoGuid, &Size, NULL);
 	FileInfo = AllocatePool(Size);
-	if (FileInfo == NULL)
+	if (FileInfo == NULL) {
+		PrintDebug(L"Unable to allocate %u bytes for file info\n", Size);
 		return EFI_OUT_OF_RESOURCES;
+	} else {
+		PrintDebug(L"Allocated %u bytes for file info\n", Size);
+	}
 	File->GetInfo(File, &gEfiFileInfoGuid, &Size, FileInfo);
 	Size = FileInfo->FileSize;
 	FreePool(FileInfo);
 
-	// Allocate a buffer and read the entire file into it.
+	// Allocate a buffer...
 	*FileContents = AllocatePool(Size);
-	Print(L"%a: Reading %u bytes of %s ... ", __FUNCTION__, Size, FilePath);
+	if (*FileContents == NULL) {
+		PrintDebug(L"Unable to allocate %u bytes for file contents\n", Size);
+	} else {
+		PrintDebug(L"Allocated %u bytes for file contents\n", Size);
+	}
+
+	// ... and read the entire file into it.
 	Status = File->Read(File, &Size, *FileContents);
 	if (EFI_ERROR(Status)) {
-		Print(L"unsuccessful (error: %r)\n", Status);
+		PrintDebug(L"Unable to read file contents (error: %r)\n", Status);
 		FreePool(*FileContents);
 	} else {
-		Print(L"successful\n");
+		PrintDebug(L"Read file contents\n", Status);
 		*FileBytes = Size;
 	}
 	
@@ -199,12 +237,11 @@ Launch(
 	// Try to load the image first.
 	//
 	FilePathOnDevice = FileDevicePath(VgaShimImageInfo->DeviceHandle, FilePath);
-	Print(L"%a: Loading '%s' ... ", __FUNCTION__, ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
 	Status = gBS->LoadImage(FALSE, VgaShimImage, FilePathOnDevice, NULL, 0, &FileImageHandle);
 	if (EFI_ERROR(Status)) {
-		Print(L"unsuccessful (error: %r)\n", Status);
+		PrintError(L"Unable to load '%s'\n", ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
 	} else {
-		Print(L"successful\n");
+		PrintDebug(L"Loaded '%s'\n", ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
 	}
 	
 	// 
@@ -212,8 +249,11 @@ Launch(
 	//
 	gBS->HandleProtocol(FileImageHandle, &gEfiLoadedImageProtocolGuid, (VOID *)&FileImageInfo);
 	if (EFI_ERROR(Status) || FileImageInfo->ImageCodeType != EfiLoaderCode) {
+		PrintError(L"File does not match an EFI loader code\n");
 		gBS->UnloadImage(FileImageHandle);
 		return EFI_UNSUPPORTED;
+	} else {
+		PrintDebug(L"File matches an EFI loader code\n");
 	}
 	
 	//
@@ -221,7 +261,7 @@ Launch(
 	//
 	Status = gBS->StartImage(FileImageHandle, NULL, NULL);
 	if (EFI_ERROR(Status)) {
-		Print(L"%a: Unable to start image (error: %r)\n", __FUNCTION__, Status);
+		PrintError(L"Unable to start image (error: %r)\n", Status);
 	}
 
 	return Status;
