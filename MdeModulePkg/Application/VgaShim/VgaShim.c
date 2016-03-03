@@ -45,8 +45,10 @@ UefiMain (
 	EFI_INPUT_KEY			Key;
 	CHAR16					*LaunchPath = NULL;
 
-	// Give user time to press 'v'.
-	//gBS->Stall(1000 * 500);
+	//
+	// Give user time to press 'v' to enter debug mode.
+	//
+	gBS->Stall(1000 * 500);
 
 	//
 	// Initialization.
@@ -70,9 +72,7 @@ UefiMain (
 		DebugMode = TRUE;
 	}
 	if (DebugMode) {
-		Print(L"Attempting PrintDebug...\n");
-		Print(L"VGA Shim v%s\n", L"0.9");
-		PrintDebug(L"VGA Shim v%s\n", L"0.9");
+		PrintDebug(L"VGA Shim v%s\n", VERSION);
 		PrintDebug(L"You are running in debug mode, press Enter to continue\n");
 		WaitForEnter();
 	}
@@ -213,7 +213,7 @@ ShimVesaInformation(
 	// Get basic video hardware information first.
 	//
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		Print(L"%a: No adapters were found, unable to fill in VESA information\n", __FUNCTION__);
+		PrintError(L"No adapters were found, unable to fill in VESA information\n");
 		return EFI_NOT_FOUND;
 	}
 	
@@ -318,8 +318,7 @@ ShimVesaInformation(
 		VbeModeInfo->BlueMaskPosLinear = 16;		// blue offset
 		VbeModeInfo->ReservedMaskPosLinear = 24;	// alpha offset
 	} else {
-		Print(L"%a: Unsupported value of PixelFormat (%d), aborting\n", 
-			__FUNCTION__, DisplayInfo.PixelFormat);
+		PrintError(L"Unsupported value of PixelFormat (%d), aborting\n", DisplayInfo.PixelFormat);
 		return EFI_UNSUPPORTED;
 	}
 	
@@ -355,11 +354,10 @@ IsInt10HandlerDefined()
 	Int10Handler = (Int10Entry->Segment << 4) + Int10Entry->Offset;
 
 	if (Int10Handler >= VGA_ROM_ADDRESS && Int10Handler < (VGA_ROM_ADDRESS+VGA_ROM_SIZE)) {
-		PrintDebug(L"%a: Int10h handler found at %04x:%04x\n", 
-			__FUNCTION__, Int10Entry->Segment, Int10Entry->Offset);
+		PrintDebug(L"Int10h handler found at %04x:%04x\n", Int10Entry->Segment, Int10Entry->Offset);
 		return TRUE;
 	} else {
-		PrintDebug(L"%a: No existing Int10h handler found\n", __FUNCTION__);
+		PrintDebug(L"No existing Int10h handler found\n");
 		return FALSE;
 	}
 }
@@ -394,10 +392,10 @@ EnsureMemoryLock(
 	// Check if we need to perform any operation.
 	// 
 	if (Operation == UNLOCK && CanWriteAtAddress(StartAddress)) {
-		Print(L"%a: Memory at %x already unlocked\n", __FUNCTION__, StartAddress);
+		PrintDebug(L"Memory at %x already unlocked\n", StartAddress);
 		Status = EFI_SUCCESS;
 	} else if (Operation == LOCK && !CanWriteAtAddress(StartAddress)) {
-		Print(L"%a: Memory at %x already locked\n", __FUNCTION__, StartAddress);
+		PrintDebug(L"Memory at %x already locked\n", StartAddress);
 		Status = EFI_SUCCESS;
 	}
 
@@ -415,8 +413,7 @@ EnsureMemoryLock(
 				Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 			}
 
-			Print(L"%a: %s %s memory at %x with EfiLegacyRegionProtocol\n", 
-				__FUNCTION__, 
+			PrintDebug(L"%s %s memory at %x with EfiLegacyRegionProtocol\n", 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
 				Operation == UNLOCK ? L"unlocking" : L"locking", 
 				StartAddress);
@@ -437,8 +434,7 @@ EnsureMemoryLock(
 				Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 			}
 
-			Print(L"%a: %s %s memory at %x with EfiLegacyRegion2Protocol\n", 
-				__FUNCTION__, 
+			PrintDebug(L"%s %s memory at %x with EfiLegacyRegion2Protocol\n", 
 				EFI_ERROR(Status) ? L"Failure" : L"Success",
 				Operation == UNLOCK ? L"unlocking" : L"locking", 
 				StartAddress);
@@ -457,8 +453,7 @@ EnsureMemoryLock(
 			Status = CanWriteAtAddress(StartAddress) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 		}
 
-		Print(L"%a: %s %s memory at %x with MTRRs\n", 
-			__FUNCTION__, 
+		PrintDebug(L"%s %s memory at %x with MTRRs\n", 
 			EFI_ERROR(Status) ? "Failure" : "Success",
 			Operation == UNLOCK ? "unlocking" : "locking", 
 			StartAddress);
@@ -468,8 +463,8 @@ EnsureMemoryLock(
 	// None of the methods worked?
 	// 
 	if (EFI_ERROR(Status)) {
-		Print(L"%a: Unable to find a way to %s memory at %x\n", 
-			__FUNCTION__, Operation == UNLOCK ? "unlock" : "lock", StartAddress);
+		PrintError(L"Unable to find a way to %s memory at %x\n", 
+			Operation == UNLOCK ? "unlock" : "lock", StartAddress);
 	}
 	
 	return Status;
@@ -569,7 +564,7 @@ ShowAnimatedLogo()
 	UINT8		*BmpFileContents;
 	UINTN		BmpFileBytes;
 	IMAGE		*WindowsFlag;
-
+	
 	// Check if <MyName>.bmp exists
 	Status = ChangeExtension(
 		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImageInfo->FilePath, FALSE, FALSE)), 
@@ -608,63 +603,57 @@ ShowAnimatedLogo()
 
 
 VOID
-PrintDebug(
+EFIAPI
+PrintFuncNameMessage(
+	IN CONST	BOOLEAN	IsError,
+	IN CONST	CHAR8	*FuncName,
 	IN CONST	CHAR16	*FormatString,
 	...)
 {
 	VA_LIST							Marker;
-	//CHAR16							Buffer[DEBUG_MESSAGE_LENGTH];
-	CHAR16 *Buffer;
+	CHAR16							*Buffer;
+	UINTN							BufferSize;
+	EFI_STATUS						Status;
+	EFI_CONSOLE_CONTROL_SCREEN_MODE	CurrentMode;
 
-	if (!DebugMode) {
+	if (!(IsError || DebugMode)) {
 		return;
 	}
 
-	//gST->ConOut->SetAttribute(gST->ConOut, EFI_LIGHTMAGENTA);
-
-	Buffer = (CHAR16 *)AllocatePool(DEBUG_MESSAGE_LENGTH * sizeof(CHAR16));
-
-	// Prepare print arguments.
-	VA_START(Marker, FormatString);
-	UnicodeVSPrint(Buffer, DEBUG_MESSAGE_LENGTH, FormatString, Marker);
-	VA_END(Marker);
-
-	// Output message and pause for a little while.
-	if ((gST != NULL) && (gST->ConOut != NULL)) {
-		gST->ConOut->OutputString(gST->ConOut, Buffer);
-	}
-
-	FreePool(Buffer);
-}
-
-
-VOID
-PrintError(
-	IN CONST	CHAR16	*FormatString,
-	...)
-{
-	EFI_STATUS						Status;
-	VA_LIST							Marker;
-	CHAR16							Buffer[DEBUG_MESSAGE_LENGTH];
-	EFI_CONSOLE_CONTROL_SCREEN_MODE	CurrentMode;
-
-	// Switch to text mode if possible, otherwise assume it is already set.
-	if (ConsoleControl != NULL) {
+	//
+	// Switch to text mode if needed and possible.
+	//
+	if (IsError && ConsoleControl != NULL) {
 		Status = ConsoleControl->GetMode(ConsoleControl, &CurrentMode, NULL, NULL);
 		if (!EFI_ERROR(Status) && CurrentMode != EfiConsoleControlScreenText) {
 			ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
 		}
 	}
 	
-	// Prepare print arguments.
+	//
+	// Generate the main message.
+	//
+	BufferSize = DEBUG_MESSAGE_LENGTH * sizeof(CHAR16);
+	Buffer = (CHAR16 *)AllocatePool(BufferSize);
 	VA_START(Marker, FormatString);
-	UnicodeVSPrint(Buffer, DEBUG_MESSAGE_LENGTH, FormatString, Marker);
+	UnicodeVSPrint(Buffer, BufferSize, FormatString, Marker);
 	VA_END(Marker);
 
-	// Output message.
+	//
+	// Output using apropriate colors.
+	//
+	gST->ConOut->SetAttribute(gST->ConOut, EFI_DARKGRAY);
+	AsciiPrint("%.10a ", FuncName);
+	gST->ConOut->SetAttribute(gST->ConOut, IsError ? EFI_YELLOW : EFI_LIGHTGRAY);
 	if ((gST != NULL) && (gST->ConOut != NULL)) {
 		gST->ConOut->OutputString(gST->ConOut, Buffer);
 	}
+
+	//
+	// Cleanup.
+	//
+	gST->ConOut->SetAttribute(gST->ConOut, EFI_LIGHTGRAY);
+	FreePool(Buffer);
 }
 
 
