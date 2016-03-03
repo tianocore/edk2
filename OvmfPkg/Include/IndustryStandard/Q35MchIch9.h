@@ -33,6 +33,14 @@
 #define MCH_GGC               0x52
 #define MCH_GGC_IVD             BIT1
 
+#define MCH_PCIEXBAR_LOW      0x60
+#define MCH_PCIEXBAR_LOWMASK    0x0FFFFFFF
+#define MCH_PCIEXBAR_BUS_FF     0
+#define MCH_PCIEXBAR_EN         BIT0
+
+#define MCH_PCIEXBAR_HIGH     0x64
+#define MCH_PCIEXBAR_HIGHMASK   0xFFFFFFF0
+
 #define MCH_SMRAM             0x9D
 #define MCH_SMRAM_D_LCK         BIT4
 #define MCH_SMRAM_G_SMRAME      BIT3
