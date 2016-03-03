@@ -15,12 +15,12 @@
 #
 # Import Modules
 #
+import argparse
 import os.path
 import re
 import StringIO
 import subprocess
 import sys
-from optparse import OptionParser
 
 
 class UnsupportedConversion(Exception):
@@ -45,20 +45,20 @@ class CommonUtils:
 
     def __init__(self, clone=None):
         if clone is None:
-            (self.Opt, self.Args) = self.ProcessCommandLine()
+            self.args = self.ProcessCommandLine()
         else:
-            (self.Opt, self.Args) = (clone.Opt, clone.Args)
+            self.args = clone.args
 
         self.unsupportedSyntaxSeen = False
-        self.src = self.Args[0]
+        self.src = self.args.source
         assert(os.path.exists(self.src))
         self.dirmode = os.path.isdir(self.src)
         srcExt = os.path.splitext(self.src)[1]
         assert (self.dirmode or srcExt != '.nasm')
         self.infmode = not self.dirmode and srcExt == '.inf'
-        self.diff = self.Opt.diff
-        self.git = self.Opt.git
-        self.force = self.Opt.force
+        self.diff = self.args.diff
+        self.git = self.args.git
+        self.force = self.args.force
 
         if clone is None:
             self.rootdir = os.getcwd()
@@ -69,27 +69,22 @@ class CommonUtils:
             self.gitemail = clone.gitemail
 
     def ProcessCommandLine(self):
-        Parser = OptionParser(description=self.__copyright__,
-                              version=self.__version__,
-                              prog=sys.argv[0],
-                              usage=self.__usage__
-                              )
-        Parser.add_option("-q", "--quiet", action="store_true", type=None,
-                          help="Disable all messages except FATAL ERRORS.")
-        Parser.add_option("--git", action="store_true", type=None,
-                          help="Use git to create commits for each file converted")
-        Parser.add_option("--diff", action="store_true", type=None,
-                          help="Show diff of conversion")
-        Parser.add_option("-f", "--force", action="store_true", type=None,
-                          help="Force conversion even if unsupported")
+        parser = argparse.ArgumentParser(description=self.__copyright__)
+        parser.add_argument('--version', action='version',
+                            version='%(prog)s ' + self.VersionNumber)
+        parser.add_argument("-q", "--quiet", action="store_true",
+                            help="Disable all messages except FATAL ERRORS.")
+        parser.add_argument("--git", action="store_true",
+                            help="Use git to create commits for each file converted")
+        parser.add_argument("--diff", action="store_true",
+                            help="Show diff of conversion")
+        parser.add_argument("-f", "--force", action="store_true",
+                            help="Force conversion even if unsupported")
+        parser.add_argument('source', help='MASM input file')
+        parser.add_argument('dest', nargs='?',
+                            help='NASM output file (default=input.nasm; - for stdout)')
 
-        (Opt, Args) = Parser.parse_args()
-
-        if not Opt.quiet:
-            print self.__copyright__
-            Parser.print_version()
-
-        return (Opt, Args)
+        return parser.parse_args()
 
     def RootRelative(self, path):
         result = path
@@ -185,7 +180,7 @@ class CommonUtils:
         if not self.git or not self.gitdir:
             return
 
-        if not self.Opt.quiet:
+        if not self.args.quiet:
             print 'Committing: Conversion of', dst
 
         prefix = ' '.join(filter(lambda a: a, [pkg, module]))
@@ -235,7 +230,7 @@ class ConvertAsmFile(CommonUtils):
             self.output = sys.stdout
         else:
             self.output = StringIO.StringIO()
-        if not self.Opt.quiet:
+        if not self.args.quiet:
             dirpath, src = os.path.split(self.inputFilename)
             dirpath = self.RootRelative(dirpath)
             dst = os.path.basename(self.outputFilename)
@@ -811,11 +806,11 @@ class ConvertInfFile(CommonUtils):
                 self.UpdateInfAsmFile(dst)
                 didSomething = True
             except UnsupportedConversion:
-                if not self.Opt.quiet:
+                if not self.args.quiet:
                     print 'MASM=>NASM conversion unsupported for', dst
                 notConverted.append(dst)
             except NoSourceFile:
-                if not self.Opt.quiet:
+                if not self.args.quiet:
                     print 'Source file missing for', reldst
                 notConverted.append(dst)
             except UnsupportedArch:
@@ -823,11 +818,11 @@ class ConvertInfFile(CommonUtils):
             else:
                 if didSomething:
                     self.ConversionFinished(dst)
-        if len(notConverted) > 0 and not self.Opt.quiet:
+        if len(notConverted) > 0 and not self.args.quiet:
             for dst in notConverted:
                 reldst = self.RootRelative(dst)
                 print 'Unabled to convert', reldst
-        if unsupportedArchCount > 0 and not self.Opt.quiet:
+        if unsupportedArchCount > 0 and not self.args.quiet:
             print 'Skipped', unsupportedArchCount, 'files based on architecture'
 
     def UpdateInfAsmFile(self, dst, IgnoreMissingAsm=False):
@@ -921,11 +916,11 @@ class ConvertInfFiles(CommonUtils):
                     inf.UpdateInfAsmFile(reldst, IgnoreMissingAsm=didSomething)
                     didSomething = True
             except UnsupportedConversion:
-                if not self.Opt.quiet:
+                if not self.args.quiet:
                     print 'MASM=>NASM conversion unsupported for', reldst
                 notConverted.append(dst)
             except NoSourceFile:
-                if not self.Opt.quiet:
+                if not self.args.quiet:
                     print 'Source file missing for', reldst
                 notConverted.append(dst)
             except UnsupportedArch:
@@ -933,11 +928,11 @@ class ConvertInfFiles(CommonUtils):
             else:
                 if didSomething:
                     inf.ConversionFinished(reldst)
-        if len(notConverted) > 0 and not self.Opt.quiet:
+        if len(notConverted) > 0 and not self.args.quiet:
             for dst in notConverted:
                 reldst = self.RootRelative(dst)
                 print 'Unabled to convert', reldst
-        if unsupportedArchCount > 0 and not self.Opt.quiet:
+        if unsupportedArchCount > 0 and not self.args.quiet:
             print 'Skipped', unsupportedArchCount, 'files based on architecture'
 
 
@@ -970,19 +965,13 @@ class ConvertAsmApp(CommonUtils):
     def __init__(self):
         CommonUtils.__init__(self)
 
-        numArgs = len(self.Args)
-        assert(numArgs >= 1)
+        src = self.args.source
+        dst = self.args.dest
         if self.infmode:
-            ConvertInfFiles(self.Args, self)
+            ConvertInfFiles(src, self)
         elif self.dirmode:
-            ConvertDirectories(self.Args, self)
+            ConvertDirectories((src,), self)
         elif not self.dirmode:
-            assert(numArgs <= 2)
-            src = self.Args[0]
-            if numArgs > 1:
-                dst = self.Args[1]
-            else:
-                dst = None
             ConvertAsmFile(src, dst, self)
 
 ConvertAsmApp()
