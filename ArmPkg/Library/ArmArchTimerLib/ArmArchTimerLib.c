@@ -24,6 +24,14 @@
 
 #define TICKS_PER_MICRO_SEC     (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
 
+// Select appropriate multiply function for platform architecture.
+#ifdef MDE_CPU_ARM
+#define MultU64xN MultU64x32
+#else
+#define MultU64xN MultU64x64
+#endif
+
+
 RETURN_STATUS
 EFIAPI
 TimerConstructor (
@@ -76,6 +84,28 @@ TimerConstructor (
   return RETURN_SUCCESS;
 }
 
+/**
+  A local utility function that returns the PCD value, if specified.
+  Otherwise it defaults to ArmGenericTimerGetTimerFreq.
+
+  @return The timer frequency.
+
+**/
+STATIC
+UINTN
+EFIAPI
+GetPlatformTimerFreq (
+  )
+{
+  UINTN TimerFreq;
+
+  TimerFreq = PcdGet32 (PcdArmArchTimerFreqInHz);
+  if (TimerFreq == 0) {
+    TimerFreq = ArmGenericTimerGetTimerFreq ();
+  }
+  return TimerFreq;
+}
+
 
 /**
   Stalls the CPU for the number of microseconds specified by MicroSeconds.
@@ -93,23 +123,6 @@ MicroSecondDelay (
 {
   UINT64 TimerTicks64;
   UINT64 SystemCounterVal;
-  UINT64 (EFIAPI
-          *MultU64xN) (
-            IN UINT64 Multiplicand,
-            IN UINTN  Multiplier
-            );
-  UINTN TimerFreq;
-
-#ifdef MDE_CPU_ARM
-  MultU64xN = MultU64x32;
-#else
-  MultU64xN = MultU64x64;
-#endif
-
-  TimerFreq = PcdGet32 (PcdArmArchTimerFreqInHz);
-  if (TimerFreq == 0) {
-    TimerFreq = ArmGenericTimerGetTimerFreq ();
-  }
 
   // Calculate counter ticks that can represent requested delay:
   //  = MicroSeconds x TICKS_PER_MICRO_SEC
@@ -117,7 +130,7 @@ MicroSecondDelay (
   TimerTicks64 = DivU64x32 (
                    MultU64xN (
                      MicroSeconds,
-                     TimerFreq
+                     GetPlatformTimerFreq ()
                      ),
                    1000000U
                    );
