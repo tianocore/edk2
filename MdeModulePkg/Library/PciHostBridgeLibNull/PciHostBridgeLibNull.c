@@ -41,11 +41,10 @@ PciHostBridgeGetRootBridges (
 }
 
 /**
-  Free the root bridge instances array returned from
-  PciHostBridgeGetRootBridges().
+  Free the root bridge instances array returned from PciHostBridgeGetRootBridges().
 
-  @param  The root bridge instances array.
-  @param  The count of the array.
+  @param Bridges The root bridge instances array.
+  @param Count   The count of the array.
 **/
 VOID
 EFIAPI
