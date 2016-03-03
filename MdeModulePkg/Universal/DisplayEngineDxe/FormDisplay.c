@@ -3731,7 +3731,6 @@ UiDisplayMenu (
   @param   MenuOptionList         Point to the menu option list which need to be free.
 
 **/
-
 VOID
 FreeMenuOptionData(
   LIST_ENTRY           *MenuOptionList
