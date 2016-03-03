@@ -42,7 +42,6 @@ TimerConstructor (
   // Check if the ARM Generic Timer Extension is implemented.
   //
   if (ArmIsArchTimerImplemented ()) {
-    UINTN TimerFreq;
 
     //
     // Check if Architectural Timer frequency is pre-determined by the platform
@@ -74,8 +73,8 @@ TimerConstructor (
     // mode (if secure extension is supported).
     // If the reset value (0) is returned, just ASSERT.
     //
-    TimerFreq = ArmGenericTimerGetTimerFreq ();
-    ASSERT (TimerFreq != 0);
+    ASSERT (ArmGenericTimerGetTimerFreq () != 0);
+
   } else {
     DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library can not be used.\n"));
     ASSERT (0);
