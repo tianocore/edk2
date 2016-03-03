@@ -94,6 +94,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
 
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 

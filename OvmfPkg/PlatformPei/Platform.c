@@ -212,17 +212,20 @@ MemMapInitialization (
 
   if (!mXen) {
     UINT32  TopOfLowRam;
+    UINT64  PciExBarBase;
     UINT32  PciBase;
     UINT32  PciSize;
 
     TopOfLowRam = GetSystemMemorySizeBelow4gb ();
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
       //
-      // On Q35 machine types that QEMU intends to support in the long term,
-      // QEMU never lets the RAM below 4 GB exceed 2 GB.
+      // The MMCONFIG area is expected to fall between the top of low RAM and
+      // the base of the 32-bit PCI host aperture.
       //
-      PciBase = BASE_2GB;
-      ASSERT (TopOfLowRam <= PciBase);
+      PciExBarBase = FixedPcdGet64 (PcdPciExpressBaseAddress);
+      ASSERT (TopOfLowRam <= PciExBarBase);
+      ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
+      PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
     } else {
       PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
     }
@@ -248,6 +251,30 @@ MemMapInitialization (
     AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
       AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
+      //
+      // Note: there should be an
+      //
+      //   AddIoMemoryBaseSizeHob (PciExBarBase, SIZE_256MB);
+      //
+      // call below, just like the one above for RCBA. However, Linux insists
+      // that the MMCONFIG area be marked in the E820 or UEFI memory map as
+      // "reserved memory" -- Linux does not content itself with a simple gap
+      // in the memory map wherever the MCFG ACPI table points to.
+      //
+      // This appears to be a safety measure. The PCI Firmware Specification
+      // (rev 3.1) says in 4.1.2. "MCFG Table Description": "The resources can
+      // *optionally* be returned in [...] EFIGetMemoryMap as reserved memory
+      // [...]". (Emphasis added here.)
+      //
+      // Normally we add memory resource descriptor HOBs in
+      // QemuInitializeRam(), and pre-allocate from those with memory
+      // allocation HOBs in InitializeRamRegions(). However, the MMCONFIG area
+      // is most definitely not RAM; so, as an exception, cover it with
+      // uncacheable reserved memory right here.
+      //
+      AddReservedMemoryBaseSizeHob (PciExBarBase, SIZE_256MB, FALSE);
+      BuildMemoryAllocationHob (PciExBarBase, SIZE_256MB,
+        EfiReservedMemoryType);
     }
     AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
   }
@@ -314,6 +341,47 @@ NoexecDxeInitialization (
 {
   UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdPropertiesTableEnable);
   UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdSetNxForStack);
+}
+
+VOID
+PciExBarInitialization (
+  VOID
+  )
+{
+  union {
+    UINT64 Uint64;
+    UINT32 Uint32[2];
+  } PciExBarBase;
+
+  //
+  // We only support the 256MB size for the MMCONFIG area:
+  // 256 buses * 32 devices * 8 functions * 4096 bytes config space.
+  //
+  // The masks used below enforce the Q35 requirements that the MMCONFIG area
+  // be (a) correctly aligned -- here at 256 MB --, (b) located under 64 GB.
+  //
+  // Note that (b) also ensures that the minimum address width we have
+  // determined in AddressWidthInitialization(), i.e., 36 bits, will suffice
+  // for DXE's page tables to cover the MMCONFIG area.
+  //
+  PciExBarBase.Uint64 = FixedPcdGet64 (PcdPciExpressBaseAddress);
+  ASSERT ((PciExBarBase.Uint32[1] & MCH_PCIEXBAR_HIGHMASK) == 0);
+  ASSERT ((PciExBarBase.Uint32[0] & MCH_PCIEXBAR_LOWMASK) == 0);
+
+  //
+  // Clear the PCIEXBAREN bit first, before programming the high register.
+  //
+  PciWrite32 (DRAMC_REGISTER_Q35 (MCH_PCIEXBAR_LOW), 0);
+
+  //
+  // Program the high register. Then program the low register, setting the
+  // MMCONFIG area size and enabling decoding at once.
+  //
+  PciWrite32 (DRAMC_REGISTER_Q35 (MCH_PCIEXBAR_HIGH), PciExBarBase.Uint32[1]);
+  PciWrite32 (
+    DRAMC_REGISTER_Q35 (MCH_PCIEXBAR_LOW),
+    PciExBarBase.Uint32[0] | MCH_PCIEXBAR_BUS_FF | MCH_PCIEXBAR_EN
+    );
 }
 
 VOID
@@ -393,6 +461,11 @@ MiscInitialization (
       POWER_MGMT_REGISTER_Q35 (ICH9_RCBA),
       ICH9_ROOT_COMPLEX_BASE | ICH9_RCBA_EN
       );
+
+    //
+    // Set PCI Express Register Range Base Address
+    //
+    PciExBarInitialization ();
   }
 }
 
