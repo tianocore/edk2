@@ -213,7 +213,7 @@ ShimVesaInformation(
 	// Get basic video hardware information first.
 	//
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		PrintError(L"No adapters were found, unable to fill in VESA information\n");
+		PrintError(L"No display adapters were found, unable to fill in VESA information\n");
 		return EFI_NOT_FOUND;
 	}
 	

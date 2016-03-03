@@ -93,10 +93,10 @@ FileExists(
 	// Open volume where VgaShim lives.
 	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
 	if (EFI_ERROR(Status)) {
-		PrintDebug(L"Unable to open simple file system protocol (error: %r)\n", Status);
+		PrintDebug(L"Unable to find simple file system protocol (error: %r)\n", Status);
 		return Status;
 	} else {
-		PrintDebug(L"Opened simple file system protocol\n");
+		PrintDebug(L"Found simple file system protocol\n");
 	}
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
 	if (EFI_ERROR(Status)) {
@@ -162,10 +162,10 @@ FileRead(
 	// Open volume where VgaShim lives.
 	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
 	if (EFI_ERROR(Status)) {
-		PrintDebug(L"Unable to open simple file system protocol (error: %r)\n", Status);
+		PrintDebug(L"Unable to find simple file system protocol (error: %r)\n", Status);
 		return Status;
 	} else {
-		PrintDebug(L"Opened simple file system protocol\n");
+		PrintDebug(L"Found simple file system protocol\n");
 	}
 		
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
@@ -239,7 +239,8 @@ Launch(
 	FilePathOnDevice = FileDevicePath(VgaShimImageInfo->DeviceHandle, FilePath);
 	Status = gBS->LoadImage(FALSE, VgaShimImage, FilePathOnDevice, NULL, 0, &FileImageHandle);
 	if (EFI_ERROR(Status)) {
-		PrintError(L"Unable to load '%s'\n", ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
+		PrintError(L"Unable to load '%s' (error: %r)\n", 
+			ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE), Status);
 	} else {
 		PrintDebug(L"Loaded '%s'\n", ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
 	}
@@ -249,11 +250,11 @@ Launch(
 	//
 	gBS->HandleProtocol(FileImageHandle, &gEfiLoadedImageProtocolGuid, (VOID *)&FileImageInfo);
 	if (EFI_ERROR(Status) || FileImageInfo->ImageCodeType != EfiLoaderCode) {
-		PrintError(L"File does not match an EFI loader code\n");
+		PrintError(L"File does not match an EFI loader signature\n");
 		gBS->UnloadImage(FileImageHandle);
 		return EFI_UNSUPPORTED;
 	} else {
-		PrintDebug(L"File matches an EFI loader code\n");
+		PrintDebug(L"File matches an EFI loader signature\n");
 	}
 	
 	//

@@ -55,7 +55,7 @@ InitializeDisplay()
 	//
 	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&DisplayInfo.GOP);
 	if (!EFI_ERROR(Status)) {
-		PrintDebug(L"Found a GOP protocol provider\n");
+		PrintDebug(L"Found a GOP display adapter\n");
 		DisplayInfo.HorizontalResolution = DisplayInfo.GOP->Mode->Info->HorizontalResolution;
 		DisplayInfo.VerticalResolution = DisplayInfo.GOP->Mode->Info->VerticalResolution;
 		DisplayInfo.PixelFormat = DisplayInfo.GOP->Mode->Info->PixelFormat;
@@ -68,6 +68,8 @@ InitializeDisplay()
 		DisplayInfo.Protocol = GOP;
 		DisplayInfo.AdapterFound = TRUE;
 		goto Exit;
+	} else {
+		PrintDebug(L"GOP display adapter not found\n");
 	}
 
 	//
@@ -76,12 +78,14 @@ InitializeDisplay()
 	DisplayInfo.GOP = NULL;
 	Status = gBS->HandleProtocol(gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&DisplayInfo.UGA);
 	if (!EFI_ERROR(Status)) {
-		PrintDebug(L"Found a UGA protocol provider\n");
+		PrintDebug(L"Found a UGA display adapter\n");
 		Status = DisplayInfo.UGA->GetMode(DisplayInfo.UGA, &DisplayInfo.HorizontalResolution, &DisplayInfo.VerticalResolution, &Temp1, &Temp2);
 		if (EFI_ERROR(Status)) {
-			PrintDebug(L"Unable to get current UGA mode\n");
+			PrintError(L"Unable to get current UGA mode (error: %r)\n", Status);
 			DisplayInfo.UGA = NULL;
 			goto Exit;
+		} else {
+			PrintDebug(L"Received current UGA mode information\n");
 		}
 		DisplayInfo.PixelFormat = PixelBlueGreenRedReserved8BitPerColor; // default for UGA
 		// TODO: find framebuffer base
@@ -89,9 +93,14 @@ InitializeDisplay()
 		// https://github.com/coreos/grub/blob/master/grub-core%2Fvideo%2Fefi_uga.c
 		DisplayInfo.Protocol = UGA;
 		DisplayInfo.AdapterFound = TRUE;
+	} else {
+		PrintDebug(L"UGA display adapter not found\n");
 	}
 
 Exit:
+	if (!DisplayInfo.AdapterFound) {
+		PrintError(L"No display adapters found\n", Status);
+	}
 	DisplayInfo.Initialized = TRUE;
 	return Status;
 }
@@ -127,7 +136,7 @@ CalculatePositionForCenter(
 	OUT	UINTN	*PositionY)
 {
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		PrintDebug(L"No graphics device found, unable to calculate position\n");
+		PrintDebug(L"No display adapters found, unable to calculate centered position\n");
 		return EFI_DEVICE_ERROR;
 	}
 
@@ -192,6 +201,7 @@ VOID
 PrintVideoInfo()
 {
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
+		PrintDebug(L"No display adapters found, unable to print display information\n");
 		return;
 	}
 
@@ -313,7 +323,8 @@ BmpFileToImage(
 		
 	*Result = CreateImage(BmpHeader->Width, BmpHeader->Height);
 	if (*Result == NULL) {
-		PrintDebug(L"Unable to allocate enough memory for image\n");
+		PrintDebug(L"Unable to allocate enough memory for image size %ux%u\n", 
+			BmpHeader->Width, BmpHeader->Height);
 		return EFI_OUT_OF_RESOURCES;
 	}
 	
@@ -369,7 +380,7 @@ ClearScreen()
 	FillColor.Reserved	= 0;
 
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		PrintDebug(L"No graphics device found, unable to clear screen\n");
+		PrintDebug(L"No display adapters found, unable to clear screen\n");
 		return;
 	}
 
@@ -402,7 +413,7 @@ DrawImage(
 	IN	UINTN	SpriteY)
 {
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		PrintDebug(L"No graphics device found, unable to draw image\n");
+		PrintDebug(L"No display adapters found, unable to draw image\n");
 		return;
 	}
 
@@ -441,7 +452,7 @@ DrawImageCentered(
 	UINTN		PositionY;
 
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
-		PrintDebug(L"No graphics device found, unable to draw centered image\n");
+		PrintDebug(L"No display adapters found, unable to draw centered image\n");
 		return;
 	}
 	Status = CalculatePositionForCenter(Image->Width, Image->Height, &PositionX, &PositionY);
