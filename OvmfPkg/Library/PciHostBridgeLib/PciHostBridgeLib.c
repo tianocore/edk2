@@ -132,6 +132,13 @@ InitRootBridge (
   RootBus->MemAbove4G.Base      = 0;
   RootBus->MemAbove4G.Limit     = 0;
 
+  if (PcdGet64 (PcdPciMmio64Size) > 0) {
+    RootBus->AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
+    RootBus->MemAbove4G.Base       = PcdGet64 (PcdPciMmio64Base);
+    RootBus->MemAbove4G.Limit      = PcdGet64 (PcdPciMmio64Base) +
+                                     (PcdGet64 (PcdPciMmio64Size) - 1);
+  }
+
   RootBus->Bus.Base  = RootBusNumber;
   RootBus->Bus.Limit = MaxSubBusNumber;
   RootBus->Io.Base   = PcdGet64 (PcdPciIoBase);
