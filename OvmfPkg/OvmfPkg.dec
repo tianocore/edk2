@@ -131,6 +131,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT64|0x24
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT64|0x25
 
+  ## The 64-bit MMIO aperture shared by all PCI root bridges.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x26
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x27
+
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable|FALSE|BOOLEAN|3
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c

@@ -32,6 +32,7 @@ Module Name:
 #include <Library/PeimEntryPoint.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Library/MtrrLib.h>
+#include <Library/QemuFwCfgLib.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -97,8 +98,117 @@ GetFirstNonAddress (
   )
 {
   UINT64               FirstNonAddress;
+  UINT64               Pci64Base, Pci64Size;
+  CHAR8                MbString[7 + 1];
+  EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM FwCfgItem;
+  UINTN                FwCfgSize;
+  UINT64               HotPlugMemoryEnd;
 
   FirstNonAddress = BASE_4GB + GetSystemMemorySizeAbove4gb ();
+
+  //
+  // If DXE is 32-bit, then we're done; PciBusDxe will degrade 64-bit MMIO
+  // resources to 32-bit anyway. See DegradeResource() in
+  // "PciResourceSupport.c".
+  //
+#ifdef MDE_CPU_IA32
+  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+    return FirstNonAddress;
+  }
+#endif
+
+  //
+  // Otherwise, in order to calculate the highest address plus one, we must
+  // consider the 64-bit PCI host aperture too. Fetch the default size.
+  //
+  Pci64Size = PcdGet64 (PcdPciMmio64Size);
+
+  //
+  // See if the user specified the number of megabytes for the 64-bit PCI host
+  // aperture. The number of non-NUL characters in MbString allows for
+  // 9,999,999 MB, which is approximately 10 TB.
+  //
+  // As signaled by the "X-" prefix, this knob is experimental, and might go
+  // away at any time.
+  //
+  Status = QemuFwCfgFindFile ("opt/ovmf/X-PciMmio64Mb", &FwCfgItem,
+             &FwCfgSize);
+  if (!EFI_ERROR (Status)) {
+    if (FwCfgSize >= sizeof MbString) {
+      DEBUG ((EFI_D_WARN,
+        "%a: ignoring malformed 64-bit PCI host aperture size from fw_cfg\n",
+        __FUNCTION__));
+    } else {
+      QemuFwCfgSelectItem (FwCfgItem);
+      QemuFwCfgReadBytes (FwCfgSize, MbString);
+      MbString[FwCfgSize] = '\0';
+      Pci64Size = LShiftU64 (AsciiStrDecimalToUint64 (MbString), 20);
+    }
+  }
+
+  if (Pci64Size == 0) {
+    if (mBootMode != BOOT_ON_S3_RESUME) {
+      DEBUG ((EFI_D_INFO, "%a: disabling 64-bit PCI host aperture\n",
+        __FUNCTION__));
+      PcdSet64 (PcdPciMmio64Size, 0);
+    }
+
+    //
+    // There's nothing more to do; the amount of memory above 4GB fully
+    // determines the highest address plus one. The memory hotplug area (see
+    // below) plays no role for the firmware in this case.
+    //
+    return FirstNonAddress;
+  }
+
+  //
+  // The "etc/reserved-memory-end" fw_cfg file, when present, contains an
+  // absolute, exclusive end address for the memory hotplug area. This area
+  // starts right at the end of the memory above 4GB. The 64-bit PCI host
+  // aperture must be placed above it.
+  //
+  Status = QemuFwCfgFindFile ("etc/reserved-memory-end", &FwCfgItem,
+             &FwCfgSize);
+  if (!EFI_ERROR (Status) && FwCfgSize == sizeof HotPlugMemoryEnd) {
+    QemuFwCfgSelectItem (FwCfgItem);
+    QemuFwCfgReadBytes (FwCfgSize, &HotPlugMemoryEnd);
+
+    ASSERT (HotPlugMemoryEnd >= FirstNonAddress);
+    FirstNonAddress = HotPlugMemoryEnd;
+  }
+
+  //
+  // SeaBIOS aligns both boundaries of the 64-bit PCI host aperture to 1GB, so
+  // that the host can map it with 1GB hugepages. Follow suit.
+  //
+  Pci64Base = ALIGN_VALUE (FirstNonAddress, (UINT64)SIZE_1GB);
+  Pci64Size = ALIGN_VALUE (Pci64Size, (UINT64)SIZE_1GB);
+
+  //
+  // The 64-bit PCI host aperture should also be "naturally" aligned. The
+  // alignment is determined by rounding the size of the aperture down to the
+  // next smaller or equal power of two. That is, align the aperture by the
+  // largest BAR size that can fit into it.
+  //
+  Pci64Base = ALIGN_VALUE (Pci64Base, GetPowerOfTwo64 (Pci64Size));
+
+  if (mBootMode != BOOT_ON_S3_RESUME) {
+    //
+    // The core PciHostBridgeDxe driver will automatically add this range to
+    // the GCD memory space map through our PciHostBridgeLib instance; here we
+    // only need to set the PCDs.
+    //
+    PcdSet64 (PcdPciMmio64Base, Pci64Base);
+    PcdSet64 (PcdPciMmio64Size, Pci64Size);
+    DEBUG ((EFI_D_INFO, "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
+      __FUNCTION__, Pci64Base, Pci64Size));
+  }
+
+  //
+  // The useful address space ends with the 64-bit PCI host aperture.
+  //
+  FirstNonAddress = Pci64Base + Pci64Size;
   return FirstNonAddress;
 }
 

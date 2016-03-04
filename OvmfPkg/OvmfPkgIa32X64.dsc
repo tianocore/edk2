@@ -467,6 +467,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base|0x0
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
