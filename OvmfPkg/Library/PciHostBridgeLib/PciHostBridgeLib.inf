@@ -51,3 +51,4 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId

@@ -16,6 +16,7 @@
 #include <PiDxe.h>
 
 #include <IndustryStandard/Pci.h>
+#include <IndustryStandard/Q35MchIch9.h>
 
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciRootBridgeIo.h>
@@ -139,7 +140,8 @@ InitRootBridge (
   RootBus->Mem.Limit = PcdGet64 (PcdPciMmio32Base) +
                        (PcdGet64 (PcdPciMmio32Size) - 1);
 
-  RootBus->NoExtendedConfigSpace = TRUE;
+  RootBus->NoExtendedConfigSpace = (PcdGet16 (PcdOvmfHostBridgePciDevId) !=
+                                    INTEL_Q35_MCH_DEVICE_ID);
 
   DevicePath = AllocateCopyPool (sizeof mRootBridgeDevicePathTemplate,
                  &mRootBridgeDevicePathTemplate);
