@@ -425,7 +425,9 @@ InitializePciHostBridge (
                         MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
                         EFI_MEMORY_UC
                         );
-        ASSERT_EFI_ERROR (Status);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC to MMIO aperture - %r.\n", Status));
+        }
       }
     }
     //
