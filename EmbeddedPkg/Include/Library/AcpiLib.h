@@ -1,7 +1,7 @@
 /** @file
   Helper Library for ACPI
 
-  Copyright (c) 2014-2015, ARM Ltd. All rights reserved.
+  Copyright (c) 2014-2016, ARM Ltd. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -67,7 +67,7 @@
     ControlFramePhysicalAddress, WatchdogTimerGSIV, WatchdogTimerFlags)                                 \
   {                                                                                                     \
     EFI_ACPI_5_1_GTDT_SBSA_GENERIC_WATCHDOG, sizeof(EFI_ACPI_5_1_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE), \
-    EFI_ACPI_RESERVED_WORD, RefreshFramePhysicalAddress, ControlFramePhysicalAddress,                   \
+    EFI_ACPI_RESERVED_BYTE, RefreshFramePhysicalAddress, ControlFramePhysicalAddress,                   \
     WatchdogTimerGSIV, WatchdogTimerFlags                                                               \
   }
 
