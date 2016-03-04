@@ -2,7 +2,7 @@
   The implementation of EFI IPv4 Configuration II Protocol.
 
   Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1194,6 +1194,7 @@ Ip4Config2SetPolicy (
       //
       if (Instance->Dhcp4Event != NULL) {
         gBS->CloseEvent (Instance->Dhcp4Event);
+        Instance->Dhcp4Event = NULL;
       }
     }
   }
@@ -1997,6 +1998,7 @@ Ip4Config2CleanInstance (
   //
   if (Instance->Dhcp4Event != NULL) {
     gBS->CloseEvent (Instance->Dhcp4Event);
+    Instance->Dhcp4Event = NULL;
   }
 
   for (Index = 0; Index < Ip4Config2DataTypeMaximum; Index++) {
