@@ -1,8 +1,9 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
-  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>  
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -5443,7 +5444,10 @@ PrintInterpretedExtendedCompatibilityAer (
     Header->CorrectableErrorStatus,
     Header->CorrectableErrorMask,
     Header->AdvancedErrorCapabilitiesAndControl,
-    Header->HeaderLog,
+    Header->HeaderLog[0],
+    Header->HeaderLog[1],
+    Header->HeaderLog[2],
+    Header->HeaderLog[3],
     Header->RootErrorCommand,
     Header->RootErrorStatus,
     Header->ErrorSourceIdentification,
