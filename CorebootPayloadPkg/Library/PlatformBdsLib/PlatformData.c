@@ -23,7 +23,7 @@ UINT16                      gPlatformBootTimeOutDefault = 5;
 ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode = gPnp16550ComPort;
 UART_DEVICE_PATH           gUartDeviceNode            = gUart;
 VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode    = gPcAnsiTerminal;
-VENDOR_DEVICE_PATH         gUartDeviceVenderNode      = gUartVender;
+VENDOR_DEVICE_PATH         gUartDeviceVendorNode      = gUartVendor;
 //
 // Predefined platform root bridge
 //

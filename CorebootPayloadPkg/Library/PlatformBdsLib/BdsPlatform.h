@@ -38,7 +38,7 @@ extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformRootBridges[];
 extern ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode;
 extern UART_DEVICE_PATH           gUartDeviceNode;
 extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
-extern VENDOR_DEVICE_PATH         gUartDeviceVenderNode;
+extern VENDOR_DEVICE_PATH         gUartDeviceVendorNode;
 
 //
 //
@@ -83,7 +83,7 @@ extern VENDOR_DEVICE_PATH         gUartDeviceVenderNode;
 #define gPnp16550ComPort \
   PNPID_DEVICE_PATH_NODE(0x0501)
 
-#define gUartVender \
+#define gUartVendor \
   { \
     { \
       HARDWARE_DEVICE_PATH, \
