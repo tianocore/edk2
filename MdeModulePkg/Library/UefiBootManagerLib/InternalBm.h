@@ -92,8 +92,6 @@ typedef enum {
   BmMessageSataBoot,
   BmMessageUsbBoot,
   BmMessageScsiBoot,
-  BmMessageNetworkBoot,
-  BmMessageHttpBoot,
   BmMiscBoot
 } BM_BOOT_TYPE;
 

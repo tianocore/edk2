@@ -28,24 +28,19 @@ LIST_ENTRY mPlatformBootDescriptionHandlers = INITIALIZE_LIST_HEAD_VARIABLE (mPl
 /**
   For a bootable Device path, return its boot type.
 
-  @param  DevicePath                   The bootable device Path to check
+  @param  DevicePath        The bootable device Path to check
 
-  @retval AcpiFloppyBoot               If given device path contains ACPI_DEVICE_PATH type device path node
-                                       which HID is floppy device.
-  @retval MessageAtapiBoot             If given device path contains MESSAGING_DEVICE_PATH type device path node
-                                       and its last device path node's subtype is MSG_ATAPI_DP.
-  @retval MessageSataBoot              If given device path contains MESSAGING_DEVICE_PATH type device path node
-                                       and its last device path node's subtype is MSG_SATA_DP.
-  @retval MessageScsiBoot              If given device path contains MESSAGING_DEVICE_PATH type device path node
-                                       and its last device path node's subtype is MSG_SCSI_DP.
-  @retval MessageUsbBoot               If given device path contains MESSAGING_DEVICE_PATH type device path node
-                                       and its last device path node's subtype is MSG_USB_DP.
-  @retval MessageNetworkBoot           If given device path contains MESSAGING_DEVICE_PATH type device path node
-                                       and its last device path node's subtype is MSG_MAC_ADDR_DP, MSG_VLAN_DP,
-                                       MSG_IPv4_DP or MSG_IPv6_DP.
-  @retval MessageHttpBoot              If given device path contains MESSAGING_DEVICE_PATH type device path node
-                                       and its last device path node's subtype is MSG_URI_DP.
-  @retval UnsupportedBoot              If tiven device path doesn't match the above condition, it's not supported.
+  @retval AcpiFloppyBoot    If given device path contains ACPI_DEVICE_PATH type device path node
+                            which HID is floppy device.
+  @retval MessageAtapiBoot  If given device path contains MESSAGING_DEVICE_PATH type device path node
+                            and its last device path node's subtype is MSG_ATAPI_DP.
+  @retval MessageSataBoot   If given device path contains MESSAGING_DEVICE_PATH type device path node
+                            and its last device path node's subtype is MSG_SATA_DP.
+  @retval MessageScsiBoot   If given device path contains MESSAGING_DEVICE_PATH type device path node
+                            and its last device path node's subtype is MSG_SCSI_DP.
+  @retval MessageUsbBoot    If given device path contains MESSAGING_DEVICE_PATH type device path node
+                            and its last device path node's subtype is MSG_USB_DP.
+  @retval BmMiscBoot        If tiven device path doesn't match the above condition.
 
 **/
 BM_BOOT_TYPE
@@ -107,17 +102,6 @@ BmDevicePathType (
 
         case MSG_SCSI_DP:
           return BmMessageScsiBoot;
-          break;
-
-        case MSG_MAC_ADDR_DP:
-        case MSG_VLAN_DP:
-        case MSG_IPv4_DP:
-        case MSG_IPv6_DP:
-          return BmMessageNetworkBoot;
-          break;
-
-        case MSG_URI_DP:
-          return BmMessageHttpBoot;
           break;
         }
     }
@@ -352,6 +336,125 @@ BmGetUsbDescription (
 }
 
 /**
+  Return the description for network boot device.
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetNetworkDescription (
+  IN EFI_HANDLE                  Handle
+  )
+{
+  EFI_STATUS                     Status;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
+  MAC_ADDR_DEVICE_PATH           *Mac;
+  VLAN_DEVICE_PATH               *Vlan;
+  EFI_DEVICE_PATH_PROTOCOL       *Ip;
+  EFI_DEVICE_PATH_PROTOCOL       *Uri;
+  CHAR16                         *Description;
+  UINTN                          DescriptionSize;
+
+  Status = gBS->OpenProtocol (
+                  Handle,
+                  &gEfiLoadFileProtocolGuid,
+                  NULL,
+                  gImageHandle,
+                  Handle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Status = gBS->OpenProtocol (
+                  Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &DevicePath,
+                  gImageHandle,
+                  Handle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status) || (DevicePath == NULL)) {
+    return NULL;
+  }
+
+  //
+  // The PXE device path is like:
+  //   ....../Mac(...)[/Vlan(...)]
+  //   ....../Mac(...)[/Vlan(...)]/IPv4(...)
+  //   ....../Mac(...)[/Vlan(...)]/IPv6(...)
+  //
+  // The HTTP device path is like:
+  //   ....../Mac(...)[/Vlan(...)]/IPv4(...)/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)]/IPv6(...)/Uri(...)
+  //
+  while (!IsDevicePathEnd (DevicePath) &&
+         ((DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH) ||
+          (DevicePathSubType (DevicePath) != MSG_MAC_ADDR_DP))
+         ) {
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  if (IsDevicePathEnd (DevicePath)) {
+    return NULL;
+  }
+
+  Mac = (MAC_ADDR_DEVICE_PATH *) DevicePath;
+  DevicePath = NextDevicePathNode (DevicePath);
+
+  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+      (DevicePathSubType (DevicePath) == MSG_VLAN_DP)
+      ) {
+    Vlan = (VLAN_DEVICE_PATH *) DevicePath;
+    DevicePath = NextDevicePathNode (DevicePath);
+  } else {
+    Vlan = NULL;
+  }
+
+  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+      ((DevicePathSubType (DevicePath) == MSG_IPv4_DP) ||
+       (DevicePathSubType (DevicePath) == MSG_IPv6_DP))
+      ) {
+    Ip = DevicePath;
+    DevicePath = NextDevicePathNode (DevicePath);
+  } else {
+    Ip = NULL;
+  }
+
+  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+      (DevicePathSubType (DevicePath) == MSG_URI_DP)
+      ) {
+    Uri = DevicePath;
+    DevicePath = NextDevicePathNode (DevicePath);
+  } else {
+    Uri = NULL;
+  }
+
+  //
+  // Build description like below:
+  //   "PXEv6 (MAC:112233445566 VLAN1)"
+  //   "HTTPv4 (MAC:112233445566)"
+  //
+  DescriptionSize = sizeof (L"HTTPv6 (MAC:112233445566 VLAN65535)");
+  Description     = AllocatePool (DescriptionSize);
+  ASSERT (Description != NULL);
+  UnicodeSPrint (
+    Description, DescriptionSize,
+    (Vlan == NULL) ?
+    L"%sv%d (MAC:%02x%02x%02x%02x%02x%02x)" :
+    L"%sv%d (MAC:%02x%02x%02x%02x%02x%02x VLAN%d)",
+    (Uri == NULL) ? L"PXE" : L"HTTP",
+    ((Ip == NULL) || (DevicePathSubType (Ip) == MSG_IPv4_DP)) ? 4 : 6,
+    Mac->MacAddress.Addr[0], Mac->MacAddress.Addr[1], Mac->MacAddress.Addr[2],
+    Mac->MacAddress.Addr[3], Mac->MacAddress.Addr[4], Mac->MacAddress.Addr[5],
+    (Vlan == NULL) ? 0 : Vlan->VlanId
+    );
+  return Description;
+}
+
+/**
   Return the boot description for the controller based on the type.
 
   @param Handle                Controller handle.
@@ -398,14 +501,6 @@ BmGetMiscDescription (
     } else {
       Description = L"Misc Device";
     }
-    break;
-
-  case BmMessageNetworkBoot:
-    Description = L"Network";
-    break;
-
-  case BmMessageHttpBoot:
-    Description = L"Http";
     break;
 
   default:
@@ -463,6 +558,7 @@ EfiBootManagerRegisterBootDescriptionHandler (
 BM_GET_BOOT_DESCRIPTION mBmBootDescriptionHandlers[] = {
   BmGetUsbDescription,
   BmGetDescriptionFromDiskInfo,
+  BmGetNetworkDescription,
   BmGetMiscDescription
 };
 
