@@ -167,28 +167,6 @@ typedef struct {
 #define BM_HOTKEY_FROM_LINK(a) CR (a, BM_HOTKEY, Link, BM_HOTKEY_SIGNATURE)
 
 /**
-  Get the image file buffer data and buffer size by its device path. 
-
-  @param FilePath  On input, a pointer to an allocated buffer containing the device
-                   path of the file.
-                   On output the pointer could be NULL when the function fails to
-                   load the boot option, or could point to an allocated buffer containing
-                   the device path of the file.
-                   It could be updated by either short-form device path expanding,
-                   or default boot file path appending.
-                   Caller is responsible to free it when it's non-NULL.
-  @param FileSize  A pointer to the size of the file buffer.
-
-  @retval NULL   File is NULL, or FileSize is NULL. Or, the file can't be found.
-  @retval other  The file buffer. The caller is responsible to free the memory.
-**/
-VOID *
-BmLoadEfiBootOption (
-  IN OUT EFI_DEVICE_PATH_PROTOCOL **FilePath,
-  OUT    UINTN                    *FileSize
-  );
-
-/**
   Get the Option Number that wasn't used.
 
   @param  LoadOptionType      Load option type.
@@ -219,28 +197,6 @@ EFIAPI
 BmWriteBootToOsPerformanceData (
   IN EFI_EVENT  Event,
   IN VOID       *Context
-  );
-
-
-/**
-  Get the headers (dos, image, optional header) from an image
-
-  @param  Device                SimpleFileSystem device handle
-  @param  FileName              File name for the image
-  @param  DosHeader             Pointer to dos header
-  @param  Hdr                   The buffer in which to return the PE32, PE32+, or TE header.
-
-  @retval EFI_SUCCESS           Successfully get the machine type.
-  @retval EFI_NOT_FOUND         The file is not found.
-  @retval EFI_LOAD_ERROR        File is not a valid image file.
-
-**/
-EFI_STATUS
-BmGetImageHeader (
-  IN  EFI_HANDLE                  Device,
-  IN  CHAR16                      *FileName,
-  OUT EFI_IMAGE_DOS_HEADER        *DosHeader,
-  OUT EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr
   );
 
 /**
@@ -471,5 +427,30 @@ BmGetFileBufferFromLoadFileFileSystem (
   IN  EFI_HANDLE                      LoadFileHandle,
   OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
   OUT UINTN                           *FileSize
+  );
+
+/**
+  Return the boot description for the controller.
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetBootDescription (
+  IN EFI_HANDLE                  Handle
+  );
+
+/**
+  Enumerate all boot option descriptions and append " 2"/" 3"/... to make
+  unique description.
+
+  @param BootOptions            Array of boot options.
+  @param BootOptionCount        Count of boot options.
+**/
+VOID
+BmMakeBootOptionDescriptionUnique (
+  EFI_BOOT_MANAGER_LOAD_OPTION         *BootOptions,
+  UINTN                                BootOptionCount
   );
 #endif // _INTERNAL_BM_H_

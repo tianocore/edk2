@@ -1,0 +1,586 @@
+/** @file
+  Library functions which relate with boot option description.
+
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include "InternalBm.h"
+
+#define VENDOR_IDENTIFICATION_OFFSET     3
+#define VENDOR_IDENTIFICATION_LENGTH     8
+#define PRODUCT_IDENTIFICATION_OFFSET    11
+#define PRODUCT_IDENTIFICATION_LENGTH    16
+
+CONST UINT16 mBmUsbLangId    = 0x0409; // English
+CHAR16       mBmUefiPrefix[] = L"UEFI ";
+
+LIST_ENTRY mPlatformBootDescriptionHandlers = INITIALIZE_LIST_HEAD_VARIABLE (mPlatformBootDescriptionHandlers);
+
+/**
+  For a bootable Device path, return its boot type.
+
+  @param  DevicePath                   The bootable device Path to check
+
+  @retval AcpiFloppyBoot               If given device path contains ACPI_DEVICE_PATH type device path node
+                                       which HID is floppy device.
+  @retval MessageAtapiBoot             If given device path contains MESSAGING_DEVICE_PATH type device path node
+                                       and its last device path node's subtype is MSG_ATAPI_DP.
+  @retval MessageSataBoot              If given device path contains MESSAGING_DEVICE_PATH type device path node
+                                       and its last device path node's subtype is MSG_SATA_DP.
+  @retval MessageScsiBoot              If given device path contains MESSAGING_DEVICE_PATH type device path node
+                                       and its last device path node's subtype is MSG_SCSI_DP.
+  @retval MessageUsbBoot               If given device path contains MESSAGING_DEVICE_PATH type device path node
+                                       and its last device path node's subtype is MSG_USB_DP.
+  @retval MessageNetworkBoot           If given device path contains MESSAGING_DEVICE_PATH type device path node
+                                       and its last device path node's subtype is MSG_MAC_ADDR_DP, MSG_VLAN_DP,
+                                       MSG_IPv4_DP or MSG_IPv6_DP.
+  @retval MessageHttpBoot              If given device path contains MESSAGING_DEVICE_PATH type device path node
+                                       and its last device path node's subtype is MSG_URI_DP.
+  @retval UnsupportedBoot              If tiven device path doesn't match the above condition, it's not supported.
+
+**/
+BM_BOOT_TYPE
+BmDevicePathType (
+  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL      *Node;
+  EFI_DEVICE_PATH_PROTOCOL      *NextNode;
+
+  ASSERT (DevicePath != NULL);
+
+  for (Node = DevicePath; !IsDevicePathEndType (Node); Node = NextDevicePathNode (Node)) {
+    switch (DevicePathType (Node)) {
+
+      case ACPI_DEVICE_PATH:
+        if (EISA_ID_TO_NUM (((ACPI_HID_DEVICE_PATH *) Node)->HID) == 0x0604) {
+          return BmAcpiFloppyBoot;
+        }
+        break;
+
+      case HARDWARE_DEVICE_PATH:
+        if (DevicePathSubType (Node) == HW_CONTROLLER_DP) {
+          return BmHardwareDeviceBoot;
+        }
+        break;
+
+      case MESSAGING_DEVICE_PATH:
+        //
+        // Skip LUN device node
+        //
+        NextNode = Node;
+        do {
+          NextNode = NextDevicePathNode (NextNode);
+        } while (
+            (DevicePathType (NextNode) == MESSAGING_DEVICE_PATH) &&
+            (DevicePathSubType(NextNode) == MSG_DEVICE_LOGICAL_UNIT_DP)
+            );
+
+        //
+        // If the device path not only point to driver device, it is not a messaging device path,
+        //
+        if (!IsDevicePathEndType (NextNode)) {
+          continue;
+        }
+
+        switch (DevicePathSubType (Node)) {
+        case MSG_ATAPI_DP:
+          return BmMessageAtapiBoot;
+          break;
+
+        case MSG_SATA_DP:
+          return BmMessageSataBoot;
+          break;
+
+        case MSG_USB_DP:
+          return BmMessageUsbBoot;
+          break;
+
+        case MSG_SCSI_DP:
+          return BmMessageScsiBoot;
+          break;
+
+        case MSG_MAC_ADDR_DP:
+        case MSG_VLAN_DP:
+        case MSG_IPv4_DP:
+        case MSG_IPv6_DP:
+          return BmMessageNetworkBoot;
+          break;
+
+        case MSG_URI_DP:
+          return BmMessageHttpBoot;
+          break;
+        }
+    }
+  }
+
+  return BmMiscBoot;
+}
+
+/**
+  Eliminate the extra spaces in the Str to one space.
+
+  @param    Str     Input string info.
+**/
+VOID
+BmEliminateExtraSpaces (
+  IN CHAR16                    *Str
+  )
+{
+  UINTN                        Index;
+  UINTN                        ActualIndex;
+
+  for (Index = 0, ActualIndex = 0; Str[Index] != L'\0'; Index++) {
+    if ((Str[Index] != L' ') || ((ActualIndex > 0) && (Str[ActualIndex - 1] != L' '))) {
+      Str[ActualIndex++] = Str[Index];
+    }
+  }
+  Str[ActualIndex] = L'\0';
+}
+
+/**
+  Try to get the controller's ATA/ATAPI description.
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetDescriptionFromDiskInfo (
+  IN EFI_HANDLE                Handle
+  )
+{
+  UINTN                        Index;
+  EFI_STATUS                   Status;
+  EFI_DISK_INFO_PROTOCOL       *DiskInfo;
+  UINT32                       BufferSize;
+  EFI_ATAPI_IDENTIFY_DATA      IdentifyData;
+  EFI_SCSI_INQUIRY_DATA        InquiryData;
+  CHAR16                       *Description;
+  UINTN                        Length;
+  CONST UINTN                  ModelNameLength    = 40;
+  CONST UINTN                  SerialNumberLength = 20;
+  CHAR8                        *StrPtr;
+  UINT8                        Temp;
+
+  Description  = NULL;
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiDiskInfoProtocolGuid,
+                  (VOID **) &DiskInfo
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  if (CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoAhciInterfaceGuid) ||
+      CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoIdeInterfaceGuid)) {
+    BufferSize   = sizeof (EFI_ATAPI_IDENTIFY_DATA);
+    Status = DiskInfo->Identify (
+                         DiskInfo,
+                         &IdentifyData,
+                         &BufferSize
+                         );
+    if (!EFI_ERROR (Status)) {
+      Description = AllocateZeroPool ((ModelNameLength + SerialNumberLength + 2) * sizeof (CHAR16));
+      ASSERT (Description != NULL);
+      for (Index = 0; Index + 1 < ModelNameLength; Index += 2) {
+        Description[Index]     = (CHAR16) IdentifyData.ModelName[Index + 1];
+        Description[Index + 1] = (CHAR16) IdentifyData.ModelName[Index];
+      }
+
+      Length = Index;
+      Description[Length++] = L' ';
+
+      for (Index = 0; Index + 1 < SerialNumberLength; Index += 2) {
+        Description[Length + Index]     = (CHAR16) IdentifyData.SerialNo[Index + 1];
+        Description[Length + Index + 1] = (CHAR16) IdentifyData.SerialNo[Index];
+      }
+      Length += Index;
+      Description[Length++] = L'\0';
+      ASSERT (Length == ModelNameLength + SerialNumberLength + 2);
+
+      BmEliminateExtraSpaces (Description);
+    }
+  } else if (CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoScsiInterfaceGuid)) {
+    BufferSize   = sizeof (EFI_SCSI_INQUIRY_DATA);
+    Status = DiskInfo->Inquiry (
+                         DiskInfo,
+                         &InquiryData,
+                         &BufferSize
+                         );
+    if (!EFI_ERROR (Status)) {
+      Description = AllocateZeroPool ((VENDOR_IDENTIFICATION_LENGTH + PRODUCT_IDENTIFICATION_LENGTH + 2) * sizeof (CHAR16));
+      ASSERT (Description != NULL);
+
+      //
+      // Per SCSI spec, EFI_SCSI_INQUIRY_DATA.Reserved_5_95[3 - 10] save the Verdor identification
+      // EFI_SCSI_INQUIRY_DATA.Reserved_5_95[11 - 26] save the product identification,
+      // Here combine the vendor identification and product identification to the description.
+      //
+      StrPtr = (CHAR8 *) (&InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET]);
+      Temp = StrPtr[VENDOR_IDENTIFICATION_LENGTH];
+      StrPtr[VENDOR_IDENTIFICATION_LENGTH] = '\0';
+      AsciiStrToUnicodeStr (StrPtr, Description);
+      StrPtr[VENDOR_IDENTIFICATION_LENGTH] = Temp;
+
+      //
+      // Add one space at the middle of vendor information and product information.
+      //
+      Description[VENDOR_IDENTIFICATION_LENGTH] = L' ';
+
+      StrPtr = (CHAR8 *) (&InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET]);
+      StrPtr[PRODUCT_IDENTIFICATION_LENGTH] = '\0';
+      AsciiStrToUnicodeStr (StrPtr, Description + VENDOR_IDENTIFICATION_LENGTH + 1);
+
+      BmEliminateExtraSpaces (Description);
+    }
+  }
+
+  return Description;
+}
+
+/**
+  Try to get the controller's USB description.
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetUsbDescription (
+  IN EFI_HANDLE                Handle
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_USB_IO_PROTOCOL          *UsbIo;
+  CHAR16                       NullChar;
+  CHAR16                       *Manufacturer;
+  CHAR16                       *Product;
+  CHAR16                       *SerialNumber;
+  CHAR16                       *Description;
+  EFI_USB_DEVICE_DESCRIPTOR    DevDesc;
+  UINTN                        DescMaxSize;
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiUsbIoProtocolGuid,
+                  (VOID **) &UsbIo
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  NullChar = L'\0';
+
+  Status = UsbIo->UsbGetDeviceDescriptor (UsbIo, &DevDesc);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Status = UsbIo->UsbGetStringDescriptor (
+                    UsbIo,
+                    mBmUsbLangId,
+                    DevDesc.StrManufacturer,
+                    &Manufacturer
+                    );
+  if (EFI_ERROR (Status)) {
+    Manufacturer = &NullChar;
+  }
+
+  Status = UsbIo->UsbGetStringDescriptor (
+                    UsbIo,
+                    mBmUsbLangId,
+                    DevDesc.StrProduct,
+                    &Product
+                    );
+  if (EFI_ERROR (Status)) {
+    Product = &NullChar;
+  }
+
+  Status = UsbIo->UsbGetStringDescriptor (
+                    UsbIo,
+                    mBmUsbLangId,
+                    DevDesc.StrSerialNumber,
+                    &SerialNumber
+                    );
+  if (EFI_ERROR (Status)) {
+    SerialNumber = &NullChar;
+  }
+
+  if ((Manufacturer == &NullChar) &&
+      (Product == &NullChar) &&
+      (SerialNumber == &NullChar)
+      ) {
+    return NULL;
+  }
+
+  DescMaxSize = StrSize (Manufacturer) + StrSize (Product) + StrSize (SerialNumber);
+  Description = AllocateZeroPool (DescMaxSize);
+  ASSERT (Description != NULL);
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), Manufacturer);
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), L" ");
+
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), Product);
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), L" ");
+
+  StrCatS (Description, DescMaxSize/sizeof(CHAR16), SerialNumber);
+
+  if (Manufacturer != &NullChar) {
+    FreePool (Manufacturer);
+  }
+  if (Product != &NullChar) {
+    FreePool (Product);
+  }
+  if (SerialNumber != &NullChar) {
+    FreePool (SerialNumber);
+  }
+
+  BmEliminateExtraSpaces (Description);
+
+  return Description;
+}
+
+/**
+  Return the boot description for the controller based on the type.
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetMiscDescription (
+  IN EFI_HANDLE                  Handle
+  )
+{
+  EFI_STATUS                      Status;
+  CHAR16                          *Description;
+  EFI_BLOCK_IO_PROTOCOL           *BlockIo;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs;
+
+  switch (BmDevicePathType (DevicePathFromHandle (Handle))) {
+  case BmAcpiFloppyBoot:
+    Description = L"Floppy";
+    break;
+
+  case BmMessageAtapiBoot:
+  case BmMessageSataBoot:
+    Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **) &BlockIo);
+    ASSERT_EFI_ERROR (Status);
+    //
+    // Assume a removable SATA device should be the DVD/CD device
+    //
+    Description = BlockIo->Media->RemovableMedia ? L"DVD/CDROM" : L"Hard Drive";
+    break;
+
+  case BmMessageUsbBoot:
+    Description = L"USB Device";
+    break;
+
+  case BmMessageScsiBoot:
+    Description = L"SCSI Device";
+    break;
+
+  case BmHardwareDeviceBoot:
+    Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **) &BlockIo);
+    if (!EFI_ERROR (Status)) {
+      Description = BlockIo->Media->RemovableMedia ? L"Removable Disk" : L"Hard Drive";
+    } else {
+      Description = L"Misc Device";
+    }
+    break;
+
+  case BmMessageNetworkBoot:
+    Description = L"Network";
+    break;
+
+  case BmMessageHttpBoot:
+    Description = L"Http";
+    break;
+
+  default:
+    Status = gBS->HandleProtocol (Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID **) &Fs);
+    if (!EFI_ERROR (Status)) {
+      Description = L"Non-Block Boot Device";
+    } else {
+      Description = L"Misc Device";
+    }
+    break;
+  }
+
+  return AllocateCopyPool (StrSize (Description), Description);
+}
+
+/**
+  Register the platform provided boot description handler.
+
+  @param Handler  The platform provided boot description handler
+
+  @retval EFI_SUCCESS          The handler was registered successfully.
+  @retval EFI_ALREADY_STARTED  The handler was already registered.
+  @retval EFI_OUT_OF_RESOURCES There is not enough resource to perform the registration.
+**/
+EFI_STATUS
+EFIAPI
+EfiBootManagerRegisterBootDescriptionHandler (
+  IN EFI_BOOT_MANAGER_BOOT_DESCRIPTION_HANDLER  Handler
+  )
+{
+  LIST_ENTRY                                    *Link;
+  BM_BOOT_DESCRIPTION_ENTRY                    *Entry;
+
+  for ( Link = GetFirstNode (&mPlatformBootDescriptionHandlers)
+      ; !IsNull (&mPlatformBootDescriptionHandlers, Link)
+      ; Link = GetNextNode (&mPlatformBootDescriptionHandlers, Link)
+      ) {
+    Entry = CR (Link, BM_BOOT_DESCRIPTION_ENTRY, Link, BM_BOOT_DESCRIPTION_ENTRY_SIGNATURE);
+    if (Entry->Handler == Handler) {
+      return EFI_ALREADY_STARTED;
+    }
+  }
+
+  Entry = AllocatePool (sizeof (BM_BOOT_DESCRIPTION_ENTRY));
+  if (Entry == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Entry->Signature = BM_BOOT_DESCRIPTION_ENTRY_SIGNATURE;
+  Entry->Handler   = Handler;
+  InsertTailList (&mPlatformBootDescriptionHandlers, &Entry->Link);
+  return EFI_SUCCESS;
+}
+
+BM_GET_BOOT_DESCRIPTION mBmBootDescriptionHandlers[] = {
+  BmGetUsbDescription,
+  BmGetDescriptionFromDiskInfo,
+  BmGetMiscDescription
+};
+
+/**
+  Return the boot description for the controller.
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetBootDescription (
+  IN EFI_HANDLE                  Handle
+  )
+{
+  LIST_ENTRY                     *Link;
+  BM_BOOT_DESCRIPTION_ENTRY      *Entry;
+  CHAR16                         *Description;
+  CHAR16                         *DefaultDescription;
+  CHAR16                         *Temp;
+  UINTN                          Index;
+
+  //
+  // Firstly get the default boot description
+  //
+  DefaultDescription = NULL;
+  for (Index = 0; Index < sizeof (mBmBootDescriptionHandlers) / sizeof (mBmBootDescriptionHandlers[0]); Index++) {
+    DefaultDescription = mBmBootDescriptionHandlers[Index] (Handle);
+    if (DefaultDescription != NULL) {
+      //
+      // Avoid description confusion between UEFI & Legacy boot option by adding "UEFI " prefix
+      // ONLY for core provided boot description handler.
+      //
+      Temp = AllocatePool (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix));
+      ASSERT (Temp != NULL);
+      StrCpyS (Temp, (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix)) / sizeof (CHAR16), mBmUefiPrefix);
+      StrCatS (Temp, (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix)) / sizeof (CHAR16), DefaultDescription);
+      FreePool (DefaultDescription);
+      DefaultDescription = Temp;
+      break;
+    }
+  }
+  ASSERT (DefaultDescription != NULL);
+
+  //
+  // Secondly query platform for the better boot description
+  //
+  for ( Link = GetFirstNode (&mPlatformBootDescriptionHandlers)
+      ; !IsNull (&mPlatformBootDescriptionHandlers, Link)
+      ; Link = GetNextNode (&mPlatformBootDescriptionHandlers, Link)
+      ) {
+    Entry = CR (Link, BM_BOOT_DESCRIPTION_ENTRY, Link, BM_BOOT_DESCRIPTION_ENTRY_SIGNATURE);
+    Description = Entry->Handler (Handle, DefaultDescription);
+    if (Description != NULL) {
+      FreePool (DefaultDescription);
+      return Description;
+    }
+  }
+
+  return DefaultDescription;
+}
+
+/**
+  Enumerate all boot option descriptions and append " 2"/" 3"/... to make
+  unique description.
+
+  @param BootOptions            Array of boot options.
+  @param BootOptionCount        Count of boot options.
+**/
+VOID
+BmMakeBootOptionDescriptionUnique (
+  EFI_BOOT_MANAGER_LOAD_OPTION         *BootOptions,
+  UINTN                                BootOptionCount
+  )
+{
+  UINTN                                Base;
+  UINTN                                Index;
+  UINTN                                DescriptionSize;
+  UINTN                                MaxSuffixSize;
+  BOOLEAN                              *Visited;
+  UINTN                                MatchCount;
+
+  if (BootOptionCount == 0) {
+    return;
+  }
+
+  //
+  // Calculate the maximum buffer size for the number suffix.
+  // The initial sizeof (CHAR16) is for the blank space before the number.
+  //
+  MaxSuffixSize = sizeof (CHAR16);
+  for (Index = BootOptionCount; Index != 0; Index = Index / 10) {
+    MaxSuffixSize += sizeof (CHAR16);
+  }
+
+  Visited = AllocateZeroPool (sizeof (BOOLEAN) * BootOptionCount);
+  ASSERT (Visited != NULL);
+
+  for (Base = 0; Base < BootOptionCount; Base++) {
+    if (!Visited[Base]) {
+      MatchCount      = 1;
+      Visited[Base]   = TRUE;
+      DescriptionSize = StrSize (BootOptions[Base].Description);
+      for (Index = Base + 1; Index < BootOptionCount; Index++) {
+        if (!Visited[Index] && StrCmp (BootOptions[Base].Description, BootOptions[Index].Description) == 0) {
+          Visited[Index] = TRUE;
+          MatchCount++;
+          FreePool (BootOptions[Index].Description);
+          BootOptions[Index].Description = AllocatePool (DescriptionSize + MaxSuffixSize);
+          UnicodeSPrint (
+            BootOptions[Index].Description, DescriptionSize + MaxSuffixSize,
+            L"%s %d",
+            BootOptions[Base].Description, MatchCount
+            );
+        }
+      }
+    }
+  }
+
+  FreePool (Visited);
+}
