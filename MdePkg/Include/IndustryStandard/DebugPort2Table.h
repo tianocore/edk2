@@ -3,6 +3,7 @@
   Microsoft DebugPort2Specification.
 
   Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2016, ARM Limited. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +48,11 @@ typedef struct {
 #define EFI_ACPI_DBG2_PORT_TYPE_SERIAL                                                 0x8000
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550                                 0x0000
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_SUBSET_COMPATIBLE_WITH_MS_DBGP_SPEC  0x0001
+#define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART                             0x0003
+#define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART_2X                   0x000d
+#define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART                      0x000e
+#define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_DCC                                        0x000f
+#define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_BCM2835_UART                               0x0010
 #define EFI_ACPI_DBG2_PORT_TYPE_1394                                                   0x8001
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_1394_STANDARD                                     0x0000
 #define EFI_ACPI_DBG2_PORT_TYPE_USB                                                    0x8002
