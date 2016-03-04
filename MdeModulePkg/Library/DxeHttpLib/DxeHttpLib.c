@@ -3,6 +3,7 @@
   It provides the helper routines to parse the HTTP message byte stream.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -13,68 +14,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Uefi.h>
-#include <Library/NetLib.h>
-#include <Library/HttpLib.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include "DxeHttpLib.h"
 
-#define BIT(x)  (1 << x)
 
-#define NET_IS_HEX_CHAR(Ch)   \
-  ((('0' <= (Ch)) && ((Ch) <= '9')) ||  \
-   (('A' <= (Ch)) && ((Ch) <= 'F')) ||  \
-   (('a' <= (Ch)) && ((Ch) <= 'f')))
-
-//
-// Field index of the HTTP URL parse result.
-//
-#define   HTTP_URI_FIELD_SCHEME           0
-#define   HTTP_URI_FIELD_AUTHORITY        1
-#define   HTTP_URI_FIELD_PATH             2
-#define   HTTP_URI_FIELD_QUERY            3
-#define   HTTP_URI_FIELD_FRAGMENT         4
-#define   HTTP_URI_FIELD_USERINFO         5
-#define   HTTP_URI_FIELD_HOST             6
-#define   HTTP_URI_FIELD_PORT             7
-#define   HTTP_URI_FIELD_MAX              8
-
-//
-// Structure to store the parse result of a HTTP URL.
-//
-typedef struct {
-    UINT32      Offset;
-    UINT32      Length;
-} HTTP_URL_FILED_DATA;
-
-typedef struct {
-  UINT16                  FieldBitMap;
-  HTTP_URL_FILED_DATA     FieldData[HTTP_URI_FIELD_MAX];
-} HTTP_URL_PARSER;
-
-typedef enum {
-  UrlParserUrlStart,
-  UrlParserScheme,
-  UrlParserSchemeColon,            // ":"
-  UrlParserSchemeColonSlash,       // ":/"
-  UrlParserSchemeColonSlashSlash,  // "://"
-  UrlParserAuthority,
-  UrlParserAtInAuthority,
-  UrlParserPath,
-  UrlParserQueryStart,    // "?"
-  UrlParserQuery,
-  UrlParserFragmentStart, // "#"
-  UrlParserFragment,
-  UrlParserUserInfo,
-  UrlParserHostStart,     // "@"
-  UrlParserHost,
-  UrlParserHostIpv6,      // "["(Ipv6 address) "]"
-  UrlParserPortStart,     // ":"
-  UrlParserPort,
-  UrlParserStateMax
-} HTTP_URL_PARSE_STATE;
 
 /**
   Decode a percent-encoded URI component to the ASCII character.
@@ -869,14 +811,15 @@ HttpUrlFreeParser (
 
 **/
 EFI_HTTP_HEADER *
-HttpIoFindHeader (
+EFIAPI
+HttpFindHeader (
   IN  UINTN                HeaderCount,
   IN  EFI_HTTP_HEADER      *Headers,
   IN  CHAR8                *FieldName
   )
 {
   UINTN                 Index;
-  
+
   if (HeaderCount == 0 || Headers == NULL || FieldName == NULL) {
     return NULL;
   }
@@ -914,7 +857,7 @@ typedef struct {
   BOOLEAN                       IsChunked;     // "chunked" transfer-coding.
   BOOLEAN                       ContentLengthIsValid;
   UINTN                         ContentLength; // Entity length (not the message-body length), invalid until ContentLengthIsValid is TRUE
-  
+
   HTTP_BODY_PARSER_CALLBACK     Callback;
   VOID                          *Context;
   UINTN                         ParsedBodyLength;
@@ -983,8 +926,8 @@ HttpIoParseContentLengthHeader (
   )
 {
   EFI_HTTP_HEADER       *Header;
-  
-  Header = HttpIoFindHeader (HeaderCount, Headers, "Content-Length");
+
+  Header = HttpFindHeader (HeaderCount, Headers, HTTP_HEADER_CONTENT_LENGTH);
   if (Header == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -1012,7 +955,7 @@ HttpIoIsChunked (
   EFI_HTTP_HEADER       *Header;
 
 
-  Header = HttpIoFindHeader (HeaderCount, Headers, "Transfer-Encoding");
+  Header = HttpFindHeader (HeaderCount, Headers, HTTP_HEADER_TRANSFER_ENCODING);
   if (Header == NULL) {
     return FALSE;
   }
@@ -1484,3 +1427,523 @@ HttpFreeMsgParser (
 {
   FreePool (MsgParser);
 }
+
+
+/**
+  Get the next string, which is distinguished by specified seperator.
+
+  @param[in]  String             Pointer to the string.
+  @param[in]  Seperator          Specified seperator used to distinguish where is the beginning
+                                 of next string.
+
+  @return     Pointer to the next string.
+  @return     NULL if not find or String is NULL.
+
+**/
+CHAR8 *
+EFIAPI
+AsciiStrGetNextToken (
+  IN CONST CHAR8 *String,
+  IN       CHAR8 Seperator
+  )
+{
+  CONST CHAR8 *Token;
+
+  Token = String;
+  while (TRUE) {
+    if (*Token == 0) {
+      return NULL;
+    }
+    if (*Token == Seperator) {
+      return (CHAR8 *)(Token + 1);
+    }
+    Token++;
+  }
+}
+
+/**
+  Set FieldName and FieldValue into specified HttpHeader.
+
+  @param[in,out]  HttpHeader      Specified HttpHeader.
+  @param[in]  FieldName           FieldName of this HttpHeader, a NULL terminated ASCII string.
+  @param[in]  FieldValue          FieldValue of this HttpHeader, a NULL terminated ASCII string.
+
+
+  @retval EFI_SUCCESS             The FieldName and FieldValue are set into HttpHeader successfully.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
+
+**/
+EFI_STATUS
+EFIAPI
+HttpSetFieldNameAndValue (
+  IN  OUT   EFI_HTTP_HEADER       *HttpHeader,
+  IN  CONST CHAR8                 *FieldName,
+  IN  CONST CHAR8                 *FieldValue
+  )
+{
+  UINTN                       FieldNameSize;
+  UINTN                       FieldValueSize;
+
+  if (HttpHeader->FieldName != NULL) {
+    FreePool (HttpHeader->FieldName);
+  }
+  if (HttpHeader->FieldValue != NULL) {
+    FreePool (HttpHeader->FieldValue);
+  }
+
+  FieldNameSize = AsciiStrSize (FieldName);
+  HttpHeader->FieldName = AllocateZeroPool (FieldNameSize);
+  if (HttpHeader->FieldName == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  CopyMem (HttpHeader->FieldName, FieldName, FieldNameSize);
+  HttpHeader->FieldName[FieldNameSize - 1] = 0;
+
+  FieldValueSize = AsciiStrSize (FieldValue);
+  HttpHeader->FieldValue = AllocateZeroPool (FieldValueSize);
+  if (HttpHeader->FieldValue == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  CopyMem (HttpHeader->FieldValue, FieldValue, FieldValueSize);
+  HttpHeader->FieldValue[FieldValueSize - 1] = 0;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Get one key/value header pair from the raw string.
+
+  @param[in]  String             Pointer to the raw string.
+  @param[out] FieldName          Points directly to field name within 'HttpHeader'.
+  @param[out] FieldValue         Points directly to field value within 'HttpHeader'.
+
+  @return     Pointer to the next raw string.
+  @return     NULL if no key/value header pair from this raw string.
+
+**/
+CHAR8 *
+EFIAPI
+HttpGetFieldNameAndValue (
+  IN     CHAR8   *String,
+     OUT CHAR8   **FieldName,
+     OUT CHAR8   **FieldValue
+  )
+{
+  CHAR8  *FieldNameStr;
+  CHAR8  *FieldValueStr;
+  CHAR8  *StrPtr;
+
+  if (String == NULL || FieldName == NULL || FieldValue == NULL) {
+    return NULL;
+  }
+
+  *FieldName    = NULL;
+  *FieldValue   = NULL;
+  FieldNameStr  = NULL;
+  FieldValueStr = NULL;
+  StrPtr        = NULL;
+
+  //
+  // Each header field consists of a name followed by a colon (":") and the field value.
+  //
+  FieldNameStr = String;
+  FieldValueStr = AsciiStrGetNextToken (FieldNameStr, ':');
+  if (FieldValueStr == NULL) {
+    return NULL;
+  }
+
+  //
+  // Replace ':' with 0
+  //
+  *(FieldValueStr - 1) = 0;
+
+  //
+  // The field value MAY be preceded by any amount of LWS, though a single SP is preferred.
+  //
+  while (TRUE) {
+    if (*FieldValueStr == ' ' || *FieldValueStr == '\t') {
+      FieldValueStr ++;
+    } else if (*FieldValueStr == '\r' && *(FieldValueStr + 1) == '\n' &&
+               (*(FieldValueStr + 2) == ' ' || *(FieldValueStr + 2) == '\t')) {
+      FieldValueStr = FieldValueStr + 3;
+    } else {
+      break;
+    }
+  }
+
+  //
+  // Header fields can be extended over multiple lines by preceding each extra
+  // line with at least one SP or HT.
+  //
+  StrPtr = FieldValueStr;
+  do {
+    StrPtr = AsciiStrGetNextToken (StrPtr, '\r');
+    if (StrPtr == NULL || *StrPtr != '\n') {
+      return NULL;
+    }
+
+    StrPtr++;
+  } while (*StrPtr == ' ' || *StrPtr == '\t');
+
+  //
+  // Replace '\r' with 0
+  //
+  *(StrPtr - 2) = 0;
+
+  //
+  // Get FieldName and FieldValue.
+  //
+  *FieldName = FieldNameStr;
+  *FieldValue = FieldValueStr;
+
+  return StrPtr;
+}
+
+/**
+  Free existing HeaderFields.
+
+  @param[in]  HeaderFields       Pointer to array of key/value header pairs waitting for free.
+  @param[in]  FieldCount         The number of header pairs in HeaderFields.
+
+**/
+VOID
+EFIAPI
+HttpFreeHeaderFields (
+  IN  EFI_HTTP_HEADER  *HeaderFields,
+  IN  UINTN            FieldCount
+  )
+{
+  UINTN                       Index;
+
+  if (HeaderFields != NULL) {
+    for (Index = 0; Index < FieldCount; Index++) {
+      if (HeaderFields[Index].FieldName != NULL) {
+        FreePool (HeaderFields[Index].FieldName);
+      }
+      if (HeaderFields[Index].FieldValue != NULL) {
+        FreePool (HeaderFields[Index].FieldValue);
+      }
+    }
+
+    FreePool (HeaderFields);
+  }
+}
+
+/**
+  Generate HTTP request string.
+
+  @param[in]   Message            Pointer to storage containing HTTP message data.
+  @param[in]   Url                The URL of a remote host.
+  @param[out]  RequestString      Pointer to the created HTTP request string.
+                                  NULL if any error occured.
+
+  @return EFI_SUCCESS             If HTTP request string was created successfully
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
+  @retval EFI_INVALID_PARAMETER   The input arguments are invalid
+
+**/
+EFI_STATUS
+EFIAPI
+HttpGenRequestString (
+  IN     CONST EFI_HTTP_MESSAGE        *Message,
+  IN     CONST CHAR8                   *Url,
+     OUT CHAR8                         **Request
+  )
+{
+  EFI_STATUS                       Status;
+  UINTN                            StrLength;
+  CHAR8                            *RequestPtr;
+  UINTN                            HttpHdrSize;
+  UINTN                            MsgSize;
+  BOOLEAN                          Success;
+  VOID                             *HttpHdr;
+  EFI_HTTP_HEADER                  **AppendList;
+  UINTN                            Index;
+  EFI_HTTP_UTILITIES_PROTOCOL      *HttpUtilitiesProtocol;
+
+
+  ASSERT (Message != NULL);
+
+  *Request = NULL;
+  MsgSize = 0;
+  Success = FALSE;
+  HttpHdr = NULL;
+  AppendList = NULL;
+  HttpUtilitiesProtocol = NULL;
+
+  //
+  // Locate the HTTP_UTILITIES protocol.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiHttpUtilitiesProtocolGuid,
+                  NULL,
+                  (VOID **)&HttpUtilitiesProtocol
+                  );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,"Failed to locate Http Utilities protocol. Status = %r.\n", Status));
+    return Status;
+  }
+
+  //
+  // Build AppendList to send into HttpUtilitiesBuild
+  //
+  AppendList = AllocateZeroPool (sizeof (EFI_HTTP_HEADER *) * (Message->HeaderCount));
+  if (AppendList == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for(Index = 0; Index < Message->HeaderCount; Index++){
+    AppendList[Index] = &Message->Headers[Index];
+  }
+
+  //
+  // Build raw HTTP Headers
+  //
+  Status = HttpUtilitiesProtocol->Build (
+              HttpUtilitiesProtocol,
+              0,
+              NULL,
+              0,
+              NULL,
+              Message->HeaderCount,
+              AppendList,
+              &HttpHdrSize,
+              &HttpHdr
+              );
+
+  if (AppendList != NULL) {
+    FreePool (AppendList);
+  }
+
+  if (EFI_ERROR (Status) || HttpHdr == NULL){
+    return Status;
+  }
+
+  //
+  // Calculate HTTP message length.
+  //
+  MsgSize = Message->BodyLength + HTTP_METHOD_MAXIMUM_LEN + AsciiStrLen (Url) +
+            AsciiStrLen (HTTP_VERSION_CRLF_STR) + HttpHdrSize;
+
+
+  *Request = AllocateZeroPool (MsgSize);
+  if (*Request == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  RequestPtr = *Request;
+  //
+  // Construct header request
+  //
+  switch (Message->Data.Request->Method) {
+  case HttpMethodGet:
+    StrLength = sizeof (HTTP_METHOD_GET) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_GET, StrLength);
+    RequestPtr += StrLength;
+    break;
+  case HttpMethodPut:
+    StrLength = sizeof (HTTP_METHOD_PUT) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_PUT, StrLength);
+    RequestPtr += StrLength;
+    break;
+  case HttpMethodPatch:
+    StrLength = sizeof (HTTP_METHOD_PATCH) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_PATCH, StrLength);
+    RequestPtr += StrLength;
+    break;
+  case HttpMethodPost:
+    StrLength = sizeof (HTTP_METHOD_POST) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_POST, StrLength);
+    RequestPtr += StrLength;
+    break;
+  case HttpMethodHead:
+    StrLength = sizeof (HTTP_METHOD_HEAD) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_HEAD, StrLength);
+    RequestPtr += StrLength;
+    break;
+  case HttpMethodDelete:
+    StrLength = sizeof (HTTP_METHOD_DELETE) - 1;
+    CopyMem (RequestPtr, HTTP_METHOD_DELETE, StrLength);
+    RequestPtr += StrLength;
+    break;
+  default:
+    ASSERT (FALSE);
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+
+  StrLength = AsciiStrLen(EMPTY_SPACE);
+  CopyMem (RequestPtr, EMPTY_SPACE, StrLength);
+  RequestPtr += StrLength;
+
+  StrLength = AsciiStrLen (Url);
+  CopyMem (RequestPtr, Url, StrLength);
+  RequestPtr += StrLength;
+
+  StrLength = sizeof (HTTP_VERSION_CRLF_STR) - 1;
+  CopyMem (RequestPtr, HTTP_VERSION_CRLF_STR, StrLength);
+  RequestPtr += StrLength;
+
+  //
+  // Construct header
+  //
+  CopyMem (RequestPtr, HttpHdr, HttpHdrSize);
+  RequestPtr += HttpHdrSize;
+
+  //
+  // Done
+  //
+  *RequestPtr = 0;
+  Success     = TRUE;
+
+Exit:
+
+  if (!Success) {
+    if (*Request != NULL) {
+      FreePool (*Request);
+    }
+    *Request = NULL;
+    return Status;
+  }
+
+  if (HttpHdr != NULL) {
+    FreePool (HttpHdr);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Translate the status code in HTTP message to EFI_HTTP_STATUS_CODE defined
+  in UEFI 2.5 specification.
+
+  @param[in]  StatusCode         The status code value in HTTP message.
+
+  @return                        Value defined in EFI_HTTP_STATUS_CODE .
+
+**/
+EFI_HTTP_STATUS_CODE
+EFIAPI
+HttpMappingToStatusCode (
+  IN UINTN                  StatusCode
+  )
+{
+  switch (StatusCode) {
+  case 100:
+    return HTTP_STATUS_100_CONTINUE;
+  case 101:
+    return HTTP_STATUS_101_SWITCHING_PROTOCOLS;
+  case 200:
+    return HTTP_STATUS_200_OK;
+  case 201:
+    return HTTP_STATUS_201_CREATED;
+  case 202:
+    return HTTP_STATUS_202_ACCEPTED;
+  case 203:
+    return HTTP_STATUS_203_NON_AUTHORITATIVE_INFORMATION;
+  case 204:
+    return HTTP_STATUS_204_NO_CONTENT;
+  case 205:
+    return HTTP_STATUS_205_RESET_CONTENT;
+  case 206:
+    return HTTP_STATUS_206_PARTIAL_CONTENT;
+  case 300:
+    return HTTP_STATUS_300_MULTIPLE_CHIOCES;
+  case 301:
+    return HTTP_STATUS_301_MOVED_PERMANENTLY;
+  case 302:
+    return HTTP_STATUS_302_FOUND;
+  case 303:
+    return HTTP_STATUS_303_SEE_OTHER;
+  case 304:
+    return HTTP_STATUS_304_NOT_MODIFIED;
+  case 305:
+    return HTTP_STATUS_305_USE_PROXY;
+  case 307:
+    return HTTP_STATUS_307_TEMPORARY_REDIRECT;
+  case 400:
+    return HTTP_STATUS_400_BAD_REQUEST;
+  case 401:
+    return HTTP_STATUS_401_UNAUTHORIZED;
+  case 402:
+    return HTTP_STATUS_402_PAYMENT_REQUIRED;
+  case 403:
+    return HTTP_STATUS_403_FORBIDDEN;
+  case 404:
+    return HTTP_STATUS_404_NOT_FOUND;
+  case 405:
+    return HTTP_STATUS_405_METHOD_NOT_ALLOWED;
+  case 406:
+    return HTTP_STATUS_406_NOT_ACCEPTABLE;
+  case 407:
+    return HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED;
+  case 408:
+    return HTTP_STATUS_408_REQUEST_TIME_OUT;
+  case 409:
+    return HTTP_STATUS_409_CONFLICT;
+  case 410:
+    return HTTP_STATUS_410_GONE;
+  case 411:
+    return HTTP_STATUS_411_LENGTH_REQUIRED;
+  case 412:
+    return HTTP_STATUS_412_PRECONDITION_FAILED;
+  case 413:
+    return HTTP_STATUS_413_REQUEST_ENTITY_TOO_LARGE;
+  case 414:
+    return HTTP_STATUS_414_REQUEST_URI_TOO_LARGE;
+  case 415:
+    return HTTP_STATUS_415_UNSUPPORTED_MEDIA_TYPE;
+  case 416:
+    return HTTP_STATUS_416_REQUESTED_RANGE_NOT_SATISFIED;
+  case 417:
+    return HTTP_STATUS_417_EXPECTATION_FAILED;
+  case 500:
+    return HTTP_STATUS_500_INTERNAL_SERVER_ERROR;
+  case 501:
+    return HTTP_STATUS_501_NOT_IMPLEMENTED;
+  case 502:
+    return HTTP_STATUS_502_BAD_GATEWAY;
+  case 503:
+    return HTTP_STATUS_503_SERVICE_UNAVAILABLE;
+  case 504:
+    return HTTP_STATUS_504_GATEWAY_TIME_OUT;
+  case 505:
+    return HTTP_STATUS_505_HTTP_VERSION_NOT_SUPPORTED;
+
+  default:
+    return HTTP_STATUS_UNSUPPORTED_STATUS;
+  }
+}
+
+/**
+  Check whether header field called FieldName is in DeleteList.
+
+  @param[in]  DeleteList        Pointer to array of key/value header pairs.
+  @param[in]  DeleteCount       The number of header pairs.
+  @param[in]  FieldName         Pointer to header field's name.
+
+  @return     TRUE if FieldName is not in DeleteList, that means this header field is valid.
+  @return     FALSE if FieldName is in DeleteList, that means this header field is invalid.
+
+**/
+BOOLEAN
+EFIAPI
+HttpIsValidHttpHeader (
+  IN  CHAR8            *DeleteList[],
+  IN  UINTN            DeleteCount,
+  IN  CHAR8            *FieldName
+  )
+{
+  UINTN                       Index;
+
+  for (Index = 0; Index < DeleteCount; Index++) {
+    if (AsciiStrCmp (FieldName, DeleteList[Index]) == 0) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
