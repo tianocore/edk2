@@ -2,6 +2,7 @@
   Implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -122,8 +123,8 @@ HttpUtilitiesBuild (
       //
       // Check whether each SeedHeaderFields member is in DeleteList
       //
-      if (IsValidHttpHeader( DeleteList, DeleteCount, SeedHeaderFields[Index].FieldName)) {
-        Status = SetFieldNameAndValue (
+      if (HttpIsValidHttpHeader( DeleteList, DeleteCount, SeedHeaderFields[Index].FieldName)) {
+        Status = HttpSetFieldNameAndValue (
                    &TempHeaderFields[TempFieldCount], 
                    SeedHeaderFields[Index].FieldName, 
                    SeedHeaderFields[Index].FieldValue
@@ -149,7 +150,7 @@ HttpUtilitiesBuild (
   }
 
   for (Index = 0; Index < TempFieldCount; Index++) {
-    Status = SetFieldNameAndValue (
+    Status = HttpSetFieldNameAndValue (
                &NewHeaderFields[Index], 
                TempHeaderFields[Index].FieldName, 
                TempHeaderFields[Index].FieldValue
@@ -162,9 +163,9 @@ HttpUtilitiesBuild (
   NewFieldCount = TempFieldCount;
 
   for (Index = 0; Index < AppendCount; Index++) {
-    HttpHeader = FindHttpHeader (NewHeaderFields, NewFieldCount, AppendList[Index]->FieldName);
+    HttpHeader = HttpFindHeader (NewFieldCount, NewHeaderFields, AppendList[Index]->FieldName);
     if (HttpHeader != NULL) {
-      Status = SetFieldNameAndValue (
+      Status = HttpSetFieldNameAndValue (
                  HttpHeader, 
                  AppendList[Index]->FieldName, 
                  AppendList[Index]->FieldValue
@@ -173,7 +174,7 @@ HttpUtilitiesBuild (
         goto ON_EXIT;
       }
     } else {
-      Status = SetFieldNameAndValue (
+      Status = HttpSetFieldNameAndValue (
                  &NewHeaderFields[NewFieldCount], 
                  AppendList[Index]->FieldName, 
                  AppendList[Index]->FieldValue
@@ -251,15 +252,15 @@ HttpUtilitiesBuild (
   //
 ON_EXIT:
   if (SeedHeaderFields != NULL) {
-    FreeHeaderFields(SeedHeaderFields, SeedFieldCount);
+    HttpFreeHeaderFields(SeedHeaderFields, SeedFieldCount);
   }
   
   if (TempHeaderFields != NULL) {
-    FreeHeaderFields(TempHeaderFields, TempFieldCount);
+    HttpFreeHeaderFields(TempHeaderFields, TempFieldCount);
   }
 
   if (NewHeaderFields != NULL) {
-    FreeHeaderFields(NewHeaderFields, NewFieldCount);
+    HttpFreeHeaderFields(NewHeaderFields, NewFieldCount);
   }
   
   return Status;
@@ -332,7 +333,7 @@ HttpUtilitiesParse (
   while (TRUE) {
     FieldName     = NULL;
     FieldValue    = NULL;
-    NextToken = GetFieldNameAndValue (Token, &FieldName, &FieldValue);
+    NextToken = HttpGetFieldNameAndValue (Token, &FieldName, &FieldValue);
     Token     = NextToken;
     if (FieldName == NULL || FieldValue == NULL) {
       break;
@@ -365,16 +366,16 @@ HttpUtilitiesParse (
   while (Index < *FieldCount) {
     FieldName     = NULL;
     FieldValue    = NULL;
-    NextToken = GetFieldNameAndValue (Token, &FieldName, &FieldValue);
+    NextToken = HttpGetFieldNameAndValue (Token, &FieldName, &FieldValue);
     Token     = NextToken;
     if (FieldName == NULL || FieldValue == NULL) {
       break;
     }
 
-    Status = SetFieldNameAndValue (&(*HeaderFields)[Index], FieldName, FieldValue);
+    Status = HttpSetFieldNameAndValue (&(*HeaderFields)[Index], FieldName, FieldValue);
     if (EFI_ERROR (Status)) {
       *FieldCount = 0;
-      FreeHeaderFields (*HeaderFields, Index);
+      HttpFreeHeaderFields (*HeaderFields, Index);
       goto ON_EXIT;
     }
     

@@ -2,8 +2,9 @@
   Support functions implementation for UEFI HTTP boot driver.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php.                                          
     
@@ -548,44 +549,10 @@ HttpBootFreeHeader (
 }
 
 /**
-  Find a specified header field according to the field name.
-
-  @param[in]   HeaderCount      Number of HTTP header structures in Headers list. 
-  @param[in]   Headers          Array containing list of HTTP headers.
-  @param[in]   FieldName        Null terminated string which describes a field name. 
-
-  @return    Pointer to the found header or NULL.
-
-**/
-EFI_HTTP_HEADER *
-HttpBootFindHeader (
-  IN  UINTN                HeaderCount,
-  IN  EFI_HTTP_HEADER      *Headers,
-  IN  CHAR8                *FieldName
-  )
-{
-  UINTN                 Index;
-  
-  if (HeaderCount == 0 || Headers == NULL || FieldName == NULL) {
-    return NULL;
-  }
-
-  for (Index = 0; Index < HeaderCount; Index++){
-    //
-    // Field names are case-insensitive (RFC 2616).
-    //
-    if (AsciiStriCmp (Headers[Index].FieldName, FieldName) == 0) {
-      return &Headers[Index];
-    }
-  }
-  return NULL;
-}
-
-/**
   Set or update a HTTP header with the field name and corresponding value.
 
   @param[in]  HttpIoHeader       Point to the HTTP header holder.
-  @param[in]  FieldName          Null terminated string which describes a field name. 
+  @param[in]  FieldName          Null terminated string which describes a field name.
   @param[in]  FieldValue         Null terminated string which describes the corresponding field value.
 
   @retval  EFI_SUCCESS           The HTTP header has been set or updated.
@@ -609,7 +576,7 @@ HttpBootSetHeader (
     return EFI_INVALID_PARAMETER;
   }
 
-  Header = HttpBootFindHeader (HttpIoHeader->HeaderCount, HttpIoHeader->Headers, FieldName);
+  Header = HttpFindHeader (HttpIoHeader->HeaderCount, HttpIoHeader->Headers, FieldName);
   if (Header == NULL) {
     //
     // Add a new header.

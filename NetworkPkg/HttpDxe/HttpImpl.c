@@ -2,7 +2,7 @@
   Implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
   Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -497,9 +497,10 @@ EfiHttpRequest (
       goto Error3;
     }
   }
-  RequestStr = HttpGenRequestString (HttpInstance, HttpMsg, FileUrl);
-  if (RequestStr == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
+
+  Status = HttpGenRequestString (HttpMsg, FileUrl, &RequestStr);
+
+  if (EFI_ERROR (Status)) {
     goto Error3;
   }
 

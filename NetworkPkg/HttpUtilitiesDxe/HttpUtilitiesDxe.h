@@ -2,6 +2,7 @@
   The header files of Http Utilities functions for HttpUtilities driver.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -27,6 +28,7 @@
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HttpLib.h>
 
 //
 // Consumed Protocols
@@ -38,98 +40,6 @@
 // Protocol instances
 //
 extern EFI_HTTP_UTILITIES_PROTOCOL mHttpUtilitiesProtocol;
-
-
-/**
-  Free existing HeaderFields.
-
-  @param[in]  HeaderFields       Pointer to array of key/value header pairs waitting for free.
-  @param[in]  FieldCount         The number of header pairs in HeaderFields.
-
-**/
-VOID
-FreeHeaderFields (
-  IN  EFI_HTTP_HEADER  *HeaderFields,
-  IN  UINTN            FieldCount
-  );
-
-
-/**
-  Find required header field in HeaderFields.
-
-  @param[in]  HeaderFields        Pointer to array of key/value header pairs.
-  @param[in]  FieldCount          The number of header pairs.
-  @param[in]  FieldName           Pointer to header field's name.
-
-  @return     Pointer to the queried header field.
-  @return     NULL if not find this required header field.
-
-**/
-EFI_HTTP_HEADER *
-FindHttpHeader (
-  IN  EFI_HTTP_HEADER  *HeaderFields,
-  IN  UINTN            FieldCount,
-  IN  CHAR8            *FieldName
-  );
-
-
-/**
-  Check whether header field called FieldName is in DeleteList.
-
-  @param[in]  DeleteList        Pointer to array of key/value header pairs.
-  @param[in]  DeleteCount       The number of header pairs.
-  @param[in]  FieldName         Pointer to header field's name.
-
-  @return     TRUE if FieldName is not in DeleteList, that means this header field is valid.
-  @return     FALSE if FieldName is in DeleteList, that means this header field is invalid.
-
-**/
-BOOLEAN
-IsValidHttpHeader (
-  IN  CHAR8            *DeleteList[],
-  IN  UINTN            DeleteCount,
-  IN  CHAR8            *FieldName
-  );
-
-
-/**
-  Set FieldName and FieldValue into specified HttpHeader.
-
-  @param[in]  HttpHeader          Specified HttpHeader.
-  @param[in]  FieldName           FieldName of this HttpHeader.
-  @param[in]  FieldValue          FieldValue of this HttpHeader.
-
-
-  @retval EFI_SUCCESS             The FieldName and FieldValue are set into HttpHeader successfully.
-  @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
-
-**/
-EFI_STATUS
-SetFieldNameAndValue (
-  IN  EFI_HTTP_HEADER     *HttpHeader,
-  IN  CHAR8               *FieldName, 
-  IN  CHAR8               *FieldValue
-  );
-
-
-/**
-  Get one key/value header pair from the raw string.
-
-  @param[in]  String             Pointer to the raw string.
-  @param[out] FieldName          Pointer to header field's name.
-  @param[out] FieldValue         Pointer to header field's value.
-
-  @return     Pointer to the next raw string.
-  @return     NULL if no key/value header pair from this raw string.
-
-**/
-CHAR8 *
-GetFieldNameAndValue (
-  IN  CHAR8   *String,
-  OUT CHAR8   **FieldName,
-  OUT CHAR8   **FieldValue
-  );
-
 
 /**
   Create HTTP header based on a combination of seed header, fields
