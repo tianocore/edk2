@@ -6,6 +6,7 @@
 #
 # Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -430,6 +431,9 @@
   gEfiProcessorSpecificErrorSectionGuid = { 0xdc3ea0b0, 0xa144, 0x4797, { 0xb9, 0x5b, 0x53, 0xfa, 0x24, 0x2b, 0x6e, 0x1d }}
 
   ## Include/Guid/Cper.h
+  gEfiIa32X64ProcessorErrorSectionGuid  = { 0xdc3ea0b0, 0xa144, 0x4797, { 0xb9, 0x5b, 0x53, 0xfa, 0x24, 0x2b, 0x6e, 0x1d }}
+
+  ## Include/Guid/Cper.h
   gEfiPlatformMemoryErrorSectionGuid = { 0xa5bc1114, 0x6f64, 0x4ede, { 0xb8, 0x63, 0x3e, 0x83, 0xed, 0x7c, 0x83, 0xb1 }}
 
   ## Include/Guid/Cper.h
@@ -617,6 +621,9 @@
 
   ## Include/Guid/MemoryAttributesTable.h
   gEfiMemoryAttributesTableGuid        = { 0xdcfa911d, 0x26eb, 0x469f, {0xa2, 0x20, 0x38, 0xb7, 0xdc, 0x46, 0x12, 0x20}}
+
+  ## Include/Guid/Cper.h
+  gEfiArmProcessorErrorSectionGuid     = { 0xe19e3d16, 0xbc11, 0x11e4, { 0x9c, 0xaa, 0xc2, 0x05, 0x1d, 0x5d, 0x46, 0xb0 }}
 
   #
   # GUID defined in PI1.0

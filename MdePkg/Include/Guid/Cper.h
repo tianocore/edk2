@@ -2,6 +2,7 @@
   GUIDs and definitions used for Common Platform Error Record.
 
   Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,7 +12,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  GUIDs defined in UEFI 2.4 Specification.
+  GUIDs defined in UEFI 2.6 Specification.
 
 **/
 
@@ -22,6 +23,8 @@
 
 #define EFI_ERROR_RECORD_SIGNATURE_START   SIGNATURE_32('C', 'P', 'E', 'R')
 #define EFI_ERROR_RECORD_SIGNATURE_END     0xFFFFFFFF
+
+#define EFI_ERROR_RECORD_REVISION          0x0101
 
 ///
 /// Error Severity in Error Record Header and Error Section Descriptor
@@ -137,6 +140,8 @@ typedef struct {
   ///
 } EFI_COMMON_ERROR_RECORD_HEADER;
 
+#define EFI_ERROR_SECTION_REVISION  0x0100
+
 ///
 /// Validity Fields in Error Section Descriptor.
 ///
@@ -164,6 +169,14 @@ typedef struct {
 #define EFI_ERROR_SECTION_PROCESSOR_SPECIFIC_GUID \
   { \
     0xdc3ea0b0, 0xa144, 0x4797, { 0xb9, 0x5b, 0x53, 0xfa, 0x24, 0x2b, 0x6e, 0x1d } \
+  }
+#define EFI_ERROR_SECTION_PROCESSOR_SPECIFIC_IA32X64_GUID \
+  { \
+    0xdc3ea0b0, 0xa144, 0x4797, { 0xb9, 0x5b, 0x53, 0xfa, 0x24, 0x2b, 0x6e, 0x1d } \
+  }
+#define EFI_ERROR_SECTION_PROCESSOR_SPECIFIC_ARM_GUID \
+  { \
+    0xe19e3d16, 0xbc11, 0x11e4, { 0x9c, 0xaa, 0xc2, 0x05, 0x1d, 0x5d, 0x46, 0xb0 } \
   }
 #define EFI_ERROR_SECTION_PLATFORM_MEMORY_GUID \
   { \
@@ -1178,6 +1191,8 @@ extern EFI_GUID gEfiEventNotificationTypeDmarGuid;
 
 extern EFI_GUID gEfiProcessorGenericErrorSectionGuid;
 extern EFI_GUID gEfiProcessorSpecificErrorSectionGuid;
+extern EFI_GUID gEfiIa32X64ProcessorErrorSectionGuid;
+extern EFI_GUID gEfiArmProcessorErrorSectionGuid ;
 extern EFI_GUID gEfiPlatformMemoryErrorSectionGuid;
 extern EFI_GUID gEfiPlatformMemory2ErrorSectionGuid;
 extern EFI_GUID gEfiPcieErrorSectionGuid;
