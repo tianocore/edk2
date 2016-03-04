@@ -88,6 +88,22 @@ GetSystemMemorySizeAbove4gb (
 
 
 /**
+  Return the highest address that DXE could possibly use, plus one.
+**/
+STATIC
+UINT64
+GetFirstNonAddress (
+  VOID
+  )
+{
+  UINT64               FirstNonAddress;
+
+  FirstNonAddress = BASE_4GB + GetSystemMemorySizeAbove4gb ();
+  return FirstNonAddress;
+}
+
+
+/**
   Initialize the mPhysMemAddressWidth variable, based on guest RAM size.
 **/
 VOID
@@ -103,7 +119,7 @@ AddressWidthInitialization (
   // The DXL IPL keys off of the physical address bits advertized in the CPU
   // HOB. To conserve memory, we calculate the minimum address width here.
   //
-  FirstNonAddress      = BASE_4GB + GetSystemMemorySizeAbove4gb ();
+  FirstNonAddress      = GetFirstNonAddress ();
   mPhysMemAddressWidth = (UINT8)HighBitSet64 (FirstNonAddress);
 
   //
