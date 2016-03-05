@@ -1,8 +1,18 @@
 diff --git a/Configure b/Configure
-index 4a715dc..eb61eda 100755
+index 4a715dc..b4a4781 100755
 --- a/Configure
 +++ b/Configure
-@@ -1082,7 +1082,7 @@ if (defined($disabled{"tls1"}))
+@@ -605,6 +605,9 @@ my %table=(
+ # with itself, Applink is never engaged and can as well be omitted.
+ "mingw64", "gcc:-mno-cygwin -DL_ENDIAN -O3 -Wall -DWIN32_LEAN_AND_MEAN -DUNICODE -D_UNICODE::-D_MT:MINGW64:-lws2_32 -lgdi32 -lcrypt32:SIXTY_FOUR_BIT RC4_CHUNK_LL DES_INT EXPORT_VAR_AS_FN:${x86_64_asm}:mingw64:win32:cygwin-shared:-D_WINDLL:-mno-cygwin:.dll.a",
+ 
++# UEFI
++"UEFI", "cc:-DL_ENDIAN -O:::UEFI::::",
++
+ # UWIN 
+ "UWIN", "cc:-DTERMIOS -DL_ENDIAN -O -Wall:::UWIN::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${no_asm}:win32",
+ 
+@@ -1082,7 +1085,7 @@ if (defined($disabled{"tls1"}))
  	}
  
  if (defined($disabled{"ec"}) || defined($disabled{"dsa"})
@@ -839,7 +849,7 @@ index 585aa8b..04c6cfc 100644
  /*
   * Borland C seems too stupid to be able to shift and do longs in the
 diff --git a/crypto/opensslconf.h.in b/crypto/opensslconf.h.in
-index 7a1c85d..a5f51a7 100644
+index 7a1c85d..7162c0f 100644
 --- a/crypto/opensslconf.h.in
 +++ b/crypto/opensslconf.h.in
 @@ -1,5 +1,15 @@
@@ -857,6 +867,15 @@ index 7a1c85d..a5f51a7 100644
 +
  /* Generate 80386 code? */
  #undef I386_ONLY
+ 
+@@ -56,7 +66,7 @@
+ #endif
+ #endif
+ 
+-#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H)
++#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H) && !defined(OPENSSL_SYSNAME_UEFI)
+ #define CONFIG_HEADER_BN_H
+ #undef BN_LLONG
  
 diff --git a/crypto/pem/pem.h b/crypto/pem/pem.h
 index d3b23fc..87b0b6a 100644
@@ -1052,6 +1071,19 @@ index c4d3724..0bc3d43 100644
 +    BIO_free_all(tmpmem);
 +    return ret;
  }
+diff --git a/crypto/rand/rand_egd.c b/crypto/rand/rand_egd.c
+index 737aebf..f23f348 100644
+--- a/crypto/rand/rand_egd.c
++++ b/crypto/rand/rand_egd.c
+@@ -95,7 +95,7 @@
+  *   RAND_egd() is a wrapper for RAND_egd_bytes() with numbytes=255.
+  */
+ 
+-#if defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_VOS) || defined(OPENSSL_SYS_BEOS)
++#if defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_VOS) || defined(OPENSSL_SYS_BEOS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_query_egd_bytes(const char *path, unsigned char *buf, int bytes)
+ {
+     return (-1);
 diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
 index 266111e..f60fac6 100644
 --- a/crypto/rand/rand_unix.c
