@@ -46,7 +46,7 @@ cryptography. This patch will enable openssl building under UEFI environment.
        Install Cygwin or get the patch utility binary from
           http://gnuwin32.sourceforge.net/packages/patch.htm
     2) cd $(WORKSPACE)\CryptoPkg\Library\OpensslLib\openssl-1.0.2f
-    3) patch -p0 -i ..\EDKII_openssl-1.0.2f.patch
+    3) patch -p1 -i ..\EDKII_openssl-1.0.2f.patch
     4) cd ..
     5) Install.cmd
 
@@ -55,7 +55,7 @@ cryptography. This patch will enable openssl building under UEFI environment.
     1) Make sure the patch utility has been installed in your machine.
        Patch utility is available from http://directory.fsf.org/project/patch/
     2) cd $(WORKSPACE)/CryptoPkg/Library/OpensslLib/openssl-1.0.2f
-    3) patch -p0 -i ../EDKII_openssl-1.0.2f.patch
+    3) patch -p1 -i ../EDKII_openssl-1.0.2f.patch
     4) cd ..
     5) ./Install.sh
 

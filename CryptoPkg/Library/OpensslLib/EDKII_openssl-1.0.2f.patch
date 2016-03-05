@@ -1,7 +1,8 @@
-diff U3 crypto/bio/bio.h crypto/bio/bio.h
---- crypto/bio/bio.h	Thu Jan 28 21:56:08 2016
-+++ crypto/bio/bio.h	Wed Feb 17 16:43:40 2016
-@@ -650,10 +650,10 @@
+diff --git a/crypto/bio/bio.h b/crypto/bio/bio.h
+index 6e2293b..325e5d2 100644
+--- a/crypto/bio/bio.h
++++ b/crypto/bio/bio.h
+@@ -650,10 +650,10 @@ int BIO_asn1_set_suffix(BIO *b, asn1_ps_func *suffix,
  int BIO_asn1_get_suffix(BIO *b, asn1_ps_func **psuffix,
                          asn1_ps_func **psuffix_free);
  
@@ -13,10 +14,11 @@ diff U3 crypto/bio/bio.h crypto/bio/bio.h
  #  define BIO_s_file_internal    BIO_s_file
  # endif
  BIO *BIO_new(BIO_METHOD *type);
-diff U3 crypto/bio/bss_file.c crypto/bio/bss_file.c
---- crypto/bio/bss_file.c	Thu Jan 28 21:38:30 2016
-+++ crypto/bio/bss_file.c	Wed Feb 17 16:01:02 2016
-@@ -467,6 +467,23 @@
+diff --git a/crypto/bio/bss_file.c b/crypto/bio/bss_file.c
+index bfba93e..4f13d1b 100644
+--- a/crypto/bio/bss_file.c
++++ b/crypto/bio/bss_file.c
+@@ -467,6 +467,23 @@ static int MS_CALLBACK file_puts(BIO *bp, const char *str)
      return (ret);
  }
  
@@ -40,236 +42,11 @@ diff U3 crypto/bio/bss_file.c crypto/bio/bss_file.c
  # endif                         /* OPENSSL_NO_STDIO */
  
  #endif                          /* HEADER_BSS_FILE_C */
-diff U3 crypto/dh/dh_pmeth.c crypto/dh/dh_pmeth.c
---- crypto/dh/dh_pmeth.c	Thu Jan 28 21:56:08 2016
-+++ crypto/dh/dh_pmeth.c	Wed Feb 17 16:15:58 2016
-@@ -449,6 +449,9 @@
-         *keylen = ret;
-         return 1;
-     } else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
-+#ifdef OPENSSL_NO_CMS
-+        return 0;
-+#else
-         unsigned char *Z = NULL;
-         size_t Zlen = 0;
-         if (!dctx->kdf_outlen || !dctx->kdf_oid)
-@@ -478,6 +481,7 @@
-             OPENSSL_free(Z);
-         }
-         return ret;
-+#endif
-     }
-     return 1;
- }
-diff U3 crypto/pem/pem.h crypto/pem/pem.h
---- crypto/pem/pem.h	Thu Jan 28 21:56:08 2016
-+++ crypto/pem/pem.h	Wed Feb 17 15:56:26 2016
-@@ -324,6 +324,7 @@
- 
- #  define DECLARE_PEM_read_fp(name, type) /**/
- #  define DECLARE_PEM_write_fp(name, type) /**/
-+#  define DECLARE_PEM_write_fp_const(name, type) /**/
- #  define DECLARE_PEM_write_cb_fp(name, type) /**/
- # else
- 
-diff U3 crypto/pkcs7/pk7_smime.c crypto/pkcs7/pk7_smime.c
---- crypto/pkcs7/pk7_smime.c	Thu Jan 28 21:56:08 2016
-+++ crypto/pkcs7/pk7_smime.c	Wed Feb 17 16:22:45 2016
-@@ -254,7 +254,8 @@
-     STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
-     PKCS7_SIGNER_INFO *si;
-     X509_STORE_CTX cert_ctx;
--    char buf[4096];
-+    char *buf = NULL;
-+    int bufsiz;
-     int i, j = 0, k, ret = 0;
-     BIO *p7bio = NULL;
-     BIO *tmpin = NULL, *tmpout = NULL;
-@@ -275,12 +276,6 @@
-         return 0;
-     }
- 
--    /* Check for data and content: two sets of data */
--    if (!PKCS7_get_detached(p7) && indata) {
--        PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_CONTENT_AND_DATA_PRESENT);
--        return 0;
--    }
--
-     sinfos = PKCS7_get_signer_info(p7);
- 
-     if (!sinfos || !sk_PKCS7_SIGNER_INFO_num(sinfos)) {
-@@ -355,9 +350,14 @@
-     } else
-         tmpout = out;
- 
-+    bufsiz = 4096;
-+    buf = OPENSSL_malloc(bufsiz);
-+    if (buf == NULL) {
-+        goto err;
-+    }
-     /* We now have to 'read' from p7bio to calculate digests etc. */
-     for (;;) {
--        i = BIO_read(p7bio, buf, sizeof(buf));
-+        i = BIO_read(p7bio, buf, bufsiz);
-         if (i <= 0)
-             break;
-         if (tmpout)
-@@ -394,6 +394,9 @@
-     }
-     BIO_free_all(p7bio);
-     sk_X509_free(signers);
-+    if (buf != NULL) {
-+        OPENSSL_free(buf);
-+    }
-     return ret;
- }
- 
-diff U3 crypto/rand/rand_unix.c crypto/rand/rand_unix.c
---- crypto/rand/rand_unix.c	Thu Jan 28 21:38:32 2016
-+++ crypto/rand/rand_unix.c	Wed Feb 17 15:40:02 2016
-@@ -116,7 +116,7 @@
- #include <openssl/rand.h>
- #include "rand_lcl.h"
- 
--#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE))
-+#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_UEFI))
- 
- # include <sys/types.h>
- # include <sys/time.h>
-@@ -439,7 +439,7 @@
-                                  * defined(OPENSSL_SYS_VXWORKS) ||
-                                  * defined(OPENSSL_SYS_NETWARE)) */
- 
--#if defined(OPENSSL_SYS_VXWORKS)
-+#if defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_UEFI)
- int RAND_poll(void)
- {
-     return 0;
-diff U3 crypto/rsa/rsa_ameth.c crypto/rsa/rsa_ameth.c
---- crypto/rsa/rsa_ameth.c	Thu Jan 28 21:56:08 2016
-+++ crypto/rsa/rsa_ameth.c	Wed Feb 17 15:09:46 2016
-@@ -68,10 +68,12 @@
- #endif
- #include "asn1_locl.h"
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_sign(CMS_SignerInfo *si);
- static int rsa_cms_verify(CMS_SignerInfo *si);
- static int rsa_cms_decrypt(CMS_RecipientInfo *ri);
- static int rsa_cms_encrypt(CMS_RecipientInfo *ri);
-+#endif
- 
- static int rsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
- {
-@@ -665,6 +667,7 @@
-     return rv;
- }
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_verify(CMS_SignerInfo *si)
- {
-     int nid, nid2;
-@@ -683,6 +686,7 @@
-     }
-     return 0;
- }
-+#endif
- 
- /*
-  * Customised RSA item verification routine. This is called when a signature
-@@ -705,6 +709,7 @@
-     return -1;
- }
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_sign(CMS_SignerInfo *si)
- {
-     int pad_mode = RSA_PKCS1_PADDING;
-@@ -729,6 +734,7 @@
-     X509_ALGOR_set0(alg, OBJ_nid2obj(NID_rsassaPss), V_ASN1_SEQUENCE, os);
-     return 1;
- }
-+#endif
- 
- static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
-                          X509_ALGOR *alg1, X509_ALGOR *alg2,
-@@ -785,6 +791,7 @@
-     return pss;
- }
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
- {
-     EVP_PKEY_CTX *pkctx;
-@@ -857,7 +864,9 @@
-         X509_ALGOR_free(maskHash);
-     return rv;
- }
-+#endif
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
- {
-     const EVP_MD *md, *mgf1md;
-@@ -920,6 +929,7 @@
-         ASN1_STRING_free(os);
-     return rv;
- }
-+#endif
- 
- const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
-     {
-diff U3 crypto/x509/x509_vfy.c crypto/x509/x509_vfy.c
---- crypto/x509/x509_vfy.c	Thu Jan 28 21:56:08 2016
-+++ crypto/x509/x509_vfy.c	Wed Feb 17 16:09:58 2016
-@@ -940,6 +940,8 @@
-         ctx->current_crl = crl;
-     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
-         ptime = &ctx->param->check_time;
-+    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
-+        return 1;
-     else
-         ptime = NULL;
- 
-@@ -1663,6 +1665,8 @@
- 
-     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
-         ptime = &ctx->param->check_time;
-+    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
-+        return 1;
-     else
-         ptime = NULL;
- 
-diff U3 crypto/x509/x509_vfy.h crypto/x509/x509_vfy.h
---- crypto/x509/x509_vfy.h	Thu Jan 28 21:56:08 2016
-+++ crypto/x509/x509_vfy.h	Wed Feb 17 16:08:18 2016
-@@ -438,6 +438,8 @@
-  * will force the behaviour to match that of previous versions.
-  */
- # define X509_V_FLAG_NO_ALT_CHAINS               0x100000
-+/* Do not check certificate/CRL validity against current time */
-+# define X509_V_FLAG_NO_CHECK_TIME               0x200000
- 
- # define X509_VP_FLAG_DEFAULT                    0x1
- # define X509_VP_FLAG_OVERWRITE                  0x2
-diff U3 crypto/x509v3/ext_dat.h crypto/x509v3/ext_dat.h
---- crypto/x509v3/ext_dat.h	Thu Jan 28 21:56:08 2016
-+++ crypto/x509v3/ext_dat.h	Wed Feb 17 16:13:30 2016
-@@ -127,8 +127,10 @@
-     &v3_idp,
-     &v3_alt[2],
-     &v3_freshest_crl,
-+#ifndef OPENSSL_SYS_UEFI
-     &v3_ct_scts[0],
-     &v3_ct_scts[1],
-+#endif
- };
- 
- /* Number of standard extensions */
-diff U3 crypto/crypto.h crypto/crypto.h
---- crypto/crypto.h	Thu Jan 28 21:38:30 2016
-+++ crypto/crypto.h	Wed Feb 17 16:33:00 2016
-@@ -235,15 +235,15 @@
+diff --git a/crypto/crypto.h b/crypto/crypto.h
+index c450d7a..d6e804e 100644
+--- a/crypto/crypto.h
++++ b/crypto/crypto.h
+@@ -235,15 +235,15 @@ typedef struct openssl_item_st {
  # ifndef OPENSSL_NO_LOCKING
  #  ifndef CRYPTO_w_lock
  #   define CRYPTO_w_lock(type)     \
@@ -290,7 +67,7 @@ diff U3 crypto/crypto.h crypto/crypto.h
  #  endif
  # else
  #  define CRYPTO_w_lock(a)
-@@ -378,19 +378,19 @@
+@@ -378,19 +378,19 @@ int CRYPTO_is_mem_check_on(void);
  # define MemCheck_off()  CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_DISABLE)
  # define is_MemCheck_on() CRYPTO_is_mem_check_on()
  
@@ -316,7 +93,7 @@ diff U3 crypto/crypto.h crypto/crypto.h
  # define OPENSSL_free_locked(addr) CRYPTO_free_locked(addr)
  
  const char *SSLeay_version(int type);
-@@ -545,7 +545,7 @@
+@@ -545,7 +545,7 @@ void CRYPTO_set_mem_debug_options(long bits);
  long CRYPTO_get_mem_debug_options(void);
  
  # define CRYPTO_push_info(info) \
@@ -325,7 +102,7 @@ diff U3 crypto/crypto.h crypto/crypto.h
  int CRYPTO_push_info_(const char *info, const char *file, int line);
  int CRYPTO_pop_info(void);
  int CRYPTO_remove_all_info(void);
-@@ -588,7 +588,7 @@
+@@ -588,7 +588,7 @@ void CRYPTO_mem_leaks_cb(CRYPTO_MEM_LEAK_CB *cb);
  
  /* die if we have to */
  void OpenSSLDie(const char *file, int line, const char *assertion);
@@ -334,7 +111,7 @@ diff U3 crypto/crypto.h crypto/crypto.h
  
  unsigned long *OPENSSL_ia32cap_loc(void);
  # define OPENSSL_ia32cap (*(OPENSSL_ia32cap_loc()))
-@@ -605,14 +605,14 @@
+@@ -605,14 +605,14 @@ void OPENSSL_init(void);
  #  define fips_md_init_ctx(alg, cx) \
          int alg##_Init(cx##_CTX *c) \
          { \
@@ -351,10 +128,245 @@ diff U3 crypto/crypto.h crypto/crypto.h
                  "Low level API call to cipher " #alg " forbidden in FIPS mode!")
  
  # else
-diff U3 e_os.h e_os.h
---- e_os.h	Thu Jan 28 21:56:08 2016
-+++ e_os.h	Wed Feb 17 15:52:08 2016
-@@ -136,7 +136,7 @@
+diff --git a/crypto/dh/dh_pmeth.c b/crypto/dh/dh_pmeth.c
+index b58e3fa..e5f345a 100644
+--- a/crypto/dh/dh_pmeth.c
++++ b/crypto/dh/dh_pmeth.c
+@@ -449,6 +449,9 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
+         *keylen = ret;
+         return 1;
+     } else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
++#ifdef OPENSSL_NO_CMS
++        return 0;
++#else
+         unsigned char *Z = NULL;
+         size_t Zlen = 0;
+         if (!dctx->kdf_outlen || !dctx->kdf_oid)
+@@ -478,6 +481,7 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
+             OPENSSL_free(Z);
+         }
+         return ret;
++#endif
+     }
+     return 1;
+ }
+diff --git a/crypto/pem/pem.h b/crypto/pem/pem.h
+index d3b23fc..d61605b 100644
+--- a/crypto/pem/pem.h
++++ b/crypto/pem/pem.h
+@@ -324,6 +324,7 @@ int PEM_write_bio_##name(BIO *bp, type *x, const EVP_CIPHER *enc, \
+ 
+ #  define DECLARE_PEM_read_fp(name, type) /**/
+ #  define DECLARE_PEM_write_fp(name, type) /**/
++#  define DECLARE_PEM_write_fp_const(name, type) /**/
+ #  define DECLARE_PEM_write_cb_fp(name, type) /**/
+ # else
+ 
+diff --git a/crypto/pkcs7/pk7_smime.c b/crypto/pkcs7/pk7_smime.c
+index c4d3724..0996c39 100644
+--- a/crypto/pkcs7/pk7_smime.c
++++ b/crypto/pkcs7/pk7_smime.c
+@@ -254,7 +254,8 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+     STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
+     PKCS7_SIGNER_INFO *si;
+     X509_STORE_CTX cert_ctx;
+-    char buf[4096];
++    char *buf = NULL;
++    int bufsiz;
+     int i, j = 0, k, ret = 0;
+     BIO *p7bio = NULL;
+     BIO *tmpin = NULL, *tmpout = NULL;
+@@ -275,12 +276,6 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+         return 0;
+     }
+ 
+-    /* Check for data and content: two sets of data */
+-    if (!PKCS7_get_detached(p7) && indata) {
+-        PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_CONTENT_AND_DATA_PRESENT);
+-        return 0;
+-    }
+-
+     sinfos = PKCS7_get_signer_info(p7);
+ 
+     if (!sinfos || !sk_PKCS7_SIGNER_INFO_num(sinfos)) {
+@@ -355,9 +350,14 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+     } else
+         tmpout = out;
+ 
++    bufsiz = 4096;
++    buf = OPENSSL_malloc(bufsiz);
++    if (buf == NULL) {
++        goto err;
++    }
+     /* We now have to 'read' from p7bio to calculate digests etc. */
+     for (;;) {
+-        i = BIO_read(p7bio, buf, sizeof(buf));
++        i = BIO_read(p7bio, buf, bufsiz);
+         if (i <= 0)
+             break;
+         if (tmpout)
+@@ -394,6 +394,9 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+     }
+     BIO_free_all(p7bio);
+     sk_X509_free(signers);
++    if (buf != NULL) {
++        OPENSSL_free(buf);
++    }
+     return ret;
+ }
+ 
+diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
+index 266111e..f60fac6 100644
+--- a/crypto/rand/rand_unix.c
++++ b/crypto/rand/rand_unix.c
+@@ -116,7 +116,7 @@
+ #include <openssl/rand.h>
+ #include "rand_lcl.h"
+ 
+-#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE))
++#if !(defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_VMS) || defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_NETWARE) || defined(OPENSSL_SYS_UEFI))
+ 
+ # include <sys/types.h>
+ # include <sys/time.h>
+@@ -439,7 +439,7 @@ int RAND_poll(void)
+                                  * defined(OPENSSL_SYS_VXWORKS) ||
+                                  * defined(OPENSSL_SYS_NETWARE)) */
+ 
+-#if defined(OPENSSL_SYS_VXWORKS)
++#if defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_UEFI)
+ int RAND_poll(void)
+ {
+     return 0;
+diff --git a/crypto/rsa/rsa_ameth.c b/crypto/rsa/rsa_ameth.c
+index 4e06218..f591f0f 100644
+--- a/crypto/rsa/rsa_ameth.c
++++ b/crypto/rsa/rsa_ameth.c
+@@ -68,10 +68,12 @@
+ #endif
+ #include "asn1_locl.h"
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_sign(CMS_SignerInfo *si);
+ static int rsa_cms_verify(CMS_SignerInfo *si);
+ static int rsa_cms_decrypt(CMS_RecipientInfo *ri);
+ static int rsa_cms_encrypt(CMS_RecipientInfo *ri);
++#endif
+ 
+ static int rsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
+ {
+@@ -665,6 +667,7 @@ static int rsa_pss_to_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pkctx,
+     return rv;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_verify(CMS_SignerInfo *si)
+ {
+     int nid, nid2;
+@@ -683,6 +686,7 @@ static int rsa_cms_verify(CMS_SignerInfo *si)
+     }
+     return 0;
+ }
++#endif
+ 
+ /*
+  * Customised RSA item verification routine. This is called when a signature
+@@ -705,6 +709,7 @@ static int rsa_item_verify(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
+     return -1;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_sign(CMS_SignerInfo *si)
+ {
+     int pad_mode = RSA_PKCS1_PADDING;
+@@ -729,6 +734,7 @@ static int rsa_cms_sign(CMS_SignerInfo *si)
+     X509_ALGOR_set0(alg, OBJ_nid2obj(NID_rsassaPss), V_ASN1_SEQUENCE, os);
+     return 1;
+ }
++#endif
+ 
+ static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
+                          X509_ALGOR *alg1, X509_ALGOR *alg2,
+@@ -785,6 +791,7 @@ static RSA_OAEP_PARAMS *rsa_oaep_decode(const X509_ALGOR *alg,
+     return pss;
+ }
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+ {
+     EVP_PKEY_CTX *pkctx;
+@@ -857,7 +864,9 @@ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+         X509_ALGOR_free(maskHash);
+     return rv;
+ }
++#endif
+ 
++#ifndef OPENSSL_NO_CMS
+ static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
+ {
+     const EVP_MD *md, *mgf1md;
+@@ -920,6 +929,7 @@ static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
+         ASN1_STRING_free(os);
+     return rv;
+ }
++#endif
+ 
+ const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
+     {
+diff --git a/crypto/x509/x509_vfy.c b/crypto/x509/x509_vfy.c
+index 0429767..7ddc21c 100644
+--- a/crypto/x509/x509_vfy.c
++++ b/crypto/x509/x509_vfy.c
+@@ -940,6 +940,8 @@ static int check_crl_time(X509_STORE_CTX *ctx, X509_CRL *crl, int notify)
+         ctx->current_crl = crl;
+     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
+         ptime = &ctx->param->check_time;
++    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
++        return 1;
+     else
+         ptime = NULL;
+ 
+@@ -1663,6 +1665,8 @@ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
+ 
+     if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
+         ptime = &ctx->param->check_time;
++    else if (ctx->param->flags & X509_V_FLAG_NO_CHECK_TIME)
++        return 1;
+     else
+         ptime = NULL;
+ 
+diff --git a/crypto/x509/x509_vfy.h b/crypto/x509/x509_vfy.h
+index 2663e1c..98d0b4c 100644
+--- a/crypto/x509/x509_vfy.h
++++ b/crypto/x509/x509_vfy.h
+@@ -438,6 +438,8 @@ void X509_STORE_CTX_set_depth(X509_STORE_CTX *ctx, int depth);
+  * will force the behaviour to match that of previous versions.
+  */
+ # define X509_V_FLAG_NO_ALT_CHAINS               0x100000
++/* Do not check certificate/CRL validity against current time */
++# define X509_V_FLAG_NO_CHECK_TIME               0x200000
+ 
+ # define X509_VP_FLAG_DEFAULT                    0x1
+ # define X509_VP_FLAG_OVERWRITE                  0x2
+diff --git a/crypto/x509v3/ext_dat.h b/crypto/x509v3/ext_dat.h
+index c3a6fce..01edd2a 100644
+--- a/crypto/x509v3/ext_dat.h
++++ b/crypto/x509v3/ext_dat.h
+@@ -127,8 +127,10 @@ static const X509V3_EXT_METHOD *standard_exts[] = {
+     &v3_idp,
+     &v3_alt[2],
+     &v3_freshest_crl,
++#ifndef OPENSSL_SYS_UEFI
+     &v3_ct_scts[0],
+     &v3_ct_scts[1],
++#endif
+ };
+ 
+ /* Number of standard extensions */
+diff --git a/e_os.h b/e_os.h
+index 1fa36c1..3e9dae2 100644
+--- a/e_os.h
++++ b/e_os.h
+@@ -136,7 +136,7 @@ extern "C" {
  #  define MSDOS
  # endif
  
@@ -363,10 +375,11 @@ diff U3 e_os.h e_os.h
  #  define GETPID_IS_MEANINGLESS
  # endif
  
-diff U3 e_os2.h e_os2.h
---- e_os2.h	Thu Jan 28 21:56:08 2016
-+++ e_os2.h	Wed Feb 17 15:53:08 2016
-@@ -97,7 +97,14 @@
+diff --git a/e_os2.h b/e_os2.h
+index 7be9989..909e22f 100644
+--- a/e_os2.h
++++ b/e_os2.h
+@@ -97,7 +97,14 @@ extern "C" {
   * For 32 bit environment, there seems to be the CygWin environment and then
   * all the others that try to do the same thing Microsoft does...
   */
