@@ -163,7 +163,7 @@ index d3b23fc..d61605b 100644
  # else
  
 diff --git a/crypto/pkcs7/pk7_smime.c b/crypto/pkcs7/pk7_smime.c
-index c4d3724..0996c39 100644
+index c4d3724..fd531c9 100644
 --- a/crypto/pkcs7/pk7_smime.c
 +++ b/crypto/pkcs7/pk7_smime.c
 @@ -254,7 +254,8 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
@@ -176,20 +176,37 @@ index c4d3724..0996c39 100644
      int i, j = 0, k, ret = 0;
      BIO *p7bio = NULL;
      BIO *tmpin = NULL, *tmpout = NULL;
-@@ -275,12 +276,6 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -274,12 +275,29 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+         PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_NO_CONTENT);
          return 0;
      }
++#if 0
++    /*
++     * NB: this test commented out because some versions of Netscape
++     * illegally include zero length content when signing data. Also
++     * Microsoft Authenticode includes a SpcIndirectDataContent data
++     * structure which describes the content to be protected by the
++     * signature, rather than directly embedding that content. So
++     * Authenticode implementations are also expected to use
++     * PKCS7_verify() with explicit external data, on non-detached
++     * PKCS#7 signatures.
++     *
++     * In OpenSSL 1.1 a new flag PKCS7_NO_DUAL_CONTENT has been
++     * introduced to disable this sanity check. For the 1.0.2 branch
++     * this change is not acceptable, so the check remains completely
++     * commented out (as it has been for a long time).
++     */
  
--    /* Check for data and content: two sets of data */
--    if (!PKCS7_get_detached(p7) && indata) {
--        PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_CONTENT_AND_DATA_PRESENT);
--        return 0;
--    }
--
+     /* Check for data and content: two sets of data */
+     if (!PKCS7_get_detached(p7) && indata) {
+         PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_CONTENT_AND_DATA_PRESENT);
+         return 0;
+     }
++#endif
+ 
      sinfos = PKCS7_get_signer_info(p7);
  
-     if (!sinfos || !sk_PKCS7_SIGNER_INFO_num(sinfos)) {
-@@ -355,9 +350,14 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -355,9 +373,14 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
      } else
          tmpout = out;
  
@@ -205,7 +222,7 @@ index c4d3724..0996c39 100644
          if (i <= 0)
              break;
          if (tmpout)
-@@ -394,6 +394,9 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -394,6 +417,9 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
      }
      BIO_free_all(p7bio);
      sk_X509_free(signers);
