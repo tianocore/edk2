@@ -5501,6 +5501,7 @@ RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS)
 ##################
 # X64 definitions
 ##################
+*_ELFGCC_X64_OBJCOPY_PATH          = DEF(ELFGCC_BIN)/objcopy
 *_ELFGCC_X64_CC_PATH               = DEF(ELFGCC_BIN)/gcc
 *_ELFGCC_X64_ASLCC_PATH            = DEF(ELFGCC_BIN)/gcc
 *_ELFGCC_X64_SLINK_PATH            = DEF(ELFGCC_BIN)/ar
@@ -5519,6 +5520,7 @@ RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS)
 *_ELFGCC_X64_PP_FLAGS              = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_ELFGCC_X64_VFRPP_FLAGS           = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 *_ELFGCC_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
+*_ELFGCC_X64_OBJCOPY_FLAGS         =
 *_ELFGCC_X64_NASM_FLAGS            = -f elf64
 
 ##################
