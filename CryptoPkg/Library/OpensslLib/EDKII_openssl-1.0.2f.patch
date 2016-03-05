@@ -31,6 +31,176 @@ index 35fd44c..9f39bff 100644
  
  typedef int char_io (void *arg, const void *buf, int len);
  
+diff --git a/crypto/asn1/asn1_mac.h b/crypto/asn1/asn1_mac.h
+index abc6dc3..3a672e9 100644
+--- a/crypto/asn1/asn1_mac.h
++++ b/crypto/asn1/asn1_mac.h
+@@ -70,7 +70,7 @@ extern "C" {
+ # endif
+ 
+ # define ASN1_MAC_H_err(f,r,line) \
+-        ERR_PUT_error(ASN1_MAC_ERR_LIB,(f),(r),__FILE__,(line))
++        ERR_PUT_error(ASN1_MAC_ERR_LIB,(f),(r),OPENSSL_FILE,(line))
+ 
+ # define M_ASN1_D2I_vars(a,type,func) \
+         ASN1_const_CTX c; \
+@@ -81,7 +81,7 @@ extern "C" {
+         c.error=ERR_R_NESTED_ASN1_ERROR; \
+         if ((a == NULL) || ((*a) == NULL)) \
+                 { if ((ret=(type)func()) == NULL) \
+-                        { c.line=__LINE__; goto err; } } \
++                        { c.line=OPENSSL_LINE; goto err; } } \
+         else    ret=(*a);
+ 
+ # define M_ASN1_D2I_Init() \
+@@ -90,7 +90,7 @@ extern "C" {
+ 
+ # define M_ASN1_D2I_Finish_2(a) \
+         if (!asn1_const_Finish(&c)) \
+-                { c.line=__LINE__; goto err; } \
++                { c.line=OPENSSL_LINE; goto err; } \
+         *(const unsigned char **)pp=c.p; \
+         if (a != NULL) (*a)=ret; \
+         return(ret);
+@@ -105,7 +105,7 @@ err:\
+ 
+ # define M_ASN1_D2I_start_sequence() \
+         if (!asn1_GetSequence(&c,&length)) \
+-                { c.line=__LINE__; goto err; }
++                { c.line=OPENSSL_LINE; goto err; }
+ /* Begin reading ASN1 without a surrounding sequence */
+ # define M_ASN1_D2I_begin() \
+         c.slen = length;
+@@ -129,21 +129,21 @@ err:\
+ # define M_ASN1_D2I_get(b, func) \
+         c.q=c.p; \
+         if (func(&(b),&c.p,c.slen) == NULL) \
+-                {c.line=__LINE__; goto err; } \
++                {c.line=OPENSSL_LINE; goto err; } \
+         c.slen-=(c.p-c.q);
+ 
+ /* Don't use this with d2i_ASN1_BOOLEAN() */
+ # define M_ASN1_D2I_get_x(type,b,func) \
+         c.q=c.p; \
+         if (((D2I_OF(type))func)(&(b),&c.p,c.slen) == NULL) \
+-                {c.line=__LINE__; goto err; } \
++                {c.line=OPENSSL_LINE; goto err; } \
+         c.slen-=(c.p-c.q);
+ 
+ /* use this instead () */
+ # define M_ASN1_D2I_get_int(b,func) \
+         c.q=c.p; \
+         if (func(&(b),&c.p,c.slen) < 0) \
+-                {c.line=__LINE__; goto err; } \
++                {c.line=OPENSSL_LINE; goto err; } \
+         c.slen-=(c.p-c.q);
+ 
+ # define M_ASN1_D2I_get_opt(b,func,type) \
+@@ -164,7 +164,7 @@ err:\
+         M_ASN1_next=(_tmp& V_ASN1_CONSTRUCTED)|type; \
+         c.q=c.p; \
+         if (func(&(b),&c.p,c.slen) == NULL) \
+-                {c.line=__LINE__; M_ASN1_next_prev = _tmp; goto err; } \
++                {c.line=OPENSSL_LINE; M_ASN1_next_prev = _tmp; goto err; } \
+         c.slen-=(c.p-c.q);\
+         M_ASN1_next_prev=_tmp;
+ 
+@@ -258,20 +258,20 @@ err:\
+         c.q=c.p; \
+         if (d2i_ASN1_SET(&(r),&c.p,c.slen,(char *(*)())func,\
+                 (void (*)())free_func,a,b) == NULL) \
+-                { c.line=__LINE__; goto err; } \
++                { c.line=OPENSSL_LINE; goto err; } \
+         c.slen-=(c.p-c.q);
+ 
+ # define M_ASN1_D2I_get_imp_set_type(type,r,func,free_func,a,b) \
+         c.q=c.p; \
+         if (d2i_ASN1_SET_OF_##type(&(r),&c.p,c.slen,func,\
+                                    free_func,a,b) == NULL) \
+-                { c.line=__LINE__; goto err; } \
++                { c.line=OPENSSL_LINE; goto err; } \
+         c.slen-=(c.p-c.q);
+ 
+ # define M_ASN1_D2I_get_set_strings(r,func,a,b) \
+         c.q=c.p; \
+         if (d2i_ASN1_STRING_SET(&(r),&c.p,c.slen,a,b) == NULL) \
+-                { c.line=__LINE__; goto err; } \
++                { c.line=OPENSSL_LINE; goto err; } \
+         c.slen-=(c.p-c.q);
+ 
+ # define M_ASN1_D2I_get_EXP_opt(r,func,tag) \
+@@ -285,16 +285,16 @@ err:\
+                 Tinf=ASN1_get_object(&c.p,&Tlen,&Ttag,&Tclass,c.slen); \
+                 if (Tinf & 0x80) \
+                         { c.error=ERR_R_BAD_ASN1_OBJECT_HEADER; \
+-                        c.line=__LINE__; goto err; } \
++                        c.line=OPENSSL_LINE; goto err; } \
+                 if (Tinf == (V_ASN1_CONSTRUCTED+1)) \
+                                         Tlen = c.slen - (c.p - c.q) - 2; \
+                 if (func(&(r),&c.p,Tlen) == NULL) \
+-                        { c.line=__LINE__; goto err; } \
++                        { c.line=OPENSSL_LINE; goto err; } \
+                 if (Tinf == (V_ASN1_CONSTRUCTED+1)) { \
+                         Tlen = c.slen - (c.p - c.q); \
+                         if(!ASN1_const_check_infinite_end(&c.p, Tlen)) \
+                                 { c.error=ERR_R_MISSING_ASN1_EOS; \
+-                                c.line=__LINE__; goto err; } \
++                                c.line=OPENSSL_LINE; goto err; } \
+                 }\
+                 c.slen-=(c.p-c.q); \
+                 }
+@@ -310,18 +310,18 @@ err:\
+                 Tinf=ASN1_get_object(&c.p,&Tlen,&Ttag,&Tclass,c.slen); \
+                 if (Tinf & 0x80) \
+                         { c.error=ERR_R_BAD_ASN1_OBJECT_HEADER; \
+-                        c.line=__LINE__; goto err; } \
++                        c.line=OPENSSL_LINE; goto err; } \
+                 if (Tinf == (V_ASN1_CONSTRUCTED+1)) \
+                                         Tlen = c.slen - (c.p - c.q) - 2; \
+                 if (d2i_ASN1_SET(&(r),&c.p,Tlen,(char *(*)())func, \
+                         (void (*)())free_func, \
+                         b,V_ASN1_UNIVERSAL) == NULL) \
+-                        { c.line=__LINE__; goto err; } \
++                        { c.line=OPENSSL_LINE; goto err; } \
+                 if (Tinf == (V_ASN1_CONSTRUCTED+1)) { \
+                         Tlen = c.slen - (c.p - c.q); \
+                         if(!ASN1_check_infinite_end(&c.p, Tlen)) \
+                                 { c.error=ERR_R_MISSING_ASN1_EOS; \
+-                                c.line=__LINE__; goto err; } \
++                                c.line=OPENSSL_LINE; goto err; } \
+                 }\
+                 c.slen-=(c.p-c.q); \
+                 }
+@@ -337,17 +337,17 @@ err:\
+                 Tinf=ASN1_get_object(&c.p,&Tlen,&Ttag,&Tclass,c.slen); \
+                 if (Tinf & 0x80) \
+                         { c.error=ERR_R_BAD_ASN1_OBJECT_HEADER; \
+-                        c.line=__LINE__; goto err; } \
++                        c.line=OPENSSL_LINE; goto err; } \
+                 if (Tinf == (V_ASN1_CONSTRUCTED+1)) \
+                                         Tlen = c.slen - (c.p - c.q) - 2; \
+                 if (d2i_ASN1_SET_OF_##type(&(r),&c.p,Tlen,func, \
+                         free_func,b,V_ASN1_UNIVERSAL) == NULL) \
+-                        { c.line=__LINE__; goto err; } \
++                        { c.line=OPENSSL_LINE; goto err; } \
+                 if (Tinf == (V_ASN1_CONSTRUCTED+1)) { \
+                         Tlen = c.slen - (c.p - c.q); \
+                         if(!ASN1_check_infinite_end(&c.p, Tlen)) \
+                                 { c.error=ERR_R_MISSING_ASN1_EOS; \
+-                                c.line=__LINE__; goto err; } \
++                                c.line=OPENSSL_LINE; goto err; } \
+                 }\
+                 c.slen-=(c.p-c.q); \
+                 }
+@@ -355,7 +355,7 @@ err:\
+ /* New macros */
+ # define M_ASN1_New_Malloc(ret,type) \
+         if ((ret=(type *)OPENSSL_malloc(sizeof(type))) == NULL) \
+-                { c.line=__LINE__; goto err2; }
++                { c.line=OPENSSL_LINE; goto err2; }
+ 
+ # define M_ASN1_New(arg,func) \
+         if (((arg)=func()) == NULL) return(NULL)
 diff --git a/crypto/conf/conf.h b/crypto/conf/conf.h
 index 8d926d5..41cf38e 100644
 --- a/crypto/conf/conf.h
@@ -183,9 +353,36 @@ index c042cf2..a25b636 100644
  }
  
 diff --git a/crypto/cryptlib.c b/crypto/cryptlib.c
-index c9f674b..e223118 100644
+index c9f674b..39ead7f 100644
 --- a/crypto/cryptlib.c
 +++ b/crypto/cryptlib.c
+@@ -263,7 +263,7 @@ int CRYPTO_get_new_dynlockid(void)
+         return (0);
+     }
+     pointer->references = 1;
+-    pointer->data = dynlock_create_callback(__FILE__, __LINE__);
++    pointer->data = dynlock_create_callback(OPENSSL_FILE, OPENSSL_LINE);
+     if (pointer->data == NULL) {
+         OPENSSL_free(pointer);
+         CRYPTOerr(CRYPTO_F_CRYPTO_GET_NEW_DYNLOCKID, ERR_R_MALLOC_FAILURE);
+@@ -289,7 +289,7 @@ int CRYPTO_get_new_dynlockid(void)
+     CRYPTO_w_unlock(CRYPTO_LOCK_DYNLOCK);
+ 
+     if (i == -1) {
+-        dynlock_destroy_callback(pointer->data, __FILE__, __LINE__);
++        dynlock_destroy_callback(pointer->data, OPENSSL_FILE, OPENSSL_LINE);
+         OPENSSL_free(pointer);
+     } else
+         i += 1;                 /* to avoid 0 */
+@@ -328,7 +328,7 @@ void CRYPTO_destroy_dynlockid(int i)
+     CRYPTO_w_unlock(CRYPTO_LOCK_DYNLOCK);
+ 
+     if (pointer) {
+-        dynlock_destroy_callback(pointer->data, __FILE__, __LINE__);
++        dynlock_destroy_callback(pointer->data, OPENSSL_FILE, OPENSSL_LINE);
+         OPENSSL_free(pointer);
+     }
+ }
 @@ -670,6 +670,7 @@ unsigned long *OPENSSL_ia32cap_loc(void)
  }
  
@@ -236,7 +433,7 @@ index fba180a..3e3ea5e 100644
  
  #ifdef  __cplusplus
 diff --git a/crypto/crypto.h b/crypto/crypto.h
-index c450d7a..d6e804e 100644
+index c450d7a..063d78e 100644
 --- a/crypto/crypto.h
 +++ b/crypto/crypto.h
 @@ -235,15 +235,15 @@ typedef struct openssl_item_st {
@@ -244,19 +441,19 @@ index c450d7a..d6e804e 100644
  #  ifndef CRYPTO_w_lock
  #   define CRYPTO_w_lock(type)     \
 -        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
-+        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,NULL,0)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,OPENSSL_FILE,OPENSSL_LINE)
  #   define CRYPTO_w_unlock(type)   \
 -        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
-+        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,NULL,0)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,OPENSSL_FILE,OPENSSL_LINE)
  #   define CRYPTO_r_lock(type)     \
 -        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,__FILE__,__LINE__)
-+        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,NULL,0)
++        CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,OPENSSL_FILE,OPENSSL_LINE)
  #   define CRYPTO_r_unlock(type)   \
 -        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,__FILE__,__LINE__)
-+        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,NULL,0)
++        CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,OPENSSL_FILE,OPENSSL_LINE)
  #   define CRYPTO_add(addr,amount,type)    \
 -        CRYPTO_add_lock(addr,amount,type,__FILE__,__LINE__)
-+        CRYPTO_add_lock(addr,amount,type,NULL,0)
++        CRYPTO_add_lock(addr,amount,type,OPENSSL_FILE,OPENSSL_LINE)
  #  endif
  # else
  #  define CRYPTO_w_lock(a)
@@ -266,23 +463,23 @@ index c450d7a..d6e804e 100644
  
 -# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,__FILE__,__LINE__)
 -# define OPENSSL_strdup(str)     CRYPTO_strdup((str),__FILE__,__LINE__)
-+# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,NULL,0)
-+# define OPENSSL_strdup(str)     CRYPTO_strdup((str),NULL,0)
++# define OPENSSL_malloc(num)     CRYPTO_malloc((int)num,OPENSSL_FILE,OPENSSL_LINE)
++# define OPENSSL_strdup(str)     CRYPTO_strdup((str),OPENSSL_FILE,OPENSSL_LINE)
  # define OPENSSL_realloc(addr,num) \
 -        CRYPTO_realloc((char *)addr,(int)num,__FILE__,__LINE__)
-+        CRYPTO_realloc((char *)addr,(int)num,NULL,0)
++        CRYPTO_realloc((char *)addr,(int)num,OPENSSL_FILE,OPENSSL_LINE)
  # define OPENSSL_realloc_clean(addr,old_num,num) \
 -        CRYPTO_realloc_clean(addr,old_num,num,__FILE__,__LINE__)
-+        CRYPTO_realloc_clean(addr,old_num,num,NULL,0)
++        CRYPTO_realloc_clean(addr,old_num,num,OPENSSL_FILE,OPENSSL_LINE)
  # define OPENSSL_remalloc(addr,num) \
 -        CRYPTO_remalloc((char **)addr,(int)num,__FILE__,__LINE__)
-+        CRYPTO_remalloc((char **)addr,(int)num,NULL,0)
++        CRYPTO_remalloc((char **)addr,(int)num,OPENSSL_FILE,OPENSSL_LINE)
  # define OPENSSL_freeFunc        CRYPTO_free
  # define OPENSSL_free(addr)      CRYPTO_free(addr)
  
  # define OPENSSL_malloc_locked(num) \
 -        CRYPTO_malloc_locked((int)num,__FILE__,__LINE__)
-+        CRYPTO_malloc_locked((int)num,NULL,0)
++        CRYPTO_malloc_locked((int)num,OPENSSL_FILE,OPENSSL_LINE)
  # define OPENSSL_free_locked(addr) CRYPTO_free_locked(addr)
  
  const char *SSLeay_version(int type);
@@ -291,7 +488,7 @@ index c450d7a..d6e804e 100644
  
  # define CRYPTO_push_info(info) \
 -        CRYPTO_push_info_(info, __FILE__, __LINE__);
-+        CRYPTO_push_info_(info, NULL, 0);
++        CRYPTO_push_info_(info, OPENSSL_FILE, OPENSSL_LINE);
  int CRYPTO_push_info_(const char *info, const char *file, int line);
  int CRYPTO_pop_info(void);
  int CRYPTO_remove_all_info(void);
@@ -300,7 +497,7 @@ index c450d7a..d6e804e 100644
  /* die if we have to */
  void OpenSSLDie(const char *file, int line, const char *assertion);
 -# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(__FILE__, __LINE__, #e),1))
-+# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(NULL, 0, #e),1))
++# define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(OPENSSL_FILE, OPENSSL_LINE, #e),1))
  
  unsigned long *OPENSSL_ia32cap_loc(void);
  # define OPENSSL_ia32cap (*(OPENSSL_ia32cap_loc()))
@@ -309,7 +506,7 @@ index c450d7a..d6e804e 100644
          int alg##_Init(cx##_CTX *c) \
          { \
 -        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
-+        if (FIPS_mode()) OpenSSLDie(NULL, 0, \
++        if (FIPS_mode()) OpenSSLDie(OPENSSL_FILE, OPENSSL_LINE, \
                  "Low level API call to digest " #alg " forbidden in FIPS mode!"); \
          return private_##alg##_Init(c); \
          } \
@@ -317,7 +514,7 @@ index c450d7a..d6e804e 100644
  
  #  define fips_cipher_abort(alg) \
 -        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
-+        if (FIPS_mode()) OpenSSLDie(NULL, 0, \
++        if (FIPS_mode()) OpenSSLDie(OPENSSL_FILE, OPENSSL_LINE, \
                  "Low level API call to cipher " #alg " forbidden in FIPS mode!")
  
  # else
@@ -358,6 +555,28 @@ index b58e3fa..e5f345a 100644
      }
      return 1;
  }
+diff --git a/crypto/engine/eng_int.h b/crypto/engine/eng_int.h
+index 46f163b..b4a72a0 100644
+--- a/crypto/engine/eng_int.h
++++ b/crypto/engine/eng_int.h
+@@ -88,7 +88,7 @@ extern "C" {
+                 (unsigned int)(e), (isfunct ? "funct" : "struct"), \
+                 ((isfunct) ? ((e)->funct_ref - (diff)) : ((e)->struct_ref - (diff))), \
+                 ((isfunct) ? (e)->funct_ref : (e)->struct_ref), \
+-                (__FILE__), (__LINE__));
++                (OPENSSL_FILE), (OPENSSL_LINE));
+ 
+ # else
+ 
+@@ -136,7 +136,7 @@ ENGINE *engine_table_select(ENGINE_TABLE **table, int nid);
+ # else
+ ENGINE *engine_table_select_tmp(ENGINE_TABLE **table, int nid, const char *f,
+                                 int l);
+-#  define engine_table_select(t,n) engine_table_select_tmp(t,n,__FILE__,__LINE__)
++#  define engine_table_select(t,n) engine_table_select_tmp(t,n,OPENSSL_FILE,OPENSSL_LINE)
+ # endif
+ typedef void (engine_table_doall_cb) (int nid, STACK_OF(ENGINE) *sk,
+                                       ENGINE *def, void *arg);
 diff --git a/crypto/engine/eng_openssl.c b/crypto/engine/eng_openssl.c
 index 34b0029..cf622bb 100644
 --- a/crypto/engine/eng_openssl.c
@@ -372,6 +591,103 @@ index 34b0029..cf622bb 100644
  /* #define TEST_ENG_OPENSSL_RC4_OTHERS */
  #define TEST_ENG_OPENSSL_RC4_P_INIT
  /* #define TEST_ENG_OPENSSL_RC4_P_CIPHER */
+diff --git a/crypto/err/err.h b/crypto/err/err.h
+index 585aa8b..04c6cfc 100644
+--- a/crypto/err/err.h
++++ b/crypto/err/err.h
+@@ -200,39 +200,39 @@ typedef struct err_state_st {
+ 
+ # define ERR_LIB_USER            128
+ 
+-# define SYSerr(f,r)  ERR_PUT_error(ERR_LIB_SYS,(f),(r),__FILE__,__LINE__)
+-# define BNerr(f,r)   ERR_PUT_error(ERR_LIB_BN,(f),(r),__FILE__,__LINE__)
+-# define RSAerr(f,r)  ERR_PUT_error(ERR_LIB_RSA,(f),(r),__FILE__,__LINE__)
+-# define DHerr(f,r)   ERR_PUT_error(ERR_LIB_DH,(f),(r),__FILE__,__LINE__)
+-# define EVPerr(f,r)  ERR_PUT_error(ERR_LIB_EVP,(f),(r),__FILE__,__LINE__)
+-# define BUFerr(f,r)  ERR_PUT_error(ERR_LIB_BUF,(f),(r),__FILE__,__LINE__)
+-# define OBJerr(f,r)  ERR_PUT_error(ERR_LIB_OBJ,(f),(r),__FILE__,__LINE__)
+-# define PEMerr(f,r)  ERR_PUT_error(ERR_LIB_PEM,(f),(r),__FILE__,__LINE__)
+-# define DSAerr(f,r)  ERR_PUT_error(ERR_LIB_DSA,(f),(r),__FILE__,__LINE__)
+-# define X509err(f,r) ERR_PUT_error(ERR_LIB_X509,(f),(r),__FILE__,__LINE__)
+-# define ASN1err(f,r) ERR_PUT_error(ERR_LIB_ASN1,(f),(r),__FILE__,__LINE__)
+-# define CONFerr(f,r) ERR_PUT_error(ERR_LIB_CONF,(f),(r),__FILE__,__LINE__)
+-# define CRYPTOerr(f,r) ERR_PUT_error(ERR_LIB_CRYPTO,(f),(r),__FILE__,__LINE__)
+-# define ECerr(f,r)   ERR_PUT_error(ERR_LIB_EC,(f),(r),__FILE__,__LINE__)
+-# define SSLerr(f,r)  ERR_PUT_error(ERR_LIB_SSL,(f),(r),__FILE__,__LINE__)
+-# define BIOerr(f,r)  ERR_PUT_error(ERR_LIB_BIO,(f),(r),__FILE__,__LINE__)
+-# define PKCS7err(f,r) ERR_PUT_error(ERR_LIB_PKCS7,(f),(r),__FILE__,__LINE__)
+-# define X509V3err(f,r) ERR_PUT_error(ERR_LIB_X509V3,(f),(r),__FILE__,__LINE__)
+-# define PKCS12err(f,r) ERR_PUT_error(ERR_LIB_PKCS12,(f),(r),__FILE__,__LINE__)
+-# define RANDerr(f,r) ERR_PUT_error(ERR_LIB_RAND,(f),(r),__FILE__,__LINE__)
+-# define DSOerr(f,r) ERR_PUT_error(ERR_LIB_DSO,(f),(r),__FILE__,__LINE__)
+-# define ENGINEerr(f,r) ERR_PUT_error(ERR_LIB_ENGINE,(f),(r),__FILE__,__LINE__)
+-# define OCSPerr(f,r) ERR_PUT_error(ERR_LIB_OCSP,(f),(r),__FILE__,__LINE__)
+-# define UIerr(f,r) ERR_PUT_error(ERR_LIB_UI,(f),(r),__FILE__,__LINE__)
+-# define COMPerr(f,r) ERR_PUT_error(ERR_LIB_COMP,(f),(r),__FILE__,__LINE__)
+-# define ECDSAerr(f,r)  ERR_PUT_error(ERR_LIB_ECDSA,(f),(r),__FILE__,__LINE__)
+-# define ECDHerr(f,r)  ERR_PUT_error(ERR_LIB_ECDH,(f),(r),__FILE__,__LINE__)
+-# define STOREerr(f,r) ERR_PUT_error(ERR_LIB_STORE,(f),(r),__FILE__,__LINE__)
+-# define FIPSerr(f,r) ERR_PUT_error(ERR_LIB_FIPS,(f),(r),__FILE__,__LINE__)
+-# define CMSerr(f,r) ERR_PUT_error(ERR_LIB_CMS,(f),(r),__FILE__,__LINE__)
+-# define TSerr(f,r) ERR_PUT_error(ERR_LIB_TS,(f),(r),__FILE__,__LINE__)
+-# define HMACerr(f,r) ERR_PUT_error(ERR_LIB_HMAC,(f),(r),__FILE__,__LINE__)
+-# define JPAKEerr(f,r) ERR_PUT_error(ERR_LIB_JPAKE,(f),(r),__FILE__,__LINE__)
++# define SYSerr(f,r)  ERR_PUT_error(ERR_LIB_SYS,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define BNerr(f,r)   ERR_PUT_error(ERR_LIB_BN,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define RSAerr(f,r)  ERR_PUT_error(ERR_LIB_RSA,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define DHerr(f,r)   ERR_PUT_error(ERR_LIB_DH,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define EVPerr(f,r)  ERR_PUT_error(ERR_LIB_EVP,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define BUFerr(f,r)  ERR_PUT_error(ERR_LIB_BUF,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define OBJerr(f,r)  ERR_PUT_error(ERR_LIB_OBJ,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define PEMerr(f,r)  ERR_PUT_error(ERR_LIB_PEM,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define DSAerr(f,r)  ERR_PUT_error(ERR_LIB_DSA,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define X509err(f,r) ERR_PUT_error(ERR_LIB_X509,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define ASN1err(f,r) ERR_PUT_error(ERR_LIB_ASN1,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define CONFerr(f,r) ERR_PUT_error(ERR_LIB_CONF,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define CRYPTOerr(f,r) ERR_PUT_error(ERR_LIB_CRYPTO,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define ECerr(f,r)   ERR_PUT_error(ERR_LIB_EC,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define SSLerr(f,r)  ERR_PUT_error(ERR_LIB_SSL,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define BIOerr(f,r)  ERR_PUT_error(ERR_LIB_BIO,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define PKCS7err(f,r) ERR_PUT_error(ERR_LIB_PKCS7,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define X509V3err(f,r) ERR_PUT_error(ERR_LIB_X509V3,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define PKCS12err(f,r) ERR_PUT_error(ERR_LIB_PKCS12,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define RANDerr(f,r) ERR_PUT_error(ERR_LIB_RAND,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define DSOerr(f,r) ERR_PUT_error(ERR_LIB_DSO,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define ENGINEerr(f,r) ERR_PUT_error(ERR_LIB_ENGINE,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define OCSPerr(f,r) ERR_PUT_error(ERR_LIB_OCSP,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define UIerr(f,r) ERR_PUT_error(ERR_LIB_UI,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define COMPerr(f,r) ERR_PUT_error(ERR_LIB_COMP,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define ECDSAerr(f,r)  ERR_PUT_error(ERR_LIB_ECDSA,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define ECDHerr(f,r)  ERR_PUT_error(ERR_LIB_ECDH,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define STOREerr(f,r) ERR_PUT_error(ERR_LIB_STORE,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define FIPSerr(f,r) ERR_PUT_error(ERR_LIB_FIPS,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define CMSerr(f,r) ERR_PUT_error(ERR_LIB_CMS,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define TSerr(f,r) ERR_PUT_error(ERR_LIB_TS,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define HMACerr(f,r) ERR_PUT_error(ERR_LIB_HMAC,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
++# define JPAKEerr(f,r) ERR_PUT_error(ERR_LIB_JPAKE,(f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /*
+  * Borland C seems too stupid to be able to shift and do longs in the
+diff --git a/crypto/opensslconf.h.in b/crypto/opensslconf.h.in
+index 7a1c85d..a5f51a7 100644
+--- a/crypto/opensslconf.h.in
++++ b/crypto/opensslconf.h.in
+@@ -1,5 +1,15 @@
+ /* crypto/opensslconf.h.in */
+ 
++#ifndef OPENSSL_FILE
++#ifdef OPENSSL_NO_FILENAMES
++#define OPENSSL_FILE ""
++#define OPENSSL_LINE 0
++#else
++#define OPENSSL_FILE __FILE__
++#define OPENSSL_LINE __LINE__
++#endif
++#endif
++
+ /* Generate 80386 code? */
+ #undef I386_ONLY
+ 
 diff --git a/crypto/pem/pem.h b/crypto/pem/pem.h
 index d3b23fc..87b0b6a 100644
 --- a/crypto/pem/pem.h
@@ -1032,6 +1348,83 @@ index f5c6156..a2e78aa 100644
  int X509V3_extensions_print(BIO *out, char *title,
                              STACK_OF(X509_EXTENSION) *exts,
                              unsigned long flag, int indent);
+diff --git a/demos/engines/cluster_labs/hw_cluster_labs_err.h b/demos/engines/cluster_labs/hw_cluster_labs_err.h
+index 3300e11..e9e58d5 100644
+--- a/demos/engines/cluster_labs/hw_cluster_labs_err.h
++++ b/demos/engines/cluster_labs/hw_cluster_labs_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_CL_strings(void);
+ static void ERR_unload_CL_strings(void);
+ static void ERR_CL_error(int function, int reason, char *file, int line);
+-# define CLerr(f,r) ERR_CL_error((f),(r),__FILE__,__LINE__)
++# define CLerr(f,r) ERR_CL_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the CL functions. */
+ 
+diff --git a/demos/engines/ibmca/hw_ibmca_err.h b/demos/engines/ibmca/hw_ibmca_err.h
+index c17e0c9..10d0212 100644
+--- a/demos/engines/ibmca/hw_ibmca_err.h
++++ b/demos/engines/ibmca/hw_ibmca_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_IBMCA_strings(void);
+ static void ERR_unload_IBMCA_strings(void);
+ static void ERR_IBMCA_error(int function, int reason, char *file, int line);
+-# define IBMCAerr(f,r) ERR_IBMCA_error((f),(r),__FILE__,__LINE__)
++# define IBMCAerr(f,r) ERR_IBMCA_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the IBMCA functions. */
+ 
+diff --git a/demos/engines/rsaref/rsaref_err.h b/demos/engines/rsaref/rsaref_err.h
+index 4356815..598836f 100644
+--- a/demos/engines/rsaref/rsaref_err.h
++++ b/demos/engines/rsaref/rsaref_err.h
+@@ -68,7 +68,7 @@ extern "C" {
+ static void ERR_load_RSAREF_strings(void);
+ static void ERR_unload_RSAREF_strings(void);
+ static void ERR_RSAREF_error(int function, int reason, char *file, int line);
+-# define RSAREFerr(f,r) ERR_RSAREF_error((f),(r),__FILE__,__LINE__)
++# define RSAREFerr(f,r) ERR_RSAREF_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ /* Error codes for the RSAREF functions. */
+ 
+ /* Function codes. */
+diff --git a/demos/engines/zencod/hw_zencod_err.h b/demos/engines/zencod/hw_zencod_err.h
+index f4a8358..94d3293 100644
+--- a/demos/engines/zencod/hw_zencod_err.h
++++ b/demos/engines/zencod/hw_zencod_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_ZENCOD_strings(void);
+ static void ERR_unload_ZENCOD_strings(void);
+ static void ERR_ZENCOD_error(int function, int reason, char *file, int line);
+-# define ZENCODerr(f,r) ERR_ZENCOD_error((f),(r),__FILE__,__LINE__)
++# define ZENCODerr(f,r) ERR_ZENCOD_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the ZENCOD functions. */
+ 
+diff --git a/doc/crypto/threads.pod b/doc/crypto/threads.pod
+index dc0e939..fe123bb 100644
+--- a/doc/crypto/threads.pod
++++ b/doc/crypto/threads.pod
+@@ -51,15 +51,15 @@ CRYPTO_destroy_dynlockid, CRYPTO_lock - OpenSSL thread support
+  void CRYPTO_lock(int mode, int n, const char *file, int line);
+ 
+  #define CRYPTO_w_lock(type)	\
+-	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,OPENSSL_FILE,OPENSSL_LINE)
+  #define CRYPTO_w_unlock(type)	\
+-	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,OPENSSL_FILE,OPENSSL_LINE)
+  #define CRYPTO_r_lock(type)	\
+-	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,OPENSSL_FILE,OPENSSL_LINE)
+  #define CRYPTO_r_unlock(type)	\
+-	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,OPENSSL_FILE,OPENSSL_LINE)
+  #define CRYPTO_add(addr,amount,type)	\
+-	CRYPTO_add_lock(addr,amount,type,__FILE__,__LINE__)
++	CRYPTO_add_lock(addr,amount,type,OPENSSL_FILE,OPENSSL_LINE)
+ 
+ =head1 DESCRIPTION
+ 
 diff --git a/e_os.h b/e_os.h
 index 1fa36c1..3e9dae2 100644
 --- a/e_os.h
@@ -1065,6 +1458,201 @@ index 7be9989..909e22f 100644
  #  undef OPENSSL_SYS_UNIX
  #  define OPENSSL_SYS_WIN32_UWIN
  # else
+diff --git a/engines/ccgost/e_gost_err.h b/engines/ccgost/e_gost_err.h
+index a2018ec..9eacdcf 100644
+--- a/engines/ccgost/e_gost_err.h
++++ b/engines/ccgost/e_gost_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ void ERR_load_GOST_strings(void);
+ void ERR_unload_GOST_strings(void);
+ void ERR_GOST_error(int function, int reason, char *file, int line);
+-# define GOSTerr(f,r) ERR_GOST_error((f),(r),__FILE__,__LINE__)
++# define GOSTerr(f,r) ERR_GOST_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the GOST functions. */
+ 
+diff --git a/engines/e_4758cca_err.h b/engines/e_4758cca_err.h
+index 2f29d96..47a2635 100644
+--- a/engines/e_4758cca_err.h
++++ b/engines/e_4758cca_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_CCA4758_strings(void);
+ static void ERR_unload_CCA4758_strings(void);
+ static void ERR_CCA4758_error(int function, int reason, char *file, int line);
+-# define CCA4758err(f,r) ERR_CCA4758_error((f),(r),__FILE__,__LINE__)
++# define CCA4758err(f,r) ERR_CCA4758_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the CCA4758 functions. */
+ 
+diff --git a/engines/e_aep_err.h b/engines/e_aep_err.h
+index 2ed0114..1f8fa5b 100644
+--- a/engines/e_aep_err.h
++++ b/engines/e_aep_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_AEPHK_strings(void);
+ static void ERR_unload_AEPHK_strings(void);
+ static void ERR_AEPHK_error(int function, int reason, char *file, int line);
+-# define AEPHKerr(f,r) ERR_AEPHK_error((f),(r),__FILE__,__LINE__)
++# define AEPHKerr(f,r) ERR_AEPHK_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the AEPHK functions. */
+ 
+diff --git a/engines/e_atalla_err.h b/engines/e_atalla_err.h
+index 7b71eff..d958496 100644
+--- a/engines/e_atalla_err.h
++++ b/engines/e_atalla_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_ATALLA_strings(void);
+ static void ERR_unload_ATALLA_strings(void);
+ static void ERR_ATALLA_error(int function, int reason, char *file, int line);
+-# define ATALLAerr(f,r) ERR_ATALLA_error((f),(r),__FILE__,__LINE__)
++# define ATALLAerr(f,r) ERR_ATALLA_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the ATALLA functions. */
+ 
+diff --git a/engines/e_capi_err.h b/engines/e_capi_err.h
+index b5d06dc..cfe46b1 100644
+--- a/engines/e_capi_err.h
++++ b/engines/e_capi_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_CAPI_strings(void);
+ static void ERR_unload_CAPI_strings(void);
+ static void ERR_CAPI_error(int function, int reason, char *file, int line);
+-# define CAPIerr(f,r) ERR_CAPI_error((f),(r),__FILE__,__LINE__)
++# define CAPIerr(f,r) ERR_CAPI_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the CAPI functions. */
+ 
+diff --git a/engines/e_chil_err.h b/engines/e_chil_err.h
+index d86a4ce..3d961b9 100644
+--- a/engines/e_chil_err.h
++++ b/engines/e_chil_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_HWCRHK_strings(void);
+ static void ERR_unload_HWCRHK_strings(void);
+ static void ERR_HWCRHK_error(int function, int reason, char *file, int line);
+-# define HWCRHKerr(f,r) ERR_HWCRHK_error((f),(r),__FILE__,__LINE__)
++# define HWCRHKerr(f,r) ERR_HWCRHK_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the HWCRHK functions. */
+ 
+diff --git a/engines/e_cswift_err.h b/engines/e_cswift_err.h
+index fde3a82..7c20691 100644
+--- a/engines/e_cswift_err.h
++++ b/engines/e_cswift_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_CSWIFT_strings(void);
+ static void ERR_unload_CSWIFT_strings(void);
+ static void ERR_CSWIFT_error(int function, int reason, char *file, int line);
+-# define CSWIFTerr(f,r) ERR_CSWIFT_error((f),(r),__FILE__,__LINE__)
++# define CSWIFTerr(f,r) ERR_CSWIFT_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the CSWIFT functions. */
+ 
+diff --git a/engines/e_gmp_err.h b/engines/e_gmp_err.h
+index 637abbc..ccaf3da 100644
+--- a/engines/e_gmp_err.h
++++ b/engines/e_gmp_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_GMP_strings(void);
+ static void ERR_unload_GMP_strings(void);
+ static void ERR_GMP_error(int function, int reason, char *file, int line);
+-# define GMPerr(f,r) ERR_GMP_error((f),(r),__FILE__,__LINE__)
++# define GMPerr(f,r) ERR_GMP_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the GMP functions. */
+ 
+diff --git a/engines/e_nuron_err.h b/engines/e_nuron_err.h
+index aa7849c..e607d3e 100644
+--- a/engines/e_nuron_err.h
++++ b/engines/e_nuron_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_NURON_strings(void);
+ static void ERR_unload_NURON_strings(void);
+ static void ERR_NURON_error(int function, int reason, char *file, int line);
+-# define NURONerr(f,r) ERR_NURON_error((f),(r),__FILE__,__LINE__)
++# define NURONerr(f,r) ERR_NURON_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the NURON functions. */
+ 
+diff --git a/engines/e_sureware_err.h b/engines/e_sureware_err.h
+index bef8623..54f2848 100644
+--- a/engines/e_sureware_err.h
++++ b/engines/e_sureware_err.h
+@@ -68,7 +68,7 @@ static void ERR_load_SUREWARE_strings(void);
+ static void ERR_unload_SUREWARE_strings(void);
+ static void ERR_SUREWARE_error(int function, int reason, char *file,
+                                int line);
+-# define SUREWAREerr(f,r) ERR_SUREWARE_error((f),(r),__FILE__,__LINE__)
++# define SUREWAREerr(f,r) ERR_SUREWARE_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the SUREWARE functions. */
+ 
+diff --git a/engines/e_ubsec_err.h b/engines/e_ubsec_err.h
+index c8aec7c..67110ed 100644
+--- a/engines/e_ubsec_err.h
++++ b/engines/e_ubsec_err.h
+@@ -67,7 +67,7 @@ extern "C" {
+ static void ERR_load_UBSEC_strings(void);
+ static void ERR_unload_UBSEC_strings(void);
+ static void ERR_UBSEC_error(int function, int reason, char *file, int line);
+-# define UBSECerr(f,r) ERR_UBSEC_error((f),(r),__FILE__,__LINE__)
++# define UBSECerr(f,r) ERR_UBSEC_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ /* Error codes for the UBSEC functions. */
+ 
+diff --git a/ssl/d1_both.c b/ssl/d1_both.c
+index d1fc716..d5f661a 100644
+--- a/ssl/d1_both.c
++++ b/ssl/d1_both.c
+@@ -1053,7 +1053,7 @@ int dtls1_send_change_cipher_spec(SSL *s, int a, int b)
+ int dtls1_read_failed(SSL *s, int code)
+ {
+     if (code > 0) {
+-        fprintf(stderr, "invalid state reached %s:%d", __FILE__, __LINE__);
++        fprintf(stderr, "dtls1_read_failed(); invalid state reached\n");
+         return 1;
+     }
+ 
+diff --git a/ssl/ssl_asn1.c b/ssl/ssl_asn1.c
+index 35cc27c..a1f5335 100644
+--- a/ssl/ssl_asn1.c
++++ b/ssl/ssl_asn1.c
+@@ -418,7 +418,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
+     if (ssl_version == SSL2_VERSION) {
+         if (os.length != 3) {
+             c.error = SSL_R_CIPHER_CODE_WRONG_LENGTH;
+-            c.line = __LINE__;
++            c.line = OPENSSL_LINE;
+             goto err;
+         }
+         id = 0x02000000L |
+@@ -429,14 +429,14 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
+         || ssl_version == DTLS1_BAD_VER) {
+         if (os.length != 2) {
+             c.error = SSL_R_CIPHER_CODE_WRONG_LENGTH;
+-            c.line = __LINE__;
++            c.line = OPENSSL_LINE;
+             goto err;
+         }
+         id = 0x03000000L |
+             ((unsigned long)os.data[0] << 8L) | (unsigned long)os.data[1];
+     } else {
+         c.error = SSL_R_UNKNOWN_SSL_VERSION;
+-        c.line = __LINE__;
++        c.line = OPENSSL_LINE;
+         goto err;
+     }
+ 
+@@ -526,7 +526,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
+     if (os.data != NULL) {
+         if (os.length > SSL_MAX_SID_CTX_LENGTH) {
+             c.error = SSL_R_BAD_LENGTH;
+-            c.line = __LINE__;
++            c.line = OPENSSL_LINE;
+             goto err;
+         } else {
+             ret->sid_ctx_length = os.length;
 diff --git a/ssl/ssl_cert.c b/ssl/ssl_cert.c
 index a73f866..d534c0a 100644
 --- a/ssl/ssl_cert.c
@@ -1138,3 +1726,40 @@ index 5478840..c2ad7c9 100644
  };
  
  static int ssl_conf_cmd_skip_prefix(SSL_CONF_CTX *cctx, const char **pcmd)
+diff --git a/ssl/t1_enc.c b/ssl/t1_enc.c
+index 514fcb3..2a54cc9 100644
+--- a/ssl/t1_enc.c
++++ b/ssl/t1_enc.c
+@@ -780,9 +780,7 @@ int tls1_enc(SSL *s, int send)
+                      * we can't write into the input stream: Can this ever
+                      * happen?? (steve)
+                      */
+-                    fprintf(stderr,
+-                            "%s:%d: rec->data != rec->input\n",
+-                            __FILE__, __LINE__);
++                    fprintf(stderr, "tls1_enc: rec->data != rec->input\n");
+                 else if (RAND_bytes(rec->input, ivlen) <= 0)
+                     return -1;
+             }
+diff --git a/util/mkerr.pl b/util/mkerr.pl
+index 09ebebe..cd57ade 100644
+--- a/util/mkerr.pl
++++ b/util/mkerr.pl
+@@ -89,7 +89,7 @@ Options:
+                   void ERR_load_<LIB>_strings(void);
+                   void ERR_unload_<LIB>_strings(void);
+                   void ERR_<LIB>_error(int f, int r, char *fn, int ln);
+-                  #define <LIB>err(f,r) ERR_<LIB>_error(f,r,__FILE__,__LINE__)
++                  #define <LIB>err(f,r) ERR_<LIB>_error(f,r,OPENSSL_FILE,OPENSSL_LINE)
+                 while the code facilitates the use of these in an environment
+                 where the error support routines are dynamically loaded at 
+                 runtime.
+@@ -474,7 +474,7 @@ EOF
+ ${staticloader}void ERR_load_${lib}_strings(void);
+ ${staticloader}void ERR_unload_${lib}_strings(void);
+ ${staticloader}void ERR_${lib}_error(int function, int reason, char *file, int line);
+-# define ${lib}err(f,r) ERR_${lib}_error((f),(r),__FILE__,__LINE__)
++# define ${lib}err(f,r) ERR_${lib}_error((f),(r),OPENSSL_FILE,OPENSSL_LINE)
+ 
+ EOF
+ 	}
