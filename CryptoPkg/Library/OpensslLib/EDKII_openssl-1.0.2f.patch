@@ -224,6 +224,35 @@ index abc6dc3..3a672e9 100644
  
  # define M_ASN1_New(arg,func) \
          if (((arg)=func()) == NULL) return(NULL)
+diff --git a/crypto/asn1/n_pkey.c b/crypto/asn1/n_pkey.c
+index d5a5514..bede55c 100644
+--- a/crypto/asn1/n_pkey.c
++++ b/crypto/asn1/n_pkey.c
+@@ -193,7 +193,12 @@ int i2d_RSA_NET(const RSA *a, unsigned char **pp,
+     OPENSSL_cleanse(pkey->private_key->data, rsalen);
+ 
+     if (cb == NULL)
++#ifndef OPENSSL_NO_UI
+         cb = EVP_read_pw_string;
++#else
++        i = 1;
++    else
++#endif
+     i = cb((char *)buf, 256, "Enter Private Key password:", 1);
+     if (i != 0) {
+         ASN1err(ASN1_F_I2D_RSA_NET, ASN1_R_BAD_PASSWORD_READ);
+@@ -264,7 +269,11 @@ RSA *d2i_RSA_NET(RSA **a, const unsigned char **pp, long length,
+         goto err;
+     }
+     if (cb == NULL)
++#ifndef OPENSSL_NO_UI
+         cb = EVP_read_pw_string;
++#else
++        goto err;
++#endif
+     if ((ret = d2i_RSA_NET_2(a, enckey->enckey->digest, cb, sgckey)) == NULL)
+         goto err;
+ 
 diff --git a/crypto/bn/bn_prime.c b/crypto/bn/bn_prime.c
 index 1d25687..e933ead 100644
 --- a/crypto/bn/bn_prime.c
@@ -848,6 +877,44 @@ index 585aa8b..04c6cfc 100644
  
  /*
   * Borland C seems too stupid to be able to shift and do longs in the
+diff --git a/crypto/evp/evp.h b/crypto/evp/evp.h
+index 39ab793..ad1e350 100644
+--- a/crypto/evp/evp.h
++++ b/crypto/evp/evp.h
+@@ -602,11 +602,13 @@ int EVP_MD_CTX_copy(EVP_MD_CTX *out, const EVP_MD_CTX *in);
+ int EVP_DigestInit(EVP_MD_CTX *ctx, const EVP_MD *type);
+ int EVP_DigestFinal(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *s);
+ 
++#ifndef OPENSSL_NO_UI
+ int EVP_read_pw_string(char *buf, int length, const char *prompt, int verify);
+ int EVP_read_pw_string_min(char *buf, int minlen, int maxlen,
+                            const char *prompt, int verify);
+ void EVP_set_pw_prompt(const char *prompt);
+ char *EVP_get_pw_prompt(void);
++#endif
+ 
+ int EVP_BytesToKey(const EVP_CIPHER *type, const EVP_MD *md,
+                    const unsigned char *salt, const unsigned char *data,
+diff --git a/crypto/evp/evp_key.c b/crypto/evp/evp_key.c
+index 5be9e33..63c8866 100644
+--- a/crypto/evp/evp_key.c
++++ b/crypto/evp/evp_key.c
+@@ -63,6 +63,7 @@
+ #include <openssl/evp.h>
+ #include <openssl/ui.h>
+ 
++#ifndef OPENSSL_NO_UI
+ /* should be init to zeros. */
+ static char prompt_string[80];
+ 
+@@ -117,6 +118,7 @@ int EVP_read_pw_string_min(char *buf, int min, int len, const char *prompt,
+     OPENSSL_cleanse(buff, BUFSIZ);
+     return ret;
+ }
++#endif /* OPENSSL_NO_UI */
+ 
+ int EVP_BytesToKey(const EVP_CIPHER *type, const EVP_MD *md,
+                    const unsigned char *salt, const unsigned char *data,
 diff --git a/crypto/opensslconf.h.in b/crypto/opensslconf.h.in
 index 7a1c85d..7162c0f 100644
 --- a/crypto/opensslconf.h.in
@@ -922,6 +989,19 @@ index d3b23fc..87b0b6a 100644
  EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x);
  int PEM_write_bio_Parameters(BIO *bp, EVP_PKEY *x);
  
+diff --git a/crypto/pem/pem_lib.c b/crypto/pem/pem_lib.c
+index a29821a..5525efd 100644
+--- a/crypto/pem/pem_lib.c
++++ b/crypto/pem/pem_lib.c
+@@ -84,7 +84,7 @@ int pem_check_suffix(const char *pem_str, const char *suffix);
+ 
+ int PEM_def_callback(char *buf, int num, int w, void *key)
+ {
+-#ifdef OPENSSL_NO_FP_API
++#if defined(OPENSSL_NO_FP_API) || defined(OPENSSL_NO_UI)
+     /*
+      * We should not ever call the default callback routine from windows.
+      */
 diff --git a/crypto/pem/pem_pk8.c b/crypto/pem/pem_pk8.c
 index 5747c73..fe465cc 100644
 --- a/crypto/pem/pem_pk8.c
