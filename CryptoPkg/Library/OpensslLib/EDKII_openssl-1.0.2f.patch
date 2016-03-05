@@ -11,6 +11,19 @@ index 4a715dc..eb61eda 100755
  	{
  	$disabled{"gost"} = "forced";
  	}
+diff --git a/apps/apps.c b/apps/apps.c
+index 2e77805..e21e759 100644
+--- a/apps/apps.c
++++ b/apps/apps.c
+@@ -2374,6 +2374,8 @@ int args_verify(char ***pargs, int *pargc,
+         flags |= X509_V_FLAG_PARTIAL_CHAIN;
+     else if (!strcmp(arg, "-no_alt_chains"))
+         flags |= X509_V_FLAG_NO_ALT_CHAINS;
++    else if (!strcmp(arg, "-no_check_time"))
++        flags |= X509_V_FLAG_NO_CHECK_TIME;
+     else
+         return 0;
+ 
 diff --git a/crypto/asn1/a_strex.c b/crypto/asn1/a_strex.c
 index 35fd44c..9f39bff 100644
 --- a/crypto/asn1/a_strex.c
@@ -1608,6 +1621,21 @@ index f4a8358..94d3293 100644
  
  /* Error codes for the ZENCOD functions. */
  
+diff --git a/doc/crypto/X509_VERIFY_PARAM_set_flags.pod b/doc/crypto/X509_VERIFY_PARAM_set_flags.pod
+index 44792f9..7f95d58 100644
+--- a/doc/crypto/X509_VERIFY_PARAM_set_flags.pod
++++ b/doc/crypto/X509_VERIFY_PARAM_set_flags.pod
+@@ -203,6 +203,10 @@ chain found is not trusted, then OpenSSL will continue to check to see if an
+ alternative chain can be found that is trusted. With this flag set the behaviour
+ will match that of OpenSSL versions prior to 1.0.2b.
+ 
++The B<X509_V_FLAG_NO_CHECK_TIME> flag suppresses checking the validity period
++of certificates and CRLs against the current time. If X509_VERIFY_PARAM_set_time()
++is used to specify a verification time, the check is not suppressed.
++
+ =head1 NOTES
+ 
+ The above functions should be used to manipulate verification parameters
 diff --git a/doc/crypto/threads.pod b/doc/crypto/threads.pod
 index dc0e939..fe123bb 100644
 --- a/doc/crypto/threads.pod
