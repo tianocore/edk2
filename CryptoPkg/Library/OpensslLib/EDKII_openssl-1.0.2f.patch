@@ -590,28 +590,128 @@ index 01e275f..7633139 100644
  int DES_read_password(DES_cblock *key, const char *prompt, int verify)
  {
      int ok;
+diff --git a/crypto/dh/Makefile b/crypto/dh/Makefile
+index 46fa5ac..cc366ec 100644
+--- a/crypto/dh/Makefile
++++ b/crypto/dh/Makefile
+@@ -134,7 +134,7 @@ dh_gen.o: ../../include/openssl/opensslconf.h ../../include/openssl/opensslv.h
+ dh_gen.o: ../../include/openssl/ossl_typ.h ../../include/openssl/safestack.h
+ dh_gen.o: ../../include/openssl/stack.h ../../include/openssl/symhacks.h
+ dh_gen.o: ../cryptlib.h dh_gen.c
+-dh_kdf.o: ../../include/openssl/asn1.h ../../include/openssl/bio.h
++dh_kdf.o: ../../e_os.h ../../include/openssl/asn1.h ../../include/openssl/bio.h
+ dh_kdf.o: ../../include/openssl/buffer.h ../../include/openssl/cms.h
+ dh_kdf.o: ../../include/openssl/crypto.h ../../include/openssl/dh.h
+ dh_kdf.o: ../../include/openssl/e_os2.h ../../include/openssl/ec.h
+diff --git a/crypto/dh/dh.h b/crypto/dh/dh.h
+index 5498a9d..4a5c665 100644
+--- a/crypto/dh/dh.h
++++ b/crypto/dh/dh.h
+@@ -240,11 +240,13 @@ DH *DH_get_1024_160(void);
+ DH *DH_get_2048_224(void);
+ DH *DH_get_2048_256(void);
+ 
++# ifndef OPENSSL_NO_CMS
+ /* RFC2631 KDF */
+ int DH_KDF_X9_42(unsigned char *out, size_t outlen,
+                  const unsigned char *Z, size_t Zlen,
+                  ASN1_OBJECT *key_oid,
+                  const unsigned char *ukm, size_t ukmlen, const EVP_MD *md);
++# endif
+ 
+ # define EVP_PKEY_CTX_set_dh_paramgen_prime_len(ctx, len) \
+         EVP_PKEY_CTX_ctrl(ctx, EVP_PKEY_DH, EVP_PKEY_OP_PARAMGEN, \
+@@ -337,7 +339,9 @@ int DH_KDF_X9_42(unsigned char *out, size_t outlen,
+ 
+ /* KDF types */
+ # define EVP_PKEY_DH_KDF_NONE                            1
++# ifndef OPENSSL_NO_CMS
+ # define EVP_PKEY_DH_KDF_X9_42                           2
++# endif
+ 
+ /* BEGIN ERROR CODES */
+ /*
+diff --git a/crypto/dh/dh_kdf.c b/crypto/dh/dh_kdf.c
+index a882cb2..4eddb9a 100644
+--- a/crypto/dh/dh_kdf.c
++++ b/crypto/dh/dh_kdf.c
+@@ -51,13 +51,18 @@
+  * ====================================================================
+  */
+ 
++#include <e_os.h>
++
++#ifndef OPENSSL_NO_CMS
+ #include <string.h>
+ #include <openssl/dh.h>
+ #include <openssl/evp.h>
+ #include <openssl/asn1.h>
+ #include <openssl/cms.h>
+ 
++
+ /* Key derivation from X9.42/RFC2631 */
++/* Uses CMS functions, hence the #ifdef wrapper. */
+ 
+ #define DH_KDF_MAX      (1L << 30)
+ 
+@@ -185,3 +190,4 @@ int DH_KDF_X9_42(unsigned char *out, size_t outlen,
+     EVP_MD_CTX_cleanup(&mctx);
+     return rv;
+ }
++#endif
 diff --git a/crypto/dh/dh_pmeth.c b/crypto/dh/dh_pmeth.c
-index b58e3fa..e5f345a 100644
+index b58e3fa..c6288f6 100644
 --- a/crypto/dh/dh_pmeth.c
 +++ b/crypto/dh/dh_pmeth.c
-@@ -449,6 +449,9 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
+@@ -207,7 +207,11 @@ static int pkey_dh_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
+     case EVP_PKEY_CTRL_DH_KDF_TYPE:
+         if (p1 == -2)
+             return dctx->kdf_type;
++#ifdef OPENSSL_NO_CMS
++        if (p1 != EVP_PKEY_DH_KDF_NONE)
++#else
+         if (p1 != EVP_PKEY_DH_KDF_NONE && p1 != EVP_PKEY_DH_KDF_X9_42)
++#endif
+             return -2;
+         dctx->kdf_type = p1;
+         return 1;
+@@ -448,7 +452,10 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
+             return ret;
          *keylen = ret;
          return 1;
-     } else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
-+#ifdef OPENSSL_NO_CMS
-+        return 0;
-+#else
+-    } else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
++    }
++#ifndef OPENSSL_NO_CMS
++    else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
++
          unsigned char *Z = NULL;
          size_t Zlen = 0;
          if (!dctx->kdf_outlen || !dctx->kdf_oid)
-@@ -478,6 +481,7 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
-             OPENSSL_free(Z);
+@@ -479,7 +486,8 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
          }
          return ret;
-+#endif
      }
-     return 1;
+-    return 1;
++#endif
++    return 0;
  }
+ 
+ const EVP_PKEY_METHOD dh_pkey_meth = {
+diff --git a/crypto/ec/ec_ameth.c b/crypto/ec/ec_ameth.c
+index 83e208c..4869098 100644
+--- a/crypto/ec/ec_ameth.c
++++ b/crypto/ec/ec_ameth.c
+@@ -67,8 +67,10 @@
+ #include <openssl/asn1t.h>
+ #include "asn1_locl.h"
+ 
++#ifndef OPENSSL_NO_CMS
+ static int ecdh_cms_decrypt(CMS_RecipientInfo *ri);
+ static int ecdh_cms_encrypt(CMS_RecipientInfo *ri);
++#endif
+ 
+ static int eckey_param2type(int *pptype, void **ppval, EC_KEY *ec_key)
+ {
 diff --git a/crypto/engine/eng_int.h b/crypto/engine/eng_int.h
 index 46f163b..b4a72a0 100644
 --- a/crypto/engine/eng_int.h
@@ -962,7 +1062,7 @@ index 266111e..f60fac6 100644
  {
      return 0;
 diff --git a/crypto/rsa/rsa_ameth.c b/crypto/rsa/rsa_ameth.c
-index 4e06218..f591f0f 100644
+index 4e06218..ddead3d 100644
 --- a/crypto/rsa/rsa_ameth.c
 +++ b/crypto/rsa/rsa_ameth.c
 @@ -68,10 +68,12 @@
@@ -1010,25 +1110,15 @@ index 4e06218..f591f0f 100644
  
  static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
                           X509_ALGOR *alg1, X509_ALGOR *alg2,
-@@ -785,6 +791,7 @@ static RSA_OAEP_PARAMS *rsa_oaep_decode(const X509_ALGOR *alg,
-     return pss;
+@@ -762,6 +768,7 @@ static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
+     return 2;
  }
  
 +#ifndef OPENSSL_NO_CMS
- static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+ static RSA_OAEP_PARAMS *rsa_oaep_decode(const X509_ALGOR *alg,
+                                         X509_ALGOR **pmaskHash)
  {
-     EVP_PKEY_CTX *pkctx;
-@@ -857,7 +864,9 @@ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
-         X509_ALGOR_free(maskHash);
-     return rv;
- }
-+#endif
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
- {
-     const EVP_MD *md, *mgf1md;
-@@ -920,6 +929,7 @@ static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
+@@ -920,6 +927,7 @@ static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
          ASN1_STRING_free(os);
      return rv;
  }
@@ -1859,6 +1949,37 @@ index 514fcb3..2a54cc9 100644
                  else if (RAND_bytes(rec->input, ivlen) <= 0)
                      return -1;
              }
+diff --git a/test/cms-test.pl b/test/cms-test.pl
+index baa3b59..1ee3f02 100644
+--- a/test/cms-test.pl
++++ b/test/cms-test.pl
+@@ -100,6 +100,13 @@ my $no_ec2m;
+ my $no_ecdh;
+ my $ossl8 = `$ossl_path version -v` =~ /0\.9\.8/;
+ 
++system ("$ossl_path no-cms > $null_path");
++if ($? == 0)
++        {
++        print "CMS disabled\n";
++        exit 0;
++        }
++
+ system ("$ossl_path no-ec > $null_path");
+ if ($? == 0)
+ 	{
+diff --git a/util/libeay.num b/util/libeay.num
+index 7f7487d..13b2e3a 100755
+--- a/util/libeay.num
++++ b/util/libeay.num
+@@ -4368,7 +4368,7 @@ DH_compute_key_padded                   4732	EXIST::FUNCTION:DH
+ ECDSA_METHOD_set_sign                   4733	EXIST::FUNCTION:ECDSA
+ CMS_RecipientEncryptedKey_cert_cmp      4734	EXIST:!VMS:FUNCTION:CMS
+ CMS_RecipEncryptedKey_cert_cmp          4734	EXIST:VMS:FUNCTION:CMS
+-DH_KDF_X9_42                            4735	EXIST::FUNCTION:DH
++DH_KDF_X9_42                            4735	EXIST::FUNCTION:CMS,DH
+ RSA_OAEP_PARAMS_free                    4736	EXIST::FUNCTION:RSA
+ EVP_des_ede3_wrap                       4737	EXIST::FUNCTION:DES
+ RSA_OAEP_PARAMS_it                      4738	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:RSA
 diff --git a/util/mkerr.pl b/util/mkerr.pl
 index 09ebebe..cd57ade 100644
 --- a/util/mkerr.pl
