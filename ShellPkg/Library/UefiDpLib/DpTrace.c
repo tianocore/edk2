@@ -136,8 +136,11 @@ GatherStatistics(
   @param[in]    Limit       The number of records to print.  Zero is ALL.
   @param[in]    ExcludeFlag TRUE to exclude individual Cumulative items from display.
   
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
+  @return Others                from a call to gBS->LocateHandleBuffer().
 **/
-VOID
+EFI_STATUS
 DumpAllTrace(
   IN UINTN             Limit,
   IN BOOLEAN           ExcludeFlag
@@ -257,12 +260,18 @@ DumpAllTrace(
           ElapsedTime
         );
       }
+      if (ShellGetExecutionBreakFlag ()) {
+        Status = EFI_ABORTED;
+        break;
+      }
     }
   }
   if (HandleBuffer != NULL) {
     FreePool (HandleBuffer);
   }
   SHELL_FREE_NON_NULL (IncFlag);
+
+  return Status;
 }
 
 /** 
@@ -281,9 +290,11 @@ DumpAllTrace(
   
   @param[in]    Limit       The number of records to print.  Zero is ALL.
   @param[in]    ExcludeFlag TRUE to exclude individual Cumulative items from display.
-  
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
 **/
-VOID
+EFI_STATUS
 DumpRawTrace(
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
@@ -298,6 +309,9 @@ DumpRawTrace(
 
   EFI_STRING    StringPtr;
   EFI_STRING    StringPtrUnknown;
+  EFI_STATUS    Status;
+
+  Status = EFI_SUCCESS;
 
   StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_RAWTRACE), NULL);
@@ -361,7 +375,12 @@ DumpRawTrace(
         Measurement.Module
       );
     }
+    if (ShellGetExecutionBreakFlag ()) {
+      Status = EFI_ABORTED;
+      break;
+    }
   }
+  return Status;
 }
 
 /** 
@@ -510,7 +529,9 @@ ProcessPhases(
   
   @param[in]    ExcludeFlag   TRUE to exclude individual Cumulative items from display.
   
-  @return       Status from a call to gBS->LocateHandle().
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_ABORTED             The user aborts the operation.
+  @return Others                  from a call to gBS->LocateHandleBuffer().
 **/
 EFI_STATUS
 ProcessHandles(
@@ -606,6 +627,10 @@ ProcessHandles(
           );
         }
       }
+      if (ShellGetExecutionBreakFlag ()) {
+        Status = EFI_ABORTED;
+        break;
+      }
     }
   }
   if (HandleBuffer != NULL) {
@@ -619,8 +644,10 @@ ProcessHandles(
   
   Only prints complete PEIM records
   
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
 **/
-VOID
+EFI_STATUS
 ProcessPeims(
   VOID
 )
@@ -632,6 +659,9 @@ ProcessPeims(
   UINTN                     LogEntryKey;
   UINTN                     TIndex;
   EFI_STRING                StringPtrUnknown;
+  EFI_STATUS                Status;
+
+  Status = EFI_SUCCESS;
 
   StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_PEIMS), NULL);
@@ -685,7 +715,12 @@ ProcessPeims(
         );
       }
     }
+    if (ShellGetExecutionBreakFlag ()) {
+      Status = EFI_ABORTED;
+      break;
+    }
   }
+  return Status;
 }
 
 /** 
@@ -696,8 +731,10 @@ ProcessPeims(
   Increment TIndex for every record, even skipped ones, so that we have an
   indication of every measurement record taken.
   
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
 **/
-VOID
+EFI_STATUS
 ProcessGlobal(
   VOID
 )
@@ -709,6 +746,9 @@ ProcessGlobal(
   UINTN                     LogEntryKey;
   UINTN                     Index;        // Index, or number, of the measurement record being processed
   EFI_STRING                StringPtrUnknown;
+  EFI_STATUS                Status;
+
+  Status = EFI_SUCCESS;
 
   StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
   StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_GENERAL), NULL);
@@ -766,8 +806,13 @@ ProcessGlobal(
         }
       }
     }
+    if (ShellGetExecutionBreakFlag ()) {
+      Status = EFI_ABORTED;
+      break;
+    }
     Index++;
   }
+  return Status;  //*HP_ISS_EDK2_CONTRIUTION
 }
 
 /** 
