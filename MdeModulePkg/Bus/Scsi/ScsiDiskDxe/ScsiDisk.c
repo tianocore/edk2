@@ -1,7 +1,7 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -466,8 +466,12 @@ ScsiDiskReset (
   Status          = ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
 
   if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto Done;
+    if (Status == EFI_UNSUPPORTED) {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
   }
 
   if (!ExtendedVerification) {
@@ -790,8 +794,12 @@ ScsiDiskResetEx (
   Status          = ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
 
   if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto Done;
+    if (Status == EFI_UNSUPPORTED) {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
   }
 
   if (!ExtendedVerification) {
