@@ -14,7 +14,7 @@
   timer information to calculate elapsed time for each measurement.
  
   Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -137,10 +137,10 @@ InitCumulativeData (
   @param[in]  ImageHandle     The image handle.
   @param[in]  SystemTable     The system table.
   
-  @retval EFI_SUCCESS            Command completed successfully.
-  @retval EFI_INVALID_PARAMETER  Command usage error.
-  @retval value                  Unknown error.
-  
+  @retval SHELL_SUCCESS            Command completed successfully.
+  @retval SHELL_INVALID_PARAMETER  Command usage error.
+  @retval SHELL_ABORTED            The user aborts the operation.
+  @retval value                    Unknown error.
 **/
 SHELL_STATUS
 EFIAPI
@@ -168,6 +168,7 @@ ShellCommandRunDp (
   BOOLEAN                   CumulativeMode;
   CONST CHAR16              *CustomCumulativeToken;
   PERF_CUM_DATA             *CustomCumulativeData;
+  SHELL_STATUS              ShellStatus;
 
   StringPtr   = NULL;
   SummaryMode = FALSE;
@@ -179,6 +180,7 @@ ShellCommandRunDp (
   ExcludeMode = FALSE;
   CumulativeMode = FALSE;
   CustomCumulativeData = NULL;
+  ShellStatus = SHELL_SUCCESS;
 
   // Get DP's entry time as soon as possible.
   // This is used as the Shell-Phase end time.
@@ -329,14 +331,22 @@ ShellCommandRunDp (
     ProcessCumulative (CustomCumulativeData);
   } else if (AllMode) {
     if (TraceMode) {
-      DumpAllTrace( Number2Display, ExcludeMode);
+      Status = DumpAllTrace( Number2Display, ExcludeMode);
+      if (Status == EFI_ABORTED) {
+        ShellStatus = SHELL_ABORTED;
+        goto Done;
+      }
     }
     if (ProfileMode) {
       DumpAllProfile( Number2Display, ExcludeMode);
     }
   } else if (RawMode) {
     if (TraceMode) {
-      DumpRawTrace( Number2Display, ExcludeMode);
+      Status = DumpRawTrace( Number2Display, ExcludeMode);
+      if (Status == EFI_ABORTED) {
+        ShellStatus = SHELL_ABORTED;
+        goto Done;
+      }
     }
     if (ProfileMode) {
       DumpRawProfile( Number2Display, ExcludeMode);
@@ -347,11 +357,24 @@ ShellCommandRunDp (
       ProcessPhases ( Ticker );
       if ( ! SummaryMode) {
         Status = ProcessHandles ( ExcludeMode);
-        if ( ! EFI_ERROR( Status)) {
-          ProcessPeims ();
-          ProcessGlobal ();
-          ProcessCumulative (NULL);
+        if (Status == EFI_ABORTED) {
+          ShellStatus = SHELL_ABORTED;
+          goto Done;
         }
+
+        Status = ProcessPeims ();
+        if (Status == EFI_ABORTED) {
+          ShellStatus = SHELL_ABORTED;
+          goto Done;
+        }
+
+        Status = ProcessGlobal ();
+        if (Status == EFI_ABORTED) {
+          ShellStatus = SHELL_ABORTED;
+          goto Done;
+        }
+
+        ProcessCumulative (NULL);
       }
     }
     if (ProfileMode) {
@@ -362,11 +385,12 @@ ShellCommandRunDp (
     DumpStatistics();
   }
 
+Done:
   SHELL_FREE_NON_NULL (StringPtr);
   if (CustomCumulativeData != NULL) {
     SHELL_FREE_NON_NULL (CustomCumulativeData->Name);
   }
   SHELL_FREE_NON_NULL (CustomCumulativeData);
 
-  return SHELL_SUCCESS;
+  return ShellStatus;
 }
