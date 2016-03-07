@@ -1667,6 +1667,8 @@ BmGetFileBufferFromLoadFileFileSystem (
     Handles = NULL;
     HandleCount = 0;
   }
+
+  Handle = NULL;
   for (Index = 0; Index < HandleCount; Index++) {
     Node = DevicePathFromHandle (Handles[Index]);
     Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);
