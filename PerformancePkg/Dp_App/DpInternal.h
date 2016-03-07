@@ -7,7 +7,7 @@
   DpUtilities.c, DpTrace.c, and DpProfile.c are included here.
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -215,8 +215,11 @@ GatherStatistics(
   @param[in]    Limit       The number of records to print.  Zero is ALL.
   @param[in]    ExcludeFlag TRUE to exclude individual Cumulative items from display.
   
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
+  @return Others                from a call to gBS->LocateHandleBuffer().
 **/
-VOID
+EFI_STATUS
 DumpAllTrace(
   IN UINTN             Limit,
   IN BOOLEAN           ExcludeFlag
@@ -238,9 +241,11 @@ DumpAllTrace(
   
   @param[in]    Limit       The number of records to print.  Zero is ALL.
   @param[in]    ExcludeFlag TRUE to exclude individual Cumulative items from display.
-  
+
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
 **/
-VOID
+EFI_STATUS
 DumpRawTrace(
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
@@ -262,8 +267,10 @@ ProcessPhases(
   Gather and print Handle data.
   
   @param[in]    ExcludeFlag   TRUE to exclude individual Cumulative items from display.
-  
-  @return       Status from a call to gBS->LocateHandle().
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_ABORTED             The user aborts the operation.
+  @return Others                  from a call to gBS->LocateHandleBuffer().
 **/
 EFI_STATUS
 ProcessHandles(
@@ -276,8 +283,10 @@ ProcessHandles(
   
   Only prints complete PEIM records
   
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
 **/
-VOID
+EFI_STATUS
 ProcessPeims(
   VOID
   );
@@ -290,8 +299,10 @@ ProcessPeims(
   Increment TIndex for every record, even skipped ones, so that we have an
   indication of every measurement record taken.
   
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_ABORTED           The user aborts the operation.
 **/
-VOID
+EFI_STATUS
 ProcessGlobal(
   VOID
   );

@@ -14,7 +14,7 @@
   timer information to calculate elapsed time for each measurement.
  
   Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -195,11 +195,11 @@ InitCumulativeData (
   
   @param[in]  ImageHandle     The image handle.
   @param[in]  SystemTable     The system table.
-  
+
   @retval EFI_SUCCESS            Command completed successfully.
   @retval EFI_INVALID_PARAMETER  Command usage error.
+  @retval EFI_ABORTED            The user aborts the operation.
   @retval value                  Unknown error.
-  
 **/
 EFI_STATUS
 EFIAPI
@@ -443,7 +443,10 @@ InitializeDp (
         ProcessCumulative (CustomCumulativeData);
       } else if (AllMode) {
         if (TraceMode) {
-          DumpAllTrace( Number2Display, ExcludeMode);
+          Status = DumpAllTrace( Number2Display, ExcludeMode);
+          if (Status == EFI_ABORTED) {
+            goto Done;
+          }
         }
         if (ProfileMode) {
           DumpAllProfile( Number2Display, ExcludeMode);
@@ -451,7 +454,10 @@ InitializeDp (
       }
       else if (RawMode) {
         if (TraceMode) {
-          DumpRawTrace( Number2Display, ExcludeMode);
+          Status = DumpRawTrace( Number2Display, ExcludeMode);
+          if (Status == EFI_ABORTED) {
+            goto Done;
+          }
         }
         if (ProfileMode) {
           DumpRawProfile( Number2Display, ExcludeMode);
@@ -463,11 +469,21 @@ InitializeDp (
           ProcessPhases ( Ticker );
           if ( ! SummaryMode) {
             Status = ProcessHandles ( ExcludeMode);
-            if ( ! EFI_ERROR( Status)) {
-              ProcessPeims (     );
-              ProcessGlobal (    );
-              ProcessCumulative (NULL);
+            if (Status == EFI_ABORTED) {
+              goto Done;
             }
+
+            Status = ProcessPeims ();
+            if (Status == EFI_ABORTED) {
+              goto Done;
+            }
+
+            Status = ProcessGlobal ();
+            if (Status == EFI_ABORTED) {
+              goto Done;
+            }
+
+            ProcessCumulative (NULL);
           }
         }
         if (ProfileMode) {
@@ -479,6 +495,8 @@ InitializeDp (
       }
     }
   }
+
+Done:
 
   //
   // Free the memory allocate from HiiGetString
