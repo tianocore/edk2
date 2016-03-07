@@ -12,13 +12,15 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from __future__ import print_function
+
 #
 # Import Modules
 #
 import argparse
+import io
 import os.path
 import re
-import StringIO
 import subprocess
 import sys
 
@@ -152,12 +154,12 @@ class CommonUtils:
         (stdout, stderr) = p.communicate(pipeIn)
         if checkExitCode:
             if p.returncode != 0:
-                print 'command:', ' '.join(cmd)
-                print 'stdout:', stdout
-                print 'stderr:', stderr
-                print 'return:', p.returncode
+                print('command:', ' '.join(cmd))
+                print('stdout:', stdout)
+                print('stderr:', stderr)
+                print('return:', p.returncode)
             assert p.returncode == 0
-        return stdout
+        return stdout.decode('utf-8', 'ignore')
 
     def FileUpdated(self, path):
         if not self.git or not self.gitdir:
@@ -181,7 +183,7 @@ class CommonUtils:
             return
 
         if not self.args.quiet:
-            print 'Committing: Conversion of', dst
+            print('Committing: Conversion of', dst)
 
         prefix = ' '.join(filter(lambda a: a, [pkg, module]))
         message = ''
@@ -195,6 +197,7 @@ class CommonUtils:
         message += 'Contributed-under: TianoCore Contribution Agreement 1.0\n'
         assert(self.gitemail is not None)
         message += 'Signed-off-by: %s\n' % self.gitemail
+        message = message.encode('utf-8', 'ignore')
 
         cmd = ('git', 'commit', '-F', '-')
         self.RunAndCaptureOutput(cmd, pipeIn=message)
@@ -226,23 +229,22 @@ class ConvertAsmFile(CommonUtils):
 
         self.inputFileBase = os.path.basename(self.inputFilename)
         self.outputFileBase = os.path.basename(self.outputFilename)
-        if self.outputFilename == '-' and not self.diff:
-            self.output = sys.stdout
-        else:
-            self.output = StringIO.StringIO()
+        self.output = io.BytesIO()
         if not self.args.quiet:
             dirpath, src = os.path.split(self.inputFilename)
             dirpath = self.RootRelative(dirpath)
             dst = os.path.basename(self.outputFilename)
-            print 'Converting:', dirpath, src, '->', dst
-        lines = open(self.inputFilename).readlines()
+            print('Converting:', dirpath, src, '->', dst)
+        lines = io.open(self.inputFilename).readlines()
         self.Convert(lines)
-        if self.outputFilename == '-':
-            if self.diff:
-                sys.stdout.write(self.output.getvalue())
-                self.output.close()
+        if self.outputFilename == '-' and not self.diff:
+            output_data = self.output.getvalue()
+            if sys.version_info >= (3, 0):
+                output_data = output_data.decode('utf-8', 'ignore')
+            sys.stdout.write(output_data)
+            self.output.close()
         else:
-            f = open(self.outputFilename, 'wb')
+            f = io.open(self.outputFilename, 'wb')
             f.write(self.output.getvalue())
             f.close()
             self.output.close()
@@ -521,18 +523,18 @@ class ConvertAsmFile(CommonUtils):
         return '.%d' % count
 
     def EmitString(self, string):
-        self.output.write(string)
+        self.output.write(string.encode('utf-8', 'ignore'))
 
     def EmitLineWithDiff(self, old, new):
         newLine = (self.indent + new).rstrip()
         if self.diff:
             if old is None:
-                print '+%s' % newLine
+                print('+%s' % newLine)
             elif newLine != old:
-                print '-%s' % old
-                print '+%s' % newLine
+                print('-%s' % old)
+                print('+%s' % newLine)
             else:
-                print '', newLine
+                print('', newLine)
         if newLine != '':
             self.newAsmEmptyLineCount = 0
         self.EmitString(newLine + '\r\n')
@@ -565,7 +567,7 @@ class ConvertAsmFile(CommonUtils):
         if emitNewLine:
             self.EmitLine(newLine.rstrip())
         elif self.diff:
-            print '-%s' % self.originalLine
+            print('-%s' % self.originalLine)
 
     leaRe = re.compile(r'''
                            (lea \s+) ([\w@][\w@0-9]*) \s* , \s* (\S (?:.*\S)?)
@@ -759,7 +761,7 @@ class ConvertInfFile(CommonUtils):
     def ScanInfAsmFiles(self):
         src = self.inf
         assert os.path.isfile(src)
-        f = open(src)
+        f = io.open(src, 'rt')
         self.lines = f.readlines()
         f.close()
 
@@ -801,17 +803,16 @@ class ConvertInfFile(CommonUtils):
         unsupportedArchCount = 0
         for dst in self:
             didSomething = False
-            fileChanged = self.UpdateInfAsmFile(dst)
             try:
                 self.UpdateInfAsmFile(dst)
                 didSomething = True
             except UnsupportedConversion:
                 if not self.args.quiet:
-                    print 'MASM=>NASM conversion unsupported for', dst
+                    print('MASM=>NASM conversion unsupported for', dst)
                 notConverted.append(dst)
             except NoSourceFile:
                 if not self.args.quiet:
-                    print 'Source file missing for', reldst
+                    print('Source file missing for', reldst)
                 notConverted.append(dst)
             except UnsupportedArch:
                 unsupportedArchCount += 1
@@ -821,9 +822,9 @@ class ConvertInfFile(CommonUtils):
         if len(notConverted) > 0 and not self.args.quiet:
             for dst in notConverted:
                 reldst = self.RootRelative(dst)
-                print 'Unabled to convert', reldst
+                print('Unabled to convert', reldst)
         if unsupportedArchCount > 0 and not self.args.quiet:
-            print 'Skipped', unsupportedArchCount, 'files based on architecture'
+            print('Skipped', unsupportedArchCount, 'files based on architecture')
 
     def UpdateInfAsmFile(self, dst, IgnoreMissingAsm=False):
         infPath = os.path.split(os.path.realpath(self.inf))[0]
@@ -842,8 +843,9 @@ class ConvertInfFile(CommonUtils):
 
         lastLine = ''
         fileChanged = False
-        for i in range(len(self.lines)):
-            line = self.lines[i].rstrip()
+        i = 0
+        for line in self.lines:
+            line = line.rstrip()
             updatedLine = line
             for src in self.dstToSrc[dst]:
                 assert self.srcToDst[src] == dst
@@ -855,22 +857,24 @@ class ConvertInfFile(CommonUtils):
                 if lastLine.strip() == updatedLine.strip():
                     self.lines[i] = None
                 else:
-                    self.lines[i] = updatedLine + '\r\n'
+                    self.lines[i] = updatedLine + '\n'
 
             if self.diff:
                 if lineChanged:
-                    print '-%s' % line
+                    print('-%s' % line)
                     if self.lines[i] is not None:
-                        print '+%s' % updatedLine
+                        print('+%s' % updatedLine)
                 else:
-                    print '', line
+                    print('', line)
 
             fileChanged |= lineChanged
             if self.lines[i] is not None:
                 lastLine = self.lines[i]
 
+            i += 1
+
         if fileChanged:
-            self.lines = filter(lambda l: l is not None, self.lines)
+            self.lines = list(filter(lambda l: l is not None, self.lines))
 
         for src in self.dstToSrc[dst]:
             if not src.endswith('.asm'):
@@ -879,7 +883,7 @@ class ConvertInfFile(CommonUtils):
                     self.RemoveFile(fullSrc)
 
         if fileChanged:
-            f = open(self.inf, 'wb')
+            f = io.open(self.inf, 'w', newline='\r\n')
             f.writelines(self.lines)
             f.close()
             self.FileUpdated(self.inf)
@@ -917,11 +921,11 @@ class ConvertInfFiles(CommonUtils):
                     didSomething = True
             except UnsupportedConversion:
                 if not self.args.quiet:
-                    print 'MASM=>NASM conversion unsupported for', reldst
+                    print('MASM=>NASM conversion unsupported for', reldst)
                 notConverted.append(dst)
             except NoSourceFile:
                 if not self.args.quiet:
-                    print 'Source file missing for', reldst
+                    print('Source file missing for', reldst)
                 notConverted.append(dst)
             except UnsupportedArch:
                 unsupportedArchCount += 1
@@ -931,9 +935,9 @@ class ConvertInfFiles(CommonUtils):
         if len(notConverted) > 0 and not self.args.quiet:
             for dst in notConverted:
                 reldst = self.RootRelative(dst)
-                print 'Unabled to convert', reldst
+                print('Unabled to convert', reldst)
         if unsupportedArchCount > 0 and not self.args.quiet:
-            print 'Skipped', unsupportedArchCount, 'files based on architecture'
+            print('Skipped', unsupportedArchCount, 'files based on architecture')
 
 
 class ConvertDirectories(CommonUtils):
@@ -968,7 +972,7 @@ class ConvertAsmApp(CommonUtils):
         src = self.args.source
         dst = self.args.dest
         if self.infmode:
-            ConvertInfFiles(src, self)
+            ConvertInfFiles((src,), self)
         elif self.dirmode:
             ConvertDirectories((src,), self)
         elif not self.dirmode:
