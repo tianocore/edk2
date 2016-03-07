@@ -204,6 +204,11 @@ ArmWriteHcr (
   );
 
 UINTN
+ArmReadHcr (
+  VOID
+  );
+
+UINTN
 ArmReadCurrentEL (
   VOID
   );

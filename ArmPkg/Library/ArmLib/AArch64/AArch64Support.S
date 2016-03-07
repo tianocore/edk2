@@ -54,6 +54,7 @@ GCC_ASM_EXPORT (ArmIsArchTimerImplemented)
 GCC_ASM_EXPORT (ArmReadIdPfr0)
 GCC_ASM_EXPORT (ArmReadIdPfr1)
 GCC_ASM_EXPORT (ArmWriteHcr)
+GCC_ASM_EXPORT (ArmReadHcr)
 GCC_ASM_EXPORT (ArmReadCurrentEL)
 
 .set CTRL_M_BIT,      (1 << 0)
@@ -468,6 +469,11 @@ ASM_PFX(ArmReadIdPfr1):
 // VOID ArmWriteHcr(UINTN Hcr)
 ASM_PFX(ArmWriteHcr):
   msr   hcr_el2, x0        // Write the passed HCR value
+  ret
+
+// UINTN ArmReadHcr(VOID)
+ASM_PFX(ArmReadHcr):
+  mrs   x0, hcr_el2
   ret
 
 // UINTN ArmReadCurrentEL(VOID)
