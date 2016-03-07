@@ -1,0 +1,63 @@
+## @file
+# Instance of CpuExceptionHandlerLib Library for ARM/AArch64 architectures
+#
+# This library instance is used for modules that will implement exception
+# handlers in-place (by programming VBAR).  The exception handlers will be
+# generated with alignment as required by the processor architecture.  The
+# alignment must be propagated into the parent FFS/FV through FDF build rules
+# for the relevant module types (i.e. Align=Auto).
+#
+# Note that using this library instance can cause growth to the size of the FV
+# due to the padding added by the build tools to meet the vector alignment
+# requirements and may not be desirable for space-sensitive FVs (uncompressed /
+# XIP components).  The alternative library instance, ArmRelocateExceptionLib
+# should be considered for these applications.
+#
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2016 HP Development Company, L.P.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmExceptionLib
+  FILE_GUID                      = A9796991-4E88-47F0-87C5-D96A1D270539
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib
+
+[Sources.common]
+  ArmExceptionLib.c
+
+[Sources.Arm]
+  Arm/ArmException.c
+  Arm/ExceptionSupport.asm | RVCT
+  Arm/ExceptionSupport.S   | GCC
+
+[Sources.AARCH64]
+  AArch64/AArch64Exception.c
+  AArch64/ExceptionSupport.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  DebugLib
+  DefaultExceptionHandlerLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
