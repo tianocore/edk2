@@ -29,17 +29,13 @@
   CpuDxe.h
   CpuMpCore.c
   CpuMmuCommon.c
+  Exception.c
 
 [Sources.ARM]
   Arm/Mmu.c
-  Arm/Exception.c
-  Arm/ExceptionSupport.asm | RVCT
-  Arm/ExceptionSupport.S   | GCC
 
 [Sources.AARCH64]
   AArch64/Mmu.c
-  AArch64/Exception.c
-  AArch64/ExceptionSupport.S
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -52,6 +48,7 @@
   BaseMemoryLib
   CacheMaintenanceLib
   CpuLib
+  CpuExceptionHandlerLib
   DebugLib
   DefaultExceptionHandlerLib
   DxeServicesTableLib
@@ -69,14 +66,13 @@
   gEfiDebugImageInfoTableGuid
   gArmMpCoreInfoGuid
   gIdleLoopEventGuid
+  gEfiVectorHandoffTableGuid
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdVFPEnabled
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
 
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport
-  gArmTokenSpaceGuid.PcdRelocateVectorTable
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
 
 [Depex]
