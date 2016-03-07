@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Implementation
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1132,7 +1132,7 @@ RemoveTableFromRsdt (
     //
     // Check if we have found the corresponding entry in both RSDT and XSDT
     //
-    if ((CurrentRsdtEntry == NULL || *CurrentRsdtEntry == (UINT32) (UINTN) Table->Table) &&
+    if (((Rsdt == NULL) || *CurrentRsdtEntry == (UINT32) (UINTN) Table->Table) &&
         ((Xsdt == NULL) || CurrentTablePointer64 == (UINT64) (UINTN) Table->Table)
         ) {
       //
