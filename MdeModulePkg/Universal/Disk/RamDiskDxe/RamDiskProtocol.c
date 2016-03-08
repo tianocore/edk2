@@ -324,7 +324,7 @@ RamDiskUnregister (
                &gEfiBlockIo2ProtocolGuid,
                &PrivateData->BlockIo2,
                &gEfiDevicePathProtocolGuid,
-               DevicePath,
+               (EFI_DEVICE_PATH_PROTOCOL *) PrivateData->DevicePath,
                NULL
                );
 
