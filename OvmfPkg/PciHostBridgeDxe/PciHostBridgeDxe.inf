@@ -49,8 +49,7 @@
   IoFifo.h
 
 [Sources.IA32]
-  Ia32/IoFifo.asm
-  Ia32/IoFifo.S
+  Ia32/IoFifo.nasm
 
 [Sources.X64]
   X64/IoFifo.asm

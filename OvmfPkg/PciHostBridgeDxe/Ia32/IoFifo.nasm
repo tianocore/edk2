@@ -12,9 +12,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .586P
-    .model  flat,C
-    .code
+    SECTION .text
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -25,7 +23,8 @@
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoReadFifo8 PROC
+global ASM_PFX(IoReadFifo8)
+ASM_PFX(IoReadFifo8):
     push    edi
     cld
     mov     dx, [esp + 8]
@@ -34,7 +33,6 @@ IoReadFifo8 PROC
 rep insb
     pop     edi
     ret
-IoReadFifo8 ENDP
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -45,7 +43,8 @@ IoReadFifo8 ENDP
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoReadFifo16 PROC
+global ASM_PFX(IoReadFifo16)
+ASM_PFX(IoReadFifo16):
     push    edi
     cld
     mov     dx, [esp + 8]
@@ -54,7 +53,6 @@ IoReadFifo16 PROC
 rep insw
     pop     edi
     ret
-IoReadFifo16 ENDP
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -65,7 +63,8 @@ IoReadFifo16 ENDP
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoReadFifo32 PROC
+global ASM_PFX(IoReadFifo32)
+ASM_PFX(IoReadFifo32):
     push    edi
     cld
     mov     dx, [esp + 8]
@@ -74,7 +73,6 @@ IoReadFifo32 PROC
 rep insd
     pop     edi
     ret
-IoReadFifo32 ENDP
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -85,7 +83,8 @@ IoReadFifo32 ENDP
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoWriteFifo8 PROC
+global ASM_PFX(IoWriteFifo8)
+ASM_PFX(IoWriteFifo8):
     push    esi
     cld
     mov     dx, [esp + 8]
@@ -94,7 +93,6 @@ IoWriteFifo8 PROC
 rep outsb
     pop     esi
     ret
-IoWriteFifo8 ENDP
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -105,7 +103,8 @@ IoWriteFifo8 ENDP
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoWriteFifo16 PROC
+global ASM_PFX(IoWriteFifo16)
+ASM_PFX(IoWriteFifo16):
     push    esi
     cld
     mov     dx, [esp + 8]
@@ -114,7 +113,6 @@ IoWriteFifo16 PROC
 rep outsw
     pop     esi
     ret
-IoWriteFifo16 ENDP
 
 ;------------------------------------------------------------------------------
 ;  VOID
@@ -125,7 +123,8 @@ IoWriteFifo16 ENDP
 ;    IN VOID                   *Buffer
 ;    );
 ;------------------------------------------------------------------------------
-IoWriteFifo32 PROC
+global ASM_PFX(IoWriteFifo32)
+ASM_PFX(IoWriteFifo32):
     push    esi
     cld
     mov     dx, [esp + 8]
@@ -134,7 +133,4 @@ IoWriteFifo32 PROC
 rep outsd
     pop     esi
     ret
-IoWriteFifo32 ENDP
-
-    END
 
