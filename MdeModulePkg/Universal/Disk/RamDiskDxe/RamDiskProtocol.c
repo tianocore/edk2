@@ -103,7 +103,6 @@ RamDiskRegister (
   MEDIA_RAM_DISK_DEVICE_PATH      *RamDiskDevNode;
   UINTN                           DevicePathSize;
   LIST_ENTRY                      *Entry;
-  EFI_TPL                         OldTpl;
 
   if ((0 == RamDiskSize) || (NULL == RamDiskType) || (NULL == DevicePath)) {
     return EFI_INVALID_PARAMETER;
@@ -163,7 +162,6 @@ RamDiskRegister (
   // Check whether the created device path is already present in the handle
   // database
   //
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   if (!IsListEmpty(&RegisteredRamDisks)) {
     DevicePathSize = GetDevicePathSize (PrivateData->DevicePath);
 
@@ -184,7 +182,6 @@ RamDiskRegister (
       }
     }
   }
-  gBS->RestoreTPL (OldTpl);
 
   //
   // Fill Block IO protocol informations for the RAM disk
@@ -212,10 +209,8 @@ RamDiskRegister (
   //
   // Insert the newly created one to the registered RAM disk list
   //
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&RegisteredRamDisks, &PrivateData->ThisInstance);
   ListEntryNum++;
-  gBS->RestoreTPL (OldTpl);
 
   gBS->ConnectController (PrivateData->Handle, NULL, NULL, TRUE);
 
@@ -269,7 +264,6 @@ RamDiskUnregister (
   EFI_DEVICE_PATH_PROTOCOL        *Header;
   MEDIA_RAM_DISK_DEVICE_PATH      *RamDiskDevNode;
   RAM_DISK_PRIVATE_DATA           *PrivateData;
-  EFI_TPL                         OldTpl;
 
   if (NULL == DevicePath) {
     return EFI_INVALID_PARAMETER;
@@ -302,7 +296,6 @@ RamDiskUnregister (
   StartingAddr   = ReadUnaligned64 ((UINT64 *) &(RamDiskDevNode->StartingAddr[0]));
   EndingAddr     = ReadUnaligned64 ((UINT64 *) &(RamDiskDevNode->EndingAddr[0]));
 
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   if (!IsListEmpty(&RegisteredRamDisks)) {
     EFI_LIST_FOR_EACH_SAFE (Entry, NextEntry, &RegisteredRamDisks) {
       PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
@@ -348,7 +341,6 @@ RamDiskUnregister (
       }
     }
   }
-  gBS->RestoreTPL (OldTpl);
 
   if (TRUE == Found) {
     return EFI_SUCCESS;

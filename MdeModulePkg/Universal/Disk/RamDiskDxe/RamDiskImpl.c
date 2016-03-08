@@ -521,7 +521,6 @@ UpdateMainForm (
   CHAR16                    *String;
   CHAR16                    RamDiskStr[128];
   EFI_STRING_ID             StringId;
-  EFI_TPL                   OldTpl;
 
   //
   // Init OpCode Handle
@@ -557,7 +556,6 @@ UpdateMainForm (
   EndLabel->Number       = MAIN_LABEL_LIST_END;
 
   Index = 0;
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   EFI_LIST_FOR_EACH (Entry, &RegisteredRamDisks) {
     PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
     String      = RamDiskStr;
@@ -588,7 +586,6 @@ UpdateMainForm (
 
     Index++;
   }
-  gBS->RestoreTPL (OldTpl);
 
   HiiUpdateForm (
     ConfigPrivate->HiiHandle,
@@ -645,7 +642,6 @@ RamDiskCallback (
   EFI_FILE_HANDLE                 FileHandle;
   LIST_ENTRY                      *Entry;
   LIST_ENTRY                      *NextEntry;
-  EFI_TPL                         OldTpl;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -747,7 +743,6 @@ RamDiskCallback (
       // Remove the selected RAM disks
       //
       Index = 0;
-      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       EFI_LIST_FOR_EACH_SAFE (Entry, NextEntry, &RegisteredRamDisks) {
         if (Configuration->RamDiskList[Index++] != 0) {
           PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
@@ -757,7 +752,6 @@ RamDiskCallback (
             );
         }
       }
-      gBS->RestoreTPL (OldTpl);
 
       UpdateMainForm (ConfigPrivate);
 
