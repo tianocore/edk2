@@ -218,11 +218,10 @@ MemMapInitialization (
     TopOfLowRam = GetSystemMemorySizeBelow4gb ();
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
       //
-      // A 3GB base will always fall into Q35's 32-bit PCI host aperture,
-      // regardless of the Q35 MMCONFIG BAR. Correspondingly, QEMU never lets
-      // the RAM below 4 GB exceed it.
+      // On Q35 machine types that QEMU intends to support in the long term,
+      // QEMU never lets the RAM below 4 GB exceed 2 GB.
       //
-      PciBase = BASE_2GB + BASE_1GB;
+      PciBase = BASE_2GB;
       ASSERT (TopOfLowRam <= PciBase);
     } else {
       PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
