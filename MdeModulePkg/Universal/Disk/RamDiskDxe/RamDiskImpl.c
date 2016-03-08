@@ -191,9 +191,6 @@ UnregisterAllRamDisks (
         FreePool ((VOID *)(UINTN) PrivateData->StartingAddr);
       }
 
-
-      gBS->DisconnectController (PrivateData->Handle, NULL, NULL);
-
       FreePool (PrivateData->DevicePath);
       FreePool (PrivateData);
       ListEntryNum--;
