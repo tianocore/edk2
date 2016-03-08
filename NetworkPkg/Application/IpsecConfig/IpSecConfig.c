@@ -1,7 +1,7 @@
 /** @file
   The main process for IpSecConfig application.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -24,6 +24,11 @@
 #include "PolicyEntryOperation.h"
 #include "Delete.h"
 #include "Helper.h"
+
+//
+// String token ID of IpSecConfig command help message text.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringIpSecHelpTokenId = STRING_TOKEN (STR_IPSEC_CONFIG_HELP);
 
 //
 // Used for ShellCommandLineParseEx only

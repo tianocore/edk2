@@ -1,7 +1,7 @@
 /** @file
   The internal structure and function declaration in IpSecConfig application.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -26,11 +26,6 @@
 #include <Library/NetLib.h>
 
 #include <Protocol/IpSecConfig.h>
-
-//
-// String token ID of VConfig command help message text.
-//
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringIpSecHelpTokenId = STRING_TOKEN (STR_IPSEC_CONFIG_HELP);
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
