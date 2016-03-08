@@ -11,6 +11,7 @@
   Performance Protocol is installed at the very beginning of DXE phase.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -522,7 +523,9 @@ DxeCorePerformanceLibConstructor (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  mMaxGaugeRecords = INIT_DXE_GAUGE_DATA_ENTRIES + PcdGet8 (PcdMaxPeiPerformanceLogEntries);
+  mMaxGaugeRecords = INIT_DXE_GAUGE_DATA_ENTRIES + (UINT16) (PcdGet16 (PcdMaxPeiPerformanceLogEntries16) != 0 ?
+                                                             PcdGet16 (PcdMaxPeiPerformanceLogEntries16) :
+                                                             PcdGet8 (PcdMaxPeiPerformanceLogEntries));
 
   mGaugeData = AllocateZeroPool (sizeof (GAUGE_DATA_HEADER) + (sizeof (GAUGE_DATA_ENTRY_EX) * mMaxGaugeRecords));
   ASSERT (mGaugeData != NULL);
