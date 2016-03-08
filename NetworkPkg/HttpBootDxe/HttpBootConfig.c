@@ -143,7 +143,7 @@ HttpBootAddBootOption (
   Status = GetVariable2 (
              L"BootOrder",
              &gEfiGlobalVariableGuid,
-             &CurrentOrder,
+             (VOID **)&CurrentOrder,
              &Length 
              );
   if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
