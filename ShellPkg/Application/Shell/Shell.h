@@ -58,6 +58,10 @@
 #include "ConsoleWrappers.h"
 #include "FileHandleWrappers.h"
 
+extern CONST CHAR16 mNoNestingEnvVarName[];
+extern CONST CHAR16 mNoNestingTrue[];
+extern CONST CHAR16 mNoNestingFalse[];
+
 typedef struct {
   LIST_ENTRY        Link;           ///< Standard linked list handler.
   SHELL_FILE_HANDLE *SplitStdOut;   ///< ConsoleOut for use in the split.
@@ -73,7 +77,8 @@ typedef struct {
   UINT32  NoMap:1;        ///< Was "-nomap"         found on command line.
   UINT32  NoVersion:1;    ///< Was "-noversion"     found on command line.
   UINT32  Delay:1;        ///< Was "-delay[:n]      found on command line
-  UINT32  Exit:1;         ///< Was "-_exit"          found on command line
+  UINT32  Exit:1;         ///< Was "-_exit"         found on command line
+  UINT32  NoNest:1;       ///< Was "-nonest"        found on command line
   UINT32  Reserved:7;     ///< Extra bits
 } SHELL_BITS;
 
