@@ -52,8 +52,7 @@
   Ia32/IoFifo.nasm
 
 [Sources.X64]
-  X64/IoFifo.asm
-  X64/IoFifo.S
+  X64/IoFifo.nasm
 
 [Protocols]
   gEfiPciHostBridgeResourceAllocationProtocolGuid       ## PRODUCES
