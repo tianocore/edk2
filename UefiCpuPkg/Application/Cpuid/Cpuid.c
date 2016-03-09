@@ -213,6 +213,10 @@ CpuidVersionInfo (
   UINT32                  DisplayFamily;
   UINT32                  DisplayModel;
 
+  if (CPUID_VERSION_INFO > gMaximumBasicFunction) {
+    return;
+  }
+
   AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, &Ebx.Uint32, &Ecx.Uint32, &Edx.Uint32);
 
   Print (L"CPUID_VERSION_INFO (Leaf %08x)\n", CPUID_VERSION_INFO);
