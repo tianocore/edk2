@@ -17,7 +17,7 @@
 DISPLAY_INFO					DisplayInfo;
 EFI_HANDLE						VgaShimImage;
 EFI_LOADED_IMAGE_PROTOCOL		*VgaShimImageInfo;
-BOOLEAN							DebugMode = TRUE;
+BOOLEAN							DebugMode = FALSE;
 EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
 
 
@@ -623,7 +623,7 @@ PrintFuncNameMessage(
 	//
 	// Switch to text mode if needed and possible.
 	//
-	if (IsError && ConsoleControl != NULL) {
+	if (ConsoleControl != NULL) {
 		Status = ConsoleControl->GetMode(ConsoleControl, &CurrentMode, NULL, NULL);
 		if (!EFI_ERROR(Status) && CurrentMode != EfiConsoleControlScreenText) {
 			ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
