@@ -17,6 +17,7 @@
   device situation.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -4096,7 +4097,18 @@ ConSplitterAbsolutePointerGetState (
   EFI_STATUS                    ReturnStatus;
   UINTN                         Index;
   EFI_ABSOLUTE_POINTER_STATE    CurrentState;
-
+  UINT64                        MinX;
+  UINT64                        MinY;
+  UINT64                        MinZ;
+  UINT64                        MaxX;
+  UINT64                        MaxY;
+  UINT64                        MaxZ;
+  UINT64                        VirtualMinX;
+  UINT64                        VirtualMinY;
+  UINT64                        VirtualMinZ;
+  UINT64                        VirtualMaxX;
+  UINT64                        VirtualMaxY;
+  UINT64                        VirtualMaxZ;
 
   Private = TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_ABSOLUTE_POINTER_THIS (This);
 
@@ -4106,6 +4118,13 @@ ConSplitterAbsolutePointerGetState (
   State->CurrentY                        = 0;
   State->CurrentZ                        = 0;
   State->ActiveButtons                   = 0;
+
+  VirtualMinX = Private->AbsolutePointerMode.AbsoluteMinX;
+  VirtualMinY = Private->AbsolutePointerMode.AbsoluteMinY;
+  VirtualMinZ = Private->AbsolutePointerMode.AbsoluteMinZ;
+  VirtualMaxX = Private->AbsolutePointerMode.AbsoluteMaxX;
+  VirtualMaxY = Private->AbsolutePointerMode.AbsoluteMaxY;
+  VirtualMaxZ = Private->AbsolutePointerMode.AbsoluteMaxZ;
 
   //
   // if no physical pointer device exists, return EFI_NOT_READY;
@@ -4124,16 +4143,26 @@ ConSplitterAbsolutePointerGetState (
         ReturnStatus = EFI_SUCCESS;
       }
 
+      MinX = Private->AbsolutePointerList[Index]->Mode->AbsoluteMinX;
+      MinY = Private->AbsolutePointerList[Index]->Mode->AbsoluteMinY;
+      MinZ = Private->AbsolutePointerList[Index]->Mode->AbsoluteMinZ;
+      MaxX = Private->AbsolutePointerList[Index]->Mode->AbsoluteMaxX;
+      MaxY = Private->AbsolutePointerList[Index]->Mode->AbsoluteMaxY;
+      MaxZ = Private->AbsolutePointerList[Index]->Mode->AbsoluteMaxZ;
+
       State->ActiveButtons = CurrentState.ActiveButtons;
 
-      if (!(Private->AbsolutePointerMode.AbsoluteMinX == 0 && Private->AbsolutePointerMode.AbsoluteMaxX == 0)) {
-        State->CurrentX = CurrentState.CurrentX;
+      //
+      // Rescale to Con Splitter virtual Absolute Pointer's resolution.
+      //
+      if (!(MinX == 0 && MaxX == 0)) {
+        State->CurrentX = VirtualMinX + (CurrentState.CurrentX * (VirtualMaxX - VirtualMinX)) / (MaxX - MinX);
       }
-      if (!(Private->AbsolutePointerMode.AbsoluteMinY == 0 && Private->AbsolutePointerMode.AbsoluteMaxY == 0)) {
-        State->CurrentY = CurrentState.CurrentY;
+      if (!(MinY == 0 && MaxY == 0)) {
+        State->CurrentY = VirtualMinY + (CurrentState.CurrentY * (VirtualMaxY - VirtualMinY)) / (MaxY - MinY);
       }
-      if (!(Private->AbsolutePointerMode.AbsoluteMinZ == 0 && Private->AbsolutePointerMode.AbsoluteMaxZ == 0)) {
-        State->CurrentZ = CurrentState.CurrentZ;
+      if (!(MinZ == 0 && MaxZ == 0)) {
+        State->CurrentZ = VirtualMinZ + (CurrentState.CurrentZ * (VirtualMaxZ - VirtualMinZ)) / (MaxZ - MinZ);
       }
 
     } else if (Status == EFI_DEVICE_ERROR) {
