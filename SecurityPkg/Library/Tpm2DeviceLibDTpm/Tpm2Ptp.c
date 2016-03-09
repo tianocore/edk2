@@ -1,7 +1,7 @@
 /** @file
   PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -52,7 +52,7 @@ typedef enum {
   @retval    FALSE   TPM PTP is not found.
 **/
 BOOLEAN
-IsPtpPresence (
+Tpm2IsPtpPresence (
   IN VOID *Reg
   )
 {
@@ -117,7 +117,7 @@ PtpCrbRequestUseTpm (
 {
   EFI_STATUS                        Status;
 
-  if (!IsPtpPresence (CrbReg)) {
+  if (!Tpm2IsPtpPresence (CrbReg)) {
     return EFI_NOT_FOUND;
   }
 
@@ -353,14 +353,14 @@ TisPcRequestUseTpm (
   @return PTP interface type.
 **/
 PTP_INTERFACE_TYPE
-GetPtpInterface (
+Tpm2GetPtpInterface (
   IN VOID *Register
   )
 {
   PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
   PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
 
-  if (!IsPtpPresence (Register)) {
+  if (!Tpm2IsPtpPresence (Register)) {
     return PtpInterfaceMax;
   }
   //
@@ -401,7 +401,7 @@ DumpPtpInfo (
   UINT8                         Rid;
   PTP_INTERFACE_TYPE            PtpInterface;
 
-  if (!IsPtpPresence (Register)) {
+  if (!Tpm2IsPtpPresence (Register)) {
     return ;
   }
 
@@ -440,7 +440,7 @@ DumpPtpInfo (
   Vid = 0xFFFF;
   Did = 0xFFFF;
   Rid = 0xFF;
-  PtpInterface = GetPtpInterface (Register);
+  PtpInterface = Tpm2GetPtpInterface (Register);
   DEBUG ((EFI_D_INFO, "PtpInterface - %x\n", PtpInterface));
   switch (PtpInterface) {
   case PtpInterfaceCrb:
@@ -485,7 +485,7 @@ DTpm2SubmitCommand (
 {
   PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
   switch (PtpInterface) {
   case PtpInterfaceCrb:
     return PtpCrbTpmCommand (
@@ -524,7 +524,7 @@ DTpm2RequestUseTpm (
 {
   PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
   switch (PtpInterface) {
   case PtpInterfaceCrb:
     return PtpCrbRequestUseTpm ((PTP_CRB_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
