@@ -1,7 +1,7 @@
 /** @file
   Legacy Boot Maintainence UI implementation.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -109,8 +109,11 @@ HII_VENDOR_DEVICE_PATH  mLegacyBootOptionHiiVendorDevicePath = {
   @param EnBootOptionCount  Count of the enabled Boot Option Numbers
   @param DisBootOption      Callee allocated buffer containing the disabled Boot Option Numbers
   @param DisBootOptionCount Count of the disabled Boot Option Numbers
+
+  @return EFI_SUCCESS       The function completed successfully.
+  @retval other             Contain some error, details see  the status return by gRT->SetVariable.
 **/
-VOID
+EFI_STATUS
 OrderLegacyBootOption4SameType (
   UINT16                   *DevOrder,
   UINTN                    DevOrderCount,
@@ -143,6 +146,7 @@ OrderLegacyBootOption4SameType (
   *DisBootOptionCount = 0;
   *EnBootOptionCount  = 0;
   Index               = 0;
+  Status              = EFI_SUCCESS;
 
   ASSERT (BbsIndexArray != NULL);
   ASSERT (DeviceTypeArray != NULL);
@@ -207,11 +211,12 @@ OrderLegacyBootOption4SameType (
                   BootOrderSize,
                   BootOrder
                   );
-  ASSERT_EFI_ERROR (Status);
 
   FreePool (NewBootOption);
   FreePool (DeviceTypeArray);
   FreePool (BbsIndexArray);
+
+  return Status;
 }
 
 /**
@@ -222,8 +227,9 @@ OrderLegacyBootOption4SameType (
   @param NVMapData   The data for egacy BBS boot.
 
   @return EFI_SUCCESS           The function completed successfully.
-  @retval EFI_NOT_FOUND         If L"LegacyDevOrder" and gEfiLegacyDevOrderVariableGuid EFI Variable can be found.
+  @retval EFI_NOT_FOUND         If L"LegacyDevOrder" and gEfiLegacyDevOrderVariableGuid EFI Variable can not be found.
   @retval EFI_OUT_OF_RESOURCES  Fail to allocate memory resource
+  @retval other                 Contain some error, details see  the status return by gRT->SetVariable.
 **/
 EFI_STATUS
 UpdateBBSOption (
@@ -260,6 +266,8 @@ UpdateBBSOption (
   DisMap              = NULL;
   NewOrder            = NULL;
   CurrentType         = 0;
+  EnBootOption        = NULL;
+  DisBootOption       = NULL;
 
   
   DisMap  = mLegacyBootOptionPrivate->MaintainMapData->DisableMap;
@@ -381,7 +389,7 @@ UpdateBBSOption (
     //
     ASSERT (OptionMenu->MenuNumber == DevOrder->Length / sizeof (UINT16) - 1);
 
-    OrderLegacyBootOption4SameType (
+    Status = OrderLegacyBootOption4SameType (
       DevOrder->Data,
       DevOrder->Length / sizeof (UINT16) - 1,
       &EnBootOption,
@@ -389,6 +397,9 @@ UpdateBBSOption (
       &DisBootOption,
       &DisBootOptionCount
       );
+     if (EFI_ERROR(Status)) {
+       goto Fail;
+     }
 
     //
     // 2. Deactivate the DisBootOption and activate the EnBootOption
@@ -445,6 +456,15 @@ UpdateBBSOption (
                   VarSize,
                   OriginalPtr
                   );
+
+Fail:
+  if (EnBootOption != NULL) {
+    FreePool (EnBootOption);
+  }
+
+  if (DisBootOption != NULL) {
+    FreePool (DisBootOption);
+  }
 
   FreePool (OriginalPtr);
   return Status;
