@@ -926,3 +926,11 @@
                                                                                              "BIT 4 - EFI_ACPI_TABLE_VERSION_4_0.<BR>\n"
                                                                                              "BIT 5 - EFI_ACPI_TABLE_VERSION_5_0.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHiiOsRuntimeSupport_PROMPT  #language en-US "Enable export HII data and configuration to be used in OS runtime."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHiiOsRuntimeSupport_HELP  #language en-US "Indicates if HII data and configuration has been exported.<BR><BR>\n"
+                                                                                        "Add this PCD mainly consider the use case of simulator. This PCD maybe set to FALSE for\n"
+                                                                                        "simulator platform because the performance cost for this feature.\n"
+                                                                                        "TRUE  - Export HII data and configuration data.<BR>\n"
+                                                                                        "FALSE - Does not export HII data and configuration.<BR>"
+
