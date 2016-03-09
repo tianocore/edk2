@@ -16,11 +16,6 @@
 #ifndef _IFCONFIG6_H_
 #define _IFCONFIG6_H_
 
-//
-// String token ID of ifconfig6 command help message text.
-//
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringIfconfig6HelpTokenId = STRING_TOKEN (STR_IFCONFIG6_HELP);
-
 enum {
   IfConfig6OpList     = 1,
   IfConfig6OpSet      = 2,

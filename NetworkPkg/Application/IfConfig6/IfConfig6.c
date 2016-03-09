@@ -28,6 +28,11 @@
 
 #include "IfConfig6.h"
 
+//
+// String token ID of ifconfig6 command help message text.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringIfconfig6HelpTokenId = STRING_TOKEN (STR_IFCONFIG6_HELP);
+
 EFI_HII_HANDLE      mHiiHandle;
 
 SHELL_PARAM_ITEM    mIfConfig6CheckList[] = {

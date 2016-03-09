@@ -30,6 +30,11 @@
 
 #include "Ping6.h"
 
+//
+// String token ID of Ping6 command help message text.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringPing6HelpToken = STRING_TOKEN (STR_PING6_HELP);
+
 SHELL_PARAM_ITEM    Ping6ParamList[] = {
   {
     L"-l",

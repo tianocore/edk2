@@ -22,11 +22,6 @@
 #define PING6_ONE_SECOND           10000000
 
 //
-// String token ID of Ping6 command help message text.
-//
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringPing6HelpToken = STRING_TOKEN (STR_PING6_HELP);
-
-//
 // A similar amount of time that passes in femtoseconds
 // for each increment of TimerValue. It is for NT32 only.
 //
