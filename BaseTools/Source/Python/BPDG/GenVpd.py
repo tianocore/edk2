@@ -420,8 +420,16 @@ class GenVPD :
                     Alignment = 2
                 else:
                     Alignment = 1
-                if PCD.PcdOccupySize % Alignment != 0:
-                    PCD.PcdOccupySize = (PCD.PcdOccupySize / Alignment + 1) * Alignment
+
+                if PCD.PcdOffset != '*':
+                    if PCD.PcdOccupySize % Alignment != 0:
+                        if PCD.PcdUnpackValue.startswith("{"):
+                            EdkLogger.warn("BPDG", "The offset value of PCD %s is not 8-byte aligned!" %(PCD.PcdCName), File=self.InputFileName)
+                        else:
+                            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 'The offset value of PCD %s should be %s-byte aligned.' % (PCD.PcdCName, Alignment))
+                else:
+                    if PCD.PcdOccupySize % Alignment != 0:
+                        PCD.PcdOccupySize = (PCD.PcdOccupySize / Alignment + 1) * Alignment
 
                 #
                 # Translate PCD size string to an integer value.
