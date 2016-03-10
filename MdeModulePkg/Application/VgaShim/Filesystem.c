@@ -261,7 +261,7 @@ Launch(
 	// 
 	// Make sure this is a valid EFI loader and fill in the options.
 	//
-	gBS->HandleProtocol(FileImageHandle, &gEfiLoadedImageProtocolGuid, (VOID *)&FileImageInfo);
+	Status = gBS->HandleProtocol(FileImageHandle, &gEfiLoadedImageProtocolGuid, (VOID *)&FileImageInfo);
 	if (EFI_ERROR(Status) || FileImageInfo->ImageCodeType != EfiLoaderCode) {
 		PrintError(L"File does not match an EFI loader signature\n");
 		gBS->UnloadImage(FileImageHandle);

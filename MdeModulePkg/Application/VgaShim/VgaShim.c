@@ -73,7 +73,6 @@ UefiMain (
 		DebugMode = TRUE;
 	}
 	if (DebugMode) {
-		//
 		PrintDebug(L"VGA Shim v%s\n", VERSION);
 		PrintDebug(L"You are running in debug mode, press Enter to continue\n");
 		WaitForEnter(FALSE);
@@ -645,8 +644,6 @@ PrintFuncNameMessage(
 	VA_LIST							Marker;
 	CHAR16							*Buffer;
 	UINTN							BufferSize;
-	EFI_STATUS						Status;
-	EFI_CONSOLE_CONTROL_SCREEN_MODE	CurrentMode;
 
 	if (!(IsError || DebugMode)) {
 		return;
