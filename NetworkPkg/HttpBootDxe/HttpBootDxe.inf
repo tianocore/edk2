@@ -28,8 +28,10 @@
   NetworkPkg/NetworkPkg.dec
 
 [Sources]
+  HttpBootConfigNVDataStruc.h
   HttpBootDxe.h
   HttpBootDxe.c
+  HttpBootConfig.h
   HttpBootConfig.c
   HttpBootComponentName.h
   HttpBootComponentName.c
