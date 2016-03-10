@@ -225,7 +225,7 @@ Tpm2CommandAllocPcr (
              );
   DEBUG ((EFI_D_INFO, "Tpm2PcrAllocate - %r\n", Status));
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   DEBUG ((EFI_D_INFO, "AllocationSuccess - %02x\n", AllocationSuccess));
@@ -233,7 +233,9 @@ Tpm2CommandAllocPcr (
   DEBUG ((EFI_D_INFO, "SizeNeeded        - %08x\n", SizeNeeded));
   DEBUG ((EFI_D_INFO, "SizeAvailable     - %08x\n", SizeAvailable));
 
-  return EFI_SUCCESS;
+Done:
+  ZeroMem(&LocalAuthSession.hmac, sizeof(LocalAuthSession.hmac));
+  return Status;
 }
 
 /**
@@ -264,6 +266,8 @@ Tpm2CommandChangeEps (
 
   Status = Tpm2ChangeEPS (TPM_RH_PLATFORM, AuthSession);
   DEBUG ((EFI_D_INFO, "Tpm2ChangeEPS - %r\n", Status));
+
+  ZeroMem(&LocalAuthSession.hmac, sizeof(LocalAuthSession.hmac));
   return Status;
 }
 
