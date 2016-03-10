@@ -304,6 +304,7 @@ InitializeVirtFdtDxe (
   UINT64                         FwCfgDataSize;
   UINT64                         FwCfgDmaAddress;
   UINT64                         FwCfgDmaSize;
+  BOOLEAN                        HavePci;
 
   Hob = GetFirstGuidHob(&gFdtHobGuid);
   if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
@@ -322,6 +323,7 @@ InitializeVirtFdtDxe (
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, DeviceTreeBase));
 
   RtcNode = -1;
+  HavePci = FALSE;
   //
   // Now enumerate the nodes and install peripherals that we are interested in,
   // i.e., GIC, RTC and virtio MMIO nodes
@@ -356,6 +358,7 @@ InitializeVirtFdtDxe (
       ASSERT (Len == 2 * sizeof (UINT64));
       Status = ProcessPciHost (DeviceTreeBase, Node, RegProp);
       ASSERT_EFI_ERROR (Status);
+      HavePci = TRUE;
       break;
 
     case PropertyTypeFwCfg:
@@ -579,5 +582,28 @@ InitializeVirtFdtDxe (
         "disabled") != 0) {
     DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
   }
+
+  if (HavePci) {
+    //
+    // Set the /chosen/linux,pci-probe-only property to 1, so that the PCI
+    // setup we will perform in the firmware is honored by the Linux OS,
+    // rather than torn down and done from scratch. This is generally a more
+    // sensible approach, and aligns with what ACPI based OSes do in general.
+    //
+    // In case we are exposing an emulated VGA PCI device to the guest, which
+    // may subsequently get exposed via the Graphics Output protocol and
+    // driven as an efifb by Linux, we need this setting to prevent the
+    // framebuffer from becoming unresponsive.
+    //
+    Node = fdt_path_offset (DeviceTreeBase, "/chosen");
+    if (Node < 0) {
+      Node = fdt_add_subnode (DeviceTreeBase, 0, "/chosen");
+    }
+    if (Node < 0 ||
+        fdt_setprop_u32 (DeviceTreeBase, Node, "linux,pci-probe-only", 1) < 0) {
+      DEBUG ((EFI_D_WARN, "Failed to set /chosen/linux,pci-probe-only property\n"));
+    }
+  }
+
   return EFI_SUCCESS;
 }
