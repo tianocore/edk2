@@ -3096,7 +3096,8 @@ ExtractSecureBootModeFromVariable(
 EFI_STATUS
 UpdateSecureBootString(
   IN SECUREBOOT_CONFIG_PRIVATE_DATA  *Private
-  ) {
+  )
+{
   UINT8       CurSecureBootMode;
   UINT8       *SecureBoot;
 
