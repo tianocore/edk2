@@ -17,7 +17,6 @@
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
-#include <Protocol/BlockIo.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleFileSystem.h>
@@ -47,7 +46,8 @@ FileRead(
 
 EFI_STATUS
 Launch(
-	IN	CHAR16	*FilePath);
+	IN	CHAR16	*FilePath,
+	IN	VOID	(*WaitForEnterCallback)(BOOLEAN));
 
 
 /**

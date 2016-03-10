@@ -163,7 +163,7 @@ FileRead(
 	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
 	if (EFI_ERROR(Status)) {
 		PrintDebug(L"Unable to find simple file system protocol (error: %r)\n", Status);
-		return Status;
+		goto Exit;
 	} else {
 		PrintDebug(L"Found simple file system protocol\n");
 	}
@@ -171,7 +171,7 @@ FileRead(
 	Status = Volume->OpenVolume(Volume, &VolumeRoot);
 	if (EFI_ERROR(Status)) {
 		PrintDebug(L"Unable to open volume (error: %r)\n", Status);
-		return Status;
+		goto Exit;
 	} else {
 		PrintDebug(L"Opened volume\n");
 	}
@@ -180,8 +180,7 @@ FileRead(
 	Status = VolumeRoot->Open(VolumeRoot, &File, FilePath, EFI_FILE_MODE_READ, 0);
 	if (EFI_ERROR(Status)) {
 		PrintDebug(L"Unable to open file '%s' for reading (error: %r)\n", FilePath, Status);
-		VolumeRoot->Close(VolumeRoot);
-		return Status;
+		goto Exit;
 	} else {
 		PrintDebug(L"Opened file '%s' for reading\n", FilePath);
 	}
@@ -191,7 +190,8 @@ FileRead(
 	FileInfo = AllocatePool(Size);
 	if (FileInfo == NULL) {
 		PrintDebug(L"Unable to allocate %u bytes for file info\n", Size);
-		return EFI_OUT_OF_RESOURCES;
+		Status = EFI_OUT_OF_RESOURCES;
+		goto Exit;
 	} else {
 		PrintDebug(L"Allocated %u bytes for file info\n", Size);
 	}
@@ -203,6 +203,8 @@ FileRead(
 	*FileContents = AllocatePool(Size);
 	if (*FileContents == NULL) {
 		PrintDebug(L"Unable to allocate %u bytes for file contents\n", Size);
+		Status = EFI_OUT_OF_RESOURCES;
+		goto Exit;
 	} else {
 		PrintDebug(L"Allocated %u bytes for file contents\n", Size);
 	}
@@ -211,39 +213,50 @@ FileRead(
 	Status = File->Read(File, &Size, *FileContents);
 	if (EFI_ERROR(Status)) {
 		PrintDebug(L"Unable to read file contents (error: %r)\n", Status);
-		FreePool(*FileContents);
+		goto Exit;
 	} else {
 		PrintDebug(L"Read file contents\n", Status);
 		*FileBytes = Size;
 	}
-	
+
+Exit:
 	// Cleanup.
-	File->Close(File);
-	VolumeRoot->Close(VolumeRoot);
+	if (EFI_ERROR(Status) && *FileContents != NULL) {
+		FreePool(*FileContents);
+		*FileContents = NULL;
+	}
+	if (File != NULL)
+		File->Close(File);
+	if (VolumeRoot != NULL)
+		VolumeRoot->Close(VolumeRoot);
 	return Status;
 }
 
 
 EFI_STATUS
 Launch(
-	IN	CHAR16	*FilePath)
+	IN	CHAR16	*FilePath,
+	IN	VOID	(*WaitForEnterCallback)(BOOLEAN))
 {
 	EFI_STATUS					Status;
 	EFI_DEVICE_PATH_PROTOCOL	*FilePathOnDevice;
 	EFI_HANDLE					FileImageHandle;
 	EFI_LOADED_IMAGE_PROTOCOL	*FileImageInfo;
+	CHAR16						*FilePathOnDeviceText;
 
 	//
 	// Try to load the image first.
 	//
 	FilePathOnDevice = FileDevicePath(VgaShimImageInfo->DeviceHandle, FilePath);
-	Status = gBS->LoadImage(FALSE, VgaShimImage, FilePathOnDevice, NULL, 0, &FileImageHandle);
+	FilePathOnDeviceText = ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE);
+	Status = gBS->LoadImage(TRUE, VgaShimImage, FilePathOnDevice, NULL, 0, &FileImageHandle);
 	if (EFI_ERROR(Status)) {
-		PrintError(L"Unable to load '%s' (error: %r)\n", 
-			ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE), Status);
+		PrintError(L"Unable to load '%s' (error: %r)\n", FilePathOnDeviceText, Status);
 	} else {
-		PrintDebug(L"Loaded '%s'\n", ConvertDevicePathToText(FilePathOnDevice, TRUE, FALSE));
+		PrintDebug(L"Loaded '%s'\n", FilePathOnDeviceText);
+		PrintDebug(L"Addresss behind FileImageHandle=%x\n", FileImageHandle);
 	}
+	FreePool(FilePathOnDeviceText);
 	
 	// 
 	// Make sure this is a valid EFI loader and fill in the options.
@@ -255,6 +268,10 @@ Launch(
 		return EFI_UNSUPPORTED;
 	} else {
 		PrintDebug(L"File matches an EFI loader signature\n");
+	}
+
+	if (WaitForEnterCallback != NULL) {
+		WaitForEnterCallback(TRUE);
 	}
 	
 	//

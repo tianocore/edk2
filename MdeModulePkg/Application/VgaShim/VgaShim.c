@@ -10,7 +10,7 @@
 
 /**
   -----------------------------------------------------------------------------
-  Global variables.
+  Variables.
   -----------------------------------------------------------------------------
 **/
 
@@ -18,7 +18,6 @@ DISPLAY_INFO					DisplayInfo;
 EFI_HANDLE						VgaShimImage;
 EFI_LOADED_IMAGE_PROTOCOL		*VgaShimImageInfo;
 BOOLEAN							DebugMode = FALSE;
-EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
 
 
 /**
@@ -39,25 +38,27 @@ UefiMain (
 	IN EFI_SYSTEM_TABLE	*SystemTable)
 {
 	EFI_PHYSICAL_ADDRESS	Int10hHandlerAddress;
-	IVT_ENTRY				*Int10hHandlerEntry;
-	EFI_PHYSICAL_ADDRESS	TempAddress;
+	IVT_ENTRY				*IvtInt10hHandlerEntry;
+	IVT_ENTRY				NewInt10hHandlerEntry;
+	EFI_PHYSICAL_ADDRESS	IvtAddress;
 	EFI_STATUS				Status;
+	EFI_STATUS				IvtAllocationStatus;
 	EFI_INPUT_KEY			Key;
 	CHAR16					*LaunchPath = NULL;
+	BOOLEAN					ModifyIvtEntry = TRUE;
 
 	//
-	// Give user time to press 'v' to enter debug mode.
+	// Claim real mode IVT memory area before any allocation can
+	// grab it. This can be done as the IDT has already been
+	// initialized so we can overwrite the IVT.
 	//
-	gBS->Stall(1000 * 500);
+	IvtAddress = IVT_ADDRESS;
+	IvtAllocationStatus = gBS->AllocatePages(AllocateAddress, EfiBootServicesCode, 1, &IvtAddress);
 
 	//
 	// Initialization.
 	//
 	VgaShimImage = ImageHandle;
-	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
-	if (EFI_ERROR(Status)) {
-		ConsoleControl = NULL;
-	}
 	Status = gBS->HandleProtocol(VgaShimImage, &gEfiLoadedImageProtocolGuid, (VOID **)&VgaShimImageInfo);
 	if (EFI_ERROR(Status)) {
 		PrintError(L"Unable to locate EFI_LOADED_IMAGE_PROTOCOL, aborting\n");
@@ -72,15 +73,16 @@ UefiMain (
 		DebugMode = TRUE;
 	}
 	if (DebugMode) {
+		//
 		PrintDebug(L"VGA Shim v%s\n", VERSION);
 		PrintDebug(L"You are running in debug mode, press Enter to continue\n");
-		WaitForEnter();
+		WaitForEnter(FALSE);
 	}
 
 	// 
 	// Show pretty graphics.
 	//
-	if (!DebugMode && ConsoleControl != NULL) {
+	if (!DebugMode) {
 		if (!ShowAnimatedLogo()) {
 			ShowStaticLogo();
 		}
@@ -90,7 +92,7 @@ UefiMain (
 	// If an Int10h handler exists there either is a real
 	// VGA ROM in operation or we installed the shim before.
 	//
-	if (IsInt10HandlerDefined()) {
+	if (IsInt10hHandlerDefined()) {
 		PrintDebug(L"Int10h already has a handler, you should be all set\n");
 		goto Exit;
 	}
@@ -99,31 +101,18 @@ UefiMain (
 	// Sanity checks.
 	//
 	if (sizeof INT10H_HANDLER > VGA_ROM_SIZE) {
-		PrintError(L"Shim size (%u) bigger than allowed (%u), aborting\n", sizeof INT10H_HANDLER, VGA_ROM_SIZE);
+		PrintError(L"Shim size bigger than allowed (%u > %u), aborting\n", 
+			sizeof INT10H_HANDLER, VGA_ROM_SIZE);
 		goto Exit;
 	}
 
 	//
-	// Unlock VGA ROM memory for writing first.
+	// Unlock VGA ROM memory area for writing first.
 	//
 	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, UNLOCK);
 	if (EFI_ERROR(Status)) {
 		PrintError(L"Unable to unlock VGA ROM memory at %04x, aborting\n", VGA_ROM_ADDRESS);
 		goto Exit;
-	}
-
-	//
-	// Claim real mode IVT memory area. This can be done as the IDT
-	// has already been initialized so we can overwrite the IVT.
-	//
-	Int10hHandlerEntry = (IVT_ENTRY *)IVT_ADDRESS + 0x10;
-	TempAddress = IVT_ADDRESS;
-	Status = gBS->AllocatePages(AllocateAddress, EfiBootServicesCode, 1, &TempAddress);
-	if (EFI_ERROR(Status)) {
-		PrintError(L"Unable to claim IVT area at %04x (error: %r), aborting\n", IVT_ADDRESS, Status);
-		goto Exit;
-	} else {
-		PrintDebug(L"IVT area at %04x claimed\n", IVT_ADDRESS);
 	}
 
 	//
@@ -136,12 +125,15 @@ UefiMain (
 		PrintError(L"VESA information could not be filled in, aborting\n");
 		goto Exit;
 	} else {
-		PrintDebug(L"VESA information filled in, Int10h handler address = %x\n", 
-			Int10hHandlerAddress);
+		// Convert from 32bit physical address to real mode segment address.
+		NewInt10hHandlerEntry.Segment = (UINT16)((UINT32)VGA_ROM_ADDRESS >> 4);
+		NewInt10hHandlerEntry.Offset = (UINT16)(Int10hHandlerAddress - VGA_ROM_ADDRESS);
+		PrintDebug(L"VESA information filled in, Int10h handler address=%x (%04x:%04x)\n", 
+			Int10hHandlerAddress, NewInt10hHandlerEntry.Segment, NewInt10hHandlerEntry.Offset);
 	}
 	
 	//
-	// Lock the VGA ROM memory to prevent further writes.
+	// Lock VGA ROM memory area to prevent further writes.
 	//
 	Status = EnsureMemoryLock(VGA_ROM_ADDRESS, VGA_ROM_SIZE, LOCK);
 	if (EFI_ERROR(Status)) {
@@ -150,15 +142,28 @@ UefiMain (
 	}
 
 	//
-	// Point the Int10h vector at the entry point in shim.
+	// Try to point the Int10h vector at shim entry point.
 	//
-	// Convert from real 32bit physical address to real mode segment address
-	//Int10hHandlerEntry = (IVT_ENTRY *)IVT_ADDRESS + 0x10;
-	Int10hHandlerEntry->Segment = (UINT16)((UINT32)VGA_ROM_ADDRESS >> 4);
-	Int10hHandlerEntry->Offset = (UINT16)(Int10hHandlerAddress - VGA_ROM_ADDRESS);
-	PrintDebug(L"Int10h handler installed at %04x:%04x\n",
-		Int10hHandlerEntry->Segment, Int10hHandlerEntry->Offset);
-
+	IvtInt10hHandlerEntry = (IVT_ENTRY *)IVT_ADDRESS + 0x10;
+	if (!EFI_ERROR(IvtAllocationStatus)) {
+		IvtInt10hHandlerEntry->Segment = NewInt10hHandlerEntry.Segment;
+		IvtInt10hHandlerEntry->Offset = NewInt10hHandlerEntry.Offset;
+		PrintDebug(L"Int10h IVT entry modified to point at %04x:%04x\n",
+			IvtInt10hHandlerEntry->Segment, IvtInt10hHandlerEntry->Offset);
+	} else if (IvtInt10hHandlerEntry->Segment == NewInt10hHandlerEntry.Segment
+		&& IvtInt10hHandlerEntry->Offset == NewInt10hHandlerEntry.Offset) {
+		PrintDebug(L"Int10h IVT entry could not be modified but already pointing at %04x:%04x\n",
+			IvtInt10hHandlerEntry->Segment, IvtInt10hHandlerEntry->Offset);
+	} else {
+		PrintError(L"Unable to claim IVT area at %04x (error: %r)\n", IVT_ADDRESS, IvtAllocationStatus);
+		PrintError(L"Int10h IVT entry could not be modified and currently poiting\n");
+		PrintError(L"at a wrong memory area (%04x:%04x instead of %04x:%04x).\n",
+			IvtInt10hHandlerEntry->Segment, IvtInt10hHandlerEntry->Offset,
+			NewInt10hHandlerEntry.Segment, NewInt10hHandlerEntry.Offset);
+		PrintError(L"Press Enter to try to continue.\n");
+		WaitForEnter(FALSE);
+	}
+	
 Exit:
 	//
 	// Check if we can chainload the Windows Boot Manager.
@@ -166,16 +171,29 @@ Exit:
 	if (FileExists(L"\\efi\\microsoft\\boot\\bootmgfw.efi")) {
 		LaunchPath = L"\\efi\\microsoft\\boot\\bootmgfw.efi";
 		PrintDebug(L"Found Windows Boot Manager at '%s'\n", LaunchPath);
-		PrintDebug(L"Press Enter to continue loading Windows\n");
-		if (DebugMode)
-			WaitForEnter();
 	} else {
 		PrintError(L"Could not find Windows Boot Manager, press Enter to exit\n");
-		WaitForEnter();
+		WaitForEnter(FALSE);
 	}
 
+	//
+	// Make it possible to enter Windows Boot Manager.
+	//
+	if (!DebugMode) {
+		Status = gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
+		if (!EFI_ERROR(Status) && Key.ScanCode == SCAN_F8) {
+			PrintError(L"F8 keypress detected, switching to text mode\n");
+			PrintError(L"Press Enter to continue and then immediately press F8 again\n");
+			WaitForEnterAndStall(FALSE);
+		}
+	} else {
+		// For debug mode we should also detect F8 and then wait a little
+		// to allow user to fill key buffer with F8 in time but this
+		// waiting will be done by the Lauch method.
+	}
+	
 	if (LaunchPath != NULL) {
-		Launch(LaunchPath);
+		Launch(LaunchPath, DebugMode ? &WaitForEnterAndStall : NULL);
 	}
 
 	return EFI_SUCCESS;
@@ -337,27 +355,45 @@ ShimVesaInformation(
 
 /**
   Checkes if an Int10h handler is already defined in the
-  Interrupt Vector Table (IVT).
+  Interrupt Vector Table (IVT), points to somewhere
+  within VGA ROM memory and this memory is not filled
+  with protective opcodes.
 
   @retval TRUE            An Int10h handler was found in IVT.
   @retval FALSE           An Int10h handler was not found in IVT.
 
 **/
 BOOLEAN
-IsInt10HandlerDefined()
+IsInt10hHandlerDefined()
 {
-	IN	IVT_ENTRY				*Int10Entry;
-	IN	EFI_PHYSICAL_ADDRESS	Int10Handler;
-	
-	// (convert from real mode segment address to 32bit physical address)
-	Int10Entry = (IVT_ENTRY *)(UINTN)IVT_ADDRESS + 0x10;
-	Int10Handler = (Int10Entry->Segment << 4) + Int10Entry->Offset;
+	CONST STATIC UINT8		PROTECTIVE_OPCODE_1 = 0xff;
+	CONST STATIC UINT8		PROTECTIVE_OPCODE_2 = 0x00;
+	IVT_ENTRY				*Int10hEntry;
+	EFI_PHYSICAL_ADDRESS	Int10hHandler;
+	UINT8					Opcode;
 
-	if (Int10Handler >= VGA_ROM_ADDRESS && Int10Handler < (VGA_ROM_ADDRESS+VGA_ROM_SIZE)) {
-		PrintDebug(L"Int10h handler found at %04x:%04x\n", Int10Entry->Segment, Int10Entry->Offset);
-		return TRUE;
+	// Fetch 10h entry in IVT.
+	Int10hEntry = (IVT_ENTRY *)(UINTN)IVT_ADDRESS + 0x10;
+	// Convert handler address from real mode segment address to 32bit physical address.
+	Int10hHandler = (Int10hEntry->Segment << 4) + Int10hEntry->Offset;
+	
+	if (Int10hHandler >= VGA_ROM_ADDRESS && Int10hHandler < (VGA_ROM_ADDRESS+VGA_ROM_SIZE)) {
+		PrintDebug(L"Int10h IVT entry points at location within VGA ROM memory area (%04x:%04x)\n", 
+			Int10hEntry->Segment, Int10hEntry->Offset);
+
+		Opcode = *((UINT8 *)Int10hHandler);
+		if (Opcode == PROTECTIVE_OPCODE_1 || Opcode == PROTECTIVE_OPCODE_2) {
+			PrintDebug(L"First Int10h handler instruction at %04x:%04x (%02x) not valid, rejecting handler\n", 
+				Int10hEntry->Segment, Int10hEntry->Offset, Opcode);
+			return FALSE;
+		} else {
+			PrintDebug(L"First Int10h handler instruction at %04x:%04x (%02x) valid, accepting handler\n", 
+				Int10hEntry->Segment, Int10hEntry->Offset, Opcode);
+			return TRUE;
+		}
 	} else {
-		PrintDebug(L"No existing Int10h handler found\n");
+		PrintDebug(L"Int10h IVT entry points at location (%04x:%04x) outside VGA ROM memory area (%04x..%04x), rejecting handler\n", 
+			Int10hEntry->Segment, Int10hEntry->Offset, VGA_ROM_ADDRESS, VGA_ROM_ADDRESS+VGA_ROM_SIZE);
 		return FALSE;
 	}
 }
@@ -529,7 +565,7 @@ ShowStaticLogo()
 	}
 	
 	// All fine, let's do some drawing.
-	ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
+	SwtichToGraphics(FALSE);
 	ClearScreen();
 	DrawImageCentered(WindowsFlag);
 
@@ -548,7 +584,7 @@ ShowStaticLogo()
 
   Eg. if you run VgaShim.efi and have VgaShim.bmp in the same
   folder, and VgaShim.bmp is a valid, 24bpp bmp image file of
-  of size 200x10000, 50 frames will be shown (top to bottom).
+  size 200x10000, 50 frames will be shown (top to bottom).
 
   @retval TRUE              Static logo was successfully retrieved
                             and displayed on screen.
@@ -561,38 +597,34 @@ ShowAnimatedLogo()
 {
 	EFI_STATUS	Status;
 	CHAR16		*BmpFilePath;
+	CHAR16		*MyFilePath;
 	UINT8		*BmpFileContents;
 	UINTN		BmpFileBytes;
-	IMAGE		*WindowsFlag;
+	IMAGE		*WindowsFlag = NULL;
 	
 	// Check if <MyName>.bmp exists
-	Status = ChangeExtension(
-		PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImageInfo->FilePath, FALSE, FALSE)), 
-		L"bmp", 
-		(VOID **)&BmpFilePath);
+	MyFilePath = PathCleanUpDirectories(ConvertDevicePathToText(VgaShimImageInfo->FilePath, FALSE, FALSE));
+	Status = ChangeExtension(MyFilePath, L"bmp", (VOID **)&BmpFilePath);
+	FreePool(MyFilePath);
 	if (EFI_ERROR(Status) || !FileExists(BmpFilePath)) {
+		FreePool(BmpFilePath);
 		return FALSE;
 	}
 
 	// Read file contents.
 	Status = FileRead(BmpFilePath, (VOID **)&BmpFileContents, &BmpFileBytes);
+	FreePool(BmpFilePath);
 	if (EFI_ERROR(Status)) {
-		FreePool(BmpFilePath);
 		return FALSE;
 	}
 	Status = BmpFileToImage(BmpFileContents, BmpFileBytes, (VOID **)&WindowsFlag);
+	FreePool(BmpFileContents);
 	if (EFI_ERROR(Status)) {
-		FreePool(BmpFilePath);
-		FreePool(BmpFileContents);
 		return FALSE;
 	}
 
-	FreePool(BmpFilePath);
-	FreePool(BmpFileContents);
-	BmpFileContents = NULL;
-
 	// All fine, let's do some drawing.
-	ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
+	SwtichToGraphics(FALSE);
 	ClearScreen();
 	AnimateImage(WindowsFlag);
 
@@ -621,14 +653,9 @@ PrintFuncNameMessage(
 	}
 
 	//
-	// Switch to text mode if needed and possible.
+	// Switch to text mode if needed.
 	//
-	if (ConsoleControl != NULL) {
-		Status = ConsoleControl->GetMode(ConsoleControl, &CurrentMode, NULL, NULL);
-		if (!EFI_ERROR(Status) && CurrentMode != EfiConsoleControlScreenText) {
-			ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
-		}
-	}
+	SwitchToText(FALSE);
 	
 	//
 	// Generate the main message.
@@ -658,14 +685,28 @@ PrintFuncNameMessage(
 
 
 VOID
-WaitForEnter()
+WaitForEnter(
+	IN	BOOLEAN	PrintMessage)
 {
 	EFI_INPUT_KEY	Key;
 	UINTN			EventIndex;
+
+	if (PrintMessage) {
+		PrintDebug(L"Press Enter to continue\n");
+	}
 
 	gST->ConIn->Reset(gST->ConIn, FALSE);
 	do {
 		gBS->WaitForEvent(1, &gST->ConIn->WaitForKey, &EventIndex);
 		gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
-	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);	
+	} while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+}
+
+
+VOID
+WaitForEnterAndStall(
+	IN	BOOLEAN	PrintMessage)
+{
+	WaitForEnter(PrintMessage);
+	gBS->Stall(1000 * 1000); // 1 second
 }

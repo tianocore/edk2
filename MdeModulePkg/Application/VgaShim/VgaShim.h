@@ -70,7 +70,7 @@ EnsureMemoryLock(
 	IN	MEMORY_LOCK_OPERATION	Operation);
 
 BOOLEAN
-IsInt10HandlerDefined();
+IsInt10hHandlerDefined();
 
 EFI_STATUS
 ShimVesaInformation(
@@ -79,7 +79,11 @@ ShimVesaInformation(
 
 VOID
 WaitForEnter(
-	VOID);
+	IN	BOOLEAN					PrintMessage);
+
+VOID
+WaitForEnterAndStall(
+	IN	BOOLEAN					PrintMessage);
 
 /**
   -----------------------------------------------------------------------------

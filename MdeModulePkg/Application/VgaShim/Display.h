@@ -83,11 +83,21 @@ typedef struct {
   -----------------------------------------------------------------------------
 **/
 
-VOID PrintVideoInfo(
+VOID
+PrintVideoInfo(
 	VOID);
 
-VOID ClearScreen(
+VOID
+ClearScreen(
 	VOID);
+
+VOID
+SwitchToText(
+	IN	BOOLEAN	Force);
+
+VOID
+SwtichToGraphics(
+	IN	BOOLEAN	Force);
 
 VOID DestroyImage(
 	IN	IMAGE	*Image);
@@ -132,6 +142,7 @@ EnsureDisplayAvailable(
   -----------------------------------------------------------------------------
 **/
 
-extern	DISPLAY_INFO				DisplayInfo;
+extern	DISPLAY_INFO					DisplayInfo;
+
 
 #endif

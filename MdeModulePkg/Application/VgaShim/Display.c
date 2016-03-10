@@ -46,7 +46,7 @@ InitializeDisplay()
 	EFI_STATUS	Status;
 	UINT32		Temp1;
 	UINT32		Temp2;
-
+	
 	// Sets AdapterFound = FALSE and Protocol = NONE
 	SetMem(&DisplayInfo, sizeof(DISPLAY_INFO), 0);
 
@@ -64,7 +64,7 @@ InitializeDisplay()
 		// usually = PixelsPerScanLine * VerticalResolution * BytesPerPixel
 		// for MacBookAir7,2: 1536 * 900 * 4 = 5,529,600 bytes
 		DisplayInfo.FrameBufferSize = DisplayInfo.GOP->Mode->FrameBufferSize;
-		
+
 		DisplayInfo.Protocol = GOP;
 		DisplayInfo.AdapterFound = TRUE;
 		goto Exit;
@@ -156,7 +156,7 @@ CalculatePositionForCenter(
 	if (*PositionY + ImageHeight > DisplayInfo.VerticalResolution)
 		*PositionY = DisplayInfo.VerticalResolution - ImageHeight;
 
-	PrintDebug(L"Top left corner position for centered image: %u,%u\n", PositionX, PositionY);
+	//PrintDebug(L"Top left corner position for centered image: %u,%u\n", *PositionX, *PositionY);
 
 	return EFI_SUCCESS;
 }
@@ -200,17 +200,35 @@ EnsureDisplayAvailable()
 VOID
 PrintVideoInfo()
 {
+	UINT32									MaxMode;
+	UINT32									i;
+	EFI_GRAPHICS_OUTPUT_MODE_INFORMATION	*ModeInfo;
+	UINTN									SizeOfInfo;
+	EFI_STATUS								Status;
+
 	if (EFI_ERROR(EnsureDisplayAvailable())) {
 		PrintDebug(L"No display adapters found, unable to print display information\n");
 		return;
 	}
 
-	PrintDebug(L"HorizontalResolution = %u\n", DisplayInfo.HorizontalResolution);
-	PrintDebug(L"VerticalResolution = %u\n", DisplayInfo.VerticalResolution);
-	PrintDebug(L"PixelFormat = %u\n", DisplayInfo.PixelFormat);
-	PrintDebug(L"PixelsPerScanLine = %u\n", DisplayInfo.PixelsPerScanLine);
-	PrintDebug(L"FrameBufferBase = %x\n", DisplayInfo.FrameBufferBase);
-	PrintDebug(L"FrameBufferSize = %u\n", DisplayInfo.FrameBufferSize);
+	PrintDebug(L"Current mode:\n");
+	PrintDebug(L"  HorizontalResolution = %u\n", DisplayInfo.HorizontalResolution);
+	PrintDebug(L"  VerticalResolution = %u\n", DisplayInfo.VerticalResolution);
+	PrintDebug(L"  PixelFormat = %u\n", DisplayInfo.PixelFormat);
+	PrintDebug(L"  PixelsPerScanLine = %u\n", DisplayInfo.PixelsPerScanLine);
+	PrintDebug(L"  FrameBufferBase = %x\n", DisplayInfo.FrameBufferBase);
+	PrintDebug(L"  FrameBufferSize = %u\n", DisplayInfo.FrameBufferSize);
+
+	// Query available modes.
+	MaxMode = DisplayInfo.GOP->Mode->MaxMode;
+	PrintDebug(L"Available modes (MaxMode = %u):\n", MaxMode);
+	for (i = 0; i < MaxMode; i++) {
+			
+		Status = DisplayInfo.GOP->QueryMode(DisplayInfo.GOP, i, &SizeOfInfo, &ModeInfo);
+		if (!EFI_ERROR(Status)) {
+			PrintDebug(L"  Mode%u: %ux%u\n", i, ModeInfo->HorizontalResolution, ModeInfo->VerticalResolution);
+		}
+	}
 }
 
 
@@ -384,6 +402,8 @@ ClearScreen()
 		return;
 	}
 
+	SwtichToGraphics(FALSE);
+
 	if (DisplayInfo.Protocol == GOP) {
 		DisplayInfo.GOP->Blt(
 			DisplayInfo.GOP,
@@ -427,6 +447,8 @@ DrawImage(
 		return;
 	}
 
+	SwtichToGraphics(FALSE);
+
 	if (DisplayInfo.Protocol == GOP) {
 		DisplayInfo.GOP->Blt(DisplayInfo.GOP, 
 			(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)Image->PixelData, 
@@ -455,6 +477,7 @@ DrawImageCentered(
 		PrintDebug(L"No display adapters found, unable to draw centered image\n");
 		return;
 	}
+
 	Status = CalculatePositionForCenter(Image->Width, Image->Height, &PositionX, &PositionY);
 	if (EFI_ERROR(Status)) {
 		return;
@@ -499,6 +522,51 @@ AnimateImage(
 		for (Frame = 0; Frame < NumFrames; Frame++) {
 			DrawImage(Image, Image->Width, Image->Width, PositionX, PositionY, 0, Frame * Image->Width);
 			gBS->Stall(MsPerFrame * 1000);
+		}
+	}
+}
+
+
+VOID
+SwitchToText(
+	IN	BOOLEAN	Force)
+{
+	EFI_CONSOLE_CONTROL_SCREEN_MODE	CurrentMode;
+	EFI_STATUS						Status;
+	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
+
+	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
+	if (EFI_ERROR(Status)) {
+		ConsoleControl = NULL;
+	}
+
+	if (ConsoleControl != NULL) {
+		Status = ConsoleControl->GetMode(ConsoleControl, &CurrentMode, NULL, NULL);
+		if (Force || (!EFI_ERROR(Status) && CurrentMode != EfiConsoleControlScreenText)) {
+			ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenText);
+		}
+	}
+}
+
+
+VOID
+SwtichToGraphics(
+	IN	BOOLEAN	Force)
+{
+	
+	EFI_CONSOLE_CONTROL_SCREEN_MODE	CurrentMode;
+	EFI_STATUS						Status;
+	EFI_CONSOLE_CONTROL_PROTOCOL	*ConsoleControl;
+
+	Status = gBS->LocateProtocol(&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
+	if (EFI_ERROR(Status)) {
+		ConsoleControl = NULL;
+	}
+
+	if (ConsoleControl != NULL) {
+		Status = ConsoleControl->GetMode(ConsoleControl, &CurrentMode, NULL, NULL);
+		if (Force || (!EFI_ERROR(Status) && CurrentMode != EfiConsoleControlScreenGraphics)) {
+			ConsoleControl->SetMode(ConsoleControl, EfiConsoleControlScreenGraphics);
 		}
 	}
 }
