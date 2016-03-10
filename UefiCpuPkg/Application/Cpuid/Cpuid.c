@@ -179,10 +179,6 @@ CpuidSignature (
   UINT32 Edx;
   CHAR8  Signature[13];
 
-  if (CPUID_SIGNATURE > gMaximumBasicFunction) {
-    return;
-  }
-
   AsmCpuid (CPUID_SIGNATURE, &Eax, &Ebx, &Ecx, &Edx);
 
   Print (L"CPUID_SIGNATURE (Leaf %08x)\n", CPUID_SIGNATURE);
