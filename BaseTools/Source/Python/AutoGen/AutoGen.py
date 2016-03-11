@@ -2378,6 +2378,8 @@ class ModuleAutoGen(AutoGen):
             self._Macro["MODULE_BUILD_DIR"      ] = self.BuildDir
             self._Macro["OUTPUT_DIR"            ] = self.OutputDir
             self._Macro["DEBUG_DIR"             ] = self.DebugDir
+            self._Macro["DEST_DIR_OUTPUT"       ] = self.OutputDir
+            self._Macro["DEST_DIR_DEBUG"        ] = self.DebugDir
         return self._Macro
 
     ## Return the module build data object
