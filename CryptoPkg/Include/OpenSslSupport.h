@@ -261,7 +261,6 @@ extern FILE  *stdout;
 #define memchr(buf,ch,count)              ScanMem8(buf,(UINTN)(count),(UINT8)ch)
 #define memcmp(buf1,buf2,count)           (int)(CompareMem(buf1,buf2,(UINTN)(count)))
 #define memmove(dest,source,count)        CopyMem(dest,source,(UINTN)(count))
-#define strcmp                            AsciiStrCmp
 #define strncmp(string1,string2,count)    (int)(AsciiStrnCmp(string1,string2,(UINTN)(count)))
 #define strcpy(strDest,strSource)         AsciiStrCpyS(strDest,MAX_STRING_SIZE,strSource)
 #define strncpy(strDest,strSource,count)  AsciiStrnCpyS(strDest,MAX_STRING_SIZE,strSource,(UINTN)count)

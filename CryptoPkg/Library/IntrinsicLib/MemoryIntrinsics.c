@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Base.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/BaseLib.h>
 
 /* OpenSSL will use floating point support, and C compiler produces the _fltused
    symbol by default. Simply define this symbol here to satisfy the linker. */
@@ -43,4 +44,9 @@ void * memset (void *dest, char ch, unsigned int count)
   }
   
   return dest;
+}
+
+int strcmp (const char *s1, const char *s2)
+{
+  return (int)AsciiStrCmp(s1, s2);
 }
