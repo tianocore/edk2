@@ -572,8 +572,7 @@ FileInterfaceStdInRead(
             TabLinePos = (EFI_SHELL_FILE_INFO*)GetFirstNode(&FoundFileList->Link);
             InTabScrolling = TRUE;
           } else {
-            FreePool(FoundFileList);
-            FoundFileList = NULL;
+            ShellInfoObject.NewEfiShellProtocol->FreeFileList (&FoundFileList);
           }
         }
       }
@@ -856,6 +855,9 @@ FileInterfaceStdInRead(
   // if this was used it should be deallocated by now...
   // prevent memory leaks...
   //
+  if (FoundFileList != NULL) {
+    ShellInfoObject.NewEfiShellProtocol->FreeFileList (&FoundFileList);
+  }
   ASSERT(FoundFileList == NULL);
 
   return Status;
