@@ -1,8 +1,8 @@
 diff --git a/Configure b/Configure
-index 4a715dc..b4a4781 100755
+index c98107a..c122709 100755
 --- a/Configure
 +++ b/Configure
-@@ -605,6 +605,9 @@ my %table=(
+@@ -609,6 +609,9 @@ my %table=(
  # with itself, Applink is never engaged and can as well be omitted.
  "mingw64", "gcc:-mno-cygwin -DL_ENDIAN -O3 -Wall -DWIN32_LEAN_AND_MEAN -DUNICODE -D_UNICODE::-D_MT:MINGW64:-lws2_32 -lgdi32 -lcrypt32:SIXTY_FOUR_BIT RC4_CHUNK_LL DES_INT EXPORT_VAR_AS_FN:${x86_64_asm}:mingw64:win32:cygwin-shared:-D_WINDLL:-mno-cygwin:.dll.a",
  
@@ -12,7 +12,7 @@ index 4a715dc..b4a4781 100755
  # UWIN 
  "UWIN", "cc:-DTERMIOS -DL_ENDIAN -O -Wall:::UWIN::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${no_asm}:win32",
  
-@@ -1082,7 +1085,7 @@ if (defined($disabled{"tls1"}))
+@@ -1088,7 +1091,7 @@ if (defined($disabled{"tls1"}))
  	}
  
  if (defined($disabled{"ec"}) || defined($disabled{"dsa"})
@@ -22,7 +22,7 @@ index 4a715dc..b4a4781 100755
  	$disabled{"gost"} = "forced";
  	}
 diff --git a/apps/apps.c b/apps/apps.c
-index 2e77805..e21e759 100644
+index b1dd970..8278c28 100644
 --- a/apps/apps.c
 +++ b/apps/apps.c
 @@ -2374,6 +2374,8 @@ int args_verify(char ***pargs, int *pargc,
@@ -462,7 +462,7 @@ index c042cf2..a25b636 100644
  }
  
 diff --git a/crypto/cryptlib.c b/crypto/cryptlib.c
-index c9f674b..39ead7f 100644
+index 1925428..da4b34d 100644
 --- a/crypto/cryptlib.c
 +++ b/crypto/cryptlib.c
 @@ -263,7 +263,7 @@ int CRYPTO_get_new_dynlockid(void)
@@ -525,7 +525,7 @@ index c9f674b..39ead7f 100644
  }
 +#endif
  
- int CRYPTO_memcmp(const void *in_a, const void *in_b, size_t len)
+ int CRYPTO_memcmp(const volatile void *in_a, const volatile void *in_b, size_t len)
  {
 diff --git a/crypto/cryptlib.h b/crypto/cryptlib.h
 index fba180a..3e3ea5e 100644
@@ -542,7 +542,7 @@ index fba180a..3e3ea5e 100644
  
  #ifdef  __cplusplus
 diff --git a/crypto/crypto.h b/crypto/crypto.h
-index c450d7a..063d78e 100644
+index 6c644ce..bea4ca1 100644
 --- a/crypto/crypto.h
 +++ b/crypto/crypto.h
 @@ -235,15 +235,15 @@ typedef struct openssl_item_st {
@@ -656,7 +656,7 @@ index 46fa5ac..cc366ec 100644
  dh_kdf.o: ../../include/openssl/crypto.h ../../include/openssl/dh.h
  dh_kdf.o: ../../include/openssl/e_os2.h ../../include/openssl/ec.h
 diff --git a/crypto/dh/dh.h b/crypto/dh/dh.h
-index 5498a9d..4a5c665 100644
+index a5bd901..6488879 100644
 --- a/crypto/dh/dh.h
 +++ b/crypto/dh/dh.h
 @@ -240,11 +240,13 @@ DH *DH_get_1024_160(void);
@@ -1021,7 +1021,7 @@ index 5747c73..fe465cc 100644
   * These functions write a private key in PKCS#8 format: it is a "drop in"
   * replacement for PEM_write_bio_PrivateKey() and friends. As usual if 'enc'
 diff --git a/crypto/pkcs7/pk7_smime.c b/crypto/pkcs7/pk7_smime.c
-index c4d3724..0bc3d43 100644
+index dc9b484..0bc3d43 100644
 --- a/crypto/pkcs7/pk7_smime.c
 +++ b/crypto/pkcs7/pk7_smime.c
 @@ -64,6 +64,9 @@
@@ -1043,37 +1043,7 @@ index c4d3724..0bc3d43 100644
      int i, j = 0, k, ret = 0;
      BIO *p7bio = NULL;
      BIO *tmpin = NULL, *tmpout = NULL;
-@@ -274,12 +277,29 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
-         PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_NO_CONTENT);
-         return 0;
-     }
-+#if 0
-+    /*
-+     * NB: this test commented out because some versions of Netscape
-+     * illegally include zero length content when signing data. Also
-+     * Microsoft Authenticode includes a SpcIndirectDataContent data
-+     * structure which describes the content to be protected by the
-+     * signature, rather than directly embedding that content. So
-+     * Authenticode implementations are also expected to use
-+     * PKCS7_verify() with explicit external data, on non-detached
-+     * PKCS#7 signatures.
-+     *
-+     * In OpenSSL 1.1 a new flag PKCS7_NO_DUAL_CONTENT has been
-+     * introduced to disable this sanity check. For the 1.0.2 branch
-+     * this change is not acceptable, so the check remains completely
-+     * commented out (as it has been for a long time).
-+     */
- 
-     /* Check for data and content: two sets of data */
-     if (!PKCS7_get_detached(p7) && indata) {
-         PKCS7err(PKCS7_F_PKCS7_VERIFY, PKCS7_R_CONTENT_AND_DATA_PRESENT);
-         return 0;
-     }
-+#endif
- 
-     sinfos = PKCS7_get_signer_info(p7);
- 
-@@ -356,8 +376,12 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -373,8 +376,12 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
          tmpout = out;
  
      /* We now have to 'read' from p7bio to calculate digests etc. */
@@ -1087,7 +1057,7 @@ index c4d3724..0bc3d43 100644
          if (i <= 0)
              break;
          if (tmpout)
-@@ -388,6 +412,7 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -405,6 +412,7 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
      ret = 1;
  
   err:
@@ -1095,7 +1065,7 @@ index c4d3724..0bc3d43 100644
      if (tmpin == indata) {
          if (indata)
              BIO_pop(p7bio);
-@@ -506,7 +531,7 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
+@@ -523,7 +531,7 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
  {
      BIO *tmpmem;
      int ret, i;
@@ -1104,7 +1074,7 @@ index c4d3724..0bc3d43 100644
  
      if (!p7) {
          PKCS7err(PKCS7_F_PKCS7_DECRYPT, PKCS7_R_INVALID_NULL_POINTER);
-@@ -550,24 +575,29 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
+@@ -567,24 +575,29 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
          }
          BIO_free_all(bread);
          return ret;
@@ -1252,21 +1222,22 @@ index 4e06218..ddead3d 100644
  const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
      {
 diff --git a/crypto/srp/srp.h b/crypto/srp/srp.h
-index d072536..73b945f 100644
+index 028892a..713fc54 100644
 --- a/crypto/srp/srp.h
 +++ b/crypto/srp/srp.h
-@@ -114,7 +114,9 @@ DECLARE_STACK_OF(SRP_gN)
+@@ -119,8 +119,9 @@ DECLARE_STACK_OF(SRP_gN)
  
  SRP_VBASE *SRP_VBASE_new(char *seed_key);
  int SRP_VBASE_free(SRP_VBASE *vb);
 +#ifndef OPENSSL_NO_STDIO
  int SRP_VBASE_init(SRP_VBASE *vb, char *verifier_file);
+-
 +#endif
+ /* This method ignores the configured seed and fails for an unknown user. */
  SRP_user_pwd *SRP_VBASE_get_by_user(SRP_VBASE *vb, char *username);
- char *SRP_create_verifier(const char *user, const char *pass, char **salt,
-                           char **verifier, const char *N, const char *g);
+ /* NOTE: unlike in SRP_VBASE_get_by_user, caller owns the returned pointer.*/
 diff --git a/crypto/srp/srp_vfy.c b/crypto/srp/srp_vfy.c
-index a3f1a8a..3fbb186 100644
+index 26ad3e0..6be4cf2 100644
 --- a/crypto/srp/srp_vfy.c
 +++ b/crypto/srp/srp_vfy.c
 @@ -225,6 +225,7 @@ static int SRP_user_pwd_set_ids(SRP_user_pwd *vinfo, const char *id,
@@ -1285,7 +1256,7 @@ index a3f1a8a..3fbb186 100644
  
  static int SRP_user_pwd_set_sv_BN(SRP_user_pwd *vinfo, BIGNUM *s, BIGNUM *v)
  {
-@@ -279,6 +281,7 @@ int SRP_VBASE_free(SRP_VBASE *vb)
+@@ -297,6 +299,7 @@ int SRP_VBASE_free(SRP_VBASE *vb)
      return 0;
  }
  
@@ -1293,7 +1264,7 @@ index a3f1a8a..3fbb186 100644
  static SRP_gN_cache *SRP_gN_new_init(const char *ch)
  {
      unsigned char tmp[MAX_LEN];
-@@ -310,6 +313,7 @@ static void SRP_gN_free(SRP_gN_cache *gN_cache)
+@@ -328,6 +331,7 @@ static void SRP_gN_free(SRP_gN_cache *gN_cache)
      BN_free(gN_cache->bn);
      OPENSSL_free(gN_cache);
  }
@@ -1301,7 +1272,7 @@ index a3f1a8a..3fbb186 100644
  
  static SRP_gN *SRP_get_gN_by_id(const char *id, STACK_OF(SRP_gN) *gN_tab)
  {
-@@ -326,6 +330,7 @@ static SRP_gN *SRP_get_gN_by_id(const char *id, STACK_OF(SRP_gN) *gN_tab)
+@@ -344,6 +348,7 @@ static SRP_gN *SRP_get_gN_by_id(const char *id, STACK_OF(SRP_gN) *gN_tab)
      return SRP_get_default_gN(id);
  }
  
@@ -1309,13 +1280,13 @@ index a3f1a8a..3fbb186 100644
  static BIGNUM *SRP_gN_place_bn(STACK_OF(SRP_gN_cache) *gN_cache, char *ch)
  {
      int i;
-@@ -467,6 +472,7 @@ int SRP_VBASE_init(SRP_VBASE *vb, char *verifier_file)
+@@ -485,6 +490,7 @@ int SRP_VBASE_init(SRP_VBASE *vb, char *verifier_file)
      return error_code;
  
  }
 +#endif
  
- SRP_user_pwd *SRP_VBASE_get_by_user(SRP_VBASE *vb, char *username)
+ static SRP_user_pwd *find_user(SRP_VBASE *vb, char *username)
  {
 diff --git a/crypto/ts/ts.h b/crypto/ts/ts.h
 index 16eccbb..a9fe40e 100644
@@ -1585,10 +1556,10 @@ index 9ee8f8d..64b052e 100644
 +
 +#endif /* OPENSSL_NO_STDIO */
 diff --git a/crypto/x509/x509_vfy.c b/crypto/x509/x509_vfy.c
-index 0429767..7ddc21c 100644
+index 4d34dba..25e8a89 100644
 --- a/crypto/x509/x509_vfy.c
 +++ b/crypto/x509/x509_vfy.c
-@@ -940,6 +940,8 @@ static int check_crl_time(X509_STORE_CTX *ctx, X509_CRL *crl, int notify)
+@@ -950,6 +950,8 @@ static int check_crl_time(X509_STORE_CTX *ctx, X509_CRL *crl, int notify)
          ctx->current_crl = crl;
      if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
          ptime = &ctx->param->check_time;
@@ -1597,7 +1568,7 @@ index 0429767..7ddc21c 100644
      else
          ptime = NULL;
  
-@@ -1663,6 +1665,8 @@ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
+@@ -1673,6 +1675,8 @@ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
  
      if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
          ptime = &ctx->param->check_time;
@@ -2066,10 +2037,10 @@ index a73f866..d534c0a 100644
  /* Add a certificate to a BUF_MEM structure */
  
 diff --git a/ssl/ssl_conf.c b/ssl/ssl_conf.c
-index 5478840..c2ad7c9 100644
+index 8d3709d..2bb403b 100644
 --- a/ssl/ssl_conf.c
 +++ b/ssl/ssl_conf.c
-@@ -362,6 +362,7 @@ static int cmd_Options(SSL_CONF_CTX *cctx, const char *value)
+@@ -370,6 +370,7 @@ static int cmd_Options(SSL_CONF_CTX *cctx, const char *value)
      return CONF_parse_list(value, ',', 1, ssl_set_option_list, cctx);
  }
  
@@ -2077,7 +2048,7 @@ index 5478840..c2ad7c9 100644
  static int cmd_Certificate(SSL_CONF_CTX *cctx, const char *value)
  {
      int rv = 1;
-@@ -428,7 +429,9 @@ static int cmd_DHParameters(SSL_CONF_CTX *cctx, const char *value)
+@@ -436,7 +437,9 @@ static int cmd_DHParameters(SSL_CONF_CTX *cctx, const char *value)
          BIO_free(in);
      return rv > 0;
  }
@@ -2088,7 +2059,7 @@ index 5478840..c2ad7c9 100644
  typedef struct {
      int (*cmd) (SSL_CONF_CTX *cctx, const char *value);
      const char *str_file;
-@@ -454,12 +457,14 @@ static const ssl_conf_cmd_tbl ssl_conf_cmds[] = {
+@@ -462,12 +465,14 @@ static const ssl_conf_cmd_tbl ssl_conf_cmds[] = {
      SSL_CONF_CMD_STRING(CipherString, "cipher"),
      SSL_CONF_CMD_STRING(Protocol, NULL),
      SSL_CONF_CMD_STRING(Options, NULL),
@@ -2137,10 +2108,10 @@ index baa3b59..1ee3f02 100644
  if ($? == 0)
  	{
 diff --git a/util/libeay.num b/util/libeay.num
-index 7f7487d..13b2e3a 100755
+index e5b3c6e..8d4185c 100755
 --- a/util/libeay.num
 +++ b/util/libeay.num
-@@ -4368,7 +4368,7 @@ DH_compute_key_padded                   4732	EXIST::FUNCTION:DH
+@@ -4370,7 +4370,7 @@ DH_compute_key_padded                   4732	EXIST::FUNCTION:DH
  ECDSA_METHOD_set_sign                   4733	EXIST::FUNCTION:ECDSA
  CMS_RecipientEncryptedKey_cert_cmp      4734	EXIST:!VMS:FUNCTION:CMS
  CMS_RecipEncryptedKey_cert_cmp          4734	EXIST:VMS:FUNCTION:CMS
