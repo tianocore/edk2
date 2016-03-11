@@ -93,5 +93,6 @@ function filelist ()
 filelist < "${OPENSSL_PATH}/MINFO" |  sed -n -f - -i OpensslLib.inf
 
 # We can tell Windows users to put this back manually if they can't run
-# Configure.
-cp "${OPENSSL_PATH}/crypto/opensslconf.h" .
+# Configure. For now, until the git repository is fixed to store things
+# sanely, also convert to DOS line-endings
+unix2dos -n "${OPENSSL_PATH}/crypto/opensslconf.h" opensslconf.h
