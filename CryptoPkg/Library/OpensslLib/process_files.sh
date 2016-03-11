@@ -71,13 +71,11 @@ function filelist ()
 		;;
 	    LIBSRC=*)
 		LIBSRC=$(echo "$LINE" | sed s/^LIBSRC=//)
-		if [ "$RELATIVE_DIRECTORY" != "ssl" ]; then
-		    for FILE in $LIBSRC; do
-			if [ "$FILE" != "b_print.c" ]; then
-			    echo -e '  $(OPENSSL_PATH)/'$RELATIVE_DIRECTORY/$FILE\\r\\
-			fi
-		    done
-		fi
+		for FILE in $LIBSRC; do
+		    if [ "$FILE" != "b_print.c" ]; then
+			echo -e '  $(OPENSSL_PATH)/'$RELATIVE_DIRECTORY/$FILE\\r\\
+		    fi
+		done
 		;;
 	esac
     done
