@@ -915,6 +915,79 @@ index 5be9e33..63c8866 100644
  
  int EVP_BytesToKey(const EVP_CIPHER *type, const EVP_MD *md,
                     const unsigned char *salt, const unsigned char *data,
+diff --git a/crypto/md5/md5_dgst.c b/crypto/md5/md5_dgst.c
+index 2b51946..4ec1719 100644
+--- a/crypto/md5/md5_dgst.c
++++ b/crypto/md5/md5_dgst.c
+@@ -106,52 +106,52 @@ void md5_block_data_order(MD5_CTX *c, const void *data_, size_t num)
+     D = c->D;
+ 
+     for (; num--;) {
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(0) = l;
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(1) = l;
+         /* Round 0 */
+         R0(A, B, C, D, X(0), 7, 0xd76aa478L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(2) = l;
+         R0(D, A, B, C, X(1), 12, 0xe8c7b756L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(3) = l;
+         R0(C, D, A, B, X(2), 17, 0x242070dbL);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(4) = l;
+         R0(B, C, D, A, X(3), 22, 0xc1bdceeeL);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(5) = l;
+         R0(A, B, C, D, X(4), 7, 0xf57c0fafL);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(6) = l;
+         R0(D, A, B, C, X(5), 12, 0x4787c62aL);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(7) = l;
+         R0(C, D, A, B, X(6), 17, 0xa8304613L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(8) = l;
+         R0(B, C, D, A, X(7), 22, 0xfd469501L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(9) = l;
+         R0(A, B, C, D, X(8), 7, 0x698098d8L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(10) = l;
+         R0(D, A, B, C, X(9), 12, 0x8b44f7afL);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(11) = l;
+         R0(C, D, A, B, X(10), 17, 0xffff5bb1L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(12) = l;
+         R0(B, C, D, A, X(11), 22, 0x895cd7beL);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(13) = l;
+         R0(A, B, C, D, X(12), 7, 0x6b901122L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(14) = l;
+         R0(D, A, B, C, X(13), 12, 0xfd987193L);
+-        HOST_c2l(data, l);
++        (void)HOST_c2l(data, l);
+         X(15) = l;
+         R0(C, D, A, B, X(14), 17, 0xa679438eL);
+         R0(B, C, D, A, X(15), 22, 0x49b40821L);
 diff --git a/crypto/opensslconf.h.in b/crypto/opensslconf.h.in
 index 7a1c85d..7162c0f 100644
 --- a/crypto/opensslconf.h.in
@@ -1221,6 +1294,101 @@ index 4e06218..ddead3d 100644
  
  const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
      {
+diff --git a/crypto/sha/sha256.c b/crypto/sha/sha256.c
+index 72a1159..64702cd 100644
+--- a/crypto/sha/sha256.c
++++ b/crypto/sha/sha256.c
+@@ -184,7 +184,7 @@ static void sha256_block_data_order(SHA256_CTX *ctx, const void *in,
+         h = ctx->h[7];
+ 
+         for (i = 0; i < 16; i++) {
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[i] = l;
+             T1 += h + Sigma1(e) + Ch(e, f, g) + K256[i];
+             T2 = Sigma0(a) + Maj(a, b, c);
+@@ -308,52 +308,52 @@ static void sha256_block_data_order(SHA256_CTX *ctx, const void *in,
+         } else {
+             SHA_LONG l;
+ 
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[0] = l;
+             ROUND_00_15(0, a, b, c, d, e, f, g, h);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[1] = l;
+             ROUND_00_15(1, h, a, b, c, d, e, f, g);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[2] = l;
+             ROUND_00_15(2, g, h, a, b, c, d, e, f);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[3] = l;
+             ROUND_00_15(3, f, g, h, a, b, c, d, e);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[4] = l;
+             ROUND_00_15(4, e, f, g, h, a, b, c, d);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[5] = l;
+             ROUND_00_15(5, d, e, f, g, h, a, b, c);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[6] = l;
+             ROUND_00_15(6, c, d, e, f, g, h, a, b);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[7] = l;
+             ROUND_00_15(7, b, c, d, e, f, g, h, a);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[8] = l;
+             ROUND_00_15(8, a, b, c, d, e, f, g, h);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[9] = l;
+             ROUND_00_15(9, h, a, b, c, d, e, f, g);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[10] = l;
+             ROUND_00_15(10, g, h, a, b, c, d, e, f);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[11] = l;
+             ROUND_00_15(11, f, g, h, a, b, c, d, e);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[12] = l;
+             ROUND_00_15(12, e, f, g, h, a, b, c, d);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[13] = l;
+             ROUND_00_15(13, d, e, f, g, h, a, b, c);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[14] = l;
+             ROUND_00_15(14, c, d, e, f, g, h, a, b);
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             T1 = X[15] = l;
+             ROUND_00_15(15, b, c, d, e, f, g, h, a);
+         }
+diff --git a/crypto/sha/sha_locl.h b/crypto/sha/sha_locl.h
+index 03bd411..8ba240d 100644
+--- a/crypto/sha/sha_locl.h
++++ b/crypto/sha/sha_locl.h
+@@ -458,7 +458,7 @@ static void HASH_BLOCK_DATA_ORDER(SHA_CTX *c, const void *p, size_t num)
+ 
+     for (;;) {
+         for (i = 0; i < 16; i++) {
+-            HOST_c2l(data, l);
++            (void)HOST_c2l(data, l);
+             X[i] = l;
+             BODY_00_15(X[i]);
+         }
 diff --git a/crypto/srp/srp.h b/crypto/srp/srp.h
 index 028892a..713fc54 100644
 --- a/crypto/srp/srp.h
