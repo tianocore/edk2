@@ -83,7 +83,7 @@ EFI_STATUS
 EFIAPI
 VirtioPciGetDeviceFeatures (
   IN VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                *DeviceFeatures
+  OUT UINT64                *DeviceFeatures
   );
 
 EFI_STATUS
@@ -125,7 +125,7 @@ EFI_STATUS
 EFIAPI
 VirtioPciSetGuestFeatures (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN UINT32                   Features
+  IN UINT64                   Features
   );
 
 EFI_STATUS

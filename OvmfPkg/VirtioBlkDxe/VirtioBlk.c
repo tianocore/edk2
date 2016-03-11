@@ -593,7 +593,7 @@ VirtioBlkInit (
   UINT8      NextDevStat;
   EFI_STATUS Status;
 
-  UINT32     Features;
+  UINT64     Features;
   UINT64     NumSectors;
   UINT32     BlockSize;
   UINT8      PhysicalBlockExp;

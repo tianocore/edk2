@@ -360,7 +360,7 @@ VirtioNetInitialize (
   EFI_TPL    OldTpl;
   EFI_STATUS Status;
   UINT8      NextDevStat;
-  UINT32     Features;
+  UINT64     Features;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;

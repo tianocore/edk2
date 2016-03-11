@@ -65,7 +65,7 @@ EFI_STATUS
 EFIAPI
 VirtioMmioGetDeviceFeatures (
   IN VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                *DeviceFeatures
+  OUT UINT64                *DeviceFeatures
   );
 
 EFI_STATUS
@@ -141,7 +141,7 @@ EFI_STATUS
 EFIAPI
 VirtioMmioSetGuestFeatures (
   VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  Features
+  UINT64                  Features
   );
 
 #endif // _VIRTIO_MMIO_DEVICE_INTERNAL_H_

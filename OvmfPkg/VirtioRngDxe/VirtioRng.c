@@ -203,7 +203,7 @@ VirtioRngInit (
   UINT8      NextDevStat;
   EFI_STATUS Status;
   UINT16     QueueSize;
-  UINT32     Features;
+  UINT64     Features;
 
   //
   // Execute virtio-0.9.5, 2.2.1 Device Initialization Sequence.

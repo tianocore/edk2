@@ -64,7 +64,7 @@ VirtioNetGetFeatures (
 {
   EFI_STATUS Status;
   UINT8      NextDevStat;
-  UINT32     Features;
+  UINT64     Features;
   UINTN      MacIdx;
   UINT16     LinkStatus;
 

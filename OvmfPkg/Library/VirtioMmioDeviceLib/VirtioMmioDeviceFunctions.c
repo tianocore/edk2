@@ -22,7 +22,7 @@ EFI_STATUS
 EFIAPI
 VirtioMmioGetDeviceFeatures (
   IN VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                *DeviceFeatures
+  OUT UINT64                *DeviceFeatures
   )
 {
   VIRTIO_MMIO_DEVICE *Device;
@@ -217,14 +217,18 @@ EFI_STATUS
 EFIAPI
 VirtioMmioSetGuestFeatures (
   VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  Features
+  UINT64                  Features
   )
 {
   VIRTIO_MMIO_DEVICE *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
-  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES, Features);
+  if (Features > MAX_UINT32) {
+    return EFI_UNSUPPORTED;
+  }
+  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
+    (UINT32)Features);
 
   return EFI_SUCCESS;
 }

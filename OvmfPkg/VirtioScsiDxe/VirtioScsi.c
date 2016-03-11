@@ -707,7 +707,7 @@ VirtioScsiInit (
   UINT8      NextDevStat;
   EFI_STATUS Status;
 
-  UINT32     Features;
+  UINT64     Features;
   UINT16     MaxChannel; // for validation only
   UINT32     NumQueues;  // for validation only
   UINT16     QueueSize;

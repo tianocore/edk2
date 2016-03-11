@@ -97,7 +97,7 @@ EFI_STATUS
 
   @param[in] This                 This instance of VIRTIO_DEVICE_PROTOCOL
 
-  @param[out] DeviceFeatures      The 32-bit device features field.
+  @param[out] DeviceFeatures      The device features field.
 
   @retval EFI_SUCCESS             The data was read successfully.
   @retval EFI_UNSUPPORTED         The underlying IO device doesn't support the
@@ -108,7 +108,7 @@ typedef
 EFI_STATUS
 (EFIAPI *VIRTIO_GET_DEVICE_FEATURES) (
   IN VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                *DeviceFeatures
+  OUT UINT64                *DeviceFeatures
   );
 
 /**
@@ -116,14 +116,14 @@ EFI_STATUS
 
   @param[in] This         This instance of VIRTIO_DEVICE_PROTOCOL
 
-  @param[in] Features     The 32-bit guest guest features field
+  @param[in] Features     The guest features field
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *VIRTIO_SET_GUEST_FEATURES) (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN UINT32                   Features
+  IN UINT64                   Features
   );
 
 /**
