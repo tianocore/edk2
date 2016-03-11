@@ -61,6 +61,7 @@ typedef struct {
   UINT64                    Start;
   UINT64                    End;
   UINT32                    BlockSize;
+  BOOLEAN                   InStop;
 
   EFI_GUID                  *EspGuid;
 
@@ -343,6 +344,20 @@ PartitionInstallChildHandle (
   IN  EFI_LBA                      End,
   IN  UINT32                       BlockSize,
   IN  BOOLEAN                      InstallEspGuid
+  );
+
+/**
+  Test to see if there is any child on ControllerHandle.
+
+  @param[in]  ControllerHandle    Handle of device to test.
+
+  @retval TRUE                    There are children on the ControllerHandle.
+  @retval FALSE                   No child is on the ControllerHandle.
+
+**/
+BOOLEAN
+HasChildren (
+  IN EFI_HANDLE           ControllerHandle
   );
 
 /**
