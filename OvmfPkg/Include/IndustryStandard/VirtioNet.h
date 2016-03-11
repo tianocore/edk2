@@ -17,6 +17,6 @@
 #ifndef _VIRTIO_NET_H_
 #define _VIRTIO_NET_H_
 
-#include <IndustryStandard/Virtio095Net.h>
+#include <IndustryStandard/Virtio10Net.h>
 
 #endif // _VIRTIO_NET_H_
