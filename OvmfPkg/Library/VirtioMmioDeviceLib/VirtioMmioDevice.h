@@ -112,8 +112,8 @@ VirtioMmioSetQueueSel (
 
 EFI_STATUS
 VirtioMmioSetQueueAddress (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  Address
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
+  IN VRING                   *Ring
   );
 
 EFI_STATUS

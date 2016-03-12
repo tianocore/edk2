@@ -180,15 +180,16 @@ VirtioMmioSetQueueSel (
 
 EFI_STATUS
 VirtioMmioSetQueueAddress (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  Address
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
+  IN VRING                   *Ring
   )
 {
   VIRTIO_MMIO_DEVICE *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
-  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_PFN, Address);
+  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_PFN,
+    (UINT32)((UINTN)Ring->Base >> EFI_PAGE_SHIFT));
 
   return EFI_SUCCESS;
 }

@@ -19,6 +19,8 @@
 #ifndef __VIRTIO_DEVICE_H__
 #define __VIRTIO_DEVICE_H__
 
+#include <IndustryStandard/Virtio.h>
+
 // VirtIo Specification Revision: Major[31:24].Minor[23:16].Revision[15:0
 #define VIRTIO_SPEC_REVISION(major,minor,revision) \
   ((((major) & 0xFF) << 24) | (((minor) & 0xFF) << 16) | ((revision) & 0xFFFF))
@@ -127,14 +129,12 @@ EFI_STATUS
   );
 
 /**
-  Write the queue address field in the Virtio Header.
-
-  The parameter Address must be the base address of the virtqueue divided
-  by 4096.
+  Write the queue address field(s) in the Virtio Header.
 
   @param[in] This             This instance of VIRTIO_DEVICE_PROTOCOL
 
-  @param[in] Address          The 32-bit Queue Address field
+  @param[in] Ring             The initialized VRING object to take the
+                              addresses from.
 
   @retval EFI_SUCCESS         The data was written successfully.
   @retval EFI_UNSUPPORTED     The underlying IO device doesn't support the
@@ -144,7 +144,7 @@ typedef
 EFI_STATUS
 (EFIAPI *VIRTIO_SET_QUEUE_ADDRESS) (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN UINT32                   Address
+  IN VRING                   *Ring
   );
 
 /**

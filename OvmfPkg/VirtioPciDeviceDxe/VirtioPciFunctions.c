@@ -181,8 +181,8 @@ VirtioPciSetGuestFeatures (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueAddress (
-  VIRTIO_DEVICE_PROTOCOL    *This,
-  UINT32                    Address
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
+  IN VRING                   *Ring
   )
 {
   VIRTIO_PCI_DEVICE *Dev;
@@ -190,7 +190,7 @@ VirtioPciSetQueueAddress (
   Dev = VIRTIO_PCI_DEVICE_FROM_VIRTIO_DEVICE (This);
 
   return VirtioPciIoWrite (Dev, VIRTIO_PCI_OFFSET_QUEUE_ADDRESS, sizeof (UINT32),
-      Address);
+      (UINT32)((UINTN)Ring->Base >> EFI_PAGE_SHIFT));
 }
 
 EFI_STATUS
