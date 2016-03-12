@@ -692,6 +692,20 @@ VirtioBlkInit (
     }
   }
 
+  Features &= VIRTIO_BLK_F_BLK_SIZE | VIRTIO_BLK_F_TOPOLOGY | VIRTIO_BLK_F_RO |
+              VIRTIO_BLK_F_FLUSH | VIRTIO_F_VERSION_1;
+
+  //
+  // In virtio-1.0, feature negotiation is expected to complete before queue
+  // discovery, and the device can also reject the selected set of features.
+  //
+  if (Dev->VirtIo->Revision >= VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Status = Virtio10WriteFeatures (Dev->VirtIo, Features, &NextDevStat);
+    if (EFI_ERROR (Status)) {
+      goto Failed;
+    }
+  }
+
   //
   // step 4b -- allocate virtqueue
   //
@@ -739,11 +753,12 @@ VirtioBlkInit (
   //
   // step 5 -- Report understood features.
   //
-  Features &= VIRTIO_BLK_F_BLK_SIZE | VIRTIO_BLK_F_TOPOLOGY | VIRTIO_BLK_F_RO |
-              VIRTIO_BLK_F_FLUSH;
-  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
-  if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+  if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Features &= ~(UINT64)VIRTIO_F_VERSION_1;
+    Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
+    if (EFI_ERROR (Status)) {
+      goto ReleaseQueue;
+    }
   }
 
   //
