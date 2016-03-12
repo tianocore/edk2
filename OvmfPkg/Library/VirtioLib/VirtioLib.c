@@ -339,3 +339,78 @@ VirtioFlush (
 
   return EFI_SUCCESS;
 }
+
+
+/**
+
+  Report the feature bits to the VirtIo 1.0 device that the VirtIo 1.0 driver
+  understands.
+
+  In VirtIo 1.0, a device can reject a self-inconsistent feature bitmap through
+  the new VSTAT_FEATURES_OK status bit. (For example if the driver requests a
+  higher level feature but clears a prerequisite feature.) This function is a
+  small wrapper around VIRTIO_DEVICE_PROTOCOL.SetGuestFeatures() that also
+  verifies if the VirtIo 1.0 device accepts the feature bitmap.
+
+  @param[in]     VirtIo        Report feature bits to this device.
+
+  @param[in]     Features      The set of feature bits that the driver wishes
+                               to report. The caller is responsible to perform
+                               any masking before calling this function; the
+                               value is directly written with
+                               VIRTIO_DEVICE_PROTOCOL.SetGuestFeatures().
+
+  @param[in,out] DeviceStatus  On input, the status byte most recently written
+                               to the device's status register. On output (even
+                               on error), DeviceStatus will be updated so that
+                               it is suitable for further status bit
+                               manipulation and writing to the device's status
+                               register.
+
+  @retval  EFI_SUCCESS      The device accepted the configuration in Features.
+
+  @return  EFI_UNSUPPORTED  The device rejected the configuration in Features.
+
+  @retval  EFI_UNSUPPORTED  VirtIo->Revision is smaller than 1.0.0.
+
+  @return                   Error codes from the SetGuestFeatures(),
+                            SetDeviceStatus(), GetDeviceStatus() member
+                            functions.
+
+**/
+EFI_STATUS
+EFIAPI
+Virtio10WriteFeatures (
+  IN     VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN     UINT64                 Features,
+  IN OUT UINT8                  *DeviceStatus
+  )
+{
+  EFI_STATUS Status;
+
+  if (VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = VirtIo->SetGuestFeatures (VirtIo, Features);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *DeviceStatus |= VSTAT_FEATURES_OK;
+  Status = VirtIo->SetDeviceStatus (VirtIo, *DeviceStatus);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = VirtIo->GetDeviceStatus (VirtIo, DeviceStatus);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((*DeviceStatus & VSTAT_FEATURES_OK) == 0) {
+    Status = EFI_UNSUPPORTED;
+  }
+
+  return Status;
+}
