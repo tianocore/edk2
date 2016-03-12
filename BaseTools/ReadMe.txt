@@ -7,7 +7,9 @@ directory contatins tools source.
 
 === Windows/Visual Studio Notes ===
 
-To build the BaseTools, you should run the standard vsvars32.bat script.
+To build the BaseTools, you should run the standard vsvars32.bat script
+from your preferred Visual Studio installation or you can run get_vsvars.bat
+to use latest automatically detected version.
 
 In addition to this, you should set the following environment variables:
 
