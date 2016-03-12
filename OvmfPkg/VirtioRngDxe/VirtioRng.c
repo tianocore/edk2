@@ -242,6 +242,19 @@ VirtioRngInit (
     goto Failed;
   }
 
+  Features &= VIRTIO_F_VERSION_1;
+
+  //
+  // In virtio-1.0, feature negotiation is expected to complete before queue
+  // discovery, and the device can also reject the selected set of features.
+  //
+  if (Dev->VirtIo->Revision >= VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Status = Virtio10WriteFeatures (Dev->VirtIo, Features, &NextDevStat);
+    if (EFI_ERROR (Status)) {
+      goto Failed;
+    }
+  }
+
   //
   // step 4b -- allocate request virtqueue, just use #0
   //
@@ -290,14 +303,14 @@ VirtioRngInit (
   }
 
   //
-  // step 5 -- Report understood features and guest-tuneables. None are
-  // currently defined for VirtioRng, and no generic features are needed by
-  // this driver.
+  // step 5 -- Report understood features and guest-tuneables.
   //
-  Features &= 0;
-  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
-  if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+  if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Features &= ~(UINT64)VIRTIO_F_VERSION_1;
+    Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
+    if (EFI_ERROR (Status)) {
+      goto ReleaseQueue;
+    }
   }
 
   //
