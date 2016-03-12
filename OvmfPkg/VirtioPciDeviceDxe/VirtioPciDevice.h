@@ -88,13 +88,6 @@ VirtioPciGetDeviceFeatures (
 
 EFI_STATUS
 EFIAPI
-VirtioPciGetQueueAddress (
-  IN  VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                 *QueueAddress
-  );
-
-EFI_STATUS
-EFIAPI
 VirtioPciGetQueueSize (
   IN  VIRTIO_DEVICE_PROTOCOL  *This,
   OUT UINT16                  *QueueNumMax

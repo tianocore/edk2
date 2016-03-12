@@ -124,25 +124,6 @@ VirtioPciGetDeviceFeatures (
 
 EFI_STATUS
 EFIAPI
-VirtioPciGetQueueAddress (
-  IN  VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                 *QueueAddress
-  )
-{
-  VIRTIO_PCI_DEVICE         *Dev;
-
-  if (QueueAddress == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Dev = VIRTIO_PCI_DEVICE_FROM_VIRTIO_DEVICE (This);
-
-  return VirtioPciIoRead (Dev, VIRTIO_PCI_OFFSET_QUEUE_ADDRESS, sizeof (UINT32),
-      sizeof (UINT32), QueueAddress);
-}
-
-EFI_STATUS
-EFIAPI
 VirtioPciGetQueueSize (
   IN  VIRTIO_DEVICE_PROTOCOL  *This,
   OUT UINT16                  *QueueNumMax

@@ -40,26 +40,6 @@ VirtioMmioGetDeviceFeatures (
 
 EFI_STATUS
 EFIAPI
-VirtioMmioGetQueueAddress (
-  IN  VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                 *QueueAddress
-  )
-{
-  VIRTIO_MMIO_DEVICE *Device;
-
-  if (QueueAddress == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
-
-  *QueueAddress = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_QUEUE_PFN);
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-EFIAPI
 VirtioMmioGetQueueSize (
   IN  VIRTIO_DEVICE_PROTOCOL  *This,
   OUT UINT16                  *QueueNumMax

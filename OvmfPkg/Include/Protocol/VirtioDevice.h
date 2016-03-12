@@ -127,27 +127,6 @@ EFI_STATUS
   );
 
 /**
-  Read the queue address field from the Virtio Header.
-
-  QueueAddress is the address of the virtqueue divided by 4096.
-
-  @param[in] This                 This instance of VIRTIO_DEVICE_PROTOCOL
-
-  @param[out] QueueAddress        The 32-bit queue address field.
-
-  @retval EFI_SUCCESS             The data was read successfully.
-  @retval EFI_UNSUPPORTED         The underlying IO device doesn't support the
-                                  provided address offset and read size.
-  @retval EFI_INVALID_PARAMETER   QueueAddress is NULL
-**/
-typedef
-EFI_STATUS
-(EFIAPI *VIRTIO_GET_QUEUE_ADDRESS) (
-  IN  VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                 *QueueAddress
-  );
-
-/**
   Write the queue address field in the Virtio Header.
 
   The parameter Address must be the base address of the virtqueue divided
@@ -356,7 +335,6 @@ struct _VIRTIO_DEVICE_PROTOCOL {
   VIRTIO_GET_DEVICE_FEATURES  GetDeviceFeatures;
   VIRTIO_SET_GUEST_FEATURES   SetGuestFeatures;
 
-  VIRTIO_GET_QUEUE_ADDRESS    GetQueueAddress;
   VIRTIO_SET_QUEUE_ADDRESS    SetQueueAddress;
 
   VIRTIO_SET_QUEUE_SEL        SetQueueSel;

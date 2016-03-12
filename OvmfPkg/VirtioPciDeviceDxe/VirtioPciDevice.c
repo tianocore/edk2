@@ -30,7 +30,6 @@ STATIC VIRTIO_DEVICE_PROTOCOL mDeviceProtocolTemplate = {
   0,                                    // SubSystemDeviceId
   VirtioPciGetDeviceFeatures,           // GetDeviceFeatures
   VirtioPciSetGuestFeatures,            // SetGuestFeatures
-  VirtioPciGetQueueAddress,             // GetQueueAddress
   VirtioPciSetQueueAddress,             // SetQueueAddress
   VirtioPciSetQueueSel,                 // SetQueueSel
   VirtioPciSetQueueNotify,              // SetQueueNotify

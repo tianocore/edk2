@@ -25,7 +25,6 @@ static VIRTIO_DEVICE_PROTOCOL mMmioDeviceProtocolTemplate = {
     0,                                     // SubSystemDeviceId
     VirtioMmioGetDeviceFeatures,           // GetDeviceFeatures
     VirtioMmioSetGuestFeatures,            // SetGuestFeatures
-    VirtioMmioGetQueueAddress,             // GetQueueAddress
     VirtioMmioSetQueueAddress,             // SetQueueAddress
     VirtioMmioSetQueueSel,                 // SetQueueSel
     VirtioMmioSetQueueNotify,              // SetQueueNotify

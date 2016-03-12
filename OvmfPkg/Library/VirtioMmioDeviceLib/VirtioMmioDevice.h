@@ -70,13 +70,6 @@ VirtioMmioGetDeviceFeatures (
 
 EFI_STATUS
 EFIAPI
-VirtioMmioGetQueueAddress (
-  IN  VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT32                 *QueueAddress
-  );
-
-EFI_STATUS
-EFIAPI
 VirtioMmioGetQueueSize (
   IN  VIRTIO_DEVICE_PROTOCOL  *This,
   OUT UINT16                  *QueueNumMax
