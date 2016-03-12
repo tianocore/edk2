@@ -737,12 +737,11 @@ VirtioBlkInit (
 
 
   //
-  // step 5 -- Report understood features. There are no virtio-blk specific
-  // features to negotiate in virtio-0.9.5, plus we do not want any of the
-  // device-independent (known or unknown) VIRTIO_F_* capabilities (see
-  // Appendix B).
+  // step 5 -- Report understood features.
   //
-  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, 0);
+  Features &= VIRTIO_BLK_F_BLK_SIZE | VIRTIO_BLK_F_TOPOLOGY | VIRTIO_BLK_F_RO |
+              VIRTIO_BLK_F_FLUSH;
+  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
