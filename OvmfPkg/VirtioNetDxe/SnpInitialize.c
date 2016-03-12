@@ -417,6 +417,19 @@ VirtioNetInitialize (
   ASSERT (Dev->Snm.MediaPresentSupported ==
     !!(Features & VIRTIO_NET_F_STATUS));
 
+  Features &= VIRTIO_NET_F_MAC | VIRTIO_NET_F_STATUS | VIRTIO_F_VERSION_1;
+
+  //
+  // In virtio-1.0, feature negotiation is expected to complete before queue
+  // discovery, and the device can also reject the selected set of features.
+  //
+  if (Dev->VirtIo->Revision >= VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Status = Virtio10WriteFeatures (Dev->VirtIo, Features, &NextDevStat);
+    if (EFI_ERROR (Status)) {
+      goto DeviceFailed;
+    }
+  }
+
   //
   // step 4b, 4c -- allocate and report virtqueues
   //
@@ -433,10 +446,12 @@ VirtioNetInitialize (
   //
   // step 5 -- keep only the features we want
   //
-  Features &= VIRTIO_NET_F_MAC | VIRTIO_NET_F_STATUS;
-  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
-  if (EFI_ERROR (Status)) {
-    goto ReleaseTxRing;
+  if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Features &= ~(UINT64)VIRTIO_F_VERSION_1;
+    Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
+    if (EFI_ERROR (Status)) {
+      goto ReleaseTxRing;
+    }
   }
 
   //
