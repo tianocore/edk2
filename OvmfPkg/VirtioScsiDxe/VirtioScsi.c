@@ -800,6 +800,19 @@ VirtioScsiInit (
     goto Failed;
   }
 
+  Features &= VIRTIO_SCSI_F_INOUT | VIRTIO_F_VERSION_1;
+
+  //
+  // In virtio-1.0, feature negotiation is expected to complete before queue
+  // discovery, and the device can also reject the selected set of features.
+  //
+  if (Dev->VirtIo->Revision >= VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Status = Virtio10WriteFeatures (Dev->VirtIo, Features, &NextDevStat);
+    if (EFI_ERROR (Status)) {
+      goto Failed;
+    }
+  }
+
   //
   // step 4b -- allocate request virtqueue
   //
@@ -847,14 +860,14 @@ VirtioScsiInit (
   }
 
   //
-  // step 5 -- Report understood features and guest-tuneables. We want none of
-  // the known (or unknown) VIRTIO_SCSI_F_* or VIRTIO_F_* capabilities (see
-  // virtio-0.9.5, Appendices B and I), except bidirectional transfers.
+  // step 5 -- Report understood features and guest-tuneables.
   //
-  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo,
-      Features & VIRTIO_SCSI_F_INOUT);
-  if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+  if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
+    Features &= ~(UINT64)VIRTIO_F_VERSION_1;
+    Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
+    if (EFI_ERROR (Status)) {
+      goto ReleaseQueue;
+    }
   }
 
   //
