@@ -294,7 +294,8 @@ VirtioRngInit (
   // currently defined for VirtioRng, and no generic features are needed by
   // this driver.
   //
-  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, 0);
+  Features &= 0;
+  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
