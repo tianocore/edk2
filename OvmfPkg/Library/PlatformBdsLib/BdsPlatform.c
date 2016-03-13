@@ -13,6 +13,7 @@
 **/
 
 #include "BdsPlatform.h"
+#include <Guid/RootBridgesConnectedEventGroup.h>
 #include <Library/QemuBootOrderLib.h>
 
 
@@ -1243,6 +1244,11 @@ Returns:
 
   VisitAllInstancesOfProtocol (&gEfiPciRootBridgeIoProtocolGuid,
     ConnectRootBridge, NULL);
+
+  //
+  // Signal the ACPI platform driver that it can download QEMU ACPI tables.
+  //
+  EfiEventGroupSignal (&gRootBridgesConnectedEventGroupGuid);
 
   //
   // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
