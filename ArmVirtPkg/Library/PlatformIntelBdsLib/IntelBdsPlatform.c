@@ -25,6 +25,7 @@
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Guid/EventGroup.h>
+#include <Guid/RootBridgesConnectedEventGroup.h>
 
 #include "IntelBdsPlatform.h"
 
@@ -368,6 +369,11 @@ PlatformBdsPolicyBehavior (
   // them.
   //
   FilterAndProcess (&gEfiPciRootBridgeIoProtocolGuid, NULL, Connect);
+
+  //
+  // Signal the ACPI platform driver that it can download QEMU ACPI tables.
+  //
+  EfiEventGroupSignal (&gRootBridgesConnectedEventGroupGuid);
 
   //
   // Find all display class PCI devices (using the handles from the previous
