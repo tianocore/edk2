@@ -2,7 +2,7 @@
 #  This file include GenVpd class for fix the Vpd type PCD offset, and PcdEntry for describe
 #  and process each entry of vpd type PCD.
 #
-#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -410,10 +410,23 @@ class GenVPD :
                 PCD.PcdUnpackValue    =  str(PCD.PcdValue)
 
                 #
+                # Translate PCD size string to an integer value.
+                PackSize = None
+                try:
+                    PackSize = int(PCD.PcdSize, 10)
+                    PCD.PcdBinSize = PackSize
+                except:
+                    try:
+                        PackSize = int(PCD.PcdSize, 16)
+                        PCD.PcdBinSize = PackSize
+                    except:
+                        EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid PCD size value %s at file: %s line: %s" % (PCD.PcdSize, self.InputFileName, PCD.Lineno))
+
+                #
                 # If value is Unicode string (e.g. L""), then use 2-byte alignment
                 # If value is byte array (e.g. {}), then use 8-byte alignment
                 #
-                PCD.PcdOccupySize     =  int(PCD.PcdSize)
+                PCD.PcdOccupySize = PCD.PcdBinSize
                 if PCD.PcdUnpackValue.startswith("{"):
                     Alignment = 8
                 elif PCD.PcdUnpackValue.startswith("L"):
@@ -430,19 +443,6 @@ class GenVPD :
                 else:
                     if PCD.PcdOccupySize % Alignment != 0:
                         PCD.PcdOccupySize = (PCD.PcdOccupySize / Alignment + 1) * Alignment
-
-                #
-                # Translate PCD size string to an integer value.
-                PackSize = None
-                try:
-                    PackSize = int(PCD.PcdSize, 10)
-                    PCD.PcdBinSize = PackSize
-                except:
-                    try:
-                        PackSize = int(PCD.PcdSize, 16)
-                        PCD.PcdBinSize = PackSize
-                    except:
-                        EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid PCD size value %s at file: %s line: %s" % (PCD.PcdSize, self.InputFileName, PCD.Lineno))
 
                 if PCD._IsBoolean(PCD.PcdValue, PCD.PcdSize):
                     PCD._PackBooleanValue(PCD.PcdValue)
