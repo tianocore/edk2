@@ -19,6 +19,7 @@
 
 #include <Protocol/AcpiTable.h>
 #include <Protocol/FirmwareVolume2.h>
+#include <Protocol/PciIo.h>
 
 #include <Library/BaseLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -26,6 +27,11 @@
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/Acpi.h>
+
+typedef struct {
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT64              PciAttributes;
+} ORIGINAL_ATTRIBUTES;
 
 EFI_STATUS
 EFIAPI
@@ -71,6 +77,18 @@ EFI_STATUS
 EFIAPI
 InstallAcpiTables (
   IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiTable
+  );
+
+VOID
+EnablePciDecoding (
+  OUT ORIGINAL_ATTRIBUTES **OriginalAttributes,
+  OUT UINTN               *Count
+  );
+
+VOID
+RestorePciDecoding (
+  IN ORIGINAL_ATTRIBUTES *OriginalAttributes,
+  IN UINTN               Count
   );
 
 #endif

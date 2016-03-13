@@ -561,6 +561,8 @@ InstallQemuFwCfgTables (
   UINTN                    FwCfgSize;
   QEMU_LOADER_ENTRY        *LoaderStart;
   CONST QEMU_LOADER_ENTRY  *LoaderEntry, *LoaderEnd;
+  ORIGINAL_ATTRIBUTES      *OriginalPciAttributes;
+  UINTN                    OriginalPciAttributesCount;
   ORDERED_COLLECTION       *Tracker;
   UINTN                    *InstalledKey;
   INT32                    Installed;
@@ -580,8 +582,10 @@ InstallQemuFwCfgTables (
   if (LoaderStart == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+  EnablePciDecoding (&OriginalPciAttributes, &OriginalPciAttributesCount);
   QemuFwCfgSelectItem (FwCfgItem);
   QemuFwCfgReadBytes (FwCfgSize, LoaderStart);
+  RestorePciDecoding (OriginalPciAttributes, OriginalPciAttributesCount);
   LoaderEnd = LoaderStart + FwCfgSize / sizeof *LoaderEntry;
 
   Tracker = OrderedCollectionInit (BlobCompare, BlobKeyCompare);
