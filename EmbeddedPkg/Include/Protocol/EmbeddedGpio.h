@@ -164,4 +164,21 @@ struct _EMBEDDED_GPIO {
 
 extern EFI_GUID gEmbeddedGpioProtocolGuid;
 
+typedef struct _GPIO_CONTROLLER              GPIO_CONTROLLER;
+typedef struct _PLATFORM_GPIO_CONTROLLER     PLATFORM_GPIO_CONTROLLER;
+
+struct _GPIO_CONTROLLER {
+  UINTN                   RegisterBase;
+  UINTN                   GpioIndex;
+  UINTN                   InternalGpioCount;
+};
+
+struct _PLATFORM_GPIO_CONTROLLER {
+  UINTN                   GpioCount;
+  UINTN                   GpioControllerCount;
+  GPIO_CONTROLLER         *GpioController;
+};
+
+extern EFI_GUID gPlatformGpioProtocolGuid;
+
 #endif
