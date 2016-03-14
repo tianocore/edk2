@@ -372,7 +372,7 @@ HttpBootDns (
   //
   Status = NetLibCreateServiceChild (
              Private->Controller,
-             Private->Image,
+             Private->Ip6Nic->ImageHandle,
              &gEfiDns6ServiceBindingProtocolGuid,
              &Dns6Handle
              );
@@ -384,7 +384,7 @@ HttpBootDns (
                   Dns6Handle,
                   &gEfiDns6ProtocolGuid,
                   (VOID **) &Dns6,
-                  Private->Image,
+                  Private->Ip6Nic->ImageHandle,
                   Private->Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -474,7 +474,7 @@ Exit:
     gBS->CloseProtocol (
            Dns6Handle,
            &gEfiDns6ProtocolGuid,
-           Private->Image,
+           Private->Ip6Nic->ImageHandle,
            Private->Controller
            );
   }
@@ -482,7 +482,7 @@ Exit:
   if (Dns6Handle != NULL) {
     NetLibDestroyServiceChild (
       Private->Controller,
-      Private->Image,
+      Private->Ip6Nic->ImageHandle,
       &gEfiDns6ServiceBindingProtocolGuid,
       Dns6Handle
       );

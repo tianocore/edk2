@@ -553,7 +553,6 @@ HttpBootConfigFormInit (
   EFI_STATUS                        Status;
   HTTP_BOOT_FORM_CALLBACK_INFO      *CallbackInfo;
   VENDOR_DEVICE_PATH                VendorDeviceNode;
-  EFI_SERVICE_BINDING_PROTOCOL      *HttpSb;
   CHAR16                            *MacString;
   CHAR16                            *OldMenuString;
   CHAR16                            MenuString[128];
@@ -600,20 +599,6 @@ HttpBootConfigFormInit (
                   &CallbackInfo->ConfigAccess,
                   NULL
                   );
-  if (!EFI_ERROR (Status)) {
-    //
-    // Open the Parent Handle for the child
-    //
-    Status = gBS->OpenProtocol (
-                    Private->Controller,
-                    &gEfiHttpServiceBindingProtocolGuid,
-                    (VOID **) &HttpSb,
-                    Private->Image,
-                    CallbackInfo->ChildHandle,
-                    EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-                    );
-  }
-
   if (EFI_ERROR (Status)) {
     goto Error;
   }
@@ -636,7 +621,7 @@ HttpBootConfigFormInit (
   //
   // Append MAC string in the menu help string
   //
-  Status = NetLibGetMacString (Private->Controller, Private->Image, &MacString);
+  Status = NetLibGetMacString (Private->Controller, NULL, &MacString);
   if (!EFI_ERROR (Status)) {
     OldMenuString = HiiGetString (
                       CallbackInfo->RegisteredHandle, 
@@ -654,6 +639,7 @@ HttpBootConfigFormInit (
     FreePool (MacString);
     FreePool (OldMenuString);
 
+    CallbackInfo->Initilized = TRUE;
     return EFI_SUCCESS;
   }
   
@@ -666,6 +652,7 @@ Error:
 /**
   Unload the configuration form, this includes: delete all the configuration
   entries, uninstall the form callback protocol, and free the resources used.
+  The form will only be unload completely when both IP4 and IP6 stack are stopped.
 
   @param[in]  Private             Pointer to the driver private data.
 
@@ -680,18 +667,15 @@ HttpBootConfigFormUnload (
 {
   HTTP_BOOT_FORM_CALLBACK_INFO      *CallbackInfo;
 
+  if (Private->Ip4Nic != NULL || Private->Ip6Nic != NULL) {
+    //
+    // Only unload the configuration form when both IP4 and IP6 stack are stopped.
+    //
+    return EFI_SUCCESS;
+  }
+
   CallbackInfo = &Private->CallbackInfo;
   if (CallbackInfo->ChildHandle != NULL) {
-    //
-    // Close the child handle
-    //
-    gBS->CloseProtocol (
-           Private->Controller,
-           &gEfiHttpServiceBindingProtocolGuid,
-           Private->Image,
-           CallbackInfo->ChildHandle
-           );
-    
     //
     // Uninstall EFI_HII_CONFIG_ACCESS_PROTOCOL
     //

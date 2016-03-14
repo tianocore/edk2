@@ -447,6 +447,7 @@ HttpBootCreateHttpIo (
 {
   HTTP_IO_CONFIG_DATA          ConfigData;
   EFI_STATUS                   Status;
+  EFI_HANDLE                   ImageHandle;
 
   ASSERT (Private != NULL);
 
@@ -456,14 +457,16 @@ HttpBootCreateHttpIo (
     ConfigData.Config4.RequestTimeOut = HTTP_BOOT_REQUEST_TIMEOUT;
     IP4_COPY_ADDRESS (&ConfigData.Config4.LocalIp, &Private->StationIp.v4);
     IP4_COPY_ADDRESS (&ConfigData.Config4.SubnetMask, &Private->SubnetMask.v4);
+    ImageHandle = Private->Ip4Nic->ImageHandle;
   } else {
     ConfigData.Config6.HttpVersion    = HttpVersion11;
     ConfigData.Config6.RequestTimeOut = HTTP_BOOT_REQUEST_TIMEOUT;
     IP6_COPY_ADDRESS (&ConfigData.Config6.LocalIp, &Private->StationIp.v6);
+    ImageHandle = Private->Ip6Nic->ImageHandle;
   }
 
   Status = HttpIoCreateIo (
-             Private->Image,
+             ImageHandle,
              Private->Controller,
              Private->UsingIpv6 ? IP_VERSION_6 : IP_VERSION_4,
              &ConfigData,

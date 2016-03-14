@@ -321,7 +321,7 @@ HttpBootIp4DxeDriverBindingStart (
                   );
 
   if (!EFI_ERROR (Status)) {
-      Private = HTTP_BOOT_PRIVATE_DATA_FROM_ID(Id);
+    Private = HTTP_BOOT_PRIVATE_DATA_FROM_ID(Id);
   } else {
     //
     // Initialize the private data structure.
@@ -332,7 +332,6 @@ HttpBootIp4DxeDriverBindingStart (
     }
     Private->Signature = HTTP_BOOT_PRIVATE_DATA_SIGNATURE;
     Private->Controller = ControllerHandle;
-    Private->Image = This->ImageHandle;
     InitializeListHead (&Private->CacheList);
     //
     // Get the NII interface if it exists, it's not required.
@@ -399,8 +398,9 @@ HttpBootIp4DxeDriverBindingStart (
   if (Private->Ip4Nic == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  Private->Ip4Nic->Private   = Private;
-  Private->Ip4Nic->Signature = HTTP_BOOT_VIRTUAL_NIC_SIGNATURE;
+  Private->Ip4Nic->Private     = Private;
+  Private->Ip4Nic->ImageHandle = This->DriverBindingHandle;
+  Private->Ip4Nic->Signature   = HTTP_BOOT_VIRTUAL_NIC_SIGNATURE;
   
   //
   // Create DHCP4 child instance.
@@ -793,7 +793,7 @@ HttpBootIp6DxeDriverBindingStart (
                   );
   
   if (!EFI_ERROR (Status)) {
-      Private = HTTP_BOOT_PRIVATE_DATA_FROM_ID(Id);
+    Private = HTTP_BOOT_PRIVATE_DATA_FROM_ID(Id);
   } else {
     //
     // Initialize the private data structure.
@@ -804,7 +804,6 @@ HttpBootIp6DxeDriverBindingStart (
     }
     Private->Signature = HTTP_BOOT_PRIVATE_DATA_SIGNATURE;
     Private->Controller = ControllerHandle;
-    Private->Image = This->ImageHandle;
     InitializeListHead (&Private->CacheList);
     //
     // Get the NII interface if it exists, it's not required.
@@ -871,9 +870,10 @@ HttpBootIp6DxeDriverBindingStart (
   if (Private->Ip6Nic == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  Private->Ip6Nic->Private   = Private;
-  Private->Ip6Nic->Signature = HTTP_BOOT_VIRTUAL_NIC_SIGNATURE;
-
+  Private->Ip6Nic->Private     = Private;
+  Private->Ip6Nic->ImageHandle = This->DriverBindingHandle;
+  Private->Ip6Nic->Signature   = HTTP_BOOT_VIRTUAL_NIC_SIGNATURE;
+  
   //
   // Create Dhcp6 child and open Dhcp6 protocol
   Status = NetLibCreateServiceChild (

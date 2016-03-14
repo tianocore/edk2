@@ -63,6 +63,7 @@ HttpBootConfigFormInit (
 /**
   Unload the configuration form, this includes: delete all the configuration
   entries, uninstall the form callback protocol, and free the resources used.
+  The form will only be unload completely when both IP4 and IP6 stack are stopped.
 
   @param[in]  Private             Pointer to the driver private data.
 

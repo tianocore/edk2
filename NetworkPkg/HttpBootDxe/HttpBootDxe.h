@@ -102,6 +102,7 @@ typedef union {
 struct _HTTP_BOOT_VIRTUAL_NIC {
   UINT32                                    Signature;
   EFI_HANDLE                                Controller;
+  EFI_HANDLE                                ImageHandle;
   EFI_LOAD_FILE_PROTOCOL                    LoadFile;
   EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
   HTTP_BOOT_PRIVATE_DATA                    *Private;
@@ -118,7 +119,6 @@ struct _HTTP_BOOT_VIRTUAL_NIC {
 struct _HTTP_BOOT_PRIVATE_DATA {
   UINT32                                    Signature;
   EFI_HANDLE                                Controller;
-  EFI_HANDLE                                Image;
 
   HTTP_BOOT_VIRTUAL_NIC                     *Ip4Nic;
   HTTP_BOOT_VIRTUAL_NIC                     *Ip6Nic;
