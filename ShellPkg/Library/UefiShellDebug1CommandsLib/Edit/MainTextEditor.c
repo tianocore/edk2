@@ -40,6 +40,7 @@ extern BOOLEAN                FileBufferMouseNeedRefresh;
 extern EFI_EDITOR_FILE_BUFFER FileBufferBackupVar;
 
 EFI_EDITOR_GLOBAL_EDITOR      MainEditor;
+EFI_EDITOR_GLOBAL_EDITOR      MainEditorBackupVar;
 
 
 /**
@@ -1689,7 +1690,8 @@ GetTextY (
 /**
   Support mouse movement.  Move the cursor.
 
-  @param[in] MouseState     The current mouse state.
+  @param[in]   MouseState             The current mouse state.
+  @param[out]  BeforeLeftButtonDown   TRUE if the left button down. Helps with selections.
 
   @retval EFI_SUCCESS       The operation was successful.
   @retval EFI_NOT_FOUND     There was no mouse support found.
@@ -1697,7 +1699,8 @@ GetTextY (
 EFI_STATUS
 EFIAPI
 MainEditorHandleMouseInput (
-  IN EFI_SIMPLE_POINTER_STATE       MouseState
+  IN  EFI_SIMPLE_POINTER_STATE        MouseState,
+  OUT BOOLEAN                         *BeforeLeftButtonDown
   )
 {
 
@@ -1705,10 +1708,8 @@ MainEditorHandleMouseInput (
   INT32           TextY;
   UINTN           FRow;
   UINTN           FCol;
-
-  LIST_ENTRY  *Link;
+  LIST_ENTRY      *Link;
   EFI_EDITOR_LINE *Line;
-
   UINTN           Index;
   BOOLEAN         Action;
 
@@ -1761,10 +1762,27 @@ MainEditorHandleMouseInput (
     Line = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
 
     //
+    // dragging
     // beyond the line's column length
     //
-    if (FCol > Line->Size + 1) {
-      FCol = Line->Size + 1;
+    if (FCol > Line->Size ) {
+      if (*BeforeLeftButtonDown) {
+
+        if (Line->Size == 0) {
+          if (FRow > 1) {
+            FRow--;
+            FCol = SHELL_EDIT_MAX_LINE_SIZE;
+          } else {
+            FRow  = 1;
+            FCol  = 1;
+          }
+
+        } else {
+          FCol = Line->Size ;
+        }
+      } else {
+        FCol      = Line->Size + 1;
+      }
     }
 
     FileBufferMovePosition (FRow, FCol);
@@ -1773,8 +1791,24 @@ MainEditorHandleMouseInput (
 
     MainEditor.FileBuffer->MousePosition.Column = MainEditor.FileBuffer->DisplayPosition.Column;
 
+    *BeforeLeftButtonDown                       = TRUE;
+
     Action = TRUE;
+  } else {
+    //
+    // else of if LButton
+    //
+    // release LButton
+    //
+    if (*BeforeLeftButtonDown) {
+      Action = TRUE;
+    }
+    //
+    // mouse up
+    //
+    *BeforeLeftButtonDown = FALSE;
   }
+
   //
   // mouse has action
   //
@@ -1804,6 +1838,23 @@ MainEditorKeyInput (
   EFI_INPUT_KEY             Key;
   EFI_STATUS                Status;
   EFI_SIMPLE_POINTER_STATE  MouseState;
+  BOOLEAN                   BeforeMouseIsDown;
+  BOOLEAN                   MouseIsDown;
+  BOOLEAN                   FirstDown;
+  BOOLEAN                   MouseDrag;
+  UINTN                     FRow;
+  UINTN                     FCol;
+  UINTN                     SelectStartBackup;
+  UINTN                     SelectEndBackup;
+
+  //
+  // variable initialization
+  //
+  FRow          = 0;
+  FCol          = 0;
+  MouseIsDown   = FALSE;
+  FirstDown     = FALSE;
+  MouseDrag     = FALSE;
 
   do {
 
@@ -1826,10 +1877,105 @@ MainEditorKeyInput (
                                             &MouseState
                                             );
       if (!EFI_ERROR (Status)) {
+        BeforeMouseIsDown = MouseIsDown;
 
-        Status = MainEditorHandleMouseInput (MouseState);
+        Status            = MainEditorHandleMouseInput (MouseState, &MouseIsDown);
 
         if (!EFI_ERROR (Status)) {
+          if (!BeforeMouseIsDown) {
+            //
+            // mouse down
+            //
+            if (MouseIsDown) {
+              FRow              = FileBuffer.FilePosition.Row;
+              FCol              = FileBuffer.FilePosition.Column;
+              SelectStartBackup = MainEditor.SelectStart;
+              SelectEndBackup   = MainEditor.SelectEnd;
+
+              FirstDown         = TRUE;
+            }
+          } else {
+
+            SelectStartBackup = MainEditor.SelectStart;
+            SelectEndBackup   = MainEditor.SelectEnd;
+
+            //
+            // begin to drag
+            //
+            if (MouseIsDown) {
+              if (FirstDown) {
+                if (MouseState.RelativeMovementX || MouseState.RelativeMovementY) {
+                  MainEditor.SelectStart = 0;
+                  MainEditor.SelectEnd   = 0;
+                  MainEditor.SelectStart = (FRow - 1) * SHELL_EDIT_MAX_LINE_SIZE + FCol;
+
+                  MouseDrag               = TRUE;
+                  FirstDown               = FALSE;
+                }
+              } else {
+                if ((
+                      (FileBuffer.FilePosition.Row - 1) *
+                      SHELL_EDIT_MAX_LINE_SIZE +
+                      FileBuffer.FilePosition.Column
+                    ) >= MainEditor.SelectStart
+                   ) {
+                  MainEditor.SelectEnd = (FileBuffer.FilePosition.Row - 1) *
+                                          SHELL_EDIT_MAX_LINE_SIZE +
+                                          FileBuffer.FilePosition.Column;
+                } else {
+                  MainEditor.SelectEnd = 0;
+                }
+              }
+              //
+              // end of if RelativeX/Y
+              //
+            } else {
+              //
+              // mouse is up
+              //
+              if (MouseDrag) {
+                if (FileBufferGetTotalSize () == 0) {
+                  MainEditor.SelectStart = 0;
+                  MainEditor.SelectEnd   = 0;
+                  FirstDown               = FALSE;
+                  MouseDrag               = FALSE;
+                }
+
+                if ((
+                      (FileBuffer.FilePosition.Row - 1) *
+                      SHELL_EDIT_MAX_LINE_SIZE +
+                      FileBuffer.FilePosition.Column
+                    ) >= MainEditor.SelectStart
+                   ) {
+                  MainEditor.SelectEnd = (FileBuffer.FilePosition.Row - 1) *
+                                          SHELL_EDIT_MAX_LINE_SIZE +
+                                          FileBuffer.FilePosition.Column;
+                } else {
+                  MainEditor.SelectEnd = 0;
+                }
+
+                if (MainEditor.SelectEnd == 0) {
+                  MainEditor.SelectStart = 0;
+                }
+              }
+
+              FirstDown = FALSE;
+              MouseDrag = FALSE;
+            }
+
+            if (SelectStartBackup != MainEditor.SelectStart || SelectEndBackup != MainEditor.SelectEnd) {
+              if ((SelectStartBackup - 1) / SHELL_EDIT_MAX_LINE_SIZE != (MainEditor.SelectStart - 1) / SHELL_EDIT_MAX_LINE_SIZE) {
+                FileBufferNeedRefresh = TRUE;
+              } else {
+                if ((SelectEndBackup - 1) / SHELL_EDIT_MAX_LINE_SIZE != (MainEditor.SelectEnd - 1) / SHELL_EDIT_MAX_LINE_SIZE) {
+                  FileBufferNeedRefresh = TRUE;
+                } else {
+                  FileBufferOnlyLineNeedRefresh = TRUE;
+                }
+              }
+            }
+          }
+
           EditorMouseAction           = TRUE;
           FileBufferMouseNeedRefresh  = TRUE;
         } else if (Status == EFI_LOAD_ERROR) {
@@ -1930,7 +2076,11 @@ MainEditorBackup (
   VOID
   )
 {
+  MainEditorBackupVar.SelectStart  = MainEditor.SelectStart;
+  MainEditorBackupVar.SelectEnd    = MainEditor.SelectEnd;
   FileBufferBackup ();
   
   return EFI_SUCCESS;
 }
+
+
