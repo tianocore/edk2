@@ -149,7 +149,16 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxPeiPerformanceLogEntries_PROMPT  #language en-US "Maximum number of PEI performance log entries"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxPeiPerformanceLogEntries_HELP  #language en-US "Maximum number of performance log entries during PEI phase."
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxPeiPerformanceLogEntries_HELP  #language en-US "Maximum number of performance log entries during PEI phase.\n"
+                                                                                                "Use PcdMaxPeiPerformanceLogEntries16 if the number of entries required is\n"
+                                                                                                "more than 255."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxPeiPerformanceLogEntries16_PROMPT  #language en-US "Maximum number of PEI performance log entries"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxPeiPerformanceLogEntries16_HELP  #language en-US "Maximum number of performance log entries during PEI phase.\n"
+                                                                                                  "If set to 0, then PcdMaxPeiPerformanceLogEntries determines the number of\n"
+                                                                                                  "entries. If greater than 0, then this PCD determines the number of entries,\n"
+                                                                                                  "and PcdMaxPeiPerformanceLogEntries is ignored."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRealTimeClockUpdateTimeout_PROMPT  #language en-US "RTC Update Timeout Value"
 
