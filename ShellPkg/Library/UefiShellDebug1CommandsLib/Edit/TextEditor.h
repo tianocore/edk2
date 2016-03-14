@@ -1,7 +1,7 @@
 /** @file
   Main include file for Edit shell Debug1 function.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,7 @@
 #include "Misc.h"
 
 extern EFI_EDITOR_GLOBAL_EDITOR MainEditor;
+extern EFI_EDITOR_GLOBAL_EDITOR MainEditorBackupVar;
 extern BOOLEAN                  EditorFirst;
 extern BOOLEAN                  EditorExit;
 
