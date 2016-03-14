@@ -20,30 +20,28 @@
 
 // PL061 GPIO Registers
 #define PL061_GPIO_DATA_REG_OFFSET      ((UINTN) 0x000)
-#define PL061_GPIO_DATA_REG             ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x000)
-#define PL061_GPIO_DIR_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x400)
-#define PL061_GPIO_IS_REG               ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x404)
-#define PL061_GPIO_IBE_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x408)
-#define PL061_GPIO_IEV_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x40C)
-#define PL061_GPIO_IE_REG               ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x410)
-#define PL061_GPIO_RIS_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x414)
-#define PL061_GPIO_MIS_REG              ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x410)
-#define PL061_GPIO_IC_REG               ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x41C)
-#define PL061_GPIO_AFSEL_REG            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0x420)
+#define PL061_GPIO_DATA_REG             0x000
+#define PL061_GPIO_DIR_REG              0x400
+#define PL061_GPIO_IS_REG               0x404
+#define PL061_GPIO_IBE_REG              0x408
+#define PL061_GPIO_IEV_REG              0x40C
+#define PL061_GPIO_IE_REG               0x410
+#define PL061_GPIO_RIS_REG              0x414
+#define PL061_GPIO_MIS_REG              0x410
+#define PL061_GPIO_IC_REG               0x41C
+#define PL061_GPIO_AFSEL_REG            0x420
 
-#define PL061_GPIO_PERIPH_ID0           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFE0)
-#define PL061_GPIO_PERIPH_ID1           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFE4)
-#define PL061_GPIO_PERIPH_ID2           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFE8)
-#define PL061_GPIO_PERIPH_ID3           ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFEC)
+#define PL061_GPIO_PERIPH_ID0           0xFE0
+#define PL061_GPIO_PERIPH_ID1           0xFE4
+#define PL061_GPIO_PERIPH_ID2           0xFE8
+#define PL061_GPIO_PERIPH_ID3           0xFEC
 
-#define PL061_GPIO_PCELL_ID0            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFF0)
-#define PL061_GPIO_PCELL_ID1            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFF4)
-#define PL061_GPIO_PCELL_ID2            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFF8)
-#define PL061_GPIO_PCELL_ID3            ((UINT32)PcdGet32 (PcdPL061GpioBase) + 0xFFC)
+#define PL061_GPIO_PCELL_ID0            0xFF0
+#define PL061_GPIO_PCELL_ID1            0xFF4
+#define PL061_GPIO_PCELL_ID2            0xFF8
+#define PL061_GPIO_PCELL_ID3            0xFFC
 
-
-// GPIO pins are numbered 0..7
-#define LAST_GPIO_PIN                   7
+#define PL061_GPIO_PINS                 8
 
 // All bits low except one bit high, native bit length
 #define GPIO_PIN_MASK(Pin)              (1UL << ((UINTN)(Pin)))

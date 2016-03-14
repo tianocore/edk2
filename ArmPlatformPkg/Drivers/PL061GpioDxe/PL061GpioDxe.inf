@@ -45,6 +45,7 @@
 
 [Protocols]
   gEmbeddedGpioProtocolGuid
+  gPlatformGpioProtocolGuid
 
 [Depex]
   TRUE
