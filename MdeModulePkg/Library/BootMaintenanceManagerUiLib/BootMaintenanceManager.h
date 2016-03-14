@@ -764,16 +764,6 @@ Var_UpdateOutOfBandOption (
   );
 
 /**
-  Update the device path of "ConOut", "ConIn" and "ErrOut" based on the new BaudRate, Data Bits, 
-  parity and stop Bits set.
-
-**/
-VOID
-Var_UpdateAllConsoleOption (
-  VOID
-  );
-
-/**
   This function update the "BootNext" EFI Variable. If there is no "BootNex" specified in BMM, 
   this EFI Variable is deleted.
   It also update the BMM context data specified the "BootNext" value.

@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -420,7 +420,10 @@ FrontPageCallback (
                         AsciiStrSize (Lang),
                         Lang
                         );
-        ASSERT_EFI_ERROR(Status);
+        if (EFI_ERROR (Status)) {
+          FreePool (Lang);
+          return EFI_DEVICE_ERROR;
+        }
       } else {
         ASSERT (FALSE);
       }

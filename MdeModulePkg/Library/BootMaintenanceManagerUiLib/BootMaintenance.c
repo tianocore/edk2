@@ -1,7 +1,7 @@
 /** @file
 The functions for Boot Maintainence Main menu.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -667,8 +667,17 @@ BootMaintRouteConfig (
                     sizeof(UINT16),
                     &(NewBmmData->BootTimeOut)
                     );
-    ASSERT_EFI_ERROR(Status);
-
+    if (EFI_ERROR (Status)) {
+      //
+      // If set variable fail, and don't have the appropriate error status for RouteConfig fuction to return,
+      // just return the EFI_NOT_FOUND.
+      //
+      if (Status == EFI_OUT_OF_RESOURCES) {
+        return Status;
+      } else {
+        return EFI_NOT_FOUND;
+      }
+    }
     Private->BmmOldFakeNVData.BootTimeOut = NewBmmData->BootTimeOut;
   }
 

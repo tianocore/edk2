@@ -301,62 +301,6 @@ Var_ChangeDriverOrder (
 }
 
 /**
-  Update the device path of "ConOut", "ConIn" and "ErrOut" 
-  based on the new BaudRate, Data Bits, parity and Stop Bits
-  set.
-
-**/
-VOID
-Var_UpdateAllConsoleOption (
-  VOID
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL  *OutDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *InpDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *ErrDevicePath;
-  EFI_STATUS                Status;
-
-  GetEfiGlobalVariable2 (L"ConOut", (VOID**)&OutDevicePath, NULL);
-  GetEfiGlobalVariable2 (L"ConIn", (VOID**)&InpDevicePath, NULL);
-  GetEfiGlobalVariable2 (L"ErrOut", (VOID**)&ErrDevicePath, NULL);
-  if (OutDevicePath != NULL) {
-    ChangeVariableDevicePath (OutDevicePath);
-    Status = gRT->SetVariable (
-                    L"ConOut",
-                    &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
-                    GetDevicePathSize (OutDevicePath),
-                    OutDevicePath
-                    );
-    ASSERT (!EFI_ERROR (Status));
-  }
-
-  if (InpDevicePath != NULL) {
-    ChangeVariableDevicePath (InpDevicePath);
-    Status = gRT->SetVariable (
-                    L"ConIn",
-                    &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
-                    GetDevicePathSize (InpDevicePath),
-                    InpDevicePath
-                    );
-    ASSERT (!EFI_ERROR (Status));
-  }
-
-  if (ErrDevicePath != NULL) {
-    ChangeVariableDevicePath (ErrDevicePath);
-    Status = gRT->SetVariable (
-                    L"ErrOut",
-                    &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
-                    GetDevicePathSize (ErrDevicePath),
-                    ErrDevicePath
-                    );
-    ASSERT (!EFI_ERROR (Status));
-  }
-}
-
-/**
   This function delete and build multi-instance device path for
   specified type of console device.
 
