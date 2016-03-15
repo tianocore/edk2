@@ -1,7 +1,7 @@
 /** @file
   GUIDs and definitions used for Common Platform Error Record.
 
-  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -345,6 +345,23 @@ typedef struct {
     0x48AB7F57, 0xDC34, 0x4f6c, {0xA7, 0xD3, 0xB0, 0xB5, 0xB0, 0xA7, 0x43, 0x14 } \
   }
 ///@}
+
+///
+/// The validation bit mask indicates which fields in the IA32/X64 Processor
+/// Error Record structure are valid.
+///@{
+#define EFI_IA32_X64_PROCESSOR_ERROR_APIC_ID_VALID         BIT0
+#define EFI_IA32_X64_PROCESSOR_ERROR_CPU_ID_INFO_VALID     BIT1
+///@}
+
+///
+/// IA32/X64 Processor Error Record
+///
+typedef struct {
+  UINT64             ValidFields;
+  UINT64             ApicId;
+  UINT8              CpuIdInfo[48];
+} EFI_IA32_X64_PROCESSOR_ERROR_RECORD;
 
 ///
 /// The validation bit mask indicates which fields in the Cache Check structure
