@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="NA|Win32">
+      <Configuration>NA</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BF774831-88E2-4BBE-AFB4-5B5FC05ECBB1}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NA|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='NA|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NA|Win32'">
+    <NMakePreprocessorDefinitions />
+    <NMakeIncludeSearchPath>$(ProjectDir)\..\..\..\..\OvmfPkg\Include;$(ProjectDir)\..\..\..\..\MdePkg\Include;$(ProjectDir)\..\..\..\..\MdePkg\Include\X64;$(ProjectDir)\..\..\..\..\UefiCpuPkg\Include;$(ProjectDir)\..\..\..\..\EdkCompatibilityPkg;$(ProjectDir)\..\..\..\..\IntelFrameworkPkg\Include</NMakeIncludeSearchPath>
+    <IncludePath />
+    <ExecutablePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Display.c" />
+    <ClCompile Include="..\Filesystem.c" />
+    <ClCompile Include="..\Util.c" />
+    <ClCompile Include="..\VgaShim.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Display.h" />
+    <ClInclude Include="..\Filesystem.h" />
+    <ClInclude Include="..\Util.h" />
+    <ClInclude Include="..\Version.h" />
+    <ClInclude Include="..\VgaShim.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
