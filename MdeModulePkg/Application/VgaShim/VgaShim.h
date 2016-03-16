@@ -10,6 +10,7 @@
 
 #include <Uefi.h>
 #include <Guid/FileInfo.h>
+#include <IndustryStandard/LegacyVgaBios.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -22,7 +23,6 @@
 #include <Protocol/LegacyRegion2.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleTextInEx.h>
-#include "External/ConsoleControl.h"
 
 
 /**

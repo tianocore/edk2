@@ -2,7 +2,6 @@
 #include "Display.h"
 #include "Util.h"
 #include "Filesystem.h"
-#include "External/LegacyVgaBios.h"
 #include "Int10hHandler.h"
 #include "BootflagSimple.h"
 #include "Version.h"
@@ -538,11 +537,6 @@ CanWriteAtAddress(
 /**
   Displays a static built-in Windows flag (last frame in
   animation shown when starting Windows 7).
-
-  @param[in] ConsoleControl Protocol for sharing the display
-                            between console and graphical output.
-							Considered legacy but still used
-							by Apple devices.
 
   @retval TRUE              Static logo was successfully retrieved
                             and displayed on screen.
