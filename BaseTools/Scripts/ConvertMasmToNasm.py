@@ -285,7 +285,9 @@ class ConvertAsmFile(CommonUtils):
                 self.oldAsmEmptyLineCount = 0
 
     procDeclRe = re.compile(r'''
-                                ([\w@][\w@0-9]*) \s+
+                                (?: ASM_PFX \s* [(] \s* )?
+                                ([\w@][\w@0-9]*) \s*
+                                [)]? \s+
                                 PROC
                                 (?: \s+ NEAR | FAR )?
                                 (?: \s+ C )?
