@@ -473,7 +473,7 @@ class ConvertAsmFile(CommonUtils):
             self.EmitAsmWithComment(oldAsm, newAsm, endOfLine)
             uses = self.mo.group(3)
             if uses is not None:
-                uses = filter(None, uses.split())
+                uses = tuple(filter(None, uses.split()))
             else:
                 uses = tuple()
             self.uses = uses
@@ -484,7 +484,7 @@ class ConvertAsmFile(CommonUtils):
             self.EmitAsmWithComment(oldAsm, newAsm, endOfLine)
         elif self.MatchAndSetMo(self.publicRe, oldAsm):
             publics = re.findall(self.varAndTypeSubRe, self.mo.group(1))
-            publics = map(lambda p: p.split(':')[0].strip(), publics)
+            publics = tuple(map(lambda p: p.split(':')[0].strip(), publics))
             for i in range(len(publics) - 1):
                 name = publics[i]
                 self.EmitNewContent('global ASM_PFX(%s)' % publics[i])
