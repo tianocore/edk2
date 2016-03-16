@@ -6,6 +6,7 @@
 
 ; Adapted from VbeShim.asm from the Qemu project.
 ;
+; Copyright (C) 2016, Dawid Ciecierski
 ; Copyright (C) 2014, Red Hat, Inc.
 ; Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 ;
