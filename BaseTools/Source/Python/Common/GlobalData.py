@@ -34,7 +34,7 @@ gActivePlatform = None
 gCommandLineDefines = {}
 gEdkGlobal = {}
 gOverrideDir = {}
-
+gCommandMaxLength = 4096
 # for debug trace purpose when problem occurs
 gProcessingFile = ''
 gBuildingModule = ''

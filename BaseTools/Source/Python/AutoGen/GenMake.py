@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -497,6 +497,22 @@ cleanlib:
                     ToolsDef.append("%s_%s = %s" % (Tool, Attr, Value))
             ToolsDef.append("")
 
+        # generate the Response file and Response flag
+        RespDict = self.CommandExceedLimit()
+        RespFileList = os.path.join(self._AutoGenObject.OutputDir, 'respfilelist.txt')
+        if RespDict:
+            RespFileListContent = ''
+            for Resp in RespDict.keys():
+                RespFile = os.path.join(self._AutoGenObject.OutputDir, str(Resp).lower() + '.txt')
+                SaveFileOnChange(RespFile, RespDict[Resp], False)
+                ToolsDef.append("%s = %s" % (Resp, '@' + RespFile))
+                RespFileListContent += '@' + RespFile + os.linesep
+                RespFileListContent += RespDict[Resp] + os.linesep
+            SaveFileOnChange(RespFileList, RespFileListContent, False)
+        else:
+            if os.path.exists(RespFileList):
+                os.remove(RespFileList)
+
         # convert source files and binary files to build targets
         self.ResultFileList = [str(T.Target) for T in self._AutoGenObject.CodaTargetList]
         if len(self.ResultFileList) == 0 and len(self._AutoGenObject.SourceFileList) <> 0:
@@ -619,6 +635,102 @@ cleanlib:
         }
 
         return MakefileTemplateDict
+
+    def CommandExceedLimit(self):
+        FlagDict = {
+                    'CC'    :  { 'Macro' : '$(CC_FLAGS)',    'Value' : False},
+                    'PP'    :  { 'Macro' : '$(PP_FLAGS)',    'Value' : False},
+                    'APP'   :  { 'Macro' : '$(APP_FLAGS)',   'Value' : False},
+                    'ASLPP' :  { 'Macro' : '$(ASLPP_FLAGS)', 'Value' : False},
+                    'VFRPP' :  { 'Macro' : '$(VFRPP_FLAGS)', 'Value' : False},
+                    'ASM'   :  { 'Macro' : '$(ASM_FLAGS)',   'Value' : False},
+                    'ASLCC' :  { 'Macro' : '$(ASLCC_FLAGS)', 'Value' : False},
+                   }
+
+        RespDict = {}
+        FileTypeList = []
+        IncPrefix = self._INC_FLAG_[self._AutoGenObject.ToolChainFamily]
+
+        # base on the source files to decide the file type
+        for File in self._AutoGenObject.SourceFileList:
+            for type in self._AutoGenObject.FileTypes:
+                if File in self._AutoGenObject.FileTypes[type]:
+                    if type not in FileTypeList:
+                        FileTypeList.append(type)
+
+        # calculate the command-line length
+        if FileTypeList:
+            for type in FileTypeList:
+                BuildTargets = self._AutoGenObject.BuildRules[type].BuildTargets
+                for Target in BuildTargets:
+                    CommandList = BuildTargets[Target].Commands
+                    for SingleCommand in CommandList:
+                        Tool = ''
+                        SingleCommandLength = len(SingleCommand)
+                        SingleCommandList = SingleCommand.split()
+                        if len(SingleCommandList) > 0:
+                            for Flag in FlagDict.keys():
+                                if '$('+ Flag +')' in SingleCommandList[0]:
+                                    Tool = Flag
+                                    break
+                        if Tool:
+                            SingleCommandLength += len(self._AutoGenObject._BuildOption[Tool]['PATH'])
+                            for item in SingleCommandList[1:]:
+                                if FlagDict[Tool]['Macro'] in item:
+                                    Str = self._AutoGenObject._BuildOption[Tool]['FLAGS']
+                                    while(Str.find('$(') != -1):
+                                        for macro in self._AutoGenObject.Macros.keys():
+                                            MacroName = '$('+ macro + ')'
+                                            if (Str.find(MacroName) != -1):
+                                                Str = Str.replace(MacroName, self._AutoGenObject.Macros[macro])
+                                                break
+                                        else:
+                                            EdkLogger.error("build", AUTOGEN_ERROR, "Not supported macro is found in make command : %s" % Str, ExtraData="[%s]" % str(self._AutoGenObject))
+                                    SingleCommandLength += len(Str)
+                                elif '$(INC)' in item:
+                                    SingleCommandLength += self._AutoGenObject.IncludePathLength + len(IncPrefix) * len(self._AutoGenObject._IncludePathList)
+                                elif item.find('$(') != -1:
+                                    Str = item
+                                    for Option in self._AutoGenObject.BuildOption.keys():
+                                        for Attr in self._AutoGenObject.BuildOption[Option]:
+                                            if Str.find(Option + '_' + Attr) != -1:
+                                                Str = Str.replace('$(' + Option + '_' + Attr + ')', self._AutoGenObject.BuildOption[Option][Attr])
+                                    while(Str.find('$(') != -1):
+                                        for macro in self._AutoGenObject.Macros.keys():
+                                            MacroName = '$('+ macro + ')'
+                                            if (Str.find(MacroName) != -1):
+                                                Str = Str.replace(MacroName, self._AutoGenObject.Macros[macro])
+                                                break
+                                        else:
+                                            EdkLogger.error("build", AUTOGEN_ERROR, "Not supported macro is found in make command : %s" % Str, ExtraData="[%s]" % str(self._AutoGenObject))
+
+                                    SingleCommandLength += len(Str)
+
+                            if SingleCommandLength > GlobalData.gCommandMaxLength:
+                                FlagDict[Tool]['Value'] = True
+
+                # generate the response file content by combine the FLAGS and INC
+                for Flag in FlagDict.keys():
+                    if FlagDict[Flag]['Value']:
+                        Key = Flag + '_RESP'
+                        RespMacro = FlagDict[Flag]['Macro'].replace('FLAGS', 'RESP')
+                        Value = self._AutoGenObject.BuildOption[Flag]['FLAGS']
+                        for inc in self._AutoGenObject._IncludePathList:
+                            Value += ' ' + IncPrefix + inc
+                        while (Value.find('$(') != -1):
+                            for macro in self._AutoGenObject.Macros.keys():
+                                MacroName = '$('+ macro + ')'
+                                if (Value.find(MacroName) != -1):
+                                    Value = Value.replace(MacroName, self._AutoGenObject.Macros[macro])
+                                    break
+                            else:
+                                EdkLogger.error("build", AUTOGEN_ERROR, "Not supported macro is found in make command : %s" % Str, ExtraData="[%s]" % str(self._AutoGenObject))
+                        RespDict[Key] = Value
+                        for Target in BuildTargets:
+                            for i, SingleCommand in enumerate(BuildTargets[Target].Commands):
+                                if FlagDict[Flag]['Macro'] in SingleCommand:
+                                    BuildTargets[Target].Commands[i] = SingleCommand.replace('$(INC)','').replace(FlagDict[Flag]['Macro'], RespMacro)
+        return RespDict
 
     def ProcessBuildTargetList(self):
         #
