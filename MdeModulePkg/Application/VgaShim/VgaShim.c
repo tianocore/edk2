@@ -45,7 +45,6 @@ UefiMain (
 	EFI_STATUS				IvtAllocationStatus;
 	EFI_INPUT_KEY			Key;
 	CHAR16					*LaunchPath = NULL;
-	BOOLEAN					ModifyIvtEntry = TRUE;
 
 	//
 	// Claim real mode IVT memory area before any allocation can

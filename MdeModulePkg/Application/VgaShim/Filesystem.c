@@ -88,7 +88,6 @@ FileExists(
 	EFI_FILE_IO_INTERFACE	*Volume;
 	EFI_FILE_HANDLE			VolumeRoot;
 	EFI_FILE_HANDLE			RequestedFile;
-	BOOLEAN					Exists;
 
 	// Open volume where VgaShim lives.
 	Status = gBS->HandleProtocol(VgaShimImageInfo->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void **)&Volume);
