@@ -1,2 +1,6 @@
 Build/
 tags/
+MdeModulePkg/Application/VgaShim/VisualStudio/.vs
+MdeModulePkg/Application/VgaShim/VisualStudio/VgaShim.sdf
+MdeModulePkg/Application/VgaShim/VisualStudio/VgaShim.VC.opendb
+MdeModulePkg/Application/VgaShim/VisualStudio/VgaShim.vcxproj.user
