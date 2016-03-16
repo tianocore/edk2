@@ -85,7 +85,7 @@ UefiMain (
 		DebugMode = TRUE;
 	}
 	if (DebugMode) {
-		PrintDebug(L"VGA Shim v%s\n", VERSION);
+		PrintDebug(L"VGA Shim %s\n", VERSION);
 		PrintDebug(L"You are running in debug mode, press Enter to continue\n");
 		WaitForEnter(FALSE);
 	}
