@@ -4156,13 +4156,34 @@ ConSplitterAbsolutePointerGetState (
       // Rescale to Con Splitter virtual Absolute Pointer's resolution.
       //
       if (!(MinX == 0 && MaxX == 0)) {
-        State->CurrentX = VirtualMinX + (CurrentState.CurrentX * (VirtualMaxX - VirtualMinX)) / (MaxX - MinX);
+        State->CurrentX = VirtualMinX + DivU64x64Remainder (
+                                          MultU64x64 (
+                                            CurrentState.CurrentX,
+                                            VirtualMaxX - VirtualMinX
+                                            ),
+                                          MaxX - MinX,
+                                          NULL
+                                          );
       }
       if (!(MinY == 0 && MaxY == 0)) {
-        State->CurrentY = VirtualMinY + (CurrentState.CurrentY * (VirtualMaxY - VirtualMinY)) / (MaxY - MinY);
+        State->CurrentY = VirtualMinY + DivU64x64Remainder (
+                                          MultU64x64 (
+                                            CurrentState.CurrentY,
+                                            VirtualMaxY - VirtualMinY
+                                            ),
+                                          MaxY - MinY,
+                                          NULL
+                                          );
       }
       if (!(MinZ == 0 && MaxZ == 0)) {
-        State->CurrentZ = VirtualMinZ + (CurrentState.CurrentZ * (VirtualMaxZ - VirtualMinZ)) / (MaxZ - MinZ);
+        State->CurrentZ = VirtualMinZ + DivU64x64Remainder (
+                                          MultU64x64 (
+                                            CurrentState.CurrentZ,
+                                            VirtualMaxZ - VirtualMinZ
+                                            ),
+                                          MaxZ - MinZ,
+                                          NULL
+                                          );
       }
 
     } else if (Status == EFI_DEVICE_ERROR) {
