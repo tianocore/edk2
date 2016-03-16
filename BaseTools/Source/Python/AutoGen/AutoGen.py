@@ -2378,6 +2378,7 @@ class ModuleAutoGen(AutoGen):
         self._MakeFileDir     = None
 
         self._IncludePathList = None
+        self._IncludePathLength = 0
         self._AutoGenFileList = None
         self._UnicodeFileList = None
         self._SourceFileList  = None
@@ -3224,6 +3225,13 @@ class ModuleAutoGen(AutoGen):
                         self._IncludePathList.append(str(Inc))
         return self._IncludePathList
 
+    def _GetIncludePathLength(self):
+        self._IncludePathLength = 0
+        if self._IncludePathList:
+            for inc in self._IncludePathList:
+                self._IncludePathLength += len(' ' + inc)
+        return self._IncludePathLength
+
     ## Get HII EX PCDs which maybe used by VFR
     #
     #  efivarstore used by VFR may relate with HII EX PCDs
@@ -3816,6 +3824,7 @@ class ModuleAutoGen(AutoGen):
     CustomMakefile  = property(_GetCustomMakefile)
 
     IncludePathList = property(_GetIncludePathList)
+    IncludePathLength = property(_GetIncludePathLength)
     AutoGenFileList = property(_GetAutoGenFileList)
     UnicodeFileList = property(_GetUnicodeFileList)
     SourceFileList  = property(_GetSourceFileList)
