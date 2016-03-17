@@ -26,6 +26,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DefaultExceptionHandlerLib.h>
 
+STATIC
 RETURN_STATUS
 CopyExceptionHandlers(
   IN  PHYSICAL_ADDRESS        BaseAddress
@@ -66,9 +67,9 @@ extern UINTN                    gDebuggerNoHandlerValue;
 // library we cannot represent this in a PCD since PCDs are evaluated on
 // a per-module basis.
 #if defined(ARM_RELOCATE_VECTORS)
-BOOLEAN gArmRelocateVectorTable = TRUE;
+STATIC CONST BOOLEAN gArmRelocateVectorTable = TRUE;
 #else
-BOOLEAN gArmRelocateVectorTable = FALSE;
+STATIC CONST BOOLEAN gArmRelocateVectorTable = FALSE;
 #endif
 
 
@@ -151,6 +152,7 @@ with default exception handlers.
 @retval EFI_UNSUPPORTED       This function is not supported.
 
 **/
+STATIC
 RETURN_STATUS
 CopyExceptionHandlers(
   IN  PHYSICAL_ADDRESS        BaseAddress
