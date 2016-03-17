@@ -107,54 +107,6 @@ GCC_ASM_EXPORT(CommonCExceptionHandler)
 #define FP_CONTEXT_SIZE    (32 * 16)
 #define SYS_CONTEXT_SIZE   ( 6 *  8) // 5 SYS regs + Alignment requirement (ie: the stack must be aligned on 0x10)
 
-// Cannot str x31 directly
-#define ALL_GP_REGS                                     \
-        REG_PAIR (x0,  x1,  0x000, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x2,  x3,  0x010, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x4,  x5,  0x020, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x6,  x7,  0x030, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x8,  x9,  0x040, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x10, x11, 0x050, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x12, x13, 0x060, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x14, x15, 0x070, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x16, x17, 0x080, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x18, x19, 0x090, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x20, x21, 0x0a0, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x22, x23, 0x0b0, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x24, x25, 0x0c0, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x26, x27, 0x0d0, GP_CONTEXT_SIZE);    \
-        REG_PAIR (x28, x29, 0x0e0, GP_CONTEXT_SIZE);    \
-        REG_ONE  (x30,      0x0f0, GP_CONTEXT_SIZE);
-
-// In order to save the SP we need to put it somewhere else first.
-// STR only works with XZR/WZR directly
-#define SAVE_SP \
-        add x1, sp, #(FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE); \
-        REG_ONE (x1,        0x0f8, GP_CONTEXT_SIZE);
-
-#define ALL_FP_REGS                                     \
-        REG_PAIR (q0,  q1,  0x000, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q2,  q3,  0x020, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q4,  q5,  0x040, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q6,  q7,  0x060, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q8,  q9,  0x080, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q10, q11, 0x0a0, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q12, q13, 0x0c0, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q14, q15, 0x0e0, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q16, q17, 0x100, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q18, q19, 0x120, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q20, q21, 0x140, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q22, q23, 0x160, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q24, q25, 0x180, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q26, q27, 0x1a0, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q28, q29, 0x1c0, FP_CONTEXT_SIZE);    \
-        REG_PAIR (q30, q31, 0x1e0, FP_CONTEXT_SIZE);
-
-#define ALL_SYS_REGS                                    \
-        REG_PAIR (x1,  x2,  0x000, SYS_CONTEXT_SIZE);   \
-        REG_PAIR (x3,  x4,  0x010, SYS_CONTEXT_SIZE);   \
-        REG_ONE  (x5,       0x020, SYS_CONTEXT_SIZE);
-
 //
 // There are two methods for installing AArch64 exception vectors:
 //  1. Install a copy of the vectors to a location specified by a PCD
@@ -170,18 +122,35 @@ ASM_PFX(ExceptionHandlersStart):
 VECTOR_BASE(ExceptionHandlersStart)
 #endif
 
-#undef  REG_PAIR
-#undef  REG_ONE
-#define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)  stp  REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
-#define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)         stur REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
-
   .macro  ExceptionEntry, val
   // Move the stackpointer so we can reach our structure with the str instruction.
   sub sp, sp, #(FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
 
-  // Save all the General regs before touching x0 and x1.
-  // This does not save r31(SP) as it is special. We do that later.
-  ALL_GP_REGS
+  // Push some GP registers so we can record the exception context
+  stp      x0, x1, [sp, #-GP_CONTEXT_SIZE]!
+  stp      x2, x3, [sp, #0x10]
+  stp      x4, x5, [sp, #0x20]
+  stp      x6, x7, [sp, #0x30]
+
+  EL1_OR_EL2_OR_EL3(x1)
+1:mrs      x2, elr_el1   // Exception Link Register
+  mrs      x3, spsr_el1  // Saved Processor Status Register 32bit
+  mrs      x5, esr_el1   // EL1 Exception syndrome register 32bit
+  mrs      x6, far_el1   // EL1 Fault Address Register
+  b        4f
+
+2:mrs      x2, elr_el2   // Exception Link Register
+  mrs      x3, spsr_el2  // Saved Processor Status Register 32bit
+  mrs      x5, esr_el2   // EL2 Exception syndrome register 32bit
+  mrs      x6, far_el2   // EL2 Fault Address Register
+  b        4f
+
+3:mrs      x2, elr_el3   // Exception Link Register
+  mrs      x3, spsr_el3  // Saved Processor Status Register 32bit
+  mrs      x5, esr_el3   // EL3 Exception syndrome register 32bit
+  mrs      x6, far_el3   // EL3 Fault Address Register
+
+4:mrs      x4, fpsr      // Floating point Status Register  32bit
 
   // Record the type of exception that occurred.
   mov       x0, #\val
@@ -278,49 +247,44 @@ ASM_PFX(ExceptionHandlersEnd):
 
 
 ASM_PFX(CommonExceptionEntry):
-  /* NOTE:
-     We have to break up the save code because the immediate value to be used
-     with the SP is too big to do it all in one step so we need to shuffle the SP
-     along as we go. (we only have 9bits of immediate to work with) */
 
-  // Save the current Stack pointer before we start modifying it.
-  SAVE_SP
-
-  // Preserve the stack pointer we came in with before we modify it
-  EL1_OR_EL2_OR_EL3(x1)
-1:mrs      x1, elr_el1   // Exception Link Register
-  mrs      x2, spsr_el1  // Saved Processor Status Register 32bit
-  mrs      x4, esr_el1   // EL1 Exception syndrome register 32bit
-  mrs      x5, far_el1   // EL1 Fault Address Register
-  b        4f
-
-2:mrs      x1, elr_el2   // Exception Link Register
-  mrs      x2, spsr_el2  // Saved Processor Status Register 32bit
-  mrs      x4, esr_el2   // EL2 Exception syndrome register 32bit
-  mrs      x5, far_el2   // EL2 Fault Address Register
-  b        4f
-
-3:mrs      x1, elr_el3   // Exception Link Register
-  mrs      x2, spsr_el3  // Saved Processor Status Register 32bit
-  mrs      x4, esr_el3   // EL3 Exception syndrome register 32bit
-  mrs      x5, far_el3   // EL3 Fault Address Register
-
-4:mrs      x3, fpsr      // Floating point Status Register  32bit
-
-  // Adjust SP to save next set
-  add      sp, sp, #FP_CONTEXT_SIZE
-
-  // Push FP regs to Stack.
-  ALL_FP_REGS
-
-  // Adjust SP to save next set
-  add      sp, sp, #SYS_CONTEXT_SIZE
+  // Stack the remaining GP registers
+  stp      x8,  x9,  [sp, #0x40]
+  stp      x10, x11, [sp, #0x50]
+  stp      x12, x13, [sp, #0x60]
+  stp      x14, x15, [sp, #0x70]
+  stp      x16, x17, [sp, #0x80]
+  stp      x18, x19, [sp, #0x90]
+  stp      x20, x21, [sp, #0xa0]
+  stp      x22, x23, [sp, #0xb0]
+  stp      x24, x25, [sp, #0xc0]
+  stp      x26, x27, [sp, #0xd0]
+  stp      x28, x29, [sp, #0xe0]
+  add      x28, sp, #GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE
+  stp      x30, x28, [sp, #0xf0]
 
   // Save the SYS regs
-  ALL_SYS_REGS
+  stp      x2,  x3,  [x28, #-SYS_CONTEXT_SIZE]!
+  stp      x4,  x5,  [x28, #0x10]
+  str      x6,  [x28, #0x20]
 
-  // Point to top of struct after all regs saved
-  sub      sp, sp, #(GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
+  // Push FP regs to Stack.
+  stp      q0,  q1,  [x28, #-FP_CONTEXT_SIZE]!
+  stp      q2,  q3,  [x28, #0x20]
+  stp      q4,  q5,  [x28, #0x40]
+  stp      q6,  q7,  [x28, #0x60]
+  stp      q8,  q9,  [x28, #0x80]
+  stp      q10, q11, [x28, #0xa0]
+  stp      q12, q13, [x28, #0xc0]
+  stp      q14, q15, [x28, #0xe0]
+  stp      q16, q17, [x28, #0x100]
+  stp      q18, q19, [x28, #0x120]
+  stp      q20, q21, [x28, #0x140]
+  stp      q22, q23, [x28, #0x160]
+  stp      q24, q25, [x28, #0x180]
+  stp      q26, q27, [x28, #0x1a0]
+  stp      q28, q29, [x28, #0x1c0]
+  stp      q30, q31, [x28, #0x1e0]
 
   // x0 still holds the exception type.
   // Set x1 to point to the top of our struct on the Stack
@@ -337,13 +301,44 @@ ASM_PFX(CommonExceptionEntry):
   // We do not try to recover.
   bl       ASM_PFX(CommonCExceptionHandler) // Call exception handler
 
+  // Pop as many GP regs as we can before entering the critical section below
+  ldp      x2,  x3,  [sp, #0x10]
+  ldp      x4,  x5,  [sp, #0x20]
+  ldp      x6,  x7,  [sp, #0x30]
+  ldp      x8,  x9,  [sp, #0x40]
+  ldp      x10, x11, [sp, #0x50]
+  ldp      x12, x13, [sp, #0x60]
+  ldp      x14, x15, [sp, #0x70]
+  ldp      x16, x17, [sp, #0x80]
+  ldp      x18, x19, [sp, #0x90]
+  ldp      x20, x21, [sp, #0xa0]
+  ldp      x22, x23, [sp, #0xb0]
+  ldp      x24, x25, [sp, #0xc0]
+  ldp      x26, x27, [sp, #0xd0]
+  ldp      x0,  x1,  [sp], #0xe0
 
-// Defines for popping from stack
+  // Pop FP regs from Stack.
+  ldp      q2,  q3,  [x28, #0x20]
+  ldp      q4,  q5,  [x28, #0x40]
+  ldp      q6,  q7,  [x28, #0x60]
+  ldp      q8,  q9,  [x28, #0x80]
+  ldp      q10, q11, [x28, #0xa0]
+  ldp      q12, q13, [x28, #0xc0]
+  ldp      q14, q15, [x28, #0xe0]
+  ldp      q16, q17, [x28, #0x100]
+  ldp      q18, q19, [x28, #0x120]
+  ldp      q20, q21, [x28, #0x140]
+  ldp      q22, q23, [x28, #0x160]
+  ldp      q24, q25, [x28, #0x180]
+  ldp      q26, q27, [x28, #0x1a0]
+  ldp      q28, q29, [x28, #0x1c0]
+  ldp      q30, q31, [x28, #0x1e0]
+  ldp      q0,  q1,  [x28], #FP_CONTEXT_SIZE
 
-#undef REG_PAIR
-#undef REG_ONE
-#define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)    ldp  REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
-#define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)           ldur REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
+  // Pop the SYS regs we need
+  ldp      x29, x30, [x28]
+  ldr      x28, [x28, #0x10]
+  msr      fpsr, x28
 
   //
   // Disable interrupt(IRQ and FIQ) before restoring context,
@@ -353,35 +348,23 @@ ASM_PFX(CommonExceptionEntry):
   msr   daifset, #3
   isb
 
-  // Adjust SP to pop system registers
-  add     sp, sp, #(GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
-  ALL_SYS_REGS
-
-  EL1_OR_EL2_OR_EL3(x6)
-1:msr      elr_el1, x1   // Exception Link Register
-  msr      spsr_el1,x2   // Saved Processor Status Register 32bit
+  EL1_OR_EL2_OR_EL3(x28)
+1:msr      elr_el1, x29  // Exception Link Register
+  msr      spsr_el1, x30 // Saved Processor Status Register 32bit
   b        4f
-2:msr      elr_el2, x1   // Exception Link Register
-  msr      spsr_el2,x2   // Saved Processor Status Register 32bit
+2:msr      elr_el2, x29  // Exception Link Register
+  msr      spsr_el2, x30 // Saved Processor Status Register 32bit
   b        4f
-3:msr      elr_el3, x1   // Exception Link Register
-  msr      spsr_el3,x2   // Saved Processor Status Register 32bit
-4:msr      fpsr, x3      // Floating point Status Register  32bit
+3:msr      elr_el3, x29  // Exception Link Register
+  msr      spsr_el3, x30 // Saved Processor Status Register 32bit
+4:
 
-  // pop all regs and return from exception.
-  sub     sp, sp, #(FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
-  ALL_GP_REGS
-
-  // Adjust SP to pop next set
-  add      sp, sp, #FP_CONTEXT_SIZE
-  // Pop FP regs to Stack.
-  ALL_FP_REGS
+  // pop remaining GP regs and return from exception.
+  ldr      x30, [sp, #0xf0 - 0xe0]
+  ldp      x28, x29, [sp], #GP_CONTEXT_SIZE - 0xe0
 
   // Adjust SP to be where we started from when we came into the handler.
   // The handler can not change the SP.
-  add      sp, sp, #SYS_CONTEXT_SIZE
+  add      sp, sp, #FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE
 
   eret
-
-#undef REG_PAIR
-#undef REG_ONE
