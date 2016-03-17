@@ -236,7 +236,7 @@ SerialReset (
   //
   // Set the Serial I/O mode
   //
-  This->Mode->ReceiveFifoDepth  = 1;
+  This->Mode->ReceiveFifoDepth  = PcdGet16 (PcdUartDefaultReceiveFifoDepth);
   This->Mode->Timeout           = 1000 * 1000;
   This->Mode->BaudRate          = PcdGet64 (PcdUartDefaultBaudRate);
   This->Mode->DataBits          = (UINT32) PcdGet8 (PcdUartDefaultDataBits);
@@ -508,6 +508,7 @@ SerialDxeInitialize (
   mSerialIoMode.DataBits = (UINT32) PcdGet8 (PcdUartDefaultDataBits);
   mSerialIoMode.Parity   = (UINT32) PcdGet8 (PcdUartDefaultParity);
   mSerialIoMode.StopBits = (UINT32) PcdGet8 (PcdUartDefaultStopBits);
+  mSerialIoMode.ReceiveFifoDepth = PcdGet16 (PcdUartDefaultReceiveFifoDepth);
   mSerialDevicePath.Uart.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
   mSerialDevicePath.Uart.DataBits = PcdGet8 (PcdUartDefaultDataBits);
   mSerialDevicePath.Uart.Parity   = PcdGet8 (PcdUartDefaultParity);

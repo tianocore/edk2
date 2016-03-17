@@ -41,10 +41,11 @@
   gEfiDevicePathProtocolGuid    ## PRODUCES
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity   ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth ## CONSUMES
 
 [Depex]
   TRUE
