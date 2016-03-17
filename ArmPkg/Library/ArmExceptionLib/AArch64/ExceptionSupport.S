@@ -356,18 +356,12 @@ ASM_PFX(CommonExceptionEntry):
   EL1_OR_EL2_OR_EL3(x6)
 1:msr      elr_el1, x1   // Exception Link Register
   msr      spsr_el1,x2   // Saved Processor Status Register 32bit
-  msr      esr_el1, x4   // EL1 Exception syndrome register 32bit
-  msr      far_el1, x5   // EL1 Fault Address Register
   b        4f
 2:msr      elr_el2, x1   // Exception Link Register
   msr      spsr_el2,x2   // Saved Processor Status Register 32bit
-  msr      esr_el2, x4   // EL2 Exception syndrome register 32bit
-  msr      far_el2, x5   // EL2 Fault Address Register
   b        4f
 3:msr      elr_el3, x1   // Exception Link Register
   msr      spsr_el3,x2   // Saved Processor Status Register 32bit
-  msr      esr_el3, x4   // EL3 Exception syndrome register 32bit
-  msr      far_el3, x5   // EL3 Fault Address Register
 4:msr      fpsr, x3      // Floating point Status Register  32bit
 
   // pop all regs and return from exception.
