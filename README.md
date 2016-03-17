@@ -11,6 +11,7 @@ This program attempts to:
 1. Unlock the (unused but locked for writing) `C0000:CFFFF` memory area where VGA ROM would normally reside using `EFI_LEGACY_REGION_PROTOCOL`, `EFI_LEGACY_REGION2_PROTOCOL` or Memory Type Range Registers depending on which method is available.
 2. Install an int10h handler in the `C0000:CFFFF` memory area which handles the most important calls Windows 7 makes and announces lack of support for others. 
 3. Fill in and make available to Windows VESA video mode information compatible with the display adapter present that should enable Windows to write directly to the framebuffer before a more robust display driver takes over from vgapnp.sys.
+4. Lock the `C0000:CFFFF` memory area to prevent further possibly unauthorized writes.
 4. Adjust the Interrupt Vector Table entry for the 10h interrupt handler to point to the shim entry point.
 5. Display the Windows wavy flag (or any other animation of choice).
 6. Chainload `\efi\microsoft\boot\bootmgfw.efi` if present on the same volume so that Windows can continue loading.
@@ -28,6 +29,9 @@ I used a virtual Lubuntu 15.04 install with GCC 4.9. Edit `Conf/target.txt` afte
     make -C BaseTools/Source/C
     build
 You will find the binary in `Build/MdeModule/RELEASE_GCC49/X64/VgaShim.efi` (or a similar folder if using GCC != 4.9).
+
+## Show me teh code
+The actual source lives under [`MdeModulePkg/Applications/VgaShim`](tree/master/MdeModulePkg/Application/VgaShim).
 
 ## Credits
 * This solution is based on a VBE shim prepared by the OVMF project (`QemuVideoDxe/VbeShim`).
