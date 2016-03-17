@@ -31,7 +31,7 @@ I used a virtual Lubuntu 15.04 install with GCC 4.9. Edit `Conf/target.txt` afte
 You will find the binary in `Build/MdeModule/RELEASE_GCC49/X64/VgaShim.efi` (or a similar folder if using GCC != 4.9).
 
 ## Show me teh code
-The actual source lives under [`MdeModulePkg/Applications/VgaShim`](tree/master/MdeModulePkg/Application/VgaShim).
+The actual source lives under [`MdeModulePkg/Applications/VgaShim`](https://github.com/davidcie/VgaShim/tree/master/MdeModulePkg/Application/VgaShim).
 
 ## Credits
 * This solution is based on a VBE shim prepared by the OVMF project (`QemuVideoDxe/VbeShim`).
