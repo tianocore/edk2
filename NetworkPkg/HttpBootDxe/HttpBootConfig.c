@@ -351,6 +351,7 @@ HttpBootFormExtractConfig (
   //
   BufferSize = sizeof (HTTP_BOOT_CONFIG_IFR_NVDATA);
   ZeroMem (&CallbackInfo->HttpBootNvData, BufferSize);
+  StrCpyS (CallbackInfo->HttpBootNvData.Description, DESCRIPTION_STR_MAX_SIZE / sizeof (CHAR16), HTTP_BOOT_DEFAULT_DESCRIPTION_STR);
 
   ConfigRequest = Request;
   if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
@@ -376,7 +377,6 @@ HttpBootFormExtractConfig (
                                 Results,
                                 Progress
                                 );
-  ASSERT_EFI_ERROR (Status);
   
   //
   // Free the allocated config request string.
@@ -487,14 +487,14 @@ HttpBootFormRouteConfig (
   //
   // Create a new boot option according to the configuration data.
   //
-  Status = HttpBootAddBootOption (
-             Private,
-             (CallbackInfo->HttpBootNvData.IpVersion == HTTP_BOOT_IP_VERSION_6) ? TRUE : FALSE,
-             CallbackInfo->HttpBootNvData.Description,
-             CallbackInfo->HttpBootNvData.Uri
-             );
+  HttpBootAddBootOption (
+    Private,
+    (CallbackInfo->HttpBootNvData.IpVersion == HTTP_BOOT_IP_VERSION_6) ? TRUE : FALSE,
+    CallbackInfo->HttpBootNvData.Description,
+    CallbackInfo->HttpBootNvData.Uri
+    );
   
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -533,7 +533,66 @@ HttpBootFormCallback (
   OUT       EFI_BROWSER_ACTION_REQUEST       *ActionRequest
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_INPUT_KEY                   Key;
+  UINTN                           Index;
+  CHAR16                          *Uri;
+  HTTP_BOOT_FORM_CALLBACK_INFO    *CallbackInfo;
+  
+  if (This == NULL || Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CallbackInfo = HTTP_BOOT_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
+  
+  if (Action != EFI_BROWSER_ACTION_CHANGING) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  switch (QuestionId) {
+  case KEY_INITIATOR_URI:
+    //
+    // Get user input URI string
+    //
+    Uri = HiiGetString (CallbackInfo->RegisteredHandle, Value->string, NULL);
+
+    //
+    // Convert the scheme to all lower case.
+    //
+    for (Index = 0; Index < StrLen (Uri); Index++) {
+      if (Uri[Index] == L':') {
+        break;
+      }
+      if (Uri[Index] >= L'A' && Uri[Index] <= L'Z') {
+        Uri[Index] -= (CHAR16)(L'A' - L'a');
+      }
+    }
+
+    //
+    // Set the converted URI string back
+    //
+    HiiSetString (CallbackInfo->RegisteredHandle, Value->string, Uri, NULL);
+
+    //
+    // We only accept http and https, pop up a message box for unsupported URI.
+    //
+    if ((StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 7) != 0)) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"ERROR: Unsupported URI!",
+        L"Only supports HTTP and HTTPS",
+        NULL
+        );
+    }
+
+    FreePool (Uri);
+    break;
+
+  default:
+    break;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
