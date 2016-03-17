@@ -7,8 +7,8 @@ subsidiaries in the United States and other countries.
 * Other names and brands may be claimed as the property of others.
 Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.
 
-EDK II packages can be checked out from the following SVN address:
-https://svn.code.sf.net/p/edk2/code/trunk/edk2
+EDK II packages can be gathered from the following address:
+  https://github.com/tianocore/edk2.git
 
 The detailed introduction of these packages can be found in each package
 description file. (The *.dec file under the package directory)
@@ -17,7 +17,7 @@ description file. (The *.dec file under the package directory)
 -------------------------------------------------------------------------------
 The most recent version of the setup instructions is available on the EDK II
 web-site:
-  http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Step-by-step_instructions
+  https://github.com/tianocore/tianocore.github.io/wiki/Getting%20Started%20with%20EDK%20II
 
 
 -------------------------------------------------------------------------------
@@ -54,18 +54,18 @@ the Supported Tool Chains comment.
 Alternatively, you may use the build command's -t option to specify a different
 tool chain tag name: build -t VS2008 ... , for example.  Using this method will
 require that you always use the build command's -t option. If you use 64-bit 
-windows OS, you should use tool chain tag name with x86, such as VS2008x86.
+Windows OS, you should use tool chain tag name with x86, such as VS2008x86.
 
 
-Next, go to the module directory and begin to build.  This example is for the
+Next, go to the module directory and begin to build. This example is for the
 HelloWorld application.
 
     c:\MyWork\edk2\> cd MdeModulePkg\Application\HelloWorld
     c:\MyWork\edk2\> build
 
 If you want to build the a module in another package (for example, 
-MdePkg\Library\BaseLib\BaseLib.inf), please edit the file,
-%WORKSPACE%\Conf\Target.txt, first.
+MdePkg\Library\BaseLib\BaseLib.inf), please edit the file
+%WORKSPACE%\Conf\Target.txt first.
 
 Change the following line
     ACTIVE_PLATFORM       = MdeModulePkg/MdeModulePkg.dsc
@@ -119,12 +119,10 @@ run       - Launch NT32 shell (only valid for NT32 platform)
 Tools in Python
 ---------------
 
-* Run buld tool written in Python from source
-  The build tool written in Python can be executed from its source directly as
-  long as you have the Python interpreter (version 2.5.4) installed. The source
-  of Python code is locating at:
-
-    https://svn.code.sf.net/p/edk2-buildtools/code/trunk/BaseTools
+* Run build tool written in Python from source
+  It can be executed from its source directly as long as you have the Python
+  interpreter (version 2.5.4) installed. The source code is located at
+  WORKSPACE/BaseTools.
 
   where:
 
