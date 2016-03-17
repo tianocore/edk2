@@ -2074,6 +2074,10 @@
   # @ValidRange 0x80000001 | 0 - 4
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
 
+  ## Indicates the receive FIFO depth of UART controller.<BR><BR>
+  # @Prompt Default UART Receive FIFO Depth.
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|1|UINT16|0x00000030
+
   ## Error level for hardware recorder.
   #  If value 0, platform does not support feature of hardware error record.
   # @Prompt Error Level For Hardware Recorder
