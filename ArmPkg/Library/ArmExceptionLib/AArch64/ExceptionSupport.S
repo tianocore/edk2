@@ -286,26 +286,25 @@ ASM_PFX(CommonExceptionEntry):
   EL1_OR_EL2_OR_EL3(x1)
 1:mrs      x1, elr_el1   // Exception Link Register
   mrs      x2, spsr_el1  // Saved Processor Status Register 32bit
-  mrs      x3, fpsr      // Floating point Status Register  32bit
   mrs      x4, esr_el1   // EL1 Exception syndrome register 32bit
   mrs      x5, far_el1   // EL1 Fault Address Register
   b        4f
 
 2:mrs      x1, elr_el2   // Exception Link Register
   mrs      x2, spsr_el2  // Saved Processor Status Register 32bit
-  mrs      x3, fpsr      // Floating point Status Register  32bit
   mrs      x4, esr_el2   // EL2 Exception syndrome register 32bit
   mrs      x5, far_el2   // EL2 Fault Address Register
   b        4f
 
 3:mrs      x1, elr_el3   // Exception Link Register
   mrs      x2, spsr_el3  // Saved Processor Status Register 32bit
-  mrs      x3, fpsr      // Floating point Status Register  32bit
   mrs      x4, esr_el3   // EL3 Exception syndrome register 32bit
   mrs      x5, far_el3   // EL3 Fault Address Register
 
+4:mrs      x3, fpsr      // Floating point Status Register  32bit
+
   // Adjust SP to save next set
-4:add      sp, sp, #FP_CONTEXT_SIZE
+  add      sp, sp, #FP_CONTEXT_SIZE
 
   // Push FP regs to Stack.
   ALL_FP_REGS
@@ -357,22 +356,21 @@ ASM_PFX(CommonExceptionEntry):
   EL1_OR_EL2_OR_EL3(x6)
 1:msr      elr_el1, x1   // Exception Link Register
   msr      spsr_el1,x2   // Saved Processor Status Register 32bit
-  msr      fpsr, x3      // Floating point Status Register  32bit
   msr      esr_el1, x4   // EL1 Exception syndrome register 32bit
   msr      far_el1, x5   // EL1 Fault Address Register
   b        4f
 2:msr      elr_el2, x1   // Exception Link Register
   msr      spsr_el2,x2   // Saved Processor Status Register 32bit
-  msr      fpsr, x3      // Floating point Status Register  32bit
   msr      esr_el2, x4   // EL2 Exception syndrome register 32bit
   msr      far_el2, x5   // EL2 Fault Address Register
   b        4f
 3:msr      elr_el3, x1   // Exception Link Register
   msr      spsr_el3,x2   // Saved Processor Status Register 32bit
-  msr      fpsr, x3      // Floating point Status Register  32bit
   msr      esr_el3, x4   // EL3 Exception syndrome register 32bit
   msr      far_el3, x5   // EL3 Fault Address Register
-4:// pop all regs and return from exception.
+4:msr      fpsr, x3      // Floating point Status Register  32bit
+
+  // pop all regs and return from exception.
   sub     sp, sp, #(FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
   ALL_GP_REGS
 
