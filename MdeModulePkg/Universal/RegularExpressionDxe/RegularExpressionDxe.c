@@ -2,7 +2,7 @@
 
   EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
 
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License that accompanies this
@@ -91,6 +91,10 @@ OnigurumaMatch (
   CHAR8           ErrorMessage[ONIG_MAX_ERROR_MESSAGE_LEN];
   UINT32          Index;
   OnigUChar       *Start;
+  EFI_STATUS      Status;
+
+
+  Status = EFI_SUCCESS;
 
   //
   // Detemine the internal syntax type
@@ -102,7 +106,7 @@ OnigurumaMatch (
     OnigSyntax = ONIG_SYNTAX_PERL;
   } else {
     DEBUG ((DEBUG_ERROR, "Unsupported regex syntax - using default\n"));
-    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
   }
 
   //
@@ -143,6 +147,7 @@ OnigurumaMatch (
                  Region,
                  ONIG_OPTION_NONE
                  );
+
   if (OnigResult >= 0) {
     *Result = TRUE;
   } else {
@@ -150,6 +155,9 @@ OnigurumaMatch (
     if (OnigResult != ONIG_MISMATCH) {
       onig_error_code_to_str (ErrorMessage, OnigResult);
       DEBUG ((DEBUG_ERROR, "Regex match failed: %a\n", ErrorMessage));
+      onig_region_free (Region, 1);
+      onig_free (OnigRegex);
+      return EFI_DEVICE_ERROR;
     }
   }
 
@@ -158,14 +166,30 @@ OnigurumaMatch (
   //
   if (*Result && Captures != NULL) {
     *CapturesCount = Region->num_regs;
-    *Captures = AllocatePool (*CapturesCount * sizeof(**Captures));
+    *Captures = AllocateZeroPool (*CapturesCount * sizeof(**Captures));
     if (*Captures != NULL) {
       for (Index = 0; Index < *CapturesCount; ++Index) {
         //
         // Region beg/end values represent bytes, not characters
         //
-        (*Captures)[Index].CapturePtr = (CHAR16*)((UINTN)String + Region->beg[Index]);
         (*Captures)[Index].Length = (Region->end[Index] - Region->beg[Index]) / sizeof(CHAR16);
+        (*Captures)[Index].CapturePtr = AllocateCopyPool (
+                                          ((*Captures)[Index].Length) * sizeof (CHAR16),
+                                          (CHAR16*)((UINTN)String + Region->beg[Index])
+                                          );
+        if ((*Captures)[Index].CapturePtr == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
+      }
+
+      if (EFI_ERROR (Status)) {
+        for (Index = 0; Index < *CapturesCount; ++Index) {
+          if ((*Captures)[Index].CapturePtr != NULL) {
+            FreePool ((CHAR16*)(*Captures)[Index].CapturePtr);
+          }
+        }
+        FreePool (*Captures);
       }
     }
   }
@@ -173,7 +197,7 @@ OnigurumaMatch (
   onig_region_free (Region, 1);
   onig_free (OnigRegex);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
