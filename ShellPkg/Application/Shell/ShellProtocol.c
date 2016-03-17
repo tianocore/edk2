@@ -1738,10 +1738,7 @@ EfiShellExecute(
   CHAR16                    *Temp;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   UINTN                     Size;
-  EFI_STATUS                CalleeStatusCode;
 
-  CalleeStatusCode = EFI_SUCCESS;
-  
   if ((PcdGet8(PcdShellSupportLevel) < 1)) {
     return (EFI_UNSUPPORTED);
   }
