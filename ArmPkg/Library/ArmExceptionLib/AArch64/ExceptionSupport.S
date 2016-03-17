@@ -187,9 +187,13 @@ VECTOR_BASE(ExceptionHandlersStart)
   mov       x0, #\val
 
   // Jump to our general handler to deal with all the common parts and process the exception.
+#if defined(ARM_RELOCATE_VECTORS)
   ldr       x1, =ASM_PFX(CommonExceptionEntry)
   br        x1
   .ltorg
+#else
+  b         ASM_PFX(CommonExceptionEntry)
+#endif
   .endm
 
 //
