@@ -1,7 +1,7 @@
 /** @file
   Sample platform variable cleanup library implementation.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -99,6 +99,15 @@ IsUserVariable (
 {
   EFI_STATUS                    Status;
   VAR_CHECK_VARIABLE_PROPERTY   Property;
+
+  if (mVarCheck == NULL) {
+    gBS->LocateProtocol (
+           &gEdkiiVarCheckProtocolGuid,
+           NULL,
+           (VOID **) &mVarCheck
+           );
+  }
+  ASSERT (mVarCheck != NULL);
 
   ZeroMem (&Property, sizeof (Property));
   Status = mVarCheck->VariablePropertyGet (
@@ -1224,13 +1233,6 @@ PlatformVarCleanupLibConstructor (
 
   mLastVarErrorFlag = InternalGetVarErrorFlag ();
   DEBUG ((EFI_D_INFO, "mLastVarErrorFlag - 0x%02x\n", mLastVarErrorFlag));
-
-  Status = gBS->LocateProtocol (
-                  &gEdkiiVarCheckProtocolGuid,
-                  NULL,
-                  (VOID **) &mVarCheck
-                  );
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Register EFI_END_OF_DXE_EVENT_GROUP_GUID event.
