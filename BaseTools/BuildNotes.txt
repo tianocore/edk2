@@ -18,7 +18,7 @@ Windows:
 
 Unix-like:
   a) make -C <buildtools_project>/BaseTools
-  b) Look over https://edk2.tianocore.org/step-by-step-instructions.html
+  b) Look over https://github.com/tianocore/tianocore.github.io/wiki/Getting%20Started%20with%20EDK%20II
      for a helpful step-by-step guide for building 'Hello World' on
      various operating systems with edk2.
 
@@ -34,7 +34,7 @@ Tools in Python
 * Convert Python source to exe file
 
   The tools written in Python can be converted into executable program which can 
-  be executed without installing a Python interpreter.  (Generally it is easier
+  be executed without installing a Python interpreter. (Generally it is easier
   to run the scripts from their source on operating systems other than Windows.)
 
   For Windows and Linux, the conversion tool package is called cx_Freeze, its
