@@ -558,7 +558,7 @@ ArmClearMemoryRegionReadOnly (
   return SetMemoryRegionAttribute (
            BaseAddress,
            Length,
-           TT_AP_NO_RO,
+           TT_AP_RW_RW,
            ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK));
 }
 
