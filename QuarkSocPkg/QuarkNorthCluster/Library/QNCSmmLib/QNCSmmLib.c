@@ -38,14 +38,12 @@ InternalTriggerSmi (
   IN UINT8                     Data
   )
 {
-  UINT16        PM1BLK_Base;
   UINT16        GPE0BLK_Base;
   UINT32        NewValue;
 
   //
-  // Get PM1BLK_Base & GPE0BLK_Base
+  // Get GPE0BLK_Base
   //
-  PM1BLK_Base = PcdGet16 (PcdPm1blkIoBaseAddress);
   GPE0BLK_Base = (UINT16)(LpcPciCfg32 (R_QNC_LPC_GPE0BLK) & 0xFFFF);
 
 

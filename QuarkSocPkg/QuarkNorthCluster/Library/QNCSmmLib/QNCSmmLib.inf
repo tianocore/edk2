@@ -44,7 +44,6 @@
   QNCAccessLib
 
 [Pcd]
-  gEfiQuarkNcSocIdTokenSpaceGuid.PcdPm1blkIoBaseAddress
   gEfiQuarkNcSocIdTokenSpaceGuid.PcdGpe0blkIoBaseAddress
   gEfiQuarkNcSocIdTokenSpaceGuid.PcdSmmDataPort
   gEfiQuarkNcSocIdTokenSpaceGuid.PcdSmmActivationPort
