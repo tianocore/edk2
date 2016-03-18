@@ -1710,7 +1710,6 @@ UsbSerialDriverBindingStart (
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
   UART_DEVICE_PATH                    *Uart;
   UART_FLOW_CONTROL_DEVICE_PATH       *FlowControl;
-  UINT32                              FlowControlMap;
   UINT32                              Control;
   EFI_DEVICE_PATH_PROTOCOL            *TempDevicePath;
 
@@ -1969,7 +1968,6 @@ UsbSerialDriverBindingStart (
   UsbSerialDevice->ParentDevicePath = ParentDevicePath;
   UsbSerialDevice->ControllerHandle = NULL;
   FlowControl                       = NULL;
-  FlowControlMap                    = 0;
 
   //
   // Allocate space for the receive buffer
