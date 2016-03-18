@@ -2215,10 +2215,6 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
-
   for (; *OutputString != 0; OutputString++) {
     DebugSerialWrite (*OutputString);
   }
