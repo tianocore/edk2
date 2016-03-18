@@ -96,13 +96,11 @@ SmmClear (
   VOID
   )
 {
-  UINT16                       PM1BLK_Base;
   UINT16                       GPE0BLK_Base;
 
   //
-  // Get PM1BLK_Base & GPE0BLK_Base
+  // Get GPE0BLK_Base
   //
-  PM1BLK_Base  = PcdGet16 (PcdPm1blkIoBaseAddress);
   GPE0BLK_Base = PcdGet16 (PcdGpe0blkIoBaseAddress);
 
   //
