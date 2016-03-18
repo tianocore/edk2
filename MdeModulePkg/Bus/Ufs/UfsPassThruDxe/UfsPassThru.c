@@ -605,10 +605,6 @@ UfsPassThruGetNextTarget (
   IN OUT UINT8                           **Target
   )
 {
-  UFS_PASS_THRU_PRIVATE_DATA      *Private;
-
-  Private = UFS_PASS_THRU_PRIVATE_DATA_FROM_THIS (This);
-
   if (Target == NULL || *Target == NULL) {
     return EFI_INVALID_PARAMETER;
   }

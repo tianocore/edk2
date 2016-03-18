@@ -1431,7 +1431,6 @@ UfsExecScsiCmds (
   UINTN                                MapLength;
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
   EDKII_UFS_HOST_CONTROLLER_OPERATION  Flag;
-  UFS_DATA_DIRECTION                   DataDirection;
   UTP_TR_PRD                           *PrdtBase;
   EFI_TPL                              OldTpl;
   UFS_PASS_THRU_TRANS_REQ              *TransReq;
@@ -1475,18 +1474,14 @@ UfsExecScsiCmds (
   if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
     DataBuf       = Packet->InDataBuffer;
     DataLen       = Packet->InTransferLength;
-    DataDirection = UfsDataIn;
     Flag          = EdkiiUfsHcOperationBusMasterWrite;
   } else {
     DataBuf       = Packet->OutDataBuffer;
     DataLen       = Packet->OutTransferLength;
-    DataDirection = UfsDataOut;
     Flag          = EdkiiUfsHcOperationBusMasterRead;
   }
 
-  if (DataLen == 0) {
-    DataDirection = UfsNoData;
-  } else {
+  if (DataLen != 0) {
     MapLength = DataLen;
     Status    = UfsHc->Map (
                          UfsHc,
