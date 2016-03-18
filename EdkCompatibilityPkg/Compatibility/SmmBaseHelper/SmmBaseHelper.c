@@ -228,7 +228,6 @@ WriteCpuSaveState (
   IN EFI_SMM_CPU_SAVE_STATE  *ToWrite
   )
 {
-  EFI_STATUS             Status;
   UINTN                  Index;
   EFI_SMM_CPU_STATE      *State;
   EFI_SMI_CPU_SAVE_STATE *SaveState;
@@ -250,14 +249,14 @@ WriteCpuSaveState (
   State->x86.AutoHALTRestart = SaveState->AutoHALTRestart;
   
   for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
-    Status = mSmmCpu->WriteSaveState (
-                        mSmmCpu,
-                        (UINTN)sizeof (UINT32),
-                        mCpuSaveStateConvTable[Index].Register,
-                        CpuIndex,
-                        ((UINT8 *)SaveState) + 
-                        mCpuSaveStateConvTable[Index].Offset
-                        );
+    mSmmCpu->WriteSaveState (
+               mSmmCpu,
+               (UINTN)sizeof (UINT32),
+               mCpuSaveStateConvTable[Index].Register,
+               CpuIndex,
+               ((UINT8 *)SaveState) +
+               mCpuSaveStateConvTable[Index].Offset
+               );
   }
 }
 
@@ -345,14 +344,12 @@ PageFaultHandler (
   )
 {
   BOOLEAN        IsHandled;
-  UINT64         *PageTable;
   UINT64         PFAddress;
   UINTN          NumCpuStatePages;
   
   ASSERT (mPageTableHookEnabled);
   AcquireSpinLock (&mPFLock);
 
-  PageTable = (UINT64*)(UINTN)(AsmReadCr3 () & mPhyMask);
   PFAddress = AsmReadCr2 ();
   NumCpuStatePages = EFI_SIZE_TO_PAGES (mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE));
   IsHandled = FALSE;
