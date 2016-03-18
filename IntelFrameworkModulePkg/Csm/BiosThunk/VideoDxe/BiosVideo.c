@@ -1257,16 +1257,15 @@ HasChildHandle (
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  *OpenInfoBuffer;
   UINTN                                EntryCount;
   BOOLEAN                              HasChild;
-  EFI_STATUS                           Status;
 
   EntryCount = 0;
   HasChild   = FALSE;
-  Status = gBS->OpenProtocolInformation (
-                  Controller,
-                  &gEfiPciIoProtocolGuid,
-                  &OpenInfoBuffer,
-                  &EntryCount
-                  );
+  gBS->OpenProtocolInformation (
+         Controller,
+         &gEfiPciIoProtocolGuid,
+         &OpenInfoBuffer,
+         &EntryCount
+         );
   for (Index = 0; Index < EntryCount; Index++) {
     if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
       HasChild = TRUE;
