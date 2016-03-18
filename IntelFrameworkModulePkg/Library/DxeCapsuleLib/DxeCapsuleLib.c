@@ -139,7 +139,6 @@ ProcessFmpCapsuleImage (
 {
   EFI_STATUS                                    Status;
   EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER        *FmpCapsuleHeader;
-  UINT8                                         *EndOfCapsule;
   EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader;
   EFI_HANDLE                                    ImageHandle;
   UINT64                                        *ItemOffsetList;
@@ -170,7 +169,6 @@ ProcessFmpCapsuleImage (
   DriverDevicePath = NULL;
 
   FmpCapsuleHeader = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER *) ((UINT8 *) CapsuleHeader + CapsuleHeader->HeaderSize);
-  EndOfCapsule     = (UINT8 *) CapsuleHeader + CapsuleHeader->CapsuleImageSize;
 
   if (FmpCapsuleHeader->Version > EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION) {
     return EFI_INVALID_PARAMETER;
