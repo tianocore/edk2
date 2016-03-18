@@ -877,7 +877,6 @@ Ikev2ChildSaSilentDelete (
   IKEV2_CHILD_SA_SESSION    *ChildSession;
   EFI_IPSEC_CONFIG_SELECTOR *LocalSelector;
   EFI_IPSEC_CONFIG_SELECTOR *RemoteSelector;
-  IKE_UDP_SERVICE           *UdpService;
   IPSEC_PRIVATE_DATA        *Private;
 
   if (IkeSaSession == NULL) {
@@ -889,7 +888,6 @@ Ikev2ChildSaSilentDelete (
   ChildSession    = NULL;
   LocalSelector   = NULL;
   RemoteSelector  = NULL;
-  UdpService      = IkeSaSession->SessionCommon.UdpService;
 
   Private = IkeSaSession->SessionCommon.Private;
 
