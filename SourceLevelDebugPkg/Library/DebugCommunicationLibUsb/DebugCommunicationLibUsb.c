@@ -597,7 +597,6 @@ InitializeUsbDebugHardware (
   RETURN_STATUS             Status;
   USB_DEBUG_PORT_REGISTER   *UsbDebugPortRegister;
   USB_DEBUG_PORT_DESCRIPTOR UsbDebugPortDescriptor;
-  UINT16                    PciCmd;
   UINT32                    *PortStatus;
   UINT32                    *UsbCmd;
   UINT32                    *UsbStatus;
@@ -606,7 +605,6 @@ InitializeUsbDebugHardware (
   UINT8                     Length;
 
   UsbDebugPortRegister = (USB_DEBUG_PORT_REGISTER *)(UINTN)(Handle->UsbDebugPortMemoryBase + Handle->DebugPortOffset);
-  PciCmd      = PciRead16 (PcdGet32(PcdUsbEhciPciAddress) + PCI_COMMAND_OFFSET);
   UsbHCSParam = (UINT32 *)(UINTN)(Handle->EhciMemoryBase + 0x04);
   UsbCmd      = (UINT32 *)(UINTN)(Handle->EhciMemoryBase + 0x20);
   UsbStatus   = (UINT32 *)(UINTN)(Handle->EhciMemoryBase + 0x24);
@@ -774,7 +772,6 @@ DebugPortReadBuffer (
   )
 {
   USB_DEBUG_PORT_HANDLE     *UsbDebugPortHandle;
-  USB_DEBUG_PORT_REGISTER   *UsbDebugPortRegister;
   RETURN_STATUS             Status;
   UINT8                     Index;
 
@@ -798,8 +795,6 @@ DebugPortReadBuffer (
       return 0;
     }
   }
-
-  UsbDebugPortRegister = (USB_DEBUG_PORT_REGISTER *)(UINTN)(UsbDebugPortHandle->UsbDebugPortMemoryBase + UsbDebugPortHandle->DebugPortOffset);
 
   //
   // Read data from buffer
@@ -1042,7 +1037,6 @@ DebugPortInitialize (
 {
   RETURN_STATUS             Status;
   USB_DEBUG_PORT_HANDLE     Handle;
-  USB_DEBUG_PORT_HANDLE     *UsbDebugPortHandle;
 
   //
   // Validate the PCD PcdDebugPortHandleBufferSize value 
@@ -1050,15 +1044,9 @@ DebugPortInitialize (
   ASSERT (PcdGet16 (PcdDebugPortHandleBufferSize) == sizeof (USB_DEBUG_PORT_HANDLE));
 
   if (Function == NULL && Context != NULL) {
-    UsbDebugPortHandle = (USB_DEBUG_PORT_HANDLE *)Context;
-  } else {
-    ZeroMem(&Handle, sizeof (USB_DEBUG_PORT_HANDLE));
-    UsbDebugPortHandle = &Handle;
-  }
-
-  if (Function == NULL && Context != NULL) {
     return (DEBUG_PORT_HANDLE *) Context;
   }
+  ZeroMem(&Handle, sizeof (USB_DEBUG_PORT_HANDLE));
 
   Status = CalculateUsbDebugPortBar(&Handle.DebugPortOffset, &Handle.DebugPortBarNumber);
   if (RETURN_ERROR (Status)) {
