@@ -452,9 +452,7 @@ Returns:
   UINTN                         Index;
   UINTN                         Count;
   UINTN                         Start;
-  UINTN                         End;
   UINTN                         Top;
-  UINTN                         Bottom;
   CHAR16                        *StringPtr;
   UINTN                         LeftColumn;
   UINTN                         RightColumn;
@@ -529,10 +527,8 @@ Returns:
   // each end plus a border.
   //
   Start     = (DimensionsWidth - LargestString - 2) / 2 + LeftColumn + 1;
-  End       = Start + LargestString + 1;
 
   Top       = ((DimensionsHeight - NumberOfLines - 2) / 2) + TopRow - 1;
-  Bottom    = Top + NumberOfLines + 2;
 
   //
   // Disable cursor

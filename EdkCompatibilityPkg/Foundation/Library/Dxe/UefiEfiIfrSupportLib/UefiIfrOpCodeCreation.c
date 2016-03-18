@@ -485,7 +485,6 @@ CreateNumericOpCode (
   IN OUT EFI_HII_UPDATE_DATA *Data
   )
 {
-  UINTN                       Length;
   EFI_STATUS                  Status;
   EFI_IFR_NUMERIC             Numeric;
   MINMAXSTEP_DATA             MinMaxStep;
@@ -498,7 +497,6 @@ CreateNumericOpCode (
     return EFI_INVALID_PARAMETER;
   }
 
-  Length = sizeof (EFI_IFR_NUMERIC) + sizeof (EFI_IFR_DEFAULT) + sizeof (EFI_IFR_END);
   if (Data->Offset + sizeof (EFI_IFR_CHECKBOX) > Data->BufferSize) {
     return EFI_BUFFER_TOO_SMALL;
   }

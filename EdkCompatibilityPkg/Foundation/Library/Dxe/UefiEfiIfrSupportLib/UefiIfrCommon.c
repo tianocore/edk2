@@ -522,7 +522,6 @@ Returns:
   EFI_HII_DATABASE_PROTOCOL    *HiiDatabase;
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
   UINT8                        *Package;
-  UINT8                        *FormSet;
   UINT8                        *OpCodeData;
   UINT32                       Offset;
   UINT32                       Offset2;
@@ -572,7 +571,6 @@ Returns:
   //
   Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
   Offset2 = 0;
-  FormSet = NULL;
   EfiCopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
 
   while (Offset < PackageListLength) {
@@ -660,7 +658,6 @@ Returns:
   EFI_HII_DATABASE_PROTOCOL    *HiiDatabase;
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
   UINT8                        *Package;
-  UINT8                        *FormSet;
   UINT8                        *OpCodeData;
   UINT32                       Offset;
   UINT32                       Offset2;
@@ -709,7 +706,6 @@ Returns:
   //
   Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
   Offset2 = 0;
-  FormSet = NULL;
   EfiCopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
 
   while (Offset < PackageListLength) {
