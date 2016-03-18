@@ -720,7 +720,6 @@ UpdateLegacyDeviceOrderPage (
   LEGACY_MENU_ENTRY           *NewMenuEntry;
   EFI_STRING_ID               StrRef;
   EFI_STRING_ID               StrRefHelp;
-  BBS_TYPE                    BbsType;
   UINT16                      *Default;
   UINT16                      Index;
   UINT16                      Key;
@@ -738,7 +737,6 @@ UpdateLegacyDeviceOrderPage (
   TypeStr     = NULL;
   TypeStrHelp = NULL;
   Default     = NULL;
-  BbsType     = BBS_FLOPPY;
 
   RefreshLegacyUpdateData();
 
@@ -752,7 +750,6 @@ UpdateLegacyDeviceOrderPage (
     TypeStr     = STR_FLOPPY;
     TypeStrHelp = STR_FLOPPY_HELP;
     FormTitle   = STR_FLOPPY_TITLE;
-    BbsType     = BBS_FLOPPY;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->CurrentNvData.LegacyFD;
     break;
 
@@ -762,7 +759,6 @@ UpdateLegacyDeviceOrderPage (
     TypeStr     = STR_HARDDISK;
     TypeStrHelp = STR_HARDDISK_HELP;
     FormTitle   = STR_HARDDISK_TITLE;
-    BbsType     = BBS_HARDDISK;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->CurrentNvData.LegacyHD;
     break;
 
@@ -772,7 +768,6 @@ UpdateLegacyDeviceOrderPage (
     TypeStr     = STR_CDROM;
     TypeStrHelp = STR_CDROM_HELP;
     FormTitle   = STR_CDROM_TITLE;
-    BbsType     = BBS_CDROM;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->CurrentNvData.LegacyCD;
     break;
 
@@ -782,7 +777,6 @@ UpdateLegacyDeviceOrderPage (
     TypeStr     = STR_NET;
     TypeStrHelp = STR_NET_HELP;
     FormTitle   = STR_NET_TITLE;
-    BbsType     = BBS_EMBED_NETWORK;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->CurrentNvData.LegacyNET;
     break;
 
@@ -792,7 +786,6 @@ UpdateLegacyDeviceOrderPage (
     TypeStr     = STR_BEV;
     TypeStrHelp = STR_BEV_HELP;
     FormTitle   = STR_BEV_TITLE;
-    BbsType     = BBS_BEV_DEVICE;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->CurrentNvData.LegacyBEV;
     break;
 
@@ -899,8 +892,6 @@ AdjustOptionValue (
   )
 {
   UINTN                       Number;
-  BBS_TYPE                    BbsType;
-  LEGACY_DEV_ORDER_ENTRY      *DevOrder;
   UINT16                      *Default;
   LEGACY_BOOT_NV_DATA         *CurrentNVMap;
   UINT16                      *CurrentVal;
@@ -915,9 +906,7 @@ AdjustOptionValue (
   UINTN                       Bit;
 
   Number = 0;
-  BbsType = BBS_UNKNOWN;
   CurrentVal = 0;
-  DevOrder = NULL;
   Default = NULL;
   NewValue = 0;
   NewValuePos = 0;
@@ -934,27 +923,22 @@ AdjustOptionValue (
 
   if (QuestionId >= LEGACY_FD_QUESTION_ID && QuestionId < LEGACY_FD_QUESTION_ID + MAX_MENU_NUMBER) {
     Number      = (UINT16) LegacyFDMenu.MenuNumber;
-    BbsType     = BBS_FLOPPY;
     CurrentVal  = CurrentNVMap->LegacyFD;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->LastTimeNvData.LegacyFD;
   } else if (QuestionId >= LEGACY_HD_QUESTION_ID && QuestionId < LEGACY_HD_QUESTION_ID + MAX_MENU_NUMBER) {
     Number      = (UINT16) LegacyHDMenu.MenuNumber;
-    BbsType     = BBS_HARDDISK;
     CurrentVal  = CurrentNVMap->LegacyHD;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->LastTimeNvData.LegacyHD;
   } else if (QuestionId >= LEGACY_CD_QUESTION_ID && QuestionId < LEGACY_CD_QUESTION_ID + MAX_MENU_NUMBER) {
     Number      = (UINT16) LegacyCDMenu.MenuNumber;
-    BbsType     = BBS_CDROM;
     CurrentVal  = CurrentNVMap->LegacyCD;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->LastTimeNvData.LegacyCD;
   } else if (QuestionId >= LEGACY_NET_QUESTION_ID && QuestionId < LEGACY_NET_QUESTION_ID + MAX_MENU_NUMBER) {
     Number      = (UINT16) LegacyNETMenu.MenuNumber;
-    BbsType     = BBS_EMBED_NETWORK;
     CurrentVal  = CurrentNVMap->LegacyNET;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->LastTimeNvData.LegacyNET;
   } else if (QuestionId >= LEGACY_BEV_QUESTION_ID && QuestionId < LEGACY_BEV_QUESTION_ID + MAX_MENU_NUMBER) {
     Number      = (UINT16) LegacyBEVMenu.MenuNumber;
-    BbsType     = BBS_BEV_DEVICE;
     CurrentVal  = CurrentNVMap->LegacyBEV;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->LastTimeNvData.LegacyBEV;
   }
