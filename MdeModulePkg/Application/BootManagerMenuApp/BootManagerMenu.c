@@ -500,7 +500,6 @@ DrawBootPopupMenu (
   EFI_STRING            String;
   UINTN                 Index;
   UINTN                 Width;  
-  UINTN                 Height;
   UINTN                 StartCol;
   UINTN                 StartRow;
   UINTN                 PrintRow;
@@ -514,7 +513,6 @@ DrawBootPopupMenu (
   SavedAttribute = gST->ConOut->Mode->Attribute;
   gST->ConOut->SetAttribute (gST->ConOut, EFI_WHITE | EFI_BACKGROUND_BLUE);
   Width    = BootMenuData->MenuScreen.Width;
-  Height   = BootMenuData->MenuScreen.Height;
   StartCol = BootMenuData->MenuScreen.StartCol;
   StartRow = BootMenuData->MenuScreen.StartRow;
   ItemCountPerScreen = BootMenuData->ScrollBarControl.ItemCountPerScreen;
