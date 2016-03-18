@@ -342,7 +342,6 @@ InitProtectedMemRange (
   UINTN                            NumberOfSpliteRange;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
   UINTN                            TotalSize;
-  EFI_STATUS                       Status;
   EFI_PHYSICAL_ADDRESS             ProtectBaseAddress;
   EFI_PHYSICAL_ADDRESS             ProtectEndAddress;
   EFI_PHYSICAL_ADDRESS             Top2MBAlignedAddress;
@@ -358,10 +357,10 @@ InitProtectedMemRange (
   //
   // Get MMIO ranges from GCD and add them into protected memory ranges.
   //
-  Status = gDS->GetMemorySpaceMap (
-                &NumberOfDescriptors,
-                &MemorySpaceMap
-                );
+  gDS->GetMemorySpaceMap (
+       &NumberOfDescriptors,
+       &MemorySpaceMap
+       );
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
       NumberOfMmioDescriptors++;
@@ -776,18 +775,16 @@ InitSmmProfileCallBack (
   IN EFI_HANDLE      Handle
   )
 {
-  EFI_STATUS         Status;
-
   //
   // Save to variable so that SMM profile data can be found.
   //
-  Status = gRT->SetVariable (
-                  SMM_PROFILE_NAME,
-                  &gEfiCallerIdGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  sizeof(mSmmProfileBase),
-                  &mSmmProfileBase
-                  );
+  gRT->SetVariable (
+         SMM_PROFILE_NAME,
+         &gEfiCallerIdGuid,
+         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+         sizeof(mSmmProfileBase),
+         &mSmmProfileBase
+         );
 
   //
   // Get Software SMI from FADT
@@ -1311,7 +1308,6 @@ SmmProfilePFHandler (
   SMM_PROFILE_ENTRY     *SmmProfileEntry;
   UINT64                SmiCommand;
   EFI_STATUS            Status;
-  UINTN                 SwSmiCpuIndex;
   UINT8                 SoftSmiValue;
   EFI_SMM_SAVE_STATE_IO_INFO    IoInfo;
 
@@ -1355,10 +1351,6 @@ SmmProfilePFHandler (
     }
 
     //
-    // Try to find which CPU trigger SWSMI
-    //
-    SwSmiCpuIndex = 0;
-    //
     // Indicate it is not software SMI
     //
     SmiCommand    = 0xFFFFFFFFFFFFFFFFULL;
@@ -1368,10 +1360,6 @@ SmmProfilePFHandler (
         continue;
       }
       if (IoInfo.IoPort == mSmiCommandPort) {
-        //
-        // Great! Find it.
-        //
-        SwSmiCpuIndex = Index;
         //
         // A software SMI triggered by SMI command port has been found, get SmiCommand from SMI command port.
         //
