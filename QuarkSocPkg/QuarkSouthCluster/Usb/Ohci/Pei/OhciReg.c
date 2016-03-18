@@ -97,10 +97,8 @@ OhciSetHcReset (
   IN UINT32                     Value
   )
 {
-  EFI_STATUS                    Status;
   HcRESET                       Reset;
 
-  Status = EFI_SUCCESS;
   *(UINT32 *) &Reset = OhciGetOperationalReg (Ohc, USBHOST_OFFSET_UHCHR);
 
   if (Field & RESET_SYSTEM_BUS) {

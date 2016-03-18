@@ -72,7 +72,6 @@ OhciControlTransfer (
   UINTN                         LeftLength;
   UINT8                         DataToggle;
 
-  UINTN                         ReqMapLength = 0;
   EFI_PHYSICAL_ADDRESS          ReqMapPhyAddr = 0;
 
   UINTN                         DataMapLength = 0;
@@ -140,7 +139,6 @@ OhciControlTransfer (
   // Setup Stage
   //
   if(Request != NULL) {
-    ReqMapLength = sizeof(EFI_USB_DEVICE_REQUEST);
     ReqMapPhyAddr = (EFI_PHYSICAL_ADDRESS)(UINTN)Request;
   }
   SetupTd = OhciCreateTD (Ohc);
@@ -356,26 +354,22 @@ OhciBulkTransfer (
 {
   USB_OHCI_HC_DEV                *Ohc;
   ED_DESCRIPTOR                  *Ed;
-  UINT8                          EdDir;
   UINT32                         DataPidDir;
   TD_DESCRIPTOR                  *HeadTd;
   TD_DESCRIPTOR                  *DataTd;
   TD_DESCRIPTOR                  *EmptyTd;
   EFI_STATUS                     Status;
-  EFI_USB_DATA_DIRECTION         TransferDirection;
   UINT8                          EndPointNum;
   UINTN                          TimeCount;
   UINT32                         ErrorCode;
 
   UINT8                          CurrentToggle;
-  VOID                           *Mapping;
   UINTN                          MapLength;
   EFI_PHYSICAL_ADDRESS           MapPyhAddr;
   UINTN                          LeftLength;
   UINTN                          ActualSendLength;
   BOOLEAN                        FirstTD;
 
-  Mapping = NULL;
   MapLength = 0;
   MapPyhAddr = 0;
   LeftLength = 0;
@@ -391,12 +385,8 @@ OhciBulkTransfer (
   Ohc = PEI_RECOVERY_USB_OHC_DEV_FROM_EHCI_THIS (This);
 
   if ((EndPointAddress & 0x80) != 0) {
-    TransferDirection = EfiUsbDataIn;
-    EdDir = ED_IN_DIR;
     DataPidDir = TD_IN_PID;
   } else {
-    TransferDirection = EfiUsbDataOut;
-    EdDir = ED_OUT_DIR;
     DataPidDir = TD_OUT_PID;
   }
 
