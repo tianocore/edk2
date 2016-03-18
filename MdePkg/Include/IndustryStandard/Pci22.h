@@ -5,11 +5,10 @@
     PCI Local Bus Specification, 2.2
     PCI-to-PCI Bridge Architecture Specification, Revision 1.2
     PC Card Standard, 8.0
+    PCI Power Management Interface Specifiction, Revision 1.2
 
-  
-
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2014 - 2105, Hewlett-Packard Development Company, L.P.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -666,7 +665,7 @@ typedef union {
   struct {
     UINT16 Version : 3;
     UINT16 PmeClock : 1;
-    UINT16 : 1;
+    UINT16 Reserved : 1;
     UINT16 DeviceSpecificInitialization : 1;
     UINT16 AuxCurrent : 3;
     UINT16 D1Support : 1;
@@ -685,7 +684,7 @@ typedef union {
 typedef union {
   struct {
     UINT16 PowerState : 2;
-    UINT16 : 6;
+    UINT16 Reserved : 6;
     UINT16 PmeEnable : 1;
     UINT16 DataSelect : 4;
     UINT16 DataScale : 2;
