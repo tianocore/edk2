@@ -464,11 +464,9 @@ ProgramFixedMtrr (
 {
   UINT32  MsrNum;
   UINT32  ByteShift;
-  UINT64  TempQword;
   UINT64  OrMask;
   UINT64  ClearMask;
 
-  TempQword = 0;
   OrMask    = 0;
   ClearMask = 0;
 
