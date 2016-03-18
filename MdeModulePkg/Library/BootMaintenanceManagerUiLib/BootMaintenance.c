@@ -867,9 +867,6 @@ BootMaintCallback (
   BMM_CALLBACK_DATA *Private;
   BM_MENU_ENTRY     *NewMenuEntry;
   BMM_FAKE_NV_DATA  *CurrentFakeNVMap;
-  UINTN             OldValue;
-  UINTN             NewValue;
-  UINTN             Number;
   UINTN             Index;
   EFI_DEVICE_PATH_PROTOCOL * File;
 
@@ -879,9 +876,6 @@ BootMaintCallback (
     //
     return EFI_UNSUPPORTED;
   }
-  OldValue       = 0;
-  NewValue       = 0;
-  Number         = 0;
 
   Private        = BMM_CALLBACK_DATA_FROM_THIS (This);
   //

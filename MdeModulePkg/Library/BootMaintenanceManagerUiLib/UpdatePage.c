@@ -581,7 +581,6 @@ UpdateOrderPage (
   UINT16            Index;
   UINT16            OptionIndex;
   VOID              *OptionsOpCodeHandle;
-  BM_LOAD_CONTEXT   *NewLoadContext;
   BOOLEAN           BootOptionFound;
   UINT32            *OptionOrder;
   EFI_QUESTION_ID   QuestionId;
@@ -619,7 +618,6 @@ UpdateOrderPage (
     BootOptionFound = FALSE;
     for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
       NewMenuEntry   = BOpt_GetMenuEntry (OptionMenu, Index);
-      NewLoadContext = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
       if ((UINT32) (NewMenuEntry->OptionNumber + 1) == OptionOrder[OptionIndex]) {
         BootOptionFound = TRUE;
         break;
