@@ -59,4 +59,3 @@
   PcAtChipsetPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   PcAtChipsetPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
-  PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
