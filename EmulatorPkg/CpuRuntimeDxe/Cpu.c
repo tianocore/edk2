@@ -327,9 +327,6 @@ EmuInit (
   IN EFI_CPU_INIT_TYPE      InitType
   )
 {
-  CPU_ARCH_PROTOCOL_PRIVATE *Private;
-
-  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
@@ -341,8 +338,6 @@ EmuRegisterInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
-  CPU_ARCH_PROTOCOL_PRIVATE *Private;
-
   //
   // Do parameter checking for EFI spec conformance
   //
@@ -352,7 +347,6 @@ EmuRegisterInterruptHandler (
   //
   // Do nothing for Emu emulation
   //
-  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
@@ -392,8 +386,6 @@ EmuSetMemoryAttributes (
   IN UINT64                 Attributes
   )
 {
-  CPU_ARCH_PROTOCOL_PRIVATE *Private;
-
   //
   // Check for invalid parameter for Spec conformance
   //
@@ -404,7 +396,6 @@ EmuSetMemoryAttributes (
   //
   // Do nothing for Nt32 emulation
   //
-  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
