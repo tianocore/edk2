@@ -854,7 +854,6 @@ CpuMpPeimInit (
 {
   EFI_STATUS           Status;
   PEI_CPU_MP_DATA      *PeiCpuMpData;
-  UINT32               ProcessorCount;
 
   //
   // Load new GDT table on BSP
@@ -867,7 +866,7 @@ CpuMpPeimInit (
   //
   // Count processor number and collect processor information
   //
-  ProcessorCount = CountProcessorNumber (PeiCpuMpData);
+  CountProcessorNumber (PeiCpuMpData);
   //
   // Build location of PEI CPU MP DATA buffer in HOB
   //
