@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define MAX_STRING_SIZE  0x1000
 
+#define OPENSSLDIR ""
 //
 // OpenSSL relies on explicit configuration for word size in crypto/bn,
 // but we want it to be automatically inferred from the target. So we
@@ -101,6 +102,7 @@ typedef VOID  *FILE;
    (but watch out!): */
 #define offsetof(type, member) OFFSET_OF (type, member)
 
+#define CHAR_BIT 8
 //
 // Basic types from EFI Application Toolkit required to buiild Open SSL
 //
@@ -261,7 +263,6 @@ extern FILE  *stdout;
 #define memchr(buf,ch,count)              ScanMem8(buf,(UINTN)(count),(UINT8)ch)
 #define memcmp(buf1,buf2,count)           (int)(CompareMem(buf1,buf2,(UINTN)(count)))
 #define memmove(dest,source,count)        CopyMem(dest,source,(UINTN)(count))
-#define strcmp                            AsciiStrCmp
 #define strncmp(string1,string2,count)    (int)(AsciiStrnCmp(string1,string2,(UINTN)(count)))
 #define strcpy(strDest,strSource)         AsciiStrCpyS(strDest,MAX_STRING_SIZE,strSource)
 #define strncpy(strDest,strSource,count)  AsciiStrnCpyS(strDest,MAX_STRING_SIZE,strSource,(UINTN)count)
@@ -273,5 +274,7 @@ extern FILE  *stdout;
 #define localtime(timer)                  NULL
 #define gmtime_r(timer,result)            (result = NULL)
 #define atoi(nptr)                        AsciiStrDecimalToUintn(nptr)
+#define gettimeofday(tvp,tz)              do { (tvp)->tv_sec = time(NULL); (tvp)->tv_usec = 0; } \
+						while(0)
 
 #endif

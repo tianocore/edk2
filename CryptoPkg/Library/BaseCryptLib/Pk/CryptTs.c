@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <openssl/pkcs7.h>
+#include <../evp/evp_locl.h>
 
 //
 // OID ASN.1 Value for SPC_RFC3161_OBJID ("1.3.6.1.4.1.311.3.3.1")
@@ -285,6 +286,7 @@ CheckTSTInfo (
   if (HashedMsg == NULL) {
     goto _Exit;
   }
+  memset(&MdCtx, 0, sizeof(MdCtx));
   EVP_DigestInit (&MdCtx, Md);
   EVP_DigestUpdate (&MdCtx, TimestampedData, DataSize);
   EVP_DigestFinal (&MdCtx, HashedMsg, NULL);

@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalCryptLib.h"
 #include <openssl/hmac.h>
+#include <../hmac/hmac_lcl.h>
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-SHA1 operations.
@@ -65,7 +66,8 @@ HmacSha1Init (
   //
   // OpenSSL HMAC-SHA1 Context Initialization
   //
-  HMAC_CTX_init (HmacSha1Context);
+  memset(HmacSha1Context, 0, sizeof(HMAC_CTX));
+  HMAC_CTX_reset (HmacSha1Context);
   HMAC_Init_ex (HmacSha1Context, Key, (UINT32) KeySize, EVP_sha1(), NULL);
 
   return TRUE;
@@ -191,7 +193,7 @@ HmacSha1Final (
   // OpenSSL HMAC-SHA1 digest finalization
   //
   HMAC_Final (HmacSha1Context, HmacValue, &Length);
-  HMAC_CTX_cleanup (HmacSha1Context);
+  HMAC_CTX_reset (HmacSha1Context);
 
   return TRUE;
 }

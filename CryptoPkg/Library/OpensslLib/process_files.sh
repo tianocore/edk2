@@ -9,48 +9,42 @@
 # do not need to do this, since the results are stored in the EDK2
 # git repository for them.
 
-OPENSSL_PATH=$(sed -n '/DEFINE OPENSSL_PATH/{s/.* \(openssl-[0-9.]*[a-z]*\)[[:space:]]*/\1/ p}' OpensslLib.inf)
+OPENSSL_PATH=$(sed -n '/DEFINE OPENSSL_PATH/{s/.* \(openssl[-0-9.]*[a-z]*\)[[:space:]]*/\1/ p}' OpensslLib.inf)
 
 if ! cd "${OPENSSL_PATH}" ; then
     echo "Cannot change to OpenSSL directory \"${OPENSSL_PATH}\""
     exit 1
 fi
 
-./Configure UEFI \
+./Configure --classic UEFI \
 	no-asm \
+	no-async \
 	no-bf \
+	no-blake2 \
 	no-camellia \
 	no-capieng \
 	no-cast \
 	no-cms \
+	no-ct \
 	no-deprecated \
 	no-dgram \
 	no-dsa \
 	no-dynamic-engine \
 	no-ec \
-	no-ecdh \
-	no-ecdsa \
 	no-engine \
-	no-engines \
 	no-err \
 	no-filenames \
-	no-fp-api \
 	no-hw \
 	no-idea \
-	no-jpake \
-	no-krb5 \
-	no-locking \
 	no-mdc2 \
+	no-poly1305 \
 	no-posix-io \
-	no-pqueue \
 	no-rc2 \
-	no-rcs \
 	no-rfc3779 \
 	no-ripemd \
 	no-scrypt \
 	no-sct \
 	no-seed \
-	no-sha0 \
 	no-sock \
 	no-srp \
 	no-ssl \
@@ -77,13 +71,11 @@ function filelist ()
 		;;
 	    LIBSRC=*)
 		LIBSRC=$(echo "$LINE" | sed s/^LIBSRC=//)
-		if [ "$RELATIVE_DIRECTORY" != "ssl" ]; then
-		    for FILE in $LIBSRC; do
-			if [ "$FILE" != "b_print.c" ]; then
-			    echo -e '  $(OPENSSL_PATH)/'$RELATIVE_DIRECTORY/$FILE\\r\\
-			fi
-		    done
-		fi
+		for FILE in $LIBSRC; do
+		    if [ "$FILE" != "b_print.c" ]; then
+			echo -e '  $(OPENSSL_PATH)/'$RELATIVE_DIRECTORY/$FILE\\r\\
+		    fi
+		done
 		;;
 	esac
     done
@@ -95,4 +87,4 @@ filelist < "${OPENSSL_PATH}/MINFO" |  sed -n -f - -i OpensslLib.inf
 # We can tell Windows users to put this back manually if they can't run
 # Configure. For now, until the git repository is fixed to store things
 # sanely, also convert to DOS line-endings
-unix2dos -n "${OPENSSL_PATH}/crypto/opensslconf.h" opensslconf.h
+unix2dos -n "${OPENSSL_PATH}/include/openssl/opensslconf.h" opensslconf.h

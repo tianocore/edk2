@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <openssl/objects.h>
 #include <openssl/x509.h>
 #include <openssl/pkcs7.h>
+#include <internal/evp_int.h>
 
 
 /**

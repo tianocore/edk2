@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalCryptLib.h"
 #include <openssl/x509.h>
 #include <openssl/rsa.h>
+#include <internal/evp_int.h>
 
 /**
   Construct a X509 object from DER-encoded certificate data.
