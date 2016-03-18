@@ -391,7 +391,7 @@ static void prog_ddr_timing_control(
     MRCParams_t *mrc_params)
 {
   uint8_t TCL, WL;
-  uint8_t TRP, TRCD, TRAS, TRFC, TWR, TWTR, TRRD, TRTP, TFAW;
+  uint8_t TRP, TRCD, TRAS, TWR, TWTR, TRRD, TRTP, TFAW;
   uint32_t TCK;
 
   RegDTR0 Dtr0;
@@ -416,7 +416,6 @@ static void prog_ddr_timing_control(
   TRP = TCL;  // Per CAT MRC
   TRCD = TCL;  // Per CAT MRC
   TRAS = MCEIL(mrc_params->params.tRAS, TCK);
-  TRFC = MCEIL(tRFC[mrc_params->params.DENSITY], TCK);
   TWR = MCEIL(15000, TCK);   // Per JEDEC: tWR=15000ps DDR2/3 from 800-1600
 
   TWTR = MCEIL(mrc_params->params.tWTR, TCK);
