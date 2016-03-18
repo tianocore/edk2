@@ -403,9 +403,6 @@ PcieSetAspmAuto (
   UINT32    EndpointPcieCapOffset;
   UINT16    RootPortAspm;
   UINT16    EndPointAspm;
-  UINT16    EndPointVendorId;
-  UINT16    EndPointDeviceId;
-  UINT8     EndPointRevId;
   UINT16    AspmVal;
   UINT32    PortLxLat;
   UINT32    EndPointLxLat;
@@ -438,13 +435,9 @@ PcieSetAspmAuto (
   EndPointAspm  = (QNCMmPci16 (0, EndpointBus, EndpointDevice, EndpointFunction, (EndpointPcieCapOffset + PCIE_LINK_CAP_OFFSET)) & B_QNC_PCIE_LCAP_APMS_MASK) >> V_QNC_PCIE_LCAP_APMS_OFFSET;
 
   //
-  // Mask APMC with values from lookup table.
+  // TODO: Mask APMC with values from lookup table.
   // RevID of 0xFF applies to all steppings.
   //
-
-  EndPointVendorId = QNCMmPci16 (0, EndpointBus, EndpointDevice, EndpointFunction, 0);
-  EndPointDeviceId = QNCMmPci16 (0, EndpointBus, EndpointDevice, EndpointFunction, 2);
-  EndPointRevId    = QNCMmPci8 (0, EndpointBus, EndpointDevice, EndpointFunction, 8);
 
   // TODO: Mask with latency/acceptable latency comparison results.
 
@@ -585,7 +578,6 @@ QNCRootPortInit (
 {
   UINT64            RPBase;
   UINT64            EndPointBase;
-  UINT64            LpcBase;
   UINT16            AspmVal;
   UINT16            SlotStatus;
   UINTN             Index;
@@ -593,7 +585,6 @@ QNCRootPortInit (
   UINT32            DwordReg;
 
   RPBase = PciExpressBar + (((PCI_BUS_NUMBER_QNC << 8) + ((PCI_DEVICE_NUMBER_PCIE_ROOTPORT) << 3) + ((PCI_FUNCTION_NUMBER_PCIE_ROOTPORT_0 + RootPortIndex) << 0)) << 12);
-  LpcBase = PciExpressBar + (((PCI_BUS_NUMBER_QNC << 8) + (31 << 3) + (0 << 0)) << 12);
   CapOffset = PcieFindCapId (PCI_BUS_NUMBER_QNC, (UINT8)(PCI_DEVICE_NUMBER_PCIE_ROOTPORT), (UINT8)(PCI_FUNCTION_NUMBER_PCIE_ROOTPORT_0 + RootPortIndex), PCIE_CAPID);
 
   if (CapOffset == 0) {
@@ -906,7 +897,6 @@ PciExpressInit (
 {
   UINT64                            PciExpressBar;
   UINT32                            QNCRootComplexBar;
-  UINT32                            QNCGpioBase;
   UINT32                            QNCPmioBase;
   UINT32                            QNCGpeBase;
   UINTN                             RpEnableMask;
@@ -917,7 +907,6 @@ PciExpressInit (
   // Get BAR registers
   //
   QNCRootComplexBar  = QNC_RCRB_BASE;
-  QNCGpioBase        = LpcPciCfg32 (R_QNC_LPC_GBA_BASE) & B_QNC_LPC_GPA_BASE_MASK;
   QNCPmioBase        = LpcPciCfg32 (R_QNC_LPC_PM1BLK) & B_QNC_LPC_PM1BLK_MASK;
   QNCGpeBase         = LpcPciCfg32 (R_QNC_LPC_GPE0BLK) & B_QNC_LPC_GPE0BLK_MASK;
   RpEnableMask = 0;                 // assume all root ports are disabled
