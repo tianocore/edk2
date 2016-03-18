@@ -1201,6 +1201,8 @@ CoreInternalAllocatePages (
 {
   EFI_STATUS      Status;
   UINT64          Start;
+  UINT64          NumberOfBytes;
+  UINT64          End;
   UINT64          MaxAddress;
   UINTN           Alignment;
 
@@ -1245,6 +1247,30 @@ CoreInternalAllocatePages (
   // The max address is the max natively addressable address for the processor
   //
   MaxAddress = MAX_ADDRESS;
+
+  //
+  // Check for Type AllocateAddress,
+  // if NumberOfPages is 0 or
+  // if (NumberOfPages << EFI_PAGE_SHIFT) is above MAX_ADDRESS or
+  // if (Start + NumberOfBytes) rolls over 0 or
+  // if Start is above MAX_ADDRESS or
+  // if End is above MAX_ADDRESS,
+  // return EFI_NOT_FOUND.
+  //
+  if (Type == AllocateAddress) {
+    if ((NumberOfPages == 0) ||
+        (NumberOfPages > RShiftU64 (MaxAddress, EFI_PAGE_SHIFT))) {
+      return EFI_NOT_FOUND;
+    }
+    NumberOfBytes = LShiftU64 (NumberOfPages, EFI_PAGE_SHIFT);
+    End = Start + NumberOfBytes - 1;
+
+    if ((Start >= End) ||
+        (Start > MaxAddress) || 
+        (End > MaxAddress)) {
+      return EFI_NOT_FOUND;
+    }
+  }
 
   if (Type == AllocateMaxAddress) {
     MaxAddress = Start;
