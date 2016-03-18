@@ -637,13 +637,11 @@ OhciBulkTransfer(
   USB_OHCI_HC_DEV                *Ohc;
   ED_DESCRIPTOR                  *HeadEd;
   ED_DESCRIPTOR                  *Ed;
-  UINT8                          EdDir;
   UINT32                         DataPidDir;
   TD_DESCRIPTOR                  *HeadTd;
   TD_DESCRIPTOR                  *DataTd;
   TD_DESCRIPTOR                  *EmptyTd;
   EFI_STATUS                     Status;
-  EFI_USB_DATA_DIRECTION         TransferDirection;
   UINT8                          EndPointNum;
   UINTN                          TimeCount;
   OHCI_ED_RESULT                 EdResult;
@@ -672,13 +670,9 @@ OhciBulkTransfer(
   Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   if ((EndPointAddress & 0x80) != 0) {
-    TransferDirection = EfiUsbDataIn;
-    EdDir = ED_IN_DIR;
     DataPidDir = TD_IN_PID;
     MapOp = EfiPciIoOperationBusMasterWrite;
   } else {
-    TransferDirection = EfiUsbDataOut;
-    EdDir = ED_OUT_DIR;
     DataPidDir = TD_OUT_PID;
     MapOp = EfiPciIoOperationBusMasterRead;
   }
@@ -941,7 +935,6 @@ OhciInterruptTransfer (
   EFI_STATUS               Status;
   UINT8                    EndPointNum;
   UINT32                   DataPidDir;
-  EFI_USB_DATA_DIRECTION   TransferDirection;
   INTERRUPT_CONTEXT_ENTRY  *Entry;
   EFI_TPL                  OldTpl;
   BOOLEAN                  FirstTD;
@@ -959,11 +952,9 @@ OhciInterruptTransfer (
   }
 
   if ((EndPointAddress & 0x80) != 0) {
-    TransferDirection = EfiUsbDataIn;
     EdDir = ED_IN_DIR;
     DataPidDir = TD_IN_PID;
   } else {
-    TransferDirection = EfiUsbDataOut;
     EdDir = ED_OUT_DIR;
     DataPidDir = TD_OUT_PID;
   }
