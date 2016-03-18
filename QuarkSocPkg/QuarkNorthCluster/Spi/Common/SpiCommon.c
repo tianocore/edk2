@@ -165,14 +165,12 @@ Returns:
   EFI_STATUS    Status;
   SPI_INSTANCE  *SpiInstance;
   UINT8         SpiStatus;
-  UINTN         PchRootComplexBar;
 
   if (UnlockCmdOpcodeIndex >= SPI_NUM_OPCODE) {
     return EFI_UNSUPPORTED;
   }
 
   SpiInstance = SPI_INSTANCE_FROM_SPIPROTOCOL (This);
-  PchRootComplexBar = SpiInstance->PchRootComplexBar;
 
   //
   // Issue unlock command to disable block protection, this only needs to be done once per SPI power on
@@ -230,11 +228,8 @@ Returns:
   UINT8         Index;
   UINT16        OpcodeType;
   SPI_INSTANCE  *SpiInstance;
-  BOOLEAN       MultiPartitionIsSupported;
   UINTN         PchRootComplexBar;
-  UINT8         SFDPCmdOpcodeIndex;
   UINT8         UnlockCmdOpcodeIndex;
-  UINT8         ReadDataCmdOpcodeIndex;
   UINT8         FlashPartId[3];
 
   SpiInstance       = SPI_INSTANCE_FROM_SPIPROTOCOL (This);
@@ -302,8 +297,6 @@ Returns:
   //
   // Setup the Opcode Menu registers.
   //
-  ReadDataCmdOpcodeIndex = SPI_NUM_OPCODE;
-  SFDPCmdOpcodeIndex = SPI_NUM_OPCODE;
   UnlockCmdOpcodeIndex = SPI_NUM_OPCODE;
   for (Index = 0; Index < SPI_NUM_OPCODE; Index++) {
     MmioWrite8 (
@@ -334,22 +327,10 @@ Returns:
       }
     }
 
-    if (SpiInstance->SpiInitTable.OpcodeMenu[Index].Operation == EnumSpiOperationReadData ||
-        SpiInstance->SpiInitTable.OpcodeMenu[Index].Operation == EnumSpiOperationFastRead ||
-        SpiInstance->SpiInitTable.OpcodeMenu[Index].Operation == EnumSpiOperationDualOutputFastRead) {
-      ReadDataCmdOpcodeIndex = Index;
-    }
-
-    if (SpiInstance->SpiInitTable.OpcodeMenu[Index].Operation == EnumSpiOperationDiscoveryParameters) {
-      SFDPCmdOpcodeIndex = Index;
-    }
-
     if (SpiInstance->SpiInitTable.OpcodeMenu[Index].Operation == EnumSpiOperationWriteStatus) {
       UnlockCmdOpcodeIndex = Index;
     }
   }
-
-  MultiPartitionIsSupported = FALSE;
 
   Status = UnlockFlashComponents (
             This,
@@ -630,10 +611,8 @@ Returns:
 --*/
 {
   SPI_INSTANCE  *SpiInstance;
-  UINTN         PchRootComplexBar;
 
   SpiInstance       = SPI_INSTANCE_FROM_SPIPROTOCOL (This);
-  PchRootComplexBar = SpiInstance->PchRootComplexBar;
 
   if (SpiRegionType == EnumSpiRegionAll) {
     //
@@ -714,13 +693,11 @@ Returns:
   UINTN         LimitAddress;
   UINT32        SpiDataCount;
   UINT8         OpCode;
-  SPI_OPERATION Operation;
   UINTN         PchRootComplexBar;
 
   SpiInstance       = SPI_INSTANCE_FROM_SPIPROTOCOL (This);
   PchRootComplexBar = SpiInstance->PchRootComplexBar;
   SpiBiosSize       = SpiInstance->SpiInitTable.BiosSize;
-  Operation         = SpiInstance->SpiInitTable.OpcodeMenu[OpcodeIndex].Operation;
   OpCode            = MmioRead8 (PchRootComplexBar + R_QNC_RCRB_SPIOPMENU + OpcodeIndex);
 
   //
