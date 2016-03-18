@@ -509,10 +509,7 @@ EFI_STATUS
 InitializeQNCPolicy (
   )
 {
-  UINT8        RevisionID;
   UINT32       PciD31F0RegBase;  // LPC
-
-  RevisionID = LpcPciCfg8(R_QNC_LPC_REV_ID);
 
   PciD31F0RegBase = PciDeviceMmBase (PCI_BUS_NUMBER_QNC, PCI_DEVICE_NUMBER_QNC_LPC, PCI_FUNCTION_NUMBER_QNC_LPC);
 
