@@ -1859,7 +1859,6 @@ CommandCommunication (
   DEBUG_DATA_SET_VIEWPOINT          *SetViewPoint;
   BOOLEAN                           HaltDeferred;
   UINT32                            ProcessorIndex;
-  DEBUG_PORT_HANDLE                 Handle;
   DEBUG_AGENT_EXCEPTION_BUFFER      AgentExceptionBuffer;
   UINT32                            IssuedViewPoint;
   DEBUG_AGENT_MAILBOX               *Mailbox;
@@ -1886,8 +1885,6 @@ CommandCommunication (
     //
     SetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS, 1);
   }
-
-  Handle = GetDebugPortHandle();
 
   while (TRUE) {
 
