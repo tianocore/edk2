@@ -3,7 +3,7 @@
 
   Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -823,6 +823,407 @@ ERROR_EXIT:
   SHELL_FREE_NON_NULL (InformationBlock);
   return NULL;
 }
+
+/**
+  Function to dump information about EFI_FIRMWARE_MANAGEMENT_PROTOCOL Protocol.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+FirmwareManagementDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL    *EfiFwMgmtProtocol;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR       *ImageInfo;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR_V1    *ImageInfoV1;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR_V2    *ImageInfoV2;
+  UINT64                              AttributeSetting;
+  UINTN                               ImageInfoSize;
+  UINTN                               DescriptorSize;
+  UINT32                              DescriptorVersion;
+  UINT32                              PackageVersion;
+  UINT8                               DescriptorCount;
+  UINT8                               Index;
+  UINT8                               Index1;
+  UINT8                               ImageCount;
+  CHAR16                              *PackageVersionName;
+  CHAR16                              *TempStr;
+  CHAR16                              *RetVal;
+  CHAR16                              *TempRetVal;
+  CHAR16                              *AttributeSettingStr;
+  BOOLEAN                             Found;
+  BOOLEAN                             AttributeSupported;
+
+  //
+  // Initialize local variables
+  //
+  ImageCount             = 0;
+  ImageInfoSize          = 1;
+  AttributeSetting       = 0;
+  Found                  = FALSE;
+  AttributeSupported     = FALSE;
+  ImageInfo              = NULL;
+  ImageInfoV1            = NULL;
+  ImageInfoV2            = NULL;
+  PackageVersionName     = NULL;
+  RetVal                 = NULL;
+  TempRetVal             = NULL;
+  TempStr                = NULL;
+  AttributeSettingStr    = NULL;
+
+  if (!Verbose) {
+    return (CatSPrint(NULL, L"FirmwareManagement"));
+  }
+
+  Status = gBS->OpenProtocol (
+                  (EFI_HANDLE) (TheHandle),
+                  &gEfiFirmwareManagementProtocolGuid,
+                  (VOID **) &EfiFwMgmtProtocol,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Status = EfiFwMgmtProtocol->GetImageInfo (
+                                EfiFwMgmtProtocol,
+                                &ImageInfoSize,
+                                ImageInfo,
+                                &DescriptorVersion,
+                                &DescriptorCount,
+                                &DescriptorSize,
+                                &PackageVersion,
+                                &PackageVersionName
+                                );
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    ImageInfo = AllocateZeroPool (ImageInfoSize);
+
+    if (ImageInfo == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      Status = EfiFwMgmtProtocol->GetImageInfo (
+                                    EfiFwMgmtProtocol,
+                                    &ImageInfoSize,
+                                    ImageInfo,
+                                    &DescriptorVersion,
+                                    &DescriptorCount,
+                                    &DescriptorSize,
+                                    &PackageVersion,
+                                    &PackageVersionName
+                                    );
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    goto ERROR_EXIT;
+  }
+
+  //
+  // Decode Image Descriptor data only if its version is supported
+  //
+  if (DescriptorVersion <= EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION) {
+
+    if (ImageInfo == NULL) {
+      goto ERROR_EXIT;
+    }
+
+    ImageInfoV1 = (EFI_FIRMWARE_IMAGE_DESCRIPTOR_V1 *)ImageInfo;
+    ImageInfoV2 = (EFI_FIRMWARE_IMAGE_DESCRIPTOR_V2 *)ImageInfo;
+
+    //
+    // Set ImageInfoSize in return buffer
+    //
+    TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_IMAGE_INFO_SIZE), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
+    RetVal = CatSPrint (NULL, TempStr, ImageInfoSize);
+    SHELL_FREE_NON_NULL (TempStr);
+
+    //
+    // Set DescriptorVersion in return buffer
+    //
+    TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_DESCRIPTOR_VERSION), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
+    TempRetVal = CatSPrint (RetVal, TempStr, DescriptorVersion);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+    SHELL_FREE_NON_NULL (TempStr);
+
+    //
+    // Set DescriptorCount in return buffer
+    //
+    TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_DESCRIPTOR_COUNT), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
+    TempRetVal = CatSPrint (RetVal, TempStr, DescriptorCount);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+    SHELL_FREE_NON_NULL (TempStr);
+
+
+    //
+    // Set DescriptorSize in return buffer
+    //
+    TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_DESCRIPTOR_SIZE), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
+    TempRetVal = CatSPrint (RetVal, TempStr, DescriptorSize);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+    SHELL_FREE_NON_NULL (TempStr);
+
+    //
+    // Set PackageVersion in return buffer
+    //
+    TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_PACKAGE_VERSION), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
+    TempRetVal = CatSPrint (RetVal, TempStr, PackageVersion);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+    SHELL_FREE_NON_NULL (TempStr);
+
+    //
+    // Set PackageVersionName in return buffer
+    //
+    TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_PACKAGE_VERSION_NAME), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
+    TempRetVal = CatSPrint (RetVal, TempStr, PackageVersionName);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+    SHELL_FREE_NON_NULL (TempStr);
+
+    for (Index = 0; Index < DescriptorCount; Index++) {
+      //
+      // First check if Attribute is supported
+      // and generate a string for AttributeSetting field
+      //
+      SHELL_FREE_NON_NULL (AttributeSettingStr);
+      AttributeSupported = FALSE;
+      AttributeSetting   = 0;
+      if (DescriptorVersion == EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V1) {
+        if (ImageInfoV1[Index].AttributesSupported != 0x0) {
+          AttributeSupported = TRUE;
+          AttributeSetting   = ImageInfoV1[Index].AttributesSetting;
+        }
+      } else if (DescriptorVersion == EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V2) {
+        if (ImageInfoV2[Index].AttributesSupported != 0x0) {
+          AttributeSupported = TRUE;
+          AttributeSetting   = ImageInfoV2[Index].AttributesSetting;
+        }
+      } else {
+        if (ImageInfo[Index].AttributesSupported != 0x0) {
+          AttributeSupported = TRUE;
+          AttributeSetting   = ImageInfo[Index].AttributesSetting;
+        }
+      }
+
+      if (!AttributeSupported) {
+        AttributeSettingStr = CatSPrint (NULL, L"None");
+      } else {
+        AttributeSettingStr = CatSPrint (NULL, L"(");
+
+        if (AttributeSetting & IMAGE_ATTRIBUTE_IMAGE_UPDATABLE) {
+          TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_IMAGE_UPDATABLE");
+          SHELL_FREE_NON_NULL (AttributeSettingStr);
+          AttributeSettingStr = TempRetVal;
+        }
+        if (AttributeSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) {
+          TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_RESET_REQUIRED");
+          SHELL_FREE_NON_NULL (AttributeSettingStr);
+          AttributeSettingStr = TempRetVal;
+        }
+        if (AttributeSetting & IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED) {
+          TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED");
+          SHELL_FREE_NON_NULL (AttributeSettingStr);
+          AttributeSettingStr = TempRetVal;
+        }
+        if (AttributeSetting & IMAGE_ATTRIBUTE_IN_USE) {
+          TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_IN_USE");
+          SHELL_FREE_NON_NULL (AttributeSettingStr);
+          AttributeSettingStr = TempRetVal;
+        }
+        if (AttributeSetting & IMAGE_ATTRIBUTE_UEFI_IMAGE) {
+          TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_UEFI_IMAGE");
+          SHELL_FREE_NON_NULL (AttributeSettingStr);
+          AttributeSettingStr = TempRetVal;
+        }
+        TempRetVal = CatSPrint (AttributeSettingStr, L" )");
+        SHELL_FREE_NON_NULL (AttributeSettingStr);
+        AttributeSettingStr = TempRetVal;
+      }
+
+      if (DescriptorVersion == EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V1) {
+        if (ImageInfoV1[Index].ImageIndex != 0x0) {
+          ImageCount++;
+        }
+
+        TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_IMAGE_DESCRIPTOR_INFO_V1), NULL);
+        if (TempStr == NULL) {
+          goto ERROR_EXIT;
+        }
+        TempRetVal = CatSPrint (
+                       RetVal,
+                       TempStr,
+                       Index,
+                       ImageInfoV1[Index].ImageIndex,
+                       ImageInfoV1[Index].ImageTypeId,
+                       ImageInfoV1[Index].ImageId,
+                       ImageInfoV1[Index].ImageIdName,
+                       ImageInfoV1[Index].Version,
+                       ImageInfoV1[Index].VersionName,
+                       ImageInfoV1[Index].Size,
+                       ImageInfoV1[Index].AttributesSupported,
+                       AttributeSettingStr,
+                       ImageInfoV1[Index].Compatibilities
+                       );
+        SHELL_FREE_NON_NULL (RetVal);
+        RetVal = TempRetVal;
+        SHELL_FREE_NON_NULL (TempStr);
+      } else if (DescriptorVersion == EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V2) {
+        if (ImageInfoV2[Index].ImageIndex != 0x0) {
+          ImageCount++;
+        }
+
+        TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_IMAGE_DESCRIPTOR_INFO_V2), NULL);
+        if (TempStr == NULL) {
+          goto ERROR_EXIT;
+        }
+        TempRetVal = CatSPrint (
+                       RetVal,
+                       TempStr,
+                       Index,
+                       ImageInfoV2[Index].ImageIndex,
+                       ImageInfoV2[Index].ImageTypeId,
+                       ImageInfoV2[Index].ImageId,
+                       ImageInfoV2[Index].ImageIdName,
+                       ImageInfoV2[Index].Version,
+                       ImageInfoV2[Index].VersionName,
+                       ImageInfoV2[Index].Size,
+                       ImageInfoV2[Index].AttributesSupported,
+                       AttributeSettingStr,
+                       ImageInfoV2[Index].Compatibilities,
+                       ImageInfoV2[Index].LowestSupportedImageVersion
+                       );
+        SHELL_FREE_NON_NULL (RetVal);
+        RetVal = TempRetVal;
+        SHELL_FREE_NON_NULL (TempStr);
+      } else {
+        if (ImageInfo[Index].ImageIndex != 0x0) {
+          ImageCount++;
+        }
+
+        TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_IMAGE_DESCRIPTOR_INFO), NULL);
+        if (TempStr == NULL) {
+          goto ERROR_EXIT;
+        }
+        TempRetVal = CatSPrint (
+                       RetVal,
+                       TempStr,
+                       Index,
+                       ImageInfo[Index].ImageIndex,
+                       ImageInfo[Index].ImageTypeId,
+                       ImageInfo[Index].ImageId,
+                       ImageInfo[Index].ImageIdName,
+                       ImageInfo[Index].Version,
+                       ImageInfo[Index].VersionName,
+                       ImageInfo[Index].Size,
+                       ImageInfo[Index].AttributesSupported,
+                       AttributeSettingStr,
+                       ImageInfo[Index].Compatibilities,
+                       ImageInfo[Index].LowestSupportedImageVersion,
+                       ImageInfo[Index].LastAttemptVersion,
+                       ImageInfo[Index].LastAttemptStatus,
+                       ImageInfo[Index].HardwareInstance
+                       );
+        SHELL_FREE_NON_NULL (RetVal);
+        RetVal = TempRetVal;
+        SHELL_FREE_NON_NULL (TempStr);
+      }
+    }
+  }
+
+  if (ImageCount > 0) {
+    for (Index=0; Index<DescriptorCount; Index++) {
+      for (Index1=Index+1; Index1<DescriptorCount; Index1++) {
+        if (DescriptorVersion == EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V1) {
+          if (ImageInfoV1[Index].ImageId == ImageInfoV1[Index1].ImageId) {
+            Found = TRUE;
+            //
+            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            //
+            goto ENDLOOP;
+          }
+        } else if (DescriptorVersion == EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V2) {
+          if (ImageInfoV2[Index].ImageId == ImageInfoV2[Index1].ImageId) {
+            Found = TRUE;
+            //
+            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            //
+            goto ENDLOOP;
+          }
+        } else {
+          if (ImageInfo[Index].ImageId == ImageInfo[Index1].ImageId) {
+            Found = TRUE;
+            //
+            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            //
+            goto ENDLOOP;
+          }
+        }
+      }
+    }
+  }
+
+ENDLOOP:
+  //
+  // Check if ImageId with duplicate value was found
+  //
+  if (Found == TRUE) {
+    TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_IMAGEID_NON_UNIQUE), NULL);
+    if (TempStr == NULL) {
+      goto ERROR_EXIT;
+    }
+    TempRetVal = CatSPrint (RetVal, TempStr);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+    SHELL_FREE_NON_NULL (TempStr);
+  }
+
+  SHELL_FREE_NON_NULL (ImageInfo);
+  SHELL_FREE_NON_NULL (PackageVersionName);
+  SHELL_FREE_NON_NULL (AttributeSettingStr);
+
+  return RetVal;
+
+ERROR_EXIT:
+  SHELL_FREE_NON_NULL (RetVal);
+  SHELL_FREE_NON_NULL (ImageInfo);
+  SHELL_FREE_NON_NULL (PackageVersionName);
+  SHELL_FREE_NON_NULL (AttributeSettingStr);
+
+  return NULL;
+}
+
 //
 // Put the information on the NT32 protocol GUIDs here so we are not dependant on the Nt32Pkg
 //
@@ -1018,7 +1419,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
 //
 // UEFI 2.3
 //
-  {STRING_TOKEN(STR_FW_MGMT),               &gEfiFirmwareManagementProtocolGuid,              NULL},
+  {STRING_TOKEN(STR_FW_MGMT),               &gEfiFirmwareManagementProtocolGuid,              FirmwareManagementDumpInformation},
   {STRING_TOKEN(STR_IP_SEC),                &gEfiIpSecProtocolGuid,                           NULL},
   {STRING_TOKEN(STR_IP_SEC2),               &gEfiIpSec2ProtocolGuid,                          NULL},
 
