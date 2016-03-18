@@ -849,12 +849,10 @@ MMCCardVoltageSelection (
   )
 {
   EFI_STATUS                 Status;
-  EFI_SD_HOST_IO_PROTOCOL    *SDHostIo;
   UINT8                      Retry;
   UINT32                     TimeOut;
 
   Status   = EFI_SUCCESS;
-  SDHostIo = CardData->SDHostIo;
   //
   //First try the high voltage, then if supported choose the low voltage
   //

@@ -269,11 +269,8 @@ SendATACommand (
   )
 {
   EFI_STATUS                 Status;
-  EFI_SD_HOST_IO_PROTOCOL    *SDHostIo;
   UINT8                      Data;
   UINT32                     TimeOut;
-
-  SDHostIo = CardData->SDHostIo;
 
   //
   //Write register

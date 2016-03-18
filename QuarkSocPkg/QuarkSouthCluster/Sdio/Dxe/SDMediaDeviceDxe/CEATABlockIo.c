@@ -294,14 +294,13 @@ CEATABlockFlushBlocks (
   )
 {
 
-  EFI_STATUS                  Status;
   CARD_DATA                   *CardData;
 
   CardData  = CARD_DATA_FROM_THIS(This);
 
   if (CardData->NeedFlush) {
     CardData->NeedFlush = FALSE;
-    Status = FlushCache (CardData);
+    FlushCache (CardData);
   }
 
   return EFI_SUCCESS;
