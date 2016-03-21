@@ -1,7 +1,7 @@
 ## @file
 # process FV generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -112,6 +112,34 @@ class FV (FvClassObject):
 
         # Process Modules in FfsList
         for FfsFile in self.FfsList :
+            if hasattr(FfsFile, 'FvFileType') and FfsFile.FvFileType == 'RAW':
+                if isinstance(FfsFile.FileName, list) and isinstance(FfsFile.Alignment, list) and len(FfsFile.FileName) == len(FfsFile.Alignment):
+                    FileContent = ''
+                    for Index, File in enumerate(FfsFile.FileName):
+                        try:
+                            f = open(File, 'r+b')
+                        except:
+                            GenFdsGlobalVariable.ErrorLogger("Error opening RAW file %s." % (File))
+                        Content = f.read()
+                        f.close()
+                        AlignValue = FfsFile.Alignment[Index]
+                        if AlignValue == None:
+                            AlignValue = 1
+                        FileContent += Content
+                        if len(FileContent) % AlignValue != 0:
+                            Size = AlignValue - len(FileContent) % AlignValue
+                            for i in range(0, Size):
+                                FileContent += pack('B', 0xFF)
+
+                    if FileContent:
+                        OutputRAWFile = os.path.join(GenFdsGlobalVariable.FfsDir, FfsFile.NameGuid, FfsFile.NameGuid + '.raw')
+                        SaveFileOnChange(OutputRAWFile, FileContent, True)
+                        FfsFile.FileName = OutputRAWFile
+                        if max(FfsFile.Alignment):
+                            FfsFile.Alignment = str(max(FfsFile.Alignment))
+                        else:
+                            FfsFile.Alignment = None
+
             FileName = FfsFile.GenFfs(MacroDict, FvParentAddr=BaseAddress)
             FfsFileList.append(FileName)
             self.FvInfFile.writelines("EFI_FILE_NAME = " + \

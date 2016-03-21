@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from FILE statement
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,6 +28,8 @@ from Common.BuildToolError import *
 from Common.Misc import GuidStructureByteArrayToGuidString
 from GuidSection import GuidSection
 from FvImageSection import FvImageSection
+from Common.Misc import SaveFileOnChange
+from struct import *
 
 ## generate FFS from FILE
 #
@@ -91,6 +93,33 @@ class FileStatement (FileStatementClassObject) :
             SectionFiles = [FileName]
 
         elif self.FileName != None:
+            if hasattr(self, 'FvFileType') and self.FvFileType == 'RAW':
+                if isinstance(self.FileName, list) and isinstance(self.Alignment, list) and len(self.FileName) == len(self.Alignment):
+                    FileContent = ''
+                    for Index, File in enumerate(self.FileName):
+                        try:
+                            f = open(File, 'r+b')
+                        except:
+                            GenFdsGlobalVariable.ErrorLogger("Error opening RAW file %s." % (File))
+                        Content = f.read()
+                        f.close()
+                        AlignValue = self.Alignment[Index]
+                        if AlignValue == None:
+                            AlignValue = 1
+                        FileContent += Content
+                        if len(FileContent) % AlignValue != 0:
+                            Size = AlignValue - len(FileContent) % AlignValue
+                            for i in range(0, Size):
+                                FileContent += pack('B', 0xFF)
+
+                    if FileContent:
+                        OutputRAWFile = os.path.join(GenFdsGlobalVariable.FfsDir, self.NameGuid, self.NameGuid + '.raw')
+                        SaveFileOnChange(OutputRAWFile, FileContent, True)
+                        self.FileName = OutputRAWFile
+                        if max(self.Alignment):
+                            self.Alignment = str(max(self.Alignment))
+                        else:
+                            self.Alignment = None
             self.FileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)
             #Replace $(SAPCE) with real space
             self.FileName = self.FileName.replace('$(SPACE)', ' ')
