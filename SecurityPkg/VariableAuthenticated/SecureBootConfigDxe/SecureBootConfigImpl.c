@@ -3590,23 +3590,23 @@ SecureBootCallback (
       break;
 
     case FORMID_ENROLL_PK_FORM:
-      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdatePKFromFile, &File);
+      ChooseFile (NULL, NULL, UpdatePKFromFile, &File);
       break;
 
     case FORMID_ENROLL_KEK_FORM:
-      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateKEKFromFile, &File);
+      ChooseFile (NULL, NULL, UpdateKEKFromFile, &File);
       break;
 
     case SECUREBOOT_ENROLL_SIGNATURE_TO_DB:
-      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateDBFromFile, &File);
+      ChooseFile (NULL, NULL, UpdateDBFromFile, &File);
       break;
 
     case SECUREBOOT_ENROLL_SIGNATURE_TO_DBX:
-      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateDBXFromFile, &File);
+      ChooseFile (NULL, NULL, UpdateDBXFromFile, &File);
       break;
 
     case SECUREBOOT_ENROLL_SIGNATURE_TO_DBT:
-      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateDBTFromFile, &File);
+      ChooseFile (NULL, NULL, UpdateDBTFromFile, &File);
       break;
 
     case KEY_SECURE_BOOT_DELETE_PK:
