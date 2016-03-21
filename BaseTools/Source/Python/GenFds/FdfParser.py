@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  This program and the accompanying materials
@@ -2692,6 +2692,11 @@ class FdfParser:
         elif self.__Token in ("DEFINE", "APRIORI", "SECTION"):
             self.__UndoToken()
             self.__GetSectionData( FfsFileObj, MacroDict)
+
+        elif hasattr(FfsFileObj, 'FvFileType') and FfsFileObj.FvFileType == 'RAW':
+            self.__UndoToken()
+            self.__GetRAWData(FfsFileObj, MacroDict)
+
         else:
             FfsFileObj.CurrentLineNum = self.CurrentLineNumber
             FfsFileObj.CurrentLineContent = self.__CurrentLine()
@@ -2700,6 +2705,48 @@ class FdfParser:
 
         if not self.__IsToken( "}"):
             raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
+
+    ## __GetRAWData() method
+    #
+    #   Get RAW data for FILE statement
+    #
+    #   @param  self         The object pointer
+    #   @param  FfsFileObj   for whom section is got
+    #   @param  MacroDict    dictionary used to replace macro
+    #
+    def __GetRAWData(self, FfsFileObj, MacroDict = {}):
+        FfsFileObj.FileName = []
+        FfsFileObj.Alignment = []
+        AlignDict = {"Auto":1, "8":8, "16":16, "32":32, "64":64, "128":128, "512":512, "1K":1024, "4K":4096, "32K":32768, "64K":65536}
+        while True:
+            AlignValue = None
+            if self.__GetAlignment():
+                if self.__Token not in ("Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K" ,"64K"):
+                    raise Warning("Incorrect alignment '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
+                AlignValue = AlignValue = AlignDict[self.__Token]
+            if not self.__GetNextToken():
+                raise Warning("expected Filename value", self.FileName, self.CurrentLineNumber)
+
+            FileName = self.__Token.replace('$(SPACE)', ' ')
+            if FileName == '}':
+                self.__UndoToken()
+                raise Warning("expected Filename value", self.FileName, self.CurrentLineNumber)
+            elif not os.path.isfile(FileName):
+                raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
+
+            self.__VerifyFile(FileName)
+            File = PathClass(NormPath(FileName), GenFdsGlobalVariable.WorkSpaceDir)
+            FfsFileObj.FileName.append(File.Path)
+            FfsFileObj.Alignment.append(AlignValue)
+
+            if self.__IsToken( "}"):
+                self.__UndoToken()
+                break
+
+        if len(FfsFileObj.Alignment) == 1:
+            FfsFileObj.Alignment = FfsFileObj.Alignment[0]
+        if len(FfsFileObj.FileName) == 1:
+            FfsFileObj.FileName = FfsFileObj.FileName[0]
 
     ## __GetFileOpts() method
     #
