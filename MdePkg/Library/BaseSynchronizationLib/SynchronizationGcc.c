@@ -45,7 +45,7 @@ GetSpinLockProperties (
   VOID
   )
 {
-  return 32;
+  return InternalGetSpinLockProperties ();
 }
 
 /**
