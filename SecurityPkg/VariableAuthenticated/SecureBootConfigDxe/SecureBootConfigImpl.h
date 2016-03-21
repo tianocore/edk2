@@ -561,6 +561,7 @@ GuidToString (
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN
+EFIAPI
 UpdatePKFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
@@ -574,6 +575,7 @@ UpdatePKFromFile (
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN
+EFIAPI
 UpdateKEKFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
@@ -587,6 +589,7 @@ UpdateKEKFromFile (
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN
+EFIAPI
 UpdateDBFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
@@ -600,6 +603,7 @@ UpdateDBFromFile (
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN
+EFIAPI
 UpdateDBXFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
@@ -613,6 +617,7 @@ UpdateDBXFromFile (
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN
+EFIAPI
 UpdateDBTFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
