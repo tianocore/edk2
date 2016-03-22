@@ -23,6 +23,7 @@ SMM_DISPATCHER_MP_SYNC_DATA                 *mSmmMpSyncData = NULL;
 UINTN                                       mSmmMpSyncDataSize;
 SMM_CPU_SEMAPHORES                          mSmmCpuSemaphores;
 UINTN                                       mSemaphoreSize;
+SPIN_LOCK                                   *mPFLock = NULL;
 
 /**
   Performs an atomic compare exchange operation to get semaphore.
@@ -165,9 +166,9 @@ AllCpusInSmmWithExceptions (
   SMM_CPU_DATA_BLOCK                *CpuData;
   EFI_PROCESSOR_INFORMATION         *ProcessorInfo;
 
-  ASSERT (mSmmMpSyncData->Counter <= mNumberOfCpus);
+  ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
 
-  if (mSmmMpSyncData->Counter == mNumberOfCpus) {
+  if (*mSmmMpSyncData->Counter == mNumberOfCpus) {
     return TRUE;
   }
 
@@ -206,7 +207,7 @@ SmmWaitForApArrival (
   UINT64                            Timer;
   UINTN                             Index;
 
-  ASSERT (mSmmMpSyncData->Counter <= mNumberOfCpus);
+  ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
 
   //
   // Platform implementor should choose a timeout value appropriately:
@@ -245,7 +246,7 @@ SmmWaitForApArrival (
   //    - In relaxed flow, CheckApArrival() will check SMI disabling status before calling this function.
   //    In both cases, adding SMI-disabling checking code increases overhead.
   //
-  if (mSmmMpSyncData->Counter < mNumberOfCpus) {
+  if (*mSmmMpSyncData->Counter < mNumberOfCpus) {
     //
     // Send SMI IPIs to bring outside processors in
     //
@@ -322,7 +323,7 @@ BSPHandler (
   //
   // Flag BSP's presence
   //
-  mSmmMpSyncData->InsideSmm = TRUE;
+  *mSmmMpSyncData->InsideSmm = TRUE;
 
   //
   // Initialize Debug Agent to start source level debug in BSP handler
@@ -360,8 +361,8 @@ BSPHandler (
     //
     // Lock the counter down and retrieve the number of APs
     //
-    mSmmMpSyncData->AllCpusInSync = TRUE;
-    ApCount = LockdownSemaphore (&mSmmMpSyncData->Counter) - 1;
+    *mSmmMpSyncData->AllCpusInSync = TRUE;
+    ApCount = LockdownSemaphore (mSmmMpSyncData->Counter) - 1;
 
     //
     // Wait for all APs to get ready for programming MTRRs
@@ -448,8 +449,8 @@ BSPHandler (
     //
     // Lock the counter down and retrieve the number of APs
     //
-    mSmmMpSyncData->AllCpusInSync = TRUE;
-    ApCount = LockdownSemaphore (&mSmmMpSyncData->Counter) - 1;
+    *mSmmMpSyncData->AllCpusInSync = TRUE;
+    ApCount = LockdownSemaphore (mSmmMpSyncData->Counter) - 1;
     //
     // Make sure all APs have their Present flag set
     //
@@ -469,7 +470,7 @@ BSPHandler (
   //
   // Notify all APs to exit
   //
-  mSmmMpSyncData->InsideSmm = FALSE;
+  *mSmmMpSyncData->InsideSmm = FALSE;
   ReleaseAllAPs ();
 
   //
@@ -532,8 +533,8 @@ BSPHandler (
   //
   // Allow APs to check in from this point on
   //
-  mSmmMpSyncData->Counter = 0;
-  mSmmMpSyncData->AllCpusInSync = FALSE;
+  *mSmmMpSyncData->Counter = 0;
+  *mSmmMpSyncData->AllCpusInSync = FALSE;
 }
 
 /**
@@ -560,12 +561,12 @@ APHandler (
   //
   for (Timer = StartSyncTimer ();
        !IsSyncTimerTimeout (Timer) &&
-       !mSmmMpSyncData->InsideSmm;
+       !(*mSmmMpSyncData->InsideSmm);
        ) {
     CpuPause ();
   }
 
-  if (!mSmmMpSyncData->InsideSmm) {
+  if (!(*mSmmMpSyncData->InsideSmm)) {
     //
     // BSP timeout in the first round
     //
@@ -586,23 +587,23 @@ APHandler (
       //
       for (Timer = StartSyncTimer ();
            !IsSyncTimerTimeout (Timer) &&
-           !mSmmMpSyncData->InsideSmm;
+           !(*mSmmMpSyncData->InsideSmm);
            ) {
         CpuPause ();
       }
 
-      if (!mSmmMpSyncData->InsideSmm) {
+      if (!(*mSmmMpSyncData->InsideSmm)) {
         //
         // Give up since BSP is unable to enter SMM
         // and signal the completion of this AP
-        WaitForSemaphore (&mSmmMpSyncData->Counter);
+        WaitForSemaphore (mSmmMpSyncData->Counter);
         return;
       }
     } else {
       //
       // Don't know BSP index. Give up without sending IPI to BSP.
       //
-      WaitForSemaphore (&mSmmMpSyncData->Counter);
+      WaitForSemaphore (mSmmMpSyncData->Counter);
       return;
     }
   }
@@ -666,7 +667,7 @@ APHandler (
     //
     // Check if BSP wants to exit SMM
     //
-    if (!mSmmMpSyncData->InsideSmm) {
+    if (!(*mSmmMpSyncData->InsideSmm)) {
       break;
     }
 
@@ -1043,7 +1044,7 @@ SmiRendezvous (
   // Determine if BSP has been already in progress. Note this must be checked after
   // ValidSmi because BSP may clear a valid SMI source after checking in.
   //
-  BspInProgress = mSmmMpSyncData->InsideSmm;
+  BspInProgress = *mSmmMpSyncData->InsideSmm;
 
   if (!BspInProgress && !ValidSmi) {
     //
@@ -1058,7 +1059,7 @@ SmiRendezvous (
     //
     // Signal presence of this processor
     //
-    if (ReleaseSemaphore (&mSmmMpSyncData->Counter) == 0) {
+    if (ReleaseSemaphore (mSmmMpSyncData->Counter) == 0) {
       //
       // BSP has already ended the synchronization, so QUIT!!!
       //
@@ -1066,7 +1067,7 @@ SmiRendezvous (
       //
       // Wait for BSP's signal to finish SMI
       //
-      while (mSmmMpSyncData->AllCpusInSync) {
+      while (*mSmmMpSyncData->AllCpusInSync) {
         CpuPause ();
       }
       goto Exit;
@@ -1173,7 +1174,7 @@ SmiRendezvous (
     //
     // Wait for BSP's signal to exit SMI
     //
-    while (mSmmMpSyncData->AllCpusInSync) {
+    while (*mSmmMpSyncData->AllCpusInSync) {
       CpuPause ();
      }
 
@@ -1234,6 +1235,12 @@ InitializeSmmCpuSemaphores (
   SemaphoreAddr += SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock
                                                   = (SPIN_LOCK *)SemaphoreAddr;
+
+  mSmmMpSyncData->Counter       = mSmmCpuSemaphores.SemaphoreGlobal.Counter;
+  mSmmMpSyncData->InsideSmm     = mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm;
+  mSmmMpSyncData->AllCpusInSync = mSmmCpuSemaphores.SemaphoreGlobal.AllCpusInSync;
+  mPFLock                       = mSmmCpuSemaphores.SemaphoreGlobal.PFLock;
+  mConfigSmmCodeAccessCheckLock = mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock;
 
   mSemaphoreSize = SemaphoreSize;
 }

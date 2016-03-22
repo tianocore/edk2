@@ -314,10 +314,10 @@ typedef struct {
   // so that UC cache-ability can be set together.
   //
   SMM_CPU_DATA_BLOCK            *CpuData;
-  volatile UINT32               Counter;
+  volatile UINT32               *Counter;
   volatile UINT32               BspIndex;
-  volatile BOOLEAN              InsideSmm;
-  volatile BOOLEAN              AllCpusInSync;
+  volatile BOOLEAN              *InsideSmm;
+  volatile BOOLEAN              *AllCpusInSync;
   volatile SMM_CPU_SYNC_MODE    EffectiveSyncMode;
   volatile BOOLEAN              SwitchBsp;
   volatile BOOLEAN              *CandidateBsp;
@@ -388,6 +388,8 @@ extern UINTN                               mSmmStackArrayEnd;
 extern UINTN                               mSmmStackSize;
 extern EFI_SMM_CPU_SERVICE_PROTOCOL        mSmmCpuService;
 extern IA32_DESCRIPTOR                     gcSmiInitGdtr;
+extern SPIN_LOCK                           *mPFLock;
+extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
 
 /**
   Create 4G PageTable in SMRAM.
