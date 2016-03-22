@@ -1305,6 +1305,7 @@ BootMaintCallback (
 
 **/
 BOOLEAN 
+EFIAPI
 CreateBootOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
@@ -1318,6 +1319,7 @@ CreateBootOptionFromFile (
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN 
+EFIAPI
 CreateDriverOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );
@@ -1332,6 +1334,7 @@ CreateDriverOptionFromFile (
   
 **/
 BOOLEAN 
+EFIAPI
 BootFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   );

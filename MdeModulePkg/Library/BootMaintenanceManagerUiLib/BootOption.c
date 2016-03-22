@@ -857,6 +857,7 @@ GetDriverOrder (
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN 
+EFIAPI
 BootFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   )
@@ -929,6 +930,7 @@ ReSendForm(
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN 
+EFIAPI
 CreateBootOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   )
@@ -946,6 +948,7 @@ CreateBootOptionFromFile (
 
 **/
 BOOLEAN 
+EFIAPI
 CreateDriverOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   )
