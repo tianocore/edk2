@@ -1208,6 +1208,7 @@ InitializeSmmCpuSemaphores (
   UINTN                      ProcessorCount;
   UINTN                      TotalSize;
   UINTN                      GlobalSemaphoresSize;
+  UINTN                      CpuSemaphoresSize;
   UINTN                      SemaphoreSize;
   UINTN                      Pages;
   UINTN                      *SemaphoreBlock;
@@ -1216,7 +1217,8 @@ InitializeSmmCpuSemaphores (
   SemaphoreSize   = GetSpinLockProperties ();
   ProcessorCount = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
   GlobalSemaphoresSize = (sizeof (SMM_CPU_SEMAPHORE_GLOBAL) / sizeof (VOID *)) * SemaphoreSize;
-  TotalSize = GlobalSemaphoresSize;
+  CpuSemaphoresSize    = (sizeof (SMM_CPU_SEMAPHORE_CPU) / sizeof (VOID *)) * ProcessorCount * SemaphoreSize;
+  TotalSize = GlobalSemaphoresSize + CpuSemaphoresSize;
   DEBUG((EFI_D_INFO, "One Semaphore Size    = 0x%x\n", SemaphoreSize));
   DEBUG((EFI_D_INFO, "Total Semaphores Size = 0x%x\n", TotalSize));
   Pages = EFI_SIZE_TO_PAGES (TotalSize);
@@ -1235,6 +1237,13 @@ InitializeSmmCpuSemaphores (
   SemaphoreAddr += SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock
                                                   = (SPIN_LOCK *)SemaphoreAddr;
+
+  SemaphoreAddr = (UINTN)SemaphoreBlock + GlobalSemaphoresSize;
+  mSmmCpuSemaphores.SemaphoreCpu.Busy    = (SPIN_LOCK *)SemaphoreAddr;
+  SemaphoreAddr += ProcessorCount * SemaphoreSize;
+  mSmmCpuSemaphores.SemaphoreCpu.Run     = (UINT32 *)SemaphoreAddr;
+  SemaphoreAddr += ProcessorCount * SemaphoreSize;
+  mSmmCpuSemaphores.SemaphoreCpu.Present = (BOOLEAN *)SemaphoreAddr;
 
   mSmmMpSyncData->Counter       = mSmmCpuSemaphores.SemaphoreGlobal.Counter;
   mSmmMpSyncData->InsideSmm     = mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm;

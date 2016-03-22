@@ -367,10 +367,21 @@ typedef struct {
 } SMM_CPU_SEMAPHORE_GLOBAL;
 
 ///
+/// All semaphores for each processor
+///
+typedef struct {
+  SPIN_LOCK                         *Busy;
+  volatile UINT32                   *Run;
+  volatile BOOLEAN                  *Present;
+} SMM_CPU_SEMAPHORE_CPU;
+
+
+///
 /// All semaphores' information
 ///
 typedef struct {
   SMM_CPU_SEMAPHORE_GLOBAL          SemaphoreGlobal;
+  SMM_CPU_SEMAPHORE_CPU             SemaphoreCpu;
 } SMM_CPU_SEMAPHORES;
 
 extern IA32_DESCRIPTOR                     gcSmiGdtr;
