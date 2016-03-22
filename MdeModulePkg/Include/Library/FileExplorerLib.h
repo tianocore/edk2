@@ -16,20 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __FILE_EXPLORER_LIB_H__
 #define __FILE_EXPLORER_LIB_H__
 
-/**
-  Prototype for the next process after user chosed one file.
-
-  @param[in] FilePath     The device path of the find file.
-
-  @retval    TRUE         Need exit file explorer after do the extra task.
-  @retval    FALSE        Not need to exit file explorer after do the extra task.
-
-**/
-typedef
-BOOLEAN
-(EFIAPI *CHOOSE_HANDLER)(
-  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
-  );
+#include <Protocol/FileExplorer.h>
 
 /**
   Choose a file in the specified directory. 
