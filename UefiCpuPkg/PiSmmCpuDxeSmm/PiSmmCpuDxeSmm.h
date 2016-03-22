@@ -326,7 +326,7 @@ typedef struct {
 #define MSR_SPIN_LOCK_INIT_NUM 15
 
 typedef struct {
-  SPIN_LOCK    SpinLock;
+  SPIN_LOCK    *SpinLock;
   UINT32       MsrIndex;
 } MP_MSR_LOCK;
 
@@ -409,6 +409,8 @@ extern UINTN                               mSmmStackArrayEnd;
 extern UINTN                               mSmmStackSize;
 extern EFI_SMM_CPU_SERVICE_PROTOCOL        mSmmCpuService;
 extern IA32_DESCRIPTOR                     gcSmiInitGdtr;
+extern SMM_CPU_SEMAPHORES                  mSmmCpuSemaphores;
+extern UINTN                               mSemaphoreSize;
 extern SPIN_LOCK                           *mPFLock;
 extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
 
