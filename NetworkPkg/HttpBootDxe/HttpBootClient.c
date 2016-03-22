@@ -570,6 +570,7 @@ HttpBootFreeCacheList (
   @param[out]         Buffer          The memory buffer to transfer the file to. IF Buffer is NULL,
                                       then the size of the requested file is returned in
                                       BufferSize.
+  @param[out]         ImageType       The image type of the downloaded file.
 
   @retval EFI_SUCCESS          Successfully created.
   @retval Others               Failed to create HttpIo.
@@ -580,7 +581,8 @@ HttpBootGetFileFromCache (
   IN     HTTP_BOOT_PRIVATE_DATA   *Private,
   IN     CHAR16                   *Uri,
   IN OUT UINTN                    *BufferSize,
-     OUT UINT8                    *Buffer
+     OUT UINT8                    *Buffer,
+     OUT HTTP_BOOT_IMAGE_TYPE     *ImageType
   )
 {
   LIST_ENTRY                  *Entry;
@@ -589,7 +591,7 @@ HttpBootGetFileFromCache (
   HTTP_BOOT_ENTITY_DATA       *EntityData;
   UINTN                       CopyedSize;
   
-  if (Uri == NULL || BufferSize == 0 || Buffer == NULL) {
+  if (Uri == NULL || BufferSize == 0 || Buffer == NULL || ImageType == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -603,7 +605,12 @@ HttpBootGetFileFromCache (
         (StrCmp (Uri, Cache->RequestData->Url) == 0)) 
     {
       //
-      // Hit cache, check buffer size.
+      // Hit in cache, record image type.
+      //
+      *ImageType  = Cache->ImageType;
+
+      //
+      // Check buffer size.
       //
       if (*BufferSize < Cache->EntityLength) {
         *BufferSize = Cache->EntityLength;
@@ -712,6 +719,7 @@ HttpBootGetBootFileCallback (
   @param[out]      Buffer          The memory buffer to transfer the file to. IF Buffer is NULL,
                                    then the size of the requested file is returned in
                                    BufferSize.
+  @param[out]      ImageType       The image type of the downloaded file.
 
   @retval EFI_SUCCESS              The file was loaded.
   @retval EFI_INVALID_PARAMETER    BufferSize is NULL or Buffer Size is not NULL but Buffer is NULL.
@@ -727,7 +735,8 @@ HttpBootGetBootFile (
   IN     HTTP_BOOT_PRIVATE_DATA   *Private,
   IN     BOOLEAN                  HeaderOnly,
   IN OUT UINTN                    *BufferSize,
-     OUT UINT8                    *Buffer
+     OUT UINT8                    *Buffer,
+     OUT HTTP_BOOT_IMAGE_TYPE     *ImageType
   )
 {
   EFI_STATUS                 Status;
@@ -750,7 +759,7 @@ HttpBootGetBootFile (
   ASSERT (Private != NULL);
   ASSERT (Private->HttpCreated);
 
-  if (BufferSize == NULL) {
+  if (BufferSize == NULL || ImageType == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -767,7 +776,7 @@ HttpBootGetBootFile (
   }
   AsciiStrToUnicodeStr (Private->BootFileUri, Url);
   if (!HeaderOnly) {
-    Status = HttpBootGetFileFromCache (Private, Url, BufferSize, Buffer);
+    Status = HttpBootGetFileFromCache (Private, Url, BufferSize, Buffer, ImageType);
     if (Status != EFI_NOT_FOUND) {
       FreePool (Url);
       return Status;
@@ -788,6 +797,7 @@ HttpBootGetBootFile (
       Status = EFI_OUT_OF_RESOURCES;
       goto ERROR_1;
     }
+    Cache->ImageType = ImageTypeMax;
     InitializeListHead (&Cache->EntityDataList);
   }
 
@@ -919,10 +929,25 @@ HttpBootGetBootFile (
   }
 
   //
+  // Check the image type according to server's response.
+  //
+  Status = HttpBootCheckImageType (
+             Private->BootFileUri,
+             Private->BootFileUriParser,
+             ResponseData->HeaderCount,
+             ResponseData->Headers,
+             ImageType
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_5;
+  }
+
+  //
   // 3.2 Cache the response header.
   //
   if (Cache != NULL) {
     Cache->ResponseData = ResponseData;
+    Cache->ImageType = *ImageType;
   }
   
   //

@@ -1007,3 +1007,145 @@ HttpBootParseFilePath (
 
   return EFI_SUCCESS;
 }
+
+/**
+  This function returns the image type according to server replied HTTP message
+  and also the image's URI info.
+
+  @param[in]    Uri              The pointer to the image's URI string.
+  @param[in]    UriParser        URI Parse result returned by NetHttpParseUrl(). 
+  @param[in]    HeaderCount      Number of HTTP header structures in Headers list. 
+  @param[in]    Headers          Array containing list of HTTP headers.
+  @param[out]   ImageType        The image type of the downloaded file.
+  
+  @retval EFI_SUCCESS            The image type is returned in ImageType.
+  @retval EFI_INVALID_PARAMETER  ImageType, Uri or UriParser is NULL.
+  @retval EFI_INVALID_PARAMETER  HeaderCount is not zero, and Headers is NULL.
+  @retval EFI_NOT_FOUND          Failed to identify the image type.
+  @retval Others                 Unexpect error happened.
+
+**/
+EFI_STATUS
+HttpBootCheckImageType (
+  IN      CHAR8                  *Uri,
+  IN      VOID                   *UriParser,
+  IN      UINTN                  HeaderCount,
+  IN      EFI_HTTP_HEADER        *Headers,
+     OUT  HTTP_BOOT_IMAGE_TYPE   *ImageType
+  )
+{
+  EFI_STATUS            Status;
+  EFI_HTTP_HEADER       *Header;
+  CHAR8                 *FilePath;
+  CHAR8                 *FilePost;
+
+  if (Uri == NULL || UriParser == NULL || ImageType == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (HeaderCount != 0 && Headers == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Determine the image type by the HTTP Content-Type header field first.
+  //   "application/efi" -> EFI Image
+  //
+  Header = HttpFindHeader (HeaderCount, Headers, HTTP_HEADER_CONTENT_TYPE);
+  if (Header != NULL) {
+    if (AsciiStriCmp (Header->FieldValue, HTTP_CONTENT_TYPE_APP_EFI) == 0) {
+      *ImageType = ImageTypeEfi;
+      return EFI_SUCCESS;
+    }
+  }
+
+  //
+  // Determine the image type by file extension:
+  //   *.efi -> EFI Image
+  //   *.iso -> CD/DVD Image
+  //   *.img -> Virtual Disk Image
+  //
+  Status = HttpUrlGetPath (
+             Uri,
+             UriParser,
+             &FilePath
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  FilePost = FilePath + AsciiStrLen (FilePath) - 4;
+  if (AsciiStrCmp (FilePost, ".efi") == 0) {
+    *ImageType = ImageTypeEfi;
+  } else if (AsciiStrCmp (FilePost, ".iso") == 0) {
+    *ImageType = ImageTypeVirtualCd;
+  } else if (AsciiStrCmp (FilePost, ".img") == 0) {
+    *ImageType = ImageTypeVirtualDisk;
+  } else {
+    *ImageType = ImageTypeMax;
+  }
+
+  FreePool (FilePath);
+
+  return (*ImageType < ImageTypeMax) ? EFI_SUCCESS : EFI_NOT_FOUND;
+}
+
+/**
+  This function register the RAM disk info to the system.
+  
+  @param[in]       Private         The pointer to the driver's private data.
+  @param[in]       BufferSize      The size of Buffer in bytes.
+  @param[in]       Buffer          The base address of the RAM disk.
+  @param[in]       ImageType       The image type of the file in Buffer.
+
+  @retval EFI_SUCCESS              The RAM disk has been registered.
+  @retval EFI_NOT_FOUND            No RAM disk protocol instances were found.
+  @retval EFI_UNSUPPORTED          The ImageType is not supported.
+  @retval Others                   Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpBootRegisterRamDisk (
+  IN  HTTP_BOOT_PRIVATE_DATA       *Private,
+  IN  UINTN                        BufferSize,
+  IN  VOID                         *Buffer,
+  IN  HTTP_BOOT_IMAGE_TYPE         ImageType
+  )
+{
+  EFI_RAM_DISK_PROTOCOL      *RamDisk;
+  EFI_STATUS                 Status;
+  EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
+  EFI_GUID                   *RamDiskType;
+  
+  ASSERT (Private != NULL);
+  ASSERT (Buffer != NULL);
+  ASSERT (BufferSize != 0);
+
+  Status = gBS->LocateProtocol (&gEfiRamDiskProtocolGuid, NULL, (VOID**) &RamDisk);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "HTTP Boot: Couldn't find the RAM Disk protocol - %r\n", Status));
+    return Status;
+  }
+
+  if (ImageType == ImageTypeVirtualCd) {
+    RamDiskType = &gEfiVirtualCdGuid;
+  } else if (ImageType == ImageTypeVirtualDisk) {
+    RamDiskType = &gEfiVirtualDiskGuid;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+  
+  Status = RamDisk->Register (
+             (UINTN)Buffer,
+             (UINT64)BufferSize,
+             RamDiskType,
+             Private->UsingIpv6 ? Private->Ip6Nic->DevicePath : Private->Ip4Nic->DevicePath,
+             &DevicePath
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "HTTP Boot: Failed to register RAM Disk - %r\n", Status));
+  }
+
+  return Status;
+}
+

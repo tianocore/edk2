@@ -81,6 +81,7 @@
   gEfiIp6ProtocolGuid                             ## TO_START
   gEfiIp6ConfigProtocolGuid                       ## TO_START
   gEfiNetworkInterfaceIdentifierProtocolGuid_31   ## SOMETIMES_CONSUMES
+  gEfiRamDiskProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiHiiConfigAccessProtocolGuid                 ## BY_START
 
 [Guids]
@@ -89,6 +90,8 @@
   ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData     mHttpBootConfigStorageName
   ## SOMETIMES_CONSUMES ## HII
   gHttpBootConfigGuid
+  gEfiVirtualCdGuid            ## SOMETIMES_CONSUMES ## GUID
+  gEfiVirtualDiskGuid          ## SOMETIMES_CONSUMES ## GUID
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpBootDxeExtra.uni

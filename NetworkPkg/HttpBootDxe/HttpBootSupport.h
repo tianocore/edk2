@@ -347,4 +347,51 @@ HttpBootParseFilePath (
      OUT CHAR8                        **UriAddress
   );
 
+/**
+  This function returns the image type according to server replied HTTP message
+  and also the image's URI info.
+
+  @param[in]    Uri              The pointer to the image's URI string.
+  @param[in]    UriParser        URI Parse result returned by NetHttpParseUrl(). 
+  @param[in]    HeaderCount      Number of HTTP header structures in Headers list. 
+  @param[in]    Headers          Array containing list of HTTP headers.
+  @param[out]   ImageType        The image type of the downloaded file.
+  
+  @retval EFI_SUCCESS            The image type is returned in ImageType.
+  @retval EFI_INVALID_PARAMETER  ImageType, Uri or UriParser is NULL.
+  @retval EFI_INVALID_PARAMETER  HeaderCount is not zero, and Headers is NULL.
+  @retval EFI_NOT_FOUND          Failed to identify the image type.
+  @retval Others                 Unexpect error happened.
+
+**/
+EFI_STATUS
+HttpBootCheckImageType (
+  IN      CHAR8                  *Uri,
+  IN      VOID                   *UriParser,
+  IN      UINTN                  HeaderCount,
+  IN      EFI_HTTP_HEADER        *Headers,
+     OUT  HTTP_BOOT_IMAGE_TYPE   *ImageType
+  );
+
+/**
+  This function register the RAM disk info to the system.
+  
+  @param[in]       Private         The pointer to the driver's private data.
+  @param[in]       BufferSize      The size of Buffer in bytes.
+  @param[in]       Buffer          The base address of the RAM disk.
+  @param[in]       ImageType       The image type of the file in Buffer.
+
+  @retval EFI_SUCCESS              The RAM disk has been registered.
+  @retval EFI_NOT_FOUND            No RAM disk protocol instances were found.
+  @retval EFI_UNSUPPORTED          The ImageType is not supported.
+  @retval Others                   Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpBootRegisterRamDisk (
+  IN  HTTP_BOOT_PRIVATE_DATA       *Private,
+  IN  UINTN                        BufferSize,
+  IN  VOID                         *Buffer,
+  IN  HTTP_BOOT_IMAGE_TYPE         ImageType
+  );
 #endif

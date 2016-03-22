@@ -17,6 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Enable the use of UEFI HTTP boot function.
 
+  If the driver has already been started but not satisfy the requirement (IP stack and 
+  specified boot file path), this function will stop the driver and start it again.
+
   @param[in]    Private            The pointer to the driver's private data.
   @param[in]    UsingIpv6          Specifies the type of IP addresses that are to be
                                    used during the session that is being started.
@@ -24,7 +27,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]    FilePath           The device specific path of the file to load.
 
   @retval EFI_SUCCESS              HTTP boot was successfully enabled.
-  @retval EFI_INVALID_PARAMETER    Private is NULL.
+  @retval EFI_INVALID_PARAMETER    Private is NULL or FilePath is NULL.
+  @retval EFI_INVALID_PARAMETER    The FilePath doesn't contain a valid URI device path node.
   @retval EFI_ALREADY_STARTED      The driver is already in started state.
   @retval EFI_OUT_OF_RESOURCES     There are not enough resources.
   
@@ -38,13 +42,50 @@ HttpBootStart (
 {
   UINTN                Index;
   EFI_STATUS           Status;
+  CHAR8                *Uri;
+  
 
   if (Private == NULL || FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
+  
+  //
+  // Check the URI in the input FilePath, in order to see whether it is
+  // required to boot from a new specified boot file. 
+  //
+  Status = HttpBootParseFilePath (FilePath, &Uri);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // Check whether we need to stop and restart the HTTP boot driver.
+  //
   if (Private->Started) {
-    return EFI_ALREADY_STARTED;
+    //
+    // Restart is needed in 2 cases:
+    // 1. Http boot driver has already been started but not on the required IP stack.
+    // 2. The specified boot file URI in FilePath is different with the one we have
+    // recorded before.
+    //
+    if ((UsingIpv6 != Private->UsingIpv6) || 
+        ((Uri != NULL) && (AsciiStrCmp (Private->BootFileUri, Uri) != 0))) {
+      //
+      // Restart is required, first stop then continue this start function.
+      //
+      Status = HttpBootStop (Private);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    } else {
+      //
+      // Restart is not required.
+      //
+      if (Uri != NULL) {
+        FreePool (Uri);
+      }
+      return EFI_ALREADY_STARTED;
+    }
   }
 
   //
@@ -55,17 +96,16 @@ HttpBootStart (
   } else if (!UsingIpv6 && Private->Ip4Nic != NULL) {
     Private->UsingIpv6 = FALSE;
   } else {
+    if (Uri != NULL) {
+      FreePool (Uri);
+    }
     return EFI_UNSUPPORTED;
   }
 
   //
-  // Check whether the URI address is specified.
+  // Record the specified URI and prepare the URI parser if needed.
   //
-  Status = HttpBootParseFilePath (FilePath, &Private->FilePathUri);
-  if (EFI_ERROR (Status)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
+  Private->FilePathUri = Uri;
   if (Private->FilePathUri != NULL) {
     Status = HttpParseUrl (
                Private->FilePathUri,
@@ -74,6 +114,7 @@ HttpBootStart (
                &Private->FilePathUriParser
                );
     if (EFI_ERROR (Status)) {
+      FreePool (Private->FilePathUri);
       return Status;
     }
   }
@@ -101,7 +142,7 @@ HttpBootStart (
       return Status;
     }
   }
-  Private->Started = TRUE;
+  Private->Started   = TRUE;
 
   return EFI_SUCCESS;
 }
@@ -161,9 +202,11 @@ HttpBootDhcp (
   @param[in]          Buffer          The memory buffer to transfer the file to. If Buffer is NULL,
                                       then the size of the requested file is returned in
                                       BufferSize.
+  @param[out]         ImageType       The image type of the downloaded file.
 
   @retval EFI_SUCCESS                 Boot file was loaded successfully.
-  @retval EFI_INVALID_PARAMETER       Private is NULL.
+  @retval EFI_INVALID_PARAMETER       Private is NULL, or ImageType is NULL, or BufferSize is NULL.
+  @retval EFI_INVALID_PARAMETER       *BufferSize is not zero, and Buffer is NULL.
   @retval EFI_NOT_STARTED             The driver is in stopped state.
   @retval EFI_BUFFER_TOO_SMALL        The BufferSize is too small to read the boot file. BufferSize has 
                                       been updated with the size needed to complete the request.
@@ -175,12 +218,17 @@ EFI_STATUS
 HttpBootLoadFile (
   IN     HTTP_BOOT_PRIVATE_DATA       *Private,
   IN OUT UINTN                        *BufferSize,
-  IN     VOID                         *Buffer       OPTIONAL
+  IN     VOID                         *Buffer,       OPTIONAL
+     OUT HTTP_BOOT_IMAGE_TYPE         *ImageType
   )
 {
   EFI_STATUS             Status;
 
-  if (Private == NULL) {
+  if (Private == NULL || ImageType == NULL || BufferSize == NULL ) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*BufferSize != 0 && Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   
@@ -222,7 +270,8 @@ HttpBootLoadFile (
                Private,
                TRUE,
                &Private->BootFileSize,
-               NULL
+               NULL,
+               ImageType
                );
     if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
       //
@@ -233,7 +282,8 @@ HttpBootLoadFile (
                  Private,
                  FALSE,
                  &Private->BootFileSize,
-                 NULL
+                 NULL,
+                 ImageType
                  );
       if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
         return Status;
@@ -253,7 +303,8 @@ HttpBootLoadFile (
             Private,
             FALSE,
             BufferSize,
-            Buffer
+            Buffer,
+            ImageType
             );
 }
 
@@ -388,6 +439,7 @@ HttpBootDxeLoadFile (
   BOOLEAN                       MediaPresent;
   BOOLEAN                       UsingIpv6;
   EFI_STATUS                    Status;
+  HTTP_BOOT_IMAGE_TYPE          ImageType;
 
   if (This == NULL || BufferSize == NULL || FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -424,46 +476,34 @@ HttpBootDxeLoadFile (
   // Initialize HTTP boot.
   //
   Status = HttpBootStart (Private, UsingIpv6, FilePath);
-  if (Status == EFI_ALREADY_STARTED) {
-    //
-    // Restart the HTTP boot driver in 2 cases:
-    // 1. Http boot Driver has already been started but not on the required IP version.
-    // 2. The required boot FilePath is different with the one we produced in the device path
-    // protocol.
-    //
-    if ((UsingIpv6 != Private->UsingIpv6) || ((Private->FilePathUri != NULL) && (AsciiStrCmp (Private->BootFileUri, Private->FilePathUri) != 0))) {
-      Status = HttpBootStop (Private);
-      if (!EFI_ERROR (Status)) {
-        Status = HttpBootStart (Private, UsingIpv6, FilePath);
-      }
-    }
+  if (Status != EFI_SUCCESS && Status != EFI_ALREADY_STARTED) {
+    return Status;
   }
-
+  
   //
   // Load the boot file.
   //
-  if (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED) {
-    Status = HttpBootLoadFile (Private, BufferSize, Buffer);
+  ImageType = ImageTypeMax;
+  Status = HttpBootLoadFile (Private, BufferSize, Buffer, &ImageType);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_BUFFER_TOO_SMALL && (ImageType == ImageTypeVirtualCd || ImageType == ImageTypeVirtualDisk)) {
+      Status = EFI_WARN_FILE_SYSTEM;
+    } else if (Status != EFI_BUFFER_TOO_SMALL) {
+      HttpBootStop (Private);
+    }
+    return Status;
   }
 
-  if (Status != EFI_SUCCESS && Status != EFI_BUFFER_TOO_SMALL) {
-    HttpBootStop (Private);
-  } else {
-    if (!Private->UsingIpv6) {
-      //
-      // Stop and release the DHCP4 child.
-      //
-      Private->Dhcp4->Stop (Private->Dhcp4);
-      Private->Dhcp4->Configure (Private->Dhcp4, NULL);
-    } else {
-      //
-      // Stop and release the DHCP6 child.
-      //
-      Private->Dhcp6->Stop (Private->Dhcp6);
-      Private->Dhcp6->Configure (Private->Dhcp6, NULL);
+  //
+  // Register the RAM Disk to the system if needed.
+  //
+  if (ImageType == ImageTypeVirtualCd || ImageType == ImageTypeVirtualDisk) {
+    Status = HttpBootRegisterRamDisk (Private, *BufferSize, Buffer, ImageType);
+    if (!EFI_ERROR (Status)) {
+      Status = EFI_WARN_FILE_SYSTEM;
     }
   }
-
+  
   return Status;
 }
 

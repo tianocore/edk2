@@ -40,6 +40,7 @@ typedef struct {
   LIST_ENTRY                 Link;            // Link to the CacheList in driver's private data.
   EFI_HTTP_REQUEST_DATA      *RequestData;
   HTTP_IO_RESPONSE_DATA      *ResponseData;   // Not include any message-body data.
+  HTTP_BOOT_IMAGE_TYPE       ImageType;
   UINTN                      EntityLength;
   LIST_ENTRY                 EntityDataList;  // Entity data (message-body)
 } HTTP_BOOT_CACHE_CONTENT;
@@ -105,6 +106,7 @@ HttpBootCreateHttpIo (
   @param[out]      Buffer          The memory buffer to transfer the file to. IF Buffer is NULL,
                                    then the size of the requested file is returned in
                                    BufferSize.
+  @param[out]      ImageType       The image type of the downloaded file.
 
   @retval EFI_SUCCESS              The file was loaded.
   @retval EFI_INVALID_PARAMETER    BufferSize is NULL or Buffer Size is not NULL but Buffer is NULL.
@@ -120,7 +122,8 @@ HttpBootGetBootFile (
   IN     HTTP_BOOT_PRIVATE_DATA   *Private,
   IN     BOOLEAN                  HeaderOnly,
   IN OUT UINTN                    *BufferSize,
-     OUT UINT8                    *Buffer
+     OUT UINT8                    *Buffer,
+     OUT HTTP_BOOT_IMAGE_TYPE     *ImageType
   );
 
 /**

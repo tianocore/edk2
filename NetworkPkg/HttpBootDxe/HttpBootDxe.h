@@ -55,6 +55,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Http.h>
 #include <Protocol/Ip4Config2.h>
 #include <Protocol/Ip6Config.h>
+#include <Protocol/RamDisk.h>
 //
 // Produced Protocols
 //
@@ -71,6 +72,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HTTP_BOOT_DXE_VERSION  0xa
 
 //
+// Provisional Standard Media Types defined in 
+// http://www.iana.org/assignments/provisional-standard-media-types/provisional-standard-media-types.xhtml
+//
+#define HTTP_CONTENT_TYPE_APP_EFI           "application/efi"
+
+//
 // Protocol instances
 //
 extern EFI_DRIVER_BINDING_PROTOCOL  gHttpBootDxeDriverBinding;
@@ -82,6 +89,13 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gHttpBootDxeComponentName;
 //
 typedef struct _HTTP_BOOT_PRIVATE_DATA      HTTP_BOOT_PRIVATE_DATA;
 typedef struct _HTTP_BOOT_VIRTUAL_NIC       HTTP_BOOT_VIRTUAL_NIC;
+
+typedef enum  {
+  ImageTypeEfi,
+  ImageTypeVirtualCd,
+  ImageTypeVirtualDisk,
+  ImageTypeMax
+} HTTP_BOOT_IMAGE_TYPE;
 
 //
 // Include files with internal function prototypes
@@ -166,6 +180,11 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   EFI_IP_ADDRESS                            GatewayIp;
   EFI_IP_ADDRESS                            ServerIp;
   UINT16                                    Port;
+
+  //
+  // The URI string attempt to download through HTTP, may point to
+  // the memory in cached DHCP offer, or to the memory in FilePathUri.
+  //
   CHAR8                                     *BootFileUri;
   VOID                                      *BootFileUriParser;
   UINTN                                     BootFileSize;
