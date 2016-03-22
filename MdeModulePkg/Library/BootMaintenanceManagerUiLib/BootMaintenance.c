@@ -902,12 +902,12 @@ BootMaintCallback (
         switch (QuestionId) {
         case FORM_BOOT_ADD_ID:
           // Leave BMM and enter FileExplorer. 
-          ChooseFile( NULL, L".efi", (CHOOSE_HANDLER) CreateBootOptionFromFile, &File);
+          ChooseFile (NULL, L".efi", CreateBootOptionFromFile, &File);
           break;
 
         case FORM_DRV_ADD_FILE_ID:
           // Leave BMM and enter FileExplorer.
-          ChooseFile( NULL, L".efi", (CHOOSE_HANDLER) CreateDriverOptionFromFile, &File);
+          ChooseFile (NULL, L".efi", CreateDriverOptionFromFile, &File);
           break;
 
         case FORM_DRV_ADD_HANDLE_ID:
@@ -983,7 +983,7 @@ BootMaintCallback (
     }
     if (QuestionId == KEY_VALUE_BOOT_FROM_FILE){
       // Leave BMM and enter FileExplorer.
-      ChooseFile( NULL, L".efi", (CHOOSE_HANDLER) BootFromFile, &File);
+      ChooseFile (NULL, L".efi", BootFromFile, &File);
     }
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if ((Value == NULL) || (ActionRequest == NULL)) {
